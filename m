@@ -1,170 +1,108 @@
-Return-Path: <netdev+bounces-249770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749F9D1D7A0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:21:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A617AD1D7B8
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F531302A96F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:17:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 478BF300794E
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87AE37F8AC;
-	Wed, 14 Jan 2026 09:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9E6387590;
+	Wed, 14 Jan 2026 09:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yyhei6ub"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4329A37F8B0;
-	Wed, 14 Jan 2026 09:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0EE387379;
+	Wed, 14 Jan 2026 09:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768382237; cv=none; b=D3yF4B9v3cJv2THh67xhHTrOLQhgtrUT1F8Ipv2kn3qqqfP+o4yePEaAYOYbEZgIngau39muBkC1FebuCSkJjCCARLwsnPAvA1OyunvzKeM2YVdkiTHsUtgtV11oWP4NUh2xC6q4CKAhJufrm2/E5TesGBXzUNZoXx8p1T6cUpA=
+	t=1768382344; cv=none; b=fh89n5KVOF4BPBn76jSGIuH6aD2pWIhjfXrCA1t/sanIX4DRNLjq60izHccJiwcv7JI4fYy/7kpwK0y9+3ldvO2sr8uneEljaHoW/ll8frNU1aPiPohY2e63YPLiUc8S8TJyOJWE8sHtqy3VaO7SuJHHrNLEJhr7zIBYxNYlFbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768382237; c=relaxed/simple;
-	bh=f6mizSXYfiX4UrL28TthCwr5Nr9HvVn4bJL9YsfTPm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QKYsg5ZMxXAyhqv7oX/VEJkrVZV2Dtwqm2yoCkJhvhNCe/tkRBkvVCFBtG2QDtZ7LYW8BKuI2Qot9b4mPAfuaQ7FVV3jIZs06pZ7xQsMigslv733Li9D5XyZ6lkP65Ktl0uN4Nmc1tM4znoOe6B/sF7PfGS4PZZB9og40xrtbjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.44.133] (unknown [185.238.219.25])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E14B02394ABD9;
-	Wed, 14 Jan 2026 10:16:31 +0100 (CET)
-Message-ID: <ff44a005-6ebf-45ed-9b84-804d44e2158c@molgen.mpg.de>
-Date: Wed, 14 Jan 2026 10:16:29 +0100
+	s=arc-20240116; t=1768382344; c=relaxed/simple;
+	bh=KbxC/u6GYTvYowvO8ObDteC116pJA/MVS+KEXLvVvMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CF5Hgd2AT5OBdXHCtHuygg9CljC75Ibdw6ocMvJ4EnHW/J6Iaa1OOO4KezE30b6FGzt8u7NpCrUvv3tfvvV3LUS83PPwayK3aMGujvtHbMq6VPWOj7cnEGQdoVovbpFG2+cG/6uvxm9Y9/TUvJVt3TgkpmbSzZW1GEjylsxPOXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yyhei6ub; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 101D1C4CEF7;
+	Wed, 14 Jan 2026 09:18:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768382343;
+	bh=KbxC/u6GYTvYowvO8ObDteC116pJA/MVS+KEXLvVvMc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Yyhei6ubgbQaWNU/bF8i9yhMDk6SzUDFYyxPtuayfkkDSLG16q/qypY7Rcf09Oxq7
+	 Ho1BSMlr0wCWaM+rlpAj5856juRSgv6gwRcjutJUv5eNJve6+wVGVOfeSRTcqbWnEu
+	 Zc9lvK6mhIevgI4Ox2US6qIxIYunLhXXxCcUckP1lpvlBD7G5Un2+UBuWHqZhE/Jum
+	 ujZIahDRdFEVPX5PUK9mCFWNCIVqwh6mqQF6nWJKDBrA/aPujWxT7LQVeZVlvUytYt
+	 NQx2Ff6eayTtSQGXUDJAQ+unIfYyyYPzeu2+IxbkJJN5k/uTZzq9LQ4687MqrvD/Yo
+	 qc7yxorYw/R7A==
+Date: Wed, 14 Jan 2026 09:18:57 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Shahar Shitrit <shshitrit@nvidia.com>,
+	Yael Chemla <ychemla@nvidia.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH net-next V2 0/3] Introduce and use
+ netif_xmit_timeout_ms() helper
+Message-ID: <aWdfgaA2543svwNi@horms.kernel.org>
+References: <1768209383-1546791-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 2/2] ice: fix retry for AQ
- command 0x06EE
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Jakub Staniszewski <jakub.staniszewski@linux.intel.com>,
- stable@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20260113193817.582-1-dawid.osuchowski@linux.intel.com>
- <20260113193817.582-3-dawid.osuchowski@linux.intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260113193817.582-3-dawid.osuchowski@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1768209383-1546791-1-git-send-email-tariqt@nvidia.com>
 
-Dear Dawid, dear Jakub,
-
-
-Thank you for your patch.
-
-Am 13.01.26 um 20:38 schrieb Dawid Osuchowski:
-> From: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
+On Mon, Jan 12, 2026 at 11:16:20AM +0200, Tariq Toukan wrote:
+> Hi,
 > 
-> Executing ethtool -m can fail reporting a netlink I/O error while firmware
-> link management holds the i2c bus used to communicate with the module.
+> This is V2, find V1 here:
+> https://lore.kernel.org/all/1764054776-1308696-1-git-send-email-tariqt@nvidia.com/
 > 
-> According to Intel(R) Ethernet Controller E810 Datasheet Rev 2.8 [1]
-> Section 3.3.10.4 Read/Write SFF EEPROM (0x06EE)
-> request should to be retried upon receiving EBUSY from firmware.
+> This series by Shahar introduces a new helper function
+> netif_xmit_timeout_ms() to check if a TX queue has timed out and report
+> the timeout duration.
+> It also encapsulates the check for whether the TX queue is stopped.
 > 
-> Commit e9c9692c8a81 ("ice: Reimplement module reads used by ethtool")
-> implemented it only for part of ice_get_module_eeprom(), leaving all other
-> calls to ice_aq_sff_eeprom() vulnerable to returning early on getting
-> EBUSY without retrying.
+> Replace duplicated open-coded timeout check in hns3 driver with the new
+> helper.
 > 
-> Remove the retry loop from ice_get_module_eeprom() and add Admin Queue
-> (AQ) command with opcode 0x06EE to the list of commands that should be
-> retried on receiving EBUSY from firmware.
+> For mlx5e, refine the TX timeout recovery flow to act only on SQs whose
+> transmit timestamp indicates an actual timeout, as determined by the
+> helper. This prevents unnecessary channel reopen events caused by
+> attempting recovery on queues that are merely stopped but not truly
+> timed out.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: e9c9692c8a81 ("ice: Reimplement module reads used by ethtool")
-> Signed-off-by: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
-> Co-developed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Link: https://www.intel.com/content/www/us/en/content-details/613875/intel-ethernet-controller-e810-datasheet.html [1]
-> ---
->   drivers/net/ethernet/intel/ice/ice_common.c  |  1 +
->   drivers/net/ethernet/intel/ice/ice_ethtool.c | 35 ++++++++------------
->   2 files changed, 15 insertions(+), 21 deletions(-)
+> Regards,
+> Tariq
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index aab00c44e9b2..26eb8e05498b 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -1854,6 +1854,7 @@ static bool ice_should_retry_sq_send_cmd(u16 opcode)
->   	case ice_aqc_opc_lldp_stop:
->   	case ice_aqc_opc_lldp_start:
->   	case ice_aqc_opc_lldp_filter_ctrl:
-> +	case ice_aqc_opc_sff_eeprom:
->   		return true;
->   	}
->   
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 3565a5d96c6d..478876908db1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -4496,7 +4496,7 @@ ice_get_module_eeprom(struct net_device *netdev,
->   	u8 addr = ICE_I2C_EEPROM_DEV_ADDR;
->   	struct ice_hw *hw = &pf->hw;
->   	bool is_sfp = false;
-> -	unsigned int i, j;
-> +	unsigned int i;
->   	u16 offset = 0;
->   	u8 page = 0;
->   	int status;
-> @@ -4538,26 +4538,19 @@ ice_get_module_eeprom(struct net_device *netdev,
->   		if (page == 0 || !(data[0x2] & 0x4)) {
->   			u32 copy_len;
->   
-> -			/* If i2c bus is busy due to slow page change or
-> -			 * link management access, call can fail. This is normal.
-> -			 * So we retry this a few times.
-> -			 */
-> -			for (j = 0; j < 4; j++) {
-> -				status = ice_aq_sff_eeprom(hw, 0, addr, offset, page,
-> -							   !is_sfp, value,
-> -							   SFF_READ_BLOCK_SIZE,
-> -							   0, NULL);
-> -				netdev_dbg(netdev, "SFF %02X %02X %02X %X = %02X%02X%02X%02X.%02X%02X%02X%02X (%X)\n",
-> -					   addr, offset, page, is_sfp,
-> -					   value[0], value[1], value[2], value[3],
-> -					   value[4], value[5], value[6], value[7],
-> -					   status);
-> -				if (status) {
-> -					usleep_range(1500, 2500);
-> -					memset(value, 0, SFF_READ_BLOCK_SIZE);
-> -					continue;
-> -				}
-> -				break;
-> +			status = ice_aq_sff_eeprom(hw, 0, addr, offset, page,
-> +						   !is_sfp, value,
-> +						   SFF_READ_BLOCK_SIZE,
-> +						   0, NULL);
-> +			netdev_dbg(netdev, "SFF %02X %02X %02X %X = %02X%02X%02X%02X.%02X%02X%02X%02X (%pe)\n",
-> +				   addr, offset, page, is_sfp,
-> +				   value[0], value[1], value[2], value[3],
-> +				   value[4], value[5], value[6], value[7],
-> +				   ERR_PTR(status));
-> +			if (status) {
-> +				netdev_err(netdev, "%s: error reading module EEPROM: status %pe\n",
-> +					   __func__, ERR_PTR(status));
-> +				return status;
->   			}
->   
->   			/* Make sure we have enough room for the new block */
+> V2:
+> - Rebase.
+> - Move helper to include/net/netdev_queues.h.
+> - Remove output paramter trans_start from the new helper.
+> - Revert the code in dev_watchdog to not use the helper.
+> - Fix the helper name in commit message.
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Thanks for the updates.
+I agree the address the review of v1.
+And, overall, this looks good to me.
 
-
-Kind regards,
-
-Paul
+Reviewed-by: Simon Horman <horms@kernel.org>
 
