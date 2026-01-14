@@ -1,81 +1,146 @@
-Return-Path: <netdev+bounces-249742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DACA6D1D027
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:04:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D9AD1D0B8
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 030673008E26
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:04:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 445D4300BDA3
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A29337C0E9;
-	Wed, 14 Jan 2026 08:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E793612C2;
+	Wed, 14 Jan 2026 08:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UlhPj/Cd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a/ZhogS/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8442835F8AF;
-	Wed, 14 Jan 2026 08:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D892F693D;
+	Wed, 14 Jan 2026 08:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768377886; cv=none; b=FmgutUjRWZboBLd++K+K+bfjxNNcU7MfIgts/nyBfF9RIH9Vp02tOjyaFxtuLDGvJAxm5E8SWBa3RIxsJgHIfoHUtN6B/cXCQ7dT5je6TF0JP9m9H6+5SYHY1rAkPeIUWUgOygy1HUCBWDINlDw1jHi0OGOlWLq0k9inObiORmU=
+	t=1768378571; cv=none; b=LKX5Ut3DMeGXIeT/00U3MCmBhfXr+gMPBM8H5wrkmR8uTyBQpdg/feBIHXDlL11NpSor1HreC7LwJQ6gQAqCG6feJH/2lCCORNQ5y0zQmgZBOet2MccZt6z5XQbXIkCRvg4N7XnF7nNrNoS3yYXrV5dl2wLMtQlz3e8glxcj2Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768377886; c=relaxed/simple;
-	bh=teWN20ErRnFtv3ipS8RQd+DHv2eZXyLMY8Q+zMcAC9k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLNq2WcI4zElN5PsKzHCjA1tEh6DbtSHRdGL9MK+1eRIf59rmQO2Lnod81EyN6I3prTPzR1eS2wvDlqZ5ZGMMf94QnZ5niUA2flmkmSvOAKTfmhchBNGid1qIUupeR31Gim2HJLoww6KUHjXLg/I4SCR0xM+TubMF6Dt2ctFuuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UlhPj/Cd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36472C4CEF7;
-	Wed, 14 Jan 2026 08:04:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768377885;
-	bh=teWN20ErRnFtv3ipS8RQd+DHv2eZXyLMY8Q+zMcAC9k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UlhPj/CdsZpVwuqS9sYLhiBfxizD0sDhbtpCoZtuThoMEglisoP0wuV02Aeg1qDWY
-	 iTBgcjjqRY3GY0VSfcYY9jbgc2VdAB2Pd3VCaw8MUDpRRsfmW7ds3AuQcOy/X/cCQT
-	 EgfFSnef13TyQdm5OeUG4Vw9sNSmjUIzz2xCgiXfxamDjukHcmRyFGAB8x9H1OQAOV
-	 rCqx0yo2RhSHU7oU/kKVIptXpLaSTBMzTs7dsYislI/+iH1h8j5r5vLmdmm3tB2rcB
-	 rR3DWevVmcpd1aK2zUqjuzoWYq2uKZjh0C1nEjVwL2ysWdhLOmkBsqbUCD+FS8BKe0
-	 3EydlRksfLQkA==
-Date: Wed, 14 Jan 2026 08:04:41 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	workflows@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH] docs: netdev: refine 15-patch limit
-Message-ID: <aWdOGUkpcNaxK-u9@horms.kernel.org>
-References: <20260113-15-minutes-of-fame-v1-1-0806b418c6fd@kernel.org>
- <20260113173454.55a995cc@kernel.org>
+	s=arc-20240116; t=1768378571; c=relaxed/simple;
+	bh=Tk40Z3bVifct2EirVXFgyYO4QzE6BJo2N8YtpP43AC0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rYjuSULoduP1ggjBmSns1qM3wuNJ3Ae1TmxtneavO6+lq54i+MUhpFmMzZsGTcozslIGyKA3p0Qmu6HcpBhuXLivRm2IKrxFj1y/xVwHm8gAY5PXXtDpXwWhZZp5sU/hus2OYjOzUOQL6sEdJ1jElfDcNzE+AtXPDYFKZrLxjKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a/ZhogS/; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768378567; x=1799914567;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Tk40Z3bVifct2EirVXFgyYO4QzE6BJo2N8YtpP43AC0=;
+  b=a/ZhogS/Xw03OPjQm0HDdHHez9uqrI+Nfn2S0Sgh30vF2iCUsh/bTjJo
+   wLEA8542vZXisjzafep8MjmxlprdS2XvBn+tqhP9QewE/meLWtANTKQZf
+   7VteSDHGcRVG4iS4a0xm0hn4salZ59bZzpwrWEWLkVAkmxIW1Zl2IOgvQ
+   U0IabhGRiUpOcfVmhoRaknIr1mET60z4aLC6O0aAJlNygoV5Ch2IdUSZe
+   QIhNo/7SmYpP6IkNSMl79ox3nIRIzvbG/iLu9hGAM+aII5gQCzvIRPc9g
+   LpHcr8Qo7HAdnAefoWjgkMB6H5EinObz/AI1S0SJAUKgWeLcPQvaJrCWR
+   g==;
+X-CSE-ConnectionGUID: 6OowTB87TSeS7/wP83IfQg==
+X-CSE-MsgGUID: QLXcZpYVSDqiraR/d9XJCQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="57228006"
+X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
+   d="scan'208";a="57228006"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 00:16:04 -0800
+X-CSE-ConnectionGUID: HdljNTGlSnmU4yQpS8iDuw==
+X-CSE-MsgGUID: aQ92HTXqTE2w3EbiZCrUwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
+   d="scan'208";a="204506952"
+Received: from soc-5cg4396xfb.clients.intel.com (HELO [172.28.180.91]) ([172.28.180.91])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 00:16:02 -0800
+Message-ID: <954dc352-2ad2-4950-9c8b-55ebafc5841c@linux.intel.com>
+Date: Wed, 14 Jan 2026 09:15:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260113173454.55a995cc@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net 1/2] ice: reintroduce retry
+ mechanism for indirect AQ
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ stable@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Jakub Staniszewski <jakub.staniszewski@linux.intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Michal Schmidt <mschmidt@redhat.com>
+References: <20260113193817.582-1-dawid.osuchowski@linux.intel.com>
+ <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
+ <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298
+ Gdansk - KRS 101882 - NIP 957-07-52-316
+In-Reply-To: <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 13, 2026 at 05:34:54PM -0800, Jakub Kicinski wrote:
-> On Tue, 13 Jan 2026 17:47:15 +0000 Simon Horman wrote:
-> > +Limit patches outstanding on mailing list
-> > +-----------------------------------------
-> > +
-> > +Avoid having more than 15 patches, across all series, outstanding for
-> > +review on the mailing list. This limit is intended to focus developer
-> > +effort on testing patches before upstream review. Aiding the quality of
-> > +upstream submissions, and easing the load on reviewers.
+Hey Paul,
+
+On 2026-01-13 11:31 PM, Paul Menzel wrote:
+> [Cc: +Michal]
 > 
-> Thanks for adding this.
+> Dear Dawid, dear Jakub,
 > 
-> In practice I think the limit is also per tree (net vs net-next)
-> to avoid head of line blocking fixes.
 
-Thanks Jakub,
+...
 
-In v2 I'll update the wording to state that the limit is per-tree.
+> Am 13.01.26 um 20:38 schrieb Dawid Osuchowski:
+>> Ccing Michal, given they are the author of the "reverted" commit.
+> 
+> At least Michal was not in the (visible) Cc: list
+
+Interesting. I was using 'git send-email' without any suppression of Cc 
+or similar options. In the direct email sent from me Michal is in Cc, 
+seems the mailing list for some reason stripped him...
+
+>>   drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++++++---
+>>   1 file changed, 9 insertions(+), 3 deletions(-)
+>>
+
+...
+
+>>       do {
+>>           status = ice_sq_send_cmd(hw, cq, desc, buf, buf_size, cd);
+>>           if (!is_cmd_for_retry || !status ||
+>>               hw->adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
+>>               break;
+>> +        if (buf_cpy)
+>> +            memcpy(buf, buf_cpy, buf_size);
+>>           memcpy(desc, &desc_cpy, sizeof(desc_cpy));
+>> -
+> 
+> Unrelated change?
+> 
+
+During internal review it was pointed out that this function contains a 
+lot of empty lines, this was my feeble attempt to at least partially 
+reduce their count.
+
+>>           msleep(ICE_SQ_SEND_DELAY_TIME_MS);
+>>       } while (++idx < ICE_SQ_SEND_MAX_EXECUTE);
+>> +    kfree(buf_cpy);
+>>       return status;
+>>   }
+> 
+> The diff looks good otherwise.
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> 
+> Kind regards,
+> 
+> Paul
+
+Thanks,
+Dawid
 
