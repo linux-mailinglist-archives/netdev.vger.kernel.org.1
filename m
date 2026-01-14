@@ -1,149 +1,169 @@
-Return-Path: <netdev+bounces-249879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31E6D20160
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:10:14 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA987D200C4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:04:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4C28130ABC41
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:03:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 136AD300217B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2225639E6CB;
-	Wed, 14 Jan 2026 16:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EFD3A1D14;
+	Wed, 14 Jan 2026 16:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hOtt5b8F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwdjZ+3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C87D3A1E71
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 16:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AF6399A59
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 16:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768406588; cv=none; b=gpIlfJMrudyoIRy5uMnm8mkbniA03cSGkERfSrgroSipI63SKV0WzDcDoXS71CNtuen0RZlCdPenU+HtWvKjL2M3+ZDn3pPZI1ORZGLJ+t42z/gZYu8QpR3Ct2E7M3B7xvkQRG823MVQXACV9rYcIyivjHKniZgGgtx6Zbuwgyo=
+	t=1768406692; cv=none; b=NXCFDjStZ6BF5I5gj0/Gwf7574Cxm8djMeFETSKH6pfsFBpDGSD4AwwmLnbIJTjPqYfcR1AyZnj+iVDlhp7Oq+C9KVqloSEAP2tCrzwANtt7Mmfhybqd9jwzadnZoJ4LdQq574t0o41l/jQPglqBEXhUPuHZCHlLr1pFZl8vAgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768406588; c=relaxed/simple;
-	bh=2tLkH0/iG6vO8WMAh6IKcIXI07RsHDeTkCcM+lNhgkk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lhbH22dK01P7ckgvc6a/0oN8QqBu7jJGeHzkdsjde5B5X9W4T4s8o7edMVXZPycQ9R9P1NMDlzZu78eCVNn+UQJYk/QzbziGOSERDce4SMGi7BBxaGgBck8anH1W7n8OkkTvJuDlqecT6ZY59k9dTdMYvkkFG6OsUmoLWVMuuk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=hOtt5b8F; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50145cede6eso11388501cf.2
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:03:06 -0800 (PST)
+	s=arc-20240116; t=1768406692; c=relaxed/simple;
+	bh=AOAKPHneUH2k+u5Nki0rOk/2j6zn7hjEd1n2qbAL9Jg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mvqM9FOmBfk6mY/Vwg4+vs0BRrtZ4OTm1/rA/Es6LM7p9RMvxAGb2vUTXIQ2sKXEILJT7TCrXCB6TflSMYa6F8mZw/RGxyN3OQYnYpjWmTC2kgFMhQeUS21tIyIZzlknOx91DarZgpF34S8EJ7uWWmE578zfG9l/f2vcthIdSUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UwdjZ+3j; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso4825005f8f.2
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768406585; x=1769011385; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768406689; x=1769011489; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yXy1jVjtlrtpHWoi7g7zkT2DTX6xQ93Wmc+QVAORp88=;
-        b=hOtt5b8FKspBFExrv0R52+y1wO7iWgUT2ALXrthbacvIxE8E8rm0Jqgzfk86PKiJVi
-         r7octe8BkGL+kA58kU1zaOFgzgVjfHOMMX9e1M8Jox9Jhiq0vVu1kOyifeg+N9sQmQm1
-         p+IkFLn74I4DbXNqaicLuizalc+YT54+chnIW1D3+26G0irVe2JtZFxsA4nC3j1FzxDL
-         wxCT3EZelv3SKPkrI/8NYA4b0S8pwi709WxOQ7GQRhrKbuEigohPbvbK9RsDQJZD7bUM
-         /3u34IgFlgWk+3jf+NBbuyCKPRpYBO15jsfyb99ZlcZ3WGu2MMtgDIYWZ8O2UulbgGu9
-         vGVA==
+        bh=DFL3Ab0hoeKdAkXw+EXhrpvZ7ps8U7iR9VnnL8zsKgI=;
+        b=UwdjZ+3ja9U6LW28eu4yE/EjY0CLNQj1/LyosjrARrgKRuawfoB0RLZWH2fjSSGA4m
+         9kq6TrgWBLDsTKM6ZlrqoYy82B82MsIdHWUjJ0vf461eb6L36XKlfS5JmERGKyNbNsU2
+         vXNgBR7vSWtIEcBhFoLvJlXHRI38iwMoOStziJhvW0wKi2lapDkCCXlBqWIpy5aeKShr
+         k0aFIUrNz7w+px7SmBIpax4DatWuzvPP87tHpftBqH0DGuPprUgpycoUlfT8lnFjtfca
+         aUKMnJZvsPQ2hHUYeh1lygu01X0XsFppKt0AtrBQvv/hM6/1OpYsBdDy9cPSlZJmJOIQ
+         YkrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768406585; x=1769011385;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1768406689; x=1769011489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=yXy1jVjtlrtpHWoi7g7zkT2DTX6xQ93Wmc+QVAORp88=;
-        b=B9sM1a4ktdZrR81G2AhYYuZpLtsxFiTadFT18f1fLScx2uwLkQ/sI2nrweEaRx5kVJ
-         AmtFB82WK4dGHRT9EWXpgWmeJlOKaizf26Ui/Fe76zbZaiODLt8gUAyanz0VQ+k/nGPF
-         b4z8djU2pMzNgePOxQVHdCz7XiGCOI35s+7KdRaHZMMbccem9JDrBbI2ZaM5hxoKEnbZ
-         E7TYWFKrSL4kZjAJPVZ2FGyHi0VqDmrHyKlaBDIDiihU1EwM1PcilkJS9bUcimk+khfr
-         gjnTIhg2Ti3lRGPX+LolgSrbco4lM606ZcY2e0SIYJoI1l1Mbzc8xToKptQCUefJT8rS
-         sW6g==
-X-Gm-Message-State: AOJu0Yx7RHYy2dV6hwzHnL8/mVZZCIUoDWr8dzp8d4ueTgwOZ5z3A1Fu
-	C1wgSEit3I6e5+t8hGoyCTgH0qux/nPnKT0CdB8Dpc3UntXIndd8xFrORIbe/LuD2g==
-X-Gm-Gg: AY/fxX6hZ323MyNfwEzUkUyxDin4ugQ3Z7chQJqUPZClWgtXgHqo3lWQvdg1LsChXaH
-	aC3sJo/pGv32es0/Y8IERsUXaarykyuAWsRzOL89vus58wyd8ni3jcIIDUzAwRqy1DFU5/c9O8b
-	a6W61DR3kbJD2Oml1IiD+SkeopDLiMAyryLU8cbegLV+IdT0+5Rx0hw+s+uKAHeMipjHN3E8wG7
-	ZGQ2DO8ZMhe2vEu8he8zPxJ925z4z4X3KCDRSAH96E/9bsMVyiLuQ+JpsC0yj3GdYfrKtMItCK7
-	Bl0cYs6Fi8kA8dTx43AhzaA5tANsyMpD4TCVk20f1enoF3DPj0kkKclItuA9FNFRf926AMFnY2E
-	E7mCnaNYv9yzKq6ted6HvArZgZu/JyYOpqw9tMEIObJTqSjPgqEp2AFkEkiH+N3yH6N5rEBlkMi
-	xdg3SGiFv/GCA=
-X-Received: by 2002:a05:622a:4d44:b0:4eb:9d04:bc4b with SMTP id d75a77b69052e-5014821c51dmr40868601cf.31.1768406584486;
-        Wed, 14 Jan 2026 08:03:04 -0800 (PST)
-Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50148ecc0e4sm15543451cf.23.2026.01.14.08.03.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 08:03:03 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: netdev@vger.kernel.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	victor@mojatatu.com,
-	km.kim1503@gmail.com,
-	security@kernel.org
-Subject: [PATCH net 3/3] selftests/tc-testing: Try to add teql as a child qdisc
-Date: Wed, 14 Jan 2026 11:02:43 -0500
-Message-Id: <20260114160243.913069-4-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260114160243.913069-1-jhs@mojatatu.com>
-References: <20260114160243.913069-1-jhs@mojatatu.com>
+        bh=DFL3Ab0hoeKdAkXw+EXhrpvZ7ps8U7iR9VnnL8zsKgI=;
+        b=PNnUns+vNyNWv0QOmq2J31S/FfX9PT1GCxEro0AIlnXYGFuf5xEe22UOZJOEcmIePV
+         sjiYU4RifduyyTPnqWrhwcLjMMfa5YoUJsyVMr+JcBwEm2WuhpS9ugvxSsXrO3PhY5c7
+         Vhz1NqLDfd86A1V2ry7D/Q2Wb+boDZR6zyoeEljK0g+UoQv+xsLp8DVP85GEFxOBZRvQ
+         L5Ev79dRCtvNWjnXmtt1ekohu+62U+P/qKWVmDzO+Vmri9fKe5qrQYJeezYY/yGZAxgh
+         suwvwvlGTdTS9PPrg7/gaNmm1J1kl4ZdgXuqAYhNSLa6Rh/YLnaKYhrJ0tXSwszd+21O
+         B/RA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsypzG/KyoKftYzKKnxnwysL1SVHvh4efUOHPlpspB1XFgejKhJspIvFyUDmvE/Z4R/oeJNVQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOFszy3cGYfms3oc4umVlxlLZn5nrdj4B6KedzvIjJKgxrfpWw
+	5hi2bBY+ce40kyXjAak//9SM4Alri/Cw1srv83Ku4pYRwirf5LXa1nH83nn+ILaAkAYAnkNf/8z
+	6dL9B/JPelwShr64tIeeGMoWK4Ss2bX0=
+X-Gm-Gg: AY/fxX76bhEFCHjaMQ5YyCr6ea9btfogmef4Lv0McP99E4kO972XTbCQQ0gBcWy2ubx
+	hjErFLPKi1EqArBTvQiEtTKs68F8PDA/VEZ9Zu1I/YdQ07d0SrEstdwA4MqgfOF46uD0BRpoG2R
+	S4Or4sEpKn4TM1cT5AyjMiuNOhm3jYH3iJBlmKdvAiavsvaxiQAsQvqkiLtFmNy8gYDqWmS4gX5
+	fOa0lw1EoK751ilWm11T+vF5qeA2ws5gKY15c1v59kMWFx0iq70NxXodRbCrEABCHpVIH01dF9T
+	XFZxOJOB1IXDSAsmeYEtKaV26ra1
+X-Received: by 2002:a05:6000:2409:b0:432:84f9:9802 with SMTP id
+ ffacd0b85a97d-4342c5483a3mr3996169f8f.49.1768406689407; Wed, 14 Jan 2026
+ 08:04:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260102150032.53106-1-leon.hwang@linux.dev> <CAADnVQJugf_t37MJbmvhrgPXmC700kJ25Q2NVGkDBc7dZdMTEQ@mail.gmail.com>
+ <aWd9z8GVYO12YsaH@krava>
+In-Reply-To: <aWd9z8GVYO12YsaH@krava>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 14 Jan 2026 08:04:38 -0800
+X-Gm-Features: AZwV_QhBzgwavE9dCvsyPnD3846iYc1-CBAq5_FLY28uDU4ys3fEyjL92GFBT_8
+Message-ID: <CAADnVQLxo1uPbutGNKrv=f=bSVkzxOfSof0ea8n7VvqsaU+S3w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 0/4] bpf: tailcall: Eliminate max_entries and
+ bpf_func access at runtime
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: Leon Hwang <leon.hwang@linux.dev>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Puranjay Mohan <puranjay@kernel.org>, Xu Kuohai <xukuohai@huaweicloud.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kernel-patches-bot@fb.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Victor Nogueira <victor@mojatatu.com>
+On Wed, Jan 14, 2026 at 3:28=E2=80=AFAM Jiri Olsa <olsajiri@gmail.com> wrot=
+e:
+>
+> On Fri, Jan 02, 2026 at 04:10:01PM -0800, Alexei Starovoitov wrote:
+> > On Fri, Jan 2, 2026 at 7:01=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev=
+> wrote:
+> > >
+> > > This patch series optimizes BPF tail calls on x86_64 and arm64 by
+> > > eliminating runtime memory accesses for max_entries and 'prog->bpf_fu=
+nc'
+> > > when the prog array map is known at verification time.
+> > >
+> > > Currently, every tail call requires:
+> > >   1. Loading max_entries from the prog array map
+> > >   2. Dereferencing 'prog->bpf_func' to get the target address
+> > >
+> > > This series introduces a mechanism to precompute and cache the tail c=
+all
+> > > target addresses (bpf_func + prologue_offset) in the prog array itsel=
+f:
+> > >   array->ptrs[max_entries + index] =3D prog->bpf_func + prologue_offs=
+et
+> > >
+> > > When a program is added to or removed from the prog array, the cached
+> > > target is atomically updated via xchg().
+> > >
+> > > The verifier now encodes additional information in the tail call
+> > > instruction's imm field:
+> > >   - bits 0-7:   map index in used_maps[]
+> > >   - bits 8-15:  dynamic array flag (1 if map pointer is poisoned)
+> > >   - bits 16-31: poke table index + 1 for direct tail calls
+> > >
+> > > For static tail calls (map known at verification time):
+> > >   - max_entries is embedded as an immediate in the comparison instruc=
+tion
+> > >   - The cached target from array->ptrs[max_entries + index] is used
+> > >     directly, avoiding the 'prog->bpf_func' dereference
+> > >
+> > > For dynamic tail calls (map pointer poisoned):
+> > >   - Fall back to runtime lookup of max_entries and prog->bpf_func
+> > >
+> > > This reduces cache misses and improves tail call performance for the
+> > > common case where the prog array is statically known.
+> >
+> > Sorry, I don't like this. tail_calls are complex enough and
+> > I'd rather let them be as-is and deprecate their usage altogether
+> > instead of trying to optimize them in certain conditions.
+> > We have indirect jumps now. The next step is indirect calls.
+> > When it lands there will be no need to use tail_calls.
+> > Consider tail_calls to be legacy. No reason to improve them.
+>
+> hi,
+> I'd like to make tail calls available in sleepable programs. I still
+> need to check if there's technical reason we don't have that, but seeing
+> this answer I wonder you'd be against that anyway ?
 
-Add a selftest that attempts to add a teql qdisc as a qfq child.
-Since teql _must_ be added as a root qdisc, the kernel should reject
-this.
+tail_calls are not allowed in sleepable progs?
+I don't remember such a limitation.
+What prevents it?
+prog_type needs to match, so all sleepable progs should be fine.
+The mix and match is problematic due to rcu vs srcu life times.
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- .../tc-testing/tc-tests/qdiscs/teql.json      | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> fyi I briefly discussed that with Andrii indicating that it might not
+> be worth the effort at this stage.
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/teql.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/teql.json
-index e5cc31f265f8..0179c57104ad 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/teql.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/teql.json
-@@ -81,5 +81,30 @@
-             "$TC qdisc del dev $DUMMY handle 1: root",
-             "$IP link del dev $DUMMY"
-         ]
-+    },
-+    {
-+        "id": "124e",
-+        "name": "Try to add teql as a child qdisc",
-+        "category": [
-+            "qdisc",
-+            "ets",
-+            "tbf"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY root handle 1: qfq",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 qfq weight 15 maxpkt 16384"
-+        ],
-+        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent 1:1 handle 2:1 teql0",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC -s -j qdisc ls dev $DUMMY parent 1:1",
-+        "matchJSON": [],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root handle 1:"
-+        ]
-     }
- ]
--- 
-2.34.1
-
+depending on complexity of course.
 
