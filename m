@@ -1,169 +1,145 @@
-Return-Path: <netdev+bounces-249721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07A3D1CA10
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:05:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EFF0D1CA6B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 40BC8301055C
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 06:05:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 55D343020FD0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 06:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998CE36BCE1;
-	Wed, 14 Jan 2026 06:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7330836C0AA;
+	Wed, 14 Jan 2026 06:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="deZaObU0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFNXONgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B9636BCF8
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 06:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE49C36C0CD
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 06:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768370704; cv=none; b=Pjt1QHGTUNJN8KINMNUR43EbCucqCTNIP6pq+0wrLFlAwXVZtl1NsrStdr1OWxOS/Dv4Zj1YBakzaueODBl1MPPjgMY2bNoIzQsuYFtXQk33a8ZpctUXUWoOk2lg0PkR4NcNLSULuIEyEpq1PUytismAp7KBKBurX77MoCMsBDE=
+	t=1768371510; cv=none; b=ILHADMyzjzr72zE5OET/KyeE/PkI2CH/LA8TNtb9I3cwmoKrDIzXYmC8RgdW3WGa7pI+bZ3tNUR4qscnwiixqStmKDRtyCuP1rwaTkKMoxVGWwQYBV92t4G8fxM6rwH6pA+i5C9lRMXsaGTBWtIhAKlTqFCJUy7HT9HDWrmaxME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768370704; c=relaxed/simple;
-	bh=DAsOq5M0Coab+rmoiISyOt1M2w/X9h0gZzQq1KG9UQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VOrbb4G3ZVIJE512gXfXoEx94foDS1ZDP93rFhE3QkGHsqo2YJcXp3I8GxQhPwXC+y0y+mlN+2f1IPPjUC6+CeqvoLnRnqVG159Cd0kuneCvKV4XtGgiwFQEZ+vgX73m0kpE9lLtmhUl7Wgs9ORagTpRqyxuQIZnMF9YcuNABJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=deZaObU0; arc=none smtp.client-ip=209.85.214.193
+	s=arc-20240116; t=1768371510; c=relaxed/simple;
+	bh=clNpslq5ijBOI5A2tm/usi5tDYC+ESDLpBpGDtp4m8E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KfAkmMqEDAUEFY6oKtdPeI9KWZ/hmZEQCcWqxqadSPUQeW7k8NlHOq+Q85ppu7ehvvuHueDtG28OnotRThMFGAgkv18iZ15tVwIBjFxJHubJrCq0T7O843cshK8aKZWq6lSjn+wIgzqI4EfvGAoQ3e01kZGHrO8TgFThIx6vULs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFNXONgZ; arc=none smtp.client-ip=74.125.82.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-29efd139227so57121925ad.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:04:57 -0800 (PST)
+Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-12339e2e2c1so7101c88.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:18:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768370694; x=1768975494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rDgcpoXWlHrnVNaTs+8RAQZSv14M5S+NeQHQRuPlaX0=;
-        b=deZaObU0L0SI3lPtu97om6fD4PorkPk/XE3iCacf0qo5O1mRqx+0okJss+TzICRqd8
-         tIle9O7m2onvHW1wxoQtp5vMHFIQ0jJDS9juTt4fVfTmbiKDQTXP/Ecf/e574aIZERyp
-         6Y/0cMzcHFJSSVbzGd0m1KTfzQy3YG6KFlvD7emdumb/2OYeF2dYCITOx+kbUyCdHGMe
-         hu8mnBZ0dx28DHP3KgiJP3jxh+KqTmaGBCeQCJLHVrNVhhK76X7m0HxNE+g79zVk0G7u
-         6eu8sxtEFxSLI0BNaH7iD20Q+Sna8MdbIbE8iRVormdWQCJWQUWqqTKGoEnBx6qsbes2
-         IC7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768370694; x=1768975494;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768371504; x=1768976304; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rDgcpoXWlHrnVNaTs+8RAQZSv14M5S+NeQHQRuPlaX0=;
-        b=IOv+aYVg9MiOo/+lUmITh1xLI3zRxGrW4WBo5+5BkZoX8UILBykUma/e1NVfeOmSSw
-         maTbPIYnoXdF5fnR9IMI5Jc26sqWBrykI+JblVUKwsWtP26anJw+R3vmmLX/0e+pSBGr
-         gks3LNxFoj5mDsBlpVWEDZPwl+XMfFBV4XT0SVZhqE8juRNag4/0uaDbEVOMS6QtmbPK
-         0lgWQ7pbRPF1+vmjbdibEY8FqWwe6Lg44qDmCI7H9ZitOlb2fKuoZqjHG2dPM5WJkQac
-         JJOzZ4EDfLn+6bDxGgO9tifrUXshsBFkJFPIgvRAaONLuJUZ5LRCQS+KbuqKeHzffX6z
-         cr4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXswlHIWcbIauoad4xnlwySyTCkSiYaM9I+/SRgME3dZV26JRBa79QBlL5a/8vaVQJWIrfCCS8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywn6nXXSpHZQoStNHVVYOUtymvVXAOA3Fkjk/9+gjeB1erKdp3+
-	mlQ5thG1lw9qBHRIi34y5HeCaFDZfz4L2zVxlswzco+D6ZUJ0rXcyBDg
-X-Gm-Gg: AY/fxX7/FTjhiyIKNJTC5w2djCPgAMRwC4ayYR+f/2+MBo0uDfnZuPAYp1fpLP0vq44
-	rIq58fM6lO5RQmN4XlPvKJorRsC8UsjZrCRF3FDlEemmlj31LMCQKH5UHJ+NaQkNkA993mHePNT
-	ea9CxoN+RBgIHCnp9S/TI/4OAF/5TGmoeJhD2/UyYBUm6tyYRlvtFEEkDHRPZivk1gIJZRewMEl
-	w/EZLnqb+iEcuhtFCIz/Yz6r3BXKqcrSX4H06MRKMgmm91EWXXEtemje0RrxObqATMjiqLYc1/8
-	YYDXVFET+/et/rOqPQJY+YIWvM/vyF55t2uyTkid3rjgc84BmwKEqD8eNeuP9oYYe+MPYu67kp6
-	yRTKBuX+BCjg+xBC0dwdBYKz8KXCqkWOC59eolo7TOmx3IkwSIHxJJlqcZvignicY9czsWgOjSZ
-	dEwX3Q5d7kaqzbzVRsBclMphRf3zbog89BQtsFpywV0THoc+dlZys=
-X-Received: by 2002:a17:902:d501:b0:295:9cb5:ae07 with SMTP id d9443c01a7336-2a599e2416fmr15597135ad.38.1768370694311;
-        Tue, 13 Jan 2026 22:04:54 -0800 (PST)
-Received: from fedora (softbank036243121217.bbtec.net. [36.243.121.217])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3c4893dsm214955615ad.28.2026.01.13.22.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 22:04:53 -0800 (PST)
-From: saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org,
-	saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>
-Subject: [bpf-next,v3] bpf: cpumap: report queue_index to xdp_rxq_info
-Date: Wed, 14 Jan 2026 15:04:30 +0900
-Message-ID: <20260114060430.1287640-1-saiaunghlyanhtet2003@gmail.com>
-X-Mailer: git-send-email 2.52.0
+        bh=NjBxkaqSZJtmI8IUKVCM6gYETHbHEi7hreoNNxicvxw=;
+        b=NFNXONgZ0yhzB88pTvIvsf58llypwEtxB0nhrmw80pljJXOCxBKjYymN61AWiE1u9b
+         V6TfBw2An14TnlJAd1gMiDc8DGhwIJc5mOF5sd3gW2JlEZXUcjUGa0F81z8+i7uFXa1d
+         cD/TVncOL0IH1RyEy0XjhHT7fTfuUW2LXoCaYh8qXysaeYdmRE0Z4+b23lztlqd336qK
+         d5DngQZyA5FPus5b+dd3gyXdJT+9gKdOb/AEpqJienzxW/uTixzx1YhTuFWEUwjpw13A
+         nutC/J453joz7rPoF4qQb7wsn72+zLPy5z8Nb4nLhCmqu+olZxa+h/8K3v8XLrDSuQq0
+         /g6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768371504; x=1768976304;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NjBxkaqSZJtmI8IUKVCM6gYETHbHEi7hreoNNxicvxw=;
+        b=weG6ewA8QMAGMknrKlu0yydZRMdxRzZ4382jQU3MhJtud1iPiUOQzUGCsxirBL3RIP
+         mWBDtiLdWWPRWx9rU+fEg/uEJbtoOGWBFETvUMcECHNUShgZhDx2dbTpuWRI+NPHSjWT
+         +gAXhMsJbWZdLs1c0JuI8CPCSx8/SkxW3etWemd/MOaRsKnnFd5fn/YkKOaIBIgJiGnO
+         JmoJWU04NfujH35vpVubzMazvdnaka6Go6EejAlgyrF7swAH++6ZG14ANoDNEtkjtyDd
+         7C50ZLCwXl9NQa0gzr3FZzq2WMhquGlbBsdu3S1k7iiZF6Zn1vwxHPhDEK3838jBkpF1
+         s6ng==
+X-Forwarded-Encrypted: i=1; AJvYcCUul8A8fPLWHLzXvqvgRiI7aIYPllFc/7Tr+UkDdYSFZHFyvSFEWI9xVRvZeUYVsjATQWP3UVQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT+UCXekpsW+AMHVBFYv74DNlqnDZBRLSXSMQ0TqrUiOkxDYGn
+	VgZ+TKzOvi303xAnCGvQrNGtraerH0FCMLXfH21GubSoheUbGT4/XNDu7iio0hrOxbVv0G3Jctu
+	jzK+N5czcVm7hBsBE6ELvuOP0HzZvev8=
+X-Gm-Gg: AY/fxX4tsCDZ9jEVkYzEbK/u7YNHeyuHfIee6ktqsHnVLATk7UOEutCoEsyUqzF0Ifu
+	dMN11FWM6XFohtPm/9oxr+xZcfYtmsg/F3JfvWkXQ5RWFhpw9+7sEgE/mBWoBdTQliTJBcmhUvM
+	oPzZQrD7KhfEUdVCXyfMCBcQhdfMnQS2flUPq4L6QHvs+qLGKOUVBU6wIzmiS/u4Lg7+kiuyi6s
+	iuXNFPCGCuHfLCzISNZZdGaul/bMPHt3i2zQRiPWVopGazKspEG7jAjjuWHGLaTQXzPa1Rz3RQu
+	G1vzPrE=
+X-Received: by 2002:a05:701b:231a:b0:11b:9386:a383 with SMTP id
+ a92af1059eb24-12336aafea9mr1292835c88.22.1768371504531; Tue, 13 Jan 2026
+ 22:18:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260114045509.1281217-1-saiaunghlyanhtet2003@gmail.com> <17dcbb5af344c64488806ab2e291d4d7a0de3c51b8d9b0478bb1f0106a584530@mail.kernel.org>
+In-Reply-To: <17dcbb5af344c64488806ab2e291d4d7a0de3c51b8d9b0478bb1f0106a584530@mail.kernel.org>
+From: Sai Aung Hlyan Htet <saiaunghlyanhtet2003@gmail.com>
+Date: Wed, 14 Jan 2026 15:18:13 +0900
+X-Gm-Features: AZwV_Qi8wCT_ok_yzffNsUzGGwwG4eOcdtdj552inJPzrpEf3gLKyb96CVsFhLo
+Message-ID: <CAGF5Uf5tRdt0Bpky+53AursJNAj1Q6-+0jkm2SQxxK-eAv=Nzw@mail.gmail.com>
+Subject: Re: [bpf-next,v2] bpf: cpumap: report queue_index to xdp_rxq_info
+To: bot+bpf-ci@kernel.org
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, netdev@vger.kernel.org, andrii@kernel.org, 
+	martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev, 
+	clm@meta.com, ihor.solodrai@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When packets are redirected via cpumap, the original queue_index
-information from xdp_rxq_info was lost. This is because the
-xdp_frame structure did not include a queue_index field.
+That makes sense. Reverted the changes in veth.c in v3.
 
-This patch adds a queue_index field to struct xdp_frame and ensures
-it is properly preserved during the xdp_buff to xdp_frame conversion.
-Now the queue_index is reported to the xdp_rxq_info.
-
-Resolves the TODO comment in cpu_map_bpf_prog_run_xdp().
-
-Signed-off-by: saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>
----
- include/net/xdp.h   | 2 ++
- kernel/bpf/cpumap.c | 2 +-
- kernel/bpf/devmap.c | 1 +
- net/core/xdp.c      | 1 +
- 4 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index aa742f413c35..feafeed327a2 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -303,6 +303,7 @@ struct xdp_frame {
- 	struct net_device *dev_rx; /* used by cpumap */
- 	u32 frame_sz;
- 	u32 flags; /* supported values defined in xdp_buff_flags */
-+	u32 queue_index;
- };
- 
- static __always_inline bool xdp_frame_has_frags(const struct xdp_frame *frame)
-@@ -421,6 +422,7 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
- 	xdp_frame->metasize = metasize;
- 	xdp_frame->frame_sz = xdp->frame_sz;
- 	xdp_frame->flags = xdp->flags;
-+	xdp_frame->queue_index = xdp->rxq->queue_index;
- 
- 	return 0;
- }
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 04171fbc39cb..f5b2ff17e328 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -195,7 +195,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
- 
- 		rxq.dev = xdpf->dev_rx;
- 		rxq.mem.type = xdpf->mem_type;
--		/* TODO: report queue_index to xdp_rxq_info */
-+		rxq.queue_index = xdpf->queue_index;
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
- 
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index 2625601de76e..7e8bfac4ca05 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -348,6 +348,7 @@ static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
- 		xdp.txq = &txq;
-+		rxq.queue_index = xdpf->queue_index;
- 		xdp.rxq = &rxq;
- 
- 		act = bpf_prog_run_xdp(xdp_prog, &xdp);
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index fee6d080ee85..29f0b5ddb39e 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -606,6 +606,7 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
- 	xdpf->metasize = metasize;
- 	xdpf->frame_sz = PAGE_SIZE;
- 	xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
-+	xdpf->queue_index = xdp->rxq->queue_index;
- 
- 	xsk_buff_free(xdp);
- 	return xdpf;
--- 
-2.52.0
-
+On Wed, Jan 14, 2026 at 2:18=E2=80=AFPM <bot+bpf-ci@kernel.org> wrote:
+>
+> > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> > index 14e6f2a2fb77..4a409802cdac 100644
+> > --- a/drivers/net/veth.c
+> > +++ b/drivers/net/veth.c
+> > @@ -648,6 +648,8 @@ static struct xdp_frame *veth_xdp_rcv_one(struct ve=
+th_rq *rq,
+> >
+> >               xdp_convert_frame_to_buff(frame, xdp);
+> >               xdp->rxq =3D &rq->xdp_rxq;
+> > +             /* Preserve original queue_index from frame */
+> > +             rq->xdp_rxq.queue_index =3D frame->queue_index;
+>                 ^^^^^^^^^^^^^^^^^^^^^^^^
+>
+> Unlike cpumap.c and devmap.c which use a stack-local rxq variable,
+> this writes to the persistent rq->xdp_rxq structure.
+>
+> In veth_poll(), the code reads queue_index before calling veth_xdp_rcv():
+>
+>     int queue_idx =3D rq->xdp_rxq.queue_index;
+>     ...
+>     peer_txq =3D peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NU=
+LL;
+>     ...
+>     done =3D veth_xdp_rcv(rq, budget, &bq, &stats);
+>
+> After processing a frame from a device with many queues (e.g. queue 32),
+> the next poll will read the corrupted queue_index and pass it to
+> netdev_get_tx_queue(). If the peer device has fewer TX queues, this
+> causes an out-of-bounds access to dev->_tx[].
+>
+> For comparison, cpumap.c uses a local variable:
+>
+>     struct xdp_rxq_info rxq =3D {};
+>     ...
+>     rxq.queue_index =3D xdpf->queue_index;
+>
+> Should veth also use a local rxq variable like cpumap and devmap do,
+> rather than modifying the persistent rq->xdp_rxq?
+>
+> > [ ... ]
+>
+>
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a =
+bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
+E.md
+>
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/209830=
+17884
 
