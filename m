@@ -1,174 +1,145 @@
-Return-Path: <netdev+bounces-249924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6650ED20BA4
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:07:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F13D20BE0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D20B63010A8A
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:07:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B01403016AC1
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4792FFDFC;
-	Wed, 14 Jan 2026 18:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE5C332903;
+	Wed, 14 Jan 2026 18:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JobFciBA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/olIjIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAED817A309
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 18:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF9532E6B7;
+	Wed, 14 Jan 2026 18:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768414043; cv=none; b=W8+30JWXUQe5B2IDOQZgxT4KDNRZtKmIW2r1o6g6wzrvCbuAh4R2PvYaBVfspUfoEWLZoxuo4hv2uKSIafp4+aqk1TalJO9uQG7G/MA3sive+jTBRfFe7vi6JYUL0xT6zUSu2NPiPeXDX1/2sHgBsFhRQSfc3y2zzDiO5Hnlyhw=
+	t=1768414566; cv=none; b=R9w0l9rQgfNUSIxzrgBoyrC6JRKKzq44WtbglOQwfe7KNDzk9ECebSF6OEPGsSZNq58uNT5daHGOfa1sq/OPl6biyTd2DE4iqR4/mtbmMp1eCSOI1nHSiivYNWk4E/SUJ5wSg6u4ivUzOT6b4/Y9vkeqSZ0bUrj95p9PB/HMmLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768414043; c=relaxed/simple;
-	bh=rAA0hfnYW/g3iYZ/x9yjGCX4k7/q0bDFC6BHR2C+Xsg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=liqANc5qawNsBA/qrwJEqYD54F0vLZzruSNx4JY6DaacMKTzdF5M4ECYhAkZE0uij1FvASkXt0gb5L7tHb3NEu7Qh/JyUsBHx6xShgXQHwQe+v6CJEiS0HcHXVzrfMJ2tuQGL2yv3WY2ZaZLiiHdoKj9v0RvcCxBT4WxZwCFbG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JobFciBA; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88a32bf0248so331876d6.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:07:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768414041; x=1769018841; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fXnvVQQge95JJk0l6ClBVGN7ircNBoD+M2yk74abE8k=;
-        b=JobFciBA+W69WB4jRjDwHs4+JAq7P/1HGn07UM2EO+CqGN7Tz7imrWzXqQCwCUkbAU
-         Ye9PC3k9Z9Hc4UdA1qqjmx2Fc9a7+o+pioZ2fRMrqmsNOeEf9jCm0O1yxN9Z5HQ6Tb0p
-         B/ADI2myZ3vAytBuOw98vAbs91ni4uyMpvZFmavVDqzyJc+7zw2ptMgwD4vPF47Q3947
-         HVMHkK46p5CMt8vL2MmYNSxlLngQUi7nEe6fXsXRtSHi2xqGXAWKAG5XRG8Jf53ARHbF
-         8619Tq4rJ5OWT0SxmJ6J1wgnPRM9vLF3Vja26wZc0zpwZD3Worj+NDzl07dSHhZ1ZYO9
-         BTUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768414041; x=1769018841;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fXnvVQQge95JJk0l6ClBVGN7ircNBoD+M2yk74abE8k=;
-        b=ESw4yFpD3WBY8MMJ0cOsuKKRaAnuPa2sC7LenUDh8gFsDmkmV6K3THq2v4yj7ARkAo
-         KDK4moun6B3sWTpDqIIJgVX+h/DvtQBGKNGQca8TlAq4EcIMYLn7VO/pKTNgUZ4+qi/R
-         KJRzyD/VOO2IzV1h7kZ9VPa+iLQf4YQ9xNYhZSFIPl0Wansv7vV/VKwGHc88s0iBy6Q0
-         kicxEJG/v32wKCPXMVF+/Sj+0jsBVWbNzePticVGf/hoBfoXvHViN7wK4a9EUOriF8ka
-         B4IhM5ty306jYsLUCS0xTSpPqcHgz0X/z4Um5HMUMwGwBcCzG9rz6jq+JXR5EtMWuZwz
-         mD+g==
-X-Gm-Message-State: AOJu0Yz6uOpPnSPykqyHqgyuPKHXUbJ1cNzj0O9iKeFQltTel5ZrWr/1
-	utQb83QGi0ZCmz3+t9wJ4M6ggLfvaTrMHyoYz94svpXDDoGy0o/gH99RsOI1/5oZe4ODhMiysW+
-	JpenVB3Fslc5wXeNNiCpCBVKxCbcTNl9Km8oCb0qoadTwZlb6cexofmtN6yU=
-X-Gm-Gg: AY/fxX4YdRxdUfcuDfUauzEvYdL0uOI8s1a+0g9TrDqhwOCIZg19caDkgn8PMSRJGUX
-	1reuLIACDmT8vVFr1rOo35dgZz1Xr4jBOA+ic8u+9Yi/Akk4XXoJseGbo18VYkplf9bri+IiqFk
-	SYz1E+VCnWXJICk/JqYcDoFAHCRPJc2BkiaDcIv9rSQJRE2/GFjnLRbjC9gXGEwEuJJVOqVjmm3
-	9UOcQACfCC8YjLA6o3HIXI4FKB4AHZxUkUjXIzTJu8Aqwu8SHZGsXwoix+rSO+UWxkrvA==
-X-Received: by 2002:a05:622a:1892:b0:4e8:96ed:2e65 with SMTP id
- d75a77b69052e-501481fa1ebmr52824681cf.22.1768414040117; Wed, 14 Jan 2026
- 10:07:20 -0800 (PST)
+	s=arc-20240116; t=1768414566; c=relaxed/simple;
+	bh=NluLEF7NMmp3/AgudKp+8aM6MBbaE0n02a0tsv2rEXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tBw5bn6sEce42E8hj6c/G7hoH71REsGisKpR30e/5fEsk2OHPWph343F+D7zpN0Q8Wmyw4/ihygS1WoRNvsxoWMUoUvOPY0UkrdGnFYFw4+0ln9T8hQI+zkrskFhZZHzFvl9/LOCcVVs8H8RSkJ9kDSgriBRAZ+Bc3SQP5FQ6Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/olIjIZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E6DC4CEF7;
+	Wed, 14 Jan 2026 18:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768414565;
+	bh=NluLEF7NMmp3/AgudKp+8aM6MBbaE0n02a0tsv2rEXM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U/olIjIZfEKxE4MnNNIenrvMBsWIKmaBEvhi76I8+nYBWKJ4wMVEXYMsmt7KxT5iz
+	 D4oUZoEiWm/h1H9fwxGRQDPKUWoR0gQQrHjh3rC2z2djAGcXB9XL8YcAJ9TylkWzeI
+	 s2XegiU5svgbx3ZjQOHdwh0NKcXcBVx2/g7w6v0/snGx0WfhopuTALN9jgjmlWTQ8l
+	 nuZzxfzduIcnP7SPo0yVoHjo79AZF3s2uk6ReJF3Nh1BtXEHhdX7lsKrBTMHbJdNsT
+	 m1O0sGCSlIqP0AUGkzZ9EruKtbyEyflFsCkk59RsMm7PzjXYdgAF8d2E4CRKbKfqY9
+	 uVv/DRs2bcLhw==
+Date: Wed, 14 Jan 2026 19:16:03 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+Message-ID: <aWfdY53PQPcqTpYv@lore-desk>
+References: <20260113-airoha-npu-firmware-name-v2-1-28cb3d230206@kernel.org>
+ <20260114-heretic-optimal-seahorse-bb094d@quoll>
+ <aWdbWN6HS0fRqeDk@lore-desk>
+ <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
+ <69676b6c.050a0220.5afb9.88e4@mx.google.com>
+ <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
+ <69677256.5d0a0220.2dc5a5.fad0@mx.google.com>
+ <76bbffa8-e830-4d02-a676-b494616568a2@lunn.ch>
+ <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
+ <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1768410519.git.pabeni@redhat.com> <70afe1dc4404ef46154b684b12c59d4bc523477c.1768410519.git.pabeni@redhat.com>
-In-Reply-To: <70afe1dc4404ef46154b684b12c59d4bc523477c.1768410519.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 Jan 2026 19:07:08 +0100
-X-Gm-Features: AZwV_QhtilMGxV-G2_E50OsKGlThJ7vXvrtgxSmll1Uj35mny0M0gsLb2OwMVaM
-Message-ID: <CANn89iKk+BPOxCYr1+w85+hd3j7ugLB7EYmm+NdN=4XCsecAig@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 01/10] net: introduce mangleid_features
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, sdf@fomichev.me, 
-	petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BXxQL3Vd8nyun2Je"
+Content-Disposition: inline
+In-Reply-To: <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
+
+
+--BXxQL3Vd8nyun2Je
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 14, 2026 at 6:21=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Some/most devices implementing gso_partial need to disable the GSO partia=
-l
-> features when the IP ID can't be mangled; to that extend each of them
-> implements something alike the following:
->
->         if (skb->encapsulation && !(features & NETIF_F_TSO_MANGLEID))
->                 features &=3D ~NETIF_F_TSO;
->
-> in the ndo_features_check() op, which leads to a bit of duplicate code.
->
-> Later patch in the series will implement GSO partial support for virtual
-> device, and the current status quo will require more duplicate code and
-> a new indirect call in the TX path for such devices.
->
-> Introduce the mangleid_features mask, allowing the core to disable NIC
-> features based on/requiring MANGLEID, without any further intervention
-> from the driver.
->
-> The same functionality could be alternatively implemented adding a single
-> boolean flag to the struct net_device, but would require an additional
-> checks in ndo_features_check().
->
-> Also note that the above mentioned action is incorrect if the NIC
-> additionally implements NETIF_F_GSO_UDP_L4, mangleid_features
-> transparently handle even such a case.
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  include/linux/netdevice.h | 5 ++++-
->  net/core/dev.c            | 4 +++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index d99b0fbc1942..23a698b70de1 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1830,7 +1830,9 @@ enum netdev_reg_state {
->   *                             and drivers will need to set them appropr=
-iately.
->   *
->   *     @mpls_features: Mask of features inheritable by MPLS
-> - *     @gso_partial_features: value(s) from NETIF_F_GSO\*
-> + *     @gso_partial_features: value(s) from NETIF_F_GSO
-> + *     @mangleid_features:     Mask of features requiring MANGLEID, will=
- be
-> + *                             disabled together with the latter.
->   *
->   *     @ifindex:       interface index
->   *     @group:         The group the device belongs to
-> @@ -2219,6 +2221,7 @@ struct net_device {
->         netdev_features_t       vlan_features;
->         netdev_features_t       hw_enc_features;
->         netdev_features_t       mpls_features;
-> +       netdev_features_t       mangleid_features;
->
->         unsigned int            min_mtu;
->         unsigned int            max_mtu;
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c711da335510..6154f306ed76 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3788,8 +3788,10 @@ static netdev_features_t gso_features_check(const =
-struct sk_buff *skb,
->                 struct iphdr *iph =3D skb->encapsulation ?
->                                     inner_ip_hdr(skb) : ip_hdr(skb);
->
-> -               if (!(iph->frag_off & htons(IP_DF)))
-> +               if (!(iph->frag_off & htons(IP_DF))) {
->                         features &=3D ~NETIF_F_TSO_MANGLEID;
+On Jan 14, Andrew Lunn wrote:
+> On Wed, Jan 14, 2026 at 05:29:28PM +0100, Christian Marangi wrote:
+> > On Wed, Jan 14, 2026 at 04:56:02PM +0100, Andrew Lunn wrote:
+> > > > > Yes. What you plug into PCI is not a part of this hardware, so ca=
+nnot be
+> > > > > part of the compatible.
+> > > > >=20
+> > > >=20
+> > > > Thanks for the quick response. Just to make sure Lorenzo doesn't get
+> > > > confused, I guess a v3 would be sending v1 again (firmware-names
+> > > > implementation series) with the review tag and we should be done wi=
+th
+> > > > this.
+> > >=20
+> > > Since this is a PCI device, you can ask it what it is, and then load
+> > > the correct firmware based on the PCI vendor:product. You don't need
+> > > to describe the hardware in DT because it is enumerable.
+> > >=20
+> >=20
+> > Hi Andrew,
+> >=20
+> > I think it's problematic to create a bind between the NPU and
+> > PCIe.
+>=20
+> But the NPU must already be bound to PCIe. How else does it know which
+> PCIe slot the WiFi card is on, so it can make use of it?
 
-Nit : We could avoid the above line, if we always make sure
-NETIF_F_TSO_MANGLEID is set in dev->mangleid_features
+In the current codebase the NPU driver does not need to access the WiFi PCIe
+slot (or any other external device) since the offloading (wired and wireles=
+s)
+is fully managed by the NPU chip (hw + firmware binaries). The NPU driver is
+only responsible for loading the proper firmware binaries, configure NPU hw
+registers and export APIs for other external chips (e.g. MT76).
+IIUC your proposal, we should add a PCIe slot access in the NPU kernel driv=
+er in
+order to enumerate PCIe Vendor/Device IDs during device probe and load the
+proper firmware binaries, right? If so, this approach seems quite more comp=
+lex
+to me with respect of relying on firmware-name dts property (assuming
+firmware-name is a suitable property for this scope). What do you think?
 
-> +                       features &=3D ~dev->mangleid_features;
-> +               }
->         }
->
->         /* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,
-> --
-> 2.52.0
->
+Regards,
+Lorenzo
+
+>=20
+>      Andrew
+
+--BXxQL3Vd8nyun2Je
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWfdYwAKCRA6cBh0uS2t
+rE57AP9zuvgwh7EtMJ2YP09lnx23PG43DiyywAvJ1zCn4QPlywEA/LYdZ976dnCp
+U9sh/SlAO7baGe7pcsLNjgLptRArTQY=
+=OEKc
+-----END PGP SIGNATURE-----
+
+--BXxQL3Vd8nyun2Je--
 
