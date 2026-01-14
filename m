@@ -1,151 +1,244 @@
-Return-Path: <netdev+bounces-249840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC90D1F084
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:18:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69ABAD1F0F0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE2BC300549C
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:15:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 880C830084E3
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1370339B4A0;
-	Wed, 14 Jan 2026 13:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1467439B4BC;
+	Wed, 14 Jan 2026 13:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fivFvMKh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayuX/yIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0847D396B92;
-	Wed, 14 Jan 2026 13:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33FD39B4B3;
+	Wed, 14 Jan 2026 13:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768396550; cv=none; b=A8t9PhQ85OG23Xdz6YWT3+6y8W5RhC0p8EufO5saxHw051fQNqOv8gV2v++lWWs0G/6jRQuQcPGDeVuSHSG2KPs/65FshSCtGJ4yECgTnXKcSrruejZA8UUYV08NEra94qpfXdViFpSVlGnh6Sz1XXZm1R0V3Im3AuabqzVhztk=
+	t=1768396737; cv=none; b=O/kWySds6Wc6cMJBktm9N9E1/DejNERqincvNekASfbfHiBvgKRtkoF5NM3/ViZXncOmNdo/U150sjMc56HDCI6v7jewDTs8L697rP7v6CpKrAcmQc81TriJQoEUu7wlCS1g1HSpCoBM03CKHcu3c451ca5cTSMw7ibvPAUEjYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768396550; c=relaxed/simple;
-	bh=seSfhC8ogzDXxa89Np+o3MnqCHwdka1m3oqnUfoi4pU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bNfpS27CoY2DepX92J8fE4LMlvuSUbpQU6khSwkrT7XK3QaAfCRHhiSM4cLsi+3Q0mEp1PvoHra1YihQlfR/8ylRLUWrIROHDzgbKO+tN+f44OuDb02/2EB/QeZdDW59ew8KSxDJsNHwrwdkfGGwA0LulhBxfOLHDOMrBWC/c5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fivFvMKh; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=OM
-	Ei+QX/R46zrUv7SSZ7MEYUT7umCGMDz2EhK2yZNWE=; b=fivFvMKh6Stfbtyewk
-	R+eL/cId7s02KUpg7dtfWWtCZ0qEQl5gxyTm6bpbH7FBI6W4Viaa8lgq8jhTo9yp
-	uY9gPF2d4zsI7Yq1w6yC7/H7xT5VBcctsKxEbcyvPDPxmRyyeSHZrrC38gW8rxGY
-	20qqzDYkS0/o+G/mgpSOOTu9I=
-Received: from GHT-5854251031.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDHuEKylmdpj+NjFg--.9247S2;
-	Wed, 14 Jan 2026 21:14:28 +0800 (CST)
-From: "wanquan.zhong" <zwq2226404116@163.com>
-To: loic.poulain@oss.qualcomm.com,
-	chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	ricardo.martinez@linux.intel.com
-Cc: netdev@vger.kernel.org,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	ryazanov.s.a@gmail.com,
-	wanquan.zhong@fibocom.com
-Subject: [PATCH] net: wwan: t7xx: Add CONFIG_WWAN_ADB_PORT for ADB port control
-Date: Wed, 14 Jan 2026 21:14:23 +0800
-Message-ID: <20260114131423.202777-1-zwq2226404116@163.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
-References: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
+	s=arc-20240116; t=1768396737; c=relaxed/simple;
+	bh=GzNGsGiv+Dat6D0sdE8p2iGYKVBLSwgdtjTPkzDp6KU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fgP0HZmoo4kkLcirLOTLj2SWEdPw474GmZWevjrcHAwjtWHe0PlGqoVuTM7R+CevUOcAroEvd4bA4ZCwskeuIg1iJ3riOeJu/vLUdyfsun2EDMESf7y1NmgfzU2duKZcprT3ckaKbw9ak2sz6fLjMCTVUNi4XtFF9jfNs/IZmWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayuX/yIn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0E64C19422;
+	Wed, 14 Jan 2026 13:18:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768396736;
+	bh=GzNGsGiv+Dat6D0sdE8p2iGYKVBLSwgdtjTPkzDp6KU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ayuX/yInGW/t2HtHRKGrsgyznv2o+2fOAGPkd0SpYjXtXQPdEbGCPnkGym489mU4Q
+	 rWIQf3SEJf03N/1f4m31O9VsSL9IV0rQAjdhPGGfzKOgbDSynFuKuSMIeitLctFBSJ
+	 eNcgXX7HHVaqOOs6m4CC7hYEpkg8qBpAUrW/S5Mgzbxi4LRIA4yujf4thdtsr1+cz7
+	 t8JQKzcB+CUW1L60x/eZo47DBluELyYYH3dNfO6DqtG6sFcVzSqsLJxFiAccXLzfEl
+	 hBXtogq3ulvLF4L+5mcUcRyIg59mcuNFHcf+h+cBx7QkLIcn2Nde9pOqKBAUW2r+Pv
+	 PFHUFUdqJQWsQ==
+Date: Wed, 14 Jan 2026 18:48:52 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH v3 net-next 00/10] PHY polarity inversion via generic
+ device tree properties
+Message-ID: <aWeXvFcGNK5T6As9@vaman>
+References: <20260111093940.975359-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDHuEKylmdpj+NjFg--.9247S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAFWfuFyDZw1UJrWkJrykuFg_yoW5CrW7pa
-	1DGFyYkrWDAFnxJw4DZayI9Fy5C3ZrCFW3Kr17t345uFyYyFy5CrZ2va4ayF15JFsrZrWx
-	ArWaqF1Y93Z8Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UBWl9UUUUU=
-X-CM-SenderInfo: h2ztjjaswuikqrrwqiywtou0bp/xtbC0RQHXmlnlrQ-OQAA32
+In-Reply-To: <20260111093940.975359-1-vladimir.oltean@nxp.com>
 
-From: "wanquan.zhong" <wanquan.zhong@fibocom.com>
+On 11-01-26, 11:39, Vladimir Oltean wrote:
+> Introduce "rx-polarity" and "tx-polarity" device tree properties.
+> Convert two existing networking use cases - the EN8811H Ethernet PHY and
+> the Mediatek LynxI PCS.
+> 
+> Requested merge strategy:
+> Patches 1-5 through linux-phy
 
-Changes from v2:
-  1) Add missing 'net:' subsystem prefix to commit subject for compliance
-  2) Remove redundant "to config" suffix and refine commit wording
-  3) Split overlong Kconfig help text lines to meet 72-char limit
-  4) Align EXPERT dependency desc with WWAN subsystem conventions
 
-Add a new Kconfig option CONFIG_WWAN_ADB_PORT to control the ADB debug port
-functionality for MediaTek T7xx WWAN modem. This option depends on MTK_T7XX
-and EXPERT, defaults to 'y' to avoid breaking existing debugging workflows
-while mitigating potential security concerns on specific target systems.
+The following changes since commit 8f0b4cce4481fb22653697cced8d0d04027cb1e8:
 
-This change addresses security risks on systems such as Google Chrome OS,
-where unauthorized root access could lead to malicious ADB configuration
-of the WWAN device. The ADB port is restricted via this config only; the
-MIPC port remains unrestricted as it is MTK's internal protocol port with
-no associated security risks.
+  Linux 6.19-rc1 (2025-12-14 16:05:07 +1200)
 
-While introducing a kernel config option for a single array element may
-appear to introduce minor resource overhead, this is the most
-straightforward and maintainable implementation approach for this use case.
-Alternativeimplementation suggestions from reviewers are welcome.
+are available in the Git repository at:
 
-Signed-off-by: wanquan.zhong <wanquan.zhong@fibocom.com>
----
- drivers/net/wwan/Kconfig                | 11 +++++++++++
- drivers/net/wwan/t7xx/t7xx_port_proxy.c |  2 ++
- 2 files changed, 13 insertions(+)
+  git://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git tags/phy_common_properties
 
-diff --git a/drivers/net/wwan/Kconfig b/drivers/net/wwan/Kconfig
-index 410b0245114e..3d49dc8491a3 100644
---- a/drivers/net/wwan/Kconfig
-+++ b/drivers/net/wwan/Kconfig
-@@ -27,6 +27,17 @@ config WWAN_DEBUGFS
- 	  elements for each WWAN device in a directory that is corresponding to
- 	  the device name: debugfs/wwan/wwanX.
- 
-+config WWAN_ADB_PORT
-+	bool "MediaTek T7xx ADB port support" if EXPERT
-+	depends on MTK_T7XX
-+	default y
-+	help
-+	  Enables ADB (Android Debug Bridge) debug port support for MediaTek T7xx WWAN devices.
-+
-+	  This option enables the ADB debug port functionality in the MediaTek T7xx driver,
-+	  allowing Android Debug Bridge connections through T7xx modems that support
-+	  this feature. It is primarily used for debugging and development purposes.
-+
- config WWAN_HWSIM
- 	tristate "Simulated WWAN device"
- 	help
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
-index 4fc131f9632f..9f3b7b1dd4e2 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
-+++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
-@@ -102,6 +102,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
- 		.ops = &ctl_port_ops,
- 		.name = "t7xx_ap_ctrl",
- 	}, {
-+#ifdef CONFIG_WWAN_ADB_PORT
- 		.tx_ch = PORT_CH_AP_ADB_TX,
- 		.rx_ch = PORT_CH_AP_ADB_RX,
- 		.txq_index = Q_IDX_ADB,
-@@ -112,6 +113,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
- 		.port_type = WWAN_PORT_ADB,
- 		.debug = true,
- 	}, {
-+#endif
- 		.tx_ch = PORT_CH_MIPC_TX,
- 		.rx_ch = PORT_CH_MIPC_RX,
- 		.txq_index = Q_IDX_MBIM_MIPC,
+for you to fetch changes up to e7556b59ba65179612bce3fa56bb53d1b4fb20db:
+
+  phy: add phy_get_rx_polarity() and phy_get_tx_polarity() (2026-01-14 18:16:05 +0530)
+
+----------------------------------------------------------------
+phy common properties
+
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+
+Introduce "rx-polarity" and "tx-polarity" device tree properties with
+Kunit tests
+
+----------------------------------------------------------------
+Vladimir Oltean (5):
+      dt-bindings: phy: rename transmit-amplitude.yaml to phy-common-props.yaml
+      dt-bindings: phy-common-props: create a reusable "protocol-names" definition
+      dt-bindings: phy-common-props: ensure protocol-names are unique
+      dt-bindings: phy-common-props: RX and TX lane polarity inversion
+      phy: add phy_get_rx_polarity() and phy_get_tx_polarity()
+
+ .../devicetree/bindings/phy/phy-common-props.yaml  | 157 ++++++++
+ .../bindings/phy/transmit-amplitude.yaml           | 103 -----
+ MAINTAINERS                                        |  10 +
+ drivers/phy/Kconfig                                |  22 ++
+ drivers/phy/Makefile                               |   2 +
+ drivers/phy/phy-common-props-test.c                | 422 +++++++++++++++++++++
+ drivers/phy/phy-common-props.c                     | 209 ++++++++++
+ include/dt-bindings/phy/phy.h                      |   4 +
+ include/linux/phy/phy-common-props.h               |  32 ++
+ 9 files changed, 858 insertions(+), 103 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/phy/phy-common-props.yaml
+ delete mode 100644 Documentation/devicetree/bindings/phy/transmit-amplitude.yaml
+ create mode 100644 drivers/phy/phy-common-props-test.c
+ create mode 100644 drivers/phy/phy-common-props.c
+ create mode 100644 include/linux/phy/phy-common-props.h
+
+> linux-phy provides stable branch or tag to netdev
+> patches 6-10 through netdev
+> 
+> v2 at:
+> https://lore.kernel.org/netdev/20260103210403.438687-1-vladimir.oltean@nxp.com/
+> Changes since v2:
+> - fix bug with existing fwnode which is missing polarity properties.
+>   This is supposed to return the default value, not an error. (thanks to
+>   Bjørn Mork).
+> - fix inconsistency between PHY_COMMON_PROPS and GENERIC_PHY_COMMON_PROPS
+>   Kconfig options by using PHY_COMMON_PROPS everywhere (thanks to Bjørn
+>   Mork).
+> 
+> v1 at:
+> https://lore.kernel.org/netdev/20251122193341.332324-1-vladimir.oltean@nxp.com/
+> Changes since v1:
+> - API changes: split error code from returned value; introduce two new
+>   helpers for simple driver cases
+> - Add KUnit tests
+> - Bug fixes in core code and in drivers
+> - Defer XPCS patches for later (*)
+> - Convert Mediatek LynxI PCS
+> - Logical change: rx-polarity and tx-polarity refer to the currently
+>   described block, and not necessarily to device pins
+> - Apply Rob's feedback
+> - Drop the "joint maintainership" idea.
+> 
+> (*) To simplify the generic XPCS driver, I've decided to make
+> "tx-polarity" default to <PHY_POL_NORMAL>, rather than <PHY_POL_NORMAL>
+> OR <PHY_POL_INVERT> for SJA1105. But in order to avoid breakage, it
+> creates a hard dependency on this patch set being merged *first*:
+> https://lore.kernel.org/netdev/20251118190530.580267-1-vladimir.oltean@nxp.com/
+> so that the SJA1105 driver can provide an XPCS fwnode with the right
+> polarity specified. All patches in context can be seen at:
+> https://github.com/vladimiroltean/linux/tree/phy-polarity-inversion
+> 
+> Original cover letter:
+> 
+> Polarity inversion (described in patch 4/10) is a feature with at least
+> 4 potential new users waiting for a generic description:
+> - Horatiu Vultur with the lan966x SerDes
+> - Daniel Golle with the MaxLinear GSW1xx switches
+> - Bjørn Mork with the AN8811HB Ethernet PHY
+> - Me with a custom SJA1105 board, switch which uses the DesignWare XPCS
+> 
+> I became interested in exploring the problem space because I was averse
+> to the idea of adding vendor-specific device tree properties to describe
+> a common need.
+> 
+> This set contains an implementation of a generic feature that should
+> cater to all known needs that were identified during my documentation
+> phase.
+> 
+> Apart from what is converted here, we also have the following, which I
+> did not touch:
+> - "st,px_rx_pol_inv" - its binding is a .txt file and I don't have time
+>   for such a large detour to convert it to dtschema.
+> - "st,pcie-tx-pol-inv" and "st,sata-tx-pol-inv" - these are defined in a
+>   .txt schema but are not implemented in any driver. My verdict would be
+>   "delete the properties" but again, I would prefer not introducing such
+>   dependency to this series.
+> 
+> Vladimir Oltean (10):
+>   dt-bindings: phy: rename transmit-amplitude.yaml to
+>     phy-common-props.yaml
+>   dt-bindings: phy-common-props: create a reusable "protocol-names"
+>     definition
+>   dt-bindings: phy-common-props: ensure protocol-names are unique
+>   dt-bindings: phy-common-props: RX and TX lane polarity inversion
+>   phy: add phy_get_rx_polarity() and phy_get_tx_polarity()
+>   dt-bindings: net: airoha,en8811h: deprecate "airoha,pnswap-rx" and
+>     "airoha,pnswap-tx"
+>   net: phy: air_en8811h: deprecate "airoha,pnswap-rx" and
+>     "airoha,pnswap-tx"
+>   dt-bindings: net: pcs: mediatek,sgmiisys: deprecate "mediatek,pnswap"
+>   net: pcs: pcs-mtk-lynxi: pass SGMIISYS OF node to PCS
+>   net: pcs: pcs-mtk-lynxi: deprecate "mediatek,pnswap"
+> 
+>  .../bindings/net/airoha,en8811h.yaml          |  11 +-
+>  .../bindings/net/pcs/mediatek,sgmiisys.yaml   |   7 +-
+>  .../bindings/phy/phy-common-props.yaml        | 157 +++++++
+>  .../bindings/phy/transmit-amplitude.yaml      | 103 -----
+>  MAINTAINERS                                   |  10 +
+>  drivers/net/dsa/mt7530-mdio.c                 |   4 +-
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c   |  19 +-
+>  drivers/net/pcs/Kconfig                       |   1 +
+>  drivers/net/pcs/pcs-mtk-lynxi.c               |  63 ++-
+>  drivers/net/phy/Kconfig                       |   1 +
+>  drivers/net/phy/air_en8811h.c                 |  53 ++-
+>  drivers/phy/Kconfig                           |  22 +
+>  drivers/phy/Makefile                          |   2 +
+>  drivers/phy/phy-common-props-test.c           | 422 ++++++++++++++++++
+>  drivers/phy/phy-common-props.c                | 209 +++++++++
+>  include/dt-bindings/phy/phy.h                 |   4 +
+>  include/linux/pcs/pcs-mtk-lynxi.h             |   5 +-
+>  include/linux/phy/phy-common-props.h          |  32 ++
+>  18 files changed, 979 insertions(+), 146 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/phy/phy-common-props.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/phy/transmit-amplitude.yaml
+>  create mode 100644 drivers/phy/phy-common-props-test.c
+>  create mode 100644 drivers/phy/phy-common-props.c
+>  create mode 100644 include/linux/phy/phy-common-props.h
+> 
+> -- 
+> 2.43.0
+
 -- 
-2.43.0
-
+~Vinod
 
