@@ -1,179 +1,226 @@
-Return-Path: <netdev+bounces-249854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43BC9D1F868
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:45:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5ADD200FA
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9453300C345
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:45:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4BB0830BDDE8
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C06389464;
-	Wed, 14 Jan 2026 14:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC1F3A35C4;
+	Wed, 14 Jan 2026 15:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="lv72PYOa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GB7UP8Mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012050.outbound.protection.outlook.com [52.101.66.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E0C2D7DE1;
-	Wed, 14 Jan 2026 14:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768401915; cv=fail; b=V3UO11PtYcEnP1uhodmpZVeCX4H6N2pcq9Q1DU6o24d/ByOqKLH4FUgDSTjsATtq1EFqZDoOJQ8uk5ffHin5LRlHZiOclfZ8Pm+w8KaqGG7lt1pIYcp/HrMfyFYMr2mu/WMOx+AoG0wnL6Y8byArlZWn0qvuhYz2u/z3zLvj47c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768401915; c=relaxed/simple;
-	bh=rp8m7wsamJyawFgFfVoDFViFEJkUCOyHHbU43FwR9nc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ywy0mi0+X9IEAYCURsN53x75kxnq3VEESOh3WRwwHPuih5bJ3mDqYqFobmBH0sA7UOKZNKLKiaWs3VTl5p/pTPzKosGPbb0zMQJ35/NQqZWx7GIIOekgnnMLwJ2anlCKv5q8Gy/iQTq6BBF1V9GC/O9kIVlLCP/ydRtCUDBvpXE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=lv72PYOa; arc=fail smtp.client-ip=52.101.66.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=no2oHuOFVrrGXAJKXwROAOupWUvKS10Qc4krnse+AiJpXxBhQp/6IB4mh/ptuVJCoVTdp6tY5vk8GZ56zVO1whN1ISzdZCQ3TUob8VJgl60Yj46PaycH+iXHwVg1gEO+IAlZ5fD4HEMYYOBSMCoX83/QE2RoJ0/RvIWisGS63b/vqGfYih+FcCALqMnRe4oeX6oM3V8DFH/2FBccvH/cZyYTLZS7UrFn1KQxl843NNfJIQnFwA2ocUWS/Pr7jP/jiYedBXugk5tmWhTabY7XBBnMXSrLBw0LAadtMFAwQ13+C78MC9kC78PgqZZ+K6QAXE2yLNjybAwuTDSYPerNhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hoXUjwP6gkQ3GMjOsro9z7pCZqUaOFIbr301O7oUY90=;
- b=NbMGqOtS9ZbZQwzJvvGjocnpKA2vX6rGvKU4FmRO7qBEdIqDk7zBWBweRlv0DjhHKVITtzPC9tZ9luRYFti/EDqotdOf6t4hbb3zd4+GmgPee8+G6sR96IkvhzUvJEJyz+X1rt+ivjdGxqdL8ncqZ9Pm9Hhh3q8fy4NDAvlBNcS/d739xnEGzNTB8CfL1qEycqIkElIirycujR3ofR9fODJ0CknLEjj3sx4oQZD4oITfbPv0O53E5GFSLSuHFNHcl8xcaNlMmnjvmJW/ZV7LOJ1uyyoC/R8kyiMwKMTEHTlD8mSAeHFKduBzNvclcIitx1smPa1u4tqaEk3oNqpJuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.6.100) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nokia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nokia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hoXUjwP6gkQ3GMjOsro9z7pCZqUaOFIbr301O7oUY90=;
- b=lv72PYOaPVfXjoeAWUy8gYFFFhhHFUDaCsTnHEdXrgFkrQguO2lHGmEnJrDQxKIlqPd1C9UGxJUQ39KYUKaIg1Z9ow95+BW/NJv34OSOgmQnH/+ehoQ07PfLXn54ahjNjdxvwT0HbWwPObY6/IZ0J4BC5YlxfJjyN7vDQ4qJ8Yxh23QzQicOh6vqqLIYg5sBzydJ04wkZqjRlC1aHkn/UtkKihs91muZrGBCPRq7BZ/V8jxH/CoVSzWJteJFnylBL1/kmyzqbkd1fibr0dmkIQqj5xxjAmgRVZmLjoU8gYWC//XH9rG3maKgYsBcUd1YS/Ddm99McxovW05Q9KQBaw==
-Received: from AS4P195CA0047.EURP195.PROD.OUTLOOK.COM (2603:10a6:20b:65a::24)
- by PA4PR07MB7517.eurprd07.prod.outlook.com (2603:10a6:102:c5::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Wed, 14 Jan
- 2026 14:45:10 +0000
-Received: from AMS0EPF000001B2.eurprd05.prod.outlook.com
- (2603:10a6:20b:65a:cafe::c3) by AS4P195CA0047.outlook.office365.com
- (2603:10a6:20b:65a::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.5 via Frontend Transport; Wed,
- 14 Jan 2026 14:45:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.100)
- smtp.mailfrom=nokia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia.com designates
- 131.228.6.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=131.228.6.100; helo=fr711usmtp2.zeu.alcatel-lucent.com; pr=C
-Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
- AMS0EPF000001B2.mail.protection.outlook.com (10.167.16.166) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.1
- via Frontend Transport; Wed, 14 Jan 2026 14:45:09 +0000
-Received: from uleclfsdev02.linsee.dyn.nesc.nokia.net.net (uleclfsdev02.linsee.dyn.nesc.nokia.net [10.47.240.2])
-	by fr711usmtp2.zeu.alcatel-lucent.com (Postfix) with ESMTP id BFB81680045;
-	Wed, 14 Jan 2026 16:45:08 +0200 (EET)
-From: Stefan Wiehler <stefan.wiehler@nokia.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	linux-omap@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wiehler <stefan.wiehler@nokia.com>
-Subject: [PATCH net-next] net: ethernet: ti: cpsw_ale: Remove obsolete macros
-Date: Wed, 14 Jan 2026 15:44:25 +0100
-Message-ID: <20260114144425.3973272-1-stefan.wiehler@nokia.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACF43A1A44
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 15:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768406298; cv=none; b=um/ARmg9qLFYe5M+/cUw7s64+rNtAEHSw2RDOWwodgy3sWRg0mfs7wnv8YRYCUDo+I03om2rQf62DhvuZbDR3MsN7CxSCsN2G8s9G040JsRoj1ZTQAsWSh72oOkNTunpQOjw5IyhQ20ReeoNzVECoHoYFiMnTchWl6usZVC6LbQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768406298; c=relaxed/simple;
+	bh=fyFkPzA7jD86HDqzxLlGJw1nUhjO3+Q6huQ4gYgSwK8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=YoUn3/QJtxU0FJ3tKRxlqSKjlz6nfxGss2ADFpdbOxEqz774wsrAm5Vxw0vs0hw13ULyUlEjSDaOFQajYDZaPx0hXw+/CVp5XSolXYY2pmc6ryTw+u3ZPRu2oaZ+2mm97w6tS2puU8svaTXQjuvSAYVVLN1v1HhJegbvdGeKLIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GB7UP8Mz; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-50145cede6eso11345701cf.2
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:58:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768406291; x=1769011091; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fyFkPzA7jD86HDqzxLlGJw1nUhjO3+Q6huQ4gYgSwK8=;
+        b=GB7UP8MzbH+zo3J+a15WxFGHqpJNmNxGFeeQnj2bW1ANbZoF3h2ufO1wHja9wlMHMb
+         NiN90QIDCgPS8SbC0v+cd/BN2qRBb0E1NVDeErx5ofZdc0u/+FJ2Vzb3Fi9TGxzIqIJk
+         6pULQnGtROKszzz2opai9vBB0pHqy1QW3Sou7AeOCPhity3t/32JolroB8JAG3toUtM7
+         /LEYj8x/nWn2KWgq2al7e2XdKgw+F4LE3eGYjyWNGmpNrooOyRUHqYK4a9O43sDT/ce4
+         o7cmb9Usn1YehbDuuBcjkTElDB2OuunRsEW8GSWiidXdE1ZcaS+3MqGO8tYtWlJtvHpT
+         wNSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768406291; x=1769011091;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fyFkPzA7jD86HDqzxLlGJw1nUhjO3+Q6huQ4gYgSwK8=;
+        b=ZhsByx2xJ4YCKOAJtI6t07/A0Y2dVIKCNnOoIMNo6ge5kmRKVXnmYkhy4dtYjuRoh6
+         i2+oZbR6LXjbV08NZ9ecpfzY0+G6FIzZO/D5KGOI7o7wmpew0Gs27ks/btVZgt5+dp8w
+         OxgClgioiIKhopAo2QIE0sI43cnmCIXXG2jA46kAoH57duDdvDJE/xVchMq36IrYo0F9
+         hjckF5kRoG24Bi0P5Bq0zOPMybKUmxHW75W45Ctbo0G1rn2GVSiY3ot+97pkxa2wz3xj
+         LclWB3DTcjsMZFqD+8Np/pEABekL4hiDYtgydmM3h13lkh9aG+NPEUrU+QBQQCQrgpg7
+         01zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmQ9hJ+GU3R84HNUfFb7aV6INvJviC3mP3ToXCqstJQfwmI1CGDN5tdWpBvvoat0kkn7J0fjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywdg+/KNdsO4+ck4mmKJqDLyqR2O1YLmrTrWtJgJfyHaFVunCjX
+	2ZsuGC5NeATbj2nYFz2yP+k3wzuEDpPhOjvbJVlv2dwRu0PYt3yzcCbduOHaHQ==
+X-Gm-Gg: AY/fxX4UOZRO2FUpgP29rGVokjOSkiazr+X/3U8bgzkwLCEhe+cTPVNSMiCzYi9vW48
+	w5hj8rzDZLzQDEfvYLR3cDljW685I/WUg8nbVwxAolDYfJyC9njdtk/jReZQhiypxjBW4v1t73Z
+	2MWb9BAggNUY2KB5/r6+6hSpDiyAvDvgfs5d1xCy/w2HXU5UdY1v3j/LOPf+ZA2+SrDP+kmq5MY
+	XwBF8MjaupsWOkfGmeWPKsMRa/+TInhAlWAkq6ohetUESRUT1Ytl+H9Cct4YiRnZyUcuM+/6Hyn
+	3/fzzw1teKawfwMkVIt5znQRa1Ej0MzSHFHA5dnjoWz2ZbNvsnFkJ59g8Rxt01LviR73usop+z+
+	cUp1hTSezqcoYv2DdcGIkzt/uL4WLCxjCVJf1uAsgmSX/8aKH6AmNCVoJmScKubFOy4PC0qU16d
+	yfFFC3tyAhLHquKh32SXKPuyq1A068KaxkYJzo3XFQVaglv805FZBvexAlJITlrUE2kOKsKw==
+X-Received: by 2002:a05:690c:9c0a:b0:78c:25fa:1bb7 with SMTP id 00721157ae682-793a1d6fa34mr22055957b3.60.1768400306350;
+        Wed, 14 Jan 2026 06:18:26 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa670ec0sm91265417b3.36.2026.01.14.06.18.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 06:18:25 -0800 (PST)
+Date: Wed, 14 Jan 2026 09:18:25 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>, 
+ Neal Cardwell <ncardwell@google.com>
+Cc: "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "parav@nvidia.com" <parav@nvidia.com>, 
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+ "corbet@lwn.net" <corbet@lwn.net>, 
+ "horms@kernel.org" <horms@kernel.org>, 
+ "dsahern@kernel.org" <dsahern@kernel.org>, 
+ "kuniyu@google.com" <kuniyu@google.com>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "dave.taht@gmail.com" <dave.taht@gmail.com>, 
+ "jhs@mojatatu.com" <jhs@mojatatu.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ "stephen@networkplumber.org" <stephen@networkplumber.org>, 
+ "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, 
+ "jiri@resnulli.us" <jiri@resnulli.us>, 
+ "davem@davemloft.net" <davem@davemloft.net>, 
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, 
+ "donald.hunter@gmail.com" <donald.hunter@gmail.com>, 
+ "ast@fiberby.net" <ast@fiberby.net>, 
+ "liuhangbin@gmail.com" <liuhangbin@gmail.com>, 
+ "shuah@kernel.org" <shuah@kernel.org>, 
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+ "ij@kernel.org" <ij@kernel.org>, 
+ "Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>, 
+ "g.white@cablelabs.com" <g.white@cablelabs.com>, 
+ "ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>, 
+ "mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>, 
+ cheshire <cheshire@apple.com>, 
+ "rs.ietf@gmx.at" <rs.ietf@gmx.at>, 
+ "Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>, 
+ Vidhi Goel <vidhi_goel@apple.com>, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <willemdebruijn.kernel.a2eb52bfa5d5@gmail.com>
+In-Reply-To: <PAXPR07MB7984F8BDC1261BD144D20DCFA38FA@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20260108155816.36001-1-chia-yu.chang@nokia-bell-labs.com>
+ <20260108155816.36001-2-chia-yu.chang@nokia-bell-labs.com>
+ <CADVnQykTJWJf7kjxWrdYMYaeamo20JDbd_SijTejLj1ES37j7Q@mail.gmail.com>
+ <PAXPR07MB7984F8BDC1261BD144D20DCFA38FA@PAXPR07MB7984.eurprd07.prod.outlook.com>
+Subject: RE: [PATCH net-next 1/1] selftests/net: Add packetdrill packetdrill
+ cases
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001B2:EE_|PA4PR07MB7517:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: cfe1f2d5-92b8-4eb2-cdec-08de537b8433
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/KOq5ShvaydVEYdxBGzCN/2KqIQ2uFx5/2w6ElF5VeF2qlxDhDx4QuNhQW6u?=
- =?us-ascii?Q?DPNHIgZyubvnvOq5gB2xTaTNit80Xkdzx/B71aeMyO5Pf2+YB16BHDht34/I?=
- =?us-ascii?Q?63y1JIFsbRhAcbOE4Z23h549c6R7g4R2RNH+4bgnlCCRUi6ZVKURCdBOtxd8?=
- =?us-ascii?Q?To4rNmp3kjuzZ0Wp436wF9nLRMdtKnRkrrEsskb8mb61P3uusKCXyjn4xKNH?=
- =?us-ascii?Q?4WprM0cZQj9eCnSVbYcnOhncUphLWY2ZXMchv/zlAaxWTKxW+pMGIEMzdmGW?=
- =?us-ascii?Q?IcOcGusW7yta4iF9bHR8CLxmgIN/D/JdYV9/eRbPH/5STKanm7wLTnTF8Tet?=
- =?us-ascii?Q?fO/kqj5h+cgyU+S4ZZi57hNAbh/ciaWTwtDA/M9lTSi6XsGoBsFpK9oQ5Dfs?=
- =?us-ascii?Q?PBXYAN1wOJEMiUL8tqr/TGTbrXPjq34amHyI0D0zMoRDeyZkGNatD42pK+P5?=
- =?us-ascii?Q?L02RScS9DjL/gOWr8bDnZjGiqMkIK72GzxVau9saEd8C4vtKifmtF6isqD0M?=
- =?us-ascii?Q?rOn7zLsYs5iBbkVohvrIEcO5VbBCLx9xjpLbFxM8l38oikQl8KF4KnhSCkGR?=
- =?us-ascii?Q?VVLFrQULzgRpF8JxUBq8daPBdiFBSkEdWhnFM8bCfEGTxZdO8jwAsKpCDsU0?=
- =?us-ascii?Q?UzR4MN2eC90hVXQKa7lIXdaCh0lDoAWjOKL+L7MXsj8Hu8tESU1/8xb1suaf?=
- =?us-ascii?Q?V7AKKT1xG0zdUiOuBJ+LVzC1Prk1hTXajHFyZ/eNXVRKP+z+mlKlacZAZFMD?=
- =?us-ascii?Q?q/kb+QpwhVBAfFC2WbqYc3U+8rxa9CPYL1TTXBJNBHl/kZQqZ/nTDm8iGlwE?=
- =?us-ascii?Q?KiyJ7qOJo83+ulVadxTJbhUnGrPeQ3pBay+86YOTLLcKbmhU55h1pBthSPHB?=
- =?us-ascii?Q?jkHEp3aM/Nd+8k3pTP0KtjvNbos+LUXlfKTFCaYZwQwej4ZV/jalaUbTm5TN?=
- =?us-ascii?Q?Vf6+A1HcpuvZ11ae7S3Bvrh2hFtHsUSv+GqLtmWoHBtg4ez2ES/Ei9xageoE?=
- =?us-ascii?Q?G4paST4DqsE269iAEeheOfx2Jy2FEOdtmmJOlOWW4ep6SdkI6laZY37OGO3q?=
- =?us-ascii?Q?ZQnB+vQzpq2ZZ5wVkb3qZsxCh0+XwRcDkvnWdDJyRofAlKAaf2IRC3Hq3CYc?=
- =?us-ascii?Q?gILnBcyeinyptTOawcyx/VKAn0VAN3M5vaJR6roQbHHkFfZsPLKW201/V8+I?=
- =?us-ascii?Q?PXm6xxdy1X1Ctr2R5hIqg0/6J1WoWe5fUtNVS9HgTzYa82ADcH5CV0gkKOwU?=
- =?us-ascii?Q?WxtmnNGIaNVV9U+pwVjx+DWJtAptLCDZ1KmQZ7AGXlDtDRUncLWDrxNe9urJ?=
- =?us-ascii?Q?b5MEDKbsVdDhbcQZud6b5/+EVkjdaWKRyxm9r5/ZfwDphNOMWYNqU0+PBrD/?=
- =?us-ascii?Q?fNMqcOAV1ZUbRBKFX1f0oeAjtUrZCgDYYTMu273CE4apxZHKqaskvtGOkMWU?=
- =?us-ascii?Q?2r3yBZVrWlLFBN57N4S/ZOuFAjG+uBGuxE1fBv9c0K8oY+8+1EpkJE/wIs/G?=
- =?us-ascii?Q?JDFWEFPOziuBkbXmBWxPlymwrRb9YRtLE2jojO97fP6byIyyc6CmUGAJ5lDg?=
- =?us-ascii?Q?MypyFiq0Xct3x4F9ginPlG/NvTKcII+D3p0ySSJWwfkJqkMGIbSrtk6MinPC?=
- =?us-ascii?Q?rDmUS8m/3N0OZ98URHrtLlHM/aSYpCkXDN4mxEcPgpOTl19fq5cwLp/snWX/?=
- =?us-ascii?Q?/O5+Dw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 14:45:09.6309
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfe1f2d5-92b8-4eb2-cdec-08de537b8433
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-AMS0EPF000001B2.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR07MB7517
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-- ALE_VERSION_MAJOR/MINOR are no longer used following the transition to
-  regmaps in commit bbfc7e2b9ebe ("net: ethernet: ti: cpsw_ale: use
-  regfields for ALE registers")
-- ALE_VERSION_IR3 is unused since entry mask bits are no longer
-  hardcoded with commit b5d31f294027 ("net: ethernet: ti: ale: optimize
-  ale entry mask bits configuartion")
-- ALE_VERSION_IR4 has never been used since its introduction in commit
-  ca47130a744b ("net: netcp: ale: update to support unknown vlan
-  controls for NU switch")
+Chia-Yu Chang (Nokia) wrote:
+> > -----Original Message-----
+> > From: Neal Cardwell <ncardwell@google.com> =
 
-Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
----
- drivers/net/ethernet/ti/cpsw_ale.c | 5 -----
- 1 file changed, 5 deletions(-)
+> > Sent: Thursday, January 8, 2026 11:47 PM
+> > To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+> > Cc: pabeni@redhat.com; edumazet@google.com; parav@nvidia.com; linux-d=
+oc@vger.kernel.org; corbet@lwn.net; horms@kernel.org; dsahern@kernel.org;=
+ kuniyu@google.com; bpf@vger.kernel.org; netdev@vger.kernel.org; dave.tah=
+t@gmail.com; jhs@mojatatu.com; kuba@kernel.org; stephen@networkplumber.or=
+g; xiyou.wangcong@gmail.com; jiri@resnulli.us; davem@davemloft.net; andre=
+w+netdev@lunn.ch; donald.hunter@gmail.com; ast@fiberby.net; liuhangbin@gm=
+ail.com; shuah@kernel.org; linux-kselftest@vger.kernel.org; ij@kernel.org=
+; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.whit=
+e@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@erics=
+son.com; cheshire <cheshire@apple.com>; rs.ietf@gmx.at; Jason_Livingood@c=
+omcast.com; Vidhi Goel <vidhi_goel@apple.com>; Willem de Bruijn <willemb@=
+google.com>
+> > Subject: Re: [PATCH net-next 1/1] selftests/net: Add packetdrill pack=
+etdrill cases
+> > =
 
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index fbe35af615a6..bb969dd435b4 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -23,11 +23,6 @@
- 
- #define BITMASK(bits)		(BIT(bits) - 1)
- 
--#define ALE_VERSION_MAJOR(rev, mask) (((rev) >> 8) & (mask))
--#define ALE_VERSION_MINOR(rev)	(rev & 0xff)
--#define ALE_VERSION_1R3		0x0103
--#define ALE_VERSION_1R4		0x0104
--
- /* ALE Registers */
- #define ALE_IDVER		0x00
- #define ALE_STATUS		0x04
--- 
-2.42.0
+> > =
 
+> > CAUTION: This is an external email. Please be very careful when click=
+ing links or opening attachments. See the URL nok.it/ext for additional i=
+nformation.
+> > =
+
+> > =
+
+> > =
+
+> > On Thu, Jan 8, 2026 at 10:58=E2=80=AFAM <chia-yu.chang@nokia-bell-lab=
+s.com> wrote:
+> > >
+> > > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> > >
+> > > Linux Accurate ECN test sets using ACE counters and AccECN options =
+to =
+
+> > > cover several scenarios: Connection teardown, different ACK =
+
+> > > conditions, counter wrapping, SACK space grabbing, fallback schemes=
+, =
+
+> > > negotiation retransmission/reorder/loss, AccECN option drop/loss, =
+
+> > > different handshake reflectors, data with marking, and different sy=
+sctl values.
+> > >
+> > > Co-developed-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > > Co-developed-by: Neal Cardwell <ncardwell@google.com>
+> > > Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> > > ---
+> > =
+
+> > Chia-Yu, thank you for posting the packetdrill tests.
+> > =
+
+> > A couple thoughts:
+> > =
+
+> > (1) These tests are using the experimental AccECN packetdrill support=
+ that is not in mainline packetdrill yet. Can you please share the github=
+ URL for the version of packetdrill you used? I will work on merging the =
+appropriate experimental AccECN packetdrill support into the Google packe=
+tdrill mainline branch.
+> > =
+
+> > (2) The last I heard, the tools/testing/selftests/net/packetdrill/
+> > infrastructure does not run tests in subdirectories of that packetdri=
+ll/ directory, and that is why all the tests in tools/testing/selftests/n=
+et/packetdrill/ are in a single directory.
+> > When you run these tests, do all the tests actually get run? Just wan=
+ted to check this. :-)
+> > =
+
+> > Thanks!
+> > neal
+> =
+
+> Hi Neal,
+> =
+
+> Regards (2), I will put all ACCECN cases in the tools/testing/selftests=
+/net/packetdrill/
+> But I would like to include another script to avoid running these AccEC=
+N tests one-by-one manually, does it make sense to you?
+> Thanks.
+
+All scripts under tools/testing/selftests/net/packetdrill are already
+picked up for automated testing in kselftests:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commi=
+t/?id=3D8a405552fd3b
 
