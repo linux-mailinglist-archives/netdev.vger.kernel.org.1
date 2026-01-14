@@ -1,147 +1,120 @@
-Return-Path: <netdev+bounces-249889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA72D203AB
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:36:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEA18D203FF
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:40:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B747C3011A69
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:34:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B06643060A7C
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88F93A35A3;
-	Wed, 14 Jan 2026 16:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429623A4AD3;
+	Wed, 14 Jan 2026 16:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hQr9aWtf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rX3NXa+Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABDF38A720
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 16:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADBF3A1E66;
+	Wed, 14 Jan 2026 16:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768408448; cv=none; b=gZkl2Ej0PP3UFe+7Ia7lKvAC5HoUIucwHUenliQtOWP/JzDkU1igd+mUMj8IJm51rKmquMvhJWQPwsqK2ZK261mBrMmecirn26Mu6Ym29TvblLtE8Za5KZyl4uJrYXnDKLJd3DG186GWHD3Zvm1EHSAx+m9YbwXeQ4Ozmc141h4=
+	t=1768408731; cv=none; b=rMf1vW6i2jYUWYNYa733bzP6Qw+S0psSNcYl0ybMr4GrZbJ6WSG1T7iAJSXxeQdv9LmKIUsixDh8ovAi5/oDdXgATuSjAYTxgukwHht/o3sSZCIuq35gGOmLrxiWKJT6Z4TKmJ6bjJUiw3OVn8pTRVmMqo9IhFKpgAU/ZgyCdq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768408448; c=relaxed/simple;
-	bh=EV0/yy7esrd7Dn9sH9OIVX7FqE756S3/nAr8EYjENSI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q/Wnf2Qly4tRNGsqiRD9nT+ffqL+8/tazmnyy5xV8ewhj3EZTmwOzwODoE2/quk4O6Ep8nwhKXgjaIHrUlANA7M/sNDdal6agUJ/qhzdy/SNfGKR9+1TkY3QcpXHxXxd4ls05PX7Y3KAgVDTJZuoq81MoFIdC/uu4MHOQy7M6Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=hQr9aWtf; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a0d52768ccso250535ad.1
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:34:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768408446; x=1769013246; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EV0/yy7esrd7Dn9sH9OIVX7FqE756S3/nAr8EYjENSI=;
-        b=hQr9aWtfrw+gtHD4U6I6cvT8E7pkTDipQoYvNrrUmLaIZC4Wdh4yLFhnhSkXtgd1iw
-         v0+5JhjPkgGKMgaY3ri1YhafS6lUIwxyaLeCLe47Z4n4O6z1zozA0iYDmAZ8PaUYThPe
-         AfZp2KtR1aB/P1oOrpl/JOTHr+1qUTwZNfgvfGeiTIzV3eWYqlUl6HOvZvSrK0baT76M
-         fFDFeHeQpkVVtEszZFnvoL8UuQMvmOBFOKddWIdWN3At8GFvGQSq8fpJ6E9W9TkI7sdj
-         crqBLkrkZjvWfhb9NY4LpBFL3+c7m2WyvhYpxvZ9TtnIY5Cgd2/jnwTMGwHRXfP5+a0O
-         gYCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768408446; x=1769013246;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EV0/yy7esrd7Dn9sH9OIVX7FqE756S3/nAr8EYjENSI=;
-        b=IF/G5GKwfXZEyxINdn9z0ypFXVc0w6pX/Rsk+lTiIhypZLts55ARSb96HAwYAXQPhf
-         3R+FCNjozeBnZTVcW5DRSisbq1ACgxJ8QipotS6dUBExj/x7ruFrG+0tat6RCJXfJHI3
-         V5Lp6/6oxHIpRLMWvOGlgJdJMTF8b9dnBTIOIZlVuHYfMVPqIsqmk3Dtv9nbe5bcDR9g
-         KDVWvO0XmtTdrgbjCWXSI18sVt5vrXdj0+LzWwNrgyppJUISaQQFyzBHMcOmeh8uiMyX
-         8L5oIoqu+QB8I0cnBlIGKQBRHZu4eCDM8/Dtu+cUgzSXvL8N2DoWks9tqVqOIhiCA2qh
-         VXEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSfRvN4KKzLNhPcsSHFM1KOp+9o/9vnLxKANniQdLQe6xbd9bTMKjGXPj8zDUOxArbmsnaMcw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/kqlkBRc5UD2ClDoIqnSlmL0PqVTP0PqDx17y9QHTCzKCXJRj
-	3C1cJZqs3eCPGioQ21FSJfVSb0ohsQY2e6o8vDyLQvR/8MDZoNjpDOINMrjGDfHGTgYyjwh2Zlj
-	kv79VEMl71SfXAwsCtfN7Gmk8lZhWM1gPY+OFnI/2
-X-Gm-Gg: AY/fxX4adM/Uol5nSdGpVUqBBjDAvz+RX7kxkPKKDxTqqUDUMaPf2GA4sEZhxc0SwKq
-	/AM6bNl1n0rk7kvvC9R/hhyg2fweYudwRhQUkbwYTN1Fp/uiIBgF4R9GKya1mBXCLjM6E2EnY81
-	3Sksvo08wvTLkNlPdW/r7ng7fLkwgUrVFF5twyZBG4LNEg3SNB3z8XVmCJjaOy3DC62s9L+nEWY
-	Ji9BOlgZ72y4lxc5VB3Z77cZSaEW2rx2cDeesgZvENFrzgaL+KYuepQSQMJXsPH7nwp576avY+l
-	iu7/sNIToL678Q==
-X-Received: by 2002:a17:90b:1f83:b0:32e:5646:d448 with SMTP id
- 98e67ed59e1d1-3510b12673cmr2360317a91.21.1768408446393; Wed, 14 Jan 2026
- 08:34:06 -0800 (PST)
+	s=arc-20240116; t=1768408731; c=relaxed/simple;
+	bh=3O46Pj7m8kkRm5o6FCiKeQjNffkaPKNOyTPfHDTuyTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c5hEBzqDtt1U8oUVdYPvxTikb4nXM3C4ZdF42WdUK9KtSXqV+lbzD9wdsLOWxUdFqvEsbTqK17oG+Ib0qmiv87KMoKukXdG9oXH5fyNWHwsOmTCLIe5UR0PM8ElvZ/9z/fYBI95e3vwp/MHJKQdnzzHQFg5sFJniJJzHBPaLejI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rX3NXa+Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80489C4CEF7;
+	Wed, 14 Jan 2026 16:38:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768408730;
+	bh=3O46Pj7m8kkRm5o6FCiKeQjNffkaPKNOyTPfHDTuyTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rX3NXa+ZIaH3nFwhK4UUCK7Tl+BkdrM7lAWylErEBVX8n4+UiQ4G9G3ZhsgmdM3kk
+	 vN8PXFoQ+O9dscO4bKZ3M3QWmyyXJXre63JLVYqnzZ2NTakKl+OU0g0oj8iEefzjr3
+	 mgengyjgYNSq8vnqi/nIcJdbHx722ODGLyY8W8WF4jD1J44QYJo3q7W39OBPor2Wnp
+	 mtMB1YriAKD7oAMO5DENXpRw1aefTtMKh3nXtSKTmIbbZIhuLzX4/xt9jCGtUk6R4U
+	 0bsnyWbYeo3xcvSjczR5clmShq482fExnV7dzxGfD2Q4FGvs3AgYwtJ9KizIe5aoQq
+	 liWKl6bOegsTQ==
+Date: Wed, 14 Jan 2026 16:38:39 +0000
+From: Daniel Thompson <danielt@kernel.org>
+To: Marcos Paulo de Souza <mpdesouza@suse.com>
+Cc: Daniel Thompson <daniel@riscstar.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jason Wessel <jason.wessel@windriver.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
+	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	sparclinux@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 00/19] printk cleanup - part 3
+Message-ID: <aWfGj1eQhj2fAWB-@aspen.lan>
+References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+ <aVuz_hpbrk8oSCVC@aspen.lan>
+ <aVvF2hivCm0vIlfE@aspen.lan>
+ <a5d83903fe2d2c2eb21de1527007913ff00847c5.camel@suse.com>
+ <89409a0f48e6998ff6dd2245691b9954f0e1e435.camel@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260111163947.811248-1-jhs@mojatatu.com> <CAM_iQpXXiOj=+jbZbmcth06-46LoU_XQd5-NuusaRdJn-80_HQ@mail.gmail.com>
-In-Reply-To: <CAM_iQpXXiOj=+jbZbmcth06-46LoU_XQd5-NuusaRdJn-80_HQ@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 14 Jan 2026 11:33:55 -0500
-X-Gm-Features: AZwV_QjM9sCmciqd-3G5CC1tZ7mrTsZr3pe_blrLR8iInt1cI1E82GjtFqVpO9k
-Message-ID: <CAM0EoM=VHt3VakG6n81Lt+6LFzOVKAL-uzjM2y_xuWMv5kE+JA@mail.gmail.com>
-Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me, 
-	William Liu <will@willsroot.io>, Savy <savy@syst3mfailure.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89409a0f48e6998ff6dd2245691b9954f0e1e435.camel@suse.com>
 
-On Tue, Jan 13, 2026 at 3:10=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
+On Tue, Jan 13, 2026 at 09:32:33PM -0300, Marcos Paulo de Souza wrote:
+> I talked with Petr Mladek and it would need to rework the way that we
+> register a console, and he's already working on it. For now I believe
+> that we could take a look in all the patches besides the last one that
+> currently breaks the earlycon with kgdb and maybe other usecases.
 >
-> On Sun, Jan 11, 2026 at 8:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-> >
-> >
-> > We introduce a 2-bit global skb->ttl counter.Patch #1 describes how we =
-puti
-> > together those bits. Patches #2 and patch #5 use these bits.
-> > I added Fixes tags to patch #1 in case it is useful for backporting.
-> > Patch #3 and #4 revert William's earlier netem commits. Patch #6 introd=
-uces
-> > tdc test cases.
->
-> 3 reasons why this patchset should be rejected:
->
-> 1) It increases sk_buff size potentially by 1 byte with minimal config
->
+> Sorry for not catching this issue before. I'll use kgdb next time to
+> make sure that it keeps working :)
 
-All distro vendors turn all options. So no change in size happens.
-Regardless, it's a non-arguement there is no way to resolve the mirred
-issue without global state.
-It's a twofer - fixing mirred and netem.
+As I understood things the bug was in earlycon rather then kgdb.
 
-> 2) Infinite loop is the symptom caused by enqueuing to the root qdisc,
-> fixing the infinite loop itself is fixing the symptom and covering up the
-> root cause deeper.
->
+It was picked up by the kgdbtest suite since kgdb does some cool things
+with earlycon (thanks to Doug Anderson) so I added a few earlycon tests
+to the kgdbtest suite. However it wasn't kgdb itself that failed here.
 
-The behavior of sending to the root has been around for ~20 years.
-I just saw your patches - do you mind explaining why you didnt Cc me on the=
-m?
+So... if you want to run https://gitlab.com/daniel-thompson/kgdbtest
+then certainly feel free but its probably less effort just to include
+a couple of earlycon checks in your testing.
 
-> 3) Using skb->ttl makes netem duplication behavior less predictable
-> for users. With a TTL-based approach, the duplication depth is limited
-> by a kernel-internal constant that is invisible to userspace. Users
-> configuring nested netem hierarchies cannot determine from tc
-> commands alone whether their packets will be duplicated at each
-> stage or silently pass through when TTL is exhausted.
->
 
-The patch is not using the ttl as a counter for netem, it's being
-treated as boolean (just like your patch is doing). We are only using
-this as a counter for the mirred loop use case.
-
-> NACKed-by: Cong Wang <xiyou.wangcong@gmail.com>
-
-Calm down please.
-
-cheers
-jamal
+Daniel.
 
