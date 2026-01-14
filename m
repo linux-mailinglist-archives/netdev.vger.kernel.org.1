@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-249842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75107D1F0F6
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:25:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1118AD1F11D
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11C9E3014BD0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:20:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 865843001809
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB4039B4B0;
-	Wed, 14 Jan 2026 13:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4E439C62F;
+	Wed, 14 Jan 2026 13:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GlebQonK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diUPluS8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D3C1FDE31
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 13:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5871639C62B;
+	Wed, 14 Jan 2026 13:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768396821; cv=none; b=TSU0sQ5IG4dWc666fRsoDUKOZJq+IXAo6SStZFc2kdEiJbgQvTQ9hX6ZMtXVUWCLrPrl5tJ14K/69bC73wUWfIVjKX7GHl8AJFGw45ACEvWJoNrJUH5WLDS82oSGU9H0UTtHma5myziiE7CodVaHejArRL8vuZ/y7YXw+T8iSLk=
+	t=1768397411; cv=none; b=ECjTLbDxcSiw5PR8t8TvCKi269MnSEYJnwzRuDQAfLNyx08RSbabqeu2Xft9INPkbCdCKMymdDSUPkjAs+WFGv1KfdADhaNadccrHYfRyueLbElfqhRk/oKhmKSNHsCufhLthS2ooWesgJiHYgqYh1v9R9yK9XCeM/10t6UVsdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768396821; c=relaxed/simple;
-	bh=tXOp5Q+91Ev71kEJDwNUHqTl/QTwmM0CMtRXuMN58II=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=es4PXDKi1uNty+1pc6M438JxMnvh1pWVZ1Ud4LvtJlEokgVqdapPrYaUcKtoa2NKZV2c1p7wV0RDqhbtd01ntIi2LxSOLfaaEualLIVgqoTNov+inUxSHkkAiuwFNV/SvTinfKiMk/B0U6JjweZdakLZNLZnWW8/gnB8Mp6gB2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GlebQonK; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42fbc305882so4735618f8f.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 05:20:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768396817; x=1769001617; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sWiGwjTB0ZEpbDkwRFO+MVJzM9uZpDrSFPQIlzRZfsU=;
-        b=GlebQonK1BdB5DbGUyi9LiHoN8EziU92CFCkVI0QFOq3zEhwH6N5lbaRdR+rY/gCBJ
-         Fg2NFXOcXLM1sjMYh2EL+pPASArlb7dn5JYQ7xAsAHxn9ooNPyk8HFEWSqJ0AKiLb8Jy
-         OQSWVcr/+nNTLUeQmGlmWpTFmRkrVv42YP0mJNxo52tq3Z9CmAHgnisMw8pXZTj3j6iw
-         W9dqlfWz3lgvzZ7jhta9fOBYyatVRtFEe5eB3muxZaEykIAOGsy8r+eNHdfFZhS6yWUF
-         ROqkPhLwPP8lxjeZu4RqCxL6fdAD5MnzbZZlLD2XpYbBoT63LePeeYvof/5bXqQB6xDM
-         DGoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768396817; x=1769001617;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sWiGwjTB0ZEpbDkwRFO+MVJzM9uZpDrSFPQIlzRZfsU=;
-        b=tRbSAgGx1heCSO6DWj0OuIAuopGYXNmmqNOezo1nR7tNOJLcsbuthw2ZS2vHFTsVCI
-         BCn4WDUJz8I6xJdmUn/vwuMr2shAFVCNt+r8anNABuG374q4msIDylahVjTmQNzFeYuT
-         KYILudX97F0d+HahV9stIIV9s3TubRqW4SeI7EnlTZ4Amo58MijTJ7sGNwbdEsvPjY5i
-         IhFY4P4eEReDqJ7udgdEK02hX1p/FpSdgSdBRh1G/+MCyU63pYCkJAaXfI8YYzkhTF16
-         2EIrAnXd4Ksymm+9QHZHXhbjGyGM61RY/TTaxCr0qMW7g0NFMp20TsQZBOzIp2GRDNBi
-         DGPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4qpGGd2U9wNCQ4Urh+UpDpQ8teIzLYGfDpnS3CTCFjPoSdMrV6MnOa8LHbWKPmaR7PbyZQTA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwHDqKhWO4V/2JZf1H7XbIoiWzvlUO+H2OdUsgcYGzBTzkvdqp
-	QCRQLHzZysS7COSN/EShBBC8p7DBRYVHC8VRIe1zVt2cX4cgJDlWprdAlwGnpXhTFpk=
-X-Gm-Gg: AY/fxX5i/jShmf7mPEVQCN/cWRqth2UgOHdZErmZqHRpjoax6HgOl1bg6UMbAlRPbV/
-	XpF+S+ru/uwHV3mKAVDkDgZBO1l0WJgTNebJ9Ty4n6JL/QeFkoBhMQ6uVN28YCakv8oed/IP6Aq
-	4MBKrPXf6h9euc3tAHXS0MYvvhx9jiyg3RsUx9YDBJZ9oZpyMSQKctNrae40wn47pfZKzjOWkQm
-	rQTDixn2u9MBtQ0BvFUA7bniA+H8dww/yK/CbZWnCIu/MRUXIubNqRpDPFf/G+WZ3wbLHTRumjf
-	mezV5mgRYiAptpAHtwlJagi/CK+RiTrtkSQLhDZnaFr6EevfdQxY3eUohZOAys/G6BRWpf2pRqG
-	98Tnhxu9rsIYWhWXMVvqYmTnk8V1mdZ0kOtWlMN0xd9NIyv2tEpk7evFCEWniyU2MoZcbnbBAH+
-	f/aWAzGoeu1BoMsA==
-X-Received: by 2002:a05:6000:2511:b0:431:9b2:61c0 with SMTP id ffacd0b85a97d-4342d5b2ab9mr2581603f8f.24.1768396817421;
-        Wed, 14 Jan 2026 05:20:17 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dacd1sm49153435f8f.4.2026.01.14.05.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 05:20:16 -0800 (PST)
-Date: Wed, 14 Jan 2026 14:20:14 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 05/19] printk: Add more context to suspend/resume
- functions
-Message-ID: <aWeYDoMsdBNkJEqO@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-5-21a291bcf197@suse.com>
+	s=arc-20240116; t=1768397411; c=relaxed/simple;
+	bh=srG/rp6SiZUedgMQAF1TOxtf22RrWkjNu0gLUr/eMZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tfInS/0NR6lNqxv+0/hyn1mdwf0w4xEweXiP9k+Ysp+wEf1Ub20Gf6u+BHkijBjcT5r9qWpTYm6XTlX+cAm1YptLRaKdWeJM4zsJ38dPCdqUbxQooNk4gYMLBqbwftJsXG+JoCWVZkb5pfrJykOE0hyDKdms8TWLkvqhms7DWy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diUPluS8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59D6C4CEF7;
+	Wed, 14 Jan 2026 13:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768397410;
+	bh=srG/rp6SiZUedgMQAF1TOxtf22RrWkjNu0gLUr/eMZY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=diUPluS8kWVPcYzmKDdzumuE4Y3MysN5Sp0CRPdgXV1pEwQ2Gc25NigfXI9vYD16a
+	 9qVZdKazh3NC+rXloSecyx5oEs3mqa5BLWVnX6BFWfqGgD24t1KpMUYTl/V6j52IfO
+	 OhdqgsghUcxdmcz8+utpVqUWAvGoCMqEMJjhmknxE3Z58K2lG2xIjPlMvHOSypGWQv
+	 Wof8DetL630oloipW8g+P/cHL0ysTMk2ESPeP5ni2miVXEZyia9IERgYkE+QNAhYZB
+	 dcwiKOCD4zOivmMvJSiLq469qm/90QOhAg9Ope+9bwQazwdmEqqnEYSuRHd4fp50P0
+	 C0GFtcpjFu9NQ==
+Message-ID: <dcad6dc7-b152-4511-becf-9e7721996f6a@kernel.org>
+Date: Wed, 14 Jan 2026 14:30:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-5-21a291bcf197@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bpf-next,v3] bpf: cpumap: report queue_index to xdp_rxq_info
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Sai Aung Hlyan Htet <saiaunghlyanhtet2003@gmail.com>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+References: <20260114060430.1287640-1-saiaunghlyanhtet2003@gmail.com>
+ <87h5so1n49.fsf@toke.dk>
+ <CAGF5Uf48mRAuUZpTAGCGQtveDoDpF_1SKXFoBECqYzU4+dVwwg@mail.gmail.com>
+ <87bjiw1l0v.fsf@toke.dk>
+ <CAGF5Uf7FiD_RQoFx9qLeOaCMH8QC0-n=ozg631g_5QVRHLZ27Q@mail.gmail.com>
+ <87zf6gz83v.fsf@toke.dk>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <87zf6gz83v.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat 2025-12-27 09:16:12, Marcos Paulo de Souza wrote:
-> The new comments clarifies from where the functions are supposed to be
-> called.
+
+
+
+On 14/01/2026 13.33, Toke Høiland-Jørgensen wrote:
+> Sai Aung Hlyan Htet <saiaunghlyanhtet2003@gmail.com> writes:
 > 
-> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
+>> On Wed, Jan 14, 2026 at 8:39 PM Toke Høiland-Jørgensen <toke@redhat.com> wrote:
+>>
+>>> Yeah, this has been discussed as well :)
+>>>
+>>> See:
+>>> https://netdevconf.info/0x19/sessions/talk/traits-rich-packet-metadata.html
+>>>
+>>> Which has since evolved a bit to these series:
+>>>
+>>> https://lore.kernel.org/r/20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com
+>>>
+>>> https://lore.kernel.org/r/20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com
+>>>
 
-The improved comments would have helped to understand the previous patch.
-I would either merge it into the previous patch or switch the
-ordering.
+Above links are about 100% user defined metadata, that the kernel itself
+have no structural knowledge about.
 
-If this stays as a separate patch, feel free to use:
+The RX queue_index (as you wrote in desc[1]) is something that gets lost
+when XDP-redirecting. The series in [0] is about transferring
+properties/info that got lost due to XDP-redirect. Lost info that the
+SKB could be populated with.
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+  [0] 
+https://lore.kernel.org/all/175146824674.1421237.18351246421763677468.stgit@firesoul/
+  - Subj: "[V2 0/7] xdp: Allow BPF to set RX hints for XDP_REDIRECTed 
+packets"
 
-Best Regards,
-Petr
+  [1] 
+https://lore.kernel.org/all/20260114060430.1287640-1-saiaunghlyanhtet2003@gmail.com/
+
+
+>>> (Also, please don't top-post on the mailing lists)
+>>>
+
+Please read Networking subsystem (netdev) process[2]:
+  [2] https://kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+
+>> Thanks for the pointers. It is really great to see this series. One
+>> question: Would adding queue_index to the packet traits KV store be
+>> a useful follow-up once the core infrastructure lands?
+> 
+> Possibly? Depends on where things land, I suppose. I'd advise following
+> the discussion on the list until it does :)
+> 
+
+Hmm, the "original" RX queue_index isn't super interesting to CPUMAP.
+You patch doesn't transfer this lost information to the SKB.
+
+Information that got lost in the XDP-redirect and which is needed for
+the SKB is RX-hash, hardware VLAN (not inlined in pkts) and RX-
+timestamp. As implemented in [0].
+
+--Jesper
+
+
 
