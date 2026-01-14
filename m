@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-249914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF06D209EB
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:47:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F984D209F4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:47:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B964430652A3
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:46:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E7E5300C295
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C9A328620;
-	Wed, 14 Jan 2026 17:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7E6324B1B;
+	Wed, 14 Jan 2026 17:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Ls/DvdJO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Dq6VUDwC"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB30322A1D;
-	Wed, 14 Jan 2026 17:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14292FF67F;
+	Wed, 14 Jan 2026 17:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768412758; cv=none; b=koqWxhDo0b3xEE52ZZ1SwXYwQ7r51cnia7m2b5iLmT9SOsyUY5JqO/1RI6er0BS7oCvN0C0NjL7Ddh6cVsfVIW4NWwq5rK+btD9IUZ3WP0Ri8xgAN7LMz1JdvUL8mYrFAfQjFd/P2F2JTt5JtOt6tuqaNnLzEzT12+4qVZw0MOg=
+	t=1768412773; cv=none; b=X2/ruue2TtxB2ADnyVCf70UkjtKOjYDedA6hSEKeXvB1i1fywFplm+JUk/gyjgj7poIQUcPAZziWkPh/MqKmRXD9iQtBlBfuX4jA8XnBmL78uMy2PpynhmpcycYmaaFMU5xFd8EAxN1T9l5p9K5hKPc2L0EA91698CU8euZ75Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768412758; c=relaxed/simple;
-	bh=dvMV4003XIwPch/kAAX1D1dC4Cj2SAtD8y62MzqhhVQ=;
+	s=arc-20240116; t=1768412773; c=relaxed/simple;
+	bh=yP7r/pCyYSOsnrU4VekhQwRLkD7KcCwln1ZOyCyJ3eY=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=NnszybFB/+ktohqesFl/zBUluoKs5dW2wpYblwtbfBYwPoLqixUKhBkHZ5lXEtpIVOKH2MGIHVZUV3YulCy7fs0CZEXA6MFpcIVZ2wyfQfqZOnhDQdKP0fxu5Rhk0p4izQa3iDqP0Bocsk/EfkPSjC0/y8QgU4uIalcsCp0vKuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Ls/DvdJO; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=hJIYsrUjEdJw6j7+1r0qhd15apXZuXfMXK8jtMmq2Cs2bg/iotbrd53e2EuCvHx+LZxNBWHZq1OtCPvLJfjNPK9f+JOk8Y77TWVjJRCzGQB0ky7mns3MzSUW3furTu7m9OhVZX/1MHLO4HHlfUpoy3Hc+wnuu+2RTuks2uC46J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Dq6VUDwC; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -35,22 +35,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MarsTdgtHs8teQdoPboCZ01yZL+brlqUeB6u3oqnnnU=; b=Ls/DvdJONU9WbjF10boC8I5ZeB
-	R1FQjCz8+2ErEKzTNfBc7arrA4/TPxNTZiuekkgCTwuunC/70eXZdAkkXn3iQ/kRN+GnXwZy3USRx
-	k9SUB/SFJ1tQs/fzJ+JcQ/G+7+oYSNignwvv13F8SjWyALLbTz0PB+NsKfjHGmMIjsJLeuquk1LfQ
-	1JEITX6ZZ5bb3lMgvEf8ihaVeZcP/2FEpFPIdWyJQVO/IYmY6vhNVepIeiZylCpPxAmCmrTj5DdFO
-	kTYnq/oTmG3qpxzFRy9YFJrvfgNbg4OMkI7gAkCztLLvc6GiEP3sZJABh/QzXfJLBOcLxBQDGgXl5
-	BBQ46DFQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42456 helo=rmk-PC.armlinux.org.uk)
+	bh=T4mH3g/zSTI5za2Co5TGmPZaih2+LgJ1+of5pexeceY=; b=Dq6VUDwCcIyNzjd4VZnhezGrbE
+	Kc11TvFTfiwttYeHULA03M4OO8j9NASEoFFLuE1ulg6ONmonfoQ+vmTGFUX9oKTFWSHy3oVEo/i9q
+	OqJlyBMRgN2nXK88ylrSrQ2Mn6b+T8pNLoNzrT9BlfPCwgZ0ER5U+06ilYcgGKKywvoOd2wl82YEA
+	6xogKztzH41XdqsEcs4szoG6LeiASHgISoSeDrW/pnleZ4vps6Jxg+ICbr7rcjQVerImW/s+LcqWx
+	TgRhPWVYgDD7D+4i6A+iuvCim9CdAiKi7tOHAZCjdKhVdvwv4kbD5DAG/Bk1GffsghEe38uBZvrku
+	P7/+1gVQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42472 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vg4wA-000000000UU-1kVu;
-	Wed, 14 Jan 2026 17:45:42 +0000
+	id 1vg4wG-000000000Uk-2wh0;
+	Wed, 14 Jan 2026 17:45:48 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vg4w7-00000003SGB-2foG;
-	Wed, 14 Jan 2026 17:45:39 +0000
+	id 1vg4wC-00000003SGH-37PI;
+	Wed, 14 Jan 2026 17:45:44 +0000
 In-Reply-To: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
 References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -72,8 +72,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next 06/14] net: stmmac: qcom-ethqos: convert to dwmac
- generic SerDes support
+Subject: [PATCH net-next 07/14] net: stmmac: move most PCS register
+ definitions to stmmac_pcs.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,136 +83,120 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vg4w7-00000003SGB-2foG@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vg4wC-00000003SGH-37PI@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 14 Jan 2026 17:45:39 +0000
+Date: Wed, 14 Jan 2026 17:45:44 +0000
 
-Convert qcom-ethqos to use the dwmac core's generic SerDes support,
-which will handle SerDes initialisation, powering, and mode setting.
+Move most of the PCS register offset definitions to stmmac_pcs.c.
+Since stmmac_pcs.c only ever passes zero into the register offset
+macros, remove that ability, making them simple constant integer
+definitions.
 
-Note that generic support requires the SerDes to support phy_validate()
-in order to probe which PHY interface modes are supported, and
-phy_set_mode_ext() to configure the appropriate PHY interface mode
-(and thus the speed.)
+Add appropriate descriptions of the registers, pointing out their
+similarity with their IEEE 802.3 counterparts. Make use of the
+BMSR definitions for the GMAC_AN_STATUS register and remove the
+driver private versions.
+
+Note that BMSR_LSTATUS is non-low-latching, unlike it's 802.3z
+counterpart.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 50 ++-----------------
- 1 file changed, 3 insertions(+), 47 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_pcs.c  | 22 +++++++++++++++----
+ .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  | 22 -------------------
+ 2 files changed, 18 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 80ea69fc8ee5..a0b893d3fbd4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -103,8 +103,6 @@ struct qcom_ethqos {
- 	int (*configure_func)(struct qcom_ethqos *ethqos, int speed);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+index 4d1902f3a58f..718e5360fca3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+@@ -3,6 +3,20 @@
+ #include "stmmac_pcs.h"
+ #include "stmmac_serdes.h"
  
- 	struct clk *link_clk;
--	struct phy *serdes_phy;
--	int serdes_speed;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *por;
-@@ -584,14 +582,6 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos, int speed)
- 	return 0;
- }
- 
--static void ethqos_set_serdes_speed(struct qcom_ethqos *ethqos, int speed)
--{
--	if (ethqos->serdes_speed != speed) {
--		phy_set_speed(ethqos->serdes_phy, speed);
--		ethqos->serdes_speed = speed;
--	}
--}
--
- static void ethqos_pcs_set_inband(struct stmmac_priv *priv, bool enable)
++/*
++ * GMAC_AN_STATUS is equivalent to MII_BMSR
++ * GMAC_ANE_ADV is equivalent to 802.3z MII_ADVERTISE
++ * GMAC_ANE_LPA is equivalent to 802.3z MII_LPA
++ * GMAC_ANE_EXP is equivalent to MII_EXPANSION
++ * GMAC_TBI is equivalent to MII_ESTATUS
++ *
++ * ADV, LPA and EXP are only available for the TBI and RTBI modes.
++ */
++#define GMAC_AN_STATUS	0x04	/* AN status */
++#define GMAC_ANE_ADV	0x08	/* ANE Advertisement */
++#define GMAC_ANE_LPA	0x0c	/* ANE link partener ability */
++#define GMAC_TBI	0x14	/* TBI extend status */
++
+ static int dwmac_integrated_pcs_enable(struct phylink_pcs *pcs)
  {
- 	stmmac_pcs_ctrl_ane(priv, enable, 0);
-@@ -609,17 +599,14 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 	case SPEED_2500:
- 		rgmii_setmask(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_IO_MACRO_CONFIG2);
--		ethqos_set_serdes_speed(ethqos, SPEED_2500);
- 		ethqos_pcs_set_inband(priv, false);
- 		break;
- 	case SPEED_1000:
- 		rgmii_setmask(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_IO_MACRO_CONFIG2);
--		ethqos_set_serdes_speed(ethqos, SPEED_1000);
- 		ethqos_pcs_set_inband(priv, true);
- 		break;
- 	case SPEED_100:
--		ethqos_set_serdes_speed(ethqos, SPEED_1000);
- 		ethqos_pcs_set_inband(priv, true);
- 		break;
- 	case SPEED_10:
-@@ -627,7 +614,6 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
- 					 SGMII_10M_RX_CLK_DVDR),
- 			      RGMII_IO_MACRO_CONFIG);
--		ethqos_set_serdes_speed(ethqos, SPEED_1000);
- 		ethqos_pcs_set_inband(priv, true);
- 		break;
+ 	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
+@@ -74,11 +88,11 @@ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
+ 			       struct stmmac_extra_stats *x)
+ {
+ 	struct stmmac_pcs *spcs = priv->integrated_pcs;
+-	u32 val = readl(spcs->base + GMAC_AN_STATUS(0));
++	u32 val = readl(spcs->base + GMAC_AN_STATUS);
+ 
+ 	if (status & PCS_ANE_IRQ) {
+ 		x->irq_pcs_ane_n++;
+-		if (val & GMAC_AN_STATUS_ANC)
++		if (val & BMSR_ANEGCOMPLETE)
+ 			dev_info(priv->device,
+ 				 "PCS ANE process completed\n");
  	}
-@@ -648,30 +634,6 @@ static void ethqos_fix_mac_speed(void *priv, int speed, unsigned int mode)
- 	ethqos_configure(ethqos, speed);
+@@ -86,9 +100,9 @@ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
+ 	if (status & PCS_LINK_IRQ) {
+ 		x->irq_pcs_link_n++;
+ 		dev_info(priv->device, "PCS Link %s\n",
+-			 val & GMAC_AN_STATUS_LS ? "Up" : "Down");
++			 val & BMSR_LSTATUS ? "Up" : "Down");
+ 
+-		phylink_pcs_change(&spcs->pcs, val & GMAC_AN_STATUS_LS);
++		phylink_pcs_change(&spcs->pcs, val & BMSR_LSTATUS);
+ 	}
  }
  
--static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
--{
--	struct qcom_ethqos *ethqos = priv;
--	int ret;
--
--	ret = phy_init(ethqos->serdes_phy);
--	if (ret)
--		return ret;
--
--	ret = phy_power_on(ethqos->serdes_phy);
--	if (ret)
--		return ret;
--
--	return phy_set_speed(ethqos->serdes_phy, ethqos->serdes_speed);
--}
--
--static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
--{
--	struct qcom_ethqos *ethqos = priv;
--
--	phy_power_off(ethqos->serdes_phy);
--	phy_exit(ethqos->serdes_phy);
--}
--
- static int ethqos_clks_config(void *priv, bool enabled)
- {
- 	struct qcom_ethqos *ethqos = priv;
-@@ -790,12 +752,11 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index 36bf75fdf478..887c4ff302aa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -16,13 +16,6 @@
  
--	ethqos->serdes_phy = devm_phy_optional_get(dev, "serdes");
--	if (IS_ERR(ethqos->serdes_phy))
--		return dev_err_probe(dev, PTR_ERR(ethqos->serdes_phy),
-+	plat_dat->serdes = devm_phy_optional_get(dev, "serdes");
-+	if (IS_ERR(plat_dat->serdes))
-+		return dev_err_probe(dev, PTR_ERR(plat_dat->serdes),
- 				     "Failed to get serdes phy\n");
- 
--	ethqos->serdes_speed = SPEED_1000;
- 	ethqos_set_clk_tx_rate(ethqos, NULL, plat_dat->phy_interface,
- 			       SPEED_1000);
- 	ethqos_set_func_clk_en(ethqos);
-@@ -816,11 +777,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	if (data->dma_addr_width)
- 		plat_dat->host_dma_width = data->dma_addr_width;
- 
--	if (ethqos->serdes_phy) {
--		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
--		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
--	}
+ /* PCS registers (AN/TBI/SGMII/RGMII) offsets */
+ #define GMAC_AN_CTRL(x)		(x)		/* AN control */
+-#define GMAC_AN_STATUS(x)	(x + 0x4)	/* AN status */
 -
- 	/* Enable TSO on queue0 and enable TBS on rest of the queues */
- 	for (i = 1; i < plat_dat->tx_queues_to_use; i++)
- 		plat_dat->tx_queues_cfg[i].tbs_en = 1;
+-/* ADV, LPA and EXP are only available for the TBI and RTBI interfaces */
+-#define GMAC_ANE_ADV(x)		(x + 0x8)	/* ANE Advertisement */
+-#define GMAC_ANE_LPA(x)		(x + 0xc)	/* ANE link partener ability */
+-#define GMAC_ANE_EXP(x)		(x + 0x10)	/* ANE expansion */
+-#define GMAC_TBI(x)		(x + 0x14)	/* TBI extend status */
+ 
+ /* AN Configuration defines */
+ #define GMAC_AN_CTRL_RAN	BIT_U32(9)	/* Restart Auto-Negotiation */
+@@ -32,21 +25,6 @@
+ #define GMAC_AN_CTRL_LR		BIT_U32(17)	/* Lock to Reference */
+ #define GMAC_AN_CTRL_SGMRAL	BIT_U32(18)	/* SGMII RAL Control */
+ 
+-/* AN Status defines */
+-#define GMAC_AN_STATUS_LS	BIT_U32(2)	/* Link Status 0:down 1:up */
+-#define GMAC_AN_STATUS_ANA	BIT_U32(3)	/* Auto-Negotiation Ability */
+-#define GMAC_AN_STATUS_ANC	BIT_U32(5)	/* Auto-Negotiation Complete */
+-#define GMAC_AN_STATUS_ES	BIT_U32(8)	/* Extended Status */
+-
+-/* ADV and LPA defines */
+-#define GMAC_ANE_FD		BIT_U32(5)
+-#define GMAC_ANE_HD		BIT_U32(6)
+-#define GMAC_ANE_PSE		GENMASK_U32(8, 7)
+-#define GMAC_ANE_PSE_SHIFT	7
+-#define GMAC_ANE_RFE		GENMASK_U32(13, 12)
+-#define GMAC_ANE_RFE_SHIFT	12
+-#define GMAC_ANE_ACK		BIT_U32(14)
+-
+ struct stmmac_priv;
+ 
+ struct stmmac_pcs {
 -- 
 2.47.3
 
