@@ -1,163 +1,130 @@
-Return-Path: <netdev+bounces-249895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB52D2079E
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:15:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E46C0D20805
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:18:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4548930136E4
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:12:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E7EC30056EA
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746E42DFA2D;
-	Wed, 14 Jan 2026 17:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A8D2EACF2;
+	Wed, 14 Jan 2026 17:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kdg/Cn41"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZTqMIE1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2C0279908;
-	Wed, 14 Jan 2026 17:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768410730; cv=none; b=lxdKyM0zo28VAggl2gtP46XId9FRIiHk4LfAXP9cW0CzXe3UY74rW6LEQuivg8a9yBHjGFRYbI/6xl/gITrseHUdaRvGdpuRdU3c7cR8KqxFe7IG7i7BpMZLxKfEo03ORATyL167sZl5hbR1rUePMZaSorCLigdzK6AdfyZ7948=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768410730; c=relaxed/simple;
-	bh=OV6vHgfMyLUxZfDJ1qhdqYaOKnADMPNJEpMtezg9vzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sJHpQca0LdHbfgLgDgmMZ54+Y1GoF2a15oe9kkUv8c7qAH+vchVwUgY4w3bn5DxZIiGTOln3NoJ7pxv1T4rHocpbDQHv90AFwYHVHoVi+2QePimInKElNlt4kbHW1zFU0y+YncsQkK7C9/tOwZLjejV3MrF4S62Jee6gz4zydQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kdg/Cn41; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iZVEm8Xn3I90+wHI7MytQ6KmTu4Lb6cFPmUPZvnv6MY=; b=kdg/Cn41mHPFQ8LySJEeTOi3sd
-	6pj/btnlABLSKHAEQhrB13uUlT7KZ42ZGVrCXODgKyWMx4fJn1e/jZ9oV+URphGYFTeU1Y1IMCnEB
-	SBqFqyclFwzt9RHJu8Quo9LsRlzaChS0sBgQtYJgO+ZQZUXVqD0KQb0NK7QE2jzPkmXiw8qJYCgXO
-	i0HLsCsOA45wvQEzgxz6X5SlAt+ovgccgc/W71TkVp0m6GLkwTu1pSt7kVxS0j4nP+j6cyrXFvta2
-	VvDovruK0y4jBTP5v2uFq8vIhwbYmmYkPoubYf76zgZgcG52ySx5dE0nk5fqVGaGB0moQZChhdnhD
-	cFE9o8xg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39000)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vg4Pc-000000000QS-3uZj;
-	Wed, 14 Jan 2026 17:12:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vg4PZ-000000001p7-3qmo;
-	Wed, 14 Jan 2026 17:12:02 +0000
-Date: Wed, 14 Jan 2026 17:12:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek Vasut <marex@nabladev.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Christophe Roullier <christophe.roullier@st.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
- interface
-Message-ID: <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
-References: <20260114081809.12758-1-marex@nabladev.com>
- <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBE82F12C9
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 17:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768410942; cv=pass; b=DuP7qYX0EPDzDTOHviHYLD7AmVj5WHNzVi9L7gU5oe4mbAL+5Su89hHaIDnzkKQXPoRyScsmgrLR5vXoGWxyCRSMeGfQpymSbqX1Z1nCp3nVyQjiVU7oGzN18sHawE5dqzU2afYtqUKGiVUXo+1DQptzOY7YntEkeFNY5S+Lj3Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768410942; c=relaxed/simple;
+	bh=HdyTuEAotX0wcLgrvzzp/lj5vQP08kw/k1tLhAdsuVE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZNPe0DVgpWSrt/vhd7ZjJqvb5Ccgj3HQHm1hDVEgbD3TEN6+dFFIY4FA5fiMqbgXgU1pudJYfswZfC/pMR9KgkBCLm07LDhkSQreahQ+rziND2LzJBDif4bRMrv3Nf9lujutq6Z7LmvAip2Ngwk0ny/QAaiBE97bgu+PMisWtTg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZTqMIE1A; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-501511aa012so277161cf.0
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 09:15:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768410940; cv=none;
+        d=google.com; s=arc-20240605;
+        b=I1sgJCBscJVJ5DyRxIHvxsuSHgRoPU1ukJlxZ1zaNY577yDQiZi5opRT4jbWSRXykO
+         NM8CDHliCAPeZLI3wwhJXdt0Nfvs3yeXFzRXG7a+0XzUyaYXolnMmtMxAgnbys4gTEAy
+         kIR7oLZf4Y7DdHkGm8TpY7+qDEbifmkffXROHA35dixoCW7BAzfnayBn7P7dZlzdb8hr
+         C9iXAjNVEEuOJcv7Seq7wpUm2ZeV2kg+Wk7yZg4A0Csxd0Slxm+ZaCI4/h0GZWGI9bVm
+         3o4GasIcsT2vbGas2ZzwTtPsW5gr5St5NWMHlCcwiqO3RCxik6V13tZ1YnhSa3h9yCh7
+         XEhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HdyTuEAotX0wcLgrvzzp/lj5vQP08kw/k1tLhAdsuVE=;
+        fh=V3jpeFn+KkG8z9s8b3vVO6uMeZ2dJ8I0/k3jM3cO/4c=;
+        b=eRj7U4xJIWCX/mT+xDyq47iHDzF7Nwn+1QnyQekRS7Ncu+hkLShKjZ0ZwYNJz5a4mX
+         Ny3vnl4ijqHYj/Px9gryTbLwIYjYQ9eKtSVxPE+oN0a+7Y6fn7PtHAbpoOKbs6p9lAMk
+         o6x6WCefACAv4LZ8BDc/07qPQ220Knjk+papx0puoVyBzf4/vZ4kFtHFdAOYAHpHrbdw
+         b5ZIkj9D7g6i8jRHV/d5fXwXtaejzb543uwoGhmkcgUhhrocKw9+OR9UfSaAEKpIb1Ko
+         7PKY8x95ohZFIJsgam9izMFFgBtDOJxQ73FQQn717vymLJVKuAV74651FZ/VU0lW0LUf
+         MJfw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768410940; x=1769015740; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HdyTuEAotX0wcLgrvzzp/lj5vQP08kw/k1tLhAdsuVE=;
+        b=ZTqMIE1A9JdwALtFd7bFiGE7/OjPSB3CVbH1f+8e0Hq2RJpbBR1mBJCVhAjFa78D+f
+         8g3pwHWc9bbcfG/g+vpwmONOMc4oGhmoAHJSSMBVB9nhAqQbxrOYgfRalV78c2499DNY
+         oslJpZuc5vstyXiE5crp/5Qmukv/FcNYFdxXrI0UQDYllERk1OZlI/iXkE4fQ/vo+lli
+         yVzO0LJqNxSHKl3mk22HTRvhaTaUwPRYbjHACad1k0Ggfx5ziF2SHAqmGL24aYeiL4w5
+         56ZIzLkUOrQ3OpAnswJGPBr5E++OW9JoWCnYoxLTOAZd1wfi+SJHmdnzJqQQHQtjHgxf
+         8QEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768410940; x=1769015740;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HdyTuEAotX0wcLgrvzzp/lj5vQP08kw/k1tLhAdsuVE=;
+        b=QeHzYsSQmA2+Yrmu7cNkHWcReKI/+7Uh11M8RcRR8hlCfkmBOsrPjrLY7QBCL02E+W
+         AJFibTiA9ZGitGvh2GKtwQiRJXvmOtQfVqJyCt1y56PwRtQCOSSeoxn46kR7pvSaLwBX
+         aFEMtKZc7I7JzN1cSKK+kFVymUQacawfjq1D4Drk8Y9ZciyjQKlHjH6w7GQGNJYelM7k
+         XQy786EkrGUWm0RT/IUlWbaLloEK21s3VQb1K3l3ynnQ5M9Y/7b4sA3Qg7HRLFpYiuvV
+         vwcX0h1JsjGksPWTA6si1yPqzqHvj3Jk04WCYPYkf5wc+eqapbTsxRaBClUxalPg9MCe
+         PICw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0crcigexX0jmMgJ45BOPgwvrqBy0eHKcPOBYB8B5Qo18UDy5aEByo7TPumrpxPBrehdI6nmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvH3I2r0fJ80htZecs3QivZeEumP9Wn+DQoMEUPFEld1lO8PBC
+	6bxZkDThQ18+kaUQDksLH0361MY7F/vWw1JjKoJB8r4Ncu6ygI/TL0VH2/OPXvLPcu0TAjyXNVm
+	w95xgyZm6qvWlnWoDyeQ9EEoQSAyAcQad3KeL2PHQ
+X-Gm-Gg: AY/fxX4GkDLhmj7IoE9vseLCPhycaDmonnY5vDsbUvcez4Demoq/Tq5nC8pzEttijUj
+	+iKGlxoiPKVF7PhkEpsoIIoiwf5P9WNPKRbclKzalPbDwei9DmFwmdDbZKnM+BJTNi8w11QTEWk
+	83uJ5liL2HGSSEF8lV6Rh6VdbUGWgwNV2OrqfqavpSZ1crKtiIgtw62WUpq8bHUq79yiNftYffQ
+	YEr9H3cP/4Y4AfY+wJJ0GuaFXsTdLubqvZYOfv6C3Si7n9xQmzVSPNlX9bw4KYqesx73dn9YGUd
+	UbW20sORyOBjRA+zNPm+VbldvMNUTJu0ZD76p0DD3z1IDWu6SBMxmR5A0KDGutVnK9ZYCvQ=
+X-Received: by 2002:ac8:5988:0:b0:4e5:8707:d31 with SMTP id
+ d75a77b69052e-50149325305mr10925241cf.7.1768410939800; Wed, 14 Jan 2026
+ 09:15:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20260114165109.1747722-1-edumazet@google.com>
+In-Reply-To: <20260114165109.1747722-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Wed, 14 Jan 2026 12:15:22 -0500
+X-Gm-Features: AZwV_Qjwf_z582aHgT9WVbMI_iDP_zv7S7eSdlXsXD4S2mbmc6IssPXMuL4HJ6s
+Message-ID: <CADVnQy=_oWWBwFBmn9pPn_VK5qJ-y5uVSwXn01XJJYCOJP=3gw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: move tcp_rate_skb_sent() to tcp_output.c
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 14, 2026 at 04:29:17PM +0000, Russell King (Oracle) wrote:
-> On Wed, Jan 14, 2026 at 09:17:54AM +0100, Marek Vasut wrote:
-> > If an interface is down, the ETHnSTP clock are not running. Suspending
-> > such an interface will attempt to stop already stopped ETHnSTP clock,
-> > and produce a warning in the kernel log about this.
-> > 
-> > STM32MP25xx that is booted from NFS root via its first ethernet MAC
-> > (also the consumer of ck_ker_eth1stp) and with its second ethernet
-> > MAC downed produces the following warnings during suspend resume
-> > cycle. This can be provoked even using pm_test:
-> > 
-> > "
-> > $ echo devices > /sys/power/pm_test
-> > $ echo mem > /sys/power/state
-> > ...
-> > ck_ker_eth2stp already disabled
-> > ...
-> > ck_ker_eth2stp already unprepared
-> > ...
-> > "
-> > 
-> > Fix this by not manipulating with the clock during suspend resume
-> > of interfaces which are downed.
-> 
-> I don't think this is the correct fix. Looking back at my commits:
-> b51f34bc85e3 net: stmmac: platform: legacy hooks for suspend()/resume() methods
-> 07bbbfe7addf net: stmmac: add suspend()/resume() platform ops
-> 
-> I think I changed the behaviour of the suspend/resume callbacks
-> unintentionally. Sorry, I don't have time to complete this email
-> (meeting.)
+On Wed, Jan 14, 2026 at 11:51=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> It is only called from __tcp_transmit_skb() and __tcp_retransmit_skb().
+>
+> Move it in tcp_output.c and make it static.
+>
+> clang compiler is now able to inline it from __tcp_transmit_skb().
+>
+> gcc compiler inlines it in the two callers, which is also fine.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
-I think I'm going to start over, trying to figure out what happened.
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
-c7308b2f3d0d net: stmmac: stm32: convert to suspend()/resume() methods
+Thanks, Eric!
 
-Did the conversion, and it always called stm32_dwmac_clk_disable() and
-where it exists, dwmac->ops->suspend() on suspend, provided
-stmmac_suspend() returns zero (which it will do, even if the interface
-is down. On resume, it always calls dwmac->ops->resume() and
-stm32_dwmac_init() before calling stmmac_resume().
-
-The conversion added hooks into ny new ->suspend() and ->resume()
-methods to handle the stm32_dwmac_clk_disable(), dwmac->ops->suspend(),
-dwmac->ops->resume() and stm32_dwmac_init() steps.
-
-However, in 07bbbfe7addf I failed to realise that, in order to keep
-things compatible with how stuff works, we need to call
-priv->plat->suspend() even if the interface is down. This is where
-the bug is, not in your glue driver.
-
-Please try this:
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a8a78fe7d01f..2acbb0107cd3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -8066,7 +8066,7 @@ int stmmac_suspend(struct device *dev)
- 	u32 chan;
- 
- 	if (!ndev || !netif_running(ndev))
--		return 0;
-+		goto suspend_bsp;
- 
- 	mutex_lock(&priv->lock);
- 
-@@ -8106,6 +8106,7 @@ int stmmac_suspend(struct device *dev)
- 	if (stmmac_fpe_supported(priv))
- 		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
- 
-+suspend_bsp:
- 	if (priv->plat->suspend)
- 		return priv->plat->suspend(dev, priv->plat->bsp_priv);
- 
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+neal
 
