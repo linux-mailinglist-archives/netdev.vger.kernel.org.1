@@ -1,196 +1,239 @@
-Return-Path: <netdev+bounces-249760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B43CD1D428
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:52:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576FFD1D437
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:52:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E19BB3016739
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:44:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D0B9303C21D
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C1937F8A0;
-	Wed, 14 Jan 2026 08:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BED025A640;
+	Wed, 14 Jan 2026 08:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="UJDpRkoJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R7jHi1BQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34E437BE7E
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A6237F740
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768380264; cv=none; b=ic+CHfYfUz04e73Wu5B+2BwKwj6yS/pnfMS+BBreIV2DZZAe1ewcAVtYjoF7gBlF1d8uaOeeTuuUEdl0my1VkS7GXCdSx1sgGCA6wKe1GWUS7W17oJNXUDljBY60O6gTm+1oycEjE98Ucc9FL3M1BBBXaURWWvqwC5NbZ6xC3OI=
+	t=1768380546; cv=none; b=ru9CqWMyl95lwIl0TRhWHnj9jiAK+qgoAmEfjzbTjlblvrq8yxhpxFzoKN2WvY14McIQ5RE2mI4vyh04i40i5t+WX9ZOmEueFwPPX7uvSj9keQ+zN1a7zvPyaFFogrJ17GHG8h0LIJ6wR/Yf1kgtnH4cmVST9g9AySMYfWhtiSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768380264; c=relaxed/simple;
-	bh=ysd4WYTvCh9+HsQ1AtbOfW5FzL4/iKQHwd6lm5bPF7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeLHKfxyS473Wuy9Hf6RPy3wOPjgDWdWU9em4KB/4X2Wr9OaRanOzXV4TGrARvc9CKUmmoifUt2RgC03NeHSEoVxMWu6XTdeYBYH7X+aJclDql1SPX6xk1AJ5JDC3kIOAMYensPajYifX0Mp/pI0WPdS18A5OKUfNVtXQvJyKe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=UJDpRkoJ; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-432d256c2e6so4679593f8f.3
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 00:44:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768380255; x=1768985055; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Nn9M/VPDoeuifL+P7no8o5FApQZk7zNKYvSR+p2CRU=;
-        b=UJDpRkoJ07RgspaR1NhfCpR626ZyVYHDm/91x63cM8gsy5+B8MAqHavRm979cqv826
-         adfCBmE4P0x6kfOJf6QVKQ+F73K8lwHrXn3rzPWHcqFa3N4E1nvvheWr+fvWlsfjnG3d
-         q5I4aa3r8n+1bnVHkuJKjH4VnxEE0Ax/OlO+0AlsTNmjx9JmMpIQmGfXyFrUV7bjE4AG
-         b+aIpJVdS5yOciq4wFCdKoOH2ygYDkIIMtINtTrq5bEwn2hZxdIsOnH1Mevl7p3aXRkT
-         mmHrpfvAEIKMqwJsI6Dxxcv5mSGvyKeQIfwtfaMbksOr61rqb70D/17uospsX2LrpTOB
-         fjgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768380255; x=1768985055;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Nn9M/VPDoeuifL+P7no8o5FApQZk7zNKYvSR+p2CRU=;
-        b=T4ccV9Qfejn/UKXoy4KOI7XNF8lY2epHJdHTu2sMf17XT3+QgjKe/aZ3nNyfjLEXBD
-         KM25ln5uUy656/UHVGL8aFOKuWbMDkaG3mhF6hSdGgi19DbfLUbHbWpVbG/75fwfNxjJ
-         qHno7s+B8C7w1tOBMDXKrugZ0rof3no761sRXsYvxvSOU260mhCFroDiIPsx5XF1aVoI
-         8iFTJvUXVqF+Qhlc1UNzBohRh4s1wD5mA04YKASObHI8AdTFWRbzUOroOUYdyQUJMvgB
-         9+n9eVToTK7KnT8Hm6V42oko6Yo69kyl/VU5rC9XlY2RgXTsb7zzeh6m9vGBVsyVf6sG
-         62nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDJfK/TJ0zlpiAuxZ7CdxDiC1tZpdRAhZH+i/JT54CUAHLDSnS2ygflnEeRScOdxoeCoY3AKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBf6U+u//xsMpkq948BMyNErdhE5cvR6Qg+Z1UWeaC1ZcPBx/4
-	Qj5LLqFBeSaSHTfX5pXdQbjv0O7Z0/ArnfWyrOxoQa8ZPvhfa8uQjAjMNGkk1/iJbmg=
-X-Gm-Gg: AY/fxX5cPl+rNG0PGwHExsC5sJoRhpsduRNFwhSvLaaRL2mIiV2AlEpfz6jA21/UVAH
-	zZxvDs1dLlI1tdKnoD2zPFSObdNgBak9DHKvWHiiFMPLPsO5rHurhlTqL3m15UpHGduC+4zk+tb
-	lBQDU/1VToHRJ4OdUBuRJ68GL6KJyz+QaV2fG8+4t3vGxxPfNcmVCHFQXZLrPaD4lvwA9++3oXs
-	s+55zZVuvPKgyfn++2QE9drLS2LWxvXvdDoaJqN9jtaLa2aeBNfig4nhRpPX8aki/55eTfpmq7Z
-	5u/PFQ3I1hybtvGqhF+l7l/3Ha8BWac4O14ngK147kA0d2u31rknBsELJYpGebJzqSg4lf3Y2Ip
-	VYbTJXW9c7s8qNl7RerxEJpVE+1dZu44TlwXceyIPPTjUTu6NqpmeLMXTcncouJocOt9ZRvthvR
-	fGb/wamhGi78duWg==
-X-Received: by 2002:a05:6000:61e:b0:431:a38:c2f7 with SMTP id ffacd0b85a97d-4342c574bedmr1500621f8f.59.1768380254886;
-        Wed, 14 Jan 2026 00:44:14 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5e3sm48685590f8f.35.2026.01.14.00.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 00:44:14 -0800 (PST)
-Date: Wed, 14 Jan 2026 09:44:11 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 03/19] printk: Drop flags argument from console_is_usable
-Message-ID: <aWdXW6ohfQ7_z2B_@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-3-21a291bcf197@suse.com>
+	s=arc-20240116; t=1768380546; c=relaxed/simple;
+	bh=m7WlSDjsJR23TNHdC8y0tLHb4b6D1xumCWxXi1BM0Eo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n77aJlh+y9Ut+beAJwbA+RAsVCoEERbUkYtrFaJGK7i4rkVm8ubnvKLbpoZd4EelwNvDSrC5LPZieNE9Zp0ToSFr8n4XERfg3uyW11TNnxLkuaNRa7zmuRuGXHegW5LQ0evSWOx0O/GQm1+9RU/7RrvQYVbke0WYe/MR+ybIQRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R7jHi1BQ; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768380530;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xFOvYS/MwLIoa2ddKtSerXnnDZ6P+P0QxZA10mD8sGk=;
+	b=R7jHi1BQHrpYXKbkhrJYyhW/15yWOtqM8To4dfUn4yXQHUs64cj6n7K4oLF+s+q/e/b2zQ
+	MMwFcGvtGx6VckfAj0b1UI+Klr5FEB5HNg1sG1un4yovX71Aqyh9uF+H5gkLyh36c/3nfa
+	AfW3oYFB22Sk3Brat2A11k7mAGushXI=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andriin@fb.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, ast@fb.com, daniel@iogearbox.net, kernel-team@fb.com
+Subject:
+ Re: [PATCH bpf-next 3/9] libbpf: improve relocation ambiguity detection
+Date: Wed, 14 Jan 2026 16:48:39 +0800
+Message-ID: <4682258.8F6SAcFxjW@7940hx>
+In-Reply-To:
+ <CAEf4Bzb04C97K=S1av_6EKG3jKHoG+mKwaxVw3cCnNsbyiDzmw@mail.gmail.com>
+References:
+ <20200818223921.2911963-1-andriin@fb.com> <2249675.irdbgypaU6@7940hx>
+ <CAEf4Bzb04C97K=S1av_6EKG3jKHoG+mKwaxVw3cCnNsbyiDzmw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-3-21a291bcf197@suse.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Sat 2025-12-27 09:16:10, Marcos Paulo de Souza wrote:
-> The flags argument was also used to check if CON_NBCON was set, but their
-> usage was fixed in the last commit. All current users are reading the
-> variable just to call console_is_usable.
-> 
-> By calling console_srcu_read_flags inside console_is_usable makes the
-> code cleaner and removes one argument from the function.
-> 
-> Along with it, create a variant called __console_is_usable that can be
-> used under console_list_lock(), like unregister_console_locked.
-> 
-> --- a/include/linux/console.h
-> +++ b/include/linux/console.h
-> @@ -656,13 +656,8 @@ extern bool nbcon_kdb_try_acquire(struct console *con,
->  				  struct nbcon_write_context *wctxt);
->  extern void nbcon_kdb_release(struct nbcon_write_context *wctxt);
->  
-> -/*
-> - * Check if the given console is currently capable and allowed to print
-> - * records. Note that this function does not consider the current context,
-> - * which can also play a role in deciding if @con can be used to print
-> - * records.
-> - */
-> -static inline bool console_is_usable(struct console *con, short flags,
-> +/* Variant of console_is_usable() when the console_list_lock is held. */
+On 2026/1/14 07:26 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> On Mon, Jan 12, 2026 at 11:36=E2=80=AFPM Menglong Dong <menglong.dong@lin=
+ux.dev> wrote:
+> >
+> > On 2020/8/19 06:39 Andrii Nakryiko <andriin@fb.com> write:
+> > > Split the instruction patching logic into relocation value calculatio=
+n and
+> > > application of relocation to instruction. Using this, evaluate reloca=
+tion
+> > > against each matching candidate and validate that all candidates agre=
+e on
+> > > relocated value. If not, report ambiguity and fail load.
+> > >
+> > > This logic is necessary to avoid dangerous (however unlikely) acciden=
+tal match
+> > > against two incompatible candidate types. Without this change, libbpf=
+ will
+> > > pick a random type as *the* candidate and apply potentially invalid
+> > > relocation.
+> > >
+> > > Signed-off-by: Andrii Nakryiko <andriin@fb.com>
+> > > ---
+> > >  tools/lib/bpf/libbpf.c | 170 ++++++++++++++++++++++++++++++---------=
+=2D-
+> > >  1 file changed, 124 insertions(+), 46 deletions(-)
+> > >
+> > > diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> > > index 2047e4ed0076..1ba458140f50 100644
+> > > --- a/tools/lib/bpf/libbpf.c
+> > [......]
+> > > @@ -5005,16 +5063,31 @@ static int bpf_core_reloc_field(struct bpf_pr=
+ogram *prog,
+> > >               if (err =3D=3D 0)
+> > >                       continue;
+> > >
+> > > +             err =3D bpf_core_calc_relo(prog, relo, relo_idx, &local=
+_spec, &cand_spec, &cand_res);
+> > > +             if (err)
+> > > +                     return err;
+> > > +
+> > >               if (j =3D=3D 0) {
+> > > +                     targ_res =3D cand_res;
+> > >                       targ_spec =3D cand_spec;
+> > >               } else if (cand_spec.bit_offset !=3D targ_spec.bit_offs=
+et) {
+> > > -                     /* if there are many candidates, they should all
+> > > -                      * resolve to the same bit offset
+> > > +                     /* if there are many field relo candidates, they
+> > > +                      * should all resolve to the same bit offset
+> > >                        */
+> > > -                     pr_warn("prog '%s': relo #%d: offset ambiguity:=
+ %u !=3D %u\n",
+> > > +                     pr_warn("prog '%s': relo #%d: field offset ambi=
+guity: %u !=3D %u\n",
+> > >                               prog_name, relo_idx, cand_spec.bit_offs=
+et,
+> > >                               targ_spec.bit_offset);
+> > >                       return -EINVAL;
+> > > +             } else if (cand_res.poison !=3D targ_res.poison || cand=
+_res.new_val !=3D targ_res.new_val) {
+> > > +                     /* all candidates should result in the same rel=
+ocation
+> > > +                      * decision and value, otherwise it's dangerous=
+ to
+> > > +                      * proceed due to ambiguity
+> > > +                      */
+> > > +                     pr_warn("prog '%s': relo #%d: relocation decisi=
+on ambiguity: %s %u !=3D %s %u\n",
+> > > +                             prog_name, relo_idx,
+> > > +                             cand_res.poison ? "failure" : "success"=
+, cand_res.new_val,
+> > > +                             targ_res.poison ? "failure" : "success"=
+, targ_res.new_val);
+> > > +                     return -EINVAL;
+> > >               }
+> >
+> > Hi, Andrii. This approach is not friend to bpf_core_cast() if the struct
+> > is not used in the vmlinux, but the kernel modules.
+> >
+> > Take "struct nft_chain" for example. Following code will fail:
+> >     struct nft_chain *chain =3D bpf_core_cast(ptr, struct nft_chain).
+> >
+> > The bpf_core_cast() will record a BPF_CORE_TYPE_ID_TARGET relocation
+> > for "struct nft_chain". The libbpf will find multi btf type of nft_chain
+> > in the modules nf_tables, nft_reject, etc, and it will fail the verific=
+ation
+> > due to the "new_val", which is btf type id, not the same, even if all
+> > the "struct nft_chain" are exactly the same in different kernel modules.
+> >
+> > I think this is a common case. So how about we check the consistence of
+> > struct nft_chain in all the candidate list, and use the first one if al=
+l of
+> > them have exactly the same definition?
+>=20
+> BTF type ID for some type in some kernel is not meaningful without
+> also capturing module's BTF ID or FD, so we'd be just capturing some
+> relatively random and meaningless type ID.
+>=20
+> I'm actually not sure bpf_core_cast() can work with BTF types defined
+> in module's BTF. Can you please check what we do if we have
+> non-ambiguous BTF type defined only in module's BTF?
 
-Nit: The comment is a bit misleading because this function is called
-     also from console_is_usable() under console_srcu_read_lock().
+You are right. I got the following error when I use bpf_core_cast()
+for the struct that in kernel module:
+    Unknown type ID 142301 passed to kfunc bpf_rdonly_cast
 
-     I would say something like:
+It seems that I didn't realize the kernel side. The module's BTF ID
+or FD for the struct is unknown for the kernel, and it will only
+lookup it in the btf that the kfunc belongs to.
 
-/*
- * The caller must ensure that @con can't disappear either by taking
- * console_list_lock() or console_srcu_read_lock(). See also
- * console_is_usable().
- */
-> +static inline bool __console_is_usable(struct console *con, short flags,
->  				     enum nbcon_write_cb nwc)
->  {
->  	if (!(flags & CON_ENABLED))
-> @@ -707,6 +702,18 @@ static inline bool console_is_usable(struct console *con, short flags,
->  	return true;
->  }
->  
-> +/*
-> + * Check if the given console is currently capable and allowed to print
-> + * records. Note that this function does not consider the current context,
-> + * which can also play a role in deciding if @con can be used to print
-> + * records.
+>=20
+> >
+> > We can check all the members in the struct iteratively, and make
+> > sure they are all the same.
+> >
+>=20
+> It's not even clear what "same" would mean here, btw. None of the
+> issues you bring up are easy to solve :)
 
-And I would add here something like:
+Yeah, thing is much more complex than I thought. I think I'd better
+use bpf_probe_kernel_read() for such case ;)
 
- *
- * Context: Must be called under console_srcu_read_lock().
+Thanks!
+Menglong Dong
 
-> + */
-> +static inline bool console_is_usable(struct console *con,
-> +				     enum nbcon_write_cb nwc)
-> +{
-> +	return __console_is_usable(con, console_srcu_read_flags(con), nwc);
-> +}
-> +
->  #else
->  static inline void nbcon_cpu_emergency_enter(void) { }
->  static inline void nbcon_cpu_emergency_exit(void) { }
+>=20
+> > Thanks!
+> > Menglong Dong
+> >
+> > >
+> > >               cand_ids->data[j++] =3D cand_spec.spec[0].type_id;
+> > > @@ -5042,13 +5115,18 @@ static int bpf_core_reloc_field(struct bpf_pr=
+ogram *prog,
+> > >        * verifier. If it was an error, then verifier will complain an=
+d point
+> > >        * to a specific instruction number in its log.
+> > >        */
+> > > -     if (j =3D=3D 0)
+> > > +     if (j =3D=3D 0) {
+> > >               pr_debug("prog '%s': relo #%d: no matching targets foun=
+d\n",
+> > >                        prog_name, relo_idx);
+> > >
+> > > -     /* bpf_core_reloc_insn should know how to handle missing targ_s=
+pec */
+> > > -     err =3D bpf_core_reloc_insn(prog, relo, relo_idx, &local_spec,
+> > > -                               j ? &targ_spec : NULL);
+> > > +             /* calculate single target relo result explicitly */
+> > > +             err =3D bpf_core_calc_relo(prog, relo, relo_idx, &local=
+_spec, NULL, &targ_res);
+> > > +             if (err)
+> > > +                     return err;
+> > > +     }
+> > > +
+> > > +     /* bpf_core_patch_insn() should know how to handle missing targ=
+_spec */
+> > > +     err =3D bpf_core_patch_insn(prog, relo, relo_idx, &targ_res);
+> > >       if (err) {
+> > >               pr_warn("prog '%s': relo #%d: failed to patch insn at o=
+ffset %d: %d\n",
+> > >                       prog_name, relo_idx, relo->insn_off, err);
+> > > --
+> > > 2.24.1
+> > >
+> > >
+> >
+> >
+> >
+> >
 
-Otherwise, it looks good. It is a nice clean up.
 
-Best Regards,
-Petr
+
+
 
