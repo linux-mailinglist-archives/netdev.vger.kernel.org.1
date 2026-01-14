@@ -1,120 +1,159 @@
-Return-Path: <netdev+bounces-249822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80C6D1E9C6
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:00:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CA4D1E9E3
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 61D783051F9F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:52:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B92DF300F710
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CC7396B9A;
-	Wed, 14 Jan 2026 11:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A49239447C;
+	Wed, 14 Jan 2026 11:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WlHvul2y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJJuQd4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB510396B66
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787DE335542
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768391539; cv=none; b=sOJU6b5wKJdt4zN30DMjkVctxf9CmUOtATaCDguWv/54nuC5dTJA6RJI1yZATc99x/TVxpqibR9oRYE7tX8BuAZus2DO9yhtZezPfSdqoQGsdMS8vKAhTyO+bTdKkUWnQlu0KmhILISDf1tYJt0Q/BzuOcfHge+MFM45GpSKXh4=
+	t=1768391746; cv=none; b=AtX6QmqBkzys/rhUG+We3N9Ve4gC2coW2Fsf6+P247xS/cWe68nncD/JrshgBVoz6McNtdvhfhBFt8NNo4hdvJYDDt8U9BWYNWoXN9dHcdiAzCUAZa/wnY6v3Sno/0On76CuRou2OchwMLke5BL8UwEdXRMgFjGWc1q4Ptgquzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768391539; c=relaxed/simple;
-	bh=8+8711yLJZZdjomCtegalYdi6yMl/i06ay+AE5+sCgE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iPmGrxo7a2P1O0xkN1p0flfPxhTVegaw1eQt6TSBhem8aGXcET9XjH8WjHj0TW0w4+pJ1P9BLx0jg2N09kQ1HHGtBGbWBtOeety18h33cbpmn6sug1h0CmZaWKHcPWqN8S3aM/4z0WcYFey6KHz9dH3bwTzm31pUECGWLOdf39k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WlHvul2y; arc=none smtp.client-ip=209.85.208.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-64b92abe63aso17939371a12.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:52:15 -0800 (PST)
+	s=arc-20240116; t=1768391746; c=relaxed/simple;
+	bh=RYWaRv10yDIeIHo2FrYnr3gnOtr55+eBsvXd5OKczjk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lL77P7ILLLHrAJh5AypjWkfX8RgYaMU1HZiAfTS/DAxizmHL6VTgaWYuxQqmAu0u7iA3U2YR9484qtMTUpAzzYg8jHcCv61bfBPU8fD7GsdOf2Zc1MItik92eIlwwiaMlLfMM0NrPYmJiguofJysGBuAKmZN/+tEaOeKvqnE2Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJJuQd4g; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64b8123c333so13780682a12.3
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:55:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768391534; x=1768996334; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IlADXTpmTXTOrFGBVzHHxJm8P+TszlCVzr4tthKySrs=;
-        b=WlHvul2ytMJyQxGnisXnWSdF+COeMD61RHnAxk6XBZ0PD+uekz8KO8fb+eTtOWsXSw
-         IRWx5pLw9kiHOitgA/1UNj1iElE/Gjw/lyG20OIxk8a8KAt/MSHqww/AadYi+aS9nTSu
-         DBfh78bquvjzFCtZbPUTjRQ46cuGb4UQBDkR1cNnLp74ubElYpY6cK6KNLWqHPllc5Uk
-         PLIG94MA3wRYRlae7ZU7xwl0yFo005NaryP7CmsjrvbMcw4XXeEDC07XoJxJimcfLHSD
-         5pmyVh6o1nM63Yn3JTU+F+USiMNRU+ieozLp2WCGNAjwJbDfCizh4t+0XzClDdiwakSe
-         SaZQ==
+        d=gmail.com; s=20230601; t=1768391744; x=1768996544; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=69DLf9uq3Kof3aVtQbEyY5tbVzuTc5c56CQDu7fHFbM=;
+        b=nJJuQd4gaGlvy/FLW0Z58hJUXC0Xe8DDaAU2INEcza3PgzXIE2V0xi8vtC3F3p0anR
+         0H9a6DrjwLi73LuPcVXPL+JmIk+NK8cwQJRl/N/PBnEk+z3Pxa6RFwLlE1GBUI2KKPlV
+         B4yVvyFK6lyXjaYY40+ZHw92ZoNAWg50dbH9eXY62yMJIAaqfgyNsJtdSJRctnNhGQlV
+         rRCT0JoWWx+40fMul0jJ1XkStJpcYjOqq97l9d4JK+LtzGY9C0ZTOTxqD1r5hFrJ9TMT
+         Qv1Lp/PWzC/VSxIvGISqvGr+RwCUROO7gFO8/tHrg5cMh1Q9yO/qE7sR+t83Ek2Rw48K
+         rK9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768391534; x=1768996334;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IlADXTpmTXTOrFGBVzHHxJm8P+TszlCVzr4tthKySrs=;
-        b=oeicoo603dmw1hsC2P7UF82NekTCDbFLuLfoIA06IWYT7cTTLFu3zdPweTmBSccSZ0
-         qp63wxzRFYeajmqdAm12/sM7Yi6HSDrajyRscPzd/dFFQOWaubtSjeGz1robsL/mkLAM
-         MkR6vYzeh8wVl7St9Tp/Iz1OSRKP02a1JuIiAZ43tqaGUGXukfNaSdg9qiEOXLG5WsSX
-         8XJWnPpytdYgnvs/gWoKZCpQkLa/fj8WBKfbE3q/ufLro/RSEXTx53kHrb+HgAuzpmJP
-         j624/kJq2KF80LMQrvidLqkOXqkD+vW9t523zURfvIVRUZpRD8ClShYyq5bev29h8RLu
-         glDg==
-X-Gm-Message-State: AOJu0Yz2wgNBm+6em+uKdr9X1Hf5aXXohp3Ig1kj087nBuAU6I2O8SPx
-	UqM14A8vKfgtNqYrnk+EH08twgubf1qpgKmWLs42E/uRLAQVSzfJfMdbZqu+LbagNdk=
-X-Gm-Gg: AY/fxX49TFdMVdLrLJnTm8tQSdyM2Czjet7ogvOZuQT2d26z+tCZqjDO+OBFiFsH8Go
-	b18yRJ7Q+mD3yCakQCozo0P9RK67zGjYKfEPtRZ4Oq0AL7lE74fOcehfrbEqAHGO56vOpWgjftm
-	ogsooNvwNG54NTamHv00AbLhNlMDB5XmiZcMaV2YLu6tuIecJ/qeQEy05fmAP7SQvhI1lGVtQgq
-	JXdQonS1l3WySl6I5576rto92VE5Oo6ZDSxjK9dJZNT9ObaMQvjp3+wBVjgax7/zu1WgMDNs6Y8
-	X5VfLlRchhKYAZRegPZP5ie4KLr7COdGRqvbI/ofWw6Nf0k7m+Nl1SlfmHM5lgNDPfyjeGZZ3Ok
-	CJDOX6CUPTWSLtDUSqynnz4Uj/fKrVU06RMbry3nPm+SDpAUb+T9kEk56mLxVIy9zsE+91kHLYF
-	MclMc=
-X-Received: by 2002:a05:6402:5209:b0:64d:250b:5a8c with SMTP id 4fb4d7f45d1cf-653ec459b6bmr1772660a12.25.1768391533839;
-        Wed, 14 Jan 2026 03:52:13 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:bd])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf6d5d4sm22805284a12.32.2026.01.14.03.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 03:52:13 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
- Borkmann <daniel@iogearbox.net>,  Jesper Dangaard Brouer
- <hawk@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,  Stanislav
- Fomichev <sdf@fomichev.me>,  Simon Horman <horms@kernel.org>,  Andrii
- Nakryiko <andrii@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,
-  Eduard Zingerman <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,
-  Yonghong Song <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,
-  Hao Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,
-  kernel-team@cloudflare.com
-Subject: Re: [PATCH bpf-next v2 00/16] Decouple skb metadata tracking from
- MAC header offset
-In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
-	(Jakub Sitnicki's message of "Mon, 05 Jan 2026 13:14:25 +0100")
-References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
-Date: Wed, 14 Jan 2026 12:52:12 +0100
-Message-ID: <87ikd4v2c3.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1768391744; x=1768996544;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=69DLf9uq3Kof3aVtQbEyY5tbVzuTc5c56CQDu7fHFbM=;
+        b=pu5ylDCpDlFsiSss4oKPnQsLBA1IvoTx6inqFgqOu7JUQMHTshGnmT+HJJY9wG4oM8
+         GMXRfH3fcZ86JPUJHKN1MatfjePVNbL/x31IV+e5uVvjHKN4+cMY3ON8xElqqWMnXfHL
+         CeeSZwYrEdLoFtRv0ND2tkMt76rq9wglVLisPi8A1H7LcMaa0b1L2FHdU0khiMarC3RE
+         1CoVbARKAGLUxKBMRihHCX1y81Pbd97mfxH9HxCdgBLb/YXo84BSv/MhexrE/M5xuwsj
+         67Vt1lskUAORngmPGei5FNnl9lCKtGyxvhfvTOOVAzZbH2+dsXQKtLIbWsDRj8XRvjNS
+         y0Kg==
+X-Gm-Message-State: AOJu0Yxo3Akqn9mDhO++PFPSXSFIycJ8qA/vrQKtC561sQ9QSjL39HvG
+	LePPCkejMgoX4BRc9b3Hq3hNtC2KCGlnFo1Q3XbubJQ1nBEN5lzeGRraUGgeDAs9LYG0kmPu0UB
+	KHICbxzIj62QypvM9oolj40DNo0T5nUMALKth
+X-Gm-Gg: AY/fxX7ujV3en0MMAHCAi+lNwyjkQp1m5H/pY8F5yWffloXreR3aVzf0V6Xtn/s5wrK
+	XxynF3I/qf86raFSpxGFaoQ0nuTq3utIPqyB3wF77ctLvUCR6tnXh1gi9xgrBlnnhkC5+FcwVi8
+	Dh9TwEVb7wsY3AxyPgKNwKYpYLpmFp4bPH0gAYJbif3hydyCs40l0r6aWw+Jd16WC8yKDC5/E3f
+	zRhET2EphTDBdDUyKpYITeUqqnw/Z3PahpqcqSVfhCExHK1AZ0I/9As+OqgXJLQjGBIacJdBMcT
+	0E3WBkig
+X-Received: by 2002:a05:6402:50c8:b0:64b:4a33:5455 with SMTP id
+ 4fb4d7f45d1cf-653ec446f0cmr1855413a12.16.1768391743487; Wed, 14 Jan 2026
+ 03:55:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260105180712.46da1eb4@kernel.org> <CAMArcTWF12MQDVQw3dbJB==CMZ8Gd-4c-cu7PCV76EK3oVvFXw@mail.gmail.com>
+In-Reply-To: <CAMArcTWF12MQDVQw3dbJB==CMZ8Gd-4c-cu7PCV76EK3oVvFXw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 14 Jan 2026 20:55:29 +0900
+X-Gm-Features: AZwV_QgzgNfx-p0ssPDKbPHzSkbP7xH2kYaImrZCYbOZSvFe1zozzaHc6_ln6C0
+Message-ID: <CAMArcTX97OGA7HXwUQk3MPdhrJo_LfNzi73XDZEKZyBbUEtwHA@mail.gmail.com>
+Subject: Re: [TEST] amt.sh flaking
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 05, 2026 at 01:14 PM +01, Jakub Sitnicki wrote:
-> This series continues the effort to provide reliable access to xdp/skb
-> metadata from BPF context on the receive path.
+On Tue, Jan 6, 2026 at 8:52=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+>
+> On Tue, Jan 6, 2026 at 11:07=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+>
+> Hi Jakub,
+> Thanks a lot for the report!
+>
+> > Hi Taehee!
+> >
+> > After migration to netdev foundation machines the amt.sh test has
+> > gotten a bit more flaky:
+> >
+> > https://netdev.bots.linux.dev/contest.html?test=3Damt-sh
+> >
+> > In fact it's the second most flaky test we have after txtimestamp.sh.
+> >
+> > All the failures are on non-debug kernels, and look like this:
+> >
+> > TAP version 13
+> > 1..1
+> > # timeout set to 3600
+> > # selftests: net: amt.sh
+> > # 0.26 [+0.26] TEST: amt discovery                                     =
+            [ OK ]
+> > # 15.27 [+15.01] 2026/01/05 19:33:27 socat[4075] W exiting on signal 15
+> > # 15.28 [+0.01] TEST: IPv4 amt multicast forwarding                    =
+             [FAIL]
+> > # 17.30 [+2.02] TEST: IPv6 amt multicast forwarding                    =
+             [ OK ]
+> > # 17.30 [+0.00] TEST: IPv4 amt traffic forwarding torture              =
+ ..........  [ OK ]
+> > # 19.48 [+2.18] TEST: IPv6 amt traffic forwarding torture              =
+ ..........  [ OK ]
+> > # 26.71 [+7.22] Some tests failed.
+> > not ok 1 selftests: net: amt.sh # exit=3D1
+> >
+> > FWIW the new setup is based on Fedora 43 with:
+> >
 
-FYI, I'm dropping the effort to make xdp/skb metadata survive L2
-encap/decap, following the discussion here and in [1].
+Hi Jakub, Sorry for the late reply.
 
-Instead, I'll work on an skb local storage backed by an skb extension,
-similar to what we have for cgroups/sockets/etc.
+The root cause is that the source sends packets before the connection
+between the gateway and the relay is established. At that moment,
+packets cannot reach the listener.
+To fix this issue, the source needs to wait until the connection is
+established. However, the current AMT module does not notify its
+status to userspace. As a temporary workaround, I will send a patch
+that adds a 5-second sleep just before =E2=80=9CIPv4 AMT multicast forwardi=
+ng.=E2=80=9D
+After that, I will work on adding status notifications to the AMT module
+and to iproute2.
 
-This approach avoids patching skb_push/pull call sites and implicit
-allocations on hot paths.
- 
-I'm happy to split out BPF_EMIT_CALL support for prologue/epilogue if
-it's considered useful on its own.
+Thanks a lot!
+Taehee Yoo
 
-[1] https://lore.kernel.org/r/20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com
-
-Thanks,
--jkbs
+> > # cat /etc/systemd/network/99-default.link
+> > [Match]
+> > OriginalName=3D*
+> >
+> > [Link]
+> > NamePolicy=3Dkeep kernel database onboard slot path
+> > AlternativeNamesPolicy=3Ddatabase onboard slot path mac
+> > MACAddressPolicy=3Dnone
+>
+> I will try to reproduce in my local machine then will try to fix this pro=
+blem.
+> Thanks a lot!
+>
+> Taehee Yoo
 
