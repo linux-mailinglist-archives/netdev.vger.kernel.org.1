@@ -1,260 +1,183 @@
-Return-Path: <netdev+bounces-249746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F9CBD1D137
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:21:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13B5D1D197
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E97BE3010579
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:20:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 79D213047AF4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B40237C0E4;
-	Wed, 14 Jan 2026 08:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF34F37C0E1;
+	Wed, 14 Jan 2026 08:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HAqBZOWJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgF2FP7s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100CB37F106
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B536937E2E1
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768378834; cv=none; b=lHPwgjNgWZB965knXC1jnyghCxJsqc37BaFz/xLcLhK7w9KuW/MMVI3MShZDP8XVqdhVHcp+9Q7SNF7L54IGGDJObGNs8V8wYgHJoeXgif4Lb85AGE5phCXOrHMZey2WCJ31EnCKHX2NBitffHO1+o5PXSJv9ZwFAFGuIkgZ38c=
+	t=1768379009; cv=none; b=B5+hzbKTNmwLqy2ZfLIpdquzY9rEHsxzIMY4D3xCEkQFZwwTy74tyXgoxFtoZ+VTYfMVmTRSq1JWgiGiL/oQxSAVB/SrNWarAiD5HynUyERzwHU3dt+xdrnvKhe6bOS3bz+GwaaMrGKgEfrApfg2Hmp4FV9Xqhf3stXajvVdHqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768378834; c=relaxed/simple;
-	bh=cVeFdKo0k7nGdWRXnAwflkhPHd9OUkqReF3689rtABc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dLe8yqMb3QJ8rBRV/i68jRtUm8ku9GYevjbB7eumn6CYCSe8jsPJCGbmHEfF/EIpn7UlXUV+ksRvcuaBFyAkBHGaMrxoRUvs1r4yQNWdkcnBg0jIxbZoRcwWkm7jZ2pcHcQeFnEDuip9dnOLMPM6Reensu0R/Y3XGB+NXSoa8hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HAqBZOWJ; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso4537809f8f.2
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 00:20:27 -0800 (PST)
+	s=arc-20240116; t=1768379009; c=relaxed/simple;
+	bh=Hhv50DMy54K6yApXKNaezvMnwfKgacI4gVN/trwQBYQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EqsQOROLoy/7fEOubY4WEAEd6dK5WSwAWRO6FHSHz7V2ojI+KS27mdtOjJViobnOjhn6XDihY458F7REhpKxMGdHoOr5KC9wNLQNdWa1MO245dIxInmKUKytJoIt/Ieq/OYA3Y/FG4lJrL2xUSARALBeYyLlW4xBQCtEMt9AQ5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgF2FP7s; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so80204665e9.1
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 00:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768378824; x=1768983624; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kOjWICKElajAktcnLTxDO0a0hjOrXuTPJG+TIiIDMlE=;
-        b=HAqBZOWJEIe4297o2nch9K7sfY2e3rwSW4KHYoclvUMAcEcNUg91l/u9/l2DhoiKDh
-         5mQ4Tmk8jFbK+/ztvvC3fxPmXlgYD014LA9iSPLwBDMuy8spbBC9T3FxGQkvef8OP8yL
-         5krZhcAQbya3VX03HlBzNsj5j1anLNi/SLLzwCVbgydydZrz9pEmavTs0dhxYagPzWPj
-         vZBG6qWsx5kDlz0+Tvb7GqDpEQKTyncmmIMrZ5k0T2lHxekITQnL8QuQx/vLfEIhqPca
-         Dpt5fKyRvxPTTBOTsr8GTUOiBe9YP3PjjL0zcPKr4ijCiy8fYXe+4Q1ggtB4RE1/+Bq5
-         1o/w==
+        d=gmail.com; s=20230601; t=1768379002; x=1768983802; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8xepdu9EdtORochsQaLUxrQzpD3d02s+vvZF2V6lRJ0=;
+        b=MgF2FP7snIq3oim2WiHSO9smo2K0ZStn7UxTVsZhuAbL8a/yyvQTZwY5ZG3okM1VYq
+         tvYzn9V/SPW8+4NIj1wu9Q9RoPeA+YAoIEBfKNb6l3WmvvRUvnhtqPVp5wwmgbwXSC7q
+         D+e0c2yJl1i3/WjnJ7Yrzky4UumySnleSFxrmRR2GGaNyhGhuMiVebzrBxREW1YqHblO
+         bEUIgdFQuZ33488RhaUEM4aHwG/xTFfQyKmAwf2VZXRR+aUGVeg/TbKoumGxPFA4ZNol
+         CWLWkSGYXHQPZ6TE2hBa7lRm7EroEfZQjdM5jBoCE54cRNllOVEjjwf90ygc57aL7Ljs
+         yZ+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768378824; x=1768983624;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kOjWICKElajAktcnLTxDO0a0hjOrXuTPJG+TIiIDMlE=;
-        b=c377Mf8KnSmHxyKnUNLfn1XO1cc3Z9wNwhYQbY2NuIRhI+SgloEH3DMG2TLAWSbyJZ
-         kLNYhUnZWgloOYUvjgzjJspclr/cG+9KDdaZ2hihbp83YMBMPyoWWlGOP55hha7sxJ9g
-         Jwqv90JqLy/Ssd/Vp0vECgbyLAE0YfRr2q0vnrCHZLRxEEIKl49q79T0TKtFVfbQKs4b
-         SNj8b0iPDzKF3CuPVVrFBCTeyeTBRGsShIt8E9SlCZVjPYsOEWXXG2+ymIp+N6WpALdK
-         HiGFcyk7pSuUWKwHY6oSOu+QC05kc72xHrNmHt7nHa8wLgprbPTrste1MrKqfw2ml+Pu
-         ZuXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVoKXkK9+OC5jKlw/0zvDar80t/C/X9NtcR9ORPzRGZIY1m07cg5pT6BClkqh50pRc9A0gEpFA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywef+L2UdlRzfjW9L+2MNF1mjE9iC8hC3UG3m6e8CYW2uPxIm7E
-	MOyzUAi/1TIcAIl22chj/pgDwk0TN3Mee6edFE5FjtzRbE3MaLR7NeZHQZ2NYiZgdv8=
-X-Gm-Gg: AY/fxX43Uoo3+d+fPLnM0KKtbnFu+g/+hx+M6cdZkIihyzhg/7qCg3OXsEQUddMcTQM
-	ZAb36Pj6oELn4dkmAQoR2d0eikjn/JU+y9CwObD3F9/VMkH6gJjn72dVft4gDEXM8EOsOqQUyhl
-	cV+rcyWv57du5r8OK6OMTJCMHYbj+7jJoQjkpSKt31gV+txSgO7/RPuNWCF4pFvGGa4pmVDw4un
-	hYuTWVanSxJiSN+JaT537DlIxT/Q4uERCajqvjHJrZCw/0zAd8lu9hSrpsQbAO4RtBPD7DtIBMB
-	6D0gHBiDvfIWoAB2p51Ki897jVBwJFa3RPP/983OgM0rws82Doub/ceym2WbQXpf+U5ZJc0eHzv
-	Q8DPGxm51uCZBVFTFlvaNxdEEUqW9V98gleitlwDGmobIYk5+VRAiJv3RhL/dXt3xfY0ywwXXem
-	K515WtNcALMXpISg==
-X-Received: by 2002:a05:6000:40e1:b0:432:5b81:498 with SMTP id ffacd0b85a97d-4342c4f4a32mr1782744f8f.23.1768378823922;
-        Wed, 14 Jan 2026 00:20:23 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dad8bsm49346913f8f.8.2026.01.14.00.20.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 00:20:23 -0800 (PST)
-Date: Wed, 14 Jan 2026 09:20:20 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Daniel Thompson <daniel@riscstar.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 00/19] printk cleanup - part 3
-Message-ID: <aWdRxBbJOEIZ-KjE@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <aVuz_hpbrk8oSCVC@aspen.lan>
- <aVvF2hivCm0vIlfE@aspen.lan>
- <a5d83903fe2d2c2eb21de1527007913ff00847c5.camel@suse.com>
- <89409a0f48e6998ff6dd2245691b9954f0e1e435.camel@suse.com>
+        d=1e100.net; s=20230601; t=1768379002; x=1768983802;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8xepdu9EdtORochsQaLUxrQzpD3d02s+vvZF2V6lRJ0=;
+        b=DWdPadauQzp3s/WGvmKnzNeCO5TcDMxF4mvx/9VhkL0b3i3mT2laxAT2r6cTttZB43
+         rgf0F+xvGF4UY5gVIg6S+GJaUU2iF4xnt01NwrkIYPOscRcui7L++mPeQb8RwVRwLUc2
+         Od8P/dlvM6KKjvchtHi1VYzvGPCGI3EuJnL8fMwy8Kqt44HQQzL09b9569BgOvUzzZVD
+         0nVjcw6ff/7pdQOT/bAmedGJAIDZav2D9wYof4nieOs8n7b45yS01bhMJ9DM1sUuEgPi
+         H4J2hig7bvQyj5XKwDk/PRTdJ8o97A+B6DG/3I7ugATG3lKMqdxNLu2U65DmKKdR53Bt
+         dQ9A==
+X-Forwarded-Encrypted: i=1; AJvYcCU+k+t98g8yfz+WXp73GXF3HcgnIL0WfSIerHUeXD36iQ6+ZZJD204tQKzBJKNSPoFehulc5+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh2hhef/xVarUTkVWryvNtgRx/hOxGe1lImrcRruGko2xStQGm
+	hvb6MmFCoL3gEu9q/ALmiYPhq+IaxI22qOU/dH3LKXkBUCrvf3tDvrd0
+X-Gm-Gg: AY/fxX7JmKNNVix7Ia5U0Vmz0uZrY19X7zOrDOpkXP0ni/jAcXNKOpri1Ncq4I66y0r
+	w4com4W9nHviRuAf3HMsemE3p3gNW1/VvtXj3bBoalTe8o9vh20BDYBzV5wOG/QKS8QfhM39NHI
+	h6PfLEBtWim0pvZXE6NzEqukaGRyg+q1Hq6HjTILdhax/Q31dd7DCoMWuOYFNcW49m5cw4Qxist
+	VpTw0/ELwlFKZgB3qzrfg85B9EY6AeLibHhygp42BbverO0mXgbWbYWXlQkgTGAcnTDLaD2BK2r
+	3nhK16PumLR01jklkUnZhAIjO3Unty32gpbfy6JcyQvI4XLQR+nDYpVowvhnpn286K0QRhQLgRY
+	OmaRl1uBHZNw+HCRoXSRDQaMgqCj/sV1PPVLELPIWTvfTKnAN+Bz6ccdyWqdLffe6UBLnZBTss5
+	j6EcgZ9KGzat8v0YMOGPeoSmfbU9YH23Mz0kYiUss=
+X-Received: by 2002:a05:6000:1b86:b0:432:8667:51c7 with SMTP id ffacd0b85a97d-4342c553a63mr1357139f8f.44.1768379002222;
+        Wed, 14 Jan 2026 00:23:22 -0800 (PST)
+Received: from [10.80.1.200] ([72.25.96.16])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edd51sm48672478f8f.29.2026.01.14.00.23.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Jan 2026 00:23:21 -0800 (PST)
+Message-ID: <cfa6e78d-82ca-43d2-a8df-48fcb7d6301e@gmail.com>
+Date: Wed, 14 Jan 2026 10:23:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <89409a0f48e6998ff6dd2245691b9954f0e1e435.camel@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Mask wqe_id when handling rx cqe
+To: Leon Hwang <leon.hwang@linux.dev>, netdev@vger.kernel.org
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Oz Shlomo <ozsh@mellanox.com>, Paul Blakey <paulb@mellanox.com>,
+ Khalid Manaa <khalidm@nvidia.com>, Achiad Shochat <achiad@mellanox.com>,
+ Jiayuan Chen <jiayuan.chen@linux.dev>, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Leon Huang Fu <leon.huangfu@shopee.com>
+References: <20260112080323.65456-1-leon.hwang@linux.dev>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260112080323.65456-1-leon.hwang@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue 2026-01-13 21:32:33, Marcos Paulo de Souza wrote:
-> On Tue, 2026-01-13 at 09:41 -0300, Marcos Paulo de Souza wrote:
-> > On Mon, 2026-01-05 at 14:08 +0000, Daniel Thompson wrote:
-> > > On Mon, Jan 05, 2026 at 12:52:14PM +0000, Daniel Thompson wrote:
-> > > > Hi Marcos
-> > > > 
-> > > > On Sat, Dec 27, 2025 at 09:16:07AM -0300, Marcos Paulo de Souza
-> > > > wrote:
-> > > > > The parts 1 and 2 can be found here [1] and here[2].
-> > > > > 
-> > > > > The changes proposed in this part 3 are mostly to clarify the
-> > > > > usage of
-> > > > > the interfaces for NBCON, and use the printk helpers more
-> > > > > broadly.
-> > > > > Besides it, it also introduces a new way to register consoles
-> > > > > and drop thes the CON_ENABLED flag. It seems too much, but in
-> > > > > reality
-> > > > > the changes are not complex, and as the title says, it's
-> > > > > basically a
-> > > > > cleanup without changing the functional changes.
-> > > > 
-> > > > I ran this patchset through the kgdb test suite and I'm afraid it
-> > > > is
-> > > > reporting functional changes.
-> > > > 
-> > > > Specifically the earlycon support for kdb has regressed (FWIW the
-> > > > problem bisects down to the final patch in the series where
-> > > > CON_ENABLED
-> > > > is removed).
-> > > > 
-> > > > Reproduction on x86-64 KVM outside of the test suite should be
-> > > > easy:
-> > > > 
-> > > >     make defconfig
-> > > >     scripts/config \
-> > > >         --enable DEBUG_INFO \
-> > > > 	--enable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
-> > > > 	--enable DEBUG_FS \
-> > > > 	--enable KALLSYMS_ALL \
-> > > > 	--enable MAGIC_SYSRQ \
-> > > > 	--enable KGDB \
-> > > > 	--enable KGDB_TESTS \
-> > > > 	--enable KGDB_KDB \
-> > > > 	--enable KDB_KEYBOARD \
-> > > > 	--enable LKDTM \
-> > > > 	--enable SECURITY_LOCKDOWN_LSM
-> > > >     make olddefconfig
-> > > >     make -j$(nproc)
-> > > >     qemu-system-x86_64 \
-> > > >         -m 1G -smp 2 -nographic \
-> > > > 	-kernel arch/x86/boot/bzImage \
-> > > > 	-append "console=ttyS0,115200 kgdboc=ttyS0
-> > > > earlycon=uart8250,io,0x3f8 kgdboc_earlycon kgdbwait"
-> > > 
-> > > Actually I realized there was a simpler reproduction (hinted at by
-> > > the
-> > > missing "printk: legacy bootconsole [uart8250] enabled" in the
-> > > regressed
-> > > case). It looks like the earlycon simply doesn't work and that
-> > > means
-> > > the
-> > > reproduction doesn't require anything related to kgdb at all.
-> > > Simply:
-> > > 
-> > >     make defconfig
-> > >     make -j$(nproc)
-> > >     qemu-system-x86_64 -m 1G -smp 2 -nographic -kernel
-> > > arch/x86/boot/bzImage \
-> > >         -append "earlycon=uart8250,io,0x3f8"
-> > > 
-> > > With the part 3 patchset applied I get no output from the earlycon
-> > > (without the patch set I get the early boot messages which, as
-> > > expected,
-> > > stop when tty0 comes up).
-> > 
-> > Hi Daniel, sorry for the late reply! Lots of things to check lately
-> > :)
-> > 
-> > Ok, I reproduced here, thanks a lot for testing kgdboc, it's a quick
-> > way to check that the new register_console_force is not working. Let
-> > me
-> > take a look to find what's wrong. Thanks a lot for finding this
-> > issue!
+
+
+On 12/01/2026 10:03, Leon Hwang wrote:
+> The wqe_id from CQE contains wrap counter bits in addition to the WQE
+> index. Mask it with sz_m1 to prevent out-of-bounds access to the
+> rq->mpwqe.info[] array when wrap counter causes wqe_id to exceed RQ size.
 > 
-> Ok, I did a bisect and found out that the issue lies in the last
-> commit, where CON_ENABLED was removed. After it, I then checked what
-> was wrong, since everything was being plumbed correctly (tm), and then
-> I found that it was not:
+> Without this fix, the driver crashes with NULL pointer dereference:
 > 
-> On _register_console, the function try_enable_default_console is called
-> when there are not registered consoles, and then it sets CON_ENABLED
-> for the console. Later on, try_enable_preferred_console it checks if
-> the console was specified by the user, and at the same time it had
-> CON_ENABLED set.
+>    BUG: kernel NULL pointer dereference, address: 0000000000000020
+>    RIP: 0010:mlx5e_skb_from_cqe_mpwrq_linear+0xb3/0x280 [mlx5_core]
+>    Call Trace:
+>     <IRQ>
+>     mlx5e_handle_rx_cqe_mpwrq+0xe3/0x290 [mlx5_core]
+>     mlx5e_poll_rx_cq+0x97/0x820 [mlx5_core]
+>     mlx5e_napi_poll+0x110/0x820 [mlx5_core]
 > 
-> It worked by chance, but now, we don't have this flag anymore, and then
-> we are not _marking_ the console on try_enable_default_console so
-> try_enable_preferred_console returns ENOENT.
 
-Great catch! Yeah, it worked just by chance.
+Hi,
 
-> So, without any console kgdb is activated much later in the boot
-> process, as you found it.
+We do not expect out-of-bounds index, fixing it this way is not 
+necessarily correct.
+
+Can you please elaborate on your test case, setup, and how to repro?
+
+> Fixes: dfd9e7500cd4 ("net/mlx5e: Rx, Split rep rx mpwqe handler from nic")
+> Fixes: f97d5c2a453e ("net/mlx5e: Add handle SHAMPO cqe support")
+> Fixes: 461017cb006a ("net/mlx5e: Support RX multi-packet WQE (Striding RQ)")
+> Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
+> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h | 5 +++++
+>   drivers/net/ethernet/mellanox/mlx5/core/en_rx.c   | 6 +++---
+>   2 files changed, 8 insertions(+), 3 deletions(-)
 > 
-> I talked with Petr Mladek and it would need to rework the way that we
-> register a console, and he's already working on it.
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> index 7e191e1569e8..df8e671d5115 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> @@ -583,4 +583,9 @@ static inline struct mlx5e_mpw_info *mlx5e_get_mpw_info(struct mlx5e_rq *rq, int
+>   
+>   	return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info + array_size(i, isz));
+>   }
+> +
+> +static inline u16 mlx5e_rq_cqe_wqe_id(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+> +{
+> +	return be16_to_cpu(cqe->wqe_id) & rq->mpwqe.wq.fbc.sz_m1;
+> +}
+>   #endif
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> index 1f6930c77437..25c04684271c 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> @@ -1957,7 +1957,7 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+>   static void mlx5e_handle_rx_cqe_mpwrq_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+>   {
+>   	u16 cstrides       = mpwrq_get_cqe_consumed_strides(cqe);
+> -	u16 wqe_id         = be16_to_cpu(cqe->wqe_id);
+> +	u16 wqe_id         = mlx5e_rq_cqe_wqe_id(rq, cqe);
+>   	struct mlx5e_mpw_info *wi = mlx5e_get_mpw_info(rq, wqe_id);
+>   	u16 stride_ix      = mpwrq_get_cqe_stride_index(cqe);
+>   	u32 wqe_offset     = stride_ix << rq->mpwqe.log_stride_sz;
+> @@ -2373,7 +2373,7 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+>   	u16 cstrides		= mpwrq_get_cqe_consumed_strides(cqe);
+>   	u32 data_offset		= wqe_offset & (PAGE_SIZE - 1);
+>   	u32 cqe_bcnt		= mpwrq_get_cqe_byte_cnt(cqe);
+> -	u16 wqe_id		= be16_to_cpu(cqe->wqe_id);
+> +	u16 wqe_id		= mlx5e_rq_cqe_wqe_id(rq, cqe);
+>   	u32 page_idx		= wqe_offset >> PAGE_SHIFT;
+>   	u16 head_size		= cqe->shampo.header_size;
+>   	struct sk_buff **skb	= &rq->hw_gro_data->skb;
+> @@ -2478,7 +2478,7 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+>   static void mlx5e_handle_rx_cqe_mpwrq(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+>   {
+>   	u16 cstrides       = mpwrq_get_cqe_consumed_strides(cqe);
+> -	u16 wqe_id         = be16_to_cpu(cqe->wqe_id);
+> +	u16 wqe_id         = mlx5e_rq_cqe_wqe_id(rq, cqe);
+>   	struct mlx5e_mpw_info *wi = mlx5e_get_mpw_info(rq, wqe_id);
+>   	u16 stride_ix      = mpwrq_get_cqe_stride_index(cqe);
+>   	u32 wqe_offset     = stride_ix << rq->mpwqe.log_stride_sz;
 
-Yes, I have some patches in early stages of developnent of another
-feature which would help here.
-
-> For now I believe
-> that we could take a look in all the patches besides the last one that
-> currently breaks the earlycon with kgdb and maybe other usecases.
-
-I agree. I am going to review this patchset first. Then I'll try to
-clean up the patches which remove the ugly side effect from
-try_enable_preferred_console(). Then we could discuss how
-to move forward. It might make sense to push this patchset
-first without the last patch...
-
-> Sorry for not catching this issue before. I'll use kgdb next time to
-> make sure that it keeps working :)
-
-Do not worry at all. It was a well hidden catch. It is great that
-Daniel found the regression in time...
-
-Best Regards,
-Petr
 
