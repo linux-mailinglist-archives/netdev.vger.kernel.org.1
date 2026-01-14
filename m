@@ -1,618 +1,194 @@
-Return-Path: <netdev+bounces-249820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D552ED1E92D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:55:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E49D1E9CF
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C29C53078ED7
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:51:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F2FD6305D7E9
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9ED397ACB;
-	Wed, 14 Jan 2026 11:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1BA399A5B;
+	Wed, 14 Jan 2026 11:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsvrmFuO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUUEgg/z";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="S25VXouS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2962397AC4
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC18C399A4C
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768391393; cv=none; b=WGAnDcXWd8y0I3sPP85X8qYTRqersYBBrhYo0xQTyccSM0A0wN6FrPtzL7PT95nozooUd6KWCdPpFSdJFdPSmt7o3h8Q8K5SGDZibPwaehYBoMkdZ3pmAFhPLFBXKT2qPYxV99BB7R0BgcDSty1jrrifsnmxH1W1MswDBEkvUNE=
+	t=1768391408; cv=none; b=Ap819kiE6+CGpok5ABpB8SglktrNg7e0x4Z/fXxq5Uyw53DCLD6q0mjYiuZKQhw74sddwGaQ1edRneLJ0Wqd9dxM+EA2uGqTtZomGX4O81bOUaMLDVqeyvcWVWGzkWuTtPuK5RrrIozjsivHqV+UFSi4yYRi/OFh9Ol45if/2GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768391393; c=relaxed/simple;
-	bh=GgMRinYhSKgSDyAcjoNF1p47gTdiShIaJazaao5MQ9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hYHL6RBpu2T0Rh3d6C8n0iQhEz8CLUCQx6Qhzr7L8Wdazzk6xpKrJAJgBxOIOy/R6p/dombiKvz2AsZ+zQLDxJ59RWkGNso8/azxbnvH/K2ZNDgks6dROXVUc/lnlSoRKq2/nblqk0WPYrONPiKEgQW0aFiz5Kyx+cBRkerlxeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsvrmFuO; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-81c72659e6bso5539545b3a.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:49:50 -0800 (PST)
+	s=arc-20240116; t=1768391408; c=relaxed/simple;
+	bh=UtKOf3/Ud2MKlYgnqMe/64gZ7wIz9Cjsm2A2iZSp4m4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=IuyO2CdfVPa8PD0xEc9yowgL+f1WECOaNBWqNVHj6RyQBFkRhX91zTxrD8tnaLJ51rvFFUUFvAJm99rpYKaScS12HaGujuZxUzajXxzfpRn5kfqsZN3tBVib4JuWOOXjoOmHzMMb5WSbRel8FkKR8pS/zZqmYrA13NDIUqR9O/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iUUEgg/z; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=S25VXouS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768391405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q8uX03BZl5AjAdWG8Y9fY1QPxmLXeoAmQaAzEsbqKH8=;
+	b=iUUEgg/zhY7lVYWa8TG5pnqce7WyhCvJz+54/nQ/KslAkye3pL5WaJI9tSz7fHbQC4Zoya
+	C5kB3+FTB/mJg1cPqwiGaqK/JNAh5+DXlgg8lXgzmRgTFAC+TsWQMdrA1tjbriVso2pvQL
+	txv8u7yoJQhtlEfe0aOt3sJ3p63VZFg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-YOv8EBC9OC6_Y1n6Fu53Dw-1; Wed, 14 Jan 2026 06:50:02 -0500
+X-MC-Unique: YOv8EBC9OC6_Y1n6Fu53Dw-1
+X-Mimecast-MFC-AGG-ID: YOv8EBC9OC6_Y1n6Fu53Dw_1768391401
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-653f94a664eso369511a12.2
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:50:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768391390; x=1768996190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+BjgVDa7czL64FxA+Zx+xW3I48p8/maMtuczUJsQ/hc=;
-        b=QsvrmFuO2UyVjFV5LzjXSvwH/3lDBHJeqvj333HCem8dR0NbrWxnVmFjBUGYUC1DSo
-         n7T2Gte/TmF9nj+T8m/TvhquXFafvyKyXmO11nylgyBH198p7GDGLlhxGC7XQFm3OX2p
-         +1h09/sd/P2tl9CN+/av1x/XnFPY8txlxmtsFKPC9gy/Jze18WSN9o/H/XLMg4DTmNXg
-         FzM7cSeS+nUnpiJoAvasoXHVAsQlhZ0Kl9zIkXo1otwqYqNjgHujXmPHWvZ3DCjbclUC
-         4qR2P8LGnz4qeOPYkPndphI0aJ0d4p0kwPj1enad9niUwgrOX9gZ2EvCu2o/+9xP86ci
-         iFUA==
+        d=redhat.com; s=google; t=1768391401; x=1768996201; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q8uX03BZl5AjAdWG8Y9fY1QPxmLXeoAmQaAzEsbqKH8=;
+        b=S25VXouSyxBbwa293SNB/yOE5a2zByfoZcGbBWXRtwh006CQX0OCpY3sI2m5AmHV2T
+         IO1wjOwVUKng+845UMeyHO6ZMFNOyfYf4Oqhzp7V8rKuLb89vMfXfRMKAd0+BCumSvQG
+         n/cosn7kK5vXEIToASao05HijQlFXipA/Gcz7pMUItiSeE0K1uO9CNT06jfMZvegSlyH
+         mUtHhCNQCbgL5u19Mh7I295ufbpKqIkKNBHI6xTzTDHNzuNHvIA3X1VCMiOS/hj5BGob
+         lCGbjhvLeNHMtc6ckjzlwRv5k9XfRVHDEnPew2cQkp2C4cnvNNhVMTNVJeuRYnV/Pz2Y
+         Ezcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768391390; x=1768996190;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+BjgVDa7czL64FxA+Zx+xW3I48p8/maMtuczUJsQ/hc=;
-        b=ZPQn+khWHJ4EANkGz5UrBtfhhrf2g3ZYT7wpODAJaulgD4rAPhtHJcOwu4SIRHvBSM
-         n8U4M0sF7iwmvBWOuMeT6hpIiOmxJG+6A/tclPC0UhbKCjdADfh4lKAN645rnpIa44rm
-         KJfvuKicGaKYZOvwxJm5Zy5ik082bDFnxX1jbslvltFlQNNJya0XNjEEtb57GwiDjNW5
-         9N8zQzG4A2jzvYFGlcsYjd2IpZYiec3je4kdPPw2eqqMpzIXw09NEXp/cOHoitlW31CE
-         JckH0BzH6YlFvpaCKL+17tMhBHsjuSxBiNiml6AyFIele+sST2W5IZuhM0zUQUrY3pnb
-         hqUw==
-X-Gm-Message-State: AOJu0YwJSwwtyviWqznAXl8UfmMwH03hDBSEqeGcyOb5Re6nqedFFVtH
-	bsDJ0WYPKcz1NE6isC+0I6S2AjIUoyXx46bUD1YyH3fgC+bXL+zUl305sHs4gg==
-X-Gm-Gg: AY/fxX4Zx4CPnXqZ59O8vQasMvZNVXq8R6uJYZQSKVGpOP1exrWPYcibvSf43i0t7R8
-	NA+RL+7/0g2MC9LG+4EyUkg24f4cWOx7UWGgRJsO53oqfNpmYhAFiT+PAWC6JfaAFM0UwXC0IAG
-	3XQWR/RqvwdG/4DYMj7KIn1LTW0LNDl7CWovRT7RPXyc0XFNGIOxsNyigDMyLBvckaLROFzHtCl
-	Cr9E8stEnFXta0sF+6LW0MBEpSC7+lHTrGzwkXuKknyhzlhuITpfUA23fv+xCvwgNrv5nVzINf+
-	FWCNOa48UQ+HIrjV0lCv+tosq+4uEqMWa0f8ZgBiJP1UQg/8jpOatdB3XJwLX1ulDZKfQyGMI+8
-	Yf5cPpfukIrx8hhWs89R+JNkq9ugsRYUXsNXyJ4CQp0jOUsv/Bs+rh2BI57GBGd6xln41bj1oA5
-	rn7QCKFHgNln4EGNm/D7UFc1VG6ZTdYnnBly2cry6q5bhMYJnc56z7tg==
-X-Received: by 2002:a05:6a20:5483:b0:361:4b9d:b9a8 with SMTP id adf61e73a8af0-38befad8ac9mr1831275637.20.1768391389937;
-        Wed, 14 Jan 2026 03:49:49 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbf28f678sm22632123a12.3.2026.01.14.03.49.46
+        d=1e100.net; s=20230601; t=1768391401; x=1768996201;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q8uX03BZl5AjAdWG8Y9fY1QPxmLXeoAmQaAzEsbqKH8=;
+        b=fBt+GFPdQodYlGZHQWgeZNe3M37DqYDKRQ2e78q6Swoe0pBzUyVJyfQP4pNDRNTg9V
+         65PqF9v+8r+kAxDaXaKT4b0oJin6ySu1hq9mMnnpjscjCCvnUCq0WJXbeMdQwA7gLkbs
+         lKDH4eWSEEuuzMbHkxhBmQWTEkEFRTtj6DIkMoQz8Orne9IjY8gok2o6YE057eVrWrIK
+         hyBOcZEbAKzAOR2WC5bjvDpiigNwe+AXr/q48BgOR3CUdOBvCDC+gjqT74rrNfwccIyg
+         jxQoGm2ehIbxZt7ixy8BAbsQow6zSV6GxY57X5vpUrARqLN6xn/cApMiOdWWBwUK8ajE
+         yf2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWP/FYx0bMEvfHQt90QbzZ0w55JHMaCZWZlUSDcV+mXOOuo/5XTc+1grUime/4I5IxZxcNqz6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd6zkE5Hgd/xIBdkomlVq/6j7ZtYHnoySijc2d2o/+FnJ87Phy
+	qh9olJtyguzv8I4a34VJFIg97xLzUFXyPQuUNfQg7h4PqYcRgX+x1VSLERKscynWnx1fzhO007i
+	crzud/QR/0WRq4J00xzw1c0C73Xtpfa+FmatLUoFhvH9isHwhy1SKY882cw==
+X-Gm-Gg: AY/fxX4cuGRDlZ9gEooTWl6xLnVCZl/0dmk5lkkDGLsI2uz8dyY1WGWi/HV+/TpUMU7
+	utfcROPWGxyZd8EfAt/AJLO94OWTa7nFlRRHi2BdoXc0BBYn0cP7Vf6LNL09/HP1gf3vwHC1LZ1
+	YiXZSzcqcyxzjUBZV+agj/Kbxqor6x3iVsBr8x7CwEsK+i+iK8r4gGkvh/cAZdomJSuoJ8siayy
+	ZEmjMB7b5qPJmsIEo0Y5q1VJhtdUrRG7TQfqrM7AxF+cQc0l9bnYM0YhpiHy4hbcIaKZ745pCyl
+	0Vu9xNKHHzn9oWLC3hweSvLHq5wWXYK6J13WsMIO7dtloa2QEGGNZl14ZyokZS0WOh4ixPNECqo
+	SoDigWW0eKBS8oPD9XyA77sE3QJQ9yIh8hA==
+X-Received: by 2002:a17:907:94c4:b0:b87:2d0f:d417 with SMTP id a640c23a62f3a-b8760fe0baamr179682166b.14.1768391401375;
+        Wed, 14 Jan 2026 03:50:01 -0800 (PST)
+X-Received: by 2002:a17:907:94c4:b0:b87:2d0f:d417 with SMTP id a640c23a62f3a-b8760fe0baamr179679266b.14.1768391400849;
+        Wed, 14 Jan 2026 03:50:00 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86ebfd007fsm1294372966b.31.2026.01.14.03.50.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 03:49:49 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 2/2] net: dsa: yt921x: Use u64_stats_t for MIB stats
-Date: Wed, 14 Jan 2026 19:47:42 +0800
-Message-ID: <20260114114745.213252-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260114114745.213252-1-mmyangfl@gmail.com>
-References: <20260114114745.213252-1-mmyangfl@gmail.com>
+        Wed, 14 Jan 2026 03:50:00 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id CA9A8408B76; Wed, 14 Jan 2026 12:49:57 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Michael
+ Chan <michael.chan@broadcom.com>, Pavan Chebbi
+ <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
+ bpf@vger.kernel.org, kernel-team@cloudflare.com, Jesse Brandeburg
+ <jbrandeburg@cloudflare.com>, Willem Ferguson <wferguson@cloudflare.com>,
+ Arthur Fabre <arthur@arthurfabre.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next 00/10] Call skb_metadata_set
+ when skb->data points past metadata
+In-Reply-To: <87wm1luusg.fsf@cloudflare.com>
+References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
+ <20260112190856.3ff91f8d@kernel.org>
+ <36deb505-1c82-4339-bb44-f72f9eacb0ac@redhat.com>
+ <bd29d196-5854-4a0c-a78c-e4869a59b91f@kernel.org>
+ <87wm1luusg.fsf@cloudflare.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 14 Jan 2026 12:49:57 +0100
+Message-ID: <878qe01kii.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-64-bit variables might not be atomic on 32-bit architectures, thus
-cannot be unconditionally made lock-free. Use u64_stats_t so it would
-still be lock-free on 64-bit architectures.
+Jakub Sitnicki via Intel-wired-lan <intel-wired-lan@osuosl.org> writes:
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/yt921x.c | 245 +++++++++++++++++++++++----------------
- drivers/net/dsa/yt921x.h | 108 +++++++++--------
- 2 files changed, 205 insertions(+), 148 deletions(-)
+> On Tue, Jan 13, 2026 at 07:52 PM +01, Jesper Dangaard Brouer wrote:
+>> *BUT* this patchset isn't doing that. To me it looks like a cleanup
+>> patchset that simply makes it consistent when skb_metadata_set() called.
+>> Selling it as a pre-requirement for doing copy later seems fishy.
+>  
+> Fair point on the framing. The interface cleanup is useful on its own -
+> I should have presented it that way rather than tying it to future work.
+>
+>> Instead of blindly copying XDP data_meta area into a single SKB
+>> extension.  What if we make it the responsibility of the TC-ingress BPF-
+>> hook to understand the data_meta format and via (kfunc) helpers
+>> transfer/create the SKB extension that it deems relevant.
+>> Would this be an acceptable approach that makes it easier to propagate
+>> metadata deeper in netstack?
+>
+> I think you and Jakub are actually proposing the same thing.
+>  
+> If we can access a buffer tied to an skb extension from BPF, this could
+> act as skb-local storage and solves the problem (with some operational
+> overhead to set up TC on ingress).
+>  
+> I'd also like to get Alexei's take on this. We had a discussion before
+> about not wanting to maintain two different storage areas for skb
+> metadata.
+>  
+> That was one of two reasons why we abandoned Arthur's patches and why I
+> tried to make the existing headroom-backed metadata area work.
+>  
+> But perhaps I misunderstood the earlier discussion. Alexei's point may
+> have been that we don't want another *headroom-backed* metadata area
+> accessible from XDP, because we already have that.
+>  
+> Looks like we have two options on the table:
+>  
+> Option A) Headroom-backed metadata
+>   - Use existing skb metadata area
+>   - Patch skb_push/pull call sites to preserve it
+>  
+> Option B) Extension-backed metadata
+>   - Store metadata in skb extension from BPF
+>   - TC BPF copies/extracts what it needs from headroom-metadata
+>  
+> Or is there an Option C I'm missing?
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 5e4e8093ba16..e1887d107008 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -18,6 +18,7 @@
- #include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-+#include <linux/u64_stats_sync.h>
- 
- #include <net/dsa.h>
- 
-@@ -666,22 +667,20 @@ yt921x_mbus_ext_init(struct yt921x_priv *priv, struct device_node *mnp)
- static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- {
- 	struct yt921x_port *pp = &priv->ports[port];
-+	struct yt921x_mib *mib_new = &pp->mib_new;
- 	struct device *dev = to_device(priv);
- 	struct yt921x_mib *mib = &pp->mib;
-+	u64 rx_frames;
-+	u64 tx_frames;
- 	int res = 0;
- 
--	/* Reading of yt921x_port::mib is not protected by a lock and it's vain
--	 * to keep its consistency, since we have to read registers one by one
--	 * and there is no way to make a snapshot of MIB stats.
--	 *
--	 * Writing (by this function only) is and should be protected by
--	 * reg_lock.
-+	/* u64_stats_read/set is redundant for mib_new, but I don't want to
-+	 * declare a plain u64 yt921x_mib variant.
- 	 */
- 
- 	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
- 		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
- 		u32 reg = YT921X_MIBn_DATA0(port) + desc->offset;
--		u64 *valp = &((u64 *)mib)[i];
- 		u32 val0;
- 		u64 val;
- 
-@@ -690,7 +689,7 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			break;
- 
- 		if (desc->size <= 1) {
--			u64 old_val = *valp;
-+			u64 old_val = u64_stats_read(&((u64_stats_t *)mib)[i]);
- 
- 			val = (old_val & ~(u64)U32_MAX) | val0;
- 			if (val < old_val)
-@@ -704,22 +703,40 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
- 			val = ((u64)val1 << 32) | val0;
- 		}
- 
--		WRITE_ONCE(*valp, val);
-+		u64_stats_set(&((u64_stats_t *)mib_new)[i], val);
- 	}
- 
--	pp->rx_frames = mib->rx_64byte + mib->rx_65_127byte +
--			mib->rx_128_255byte + mib->rx_256_511byte +
--			mib->rx_512_1023byte + mib->rx_1024_1518byte +
--			mib->rx_jumbo;
--	pp->tx_frames = mib->tx_64byte + mib->tx_65_127byte +
--			mib->tx_128_255byte + mib->tx_256_511byte +
--			mib->tx_512_1023byte + mib->tx_1024_1518byte +
--			mib->tx_jumbo;
--
--	if (res)
-+	if (res) {
- 		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
- 			port, res);
--	return res;
-+		return res;
-+	}
-+
-+	rx_frames = u64_stats_read(&mib_new->rx_64byte) +
-+		    u64_stats_read(&mib_new->rx_65_127byte) +
-+		    u64_stats_read(&mib_new->rx_128_255byte) +
-+		    u64_stats_read(&mib_new->rx_256_511byte) +
-+		    u64_stats_read(&mib_new->rx_512_1023byte) +
-+		    u64_stats_read(&mib_new->rx_1024_1518byte) +
-+		    u64_stats_read(&mib_new->rx_jumbo);
-+	tx_frames = u64_stats_read(&mib_new->tx_64byte) +
-+		    u64_stats_read(&mib_new->tx_65_127byte) +
-+		    u64_stats_read(&mib_new->tx_128_255byte) +
-+		    u64_stats_read(&mib_new->tx_256_511byte) +
-+		    u64_stats_read(&mib_new->tx_512_1023byte) +
-+		    u64_stats_read(&mib_new->tx_1024_1518byte) +
-+		    u64_stats_read(&mib_new->tx_jumbo);
-+
-+	u64_stats_update_begin(&pp->syncp);
-+	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-+		u64_stats_set(&((u64_stats_t *)mib)[i],
-+			      u64_stats_read(&((u64_stats_t *)mib_new)[i]));
-+	}
-+	u64_stats_set(&pp->rx_frames, rx_frames);
-+	u64_stats_set(&pp->tx_frames, tx_frames);
-+	u64_stats_update_end(&pp->syncp);
-+
-+	return 0;
- }
- 
- static void yt921x_poll_mib(struct work_struct *work)
-@@ -762,22 +779,27 @@ yt921x_dsa_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
- 	size_t j;
- 
- 	mutex_lock(&priv->reg_lock);
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
--	j = 0;
--	for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
--		const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
- 
--		if (!desc->name)
--			continue;
-+		j = 0;
-+		for (size_t i = 0; i < ARRAY_SIZE(yt921x_mib_descs); i++) {
-+			const struct yt921x_mib_desc *desc = &yt921x_mib_descs[i];
- 
--		data[j] = ((u64 *)mib)[i];
--		j++;
--	}
-+			if (!desc->name)
-+				continue;
-+
-+			data[j] = u64_stats_read(&((u64_stats_t *)mib)[i]);
-+			j++;
-+		}
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- }
- 
- static int yt921x_dsa_get_sset_count(struct dsa_switch *ds, int port, int sset)
-@@ -804,33 +826,38 @@ yt921x_dsa_get_eth_mac_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
- 
- 	mutex_lock(&priv->reg_lock);
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
--	mac_stats->FramesTransmittedOK = pp->tx_frames;
--	mac_stats->SingleCollisionFrames = mib->tx_single_collisions;
--	mac_stats->MultipleCollisionFrames = mib->tx_multiple_collisions;
--	mac_stats->FramesReceivedOK = pp->rx_frames;
--	mac_stats->FrameCheckSequenceErrors = mib->rx_crc_errors;
--	mac_stats->AlignmentErrors = mib->rx_alignment_errors;
--	mac_stats->OctetsTransmittedOK = mib->tx_good_bytes;
--	mac_stats->FramesWithDeferredXmissions = mib->tx_deferred;
--	mac_stats->LateCollisions = mib->tx_late_collisions;
--	mac_stats->FramesAbortedDueToXSColls = mib->tx_aborted_errors;
--	/* mac_stats->FramesLostDueToIntMACXmitError */
--	/* mac_stats->CarrierSenseErrors */
--	mac_stats->OctetsReceivedOK = mib->rx_good_bytes;
--	/* mac_stats->FramesLostDueToIntMACRcvError */
--	mac_stats->MulticastFramesXmittedOK = mib->tx_multicast;
--	mac_stats->BroadcastFramesXmittedOK = mib->tx_broadcast;
--	/* mac_stats->FramesWithExcessiveDeferral */
--	mac_stats->MulticastFramesReceivedOK = mib->rx_multicast;
--	mac_stats->BroadcastFramesReceivedOK = mib->rx_broadcast;
--	/* mac_stats->InRangeLengthErrors */
--	/* mac_stats->OutOfRangeLengthField */
--	mac_stats->FrameTooLongErrors = mib->rx_oversize_errors;
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		mac_stats->FramesTransmittedOK = u64_stats_read(&pp->tx_frames);
-+		mac_stats->SingleCollisionFrames = u64_stats_read(&mib->tx_single_collisions);
-+		mac_stats->MultipleCollisionFrames = u64_stats_read(&mib->tx_multiple_collisions);
-+		mac_stats->FramesReceivedOK = u64_stats_read(&pp->rx_frames);
-+		mac_stats->FrameCheckSequenceErrors = u64_stats_read(&mib->rx_crc_errors);
-+		mac_stats->AlignmentErrors = u64_stats_read(&mib->rx_alignment_errors);
-+		mac_stats->OctetsTransmittedOK = u64_stats_read(&mib->tx_good_bytes);
-+		mac_stats->FramesWithDeferredXmissions = u64_stats_read(&mib->tx_deferred);
-+		mac_stats->LateCollisions = u64_stats_read(&mib->tx_late_collisions);
-+		mac_stats->FramesAbortedDueToXSColls = u64_stats_read(&mib->tx_aborted_errors);
-+		/* mac_stats->FramesLostDueToIntMACXmitError */
-+		/* mac_stats->CarrierSenseErrors */
-+		mac_stats->OctetsReceivedOK = u64_stats_read(&mib->rx_good_bytes);
-+		/* mac_stats->FramesLostDueToIntMACRcvError */
-+		mac_stats->MulticastFramesXmittedOK = u64_stats_read(&mib->tx_multicast);
-+		mac_stats->BroadcastFramesXmittedOK = u64_stats_read(&mib->tx_broadcast);
-+		/* mac_stats->FramesWithExcessiveDeferral */
-+		mac_stats->MulticastFramesReceivedOK = u64_stats_read(&mib->rx_multicast);
-+		mac_stats->BroadcastFramesReceivedOK = u64_stats_read(&mib->rx_broadcast);
-+		/* mac_stats->InRangeLengthErrors */
-+		/* mac_stats->OutOfRangeLengthField */
-+		mac_stats->FrameTooLongErrors = u64_stats_read(&mib->rx_oversize_errors);
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- }
- 
- static void
-@@ -840,14 +867,19 @@ yt921x_dsa_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
- 
- 	mutex_lock(&priv->reg_lock);
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
--	ctrl_stats->MACControlFramesTransmitted = mib->tx_pause;
--	ctrl_stats->MACControlFramesReceived = mib->rx_pause;
--	/* ctrl_stats->UnsupportedOpcodesReceived */
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		ctrl_stats->MACControlFramesTransmitted = u64_stats_read(&mib->tx_pause);
-+		ctrl_stats->MACControlFramesReceived = u64_stats_read(&mib->rx_pause);
-+		/* ctrl_stats->UnsupportedOpcodesReceived */
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- }
- 
- static const struct ethtool_rmon_hist_range yt921x_rmon_ranges[] = {
-@@ -869,6 +901,7 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
- 
- 	mutex_lock(&priv->reg_lock);
- 	yt921x_read_mib(priv, port);
-@@ -876,26 +909,30 @@ yt921x_dsa_get_rmon_stats(struct dsa_switch *ds, int port,
- 
- 	*ranges = yt921x_rmon_ranges;
- 
--	rmon_stats->undersize_pkts = mib->rx_undersize_errors;
--	rmon_stats->oversize_pkts = mib->rx_oversize_errors;
--	rmon_stats->fragments = mib->rx_alignment_errors;
--	/* rmon_stats->jabbers */
--
--	rmon_stats->hist[0] = mib->rx_64byte;
--	rmon_stats->hist[1] = mib->rx_65_127byte;
--	rmon_stats->hist[2] = mib->rx_128_255byte;
--	rmon_stats->hist[3] = mib->rx_256_511byte;
--	rmon_stats->hist[4] = mib->rx_512_1023byte;
--	rmon_stats->hist[5] = mib->rx_1024_1518byte;
--	rmon_stats->hist[6] = mib->rx_jumbo;
--
--	rmon_stats->hist_tx[0] = mib->tx_64byte;
--	rmon_stats->hist_tx[1] = mib->tx_65_127byte;
--	rmon_stats->hist_tx[2] = mib->tx_128_255byte;
--	rmon_stats->hist_tx[3] = mib->tx_256_511byte;
--	rmon_stats->hist_tx[4] = mib->tx_512_1023byte;
--	rmon_stats->hist_tx[5] = mib->tx_1024_1518byte;
--	rmon_stats->hist_tx[6] = mib->tx_jumbo;
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		rmon_stats->undersize_pkts = u64_stats_read(&mib->rx_undersize_errors);
-+		rmon_stats->oversize_pkts = u64_stats_read(&mib->rx_oversize_errors);
-+		rmon_stats->fragments = u64_stats_read(&mib->rx_alignment_errors);
-+		/* rmon_stats->jabbers */
-+
-+		rmon_stats->hist[0] = u64_stats_read(&mib->rx_64byte);
-+		rmon_stats->hist[1] = u64_stats_read(&mib->rx_65_127byte);
-+		rmon_stats->hist[2] = u64_stats_read(&mib->rx_128_255byte);
-+		rmon_stats->hist[3] = u64_stats_read(&mib->rx_256_511byte);
-+		rmon_stats->hist[4] = u64_stats_read(&mib->rx_512_1023byte);
-+		rmon_stats->hist[5] = u64_stats_read(&mib->rx_1024_1518byte);
-+		rmon_stats->hist[6] = u64_stats_read(&mib->rx_jumbo);
-+
-+		rmon_stats->hist_tx[0] = u64_stats_read(&mib->tx_64byte);
-+		rmon_stats->hist_tx[1] = u64_stats_read(&mib->tx_65_127byte);
-+		rmon_stats->hist_tx[2] = u64_stats_read(&mib->tx_128_255byte);
-+		rmon_stats->hist_tx[3] = u64_stats_read(&mib->tx_256_511byte);
-+		rmon_stats->hist_tx[4] = u64_stats_read(&mib->tx_512_1023byte);
-+		rmon_stats->hist_tx[5] = u64_stats_read(&mib->tx_1024_1518byte);
-+		rmon_stats->hist_tx[6] = u64_stats_read(&mib->tx_jumbo);
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- }
- 
- static void
-@@ -905,33 +942,41 @@ yt921x_dsa_get_stats64(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
-+
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		stats->rx_length_errors = u64_stats_read(&mib->rx_undersize_errors) +
-+					  u64_stats_read(&mib->rx_fragment_errors);
-+		stats->rx_over_errors = u64_stats_read(&mib->rx_oversize_errors);
-+		stats->rx_crc_errors = u64_stats_read(&mib->rx_crc_errors);
-+		stats->rx_frame_errors = u64_stats_read(&mib->rx_alignment_errors);
-+		/* stats->rx_fifo_errors */
-+		/* stats->rx_missed_errors */
-+
-+		stats->tx_aborted_errors = u64_stats_read(&mib->tx_aborted_errors);
-+		/* stats->tx_carrier_errors */
-+		stats->tx_fifo_errors = u64_stats_read(&mib->tx_undersize_errors);
-+		/* stats->tx_heartbeat_errors */
-+		stats->tx_window_errors = u64_stats_read(&mib->tx_late_collisions);
-+
-+		stats->rx_packets = u64_stats_read(&pp->rx_frames);
-+		stats->tx_packets = u64_stats_read(&pp->tx_frames);
-+		stats->rx_bytes = u64_stats_read(&mib->rx_good_bytes) -
-+				  ETH_FCS_LEN * stats->rx_packets;
-+		stats->tx_bytes = u64_stats_read(&mib->tx_good_bytes) -
-+				  ETH_FCS_LEN * stats->tx_packets;
-+		stats->rx_dropped = u64_stats_read(&mib->rx_dropped);
-+		/* stats->tx_dropped */
-+		stats->multicast = u64_stats_read(&mib->rx_multicast);
-+		stats->collisions = u64_stats_read(&mib->tx_collisions);
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- 
--	stats->rx_length_errors = mib->rx_undersize_errors +
--				  mib->rx_fragment_errors;
--	stats->rx_over_errors = mib->rx_oversize_errors;
--	stats->rx_crc_errors = mib->rx_crc_errors;
--	stats->rx_frame_errors = mib->rx_alignment_errors;
--	/* stats->rx_fifo_errors */
--	/* stats->rx_missed_errors */
--
--	stats->tx_aborted_errors = mib->tx_aborted_errors;
--	/* stats->tx_carrier_errors */
--	stats->tx_fifo_errors = mib->tx_undersize_errors;
--	/* stats->tx_heartbeat_errors */
--	stats->tx_window_errors = mib->tx_late_collisions;
--
--	stats->rx_packets = pp->rx_frames;
--	stats->tx_packets = pp->tx_frames;
--	stats->rx_bytes = mib->rx_good_bytes - ETH_FCS_LEN * stats->rx_packets;
--	stats->tx_bytes = mib->tx_good_bytes - ETH_FCS_LEN * stats->tx_packets;
- 	stats->rx_errors = stats->rx_length_errors + stats->rx_over_errors +
- 			   stats->rx_crc_errors + stats->rx_frame_errors;
- 	stats->tx_errors = stats->tx_aborted_errors + stats->tx_fifo_errors +
- 			   stats->tx_window_errors;
--	stats->rx_dropped = mib->rx_dropped;
--	/* stats->tx_dropped */
--	stats->multicast = mib->rx_multicast;
--	stats->collisions = mib->tx_collisions;
- }
- 
- static void
-@@ -941,13 +986,18 @@ yt921x_dsa_get_pause_stats(struct dsa_switch *ds, int port,
- 	struct yt921x_priv *priv = to_yt921x_priv(ds);
- 	struct yt921x_port *pp = &priv->ports[port];
- 	struct yt921x_mib *mib = &pp->mib;
-+	unsigned int start;
- 
- 	mutex_lock(&priv->reg_lock);
- 	yt921x_read_mib(priv, port);
- 	mutex_unlock(&priv->reg_lock);
- 
--	pause_stats->tx_pause_frames = mib->tx_pause;
--	pause_stats->rx_pause_frames = mib->rx_pause;
-+	do {
-+		start = u64_stats_fetch_begin(&pp->syncp);
-+
-+		pause_stats->tx_pause_frames = u64_stats_read(&mib->tx_pause);
-+		pause_stats->rx_pause_frames = u64_stats_read(&mib->rx_pause);
-+	} while (u64_stats_fetch_retry(&pp->syncp, start));
- }
- 
- static int
-@@ -2968,6 +3018,7 @@ static int yt921x_mdio_probe(struct mdio_device *mdiodev)
- 
- 		pp->index = i;
- 		INIT_DELAYED_WORK(&pp->mib_read, yt921x_poll_mib);
-+		u64_stats_init(&pp->syncp);
- 	}
- 
- 	ds = &priv->ds;
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index 61bb0ab3b09a..17fee83952c2 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -6,6 +6,8 @@
- #ifndef __YT921X_H
- #define __YT921X_H
- 
-+#include <linux/u64_stats_sync.h>
-+
- #include <net/dsa.h>
- 
- #define YT921X_SMI_SWITCHID_M		GENMASK(3, 2)
-@@ -475,55 +477,55 @@ enum yt921x_fdb_entry_status {
- #define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
- 
- struct yt921x_mib {
--	u64 rx_broadcast;
--	u64 rx_pause;
--	u64 rx_multicast;
--	u64 rx_crc_errors;
--
--	u64 rx_alignment_errors;
--	u64 rx_undersize_errors;
--	u64 rx_fragment_errors;
--	u64 rx_64byte;
--
--	u64 rx_65_127byte;
--	u64 rx_128_255byte;
--	u64 rx_256_511byte;
--	u64 rx_512_1023byte;
--
--	u64 rx_1024_1518byte;
--	u64 rx_jumbo;
--	u64 rx_good_bytes;
--
--	u64 rx_bad_bytes;
--	u64 rx_oversize_errors;
--
--	u64 rx_dropped;
--	u64 tx_broadcast;
--	u64 tx_pause;
--	u64 tx_multicast;
--
--	u64 tx_undersize_errors;
--	u64 tx_64byte;
--	u64 tx_65_127byte;
--	u64 tx_128_255byte;
--
--	u64 tx_256_511byte;
--	u64 tx_512_1023byte;
--	u64 tx_1024_1518byte;
--	u64 tx_jumbo;
--
--	u64 tx_good_bytes;
--	u64 tx_collisions;
--
--	u64 tx_aborted_errors;
--	u64 tx_multiple_collisions;
--	u64 tx_single_collisions;
--	u64 tx_good;
--
--	u64 tx_deferred;
--	u64 tx_late_collisions;
--	u64 rx_oam;
--	u64 tx_oam;
-+	u64_stats_t rx_broadcast;
-+	u64_stats_t rx_pause;
-+	u64_stats_t rx_multicast;
-+	u64_stats_t rx_crc_errors;
-+
-+	u64_stats_t rx_alignment_errors;
-+	u64_stats_t rx_undersize_errors;
-+	u64_stats_t rx_fragment_errors;
-+	u64_stats_t rx_64byte;
-+
-+	u64_stats_t rx_65_127byte;
-+	u64_stats_t rx_128_255byte;
-+	u64_stats_t rx_256_511byte;
-+	u64_stats_t rx_512_1023byte;
-+
-+	u64_stats_t rx_1024_1518byte;
-+	u64_stats_t rx_jumbo;
-+	u64_stats_t rx_good_bytes;
-+
-+	u64_stats_t rx_bad_bytes;
-+	u64_stats_t rx_oversize_errors;
-+
-+	u64_stats_t rx_dropped;
-+	u64_stats_t tx_broadcast;
-+	u64_stats_t tx_pause;
-+	u64_stats_t tx_multicast;
-+
-+	u64_stats_t tx_undersize_errors;
-+	u64_stats_t tx_64byte;
-+	u64_stats_t tx_65_127byte;
-+	u64_stats_t tx_128_255byte;
-+
-+	u64_stats_t tx_256_511byte;
-+	u64_stats_t tx_512_1023byte;
-+	u64_stats_t tx_1024_1518byte;
-+	u64_stats_t tx_jumbo;
-+
-+	u64_stats_t tx_good_bytes;
-+	u64_stats_t tx_collisions;
-+
-+	u64_stats_t tx_aborted_errors;
-+	u64_stats_t tx_multiple_collisions;
-+	u64_stats_t tx_single_collisions;
-+	u64_stats_t tx_good;
-+
-+	u64_stats_t tx_deferred;
-+	u64_stats_t tx_late_collisions;
-+	u64_stats_t rx_oam;
-+	u64_stats_t tx_oam;
- };
- 
- struct yt921x_port {
-@@ -533,9 +535,13 @@ struct yt921x_port {
- 	bool isolated;
- 
- 	struct delayed_work mib_read;
-+	struct u64_stats_sync syncp;
- 	struct yt921x_mib mib;
--	u64 rx_frames;
--	u64 tx_frames;
-+	u64_stats_t rx_frames;
-+	u64_stats_t tx_frames;
-+
-+	/* only used by read routine to avoid huge allocations on the stack */
-+	struct yt921x_mib mib_new;
- };
- 
- struct yt921x_reg_ops {
--- 
-2.51.0
+Not sure if it's really an option C, but would it be possible to
+consolidate them using verifier tricks? I.e., the data_meta field in the
+__sk_buff struct is really a virtual pointer that the verifier rewrites
+to loading an actual pointer from struct bpf_skb_data_end in skb->cb. So
+in principle this could be loaded from an skb extension instead with the
+BPF programs being none the wiser.
+
+There's the additional wrinkle that the end of the data_meta pointer is
+compared to the 'data' start pointer to check for overflow, which
+wouldn't work anymore. Not sure if there's a way to make the verifier
+rewrite those checks in a compatible way, or if this is even a path we
+want to go down. But it would be a pretty neat way to make the whole
+thing transparent and backwards compatible, I think :)
+
+Other than that, I like the extention-backed metadata idea!
+
+-Toke
 
 
