@@ -1,120 +1,287 @@
-Return-Path: <netdev+bounces-249929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C35DFD20F11
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:59:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DA46D20F27
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E593304908D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:55:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3D0B1308E9BF
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCF9339B5A;
-	Wed, 14 Jan 2026 18:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6AE33B947;
+	Wed, 14 Jan 2026 18:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1LhRzFKX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LGoQRUBS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2422337BBA;
-	Wed, 14 Jan 2026 18:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2545F337BBA
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 18:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768416951; cv=none; b=tBKyeuLVV99t07HdVm+TVk9DNJ8YDGgsPN7NNGL4RAWDEmSyeGcpVZ1EyndTH5243LrOec8sTROoK0FRziYhDp4Llv8DfF7baKR35Vzs+LeMneNjiLiBek0/T1N/VTPXbP42kviILyGjJT7QUipQLpCA32b9a2VpKionYPDoRM0=
+	t=1768416994; cv=none; b=UVRbJOaMsR2eauYxs7DgINf6JLPRZX+lo3aIkAHlKyCthy/715gJWp1HH5aAay+D82CCTmwfGWJnbDskKCitQnvElh6W4DRW80tEi2Iw/5LPv4LhxB9BzONa8VWXH/2O8Qo35AfDfsqhu0dZnJGeGAi0m1JLNRY/7SiZClfFJqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768416951; c=relaxed/simple;
-	bh=OagmRB3adnvdpWPITIkngmbMP4IksUjG1iCmJcH9Dts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FRBrcS3XmS1YPlV8UrAOhtTwGUdj6ZKkNgR87E01akAhlC4Czp0yslbKUy5atsec0FP7mQITNVqpocSbqSfyoeP6kV35h7Ji2CjhKYFVibVCqSKjm7aj3tV/UwGGNZXqQIKwH0eo/SuewQc5rrTaVvkzEw4j/UDfWjFijrxSA84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1LhRzFKX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iTNLp10Ro+X5fPkwXrfSV4iRZlIf0RMpE69VDQnSaDU=; b=1LhRzFKXkFPsaaOO+voWBOqmCx
-	WlnkLzJfHlydzw2SupdC0FtuHxJFpWUTE3rHxleSIvoNimmsJ74c4uQvhjZ5mKgk1erkai5LToTCu
-	KGmiXHFeAVwhRvi7Dr7f08JrQRzAfcc9+n1xowSCaSCfv74kEjtro56lOmizuDoQHXoweuV6H04bA
-	ATi3Udti/sDsrn/o9G3B40TwksP84ndpiOAovq7FyzWG+L++U1By4AXv4Q1+iLLOGqE4SWX74XiWb
-	zisnyNCoVk3fB4Ad/jxIeqn8mldsG2eB5Re8HQizk8XYDzCQuP/9mG7DR3gHc8DKVBNFTX2s9SJQa
-	Viw5474Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40706)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vg61r-000000000b8-1JiZ;
-	Wed, 14 Jan 2026 18:55:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vg61n-000000001sW-0Hze;
-	Wed, 14 Jan 2026 18:55:35 +0000
-Date: Wed, 14 Jan 2026 18:55:34 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 03/14] phy: qcom-sgmii-eth: add .set_mode() and
- .validate() methods
-Message-ID: <aWfmpq-dJ-mUCvz1@shell.armlinux.org.uk>
-References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
- <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
- <E1vg4vs-00000003SFt-1Fje@rmk-PC.armlinux.org.uk>
- <E1vg4vs-00000003SFt-1Fje@rmk-PC.armlinux.org.uk>
- <20260114184705.djvad5phrnfen6wx@skbuf>
+	s=arc-20240116; t=1768416994; c=relaxed/simple;
+	bh=4azGP8VcRIjSALxG8aZAYNFnLhGyrhB2MnSKXZKdT/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BUq1QkABLxa6aVhOCP4ep987hMk4ygTDGEEN1AU3VbDFWixywTvKO7OrP6eNuF8TJOH3aoI88VrviUS4AoZQK15VmfH7+HLpukvTjcV4xCh5g116QA4hlUZIVbKtLc9iyIpzpi4ZtJ3EVw99KmCMJZnRW0rCAep8LQkciBJ2cNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LGoQRUBS; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34c2f335681so27786a91.1
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:56:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768416991; x=1769021791; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/jyqCRUml6RQX1yM05nYgct3qQ9LHRmYpUM/HjuPv5M=;
+        b=LGoQRUBSupmRP6iB2j4QftDczDMNWE+pyRKa06trxzgV0cLdLa5eIXnCR7nhATE7fa
+         RxYYEKja26tOoLntochQ/st6nADBTEJFL7mJX7aDGM2toRPoemjUvdGQVOqVXl/JKSOz
+         s6S1dDgKMBm0YmeMtgr5VsLHhdjqsbDCsAqFKmwMd9iUWT2mLPRr02VgifGIq62ud+a5
+         ekmG3FO3yMufRuUNfzULh+/SjUgsxn+HjVxfDo+Xz1zXg0+SImcb4xi7cNa4T/awKMOs
+         zkN/PknwSrvDMiRdzMvcntAE0yDPkEYKboHNso8hN8JYOnwlvU+ILXb37I0v3zBUcCxn
+         OUPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768416991; x=1769021791;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/jyqCRUml6RQX1yM05nYgct3qQ9LHRmYpUM/HjuPv5M=;
+        b=IQtk461nY2wHzO05LNXA7Db3fi3FMiOlf8HPBolkounxlxfsPnXTq/tIRZxbnguP/C
+         vWwqYpzbws8aU4rKkmI2AAucXyuLuCUtzcjNalHI3cEnlzxD2DbKWA1WDD5gmRWwOLiN
+         WblZfSppMxTRKa+NH/Pvs9TeC4yKyqNVLYb42k+cyAxUXeOo2mByqbACwO+PjquHFOG6
+         mgpFzyi/HIN5poUk3pY5wBsRPF7WCgxis2SjD4vu3M7Zw7eHuQ8+VJmT0GzuvfC2RR0W
+         jpbaPFmLuRu7SnM7zHf0wXyNBrCtblIDJ/BWnWPCfA2ukqEqZJijw+J20OACx7X2Rh0l
+         V7RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUjrrkVLMA//BnpSoVb3YV1se3LPkpiqk5nRU3KHm5Kox4IqKpo+75hpLbua83kEV+lqEAWyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnsh/XYOzu0xUCvc0XjlIT0YbzM1j9XOM1wzwuUbwUUtgcVzvo
+	Waw2shugIcBnbvRB75eqOoSVZ21JzSLHLiD+iJdz40zP4LMHsJyxUlXMUm+d4Yj2UM2I1GSunSi
+	80Zv9R5Xfa/pv65G3hx0P1uSu0bDMzII=
+X-Gm-Gg: AY/fxX5TdFn196seVKpFi2+xGCAApAxwdH94g789yFAKfMT+mPq+WnDww3ToATqQsYb
+	JKaVaY2f6dhGgihKcfv0eMX4yir65qDSC+f8vQuTHKqMWfAhVuLlZbXXkGt4Zanqd9mZmQjwr7V
+	nJrJZ24WI/okXHAMxfIU2mzPY9QJX22khtWOJJALxsitB7/shZKpqsnK6JCMXqv/HpQLkypv75d
+	VWKuiy0yg+pjyJUgfLlUjlOniwREMYF67mapQ4lL/NHwCrFLVMO6/Fmk3CceIbS12/N7idJdW2p
+	ji70oNtCoyeayNq6mO9F
+X-Received: by 2002:a17:90b:3d8f:b0:32d:e07f:3236 with SMTP id
+ 98e67ed59e1d1-3510915bb29mr3671344a91.22.1768416991354; Wed, 14 Jan 2026
+ 10:56:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260114184705.djvad5phrnfen6wx@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20260110141115.537055-1-dongml2@chinatelecom.cn>
+ <20260110141115.537055-2-dongml2@chinatelecom.cn> <CAEf4Bzb+p4fXkCL01MVrvCwPvboeMWXgu4uTSMhweO_MYL+tqg@mail.gmail.com>
+ <3026834.e9J7NaK4W3@7940hx>
+In-Reply-To: <3026834.e9J7NaK4W3@7940hx>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 14 Jan 2026 10:56:16 -0800
+X-Gm-Features: AZwV_QhhhMbgeUBMJrChYDEp9_IVNQzntrSbFWIrvtYGIewMkOM9tYD4U31ZKF0
+Message-ID: <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v9 01/11] bpf: add fsession support
+To: Menglong Dong <menglong.dong@linux.dev>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org, andrii@kernel.org, 
+	daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com, 
+	x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 14, 2026 at 08:47:05PM +0200, Vladimir Oltean wrote:
-> On Wed, Jan 14, 2026 at 05:45:24PM +0000, Russell King (Oracle) wrote:
-> > qcom-sgmii-eth is an Ethernet SerDes supporting only Ethernet mode
-> > using SGMII, 1000BASE-X and 2500BASE-X.
-> > 
-> > Add an implementation of the .set_mode() method, which can be used
-> > instead of or as well as the .set_speed() method. The Ethernet
-> > interface modes mentioned above all have a fixed data rate, so
-> > setting the mode is sufficient to fully specify the operating
-> > parameters.
-> > 
-> > Add an implementation of the .validate() method, which will be
-> > necessary to allow discovery of the SerDes capabilities for platform
-> > independent SerDes support in the stmmac netowrk driver.
-> 
-> s/netowrk/network/
-> 
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> 
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+On Tue, Jan 13, 2026 at 6:11=E2=80=AFPM Menglong Dong <menglong.dong@linux.=
+dev> wrote:
+>
+> On 2026/1/14 09:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong@g=
+mail.com> wrote:
+> > >
+> > > The fsession is something that similar to kprobe session. It allow to
+> > > attach a single BPF program to both the entry and the exit of the tar=
+get
+> > > functions.
+> > >
+> [...]
+> > > --- a/kernel/bpf/btf.c
+> > > +++ b/kernel/bpf/btf.c
+> > > @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct bp=
+f_verifier_log *log, const struct
+> > >                 case BPF_TRACE_FENTRY:
+> > >                 case BPF_TRACE_FEXIT:
+> > >                 case BPF_MODIFY_RETURN:
+> > > +               case BPF_TRACE_FSESSION:
+> > >                         /* allow u64* as ctx */
+> > >                         if (btf_is_int(t) && t->size =3D=3D 8)
+> > >                                 return 0;
+> > > @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum bpf=
+_access_type type,
+> > >                         fallthrough;
+> > >                 case BPF_LSM_CGROUP:
+> > >                 case BPF_TRACE_FEXIT:
+> > > +               case BPF_TRACE_FSESSION:
+> >
+> > According to the comment below we make this exception due to LSM.
+> > FSESSION won't be using FSESSION programs, no? So this is not
+> > necessary?
+>
+> The comment describe the LSM case here, but the code
+> here is not only for LSM. It is also for FEXIT, which makes
+> sure that we can get the return value with "ctx[nr_args]".
+> So I think we still need it here, as we need to access the
+> return value with "ctx[nr_args]" too.
 
-According to patchwork (I forgot the RFC tag on the patches) it needs
-linux/phy.h included. Plesae let me know if you'd like me to retain
-your r-b. Thanks.
+please update the comment then as well
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>
+> >
+> > >                         /* When LSM programs are attached to void LSM=
+ hooks
+> > >                          * they use FEXIT trampolines and when attach=
+ed to
+> > >                          * int LSM hooks, they use MODIFY_RETURN tram=
+polines.
+> >
+> > [...]
+> >
+> > > @@ -4350,6 +4365,7 @@ attach_type_to_prog_type(enum bpf_attach_type a=
+ttach_type)
+> > >         case BPF_TRACE_RAW_TP:
+> > >         case BPF_TRACE_FENTRY:
+> > >         case BPF_TRACE_FEXIT:
+> > > +       case BPF_TRACE_FSESSION:
+> > >         case BPF_MODIFY_RETURN:
+> > >                 return BPF_PROG_TYPE_TRACING;
+> > >         case BPF_LSM_MAC:
+> > > diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+> > > index 2a125d063e62..11e043049d68 100644
+> > > --- a/kernel/bpf/trampoline.c
+> > > +++ b/kernel/bpf/trampoline.c
+> > > @@ -111,7 +111,7 @@ bool bpf_prog_has_trampoline(const struct bpf_pro=
+g *prog)
+> > >
+> > >         return (ptype =3D=3D BPF_PROG_TYPE_TRACING &&
+> > >                 (eatype =3D=3D BPF_TRACE_FENTRY || eatype =3D=3D BPF_=
+TRACE_FEXIT ||
+> > > -                eatype =3D=3D BPF_MODIFY_RETURN)) ||
+> > > +                eatype =3D=3D BPF_MODIFY_RETURN || eatype =3D=3D BPF=
+_TRACE_FSESSION)) ||
+> > >                 (ptype =3D=3D BPF_PROG_TYPE_LSM && eatype =3D=3D BPF_=
+LSM_MAC);
+> >
+> > this is getting crazy, switch to the switch (lol) maybe?
+>
+> ACK
+>
+> >
+> > >  }
+> > >
+> > > @@ -559,6 +559,8 @@ static enum bpf_tramp_prog_type bpf_attach_type_t=
+o_tramp(struct bpf_prog *prog)
+> > >                 return BPF_TRAMP_MODIFY_RETURN;
+> > >         case BPF_TRACE_FEXIT:
+> > >                 return BPF_TRAMP_FEXIT;
+> > > +       case BPF_TRACE_FSESSION:
+> > > +               return BPF_TRAMP_FSESSION;
+> > >         case BPF_LSM_MAC:
+> > >                 if (!prog->aux->attach_func_proto->type)
+> > >                         /* The function returns void, we cannot modif=
+y its
+> > > @@ -596,6 +598,8 @@ static int __bpf_trampoline_link_prog(struct bpf_=
+tramp_link *link,
+> > >  {
+> > >         enum bpf_tramp_prog_type kind;
+> > >         struct bpf_tramp_link *link_exiting;
+> > > +       struct bpf_fsession_link *fslink;
+> >
+> > initialize to NULL to avoid compiler (falsely, but still) complaining
+> > about potentially using uninitialized value
+>
+> ACK
+>
+> >
+> > > +       struct hlist_head *prog_list;
+> > >         int err =3D 0;
+> > >         int cnt =3D 0, i;
+> > >
+> >
+> > [...]
+> >
+> > > -       hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[kind]);
+> > > -       tr->progs_cnt[kind]++;
+> > > +       hlist_add_head(&link->tramp_hlist, prog_list);
+> > > +       if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> > > +               tr->progs_cnt[BPF_TRAMP_FENTRY]++;
+> > > +               fslink =3D container_of(link, struct bpf_fsession_lin=
+k, link.link);
+> > > +               hlist_add_head(&fslink->fexit.tramp_hlist,
+> > > +                              &tr->progs_hlist[BPF_TRAMP_FEXIT]);
+> >
+> > fits under 100 characters? keep on a single line then
+>
+> ACK
+>
+> >
+> > > +               tr->progs_cnt[BPF_TRAMP_FEXIT]++;
+> > > +       } else {
+> > > +               tr->progs_cnt[kind]++;
+> > > +       }
+> > >         err =3D bpf_trampoline_update(tr, true /* lock_direct_mutex *=
+/);
+> > >         if (err) {
+> > >                 hlist_del_init(&link->tramp_hlist);
+> > > -               tr->progs_cnt[kind]--;
+> > > +               if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> > > +                       tr->progs_cnt[BPF_TRAMP_FENTRY]--;
+> > > +                       hlist_del_init(&fslink->fexit.tramp_hlist);
+> > > +                       tr->progs_cnt[BPF_TRAMP_FEXIT]--;
+> > > +               } else {
+> > > +                       tr->progs_cnt[kind]--;
+> > > +               }
+> > >         }
+> > >         return err;
+> > >  }
+> > > @@ -659,6 +683,7 @@ static int __bpf_trampoline_unlink_prog(struct bp=
+f_tramp_link *link,
+> > >                                         struct bpf_trampoline *tr,
+> > >                                         struct bpf_prog *tgt_prog)
+> > >  {
+> > > +       struct bpf_fsession_link *fslink;
+> >
+> > used in only one branch, move declaration there?
+>
+> ACK
+>
+> Thanks!
+> Menglong Dong
+>
+> >
+> > >         enum bpf_tramp_prog_type kind;
+> > >         int err;
+> > >
+> > > @@ -672,6 +697,11 @@ static int __bpf_trampoline_unlink_prog(struct b=
+pf_tramp_link *link,
+> > >                 guard(mutex)(&tgt_prog->aux->ext_mutex);
+> > >                 tgt_prog->aux->is_extended =3D false;
+> > >                 return err;
+> > > +       } else if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> > > +               fslink =3D container_of(link, struct bpf_fsession_lin=
+k, link.link);
+> > > +               hlist_del_init(&fslink->fexit.tramp_hlist);
+> > > +               tr->progs_cnt[BPF_TRAMP_FEXIT]--;
+> > > +               kind =3D BPF_TRAMP_FENTRY;
+> > >         }
+> > >         hlist_del_init(&link->tramp_hlist);
+> > >         tr->progs_cnt[kind]--;
+> >
+> > [...]
+> >
+>
+>
+>
+>
 
