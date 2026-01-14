@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-249782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761E2D1DC0D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:58:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACACD1DBF1
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:56:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C40A3014BC5
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:56:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0ACC53025704
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA73A37F735;
-	Wed, 14 Jan 2026 09:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658D53803C0;
+	Wed, 14 Jan 2026 09:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TjGKKYeS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G8rrXUTF"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010054.outbound.protection.outlook.com [52.101.85.54])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010006.outbound.protection.outlook.com [52.101.193.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4778A3816F1
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 09:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0928F3806B7
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 09:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.6
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768384597; cv=fail; b=MSoEvwSMwCXXlnVEw0EiH+d8Y+4KCdr0NqTdiUZWQEUgADCLapdMumZVa0vIk4hJPNluxoaNhWkUAYq6sVQqXVU0YbLh3S/fYKMfCB8CuNT37api3B9zmzAFmRE1g3VLrffwf+D63W1X3xUpouqZ8pqNwtZ/3b4x2wqaiMK2jes=
+	t=1768384604; cv=fail; b=tLBVGi8Oq69t4RITmctAmJ62ce67MKtjsgnflLNLGmjCfpYwkcs6/yel0hCh6dVfYEShOwMgovvzat7zS7OnaaexaZo5IBU+HOwdkdmP28VsCUm3/61DvdYHmKm5R3vUlIBIfTQwU697ILsaqCKd5U0nm82ITOw6LZFL7VZrggQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768384597; c=relaxed/simple;
-	bh=zOUNGRoxPl5Yto3Cgk0L2Z2Pd5nChPDzltlFiaffepo=;
+	s=arc-20240116; t=1768384604; c=relaxed/simple;
+	bh=ZqW5G95FD9gHlBiCXuowPRDrGp38gSop9lk0RvllY30=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SnMRgNP/f9CgSPyTHNLhg0kAqpDwE+TuFr/zsoAsf+tz7sz9oMTGAed1TZizYV9ePa7WTmK+xZReb4yW99Ae24cxvkNdsohIhNU0aiHbNi0cUeY0fyrOo8WiXI3njwQEK3FfpkhyIbc0tz9vD5B2VCQtiqce+plZVEpjJhYOwhg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TjGKKYeS; arc=fail smtp.client-ip=52.101.85.54
+	 MIME-Version:Content-Type; b=CHhCbnrK7VETx/IFB4/y99oqOeK9vfm0fhTOlvQywLomR2aQpfnYX+hMstrr5W0JQnhSDK1PNHdJD9wU2iAIHbJu/r2NFTu01XsoSrWYta332FaaC0K6xYP1ZPEOtWoYHo3S8+8OZJif4Tb3xvEOw05I75prJPpiF7dfri+iNT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G8rrXUTF; arc=fail smtp.client-ip=52.101.193.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yc8W0p4T8KCSwhvcupPSIkBHbVuV1pWULFhCX8qHINxTYHOw7fX/dpSXCqV8qEraWwaSDBk/oQHxEl7lEvCEG+TlTQ+g7m+1ep/9nhmiBBPHCI8Ub/c0Y2zaDomJxLlXlFBXoVaLJlvR16DFwsZkxUOnGmotxzj58NRv85pZTUWalpkheKoTprZKO46iIiNLwOt5BeEOMT9em5bFYvq4jnCgS7U2mGdqcdaPNXrsJNL06Po2PoWyxUFO5FD+u4w/22oPBxddj1yCM0LtW+udTCE9XFbTI/6kc4rX2rPiX8V/OOLxVR/NzLZ3Xea9hRgi0Ny4DHW4mqTMPWJqsI+MIA==
+ b=uVTIDDakOh9J3PLmWwO+Jqhx6Wwz5tGvdbFhtWzKWJba6XAdYAEUWMv++RAzsxtKCowaUXBDe9OUGDgXpYzuLt2CoT+MfJpAxGUZe24GolG3iMfT71HQJwHYafCX60w5Hx/dNtmHm2l0SnwqkeO9RGctfIhjno59nFdLoE/E2ZmuttRBlGj9ndvSmgdZ+4RfdoPCIPjAA984iU6nfziV4w8LJn9ucowN4MNUerIQ351nXdzPHP9PeqhWXQ9is0+lovTqicglQf723gbUTxQBowCxTWDLAHVq9E2kUlvlhxZoeonO2FwOAdf3QAmh1D7AApjFYTtTMuPyZ5ZBI0ADjg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=chbcuu3quLxzdXXvBw0+347kWUPi9Pp+oG+r0LdqpjQ=;
- b=E1fRxcDuSPDob1jWQuSi8jqZbjH8QwiU4ditRgZomfdA6E8CAg7ns6v5mflrB3UIkEVcFsbqBTRS2mQjvmDy/NuqIk36ZqlHnHovQ3Lq9mC78L6L5uCTpLmKl+dGTwUyD3vmQoPIhTs6JX2vqXC2KqnEOblKVr+xau1JRti+qzMM5CxD66NF01FHjA1p0dKYmOMZkNvMHoSt7ZxLoImE4i8xdIDShnF79q564kBRY90RRQ+3DCXrKQ4az8DNBUOfNj+N0NnMGYXFAAwby2Cfvt/+qtJLEgWtobJ4ptqbepkgK1dIm95MBpZ6u/Ns29zE1OX41asyHVp7D9ThWTUdxg==
+ bh=0nDDn8u+JEeLQwdjdXslIX5WcEIPBtK8XpYXgXfpFv8=;
+ b=owoWkrRujeGFTAqQWwaZXWhwd8pF4P2Jslfex2JKpzcG5eq1T5gais16r4n3bpFOctJ7avb2lt5qPFeQbO3i1Jma6xY5PRad3nDb4L6KwNYJr3rOcOhC0SaZfoDJL7v/OmvZ6jdzuC7kDUNlJhvay3dFjTeuLN//bePvzA4r9QAFYEgz9cbBOpcnqnHzaGdrGHhwHiRHg/nrmAGhVpkVaM4UFXgc8YCzeL0zF2Sb0Z8Isb3NwKRnqflcofnyF1hwarTpvGwdTkjiWDM6fv1lSvlq8az6qEKVsmkdvnLdohZPmZVlO8krmZGhZencFJaMaPTtciQwT642iuJW1dMcZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -43,18 +43,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=chbcuu3quLxzdXXvBw0+347kWUPi9Pp+oG+r0LdqpjQ=;
- b=TjGKKYeSuSK2sSEryW1LSIfojmkqQfQ0dnsu0qnl4NFee0OrQsWDMS/10t7kKdprrY1XnzNlX7I+8vN0jvEUBpDx0EbIaGrbm+qdsjpjp5SzaIafNZN+JNLsGDoRnyuOOfEo/9mdRXElGas5yW+tDuHsiSawXD5Sq0W9aILMtqx5XjQ36JhoIy8Agr+1Q3d4DQEvPFcyeXky8V4swUuhIkvds7wkXUk7IRqrIsgSGf+mzHDIZYqhV7eB6eF6tZ+3u1fJMjiL1yvxhvs60fF8HhMJdw1OsgcMOEioZlCC/4RwziIvos6K3l+VhcxwfWC5dB+x6ui1tcJrFn8WkCb7uw==
-Received: from SN6PR05CA0001.namprd05.prod.outlook.com (2603:10b6:805:de::14)
- by DS0PR12MB7801.namprd12.prod.outlook.com (2603:10b6:8:140::10) with
+ bh=0nDDn8u+JEeLQwdjdXslIX5WcEIPBtK8XpYXgXfpFv8=;
+ b=G8rrXUTFneoiWoX8DYjUhgkowxPgodBO8Fp2R30Am1IInyVyXOPlrJzSE+Ll+Nnb7rC2aXnoYi74RaI8v3oB9VMytNV6Lsjf2OqYp03eUyj3BDnCF/lJKS3bo/bvLpgNL/e4rcfHjhKyNI1Z8a0yozRa4Tffd4bYGk7Adgj0/YuiOXDgNgTd0Y88a3o6dcbvMu3spxjMQezn1E53bq3SwqzzHPaYPQN8NgitSszA6AHwTd3NbBLa/WJPKYTPSBR66vxG/BGAzEJA71G9e8zPni5EDAZuxRcpk3t+KL2vTkJOCjO66YQAwXPi8L1z6e6vZX8ZH7ldssz4R5V0JNxuSA==
+Received: from SA9P221CA0024.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::29)
+ by MN2PR12MB4424.namprd12.prod.outlook.com (2603:10b6:208:26a::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Wed, 14 Jan
- 2026 09:56:30 +0000
-Received: from SN1PEPF0002529F.namprd05.prod.outlook.com
- (2603:10b6:805:de:cafe::86) by SN6PR05CA0001.outlook.office365.com
- (2603:10b6:805:de::14) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 09:56:39 +0000
+Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
+ (2603:10b6:806:25:cafe::57) by SA9P221CA0024.outlook.office365.com
+ (2603:10b6:806:25::29) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.5 via Frontend Transport; Wed,
- 14 Jan 2026 09:56:27 +0000
+ 14 Jan 2026 09:56:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -62,17 +62,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002529F.mail.protection.outlook.com (10.167.242.6) with Microsoft
+ SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Wed, 14 Jan 2026 09:56:29 +0000
+ 15.20.9520.1 via Frontend Transport; Wed, 14 Jan 2026 09:56:37 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 14 Jan
- 2026 01:56:16 -0800
+ 2026 01:56:22 -0800
 Received: from fedora.docsis.vodafone.cz (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 14 Jan 2026 01:56:10 -0800
+ 15.2.2562.20; Wed, 14 Jan 2026 01:56:16 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -83,9 +83,9 @@ CC: Ido Schimmel <idosch@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>,
 	"Francesco Ruggeri" <fruggeri@arista.com>, Stephen Hemminger
 	<stephen@networkplumber.org>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 7/8] net: core: neighbour: Make one netlink notification atomically
-Date: Wed, 14 Jan 2026 10:54:50 +0100
-Message-ID: <e3752b30651dcf46ac0be0099f5661f349268d2d.1768225160.git.petrm@nvidia.com>
+Subject: [PATCH net-next 8/8] net: core: neighbour: Make another netlink notification atomically
+Date: Wed, 14 Jan 2026 10:54:51 +0100
+Message-ID: <0b26d2a012cf11e990a759f3374585c801c39be5.1768225160.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1768225160.git.petrm@nvidia.com>
 References: <cover.1768225160.git.petrm@nvidia.com>
@@ -101,115 +101,71 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529F:EE_|DS0PR12MB7801:EE_
-X-MS-Office365-Filtering-Correlation-Id: a629a435-b1eb-4c51-f51a-08de535330ca
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|MN2PR12MB4424:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87a48dd9-deb6-42e3-154d-08de535335a3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024;
+	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?th8RCSPbl9rqEDRjZoJ5R0k4ckEcMBDvKA2I0nw4EfJeOn7o0kpdT4aP+bZd?=
- =?us-ascii?Q?hpboCHss4EU0GNhb0gN8wkX3R1F6LWFZSRbz+eEdl0Kl+UjCkHzuNU2x4VDu?=
- =?us-ascii?Q?sjBucaxFQzsoKqNmAVBf3bb2RvqclR9ZOvsig7vOjgY8ybw2pBwaaMLdiQAC?=
- =?us-ascii?Q?OR9nCZkiszjza9dlIVIuDU1twqiIuyx+T3mD4noncmXpDutvI1rT+MUYqxPb?=
- =?us-ascii?Q?qnkE7AitquujEWn+tbaTRJby31iVJ+0eJoq4N5Qn3r0H47FAX6M75oADRwB4?=
- =?us-ascii?Q?P7x7uX0W5qOnbtvaW1ir+fK5Zy8cwuW9NFoYvc/z6EUrLiRZYIFSqOEDi6vU?=
- =?us-ascii?Q?xjrng+vq1my66tbJwJmGK8EAq1gXIeq91qGARh340d/p9gJDjmJg1xTN1LvF?=
- =?us-ascii?Q?XO+qDjhq1i5zYRkBhIKPTIrEdt/wDTCnPaCFS4c6d/qulzwWZf33KSyUYIRn?=
- =?us-ascii?Q?Ii3FS/HYnWdiZhW0/rqowvMR0njJifniotxcOjYfYyBukePPNh0U6dTbs3R9?=
- =?us-ascii?Q?GSRHEFUaVnp/6YNM82JEoQ7wMzjSzrsQRu/6lZ8VL6c06REDcIipNm+58PzK?=
- =?us-ascii?Q?vlOeKBfXXoa0UGoqpE5UtGHseP1tM1ds98cDuJzUComGUZ6daNcWC+avIgbf?=
- =?us-ascii?Q?FCbwDrnDTkGId8zkFVhaUozCpYUuPtBp8we0gp6WH4vSHQYCpa4P4A5MxjU3?=
- =?us-ascii?Q?L8nVPmZgGGGirN3qvjfwE2dDNK9ivIM0qso3ukwUDNeo1VpntKb6ThR1SX9y?=
- =?us-ascii?Q?ggavvPvp4Q+cG6a8DMDy55B7ryywScgodlYLs+W4pwkiVK+ayl8wcYWekLVI?=
- =?us-ascii?Q?HP6hGjPDzXDH8PXlTFFJOAWa5bfi8UWtB4hYe7M6DFhLNYgFKb3JYy1deI+a?=
- =?us-ascii?Q?hyxgr4CsIiugdfOjOdEtXTDf+dI+GIICvafRCGGriHBpuw4/GvOviSl5k82q?=
- =?us-ascii?Q?WGDTz5GpbexgoAiiCqUsP6G0FqgyAaKIcfsm06oCVSHFSKnGQb9YqELnVwBn?=
- =?us-ascii?Q?AVWVQuUH395x7Plw8CsjJzz/Cvp9XHq5oPSsZS6waztPHK4LSPtakKb/m5PR?=
- =?us-ascii?Q?l8VtbPe82ddQN7BFtQg6GxXrvBjPycctGVMwtnwP/nPXH6vEzgbcPZEAbJFZ?=
- =?us-ascii?Q?EJVa1BeTF3DdCgZ4R+TnW2StMdQD3FDa9rqlAurxCLlIC00NdcTvaOZlFPR8?=
- =?us-ascii?Q?xSdc+8DXvLPVYs+NeuXyNWRsh6SiSW8XtCJ2NBkW/yYBYm9QJXv8762/FIPb?=
- =?us-ascii?Q?pUxhizM5mM4QcSLtyhtoORMcGwoLRnAq/OPacpS6g9f3/90+Bv5qw2ZTJaQG?=
- =?us-ascii?Q?Wf0P+GdmOkwu37nwo1lrNvFNviX5Q56UAZ2ZKXTOCPuTy8mEIFNQsDLdRZNO?=
- =?us-ascii?Q?oErgzAlHkX4igWJQA+E26DKTQfNS0v058dyo3ykVda48NqXEHtkTuUHGHGWA?=
- =?us-ascii?Q?JSM90GdTRDa9Iy8bk6+vu+yw46mIrj9D5mSypB4+yhi/tgM4DkqYxmVi0XaM?=
- =?us-ascii?Q?OEQNxp/Y6t3aKrxIAysuD8J5pCKB+xdZ10DHJwr2u9oUpEbrAwIEYpaQlNOb?=
- =?us-ascii?Q?jKoY5J2QGLqszWzk1W4=3D?=
+	=?us-ascii?Q?hvsCuaSZT9RvAMqOo3cVziOaI6oFK3z7YjXwja/nHbiq4jIlmgLneB1eBi/k?=
+ =?us-ascii?Q?tFEgwqFf9/Cc6yP/kSioucFh4N3uWyUIu+wjBRY/l0WPWMPYpxTYbHDKnI1o?=
+ =?us-ascii?Q?lC7MU0m6qtEWuU1CQDJhzuWeVb/FH5I5PovZHmyG8Rhb7j+6zWLUbcyK/7EV?=
+ =?us-ascii?Q?6R9aOTKBLgOGyh1EPtOg4RzWCop497cmBKI6dvaEVwPmg+63rrSIbHpdk+2V?=
+ =?us-ascii?Q?+oci7oMLJ8Noos3xczsZXbtbYop5y6OeuoYkVPeInc7jMEJL/6w/nd9oqYWC?=
+ =?us-ascii?Q?6opXJ3z8imb+CH7xMhbQTWX+s6tTlVR1qOR0R2udl89+cDrJm9epC6tSq6HM?=
+ =?us-ascii?Q?sedwbtIv36SNYx/C7iYPuESjaTkn+hnPhhWnpEk10XT4EKPe2n92GazwqcDy?=
+ =?us-ascii?Q?7C81EL63askxVnQsZ+U48h1FN/FsQxcF/NYpbWCAFU3dBbsp+4Pw47Q6l50c?=
+ =?us-ascii?Q?V4Jv2971iPG6IFuWP2jUNTo+Gfv0Fck6d9FB99jT3XnVlTIu4G9s6xDLdsvc?=
+ =?us-ascii?Q?Wbaq5F3pGXErVr7ACNGVmWsvEmQtjxFP1FiSNQpSk1sH3bSgqP8UA0rgEsTK?=
+ =?us-ascii?Q?FP8tLxBrlxHmawZq+QpcgKmkQjPqeIr9ftXYINlVSeKXN0gQq58oZJ6RDaLL?=
+ =?us-ascii?Q?rAsZAaiPUW4ewiGn9Yc7iJZS/9KuPra0TklhKsbQeW3AhlUvjm2teqwCb4k5?=
+ =?us-ascii?Q?juyUnCLKtQch0ovGrvF7mZvIIRzZwF5wTeWQhItupAfjmrmCknfcYXK2GjwV?=
+ =?us-ascii?Q?7noAva6weTa/4bBDi27h0PQruxoJPXbSA/gENEcwxyJ+KGkdRodbbGKFI00Z?=
+ =?us-ascii?Q?oifRmY40qFce5+i2PJCzrKr0DmvGATaWF6SppSRmMff4GvpOovFl0widWoMy?=
+ =?us-ascii?Q?8hXf2kF0qY8unzeVELWFMm6nOsLu20rDJ8lUsIRe0VZtWy06YLDRB5Wvv/Fj?=
+ =?us-ascii?Q?Lt1KVTRcVEIKsv3KVMv/GeTSyxF734HpS4gjiJojtdrfN4uc5p+Ywbbk5ax1?=
+ =?us-ascii?Q?pT5V61koI4KR5ThwqCrQ9kS/AFdbBq/RVyMUMIp4euHllv+L4XNGmSyCP8U0?=
+ =?us-ascii?Q?IJtV7iTxY7HXFvYYkUkdoSLFShX0AkJiZ5mFiQDFVvhEf7gYoPJ+D9Ru7uoF?=
+ =?us-ascii?Q?1GmLcXRprlPaYtAbfNSrVjmzebuXPi58BWisML+K1kQjRQpx1iAhHwsrj3pQ?=
+ =?us-ascii?Q?x1kIqEMkZ0zOFRfC4GAnihg8kiwHgHI2ju06dU3Bq3MrKJZQV/sn3ZpSOgKp?=
+ =?us-ascii?Q?NTRW9pWG4wuIlcP97wn1gRRmpzv9PMhA0rssdA5rhLmJT5jBNBqleTfi46oi?=
+ =?us-ascii?Q?S26LCragg2rKBrKlhBbpJsrDfsADCyr5nbkBgZU+ONOzgi2rGequGN6fQJ0k?=
+ =?us-ascii?Q?nf8GM4rSZ6mIabnEW0c6FkBkxATWIR445tnrUadKxns+QVMGVEFJb9vOORib?=
+ =?us-ascii?Q?vWBpak/8k1Re7Z3qCINnxXrE6vgjP/VD+4VuJP0FIdDQMccOSyEomwbPotZz?=
+ =?us-ascii?Q?fHPrlLounAORvrG/U5vPwmJ8B4V56jIl+ayWeG6AQ/NDPRoGLQrSzGxFSqFv?=
+ =?us-ascii?Q?uZTgrj6FHuq1eDKgJVo=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 09:56:29.7696
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 09:56:37.8914
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a629a435-b1eb-4c51-f51a-08de535330ca
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87a48dd9-deb6-42e3-154d-08de535335a3
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529F.namprd05.prod.outlook.com
+	SN1PEPF0002529D.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7801
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4424
 
-As noted in a previous patch, one race remains in the current code. A
-kernel thread might interrupt a userspace thread after the change is done,
-but before formatting and sending the message. Then what we would see is
-two messages with the same contents:
+Similarly to the issue from the previous patch, neigh_timer_handler() also
+updates the neighbor separately from formatting and sending the netlink
+notification message. We have not seen reports to the effect of this
+causing trouble, but in theory, the same sort of issues could have come up:
+neigh_timer_handler() would make changes as necessary, but before
+formatting and sending a notification, is interrupted before sending by
+another thread, which makes a parallel change and sends its own message.
+The message send that is prompted by an earlier change thus contains
+information that does not reflect the change having been made.
 
-    userspace thread		       kernel thread
-    ================		       =============
-    neigh_update
-       write_lock_bh(n->lock)
-       n->nud_state = STALE
-       write_unlock_bh(n->lock)
-	 -------------------------->
-				      neigh:update
-				      write_lock_bh(n->lock)
-				      n->nud_state = REACHABLE
-				      write_unlock_bh(n->lock)
-				      neigh_notify
-					read_lock_bh(n->lock)
-					__neigh_fill_info
-					   ndm->nud_state = REACHABLE
-					rtnl_notify
-					read_unlock_bh(n->lock)
-				      RTNL REACHABLE sent
-			    <--------
-       neigh_notify
-	 read_lock_bh(n->lock)
-	 __neigh_fill_info
-	   ndm->nud_state = REACHABLE
-	 rtnl_notify
-	 read_unlock_bh(n->lock)
-       RTNL REACHABLE sent again
-
-The solution is to send the netlink message inside the critical section
-where the neighbor is changed, so that it reflects the notified-upon
-neighbor state.
-
-To that end, in __neigh_update(), move the current neigh_notify() call up
-to said critical section, and convert it to __neigh_notify(), because the
-lock is held. This motion crosses calls to neigh_update_managed_list(),
-neigh_update_gc_list() and neigh_update_process_arp_queue(), all of which
-potentially unlock and give an opportunity for the above race.
-
-This also crosses a call to neigh_update_process_arp_queue() which calls
-neigh->output(), which might be neigh_resolve_output() calls
-neigh_event_send() calls neigh_event_send_probe() calls
-__neigh_event_send() calls neigh_probe(), which touches neigh->probes,
-an update which will now not be visible in the notification.
-
-However, there is indication that there is no promise that these changes
-will be accurately projected to notifications: fib6_table_lookup()
-indirectly calls route.c's find_match() calls rt6_probe(), which looks up a
-neighbor and call __neigh_set_probe_once(), which sets neigh->probes to 0,
-but neither this nor the caller seems to send a notification.
-
-Additionally, the neighbor object that the neigh_probe() mentioned above is
-called on, might be the alternative neighbor looked up for the ARP queue
-packet destination. If that is the case, the changed value of n1->probes is
-not notified anywhere.
-
-So at least in some circumstances, the reported number of probes needs to
-be assumed to change without notification.
+To solve this, the netlink notification needs to be in the same critical
+section that updates the neighbor. The critical section is ended by the
+neigh_probe() call which drops the lock before calling solicit. Stretching
+the critical section over the solicit call is problematic, because that can
+then involved all sorts of forwarding callbacks. Therefore, like in the
+previous patch, split the netlink notification away from the internal one
+and move it ahead of the probe call.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
@@ -218,39 +174,32 @@ Reviewed-by: Ido Schimmel <idosch@nvidia.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index ada691690948..635d71c6420f 100644
+index 635d71c6420f..5512dd7035b1 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -52,6 +52,7 @@ do {						\
- 
- static void neigh_timer_handler(struct timer_list *t);
- static void neigh_notify(struct neighbour *n, int type, int flags, u32 pid);
-+static void __neigh_notify(struct neighbour *n, int type, int flags, u32 pid);
- static void pneigh_ifdown(struct neigh_table *tbl, struct net_device *dev,
- 			  bool skip_perm);
- 
-@@ -1512,6 +1513,9 @@ static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
- 	if (update_isrouter)
- 		neigh_update_is_router(neigh, flags, &notify);
- 
-+	if (notify)
-+		__neigh_notify(neigh, RTM_NEWNEIGH, 0, nlmsg_pid);
+@@ -1180,6 +1180,10 @@ static void neigh_timer_handler(struct timer_list *t)
+ 		if (!mod_timer(&neigh->timer, next))
+ 			neigh_hold(neigh);
+ 	}
 +
- 	if (process_arp_queue)
- 		neigh_update_process_arp_queue(neigh);
- 
-@@ -1522,10 +1526,8 @@ static int __neigh_update(struct neighbour *neigh, const u8 *lladdr,
- 	if (managed_update)
- 		neigh_update_managed_list(neigh);
++	if (notify)
++		__neigh_notify(neigh, RTM_NEWNEIGH, 0, 0);
++
+ 	if (neigh->nud_state & (NUD_INCOMPLETE | NUD_PROBE)) {
+ 		neigh_probe(neigh);
+ 	} else {
+@@ -1187,10 +1191,8 @@ static void neigh_timer_handler(struct timer_list *t)
+ 		write_unlock(&neigh->lock);
+ 	}
  
 -	if (notify) {
--		neigh_notify(neigh, RTM_NEWNEIGH, 0, nlmsg_pid);
+-		neigh_notify(neigh, RTM_NEWNEIGH, 0, 0);
 +	if (notify)
  		call_netevent_notifiers(NETEVENT_NEIGH_UPDATE, neigh);
 -	}
  
- 	trace_neigh_update_done(neigh, err);
- 	return err;
+ 	trace_neigh_timer_handler(neigh, 0);
+ 
 -- 
 2.51.1
 
