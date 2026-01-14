@@ -1,216 +1,121 @@
-Return-Path: <netdev+bounces-249732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34582D1CCA4
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:18:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F854D1CCB3
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:19:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D52663003B27
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:18:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C46853009746
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292263590C4;
-	Wed, 14 Jan 2026 07:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C749C35A945;
+	Wed, 14 Jan 2026 07:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vw+UjI7U";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwjLf4jd"
+	dkim=pass (2048-bit key) header.d=edu.ge.ch header.i=@edu.ge.ch header.b="BSOkvRFZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gwsmtp.ge.ch (smtpsw24.ge.ch [160.53.250.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270A93587C3
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351DD357A56;
+	Wed, 14 Jan 2026 07:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.53.250.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768375131; cv=none; b=RZMwjCI8f9Whn9zHIhbNtxXjBaqGloQvDT7v/7Qbv8xYw36PXMdpg/3PV+rzkQZCSJMIL9kBPKGym2vNA152+SVtJ0uIcPn+YRBFtfEguJk/9IdNXONXoYqWv/IKeqdJ+yQltALaNHOlJLSQ8lAIkXs3E2JX/PSJhhdvv5UGaa4=
+	t=1768375165; cv=none; b=WrAcd8hRjVsAQtaRo+K+qpcFQuTCr0MYwqbus53tGV53K4Ib61wnGyphJW6hIBi31Yw5OvRNYBaQGd5TAWKkhpVBEWA0It/mleusgErobfMke9ulLqf8884UAWrofDoZEW4wrMu+LFZRhDC7PFec+OBgPVzL6F+OSHB/KX2zWe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768375131; c=relaxed/simple;
-	bh=kqP77k226Wx8tCQ/0jWeIHBXDlzM0lq0ign/yDhfiAw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VnuZd9BTtNRMPdtqQkqHR/VfnnUmssvvI8+IXplLVh64PN/UVhDsoFC769KwBmBRFXJ+TYHGAlE2EHY6VciLYkFdv8QnF/bqAxXQxUzeAGsEtyfNTL2I32ZS8kimYy+a+W5vh5cZlUj7woBXGK5LhgTNRQJFPeckQtt1I5V+sdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vw+UjI7U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QwjLf4jd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768375123;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
-	b=Vw+UjI7UgeDsiuTK+AldtFGslG1lpa6BX8qwit8ktjV04T28NF/6JZkLXvWX+JezbhZZjZ
-	blBvO00IdKaLRR7uXFex1toqeaiQRsB5cvpRNriGftNCRo1DS1vuj5Ni1MFoiHLkqUlU6t
-	8ajpR1bV5fdYtvB7Na3Sqt175FSzlFM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-533-pOzYp4XRMgiwTzmu1fCPkQ-1; Wed, 14 Jan 2026 02:18:42 -0500
-X-MC-Unique: pOzYp4XRMgiwTzmu1fCPkQ-1
-X-Mimecast-MFC-AGG-ID: pOzYp4XRMgiwTzmu1fCPkQ_1768375121
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c6e05af3bso8962413a91.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:18:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768375121; x=1768979921; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
-        b=QwjLf4jd4v7iK7Jb9KwEPCFNb7YsGvratPiQCwV9o6Okk0pQNWozGR8RVAJixy12cA
-         Z99aqllsIMJZbJwuQw22x947KlhTJEbDozH9fJn/Bx+b5lxpbVZtkF4k1FYvFVx6AXKO
-         7tHQoUMFyOgDwksiqgwa6hfdZdC1FUj5/nYGbyzTZT0CvJbeb5+7tpc4YPxAEEqWhspz
-         KGje0p/cWV1HaxeIxKggWwefjyjBv4ONknIP31KwU8sxnD/1UdHSjIBTGvw/0CGx81Zg
-         3dIS1MU61tPBsBP1lo38wzGMUlGTu6t1VCDtl+DJNlxqJBbioPeyCUxhTtu8QFNAHrIf
-         YNdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768375121; x=1768979921;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
-        b=p1sm/CWsm9EgZgUAsR3kvxLrsHP9JnXZmRozeEBxAwIZXJVRBa+tR97YUaafA+tE0G
-         8xAHaFAEN5Ubm3jfJJAiPmUvqbtElkH0AOLTQEDGOMyY1vnTsWt285w3mJ4j+y2lqqCX
-         PE+rxaHIi4OIiihSTWNO8GLcYbNX0bSc60oFCGmGAgTquRJxjjDtYQXwB3rpOro1vo+w
-         Rx0p6w23X/6WSd0/88iraa24UGs7Y847EraMGqJm0Wve+9FgoSngjZFYjvMU0/0Lu/26
-         IwdNo4pQolSYdD6Ql4XhGA/TuWZbJyXoNuvQ4beBqavjeQx0FpyrIVWg+ZnYOorC06BQ
-         a+Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCXms3DLIOJfPkKPnNRmh5gDycB+1KCAI+QCiCf77AYDsxCffmjjnISnOHu5XTMhfXhP47pCcE8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgNN2SHiWBMk/dBDSWXVdYPJpRyokd0fUL86eNG+x+BchQkyLs
-	i7prMLy0UhotvSKvNc9jIa8oxZ4vMZIkveiBzoaOoHhnWWWp09uadbizfjfZUQi0ek3CMfUG5ha
-	tYfd6yBIcV3fVXQDTbR19MWGlYQrSM3kQA9kCrS1zVifeKNIIpZQiYYbAt7DywEiffr85EZrPPC
-	+UK6nUkm34P1VoJ6r+gUGpvOB6BHq0GSJg
-X-Gm-Gg: AY/fxX5ZrIGcROkmdl7Hm+O4tsygS2hRlG7ySWIlQMc84jo2b/tuvNq41bep3xyfWeu
-	EpnPMOLiIytmBLdq6H/AAF6uUdKHLKHC/4mqq/jyo6zuQjOz197XTCNYG8VbKYexiaX8jzkLdJC
-	2U2un07xK8TG4r678XJf4HGrfv6aEEp3dPFH6boXKcL4yFE0MAWIVcnRBve72WbRg=
-X-Received: by 2002:a17:90b:28cc:b0:335:2747:a9b3 with SMTP id 98e67ed59e1d1-3510913fd7bmr1582673a91.32.1768375120981;
-        Tue, 13 Jan 2026 23:18:40 -0800 (PST)
-X-Received: by 2002:a17:90b:28cc:b0:335:2747:a9b3 with SMTP id
- 98e67ed59e1d1-3510913fd7bmr1582663a91.32.1768375120558; Tue, 13 Jan 2026
- 23:18:40 -0800 (PST)
+	s=arc-20240116; t=1768375165; c=relaxed/simple;
+	bh=w2JQbYike37s8pXtIOzlkR0AUFRs7qVn2gHkmKt7qwQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HXjjxToTGxSYXF7Ulic7yMA652o3nkJv+mnyG0NS1+dPO9uS9vJvOAWd+lgo4itM3aT7eMd7HL+TnUCX7/sIDbuwSKrS4gaPl4dzEzjfdez5YW7CjOhqRXZAq3t8QXc24SYZLcDsVi/3Mk8bO5CTY4mg/IMg7jpTklnInvCcO+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=edu.ge.ch; spf=pass smtp.mailfrom=edu.ge.ch; dkim=pass (2048-bit key) header.d=edu.ge.ch header.i=@edu.ge.ch header.b=BSOkvRFZ; arc=none smtp.client-ip=160.53.250.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=edu.ge.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=edu.ge.ch
+From: "Wenger Jeremie (EDU)" <jeremie.wenger@edu.ge.ch>
+To: Jakub Kicinski <kuba@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>
+Subject: RE: [REGRESSION] e1000e: RX stops after link down/up on Intel
+ 8086:550a since v6.12.43 (fixed by suspend/resume)
+Thread-Index: AQHcgKY4vqPf4k7m6ECp9OMR6mOttLVJlHgAgAdTJwCAAGBwmA==
+Date: Wed, 14 Jan 2026 07:19:12 +0000
+Message-ID: <33854287fd02403093ff9f7dfa6412f1@edu.ge.ch>
+References: <c8bd43a3053047dba7999102920d37c9@edu.ge.ch>
+	<01412a4684684995ac35b4d6dba75853@edu.ge.ch>,<20260113182400.723e34a1@kernel.org>
+In-Reply-To: <20260113182400.723e34a1@kernel.org>
+Accept-Language: fr-CH, en-US
+Content-Language: fr-CH
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aWIItWq5dV9XTTCJ@kspp> <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
-In-Reply-To: <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 14 Jan 2026 15:18:29 +0800
-X-Gm-Features: AZwV_Qil4_emZc9UC594LVQZD_WDE3u0sgwiGLvdx73MXFe_Cb2QNMYVC2G9b8k
-Message-ID: <CACGkMEuFePpfpFvnJz6xvrKrVG84KmAfODP55cCJgFzZqba29A@mail.gmail.com>
-Subject: Re: [PATCH v2][next] virtio_net: Fix misalignment bug in struct virtnet_info
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Akihiko Odaki <akihiko.odaki@daynix.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-FEAS-BEC-Info: WlpIGw0aAQkEARIJHAEHBlJSCRoLAAEeDUhZUEhYSFhIWUhZXkguLUVaIy48WlpbWFhYWFldSFpcSAINGg0FAQ1GHw0GDw0aKA0MHUYPDUYLAEhZSFpaSAYNHAwNHigeDw0aRgMNGgYNBEYHGg9IWEhaSFlbSFlYRllcXUZQXkZZX1lIUEhYSFhIXEhYSFhIWEhaXkgJBhwABwYRRgRGBg8dEQ0GKAEGHA0ERgsHBUhYSFtaSAEGHA0ERR8BGg0MRQQJBigEARscG0YHGx0HGwRGBxoPSFhIWV1IAx0KCSgDDRoGDQRGBxoPSFhIWlBIBAEGHRBFAw0aBg0EKB4PDRpGAw0aBg0ERgcaD0hY
+X-SM-outgoing: yes
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; d=edu.ge.ch; s=GVA21; c=relaxed/relaxed;
+ h=from:to:cc:subject:date:message-id:references:content-type:mime-version;
+ bh=w2JQbYike37s8pXtIOzlkR0AUFRs7qVn2gHkmKt7qwQ=;
+ b=BSOkvRFZne7MtqSHfq5YpBfAyUZBw9Qd+E4GqSyhMykUN+IGqE4DDimvX6xz+0MLEo4VPOrPm4CW
+	VZbNVeUbyvtmhRJ9KLSYLaACI/iiMfLFyprvpulp//u7PJE5+NCtZCys3T+Kiau5uvjo6pqYEpMS
+	IC4Qtw0XXQxeebXmSBHO6uPlwZe2PQ0c3bPGpWgUDYmyirOVIxf+D0xCdJNkA8OhunWvHkHMQJiN
+	lId/zbivqy35RWPWepd5PUw6aDMoavlxagvK7Ht1a+w6D4H1VI9Krw3DGRjDkzRvZ4DtjrnJiBbU
+	AP3d7HpXEqAwvVYQQfweopTQaApfTPPGVCSUrA==
 
-On Tue, Jan 13, 2026 at 10:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On 1/10/26 9:07 AM, Gustavo A. R. Silva wrote:
-> > Use the new TRAILING_OVERLAP() helper to fix a misalignment bug
-> > along with the following warning:
-> >
-> > drivers/net/virtio_net.c:429:46: warning: structure containing a flexib=
-le array member is not at the end of another structure [-Wflex-array-member=
--not-at-end]
-> >
-> > This helper creates a union between a flexible-array member (FAM)
-> > and a set of members that would otherwise follow it (in this case
-> > `u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
-> > overlays the trailing members (rss_hash_key_data) onto the FAM
-> > (hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
-> > The static_assert() ensures this alignment remains.
-> >
-> > Notice that due to tail padding in flexible `struct
-> > virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
-> > (at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
-> > offset 84 in struct virtnet_info) are misaligned by one byte. See
-> > below:
-> >
-> > struct virtio_net_rss_config_trailer {
-> >         __le16                     max_tx_vq;            /*     0     2=
- */
-> >         __u8                       hash_key_length;      /*     2     1=
- */
-> >         __u8                       hash_key_data[];      /*     3     0=
- */
-> >
-> >         /* size: 4, cachelines: 1, members: 3 */
-> >         /* padding: 1 */
-> >         /* last cacheline: 4 bytes */
-> > };
-> >
-> > struct virtnet_info {
-> > ...
-> >         struct virtio_net_rss_config_trailer rss_trailer; /*    80     =
-4 */
-> >
-> >         /* XXX last struct has 1 byte of padding */
-> >
-> >         u8                         rss_hash_key_data[40]; /*    84    4=
-0 */
-> > ...
-> >         /* size: 832, cachelines: 13, members: 48 */
-> >         /* sum members: 801, holes: 8, sum holes: 31 */
-> >         /* paddings: 2, sum paddings: 5 */
-> > };
-> >
-> > After changes, those members are correctly aligned at offset 795:
-> >
-> > struct virtnet_info {
-> > ...
-> >         union {
-> >                 struct virtio_net_rss_config_trailer rss_trailer; /*   =
-792     4 */
-> >                 struct {
-> >                         unsigned char __offset_to_hash_key_data[3]; /* =
-  792     3 */
-> >                         u8         rss_hash_key_data[40]; /*   795    4=
-0 */
-> >                 };                                       /*   792    43=
- */
-> >         };                                               /*   792    44=
- */
-> > ...
-> >         /* size: 840, cachelines: 14, members: 47 */
-> >         /* sum members: 801, holes: 8, sum holes: 35 */
-> >         /* padding: 4 */
-> >         /* paddings: 1, sum paddings: 4 */
-> >         /* last cacheline: 8 bytes */
-> > };
-> >
-> > As a result, the RSS key passed to the device is shifted by 1
-> > byte: the last byte is cut off, and instead a (possibly
-> > uninitialized) byte is added at the beginning.
-> >
-> > As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
-> > moved to the end, since it seems those three members should stick
-> > around together. :)
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> > ---
-> > Changes in v2:
-> >  - Update subject and changelog text (include feedback from Simon and
-> >    Michael --thanks folks)
-> >  - Add Fixes tag and CC -stable.
->
-> @Michael, @Jason: This is still apparently targeting 'net-next', but I
-> think it should land in the 'net' tree, right?
-
-Right.
-
-Thanks
-
->
-> /P
->
-
+VGhhbmtzIGZvciB0aGUgcmVwb3J0LCBJJ20gYWRkaW5nIHRoZSByZWxldmFudCBwZW9wbGUgdG8g
+Q0Mgbm93Lg0KUGxlYXNlIHRyeSB0byBjb25zdWx0IHRoZSBNQUlOVEFJTkVSUyBmaWxlIG5leHQg
+dGltZSAnY2F1c2UgbmV0d29ya2luZw0KaXMgYSBiaXQgdG9vIGJpZyBmb3IgdGhlIHJpZ2h0IHBl
+b3BsZSB0byBhbHdheXMgbm90aWNlIHJlcG9ydHMuDQoNCk15IGJlc3QgZ3Vlc3MgYmVsb3cuLg0K
+DQpPbiBGcmksIDkgSmFuIDIwMjYgMDk6NDA6MzQgKzAwMDAgV2VuZ2VyIEplcmVtaWUgKEVEVSkg
+d3JvdGU6DQo+IEhlbGxvLA0KPg0KPiBJIHdvdWxkIGxpa2UgdG8gcmVwb3J0IGEgcmVncmVzc2lv
+biBpbiB0aGUgZTEwMDBlIGRyaXZlciBhZmZlY3RpbmcgYW4gSW50ZWwgaW50ZWdyYXRlZCBFdGhl
+cm5ldCBjb250cm9sbGVyLg0KPg0KPiBIYXJkd2FyZToNCj4gSW50ZWwgRXRoZXJuZXQgY29udHJv
+bGxlcsKgIFs4MDg2OjU1MGFdDQo+IERyaXZlcjogZTEwMDBlDQo+DQo+IFN1bW1hcnk6DQo+IC0g
+Ulggc3RvcHMgd29ya2luZyBhZnRlciBhbiBFdGhlcm5ldCBsaW5rIGRvd24vdXAgKHVucGx1Zy9y
+ZXBsdWcgY2FibGUpLg0KPiAtIFRYIHN0aWxsIHdvcmtzLiBBIHN5c3RlbSBzdXNwZW5kL3Jlc3Vt
+ZSByZWxpYWJseSByZXN0b3JlcyBSWC4NCj4NCj4gUmVncmVzc2lvbiByYW5nZToNCj4gLSBXb3Jr
+aW5nOiB2Ni4xMi4yMg0KPiAtIEJyb2tlbjogdjYuMTIuNDMgLi4gdjYuMTguMyAodGVzdGVkIG9u
+IERlYmlhbiAxMiBiYWNrcG9ydHMsIERlYmlhbiAxMywgRGViaWFuIHNpZCkuIHY2LjE4LjMgaXMg
+dGhlIG1vc3QgcmVjZW50IGtlcm5lbCB0ZXN0ZWQgc28gZmFyLCBzbyB0aGUgcmVncmVzc2lvbiBp
+cyBsaWtlbHkgc3RpbGwgcHJlc2VudCBpbiBuZXdlciBrZXJuZWxzLg0KDQpKdWRnaW5nIGJ5IHRo
+ZSByYW5nZSBzZWVtcyBsaWtlIGl0IGhhcyB0byBiZSBlZmFhZjM0NGJjMjkxN2NiDQpXb3VsZCB5
+b3UgYmUgYWJsZSB0byB0cnkgYnVpbGRpbmcgYSBrZXJuZWwgd2l0aCB0aGF0IGNvbW1pdCByZXZl
+cnRlZD8NCg0KDQoNCkhpLA0KDQpUaGFua3MgZm9yIGxvb2tpbmcgaW50byB0aGlzLg0KDQpKdXN0
+IHRvIHByb3ZpZGUgc29tZSBhZGRpdGlvbmFsIGNvbnRleHQgYW5kIGhlbHAgYXZvaWQgZHVwbGlj
+YXRlZCB3b3JrOg0KdGhlIGlzc3VlIGhhcyBhbHNvIGJlZW4gZGlzY3Vzc2VkIG9uIG5ldGRldkB2
+Z2VyLmtlcm5lbC5vcmcsIGFuZCBJIHdhcyBwb2ludGVkIHRvIGEgZml4IHRoYXQgbGFuZGVkIGlu
+IG1haW5saW5lLg0KDQpJIHRlc3RlZCB0aGUgaXNzdWUgd2l0aCBMaW51eCA2LjE5ICg2LjE5fnJj
+NC0xfmV4cDEpLCBhbmQgdGhlIHByb2JsZW0gaXMgZnVsbHkgcmVzb2x2ZWQgdGhlcmU6IFJYIGNv
+cnJlY3RseSByZWNvdmVycyBhZnRlciBhIGxpbmsgZG93bi91cCB3aXRob3V0IHJlcXVpcmluZyBh
+IHN1c3BlbmQvcmVzdW1lIGN5Y2xlLg0KDQpUaGlzIGJlaGF2aW9yIGNoYW5nZSBhcHBlYXJzIHRv
+IGJlIGR1ZSB0byBjb21taXQ6DQozYzdiZjVhZjIxOTYwODdmMzk0ZjkwOTliNTNlMzc1Njk2MzZi
+MjU5DQoNCkdpdmVuIHRoYXQgY3VycmVudCBtYWlubGluZSB3b3JrcyBhcyBleHBlY3RlZCwgSSBk
+aWQgbm90IGF0dGVtcHQgcmV2ZXJ0aW5nIGVmYWFmMzQ0YmMyOTE3Y2IuIEkgYWxzbyBhc2tlZCBv
+biBuZXRkZXYgd2hldGhlciBhIGJhY2twb3J0IG9mIHRoZSBhYm92ZSBmaXggdG8gc3RhYmxlIGtl
+cm5lbHMgd291bGQgYmUgYXBwcm9wcmlhdGUuDQoNClBsZWFzZSBsZXQgbWUga25vdyBpZiB5b3Ug
+c3RpbGwgdGhpbmsgYSB0YXJnZXRlZCByZXZlcnQgdGVzdCB3b3VsZCBiZSB1c2VmdWwuDQoNCkJl
+c3QgcmVnYXJkcywNCkrDqXLDqW1pZQ0KDQoNCj4gU3ltcHRvbXM6DQo+IC0gTGluayBpcyBkZXRl
+Y3RlZCAoMUdicHMsIGZ1bGwgZHVwbGV4KS4NCj4gLSBESENQIERJU0NPVkVSIGZyYW1lcyBhcmUg
+dHJhbnNtaXR0ZWQgKGNvbmZpcm1lZCB2aWEgZXh0ZXJuYWwgcGFja2V0IGNhcHR1cmUpLg0KPiAt
+IE5vIHBhY2tldHMgYXJlIHJlY2VpdmVkIChubyBESENQIE9GRkVSLCBSWCBhcHBlYXJzIGRlYWQp
+Lg0KPiAtIEJvb3Rpbmcgd2l0aCB0aGUgY2FibGUgcGx1Z2dlZCB3b3Jrcy4NCj4gLSBUaGUgaXNz
+dWUgaXMgdHJpZ2dlcmVkIG9ubHkgYWZ0ZXIgdW5wbHVnZ2luZyBhbmQgcmVwbHVnZ2luZyB0aGUg
+Y2FibGUuDQo+IC0gQSBzdXNwZW5kL3Jlc3VtZSBjeWNsZSByZXN0b3JlcyBSWCBpbW1lZGlhdGVs
+eS4NCj4gLSBVc2luZyBhIFVTQiBFdGhlcm5ldCBhZGFwdGVyIChyODE1Mikgb24gdGhlIHNhbWUg
+bmV0d29yayB3b3JrcyBjb3JyZWN0bHkuDQo+DQo+IFJlcHJvZHVjdGlvbiBzdGVwczoNCj4gLSBC
+b290IHdpdGggRXRoZXJuZXQgY2FibGUgcGx1Z2dlZC4NCj4gLSBWZXJpZnkgbmV0d29yayBjb25u
+ZWN0aXZpdHkgd29ya3MuDQo+IC0gVW5wbHVnIHRoZSBFdGhlcm5ldCBjYWJsZS4NCj4gLSBQbHVn
+IHRoZSBFdGhlcm5ldCBjYWJsZSBiYWNrIGluLg0KPiAtIE9ic2VydmUgdGhhdCBSWCBubyBsb25n
+ZXIgd29ya3MgKG5vIERIQ1AgT0ZGRVIpLg0KPiAtIFN1c3BlbmQvcmVzdW1lIHRoZSBzeXN0ZW0g
+4oaSIFJYIHdvcmtzIGFnYWluLg0KPg0KPiBUaGlzIHN1Z2dlc3RzIHRoYXQgdGhlIFBIWSBvciBS
+WCBwYXRoIGlzIG5vdCBjb3JyZWN0bHkgcmVpbml0aWFsaXplZCBvbiBsaW5rIHVwIGFmdGVyIGEg
+bGluayBkb3duIGV2ZW50LCB3aGlsZSB0aGUgcmVzdW1lIHBhdGggcGVyZm9ybXMgYSBtb3JlIGNv
+bXBsZXRlIHJlc2V0Lg0KPg0KPiBJIGNhbiBwcm92aWRlIGFkZGl0aW9uYWwgbG9ncywgZXRodG9v
+bCBzdGF0aXN0aWNzLCBvciB0ZXN0IHBhdGNoZXMgaWYgbmVlZGVkLg0KPg0KPg0KPiBCZXN0IHJl
+Z2FyZHMsDQo+DQo+IErDqXLDqW1pZSBXZW5nZXINCiAgICA=
 
