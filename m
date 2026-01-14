@@ -1,129 +1,152 @@
-Return-Path: <netdev+bounces-249932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E949FD20F57
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:03:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4441BD21087
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:29:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E561E3015E38
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:03:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABE863018F7F
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D51433FE07;
-	Wed, 14 Jan 2026 19:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4D8346FA7;
+	Wed, 14 Jan 2026 19:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvnIsTGZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1SaFUWm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA3C32AAD4
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 19:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F43346AE5
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 19:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768417409; cv=none; b=V2o1At5JUlpha6dFL8W4/vO81vLDUh6f4t12DoMV0t+EOTybkJyzGUzjp5Pnaan1V2JlJlthFA63uANbF8d/3m+GHV4KQNedzvdGXBRVPUh9BEjURI1fPvEQCvcdGzBnjxq3C7054cDZvpWZNif52qp2Xcx18RDGSxjRhvPkHfw=
+	t=1768418933; cv=none; b=M0OWoLQDU/YhUt+uYEK+IPD3K76Lj3VNV7R4mekjBiTEmLF8eIETre5tW4QH7jtBZV/dPsV8tV7AmgYab58UGxhpLuLgrMZJzxjWWdJaL2XvSyALfZasB1GYH3QttXoAxr2x/OXOEIl1O2bE8F8hoXloLeH6EwRof400CiJkcxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768417409; c=relaxed/simple;
-	bh=0rMQ6zOURla4mzk4Z8trD7B7gUluo/Fy3On3fQUwXtg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LWjSFH/3VpfHBKz8ABDpRWRQXmzj02Hdde6qKDmjUcAh/4cD8NfPm1NZjKg8IrwQE074xFeG/lnqB8Gfb9QWmeei3NIhOJkmVlaANidsJVEzTHNXURy6YtdaHhSv39xKnXm31WxHtHdo68AYRI2gjs4tX2fL8ZwHs5kpm2uoLOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvnIsTGZ; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1768418933; c=relaxed/simple;
+	bh=QKRezXrA3bG4ArDBbT58+S8c1CtyAn6iBKaQozySKZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S0TYKCpd3bHvqnwl8YBkHmrw7c/XW46UVHQDQ9I8AgppqIRk144tCjNi5afC8bLFKkknD6vZ6FfyDaGyMXIVSGeeDj5Qy6UUzwec/4WONe7EO1uLQZQ7O19JLVWYJiXLR4pwUkUXd1z31k7wDRaNXISyHzGSAJxuk5apmhBjCnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1SaFUWm; arc=none smtp.client-ip=209.85.221.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47ee4539adfso1597795e9.3
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:03:28 -0800 (PST)
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56373f07265so137592e0c.0
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:28:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768417407; x=1769022207; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=59rTEl+o7f1MOuKCLVPM1nM2JKRGkvQaPwVRBCBoMgg=;
-        b=lvnIsTGZGKs9BtAOGLsXBYnNo6oczlaT7Lw4VVfpFNurZylXPsUOTYNuDqT21uiKBV
-         6DkzVirfzl1oCUMXhEppImlWOGmYkqs5CBlwQrF1f8cVvK1ARf7RGvOw00K1M+MdN882
-         vl3JYba1HlH8Rb+U5mOSCj8Kw/6NjY45A3dd/27bedMtELAO38LpD2vX1fYR/rVJxXeF
-         iCyOeAjedAJt9XbRcyjTI91NHWjzPLNtgcXl+ZK9ixCGQlwTnNJD6pfp+FSK+p4oUqfW
-         L/S4SqkhBngEAatyhhlzXXnShgTJd8vJhnNALM7pnYZQucaTaLzSxXWP9oI5aMQvKM+f
-         kTlw==
+        d=gmail.com; s=20230601; t=1768418931; x=1769023731; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jUpDNPxjIqi9ICJXtc+mfMuxEexyo061EqFw5Nyb8q0=;
+        b=F1SaFUWm961JKpMnu0ydteNHS4t3gcUzC4JP64uX+Pxwm6r+qtELwLoB7gSni/Vb87
+         ST5RwkRCCH/SRgx5WxbexFtcrj26A8BiglaB5QC30Rl/Uv41uKG7AVFGlPgBTmFFmKJw
+         coXkIQuaGC0k2EPoL0hhFOLMboVh7HCwv30Vi4N3Rg449J4JzWWraOAZZYHXRMnpcR1z
+         pMqlkGgiEDtsaNCPANBcnVAE5GJq9rpbSUYYL9hBi1OcDD/9mpRNCtlaPN1VqTo2zk6u
+         Fztciom0/pJecn0NCLJpn+i5hSrSetqKJwq6Oc7PZsCl4e6/JZ9lYCfHMoMutSuVEZlZ
+         86mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768417407; x=1769022207;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=59rTEl+o7f1MOuKCLVPM1nM2JKRGkvQaPwVRBCBoMgg=;
-        b=m85I9VMaUTuaWuMAUSF3L9cH/MF9GAfyP+tjHXtmcxzIlgmVE20uOUCdDcRsYRbUYe
-         QuDdM6BEzIg5e7e+LsEOv7So72POSatepsO9JZz0kukSPNgzVfTuh7191UlOoK6/Apzx
-         3ukRsPySx/teyVxlYjwPxdRHtbrRDHOXgIi1tAr811Z4gJ8O5g8e3h0AyqcOMEdkr2Ez
-         DWZ9OMjVVE/PQfU2Dzqv9u/dcP8G4qHHtA0AYrZNZYka4jiJGpNlyZmVxO2bzlVtHPCG
-         NvoA2vLlTqndKf/XWCWLCZbogvT6iO9FrdOzWbaEcAcqgk6gEtgG+pZF5qUcZQsaSgj2
-         BYiA==
-X-Gm-Message-State: AOJu0YyCc+pZJ5pQYjfcMieLqGYHr1WWMhbvbXPV+/+n6ZEPc1mQUEc8
-	WhbSKBHhIItbt58Ox4BKOaDyeaCpjz4Hrueb4Lrt3ObYFVCXstF9QoKQ
-X-Gm-Gg: AY/fxX5rH49NLcxpiy3I8ZWLtIG2WfBA+RcY6maa03eJUAuIkmjRvxGcm8kI4wVfAdx
-	8CoUPKWRLlVQWXjCJVWKBmobZaivrEshPDmFPeBQ5grOB8OoLgN81nOeJoyz+UkVN5HaPKGcCiS
-	7uYnwYvQs9jawugDLTwr5eCsRKvAk71gMfxE+O9b9/oRXFljna5avxouwolGoDC43Xy4mCubgBx
-	9TZnSopFmvmF8Ywuf3KwNnHHtoOIWJbB6dMkAbIkh50Kh42IXFtZInVGjNh52JkjH0nIqBrGA55
-	MEhME4rG6jJNWdhljRDLQfIWo4H2CPItjtztSH6lDoKbpHUkEaFyg4oUc5TtRMjzaEd8fx4RlpZ
-	B+GeiUhrChg6Z/UAuYaLJfCRn4FSkA0k6OcII8lcc+Rw38Ea4Twj/yoDqRGpjg1SKjGDJH9jjKp
-	BtykkIS+spXxnE3A==
-X-Received: by 2002:a05:600c:548c:b0:477:fcb:2256 with SMTP id 5b1f17b1804b1-47ee3371876mr49366775e9.17.1768417406589;
-        Wed, 14 Jan 2026 11:03:26 -0800 (PST)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4289b83csm5779735e9.3.2026.01.14.11.03.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jan 2026 11:03:25 -0800 (PST)
-Message-ID: <b2e87b4e-c675-4e38-b28f-cc00cf969260@gmail.com>
-Date: Wed, 14 Jan 2026 21:03:44 +0200
+        d=1e100.net; s=20230601; t=1768418931; x=1769023731;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jUpDNPxjIqi9ICJXtc+mfMuxEexyo061EqFw5Nyb8q0=;
+        b=QAnQ+Wyhq+z/IJjl9C6iZtJLcfqdA3q+QvD6w4Lx8zGIZb9+ibQUHANO4EoTuJk4vB
+         QuWy5GZY4ToMlZWozbanMXCC2Q2HWkCauZjqf+G//ClsUCYmm4IAlDmPHEG1P00VK1Ng
+         Y+xqZkRGZHcUd0bfMx0iUtuKRWp96in0Ie92mUlGK1UpXB5SH0imcvCYoEgu4R80jgE9
+         sC7lFcEh790gkNPJ3qUjll0Zf/1SS1aw+6XmLLOF/zJrKvb4Mgt55A+B/w+JdgZMidbR
+         PBLbdzXetAEajcAFkXrXlIYeOPTJ0WRBAEmh1u1VztJlaUJ5wwAppvg2Kz/NmS9ZQVRX
+         0Z5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVlY9wBIzkmAXE5Z33qAYQw/lJlWl1nd0xu94Nk3+VI7XzGs1rmgboUILT/sJvO7BzH2a3cQPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN/RHIcSZQ9OAQlGehu9X/8rTY68SLg8TxqN47utwQVstMhvNj
+	J9IwXDJRm5ZXtbbeyOYhuF9odJLVGqEjeAlF3EVdMIHtx08AbmbUZa06SKF/RA==
+X-Gm-Gg: AY/fxX7nz6wF6Tkwyq9B1Sy9nremlxVnWqxP4cLn3txs8usxNWaDr/NCW8Bxietpbuj
+	OutYLv6tuzwSk6VB219GvnU4SDRQXIgnOPr6MHf3OdI7iPSC/rpkKGnAWVuin02eORrT1BrY0aH
+	QEtMggeWwB9I7OEvWeW/hsvcnIhBg6lOHKb0yI3vsgzD8kmqRSPN9dThCzDdwtIRHEMV3YWDjqW
+	YLRRrPl0ETsLPxx70qUAoRHONNrDCxUfce7jyY54EsFmJ+dUMzg56I+LjJnw3ef9nlDEn9ke7uF
+	Su3R2QJkgotHfCDpt3FXcKkkn+t3EqNUCvNbE8TUBpFEnJwpGn0pNgsW2O5AiczlO/IVDdeeqPr
+	BSDOOSCiISD41CmVLB0vJkiSwKORswP69/pHcyZesfmOEph8V8hTtwyfK9BNmtv9Y64l2Jc4Fb5
+	/oszmvu6+XmoGqSVJTh9arPzrZvOWx8TguKQ==
+X-Received: by 2002:a05:690e:1c06:b0:646:eb06:f2e2 with SMTP id 956f58d0204a3-64903b513d2mr1973243d50.73.1768411311135;
+        Wed, 14 Jan 2026 09:21:51 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa6e12ffsm92418037b3.53.2026.01.14.09.21.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 09:21:50 -0800 (PST)
+Date: Wed, 14 Jan 2026 09:21:49 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: kernel test robot <lkp@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Long Li <longli@microsoft.com>, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>
+Subject: Re: [PATCH net-next v14 01/12] vsock: add netns to vsock core
+Message-ID: <aWfQrS1oNcXwcXu3@devvm11784.nha0.facebook.com>
+References: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
+ <202601140749.5TXm5gpl-lkp@intel.com>
+ <CAGxU2F45q7CWy3O_QhYj0Y2Bt84vA=eaTeBTu+TvEmFm0_E7Jw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: wwan: t7xx: Add CONFIG_WWAN_ADB_PORT for ADB port
- control
-To: "wanquan.zhong" <zwq2226404116@163.com>, loic.poulain@oss.qualcomm.com,
- chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, ricardo.martinez@linux.intel.com
-Cc: netdev@vger.kernel.org, johannes@sipsolutions.net, davem@davemloft.net,
- andrew+netdev@lunn.ch, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, wanquan.zhong@fibocom.com
-References: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
- <20260114131423.202777-1-zwq2226404116@163.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20260114131423.202777-1-zwq2226404116@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F45q7CWy3O_QhYj0Y2Bt84vA=eaTeBTu+TvEmFm0_E7Jw@mail.gmail.com>
 
-Hi Wanquan,
-
-On 1/14/26 15:14, wanquan.zhong wrote:
-> From: "wanquan.zhong" <wanquan.zhong@fibocom.com>
+On Wed, Jan 14, 2026 at 04:54:15PM +0100, Stefano Garzarella wrote:
+> On Wed, 14 Jan 2026 at 00:13, kernel test robot <lkp@intel.com> wrote:
+> >
+> > Hi Bobby,
+> >
+> > kernel test robot noticed the following build warnings:
+> >
+> > [auto build test WARNING on net-next/main]
+> >
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-set-skb-owner-of-virtio_transport_reset_no_sock-reply/20260113-125559
+> > base:   net-next/main
+> > patch link:    https://lore.kernel.org/r/20260112-vsock-vmtest-v14-1-a5c332db3e2b%40meta.com
+> > patch subject: [PATCH net-next v14 01/12] vsock: add netns to vsock core
+> > config: x86_64-buildonly-randconfig-004-20260113 (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/config)
+> > compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/reproduce)
+> >
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202601140749.5TXm5gpl-lkp@intel.com/
+> >
+> > All warnings (new ones prefixed by >>, old ones prefixed by <<):
+> >
+> > >> WARNING: modpost: net/vmw_vsock/vsock: section mismatch in reference: vsock_exit+0x25 (section: .exit.text) -> vsock_sysctl_ops (section: .init.data)
 > 
-> Changes from v2:
->    1) Add missing 'net:' subsystem prefix to commit subject for compliance
->    2) Remove redundant "to config" suffix and refine commit wording
->    3) Split overlong Kconfig help text lines to meet 72-char limit
->    4) Align EXPERT dependency desc with WWAN subsystem conventions
+> Bobby can you check this report?
 > 
-> Add a new Kconfig option CONFIG_WWAN_ADB_PORT to control the ADB debug port
-> functionality for MediaTek T7xx WWAN modem. This option depends on MTK_T7XX
-> and EXPERT, defaults to 'y' to avoid breaking existing debugging workflows
-> while mitigating potential security concerns on specific target systems.
+> Could be related to `__net_initdata` annotation of `vsock_sysctl_ops` ?
+> Why we need that?
 > 
-> This change addresses security risks on systems such as Google Chrome OS,
-> where unauthorized root access could lead to malicious ADB configuration
-> of the WWAN device. The ADB port is restricted via this config only; the
-> MIPC port remains unrestricted as it is MTK's internal protocol port with
-> no associated security risks.
+> Thanks,
+> Stefano
+> 
 
-As it was shared before, you cannot stop user having root privileges. He 
-can simply unload your 'secured' driver and load another custom build 
-module. If the patch is attempt to address a Chrome OS privileges 
-separation issue, then, please, fix Chrome OS itself.
+Yep, no problem.
 
-For this specific patch:
-
-NACKed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Best,
+Bobby
 
