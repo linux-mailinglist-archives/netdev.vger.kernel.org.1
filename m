@@ -1,148 +1,229 @@
-Return-Path: <netdev+bounces-250122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9C6FD242AF
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:27:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F67D24312
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:32:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9E95D3043684
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:25:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EAF7B30A033C
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519073793D0;
-	Thu, 15 Jan 2026 11:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABC437B40A;
+	Thu, 15 Jan 2026 11:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQqSOEUo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="akeSxJx5";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSI+99es"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19191378D92
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CE83793B1
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768476296; cv=none; b=hwBhtnxm9CjWy2e1ztK0tLTI1B2JGSx5XxErDuUugzDxKr+XHP0i4T6icKyrKEtg5ME7Wy1oQKLEgI30as4mSMzDvCfvai1Whzu+7Ke68AgxCJLLinQojy72iHTpXiznq6K+6OUzIQA2dkg+ueftspAnjxXJ8kn9hXJWVjbe+JA=
+	t=1768476327; cv=none; b=TmOwaq8FEEdartz5T65ChhKsswGhFKl2vilO7bwaZ4G2h3JoVmL+aLDM8S8PYc9z6pDpmSpFIa55tyE9qyxhjDihjV6f5s5DegQv4YmdPxzhrvBiUFb/oFjT7bTS8FQ/+AGpPEHY3tlrj5kCP3/3BdnbUS6QwuWJTxgTv4OiE4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768476296; c=relaxed/simple;
-	bh=cL25nkDUzKZag4J9iucviG36ODRXZz/OJhTfJnS3kJQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N7Swca1qyAMDYqA9uvwnIyZUKMRC1fyDGTUv6j3xTnuqOxFM7Hp/gHXCqc3BEj19B3dZ6ZHaY17ppkniwt13S9B1IN05yuuIVNWG2kiTr4m9aeEbAPN4X4hKjrTzN7I2kz35W3f2LcbPIoU40GVwLExCg1fF2YtWeunjwH3Can4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nQqSOEUo; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2a110548cdeso5742345ad.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:24:55 -0800 (PST)
+	s=arc-20240116; t=1768476327; c=relaxed/simple;
+	bh=H2Rd0lLdKRFcnzUCm2F7g+aZlfEhedtUjCpakzmz5Hc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MmXGLSz9NCuTiueKtFJeo0QB4cZGRGa0FWIcJuvA4vsJUUWGAyPTnfqPQ4HLHHC/BbrtEADoPrE3cXc/VSKxuCFL7W7jtVmik0OoEpZi+3gc84XaT8btc2L4EpML2/6IWr43UCdfNP8TmuPUhvRqTGZzX54JxLoDer303YUQ1cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=akeSxJx5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSI+99es; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768476325;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Daj4mBvKz/orNgYkU+OBGpVjcjRCjHiW0Hdgz6VukRA=;
+	b=akeSxJx5Eh9ytpOqh5sQZsJpaRcTdXLD/vUqAe+SM1X8pesbbAEdg6Ypf7aFCBu0haWC9l
+	WfKSf3kXH9f+n6PV/6GqCH8xF7RsPrGoQeA13Yojf10jI2qBeD9ZKItanSK4AJpUxa0rN8
+	NaVpm46zqkmNJwws5246eOZADfLklSY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-oWzchRkFNRii_xPORKVdwg-1; Thu, 15 Jan 2026 06:25:23 -0500
+X-MC-Unique: oWzchRkFNRii_xPORKVdwg-1
+X-Mimecast-MFC-AGG-ID: oWzchRkFNRii_xPORKVdwg_1768476323
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-434302283dcso654902f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:25:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768476294; x=1769081094; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XYfLimlEod4L01lx+XYB7h0VUHpcPwya1tLXiZjahd0=;
-        b=nQqSOEUo0UOxJiaWM/FLncotJa7v4vghPCNnDfKBxm7lEHJ5TSn+lziDLPsQWBuW8k
-         pDY1h2XMHr6k5ozA1ICuc8bMARufuOP00v0jAZnenwlkXkfxpcIMezmvh2RPFH3BGzg2
-         FmfhmxvjJeU9idfz0QIcmz/Gn61sKKBQWq5Xpk/mb1Zd6DN4/l5qFtw7Udi4YMVJBN6R
-         9E92O3G+9+3puzzt1Y/PTh/GK07INuJ5K+BzhIqKK377Hq6WjWAHY6+LU0egOuwu3kfP
-         bIC8L7eMAYxNJUvSIPmv7fi9XEJSt3Jh6SsqBG6BQSeG8Qa/lBkH+7ydWPUsIYNo+jWb
-         mqrA==
+        d=redhat.com; s=google; t=1768476322; x=1769081122; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Daj4mBvKz/orNgYkU+OBGpVjcjRCjHiW0Hdgz6VukRA=;
+        b=HSI+99esRvWQ644N5Z8DtGiWLt3PvNMqDMstxdZsXbXCxpLIwMG9wB1BRORbKPhzDK
+         FFfezjf/PsXLurzv5XwDAukgxyO8CmNSY5E3guVg7i7RPYMTZ70Hakh8dcsNEd5WiNmR
+         ZT6xFQ0nBP6y5TLqGtwWHrwVbhxiJ/etTkdGt6d1N3t8lbtiZl+KQptcEurXP8GMNsjW
+         0RjLCEw0vZ/tkCIJi76Ki7Fbu3pnFVleTBBchzAZ25qVn4M4Jsym9/SYE+fBqsR9VSic
+         ZEU3IUj1FfPRzmPkPSwmBdmLivSR93ETklyuCFa1r2Daoqg5Xpug5SlMQQssmUCMhCBX
+         os5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768476294; x=1769081094;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XYfLimlEod4L01lx+XYB7h0VUHpcPwya1tLXiZjahd0=;
-        b=iIQv6LQSpehqli7x+UUNlJV+OVTZI/Qg1t2bgf1OVXbOa38aWlCkOn0u5q5sSkfzKs
-         I1z5IvU+MYwBnMHUAUS9BnoIRP9KsX2mhKKiPJ1L2jNbs9gDviF2g8mMqZhiB7SQ/80H
-         Cjtgeiqe7QMLxBMi5HbT5+uZpojIDAMiNfQEm3/faI1WzAc3BoEVk+dXKO/x9lNZFbCx
-         dwu9FgQVEj07p1/i9zlAphJ7vcCsSvygL6a9De11EMDRaseIIXOuNxveLDcjVgbKFBpb
-         RhA+EplQkWW8kLWeEAMgQBUPO4Y0YHSs1uSgVGvaf2Es2D6vUw4Mq+/WhHAwJOBRykQk
-         EKiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAz1wMTt8j+kETpuNYQCyYsNS6uL36SBPDYG3PwlujLw5pIPUmkBEQYfpFKq25eGEEeyyTyR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/2CU3pIA8xmgZrE5YIQn3LdkNhaByGM1kHc0IIzqKJiejR7Bd
-	gaEKoV1pMjb9cb4RqKmeF/nAZfhmTj6fleOFXiVsuge8rnDKTzJusBMv
-X-Gm-Gg: AY/fxX5w8yR7BwyQ69Jjr7jrLI5oaPf7UHqbyn0CnszE2dOcIpUTnzS3u/87T7cRgrp
-	g/4V+5Unovm/1X/qCgNErPK58mkyPMfBozk9Byna/gw83seA8IiBegmwG/fXU3+dg9FLPe9vS14
-	AHJqkh6+SATukyGpVejcVD4Fy/KK5R6y/TzR0OMhM1AbriTNiQrxh63x70v7Jlqd3qIir/xCDbz
-	/eTCy2YR9Vxz9n7okm6BOXmt7ytx1i4Pp8NklmwD4soFe8CEAU6SztdarWXeRaU+LaKop48UxFe
-	IAYspwQnTZOvn/enL23mNSnyk571f7AkJF5wHbFrfRgcbM0a7WUKFkIUjIlRj3xQGZK5eHfsZDH
-	JyDcvvoYxXnhBIOOH0vIE+9mjjdHoxpeGlzgpqTBDx8lyEbxCgTY1ltkQ4+Weuzu/Erm5JcgyNa
-	Ta+lu24C0=
-X-Received: by 2002:a17:903:2a90:b0:2a0:9970:13fd with SMTP id d9443c01a7336-2a599e493b5mr54268265ad.43.1768476294546;
-        Thu, 15 Jan 2026 03:24:54 -0800 (PST)
-Received: from 7940hx ([160.187.0.149])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3ba03f9sm248523225ad.0.2026.01.15.03.24.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 03:24:54 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: ast@kernel.org,
-	andrii@kernel.org
-Cc: daniel@iogearbox.net,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	jiang.biao@linux.dev,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v10 12/12] selftests/bpf: test fsession mixed with fentry and fexit
-Date: Thu, 15 Jan 2026 19:22:46 +0800
-Message-ID: <20260115112246.221082-13-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260115112246.221082-1-dongml2@chinatelecom.cn>
-References: <20260115112246.221082-1-dongml2@chinatelecom.cn>
+        d=1e100.net; s=20230601; t=1768476322; x=1769081122;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Daj4mBvKz/orNgYkU+OBGpVjcjRCjHiW0Hdgz6VukRA=;
+        b=dYi/wcYJqpUyVWaxavWPiZUN75aMhfKZTeIbWCMiQ94pqEi7mQlxuloy+7IkJNdUEq
+         Flgv63H0nYGrup9EsSkg5TWfo8IMQZPx+0DTvayDg4+Q3rB8ZHGJYP/077f4++dAeJ19
+         NMslN0IU2PiZCh7+OVdveuurLeSdH2HNXoPc3yg/LBoNMb491BLokVFOy8ExQrnQFHfv
+         SLlVuYA9YM0BGl2haGZsgQBNUhmwhiZ+fYqHLvjH8VQBOSe5VypmH5L4Kckr7YwGL1tE
+         pf0hp+Y+n/nyW+/iVswX4RpU6zSAom4kgj5nfdAFdU2mHRGuhR1iAmiNvp8JUlPJXDJ7
+         f3oA==
+X-Forwarded-Encrypted: i=1; AJvYcCWvo319V1+FAzlSrtWbIq472nE6plMMfojrOSl6OmclMdlxhCec2BRjh6WpPooVr7YvVXDC9Zw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuCxY7wtTuRr5W9OCu+MDje7fF0HAsHwS7ElJN3AoMIW1l2MyG
+	qM59wH3w6nb3XzD8FIIdyppV/2gXraR9jJxrhpXRCyQ3wyKcB3NghFA5a5Hi2NA9IYT8MRJUwum
+	dEqMk31fxzg4StZ5DBVUibIrquj+D849cZop91bZhsXrwSMdGHI+dDCUiHA==
+X-Gm-Gg: AY/fxX5BjR1VxZ2AElWnGSFPMOnV3+x0DiSQPKD5oIfFXaiWWGpKVVkIfMdgPfQ/VHy
+	cIKUedpUz6wbKc+3nEM+FJGmT7E+DDBXErG+ItFEPW2eummF4rxzK0kj0LQLdx0NSJVN/i5jFhZ
+	bqCcQ0DCgVJ/gpgyvVnMDbs+3KjL4BzYohD+lGHRhL9FgQN6d2SMDsX1j54Rr76ydU/ToYPfT3h
+	axDz++5XoZOnbC31SdxX+XxvUrKitGENeVhka0w2NahL/w8JcYvyMtVRLjWydhacVm8TD1YxIKR
+	CAKTxe6rEF5pPKtDArG/tTrQgwAUuE2oXO23i71dBQbaykRmYYov9S2LqwhO+AfaTu02erwhyAZ
+	yvJK5M987/l0W8A==
+X-Received: by 2002:a05:6000:420a:b0:430:fd0f:28fe with SMTP id ffacd0b85a97d-4342c54ace1mr7936676f8f.31.1768476322532;
+        Thu, 15 Jan 2026 03:25:22 -0800 (PST)
+X-Received: by 2002:a05:6000:420a:b0:430:fd0f:28fe with SMTP id ffacd0b85a97d-4342c54ace1mr7936636f8f.31.1768476322080;
+        Thu, 15 Jan 2026 03:25:22 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.128])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af6b2988sm5137976f8f.28.2026.01.15.03.25.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 03:25:21 -0800 (PST)
+Message-ID: <21e77ec4-fa57-4a9f-8d9b-c417fd908ac6@redhat.com>
+Date: Thu, 15 Jan 2026 12:25:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5] net: nfc: nci: Fix parameter validation for packet
+ data
+To: Michael Thalmeier <michael.thalmeier@hale.at>,
+ Deepak Sharma <deepak.sharma.472935@gmail.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon Horman
+ <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Michael Thalmeier <michael@thalmeier.at>, stable@vger.kernel.org
+References: <20260112124819.171028-1-michael.thalmeier@hale.at>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260112124819.171028-1-michael.thalmeier@hale.at>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Test the fsession when it is used together with fentry, fexit.
+On 1/12/26 1:48 PM, Michael Thalmeier wrote:
+> Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
+> packet data") communication with nci nfc chips is not working any more.
+> 
+> The mentioned commit tries to fix access of uninitialized data, but
+> failed to understand that in some cases the data packet is of variable
+> length and can therefore not be compared to the maximum packet length
+> given by the sizeof(struct).
+> 
+> Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet data")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- .../testing/selftests/bpf/progs/fsession_test.c  | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+AFAICS this patch is doing at least 2 separate things:
 
-diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
-index 4e55ca67db46..7f640ddc8905 100644
---- a/tools/testing/selftests/bpf/progs/fsession_test.c
-+++ b/tools/testing/selftests/bpf/progs/fsession_test.c
-@@ -161,3 +161,19 @@ int BPF_PROG(test9, int a, int ret)
- 	test9_exit_result = a == 1 && ret == 2 && *cookie == 0x123456ULL;
- 	return 0;
- }
-+
-+__u64 test10_result = 0;
-+SEC("fexit/bpf_fentry_test1")
-+int BPF_PROG(test10, int a, int ret)
-+{
-+	test10_result = a == 1 && ret == 2;
-+	return 0;
-+}
-+
-+__u64 test11_result = 0;
-+SEC("fentry/bpf_fentry_test1")
-+int BPF_PROG(test11, int a)
-+{
-+	test11_result = a == 1;
-+	return 0;
-+}
--- 
-2.52.0
+- what described above,
+- adding the missing checkes in
+nci_extract_rf_params_nfcf_passive_listen and nci_rf_discover_ntf_packet
+
+the latter is completely not described above and should land in separate
+patch; note that whatever follows the '---' separator will not enter the
+changelog.
+
+> @@ -138,23 +142,49 @@ static int nci_core_conn_intf_error_ntf_packet(struct nci_dev *ndev,
+>  static const __u8 *
+>  nci_extract_rf_params_nfca_passive_poll(struct nci_dev *ndev,
+>  					struct rf_tech_specific_params_nfca_poll *nfca_poll,
+> -					const __u8 *data)
+> +					const __u8 *data, size_t data_len)
+>  {
+> +	/* Check if we have enough data for sens_res (2 bytes) */
+> +	if (data_len < 2)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	nfca_poll->sens_res = __le16_to_cpu(*((__le16 *)data));
+>  	data += 2;
+> +	data_len -= 2;
+> +
+> +	/* Check if we have enough data for nfcid1_len (1 byte) */
+> +	if (data_len < 1)
+> +		return ERR_PTR(-EINVAL);
+>  
+>  	nfca_poll->nfcid1_len = min_t(__u8, *data++, NFC_NFCID1_MAXSIZE);
+> +	data_len--;
+>  
+>  	pr_debug("sens_res 0x%x, nfcid1_len %d\n",
+>  		 nfca_poll->sens_res, nfca_poll->nfcid1_len);
+>  
+> +	/* Check if we have enough data for nfcid1 */
+> +	if (data_len < nfca_poll->nfcid1_len)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	memcpy(nfca_poll->nfcid1, data, nfca_poll->nfcid1_len);
+>  	data += nfca_poll->nfcid1_len;
+> +	data_len -= nfca_poll->nfcid1_len;
+> +
+> +	/* Check if we have enough data for sel_res_len (1 byte) */
+> +	if (data_len < 1)
+> +		return ERR_PTR(-EINVAL);
+>  
+>  	nfca_poll->sel_res_len = *data++;
+> +	data_len--;
+> +
+> +	if (nfca_poll->sel_res_len != 0) {
+> +		/* Check if we have enough data for sel_res (1 byte) */
+> +		if (data_len < 1)
+> +			return ERR_PTR(-EINVAL);
+>  
+> -	if (nfca_poll->sel_res_len != 0)
+>  		nfca_poll->sel_res = *data++;
+> +		data_len--;
+
+Last decrement not needed as data_len is never used afterwards.
+
+> @@ -181,16 +221,32 @@ nci_extract_rf_params_nfcb_passive_poll(struct nci_dev *ndev,
+>  static const __u8 *
+>  nci_extract_rf_params_nfcf_passive_poll(struct nci_dev *ndev,
+>  					struct rf_tech_specific_params_nfcf_poll *nfcf_poll,
+> -					const __u8 *data)
+> +					const __u8 *data, size_t data_len)
+>  {
+> +	/* Check if we have enough data for bit_rate (1 byte) */
+> +	if (data_len < 1)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	nfcf_poll->bit_rate = *data++;
+> +	data_len--;
+> +
+> +	/* Check if we have enough data for sensf_res_len (1 byte) */
+> +	if (data_len < 1)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	nfcf_poll->sensf_res_len = min_t(__u8, *data++, NFC_SENSF_RES_MAXSIZE);
+> +	data_len--;
+>  
+>  	pr_debug("bit_rate %d, sensf_res_len %d\n",
+>  		 nfcf_poll->bit_rate, nfcf_poll->sensf_res_len);
+>  
+> +	/* Check if we have enough data for sensf_res */
+> +	if (data_len < nfcf_poll->sensf_res_len)
+> +		return ERR_PTR(-EINVAL);
+> +
+>  	memcpy(nfcf_poll->sensf_res, data, nfcf_poll->sensf_res_len);
+>  	data += nfcf_poll->sensf_res_len;
+> +	data_len -= nfcf_poll->sensf_res_len;
+
+Same here.
+
+/P
 
 
