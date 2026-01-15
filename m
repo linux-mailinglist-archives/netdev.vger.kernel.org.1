@@ -1,59 +1,76 @@
-Return-Path: <netdev+bounces-250008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5A26D2252A
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 04:40:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58E32D225B0
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 05:11:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 67E4E3004284
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:40:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AADF63021069
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 04:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CB127A92D;
-	Thu, 15 Jan 2026 03:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27B42C027B;
+	Thu, 15 Jan 2026 04:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fjXzblx2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5VlrzLx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D61119005E
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC16EEA8;
+	Thu, 15 Jan 2026 04:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768448447; cv=none; b=bfB/4cOU/SAS0f/VoSXzQCWXrg9P5MSqzICJQTmB/ZxbiLr8e96tlNxmO3g5ZHG7hjb1CtPuU/r/Bne50mAE3qp5us3ezfzdtW0NIbYIanxrI2bjQJcJt1FXi7hxugo4cxyHAhPvb7o+3wMBLPCK743p1+NLnPfTFaL+M2MeJ+Q=
+	t=1768450295; cv=none; b=o8otknYNqX9qR+qcLUfwS/8iqbZNgFJN4VsliboE8I/2I+D9LXFW84JIJzPQ8hI/0NFWc+MPBjYWu2BMKSmRGkt4Asf1rf6mEinTHpm1a15okprFlJ3a8Q250nNU6qjtm6JF/mdX8YNMueCfR5AaxtNErkcXsPDVeHJWAL0iTAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768448447; c=relaxed/simple;
-	bh=hDBGVTyt4F8UY7TLWnOaX0uq6tkYegGp+x5a8VYBpqQ=;
+	s=arc-20240116; t=1768450295; c=relaxed/simple;
+	bh=bVEzf1YEsVmAfpl4RGUDHiheNnPIShSLYxhFE64NKhc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mcUh5VNctgCwcmTU+/K2CsXxmw83GoXXBLhDTF+akE3Ob/0GFKXDH+7jUzlMTcux2ZkuFGlQDc4lfVvh/iJ7Ewa77Hfxocm1MrjYl/DbVVmEgTEcDEUIgcKAg6ULSMU0ftT99lGbNXleutiNlXvGMEAKBnY7ix/6XS85GTF/mLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fjXzblx2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A225C4CEF7;
-	Thu, 15 Jan 2026 03:40:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TATyXte5zLB1NuLf2PUBMVIkP/DXs1c7rnZeV2mu8gEry8nPQQyIP43FYmwD4pdZB1He9N/PejWobECT5ch0D7zYHfJ8vLA467bJoGHhQDcrB0u/c5rXELkgzCtW/a3bVHzPxz5cyE99XO397A+/I/JFWmXQldJISlACw1eTy1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5VlrzLx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2D57C116D0;
+	Thu, 15 Jan 2026 04:11:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768448446;
-	bh=hDBGVTyt4F8UY7TLWnOaX0uq6tkYegGp+x5a8VYBpqQ=;
+	s=k20201202; t=1768450295;
+	bh=bVEzf1YEsVmAfpl4RGUDHiheNnPIShSLYxhFE64NKhc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fjXzblx2fpekphJSXRFO3b18HOOp9wcWsPfaYI02f3faqGKWwvvfCwzsmvs+AhZxs
-	 NOv1LnFsXZHhvMnZjCNpxrAFV5ItuiaAkGdbdAtbyszlraW82MvMJGKClv0l8sL2/v
-	 5z08RTZQ3OpJZi9ybjLsHfwhX1xMyYA/azZvjw/wE9YGgGegk4Fdx4NTsvqNhP6AO2
-	 s4VkzM6vZ9ZVRJXXOU/dtP8lkSj4AI5HmqJ+4wBhb3FPU8qUOb5yi0Gf0AC5+tma54
-	 zhwwS2B6VP8fUI0kAF2YV20lsbJz31bWSaeLChRiJikmpl7qhOubOamn+gxDHdGHMK
-	 imtofVjjzu5tA==
-Date: Wed, 14 Jan 2026 19:40:45 -0800
+	b=G5VlrzLxRqLvfO0lhVUQKX8RVuAclYZ5DXQW7V6v8UY1VB+zXZ0jOoOWx2dE4JBlR
+	 YmuFXwgwKHpEcP2Mgf9iRNx/qHDFcIrxg2DXAVoNdvJRU6+8dFIDFa9XIEl3L1Etpu
+	 iXoVBMS36ls72qM3pQwkzYGvdAYIdPx5ooQcBReJpU133MXyakTc889hjeo0EMd/co
+	 ldHtVOlAVKgstTehtAEfbsdRXPTtxUbCh+h0TcxBF5v1gQNcEEodAx6pnTNNjQwRp/
+	 hHqHkqWJRgBrlBYKWDqTyAC+5nM1c22pJZn5nfMoySkYLoba9cjTB1caGm9WEw7Tqt
+	 rSSTlg480f5gw==
+Date: Wed, 14 Jan 2026 20:11:33 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Tom Herbert
- <therbert@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net 2/2] fou: Don't allow 0 for FOU_ATTR_IPPROTO.
-Message-ID: <20260114194045.2916ef4e@kernel.org>
-In-Reply-To: <CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
-References: <20260112200736.1884171-1-kuniyu@google.com>
-	<20260112200736.1884171-3-kuniyu@google.com>
-	<20260113191122.1d0f3ec4@kernel.org>
-	<CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+Cc: "pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
+ <edumazet@google.com>, "parav@nvidia.com" <parav@nvidia.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "corbet@lwn.net"
+ <corbet@lwn.net>, "horms@kernel.org" <horms@kernel.org>,
+ "dsahern@kernel.org" <dsahern@kernel.org>, "kuniyu@google.com"
+ <kuniyu@google.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dave.taht@gmail.com"
+ <dave.taht@gmail.com>, "jhs@mojatatu.com" <jhs@mojatatu.com>,
+ "stephen@networkplumber.org" <stephen@networkplumber.org>,
+ "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
+ <donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
+ "liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
+ <shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+ "ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+ <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+ <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+ <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+ <mirja.kuehlewind@ericsson.com>, cheshire <cheshire@apple.com>,
+ "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+ <Jason_Livingood@comcast.com>, Vidhi Goel <vidhi_goel@apple.com>
+Subject: Re: [PATCH v2 net-next 0/1] AccECN packetdrill selftest series
+Message-ID: <20260114201133.710abe3c@kernel.org>
+In-Reply-To: <PAXPR07MB7984E23DB685074239202CA8A38FA@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20260114162915.94820-1-chia-yu.chang@nokia-bell-labs.com>
+	<20260114151346.734001ac@kernel.org>
+	<PAXPR07MB7984E23DB685074239202CA8A38FA@PAXPR07MB7984.eurprd07.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,39 +80,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Jan 2026 23:15:42 -0800 Kuniyuki Iwashima wrote:
-> Btw I needed the change below to generate the diff above
-> by "./tools/net/ynl/ynl-regen.sh -f".  Maybe depending on
+On Wed, 14 Jan 2026 23:25:59 +0000 Chia-Yu Chang (Nokia) wrote:
+> > Missing your own SoB on the patch, but also -- are these supposed to pass without the kernel patches? Without going back to check Paolo's message my understanding was that you'd repost this as patch 15 of the kernel series.
+> > 
+> > On the packetdrill side -- is PR #61 the code we need merged?
+> > Doesn't seem like it. Could you please clean that part up and start the review process?  
 > 
-> 
-> diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
-> index 81b4ecd891006..fda5fe24cfd47 100755
-> --- a/tools/net/ynl/ynl-regen.sh
-> +++ b/tools/net/ynl/ynl-regen.sh
-> @@ -29,9 +29,9 @@ for f in $files; do
->   continue
->      fi
-> 
-> -    echo -e "\tGEN ${params[2]}\t$f"
-> -    $TOOL --cmp-out --mode ${params[2]} --${params[3]} \
-> -   --spec $KDIR/${params[0]} $args -o $f
-> +    echo -e "\tGEN ${params[5]}\t$f"
-> +    $TOOL --cmp-out --mode ${params[4]} --${params[5]} \
-> +   --spec $KDIR/${params[1]} $args -o $f
->  done
-> 
->  popd >>/dev/null
-> 
-> 
-> fwiw, $params were like
-> 
-> 3- Documentation/netlink/specs/fou.yaml
-> 4: YNL-GEN kernel source
-> --
-> 3- Documentation/netlink/specs/fou.yaml
-> 4: YNL-GEN kernel header
+> Thanks, I will add my own SoB in the next version.
+> This patch can NOT pass without the last kernel patch; shall I merge
+> this series into that kernel series? If yes, I will submit v8 on that
+> series and add this patch as the last one.
 
-Hm, I guess you have grep.lineNumber enabled in your git config?
-Could you see if tossing --no-line-number into the git grep
-in this script fixes it for you and if yes send a patch?
+Yes, please.
+
+> On the packetdrill, the used packetdrill is commit
+> 6f2116af6b7e1936a53e80ab31b77f74abda1aaa of the branch:
+> https://github.com/minuscat/packetdrill_accecn Shall I create PR? Or
+> above info is ok for merging into packetdrill.
+
+Please create a PR and let's give Neal a couple of days to look thru it.
+We don't need the packetdrill side to be fully merged upstream but
+I'd love some indication that it's not going to take long because
+we need to manually manage the packetdrill build if it's not upstream.
 
