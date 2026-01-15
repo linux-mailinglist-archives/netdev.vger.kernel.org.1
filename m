@@ -1,140 +1,95 @@
-Return-Path: <netdev+bounces-250183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100E5D24810
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 13:32:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E29BD24927
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 13:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ABAF4302DC9B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:30:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 92BAC30C9E75
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93044399A6D;
-	Thu, 15 Jan 2026 12:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EE9394473;
+	Thu, 15 Jan 2026 12:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YWoqPUwR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hkpLqDSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463DD28469A
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4E718DB01
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768480185; cv=none; b=uausEYmkymRpRb8KcmzbxR4I3puF2xgtvULOJ5+y5YfqC8Q3MltLxlh91BwhL1hYNEk91Yr1umdTPIITNTDx2NEopqxfqDlPPef/LlIKQmHF2JBUPeOVlXtmnV0sT/Dx05Y0DTeVoL+Z/PlbMAbtoNFN55Gu9bv1KIT2q4ZX/y0=
+	t=1768480298; cv=none; b=Afkx9ric4LdW1j94uk0ODZ7lfIx8dyt51hdYYCBnQ+s+WbR7ryAzLz9GWy0VsNI2hG6sWN9WIK4/mafu4PeH6H6a5v8/31g3Ro6pGljiWsfKNTJh+B7eA+7gN+8sl0YaLX/YpujuxOR+AzocVnDZnqcQCYSEGDogUFdk05HVaVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768480185; c=relaxed/simple;
-	bh=vYsdvT7Esg+O4+yVXNphLK0YKxhLuEHhcRTW8Mb/9K8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSJsIEKoG8fhNss0Bzuyrohq2Dg1X74hwzRFzZKCrIxvjPtYdmf+swm6KqK8UyTUl8irIr5NbgzmQYLd87XTvD3nsa+vMKoEUKGB+o9eXoEC+pBcSIthh4LDZEOzKxRO2wGsDyPWEUUxm5APF+cHmOBxDWx4LyHf0pGaWl1uBsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YWoqPUwR; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47d59da3d81so8025355e9.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 04:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768480181; x=1769084981; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ld+As4KXLNBvjLuNePKBkF4h3CZ3gGNkmAsVzP6KebE=;
-        b=YWoqPUwRhFjDNetwPJSdKBHF/sh7S1EgP7tlt+wR//RGEkO9N4XmFTkKsELsXCN+Wh
-         tAaa3ENOSjTUpPILgZg/y++6goGL+uSgamekIXw8LmEugXqkm+977/byxDPFL1eoqlch
-         cGOXGBs3zphBNNZNyLq/ZN0EehjhFZAUYOQqw+DHgPeteIljG+U4TPt1rzkLOeMvmZ27
-         1O7Yw5joixwU3lRrqJFdpDK0eX4HermI+x+n3JLmTrJSvtJqL+AZ+HvmrKi9QhTt/+v6
-         TP50tRwd+Z2mmYQDTI3Bo6Q51iA8Biw9ePX1ylXoopdCQ6oTxMlph+beE7QlfFLDppB4
-         0k0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768480181; x=1769084981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ld+As4KXLNBvjLuNePKBkF4h3CZ3gGNkmAsVzP6KebE=;
-        b=vhSnFxtXkh0s6znK7ORwO0ZP0kB6hFuOxyPk5+D3L8KRfKqs+EMtlItQN57dm5lfes
-         9kGy29oFFm+gol7mTJZdw7xvHS+K9yCDdFuf4+O/2dJwHf4o5mppJKquNry8JTonTgBv
-         7GBv/Nli6hf965piQSAO+ZHfGoPeEJ6OTkt571gum6VfAzJ+5LkllCV/HeLVW4ywtEx5
-         1KAu8wE0xDWXmO7ojvnWtN0sg7arI6UVWYixBtnlKN4SnhrZbGRwm/qHww5w49vWPmbX
-         gxU9ImGWZoW5shCWE068vim92Fz2gXnxQqCeqnzNRDmg6Nt0bkwI1ldy/fYGau085/Fq
-         o5zw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6AT0AX8xIBKGzlvBdwtQmSfKLpZ1U1gv+/hEjPQFRZPojCtPpWfOofKsTf04GssTHjj5d9bA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+3MQWCZaCuI6l0BartG+XbI8YfIFCaeYRpJpjk7BXhK3fjo7d
-	+vnFYsXpbse5lR41R6VSvYgdeWX1HfNpw73YzmcRwYbLN4nVWhUvlquhAXiVPZFA3us=
-X-Gm-Gg: AY/fxX77CGNC4ra/I7SfprjiZTX1tiVYoLTFkoV9D1TtNxKlqdLJLDQxGroxrvvHJsN
-	E5XXB7PCUp/JvFr5aCUg8f/95asZJW4vuhtszps3cyA5l05H8KdgeZplBGuE6xH325TOsPz1VRE
-	pvwMb88i0tkQ7vcuLol5oqSigwBiTwPzvBHa/N/shM/cJqcoKgXIt/liYe5UqLINbxFhAX4IINz
-	kwOb/xwQCScNo0lWB1UnjI6WY9rErclGmktImz7KQST3PKIVApmluCoyPdVGNvuraMmPJpSgiUz
-	BINAQmKSn3WuaEexoNBjQqug4OBbphTtcD1IABtGdaYCTsifbGzYIADmcQ7W5zeoxbZjx0Zdulz
-	zUmuKsnIp/kLyjJXYZzedchxawg0+SOdpPgpT8a40UUsbXvp5ExSy+z5NQ394rfGcUw9oRRcCwF
-	1U3qfPXCvJSzzbAg==
-X-Received: by 2002:a05:6000:420a:b0:42f:f627:3a88 with SMTP id ffacd0b85a97d-434ce7324b4mr3823468f8f.4.1768480180633;
-        Thu, 15 Jan 2026 04:29:40 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af653576sm5965022f8f.17.2026.01.15.04.29.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 04:29:40 -0800 (PST)
-Date: Thu, 15 Jan 2026 13:29:37 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>, linux-um@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
-	linux-serial@vger.kernel.org, netdev@vger.kernel.org,
-	linux-m68k@lists.linux-m68k.org, linux-hardening@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 14/19] drivers: hwtracing: stm: console.c: Migrate to
- register_console_force helper
-Message-ID: <aWjdsbYev_5zfKEC@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-14-21a291bcf197@suse.com>
+	s=arc-20240116; t=1768480298; c=relaxed/simple;
+	bh=iWRr1IbTjdrMOyK8HbQJ38WOEF5iGghTXvLQUmBJoe0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EofryYi7dVobPY//0NXLq0MhkAzV2AzO1izPQafxw4hTX7w0zOgS5fobSOZbzWo8fX2xpMqaimVQG20610xKfu6unBSocZelVesAeQ/vT0W9Il8s2shI44B25oEl4/ZcZXE+6SAhIDl7QikYPRk5eA9zXk7/KBQCYF/w/DqkofI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hkpLqDSq; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c548e847-ec4a-4aeb-99c0-c48342a21a11@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768480294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IXYbi4jjWeT6ITpty2L/OMrvhreUneAGlfUb7ET8lXY=;
+	b=hkpLqDSqzfUE0QO57bw2slPOZnksrVcB65nwaQPORurnU81L1e6TJFr1deGE3ZHSCIjERS
+	p98NDO1QMBquIM7At+n6sa0OThNr2uB0gQKe5erAy9ToS9gIECUYh788bb458NqZdBfDYC
+	ucw+kyofY2FUyBOKQd3CKD875n3gpAM=
+Date: Thu, 15 Jan 2026 12:31:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-14-21a291bcf197@suse.com>
+Subject: Re: [PATCH net-next 1/2] net: remove legacy way to get/set HW
+ timestamp config
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org
+References: <20260114224414.1225788-1-vadim.fedorenko@linux.dev>
+ <20260115125815.299accc6@kmaincent-XPS-13-7390>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260115125815.299accc6@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat 2025-12-27 09:16:21, Marcos Paulo de Souza wrote:
-> The register_console_force function was introduced to register consoles
-> even on the presence of default consoles, replacing the CON_ENABLE flag
-> that was forcing the same behavior.
+On 15/01/2026 11:58, Kory Maincent wrote:
+> On Wed, 14 Jan 2026 22:44:13 +0000
+> Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 > 
-> No functional changes.
+>> With all drivers converted to use ndo_hwstamp callbacks the legacy way
+>> can be removed, marking ioctl interface as deprecated.
 > 
-> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
+> Thanks for all this work converting drivers to ndo_hwtstamp!
+> 
+> Maybe you can also remove this:
+> https://elixir.bootlin.com/linux/v6.19-rc5/source/drivers/infiniband/ulp/ipoib/ipoib_main.c#L1834
 
-LGTM, nice cleanup!
+Hmm... looks like left-over from the drivers cleaning part. I'll remove
+it in next version.
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+> 
+> And in the driver development part of the documentation to avoid any new driver
+> with it:
+> https://elixir.bootlin.com/linux/v6.19-rc5/source/Documentation/networking/timestamping.rst#L630
 
-Best Regards,
-Petr
+Good point, I'll adjust it in v2!
+
+Thanks!
+
+> 
+> Regards,
+
 
