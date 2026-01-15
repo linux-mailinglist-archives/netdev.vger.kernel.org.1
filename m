@@ -1,170 +1,140 @@
-Return-Path: <netdev+bounces-250164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC6ED246FC
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 13:23:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40759D2473B
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 13:26:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 885523004ECF
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:23:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D3F35300AFC8
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90E2393DEE;
-	Thu, 15 Jan 2026 12:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC79396D0B;
+	Thu, 15 Jan 2026 12:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dJ4uEcSQ"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AavSW8zD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B605838A9AB;
-	Thu, 15 Jan 2026 12:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8623537418B
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768479792; cv=none; b=RhCMkof2++KouQ2nNUGGa2xvNgSuX22b7C4t9WmArpkkdh9xT0/V/fkjc7t1SouD+bUb2z6STokKwmmjI6C/UHFaGSPHV4F5GajBEa0pXFAoMo9wxRr9kSl0nL/I4KGsFdK6VO9OGzNeTrrXDNE5GLRSxOGmlvMl7zgFH7KGshY=
+	t=1768479892; cv=none; b=tCZuP+ADAWDw3vBGVY5SpVRWoIzY4jxLkQVhd4PQlc4lkHXoKeXb3Te8Gmxbo1SqJyffl3vqoUNXlunK9wQ+ndTn7o0X0SpylOvqlp9v/muXZt1kvSGAEdIHYvpfrdlUO2cEd/9vPP+oGtqKqqHV5K/f8I6bkW8HwWGqlsmQS3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768479792; c=relaxed/simple;
-	bh=ZMEYK47BrOyJGKV5630tH7EVWhmlchg1ygi5vcWhQfo=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=IA48K5+OaXAM2WuBTi/7zHQjWBwByKipBdY8isBoVyfBpuzPAvN2pB1lUtSp5GK665ELD6SfKMx1jjOftmQAAJRxAysOM3Sj7pyTg4tCr9DZuQL4lG73tOiajQfEZEV22hmwYqUeOf7XnhvUaH7KCX2XD1lFZ+zywThQS7wfk1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dJ4uEcSQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30A93C116D0;
-	Thu, 15 Jan 2026 12:23:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768479792;
-	bh=ZMEYK47BrOyJGKV5630tH7EVWhmlchg1ygi5vcWhQfo=;
-	h=Subject:From:To:Cc:Date:From;
-	b=dJ4uEcSQwshSKla8C7v9CFLU/Y3Ve5YWg59pfX/APy7foMLST1tHc6Eb01szMpxjK
-	 jWfDde/7Fsh4ceYiVazDO78bFUgGsyILBnXPy+GLp4Ft4EbmZRIzglfiIHyopyr9TN
-	 g4bWgSuC71rMI9bDta+gPWPD/h4N2FMYROilt0m4FzwtGgA2MwEC3QB5ej9KGXeM7y
-	 W92o3NKoFysDwZm7UA2FYqIxo3HS3NEbRicic87V5W/K0Ns3FgdCnFTesWK7rnaixL
-	 kx1Mkhh0u4tdXue+f+lTYi74FVmlGvHd4c+lJ9YjW9ivID8F/ZARRRbec6RgvPN98N
-	 S7nWGhVaEEKuw==
-Subject: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons for
- monitoring
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- carges@cloudflare.com, kernel-team@cloudflare.com
-Date: Thu, 15 Jan 2026 13:23:07 +0100
-Message-ID: <176847978787.939583.16722243649193888625.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1768479892; c=relaxed/simple;
+	bh=L1TTyH0HQfm7i7n+eqeYhrSGiuwmELmvtw7QQ3GNH2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5KDSZEgGmcqXKEdUYKMcWRyC6OEEbJVGtLWpci+YLnH+en1s4J9zqd2ODz5LCqi/ZUfzRx31DVc3tOePMtmtStaub/7LLMVf4miHmaKZR4zI2dyuIz0LS0yo3VRTKYBaa/WXNxffrcWFmWBUbSi4c/welYx1+FcK7sxl76ibzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AavSW8zD; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-430f57cd471so530319f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 04:24:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1768479883; x=1769084683; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jS491F7pY/6VV44vwrzsFaAyA9RjAqjEAkamZCNInAE=;
+        b=AavSW8zDa7wyUQOrKCsE5mEiLhCbCgtNLUJDLiygsCIz5MtcNfL5qg5hmiFSH/hnLF
+         dY1NM5kxU9pSW9DgohxUfSzAVt+iLYuHkRY/WkdFE1XVmgvI8pljiAwerID8UL6g7PU/
+         eolJwYFX6Yj0B7yZch1EvVk8qqbK6y7rtIhghbakTGjeNT0IeZm0hOjwyUU0ncWi7Ohd
+         fORx/nYcwlXu0aeT6z2nysNJs2vxMwjVnQi03RkyIvPvmebQbr0uJa/GOMbQXodXURQ6
+         +ZErOfCH6CKBneuJM1DXIQJeb7qxioDN+X5ZyEYo1486PL/QTstgRmV32S5n4c6fMV9G
+         3dqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768479883; x=1769084683;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jS491F7pY/6VV44vwrzsFaAyA9RjAqjEAkamZCNInAE=;
+        b=rDU/HDkLqcpIs4W82cTZpuLw0w8e6eZZY9N+CekFo8IyTUcJgxdBxdRU5fRKo21F0l
+         oo1B8NlMJdUA89n1amzeGGuOUuAPs/SrwocrKVFCrdSYk7fUmGzdkThHsZPTCBb3y+U3
+         f/AHiGmJ3ZOt90Jewn6n1Sfm/TESHLN3nuPSnKVWGfTSqsKXe2XYPknSsjqF4ypXmfK4
+         tzrBNU4Dg0Ctnw7T06S6KXLYz4aHMLn7uHTwhLaUe0y36ykrPmlTf2RlPWseAo4Ln6A5
+         VjmVvzXFPH7w1T+z6pSUTK2+zyaIhqOpeHy1O5Q6QX1B5Vnr8TvbivTLapl+yq0KY/7u
+         pyoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW10NEzWhsus6omVBuv4Hzww9kp3q/GFzKO+AW4+ivCoHgcmMdoKUGLhaKKBAYwgoR+gOELAtY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYtMYf1Lf5Uc4q1S2tJTutThl1BvnXVJfHx3n1nrJ+XcAKiWgx
+	Noh4/L0WjhkCWAAlOj9lNi2dra6cvisswfmrS8uMnQhi39OSxKnS9eiIhqlwoDr7fGk=
+X-Gm-Gg: AY/fxX4sgSMMEuSXbKgmblONh3gqZAcJ98HUk1XCECPS1Dftr5Mz6BZJHbX8FkjsOMx
+	x9zBkVwIsp9F7egfU/aqVNWfwe/QDBF8wZ1HzfTZXw68GMsJP7MZFdrNbHryL1Tk2SIPlCb18/1
+	WcdpyDx8rDHN8LWso4Qtb+PxEQy1BhImFk6mkJ2nyFZgk1IG80AKXvVrdiDWeDy0B6lsyOwdhEx
+	9GwL1MIi2ZMo47tvhepORvQw6V0Q+XRHb+kAmfDjf3PtTcfcg34lg49l2TgEdD0Gf2d2nRYtrNX
+	pXooixILdHrGrtlVab2LFbR1kIzRPLzfKg0X1xO1tuorSLzPh5UDz58oxGl06pB9nyZmIRI7IHR
+	DrmWJj90lk4fVO4HpGohUz6AJIMmQnfBFcnuoxQGeKILa+9BlrcY/x6l4yxvrKXVs1vEPm44kuu
+	6jt9ZppDf7ILftuA==
+X-Received: by 2002:a05:6000:1789:b0:432:5c43:64 with SMTP id ffacd0b85a97d-4342c547aa9mr7495008f8f.41.1768479882771;
+        Thu, 15 Jan 2026 04:24:42 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af64a650sm5653238f8f.4.2026.01.15.04.24.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 04:24:42 -0800 (PST)
+Date: Thu, 15 Jan 2026 13:24:39 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Marcos Paulo de Souza <mpdesouza@suse.com>
+Cc: Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jason Wessel <jason.wessel@windriver.com>,
+	Daniel Thompson <danielt@kernel.org>,
+	Douglas Anderson <dianders@chromium.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>, linux-um@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+	linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+	linux-m68k@lists.linux-m68k.org, linux-hardening@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, sparclinux@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 13/19] um: drivers: mconsole_kern.c: Migrate to
+ register_console_force helper
+Message-ID: <aWjch-EcYm7tkF0t@pathway.suse.cz>
+References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+ <20251227-printk-cleanup-part3-v1-13-21a291bcf197@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251227-printk-cleanup-part3-v1-13-21a291bcf197@suse.com>
 
-Add specific drop reasons to SFQ qdisc to improve packet drop observability
-and monitoring capabilities. This change replaces generic qdisc_drop()
-calls with qdisc_drop_reason() to provide granular metrics about different
-drop scenarios in production environments.
+On Sat 2025-12-27 09:16:20, Marcos Paulo de Souza wrote:
+> The register_console_force function was introduced to register consoles
+> even on the presence of default consoles, replacing the CON_ENABLE flag
+> that was forcing the same behavior.
+> 
+> No functional changes.
+> 
+> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
 
-Two new drop reasons are introduced:
+LGTM, nice cleanup!
 
-- SKB_DROP_REASON_QDISC_MAXFLOWS: Used when a new flow cannot be created
-  because the maximum number of flows (flows parameter) has been
-  reached and no free flow slots are available.
+Reviewed-by: Petr Mladek <pmladek@suse.com>
 
-- SKB_DROP_REASON_QDISC_MAXDEPTH: Used when a flow's queue length exceeds
-  the per-flow depth limit (depth parameter), triggering either tail drop
-  or head drop depending on headdrop configuration.
-
-The existing SKB_DROP_REASON_QDISC_OVERLIMIT is used in sfq_drop() when
-the overall qdisc limit is exceeded and packets are dropped from the
-longest queue.
-
-These detailed drop reasons enable production monitoring systems to
-distinguish between different SFQ drop scenarios and generate specific
-metrics for:
-- Flow table exhaustion (flows exceeded)
-- Per-flow congestion (depth limit exceeded)
-- Global qdisc congestion (overall limit exceeded)
-
-This granular visibility allows operators to identify issues related
-to traffic patterns, and optimize SFQ configuration based on
-real-world drop patterns.
-
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- include/net/dropreason-core.h |   12 ++++++++++++
- net/sched/sch_sfq.c           |    8 ++++----
- 2 files changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 58d91ccc56e0..e395d0ff9904 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -69,6 +69,8 @@
- 	FN(QDISC_DROP)			\
- 	FN(QDISC_OVERLIMIT)		\
- 	FN(QDISC_CONGESTED)		\
-+	FN(QDISC_MAXFLOWS)		\
-+	FN(QDISC_MAXDEPTH)		\
- 	FN(CAKE_FLOOD)			\
- 	FN(FQ_BAND_LIMIT)		\
- 	FN(FQ_HORIZON_LIMIT)		\
-@@ -384,6 +386,16 @@ enum skb_drop_reason {
- 	 * due to congestion.
- 	 */
- 	SKB_DROP_REASON_QDISC_CONGESTED,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_MAXFLOWS: dropped by qdisc when the maximum
-+	 * number of flows is exceeded.
-+	 */
-+	SKB_DROP_REASON_QDISC_MAXFLOWS,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_MAXDEPTH: dropped by qdisc when a flow
-+	 * exceeds its maximum queue depth limit.
-+	 */
-+	SKB_DROP_REASON_QDISC_MAXDEPTH,
- 	/**
- 	 * @SKB_DROP_REASON_CAKE_FLOOD: dropped by the flood protection part of
- 	 * CAKE qdisc AQM algorithm (BLUE).
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 96eb2f122973..e91d74127600 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -302,7 +302,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
--		qdisc_drop(skb, sch, to_free);
-+		qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 		return len;
- 	}
- 
-@@ -363,7 +363,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (x == SFQ_EMPTY_SLOT) {
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_MAXFLOWS);
- 		q->ht[hash] = x;
- 		slot = &q->slots[x];
- 		slot->hash = hash;
-@@ -420,14 +420,14 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (slot->qlen >= q->maxdepth) {
- congestion_drop:
- 		if (!sfq_headdrop(q))
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_MAXDEPTH);
- 
- 		/* We know we have at least one packet in queue */
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
- 		slot->backlog -= delta;
--		qdisc_drop(head, sch, to_free);
-+		qdisc_drop_reason(head, sch, to_free, SKB_DROP_REASON_QDISC_MAXDEPTH);
- 
- 		slot_queue_add(slot, skb);
- 		qdisc_tree_reduce_backlog(sch, 0, delta);
-
-
+Best Regards,
+Petr
 
