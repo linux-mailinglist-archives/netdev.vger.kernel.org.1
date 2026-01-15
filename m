@@ -1,140 +1,121 @@
-Return-Path: <netdev+bounces-250045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D173D23388
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:44:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E070D23448
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C024D30188C0
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:34:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1AC830C6645
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BF53375C3;
-	Thu, 15 Jan 2026 08:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A472230C63A;
+	Thu, 15 Jan 2026 08:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KJkXYCV9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gq8nLFyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83DE334370
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 08:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2306133DEF0
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 08:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768466042; cv=none; b=jD/AQhJ3Kr2dRQSaxiaGpvqD7m1vue+nyNvfwW2Wq1kYG5eMSlHZ8rZszaSWxkg9nJtDLyMJqxWPQB5t8HLoCrw3Dskbl50hOfhdonctQm3PdWmPIUjTK77Iaj/dxjN+enak+tiXOSj480P8mvxejHuU1u1CeYhUpE2r/hU9hdw=
+	t=1768466954; cv=none; b=SeV9uToKXj/bY0l4XY9RN0S2NDYMGDq3aOv8wVou8FvPUpGR88kXcN0UmPh1WwrgXoVavchPSAh3oawRKHCJ/8fo1M0HzQDH7OdrxwbM0HsCSBhe5r3dp4NQMxWki2BKt21bFHnuHLNzO5dqk3AMpgfFy66KEEGu+GsS4Oc/vzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768466042; c=relaxed/simple;
-	bh=2EKJYAPuzH7oKPGpx9c+rZgCTn1LKzT+k+fkIG/FR1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QbCAJEbcT5fbH5HwCa0QFwz9Ha891qAwMaRutDb+VbeaGzGd/HDxfMb46S0F9bKZqc1QqlzfNZHP4NW4vRkVka+fsIGtkU7mUsZkfzWuO1W11YTqYoxdITe3jqoVa/rBT2JIcQPehIJc5iYk0DsW+3ifgUFP/8Rtv8JrLD8z/Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KJkXYCV9; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768466038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bw7DDQX/ZM5AiYqMY7G1eGZ2tEpOcpxd1X3KkINTp4I=;
-	b=KJkXYCV9H069dK/Agq+oqiQrHE888vQDRueMyeNIq9PRKUxqnsXOUvrMqbw5MZCTgcjfPv
-	kLEAXhMG9+veX1lIfiSTDNvys1HnOONq4STvTmhkB3SJrGi6Hq69odDTTKLcavlA/6oDHF
-	SbZqZgFbRCcXspUuANHLVlXNmW6JcWQ=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- andrii@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v9 01/11] bpf: add fsession support
-Date: Thu, 15 Jan 2026 16:33:42 +0800
-Message-ID: <13928754.uLZWGnKmhe@7940hx>
-In-Reply-To:
- <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
-References:
- <20260110141115.537055-1-dongml2@chinatelecom.cn> <3026834.e9J7NaK4W3@7940hx>
- <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
+	s=arc-20240116; t=1768466954; c=relaxed/simple;
+	bh=mcl3xK17r1J/Hcw3rWvyw7z0s1rU1GCdvZrvuwnTmTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VgOp1gAEi0PKTfTMFfNZ/ZaRX/p8mJD+TXirluRtVEBbMpdo3UE8TkyrHJ5P9jYyhW33ggjT30YIs2gJQU0RFv+0i9X07zi5uhfn+M0m+bLPhvX3/Bj2xzeD8B5KB03DHFAD1M+5CnSlZStvAvbGDyKCx62Lbv83WvzIXx+xQEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gq8nLFyC; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a0d0788adaso4525885ad.3
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 00:49:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768466952; x=1769071752; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=edU6xkXjAjWZJykGFUAvi4D1HZcCJChoYmvCxl8CEyU=;
+        b=gq8nLFyCinZjXkxuFpRnZGfKZoXiU8OciNqHVEASb1zGnbRjoFbn2USsV/+j6Qv9Iu
+         K2SWT9c7gC6DS47KJX2evLSwoj6cNn7W3KkiJOKFi+04sbWc+KiyKhPMRa5LGP924eel
+         lCxQZqj9dL7e9Az1aoXn16FjibVAp27xjxHq5zoB/YY1rENm2H5/NqbHyXBEvjAcgERE
+         jKMsVaYCQbQO4JegBTF/lkfjdSjtd3mJ+HwaZNA3+ciB2TQrzfq2JovnE0NQjvj0ownh
+         36kCv333i+Wcw0P7SPGyFPnZ5B3VCalmnOuJd8FgJ30sJFIM74gXru565dmfUSrOocvN
+         Ip2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768466952; x=1769071752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=edU6xkXjAjWZJykGFUAvi4D1HZcCJChoYmvCxl8CEyU=;
+        b=V2zfxu78vEMmrvrpJW0rb2nBOhtKPqrIXa0rLGVMwi5gKOZm7Susg9Gkc3Ucc5JHTx
+         dMPqfxwHip2c6+SHDP5oKcR/YWgUkrqyJuBQYQUZfdn6Grwkv+3Iv4WAV64pWc51rUj4
+         XPCalKdUapRmh/+F3NpC5gmmoIVsB0jQPB9gTWcJUCHngCUyAdrhHYZ2cWQ0cFkJjEP7
+         0q+HmYZzq3ImCZ1Jndcy0KvK9Spi0GMy1RMgtdcm5UJpJ5g7D10jed04EKCAXUueDyH6
+         M7e/CEJyl7l5CZNzVNuluOgTJUE9X5HCeBzyZTKb+33biegMk5htHfzt3UKRr9MYUWcj
+         DVVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUOnkpH5nneu5rTvC60iCTdqcbeRVGk3SO4PN1LunkSXa9pud5uDx/8CpMfuGHdUFarzxOCNdA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvM/NB3qxypHSpe0AuB+hEJuNuzO/YmwBDA96sgAvCfhJ1IvlN
+	l2KFeJclIueR4tVWvH62n/O1t8T5z2cyrV0v3xnWjc+UyXcVT81jQfHq
+X-Gm-Gg: AY/fxX5FAfV6mu9bzP+sMNtlOSoGzdnqfLIDQ+1Zs/W3WoJdJpFCv3TqcXCiw6t/855
+	zmsCHIcvO8UZtZYnYpA/RpCEoPlhqDv0bzuk4AFI9BXoyrgIB/sPU7J5T6izrffpJuXnzIRx0g5
+	E9Ii+SQoYo3tRwG//IBc70eWTxDOMQT4tsnhFqnju/ahmqYQT0kkOd3nsCPxYl5u/J5ZLzW7Ogt
+	BZby3MTgWudS48FKDRzHAta1HOSCSABbQNYsRkrByRroM3iR6/IHwVbmFeIT41YSSFwCdYzl7Ty
+	KQE/6atPqeM90IMR+r0sW+bgWL2e0Q1a95YQKaUcPssdzmAyfkVLjiwyUeKfMSgbTyH/MjAKpKx
+	BO2clBjOavGXDAQJ00IJv9jJ3OrlJerKqmvDWaafGamhp9bti3uWSSMp8LKOJn0ZYrgBlJY3H8h
+	bFPoFmsx4fkWGCegQOxsjrV5U=
+X-Received: by 2002:a17:902:e551:b0:2a3:1b33:ae30 with SMTP id d9443c01a7336-2a599e3df46mr45989525ad.51.1768466952287;
+        Thu, 15 Jan 2026 00:49:12 -0800 (PST)
+Received: from nbai25050028.lan ([2409:4090:807d:4601:625b:d547:cf6b:e854])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cd2b3asm243846775ad.88.2026.01.15.00.49.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 00:49:11 -0800 (PST)
+From: Sayantan Nandy <sayantann11@gmail.com>
+To: lorenzo@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	sayantan.nandy@airoha.com,
+	bread.hsu@airoha.com,
+	kuldeep.malik@airoha.com,
+	aniket.negi@airoha.com,
+	rajeev.kumar@airoha.com,
+	Sayantan Nandy <sayantann11@gmail.com>
+Subject: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo frames
+Date: Thu, 15 Jan 2026 14:18:37 +0530
+Message-ID: <20260115084837.52307-1-sayantann11@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 2026/1/15 02:56 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> On Tue, Jan 13, 2026 at 6:11=E2=80=AFPM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> > On 2026/1/14 09:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> > > On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong=
-@gmail.com> wrote:
-> > > >
-> > > > The fsession is something that similar to kprobe session. It allow =
-to
-> > > > attach a single BPF program to both the entry and the exit of the t=
-arget
-> > > > functions.
-> > > >
-> > [...]
-> > > > --- a/kernel/bpf/btf.c
-> > > > +++ b/kernel/bpf/btf.c
-> > > > @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct =
-bpf_verifier_log *log, const struct
-> > > >                 case BPF_TRACE_FENTRY:
-> > > >                 case BPF_TRACE_FEXIT:
-> > > >                 case BPF_MODIFY_RETURN:
-> > > > +               case BPF_TRACE_FSESSION:
-> > > >                         /* allow u64* as ctx */
-> > > >                         if (btf_is_int(t) && t->size =3D=3D 8)
-> > > >                                 return 0;
-> > > > @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum b=
-pf_access_type type,
-> > > >                         fallthrough;
-> > > >                 case BPF_LSM_CGROUP:
-> > > >                 case BPF_TRACE_FEXIT:
-> > > > +               case BPF_TRACE_FSESSION:
-> > >
-> > > According to the comment below we make this exception due to LSM.
-> > > FSESSION won't be using FSESSION programs, no? So this is not
-> > > necessary?
-> >
-> > The comment describe the LSM case here, but the code
-> > here is not only for LSM. It is also for FEXIT, which makes
-> > sure that we can get the return value with "ctx[nr_args]".
-> > So I think we still need it here, as we need to access the
-> > return value with "ctx[nr_args]" too.
->=20
-> please update the comment then as well
+The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
+sub-system, an extra 4 byte tag is added to each frame. To allow users
+to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
+to 9220 bytes (9216+4).
 
-Hi, Andrii. After deeper analysis, I think the comment is explaining
-why LSM doesn't need to check the return value type of the target
-kernel function in this code patch, as the target for LSM always
-return void or int. So I think the comment has nothing to do with
-fsession or fexit, right?
+Signed-off-by: Sayantan Nandy <sayantann11@gmail.com>
+---
+ drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Its position may cause some misunderstanding, and if it is placed
-after "cast BPF_LSM_MAC", it maybe more clear. (But it's another thing,
-and let's keep it still now)
-
-Thanks!
-Menglong Dong
-
->=20
-> >
-[...]
-> >
-> >
-> >
-> >
-
-
-
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index fbbc58133364..20e602d61e61 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -21,7 +21,7 @@
+ #define AIROHA_MAX_NUM_IRQ_BANKS	4
+ #define AIROHA_MAX_DSA_PORTS		7
+ #define AIROHA_MAX_NUM_RSTS		3
+-#define AIROHA_MAX_MTU			9216
++#define AIROHA_MAX_MTU			9220
+ #define AIROHA_MAX_PACKET_SIZE		2048
+ #define AIROHA_NUM_QOS_CHANNELS		4
+ #define AIROHA_NUM_QOS_QUEUES		8
+-- 
+2.43.0
 
 
