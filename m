@@ -1,160 +1,117 @@
-Return-Path: <netdev+bounces-250019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF656D22F84
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:58:57 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033D0D22F66
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1D0443005594
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 07:58:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A442C300B881
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 07:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88B632ABE1;
-	Thu, 15 Jan 2026 07:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB91283C87;
+	Thu, 15 Jan 2026 07:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="dcgrECej";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="eP3Q0HCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YxUWpxsP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA69427510E;
-	Thu, 15 Jan 2026 07:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768463933; cv=pass; b=PntbI5STtxXFQjNqgj8LBfEHxc4KYXdJyq5kciPhh5IV8RdU101Q2pQMrMC2zlRiqS/lHGiPwkt/KpcfoUpQiKjRVorgHfT9rU0+GzQfZ+rffT38BodEkCmGf9B528ldAmloYYpHn22Ec6OM9TxH2CcKMexpjtvMbwHjKDrLHBs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768463933; c=relaxed/simple;
-	bh=MoeNflbbWlYF5eq/9m77OdK19Iz1rNy6ARrfCpHaBEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G1E9mNnYcDNUHULYymt3SBw4HjvdhOLTvfMpsAQsK19TUFMbNnedVIpS28sDT7BdaZvuY4qNnLSLGUGaNtghFqWy4YPDpjBxYOVOvU4ajkkYmFdWKOLORyYBS4FjvFOT8MISKvnHYSF2b1nnBi0swXi8A+cy+AyP0i/YFIa4et0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=dcgrECej; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=eP3Q0HCQ; arc=pass smtp.client-ip=81.169.146.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1768463740; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=ToNQwJSXm+XEA0DiGqmZYglRnaptNjHFfr6vQv17U+oSAOGQQvgs5Xzk57MGTt5XNG
-    q2JabWQC/AotAsJkr4CPBTldTXtXl/BY5pS90/ijASPoBOeacpyG0c5Y0jUSbwMCtJ4z
-    4NUtuwTEhUb/E0WxuQQZITk+SDxyPaNi7Bhguz4vB4GV/20jr4eqUEz7usGTu1/qRUqG
-    YYOSChacaC+GJFZLHcJM/ts6qsGx8jMqyMBzwz80mVXDQ8YcMd4rAjmG3o0krN2KfQ/D
-    ZarK6A1Vntua9OWHflckTx3xQNZBWpRu1GNqzKMuquhsaFxIJy2JfodZ+xw8zcwclrBI
-    PjpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768463740;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=v4l7h6QpOQKdnefXElu8ErhAx3gzH37dPBsdYvviN1A=;
-    b=FMYhc9QqV/sHquCPEiPLe6wDL2UlGj7Y3TtDJHs8iikwTE9uM0gRAMBcwZkMXVY7cq
-    AOGrqUxPwyNUMkxePoDu+0W0oi9u8QB7hwSjCHIsFoVLwgEj2iWMUzr2jQ5Z2XW/nNyj
-    tw0wzq3hTuTR1P1rVQliztBppQBdFJrvacYLmaY3cDyOgs0kMFNjQh5DbzLMC5xrwN3x
-    2UpmwwbQyP8wJjYoiiyZPXBvYxzJ9GdjEEVhQpMPCbCLHXXRI1CuGEmrAgEfSXyfUJwA
-    lvQ7JTS+LBQ4Z6EWvwAZDmUp6vEW0GQgqphIKSoB2FpYLtqhx9vMRxESt46wiMyBZw34
-    f0xA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768463740;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=v4l7h6QpOQKdnefXElu8ErhAx3gzH37dPBsdYvviN1A=;
-    b=dcgrECejicA3E6FnVH1gDvcFDVVphFMgIM0oXYEpUO7YSfR/uFA0mgNvaCFRG6Y5dF
-    tLfluK1jC59XnZUxQQJwn9R0/BLL7a1Z63wzTePoR7l+OH5XSdCR8sm7Xy4nOIUAeh/B
-    nstVPRfeuaXqpkUgUu5niJqpovSf0+d2FGLWrRDU80XfQpb5bBf31kZ30AVbMu5qSP40
-    dC1YXvsWLjD3NHRo9ZgKHnWulMnakOK41pfwfK9+ZpL8tnyZlq6QC8N1TERmtWQSQ9Dh
-    MwJ1WMG0uMOn+4FC8nfHKTmH49BX9xOJBnZX42vmIzT5Y2kfEQh/zPMGvpsofGq9Wwoi
-    z+LA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768463740;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=v4l7h6QpOQKdnefXElu8ErhAx3gzH37dPBsdYvviN1A=;
-    b=eP3Q0HCQSxzb6BEZooRaLAHAEhTA/hysZVXImWPpTszLU7su4/U0UxFFyScF32393Q
-    M6L3rsU4tSxrUvGFadBg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b20F7tdwuq
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Thu, 15 Jan 2026 08:55:39 +0100 (CET)
-Message-ID: <0636c732-2e71-4633-8005-dfa85e1da445@hartkopp.net>
-Date: Thu, 15 Jan 2026 08:55:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B4B27510E
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 07:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768463824; cv=none; b=at4L2LM7cqcrq4dLSZ5hcqhuheGJX94DFthPF9QAjp9mNGWed6mmDK7RFfXwEaYseBjGDNKZ/p5Xe7gPtwS7zC5vyAvaHgJf8LaAdcHqLjCZN83ZRZabCo30/+63t7Dpb3US0tXILGJslTe7ib57nB85aPu7MbJFbTkRlLlDnq8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768463824; c=relaxed/simple;
+	bh=z7M1gJSxco/n4ZsPehNhTapu74iwMGfHlhkpGIYRppU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nlwhLoYfYvEX0aGcPT2cVVW7I+C2/DhMXxM8TzAtkjO21L62UdZza26htUHh0kugzwKk0p0uDscDbM5Q5LQN4TmKm/XPrp6/91ZnJNEBVh6gmYGnLmOIuDsS5GKEwG9hCNeMR2lZxVZ283+n5UrwepH/jY/UyG9L5OqlonPvXbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YxUWpxsP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899D1C116D0;
+	Thu, 15 Jan 2026 07:57:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768463823;
+	bh=z7M1gJSxco/n4ZsPehNhTapu74iwMGfHlhkpGIYRppU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YxUWpxsPOzHxOA0tGdbH62iRX4bmlHdJ4ghaK0B9VqEVDKqGzIE19FruKFYFVBVGK
+	 cWQqk+drILJSEIGsBFzk26fMSBtflhxTa6ReUMaFeCtJ7SHcwzGsq5sgpmHIvMBV3d
+	 Zzo3ZgeYY1cL8RzYLYSI9NTRn4yXyXpJZ0zF+mPwTsObq8xoOEOeTYaQT2Bc6/sB/Z
+	 xFxQ8jF8NHhhmVBGvlFHNEY+uVDBPWrc49KP+AmWf8VfMGN3lyy7Qj5rnz4/WSMNRr
+	 O+bbaBgjpVLIC3fc1Yy9oHKzR46sxzkO/Jccdz8C5Ra1ycdyXERKoyyHLIzm2EgpYM
+	 hvs1kzMCSec1Q==
+Date: Thu, 15 Jan 2026 08:57:01 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Sayantan Nandy <sayantann11@gmail.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
+	kuldeep.malik@airoha.com, aniket.negi@airoha.com
+Subject: Re: [PATCH] net: airoha_eth: increase max MTU to 9220 for DSA jumbo
+ frame support the industry standard for jumbo frame MTU is 9216 bytes. When
+ using DSA sub-system, an extra 4 byte tag is added to each frame. To allow
+ users to set the standard 9216-byte MTU via ifconfig ,increase
+ AIROHA_MAX_MTU to 9220 bytes (9216+4).
+Message-ID: <aWidzQgGXpbht9zL@lore-desk>
+References: <20260115064043.45589-1-sayantann11@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/4] can: raw: instantly reject disabled CAN frames
-To: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org,
- kernel@pengutronix.de, Arnd Bergmann <arnd@arndb.de>,
- Vincent Mailhol <mailhol@kernel.org>
-References: <20260114105212.1034554-1-mkl@pengutronix.de>
- <20260114105212.1034554-4-mkl@pengutronix.de>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20260114105212.1034554-4-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Hello Marc,
-
-On 14.01.26 11:45, Marc Kleine-Budde wrote:
-> From: Oliver Hartkopp <socketcan@hartkopp.net>
-
-> @@ -944,6 +945,10 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
->   	if (!dev)
->   		return -ENXIO;
->   
-> +	/* no sending on a CAN device in read-only mode */
-> +	if (can_cap_enabled(dev, CAN_CAP_RO))
-> +		return -EACCES;
-> +
->   	skb = sock_alloc_send_skb(sk, size + sizeof(struct can_skb_priv),
->   				  msg->msg_flags & MSG_DONTWAIT, &err);
->   	if (!skb)
-
-At midnight the AI review from the netdev patchwork correctly identified 
-a problem with the above code:
-
-https://netdev-ai.bots.linux.dev/ai-review.html?id=fb201338-eed0-488f-bb32-5240af254cf4
-
-An excellent tool indeed!
-
-This patch has to be changed to not leak a dev reference.
-
-Can you please change it in your tree and send an updated PR?
-
-Sorry for that extra effort :-/
-
-Best regards,
-Oliver
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="agj4UNEhb8R3CoY5"
+Content-Disposition: inline
+In-Reply-To: <20260115064043.45589-1-sayantann11@gmail.com>
 
 
-diff --git a/net/can/raw.c b/net/can/raw.c
-index d66036da6753..12293363413c 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -944,12 +944,14 @@ static int raw_sendmsg(struct socket *sock, struct 
-msghdr *msg, size_t size)
-  	dev = dev_get_by_index(sock_net(sk), ifindex);
-  	if (!dev)
-  		return -ENXIO;
+--agj4UNEhb8R3CoY5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  	/* no sending on a CAN device in read-only mode */
--	if (can_cap_enabled(dev, CAN_CAP_RO))
--		return -EACCES;
-+	if (can_cap_enabled(dev, CAN_CAP_RO)) {
-+		err = -EACCES;
-+		goto put_dev;
-+	}
+> This change ensures compatibility with common network equipment and jumbo=
+ frame configurations.
 
-  	skb = sock_alloc_send_skb(sk, size + sizeof(struct can_skb_priv),
-  				  msg->msg_flags & MSG_DONTWAIT, &err);
-  	if (!skb)
-  		goto put_dev;
+can you please provide more details?
 
+Regards,
+Lorenzo
+
+>=20
+> Signed-off-by: Sayantan Nandy <sayantann11@gmail.com>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index fbbc58133364..20e602d61e61 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -21,7 +21,7 @@
+>  #define AIROHA_MAX_NUM_IRQ_BANKS	4
+>  #define AIROHA_MAX_DSA_PORTS		7
+>  #define AIROHA_MAX_NUM_RSTS		3
+> -#define AIROHA_MAX_MTU			9216
+> +#define AIROHA_MAX_MTU			9220
+>  #define AIROHA_MAX_PACKET_SIZE		2048
+>  #define AIROHA_NUM_QOS_CHANNELS		4
+>  #define AIROHA_NUM_QOS_QUEUES		8
+> --=20
+> 2.43.0
+>=20
+
+--agj4UNEhb8R3CoY5
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWidzQAKCRA6cBh0uS2t
+rE5mAQDNH43QGKQqdK54O/WNSaz5NO5TROfHNgllhMJoY2J7gAEArEqFD7ASdBH5
+PfGPjeC1j0qi9Ysjn4GYqMIXUyyIWAQ=
+=JgeZ
+-----END PGP SIGNATURE-----
+
+--agj4UNEhb8R3CoY5--
 
