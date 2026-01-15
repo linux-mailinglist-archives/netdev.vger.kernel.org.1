@@ -1,94 +1,110 @@
-Return-Path: <netdev+bounces-250273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9481BD269DD
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:41:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F061D26A01
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9EF1316C0A1
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:23:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1B5F030EB8E9
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11F43BF2F6;
-	Thu, 15 Jan 2026 17:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E11E3BFE35;
+	Thu, 15 Jan 2026 17:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yl7Qh0pY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ml/xKkfV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73922F619D;
-	Thu, 15 Jan 2026 17:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96943AE701
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768497814; cv=none; b=JWKA/kYYQ+MPV8/jijUJyDt98hC7PsCtzceW1KncW4U22/NhQIgSqYFSAw6CfZihpzbmAfIeHWiWsn6QQ/5zaOMtqFebojOZ0Junim52BWRJ0aTAc3vbFD5zLljvMle2g5jSWs4J4d0OwOk8r2PJDxHwH3QV/4rsX0AaMFGEYWY=
+	t=1768497938; cv=none; b=J+WOK2chhbA0IBwwskFAVhpUmU2rQ2PC7zgU7eGUZfL/xrSylBAIWptJc6nzfXhN9tqlwWPO974aNiMv09xDytZvKqhRjfjB/HAiVqV6MOAd+gzZaQks2C8QLT+XNnqEGtExiqxYyCU60dt95jFTDmbMmr7bm1UFmdlcVbJExHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768497814; c=relaxed/simple;
-	bh=UodKu5Nxhf/UktRjhZh/tGid3xqAy82yRTwBh2y3GKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H9APF/g6cTS1wDpi5qZxDOg20FvGN+a7vTIsxhBq07D4a3doiWCGsOtoocOwdVHm4ADv2XRLf55dNMo2Dnin/1rYByeNRpUmyH/c9F+FquQ1MaB4jTrDXjSFjz9mMHXVHUk00VvXsuNAaO5YTl9o6bf12AQZMCL3L2HeH+12Tp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yl7Qh0pY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sQ7vP21dlzkkieemZjIahhU81dRaLsybz6UG5FalGMc=; b=yl7Qh0pYjwozEKS828gvwa0CFX
-	ty7BCEZdeh+j9tUx/oR6XUGAw+Jayo7ZAY9j9MH8ypO0txEZ3jwhtRIbfG8GhIhZeVSB+7BOLul/W
-	29OmA6cEFLKSHaqX2kbsACyBJARoYyXL8k7+UGkrXx1Gh9oKOlavAgrCZLLGEBHRojoY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vgR3y-002xkP-Ib; Thu, 15 Jan 2026 18:23:14 +0100
-Date: Thu, 15 Jan 2026 18:23:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vinitha Vijayan <vinithamvijayan723@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	pabeni@redhat.com, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH] net: phy: qcom: replace CDT poll magic numbers with
- named constants
-Message-ID: <6504f3dc-4e95-4f10-b46c-4583ceb74a4a@lunn.ch>
-References: <20260115165718.36809-1-vinithamvijayan723@gmail.com>
+	s=arc-20240116; t=1768497938; c=relaxed/simple;
+	bh=sdqndQkOw7pkj391Xo/h0K9rm4sWOqDPCE8XGyjfWjU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U5BNnyDnEi84tjlXPL//VfxWjIX+Js9S8xi9oJikOvj9g+eYk9Ii5ko0U6vrpcSvK5NJhnZBVfFJftoXBHrS/jDbMjWWtnt7aQe2g04KMtIPbDQJY3o4yS3n7pw5K5ZAZ+ovQCZBzcznLjoHvuf1PYmkdNfVlwFw9vBRIBS4I8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ml/xKkfV; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-81dd077ca65so893766b3a.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:25:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768497936; x=1769102736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8csUjF01ZCz05JfEPNndpxt18GhkXZ2SlIhYo7GPkqk=;
+        b=Ml/xKkfVEzJ8mw2Vzt61V6jZBUUmV5gns2/mA/mTz2pV6pmVEVqqi17jX8vNSRgVgi
+         kDyg0F/S5yyw24cQZy7Dlm4a3gYxeDbUa2KnZkHma89C2nGs/v01Z4Q5F6fGoVvdIrVv
+         ZYOW+kwJr51k32WI5y3y9FyhKVqIHJHftKfZwlvelIOGZkFzyMCPp4N1OSY6AtBkK7rQ
+         pQUkvLo8yiWvw9GxAb1sR7EpBtflvVRCN9Io1+43UpAIOShfLnDBK/CVIcxg5+8EDQn1
+         7KGVgqes12qb6KCtFEXVNl7UpPAGSrl5enDPeE9A6xIcOXSROe5xUPbfao74K3NW8TLL
+         tclg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768497936; x=1769102736;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8csUjF01ZCz05JfEPNndpxt18GhkXZ2SlIhYo7GPkqk=;
+        b=uYA1VOIi40MwUa0VFZyDP8hAveUkg4FuQ38qi3V9KxTtsqi+brns+twuYJWearL2DE
+         Fv33B4qV2Bhs1UdD2odcND1Ko7BjucaQxD7q1Bow9aNAcuFfN9Pn9Jc8YW0Im/p67oH+
+         V1M/oSgo7AI52s/yQ/f8WSUzlpLEeva2pVE7QQxo3yYGorfF/9UxNpdIGijKHs+bTAa8
+         9ly4NlI2MRoWw4/76zp4NaYTeSdqXnq/SlRhSM9qMiOfMrm5oPJy4jb9z+/S3ZVVLo/W
+         aAYVr/NHsSyD1xhX2mRZICEL38oNQnd96FstjntUcqZXHDoVAib5oIwyA2xf0eSa0bbP
+         RMXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrg2A6KnW3njJdjM+1cy/n9x7KWWEYf4xGHGl61aApkkm2eYVtgghbzzHvKgPvtdDuU3cz5Kg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnLjUbZhQQOOalSW8UV75nAylIAWs4+JUFDON5QSAxHifAn29H
+	zGYMYINPKlloCvnjlg1i6OA9iGmm4rPbhjhmp0muikasIq95z91gt77weWYIIbTjQbMCn/438nr
+	DRmQeCw==
+X-Received: from pgkz4.prod.google.com ([2002:a63:a44:0:b0:c5e:2c78:a114])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3288:b0:38b:d93f:b467
+ with SMTP id adf61e73a8af0-38dfe59d36emr483282637.6.1768497936149; Thu, 15
+ Jan 2026 09:25:36 -0800 (PST)
+Date: Thu, 15 Jan 2026 17:24:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260115165718.36809-1-vinithamvijayan723@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260115172533.693652-1-kuniyu@google.com>
+Subject: [PATCH v2 net 0/3] fou/gue: Fix skb memleak with inner protocol 0.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 15, 2026 at 10:27:18PM +0530, Vinitha Vijayan wrote:
-> Replace hard-coded poll interval and timeout values in
-> at803x_cdt_wait_for_completion() with named macros.
-> 
-> This improves readability
+syzbot reported memleak for a GUE packet with its inner
+protocol number 0.
 
-  	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
-  				    !(val & cdt_en),
- 				    30000, 100000, true);
+Patch 1 fixes the issue, and patch 3 fixes the same issue
+in FOU.
 
-	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
-				    !(val & cdt_en),
-				    AT803X_CDT_POLL_INTERVAL_US,
-				    AT803X_CDT_TIMEOUT_US,
-				    true);
 
-Is it really more readable?
+Changes:
+  v2:
+    * Add patch 2 for ynl-regen.sh (Jakub)
+    * Patch 3
+      * Updated ynl spec and regenerated fou_nl.c (Jakub)
 
-The point about magic values is that you cannot easily see what they
-mean. With BIT(4) is hard know that that means. But all the
-read_poll_timeout() functions are very similar. If you know one, you
-know them all.  I know the poll interval is 30,000us and timeout
-happens after 100,000us. Using macros just means i need to go find the
-definition of the macro to know the timers used in this polling
-method.
+  v1: https://lore.kernel.org/netdev/20260112200736.1884171-1-kuniyu@google.com/
 
-    Andrew
 
----
-pw-bot: cr
+Kuniyuki Iwashima (3):
+  gue: Fix skb memleak with inner IP protocol 0.
+  tools: ynl: Specify --no-line-number in ynl-regen.sh.
+  fou: Don't allow 0 for FOU_ATTR_IPPROTO.
 
+ Documentation/netlink/specs/fou.yaml | 2 ++
+ net/ipv4/fou_core.c                  | 3 +++
+ net/ipv4/fou_nl.c                    | 2 +-
+ tools/net/ynl/ynl-regen.sh           | 2 +-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
+
+-- 
+2.52.0.457.g6b5491de43-goog
 
 
