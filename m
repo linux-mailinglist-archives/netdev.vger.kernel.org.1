@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-250282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC505D27638
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 19:22:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B71FD26CEF
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E95E032394DC
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:37:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AE33D30B5D4B
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F1B3AA1A8;
-	Thu, 15 Jan 2026 17:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83DA3B530F;
+	Thu, 15 Jan 2026 17:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hV+1yj+o"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CbsUxWna"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45544C81;
-	Thu, 15 Jan 2026 17:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFE03624C4
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768498623; cv=none; b=jxA54EHkTISMIuAIH52Ou51NqDQV2Z2buCDqWtlsRKhgCH8HCSzYt487SyqYE8nDzoZKCh+za/J/fqT1iJ064pFMPluIgJB6rDxuDOP2imv+IdIE0/YuRU7SMFH7JBnk9kT5khqKqd8tmTkvOqbl23qtX/gPcmqQ7LF5w7yLM28=
+	t=1768498916; cv=none; b=hohBQtRekzXKkEs0Yn8HzWu0ei2SIuRulE8iwCZ4heiWdbcLh4roH05/eDmp7dmLsVZsn2dq3woVQPA9W6yW8VDDB8E9KWCVUvry5+uXVw5zHSMaaEC8/eGV2etczTOTRpU6EeuPipPEev58N5WXKTFRCq3f784O7IRtsFiRusY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768498623; c=relaxed/simple;
-	bh=7dtxLIwdJn4CWNO7qgXOLkKRkgzWHxgwNlC41RergPI=;
+	s=arc-20240116; t=1768498916; c=relaxed/simple;
+	bh=q8KYT4sbvVkbG5IqadL8WHzzvO2Tahgr4QE2etf1VIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=In0Wk6thgPv14pu8V5W+q5yhC2mDTH/lqakyGHpCjI6RaFd3u3oFHTFnRjk0vz5/vObncXmAzLHiH28M259QKx+xmv7LVpMTzQcL+yYnWLvBP4USEh+Fc1FJgU0J1r36KaUimW5H5d092kfO/FipN3OvRK1lhlGbEUC3fJDdD6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hV+1yj+o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F204C116D0;
-	Thu, 15 Jan 2026 17:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768498623;
-	bh=7dtxLIwdJn4CWNO7qgXOLkKRkgzWHxgwNlC41RergPI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hV+1yj+oW2PVe01Ss9+NKu0GcUtuPnVN7VQsUKPhWkEi/z2BDpNzQte7aBetvB1+p
-	 CmoLEIAMpWEQN1Wxz2kPNg79is6+jGAYrpd5NvRKDIkZesF0AobpT/0NlA8FlDDfUt
-	 ozwXRLgiDT7QzX3BtpJ1nYigcdHubHLvPr65QrvpBrBf1SgPF2ktaXpg+pHMm01Z7H
-	 GeB91FfGd+3sP09kL7f9UcS8X87dM9WoG22bNCtHyDCYWZUEGbN1ij293KW8HMAUP/
-	 eG2Cb9fAqXJFf2tSdUFfh3QcjDaXHVhT6pZJxiZxAmaTP0wisai9m90a4yyyg2++Qb
-	 78iWcX+q09QIg==
-Date: Thu, 15 Jan 2026 17:36:59 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>
-Subject: Re: [PATCH net-next] net: usb: sr9700: fix byte numbering in comments
-Message-ID: <aWklu0EwMbINC6T0@horms.kernel.org>
-References: <20260113075327.85435-1-enelsonmoore@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bms58tlufMZvV0cN5ORx3bvHAG6l8w7NSmutPive3pMoNrGNRZSWbEQqfYb+UTb8mGjEVKROpvoE6KUFysIxtzsXqcxUMk4pXo9dMhlvTQUOUvXRdzAsNS6enBwtKVnwOx9IC1n2sifHzOMPCYJKQcl8nCvTGdIdgMWvHnF92Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CbsUxWna; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+kDi0Nl3A+slky2xKqNT3JRyrF+r1xn6UkkHjegXuiw=; b=CbsUxWnatxSQjbieGBw08x9PxE
+	oq3z3oR4bitdTyXDbS8VOFY86Uzf2NksTtTUqWX8gpKqAOMbTplPjvC+NFbsMw13y5o5XahFqPXmT
+	QuDVSYVQukaQuaPwJoApwSiD3K4GXnX0SOwPlYf8Y9CHBF9BgGzCPp3+RECaCaqNvlkY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgRLv-002xwl-OO; Thu, 15 Jan 2026 18:41:47 +0100
+Date: Thu, 15 Jan 2026 18:41:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sayantan Nandy <sayantann11@gmail.com>
+Cc: lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
+	kuldeep.malik@airoha.com, aniket.negi@airoha.com,
+	rajeev.kumar@airoha.com
+Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
+ frames
+Message-ID: <e86cea28-1495-4b1a-83f1-3b0f1899b85f@lunn.ch>
+References: <20260115084837.52307-1-sayantann11@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,106 +60,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260113075327.85435-1-enelsonmoore@gmail.com>
+In-Reply-To: <20260115084837.52307-1-sayantann11@gmail.com>
 
-On Mon, Jan 12, 2026 at 11:53:21PM -0800, Ethan Nelson-Moore wrote:
-> The comments describing the RX/TX headers and status response use
-> a combination of 0- and 1-based indexing, leading to confusion. Correct
-> the numbering and make it consistent. Also fix a typo "pm" for "pn".
-> 
-> This issue also existed in dm9601 and was fixed in commit 61189c78bda8
-> ("dm9601: trivial comment fixes").
-> 
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+On Thu, Jan 15, 2026 at 02:18:37PM +0530, Sayantan Nandy wrote:
+> The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
+> sub-system, an extra 4 byte tag is added to each frame. To allow users
+> to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
+> to 9220 bytes (9216+4).
 
-Thanks,
+What does the hardware actually support? Is 9220 the real limit? 10K?
+16K?
 
-I agree this is consistent with the cited commit.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-Context left below for the benefit of Peter who I've added to the CC list.
-
-> ---
->  drivers/net/usb/sr9700.c | 42 ++++++++++++++++++++--------------------
->  1 file changed, 21 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-> index 820c4c506979..bd90ac40acdd 100644
-> --- a/drivers/net/usb/sr9700.c
-> +++ b/drivers/net/usb/sr9700.c
-> @@ -391,20 +391,20 @@ static int sr9700_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
->  	int len;
->  
->  	/* skb content (packets) format :
-> -	 *                    p0            p1            p2    ......    pm
-> +	 *                    p1            p2            p3    ......    pn
->  	 *                 /      \
->  	 *            /                \
->  	 *        /                            \
->  	 *  /                                        \
-> -	 * p0b0 p0b1 p0b2 p0b3 ...... p0b(n-4) p0b(n-3)...p0bn
-> +	 * p1b1 p1b2 p1b3 p1b4 ...... p1b(n-4) p1b(n-3)...p1bn
->  	 *
-> -	 * p0 : packet 0
-> -	 * p0b0 : packet 0 byte 0
-> +	 * p1 : packet 1
-> +	 * p1b1 : packet 1 byte 1
->  	 *
-> -	 * b0: rx status
-> -	 * b1: packet length (incl crc) low
-> -	 * b2: packet length (incl crc) high
-> -	 * b3..n-4: packet data
-> +	 * b1: rx status
-> +	 * b2: packet length (incl crc) low
-> +	 * b3: packet length (incl crc) high
-> +	 * b4..n-4: packet data
->  	 * bn-3..bn: ethernet packet crc
->  	 */
->  	if (unlikely(skb->len < SR_RX_OVERHEAD)) {
-> @@ -452,12 +452,12 @@ static struct sk_buff *sr9700_tx_fixup(struct usbnet *dev, struct sk_buff *skb,
->  
->  	/* SR9700 can only send out one ethernet packet at once.
->  	 *
-> -	 * b0 b1 b2 b3 ...... b(n-4) b(n-3)...bn
-> +	 * b1 b2 b3 b4 ...... b(n-4) b(n-3)...bn
->  	 *
-> -	 * b0: rx status
-> -	 * b1: packet length (incl crc) low
-> -	 * b2: packet length (incl crc) high
-> -	 * b3..n-4: packet data
-> +	 * b1: rx status
-> +	 * b2: packet length (incl crc) low
-> +	 * b3: packet length (incl crc) high
-> +	 * b4..n-4: packet data
->  	 * bn-3..bn: ethernet packet crc
->  	 */
->  
-> @@ -488,14 +488,14 @@ static void sr9700_status(struct usbnet *dev, struct urb *urb)
->  	u8 *buf;
->  
->  	/* format:
-> -	   b0: net status
-> -	   b1: tx status 1
-> -	   b2: tx status 2
-> -	   b3: rx status
-> -	   b4: rx overflow
-> -	   b5: rx count
-> -	   b6: tx count
-> -	   b7: gpr
-> +	   b1: net status
-> +	   b2: tx status 1
-> +	   b3: tx status 2
-> +	   b4: rx status
-> +	   b5: rx overflow
-> +	   b6: rx count
-> +	   b7: tx count
-> +	   b8: gpr
->  	*/
->  
->  	if (urb->actual_length < 8)
-> -- 
-> 2.43.0
-> 
-> 
+	Andrew
 
