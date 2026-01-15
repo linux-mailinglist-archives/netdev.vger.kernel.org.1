@@ -1,107 +1,112 @@
-Return-Path: <netdev+bounces-250060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C29D23635
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:16:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 905EBD2362F
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF9A63023841
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:15:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CCC2B3015141
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D6A3587C7;
-	Thu, 15 Jan 2026 09:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTXX7YUn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8715434677D;
+	Thu, 15 Jan 2026 09:12:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABEA357A30
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179EA3469F5
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768468556; cv=none; b=MZPAgueg7+8QyNn0BIrb1PYM/s0xqJj0XrlW+m45S0zwjSxL694qbuc1jhRioPosi7oppYLThD6AwUdvYThokxZW01wyOe5VXcxwhe0JIvrF55c4GzXgPU3Ojw/hq56SCGU7hWTFg+1IIh002j2i5grmqerWtMfRzoEqHuA0W8c=
+	t=1768468339; cv=none; b=G6IeP6QLy/P1m51Oa6jKrLxhfK6Ju5uT7QLcDmE74ipfd4IxviHxqy+fc5MpgopsGGRF7CtomO32B5+taBMWHe0SWuVaQxqXrRB5He/9ibJsHdfYa6WTpC9k2seABGefsD+8AUhghQ1zTvcxVPJLMy4DXkqg3NIET8XSXTPYmIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768468556; c=relaxed/simple;
-	bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YLG1pzKKZe7S3blkFDw3TcenvzUubjmyKXLmY7guq4l9no6dAPBAmI6TC5xyNwHZrsdnvGMXE089P3blUXWBT3ArlIN9890qySjyBk+6jSSPZMpBfuKv+wayCbzAdlDM06JpPfD/M8iUUIPzCrPBQc+LBMc2YiFFyZZRHiXTygw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OTXX7YUn; arc=none smtp.client-ip=209.85.215.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso265361a12.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:15:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768468551; x=1769073351; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
-        b=OTXX7YUnCYhrg1AwTXyxej5XtK6qSMAW5E6Pnnx48K2lMGod0kyMc9Tfzx0+A/YQO2
-         /wZbfVE4KfE6jtOm/62GgTY51NmPs++pVlc/zNY1CJxnIreB6l6GJ/DMhFBDh7xtbCwO
-         syCskqbMTE3S00xjM02cggneEp9xgPNaZaavvjL4YRFhZOUvwzs3LVIdOcxHI9U6jztA
-         znGqyqQAN8vndJKpH//bWCgytt+P0vKEHSZnx8DeTdIahjzNk6CVKiazLb4ZsXP8bzuM
-         4gy+g7saZx7gOekMwrB5u90+sipTnxO8bLir7cjavgJbX7YnEkh+BAYyt3kHEh8Epme2
-         3l1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768468551; x=1769073351;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
-        b=N4lPHlGS/Jbeg6oHKsxwgz5g0Ku8CamzgBhaBkdAmhYeJQLnftyH6BNjSrUG5I8Uza
-         yGvv1aFBLPcJt3DUnOVgfyqlSZ8alZFDU9zTXlzxXXzH7akFurbKER7LZ+DHSbK6n7ra
-         EYIBDd+i9lEqjNvSRcVQc7RjujE72aJDoA1WbYgJbAyjQJLZ0fwZliXP4RmFEciuYRqz
-         n3z0OubZ6XGKhiQs/5q/mGejN8v37rZ76Zns1ddkR/01aLt3oF09NrxIttnc0RXGuEcj
-         gBNhXC31hsdCNjITSb/L2T5E4PbOafD1ABO476ssqT0czKrDe3c27ZEkurKqQddwzsAw
-         cw8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXl0McemiAwfkOYbAOAfdxew/tGBRPsVEkRtVquLwE0+QFC0M2JJZkJuVIhW2V+57BSeybEaYA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzqxkl+Zw+uRUltoH8SQ4xPQFgISy6ZUqR3I4yJdahCyRV5jBEq
-	urnvbutCj+sQx0nUqCT8y0HljhMAtNWlZ0XsQrqkDJnHycL8611gD/M=
-X-Gm-Gg: AY/fxX7An07D3gfwxfvM50uzOiP1UEMw8txleO4IzSxDwgeBE4FH4yTTlyhwfNnXl74
-	Jyux65NPNDmlrFyaOUtN6Bg+jo6YWgQbTT8CeysbupWClaKf0O58tCRkvuwBz+sTfs+W0tcwyNh
-	dywpYwzVqPx7Qek2dWN2erSXTz8SEzcZ6sYeqyMo3pUKcEKjFpOxwF6qaFdg2+NnLUev7+3buxK
-	trprCqVUOcNgnXDjD7cnRMIhIAEVmEMSvDmCS3/hXh12A23gIlRHoITcVu1Ldst1y/S3Du6vxb2
-	7NSue0BWlflW3oacRwkXbEF2M74IU7i9UaTBo9UfxPghKPj/U1gnzCIY8dPyaEVYmwTtamMRLb7
-	yq3GBny8FGYWfWmlouflJF4WOjtZ6Y80Mkimtm9/Vw4CooGOmXpg8i1KbAGbhuVl7vIlPDgxlqx
-	eA2MTLWi4dkskuwDizdRPV8eOZMcs3bxA=
-X-Received: by 2002:a17:90b:3cc7:b0:34c:e5fc:faec with SMTP id 98e67ed59e1d1-351090bdf07mr5514921a91.2.1768468550753;
-        Thu, 15 Jan 2026 01:15:50 -0800 (PST)
-Received: from localhost.localdomain ([64.114.211.100])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-352675f8e97sm1554321a91.0.2026.01.15.01.15.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 01:15:50 -0800 (PST)
-From: Jinseok Kim <always.starving0@gmail.com>
-To: kuba@kernel.org
-Cc: always.starving0@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	quic_luoj@quicinc.com
-Subject: Re: [PATCH] net: qualcomm: ppe: Remove redundant include of dev_printk.h
-Date: Thu, 15 Jan 2026 01:11:23 -0800
-Message-ID: <20260115091439.2216-1-always.starving0@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260113190210.5387bde1@kernel.org>
-References: <20260113190210.5387bde1@kernel.org>
+	s=arc-20240116; t=1768468339; c=relaxed/simple;
+	bh=LVvYUTqC/oEI4gN4LmMhQdNkMf8OhpvENex0r8YMyt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jNO0BpmqvQmkz3RL/33Lherrg37EYx2w/FfKC2Evatd9nbkLTMxqWxJaMjvbX7WhxjsnxcYilOfWuNljhkIedJJ9wVOBaijs+/s9btGxyh2UjsDRD2mqQJKuHXQ9fG2OFRhE8owjMwOGGc4aBPTKGPiCF1RenP+1NWDB8SbBCH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgJOn-0005Xa-Mx; Thu, 15 Jan 2026 10:12:13 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgJOn-000jHX-39;
+	Thu, 15 Jan 2026 10:12:13 +0100
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 0141F4CD6EB;
+	Thu, 15 Jan 2026 09:12:12 +0000 (UTC)
+Date: Thu, 15 Jan 2026 10:12:12 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de
+Subject: Re: [PATCH net 0/4] pull-request: can 2026-01-14
+Message-ID: <20260115-acoustic-adaptable-cougar-a8cd74-mkl@pengutronix.de>
+References: <20260114105212.1034554-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jgx3ky55dpjbc3ss"
+Content-Disposition: inline
+In-Reply-To: <20260114105212.1034554-1-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Thanks for the review!
 
-I suggested removing the direct #include <linux/dev_printk.h> because
-this is the only file under net/ethernet/qualcomm/ that explicitly includes it.
-All other files use dev_err() etc. just fine via <linux/device.h>.
+--jgx3ky55dpjbc3ss
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net 0/4] pull-request: can 2026-01-14
+MIME-Version: 1.0
 
-But you're right — relying on indirect includes isn't ideal...
-I'll leave it as-is for now.
+On 14.01.2026 11:44:59, Marc Kleine-Budde wrote:
+> Hello netdev-team,
+>
+> this is a pull request of 4 patches for net/main.
+
+This PR is Super-seeded by:
+https://lore.kernel.org/all/20260115090603.1124860-2-mkl@pengutronix.de/
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--jgx3ky55dpjbc3ss
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmlor2kACgkQDHRl3/mQ
+kZxeawf9HdIIVePhlbspkufhxAInFz21dJVgFRn24xxTkS3cp6uXcT4U7GfYvgGF
+2lM2n/3ZTV2xDsqcDqKKJkxC6X9vZoOLIxO8tHAmG1A5PcUmz+eDyJ231kYu/dU8
+HVVTSJhy42jzrLZz7Mx9yNErlB5wX/1KpKHEuhuAZlYvaBLiM5zDX204u0Nd9gt3
+3F1qNK2tL7GV6zKToThfAHlWZXy13/2QVhZf869nSpSIR8HGALtpCmzg9fO4nHx2
+eldQ4eFXyRrC89rlbqLqaXmH5Jd7XwLUQNmEJ24ppNfnebb3H/qbiYIiusL8tTw8
+K1l1fFtWrfptLA8xpUAauljmj6y0HQ==
+=oEPJ
+-----END PGP SIGNATURE-----
+
+--jgx3ky55dpjbc3ss--
 
