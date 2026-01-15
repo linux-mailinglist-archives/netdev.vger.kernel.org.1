@@ -1,151 +1,139 @@
-Return-Path: <netdev+bounces-250058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC85D23669
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:19:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB51FD2362C
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF9B130EB08B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:15:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA59F30434BA
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853C33446D8;
-	Thu, 15 Jan 2026 09:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0F735771A;
+	Thu, 15 Jan 2026 09:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1jv5x/Lw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568F8355807
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58428357A28
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768468525; cv=none; b=HZc7gmkiJPoaQCaslruJo5shxszPS7zjU4xeNO0awU7D28PnjX5Sl223S4Xx4T5fba1iuRxE8n98SyDXQogo/GJd2IZ81+j/0vz0nvBe2YUiN/drUNjWCifu5T9HY+iHHu+2lEaAiCQT0jtHHRB60CfcMT8f+nBmcB3/vrKmHzs=
+	t=1768468553; cv=none; b=JxLzDhRdp+tHBgsciuGqNk6PH1fe9uhnWC2ZkBKFUtWF6oJ5ioQm98wNALQlz+BuPpeDsMT7A2//Bo+5ULwMXFY08TVL5XpwAXTnZv6DNulA1m7NrU5SKAwo9Mzo8W9BODIoaE9X1ILNAzMi8miTYblJH/DALK7cC/sXUQxe9fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768468525; c=relaxed/simple;
-	bh=JO3r1AGUSaeclQ1le4igMTyX73HehkmcPf7CrCjlEhM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QoHD96j4xdo4603Siv62loEr9UPxcos6atqiLUUaoFcPAbHRX2u18PwfTueO/7WpnDEek9ABb8EByXSCLQFHDKTsLmtl+52v7iX1h0Ht7knXSVyOc8yUhmlo12JtyvvlhA9x1eiVPyxkh5VqCxSMGEV2feTAX48OkKEuZGiUWys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-661125c8491so607920eaf.3
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:15:22 -0800 (PST)
+	s=arc-20240116; t=1768468553; c=relaxed/simple;
+	bh=gtMeMIiWZfR1FPtMNs15Lf/g6JMp2RzBjrLoGR7//dE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qL+mLn2bgU1BdnJMKqzydu1UyJCvqNDQKYNXyva/G5lRshb3Ms1NuhaK7qhlHPHsiYFMZdvYsNYFvk0g1TLrvn6axWGC7GZRYtO5/tLcNIPLRZx6sknUeFsrhvgojTlcb3DPyqu+/OvT368+5qPnsBGe4icrB+vQ10RjOPlj+cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1jv5x/Lw; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5029901389dso2882351cf.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:15:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768468548; x=1769073348; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1LJoalJ/bPq/SwT2K8wCn2gybGfkpq32wbnQ3LM3Vlc=;
+        b=1jv5x/LwZ4womyiZUsDHisqA1CI3EUWxOSDb02YihrPIjFOsV6ERhnOOAS0E7eNtzg
+         6PyGXm978pbxe4Wc9CFwoBk32LyaeVRvWgOCzBDOofJ1RF3WP42Nmks32d+yNSZPpWCL
+         mOQRidsINSw5VUECGkBPqL/PCkHT9UB1V10imoEhXWKJ4qoSwlKCm97Tz/8QeLCJTIIn
+         2VuovK8kyPRRI7tgo30DZ15s/tP8HYo06SBkVMtpHoyaPkPcHm76Gi+/DB8YMd2/fEdU
+         H9EbgSLpvM7HGDB1N/lTphjiQ692vJ0HbnYTrpig3HIzz2T5hp6wJHjNkyXOGXisUNLZ
+         UnMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768468521; x=1769073321;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wdcygAQemIWGYaInbBbXcp/6UHNE5yO0hXqCDywHlzg=;
-        b=D+XPFSKTWdu6l3Sj6AwsA3d7OKNy4J2XEKOWUSVdTemgGakgwtTlaQgtEMQrIg1039
-         5hwMzA6sb1kV+drDEWug3qRTx0ACUEGWRGP7nOAD7wKXjpUjoLF4AJDgCNxVt6EoapE3
-         gxb7q8nEeBhJIfUPmsuxpY54+rsqCAMbVYIh8yBZDmq3tBsUWuLQKFpAxE+3IIpPuuCj
-         dHk4rN3JulLpSlVePscg/C2Bo1QR7UP0u8VXBuQ7Cn7hBpT43P5FDgb8jhrE+BLncA8k
-         TtF5O+yvVd7PIwWsejVt40+KQp0nTU+ZkXUwh5BX3IsG07qzrOLAsOSBoTIrr0BUpMDT
-         szNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMZD/PJX+ij5BzcyLgIGMmQTb2CmV54QkkU335KjS9TN+sHJ/C3S+yEXup4G+z+imTw2LMv0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfOi1Qb97zR+rYu6bzVgC25oMgn1pv4fNQRZVIaqShwGEJXuct
-	/AzLnGqKWklv9uCBnkp1I+koHO0HBoMpPHmVV2PhCEiV617o7RsXjZ1zsvk5ZC5BrkKhg6B/+XY
-	rkAHljJHc97OjmWFq95jzRk8Af3vD5QL2XXNQhNVDzrc2WMUUs5o24mtAmEQ=
+        d=1e100.net; s=20230601; t=1768468548; x=1769073348;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1LJoalJ/bPq/SwT2K8wCn2gybGfkpq32wbnQ3LM3Vlc=;
+        b=WBR3UNFJHduyAGpr9dZTrzqX14HLfaZtKBNgyBcTDFwgiZeABx0D8pnj+jrOVr072K
+         NKvosyNfqi9VLWoUDhUPEvCn6FudTrULVxAPdtfNeS+lmS02+2uNnoTPWqP3R+J6NR/w
+         XjVr0FkdNvURpfZ4A9ZENwde6jAydkyhoVYEnXBdllGr/OQghcOibb3eqy8dbbvqkxWd
+         8rq+ojZIIKQjrNli6K27V11LjRJTpGvpZT+KqTN5D6vRAzaPADDTTy0oKrvt3k6v/Ure
+         MiwlkBcEgMaUxz4FBeHcPAZB9edmtPGbzjrsNpOWZC61NSlD/OYJnhevLWXAY/lPjIDc
+         j1ew==
+X-Forwarded-Encrypted: i=1; AJvYcCX3FksSZfJ05C0XoCCCoAzkK6U8pVLWjspZNZey+HPcin9rR2hAATobbuN/KrAunmPtOj2h0es=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAIvrH8KAJeLsKC4OGW6nC2jQa9nJXuwwbovRscZ0fQJh+yEv8
+	/Ht0H/wtySJMkyWEE5M8hZyIwAp8kw5tjA2JGVXehNfATVsxlLtHgh8p2qjHHKNUgLKi7mXa63r
+	7CqpZsi7On+Z8deaM8dxMT9N8xW+eGPf0YniIhiaF
+X-Gm-Gg: AY/fxX4MUsxKQd7X0UIiBugqAbNGO4Xxd7xy0AGeiMiCsgLvZ4sGzNAzrcJ5CYb54Uq
+	cTq/9/cVorywuYKpwd+ksf0mNZrYeQHXx14EMI7zb6AG+Xc0BczgR+Qsb6rC+9OPkJ4X09tUKEr
+	kZuMjOlwnf1ZQjxAR1F4HvUtwiHd0UDkgokmLeVId3zMi3Xgz3mkyqurNPMvRw4+QObfkKvOhPz
+	MUy0viwZ2A8yxr2xIhSnZsWNpKxIYDZCK7Z+gccLMaMmF91hjuVG6UMspMWJmbSbv1JfA==
+X-Received: by 2002:a05:622a:199b:b0:502:9bdc:57e1 with SMTP id
+ d75a77b69052e-5029bdc598cmr6774851cf.2.1768468548067; Thu, 15 Jan 2026
+ 01:15:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2302:b0:65c:fff0:818e with SMTP id
- 006d021491bc7-6610070654bmr3533105eaf.63.1768468521216; Thu, 15 Jan 2026
- 01:15:21 -0800 (PST)
-Date: Thu, 15 Jan 2026 01:15:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6968b029.050a0220.58bed.0016.GAE@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in l2tp_tunnel_del_work /
- sk_common_release (7)
-From: syzbot <syzbot+7312e82745f7fa2526db@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20260115033237.1545400-1-kuba@kernel.org> <20260115051221.68054-1-fushuai.wang@linux.dev>
+In-Reply-To: <20260115051221.68054-1-fushuai.wang@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 15 Jan 2026 10:15:36 +0100
+X-Gm-Features: AZwV_QhTCMDKh5q0J0qjsf9QjxWK4VZqifJza4JSZzX25aIAu0asXhhTMuuhlKY
+Message-ID: <CANn89iKfuXjqKsn+xB6bpGOaqM7pN4ZcRJ=2KJg4WY76ArYXhQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] wireguard: allowedips: Use kfree_rcu()
+ instead of call_rcu()
+To: Fushuai Wang <fushuai.wang@linux.dev>
+Cc: kuba@kernel.org, Jason@zx2c4.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, vadim.fedorenko@linux.dev, wangfushuai@baidu.com, 
+	wireguard@lists.zx2c4.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Jan 15, 2026 at 6:12=E2=80=AFAM Fushuai Wang <fushuai.wang@linux.de=
+v> wrote:
+>
+> >> @@ -271,13 +266,13 @@ static void remove_node(struct allowedips_node *=
+node, struct mutex *lock)
+> >>      if (free_parent)
+> >>              child =3D rcu_dereference_protected(parent->bit[!(node->p=
+arent_bit_packed & 1)],
+> >>                                                lockdep_is_held(lock));
+> >> -    call_rcu(&node->rcu, node_free_rcu);
+> >> +    kfree_rcu(node, rcu);
+> >
+> > Does wg_allowedips_slab_uninit() need to be updated to use
+> > kvfree_rcu_barrier() instead of rcu_barrier()?
+> >
+> > When CONFIG_KVFREE_RCU_BATCHED is enabled (the default), kfree_rcu()
+> > uses a batched mechanism that queues work via queue_rcu_work(). The
+> > rcu_barrier() call waits for RCU callbacks to complete, but these
+> > callbacks only queue the actual free to a workqueue via rcu_work_rcufn(=
+).
+> > The workqueue work that calls kvfree() may still be pending after
+> > rcu_barrier() returns.
+> >
+> > The existing cleanup path is:
+> >   wg_allowedips_slab_uninit() -> rcu_barrier() -> kmem_cache_destroy()
+> >
+> > With kfree_rcu(), this sequence could destroy the slab cache while
+> > kfree_rcu_work() still has pending frees queued. The proper barrier for
+> > kfree_rcu() is kvfree_rcu_barrier() which also calls flush_rcu_work()
+> > on all pending batches.
+>
+> We do not need to add an explict kvfree_rcu_barrier(), becasue the commit
+> 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destro=
+y()")
+> already does it.
 
-syzbot found the following issue on:
+It was doing it, but got replaced recently with a plain rcu_barrier()
 
-HEAD commit:    3609fa95fb0f Merge tag 'devicetree-fixes-for-6.19-2' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17de2e9a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b319ff1b6a2797ca
-dashboard link: https://syzkaller.appspot.com/bug?extid=7312e82745f7fa2526db
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+commit 0f35040de59371ad542b915d7b91176c9910dadc
+Author: Harry Yoo <harry.yoo@oracle.com>
+Date:   Mon Dec 8 00:41:47 2025 +0900
 
-Unfortunately, I don't have any reproducer for this issue yet.
+    mm/slab: introduce kvfree_rcu_barrier_on_cache() for cache destruction
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3018b7ea95aa/disk-3609fa95.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b7f25f6e87af/vmlinux-3609fa95.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/13d7f9c6c13e/bzImage-3609fa95.xz
+We would like explicit +2 from mm _and_ rcu experts on this wireguard patch=
+.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7312e82745f7fa2526db@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in l2tp_tunnel_del_work / sk_common_release
-
-write to 0xffff88811bce50e0 of 8 bytes by task 10132 on cpu 1:
- sk_set_socket include/net/sock.h:2092 [inline]
- sock_orphan include/net/sock.h:2118 [inline]
- sk_common_release+0xae/0x230 net/core/sock.c:4003
- udp_lib_close+0x15/0x20 include/net/udp.h:325
- inet_release+0xce/0xf0 net/ipv4/af_inet.c:437
- __sock_release net/socket.c:662 [inline]
- sock_close+0x6b/0x150 net/socket.c:1455
- __fput+0x29b/0x650 fs/file_table.c:468
- ____fput+0x1c/0x30 fs/file_table.c:496
- task_work_run+0x131/0x1a0 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
- exit_to_user_mode_loop+0x1fe/0x740 kernel/entry/common.c:75
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
- do_syscall_64+0x1dd/0x2b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-read to 0xffff88811bce50e0 of 8 bytes by task 6117 on cpu 0:
- l2tp_tunnel_del_work+0x2f/0x1a0 net/l2tp/l2tp_core.c:1418
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0x4ce/0x9d0 kernel/workqueue.c:3340
- worker_thread+0x582/0x770 kernel/workqueue.c:3421
- kthread+0x489/0x510 kernel/kthread.c:463
- ret_from_fork+0x149/0x290 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-value changed: 0xffff88811b477a80 -> 0x0000000000000000
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 UID: 0 PID: 6117 Comm: kworker/u8:55 Tainted: G        W           syzkaller #0 PREEMPT(voluntary) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: l2tp l2tp_tunnel_del_work
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thank you.
 
