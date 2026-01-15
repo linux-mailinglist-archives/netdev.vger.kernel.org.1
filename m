@@ -1,298 +1,207 @@
-Return-Path: <netdev+bounces-249991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20FACD22192
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:12:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06EB2D221E7
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D91C63031986
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:12:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 099FD3027599
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F82B24468C;
-	Thu, 15 Jan 2026 02:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4212517B9;
+	Thu, 15 Jan 2026 02:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sKBSJhBj"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Ryy7Ap7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011062.outbound.protection.outlook.com [52.101.65.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A950D23DEB6
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768443177; cv=none; b=f5VOI8pOVPT/orw6xXQyzXjLFWrGn19dNR761uZRYnLXIssxNeIgvRLLXQdVqBBGoLY3ac9zzY3ex4eg8Sc9UFsZ8BTFPo7hwC2m1vHtq5mkBAaOMwYjBM2QGNuOVJ1r0okH+/nF7ThhJfGBRTV+G9wHmGH3VrU3iPQxqi9Yr0o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768443177; c=relaxed/simple;
-	bh=d8e0gLcL28k4ZCy2Zp1RAC6hTKSKgKyxQJQNIohVYAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UscSLTd5klSP/4SDIb8eoPuOGl5Q/EhuHFftDNLZOymLvomY8RUcZo1ZuXKfQXuQ2HPTUPI7D6Mz7ew0QS9ZYMrz9bMqCf45kJLyUX8GrnkUT9MuxSlStfG5jUnbXL4jVhMVRK5CVUEqVBrCsWsgf/qqZzwbw+8Y0OpLduM/iH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sKBSJhBj; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768443173;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/SsQyIQrEbUrbWZyBqgLEQMAXp4icWsKhg23/MVhzuk=;
-	b=sKBSJhBjH6Qx7MC1ZCm7oqgqBxAQ6Fk4YMbS6hg41WDB1Eut/pAtPUtkveGh0HZVZN8/M0
-	8/11KZBnSpvwTkLbb56tmnv7hC4IyywwYJkItxnUwMdcvc8igF3NKNXKXZXXS6E5QtAg6A
-	G/rTA2stu9yYWYR2kutcMIguZFydAlc=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- andrii@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH bpf-next v9 07/11] bpf,x86: add fsession support for x86_64
-Date: Thu, 15 Jan 2026 10:12:39 +0800
-Message-ID: <4707131.LvFx2qVVIh@7940hx>
-In-Reply-To:
- <CAEf4BzZZSUkMbv=7DcBubGjnABHNnAZjT3-A5XKB-UW58a=6jg@mail.gmail.com>
-References:
- <20260110141115.537055-1-dongml2@chinatelecom.cn> <2187165.bB369e8A3T@7940hx>
- <CAEf4BzZZSUkMbv=7DcBubGjnABHNnAZjT3-A5XKB-UW58a=6jg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2210F20C488;
+	Thu, 15 Jan 2026 02:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768444040; cv=fail; b=BblJPgJZPycokKLaHEpr1yOR+d6ATBB2FAR1eH9FvUtzMFoEmbM6uTlVmUyDaUcm8QDdfXoMfe3GvduKsBYS9sqSVjLMbP43OnbzufRJT2mWIWeoWMmLoGD0ptOW4pn5eoO48xsf6JNbuwvHHKvXxavtdExVyjI8utl45AxFaHA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768444040; c=relaxed/simple;
+	bh=U4BZ2kdCgrJVE1dDdrwZUfXSrZe6PTxkBV9/Z369pEo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=to+ep0jBMs9y6TfYzyHDUnnX5lB7iJ/rHjUT8fzvT7aIB4RouaZBSB62OCCvoZnmH8APm0Nivun93hP97+fQ47rRsVVYVz38Lh/UGh3hrNX2tgB7UJ5+JNGBMYQLmOuljAXxLE5GaiAky4glK07nmL6D6N2D+VZwau3g7bfiph4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Ryy7Ap7H; arc=fail smtp.client-ip=52.101.65.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kU1EjWN5R7W3xiDVFcE+IyYKfF4lQgAvUWDXfPuBVNvMsiVWmlQljfPBExhMEOJ+rmcNm2EEi284b96aIhDhIf7ocJmlZ8Nhperbujgdq3boZxqaFdhWGOObZbHqwtQYiIgnP6Ddafcc/uno7hJ2LW7SbDMu2JDt9MP21VMu2RLb6t/FbL2NWh3eIlskiPRvpEfouU5e6ZL/ga+DKrL/YShiX6TvFKIwo4G8X7NKIlR+t0HEO+cy3tQiPslFw+lZxLV+U7Tn2poD53qdUC9nZSSxBwdeOMz8k6sO8XWO8u8hxDfn2q3ex2IW+9sJZqoJuVVo0BtK0QdpJjtv0N91/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zYBKzn3rHbxPKx3X5NiGDYq21uNZEDIGbYgFQJ4T4Cw=;
+ b=I04gk8JAY3i8znUI/1b7SAfhjY33mR+jACBI7Osrh2g6NgOhB/y1OjDxGRnVoGrAMklKtdfIQXIst8t3DMyJF5KGEpFlKSnKpcg0bYpdoqNBh0G/KNBb/6CBG0vnvfoJd1GPipwJvpmWc+1GqbcfhooGyna/wBce/Fn3XHfKmSj5E+aBzXRIM9D5VuzWO+gIKpgwLI38EhK+m+YQT3CfbJUPJBo37110r0R4TKUYNtsajDdqsHHHSpnPFgSkUoHd36xhI4uV0AdIP3wFnN1X0ng6GvyTcj4iRW0HjXM986JJpNVqXumETXJCzFxzSHKQ6Jhe9RxAd1/oMwvc75MKAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zYBKzn3rHbxPKx3X5NiGDYq21uNZEDIGbYgFQJ4T4Cw=;
+ b=Ryy7Ap7H1UNd6rj+wZea2x7UhmXo6g4d0EqLYiCwFCx410u0yKoVPkUnkp6euiZlTt6Qflm4wMBydEOGa5oqgePdUdIK5WxJxFsQoXZ9lq9YMEnShy4fHgBwdxJdu0GxhGumHgc1S96wBYbrl1/J3iZ1Cn84ntfqs9MZAYpa77tHbeu+BwIYNLxJNPDIOtwmxqPamJH6lT8VI8DxdyZD5qVIMI3VRIaKL5oI86SR2qzIBsYchRMQE0UcEitNTPkyvpq8ucscboYVmOP+r7OMUexEjRymcnY73O5VwTlm29qnrAN8B0UxlOXaq8DO294e5GP9wZ6G+/GgkEO4ToUwvQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DU0PR04MB9347.eurprd04.prod.outlook.com (2603:10a6:10:357::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Thu, 15 Jan
+ 2026 02:27:15 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9499.001; Thu, 15 Jan 2026
+ 02:27:14 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: David Laight <david.laight.linux@gmail.com>
+CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	Frank Li <frank.li@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "hawk@kernel.org"
+	<hawk@kernel.org>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Subject: RE: [PATCH net-next 07/11] net: fec: use switch statement to check
+ the type of tx_buf
+Thread-Topic: [PATCH net-next 07/11] net: fec: use switch statement to check
+ the type of tx_buf
+Thread-Index: AQHchDz94JEEe8B96kSUW261P6sEvLVRsBiAgADJlEA=
+Date: Thu, 15 Jan 2026 02:27:14 +0000
+Message-ID:
+ <PAXPR04MB85108330035756EDEE55D943888CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260113032939.3705137-1-wei.fang@nxp.com>
+	<20260113032939.3705137-8-wei.fang@nxp.com> <20260114134713.565f2b3c@pumpkin>
+In-Reply-To: <20260114134713.565f2b3c@pumpkin>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DU0PR04MB9347:EE_
+x-ms-office365-filtering-correlation-id: 66bbef33-7cb1-4145-5042-08de53dd98c6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|19092799006|366016|1800799024|7416014|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?wjCXbbSNzm8Ut3ijD+mSvOW6AGgIgN3DZWlcw65y8Ujl7lDBAzsRG3BTthWF?=
+ =?us-ascii?Q?rmSaYjvkqRCSa+C0nmpbuh5xR6pDaPSp+x6BNY3xcg2fOn0E5E1X+T2+I5R3?=
+ =?us-ascii?Q?uz2IVChZDLudglnuhUyYgyluya8U86HJyf6r8Ukn9Hxo91TAWNyBb3wG+Dm7?=
+ =?us-ascii?Q?sxxcfFunc5LiJB81c2J5ukhcRVzj6sJ/YFVwgDU3ZOTrdb8GUtjnQQpIhjOQ?=
+ =?us-ascii?Q?zBMRzYF75qSH9NOAF3GAgJOXtmEj7usDxJdiKzDO88eQJwt1xP9O8QsSmcmE?=
+ =?us-ascii?Q?p09vIlRs7CQQuS2Mpc/BGxafDKHQskDoL1VjZOGJzooX1VjiEb5LnXS63pEg?=
+ =?us-ascii?Q?dWPv/CWrZLIN3hvMIdwSLg0ozf9Ztsnd8rJvtmLpJmMifADJkO8Xxk68oyUI?=
+ =?us-ascii?Q?iEwjioKNq2VUpiNCHTnbosDN1U602oC7bsA2MwJG7LLbPZ6AIVBF/Qh+3aNt?=
+ =?us-ascii?Q?LdI6NyvhIvoIeyldYzO+9Jl/oYpFsMFFTpEoU7BqJZXqGUgMSn1Z1dF8CaoJ?=
+ =?us-ascii?Q?jo0WAignGgJ5bqgfH1ca7McmxamkeTKUy3hpDiS7y1FjWXhFPACFYD9Vf6h9?=
+ =?us-ascii?Q?tZXPEz15hzxnnLJ4oMBbi+2261fjRkiEQCeW7oZyzdH12RIif0o/W6iIyy4O?=
+ =?us-ascii?Q?uF4H8i8G9Q4xpb9t3RqLE4TLvyeibCCuBzg6zHBZWdFEE5SmYT2imQ0bEYa4?=
+ =?us-ascii?Q?ZrbDTOgvUj2D+HLGsLh5aVo/WXNDRyErfPUwEEHoVCwlixhwYkqDEMUxJ5sa?=
+ =?us-ascii?Q?iEp4BdSJoW9EEfybyY796UdJ84nhogR7UA0Gq3KkKwNcsMCs+yWRI11RbIvY?=
+ =?us-ascii?Q?kApi9IIgXsJtNo6XYEqvrANrfLwk0pY5S9/cEfCosmBVsckzOQ3V+6A5R8ZU?=
+ =?us-ascii?Q?9m8zW3CTb7lPEVgUKIkqOqjEzNJm9Es0wmhFBRrXhf1td/bplyvxMrJflUNa?=
+ =?us-ascii?Q?F9TSxxetfR2G6mJgqa6c9Xu2GkqGtvCqPcB27Q5Dw+g/hcLAaqo7xWyyUPmB?=
+ =?us-ascii?Q?fwW9qAuqx52eREKOoUstwUzr4BkJjJt4Tr0VVNgATjoN/znOII7faxYK+p5B?=
+ =?us-ascii?Q?Dzz8B2mkBIrgpN4lraA+PKGuGhBNmRXTSMvXPlBnG3qhJo9qWbXTWf8ntHPb?=
+ =?us-ascii?Q?rAIDSVKteaeQJr1xYTTPYhpN1ZJa5rEURlwEn3Bo0jH8oX9vhMpJPmjOyMLE?=
+ =?us-ascii?Q?LMqL9AfgX0xxHls0TkA0g3M/nmxKNWc9ntPuGOsycRET41Gy5fTXmmf5X+Aw?=
+ =?us-ascii?Q?7ucciTQp8DzY2OAtsfzEtwpJATk2blmpiYxpDWSxni6wJp2ekG89a4QtUy35?=
+ =?us-ascii?Q?qxv6d+sjOPjj1raDsAG755gPTZHfan92F8ChEkyhwDn+pEkFMtclpFx3wWQf?=
+ =?us-ascii?Q?rH7/46bAbar9rr9HrIfIxU+ZIvK79b69Yv2gdpdfOudo4AqliejJPXTUr8uC?=
+ =?us-ascii?Q?ZR9ZS8AM/wOW2nrMRME4AQpC3eInaQfXhWzEqNBTQcbdB58BtTR/NmDeLkXE?=
+ =?us-ascii?Q?zxZd6+pJCroOh5BcXrSzKNtSf/ExmYAz1LgD5PEs8luQEosIOB41FZkFVl4h?=
+ =?us-ascii?Q?2YkiQKUFFmEPNbgblT/vMp1DOsciW9rkZOVTGOJeHYq4pL0k7HPSZklsqRPL?=
+ =?us-ascii?Q?obhM0Sj1Exx/yoMomGjt01A=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(366016)(1800799024)(7416014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?/3st0zk+UHuzBwEc2pTJtTMj8XkhZ1b0uwH4x+PDpZ2WmHcL7GxoWdaE63Nf?=
+ =?us-ascii?Q?uVqd8NgmvDN8x2gnVD9F5wjaAjskaspdz/JN+Ym5fmSNV/A3rfIgoFZuJHcR?=
+ =?us-ascii?Q?1DlGCWfiGutRneYpZhXxoNrOkWRdEFO5XyU0amSZJva879BiDdJgSxcYuDVQ?=
+ =?us-ascii?Q?6QUI0icSkhRakJ/rvBn8PDY0MTDMAkh/tXE+RCT/nK7c8e0yobLcRm3cWPyN?=
+ =?us-ascii?Q?AouPRqryV1X6TWoh1TrsWykTiD9p5DS08rGFR2363sc/bWfr0xjoEkdPFphH?=
+ =?us-ascii?Q?V+cl+mNn6uig76nzKJTEWzY1OpC30PzDyX9nm6tucunAZaEQxjqt4NeqyzT5?=
+ =?us-ascii?Q?0QtaHHGz9Y1ofP4XBp4uoRoer8eQBz0w3AcBMeJOrlVQHMZZ2ja1pewA3WNQ?=
+ =?us-ascii?Q?3NMj7IglW3/XXAZBhfHNPLq83W2C+dDxrblRnHNa8j0FGFG2pEr7/f7+gjju?=
+ =?us-ascii?Q?/RLvvydpzGaUgFFul5gqKb5bQ5x5NvM+paW99jgsZcWWIACJc+JLpTU81DCc?=
+ =?us-ascii?Q?2w29f9eV/b8xoJPscYDYaKrHBDyST/PWyvpSxUiT4LkGWea1S06t+9ley0aV?=
+ =?us-ascii?Q?cUkjFWPPksSFIn0EUkvTRbDbC2FOKhVZq88eLPMF9712AQ1t3XUjmKbz+ue0?=
+ =?us-ascii?Q?JmRLSETxWz99ObwG7rq+AmfVNZyl1OLe+m9XXAfqdJxlVCKi90nzQrl7M6pq?=
+ =?us-ascii?Q?uk09VQoE3wjVvcQcqkiYFcS9u1xXU5Zhrnr5wUgH07l6ElyXseW1NPYMLzOU?=
+ =?us-ascii?Q?ViN2efcvecpgPLCXgp5xMbeOHk54L+awXWVqLsCPDljuRgH8qGcMZ4pOwzwv?=
+ =?us-ascii?Q?Xhd7/WIFp4kPF8YHkLOQtllQ4gh/jpGYgDBmXvtYSK23eEqkupXEHT9PsKYD?=
+ =?us-ascii?Q?PdiOqCYFUq4IcO6Xa+O9pFgV/LUFdVZtDM/crPtcUu/Tr91j2UCvJl0vNIz9?=
+ =?us-ascii?Q?rXtrUKLub3jiuQ7+4v6xX/NplwhZaMarEXWkcUCkdfU9oMx5IXuR3eIW2Ysw?=
+ =?us-ascii?Q?GRA+7VRoeGE4gXCYC+bA8vQWTBwkZsClIM7P9PR0ozNho31mavZrU174XmnO?=
+ =?us-ascii?Q?rjs68cytBWxcPNciz1LsJLaYA67R4WL4Of92eqVFHheCxq1jFoqj6gli1ogj?=
+ =?us-ascii?Q?wm0SJU0I3YBo1O2utWyyxrK309QOnwusdK3mJykyutfhyxq1gHgtTkoORmmx?=
+ =?us-ascii?Q?2gtvShm25AzfvM2tb375njVSF6WSllCx6ZsPGEYQxrAknngBIj20Znk8O2M9?=
+ =?us-ascii?Q?KLAVbPPrLAFLBFBzmOpMUXZhejtt5GCMCbWGMFVfghyY0jpQx6xUcEfvAXZG?=
+ =?us-ascii?Q?ZRaLPMI4Xs/3yynTKoS/e3E5H5gZntNDHnVMRjpEoisiN/AazZ50mQyBlr2a?=
+ =?us-ascii?Q?a56+pBwNuuMcVycm9KjghI2rdk3hetkzK3YLRr8OTQzNVvo8LdYhGBCd4nUt?=
+ =?us-ascii?Q?FXCUj1C7Ya4B/QKJMnNYAQXJ4aZdOnq+GCJ+x32cgBseDHmCnSZqQsYqecVo?=
+ =?us-ascii?Q?83mFd5MQcdXHA92jNSUwofgZzE3NdUotgWtxUoWHZ7MSMBPOtQhUFF1RCUJi?=
+ =?us-ascii?Q?/OZ1fcwvm45G1iTr/KrhYWgQjJpXDDhvm5v7z8QTvorfxeQQU7p68DxiGrQ2?=
+ =?us-ascii?Q?xLqoXd1+pMgtUbpJ+VK2x0vVq6ypQuNsDdrlic7EjbS7aMmzYU8RNse5rLAv?=
+ =?us-ascii?Q?77iwp2ngXZjR9kxFaIfAVIMk/vCpmhumxHUV6futAQ92YcIH?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66bbef33-7cb1-4145-5042-08de53dd98c6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2026 02:27:14.8957
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yM6QzTPBzkfni+auhTIOjlTtazJFGy8rWVvS7+uhIxVkaeC6t/Kt5vS7j3XHKBYavkEfhGhqIV99m76JmwU9nw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9347
 
-On 2026/1/15 03:05 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> On Tue, Jan 13, 2026 at 7:27=E2=80=AFPM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> > On 2026/1/14 09:25 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> > > On Sat, Jan 10, 2026 at 6:12 AM Menglong Dong <menglong8.dong@gmail.c=
-om> wrote:
-> > > >
-> > > > Add BPF_TRACE_FSESSION supporting to x86_64, including:
-> > [...]
-> > > >
-> > > > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_com=
-p.c
-> > > > index d94f7038c441..0671a434c00d 100644
-> > > > --- a/arch/x86/net/bpf_jit_comp.c
-> > > > +++ b/arch/x86/net/bpf_jit_comp.c
-> > > > @@ -3094,12 +3094,17 @@ static int emit_cond_near_jump(u8 **pprog, =
-void *func, void *ip, u8 jmp_cond)
-> > > >  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
-> > > >                       struct bpf_tramp_links *tl, int stack_size,
-> > > >                       int run_ctx_off, bool save_ret,
-> > > > -                     void *image, void *rw_image)
-> > > > +                     void *image, void *rw_image, u64 func_meta)
-> > > >  {
-> > > >         int i;
-> > > >         u8 *prog =3D *pprog;
-> > > >
-> > > >         for (i =3D 0; i < tl->nr_links; i++) {
-> > > > +               if (tl->links[i]->link.prog->call_session_cookie) {
-> > > > +                       /* 'stack_size + 8' is the offset of func_m=
-d in stack */
-> > >
-> > > not func_md, don't invent new names, "func_meta" (but it's also so
-> >
-> >
-> > Ah, it should be func_meta here, it's a typo.
-> >
-> >
-> > > backwards that you have stack offsets as positive... and it's not even
-> > > in verifier's stack slots, just bytes... very confusing to me)
-> >
-> >
-> > Do you mean the offset to emit_store_stack_imm64()? I'll convert it
-> > to negative after modify the emit_store_stack_imm64() as you suggested.
-> >
+> > The tx_buf has three types: FEC_TXBUF_T_SKB, FEC_TXBUF_T_XDP_NDO and
+> > FEC_TXBUF_T_XDP_TX. Currently, the driver uses 'if...else...' statement=
+s
+> > to check the type and perform the corresponding processing. This is ver=
+y
+> > detrimental to future expansion. For example, if new types are added to
+> > support XDP zero copy in the future, continuing to use 'if...else...'
+> > would be a very bad coding style. So the 'if...else...' statements in
+> > the current driver are replaced with switch statements to support XDP
+> > zero copy in the future.
 >=20
-> yes
+> The if...else... sequence has the advantage that the common 'cases'
+> can be put first.
 
-ACK
+Yes, you are right. But for the current situation, we cannot determine whic=
+h
+is the common case. When XDP is not enabled, there is no doubt that TX
+packets come from the traditional kernel network stack, so FEC_TXBUF_T_SKB
+is the common case. However, the situation may be different when XDP copy
+mode or XDP zero-copy mode is enabled. With AF_XDP support, there will be
+five types of tx_buf. So there will be five branches, thus I think using a =
+switch
+statement is clearer and more readable.
 
+> The compiler will use a branch tree for a switch statement (jumps tables
+> are pretty much not allowed because of speculative execution issues) and
+> limit the maximum number of branches.
+> That is likely to be pessimal in many cases - especially if it generates
+> mispredicted branches for the common cases.
 >=20
-> >
-> > >
-> > > > +                       emit_store_stack_imm64(&prog, stack_size + =
-8, func_meta);
-> > > > +                       func_meta -=3D (1 << BPF_TRAMP_M_COOKIE);
-> > >
-> > > was this supposed to be BPF_TRAMP_M_IS_RETURN?... and why didn't AI c=
-atch this?
-> >
-> >
-> > It should be BPF_TRAMP_M_COOKIE here. I'm decreasing and
-> > compute the offset of the session cookie for the next bpf
-> > program.
-> >
-> >
-> > This part correspond to the 5th patch. It will be more clear if you
-> > combine it to the 5th patch. Seems that it's a little confusing
-> > here :/
-> >
+> So not clear cut at all.
 >=20
-> It is confusing. And invoke_bpf is partly provided with opaque
-> func_meta, but also partly knows its structure and does extra
-> adjustments, I don't like it. I think it would be simpler to just pass
-> nr_args and cookies_offset and let invoke_bpf construct func_meta for
-> each program invocation, IMO.
-
-Then we need to pass the "is_return" to invoke_bpf() too, and
-all the possible flags in func_meta in the feature, which will
-make the function arguments become more and more.
-
-I think maybe we can pass the func_meta(don't contain the cookie_offset)
-and the cookie_offset, and let invoke_bpf() construct func_meta with
-cookie_offset further? Which will make it less confusing. What do you
-think?
-
-Thanks!
-Menglong Dong
-
->=20
-> >
-> > Maybe some comment is needed here.
-> >
-> >
-> > >
-> > > > +               }
-> > > >                 if (invoke_bpf_prog(m, &prog, tl->links[i], stack_s=
-ize,
-> > > >                                     run_ctx_off, save_ret, image, r=
-w_image))
-> > > >                         return -EINVAL;
-> > > > @@ -3222,7 +3227,9 @@ static int __arch_prepare_bpf_trampoline(stru=
-ct bpf_tramp_image *im, void *rw_im
-> > > >         struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
-> > > >         struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODI=
-=46Y_RETURN];
-> > > >         void *orig_call =3D func_addr;
-> > > > +       int cookie_off, cookie_cnt;
-> > > >         u8 **branches =3D NULL;
-> > > > +       u64 func_meta;
-> > > >         u8 *prog;
-> > > >         bool save_ret;
-> > > >
-> > > > @@ -3290,6 +3297,11 @@ static int __arch_prepare_bpf_trampoline(str=
-uct bpf_tramp_image *im, void *rw_im
-> > > >
-> > > >         ip_off =3D stack_size;
-> > > >
-> > > > +       cookie_cnt =3D bpf_fsession_cookie_cnt(tlinks);
-> > > > +       /* room for session cookies */
-> > > > +       stack_size +=3D cookie_cnt * 8;
-> > > > +       cookie_off =3D stack_size;
-> > > > +
-> > > >         stack_size +=3D 8;
-> > > >         rbx_off =3D stack_size;
-> > > >
-> > > > @@ -3383,9 +3395,19 @@ static int __arch_prepare_bpf_trampoline(str=
-uct bpf_tramp_image *im, void *rw_im
-> > > >                 }
-> > > >         }
-> > > >
-> > > > +       if (bpf_fsession_cnt(tlinks)) {
-> > > > +               /* clear all the session cookies' value */
-> > > > +               for (int i =3D 0; i < cookie_cnt; i++)
-> > > > +                       emit_store_stack_imm64(&prog, cookie_off - =
-8 * i, 0);
-> > > > +               /* clear the return value to make sure fentry alway=
-s get 0 */
-> > > > +               emit_store_stack_imm64(&prog, 8, 0);
-> > > > +       }
-> > > > +       func_meta =3D nr_regs + (((cookie_off - regs_off) / 8) << B=
-PF_TRAMP_M_COOKIE);
-> > >
-> > > func_meta conceptually is a collection of bit fields, so using +/-
-> > > feels weird, use | and &, more in line with working with bits?
-> >
-> >
-> > It's not only for bit fields. For nr_args and cookie offset, they are
-> > byte fields. Especially for cookie offset, arithmetic operation is perf=
-ormed
-> > too. So I think it make sense here, right?
-> >
-> >
-> > >
-> > > (also you defined that BPF_TRAMP_M_NR_ARGS but you are not using it
-> > > consistently...)
-> >
-> >
-> > I'm not sure if we should define it. As we use the least significant by=
-te for
-> > the nr_args, the shift for it is always 0. If we use it in the inline, =
-unnecessary
-> > instruction will be generated, which is the bit shift instruction.
-> >
-> >
-> > I defined it here for better code reading. Maybe we can do some comment
-> > in the inline of bpf_get_func_arg(), instead of defining such a unused
-> > macro?
->=20
-> I think I just wouldn't define NR_ARGS macro at all then, given inline
-> implementation implicitly encodes that knowledge anyways.
->=20
-> >
-> >
-> > Thanks!
-> > Menglong Dong
-> >
-> >
-> > >
-> > >
-> > >
-> > >
-> > > > +
-> > > >         if (fentry->nr_links) {
-> > > >                 if (invoke_bpf(m, &prog, fentry, regs_off, run_ctx_=
-off,
-> > > > -                              flags & BPF_TRAMP_F_RET_FENTRY_RET, =
-image, rw_image))
-> > > > +                              flags & BPF_TRAMP_F_RET_FENTRY_RET, =
-image, rw_image,
-> > > > +                              func_meta))
-> > > >                         return -EINVAL;
-> > > >         }
-> > > >
-> > > > @@ -3445,9 +3467,14 @@ static int __arch_prepare_bpf_trampoline(str=
-uct bpf_tramp_image *im, void *rw_im
-> > > >                 }
-> > > >         }
-> > > >
-> > > > +       /* set the "is_return" flag for fsession */
-> > > > +       func_meta +=3D (1 << BPF_TRAMP_M_IS_RETURN);
-> > > > +       if (bpf_fsession_cnt(tlinks))
-> > > > +               emit_store_stack_imm64(&prog, nregs_off, func_meta);
-> > > > +
-> > > >         if (fexit->nr_links) {
-> > > >                 if (invoke_bpf(m, &prog, fexit, regs_off, run_ctx_o=
-ff,
-> > > > -                              false, image, rw_image)) {
-> > > > +                              false, image, rw_image, func_meta)) {
-> > > >                         ret =3D -EINVAL;
-> > > >                         goto cleanup;
-> > > >                 }
-> > > > --
-> > > > 2.52.0
-> > > >
-> > >
-> >
-> >
-> >
-> >
-> >
->=20
-
-
-
-
+> 	David
 
