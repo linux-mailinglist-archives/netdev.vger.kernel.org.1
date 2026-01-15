@@ -1,126 +1,196 @@
-Return-Path: <netdev+bounces-250125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD867D24348
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:35:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FC1D2438A
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 128413014598
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:35:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 65ADA3014D19
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE20535E523;
-	Thu, 15 Jan 2026 11:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D697F37B3F8;
+	Thu, 15 Jan 2026 11:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="INKnG8Ds"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="Snj4H2ke"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B3D33AD83
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A021837997A
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768476924; cv=none; b=I+cJqvN9Dd/DaWQtMBqeh/LKFCqBCj4UidczL21HFkgWmq1+2fRkpp+Jsp9MmE47VyaN+N2DcIV58kQ2cKiLnmaa8W0jbKmiiOum64HUV257fb5g6a7awAstvcTf2HqiV+tT996ggxuAHuCHsgsDPzHIrMpiKcxrie2ONYedLJ4=
+	t=1768477240; cv=none; b=rkaYL8ekkRe9xw7RQ1+Qpt8QzGzXNeWzPjfvuOv8D+mcsz68cX2fz3rX+5cbxkex5ahU7qBHvGuwl473hRsU7sIlnEUviUN3s2KVt6OjmjZwLyNLkNfBlDF+EUivostu+uqBjkM0wIG2TxyjTiGBW4j6MWdoyTSMC6YEf5KbJ+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768476924; c=relaxed/simple;
-	bh=HGK8KU2XQHQLnkvp6F85E2i+Z8ViAFYO0nG/sD3SBFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R4EiRPTP3fuF4UIhsuheosV59UA3Gv3gCg6M0aG5Ny0cIZGSFSO8N1nQfwjksljajHSUPxQtEwBJN+UawnOIWd+vqyjI2o9muZKSXxKTa4dA7mIVITOri5u2x2NIIjyE6RrCnRQPkFk06vFiAo8vkUadajobDlqRSGSJ1sdapkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=INKnG8Ds; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5013c912f9fso9537721cf.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:35:23 -0800 (PST)
+	s=arc-20240116; t=1768477240; c=relaxed/simple;
+	bh=PXS05RerQpUx4ctPGdnS/G+foMJ48Qj8aQtOAt7OSgE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g6AxXE+UZbEOAZFtfN+mW8gsGTY9NzqypWp7ql+8DTLNLrojd0PQvBCVQSzVkwY2qkhuoytZdpfJu93XDqCU1ij9g1Qwvh+/ukFthbCMK65dcnoCX3Ojbv4nazUCzTaubXIZxUmLdgCFlGq3rPs2Begp/CPju9oODay6ZI2I6xI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=Snj4H2ke; arc=none smtp.client-ip=74.125.82.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-1233702afd3so943707c88.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:40:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768476922; x=1769081722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/W0S2/bK8xUoCrZvoVCNOu1N9wLhj86+1jh6DZFbWek=;
-        b=INKnG8DsaKcQOMQDWrFLiNwiihlH/huHsh7lS3NmqFxR0WcD/NP5mFUKaHbBWfXo+z
-         B01cglhxuwlxy2N9E8iC54pQK6qaMNOyv++JQYxtpLJEPHGOvq1ICwQxZupkN+7ogfjD
-         N0V4xD3aERaWewYglHMBk+0MyV3i7mbS2it87bXNPj8nOI9mq/GbAVdeBL6bA/sMYQN+
-         ONcQNThS0bB18weI6eK9tKbSjKoL3QYihVCMQ2AbWlravLS8e381rtvunoVtRJCVghOG
-         v/McXODBYFvkeyzhJiz4sz7zqdk2xmrOdmnmFwP/nsnBDiAuwHXHsX4BWW4BnaCVgtTe
-         5bug==
+        d=sartura.hr; s=sartura; t=1768477238; x=1769082038; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cROdaZB2e3rP7WqjBdCtWuYMmHKRB0QhTDeH6xpIT5w=;
+        b=Snj4H2keuLGA7mBYNWNb7wLGKBThA06Y55uRRk5uCfCkPET0J6R0yz782x4EmHUDZU
+         x1phjNTKZcf6VkYqXdpdbDi/+/EQLAOJGxCX86tTBxCZrMwDoHCzeqzvWV3N6+PYPi6U
+         +cBfB2rdG5hiuqwBrwWBXXREREf4D7MgQTKd+fcBScJY+i+yhNR41iVUBtxtLu1Yr5Ra
+         HjdiID4koXPiVhsLA2rKtBxnOkK7YGzga0dcDPDV5T1lBaJvysqQVkVP8PicGWFOJLkT
+         XXaoeEv+/YFh4rmONO8a868tJ4eoQJVMmxgrsBMhru5hn0Mpbcj4SQWAeFdAvuHC/91g
+         Y6DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768476922; x=1769081722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/W0S2/bK8xUoCrZvoVCNOu1N9wLhj86+1jh6DZFbWek=;
-        b=etHsyVkma1XWg9gQs7fWVCZkiodZL3unUhBz3yVGL00UCP7NQLzu8qBW72oo+zSlOB
-         XZ2iHFZvTKyjttqctHReSObRzVq/XimRUCTIj4T26nATfkrL9AwNYGJCvgArHnkDAo7G
-         YcIhdmn5jAG0498WW1RIVUbsT4eTc8KsYEEZqkeOmMBCywL28udVr5a+KsPqkzUxaOz3
-         Cf/t2mM+cb4gTwdmuplMUTdzJ9oNZLNvKLkD8tuwZLKLHuPr/NNjP3w5tMe8u0EztTx0
-         Q4HKdTtGs8x13EwufSbJI7qDbKT9ET/KDOZ7NzBp6jLjqcF7Ot5IofaJVqXUmPbu8Du8
-         J1Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCX3mZJGwG+Gl+abVyBcKAKb++NloKESwtpNWImw7l6Edr4Dm80U/oBYuPA63UTvsOSKkQ1z67c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCvQ15291iiKwcyyriEf/LndAwVTe0mL3jrdqpf2hGZIGDGlbW
-	cbwcZ59btKQ6Cr1FeU9mKI3A9KTck3nfvYawkFao6+yj8uS16JCMF8luoVfCsVNtH8Yq7HTKmsJ
-	FJuq49e+s5JRxElWzDoc7jZ2dksyWeHt2Ef2EDBH789TmqTl990mNEAE82rE=
-X-Gm-Gg: AY/fxX5idRt3Cm81Q9V4672oaHeNiHvg1ICYdbsTdKnWPfW3uyAGoUnqT1/viD1uKXD
-	lDYDISUmAQgV8QdmEArbvQBxAUF75OCQqw3Xq/SvtZzNTMxMxj3QRu+sMlO1YhwbjFsVdF94n+7
-	xs9G2Y4SeZ/yyy0/fQ/BwTS3AcUSjHMi3hpuCcYVWMELca+Izj919TrX7zMwzjYeJxvIP/HaOkb
-	2wrCeQH2KfT+DW6fKgHNb/GBscwM0FO6wpvzcltMFCP05epeFt5P18u+f3n8k+DK59FPQ==
-X-Received: by 2002:a05:622a:a05:b0:4ee:1301:ebb3 with SMTP id
- d75a77b69052e-50148278431mr78671091cf.54.1768476921830; Thu, 15 Jan 2026
- 03:35:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768477238; x=1769082038;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cROdaZB2e3rP7WqjBdCtWuYMmHKRB0QhTDeH6xpIT5w=;
+        b=PqwOHUsNGF5BsR79tFYitREgy58uywwfPpAx9J6QgO4ER8pBhX+84RJQ5XfJHF1ijc
+         UzTfu4NLLMeBut1xgj9uQPJ1f+Y9rkk8LKvKf/n/K1GJKo/Z+h5xzFykdDEQdm5gzBke
+         AhzJn67RmV99U95Br1XJ6e3vXWpbZU+vVVov6q5Y0ZX7A5vRfh7a3zv++8wrfz1JQlEu
+         E1vP9JWutkpzvYtPcbNhsYiJHIAMt2LyiwCj9DM+Dmuut3Mt8A0KUqki83UKYgBfFfS8
+         jsFwQ8LkiHnSaAuiqaUtiSEeXTxsZ9T7zlDcvGrIEpnx44crZ4qwM9mksV1KvzCYBTwA
+         F5yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDrb0Paz/PVP7CvMztl5uJE7PjfEmnTbwGnKYjU9S/BbvGeolQd4zOWLLSXaOZvzX/U8YwhZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDBuHBSZLCEwkDCyryNRXrPWakySomFFwHHkneQcvqXwLnKC/U
+	9jbEGfaUnud5RyniTKRQ+5X9bR/tugMrk8f6WbKRlHdzgNiyTD0ja2e77RGyqahx4oQ=
+X-Gm-Gg: AY/fxX7WecUCVD66QLhJY2N5ig9YRi+3SS1+fcCj/WhihJsUK8+6Y0TriImeMHxlrJi
+	U0FfjNOO7c2N9vBLEa1nWGeDC7Dcvx6LoXBba1AUY7eQF8J931pO7nC4IFSMpz4IOQQEx0nyigV
+	BSDLyzBD2K4Yk51z2YX/PrDuyWRocrV149tgQYBb4DFInvBeiRMLfrAwvb9ZZm+y5s7hRl3W2V7
+	PSDfDfHy8QkZ7QwLVWfLIumQzojBXjIK1zrROCzweHKHhvFqyfNehlLCuZYnSlm1K9h3TC3pXB6
+	NQq4PgUpuvfv2laCaDqgihruf3TdTiKL6P6KnKK2i4CfdcW0x6wenZ9MwzruYapQuRMK0rsEJRA
+	yr2B3lnpToiUAUGieuEk3OSrLyqwgaf4vPcxta4h8AEP2lEt9Htnpf8z8EUpYXrJgGdJrZpdr0l
+	YycGRAqAsp5appJ3nu4CuVid49aZrd0+xEmJhpyCeRjo1st5rfApLkxEZ3VYBvd94zt0ORJq5eJ
+	vBWv2Xd
+X-Received: by 2002:a05:701b:2305:b0:123:2c7f:28cf with SMTP id a92af1059eb24-12336a23a4amr5794003c88.8.1768477237584;
+        Thu, 15 Jan 2026 03:40:37 -0800 (PST)
+Received: from fedora (dh207-14-52.xnet.hr. [88.207.14.52])
+        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-123370a051esm4875347c88.15.2026.01.15.03.40.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 03:40:36 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	lee@kernel.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	linusw@kernel.org,
+	olivia@selenic.com,
+	richard.genoud@bootlin.com,
+	radu_nicolae.pirea@upb.ro,
+	gregkh@linuxfoundation.org,
+	richardcochran@gmail.com,
+	horatiu.vultur@microchip.com,
+	Ryan.Wanner@microchip.com,
+	tudor.ambarus@linaro.org,
+	kavyasree.kotagiri@microchip.com,
+	lars.povlsen@microchip.com,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [PATCH v5 00/11] Add support for Microchip LAN969x
+Date: Thu, 15 Jan 2026 12:37:25 +0100
+Message-ID: <20260115114021.111324-1-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112131515.4051589-1-edumazet@google.com> <bc1b8d79-2229-486b-aea2-bbd71d1fc74f@redhat.com>
-In-Reply-To: <bc1b8d79-2229-486b-aea2-bbd71d1fc74f@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 15 Jan 2026 12:35:10 +0100
-X-Gm-Features: AZwV_QjTWUinG0vB_TeYpanXX9GF35uvCincNiTgIy1fFa__45zDZGX_h3aay2Y
-Message-ID: <CANn89iJdpMQe9M-ubvc1bZm+KFdpOOL_EPmyhUjka82L8YJpDw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: inline napi_skb_cache_get()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 15, 2026 at 12:29=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On 1/12/26 2:15 PM, Eric Dumazet wrote:
-> > clang is inlining it already, gcc (14.2) does not.
-> >
-> > Small space cost (215 bytes on x86_64) but faster sk_buff allocations.
-> >
-> > $ scripts/bloat-o-meter -t net/core/skbuff.gcc.before.o net/core/skbuff=
-.gcc.after.o
-> > add/remove: 0/1 grow/shrink: 4/1 up/down: 359/-144 (215)
-> > Function                                     old     new   delta
-> > __alloc_skb                                  471     611    +140
-> > napi_build_skb                               245     363    +118
-> > napi_alloc_skb                               331     416     +85
-> > skb_copy_ubufs                              1869    1885     +16
-> > skb_shift                                   1445    1413     -32
-> > napi_skb_cache_get                           112       -    -112
-> > Total: Before=3D59941, After=3D60156, chg +0.36%
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Not blocking this patch, but I'm wondering if we should consider
-> defining an 'inline_for_performance' macro for both documentation
-> purpose and to allow no inline for size-sensitive build.
+This series adds support for the Microchip LAN969x switch SoC family.
 
-Yes, I saw mm/slub.c was using __fastpath_inline, but conditional to
-CONFIG_SLUB_TINY,
-and forcing __always_inline
+Series is a bit long since after discussions in previous versions, it was
+recommended[1][2] to add SoC specific compatibles for device nodes so it
+includes the required bindings updates.
 
-#ifndef CONFIG_SLUB_TINY
-#define __fastpath_inline __always_inline
-#else
-#define __fastpath_inline
-#endif
+[1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
+[2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
+[3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
+[4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
 
-(For some reason clang is not very smart at compiling mm/slub.c, I am
-preparing a series to help with that)
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+
+Changes in v5:
+* Picked Acked-by and Reviewed-by tags
+* Change clock header license to match the DTSI one
+* Alphabetize EV23X71A pin nodes
+* Remove the requirment for all ethernet-port nodes to have phys property
+as when RGMII is used there is no SERDES being used
+* Drop phys from RGMII port on EV23X71A
+* Drop USB, DMA, MIIM, SPI and I2C bindings as those were already picked
+
+Changes in v4:
+* Pick Acked-by from Andi for I2C bindings
+* Move clock indexes from dt-bindings into a DTS header as suggested by
+Krzysztof[4]
+
+Changes in v3:
+* Pick Acked-by from Conor
+* Drop HWMON binding as it was picked into hwmon already
+* Document EV23X71A into AT91 binding
+* Drop SparX-5 and AT91 bindings merge
+* Apply remark from Conor on DMA binding regarding merging cases
+
+Changes in v2:
+* Change LAN969x wildcards to LAN9691 in patches
+* Split SoC DTSI and evaluation board patches
+* Add the suggested binding changes required for SoC specific compatibles
+* Merge SparX-5 and AT91 bindings as suggested[3]
+
+Robert Marko (11):
+  dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+  dt-bindings: serial: atmel,at91-usart: add microchip,lan9691-usart
+  dt-bindings: rng: atmel,at91-trng: add microchip,lan9691-trng
+  dt-bindings: crypto: atmel,at91sam9g46-aes: add microchip,lan9691-aes
+  dt-bindings: crypto: atmel,at91sam9g46-sha: add microchip,lan9691-sha
+  dt-bindings: pinctrl: pinctrl-microchip-sgpio: add LAN969x
+  arm64: dts: microchip: add LAN969x clock header file
+  arm64: dts: microchip: add LAN969x support
+  dt-bindings: arm: AT91: document EV23X71A board
+  dt-bindings: net: sparx5: do not require phys when RGMII is used
+  arm64: dts: microchip: add EV23X71A board
+
+ .../devicetree/bindings/arm/atmel-at91.yaml   |   6 +
+ .../crypto/atmel,at91sam9g46-aes.yaml         |   1 +
+ .../crypto/atmel,at91sam9g46-sha.yaml         |   1 +
+ .../bindings/mfd/atmel,sama5d2-flexcom.yaml   |   1 +
+ .../bindings/net/microchip,sparx5-switch.yaml |  15 +-
+ .../pinctrl/microchip,sparx5-sgpio.yaml       |  20 +-
+ .../bindings/rng/atmel,at91-trng.yaml         |   1 +
+ .../bindings/serial/atmel,at91-usart.yaml     |   1 +
+ arch/arm64/boot/dts/microchip/Makefile        |   1 +
+ arch/arm64/boot/dts/microchip/clk-lan9691.h   |  24 +
+ arch/arm64/boot/dts/microchip/lan9691.dtsi    | 488 +++++++++++
+ .../boot/dts/microchip/lan9696-ev23x71a.dts   | 756 ++++++++++++++++++
+ 12 files changed, 1309 insertions(+), 6 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/microchip/clk-lan9691.h
+ create mode 100644 arch/arm64/boot/dts/microchip/lan9691.dtsi
+ create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
+
+-- 
+2.52.0
+
 
