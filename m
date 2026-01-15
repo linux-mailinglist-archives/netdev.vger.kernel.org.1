@@ -1,149 +1,218 @@
-Return-Path: <netdev+bounces-250027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 395CBD23095
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:14:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8536ED23223
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36CF13007185
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:13:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC4BD3005BA8
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9423C32D45B;
-	Thu, 15 Jan 2026 08:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAEB332EDE;
+	Thu, 15 Jan 2026 08:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=atlas.cz header.i=@atlas.cz header.b="PzX+Io4W"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="o6Q3gPNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from gmmr-3.centrum.cz (gmmr-3.centrum.cz [46.255.225.205])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313612D3EC1;
-	Thu, 15 Jan 2026 08:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.255.225.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67002D24B7;
+	Thu, 15 Jan 2026 08:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768464838; cv=none; b=htVpuzW6w6HdbDjktzqHv0Y7eFspokknThO51QquWHPeCJ3qR3zJlEPfhqEwdwFW/ARZNtDdZxf/0k1IhvWKfjUX2x32k7b8j1Wn8DujbuNjOFT8crSPwRWtY6vqjU7gJh0UIVVCZHVqdA3/iUlJH1ypTE70OD2GhzSOcY9Dmmc=
+	t=1768465590; cv=none; b=ENd7P565w9JFqnjPO+K69mjx3l9k9+tD9bgdxnCNgeBOVYly0PuVzmLLgEhBIry88pPGQaZPH/a9v1r9m63ZfrBqx2IbKiyQBk1CStFb93CiezzMmSutIH/FICmL4XDLCSN4JVVYO4XPhAuGOUe5TdQ1pN33Y/Yaz5vE23S26mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768464838; c=relaxed/simple;
-	bh=RVJsit++Thv4QFWpjxk1A5tPUotoM8QUBIxSFIY+aiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=id98HfPtdVkvdy8iVvhS1pZ2faJ1UN+yVns3kIs5V+YUkRyiSAqsEwCvCvjZxldYZjHQ++jbwpWcYiQp6+TLWEA1Ldsm8PDoOoKSb6NcmhNiASG+9s7azhhhnH5n7cJXYSunvhug9fBC4NKLKFjYZljjd0JgQ8ajBReZ3D8wl1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atlas.cz; spf=pass smtp.mailfrom=atlas.cz; dkim=pass (1024-bit key) header.d=atlas.cz header.i=@atlas.cz header.b=PzX+Io4W; arc=none smtp.client-ip=46.255.225.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=atlas.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atlas.cz
-Received: from gmmr-3.centrum.cz (localhost [127.0.0.1])
-	by gmmr-3.centrum.cz (Postfix) with ESMTP id E9921205FFE0;
-	Thu, 15 Jan 2026 09:12:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=atlas.cz; s=mail;
-	t=1768464740; bh=8xs4Ur+iyrRIuci3J+LzFqMJp6PbKveiLreGF9YV6j8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PzX+Io4WQTvytOktzlWe8zZStzEvkGKY9E5an3T2xojbmYzqOc8dKrmF5Yc8nFoyL
-	 9WsjJ1Fso/HOLad3FPdu1GTYKPxUbUXU1mxYwI/sZ+bF/ymyL93xa3a5Gct0GXtMCD
-	 Cx4cuPtzfJqoTK9mWHikSAeEgT9+TlxHD62r1/Js=
-Received: from antispam102.centrum.cz (antispam102.cent [10.30.208.102])
-	by gmmr-3.centrum.cz (Postfix) with ESMTP id E4D1E20241B8;
-	Thu, 15 Jan 2026 09:12:20 +0100 (CET)
-X-CSE-ConnectionGUID: JIz2WijUQpieEWqCpfKtUg==
-X-CSE-MsgGUID: SVgMl3xhSHqvlnkbrVU6cg==
-X-ThreatScanner-Verdict: Negative
-X-IPAS-Result: =?us-ascii?q?A2H/BwBCoGhp/0vj/y5agQkJi1GRd1WLIoY1gSCEAYZhg?=
- =?us-ascii?q?WsPAQEBAQEBAQEBCVEEAQGFBwKMdic4EwECBAEBAQEDAgMBAQEBAQEBAQEBA?=
- =?us-ascii?q?QsBAQYBAQEBAQEGBgECgR2GCVOCW4QIAQUjBFIQCw0BCgICJgICVgaDFYI6A?=
- =?us-ascii?q?TmuY38zGgJl3HcCgSVigSwVgQouiFMBhH5xhHhCgg2EPz6EDgESAYN8gmkEg?=
- =?us-ascii?q?iKBDoFFik6IAVJ4HANZLAFVExcLBwWBI0MDgQYjSwUtHYEjIR0XEx9YGwcFE?=
- =?us-ascii?q?yOBHAYbBhwSAgMBAgI6UwyBdgICBIIQe4IBD4cQgQAFLm8aDiICQzUDC209N?=
- =?us-ascii?q?xQbBJV7gRMgG8ZggxyBCoROnSQzg3EBlAsDkmsumFipQYFRLoEPcDMiMIMjU?=
- =?us-ascii?q?RnSLoEzAgcLAQEDCYI7j2OBSwEB?=
-IronPort-PHdr: A9a23:GzdngRAVN7V5rxfn4nOgUyQUC0UY04WdBeb1wqQuh78GSKm/5ZOqZ
- BWZua4xygeRFtyBtq8fw8Pt8IneGkU4qa6bt34DdJEeHzQksu4x2yEGPouuJHa/EsTXaTcnF
- t9JTl5v8iLzG0FUHMHjew+a+SXqvnYdFRrlKAV6OPn+FJLMgMSrzeCy/IDYbxlViDanbr5/I
- hq7oR/NusUKjoduN7g9xxvJr3ZGZu9b2X5mKVWPkhnz4cu94IRt+DlKtfI78M5AX6T6f6AmQ
- rFdET8rLWM76tD1uBfaVQeB6WMSXWoPnhdWDAbL8Qn2UZjtvCT0sOp9wzSaMtbtTb8oQzSi7
- rxkRwHuhSwaKjM26mDXish3jKJGvBKsogF0zoDIbI2JMvd1Y6XQds4YS2VcRMZcTyJPDIOiY
- YYREuQPPuhYoIbhqFQTrxSzHhWsCP/1xzNUmnP6wa833uI8Gg/GxgwgGNcOvWzOotrrKKcSS
- /2+w6bSwjXFcfZW2ir25Y/SfRA7ovGDR7dwftDLyUQ0DQzFklGQppb+Pz+PyusMsnGW4ux9X
- u2gl2ApsRt+oiSzxsgykInJgJoYxk3Y+Chlz4s4J9+1RVNmbdOmH5VduSGXOop5TM4sTW9lp
- ig0xLIGtJKmYiUG1ZQqyh7fZfCbcoWG7BbuWPiRLDp+mXlre6q/ig69/EWh0OHwSMm53VZQo
- iZbjNXBtGoB2h7T58SfVPdx40ms1SyR2wzN9u1IO144mKXHJ5I7xrM9l5weulnZECDsgkX5l
- qqWe10h+uiv9uvofK3rpoSZN49okgH+NbkumtCnDeQ4LAcOW2+b9Pyz1L3m5EH5W7BKjuEuk
- qXErZzWP9gUqbC/Aw9JyIYj9hO/Ay2639UZhXUHLVRFdwybj4XxNFzDIer0Aem/jlmsijtn2
- e7KM7/7DpjPLnXPiLLhcqx8605Yxgoz19df55dMB74bOvLzWVX+tNnCAR8jKAG72frnCNFn2
- YMFQ26AHq6YPLvIsVCU/uIvP/WMZIgNtTfzMfcl4fHujXEkmV8GfampwIEYaHGjE/t9OUqZY
- GfjgsobHWgWuQo+SfTmiEeeXj5Le3ayQ6U86ykmB428E4fMWIWtjaec0yihAJ1ZeGVGClSLE
- Xfma4WIQfEMZzyOIsN5iDwLSaChS5M91RGprAL11adoLvfR+iICtJPsysR16vbclRE18jx0A
- MCd3H+XQ25omWMIQic63Lpjrkxl1leDza94juRbFdxO/PxGSBw3NZ3CwOxgDdD9RAbBcs2OS
- Fa8TdWqGSsxQc4pw98Sf0Z9HM2vjh7e3yqxA78ViqaEBJ0u/qPSxXfxIcl9xm3C1KkgiVkmX
- 8ROOXe7iaFh6QjfH5TJnFmBl6a2aaQc2zbA9HmZwmWTvUFYVRR8UavbUn8CYUvWt8r25kXBT
- 7+pErknNgpBycifKqpFcNHmkEtJROn7NNTEf22xg3uwBQqPxr6UYovqen8d0zvSCEgZiQ8T5
- 2uJOBM6BieguGLeECduGUjuYkLj7+VxtHy2QlUowAGNak1tz6C19QINhfyAV/MT2aoJtz0nq
- zppBlaywdzXB92GpwV/YKVTfM0y4Elc2GLdqgx9OJqgI7p+iV4eIExLuBbM3hZqAM1jkMMrq
- mgpzUImKr+S2XtCeime0JS2PafYfDrc5heqPpbbxkuW7t+QWaRHvP0iqFzmtRuBH1Ym+m4h2
- MsDgCjU3YnDEAdHCcG5aU0w7RUv/9nn
-IronPort-Data: A9a23:KRK5N6NKSab0qJ/vrR0WlsFynXyQoLVcMsEvi/4bfWQNrUoqgWcHm
- GMXCz+FPPmLMDbzedB3Pojg8xhTscDSxtNkT3M5pCpnJ55oRWspJjg7wmPYZX76whjrFRo/h
- ykmQoCeaphyFDmF/03F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZg6mJTqYb/WVrlV
- e/a+ZWFZgf8gmMsawr41orawP9RlKWv0N8nlgNmDRx7lAe2v2UYCpsZOZawIxPQKqFIHvS3T
- vr017qw+GXU5X8FUrtJRZ6mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwOhxIktl
- YoX5fRcfi9yVkHEsLx1vxC1iEiSN4UekFPMCSDXXcB+UyQq2pYjqhljJBheAGEWxgp4KUNv5
- 6YnKTIwVwiCis+J2ZmjRMpwu8t2eaEHPKtH0p1h5T7cSO0jXYiaGuPB6NlExio1wMtcdRrcT
- 5ZHL2AyMVKaOUIJZQp/5JEWxY9EglH2aT5RrVuPjaMr52HIigdjuFToGIOJIoHRHJoIwi50o
- Er9wWvcBkoKNOe/0CSB9HGmnNHywyj0Ddd6+LqQs6QCbEeo7nMaDhIYSEC7vPC4okS3Wt5Cb
- UcT/0IGoaEs+UmDQtDjUhi8p3CY+BgRR7J4HuEn7Qifx7b87AGeCWwJCDVGbbQOt9I8TBQp2
- 0WPktevAiZg2JWbVGmd676V6yy7Pyc9KW4EeD9CQQYbi/H9qY0yi1TBQ9pkCqOzjdrdHTD23
- iDMoCUg750MjNQG2Liy51zvhzO3uoOPXB5v7VmRVWWghitwYoK/apPr71XH4fteBIKESF/Ht
- 3hss9CX5u0IDLmXmSCNSflLF7asj96BMTvBkRtsEoMn+jCF5XGuZ8ZT7St4KUMvNdwLERfvb
- VPftB15+pBeJj2pYLVxbob3DN4lpYDCHM/iUNjGfoBFPt56cwrvwc11TRLOmTqwzQ52y/55Z
- srznduQMEv2wJ9PlFKeL9rxG5dymkjSGUu7qUjH8ima
-IronPort-HdrOrdr: A9a23:2bgCWKt2UQHsy+T32PlbOIEF7skDYdV00zEX/kB9WHVpmwKj+P
- xGuM5rsCMc6QxhOk3I9urrBEDtex7hHNtOkO0s1NSZLWrbUQmTTb2KhLGKq1bd8m/FltK1vp
- 0PT0ERMrHNMWQ=
-X-Talos-CUID: =?us-ascii?q?9a23=3AylOexGqUfdOXsIpV1xSkjbzmUeIEYCfizXXtGle?=
- =?us-ascii?q?5BEtWUZaNR3yMxawxxg=3D=3D?=
-X-Talos-MUID: =?us-ascii?q?9a23=3AOTmOVA8+3PYVdYCLRGzlJd2Qf/xW7IGqU1ANqrU?=
- =?us-ascii?q?fpc2CNiZqBQrDhzviFw=3D=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.21,226,1763420400"; 
-   d="scan'208";a="140531754"
-Received: from unknown (HELO gm-smtp11.centrum.cz) ([46.255.227.75])
-  by antispam102.centrum.cz with ESMTP; 15 Jan 2026 09:12:14 +0100
-Received: from arkam (ip-213-220-240-96.bb.vodafone.cz [213.220.240.96])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by gm-smtp11.centrum.cz (Postfix) with ESMTPSA id 077331004FFCE;
-	Thu, 15 Jan 2026 09:12:14 +0100 (CET)
-Date: Thu, 15 Jan 2026 09:12:13 +0100
-From: Petr =?utf-8?B?VmFuxJtr?= <arkamar@atlas.cz>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: fushuai.wang@linux.dev, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, davem@davemloft.net,
-	vadim.fedorenko@linux.dev, Jason@zx2c4.com,
-	wireguard@lists.zx2c4.com, wangfushuai@baidu.com
-Subject: Re: [net-next, v3] wireguard: allowedips: Use kfree_rcu() instead of
- call_rcu()
-Message-ID: <202611581213-aWihXdQpdnhXv606-arkamar@atlas.cz>
-References: <20260112130633.25563-1-fushuai.wang@linux.dev>
- <20260115033237.1545400-1-kuba@kernel.org>
+	s=arc-20240116; t=1768465590; c=relaxed/simple;
+	bh=hjRK7S2yHOJWgvJDDW/5DKmLFZ1dyZcklQuWpWEJMsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MQoxSrTzqGXwJ/Ih+YYfAEN8hd3lz9Aj29wr4tQVy2zqx2IheDI36ecyAD+9FLPSyj245CWPY0kvRv22V238upmWcf419YUwq0IoO07u0mAaThJzIJi/sDCUddI8uE6e0J9dw02difCaRi3P7P+0C6IX8bY5Az6qIvPpDijNNss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=o6Q3gPNK; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=coeHE8IRePhJggmjMKT9z8lYs1HyViWzWxocUnEa7Gs=; b=o6Q3gPNK0x/+qjgXzrxJM0mNQR
+	HSmYNm3/XZk4GfhKfw0ilv1hauvziUf5/NR6ghGujYkhXrBMxelEz0bxJW9A33gPsGPS8rUl/vmS5
+	PTkwb2ZkthBsyl6OXBvVAGTcYibkL9QLJ+xFUK84xGY1AKAjuQgN2jm/yq9zUJmmEKgu7Rb6Lqs2d
+	lukyhT3ofbvrtJCvoLJgzAuCQcLtl6qEjcqIZSlJM0iudCq51dPuoOpwc7s/QkgVD8rhHIo7lyD9e
+	+kj0PHggzfJ3VMYIrNKvGH7QkvD8iFzoZDQFL6ejoHDDHmxdEc0evmwydKEizFHZgcVsP3lz5Mqbs
+	R3FsiWTw==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vgIg8-000Nov-1N;
+	Thu, 15 Jan 2026 09:26:04 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	dw@davidwei.uk,
+	toke@redhat.com,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: [PATCH net-next v7 00/16] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Thu, 15 Jan 2026 09:25:47 +0100
+Message-ID: <20260115082603.219152-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260115033237.1545400-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27881/Thu Jan 15 08:25:08 2026)
 
-Hi Jakub,
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
-Minor side note: I noticed a small typo in the AI review foreword. I
-assume this is part of a template:
+This patchset adds the concept of queue leasing to virtual netdevs that
+allow containers to use memory providers and AF_XDP at native speed.
+Leased queues are bound to a real queue in a physical netdev and act
+as a proxy.
 
-On Wed, Jan 14, 2026 at 07:32:37PM -0800, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least pausible.
-                                                        ^~~~~~~~
-pausible -> plausible
+Memory providers and AF_XDP operations take an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a leased queue, which then gets proxied to the underlying real
+queue.
 
-Best,
-Petr
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
+
+v6->v7:
+ - Add xsk_dev_queue_valid real_num_rx_queues check given bound
+   xs->queue_id could be from a TX queue (AI review bot)
+ - Fix up exception path in queue leasing selftest (AI review bot)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v5->v6:
+ - Fix nest_queue test in netdev_nl_queue_fill_one (Jakub/AI review bot)
+ - Fix netdev notifier locking leak (Jakub/AI review bot)
+ - Drop NETREG_UNREGISTERING WARN_ON_ONCE to avoid confusion (Stan)
+ - Remove slipped-in .gitignore cruft in net selftest (Stan)
+ - Fix Pylint warnings in net selftest (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v4->v5:
+ - Rework of the core API into queue-create op (Jakub)
+ - Rename from queue peering to queue leasing (Jakub)
+ - Add net selftests for queue leasing (Stan, Jakub)
+ - Move netkit_queue_get_dma_dev into core (Jakub)
+ - Dropped netkit_get_channels (Jakub)
+ - Moved ndo_queue_create back to return index or error (Jakub)
+ - Inline __netdev_rx_queue_{peer,unpeer} helpers (Jakub)
+ - Adding helpers in patches where they are used (Jakub)
+ - Undo inline for netdev_put_lock (Jakub)
+ - Factoring out checks whether device can lease (Jakub)
+ - Fix up return codes in netdev_nl_bind_queue_doit (Jakub)
+ - Reject when AF_XDP or mp already bound (Jakub)
+ - Switch some error cases to NL_SET_BAD_ATTR() (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v3->v4:
+ - ndo_queue_create store dst queue via arg (Nikolay)
+ - Small nits like a spelling issue + rev xmas (Nikolay)
+ - admin-perm flag in bind-queue spec (Jakub)
+ - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
+ - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
+ - New patch (12/14) to handle the underlying device going away (Jakub)
+ - Improve commit message on queue-get (Jakub)
+ - Do not expose phys dev info from container on queue-get (Jakub)
+ - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
+ - Rework xsk handling to simplify the code and drop a few patches
+ - Rebase and retested everything with mlx5 + bnxt_en
+v2->v3:
+ - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
+ - Add missing netdev_lockdep_set_classes in netkit
+v1->v2:
+ - Removed bind sample ynl code (Stan)
+ - Reworked netdev locking to have consistent order (Stan, Kuba)
+ - Return 'not supported' in API patch (Stan)
+ - Improved ynl documentation (Kuba)
+ - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
+ - Added also queue type in ynl to have user specify rx to make
+   it obvious (Kuba)
+ - Use of netdev_hold (Kuba)
+ - Avoid static inlines from another header (Kuba)
+ - Squashed some commits (Kuba, Stan)
+ - Removed ndo_{peer,unpeer}_queues callback and simplified
+   code (Kuba)
+ - Improved commit messages (Toke, Kuba, Stan, zf)
+ - Got rid of locking genl_sk_priv_get (Stan)
+ - Removed af_xdp cleanup churn (Maciej)
+ - Added netdev locking asserts (Stan)
+ - Reject ethtool ioctl path queue resizing (Kuba)
+ - Added kdoc for ndo_queue_create (Stan)
+ - Uninvert logic in netkit single dev mode (Jordan)
+ - Added binding support for multiple queues
+
+Daniel Borkmann (9):
+  net: Add queue-create operation
+  net: Implement netdev_nl_queue_create_doit
+  net: Add lease info to queue-get response
+  net, ethtool: Disallow leased real rxqs to be resized
+  xsk: Extend xsk_rcv_check validation
+  xsk: Proxy pool management for leased queues
+  netkit: Add single device mode for netkit
+  netkit: Add netkit notifier to check for unregistering devices
+  netkit: Add xsk support for af_xdp applications
+
+David Wei (7):
+  net: Proxy net_mp_{open,close}_rxq for leased queues
+  net: Proxy netdev_queue_get_dma_dev for leased queues
+  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+  selftests/net: Add bpf skb forwarding program
+  selftests/net: Add env for container based tests
+  selftests/net: Make NetDrvContEnv support queue leasing
+  selftests/net: Add netkit container tests
+
+ Documentation/netlink/specs/netdev.yaml       |  44 +++
+ drivers/net/netkit.c                          | 360 +++++++++++++++---
+ include/linux/netdevice.h                     |   6 +
+ include/net/netdev_queues.h                   |  19 +-
+ include/net/netdev_rx_queue.h                 |  21 +-
+ include/net/page_pool/memory_provider.h       |   4 +-
+ include/net/xdp_sock_drv.h                    |   2 +-
+ include/uapi/linux/if_link.h                  |   6 +
+ include/uapi/linux/netdev.h                   |  11 +
+ net/core/dev.c                                |   7 +
+ net/core/dev.h                                |   2 +
+ net/core/netdev-genl-gen.c                    |  20 +
+ net/core/netdev-genl-gen.h                    |   2 +
+ net/core/netdev-genl.c                        | 185 +++++++++
+ net/core/netdev_queues.c                      |  74 +++-
+ net/core/netdev_rx_queue.c                    | 169 ++++++--
+ net/ethtool/channels.c                        |  12 +-
+ net/ethtool/ioctl.c                           |   9 +-
+ net/xdp/xsk.c                                 |  79 +++-
+ tools/include/uapi/linux/netdev.h             |  11 +
+ .../testing/selftests/drivers/net/README.rst  |   7 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../drivers/net/hw/lib/py/__init__.py         |   7 +-
+ .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 +++
+ .../selftests/drivers/net/hw/nk_netns.py      |  23 ++
+ .../selftests/drivers/net/hw/nk_qlease.py     |  55 +++
+ .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
+ .../selftests/drivers/net/lib/py/env.py       | 157 ++++++++
+ 28 files changed, 1233 insertions(+), 117 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
+
+-- 
+2.43.0
+
 
