@@ -1,209 +1,140 @@
-Return-Path: <netdev+bounces-250040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58FA2D23265
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:33:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D173D23388
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99F4F31433BC
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:27:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C024D30188C0
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320BA334C3B;
-	Thu, 15 Jan 2026 08:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BF53375C3;
+	Thu, 15 Jan 2026 08:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="GVOIne+9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KJkXYCV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC97F331A40;
-	Thu, 15 Jan 2026 08:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83DE334370
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 08:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768465606; cv=none; b=Zg1ckJFIYe+s+4sSxycqki3VI5fj2+FA3axT3OFdu12G79ZUWd2BtZhtsSZOmBXTT/Y8RpALZRPV+HrbKRyx0Ug1xnXcTNwZC4B9OOR83iVg0xyZtSqB4VuYBJRqeDLAISIXsyzWsSi5pJ7pOAKkTocdCnH5gquhGR0k6/TGRkQ=
+	t=1768466042; cv=none; b=jD/AQhJ3Kr2dRQSaxiaGpvqD7m1vue+nyNvfwW2Wq1kYG5eMSlHZ8rZszaSWxkg9nJtDLyMJqxWPQB5t8HLoCrw3Dskbl50hOfhdonctQm3PdWmPIUjTK77Iaj/dxjN+enak+tiXOSj480P8mvxejHuU1u1CeYhUpE2r/hU9hdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768465606; c=relaxed/simple;
-	bh=ds3vmtRO482oJ4L9zl1gi+HwQInYAfVxpdU9illDGlw=;
+	s=arc-20240116; t=1768466042; c=relaxed/simple;
+	bh=2EKJYAPuzH7oKPGpx9c+rZgCTn1LKzT+k+fkIG/FR1I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W7ypFYnVl4HZ1An0rQ5cCQffROIRn9+7WXLlvJqNm7qHV3DeQBy0WzUTHZkkwXokIny96uN+QBFEQZxLv3DhlwSVscLTee6n4EXbim61wruAD6Krq//cadjs1wiRtutrbrXCSxTTvms92/8BhLuU/qpxJCRW8V1/aywfeJu9+dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=GVOIne+9; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=A3JhZ4YZgwR/rLOGJb+FXJJbVesXMoF+77HTdLn+a1E=; b=GVOIne+9qrj9thDef3MU2gbPTo
-	2urAdT9TOi8iqQEkT+29ViU+G6D6dwO7PZT9MTu5aI1z9TBKXhT5yjd8A1rnhTyTe0LjaQQBmHWos
-	rzo1re2kn5QhE6rmCUticlghmlscgS8ji774HRWy7wqgKMz49pLQp4Vgibjwp4mtPn4p+1H5okSS+
-	hznG5xsuhf5MPacJZRwTt9F3WlQ59F5xWou+ZKAdg184cHVGRvwWtTwkyTyFDr5xF4gzEvlndVa/t
-	OmHtxgmCFiH+6EiM8iml+GpfUvO3UvghBrRDpuNxTvJYgxAn8EIMZZTO+eXSpftTHjfSZpHAie6e1
-	l22yK2/g==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vgIgR-000NsN-0R;
-	Thu, 15 Jan 2026 09:26:23 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	razor@blackwall.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	sdf@fomichev.me,
-	john.fastabend@gmail.com,
-	martin.lau@kernel.org,
-	jordan@jrife.io,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	dw@davidwei.uk,
-	toke@redhat.com,
-	yangzhenze@bytedance.com,
-	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v7 16/16] selftests/net: Add netkit container tests
-Date: Thu, 15 Jan 2026 09:26:03 +0100
-Message-ID: <20260115082603.219152-17-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260115082603.219152-1-daniel@iogearbox.net>
-References: <20260115082603.219152-1-daniel@iogearbox.net>
+	 MIME-Version:Content-Type; b=QbCAJEbcT5fbH5HwCa0QFwz9Ha891qAwMaRutDb+VbeaGzGd/HDxfMb46S0F9bKZqc1QqlzfNZHP4NW4vRkVka+fsIGtkU7mUsZkfzWuO1W11YTqYoxdITe3jqoVa/rBT2JIcQPehIJc5iYk0DsW+3ifgUFP/8Rtv8JrLD8z/Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KJkXYCV9; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768466038;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bw7DDQX/ZM5AiYqMY7G1eGZ2tEpOcpxd1X3KkINTp4I=;
+	b=KJkXYCV9H069dK/Agq+oqiQrHE888vQDRueMyeNIq9PRKUxqnsXOUvrMqbw5MZCTgcjfPv
+	kLEAXhMG9+veX1lIfiSTDNvys1HnOONq4STvTmhkB3SJrGi6Hq69odDTTKLcavlA/6oDHF
+	SbZqZgFbRCcXspUuANHLVlXNmW6JcWQ=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
+ andrii@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v9 01/11] bpf: add fsession support
+Date: Thu, 15 Jan 2026 16:33:42 +0800
+Message-ID: <13928754.uLZWGnKmhe@7940hx>
+In-Reply-To:
+ <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
+References:
+ <20260110141115.537055-1-dongml2@chinatelecom.cn> <3026834.e9J7NaK4W3@7940hx>
+ <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27881/Thu Jan 15 08:25:08 2026)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-From: David Wei <dw@davidwei.uk>
+On 2026/1/15 02:56 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> On Tue, Jan 13, 2026 at 6:11=E2=80=AFPM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> > On 2026/1/14 09:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > > On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong=
+@gmail.com> wrote:
+> > > >
+> > > > The fsession is something that similar to kprobe session. It allow =
+to
+> > > > attach a single BPF program to both the entry and the exit of the t=
+arget
+> > > > functions.
+> > > >
+> > [...]
+> > > > --- a/kernel/bpf/btf.c
+> > > > +++ b/kernel/bpf/btf.c
+> > > > @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct =
+bpf_verifier_log *log, const struct
+> > > >                 case BPF_TRACE_FENTRY:
+> > > >                 case BPF_TRACE_FEXIT:
+> > > >                 case BPF_MODIFY_RETURN:
+> > > > +               case BPF_TRACE_FSESSION:
+> > > >                         /* allow u64* as ctx */
+> > > >                         if (btf_is_int(t) && t->size =3D=3D 8)
+> > > >                                 return 0;
+> > > > @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum b=
+pf_access_type type,
+> > > >                         fallthrough;
+> > > >                 case BPF_LSM_CGROUP:
+> > > >                 case BPF_TRACE_FEXIT:
+> > > > +               case BPF_TRACE_FSESSION:
+> > >
+> > > According to the comment below we make this exception due to LSM.
+> > > FSESSION won't be using FSESSION programs, no? So this is not
+> > > necessary?
+> >
+> > The comment describe the LSM case here, but the code
+> > here is not only for LSM. It is also for FEXIT, which makes
+> > sure that we can get the return value with "ctx[nr_args]".
+> > So I think we still need it here, as we need to access the
+> > return value with "ctx[nr_args]" too.
+>=20
+> please update the comment then as well
 
-Add two tests using NetDrvContEnv. One basic test that sets up a netkit
-pair, with one end in a netns. Use LOCAL_PREFIX_V6 and nk_forward BPF
-program to ping from a remote host to the netkit in netns.
+Hi, Andrii. After deeper analysis, I think the comment is explaining
+why LSM doesn't need to check the return value type of the target
+kernel function in this code patch, as the target for LSM always
+return void or int. So I think the comment has nothing to do with
+fsession or fexit, right?
 
-Second is a selftest for netkit queue leasing, using io_uring zero copy
-test binary inside of a netns with netkit. This checks that memory
-providers can be bound against virtual queues in a netkit within a
-netns that are leasing from a physical netdev in the default netns.
+Its position may cause some misunderstanding, and if it is placed
+after "cast BPF_LSM_MAC", it maybe more clear. (But it's another thing,
+and let's keep it still now)
 
-Signed-off-by: David Wei <dw@davidwei.uk>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- .../testing/selftests/drivers/net/hw/Makefile |  2 +
- .../selftests/drivers/net/hw/nk_netns.py      | 23 ++++++++
- .../selftests/drivers/net/hw/nk_qlease.py     | 55 +++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
+Thanks!
+Menglong Dong
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 9c163ba6feee..39ad86d693b3 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -32,6 +32,8 @@ TEST_PROGS = \
- 	irq.py \
- 	loopback.sh \
- 	nic_timestamp.py \
-+	nk_netns.py \
-+	nk_qlease.py \
- 	pp_alloc_fail.py \
- 	rss_api.py \
- 	rss_ctx.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-new file mode 100755
-index 000000000000..afa8638195d8
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-@@ -0,0 +1,23 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import NetDrvContEnv
-+from lib.py import cmd
-+
-+
-+def test_ping(cfg) -> None:
-+    cfg.require_ipver("6")
-+
-+    cmd(f"ping -c 1 -W5 {cfg.nk_guest_ipv6}", host=cfg.remote)
-+    cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=cfg.netns)
-+
-+
-+def main() -> None:
-+    with NetDrvContEnv(__file__) as cfg:
-+        ksft_run([test_ping], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_qlease.py b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
-new file mode 100755
-index 000000000000..738a46d2d20c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
-@@ -0,0 +1,55 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import re
-+from os import path
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import NetDrvContEnv
-+from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
-+
-+
-+def create_rss_ctx(cfg):
-+    output = ethtool(f"-X {cfg.ifname} context new start {cfg.src_queue} equal 1").stdout
-+    values = re.search(r'New RSS context is (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def set_flow_rule(cfg):
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} action {cfg.src_queue}").stdout
-+    values = re.search(r'ID (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def set_flow_rule_rss(cfg, rss_ctx_id):
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} context {rss_ctx_id}").stdout
-+    values = re.search(r'ID (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def test_iou_zcrx(cfg) -> None:
-+    cfg.require_ipver('6')
-+
-+    ethtool(f"-X {cfg.ifname} equal {cfg.src_queue}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    flow_rule_id = set_flow_rule(cfg)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
-+
-+    rx_cmd = f"ip netns exec {cfg.netns.name} {cfg.bin_local} -s -p {cfg.port} -i {cfg._nk_guest_ifname} -q {cfg.nk_queue}"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.nk_guest_ipv6} -p {cfg.port} -l 12840"
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(cfg.port, proto="tcp", ns=cfg.netns)
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+
-+def main() -> None:
-+    with NetDrvContEnv(__file__, lease=True) as cfg:
-+        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+        cfg.port = rand_port()
-+        ksft_run([test_iou_zcrx], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.0
+>=20
+> >
+[...]
+> >
+> >
+> >
+> >
+
+
+
 
 
