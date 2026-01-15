@@ -1,111 +1,99 @@
-Return-Path: <netdev+bounces-250221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FECD2542B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:20:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA43D254AF
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9C0273087B7B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:16:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6C9F630AAE0F
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E336B3AE6FE;
-	Thu, 15 Jan 2026 15:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4989C3AE6F3;
+	Thu, 15 Jan 2026 15:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RrA0c2Cr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+40vPcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4419B3AE6ED;
-	Thu, 15 Jan 2026 15:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B0D3ACEE1;
+	Thu, 15 Jan 2026 15:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768490177; cv=none; b=OAkG+fIabxnrPET/pn51ZtUkaMSNse6tPjvrSjjaR37BQaIp80hM6Z06h94pwJeJNOsD7GuZ/7uQBCApFsbgARnye8RBFZ37qYREoL6c94JEEE3K5rLjyDKVqxgnkEtBXI0c+6lfeJiRCG75VxP/B3aar2R2wHGKqiU8D8nw/MY=
+	t=1768490312; cv=none; b=bH0j4qwf6H4MBqSRmuExltswHaaV3PinAyBFIc7eDLWORf5Q4l9EE4udV9Tgpg/3lvHeFXm9VsQ5OZlbUHWZtbVklTNkX1WZsdzrq7w227EKJLZ6rg5Gu+RsF/9EzgnwTm9MjAmGxLdc8cI4dxX14MjxEo8jSBVwhO+9IVptzbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768490177; c=relaxed/simple;
-	bh=kWYMgicb/wXnfn/i+0E5kPZESbgs/m1X/QORhgZCg4A=;
+	s=arc-20240116; t=1768490312; c=relaxed/simple;
+	bh=tnpsywHE5eQehgwsiTgSIg1hMX70Ml+yH71IO/JtgXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X5TVxdwvkLakLtviI/Mkfocdun0hM/vVhjGhMJd0l9iYTAfrFVh1a4XPPjKFc8YOISO2LN/nS1YVYGRGt1g/FIPKdXKoRwZ+SthZEuMNd0CS9aEUUzsy2ECCBIrCMB6kTB6jwmK58+KqSXe6FkQE+HfPXFDws4dXBWdwkOud2qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RrA0c2Cr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QOLovP1nf5K8/XFRLq/JOQI95IJezXEIyYwgpMIfHxg=; b=RrA0c2Crm8jwm+G3tWPYeyiqT7
-	zErC1h99cNML2NBK9REG2mW04hcq38xBMii0CtX5baQwyTf8qSB+aKaO+QM16CHsyH9H/x2aTuxXM
-	ILfkpky1HEd40uBy+7wNq7YihR+5WgT3rnxPGL3ikENUP57iAluJPkWrrF+YrdYlpNbGPFz8tsnbm
-	m2rGB7I1S1E8qmyGtbzKZZuc1Ow0GJno4sJnG6IV9aMMxUZzPXN+MAEceecT5UJxepEK9pPRiWEUf
-	nTa3+MGFhxPa6YurSLP0sHO2oC5Q9T0m8M4LzafOZ69dGyIIToW9uQSqyf8XcRUdBk9k0K86Gmyfl
-	UaBs1WYw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59658)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgP4Z-000000001PW-0scZ;
-	Thu, 15 Jan 2026 15:15:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgP4U-000000002kl-1vG7;
-	Thu, 15 Jan 2026 15:15:38 +0000
-Date: Thu, 15 Jan 2026 15:15:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fzu2WoewSQwx3G9gYKe9gmwhWpVcUEheYawyVMXKuZCWW4pzLEuk0qPpDe0Rxt7+MGMnIhmeYA+cqPGHlND25N4i+jqK7PMRadHeS0hBaJjYCAQVySKGcV/vgHvbZ6ZSGVBk/b4DUwKv9ank2mG3NP4Wz4V5OjiFrKfwBGYjlrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+40vPcZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E29EC116D0;
+	Thu, 15 Jan 2026 15:18:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768490311;
+	bh=tnpsywHE5eQehgwsiTgSIg1hMX70Ml+yH71IO/JtgXU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p+40vPcZ68hiY9xP3RqBzt/QCsI94dJDKI+1hRXeNEivGPsRdWXd2sIFM/65wyAdG
+	 KJfXJNAX2ZVUQKWTXGXXt+ozEuByhWCoXSkl3Nh0iVMLltT3BzCznwoyfFl5qibpQX
+	 O3giP88jqMf2ihi8r4U+E4eAwCFjLUXSDjq3+vni5D4wOZRIn2UqKphXVBPT6dSht+
+	 U3Vmdbt/g4I1YUjaYAIFD4G4fRwNWe7HG0S2XcxynJe7YivJurD67wjAI/6OU4RaYz
+	 i8LJUXNlk6FSq8Lb9jI3H/VAEjsZS66R6cxMwc0ZnBH5G8Th6nIiIwhuk4uydDok8I
+	 MkafwK+LVR9kw==
+Date: Thu, 15 Jan 2026 15:18:26 +0000
+From: Lee Jones <lee@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 05/14] net: stmmac: add stmmac core serdes
- support
-Message-ID: <aWkEmockEyLsZKMd@shell.armlinux.org.uk>
-References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
- <E1vg4w2-00000003SG5-2FH5@rmk-PC.armlinux.org.uk>
- <a91a0937-93cd-40f2-9759-8823fb08f48c@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 07/15] mfd: core: add ability for cells to probe
+ on a custom parent OF node
+Message-ID: <20260115151826.GH2842980@google.com>
+References: <20251120153622.p6sy77coa3de6srw@skbuf>
+ <20251121120646.GB1117685@google.com>
+ <20251121170308.tntvl2mcp2qwx6qz@skbuf>
+ <20251215155028.GF9275@google.com>
+ <20251216002955.bgjy52s4stn2eo4r@skbuf>
+ <20251216091831.GG9275@google.com>
+ <20251216162447.erl5cuxlj7yd3ktv@skbuf>
+ <20260109103105.GE1118061@google.com>
+ <20260109121432.lu2o22iijd4i57qq@skbuf>
+ <20260115093538.o5ghqb6j6dzledyw@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a91a0937-93cd-40f2-9759-8823fb08f48c@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260115093538.o5ghqb6j6dzledyw@skbuf>
 
-On Thu, Jan 15, 2026 at 03:48:40PM +0100, Maxime Chevallier wrote:
-> Hi Russell,
-> 
-> On 14/01/2026 18:45, Russell King (Oracle) wrote:
-> > Rather than having platform glue implement SerDes PHY support, add it
-> > to the core driver, specifically to the stmmac integrated PCS driver
-> > as the SerDes is connected to the integrated PCS.
-> > 
-> > Platforms using external PCS can also populate plat->serdes, and the
-> > core driver will call phy_init() and phy_exit() when the administrative
-> > state of the interface changes, but the other phy methods will not be
-> > called.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Unfortunately I have no way to test. But still,
+On Thu, 15 Jan 2026, Vladimir Oltean wrote:
 
-I am hoping Mohd Ayaan Anwar will be able to do at least some testing
-on the qcom-ethqos hardware.
+> Hi Lee,
+> 
+> On Fri, Jan 09, 2026 at 02:14:32PM +0200, Vladimir Oltean wrote:
+> > > When I've thought about replacing the existing occurrences of the MFD
+> > > API being used outside of drivers/mfd, I have often thought of a
+> > > platform_add_device_simple() call which I believe would do what most
+> > > people of these use-cases actually want.
+> > 
+> > Would this platform_add_device_simple() share or duplicate code with
+> > mfd_add_devices()? Why not just liberalize mfd_add_devices() (the
+> > simplest solution)?
+> 
+> Sorry to nag you, but I would like to have a clear image of which way
+> this patch set needs to be heading for v2. My understanding is that
+> you're pushing for platform_device_add() while not completely rejecting
+> that MFD could be the correct model for this switch's sub-devices.
+
+Sorry, lots on.  I'll go take a look now.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Lee Jones [李琼斯]
 
