@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-250146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D8A9D24512
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:51:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB36D24518
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3BE430B9688
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:47:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5BFF63024A28
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D9139446F;
-	Thu, 15 Jan 2026 11:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43670389E0E;
+	Thu, 15 Jan 2026 11:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A+xS9meI"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UBMq8LG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABD4393DE8;
-	Thu, 15 Jan 2026 11:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C8C38A9B6;
+	Thu, 15 Jan 2026 11:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768477655; cv=none; b=DMZAL9l4wTg3ZfKZSZ1oSCzF/+pw/KjG1da1osAuPJS8oVHyq8HGKe9M+WkDvYzG0AeDCy2ZWiqe3X6dofu+/bH49w/scXF8Q2Ze8GM6yYuXzVwMp5ip26U7o+RmS60hywP29gqVrEeKXlLRfyWkIBjKESYOs3lPeM5moJrnlVE=
+	t=1768477643; cv=none; b=GuEv9ubuPktt/S13TOyMX2DCE9ndJsX8Z0+OhXPUm4OlhyuJwlCxS7stGYgr9hXYuTQqNqZRrVIkHiWoclcNIVK0RbLSGByvfgVN0ZqtMYucj1wnCg+C0IwTWN56uJf9mcUDfG6frmPkWp4ZqpYNliXlbFERyXoQDI/MjC3N5Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768477655; c=relaxed/simple;
-	bh=4DVhCl4gbIXZz7OZyWroJqYsJfVpaSbkJ/cFhnuOB1c=;
+	s=arc-20240116; t=1768477643; c=relaxed/simple;
+	bh=h2aKPbYYSCfPFp+IaCbNK1a2/jGwBhkzQ4eo2a8O6QQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=U1/0VPvJzYnMhcHHBGegbU+7wZFyPLBXWBjutIPPXtV/wGCJwaQ/fN/BRljh6lPiksIyqmZgj+aA3byIezRt7swhNqN1q/Jxy4CfWoSkR5r8RzFzksGPU4nSPyUs1WULQ8JGNvcHhJ5DkpmpWXyVDf8+JU5N2AdVbdh69YgGr6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=A+xS9meI; arc=none smtp.client-ip=117.135.210.4
+	 MIME-Version; b=iIbHHdHliHW3jS+tULjiCZCn1j3vSqDDYUa5XQf41LFNbGPhFH3kEyn+nNCCq8Qa752qI4ra13L7SZgMDUqolAUZNNGSzQRx0Npd1YjmzWye1q+1VtLs+MJKJvhtL/eJNxY/hVzro8HL4zkpcv6WABaGzyPEGJSJD1kvQYFtPzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UBMq8LG9; arc=none smtp.client-ip=220.197.31.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=ez
-	xx3sezb37S1HGZPsf+TTq5UcEdoA3/kKhmJ7zHOx4=; b=A+xS9meIXscL+2kO/C
-	sGy6dF0UVWU9eJUUf96HIbXlHtXrgMpSvu+jDelMxOkcPwNNNuC0Rr7G3mzw3dQg
-	18yu4NxyVfs2EDg47TORcGR3U26/rdOxT5UEfAyhD30YP7Mf2MpqL/KEUVu75ASp
-	KazA22+jWQREVsKP97HPP8pJ4=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=3U
+	FBFgL70KdmPe6agoutZjKBWX5ibQPwtUx3H8N2FHE=; b=UBMq8LG9hTsmdHPuU2
+	PT/mdryuI1PwSqMITEyqLNjW/7zIlhs7/K0BFvL5oyGeNSkg1cz1Wb5PpdVdAgGV
+	AKVLuGuKFmLt00BTRoZ/jWpIPJUCiiKsTsM6qxwiwv01yY2SZRnZ3tziOVcn8XnS
+	frFefJ8sRhxnGNoKG/WM+Kapg=
 Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wBHLGiX02hpr2PzGQ--.4331S4;
-	Thu, 15 Jan 2026 19:46:40 +0800 (CST)
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wBHLGiX02hpr2PzGQ--.4331S5;
+	Thu, 15 Jan 2026 19:46:43 +0800 (CST)
 From: Slark Xiao <slark_xiao@163.com>
 To: loic.poulain@oss.qualcomm.com,
 	ryazanov.s.a@gmail.com,
@@ -50,11 +50,10 @@ To: loic.poulain@oss.qualcomm.com,
 	mani@kernel.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	slark_xiao@163.com,
-	Daniele Palmas <dnlplm@gmail.com>
-Subject: [net-next v7 2/8] net: wwan: core: explicit WWAN device reference counting
-Date: Thu, 15 Jan 2026 19:46:19 +0800
-Message-Id: <20260115114625.46991-3-slark_xiao@163.com>
+	slark_xiao@163.com
+Subject: [net-next v7 3/8] net: wwan: core: split port creation and registration
+Date: Thu, 15 Jan 2026 19:46:20 +0800
+Message-Id: <20260115114625.46991-4-slark_xiao@163.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260115114625.46991-1-slark_xiao@163.com>
 References: <20260115114625.46991-1-slark_xiao@163.com>
@@ -65,132 +64,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBHLGiX02hpr2PzGQ--.4331S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCw13Gry8Gw45Xry7CFyxuFg_yoWrZF47pa
-	y3KFy3KFW8Jr4Uu39avr47XFyF9a1xCw1ft348W34Fkry3tryrXrWUXFyYqFy8tFWkCF45
-	urWUta18CF4UW3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRUUUUUUUUU=
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbC6AKR9Wlo06L4BAAA3C
+X-CM-TRANSID:_____wBHLGiX02hpr2PzGQ--.4331S5
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJFWkAw45CFWxKFW5Jw1xuFg_yoWrZF4kp3
+	W0gas5tFW8Jrnrur43AF47ZF4rua1Ik34IyrW8W34Skrn0qryFvFZY9FyqvFWrGFy7GFy3
+	Xrs8ta10ka4UWr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRrhLnUUUUU=
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCwASS9mlo06Tm+gAA3K
 
 From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
-We need information about existing WWAN device children since we remove
-the device after removing the last child. Previously, we tracked users
-implicitly by checking whether ops was registered and existence of a
-child device of the wwan_class class. Upcoming GNSS (NMEA) port type
-support breaks this approach by introducing a child device of the
-gnss_class class.
+Upcoming GNSS (NMEA) port type support requires exporting it via the
+GNSS subsystem. On another hand, we still need to do basic WWAN core
+work: find or allocate the WWAN device, make it the port parent, etc. To
+reuse as much code as possible, split the port creation function into
+the registration of a regular WWAN port device, and basic port struct
+initialization.
 
-And a modem driver can easily trigger a kernel Oops by removing regular
-(e.g., MBIM, AT) ports first and then removing a GNSS port. The WWAN
-device will be unregistered on removal of a last regular WWAN port. And
-subsequent GNSS port removal will cause NULL pointer dereference in
-simple_recursive_removal().
+To be able to use put_device() uniformly, break the device_register()
+call into device_initialize() and device_add() and call device
+initialization earlier.
 
-In order to support ports of classes other than wwan_class, switch to
-explicit references counting. Introduce a dedicated counter to the WWAN
-device struct, increment it on every wwan_create_dev() call, decrement
-on wwan_remove_dev(), and actually unregister the WWAN device when there
-are no more references.
+While at it, fix a minor number leak upon WWAN port registration
+failure.
 
-Run tested with wwan_hwsim with NMEA support patches applied and
-different port removing sequences.
-
-Reported-by: Daniele Palmas <dnlplm@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fecK1vnrghjG_e9UaRA@mail.gmail.com/
-Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 ---
- drivers/net/wwan/wwan_core.c | 34 +++++++++++++++-------------------
- 1 file changed, 15 insertions(+), 19 deletions(-)
+ drivers/net/wwan/wwan_core.c | 68 ++++++++++++++++++++++--------------
+ 1 file changed, 42 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index ade8bbffc93e..1da935e84008 100644
+index 1da935e84008..1a9a77d597e6 100644
 --- a/drivers/net/wwan/wwan_core.c
 +++ b/drivers/net/wwan/wwan_core.c
-@@ -42,6 +42,9 @@ static struct dentry *wwan_debugfs_dir;
-  * struct wwan_device - The structure that defines a WWAN device
-  *
-  * @id: WWAN device unique ID.
-+ * @refcount: Reference count of this WWAN device. When this refcount reaches
-+ * zero, the device is deleted. NB: access is protected by global
-+ * wwan_register_lock mutex.
-  * @dev: Underlying device.
-  * @ops: wwan device ops
-  * @ops_ctxt: context to pass to ops
-@@ -49,6 +52,7 @@ static struct dentry *wwan_debugfs_dir;
-  */
- struct wwan_device {
- 	unsigned int id;
-+	int refcount;
- 	struct device dev;
- 	const struct wwan_ops *ops;
- 	void *ops_ctxt;
-@@ -222,8 +226,10 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
+@@ -357,7 +357,8 @@ static void wwan_port_destroy(struct device *dev)
+ {
+ 	struct wwan_port *port = to_wwan_port(dev);
  
- 	/* If wwandev already exists, return it */
- 	wwandev = wwan_dev_get_by_parent(parent);
--	if (!IS_ERR(wwandev))
-+	if (!IS_ERR(wwandev)) {
-+		wwandev->refcount++;
- 		goto done_unlock;
-+	}
- 
- 	id = ida_alloc(&wwan_dev_ids, GFP_KERNEL);
- 	if (id < 0) {
-@@ -242,6 +248,7 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
- 	wwandev->dev.class = &wwan_class;
- 	wwandev->dev.type = &wwan_dev_type;
- 	wwandev->id = id;
-+	wwandev->refcount = 1;
- 	dev_set_name(&wwandev->dev, "wwan%d", wwandev->id);
- 
- 	err = device_register(&wwandev->dev);
-@@ -263,30 +270,18 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
- 	return wwandev;
+-	ida_free(&minors, MINOR(port->dev.devt));
++	if (dev->class == &wwan_class)
++		ida_free(&minors, MINOR(dev->devt));
+ 	mutex_destroy(&port->data_lock);
+ 	mutex_destroy(&port->ops_lock);
+ 	kfree(port);
+@@ -436,6 +437,43 @@ static int __wwan_port_dev_assign_name(struct wwan_port *port, const char *fmt)
+ 	return dev_set_name(&port->dev, "%s", buf);
  }
  
--static int is_wwan_child(struct device *dev, void *data)
--{
--	return dev->class == &wwan_class;
--}
--
- static void wwan_remove_dev(struct wwan_device *wwandev)
- {
--	int ret;
--
- 	/* Prevent concurrent picking from wwan_create_dev */
- 	mutex_lock(&wwan_register_lock);
- 
--	/* WWAN device is created and registered (get+add) along with its first
--	 * child port, and subsequent port registrations only grab a reference
--	 * (get). The WWAN device must then be unregistered (del+put) along with
--	 * its last port, and reference simply dropped (put) otherwise. In the
--	 * same fashion, we must not unregister it when the ops are still there.
--	 */
--	if (wwandev->ops)
--		ret = 1;
--	else
--		ret = device_for_each_child(&wwandev->dev, NULL, is_wwan_child);
-+	if (--wwandev->refcount <= 0) {
-+		struct device *child = device_find_any_child(&wwandev->dev);
++/* Register a regular WWAN port device (e.g. AT, MBIM, etc.) */
++static int wwan_port_register_wwan(struct wwan_port *port)
++{
++	struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
++	char namefmt[0x20];
++	int minor, err;
 +
-+		put_device(child);
-+		if (WARN_ON(wwandev->ops || child))	/* Paranoid */
-+			goto out_unlock;
++	/* A port is exposed as character device, get a minor */
++	minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
++	if (minor < 0)
++		return minor;
++
++	port->dev.class = &wwan_class;
++	port->dev.devt = MKDEV(wwan_major, minor);
++
++	/* allocate unique name based on wwan device id, port type and number */
++	snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
++		 wwan_port_types[port->type].devsuf);
++
++	/* Serialize ports registration */
++	mutex_lock(&wwan_register_lock);
++
++	__wwan_port_dev_assign_name(port, namefmt);
++	err = device_add(&port->dev);
++
++	mutex_unlock(&wwan_register_lock);
++
++	if (err) {
++		ida_free(&minors, minor);
++		return err;
++	}
++
++	dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
++
++	return 0;
++}
++
+ struct wwan_port *wwan_create_port(struct device *parent,
+ 				   enum wwan_port_type type,
+ 				   const struct wwan_port_ops *ops,
+@@ -444,8 +482,7 @@ struct wwan_port *wwan_create_port(struct device *parent,
+ {
+ 	struct wwan_device *wwandev;
+ 	struct wwan_port *port;
+-	char namefmt[0x20];
+-	int minor, err;
++	int err;
  
--	if (!ret) {
- #ifdef CONFIG_WWAN_DEBUGFS
- 		debugfs_remove_recursive(wwandev->debugfs_dir);
- #endif
-@@ -295,6 +290,7 @@ static void wwan_remove_dev(struct wwan_device *wwandev)
- 		put_device(&wwandev->dev);
+ 	if (type > WWAN_PORT_MAX || !ops)
+ 		return ERR_PTR(-EINVAL);
+@@ -457,17 +494,9 @@ struct wwan_port *wwan_create_port(struct device *parent,
+ 	if (IS_ERR(wwandev))
+ 		return ERR_CAST(wwandev);
+ 
+-	/* A port is exposed as character device, get a minor */
+-	minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
+-	if (minor < 0) {
+-		err = minor;
+-		goto error_wwandev_remove;
+-	}
+-
+ 	port = kzalloc(sizeof(*port), GFP_KERNEL);
+ 	if (!port) {
+ 		err = -ENOMEM;
+-		ida_free(&minors, minor);
+ 		goto error_wwandev_remove;
  	}
  
-+out_unlock:
- 	mutex_unlock(&wwan_register_lock);
- }
+@@ -481,27 +510,14 @@ struct wwan_port *wwan_create_port(struct device *parent,
+ 	mutex_init(&port->data_lock);
  
+ 	port->dev.parent = &wwandev->dev;
+-	port->dev.class = &wwan_class;
+ 	port->dev.type = &wwan_port_dev_type;
+-	port->dev.devt = MKDEV(wwan_major, minor);
+ 	dev_set_drvdata(&port->dev, drvdata);
++	device_initialize(&port->dev);
+ 
+-	/* allocate unique name based on wwan device id, port type and number */
+-	snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
+-		 wwan_port_types[port->type].devsuf);
+-
+-	/* Serialize ports registration */
+-	mutex_lock(&wwan_register_lock);
+-
+-	__wwan_port_dev_assign_name(port, namefmt);
+-	err = device_register(&port->dev);
+-
+-	mutex_unlock(&wwan_register_lock);
+-
++	err = wwan_port_register_wwan(port);
+ 	if (err)
+ 		goto error_put_device;
+ 
+-	dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
+ 	return port;
+ 
+ error_put_device:
 -- 
 2.25.1
 
