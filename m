@@ -1,115 +1,139 @@
-Return-Path: <netdev+bounces-250015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA8D22C93
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:21:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD5AD22E82
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 08:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C54E1309620C
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 07:20:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9EC8030115C4
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 07:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0422A31354C;
-	Thu, 15 Jan 2026 07:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A65F32863B;
+	Thu, 15 Jan 2026 07:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b="A3bXMdjd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4imA67K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw03.horizon.ai (mailgw03.horizon.ai [42.62.85.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1D018D658
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 07:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.62.85.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC0632825D
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 07:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768461604; cv=none; b=UoDyNAi9tozZONlSa361mCmmt74L1w9qPxNWu6SLqny95UzkkPhOTkA0YNT8NWkNUbYCc+/fh2GgTRaEv5Ow9QQaoteOM0Az2GzB7MYx8yFvvBXmJj45VpuxBOWCcBYPB5Czd/BFlf+g2Go696CDl9v04WgsaukOjQYd1MNCDAY=
+	t=1768463031; cv=none; b=uAzKZpAfKB+oTorCYk+LLMcEeX9ZEWCgvF4/QF47bncQpYmLjTuW5R+BGEa7s/+PZsNiOxcCOiWUuh9giIYmVot4OCNX4GpHftGe3MKgoSVMzKHoMHYKhhjTu5QyzNlRT4iQup9tSyQO3iBp1uGxzoagLWQZdABTVDF60JqbK5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768461604; c=relaxed/simple;
-	bh=qlcDgNGG2656bF5uh/RNu7eudkJOmvbjlqIJXlTkkWc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=njdIqR9qbUpFcNxM4UbECOMXCFmQy/k2ZP6x41hAw5Vt/94mk6bSU1nHKYL3hEFz42lzyiES5+r6hAvFvi/Mn2d6XBv+MMJ0zJ6sDHfWbh7ECsQN96F12K/5qbPmxvhIo2sUkMZBi3Jcp8JH1lJD8Y65luLwV9ZSbc7SlGsQ6Zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto; spf=pass smtp.mailfrom=horizon.auto; dkim=pass (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b=A3bXMdjd; arc=none smtp.client-ip=42.62.85.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=horizon.auto
-DKIM-Signature: v=1; a=rsa-sha256; d=horizon.auto; s=horizonauto; c=relaxed/simple;
-	q=dns/txt; i=@horizon.auto; t=1768461591; x=2632375191;
-	h=From:Sender:Reply-To:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qlcDgNGG2656bF5uh/RNu7eudkJOmvbjlqIJXlTkkWc=;
-	b=A3bXMdjdeMr84nPHcqcDWBbxG7JYyYC0y6wlXnxcAjtwXu3eguLg7k4m8D/dt26o
-	v+LO1QajvKcXlPTwK3bWNwfv9VwbWFHn6GRcm5bT2+tWmIwONnKTcdS3h+AW1gS8
-	halF6Mr6wY9o/gvsSJ2qIUmsWBGK43o5gsa9OYIkX2o=;
-X-AuditID: 0a0901b2-df5da70000001406-e3-69689516a14b
-Received: from mailgw03.horizon.ai ( [10.9.15.111])
-	by mailgw03.horizon.ai (Anti-spam for msg) with SMTP id FD.D2.05126.61598696; Thu, 15 Jan 2026 15:19:50 +0800 (HKT)
-Received: from wangtao-VirtualBox.hobot.cc (10.9.0.252) by
- exchange002.hobot.cc (10.9.15.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.27;
- Thu, 15 Jan 2026 15:19:49 +0800
-From: Tao Wang <tao03.wang@horizon.auto>
-To: <kuba@kernel.org>
-CC: <alexandre.torgue@foss.st.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<maxime.chevallier@bootlin.com>, <mcoquelin.stm32@gmail.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <rmk+kernel@armlinux.org.uk>,
-	<tao03.wang@horizon.auto>
-Subject: Re: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after resume
-Date: Thu, 15 Jan 2026 15:19:38 +0800
-Message-ID: <20260115071938.116336-1-tao03.wang@horizon.auto>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260114191645.03ed8d67@kernel.org>
-References: <20260114191645.03ed8d67@kernel.org>
+	s=arc-20240116; t=1768463031; c=relaxed/simple;
+	bh=4ZKMFzqUYnla7RqOdHYETkH39sGLPzWrK9jRFhTlv04=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JDowfbcxJ6Hcm1OazCpXj/pJ+6nwhlVCSp99UHjTGWi4XV8pn8nvCaC6FJfwRw2YhB0dpMuwvOJ8oMYDJOu1T2eAozr+l1qOpQC/AZN7ov5UghC7U/KGqULkk8zvolO82BaXjyUdn6ALKZ+zfZ2LPb61ccxLN/cjMV8fiylJaHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4imA67K; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-12331482b8fso2055081c88.1
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 23:43:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768463029; x=1769067829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HG78mpNhTdrp/DWvaFu2sCfC8aNreM8Rt9E5tzcxfmg=;
+        b=J4imA67KAyyx95CuKdPNOl78Pfa8voencyCIxGn5E7P6PKwOFRfKEEeUCIYfhM8R90
+         sB4EWevHcDQKvGX3UZwRQ6i5EbbHpLer7VARGJtG89gatkhvIrmqeWIJkDjjZRaEBs7f
+         YzA6U7F7IqWbmPiq2pThmtD3/JhsQ5wRCZzL/UWcQXCzwdw1u21/VsXqTyyRHO7jKdNx
+         VRiRJrGBg9gui8ll5qxKFJ9AETkjTN6IFnSj0/IPjFksDkzrD+NI+gMMGRlKwH8mKjp/
+         HY/9DoHb5zSmVkrdt21NKLMyKd48EJXsYDvLNUYQaKhgirwgxOm0DFEFO4ARy2BS3N9W
+         AYBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768463029; x=1769067829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HG78mpNhTdrp/DWvaFu2sCfC8aNreM8Rt9E5tzcxfmg=;
+        b=JwlNZyGrbb3iQ6e1Koj0Mio1hMLmhehVnnkfUOdxnwWD3MrloIg1gSSlztmXHBxvi4
+         nY4e/BxIHn/Jeyt5lBASd7tSCTzuTVLifDxOOQ3uZQ2/wjnwyP2viv0k1DPrYbnJp6IK
+         4f0fecV0x3icaKEwmWVl4a+qSEtSgkYtgcWo8ZUiMzw5QxqKYnzP3chOhDOV/uhohkUw
+         +NacSrq5721aBrG3ktVnMun260kf0FBfkYbunnc14sCage57hU59uUiiQba2qz9N+tqH
+         DB1L0As8corkD42+cDOw7heAt77by/5a/1ATN/ml0VwRJds9AjFZMDCrss/QETCNvFyH
+         ve4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWr7nZU89uTuNs/6+6KWw3ZZ/dIP7fNSOeQzVdCOeH1VdP4jrlIQGgeCI1b0bydWmSeFzejE8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgc5nmL3RyCV/K1vo+dy4En/MuPzBJFaiFLd5sCPhbt73TBl86
+	K0xayvgZzLjuxPwSXjLNkGihtBjAXeYqwwSMUgDz346X7feZXMnH/CH0GPbFbmQoFf+p1ZIehsE
+	TPN2W6tLgegDIUwtNhJJ8p17utXIEheXGX2A7bw/Y
+X-Gm-Gg: AY/fxX4I/xJHDnNRq2ul25x0lOD/2u/Q0LxFpBa9On7dlRb+4O/HYBKgacLajFqYpXe
+	VJFxVoM6/u6ll2e+bPWcOKdR4fFyAEOkyA9ALdVTDun+dSgqvZr1DNBLn9uG/w+ew2esauk+eod
+	6p0z422fCjVI3r3zXWK5DUVBKwPbDu9jVDBFiIwK76SyuzI1dzDLX8PAff2LdO/2H8jUNpZPSZn
+	HaOgAzAalXs6pfwJS48G2ixwFU0aewJ7zqTZcS/lKA9fs44rDAswOyT+F7aDWFOty1V9h3OrYtI
+	rUxVxTf7KufjPCy4G6r9JMMEnGKOOK60kuVXkFIu8sWLnjp8IpsRcAY4FpvUfw==
+X-Received: by 2002:a05:701b:2711:b0:11b:b064:f606 with SMTP id
+ a92af1059eb24-1233775f708mr4935793c88.26.1768463028777; Wed, 14 Jan 2026
+ 23:43:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: exchange001.hobot.cc (10.9.15.110) To exchange002.hobot.cc
- (10.9.15.111)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplkeLIzCtJLcpLzFFi42Lh4uTP1xWbmpFpsOuCjcXPl9MYLZY/2MFq
-	Med8C4vFo/4TbBYXtvWxWixsW8JicXnXHDaLl6+3MVscWyBm8e30G0aLS/0TmRy4PS5fu8js
-	MW9NtceWlTeZPJ72b2X32LSqk81j547PTB7v911l8/i8SS6AI4rLJiU1J7MstUjfLoEr4+Xv
-	j6wFfRwVK1+1MTYw7mfrYuTgkBAwkbjTVdnFyMUhJLCSUWLuvQmsEM4LRonZPzYydjFycrAJ
-	aEjcnXqNBcQWERCV2L5hHTtIEbPAKyaJ3hvTWUESwgJhEpdP/GADsVkEVCUunz7HDGLzCthK
-	rH00H8yWEJCXuD7lANhQTgFDia03F4MNFRIwkHja18wCUS8ocXLmEzCbGai+eetsZghbQuLg
-	ixfMEPUqEs0n57NDzJSTeL0B5ptYiRM/PCYwCs1CMmkWkkmzkExawMi8ilE4NzEzJ73cwFgv
-	I78osyo/Ty8xcxMjOKYYN+1gXLLgo94hRiYOxkOMEhzMSiK8vL/TMoV4UxIrq1KL8uOLSnNS
-	iw8xSnOwKInzaivGZQoJpCeWpGanphakFsFkmTg4pRqYTpQwn3hrUNw3/69f9OKrnDd13xq+
-	O3v48Y3fH17yLctw1dx5tGz+9A8Xm2ULhcTjF2/qWLck78Dm6ZNf3FT8Y3X2g1OYz8bZKzfy
-	cGXde5S1b+u5G7/cin3v3OfK1LgzrSThxsZn3RFXnnTqBGeu4jZnv2Gy/jTP23eBtXrJqi+c
-	H+Y+SargNZnzkWfTuoL70p82le9j5Lq0M1N79Yx3IfsfHAnImb0xa8/MNEnHqg375wRMv7Sq
-	hqnD8PvSRPP0dwphVZar7ocIpMfKdPd2v3rMnshRkPNofsJL382tcrY6Gz4Htgh/nnH3c792
-	JcemBe3L5m2Y5vJkuqzjxzIpk1M79vcvP/j5IPdD9S52lrVKLMUZiYZazEXFiQA5irVgGAMA
-	AA==
+References: <20260112200736.1884171-1-kuniyu@google.com> <20260112200736.1884171-3-kuniyu@google.com>
+ <20260113191122.1d0f3ec4@kernel.org> <CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
+ <20260114194045.2916ef4e@kernel.org>
+In-Reply-To: <20260114194045.2916ef4e@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 14 Jan 2026 23:43:36 -0800
+X-Gm-Features: AZwV_QjXRi806zbqzI7XdTVzUP5gxwTsFDHxRFmMo2BNlZAM_nt5Ls4sSSh1P-k
+Message-ID: <CAAVpQUAafpy7QC4bAff9Yx0utaoGkCf-L79Tc9C7bcqDrzO3ew@mail.gmail.com>
+Subject: Re: [PATCH v1 net 2/2] fou: Don't allow 0 for FOU_ATTR_IPPROTO.
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Tom Herbert <therbert@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > To solve the issue, set last_segment to false in stmmac_free_tx_buffer:
-> > tx_q->tx_skbuff_dma[i].last_segment = false.  Do not use the last_segment
-> >  default value and set last_segment to false in stmmac_tso_xmit. This
-> > will prevent similar issues from occurring in the future.
-> > 
-> > Fixes: c2837423cb54 ("net: stmmac: Rework TX Coalesce logic")
-> > 
-> > changelog:
-> > v1 -> v2:
-> > 	- Modify commit message, del empty line, add fixed commit
-> > 	 information.
-> > 
-> > Signed-off-by: Tao Wang <tao03.wang@horizon.auto>
-> 
-> When you repost to address Russell's feedback in the commit
-> message please:
->  - follow the recommended format (changelog placement and no empty
->    lines between Fixes and SoB):
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#changes-requested
->  - do not send new version in reply to the old one, start a new thread
+On Wed, Jan 14, 2026 at 7:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 13 Jan 2026 23:15:42 -0800 Kuniyuki Iwashima wrote:
+> > Btw I needed the change below to generate the diff above
+> > by "./tools/net/ynl/ynl-regen.sh -f".  Maybe depending on
+> >
+> >
+> > diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
+> > index 81b4ecd891006..fda5fe24cfd47 100755
+> > --- a/tools/net/ynl/ynl-regen.sh
+> > +++ b/tools/net/ynl/ynl-regen.sh
+> > @@ -29,9 +29,9 @@ for f in $files; do
+> >   continue
+> >      fi
+> >
+> > -    echo -e "\tGEN ${params[2]}\t$f"
+> > -    $TOOL --cmp-out --mode ${params[2]} --${params[3]} \
+> > -   --spec $KDIR/${params[0]} $args -o $f
+> > +    echo -e "\tGEN ${params[5]}\t$f"
+> > +    $TOOL --cmp-out --mode ${params[4]} --${params[5]} \
+> > +   --spec $KDIR/${params[1]} $args -o $f
+> >  done
+> >
+> >  popd >>/dev/null
+> >
+> >
+> > fwiw, $params were like
+> >
+> > 3- Documentation/netlink/specs/fou.yaml
+> > 4: YNL-GEN kernel source
+> > --
+> > 3- Documentation/netlink/specs/fou.yaml
+> > 4: YNL-GEN kernel header
+>
+> Hm, I guess you have grep.lineNumber enabled in your git config?
 
-Understood, I will correct the commit message format and post the next
- version of the patch as a new thread.
+Ah exactly, I didn't know that my corp machine enabled
+it globally by default :)
 
-Thanks
-Tao Wang
+
+> Could you see if tossing --no-line-number into the git grep
+> in this script fixes it for you and if yes send a patch?
+
+It worked, I'll include it in the series.
+
+Thank you!
 
