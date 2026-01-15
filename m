@@ -1,175 +1,106 @@
-Return-Path: <netdev+bounces-250312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49937D285B9
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 21:17:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263E3D285DE
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 21:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 825303002878
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 20:17:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7F45B300B34C
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 20:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C864267B05;
-	Thu, 15 Jan 2026 20:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6335431B80D;
+	Thu, 15 Jan 2026 20:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I92j7Tnl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h5IBRNEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1597F218592
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 20:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D480C318EE4
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 20:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768508224; cv=none; b=Ze1aVnhKL9jtGeduHpsFnqwOurUk0SpUV6m+zudGWtOId+Oi08itpeI3fGGxw0rUPbylhLvv08EQsjt+ZkKz1ZLSeFiU4YBHPLxR3giZNQTTaAGCL7JLuuDBGpUZ2dHld/TE5cCr3rsR9UY8lSObKrMrS9dizu0D9lHAPAStAhY=
+	t=1768508342; cv=none; b=cPZ55TcNZhkKqFTNq2fkvpKoTTCoSkgkRafcR7CC9vAAncnI0S4YrpCWTSUF8so8M6HEeGPTEhE3HsBnCO7vt4S4FH/I4K6WfiXUH5nrFR6WP9S5sAb6D557w740bBxWEns18TngMaREfpCBksaCK39Xka5k4Yw1bpZ6LU7FeuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768508224; c=relaxed/simple;
-	bh=sr/hdWFQ9KkD+TzkczJguG2xe/t5a33rnbeMI16o8vI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pA6JOK0OTbh1oD4ekuI2mS9UPl9U0fgUI/4BVsKa7twD0/ZoaEwuTTOTgms/zW7ijBJWL+/g8x3O4HwxEVajOfZ00TtXciKzJvk3jdtAxZEiA8lzqjNjoIbdO7XJNAxXUFBfXlzPIro36qcPrZqZqbA9J0fdPBS6+AbtcuuDXEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I92j7Tnl; arc=none smtp.client-ip=209.85.217.51
+	s=arc-20240116; t=1768508342; c=relaxed/simple;
+	bh=eh+kBRyz90Egas7KTTUMuggMZfmSELLpVeZFZwhRQKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GBErqf0N/tUvA2WZY4noHb4LzoI/JJgLtFXhQcZHn3KrbsSSDKFjZmNWWyl6DaX2BZ+B6E/aktmEErmxVlbnPVjFVay6gxYCVS+9uYcskHuZuMyyRFUiMIrqwPd3bxXB0pqAM260o3EM7b7bG3GRWCBhOmeVoQv0Zxc3v1/tYr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h5IBRNEs; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5eea9fbe4a4so498855137.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:17:02 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4801bbbdb4aso5331075e9.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:19:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768508222; x=1769113022; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zhclwvWvzEdw1QOphaqNrn+NFyAYXreTgP2FFPklQQc=;
-        b=I92j7TnliemfJnMFfkzH8K1qOtoPPhKuxyFWjqRGET/VEkq5JEcMZ2WIQWM2HYgvGo
-         cEVN/5HRn9XNfKDIJRTxs19ysbUwamA+EaNaZZUWF7sEtNSj3U/gxsVCdgDy4/QsIDb1
-         XVCRHbiuqK2I7gzq+eEWlPDrL5zMRt1lT2C16H58HkIybrJkp5dU7K++IyjaIdPOyT9M
-         0vZtVtlKCO1jXkTYpbdh00zxRVczsEklcd6XeDz4s6poA+aTL5pDyfbfxD0iLnULMo/8
-         Aog/aGXmLXT2NJNHSDGNK+XgvpfCVUQlwXR8FWzHe68Vx4LUSsyCqfEBO7hu0vQlKPSD
-         d8FA==
+        d=gmail.com; s=20230601; t=1768508339; x=1769113139; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9dKQcYgWyb162lQDNUk/o/1MWqwzqk7rHOzrFb1oG9I=;
+        b=h5IBRNEskQDvTKUQ5PLkIphzkUtH9IEF4I5BHtjVEAs4u5A/OnkTujsx/PauXCrW3f
+         nlhmJiEAZUCpfnkaZ9pl7l4sCJzbS966hKoFETw5fMlm7v89ETlY+GfufufkA03bDOe0
+         fiPwy3AUvUqlcHob70BdXTzHEvS7KRpA6hKAsQl6He0TJ5WU7zDj8VEGnXoLSE22T052
+         BjBUHVn2tdtNggAhmPFlBur0P81BI2eQv7Qr73z3H/ARs6L1fGna4UGLCLx56dTxLYaE
+         D01x3eUVWUmrI41QUZ5zkbd7x3G4YsiA+gScHElgnmKoqP4eQlcec4GzUG91E/SALKP6
+         F+qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768508222; x=1769113022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zhclwvWvzEdw1QOphaqNrn+NFyAYXreTgP2FFPklQQc=;
-        b=tzxUjIUMq+GDNsupzLAtPN4eJ781RWk2vLnpaVAbf/fz44nB059NbTAQhg4v9IkKjh
-         FfXdLZ5TKYu9dmjbV/Ty1zsurpLkbXvflO6aBgncWRcWPiFVpGN+OG/h40437KWSWrzs
-         LeAXpR56AXBO/OptgSyr38tMgMSLuRtK1faByDhVRHeFPeCvBgoNEG0BuLybOomA6z69
-         0Oly7YUFprs6yOYKnHCE1mYa2DziousyDMx1Nt1XZ1h2PL6kOp15y0U57EOCNcXj9CYe
-         8M2OKVQbhc4TZt400WRWRr0LrIJa0wzEAjNEg+kP/VZnOsuWloXNO40rkJtveMzxKF69
-         0BHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvwbiFr3pDLfRp/WQID/m6pIk8cSZD46XuxC2XiNZfhnYNBIqaK5FEOMjZbHkZZZxw0XNTP5A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiRAtIw8smB1BERak0OeMPPFgymfS7oIdVc62ZfJXjAqMcPrmX
-	WQ3TKyLim1K+Zy0PhshSRfPouPe/J0qYdUOWy4l4kVwiLYgyXo6XqPGTpclHeHzCP4phqjP4A7B
-	hyVteU9tvpGNf7apPf/CX7coRCZxNfhs=
-X-Gm-Gg: AY/fxX7KsVtKP5wDoo3OYgUXk3H1n6HAt+Vhy/PXBDimQ5KUU36S8/U077rNj32QriN
-	sx4XgpY8Zws5DweHqMdKgIkeJM3xbxM8uUiAKTksP5SiyuI/fFEDOuVJWZ6UOamx0Y9f4FVmvNJ
-	A1DEt2Kpe45a6krpxpprb/k7jPYuHvopeLnbXZ2wb/Vvg3xs0xWcsjMUbLyzasmBOe7nMj3CiMa
-	5xarEWbLnFC8X7wG7ftXxQ6NXR1fRayirWI3as5RO+NBkrbaTS4Z3+mdpaEVrYfNSuGzjH2RR3J
-	WboG82EIF7S00+nr/M5ZiYTD/opi
-X-Received: by 2002:a05:6102:3f52:b0:5ee:a068:b349 with SMTP id
- ada2fe7eead31-5f1a53b0fc9mr385805137.15.1768508221761; Thu, 15 Jan 2026
- 12:17:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768508339; x=1769113139;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9dKQcYgWyb162lQDNUk/o/1MWqwzqk7rHOzrFb1oG9I=;
+        b=BlNpELYXwAWBuHaQwm+dl1BQEtAek6520VRotMFGckQx2l5gQ1UnwdKsGToEOtgoxm
+         pA9toxbwOrz1/pCqW5BL6IkLcrNuqdyBOOLwMzVnUD9FI9Q6pYG0HsfWCwVzAUpnOMIW
+         dUsztW6jC93U2FVUWUkGvztP68Kv1udVWEwEigFRhReMqaj0S2cUjE297N2B5u0xjDK7
+         NG6EB3By1HuAEID9lK+a1rgGGWVuqWuoZ236LjItWjywOQQnQmJUzETSCbCgQSt9YSvq
+         shFQh5YEpden4VXPu39VQ5CYJX3S5Y/J56zAwPXlTdEqc46ldz8xwJ46ogSRMsAl9ELM
+         H8GA==
+X-Gm-Message-State: AOJu0YwJEBCAiTeGlWCuMFr7KtkC0r6W+XTE8SFM4FHAW9DgsBXNeLGg
+	tNi3nWIRRU5WHsn872LqSj+TJjaLCnJ7Cgtzse2NTlg6qp2Dhbk7v60p
+X-Gm-Gg: AY/fxX5hfgD4VOWp82pgOp1U1FMrNAzsSVSiv6EP9uBe2eVDA5g35718zvu/AetU2Uk
+	2JUD9OU3g53sm+2+IxR5IXPrtimhymZPyWqc1FKbSZm57vOMJJ7LqStWn3ULotUsjE1xqHMW9aF
+	D4R5ii+jsz7j4dAREKg6xYb8Xf2ERE7FE8m3MhSk5p4P9Cf3MTUn19DJqCHdGvAGdu0s3Gd0ceC
+	TXKASKdZc6kH4+3oteVXaZtw8fuj8ffBpCjt2SLToh2VvCSUWgpnKDe/E/zb3kOiGaoY8HDha1J
+	wEcMtKL6ZaxF34uGI2nHCu1c9haxZ6v9bVkhheReDeutFtc5c316UkZJ9vhsXRFokph2L/YVvK9
+	nnaF7CduKOpqDqGrreQG23/y8LZYlQWmXR2I3uZjYgesPrdqieA7WUPlv4yR9aGCT8nLQ6UXRa0
+	/MEh07d+jpm9IvRg==
+X-Received: by 2002:a05:6000:2484:b0:430:fcbc:dc4a with SMTP id ffacd0b85a97d-434d75c16c1mr5425911f8f.19.1768508338952;
+        Thu, 15 Jan 2026 12:18:58 -0800 (PST)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435696fbea8sm1034255f8f.0.2026.01.15.12.18.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 12:18:58 -0800 (PST)
+Message-ID: <f73b6acd-7674-44a5-8ffb-79c66f940cb1@gmail.com>
+Date: Thu, 15 Jan 2026 22:19:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260111163947.811248-1-jhs@mojatatu.com> <CAM_iQpXXiOj=+jbZbmcth06-46LoU_XQd5-NuusaRdJn-80_HQ@mail.gmail.com>
- <CAM0EoM=VHt3VakG6n81Lt+6LFzOVKAL-uzjM2y_xuWMv5kE+JA@mail.gmail.com>
-In-Reply-To: <CAM0EoM=VHt3VakG6n81Lt+6LFzOVKAL-uzjM2y_xuWMv5kE+JA@mail.gmail.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Thu, 15 Jan 2026 12:16:49 -0800
-X-Gm-Features: AZwV_QiCf4MFAT586C7BvNoVP7RL0PfDmrffbC94GvHxKxhZrmwebHR7iUFKT-A
-Message-ID: <CAM_iQpUGvHLB2cZmdd=0a4KAW2+RALNH=_jZruE1sju2gBGTeA@mail.gmail.com>
-Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me, 
-	William Liu <will@willsroot.io>, Savy <savy@syst3mfailure.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v7 8/8] net: wwan: mhi_wwan_ctrl: Add NMEA channel
+ support
+To: Slark Xiao <slark_xiao@163.com>, loic.poulain@oss.qualcomm.com,
+ johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mani@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260115114625.46991-1-slark_xiao@163.com>
+ <20260115114625.46991-9-slark_xiao@163.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20260115114625.46991-9-slark_xiao@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 14, 2026 at 8:34=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Tue, Jan 13, 2026 at 3:10=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.c=
-om> wrote:
-> >
-> > On Sun, Jan 11, 2026 at 8:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.=
-com> wrote:
-> > >
-> > >
-> > > We introduce a 2-bit global skb->ttl counter.Patch #1 describes how w=
-e puti
-> > > together those bits. Patches #2 and patch #5 use these bits.
-> > > I added Fixes tags to patch #1 in case it is useful for backporting.
-> > > Patch #3 and #4 revert William's earlier netem commits. Patch #6 intr=
-oduces
-> > > tdc test cases.
-> >
-> > 3 reasons why this patchset should be rejected:
-> >
-> > 1) It increases sk_buff size potentially by 1 byte with minimal config
-> >
->
-> All distro vendors turn all options. So no change in size happens.
-> Regardless, it's a non-arguement there is no way to resolve the mirred
-> issue without global state.
-> It's a twofer - fixing mirred and netem.
+On 1/15/26 13:46, Slark Xiao wrote:
+> For MHI WWAN device, we need a match between NMEA channel and
+> WWAN_PORT_NMEA type. Then the GNSS subsystem could create the
+> gnss device succssfully.
+> 
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
+> Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 
-This makes little sense, because otherwise people could easily add:
-
-struct sk_buff {
-....
-#ifdef CONFIG_NOT_ENABLED_BY_DEFAULT
-  struct a_huge_field very_big;
-#endif
-};
-
-What's the boundary?
-
->
-> > 2) Infinite loop is the symptom caused by enqueuing to the root qdisc,
-> > fixing the infinite loop itself is fixing the symptom and covering up t=
-he
-> > root cause deeper.
-> >
->
-> The behavior of sending to the root has been around for ~20 years.
-
-So what?
-
-> I just saw your patches - do you mind explaining why you didnt Cc me on t=
-hem?
-
-You were the one who refused anyone's feedback on your broken and
-hard-coded policy in the kernel.
-
-Please enlighten me on how we should talk to a person who refused
-any feedback? More importantly, why should we waste time on that?
-
-BTW, I am sure you are on netdev.
-
->
-> > 3) Using skb->ttl makes netem duplication behavior less predictable
-> > for users. With a TTL-based approach, the duplication depth is limited
-> > by a kernel-internal constant that is invisible to userspace. Users
-> > configuring nested netem hierarchies cannot determine from tc
-> > commands alone whether their packets will be duplicated at each
-> > stage or silently pass through when TTL is exhausted.
-> >
->
-> The patch is not using the ttl as a counter for netem, it's being
-> treated as boolean (just like your patch is doing). We are only using
-> this as a counter for the mirred loop use case.
-
-This does not change this argument for a bit. It is still hidden
-and users are still unable to figure it out (even before your patch).
-
-Regards,
-Cong
+Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
