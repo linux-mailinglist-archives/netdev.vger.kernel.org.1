@@ -1,99 +1,111 @@
-Return-Path: <netdev+bounces-249993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9538DD222D7
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:46:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4346D2232E
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:54:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B26B4305BC1B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8424A30119D8
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8802E26CE2D;
-	Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3692F26CE2D;
+	Thu, 15 Jan 2026 02:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWNjWBYQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNvy7nvT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C39B283FD9
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1331F21771B;
+	Thu, 15 Jan 2026 02:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768445119; cv=none; b=reViYgQIIzfnQ1r1aSeKCq0IfUbHF0ApbGJsjRh5kbMXjRgZquNiQ7cbGbw6s4L39sexCoKusu0jGoedz/KH9s8yxmbT/CYF50l1ytNPm8T8ZP82NLjLVHsoy3vHBuXlcF0fjSREuPm9XfptCjceM8fzGUIo8QuelwDaBnAltsY=
+	t=1768445693; cv=none; b=cJEX3MnY11s5ID+AH+kbLsRS/9OveRKbDvE/FkbdnFs0rZn4aVlpMVzJDXIYouJsSxY4bQOhEN3TwXZi8Pv3aM8Y9C9mUEvbSdhmxQc7PwKu41+h6KN7pJYAMk/pnIbiJqUvdS7lvNR6unxbbAP4rG+8mQRAZNESZBUzM+OQAHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768445119; c=relaxed/simple;
-	bh=FyYtlOLn2WmoBeGCZCwdnfekhJBHi+NNevlSx7+iXxM=;
+	s=arc-20240116; t=1768445693; c=relaxed/simple;
+	bh=ReE9y3cpx7nfrJ/EI3c/BSACDpTiFZ3k4jBkHJnx2zs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tb/V1BGZU7TRQSStqvxmSLJ9o2XsX3bQApVlHp8sRN4lHMp6lTtXzOtMzEN4/MZ+XE0M1FbBqkaB+l1l5GjxtpY8ZnDwMiX9nta4pH29SI9g58GU5EmAaCBjX9/I8C6p8YKt7cAPCTv5ekpPEijRwC0VGtX+yHQhvEeed7BOR6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWNjWBYQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF622C16AAE;
-	Thu, 15 Jan 2026 02:45:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DFgrJ3bOx2cfcHPiccwRcn+zMfmu/dT00+RBQWNGkY0pKEeDIZKY6ml2iyTLQGl/hm8CmkTnGAu5Gd/TSQKu5OgpmfW3ZsB5huTlN25HtHjXeIPf786sfIDkuJjbjAIDq1sNwoZcF8P66Fn/zEKAEVN7SEaxtH+zXqQz3Gt9ZpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tNvy7nvT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EC87C4CEF7;
+	Thu, 15 Jan 2026 02:54:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768445118;
-	bh=FyYtlOLn2WmoBeGCZCwdnfekhJBHi+NNevlSx7+iXxM=;
+	s=k20201202; t=1768445692;
+	bh=ReE9y3cpx7nfrJ/EI3c/BSACDpTiFZ3k4jBkHJnx2zs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iWNjWBYQokOvEPcgdNqId7u7aq1CaBXulRsYXHmPGBY8JcPcc48OgYtd9zo++abvm
-	 vWX1yQv73rSVfh/NTLFem3xgop+DN6pQRo/hnyTUUnoO6Wy7QriZy8eKTHErw4ZxN9
-	 Io+j0B+NzGstVX3PQgm4hfZMMBUAQt7MzRfyIM1XwZBo0568OXTTzFiGQFYyG0EivY
-	 89XNoZCPyMx0dH6uH2rqyqqR5dbyaPu2Zj7zrymfBl0fkSJU8zMaFajNW7SwrVIt+P
-	 KXxvY4itq05IOScD831jhsqKK62FG2eAv3oN7dlzyCOH1v1Ogl/Zxwp/dALIzEdPgq
-	 QNgQIeaxMlfKA==
-Date: Wed, 14 Jan 2026 18:45:17 -0800
+	b=tNvy7nvTbYt57gDannbLvJRPECjFoYh5ylkqlUn7uvPmKR+JRLmipLhPkOcPCjf7z
+	 uHP5V57EckjsdxmTzP9KixXv5M1rZN/aoCUIk3PM2Rnel5NgMkiw+0lC3vLzk3YoyB
+	 lIz7/MSisKT7bGNYR9Blu2Eg8Hz7YGsvd1x1J1wp2lANoW+G2BfZDOoIQMAQ4xgYwS
+	 MCVFwMasCZh/3XSVlen24lA5Wxi2KZ6P3jQzRl1JOn48ATEJli21atm3WOU27PnaLG
+	 W2p/8N1CAGWkWbVlBEQ0dfsODueziN/13j5PGbuvLM7FHFsG7En6hmVPySbJwG/ORA
+	 RCnHRYBtxMxQQ==
+Date: Wed, 14 Jan 2026 18:54:50 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [TEST] amt.sh flaking
-Message-ID: <20260114184517.281a816b@kernel.org>
-In-Reply-To: <CAMArcTX97OGA7HXwUQk3MPdhrJo_LfNzi73XDZEKZyBbUEtwHA@mail.gmail.com>
-References: <20260105180712.46da1eb4@kernel.org>
-	<CAMArcTWF12MQDVQw3dbJB==CMZ8Gd-4c-cu7PCV76EK3oVvFXw@mail.gmail.com>
-	<CAMArcTX97OGA7HXwUQk3MPdhrJo_LfNzi73XDZEKZyBbUEtwHA@mail.gmail.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@linux.microsoft.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+ <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
+ Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni
+ Sri Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
+ <shradhagupta@linux.microsoft.com>, Saurabh Sengar
+ <ssengar@linux.microsoft.com>, Aditya Garg
+ <gargaditya@linux.microsoft.com>, Dipayaan Roy
+ <dipayanroy@linux.microsoft.com>, Shiraz Saleem
+ <shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
+ for coalesced RX packets on CQE
+Message-ID: <20260114185450.58db5a6d@kernel.org>
+In-Reply-To: <SA3PR21MB38676C98AA702F212CE391E2CA8FA@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
+	<1767732407-12389-2-git-send-email-haiyangz@linux.microsoft.com>
+	<20260109175610.0eb69acb@kernel.org>
+	<SA3PR21MB3867BAD6022A1CAE2AC9E202CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
+	<20260112172146.04b4a70f@kernel.org>
+	<SA3PR21MB3867B36A9565AB01B0114D3ACA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
+	<SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
+	<20260113170948.1d6fbdaf@kernel.org>
+	<SA3PR21MB38676C98AA702F212CE391E2CA8FA@SA3PR21MB3867.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Jan 2026 20:55:29 +0900 Taehee Yoo wrote:
-> > > TAP version 13
-> > > 1..1
-> > > # timeout set to 3600
-> > > # selftests: net: amt.sh
-> > > # 0.26 [+0.26] TEST: amt discovery                                   =
-              [ OK ]
-> > > # 15.27 [+15.01] 2026/01/05 19:33:27 socat[4075] W exiting on signal =
-15
-> > > # 15.28 [+0.01] TEST: IPv4 amt multicast forwarding                  =
-               [FAIL]
-> > > # 17.30 [+2.02] TEST: IPv6 amt multicast forwarding                  =
-               [ OK ]
-> > > # 17.30 [+0.00] TEST: IPv4 amt traffic forwarding torture            =
-   ..........  [ OK ]
-> > > # 19.48 [+2.18] TEST: IPv6 amt traffic forwarding torture            =
-   ..........  [ OK ]
-> > > # 26.71 [+7.22] Some tests failed.
-> > > not ok 1 selftests: net: amt.sh # exit=3D1
-> > >
-> > > FWIW the new setup is based on Fedora 43 with:
->=20
-> Hi Jakub, Sorry for the late reply.
->=20
-> The root cause is that the source sends packets before the connection
-> between the gateway and the relay is established. At that moment,
-> packets cannot reach the listener.
-> To fix this issue, the source needs to wait until the connection is
-> established. However, the current AMT module does not notify its
-> status to userspace. As a temporary workaround, I will send a patch
-> that adds a 5-second sleep just before =E2=80=9CIPv4 AMT multicast forwar=
-ding.=E2=80=9D
-> After that, I will work on adding status notifications to the AMT module
-> and to iproute2.
+On Wed, 14 Jan 2026 18:27:50 +0000 Haiyang Zhang wrote:
+> > > And, the coalescing can add up to 2 microseconds into one-way latency.  
+> > 
+> > I am asking you how the _device_ (hypervisor?) decides when to coalesce
+> > and when to send a partial CQE (<4 packets in 4 pkt CQE). You are using
+> > the coalescing uAPI, so I'm trying to make sure this is the correct API.
+> > CQE configuration can also be done via ringparam.  
+> 
+> When coalescing is enabled, the device waits for packets which can 
+> have the CQE coalesced with previous packet(s). That coalescing process 
+> is finished (and a CQE written to the appropriate CQ) when the CQE is 
+> filled with 4 pkts, or time expired, or other device specific logic is 
+> satisfied.
 
-Sounds great. I don't think that a single sleep 5 in this test would=20
-be a big deal but of course having a notification is better if you have
-cycles to implement that. Thanks for looking into it!
+See, what I'm afraid is happening here is that you are enabling
+completion coalescing (how long the device keeps the CQE pending). 
+Which is _not_ what rx_max_coalesced_frames controls for most NICs.
+For most NICs rx_max_coalesced_frames controls IRQ generation logic.
+
+The NIC first buffers up CQEs for typically single digit usecs, and
+then once CQE timer exipred and writeback happened it starts an IRQ
+coalescing timer. Once the IRQ coalescing timer expires IRQ is
+triggered, which schedules NAPI. (broad strokes, obviously many
+differences and optimizations exist)
+
+Is my guess correct? Are you controlling CQE coalescing>
+
+Can you control the timeout instead of the frame count?
 
