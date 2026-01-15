@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-250283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B71FD26CEF
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:50:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C1AD27816
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 19:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AE33D30B5D4B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:42:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 286DF32640F1
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83DA3B530F;
-	Thu, 15 Jan 2026 17:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020273A63F1;
+	Thu, 15 Jan 2026 17:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CbsUxWna"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wmwrC43/"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFE03624C4
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EFD2F619D
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768498916; cv=none; b=hohBQtRekzXKkEs0Yn8HzWu0ei2SIuRulE8iwCZ4heiWdbcLh4roH05/eDmp7dmLsVZsn2dq3woVQPA9W6yW8VDDB8E9KWCVUvry5+uXVw5zHSMaaEC8/eGV2etczTOTRpU6EeuPipPEev58N5WXKTFRCq3f784O7IRtsFiRusY=
+	t=1768499068; cv=none; b=a9rz7ZQMFZ3EAVxULfbO5jf293Jt9N7OKjwUX6zwI2pR2bNbWrQja3N+0sYqEXd1AW7NlFpAku0moJkOtlYsbrG3dXXDxc5dIEtZznY6ybd60KNjPiBX/4BPMD3qNMhUomesRRxjB+1E7z7rfg98vzea/8AYIHzq9EaOELpWO4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768498916; c=relaxed/simple;
-	bh=q8KYT4sbvVkbG5IqadL8WHzzvO2Tahgr4QE2etf1VIU=;
+	s=arc-20240116; t=1768499068; c=relaxed/simple;
+	bh=WrPyv1uGTabff5FG8aQVGGttyvL+RpPO6d0N2NK1JgU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bms58tlufMZvV0cN5ORx3bvHAG6l8w7NSmutPive3pMoNrGNRZSWbEQqfYb+UTb8mGjEVKROpvoE6KUFysIxtzsXqcxUMk4pXo9dMhlvTQUOUvXRdzAsNS6enBwtKVnwOx9IC1n2sifHzOMPCYJKQcl8nCvTGdIdgMWvHnF92Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CbsUxWna; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bBB8TjwmI7uBds4oppa9bJdUniCWjaoB/PFGptnO7eOH6XkqvOKdKMSobwMXS2hlj+vCvYQQk5gfVG0p6imQxROV5nIhYPjp/Ztu4/0l6CrwSDjhkdMj1UVMocAjZBj89Z4GwB36dMS5kx+rnSLoQtZs6Ry/MP/SCG2m/+ZY1aA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wmwrC43/; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,24 +34,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+kDi0Nl3A+slky2xKqNT3JRyrF+r1xn6UkkHjegXuiw=; b=CbsUxWnatxSQjbieGBw08x9PxE
-	oq3z3oR4bitdTyXDbS8VOFY86Uzf2NksTtTUqWX8gpKqAOMbTplPjvC+NFbsMw13y5o5XahFqPXmT
-	QuDVSYVQukaQuaPwJoApwSiD3K4GXnX0SOwPlYf8Y9CHBF9BgGzCPp3+RECaCaqNvlkY=;
+	bh=FH3souKGZI5TVjTFQqVVel+odvaXHoS2q4HbDexphGE=; b=wmwrC43/Iu4sdxvJMW145zob/H
+	NwSA2CswbTkCsU3+z1QCTVz5FHuU7y17d+Bkaf6gyYM7z8y91N8mVN9sgAOJp6ZWwvNlWCX7lbBhm
+	1qJ1JNX2AF27sb5gleY0U350XjikccMnHXVKfMKgl5BkrEKLAnMlo93NBnOWc5d4J4Ik=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vgRLv-002xwl-OO; Thu, 15 Jan 2026 18:41:47 +0100
-Date: Thu, 15 Jan 2026 18:41:47 +0100
+	id 1vgROP-002xyg-Us; Thu, 15 Jan 2026 18:44:21 +0100
+Date: Thu, 15 Jan 2026 18:44:21 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Sayantan Nandy <sayantann11@gmail.com>
-Cc: lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
-	kuldeep.malik@airoha.com, aniket.negi@airoha.com,
-	rajeev.kumar@airoha.com
-Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
- frames
-Message-ID: <e86cea28-1495-4b1a-83f1-3b0f1899b85f@lunn.ch>
-References: <20260115084837.52307-1-sayantann11@gmail.com>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: netdev@vger.kernel.org, Ian MacDonald <ian@netstatz.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Salvatore Bonaccorso <carnil@debian.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH net-next v3 2/4] net: ethtool: Add support for 80Gbps
+ speed
+Message-ID: <952b25fe-9e54-45ec-b6c2-77dcca5ef9a7@lunn.ch>
+References: <20260115115646.328898-1-mika.westerberg@linux.intel.com>
+ <20260115115646.328898-3-mika.westerberg@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,16 +68,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260115084837.52307-1-sayantann11@gmail.com>
+In-Reply-To: <20260115115646.328898-3-mika.westerberg@linux.intel.com>
 
-On Thu, Jan 15, 2026 at 02:18:37PM +0530, Sayantan Nandy wrote:
-> The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
-> sub-system, an extra 4 byte tag is added to each frame. To allow users
-> to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
-> to 9220 bytes (9216+4).
+On Thu, Jan 15, 2026 at 12:56:44PM +0100, Mika Westerberg wrote:
+> USB4 v2 link used in peer-to-peer networking is symmetric 80Gbps so in
+> order to support reading this link speed, add support for it to ethtool.
+> 
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 
-What does the hardware actually support? Is 9220 the real limit? 10K?
-16K?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-	Andrew
+    Andrew
 
