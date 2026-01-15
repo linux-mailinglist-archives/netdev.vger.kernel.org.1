@@ -1,142 +1,144 @@
-Return-Path: <netdev+bounces-250094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 453C3D23E88
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:21:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D5BD23EAC
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 28C9530963DD
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:20:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C53953067F7F
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7E335502E;
-	Thu, 15 Jan 2026 10:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DDD3624C7;
+	Thu, 15 Jan 2026 10:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="POOTpyf2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfLfFBNN";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WzDb6dsy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0D935EDAB
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 10:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4283624AC
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 10:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768472407; cv=none; b=bkzGja4kHYeauNx/0p5t9ndB59Tfu+w+TMTk7u5eIgWc8UzC+wWvTC+zm77LaEdslHks3wdHip9ruDVoWJ/RlqxegdpZpXZyV2G7NwHWuVO36FfA8GYMdqon2LS1go5NCnMrnWm9k67XSf4FYjTGR6tPfnQ50IJAXXAmnlZzGXE=
+	t=1768472586; cv=none; b=psetH1OT8hxHUdRuHmjE4zrgQxfUlsX3esKWU9n7QNNr9tLq68qIOk90EJB12p5pPOt53c3nLiKyTTrNRPze9x1R3PxSM21V6lOa8r1QtbU8IBcNxLdexMtSvuwy4MNhl39BsNf7BKJ+/bvnZgfhwSENYGK8rMRZsWbfDTiggiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768472407; c=relaxed/simple;
-	bh=mwoYamMX+C4LOG3qk2bHenfle0rpDp5AHcC+7a69BvQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5gTMo30B/qOJ3mIcMH2RHYl/ymQh15wTwabFEPQkrni/vEe4hLamoB7qDVeUY4odCKlLdI3utnm5UR5dt8WCHCJP/m2IJocK+Jelcw7SEKXdXZMqQ+/+TbG8fVnqNzvH32VK+YBxpOXDlm8CnhvtHYVbMMzs9AKqxuslyhFOrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=POOTpyf2; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso387783f8f.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:20:05 -0800 (PST)
+	s=arc-20240116; t=1768472586; c=relaxed/simple;
+	bh=KY40kM638NlIdHs/JAxVo5KCQ/kQSuzRNhfaex8x0KU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gi3SBBgqmLOrlqI6dx0gpnDOr4EPd02iK1vNH+I9EA5G0G76C6Qe0Xje+dx7CHFvc4iAVK3M/732E23RVsmVOqbXei4TqepybEGxU/aG4amsCBEwACm+Gtwjh+qv2K1AaRIvb5p0CVkAQZKeEGVynFhu79PjtCHKAJz8qy31xdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GfLfFBNN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WzDb6dsy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768472584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KY40kM638NlIdHs/JAxVo5KCQ/kQSuzRNhfaex8x0KU=;
+	b=GfLfFBNNhtErFvUEn04Atz/Qd+KrvloPtHvIqqxzNcAUFpujTqjjY5Iu6hhKmo9uDk8KfA
+	7XVXZoH5NuEdOVT4iw++cBrVdmXM309cyNNGqVcnlQ/72ViHaU8211ddelrEhv37QfBrhC
+	Vp3kVw4fnBrkQXeqUXBeVL8o9g0fus8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-C3gAiPm2O9COjFGFstfXVQ-1; Thu, 15 Jan 2026 05:23:02 -0500
+X-MC-Unique: C3gAiPm2O9COjFGFstfXVQ-1
+X-Mimecast-MFC-AGG-ID: C3gAiPm2O9COjFGFstfXVQ_1768472581
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-432db1a9589so493587f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:23:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768472404; x=1769077204; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Blw9ol92Adxv0ebGIyoRpKSiGhl8JOSAW1An3S4C+Hw=;
-        b=POOTpyf2E8LQhfgcWoVnmGcwTv9cjx7t9nOoTBipWSoduSQDl2DtDEX5jXOGnGpHug
-         /vEr3bRycNEF9KDphpixHf8pjEFI6ZYVF8QXfo2/p/K4igsaUNuTuTAXBRonG0hkEw3y
-         zjPwl0nXJwH8C//iA7KkpuUuefoo6u/aeL1FN/9mZaiJHPN2asi8Bnj10GOb/8yZxglx
-         Mo+8uDhw7wpooLcni7m/NfXXLd+GFxPn8auytjzx3hOMHRSxcVVJJnn1AEDU7nQEhSnb
-         pM9pvUeivyUXXZdwnM+CoENtMt4wf2UWt/Iei7G0hU36UOd88kWLwxHkhYgi5FI9j7DC
-         cpzA==
+        d=redhat.com; s=google; t=1768472581; x=1769077381; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KY40kM638NlIdHs/JAxVo5KCQ/kQSuzRNhfaex8x0KU=;
+        b=WzDb6dsyq9aQHb6wZj9KII0p3iq526bBqrAAJKyXqSTBDBaZDyuHA9t1Zg9egTxWO7
+         Bagd9h3PNFr2BCpenz6UVYiRSd4z5Otxeh5VZrKNw7oo05tAGT6bbBtpW4Wjus2xQHxY
+         omKBGyOasJX2B/CcltqTBGDKhldxThD29ee4i2Y9Oiu2FdRYtkNe9SEPdj86Phse4Gxw
+         Y/jXYR+IaZ12+CTTMyR/cXCI4h+DdlODW0IyiAKEdvnnvdxUpRejDT9A3iT0dsWSxpEe
+         sDzP7PqOd3mxSeCSlGsef/OUAV2eiD+LadYpKzprDvn1ER+zPNB9puFR0Ju02lwuTEex
+         pv9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768472404; x=1769077204;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Blw9ol92Adxv0ebGIyoRpKSiGhl8JOSAW1An3S4C+Hw=;
-        b=JGWl3JgaFVp5zyBlgrK9cpcwQ4b04itTjemDBut7XH6UxH646oOjwp3obyZcRPaefy
-         HLjtiTVdmGw5gDfqyIVlCej6TsOJh2ABDqBWuFspKnqg3okRwY0BTdK7CxLGkRwEc00n
-         g4T6iIDbQCCB9NnHu07aHDGLQ1xuFY3L3U+NN42uaZbZruV2kMJGPV89mKPwBCXu/BmM
-         s2hd00x4fB62XQsxRzaZ6QHXvtplkIO9PpyyP1+E+LMX//Y0zcqif19jf8h5OMCH3tkM
-         FzUmk9rgcID5Dsqpmh3dn2vge/m0e9XRdkZZqaSlUfpmbuShpi9Jfys5dq/X3d+NG8vV
-         MAww==
-X-Forwarded-Encrypted: i=1; AJvYcCXWhc50eAuUDyrqKWxWN628aDuQoGFFmDbX72d0j9NHFFaIokKCuCgyDTN6yHqat3cNRD++SEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4R946M4ZTcsOQRwSev6GNQur0Awsi/VG58TmqW9PRGOAeez5k
-	jMtU3R5RY82dKeDobMWChaZuMLKv7V6Yztrlu6UkFxhtGprD+mCxwFYL5tyeBguaQDM=
-X-Gm-Gg: AY/fxX6E2s9iTO/9loCi6Z3iEWaJDDXodLIuB/8LfduExDZlwtu7u/fuylLyHx8kZX9
-	PtayopndF9LP19/nq2zz46rQNz7dAbs7GCDy8lb1GU6hzgn/G0KmY6COfrKXPVhGcDDsJslM1Ng
-	8JuqMSvLEnYAadY77IYtsaxkLYE/6McG1xF+GRC+q9dlvcfNIYVZaP5qQV17QDyGCTsATcoRIzH
-	pbcsjbAQAUAHyOzPORdlAgyrQgk8cVaFF9UZnDp33LGezzaQMMI85SWP4mTg6pAy+3dn4Pc7AeM
-	LEpJEAb0Jbb10ZaysKvX88Ez7cxTrrT7AFH81uO+lo3pSkUAOzoXLmUxw2WfXLV1J7Cnw3a6tes
-	c9TTrLfeodZvsdbu6TX3ubTGzMgZfcoqXQOEul2CMPYwoApk15fTnF8ElLvp0awbQ5yx7UqzYm0
-	inn7Iut30P01sGng==
-X-Received: by 2002:a5d:6b41:0:b0:432:a9db:f99d with SMTP id ffacd0b85a97d-4342c535db3mr5505744f8f.36.1768472403629;
-        Thu, 15 Jan 2026 02:20:03 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af653632sm5139931f8f.11.2026.01.15.02.20.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 02:20:02 -0800 (PST)
-Date: Thu, 15 Jan 2026 11:20:00 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 08/19] debug: debug_core: Migrate to
- register_console_force helper
-Message-ID: <aWi_UJcrphO9Esxw@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-8-21a291bcf197@suse.com>
+        d=1e100.net; s=20230601; t=1768472581; x=1769077381;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KY40kM638NlIdHs/JAxVo5KCQ/kQSuzRNhfaex8x0KU=;
+        b=Ybk7Enh7RuEJ+HkOU8R3voy4o9cGJdKKDSR0l884926YIblfMOeGAKOCzNsSG1CUNu
+         B0OF7r7orh0eYuJvdCwKZ9cyYj747Lghl1yQZVxUHQFL8hvs8L2Vqq9Q0IqFaYufi9/e
+         rzj15ENsRvzfEM4r7gTQaHcvKnetvNTrq4uYlYo1nXyJTt2RbFAIKROqYV3VnlU1ZmLE
+         BBtBgyRoK4kl3MXouA4OkiPECpL4IRCgPO2U1x+XNazaGe3k+q2vpmnPh3Xtoj3yoEo9
+         Omm6zG+2uliMvBvh2jxCGrs3A6kmSFJUtad75n+QZI9xGs25eJxisp8WPZ0J5SN4xsWW
+         lumQ==
+X-Gm-Message-State: AOJu0YxRM4KOnHGoHuPHauEvQrn7gCNtEISAIa29Y101R/kQ7aiw6imh
+	HM6mZLFKPpBBBZOUlzfjRkO/PWp1VNCUistY87NCwD4WO7yhNTIw5RI87+pxOJu8q3bnk+Yw7xV
+	UTGzLa2GxmWju6BIGTqvYQiFiiKVsxhp2KowSRGk3JdRjtubQb0hoHEjK0A==
+X-Gm-Gg: AY/fxX6gIybf2XSuNUN9vw8NRlBj3RbrNvsJ8bEODgyvPaX7ZFe1A+yZ6+/krO/Bf14
+	wo4qJOAzWNC7smIOSfVB97IziNT18vBedfot/A7ZxKvV2AOW2Ze4LM64CvkCWPUU7N2qIpkxf3q
+	N/7f1Xqpuol5F0+qzYOijQGnsM16nH3OT5qe04r0u4v9sAi3ixFEpF+sOZCamhU2KAe8xmBFKBj
+	ekeYi/wmXsgayXQA6R7SwB/UZzGTeuEJE6fH1obACI14yDnp7UO/26jrrf/I3qLSvuXZ33dttYs
+	qqAdQ572xvjAjUQkTvtn6YhqVx5bOh9WxFNiM0r0Ca/iUmvybHf7qwWX5ACnH3bQG9sgo8AQgpv
+	rHXjajQPNgXf4Hw==
+X-Received: by 2002:a5d:588d:0:b0:432:851d:35ef with SMTP id ffacd0b85a97d-4342c547dbamr7818775f8f.42.1768472581007;
+        Thu, 15 Jan 2026 02:23:01 -0800 (PST)
+X-Received: by 2002:a5d:588d:0:b0:432:851d:35ef with SMTP id ffacd0b85a97d-4342c547dbamr7818742f8f.42.1768472580610;
+        Thu, 15 Jan 2026 02:23:00 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.128])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af6fca86sm5029391f8f.43.2026.01.15.02.22.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 02:23:00 -0800 (PST)
+Message-ID: <d42f0c80-e289-4e0f-8608-10580d315fd9@redhat.com>
+Date: Thu, 15 Jan 2026 11:22:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-8-21a291bcf197@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
+To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, horms@kernel.org, andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ victor@mojatatu.com, dcaratti@redhat.com, lariel@nvidia.com,
+ daniel@iogearbox.net, pablo@netfilter.org, kadlec@netfilter.org,
+ fw@strlen.de, phil@nwl.cc, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, zyc199902@zohomail.cn, lrGerlinde@mailfence.com,
+ jschung2@proton.me
+References: <20260111163947.811248-1-jhs@mojatatu.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260111163947.811248-1-jhs@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat 2025-12-27 09:16:15, Marcos Paulo de Souza wrote:
-> The register_console_force function was introduced to register consoles
-> even on the presence of default consoles, replacing the CON_ENABLE flag
-> that was forcing the same behavior.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
+On 1/11/26 5:39 PM, Jamal Hadi Salim wrote:
+> We introduce a 2-bit global skb->ttl counter.Patch #1 describes how we puti
+> together those bits. Patches #2 and patch #5 use these bits.
+> I added Fixes tags to patch #1 in case it is useful for backporting.
+> Patch #3 and #4 revert William's earlier netem commits. Patch #6 introduces
+> tdc test cases.
 
-LGTM, nice cleanup!
+Generally speaking I think that a more self-encapsulated solution should
+be preferable.
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+I [mis?]understand that your main concern with Cong's series is the
+possible parent qlen corruption in case of duplication and the last
+iteration of such series includes a self-test for that, is there
+anything missing there?
 
-Best Regards,
-Petr
+The new sk_buff field looks a bit controversial. Adding such field
+opens/implies using it for other/all loop detection; a 2 bits counter
+will not be enough for that, and the struct sk_buff will increase for
+typical build otherwise.
+
+FTR I don't think that sk_buff the size increase for minimal config is
+very relevant, as most/all of the binary layout optimization and not
+thought for such build.
+
+/P
+
 
