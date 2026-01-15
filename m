@@ -1,914 +1,321 @@
-Return-Path: <netdev+bounces-250215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5FDD25166
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37848D25251
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A44A6300F66A
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:51:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1140C3019840
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68E334FF4C;
-	Thu, 15 Jan 2026 14:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B29A34E75D;
+	Thu, 15 Jan 2026 14:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLOkUTYb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FW20dfCo";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVila3PT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA4734F259
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BA83A1E73
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768488693; cv=none; b=niHxkClJStlI5Cw6m8s1SKHvnggkH9ws8xPK5pSIui7NhmB9uYcSRosVEFQXHdcSKEYR5aCVfEWVZMfVAkDyeGDBbpP5Ehrp9Vk/UqF4JS67MoMpK144gRuyMXTc2HjWmkOZ8MN9B2VPrQupojlcxdNhYn7Gv8vUicb/bR76nNQ=
+	t=1768489038; cv=none; b=MqlTtC46LZ0HsI8iSxHwDQN5nswHMi9wuqni7KP4QSypNwf+L+zLQLdSLJl/0fQ25TylVffe14Nqb+FuI/WfisErCHCGCgNsUiR3OFu0iqZnBnLkGsxwg+kTyfej6XxnmH3kJSJL8n2gulyPeZ/mivfEfo20S7iJooP8eFpwKTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768488693; c=relaxed/simple;
-	bh=4fy5bpaoSwNMdF//G0iof828zFjENyFzFAnbZYZMjUI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gF/fgBcxOSkrWGECKee+1iYPTRJJ70YZXacn2+j0nsBxGCh/0+dwOOcSVNPL4bA6YZJUp+aVj7Je60Xj+v/0IHAxIgtfPmzhbvND2G6Toi40QXT4P59cy0DmakVEMDq7D6upTpxb0xJfOqWrt8WOnWE1fK0XZ3xUmXze/yP+prA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLOkUTYb; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-78c66bdf675so9180547b3.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:51:31 -0800 (PST)
+	s=arc-20240116; t=1768489038; c=relaxed/simple;
+	bh=MOXAX6Cj+2/bVL0ESAhAFWUMkXp/mI/2P4uQHJp4w1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jij4tq4USSiwiD8ieeUAIX1spIezJeZjp7IddxyKlokYg57ne8/TtXWVD+0rznDyPU458mbDUWvNPovOItwHDrgikOHi/yjWVmkd3QhrCMwCpWNs68n6i29ya7sJm/Ft7XWoPXYM763+wNKj+uBE8/vgaGC30ym/CTCWLEkCwGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FW20dfCo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hVila3PT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768489036;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2I4A6pXsGS8qSIswyUS7eSprAnSExVzJ8lG3EVQyBRA=;
+	b=FW20dfCofy9bgxNX0wMpunVvMZUnb5ZcfdBefIraK+1mzuJ6EmGDe7hukU6p4fhkGYZ2xI
+	FyAS/5Ls+TxcQaCGYLr0/J3GUeMaKEb/nnYna5XcTuEyuMDTYkL0LlvLiS8S3KNb2z1vMd
+	Tz9WxVbh4GMnHPrLSOkJaGv1w5rh4A0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-K1_f7swDO2OcLexIowfTAQ-1; Thu, 15 Jan 2026 09:57:14 -0500
+X-MC-Unique: K1_f7swDO2OcLexIowfTAQ-1
+X-Mimecast-MFC-AGG-ID: K1_f7swDO2OcLexIowfTAQ_1768489033
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432db1a9589so1027593f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:57:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768488690; x=1769093490; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aULtMoAM2+HlPVbY2JpfAUK5fij39IwL8G6QxGEgjyQ=;
-        b=kLOkUTYbNDGDAnvWJmTJDxw9Mm3Qs6PEDyfeIvHxWPqwhLBw1yjukEZFDeP6o8Fzsm
-         20dt2pOkeOk2Eq5HNJzmQDhhhWm/t3lrBlno049YRARYpIWwcagEQAEy6S9wLIVWYh/C
-         /8UZ+5czP3jvy/4uQQlU4qIOWy9ahQdBWDQ5NQAS0dP/jfSO0qgA2gY9xmz1N00w4ss6
-         ugS1TQBi6ZtL4wT0eSjWeM37GXDap4s0nLm5ZqcETqC2DqNrx+KDU+A8l26oE7gkONAx
-         VQsPElwVqscPmN/AQ9P7BIfTLkoAUxZZK9K8nKZSjMDLgYtzT/ZLFngzxxR2WGz5uwzz
-         DApA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768488690; x=1769093490;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=redhat.com; s=google; t=1768489033; x=1769093833; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=aULtMoAM2+HlPVbY2JpfAUK5fij39IwL8G6QxGEgjyQ=;
-        b=IToYLWXtXJ+Giu+kme8IHWfGkn+7G+hZrPj9sW+l1mVUWVzFpWtkLhPTwWY73FURaw
-         MMbDBFTWgrEnTmIM04dczqYIFN2EhT9Lyd5ItmB73qRv/HcvpQ2S1UhLL3EzA8sihh/W
-         A/TrFK8irFxXkL1TUNP64ybMNJH7i6u92ASAYV7FuRtqOe21ZGM8oMALRCdYVZbNL5QA
-         5Ql584BE8/ZPtn8rT6M0SW+8jFvkL+ZTxyX+/LMPzbdSomFYMdxNR+eTzELtz34TIdgA
-         bsTvDP1uH4UJ+EpOSGEi62AwyW/fneQfy17pkhmfT5QkOBIDOC5OPHJuKRIAidm/76Tg
-         eksA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMMaoxb27ib0XGNT6WLsvjLPeAVf1NdZ32FmN3qIcHGrEJ8zQrz/xFXu3iaCTEL7JaP9U5yxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh6Y+Mm8rlBRyxoPKFqMhvJbdiMDCAqKMrXvG6397eVDmvNgaX
-	Mt0AFcE0JdpdUJHdG/8IBH6pUfWAIRE0eOpNVGj86iFPm9k9iX0AlRce
-X-Gm-Gg: AY/fxX5lUB+UtSH1sPvP/RYHj9r2Qemh0j/BH3XhoRrWovD5yqlp2EtZDGxh3jEZj6W
-	BQuT3BclEbWFG+ghuwVytD9Jgh8dRMAuhKhmvonimcSZekzrWSpPIFVgzxceaWdcHvYsM7q1UHZ
-	OLaANmhpjy0+crSgQXF3/wgNcOIN3OGOwAAC14AGsdrbxM5HFvLwJTzyu+g5bQfhE3L50DqRngL
-	pEiNhXSEtlrcVSbhqUv+gGPJkukc+WBXZwXRawk/Qwoxt5o8gRPznh+kOkE3KDxexuT4HpIXaZe
-	6w/yCunYAC45i+EZXsnvmCOmJAXkA78Wk26cR5BOBE/MGOly5lNbkody5sHw2LyvJfDzHZ0gpRO
-	J2bi7ob9G3PhufGkN1C3htsVU7yeONYkv+wOwQcWtkoxyYbOOMnYw1P01vJBmb1lBhtZf3QW5f1
-	KRg8bsf6GvSdAFvMRHYuGaFRtwUCUajYlmzm0IP8EczGUdxiLuH1fTjqpVJYNBkGO8HJcbYQ==
-X-Received: by 2002:a05:690c:1b:b0:785:fe77:ccce with SMTP id 00721157ae682-793a1d359f2mr55231977b3.44.1768488689910;
-        Thu, 15 Jan 2026 06:51:29 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa6abc01sm102596927b3.46.2026.01.15.06.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 06:51:28 -0800 (PST)
-Date: Thu, 15 Jan 2026 09:51:28 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Danielle Ratson <danieller@nvidia.com>, 
- netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- shuah@kernel.org, 
- mlxsw@nvidia.com, 
- Danielle Ratson <danieller@nvidia.com>
-Message-ID: <willemdebruijn.kernel.1ad957d6f7314@gmail.com>
-In-Reply-To: <20260114113141.2522209-1-danieller@nvidia.com>
-References: <20260114113141.2522209-1-danieller@nvidia.com>
-Subject: Re: [PATCH net-next] selftests: net: Add kernel selftest for RFC 4884
+        bh=2I4A6pXsGS8qSIswyUS7eSprAnSExVzJ8lG3EVQyBRA=;
+        b=hVila3PTxNjQLzDM2rq/PIEr+ToytuPDdnmU+NFMMAd/b1xhBdj7W/cqPYfXujBhda
+         26uKBtownymm/RRv8AklFulPhAhl3hPhZIlogw/I9hhRSd38w3d4Ru5Vi/x1kQO9AQ8J
+         3tmI3wieY1AIa4XX6idL45q/ewHo/eEkIeIY78obJY0Up5OW1icRZxeDesflzBzRv9G1
+         VDdjxvcsKXnb1XtDkAgPTbhBNFqICLJqcCoyGkOIeJHM1dj5prHLLiuOOgCsDgM0EAle
+         EoXRHlBbRJWYdLdfTxyyS6WMORxYxAwR43PuJiZaCXVf0shj94FA/Wb2i+vhCPRIz9G/
+         NDaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768489033; x=1769093833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2I4A6pXsGS8qSIswyUS7eSprAnSExVzJ8lG3EVQyBRA=;
+        b=p2jvzgDytAMQEr49qXKkKw1WZSLusmoDktQU6W7kYcSh2W6TOF87+7nRrEusYDiYTu
+         tJmKgnBfI89h7KAVc4LwQwsObqD5Yhb0C/H8WkAIE/zy/cqXUWF/AD8zswPAbYuxTuMN
+         F9btgIaL4kA55m6MBX7sbJyoH8IYG2X1DJaKOLrE7DqU+nA7EjEcug3/0KViAO91+zlT
+         fKMaKrjYsvt5kZbmYzS5MWOJxfAqGp2R4ewHIqtpq/VNuAYRjZa1uNkRdJRYe8VXeAhu
+         6Vd3WGrZZJZ7O8r0V5T1R+hHrLvrRB2PClklTOx2udnO7n4yjUqulelfTaetVHvmHw0L
+         kyVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCw2Un44uihAZ4gmHSqZMK0NNrLTJQxYKGbHjHfxQMPVpr7evHcFYDLNsWWY9Uf+bgghXfozY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/yfl7H6p/PYoAvV8BfugSjt5evT20SvRluEOqEa20XDVQl+yd
+	N7X9Rivspla3o6D5EdsV3R9eQGJS3TYjmzGRs3gatT644XaJvYecm8df3BGZu6GUkRcU49PwuIE
+	JFAcVSAjofkvza4QW1H4cdG/nkgRdv9A6gAPkEDTVa4dpj93jB6Z9jPfFOg==
+X-Gm-Gg: AY/fxX5o27O2A5k9sXUA9M/+2hVTf0RyU284d8oh15RYs3V4RA58Gf4CsJNJvg0xHBX
+	H0benx1nD7MxZ/VgzNNujQLklEXlYMvZAR8vnlW7ATHZ4HgSNREm0ZrJWF/P+UlN8Vvp+SCI1Cg
+	XbJAzq6N8eZbhRIuvT2pVLi0/P/FUW64DwXO3H0/wG4Jpr4v+WrioMIUAw/EsprPrxtPwdLOVl/
+	fKl+/QnD8uybeMIP4bTiG9RVMYEypLYee1gh//GdzENQX0oPLYnBJEtLu8Rl/glaJakXEiHa02f
+	F/1cxO6GXxn3MB3T5Oqx08tuunUs/Br0YdOLaihT8BFlkUQxyExH7a76CY7ctOERCiuknwkhK57
+	Uh33coDqDz+6Mqg==
+X-Received: by 2002:a05:600c:3ba6:b0:47a:7fd0:9eea with SMTP id 5b1f17b1804b1-4801e2f3013mr146245e9.3.1768489033431;
+        Thu, 15 Jan 2026 06:57:13 -0800 (PST)
+X-Received: by 2002:a05:600c:3ba6:b0:47a:7fd0:9eea with SMTP id 5b1f17b1804b1-4801e2f3013mr145755e9.3.1768489032850;
+        Thu, 15 Jan 2026 06:57:12 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.128])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428acd0csm50981045e9.6.2026.01.15.06.57.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 06:57:12 -0800 (PST)
+Message-ID: <7e81c093-c578-46ad-b00b-a45da074939a@redhat.com>
+Date: Thu, 15 Jan 2026 15:57:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/4] net: dsa: add tag format for MxL862xx
+ switches
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+ Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+ Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu
+ <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+ Juraj Povazanec <jpovazanec@maxlinear.com>,
+ "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+ "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+ "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
+References: <cover.1768225363.git.daniel@makrotopia.org>
+ <3c44b74b9908c134e52ee9b18c04d26cba51d3d7.1768225363.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <3c44b74b9908c134e52ee9b18c04d26cba51d3d7.1768225363.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Danielle Ratson wrote:
-> RFC 4884 extended certain ICMP messages with a length attribute that
-> encodes the length of the "original datagram" field. This is needed so
-> that new information could be appended to these messages without
-> applications thinking that it is part of the "original datagram" field.
+
+
+On 1/12/26 2:51 PM, Daniel Golle wrote:
+> Add proprietary special tag format for the MaxLinear MXL862xx family of
+> switches. While using the same Ethertype as MaxLinear's GSW1xx switches,
+> the actual tag format differs significantly, hence we need a dedicated
+> tag driver for that.
 > 
-> In version 5.9, the kernel was extended with two new socket options
-> (SOL_IP/IP_RECVERR_4884 and SOL_IPV6/IPV6_RECVERR_RFC4884) that allow
-> user space to retrieve this length which is basically the offset to the
-> ICMP Extension Structure at the end of the ICMP message. This is
-> required by user space applications that need to parse the information
-> contained in the ICMP Extension Structure. For example, the RFC 5837
-> extension for tracepath.
-> 
-> Add a selftest that verifies correct handling of the RFC 4884 length
-> field for both IPv4 and IPv6, with and without extension structures,
-> and validates that malformed extensions are correctly reported as invalid.
-> 
-> For each address family, the test creates:
->   - a raw socket used to send locally crafted ICMP error packets to the
->     loopback address, and
->   - a datagram socket used to receive the encapsulated original datagram
->     and associated error metadata from the kernel error queue.
-> 
-> ICMP packets are constructed entirely in user space rather than relying
-> on kernel-generated errors. This allows the test to exercise invalid
-> scenarios (such as corrupted checksums and incorrect length fields) and
-> verify that the SO_EE_RFC4884_FLAG_INVALID flag is set as expected.
-> 
-> Output Example:
-> 
-> $ ./icmp_rfc4884
-> Starting 18 tests from 18 test cases.
->   RUN           rfc4884.ipv4_ext_small_payload.rfc4884 ...
->             OK  rfc4884.ipv4_ext_small_payload.rfc4884
-> ok 1 rfc4884.ipv4_ext_small_payload.rfc4884
->   RUN           rfc4884.ipv4_ext.rfc4884 ...
->             OK  rfc4884.ipv4_ext.rfc4884
-> ok 2 rfc4884.ipv4_ext.rfc4884
->   RUN           rfc4884.ipv4_ext_large_payload.rfc4884 ...
->             OK  rfc4884.ipv4_ext_large_payload.rfc4884
-> ok 3 rfc4884.ipv4_ext_large_payload.rfc4884
->   RUN           rfc4884.ipv4_no_ext_small_payload.rfc4884 ...
->             OK  rfc4884.ipv4_no_ext_small_payload.rfc4884
-> ok 4 rfc4884.ipv4_no_ext_small_payload.rfc4884
->   RUN           rfc4884.ipv4_no_ext_min_payload.rfc4884 ...
->             OK  rfc4884.ipv4_no_ext_min_payload.rfc4884
-> ok 5 rfc4884.ipv4_no_ext_min_payload.rfc4884
->   RUN           rfc4884.ipv4_no_ext_large_payload.rfc4884 ...
->             OK  rfc4884.ipv4_no_ext_large_payload.rfc4884
-> ok 6 rfc4884.ipv4_no_ext_large_payload.rfc4884
->   RUN           rfc4884.ipv4_invalid_ext_checksum.rfc4884 ...
->             OK  rfc4884.ipv4_invalid_ext_checksum.rfc4884
-> ok 7 rfc4884.ipv4_invalid_ext_checksum.rfc4884
->   RUN           rfc4884.ipv4_invalid_ext_length_small.rfc4884 ...
->             OK  rfc4884.ipv4_invalid_ext_length_small.rfc4884
-> ok 8 rfc4884.ipv4_invalid_ext_length_small.rfc4884
->   RUN           rfc4884.ipv4_invalid_ext_length_large.rfc4884 ...
->             OK  rfc4884.ipv4_invalid_ext_length_large.rfc4884
-> ok 9 rfc4884.ipv4_invalid_ext_length_large.rfc4884
->   RUN           rfc4884.ipv6_ext_small_payload.rfc4884 ...
->             OK  rfc4884.ipv6_ext_small_payload.rfc4884
-> ok 10 rfc4884.ipv6_ext_small_payload.rfc4884
->   RUN           rfc4884.ipv6_ext.rfc4884 ...
->             OK  rfc4884.ipv6_ext.rfc4884
-> ok 11 rfc4884.ipv6_ext.rfc4884
->   RUN           rfc4884.ipv6_ext_large_payload.rfc4884 ...
->             OK  rfc4884.ipv6_ext_large_payload.rfc4884
-> ok 12 rfc4884.ipv6_ext_large_payload.rfc4884
->   RUN           rfc4884.ipv6_no_ext_small_payload.rfc4884 ...
->             OK  rfc4884.ipv6_no_ext_small_payload.rfc4884
-> ok 13 rfc4884.ipv6_no_ext_small_payload.rfc4884
->   RUN           rfc4884.ipv6_no_ext_min_payload.rfc4884 ...
->             OK  rfc4884.ipv6_no_ext_min_payload.rfc4884
-> ok 14 rfc4884.ipv6_no_ext_min_payload.rfc4884
->   RUN           rfc4884.ipv6_no_ext_large_payload.rfc4884 ...
->             OK  rfc4884.ipv6_no_ext_large_payload.rfc4884
-> ok 15 rfc4884.ipv6_no_ext_large_payload.rfc4884
->   RUN           rfc4884.ipv6_invalid_ext_checksum.rfc4884 ...
->             OK  rfc4884.ipv6_invalid_ext_checksum.rfc4884
-> ok 16 rfc4884.ipv6_invalid_ext_checksum.rfc4884
->   RUN           rfc4884.ipv6_invalid_ext_length_small.rfc4884 ...
->             OK  rfc4884.ipv6_invalid_ext_length_small.rfc4884
-> ok 17 rfc4884.ipv6_invalid_ext_length_small.rfc4884
->   RUN           rfc4884.ipv6_invalid_ext_length_large.rfc4884 ...
->             OK  rfc4884.ipv6_invalid_ext_length_large.rfc4884
-> ok 18 rfc4884.ipv6_invalid_ext_length_large.rfc4884
->  PASSED: 18 / 18 tests passed.
->  Totals: pass:18 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
->  tools/testing/selftests/net/.gitignore     |   1 +
->  tools/testing/selftests/net/Makefile       |   1 +
->  tools/testing/selftests/net/icmp_rfc4884.c | 658 +++++++++++++++++++++
->  3 files changed, 660 insertions(+)
->  create mode 100644 tools/testing/selftests/net/icmp_rfc4884.c
+> v5:
+>  * remove unused macro definitions
 > 
-> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-> index 6930fe926c58..97ad4d551d44 100644
-> --- a/tools/testing/selftests/net/.gitignore
-> +++ b/tools/testing/selftests/net/.gitignore
-> @@ -7,6 +7,7 @@ cmsg_sender
->  epoll_busy_poll
->  fin_ack_lat
->  hwtstamp_config
-> +icmp_rfc4884
->  io_uring_zerocopy_tx
->  ioam6_parser
->  ip_defrag
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index b66ba04f19d9..fe7937dc5f45 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -166,6 +166,7 @@ TEST_GEN_PROGS := \
->  	bind_timewait \
->  	bind_wildcard \
->  	epoll_busy_poll \
-> +	icmp_rfc4884 \
->  	ipv6_fragmentation \
->  	proc_net_pktgen \
->  	reuseaddr_conflict \
-> diff --git a/tools/testing/selftests/net/icmp_rfc4884.c b/tools/testing/selftests/net/icmp_rfc4884.c
+> RFC v4:
+>  * describe fields and variables with comments
+>  * sub-interface is only 5 bits
+>  * harmonize Kconfig symbol name
+>  * maintain alphabetic order in Kconfig
+>  * fix typo s/beginnig/beginning/
+>  * fix typo s/swtiches/switches/
+>  * arrange local variables in reverse xmas tree order
+> 
+> RFC v3: no changes
+> RFC v2: make sure all tag fields are initialized
+> 
+>  MAINTAINERS            |   1 +
+>  include/net/dsa.h      |   2 +
+>  net/dsa/Kconfig        |   7 +++
+>  net/dsa/Makefile       |   1 +
+>  net/dsa/tag_mxl862xx.c | 116 +++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 127 insertions(+)
+>  create mode 100644 net/dsa/tag_mxl862xx.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 162859534a77c..686591074b34d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -15619,6 +15619,7 @@ M:	Daniel Golle <daniel@makrotopia.org>
+>  L:	netdev@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+> +F:	net/dsa/tag_mxl862xx.c
+>  
+>  MCAN DEVICE DRIVER
+>  M:	Markus Schneider-Pargmann <msp@baylibre.com>
+> diff --git a/include/net/dsa.h b/include/net/dsa.h
+> index 6b2b5ed64ea4c..1e33242b6d94d 100644
+> --- a/include/net/dsa.h
+> +++ b/include/net/dsa.h
+> @@ -57,6 +57,7 @@ struct tc_action;
+>  #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
+>  #define DSA_TAG_PROTO_YT921X_VALUE		30
+>  #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
+> +#define DSA_TAG_PROTO_MXL862_VALUE		32
+>  
+>  enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+> @@ -91,6 +92,7 @@ enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
+>  	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
+>  	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+> +	DSA_TAG_PROTO_MXL862		= DSA_TAG_PROTO_MXL862_VALUE,
+>  };
+>  
+>  struct dsa_switch;
+> diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+> index f86b30742122f..efc95759a10e1 100644
+> --- a/net/dsa/Kconfig
+> +++ b/net/dsa/Kconfig
+> @@ -104,6 +104,13 @@ config NET_DSA_TAG_MTK
+>  	  Say Y or M if you want to enable support for tagging frames for
+>  	  Mediatek switches.
+>  
+> +config NET_DSA_TAG_MXL_862XX
+> +	tristate "Tag driver for MxL862xx switches"
+> +	help
+> +	  Say Y or M if you want to enable support for tagging frames for the
+> +	  Maxlinear MxL86252 and MxL86282 switches using their native 8-byte
+> +	  tagging protocol.
+> +
+>  config NET_DSA_TAG_MXL_GSW1XX
+>  	tristate "Tag driver for MaxLinear GSW1xx switches"
+>  	help
+> diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+> index 42d173f5a7013..bf7247759a64a 100644
+> --- a/net/dsa/Makefile
+> +++ b/net/dsa/Makefile
+> @@ -28,6 +28,7 @@ obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
+>  obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
+>  obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
+>  obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
+> +obj-$(CONFIG_NET_DSA_TAG_MXL_862XX) += tag_mxl862xx.o
+>  obj-$(CONFIG_NET_DSA_TAG_MXL_GSW1XX) += tag_mxl-gsw1xx.o
+>  obj-$(CONFIG_NET_DSA_TAG_NONE) += tag_none.o
+>  obj-$(CONFIG_NET_DSA_TAG_OCELOT) += tag_ocelot.o
+> diff --git a/net/dsa/tag_mxl862xx.c b/net/dsa/tag_mxl862xx.c
 > new file mode 100644
-> index 000000000000..043965289116
+> index 0000000000000..c4d0ea2eb48f9
 > --- /dev/null
-> +++ b/tools/testing/selftests/net/icmp_rfc4884.c
-> @@ -0,0 +1,658 @@
-> +// SPDX-License-Identifier: GPL-2.0
+> +++ b/net/dsa/tag_mxl862xx.c
+> @@ -0,0 +1,116 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * DSA Special Tag for MaxLinear 862xx switch chips
+> + *
+> + * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
+> + * Copyright (C) 2024 MaxLinear Inc.
+> + */
 > +
-> +#include <linux/icmp.h>
-> +#include <linux/icmpv6.h>
-> +#include <linux/in6.h>
-> +#include <linux/ip.h>
-> +#include <linux/ipv6.h>
-> +#include <linux/errqueue.h>
-
-no need to respin but tiny: alphabetical ordering
-
-> +#include <sched.h>
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/socket.h>
-> +#include <netinet/in.h>
-> +#include <netinet/udp.h>
+> +#include <linux/bitops.h>
+> +#include <linux/etherdevice.h>
+> +#include <linux/skbuff.h>
+> +#include <net/dsa.h>
+> +#include "tag.h"
 > +
-> +#include "../kselftest_harness.h"
+> +#define MXL862_NAME	"mxl862xx"
 > +
-> +#define SRC_PORT 44444
-> +#define DST_PORT 55555
-> +#define MIN_ORIG_DGRAM_LEN 128
-> +#define MIN_PAYLOAD_LEN_V4	\
-> +	(MIN_ORIG_DGRAM_LEN - sizeof(struct iphdr) - sizeof(struct udphdr))
-> +#define MIN_PAYLOAD_LEN_V6	\
-> +	(MIN_ORIG_DGRAM_LEN - sizeof(struct ipv6hdr) - sizeof(struct udphdr))
-> +#define ORIG_PAYLOAD_BYTE 0xAA
-
-only if respinning: prefer typed (const) variables over macros
-
+> +#define MXL862_HEADER_LEN	8
 > +
-> +struct sockaddr_inet {
-> +	union {
-> +		struct sockaddr_in6 v6;
-> +		struct sockaddr_in v4;
-> +		struct sockaddr sa;
-> +	};
-> +	socklen_t len;
-> +};
+> +/* Word 0 -> EtherType */
 > +
-> +struct ip_case_info {
-> +	int	domain;
-> +	int	level;
-> +	int	opt1;
-> +	int	opt2;
-> +	int	proto;
-> +	int	(*build_func)(uint8_t *buf, ssize_t buflen, bool with_ext,
-> +			      int payload_len, bool bad_csum, bool bad_len,
-> +			      bool smaller_len);
-> +	int	min_payload;
-> +};
+> +/* Word 2 */
+> +#define MXL862_SUBIF_ID		GENMASK(4, 0)
 > +
-> +static int bringup_loopback(void)
+> +/* Word 3 */
+> +#define MXL862_IGP_EGP		GENMASK(3, 0)
+> +
+> +static struct sk_buff *mxl862_tag_xmit(struct sk_buff *skb,
+> +				       struct net_device *dev)
 > +{
-> +	struct ifreq ifr = {
-> +		.ifr_name = "lo"
-> +	};
-> +	int fd;
+> +	unsigned int cpu_port, usr_port, sub_interface;
+> +	struct dsa_port *dp = dsa_user_to_port(dev);
+> +	struct dsa_port *cpu_dp = dp->cpu_dp;
+> +	__be16 *mxl862_tag;
 > +
-> +	fd = socket(AF_INET, SOCK_DGRAM, 0);
-> +	if (fd < 0)
-> +		return -1;
+> +	/* switch firmware expects ports to be counted starting from 1 */
+> +	cpu_port = cpu_dp->index + 1;
+> +	usr_port = dp->index + 1;
 > +
-> +	if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
-> +		goto err;
+> +	/* target port sub-interface ID relative to the CPU port */
+> +	sub_interface = usr_port + 16 - cpu_port;
 > +
-> +	ifr.ifr_flags = ifr.ifr_flags | IFF_UP;
-> +
-> +	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
-> +		goto err;
-> +
-> +	close(fd);
-> +	return 0;
-> +
-> +err:
-> +	close(fd);
-> +	return -1;
-> +}
-> +
-> +static uint16_t csum(const void *buf, size_t len)
-> +{
-> +	const uint8_t *data = buf;
-> +	uint32_t sum = 0;
-> +
-> +	while (len > 1) {
-> +		sum += (data[0] << 8) | data[1];
-> +		data += 2;
-> +		len -= 2;
-> +	}
-> +
-> +	if (len == 1)
-> +		sum += data[0] << 8;
-> +
-> +	while (sum >> 16)
-> +		sum = (sum & 0xFFFF) + (sum >> 16);
-> +
-> +	return ~sum & 0xFFFF;
-> +}
-> +
-> +static void set_addr(struct sockaddr_inet *addr, int domain, int port)
-> +{
-> +	memset(addr, 0, sizeof(*addr));
-> +
-> +	switch (domain) {
-> +	case AF_INET:
-> +		addr->v4.sin_family = AF_INET;
-> +		addr->v4.sin_port = htons(port);
-> +		addr->v4.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-> +		addr->len = sizeof(addr->v4);
-> +		break;
-> +	case AF_INET6:
-> +		addr->v6.sin6_family = AF_INET6;
-> +		addr->v6.sin6_port = htons(port);
-> +		addr->v6.sin6_addr = in6addr_loopback;
-> +		addr->len = sizeof(addr->v6);
-> +		break;
-> +	}
-> +}
-> +
-> +static int bind_to_loopback(int fd, const struct ip_case_info *info)
-> +{
-> +	struct sockaddr_inet addr;
-> +	int opt = 1;
-> +
-> +	set_addr(&addr, info->domain, SRC_PORT);
-> +
-> +	if (setsockopt(fd, info->level, info->opt1, &opt, sizeof(opt)) < 0)
-> +		return -1;
-> +
-> +	if (setsockopt(fd, info->level, info->opt2, &opt, sizeof(opt)) < 0)
-> +		return -1;
-> +
+> +	if (!skb)
+> +		return skb;
 
-no need to respin just for this but nit: this does more than the
-function name covers. I was looking for where IPV6_RECVERR was set.
+I think skb can't be NULL here?!? Otherwise it would be better to move
+the check at the beginning of the function and return NULL directly.
 
-> +	return bind(fd, &addr.sa, addr.len);
-> +}
 > +
-> +static int build_rfc4884_ext(uint8_t *buf, size_t buflen, bool bad_csum,
-> +			     bool bad_len, bool smaller_len)
-> +{
-> +	struct icmp_extobj_hdr *objh;
-> +	struct icmp_ext_hdr *exthdr;
-> +	size_t obj_len, ext_len;
-> +	uint16_t sum;
+> +	/* provide additional space 'MXL862_HEADER_LEN' bytes */
+> +	skb_push(skb, MXL862_HEADER_LEN);
 > +
-> +	/* Use an object payload of 4 bytes */
-> +	obj_len = sizeof(*objh) + sizeof(uint32_t);
-> +	ext_len = sizeof(*exthdr) + obj_len;
-> +
-> +	if (ext_len > buflen)
-> +		return -EINVAL;
-> +
-> +	exthdr = (struct icmp_ext_hdr *)buf;
-> +	objh = (struct icmp_extobj_hdr *)(buf + sizeof(*exthdr));
-> +
-> +	exthdr->version = 2;
-> +	/* When encoding a bad object length, either encode a length too small
-> +	 * to fit the object header or too big to fit in the packet.
+> +	/* shift MAC address to the beginning of the enlarged buffer,
+> +	 * releasing the space required for DSA tag (between MAC address and
+> +	 * Ethertype)
 > +	 */
-> +	if (bad_len)
-> +		obj_len = smaller_len ? sizeof(*objh) - 1 : obj_len * 2;
-> +	objh->length = htons(obj_len);
+> +	dsa_alloc_etype_header(skb, MXL862_HEADER_LEN);
 > +
-> +	sum = csum(buf, ext_len);
-> +	exthdr->checksum = htons(bad_csum ? sum - 1 : sum);
+> +	/* special tag ingress */
+> +	mxl862_tag = dsa_etype_header_pos_tx(skb);
+> +	mxl862_tag[0] = htons(ETH_P_MXLGSW);
+> +	mxl862_tag[1] = 0;
+> +	mxl862_tag[2] = htons(FIELD_PREP(MXL862_SUBIF_ID, sub_interface));
+> +	mxl862_tag[3] = htons(FIELD_PREP(MXL862_IGP_EGP, cpu_port));
 > +
-> +	return ext_len;
+> +	return skb;
 > +}
 > +
-> +static int build_orig_dgram_v4(uint8_t *buf, ssize_t buflen, int payload_len)
+> +static struct sk_buff *mxl862_tag_rcv(struct sk_buff *skb,
+> +				      struct net_device *dev)
 > +{
-> +	struct udphdr *udph;
-> +	struct iphdr *iph;
-> +	size_t len = 0;
+> +	__be16 *mxl862_tag;
+> +	int port;
 > +
-> +	len = sizeof(*iph) + sizeof(*udph) + payload_len;
-> +	if (len > buflen)
-> +		return -EINVAL;
-> +
-> +	iph = (struct iphdr *)buf;
-> +	udph = (struct udphdr *)(buf + sizeof(*iph));
-> +
-> +	iph->version = 4;
-> +	iph->ihl = 5;
-> +	iph->protocol = IPPROTO_UDP;
-> +	iph->saddr = htonl(INADDR_LOOPBACK);
-> +	iph->daddr = htonl(INADDR_LOOPBACK);
-> +	iph->tot_len = htons(len);
-> +	iph->check = htons(csum(iph, sizeof(*iph)));
-> +
-> +	udph->source = htons(SRC_PORT);
-> +	udph->dest = htons(DST_PORT);
-> +	udph->len = htons(sizeof(*udph) + payload_len);
-> +
-> +	memset(buf + sizeof(*iph) + sizeof(*udph), ORIG_PAYLOAD_BYTE,
-> +	       payload_len);
-> +
-> +	return len;
-> +}
-> +
-> +static int build_orig_dgram_v6(uint8_t *buf, ssize_t buflen, int payload_len)
-> +{
-> +	struct udphdr *udph;
-> +	struct ipv6hdr *iph;
-> +	size_t len = 0;
-> +
-> +	len = sizeof(*iph) + sizeof(*udph) + payload_len;
-> +	if (len > buflen)
-> +		return -EINVAL;
-> +
-> +	iph = (struct ipv6hdr *)buf;
-> +	udph = (struct udphdr *)(buf + sizeof(*iph));
-> +
-> +	iph->version = 6;
-> +	iph->payload_len = htons(sizeof(*udph) + payload_len);
-> +	iph->nexthdr = IPPROTO_UDP;
-> +	iph->saddr = in6addr_loopback;
-> +	iph->daddr = in6addr_loopback;
-> +
-> +	udph->source = htons(SRC_PORT);
-> +	udph->dest = htons(DST_PORT);
-> +	udph->len = htons(sizeof(*udph) + payload_len);
-> +
-> +	memset(buf + sizeof(*iph) + sizeof(*udph), ORIG_PAYLOAD_BYTE,
-> +	       payload_len);
-> +
-> +	return len;
-> +}
-> +
-> +static int build_icmpv4_pkt(uint8_t *buf, ssize_t buflen, bool with_ext,
-> +			    int payload_len, bool bad_csum, bool bad_len,
-> +			    bool smaller_len)
-> +{
-> +	struct icmphdr *icmph;
-> +	int len, ret;
-> +
-> +	len = sizeof(*icmph);
-> +	memset(buf, 0, buflen);
-> +
-> +	icmph = (struct icmphdr *)buf;
-> +	icmph->type = ICMP_DEST_UNREACH;
-> +	icmph->code = ICMP_PORT_UNREACH;
-> +	icmph->checksum = 0;
-> +
-> +	ret = build_orig_dgram_v4(buf + len, buflen - len, payload_len);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	len += ret;
-> +
-> +	icmph->un.reserved[1] = (len - sizeof(*icmph)) / sizeof(uint32_t);
-> +
-> +	if (with_ext) {
-> +		ret = build_rfc4884_ext(buf + len, buflen - len,
-> +					bad_csum, bad_len, smaller_len);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		len += ret;
+> +	if (unlikely(!pskb_may_pull(skb, MXL862_HEADER_LEN))) {
+> +		dev_warn_ratelimited(&dev->dev, "Cannot pull SKB, packet dropped\n");
+> +		return NULL;
 > +	}
 > +
-> +	icmph->checksum = htons(csum(icmph, len));
-> +	return len;
-> +}
+> +	mxl862_tag = dsa_etype_header_pos_rx(skb);
 > +
-> +static int build_icmpv6_pkt(uint8_t *buf, ssize_t buflen, bool with_ext,
-> +			    int payload_len, bool bad_csum, bool bad_len,
-> +			    bool smaller_len)
-> +{
-> +	struct icmp6hdr *icmph;
-> +	int len, ret;
-> +
-> +	len = sizeof(*icmph);
-> +	memset(buf, 0, buflen);
-> +
-> +	icmph = (struct icmp6hdr *)buf;
-> +	icmph->icmp6_type = ICMPV6_DEST_UNREACH;
-> +	icmph->icmp6_code = ICMPV6_PORT_UNREACH;
-> +	icmph->icmp6_cksum = 0;
-> +
-> +	ret = build_orig_dgram_v6(buf + len, buflen - len, payload_len);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	len += ret;
-> +
-> +	icmph->icmp6_datagram_len = (len - sizeof(*icmph)) / sizeof(uint64_t);
-> +
-> +	if (with_ext) {
-> +		ret = build_rfc4884_ext(buf + len, buflen - len,
-> +					bad_csum, bad_len, smaller_len);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		len += ret;
-> +	}
-> +
-> +	icmph->icmp6_cksum = htons(csum(icmph, len));
-> +	return len;
-> +}
-> +
-> +FIXTURE(rfc4884) {};
-> +
-> +FIXTURE_SETUP(rfc4884)
-> +{
-> +	int ret;
-> +
-> +	ret = unshare(CLONE_NEWNET);
-> +	ASSERT_EQ(ret, 0) {
-> +		TH_LOG("unshare(CLONE_NEWNET) failed: %s", strerror(errno));
-> +	}
-> +
-> +	ret = bringup_loopback();
-> +	ASSERT_EQ(ret, 0) TH_LOG("Failed to bring up loopback interface");
-> +}
-> +
-> +FIXTURE_TEARDOWN(rfc4884)
-> +{
-> +}
-> +
-> +const struct ip_case_info ipv4_info = {
-> +	.domain		= AF_INET,
-> +	.level		= SOL_IP,
-> +	.opt1		= IP_RECVERR,
-> +	.opt2		= IP_RECVERR_RFC4884,
-> +	.proto		= IPPROTO_ICMP,
-> +	.build_func	= build_icmpv4_pkt,
-> +	.min_payload	= MIN_PAYLOAD_LEN_V4,
-> +};
-> +
-> +const struct ip_case_info ipv6_info = {
-> +	.domain		= AF_INET6,
-> +	.level		= SOL_IPV6,
-> +	.opt1		= IPV6_RECVERR,
-> +	.opt2		= IPV6_RECVERR_RFC4884,
-> +	.proto		= IPPROTO_ICMPV6,
-> +	.build_func	= build_icmpv6_pkt,
-> +	.min_payload	= MIN_PAYLOAD_LEN_V6,
-> +};
-> +
-> +FIXTURE_VARIANT(rfc4884) {
-> +	/* IPv4/v6 related information */
-> +	struct ip_case_info	info;
-> +	/* Whether to append an ICMP extension or not */
-> +	bool			with_ext;
-> +	/* UDP payload length */
-> +	int			payload_len;
-> +	/* Whether to generate a bad checksum in the ICMP extension structure */
-> +	bool			bad_csum;
-> +	/* Whether to generate a bad length in the ICMP object header */
-> +	bool			bad_len;
-> +	/* Whether it is too small to fit the object header or too big to fit
-> +	 * in the packet
-> +	 */
-> +	bool			smaller_len;
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message with extension and the original
-> + * datagram is smaller than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_ext_small_payload) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= 64,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message with extension and 128 bytes original
-> + * datagram, generates an error with the expected offset, and does not raise the
-> + * SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_ext) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V4,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message with extension and the original
-> + * datagram is larger than 128 bytes, generates an error with the expected
-> + * offset, and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_ext_large_payload) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= 256,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message without extension and the original
-> + * datagram is smaller than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_no_ext_small_payload) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= false,
-> +	.payload_len	= 64,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message without extension and 128 bytes
-> + * original datagram, generates an error with zero offset, and does not raise
-> + * the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_no_ext_min_payload) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= false,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V4,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv4 error message without extension and the original
-> + * datagram is larger than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_no_ext_large_payload) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= false,
-> +	.payload_len	= 256,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that an ICMPv4 error message with extension and an invalid checksum,
-> + * generates an error with the expected offset, and raises the
-> + * SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_invalid_ext_checksum) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V4,
-> +	.bad_csum	= true,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that an ICMPv4 error message with extension and an object length
-> + * smaller than the object header, generates an error with the expected offset,
-> + * and raises the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_invalid_ext_length_small) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V4,
-> +	.bad_csum	= false,
-> +	.bad_len	= true,
-> +	.smaller_len	= true,
-> +};
-> +
-> +/* Tests that an ICMPv4 error message with extension and an object length that
-> + * is too big to fit in the packet, generates an error with the expected offset,
-> + * and raises the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv4_invalid_ext_length_large) {
-> +	.info		= ipv4_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V4,
-> +	.bad_csum	= false,
-> +	.bad_len	= true,
-> +	.smaller_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv6 error message with extension and the original
-> + * datagram is smaller than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_ext_small_payload) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= 64,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv6 error message with extension and 128 bytes original
-> + * datagram, generates an error with the expected offset, and does not raise the
-> + * SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_ext) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V6,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv6 error message with extension and the original
-> + * datagram is larger than 128 bytes, generates an error with the expected
-> + * offset, and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_ext_large_payload) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= 256,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +/* Tests that a valid ICMPv6 error message without extension and the original
-> + * datagram is smaller than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_no_ext_small_payload) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= false,
-> +	.payload_len	= 64,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv6 error message without extension and 128 bytes
-> + * original datagram, generates an error with zero offset, and does not
-> + * raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_no_ext_min_payload) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= false,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V6,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that a valid ICMPv6 error message without extension and the original
-> + * datagram is larger than 128 bytes, generates an error with zero offset,
-> + * and does not raise the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_no_ext_large_payload) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= false,
-> +	.payload_len	= 256,
-> +	.bad_csum	= false,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that an ICMPv6 error message with extension and an invalid checksum,
-> + * generates an error with the expected offset, and raises the
-> + * SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_invalid_ext_checksum) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V6,
-> +	.bad_csum	= true,
-> +	.bad_len	= false,
-> +};
-> +
-> +/* Tests that an ICMPv6 error message with extension and an object length
-> + * smaller than the object header, generates an error with the expected offset,
-> + * and raises the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_invalid_ext_length_small) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V6,
-> +	.bad_csum	= false,
-> +	.bad_len	= true,
-> +	.smaller_len	= true,
-> +};
-> +
-> +/* Tests that an ICMPv6 error message with extension and an object length that
-> + * is too big to fit in the packet, generates an error with the expected offset,
-> + * and raises the SO_EE_RFC4884_FLAG_INVALID flag.
-> + */
-> +FIXTURE_VARIANT_ADD(rfc4884, ipv6_invalid_ext_length_large) {
-> +	.info		= ipv6_info,
-> +	.with_ext	= true,
-> +	.payload_len	= MIN_PAYLOAD_LEN_V6,
-> +	.bad_csum	= false,
-> +	.bad_len	= true,
-> +	.smaller_len	= false,
-> +};
-> +
-> +static void
-> +check_rfc4884_offset(struct __test_metadata *_metadata, int sock,
-> +		     const FIXTURE_VARIANT(rfc4884) *v)
-> +{
-> +	char rxbuf[1024];
-> +	char ctrl[1024];
-> +	struct iovec iov = {
-> +		.iov_base = rxbuf,
-> +		.iov_len = sizeof(rxbuf)
-> +	};
-> +	struct msghdr msg = {
-> +		.msg_iov = &iov,
-> +		.msg_iovlen = 1,
-> +		.msg_control = ctrl,
-> +		.msg_controllen = sizeof(ctrl),
-> +	};
-> +	struct cmsghdr *cmsg;
-> +	int recv;
-> +
-> +	recv = recvmsg(sock, &msg, MSG_ERRQUEUE);
+> +	if (unlikely(mxl862_tag[0] != htons(ETH_P_MXLGSW))) {
+> +		dev_warn_ratelimited(&dev->dev, "Invalid special tag marker, packet dropped\n");
+> +		dev_warn_ratelimited(&dev->dev, "Rx Packet Tag: %8ph\n",
+> +				     mxl862_tag);
 
-Reading from the error queue does not block.
+Why breaking the message in 2 strings? a single dev_warn_ratelimited()
+would be more readable and will generate smaller code. Similar thing below.
 
-Is it assured that the ICMP packet is queued on return from sendmsg?
-Or does this need a poll to be on the safe side wrt flakes.
-
-> +	ASSERT_GE(recv, 0) TH_LOG("recvmsg(MSG_ERRQUEUE) failed");
-> +
-> +	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-> +		bool is_invalid, expected_invalid;
-> +		struct sock_extended_err *ee;
-> +		int expected_off;
-> +		uint16_t off;
-> +
-> +		if (cmsg->cmsg_level != v->info.level &&
-> +		    cmsg->cmsg_type != v->info.opt1)
-> +			continue;
-
-Do we expect any other cmsg? Else just fail if encountering them, to
-make the test more strict?
-
-> +
-> +		ee = (struct sock_extended_err *)CMSG_DATA(cmsg);
-> +		off = ee->ee_rfc4884.len;
-> +		is_invalid = ee->ee_rfc4884.flags & SO_EE_RFC4884_FLAG_INVALID;
-> +
-> +		expected_invalid = v->bad_csum || v->bad_len;
-> +		ASSERT_EQ(is_invalid, expected_invalid) {
-> +			TH_LOG("Expected invalidity flag to be %d, but got %d",
-> +			       expected_invalid, is_invalid);
-> +		}
-> +
-> +		expected_off =
-> +			(v->with_ext && v->payload_len >= v->info.min_payload) ?
-> +			v->payload_len : 0;
-> +		ASSERT_EQ(off, expected_off) {
-> +			TH_LOG("Expected RFC4884 offset %u, got %u",
-> +			       expected_off, off);
-> +		}
-> +		break;
-> +	}
-> +}
-> +
-> +TEST_F(rfc4884, rfc4884)
-> +{
-> +	const typeof(variant) v = variant;
-> +	struct sockaddr_inet addr;
-> +	uint8_t pkt[1024];
-> +	int dgram, raw;
-> +	int len, sent;
-> +	int err;
-> +
-> +	dgram = socket(v->info.domain, SOCK_DGRAM, 0);
-> +	ASSERT_GE(dgram, 0) TH_LOG("Opening datagram socket failed");
-> +
-> +	err = bind_to_loopback(dgram, &v->info);
-> +	ASSERT_EQ(err, 0) TH_LOG("Bind failed");
-> +
-> +	raw = socket(v->info.domain, SOCK_RAW, v->info.proto);
-> +	ASSERT_GE(raw, 0) TH_LOG("Opening raw socket failed");
-> +
-> +	len = v->info.build_func(pkt, sizeof(pkt), v->with_ext, v->payload_len,
-> +				 v->bad_csum, v->bad_len, v->smaller_len);
-> +	ASSERT_GT(len, 0) TH_LOG("Building packet failed");
-> +
-> +	set_addr(&addr, v->info.domain, 0);
-> +	sent = sendto(raw, pkt, len, 0, &addr.sa, addr.len);
-> +	ASSERT_EQ(len, sent) TH_LOG("Sending packet failed");
-> +
-> +	check_rfc4884_offset(_metadata, dgram, v);
-> +
-> +	close(dgram);
-> +	close(raw);
-> +}
-> +
-> +TEST_HARNESS_MAIN
-> -- 
-> 2.51.0
-> 
-
+/P
 
 
