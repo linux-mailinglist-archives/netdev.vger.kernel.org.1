@@ -1,152 +1,107 @@
-Return-Path: <netdev+bounces-250056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7B8D235B7
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:08:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C29D23635
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CBC553002897
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:08:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF9A63023841
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4452342173;
-	Thu, 15 Jan 2026 09:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D6A3587C7;
+	Thu, 15 Jan 2026 09:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pV9kTPcB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTXX7YUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AF433E35B;
-	Thu, 15 Jan 2026 09:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABEA357A30
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768468132; cv=none; b=d+RFzaGv6y7fmyfFNE9W1BjIWiRDN9lxIFGRRzYgaEhksXOdB40R4wobSSo2oPaU/pNtUJoWAwZ6bb0yC+2pkPu2yQ9YRSo8PgnE3VwoKa2/+sXtwC93rNCV6GNX27tF0gHB6cNcBCLdCpo98L9r6l9zI42vAS3aCcqM7i9Yu80=
+	t=1768468556; cv=none; b=MZPAgueg7+8QyNn0BIrb1PYM/s0xqJj0XrlW+m45S0zwjSxL694qbuc1jhRioPosi7oppYLThD6AwUdvYThokxZW01wyOe5VXcxwhe0JIvrF55c4GzXgPU3Ojw/hq56SCGU7hWTFg+1IIh002j2i5grmqerWtMfRzoEqHuA0W8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768468132; c=relaxed/simple;
-	bh=TACqM6MrhIV6ay/73FoCpS3CaZS0eJYh1YKHXmr7TV4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=I+w6VU038Qx5D7IHWBsn2TCB6hNP8GST2J984807Ee1EM4EwlrUmjXS7WHXhNae0+jJQ13uNBp/avc1vcg3w7HgxcKY5PvJNmSse5XuP8Ah7DJxbSSWCiyIe/QB7hqm/eKHLb4C1KyydLHqxkes7W5+ue1Y5ZUimMU1i73NQCKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pV9kTPcB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0709C116D0;
-	Thu, 15 Jan 2026 09:08:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768468132;
-	bh=TACqM6MrhIV6ay/73FoCpS3CaZS0eJYh1YKHXmr7TV4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=pV9kTPcBH5t5MkMrLlFtvaNeLRH/Q9UTak53dCbGpZuandiKS4B9E4q3xryWLbJ1w
-	 cuR4Fh7K13C+CwOOxnIlHdrZQqPmjWBiX/d4MKNxLP+WcqwKSe+/6lRte0Xt4lMSQu
-	 dJjOyWj0/qq1dKEnAHplgD09zXDaXPfVRR/9Pof3VvzPefAenw8m3MnWRgoWFR9uD1
-	 dffM0OSqeGgUy9GoFGIjysjKS/jvgDCm3HfTLWRmsHoL3215jBGXcp9k+vJWsCOV5L
-	 KCGG++s+8yQ6NuTp5Hk9noZbU6UkvEC7lYzzjH5Kxkqe0lIxr/8Ocq9L9Ocu5V4dKY
-	 ZZMejgqpZLC8Q==
-Message-ID: <748dbd7653d31edaccb54425788bbf9a6881da89.camel@kernel.org>
-Subject: Re: [PATCH net-next] selftests: tls: use mkstemp instead of
- open(O_TMPFILE)
-From: Geliang Tang <geliang@kernel.org>
-To: John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>,  Sabrina Dubroca <sd@queasysnail.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>
-Cc: Gang Yan <yangang@kylinos.cn>, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev
-Date: Thu, 15 Jan 2026 17:08:46 +0800
-In-Reply-To: <3936106c6b3cc45c570023e083a1e56fa6548b41.1768356312.git.geliang@kernel.org>
-References: 
-	<3936106c6b3cc45c570023e083a1e56fa6548b41.1768356312.git.geliang@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.56.2-4 
+	s=arc-20240116; t=1768468556; c=relaxed/simple;
+	bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YLG1pzKKZe7S3blkFDw3TcenvzUubjmyKXLmY7guq4l9no6dAPBAmI6TC5xyNwHZrsdnvGMXE089P3blUXWBT3ArlIN9890qySjyBk+6jSSPZMpBfuKv+wayCbzAdlDM06JpPfD/M8iUUIPzCrPBQc+LBMc2YiFFyZZRHiXTygw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OTXX7YUn; arc=none smtp.client-ip=209.85.215.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso265361a12.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:15:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768468551; x=1769073351; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
+        b=OTXX7YUnCYhrg1AwTXyxej5XtK6qSMAW5E6Pnnx48K2lMGod0kyMc9Tfzx0+A/YQO2
+         /wZbfVE4KfE6jtOm/62GgTY51NmPs++pVlc/zNY1CJxnIreB6l6GJ/DMhFBDh7xtbCwO
+         syCskqbMTE3S00xjM02cggneEp9xgPNaZaavvjL4YRFhZOUvwzs3LVIdOcxHI9U6jztA
+         znGqyqQAN8vndJKpH//bWCgytt+P0vKEHSZnx8DeTdIahjzNk6CVKiazLb4ZsXP8bzuM
+         4gy+g7saZx7gOekMwrB5u90+sipTnxO8bLir7cjavgJbX7YnEkh+BAYyt3kHEh8Epme2
+         3l1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768468551; x=1769073351;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0HijuXWJpjwbVYBFjlsD56UImJ6stIXjhDyb2cKuonk=;
+        b=N4lPHlGS/Jbeg6oHKsxwgz5g0Ku8CamzgBhaBkdAmhYeJQLnftyH6BNjSrUG5I8Uza
+         yGvv1aFBLPcJt3DUnOVgfyqlSZ8alZFDU9zTXlzxXXzH7akFurbKER7LZ+DHSbK6n7ra
+         EYIBDd+i9lEqjNvSRcVQc7RjujE72aJDoA1WbYgJbAyjQJLZ0fwZliXP4RmFEciuYRqz
+         n3z0OubZ6XGKhiQs/5q/mGejN8v37rZ76Zns1ddkR/01aLt3oF09NrxIttnc0RXGuEcj
+         gBNhXC31hsdCNjITSb/L2T5E4PbOafD1ABO476ssqT0czKrDe3c27ZEkurKqQddwzsAw
+         cw8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXl0McemiAwfkOYbAOAfdxew/tGBRPsVEkRtVquLwE0+QFC0M2JJZkJuVIhW2V+57BSeybEaYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzqxkl+Zw+uRUltoH8SQ4xPQFgISy6ZUqR3I4yJdahCyRV5jBEq
+	urnvbutCj+sQx0nUqCT8y0HljhMAtNWlZ0XsQrqkDJnHycL8611gD/M=
+X-Gm-Gg: AY/fxX7An07D3gfwxfvM50uzOiP1UEMw8txleO4IzSxDwgeBE4FH4yTTlyhwfNnXl74
+	Jyux65NPNDmlrFyaOUtN6Bg+jo6YWgQbTT8CeysbupWClaKf0O58tCRkvuwBz+sTfs+W0tcwyNh
+	dywpYwzVqPx7Qek2dWN2erSXTz8SEzcZ6sYeqyMo3pUKcEKjFpOxwF6qaFdg2+NnLUev7+3buxK
+	trprCqVUOcNgnXDjD7cnRMIhIAEVmEMSvDmCS3/hXh12A23gIlRHoITcVu1Ldst1y/S3Du6vxb2
+	7NSue0BWlflW3oacRwkXbEF2M74IU7i9UaTBo9UfxPghKPj/U1gnzCIY8dPyaEVYmwTtamMRLb7
+	yq3GBny8FGYWfWmlouflJF4WOjtZ6Y80Mkimtm9/Vw4CooGOmXpg8i1KbAGbhuVl7vIlPDgxlqx
+	eA2MTLWi4dkskuwDizdRPV8eOZMcs3bxA=
+X-Received: by 2002:a17:90b:3cc7:b0:34c:e5fc:faec with SMTP id 98e67ed59e1d1-351090bdf07mr5514921a91.2.1768468550753;
+        Thu, 15 Jan 2026 01:15:50 -0800 (PST)
+Received: from localhost.localdomain ([64.114.211.100])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-352675f8e97sm1554321a91.0.2026.01.15.01.15.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 01:15:50 -0800 (PST)
+From: Jinseok Kim <always.starving0@gmail.com>
+To: kuba@kernel.org
+Cc: always.starving0@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	quic_luoj@quicinc.com
+Subject: Re: [PATCH] net: qualcomm: ppe: Remove redundant include of dev_printk.h
+Date: Thu, 15 Jan 2026 01:11:23 -0800
+Message-ID: <20260115091439.2216-1-always.starving0@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260113190210.5387bde1@kernel.org>
+References: <20260113190210.5387bde1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Wed, 2026-01-14 at 10:12 +0800, Geliang Tang wrote:
-> From: Gang Yan <yangang@kylinos.cn>
-> 
-> When running TLS tests in a virtual machine/container environment,
-> they
-> fail:
-> 
->  # tls.c:1479:mutliproc_even: Expected fd (-1) >= 0 (0)
->  # mutliproc_even: Test terminated by assertion
->  #          FAIL  tls.12_aes_gcm.mutliproc_even
->  not ok 59 tls.12_aes_gcm.mutliproc_even
->  #  RUN           tls.12_aes_gcm.mutliproc_readers ...
->  # tls.c:1479:mutliproc_readers: Expected fd (-1) >= 0 (0)
->  # mutliproc_readers: Test terminated by assertion
->  #          FAIL  tls.12_aes_gcm.mutliproc_readers
->  not ok 60 tls.12_aes_gcm.mutliproc_readers
->  #  RUN           tls.12_aes_gcm.mutliproc_writers ...
->  # tls.c:1479:mutliproc_writers: Expected fd (-1) >= 0 (0)
->  # mutliproc_writers: Test terminated by assertion
->  #          FAIL  tls.12_aes_gcm.mutliproc_writers
->  not ok 61 tls.12_aes_gcm.mutliproc_writers
-> 
-> This is because the /tmp directory uses the virtiofs filesystem,
-> which does
-> not support the O_TMPFILE feature.
-> 
-> This patch uses mkstemp() to create temporary files, thereby
-> eliminating
-> the dependency on the O_TMPFILE feature. And closes the file
-> descriptor
-> (fd) and deletes the temfile after the test ends.
-> 
-> Co-developed-by: Geliang Tang <geliang@kernel.org>
-> Signed-off-by: Geliang Tang <geliang@kernel.org>
-> Signed-off-by: Gang Yan <yangang@kylinos.cn>
-> ---
->  tools/testing/selftests/net/tls.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/tls.c
-> b/tools/testing/selftests/net/tls.c
-> index 9e2ccea13d70..f4b8dd99d501 100644
-> --- a/tools/testing/selftests/net/tls.c
-> +++ b/tools/testing/selftests/net/tls.c
-> @@ -1456,6 +1456,7 @@ test_mutliproc(struct __test_metadata
-> *_metadata, struct _test_data_tls *self,
->  	       bool sendpg, unsigned int n_readers, unsigned int
-> n_writers)
->  {
->  	const unsigned int n_children = n_readers + n_writers;
-> +	char tmpfile[] = "/tmp/tls_test_tmpfile_XXXXXX";
->  	const size_t data = 6 * 1000 * 1000;
->  	const size_t file_sz = data / 100;
->  	size_t read_bias, write_bias;
-> @@ -1469,7 +1470,7 @@ test_mutliproc(struct __test_metadata
-> *_metadata, struct _test_data_tls *self,
->  	write_bias = n_readers / n_writers ?: 1;
->  
->  	/* prep a file to send */
-> -	fd = open("/tmp/", O_TMPFILE | O_RDWR, 0600);
-> +	fd = mkstemp(tmpfile);
+Thanks for the review!
 
-Superseded.
+I suggested removing the direct #include <linux/dev_printk.h> because
+this is the only file under net/ethernet/qualcomm/ that explicitly includes it.
+All other files use dev_err() etc. just fine via <linux/device.h>.
 
-I noticed that this mkstemp approach was already implemented in
-chunked_sendfile(). To eliminate duplication, in v2 I just submitted, I
-extracted this logic into a new helper create_temp_file(), which is now
-shared by both chunked_sendfile() and test_mutliproc().
-
-Thanks,
--Geliang
-
->  	ASSERT_GE(fd, 0);
->  
->  	memset(buf, 0xac, file_sz);
-> @@ -1527,6 +1528,8 @@ test_mutliproc(struct __test_metadata
-> *_metadata, struct _test_data_tls *self,
->  			left -= res;
->  		}
->  	}
-> +	close(fd);
-> +	unlink(tmpfile);
->  }
->  
->  TEST_F(tls, mutliproc_even)
+But you're right — relying on indirect includes isn't ideal...
+I'll leave it as-is for now.
 
