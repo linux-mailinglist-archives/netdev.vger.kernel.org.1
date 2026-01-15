@@ -1,120 +1,126 @@
-Return-Path: <netdev+bounces-249989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A233AD220C2
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:41:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D2ED22164
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:05:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98FCA301B672
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 01:41:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 728C4301F034
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8DE24A04A;
-	Thu, 15 Jan 2026 01:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473672417C2;
+	Thu, 15 Jan 2026 02:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jZxqloSK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F27B23815B;
-	Thu, 15 Jan 2026 01:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FE835972
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768441264; cv=none; b=lSfR6OpJ56tIE8sUQAXf+XVJqF9Fq7MfWP/KBRfOXptbM54f+0/sxUEyp5YIoHU9boF0+VVmmDbqE2BJTRphmN/YfBp6EIv6V/nY6Ay/yf2NRKw6nA2Hb48oSKBFRXmkQCp6lhjUtOAtcDgtBNMzQj9gWV02xpSrbmi1L10MqZo=
+	t=1768442740; cv=none; b=YJGGKxTX+DoMXVamv5ylHyVn6N/V+bCfXuI/DDwZaXsd684tiQK/EfbWtuW+kDUQ8sZ/rur8D3cCuyR/NapzSLEhZZhkZRUbLtGrAPS8CiSEKboq5p0OUpXlO1dQESvzai1i3QubMgnTM+CiRGpPzqa20VPjC8bSuXiF43zTptI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768441264; c=relaxed/simple;
-	bh=otwVYL7nOtrDHHkGJjmQ15xUyz53dvMV7ILy5SSUP2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H38uJGRNCdgF55gOdjUPtsdp5soPHED7997y0XViC4FmijQMGcvMRxZnhbEPLhU43EwSNBgiL48L9/Xw0JfaTR10Pj3ho8JMiAWjmOqOnnybQJbPshcgxwKh1i3zN9He1afhfQ9rdThMReSK3c2YegpLF5YB2116z1GzE6gqyP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vgCM1-000000002A3-223U;
-	Thu, 15 Jan 2026 01:40:53 +0000
-Date: Thu, 15 Jan 2026 01:40:50 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
-Subject: Re: [PATCH net-next v2 3/6] net: dsa: lantiq: allow arbitrary MII
- registers
-Message-ID: <aWhFohyjEnaIeHSS@makrotopia.org>
-References: <cover.1768438019.git.daniel@makrotopia.org>
- <572c7d91f8eb97bd72584018f9b5941dbfb2e46e.1768438019.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1768442740; c=relaxed/simple;
+	bh=QqRkRsY6W6cDg2r9/GWdrhfW8vG4bXD+1TOJ5m14h2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PL5VdL9+K4uBuv90aS+W+mWqWO51D9iOj8Sqy4AjO7Vx9lamQSv9Tg7FBcKyhrPsTvlown7hfJsRCXqFTnWyvmoi14wJlbqNfvCdMVjqtBDkwCHwQOTkf0THRlA5UM0AiWYAtJS2Nu6Ag/QEaSbva2Lq0OXYldbIz8PE5xnIvDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jZxqloSK; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768442725;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1dVBa1uqlDFXUaBoOe7Sd2+L0eYTFhi+IVix/28bQU=;
+	b=jZxqloSKgyUDzuZg1j1fKmAHPfh1FMRvaNKyyrWZ7ay4YNtXzrQZuttKwi2O7oldR0RGlZ
+	0AXxMKOjnkawyarHbD2YiyDl8Iew528hfRXTZLk9QxG5guU8jkFvYCoKq+eGm8FX8F2/jh
+	5vjhjDZUd5d4OKvihEtCJb1XhyGqpnA=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
+ andrii@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v9 01/11] bpf: add fsession support
+Date: Thu, 15 Jan 2026 10:05:11 +0800
+Message-ID: <2815339.mvXUDI8C0e@7940hx>
+In-Reply-To:
+ <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
+References:
+ <20260110141115.537055-1-dongml2@chinatelecom.cn> <3026834.e9J7NaK4W3@7940hx>
+ <CAEf4Bza84H=FL-KxJEFAn6pFpVBQVnvrpif6_gtf_SWHH4pRJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <572c7d91f8eb97bd72584018f9b5941dbfb2e46e.1768438019.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 15, 2026 at 12:57:07AM +0000, Daniel Golle wrote:
-> The Lantiq GSWIP and MaxLinear GSW1xx drivers are currently relying on a
-> hard-coded mapping of MII ports to their respective MII_CFG and MII_PCDU
-> registers and only allow applying an offset to the port index.
-> 
-> While this is sufficient for the currently supported hardware, the very
-> similar Intel GSW150 (aka. Lantiq PEB7084) cannot be described using
-> this arrangement.
-> 
-> Introduce two arrays to specify the MII_CFG and MII_PCDU registers for
-> each port, replacing the current bitmap used to safeguard MII ports as
-> well as the port index offset.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> v2:
->  * introduce GSWIP_MAX_PORTS macro
-> 
->  drivers/net/dsa/lantiq/lantiq_gswip.c        | 30 ++++++++++++++++----
->  drivers/net/dsa/lantiq/lantiq_gswip.h        |  6 ++--
->  drivers/net/dsa/lantiq/lantiq_gswip_common.c | 27 +++---------------
->  drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 30 ++++++++++++++++----
->  4 files changed, 56 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-> index b094001a7c805..4a1be6a1df6fe 100644
-> --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-> +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-> @@ -463,10 +463,20 @@ static void gswip_shutdown(struct platform_device *pdev)
->  }
->  
->  static const struct gswip_hw_info gswip_xrx200 = {
-> -	.max_ports = 7,
-> +	.max_ports = GSWIP_MAX_PORTS,
->  	.allowed_cpu_ports = BIT(6),
-> -	.mii_ports = BIT(0) | BIT(1) | BIT(5),
-> -	.mii_port_reg_offset = 0,
-> +	.mii_cfg = {
-> +		[0 ... GSWIP_MAX_PORTS - 1] = -1,
-> +		[0] = GSWIP_MII_CFGp(0),
-> +		[1] = GSWIP_MII_CFGp(1),
-> +		[5] = GSWIP_MII_CFGp(5),
-> +	},
+On 2026/1/15 02:56 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> On Tue, Jan 13, 2026 at 6:11=E2=80=AFPM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> > On 2026/1/14 09:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > > On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong=
+@gmail.com> wrote:
+> > > >
+> > > > The fsession is something that similar to kprobe session. It allow =
+to
+> > > > attach a single BPF program to both the entry and the exit of the t=
+arget
+> > > > functions.
+> > > >
+> > [...]
+> > > > --- a/kernel/bpf/btf.c
+> > > > +++ b/kernel/bpf/btf.c
+> > > > @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct =
+bpf_verifier_log *log, const struct
+> > > >                 case BPF_TRACE_FENTRY:
+> > > >                 case BPF_TRACE_FEXIT:
+> > > >                 case BPF_MODIFY_RETURN:
+> > > > +               case BPF_TRACE_FSESSION:
+> > > >                         /* allow u64* as ctx */
+> > > >                         if (btf_is_int(t) && t->size =3D=3D 8)
+> > > >                                 return 0;
+> > > > @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum b=
+pf_access_type type,
+> > > >                         fallthrough;
+> > > >                 case BPF_LSM_CGROUP:
+> > > >                 case BPF_TRACE_FEXIT:
+> > > > +               case BPF_TRACE_FSESSION:
+> > >
+> > > According to the comment below we make this exception due to LSM.
+> > > FSESSION won't be using FSESSION programs, no? So this is not
+> > > necessary?
+> >
+> > The comment describe the LSM case here, but the code
+> > here is not only for LSM. It is also for FEXIT, which makes
+> > sure that we can get the return value with "ctx[nr_args]".
+> > So I think we still need it here, as we need to access the
+> > return value with "ctx[nr_args]" too.
+>=20
+> please update the comment then as well
 
-Kernel CI trips with
-warning: initialized field overwritten [-Woverride-init]
+ACK
 
-Would it be ok to enclose the gswip_hw_info initializers with
-__diag_push();
-__diag_ignore_all("-Woverride-init",
-		  "logic to initialize all and then override some is OK");
+>=20
+> >
+> > >
 
-like it is done in drivers/net/ethernet/renesas/sh_eth.c?
 
-Or should I rather keep the .mii_ports bitmap in addition to the array
-to indicate the indexes with valid values?
+
+
+
 
