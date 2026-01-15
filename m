@@ -1,651 +1,120 @@
-Return-Path: <netdev+bounces-250254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFDCD26134
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:06:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0A0D26137
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CDD8D302FCE3
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:03:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5F087302197E
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFF837C117;
-	Thu, 15 Jan 2026 17:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D5D3BF316;
+	Thu, 15 Jan 2026 17:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPD/DOtX"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PyHD9Xc2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325922C028F
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC0F396B7D;
+	Thu, 15 Jan 2026 17:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768496632; cv=none; b=ttpDX07Nl0kdoH2u8RMLukTAq2c2HTvABYzqYuoUQFAonnq9EsWsjhusT5qW+swrro1u7GDbSRfFzgKCZn2/6W+sWFLraFFDifDLFdAw6tXZqC7fUkEmIGpcJiLnk1uUMvg4xtL0dLklLXlmBEd/tJqQVLofez7lxBdOnUY00v8=
+	t=1768496755; cv=none; b=XMvLxmhd5IsYsEiJfKvECkAMn9jQjyQsZfJ03a7Fpr65hf0cD3EQIB1y9Ba88CCXn/Ez9GKKrB78P080Kc+tyShySUVhQlPB9cCZJasJbJjRGw3drmGbtCZZgHK1MUf1rW5/xcmNUxElxBqbwR5PKrqN28qg0DLRDmG4cSbASzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768496632; c=relaxed/simple;
-	bh=JWWtGuV/VwhZsUmEljlNKeFiQPvZzC1+EmFtymL4mHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uK24Rwdqi1TNwjDaOeACVcTp1rWwg1rJyC3g9fLFpfotfZBantnPz1a0nESGwUiQ4WLQlQfiGhO4PxvJYIMiH6u8iKHRBafKv4s+ikmPGxnviniRr/6wst/36vjPauD3N7NEZf98mw6uSuHS9NawGCIcnrVZEnfJbvl80PrAEb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPD/DOtX; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7cfd0f2ab32so792764a34.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:03:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768496629; x=1769101429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oX2zMpvfQJcsDHtvGDGxiX3cGUndHgHP6A2JLNcAI8o=;
-        b=TPD/DOtX0Jqru8WqC1if1gUjFD2pG2ngprJXORieLFZ0ip86IDnUiHyKmexbRp5Tgm
-         4V6Lj8DQU+HWA3oxva9iT+03UR8ZMtsG365c6xKSJHwRX05CNd0uajNIdFU8CQa57dJ4
-         OhnNSnuX3fAnpxPCI8lDwx2uiZ5Zazv8RupwrzZCLp3oHj+F/jiHBlMXW+czzj0VYxIS
-         eF4fAKY1PREhAiK7/801Grl6o4sGLypyLd0sXzxh0pTse4RE/lOmEhalsvpTtVPfHSOb
-         8c1LkPBS2uUZauUsYWwrwfWNDgcYiq18mc6uutdVdQETtbYPWlg3gRJQhhUkBI3A7kjK
-         py0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768496629; x=1769101429;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oX2zMpvfQJcsDHtvGDGxiX3cGUndHgHP6A2JLNcAI8o=;
-        b=MELUvepIm7n/DY04yjw1tIa1XcKsdmmUje6Yg/MAwuAWjcHX4RWdRF610Q2kqkxjkg
-         PDWt9p4Y6x4Wvq+1XuDO9xFYnlON7pXmyiauAMQex6v95tNIot7pSt2Iir+o7zcd+L7H
-         eSyeFflCvt1A+KZqO0WZBHoZkG2drSKu4s11C7WXqoDwSJLtujPJTZnskPLcd1PYPgO1
-         YHdIU5krdwAlRqQv/GJi6NVSQJOfRHQgyhfpSJDIzWrBFbIhBIDr8z9h1Xy2mBED+/6V
-         3OEiOFXNc7GiPHoQ5MK4aq2oZIWyLrTzkMvQZGiwvw/sacgUhpyqefF80+fMQzNzHUWi
-         Gevw==
-X-Gm-Message-State: AOJu0YwAA0NZL+625umJ2MdU0K2s82ZIiQuywUFxoPM/c0r/Ci3LnVlO
-	LAi/kvIaH5PrV2T651LjHwBtdtBtPHD34fyruNg1ylp4caKH4IRn0a0rqgyySXzA
-X-Gm-Gg: AY/fxX4VJPNmodbNYgNibzW/7pfJOpRZjdBw1RIIIy456WhKusHRHn4H2SR4F3306nU
-	hBdfYEKMXvaJCkn+vLArlUsQx5AebtnkVfrgwSwsPfFBA6ii0JEob8GknW02kKPHOuyZED1oHX6
-	w3vOgtxt7RiAHiBI+LOEwEIQmkeZwzbmYdoapsviQBN3p9x9liNIC3mOWVfBItVp/AHOsjP1Od/
-	wqYINo2h4hc08HgW7ZnPZUzkMHE+LG8CjzpQR2bcs6H3bTFls/OTitLRRFaBhjE+jkRGoP84Mfv
-	WpArCagxkW8X6Ya6v1zgO1n//nFBc7XwYQWZFFrSyhTMz787SiFUPt+OaV1nEX4c1jATnEIVkdm
-	TDzPsybiepn4L8Y1owEg8MrdQ0TzDUB27lTTOsSg5xqbAOcmPLYikhMBlrPp/52hH/Hd5Gcxl8f
-	X1HtwrpjHzvJUy3EoiNLvrj1VEbKXLg/NedYHYyZlEuYh8w5lT83o=
-X-Received: by 2002:a05:6102:5705:b0:5ee:9df0:a608 with SMTP id ada2fe7eead31-5f183bdccbfmr2204558137.30.1768490154728;
-        Thu, 15 Jan 2026 07:15:54 -0800 (PST)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770cc6edsm201030056d6.4.2026.01.15.07.15.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 07:15:54 -0800 (PST)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	quic@lists.linux.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Metzmacher <metze@samba.org>,
-	Moritz Buhl <mbuhl@openbsd.org>,
-	Tyler Fanelli <tfanelli@redhat.com>,
-	Pengtao He <hepengtao@xiaomi.com>,
-	Thomas Dreibholz <dreibh@simula.no>,
-	linux-cifs@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Steve Dickson <steved@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alexander Aring <aahringo@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	John Ericson <mail@johnericson.me>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	"D . Wythe" <alibuda@linux.alibaba.com>,
-	Jason Baron <jbaron@akamai.com>,
-	illiliti <illiliti@protonmail.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Daniel Stenberg <daniel@haxx.se>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v7 07/16] quic: add connection id management
-Date: Thu, 15 Jan 2026 10:11:07 -0500
-Message-ID: <8f7d6df1f95a5407043c55e720ec0889ac2548fc.1768489876.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1768489876.git.lucien.xin@gmail.com>
-References: <cover.1768489876.git.lucien.xin@gmail.com>
+	s=arc-20240116; t=1768496755; c=relaxed/simple;
+	bh=y8qkrc7MAMIJcCKh2tDsF+EBlT0sGzZ7XalQzMxRcdQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s7yoVI+o2UYxDIHHTVGLL/yMUAMCENA2hBxLiB+nLeJB7iVtRiBFjfyoxea2Yiz/5rgOBQR/6Q8AdrvzRg9KFKs6WZa5tgFFZtc0qgWPzqXtG5hTtpGm9xUiTQGJX230W1ZFJtIXId2pHcYeA6CmsX6bj46GqSxf6ZMah3NDkKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PyHD9Xc2; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 67C4FC1F1E7;
+	Thu, 15 Jan 2026 17:05:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0298A606E0;
+	Thu, 15 Jan 2026 17:05:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D0EEB10B686E6;
+	Thu, 15 Jan 2026 18:05:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768496749; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=g4zRCSFfE37X0wjE4Eq60ptM+6zY+xi0fpy9SZxByac=;
+	b=PyHD9Xc2nFFNUiJ8vCVKW6UoakkqrJe4GfZCmHL47MSiF7lqDVHbIizQ+CqIuDxa3UrF0d
+	69x3/HeT4iQ4ZpGF7A9AEaOgJBdiL3ax4kenM4qkK5JB3kysk1/sol6ynCKQzoHU0xpJZb
+	knTvfnnGFoaJmmsGLAmeLASOAdhdzoi0VDMYp6tTna0K0TD5xySYQDy2KAe2AN4Ois5ZPi
+	wAPiIJqxXwKr+y4EPEO8gsI0nerg7ai0eTSrcc78mUylsPJMkP/IP2C8POMuBrMdH/Inl9
+	hCPSRsty4LYYmNv1BHQItLHE4/y5L3HC1rtgEtyUz6gUG/GvBWJNEUcCGeocKg==
+Message-ID: <722dcba9-d9ae-43ba-b1bf-1d577a882bef@bootlin.com>
+Date: Thu, 15 Jan 2026 18:05:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net: dsa: microchip: Add KSZ8463 tail tag
+ handling
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com>
+ <20260115-ksz8463-ptp-v1-5-bcfe2830cf50@bootlin.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260115-ksz8463-ptp-v1-5-bcfe2830cf50@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-This patch introduces 'struct quic_conn_id_set' for managing Connection
-IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-and 'struct quic_dest_conn_id'.
+Hi Bastien,
 
-It provides helpers to add and remove CIDs from the set, and handles
-insertion of source CIDs into the global connection ID hash table
-when necessary.
+On 15/01/2026 16:57, Bastien Curutchet (Schneider Electric) wrote:
+> KSZ8463 uses the KSZ9893 DSA TAG driver. However, the KSZ8463 doesn't
+> use the tail tag to convey timestamps to the host as KSZ9893 does. It
+> uses the reserved fields in the PTP header instead.
 
-- quic_conn_id_add(): Add a new Connection ID to the set, and inserts
-  it to conn_id hash table if it is a source conn_id.
+[ ... ]
 
-- quic_conn_id_remove(): Remove connection IDs the set with sequence
-  numbers less than or equal to a number.
+> +static struct sk_buff *ksz8463_rcv(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +	unsigned int len = KSZ_EGRESS_TAG_LEN;
+> +	struct ptp_header *ptp_hdr;
+> +	unsigned int ptp_class;
+> +	unsigned int port;
+> +	ktime_t tstamp;
+> +	u8 *tag;
+> +
+> +	if (skb_linearize(skb))
+> +		return NULL;
+> +
+> +	/* Tag decoding */
+> +	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+> +	port = tag[0] & KSZ8463_TAIL_TAG_EG_PORT_M;
+> +
+> +	__skb_push(skb, ETH_HLEN);
+> +	ptp_class = ptp_classify_raw(skb);
+> +	__skb_pull(skb, ETH_HLEN);
+> +	if (ptp_class == PTP_CLASS_NONE)
+> +		goto common_rcv;
+> +
+> +	ptp_hdr = ptp_parse_header(skb, ptp_class);
+> +	if (ptp_hdr) {
+> +		tstamp = ksz_decode_tstamp(get_unaligned_be32(&ptp_hdr->reserved2));
+> +		KSZ_SKB_CB(skb)->tstamp = tstamp;
 
-It also adds utilities to look up CIDs by value or sequence number,
-search the global hash table for incoming packets, and check for
-stateless reset tokens among destination CIDs. These functions are
-essential for RX path connection lookup and stateless reset processing.
+As it is using a reserved field, is it OK to leave this field as-is when forwarding
+this skb to userspace, or should it be zeroed first ?
 
-- quic_conn_id_find(): Find a Connection ID in the set by seq number.
-
-- quic_conn_id_lookup(): Lookup a Connection ID from global hash table
-  using the ID value, typically used for socket lookup on the RX path.
-
-- quic_conn_id_token_exists(): Check if a stateless reset token exists
-  in any dest Connection ID (used during stateless reset processing).
-
-Note source/dest conn_id set is per socket, the operations on it are
-always pretected by the sock lock.
-
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
-v3:
-  - Clarify in changelog that conn_id set is always protected by sock lock
-    (suggested by Paolo).
-  - Adjust global source conn_id hashtable operations for the new hashtable
-    type.
-v4:
-  - Replace struct hlist_node with hlist_nulls_node for the node in
-    struct quic_source_conn_id to support lockless lookup.
-v7:
-  - Break the loop earlier if common->number > number in
-    quic_conn_id_remove/find() (suggested by Paolo).
-  - Add a comment in quic_conn_id_first_number().
----
- net/quic/Makefile |   2 +-
- net/quic/connid.c | 225 ++++++++++++++++++++++++++++++++++++++++++++++
- net/quic/connid.h | 163 +++++++++++++++++++++++++++++++++
- net/quic/socket.c |   6 ++
- net/quic/socket.h |  13 +++
- 5 files changed, 408 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/connid.c
- create mode 100644 net/quic/connid.h
-
-diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 094e9da5d739..eee7501588d3 100644
---- a/net/quic/Makefile
-+++ b/net/quic/Makefile
-@@ -5,4 +5,4 @@
- 
- obj-$(CONFIG_IP_QUIC) += quic.o
- 
--quic-y := common.o family.o protocol.o socket.o stream.o
-+quic-y := common.o family.o protocol.o socket.o stream.o connid.o
-diff --git a/net/quic/connid.c b/net/quic/connid.c
-new file mode 100644
-index 000000000000..79f48e9775f2
---- /dev/null
-+++ b/net/quic/connid.c
-@@ -0,0 +1,225 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Initialization/cleanup for QUIC protocol support.
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#include <linux/quic.h>
-+#include <net/sock.h>
-+
-+#include "common.h"
-+#include "connid.h"
-+
-+/* Lookup a source connection ID (scid) in the global source connection ID hash table. */
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
-+{
-+	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
-+	struct quic_source_conn_id *s_conn_id;
-+	struct quic_conn_id *conn_id = NULL;
-+	struct hlist_nulls_node *node;
-+
-+	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
-+		if (net == sock_net(s_conn_id->sk) && s_conn_id->common.id.len == len &&
-+		    !memcmp(scid, &s_conn_id->common.id.data, s_conn_id->common.id.len)) {
-+			if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
-+				conn_id = &s_conn_id->common.id;
-+			break;
-+		}
-+	}
-+	return conn_id;
-+}
-+
-+/* Check if a given stateless reset token exists in any connection ID in the connection ID set. */
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token)
-+{
-+	struct quic_common_conn_id *common;
-+	struct quic_dest_conn_id *dcid;
-+
-+	dcid = (struct quic_dest_conn_id *)id_set->active;
-+	if (!memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN)) /* Fast path. */
-+		return true;
-+
-+	list_for_each_entry(common, &id_set->head, list) {
-+		dcid = (struct quic_dest_conn_id *)common;
-+		if (common == id_set->active)
-+			continue;
-+		if (!memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-+			return true;
-+	}
-+	return false;
-+}
-+
-+static void quic_source_conn_id_free_rcu(struct rcu_head *head)
-+{
-+	struct quic_source_conn_id *s_conn_id;
-+
-+	s_conn_id = container_of(head, struct quic_source_conn_id, rcu);
-+	kfree(s_conn_id);
-+}
-+
-+static void quic_source_conn_id_free(struct quic_source_conn_id *s_conn_id)
-+{
-+	u8 *data = s_conn_id->common.id.data;
-+	u32 len = s_conn_id->common.id.len;
-+	struct quic_shash_head *head;
-+
-+	if (!hlist_nulls_unhashed(&s_conn_id->node)) {
-+		head = quic_source_conn_id_head(sock_net(s_conn_id->sk), data, len);
-+		spin_lock_bh(&head->lock);
-+		hlist_nulls_del_init_rcu(&s_conn_id->node);
-+		spin_unlock_bh(&head->lock);
-+	}
-+
-+	/* Freeing is deferred via RCU to avoid use-after-free during concurrent lookups. */
-+	call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
-+}
-+
-+static void quic_conn_id_del(struct quic_common_conn_id *common)
-+{
-+	list_del(&common->list);
-+	if (!common->hashed) {
-+		kfree(common);
-+		return;
-+	}
-+	quic_source_conn_id_free((struct quic_source_conn_id *)common);
-+}
-+
-+/* Add a connection ID with sequence number and associated private data to the connection ID set. */
-+int quic_conn_id_add(struct quic_conn_id_set *id_set,
-+		     struct quic_conn_id *conn_id, u32 number, void *data)
-+{
-+	struct quic_source_conn_id *s_conn_id;
-+	struct quic_dest_conn_id *d_conn_id;
-+	struct quic_common_conn_id *common;
-+	struct quic_shash_head *head;
-+	struct list_head *list;
-+
-+	/* Locate insertion point to keep list ordered by number. */
-+	list = &id_set->head;
-+	list_for_each_entry(common, list, list) {
-+		if (number == common->number)
-+			return 0; /* Ignore if it already exists on the list. */
-+		if (number < common->number) {
-+			list = &common->list;
-+			break;
-+		}
-+	}
-+
-+	if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
-+		return -EINVAL;
-+	common = kzalloc(id_set->entry_size, GFP_ATOMIC);
-+	if (!common)
-+		return -ENOMEM;
-+	common->id = *conn_id;
-+	common->number = number;
-+	if (id_set->entry_size == sizeof(struct quic_dest_conn_id)) {
-+		/* For destination connection IDs, copy the stateless reset token if available. */
-+		if (data) {
-+			d_conn_id = (struct quic_dest_conn_id *)common;
-+			memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN_LEN);
-+		}
-+	} else {
-+		/* For source connection IDs, mark as hashed and insert into the global source
-+		 * connection ID hashtable.
-+		 */
-+		common->hashed = 1;
-+		s_conn_id = (struct quic_source_conn_id *)common;
-+		s_conn_id->sk = data;
-+
-+		head = quic_source_conn_id_head(sock_net(s_conn_id->sk), common->id.data,
-+						common->id.len);
-+		spin_lock_bh(&head->lock);
-+		hlist_nulls_add_head_rcu(&s_conn_id->node, &head->head);
-+		spin_unlock_bh(&head->lock);
-+	}
-+	list_add_tail(&common->list, list);
-+
-+	if (number == quic_conn_id_last_number(id_set) + 1) {
-+		if (!id_set->active)
-+			id_set->active = common;
-+		id_set->count++;
-+
-+		/* Increment count for consecutive following IDs. */
-+		list_for_each_entry_continue(common, &id_set->head, list) {
-+			if (common->number != ++number)
-+				break;
-+			id_set->count++;
-+		}
-+	}
-+	return 0;
-+}
-+
-+/* Remove connection IDs from the set with sequence numbers less than or equal to a number. */
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
-+{
-+	struct quic_common_conn_id *common, *tmp;
-+	struct list_head *list;
-+
-+	list = &id_set->head;
-+	list_for_each_entry_safe(common, tmp, list, list) {
-+		if (common->number > number)
-+			break;
-+		if (id_set->active == common)
-+			id_set->active = tmp;
-+		quic_conn_id_del(common);
-+		id_set->count--;
-+	}
-+}
-+
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set, u32 number)
-+{
-+	struct quic_common_conn_id *common;
-+
-+	list_for_each_entry(common, &id_set->head, list) {
-+		if (common->number > number)
-+			break;
-+		if (common->number == number)
-+			return &common->id;
-+	}
-+	return NULL;
-+}
-+
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number)
-+{
-+	struct quic_conn_id *conn_id;
-+
-+	if (number == id_set->active->number)
-+		return;
-+	conn_id = quic_conn_id_find(id_set, number);
-+	if (!conn_id)
-+		return;
-+	quic_conn_id_set_active(id_set, conn_id);
-+}
-+
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source)
-+{
-+	id_set->entry_size = source ? sizeof(struct quic_source_conn_id) :
-+				      sizeof(struct quic_dest_conn_id);
-+	INIT_LIST_HEAD(&id_set->head);
-+}
-+
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set)
-+{
-+	struct quic_common_conn_id *common, *tmp;
-+
-+	list_for_each_entry_safe(common, tmp, &id_set->head, list)
-+		quic_conn_id_del(common);
-+	id_set->count = 0;
-+	id_set->active = NULL;
-+}
-+
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set, struct quic_transport_param *p)
-+{
-+	p->active_connection_id_limit = id_set->max_count;
-+}
-+
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set, struct quic_transport_param *p)
-+{
-+	id_set->max_count = p->active_connection_id_limit;
-+}
-diff --git a/net/quic/connid.h b/net/quic/connid.h
-new file mode 100644
-index 000000000000..f5bb590ffd93
---- /dev/null
-+++ b/net/quic/connid.h
-@@ -0,0 +1,163 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#define QUIC_CONN_ID_LIMIT	8
-+#define QUIC_CONN_ID_DEF	7
-+#define QUIC_CONN_ID_LEAST	2
-+
-+#define QUIC_CONN_ID_TOKEN_LEN	16
-+
-+/* Common fields shared by both source and destination Connection IDs */
-+struct quic_common_conn_id {
-+	struct quic_conn_id id;	/* The actual Connection ID value and its length */
-+	struct list_head list;	/* Linked list node for conn_id list management */
-+	u32 number;		/* Sequence number assigned to this Connection ID */
-+	u8 hashed;		/* Non-zero if this ID is stored in source_conn_id hashtable */
-+};
-+
-+struct quic_source_conn_id {
-+	struct quic_common_conn_id common;
-+	struct hlist_nulls_node node;	/* Hash table node for fast lookup by Connection ID */
-+	struct rcu_head rcu;		/* RCU header for deferred destruction */
-+	struct sock *sk;		/* Pointer to sk associated with this Connection ID */
-+};
-+
-+struct quic_dest_conn_id {
-+	struct quic_common_conn_id common;
-+	u8 token[QUIC_CONN_ID_TOKEN_LEN];	/* Stateless reset token in rfc9000#section-10.3 */
-+};
-+
-+struct quic_conn_id_set {
-+	/* Connection ID in use on the current path */
-+	struct quic_common_conn_id *active;
-+	/* Connection ID to use for a new path (e.g., after migration) */
-+	struct quic_common_conn_id *alt;
-+	struct list_head head;	/* Head of the linked list of available connection IDs */
-+	u8 entry_size;		/* Size of each connection ID entry (in bytes) in the list */
-+	u8 max_count;		/* active_connection_id_limit in rfc9000#section-18.2 */
-+	u8 count;		/* Current number of connection IDs in the list */
-+};
-+
-+static inline u32 quic_conn_id_first_number(struct quic_conn_id_set *id_set)
-+{
-+	struct quic_common_conn_id *common;
-+
-+	/* The id_set is guaranteed to be non-empty when called (sk is not in CLOSE state). */
-+	common = list_first_entry(&id_set->head, struct quic_common_conn_id, list);
-+	return common->number;
-+}
-+
-+static inline u32 quic_conn_id_last_number(struct quic_conn_id_set *id_set)
-+{
-+	return quic_conn_id_first_number(id_set) + id_set->count - 1;
-+}
-+
-+static inline void quic_conn_id_generate(struct quic_conn_id *conn_id)
-+{
-+	get_random_bytes(conn_id->data, QUIC_CONN_ID_DEF_LEN);
-+	conn_id->len = QUIC_CONN_ID_DEF_LEN;
-+}
-+
-+/* Select an alternate destination Connection ID for a new path (e.g., after migration). */
-+static inline bool quic_conn_id_select_alt(struct quic_conn_id_set *id_set, bool active)
-+{
-+	if (id_set->alt)
-+		return true;
-+	/* NAT rebinding: peer keeps using the current source conn_id.
-+	 * In this case, continue using the same dest conn_id for the new path.
-+	 */
-+	if (active) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* Treat the prev conn_ids as used.
-+	 * Try selecting the next conn_id in the list, unless at the end.
-+	 */
-+	if (id_set->active->number != quic_conn_id_last_number(id_set)) {
-+		id_set->alt = list_next_entry(id_set->active, list);
-+		return true;
-+	}
-+	/* If there's only one conn_id in the list, reuse the active one. */
-+	if (id_set->active->number == quic_conn_id_first_number(id_set)) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* No alternate conn_id could be selected.  Caller should send a
-+	 * QUIC_FRAME_RETIRE_CONNECTION_ID frame to request new connection IDs from the peer.
-+	 */
-+	return false;
-+}
-+
-+static inline void quic_conn_id_set_alt(struct quic_conn_id_set *id_set, struct quic_conn_id *alt)
-+{
-+	id_set->alt = (struct quic_common_conn_id *)alt;
-+}
-+
-+/* Swap the active and alternate destination Connection IDs after path migration completes,
-+ * since the path has already been switched accordingly.
-+ */
-+static inline void quic_conn_id_swap_active(struct quic_conn_id_set *id_set)
-+{
-+	void *active = id_set->active;
-+
-+	id_set->active = id_set->alt;
-+	id_set->alt = active;
-+}
-+
-+/* Choose which destination Connection ID to use for a new path migration if alt is true. */
-+static inline struct quic_conn_id *quic_conn_id_choose(struct quic_conn_id_set *id_set, u8 alt)
-+{
-+	return (alt && id_set->alt) ? &id_set->alt->id : &id_set->active->id;
-+}
-+
-+static inline struct quic_conn_id *quic_conn_id_active(struct quic_conn_id_set *id_set)
-+{
-+	return &id_set->active->id;
-+}
-+
-+static inline void quic_conn_id_set_active(struct quic_conn_id_set *id_set,
-+					   struct quic_conn_id *active)
-+{
-+	id_set->active = (struct quic_common_conn_id *)active;
-+}
-+
-+static inline u32 quic_conn_id_number(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_common_conn_id *)conn_id)->number;
-+}
-+
-+static inline struct sock *quic_conn_id_sk(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_source_conn_id *)conn_id)->sk;
-+}
-+
-+static inline void quic_conn_id_set_token(struct quic_conn_id *conn_id, u8 *token)
-+{
-+	memcpy(((struct quic_dest_conn_id *)conn_id)->token, token, QUIC_CONN_ID_TOKEN_LEN);
-+}
-+
-+static inline int quic_conn_id_cmp(struct quic_conn_id *a, struct quic_conn_id *b)
-+{
-+	return a->len != b->len || memcmp(a->data, b->data, a->len);
-+}
-+
-+int quic_conn_id_add(struct quic_conn_id_set *id_set, struct quic_conn_id *conn_id,
-+		     u32 number, void *data);
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token);
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number);
-+
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set, u32 number);
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len);
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number);
-+
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set, struct quic_transport_param *p);
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set, struct quic_transport_param *p);
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source);
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set);
-diff --git a/net/quic/socket.c b/net/quic/socket.c
-index d6f25669c693..ad581d84f684 100644
---- a/net/quic/socket.c
-+++ b/net/quic/socket.c
-@@ -41,6 +41,9 @@ static int quic_init_sock(struct sock *sk)
- 	sk->sk_write_space = quic_write_space;
- 	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
- 
-+	quic_conn_id_set_init(quic_source(sk), 1);
-+	quic_conn_id_set_init(quic_dest(sk), 0);
-+
- 	if (quic_stream_init(quic_streams(sk)))
- 		return -ENOMEM;
- 
-@@ -55,6 +58,9 @@ static int quic_init_sock(struct sock *sk)
- 
- static void quic_destroy_sock(struct sock *sk)
- {
-+	quic_conn_id_set_free(quic_source(sk));
-+	quic_conn_id_set_free(quic_dest(sk));
-+
- 	quic_stream_free(quic_streams(sk));
- 
- 	quic_data_free(quic_ticket(sk));
-diff --git a/net/quic/socket.h b/net/quic/socket.h
-index 0dfd3f8f3115..34363dd3345a 100644
---- a/net/quic/socket.h
-+++ b/net/quic/socket.h
-@@ -14,6 +14,7 @@
- #include "common.h"
- #include "family.h"
- #include "stream.h"
-+#include "connid.h"
- 
- #include "protocol.h"
- 
-@@ -37,6 +38,8 @@ struct quic_sock {
- 	struct quic_data		alpn;
- 
- 	struct quic_stream_table	streams;
-+	struct quic_conn_id_set		source;
-+	struct quic_conn_id_set		dest;
- };
- 
- struct quic6_sock {
-@@ -79,6 +82,16 @@ static inline struct quic_stream_table *quic_streams(const struct sock *sk)
- 	return &quic_sk(sk)->streams;
- }
- 
-+static inline struct quic_conn_id_set *quic_source(const struct sock *sk)
-+{
-+	return &quic_sk(sk)->source;
-+}
-+
-+static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
-+{
-+	return &quic_sk(sk)->dest;
-+}
-+
- static inline bool quic_is_serv(const struct sock *sk)
- {
- 	return !!sk->sk_max_ack_backlog;
--- 
-2.47.1
+Maxime
 
 
