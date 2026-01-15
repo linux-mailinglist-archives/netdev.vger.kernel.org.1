@@ -1,276 +1,167 @@
-Return-Path: <netdev+bounces-250322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579A9D28AB7
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:13:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC8ED28B44
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DEFF3031CF6
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 21:11:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C31F2300286B
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 21:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A18131ED72;
-	Thu, 15 Jan 2026 21:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DBE13242AD;
+	Thu, 15 Jan 2026 21:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="QMFAfxuk"
+	dkim=pass (2048-bit key) header.d=michel-slm.name header.i=@michel-slm.name header.b="ogTMcWUN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cBtf92Zc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FFE2D0298;
-	Thu, 15 Jan 2026 21:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6613A31D371
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 21:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768511493; cv=none; b=QUwvjB+BtcCbKvoTrkVujKeFFV0Wpis/q0+ZX5KRKy+zFsRwQ6q2GZOCReFewPsY0VkAITmqUJ93dwrF2ndSlb2qd8TdBVh3vjHWOX+jryVTqVKtH0UmgNLTPfYsMBtOwhbU/7Eo51aNcBu5H9FOUCamnk5oxQ/YAhMm1agS4tI=
+	t=1768512238; cv=none; b=sTzaPXBtL7S5RjAfInULesqRM6YHjffq/uzcmjLNcQ4eFMFjPG+6mJbpHYVFO2ZX8fL3U++X0eY6BdYS3Ek69GYUqZaQuNpKco0hBUbJ5vwSSErri3hOPeQR31UUtmPrCjI0Fb3eUJDqxk24lnFtJAljqH/v7TdK/0kGS53+Yl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768511493; c=relaxed/simple;
-	bh=KF0R/gDJpkoxYLzmZ3oOaOT27TcsbydoZPtKtU2/eHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cRj1cYWDyLZgemi5ZD5EeIb0g7hYXau4+rZhNPuBQHB9GOR2wDbZEjtfRrmitR25PVnXCu2ToIPRVe9/9DiRGGFRI5oyk9/mwAnDF7ZB633WLXeOQaLGrk4W9EiReGVZUfBb2G0zLt54DEgA4/TobThxxVLPNKKJubtpTkKComA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=QMFAfxuk; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1768511486;
-	bh=KF0R/gDJpkoxYLzmZ3oOaOT27TcsbydoZPtKtU2/eHM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QMFAfxukOYMVGfoRJbBNBmTmtt2fJkDmx8U8kzJ+yFHJj5HJw9PiDl2argFKEDz05
-	 YITpzxn0BPiQWwIlVQADNjGTQxLwoAQZNOKOkyGFRT5kQeMytZOjZMFgwE9U/XIkoY
-	 dAWmgpo9NSEpadNT7OW7pQSe2ettuPjxFG47SjGUWgVEI5XEzckG7W+N4Uf/xu8yxm
-	 UZmWPfWjTRQ83/hrWRYSP+PnCkBHhJ1APgZZhPD3YcUnxXbbJRB7jwGQ6jpxc/sbFO
-	 qRwTOTx9YZxZ3th/q/ONVbxhDw+70DENwVrsnN5gGsUOesh2JAhKK3EtpPz6097Mq6
-	 oZw/MEdPM+HhA==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 1E71C60075;
-	Thu, 15 Jan 2026 21:10:49 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 606EA2020D7; Thu, 15 Jan 2026 21:10:45 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH wireguard v5] tools: ynl: add sample for wireguard
-Date: Thu, 15 Jan 2026 21:10:31 +0000
-Message-ID: <20260115211032.204481-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1768512238; c=relaxed/simple;
+	bh=GhtJfPF+X1By75ADqTaaI3ZQFO1Ij0CLtH7sBdT436M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Knuw3tK7GJ4c/YC97kkawDDB6ZvHajLf8RLqjP8Xss2QlMOirUYcYR5Pt6Jw3TQBdPbHQDlHgIRUV3Fngv9PLbCMAHaTUdxSxAXv7xCQvWElkXq4xwwhNT1cYsdKHnqqL1g0t16h8tC1ErvElfF5K8OaJTnwH0j6nXUvkInlgKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michel-slm.name; spf=pass smtp.mailfrom=michel-slm.name; dkim=pass (2048-bit key) header.d=michel-slm.name header.i=@michel-slm.name header.b=ogTMcWUN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cBtf92Zc; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michel-slm.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michel-slm.name
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 8B334EC028C;
+	Thu, 15 Jan 2026 16:23:55 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 15 Jan 2026 16:23:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=michel-slm.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1768512235; x=1768598635; bh=+b3dzSGR4e1+ZHZRw+BKR
+	mP68ylKconjAcDWqFCZfM8=; b=ogTMcWUN8DrsjRgEtB95D0f+1tRgqkKIup+1N
+	ACLDGJJO7RnDL+j5XPbeXt3NbBuassb/G2MWBB46KfJLLZNEZPR2fwstSbb7g6k1
+	EHnhL78NiFs4ZJQY2hPE9pzrJ6plDmRqwa33d1n84mKORoNHl0i0tvQGrD7cM1om
+	QACaFkVnRj5TcE8JuS3XfKNWYKSen18ftOXo1hmlzMQEYbfM97rXAfN6IrD0weFJ
+	C0NXLWWhBL39DXsdCRZelOszjQoqL2Y1nmItU3rPKG5+jocGPsvluxw4DlKZ0fQE
+	6lIzOz7hpUnTT5CVg8hQGUT/lt8nRNhJN/lyscMOQ7mDvDr6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768512235; x=
+	1768598635; bh=+b3dzSGR4e1+ZHZRw+BKRmP68ylKconjAcDWqFCZfM8=; b=c
+	Btf92ZcQDTD3OLQiKgsLeOG2kx80U6rU+Gif/gFQWSGmXly+FB85d7ZhFDxys0mA
+	yajs0R8ei/rPVb+wspPvYR0UyZX5y/h5Bev8Ogl3fZvFMiPI+7KrAyyiPmGrw3kf
+	BdIsNWm+wBQuzhcDy0vkPZ7BdVXa/I4TrqoJS4H7UTT2gCISTNCUfqPQpzfnvpcP
+	RRUtmuRg635PUPuPwIM5MPby9gjdgIUMa4hoziND0Ri2mKmQdMAXfJPxzdRxX24l
+	OOxN7dY0c1Qk+E89PRXljNrvDB1Npuc7kbvfMRWM2jx6U042llsgto44wyzznHoM
+	xVZvVs+eHdYGyHtFuyQiw==
+X-ME-Sender: <xms:61ppaQZxWcI_BjboBB8IJCbs-Kr1uuKiOGS28bDbxm6myJDq7AIj6Q>
+    <xme:61ppaRYjvFmFcRT6roC7Zx7Zdo4atOrc8gKRKf4yh1SWbe2ArH_xtLJV_ljSm4S7v
+    4yr9ukmdbvKyKq90ANeKueJ_2_Gtb3uZVAzMnKnH3s2ko3jzFw9n7U>
+X-ME-Received: <xmr:61ppaYmqMd3-MWaGzcmwwzmM5fv3LHL00pX3gESvu6DnGRf9nqOk6iwLeXJx1m0AQeSO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdejudefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfggtggusehgtderredttd
+    dvnecuhfhrohhmpefoihgthhgvlhcunfhinhguuceomhhitghhvghlsehmihgthhgvlhdq
+    shhlmhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpedvleejhfeggfekvdevfedtgeeihf
+    duvefgvdejheethfegfeeltdetjefgveevveenucffohhmrghinhepkhgvhihogihiuggv
+    rdhorhhgpdhfvgguohhrrghprhhojhgvtghtrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepmhhitghhvghlsehmihgthhgvlhdqshhl
+    mhdrnhgrmhgvpdhnsggprhgtphhtthhopedvpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehk
+    uhgsrgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:61ppaVz7gvlTRxm1Ww_Xf3AGpQnVjFZiUHuQ2Y6toWZRHV4MigRTSA>
+    <xmx:61ppaeMrMFXZCOE5wth1rmn1ey5t9fNpUP9R1wnLAZI15DhjMSXLoQ>
+    <xmx:61ppaRSNzHnqMoWqGaLJXx9_j-gpFAw3gO4GFVWcZzq7dSeRUTgKJg>
+    <xmx:61ppaUa83OThlpWCNzEh_wVLjbqwXh3bFE_q8MwC_W6Pre2M6mQ-sQ>
+    <xmx:61ppaWPEuzx7X6M_dzT6gt49G6NMW9ooY9FzQKEFxh9Uj54fYV4frBxZ>
+Feedback-ID: i71264891:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 15 Jan 2026 16:23:54 -0500 (EST)
+Date: Thu, 15 Jan 2026 21:23:51 +0000
+From: Michel Lind <michel@michel-slm.name>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net] tools/net/ynl: Makefile's install target now installs
+ ynltool
+Message-ID: <aWla562jr4q6cotH@mbp-m3-fedora.vm>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GWLqCfI0WXqL9HqS"
+Content-Disposition: inline
 
-Add a sample application for WireGuard, using the generated C library.
 
-The main benefit of this is to exercise the generated library,
-which might be useful for future self-tests.
+--GWLqCfI0WXqL9HqS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Example:
-  $ make -C tools/net/ynl/lib
-  $ make -C tools/net/ynl/generated
-  $ make -C tools/net/ynl/samples wireguard
-  $ ./tools/net/ynl/samples/wireguard
-  usage: ./tools/net/ynl/samples/wireguard <ifindex|ifname>
-  $ sudo ./tools/net/ynl/samples/wireguard wg-test
-  Interface 3: wg-test
-      Peer 6adfb183a4a2c94a2f92dab5ade762a4788[...]:
-          Data: rx: 42 / tx: 42 bytes
-          Allowed IPs:
-              0.0.0.0/0
-              ::/0
+This tool is built by default, but was not being installed by default
+when running `make install`. Fix this; it installs to $(prefix)/bin by
+default unless bindir is overridden.
 
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+Signed-off-by: Michel Lind <michel@michel-slm.name>
 ---
-v5:
-- The series was applied, except patch 09 which had a leaky error path.
-  The leak was fixed, so wireguard_get_device_req_free() is always called.
-- The Makefile.deps changes was removed (commited in db6b35cffe59).
-- The ynl_sock_create() is now given an struct ynl_error pointer.
+ tools/net/ynl/Makefile | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-v4: https://lore.kernel.org/r/20251126173546.57681-1-ast@fiberby.net/
-- Thanks Jason and Jakub for all the feedback.
-- Old patch 03 has been accepted into Jason's tree.
-- Old patch 09 split_ops conversion has been moved to new 03.
-- Old patch 10 function renaming was merged into old patch 11 (new 10).
-- Patch 04 has been added to adjust .maxattr for GET_DEVICE.
-- The old patches 04-08 and 11 was renumbered to patch 05-10.
-- Changes to the spec:
-  - Re-wrap the documentation lines in the spec.
-  - Reword the index/type documentation.
-  - get-device now have a more strict request attribute list.
-  - The pre/post functions now avoids renaming.
-- Changes to patch 10 (was 10+11):
-  - The generated kernel code now uses YNL-ARG --function-prefix,
-    to reduce the function renaming.
-  - The generated files have been moved to their own sub-directory.
-- The commit messages have in general been tweaked a bit.
+diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+index c2f3e8b3f2ac..bf3f8b16170d 100644
+--- a/tools/net/ynl/Makefile
++++ b/tools/net/ynl/Makefile
+@@ -4,6 +4,7 @@ include ../../scripts/Makefile.arch
+=20
+ INSTALL	?=3D install
+ prefix  ?=3D /usr
++bindir  ?=3D $(prefix)/bin
+ ifeq ($(LP64), 1)
+   libdir_relative =3D lib64
+ else
+@@ -41,13 +42,16 @@ clean distclean:
+ 	rm -rf pyynl.egg-info
+ 	rm -rf build
+=20
+-install: libynl.a lib/*.h
++install: libynl.a lib/*.h ynltool
+ 	@echo -e "\tINSTALL libynl.a"
+ 	@$(INSTALL) -d $(DESTDIR)$(libdir)
+ 	@$(INSTALL) -m 0644 libynl.a $(DESTDIR)$(libdir)/libynl.a
+ 	@echo -e "\tINSTALL libynl headers"
+ 	@$(INSTALL) -d $(DESTDIR)$(includedir)/ynl
+ 	@$(INSTALL) -m 0644 lib/*.h $(DESTDIR)$(includedir)/ynl/
++	@echo -e "\tINSTALL ynltool"
++	@$(INSTALL) -d $(DESTDIR)$(bindir)
++	@$(INSTALL) -m 0755 ynltool/ynltool $(DESTDIR)$(bindir)/
+ 	@echo -e "\tINSTALL pyynl"
+ 	@pip install --prefix=3D$(DESTDIR)$(prefix) .
+ 	@make -C generated install
+--=20
+2.52.0
 
-v3: https://lore.kernel.org/r/20251105183223.89913-1-ast@fiberby.net/
-- Spec: Make flags-mask checks implicit (thanks Jakub).
-- Sample: Add header to Makefile.deps, and avoid copy (thanks Jakub).
 
-v2: https://lore.kernel.org/r/20251031160539.1701943-1-ast@fiberby.net/
-- Add missing forward declaration
+--=20
+ _o) Michel Lind
+_( ) identities: https://keyoxide.org/5dce2e7e9c3b1cffd335c1d78b229d2f7ccc0=
+4f2
+     README:     https://fedoraproject.org/wiki/User:Salimma#README
 
-v1: https://lore.kernel.org/r/20251029205123.286115-1-ast@fiberby.net/
-- Policy arguement to nla_parse_nested() changed to NULL (thanks Johannes).
-- Added attr-cnt-name to the spec, to reduce the diff a bit.
-- Refined the doc in the spec a bit.
-- Reword commit messages a bit.
-- Reordered the patches, and reduced the series from 14 to 11 patches.
+--GWLqCfI0WXqL9HqS
+Content-Type: application/pgp-signature; name=signature.asc
 
-RFC: https://lore.kernel.org/r/20250904-wg-ynl-rfc@fiberby.net/
+-----BEGIN PGP SIGNATURE-----
 
----
- MAINTAINERS                       |   1 +
- tools/net/ynl/samples/.gitignore  |   1 +
- tools/net/ynl/samples/wireguard.c | 106 ++++++++++++++++++++++++++++++
- 3 files changed, 108 insertions(+)
- create mode 100644 tools/net/ynl/samples/wireguard.c
+iHUEABYKAB0WIQRdzi5+nDsc/9M1wdeLIp0vfMwE8gUCaWla5wAKCRCLIp0vfMwE
+8lqyAQDYDitPvQICcwYo1ikmboWd5idXHGIqhlol3fk2W3X3GQEA1S9j5Ak2ZYVZ
+gV9Ta7xOk8avNEyMU9Nl5Q86Js71rQg=
+=dmoK
+-----END PGP SIGNATURE-----
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d38dcab1fa068..f2a68bfc45963 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -28113,6 +28113,7 @@ L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/netlink/specs/wireguard.yaml
- F:	drivers/net/wireguard/
-+F:	tools/net/ynl/samples/wireguard.c
- F:	tools/testing/selftests/wireguard/
- 
- WISTRON LAPTOP BUTTON DRIVER
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 05087ee323ba2..6fbed294feac0 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -8,3 +8,4 @@ rt-link
- rt-route
- tc
- tc-filter-add
-+wireguard
-diff --git a/tools/net/ynl/samples/wireguard.c b/tools/net/ynl/samples/wireguard.c
-new file mode 100644
-index 0000000000000..df601e742c287
---- /dev/null
-+++ b/tools/net/ynl/samples/wireguard.c
-@@ -0,0 +1,106 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <arpa/inet.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <errno.h>
-+#include <ynl.h>
-+
-+#include "wireguard-user.h"
-+
-+static void print_allowed_ip(const struct wireguard_wgallowedip *aip)
-+{
-+	char addr_out[INET6_ADDRSTRLEN];
-+
-+	if (!inet_ntop(aip->family, aip->ipaddr, addr_out, sizeof(addr_out))) {
-+		addr_out[0] = '?';
-+		addr_out[1] = '\0';
-+	}
-+	printf("\t\t\t%s/%u\n", addr_out, aip->cidr_mask);
-+}
-+
-+/* Only printing public key in this demo. For better key formatting,
-+ * use the constant-time implementation as found in wireguard-tools.
-+ */
-+static void print_peer_header(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int len = peer->_len.public_key;
-+	uint8_t *key = peer->public_key;
-+	unsigned int i;
-+
-+	if (len != 32)
-+		return;
-+	printf("\tPeer ");
-+	for (i = 0; i < len; i++)
-+		printf("%02x", key[i]);
-+	printf(":\n");
-+}
-+
-+static void print_peer(const struct wireguard_wgpeer *peer)
-+{
-+	unsigned int i;
-+
-+	print_peer_header(peer);
-+	printf("\t\tData: rx: %llu / tx: %llu bytes\n",
-+	       peer->rx_bytes, peer->tx_bytes);
-+	printf("\t\tAllowed IPs:\n");
-+	for (i = 0; i < peer->_count.allowedips; i++)
-+		print_allowed_ip(&peer->allowedips[i]);
-+}
-+
-+static void build_request(struct wireguard_get_device_req *req, char *arg)
-+{
-+	char *endptr;
-+	int ifindex;
-+
-+	ifindex = strtol(arg, &endptr, 0);
-+	if (endptr != arg + strlen(arg) || errno != 0)
-+		ifindex = 0;
-+	if (ifindex > 0)
-+		wireguard_get_device_req_set_ifindex(req, ifindex);
-+	else
-+		wireguard_get_device_req_set_ifname(req, arg);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct wireguard_get_device_list *devs;
-+	struct wireguard_get_device_req *req;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	if (argc < 2) {
-+		fprintf(stderr, "usage: %s <ifindex|ifname>\n", argv[0]);
-+		return 1;
-+	}
-+
-+	ys = ynl_sock_create(&ynl_wireguard_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return 2;
-+	}
-+
-+	req = wireguard_get_device_req_alloc();
-+	build_request(req, argv[1]);
-+
-+	devs = wireguard_get_device_dump(ys, req);
-+	if (!devs) {
-+		fprintf(stderr, "YNL (%d): %s\n", ys->err.code, ys->err.msg);
-+		wireguard_get_device_req_free(req);
-+		ynl_sock_destroy(ys);
-+		return 3;
-+	}
-+
-+	ynl_dump_foreach(devs, d) {
-+		unsigned int i;
-+
-+		printf("Interface %d: %s\n", d->ifindex, d->ifname);
-+		for (i = 0; i < d->_count.peers; i++)
-+			print_peer(&d->peers[i]);
-+	}
-+
-+	wireguard_get_device_list_free(devs);
-+	wireguard_get_device_req_free(req);
-+	ynl_sock_destroy(ys);
-+
-+	return 0;
-+}
--- 
-2.51.0
-
+--GWLqCfI0WXqL9HqS--
 
