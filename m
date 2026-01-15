@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-250201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37F4D24FC5
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:38:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86EFFD24FC2
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:38:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 54D1730392A6
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:38:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 04E0330096B3
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE01E3A4F4B;
-	Thu, 15 Jan 2026 14:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A498F3815FE;
+	Thu, 15 Jan 2026 14:38:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A20430B53C
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF0637C0E4
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768487903; cv=none; b=Pww3OCxduuxfDk1Jh3FvpjphCScLG2WjibaDRLD4PzFXoH8TUBQYb+TY3B6UbEHBbpmLO1EzINBiU2tpaReQalsnuzL861reXaixqKDF/m7UKp1fXAdHTegRvecnD0Z4dylu1wDGAvJyq2iflDB9ghduJg4PuP3Gp8USdltgD6M=
+	t=1768487901; cv=none; b=ExASLD/IjP/b9rI/HEOfqv+4s/+Wa8ap1xoWZ6Qopof/gj5xn/pgYHRDXJeKDC953SHjFfEluUbnyaMOYpJEkqG2olwg3v3n24DnLl2vXF0MIyM3kWcUgS/CWI6Kv7X+59EpmjwOtxr1/ko+sTklo/764f+SeaOedYW46JhQLtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768487903; c=relaxed/simple;
-	bh=Jym+hB7alQQy54wZeliTw3/vUjoLAwmzKirUqnTIOwM=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jNEb6MuPJE3eZAs75k7F18dt+PQ42PYf7y9V/QSHFJorXeuqp2nsg+VmpwJzXw8nBHPfReyDJ9uSiyVqLb8Pf2g/0vZTGhn6Z5tgyp9iRmqT5+a9edS9dRDJVtcxlNe2nz2G61TRd23QIwm/x4MB8yurnywwav9RSxUfqepQfLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.177
+	s=arc-20240116; t=1768487901; c=relaxed/simple;
+	bh=ho090fN91gnMOR0nUR4Y+EcFIXlQvnkEfyY6PgYidL0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ECW8eKBtOjiIfre2j6iLyx01/OpPk1C0bBY2UyvkCy130AI/iXx3DMnOS/KboDuJnKIIO/4j3pQOfVkorE2tfjN2boNK5xoNWcPomIVK7Vzfa27cCT8UGb1LQVVujrwh8qPrjl4jU06CGpet4b4hYzOskpNVwgw9Q1DXTpKcQ/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-45c715116dbso631827b6e.3
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:38:15 -0800 (PST)
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-4042f55de3aso640064fac.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:38:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768487892; x=1769092692;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=obRPckYhjEiJNPLv4O3955QSZYUHJdHSvxM4hv9Cxmk=;
-        b=IyBc9Vp93aM5CrOQfL95PdzzCMzCoT1lOUU67qyPnnwyrICckIDTNcmfTEmmm8TIfT
-         b7h/a2sSMWyL6BwBtGGIjtNZGsadVhLuEdmKTmdg7CAe37GJ293A6zas8Jg81WHF6AnX
-         vOteFQ5+rkJjUW5H9WM4Nb4Xgt2s9pRS/AlBI8XXMPO+wZJgMZcQdnfTVjGDKLTASQkR
-         7UrbFEawsdhyoaBVoSqWs8tuIetMJBKpCV71LCcHKq058Zv9wnzvGNSxAJPWE3E5tXrS
-         ROIO9lJJ6GeacSsULlJpFagbGSBcH0AHIpmObsrJ7hdvC2OVdohSZ1L4cW/sBHk/NxNT
-         d1nQ==
-X-Gm-Message-State: AOJu0Yyf/cieuJNNvMrb61BK1x2Ywrgr7GOtSl4IAmu4k6sbEaP6PMBl
-	MhmCL3VDJ3/rVGyG7F1hS100ogb93iBq2hEZJdMvmozY1Jwk2mDd7itw
-X-Gm-Gg: AY/fxX4saLxtaos5DFfTlqgOQhTUsxMQJyDVAORDJ/AYZTnhPyo73FPpiXet63+kiPU
-	ueOxdAruVCMwKao/x1yBFzJsjayv+y/xqlezj1GPDw0OEfbmV7Ti/ardNc4Gn4d1Wtatg3Zdxhu
-	GF7hn6UVe060Gag2p8irrD9SHTOrKqPPzV+BWpvss/9Mnue613ETlMqvStG1v45G1mrLIsmLAZD
-	uE+edumiAiZ7hdufv9otVMEsr/w7Sv+xsvFut+DMQvQ9i2ZTnnS0IP1C+GAbngVeymsyJgREoCU
-	AICIxTsYuiarR6Iy41viLAK5Josp8Kk8e45VKNh6ym64TIT+/eXzIJ5pbciGHRvBP3ZG5R/D8nT
-	UnBThU5BtYs7dDWFjPy/3HhX3NiXmElA8CSczT8UPxXpk+P3Y+FjOxtpvgrxtihxiyzYrFno6NI
-	APYkWHpzRvSndh
-X-Received: by 2002:a05:6808:83cd:b0:45c:73b0:893c with SMTP id 5614622812f47-45c73b0aae1mr3347077b6e.11.1768487892230;
-        Thu, 15 Jan 2026 06:38:12 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:5e::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45a5dfb6256sm12849514b6e.0.2026.01.15.06.38.11
+        d=1e100.net; s=20230601; t=1768487894; x=1769092694;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bxQOvp3FO/FV+ivIiwVToR8TzMNrudoK/UpMDqV1B+s=;
+        b=ChUXW86/bIlPW33W+wBRUI6GPZuiAQ45XAo1sObTQuXfo4lCEyjFiO1xcbX+JQwS+o
+         yEwTxdhV0FDwvWX/8K01BnlRDe0QoXDK3gMPt0Tb56RF18WjXMt6+/Wg72I8ctqzuNwf
+         e8casopoEI8ERMZYyMX4QOzMiKk7H51Fjze75rqOU9TlC/5YXQZbke7NTmf2ouzVmFWQ
+         KaPPJz0/JOgh9mojI3h0Qbf0sMO7MkRHi9TS46ESf8cc2ev+eRWFsnZuwjaFo/aUvWl+
+         2OJpELFENTkrix2ifxqZ+3t+kzSGoJWPf0KTAZXfCQKiqRgUeVdsr1o6ZtaZDsN0IqWT
+         BXUQ==
+X-Gm-Message-State: AOJu0YyI+lAa9DWRn0szQ1P757NUTpRk1rui/hC43zgySoTrTtl9yCRQ
+	jFN2b+17fDGqOkag2eKOrw+0c+kaz6GsN851IRMGaQPlde5JW7AxMxnd
+X-Gm-Gg: AY/fxX6yWY7bgqd/DRDLYPxVNejZ+HHZ3DytQqceG2cq7ykPPLIpN7cwHudP6tsQXE5
+	cgzGMHJcQ/YfcTKaNel3J8tkJBVB81XRRlG91MFxwipf0ISxnSOdiRXuR1G95QrQyJgNHM+atOT
+	T8QHpfkOGOuWVM5Is/MmX9ZtZfgZXKzFySBmBhFXVtF42vFZ9HGdC5HGEDhVdr5MYqDUM024n4l
+	gFxZT1R4/X79qZesl8DMH33GJz/fGKVIligHT9x+UmM9h49T9OGNqEDWlgsIy6pSYwCi8tMFl/D
+	Sdb3Bfaf1XqQVEIwuRfHnU2tuFzDAVnJfbmZEM/sf37e54iFfnzBYK/GUx+EqzMWJmLyVdrmLcI
+	tYbZ7tlAcoP1Us+HxpNHGQJKJ6jxz5xLDNQ8W87Dt9RZjPlti3fRAhxHSq7FWHS00sPwJ7Oa0Mb
+	pX7A==
+X-Received: by 2002:a05:6870:f10c:b0:3f6:1e6:d0dc with SMTP id 586e51a60fabf-404291e9118mr2182430fac.16.1768487893377;
+        Thu, 15 Jan 2026 06:38:13 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:5a::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40414c5d332sm3357458fac.20.2026.01.15.06.38.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 06:38:11 -0800 (PST)
+        Thu, 15 Jan 2026 06:38:12 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net-next 0/9] net: convert drivers to .get_rx_ring_count
- (part 2)
-Date: Thu, 15 Jan 2026 06:37:47 -0800
-Message-Id: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
+Date: Thu, 15 Jan 2026 06:37:48 -0800
+Subject: [PATCH net-next 1/9] net: benet: convert to use .get_rx_ring_count
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,10 +67,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAL37aGkC/yXMTQrCMBAG0KuEb91AklrRXEWk9GeM42KUSSyB0
- ruL7frBW5FJmTKiWaG0cOa3IBrfGEzPQRJZnhENggtn531nk1ZlSf3IqV+CJZqvQ3dx7an1aAw
- +Sg+ue3iDULFCteB+SP6OL5rK/8O2/QCuTJhFfAAAAA==
-X-Change-ID: 20260115-grxring_big_v2-eed9a5803431
+Message-Id: <20260115-grxring_big_v2-v1-1-b3e1b58bced5@debian.org>
+References: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
+In-Reply-To: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
 To: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
  Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, 
  Somnath Kotur <somnath.kotur@broadcom.com>, 
@@ -96,74 +94,92 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
  Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2118; i=leitao@debian.org;
- h=from:subject:message-id; bh=Jym+hB7alQQy54wZeliTw3/vUjoLAwmzKirUqnTIOwM=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpaPvR64rLYjr2/iNqLeLLq4WUcZf2UrXiopTlb
- njcXO6FZImJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaWj70QAKCRA1o5Of/Hh3
- bZroD/0RDCaNjdoDbu0mv1OiLrdFYjfSMbkXoNZQmy/Ib1BSBZcMkshG7AJyuWcGBafcCmjj03x
- VKqJbxcSyWQ+tpj8TL1dqoqagPpMLEixz4HugR9MHu39GxRHg67sAwg+bPc4+wBaKuZLdJrov+i
- k4fLF83CLgthdt8vpKY08wNYHyNdWcaH9Gf1xQ1hbACXK2Knoyo3vVPYYVqwqG4Mrjc1N6tnItO
- ShNU2XPOjTekErc+spOHazhTgbPOS2cL1cBA5An3oEfBvoryhf7jy/IljJdNYk3YOJxER/wCgWH
- DktqZGJ03Tmty7FkBdzUv01Q7oMMOdia7Xa9xf7HBkWx1OmpOATfQhLnUwSusKwm6zxbDTy6jqL
- 5h0No4RHrYc/ivjDAoBCmrG8u8LrAxElbmUm48x6nm7hIF8rSY/U0/FT87qYDJJuFycgyP2cQnR
- mUzjeKJYEDqQw+vGd4Pg9Gjl+EenugTNENvN4aV8R3+z7BaR4NIsrT7N39bXBBxKSIOK9I26bGc
- IkQovYC7ZbWc5SU7+e4ShGDEeeEjC9S8qIdwuLLXtglOSDGpEPrWbZDLSSURHuVTjjIzuEnFupK
- C4GynyaMc4wqYJmfPgo5TVI7Bu+0yzeda7t8AfkbLDXnzDtVS07r4lJVG/ZyrVOJVsUKD89MXcG
- 47Q/f6pZkmqcEEg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2204; i=leitao@debian.org;
+ h=from:subject:message-id; bh=ho090fN91gnMOR0nUR4Y+EcFIXlQvnkEfyY6PgYidL0=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpaPvREfl1vVTFd9VCzNZLXGv4qdGXI1B9s775w
+ CRZVlDxz92JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaWj70QAKCRA1o5Of/Hh3
+ bRjCEACa04xXzzhEph5wulMAMymz5V6/MzKrLa6K9yiJeFzArG7sXYRape5HeOReDq/e1HtKQOD
+ U5MlsKbmvFNXwZ0RU3HbBarbRX/r71YAnp2Zi+LoQVbMmifAyizczt9GzkEnWCVMKtvrd4M0Gpz
+ NKSJQVdwgwAXY7LucPNj7NgoP7eOpYo7uL5iWWlDWb5ZueFIkU3eNQhPUmQFm9hdke9eGtZBif0
+ qRND+fwHDtZt/96hhvbByIcXEuK54DdcIa2UsGU45hQYBSfSauFX0dOuwkI4PIwpVpfIsA73ZF3
+ QHj2c1fD5a1B+Op7EEgmkUkBOnr2VXcB3nupJr42Q0lF0hQ2Kb/+V0o8ZqUstXEHhOFL8/cXHtc
+ l1s36gb4ruqXR4UVMgHIY2/YvCJ1kVBwmU4n0Y7iPkPH2AuYACRrH4sveEATGszfob5/Yj8DFxJ
+ QbRzhTDaXCMTCPcgBLOwTpJOXmqwPRvI3Ml2OwpHl+xxw8YEM/HrGy3+7Rgc5n7HERJp4knxX6u
+ lr5QlKFLr1F11yTZdvdTrfamoTW1d/xJnZ2lu+74x70tKhKzv/6WycPoiG0RPm8BL0Wvi7ylid1
+ AaM5Q7zzsvcp88wLuZ7mZvtsX6k8Mtou08w2vVmA1wxAFiNysONe64i/DYxl9+AS98kdSD/LFv9
+ 7Ro847D2vuFjy1w==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
-optimize RX ring queries") added specific support for GRXRINGS callback,
-simplifying .get_rxnfc.
+Use the newly introduced .get_rx_ring_count ethtool ops callback instead
+of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
 
-Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
-.get_rx_ring_count().
+Since ETHTOOL_GRXRINGS was the only command handled by be_get_rxnfc(),
+remove the function entirely.
 
-This simplifies the RX ring count retrieval and aligns the following
-drivers with the new ethtool API for querying RX ring parameters.
-  * emulex/benet
-  * engleder/tsnep
-  * mediatek
-  * amazon/ena
-  * microchip/lan743x
-  * amd/xgbe
-  * chelsio/cxgb4
-  * wangxun/txgbe
-  * cadence/macb
-
-Part 1 is already merged in net-next and can be seen in
-https://lore.kernel.org/all/20260109-grxring_big_v1-v1-0-a0f77f732006@debian.org/
-
-PS: all of these change were compile-tested only.
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-Breno Leitao (9):
-      net: benet: convert to use .get_rx_ring_count
-      net: tsnep: convert to use .get_rx_ring_count
-      net: mediatek: convert to use .get_rx_ring_count
-      net: ena: convert to use .get_rx_ring_count
-      net: lan743x: convert to use .get_rx_ring_count
-      net: xgbe: convert to use .get_rx_ring_count
-      net: cxgb4: convert to use .get_rx_ring_count
-      net: macb: convert to use .get_rx_ring_count
-      net: txgbe: convert to use .get_rx_ring_count
+ drivers/net/ethernet/emulex/benet/be_ethtool.c | 31 +++++++-------------------
+ 1 file changed, 8 insertions(+), 23 deletions(-)
 
- drivers/net/ethernet/amazon/ena/ena_ethtool.c      | 22 +++------------
- drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c       | 15 +++--------
- drivers/net/ethernet/cadence/macb_main.c           | 11 +++++---
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c | 11 +++++---
- drivers/net/ethernet/emulex/benet/be_ethtool.c     | 31 ++++++----------------
- drivers/net/ethernet/engleder/tsnep_ethtool.c      | 11 +++++---
- drivers/net/ethernet/mediatek/mtk_eth_soc.c        | 15 ++++++-----
- drivers/net/ethernet/microchip/lan743x_ethtool.c   | 13 +++------
- drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c | 12 ++++++---
- 9 files changed, 58 insertions(+), 83 deletions(-)
----
-base-commit: cc75d43783f74fe0a1c288aba9e6ac55f1444977
-change-id: 20260115-grxring_big_v2-eed9a5803431
+diff --git a/drivers/net/ethernet/emulex/benet/be_ethtool.c b/drivers/net/ethernet/emulex/benet/be_ethtool.c
+index f9216326bdfe..4717a1dacbe2 100644
+--- a/drivers/net/ethernet/emulex/benet/be_ethtool.c
++++ b/drivers/net/ethernet/emulex/benet/be_ethtool.c
+@@ -1073,6 +1073,13 @@ static void be_set_msg_level(struct net_device *netdev, u32 level)
+ 	adapter->msg_enable = level;
+ }
+ 
++static u32 be_get_rx_ring_count(struct net_device *netdev)
++{
++	struct be_adapter *adapter = netdev_priv(netdev);
++
++	return adapter->num_rx_qs;
++}
++
+ static int be_get_rxfh_fields(struct net_device *netdev,
+ 			      struct ethtool_rxfh_fields *cmd)
+ {
+@@ -1117,28 +1124,6 @@ static int be_get_rxfh_fields(struct net_device *netdev,
+ 	return 0;
+ }
+ 
+-static int be_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
+-			u32 *rule_locs)
+-{
+-	struct be_adapter *adapter = netdev_priv(netdev);
+-
+-	if (!be_multi_rxq(adapter)) {
+-		dev_info(&adapter->pdev->dev,
+-			 "ethtool::get_rxnfc: RX flow hashing is disabled\n");
+-		return -EINVAL;
+-	}
+-
+-	switch (cmd->cmd) {
+-	case ETHTOOL_GRXRINGS:
+-		cmd->data = adapter->num_rx_qs;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+ static int be_set_rxfh_fields(struct net_device *netdev,
+ 			      const struct ethtool_rxfh_fields *cmd,
+ 			      struct netlink_ext_ack *extack)
+@@ -1441,7 +1426,7 @@ const struct ethtool_ops be_ethtool_ops = {
+ 	.get_ethtool_stats = be_get_ethtool_stats,
+ 	.flash_device = be_do_flash,
+ 	.self_test = be_self_test,
+-	.get_rxnfc = be_get_rxnfc,
++	.get_rx_ring_count = be_get_rx_ring_count,
+ 	.get_rxfh_fields = be_get_rxfh_fields,
+ 	.set_rxfh_fields = be_set_rxfh_fields,
+ 	.get_rxfh_indir_size = be_get_rxfh_indir_size,
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+-- 
+2.47.3
 
 
