@@ -1,156 +1,153 @@
-Return-Path: <netdev+bounces-250102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E49D24090
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:59:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E23FD2409D
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08432301E1A8
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:59:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6CEC53010768
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E292335087;
-	Thu, 15 Jan 2026 10:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EC6322B6E;
+	Thu, 15 Jan 2026 11:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMpOPtq7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+CHu08Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUP5DQTt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EB235E553
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 10:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506982FFF9D
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768474790; cv=none; b=ps4WryhHlkLo4J68QajNbwpTrjlie6BhJxEt9JXzYq8lh5auH5FU9WhkEuk7oZVxGHaLeT4bHDcBVseeyKtTLFnqZkz415NYhYu7KKlX3PSS1N48eEjwAiey9z/oIkUn8KNy7/emaB9z9pLUR82cUI26bn8SiWz2Q/thLLeTtXY=
+	t=1768474844; cv=none; b=ezHRqJp2mdmhm9RdZ3muTcubpzElMROly9prtTQhay9SOOxLBJ5c9t54b3WKrFg9sMD35XgIThJ2h7noXXlzlkF0EXb+RIMLEFSygl8Ml5YHn2Lj5c0hKUChcKf000amb2ElxuP7LdNFeKGb3ZjqeYoMlK+vbBAxi0GpmIP5XhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768474790; c=relaxed/simple;
-	bh=CAKbJAD4oIm+N7JrjIcvupaT10s1lWECUUscp7JIm1c=;
+	s=arc-20240116; t=1768474844; c=relaxed/simple;
+	bh=KV8au2rEFx59wbezKuS9pej8/Huc6GBz+7s+0BSdx0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PmCGP0KClI8eXLdv5vZs08Ethae89377fMIByROsiN86hjTyZUI3knKepGHDravOVi3YpW85Nv+6EX80JQhDaoIclv9ID8iGFgW+PpeYV4sdb0QzORLd/M7e76JIfJHe0IbujiKgD0OUI18rqkDC6NDqbkY/IGivaMiwQr8OMtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RMpOPtq7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=N+CHu08Q; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768474786;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H2uhWiOU9sr/3RaYIJxLhBZXX5ft69qZ13Y2qAxVi3Q=;
-	b=RMpOPtq7UVKYjYtMhU9qvoBB6z11nsR93DZmXN9JN6idVMHXv2WIKRPM1rS4paW10alQu0
-	4a8Thg135xx/Bd2P0nRW1IUiq46kIsFfJ2X7s3PTl4ijWBdLG5Y2gd+YmCRIk+I/glrPvj
-	GprZ8uYC1t4fS9EZIMAEC3kX5DY1vXM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-Z-Ep2y_TOVi32Vw0bJIfdQ-1; Thu, 15 Jan 2026 05:59:44 -0500
-X-MC-Unique: Z-Ep2y_TOVi32Vw0bJIfdQ-1
-X-Mimecast-MFC-AGG-ID: Z-Ep2y_TOVi32Vw0bJIfdQ_1768474783
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430fd96b440so482064f8f.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:59:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768474783; x=1769079583; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H2uhWiOU9sr/3RaYIJxLhBZXX5ft69qZ13Y2qAxVi3Q=;
-        b=N+CHu08QUFPWccPdZkMrprq4SKIrzrc0MDxABpyhbGcWYvQlJkxKFYyLmfhGBYrGUh
-         KkS94q4XDbVryKO8qEcWvx+IRQYkle48hESIRs3Lrfw4WB6H89qdI2HUiSK58TWt0HfW
-         fFJvOKmT+7kVWx+cjoWfcvjJXfBRL5AfeM/94YTqMgoMqHC60klWpGOVHdztDw1JvIZT
-         X4SrbzfPO8luZX3GXNEMaToPhh0aorx4ozHaKXQ2ZwKIlXwiB98s0B/1mM3u5su9NLlv
-         KLvkm6iyyCBmdfU8xRFtXEe7R8x+FCk0fH780dzRA5GEtEEAQ76VGLpJo6pUntVqBXSE
-         hYjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768474783; x=1769079583;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H2uhWiOU9sr/3RaYIJxLhBZXX5ft69qZ13Y2qAxVi3Q=;
-        b=jJFrV3k3s3qawyzMnHBLLOEv6ZLjALIt03k/EteU2TXSUY/OEj9DdllLENOcp/S5rE
-         aFnnMzhIIhKTbnV0/3TbXyviPNzxtazkaVmB0q356bO3GzZP/8g7PKNH1btJwqdhUWs1
-         4SzcDyHdtxQVFUZC2P4cJpmsrZGrrGYufss1+gPNxmYURdxmcjaBTliBLiydhmVxysNn
-         xhVM5TrbTgPXp/+zLlzdNvdsVYiuYxo7DMITsKC7u2DLnTD0oKq4m87rO0HIJGxvnsm1
-         tUjEHiqpSLzW6FHW1zCxeYWeRTXyUy0uZARMagzr2tIXiQo+mtC7gVH5SCnKAgTaYU9M
-         WE/g==
-X-Forwarded-Encrypted: i=1; AJvYcCU/YVy7zjJ0/Q7h0V1+RztJIJznk2lc1u0N/V6hguTJWLxeotrgZnZNebSy0zb3HrRIUhFNRlk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHm4jZibMGWhRXEYfxOnjbt7pM5ZkwPvpEvDoFR38ZVXVy/Bjr
-	4X5cKfSdIds4Rx4p9LHHKc0Yh9XPbHTe8XvHwptLjAJKumctwDlI65AMSI1kvYJ8h9MalIeLl9r
-	XPL2IwkYu9r220zBQLviyPq9ndrOkJvQbqtRo43K06qtrzWGSPuHmSBVvAQ==
-X-Gm-Gg: AY/fxX7nXLcE7c5JQcqoUV4rSYJQVs4yCKz3UC/ePiLsFcHXNmgMZe95arl0fABUDHR
-	BivC3cD3NYBvU8G3lZpjLwfcRHFrwPSKFPIIknSmIEFYl/DSL7MkEMv+TmCOYMnR7A2MMvVf851
-	aTlOSPZonQxw9Srply/HX+0m3zZly0uSSIOy9ZfV8ONmTNRdPegYZRnSwtBHWsOPf3arFNmIMeg
-	W3g1EZUNceInYQP4mX3yXaio3B+tiuBHUuF72x8RO92+g8Eef3tLVSEGBwCSzvjd3cDZmdNmosj
-	hLtO6hgARK4Oi2Gkus0HledgffSTqUKCLLfEGbN3wQ6J2UobNYsLnrLIBRo0clldu7MlyWXDSKc
-	vV3KtdicvcYv1ynS8C33diNA2e48mwFmasIwJH5je+sCeRrnncMPN+yAloJX4CNId
-X-Received: by 2002:a05:600c:6489:b0:47d:4044:4ada with SMTP id 5b1f17b1804b1-47ee33441a5mr61634895e9.13.1768474783072;
-        Thu, 15 Jan 2026 02:59:43 -0800 (PST)
-X-Received: by 2002:a05:600c:6489:b0:47d:4044:4ada with SMTP id 5b1f17b1804b1-47ee33441a5mr61634725e9.13.1768474782697;
-        Thu, 15 Jan 2026 02:59:42 -0800 (PST)
-Received: from debian (2a01cb058918ce0031a07ba3ae782cb2.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:31a0:7ba3:ae78:2cb2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428be2b6sm41607815e9.9.2026.01.15.02.59.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 02:59:41 -0800 (PST)
-Date: Thu, 15 Jan 2026 11:59:39 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+7312e82745f7fa2526db@syzkaller.appspotmail.com,
-	James Chapman <jchapman@katalix.com>
-Subject: Re: [PATCH net] l2tp: avoid one data-race in l2tp_tunnel_del_work()
-Message-ID: <aWjIm9SDLjHztAT-@debian>
-References: <20260115092139.3066180-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KzxcnGC8QPROuefcAwwaQgFrmvr0R5NHmzh+32ibdq/v14NN2+/DG1qq64cJDY4TnuUEocZB4/OhVOizAbSPGXS1tzlzJzCxMs8fmkRKIL/OyNYJlUpjSo/opV74Me/GK8SQfLz+ZbnrblhBkQ4sCHoYusf/y2kBwDB/hRMnxFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUP5DQTt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B77CBC116D0;
+	Thu, 15 Jan 2026 11:00:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768474844;
+	bh=KV8au2rEFx59wbezKuS9pej8/Huc6GBz+7s+0BSdx0o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eUP5DQTt10gGsV6O1VE1FGRLELjhCcxjMk3w8Yl1Dzm8vLcuS2PjNFgLgRl6VC7Cc
+	 ULYOR40TDjzKEgE7I5O0Ai/MMHxsj4PyGn9EVWdHosHaes2Lox03FMWlbUrM2Xz8M0
+	 OsaG8+8YW3Yt+kRuoXQw19YTMN9CKpAgOCVFxxIMzjKifnm2HOlE8j/+0YalyV3Zeq
+	 QqOiWYlcTkzoVPTfkiL2YxUgJsjhkmErP5Ta7R/jKfNsEPyKZr5ZFoPyr7IvqVtCvz
+	 Se7Infti1rB9N4TcSbbcRlrtIkbr53OTK8/DEK/uJhYwDZHkyrr+8WZqI4+6LVIxfH
+	 YS/Ou5glh/H3A==
+Date: Thu, 15 Jan 2026 13:00:39 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: jgg@ziepe.ca, michael.chan@broadcom.com, dave.jiang@intel.com,
+	saeedm@nvidia.com, Jonathan.Cameron@huawei.com, davem@davemloft.net,
+	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [PATCH net-next v5 2/5] bnxt_en: Refactor aux bus functions to
+ be more generic
+Message-ID: <20260115110039.GE14359@unreal>
+References: <20251014081033.1175053-1-pavan.chebbi@broadcom.com>
+ <20251014081033.1175053-3-pavan.chebbi@broadcom.com>
+ <20251019125231.GH6199@unreal>
+ <CALs4sv3GenPwPXJxON8wkhRW1F-KB7DT3DkPbzm4BY620aTEvA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260115092139.3066180-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALs4sv3GenPwPXJxON8wkhRW1F-KB7DT3DkPbzm4BY620aTEvA@mail.gmail.com>
 
-On Thu, Jan 15, 2026 at 09:21:39AM +0000, Eric Dumazet wrote:
-> We should read sk->sk_socket only when dealing with kernel sockets.
+On Thu, Jan 15, 2026 at 02:58:55PM +0530, Pavan Chebbi wrote:
+> On Sun, Oct 19, 2025 at 6:22 PM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Tue, Oct 14, 2025 at 01:10:30AM -0700, Pavan Chebbi wrote:
+> > > Up until now there was only one auxiliary device that bnxt
+> > > created and that was for RoCE driver. bnxt fwctl is also
+> > > going to use an aux bus device that bnxt should create.
+> > > This requires some nomenclature changes and refactoring of
+> > > the existing bnxt aux dev functions.
+> > >
+> > > Convert 'aux_priv' and 'edev' members of struct bnxt into
+> > > arrays where each element contains supported auxbus device's
+> > > data. Move struct bnxt_aux_priv from bnxt.h to ulp.h because
+> > > that is where it belongs. Make aux bus init/uninit/add/del
+> > > functions more generic which will accept aux device type as
+> > > a parameter. Make bnxt_ulp_start/stop functions (the only
+> > > other common functions applicable to any aux device) loop
+> > > through the aux devices to update their config and states.
+> > >
+> > > Also, as an improvement in code, bnxt_register_dev() can skip
+> > > unnecessary dereferencing of edev from bp, instead use the
+> > > edev pointer from the function parameter.
+> > >
+> > > Future patches will reuse these functions to add an aux bus
+> > > device for fwctl.
+> > >
+> > > Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> > > Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> > > ---
+> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  29 ++-
+> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  13 +-
+> > >  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +-
+> > >  drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 238 ++++++++++--------
+> > >  include/linux/bnxt/ulp.h                      |  23 +-
+> > >  5 files changed, 181 insertions(+), 124 deletions(-)
+> >
+> > <...>
+> >
+> > > -void bnxt_rdma_aux_device_uninit(struct bnxt *bp)
+> > > +void bnxt_aux_device_uninit(struct bnxt *bp, enum bnxt_auxdev_type idx)
+> > >  {
+> > >       struct bnxt_aux_priv *aux_priv;
+> > >       struct auxiliary_device *adev;
+> > >
+> > >       /* Skip if no auxiliary device init was done. */
+> > > -     if (!bp->aux_priv)
+> > > +     if (!bp->aux_priv[idx])
+> > >               return;
+> >
+> > <...>
+> >
+> > > -void bnxt_rdma_aux_device_del(struct bnxt *bp)
+> > > +void bnxt_aux_device_del(struct bnxt *bp, enum bnxt_auxdev_type idx)
+> > >  {
+> > > -     if (!bp->edev)
+> > > +     if (!bp->edev[idx])
+> > >               return;
+> >
+> > You are not supposed to call these functions if you didn't initialize
+> > auxdev for this idx first. Please don't use defensive programming style
+> > for in-kernel API.
 > 
-> syzbot reported the following data-race:
-> 
-> BUG: KCSAN: data-race in l2tp_tunnel_del_work / sk_common_release
-> 
-> write to 0xffff88811c182b20 of 8 bytes by task 5365 on cpu 0:
->   sk_set_socket include/net/sock.h:2092 [inline]
->   sock_orphan include/net/sock.h:2118 [inline]
->   sk_common_release+0xae/0x230 net/core/sock.c:4003
->   udp_lib_close+0x15/0x20 include/net/udp.h:325
->   inet_release+0xce/0xf0 net/ipv4/af_inet.c:437
->   __sock_release net/socket.c:662 [inline]
->   sock_close+0x6b/0x150 net/socket.c:1455
->   __fput+0x29b/0x650 fs/file_table.c:468
->   ____fput+0x1c/0x30 fs/file_table.c:496
->   task_work_run+0x131/0x1a0 kernel/task_work.c:233
->   resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
->   __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
->   exit_to_user_mode_loop+0x1fe/0x740 kernel/entry/common.c:75
->   __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
->   syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
->   syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
->   syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
->   do_syscall_64+0x1e1/0x2b0 arch/x86/entry/syscall_64.c:100
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> read to 0xffff88811c182b20 of 8 bytes by task 827 on cpu 1:
->   l2tp_tunnel_del_work+0x2f/0x1a0 net/l2tp/l2tp_core.c:1418
->   process_one_work kernel/workqueue.c:3257 [inline]
->   process_scheduled_works+0x4ce/0x9d0 kernel/workqueue.c:3340
->   worker_thread+0x582/0x770 kernel/workqueue.c:3421
->   kthread+0x489/0x510 kernel/kthread.c:463
->   ret_from_fork+0x149/0x290 arch/x86/kernel/process.c:158
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-> 
-> value changed: 0xffff88811b818000 -> 0x0000000000000000
-> 
-> Fixes: d00fa9adc528 ("l2tp: fix races with tunnel socket close")
+> Sorry for late response, I started reworking the patches and wanted to
+> address this comment.
+> Without a map/list of active aux devs, we will have to check the
+> validity of the aux_priv or edev somewhere before. That won't change
+> much for the defensive programming concern.
+> To do away completely with these checks, I wish to handle this change
+> separately where we maintain bnxt's active auxdev by idx, in the newly
+> introduced struct bnxt_aux_device.
+> I hope that is fine.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+I don't know. My preference is that you get things right from the
+beginning. For reasons unknown to me, the Broadcom drivers are full of
+random `if (.. == NULL)` checks, which makes the code hard to review, as
+it's never clear whether the functions are re-entrant or not.
+
+Thanks
+
+> 
+> >
+> > Thanks
+
 
 
