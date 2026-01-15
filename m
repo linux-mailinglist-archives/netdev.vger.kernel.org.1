@@ -1,163 +1,133 @@
-Return-Path: <netdev+bounces-250209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD200D2503A
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:43:57 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F80FD25008
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8ADF230504E0
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:40:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 220DF3005F3D
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C0530E824;
-	Thu, 15 Jan 2026 14:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66BB199252;
+	Thu, 15 Jan 2026 14:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofCPYWcR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y03g9Vto";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="m6je4vTJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE11D2ECD39
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6857F30E82E
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768488033; cv=none; b=OC/caDQjmxAfGx1h7HbzMktOFxZZQXt6bIgSiv3DZzNoE8npjLCw5IWTzQ1ziqFCaj9FALNr1hFbCPd5PrN2rqeoI+T3nCuuPglnBJNr9ikH3c2NUudT/M7AeMS0JIbqvPCiLLlI6iUzB/HSGqfUg4WiRFhU4QwMlGQolRcgphU=
+	t=1768488094; cv=none; b=qP0nb+COVfbjL+1KOyKA9hG8UalS4e1v3gWqJZnJjmwoplIEtMi1L/bchm8VhwZIhkMybS/nZFTQ6+6KieFbNjDZMiN77WZwqEMZUy9Q+WZodaG2dOdwZFQt9rX3bDfUR/UjfBT/GRo3dK19sBQsyu/4QBMHSGvsz6DCgwbYAAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768488033; c=relaxed/simple;
-	bh=bg9+1InGoek0RAw+SSIDDOo/nDZj5525j5AiNZYVQUs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CW+ZzPyo6A1Dv1kaiNXMpEaYmwJFHKjnqTrsR7ot8RX3SbuP4wBEyE6wFU69obAXRsPB1MMq/9LZBrcSyFo4rhDWErZTnzVrV9t3R3rs8THTIPnVz7hfRHFxCFRJ+OSeTFx6YRQYU2UYhxQiaMfb9rGp+MWxrPE9HWe4x/KPSx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofCPYWcR; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5029901389dso4905261cf.2
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:40:30 -0800 (PST)
+	s=arc-20240116; t=1768488094; c=relaxed/simple;
+	bh=TyU0gMLqFTK+pDBPFxFjaSk3mG90q+s7JHDJ5rmGvyU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g7SJqeTU/YT0iMLTi07sT44NVM/apf3kWqZZ1iUwk6kliefQM0IhImyhy1Wxuc58YEipP4ubF6hWPhQSfWpC8RaZRcEprjK4vSApx/jEeiJV++Eb3+zA61jJVn+Cz5Zp73QqH8C8uTX/goyUXriK1iGMQFNAP4vxj6rbXHcQokI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y03g9Vto; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=m6je4vTJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768488089;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vIbzKrAPTN6vgr0Z1Kn5aIZgGvfkFePJqqJV9nUj6cE=;
+	b=Y03g9VtodqqYXJfRui5jXFqYZ0EVGk9Y69Xvaivvfn/gwDwfsFuIf0fCeL1s9/2UqyQ7r0
+	eO1RhaS6gw0WAWh0NNG9BRAzbqm3Mb0/KDaYkC4DZ26VeFzYQiMx1dVF5I6AbYKrCjFCNV
+	tw5wenFQngW0VgF8CI7t34YW708fbA0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-693-q6_eoXAjPQGEaYm12SBVUw-1; Thu, 15 Jan 2026 09:41:28 -0500
+X-MC-Unique: q6_eoXAjPQGEaYm12SBVUw-1
+X-Mimecast-MFC-AGG-ID: q6_eoXAjPQGEaYm12SBVUw_1768488087
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43102ac1da8so895376f8f.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:41:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768488029; x=1769092829; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W67l+qWJf4i/uzrZs13/VAgBMKdkcy4ybsbPGITcYBU=;
-        b=ofCPYWcRo5ssWSkAN1VuxEhrTas1KLKgT2q7czjR63cfEhs14jeEs0PW2ZEIjNKXCn
-         MgoKRi/OWlUIRdMWrRTa1FWJZloISH+KHiIR3OKbFgoVPumuNXGUOQldvWrrdRKYDA9e
-         KDatQ1joPAJRvD7ZPhT8OAf2kNNdRUJCPmiGvYFm/XmvUkG3IxeGXdmokOjumEgVnJ9T
-         B0wGqd6vWB+bAmlQ4YBjwthQkFh2uWaRpH+NK8SzykVrmm2dxA0dar76swUNU4ugGYnA
-         eip8XC6psd4CS8Ast30eYGdFKkMoH/yurHZPOjKov+VmvhWtbY6yzLTjxIElW6a/Bjh/
-         I2Mg==
+        d=redhat.com; s=google; t=1768488087; x=1769092887; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vIbzKrAPTN6vgr0Z1Kn5aIZgGvfkFePJqqJV9nUj6cE=;
+        b=m6je4vTJ1Yj9QAFVZGtE/fZX2MW7dWlZow1df5G2lHI9R8SyPCDjgP9tKND2LALlxu
+         fbidf6d75jykZQwF/7JNqJWksGOMJI6xYESJ+Uv8iC18TaUGvEL8oTtlb5mg3X6eDOSL
+         KXX4NrTYdO1M/0e/Sh5/hnLmyFIDQ+c317btyBmTPeBWmIi7+im4Ql0JMxph/tSpCpEK
+         0Ipq3G9weVAob8rJZFxzF8Xb7fZFN4+axpzhcVVk72Q0TRi7Jkaiavo49/Giujskwv75
+         upDZcHzNNPOoPIHcu8ejXwSibnpgZZClYqAEMGy7SbTBUOZZTa8V/o06gnASJNHegoN5
+         Gcxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768488029; x=1769092829;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=W67l+qWJf4i/uzrZs13/VAgBMKdkcy4ybsbPGITcYBU=;
-        b=d01gj9I6s0dOwOmmP4CPPmFIkAhgcyja8ugd1BIP2BenNXA1Z/4LaiS6jpBIb9Q6T3
-         NPa8MmDenKm7eSGQ5XuVSkSC5pQdjoxnU6e258XBM82k9WrAdd+vzfh2OkR1JP0+Dt31
-         QXaoiEPKvRDSJffxZ5jcHwfPHepHhQ/fhZ/YXHXxYAq4TSgJtovEGg7H457RATGNkgpg
-         v4sThXtZ3JIp93kNEJJ66Izs4ks/svDh1usECFuZax3TVmJMjvK7ifyyWC7XzMAQ3dLC
-         O2fwpNmPW0TwsJQTnn6fONjz3HaoCW5fOcASE+80dyItjQ+VMv+Hg7gDe+c3haG5e77V
-         COhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwK42qW6/peXn3uSFcMuDBAwKy0BVo2lFSz9zfI+H1zpHYeQOjIFWGWdiV2PYZu1NeHbSf1OY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcsTubh+mbWvomoczGmfIvU/EqYq9ccfggOcKm+u8u7kQKrhFt
-	FLDHG5JN6g8tb0Ivd/OCPk36NEtdND4iaCJsnWEsOQNxykUv5LvUJCKua224ufhxRkBQ4qdDC3i
-	L+Whfkje4BihK7yOm2S9LtW9YjK9JyAM/qL/G+NXB
-X-Gm-Gg: AY/fxX7Ut/zKJmvdTgt+W8iF/O1YP3HR/4ycsWK3b7Ts/ANm0Rhr5nspQpdb3MtfR6u
-	mCLu/Qx1bVcPOsqmaWRQJIw3Smi+UBLu49HaAeDZVsDfs8pOgMiDmYdwAWOLZFBE9w3oLFof+WW
-	Bje6HSNTN+X+w0CFSRHg4CvjUFU+xjh0k6ugz6dikCMswtHijD4uINdYAsy1hzZYNmd8oNmO54w
-	WMU/FQtseHEdKOX8efKiMs1vojYmMB5dCDp/blN3BjohK8o1E4VCBmwTxKmja/pKHYAgqGZNAqj
-	/d4Tlw==
-X-Received: by 2002:ac8:74c9:0:b0:501:50c4:a9fb with SMTP id
- d75a77b69052e-50150c4ac4bmr47283611cf.80.1768488028278; Thu, 15 Jan 2026
- 06:40:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768488087; x=1769092887;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vIbzKrAPTN6vgr0Z1Kn5aIZgGvfkFePJqqJV9nUj6cE=;
+        b=PqZkCn7nlrtM79x7S0zwoa1/sgOuiUAqVMJQ1F+Y6twzTvax6eibwVZKoK1KbkXJqV
+         cXRw+YTBE1xEQrNy92YsFXd7qCwDzANt1xMIlNPkIQYka9X2WYi0FgNwjhoUK+F+rSZg
+         J2Nb4h8T0BC6NO7ffgJZhkdMJdrorSlE87D/jVps1bLPYbOdOR36Fc6e/R5eCm6pMF5v
+         91bSd2WWWUkaaes/Nf9N5ydmt163UauXSFJLXd1R1mpDV+lnoiWhfcjgiVoaAC7p3TLj
+         WP79L5WNOl7nf1KPvlfLDDWvzFG9OtCDHUZ6+c82KsL5HvhsMwbvQI+6fNH3Ar9z1zbC
+         3oFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ1nK0hqgrSAY2rR4Tqp08WWrbE1WlfqUnZt7ebhDFBts3AjebqGfBacehbtb9RFiqxKpFpbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgZPzZBsA2rdElVsoaLmbWR+bDqKz6U0R9KEc/p0Z3dOXcS4s8
+	/xDshp79Qd1l4zGB69aES3OMM1NGEzR/Q7e5W0INVY/3paU38rld2LzMMcP1RkXbfXhpcxaE9fw
+	XnVNLZKwhCgQUuPBOwDlJb3Eky/da+jWvh7VwKWCzSIMVZ0ZBm/3qQ3whPQ==
+X-Gm-Gg: AY/fxX5ZqSgG6vZt0qjGd/gX9TiIRRqPTkfqWXnJ/7rRJ5gkSCrrGUV1c5xh9h8+5OB
+	TJ38OoDF4GOfSXH07vhZoLiJcoXuvXImRveJZy7tKOgB9q35lKgV50irCcDvLGPC0iyV1Q8O6T6
+	pFY8Gqvvli1lQdHblich+stVj/bUkq0jyi+Ge7uuuaZ2++8N7YU8Ip2iEHIYpOgpUPajgMYkFvj
+	eVtbGNYpqIsM+iHAKXnsZfEGCgKk6JqrKqFFsaY9DkvveGZdzVqioIaNXZ34xGq025UXg63c0ep
+	a8kOgGZUs3OnuYulwvuAl0d65Xz4LYYysqVqFiuDd9CKadDUy7lxGyVrSyU0aOYpzvWCGcet5yG
+	ZvgRQQl7q938+9Q==
+X-Received: by 2002:a5d:5889:0:b0:430:f5ed:83d3 with SMTP id ffacd0b85a97d-4342c4f4d35mr8729828f8f.5.1768488087147;
+        Thu, 15 Jan 2026 06:41:27 -0800 (PST)
+X-Received: by 2002:a5d:5889:0:b0:430:f5ed:83d3 with SMTP id ffacd0b85a97d-4342c4f4d35mr8729776f8f.5.1768488086690;
+        Thu, 15 Jan 2026 06:41:26 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.128])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-434af64a6c0sm6403382f8f.5.2026.01.15.06.41.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 06:41:26 -0800 (PST)
+Message-ID: <cc302f3c-c4fe-4660-b069-8eaeb21b5580@redhat.com>
+Date: Thu, 15 Jan 2026 15:41:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260115033237.1545400-1-kuba@kernel.org> <20260115051221.68054-1-fushuai.wang@linux.dev>
- <CANn89iKfuXjqKsn+xB6bpGOaqM7pN4ZcRJ=2KJg4WY76ArYXhQ@mail.gmail.com> <CAHmME9quqMVzD5zSEKvOFOYj3QLANAo2iYeqWQ1toV0C7gJXTg@mail.gmail.com>
-In-Reply-To: <CAHmME9quqMVzD5zSEKvOFOYj3QLANAo2iYeqWQ1toV0C7gJXTg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 15 Jan 2026 15:40:17 +0100
-X-Gm-Features: AZwV_QhUjToNAgS38h20mRwxrxdb2GylWDqbb5JI3WCn-MPbxbSmB7DRusOwq7M
-Message-ID: <CANn89iKmNSPjsTBwN3166cKyipJbH64ZPE0O6i2AMh7vyKXS=w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] wireguard: allowedips: Use kfree_rcu()
- instead of call_rcu()
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Fushuai Wang <fushuai.wang@linux.dev>, kuba@kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, vadim.fedorenko@linux.dev, wangfushuai@baidu.com, 
-	wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net/mlx5e: RX, Drop oversized packets in
+ non-linear mode
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+References: <1768224129-1600265-1-git-send-email-tariqt@nvidia.com>
+ <1768224129-1600265-2-git-send-email-tariqt@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <1768224129-1600265-2-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 15, 2026 at 3:33=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
-> wrote:
->
-> Hi Eric,
->
-> On Thu, Jan 15, 2026 at 10:15=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > > > The existing cleanup path is:
-> > > >   wg_allowedips_slab_uninit() -> rcu_barrier() -> kmem_cache_destro=
-y()
-> > > >
-> > > > With kfree_rcu(), this sequence could destroy the slab cache while
-> > > > kfree_rcu_work() still has pending frees queued. The proper barrier=
- for
-> > > > kfree_rcu() is kvfree_rcu_barrier() which also calls flush_rcu_work=
-()
-> > > > on all pending batches.
-> > >
-> > > We do not need to add an explict kvfree_rcu_barrier(), becasue the co=
-mmit
-> > > 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_de=
-stroy()")
-> > > already does it.
-> >
-> > It was doing it, but got replaced recently with a plain rcu_barrier()
-> >
-> > commit 0f35040de59371ad542b915d7b91176c9910dadc
-> > Author: Harry Yoo <harry.yoo@oracle.com>
-> > Date:   Mon Dec 8 00:41:47 2025 +0900
-> >
-> >     mm/slab: introduce kvfree_rcu_barrier_on_cache() for cache destruct=
-ion
-> >
-> > We would like explicit +2 from mm _and_ rcu experts on this wireguard p=
-atch.
->
-> I'll take this through the wireguard tree.
->
-> But just a question on your comment, "It was doing it, but got
-> replaced recently with a plain rcu_barrier()". Are you suggesting I
-> need a kvfree_rcu_barrier() instead? The latest net-next has a
-> kvfree_rcu_barrier_on_cache() called from kmem_cache_destroy()
-> still... But are you suggesting I add this anyway?
->
-> diff --git a/drivers/net/wireguard/allowedips.c
-> b/drivers/net/wireguard/allowedips.c
-> index 5ece9acad64d..aee39a0303b0 100644
-> --- a/drivers/net/wireguard/allowedips.c
-> +++ b/drivers/net/wireguard/allowedips.c
-> @@ -417,7 +417,7 @@ int __init wg_allowedips_slab_init(void)
->
->  void wg_allowedips_slab_uninit(void)
->  {
-> - rcu_barrier();
-> + kvfree_rcu_barrier();
-
-It seems kmem_cache_destroy() should take care of needed barriers,
-at least this is what is claimed. An rcu_barrier() or kvfree_rcu_barrier()
-should not be needed in wg_allowedips_slab_uninit() ?
-
-Probably boring/distracting, I do not expect anyone needing to unload
-this module in a loop and expect this to be ultra fast ?
-
->   kmem_cache_destroy(node_cache);
+On 1/12/26 2:22 PM, Tariq Toukan wrote:
+> @@ -962,6 +962,12 @@ static inline u16 get_cqe_flow_tag(struct mlx5_cqe64 *cqe)
+>  	return be32_to_cpu(cqe->sop_drop_qpn) & 0xFFF;
 >  }
->
-> Let me know.
->
-> Thanks,
-> Jason
+>  
+> +
+> +static inline u8 get_cqe_lro_num_seg(struct mlx5_cqe64 *cqe)
+
+Minor nit: duplicate empty lines above.
+
+/P
+
 
