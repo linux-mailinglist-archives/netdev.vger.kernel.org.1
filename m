@@ -1,207 +1,99 @@
-Return-Path: <netdev+bounces-249992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06EB2D221E7
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:27:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9538DD222D7
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:46:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 099FD3027599
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:27:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B26B4305BC1B
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4212517B9;
-	Thu, 15 Jan 2026 02:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8802E26CE2D;
+	Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Ryy7Ap7H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWNjWBYQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011062.outbound.protection.outlook.com [52.101.65.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2210F20C488;
-	Thu, 15 Jan 2026 02:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768444040; cv=fail; b=BblJPgJZPycokKLaHEpr1yOR+d6ATBB2FAR1eH9FvUtzMFoEmbM6uTlVmUyDaUcm8QDdfXoMfe3GvduKsBYS9sqSVjLMbP43OnbzufRJT2mWIWeoWMmLoGD0ptOW4pn5eoO48xsf6JNbuwvHHKvXxavtdExVyjI8utl45AxFaHA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768444040; c=relaxed/simple;
-	bh=U4BZ2kdCgrJVE1dDdrwZUfXSrZe6PTxkBV9/Z369pEo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=to+ep0jBMs9y6TfYzyHDUnnX5lB7iJ/rHjUT8fzvT7aIB4RouaZBSB62OCCvoZnmH8APm0Nivun93hP97+fQ47rRsVVYVz38Lh/UGh3hrNX2tgB7UJ5+JNGBMYQLmOuljAXxLE5GaiAky4glK07nmL6D6N2D+VZwau3g7bfiph4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Ryy7Ap7H; arc=fail smtp.client-ip=52.101.65.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kU1EjWN5R7W3xiDVFcE+IyYKfF4lQgAvUWDXfPuBVNvMsiVWmlQljfPBExhMEOJ+rmcNm2EEi284b96aIhDhIf7ocJmlZ8Nhperbujgdq3boZxqaFdhWGOObZbHqwtQYiIgnP6Ddafcc/uno7hJ2LW7SbDMu2JDt9MP21VMu2RLb6t/FbL2NWh3eIlskiPRvpEfouU5e6ZL/ga+DKrL/YShiX6TvFKIwo4G8X7NKIlR+t0HEO+cy3tQiPslFw+lZxLV+U7Tn2poD53qdUC9nZSSxBwdeOMz8k6sO8XWO8u8hxDfn2q3ex2IW+9sJZqoJuVVo0BtK0QdpJjtv0N91/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zYBKzn3rHbxPKx3X5NiGDYq21uNZEDIGbYgFQJ4T4Cw=;
- b=I04gk8JAY3i8znUI/1b7SAfhjY33mR+jACBI7Osrh2g6NgOhB/y1OjDxGRnVoGrAMklKtdfIQXIst8t3DMyJF5KGEpFlKSnKpcg0bYpdoqNBh0G/KNBb/6CBG0vnvfoJd1GPipwJvpmWc+1GqbcfhooGyna/wBce/Fn3XHfKmSj5E+aBzXRIM9D5VuzWO+gIKpgwLI38EhK+m+YQT3CfbJUPJBo37110r0R4TKUYNtsajDdqsHHHSpnPFgSkUoHd36xhI4uV0AdIP3wFnN1X0ng6GvyTcj4iRW0HjXM986JJpNVqXumETXJCzFxzSHKQ6Jhe9RxAd1/oMwvc75MKAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zYBKzn3rHbxPKx3X5NiGDYq21uNZEDIGbYgFQJ4T4Cw=;
- b=Ryy7Ap7H1UNd6rj+wZea2x7UhmXo6g4d0EqLYiCwFCx410u0yKoVPkUnkp6euiZlTt6Qflm4wMBydEOGa5oqgePdUdIK5WxJxFsQoXZ9lq9YMEnShy4fHgBwdxJdu0GxhGumHgc1S96wBYbrl1/J3iZ1Cn84ntfqs9MZAYpa77tHbeu+BwIYNLxJNPDIOtwmxqPamJH6lT8VI8DxdyZD5qVIMI3VRIaKL5oI86SR2qzIBsYchRMQE0UcEitNTPkyvpq8ucscboYVmOP+r7OMUexEjRymcnY73O5VwTlm29qnrAN8B0UxlOXaq8DO294e5GP9wZ6G+/GgkEO4ToUwvQ==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DU0PR04MB9347.eurprd04.prod.outlook.com (2603:10a6:10:357::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Thu, 15 Jan
- 2026 02:27:15 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9499.001; Thu, 15 Jan 2026
- 02:27:14 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: David Laight <david.laight.linux@gmail.com>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	Frank Li <frank.li@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "hawk@kernel.org"
-	<hawk@kernel.org>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: RE: [PATCH net-next 07/11] net: fec: use switch statement to check
- the type of tx_buf
-Thread-Topic: [PATCH net-next 07/11] net: fec: use switch statement to check
- the type of tx_buf
-Thread-Index: AQHchDz94JEEe8B96kSUW261P6sEvLVRsBiAgADJlEA=
-Date: Thu, 15 Jan 2026 02:27:14 +0000
-Message-ID:
- <PAXPR04MB85108330035756EDEE55D943888CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20260113032939.3705137-1-wei.fang@nxp.com>
-	<20260113032939.3705137-8-wei.fang@nxp.com> <20260114134713.565f2b3c@pumpkin>
-In-Reply-To: <20260114134713.565f2b3c@pumpkin>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DU0PR04MB9347:EE_
-x-ms-office365-filtering-correlation-id: 66bbef33-7cb1-4145-5042-08de53dd98c6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|19092799006|366016|1800799024|7416014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?wjCXbbSNzm8Ut3ijD+mSvOW6AGgIgN3DZWlcw65y8Ujl7lDBAzsRG3BTthWF?=
- =?us-ascii?Q?rmSaYjvkqRCSa+C0nmpbuh5xR6pDaPSp+x6BNY3xcg2fOn0E5E1X+T2+I5R3?=
- =?us-ascii?Q?uz2IVChZDLudglnuhUyYgyluya8U86HJyf6r8Ukn9Hxo91TAWNyBb3wG+Dm7?=
- =?us-ascii?Q?sxxcfFunc5LiJB81c2J5ukhcRVzj6sJ/YFVwgDU3ZOTrdb8GUtjnQQpIhjOQ?=
- =?us-ascii?Q?zBMRzYF75qSH9NOAF3GAgJOXtmEj7usDxJdiKzDO88eQJwt1xP9O8QsSmcmE?=
- =?us-ascii?Q?p09vIlRs7CQQuS2Mpc/BGxafDKHQskDoL1VjZOGJzooX1VjiEb5LnXS63pEg?=
- =?us-ascii?Q?dWPv/CWrZLIN3hvMIdwSLg0ozf9Ztsnd8rJvtmLpJmMifADJkO8Xxk68oyUI?=
- =?us-ascii?Q?iEwjioKNq2VUpiNCHTnbosDN1U602oC7bsA2MwJG7LLbPZ6AIVBF/Qh+3aNt?=
- =?us-ascii?Q?LdI6NyvhIvoIeyldYzO+9Jl/oYpFsMFFTpEoU7BqJZXqGUgMSn1Z1dF8CaoJ?=
- =?us-ascii?Q?jo0WAignGgJ5bqgfH1ca7McmxamkeTKUy3hpDiS7y1FjWXhFPACFYD9Vf6h9?=
- =?us-ascii?Q?tZXPEz15hzxnnLJ4oMBbi+2261fjRkiEQCeW7oZyzdH12RIif0o/W6iIyy4O?=
- =?us-ascii?Q?uF4H8i8G9Q4xpb9t3RqLE4TLvyeibCCuBzg6zHBZWdFEE5SmYT2imQ0bEYa4?=
- =?us-ascii?Q?ZrbDTOgvUj2D+HLGsLh5aVo/WXNDRyErfPUwEEHoVCwlixhwYkqDEMUxJ5sa?=
- =?us-ascii?Q?iEp4BdSJoW9EEfybyY796UdJ84nhogR7UA0Gq3KkKwNcsMCs+yWRI11RbIvY?=
- =?us-ascii?Q?kApi9IIgXsJtNo6XYEqvrANrfLwk0pY5S9/cEfCosmBVsckzOQ3V+6A5R8ZU?=
- =?us-ascii?Q?9m8zW3CTb7lPEVgUKIkqOqjEzNJm9Es0wmhFBRrXhf1td/bplyvxMrJflUNa?=
- =?us-ascii?Q?F9TSxxetfR2G6mJgqa6c9Xu2GkqGtvCqPcB27Q5Dw+g/hcLAaqo7xWyyUPmB?=
- =?us-ascii?Q?fwW9qAuqx52eREKOoUstwUzr4BkJjJt4Tr0VVNgATjoN/znOII7faxYK+p5B?=
- =?us-ascii?Q?Dzz8B2mkBIrgpN4lraA+PKGuGhBNmRXTSMvXPlBnG3qhJo9qWbXTWf8ntHPb?=
- =?us-ascii?Q?rAIDSVKteaeQJr1xYTTPYhpN1ZJa5rEURlwEn3Bo0jH8oX9vhMpJPmjOyMLE?=
- =?us-ascii?Q?LMqL9AfgX0xxHls0TkA0g3M/nmxKNWc9ntPuGOsycRET41Gy5fTXmmf5X+Aw?=
- =?us-ascii?Q?7ucciTQp8DzY2OAtsfzEtwpJATk2blmpiYxpDWSxni6wJp2ekG89a4QtUy35?=
- =?us-ascii?Q?qxv6d+sjOPjj1raDsAG755gPTZHfan92F8ChEkyhwDn+pEkFMtclpFx3wWQf?=
- =?us-ascii?Q?rH7/46bAbar9rr9HrIfIxU+ZIvK79b69Yv2gdpdfOudo4AqliejJPXTUr8uC?=
- =?us-ascii?Q?ZR9ZS8AM/wOW2nrMRME4AQpC3eInaQfXhWzEqNBTQcbdB58BtTR/NmDeLkXE?=
- =?us-ascii?Q?zxZd6+pJCroOh5BcXrSzKNtSf/ExmYAz1LgD5PEs8luQEosIOB41FZkFVl4h?=
- =?us-ascii?Q?2YkiQKUFFmEPNbgblT/vMp1DOsciW9rkZOVTGOJeHYq4pL0k7HPSZklsqRPL?=
- =?us-ascii?Q?obhM0Sj1Exx/yoMomGjt01A=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(366016)(1800799024)(7416014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?/3st0zk+UHuzBwEc2pTJtTMj8XkhZ1b0uwH4x+PDpZ2WmHcL7GxoWdaE63Nf?=
- =?us-ascii?Q?uVqd8NgmvDN8x2gnVD9F5wjaAjskaspdz/JN+Ym5fmSNV/A3rfIgoFZuJHcR?=
- =?us-ascii?Q?1DlGCWfiGutRneYpZhXxoNrOkWRdEFO5XyU0amSZJva879BiDdJgSxcYuDVQ?=
- =?us-ascii?Q?6QUI0icSkhRakJ/rvBn8PDY0MTDMAkh/tXE+RCT/nK7c8e0yobLcRm3cWPyN?=
- =?us-ascii?Q?AouPRqryV1X6TWoh1TrsWykTiD9p5DS08rGFR2363sc/bWfr0xjoEkdPFphH?=
- =?us-ascii?Q?V+cl+mNn6uig76nzKJTEWzY1OpC30PzDyX9nm6tucunAZaEQxjqt4NeqyzT5?=
- =?us-ascii?Q?0QtaHHGz9Y1ofP4XBp4uoRoer8eQBz0w3AcBMeJOrlVQHMZZ2ja1pewA3WNQ?=
- =?us-ascii?Q?3NMj7IglW3/XXAZBhfHNPLq83W2C+dDxrblRnHNa8j0FGFG2pEr7/f7+gjju?=
- =?us-ascii?Q?/RLvvydpzGaUgFFul5gqKb5bQ5x5NvM+paW99jgsZcWWIACJc+JLpTU81DCc?=
- =?us-ascii?Q?2w29f9eV/b8xoJPscYDYaKrHBDyST/PWyvpSxUiT4LkGWea1S06t+9ley0aV?=
- =?us-ascii?Q?cUkjFWPPksSFIn0EUkvTRbDbC2FOKhVZq88eLPMF9712AQ1t3XUjmKbz+ue0?=
- =?us-ascii?Q?JmRLSETxWz99ObwG7rq+AmfVNZyl1OLe+m9XXAfqdJxlVCKi90nzQrl7M6pq?=
- =?us-ascii?Q?uk09VQoE3wjVvcQcqkiYFcS9u1xXU5Zhrnr5wUgH07l6ElyXseW1NPYMLzOU?=
- =?us-ascii?Q?ViN2efcvecpgPLCXgp5xMbeOHk54L+awXWVqLsCPDljuRgH8qGcMZ4pOwzwv?=
- =?us-ascii?Q?Xhd7/WIFp4kPF8YHkLOQtllQ4gh/jpGYgDBmXvtYSK23eEqkupXEHT9PsKYD?=
- =?us-ascii?Q?PdiOqCYFUq4IcO6Xa+O9pFgV/LUFdVZtDM/crPtcUu/Tr91j2UCvJl0vNIz9?=
- =?us-ascii?Q?rXtrUKLub3jiuQ7+4v6xX/NplwhZaMarEXWkcUCkdfU9oMx5IXuR3eIW2Ysw?=
- =?us-ascii?Q?GRA+7VRoeGE4gXCYC+bA8vQWTBwkZsClIM7P9PR0ozNho31mavZrU174XmnO?=
- =?us-ascii?Q?rjs68cytBWxcPNciz1LsJLaYA67R4WL4Of92eqVFHheCxq1jFoqj6gli1ogj?=
- =?us-ascii?Q?wm0SJU0I3YBo1O2utWyyxrK309QOnwusdK3mJykyutfhyxq1gHgtTkoORmmx?=
- =?us-ascii?Q?2gtvShm25AzfvM2tb375njVSF6WSllCx6ZsPGEYQxrAknngBIj20Znk8O2M9?=
- =?us-ascii?Q?KLAVbPPrLAFLBFBzmOpMUXZhejtt5GCMCbWGMFVfghyY0jpQx6xUcEfvAXZG?=
- =?us-ascii?Q?ZRaLPMI4Xs/3yynTKoS/e3E5H5gZntNDHnVMRjpEoisiN/AazZ50mQyBlr2a?=
- =?us-ascii?Q?a56+pBwNuuMcVycm9KjghI2rdk3hetkzK3YLRr8OTQzNVvo8LdYhGBCd4nUt?=
- =?us-ascii?Q?FXCUj1C7Ya4B/QKJMnNYAQXJ4aZdOnq+GCJ+x32cgBseDHmCnSZqQsYqecVo?=
- =?us-ascii?Q?83mFd5MQcdXHA92jNSUwofgZzE3NdUotgWtxUoWHZ7MSMBPOtQhUFF1RCUJi?=
- =?us-ascii?Q?/OZ1fcwvm45G1iTr/KrhYWgQjJpXDDhvm5v7z8QTvorfxeQQU7p68DxiGrQ2?=
- =?us-ascii?Q?xLqoXd1+pMgtUbpJ+VK2x0vVq6ypQuNsDdrlic7EjbS7aMmzYU8RNse5rLAv?=
- =?us-ascii?Q?77iwp2ngXZjR9kxFaIfAVIMk/vCpmhumxHUV6futAQ92YcIH?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C39B283FD9
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 02:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768445119; cv=none; b=reViYgQIIzfnQ1r1aSeKCq0IfUbHF0ApbGJsjRh5kbMXjRgZquNiQ7cbGbw6s4L39sexCoKusu0jGoedz/KH9s8yxmbT/CYF50l1ytNPm8T8ZP82NLjLVHsoy3vHBuXlcF0fjSREuPm9XfptCjceM8fzGUIo8QuelwDaBnAltsY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768445119; c=relaxed/simple;
+	bh=FyYtlOLn2WmoBeGCZCwdnfekhJBHi+NNevlSx7+iXxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tb/V1BGZU7TRQSStqvxmSLJ9o2XsX3bQApVlHp8sRN4lHMp6lTtXzOtMzEN4/MZ+XE0M1FbBqkaB+l1l5GjxtpY8ZnDwMiX9nta4pH29SI9g58GU5EmAaCBjX9/I8C6p8YKt7cAPCTv5ekpPEijRwC0VGtX+yHQhvEeed7BOR6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWNjWBYQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF622C16AAE;
+	Thu, 15 Jan 2026 02:45:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768445118;
+	bh=FyYtlOLn2WmoBeGCZCwdnfekhJBHi+NNevlSx7+iXxM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iWNjWBYQokOvEPcgdNqId7u7aq1CaBXulRsYXHmPGBY8JcPcc48OgYtd9zo++abvm
+	 vWX1yQv73rSVfh/NTLFem3xgop+DN6pQRo/hnyTUUnoO6Wy7QriZy8eKTHErw4ZxN9
+	 Io+j0B+NzGstVX3PQgm4hfZMMBUAQt7MzRfyIM1XwZBo0568OXTTzFiGQFYyG0EivY
+	 89XNoZCPyMx0dH6uH2rqyqqR5dbyaPu2Zj7zrymfBl0fkSJU8zMaFajNW7SwrVIt+P
+	 KXxvY4itq05IOScD831jhsqKK62FG2eAv3oN7dlzyCOH1v1Ogl/Zxwp/dALIzEdPgq
+	 QNgQIeaxMlfKA==
+Date: Wed, 14 Jan 2026 18:45:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [TEST] amt.sh flaking
+Message-ID: <20260114184517.281a816b@kernel.org>
+In-Reply-To: <CAMArcTX97OGA7HXwUQk3MPdhrJo_LfNzi73XDZEKZyBbUEtwHA@mail.gmail.com>
+References: <20260105180712.46da1eb4@kernel.org>
+	<CAMArcTWF12MQDVQw3dbJB==CMZ8Gd-4c-cu7PCV76EK3oVvFXw@mail.gmail.com>
+	<CAMArcTX97OGA7HXwUQk3MPdhrJo_LfNzi73XDZEKZyBbUEtwHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66bbef33-7cb1-4145-5042-08de53dd98c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2026 02:27:14.8957
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yM6QzTPBzkfni+auhTIOjlTtazJFGy8rWVvS7+uhIxVkaeC6t/Kt5vS7j3XHKBYavkEfhGhqIV99m76JmwU9nw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9347
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> > The tx_buf has three types: FEC_TXBUF_T_SKB, FEC_TXBUF_T_XDP_NDO and
-> > FEC_TXBUF_T_XDP_TX. Currently, the driver uses 'if...else...' statement=
-s
-> > to check the type and perform the corresponding processing. This is ver=
-y
-> > detrimental to future expansion. For example, if new types are added to
-> > support XDP zero copy in the future, continuing to use 'if...else...'
-> > would be a very bad coding style. So the 'if...else...' statements in
-> > the current driver are replaced with switch statements to support XDP
-> > zero copy in the future.
+On Wed, 14 Jan 2026 20:55:29 +0900 Taehee Yoo wrote:
+> > > TAP version 13
+> > > 1..1
+> > > # timeout set to 3600
+> > > # selftests: net: amt.sh
+> > > # 0.26 [+0.26] TEST: amt discovery                                   =
+              [ OK ]
+> > > # 15.27 [+15.01] 2026/01/05 19:33:27 socat[4075] W exiting on signal =
+15
+> > > # 15.28 [+0.01] TEST: IPv4 amt multicast forwarding                  =
+               [FAIL]
+> > > # 17.30 [+2.02] TEST: IPv6 amt multicast forwarding                  =
+               [ OK ]
+> > > # 17.30 [+0.00] TEST: IPv4 amt traffic forwarding torture            =
+   ..........  [ OK ]
+> > > # 19.48 [+2.18] TEST: IPv6 amt traffic forwarding torture            =
+   ..........  [ OK ]
+> > > # 26.71 [+7.22] Some tests failed.
+> > > not ok 1 selftests: net: amt.sh # exit=3D1
+> > >
+> > > FWIW the new setup is based on Fedora 43 with:
 >=20
-> The if...else... sequence has the advantage that the common 'cases'
-> can be put first.
+> Hi Jakub, Sorry for the late reply.
+>=20
+> The root cause is that the source sends packets before the connection
+> between the gateway and the relay is established. At that moment,
+> packets cannot reach the listener.
+> To fix this issue, the source needs to wait until the connection is
+> established. However, the current AMT module does not notify its
+> status to userspace. As a temporary workaround, I will send a patch
+> that adds a 5-second sleep just before =E2=80=9CIPv4 AMT multicast forwar=
+ding.=E2=80=9D
+> After that, I will work on adding status notifications to the AMT module
+> and to iproute2.
 
-Yes, you are right. But for the current situation, we cannot determine whic=
-h
-is the common case. When XDP is not enabled, there is no doubt that TX
-packets come from the traditional kernel network stack, so FEC_TXBUF_T_SKB
-is the common case. However, the situation may be different when XDP copy
-mode or XDP zero-copy mode is enabled. With AF_XDP support, there will be
-five types of tx_buf. So there will be five branches, thus I think using a =
-switch
-statement is clearer and more readable.
-
-> The compiler will use a branch tree for a switch statement (jumps tables
-> are pretty much not allowed because of speculative execution issues) and
-> limit the maximum number of branches.
-> That is likely to be pessimal in many cases - especially if it generates
-> mispredicted branches for the common cases.
->=20
-> So not clear cut at all.
->=20
-> 	David
+Sounds great. I don't think that a single sleep 5 in this test would=20
+be a big deal but of course having a notification is better if you have
+cycles to implement that. Thanks for looking into it!
 
