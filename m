@@ -1,131 +1,101 @@
-Return-Path: <netdev+bounces-250007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE05D224E5
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 04:33:31 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A26D2252A
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 04:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40C3E3016DE3
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:33:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 67E4E3004284
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 03:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D822798EA;
-	Thu, 15 Jan 2026 03:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CB127A92D;
+	Thu, 15 Jan 2026 03:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NP072mEy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fjXzblx2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50822175A5;
-	Thu, 15 Jan 2026 03:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D61119005E
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768448008; cv=none; b=q4Is2tyRZAGbycoOprqU45V/33r8AqUah3Feih7QAT6HI70yZjjIDu/FBwRiGCh7UXmx6m/iunjObSgU2nrMY1GjO0UaXe+wxJfJNVcEdeLvYrMqEmbOKmQRPQRAzPg6/YtjVQcnD72EZuQFAVbwKs0HuA2mU/SRomDJLlxPa5I=
+	t=1768448447; cv=none; b=bfB/4cOU/SAS0f/VoSXzQCWXrg9P5MSqzICJQTmB/ZxbiLr8e96tlNxmO3g5ZHG7hjb1CtPuU/r/Bne50mAE3qp5us3ezfzdtW0NIbYIanxrI2bjQJcJt1FXi7hxugo4cxyHAhPvb7o+3wMBLPCK743p1+NLnPfTFaL+M2MeJ+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768448008; c=relaxed/simple;
-	bh=8Ymc27CFNVZ9pjs4dlypKvNfcqUnbSbMf8iST/L3RDI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oGTzNdsYRX+Y4Hkl9yz4BD25mc0Y7ivNxut+Iru4M6QrhXTU6GkV8KCXETgfC1aVDeVW7ooIcQ3TmCumfPa1AWSxWXMuEiSNbVcHZvn0tAAsmkjzyZ7Em8g/YSAvKsayotufgXjHbeSBH1659bhLJ3IS88KM/yqL01+GAdjZG28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NP072mEy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506A3C4CEF7;
-	Thu, 15 Jan 2026 03:33:27 +0000 (UTC)
+	s=arc-20240116; t=1768448447; c=relaxed/simple;
+	bh=hDBGVTyt4F8UY7TLWnOaX0uq6tkYegGp+x5a8VYBpqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mcUh5VNctgCwcmTU+/K2CsXxmw83GoXXBLhDTF+akE3Ob/0GFKXDH+7jUzlMTcux2ZkuFGlQDc4lfVvh/iJ7Ewa77Hfxocm1MrjYl/DbVVmEgTEcDEUIgcKAg6ULSMU0ftT99lGbNXleutiNlXvGMEAKBnY7ix/6XS85GTF/mLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fjXzblx2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A225C4CEF7;
+	Thu, 15 Jan 2026 03:40:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768448007;
-	bh=8Ymc27CFNVZ9pjs4dlypKvNfcqUnbSbMf8iST/L3RDI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NP072mEyDTP0cKPX4iQ/zWTo3ZK02QGLeffLuBEclBtAUkssE7NRMPgmepfgrMpiu
-	 gQMQeqvNsp0jivjf2O/hFQWYjcEOINzpjfhxsT3zsE1xtC1cdq3qXb1iFmIugexGa0
-	 OmrJCxIxw66q8ha/WR7RFFECub/G92MGylWBj4ccZHr3FtUR8Z+cXZS7UUXf1+N1Yg
-	 MU//GxOW8E4W9g/DvQpwOroZI2fIC87Tgt9Lk6RWGkAD4pkjOS+rHqy5+oyd3IBTid
-	 sIZC5gF2UQ3JmVMhDGDVFadYCZ0/3MCzSlZMK/wuMx/a/VECNe6RYtXRVYKbVz0o/I
-	 BRdcSiHbivpiA==
+	s=k20201202; t=1768448446;
+	bh=hDBGVTyt4F8UY7TLWnOaX0uq6tkYegGp+x5a8VYBpqQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fjXzblx2fpekphJSXRFO3b18HOOp9wcWsPfaYI02f3faqGKWwvvfCwzsmvs+AhZxs
+	 NOv1LnFsXZHhvMnZjCNpxrAFV5ItuiaAkGdbdAtbyszlraW82MvMJGKClv0l8sL2/v
+	 5z08RTZQ3OpJZi9ybjLsHfwhX1xMyYA/azZvjw/wE9YGgGegk4Fdx4NTsvqNhP6AO2
+	 s4VkzM6vZ9ZVRJXXOU/dtP8lkSj4AI5HmqJ+4wBhb3FPU8qUOb5yi0Gf0AC5+tma54
+	 zhwwS2B6VP8fUI0kAF2YV20lsbJz31bWSaeLChRiJikmpl7qhOubOamn+gxDHdGHMK
+	 imtofVjjzu5tA==
+Date: Wed, 14 Jan 2026 19:40:45 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: fushuai.wang@linux.dev
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	vadim.fedorenko@linux.dev,
-	Jason@zx2c4.com,
-	wireguard@lists.zx2c4.com,
-	wangfushuai@baidu.com
-Subject: Re: [net-next,v3] wireguard: allowedips: Use kfree_rcu() instead of call_rcu()
-Date: Wed, 14 Jan 2026 19:32:37 -0800
-Message-ID: <20260115033237.1545400-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112130633.25563-1-fushuai.wang@linux.dev>
-References: <20260112130633.25563-1-fushuai.wang@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Tom Herbert
+ <therbert@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net 2/2] fou: Don't allow 0 for FOU_ATTR_IPPROTO.
+Message-ID: <20260114194045.2916ef4e@kernel.org>
+In-Reply-To: <CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
+References: <20260112200736.1884171-1-kuniyu@google.com>
+	<20260112200736.1884171-3-kuniyu@google.com>
+	<20260113191122.1d0f3ec4@kernel.org>
+	<CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least pausible.
+On Tue, 13 Jan 2026 23:15:42 -0800 Kuniyuki Iwashima wrote:
+> Btw I needed the change below to generate the diff above
+> by "./tools/net/ynl/ynl-regen.sh -f".  Maybe depending on
+> 
+> 
+> diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
+> index 81b4ecd891006..fda5fe24cfd47 100755
+> --- a/tools/net/ynl/ynl-regen.sh
+> +++ b/tools/net/ynl/ynl-regen.sh
+> @@ -29,9 +29,9 @@ for f in $files; do
+>   continue
+>      fi
+> 
+> -    echo -e "\tGEN ${params[2]}\t$f"
+> -    $TOOL --cmp-out --mode ${params[2]} --${params[3]} \
+> -   --spec $KDIR/${params[0]} $args -o $f
+> +    echo -e "\tGEN ${params[5]}\t$f"
+> +    $TOOL --cmp-out --mode ${params[4]} --${params[5]} \
+> +   --spec $KDIR/${params[1]} $args -o $f
+>  done
+> 
+>  popd >>/dev/null
+> 
+> 
+> fwiw, $params were like
+> 
+> 3- Documentation/netlink/specs/fou.yaml
+> 4: YNL-GEN kernel source
+> --
+> 3- Documentation/netlink/specs/fou.yaml
+> 4: YNL-GEN kernel header
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-wireguard: allowedips: Use kfree_rcu() instead of call_rcu()
-
-This commit replaces call_rcu() with a custom kmem_cache_free() callback
-with kfree_rcu() to simplify the code. The change affects how nodes are
-freed in the remove_node() function.
-
-> diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> index 09f7fcd7da78..5ece9acad64d 100644
-> --- a/drivers/net/wireguard/allowedips.c
-> +++ b/drivers/net/wireguard/allowedips.c
-> @@ -48,11 +48,6 @@ static void push_rcu(struct allowedips_node **stack,
->  	}
->  }
->
-> -static void node_free_rcu(struct rcu_head *rcu)
-> -{
-> -	kmem_cache_free(node_cache, container_of(rcu, struct allowedips_node, rcu));
-> -}
-> -
-
-[ ... ]
-
-> @@ -271,13 +266,13 @@ static void remove_node(struct allowedips_node *node, struct mutex *lock)
->  	if (free_parent)
->  		child = rcu_dereference_protected(parent->bit[!(node->parent_bit_packed & 1)],
->  						  lockdep_is_held(lock));
-> -	call_rcu(&node->rcu, node_free_rcu);
-> +	kfree_rcu(node, rcu);
-
-Does wg_allowedips_slab_uninit() need to be updated to use
-kvfree_rcu_barrier() instead of rcu_barrier()?
-
-When CONFIG_KVFREE_RCU_BATCHED is enabled (the default), kfree_rcu()
-uses a batched mechanism that queues work via queue_rcu_work(). The
-rcu_barrier() call waits for RCU callbacks to complete, but these
-callbacks only queue the actual free to a workqueue via rcu_work_rcufn().
-The workqueue work that calls kvfree() may still be pending after
-rcu_barrier() returns.
-
-The existing cleanup path is:
-  wg_allowedips_slab_uninit() -> rcu_barrier() -> kmem_cache_destroy()
-
-With kfree_rcu(), this sequence could destroy the slab cache while
-kfree_rcu_work() still has pending frees queued. The proper barrier for
-kfree_rcu() is kvfree_rcu_barrier() which also calls flush_rcu_work()
-on all pending batches.
-
->  	if (!free_parent)
->  		return;
->  	if (child)
->  		child->parent_bit_packed = parent->parent_bit_packed;
->  	*(struct allowedips_node **)(parent->parent_bit_packed & ~3UL) = child;
-> -	call_rcu(&parent->rcu, node_free_rcu);
-> +	kfree_rcu(parent, rcu);
->  }
--- 
-pw-bot: cr
+Hm, I guess you have grep.lineNumber enabled in your git config?
+Could you see if tossing --no-line-number into the git grep
+in this script fixes it for you and if yes send a patch?
 
