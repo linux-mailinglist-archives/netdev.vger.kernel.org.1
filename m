@@ -1,145 +1,112 @@
-Return-Path: <netdev+bounces-250246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C0FD25B3F
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:21:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 697E8D25BB4
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1EF7F30C3684
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:15:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D95330533CE
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811AC3AEF54;
-	Thu, 15 Jan 2026 16:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C3D3B8D61;
+	Thu, 15 Jan 2026 16:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hILxpg2e"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="fS91y4AN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from outbound.mr.icloud.com (p-west2-cluster4-host6-snip4-10.eps.apple.com [57.103.69.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE752C3268;
-	Thu, 15 Jan 2026 16:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636453ACF1B
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.69.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768493748; cv=none; b=Xvfk3bKYld9yEEhlAgkEYhC1FK+9oohD04iiNMpsTJPynhWpem9bCG0Gn4Hn7OtvUa1WIUEebNPB6WgmpBty/Vy1ZhLV2fIMak1tnxFU1mi5hb3L7X1kgs0YD8VnZ3fNMLw0UG7bejazzZu84DA4nwXxXqW75rTxJPJGtOMyY48=
+	t=1768494068; cv=none; b=CTLlUKyTPMNv/xVhVmkERGUFFKKXPx+jjIooKQ0Sjvbr0y8IxLUrZ0Mkj2BNJfEIALmIaZ/BypXm+ukJHTk0Wgc3ZCNBwUg8eyFBfWePLlZoawt3hT3B0MbyW1zlKjr44Cbilt1s5dwPmQ/tVXr11KHVx4l72s8qNZWUR+z1kXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768493748; c=relaxed/simple;
-	bh=ZGpnvg+G3xAAeLZmH9mflMH1HBmSgd8ebhhvzQYVWdQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TSK/ozz55Uk4NAmtUYv7DLsq4U4OUHMUcU2SrZ1VN5OI7eEGv2w0HajnwFkJBrtobt5jabesD58X9btQeQnW5oNN6AE5mxZqFEmkrJA6qLLV3cmLQPRS7g92Buul+ysqD2n49M1WCBf8Ft/5Xg31pb8TuqvSlkiaOPmp7zMx/Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hILxpg2e; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768493748; x=1800029748;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ZGpnvg+G3xAAeLZmH9mflMH1HBmSgd8ebhhvzQYVWdQ=;
-  b=hILxpg2ebIJEPOaMP11liWzN6MSF51uyLjUemBZsQRh5fiTzOIWWncEZ
-   mEc74br39rVHq2VtwnYZwOU/MyXMNlLinhBNkrtFtUaxxzt5Wm+dn+9Ba
-   Vp/XoXW4pW2vEz6RfIPs+tMvMZ7TVn7gyrf+uPZ+q1emCd/fNx2qdOlrI
-   +Plgh4J6564GgUSgboAdiqOWBjxaEQ0lD7HfslBGxV4dGsnB+z3aPBcjb
-   5V5TCMdbJOA0DtyZ+9aIhp11Wcy6WMQ6N50mZCy7miWuPxy2iN/hAvsIZ
-   qUfzShk1jhPR2Dm4XjNN0ZH5/31V3bhzLaBwwR8Bc0T+a1Qto9r8H9mTi
-   A==;
-X-CSE-ConnectionGUID: i0ymt/xQT1SerYjYJjRaLg==
-X-CSE-MsgGUID: mNXb/g9FR02n2xai9oEPPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="81248013"
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="81248013"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 08:15:47 -0800
-X-CSE-ConnectionGUID: X31GgfJ3T1yqTw0sVy2s7g==
-X-CSE-MsgGUID: 4qmu4v/zQPCgxRmKYHmqsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="204603476"
-Received: from junjie-nuc14rvs.bj.intel.com ([10.238.152.92])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 08:15:43 -0800
-From: Junjie Cao <junjie.cao@intel.com>
-To: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	linux-wireless@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
-	Avraham Stern <avraham.stern@intel.com>,
-	Daniel Gabay <daniel.gabay@intel.com>,
-	Krishnanand Prabhu <krishnanand.prabhu@intel.com>,
-	Luca Coelho <luciano.coelho@intel.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] wifi: iwlwifi: ptp: Fix potential race condition in PTP removal
-Date: Fri, 16 Jan 2026 00:15:29 +0800
-Message-ID: <20260115161529.85720-1-junjie.cao@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1768494068; c=relaxed/simple;
+	bh=OUyVgq7n6ocw8+tH/ttuc+fcP78f5xqqDzDaGHPrNuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iztWSLyVFmpjLdgbKmL+S2jmXHKu1qblcijdzHzr30U6kP2QpCk947JE6FsQNBVhNAEb995gxBxpf8dxo8DrSTSOKyV5Tpwis7+m01V+185YMWEnIooobW9o/5WFxUx1M/72ri42FbwZmdj2rWwDVTUtMpercZHhszgrhB/Aj3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=fS91y4AN reason="key not found in DNS"; arc=none smtp.client-ip=57.103.69.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.mr.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-2a-60-percent-3 (Postfix) with ESMTPS id 1A444180011D;
+	Thu, 15 Jan 2026 16:21:04 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=aH808W6yiWKX0lcyGYLe3fnalzSmDYO3ZMB253efdQw=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=fS91y4ANhGYo7yPgIAtx6NESup1ZJGceGTWF2IXmsVWXZY5AucfX5tQHfs5Fn9YmQeTCLkC+xhoOhYrdSipkFyJQgM/83Yh/ywqA0oNz4Ta8mzW6GGTy4zGiXLF9U2zOtpPTKI6geWtFd1zoSJa8KMerxyXFtd1xaPaFuefGLP/3QafqiBN/Jem5wMgwRjmgIhXIdfsoCaZVV8tb1X2j8rcb9wYi0BJ9vGv8nRV0Tp5kofPnbIgCEgIaXTY7V7P0Y74qaLDLc+GVorlRk3XfC8tPGIjQpE4UT+58vqHJwRlagDCJ43UPagXqjCYnqH/3FwhGT0WKxgpXVKU2cif0TA==
+mail-alias-created-date: 1719758601013
+Received: from desktop.y-koj.net (unknown [17.57.152.38])
+	by p00-icloudmta-asmtp-us-west-2a-60-percent-3 (Postfix) with ESMTPSA id 53EC118013D6;
+	Thu, 15 Jan 2026 16:21:02 +0000 (UTC)
+Date: Fri, 16 Jan 2026 01:21:00 +0900
+From: Yohei Kojima <yk@y-koj.net>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] selftests: net: improve error handling
+ in passive TFO test
+Message-ID: <aWkRvBz734sa_1vV@desktop.y-koj.net>
+References: <cover.1768312014.git.yk@y-koj.net>
+ <24707c8133f7095c0e5a94afa69e75c3a80bf6e7.1768312014.git.yk@y-koj.net>
+ <1696424e-2092-4e47-bd4f-293e2992056b@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1696424e-2092-4e47-bd4f-293e2992056b@web.de>
+X-Proofpoint-GUID: Y5j5UaESNPWUHeIKiSAldqreB0UtguRO
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE1MDEyNCBTYWx0ZWRfX6PHlrvHZ3Dz2
+ 7HEBRVJ3hsWICYlYguvKPxyxFgLEIMZWneK9OZ2B8PyZ1w1W7zc6smiA8TDWZjHs+Ymu85j8Xmz
+ kLHDbsGei0vUk6YdOnaJ8Rv877ncQcKKfxCxMEhORHwkYdtPZw+DBFjv6oVxdljkVUSiV+rRjJq
+ MwBikyLGEOHy+R5zxLPIKH0PRGpH/ypE1EdSdhpbDpMQflYUXDi7OGyYOSR9FhRxbrtZnuG61SZ
+ Zq1CJDz9FpQfauPoG35rmLwcsJrm/pu9jQrQ/+xfToVGH8iKvfrApbZRbaykAeAaJs3JAA8/dMA
+ oiYkwgNUjlkDSPBDx9j
+X-Authority-Info: v=2.4 cv=bapmkePB c=1 sm=1 tr=0 ts=696913f2
+ cx=c_apl:c_apl_out:c_pps a=9OgfyREA4BUYbbCgc0Y0oA==:117
+ a=9OgfyREA4BUYbbCgc0Y0oA==:17 a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8
+ a=qKQrQ7_CLwTn8uSwdssA:9 a=CjuIK1q_8ugA:10 a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-ORIG-GUID: Y5j5UaESNPWUHeIKiSAldqreB0UtguRO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-15_05,2026-01-15_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 mlxlogscore=771 spamscore=0 clxscore=1030
+ suspectscore=0 malwarescore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2510240001 definitions=main-2601150124
+X-JNJ: AAAAAAABetAzsSZ6/ZjHiPzpY9p5fLxX3cLwYCfpINjrrjGCVem46SQ0ppjb8Em7W+WyglCjc6BiJF35by0x9gA3/ARjj4IAqqBNiyyiW57El1mqVPmBI9pbbUdZgwccgpfbIavn0YKio8wV1AdsU/Yxny/o6LeE8P8ks4V6EwucBipZjiBRV0V4NSivMZKyVVAjvQIemah1ca7q63jwctQ3hzmPUXPq2AbCEvbd4R4oPR1ILUXUIXFC/eSFWpx2cs8OQwogxUsdnZR2duRGIQ1dkSKJyLdVg8iRfp8orKwmQxhHJYLrn8QCHdEUa58f87GHgS9zApMGf5RJOpRZlSLDOXWVoyUKqggPLAgnMQmh4W147gTU9IfA0iuF2gld25SXECmpaqxGAwqBEL2q1E4Pi3/uNpQraFVa2U+pvoo9biiaeoF4VjWcxnrucp5uHcA/k6MkljhjQD1Kj3FLE/rtirzUspyaLwlr7VOQzwQqdRHJoQxuypjtm6iWpq2zy9lPik2hNIBcQ/uND/xbfXujU/HmhhzosN48jjhO+RkWos7mNgPAr6r7pPsCR+0ukXEnvw87dpXpTbGsA/fdUMRELyeOWgVF4gM5Zy18fl/fPYRMd+VRssMJlZLG3Ey9kOxENriR0N8Sl127CBeZrxISdm7Aplww1/UJg2LZQK+j9ChAN43FdeXVKhcWT7qbjEvP5F+OO6WE6oJwrDIxxWIlJv2X6c4ZnUuAY27PH/CAOrJUYU1nInw1Y9A+1WQArEs6v9N+Ceew4wYJQg==
 
-iwl_mvm_ptp_remove() and iwl_mld_ptp_remove() call
-cancel_delayed_work_sync() only after ptp_clock_unregister() and after
-partially clearing ptp_data state.
+On Wed, Jan 14, 2026 at 09:33:12AM +0100, Markus Elfring wrote:
+> > Improve the error handling in passive TFO test to check the return value
+> > from sendto(), and to fail if read() or fprintf() failed.
+> 
+> You propose to adjust error detection and corresponding exception handling another bit.
+> How do you think about to take also another look if further function implementations
+> would be similarly affected?
 
-This creates a race where the delayed work (iwl_mvm_ptp_work /
-iwl_mld_ptp_work) can run while teardown is in progress and observe a
-partially modified PTP state. In addition, the work may re-arm itself,
-extending the teardown window and risking execution after driver
-resources have been released.
+Thank you for the suggestion. The first objective of this series is to
+fix the misleading behavior that was caused by the following bug.
+Therefore, I intentionally limited the scope of this patch to the
+affected or closely related functions.
 
-Move cancel_delayed_work_sync() before ptp_clock_unregister() to ensure
-the delayed work is fully stopped before any PTP cleanup begins. This
-follows the standard pattern used by other Intel PTP drivers such as
-e1000e, igb, ixgbe, and ice.
+https://lore.kernel.org/netdev/602c9e1ba5bb2ee1997bb38b1d866c9c3b807ae9.1767624906.git.yk@y-koj.net/
 
-Fixes: d1e879ec600f ("wifi: iwlwifi: add iwlmld sub-driver")
-Fixes: 1595ecce1cf3 ("wifi: iwlwifi: mvm: add support for PTP HW clock (PHC)")
-Cc: stable@vger.kernel.org
-Signed-off-by: Junjie Cao <junjie.cao@intel.com>
----
- drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+I believe this is sufficient to prevent it from showing misleading error
+messages when the test fails.
 
-diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-index 231920425c06..b40182320801 100644
---- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-@@ -319,10 +319,10 @@ void iwl_mld_ptp_remove(struct iwl_mld *mld)
- 			       mld->ptp_data.ptp_clock_info.name,
- 			       ptp_clock_index(mld->ptp_data.ptp_clock));
- 
-+		cancel_delayed_work_sync(&mld->ptp_data.dwork);
- 		ptp_clock_unregister(mld->ptp_data.ptp_clock);
- 		mld->ptp_data.ptp_clock = NULL;
- 		mld->ptp_data.last_gp2 = 0;
- 		mld->ptp_data.wrap_counter = 0;
--		cancel_delayed_work_sync(&mld->ptp_data.dwork);
- 	}
- }
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-index 1da6260e238c..2b01ca36a1b5 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-@@ -325,11 +325,11 @@ void iwl_mvm_ptp_remove(struct iwl_mvm *mvm)
- 			       mvm->ptp_data.ptp_clock_info.name,
- 			       ptp_clock_index(mvm->ptp_data.ptp_clock));
- 
-+		cancel_delayed_work_sync(&mvm->ptp_data.dwork);
- 		ptp_clock_unregister(mvm->ptp_data.ptp_clock);
- 		mvm->ptp_data.ptp_clock = NULL;
- 		memset(&mvm->ptp_data.ptp_clock_info, 0,
- 		       sizeof(mvm->ptp_data.ptp_clock_info));
- 		mvm->ptp_data.last_gp2 = 0;
--		cancel_delayed_work_sync(&mvm->ptp_data.dwork);
- 	}
- }
--- 
-2.43.0
+Thank you,
+Yohei
 
+> 
+> Regards,
+> Markus
 
