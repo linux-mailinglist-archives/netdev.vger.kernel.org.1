@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-250133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E984D2446A
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:46:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85325D2440E
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:44:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A71130C70E8
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:41:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0D852302662C
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F0037E2EB;
-	Thu, 15 Jan 2026 11:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B869537BE81;
+	Thu, 15 Jan 2026 11:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="bgojcElQ"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="X4SS80b0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0947D37BE67
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE58F32D0FE
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768477296; cv=none; b=sa7UMPvlGecATmUHeZRL1SnBo28cihpb1WYDdUBqoHFieaSjU3V9bMqEa6dVXJyilbUK2kESr3Jy3yG8jGRgwqpvJTcvCGN3XpFrL3pdMzLDOd67ko50+jbDlmhPfW4siuSmMQX83uIxqhn+t9XWQvpE6yqdwgtWIv5orzTCm2A=
+	t=1768477307; cv=none; b=Zi8wNxOQrbK5k8oypjX2mPpgnAl814/tARXdNo1qrnq/G8Ml5SPvSdxMOwBYCEtzj1/DS7wQEWooB+HYTfNK47A/j+gxSYrkn1AL9x6IZLhbqkmtJ6N+Rt87KOohZE/eEZsCx6zIGzIfWC/hWpmWejiJvLdIpIP44QGFUrEA6lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768477296; c=relaxed/simple;
-	bh=kGLAInhaNaEk5rc2QTU8x+5FcCE5pgYroSfVZcUveHk=;
+	s=arc-20240116; t=1768477307; c=relaxed/simple;
+	bh=W+QV9C9LHAzf4QB2GSUhSEPEUZtyrpGoi0KP634dsE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b4qsNE2kevDfjdQsFbcNCnHHi+BuvCqT/LzlecS9zeEOfQr5lI0f6bZzZHuHY9TPxRUGUWJCQ0mgEbn+eq2tkuM7jP2K4MCDpVsqtaTZm4wRmSz36NJO8BSK2yCY/embHS7stvFEeRfp3JWjQHl7fprxdXumTWlbAIex66qSMVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=bgojcElQ; arc=none smtp.client-ip=74.125.82.42
+	 MIME-Version; b=AWA93VESiEEClEDSFYfUyMCvF4Dsptpv6g4kaOFURJ5Tou5ioTpNBMcEaa/cIOxHTZCuzb8ywd+0jRRpgr5TkTQb+WzjwPRa7JtCIci8cxBQCqTXlTW6ugDuEBCiYI8jdpQ0SKUAOJJ7DUJvQNr+qz/00ShoGdOWUIC8DunVYHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=X4SS80b0; arc=none smtp.client-ip=74.125.82.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-1233b172f02so964728c88.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:41:34 -0800 (PST)
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1233b953bebso1972773c88.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:41:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1768477294; x=1769082094; darn=vger.kernel.org;
+        d=sartura.hr; s=sartura; t=1768477302; x=1769082102; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A6Hh4x4yU6+a4AjWH4xSBmP3UWp5wIhlMj96VEo5V8g=;
-        b=bgojcElQFKHWk8J2QDM7bzI7VeTyPtMU5yByyGLHBGEn0Yzh6BeApsylOLgTpadW4C
-         KTO1oV5OARVmQgoUL2M7aMX8JxJbTyaGXnuY1QlkT9ZTwtT4DFVNXsbB7oM/L3ESDuh+
-         IVs1btTKYgCKpoOZMrBCkWDrae+Qk25O2wHtNBudsylq5Gdj9fYDS2GIRpqIIdBYA2jF
-         hsfBZOtSrnv2D+T1AfKZxKG/klbK0DitTvy5qNG9gy1RmjLb/J+wl2WooBVlzq4LRMJP
-         vwoW4R36Rj15ZIavj6NtwxzN41g92CfBvH2dEcieMaVZeOXyIIIJw137E7xK7o4Zmtrc
-         sZTA==
+        bh=kAdbCRbsqzDYxcrWyLexTRwdzkjkGo4bv7BLclwMV3A=;
+        b=X4SS80b0huM9CAiIvW+ylEwE28WiAjmhUbq5F2AdF3MXhCiIbkBgKvZzwFSq10rKqh
+         /FpW1gjkYt4TdAfTHJowdxaMHjS4WQwg4GermFdyomF+8Kih0w98egom3VROQ9UHZgV+
+         v24e526IhJWFC0reGIuU7LaJcrEeERrPQl5nYWptr4Jci+heSFItP2P1FC9nqIgVhHzz
+         fQAdjZPTxD2+aBreygbmvr/ycBIZbN7hfUkSS8JsFqFJb0nuVTPpUGlACxVW0MywZSpp
+         cT7WS6cpLkcfp/x/exhINq/56NTWNkvmus1YqpYgrNS3bkjdxaWlrgfSAW8snDXdNfhQ
+         KhxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768477294; x=1769082094;
+        d=1e100.net; s=20230601; t=1768477302; x=1769082102;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=A6Hh4x4yU6+a4AjWH4xSBmP3UWp5wIhlMj96VEo5V8g=;
-        b=Uf9jy2Pi9a99eeoWIh4z3rkRO3yhR5/dDy/Qs7f/BPrMbP76YTcIWgYoqeQRb9rbfg
-         1ZBBpJ0TXEhtOcIbefFuU1t6qR+mSTIxcnCfGhz+0NP08nvaoEJcDNWv9HyXhH7wLN0Y
-         /tINtqOrjnKONnjvQZeyQKe9MAKLBcMG5aV+XYqpT0hVgi29U3iokvtA/gDOaW01djem
-         xi6PSYNzZoa83+E8yU46g/ehz4Dui+5JPXKRezUtmf+50qGD9APE0+l7sSnnbq3UDllr
-         nNJB4Xfq+FJm22MH/g6gCv4H2IsXxc6xa2jNp9l5IB9jJqN2aPi+Ic8pv5a/iYUsZk/5
-         9Dgg==
-X-Forwarded-Encrypted: i=1; AJvYcCWHSW6f3J05Atian5sM6gIlJc+oK4Sb4Q81iEV21NpgdHVvTADYHLdOWI8Ew71syCTD4qTNspo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcF7FMbcBHxLJvQi3HN2icI+cQGYSeI+XGuBZobTM8F58hNwFs
-	eSCZhK744WcydjeUSI7J+mJo4O+F471Z7JshdGwAeOo2gsAz1+7oh4GIrOdR8mM5p8E=
-X-Gm-Gg: AY/fxX63UgPtuDwAHcRUz72VuqsoFXkZqn6v+Pr+9M8zHHeP0X0S5Fjjjc0G0gbE9FA
-	+9wPuaj+DnF9jSiKv4VQLzbR3DJqilB+36NqJ7sks7AWhKwrH6qrEcscfz5kQNrCO0T4lfMpCn0
-	JZrwqEtagyBElKax1359k2e6sk37Ill++dFS02XVJfDCPLveVHpzwA0B57r0DSNvDd5NX0miT7H
-	CuH97qU7BxydYD1j1e0CNDHr7dv3+6Mg+KIcy1CcOMOdGTrv8zr1zUgA/dZLr3xhfbKB/t2gnES
-	JX+7jsHLHGuk1fUcV5Zb9Y3Re8VLTaRct0C3ZbGlGYV2wUNAfqwyOXNZ0K2kyPl3x3LuMHIxf+Y
-	2YMxRK3TWWSBm4hYcfHAKgag4L68lnvUA2/WQxgzaUaVEl778HscLOgueVAqH5CqGpGs0wxdRz1
-	8yNb7FBrE728qF6oIuDGx+FNI1AwkPly/RVIbXVNzjHyrxtdjvMypVh5Cg1LzH651Eia6Ou5we3
-	0wBZn2t
-X-Received: by 2002:a05:701b:220b:b0:119:e56b:98bf with SMTP id a92af1059eb24-12336a82526mr5837069c88.38.1768477294058;
-        Thu, 15 Jan 2026 03:41:34 -0800 (PST)
+        bh=kAdbCRbsqzDYxcrWyLexTRwdzkjkGo4bv7BLclwMV3A=;
+        b=oTSLtmGRzRyTh4lg4/qBzAnEZn/519jF3wWPLoQsRVQLzvHXb9ir7/ovpQF7BLsybm
+         uTcKAMs2GT5/r3hy2FRXkaK/7A+zH1t83l/SGlog9MIHARUr1Omx84bV5UaBRjAIEoJW
+         6AlcFqZOAr9XnV04WytBfGTmkqZU51bp6pfL9+8Ss1VFIWw905O+5hPQQeXh6AIvqoFY
+         kJtZ3H7hp4Y3xZwkngxminT1kzSrQgAIcx82MuCYdfXjOw9IlzW4cVWC72la6tqZBZio
+         sx51x8TsyHZAqBjW5MDdJdZQh3WwcAQmeaOHi9SuAXuNR8CTH/WV0nEY9whyu8qn1MWZ
+         eJhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRsQEDJAPkx/mGBWh9jc6K02gRfvasR0zjaKczXWbLCLiMJOn/0cScBYOZ5qWg4HPQ1aFb4DI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxoRAXvU3V8c9AHbspyUjC/Yd6P30YGPomegILHfpFrXN/eoNW
+	EJNl4kDXnizgmJ13FCAVhs2bUWZdBlLKTkg3UnsVWGlr8FQ64u1S2VXsax84nj255dM=
+X-Gm-Gg: AY/fxX4A/kdjRdKaKb5NOlNGt3xxfubpUw09D5FtdkaXShDki2+sCcdkZZaP2jC/K4I
+	DkOF/XDL8HGmSehXmF4dYzkKakpSn0qSE66+r+phAq+msiSk5OssnJuVDxC9N4F26LRrtiXPkoS
+	QY8QwoPGGh/37naTfOLsPwOqKat7AqmjKbgdX9cKR9SgeUSYR60QIvXqWAJaj0pxHwqM+vb7YA3
+	sEmoQ+oEKtGFMVR8BAnygRE+CmgsM4Z8Rs/ViSrFRDDpeZ3uYp++Ak0CE75EUCoX0/JZMnuM7+m
+	gIQMVJ/R9mIrq68AMc+Vz12x1s25ieLMrte7GKEV/OO+iQRUo4r2QJKXzjXFaWeycv7wAbt6F4s
+	Ypzgd8z5yEhhwRlqyRo/jiTvwIakBDJVXwyEGbTXe3N/IoaQRlhif/ZymwzHjenZDtA2+y4GMAl
+	JVgawEEffdaYpiozjBIfbwvIwDI5nIRgav4hoMDSAts+Y7WTXJ9FoUxCilo0wMUNgvG0aa6/ME8
+	894XmZX
+X-Received: by 2002:a05:7022:f316:b0:11d:f682:e475 with SMTP id a92af1059eb24-12336a8aac3mr6714358c88.40.1768477302029;
+        Thu, 15 Jan 2026 03:41:42 -0800 (PST)
 Received: from fedora (dh207-14-52.xnet.hr. [88.207.14.52])
-        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-123370a051esm4875347c88.15.2026.01.15.03.41.26
+        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-123370a051esm4875347c88.15.2026.01.15.03.41.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 03:41:33 -0800 (PST)
+        Thu, 15 Jan 2026 03:41:41 -0800 (PST)
 From: Robert Marko <robert.marko@sartura.hr>
 To: robh@kernel.org,
 	krzk+dt@kernel.org,
@@ -110,9 +110,9 @@ To: robh@kernel.org,
 	linux-serial@vger.kernel.org
 Cc: luka.perkov@sartura.hr,
 	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH v5 07/11] arm64: dts: microchip: add LAN969x clock header file
-Date: Thu, 15 Jan 2026 12:37:32 +0100
-Message-ID: <20260115114021.111324-8-robert.marko@sartura.hr>
+Subject: [PATCH v5 08/11] arm64: dts: microchip: add LAN969x support
+Date: Thu, 15 Jan 2026 12:37:33 +0100
+Message-ID: <20260115114021.111324-9-robert.marko@sartura.hr>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260115114021.111324-1-robert.marko@sartura.hr>
 References: <20260115114021.111324-1-robert.marko@sartura.hr>
@@ -124,48 +124,522 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-LAN969x uses hardware clock indexes, so document theses in a header to make
-them humanly readable.
+Add support for Microchip LAN969x switch SoC series by adding the SoC DTSI.
 
 Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 ---
 Changes in v5:
-* Relicense to GPL-2.0-or-later OR MIT to match DTSI
+* Pick Reviewed-by from Claudiu
 
- arch/arm64/boot/dts/microchip/clk-lan9691.h | 24 +++++++++++++++++++++
- 1 file changed, 24 insertions(+)
- create mode 100644 arch/arm64/boot/dts/microchip/clk-lan9691.h
+Changes in v4:
+* Adapt to clock indexes now being in a DTS header only
 
-diff --git a/arch/arm64/boot/dts/microchip/clk-lan9691.h b/arch/arm64/boot/dts/microchip/clk-lan9691.h
+Changes in v2:
+* Rename to lan9691
+* Split SoC DTSI and evaluation board commits
+* Use SoC specific compatibles for devices
+* Alphanumerically sort remaining nodes
+* Apply DTS coding style
+
+ arch/arm64/boot/dts/microchip/lan9691.dtsi | 488 +++++++++++++++++++++
+ 1 file changed, 488 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/microchip/lan9691.dtsi
+
+diff --git a/arch/arm64/boot/dts/microchip/lan9691.dtsi b/arch/arm64/boot/dts/microchip/lan9691.dtsi
 new file mode 100644
-index 000000000000..0f2d7a0f881e
+index 000000000000..235e56bebbdb
 --- /dev/null
-+++ b/arch/arm64/boot/dts/microchip/clk-lan9691.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: (GPL-2.0-or-later OR MIT) */
++++ b/arch/arm64/boot/dts/microchip/lan9691.dtsi
+@@ -0,0 +1,488 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
++/*
++ * Copyright (c) 2025 Microchip Technology Inc. and its subsidiaries.
++ */
 +
-+#ifndef _DTS_CLK_LAN9691_H
-+#define _DTS_CLK_LAN9691_H
++#include <dt-bindings/dma/at91.h>
++#include <dt-bindings/interrupt-controller/arm-gic.h>
++#include <dt-bindings/mfd/at91-usart.h>
++#include <dt-bindings/mfd/atmel-flexcom.h>
 +
-+#define GCK_ID_QSPI0		0
-+#define GCK_ID_QSPI2		1
-+#define GCK_ID_SDMMC0		2
-+#define GCK_ID_SDMMC1		3
-+#define GCK_ID_MCAN0		4
-+#define GCK_ID_MCAN1		5
-+#define GCK_ID_FLEXCOM0		6
-+#define GCK_ID_FLEXCOM1		7
-+#define GCK_ID_FLEXCOM2		8
-+#define GCK_ID_FLEXCOM3		9
-+#define GCK_ID_TIMER		10
-+#define GCK_ID_USB_REFCLK	11
++#include "clk-lan9691.h"
 +
-+/* Gate clocks */
-+#define GCK_GATE_USB_DRD	12
-+#define GCK_GATE_MCRAMC		13
-+#define GCK_GATE_HMATRIX	14
++/ {
++	#address-cells = <1>;
++	#size-cells = <1>;
 +
-+#endif
++	model = "Microchip LAN969x";
++	compatible = "microchip,lan9691";
++	interrupt-parent = <&gic>;
++
++	clocks {
++		fx100_clk: fx100-clk {
++			compatible = "fixed-clock";
++			#clock-cells = <0>;
++			clock-frequency = <320000000>;
++		};
++
++		cpu_clk: cpu-clk {
++			compatible = "fixed-clock";
++			#clock-cells = <0>;
++			clock-frequency = <1000000000>;
++		};
++
++		ddr_clk: ddr-clk {
++			compatible = "fixed-clock";
++			#clock-cells = <0>;
++			clock-frequency = <600000000>;
++		};
++
++		fabric_clk: fabric-clk {
++			compatible = "fixed-clock";
++			#clock-cells = <0>;
++			clock-frequency = <250000000>;
++		};
++	};
++
++	cpus {
++		#address-cells = <2>;
++		#size-cells = <0>;
++
++		cpu0: cpu@0 {
++			compatible = "arm,cortex-a53";
++			device_type = "cpu";
++			reg = <0x0 0x0>;
++			next-level-cache = <&l2_0>;
++		};
++
++		l2_0: l2-cache {
++			compatible = "cache";
++			cache-level = <2>;
++			cache-unified;
++		};
++	};
++
++	psci {
++		compatible = "arm,psci-1.0";
++		method = "smc";
++	};
++
++	pmu {
++		compatible = "arm,cortex-a53-pmu";
++		interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>;
++	};
++
++	timer {
++		compatible = "arm,armv8-timer";
++		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>, /* Secure Phys IRQ */
++			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>, /* Non-secure Phys IRQ */
++			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>, /* Virt IRQ */
++			     <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>; /* Hyp IRQ */
++	};
++
++	axi: axi {
++		compatible = "simple-bus";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		usb: usb@300000 {
++			compatible = "microchip,lan9691-dwc3", "snps,dwc3";
++			reg = <0x300000 0x80000>;
++			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&clks GCK_GATE_USB_DRD>,
++				 <&clks GCK_ID_USB_REFCLK>;
++			clock-names = "bus_early", "ref";
++			assigned-clocks = <&clks GCK_ID_USB_REFCLK>;
++			assigned-clock-rates = <60000000>;
++			maximum-speed = "high-speed";
++			dr_mode = "host";
++			status = "disabled";
++		};
++
++		flx0: flexcom@e0040000 {
++			compatible = "microchip,lan9691-flexcom", "atmel,sama5d2-flexcom";
++			reg = <0xe0040000 0x100>;
++			ranges = <0x0 0xe0040000 0x800>;
++			clocks = <&clks GCK_ID_FLEXCOM0>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			status = "disabled";
++
++			usart0: serial@200 {
++				compatible = "microchip,lan9691-usart", "atmel,at91sam9260-usart";
++				reg = <0x200 0x200>;
++				interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "usart";
++				atmel,fifo-size = <32>;
++				atmel,usart-mode = <AT91_USART_MODE_SERIAL>;
++				status = "disabled";
++			};
++
++			spi0: spi@400 {
++				compatible = "microchip,lan9691-spi", "atmel,at91rm9200-spi";
++				reg = <0x400 0x200>;
++				interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "spi_clk";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				atmel,fifo-size = <32>;
++				status = "disabled";
++			};
++
++			i2c0: i2c@600 {
++				compatible = "microchip,lan9691-i2c", "microchip,sam9x60-i2c";
++				reg = <0x600 0x200>;
++				interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				status = "disabled";
++			};
++		};
++
++		flx1: flexcom@e0044000 {
++			compatible = "microchip,lan9691-flexcom", "atmel,sama5d2-flexcom";
++			reg = <0xe0044000 0x100>;
++			ranges = <0x0 0xe0044000 0x800>;
++			clocks = <&clks GCK_ID_FLEXCOM1>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			status = "disabled";
++
++			usart1: serial@200 {
++				compatible = "microchip,lan9691-usart", "atmel,at91sam9260-usart";
++				reg = <0x200 0x200>;
++				interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "usart";
++				atmel,fifo-size = <32>;
++				atmel,usart-mode = <AT91_USART_MODE_SERIAL>;
++				status = "disabled";
++			};
++
++			spi1: spi@400 {
++				compatible = "microchip,lan9691-spi", "atmel,at91rm9200-spi";
++				reg = <0x400 0x200>;
++				interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "spi_clk";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				atmel,fifo-size = <32>;
++				status = "disabled";
++			};
++
++			i2c1: i2c@600 {
++				compatible = "microchip,lan9691-i2c", "microchip,sam9x60-i2c";
++				reg = <0x600 0x200>;
++				interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(3)>,
++				       <&dma AT91_XDMAC_DT_PERID(2)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				status = "disabled";
++			};
++		};
++
++		trng: rng@e0048000 {
++			compatible = "microchip,lan9691-trng", "atmel,at91sam9g45-trng";
++			reg = <0xe0048000 0x100>;
++			clocks = <&fabric_clk>;
++			status = "disabled";
++		};
++
++		aes: crypto@e004c000 {
++			compatible = "microchip,lan9691-aes", "atmel,at91sam9g46-aes";
++			reg = <0xe004c000 0x100>;
++			interrupts = <GIC_SPI 51 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dma AT91_XDMAC_DT_PERID(12)>,
++			       <&dma AT91_XDMAC_DT_PERID(13)>;
++			dma-names = "tx", "rx";
++			clocks = <&fabric_clk>;
++			clock-names = "aes_clk";
++			status = "disabled";
++		};
++
++		flx2: flexcom@e0060000 {
++			compatible = "microchip,lan9691-flexcom", "atmel,sama5d2-flexcom";
++			reg = <0xe0060000 0x100>;
++			ranges = <0x0 0xe0060000 0x800>;
++			clocks = <&clks GCK_ID_FLEXCOM2>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			status = "disabled";
++
++			usart2: serial@200 {
++				compatible = "microchip,lan9691-usart", "atmel,at91sam9260-usart";
++				reg = <0x200 0x200>;
++				interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(7)>,
++				       <&dma AT91_XDMAC_DT_PERID(6)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "usart";
++				atmel,fifo-size = <32>;
++				atmel,usart-mode = <AT91_USART_MODE_SERIAL>;
++				status = "disabled";
++			};
++
++			spi2: spi@400 {
++				compatible = "microchip,lan9691-spi", "atmel,at91rm9200-spi";
++				reg = <0x400 0x200>;
++				interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(7)>,
++				       <&dma AT91_XDMAC_DT_PERID(6)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "spi_clk";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				atmel,fifo-size = <32>;
++				status = "disabled";
++			};
++
++			i2c2: i2c@600 {
++				compatible = "microchip,lan9691-i2c", "microchip,sam9x60-i2c";
++				reg = <0x600 0x200>;
++				interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(7)>,
++				       <&dma AT91_XDMAC_DT_PERID(6)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				status = "disabled";
++			};
++		};
++
++		flx3: flexcom@e0064000 {
++			compatible = "microchip,lan9691-flexcom", "atmel,sama5d2-flexcom";
++			reg = <0xe0064000 0x100>;
++			ranges = <0x0 0xe0064000 0x800>;
++			clocks = <&clks GCK_ID_FLEXCOM3>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			status = "disabled";
++
++			usart3: serial@200 {
++				compatible = "microchip,lan9691-usart", "atmel,at91sam9260-usart";
++				reg = <0x200 0x200>;
++				interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(9)>,
++				       <&dma AT91_XDMAC_DT_PERID(8)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "usart";
++				atmel,fifo-size = <32>;
++				atmel,usart-mode = <AT91_USART_MODE_SERIAL>;
++				status = "disabled";
++			};
++
++			spi3: spi@400 {
++				compatible = "microchip,lan9691-spi", "atmel,at91rm9200-spi";
++				reg = <0x400 0x200>;
++				interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(9)>,
++				       <&dma AT91_XDMAC_DT_PERID(8)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				clock-names = "spi_clk";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				atmel,fifo-size = <32>;
++				status = "disabled";
++			};
++
++			i2c3: i2c@600 {
++				compatible = "microchip,lan9691-i2c", "microchip,sam9x60-i2c";
++				reg = <0x600 0x200>;
++				interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dma AT91_XDMAC_DT_PERID(9)>,
++				       <&dma AT91_XDMAC_DT_PERID(8)>;
++				dma-names = "tx", "rx";
++				clocks = <&fabric_clk>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				status = "disabled";
++			};
++		};
++
++		dma: dma-controller@e0068000 {
++			compatible = "microchip,lan9691-dma", "microchip,sama7g5-dma";
++			reg = <0xe0068000 0x1000>;
++			interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
++			dma-channels = <16>;
++			#dma-cells = <1>;
++			clocks = <&fabric_clk>;
++			clock-names = "dma_clk";
++		};
++
++		sha: crypto@e006c000 {
++			compatible = "microchip,lan9691-sha", "atmel,at91sam9g46-sha";
++			reg = <0xe006c000 0xec>;
++			interrupts = <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>;
++			dmas = <&dma AT91_XDMAC_DT_PERID(14)>;
++			dma-names = "tx";
++			clocks = <&fabric_clk>;
++			clock-names = "sha_clk";
++			status = "disabled";
++		};
++
++		timer: timer@e008c000 {
++			compatible = "snps,dw-apb-timer";
++			reg = <0xe008c000 0x400>;
++			clocks = <&fabric_clk>;
++			clock-names = "timer";
++			interrupts = <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>;
++			status = "disabled";
++		};
++
++		watchdog: watchdog@e0090000 {
++			compatible = "snps,dw-wdt";
++			reg = <0xe0090000 0x1000>;
++			interrupts = <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&fabric_clk>;
++		};
++
++		cpu_ctrl: syscon@e00c0000 {
++			compatible = "microchip,lan966x-cpu-syscon", "syscon";
++			reg = <0xe00c0000 0x350>;
++		};
++
++		switch: switch@e00c0000 {
++			compatible = "microchip,lan9691-switch";
++			reg = <0xe00c0000 0x0010000>,
++			      <0xe2010000 0x1410000>;
++			reg-names = "cpu", "devices";
++			interrupt-names = "xtr", "fdma", "ptp";
++			interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 88 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI  9 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&reset 0>;
++			reset-names = "switch";
++			status = "disabled";
++		};
++
++		clks: clock-controller@e00c00b4 {
++			compatible = "microchip,lan9691-gck";
++			reg = <0xe00c00b4 0x30>, <0xe00c0308 0x4>;
++			#clock-cells = <1>;
++			clocks = <&cpu_clk>, <&ddr_clk>, <&fx100_clk>;
++			clock-names = "cpu", "ddr", "sys";
++		};
++
++		reset: reset-controller@e201000c {
++			compatible = "microchip,lan9691-switch-reset",
++				     "microchip,lan966x-switch-reset";
++			reg = <0xe201000c 0x4>;
++			reg-names = "gcb";
++			#reset-cells = <1>;
++			cpu-syscon = <&cpu_ctrl>;
++		};
++
++		gpio: pinctrl@e20100d4 {
++			compatible = "microchip,lan9691-pinctrl";
++			reg = <0xe20100d4 0xd4>,
++			      <0xe2010370 0xa8>;
++			gpio-controller;
++			#gpio-cells = <2>;
++			gpio-ranges = <&gpio 0 0 66>;
++			interrupt-controller;
++			interrupts = <GIC_SPI 15 IRQ_TYPE_LEVEL_HIGH>;
++			#interrupt-cells = <2>;
++		};
++
++		mdio0: mdio@e20101a8 {
++			compatible = "microchip,lan9691-miim", "mscc,ocelot-miim";
++			reg = <0xe20101a8 0x24>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			clocks = <&fx100_clk>;
++			status = "disabled";
++		};
++
++		mdio1: mdio@e20101cc {
++			compatible = "microchip,lan9691-miim", "mscc,ocelot-miim";
++			reg = <0xe20101cc 0x24>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			clocks = <&fx100_clk>;
++			status = "disabled";
++		};
++
++		sgpio: gpio@e2010230 {
++			compatible = "microchip,lan9691-sgpio", "microchip,sparx5-sgpio";
++			reg = <0xe2010230 0x118>;
++			clocks = <&fx100_clk>;
++			resets = <&reset 0>;
++			reset-names = "switch";
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++
++			sgpio_in: gpio@0 {
++				compatible = "microchip,lan9691-sgpio-bank",
++					     "microchip,sparx5-sgpio-bank";
++				reg = <0>;
++				gpio-controller;
++				#gpio-cells = <3>;
++				interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-controller;
++				#interrupt-cells = <3>;
++			};
++
++			sgpio_out: gpio@1 {
++				compatible = "microchip,lan9691-sgpio-bank",
++					     "microchip,sparx5-sgpio-bank";
++				reg = <1>;
++				gpio-controller;
++				#gpio-cells = <3>;
++			};
++		};
++
++		tmon: hwmon@e2020100 {
++			compatible = "microchip,lan9691-temp", "microchip,sparx5-temp";
++			reg = <0xe2020100 0xc>;
++			clocks = <&fx100_clk>;
++			#thermal-sensor-cells = <0>;
++		};
++
++		serdes: serdes@e3410000 {
++			compatible = "microchip,lan9691-serdes";
++			reg = <0xe3410000 0x150000>;
++			#phy-cells = <1>;
++			clocks = <&fabric_clk>;
++		};
++
++		gic: interrupt-controller@e8c11000 {
++			compatible = "arm,gic-400";
++			reg = <0xe8c11000 0x1000>, /* Distributor GICD_ */
++			      <0xe8c12000 0x2000>, /* CPU interface GICC_ */
++			      <0xe8c14000 0x2000>, /* Virt interface control */
++			      <0xe8c16000 0x2000>; /* Virt CPU interface */
++			#interrupt-cells = <3>;
++			interrupt-controller;
++			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
++		};
++	};
++};
 -- 
 2.52.0
 
