@@ -1,73 +1,76 @@
-Return-Path: <netdev+bounces-250328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E3B1D28FFE
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:23:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA4ABD29006
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E4B703010508
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:23:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 59CE2301458C
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EA4327BEC;
-	Thu, 15 Jan 2026 22:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA2B327BEC;
+	Thu, 15 Jan 2026 22:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="skT/3Fo1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KpVhqMpG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C86320A1A
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D73A320A1A
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768515822; cv=none; b=LJLPPv0EirTE1jVZGG7VdzeTif1iaC61QT+ZdBWatYVCxMu3zhrSWKPWH18XGAgipFOG4LefaBYewxp/gfshn5ClQNtLmKAc3L9T1r3H3sop+4+2TzXNsPZO0B4l8jgMSSmQ0RgZVAvYd2IFE8NyZPMH1BCIh0Ve+TGLtv9ScbM=
+	t=1768515827; cv=none; b=F/O64kBhByNAeFMO/nLPypSVQFyy07GNylmbIW0BQTPDVB7YN3L+bg1Ut0l0qVxQz8RDsqBDx4cSDVCeRjAE9mwm/qIMl4BYxOTJWmrB81yeX4Xv7qiPqJ5rOKDxqU1L9I+iEvdWfu0GPqJoF0OXVO5vAipPQ06WmgrYGE5i8ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768515822; c=relaxed/simple;
-	bh=40F/2n0Y5ytzoXl0ovDTL1vt3bextte+3RoFWfnFZ+s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iURtj90F8OgR8R7Fncsupk/a0hNGtTDGQbPb6bnFWgb9mgpwNE192X3nLCF5oBz5eGliSviJzzvhk2JOyf9GVKcz0oI+qFFWpb6jGE66rUt0J5ZOOP9m/l1AZw4ONhZXtVaVBpgzOUlMGzwv9njJkK7RYYpqczrSzTnyps2wzhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=skT/3Fo1; arc=none smtp.client-ip=74.125.224.74
+	s=arc-20240116; t=1768515827; c=relaxed/simple;
+	bh=fDJP42lW9gpk6FWW89FMF7VSnQZOI3y90HN2JTsof7E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iU6PgoNrl4IDlw3EZEVwCMyHjCbWVeVioziAuBn1Un/zLuZQO7qo11xVd/uH5E3jKrfyJ1ezBYfxGNsJhBPnuEl3CaHOSJYgNTvVkUEVfYezCXpDByyZlCPCNhzYyeU/7mFOMnptoopBQoKdQsxEyH1XDHxql3owrY0w4J7M5YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KpVhqMpG; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com
-Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-644790187b7so1724015d50.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:23:40 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c6a87029b6so9876685a.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:23:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768515819; x=1769120619; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NQL2qVsBcu8DDV8qfU3/tw3Owv0TZxitHyc9kCEjxgc=;
-        b=skT/3Fo1VVUBzx5Jd0WMHoOcKhB8jy5mmC017GlQVso+qI1obEOMILe+BuYLqOq7W/
-         sW3Jp4fHD3wLFY/1xeJwVjU23HmsjfhcUmbuPnbgoKaZQsQ6sO2df1xlKU2peKFZvnBh
-         OxEFIaQejjry07Dggph+HZMkT6c1a509PMJoLjw7WtJy5bJOacaZ+t7+RJMhvU6b/V2j
-         Y9XcGk2O4puZrzSKjp8y3bINr2jf28NDwl6NCobXUT0AJwamyPhVIiog5R9QNbZU2IaI
-         OLJSkfXqIyzWQXVNEVt7q9+V+xFkNPlNM0N61Szz1JDIO2RII0HAttwAFjz19qndjcLW
-         ZJfw==
+        d=google.com; s=20230601; t=1768515825; x=1769120625; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ua18wpmfPdr+0GKOF5nrtTwAkOqbH3SKTA8BQ5ivfqA=;
+        b=KpVhqMpGeBmXOmqfhuF7ZG1e2cKa7PCEfHLYBXv8d01B29ijUJnkhLDbSwYeJedvNq
+         OctZ+Mu8By0HLwY45guklI8SLx5/GzYTsuuQtjcdMLdG8TefwP8VhIGeVJ98vSmn/igE
+         BDxYJUMLRK14Y4ixAiFyX/+mm+CdupdEOSPxOALG09l1meyVcVKAl4sqpgckmR7ulzZW
+         a6FLwcmO4bOtqD95ptXGsT8sTDOIt0zvMk+8EzPKVzR5c8bpP3jcdE8vkxyVJZ1ENcz6
+         z/3PCdbPrjMm8c6NFEF3eeLPtFg/pl0IQU85Yu0NLb1Sv7VNWO4uxgbwWmItWN1H4+bB
+         UnSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768515819; x=1769120619;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NQL2qVsBcu8DDV8qfU3/tw3Owv0TZxitHyc9kCEjxgc=;
-        b=gKfj4IVFbFIBJzOiTXz/CwE2NMcs1aqSkxOczXQbURv2cSIv1hitkNoRFz7S+sVdtF
-         CW1bWwLb+iHTmVirzH58mv/1REGBJQsxZUO+kNBKhUj9nX8R+xjw3z9Z9+5ngSn2qN3+
-         INanSnB33U6wtHD2hoJFUEyy4JAQkACF0VAa7ErxguVsSbeuCX/uEaxR38frJAd/wt3d
-         uzqMQf7lglhY9IFq8IcU88oImTJ1urqVQDOa1PNoBdtzdPJvGwyEB3O58sdJO14zie2K
-         jZUkEKGC30OG6LvOk+rV3zhx4xt4DUcrIU1SXjkgOuQC5XqnjepOgAcSJz7yUe3f+YdS
-         ffMQ==
-X-Gm-Message-State: AOJu0YxTZUVTTIS3F81HfeSkoR7YZl2X3XcVz3pEebD0uQeLpfxRFW78
-	uF/cnREQoP/Yan5hP1O0VaK7quJP8fN4WBYffDXRHuV/mG1epv0mgxrez+yOGsfDW1ZFjg==
-X-Received: from yxtq15.prod.google.com ([2002:a53:bb8f:0:b0:645:517e:89fb])
- (user=yyd job=prod-delivery.src-stubby-dispatcher) by 2002:a05:690e:1883:b0:63f:9d50:fdfe
- with SMTP id 956f58d0204a3-64917722d10mr559322d50.56.1768515819459; Thu, 15
- Jan 2026 14:23:39 -0800 (PST)
-Date: Thu, 15 Jan 2026 22:22:59 +0000
+        d=1e100.net; s=20230601; t=1768515825; x=1769120625;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ua18wpmfPdr+0GKOF5nrtTwAkOqbH3SKTA8BQ5ivfqA=;
+        b=TIB9/ES6+6WtnniVbGjN9AuX22eVytFYgR5+ITJ5puW0rjgySwx7WpM03x5rF1tOJz
+         ezgf9vV7H5U0Ot9cLh1QI3DWkvGKR24h7zWy8ZfScqGAfezBXX691l/PH9yqE0HENy//
+         tU/g+XPpu77QV/6bZ5/5nDEjho4+NYLf9rfsGdxY7qcVaSO7EqeC08MUL43jQNDuIXr8
+         riLiv8OiZkf+gPMh6up4IF1rwUkNQhyUqEqDRPIMFHXQ5q3l5LpgVl6UMMrx5te2S46w
+         TxFHWNajiczdX8PISvnvklNyovEke/RTCEn41PplUxKtVeBfUW0dyAvwH9Ak23ULnKvH
+         7qsw==
+X-Gm-Message-State: AOJu0YxUmiJs7M2PesOykIF6M38kd3B3EAxxejOmv1JpeWe3QnJajBXZ
+	d444RZKbsMtj40rUCnxybT6kEct0f3nss0ceaHFTFiiplg5ACpVi4/vh5WGFTKKPdGZ9Sw==
+X-Received: from qkww27.prod.google.com ([2002:a05:620a:95b:b0:8c6:a2f2:26e8])
+ (user=yyd job=prod-delivery.src-stubby-dispatcher) by 2002:a05:620a:29d3:b0:8b2:f090:b167
+ with SMTP id af79cd13be357-8c6a670434fmr154195185a.24.1768515824929; Thu, 15
+ Jan 2026 14:23:44 -0800 (PST)
+Date: Thu, 15 Jan 2026 22:23:00 +0000
+In-Reply-To: <20260115222300.1116386-1-yyd@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260115222300.1116386-1-yyd@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260115222300.1116386-1-yyd@google.com>
-Subject: [PATCH net-next 1/2] net: extend ndo_get_tstamp for other timestamp types
+Message-ID: <20260115222300.1116386-2-yyd@google.com>
+Subject: [PATCH net-next 2/2] gve: implement ndo_get_tstamp
 From: Kevin Yang <yyd@google.com>
 To: Willem de Bruijn <willemb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
 	Andrew Lunn <andrew+netdev@lunn.ch>, David Miller <davem@davemloft.net>, 
@@ -77,147 +80,252 @@ To: Willem de Bruijn <willemb@google.com>, Harshitha Ramamurthy <hramamurthy@goo
 Cc: netdev@vger.kernel.org, yyd@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Network device hardware timestamps (hwtstamps) and the system's
-clock (ktime) often originate from different clock domains.
-This makes it hard to directly calculate the duration between
-a hardware-timestamped event and a system-time event by simple
-subtraction.
+This patch implements ndo_get_tstamp in gve to support converting a
+hwtstamp to the system's realtime clock.
 
-This patch extends ndo_get_tstamp to allow a netdev to provide
-a hwtstamp into the system's CLOCK_REALTIME domain. This allows a
-driver to either perform a conversion by estimating or, if the
-clocks are kept synchronized, return the original timestamp directly.
-Other clock domains, e.g. CLOCK_MONOTONIC_RAW can also be added when
-a use surfaces.
-
-This is useful for features that need to measure the delay between
-a packet's hardware arrival/departure and a later software event.
-For example, the TCP stack can use this to measure precise
-packet receive delays, which is a requirement for the upcoming
-TCP Swift [1] congestion control algorithm.
-
-[1] Kumar, Gautam, et al. "Swift: Delay is simple and effective
-for congestion control in the datacenter." Proceedings of the
-Annual conference of the ACM Special Interest Group on Data
-Communication on the applications, technologies, architectures,
-and protocols for computer communication. 2020.
+The implementation does not assume the NIC clock is disciplined,
+in other word, the NIC clock can be free-running. A periodic
+job, embedded in gve's ptp_aux_work, updates the offset and slope
+for the conversion.
 
 Signed-off-by: Kevin Yang <yyd@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- drivers/net/ethernet/engleder/tsnep_main.c |  8 +++++---
- drivers/net/ethernet/intel/igc/igc_main.c  |  8 +++++---
- include/linux/netdevice.h                  | 21 ++++++++++++++-------
- 3 files changed, 24 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/google/gve/gve.h        |   8 ++
+ drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
+ drivers/net/ethernet/google/gve/gve_main.c   |  27 +++++
+ drivers/net/ethernet/google/gve/gve_ptp.c    | 106 ++++++++++++++++++-
+ 4 files changed, 142 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
-index b118407c30e87..7ae697fe51cf6 100644
---- a/drivers/net/ethernet/engleder/tsnep_main.c
-+++ b/drivers/net/ethernet/engleder/tsnep_main.c
-@@ -2275,15 +2275,17 @@ static int tsnep_netdev_set_features(struct net_device *netdev,
- 
- static ktime_t tsnep_netdev_get_tstamp(struct net_device *netdev,
- 				       const struct skb_shared_hwtstamps *hwtstamps,
--				       bool cycles)
-+				       enum netdev_tstamp_type type)
- {
- 	struct tsnep_rx_inline *rx_inline = hwtstamps->netdev_data;
- 	u64 timestamp;
- 
--	if (cycles)
-+	if (type == NETDEV_TSTAMP_CYCLE)
- 		timestamp = __le64_to_cpu(rx_inline->counter);
--	else
-+	else if (type == NETDEV_TSTAMP_RAW)
- 		timestamp = __le64_to_cpu(rx_inline->timestamp);
-+	else
-+		return 0;
- 
- 	return ns_to_ktime(timestamp);
- }
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 7aafa60ba0c86..c233e78f474f1 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6947,7 +6947,7 @@ int igc_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
- 
- static ktime_t igc_get_tstamp(struct net_device *dev,
- 			      const struct skb_shared_hwtstamps *hwtstamps,
--			      bool cycles)
-+			      enum netdev_tstamp_type type)
- {
- 	struct igc_adapter *adapter = netdev_priv(dev);
- 	struct igc_inline_rx_tstamps *tstamp;
-@@ -6955,10 +6955,12 @@ static ktime_t igc_get_tstamp(struct net_device *dev,
- 
- 	tstamp = hwtstamps->netdev_data;
- 
--	if (cycles)
-+	if (type == NETDEV_TSTAMP_CYCLE)
- 		timestamp = igc_ptp_rx_pktstamp(adapter, tstamp->timer1);
--	else
-+	else if (type == NETDEV_TSTAMP_RAW)
- 		timestamp = igc_ptp_rx_pktstamp(adapter, tstamp->timer0);
-+	else
-+		return 0;
- 
- 	return timestamp;
- }
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d99b0fbc1942a..1c1c7dcb8e801 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1062,6 +1062,12 @@ struct netdev_net_notifier {
- 	struct notifier_block *nb;
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 970d5ca8cddee..13a4c450e7635 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -774,6 +774,13 @@ struct gve_flow_rule {
+ 	struct gve_flow_spec mask;
  };
  
-+enum netdev_tstamp_type {
-+	NETDEV_TSTAMP_RAW = 0,
-+	NETDEV_TSTAMP_CYCLE,
-+	NETDEV_TSTAMP_REALTIME,
++struct gve_tstamp_conversion {
++	u64 last_sync_ns;
++	seqlock_t lock; /* protects tc and cc */
++	struct timecounter tc;
++	struct cyclecounter cc;
 +};
 +
- /*
-  * This structure defines the management hooks for network devices.
-  * The following hooks can be defined; unless noted otherwise, they are
-@@ -1406,11 +1412,10 @@ struct netdev_net_notifier {
-  *     Get the forwarding path to reach the real device from the HW destination address
-  * ktime_t (*ndo_get_tstamp)(struct net_device *dev,
-  *			     const struct skb_shared_hwtstamps *hwtstamps,
-- *			     bool cycles);
-- *	Get hardware timestamp based on normal/adjustable time or free running
-- *	cycle counter. This function is required if physical clock supports a
-- *	free running cycle counter.
-- *
-+ *			     enum netdev_tstamp_type type);
-+ *	Get hardware timestamp based on the type requested, or return 0 if the
-+ *	requested type is not supported. This function is required if physical
-+ *	clock supports a free running cycle counter.
-  * int (*ndo_hwtstamp_get)(struct net_device *dev,
-  *			   struct kernel_hwtstamp_config *kernel_config);
-  *	Get the currently configured hardware timestamping parameters for the
-@@ -1661,7 +1666,7 @@ struct net_device_ops {
-                                                          struct net_device_path *path);
- 	ktime_t			(*ndo_get_tstamp)(struct net_device *dev,
- 						  const struct skb_shared_hwtstamps *hwtstamps,
--						  bool cycles);
-+						  enum netdev_tstamp_type type);
- 	int			(*ndo_hwtstamp_get)(struct net_device *dev,
- 						    struct kernel_hwtstamp_config *kernel_config);
- 	int			(*ndo_hwtstamp_set)(struct net_device *dev,
-@@ -5236,9 +5241,11 @@ static inline ktime_t netdev_get_tstamp(struct net_device *dev,
- 					bool cycles)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
-+	enum netdev_tstamp_type type = cycles ? NETDEV_TSTAMP_CYCLE :
-+						NETDEV_TSTAMP_RAW;
+ struct gve_flow_rules_cache {
+ 	bool rules_cache_synced; /* False if the driver's rules_cache is outdated */
+ 	struct gve_adminq_queried_flow_rule *rules_cache;
+@@ -925,6 +932,7 @@ struct gve_priv {
+ 	struct gve_nic_ts_report *nic_ts_report;
+ 	dma_addr_t nic_ts_report_bus;
+ 	u64 last_sync_nic_counter; /* Clock counter from last NIC TS report */
++	struct gve_tstamp_conversion ts_real;
+ };
  
- 	if (ops->ndo_get_tstamp)
--		return ops->ndo_get_tstamp(dev, hwtstamps, cycles);
-+		return ops->ndo_get_tstamp(dev, hwtstamps, type);
+ enum gve_service_task_flags_bit {
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
+index 22a74b6aa17ea..812160b87b143 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.h
++++ b/drivers/net/ethernet/google/gve/gve_adminq.h
+@@ -411,8 +411,8 @@ static_assert(sizeof(struct gve_adminq_report_nic_ts) == 16);
  
- 	return hwtstamps->hwtstamp;
+ struct gve_nic_ts_report {
+ 	__be64 nic_timestamp; /* NIC clock in nanoseconds */
+-	__be64 reserved1;
+-	__be64 reserved2;
++	__be64 cycle_pre;
++	__be64 cycle_post;
+ 	__be64 reserved3;
+ 	__be64 reserved4;
+ };
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 7eb64e1e4d858..2acc1a3d85838 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -2198,6 +2198,32 @@ static int gve_set_ts_config(struct net_device *dev,
+ 	return 0;
  }
+ 
++static ktime_t gve_get_tstamp(struct net_device *dev,
++			      const struct skb_shared_hwtstamps *hwtstamps,
++			      enum netdev_tstamp_type type)
++{
++	struct gve_priv *priv = netdev_priv(dev);
++	unsigned int seq;
++	u64 ns;
++
++	if (type == NETDEV_TSTAMP_RAW)
++		return hwtstamps->hwtstamp;
++
++	if (type != NETDEV_TSTAMP_REALTIME)
++		return 0;
++
++	/* Skip if never synced */
++	if (!READ_ONCE(priv->ts_real.last_sync_ns))
++		return 0;
++
++	do {
++		seq = read_seqbegin(&priv->ts_real.lock);
++		ns = timecounter_cyc2time(&priv->ts_real.tc,
++					  hwtstamps->hwtstamp);
++	} while (read_seqretry(&priv->ts_real.lock, seq));
++	return ns_to_ktime(ns);
++}
++
+ static const struct net_device_ops gve_netdev_ops = {
+ 	.ndo_start_xmit		=	gve_start_xmit,
+ 	.ndo_features_check	=	gve_features_check,
+@@ -2209,6 +2235,7 @@ static const struct net_device_ops gve_netdev_ops = {
+ 	.ndo_bpf		=	gve_xdp,
+ 	.ndo_xdp_xmit		=	gve_xdp_xmit,
+ 	.ndo_xsk_wakeup		=	gve_xsk_wakeup,
++	.ndo_get_tstamp		=	gve_get_tstamp,
+ 	.ndo_hwtstamp_get	=	gve_get_ts_config,
+ 	.ndo_hwtstamp_set	=	gve_set_ts_config,
+ };
+diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
+index 073677d82ee8e..df32735fa940f 100644
+--- a/drivers/net/ethernet/google/gve/gve_ptp.c
++++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+@@ -10,10 +10,91 @@
+ /* Interval to schedule a nic timestamp calibration, 250ms. */
+ #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
+ 
++/* Scale ts_real.cc.mult by 1 << 31. Maximize mult for finer adjustment
++ * granularity, but ensure (mult * cycle) does not overflow in
++ * cyclecounter_cyc2ns.
++ */
++#define GVE_HWTS_REAL_CC_SHIFT 31
++#define GVE_HWTS_REAL_CC_NOMINAL BIT_ULL(GVE_HWTS_REAL_CC_SHIFT)
++
++/* Get the cross time stamp info */
++static int gve_get_cross_time(ktime_t *device,
++			      struct system_counterval_t *system, void *ctx)
++{
++	struct gve_priv *priv = ctx;
++
++	*device = ns_to_ktime(be64_to_cpu(priv->nic_ts_report->nic_timestamp));
++	system->cycles = be64_to_cpu(priv->nic_ts_report->cycle_pre) +
++			 (be64_to_cpu(priv->nic_ts_report->cycle_post) -
++			  be64_to_cpu(priv->nic_ts_report->cycle_pre)) / 2;
++	system->use_nsecs = false;
++	if (IS_ENABLED(CONFIG_X86))
++		system->cs_id = CSID_X86_TSC;
++	else if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER))
++		system->cs_id = CSID_ARM_ARCH_COUNTER;
++	else
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++static int gve_hwts_realtime_update(struct gve_priv *priv, u64 prev_nic)
++{
++	struct system_device_crosststamp cts = {};
++	struct system_time_snapshot history = {};
++	s64 nic_real_off_ns;
++	u64 real_ns;
++	int ret;
++
++	/* Step 1: Get the realtime of when NIC clock was read */
++	ktime_get_snapshot(&history);
++	ret = get_device_system_crosststamp(gve_get_cross_time, priv, &history,
++					    &cts);
++	if (ret) {
++		dev_err_ratelimited(&priv->pdev->dev,
++				    "%s crosststamp err %d\n", __func__, ret);
++		return ret;
++	}
++
++	real_ns = ktime_to_ns(cts.sys_realtime);
++
++	/* Step 2: Adjust NIC clock's offset */
++	/* Read-side ndo_get_tstamp can be called from TCP rx softirq */
++	write_seqlock_bh(&priv->ts_real.lock);
++	nic_real_off_ns = real_ns - timecounter_read(&priv->ts_real.tc);
++	timecounter_adjtime(&priv->ts_real.tc, nic_real_off_ns);
++
++	/* Step 3: Adjust NIC clock's ratio (when this is not the first sync).
++	 * The NIC clock's nominal tick ratio is 1 tick per nanosecond,
++	 * scaled by 1 << GVE_HWTS_REAL_CC_SHIFT. Adjust it to
++	 * (ktime - prev_ktime) / (nic - prev_nic). The ratio should not
++	 * deviate more than 1% from the nominal, otherwise it may suggest
++	 * there was a sudden change on NIC clock. In that case, reset ratio
++	 * to nominal. And since each sync only compares to the previous read,
++	 * this is a one-time error, not a persistent failure.
++	 */
++	if (prev_nic) {
++		const u64 lower = GVE_HWTS_REAL_CC_NOMINAL * 99 / 100;
++		const u64 upper = GVE_HWTS_REAL_CC_NOMINAL * 101 / 100;
++		u64 mult;
++
++		mult = mult_frac(GVE_HWTS_REAL_CC_NOMINAL,
++				 real_ns - priv->ts_real.last_sync_ns,
++				 priv->last_sync_nic_counter - prev_nic);
++		if (mult < lower || mult > upper)
++			mult = GVE_HWTS_REAL_CC_NOMINAL;
++		priv->ts_real.cc.mult = mult;
++	}
++
++	write_sequnlock_bh(&priv->ts_real.lock);
++	WRITE_ONCE(priv->ts_real.last_sync_ns, real_ns);
++	return 0;
++}
++
+ /* Read the nic timestamp from hardware via the admin queue. */
+ int gve_clock_nic_ts_read(struct gve_priv *priv)
+ {
+-	u64 nic_raw;
++	u64 nic_raw, prev_nic;
+ 	int err;
+ 
+ 	err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
+@@ -21,7 +102,11 @@ int gve_clock_nic_ts_read(struct gve_priv *priv)
+ 		return err;
+ 
+ 	nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
++	prev_nic = priv->last_sync_nic_counter;
+ 	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
++	err = gve_hwts_realtime_update(priv, prev_nic);
++	if (err)
++		return err;
+ 
+ 	return 0;
+ }
+@@ -57,6 +142,14 @@ static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
+ 	return msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS);
+ }
+ 
++static u64 gve_cycles_read(struct cyclecounter *cc)
++{
++	const struct gve_priv *priv = container_of(cc, struct gve_priv,
++						   ts_real.cc);
++
++	return READ_ONCE(priv->last_sync_nic_counter);
++}
++
+ static const struct ptp_clock_info gve_ptp_caps = {
+ 	.owner          = THIS_MODULE,
+ 	.name		= "gve clock",
+@@ -89,6 +182,17 @@ static int gve_ptp_init(struct gve_priv *priv)
+ 		goto free_ptp;
+ 	}
+ 
++	priv->last_sync_nic_counter = 0;
++	priv->ts_real.last_sync_ns = 0;
++	seqlock_init(&priv->ts_real.lock);
++	memset(&priv->ts_real.cc, 0, sizeof(priv->ts_real.cc));
++	priv->ts_real.cc.mask = U32_MAX;
++	priv->ts_real.cc.shift = GVE_HWTS_REAL_CC_SHIFT;
++	priv->ts_real.cc.mult = GVE_HWTS_REAL_CC_NOMINAL;
++	priv->ts_real.cc.read = gve_cycles_read;
++	timecounter_init(&priv->ts_real.tc, &priv->ts_real.cc,
++			 ktime_get_real_ns());
++
+ 	ptp->priv = priv;
+ 	return 0;
+ 
 -- 
 2.52.0.457.g6b5491de43-goog
 
