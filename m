@@ -1,444 +1,143 @@
-Return-Path: <netdev+bounces-250213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B328ED2512D
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:53:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07607D25145
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CF76E3012C65
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:48:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5DFF6301A185
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B897B1C4A24;
-	Thu, 15 Jan 2026 14:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oUheIc45"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED913347BA9;
+	Thu, 15 Jan 2026 14:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B3D34F48C
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EB2279907
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768488530; cv=none; b=E2K3FA8RL0De2KTizP1T6Ci5q4viXpZFV60dxDv29q0XhtK02GBLNe2Z8as7HwOnynETrk2JmONd4EUHtZfn8iibEdxM1OP8KlaX7RzzzyVWC1BB4rVHdQjxJjjF4IhDJxW0tCEy84Ds40+GzIjOo57zEAmkPCbVI/gQS358oHs=
+	t=1768488629; cv=none; b=r8zNKG0Hl1bNLBiUOlTq6YEh2ubzC3K0ifY36O9wZ3hqJyBaA86xAXuaRfSINdtSFItQcrP7v+m6KydbYwzS3eRor4ujtXa8dtd2Tjgc2z3QloocHWPOyYTfipT3GM2yc+AD+EFyHiF15/OobOAeEkPHE5AzCzS5rRtFwGOEVGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768488530; c=relaxed/simple;
-	bh=/wqLaNcbkoPRXp8u3cwMXDZ7kXCOXFwlXPBCo7HbKnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=arcXwrU7xMNmxt210oUpVRAMVwpDIF34rmo25/op+/qwFqO8F75f0aKjmKCIKfuImRCG3nB7ScPl86pgDzZl1nPaaUzU77jOlLpyzMOWeUvQV7ZhSD1NCOZ9ZQctl/xLfzxhUkDhjA+wwGphge9FnHz1vU2PHngfpzB+CObDlPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oUheIc45; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D269D4E420F6;
-	Thu, 15 Jan 2026 14:48:45 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A0645606B6;
-	Thu, 15 Jan 2026 14:48:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0368510B685B3;
-	Thu, 15 Jan 2026 15:48:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768488524; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=+QYowkF0ylQwr81E7dNDCYNQ4alDslj2K3oqmZv522g=;
-	b=oUheIc45ljAvwXYhk0Aau0jRxamfAh6xH0rQ4hZbzgdHLYgXV/BtH6dfKAGDefWVtGM4lo
-	iaHN8MCwCkmjKP1GF4/BS7krnuSlGSpac7jaH25lzfm6/aQMOFQTQm+NKX3Y/hGOhsaZ/P
-	snd1qOC5zqOk5oBGrCwOQIGzRGwc9UAUPWjtzJQyGXzNSbsN7a1a1doSqVOydrHPsa/0nz
-	LDNcnsM0eeB1E+PNzjAoI/LO3TCcJs61WnLDcaoxlGHsvaIoqRKE2abbphB2UZnXXNOImm
-	XMcheO6zkttudxz3PTioR0vMaAaB79bo7QXKFMj1RE8UETvfKnraWS7O9OBVBQ==
-Message-ID: <a91a0937-93cd-40f2-9759-8823fb08f48c@bootlin.com>
-Date: Thu, 15 Jan 2026 15:48:40 +0100
+	s=arc-20240116; t=1768488629; c=relaxed/simple;
+	bh=3RMfVYSGpkOLiHJBEL0zVUsNi8tg/hwdMTnY1KweINw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pynpndT8eMDowdlN/srGlkdoqzh4WZ0/zuCHeW5Peeg228DFkBkIsNy4rylHok8LjSFoBdTgHTAtC2PDkQaUBb///nEAj4gSrFuW41SSLv4IPvRx1i7F503QmnkxVMXxpChhXHnj1YVT2BjmLfdQOmIV30y60aaqFmnmC26nI+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7cfcf550dd8so2335608a34.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:50:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768488627; x=1769093427;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ze4Dv+UBkNGbitWZ+zMrF7QcGpoJNiTm4Tn/wiF9wyU=;
+        b=uErFqRjcxmIyWlbzEZEepnxMveW+2X+lDbR0HmnnE2JZ7zMe9W1Q0+4U1pL+PZ/t3d
+         yqdFOx/HyHeweF/ivlFd++S2y12olkAxPLlVrtmsneMY3R1CCuGYq6JVoYqICNbImQ+V
+         hC3qaTX315IP+/KWeBqaXIK1yof2JocAvmCl8gSmF32JGuopvAkRxcte0ZnRzhfpldns
+         /1VxmE0kSE0rjEybFo/xCT/JcvLjv+wCWPRiEDJ0XjDSmEJVEft4PIFzrfh5cdN3gkdh
+         ++WJlbXwMWqTLIl/bpthrII3yNJzq1aIKNNbIRAIdLqYvuR8UrhwmQ11AQHo0Oma/RSp
+         2KeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUihM5XUNBIIcciNpQptm1jl4lWfMrJgYj44nBwxNyzjZmyefCLNTR4jbu+tzy8hFmcvbp/4jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxgo06fNf5GLQ0+P18N1uyWWjG4ll3Y6IX+rlrn/HAMazscAch
+	W/9XuMj/k+onoeGAPe24NDDnytK+JKPRAGA9jj3PRBhY6dFBur0fSLd2ar9422VceNEx2C4ZN68
+	ynGZ3ZYJZQgnvclvSXeX0rudPoBoL58ca8cEz+7QnbFJEcRNHnZjVTVncr+A=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/14] net: stmmac: add stmmac core serdes
- support
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
- Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
- <E1vg4w2-00000003SG5-2FH5@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vg4w2-00000003SG5-2FH5@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Received: by 2002:a05:6820:16a7:b0:65d:c8e:840a with SMTP id
+ 006d021491bc7-66102dc0ed3mr4212474eaf.65.1768488627308; Thu, 15 Jan 2026
+ 06:50:27 -0800 (PST)
+Date: Thu, 15 Jan 2026 06:50:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6968feb3.050a0220.58bed.0021.GAE@google.com>
+Subject: [syzbot] [isdn4linux?] KCSAN: data-race in mISDN_ioctl / mISDN_read (4)
+From: syzbot <syzbot+c6e7bcea7ffb7ff46acb@syzkaller.appspotmail.com>
+To: isdn4linux@listserv.isdn4linux.de, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Russell,
+Hello,
 
-On 14/01/2026 18:45, Russell King (Oracle) wrote:
-> Rather than having platform glue implement SerDes PHY support, add it
-> to the core driver, specifically to the stmmac integrated PCS driver
-> as the SerDes is connected to the integrated PCS.
-> 
-> Platforms using external PCS can also populate plat->serdes, and the
-> core driver will call phy_init() and phy_exit() when the administrative
-> state of the interface changes, but the other phy methods will not be
-> called.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+syzbot found the following issue on:
 
-Unfortunately I have no way to test. But still,
+HEAD commit:    516471569089 Merge tag 'libcrypto-fixes-for-linus' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12417dc2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b319ff1b6a2797ca
+dashboard link: https://syzkaller.appspot.com/bug?extid=c6e7bcea7ffb7ff46acb
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Maxime
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/daca6d82d1e1/disk-51647156.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3e0d93470f33/vmlinux-51647156.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/27efb1907b03/bzImage-51647156.xz
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  14 ++-
->  .../net/ethernet/stmicro/stmmac/stmmac_pcs.c  |  38 +++++-
->  .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  |   1 +
->  .../ethernet/stmicro/stmmac/stmmac_serdes.c   | 111 ++++++++++++++++++
->  .../ethernet/stmicro/stmmac/stmmac_serdes.h   |  16 +++
->  include/linux/stmmac.h                        |   2 +
->  7 files changed, 180 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.h
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> index c9263987ef8d..a3c2cd5d0c91 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> @@ -7,7 +7,7 @@ stmmac-objs:= stmmac_main.o stmmac_ethtool.o stmmac_mdio.o ring_mode.o	\
->  	      dwmac4_dma.o dwmac4_lib.o dwmac4_core.o dwmac5.o hwif.o \
->  	      stmmac_tc.o dwxgmac2_core.o dwxgmac2_dma.o dwxgmac2_descs.o \
->  	      stmmac_xdp.o stmmac_est.o stmmac_fpe.o stmmac_vlan.o \
-> -	      stmmac_pcs.o $(stmmac-y)
-> +	      stmmac_pcs.o stmmac_serdes.o $(stmmac-y)
->  
->  stmmac-$(CONFIG_STMMAC_SELFTESTS) += stmmac_selftests.o
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 24a2555ca329..6c515f9efbe7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -48,6 +48,7 @@
->  #include "stmmac_fpe.h"
->  #include "stmmac.h"
->  #include "stmmac_pcs.h"
-> +#include "stmmac_serdes.h"
->  #include "stmmac_xdp.h"
->  #include <linux/reset.h>
->  #include <linux/of_mdio.h>
-> @@ -3549,12 +3550,16 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
->  
->  static void stmmac_clk_rx_i_require(struct stmmac_priv *priv)
->  {
-> +	dwmac_serdes_power_on(priv);
-> +	/* Only sets the SerDes mode if it wasn't already configured. */
-> +	dwmac_serdes_init_mode(priv, priv->plat->phy_interface);
->  	phylink_rx_clk_stop_block(priv->phylink);
->  }
->  
->  static void stmmac_clk_rx_i_release(struct stmmac_priv *priv)
->  {
->  	phylink_rx_clk_stop_unblock(priv->phylink);
-> +	dwmac_serdes_power_off(priv);
->  }
->  
->  /**
-> @@ -4152,10 +4157,14 @@ static int stmmac_open(struct net_device *dev)
->  	if (ret)
->  		goto err_runtime_pm;
->  
-> -	ret = __stmmac_open(dev, dma_conf);
-> +	ret = dwmac_serdes_init(priv);
->  	if (ret)
->  		goto err_disconnect_phy;
->  
-> +	ret = __stmmac_open(dev, dma_conf);
-> +	if (ret)
-> +		goto err_serdes;
-> +
->  	kfree(dma_conf);
->  
->  	/* We may have called phylink_speed_down before */
-> @@ -4163,6 +4172,8 @@ static int stmmac_open(struct net_device *dev)
->  
->  	return ret;
->  
-> +err_serdes:
-> +	dwmac_serdes_exit(priv);
->  err_disconnect_phy:
->  	phylink_disconnect_phy(priv->phylink);
->  err_runtime_pm:
-> @@ -4226,6 +4237,7 @@ static int stmmac_release(struct net_device *dev)
->  
->  	__stmmac_release(dev);
->  
-> +	dwmac_serdes_exit(priv);
->  	phylink_disconnect_phy(priv->phylink);
->  	pm_runtime_put(priv->device);
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> index 2f826fe7229b..4d1902f3a58f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> @@ -1,12 +1,25 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  #include "stmmac.h"
->  #include "stmmac_pcs.h"
-> +#include "stmmac_serdes.h"
->  
->  static int dwmac_integrated_pcs_enable(struct phylink_pcs *pcs)
->  {
->  	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
-> +	struct stmmac_priv *priv = spcs->priv;
-> +	int ret;
->  
-> -	stmmac_mac_irq_modify(spcs->priv, 0, spcs->int_mask);
-> +	ret = dwmac_serdes_power_on(priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (spcs->interface != PHY_INTERFACE_MODE_NA) {
-> +		ret = dwmac_serdes_set_mode(priv, spcs->interface);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	stmmac_mac_irq_modify(priv, 0, spcs->int_mask);
->  
->  	return 0;
->  }
-> @@ -14,8 +27,11 @@ static int dwmac_integrated_pcs_enable(struct phylink_pcs *pcs)
->  static void dwmac_integrated_pcs_disable(struct phylink_pcs *pcs)
->  {
->  	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
-> +	struct stmmac_priv *priv = spcs->priv;
->  
-> -	stmmac_mac_irq_modify(spcs->priv, spcs->int_mask, 0);
-> +	stmmac_mac_irq_modify(priv, spcs->int_mask, 0);
-> +
-> +	dwmac_serdes_power_off(priv);
->  }
->  
->  static void dwmac_integrated_pcs_get_state(struct phylink_pcs *pcs,
-> @@ -32,6 +48,15 @@ static int dwmac_integrated_pcs_config(struct phylink_pcs *pcs,
->  				       bool permit_pause_to_mac)
->  {
->  	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
-> +	int ret;
-> +
-> +	if (spcs->interface != interface) {
-> +		ret = dwmac_serdes_set_mode(spcs->priv, interface);
-> +		if (ret)
-> +			return ret;
-> +
-> +		spcs->interface = interface;
-> +	}
->  
->  	dwmac_ctrl_ane(spcs->base, 0, 1, spcs->priv->hw->reverse_sgmii_enable);
->  
-> @@ -71,6 +96,7 @@ int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
->  			       u32 int_mask)
->  {
->  	struct stmmac_pcs *spcs;
-> +	int ret;
->  
->  	spcs = devm_kzalloc(priv->device, sizeof(*spcs), GFP_KERNEL);
->  	if (!spcs)
-> @@ -81,6 +107,14 @@ int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
->  	spcs->int_mask = int_mask;
->  	spcs->pcs.ops = &dwmac_integrated_pcs_ops;
->  
-> +	if (priv->plat->serdes) {
-> +		ret = dwmac_serdes_validate(priv, PHY_INTERFACE_MODE_SGMII);
-> +		if (ret)
-> +			dev_warn(priv->device,
-> +				 "serdes does not support SGMII: %pe\n",
-> +				 ERR_PTR(ret));
-> +	}
-> +
->  	__set_bit(PHY_INTERFACE_MODE_SGMII, spcs->pcs.supported_interfaces);
->  
->  	priv->integrated_pcs = spcs;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> index c4e6b242d390..36bf75fdf478 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> @@ -53,6 +53,7 @@ struct stmmac_pcs {
->  	struct stmmac_priv *priv;
->  	void __iomem *base;
->  	u32 int_mask;
-> +	phy_interface_t interface;
->  	struct phylink_pcs pcs;
->  };
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-> new file mode 100644
-> index 000000000000..3003e1ae38d2
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-> @@ -0,0 +1,111 @@
-> +#include <linux/phy/phy.h>
-> +
-> +#include "stmmac.h"
-> +#include "stmmac_serdes.h"
-> +
-> +static phy_interface_t dwmac_serdes_phy_modes[] = {
-> +	PHY_INTERFACE_MODE_SGMII,
-> +	PHY_INTERFACE_MODE_1000BASEX,
-> +	PHY_INTERFACE_MODE_2500BASEX
-> +};
-> +
-> +int dwmac_serdes_validate(struct stmmac_priv *priv, phy_interface_t interface)
-> +{
-> +	return phy_validate(priv->plat->serdes, PHY_MODE_ETHERNET, interface,
-> +			    NULL);
-> +}
-> +
-> +int dwmac_serdes_init(struct stmmac_priv *priv)
-> +{
-> +	size_t i;
-> +	int ret;
-> +
-> +	if (!priv->plat->serdes)
-> +		return 0;
-> +
-> +	/* Encourage good implementation of the SerDes PHY driver, so that
-> +	 * we can discover which Ethernet modes the SerDes supports.
-> +	 * Unfortunately, some implementations are noisy (bad), others
-> +	 * require phy_set_speed() to select the correct speed first
-> +	 * (which then reprograms the SerDes, negating the whole point of
-> +	 * phy_validate().) Weed out these incompatible implementations.
-> +	 */
-> +	for (i = 0; i < ARRAY_SIZE(dwmac_serdes_phy_modes); i++) {
-> +		ret = phy_validate(priv->plat->serdes, PHY_MODE_ETHERNET,
-> +				   dwmac_serdes_phy_modes[i], NULL);
-> +		if (ret == 0 || ret == -EOPNOTSUPP)
-> +			break;
-> +	}
-> +
-> +	if (ret == -EOPNOTSUPP)
-> +		dev_warn(priv->device,
-> +			 "SerDes driver does not implement phy_validate()\n");
-> +	if (ret) {
-> +		/* The SerDes PHY failed validation, refuse to use it. */
-> +		dev_warn(priv->device,
-> +			 "SerDes driver fails to validate SGMII, 1000BASE-X nor 2500BASE-X\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = phy_init(priv->plat->serdes);
-> +	if (ret)
-> +		dev_err(priv->device, "failed to initialize SerDes: %pe\n",
-> +			ERR_PTR(ret));
-> +
-> +	return ret;
-> +}
-> +
-> +int dwmac_serdes_power_on(struct stmmac_priv *priv)
-> +{
-> +	int ret;
-> +
-> +	ret = phy_power_on(priv->plat->serdes);
-> +	if (ret)
-> +		dev_err(priv->device, "failed to power on SerDes: %pe\n",
-> +			ERR_PTR(ret));
-> +
-> +	return ret;
-> +}
-> +
-> +int dwmac_serdes_init_mode(struct stmmac_priv *priv, phy_interface_t interface)
-> +{
-> +	struct phy *serdes = priv->plat->serdes;
-> +
-> +	if (phy_get_mode(serdes) == PHY_MODE_ETHERNET)
-> +		return 0;
-> +
-> +	return dwmac_serdes_set_mode(priv, interface);
-> +}
-> +
-> +int dwmac_serdes_set_mode(struct stmmac_priv *priv, phy_interface_t interface)
-> +{
-> +	struct phy *serdes = priv->plat->serdes;
-> +	int ret;
-> +
-> +	ret = phy_set_mode_ext(serdes, PHY_MODE_ETHERNET, interface);
-> +	if (ret)
-> +		dev_err(priv->device,
-> +			"failed to set SerDes mode %s: %pe\n",
-> +			phy_modes(interface), ERR_PTR(ret));
-> +
-> +	return ret;
-> +}
-> +
-> +void dwmac_serdes_power_off(struct stmmac_priv *priv)
-> +{
-> +	int ret;
-> +
-> +	ret = phy_power_off(priv->plat->serdes);
-> +	if (ret)
-> +		dev_err(priv->device, "failed to power off SerDes: %pe\n",
-> +			ERR_PTR(ret));
-> +}
-> +
-> +void dwmac_serdes_exit(struct stmmac_priv *priv)
-> +{
-> +	int ret = phy_exit(priv->plat->serdes);
-> +
-> +	if (ret)
-> +		dev_err(priv->device, "failed to shutdown SerDes: %pe\n",
-> +			ERR_PTR(ret));
-> +}
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.h
-> new file mode 100644
-> index 000000000000..a31e6c9e0570
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.h
-> @@ -0,0 +1,16 @@
-> +#ifndef STMMAC_SERDES_H
-> +#define STMMAC_SERDES_H
-> +
-> +#include <linux/phy.h>
-> +
-> +struct stmmac_priv;
-> +
-> +int dwmac_serdes_validate(struct stmmac_priv *priv, phy_interface_t interface);
-> +int dwmac_serdes_init(struct stmmac_priv *priv);
-> +int dwmac_serdes_power_on(struct stmmac_priv *priv);
-> +int dwmac_serdes_init_mode(struct stmmac_priv *priv, phy_interface_t interface);
-> +int dwmac_serdes_set_mode(struct stmmac_priv *priv, phy_interface_t interface);
-> +void dwmac_serdes_power_off(struct stmmac_priv *priv);
-> +void dwmac_serdes_exit(struct stmmac_priv *priv);
-> +
-> +#endif
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index f1054b9c2d8a..4db506e5cf13 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -193,6 +193,7 @@ enum dwmac_core_type {
->  #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(13)
->  
->  struct mac_device_info;
-> +struct phy;
->  
->  struct plat_stmmacenet_data {
->  	enum dwmac_core_type core_type;
-> @@ -222,6 +223,7 @@ struct plat_stmmacenet_data {
->  	 * that phylink uses.
->  	 */
->  	phy_interface_t phy_interface;
-> +	struct phy *serdes;
->  	struct stmmac_mdio_bus_data *mdio_bus_data;
->  	struct device_node *phy_node;
->  	struct fwnode_handle *port_node;
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c6e7bcea7ffb7ff46acb@syzkaller.appspotmail.com
 
+==================================================================
+BUG: KCSAN: data-race in mISDN_ioctl / mISDN_read
+
+write to 0xffff88812d848280 of 4 bytes by task 10864 on cpu 1:
+ misdn_add_timer drivers/isdn/mISDN/timerdev.c:175 [inline]
+ mISDN_ioctl+0x2fb/0x550 drivers/isdn/mISDN/timerdev.c:233
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xce/0x140 fs/ioctl.c:583
+ __x64_sys_ioctl+0x43/0x50 fs/ioctl.c:583
+ x64_sys_call+0x14b0/0x3000 arch/x86/include/generated/asm/syscalls_64.h:17
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd8/0x2c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+read to 0xffff88812d848280 of 4 bytes by task 10857 on cpu 0:
+ mISDN_read+0x1f2/0x470 drivers/isdn/mISDN/timerdev.c:112
+ do_loop_readv_writev fs/read_write.c:847 [inline]
+ vfs_readv+0x3fb/0x690 fs/read_write.c:1020
+ do_readv+0xe7/0x210 fs/read_write.c:1080
+ __do_sys_readv fs/read_write.c:1165 [inline]
+ __se_sys_readv fs/read_write.c:1162 [inline]
+ __x64_sys_readv+0x45/0x50 fs/read_write.c:1162
+ x64_sys_call+0x2831/0x3000 arch/x86/include/generated/asm/syscalls_64.h:20
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd8/0x2c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+value changed: 0x00000000 -> 0x00000001
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 UID: 0 PID: 10857 Comm: syz.0.2523 Tainted: G        W           syzkaller #0 PREEMPT(voluntary) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
