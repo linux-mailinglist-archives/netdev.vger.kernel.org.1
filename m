@@ -1,92 +1,95 @@
-Return-Path: <netdev+bounces-250330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBDED29021
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:26:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E6AD29024
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:26:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EE8113018416
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:26:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 289373039989
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD193242AD;
-	Thu, 15 Jan 2026 22:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AE632C33A;
+	Thu, 15 Jan 2026 22:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmV23DrH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="npBOFfDI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wzok4xfQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5w1hpZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B3E1C4A24
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACEA238D27
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768515969; cv=none; b=CMwYpUZKyiitirDYWXQoRw2tgLalbXwdpUfG5l6IouNBo/HDGPBDzgTJM5z82gyeyt3JjRrN+GeDD3ISBwoktNo8YA0/AGbFO4UGZt/pUzELMPc4SvWAwLxeccoMnhvp57CFsWj0Q4GryTDCx6vNIUosTNqhdH8zelnNfLHiVoM=
+	t=1768515970; cv=none; b=pqUltuVcH9MEVmMQlc3ZxZgBhwdBHfemx2s/xrMJ+jOhJrrWGJTZjp9L8BbNwhjaBYrU+Aj+7EnzChi3MSPwwYiKtk8n4QNxNhwMwUZZvA4sDQYmNGzf7ZpQgYMtfO3bQ7J89J0mPMwm6nDZkbf0y+kOqfKgJ+IoFwFFrxvLbSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768515969; c=relaxed/simple;
-	bh=HAhZBVOAndOrwaivbJzPBiAv/kgx9YIV8eA0/DOxyos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AXGkHvUZ7kFzNVo2xYRcK61lZ1sGUPWhoLv7LAWlNKLiG/aVJRnDpx2hPIzBeLmGo1s/8U68dDxvfbHG2Xd8jcxWx2NQJIuJm9HdEt0O5cMJl15qGkQl0BkK97UhwjcTAz9i7qlTQ8OHXpafQoUdm0nGjPuEbYWf32FtyszxblA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmV23DrH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=npBOFfDI; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1768515970; c=relaxed/simple;
+	bh=wO7VbTTA74i6b8rXWNUZqLt1krbj/c5iltyk1DS6oFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=t3Mdxc/WtuLdd1RjJOVKJYWbe4TN64vcDfd337AYbCnrkkZ/cUq+7OEOwYI0VUNCp7QiFQl9gUYLudGBGOLOYYpe6YcR96le4T0jcn0GDT8PhsV9zsq40y/YARfvUA5fVmbS65gvB7VnAMvw2zoFvIGdV6ahC7QqdSKngM3RlMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wzok4xfQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5w1hpZA; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768515967;
+	s=mimecast20190719; t=1768515968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
-	b=EmV23DrHWxAxVr2jrYgLH313FIDKAuR3oiIsLgJJs+n9aSNQsYjy0m4bHRQdCp/ijErTKw
-	e0nUrUULqr7ve8ODVvVxzr7BsYsP+daspJih7A64SvS0Gjre/mq1/0KDxpP6I72CZ4BWSn
-	DkJpa3oWDji7MrqYhv8c3JBAoaFU+iQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yOw140+gS4p6D8j9ofaxXXMdBY274y7EasdRz0cci48=;
+	b=Wzok4xfQPS6oRTaUCNTN4BNBFTsq+e6gtdMix8jjFCOZQUMz0AD5//cfZzZRzZSqQo0V1s
+	vApycqBW79g3v6+bjYNWf/GWxXlr9TCSsYm3wFChrtujztDWuZ6LGA6u2ZohR+rfLUv3Eg
+	zbdGqHwZSlLzxomPlzPmM31WPz+Lfe0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-408-XxGpBlcmPNGw7TAtRUaJJA-1; Thu, 15 Jan 2026 17:26:05 -0500
-X-MC-Unique: XxGpBlcmPNGw7TAtRUaJJA-1
-X-Mimecast-MFC-AGG-ID: XxGpBlcmPNGw7TAtRUaJJA_1768515964
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432c05971c6so942543f8f.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:26:05 -0800 (PST)
+ us-mta-283-p4DS3qIMP1KUKofSY5F1lA-1; Thu, 15 Jan 2026 17:26:07 -0500
+X-MC-Unique: p4DS3qIMP1KUKofSY5F1lA-1
+X-Mimecast-MFC-AGG-ID: p4DS3qIMP1KUKofSY5F1lA_1768515966
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-432db1a9589so1228410f8f.0
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:26:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768515963; x=1769120763; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
-        b=npBOFfDI4Y39RrPRT8agzoseiFCj05uMSykYxjQ+LPxFIS1mFSuZkpnZEUXYF+oT7Q
-         LZJ4yGfoDF8gM/4YsqiiHHPqbO5ET3FWjRr1jCwp/gGLrdyBXwDLc2xv3Dvrng1LVZzp
-         wsCGlpWmZPQSjzTPyV5ZcxrHRp2kNSUv0rbqvZHgME3aD4eEAga+uHGMfC1bKA/A/y64
-         RbmIbH+W2J9zxdYDLKod3fo+2jCXQdr/+XdSCthjgpJibFFBbuuu0UKYp9tyzLrkmeTd
-         l6mV1MVbYraAEbeEiaANZKYZy0kMFy0nvniFV4Yp1HNfDxIua4lzsTukH5BU2NYH+aNz
-         /fsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768515963; x=1769120763;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1768515964; x=1769120764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
-        b=EeV4ynt1cojFHfsETDIvB1Oa82/KwQl2/kmOv2q2dqtriUS+Ozq7yiBRZnybQBK510
-         IOPVSptU+9A7R4eM/USFuor8VRxXThUWggSUEM9BcFBuZfFwy+04rp4gVoDekbP9p6eY
-         hJcbCqhGQyUhPkeVq0qghZGjzqL9MWf7GDUxNRjFu7bv7DjAg606x5mfEo71S35eiWCj
-         4Y1OBSoDo5H7JE6J0IOUVCb4ZcYOJ0l6np8YEz12Ik5dJiG3hRO5iIf80vntHYhjFS/u
-         5T9Htx61Ni3g5m/VYpNpUfi+SMPUW8cl0gdnMAk/1I+uWlwU65LSy+bD4dC8q1q95aKT
-         krPw==
-X-Gm-Message-State: AOJu0YyCnLoGqtNa79S8UneVZ3goOeoYNpAJTebc/xqhXZgeBWXME33M
-	JlCGLl/ZMgPK2tllIWlU7IcYsMoTPecxW7MNZzpqTBcN0/3ZfR5vWmYUS+Xb4LDR+3dQjGxusSm
-	RiJATE2FAEfkItQnnkJOav9dd8iHGM3KqLQpXyozOc1FNHxseno8L9u3EprFdfL4y0eBk2emWBn
-	rVpKA4kX78U0XVqHppg+KX1ehY2LFS7GpIO3mqZpPiaw==
-X-Gm-Gg: AY/fxX4o7nKxHodzDbkrAzy33eJqtIDG2S645h/vGPG+oeHj48FalLOzz9C30WrKBtz
-	wEkQ//APt65nUNzUs+VdLXJOKObacxVZiHUg3ovqgNWGGtio+VtGs/OYiv23IZWfQdurm1DnH9U
-	bFffrMvDStUw4EcbcXye3m/BnNfrzdb/4qCrHqksKq8qC2KRvSpyQKd93m7pGJcM0y42jzh8sGQ
-	2GNhEkl2JPc7rVdSA8vOXmklXIfm75MGyoHz5/MHIbyX7FRGiUa4lrFXZFmXWbbzwHS3cKiuxZu
-	/N97/AaIWkxxX3z00I4LoiblhCij+/iqd4hY6AQXzkNSfTKFpa8QnN2F/UNcpBFU/roH4MTov2/
-	gOi//cj/UHqLC2VYB4216uTZ0gA+VikOvTU5jhUQMK+z7kQ==
-X-Received: by 2002:a05:6000:258a:b0:430:fae3:c833 with SMTP id ffacd0b85a97d-434d755262bmr6220023f8f.7.1768515963017;
+        bh=yOw140+gS4p6D8j9ofaxXXMdBY274y7EasdRz0cci48=;
+        b=G5w1hpZAoD/Y3sz9tj328Hav6wI+Y91yRB72T6QWtEZTJ4yImr+9dDQ4oB0Rqs30IH
+         5mA1kILKclKgtHyJjmLZv79eNmwMRwQzy9/nwvVBO206bEJIZNZ2q1+hMZSK1CIoTh1t
+         sMj0EKUgaKPVXkR6kegBomcHuW2nQ5mlGjHlbaMgeBK8agF4qZ3EK4emT56y13vWQ5mU
+         BlqpC6aV7va+NAQdtbkgupZsgM6Mh1edpF0fbL3Vl4MXeYR+tZPHtqBDYOfaJ45wB+Kp
+         mbi1VEtZ9miVh91RpSTYyWd+A75DAdxLQaxEp9E4f6sYSIv8DyhGBHOIaOgmYYh21n7+
+         Yw9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768515964; x=1769120764;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yOw140+gS4p6D8j9ofaxXXMdBY274y7EasdRz0cci48=;
+        b=XWEzPBKqi3TFoyNRLaqgoZtQFK1iAQbo6Qnyoy2Medc5t5SgZcMYKJ4Ma1Qz1tzseu
+         /f2y0iJfyJlsJI9THT6hYvc8UTQmEj4d57cPNQIpdKdJ+x/Arh1H6Z6neOxcVj/zr4Bc
+         G3l3X12QpSNTQ8ZKzNV8MrRQKMEhh/3xjVprM4RIJYktrXMvQPZ4RMKefluE9Y/LTzD4
+         OZgBFbf6g4lPp0dceJ5EYqFFw93steMD+2tvvmSG4MxOqqNrEEe91oV57e2cQ/LC/0tY
+         dlLZrkuMjSeTVc8UQZ/iHUjXobtsw1KNxzP2jH0PhdJZpARVGfLaWAgx9ja/4JdLdBT+
+         mXoA==
+X-Gm-Message-State: AOJu0YxoixHa/KA4eymxY+9XKo1EWQxM433O46Gzr5dxOCrFxpyp3Uqt
+	hYUz3zbjdUfSD9Dvn3LGTgljLUrxTABElD/pIn7USwt8OJrf/MYHgpoU2XCQe/3//A181uskBFN
+	VAc14+Cu2ilWatzJH544TSHQrAv1ivh8+p7/l4f3Gb3WR27/OITzSNu+BlTfLlqTF0HVDNuXPUv
+	ejw1hKWUVV/Y5S67RDUTuOB8G79DpC5JKuOXOUYPQh5Q==
+X-Gm-Gg: AY/fxX4kd27Z/6QNkSJVJzG+cKMiGy3qJXJnMT6FAyTE2fKG/+oWhw8yv5K/WS7zeVW
+	K432N2oUDwI1WHZr+0DJcXn/nmJchrZiY7tg1cTc6BckHHRyGTYuCFlH8w1FazP8iF9mgL7A96U
+	GRXC+5dDaCFYIzZVRrMHuMxveEXRQ8famgXwbNFANGrFjen+4Y4dwKuW68Po+PFAKDhmL8zhXZ4
+	aJJXo9/aNC5cAdkAKRLPWXUL+Glh2sdV+zZoAai3WJ3Y9Ri6M4QyrNwaVkaTFAXJLJ2gPKrAr2e
+	h+rs1+fFgoMCMLh37I/K1xCSTP/7jLvRB2JK+HqmbkdMJBcyZK7ZjXf/5kUqrYTPmTbwVNuas0V
+	h6mIidGBAcCWu7Yfl4Y5NiDLq4QxrnBu8pvBytPDUhCLQLQ==
+X-Received: by 2002:a05:6000:26c6:b0:431:6ba:38bd with SMTP id ffacd0b85a97d-43569972db5mr1148674f8f.10.1768515964015;
+        Thu, 15 Jan 2026 14:26:04 -0800 (PST)
+X-Received: by 2002:a05:6000:26c6:b0:431:6ba:38bd with SMTP id ffacd0b85a97d-43569972db5mr1148642f8f.10.1768515963575;
         Thu, 15 Jan 2026 14:26:03 -0800 (PST)
-X-Received: by 2002:a05:6000:258a:b0:430:fae3:c833 with SMTP id ffacd0b85a97d-434d755262bmr6219993f8f.7.1768515962614;
-        Thu, 15 Jan 2026 14:26:02 -0800 (PST)
 Received: from localhost (net-37-117-189-93.cust.vodafonedsl.it. [37.117.189.93])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699271dfsm1395487f8f.15.2026.01.15.14.26.02
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cf42sm1390240f8f.20.2026.01.15.14.26.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 14:26:02 -0800 (PST)
+        Thu, 15 Jan 2026 14:26:03 -0800 (PST)
 From: Paolo Valerio <pvalerio@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
@@ -98,10 +101,12 @@ Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
-Subject: [PATCH net-next 0/8] net: macb: Add XDP support and page pool integration
-Date: Thu, 15 Jan 2026 23:25:23 +0100
-Message-ID: <20260115222531.313002-1-pvalerio@redhat.com>
+Subject: [PATCH net-next 1/8] net: macb: move Rx buffers alloc from link up to open
+Date: Thu, 15 Jan 2026 23:25:24 +0100
+Message-ID: <20260115222531.313002-2-pvalerio@redhat.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260115222531.313002-1-pvalerio@redhat.com>
+References: <20260115222531.313002-1-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,83 +116,181 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Tested on Raspberry Pi 5.
-All the changes are intended for gem only.
+From: Théo Lebrun <theo.lebrun@bootlin.com>
 
-The series consists of two main changes:
+mog_alloc_rx_buffers(), getting called at open, does not do rx buffer
+alloc on GEM. The bulk of the work is done by gem_rx_refill() filling
+up all slots with valid buffers.
 
-- Migration from netdev_alloc_skb() to page pool allocation model,
-  enabling skb recycling.
-  This also adds support for multi-descriptor frame reception,
-  removing the previous single-descriptor approach and avoiding
-  potentially large contiguous allocations for e.g. jumbo frames
-  with CONFIG_PAGE_SIZE_4KB.
+gem_rx_refill() is called at link up by
+gem_init_rings() == bp->macbgem_ops.mog_init_rings().
 
-- XDP support: Initial XDP implementation supporting major
-  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
-  the ndo_xdp_xmit function for packet redirection.
+Move operation to macb_open(), mostly to allow it to fail early and
+loudly rather than init the device with Rx mostly broken.
 
-The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
-NETDEV_XDP_ACT_NDO_XMIT capabilities.
+About `bool fail_early`:
+ - When called from macb_open(), ring init fails as soon as a queue
+   cannot be refilled.
+ - When called from macb_hresp_error_task(), we do our best to reinit
+   the device: we still iterate over all queues and try refilling all
+   even if a previous queue failed.
 
-Previous versions
-=================
-  - RFC v1: https://lore.kernel.org/netdev/20251119135330.551835-1-pvalerio@redhat.com/
-  - RFC v2: https://lore.kernel.org/netdev/20251220235135.1078587-1-pvalerio@redhat.com/
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+---
+ drivers/net/ethernet/cadence/macb.h      |  2 +-
+ drivers/net/ethernet/cadence/macb_main.c | 40 +++++++++++++++++-------
+ 2 files changed, 30 insertions(+), 12 deletions(-)
 
-RFC v2 -> v1
-============
-  - Removed bp->macbgem_ops.mog_init_rings(bp) call from macb_open()
-  - Fixed includes (remove unneeded, moved one from header to macb_main.c)
-  - Reverse xmas tree ordering (gem_rx, gem_rx_refill)
-  - print_hex_dump_debug() instead of print_hex_dump()
-  - Replaced rx frame length check with MACB_BIT(RX_EOF) for data_len
-    calculation
-  - Removed NET_IP_ALIGN handling in rx buffer size calculation
-  - Updated debug format string to include rx_headroom and total size
-  - Changed types to unsigned int in helper functions and variable
-  - Removed unneeded line break
-
-RFC v1 -> RFC v2
-================
-  - Squashed 1/6 and 2/6
-  - Reworked rx_buffer_size computation. It no longer takes into
-    accounts extra room.
-  - A bunch of renaming (rx_offset => rx_headroom, removed MACB_MAX_PAD,
-    MACB_PP_HEADROOM => XDP_PACKET_HEADROOM, data => ptr, xdp_q => xdp_rxq,
-    macb_xdp() => gem_xdp(), macb_xdp_xmit() => gem_xdp_xmit())
-  - Deduplicated buffer size computation in gem_xdp_valid_mtu()
-    and gem_xdp_setup()
-  - gem_xdp_setup() no longer close()/open()
-  - Renaming from rx_skbuff to rx_buff is now got split in a separate commit
-  - Open-coded gem_page_pool_get_buff()
-  - Added missing rx_buff re-initialization in the error path during rx
-  - Page pool creation failure now fails the device open
-  - Moved xdp buff preparation inside gem_xdp_run()
-  - Added missing rcu_access_pointer()
-  - Turned return value in -EOPNOTSUPP for macb_xdp() on failure
-  - moved tx_skb to tx_buff renaming to a separate commit
-  - Removed some unneeded code and set MACB_TYPE_SKB for lp->rm9200_txq[desc].type as well
-  - Replaced !!addr with a dedicated bool in macb_xdp_submit_frame()
-
-
-Paolo Valerio (7):
-  net: macb: rename rx_skbuff into rx_buff
-  cadence: macb: Add page pool support handle multi-descriptor frame rx
-  cadence: macb: use the current queue number for stats
-  cadence: macb: add XDP support for gem
-  cadence: macb: make macb_tx_skb generic
-  cadence: macb: make tx path skb agnostic
-  cadence: macb: introduce xmit support
-
-Théo Lebrun (1):
-  net: macb: move Rx buffers alloc from link up to open
-
- drivers/net/ethernet/cadence/Kconfig     |   1 +
- drivers/net/ethernet/cadence/macb.h      |  40 +-
- drivers/net/ethernet/cadence/macb_main.c | 827 +++++++++++++++++------
- 3 files changed, 659 insertions(+), 209 deletions(-)
-
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 87414a2ddf6e..2cb65ec37d44 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1180,7 +1180,7 @@ struct macb_queue;
+ struct macb_or_gem_ops {
+ 	int	(*mog_alloc_rx_buffers)(struct macb *bp);
+ 	void	(*mog_free_rx_buffers)(struct macb *bp);
+-	void	(*mog_init_rings)(struct macb *bp);
++	int	(*mog_init_rings)(struct macb *bp, bool fail_early);
+ 	int	(*mog_rx)(struct macb_queue *queue, struct napi_struct *napi,
+ 			  int budget);
+ };
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 2d5f3eb09530..5947c2b44bb3 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -705,8 +705,8 @@ static void macb_mac_link_up(struct phylink_config *config,
+ 		if (rx_pause)
+ 			ctrl |= MACB_BIT(PAE);
+ 
+-		/* Initialize rings & buffers as clearing MACB_BIT(TE) in link down
+-		 * cleared the pipeline and control registers.
++		/* Initialize buffer registers as clearing MACB_BIT(TE) in link
++		 * down cleared the pipeline and control registers.
+ 		 */
+ 		macb_init_buffers(bp);
+ 
+@@ -1249,13 +1249,14 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 	return packets;
+ }
+ 
+-static void gem_rx_refill(struct macb_queue *queue)
++static int gem_rx_refill(struct macb_queue *queue)
+ {
+ 	unsigned int		entry;
+ 	struct sk_buff		*skb;
+ 	dma_addr_t		paddr;
+ 	struct macb *bp = queue->bp;
+ 	struct macb_dma_desc *desc;
++	int err = 0;
+ 
+ 	while (CIRC_SPACE(queue->rx_prepared_head, queue->rx_tail,
+ 			bp->rx_ring_size) > 0) {
+@@ -1272,6 +1273,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 			if (unlikely(!skb)) {
+ 				netdev_err(bp->dev,
+ 					   "Unable to allocate sk_buff\n");
++				err = -ENOMEM;
+ 				break;
+ 			}
+ 
+@@ -1321,6 +1323,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 
+ 	netdev_vdbg(bp->dev, "rx ring: queue: %p, prepared head %d, tail %d\n",
+ 			queue, queue->rx_prepared_head, queue->rx_tail);
++	return err;
+ }
+ 
+ /* Mark DMA descriptors from begin up to and not including end as unused */
+@@ -1773,7 +1776,7 @@ static void macb_hresp_error_task(struct work_struct *work)
+ 	netif_tx_stop_all_queues(dev);
+ 	netif_carrier_off(dev);
+ 
+-	bp->macbgem_ops.mog_init_rings(bp);
++	bp->macbgem_ops.mog_init_rings(bp, false);
+ 
+ 	/* Initialize TX and RX buffers */
+ 	macb_init_buffers(bp);
+@@ -2546,8 +2549,6 @@ static int macb_alloc_consistent(struct macb *bp)
+ 		if (!queue->tx_skb)
+ 			goto out_err;
+ 	}
+-	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+-		goto out_err;
+ 
+ 	/* Required for tie off descriptor for PM cases */
+ 	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
+@@ -2559,6 +2560,11 @@ static int macb_alloc_consistent(struct macb *bp)
+ 			goto out_err;
+ 	}
+ 
++	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
++		goto out_err;
++	if (bp->macbgem_ops.mog_init_rings(bp, true))
++		goto out_err;
++
+ 	return 0;
+ 
+ out_err:
+@@ -2579,11 +2585,13 @@ static void macb_init_tieoff(struct macb *bp)
+ 	desc->ctrl = 0;
+ }
+ 
+-static void gem_init_rings(struct macb *bp)
++static int gem_init_rings(struct macb *bp, bool fail_early)
+ {
+ 	struct macb_queue *queue;
+ 	struct macb_dma_desc *desc = NULL;
++	int last_err = 0;
+ 	unsigned int q;
++	int err;
+ 	int i;
+ 
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+@@ -2599,13 +2607,24 @@ static void gem_init_rings(struct macb *bp)
+ 		queue->rx_tail = 0;
+ 		queue->rx_prepared_head = 0;
+ 
+-		gem_rx_refill(queue);
++		/* We get called in two cases:
++		 *  - open: we can propagate alloc errors (so fail early),
++		 *  - HRESP error: cannot propagate, we attempt to reinit
++		 *    all queues in case of failure.
++		 */
++		err = gem_rx_refill(queue);
++		if (err) {
++			last_err = err;
++			if (fail_early)
++				break;
++		}
+ 	}
+ 
+ 	macb_init_tieoff(bp);
++	return last_err;
+ }
+ 
+-static void macb_init_rings(struct macb *bp)
++static int macb_init_rings(struct macb *bp, bool fail_early)
+ {
+ 	int i;
+ 	struct macb_dma_desc *desc = NULL;
+@@ -2622,6 +2641,7 @@ static void macb_init_rings(struct macb *bp)
+ 	desc->ctrl |= MACB_BIT(TX_WRAP);
+ 
+ 	macb_init_tieoff(bp);
++	return 0;
+ }
+ 
+ static void macb_reset_hw(struct macb *bp)
+@@ -2953,8 +2973,6 @@ static int macb_open(struct net_device *dev)
+ 		goto pm_exit;
+ 	}
+ 
+-	bp->macbgem_ops.mog_init_rings(bp);
+-
+ 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+ 		napi_enable(&queue->napi_rx);
+ 		napi_enable(&queue->napi_tx);
 -- 
 2.52.0
 
