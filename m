@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-250049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D5CD23565
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:04:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF093D23583
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72B0030DA385
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:02:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6E7C3016B98
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFFF342524;
-	Thu, 15 Jan 2026 09:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubX5azMq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CC7345CDC;
+	Thu, 15 Jan 2026 09:06:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB7C34216C;
-	Thu, 15 Jan 2026 09:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F1134676E
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768467770; cv=none; b=KurOPkgV2StONxgi5K7bomRBef1/CnayEq3usAITPuIZlaKYWT+3RWiK55gBTy6p+7JIkEylZWjMG3x/2F0CpgLP+uWaAj7O/+JmXsxIXRGQN9BZA/py1uJt3IOsSr79laAiaTGpvJkrxieOZQ7bMSn2DcD48UanCobHdWcYiwQ=
+	t=1768467979; cv=none; b=ONzIHKzC8hKwJAnGuKdoD5/B/PX0b1TawS7xIFH3uvKVg02e8G1ybbA97sRPLvDTGZgGiSq+PylVV7aBgLnmbo56159GWtC8TCMRLtb3od1aK9vw2ALLE6dbvKqavAnvZDaYJCSUVrBRqT231afbn3uhR3H4X0E92capwCpEoW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768467770; c=relaxed/simple;
-	bh=OJj8CRmBJiC3L/Xh0D1spEOAiNmtLuldfxbZuCRn0ZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WIr74MGpAFdnhbfPYAd2Ki2TGdlPAylW7xFFJliW7bcYtvhwS0Cp4GHHHcYQam4HhuOvabYBHFNUZbLrZmtI9XRRI7BwCw7Zfv4qsTgdy5xrweHB0QqtLsrEkLpCXUodQv23muqCxWcxc8PNaRZ4jYUsGcOc3wLNVQCcEYRCs2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubX5azMq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C217C19421;
-	Thu, 15 Jan 2026 09:02:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768467770;
-	bh=OJj8CRmBJiC3L/Xh0D1spEOAiNmtLuldfxbZuCRn0ZI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ubX5azMqdkrf9FZ5tv34PY1boGwgvK0kZf0QdGDz4KUfT9TSD6NfbTSYITwsG/H6b
-	 ZA+gyY1uRUuJzDh0Mglfta50RGX3PWKFcpGwxWiuaZJdvytZBf9PXkPXQ5XYOlEO/Y
-	 gD8XZQRCg81iY59uEKZC9XSmCW54TQ0D9gLE2znmowtTX/PoTAy9dHRWHcCJF0lHkW
-	 /FHWCv796uJi1zm8nT/9+4hhSKhIrXv+WW9+XEcovAtgwZnWT17Yr8BTu/aHuiSKOo
-	 HUQBYwI4oVRLZMDLCp0DwF3Gfr+sUCVaWW6lD/s/To0+AprIoj4kWqL9EFfP/xoaZY
-	 GYzuUZyK+isGA==
-From: Geliang Tang <geliang@kernel.org>
-To: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Gang Yan <yangang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	Geliang Tang <geliang@kernel.org>
-Subject: [PATCH net-next v2] selftests: tls: use mkstemp instead of open(O_TMPFILE)
-Date: Thu, 15 Jan 2026 17:02:40 +0800
-Message-ID: <2fa14a04f5287c956a1112cef8cdfb2c86931d2d.1768467496.git.tanggeliang@kylinos.cn>
+	s=arc-20240116; t=1768467979; c=relaxed/simple;
+	bh=v6HrDI9cHjNgf34ugiRGvSLeT0iHi/rraxnkXrDSAmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MqewBhwtJ9o4sqwTRnGHTaCBdw39A4us/Xe93m5kurDs3yDmqVkC5Rieu+Kz6JqdWG9udLWeRvF10DnfVOwUHlvR4JEscfhFBJzQZ7csfG21vMJVl+SXiMv8GdCPFzurgNjcUIxKfearwU3Ha41IXhSC2rtcmYvUuZfMQtPO0XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgJIu-0004cP-TW; Thu, 15 Jan 2026 10:06:08 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgJIv-000jGP-1B;
+	Thu, 15 Jan 2026 10:06:08 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 70DB74CD6AF;
+	Thu, 15 Jan 2026 09:06:08 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/4] pull-request: can 2026-01-15
+Date: Thu, 15 Jan 2026 09:57:07 +0100
+Message-ID: <20260115090603.1124860-1-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,100 +61,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Gang Yan <yangang@kylinos.cn>
+Hello netdev-team,
 
-When running TLS tests in a virtual machine/container environment, they
-fail in test_mutliproc():
+this is a pull request of 4 patches for net/main, it super-seeds the
+"can 2026-01-14" pull request. The dev refcount leak in patch #3 is
+fixed.
 
- # tls.c:1479:mutliproc_even: Expected fd (-1) >= 0 (0)
- # mutliproc_even: Test terminated by assertion
- #          FAIL  tls.12_aes_gcm.mutliproc_even
- not ok 59 tls.12_aes_gcm.mutliproc_even
- #  RUN           tls.12_aes_gcm.mutliproc_readers ...
- # tls.c:1479:mutliproc_readers: Expected fd (-1) >= 0 (0)
- # mutliproc_readers: Test terminated by assertion
- #          FAIL  tls.12_aes_gcm.mutliproc_readers
- not ok 60 tls.12_aes_gcm.mutliproc_readers
- #  RUN           tls.12_aes_gcm.mutliproc_writers ...
- # tls.c:1479:mutliproc_writers: Expected fd (-1) >= 0 (0)
- # mutliproc_writers: Test terminated by assertion
- #          FAIL  tls.12_aes_gcm.mutliproc_writers
- not ok 61 tls.12_aes_gcm.mutliproc_writers
+The first 3 patches are by Oliver Hartkopp and revert the approach to
+instantly reject unsupported CAN frames introduced in
+net-next-for-v6.19 and replace it by placing the needed data into the
+CAN specific ml_priv.
 
-This is because the /tmp directory uses the virtiofs filesystem, which does
-not support the O_TMPFILE feature.
+The last patch is by Tetsuo Handa and fixes a J1939 refcount leak for
+j1939_session in session deactivation upon receiving the second RTS.
 
-This patch uses mkstemp() to create temporary files, just like the approach
-used in chunked_sendfile(), thereby eliminating the dependency on the
-O_TMPFILE feature.
+regards,
+Marc
 
-For better code reuse, factor out this code from chunked_sendfile() into a
-separate helper create_temp_file(). Use this new heler in test_mutliproc()
-and closes the file descriptor (fd) after the test ends.
-
-Co-developed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Gang Yan <yangang@kylinos.cn>
 ---
-v2:
- - factor out a new helper, use it in both chunked_sendfile() and
-   test_mutliproc().
----
- tools/testing/selftests/net/tls.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index 9e2ccea13d70..2eaacb7f2e56 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -467,6 +467,15 @@ TEST_F(tls, send_then_sendfile)
- 	close(filefd);
- }
- 
-+static int create_temp_file(void)
-+{
-+	char filename[] = "/tmp/mytemp.XXXXXX";
-+	int fd = mkstemp(filename);
-+
-+	unlink(filename);
-+	return fd;
-+}
-+
- static void chunked_sendfile(struct __test_metadata *_metadata,
- 			     struct _test_data_tls *self,
- 			     uint16_t chunk_size,
-@@ -476,11 +485,9 @@ static void chunked_sendfile(struct __test_metadata *_metadata,
- 	uint16_t test_payload_size;
- 	int size = 0;
- 	int ret;
--	char filename[] = "/tmp/mytemp.XXXXXX";
--	int fd = mkstemp(filename);
-+	int fd = create_temp_file();
- 	off_t offset = 0;
- 
--	unlink(filename);
- 	ASSERT_GE(fd, 0);
- 	EXPECT_GE(chunk_size, 1);
- 	test_payload_size = chunk_size + extra_payload_size;
-@@ -1469,7 +1476,7 @@ test_mutliproc(struct __test_metadata *_metadata, struct _test_data_tls *self,
- 	write_bias = n_readers / n_writers ?: 1;
- 
- 	/* prep a file to send */
--	fd = open("/tmp/", O_TMPFILE | O_RDWR, 0600);
-+	fd = create_temp_file();
- 	ASSERT_GE(fd, 0);
- 
- 	memset(buf, 0xac, file_sz);
-@@ -1527,6 +1534,7 @@ test_mutliproc(struct __test_metadata *_metadata, struct _test_data_tls *self,
- 			left -= res;
- 		}
- 	}
-+	close(fd);
- }
- 
- TEST_F(tls, mutliproc_even)
--- 
-2.51.0
+The following changes since commit 3879cffd9d07aa0377c4b8835c4f64b4fb24ac78:
 
+  net/sched: sch_qfq: do not free existing class in qfq_change_class() (2026-01-13 19:36:56 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.19-20260115
+
+for you to fetch changes up to 1809c82aa073a11b7d335ae932d81ce51a588a4a:
+
+  net: can: j1939: j1939_xtp_rx_rts_session_active(): deactivate session upon receiving the second rts (2026-01-15 09:52:39 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.19-20260115
+
+----------------------------------------------------------------
+Marc Kleine-Budde (1):
+      Merge patch series "can: raw: better approach to instantly reject unsupported CAN frames"
+
+Oliver Hartkopp (3):
+      Revert "can: raw: instantly reject unsupported CAN frames"
+      can: propagate CAN device capabilities via ml_priv
+      can: raw: instantly reject disabled CAN frames
+
+Tetsuo Handa (1):
+      net: can: j1939: j1939_xtp_rx_rts_session_active(): deactivate session upon receiving the second rts
+
+ drivers/net/can/Kconfig       |  7 ++++--
+ drivers/net/can/Makefile      |  2 +-
+ drivers/net/can/dev/Makefile  |  5 +++--
+ drivers/net/can/dev/dev.c     | 27 +++++++++++++++++++++++
+ drivers/net/can/dev/netlink.c |  1 +
+ drivers/net/can/vcan.c        | 15 +++++++++++++
+ drivers/net/can/vxcan.c       | 15 +++++++++++++
+ include/linux/can/can-ml.h    | 24 ++++++++++++++++++++
+ include/linux/can/dev.h       |  8 +------
+ net/can/j1939/transport.c     | 10 ++++++++-
+ net/can/raw.c                 | 51 +++++++++----------------------------------
+ 11 files changed, 111 insertions(+), 54 deletions(-)
 
