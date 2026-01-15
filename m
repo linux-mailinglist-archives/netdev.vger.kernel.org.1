@@ -1,139 +1,169 @@
-Return-Path: <netdev+bounces-250198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C056FD24F77
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:34:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37F4D24FC5
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8F6F3023552
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:33:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 54D1730392A6
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5073A1A5B;
-	Thu, 15 Jan 2026 14:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hB+Tg+9f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE01E3A4F4B;
+	Thu, 15 Jan 2026 14:38:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795503A0B28
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A20430B53C
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768487634; cv=none; b=HanLG9vnvfh7O0MDLvIFSp4jBe4kZaKoyU4HGf08TsQ39VbNcSamAc9sCPMpCjA5CTzHAQbTtQfm346S/fI0MorEes0Kd23ypXutXbOFqI0knnlWw63H9loYQDDyCmpHmurI7434joEchdS3zEtoQ/SnSM0V1XKm8k5H1ZfOWfM=
+	t=1768487903; cv=none; b=Pww3OCxduuxfDk1Jh3FvpjphCScLG2WjibaDRLD4PzFXoH8TUBQYb+TY3B6UbEHBbpmLO1EzINBiU2tpaReQalsnuzL861reXaixqKDF/m7UKp1fXAdHTegRvecnD0Z4dylu1wDGAvJyq2iflDB9ghduJg4PuP3Gp8USdltgD6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768487634; c=relaxed/simple;
-	bh=8rR//kRgRM+Qh/l7k8ZvuRcqg72t/rP4Ihy/06zJAuc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YGzZKA7BbesesKk0+6qFvpw0pAbPRMUTbgENMQkolfnBKfBbCECoGx2qrXWY4qVpPfPnLuKQcjvR3gqPScEPE/XeI/c/2NPnDVxGy4xOwicxt/dbU5XxIzahXDPhM1mA3jPP8MsK4TbB5FunC6aXGcOtuCicpJi3o6M+I46NxKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=hB+Tg+9f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6517C16AAE
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:33:53 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hB+Tg+9f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1768487630;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=puVYZ6ntPN6hFvEqttknJOK7T6Kh44cVv1NhFCJjVaw=;
-	b=hB+Tg+9f6rUXMn2ykTVGX21ss7Qr2zMZ1+WP2YhUFNWwhxEWShlgPgBLvIZwYLKt1wTaaA
-	NZCcbcBPipIHJkpIyyYfCmX2rMaAWnDxn0qRNRmhvgcNwji6fA7rQs4CeqnHk19T+riTG1
-	0eLkV+gW6/BrIrMNQ5Sq/i8e/j/JUqo=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 96a1c10f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Thu, 15 Jan 2026 14:33:50 +0000 (UTC)
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7cfd1086588so601321a34.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:33:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW1M4wjQt7PL5FusN1nqRn+LneC+eWPByYvmeyeL6HW0ije/ES/Yn6A2sZ8Xz1OLJ8nC1hpyb8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhAWkcHXU0Vb6euAhHrQ64rU10YhXN/2JM7bAg7QR5fxgNwDqW
-	d+klvxeYkpy6pl0+5Cwl3ge2/Q2TsvxuKgaesxUJdGeca5HTggSjz/DcVz5N3V0MMuA2ZPKarwY
-	tTdtTYBIxShTZcqM9VBUCIAtIRo0dJKI=
-X-Received: by 2002:a05:6830:4408:b0:7bc:6cc3:a624 with SMTP id
- 46e09a7af769-7cfc8b69bd1mr4946386a34.32.1768487628292; Thu, 15 Jan 2026
- 06:33:48 -0800 (PST)
+	s=arc-20240116; t=1768487903; c=relaxed/simple;
+	bh=Jym+hB7alQQy54wZeliTw3/vUjoLAwmzKirUqnTIOwM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jNEb6MuPJE3eZAs75k7F18dt+PQ42PYf7y9V/QSHFJorXeuqp2nsg+VmpwJzXw8nBHPfReyDJ9uSiyVqLb8Pf2g/0vZTGhn6Z5tgyp9iRmqT5+a9edS9dRDJVtcxlNe2nz2G61TRd23QIwm/x4MB8yurnywwav9RSxUfqepQfLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-45c715116dbso631827b6e.3
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 06:38:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768487892; x=1769092692;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=obRPckYhjEiJNPLv4O3955QSZYUHJdHSvxM4hv9Cxmk=;
+        b=IyBc9Vp93aM5CrOQfL95PdzzCMzCoT1lOUU67qyPnnwyrICckIDTNcmfTEmmm8TIfT
+         b7h/a2sSMWyL6BwBtGGIjtNZGsadVhLuEdmKTmdg7CAe37GJ293A6zas8Jg81WHF6AnX
+         vOteFQ5+rkJjUW5H9WM4Nb4Xgt2s9pRS/AlBI8XXMPO+wZJgMZcQdnfTVjGDKLTASQkR
+         7UrbFEawsdhyoaBVoSqWs8tuIetMJBKpCV71LCcHKq058Zv9wnzvGNSxAJPWE3E5tXrS
+         ROIO9lJJ6GeacSsULlJpFagbGSBcH0AHIpmObsrJ7hdvC2OVdohSZ1L4cW/sBHk/NxNT
+         d1nQ==
+X-Gm-Message-State: AOJu0Yyf/cieuJNNvMrb61BK1x2Ywrgr7GOtSl4IAmu4k6sbEaP6PMBl
+	MhmCL3VDJ3/rVGyG7F1hS100ogb93iBq2hEZJdMvmozY1Jwk2mDd7itw
+X-Gm-Gg: AY/fxX4saLxtaos5DFfTlqgOQhTUsxMQJyDVAORDJ/AYZTnhPyo73FPpiXet63+kiPU
+	ueOxdAruVCMwKao/x1yBFzJsjayv+y/xqlezj1GPDw0OEfbmV7Ti/ardNc4Gn4d1Wtatg3Zdxhu
+	GF7hn6UVe060Gag2p8irrD9SHTOrKqPPzV+BWpvss/9Mnue613ETlMqvStG1v45G1mrLIsmLAZD
+	uE+edumiAiZ7hdufv9otVMEsr/w7Sv+xsvFut+DMQvQ9i2ZTnnS0IP1C+GAbngVeymsyJgREoCU
+	AICIxTsYuiarR6Iy41viLAK5Josp8Kk8e45VKNh6ym64TIT+/eXzIJ5pbciGHRvBP3ZG5R/D8nT
+	UnBThU5BtYs7dDWFjPy/3HhX3NiXmElA8CSczT8UPxXpk+P3Y+FjOxtpvgrxtihxiyzYrFno6NI
+	APYkWHpzRvSndh
+X-Received: by 2002:a05:6808:83cd:b0:45c:73b0:893c with SMTP id 5614622812f47-45c73b0aae1mr3347077b6e.11.1768487892230;
+        Thu, 15 Jan 2026 06:38:12 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:5e::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45a5dfb6256sm12849514b6e.0.2026.01.15.06.38.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 06:38:11 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/9] net: convert drivers to .get_rx_ring_count
+ (part 2)
+Date: Thu, 15 Jan 2026 06:37:47 -0800
+Message-Id: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260115033237.1545400-1-kuba@kernel.org> <20260115051221.68054-1-fushuai.wang@linux.dev>
- <CANn89iKfuXjqKsn+xB6bpGOaqM7pN4ZcRJ=2KJg4WY76ArYXhQ@mail.gmail.com>
-In-Reply-To: <CANn89iKfuXjqKsn+xB6bpGOaqM7pN4ZcRJ=2KJg4WY76ArYXhQ@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 15 Jan 2026 15:33:42 +0100
-X-Gmail-Original-Message-ID: <CAHmME9quqMVzD5zSEKvOFOYj3QLANAo2iYeqWQ1toV0C7gJXTg@mail.gmail.com>
-X-Gm-Features: AZwV_Qgs49WZRh6E-yqe5lqzG8HY34Jy6O9o1SJKl4M8EfIBEY_spLptdahY4Ps
-Message-ID: <CAHmME9quqMVzD5zSEKvOFOYj3QLANAo2iYeqWQ1toV0C7gJXTg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] wireguard: allowedips: Use kfree_rcu()
- instead of call_rcu()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Fushuai Wang <fushuai.wang@linux.dev>, kuba@kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, vadim.fedorenko@linux.dev, wangfushuai@baidu.com, 
-	wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAL37aGkC/yXMTQrCMBAG0KuEb91AklrRXEWk9GeM42KUSSyB0
+ ruL7frBW5FJmTKiWaG0cOa3IBrfGEzPQRJZnhENggtn531nk1ZlSf3IqV+CJZqvQ3dx7an1aAw
+ +Sg+ue3iDULFCteB+SP6OL5rK/8O2/QCuTJhFfAAAAA==
+X-Change-ID: 20260115-grxring_big_v2-eed9a5803431
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
+ Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, 
+ Somnath Kotur <somnath.kotur@broadcom.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, 
+ David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>, 
+ Bryan Whitehead <bryan.whitehead@microchip.com>, 
+ UNGLinuxDriver@microchip.com, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, 
+ Raju Rangoju <Raju.Rangoju@amd.com>, 
+ Potnuri Bharat Teja <bharat@chelsio.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Jiawen Wu <jiawenwu@trustnetic.com>, 
+ Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2118; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Jym+hB7alQQy54wZeliTw3/vUjoLAwmzKirUqnTIOwM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpaPvR64rLYjr2/iNqLeLLq4WUcZf2UrXiopTlb
+ njcXO6FZImJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaWj70QAKCRA1o5Of/Hh3
+ bZroD/0RDCaNjdoDbu0mv1OiLrdFYjfSMbkXoNZQmy/Ib1BSBZcMkshG7AJyuWcGBafcCmjj03x
+ VKqJbxcSyWQ+tpj8TL1dqoqagPpMLEixz4HugR9MHu39GxRHg67sAwg+bPc4+wBaKuZLdJrov+i
+ k4fLF83CLgthdt8vpKY08wNYHyNdWcaH9Gf1xQ1hbACXK2Knoyo3vVPYYVqwqG4Mrjc1N6tnItO
+ ShNU2XPOjTekErc+spOHazhTgbPOS2cL1cBA5An3oEfBvoryhf7jy/IljJdNYk3YOJxER/wCgWH
+ DktqZGJ03Tmty7FkBdzUv01Q7oMMOdia7Xa9xf7HBkWx1OmpOATfQhLnUwSusKwm6zxbDTy6jqL
+ 5h0No4RHrYc/ivjDAoBCmrG8u8LrAxElbmUm48x6nm7hIF8rSY/U0/FT87qYDJJuFycgyP2cQnR
+ mUzjeKJYEDqQw+vGd4Pg9Gjl+EenugTNENvN4aV8R3+z7BaR4NIsrT7N39bXBBxKSIOK9I26bGc
+ IkQovYC7ZbWc5SU7+e4ShGDEeeEjC9S8qIdwuLLXtglOSDGpEPrWbZDLSSURHuVTjjIzuEnFupK
+ C4GynyaMc4wqYJmfPgo5TVI7Bu+0yzeda7t8AfkbLDXnzDtVS07r4lJVG/ZyrVOJVsUKD89MXcG
+ 47Q/f6pZkmqcEEg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hi Eric,
+Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
+optimize RX ring queries") added specific support for GRXRINGS callback,
+simplifying .get_rxnfc.
 
-On Thu, Jan 15, 2026 at 10:15=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> > > The existing cleanup path is:
-> > >   wg_allowedips_slab_uninit() -> rcu_barrier() -> kmem_cache_destroy(=
-)
-> > >
-> > > With kfree_rcu(), this sequence could destroy the slab cache while
-> > > kfree_rcu_work() still has pending frees queued. The proper barrier f=
-or
-> > > kfree_rcu() is kvfree_rcu_barrier() which also calls flush_rcu_work()
-> > > on all pending batches.
-> >
-> > We do not need to add an explict kvfree_rcu_barrier(), becasue the comm=
-it
-> > 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_dest=
-roy()")
-> > already does it.
->
-> It was doing it, but got replaced recently with a plain rcu_barrier()
->
-> commit 0f35040de59371ad542b915d7b91176c9910dadc
-> Author: Harry Yoo <harry.yoo@oracle.com>
-> Date:   Mon Dec 8 00:41:47 2025 +0900
->
->     mm/slab: introduce kvfree_rcu_barrier_on_cache() for cache destructio=
-n
->
-> We would like explicit +2 from mm _and_ rcu experts on this wireguard pat=
-ch.
+Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
+.get_rx_ring_count().
 
-I'll take this through the wireguard tree.
+This simplifies the RX ring count retrieval and aligns the following
+drivers with the new ethtool API for querying RX ring parameters.
+  * emulex/benet
+  * engleder/tsnep
+  * mediatek
+  * amazon/ena
+  * microchip/lan743x
+  * amd/xgbe
+  * chelsio/cxgb4
+  * wangxun/txgbe
+  * cadence/macb
 
-But just a question on your comment, "It was doing it, but got
-replaced recently with a plain rcu_barrier()". Are you suggesting I
-need a kvfree_rcu_barrier() instead? The latest net-next has a
-kvfree_rcu_barrier_on_cache() called from kmem_cache_destroy()
-still... But are you suggesting I add this anyway?
+Part 1 is already merged in net-next and can be seen in
+https://lore.kernel.org/all/20260109-grxring_big_v1-v1-0-a0f77f732006@debian.org/
 
-diff --git a/drivers/net/wireguard/allowedips.c
-b/drivers/net/wireguard/allowedips.c
-index 5ece9acad64d..aee39a0303b0 100644
---- a/drivers/net/wireguard/allowedips.c
-+++ b/drivers/net/wireguard/allowedips.c
-@@ -417,7 +417,7 @@ int __init wg_allowedips_slab_init(void)
+PS: all of these change were compile-tested only.
+---
+Breno Leitao (9):
+      net: benet: convert to use .get_rx_ring_count
+      net: tsnep: convert to use .get_rx_ring_count
+      net: mediatek: convert to use .get_rx_ring_count
+      net: ena: convert to use .get_rx_ring_count
+      net: lan743x: convert to use .get_rx_ring_count
+      net: xgbe: convert to use .get_rx_ring_count
+      net: cxgb4: convert to use .get_rx_ring_count
+      net: macb: convert to use .get_rx_ring_count
+      net: txgbe: convert to use .get_rx_ring_count
 
- void wg_allowedips_slab_uninit(void)
- {
-- rcu_barrier();
-+ kvfree_rcu_barrier();
-  kmem_cache_destroy(node_cache);
- }
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c      | 22 +++------------
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c       | 15 +++--------
+ drivers/net/ethernet/cadence/macb_main.c           | 11 +++++---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c | 11 +++++---
+ drivers/net/ethernet/emulex/benet/be_ethtool.c     | 31 ++++++----------------
+ drivers/net/ethernet/engleder/tsnep_ethtool.c      | 11 +++++---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c        | 15 ++++++-----
+ drivers/net/ethernet/microchip/lan743x_ethtool.c   | 13 +++------
+ drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c | 12 ++++++---
+ 9 files changed, 58 insertions(+), 83 deletions(-)
+---
+base-commit: cc75d43783f74fe0a1c288aba9e6ac55f1444977
+change-id: 20260115-grxring_big_v2-eed9a5803431
 
-Let me know.
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
-Thanks,
-Jason
 
