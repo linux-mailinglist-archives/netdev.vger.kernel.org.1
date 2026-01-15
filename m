@@ -1,332 +1,194 @@
-Return-Path: <netdev+bounces-250329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA4ABD29006
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:24:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBDED29021
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 23:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59CE2301458C
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:23:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE8113018416
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 22:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA2B327BEC;
-	Thu, 15 Jan 2026 22:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD193242AD;
+	Thu, 15 Jan 2026 22:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KpVhqMpG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmV23DrH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="npBOFfDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D73A320A1A
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B3E1C4A24
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768515827; cv=none; b=F/O64kBhByNAeFMO/nLPypSVQFyy07GNylmbIW0BQTPDVB7YN3L+bg1Ut0l0qVxQz8RDsqBDx4cSDVCeRjAE9mwm/qIMl4BYxOTJWmrB81yeX4Xv7qiPqJ5rOKDxqU1L9I+iEvdWfu0GPqJoF0OXVO5vAipPQ06WmgrYGE5i8ag=
+	t=1768515969; cv=none; b=CMwYpUZKyiitirDYWXQoRw2tgLalbXwdpUfG5l6IouNBo/HDGPBDzgTJM5z82gyeyt3JjRrN+GeDD3ISBwoktNo8YA0/AGbFO4UGZt/pUzELMPc4SvWAwLxeccoMnhvp57CFsWj0Q4GryTDCx6vNIUosTNqhdH8zelnNfLHiVoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768515827; c=relaxed/simple;
-	bh=fDJP42lW9gpk6FWW89FMF7VSnQZOI3y90HN2JTsof7E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iU6PgoNrl4IDlw3EZEVwCMyHjCbWVeVioziAuBn1Un/zLuZQO7qo11xVd/uH5E3jKrfyJ1ezBYfxGNsJhBPnuEl3CaHOSJYgNTvVkUEVfYezCXpDByyZlCPCNhzYyeU/7mFOMnptoopBQoKdQsxEyH1XDHxql3owrY0w4J7M5YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KpVhqMpG; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c6a87029b6so9876685a.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:23:45 -0800 (PST)
+	s=arc-20240116; t=1768515969; c=relaxed/simple;
+	bh=HAhZBVOAndOrwaivbJzPBiAv/kgx9YIV8eA0/DOxyos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AXGkHvUZ7kFzNVo2xYRcK61lZ1sGUPWhoLv7LAWlNKLiG/aVJRnDpx2hPIzBeLmGo1s/8U68dDxvfbHG2Xd8jcxWx2NQJIuJm9HdEt0O5cMJl15qGkQl0BkK97UhwjcTAz9i7qlTQ8OHXpafQoUdm0nGjPuEbYWf32FtyszxblA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmV23DrH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=npBOFfDI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768515967;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
+	b=EmV23DrHWxAxVr2jrYgLH313FIDKAuR3oiIsLgJJs+n9aSNQsYjy0m4bHRQdCp/ijErTKw
+	e0nUrUULqr7ve8ODVvVxzr7BsYsP+daspJih7A64SvS0Gjre/mq1/0KDxpP6I72CZ4BWSn
+	DkJpa3oWDji7MrqYhv8c3JBAoaFU+iQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-408-XxGpBlcmPNGw7TAtRUaJJA-1; Thu, 15 Jan 2026 17:26:05 -0500
+X-MC-Unique: XxGpBlcmPNGw7TAtRUaJJA-1
+X-Mimecast-MFC-AGG-ID: XxGpBlcmPNGw7TAtRUaJJA_1768515964
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432c05971c6so942543f8f.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 14:26:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768515825; x=1769120625; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ua18wpmfPdr+0GKOF5nrtTwAkOqbH3SKTA8BQ5ivfqA=;
-        b=KpVhqMpGeBmXOmqfhuF7ZG1e2cKa7PCEfHLYBXv8d01B29ijUJnkhLDbSwYeJedvNq
-         OctZ+Mu8By0HLwY45guklI8SLx5/GzYTsuuQtjcdMLdG8TefwP8VhIGeVJ98vSmn/igE
-         BDxYJUMLRK14Y4ixAiFyX/+mm+CdupdEOSPxOALG09l1meyVcVKAl4sqpgckmR7ulzZW
-         a6FLwcmO4bOtqD95ptXGsT8sTDOIt0zvMk+8EzPKVzR5c8bpP3jcdE8vkxyVJZ1ENcz6
-         z/3PCdbPrjMm8c6NFEF3eeLPtFg/pl0IQU85Yu0NLb1Sv7VNWO4uxgbwWmItWN1H4+bB
-         UnSg==
+        d=redhat.com; s=google; t=1768515963; x=1769120763; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
+        b=npBOFfDI4Y39RrPRT8agzoseiFCj05uMSykYxjQ+LPxFIS1mFSuZkpnZEUXYF+oT7Q
+         LZJ4yGfoDF8gM/4YsqiiHHPqbO5ET3FWjRr1jCwp/gGLrdyBXwDLc2xv3Dvrng1LVZzp
+         wsCGlpWmZPQSjzTPyV5ZcxrHRp2kNSUv0rbqvZHgME3aD4eEAga+uHGMfC1bKA/A/y64
+         RbmIbH+W2J9zxdYDLKod3fo+2jCXQdr/+XdSCthjgpJibFFBbuuu0UKYp9tyzLrkmeTd
+         l6mV1MVbYraAEbeEiaANZKYZy0kMFy0nvniFV4Yp1HNfDxIua4lzsTukH5BU2NYH+aNz
+         /fsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768515825; x=1769120625;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ua18wpmfPdr+0GKOF5nrtTwAkOqbH3SKTA8BQ5ivfqA=;
-        b=TIB9/ES6+6WtnniVbGjN9AuX22eVytFYgR5+ITJ5puW0rjgySwx7WpM03x5rF1tOJz
-         ezgf9vV7H5U0Ot9cLh1QI3DWkvGKR24h7zWy8ZfScqGAfezBXX691l/PH9yqE0HENy//
-         tU/g+XPpu77QV/6bZ5/5nDEjho4+NYLf9rfsGdxY7qcVaSO7EqeC08MUL43jQNDuIXr8
-         riLiv8OiZkf+gPMh6up4IF1rwUkNQhyUqEqDRPIMFHXQ5q3l5LpgVl6UMMrx5te2S46w
-         TxFHWNajiczdX8PISvnvklNyovEke/RTCEn41PplUxKtVeBfUW0dyAvwH9Ak23ULnKvH
-         7qsw==
-X-Gm-Message-State: AOJu0YxUmiJs7M2PesOykIF6M38kd3B3EAxxejOmv1JpeWe3QnJajBXZ
-	d444RZKbsMtj40rUCnxybT6kEct0f3nss0ceaHFTFiiplg5ACpVi4/vh5WGFTKKPdGZ9Sw==
-X-Received: from qkww27.prod.google.com ([2002:a05:620a:95b:b0:8c6:a2f2:26e8])
- (user=yyd job=prod-delivery.src-stubby-dispatcher) by 2002:a05:620a:29d3:b0:8b2:f090:b167
- with SMTP id af79cd13be357-8c6a670434fmr154195185a.24.1768515824929; Thu, 15
- Jan 2026 14:23:44 -0800 (PST)
-Date: Thu, 15 Jan 2026 22:23:00 +0000
-In-Reply-To: <20260115222300.1116386-1-yyd@google.com>
+        d=1e100.net; s=20230601; t=1768515963; x=1769120763;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1miKLy3Py4+m2LBM84rc6I+GGI6VlQkCR0LFVsJnfk0=;
+        b=EeV4ynt1cojFHfsETDIvB1Oa82/KwQl2/kmOv2q2dqtriUS+Ozq7yiBRZnybQBK510
+         IOPVSptU+9A7R4eM/USFuor8VRxXThUWggSUEM9BcFBuZfFwy+04rp4gVoDekbP9p6eY
+         hJcbCqhGQyUhPkeVq0qghZGjzqL9MWf7GDUxNRjFu7bv7DjAg606x5mfEo71S35eiWCj
+         4Y1OBSoDo5H7JE6J0IOUVCb4ZcYOJ0l6np8YEz12Ik5dJiG3hRO5iIf80vntHYhjFS/u
+         5T9Htx61Ni3g5m/VYpNpUfi+SMPUW8cl0gdnMAk/1I+uWlwU65LSy+bD4dC8q1q95aKT
+         krPw==
+X-Gm-Message-State: AOJu0YyCnLoGqtNa79S8UneVZ3goOeoYNpAJTebc/xqhXZgeBWXME33M
+	JlCGLl/ZMgPK2tllIWlU7IcYsMoTPecxW7MNZzpqTBcN0/3ZfR5vWmYUS+Xb4LDR+3dQjGxusSm
+	RiJATE2FAEfkItQnnkJOav9dd8iHGM3KqLQpXyozOc1FNHxseno8L9u3EprFdfL4y0eBk2emWBn
+	rVpKA4kX78U0XVqHppg+KX1ehY2LFS7GpIO3mqZpPiaw==
+X-Gm-Gg: AY/fxX4o7nKxHodzDbkrAzy33eJqtIDG2S645h/vGPG+oeHj48FalLOzz9C30WrKBtz
+	wEkQ//APt65nUNzUs+VdLXJOKObacxVZiHUg3ovqgNWGGtio+VtGs/OYiv23IZWfQdurm1DnH9U
+	bFffrMvDStUw4EcbcXye3m/BnNfrzdb/4qCrHqksKq8qC2KRvSpyQKd93m7pGJcM0y42jzh8sGQ
+	2GNhEkl2JPc7rVdSA8vOXmklXIfm75MGyoHz5/MHIbyX7FRGiUa4lrFXZFmXWbbzwHS3cKiuxZu
+	/N97/AaIWkxxX3z00I4LoiblhCij+/iqd4hY6AQXzkNSfTKFpa8QnN2F/UNcpBFU/roH4MTov2/
+	gOi//cj/UHqLC2VYB4216uTZ0gA+VikOvTU5jhUQMK+z7kQ==
+X-Received: by 2002:a05:6000:258a:b0:430:fae3:c833 with SMTP id ffacd0b85a97d-434d755262bmr6220023f8f.7.1768515963017;
+        Thu, 15 Jan 2026 14:26:03 -0800 (PST)
+X-Received: by 2002:a05:6000:258a:b0:430:fae3:c833 with SMTP id ffacd0b85a97d-434d755262bmr6219993f8f.7.1768515962614;
+        Thu, 15 Jan 2026 14:26:02 -0800 (PST)
+Received: from localhost (net-37-117-189-93.cust.vodafonedsl.it. [37.117.189.93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699271dfsm1395487f8f.15.2026.01.15.14.26.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 14:26:02 -0800 (PST)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next 0/8] net: macb: Add XDP support and page pool integration
+Date: Thu, 15 Jan 2026 23:25:23 +0100
+Message-ID: <20260115222531.313002-1-pvalerio@redhat.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260115222300.1116386-1-yyd@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260115222300.1116386-2-yyd@google.com>
-Subject: [PATCH net-next 2/2] gve: implement ndo_get_tstamp
-From: Kevin Yang <yyd@google.com>
-To: Willem de Bruijn <willemb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Joshua Washington <joshwash@google.com>, Gerhard Engleder <gerhard@engleder-embedded.com>, 
-	Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, yyd@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-This patch implements ndo_get_tstamp in gve to support converting a
-hwtstamp to the system's realtime clock.
+Tested on Raspberry Pi 5.
+All the changes are intended for gem only.
 
-The implementation does not assume the NIC clock is disciplined,
-in other word, the NIC clock can be free-running. A periodic
-job, embedded in gve's ptp_aux_work, updates the offset and slope
-for the conversion.
+The series consists of two main changes:
 
-Signed-off-by: Kevin Yang <yyd@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
- drivers/net/ethernet/google/gve/gve.h        |   8 ++
- drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
- drivers/net/ethernet/google/gve/gve_main.c   |  27 +++++
- drivers/net/ethernet/google/gve/gve_ptp.c    | 106 ++++++++++++++++++-
- 4 files changed, 142 insertions(+), 3 deletions(-)
+- Migration from netdev_alloc_skb() to page pool allocation model,
+  enabling skb recycling.
+  This also adds support for multi-descriptor frame reception,
+  removing the previous single-descriptor approach and avoiding
+  potentially large contiguous allocations for e.g. jumbo frames
+  with CONFIG_PAGE_SIZE_4KB.
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 970d5ca8cddee..13a4c450e7635 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -774,6 +774,13 @@ struct gve_flow_rule {
- 	struct gve_flow_spec mask;
- };
- 
-+struct gve_tstamp_conversion {
-+	u64 last_sync_ns;
-+	seqlock_t lock; /* protects tc and cc */
-+	struct timecounter tc;
-+	struct cyclecounter cc;
-+};
-+
- struct gve_flow_rules_cache {
- 	bool rules_cache_synced; /* False if the driver's rules_cache is outdated */
- 	struct gve_adminq_queried_flow_rule *rules_cache;
-@@ -925,6 +932,7 @@ struct gve_priv {
- 	struct gve_nic_ts_report *nic_ts_report;
- 	dma_addr_t nic_ts_report_bus;
- 	u64 last_sync_nic_counter; /* Clock counter from last NIC TS report */
-+	struct gve_tstamp_conversion ts_real;
- };
- 
- enum gve_service_task_flags_bit {
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
-index 22a74b6aa17ea..812160b87b143 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.h
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.h
-@@ -411,8 +411,8 @@ static_assert(sizeof(struct gve_adminq_report_nic_ts) == 16);
- 
- struct gve_nic_ts_report {
- 	__be64 nic_timestamp; /* NIC clock in nanoseconds */
--	__be64 reserved1;
--	__be64 reserved2;
-+	__be64 cycle_pre;
-+	__be64 cycle_post;
- 	__be64 reserved3;
- 	__be64 reserved4;
- };
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 7eb64e1e4d858..2acc1a3d85838 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2198,6 +2198,32 @@ static int gve_set_ts_config(struct net_device *dev,
- 	return 0;
- }
- 
-+static ktime_t gve_get_tstamp(struct net_device *dev,
-+			      const struct skb_shared_hwtstamps *hwtstamps,
-+			      enum netdev_tstamp_type type)
-+{
-+	struct gve_priv *priv = netdev_priv(dev);
-+	unsigned int seq;
-+	u64 ns;
-+
-+	if (type == NETDEV_TSTAMP_RAW)
-+		return hwtstamps->hwtstamp;
-+
-+	if (type != NETDEV_TSTAMP_REALTIME)
-+		return 0;
-+
-+	/* Skip if never synced */
-+	if (!READ_ONCE(priv->ts_real.last_sync_ns))
-+		return 0;
-+
-+	do {
-+		seq = read_seqbegin(&priv->ts_real.lock);
-+		ns = timecounter_cyc2time(&priv->ts_real.tc,
-+					  hwtstamps->hwtstamp);
-+	} while (read_seqretry(&priv->ts_real.lock, seq));
-+	return ns_to_ktime(ns);
-+}
-+
- static const struct net_device_ops gve_netdev_ops = {
- 	.ndo_start_xmit		=	gve_start_xmit,
- 	.ndo_features_check	=	gve_features_check,
-@@ -2209,6 +2235,7 @@ static const struct net_device_ops gve_netdev_ops = {
- 	.ndo_bpf		=	gve_xdp,
- 	.ndo_xdp_xmit		=	gve_xdp_xmit,
- 	.ndo_xsk_wakeup		=	gve_xsk_wakeup,
-+	.ndo_get_tstamp		=	gve_get_tstamp,
- 	.ndo_hwtstamp_get	=	gve_get_ts_config,
- 	.ndo_hwtstamp_set	=	gve_set_ts_config,
- };
-diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
-index 073677d82ee8e..df32735fa940f 100644
---- a/drivers/net/ethernet/google/gve/gve_ptp.c
-+++ b/drivers/net/ethernet/google/gve/gve_ptp.c
-@@ -10,10 +10,91 @@
- /* Interval to schedule a nic timestamp calibration, 250ms. */
- #define GVE_NIC_TS_SYNC_INTERVAL_MS 250
- 
-+/* Scale ts_real.cc.mult by 1 << 31. Maximize mult for finer adjustment
-+ * granularity, but ensure (mult * cycle) does not overflow in
-+ * cyclecounter_cyc2ns.
-+ */
-+#define GVE_HWTS_REAL_CC_SHIFT 31
-+#define GVE_HWTS_REAL_CC_NOMINAL BIT_ULL(GVE_HWTS_REAL_CC_SHIFT)
-+
-+/* Get the cross time stamp info */
-+static int gve_get_cross_time(ktime_t *device,
-+			      struct system_counterval_t *system, void *ctx)
-+{
-+	struct gve_priv *priv = ctx;
-+
-+	*device = ns_to_ktime(be64_to_cpu(priv->nic_ts_report->nic_timestamp));
-+	system->cycles = be64_to_cpu(priv->nic_ts_report->cycle_pre) +
-+			 (be64_to_cpu(priv->nic_ts_report->cycle_post) -
-+			  be64_to_cpu(priv->nic_ts_report->cycle_pre)) / 2;
-+	system->use_nsecs = false;
-+	if (IS_ENABLED(CONFIG_X86))
-+		system->cs_id = CSID_X86_TSC;
-+	else if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER))
-+		system->cs_id = CSID_ARM_ARCH_COUNTER;
-+	else
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int gve_hwts_realtime_update(struct gve_priv *priv, u64 prev_nic)
-+{
-+	struct system_device_crosststamp cts = {};
-+	struct system_time_snapshot history = {};
-+	s64 nic_real_off_ns;
-+	u64 real_ns;
-+	int ret;
-+
-+	/* Step 1: Get the realtime of when NIC clock was read */
-+	ktime_get_snapshot(&history);
-+	ret = get_device_system_crosststamp(gve_get_cross_time, priv, &history,
-+					    &cts);
-+	if (ret) {
-+		dev_err_ratelimited(&priv->pdev->dev,
-+				    "%s crosststamp err %d\n", __func__, ret);
-+		return ret;
-+	}
-+
-+	real_ns = ktime_to_ns(cts.sys_realtime);
-+
-+	/* Step 2: Adjust NIC clock's offset */
-+	/* Read-side ndo_get_tstamp can be called from TCP rx softirq */
-+	write_seqlock_bh(&priv->ts_real.lock);
-+	nic_real_off_ns = real_ns - timecounter_read(&priv->ts_real.tc);
-+	timecounter_adjtime(&priv->ts_real.tc, nic_real_off_ns);
-+
-+	/* Step 3: Adjust NIC clock's ratio (when this is not the first sync).
-+	 * The NIC clock's nominal tick ratio is 1 tick per nanosecond,
-+	 * scaled by 1 << GVE_HWTS_REAL_CC_SHIFT. Adjust it to
-+	 * (ktime - prev_ktime) / (nic - prev_nic). The ratio should not
-+	 * deviate more than 1% from the nominal, otherwise it may suggest
-+	 * there was a sudden change on NIC clock. In that case, reset ratio
-+	 * to nominal. And since each sync only compares to the previous read,
-+	 * this is a one-time error, not a persistent failure.
-+	 */
-+	if (prev_nic) {
-+		const u64 lower = GVE_HWTS_REAL_CC_NOMINAL * 99 / 100;
-+		const u64 upper = GVE_HWTS_REAL_CC_NOMINAL * 101 / 100;
-+		u64 mult;
-+
-+		mult = mult_frac(GVE_HWTS_REAL_CC_NOMINAL,
-+				 real_ns - priv->ts_real.last_sync_ns,
-+				 priv->last_sync_nic_counter - prev_nic);
-+		if (mult < lower || mult > upper)
-+			mult = GVE_HWTS_REAL_CC_NOMINAL;
-+		priv->ts_real.cc.mult = mult;
-+	}
-+
-+	write_sequnlock_bh(&priv->ts_real.lock);
-+	WRITE_ONCE(priv->ts_real.last_sync_ns, real_ns);
-+	return 0;
-+}
-+
- /* Read the nic timestamp from hardware via the admin queue. */
- int gve_clock_nic_ts_read(struct gve_priv *priv)
- {
--	u64 nic_raw;
-+	u64 nic_raw, prev_nic;
- 	int err;
- 
- 	err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
-@@ -21,7 +102,11 @@ int gve_clock_nic_ts_read(struct gve_priv *priv)
- 		return err;
- 
- 	nic_raw = be64_to_cpu(priv->nic_ts_report->nic_timestamp);
-+	prev_nic = priv->last_sync_nic_counter;
- 	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
-+	err = gve_hwts_realtime_update(priv, prev_nic);
-+	if (err)
-+		return err;
- 
- 	return 0;
- }
-@@ -57,6 +142,14 @@ static long gve_ptp_do_aux_work(struct ptp_clock_info *info)
- 	return msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS);
- }
- 
-+static u64 gve_cycles_read(struct cyclecounter *cc)
-+{
-+	const struct gve_priv *priv = container_of(cc, struct gve_priv,
-+						   ts_real.cc);
-+
-+	return READ_ONCE(priv->last_sync_nic_counter);
-+}
-+
- static const struct ptp_clock_info gve_ptp_caps = {
- 	.owner          = THIS_MODULE,
- 	.name		= "gve clock",
-@@ -89,6 +182,17 @@ static int gve_ptp_init(struct gve_priv *priv)
- 		goto free_ptp;
- 	}
- 
-+	priv->last_sync_nic_counter = 0;
-+	priv->ts_real.last_sync_ns = 0;
-+	seqlock_init(&priv->ts_real.lock);
-+	memset(&priv->ts_real.cc, 0, sizeof(priv->ts_real.cc));
-+	priv->ts_real.cc.mask = U32_MAX;
-+	priv->ts_real.cc.shift = GVE_HWTS_REAL_CC_SHIFT;
-+	priv->ts_real.cc.mult = GVE_HWTS_REAL_CC_NOMINAL;
-+	priv->ts_real.cc.read = gve_cycles_read;
-+	timecounter_init(&priv->ts_real.tc, &priv->ts_real.cc,
-+			 ktime_get_real_ns());
-+
- 	ptp->priv = priv;
- 	return 0;
- 
+- XDP support: Initial XDP implementation supporting major
+  verdicts (XDP_PASS, XDP_DROP, XDP_REDIRECT, XDP_TX) along with
+  the ndo_xdp_xmit function for packet redirection.
+
+The driver now advertises NETDEV_XDP_ACT_BASIC, NETDEV_XDP_ACT_REDIRECT,
+NETDEV_XDP_ACT_NDO_XMIT capabilities.
+
+Previous versions
+=================
+  - RFC v1: https://lore.kernel.org/netdev/20251119135330.551835-1-pvalerio@redhat.com/
+  - RFC v2: https://lore.kernel.org/netdev/20251220235135.1078587-1-pvalerio@redhat.com/
+
+RFC v2 -> v1
+============
+  - Removed bp->macbgem_ops.mog_init_rings(bp) call from macb_open()
+  - Fixed includes (remove unneeded, moved one from header to macb_main.c)
+  - Reverse xmas tree ordering (gem_rx, gem_rx_refill)
+  - print_hex_dump_debug() instead of print_hex_dump()
+  - Replaced rx frame length check with MACB_BIT(RX_EOF) for data_len
+    calculation
+  - Removed NET_IP_ALIGN handling in rx buffer size calculation
+  - Updated debug format string to include rx_headroom and total size
+  - Changed types to unsigned int in helper functions and variable
+  - Removed unneeded line break
+
+RFC v1 -> RFC v2
+================
+  - Squashed 1/6 and 2/6
+  - Reworked rx_buffer_size computation. It no longer takes into
+    accounts extra room.
+  - A bunch of renaming (rx_offset => rx_headroom, removed MACB_MAX_PAD,
+    MACB_PP_HEADROOM => XDP_PACKET_HEADROOM, data => ptr, xdp_q => xdp_rxq,
+    macb_xdp() => gem_xdp(), macb_xdp_xmit() => gem_xdp_xmit())
+  - Deduplicated buffer size computation in gem_xdp_valid_mtu()
+    and gem_xdp_setup()
+  - gem_xdp_setup() no longer close()/open()
+  - Renaming from rx_skbuff to rx_buff is now got split in a separate commit
+  - Open-coded gem_page_pool_get_buff()
+  - Added missing rx_buff re-initialization in the error path during rx
+  - Page pool creation failure now fails the device open
+  - Moved xdp buff preparation inside gem_xdp_run()
+  - Added missing rcu_access_pointer()
+  - Turned return value in -EOPNOTSUPP for macb_xdp() on failure
+  - moved tx_skb to tx_buff renaming to a separate commit
+  - Removed some unneeded code and set MACB_TYPE_SKB for lp->rm9200_txq[desc].type as well
+  - Replaced !!addr with a dedicated bool in macb_xdp_submit_frame()
+
+
+Paolo Valerio (7):
+  net: macb: rename rx_skbuff into rx_buff
+  cadence: macb: Add page pool support handle multi-descriptor frame rx
+  cadence: macb: use the current queue number for stats
+  cadence: macb: add XDP support for gem
+  cadence: macb: make macb_tx_skb generic
+  cadence: macb: make tx path skb agnostic
+  cadence: macb: introduce xmit support
+
+Théo Lebrun (1):
+  net: macb: move Rx buffers alloc from link up to open
+
+ drivers/net/ethernet/cadence/Kconfig     |   1 +
+ drivers/net/ethernet/cadence/macb.h      |  40 +-
+ drivers/net/ethernet/cadence/macb_main.c | 827 +++++++++++++++++------
+ 3 files changed, 659 insertions(+), 209 deletions(-)
+
 -- 
-2.52.0.457.g6b5491de43-goog
+2.52.0
 
 
