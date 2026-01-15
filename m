@@ -1,139 +1,126 @@
-Return-Path: <netdev+bounces-250124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F555D242D6
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:29:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD867D24348
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:35:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A431300F31B
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:29:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 128413014598
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8324378D9C;
-	Thu, 15 Jan 2026 11:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE20535E523;
+	Thu, 15 Jan 2026 11:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eRXqrtQp";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkCqqllY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="INKnG8Ds"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E3C339850
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B3D33AD83
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768476594; cv=none; b=llWL1D5Eo0L5LdiFW0/FdGHWfEDbYemWKlq+KLEdiPOi8ZyNY4KjgVeCNrNAM2OkogW9Nk5S0Th2oKHPLRZQZpuksyK2sj4Mr4EVNlw0uM8o9rYZok6TArbQnkA0FtvtFHTPTT+miyDMj/CdtCAZIYhq6Lyz60lFJwCWpB6+quE=
+	t=1768476924; cv=none; b=I+cJqvN9Dd/DaWQtMBqeh/LKFCqBCj4UidczL21HFkgWmq1+2fRkpp+Jsp9MmE47VyaN+N2DcIV58kQ2cKiLnmaa8W0jbKmiiOum64HUV257fb5g6a7awAstvcTf2HqiV+tT996ggxuAHuCHsgsDPzHIrMpiKcxrie2ONYedLJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768476594; c=relaxed/simple;
-	bh=M4DvzLsCXZFYxMhwh/pssYVWxrCueXiZ8jeLD9VuKvE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EEdWUBIuJezB1yfLe6IixarUD6Av7g3zvxfSFA9a7vj+IyuO9iXb9Bd2NoE7PeXEw4o84IcaBa24Wqwjhar4xfUKdEGHp8dpoYnb9LCBqMBDxwj+4G/Jwv9dX3SirJUa+pOkHsmMegXHWSOvZMhZKl4pja61wq9fzZullf2u/t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eRXqrtQp; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DkCqqllY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768476592;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C0eXe1JzIQTafP79VBproknkanfNvCt+bvKV4XyaAgw=;
-	b=eRXqrtQpMqAHyxoGCT6hCC2z59/AyLhvQUTQPtXT/kdFTnsqv2qi+c2qm6stfik1z6LlLe
-	oRrTOz+P1LDyE6EjpINjZVMAhryoX0WgUqLsjWSJLgzYApQJoxaD4sr4FQCNM9/q7xNMHM
-	tPJQXprfVDxnn+VZgl21tVlJjSx/x/c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-570-Un_4UEfyOeSnKi7Pq3lhcw-1; Thu, 15 Jan 2026 06:29:51 -0500
-X-MC-Unique: Un_4UEfyOeSnKi7Pq3lhcw-1
-X-Mimecast-MFC-AGG-ID: Un_4UEfyOeSnKi7Pq3lhcw_1768476590
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4801bceb317so3371155e9.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:29:50 -0800 (PST)
+	s=arc-20240116; t=1768476924; c=relaxed/simple;
+	bh=HGK8KU2XQHQLnkvp6F85E2i+Z8ViAFYO0nG/sD3SBFA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R4EiRPTP3fuF4UIhsuheosV59UA3Gv3gCg6M0aG5Ny0cIZGSFSO8N1nQfwjksljajHSUPxQtEwBJN+UawnOIWd+vqyjI2o9muZKSXxKTa4dA7mIVITOri5u2x2NIIjyE6RrCnRQPkFk06vFiAo8vkUadajobDlqRSGSJ1sdapkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=INKnG8Ds; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5013c912f9fso9537721cf.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 03:35:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768476589; x=1769081389; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C0eXe1JzIQTafP79VBproknkanfNvCt+bvKV4XyaAgw=;
-        b=DkCqqllY88wacqdRrjJAJG8GZ+LCfVB45iaXXJpsMiK9shGhnZ/90I9eRTxx8MFGV+
-         MRtjRXBOyigkIa7DURMuOX321QSPxhojI/GdkAAkuxMXfyoBQXqtGXuzqq9ZEFzmPjsL
-         ZM+HBFfroU7HSqANnEFg1qYvTHKAHcPH7MHpWOxRnF0jgYYp4u1V4OvrMPU521VSCks9
-         9EJL6cSIK88srfEsTCePQyFgx/JIMgmGA8HCzhLM/FgnwUngznyjKgYyhACZtr6jRYaZ
-         wVgkaec83rYB1NXky+5ksU0H8IfTE7n6r9WzkSy+iEx7n9ZjC1PFISRUDeFNqf11Eser
-         1JTQ==
+        d=google.com; s=20230601; t=1768476922; x=1769081722; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/W0S2/bK8xUoCrZvoVCNOu1N9wLhj86+1jh6DZFbWek=;
+        b=INKnG8DsaKcQOMQDWrFLiNwiihlH/huHsh7lS3NmqFxR0WcD/NP5mFUKaHbBWfXo+z
+         B01cglhxuwlxy2N9E8iC54pQK6qaMNOyv++JQYxtpLJEPHGOvq1ICwQxZupkN+7ogfjD
+         N0V4xD3aERaWewYglHMBk+0MyV3i7mbS2it87bXNPj8nOI9mq/GbAVdeBL6bA/sMYQN+
+         ONcQNThS0bB18weI6eK9tKbSjKoL3QYihVCMQ2AbWlravLS8e381rtvunoVtRJCVghOG
+         v/McXODBYFvkeyzhJiz4sz7zqdk2xmrOdmnmFwP/nsnBDiAuwHXHsX4BWW4BnaCVgtTe
+         5bug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768476589; x=1769081389;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C0eXe1JzIQTafP79VBproknkanfNvCt+bvKV4XyaAgw=;
-        b=vm6QRSbY7Poy/3nET+j+LkWuRtUDOEMCUks9dl46cY5jyf8D4CHCH0D25TycBLIoJo
-         6zhX4tCk9ucgXZ13EbPbSoVpxzRUByx0ZRUQmk85VS0LaT1AYYmfGKyTM47Ay3fHs5Ip
-         9vONi9F9OfIyx878q6FneEx0yu4tJWtsIcwQO3V4UTXsK/Yj2xklf396LRPmSmaHwYR6
-         6sVtpow8XPLGXyFxayeNvjYDAzYoe8UPfU9o3YVkWeqKz5ia801KIowfF2jHAmxckPDD
-         xNpEB+8MHTXj+GQlO/KXJGa8wuLnzDFompUT7joTzC/ldSopJqg/6GXYFg6Rsld60KJX
-         EjLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWAblTOKbD8om8I1nQbFI4gJdwSW+c+WBfkwi1wIxWKNLQQLO1hJ1EQqHGw/RlbLElIh/0vbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx14ZdktmyIvTu7oIQVlQz/t03M0n/RQyawAdwtUjNCP2DfS9QC
-	DqVPf20z3R7YN27klReOjdSWDeb+/MGUHcmeem1x1G47/6ll6JCdB3YYlHSO8DhBOsvl1RPEqpL
-	da8DGx4q/M8P0l9EkT8J3eGG5jAl8W9QvspBEtGG7GvfSzAx4b33ULNPxislOX+0MzA==
-X-Gm-Gg: AY/fxX69D+NXVuJ1owFMNEtr/I1TsfzlOXQrOwTabBYuNXplw21dvopu2gZXRK2u4rJ
-	8d9RkGzejICGbC2TkX+fxTzBAOlBYgSCdJ4oH7/aU690uAI0EY8qBq1CZOzcC1J3Bh+IFijUb4I
-	Dj4b6txHLpmWotDD8Vif7dPsgUyZZp0cdphrjf5bXWQ5X6KpoODm32aLWi/bhovaQVup0+0YrYg
-	Kc3OsghM5CbyPclF4SDvQ2ulN+koG7Ufo6W10HuPjk69uWN47P8nZq80jHPlyqOgnLdA3/xdlyD
-	HRN4tGvb6R+M5Xw6zJcfvfhulYZahiXK+TtabjRQLbdozZ1T9YdLywRRkT1D3smDfijujv5J7tX
-	69cMN4+2c3wahaQ==
-X-Received: by 2002:a05:600c:8719:b0:47d:2093:649f with SMTP id 5b1f17b1804b1-47ee32e5de9mr75610495e9.8.1768476589643;
-        Thu, 15 Jan 2026 03:29:49 -0800 (PST)
-X-Received: by 2002:a05:600c:8719:b0:47d:2093:649f with SMTP id 5b1f17b1804b1-47ee32e5de9mr75610115e9.8.1768476589244;
-        Thu, 15 Jan 2026 03:29:49 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.128])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428e5488sm43603615e9.14.2026.01.15.03.29.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 03:29:48 -0800 (PST)
-Message-ID: <bc1b8d79-2229-486b-aea2-bbd71d1fc74f@redhat.com>
-Date: Thu, 15 Jan 2026 12:29:47 +0100
+        d=1e100.net; s=20230601; t=1768476922; x=1769081722;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/W0S2/bK8xUoCrZvoVCNOu1N9wLhj86+1jh6DZFbWek=;
+        b=etHsyVkma1XWg9gQs7fWVCZkiodZL3unUhBz3yVGL00UCP7NQLzu8qBW72oo+zSlOB
+         XZ2iHFZvTKyjttqctHReSObRzVq/XimRUCTIj4T26nATfkrL9AwNYGJCvgArHnkDAo7G
+         YcIhdmn5jAG0498WW1RIVUbsT4eTc8KsYEEZqkeOmMBCywL28udVr5a+KsPqkzUxaOz3
+         Cf/t2mM+cb4gTwdmuplMUTdzJ9oNZLNvKLkD8tuwZLKLHuPr/NNjP3w5tMe8u0EztTx0
+         Q4HKdTtGs8x13EwufSbJI7qDbKT9ET/KDOZ7NzBp6jLjqcF7Ot5IofaJVqXUmPbu8Du8
+         J1Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCX3mZJGwG+Gl+abVyBcKAKb++NloKESwtpNWImw7l6Edr4Dm80U/oBYuPA63UTvsOSKkQ1z67c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCvQ15291iiKwcyyriEf/LndAwVTe0mL3jrdqpf2hGZIGDGlbW
+	cbwcZ59btKQ6Cr1FeU9mKI3A9KTck3nfvYawkFao6+yj8uS16JCMF8luoVfCsVNtH8Yq7HTKmsJ
+	FJuq49e+s5JRxElWzDoc7jZ2dksyWeHt2Ef2EDBH789TmqTl990mNEAE82rE=
+X-Gm-Gg: AY/fxX5idRt3Cm81Q9V4672oaHeNiHvg1ICYdbsTdKnWPfW3uyAGoUnqT1/viD1uKXD
+	lDYDISUmAQgV8QdmEArbvQBxAUF75OCQqw3Xq/SvtZzNTMxMxj3QRu+sMlO1YhwbjFsVdF94n+7
+	xs9G2Y4SeZ/yyy0/fQ/BwTS3AcUSjHMi3hpuCcYVWMELca+Izj919TrX7zMwzjYeJxvIP/HaOkb
+	2wrCeQH2KfT+DW6fKgHNb/GBscwM0FO6wpvzcltMFCP05epeFt5P18u+f3n8k+DK59FPQ==
+X-Received: by 2002:a05:622a:a05:b0:4ee:1301:ebb3 with SMTP id
+ d75a77b69052e-50148278431mr78671091cf.54.1768476921830; Thu, 15 Jan 2026
+ 03:35:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20260112131515.4051589-1-edumazet@google.com> <bc1b8d79-2229-486b-aea2-bbd71d1fc74f@redhat.com>
+In-Reply-To: <bc1b8d79-2229-486b-aea2-bbd71d1fc74f@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 15 Jan 2026 12:35:10 +0100
+X-Gm-Features: AZwV_QjTWUinG0vB_TeYpanXX9GF35uvCincNiTgIy1fFa__45zDZGX_h3aay2Y
+Message-ID: <CANn89iJdpMQe9M-ubvc1bZm+KFdpOOL_EPmyhUjka82L8YJpDw@mail.gmail.com>
 Subject: Re: [PATCH net-next] net: inline napi_skb_cache_get()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20260112131515.4051589-1-edumazet@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260112131515.4051589-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/12/26 2:15 PM, Eric Dumazet wrote:
-> clang is inlining it already, gcc (14.2) does not.
-> 
-> Small space cost (215 bytes on x86_64) but faster sk_buff allocations.
-> 
-> $ scripts/bloat-o-meter -t net/core/skbuff.gcc.before.o net/core/skbuff.gcc.after.o
-> add/remove: 0/1 grow/shrink: 4/1 up/down: 359/-144 (215)
-> Function                                     old     new   delta
-> __alloc_skb                                  471     611    +140
-> napi_build_skb                               245     363    +118
-> napi_alloc_skb                               331     416     +85
-> skb_copy_ubufs                              1869    1885     +16
-> skb_shift                                   1445    1413     -32
-> napi_skb_cache_get                           112       -    -112
-> Total: Before=59941, After=60156, chg +0.36%
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Thu, Jan 15, 2026 at 12:29=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 1/12/26 2:15 PM, Eric Dumazet wrote:
+> > clang is inlining it already, gcc (14.2) does not.
+> >
+> > Small space cost (215 bytes on x86_64) but faster sk_buff allocations.
+> >
+> > $ scripts/bloat-o-meter -t net/core/skbuff.gcc.before.o net/core/skbuff=
+.gcc.after.o
+> > add/remove: 0/1 grow/shrink: 4/1 up/down: 359/-144 (215)
+> > Function                                     old     new   delta
+> > __alloc_skb                                  471     611    +140
+> > napi_build_skb                               245     363    +118
+> > napi_alloc_skb                               331     416     +85
+> > skb_copy_ubufs                              1869    1885     +16
+> > skb_shift                                   1445    1413     -32
+> > napi_skb_cache_get                           112       -    -112
+> > Total: Before=3D59941, After=3D60156, chg +0.36%
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Not blocking this patch, but I'm wondering if we should consider
+> defining an 'inline_for_performance' macro for both documentation
+> purpose and to allow no inline for size-sensitive build.
 
-Not blocking this patch, but I'm wondering if we should consider
-defining an 'inline_for_performance' macro for both documentation
-purpose and to allow no inline for size-sensitive build.
+Yes, I saw mm/slub.c was using __fastpath_inline, but conditional to
+CONFIG_SLUB_TINY,
+and forcing __always_inline
 
-Paolo
+#ifndef CONFIG_SLUB_TINY
+#define __fastpath_inline __always_inline
+#else
+#define __fastpath_inline
+#endif
 
+(For some reason clang is not very smart at compiling mm/slub.c, I am
+preparing a series to help with that)
 
