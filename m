@@ -1,97 +1,112 @@
-Return-Path: <netdev+bounces-250259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D000D263D8
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:18:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 755A0D26257
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 457003100FF1
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:08:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6D2FF305C967
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1762D5C9B;
-	Thu, 15 Jan 2026 17:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062E53BF2E4;
+	Thu, 15 Jan 2026 17:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s1yIGlI3"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="CGsK+8RX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AEA33993;
-	Thu, 15 Jan 2026 17:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A493BC4F3
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 17:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768496900; cv=none; b=cSMQDfoIlaolkWqEgFpn6ZZOdx0x40cPX8hw7mKoWNd25dEqMymfiUBA0RRqCglNczZA9RgPhZdfiDQou1nSAEejAqUwt2xcAkK5qtuS4RZEg5eNiQ9yWOO5cHDEKmer4ceFPrBbXk6YuWOr7iOq524bllbWjQtyXCixcZYJXuI=
+	t=1768496999; cv=none; b=u9p6mpb1lH3qQLpToXqqpgvp7c0ZalvJfuFodaQyFlRlvr4e4unvXYTU2byB6fLPtku0Gu5ztbAFraazLMLf4yyCrXwO0GyNgJhT3YEVDqKWZRZaoUVR5HNbLqzkDvjGPA8osiuLusXDCpoPE3eztgXftp3GUKXw1RApRBpNr+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768496900; c=relaxed/simple;
-	bh=iOcpCIZ+a4vdsBx+sEdiZ2mYqK9JkOiq05tb+TdjeNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dL3dngSDaVq0Oxr1kxjm2PJLcMkuP31pGx2K+2IhTsU+ypPzc4wvbszvpUWLJuvsjTNttPRpwE/pI4ewWcOfzAr3+k7rq4hWfby9BhPxc+hXo5BGzcgkLPCJYT31/D61bwhU6Aybg42HyvOilpAY1AIg/5JMwwndlY6N2h7uPUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s1yIGlI3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB4EC16AAE;
-	Thu, 15 Jan 2026 17:08:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768496900;
-	bh=iOcpCIZ+a4vdsBx+sEdiZ2mYqK9JkOiq05tb+TdjeNc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s1yIGlI3tuUg/NO2qx6O647UlNwXPcLKi71SUUFXNzkFVG+7072TXoWKG9KBeIv3X
-	 k6zi/1c6SJu38yetGEtkdXcWBT6bv6b1Jid1keiPzIv9btU2FzYyxDOKvGLmhmdfJg
-	 P63Fds8Oetnvb8+R1XOcc10yubbOZaDJILZsxSVwoAGfdLuc0WkwQO3qOhX4x0f9Bf
-	 Weov/+lWZw0okq9OmyKnrZtDgfLrDK8xzet46Fxr5EZbgZZwELaE4gQhy5Zkz3XGuz
-	 Kgn4u2sSdpcK6IUkeLQls3S64gvP/K86TAiLfTXTWop1m0U0HCCyehX1H3efyUmfrG
-	 JhRc5L0SNDL0g==
-Date: Thu, 15 Jan 2026 17:08:17 +0000
-From: Simon Horman <horms@kernel.org>
-To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc: "Maciej W. Rozycki" <macro@orcam.me.uk>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	linux-mips@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] pcnet32: remove VLB support
-Message-ID: <aWkfAQNO8PQes7sV@horms.kernel.org>
-References: <20260107071831.32895-1-enelsonmoore@gmail.com>
- <20260109180443.GO345651@kernel.org>
- <alpine.DEB.2.21.2601110027520.30566@angie.orcam.me.uk>
- <aWVxAVHWTOgEcwAD@alpha.franken.de>
+	s=arc-20240116; t=1768496999; c=relaxed/simple;
+	bh=1EDq5ZPRMnIGZMFaI4xo2JWXv+jMsvw689r6RKN9IEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XzZr13klLCaDZuL93u1KLq6TyqZaR0DsGIYRenMbnbF54fGAQDf1J244RTteyvcpCg2w+JdvNTnIkgynkhoe6eUBpKvrgfd3+MLphEWtTX/FWGASQVTT2WjqoL7mf8YiYGrQt/1emYhmGIxKZP2V0XP7wJMHv2GEqLNfIl2pang=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=CGsK+8RX; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-12448c4d404so328751c88.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:09:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1768496997; x=1769101797; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+yeNnib88Xjj68PvEZBZRp0ajnP5njNHxJvHevJizyc=;
+        b=CGsK+8RXEaMFIFvljm/xvJobUZflk6yERtDNtuvwRpoTs34zHGT7GYRjVKQsZ/fs2U
+         M4p8aJy5QGSthwYYHRL7MoSq1wsL29rMjB+yH3DQVB50cg7xBFQBvftIq7uhz/SHUU4v
+         PkaC0wX67OjljrETyaM98yyCGArhzNQK+VLslpjPQoV9Ge5bObU4q6yipZB+3Wh9aigr
+         PIBL96L3KoCOLmGXMIakFOmyWuoiPLB1sLuSq+9pz8w4VaZBB28Y9rvrkMJBJwUdgKK+
+         P22BNv2odHQb317+PCx3WTPp8w1ac5sLvVpZWWmb/+fSjDlZqJSwqO+5IAdNaZyIOtTE
+         pGkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768496997; x=1769101797;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+yeNnib88Xjj68PvEZBZRp0ajnP5njNHxJvHevJizyc=;
+        b=b6yQlt/tbqT46Oj+xO+zLY1rCRtvnjf32aHkZEO1CaKtJvlDBw+f77JrRhyB5g4zto
+         veNI6zVAsryVF31LdV/ZOId/9OSaHKIQ9JuO3CrECBpJ0Ems0UdYwe6dkpx/YXOhKW7j
+         d5D9x25SZxzFzCkyEG6RjcrtFcPhmEApDWAHQ0olQG4b4O5eWcqIQ0/ZhbkbLPgMYEjX
+         E/YV/uX0/eF943T5I+oyksh8yA54Zr8bjSX5etqNMmRvOsii5Y9QkTMFCNnS3VyYrWeg
+         Qgq9lAG3vyeuDdZVOYQuQapTLLj2P0Hwqopj1ZF0umrPg+OtcaINfZOZ21gL8JxEj3Py
+         G7ug==
+X-Forwarded-Encrypted: i=1; AJvYcCU5bBPUhBA/IjBYcFmGG1dPhbGkLr5ooZ350ERtvUAQp4BppsYLjoUPNGUr/C9HZRfdnhMUsTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnfcCc1vMt448H4MFsX5WBo0sLsO5/GkwNeJtGLshw+wob5Wi+
+	JKs1CSKoQcmily9OHLTCpj1/SZffRzNbXTvYK/RizWyIcwtykpmYtFjEbygRy9QwQyM=
+X-Gm-Gg: AY/fxX6O/o/wyPl2SqlsUZjbKEgaFDXxNADxppOr5lFosIuEYxA05pGvFBxxKoeqymF
+	CiL05ZE/UH57ZIeFWEzU2MFOrgirn6XiQD7FQbomjvQpNPhJ6V32+aASv1opkGqlkkQ5h1YI6oa
+	TqoqiUTFe3aBriwl4hJhPu9UEOOAaAQzDW6VVBqZesO9gGcDFzXpDWDRttsdbLIjHb+5uac+p6J
+	v7BTYvMXDMGdYgvGMX8UWVm6AVcb/cElPsyNIOEFQIVD+vN9BnaTB48ndItrEck3acwxlnvrBPj
+	WlB5WJ7+1QqyJuRt1V1zbxpAaeFBVwtOD8WT8j8ZNvcjq15wr85+/YGW0FXJbgga48P7vEoOrkw
+	A6I+LuaGuWN7QLUQdILUgloQkWZsnlJncfcD9+Y5Bpjeiuqult3yPNlDG5mj/QDjlKTpj8THxWR
+	x5VgBRpFMCDZBY/K6aerhwesxUb+PU2lTsG4ThYCQhnd9vlNpdUpN0JBq0Hgbi24fUqTivCA==
+X-Received: by 2002:a05:7022:6b8d:b0:122:33e:6d41 with SMTP id a92af1059eb24-1244a76c4dbmr287679c88.23.1768496997355;
+        Thu, 15 Jan 2026 09:09:57 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ad72063sm136407c88.6.2026.01.15.09.09.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 09:09:56 -0800 (PST)
+Message-ID: <1ddec6fb-7a0d-4c07-a328-4eb7685b9b69@blackwall.org>
+Date: Thu, 15 Jan 2026 19:09:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWVxAVHWTOgEcwAD@alpha.franken.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/4] bonding: 3ad: Add support for SPEED_80000
+To: Mika Westerberg <mika.westerberg@linux.intel.com>, netdev@vger.kernel.org
+Cc: Ian MacDonald <ian@netstatz.com>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Simon Horman <horms@kernel.org>, Salvatore Bonaccorso <carnil@debian.org>
+References: <20260115115646.328898-1-mika.westerberg@linux.intel.com>
+ <20260115115646.328898-4-mika.westerberg@linux.intel.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260115115646.328898-4-mika.westerberg@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 12, 2026 at 11:09:05PM +0100, Thomas Bogendoerfer wrote:
-> On Sun, Jan 11, 2026 at 12:40:56AM +0000, Maciej W. Rozycki wrote:
-> > [+cc Thomas, linux-mips]
-> > 
-> > On Fri, 9 Jan 2026, Simon Horman wrote:
-> > 
-> > > > This allows the code managing device instances to be simplified
-> > > > significantly. The VLB bus is very obsolete and last appeared on
-> > > > P5 Pentium-era hardware. Support for it has been removed from
-> > > > other drivers, and it is highly unlikely anyone is using it with
-> > > > modern Linux kernels.
-> > > > 
-> > > > Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-> > > 
-> > > Hi Ethan,
-> > > 
-> > > I don't think this driver has received much attention for some time.
-> > > So, unless you have hardware to test changes on, I would suggest
-> > > either leaving it alone or, if we suspect there are no users,
-> > > removing it.
-> > 
-> >  You mean discarding the whole of drivers/net/ethernet/amd/pcnet32.c?  If 
-> > so, then it's a hard NAK from me.  It's the onboard/netboot interface of 
-> > the MIPS Malta platform and it continues being used regularly, primarily 
-> > with QEMU setups, although I have actual Malta hardware in my lab too, 
-> > usually running 24/7.  It's one of the primary MIPS plaforms, cf. 
-> > arch/mips/configs/malta_defconfig.
+On 15/01/2026 13:56, Mika Westerberg wrote:
+> Add support for ethtool SPEED_80000. This is needed to allow
+> Thunderbolt/USB4 networking driver to be used with the bonding driver.
 > 
-> I have a few more MIPS systems with PCnet32 chip on board. And this
-> driver was the first network driver for VMware. I see no reason to
-> remove it as it simply works.
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> ---
+>   drivers/net/bonding/bond_3ad.c | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+> 
 
-Understood. Thanks for the valuable feedback.
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
