@@ -1,66 +1,54 @@
-Return-Path: <netdev+bounces-250272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C14D2667C
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:29:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9481BD269DD
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 18:41:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 260633046ACB
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:22:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9EF1316C0A1
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DAA39E199;
-	Thu, 15 Jan 2026 17:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11F43BF2F6;
+	Thu, 15 Jan 2026 17:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fiXm5fxW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yl7Qh0pY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1FA21CC5A;
-	Thu, 15 Jan 2026 17:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73922F619D;
+	Thu, 15 Jan 2026 17:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768497771; cv=none; b=OCNQ+L+6N66eAKoWkBlTmFdVVkwPBW2sLZRNwcFznl5ZmCUvjutVzsIVUol34x8cHVKIoHBtbin/3ZnbVneznZr3BRQ6cSZsfzyAT4DpaEc/esipyk0z92KxBMFgm7JjOke0wt+cQP/f6rnhzq/DIn+lifERHgjxeXWd4+AcdMk=
+	t=1768497814; cv=none; b=JWKA/kYYQ+MPV8/jijUJyDt98hC7PsCtzceW1KncW4U22/NhQIgSqYFSAw6CfZihpzbmAfIeHWiWsn6QQ/5zaOMtqFebojOZ0Junim52BWRJ0aTAc3vbFD5zLljvMle2g5jSWs4J4d0OwOk8r2PJDxHwH3QV/4rsX0AaMFGEYWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768497771; c=relaxed/simple;
-	bh=iZwBmxuFmyj5yd/MrkiJeSxiq8n2lmnresw5RhxA2iE=;
+	s=arc-20240116; t=1768497814; c=relaxed/simple;
+	bh=UodKu5Nxhf/UktRjhZh/tGid3xqAy82yRTwBh2y3GKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hsVPeSnfp9kMn148jLdfnSikcxIEhYT98LXtZrH0g5Szzwv1ATKYOvY0QOVI9qtdwFziY2WgEH9BiHGwy483e0DR5FOw8KvQSG4LRluF2REnhq1u/LrmxVCf/y+PBIL/bJMr5DbyGxLutTw/eV78mlrqPxJcM1ipZUenD7imwoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiXm5fxW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AC0FC116D0;
-	Thu, 15 Jan 2026 17:22:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768497771;
-	bh=iZwBmxuFmyj5yd/MrkiJeSxiq8n2lmnresw5RhxA2iE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fiXm5fxWUQPJgn7Cj+1ATSMBKYuXOHIJGsoL3bcW9HQioIxLdk/wlMwP2O6QnN/qs
-	 rTE/toiqVL1EHXqK+biWlzyUHt1U+aVbJiCXQsrlIGc5CnyJm4D8qjOQbgjkBpWeHP
-	 8h+ezAGL/Tu/mLnDTeEcySyOMlEfqVCReI6JLg4R2RWmyLIHS6RFmsg40CsCJ8ixh6
-	 YEe5w2Bd23BuoDzvuUL05lH7Ix00nPvHzcv396yZtXgY8TGY9MnRUzmhMcFrw8DlBs
-	 IknuMGYkcFy/2nIZ2sV1xb3vtRSsCdJBdsATB0O+8Y2UKREpoNGgRBWHUz+PE4uzBy
-	 v6b9IJw6cneJg==
-Date: Thu, 15 Jan 2026 11:22:50 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Biju Das <biju.das.jz@bp.renesas.com>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: pcs:
- renesas,rzn1-miic: Add renesas,miic-phylink-active-low property
-Message-ID: <176849776989.913679.4064770470334805366.robh@kernel.org>
-References: <20260109142250.3313448-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20260109142250.3313448-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H9APF/g6cTS1wDpi5qZxDOg20FvGN+a7vTIsxhBq07D4a3doiWCGsOtoocOwdVHm4ADv2XRLf55dNMo2Dnin/1rYByeNRpUmyH/c9F+FquQ1MaB4jTrDXjSFjz9mMHXVHUk00VvXsuNAaO5YTl9o6bf12AQZMCL3L2HeH+12Tp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yl7Qh0pY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sQ7vP21dlzkkieemZjIahhU81dRaLsybz6UG5FalGMc=; b=yl7Qh0pYjwozEKS828gvwa0CFX
+	ty7BCEZdeh+j9tUx/oR6XUGAw+Jayo7ZAY9j9MH8ypO0txEZ3jwhtRIbfG8GhIhZeVSB+7BOLul/W
+	29OmA6cEFLKSHaqX2kbsACyBJARoYyXL8k7+UGkrXx1Gh9oKOlavAgrCZLLGEBHRojoY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgR3y-002xkP-Ib; Thu, 15 Jan 2026 18:23:14 +0100
+Date: Thu, 15 Jan 2026 18:23:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vinitha Vijayan <vinithamvijayan723@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH] net: phy: qcom: replace CDT poll magic numbers with
+ named constants
+Message-ID: <6504f3dc-4e95-4f10-b46c-4583ceb74a4a@lunn.ch>
+References: <20260115165718.36809-1-vinithamvijayan723@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,38 +57,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260109142250.3313448-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20260115165718.36809-1-vinithamvijayan723@gmail.com>
 
+On Thu, Jan 15, 2026 at 10:27:18PM +0530, Vinitha Vijayan wrote:
+> Replace hard-coded poll interval and timeout values in
+> at803x_cdt_wait_for_completion() with named macros.
+> 
+> This improves readability
 
-On Fri, 09 Jan 2026 14:22:49 +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> Add the renesas,miic-phylink-active-low property to allow configuring the
-> active level of PHY link status signals provided by the MIIC block.
-> 
-> EtherPHY link-up and link-down status is required as a hardware feature
-> independent of whether GMAC or ETHSW is used. With GMAC, link status is
-> obtained via MDC/MDIO and handled in software. In contrast, ETHSW exposes
-> dedicated PHY link pins that provide this information directly in
-> hardware.
-> 
-> These PHY link signals are required not only for host-controlled traffic
-> but also for switch-only forwarding paths where frames are exchanged
-> between external nodes without CPU involvement. This is particularly
-> important for redundancy protocols such as DLR (Device Level Ring),
-> which depend on fast detection of link-down events caused by cable or
-> port failures. Handling such events purely in software introduces
-> latency, which is why ETHSW provides dedicated hardware link pins.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> ---
-> v1->v2:
-> - Updated commit message to elaborate the necessity of PHY link signals.
-> ---
->  .../devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml     | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
+  	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
+  				    !(val & cdt_en),
+ 				    30000, 100000, true);
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
+				    !(val & cdt_en),
+				    AT803X_CDT_POLL_INTERVAL_US,
+				    AT803X_CDT_TIMEOUT_US,
+				    true);
+
+Is it really more readable?
+
+The point about magic values is that you cannot easily see what they
+mean. With BIT(4) is hard know that that means. But all the
+read_poll_timeout() functions are very similar. If you know one, you
+know them all.  I know the poll interval is 30,000us and timeout
+happens after 100,000us. Using macros just means i need to go find the
+definition of the macro to know the timers used in this polling
+method.
+
+    Andrew
+
+---
+pw-bot: cr
+
 
 
