@@ -1,78 +1,90 @@
-Return-Path: <netdev+bounces-250195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72734D24EFC
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:27:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C9BD24F26
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 15:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A7973011EF8
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:26:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30DF3300C9B6
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 14:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998013A1E69;
-	Thu, 15 Jan 2026 14:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/e+vRr3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AADE3A1E97;
+	Thu, 15 Jan 2026 14:27:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7603F39527C;
-	Thu, 15 Jan 2026 14:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D753A0E84;
+	Thu, 15 Jan 2026 14:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768487203; cv=none; b=b6C6vWxunl8dg7h93DDchbJ+xib7W/GYLsI2z9fR9Iq6DW9TtKAfENCwiH6Put3mRwacln33JlD+s9XcANtnFzcdDsQgiIp5MxnMwc741J86GuhYlHKFop7PqGGxlmKTfVxlja1x3D7NhbEoAX6kS+QLRfUm7Fu9ZZEWm8Af01o=
+	t=1768487251; cv=none; b=oR/7xN5CY9dc6Bz5T09aTU7/PrqTJqfG3toj6wuTyutKscaD4LA/jgSNMbRC5mSe+TxTs9ru2eE0N7CQ6c62VZ5Z7viF2/7zkXtk7Zrs3eI9CmdbeElmXcd43VuX5Axid6CI+4B9FjEKC1roBaQNA40r0ckC/VdiQMN1J5pjYZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768487203; c=relaxed/simple;
-	bh=PMAJAir+s0K7IBCyK9b2N9yWQhFNnwBw4MRBfncPqVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DCDtCs+oApK5oj1IiSJinTmFpMUU8YO9SYzSCSRy8Bpk+AfNrL6FprqTgChma6FTrBaqCXna6JANJrqssAZE655XJk7fsv542WiOUsDw8cTczYCUPOt4hUSPKdEKf6Ic0xHVTjKmWO80prf2s1dTpWUX5ZziCDE5mkT+dS9yymM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/e+vRr3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F731C116D0;
-	Thu, 15 Jan 2026 14:26:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768487203;
-	bh=PMAJAir+s0K7IBCyK9b2N9yWQhFNnwBw4MRBfncPqVg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j/e+vRr3yMnj05RMUWiW/nquWu2AgkZz8V8HB3buU57g2zERJDI83jH4s0Pxt0m84
-	 VC/caCJPd9uqFhlAi91h9J8xIONaj+G7xecXlkJzVHd91iQg6Aw+cUpxjpM1tElAa5
-	 kUM/4Xzym2j/zRJlwOhXlLgfqZ0gU7y0/ML91nllzb34/8pq/ky/Yu6qBSVazAcVvJ
-	 aR9pcW06YOn3HQRdGziAv1svEZm1R+CcvXjqqg1v7Ur5SPUhoUTTeQZCc1kKVZI7Lz
-	 zbbbKU785Ni1by/hM7lOTLwl7Glxn6tzYRvlG9v2zSMSCawEeGI9+tS2pf8/GyXYCz
-	 M3VtK+ZOZryJw==
-Date: Thu, 15 Jan 2026 06:26:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr =?UTF-8?B?VmFuxJtr?= <arkamar@atlas.cz>
-Cc: fushuai.wang@linux.dev, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- davem@davemloft.net, vadim.fedorenko@linux.dev, Jason@zx2c4.com,
- wireguard@lists.zx2c4.com, wangfushuai@baidu.com
-Subject: Re: [net-next, v3] wireguard: allowedips: Use kfree_rcu() instead
- of call_rcu()
-Message-ID: <20260115062641.57ef05fe@kernel.org>
-In-Reply-To: <202611581213-aWihXdQpdnhXv606-arkamar@atlas.cz>
-References: <20260112130633.25563-1-fushuai.wang@linux.dev>
-	<20260115033237.1545400-1-kuba@kernel.org>
-	<202611581213-aWihXdQpdnhXv606-arkamar@atlas.cz>
+	s=arc-20240116; t=1768487251; c=relaxed/simple;
+	bh=Y7xokPaOKeAuzywvVNYnQfVIAxyOu+0u2+HnZoXjK14=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F3V9s2dxEwx1NY9++yOSkKvZHNSgPvRti16CE9SvWTwWPnmPKdbXAfnMJ7Ka74m2OxGDe1R5rahxSDWXf1J/NoN2UR3tm05ywY+9xcnHPPa0++qeYOoKg9roxa0plxijtZnVuVqno6iT9rOTB+/GhIGD7oFmN9pzL52DPKCCwnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC6CC16AAE;
+	Thu, 15 Jan 2026 14:27:28 +0000 (UTC)
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH net-next v2] net/tcp_sigpool: Enable compile-testing
+Date: Thu, 15 Jan 2026 15:27:26 +0100
+Message-ID: <e4822cf4aa03fed067f5df7cd4f3496828abc638.1768487199.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, 15 Jan 2026 09:12:13 +0100 Petr Van=C4=9Bk wrote:
-> Hi Jakub,
->=20
-> Minor side note: I noticed a small typo in the AI review foreword. I
-> assume this is part of a template:
->=20
-> On Wed, Jan 14, 2026 at 07:32:37PM -0800, Jakub Kicinski wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least pausible. =20
->                                                         ^~~~~~~~
-> pausible -> plausible
+Since commit 37a183d3b7cdb873 ("tcp: Convert tcp-md5 to use MD5 library
+instead of crypto_ahash"), TCP_SIGPOOL is only selected by TCP_AO.
+However, the latter depends on 64BIT, so tcp_sigpool can no longer be
+built on 32-bit platforms at all.
 
-Ah, thanks :)
+Improve compile coverage on 32-bit by allowing the user to enable
+TCP_SIGPOOL when compile-testing.  Add a dependency on CRYPTO, which is
+always fulfilled when selected by TCP_AO.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+One remaining oddity is that TCP_SIGPOOL has always been a tristate
+symbol, while all users that select it have always been boolean symbols.
+I kept that as-is, as it builds fine as a module.
+
+v2:
+  - Add Reviewed-by.
+---
+ net/ipv4/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
+index b71c22475c515ffc..7280d1b1dae1ba53 100644
+--- a/net/ipv4/Kconfig
++++ b/net/ipv4/Kconfig
+@@ -743,7 +743,8 @@ config DEFAULT_TCP_CONG
+ 	default "cubic"
+ 
+ config TCP_SIGPOOL
+-	tristate
++	tristate "TCP: Per-CPU pool of crypto requests" if COMPILE_TEST
++	depends on CRYPTO
+ 
+ config TCP_AO
+ 	bool "TCP: Authentication Option (RFC5925)"
+-- 
+2.43.0
+
 
