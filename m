@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-250073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10FF5D23AB7
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:45:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54843D23C02
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 10:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E047E302AFE8
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:41:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3F0F13048510
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 09:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC55835BDD7;
-	Thu, 15 Jan 2026 09:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C9135CBC9;
+	Thu, 15 Jan 2026 09:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zobG3wEW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OutONDYw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF9F35B136
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EAF35B130
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 09:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768470109; cv=none; b=e8GhQRM8sgH7gFZsCrUaEqs19ARidUcPOe+aoJfkHvK0hTJzzMmd6L7G0ElHrKhrAGPOpMYIJgBO9Fhpt73YAJz2Gz8/xIivzKS/vOZxgJUXT0/2xIyU09+gbRna5yk95aoAqM7pr6msRKks+yFeegebuutPJbfNORwvZgRMpfg=
+	t=1768470111; cv=none; b=uuNSOTcX9ccj7vTF/b2SnCIFiIn96WaBeFdgKGMTOJKRYOBnzFUivzZzKowjIidv53yV2exHFUelqZNEWIrxTfqJ7mzZeO4g7N9XtgSlAboz+SgP6kGq/9qDAGoL/iCyKwrhZrEBMx21I1Zquf0lhHUZck/akm5Ftf7ekN/rciM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768470109; c=relaxed/simple;
-	bh=6W48DX3XOQKQNOPVCDSmVyyOO5LHjYSOjlZw4elr6XY=;
+	s=arc-20240116; t=1768470111; c=relaxed/simple;
+	bh=rIDbod+5PhHfWnCeEqeAnlXqMlpTvjREx4POHkm/2/Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uWBbbQ0matPM7VNBnqtQuxuCyKPvO3Ht+9Gdc3HCPF/je7YgAycEtjPek4raOHvXHfOupCd42+ffXrBBKjsN91LPqnVFLP3tPMpQhuJcZmrsOVBf8OTeEZj2FOMN7HCaJE/whnpMgaPab1ppH9uPRvzmGFBI/1+8FsCAfohpo/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zobG3wEW; arc=none smtp.client-ip=74.125.224.74
+	 To:Cc:Content-Type; b=aTkV6mAJ19CFbmSKzjgp3gu253tjsV1FQZq4dfjbsOwXc526eUnPc4YKHZ2EQ3SNqaGWiMRG90tM8cSrScCgCaoGohSF6A3V3YJz3x/psuRBV5vAINXtB888gAyL7dR823BdKuy5JK7lrsCeiJ3Xkmc4vsDOy2BBU4Qs6e1488Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OutONDYw; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-63e32e1737aso1037116d50.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:41:47 -0800 (PST)
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-88233d526baso26551586d6.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 01:41:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768470107; x=1769074907; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768470108; x=1769074908; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=deCf4dX9C8xwn9iSMZi2UX52hjHsowlJWMzwyrW0zpM=;
-        b=zobG3wEWYG8E7OGwW7QCha+PcqjCsYzwNaKt4fivkU9FzNKaSRUgvr2DsTgXy6P+SY
-         qG//lb8EW7+lmlGM6QrEtvy3PrRBm7stze5pQQHolRkCy3nMvVkw5OxhRo+saU5RMRI2
-         xxoN7buBgFwHi9ePaJ/uZjRDarR7elEOLwBhLcspZvv/fURX7uWfL34LXpOvxkpqPDzI
-         j7quLJMvRNV6A5TRXXTj4a6FgTywigFGkyb1yauurRT3fO4J+nRqcsF0Soqv8iVXd2ak
-         C7a8uEhSPVUZw4yOKl+V+bhAHq4RSsNroAEsUfdsMX5G44Dx+GTOOz2UsQvDiga+3BBb
-         cvxw==
+        bh=wgHbUIoDMmCNIMWscCtl0fTgyKkLS4/xvz0vZlzAUGk=;
+        b=OutONDYw9ptBdCprz8NO2s6q8jsKS569lQAInPDY/rSTAJc6/UyM0r8zAIC9ABvENN
+         ysoe2qFfyiD84dSpnel/IkKoWIHvpoK0TlEdzBYUSTLNQedMI9BHPeIwiBlYEDpWknuf
+         63Uvg/2QEE5Ym+u4GgAvfmKTDN8/jTR5qSBTVpHb9S/S/1GTL6qPuVYrcTEr16myNv/v
+         IJm0GBTiX4d8fkd6bg0eJx6wV41bCVakUSKgijvr7k7q32JCbZ8gTPt8+zj/YFigtEU4
+         1AOj8TeZ4SZD8uJ9LaJAWjlchsX6vop22yAD+Z7iwhFjnF+Ltyuhmqe54LvWs5nFlUAX
+         ca0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768470107; x=1769074907;
+        d=1e100.net; s=20230601; t=1768470108; x=1769074908;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=deCf4dX9C8xwn9iSMZi2UX52hjHsowlJWMzwyrW0zpM=;
-        b=BqQY+aKRJdU3oyFb0kegJWqJoX/kyv5QOsqrveAZTWhwDhNQEeuaky5WxI6wTGPJTx
-         pF05wVia1d0aEpGNB+jhRX5mP8v19ikSC0s7eSSsRVQDTTElIcjmlz2i1/sMMhG/fg0/
-         4QyU1HTzsBITw3AebVHVUEbyOInChwEwBsgXuX9r6mqkYA660DmUYiGlM5qk28WpUHNx
-         Qb4VhbuofuOBzJDpwXdR25auISszQmargrQtrSH3/q36Bm/UeHMWJ9oKUK7JUnWz6Q0q
-         P5rEuoAiKDyAo9juVCAlcUJtMBhcTZn2MfXH1Vwljo+iACdQNoK3qQCwHtEymMczQatB
-         TX7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWnlP9kWEgPWN2e8rVA0zCkP6sJo3Y5wJ8neso4ylGM9svjtKXXydrI9GNljAbE1uRoVdaf2nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytjmYqpEUFJd4hqZD+GANb6xhHV+YPlYO8l5uArvmPrTlp1qFY
-	/MHQ01jjDEbAq2k+Alasy8K96lFx3L7klIvPD8lSGCjK82pYXsyutMkoBFZ4e8BcJLP+sRxMKLM
-	vz4eCZwoxuC9z8w==
-X-Received: from yxbu2.prod.google.com ([2002:a53:e1e2:0:b0:644:75c5:bab6])
+        bh=wgHbUIoDMmCNIMWscCtl0fTgyKkLS4/xvz0vZlzAUGk=;
+        b=TDfgpffwDn9zLAGlya5X0PhsYoU/Kx3XiNZsOfsoLx+ByYvmr2OWCih3MFAuCeWXHC
+         UnV+mimRSWS/yoI7RaYctpWKxvbYL/SDN3L2gU9hP0amJLoqN1Hmg1TY+684uH1+w1wV
+         hyraoGvirwIenGZs+rUUBiQXbnWEKCiVKS7527CFsu/76gVbjlmmeuNlRVlKr61o/kmo
+         M7x/HmJVfu7Eoh8xGvB4CyR7c4SO9VhS3Az1KImuz4/jAWYJXXh4vXfWa17B9f5uD/Ho
+         6nilw6oQoYvg11tS+Wv6tIwuVInCaOW4yMGALULItFZZVGMT1ZOaWJKRRlGOxhXyv6qx
+         FYIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCG/8VKQrjvhutFF1blvc3dFSGnRX5NWC64AGKopsr3GxxRtC+gKrxeMIg/29z8fbOBQdd4Xk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHGzJ5zdJw0bugle0ZRELK12ro4JLR5RW4ZQ9z38dtz2aFG/JD
+	bJ3ouHLN7iQsh7HSinOpIydjGTVJ0OCkBZmKRFzNksZt/yle3sEqLKgZOAFlSWPXk/d5DInIiS7
+	KtDPmGIpZfTRoDA==
+X-Received: from qvbom27.prod.google.com ([2002:a05:6214:3d9b:b0:892:72f1:41d0])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690e:134f:b0:646:6a95:9626 with SMTP id 956f58d0204a3-64903b45e81mr3579658d50.60.1768470106673;
- Thu, 15 Jan 2026 01:41:46 -0800 (PST)
-Date: Thu, 15 Jan 2026 09:41:34 +0000
+ 2002:a05:6214:e64:b0:890:80b9:122c with SMTP id 6a1803df08f44-8927439b947mr70532266d6.27.1768470108393;
+ Thu, 15 Jan 2026 01:41:48 -0800 (PST)
+Date: Thu, 15 Jan 2026 09:41:35 +0000
 In-Reply-To: <20260115094141.3124990-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,8 +71,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260115094141.3124990-1-edumazet@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260115094141.3124990-2-edumazet@google.com>
-Subject: [PATCH net-next 1/8] ipv6: add sysctl_ipv6_flowlabel group
+Message-ID: <20260115094141.3124990-3-edumazet@google.com>
+Subject: [PATCH net-next 2/8] ipv6: annotate data-races from ip6_make_flowlabel()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -80,51 +80,86 @@ Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vg
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Group together following struct netns_sysctl_ipv6 fields:
+Use READ_ONCE() to read sysctl values in ip6_make_flowlabel()
+and ip6_make_flowlabel()
 
-- flowlabel_consistency
-- auto_flowlabels
-- flowlabel_state_ranges
-
-After this patch, ip6_make_flowlabel() uses a single cache line to fetch
-auto_flowlabels and flowlabel_state_ranges (instead of two before the patch).
+Add a const qualifier to 'struct net' parameters.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/netns/ipv6.h | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ include/net/ipv6.h | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 08d2ecc96e2b43901af6d91ae06d555b5ae9298d..34bdb1308e8ff85f04130ed25f40a4f8a24db083 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -30,19 +30,23 @@ struct netns_sysctl_ipv6 {
- 	int ip6_rt_min_advmss;
- 	u32 multipath_hash_fields;
- 	u8 multipath_hash_policy;
--	u8 bindv6only;
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 74fbf1ad8065a6596487b72af70131919a26c5a2..7873b34181d9bbf18cc61522967e6db5d646813c 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -949,10 +949,12 @@ static inline bool ipv6_can_nonlocal_bind(struct net *net,
+ 
+ #define IP6_DEFAULT_AUTO_FLOW_LABELS	IP6_AUTO_FLOW_LABEL_OPTOUT
+ 
+-static inline __be32 ip6_make_flowlabel(struct net *net, struct sk_buff *skb,
++static inline __be32 ip6_make_flowlabel(const struct net *net,
++					struct sk_buff *skb,
+ 					__be32 flowlabel, bool autolabel,
+ 					struct flowi6 *fl6)
+ {
++	u8 auto_flowlabels;
+ 	u32 hash;
+ 
+ 	/* @flowlabel may include more than a flow label, eg, the traffic class.
+@@ -960,10 +962,12 @@ static inline __be32 ip6_make_flowlabel(struct net *net, struct sk_buff *skb,
+ 	 */
+ 	flowlabel &= IPV6_FLOWLABEL_MASK;
+ 
+-	if (flowlabel ||
+-	    net->ipv6.sysctl.auto_flowlabels == IP6_AUTO_FLOW_LABEL_OFF ||
+-	    (!autolabel &&
+-	     net->ipv6.sysctl.auto_flowlabels != IP6_AUTO_FLOW_LABEL_FORCED))
++	if (flowlabel)
++		return flowlabel;
 +
-+	__cacheline_group_begin(sysctl_ipv6_flowlabel);
- 	u8 flowlabel_consistency;
- 	u8 auto_flowlabels;
--	int icmpv6_time;
-+	u8 flowlabel_state_ranges;
-+	__cacheline_group_end(sysctl_ipv6_flowlabel);
-+
- 	u8 icmpv6_echo_ignore_all;
- 	u8 icmpv6_echo_ignore_multicast;
- 	u8 icmpv6_echo_ignore_anycast;
-+	int icmpv6_time;
- 	DECLARE_BITMAP(icmpv6_ratemask, ICMPV6_MSG_MAX + 1);
- 	unsigned long *icmpv6_ratemask_ptr;
- 	u8 anycast_src_echo_reply;
-+	u8 bindv6only;
- 	u8 ip_nonlocal_bind;
- 	u8 fwmark_reflect;
--	u8 flowlabel_state_ranges;
- 	int idgen_retries;
- 	int idgen_delay;
- 	int flowlabel_reflect;
++	auto_flowlabels = READ_ONCE(net->ipv6.sysctl.auto_flowlabels);
++	if (auto_flowlabels == IP6_AUTO_FLOW_LABEL_OFF ||
++	    (!autolabel && auto_flowlabels != IP6_AUTO_FLOW_LABEL_FORCED))
+ 		return flowlabel;
+ 
+ 	hash = skb_get_hash_flowi6(skb, fl6);
+@@ -976,15 +980,15 @@ static inline __be32 ip6_make_flowlabel(struct net *net, struct sk_buff *skb,
+ 
+ 	flowlabel = (__force __be32)hash & IPV6_FLOWLABEL_MASK;
+ 
+-	if (net->ipv6.sysctl.flowlabel_state_ranges)
++	if (READ_ONCE(net->ipv6.sysctl.flowlabel_state_ranges))
+ 		flowlabel |= IPV6_FLOWLABEL_STATELESS_FLAG;
+ 
+ 	return flowlabel;
+ }
+ 
+-static inline int ip6_default_np_autolabel(struct net *net)
++static inline int ip6_default_np_autolabel(const struct net *net)
+ {
+-	switch (net->ipv6.sysctl.auto_flowlabels) {
++	switch (READ_ONCE(net->ipv6.sysctl.auto_flowlabels)) {
+ 	case IP6_AUTO_FLOW_LABEL_OFF:
+ 	case IP6_AUTO_FLOW_LABEL_OPTIN:
+ 	default:
+@@ -995,13 +999,13 @@ static inline int ip6_default_np_autolabel(struct net *net)
+ 	}
+ }
+ #else
+-static inline __be32 ip6_make_flowlabel(struct net *net, struct sk_buff *skb,
++static inline __be32 ip6_make_flowlabel(const struct net *net, struct sk_buff *skb,
+ 					__be32 flowlabel, bool autolabel,
+ 					struct flowi6 *fl6)
+ {
+ 	return flowlabel;
+ }
+-static inline int ip6_default_np_autolabel(struct net *net)
++static inline int ip6_default_np_autolabel(const struct net *net)
+ {
+ 	return 0;
+ }
 -- 
 2.52.0.457.g6b5491de43-goog
 
