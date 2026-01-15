@@ -1,97 +1,180 @@
-Return-Path: <netdev+bounces-250156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F82D2457E
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:58:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5FDD245E7
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 13:03:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A68FA30010D9
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:58:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D13043036AC8
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2896D3793AF;
-	Thu, 15 Jan 2026 11:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8B438A9AB;
+	Thu, 15 Jan 2026 12:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FW2hr4f2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="isQK8rJo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F4F34D911
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E36352925
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 12:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768478307; cv=none; b=Jur3HnfzqqMFoAGzbOHD5YhvdCH1Swfl74ji8zrTUR6qRi4tyLX52dfmardR2zqfjVhTQYAAxa4AatA7WFQQwQ1mnM5AIK2+DPxC8fLNGdMLkny3i8n+4uAoD1BDzSLiriZUVSGRWRfmqyUTj51oIiq3nLDLbfi8gUAn+meMF5Q=
+	t=1768478524; cv=none; b=HEyBBvmLhWwsQGbE4qCx12iDN1IAB0cdiEdB89lpoefe2wt1S66IU4UBqDvf7bhRpFeKC3cpUwxvTY0GrUnZ/CGkc0AnjbvIF6+we1S+0VslbtZYUb/cdkKr5Sp50GwRjv26Uq2ybsvD9YW4LXRcDdwIIoDZR1qOqj+xy3Xsr8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768478307; c=relaxed/simple;
-	bh=14bOHJ1JcFL4fF0W+8b6eUUmHribqN5/rmNWb8qZKoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zh5WdRKtBHGG+aUP9yiYWbKdZisuG61o3V99hdJJ3WEFKhWsWXSZLspIxKh30L04knyOWCtHfd9Brn3uqGJ5bDgQxq9fxTW4yuDwvHDv012drK7KRuKUVxeH/9J2XAvIrsdNNInAiSIztyZWzNwwy1hA54cehBnzZbit6T1o4Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FW2hr4f2; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 785C01A2877;
-	Thu, 15 Jan 2026 11:58:22 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 47A66606B6;
-	Thu, 15 Jan 2026 11:58:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5B1DC10B685A9;
-	Thu, 15 Jan 2026 12:58:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768478301; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=14bOHJ1JcFL4fF0W+8b6eUUmHribqN5/rmNWb8qZKoA=;
-	b=FW2hr4f2npkZbF0uTZiv+DDJzI2bxtf5RzhbHLznFJdLXKh6kphgFuzwftHhHkPEr4gvy9
-	zzgLoTrsLfonV1z7hZ7Iag6YSw9DSmg4rfhy4EhYtAh7r+0Qt2BqUMASzK7chjl/O7noFX
-	pDG5gjWO7cLcVpiTwpl1qG2TFho33fOmpYj2nNQF1MoESqwRtogY3cgvBt4F9a4daZMeLG
-	Nmyr8L/3PWCA2CB8UFPMOjWyC2nkcPgz7+srjzxZ+CbEORkXGMkXsZXEityIsKSkktH9us
-	sr1yFer3L50OSDiSaAgIwr6qtKuAbq3XEDryjDdf7vBpV70bbLRIb8ptAUlhDQ==
-Date: Thu, 15 Jan 2026 12:58:15 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: remove legacy way to get/set HW
- timestamp config
-Message-ID: <20260115125815.299accc6@kmaincent-XPS-13-7390>
-In-Reply-To: <20260114224414.1225788-1-vadim.fedorenko@linux.dev>
-References: <20260114224414.1225788-1-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1768478524; c=relaxed/simple;
+	bh=RgSCItvIzITjg76iDqAPErZBX5BArJAS6aQlRSuCTf8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=HSZGXGJWUyHIP5etC46E8VDdRtWqn7VhX2tozYEpwHpGYd2mBLkF8zFqakfV6UPWx27VLVY1EmzGzXaap1STWx6lukn/K84yqqkMQRtVpJuMGRLfR57+A57wAYzxr700t/kzfOh8eaOClL8YwB+N9KIVr2dIVOmxVDEI7NlFrtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=isQK8rJo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768478520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4t6OWwNa16OqY64IWC39VX/QLXVgOz/FT6ehthBksPk=;
+	b=isQK8rJo3JNTh583vehT32QrNPwJahqQMxoh60Q6cHXdehCsjkKDKo3wVx7jrDI6ws5B1u
+	T2gwkLU9StzZ0budq/Sg8wNN1w28T7dLUGF0dV9gtpfvq8bi/Hdf87DeVxGa+R1vi7wxsU
+	NlCXqAAhcm488pDm8J1HsOTdTIF6bJ8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-255-uI448jlmOA-U__5D4zdMPg-1; Thu,
+ 15 Jan 2026 07:01:56 -0500
+X-MC-Unique: uI448jlmOA-U__5D4zdMPg-1
+X-Mimecast-MFC-AGG-ID: uI448jlmOA-U__5D4zdMPg_1768478513
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E6D319560B2;
+	Thu, 15 Jan 2026 12:01:52 +0000 (UTC)
+Received: from [10.44.32.221] (unknown [10.44.32.221])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 38B0618001D5;
+	Thu, 15 Jan 2026 12:01:44 +0000 (UTC)
+Message-ID: <92bfc390-d706-4988-b98d-841a50f10834@redhat.com>
+Date: Thu, 15 Jan 2026 13:01:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/12] dt-bindings: dpll: add common
+ dpll-pin-consumer schema
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>,
+ Grzegorz Nitka <grzegorz.nitka@intel.com>
+References: <20260108182318.20935-1-ivecera@redhat.com>
+ <20260108182318.20935-2-ivecera@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260108182318.20935-2-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, 14 Jan 2026 22:44:13 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+On 1/8/26 7:23 PM, Ivan Vecera wrote:
+> Introduce a common schema for DPLL pin consumers. Devices such as Ethernet
+> controllers and PHYs may require connections to DPLL pins for Synchronous
+> Ethernet (SyncE) or other frequency synchronization tasks.
+> 
+> Defining these properties in a shared schema ensures consistency across
+> different device types that consume DPLL resources.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>   .../bindings/dpll/dpll-pin-consumer.yaml      | 30 +++++++++++++++++++
+>   MAINTAINERS                                   |  1 +
+>   2 files changed, 31 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> new file mode 100644
+> index 0000000000000..60c184c18318a
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> @@ -0,0 +1,30 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/dpll/dpll-pin-consumer.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: DPLL Pin Consumer
+> +
+> +maintainers:
+> +  - Ivan Vecera <ivecera@redhat.com>
+> +
+> +description: |
+> +  Common properties for devices that require connection to DPLL (Digital Phase
+> +  Locked Loop) pins for frequency synchronization (e.g. SyncE).
+> +
+> +properties:
+> +  dpll-pins:
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    description:
+> +      List of phandles to the DPLL pin nodes connected to this device.
+> +
+> +  dpll-pin-names:
+> +    $ref: /schemas/types.yaml#/definitions/string-array
+> +    description:
+> +      Names for the DPLL pins defined in 'dpll-pins', in the same order.
+> +
+> +dependencies:
+> +  dpll-pin-names: [ dpll-pins ]
+> +
+> +additionalProperties: true
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 765ad2daa2183..f6f58dfb20931 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -7648,6 +7648,7 @@ M:	Jiri Pirko <jiri@resnulli.us>
+>   L:	netdev@vger.kernel.org
+>   S:	Supported
+>   F:	Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> +F:	Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+>   F:	Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+>   F:	Documentation/driver-api/dpll.rst
+>   F:	drivers/dpll/
 
-> With all drivers converted to use ndo_hwstamp callbacks the legacy way
-> can be removed, marking ioctl interface as deprecated.
+Based on private discussion with Andrew Lunn (thanks a lot), this is
+wrong approach. Referencing directly dpll-pin nodes and using their
+phandles in consumers is at least unusual.
 
-Thanks for all this work converting drivers to ndo_hwtstamp!
+The right approach should be referencing dpll-device and use cells
+to specify the dpll pin that is used.
 
-Maybe you can also remove this:
-https://elixir.bootlin.com/linux/v6.19-rc5/source/drivers/infiniband/ulp/ip=
-oib/ipoib_main.c#L1834
+Also Krzysztof mentioned there are missing update of supplier_bindings
+in drivers/of/property.c to ensure that proper dev_links between
+producer and consumer are created.
 
-And in the driver development part of the documentation to avoid any new dr=
-iver
-with it:
-https://elixir.bootlin.com/linux/v6.19-rc5/source/Documentation/networking/=
-timestamping.rst#L630
+I will send a v2 of this patch-set with addressed another issues found
+by patchwork bot and including the DT schema (this patch) to review
+if it is ok.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Thanks,
+Ivan
+
 
