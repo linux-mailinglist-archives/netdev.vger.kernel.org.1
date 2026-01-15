@@ -1,48 +1,85 @@
-Return-Path: <netdev+bounces-250250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34688D25C41
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:33:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3ECED25F31
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 17:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F000D30057D3
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:33:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A26B830000B8
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 16:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671DE27AC5C;
-	Thu, 15 Jan 2026 16:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C161E3BC4E2;
+	Thu, 15 Jan 2026 16:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qac3tG8s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Og3zfSGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4433323A9AD
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770AC396B75
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768494816; cv=none; b=PWWVDfnM4RH2rPKyET3SD5oCimjVnmWalL8pAE9SD4DDT20d9sv8HPehXolKTKyhNuuHXWOjaQ13IFki3GE4yQJLXNMxH0h0wsvU/ncv3FjzImhKj7AwR8021BeT1Xf38lRv2C0pcKibuuTku/HcvcvWsAVZohxkKO9EHIJnh0c=
+	t=1768496249; cv=none; b=AfJsbSqZfBKiS4FzDborgp6hJdZqAVxgJulvUjb1yzL1uyvum8QcSkQD6Xhm47fJYKNG+l9GARlmYmq8zlfA/1lWGoHFk0AY4WDZ7T/ve4f5q/gnd61xovrd2xkK6Q+KwGrclpLB4mZDtOf4/E85o6MbGVkmME/rJEOh3b6kvaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768494816; c=relaxed/simple;
-	bh=CDmk3YeYR4mOCcp7fEq+OtpzZVr5Athxw+AgHQG+skc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FFiD1UiRrw+lNXXuaEzqmYg1Y2N6EyBAswJMH/0IIse5y2VZ/Iwhc1p9H0STnLXMT6Gywr5c67eHUF14ZYinSQRx1jPQKfPeMQzSmnJAZloQx6kcXJDoz4n4rscm0yVjoGAZmc2axGYS9gfkfAYDRYnkwHiBE8JptHFHbJkh0rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qac3tG8s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC45BC116D0;
-	Thu, 15 Jan 2026 16:33:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768494815;
-	bh=CDmk3YeYR4mOCcp7fEq+OtpzZVr5Athxw+AgHQG+skc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Qac3tG8sp8aalV2KOJFywHvoi1cdaoITKkJjCvz5zGshj8gHUKqk0Hs7n0rZbgEck
-	 KllqnJhFv4GXkhnx/PvNfvM9O+3ss+POSOhVj+q4/4+NR3XATVyzs7TwgFNRs4Oau/
-	 o2VT85mNZMAa94xARRPgyILItQOO04n0DKSfwY0GvIVa8MvVJd8KGMFmrYdFpr6K3e
-	 B+9aL2ESSgrvywDVzndgyxYadBUFyiL+fKrE8lf4CrVz3iOL51/gNTo1lafW2MQGtl
-	 pN6g7jmLRdy2sqcaBs3xIpq8I9JkP8JwWyaMknOWmx+1GWIXxdv0hgnrpSk5yFFWmK
-	 96vOsQuxQXCYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B90F380A965;
-	Thu, 15 Jan 2026 16:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1768496249; c=relaxed/simple;
+	bh=9ySFre6xeLFxuRQ1uFGc0x6OKIRIgNvKVxg9yBTPQsw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YLwkZta5AlS6FXVFMKVsIrumExhdMHInkCfj4gJ2hkJ9laC7r2fcKNa9QRcoeIcnBeWOYd7pj79/lctujAc7hS/5NxSl+c0y0iriQIu3wdNohcEP4TijyjhhEpxg8FHnZIe325xbkd5EJTpZ7UV6S+Y7f9hdL1wKZGYRwFQHyDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Og3zfSGo; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-81e8a9d521dso724463b3a.2
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 08:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768496248; x=1769101048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JXzZPPHjigDuE6/X7cZt8+YJ2SkPYBNIpUyOiSXW2w0=;
+        b=Og3zfSGoYg9VIa1ZakxtfIiXkLxKF96Ju+lgckkv/lh5n96y9FcSz+pkchmdRmo/IV
+         K3jDloTcanY49xN0PPjXx1l/2w++rCU2U0DkXrRW744KMc6ghHshBeLhukQC4yDt3a+1
+         DKQJTE/eg6dGm+CS6XreMF9XWtvTfljJS2SIi0gTpOyUMElseiiCbG3doGkk+7Bn8Jdw
+         VYMM+g8TnEs06Li3Hu21yGzoXxG/fiRo5aZzj1iZ3zF63ayH5qjv/AO4E8RgCgR0T8ZW
+         etx8nE2iErWSlIuozXj9sPnemok0nKwLFcE8/OiXC60+7UxXMglZ2TSKmLr2Q3L/PRmC
+         mxUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768496248; x=1769101048;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JXzZPPHjigDuE6/X7cZt8+YJ2SkPYBNIpUyOiSXW2w0=;
+        b=Uv006v4QdVtEO9M1Zp2WsSLvpvBoskRCeEBaw7550PmBv/TMoLVcn4MfE4a1hlPIi1
+         ycqUJNtZJoSNc0cNDRKfcTcCDqdXy5+gVXztb21WTmUD7Z58ZUwiAVqZXZahuF9+KxLt
+         5uA8ZSOmQanun3K/4g7iBHd4U7rUxAhGDPc5sabJcvBFRgz79xM1Emx3HGimSFsZN3Zy
+         jvz9nWbc3KB0kPDvfi27fJKPr+FEpwL4WN7/8HRwyllTJdLocCjni0Ck6DbyPGdPSw4y
+         s/eFT81z1DOzCp0KKsWubsQyM4sk2IiyhIiEQILWeObDi7DelaLYxKcvmJ0B+leYTkct
+         Xx8A==
+X-Gm-Message-State: AOJu0Yyw4Sma76TnpH5utC0hERIwT2iqOXp/KLXt1KhRHveXuRFnxVvP
+	YBcS/hX8CtIJ43fJt07SF/o5nuXxqiq/Waf3Td8AHwcTSubF5Aow/dEc
+X-Gm-Gg: AY/fxX5TpXP4aoHc8mc8YXtORXRJZfjwoUreZl+/AZINSUFDWok/21fXjFqE1AeHXsj
+	3LVYR+PkNdGPVknrUwCNyBa2pibHVh+LvAsYSX7+A1sYtmHqfYJw4HJZSimcaEPsraF5qmpliTE
+	yeI2Xc4LvLE+UCJHMtnVicVdmjtcXZb2B0NyZ7LziBsDIjOhrMjeF5lUply5MEmrKFvGy2Tztm1
+	7tntDCtaYNU4QYYqmPsAEwkhTivB/X6Q0c3F0Gf4X8FpRyrkhNUfCt46voENGcmAjqiGu7S9o5W
+	D7BbAg2WrUR+4Dmb7lvF0rluQyRk1CHrKEfsiGp0xxcYMrI/kWYM7O0svXXuNO+Nb6444cSMJ3h
+	hr1IE9v17X8+xnTNwdC5XRMhfFLllubCTHtK3VrzIxLAEbO+MUTUb9RE87EYO12bbvQSboAPyyF
+	qs5e3QW4f2ipbMYu86ITFWmmMSQWKJ
+X-Received: by 2002:a05:6a00:22c7:b0:81f:50ea:5d98 with SMTP id d2e1a72fcca58-81f9f6c8dd0mr233498b3a.31.1768496247797;
+        Thu, 15 Jan 2026 08:57:27 -0800 (PST)
+Received: from ubuntu ([49.207.56.170])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81f8e4dd11dsm3002392b3a.18.2026.01.15.08.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 08:57:27 -0800 (PST)
+From: Vinitha Vijayan <vinithamvijayan723@gmail.com>
+To: andrew@lunn.ch
+Cc: netdev@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	linux-arm-msm@vger.kernel.org,
+	Vinitha Vijayan <vinithamvijayan723@gmail.com>
+Subject: [PATCH] net: phy: qcom: replace CDT poll magic numbers with named constants
+Date: Thu, 15 Jan 2026 22:27:18 +0530
+Message-ID: <20260115165718.36809-1-vinithamvijayan723@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,40 +87,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2 2/2] tc: cake: add cake_mq support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176849460809.4062473.12743288518505930560.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Jan 2026 16:30:08 +0000
-References: <20260105162902.1432940-2-toke@redhat.com>
-In-Reply-To: <20260105162902.1432940-2-toke@redhat.com>
-To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
-Cc: dsahern@gmail.com, stephen@networkplumber.org, netdev@vger.kernel.org,
- j.koeppeler@tu-berlin.de
 
-Hello:
+Replace hard-coded poll interval and timeout values in
+at803x_cdt_wait_for_completion() with named macros.
 
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+This improves readability and documents the timing assumptions
+used by the cable diagnostic test without changing behavior.
 
-On Mon,  5 Jan 2026 17:29:02 +0100 you wrote:
-> From: Jonas Köppeler <j.koeppeler@tu-berlin.de>
-> 
-> This adds support for the cake_mq variant of sch_cake to tc.
-> 
-> Signed-off-by: Jonas Köppeler <j.koeppeler@tu-berlin.de>
-> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> 
-> [...]
+Signed-off-by: Vinitha Vijayan <vinithamvijayan723@gmail.com>
+---
+ drivers/net/phy/qcom/qcom-phy-lib.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [iproute2,2/2] tc: cake: add cake_mq support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=24236c0eb5dd
-
-You are awesome, thank you!
+diff --git a/drivers/net/phy/qcom/qcom-phy-lib.c b/drivers/net/phy/qcom/qcom-phy-lib.c
+index 965c2bb99a9b..cc4c6b254c62 100644
+--- a/drivers/net/phy/qcom/qcom-phy-lib.c
++++ b/drivers/net/phy/qcom/qcom-phy-lib.c
+@@ -9,6 +9,9 @@
+ 
+ #include "qcom.h"
+ 
++#define AT803X_CDT_POLL_INTERVAL_US             30000
++#define AT803X_CDT_TIMEOUT_US                   100000
++
+ MODULE_DESCRIPTION("Qualcomm PHY driver Common Functions");
+ MODULE_AUTHOR("Matus Ujhelyi");
+ MODULE_AUTHOR("Christian Marangi <ansuelsmth@gmail.com>");
+@@ -484,7 +487,9 @@ int at803x_cdt_wait_for_completion(struct phy_device *phydev,
+ 	/* One test run takes about 25ms */
+ 	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
+ 				    !(val & cdt_en),
+-				    30000, 100000, true);
++				    AT803X_CDT_POLL_INTERVAL_US,
++				    AT803X_CDT_TIMEOUT_US,
++				    true);
+ 
+ 	return ret < 0 ? ret : 0;
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1
 
 
