@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-250154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B609D24563
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:57:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FF0D2455D
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 12:57:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B743F3018364
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:57:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D9BEA30150E4
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 11:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD25394478;
-	Thu, 15 Jan 2026 11:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1D2394474;
+	Thu, 15 Jan 2026 11:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IafE6CjI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YPYDSRyJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10BD393DD4
-	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13A7394463
+	for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 11:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768478219; cv=none; b=lEd6ST6oYvkFcNPuxxHUhiQjLSk2YS0tDRTQtq/7kK+MQphntME7aV49Z64GEK94urEBwP2JMs4HPmzsFtlKAmDlmRJ8OxoN13QrXByb1/jmY3zowUPHF7OmpDY9AP8S0Fno/pobbudyYj9mO0NCtOgPc/YCdAIHgaVPxgHItIo=
+	t=1768478215; cv=none; b=sFB899Ufmhju9KGtUs34SNhh3FSN0Cvk8bcLfiMDBo3IaQByXEUn+qZ13xKmgRbi7k+mJdRd7W+kaWSotTxSujDZjpjrIDjwd3okLv17jjxv4r2QyKoniht7ChKSUzdqAS11HWacZ+w8rIR3DPSYY+07rzeb4ekv/ZSR6ZzOjcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768478219; c=relaxed/simple;
-	bh=9Ram+zm+a/I03dQdDMtdGiHtetxs4RlEtSjVj+5A1gE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bSj3zwKisMiGsaIzO1u3nc5zsjH9XWxoOUvb0LS0W2GrMeQDCAYj0MQNzL1YNxHaUTWVEmlr6jz6CD9z5z0jLlgfZxht31IZgoF/m22x8RfXpVEgJ/3R2Z4FPysaaJkJ5cqeMMKst9zGAuyqysnGpRXIoah1w12VC4kRBVGoetA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IafE6CjI; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1768478215; c=relaxed/simple;
+	bh=5kclX+p3ga+gWYDULD0Tckau8mQuj4sOrK0Tm9zfluQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PJguhpMQXRvGxZL+fjTuhzyT40p8ZgIF38QXYzuwHO6bol7vne78FUPPPjzPJxdR2kHV5/nX5CXNp62acD4g6N8twqnGkuWf7bRvCLUt3zYDxcFsnWXiTz6rRru174RjMFfgpQ1kQUuQfxO1rNRL54l61gvxBVM7xusxxdd8uZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YPYDSRyJ; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768478217; x=1800014217;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=9Ram+zm+a/I03dQdDMtdGiHtetxs4RlEtSjVj+5A1gE=;
-  b=IafE6CjIiLvjQrdhK41htjs6VJT/4GNTnz0mHro0yMNFPR3jSnLKWIP5
-   boyJiVlsiK1uy/qJpWtUeJ37rInnZaQr/xkW0B12g+CQNVKH6kON8Wwm7
-   ELZU2TI0kwba+bxw40TgtOt9LTU5NDPyQcDvzHWwBVfoT30GljWFOz9QA
-   AOdub59qVLCEkbgeK+raGAJas6lKXIHsrodKBU5CqYFBn3xb2j6QVjsSp
-   IAuDCrqeH7u4BhZf8rvJfhkrA1CFrDg5/Vo7QXSW99mrwOjkp/296SDD0
-   MwQRnCL7z/0zqUhPvNLRnWGFd955gaSFsKAPYnm95p5M10NYP1RHEFreb
-   w==;
-X-CSE-ConnectionGUID: BnxA2VoPSZe5c0xE701M9g==
-X-CSE-MsgGUID: W3GeB00hQ+utU/eXdsKFWg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="80503310"
+  t=1768478213; x=1800014213;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5kclX+p3ga+gWYDULD0Tckau8mQuj4sOrK0Tm9zfluQ=;
+  b=YPYDSRyJ5bq1D20zvXP5NhExOshwYMBrXTPOhp8n+aw4YiJBZ88Nk+YN
+   q/nFQ/OkDKQkWzBycITo8b7JqszX9k2YIP5Bz9tKoSUcenmKDLfd+i4Ki
+   +Kh6x1BIWsm0m8mtcKN1UAztqSm/DLW9489XQ1H02ufZUltlSLnySIemW
+   uMti/vQ61+uCX8L1KG42ZlNUnCJPGEyriZnBGHnpmtorI4q4tfDi4dHeA
+   8mgjpxHnMZg+YuaI39pxFbFPz9rL8zf5lSuKijaNnp3Xu98dcUMHmf8/n
+   bUlym9Tl/okTUa5mL9bXCJOpZ6twHShgYHpwjNaVehKKJPLZ+FOozul54
+   Q==;
+X-CSE-ConnectionGUID: /DV1zIYCQn2ji6fsQ0+lbQ==
+X-CSE-MsgGUID: i749Wd3lTuCijWIjV4L0/g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="95258945"
 X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="80503310"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 03:56:52 -0800
-X-CSE-ConnectionGUID: Aczuku30QweCUDg76X7DZg==
-X-CSE-MsgGUID: u17iqXRlS8GlGq8xMBK5pQ==
+   d="scan'208";a="95258945"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 03:56:51 -0800
+X-CSE-ConnectionGUID: M1zpoQTwTXmObavj27/nhw==
+X-CSE-MsgGUID: TTF3gDQjQmKt2OYNvJp1gQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="204078624"
+   d="scan'208";a="209413881"
 Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa006.jf.intel.com with ESMTP; 15 Jan 2026 03:56:49 -0800
+  by fmviesa005.fm.intel.com with ESMTP; 15 Jan 2026 03:56:47 -0800
 Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id EE3AB98; Thu, 15 Jan 2026 12:56:46 +0100 (CET)
+	id F0B4C99; Thu, 15 Jan 2026 12:56:46 +0100 (CET)
 From: Mika Westerberg <mika.westerberg@linux.intel.com>
 To: netdev@vger.kernel.org
 Cc: Ian MacDonald <ian@netstatz.com>,
@@ -73,10 +74,12 @@ Cc: Ian MacDonald <ian@netstatz.com>,
 	Salvatore Bonaccorso <carnil@debian.org>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH net-next v3 0/4] net: thunderbolt: Various improvements
-Date: Thu, 15 Jan 2026 12:56:42 +0100
-Message-ID: <20260115115646.328898-1-mika.westerberg@linux.intel.com>
+Subject: [PATCH net-next v3 1/4] net: thunderbolt: Allow changing MAC address of the device
+Date: Thu, 15 Jan 2026 12:56:43 +0100
+Message-ID: <20260115115646.328898-2-mika.westerberg@linux.intel.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260115115646.328898-1-mika.westerberg@linux.intel.com>
+References: <20260115115646.328898-1-mika.westerberg@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,51 +88,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi all,
+The MAC address we use is based on a suggestion in the USB4 Inter-domain
+spec but it is not really used in the USB4NET protocol. It is more
+targeted for the upper layers of the network stack. There is no reason
+why it should not be changed by the userspace for example if needed for
+bonding.
 
-This series improves the Thunderbolt networking driver so that it should
-work with the bonding driver.
+Reported-by: Ian MacDonald <ian@netstatz.com>
+Closes: https://lore.kernel.org/netdev/CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com/
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+---
+ drivers/net/thunderbolt/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-The discussion that started this patch series can be read below:
-
-  https://lore.kernel.org/netdev/CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com/
-
-The previous version of the series can be seen here:
-
-  v2: https://lore.kernel.org/netdev/20260109122606.3586895-1-mika.westerberg@linux.intel.com/
-  v1: https://lore.kernel.org/netdev/20251127131521.2580237-1-mika.westerberg@linux.intel.com/
-
-Changes from v2:
-  - Drop the patch that allows changing MTU. It is not necessary as we fill
-    in the min/max_mtu already.
-  - Updated code under drivers/net/phy/ to deal with the new SPEED_80000.
-  - Updated bond_3ad.c::__get_agg_bandwidth() with the new speed as well.
-  - Added review tags from Andrew.
-
-Changes from v1:
-  - Add SPEED_80000
-  - Add support for SPEED_80000 for ethtool and 3ad bonding driver
-  - Use SPEED_80000 with the USB4 v2 symmetric link
-  - Fill blank for supported and advertising.
-
-Ian MacDonald (1):
-  net: thunderbolt: Allow reading link settings
-
-Mika Westerberg (3):
-  net: thunderbolt: Allow changing MAC address of the device
-  net: ethtool: Add support for 80Gbps speed
-  bonding: 3ad: Add support for SPEED_80000
-
- drivers/net/bonding/bond_3ad.c |  9 ++++++
- drivers/net/phy/phy-caps.h     |  1 +
- drivers/net/phy/phy-core.c     |  2 ++
- drivers/net/phy/phy_caps.c     |  2 ++
- drivers/net/phy/phylink.c      |  1 +
- drivers/net/thunderbolt/main.c | 53 ++++++++++++++++++++++++++++++++++
- include/linux/phylink.h        |  7 +++--
- include/uapi/linux/ethtool.h   |  1 +
- 8 files changed, 73 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+index dcaa62377808..57b226afeb84 100644
+--- a/drivers/net/thunderbolt/main.c
++++ b/drivers/net/thunderbolt/main.c
+@@ -1261,6 +1261,7 @@ static const struct net_device_ops tbnet_netdev_ops = {
+ 	.ndo_open = tbnet_open,
+ 	.ndo_stop = tbnet_stop,
+ 	.ndo_start_xmit = tbnet_start_xmit,
++	.ndo_set_mac_address = eth_mac_addr,
+ 	.ndo_get_stats64 = tbnet_get_stats64,
+ };
+ 
+@@ -1281,6 +1282,9 @@ static void tbnet_generate_mac(struct net_device *dev)
+ 	hash = jhash2((u32 *)xd->local_uuid, 4, hash);
+ 	addr[5] = hash & 0xff;
+ 	eth_hw_addr_set(dev, addr);
++
++	/* Allow changing it if needed */
++	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+ }
+ 
+ static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
 -- 
 2.50.1
 
