@@ -1,217 +1,92 @@
-Return-Path: <netdev+bounces-250370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA10D29751
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:52:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B36D2984F
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A13630A36F1
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:51:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CFC513028545
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BC630E844;
-	Fri, 16 Jan 2026 00:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07EC316919;
+	Fri, 16 Jan 2026 01:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AhfzsMIq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JUkH8GxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C90F30FC09
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 00:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A165D302CDE
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 01:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768524658; cv=none; b=WGEarZWrvHDVnd/Zp5Bc0+DPJsDsEWmsWjf/fKqmJkQRuBVNS+6MmOwmiEBLNCmgfmvAWyiPw6OcvmsFk+7HmsfjmO3Jn4kJRJGuxR8xPDDhoeXhUmDlah2FEO4TI3jBVw8zsKFdi3tFjcer2Go82f8R0nFbbwYShrmJO2a3k/U=
+	t=1768525720; cv=none; b=c/JPoclVBZOstett7oyJT+bJq8uK0R8+q6yxFD/HsRW62ey0l4Foh7lb2Q+Y0HZvyJsqNZkuskx8Eg38d4VbqSssTlUZ2CS8wKiCjXgGGvVweuKdYvNrittoJFzYKJc57XGmBSVfZTXr4zoEAj1pxBPHOGdMAUodVkHTsO/6Kvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768524658; c=relaxed/simple;
-	bh=B68hiSoceJbcqhNRzfhRMhhxS2RswzXuTBa7G6mFQh0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hv+bcoCg2MQ6w6tXhIHF25khl+LulPxLEN4ZASDti6Zwxe2cTkPDnj/6yTpoJE74nb2mf6eMz3g15AmavboUZa7pLnjTPM6zV+s4piR8voxo/VVUo9rQdbVrNg3bJ0ZgmdeLC4RioWzk2Lqh527ovi3hcUQNRYIwvZs+3CIBfOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AhfzsMIq; arc=none smtp.client-ip=209.85.214.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2a0a95200e8so9955445ad.0
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:50:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768524646; x=1769129446;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHSl7KjNCmlL34Leswa6T4gMldUPRkc0V/lVqvwLlhY=;
-        b=CZfGe0OqxMgReSSl/GeJFaKTRg+ia1NjgW/LgJpKwBxzKKjJMLU4ltercM2gyzDzfW
-         cVYtK9bXFSlnrsnWVvtHH4nncW95EaBMMpiDF4shFqRGNMz32Pnnd66IWxcENZHV0TWD
-         nI4J7TF59DkjyHz/qC2ySNncI6MPdGyKsz1u8kAGIqo69rt7AQ7xu1sNwX9xU9+mBXhh
-         T7t5tIVFnr9hUeUUUgNSC0ikQxws090f5krcEDnZ0LruWO82Gmlsg30LlPdSWDeqglvc
-         3rck8fZPq+GyLe4ZRbf0dwHxhZpKIEtthhOfOI4kHzimNjhxfwyniiv45aHRsro9rc2/
-         XdnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVatA1x+/rE+rm9heXOKwnMG1aBx5EuXM6nTgzePpFjxI6wPZKkhKUYMk3aPNUFTIqQk8Mj3NE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOhhUvt7uf2rj+lrG5nLTNZA3ZaEJLZL6D8ESBJgz2JRaBiXV2
-	do5BOvFjg3e0gwUu07JS627/oLxG76YrCtrZMdqCyVvGARRzPGKF3O11PkV9PsMUHtoeZaXE978
-	IkNN2sQ/jNlqhhGmBoA7lU3R0W+5tBlkQOjIRGxHMd8HKRK86NiYl7L0MMh0izrXnIeIJP9W+p2
-	I4HTdW2RICgfdCbyrz2vJ1WEOEwykbDwYS1ped3wln0Osk519u+r+W6MUp8YdNVA0DNp1aFQa1g
-	GaKBINXww==
-X-Gm-Gg: AY/fxX5hBedIzbVjHx9Cd3XPkb7US5nEhPFEvQriqbM5Ohz+oVNNvNkCd44j6cqR1xE
-	StST+tlxhoUV6pDljssnAfMp3j4qVfUte2katFnrPIfsQ/2urbwpTjCyckOAd8lk54QeW73TBlB
-	29B9h74dshTsid/+OiNUJ5/4bCpAeWJgMZV/EwfuGwtNPvEUUr8lgLmU5+296hj9yvq/BMZgKHc
-	+p19g74zcrqBnNcZla+hyyMFFGsDdyKz8WiPMN1P1LmmBgPpFkkvM9dy3sQ1Tji78mMONRskdYU
-	ahTfd2hTGY28pLYRs5xoHUHQljPyWWNrn1cxA8UMj5bdwlf+16jh8wo8vWCtoRwkxBCxwY/HwSf
-	jZxlc6iuHSS0ClXkmt3tjyLaCNi44u+r6gnHnWzuvc5qrnEaH6ZHFRn23Y6SpcbIY41ewcRg01g
-	+PUK0qZ5Aa9xpnS8N2IR/eh+eIsfGQ2toLeJ6L80dAwFWiOQ==
-X-Received: by 2002:a17:902:e949:b0:295:86a1:5008 with SMTP id d9443c01a7336-2a7175a5db7mr12112005ad.38.1768524646439;
-        Thu, 15 Jan 2026 16:50:46 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a719399a02sm1132905ad.50.2026.01.15.16.50.46
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Jan 2026 16:50:46 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f72.google.com with SMTP id a92af1059eb24-122008d48e5so2757184c88.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:50:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1768524645; x=1769129445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QHSl7KjNCmlL34Leswa6T4gMldUPRkc0V/lVqvwLlhY=;
-        b=AhfzsMIqwUsgBws6T0ln5cnR3rZP+2SRB8OmsIynkWP7Ystt8rwrFv7iaUicWlFzv+
-         +nycr1kCpeOF1LyjR88l19BhQWmBDguTXm0RwhVUsLA8QuF10j0eFiIAkdcCgJagrdyf
-         /NOrUCcZdaUJKaOfo4qpEMyALJ5NpI0OBu8NI=
-X-Forwarded-Encrypted: i=1; AJvYcCXcBsvuNDIv0ku9RdOuJzk0LDrUaUfjcBDixsjYUduaQo665poocMDA8Ff//n6Jac3SiEJO4xQ=@vger.kernel.org
-X-Received: by 2002:a05:7022:4388:b0:123:34c2:55ff with SMTP id a92af1059eb24-1244a72ec3dmr1640216c88.20.1768524644968;
-        Thu, 15 Jan 2026 16:50:44 -0800 (PST)
-X-Received: by 2002:a05:7022:4388:b0:123:34c2:55ff with SMTP id a92af1059eb24-1244a72ec3dmr1640197c88.20.1768524644472;
-        Thu, 15 Jan 2026 16:50:44 -0800 (PST)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ac6c2besm1162305c88.5.2026.01.15.16.50.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 16:50:44 -0800 (PST)
-From: justin.chen@broadcom.com
-To: florian.fainelli@broadcom.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next 3/3] net: bcmasp: streamline early exit and fix leak
-Date: Thu, 15 Jan 2026 16:50:37 -0800
-Message-Id: <20260116005037.540490-4-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260116005037.540490-1-justin.chen@broadcom.com>
-References: <20260116005037.540490-1-justin.chen@broadcom.com>
+	s=arc-20240116; t=1768525720; c=relaxed/simple;
+	bh=PBnLKOR8WDd2cJcejUobeQj3vlJXf1e8HYY+/BpYJQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lYECCdcxKi3iCyvq+wxkob5Y11UmmbAEqPhsk4NBzJw+NipNw7BLkhNrHvwJDj0/xlM4b9WBLussUQ1Oa8JHCxFRkZSZ1AXF/4zcdNFrxaywNa0KjcDlK8mrmo1up6su1g28H5k+mF0T3ham1nGhPVyofjRqKW6H1xitOMSw8Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JUkH8GxV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LGiSUz37N9ovSZPw34TwWstspblmqZbHN8iTZJ4qCGU=; b=JUkH8GxV7ehKt+YzFs1LPmF3J7
+	yZJdJP7NGpfeasSHg/nkXKNVRrqOa62ZUUCz5s/di26PwMOxmtS8V5mWv6RJbYPLTrfMU3NeiTTuy
+	lzQYzN4FqZrFBU1XAWDJopXBwEitl44YxBUAh0kScCYJdOm1EypPoGBEomkMYpww5xKc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgYKB-0030eW-2r; Fri, 16 Jan 2026 02:08:27 +0100
+Date: Fri, 16 Jan 2026 02:08:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benjamin Larsson <benjamin.larsson@genexis.eu>
+Cc: Sayantan Nandy <sayantann11@gmail.com>, lorenzo@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
+	kuldeep.malik@airoha.com, aniket.negi@airoha.com,
+	rajeev.kumar@airoha.com
+Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
+ frames
+Message-ID: <ce42ade7-acd9-4e6f-8e22-bf7b34261ad9@lunn.ch>
+References: <20260115084837.52307-1-sayantann11@gmail.com>
+ <e86cea28-1495-4b1a-83f1-3b0f1899b85f@lunn.ch>
+ <c69e5d8d-5f2b-41f5-a8e9-8f34f383f60c@genexis.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c69e5d8d-5f2b-41f5-a8e9-8f34f383f60c@genexis.eu>
 
-From: Justin Chen <justin.chen@broadcom.com>
+On Thu, Jan 15, 2026 at 08:10:20PM +0100, Benjamin Larsson wrote:
+> On 15/01/2026 18:41, Andrew Lunn wrote:
+> > On Thu, Jan 15, 2026 at 02:18:37PM +0530, Sayantan Nandy wrote:
+> > > The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
+> > > sub-system, an extra 4 byte tag is added to each frame. To allow users
+> > > to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
+> > > to 9220 bytes (9216+4).
+> > What does the hardware actually support? Is 9220 the real limit? 10K?
+> > 16K?
+> > 
+> > 	Andrew
+> > 
+> Hi, datasheets say 16k and I have observed packet sizes close to that on the
+> previous SoC generation EN7523 on the tx path.
 
-Fix an early exit cleanup leak by unregistering of_phy_fixed_link()
+Can you test 16K?
 
-Streamline the bcmasp_probe early exit. As support for other
-functionality is added(i.e. ptp), it is easier to keep track of early
-exit cleanup when it is all in one place.
+Does it make any difference to the memory allocation? Some drivers
+allocate receive buffers based on the MAX MTU, not the current MTU, so
+can eat up a lot of memory which is unlikely to be used. We should try
+to avoid that.
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c   | 27 ++++++++++---------
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c  |  5 +++-
- 2 files changed, 18 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 36df7d1a9be3..aa6d8606849f 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1317,6 +1317,8 @@ static int bcmasp_probe(struct platform_device *pdev)
- 
- 	bcmasp_core_init_filters(priv);
- 
-+	bcmasp_init_wol(priv);
-+
- 	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
- 	if (!ports_node) {
- 		dev_warn(dev, "No ports found\n");
-@@ -1328,16 +1330,14 @@ static int bcmasp_probe(struct platform_device *pdev)
- 		intf = bcmasp_interface_create(priv, intf_node, i);
- 		if (!intf) {
- 			dev_err(dev, "Cannot create eth interface %d\n", i);
--			bcmasp_remove_intfs(priv);
--			ret = -ENOMEM;
--			goto of_put_exit;
-+			of_node_put(ports_node);
-+			ret = -EINVAL;
-+			goto err_cleanup;
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
- 		i++;
- 	}
--
--	/* Check and enable WoL */
--	bcmasp_init_wol(priv);
-+	of_node_put(ports_node);
- 
- 	/* Drop the clock reference count now and let ndo_open()/ndo_close()
- 	 * manage it for us from now on.
-@@ -1352,19 +1352,20 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	list_for_each_entry(intf, &priv->intfs, list) {
- 		ret = register_netdev(intf->ndev);
- 		if (ret) {
--			netdev_err(intf->ndev,
--				   "failed to register net_device: %d\n", ret);
--			bcmasp_wol_irq_destroy(priv);
--			bcmasp_remove_intfs(priv);
--			goto of_put_exit;
-+			dev_err(dev, "failed to register net_device: %d\n", ret);
-+			goto err_cleanup;
- 		}
- 		count++;
- 	}
- 
- 	dev_info(dev, "Initialized %d port(s)\n", count);
- 
--of_put_exit:
--	of_node_put(ports_node);
-+	return ret;
-+
-+err_cleanup:
-+	bcmasp_wol_irq_destroy(priv);
-+	bcmasp_remove_intfs(priv);
-+
- 	return ret;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 6cddd3280cb8..f3b8d94f4791 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -1228,7 +1228,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 		netdev_err(intf->ndev, "invalid PHY mode: %s for port %d\n",
- 			   phy_modes(intf->phy_interface), intf->port);
- 		ret = -EINVAL;
--		goto err_free_netdev;
-+		goto err_unregister_fixed_link;
- 	}
- 
- 	ret = of_get_ethdev_address(ndev_dn, ndev);
-@@ -1252,6 +1252,9 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 
- 	return intf;
- 
-+err_unregister_fixed_link:
-+	if (of_phy_is_fixed_link(ndev_dn))
-+		of_phy_deregister_fixed_link(ndev_dn);
- err_free_netdev:
- 	free_netdev(ndev);
- err:
--- 
-2.34.1
-
+Thanks
+	Andrew
 
