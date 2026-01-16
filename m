@@ -1,142 +1,138 @@
-Return-Path: <netdev+bounces-250578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94F7D339E8
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:01:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45079D33A66
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB25B30A21B3
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:59:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 36883301664B
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560273939A4;
-	Fri, 16 Jan 2026 16:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BJPvEdR6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60161369207;
+	Fri, 16 Jan 2026 17:02:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC570340D8C
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 16:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30DC33B6E1
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 17:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768582794; cv=none; b=TtKcrltjeM7bPYau5R/IYoNDY+yehW1tu+R4zbJ0491ErnpUC8DdMS7YW5palhCJD+0+MWO/LIKiJAiMVQfhny7rkixIDTucBjPKaN6HoVGQ9C17yJ6BPp8OO2F11xHt/zrBghReZkqQQvR6MaGmBXXQQwSsJI6xnKt5k5A31zU=
+	t=1768582971; cv=none; b=U1m4q/I5/R+GSzZakzX9VmaVX1h5MeUHwwoWtxcQeuXhxoLGMAezTdPUvoHZDHT0lhxDXCu6HeRAtU5WFjsuDuecm6yB6pJj/PG6eMyRkaJPz8AaKdFqaZRBxs+hQbpev1ljj8evcEpdrke7wulDMIl2tFg+o1LYa3zrOPfdAVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768582794; c=relaxed/simple;
-	bh=g5/sW2OukMHtYOjWFxtjJRGK4Oxj6NDZRd6XNP7Ph9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SAnkRJy/eq+XdWZUe+riz5pgcBBaqtaOClIM8OJQJQ1Je0KRlyjis9dNNKBU7nOXivFlsrduIIP8juNnrCZJBg52pYxdB6hEKsP8YVAnDYJShwnGI6gqCgC9shGIjAfw6W33tQpeDhDMULOVl2kRH+9MGYSf1/bb/6Ob1caU8kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BJPvEdR6; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <42614b10-549b-4cb2-a226-b9db30ff26c0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768582789;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zllNg8/FdqNycdpGniGNzL0Gsm8TQnL88LvbSU/qkBQ=;
-	b=BJPvEdR6T9B8fYeelrEWXi7VwhrLzFCU4LmPYNruDPL+UPwmSNbdClQNYAvYzbQuz5sLp8
-	e1T7RNtEyq/Jx376gMM1w5C/W6wBdU1GUHd16OSKx+q01AX3OgIA24PmgAYaxtvT3BF5D5
-	aVMsobtBBtlqAzPmtiFxwHGPwLPxle4=
-Date: Fri, 16 Jan 2026 16:59:46 +0000
+	s=arc-20240116; t=1768582971; c=relaxed/simple;
+	bh=IbEwciyhwpuFm15AlQJawIlmJViOLsYtHhvUF9Fj/A0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ghRU/CzHJlkyCGZgtaS3yxZNi0GMRJ6aIifFlYQoM5FqJ5zdYFenJbxoUQQqTyjklnArMsoWCAxJFXPamIZct4a4yM6NxyeedRK059TfsplLf3SdBpiAiii+ZaX9uEClpxS/3DhTctNAGTZtuzaMS1614c7DG2gm1iyGrOJX1kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgnDb-0005cz-Lr; Fri, 16 Jan 2026 18:02:39 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vgnDa-000xLS-2u;
+	Fri, 16 Jan 2026 18:02:38 +0100
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DC1684CED52;
+	Fri, 16 Jan 2026 17:02:37 +0000 (UTC)
+Date: Fri, 16 Jan 2026 18:02:37 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, mailhol@kernel.org, ondrej.ille@gmail.com, 
+	linux-can@vger.kernel.org, davem@davemloft.net, kernel@pengutronix.de, 
+	swilczek.lx@gmail.com, pisa@fel.cvut.cz, 
+	syzbot+e8cb6691a7cf68256cb8@syzkaller.appspotmail.com, stable@vger.kernel.org
+Subject: Re: [net,2/3] can: gs_usb: gs_usb_receive_bulk_callback(): fix URB
+ memory leak
+Message-ID: <20260116-analytic-splendid-frigatebird-5cb087-mkl@pengutronix.de>
+References: <20260109135311.576033-3-mkl@pengutronix.de>
+ <20260110223836.3890248-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: ethernet: xscale: Check for PTP support
- properly
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
- Linus Walleij <linusw@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-References: <20260116-ixp4xx-fix-ethernet-v1-1-9ab3b411c77e@kernel.org>
- <20260116-ixp4xx-fix-ethernet-v1-1-9ab3b411c77e@kernel.org>
- <20260116143754.6xfhqrlhgtsewifd@skbuf>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260116143754.6xfhqrlhgtsewifd@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2tzpgghhms3g6g7m"
+Content-Disposition: inline
+In-Reply-To: <20260110223836.3890248-1-kuba@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 16/01/2026 14:37, Vladimir Oltean wrote:
-> On Fri, Jan 16, 2026 at 03:27:29PM +0100, Linus Walleij wrote:
->> In ixp4xx_get_ts_info() ixp46x_ptp_find() is called
->> unconditionally despite this feature only existing on
->> ixp46x, leading to the following splat from tcpdump:
->>
->> root@OpenWrt:~# tcpdump -vv -X -i eth0
->> (...)
->> Unable to handle kernel NULL pointer dereference at virtual address
->>    00000238 when read
->> (...)
->> Call trace:
->>   ptp_clock_index from ixp46x_ptp_find+0x1c/0x38
->>   ixp46x_ptp_find from ixp4xx_get_ts_info+0x4c/0x64
->>   ixp4xx_get_ts_info from __ethtool_get_ts_info+0x90/0x108
->>   __ethtool_get_ts_info from __dev_ethtool+0xa00/0x2648
->>   __dev_ethtool from dev_ethtool+0x160/0x234
->>   dev_ethtool from dev_ioctl+0x2cc/0x460
->>   dev_ioctl from sock_ioctl+0x1ec/0x524
->>   sock_ioctl from sys_ioctl+0x51c/0xa94
->>   sys_ioctl from ret_fast_syscall+0x0/0x44
->>   (...)
->> Segmentation fault
->>
->> Check for ixp46x support before calling PTP.
->>
->> Fixes: c14e1ecefd9e ("net: ixp4xx_eth: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()")
-> 
-> I fail to see how this commit affected the ethtool_get_ts_info() code
-> path, and how the problem wasn't already there.
-> 
-> What do you think about commit 9055a2f59162 ("ixp4xx_eth: make ptp
-> support a platform driver")? Before it, ixp4xx_get_ts_info() had a
-> cpu_is_ixp46x() test. Now it lacks it, and it relies on ixp46x_ptp_find()
-> to not crash when the platform device driver for the PTP clock didn't
-> probe (something which obviously doesn't happen currently).
 
-I agree, 9055a2f59162 ("ixp4xx_eth: make ptp support a platform driver")
-did introduce the regression while NDO hwtstamp conversion didn't touch
-capabilities code.
+--2tzpgghhms3g6g7m
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [net,2/3] can: gs_usb: gs_usb_receive_bulk_callback(): fix URB
+ memory leak
+MIME-Version: 1.0
 
-And the fix should be applied to ixp46x_ptp_find() as it's obviously
-wrong.
+On 10.01.2026 14:38:36, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch.
+> > diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
+> > index a0233e550a5a..d093babbc320 100644
+> > --- a/drivers/net/can/usb/gs_usb.c
+> > +++ b/drivers/net/can/usb/gs_usb.c
+> > @@ -751,6 +751,8 @@ static void gs_usb_receive_bulk_callback(struct urb=
+ *urb)
+> >  			  hf, parent->hf_size_rx,
+> >  			  gs_usb_receive_bulk_callback, parent);
+> >
+> > +	usb_anchor_urb(urb, &parent->rx_submitted);
+> > +
+> >  	rc =3D usb_submit_urb(urb, GFP_ATOMIC);
+>
+> If usb_submit_urb() fails here, the URB remains anchored but is never
+> submitted. When gs_can_close() later calls usb_kill_anchored_urbs(), it
+> iterates over anchored URBs and calls usb_kill_urb() on each one. For URBs
+> that were never successfully submitted, use_count is 0, so usb_kill_urb()
+> returns without unanchoring them. This causes usb_kill_anchored_urbs() to
+> loop infinitely on the same URB since the anchor list never becomes empty.
 
-> 
->> Signed-off-by: Linus Walleij <linusw@kernel.org>
->> ---
->>   drivers/net/ethernet/xscale/ixp4xx_eth.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
->> index e1e7f65553e7..fa3a7694087a 100644
->> --- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
->> +++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
->> @@ -1014,7 +1014,7 @@ static int ixp4xx_get_ts_info(struct net_device *dev,
->>   {
->>   	struct port *port = netdev_priv(dev);
->>   
->> -	if (port->phc_index < 0)
->> +	if (cpu_is_ixp46x() && (port->phc_index < 0))
->>   		ixp46x_ptp_find(&port->timesync_regs, &port->phc_index);
->>   
->>   	info->phc_index = port->phc_index;
->>
->> ---
->> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
->> change-id: 20260116-ixp4xx-fix-ethernet-4fa36d900ccc
->>
->> Best regards,
->> -- 
->> Linus Walleij <linusw@kernel.org>
->>
+Good AI!
 
+Here's the patch to fix the problem. I'll include this in my next PR.
+
+| https://lore.kernel.org/all/20260116-can_usb-fix-reanchor-v1-1-9d74e72892=
+25@pengutronix.de/
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2tzpgghhms3g6g7m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmlqbyoACgkQDHRl3/mQ
+kZyTBAgAt8SmEwKz5wQOu3K6wbfoIm+Ps1df8mjyWiSOPp2qs4Xhrx/MJ8pwtfiv
+sPXH2JOFa/aOcQL1i7Xx7IsCuThNWylvSWKu+JBpSGkDWk1O4y8WobvLPwmo4Mh1
+ToZvsfvf36BbapKSfk2mvjOF01dDCGDewai2NrRyzVqfP6aHHtS5dpEFEBTyhhkz
+hh2DBCvxiqUXGxH1/sPbnolOZnd0YPrM3t40axXkS7J8an1LqnhNKShMhU1sqZKe
+RUy/jIIBnkomyC6R8/PTRwIi/mucsL93+LiBGFoKSIdN7WOLJXTfmQlvoDzcyKWD
+UI9oL8Tw7hRKfGQhIIH4I1sVQgGcVw==
+=pvan
+-----END PGP SIGNATURE-----
+
+--2tzpgghhms3g6g7m--
 
