@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-250410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF43D2A82A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:05:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6722BD2A8FA
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6DDCB3003B0C
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:05:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63D5D303021A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFAE325739;
-	Fri, 16 Jan 2026 03:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1058633E350;
+	Fri, 16 Jan 2026 03:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1QYiDqK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7Z87/fS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF21930EF85
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 03:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65BA271450;
+	Fri, 16 Jan 2026 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768532747; cv=none; b=aPN6GNWct6KKXZbmPW50W1zp7gfVCiNCpYJa6ThnSSw6Vw4l7EiWi012IwO2vl9UxYqLtJsI1sqzhe8WkjoqqhyKwMDeZT6xy92QRFCLQhHPzeLmF88CWOA14XlRLGAMW/T3AfD/6oKmGHQncpyL/AvByWk6EKfIQ5BpLTLKD8o=
+	t=1768533070; cv=none; b=DRCbeYdn/M9a8qhGjsAnsSHkCPgEW5HVTPSaVwPlVGOkshLPI+Az++NUpRtS8tCYthA+5oU/BXybMTHB2AyuKTTocul3zlf9nxTYWa+3jUwAptGmjwBtu1HYzvwQmck1+0uqjY8Hs6LhVfNuyQAqFvL5O3SO6OJWmiE90Dv7tjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768532747; c=relaxed/simple;
-	bh=U3Aoti0YPoxifwNh7V0YYpw1gTTxaBib3ervHQ0XypE=;
+	s=arc-20240116; t=1768533070; c=relaxed/simple;
+	bh=KQWIKFhIXKwpnawXhuI50mbD7zUL5C7YdyjLcK0viS4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aKTQaFjh907ntmI+enmhiRhQpZffegyPO2PCuX7wm++g7rfXgpnW0pLczzwkvi2pS7f90o5ABmrdn4wX2VbYvA00iWaY5ylij0AVjobzIJTKB1LEBkLXxPTwFEZ3UY3Hucbajv7W5mSoCUcPLwW4ooJiHezU9MD6Haqjc/NS/XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1QYiDqK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA59C116D0;
-	Fri, 16 Jan 2026 03:05:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=is+UUq6ArUTcMgXnhyVl29JlcSPAvsuSM2MV6XJqgoF14gjDLHux5LM4aGrmcHednPkihj7J6G/53Q3mBM/HZNDf1fAv4egTaVHvqWNbkesDHHstkNNTBNO53inrVhmUjtxIb5mLPEalNUKDuSI3E2aGR8VgXZH4FFPVztWbx+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7Z87/fS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC3DDC2BCB5;
+	Fri, 16 Jan 2026 03:11:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768532747;
-	bh=U3Aoti0YPoxifwNh7V0YYpw1gTTxaBib3ervHQ0XypE=;
+	s=k20201202; t=1768533070;
+	bh=KQWIKFhIXKwpnawXhuI50mbD7zUL5C7YdyjLcK0viS4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L1QYiDqKnDOSSq+xNu+85WqFwC8Qoq9llFdwS+6br3L3Q5qGCwSBH4tzlpuO3mq3r
-	 vaEOV8686ZZIri8oA4Plxr8THRmQ6eDgQHLdKqOoGFF2BrIk6eOieq1eiChchXjgAE
-	 ND1QawHZH0QXhocxN9ghOzjhfneolngOFAQMz6fg0slaJUtuiMZLk7PnFhHoZkJ7Tm
-	 3wUSihRl3EyFF5DahJf+HsOKeV7ufvwsJ44HfcS9VcYQYRHdeOm7IR4w+ouPDkIUG4
-	 sMH810M6wuXKRoJEovwOxYpa2C3grmqrC5EPFCP2x8zuUc7moPv5lg+OVTZ+vQQ6V+
-	 +R/3912fAVxfQ==
-Date: Thu, 15 Jan 2026 19:05:46 -0800
+	b=V7Z87/fSTYgco61K4c0UrRiSCu3XYGzkoyIsJbG/dXMg9hCEYHcxm+4s00sL4gtge
+	 /ogZLhSc0qaGNCQHZKDVASTL0rpssJ8y/roScaLKUsQ4L0V66VwxFUkTIvWjRv1DSu
+	 bcj9zZGa7SgyVPS2pUAwkEvrvEcj+vIgaJpvd4O/7nEKBt9i7B8iwn7R9BrqrStlR2
+	 O8ADsf2qG/oFyJXeui7h9KV9woHlifrGnC4uqeke0oeAOQlEgxpnAYSCbHrnU1LstL
+	 rmBasyxzFGSKuQphbtU4r5B/01IglRTSPlHGJN0uEV/MZ9gDGdMrmnZVciIOd/6Vec
+	 IouFdwatDS/8w==
+Date: Thu, 15 Jan 2026 19:11:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Sayantan Nandy <sayantann11@gmail.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, sayantan.nandy@airoha.com, bread.hsu@airoha.com,
- kuldeep.malik@airoha.com, aniket.negi@airoha.com, rajeev.kumar@airoha.com
-Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
- frames
-Message-ID: <20260115190546.5ede6750@kernel.org>
-In-Reply-To: <aWjuM3Ov0e45QyW4@lore-desk>
-References: <20260115084837.52307-1-sayantann11@gmail.com>
-	<aWjuM3Ov0e45QyW4@lore-desk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Chen Minqiang
+ <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
+Subject: Re: [PATCH net-next v3 3/6] net: dsa: lantiq: allow arbitrary MII
+ registers
+Message-ID: <20260115191108.1a7eac9f@kernel.org>
+In-Reply-To: <c1b9bc590aa097c98816a3fda6931db9b3d080af.1768519376.git.daniel@makrotopia.org>
+References: <cover.1768519376.git.daniel@makrotopia.org>
+	<c1b9bc590aa097c98816a3fda6931db9b3d080af.1768519376.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,23 +65,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 Jan 2026 14:40:03 +0100 Lorenzo Bianconi wrote:
-> > The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
-> > sub-system, an extra 4 byte tag is added to each frame. To allow users
-> > to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
-> > to 9220 bytes (9216+4).
-> > 
-> > Signed-off-by: Sayantan Nandy <sayantann11@gmail.com>  
-> 
-> I think the patch is fine, but here you are missing to specify this is v2
-> and this patch targets net-next. Moreover, please wait 24h before reposting
-> a new version of the same patch.
+On Fri, 16 Jan 2026 00:07:37 +0000 Daniel Golle wrote:
+> +__diag_push();
+> +__diag_ignore_all("-Woverride-init",
+> +		  "logic to initialize all and then override some is OK");
 
-FWIW this is a good reminder for Sayantan for the future but it doesn't
-merit a repost in itself. net-next is our default tree, and pw bot
-guessed correctly.
-
-That said I think Andrews request warrants some extra testing here so:
+This seems quite unjustified to save at a glance 4 lines of code.
 -- 
 pw-bot: cr
 
