@@ -1,75 +1,52 @@
-Return-Path: <netdev+bounces-250593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC15D383F8
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 19:09:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C88D38406
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 19:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 57ADB3042902
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:08:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D1463042808
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83369338906;
-	Fri, 16 Jan 2026 18:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63C7338902;
+	Fri, 16 Jan 2026 18:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="czOKsZ4p"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zd0LYlgD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6983230D0F;
-	Fri, 16 Jan 2026 18:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BE228135D
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 18:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768586926; cv=none; b=Di0PgdZAjq9LGgmK+0z2b0MEedNyFD3ZqqHGrb1e16Obz2vjXH5POyjil0lbIJx4mXTtxkjeGdM9JB03Bf63sUb4/SP9hFh93+FSZ7tESdIMbjAVl/O7w0UoW100JxJf2FUP3zFoEoXdYEdixWwX/La0iVZLn81x3t5rH+ZUozU=
+	t=1768587058; cv=none; b=lnZ7KSeVV9A2swUdHldWPJo91n/txPH3Scm3BZF04qGROPnVqYWI8YwRaC/H2l92xypvvfz0TND20j+Ubr2PSs7Q8rSC6vwyMg0V+Hf5eKh/t1oL47+HtOUlCEDuP3S2zK4avSTTRgV5l6PP+yU9zk8OeOtNMiLaFACxbO5tK5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768586926; c=relaxed/simple;
-	bh=JbpAk7nm96q2ucJt6fQNL6+1nRmms1uHBJJcqphNN/E=;
+	s=arc-20240116; t=1768587058; c=relaxed/simple;
+	bh=n3THFwvtUR9pSC8IDO9AttXXT/OeL9IxiR82cObeKw8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dtckE7oMHaAbygq8iLxNJfaSKeSRV1YysRS1WZ7UmeW+/IEMFo8BxVHYKnNOpFxMSeJPKVHds4TaxWj+784lY41jPB2TscH3RTey0SnrXx8nKUHZX6xWhAE1pXXK4UwmRy84YTq04N4r01KGVVF4EDPQJcHrKWn5gbqQN125MuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=czOKsZ4p; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rMSr8rpE6TXL8VId1UJJIMcjxvz+l9cVkHXKgGNXGQU=; b=czOKsZ4pEL+m12rvJSEQX3ENCY
-	WGGDiIxep4Jy+Lux3W704sxZsTLeXQwBD+5bgVX7fXQIzvoR/lflnfA9DBwoSfH3B3+9UflPDxsNM
-	GO7aLPgA3tIbC4bJPX5iybc/9DYkoE4ULTcSiXEIhc46LJnK26v3hU48AKiZMyoarTdC2+fGTUFRa
-	7woR02y45qo2jB0apChCV1XV4tiiX1uWf32nOEnEL6/egfiOHcMLPhbQZcAlPaEMlD/PUneDoM29i
-	9GjasNLKE8q4ela5NIstKa5Jvb8o/QbtUCt2oSayT6iL+qkatn0b0BmyTj+lRHK5Zizca7yLWoZ7b
-	Cz9uNmhA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54658)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgoFF-000000002ZL-3znI;
-	Fri, 16 Jan 2026 18:08:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgoFA-000000003nO-1jaq;
-	Fri, 16 Jan 2026 18:08:20 +0000
-Date: Fri, 16 Jan 2026 18:08:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Tao Wang <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
- resume
-Message-ID: <aWp-lDunV9URYNRL@shell.armlinux.org.uk>
-References: <aWd9WUUGhSU5tWcn@shell.armlinux.org.uk>
- <20260115070853.116260-1-tao03.wang@horizon.auto>
- <aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
- <aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
- <6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
- <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
- <aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
- <aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZxF205J1xzcr42FDLVXsLlosCnpQ5Y4FRWye/9GNAkFxGsq9LapatFrOY66JMIxdSdDZ9Z6JSmgyswbuy9WFftRKmbFrNJ4/9q0D6/3Pj/yrRW3xnRWgVyKf6ZuKMMsxzbn/gv0TVPJl44p+3VYHGHdw2WjzyB5vIEYbPhK1Jhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zd0LYlgD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uF0LM1glmVMNdJs2O752P8TOFbY379fHdS5sSUyEfQU=; b=zd0LYlgD2qrp2YgW4uiNvrjIqy
+	8Q8RFGRb/M8ewKpI60zBr0zhodM7YHmINCDcAm94yO8UU2FcSlyEwvsfeIGgog2rukobfoKidsuUl
+	61+r2vq6TZiU3HsFeDLXzXunxvQMkheNyUtGIYTjj+wgtysLCnD9ukeb9DzHPFLRu1OM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgoHe-0036Qn-2y; Fri, 16 Jan 2026 19:10:54 +0100
+Date: Fri, 16 Jan 2026 19:10:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Damien Dejean <dam.dejean@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: phy: realtek: add RTL8224 pair swap support
+Message-ID: <bde1d3a9-6378-49a9-bcc2-00f4038f5558@lunn.ch>
+References: <20260116173920.371523-1-dam.dejean@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,36 +55,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20260116173920.371523-1-dam.dejean@gmail.com>
 
-On Fri, Jan 16, 2026 at 01:37:48PM +0000, Russell King (Oracle) wrote:
-> On Fri, Jan 16, 2026 at 12:50:35AM +0000, Russell King (Oracle) wrote:
-> > However, while this may explain the transmit slowdown because it's
-> > on the transmit side, it doesn't explain the receive problem.
-> 
-> I'm bisecting to find the cause of the receive issue, but it's going to
-> take a long time (in the mean time, I can't do any mainline work.)
-> 
-> So far, the range of good/bad has been narrowed down to 6.14 is good,
-> 1b98f357dadd ("Merge tag 'net-next-6.16' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next") is bad.
-> 
-> 14 more iterations to go. Might be complete by Sunday. (Slowness in
-> building the more fully featured net-next I use primarily for build
-> testing, the slowness of the platform to reboot, and the need to
-> manually test each build.)
+On Fri, Jan 16, 2026 at 06:39:19PM +0100, Damien Dejean wrote:
+> The RTL8224 has a register to configure a pair swap (from ABCD order to
+> DCBA) providing PCB designers more flexbility when wiring the chip. The
+> swap parameter has to be set correctly for each of the 4 ports before
+> the chip can detect a link.
 
-Well, that's been a waste of time today. While the next iteration was
-building, because it's been suspicious that each and every bisect
-point has failed so far, I decided to re-check 6.14, and that fails.
-So, it looks like this problem has existed for some considerable
-time. I don't have the compute power locally to bisect over a massive
-range of kernels, so I'm afraid stmmac receive is going to have to
-stay broken unless someone else can bisect (and find a "good" point
-in the git history.)
+Does the PHY support auto MDI-X, where it figures out a working
+combination at link up time? That allows you to use crossed or not
+crossed cables.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Anyway, the DT property you are adding seems to be the same as
+marvell,mdi-cfg-order. See commit:
+
+1432965bf5ce ("dt-bindings: net: marvell,aquantia: add property to override MDI_CFG")
+
+> +  realtek,mdi-pair-swap:
+
+Maybe call this realtek,mdi-cfg-order and use the same binding?
+
+> +    description:
+> +      Enable or disable the swap of the ethernet pairs (from ABCD to DCBA).
+> +      The "keep" setting will keep the pair configuration at whatever its
+> +      current state is.
+> +    $ref: /schemas/types.yaml#/definitions/string
+> +    enum:
+> +      - keep
+
+You should not need keep. If the property is not present in DT, you by
+default do nothing, which would be keep.
+
+> diff --git a/drivers/net/phy/realtek/Kconfig b/drivers/net/phy/realtek/Kconfig
+> index b05c2a1e9024..a741b34d193e 100644
+> --- a/drivers/net/phy/realtek/Kconfig
+> +++ b/drivers/net/phy/realtek/Kconfig
+> @@ -1,6 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  config REALTEK_PHY
+>  	tristate "Realtek PHYs"
+> +	select PHY_PACKAGE
+>  	help
+>  	  Currently supports RTL821x/RTL822x and fast ethernet PHYs
+
+Changes to DT bindings should be in a patch of its own.
+
+    Andrew
+
+---
+pw-bot: cr
 
