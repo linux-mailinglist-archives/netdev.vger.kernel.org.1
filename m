@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-250421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3104FD2B036
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:53:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 695C2D2B06C
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 188113035F4A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:53:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF75B30704C6
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427A72857FC;
-	Fri, 16 Jan 2026 03:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D433E344053;
+	Fri, 16 Jan 2026 03:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUUTJz4z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YAYmCB2f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCC329A1;
-	Fri, 16 Jan 2026 03:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B187634403E;
+	Fri, 16 Jan 2026 03:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768535622; cv=none; b=Ogeqz0Q5OVLQ5bv+9bU6aCQIZ8pVLPA+oqkV79JOVEIzl1qmWBWkUuDF3p1LWQP8s/VSPDw+T3bHRMXXOy5KDscGq5zwkUOaPAcylp5VhPwuyCNMHgPouKqbfnIZCK90YrZZdtH8L/ytDVE2yszDVZEdOE4Dyy4kQSTW+v7c70M=
+	t=1768535623; cv=none; b=NR2bJgq2D3+YzzdoozxQvjMwA7vhe+6gmboiPyctC+EfOpCPUmevX8FxJAut33SDrkYGNXWk9qyARmFvUSGFnHe/ASZUBKDbnPT2MSOFB0BdP5kJAyIF+bK4NBbwD2ZZB3lFShSCTAJJ0bHMQyZf9XCXvex+x4KsJtCczvJOhUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768535622; c=relaxed/simple;
-	bh=ees821A/NRyoXsrx3xfbPYGegZtOUU+kLtT35pR1m6I=;
+	s=arc-20240116; t=1768535623; c=relaxed/simple;
+	bh=BL83QA3J/K3M/g7RWyYOI368jPKHfHfqOTz0Zfvm+e4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iW/kLXYzp0HVmNGlSLFUSuPe1tapVMezzzFlzuWRuyP7roaWfzyNkbTg9oyPb4gDp773P0htYyQGhQRd3XJEY2gY1UBLspegDPbXWR5Cr8eOvt/5tfVEijRu8cVLphOi+Eke+e/mPFLarIjMMf0d6S6vDimrLlufVfP8QaSgRI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUUTJz4z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D98E0C116C6;
-	Fri, 16 Jan 2026 03:53:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p4ZwirUsaitiJbSM9b4vtTYCj38g+meZxlR7U9jQbGHunxUP7NztxEAKMrPpvUT4tmPgA1jshplnqBltoO+w8XbSiCaElYO4C8kI5VdUI4lSXQ5VTjJkcAd54BTAWDJq+cuKmzcYmfy7k/KWdn80Om1umu1Hh5eQZeZJRXHSu3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YAYmCB2f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53735C116C6;
+	Fri, 16 Jan 2026 03:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768535621;
-	bh=ees821A/NRyoXsrx3xfbPYGegZtOUU+kLtT35pR1m6I=;
+	s=k20201202; t=1768535623;
+	bh=BL83QA3J/K3M/g7RWyYOI368jPKHfHfqOTz0Zfvm+e4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fUUTJz4zzhiey11yCDXou4SYTiAR5Azs2vfoy5dsBP00Yp4sxsRc+EyJf4u9Bs8OE
-	 GccNYWkdtnPNKA5raPdyrQFjuEkg0bdvY8/d8KYaeGYQJP5QS7B5AotXa0KIsUb6Tk
-	 7FNccr4ci1Wvxj2RAfw+EZpt5n7FAczQmKleGA1Fjuqy3/UChRZdbN2UNBIEA9GQpb
-	 ZqWFgDjQtRoc3+Y6upOwA2ZFFZEOMRFrXWzvwDvDTqZxfQ+H3XLlQwXNuUSovHx3hG
-	 BenA/sCwuL2tvlsXNfpXO31YD46Un5FEKneKo+HrrWNBgmYHNUjZCpbnSpk/0KihQj
-	 rGolUTNyYf9HQ==
+	b=YAYmCB2feLv7LjxvgZ0ujzQZBSCxR6qMFc5QLBh/UtAzT1OfT2PO55CYUMcls/Ywc
+	 6RSWZ4YE23H2vm3TO3khorHLr13V3WDiSG15X0ucGaFtBlUHXUnXvRm9HCjbiYEbX9
+	 qlgZQ/P015FQhw+G6F9hWCFZHRkKq6TDRNBpYCDmvVHgmdY1ZRZzyq3f3xGbYYu6rK
+	 qoGSg8RyYjNf2bFPsH0xEPRaxspLAU6ZzjzI9i2DvddAFbwKD7n2DxPDg7MXpONWhR
+	 OWVOscY3/sL7UT388gofqcHyKFOAIqf1AwtgKbEuCHtOjnuIgyqifOj9uZx5snx+mn
+	 kIH+6B5Uwqhqw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2D49380AA4C;
-	Fri, 16 Jan 2026 03:50:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78860380AA4C;
+	Fri, 16 Jan 2026 03:50:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,43 +50,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] vsock/virtio: Fix data loss/disclosure due to
- joining of non-linear skb
+Subject: Re: [PATCH net-next] net: usb: dm9601: remove broken SR9700 support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176853541379.73880.1523933518591592704.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Jan 2026 03:50:13 +0000
-References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
-In-Reply-To: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- eperezma@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, avkrasnov@salutedevices.com, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <176853541503.73880.8065779196205635793.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Jan 2026 03:50:15 +0000
+References: <20260113063924.74464-1-enelsonmoore@gmail.com>
+In-Reply-To: <20260113063924.74464-1-enelsonmoore@gmail.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, peter@korsgaard.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, liujunliang_ljl@163.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 13 Jan 2026 16:08:17 +0100 you wrote:
-> Loopback transport coalesces some skbs too eagerly. Handling a zerocopy
-> (non-linear) skb as a linear one leads to skb data loss and kernel memory
-> disclosure.
-> 
-> Plug the loss/leak by allowing only linear skb join. Provide a test.
-> 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+On Mon, 12 Jan 2026 22:39:24 -0800 you wrote:
+> The SR9700 chip sends more than one packet in a USB transaction,
+> like the DM962x chips can optionally do, but the dm9601 driver does not
+> support this mode, and the hardware does not have the DM962x
+> MODE_CTL register to disable it, so this driver drops packets on SR9700
+> devices. The sr9700 driver correctly handles receiving more than one
+> packet per transaction.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] vsock/virtio: Coalesce only linear skb
-    https://git.kernel.org/netdev/net/c/0386bd321d0f
-  - [net,v2,2/2] vsock/test: Add test for a linear and non-linear skb getting coalesced
-    https://git.kernel.org/netdev/net/c/a63e5fe09592
+  - [net-next] net: usb: dm9601: remove broken SR9700 support
+    https://git.kernel.org/netdev/net/c/7d7dbafefbe7
 
 You are awesome, thank you!
 -- 
