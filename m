@@ -1,263 +1,171 @@
-Return-Path: <netdev+bounces-250371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31D9D29757
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:53:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70581D29733
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DACB930ACE4C
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:51:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9594A303E402
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6617D3093DB;
-	Fri, 16 Jan 2026 00:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0FD30F53E;
+	Fri, 16 Jan 2026 00:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jXaMz/WH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JIxmQowp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f100.google.com (mail-ot1-f100.google.com [209.85.210.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0ED30DD24;
-	Fri, 16 Jan 2026 00:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DD030AD10
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 00:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768524664; cv=none; b=QWJba1mOrIItiEpxnMnxqCK8lnYF5BYbpMNc5zP4Zu6PKxA8zs8++YpEJ9g0/KymsiDVuytmg7eoU2WuugPJ5snH40AMePjgtSgSmCc3UEXcijpBsiOz7t14ivFpNlyY+TEvWetDc4kxKtilKEAj/ZPhYRzASpPA/JQeNtL1R6Y=
+	t=1768524646; cv=none; b=TLJKKCVdcBxs9S3+dPVSsijaJ6xp+zm6EGlOy3qki+yvwXBxpwm2s9jJo2SfojN+UPFTw+9ptAuVrBPARNO1vKWv7NsldWY/4l04ZyJ/Xt9xOTKTcBXw9UrVWmupSpoSfaxpJLY7f8M/suhC3kmBAZ4B/ZGKQaxjR7pl5OFJ5bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768524664; c=relaxed/simple;
-	bh=QbyhLsls3nlhnuRW/mDW0pGBKiyS7I0v8Nzq9vaYBE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZrWN857kawl6Ak0huPHGRXG77aJJyYIJAK2EG8PqZcQ9XbiSWTww+jEpYsssyeh6SSfOlxu9IYdM9GHNf80TeLNye7QnNmQbmr4uxJz3P+Q+BjfqkedJMr0AbAQn00GkiVX6/TCLxUaooLSoqG8RcZn5qDB9PaomX+2Bacl1gpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jXaMz/WH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Epl5JNNsyOzzTO/l/0nsP04mMOHrR9SHTj1QJq8FS+4=; b=jXaMz/WHD8am70A2hLxr07gInt
-	HrCU+7GUGqhD2xowWXBJcnWJRmEsAfNvNdNjxiRVoKeijqKpq/LTjBYZS3CiFhjbsamhEY1zxahPA
-	JyuThUqQloco+cntBJ2mwqEFszLE2wXDSyp1R9j675vsEMDH9IyHeqxFwH0nMQDJiXBZ+lfMu91R4
-	ROZohKtHhpndXyDsyG2McDCSimsLbcNg62LpJVrBn7Bxp/7qbKJHgQbhHQCgP1EFK5el9iIFDIPse
-	18YgiEbz/6FJMjrtMWY+DsGw3nZ8h9glvh6uoHuaMZxAW2CT4KcnXIVqsihFivCYKlaH5M9y1xanZ
-	ow3Fy1tA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49026)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgY2y-000000001mr-1ChY;
-	Fri, 16 Jan 2026 00:50:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgY2t-00000000382-1MBD;
-	Fri, 16 Jan 2026 00:50:35 +0000
-Date: Fri, 16 Jan 2026 00:50:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Tao Wang <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
- resume
-Message-ID: <aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
-References: <aWd9WUUGhSU5tWcn@shell.armlinux.org.uk>
- <20260115070853.116260-1-tao03.wang@horizon.auto>
- <aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
- <aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
- <6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
- <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
+	s=arc-20240116; t=1768524646; c=relaxed/simple;
+	bh=f0OIUVxI0PgOWhExbU1FecOBaSLnmmkg1XtjgJTX8yA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CxyiyCqWfmEBxed4n3Xbw8YxxCRprQNaP9I1cuPnQCkh+jcsV6esIqBfeLTgBlQzzYOs5hlOKTK5YiIAkjyz7rwCebM9VJa5qX53P4ksgSRjpgEiimWL1qwJBsJTmIidnEvCggAuiyg2pXqNfKHwAGEesJpsgdk12lFzJZztnMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JIxmQowp; arc=none smtp.client-ip=209.85.210.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ot1-f100.google.com with SMTP id 46e09a7af769-7cfd48df0afso993461a34.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:50:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768524644; x=1769129444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdegUEJa3UjiBfkCLkRNHs7XLVuHULtTod8beQSblao=;
+        b=JRFsyCGgKI9F+akQcA7QxygvmGAByuORomX8E3h10SMiMtCs3VfAZo1hFX5uMhTFxz
+         KX/ywMqfgZe0kbNdRMYdKfd1iWnhP1iWShO7kwyBZXl8j6+ZHs5WZTARznGsNxPJSvwi
+         fzp50nNzKdZmbuhAcJKRPhg3dlJO6EJgbazJj276yspkuHV3wYZ3W0UJAgRZLyX0sChw
+         subBf1xjJa7wEFyJUTOgK5KsvVzlsCEBMVXnldedUEfBJYqfzztvlEZdK4QFoKdF/UlP
+         ie7O6sgpFRF0nIWmbI6R5NUwx2Jf3fwiPxotVsXzzePgjI/WoKdef+jBihG/cWrXJH3M
+         lGyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX74rZjltgNHEOmmEHEwYZE2VUGtKH2cEMhWGXV+lObKTkzjx40kBZag/oBfCGfAbchjg898CE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzCWnhqob34B7ScxZ6GVn9nee/+yN2ETZqBt7YQig7Ae65VU3S
+	q5BXjidmnuKvNGJBbSDoEVc3u153aD+K22em8ifN7WuTZy+NL3EtCkd3OC7xJravoYlRqACckGP
+	GSbrB3mhUlvVqag2TDHzUzXOEKSwRUJh6dRQDu1YXUTESnoHUfRjaR5c0hiphg/dVY5ISj/NZDJ
+	qmUDVfEufAj1XO1EVrF4cS8jngZnwkOHL8ZzF7uApbr5fOTLh0kX+x7D9qJLLUV1gXBtqrflTXB
+	dQxWtkjvQ==
+X-Gm-Gg: AY/fxX5y6Q3yHR4qsB+8gccYpynj8hOgx/tYK024+ccUveP/U07fsl6Bvo2TftZwLYJ
+	nrDgOHiyg7rUiOnSXsq6XAwsW20kHuXZ/b9tNuBuIICQV1KaMOor9qZCYm4Aooc2fhVSF8LRLNU
+	PkPl62bi+SP2zgcDhnYAHkR9qxWGInn7/1zUX5Gmjcgt/ZWA923aQUQWllgYwmrzgj9jS1lug0m
+	mY3jvujgz8cogPglstzWbjcmJP4ENLoMfGA2MX+PBftoIhxw7sc7VF13+4zBBbSjXSJyujwDj0b
+	51HellRBFClCR/fUZZtbhbYFEyFBR8eigCvwSVq7GiguFylpPbYL17prWEPxQW9tBeGfehQw0p8
+	RPMFMOLM+YWGjgcUqNhiT3/UHfG1Zy9psZtQy2rKA9AVTK+ITVuN97SdNnwek9Le9U2LH3meNvi
+	Pq0Osv58wca3tY5/Q7ieLPPIKBAkwVq/sno5bR1gs7jCGJ0A==
+X-Received: by 2002:a05:6830:82e4:b0:7cf:db30:bb5f with SMTP id 46e09a7af769-7cfdee80c86mr866380a34.33.1768524643805;
+        Thu, 15 Jan 2026 16:50:43 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id 46e09a7af769-7cfdf2c89fdsm112806a34.8.2026.01.15.16.50.43
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Jan 2026 16:50:43 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-2ae56205588so2243542eec.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 16:50:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1768524642; x=1769129442; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jdegUEJa3UjiBfkCLkRNHs7XLVuHULtTod8beQSblao=;
+        b=JIxmQowpgj3I/MPSWWd8HudrhO8LVHMvKHiXANL5zEZBSQS4JEO79o9ATcVw7dAkN8
+         M7AUlVDnBlTAX5eDfy3Stezos6YmzXF1BpMlrek6Z2NFzE1jRxWVZEEz6oy6xvmQYeLh
+         gZEi0gofACiwuDOuV+inL3ZhLhejIMt+i4YoA=
+X-Forwarded-Encrypted: i=1; AJvYcCVSFyIfyFYMwY5xcQTZ7TRcsA+YRrTpouctotehg472mQk5eyEXsYZ+TxJrcjnRAJSx7dq7Aj0=@vger.kernel.org
+X-Received: by 2002:a05:7022:6085:b0:11a:51a8:ec9 with SMTP id a92af1059eb24-1244a766aefmr1471424c88.29.1768524642507;
+        Thu, 15 Jan 2026 16:50:42 -0800 (PST)
+X-Received: by 2002:a05:7022:6085:b0:11a:51a8:ec9 with SMTP id a92af1059eb24-1244a766aefmr1471413c88.29.1768524642030;
+        Thu, 15 Jan 2026 16:50:42 -0800 (PST)
+Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ac6c2besm1162305c88.5.2026.01.15.16.50.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 16:50:41 -0800 (PST)
+From: justin.chen@broadcom.com
+To: florian.fainelli@broadcom.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH net-next 1/3] net: bcmasp: Fix network filter wake for asp-3.0
+Date: Thu, 15 Jan 2026 16:50:35 -0800
+Message-Id: <20260116005037.540490-2-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260116005037.540490-1-justin.chen@broadcom.com>
+References: <20260116005037.540490-1-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On Thu, Jan 15, 2026 at 10:35:26PM +0100, Maxime Chevallier wrote:
-> Hi again,
-> 
-> On 15/01/2026 22:04, Maxime Chevallier wrote:
-> > Hi,
-> > 
-> >>
-> >> I've just run iperf3 in both directions with the kernel I had on the
-> >> board (based on 6.18.0-rc7-net-next+), and stmmac really isn't looking
-> >> particularly great - by that I mean, iperf3 *failed* spectacularly.
-> >>
-> >> First, running in normal mode (stmmac transmitting, x86 receiving)
-> >> it's only capable of 210Mbps, which is nowhere near line rate.
-> >>
-> >> However, when running iperf3 in reverse mode, it filled the stmmac's
-> >> receive queue, which then started spewing PAUSE frames at a rate of
-> >> knots, flooding the network, and causing the entire network to stop.
-> >> It never recovered without rebooting.
-> 
->  [...]
-> 
-> > Heh, I was able to reproduce something similar on imx8mp, that has an
-> > imx-dwmac (dwmac 4/5 according to dmesg) :
-> > 
-> > DUT to x86
-> > 
-> > Connecting to host 192.168.2.1, port 5201
-> > [  5] local 192.168.2.13 port 54744 connected to 192.168.2.1 port 5201
-> > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> > [  5]   0.00-1.00   sec  0.00 Bytes  0.00 bits/sec    2   1.41 KBytes
-> > [  5]   1.00-2.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
-> > 
-> > x86 to DUT :
-> > 
-> > Reverse mode, remote host 192.168.2.1 is sending
-> > [  5] local 192.168.2.13 port 47050 connected to 192.168.2.1 port 5201
-> > [ ID] Interval           Transfer     Bitrate
-> > [  5]   0.00-1.00   sec   112 MBytes   935 Mbits/sec
-> > [  5]   1.00-2.00   sec   112 MBytes   936 Mbits/sec
-> > [  5]   2.00-3.00   sec   112 MBytes   936 Mbits/sec
-> > 
-> > Nothing as bas as what you face, but there's defintely something going
-> > on there. "good" news is that it worked in v6.19-rc1, I have a bisect
-> > ongoing.
-> > 
-> > I'll update once I have homed-in on something.
-> > 
-> > Maxime
-> 
-> So the bisect results are in, at least for the problem I noticed. It's
-> not certain yet this is the same problem as Russell, and maybe not the
-> same as Tao Wang as well...
-> 
-> The culprit commit is :
-> 
-> commit 8409495bf6c907a5bc9632464dbdd8fb619f9ceb (HEAD)
-> Author: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Date:   Thu Jan 8 17:36:40 2026 +0000
-> 
->     net: stmmac: cores: remove many xxx_SHIFT definitions
->     
->     We have many xxx_SHIFT definitions along side their corresponding
->     xxx_MASK definitions for the various cores. Manually using the
->     shift and mask can be error prone, as shown with the dwmac4 RXFSTS
->     fix patch.
->     
->     Convert sites that use xxx_SHIFT and xxx_MASK directly to use
->     FIELD_GET(), FIELD_PREP(), and u32_replace_bits() as appropriate.
->     
->     Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
->     Link: https://patch.msgid.link/E1vdtw8-00000002Gtu-0Hyu@rmk-PC.armlinux.org.uk
->     Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> Lore link :
-> 
-> https://lore.kernel.org/netdev/E1vdtw8-00000002Gtu-0Hyu@rmk-PC.armlinux.org.uk/
-> 
-> I confirm that iperf3 works perfectly in both directions before this commit,
-> and I get 0 bits/s when running "iperf3 -c my_host" on the DUT that has stmmac.
-> 
-> Looks like something happened while cleaning-up the macros for the various
-> definitions.
+From: Justin Chen <justin.chen@broadcom.com>
 
-Thanks for finding the blame.
+We need to apply the tx_chan_offset to the netfilter cfg channel or the
+output channel will be incorrect for asp-3.0 and newer.
 
-A few other interesting things... I have an old 6.14 kernel on the
-platform, and that gives what I deem to be good transmit performance.
-Receive performance is low, but it doesn't fail.
+Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c | 5 +++--
+ drivers/net/ethernet/broadcom/asp2/bcmasp.h | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-I wrote a shell script to use devmem2 to dump all the stmmac registers.
-These seem more significant on the face of it... but I'm working it out
-as I write this email:
-
--Value at address 0x02490010: 0x00010008
-+Value at address 0x02490010: 0x00080008
--Value at address 0x02490014: 0x20020008
-+Value at address 0x02490014: 0x20000008
--Value at address 0x02490018: 0x00000001
-+Value at address 0x02490018: 0x04000001
-
-These are GMAC_HASH_TAB()
-
--Value at address 0x02490060: 0x001a0000
-+Value at address 0x02490060: 0x00120000
-
-VLAN_ONCL, bit is VLAN_CSVL, changed in commit:
-c657f86106c8 net: stmmac: vlan: Disable 802.1AD tag insertion offload.
-
--Value at address 0x024900c0: 0x01000000
-+Value at address 0x024900c0: 0x05000000
-
-GMAC_PMT - bit 26, part of the RWKPTR[4:0] bitfield, read-only.
-
--Value at address 0x02490d30: 0x0ff1c4a0
-+Value at address 0x02490d30: 0x0ff1c4e0
-
-MTL_CHAN_RX_OP_MODE(0) - bit 6 is different, MTL_OP_MODE_DIS_TCP_EF.
-
-This is a change from:
-fe4042797651 net: stmmac: dwmac4: stop hardware from dropping checksum-error packets
-
--Value at address 0x02491104: 0x00101011
-+Value at address 0x02491104: 0x00001011
-
-DMA_CHAN_TX_CONTROL(0) - but this is significant.
-In dwmac4_dma_init_tx_chan(), we have:
-
--       value = value | (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-+       value = value | FIELD_PREP(DMA_BUS_MODE_PBL, txpbl);
-
-and the corresponding change in the header file:
-
- /* DMA SYS Bus Mode bitmap */
- #define DMA_BUS_MODE_SPH               BIT(24)
- #define DMA_BUS_MODE_PBL               BIT(16)
--#define DMA_BUS_MODE_PBL_SHIFT         16
--#define DMA_BUS_MODE_RPBL_SHIFT                16
-+#define DMA_BUS_MODE_RPBL_MASK         GENMASK(21, 16)
- #define DMA_BUS_MODE_MB                        BIT(14)
- #define DMA_BUS_MODE_FB                        BIT(0)
-
-The combination of DMA_BUS_MODE_PBL and DMA_BUS_MODE_PBL_SHIFT leads
-one to believe that this is a single bit field, whereas there
-is another overlapping field called RPBL that is wider. RPBL gets
-used for DMA_CHAN_RX_CONTROL, whereas PBL gets used for
-DMA_CHAN_TX_CONTROL.
-
-txpbl for the Jetson Xavier NX board (tegra194) is 16:
-
-arch/arm64/boot/dts/nvidia/tegra194.dtsi:                       snps,txpbl = <16>;
-
-which is txpbl. 16 doesn't fit into a single bit. The header file
-was wrong.
-
-According to non-Tegra documentation (the closest I have for
-dwmac4 is stm32mp151), this field is called TXPBL[5:0] covering
-bits 21:16 of this register, and is the transmit burst length.
-
-However, while this may explain the transmit slowdown because it's
-on the transmit side, it doesn't explain the receive problem.
-
--Value at address 0x0249113c: 0x000d07c0
-+Value at address 0x0249113c: 0x000507c0
-
-DMA_CHAN_SLOT_CTRL_STATUS(0) - bit 19 RSN[3:0] bit 3, readonly.
-
-With the TXPBL thing fixed, for transmit I now get:
-
-[ ID] Interval           Transfer     Bitrate         Retr
-[  5]   0.00-10.00  sec  1003 MBytes   841 Mbits/sec    0             sender
-[  5]   0.00-10.01  sec  1002 MBytes   839 Mbits/sec                  receiver
-
-which is way better, but receive still fails, with a storm of
-PAUSE, with RBU set.
-
-Transmit fix (eventually):
-https://lore.kernel.org/r/E1vgY1k-00000003vOC-0Z1H@rmk-PC.armlinux.org.uk
-
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+index fd35f4b4dc50..014340f33345 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+@@ -156,7 +156,7 @@ static void bcmasp_netfilt_hw_en_wake(struct bcmasp_priv *priv,
+ 			  ASP_RX_FILTER_NET_OFFSET_L4(32),
+ 			  ASP_RX_FILTER_NET_OFFSET(nfilt->hw_index + 1));
+ 
+-	rx_filter_core_wl(priv, ASP_RX_FILTER_NET_CFG_CH(nfilt->port + 8) |
++	rx_filter_core_wl(priv, ASP_RX_FILTER_NET_CFG_CH(nfilt->ch) |
+ 			  ASP_RX_FILTER_NET_CFG_EN |
+ 			  ASP_RX_FILTER_NET_CFG_L2_EN |
+ 			  ASP_RX_FILTER_NET_CFG_L3_EN |
+@@ -166,7 +166,7 @@ static void bcmasp_netfilt_hw_en_wake(struct bcmasp_priv *priv,
+ 			  ASP_RX_FILTER_NET_CFG_UMC(nfilt->port),
+ 			  ASP_RX_FILTER_NET_CFG(nfilt->hw_index));
+ 
+-	rx_filter_core_wl(priv, ASP_RX_FILTER_NET_CFG_CH(nfilt->port + 8) |
++	rx_filter_core_wl(priv, ASP_RX_FILTER_NET_CFG_CH(nfilt->ch) |
+ 			  ASP_RX_FILTER_NET_CFG_EN |
+ 			  ASP_RX_FILTER_NET_CFG_L2_EN |
+ 			  ASP_RX_FILTER_NET_CFG_L3_EN |
+@@ -714,6 +714,7 @@ struct bcmasp_net_filter *bcmasp_netfilt_get_init(struct bcmasp_intf *intf,
+ 		nfilter = &priv->net_filters[open_index];
+ 		nfilter->claimed = true;
+ 		nfilter->port = intf->port;
++		nfilter->ch = intf->channel + priv->tx_chan_offset;
+ 		nfilter->hw_index = open_index;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
+index 74adfdb50e11..e238507be40a 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
+@@ -348,6 +348,7 @@ struct bcmasp_net_filter {
+ 	bool				wake_filter;
+ 
+ 	int				port;
++	int				ch;
+ 	unsigned int			hw_index;
+ };
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
