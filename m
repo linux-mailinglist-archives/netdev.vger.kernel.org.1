@@ -1,129 +1,197 @@
-Return-Path: <netdev+bounces-250569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6EED33591
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:57:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CE00D3360A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:04:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3A2E33016937
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 15:55:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A668230C5523
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69CF33D501;
-	Fri, 16 Jan 2026 15:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B1335C1BC;
+	Fri, 16 Jan 2026 16:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="W83LidmA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iAOcfHMt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C498336ECC;
-	Fri, 16 Jan 2026 15:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F73B33F8BC
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 16:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768578898; cv=none; b=eeKuSruURS9QQEXqXMe4bwDpxzk1A0Y2QXCpEr0VM+Xx8HtEVZw5SXWuu4Dg9/7I6BBfDaqu7LUAOYg3gReMcEZ4bCRfTDWB5slUFHNlvZrvE8hSHo/fzVHPKUPIMliWBbMwUkVWwuV1uZX6Zl78NsEKfdXrGlft4uU1HZoZQsQ=
+	t=1768579385; cv=none; b=IMOdaXAfx9rMCq+9fi2H/rJzIE0UbuFxaNyvUHNWgyXSQycgVgT7AwK2qVSomCRBO4ETnpCmNQNmC/mNxHW8y2ICLYJbWM/xn0Veh8Y+shWTLwIZxn/we5jxLgPhR0AiLdf+OprW1rCryJsPXnSi/752PljaRExI6XbH9agkI7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768578898; c=relaxed/simple;
-	bh=B+Awa794dqIO+/Uzgn/CPs4acC9KvBiq6b83PYrRyWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lLvshlmfOKXcbBkb3rzrJMm1j2vjQnOumHDT1fiKK8LGXT2E2/0jpdO6mmQW4ClPcoCFuYjv1svjj66FNW6kxbkidh2h/FnBk18KqVcmiEBseo5G8ezLzYRVfMniplJyxJB/voZbt9z6YAe3NndEkslVRxKSadbqmtKLHStAXfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=W83LidmA; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vgm9x-009emH-3T; Fri, 16 Jan 2026 16:54:49 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=pPLXmraDS/TUqdgYNNIBp7gWJwJ6pPMA1qllGIDWHm0=; b=W83LidmAkqN0xBwx1jzBstFEzZ
-	9C2xl/3Ener0pW3Q4W4jEwpMzrSvmqu0WKhUxQTxSd1MOCyPcCv2KHw4mSceKC66cLc2AS6tJIIYd
-	byLyFi/u9Uj7i6aWwivuFAZ7yQ1pPUjNflazWPKDgq87LUXiOEFMqWS/jyost3mPDFpiYziWd/Vkw
-	Yyl3b52hB7G3KL6K2g+Xnw/48HM4B935jkbFmZMN/VCUpckCPA9C1i+SSE3RT+YursLCwz+cDlNVf
-	8GQdUHzROdlB0zJbmjupWo9ixh65nKzxTRTVZ3AaLyOK+nov3zWb565Vc7BWRRyRZVJrugu6eU+Eg
-	04PzLP3A==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vgm9w-0004kJ-Nn; Fri, 16 Jan 2026 16:54:48 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vgm9i-004Ln0-Ll; Fri, 16 Jan 2026 16:54:34 +0100
-Message-ID: <27a29281-03a3-4ec5-b0b1-28d474e0539e@rbox.co>
-Date: Fri, 16 Jan 2026 16:54:33 +0100
+	s=arc-20240116; t=1768579385; c=relaxed/simple;
+	bh=BhtIab84IdoeMyJM4092ElaZLaK1ny/rkG7xxvHmUy0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z+cOvVEbtSu4nMpnHl8+UrSaBgiCjPSZBKg0hSeQDd9A63s0gPiH7QHuZKui/e5/Xcw6QhqJrviSB5Q0ruwvZPlAcfktaBqJ95+ADWxQWRpN9VhqShKQwYYsT5fwq94VUwv6eOsGBDq+mYAeltxxTiSHaVVkmJXLrK+HQYtv140=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iAOcfHMt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF31C2BC86
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 16:03:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768579385;
+	bh=BhtIab84IdoeMyJM4092ElaZLaK1ny/rkG7xxvHmUy0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=iAOcfHMtlNtYlCHmFfVUnCzaca1bIVX694JckNNVKqYpdHqwWEYtQsK4SV34XUbws
+	 c5to2nDD9XOPqNh+R8/bz3Mm8eixqo2cskf2EIC0WO+yqqsZYz0bjcRPzQ4TtP9XMJ
+	 DOwMhS3K5M+HuaXJy01xByVGFJMncxe+ILm3PgPGAzwFXTD7x0WKCzT6fs1KtmNHi4
+	 bRShYx0G7Jr5r61NzGAxNRXXnSMgjj2N6fumDSO1vLvzpG+/hcrEHHm0sDGlvqVekU
+	 ivhAVNcRS9SgL2a+AbsfwslZ4X9hWpi1y0oTQqpz9XGhsCsJ0/ocDiwNp80qiarrKd
+	 xNYDJ38ARY0Sg==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b7cf4a975d2so395580866b.2
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 08:03:05 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX4HxIylHGsAKMfzOD/4gGswvT1Cx9/LesEOGwQlB1+nGnlGLPoKrhvkBC1oSEtVp1of8C47EE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzW3AWrct4c+16Btr1ehw2IJ+AFljlo+P5PWDRklCWTdeJ45F1
+	N5Zueb/v/M6XNh1QLgsoCWOw9PkHGrLj+DddHSugZbz+uc3jLzV0lzWUylnONYR+Dd5TJdOQ3Lj
+	pqX1Ag5222sD1Glr/QhI1c4YInpzFoQ==
+X-Received: by 2002:a17:906:fe0a:b0:b87:693:31 with SMTP id
+ a640c23a62f3a-b8792feb242mr308189566b.52.1768579383254; Fri, 16 Jan 2026
+ 08:03:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock/test: Do not filter kallsyms by symbol type
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Luigi Leonardi <leonardi@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
- <aWoKNf1AI9s1bmYM@sgarzare-redhat>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <aWoKNf1AI9s1bmYM@sgarzare-redhat>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251223-openwrt-one-network-v5-0-7d1864ea3ad5@collabora.com> <20251223-openwrt-one-network-v5-2-7d1864ea3ad5@collabora.com>
+In-Reply-To: <20251223-openwrt-one-network-v5-2-7d1864ea3ad5@collabora.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 16 Jan 2026 10:02:51 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLffH-MY+6frA_kxwifUPskLY8eNqtBoOP0O7Dxs=XHLQ@mail.gmail.com>
+X-Gm-Features: AZwV_QilotzZl5lJNLcliW_LfwPmw5qv0NdDfcdZ6pytb6giOF_8l_TtUZnUaC4
+Message-ID: <CAL_JsqLffH-MY+6frA_kxwifUPskLY8eNqtBoOP0O7Dxs=XHLQ@mail.gmail.com>
+Subject: Re: [PATCH v5 2/8] arm64: dts: mediatek: mt7981b: Add PCIe and USB support
+To: Sjoerd Simons <sjoerd@collabora.com>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang <jianjun.wang@mediatek.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Chunfeng Yun <chunfeng.yun@mediatek.com>, 
+	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, kernel@collabora.com, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org, 
+	netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>, 
+	Bryan Hinton <bryan@bryanhinton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/16/26 11:11, Stefano Garzarella wrote:
-> On Fri, Jan 16, 2026 at 09:52:36AM +0100, Michal Luczaj wrote:
->> Blamed commit implemented logic to discover available vsock transports by
->> grepping /proc/kallsyms for known symbols. It incorrectly filtered entries
->> by type 'd'.
->>
->> For some kernel configs having
->>
->>    CONFIG_VIRTIO_VSOCKETS=m
->>    CONFIG_VSOCKETS_LOOPBACK=y
->>
->> kallsyms reports
->>
->>    0000000000000000 d virtio_transport	[vmw_vsock_virtio_transport]
->>    0000000000000000 t loopback_transport
->>
->> Overzealous filtering might have affected vsock test suit, resulting in
->> insufficient/misleading testing.
->>
->> Do not filter symbols by type. It never helped much.
->>
->> Fixes: 3070c05b7afd ("vsock/test: Introduce get_transports()")
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> man nm says: 't' stands for symbol is in the text (code) section. Is this
->> correct for `static struct virtio_transport loopback_transport`?
-> 
-> I'm not an expert, but yeah I was expecting "d" too, but maybe since
-> it's static and built-in will be in the text section?
+On Tue, Dec 23, 2025 at 6:38=E2=80=AFAM Sjoerd Simons <sjoerd@collabora.com=
+> wrote:
+>
+> Add device tree nodes for PCIe controller and USB3 XHCI host
+> controller on MT7981B SoC. Both controllers share the USB3 PHY
+> which can be configured for either USB3 or PCIe operation.
+>
+> The USB3 XHCI controller supports USB 2.0 and USB 3.0 SuperSpeed
+> operation. The PCIe controller is compatible with PCIe Gen2
+> specifications.
+>
+> Also add the topmisc syscon node required for USB/PCIe PHY
+> multiplexing.
+>
+> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collab=
+ora.com>
+> Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+> ---
+> V1 -> V2: Keep xhci reg and phys properties in single lines
+> ---
+>  arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 80 +++++++++++++++++++++++++=
+++++++
+>  1 file changed, 80 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi b/arch/arm64/boot/=
+dts/mediatek/mt7981b.dtsi
+> index 416096b80770..d3f37413413e 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
+> @@ -2,6 +2,7 @@
+>
+>  #include <dt-bindings/clock/mediatek,mt7981-clk.h>
+>  #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +#include <dt-bindings/phy/phy.h>
+>  #include <dt-bindings/reset/mt7986-resets.h>
+>
+>  / {
+> @@ -223,6 +224,55 @@ auxadc: adc@1100d000 {
+>                         status =3D "disabled";
+>                 };
+>
+> +               xhci: usb@11200000 {
+> +                       compatible =3D "mediatek,mt7986-xhci", "mediatek,=
+mtk-xhci";
+> +                       reg =3D <0 0x11200000 0 0x2e00>, <0 0x11203e00 0 =
+0x0100>;
+> +                       reg-names =3D "mac", "ippc";
+> +                       clocks =3D <&infracfg CLK_INFRA_IUSB_SYS_CK>,
+> +                                <&infracfg CLK_INFRA_IUSB_CK>,
+> +                                <&infracfg CLK_INFRA_IUSB_133_CK>,
+> +                                <&infracfg CLK_INFRA_IUSB_66M_CK>,
+> +                                <&topckgen CLK_TOP_U2U3_XHCI_SEL>;
+> +                       clock-names =3D "sys_ck", "ref_ck", "mcu_ck", "dm=
+a_ck", "xhci_ck";
+> +                       interrupts =3D <GIC_SPI 173 IRQ_TYPE_LEVEL_HIGH>;
+> +                       phys =3D <&u2port0 PHY_TYPE_USB2>, <&u3port0 PHY_=
+TYPE_USB3>;
+> +                       status =3D "disabled";
+> +               };
+> +
+> +               pcie: pcie@11280000 {
+> +                       compatible =3D "mediatek,mt7981-pcie",
+> +                                    "mediatek,mt8192-pcie";
+> +                       reg =3D <0 0x11280000 0 0x4000>;
+> +                       reg-names =3D "pcie-mac";
+> +                       ranges =3D <0x82000000 0 0x20000000
+> +                                 0x0 0x20000000 0 0x10000000>;
+> +                       bus-range =3D <0x00 0xff>;
+> +                       clocks =3D <&infracfg CLK_INFRA_IPCIE_CK>,
+> +                                <&infracfg CLK_INFRA_IPCIE_PIPE_CK>,
+> +                                <&infracfg CLK_INFRA_IPCIER_CK>,
+> +                                <&infracfg CLK_INFRA_IPCIEB_CK>;
+> +                       clock-names =3D "pl_250m", "tl_26m", "peri_26m", =
+"top_133m";
+> +                       device_type =3D "pci";
+> +                       phys =3D <&u3port0 PHY_TYPE_PCIE>;
+> +                       phy-names =3D "pcie-phy";
+> +                       interrupts =3D <GIC_SPI 168 IRQ_TYPE_LEVEL_HIGH>;
+> +                       interrupt-map-mask =3D <0 0 0 7>;
+> +                       interrupt-map =3D <0 0 0 1 &pcie_intc 0>,
+> +                                       <0 0 0 2 &pcie_intc 1>,
+> +                                       <0 0 0 3 &pcie_intc 2>,
+> +                                       <0 0 0 4 &pcie_intc 3>;
+> +                       #address-cells =3D <3>;
+> +                       #interrupt-cells =3D <1>;
+> +                       #size-cells =3D <2>;
+> +                       status =3D "disabled";
+> +
+> +                       pcie_intc: interrupt-controller {
+> +                               interrupt-controller;
+> +                               #address-cells =3D <0>;
+> +                               #interrupt-cells =3D <1>;
+> +                       };
+> +               };
+> +
+>                 pio: pinctrl@11d00000 {
+>                         compatible =3D "mediatek,mt7981-pinctrl";
+>                         reg =3D <0 0x11d00000 0 0x1000>,
+> @@ -252,6 +302,36 @@ mux {
+>                         };
+>                 };
+>
+> +               topmisc: topmisc@11d10000 {
+> +                       compatible =3D "mediatek,mt7981-topmisc", "syscon=
+";
+> +                       reg =3D <0 0x11d10000 0 0x10000>;
+> +                       #clock-cells =3D <1>;
 
-But it does not end up in the text section. Address points at RW NX
-(read-writeable non-executable) pages. Please see below.
+This is now a warning as the syscon.yaml binding this compatible is
+defined in doesn't allow #clock-cells.
 
-> BTW I just checked and for example on my 6.18.4-100.fc42.x86_64 I have:
-> 
-> 0000000000000000 t sock_fs_type
-> 0000000000000000 t proto_net_ops
-> 0000000000000000 t net_inuse_ops
-> 
-> And they are all static structs of built-in modules.
-> So it seems it is common.
-
-$ mv .config .config.orig
-$ vng -k --configitem RANDOMIZE_BASE=n --configitem CONFIG_PTDUMP_DEBUGFS=y
-$ vng -b
-$ vng --user root "grep sock_fs_type /proc/kallsyms"
-ffffffff82c1f000 t sock_fs_type
-$ vng --user root "grep 0xffffffff82 /sys/kernel/debug/page_tables/kernel"
-0xffffffff82a00000-0xffffffff83000000     6M    RW    PSE   GLB NX pmd
-
-And if I try a 2-year-old v6.13, kallsyms shows 'd' as we'd expect. I've
-bisected it down to commit cb33ff9e063c ("x86/kexec: Move relocate_kernel
-to kernel .data section"), but I still don't know if it's a bug or a feature.
-
+Rob
 
