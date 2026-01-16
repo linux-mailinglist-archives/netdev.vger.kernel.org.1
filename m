@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-250582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5350AD33C1C
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B509D37935
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C349330213CE
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:16:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20A0930285E7
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F786348479;
-	Fri, 16 Jan 2026 17:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870B93469FE;
+	Fri, 16 Jan 2026 17:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="07Fa+nk3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wSkEwOV2"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEFF21FF35
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 17:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E5630EF7A;
+	Fri, 16 Jan 2026 17:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768583783; cv=none; b=N4mfEGc/Ly8eYfff/B2FQuiCPuSZMxcA3ORRLPX6ilsDTSmFQ++2mQ28sPq0hPRKRVp57j3AMK5gvpQ+25cDNHLVRrcDUYkmIUzC3hDv5kcFiRAgUcMjfTXg+iNHrDOw+Kr/a1FDFg5hnImwaFvdCrbm1pYojdMHp/wc8VL4cLw=
+	t=1768584018; cv=none; b=IYgOs6GsB6egZODbX/xQq4RPAgM6CxN1srC1Zctuuw6Y64eboBlf+INasyk1+uamWw5R0QObTlD9qciOTJVEfB+5DVRZinP8eKAcOJJAFzqr71E4c4Hqvfb2uMTeYo0rGO5r7sEaxHA0JiaN0HwHS045KdFnxM0hABIVaFDnDGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768583783; c=relaxed/simple;
-	bh=QZakKgMlJB3ZqJfEisSqfL/tfwtXNgut9U2tq1gx9NA=;
+	s=arc-20240116; t=1768584018; c=relaxed/simple;
+	bh=xx5Gik6h+KYWlcMNhtzfIXHUciJQIHjHz/zx1h0hXZs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PMDP9Q815bJKylhOxyFc/jVtfc9SPS983UTgmnZFpK6szCpqeXnGUSpfy5PpQYaWG/eVkvVrqOjUdc/ozkjqpj2VfrcWGON4CE0PlsNhCbswN5zLYwcDhaJe/5SOu6oN1peaS4Y/lLlqwe7PcnIJSFr5+iRjWsWjGbf1f4RUkOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=07Fa+nk3; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=EPZgViMDtC8eaUraZn+yyYGavWvaCrKIMMgbv2593CIY4lWKeDzRuf/EEjPZ0sRQDHvzmBBRKmBihxqRzY2rwduS/MG4HbZZVBY4JVG9+9AVz8k6S+X46ANv+X+szbMY1FS6E88O0Ct3kidcZ8jqlHuk29w103Wq0c7KpaOnApE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wSkEwOV2; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,28 +34,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=x0ZJ6hNAp3es+pWQaJuIpYM6K/K/Nbp/iC8UR6BU5bw=; b=07Fa+nk3JCKzQVixoOBxDAE7S5
-	hQ+cTaCcPGXPYyuAK+kMsUo9NrLpVMLEte7j20pbTRUuCbRDcGLorDqkJiEarMgocjcWpLb/Wmfan
-	t6xmW9X5LOs6/aT+Wi8CrC8ltjBDwxJhT/Ro/rynnhtrvFfd2ZI2Wo0kmXQLyObOVM5w=;
+	bh=Zu6BgHemIMW4qE7p9Q/SzrPE/sfOtlpXPxQ3/da+CiA=; b=wSkEwOV2yAX+o0EUYzKCIxJCQx
+	cat+MY49qHJHLDfV68A5LrUO8qM8LZqRBNz2nle/l+Vk4pNvmRk9L1SnSLd3oV8KKEKtZO4fzm/MQ
+	wEIiqtb0VzuD7MWcGH5FBjmMboELjNWZx7pPcTf9bQ5fvLidrdCh2ILv2fKELNcucUQw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vgnQm-0036AM-Ri; Fri, 16 Jan 2026 18:16:16 +0100
-Date: Fri, 16 Jan 2026 18:16:16 +0100
+	id 1vgnUT-0036BQ-HS; Fri, 16 Jan 2026 18:20:05 +0100
+Date: Fri, 16 Jan 2026 18:20:05 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Paolo Valerio <pvalerio@redhat.com>
-Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 3/8] cadence: macb: Add page pool support handle
- multi-descriptor frame rx
-Message-ID: <4c74c2c4-7a47-45ff-be17-485e0702cc37@lunn.ch>
-References: <20260115222531.313002-1-pvalerio@redhat.com>
- <20260115222531.313002-4-pvalerio@redhat.com>
+	Karol Gugala <kgugala@antmicro.com>,
+	Mateusz Holenko <mholenko@antmicro.com>,
+	Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next] net: ethernet: litex: use
+ devm_register_netdev() to register netdev
+Message-ID: <3e326797-b4c1-424f-8cf1-f0095e33e0bc@lunn.ch>
+References: <20260116003150.183070-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,17 +64,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260115222531.313002-4-pvalerio@redhat.com>
+In-Reply-To: <20260116003150.183070-1-inochiama@gmail.com>
 
-On Thu, Jan 15, 2026 at 11:25:26PM +0100, Paolo Valerio wrote:
-> Use the page pool allocator for the data buffers and enable skb recycling
-> support, instead of relying on netdev_alloc_skb allocating the entire skb
-> during the refill.
+On Fri, Jan 16, 2026 at 08:31:50AM +0800, Inochi Amaoto wrote:
+> Use devm_register_netdev to avoid unnecessary remove() callback in
+> platform_driver structure.
 
-Do you have any benchmark numbers for this change? Often swapping to
-page pool improves the performance of the driver, and i use it as a
-selling point for doing the conversion, independent of XDP.
+> -	netdev = devm_alloc_etherdev(&pdev->dev, sizeof(*priv));
+> +	netdev = devm_alloc_etherdev(dev, sizeof(*priv));
+>  	if (!netdev)
+>  		return -ENOMEM;
 
-Thanks
-	Andrew
+The commit message does not fit the actual change.
+
+You probably want to split this into multiple patches. Ideally you
+want lots of small patches with good commit messages which are
+obviously correct.
+
+    Andrew
+
+---
+pw-bot: cr
 
