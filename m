@@ -1,171 +1,193 @@
-Return-Path: <netdev+bounces-250614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375FED385BC
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:23:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63807D385CC
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:27:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 598E2310164A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 19:23:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A21673061DDB
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 19:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E842D322A28;
-	Fri, 16 Jan 2026 19:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FABB34DB5C;
+	Fri, 16 Jan 2026 19:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PC8hgBR/"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZZgx8W2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011006.outbound.protection.outlook.com [52.101.62.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4B41F1932;
-	Fri, 16 Jan 2026 19:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768591381; cv=none; b=MMQ2ULIRj4rBr1vIcyOs2SEvh19SMwTjeW7pLp04jHwp3s2sv07MPzTp0/PRw5SHohKKAmRYcPMtjZ5U6V0j+dNGEekzmDJmUqN/9EvpUi0vCCeast88+H/vno1iBT5PGd5wgGswM511gV8jGRccpqSqWpuuXPKKHQOsylqOn04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768591381; c=relaxed/simple;
-	bh=AaA921OgWgVGcYxhc/bFfdVLOLTjeI93lm9H8nt8ULU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p35siKoQ2PIYOhRf6RhQonLsN+UQkqxyfoOp9nDrKdN6VjZznuMv8ZMpCz2xwarog+bW2iWClpJVbrhRJa4f2v+9WAwDV0KdZQb38SVhtyIEiYIclp6W/oG+OAfUTksFlND7B4gKmGPTNo6e64I19r4Hqkt4kGFUX582wupMciQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PC8hgBR/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nNIBJ/gbrOzWSlLTD1GWeFnlI64FCaEfCKZHp3Gq1yQ=; b=PC8hgBR/4eKiTuiiAtp6ojEkup
-	vEwn0OMgJ03AK1nFjyZaycmOaMDTRvSp0h3KWJUYQycJyvd7u1x/ChRwJkRgewR/zQ0FpJfDNBTIi
-	z4POefgQ4NKvrdTKRovA0oqn5Gv4CCJrJGiMD9hsPN7HlTELnCtqKGJoF2VUlX/p9BT1L/1SkmpSQ
-	2MqkAI69LcGQy/3sqAwHQARTyaqXE9xV8wwpnLt+wQpYkDV6LPIvn+/dtVZK6u1RUG6xjbw2ULBG5
-	17/e/zjEqHhOAYp1+83uiYTDUaNn9rxc41wsPR920b0UAc1LiZT7NudOS5lkcQ3ulMEKsPlhxDG8m
-	FFCUoZZQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55682)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgpPB-000000002bC-2XxK;
-	Fri, 16 Jan 2026 19:22:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgpP4-000000003qk-41XR;
-	Fri, 16 Jan 2026 19:22:38 +0000
-Date: Fri, 16 Jan 2026 19:22:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Tao Wang <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
- resume
-Message-ID: <aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
-References: <aWd9WUUGhSU5tWcn@shell.armlinux.org.uk>
- <20260115070853.116260-1-tao03.wang@horizon.auto>
- <aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
- <aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
- <6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
- <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
- <aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
- <aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
- <aWp-lDunV9URYNRL@shell.armlinux.org.uk>
- <3a93c79e-f755-4642-a3b0-1cce7d0ea0ef@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD2734CFB4;
+	Fri, 16 Jan 2026 19:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768591663; cv=fail; b=UW2BQ6wkWhxLYqGXjoD8q/9ZTrpMHgk4bY8deIiB+mJnN7E1PUNnnSs0wIoXJgPDeVSRv3OUdsl7rZms171oqgrImvOquRBOIKqeQd4hyA/rHFkizDq9Tw7fiPlsWHadfbxpchY82oY1ZpkJKOn+pp32oxOANQ+FFN7gXnuELbo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768591663; c=relaxed/simple;
+	bh=GN5QhWANprc0Ng1hD/PV9kFir2S0+5pfNstfKj5uRGc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MC62SmvyQTXo9kL6S3UTr77cXeUw5C6AaOUmaXkMRD3Ec0QBPhYJZ0U5sn1CLtfRxqtubBJZ3WK2RdiUjKuFe2GBItlUU1Y8Ws1R21yslUW3r2VM7r8O7bydRg/D0y7gHAr8lDHe479lQmGujfu1jUmeUgork0SEhP8PJM+iLIU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZZgx8W2L; arc=fail smtp.client-ip=52.101.62.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hDU5CdUYfvM779rqJhcbv7IcskVPcmlnksaOIJ1sLv5BR3HhR7SkpnxmmiuTn8GIqjDnIR4d6geyD8R2iWK0CvqEMtYflg1Uk65HKHWBgv+LCJN6d7itUNTgXb2SJTxace7mg0CjrrpvnrJsJRyCxR9W46UV+g4GzpWWUVJ/j+TOreiKZT4OQ1MpUAvwsZlV7HOzGIhfAC6Jn1M0DPrn9DA5jxGh69JOLXQwcnVeL0YC5Vn7KZgEcRHCntME5ofWMVJmCKY65FzJuM40KOS8F7CytUQixZZRHjTA8wbOXWMuifJlNF0FsGzUdPXS6aw2EAagmd0uytGpaMfhqbUYMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LOZsR9wD7hRY1wsccByStwxXmomHMxSESH5uMuO/bAQ=;
+ b=NWvgYPFYQYfFavcLdQwcjs6P205AmaE3gQxguO/5p+MDQ21Rue6fawf6YGRIHooHjBILWtvy2iIT1aITBwfS8uPatSsGPdgDGKsxxMhNf3ymtUGxXjCF8f1i5izR+dSsL7cgeOt0MsJLafymY17R6HZi3vpTSr+gkevu7Cix/5fmvNuctwURkQujzZ8tTOR9pR755F1za1PeqFwe56CPcDykRR1t9zJo9ipxMY5sy55X5/YHKP+UWunvc3OfBOiM41+sy5wFqt73GpJMUD+uLBBNdT0gquMRdvccAqlILEuit1o4ypREheFo111Gk8wyxrELvzvBiGMF9+N3sDERZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=baylibre.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LOZsR9wD7hRY1wsccByStwxXmomHMxSESH5uMuO/bAQ=;
+ b=ZZgx8W2L3yXeYcufjNSEBvfNdROnhpBazZVKs6lq0UsRm+qvRhh6yGAz7uOhvq9Ekbc6dc7+v4fBGRlzuba75FreofWdE3f+74kV+inIzPkVRuvyjwqFpD8wv9VlYia+xscuYZ1Dib2LQu2lnvCexNY998aXhQYqNFJ0mOrXX4Q=
+Received: from SJ0PR05CA0138.namprd05.prod.outlook.com (2603:10b6:a03:33d::23)
+ by IA1PR12MB9524.namprd12.prod.outlook.com (2603:10b6:208:596::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.8; Fri, 16 Jan
+ 2026 19:27:36 +0000
+Received: from SJ1PEPF00002314.namprd03.prod.outlook.com
+ (2603:10b6:a03:33d:cafe::76) by SJ0PR05CA0138.outlook.office365.com
+ (2603:10b6:a03:33d::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.4 via Frontend Transport; Fri,
+ 16 Jan 2026 19:27:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ SJ1PEPF00002314.mail.protection.outlook.com (10.167.242.168) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9542.4 via Frontend Transport; Fri, 16 Jan 2026 19:27:36 +0000
+Received: from SATLEXMB03.amd.com (10.181.40.144) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Fri, 16 Jan
+ 2026 13:27:35 -0600
+Received: from satlexmb07.amd.com (10.181.42.216) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 16 Jan
+ 2026 13:27:34 -0600
+Received: from xhdsuragupt40.xilinx.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Fri, 16 Jan 2026 11:27:30 -0800
+From: Suraj Gupta <suraj.gupta2@amd.com>
+To: <mturquette@baylibre.com>, <sboyd@kernel.org>,
+	<radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <michal.simek@amd.com>
+CC: <sean.anderson@linux.dev>, <linux@armlinux.org.uk>,
+	<linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<bmasney@redhat.com>
+Subject: [PATCH V3 0/2] Add devm_clk_bulk_get_optional_enable() helper and use in AXI Ethernet driver
+Date: Sat, 17 Jan 2026 00:57:22 +0530
+Message-ID: <20260116192725.972966-1-suraj.gupta2@amd.com>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a93c79e-f755-4642-a3b0-1cce7d0ea0ef@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Received-SPF: None (SATLEXMB03.amd.com: suraj.gupta2@amd.com does not
+ designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002314:EE_|IA1PR12MB9524:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5f004987-2f8a-418d-4aa3-08de55354de6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LLoUNtOVcIfGQ/hXHDQRXSirOfdOA5O6v7nWpDjj27w/VBT2T9qw1JHMsGuA?=
+ =?us-ascii?Q?lvM8YE4EMaujg8SrTeJDxXNoORjQJk+Fyv1qQcxr3gNWdZEEVELtxsZpM3PC?=
+ =?us-ascii?Q?D4rOPmdfH5RWo7fmAN3wlDfzzBwkt40RF+blZolkJNbHJfvVbYCFE3kxoSbS?=
+ =?us-ascii?Q?Gsqqn0omygO4h2Kh7o+s0TuAn12Mbefsih9lnRnUJnpVzIpRDAJhYBDQPqfT?=
+ =?us-ascii?Q?mg7JUOEVyIgJG5RofGXMN2PGfIocxg4pvjR/niNTUVqBcJI1bJPw/Y7rsat7?=
+ =?us-ascii?Q?r+DYE1f/eh4J/IUQggxAXWLSVSckV/aQgZljz27eICdStJ5bYjDuZwE+Rfmy?=
+ =?us-ascii?Q?mPvQHHZvpiAQ3ssD9t4KV40121pOLv3N3V4pAOl4SXy8tjEcOkZ7QxeOIpqe?=
+ =?us-ascii?Q?Bk/pv0veoMutLsf1LdKUt8aexK29DQGcbscXmJFGxwCRvmz/Wy2C5soPhOdK?=
+ =?us-ascii?Q?Oykh8tG4Xzem6FTFpwbmPlBXpkTidafOJe4u0nNmPNU6xsxx3XNM3qKtx87K?=
+ =?us-ascii?Q?nZwD4/3vx40PC/JtPUCts8v2sBs5a5+es6q2QTEatqoFokUouZcc1IIs7Rob?=
+ =?us-ascii?Q?m8/gP17mY8ehsPHpXvRHtBRwcW114yu8d7oZV2Emf190EcG/kSelQ+M6dVEW?=
+ =?us-ascii?Q?FjOCHH9F5tdLO8W+o+dOV1RM27yQEnrAOEWyKRKSZ7eb5s6qwafzpGgLYD7M?=
+ =?us-ascii?Q?Psxmp7IUJvmR6LWFDijeNV3RaMECnGy67YTzqx0J3BGCYaexR84MzvvHHD3R?=
+ =?us-ascii?Q?PjaTWyj0RZK8e8hJ3T83IlDPt1So8+auHf+OZeOL+dKshHuw8tGxqdYhKk7q?=
+ =?us-ascii?Q?Rls9imDnRpJMue/vtAeaTkahFSfOQm1I1jAxTcNEPToLn8zoob42bRns2nMO?=
+ =?us-ascii?Q?OLdpBk8WwNATF3vp1uM6XTCDj9Bl6AdpMDVEOonsFRA7Sx53UOrlhR+rKGdj?=
+ =?us-ascii?Q?XUbU3Xi/aWJvhTZK/9gHUzVp5lpUfFsSTt8RNYanfIJcEh3tn3ig5jwyD3v+?=
+ =?us-ascii?Q?l1OQ2AEIKsbA3bnz00YDzsQon3kfbBazxYzsEHDpKCfvp4rXrqNAZ0ehBMTp?=
+ =?us-ascii?Q?iOZGPjsju3sULRpAWgKkgyGB0Hxr9qBMhCBlnOUq/TKbxLowxEMbDgO3QST4?=
+ =?us-ascii?Q?x52vP3/SQ685xiKkC9JnC2xDG7JyrA4Q4Q+BAdpcFqDeD/EbND2ljaV3WYAh?=
+ =?us-ascii?Q?EIgV3OVxmiOodTETPfYNWp8pIrrmWRXRPQTu5DIAjfWka9g/wT4RzBZhehAI?=
+ =?us-ascii?Q?k8MKSVolYHTIRANM+YoCf02o5FDZmdcUeaThHB9vk8ti5zk74MFk46yJDHi+?=
+ =?us-ascii?Q?uWMDuVXH2NxUkYwQQgcrN8PvQ7NT+3MN33vBWmk2Y6XLJNhXvLcOWDf3aXL2?=
+ =?us-ascii?Q?sbXAyiFH68tz2xtZZvkm035U6eUUWFYGrR44xripKtpB8oV4/Dq/n8jIpOf0?=
+ =?us-ascii?Q?nnNbvMeOJWZ3Osi46xVBKwaf8V8Wifvgy+nwbP2AAgQdKYW+oJs+s9CscZTm?=
+ =?us-ascii?Q?vOXKXncHSP4nN6yJMg2byp98rlPjhJkp+uDsB2OENMXkcgZvEbRLtQYP6CbI?=
+ =?us-ascii?Q?+BYXABjwkd7JlTUwgC/ys/z1qkJ7wZUbYJQ1Wfz6VyVoXheSTOk3liMliXnC?=
+ =?us-ascii?Q?j/0jkRFctMQEKQyT+pNmYdi3mrwThlIs7+E0CNlHVvu2sGQGmt8copxwngaP?=
+ =?us-ascii?Q?ord/+GlJC/T9sWMhEmtdNBjfu+o=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2026 19:27:36.0936
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f004987-2f8a-418d-4aa3-08de55354de6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002314.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9524
 
-On Fri, Jan 16, 2026 at 07:27:16PM +0100, Maxime Chevallier wrote:
-> Hi,
-> 
-> On 16/01/2026 19:08, Russell King (Oracle) wrote:
-> > On Fri, Jan 16, 2026 at 01:37:48PM +0000, Russell King (Oracle) wrote:
-> >> On Fri, Jan 16, 2026 at 12:50:35AM +0000, Russell King (Oracle) wrote:
-> >>> However, while this may explain the transmit slowdown because it's
-> >>> on the transmit side, it doesn't explain the receive problem.
-> >>
-> >> I'm bisecting to find the cause of the receive issue, but it's going to
-> >> take a long time (in the mean time, I can't do any mainline work.)
-> >>
-> >> So far, the range of good/bad has been narrowed down to 6.14 is good,
-> >> 1b98f357dadd ("Merge tag 'net-next-6.16' of
-> >> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next") is bad.
-> >>
-> >> 14 more iterations to go. Might be complete by Sunday. (Slowness in
-> >> building the more fully featured net-next I use primarily for build
-> >> testing, the slowness of the platform to reboot, and the need to
-> >> manually test each build.)
-> > 
-> > Well, that's been a waste of time today. While the next iteration was
-> > building, because it's been suspicious that each and every bisect
-> > point has failed so far, I decided to re-check 6.14, and that fails.
-> > So, it looks like this problem has existed for some considerable
-> > time. I don't have the compute power locally to bisect over a massive
-> > range of kernels, so I'm afraid stmmac receive is going to have to
-> > stay broken unless someone else can bisect (and find a "good" point
-> > in the git history.)
-> > 
-> 
-> To me RX looks OK, at least on the various devices I have that use
-> stmmac. It's fine on Cyclone V socfpga, and imx8mp. Maybe that's Jetson
-> specific ?
+This patch series introduces a new managed clock framework helper function
+and demonstrates its usage in AXI ethernet driver.
 
-Maybe - it could be something to do with MMUs slowing down the packet
-rate, or it could be uncovering a bug in stmmac's handling of dwmac4
-when it runs out of descriptors in the ring.
+Device drivers frequently need to get optional bulk clocks, prepare them,
+and enable them during probe, while ensuring automatic cleanup on device
+unbind. Currently, this requires three separate operations with manual
+cleanup handling.
 
-The problem I'm seeing is that RBU ends up being set in the channel 0
-control register (there's only a single channel) which means that the
-hardware moved on to the next receive descriptor, and found that it
-didn't own it.
+The new devm_clk_bulk_get_optional_enable() helper combines these
+operations into a single managed call, eliminating boilerplate code and
+following the established pattern of devm_clk_bulk_get_all_enabled().
 
-It _should_ be counted by this statistic:
+Changes in V3:
+- Correct 'Return' format in documentation of
+devm_clk_bulk_get_optional_enable() in patch 1/2.
 
-     rx_buf_unav_irq: 0
+Changes in V2:
+- Modified commit descriptio and subject of patch 2/2
 
-but clearly, this doesn't work, because here is the channel 0 status
-register:
+Note:
+Prepared this series as per mainline discussion here:
+https://lore.kernel.org/all/540737b2-f155-4c55-ab95-b18f113e0031@linux.dev
 
-Value at address 0x02491160: 0x00000484
+RFC patch link:
+https://lore.kernel.org/all/20260102085454.3439195-1-suraj.gupta2@amd.com/
 
-which has:
 
-#define DMA_CHAN_STATUS_RBU             BIT(7)
+Sean Anderson (1):
+  net: axienet: Fix resource release ordering
 
-set. The documentation I have (sadly not for Xavier but for stm32mp151)
-states that when this occurs, a "Receive Poll Demand" command needs to
-be issued, but fails to explain how to do that. Older cores (such as
-dwmac1000) had a "received poll demand" register to write to for this.
+Suraj Gupta (1):
+  clk: Add devm_clk_bulk_get_optional_enable() helper
 
-> I've got pretty-much line rate with a basic 'iperf3 -c XX" and same with
-> 'iperf3 -c XX -R". What commands are you running to check the issue ?
-
-Merely iperf3 -R -c XX, it's enough to make it fall over normally
-within the first second.
-
-> Are you still seeing the pause frames flood ?
-
-Yes, because the receive DMA has stopped, which makes the FIFO between
-the MAC and MTL fill above the threshold for sending pause frames.
-
-In order to stop the disruption to my network (because it basically
-causes *everything* to clog up) I've had to turn off pause autoneg,
-but that doesn't affect whether or not this happens.
-
-It _may_ be worth testing whether adding a ndelay(500) into the
-receive processing path, thereby making it intentionally slow,
-allows you to reproduce the problem. If it does, then that confirms
-that we're missing something in the dwmac4 handling for RBU.
+ drivers/clk/clk-devres.c                      | 50 +++++++++++
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 83 ++++++-------------
+ include/linux/clk.h                           | 23 +++++
+ 3 files changed, 100 insertions(+), 56 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
