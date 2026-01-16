@@ -1,292 +1,348 @@
-Return-Path: <netdev+bounces-250574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A6CD33932
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:49:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB99D33956
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9D5330517FD
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:44:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4788B30EC0B3
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95BB3939A4;
-	Fri, 16 Jan 2026 16:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC52934321C;
+	Fri, 16 Jan 2026 16:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="QK/A3gEE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WImMs3qt"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11021114.outbound.protection.outlook.com [40.93.194.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ECB33BBAA;
-	Fri, 16 Jan 2026 16:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8AD39B4BB
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 16:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.226
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768581878; cv=fail; b=jxwLlLvni32S8KOg4mwUDjTOUIwu10v7GNSbfhwfQEBRODeNxa6TzBhYaZ+gzbPreehg3UtpmVmOBTjF7DMjFKUfT2R7wvGLf6PRxh8RQ//MtP1SU6wyDh09xugAXK0hkwnm1UfUsMTLFKPFSg8abEqFzskpt251n1IxoWtfX4I=
+	t=1768582058; cv=pass; b=JIF0oIsJjp7HvqFw1iL/y2d669c9do7GuzviStUKcmg74w/IGBgu+KvRnP3a4KdtlTOZEvyxdAr8T25Fl8gkQYHzOhq3VqxZtBSq2wDQnCmmzeWnLoereJUIZrc8VgYE0MjERBfIzIYA0c6YbeM5QU89MZ1mJSC7CP/GRRl2W08=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768581878; c=relaxed/simple;
-	bh=AsUhWbouZZG/Ypeah20Nbxb8Na1idiZt9hZ9uNgIHW0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TDSqNCVMnxzgzqteW4KCItrFglVjbdvsMOcJIqDT4TufCADv1mmKiSRsC0C9WnVFqaqv85CQIS7NzpN1dxF1UIWvq8UUHLTphp+8k1iw+MbwIocvbl/X9/lzUE9RaZ4zAoPGNuf3n1VCxiI3dDBMU2xVGTUOO/cdLwLV0SoqbZQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=QK/A3gEE; arc=fail smtp.client-ip=40.93.194.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Yaeazrqfp8Bo6VCdKQVdsB3KLtJ5b9pINdbVyBWqTTCssd8/oJ6g0omOt3dEgOPs4ypcH1Yg2H8w50Kgczy85YXQbAoLFlR2sHIl8Ds0OJPG08B82bd6UiVmSD71z1VcdHuXKInHKj/WAWGoaV+n/uXhTWnwi36HsQh48xhkflh+1FlLBoZpbD1CLUHKDFFz2/clHf4BpEKXMJ/D1+av/5hH1KZHYY25Zk4cDo7tD8ZukIdiGdo/C/jIn9wQ/zM36TmHqc+2/dXPUGVNCdXefrmEG7CUlCWI9l646HyI/W08nPbPUUCAUVR4F1BERCQtuycjJ9ChD5G8WXEOu7qMpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KHYLJUHoGyBzZ5iOgZ5nVXqLpfKzt7b1QuLLjnMJ27Y=;
- b=T52LGKhYsMevtbn4fyejBzBIftPnz4m8lGHjUDvrIzxM34dTbABkFsUIOgDGGcyE/rs61uEjwF2/XsvgfGtE/STgLEny0lnrC8OvFYiVBAMyDDpY+AFpZzfBnG5YlxsfPv3YfdxnGZ7hajrQgS+hzIzrK5AVxuov7EzvLLNXy8EgtR1r4VUr0cZ7AdwJmmsgp9+zKJLbgCDiKiduBJi5d23jiEnsHfCn8LZbeHcP9m8a7xFIq1TH/DGNWMQSaC5c/t1w8q5nlyChl3CNNXvPAwmI9JCj1LqmPat/fNVGUAIywKX05ycVW+czlm2SG7ldBVjKimkJAujj/2pFTk0Kfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KHYLJUHoGyBzZ5iOgZ5nVXqLpfKzt7b1QuLLjnMJ27Y=;
- b=QK/A3gEEMWxsKgJSQ7ocpqpKCrSquANUBOeBOQ0Xy7JfFFNutwS8LBuaZXBydcHsFiwybKiYA8wuKIxbiFE9NMc1pKsy4cp04Bzus1Kr7YMImmLDNRsKmLuNBsu3+3/QTJSatx/vzrsenCeURwfxfU+wVc+FPL+j4DU530OsjCk=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by SA1PR21MB6225.namprd21.prod.outlook.com (2603:10b6:806:4a7::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.3; Fri, 16 Jan
- 2026 16:44:33 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9542.003; Fri, 16 Jan 2026
- 16:44:33 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Haiyang Zhang <haiyangz@linux.microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni Sri
- Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
-	<shradhagupta@linux.microsoft.com>, Saurabh Sengar
-	<ssengar@linux.microsoft.com>, Aditya Garg <gargaditya@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>, Shiraz Saleem
-	<shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
- for coalesced RX packets on CQE
-Thread-Topic: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
- for coalesced RX packets on CQE
-Thread-Index:
- AQHcf02oLJOgwMZgokiNaAnIBRMMibVKqfoAgARiUFCAAEsSAIAA4mDAgAAFB6CAAKeVAIABIOnwgACOxQCAARoLgIAAbQoAgADxWmA=
-Date: Fri, 16 Jan 2026 16:44:33 +0000
-Message-ID:
- <SA3PR21MB3867B98BBA96FF3BA7F42F3FCA8DA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
-	<1767732407-12389-2-git-send-email-haiyangz@linux.microsoft.com>
-	<20260109175610.0eb69acb@kernel.org>
-	<SA3PR21MB3867BAD6022A1CAE2AC9E202CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260112172146.04b4a70f@kernel.org>
-	<SA3PR21MB3867B36A9565AB01B0114D3ACA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260113170948.1d6fbdaf@kernel.org>
-	<SA3PR21MB38676C98AA702F212CE391E2CA8FA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260114185450.58db5a6d@kernel.org>
-	<SA3PR21MB38673CA4DDE618A5D9C4FA99CA8CA@SA3PR21MB3867.namprd21.prod.outlook.com>
- <20260115181434.4494fe9f@kernel.org>
-In-Reply-To: <20260115181434.4494fe9f@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=40f04205-2a08-469e-87f6-beefcfa6eb72;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-01-16T16:38:24Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB6225:EE_
-x-ms-office365-filtering-correlation-id: 37c04353-1182-4618-426d-08de551e8710
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?aZoFH7gPoVzX1ZJav2ZvSmj+TPj8tKzFXer9LK4FP0KH8Ym3XNuDW+DriKcj?=
- =?us-ascii?Q?Z6nUKf+edvn00xS8I+RHBcu6ax9bgo5umqM+0Nt6/7S34g43TdkQa7PgPH3d?=
- =?us-ascii?Q?nsppbmQ2i9MKFZEWMgUBKVlNnyryJVxyK9EQCembB3B6CqO/MpSklkIgIogk?=
- =?us-ascii?Q?E8SV8RxlGL7Z4uCeoH43cup9UHOEw0+XDezh4bgFOjv+VRvsKXq+JGxYs/dU?=
- =?us-ascii?Q?7qrTuSo7G1siVdLuvesDjXOfOLv1adsyCy9xWxtScJHrp5Rs/nxrZ9d6hXjr?=
- =?us-ascii?Q?vrCggEJN3rvgh4Ij9xrQlQoNJ74XL4hPU7hapdLXzdNVsNtAQTWh/cYRgYsi?=
- =?us-ascii?Q?XVSExONM7LUHWtZd2f6RwAFr/GNWyFGcyFpaT0zdfWQolgxK9OU+/T9RFdLs?=
- =?us-ascii?Q?poEk33/BJE47p8MUOqtBBoaaconNUw5nycSUBfogEmxBT7XodPBRi9nVXOtz?=
- =?us-ascii?Q?G7MtNsDv1LYtv1hNBdQ9+ZRlPv2L2m+c08quKsszNgnX2GHlOef+XJaBiDYl?=
- =?us-ascii?Q?nYnLMg3rP91twi/alSOp4e4/sexd4C8JBo2fBDBCD0mENMO325hglgP3/dgs?=
- =?us-ascii?Q?pfxvWxpz6Kf8bVs7kSM50leZWFYzLrJJ0F0WwvSiba7PAsWo1vOtnkbB/md8?=
- =?us-ascii?Q?QGQpKimIY9/HX0YfOMtV/jbE3HxzYpl8bfc2sMeI60jT/4klpCXggMC9hW1B?=
- =?us-ascii?Q?H140Ry5iv+rLuZ41F7/cRLSTLOr9J8aC8zGyAugxih8A1NSRK8ccFRrUZdL5?=
- =?us-ascii?Q?uKwWJ/HQ+JFpKW5Xl275TzQitubo+hk6c3mUie6I/75eZrrd+muD0Ejthwhz?=
- =?us-ascii?Q?U/ww5GTAsOy0YfPApSclZQKiXHU2efpVsAI65S785Z9/mH4XriALEmdCSzdc?=
- =?us-ascii?Q?UzyRUgyNip9UUtGDJsSV7iCHpcZvSZHz9g6eRY2ht4mlMohhpaISzCX2DLpC?=
- =?us-ascii?Q?61YQdEcY+YAFK5pjwAv9yzSDKf9DEk33RRb+1xmTvNTKey3FWIPPwi5YbceJ?=
- =?us-ascii?Q?sNxIvLGtmSGHWheBOWMUDcvkmid3LUncJc2cGh9Pmdmo4receFV9Qf53laNy?=
- =?us-ascii?Q?2OfcUiUm4RE/EiRX7lr92hLCHU2469tox8wg4ANUa00kDmUbPtTZBWAxWj1s?=
- =?us-ascii?Q?XdpkLdPFJckIfKcbSFEgUl5dwcHKp1ggmauE+pedsFSgQsdDtebtahDfleDt?=
- =?us-ascii?Q?YGubG5O1lW075DiAPVzBO5NmgB7MBcLXcPjoA9yr/1plG36RGKDrj/xrtCpx?=
- =?us-ascii?Q?0kD4M8Ow8pIsm09pYE7djv87rQT0fFvSxcEbm1IutmSyfaXuIDLZZjealdAu?=
- =?us-ascii?Q?j2tpqPUlSlwWOC01iea5AsQy7tfPIgITV/aVocjx2kgxf+nCcImKSrwDLJw4?=
- =?us-ascii?Q?JldHu+fLuoXpCkffK0HLqWVILa/sF0ICWTTzDXIwJOZ+KAtRl/nPjj0m2r28?=
- =?us-ascii?Q?TV55Dpz9vlVih+L04fW0FhmY9g7d6wg5CV4pMlT7d8/jKA4rWkchl4Tz1Rvm?=
- =?us-ascii?Q?+NX80mHlzB0P8PzV+lgL7y7zTBbKTOfvDp46smAnssQr2jqGGk4LT7gBnxxL?=
- =?us-ascii?Q?uvyBNfahGr+/ofEla93sGIWNUOk6DX37HYeQsBZlkH/Ipe2sYcPVIZup83OQ?=
- =?us-ascii?Q?MHpY53eurrxblkQENIdkXrI=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?d+nSkG2e8av7yMHgAdJ852ZGuy++z33JpnK5tBwIG+tNHqUfFRhoRznhnMn6?=
- =?us-ascii?Q?N/QuXlxmAf7XhksIx53fuRib51qB92Lm9nMPCpFbuPzhWaLaJrpbx4UTM+HQ?=
- =?us-ascii?Q?+fvx05qe07+n16NVX79OAg64yiGrcdaJpZi/l/DcXe6uwYsLMTl+DBoERD/T?=
- =?us-ascii?Q?VDwcYErw4INNTel/0Zw7ZYOvWI4Sn9LJOPkZqXr89V4ZynWd7UirhkpolHFZ?=
- =?us-ascii?Q?+A8Pd5OpNlLUIQPvh3ZHK2VrYiXsJeRkSyO9E6gUqOm8683QcXbsvzhYducw?=
- =?us-ascii?Q?PFkN22eJJZDgmfBgNW9AA5LuVU0nWLxWidotSidqVJi0nPA9cPH+IATpSGgq?=
- =?us-ascii?Q?t8sh+U6HP9vHqn/7ddlMMWcswUnnp2Ak6SfBpIl91d4V2CfL0Z0Te/njiMB3?=
- =?us-ascii?Q?kLvOWTkJZy9ZpxV8sI1b9x/nr8xrGx9suDX1oFgci+dNHnmfl7TyrlEKqBrd?=
- =?us-ascii?Q?gvUbjTzvjZQgXCxmaWC7fFvMb3D32yPUqeFOlQ9IA7UihyMche8vWCIhC1oP?=
- =?us-ascii?Q?IeuWZiap7VqSuDZdJ4HH39cxWgbpCrSrlG9OehO2/KwKftsZ+88ubfaxvdEZ?=
- =?us-ascii?Q?6Tu6c/p3IdFi5kBPDzqikFW0L9jnVYIk6tmBWzvXKvvGdsE2e5ya9lcPnZKJ?=
- =?us-ascii?Q?EF8dmJAtyhrcxta1+gVoSn9Se5joTFcsd8Xg4x2vgakK3lOmkezqPUMytDvi?=
- =?us-ascii?Q?Dn0esLkhEbQaT7510YJXWKVn32f9g74cFMjz15P1YbD3KbzzzIYHzgiM3nWK?=
- =?us-ascii?Q?PaNeNYyk+9fEoOdCUnFl6oijsilO9hBhENIiRYB91iHujrTqarAU+4QpaIQt?=
- =?us-ascii?Q?PSGMTGwOhKsOofffUBjsQDunBP7WXm+uXdu1EG3tGJMUYX/0txW8zFqlFX2I?=
- =?us-ascii?Q?Eur9m/or+YCt77BA8kjOxpsBO/NcokM7P7d0O2FiOpcfqS7glIZJ8K5j7MRa?=
- =?us-ascii?Q?h/AfnLTxKnmrtTgv5bNjYGlhU6kOq6xwNNVF9Tq9l5PuIPrMAVFVAzfAPpcH?=
- =?us-ascii?Q?9N+xxtbjSHPcL4oPFI1FuZ2/6uJhjAclgd5JM9u7W+iGQycg/TN+zUl5jJnU?=
- =?us-ascii?Q?ZBzr8HuJbfn4cbOBrnmXH9GM8l8NMFzFW1Ymtjhwrj7bcw6mD/2xUrFBBPqO?=
- =?us-ascii?Q?egRINcXxGV8s9PRGa0CIjxjHUscRxbIu3h/3jA6yh5XAgCtkly9/Rv1v9wi3?=
- =?us-ascii?Q?aCipUCxnYBOfpf6mTx7rmGv8sNLeMoem2f8VFOd0Qt0TfvhDkz+dZ6uuwf1+?=
- =?us-ascii?Q?tipuWiTYt9AW5zRJHGEQusRDZWxWxithJ4CTdogbG7K3H1D8B3UDPjN5zQ5w?=
- =?us-ascii?Q?uPF9ZPWtOTDv6wmB8TMIhB1ZWO5XnnY24DpXBMx2aP2RT47K9bcy0lCqq1ZC?=
- =?us-ascii?Q?IuK0L3WqpE6kqmlves13lulmHk7xXOYW9Kt1DRYs9XD7Ss9dk/ZtVlhB5zJY?=
- =?us-ascii?Q?bAu2cPeC6+DWa/pAIjNBCxEh/w4qY0Je2sjM75iDsctMTWE+wMew98cv/BL7?=
- =?us-ascii?Q?UF87UN7+x3Z/IwZ2Mteo2ElyvDKNAWHZDMpWcJgSu165ezafY8Q2wSgSQkJN?=
- =?us-ascii?Q?zryHzg0L+BS0za/tmsGKAvCAnjE+UDUJczIgziHFZsi7pcpDk/AgNCuNBRpa?=
- =?us-ascii?Q?VACmH52h3yhxt+kuQZXNxpGHxTzyhih+SNo7x7jvUIzIJktKyVI2ITMvOjSE?=
- =?us-ascii?Q?k4K7V2vHVdL/y7RUybttTvE9sjbMMhp75T5MWQ3C0FBu7mzIry8nc6lp/TEA?=
- =?us-ascii?Q?aLAa+CWtRA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1768582058; c=relaxed/simple;
+	bh=qAyTWEJ8ohRYJ3hpIlJNB1kL5zfWdNJ3V8LCGdAUR40=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P9WnIDyQF1mvrjU0K0GB9IGs6gYY/Sg6RP7RlBHxMrzwPtaZN6K9FcBwAY/8K9uQ9LK2bePpbRjdYQclvnaLDJ/AgzLPSgpscDI9GPBzJLPah55T1VseOAguIjLijMiXdVnhvaMpQ0/mAXoiNN7QXN5T8bwdIh8tbFTTh40H94A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WImMs3qt; arc=pass smtp.client-ip=209.85.128.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-79088484065so22348657b3.1
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 08:47:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768582045; x=1769186845;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SMb0WALZwGjuAmZYuZw5xk7g954FJD/GgrC+LeF4kjA=;
+        b=LjHfvk+Re4Iw7/Kx4NP7H1eGJoYo9h0J77l/T4TEK8FuxFNff4fa77NhBXX4TR/rsS
+         MCOq+pbp9kvvp5Qi8PFRGXGx02cyAG5v6L9p2AvZ62/avlQBxflnepp1XGtRqYbUXCCq
+         GO2Xr/rDxHdx463SAzHp8eGlLJ7c8wuDuuFyioarAlGvI28WQg2TaxITrdqc37prl6Kg
+         An+HaX9mGcLeBgPnMDVh3U7pT1oTN9Nl4BE9cImQefjmXGOUFxuZFAAzqaljLoVOtyxl
+         h/mRMXNHQ7hhkSGCBvytkT4O+Y9PDJnDoISfztbZna6CDQqSaEYLmpopbtF8bpTQX4DT
+         uejw==
+X-Forwarded-Encrypted: i=2; AJvYcCWcphvRD2FEiWNUOB1TZD2csmlCIiwaQQxiCAemdF/xuZHHpkUq23YmLwdzc/ERE6jqfOa1nrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2QVLflmVvclH/B8w9ZZBORnT5N5I/ALXjBLIXkrucLwXBbwDH
+	kP9AHU9UuV3josSoYkZ9jPVmKnMI7SK0fgk9Z40B3Olz72+uf3cjAug0GqsmomJOHAWyTGctjaK
+	vkxRX2djVFfx/U1QTGFZKt8/1TLA1eRdEDeUVAgf5OScoOmrJQ93IkbgPIesZXFTVsHnR3IfV1F
+	PH40R+/F4smJAO4B6fQHnXsVtr48TxuFinsKlEWgANAjMz/6X83uxGN9Nsw47+vvL6VKiXW9gIH
+	93o8aaKdrpxZbW7pA==
+X-Gm-Gg: AY/fxX4tmAni+0ixOQrGgUswaykZ90FK1o+9QhkIHPtQ+jvEIQUaR9Fu8dCC+GJ6fDw
+	lCEY07457y5pLuUZjKAuMPguU4QF/E8wfScoqqR9imoLIfvVXp8aFL1SWoF1MKxufjy4LX+SaAN
+	ApQt7+z8rAUvdjW8SKgT8tS8jrkS3L4xHncApEHrOG1AAOhjqQ9D8D+ONfZU46tmSnLGUzJ1JRx
+	ou3q/4Bllq1GtWpn49upartCzSNJLIv8j4Sa/J1l2BnyCvvqUntEc+azKHWVHXPqITkI8vH+QrS
+	kF2OBdFe3jQsLHC+eXVgYSkRRKRvljQb5AZQ8OWp7HyKIkcKD/gMlQ7dmoMqfNTvjYqEe60aIFN
+	rhi3czMqDOEJrr0G9g2BYMX4XwMT/TfOgYNrrtdiOI0OxoBHD3bTJPo8ferrGZGNImid/ZkPh0q
+	FwamBFQ5nAX6gCjwONivfQBlfQcglrBzm2Tkk0FHrrrYP4q/mdrHzgdg==
+X-Received: by 2002:a05:690c:45c7:b0:788:e74:b267 with SMTP id 00721157ae682-793c54053e0mr64160607b3.65.1768582044537;
+        Fri, 16 Jan 2026 08:47:24 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-793c67137a2sm1586347b3.14.2026.01.16.08.47.24
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 16 Jan 2026 08:47:24 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-123377038f9so7172549c88.0
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 08:47:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768582043; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Z3VYlYjhReCTLUIYmDF2iD3JQ41Nl867mkp7wvUTx140OL2En2Hb/darJeXfjxri63
+         zrGMJnwf47HGGE2OepHlhbTjt8G3ORCaxV0pfPR1zrpLlKXfO4WXQad0qEgxAcSXbqIL
+         Z5MrGHDLJWIe98ywEmGLWtLaJE8zwpgcnseK15FtYyONYqQS4zWAngrlYtOUFdTs23hW
+         lJ6PEQqVIWHdlZpewq2DVGQpv3Tpz6+ezZLE6V3Y78EQl99CpzUim0G3LQWlHE2Jza2g
+         pr+UsWX1keAxDXSWoNDVpnXlHh8IqhdWcIl4EZJ3jbPUYB4XbGAwBn/W5budy/C1OYDO
+         zvew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=SMb0WALZwGjuAmZYuZw5xk7g954FJD/GgrC+LeF4kjA=;
+        fh=9VaF3Ij+3H32vvNgXkMXtMXadYfH1oVFWJYLlk5CoSA=;
+        b=TZ58rpW++464XqQ15ZUQOeL0wF/U2wK2iOnj4Laxr80gJwzDSkosjN7I5GMGRaxJF9
+         3PvwV+5lnc4jFFwaY6YyCBOoKQqf8d7PEsAldTTkWntG+9dN9qWMUSoP4Y8uL7OHrWIw
+         ZpiPcCfwi3iqgAYXVsYGKmu9KP7vBvWK6QQCKMLCg0M49ONwCkhT6F+PlQdhVGakGSMv
+         j25SvXlGwGoNWus7rvAFP0Ez5Uz0GmGcsbT7EA6aZYlIvA8IFyiznm+xyFz2Q1oc1lP7
+         1fpcx3w9pSPCD4oAOnAjPjzDOaWc5AtXX6iSSOHtknkgTxFunRV8I999L5FGPnh0yoKC
+         Ybwg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1768582043; x=1769186843; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SMb0WALZwGjuAmZYuZw5xk7g954FJD/GgrC+LeF4kjA=;
+        b=WImMs3qt1bynYd8LzsLCaSbyaWPQW7gEb8IypDDu7QRazYBc7EBcHj92WNxUCi9wN9
+         7EiwEJEItMYsC3ye2gIPbJTfvF1CQcs3Injz1UEsMTph/cv0lWPMl+TjYnNxdVaTtB1X
+         h5DfcUVFQvYAuC/fAALzFvdZhod2FKguigzcU=
+X-Forwarded-Encrypted: i=1; AJvYcCVqAc3vNhCKiXBOdts9Ae/3RYSsRxveA8POTbqAJEHLcRYM2gXK0Wgrr54Tn+1N73mRxlSRo8o=@vger.kernel.org
+X-Received: by 2002:a05:7022:221a:b0:119:e56b:c73d with SMTP id a92af1059eb24-1244a6d7e40mr3611280c88.2.1768582043243;
+        Fri, 16 Jan 2026 08:47:23 -0800 (PST)
+X-Received: by 2002:a05:7022:221a:b0:119:e56b:c73d with SMTP id
+ a92af1059eb24-1244a6d7e40mr3611259c88.2.1768582042798; Fri, 16 Jan 2026
+ 08:47:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37c04353-1182-4618-426d-08de551e8710
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2026 16:44:33.6458
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XqadLw/kOI3C8lxUW5da5wAWCaz2viejwmbyPTCpyOIWFDPKuA82n5STZwF+9OqGG6/hrgU1rWkGIQ8h9/7CEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6225
+References: <20260105072143.19447-1-bhargava.marreddy@broadcom.com>
+ <20260105072143.19447-3-bhargava.marreddy@broadcom.com> <a3aab7af-3807-4f37-92e0-5ea52df1bd4c@redhat.com>
+ <CANXQDtYR6P9+oHXpAzxPk4cE1jSYCFoCbELcWad25h1c6wfmQQ@mail.gmail.com> <ec0dc3cd-687a-4612-89d9-3c5cdd093ad0@lunn.ch>
+In-Reply-To: <ec0dc3cd-687a-4612-89d9-3c5cdd093ad0@lunn.ch>
+From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+Date: Fri, 16 Jan 2026 22:17:08 +0530
+X-Gm-Features: AZwV_QgW-bSPabsY_SiI1_VMLJi9X2NtH6YD9EKakCPxabxH2-VyIIUFWJwvL0s
+Message-ID: <CANXQDtabZu+Jyg57a5z_YAkbST6Wjuf_0-PQRAZR5NHXWsg2Sw@mail.gmail.com>
+Subject: Re: [v4, net-next 2/7] bng_en: Add RX support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, andrew+netdev@lunn.ch, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
+	vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com, 
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000075e42306488418dd"
 
+--00000000000075e42306488418dd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Thursday, January 15, 2026 9:15 PM
-> To: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Haiyang Zhang <haiyangz@linux.microsoft.com>; linux-
-> hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
-> <kys@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
-> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Konstanti=
-n
-> Taranov <kotaranov@microsoft.com>; Simon Horman <horms@kernel.org>; Erni
-> Sri Satya Vennela <ernis@linux.microsoft.com>; Shradha Gupta
-> <shradhagupta@linux.microsoft.com>; Saurabh Sengar
-> <ssengar@linux.microsoft.com>; Aditya Garg
-> <gargaditya@linux.microsoft.com>; Dipayaan Roy
-> <dipayanroy@linux.microsoft.com>; Shiraz Saleem
-> <shirazsaleem@microsoft.com>; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
-> Subject: Re: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add
-> support for coalesced RX packets on CQE
->=20
-> On Thu, 15 Jan 2026 19:57:44 +0000 Haiyang Zhang wrote:
-> > > > When coalescing is enabled, the device waits for packets which can
-> > > > have the CQE coalesced with previous packet(s). That coalescing
-> process
-> > > > is finished (and a CQE written to the appropriate CQ) when the CQE
-> is
-> > > > filled with 4 pkts, or time expired, or other device specific logic
-> is
-> > > > satisfied.
+On Tue, Jan 13, 2026 at 2:41=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, Jan 13, 2026 at 01:14:33AM +0530, Bhargava Chenna Marreddy wrote:
+> > On Thu, Jan 8, 2026 at 3:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
+wrote:
 > > >
-> > > See, what I'm afraid is happening here is that you are enabling
-> > > completion coalescing (how long the device keeps the CQE pending).
-> > > Which is _not_ what rx_max_coalesced_frames controls for most NICs.
-> > > For most NICs rx_max_coalesced_frames controls IRQ generation logic.
+> > > On 1/5/26 8:21 AM, Bhargava Marreddy wrote:
+> > > > diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h b/dri=
+vers/net/ethernet/broadcom/bnge/bnge_hw_def.h
+> > > > new file mode 100644
+> > > > index 000000000000..4da4259095fa
+> > > > --- /dev/null
+> > > > +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
+> > > > @@ -0,0 +1,198 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > > +/* Copyright (c) 2025 Broadcom */
+> > > > +
+> > > > +#ifndef _BNGE_HW_DEF_H_
+> > > > +#define _BNGE_HW_DEF_H_
+> > > > +
+> > > > +struct tx_bd_ext {
+> > > > +     __le32 tx_bd_hsize_lflags;
+> > > > +     #define TX_BD_FLAGS_TCP_UDP_CHKSUM                      (1 <<=
+ 0)
 > > >
-> > > The NIC first buffers up CQEs for typically single digit usecs, and
-> > > then once CQE timer exipred and writeback happened it starts an IRQ
-> > > coalescing timer. Once the IRQ coalescing timer expires IRQ is
-> > > triggered, which schedules NAPI. (broad strokes, obviously many
-> > > differences and optimizations exist)
-> > >
-> > > Is my guess correct? Are you controlling CQE coalescing>
-> > >
-> > > Can you control the timeout instead of the frame count?
+> > > Please use BIT()
 > >
-> > Our NIC's timeout value cannot be controlled by driver. Also, the
-> > timeout may be changed in future NIC HW.
+> > Simon Horman raised a similar point. However, some hardware BD values
+> > use non-contiguous bits that make BIT() and GENMASK() overly complex.
+> > We believe the current definitions better reflect the hardware spec.
+> > Please let us know if you=E2=80=99d still prefer a different approach.
+>
+> You probably want to use BIT() for all fields which are
+> contiguous. Doing something different then marks the other fields are
+> somehow special and need treating with care.
+
+Thanks, Andrew. Will address in the next version.
+
+>
+> > > > +     #define TX_BD_FLAGS_IP_CKSUM                            (1 <<=
+ 1)
+> > > > +     #define TX_BD_FLAGS_NO_CRC                              (1 <<=
+ 2)
+> > > > +     #define TX_BD_FLAGS_STAMP                               (1 <<=
+ 3)
+> > > > +     #define TX_BD_FLAGS_T_IP_CHKSUM                         (1 <<=
+ 4)
+> > > > +     #define TX_BD_FLAGS_LSO                                 (1 <<=
+ 5)
+> > > > +     #define TX_BD_FLAGS_IPID_FMT                            (1 <<=
+ 6)
+> > > > +     #define TX_BD_FLAGS_T_IPID                              (1 <<=
+ 7)
+> > > > +     #define TX_BD_HSIZE                                     (0xff=
+ << 16)
+> > > > +      #define TX_BD_HSIZE_SHIFT                               16
+> > >
+> > > I'm quite suprised checkpatch does not complain, but the above
+> > > indentation is IMHO quite messy.
+>
+> > > please move the macro definition before the struct and avoid mixing
+> > > whitespaces and tabs.
 > >
-> > So, I use the ethtool/rx-frames, which is either 1 or 4 on our
-> > NIC, to switch the CQE coalescing feature on/off.
->=20
-> I feel like this is not the first time I'm having a conversation with
-> you where you are not answering my direct questions, not just one
-> sliver. IDK why you're doing this, but being able to participate
-> in  an email exchange is a bare minimum for participating upstream.
-> Please consider this a warning.
+> > Since these are hardware-defined structs, we kept the #defines with
+> > their members to make the mapping clear.
+> > Any concerns with this?
 
-Sure, let me try to reply again -- does this (see below) answer all=20
-your questions? And, feel free to ask any further questions, we are=20
-willing to collaborate with you and other upstream people at any time :)
-=20
-> The NIC first buffers up CQEs for typically single digit usecs, and
-> then once CQE timer exipred and writeback happened it starts an IRQ
-> coalescing timer. Once the IRQ coalescing timer expires IRQ is
-> triggered, which schedules NAPI. (broad strokes, obviously many
-> differences and optimizations exist)
-> Is my guess correct? Are you controlling CQE coalescing?
-=20
-Yes, it's correct. And we are controlling "CQE coalescing".
+Ack. Will fix it in the next spin.
 
->=20
-> If I interpret your reply correctly you are indeed coalescing writeback.
+>
+> The names should make it clear. The structure member can be called
+> tx_bd_flags, and the bits are TX_BD_FLAGS_IP_CKSUM etc.
+>
+> > > > +static struct sk_buff *bnge_copy_skb(struct bnge_napi *bnapi, u8 *=
+data,
+> > > > +                                  unsigned int len, dma_addr_t map=
+ping)
+> > > > +{
+> > > > +     struct bnge_net *bn =3D bnapi->bn;
+> > > > +     struct bnge_dev *bd =3D bn->bd;
+> > > > +     struct sk_buff *skb;
+> > > > +
+> > > > +     skb =3D napi_alloc_skb(&bnapi->napi, len);
+> > > > +     if (!skb)
+> > > > +             return NULL;
+> > > > +
+> > > > +     dma_sync_single_for_cpu(bd->dev, mapping, bn->rx_copybreak,
+> > > > +                             bn->rx_dir);
+> > > > +
+> > > > +     memcpy(skb->data - NET_IP_ALIGN, data - NET_IP_ALIGN,
+> > > > +            len + NET_IP_ALIGN);
+> > >
+> > > This works under the assumption that len <=3D  bn->rx_copybreak; why
+> > > syncing the whole 'rx_copybreak' instead of 'len' ?
+> >
+> > Good point. syncing the actual packet length is more precise and
+> > avoids unnecessary cache maintenance.
+> > Let us test this on our hardware and get back to you.
+>
+> When i did this for the FEC, i got a nice performance boost.
 
-Yes, we are coalescing CQE writeback.
-
-> You need to add a new param to the uAPI.=20
-
-Since this feature is not common to other NICs, can we use an=20
-ethtool private flag instead?
-When the flag is set, the CQE coalescing will be enabled and put=20
-up to 4 pkts in a CQE.
-
-> Please add both size and
-> timeout. Expose the timeout as read only if your device doesn't support
-> controlling it per queue.
-
-Does the "size" mean the max pks per CQE (1 or 4)?
-The timeout value is not even exposed to driver, and subject to change=20
-in the future. Also the HW mechanism is proprietary... So, can we not=20
-"expose" the timeout value in "ethtool -c" outputs, because it's not=20
-available at driver level?
+Thanks for sharing the results, will fix it in next spin.
 
 Thanks,
-- Haiyang
+Bhargava Marreddy
+
+>
+>      Andrew
+
+--00000000000075e42306488418dd
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGqjCCBJKg
+AwIBAgIMFJTEEB7G+bRSFHogMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI1MDYyMDEzNTI1NVoXDTI3MDYyMTEzNTI1NVowge0xCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzERMA8GA1UEBBMITWFycmVkZHkxGDAWBgNVBCoTD0JoYXJnYXZhIENoZW5uYTEWMBQGA1UE
+ChMNQlJPQURDT00gSU5DLjEnMCUGA1UEAwweYmhhcmdhdmEubWFycmVkZHlAYnJvYWRjb20uY29t
+MS0wKwYJKoZIhvcNAQkBFh5iaGFyZ2F2YS5tYXJyZWRkeUBicm9hZGNvbS5jb20wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQCq1sbXItt9Z31lzjb1WqEEegmLi72l7kDsxOJCWBCSkART
+C/LTHOEoELrltkLJnRJiEujzwxS1/cV0LQse38GKog0UmiG5Jsq4YbNxmC7s3BhuuZYSoyCQ7Jg+
+BzqQDU+k9ESjiD/R/11eODWJOxHipYabn/b+qYM+7CTSlVAy7vlJ+z1E/LnygVYHkWFN+IJSuY26
+OWgSyvM8/+TPOrECYbo+kLcjqZfLS9/8EDThXQgg9oCeQOD8pwExycHc9w6ohJLoK7mVWrDol6cl
+vW0XPONZARkdcZ69nJIHt/aMhihlyTUEqD0R8yRHfBp9nQwoSs8z+8xZ+cczX/XvtCVJAgMBAAGj
+ggHiMIIB3jAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADCBkwYIKwYBBQUHAQEEgYYwgYMw
+RgYIKwYBBQUHMAKGOmh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZz
+bWltZWNhMjAyMy5jcnQwOQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dz
+Z2NjcjZzbWltZWNhMjAyMzBlBgNVHSAEXjBcMAkGB2eBDAEFAwMwCwYJKwYBBAGgMgEoMEIGCisG
+AQQBoDIKAwIwNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3Np
+dG9yeS8wQQYDVR0fBDowODA2oDSgMoYwaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3I2
+c21pbWVjYTIwMjMuY3JsMCkGA1UdEQQiMCCBHmJoYXJnYXZhLm1hcnJlZGR5QGJyb2FkY29tLmNv
+bTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAd
+BgNVHQ4EFgQUkiPQZ5IKnCUHj3xJyO85n4OdVl4wDQYJKoZIhvcNAQELBQADggIBALtu8uco00Hh
+dGp+c7lMOYHnFquYd6CXMYL1sBTi51PmiOKDO2xgfVvR7XI/kkqK5Iut0PYzv7kvUJUpG7zmL+XW
+ABC2V9jvp5rUPlGSfP9Ugwx7yoGYEO+x42LeSKypUNV0UbBO8p32C1C/OkqikHlrQGuy8oUMNvOl
+rrSoYMXdlZEravXgTAGO1PLgwVHEpXKy+D523j8B7GfDKHG7M7FjuqqyuxiDvFSoo3iEjYVzKZO9
+NkcawmbO73W8o/5QE6GiIIvXyc+YUfVSNmX5/XpZFqbJ/uFhmiMmBhsT7xJA+L0NHTR7m09xCfZd
++XauyU42jyqUrgRWA36o20SMf1IURZYWgH4V7gWF2f95BiJs0uV1ddjo5ND4pejlKGkCGBfXSAWP
+Ye5wAfgaC3LLKUnpYc3o6q5rUrhp9JlPey7HcnY9yJzQsw++DgKprh9TM/9jwlek8Kw1SIIiaFry
+iriecfkPEiR9HVip63lbWsOrBFyroVEsNmmWQYKaDM4DLIDItDZNDw0FgM1b6R/E2M0ME1Dibn8P
+alTJmpepLqlS2uwywOFZMLeiiVfTYSHwV/Gikq70KjVLNF59BWZMtRvyD5EoPHQavcOQTr7I/5Gc
+GboBOYvJvkYzugiHmztSchEvGtPA10eDOxR1voXJlPH95MB73ZQwqQNpRPq04ElwMYICVzCCAlMC
+AQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMf
+R2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0EgMjAyMwIMFJTEEB7G+bRSFHogMA0GCWCGSAFlAwQC
+AQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDARWi78VXvwphJPZimNUZoYJ72AmuBpWwJsSzUqDlAkjAY
+BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjAxMTYxNjQ3MjNaMFwG
+CSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYI
+KoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAb2o4l
+pThhW22a8XQmsJwCuTVQU1Y2PkDdnolJLOXqD+/NkdnkYl29jcmdEu9SZC5ldsRtHgcFWLtTZgtr
+sXTlNXFy63fo116NS3pmaac8o/cKweiakqnjw0lEtuqCKbWEKJjfvBMJpSrSRldhV0kQneoi+I8v
+a9MhpAIkS89mQAJHNSZ6ahwr869HC4XzllTJKhQ5KOG2s4Dw+Q/R0Xj8s+sgN//V45Z46NwL0quE
+x/hWj8ns5E3Rpnrz+63GNdB4t9TrgKfahqluL+WrideMuKr/R74WKHtpXgG0lEtxRJcSnoXUbABK
+ifyrsTnthT32JYnwVbjlN86OXTI6yIw6
+--00000000000075e42306488418dd--
 
