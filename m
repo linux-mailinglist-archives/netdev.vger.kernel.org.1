@@ -1,82 +1,93 @@
-Return-Path: <netdev+bounces-250436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13FD9D2B284
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:06:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9F2D2B3A7
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:13:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 79E43300F31E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:06:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D6F1300E17E
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086A6344053;
-	Fri, 16 Jan 2026 04:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D70E341AD6;
+	Fri, 16 Jan 2026 04:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2SVhu4j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lzgi0q9s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB77335BBB
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 04:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A50C20C00C
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 04:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768536415; cv=none; b=UKSZr7dzA/bwS2SU6N45RMMAel0zK7O6K20O1vOmpV13fGcKxF4TIjAqTGTJhbTIKpvrSoDr5CIPWo/VnelxMLpt7Nq7nBusU7myVlPngX8zIc8ThtcABEIfPWsmSAOo5kkBXfwO/gkmZavMDNlQAs4ReLb23G+nJF3p0gYgyHs=
+	t=1768536814; cv=none; b=n1e9Jd1vOXWxmJXOHvo3BpZm6IBJ3r1wLYprzGrh3ebt4UZ6ptBfpXkoGcsB1OFjQvGSdcwTiM6wBrovioDpyX+c0WfQNQHoziHBGRmyyfeXM2YPmwkjTHUEixAVMEzCwQJuRxZ5xJrBmoVoT/rcR4HKEzgs9hdzGbaA2NxGPIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768536415; c=relaxed/simple;
-	bh=tjC04V6FxrkwYO0VPLzmYlI1IYEgTao9gUmmOKVJBT4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EBI1ounlpJQevR4rmj18BR9BuwuONU3eN8N0GcY26KNB6oKVd/MT7KSDnk5jVNSFrw9h6/4ZLw6ckZnK8GWIJumoLcazorH1JmH/ehEMxm/bfvZlvQ50+S+VWFZhzTKA8Tvs1ZxhiorDN/sc1T6JQY5QX7lQ//aHfaXyWBhaNfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2SVhu4j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91FAFC116C6;
-	Fri, 16 Jan 2026 04:06:54 +0000 (UTC)
+	s=arc-20240116; t=1768536814; c=relaxed/simple;
+	bh=RJgP0oSCPnvtxFvzh7DZGIlYNLvPQY9y/cj4rFBtraA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Lcer5PEztBAlWfPUCE0DwbI8bPGFQqphLaM6qCb0W1JmjVo+zdChdj+JxlcoONr6m5nTqMAdcgfFTivShfnvwEYnFg0RbzylPk1X0877Zgzit0780fBe7IrQZsXOuHo06xvAOCCjZcRMabcAxjfTTzv5YgTnBjpAzQqBjVT8RXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lzgi0q9s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 591FDC116C6;
+	Fri, 16 Jan 2026 04:13:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768536414;
-	bh=tjC04V6FxrkwYO0VPLzmYlI1IYEgTao9gUmmOKVJBT4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f2SVhu4jwSmP+upFCeO02l8ZkBoO9JuZunQlw/lKfBuk30Z0Sxx+XbPQK1Vp4vTnX
-	 QJmsSTfwGbFBfrwgt11dPuVpn0XQtXiHnWws8hvwlM8yDD7CU3/UP7LnvHOAEm4Opf
-	 U9qPs8ptBZBvXbXtH1n+kZJ9DtgjekxyJ1/kCRUfQDx4zxQRCrNJtfjETX2GJA63Hx
-	 ly9/SX1I/ZNaPUZpPBVelW+9k/wwykpEW6YahDkrs6ceivfsyFz7xDZx4grRWJzggj
-	 XOFbcXXTkVJy6sBavR8LL0aZBweJHy6ApPctaqu2bFhBTxprww5gDxAVJpkuNZzCV9
-	 7jF9gR0j2wpPg==
-Date: Thu, 15 Jan 2026 20:06:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: split kmalloc_reserve()
-Message-ID: <20260115200653.6afa6149@kernel.org>
-In-Reply-To: <20260114212840.2511487-1-edumazet@google.com>
-References: <20260114212840.2511487-1-edumazet@google.com>
+	s=k20201202; t=1768536814;
+	bh=RJgP0oSCPnvtxFvzh7DZGIlYNLvPQY9y/cj4rFBtraA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lzgi0q9sGGIz0RYuVBI/EMUSYIp4L75B/ffnqenEiOvwWd1uPffEFKHTeCmpu85gx
+	 RW3Ex7nmlrxcGHO8/6F4qjDAw4WmsqXzseYh6hSrXt77RZjBSx/cPLvUC7GHNXrC/T
+	 JQmd/3ojM43toZzfqYvzR3OgEIRqh1caecyMfCQwgnVtkaosuxVNVUT3RWLPypSKjP
+	 SUnI/BkYep5xQuO1engOKVzAB/SuXwxd/0dWGNsSoamoAJVRkYhrXl2Lb/4qoQgvg3
+	 VtnsuWurVtFuvTzFexuaC14IvnSQOO79vIZAzme7+dPvNe2RSs14wue1OrR3o5cwFd
+	 OasS/gfBbVfrA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78A4A380AA4C;
+	Fri, 16 Jan 2026 04:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] xgbe: Use netlink extack to report errors to
+ ethtool
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176853660636.79095.7065833387528038849.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Jan 2026 04:10:06 +0000
+References: <20260114080357.1778132-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20260114080357.1778132-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+ Shyam-sundar.S-k@amd.com, Vishal.Badole@amd.com
 
-On Wed, 14 Jan 2026 21:28:40 +0000 Eric Dumazet wrote:
-> kmalloc_reserve() is too big to be inlined.
-> 
-> Put the slow path in a new out-of-line function : kmalloc_pfmemalloc()
-> 
-> Then let kmalloc_reserve() set skb->pfmemalloc only when/if
-> the slow path is taken.
-> 
-> This means __alloc_skb() is faster :
-> 
-> - kmalloc_reserve() is now automatically inlined by both gcc and clang.
-> - No more expensive RMW (skb->pfmemalloc = pfmemalloc).
-> - No more expensive stack canary (for CONFIG_STACKPROTECTOR_STRONG=y).
-> - Removal of two prefetches that were coming too late for modern cpus.
-> 
-> Text size increase is quite small compared to the cpu savings (~0.5 %)
+Hello:
 
-Could you resend? Looks like this depends on some of the patches that
-were pending so it didn't apply when posted.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 14 Jan 2026 13:33:57 +0530 you wrote:
+> From: Vishal Badole <Vishal.Badole@amd.com>
+> 
+> Upgrade XGBE driver to report errors via netlink extack instead
+> of netdev_error so ethtool userspace can be aware of failures.
+> 
+> Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+> Reviewed-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] xgbe: Use netlink extack to report errors to ethtool
+    https://git.kernel.org/netdev/net-next/c/74ecff77dace
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
