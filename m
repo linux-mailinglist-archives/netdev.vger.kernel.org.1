@@ -1,115 +1,89 @@
-Return-Path: <netdev+bounces-250438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79BAED2B31A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:10:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8655BD2B379
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 55577300D931
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:10:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39158301515F
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A81D32E15B;
-	Fri, 16 Jan 2026 04:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D79E34321C;
+	Fri, 16 Jan 2026 04:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ASsKJ2nn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pofHY7nk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01774308F3E
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 04:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC9D20C00C;
+	Fri, 16 Jan 2026 04:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768536642; cv=none; b=mItTAgoqZ5DzAWS4PWQqT1VgRF7Xa/aULGypnOZJVm7hcmxYgZW2OHr8TiNbXDwdo0XeflTplSzb0HxRd37A1HhVjsrsNL9KA5EgDBj5deuVFU83WFUseFFiSCmSCUfZ22rl2VWqaYjNfghH96M7xrTMy1AtLdpT81Z9ODfiof4=
+	t=1768536720; cv=none; b=JtSnhhlWpfMmuqU3VXIt1SiFxvRNdr3nG5QnqBxHpgEghBEmlVb0QvFb/+Vky1Ma6LW/Lg8jXBB58i+XtBl0P2A7BhKZUBH4HZzYYI6NYi0lBBejlV3ZueLt+nPJ9njCrCjBdvV46mY6wyOiEwGSzOqvncubu7gN9rEXL2lYCEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768536642; c=relaxed/simple;
-	bh=O1pwVJR2mtxsLYJsVZiIPKyZKWdE+AKwbznrSla2OEE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gHz2D4pPad/39wJG0yBS2nQhes1ANb27OpiQZV3i6pftyGU1sySVjV4RPip0fxySwOMSAZelyj4e7Mb7zyvOmIHFF5o5NeXRUdmmhwxRolLYhgiBfiqAq08kFthjOA852/dx49QKKqXqTpwUJVoXDHjUrsEJdgBL/6TBro1pNV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ASsKJ2nn; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8b29ff9d18cso196299685a.3
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 20:10:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768536640; x=1769141440; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O1pwVJR2mtxsLYJsVZiIPKyZKWdE+AKwbznrSla2OEE=;
-        b=ASsKJ2nnP8hCcNi3tiZAev2cwQ+HMbiMXhSTNYX0Yk6orUbmaDGntDCWf3C+WQiZqr
-         NDXaiAHCv4jhL5+RWVNXSyfuZPpfgNgYBODG/EMiz9X9CijOFwWKt0Pcs76fLRmRBbVc
-         tnAL30iSwjT9fC3WOyv+aOIqKunuiq0mWicYYavsQV0cbe5WHwSosunpT+Dns/2WvLJ5
-         iUqWG8D2bZbpiynZ+5eMHEHO+J8S+qzLEGd6Q/M3gcFDa5UCUnf0Tjs0eNm6dQ3zH1BA
-         7heHkxbuAjArBc9bCBiuWUeLIwvIqxeEPzIZ/yfEHsx51i7lwcgMkUxsgXtDZu8cPedC
-         6/ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768536640; x=1769141440;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=O1pwVJR2mtxsLYJsVZiIPKyZKWdE+AKwbznrSla2OEE=;
-        b=ENYKmFZXKPQXyNRXtABJKXlA0ixTuYYBPAes8w96o5F2ptPrejVSwRjz1jqLiUp3E4
-         vhBL1oLfTwoU1eLpwyJfu3BnTLUxKTboGap/coK7vBm51o+9I78BsPR2JwejGmtI7HWA
-         VTF2ice0QKTUvpbaqI+b2VLL7C2/94gyvvKF3uNCoUWsgL/Ak5LvbKxtdHPtCDGX3fKp
-         9FegSiVVx1Bt2qgrduqoiSc3ju+Qhb0A19dXPpApz4gG/m5QWxodI64h9u31EGMSJOgj
-         w8zkDoLcZSMNeL0pB4WCCgsr9MkfY1z7KD/JDsuvhCXAELO0602lTnHDTVg5HKLv8N9h
-         ak7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVHJtOgdezIkqDzcCDSyNXfX85S+kDd3LEYvEq2RyhYMv8Ub38zXGjtNQ9sG8S2Qm/jY8sCBWg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKJM54ML4LtLAyDmrJMtc6yETXER1lIKRanJ+tl1eYVTEq3jNK
-	aAeTguLnhrDUbJ3jeUM80h4AHUnc9kZ8LxNL62/XZ4a7F0Kc3Zbi+Jf6kq9gO7xF3pZc+8u4Ucq
-	s9FFgCTDlSsJP4eSSAvYR584/ul79cyaalUgHBTQj
-X-Gm-Gg: AY/fxX4OAh1h+BWfTfNVrGQDcVSZ19LY1McNSxpiQj5EaL3iVUQ7gth4S+WITSqxTk5
-	IPzwZdWXMpfKDkMobob6b/GBba1kgL0v3P/vdtpSLpDHY3M3gmQdx51V9qoqpT7emV727m8+9Wf
-	CCYewvggtEa834+v8auJZGCEwPm1Es9d/cHSO4rABL9nFLd/MXZd8AGmZX7FgayMJu6z6/PorRL
-	HHnKkINd7VLHxiVAq9cQ6r+YO6SaaJAfrH/2X1vp+LdVKolamzpc0+Wgn2RKvU56yUcSKGB
-X-Received: by 2002:a05:622a:4c8:b0:501:40af:96c4 with SMTP id
- d75a77b69052e-502a1758656mr24774001cf.54.1768536639586; Thu, 15 Jan 2026
- 20:10:39 -0800 (PST)
+	s=arc-20240116; t=1768536720; c=relaxed/simple;
+	bh=4uoGgoog5Fby7u6C0Dxo43qgoE40DFXVo7FCNNGrnfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OherzVIgrHtg+PaEEIikmUI2vbr5zV1jAq6JsdUnct1Ss6UR4omzU5iK1IBA4KYomVAIuPHY6ExAU7eD650H7lGHTJDkSrxaMfpyj0B+k25CLhNaue2xyi6T9gr9SuB/+QMmoDMD8zjilhZA19P3YPHKfyRpH12+niNdD0SmFPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pofHY7nk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5566AC116C6;
+	Fri, 16 Jan 2026 04:11:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768536720;
+	bh=4uoGgoog5Fby7u6C0Dxo43qgoE40DFXVo7FCNNGrnfU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pofHY7nkpiKhAxQyLOLbPsRy8q/x5Q/3s4n/wEkvNw0YzWKn8tw91Nl7uszQ3mN4R
+	 k2af9HzewRX7zlJGADX7lewi1sxDwR2sJvcO6V2gbWRDEnpu2+F1yhW9zGSmjabsHT
+	 laMMS8KVeWATcL2n55obXgFbbrSQmlqLlMbsgmAy1EQopNMfjX6TPXzU9ZNoJ+fpl2
+	 5JKOlnQXI3XrLyLR1fa4cvXYy+7lYnkaU3qtdtgC+Oy7ylKTTQy/B4l/83h47iT71o
+	 YGPUza2uy325wf3IlpZzXqsZaQvOe9cFyJIj121e8LQJq8wPQS5gPbnbvAOpVTCLHt
+	 tic45C3RQ0WlA==
+Date: Thu, 15 Jan 2026 20:11:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: <mturquette@baylibre.com>, <sboyd@kernel.org>,
+ <radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <michal.simek@amd.com>, <sean.anderson@linux.dev>, <linux@armlinux.org.uk>,
+ <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <bmasney@redhat.com>
+Subject: Re: [PATCH V2 1/2] clk: Add devm_clk_bulk_get_optional_enable()
+ helper
+Message-ID: <20260115201158.3371bf40@kernel.org>
+In-Reply-To: <20260113181002.200544-2-suraj.gupta2@amd.com>
+References: <20260113181002.200544-1-suraj.gupta2@amd.com>
+	<20260113181002.200544-2-suraj.gupta2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260114212840.2511487-1-edumazet@google.com> <20260115200653.6afa6149@kernel.org>
-In-Reply-To: <20260115200653.6afa6149@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 16 Jan 2026 05:10:28 +0100
-X-Gm-Features: AZwV_QiDlvtWse-x0ZEkDc7t4e8av1PBGpwVov-2JBwXcSea_hjzDZR2dFoQ0lg
-Message-ID: <CANn89i+TX8pJte0o4=82VExJQi17Pyqz8dYaKCnbTvKewgOO1w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: split kmalloc_reserve()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 16, 2026 at 5:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 14 Jan 2026 21:28:40 +0000 Eric Dumazet wrote:
-> > kmalloc_reserve() is too big to be inlined.
-> >
-> > Put the slow path in a new out-of-line function : kmalloc_pfmemalloc()
-> >
-> > Then let kmalloc_reserve() set skb->pfmemalloc only when/if
-> > the slow path is taken.
-> >
-> > This means __alloc_skb() is faster :
-> >
-> > - kmalloc_reserve() is now automatically inlined by both gcc and clang.
-> > - No more expensive RMW (skb->pfmemalloc =3D pfmemalloc).
-> > - No more expensive stack canary (for CONFIG_STACKPROTECTOR_STRONG=3Dy)=
-.
-> > - Removal of two prefetches that were coming too late for modern cpus.
-> >
-> > Text size increase is quite small compared to the cpu savings (~0.5 %)
->
-> Could you resend? Looks like this depends on some of the patches that
-> were pending so it didn't apply when posted.
+On Tue, 13 Jan 2026 23:40:01 +0530 Suraj Gupta wrote:
+> +/**
+> + * devm_clk_bulk_get_optional_enable - Get and enable optional bulk clocks (managed)
+> + * @dev: device for clock "consumer"
+> + * @num_clks: the number of clk_bulk_data
+> + * @clks: pointer to the clk_bulk_data table of consumer
+> + *
+> + * Behaves the same as devm_clk_bulk_get_optional() but also prepares and enables
+> + * the clocks in one operation with management. The clks will automatically be
+> + * disabled, unprepared and freed when the device is unbound.
+> + *
+> + * Returns 0 if all clocks specified in clk_bulk_data table are obtained
+> + * and enabled successfully, or for any clk there was no clk provider available.
+> + * Otherwise returns valid IS_ERR() condition containing errno.
+> + */
+> +int __must_check devm_clk_bulk_get_optional_enable(struct device *dev, int num_clks,
+> +						   struct clk_bulk_data *clks);
 
-Sure thing !
-
-Thanks.
+s/Returns 0/Return: /
+the colon is required by kdoc
+-- 
+pw-bot: cr
 
