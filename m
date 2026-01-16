@@ -1,175 +1,130 @@
-Return-Path: <netdev+bounces-250455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04BFD2C7F1
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:24:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91302D2CF25
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 08:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6B9133009694
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:24:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 49C273027E08
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053EE34C121;
-	Fri, 16 Jan 2026 06:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3326346799;
+	Fri, 16 Jan 2026 07:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="VzMF19gn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eRCQvuAf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818583346AD
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0319344035
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768544663; cv=none; b=o/GWc9p6CrugyLBV2pwTSOfbtAjKFree8tiV65UQHFiHGfGotxpc1UDGWp3BRJq+0vF876I8T5nQLkd922vkQU8n3YeKFLC0HV2O3OZRFlBvTcFY0Hdcs2J/FxRXo2nFbkZgQ52MD5cnnV69u8cLaPW3PyuOXyKxWDOxVmKGwBM=
+	t=1768547340; cv=none; b=rKQvaHeDH3gYyEag/+7a7yIO8U2zTF5BJVyds/edXbszsSrv7IYArPUCCsD3QzFcr+4r57/9uXMNVznZgWPGMI8/I1y4Oj/KlP6QGnSEmvtvrxOAPdLW+ZA3t9tECOZz3OOgn3W1s5cxa6olL5dCZXRdFGZ807z05r40TpjS6YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768544663; c=relaxed/simple;
-	bh=FPqutsrZ8kCZoA41/6ojy/mwwIeQcOcxPC3KEd/lSKw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tjp8tAAd/eng3u6z8CqUJ+ip08HcdRHplnGjHzHgu68o5EI2ZuaeJWGXpu/uzk35Y7Ys2t9oO+83idB9FpgPHLiO1p3kCUB9DBCY1SGKlyo7/wlhNF37o+eDu42Mm+w2+dWdMm7ysAo2lYNVErK+72Rej6fpFmkGHvWP6K8qa4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzMF19gn; arc=none smtp.client-ip=52.12.53.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768544662; x=1800080662;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wpt1kM1YRs4xIHdqwfPIt9Yi6xvFOdnSBe+yiJjWAQE=;
-  b=VzMF19gnhX6sr64DyvRY+0PZOyCNghTG1xwOMWtPmp99O3nLm2FgjQ1o
-   A0a+fN6jh96wjOZyzrYtORZEYRaie58sabeuYMvdzjGEd4E/ACyExVfwh
-   NZt/ZJcvoRfH878DqiYSSh0reKONC0JFud0wkLSwkpoR6ru/qva0UUYTW
-   WRoIDjhFTXE5RMIo+2i0MJe/ps+J01TZ9DUqNQdYgAFEz6MJXQLmlhpE2
-   CtjuSvodM316YcyPWKd9CPshlRPvipHIwzVLr3lkSmiJHrTopbR5Bp2d1
-   wD866xG14cL+kXVxHyf8WDBCiXDiJxiKjHELnuFpjK6fj+2FfPAAPhxl6
-   A==;
-X-CSE-ConnectionGUID: UDn9gg2ZT/KAZBdf0H8yRQ==
-X-CSE-MsgGUID: c5a4pxpJT9ak3+S++Pv2Pw==
-X-IronPort-AV: E=Sophos;i="6.21,230,1763424000"; 
-   d="scan'208";a="10849593"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 06:24:20 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:9315]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.220:2525] with esmtp (Farcaster)
- id 6875cfc2-26af-4f0a-b7d8-12d6d4c1f805; Fri, 16 Jan 2026 06:24:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 6875cfc2-26af-4f0a-b7d8-12d6d4c1f805
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 16 Jan 2026 06:24:19 +0000
-Received: from 603e5f7bc1fe.amazon.com (10.37.245.10) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 16 Jan 2026 06:24:17 +0000
-From: Takashi Kozu <takkozu@amazon.com>
-To: <aleksandr.loktionov@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <takkozu@amazon.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via ethtool set_rxfh
-Date: Fri, 16 Jan 2026 15:24:11 +0900
-Message-ID: <20260116062410.80174-2-takkozu@amazon.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1768547340; c=relaxed/simple;
+	bh=GUgRfny8ILBolkzrIObt84Gwn9WtU+PYmdPIsybZBPc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d3P8a5db16oiq6+6hHoBn2hUgeDa0+jmk8/6zA3N2wSPcFtpb8QF9hgTA5qHIkuRcYuiv1TBBjE5M2jdItsdMv5+h5csxEYl7knJtdiMC0OnSazEI2CuV7RSBE7Da/Vt4owyY7OKJp0z9zBjHIcYW5BEc7Jaq6cOGYY01DDRH1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eRCQvuAf; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 407EFC1F1F4;
+	Fri, 16 Jan 2026 07:08:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CE63960732;
+	Fri, 16 Jan 2026 07:08:55 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7B91610B68919;
+	Fri, 16 Jan 2026 08:08:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768547334; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=7X4iGHOpoO4GX15j7st3JUnO9pqAPsNSvmrMO+kwytg=;
+	b=eRCQvuAfVs4WgEaFm98M6B6lq46VFaDSSJV93xTdctTsEeTEKzvxP2UinsUVkZKDKWs+wH
+	fjIe/w+h6WEA8T7Yg2tREEIN03yJ7sXapAmCVfo27raDDNUgbAQxnV/b+GViSo5o+k2Vy/
+	fwCHOEFlg6y70bDYVx1TgDx3jeIO7VFa+bpzJVNxa/0rQ3gxFAAThYaxiKPv8FlacIJgnp
+	TILGIDsqzC4Kgo2UahLjpFZ+7Nc8Fq0C49A1lwR17zPhezrSz97KjCpZ4eY3AZ1UwEHehl
+	QhwgEWviJ14cOMTdtW2F5AWCUusiTroT/iNGz1nBx5R303qDbkKRVdjPYErTPQ==
+Message-ID: <b6779c36-c969-42dd-9395-6c34de55a5d9@bootlin.com>
+Date: Fri, 16 Jan 2026 08:08:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net: dsa: microchip: Add KSZ8463 tail tag
+ handling
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com>
+ <20260115-ksz8463-ptp-v1-5-bcfe2830cf50@bootlin.com>
+ <722dcba9-d9ae-43ba-b1bf-1d577a882bef@bootlin.com>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <722dcba9-d9ae-43ba-b1bf-1d577a882bef@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-> -----Original Message-----
-> From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-> To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-> Kohei Enju <enjuk@amazon.com>
-> Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-> "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-> "davem@davemloft.net" <davem@davemloft.net>,
-> "edumazet@google.com" <edumazet@google.com>,
-> "intel-wired-lan@lists.osuosl.org"
-> <intel-wired-lan@lists.osuosl.org>,
-> "kuba@kernel.org" <kuba@kernel.org>,
-> "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-> "pabeni@redhat.com" <pabeni@redhat.com>,
-> "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-> "takkozu@amazon.com" <takkozu@amazon.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via ethtool set_rxfh
-> Date: Thu, 8 Jan 2026 13:03:12 +0000 [thread overview]
-> Message-ID: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com> (raw)
-> In-Reply-To: <IA3PR11MB89865D0189D37BB3393B57F5E585A@IA3PR11MB8986.namprd11.prod.outlook.com>
-> 
-> 
-> 
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Loktionov, Aleksandr
-> > Sent: Thursday, January 8, 2026 1:28 PM
-> > To: Kohei Enju <enjuk@amazon.com>
-> > Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
-> > <anthony.l.nguyen@intel.com>; davem@davemloft.net;
-> > edumazet@google.com; intel-wired-lan@lists.osuosl.org;
-> > kuba@kernel.org; netdev@vger.kernel.org; pabeni@redhat.com; Kitszel,
-> > Przemyslaw <przemyslaw.kitszel@intel.com>; takkozu@amazon.com
-> > Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow
-> > configuring RSS key via ethtool set_rxfh
-> >
-> >
-> >
-> > > -----Original Message-----
-> > > From: Kohei Enju <enjuk@amazon.com>
-> > > Sent: Thursday, January 8, 2026 1:04 PM
-> > > To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> > > Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
-> > > <anthony.l.nguyen@intel.com>; davem@davemloft.net;
-> > > edumazet@google.com; enjuk@amazon.com; intel-wired-
-> > > lan@lists.osuosl.org; kuba@kernel.org; netdev@vger.kernel.org;
-> > > pabeni@redhat.com; Kitszel, Przemyslaw
-> > <przemyslaw.kitszel@intel.com>;
-> > > takkozu@amazon.com
-> > > Subject: Re: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb:
-> > allow
-> > > configuring RSS key via ethtool set_rxfh
-> > >
-> > > On Thu, 8 Jan 2026 07:29:19 +0000, Loktionov, Aleksandr wrote:
-> > >
-> > > >>
-> > > >> - igb_write_rss_indir_tbl(adapter);
-> > > >> + if (rxfh->key) {
-> > > >> + adapter->has_user_rss_key = true;
-> > > >> + memcpy(adapter->rss_key, rxfh->key, sizeof(adapter-
-> > > >> >rss_key));
-> > > >> + igb_write_rss_key(adapter);
-> > > >It leads to race between ethtool RSS update and concurrent resets.
-> > > >Because igb_setup_mrqc() (called during resets) also calls
-> > > igb_write_rss_key(adapter).
-> > > >Non-fatal but breaks RSS configuration guarantees.
-> > >
-> > > At my first glance, rtnl lock serializes those operation, so it
-> > > doesn't seem to be racy as long as they are under the rtnl lock.
-> > >
-> > > As far as I skimmed the codes, functions such as igb_open()/
-> > > igb_up()/igb_reset_task(), which finally call igb_write_rss_key()
-> > are
-> > > serialized by rtnl lock or serializes igb_write_rss_key() call by
-> > > locking rtnl.
-> > >
-> > > Please let me know if I'm missing something and it's truly racy.
-> > I think you're right, and I've missed that missing rtnl_lock was added
-> > in upstream.
-> >
-> > Thank you for clarification
-> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> >
-> 
-> Afterthought, I think it could be nice to place ASSERT_RTNL() to show it explicitly.
-> What do you think about this idea?
+Hi Maxime,
 
-Sorry for the late reply. 
-I think it's a good idea. I will add ASSERT_RTNL().
+On 1/15/26 6:05 PM, Maxime Chevallier wrote:
+> Hi Bastien,
+> 
+> On 15/01/2026 16:57, Bastien Curutchet (Schneider Electric) wrote:
+>> KSZ8463 uses the KSZ9893 DSA TAG driver. However, the KSZ8463 doesn't
+>> use the tail tag to convey timestamps to the host as KSZ9893 does. It
+>> uses the reserved fields in the PTP header instead.
+> 
+> [ ... ]
+> 
+>> +static struct sk_buff *ksz8463_rcv(struct sk_buff *skb, struct net_device *dev)
+>> +{
+>> +	unsigned int len = KSZ_EGRESS_TAG_LEN;
+>> +	struct ptp_header *ptp_hdr;
+>> +	unsigned int ptp_class;
+>> +	unsigned int port;
+>> +	ktime_t tstamp;
+>> +	u8 *tag;
+>> +
+>> +	if (skb_linearize(skb))
+>> +		return NULL;
+>> +
+>> +	/* Tag decoding */
+>> +	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+>> +	port = tag[0] & KSZ8463_TAIL_TAG_EG_PORT_M;
+>> +
+>> +	__skb_push(skb, ETH_HLEN);
+>> +	ptp_class = ptp_classify_raw(skb);
+>> +	__skb_pull(skb, ETH_HLEN);
+>> +	if (ptp_class == PTP_CLASS_NONE)
+>> +		goto common_rcv;
+>> +
+>> +	ptp_hdr = ptp_parse_header(skb, ptp_class);
+>> +	if (ptp_hdr) {
+>> +		tstamp = ksz_decode_tstamp(get_unaligned_be32(&ptp_hdr->reserved2));
+>> +		KSZ_SKB_CB(skb)->tstamp = tstamp;
+> 
+> As it is using a reserved field, is it OK to leave this field as-is when forwarding
+> this skb to userspace, or should it be zeroed first ?
+> 
+
+It doesn't seem to hurt, at least on my test setup (I'm using ptp4l in 
+userspace btw), but I agree with you: it feels safer to zero it first. 
+I'll do it in next iteration.
+
+
+Best regards,
+Bastien
 
