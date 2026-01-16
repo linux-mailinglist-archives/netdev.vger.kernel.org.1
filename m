@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-250584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C231ED379F2
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:23:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F41D37A37
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 747103004F1E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:23:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 458BB302E078
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3C8337B91;
-	Fri, 16 Jan 2026 17:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5A833F8B7;
+	Fri, 16 Jan 2026 17:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cHNVRQts"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0mrgd8Ss"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0C623D2B2;
-	Fri, 16 Jan 2026 17:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA4A337B91;
+	Fri, 16 Jan 2026 17:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768584226; cv=none; b=G6Wob2rMERVvnhGrJgTPv8Sm7a8cJjePH+VBstq90I2t0X1A72gwwSHHBKjpUKw0gvE3YSkOMPaWoN39B9UyhGjpdnx6o1vx1JnC7hGfF838am+Qy0fKAzrdH8HdY3fREMz1FfPNs86rZWExvQ/1RdMno0O474p7D+JXdWWqjwY=
+	t=1768584775; cv=none; b=IQYZ9Ly2h5ttoEHSm5lzd9SE/00mFqS8XlkdjRX9z4ujR+8ZNot9h3M/qiRK0IX3DTgBdT5JTCUGMQXTqB4DJ82xbI/HqaGgIK9pCQmJUcGDfnjDLViNyf4InKWFp2OZgqnNdBXwYQ7+3F4ijVj8MVCqPG8kJAlXTUmsD8ystdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768584226; c=relaxed/simple;
-	bh=GVh7cRTdfrinz7j06+o0SpknmSx2dwVUTC6dhGWGMu0=;
+	s=arc-20240116; t=1768584775; c=relaxed/simple;
+	bh=YyvyrsGhMbFFDQKb6NiNeT+k/FsQborlUQWPjAXpp3o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L4GMDamj7pq3wYg0micxRsbz0+0V+aiAtz1lr/12ppD0CQkAxT5BqTOeK6HY9/efwkvyI0lBJACrucpmToC5NZAUCL1D4xSftqZsyISCv5B6dTV0YIU+9PDE7ijmu1q17VWt627jOqWodAS3I8zlFVOcA36DRv/QIqssuDec9lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cHNVRQts; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1dI2i6fKPjdDR7l4zXTt5gzKcKY8y0N68wNDwVa3v3creJWpKkZM4eke8HwK4MyhDRkFgtSaSwZhzGujn1zPquarmTg+WcalHPcycBICxFC/2WT3kYQlNqk0k38yD57QtEysVe7/2QMrvLT4hy1aXZtdEnkVEcRTm5fHaVx6c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0mrgd8Ss; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,25 +34,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1GzRULt8Tsp0YZr10Rjqc+u3hQoQsE+Jtq4T+leliK8=; b=cHNVRQtsZTyVqzUN3mPiS+rkqu
-	tLLSUErUAwrNyo1omM5geeFItBYV5EAhj9Zm9kM8TxjIOMbw8n13zzfodspa8wTO0JbYVLIEB/xAY
-	ynj7bLcFp3ZkXHO7pCwBqNbacou9Pj8hIx1qZIhGU0Zc9KpxDthmd/Kk6ygoZiinV7b0=;
+	bh=NLErl4gvK4Y6j6GKoVV2CPKisx29kEhGwGnW45BCQVA=; b=0mrgd8SsKEWO0/U6VH1OOSWZPr
+	Our3oHj2A6KaqaaddV8Gn55ACMyMk6XJ9YE3radbRgYjQ5uGNzRLC7DscGRkw3fNfxLocZbKqSJcw
+	eCI7CGmBfxbxnSP+cuiO1BRKZGT9uY1VT48wusMkv4IqjvPWWavYt8NSupCyc/4DESVU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vgnXl-0036Cd-M8; Fri, 16 Jan 2026 18:23:29 +0100
-Date: Fri, 16 Jan 2026 18:23:29 +0100
+	id 1vgngn-0036Fb-Uc; Fri, 16 Jan 2026 18:32:49 +0100
+Date: Fri, 16 Jan 2026 18:32:49 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: justin.chen@broadcom.com
-Cc: florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: bcmasp: Fix network filter wake for
- asp-3.0
-Message-ID: <f104b361-bc3c-4666-86e7-68fd5218eafe@lunn.ch>
-References: <20260116005037.540490-1-justin.chen@broadcom.com>
- <20260116005037.540490-2-justin.chen@broadcom.com>
+To: insyelu <insyelu@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, nic_swsd@realtek.com,
+	tiwai@suse.de, hayeswang@realtek.com, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: usb: r8152: fix transmit queue timeout
+Message-ID: <974e39e1-490c-4d61-87fc-6d8249cf8c25@lunn.ch>
+References: <20260114025622.24348-1-insyelu@gmail.com>
+ <20260116023725.8095-1-insyelu@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,15 +58,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260116005037.540490-2-justin.chen@broadcom.com>
+In-Reply-To: <20260116023725.8095-1-insyelu@gmail.com>
 
-On Thu, Jan 15, 2026 at 04:50:35PM -0800, justin.chen@broadcom.com wrote:
-> From: Justin Chen <justin.chen@broadcom.com>
+On Fri, Jan 16, 2026 at 10:37:25AM +0800, insyelu wrote:
+> When the TX queue length reaches the threshold, the netdev watchdog
+> immediately detects a TX queue timeout.
 > 
-> We need to apply the tx_chan_offset to the netfilter cfg channel or the
-> output channel will be incorrect for asp-3.0 and newer.
+> This patch updates the trans_start timestamp of the transmit queue
+> on every asynchronous USB URB submission along the transmit path,
+> ensuring that the network watchdog accurately reflects ongoing
+> transmission activity.
+> 
+> Signed-off-by: insyelu <insyelu@gmail.com>
+> ---
+> v2: Update the transmit timestamp when submitting the USB URB.
 
-If this is a fix, should it be queued for stable?
+Always create a new thread for a new version of a patch. The CI/CD
+system just thinks this is a discussion comment, so has ignored it.
 
-   Andrew
+    Andrew
+
+---
+pw-bot: cr
 
