@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-250487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98BFD2E4CE
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 09:53:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCFED2E690
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:01:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 441F33019547
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 08:53:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C69A30C9CF2
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 08:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0B530E82C;
-	Fri, 16 Jan 2026 08:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136F53128AE;
+	Fri, 16 Jan 2026 08:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ZfmZi7Cd"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QOuHqid2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-101.ptr.blmpb.com (sg-1-101.ptr.blmpb.com [118.26.132.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6FF30F550;
-	Fri, 16 Jan 2026 08:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF012940D
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 08:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768553603; cv=none; b=OGgilM98gdj7ydZ3Q2KO+mdI2UVNqIBkqZjiAKkrJTA2OuJJ2TKSGM9MF1l0IIZ6btemi2zpZ0zvoKrqjBgXtaHcL2+fNjV1gwUYI7jkUXyiN5oS2ktw8cD5FENBzSKUoQGJjTZTtjfCubinnW8pbAO3ZyCDVB8EvxcxSXn+ijw=
+	t=1768553954; cv=none; b=Cj3fkpD8oE51rbQjJPq/no938QpB+aP62h/cQJW/J9635J9trU4oRStgsCiSCvbdD55xbAyv/fczf6VgV+3vDn8TRORrAlbn8tZxc7oJ6YiW5HsLmB1JsZrtV1kbcMs5ZteWvmkWsD8ahP8drzewmGMGNZSOLMPnzvuJNUD4NIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768553603; c=relaxed/simple;
-	bh=rPRrOO9EpEhd6j2mFqhrpiOMDftBm6VQnFQJlZap5tY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QPD540x+vvrb5uy9M1ggBL8f2IaroCwAAtVqntniFHtQVhm/Um1aSlFeGxO4n39j7QmTfa49fP3SztzXNuHLLU3VqICH3lxkUNZRP3WDzlmyAabSKF+itVkeJvxk50tofVBLiO7Uun8JR+VLxVhW/U2G7fWTidi2erHltQVlTmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ZfmZi7Cd; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vgfZt-008RKy-AS; Fri, 16 Jan 2026 09:53:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From;
-	bh=LIqElcPRbRn6PMxm7/HJ/icGwZZsBWYgtsGeUEkL/L4=; b=ZfmZi7CdHmy1VrOQevq3Hsb40T
-	RYqxxjE51+15zasdflKMtTyg5qjsRwqTqCdBeXOCTEmxOMxWM8kXNTm90pujdypI40ghl9wRJXwil
-	Q1oS7Jv+LBOUNJ6OfLEpsuhSRy/rRTk2AeULVOqv/pk/KFBldVegaO68jPFrpW8TLqZhNSUyEh9Ta
-	oOcQE/C6cXcNiyw+FiWobF0J+N6mW1E9IgcBqJdHZeKq0Kf1qfWWa5SGyh4/qaG49w4WrKQsHpmG/
-	WraH6EqwCRYCT78v+0ZuwTYBgEs/CW9w/soaqiiYL12SAK+o7rK27Nwqv8sVE5CV6goKA+0Zzvz11
-	Wa1u+mXw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vgfZs-0004kF-V4; Fri, 16 Jan 2026 09:53:09 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vgfZn-0036un-Ph; Fri, 16 Jan 2026 09:53:03 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 16 Jan 2026 09:52:36 +0100
-Subject: [PATCH net] vsock/test: Do not filter kallsyms by symbol type
+	s=arc-20240116; t=1768553954; c=relaxed/simple;
+	bh=QkEqfAg81XmgEjIb9AsSjt2DNUAJVx30o5YbwK7ya4s=;
+	h=Mime-Version:Message-Id:Date:From:Subject:Content-Type:To; b=AYrW1HywygrfISFQM1+H/8o2YMBIQFMHAh8u2Em/qwDWb98PFF9P+QX4SAZamfbKOLTRQ/o/13f06vqDzoBaG9siMU/E3s+VCiNHr5iGZHVO3A8L1CI9GqRzawTapE1uxertW8QgQc9ShGxsGjUO6wLx9ZuV3pMpkqhp2LwATX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QOuHqid2; arc=none smtp.client-ip=118.26.132.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1768553934; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=8AaJtUtjIptHEHqur2hwHmgGsdGdRM/pF4MvVTWiJ7U=;
+ b=QOuHqid2S/GuMdy4mpAApcosveXApq0h0jppyPc1TE2nQECNsZHk/99JIFITe4Uz7EN1+K
+ fDRSlypygFOACqwNUTgDqZ3tF0jzEK4mg7x4cxeBtPZZwTYvgLrcJS7MahBOieFZ3otgqo
+ Ubu38F/UobLoVHyRvb6FrdAaylGWugbyE5ypcAZV8FFFf480Owv9yfPxbBnxqc5G8/fLYg
+ MkLkJ0Hr0t4joD4CGuT+tmlvpqJUethxDwbHHOPXyegNQWmSlpTf5tTJz91WIxo9VFGGKc
+ UBdkESJ36PPjt6QCvTv+9fsBVbAE4Y844FfI/NyzeOC8ROPIxw707mSQFjrKiw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
-X-B4-Tracking: v=1; b=H4sIAFP8aWkC/x3MQQqDMBBG4avIrB1IUhDbq5RSJPnVQRslE8Qi3
- t3g8lu8d5AiCZRe1UEJm6gsscDWFfmxiwNYQjE54xpj7YM3Xfz0zdDMUzfP+v8pDwkrw7Q+PJ1
- pnA1U8jWhl/1evyki0+c8L20l+idvAAAA
-X-Change-ID: 20260113-vsock_test-kallsyms-grep-e08cd920621d
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- Luigi Leonardi <leonardi@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.3
+Message-Id: <20260116085840.1946398-1-zhangjian.3032@bytedance.com>
+Date: Fri, 16 Jan 2026 16:58:39 +0800
+X-Mailer: git-send-email 2.20.1
+X-Original-From: Jian Zhang <zhangjian.3032@bytedance.com>
+From: "Jian Zhang" <zhangjian.3032@bytedance.com>
+Subject: [PATCH net-next v2 v2 1/2] net: mctp-i2c: notify user space on TX failure
+Content-Type: text/plain; charset=UTF-8
+To: "Jeremy Kerr" <jk@codeconstruct.com.au>, 
+	"Matt Johnston" <matt@codeconstruct.com.au>, 
+	"Andrew Lunn" <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <mkl@pengutronix.de>
+X-Lms-Return-Path: <lba+26969fdcc+9254ee+vger.kernel.org+zhangjian.3032@bytedance.com>
 
-Blamed commit implemented logic to discover available vsock transports by
-grepping /proc/kallsyms for known symbols. It incorrectly filtered entries
-by type 'd'.
+Report local transmit errors from the MCTP I2C transport using
+sock_queue_err_skb(), allowing the socket layer to be notified
+of failed transmissions.
 
-For some kernel configs having
-
-    CONFIG_VIRTIO_VSOCKETS=m
-    CONFIG_VSOCKETS_LOOPBACK=y
-
-kallsyms reports
-
-    0000000000000000 d virtio_transport	[vmw_vsock_virtio_transport]
-    0000000000000000 t loopback_transport
-
-Overzealous filtering might have affected vsock test suit, resulting in
-insufficient/misleading testing.
-
-Do not filter symbols by type. It never helped much.
-
-Fixes: 3070c05b7afd ("vsock/test: Introduce get_transports()")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
 ---
-man nm says: 't' stands for symbol is in the text (code) section. Is this
-correct for `static struct virtio_transport loopback_transport`?
----
- tools/testing/vsock/util.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changelog v2:
+- use sock_queue_err_skb() instead of sk_error_report()
+- link to v1: https://lore.kernel.org/all/20241108094206.2808293-1-zhangjian.3032@bytedance.com/
 
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index 142c02a6834a..bf633cde82b0 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -25,7 +25,7 @@ enum transport {
- };
+ drivers/net/mctp/mctp-i2c.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index f782d93f826e..f6e329b66240 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -24,6 +24,7 @@
+ #include <linux/if_arp.h>
+ #include <net/mctp.h>
+ #include <net/mctpdevice.h>
++#include <linux/errqueue.h>
  
- static const char * const transport_ksyms[] = {
--	#define x(name, symbol) "d " symbol "_transport",
-+	#define x(name, symbol) " " symbol "_transport",
- 	KNOWN_TRANSPORTS(x)
- 	#undef x
- };
-
----
-base-commit: a74c7a58ca2ca1cbb93f4c01421cf24b8642b962
-change-id: 20260113-vsock_test-kallsyms-grep-e08cd920621d
-
-Best regards,
+ /* byte_count is limited to u8 */
+ #define MCTP_I2C_MAXBLOCK 255
+@@ -477,6 +478,23 @@ static void mctp_i2c_invalidate_tx_flow(struct mctp_i2c_dev *midev,
+ 		mctp_i2c_unlock_nest(midev);
+ }
+ 
++static void mctp_i2c_report_error(struct sock *sk, struct sk_buff *skb, int rc)
++{
++	struct sock_exterr_skb *serr;
++
++	skb = skb_clone(skb, GFP_ATOMIC);
++	if (!skb)
++		return;
++
++	serr = SKB_EXT_ERR(skb);
++	memset(serr, 0, sizeof(*serr));
++	serr->ee.ee_errno = -rc;
++	serr->ee.ee_origin = SO_EE_ORIGIN_LOCAL;
++
++	if (sock_queue_err_skb(sk, skb))
++		kfree_skb(skb);
++}
++
+ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ {
+ 	struct net_device_stats *stats = &midev->ndev->stats;
+@@ -537,8 +555,11 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ 		rc = __i2c_transfer(midev->adapter, &msg, 1);
+ 
+ 		/* on tx errors, the flow can no longer be considered valid */
+-		if (rc < 0)
++		if (rc < 0) {
+ 			mctp_i2c_invalidate_tx_flow(midev, skb);
++			if (skb->sk)
++				mctp_i2c_report_error(skb->sk, skb, rc);
++		}
+ 
+ 		break;
+ 
 -- 
-Michal Luczaj <mhal@rbox.co>
-
+2.20.1
 
