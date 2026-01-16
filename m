@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-250390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D90D29F9A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:14:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8DBCD29FC1
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9322330E6302
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8216630E8D22
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5093385B5;
-	Fri, 16 Jan 2026 02:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387DD33859B;
+	Fri, 16 Jan 2026 02:10:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A21337BB0;
-	Fri, 16 Jan 2026 02:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE21F3385BE;
+	Fri, 16 Jan 2026 02:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768529419; cv=none; b=U/rD4ZV9mt+HieQ+1vkOsNMh0VUcxq4mn6+qQ0OeOhlYYg6xitKIjOrbYnqZR048rU9lWsB4XTZdJ0T6yHGPpctjE4Ov6dlXeC1myPMUoPiSxbKWCMMUf5WYvkVGBGW4u/rTp0LGZPYTRdntdDGdCjq4gWRCWQUo4O5pSqMp2Oc=
+	t=1768529421; cv=none; b=XVVHdkVZ+FDdJUDzefrQhDiHJMnEo3Azga44nULSPSsTji3EjsMtO1IhRoScprr3+1bIxYGIyMj46rRA/CSvArWgrDk0SCr4oRlTt2U3DbtW18tYJNN1vVH5qb+l4BdNeGY1SBXx0hBjnc9X/oWUBZvYlrVP+2Tp6WnEvShCMJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768529419; c=relaxed/simple;
-	bh=r+r3eupNaSJOZI65jGhNKLCMIGci+uvguSrj4QWnPgw=;
+	s=arc-20240116; t=1768529421; c=relaxed/simple;
+	bh=oJW/jqRlKmVdWXR4ln1BfDJKxvdZsnfUsbkfIw2yr5A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=irshk4mynjMWTo/x35xN4b+gaDmtx0FGgek3RW1UlQoMQCwCTai5H0teFjCc2jd+lpO3+hOMMYj7UTkqN/MtVP6Thhpzvo+Bbx+CMZ8GhL+/sIrO4SwS2dNiTawyHcysijkAsdq4/DyRUaJ28NgIG+Auz6Ed9mS0u64tkswHKxA=
+	 In-Reply-To:To:CC; b=udeJeW7Fv7Ta8alGWwO+AEDXQtRbZcJU3GfpWklLgLqTnNPx+En1Dq70tHFwInHclij3fU6NKkV/D5waXn8d2MqeyKqrH9I9o9rdqpoctnLBz26o2aqJ3Nhm5+/SidPIr+j2JIRFVh+b5Rc23ltv8dxyawDeQItQLgVGCicFVSU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -35,9 +35,9 @@ Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
  (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
  Transport; Fri, 16 Jan 2026 10:09:16 +0800
 From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Fri, 16 Jan 2026 10:09:22 +0800
-Subject: [PATCH net-next v2 11/15] net: ftgmac100: Move DT probe into a
- helper
+Date: Fri, 16 Jan 2026 10:09:23 +0800
+Subject: [PATCH net-next v2 12/15] net: ftgmac100: Remove redundant
+ PHY_POLL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260116-ftgmac-cleanup-v2-11-81f41f01f2a8@aspeedtech.com>
+Message-ID: <20260116-ftgmac-cleanup-v2-12-81f41f01f2a8@aspeedtech.com>
 References: <20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com>
 In-Reply-To: <20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -56,145 +56,50 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
 	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
 	<horms@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768529355; l=4071;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768529355; l=1321;
  i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=tVopXV5DNmT07+98loUzJrFCfmalZhQi/WEZSI7l9e4=;
- b=XmRCAZoJiK/LDzVHb9aLf2e7q8ovTzBkXnNXJHHBzaFch3dSepUIFdCepKUxAtKccZ8TsKtnb
- 8wD+Yd7ON5wCg85VYxxIq+snHUGx0NPuxdUSdf+eshXIYM4gSmoP1NZ
+ bh=o1kbgFmdMemKmk5PrV8wGbPTM2EI0nj1qFintcv6DQg=;
+ b=1+2OjYAq+CkReN5YmkeyrkykNkUK8CLZEObqBZy4kPA2CXdU3VgK2JRQHlysNxf/Jpdg7DfY/
+ QEndvK1yZz7ChQewW3s2qf5Nz1K03yia4BCWkZNA66DqgTAXBoxvSU8
 X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
  pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 
 From: Andrew Lunn <andrew@lunn.ch>
 
-By moving all the DT probe code into a helper, the complex if else if
-else structure can be simplified. No functional change intended.
+When an MDIO bus is allocated, the irqs for each PHY are set to
+polling. Remove the redundant code in the MAC driver which does the
+same.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 89 +++++++++++++++++++-------------
- 1 file changed, 54 insertions(+), 35 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index f5e69abb1fcf..71ea7062446e 100644
+index 71ea7062446e..1440a4b358e3 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1870,6 +1870,58 @@ static int ftgmac100_probe_ncsi(struct net_device *netdev,
- 	return err;
- }
+@@ -1712,7 +1712,7 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+ 	struct platform_device *pdev = to_platform_device(priv->dev);
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct device_node *mdio_np;
+-	int i, err = 0;
++	int err = 0;
+ 	u32 reg;
  
-+static int ftgmac100_probe_dt(struct net_device *netdev,
-+			      struct platform_device *pdev,
-+			      struct ftgmac100 *priv,
-+			      struct device_node *np)
-+{
-+	struct phy_device *phy;
-+	int err;
-+
-+	if (of_get_property(np, "use-ncsi", NULL))
-+		return ftgmac100_probe_ncsi(netdev, priv, pdev);
-+
-+	if (of_phy_is_fixed_link(np) ||
-+	    of_get_property(np, "phy-handle", NULL)) {
-+		/* Support "mdio"/"phy" child nodes for ast2400/2500
-+		 * with an embedded MDIO controller. Automatically
-+		 * scan the DTS for available PHYs and register
-+		 * them. 2600 has an independent MDIO controller, not
-+		 * part of the MAC.
-+		 */
-+		phy = of_phy_get_and_connect(priv->netdev, np,
-+					     &ftgmac100_adjust_link);
-+		if (!phy) {
-+			dev_err(&pdev->dev, "Failed to connect to phy\n");
-+			return -EINVAL;
-+		}
-+
-+		/* Indicate that we support PAUSE frames (see comment in
-+		 * Documentation/networking/phy.rst)
-+		 */
-+		phy_support_asym_pause(phy);
-+
-+		/* Display what we found */
-+		phy_attached_info(phy);
-+		return 0;
-+	}
-+
-+	if (!ftgmac100_has_child_node(np, "mdio")) {
-+		/* Support legacy ASPEED devicetree descriptions that
-+		 * decribe a MAC with an embedded MDIO controller but
-+		 * have no "mdio" child node. Automatically scan the
-+		 * MDIO bus for available PHYs.
-+		 */
-+		err = ftgmac100_mii_probe(netdev);
-+		if (err) {
-+			dev_err(priv->dev, "MII probe failed!\n");
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int ftgmac100_probe(struct platform_device *pdev)
- {
- 	const struct ftgmac100_match_data *match_data;
-@@ -1965,41 +2017,10 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 			goto err_phy_connect;
- 	}
+ 	/* initialize mdio bus */
+@@ -1740,9 +1740,6 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+ 	priv->mii_bus->read = ftgmac100_mdiobus_read;
+ 	priv->mii_bus->write = ftgmac100_mdiobus_write;
  
--	if (np && of_get_property(np, "use-ncsi", NULL)) {
--		err = ftgmac100_probe_ncsi(netdev, priv, pdev);
-+	if (np) {
-+		err = ftgmac100_probe_dt(netdev, pdev, priv, np);
- 		if (err)
--			goto err_setup_mdio;
--	} else if (np && (of_phy_is_fixed_link(np) ||
--			  of_get_property(np, "phy-handle", NULL))) {
--		struct phy_device *phy;
+-	for (i = 0; i < PHY_MAX_ADDR; i++)
+-		priv->mii_bus->irq[i] = PHY_POLL;
 -
--		phy = of_phy_get_and_connect(priv->netdev, np,
--					     &ftgmac100_adjust_link);
--		if (!phy) {
--			dev_err(&pdev->dev, "Failed to connect to phy\n");
--			err = -EINVAL;
- 			goto err_phy_connect;
--		}
--
--		/* Indicate that we support PAUSE frames (see comment in
--		 * Documentation/networking/phy.rst)
--		 */
--		phy_support_asym_pause(phy);
--
--		/* Display what we found */
--		phy_attached_info(phy);
--	} else if (np && !ftgmac100_has_child_node(np, "mdio")) {
--		/* Support legacy ASPEED devicetree descriptions that decribe a
--		 * MAC with an embedded MDIO controller but have no "mdio"
--		 * child node. Automatically scan the MDIO bus for available
--		 * PHYs.
--		 */
--		err = ftgmac100_mii_probe(netdev);
--		if (err) {
--			dev_err(priv->dev, "MII probe failed!\n");
--			goto err_ncsi_dev;
--		}
--
- 	}
+ 	mdio_np = of_get_child_by_name(np, "mdio");
  
- 	priv->rst = devm_reset_control_get_optional_exclusive(priv->dev, NULL);
-@@ -2057,11 +2078,9 @@ static int ftgmac100_probe(struct platform_device *pdev)
- err_register_netdev:
- err_phy_connect:
- 	ftgmac100_phy_disconnect(netdev);
--err_ncsi_dev:
- 	if (priv->ndev)
- 		ncsi_unregister_dev(priv->ndev);
- 	ftgmac100_destroy_mdio(netdev);
--err_setup_mdio:
- 	return err;
- }
- 
+ 	err = of_mdiobus_register(priv->mii_bus, mdio_np);
 
 -- 
 2.34.1
