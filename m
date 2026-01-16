@@ -1,179 +1,132 @@
-Return-Path: <netdev+bounces-250495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C48D2F572
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:12:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6387D2F6A0
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3855A3057F56
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:11:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16924310DE7B
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BB435F8AF;
-	Fri, 16 Jan 2026 10:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C07935F8CE;
+	Fri, 16 Jan 2026 10:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7BOVrZc";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SguTFJKn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oHWRvHPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011E535F8C7
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 10:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2928131960D;
+	Fri, 16 Jan 2026 10:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768558290; cv=none; b=BINxYuDW+80ppvrH+OYKpuM6HNqxm2yZW0Rhmf8XaJG+YyWI/EhtZ5qFEBajAOe5ltBLfB9fTFJ4W2J1K9Rvdihnp87HGhACh66m2loSvSG6aeldiW13jhOXoQwNlRaYSipWKeHVBsTA/kol6ZZROZSi8HoF/iZxgfTLhHK0Zmg=
+	t=1768558391; cv=none; b=NawAbWZyh/ZuaJuOPmAkP6TcJevzxHClpDjzWF1M5bOgqXp0nVuC0P/FxoiF69WFi67qAiBUUeaBxV5sujmBm0F+BETz1e9vEXlpYGVSpnvKUeUmOZp401ctOhtop0AJGG5YR3vVgJ4RhL0RZZiGP1ZX2q0O2g6ghLgMSUEfhi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768558290; c=relaxed/simple;
-	bh=GvKTSXpSnV61qIeIj7djXSRQdMUqOq9sB7I5GfaTK/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W9kyqN2Dt7MVXy6vRk3DqwiI7uc9/G1TfmVArJ7XskruA7wZ2wMIGpKAt5ayUXTEl4aDSL2n7pZA3Tymvtc4efxDxsygftL9l7HB18Yn2EH+M9VT70gHY4YsKI+L5hLH2swdPzLiCdzen4kfdsPy4YklpQB6/WDDVrkI0ANiL6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7BOVrZc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SguTFJKn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768558286;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
-	b=A7BOVrZcSOj8NtR1qeEtI0L0SXcEF22LYwdmkdics4UTOD1aYlpGGzn9LRpZtuIrEi8Vkk
-	z59VVikqaeDdvqSKmB/JoduO0pJVyXrktQYwhQp5qob3yCHw33DnFbIGoIAwudrNewFzf3
-	Ah3uWYLC9pM7IjrBi2/Q/VGnQbedQxA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-84-XWDIMKP-OWKHsrbfwu9v5Q-1; Fri, 16 Jan 2026 05:11:25 -0500
-X-MC-Unique: XWDIMKP-OWKHsrbfwu9v5Q-1
-X-Mimecast-MFC-AGG-ID: XWDIMKP-OWKHsrbfwu9v5Q_1768558284
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee868f5adso11925725e9.0
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 02:11:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768558284; x=1769163084; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
-        b=SguTFJKn50YAKa86lhueg5kezwUXRjoOu3hY7Pjw9Y4Rbc6TcaRRm3drqTqhXguBqn
-         Cnk2E4BvDMOtzuFutNwcHBhprztlLjEKdfmWV5r+W2eNInjs7Wp4h/OduCXEbQtUVkUL
-         VoypiLNhVlpuQIK6Wa+z5ms3+MaToSYfsKlxgDNOUMAjX9hoA+8aNuL6vCrD/vlTbWVI
-         h7/bIq+NblObGEJH4n0pD8xfc9OQ0KQYvmWUChZ67t2bj3xqWv6VyNc88wk7shOw4aiG
-         FJh1fhs3LIlZATygoIHMAFIn7E8WH9LGBfFGOMuSTEIJRhDGn6mCmXXkOTFR2COFYYTN
-         4KFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768558284; x=1769163084;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
-        b=u9ga56HAdYwpBcBkEmYfsfnAyFhqhrG9HxbKTu6kP5QsAQbxyJNNJ+S2dJxh8GZGxg
-         r3Z1ih+QMEvtWs4LCsp8SM81b89F0jaxQBOthEbBjWRQrTeVEM5yGxzseJmyafPkhSeU
-         8HYDh/CL2wRmVVz5H1bN1k3q8MD/upxvgkSf4HWJeWO0wRP6bcUf/XKybm2AsomqunRQ
-         obfFRJHC8FB4wRekDhcWtwA6ujpyqsZ26OXxlP4wihX3HAHdkomyyzd7KS9Cd9M/K79y
-         fswSmidIPtVLvb/7jhoFf00pFpJg5UWPRJJW2Jw8STYJDPEIWNssMOjPFmgEAH/Mph24
-         n5/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVDJXD4EZMvWmGKqzfk9eXD1BTYXO/pD4m+v1rVA7WV1KdlYsPS/z/jLu61jZCaPC7fzBr5zLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLwXy9glgLi71mv1CxBx2MH0/+uWxLVgjnXgIRkHmNWT9+mUpy
-	L5wv7rytdaXpsMm2c9vR2o8W+2QJqFkb3oUwVBu8eV+1gRIzBaXVw0WNo/yhrSvFCjnpGO9uo7L
-	Rz9r6LJw4i3w+6Dg+WnvnwDl6DdD3pBvC0s4iOKOuuL/VAbaHYH89UdRZjWA9saZHyA==
-X-Gm-Gg: AY/fxX5kjb0eMSeZW4qvNs5PELo7ShOVBda4JvvH2lMsvSczVjqEuz6WiX24Q4dTfLh
-	Rr2UzrgBmGRpSZjgGuvGo6Ch6Dzu4U7sLDPW0jTSsZ7O+TLuXy7uicW8beQPq9YZ9uDEw0VWKqV
-	GFyhOZyJZePMyUJD/GUWZT30B8RbG4UcsXrVK0RAiMnhyXDslbyQvYnBZ2VRjmSjw7lCt5YVsbI
-	+dCQ8tJ9mJqcbDim9wzQaLP98UITx0WQ6cmt/7bqGhwo9V6msbShAOOLAOyiNVx1EuZcEGE8Xap
-	GiOZS2He96pOiPObsId0w/XfFIYvnfwtP+MCn0RFk/bFL0RrWr+DsKr8ilIoJ8pJYBt6iRr9SoA
-	1gIOTYSz10gEa1CLNHTkx52UdsStmRzkh4BfUEyPdDoYMU+ErNiZCE+a1yHk=
-X-Received: by 2002:a05:600c:c178:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-4801e34cd0emr32517705e9.31.1768558283730;
-        Fri, 16 Jan 2026 02:11:23 -0800 (PST)
-X-Received: by 2002:a05:600c:c178:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-4801e34cd0emr32517485e9.31.1768558283318;
-        Fri, 16 Jan 2026 02:11:23 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e8d90b3sm35848465e9.15.2026.01.16.02.11.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 02:11:22 -0800 (PST)
-Date: Fri, 16 Jan 2026 11:11:20 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Luigi Leonardi <leonardi@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] vsock/test: Do not filter kallsyms by symbol type
-Message-ID: <aWoKNf1AI9s1bmYM@sgarzare-redhat>
-References: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
+	s=arc-20240116; t=1768558391; c=relaxed/simple;
+	bh=dD4ktUXSdzPxh0/i3Mr5JrynjVkQ61mtOqVLiI9+UHE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OyUPzxEpquodOFXaSVp8KmApb0CW2/xDQwdElmZZRR+zYamx8I/xu1pkcc08YCQtNemRIN07/53sdfP65+Qh+o0Rr78KfVLRuRWPU6kTlTBdrvBCVTs48Gk9dmtPxVG93ATOFgf8KsXFh6yPyzAeJ4Ian+rnrI7EALgDdhWlkeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oHWRvHPv; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 935271A28A8;
+	Fri, 16 Jan 2026 10:13:07 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6129560732;
+	Fri, 16 Jan 2026 10:13:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5E19110B68A09;
+	Fri, 16 Jan 2026 11:13:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768558386; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=CPzGsjCOcQw08nSbm42HGUOHFechIwaV6RDhIkpehf0=;
+	b=oHWRvHPvq0FBMMzmrorg/CGO2/SQ8eG4KA8rBOT6wf4NHgzLFLkEzG4+n2F7DEPsAyFtWt
+	4QwJpreD0EHxEk0Huq8kmNHVhwrSE8ItIcReRuQrgYkC4L1lhw8BDr4xGBmbcZUbsWfoD5
+	XgOmAfAOYgozh+Je98icNPsIMJ9sClntRW6SRupT5FiaXByY2pixWEBrru7a0f0q9bdTVS
+	GJfWPXosWKmm2DpUItcb+riwG6IYpP+R3zoGuV8fsa7aw3y9r+3/2QtRovSyP+qGZO3jUc
+	IGNYPQ0On53Yova6TZnUuOMrEDKuHKSh8iIZZ/eIjPbc9EAc9VmIgyhmY2l7RA==
+Message-ID: <f6fef672-a657-451c-b60e-d9786f743cc4@bootlin.com>
+Date: Fri, 16 Jan 2026 11:13:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] selftests: net: csum: Fix printk format in
+ recv_get_packet_csum_status()
+To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <8b69b40826553c1dd500d9d25e45883744f3f348.1768556791.git.chleroy@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <8b69b40826553c1dd500d9d25e45883744f3f348.1768556791.git.chleroy@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Jan 16, 2026 at 09:52:36AM +0100, Michal Luczaj wrote:
->Blamed commit implemented logic to discover available vsock transports by
->grepping /proc/kallsyms for known symbols. It incorrectly filtered entries
->by type 'd'.
->
->For some kernel configs having
->
->    CONFIG_VIRTIO_VSOCKETS=m
->    CONFIG_VSOCKETS_LOOPBACK=y
->
->kallsyms reports
->
->    0000000000000000 d virtio_transport	[vmw_vsock_virtio_transport]
->    0000000000000000 t loopback_transport
->
->Overzealous filtering might have affected vsock test suit, resulting in
->insufficient/misleading testing.
->
->Do not filter symbols by type. It never helped much.
->
->Fixes: 3070c05b7afd ("vsock/test: Introduce get_transports()")
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
->man nm says: 't' stands for symbol is in the text (code) section. Is this
->correct for `static struct virtio_transport loopback_transport`?
+Hi Christophe
 
-I'm not an expert, but yeah I was expecting "d" too, but maybe since
-it's static and built-in will be in the text section?
+On 16/01/2026 10:48, Christophe Leroy (CS GROUP) wrote:
+> Following warning is encountered when building selftests on powerpc/32.
+> 
+>   CC       csum
+> csum.c: In function 'recv_get_packet_csum_status':
+> csum.c:710:50: warning: format '%lu' expects argument of type 'long unsigned int', but argument 4 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+>   710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+>       |                                                ~~^
+>       |                                                  |
+>       |                                                  long unsigned int
+>       |                                                %u
+>   711 |                               cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
+>       |                               ~~~~~~~~~~~~
+>       |                                 |
+>       |                                 size_t {aka unsigned int}
+> csum.c:710:63: warning: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'unsigned int' [-Wformat=]
+>   710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+>       |                                                             ~~^
+>       |                                                               |
+>       |                                                               long unsigned int
+>       |                                                             %u
+> 
+> cm->cmsg_len has type __kernel_size_t and CMSG() macro has the type
+> returned by sizeof() which is size_t.
+> 
+> size_t is 'unsigned int' on some platforms and 'unsigned long' on
+> other ones so use %zu instead of %lu.
+> 
+> This fixes commit 91a7de85600d ("selftests/net: add csum offload test").
+> 
+> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
 
-BTW I just checked and for example on my 6.18.4-100.fc42.x86_64 I have:
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-0000000000000000 t sock_fs_type
-0000000000000000 t proto_net_ops
-0000000000000000 t net_inuse_ops
+Maxime
 
-And they are all static structs of built-in modules.
-So it seems it is common.
-
->---
-> tools/testing/vsock/util.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-
-Thanks for the fix!
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index 142c02a6834a..bf633cde82b0 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -25,7 +25,7 @@ enum transport {
-> };
->
-> static const char * const transport_ksyms[] = {
->-	#define x(name, symbol) "d " symbol "_transport",
->+	#define x(name, symbol) " " symbol "_transport",
-> 	KNOWN_TRANSPORTS(x)
-> 	#undef x
-> };
->
->---
->base-commit: a74c7a58ca2ca1cbb93f4c01421cf24b8642b962
->change-id: 20260113-vsock_test-kallsyms-grep-e08cd920621d
->
->Best regards,
->-- 
->Michal Luczaj <mhal@rbox.co>
->
+> ---
+> v2: Removed use %zu instead of %u and removed Fixes tag
+> ---
+>  tools/testing/selftests/net/lib/csum.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
+> index 27437590eeb53..e28884ce3ab39 100644
+> --- a/tools/testing/selftests/net/lib/csum.c
+> +++ b/tools/testing/selftests/net/lib/csum.c
+> @@ -707,7 +707,7 @@ static uint32_t recv_get_packet_csum_status(struct msghdr *msg)
+>  			      cm->cmsg_level, cm->cmsg_type);
+>  
+>  		if (cm->cmsg_len != CMSG_LEN(sizeof(struct tpacket_auxdata)))
+> -			error(1, 0, "cmsg: len=%lu expected=%lu",
+> +			error(1, 0, "cmsg: len=%zu expected=%zu",
+>  			      cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
+>  
+>  		aux = (void *)CMSG_DATA(cm);
 
 
