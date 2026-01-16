@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-250357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F622D295DF
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:07:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA33D295E5
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:07:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D45FA300A501
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:07:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DEA80301BB0D
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9E117BA6;
-	Fri, 16 Jan 2026 00:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB141F92E;
+	Fri, 16 Jan 2026 00:07:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7712AEF5;
-	Fri, 16 Jan 2026 00:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B716D182D0;
+	Fri, 16 Jan 2026 00:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768522023; cv=none; b=lbCJw7oc1FC6OepSUBI+Y9H+pGzk6uxENCe+MQwLMRO2ixajW8LkdLUdoMalrSFpwtRGeZzN/tRQZhbd86uzS59Wa6Z7IfhzhMoacvpu6o0cVc9E8fJkuKFZR+V3VraW0rM2FmGDugLuhYBQP9LplVGHIilDhetMkiXTVTYp7jk=
+	t=1768522031; cv=none; b=WNGYNNjWOg/Pb9uvWPuLEAumVgRe41hjabzw24bq+bJq38K1PhFrCQUeCC3gC+OV4ty4XspqlaE0epiBydGI+I+UKqMxGbAtNA4LVSP3FP195Ij8zRMpIXGLb98YfX0hqyMLEA4XG5q2qMCwcW0CRnad/6dXtQMvHtnR2cDSwGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768522023; c=relaxed/simple;
-	bh=ZWG9lOM2O3p9oipJ7/sTnYvspCAzyjnu3Rc+qj0Q0Jg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ktOgJMjYxoIKVlXftBIJZIGDlxWffK9Ru1hjkU0jFQZBqqqRJ8zZ/OMQWessoPY61yrB3ZmxYMaGXrJqlvAfQ8KCO6eUqQcqt76XoxWo6iBDcOTEsshyKfw/SAamUN2wxniT3ulVsntx/XYPWgUkg3RT4iUtU6omriMva2C3GTE=
+	s=arc-20240116; t=1768522031; c=relaxed/simple;
+	bh=lVwW+ZIzwZlAGPTlomz9CtGlt07l+YYmlibe8px+xUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQphf/IqZHWFELu20y9CWOrJFVy/47bg3paM4z+EOmVyYlSmY4odfdJbTXDcE1JKthVTjTVxXLKAAZl9kykWRUSKkGlfz4BHq2YkzoJ3mTQqxm4rWSJVPEayR2lTRcpRU85sYl0rMw/OO2tfVf1dJq2obhQADnH+sd2efQkKut8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vgXMZ-000000007Xs-49Fb;
-	Fri, 16 Jan 2026 00:06:52 +0000
-Date: Fri, 16 Jan 2026 00:06:48 +0000
+	id 1vgXMn-000000007Y7-249h;
+	Fri, 16 Jan 2026 00:07:05 +0000
+Date: Fri, 16 Jan 2026 00:07:02 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -46,9 +46,10 @@ To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
-Subject: [PATCH net-next v3 0/6] net: dsa: lantiq: add support for Intel
- GSW150
-Message-ID: <cover.1768519376.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v3 1/6] dt-bindings: net: dsa: lantiq,gswip: use
+ correct node name
+Message-ID: <b85391636db5af2f038ba6968b292199d312f403.1768519376.git.daniel@makrotopia.org>
+References: <cover.1768519376.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,39 +58,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1768519376.git.daniel@makrotopia.org>
 
-The Intel GSW150 Ethernet Switch (aka. Lantiq PEB7084) is the predecessor of
-MaxLinear's GSW1xx series of switches. It shares most features, but has a
-slightly different port layout and different MII interfaces.
-Adding support for this switch to the mxl-gsw1xx driver is quite trivial.
+Ethernet PHYs should use nodes named 'ethernet-phy@'.
+Rename the Ethernet PHY nodes in the example to comply.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 ---
-Changes since v2:
- * enclose the gswip_hw_info initializers in compiler diag exception
-   to prevent triggering -Woverride-init
+v3: no changes
+v2: new patch
 
-Changes since initial submission:
- * add patch fixing node naming convention for dt-bindings
- * introduce GSWIP_MAX_PORTS macro
- * don't assert SGMII PCS reset in case chip doesn't have SGMII
- * use case ranges in phylink_get_caps
+ Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-Daniel Golle (6):
-  dt-bindings: net: dsa: lantiq,gswip: use correct node name
-  dt-bindings: net: dsa: lantiq,gswip: add Intel GSW150
-  net: dsa: lantiq: allow arbitrary MII registers
-  net: dsa: lantiq: clean up phylink_get_caps switch statement
-  net: dsa: mxl-gsw1xx: only setup SerDes PCS if it exists
-  net: dsa: mxl-gsw1xx: add support for Intel GSW150
-
- .../bindings/net/dsa/lantiq,gswip.yaml        |   6 +-
- drivers/net/dsa/lantiq/lantiq_gswip.c         |  49 ++++--
- drivers/net/dsa/lantiq/lantiq_gswip.h         |   6 +-
- drivers/net/dsa/lantiq/lantiq_gswip_common.c  |  27 +---
- drivers/net/dsa/lantiq/mxl-gsw1xx.c           | 146 ++++++++++++++----
- drivers/net/dsa/lantiq/mxl-gsw1xx.h           |   2 +
- 6 files changed, 163 insertions(+), 73 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index 205b683849a53..9c0de536bae97 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -316,7 +316,7 @@ examples:
+                 #address-cells = <1>;
+                 #size-cells = <0>;
+ 
+-                switchphy0: switchphy@0 {
++                switchphy0: ethernet-phy@0 {
+                     reg = <0>;
+ 
+                     leds {
+@@ -331,7 +331,7 @@ examples:
+                     };
+                 };
+ 
+-                switchphy1: switchphy@1 {
++                switchphy1: ethernet-phy@1 {
+                     reg = <1>;
+ 
+                     leds {
 -- 
 2.52.0
 
