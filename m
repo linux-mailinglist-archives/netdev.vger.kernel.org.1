@@ -1,58 +1,53 @@
-Return-Path: <netdev+bounces-250406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F26D2A55E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:49:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 713DDD2A5E7
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B88C83000369
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:49:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E07463058A2B
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381CD1D54FA;
-	Fri, 16 Jan 2026 02:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD9F337117;
+	Fri, 16 Jan 2026 02:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlIn1LKv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZH6GEZu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141D32EB10;
-	Fri, 16 Jan 2026 02:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6683631D371;
+	Fri, 16 Jan 2026 02:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768531764; cv=none; b=Y5xU1Bn5D/ikEqmSa9QgA9zJev0WQ8Pgt00u27iFqYvrL5m/BXbiC3tpTqmZqTHjdFrzT3xn7dYGqS5u9WQjKLOQ5scO0QWRWKhPHvWcNzYNixrTpOc6bi8r4RutAo7p120ERNCjWjEIjpMr9tIQpzczruYPgzzEhknDm+bWbMk=
+	t=1768531871; cv=none; b=Bl6UsxX3T7InU9eZp3KrKxU4EMnteiIHmA7qKyO4jlRBeWfXMV8wVYqsBIQP0WMV3yd8hw9oYpFhlWcQ/7X6Q5We1bG6y7eW2phTl7eckrcZHXY5KmDM4Ld0Wkhjn1AYxKSQD2unGsLZmB7dNYuyxLXohFuuPsOw6J2oMwSBRZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768531764; c=relaxed/simple;
-	bh=naNXNmtw5GvOQ0Wi06agiNYq5/AY9obtlTtzMBUwwuY=;
+	s=arc-20240116; t=1768531871; c=relaxed/simple;
+	bh=c+ublGeQ2GKZNYsbFMLt62VOVByqn7UxmEQZbcPs/ic=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZsKGEXg8AWDuDaqt+zpDqspLHcmgFd5042v7qaRMdy2oclo/e89RjtufND73I7F0ucwWjKrm4v3xtREAZMlU4VuyB37OE0nTJHPgm59KRY+zISc/fVfzge5TOoY4lJf3aRhtQ3FE6m/VjDgoYhSEAM0CXru7nUmL3C5zDUOp24o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlIn1LKv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B74C116D0;
-	Fri, 16 Jan 2026 02:49:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=H0VYtk97/4RvFndJEt9USpjUqEyxHcxfMSBhPc4kvHqNYODbLmGivTuzWtLfaw027d0JbBBQ2R2tDIKu18YriMt/zpB3uEWEYAJN5OL+2yVkKmQUFPaItmmxi2VjHjXJMhS88D7yajiIWZ1se+dPCT+5hjeBABIGNUrhR4G1F2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZH6GEZu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EBF7C116D0;
+	Fri, 16 Jan 2026 02:51:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768531763;
-	bh=naNXNmtw5GvOQ0Wi06agiNYq5/AY9obtlTtzMBUwwuY=;
+	s=k20201202; t=1768531871;
+	bh=c+ublGeQ2GKZNYsbFMLt62VOVByqn7UxmEQZbcPs/ic=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SlIn1LKvDxsHVkJLmzgFnLPLIL8vLFPv0QnTyKPLisMrQErAmGu3IsvxDt4wsWcmG
-	 kPlFzIwOj2pp8/RKJk9S6koFc9k17LsWdNPd5sCle1YrnIU7px0enjogYEfGkCBBVN
-	 9iUbaUBRvJTdDaN/I48cq+ZsjB9MVdzJA9Y+bAHKxUXPYWsidgg8uuNMEACIqH5vdi
-	 gZ+LFcxCLW7pxXmJwofh+K47sEHFEhg/6ypJ74Q0NCueB69xL4KmyUt+agpaVW/ZDe
-	 Wp+56u3pk2rS80aLyzVSe4NthAbVTQtNdWsuX/oAecY1+JpL8/UdWFQKLw1h2M91Wj
-	 KVr69vwHupRSg==
-Date: Thu, 15 Jan 2026 18:49:22 -0800
+	b=IZH6GEZuC9kIX7Uu1Pc+zGv7wETXlTqy7vIighXRTBXLf7UgGXBwgFM3s5R35rm1S
+	 uEPbyK0MqVOe0hPJdnGkrwkRnLmqW14DGTCjNlHnZzhIx0vr044GPYYwFvFXaOTTfM
+	 P4wN0jQm367CVMrrJ9Yag9iiUiHHB7nB8pS2URsNqs8C+XG3sNxcx+7TiolfFgeSa5
+	 wZ6VDf3gnCsREeOP0cYNOq74DO7CuEFlGqqu9dK2gfo/9RXCB0piYd2+hp6OxCHShk
+	 xO7PRlrKgeT+5eqU4ybyhuDIlNhXYqbPWIusqToPqyMEkyLvtP4XwfD5C94j+Bk7OO
+	 MCPHIHdoftf3A==
+Date: Thu, 15 Jan 2026 18:51:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Geliang Tang <geliang@kernel.org>
-Cc: John Fastabend <john.fastabend@gmail.com>, Sabrina Dubroca
- <sd@queasysnail.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Gang Yan
- <yangang@kylinos.cn>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next v2] selftests: tls: use mkstemp instead of
- open(O_TMPFILE)
-Message-ID: <20260115184922.7e346931@kernel.org>
-In-Reply-To: <2fa14a04f5287c956a1112cef8cdfb2c86931d2d.1768467496.git.tanggeliang@kylinos.cn>
-References: <2fa14a04f5287c956a1112cef8cdfb2c86931d2d.1768467496.git.tanggeliang@kylinos.cn>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de
+Subject: Re: [PATCH net 0/4] pull-request: can 2026-01-15
+Message-ID: <20260115185110.6c4de645@kernel.org>
+In-Reply-To: <20260115090603.1124860-1-mkl@pengutronix.de>
+References: <20260115090603.1124860-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,14 +57,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 Jan 2026 17:02:40 +0800 Geliang Tang wrote:
-> This is because the /tmp directory uses the virtiofs filesystem, which does
-> not support the O_TMPFILE feature.
+On Thu, 15 Jan 2026 09:57:07 +0100 Marc Kleine-Budde wrote:
+> Hello netdev-team,
+> 
+> this is a pull request of 4 patches for net/main, it super-seeds the
+> "can 2026-01-14" pull request. The dev refcount leak in patch #3 is
+> fixed.
+> 
+> The first 3 patches are by Oliver Hartkopp and revert the approach to
+> instantly reject unsupported CAN frames introduced in
+> net-next-for-v6.19 and replace it by placing the needed data into the
+> CAN specific ml_priv.
+> 
+> The last patch is by Tetsuo Handa and fixes a J1939 refcount leak for
+> j1939_session in session deactivation upon receiving the second RTS.
 
-I don't think selftests are expected to support setups where /tmp 
-isn't tmp. Please fix your setup instead (or explain why it's very
-crucial that you don't). The upstream CI runs all the selftests in
-VMs and they are working just fine.
--- 
-pw-bot: reject
+Hi Marc!
+
+Was the AI wrong here
+https://lore.kernel.org/all/20260110223836.3890248-1-kuba@kernel.org/
+or that fix is still in the works?
 
