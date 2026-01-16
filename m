@@ -1,310 +1,211 @@
-Return-Path: <netdev+bounces-250519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB2FD30D22
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:03:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E68B7D31195
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7D57302D2C6
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:03:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C30073092216
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9D436E48B;
-	Fri, 16 Jan 2026 12:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04F01A0BD0;
+	Fri, 16 Jan 2026 12:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MPPpH4hH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZsRsJEf/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FDC36C5BA
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 12:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF28E1DE4EF;
+	Fri, 16 Jan 2026 12:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768565036; cv=none; b=D2XAWD/NsNNho/JzzoreDBS5UCmukZLSNxMh17mUnmz569K7O//ikjYsaW25eGVKqhkS0BWFpR4G/BJJCPR2qbxEElHg0HMebBhpeh3fc6rj0FVij9f3Z40kOnf1zCkQLFEgkEkHoSTEt1cNYSdz0v3ZuT13O0u3IdqTDc6R3Aw=
+	t=1768566550; cv=none; b=jx/LU4Wn7cpZK2fIqEJcaF+YcAKvRknSFttYveOywTdf5gZSMHFJ/Q6A4nBeY5QW0Dnskr1SFn2DRMT3u8/ThDR61/VyGbGwhFWv4aIVYJryujUTjx1K4mq84MtHob9xnZiArJaXOmrvobJuSV+hh4Fvhuk7qDMwwx4TV+xdRe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768565036; c=relaxed/simple;
-	bh=oBO3ITxFMX8v/YIdID1ueiMqoXkXoALFvhh4gQNVedQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i3ZvSU994+UqY2gZEQKlsFBnSK/8h0y3HVGWcnnBvTuUPplnSWPK3WEVyvRXa4umikPsYqifE2bS879HFJ258xWJWHo5inExsGDfNw+ocVBOtXKjg49c+hq6AwTAqesRYu99/WCOzkfwq8XF1YhpqcVJ7CTMyAGH5ZNw5Vxn0m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MPPpH4hH; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1768566550; c=relaxed/simple;
+	bh=xi6zM5CVklLfECdqHMYOBwNT/HjrbAQtzgaoZogHnGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbwpwxcaK8Ti6qammFdYw1vQZ7rQR9Gp+WfTgS2bbNX2JlDyRNWWtE+n3R4tqZmmguYf+s8XYeTi3yiTja8hqpJYUJY8mjSVOcTYxcZeLbQUaF+JimQwWG3PrH3ievKnHuqbNMXN0HSUyCqRozBlI7ZTpaNOYpaVbIDmPoC/COs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZsRsJEf/; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768565035; x=1800101035;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oBO3ITxFMX8v/YIdID1ueiMqoXkXoALFvhh4gQNVedQ=;
-  b=MPPpH4hHsZzo0WfQOeUGqnazYw+MRL86snmtJXnO4LUzfc0+Tms9YnUr
-   eR4nHOJDISxYAmY/2F4ItWm3kEOK9TnJaCuhc3orUkC/QUxR+2Yhkpp2e
-   xvUry6VFmq+IDg1MVg+chNpSAU7HcZEEynUx0Mh9hSLI/eBOcHpA2TD59
-   bcQh1zHlE0GJXT4rISprLAJZMaVnAAYqEFRssvYeykSocC7Plj4ggMCZ+
-   t4/0VCbhxWRyfVMA2BzyEt90KJ+Xxo6wpRujaxbFCBnlBDTKhn1tbfAcP
-   USshPHtt4Vebj3SyEwohNB86eHwIBcTbpasszs9O844Xf0sc/kcFThphU
-   w==;
-X-CSE-ConnectionGUID: hm3QTbrhSbykYS1YAcY1Nw==
-X-CSE-MsgGUID: tIIqaaoGREu3DUvY9ZSOvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="80521210"
+  t=1768566545; x=1800102545;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xi6zM5CVklLfECdqHMYOBwNT/HjrbAQtzgaoZogHnGk=;
+  b=ZsRsJEf/vK1anXUXmW7JYtGZI282edn0MHA6+wReWxYztmKTHpMC5ssy
+   tAHadgkXSvFTXQZBnpI08iAUsaCxSRSLRcoUP2f64bYleEpVExjBPAUpr
+   Y/HUImRlOzUfUTZFMhBM5aAh2Wu2b+bh3DKmouWkoFNnXe1IhDF+bRND5
+   C3VN8/ZS06CCSDGzCNr1NaY5hFWQB+0KNB5ycJosHRESJ5kxhw7etBt8M
+   NB3MORhHypmQRX9aeCRlTG5DFSZP91k90JVu1R2PegFsC+txzQDkXh3P/
+   k8PdBPu+2Va0N+OQSsXFUhfQoXOgjgkbL0c/IcSpLhLAgqosPDPQ8JcIm
+   Q==;
+X-CSE-ConnectionGUID: Rkx3tlRwQLybkafiz5dH/g==
+X-CSE-MsgGUID: oRSfnv43TKOv3/QHR2b6ag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="68889869"
 X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="80521210"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 04:03:54 -0800
-X-CSE-ConnectionGUID: 7RmJ2Ic6RKOtmtj4BR6B5A==
-X-CSE-MsgGUID: kKyMe24NSx23sfw3MN0Lxw==
+   d="scan'208";a="68889869"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 04:29:04 -0800
+X-CSE-ConnectionGUID: cciyI+moRiCnC1gkccgIFw==
+X-CSE-MsgGUID: M4jROaV+Qo67aryhk+swUA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="242772742"
-Received: from amlin-018-252.igk.intel.com ([10.102.18.252])
-  by orviesa001.jf.intel.com with ESMTP; 16 Jan 2026 04:03:52 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-next 2/2] ixgbe: e610: add ACI dynamic debug
-Date: Fri, 16 Jan 2026 13:24:38 +0100
-Message-ID: <20260116122438.78275-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.47.1
+   d="scan'208";a="204384752"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 16 Jan 2026 04:28:59 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vgiwi-00000000KpE-0KSC;
+	Fri, 16 Jan 2026 12:28:56 +0000
+Date: Fri, 16 Jan 2026 20:28:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Fang <wei.fang@nxp.com>, shenwei.wang@nxp.com,
+	xiaoning.wang@nxp.com, frank.li@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 14/14] net: fec: add AF_XDP zero-copy support
+Message-ID: <202601162115.ATDIXPBp-lkp@intel.com>
+References: <20260116074027.1603841-15-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260116074027.1603841-15-wei.fang@nxp.com>
 
-Enable dynamic debug (dyndbg) of Admin Command Interface (ACI) for e610
-adapter. Utilizes the standard dynamic debug interface. For example to
-enable dyndbg at driver load:
+Hi Wei,
 
-insmod ixgbe.ko dyndbg='+p'
+kernel test robot noticed the following build warnings:
 
-ACI debug output for e610 adapter is immediately printed into a kernel
-log (dmesg). Example output:
+[auto build test WARNING on net-next/main]
 
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0701, flags 0x3003, datalen 0x0060, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x8194E044 0x00600000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0: Buffer:
-ixgbe 0000:01:00.0 eth0: 00000000: 01 00 17 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000010: 1d 00 00 00 0b d5 1e 15 5e 4b 90 63 aa 0b 21 31
-ixgbe 0000:01:00.0 eth0: 00000020: 69 eb cd ab dc f8 8a fd f4 53 e2 dc 54 e0 81 fa
-ixgbe 0000:01:00.0 eth0: 00000030: 12 dc 41 82 01 00 00 00 24 20 08 26 53 08 00 00
-ixgbe 0000:01:00.0 eth0: 00000040: 08 00 14 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0009, flags 0x2003, datalen 0x0000, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x00000001 0x00000000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/net-fec-add-fec_txq_trigger_xmit-helper/20260116-154834
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260116074027.1603841-15-wei.fang%40nxp.com
+patch subject: [PATCH v2 net-next 14/14] net: fec: add AF_XDP zero-copy support
+config: arm-imx_v4_v5_defconfig (https://download.01.org/0day-ci/archive/20260116/202601162115.ATDIXPBp-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260116/202601162115.ATDIXPBp-lkp@intel.com/reproduce)
 
-Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 112 ++++++++++++++++--
- 1 file changed, 105 insertions(+), 7 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601162115.ATDIXPBp-lkp@intel.com/
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index f494e90..bccd51e 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -9,6 +9,78 @@
- #include "ixgbe_mbx.h"
- #include "ixgbe_phy.h"
- 
-+#define IXGBE_ACI_DEBUG_ROW_SIZE	16
-+#define IXGBE_ACI_DEBUG_GROUP_SIZE	1
-+#define IXGBE_NETDEV_PREFIX_BUF_SIZE	64
-+
-+/**
-+ * ixgbe_hex_debug_dump - dump a blob of data in "hex ASCII" format
-+ * @hw: hardware structure address
-+ * @buf: data blob to dump
-+ * @buf_size: number of bytes in the @buf
-+ *
-+ * Dump a blob of data into a kernel log. The blob is printed in lines
-+ * consisting of 16 or 32 bytes decorated with PCI device string. Each byte is
-+ * printed in a "hex ASCII" format.
-+ * Example output:
-+ * ixgbe 0000:01:00.1 eth14: 00000000: 01 00 17 00 00 00 00 00 00 00 00 00 00 00 00 00
-+ * ixgbe 0000:01:00.1 eth14: 00000010: 1d 00 00 00 0b d5 1e 15 5e 4b 90 63 aa 0b 21 31
-+ * ixgbe 0000:01:00.1 eth14: 00000020: 69 eb cd ab dc f8 8a fd f4 53 e2 dc 54 e0 81 fa
-+ */
-+static void ixgbe_hex_debug_dump(struct ixgbe_hw *hw, void *buf,
-+				 size_t buf_size)
-+{
-+	char netdev_info[IXGBE_NETDEV_PREFIX_BUF_SIZE];
-+	struct ixgbe_adapter *adapter = hw->back;
-+	struct pci_dev *pdev = adapter->pdev;
-+
-+	snprintf(netdev_info, IXGBE_NETDEV_PREFIX_BUF_SIZE,
-+		 "%s %s %s: ", ixgbe_driver_name, pci_name(pdev),
-+		 netdev_name(adapter->netdev));
-+	print_hex_dump_debug(netdev_info, DUMP_PREFIX_OFFSET,
-+			     IXGBE_ACI_DEBUG_ROW_SIZE,
-+			     IXGBE_ACI_DEBUG_GROUP_SIZE,
-+			     buf, buf_size, false);
-+}
-+
-+/**
-+ * ixgbe_aci_debug - dump the ACI content
-+ * @hw: pointer to the hardware structure
-+ * @desc: pointer to control queue descriptor
-+ * @buf: pointer to command buffer
-+ * @buf_len: max length of buf
-+ *
-+ * Dump individual ACI commands and its descriptor details.
-+ */
-+static void ixgbe_aci_debug(struct ixgbe_hw *hw, void *desc, void *buf,
-+			    u16 buf_len)
-+{
-+	struct libie_aq_desc *aq_desc = desc;
-+	u16 datalen, flags;
-+
-+	datalen = le16_to_cpu(aq_desc->datalen);
-+	flags = le16_to_cpu(aq_desc->flags);
-+
-+	hw_dbg(hw, "CQ CMD: opcode 0x%04X, flags 0x%04X, datalen 0x%04X, retval 0x%04X\n",
-+	       le16_to_cpu(aq_desc->opcode), flags, datalen,
-+	       le16_to_cpu(aq_desc->retval));
-+	hw_dbg(hw, "\tcookie (h,l) 0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->cookie_high),
-+	       le32_to_cpu(aq_desc->cookie_low));
-+	hw_dbg(hw, "\tparam (0,1)  0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->params.generic.param0),
-+	       le32_to_cpu(aq_desc->params.generic.param1));
-+	hw_dbg(hw, "\taddr (h,l)   0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->params.generic.addr_high),
-+	       le32_to_cpu(aq_desc->params.generic.addr_low));
-+
-+	if (buf && datalen && (flags & (LIBIE_AQ_FLAG_DD | LIBIE_AQ_FLAG_CMP |
-+	    LIBIE_AQ_FLAG_RD))) {
-+		hw_dbg(hw, "Buffer:\n");
-+		ixgbe_hex_debug_dump(hw, buf, min(buf_len, datalen));
-+	}
-+}
-+
- /**
-  * ixgbe_should_retry_aci_send_cmd_execute - decide if ACI command should
-  * be resent
-@@ -69,26 +141,33 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	/* It's necessary to check if mechanism is enabled */
- 	hicr = IXGBE_READ_REG(hw, IXGBE_PF_HICR);
- 
--	if (!(hicr & IXGBE_PF_HICR_EN))
-+	if (!(hicr & IXGBE_PF_HICR_EN)) {
-+		hw_dbg(hw, "CSR mechanism is not enabled\n");
- 		return -EIO;
-+	}
- 
- 	if (hicr & IXGBE_PF_HICR_C) {
- 		hw->aci.last_status = LIBIE_AQ_RC_EBUSY;
-+		hw_dbg(hw, "CSR mechanism is busy\n");
- 		return -EBUSY;
- 	}
- 
- 	opcode = le16_to_cpu(desc->opcode);
- 
--	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE)
-+	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE) {
-+		hw_dbg(hw, "buf_size is too big\n");
- 		return -EINVAL;
-+	}
- 
- 	if (buf)
- 		desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_BUF);
- 
- 	if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_BUF)) {
- 		if ((buf && !buf_size) ||
--		    (!buf && buf_size))
-+		    (!buf && buf_size)) {
-+			hw_dbg(hw, "error: invalid argument buf or buf_size\n");
- 			return -EINVAL;
-+		}
- 		if (buf && buf_size)
- 			valid_buf = true;
- 	}
-@@ -106,8 +185,12 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 		if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_RD)) {
- 			for (i = 0; i < buf_size / 4; i++)
- 				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), ((u32 *)buf)[i]);
--			if (buf_tail_size)
-+			ixgbe_aci_debug(hw, desc, buf, buf_size);
-+			if (buf_tail_size) {
- 				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), buf_tail);
-+				ixgbe_aci_debug(hw, desc, &buf_tail,
-+						buf_tail_size);
-+			}
- 		}
- 	}
- 
-@@ -148,6 +231,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
- 			raw_desc[i] = cpu_to_le32(raw_desc[i]);
- 		}
-+		ixgbe_aci_debug(hw, raw_desc, NULL, 0);
- 	}
- 
- 	/* Read async Admin Command response */
-@@ -156,14 +240,21 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
- 			raw_desc[i] = cpu_to_le32(raw_desc[i]);
- 		}
-+		ixgbe_aci_debug(hw, raw_desc, NULL, 0);
- 	}
- 
- 	/* Handle timeout and invalid state of HICR register */
--	if (hicr & IXGBE_PF_HICR_C)
-+	if (hicr & IXGBE_PF_HICR_C) {
-+		hw_dbg(hw, "error: Admin Command 0x%X command timeout\n",
-+		       le16_to_cpu(desc->opcode));
- 		return -ETIME;
-+	}
- 
--	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV))
-+	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV)) {
-+		hw_dbg(hw, "error: Admin Command 0x%X invalid state of HICR register\n",
-+		       le16_to_cpu(desc->opcode));
- 		return -EIO;
-+	}
- 
- 	/* For every command other than 0x0014 treat opcode mismatch
- 	 * as an error. Response to 0x0014 command read from HIDA_2
-@@ -171,12 +262,16 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	 * different opcode than the command.
- 	 */
- 	if (desc->opcode != cpu_to_le16(opcode) &&
--	    opcode != ixgbe_aci_opc_get_fw_event)
-+	    opcode != ixgbe_aci_opc_get_fw_event) {
-+		hw_dbg(hw, "error: Admin Command failed, bad opcode returned\n");
- 		return -EIO;
-+	}
- 
- 	if (desc->retval) {
- 		hw->aci.last_status = (enum libie_aq_err)
- 			le16_to_cpu(desc->retval);
-+		hw_dbg(hw, "error: Admin Command failed with error %x\n",
-+		       le16_to_cpu(desc->retval));
- 		return -EIO;
- 	}
- 
-@@ -184,10 +279,13 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if (valid_buf) {
- 		for (i = 0; i < buf_size / 4; i++)
- 			((u32 *)buf)[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
-+		ixgbe_aci_debug(hw, raw_desc, buf, buf_size);
- 		if (buf_tail_size) {
- 			buf_tail = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
- 			memcpy(buf + buf_size - buf_tail_size, &buf_tail,
- 			       buf_tail_size);
-+			ixgbe_aci_debug(hw, raw_desc, &buf_tail,
-+					buf_tail_size);
- 		}
- 	}
- 
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/freescale/fec_main.c:1040:4: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+    1040 |                         default:
+         |                         ^
+   drivers/net/ethernet/freescale/fec_main.c:1040:4: note: insert 'break;' to avoid fall-through
+    1040 |                         default:
+         |                         ^
+         |                         break; 
+   1 warning generated.
+
+
+vim +1040 drivers/net/ethernet/freescale/fec_main.c
+
+61a4427b955f79d drivers/net/ethernet/freescale/fec_main.c Nimrod Andy    2014-06-12   970  
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   971  /* Init RX & TX buffer descriptors
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   972   */
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   973  static void fec_enet_bd_init(struct net_device *dev)
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   974  {
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   975  	struct fec_enet_private *fep = netdev_priv(dev);
+4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   976  	struct fec_enet_priv_tx_q *txq;
+4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   977  	struct fec_enet_priv_rx_q *rxq;
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   978  	struct bufdesc *bdp;
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   979  	unsigned int i;
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   980  	unsigned int q;
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   981  
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   982  	for (q = 0; q < fep->num_rx_queues; q++) {
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   983  		/* Initialize the receive buffer descriptors. */
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   984  		rxq = fep->rx_queue[q];
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   985  		bdp = rxq->bd.base;
+4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   986  
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   987  		for (i = 0; i < rxq->bd.ring_size; i++) {
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   988  
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   989  			/* Initialize the BD for every fragment in the page. */
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   990  			if (bdp->cbd_bufaddr)
+5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24   991  				bdp->cbd_sc = cpu_to_fec16(BD_ENET_RX_EMPTY);
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   992  			else
+5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24   993  				bdp->cbd_sc = cpu_to_fec16(0);
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   994  			bdp = fec_enet_get_nextdesc(bdp, &rxq->bd);
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   995  		}
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   996  
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   997  		/* Set the last buffer to wrap */
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   998  		bdp = fec_enet_get_prevdesc(bdp, &rxq->bd);
+bd31490718b47d9 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2025-11-19   999  		bdp->cbd_sc |= cpu_to_fec16(BD_ENET_RX_WRAP);
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1000  
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1001  		rxq->bd.cur = rxq->bd.base;
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1002  	}
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1003  
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1004  	for (q = 0; q < fep->num_tx_queues; q++) {
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1005  		/* ...and the same for transmit */
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1006  		txq = fep->tx_queue[q];
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1007  		bdp = txq->bd.base;
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1008  		txq->bd.cur = bdp;
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1009  
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1010  		for (i = 0; i < txq->bd.ring_size; i++) {
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1011  			struct page *page;
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1012  
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1013  			/* Initialize the BD for every fragment in the page. */
+5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24  1014  			bdp->cbd_sc = cpu_to_fec16(0);
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1015  
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1016  			switch (txq->tx_buf[i].type) {
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1017  			case FEC_TXBUF_T_SKB:
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1018  				if (bdp->cbd_bufaddr &&
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1019  				    !IS_TSO_HEADER(txq, fec32_to_cpu(bdp->cbd_bufaddr)))
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1020  					dma_unmap_single(&fep->pdev->dev,
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1021  							 fec32_to_cpu(bdp->cbd_bufaddr),
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1022  							 fec16_to_cpu(bdp->cbd_datlen),
+178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1023  							 DMA_TO_DEVICE);
+af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1024  				dev_kfree_skb_any(txq->tx_buf[i].buf_p);
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1025  				break;
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1026  			case FEC_TXBUF_T_XDP_NDO:
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1027  				dma_unmap_single(&fep->pdev->dev,
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1028  						 fec32_to_cpu(bdp->cbd_bufaddr),
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1029  						 fec16_to_cpu(bdp->cbd_datlen),
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1030  						 DMA_TO_DEVICE);
+af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1031  				xdp_return_frame(txq->tx_buf[i].buf_p);
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1032  				break;
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1033  			case FEC_TXBUF_T_XDP_TX:
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1034  				page = txq->tx_buf[i].buf_p;
+65589e860a80369 drivers/net/ethernet/freescale/fec_main.c Byungchul Park 2025-07-21  1035  				page_pool_put_page(pp_page_to_nmdesc(page)->pp,
+f1d89a02b16bcdc drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1036  						   page, 0, false);
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1037  				break;
+f9806afd55c4ab1 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1038  			case FEC_TXBUF_T_XSK_TX:
+f9806afd55c4ab1 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1039  				xsk_buff_free(txq->tx_buf[i].buf_p);
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16 @1040  			default:
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1041  				break;
+81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1042  			};
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1043  
+af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1044  			txq->tx_buf[i].buf_p = NULL;
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1045  			/* restore default tx buffer type: FEC_TXBUF_T_SKB */
+20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1046  			txq->tx_buf[i].type = FEC_TXBUF_T_SKB;
+5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24  1047  			bdp->cbd_bufaddr = cpu_to_fec32(0);
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1048  			bdp = fec_enet_get_nextdesc(bdp, &txq->bd);
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1049  		}
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1050  
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1051  		/* Set the last buffer to wrap */
+7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1052  		bdp = fec_enet_get_prevdesc(bdp, &txq->bd);
+bd31490718b47d9 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2025-11-19  1053  		bdp->cbd_sc |= cpu_to_fec16(BD_ENET_TX_WRAP);
+4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13  1054  		txq->dirty_tx = bdp;
+14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1055  	}
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1056  }
+59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1057  
+
 -- 
-2.47.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
