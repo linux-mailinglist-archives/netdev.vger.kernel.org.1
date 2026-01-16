@@ -1,130 +1,118 @@
-Return-Path: <netdev+bounces-250491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0388D2EE30
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:40:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742F1D2F043
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 38EA6303E0C3
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 09:40:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ACF63300B890
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 09:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DF73587AB;
-	Fri, 16 Jan 2026 09:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2578F34F27D;
+	Fri, 16 Jan 2026 09:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b="VmTeKKYY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsj2fmDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw03.horizon.ai (mailgw03.horizon.ai [42.62.85.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206B23587A1
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 09:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.62.85.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0143930BB8E;
+	Fri, 16 Jan 2026 09:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768556399; cv=none; b=RzhZWUsMINNLBpT+COVAc9Os0vqteIwQZLB51+VSQgHwHNmNRt1t5ZzFCBiv1JNEa6q+8UGyMlA7qqnylDtlRluODMLg0/yOnWDEqoq101L7xea34lC2OXN9PKZfgfaes2cjkmh2MX9b33DqNPalaplovWDDJOnYlHig1s9RC24=
+	t=1768556948; cv=none; b=JhYOdzEHd0Qngc4TYK2cZ2llU/7Xu9pCChj0WAduZBT8ewpGAU6SQwjwUmO4V6DGJkuSS7MQt4kiPse9G36pXjSws4Y3Xrx0Zl3QZqLANyIXzVYCb733FTWKKoqs1w5DshSwX51y2j2W7Ntu6wsgrNV7MBoEjrcn5OynhXwYz88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768556399; c=relaxed/simple;
-	bh=a4gfC11GKOCqy9sxLvnmGbXidmAXWWeVuphhN34RDLA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RqnpypEj0o5G7+wTHsmwzlsa3YmVJMdTGSGqVYRDtRw2sBn/RqjYE2hRnqWFTYuzX/EcIGHVSZ1kgoO6NOtrVIrWHDbPCTusN8ZLlo4qIxb/N4KvhPP1G1SEh+H39eTzyn5G37NjyvOxWKNudD958K19ZsUOr1zJoClwUoZrUjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto; spf=pass smtp.mailfrom=horizon.auto; dkim=pass (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b=VmTeKKYY; arc=none smtp.client-ip=42.62.85.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=horizon.auto
-DKIM-Signature: v=1; a=rsa-sha256; d=horizon.auto; s=horizonauto; c=relaxed/simple;
-	q=dns/txt; i=@horizon.auto; t=1768556386; x=2632469986;
-	h=From:Sender:Reply-To:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=a4gfC11GKOCqy9sxLvnmGbXidmAXWWeVuphhN34RDLA=;
-	b=VmTeKKYYbQZ/V14t568JLOTRp+3Rz3NThRX7O4qfzDpIVCkOsRJmBZXIFuDKL3o+
-	02IRYptJWbLqsoKLCCPgDbbBQAMdwe8AVHBR5PnTbqtezZPHXuymobWbCqwI7o5v
-	1FqbzWhkyQ1i7RLa+yIGsUJB4uf/mPefF6HVVHNeUo0=;
-X-AuditID: 0a0901b2-dfddb70000001406-f6-696a07629f97
-Received: from mailgw03.horizon.ai ( [10.69.1.10])
-	by mailgw03.horizon.ai (Anti-spam for msg) with SMTP id BB.6D.05126.2670A696; Fri, 16 Jan 2026 17:39:46 +0800 (HKT)
-Received: from wangtao-VirtualBox.hobot.cc (10.9.0.252) by
- exchange003.hobot.cc (10.69.1.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.27; Fri, 16 Jan 2026
- 17:39:45 +0800
-From: Tao Wang <tao03.wang@horizon.auto>
-To: <kuba@kernel.org>, <linux@armlinux.org.uk>,
-	<maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <andrew+netdev@lunn.ch>, <mcoquelin.stm32@gmail.com>,
-	<alexandre.torgue@foss.st.com>, <rmk+kernel@armlinux.org.uk>
-CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, Tao Wang
-	<tao03.wang@horizon.auto>
-Subject: [PATCH net v3] net: stmmac: fix transmit queue timed out after resume for tso
-Date: Fri, 16 Jan 2026 17:39:31 +0800
-Message-ID: <20260116093931.126457-1-tao03.wang@horizon.auto>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1768556948; c=relaxed/simple;
+	bh=NLbTtFH/y1ozIwxkXOHUPwJjVtEvUi7rKolh4lp3SFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BV3h2dEfNLQge8LKEtlKNmM/D1kN5VbeYuqYHidCw3yw/gHZt9YQAKjm8w4cDTYo2I3k9qD0/3ZKFGuinKRKZPf4NClRSOV8agQv+z4YvreENadDynV0eeh6ZJnD6pfPeFDo5h6s0EdZRD/OoCVKoBX/vATKOWT+IU0rkVNgAMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsj2fmDf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0A8EC19425;
+	Fri, 16 Jan 2026 09:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768556947;
+	bh=NLbTtFH/y1ozIwxkXOHUPwJjVtEvUi7rKolh4lp3SFw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jsj2fmDfl0g3Bb8a+nW16oOpT+K1/cokaJfIYEi6sov5hxX195Fe6eat5quyrzb3a
+	 ouCr36T/lA+aiNZKRAQBVZpgCQym+EXgNTfP9i30NMrgDsxW0aESXVVo/ct0KRrq9H
+	 ippobTrYJcKzUlDQuQSplPne8h9FPZyICXCPuDSdDEp0XKWkqxuN9fLwuRPAiD8H9b
+	 /p+57sEFzM6wr7bkXqoAJi2FgX5fssdMI7qoOEKNZyK5G/ARKz2BrHM4MSii0Pup46
+	 XhhgkCaQYEmamB++sCkUoNCixny5Nk/a1C55WcNgkujlFtKDxHvuWJ7r7TQuqe2HMs
+	 dRdW/dPTZXcww==
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] selftests: net: csum: Fix printk format in recv_get_packet_csum_status()
+Date: Fri, 16 Jan 2026 10:48:55 +0100
+Message-ID: <8b69b40826553c1dd500d9d25e45883744f3f348.1768556791.git.chleroy@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2562; i=chleroy@kernel.org; h=from:subject:message-id; bh=NLbTtFH/y1ozIwxkXOHUPwJjVtEvUi7rKolh4lp3SFw=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWRmcXac4imLllI4KKWystG74YJtXr+R4UclI63Ezc9eX 75rwfKmo5SFQYyLQVZMkeX4f+5dM7q+pOZP3aUPM4eVCWQIAxenAEwk7zsjw8eLF1O2lNlOT5dL VPW8xdi9UYJlaePNqXuervctFpx1fR8jw0HzufkxH/oib/9qCpm68unM1ZwfZm16kHZ2p8nGv2s i/TkB
+X-Developer-Key: i=chleroy@kernel.org; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: exchange001.hobot.cc (10.9.15.110) To exchange003.hobot.cc
- (10.69.1.10)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjkeLIzCtJLcpLzFFi42LhcmXk0k1iz8o0OP3I3OLny2mMFssf7GC1
-	mHO+hcXi6bFH7BaP+k+wWVzY1sdqsbBtCYvF5V1z2CwOTd3LaPHy9TZmi3l/17JaHFsgZvHt
-	9BtGi0v9E5kc+DwuX7vI7DFvTbXHlpU3mTye9m9l99g56y67x4JNpR6bVnWyeezc8ZnJ4/2+
-	q2wenzfJBXBFcdmkpOZklqUW6dslcGXcf3yOrWA3f8XV++2MDYxtvF2MnBwSAiYSx46tY+xi
-	5OIQEljBKLH51n5WCOc5o8TEdRPYQarYBDQk7k69xgKSEBHYwyRx+UUnM0iCWSBVYu/un2C2
-	sECYxIT5a1hBbBYBVYlHbeuBbA4OXgFbifMbTSC2yUtcn3KAEcTmFRCUODnzCQvEGHmJ5q2z
-	oUZKSBx88QLMFhJQkWg+OZ8doldO4vWG/WwQdozElQcdTBMYBWYhGTULyahZSEYtYGRexSic
-	m5iZk15uYKyXkV+UWZWfp5eYuYkRFFWcjJt2MC5Z8FHvECMTB+MhRgkOZiURXt7faZlCvCmJ
-	lVWpRfnxRaU5qcWHGKU5WJTEebUV4zKFBNITS1KzU1MLUotgskwcnFINTF5Tw3Tubih8WF3o
-	dXZps8aMEkGzSx83v88VrJSPmaCQcn6Pyy+J1nZ1qe2Tm52vRHT6i+241fy57nba7G86iUbh
-	DrdFagR7Pz84YTdxWfTxTX+PH11zdj2DebVlYVo481Hnjz0bYrsKf00Uc/xwMOqo9Yl0k/WM
-	qWm7s9rY3rJ6fwjuMP9gVVHlf8/5q6W1nbRU65ZNO5qijkh1v79q+bslIdMtZuLOt6dz/6tH
-	Nj5fbriEZbfg/Oidpz8+Czrl5vw84v4Kz5qz/f6nFCaniGqfmZj8/sjDPT/eXym0XO7E33Ak
-	prJc55jVg4WCPzfwzzmldLRTl13aVrYh/IbCzqwlEybuV7kUuPB28dLanUosxRmJhlrMRcWJ
-	AN3aH7EZAwAA
 
-after resume dev_watchdog() message:
-"NETDEV WATCHDOG: CPU: x: transmit queue x timed out xx ms"
+Following warning is encountered when building selftests on powerpc/32.
 
-The trigging scenario is as follows:
-When the TSO function sets tx_skbuff_dma[tx_q->cur_tx].last_segment = true,
- and the last_segment value is not cleared in stmmac_free_tx_buffer after
- resume, restarting TSO transmission may incorrectly use
-tx_q->tx_skbuff_dma[first_entry].last_segment = true for a new TSO packet.
+  CC       csum
+csum.c: In function 'recv_get_packet_csum_status':
+csum.c:710:50: warning: format '%lu' expects argument of type 'long unsigned int', but argument 4 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+  710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+      |                                                ~~^
+      |                                                  |
+      |                                                  long unsigned int
+      |                                                %u
+  711 |                               cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
+      |                               ~~~~~~~~~~~~
+      |                                 |
+      |                                 size_t {aka unsigned int}
+csum.c:710:63: warning: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'unsigned int' [-Wformat=]
+  710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+      |                                                             ~~^
+      |                                                               |
+      |                                                               long unsigned int
+      |                                                             %u
 
-When the tx queue has timed out, and the emac TX descriptor is as follows:
-eth0: 221 [0x0000000876d10dd0]: 0x73660cbe 0x8 0x42 0xb04416a0
-eth0: 222 [0x0000000876d10de0]: 0x77731d40 0x8 0x16a0 0x90000000
+cm->cmsg_len has type __kernel_size_t and CMSG() macro has the type
+returned by sizeof() which is size_t.
 
-Descriptor 221 is the TSO header, and descriptor 222 is the TSO payload.
-In the tdes3 (0xb04416a0), bit 29 (first descriptor) and bit 28
-(last descriptor) of the TSO packet 221 DMA descriptor cannot both be
-set to 1 simultaneously. Since descriptor 222 is the actual last
-descriptor, failing to set it properly will cause the EMAC DMA to stop
-and hang.
+size_t is 'unsigned int' on some platforms and 'unsigned long' on
+other ones so use %zu instead of %lu.
 
-To solve the issue, Do not use the last_segment  default value and set
- last_segment to false in stmmac_tso_xmit.
+This fixes commit 91a7de85600d ("selftests/net: add csum offload test").
 
-Fixes: c2837423cb54 ("net: stmmac: Rework TX Coalesce logic")
-Signed-off-by: Tao Wang <tao03.wang@horizon.auto>
+Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 +
- 1 file changed, 1 insertion(+)
+v2: Removed use %zu instead of %u and removed Fixes tag
+---
+ tools/testing/selftests/net/lib/csum.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b3730312aeed..1735f1b50a71 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4448,6 +4448,7 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (dma_mapping_error(priv->device, des))
- 		goto dma_map_err;
+diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
+index 27437590eeb53..e28884ce3ab39 100644
+--- a/tools/testing/selftests/net/lib/csum.c
++++ b/tools/testing/selftests/net/lib/csum.c
+@@ -707,7 +707,7 @@ static uint32_t recv_get_packet_csum_status(struct msghdr *msg)
+ 			      cm->cmsg_level, cm->cmsg_type);
  
-+	tx_q->tx_skbuff_dma[first_entry].last_segment = false;
- 	stmmac_set_desc_addr(priv, first, des);
- 	stmmac_tso_allocator(priv, des + proto_hdr_len, pay_len,
- 			     (nfrags == 0), queue);
+ 		if (cm->cmsg_len != CMSG_LEN(sizeof(struct tpacket_auxdata)))
+-			error(1, 0, "cmsg: len=%lu expected=%lu",
++			error(1, 0, "cmsg: len=%zu expected=%zu",
+ 			      cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
+ 
+ 		aux = (void *)CMSG_DATA(cm);
 -- 
-2.52.0
+2.49.0
 
 
