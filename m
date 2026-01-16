@@ -1,181 +1,229 @@
-Return-Path: <netdev+bounces-250669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABB0D38A07
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 00:29:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87662D38A51
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 00:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7EAB1300B897
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 23:29:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9E0D9300C371
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 23:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979A031A81F;
-	Fri, 16 Jan 2026 23:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D2F2D780A;
+	Fri, 16 Jan 2026 23:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fpcJ4ARz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CPr7Dtsn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0316531987D;
-	Fri, 16 Jan 2026 23:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7552D94A7
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 23:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768606153; cv=none; b=MFjJvCnmDPw1wcQm/+c4Ieu38xgJ0VlvSR+otikqrG2dIOHfg1agtrBseSIZIB329rPQtXMK3teJfr44nVC1T7Dmrbj5ag0cVyELNSF0NZvHJu2YKOSe1YgO2yYnHCCKxntSWF8Lfu0lp/OzdNLPR9qwXSXBkR9eQRqyxB1QsO0=
+	t=1768606788; cv=none; b=eRG5ARrwv4VtSCPW3Xgd9EHYc//IgUt2Y/3tbcawra3FJc8Io6PI7xQqQf2j71Pd3tGOdnKPHTcT7/NzDN6l3toOPlAUItark9GjAPUJ4Ga6HYJHAboVn4OS8Qd+oqRMh/vGA4VxrP+Jtrs9kl9AR0rbeeD6RW4CRBH1YChM3Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768606153; c=relaxed/simple;
-	bh=kvbojYaek5WbRfXXpN17VKj5S4j74g/KOb37gShoZlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IyRwLosdO7cJHH0W9/AReyj10CgsaSEGwU8x+GT8jpzmBYkk6c+jeo1AT0q4QWR8lUEWeughVboqFjjivLxNNTwY1+pdC+DtfS8JYAqaHchYK+NrMLl3Q7h7UcGu1uzbRotiFihTe7L+6vGBje6/9nMzXvoL9eHUbOGHmosrBho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fpcJ4ARz; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=y89AQp25tJxqhLWz3k0d+HDG26wCHWOz1xe3GMgTCFM=; b=fpcJ4ARzEWseLdm7DCmvMX8gmp
-	ZlPQdLzJR1U72oXOIv8nTMSjsubA6r+CosGJsdz8BCd4PgOxCpzDqWY6NMuahZTTqyJjBZnov1J8F
-	XPH+sLY0fKzgBlSWpA+5eFRxfVd/u5m82eN4r0hYO9SEx8IbSLDN+OmmJQDALiLbV2+4lWfWqjdDW
-	I6IzwYZCKWwU3MU2WTS/V51+qUQDnP4O+D8hFvCl4lHhiRUGsAjvYKnKqSagXNc2hcyYRx5VQPCSB
-	RqMagM6xJzZ32IYjv+1GSB7PLp5I0J2TZkW1jkGOtTYY7qcRogTyYf9DxOQ9SYxHRCHgRbxRD7nzw
-	mbh+9DCQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56038)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgtFa-000000002mF-3VJw;
-	Fri, 16 Jan 2026 23:29:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgtFW-0000000041E-3aCg;
-	Fri, 16 Jan 2026 23:29:02 +0000
-Date: Fri, 16 Jan 2026 23:29:02 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tao Wang <tao03.wang@horizon.auto>
-Cc: kuba@kernel.org, maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, andrew+netdev@lunn.ch, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net v3] net: stmmac: fix transmit queue timed out after
- resume for tso
-Message-ID: <aWrJvrpIAZHQS2uv@shell.armlinux.org.uk>
-References: <20260116093931.126457-1-tao03.wang@horizon.auto>
+	s=arc-20240116; t=1768606788; c=relaxed/simple;
+	bh=1L4Z10EN3fStlLWrOTv25Pq3Qk48HrL3c61DmZOsz6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e9nj3gEVuK7EurziTcz59h8EY72V7ZbQHeZLK6mq01lCBztjRDKqNox+YsHoEEpAgOQ3uwZQRy0C+BRL6HtMAHnmWFYLS9RIqXmPM6dS6Xx+WUuzLPNnjrWhF5SJ/Y19FdQCkq4wClj22oEksFZLxL0Wgnw8WTLW4qqCTytro+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CPr7Dtsn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBDEC16AAE
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 23:39:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768606788;
+	bh=1L4Z10EN3fStlLWrOTv25Pq3Qk48HrL3c61DmZOsz6s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CPr7Dtsnm5xqqjXRoF4zmWwxIcvihEIqjlYx3ZOjBpFWmdO+6X/jWujdQK9oaw2gp
+	 khc5ZIXwQLm32zCcGPWx58h/7b6Ar2SeZjjylFefDa0SyPZIeuCm6XPVxTVyqNILYc
+	 cGsBKMlC8DlhJQBl8v1ITDHAkqoEFnW9nnuMOmPQB8eW5+CjcfMo1mLhzsZUDYPFUe
+	 9v4fwygvZqHklVK8cdq+xo90aLrH+KhrA+JxOZ/C3EeM4rPHAzNTB3gjfXlwpPsg/y
+	 Q8Q8RCBh7QIaWDcGjgqE6LFQa5rq0PmGvEBeOg/QC57ckm0PJ4lqje94zowytehp0k
+	 N2SK0WfBEUNyw==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65089cebdb4so4056442a12.0
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 15:39:47 -0800 (PST)
+X-Gm-Message-State: AOJu0YwZs2kz51wLsIjsb0VaWzR45J9tJdu+TJeEaOt6Tx2K6h4StwV5
+	yl3DMHmgKXVaYqYo0cRBwHgeMflDdJeZ9v948G+xG+CkfnUCUv5uuC/uRMhZZ2oD0Eqj41e9XH3
+	d0Gu7c9dOf9PoTFo63kTD3GO/WFzfEA==
+X-Received: by 2002:a05:6402:3547:b0:653:10be:c89b with SMTP id
+ 4fb4d7f45d1cf-654bb70fa92mr3102930a12.34.1768606786546; Fri, 16 Jan 2026
+ 15:39:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116093931.126457-1-tao03.wang@horizon.auto>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20260108182318.20935-1-ivecera@redhat.com> <20260108182318.20935-2-ivecera@redhat.com>
+ <92bfc390-d706-4988-b98d-841a50f10834@redhat.com> <CAL_Jsq+m7-wop-AU-7R-=2JsUqb+2LsVTXCbZw==1XuAAQ4Tkg@mail.gmail.com>
+ <a5dad0f9-001c-468f-99bc-e24c23bc9b36@redhat.com>
+In-Reply-To: <a5dad0f9-001c-468f-99bc-e24c23bc9b36@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 16 Jan 2026 17:39:35 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJhqp-cgj604eEgxD47gJci0d3CFYf1wC_t1c00OptTiQ@mail.gmail.com>
+X-Gm-Features: AZwV_Qgghn897CtG_q8P6welgr6_MD-NJlyOmC0cWTEkTMdvGwzWh8_gNK8Dfu8
+Message-ID: <CAL_JsqJhqp-cgj604eEgxD47gJci0d3CFYf1wC_t1c00OptTiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/12] dt-bindings: dpll: add common
+ dpll-pin-consumer schema
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+	linux-rdma@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
+	Petr Oros <poros@redhat.com>, Grzegorz Nitka <grzegorz.nitka@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 16, 2026 at 05:39:31PM +0800, Tao Wang wrote:
-> after resume dev_watchdog() message:
-> "NETDEV WATCHDOG: CPU: x: transmit queue x timed out xx ms"
-> 
-> The trigging scenario is as follows:
-> When the TSO function sets tx_skbuff_dma[tx_q->cur_tx].last_segment = true,
->  and the last_segment value is not cleared in stmmac_free_tx_buffer after
->  resume, restarting TSO transmission may incorrectly use
-> tx_q->tx_skbuff_dma[first_entry].last_segment = true for a new TSO packet.
-> 
-> When the tx queue has timed out, and the emac TX descriptor is as follows:
-> eth0: 221 [0x0000000876d10dd0]: 0x73660cbe 0x8 0x42 0xb04416a0
-> eth0: 222 [0x0000000876d10de0]: 0x77731d40 0x8 0x16a0 0x90000000
-> 
-> Descriptor 221 is the TSO header, and descriptor 222 is the TSO payload.
-> In the tdes3 (0xb04416a0), bit 29 (first descriptor) and bit 28
-> (last descriptor) of the TSO packet 221 DMA descriptor cannot both be
-> set to 1 simultaneously. Since descriptor 222 is the actual last
-> descriptor, failing to set it properly will cause the EMAC DMA to stop
-> and hang.
-> 
-> To solve the issue, Do not use the last_segment  default value and set
->  last_segment to false in stmmac_tso_xmit.
-> 
-> Fixes: c2837423cb54 ("net: stmmac: Rework TX Coalesce logic")
-> Signed-off-by: Tao Wang <tao03.wang@horizon.auto>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index b3730312aeed..1735f1b50a71 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4448,6 +4448,7 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
->  	if (dma_mapping_error(priv->device, des))
->  		goto dma_map_err;
->  
-> +	tx_q->tx_skbuff_dma[first_entry].last_segment = false;
->  	stmmac_set_desc_addr(priv, first, des);
->  	stmmac_tso_allocator(priv, des + proto_hdr_len, pay_len,
->  			     (nfrags == 0), queue);
+On Fri, Jan 16, 2026 at 1:00=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
+ote:
+>
+> On 1/16/26 4:23 PM, Rob Herring wrote:
+> > On Thu, Jan 15, 2026 at 6:02=E2=80=AFAM Ivan Vecera <ivecera@redhat.com=
+> wrote:
+> >>
+> >> On 1/8/26 7:23 PM, Ivan Vecera wrote:
+> >>> Introduce a common schema for DPLL pin consumers. Devices such as Eth=
+ernet
+> >>> controllers and PHYs may require connections to DPLL pins for Synchro=
+nous
+> >>> Ethernet (SyncE) or other frequency synchronization tasks.
+> >>>
+> >>> Defining these properties in a shared schema ensures consistency acro=
+ss
+> >>> different device types that consume DPLL resources.
+> >>>
+> >>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> >>> ---
+> >>>    .../bindings/dpll/dpll-pin-consumer.yaml      | 30 +++++++++++++++=
+++++
+> >>>    MAINTAINERS                                   |  1 +
+> >>>    2 files changed, 31 insertions(+)
+> >>>    create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin=
+-consumer.yaml
+> >>>
+> >>> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin-consumer=
+.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> >>> new file mode 100644
+> >>> index 0000000000000..60c184c18318a
+> >>> --- /dev/null
+> >>> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> >>> @@ -0,0 +1,30 @@
+> >>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> >>> +%YAML 1.2
+> >>> +---
+> >>> +$id: http://devicetree.org/schemas/dpll/dpll-pin-consumer.yaml#
+> >>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> >>> +
+> >>> +title: DPLL Pin Consumer
+> >>> +
+> >>> +maintainers:
+> >>> +  - Ivan Vecera <ivecera@redhat.com>
+> >>> +
+> >>> +description: |
+> >>> +  Common properties for devices that require connection to DPLL (Dig=
+ital Phase
+> >>> +  Locked Loop) pins for frequency synchronization (e.g. SyncE).
+> >>> +
+> >>> +properties:
+> >>> +  dpll-pins:
+> >>> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> >>> +    description:
+> >>> +      List of phandles to the DPLL pin nodes connected to this devic=
+e.
+> >>> +
+> >>> +  dpll-pin-names:
+> >>> +    $ref: /schemas/types.yaml#/definitions/string-array
+> >>> +    description:
+> >>> +      Names for the DPLL pins defined in 'dpll-pins', in the same or=
+der.
+> >>> +
+> >>> +dependencies:
+> >>> +  dpll-pin-names: [ dpll-pins ]
+> >>> +
+> >>> +additionalProperties: true
+> >>> diff --git a/MAINTAINERS b/MAINTAINERS
+> >>> index 765ad2daa2183..f6f58dfb20931 100644
+> >>> --- a/MAINTAINERS
+> >>> +++ b/MAINTAINERS
+> >>> @@ -7648,6 +7648,7 @@ M:      Jiri Pirko <jiri@resnulli.us>
+> >>>    L:  netdev@vger.kernel.org
+> >>>    S:  Supported
+> >>>    F:  Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> >>> +F:   Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+> >>>    F:  Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> >>>    F:  Documentation/driver-api/dpll.rst
+> >>>    F:  drivers/dpll/
+> >>
+> >> Based on private discussion with Andrew Lunn (thanks a lot), this is
+> >> wrong approach. Referencing directly dpll-pin nodes and using their
+> >> phandles in consumers is at least unusual.
+> >>
+> >> The right approach should be referencing dpll-device and use cells
+> >> to specify the dpll pin that is used.
+> >
+> > You only need a cells property if you expect the number of cells to
+> > vary by provider.
+> >
+> > However, the DPLL device just appears to be a clock provider and
+> > consumer, so why not just use the clock binding here? Also, there is
+> > no rule that using foo binding means you have to use foo subsystem in
+> > the kernel.
+>
+> Hmm, do you mean something like this example?
+>
+> &dpll0 {
+>      ...
+>      #clock-cells =3D <2>; /* 1st pin index, 2nd pin type (input/output) =
+*/
+>
+>      input-pins {
+>          pin@2 {
+>              reg =3D <2>;
+>              ...
+>          };
+>          pin@4 {
+>              reg =3D <4>;
+>              ...
+>          };
+>      };
+>      output-pins {
+>          pin@3 {
+>              reg =3D <3>;
+>          };
+>      };
+> };
+> &phy0 {
+>      ...
+>      clock-names =3D "rclk0", "rclk1", "synce_ref";
+>      clocks =3D <&dpll0 2 DPLL_INPUT>,
+>               <&dpll0 4 DPLL_INPUT>,
+>               <&dpll0 3 DPLL_OUTPUT>;
+>      ...
+> };
 
-Buried in the patches I worked on as a result of the previous version
-of this patch, I came up with a completely different way to deal with
-this which doesn't even need .last_segment set correctly.
+No, clock providers are always the clock outputs, and clock consumers
+are the clock inputs. So something like this:
 
-8<===
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH net-next] net: stmmac: calculate tso last_segment
+&dpll0 {
+     ...
+     #clock-cells =3D <1>; /* 1st pin index */
 
-Rather than using tx_q->tx_skbuff_dma[].last_segment to determine
-whether the first descriptor entry is the only segment, calculate the
-number of descriptor entries used. If there is only one descriptor,
-then the first is also the last, so mark it as such.
+     // clocks index corresponds to input pins on dpll0 */
+     clocks =3D <&phy0 0>, <&phy0 1>, <&phy1 0>, <&phy1 1>
+};
+&phy0 {
+     ...
+     #clock-cells =3D <1>;
+     clocks =3D <&dpll0 3>;
+     ...
+};
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index c2589f02ff7e..e0da51222966 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4359,11 +4359,11 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	unsigned int first_entry, tx_packets;
- 	struct stmmac_txq_stats *txq_stats;
- 	struct stmmac_tx_queue *tx_q;
-+	bool set_ic, is_last_segment;
- 	u32 pay_len, mss, queue;
- 	int i, first_tx, nfrags;
- 	u8 proto_hdr_len, hdr;
- 	dma_addr_t des;
--	bool set_ic;
- 
- 	/* Always insert VLAN tag to SKB payload for TSO frames.
- 	 *
-@@ -4551,10 +4551,16 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 		stmmac_enable_tx_timestamp(priv, first);
- 	}
- 
-+	/* If we only have one DMA descriptor used, then the first entry
-+	 * is the last segment.
-+	 */
-+	is_last_segment = ((tx_q->cur_tx - first_entry) &
-+			   (priv->dma_conf.dma_tx_size - 1)) == 1;
-+
- 	/* Complete the first descriptor before granting the DMA */
- 	stmmac_prepare_tso_tx_desc(priv, first, 1, proto_hdr_len, 0, 1,
--				   tx_q->tx_skbuff_dma[first_entry].last_segment,
--				   hdr / 4, (skb->len - proto_hdr_len));
-+				   is_last_segment, hdr / 4,
-+				   skb->len - proto_hdr_len);
- 
- 	/* If context desc is used to change MSS */
- 	if (mss_desc) {
--- 
-2.47.3
-
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Rob
 
