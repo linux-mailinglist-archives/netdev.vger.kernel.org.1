@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-250362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0185ED2960F
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:08:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CDDD29615
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 425FB304349A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:08:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 21DA830119E7
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 00:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4A954723;
-	Fri, 16 Jan 2026 00:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA19872612;
+	Fri, 16 Jan 2026 00:08:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628C842AA3;
-	Fri, 16 Jan 2026 00:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B01F3BB4A;
+	Fri, 16 Jan 2026 00:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768522081; cv=none; b=t6D3GOaazW8AvKMpm9A/0RRn2UwKQ1+Ht0qVvcXXUbfhABdZqEKEUj/OGFcJcVFRLkChkhJMivLAkOYvTtvUWHGVmIaUyEVEy5851Q0dIb0kL7CNb3er0Ym7brqC/aS4DUq0dM+1NfCCAT5PUtDo4H45pgs9Xlh0KLmcx+q4vPQ=
+	t=1768522089; cv=none; b=TqO3sjls8qjG0TLHDsoeK+IEjYW0qgMRBECcsjBGgzNaB/C1KVna7S7HW386b3I4YGP0MsyBMNSVhCqoDHLimg350u1wcQqVy07BOPT6iPi5Yrv7zfLHIr9NmH3bLhIS+cfJiEnCjr5g4wdv5YfvJFppQ9dq88Yr/G9jbLpnhiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768522081; c=relaxed/simple;
-	bh=J2qPx9fpXS+2+oSDbHYS4ZGyTfAP2YRim//GPBwaj14=;
+	s=arc-20240116; t=1768522089; c=relaxed/simple;
+	bh=he2o5intyrOjV+NrjU2oHE/I+EjiYieX2DwVVB3MErM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OsF/G0h6feHk+wF/Pg0A7n008IlzkQdSOCOmSlbJF4BkOgFiDjWPDdzPEUe2lhfHC/9y92e19s5t5ECs9GyQ/WePB3tKpVV5RWYanphAKjc4rN2g8cVmh1oJ711dYYxtch3UVV8//9cap+PKvl28d4pKlWQp7u7uWypLOjx9Q3g=
+	 Content-Type:Content-Disposition:In-Reply-To; b=mNSTVFJCNHKPDqUS57Kbd8DDKwFX6wn5jcfDuegTah7sysGHqXimTrk5HKM70Vwk2iOLdYKUQIshGoC4UaeWEkSptRFApkEQZNW0ya6EWs5aZFIA8bdf8LKQu53y1qK5BjgdixtwV2WWSASa355dmh1H3AultFnDtRkHIX0zDus=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vgXNc-000000007ZK-0VIb;
-	Fri, 16 Jan 2026 00:07:56 +0000
-Date: Fri, 16 Jan 2026 00:07:53 +0000
+	id 1vgXNj-000000007Zh-472j;
+	Fri, 16 Jan 2026 00:08:04 +0000
+Date: Fri, 16 Jan 2026 00:08:01 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -46,9 +46,9 @@ To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
-Subject: [PATCH net-next v3 5/6] net: dsa: mxl-gsw1xx: only setup SerDes PCS
- if it exists
-Message-ID: <9755af5b9607d0954f44a493577db78afdbfac3b.1768519376.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v3 6/6] net: dsa: mxl-gsw1xx: add support for Intel
+ GSW150
+Message-ID: <72ec93c733c3c23320b7b04be935e8fa236af74d.1768519376.git.daniel@makrotopia.org>
 References: <cover.1768519376.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,73 +60,133 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1768519376.git.daniel@makrotopia.org>
 
-Older Intel GSW150 chip doesn't have a SGMII/1000Base-X/2500Base-X PCS.
-Prepare for supporting Intel GSW150 by skipping PCS reset and
-initialization in case no .mac_select_pcs operation is defined.
+Add support for the Intel GSW150 (aka. Lantiq PEB7084) switch IC to
+the mxl-gsw1xx driver. This switch comes with 5 Gigabit Ethernet
+copper ports (Intel XWAY PHY11G (xRX v1.2 integrated) PHYs) as well as
+one GMII/RGMII and one RGMII port.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v3: no changes
-v2: new patch
+v3: enclose the gswip_hw_info initializers in compiler diag exception
+    to prevent triggering -Woverride-init
 
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 37 ++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 14 deletions(-)
+v2: clean-up phylink_get_caps
+
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c | 61 ++++++++++++++++++++++++++---
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h |  2 +
+ 2 files changed, 58 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index 0267196f98464..54cf7aab3bfe4 100644
+index 54cf7aab3bfe4..0d18b79647064 100644
 --- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
 +++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -579,6 +579,28 @@ static struct regmap *gsw1xx_regmap_init(struct gsw1xx_priv *priv,
- 				priv, &config);
- }
+@@ -503,6 +503,14 @@ static const struct phylink_pcs_ops gsw1xx_pcs_ops = {
+ 	.pcs_link_up = gsw1xx_pcs_link_up,
+ };
  
-+static int gsw1xx_serdes_pcs_init(struct gsw1xx_priv *priv)
++static void gsw1xx_phylink_get_lpi_caps(struct phylink_config *config)
 +{
-+	/* do nothing if the chip doesn't have a SerDes PCS */
-+	if (!priv->gswip.hw_info->mac_select_pcs)
-+		return 0;
-+
-+	priv->pcs.ops = &gsw1xx_pcs_ops;
-+	priv->pcs.poll = true;
-+	__set_bit(PHY_INTERFACE_MODE_SGMII,
-+		  priv->pcs.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+		  priv->pcs.supported_interfaces);
-+	if (priv->gswip.hw_info->supports_2500m)
-+		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-+			  priv->pcs.supported_interfaces);
-+	priv->tbi_interface = PHY_INTERFACE_MODE_NA;
-+
-+	/* assert SGMII reset to power down SGMII unit */
-+	return regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
-+			       GSW1XX_RST_REQ_SGMII_SHELL);
++	config->lpi_capabilities = MAC_100FD | MAC_1000FD;
++	config->lpi_timer_default = 20;
++	memcpy(config->lpi_interfaces, config->supported_interfaces,
++	       sizeof(config->lpi_interfaces));
 +}
 +
- static int gsw1xx_probe(struct mdio_device *mdiodev)
+ static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
+ 				    struct phylink_config *config)
  {
- 	struct device *dev = &mdiodev->dev;
-@@ -631,20 +653,7 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (IS_ERR(priv->shell))
- 		return PTR_ERR(priv->shell);
+@@ -536,10 +544,32 @@ static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
+ 		break;
+ 	}
  
--	priv->pcs.ops = &gsw1xx_pcs_ops;
--	priv->pcs.poll = true;
--	__set_bit(PHY_INTERFACE_MODE_SGMII,
--		  priv->pcs.supported_interfaces);
--	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
--		  priv->pcs.supported_interfaces);
--	if (priv->gswip.hw_info->supports_2500m)
--		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
--			  priv->pcs.supported_interfaces);
--	priv->tbi_interface = PHY_INTERFACE_MODE_NA;
--
--	/* assert SGMII reset to power down SGMII unit */
--	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
--			      GSW1XX_RST_REQ_SGMII_SHELL);
-+	ret = gsw1xx_serdes_pcs_init(priv);
- 	if (ret < 0)
- 		return ret;
+-	config->lpi_capabilities = MAC_100FD | MAC_1000FD;
+-	config->lpi_timer_default = 20;
+-	memcpy(config->lpi_interfaces, config->supported_interfaces,
+-	       sizeof(config->lpi_interfaces));
++	gsw1xx_phylink_get_lpi_caps(config);
++}
++
++static void gsw150_phylink_get_caps(struct dsa_switch *ds, int port,
++				    struct phylink_config *config)
++{
++	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
++				   MAC_10 | MAC_100 | MAC_1000;
++
++	switch (port) {
++	case 0 ... 4: /* built-in PHYs */
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++			  config->supported_interfaces);
++		break;
++
++	case 5: /* GMII or RGMII */
++		__set_bit(PHY_INTERFACE_MODE_GMII,
++			  config->supported_interfaces);
++		fallthrough;
++
++	case 6: /* RGMII */
++		phy_interface_set_rgmii(config->supported_interfaces);
++		break;
++	}
++
++	gsw1xx_phylink_get_lpi_caps(config);
+ }
  
+ static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *config,
+@@ -768,6 +798,25 @@ static const struct gswip_hw_info gsw141_data = {
+ 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
+ };
+ 
++static const struct gswip_hw_info gsw150_data = {
++	.max_ports		= GSW150_PORTS,
++	.allowed_cpu_ports	= BIT(5) | BIT(6),
++	.mii_cfg = {
++		[0 ... GSWIP_MAX_PORTS - 1] = -1,
++		[5] = 0,
++		[6] = 10,
++	},
++	.mii_pcdu = {
++		[0 ... GSWIP_MAX_PORTS - 1] = -1,
++		[5] = 1,
++		[6] = 11,
++	},
++	.phylink_get_caps	= gsw150_phylink_get_caps,
++	.pce_microcode		= &gsw1xx_pce_microcode,
++	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
++	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
++};
++
+ __diag_pop();
+ 
+ /*
+@@ -775,6 +824,8 @@ __diag_pop();
+  * GSW145 is the industrial temperature version of GSW140.
+  */
+ static const struct of_device_id gsw1xx_of_match[] = {
++	{ .compatible = "intel,gsw150", .data = &gsw150_data },
++	{ .compatible = "lantiq,peb7084", .data = &gsw150_data },
+ 	{ .compatible = "maxlinear,gsw120", .data = &gsw12x_data },
+ 	{ .compatible = "maxlinear,gsw125", .data = &gsw12x_data },
+ 	{ .compatible = "maxlinear,gsw140", .data = &gsw140_data },
+@@ -798,5 +849,5 @@ static struct mdio_driver gsw1xx_driver = {
+ mdio_module_driver(gsw1xx_driver);
+ 
+ MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
+-MODULE_DESCRIPTION("Driver for MaxLinear GSW1xx ethernet switch");
++MODULE_DESCRIPTION("Driver for Intel/MaxLinear GSW1xx Ethernet switch");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
+index 38e03c048a26c..087587f62e5e1 100644
+--- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
++++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
+@@ -10,6 +10,8 @@
+ #include <linux/bitfield.h>
+ 
+ #define GSW1XX_PORTS				6
++#define GSW150_PORTS				7
++
+ /* Port used for RGMII or optional RMII */
+ #define GSW1XX_MII_PORT				5
+ /* Port used for SGMII */
 -- 
 2.52.0
 
