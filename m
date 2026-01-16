@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-250567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DCFBD33549
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:54:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B67D33540
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:54:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F022630C901C
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 15:51:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 765AA30019C2
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 15:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871A032B9B4;
-	Fri, 16 Jan 2026 15:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EBA33C1A7;
+	Fri, 16 Jan 2026 15:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Wbxv4Nv1"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dYbiWw9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCC133B6C0
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 15:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E79238D22
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 15:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768578712; cv=none; b=oMBBzPHlUgCa8H4P/wWVDPobbwsH27BgZJEjEqd30wa0QWbuTeUPtFI+H8kOzyz8ldPDY69fJNYwS9wy6K+6E4zl6ecTtQVecb/0yGgpOVGusid4IVBZdZR31hzECYpSpxK9V7OTMpwoFXM+qttOKeqh5txYY0g30MaHgWTUBzE=
+	t=1768578834; cv=none; b=vClCFwrOgohJVH0XIHyOEliOKw2ryM7tekA2GjY5dsMJ2IaioSV4Tx6DhSopWX+Zbni2jgGm59s7SfDCMQJqZduSXtxPFd2dmBABNvIYf8nEymD9K759YbRqMVP0Ik1wKfxrv5WqBsRBUdPdrxK0mOYd78Tvla1LVdApgYH+yeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768578712; c=relaxed/simple;
-	bh=u4Cy3dy+Jt+nOhLZsenXS55g+kk8o9dxuY1nRgQlMj0=;
+	s=arc-20240116; t=1768578834; c=relaxed/simple;
+	bh=0xEa8Yb22m/PsM7QL1vxfsX1JgV7ZzzkddwYB4rgMgk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KiYv2K7wYnwHOXdHZLVWnTcFWFak5k3yLbwg53YDccRN9zIA8p+GZS/8J9vQOAnjO3O660pVyVFLrjrioQTJXWPAKZ8oFPqKABhrJZPLtctor2VE46KRJWMVdMwsGtJ3QEFuNRHzRPYtBrCq182WacFBMwhB16tmRLl2WmWtBas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Wbxv4Nv1; arc=none smtp.client-ip=209.85.128.67
+	 Content-Type:Content-Disposition:In-Reply-To; b=fbgElR2WZIiLnWt8/+UQ8E1QikPLQESUZE+BdxzsZY9RWf0XlaIyn4EV0qCqjr4Nv1TYrLsKxT5nrVM4IZrkA7zI7o6eRtNwuSg6/Y22v0RXjum91Eopg1aNeqPxoiy3JbqLWXqRLrIt4ChHBzvfNkTTK3LXgJVKG6FZp3RoMB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dYbiWw9N; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-4801d7c72a5so8751625e9.0
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:51:50 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47ee07570deso16135715e9.1
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:53:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768578709; x=1769183509; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1768578831; x=1769183631; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qnYDOUmkfIQkeRwuM/CKf7bJKNlDv8Tunazw6EC/9Xw=;
-        b=Wbxv4Nv1iN8E8s6o0eGCPSPjmYfTrD7YvmCbbzqBiCOfIpVSnLCSLdB6Dkk61iIa6r
-         ZwMfm3fxcOxl5RsXS3eNjOWe83vS48wask5pl8FCxaNHzT3AYd0d0St2NEQbqcvXNbTf
-         21Txm562jYoFfQu61e8ddmeFeGp8PSewZsXXCSs9dn5L7VhHX9A18sj13D/awGjIcWbo
-         /Onr330RFzG2wS4BT3HjZ7+y7b7SIgx7TaZj5nHdumx+wcYTyboTK9HN0MHZaBtO2wei
-         XpVyKcahSFdA3YtBbzoI38RtkvhTXHLPjDh72ZyH/GleFqF9+gdsu3/jku4g3Kr8YhgZ
-         os0w==
+        bh=IhfsGF0Lr88dXj6BtoBIvCxUcSfXthaHRcGxI1cR848=;
+        b=dYbiWw9NvUSJ53sSpvT07m9/6bVcl0krUts0Vj0oLZ7hjFnpTMuw20a5GlTyUQk7GH
+         M1v2BkmIi0LswoGzs6qbSbqyZme9O2ajBC/pSuU6RVSbDhvDvNTqY7WtsA3TbMmVIGsy
+         BJ80ouItJqdqvCoCCM66Kl3J+0POSuAH2P1L1kDx/WxLOSkNQcBokUIiygFYizTGrbKS
+         pXYcOOdWE+GutIRN9h/uR/KWZ6jtN9prSih2AWCfQMqNF95aL+XkDMzc+AMEfQWtfjzk
+         8oA+/leSK83V9jEwTj+ynnV91MLqWzj5/yEgLM4EXgFSieza2mY/Gy5xk4hJSgoZ/mxr
+         pQDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768578709; x=1769183509;
+        d=1e100.net; s=20230601; t=1768578831; x=1769183631;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qnYDOUmkfIQkeRwuM/CKf7bJKNlDv8Tunazw6EC/9Xw=;
-        b=V+TrtdCoxqYFL6oG+GEMomQvuhhk+2iBEjUFdQqf1czVPwIRgJLIKLEnkyY6AXwdbN
-         V/r1OucA6GPfHEA7CQlS6Svyf93kUN7Lq4kNQKDZiLyKYcPzWFMWoZJmeCKIhq9mt6hP
-         qBwt/rG7rArcWA32j83hgtviOJaMqIa2wbvdjxeXuqjVG+RFR/GcXX+CmtT8G1wWCyB4
-         2x55gY2AtHM0w7JQXBlhj63fXH9zbuZtR/deyH3PnMtnYFxttIBv4i8ULHE0sq1GkV44
-         f88IQ/lKAmCwLouvykN6brX/UzUk5/M7vH+ehOJCxwKk8Y4Uy5anSLl8tmdcerH/xRco
-         +Www==
-X-Forwarded-Encrypted: i=1; AJvYcCUemrj8+dGI0gRY33wjSJW/pDDFKnguayBfIjec4ZC4AFLjRgCaJLelGuxsPcmOFCVsTzE5JpI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySJu4FvT2TQmg3dF0h9L5pLzaJOgAPPnljKtbio8FNtaHihNFB
-	4JTZtjgM3Aa9USYK8lm4C8yCdw86aY+gDNdOvFZsVRrUfatX4+EhfxnNuX9nizZu2YI=
-X-Gm-Gg: AY/fxX4u/2GIulEhtk0+2C67xq0ez2r/jHoqc+DC6MMPwE4OMrNlvNVR4VMKKyAVKSd
-	v7PVYbkg2ew6Tw1/d/7yKQ1w3zcmA9UoIjwu+b4fXzCx+aw3NHpOR1s7VhsJyJUQKD18zp/5fjQ
-	lCdXvmlngUOaEDXEH0o0n2Orf3J2P8pXuZSaPzsIN9tNb4mA69djELrhSGM8CppNOjHtR0e71cf
-	ij4xA3paQ9dVMbgmz7shb0pO6dtwiBgWPrIpoNE8dgafwBzEm32SO6RKoBj2HhW5dRXSWurjnPr
-	ea2x6FzeIWq+NYnVz/zlMr6zZVRInxaJpmm1uAeAUepavjxQ0F4y5N0kdbqEGgZLwVi3NTab0dF
-	iFFHAThT6HKyxAocBF1JW3KdaGrLA2KVIvcF1i0+ox/JsVuEbPse6veV7JcVSAn9EjzhC54o9pD
-	42oAxhOGZk8mwwRg==
-X-Received: by 2002:a05:600c:37cf:b0:471:1765:839c with SMTP id 5b1f17b1804b1-4801eb041f7mr33515455e9.20.1768578708783;
-        Fri, 16 Jan 2026 07:51:48 -0800 (PST)
+        bh=IhfsGF0Lr88dXj6BtoBIvCxUcSfXthaHRcGxI1cR848=;
+        b=vYq60x2cpSanl563P8CDFzFDYeHs8DG2qmmX3yt6EuxN6bHZhUW+/QNhuN2yRazDwp
+         utkukf92HRRHOK35HNOEzchC0JSBl3YKUzYV3qz4ad2OLPP0pu3rP0cT3KMnbOXUVDxo
+         I3zD+e8dIwYDwDyw4WLl6gs8PeRkMaSYispMuybZFubIsA/3+AUbYel8T9RkgLk+siy2
+         86VTWmr8Qr18VIW8JhWNeZZMlentATOW5Ci/h3KDttkUpGyrHpCoIvZd6LcO8tIYL701
+         6/Ai7qmx8ln6mC8g8qyP2+PIuDG59wLQYLr0BlZP3aWoUA2AHthZ4VymuLnQ3Lvfivsp
+         B+Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCVm1Cz+11D011OjBhS703RDjVtc87oTWEPJnJ/zeYBnc/Nb9wNeYx1Tsa2Usibum3+r4AqrLzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtDsIQhbIbyKkbig81KVeOxU3qp2bNW2hzWtZxSDgSOJRdHxCj
+	aynM7FoVrary0mxwgyLHXe9gWGj0js1GwOV8DVF5CarDO5yBcbFG26eUyx81pLCAOV8=
+X-Gm-Gg: AY/fxX5BgvqxAkKswexbwjUgIvsXgXdjGQadLv4+tyZ6+eraOL0iImVf50XbBTwaYVI
+	w1+d+qzXKrc/3aAQCpRyO7bbeaoXtEkWkN0SYOnYX0QVAbZmKz0XID9b+ABmgO7NEO4EcbvaGoB
+	tIs4ooZXMIabqclYTedTqjgAw01gpBzgnrCEERdC+TzPvMPpwbGCQNhDrqJZ7yD523kjGD3Dfvm
+	YiXp5peyAQhsKT3hJgFP8r5quhtV7mnf+br9mg5ZYCTq6vtRXLW7WgqQPJMo92Y1kZJp7hShw/m
+	3yd+W/MAWn3fqHz3UlIDpqHXOkBM26tl7FECQds9QOjnEePvgRgL7vvD0ntdPuvuCf5ZhXLhI6S
+	RqKpp18lu6U5EEQpsfKH+Oc6rigpr13sm8WV3KGN1jE4U1nt88HecFTlOGramu+TFSxVRp+dtNN
+	SSM6h7FItA9gj7SA==
+X-Received: by 2002:a05:600c:4448:b0:47e:e2b0:15ba with SMTP id 5b1f17b1804b1-4801eab9ed9mr38086855e9.8.1768578831547;
+        Fri, 16 Jan 2026 07:53:51 -0800 (PST)
 Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569927007sm5815673f8f.16.2026.01.16.07.51.47
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569921dddsm6174633f8f.6.2026.01.16.07.53.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 07:51:48 -0800 (PST)
-Date: Fri, 16 Jan 2026 16:51:45 +0100
+        Fri, 16 Jan 2026 07:53:51 -0800 (PST)
+Date: Fri, 16 Jan 2026 16:53:48 +0100
 From: Petr Mladek <pmladek@suse.com>
 To: Breno Leitao <leitao@debian.org>
 Cc: John Ogness <john.ogness@linutronix.de>, osandov@osandov.com,
@@ -85,9 +85,8 @@ Cc: John Ogness <john.ogness@linutronix.de>, osandov@osandov.com,
 	rostedt@goodmis.org
 Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
  infrastructure
-Message-ID: <aWpekVlhRpD4CaDI@pathway.suse.cz>
-References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
- <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+Message-ID: <aWpfDKd64DLX32Hl@pathway.suse.cz>
+References: <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
  <87zf6pfmlq.fsf@jogness.linutronix.de>
  <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
  <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
@@ -96,6 +95,7 @@ References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
  <875x9a6cpw.fsf@jogness.linutronix.de>
  <44upa7szd563kggh4xolznmfcwfnhrrh5guvecp6pzlvp5qvic@w7hxtzy7huzf>
  <jakydyx5dprrzgbsb6lorgpova46jbhq5tecwwtiihkhyi6ofy@olsrizfk52je>
+ <aWpekVlhRpD4CaDI@pathway.suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,222 +104,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <jakydyx5dprrzgbsb6lorgpova46jbhq5tecwwtiihkhyi6ofy@olsrizfk52je>
+In-Reply-To: <aWpekVlhRpD4CaDI@pathway.suse.cz>
 
-On Mon 2026-01-12 04:44:42, Breno Leitao wrote:
-> On Mon, Jan 12, 2026 at 02:55:06AM -0800, Breno Leitao wrote:
-> > > My ordered preferences for right now would be:
-> > > 
-> > > 1. keeping @caller_id semantics + adding @cpu + adding @comm (similar to
-> > > your C)
+On Fri 2026-01-16 16:51:49, Petr Mladek wrote:
+> On Mon 2026-01-12 04:44:42, Breno Leitao wrote:
+> > On Mon, Jan 12, 2026 at 02:55:06AM -0800, Breno Leitao wrote:
+> > 
+> >     printk: Add execution context (task name/CPU) to printk_info
+> >     
+> > 
+> > --- a/kernel/printk/printk_ringbuffer.h
+> > +++ b/kernel/printk/printk_ringbuffer.h
+> > @@ -23,6 +24,10 @@ struct printk_info {
+> >  	u8	flags:5;	/* internal record flags */
+> >  	u8	level:3;	/* syslog level */
+> >  	u32	caller_id;	/* thread id or processor id */
+> > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > +	char	msg_comm[TASK_COMM_LEN]; /* name of the task that generated the message */
+> > +	int	msg_cpu;	/* CPU where the message was generated */
 > 
-> ...
+> I would allow to store the caller_id complement so that we
+> always store both cpu and pid.
 > 
-> > Let me hack a new version of it with @comm, and post here to check how
-> > it looks likes.
+> Also I would remove the "msg_" prefix. It is not bad. But it is
+> inconsistent with the existing "caller_" prefix. And the meaning
+> should be obvious because it is stored in struct printk_info...
 > 
-> How does this version look like according to the suggestion above. It is
-> mostly Petr's option C with a few changes:
+> Otherwise, it looks good to me.
 > 
->   a) caller_id continues to be unchanged with (pid and context bit)
->   b) Append @pid and @comm to printk_info
-> 
-> 
-> Author: Breno Leitao <leitao@debian.org>
-> Date:   Thu Jan 8 03:00:46 2026 -0800
-> 
->     printk: Add execution context (task name/CPU) to printk_info
->     
->     Extend struct printk_info to include the task name and CPU number
->     where printk messages originate. This information is captured at
->     vprintk_store() time and propagated through printk_message to
->     nbcon_write_context, making it available to nbcon console drivers.
->     
->     This is useful for consoles like netconsole that want to include
->     execution context in their output, allowing correlation of messages
->     with specific tasks and CPUs regardless of where the console driver
->     actually runs.
->     
->     The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
->     automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
->     the helper functions compile to no-ops with no overhead.
->     
->     Suggested-by: John Ogness <john.ogness@linutronix.de>
->     Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> --- a/kernel/printk/printk_ringbuffer.h
-> +++ b/kernel/printk/printk_ringbuffer.h
-> @@ -23,6 +24,10 @@ struct printk_info {
->  	u8	flags:5;	/* internal record flags */
->  	u8	level:3;	/* syslog level */
->  	u32	caller_id;	/* thread id or processor id */
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +	char	msg_comm[TASK_COMM_LEN]; /* name of the task that generated the message */
-> +	int	msg_cpu;	/* CPU where the message was generated */
+> I tried to update your patch with the above proposal to see how
+> it looks and I got:
 
-I would allow to store the caller_id complement so that we
-always store both cpu and pid.
+The change seems to work. I have tested it with the following patch:
 
-Also I would remove the "msg_" prefix. It is not bad. But it is
-inconsistent with the existing "caller_" prefix. And the meaning
-should be obvious because it is stored in struct printk_info...
+From 1966dc35bb19eb3fc13ca41257203819c36cd21b Mon Sep 17 00:00:00 2001
+From: Petr Mladek <pmladek@suse.com>
+Date: Fri, 16 Jan 2026 16:38:16 +0100
+Subject: [PATCH 2/2] printk: Test extended execution context
 
-Otherwise, it looks good to me.
+Compile with
 
-I tried to update your patch with the above proposal to see how
-it looks and I got:
+CONFIG_NETCONSOLE=y
+CONFIG_NETCONSOLE_EXTENDED_LOG=y
+CONFIG_CONSOLE_HAS_EXECUTION_CTX=y
+CONFIG_PRINTK_EXECUTION_CTX=y
 
-From ac9d7962d478bda9b5c7ef1d42e14c46c9d576fc Mon Sep 17 00:00:00 2001
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 12 Jan 2026 04:44:42 -0800
-Subject: [PATCH 1/2] printk: Add execution context (task name/CPU) to
- printk_info
+Then the extended console format should show also:
 
-Extend struct printk_info to include the task name, pid, and CPU
-number where printk messages originate. This information is captured
-at vprintk_store() time and propagated through printk_message to
-nbcon_write_context, making it available to nbcon console drivers.
+     ,cpu=XXX,pid=YYY,comm=ZZZ
 
-This is useful for consoles like netconsole that want to include
-execution context in their output, allowing correlation of messages
-with specific tasks and CPUs regardless of where the console driver
-actually runs.
+For example:
 
-The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
-automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
-the helper functions compile to no-ops with no overhead.
+[...]
+6,776,2595848,-,caller=T167,cpu=3,pid=167,comm=scsi_eh_4;ata5: SATA link down (SStatus 0 SControl 300)
+6,777,2623478,-,caller=T1,cpu=11,pid=1,comm=swapper/0;sched_clock: Marking stable (2420002924, 202869031)->(2789319400, -166447445)
+6,778,2626663,-,caller=T159,cpu=2,pid=159,comm=scsi_eh_0;ata1: SATA link down (SStatus 0 SControl 300)
+6,779,2671763,-,caller=T1,cpu=7,pid=1,comm=swapper/0;registered taskstats version 1
+6,780,2672803,-,caller=T163,cpu=3,pid=163,comm=scsi_eh_2;ata3: SATA link down (SStatus 0 SControl 300)
+[...]
+4,1210,238099642,-,caller=C11,cpu=11,pid=0,comm=swapper/11; common_startup_64+0x13e/0x141
+4,1211,238099651,-,caller=C11,cpu=11,pid=0,comm=swapper/11; </TASK>
+4,1212,238099652,-,caller=C7,cpu=7,pid=0,comm=swapper/7;NMI backtrace for cpu 7
+4,1213,238099655,-,caller=C7,cpu=7,pid=0,comm=swapper/7;CPU: 7 UID: 0 PID: 0 Comm: swapper/7 Not tainted 6.19.0-rc5-default+ #475 PREEMPT(full)  9097c5ae70fd66490486e279e5273a94d14cd453
+[...]
 
-Suggested-by: John Ogness <john.ogness@linutronix.de>
-Signed-off-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Petr Mladek <pmladek@suse.com>
 ---
- drivers/net/Kconfig               |  1 +
- include/linux/console.h           |  8 +++++
- kernel/printk/internal.h          |  7 ++++
- kernel/printk/nbcon.c             | 15 +++++++++
- kernel/printk/printk.c            | 53 ++++++++++++++++++++++++++++++-
- kernel/printk/printk_ringbuffer.h |  5 +++
- lib/Kconfig.debug                 | 20 ++++++++++++
- 7 files changed, 108 insertions(+), 1 deletion(-)
+ kernel/printk/printk.c | 84 ++++++++++++++++++++++++------------------
+ 1 file changed, 48 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index ac12eaf11755..12e47cb27ffa 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
- 	bool "Dynamic reconfiguration of logging targets"
- 	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
- 			!(NETCONSOLE=y && CONFIGFS_FS=m)
-+	select CONSOLE_HAS_EXECUTION_CTX
- 	help
- 	  This option enables the ability to dynamically reconfigure target
- 	  parameters (interface, IP addresses, port numbers, MAC addresses)
-diff --git a/include/linux/console.h b/include/linux/console.h
-index fc9f5c5c1b04..47477fd05ee8 100644
---- a/include/linux/console.h
-+++ b/include/linux/console.h
-@@ -19,6 +19,7 @@
- #include <linux/irq_work.h>
- #include <linux/rculist.h>
- #include <linux/rcuwait.h>
-+#include <linux/sched.h>
- #include <linux/smp.h>
- #include <linux/types.h>
- #include <linux/vesa.h>
-@@ -298,12 +299,19 @@ struct nbcon_context {
-  * @outbuf:		Pointer to the text buffer for output
-  * @len:		Length to write
-  * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
-+ * @msg_comm:		Name of the task that generated the message
-+ * @msg_cpu:		CPU on which the message was generated
-  */
- struct nbcon_write_context {
- 	struct nbcon_context	__private ctxt;
- 	char			*outbuf;
- 	unsigned int		len;
- 	bool			unsafe_takeover;
-+#ifdef CONFIG_PRINTK_EXECUTION_CTX
-+	int			cpu;
-+	pid_t			pid;
-+	char			comm[TASK_COMM_LEN];
-+#endif
- };
- 
- /**
-diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
-index 5f5f626f4279..cf9c01a02853 100644
---- a/kernel/printk/internal.h
-+++ b/kernel/printk/internal.h
-@@ -281,12 +281,19 @@ struct printk_buffers {
-  *		nothing to output and this record should be skipped.
-  * @seq:	The sequence number of the record used for @pbufs->outbuf.
-  * @dropped:	The number of dropped records from reading @seq.
-+ * @msg_comm:	Name of the task that generated the message.
-+ * @msg_cpu:	CPU on which the message was generated.
-  */
- struct printk_message {
- 	struct printk_buffers	*pbufs;
- 	unsigned int		outbuf_len;
- 	u64			seq;
- 	unsigned long		dropped;
-+#ifdef CONFIG_PRINTK_EXECUTION_CTX
-+	int			cpu;
-+	pid_t			pid;
-+	char			comm[TASK_COMM_LEN];
-+#endif
- };
- 
- bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
-diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
-index 3fa403f9831f..c2b3c4d2146e 100644
---- a/kernel/printk/nbcon.c
-+++ b/kernel/printk/nbcon.c
-@@ -946,6 +946,19 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
- }
- EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
- 
-+#ifdef CONFIG_PRINTK_EXECUTION_CTX
-+static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
-+					    struct printk_message *pmsg)
-+{
-+	wctxt->cpu = pmsg->cpu;
-+	wctxt->pid = pmsg->pid;
-+	memcpy(wctxt->comm, pmsg->comm, TASK_COMM_LEN);
-+}
-+#else
-+static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
-+					    struct printk_message *pmsg) {}
-+#endif
-+
- /**
-  * nbcon_emit_next_record - Emit a record in the acquired context
-  * @wctxt:	The write context that will be handed to the write function
-@@ -1048,6 +1061,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
- 	/* Initialize the write context for driver callbacks. */
- 	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
- 
-+	wctxt_load_execution_ctx(wctxt, &pmsg);
-+
- 	if (use_atomic)
- 		con->write_atomic(con, wctxt);
- 	else
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 1d765ad242b8..bc09fb6e33d1 100644
+index bc09fb6e33d1..ac8eccb1d2fc 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
-@@ -2131,12 +2131,40 @@ static inline void printk_delay(int level)
- 	}
+@@ -630,6 +630,40 @@ static int check_syslog_permissions(int type, int source)
+ 	return security_syslog(type);
  }
  
 +#define caller_id_mask 0x80000000
 +
- static inline u32 printk_caller_id(void)
- {
- 	return in_task() ? task_pid_nr(current) :
--		0x80000000 + smp_processor_id();
++static inline u32 printk_caller_id(void)
++{
++	return in_task() ? task_pid_nr(current) :
 +		caller_id_mask + smp_processor_id();
- }
- 
++}
++
 +
 +#ifdef CONFIG_PRINTK_EXECUTION_CTX
 +/* Store the opposite info than caller_id. */
@@ -346,107 +215,83 @@ index 1d765ad242b8..bc09fb6e33d1 100644
 +}
 +#endif
 +
+ static void append_char(char **pp, char *e, char c)
+ {
+ 	if (*pp < e)
+@@ -641,6 +675,7 @@ static ssize_t info_print_ext_header(char *buf, size_t size,
+ {
+ 	u64 ts_usec = info->ts_nsec;
+ 	char caller[20];
++	char ext_caller[100];
+ #ifdef CONFIG_PRINTK_CALLER
+ 	u32 id = info->caller_id;
+ 
+@@ -650,11 +685,22 @@ static ssize_t info_print_ext_header(char *buf, size_t size,
+ 	caller[0] = '\0';
+ #endif
+ 
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	snprintf(ext_caller, sizeof(ext_caller),
++		 ",cpu=%u,pid=%u,comm=%s",
++		 printk_info_get_cpu(info),
++		 printk_info_get_pid(info),
++		 info->comm);
++#else
++	ext_caller[0] = '\0';
++#endif
++
+ 	do_div(ts_usec, 1000);
+ 
+-	return scnprintf(buf, size, "%u,%llu,%llu,%c%s;",
++	return scnprintf(buf, size, "%u,%llu,%llu,%c%s%s;",
+ 			 (info->facility << 3) | info->level, info->seq,
+-			 ts_usec, info->flags & LOG_CONT ? 'c' : '-', caller);
++			 ts_usec, info->flags & LOG_CONT ? 'c' : '-',
++			 caller, ext_caller);
+ }
+ 
+ static ssize_t msg_add_ext_text(char *buf, size_t size,
+@@ -2131,40 +2177,6 @@ static inline void printk_delay(int level)
+ 	}
+ }
+ 
+-#define caller_id_mask 0x80000000
+-
+-static inline u32 printk_caller_id(void)
+-{
+-	return in_task() ? task_pid_nr(current) :
+-		caller_id_mask + smp_processor_id();
+-}
+-
+-
+-#ifdef CONFIG_PRINTK_EXECUTION_CTX
+-/* Store the opposite info than caller_id. */
+-static inline u32 printk_caller_id2(void)
+-{
+-	return !in_task() ? task_pid_nr(current) :
+-		caller_id_mask + smp_processor_id();
+-}
+-
+-static inline pid_t printk_info_get_pid(const struct printk_info *info)
+-{
+-	u32 caller_id = info->caller_id;
+-	u32 caller_id2 = info->caller_id2;
+-
+-	return caller_id & caller_id_mask ? caller_id2 : caller_id;
+-}
+-
+-static inline int printk_info_get_cpu(const struct printk_info *info)
+-{
+-	u32 caller_id = info->caller_id;
+-	u32 caller_id2 = info->caller_id2;
+-
+-	return (caller_id & caller_id_mask ? caller_id : caller_id2) & ~caller_id_mask;
+-}
+-#endif
+-
  /**
   * printk_parse_prefix - Parse level and control flags.
   *
-@@ -2213,6 +2241,27 @@ static u16 printk_sprint(char *text, u16 size, int facility,
- 	return text_len;
- }
- 
-+#ifdef CONFIG_PRINTK_EXECUTION_CTX
-+static inline void printk_store_execution_ctx(struct printk_info *info)
-+{
-+	info->caller_id2 = printk_caller_id2();
-+	get_task_comm(info->comm, current);
-+}
-+
-+static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
-+					   const struct printk_info *info)
-+{
-+	pmsg->cpu = printk_info_get_cpu(info);
-+	pmsg->pid = printk_info_get_pid(info);
-+	memcpy(pmsg->comm, info->comm, TASK_COMM_LEN);
-+}
-+#else
-+static inline void printk_store_execution_ctx(struct printk_info *info) {}
-+
-+static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
-+					   const struct printk_info *info) {}
-+#endif
-+
- __printf(4, 0)
- int vprintk_store(int facility, int level,
- 		  const struct dev_printk_info *dev_info,
-@@ -2320,6 +2369,7 @@ int vprintk_store(int facility, int level,
- 	r.info->caller_id = caller_id;
- 	if (dev_info)
- 		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
-+	printk_store_execution_ctx(r.info);
- 
- 	/* A message without a trailing newline can be continued. */
- 	if (!(flags & LOG_NEWLINE))
-@@ -3002,6 +3052,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
- 	pmsg->seq = r.info->seq;
- 	pmsg->dropped = r.info->seq - seq;
- 	force_con = r.info->flags & LOG_FORCE_CON;
-+	pmsg_load_execution_ctx(pmsg, r.info);
- 
- 	/*
- 	 * Skip records that are not forced to be printed on consoles and that
-diff --git a/kernel/printk/printk_ringbuffer.h b/kernel/printk/printk_ringbuffer.h
-index 4ef81349d9fb..8943c02995af 100644
---- a/kernel/printk/printk_ringbuffer.h
-+++ b/kernel/printk/printk_ringbuffer.h
-@@ -6,6 +6,7 @@
- #include <linux/atomic.h>
- #include <linux/bits.h>
- #include <linux/dev_printk.h>
-+#include <linux/sched.h>
- #include <linux/stddef.h>
- #include <linux/types.h>
- 
-@@ -23,6 +24,10 @@ struct printk_info {
- 	u8	flags:5;	/* internal record flags */
- 	u8	level:3;	/* syslog level */
- 	u32	caller_id;	/* thread id or processor id */
-+#ifdef CONFIG_PRINTK_EXECUTION_CTX
-+	u32	caller_id2;	/* caller_id complement */
-+	char	comm[TASK_COMM_LEN]; /* name of the task that generated the message */
-+#endif
- 
- 	struct dev_printk_info	dev_info;
- };
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index ba36939fda79..57f91ee10b8e 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -35,6 +35,26 @@ config PRINTK_CALLER
- 	  no option to enable/disable at the kernel command line parameter or
- 	  sysfs interface.
- 
-+config CONSOLE_HAS_EXECUTION_CTX
-+	bool
-+	help
-+	  Selected by console drivers that support execution context
-+	  (task name/CPU) in their output. This enables PRINTK_EXECUTION_CTX
-+	  to provide the necessary infrastructure.
-+
-+config PRINTK_EXECUTION_CTX
-+	bool "Include execution context (task/CPU) in printk messages"
-+	depends on PRINTK && CONSOLE_HAS_EXECUTION_CTX
-+	default CONSOLE_HAS_EXECUTION_CTX
-+	help
-+	  This option extends struct printk_info to include extra execution
-+	  context in printk, such as task name and CPU number from where the
-+	  message originated. This is useful for correlating printk messages
-+	  with specific execution contexts.
-+
-+	  This is automatically enabled when a console driver that supports
-+	  execution context is selected.
-+
- config STACKTRACE_BUILD_ID
- 	bool "Show build ID information in stacktraces"
- 	depends on PRINTK
 -- 
 2.52.0
 
