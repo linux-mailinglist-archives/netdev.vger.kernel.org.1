@@ -1,78 +1,53 @@
-Return-Path: <netdev+bounces-250398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBFFFD29FDC
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:16:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC339D2A2CA
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3969C300B379
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:14:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CD95B3039843
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440A1337B90;
-	Fri, 16 Jan 2026 02:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451C12F60BC;
+	Fri, 16 Jan 2026 02:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X//KYJwT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzBmdbTi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195AE337118;
-	Fri, 16 Jan 2026 02:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22945224FA
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 02:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768529677; cv=none; b=I/BXaO2e8kaEkejweryANwwBf13U+sFc1C9EHEdQXRVG6GSHkGU9GuVaz6UZu/AX/D+ZA7RRFxooH7ZhKg6C5UzpCTUpauCst9ckaW6c9xhbUedWsvNESovjc1F3hRwfcSYLg//5pHhRdUIFLlH0WPsdTVg3KFxzn0srdmOCC8Q=
+	t=1768530837; cv=none; b=BMcCdv7KRRzmu/C5tI+JafZPYdbRTdjH3is8LImn+4ud//wi4J0ZvQ7paqNJONlXPTYY+IXlUdguKwnE117I1lBQqXPm+Fi0AZoALFx2EC5y3t0RXH6wSwRsqi7CiEOz27xzdZCa8DNe21CFv3bdJyNXKYCwprzFeeu5u0j1Qzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768529677; c=relaxed/simple;
-	bh=Wn0tUXC979x9pCkmMJyVpTI1cgSaVEHiWarrypJ7K4I=;
+	s=arc-20240116; t=1768530837; c=relaxed/simple;
+	bh=nfpCv9XH3mdzOxCKXEixjHOhpJiiHoQ2YuriFNEW6zo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bkdOeVWBOenma44s6bUqpx+sAb1+2G+21ioJwv9La3wA28E8bDvv0TXoqLNr5irmGsisHOqV+HYHcMTSCYpze94TazqnG9rxcQ1/k85RSzWfRcHHZU821rMnFLKVY/ba37ewv17Yax1Lq3N1jrPgAItCydIOhJKfWFhcrwZuu2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X//KYJwT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1385C116D0;
-	Fri, 16 Jan 2026 02:14:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=B4r3k/4LFvzMXljc6IBaQrMxXggjsjWy/1TL6k74M16r1t4YW/FJde7LJzIY31fzHnsmRTFW7jw5YwujOEzsqWTozXM3VHbTHMUwBewsg4YrIBvwruzGQJF5M1dUPfAs2dh47aDuACTXRCgdLMsDfcPdtE3MQnOe670rwaeWfU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rzBmdbTi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA4AC116D0;
+	Fri, 16 Jan 2026 02:33:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768529676;
-	bh=Wn0tUXC979x9pCkmMJyVpTI1cgSaVEHiWarrypJ7K4I=;
+	s=k20201202; t=1768530836;
+	bh=nfpCv9XH3mdzOxCKXEixjHOhpJiiHoQ2YuriFNEW6zo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X//KYJwT3bN2OJWMtKSoz+1hDIvthN9O61Xlg6jLUfieNIy43sWsrO3O6fiwQ9xr7
-	 4lXLOxSwbWnCMvQPH89Plr4iwNj2iQdtgMkew545OzBEA6pYAqDeR8ngBH+vrGM+Ly
-	 8TYnbF142VvYAmflRAosMjoAN3bA8p1ra6I1Ab0rYcFXwlCntpgePd3qHeKq4JyjNw
-	 TFxaVWDZzBZUBqH+5vNbuvMUkFrvI8KBxBT4KzgQVHartyXjPWCmEaJxGAlROgJrek
-	 VCVqZzBOaoUvfZiQyveUN2EuoWs0oxOg+aWHwEQbm6OE+ukljxd4+SAa1cQ1sOItVK
-	 bEf9D6rb/58WA==
-Date: Thu, 15 Jan 2026 18:14:34 -0800
+	b=rzBmdbTiRrOGZEsm6qYJqASYuwg7JKCe3JfUHmJKm/r3CjVICH3ih/RcmYTPtuuIw
+	 Grk8mweuMwg0qmmM6qCynQ5zSepJNSTLcar7D+clv7wwY5SKowjmPUo/28cz7/6cvI
+	 958LwSBZVwr9bGe/Kw/6oJ21LAFmOxNvRHRYvF/UFoFgxegb6AUBeacVhxFj5y1tif
+	 7hCK8sqS4dVEfzWlWkz0bFlX5XHuL27pCYqGovXl7CoXEY5a+scVj7BUFy/9crOvMN
+	 pLyIZdKNz3Ywp7hp1RiO0ffJdOnc5PbDT5p3eGyp4ixb6ta9P/AmXHlgc0efJ6psE0
+	 6mkordlT639AQ==
+Date: Thu, 15 Jan 2026 18:33:55 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Haiyang Zhang <haiyangz@linux.microsoft.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni
- Sri Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
- <shradhagupta@linux.microsoft.com>, Saurabh Sengar
- <ssengar@linux.microsoft.com>, Aditya Garg
- <gargaditya@linux.microsoft.com>, Dipayaan Roy
- <dipayanroy@linux.microsoft.com>, Shiraz Saleem
- <shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: Re: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
- for coalesced RX packets on CQE
-Message-ID: <20260115181434.4494fe9f@kernel.org>
-In-Reply-To: <SA3PR21MB38673CA4DDE618A5D9C4FA99CA8CA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
-	<1767732407-12389-2-git-send-email-haiyangz@linux.microsoft.com>
-	<20260109175610.0eb69acb@kernel.org>
-	<SA3PR21MB3867BAD6022A1CAE2AC9E202CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260112172146.04b4a70f@kernel.org>
-	<SA3PR21MB3867B36A9565AB01B0114D3ACA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260113170948.1d6fbdaf@kernel.org>
-	<SA3PR21MB38676C98AA702F212CE391E2CA8FA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260114185450.58db5a6d@kernel.org>
-	<SA3PR21MB38673CA4DDE618A5D9C4FA99CA8CA@SA3PR21MB3867.namprd21.prod.outlook.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [Patch net v7 0/9] netem: Fix skb duplication logic and prevent
+ infinite loops
+Message-ID: <20260115183351.3ffc833e@kicinski-fedora-PF5CM1Y0>
+In-Reply-To: <20260113190634.681734-1-xiyou.wangcong@gmail.com>
+References: <20260113190634.681734-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,42 +57,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 Jan 2026 19:57:44 +0000 Haiyang Zhang wrote:
-> > > When coalescing is enabled, the device waits for packets which can
-> > > have the CQE coalesced with previous packet(s). That coalescing process
-> > > is finished (and a CQE written to the appropriate CQ) when the CQE is
-> > > filled with 4 pkts, or time expired, or other device specific logic is
-> > > satisfied.  
-> > 
-> > See, what I'm afraid is happening here is that you are enabling
-> > completion coalescing (how long the device keeps the CQE pending).
-> > Which is _not_ what rx_max_coalesced_frames controls for most NICs.
-> > For most NICs rx_max_coalesced_frames controls IRQ generation logic.
-> > 
-> > The NIC first buffers up CQEs for typically single digit usecs, and
-> > then once CQE timer exipred and writeback happened it starts an IRQ
-> > coalescing timer. Once the IRQ coalescing timer expires IRQ is
-> > triggered, which schedules NAPI. (broad strokes, obviously many
-> > differences and optimizations exist)
-> > 
-> > Is my guess correct? Are you controlling CQE coalescing>
-> > 
-> > Can you control the timeout instead of the frame count?  
+On Tue, 13 Jan 2026 11:06:25 -0800 Cong Wang wrote:
+> This patchset fixes the infinite loops due to duplication in netem, the
+> real root cause of this problem is enqueuing to the root qdisc, which is
+> now changed to enqueuing to the same qdisc. This is more reasonable,
+> more intuitive from users' perspective, less error-prone and more elegant
+> from kernel developers' perspective.
 > 
-> Our NIC's timeout value cannot be controlled by driver. Also, the
-> timeout may be changed in future NIC HW.
+> Please see more details in patch 4/9 which contains two pages of detailed
+> explanation including why it is safe and better.
 > 
-> So, I use the ethtool/rx-frames, which is either 1 or 4 on our
-> NIC, to switch the CQE coalescing feature on/off.
+> This reverts the offending commits from William which clearly broke
+> mq+netem use cases, as reported by two users.
+> 
+> All the TC test cases pass with this patchset.
 
-I feel like this is not the first time I'm having a conversation with
-you where you are not answering my direct questions, not just one
-sliver. IDK why you're doing this, but being able to participate 
-in  an email exchange is a bare minimum for participating upstream.
-Please consider this a warning.
+Hi Cong, looks like this was failing in TCD
 
-If I interpret your reply correctly you are indeed coalescing writeback.
-You need to add a new param to the uAPI. Please add both size and
-timeout. Expose the timeout as read only if your device doesn't support
-controlling it per queue.
+# not ok 709 7c3b - Test nested DRR with NETEM duplication
+# Value doesn't match: bytes: 98 != 196
+# Matching against output: {'kind': 'netem', 'handle': '3:', 'parent': '2:1', 'options': {'limit': 1000, 'duplicate': {'duplicate': 1, 'correlation': 0}, 'seed': 11404757756329248505, 'ecn': False, 'gap': 0}, 'bytes': 196, 'packets': 2, 'drops': 0, 'overlimits': 0, 'requeues': 0, 'backlog': 0, 'qlen': 0}
+
+https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/474644/1-tdc-sh/stdout
+
+So I marked it as changes requested.
 
