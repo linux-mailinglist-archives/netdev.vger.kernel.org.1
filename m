@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-250452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B80BD2C6B5
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:16:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1BFD2C779
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4D0B304323E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:16:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F064B303D92A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83225342CBA;
-	Fri, 16 Jan 2026 06:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E4334DB56;
+	Fri, 16 Jan 2026 06:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="a0Nj2Gtw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aEPHJpuW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE50322533
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182EE34A774
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768544205; cv=none; b=pqjZ/VptKDfuZwMcu6faTOSBoBmWEiywCx6/ObnteDgcqmS9PXJjnX8J6rG0zAddPy8I9MWGjbkDyDkIcwpghWh1loXw1pRZI6ls2E0YyONZTRoYzOWUJrZFmWqwZxPmpOIzlNdXR5UaisKDcXuwSwcmsVRnlIsf22+OhUz7IBo=
+	t=1768544470; cv=none; b=c39EJB6YaTGXE4Jmo5jYCliKItTT2w9FT96R3kw6Z0Zw4wyu8hYhE+9CELKSPWpuT6bwiUhPI5xaDhcoCUok7DA6TZ+YA5QjmuMm0ostQOuxkwG0GqBtKOxaV8qs14ORhhxBfb9QvUeTN2O+k7WFPsE9hG4PpN8N9x5pJF5g2eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768544205; c=relaxed/simple;
-	bh=y/Cx2zbsytOQ8HB2TXHSgCNMOJzg2AE3hjdpB44xxkk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rK99iWOSqfrtcS8JZ7EzWHVVADwqKsEA9yfujGxTaaOk+VC9GA/opTZP72xubBrAxLtkY/uKLYyOFcNJQkmYA9HrSpbkggz1viE5gVi+GMkiv/VDgjlVjWLSnryKj1B8CB9+fDpUF5IFgoect+Byl3r4wfeDqziqH5rxMFDJlsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=a0Nj2Gtw; arc=none smtp.client-ip=34.218.115.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768544203; x=1800080203;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EYmrqpWIPJWJpN9ggqrG8icNXtPcugfX8hE3p0bXivo=;
-  b=a0Nj2GtwvvQCHEQl5MpiAo9XD2e//jVPCQwHClnHPwqYca4aEGzaQrsV
-   Z8f1nnXST7pO7F+KCew9QAhWaOO5esry9+nmMlMdlwdvxhedCk+Hh2gl8
-   Qt4PtKv6wsMSLJJKemEVU5gGNcqt6cCJP5E08BBFQgymJqsB7uR616fvG
-   0dH3SeEzF9CGEHj5oyex7pTi58zx5z24y6MotTl+rosHdgPhpnfMo9nBL
-   WKQSuXX4ITiTkRahGd/Qd1dtJmxW6SVMUOvBNI3DsyvGCeQIykuP+HITx
-   8R5lo7L/jFVRL2P9xb0OdpdI/sO5x9MfLEZ8oQw50VSQbyShgr8ZidsFf
-   A==;
-X-CSE-ConnectionGUID: VC7y4LxHQCiNZMA6aQ8Zvg==
-X-CSE-MsgGUID: pyI9yhR9QYGA0MYc9INvaA==
-X-IronPort-AV: E=Sophos;i="6.21,230,1763424000"; 
-   d="scan'208";a="10781657"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 06:16:40 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:17737]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.191:2525] with esmtp (Farcaster)
- id 29701752-47e2-42e6-99e6-c54bb65648dc; Fri, 16 Jan 2026 06:16:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 29701752-47e2-42e6-99e6-c54bb65648dc
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 16 Jan 2026 06:16:39 +0000
-Received: from 603e5f7bc1fe.amazon.com (10.37.245.10) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 16 Jan 2026 06:16:38 +0000
-From: Takashi Kozu <takkozu@amazon.com>
-To: <pmenzel@molgen.mpg.de>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <takkozu@amazon.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 1/3] igb: prepare for RSS key get/set support
-Date: Fri, 16 Jan 2026 15:16:31 +0900
-Message-ID: <20260116061630.77723-2-takkozu@amazon.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <2ad8d26a-794c-498b-a09b-5791acb0a9d5@molgen.mpg.de>
-References: <2ad8d26a-794c-498b-a09b-5791acb0a9d5@molgen.mpg.de>
+	s=arc-20240116; t=1768544470; c=relaxed/simple;
+	bh=n/Cjiz4enSqA28KJSyzX1xZU0qLNvqt0othrhYOgbBs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XIKd2MZ1rNzaZ5hoegIouw5/J48YpeVrUXkhqTIBfkO613w0lsl9wU6SIZaODIOWv3jSghK0/5FIXeLsSq5mpvC2G2PmIErKWOjMK3Qxr1lVU15StDk1qatJhN+8EVPKqwL53djX38dca4UwuEKljuMAKZQNDs05kUsCUvQCozg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aEPHJpuW; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768544466;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=j4j5zWZbjDJTpAgq5afXR42uW4v94hZCLbOAgpx00es=;
+	b=aEPHJpuWxo6pmMicnk0zgpU41mDGQ12xvQSGgUDjSHgiKri/kLLTI7UsCq6RTd0fVQsrLI
+	XwLrslp4v8b6F+WxDzN6DqL8mrqKNC7QEtJV/OpoJwtXAg7Un/OZg4aWvFEaVJuq8Wf1sL
+	u0bD2kBy834DyG5+bvDOhDB207idMPk=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v2 1/2] net: remove legacy way to get/set HW timestamp config
+Date: Fri, 16 Jan 2026 06:21:20 +0000
+Message-ID: <20260116062121.1230184-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,87 +64,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Migadu-Flow: FLOW_OUT
 
-> From: Paul Menzel <pmenzel@molgen.mpg.de>
-> To: Takashi Kozu <takkozu@amazon.com>
-> Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-> andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-> kuba@kernel.org, pabeni@redhat.com,
-> intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-> Kohei Enju <enjuk@amazon.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 1/3] igb: prepare for RSS key get/set support
-> Date: Thu, 8 Jan 2026 13:27:57 +0100 [thread overview]
-> Message-ID: <2ad8d26a-794c-498b-a09b-5791acb0a9d5@molgen.mpg.de> (raw)
-> In-Reply-To: <20260108052020.84218-6-takkozu@amazon.com>
-> 
-> Dear Takashi,
-> 
-> 
-> Thank you for the patch.
-> 
-> Am 08.01.26 um 06:20 schrieb Takashi Kozu:
-> > Store the RSS key inside struct igb_adapter and introduce the
-> > igb_write_rss_key() helper function. This allows the driver to program
-> > the E1000 registers using a persistent RSS key, instead of using a
-> > stack-local buffer in igb_setup_mrqc().
-> >
-> > Tested-by: Kohei Enju <enjuk@amazon.com>
-> > Signed-off-by: Takashi Kozu <takkozu@amazon.com>
-> > ---
-> > drivers/net/ethernet/intel/igb/igb.h | 3 +++
-> > drivers/net/ethernet/intel/igb/igb_ethtool.c | 12 ++++++++++++
-> > drivers/net/ethernet/intel/igb/igb_main.c | 6 ++----
-> > 3 files changed, 17 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-> > index 0fff1df81b7b..8c9b02058cec 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb.h
-> > +++ b/drivers/net/ethernet/intel/igb/igb.h
-> > @@ -495,6 +495,7 @@ struct hwmon_buff {
-> > #define IGB_N_PEROUT 2
-> > #define IGB_N_SDP 4
-> > #define IGB_RETA_SIZE 128
-> > +#define IGB_RSS_KEY_SIZE 40
-> >
-> > enum igb_filter_match_flags {
-> > IGB_FILTER_FLAG_ETHER_TYPE = 0x1,
-> > @@ -655,6 +656,7 @@ struct igb_adapter {
-> > struct i2c_client *i2c_client;
-> > u32 rss_indir_tbl_init;
-> > u8 rss_indir_tbl[IGB_RETA_SIZE];
-> > + u8 rss_key[IGB_RSS_KEY_SIZE];
-> >
-> > unsigned long link_check_timeout;
-> > int copper_tries;
-> > @@ -735,6 +737,7 @@ void igb_down(struct igb_adapter *);
-> > void igb_reinit_locked(struct igb_adapter *);
-> > void igb_reset(struct igb_adapter *);
-> > int igb_reinit_queues(struct igb_adapter *);
-> > +void igb_write_rss_key(struct igb_adapter *adapter);
-> > void igb_write_rss_indir_tbl(struct igb_adapter *);
-> > int igb_set_spd_dplx(struct igb_adapter *, u32, u8);
-> > int igb_setup_tx_resources(struct igb_ring *);
-> > diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> > index 10e2445e0ded..8695ff28a7b8 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> > +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> > @@ -3016,6 +3016,18 @@ static int igb_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
-> > return ret;
-> > }
-> >
-> > +void igb_write_rss_key(struct igb_adapter *adapter)
-> > +{
-> > + struct e1000_hw *hw = &adapter->hw;
-> > + u32 val;
-> > + int i;
-> > +
-> > + for (i = 0; i < IGB_RSS_KEY_SIZE / 4; i++) {
-> > + val = get_unaligned_le32(&adapter->rss_key[i info.plist 4]);
-> 
-> Why is `get_unaligned_le32()` needed?
+With all drivers converted to use ndo_hwstamp callbacks the legacy way
+can be removed, marking ioctl interface as deprecated.
 
-I think it's necessary in order to align to 4 bytes.
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+v1 -> v2:
+* added cleanup in Infiniband
+* adjusted documentation to remove mentions of legacy way
+---
+ Documentation/networking/timestamping.rst |  7 ++-
+ drivers/infiniband/ulp/ipoib/ipoib_main.c |  6 +--
+ net/core/dev_ioctl.c                      | 60 ++++++-----------------
+ 3 files changed, 21 insertions(+), 52 deletions(-)
+
+diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+index 7aabead90648..2162c4f2b28a 100644
+--- a/Documentation/networking/timestamping.rst
++++ b/Documentation/networking/timestamping.rst
+@@ -627,10 +627,9 @@ ioctl(SIOCSHWTSTAMP). However, this has not been implemented in all drivers.
+ --------------------------------------------------------
+ 
+ A driver which supports hardware time stamping must support the
+-ndo_hwtstamp_set NDO or the legacy SIOCSHWTSTAMP ioctl and update the
+-supplied struct hwtstamp_config with the actual values as described in
+-the section on SIOCSHWTSTAMP. It should also support ndo_hwtstamp_get or
+-the legacy SIOCGHWTSTAMP.
++ndo_hwtstamp_set NDO and update the supplied struct hwtstamp_config with
++the actual values as described in the section on SIOCSHWTSTAMP. It
++should also support ndo_hwtstamp_get NDO to retrieve configuration.
+ 
+ Time stamps for received packets must be stored in the skb. To get a pointer
+ to the shared time stamp structure of the skb call skb_hwtstamps(). Then
+diff --git a/drivers/infiniband/ulp/ipoib/ipoib_main.c b/drivers/infiniband/ulp/ipoib/ipoib_main.c
+index 300afc27c561..4a504b7c4293 100644
+--- a/drivers/infiniband/ulp/ipoib/ipoib_main.c
++++ b/drivers/infiniband/ulp/ipoib/ipoib_main.c
+@@ -1831,8 +1831,7 @@ static int ipoib_hwtstamp_get(struct net_device *dev,
+ 	struct ipoib_dev_priv *priv = ipoib_priv(dev);
+ 
+ 	if (!priv->rn_ops->ndo_hwtstamp_get)
+-		/* legacy */
+-		return dev_eth_ioctl(dev, config->ifr, SIOCGHWTSTAMP);
++		return -EOPNOTSUPP;
+ 
+ 	return priv->rn_ops->ndo_hwtstamp_get(dev, config);
+ }
+@@ -1844,8 +1843,7 @@ static int ipoib_hwtstamp_set(struct net_device *dev,
+ 	struct ipoib_dev_priv *priv = ipoib_priv(dev);
+ 
+ 	if (!priv->rn_ops->ndo_hwtstamp_set)
+-		/* legacy */
+-		return dev_eth_ioctl(dev, config->ifr, SIOCSHWTSTAMP);
++		return -EOPNOTSUPP;
+ 
+ 	return priv->rn_ops->ndo_hwtstamp_set(dev, config, extack);
+ }
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index 53a53357cfef..7a8966544c9d 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -287,7 +287,7 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
+ 	int err;
+ 
+ 	if (!ops->ndo_hwtstamp_get)
+-		return dev_eth_ioctl(dev, ifr, SIOCGHWTSTAMP); /* legacy */
++		return -EOPNOTSUPP;
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+@@ -414,7 +414,7 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
+ 	}
+ 
+ 	if (!ops->ndo_hwtstamp_set)
+-		return dev_eth_ioctl(dev, ifr, SIOCSHWTSTAMP); /* legacy */
++		return -EOPNOTSUPP;
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+@@ -438,48 +438,23 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
+ 	return 0;
+ }
+ 
+-static int generic_hwtstamp_ioctl_lower(struct net_device *dev, int cmd,
+-					struct kernel_hwtstamp_config *kernel_cfg)
+-{
+-	struct ifreq ifrr;
+-	int err;
+-
+-	if (!kernel_cfg->ifr)
+-		return -EINVAL;
+-
+-	strscpy_pad(ifrr.ifr_name, dev->name, IFNAMSIZ);
+-	ifrr.ifr_ifru = kernel_cfg->ifr->ifr_ifru;
+-
+-	err = dev_eth_ioctl(dev, &ifrr, cmd);
+-	if (err)
+-		return err;
+-
+-	kernel_cfg->ifr->ifr_ifru = ifrr.ifr_ifru;
+-	kernel_cfg->copied_to_user = true;
+-
+-	return 0;
+-}
+-
+ int generic_hwtstamp_get_lower(struct net_device *dev,
+ 			       struct kernel_hwtstamp_config *kernel_cfg)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
++	int err;
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+ 
+-	if (ops->ndo_hwtstamp_get) {
+-		int err;
+-
+-		netdev_lock_ops(dev);
+-		err = dev_get_hwtstamp_phylib(dev, kernel_cfg);
+-		netdev_unlock_ops(dev);
++	if (!ops->ndo_hwtstamp_get)
++		return -EOPNOTSUPP;
+ 
+-		return err;
+-	}
++	netdev_lock_ops(dev);
++	err = dev_get_hwtstamp_phylib(dev, kernel_cfg);
++	netdev_unlock_ops(dev);
+ 
+-	/* Legacy path: unconverted lower driver */
+-	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
++	return err;
+ }
+ EXPORT_SYMBOL(generic_hwtstamp_get_lower);
+ 
+@@ -488,22 +463,19 @@ int generic_hwtstamp_set_lower(struct net_device *dev,
+ 			       struct netlink_ext_ack *extack)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
++	int err;
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+ 
+-	if (ops->ndo_hwtstamp_set) {
+-		int err;
+-
+-		netdev_lock_ops(dev);
+-		err = dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
+-		netdev_unlock_ops(dev);
++	if (!ops->ndo_hwtstamp_set)
++		return -EOPNOTSUPP;
+ 
+-		return err;
+-	}
++	netdev_lock_ops(dev);
++	err = dev_set_hwtstamp_phylib(dev, kernel_cfg, extack);
++	netdev_unlock_ops(dev);
+ 
+-	/* Legacy path: unconverted lower driver */
+-	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
++	return err;
+ }
+ EXPORT_SYMBOL(generic_hwtstamp_set_lower);
+ 
+-- 
+2.47.3
+
 
