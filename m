@@ -1,66 +1,78 @@
-Return-Path: <netdev+bounces-250454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F689D2C786
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:21:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F04BFD2C7F1
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 04B573016A8A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:21:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6B9133009694
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C982634DB4D;
-	Fri, 16 Jan 2026 06:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053EE34C121;
+	Fri, 16 Jan 2026 06:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aN0EYFeX"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="VzMF19gn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B6A34DB67
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818583346AD
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768544472; cv=none; b=CuLfkVR1/RTrC0PXdkJ34rmSfkjO/5nbRppb49ZHkvr9Op07JpiY8EN0smz5g6gvBJZ5IoiY/FdKI40in7LFTzV4nuPmO8oPxIvbLAp1Wt/cqcPFWql/v+Tx2UY9UlgYkyp3ocPgi8MAXPl7LVrWAc8fJuqI7Lp6kF7jY3SbgeI=
+	t=1768544663; cv=none; b=o/GWc9p6CrugyLBV2pwTSOfbtAjKFree8tiV65UQHFiHGfGotxpc1UDGWp3BRJq+0vF876I8T5nQLkd922vkQU8n3YeKFLC0HV2O3OZRFlBvTcFY0Hdcs2J/FxRXo2nFbkZgQ52MD5cnnV69u8cLaPW3PyuOXyKxWDOxVmKGwBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768544472; c=relaxed/simple;
-	bh=9VBL47eqohze6t5E0t6T3XMJeZRUFkea6727za1gW+0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KSlRax9Fgdw6taxBMRS271emCDfSTteARVS3cpauBwpPq6t2akr53gJ94SBUPws5IYIQR5DSIqUBhXtpCE3vZYhHkH/XfIgBrlPpF+d8M0QaFoKrmb0vUeGG4nrzMQHeYXrWrK2IWYXKmHvmbrVZF9gTJxeZl8zkn6P40Z7p2Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aN0EYFeX; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768544468;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IukgeRwI0rnJ0F3Z/nKWjDgZvwa4tCZLAXgfQidZ6Mg=;
-	b=aN0EYFeXV/31Tmp8bcbXKRvi2Zoh9LOPK4xhSuGAeCI7x+B5loQb+dMozvzWb9XsRoDakw
-	lvqGbKhHPf327/n/Bo+BFsM8GXoSrmqOuyobJqaxAiFrW1NZAGvtKeOB4/TA5HbuvJltPs
-	rX+wRnsIACIVhHy8vdjaPrTX61I928I=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v2 2/2] selftests: drv-net: extend HW timestamp test with ioctl
-Date: Fri, 16 Jan 2026 06:21:21 +0000
-Message-ID: <20260116062121.1230184-2-vadim.fedorenko@linux.dev>
-In-Reply-To: <20260116062121.1230184-1-vadim.fedorenko@linux.dev>
-References: <20260116062121.1230184-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1768544663; c=relaxed/simple;
+	bh=FPqutsrZ8kCZoA41/6ojy/mwwIeQcOcxPC3KEd/lSKw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tjp8tAAd/eng3u6z8CqUJ+ip08HcdRHplnGjHzHgu68o5EI2ZuaeJWGXpu/uzk35Y7Ys2t9oO+83idB9FpgPHLiO1p3kCUB9DBCY1SGKlyo7/wlhNF37o+eDu42Mm+w2+dWdMm7ysAo2lYNVErK+72Rej6fpFmkGHvWP6K8qa4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=VzMF19gn; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768544662; x=1800080662;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=wpt1kM1YRs4xIHdqwfPIt9Yi6xvFOdnSBe+yiJjWAQE=;
+  b=VzMF19gnhX6sr64DyvRY+0PZOyCNghTG1xwOMWtPmp99O3nLm2FgjQ1o
+   A0a+fN6jh96wjOZyzrYtORZEYRaie58sabeuYMvdzjGEd4E/ACyExVfwh
+   NZt/ZJcvoRfH878DqiYSSh0reKONC0JFud0wkLSwkpoR6ru/qva0UUYTW
+   WRoIDjhFTXE5RMIo+2i0MJe/ps+J01TZ9DUqNQdYgAFEz6MJXQLmlhpE2
+   CtjuSvodM316YcyPWKd9CPshlRPvipHIwzVLr3lkSmiJHrTopbR5Bp2d1
+   wD866xG14cL+kXVxHyf8WDBCiXDiJxiKjHELnuFpjK6fj+2FfPAAPhxl6
+   A==;
+X-CSE-ConnectionGUID: UDn9gg2ZT/KAZBdf0H8yRQ==
+X-CSE-MsgGUID: c5a4pxpJT9ak3+S++Pv2Pw==
+X-IronPort-AV: E=Sophos;i="6.21,230,1763424000"; 
+   d="scan'208";a="10849593"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 06:24:20 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:9315]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.220:2525] with esmtp (Farcaster)
+ id 6875cfc2-26af-4f0a-b7d8-12d6d4c1f805; Fri, 16 Jan 2026 06:24:19 +0000 (UTC)
+X-Farcaster-Flow-ID: 6875cfc2-26af-4f0a-b7d8-12d6d4c1f805
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Fri, 16 Jan 2026 06:24:19 +0000
+Received: from 603e5f7bc1fe.amazon.com (10.37.245.10) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Fri, 16 Jan 2026 06:24:17 +0000
+From: Takashi Kozu <takkozu@amazon.com>
+To: <aleksandr.loktionov@intel.com>
+CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
+	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>, <takkozu@amazon.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via ethtool set_rxfh
+Date: Fri, 16 Jan 2026 15:24:11 +0900
+Message-ID: <20260116062410.80174-2-takkozu@amazon.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,233 +80,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Extend HW timestamp tests to check that ioctl interface is not broken
-and configuration setups and requests are equal to netlink interface.
-Some linter warnings are disabled because of ctypes classes.
+> -----Original Message-----
+> From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+> To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+> Kohei Enju <enjuk@amazon.com>
+> Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+> "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+> "davem@davemloft.net" <davem@davemloft.net>,
+> "edumazet@google.com" <edumazet@google.com>,
+> "intel-wired-lan@lists.osuosl.org"
+> <intel-wired-lan@lists.osuosl.org>,
+> "kuba@kernel.org" <kuba@kernel.org>,
+> "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+> "pabeni@redhat.com" <pabeni@redhat.com>,
+> "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+> "takkozu@amazon.com" <takkozu@amazon.com>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via ethtool set_rxfh
+> Date: Thu, 8 Jan 2026 13:03:12 +0000 [thread overview]
+> Message-ID: <IA3PR11MB898612B0CDA9C5A5448733EEE585A@IA3PR11MB8986.namprd11.prod.outlook.com> (raw)
+> In-Reply-To: <IA3PR11MB89865D0189D37BB3393B57F5E585A@IA3PR11MB8986.namprd11.prod.outlook.com>
+> 
+> 
+> 
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Loktionov, Aleksandr
+> > Sent: Thursday, January 8, 2026 1:28 PM
+> > To: Kohei Enju <enjuk@amazon.com>
+> > Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
+> > <anthony.l.nguyen@intel.com>; davem@davemloft.net;
+> > edumazet@google.com; intel-wired-lan@lists.osuosl.org;
+> > kuba@kernel.org; netdev@vger.kernel.org; pabeni@redhat.com; Kitszel,
+> > Przemyslaw <przemyslaw.kitszel@intel.com>; takkozu@amazon.com
+> > Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow
+> > configuring RSS key via ethtool set_rxfh
+> >
+> >
+> >
+> > > -----Original Message-----
+> > > From: Kohei Enju <enjuk@amazon.com>
+> > > Sent: Thursday, January 8, 2026 1:04 PM
+> > > To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> > > Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
+> > > <anthony.l.nguyen@intel.com>; davem@davemloft.net;
+> > > edumazet@google.com; enjuk@amazon.com; intel-wired-
+> > > lan@lists.osuosl.org; kuba@kernel.org; netdev@vger.kernel.org;
+> > > pabeni@redhat.com; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>;
+> > > takkozu@amazon.com
+> > > Subject: Re: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb:
+> > allow
+> > > configuring RSS key via ethtool set_rxfh
+> > >
+> > > On Thu, 8 Jan 2026 07:29:19 +0000, Loktionov, Aleksandr wrote:
+> > >
+> > > >>
+> > > >> - igb_write_rss_indir_tbl(adapter);
+> > > >> + if (rxfh->key) {
+> > > >> + adapter->has_user_rss_key = true;
+> > > >> + memcpy(adapter->rss_key, rxfh->key, sizeof(adapter-
+> > > >> >rss_key));
+> > > >> + igb_write_rss_key(adapter);
+> > > >It leads to race between ethtool RSS update and concurrent resets.
+> > > >Because igb_setup_mrqc() (called during resets) also calls
+> > > igb_write_rss_key(adapter).
+> > > >Non-fatal but breaks RSS configuration guarantees.
+> > >
+> > > At my first glance, rtnl lock serializes those operation, so it
+> > > doesn't seem to be racy as long as they are under the rtnl lock.
+> > >
+> > > As far as I skimmed the codes, functions such as igb_open()/
+> > > igb_up()/igb_reset_task(), which finally call igb_write_rss_key()
+> > are
+> > > serialized by rtnl lock or serializes igb_write_rss_key() call by
+> > > locking rtnl.
+> > >
+> > > Please let me know if I'm missing something and it's truly racy.
+> > I think you're right, and I've missed that missing rtnl_lock was added
+> > in upstream.
+> >
+> > Thank you for clarification
+> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> >
+> 
+> Afterthought, I think it could be nice to place ASSERT_RTNL() to show it explicitly.
+> What do you think about this idea?
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
-v1 -> v2:
-* improved import and added struct docs
-* silenced linter because of ctypes.Structure format
----
- .../selftests/drivers/net/hw/nic_timestamp.py | 128 ++++++++++++++++--
- 1 file changed, 120 insertions(+), 8 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/nic_timestamp.py b/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-index c1e943d53f19..c632b41e7a23 100755
---- a/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-+++ b/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-@@ -1,15 +1,38 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
-+# pylint: disable=locally-disabled, invalid-name, attribute-defined-outside-init, too-few-public-methods
- 
- """
- Tests related to configuration of HW timestamping
- """
- 
- import errno
-+import ctypes
-+import fcntl
-+import socket
- from lib.py import ksft_run, ksft_exit, ksft_ge, ksft_eq, KsftSkipEx
- from lib.py import NetDrvEnv, EthtoolFamily, NlError
- 
- 
-+SIOCSHWTSTAMP = 0x89b0
-+SIOCGHWTSTAMP = 0x89b1
-+class hwtstamp_config(ctypes.Structure):
-+    """ Python copy of struct hwtstamp_config """
-+    _fields_ = [
-+        ("flags", ctypes.c_int),
-+        ("tx_type", ctypes.c_int),
-+        ("rx_filter", ctypes.c_int),
-+    ]
-+
-+
-+class ifreq(ctypes.Structure):
-+    """ Python copy of struct ifreq """
-+    _fields_ = [
-+        ("ifr_name", ctypes.c_char * 16),
-+        ("ifr_data", ctypes.POINTER(hwtstamp_config)),
-+    ]
-+
-+
- def __get_hwtimestamp_support(cfg):
-     """ Retrieve supported configuration information """
- 
-@@ -31,8 +54,29 @@ def __get_hwtimestamp_support(cfg):
-     return ctx
- 
- 
-+def __get_hwtimestamp_config_ioctl(cfg):
-+    """ Retrieve current TS configuration information (via ioctl) """
-+
-+    config = hwtstamp_config()
-+
-+    req = ifreq()
-+    req.ifr_name = cfg.ifname.encode()
-+    req.ifr_data = ctypes.pointer(config)
-+
-+    try:
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        fcntl.ioctl(sock.fileno(), SIOCGHWTSTAMP, req)
-+        sock.close()
-+
-+    except OSError as e:
-+        if e.errno == errno.EOPNOTSUPP:
-+            raise KsftSkipEx("timestamping configuration is not supported via ioctl") from e
-+        raise
-+    return config
-+
-+
- def __get_hwtimestamp_config(cfg):
--    """ Retrieve current TS configuration information """
-+    """ Retrieve current TS configuration information (via netLink) """
- 
-     try:
-         tscfg = cfg.ethnl.tsconfig_get({'header': {'dev-name': cfg.ifname}})
-@@ -43,8 +87,27 @@ def __get_hwtimestamp_config(cfg):
-     return tscfg
- 
- 
-+def __set_hwtimestamp_config_ioctl(cfg, ts):
-+    """ Setup new TS configuration information (via ioctl) """
-+    config = hwtstamp_config()
-+    config.rx_filter = ts['rx-filters']['bits']['bit'][0]['index']
-+    config.tx_type = ts['tx-types']['bits']['bit'][0]['index']
-+    req = ifreq()
-+    req.ifr_name = cfg.ifname.encode()
-+    req.ifr_data = ctypes.pointer(config)
-+    try:
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        fcntl.ioctl(sock.fileno(), SIOCSHWTSTAMP, req)
-+        sock.close()
-+
-+    except OSError as e:
-+        if e.errno == errno.EOPNOTSUPP:
-+            raise KsftSkipEx("timestamping configuration is not supported via ioctl") from e
-+        raise
-+
-+
- def __set_hwtimestamp_config(cfg, ts):
--    """ Setup new TS configuration information """
-+    """ Setup new TS configuration information (via netlink) """
- 
-     ts['header'] = {'dev-name': cfg.ifname}
-     try:
-@@ -56,9 +119,9 @@ def __set_hwtimestamp_config(cfg, ts):
-     return res
- 
- 
--def test_hwtstamp_tx(cfg):
-+def __perform_hwtstamp_tx(cfg, is_ioctl):
-     """
--    Test TX timestamp configuration.
-+    Test TX timestamp configuration via either netlink or ioctl.
-     The driver should apply provided config and report back proper state.
-     """
- 
-@@ -66,16 +129,37 @@ def test_hwtstamp_tx(cfg):
-     ts = __get_hwtimestamp_support(cfg)
-     tx = ts['tx']
-     for t in tx:
-+        res = None
-         tscfg = orig_tscfg
-         tscfg['tx-types']['bits']['bit'] = [t]
--        res = __set_hwtimestamp_config(cfg, tscfg)
-+        if is_ioctl:
-+            __set_hwtimestamp_config_ioctl(cfg, tscfg)
-+        else:
-+            res = __set_hwtimestamp_config(cfg, tscfg)
-         if res is None:
-             res = __get_hwtimestamp_config(cfg)
-+        resioctl = __get_hwtimestamp_config_ioctl(cfg)
-         ksft_eq(res['tx-types']['bits']['bit'], [t])
-+        ksft_eq(resioctl.tx_type, t['index'])
-     __set_hwtimestamp_config(cfg, orig_tscfg)
- 
-+def test_hwtstamp_tx_netlink(cfg):
-+    """
-+    Test TX timestamp configuration setup via netlink.
-+    The driver should apply provided config and report back proper state.
-+    """
-+    __perform_hwtstamp_tx(cfg, False)
-+
-+
-+def test_hwtstamp_tx_ioctl(cfg):
-+    """
-+    Test TX timestamp configuration setup via ioctl.
-+    The driver should apply provided config and report back proper state.
-+    """
-+    __perform_hwtstamp_tx(cfg, True)
-+
- 
--def test_hwtstamp_rx(cfg):
-+def __perform_hwtstamp_rx(cfg, is_ioctl):
-     """
-     Test RX timestamp configuration.
-     The filter configuration is taken from the list of supported filters.
-@@ -87,11 +171,17 @@ def test_hwtstamp_rx(cfg):
-     ts = __get_hwtimestamp_support(cfg)
-     rx = ts['rx']
-     for r in rx:
-+        res = None
-         tscfg = orig_tscfg
-         tscfg['rx-filters']['bits']['bit'] = [r]
--        res = __set_hwtimestamp_config(cfg, tscfg)
-+        if is_ioctl:
-+            __set_hwtimestamp_config_ioctl(cfg, tscfg)
-+        else:
-+            res = __set_hwtimestamp_config(cfg, tscfg)
-         if res is None:
-             res = __get_hwtimestamp_config(cfg)
-+        resioctl = __get_hwtimestamp_config_ioctl(cfg)
-+        ksft_eq(resioctl.rx_filter, res['rx-filters']['bits']['bit'][0]['index'])
-         if r['index'] == 0 or r['index'] == 1:
-             ksft_eq(res['rx-filters']['bits']['bit'][0]['index'], r['index'])
-         else:
-@@ -100,12 +190,34 @@ def test_hwtstamp_rx(cfg):
-     __set_hwtimestamp_config(cfg, orig_tscfg)
- 
- 
-+def test_hwtstamp_rx_netlink(cfg):
-+    """
-+    Test RX timestamp configuration via netlink.
-+    The filter configuration is taken from the list of supported filters.
-+    The driver should apply the config without error and report back proper state.
-+    Some extension of the timestamping scope is allowed for PTP filters.
-+    """
-+    __perform_hwtstamp_rx(cfg, False)
-+
-+
-+def test_hwtstamp_rx_ioctl(cfg):
-+    """
-+    Test RX timestamp configuration via ioctl.
-+    The filter configuration is taken from the list of supported filters.
-+    The driver should apply the config without error and report back proper state.
-+    Some extension of the timestamping scope is allowed for PTP filters.
-+    """
-+    __perform_hwtstamp_rx(cfg, True)
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
-     with NetDrvEnv(__file__, nsim_test=False) as cfg:
-         cfg.ethnl = EthtoolFamily()
--        ksft_run([test_hwtstamp_tx, test_hwtstamp_rx], args=(cfg,))
-+        ksft_run([test_hwtstamp_tx_ioctl, test_hwtstamp_tx_netlink,
-+                  test_hwtstamp_rx_ioctl, test_hwtstamp_rx_netlink],
-+                 args=(cfg,))
-         ksft_exit()
- 
- 
--- 
-2.47.3
-
+Sorry for the late reply. 
+I think it's a good idea. I will add ASSERT_RTNL().
 
