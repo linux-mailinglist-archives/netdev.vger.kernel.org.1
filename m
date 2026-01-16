@@ -1,186 +1,180 @@
-Return-Path: <netdev+bounces-250493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB73AD2F186
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:54:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2821BD2F2B0
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 092B830109B1
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 09:53:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11AF23023540
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DE93587A2;
-	Fri, 16 Jan 2026 09:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611B535E538;
+	Fri, 16 Jan 2026 10:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NQoBm6ze"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WCF7cVDD"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9E13587AB;
-	Fri, 16 Jan 2026 09:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D2B35CB95
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 10:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768557230; cv=none; b=cclw57stiN1gDFDNbZNdzXqvbq9sa7rnFrNsWo0Srq1VoJ4J9XsW8EC9eqlrPn5TY0Pr2eFTFx8vKlcIal5IhXxgxcuDA5DJPpIL02WqU73qGvCbTiYcM2qK5pp8FGdgkAyJAHRgxLEpVKrywH+LskOCjZQWWA6Xt4UMgXSh8xI=
+	t=1768557605; cv=none; b=La8Feh3cUAAoCEEc2e9u+zsjRwe5fpaBO3awpjmFoQO3HtY8E0FA/JB4eL5dANH5hDF6HzAD8bMhild9mjKSBIz2FbU2y62lptdok49DDgodjgfjmqtyJ/zZOrEVNYl5Y2NR2i+pncx2cJkIgbPe1DDiiz4+HRfU/nMAg4eNt3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768557230; c=relaxed/simple;
-	bh=M478kraDJ8FL55aN/XsX6V+BvP/0Bl0eTfRT3Xhsvr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AJST5M0mtoDGsYvfeL6S6u+opx6W3fXdyprqSDjmDhCB2/cgtUkAaweC/jZcKT5KGaNMlWTQ5d4JbTvpw03u/RNd91P7O+bQGtEAx021W/DqU3uxkHo/cwOqQjkv6eiSWdbS0034nNFfZs4IXJr+SHJZtI+6bMrvVolm7mRHlS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NQoBm6ze; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=IG
-	6FEphT3FP53L2a4lJ/nrcd7qTikV/7NmIBtVw2U3A=; b=NQoBm6zev1XEsStA4b
-	dYVevbg6JaeT+v3NGkkPB/epp0bt9bVjDOg2PvrVWvdNGodFbqVw5h//BQn5r3lz
-	VT2UiTZiG15t75pmEvyahPdiiB9S0N1UbzJWfvjWg52jAv5FUfPLK12zx9RN4ut1
-	LewCiJpmYHErmTw4ch+3iUUrQ=
-Received: from kylin-ERAZER-H610M.. (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3LJiECmppTp7dNA--.35890S2;
-	Fri, 16 Jan 2026 17:53:09 +0800 (CST)
-From: Yun Lu <luyun_611@163.com>
-To: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] netdevsim: fix a race issue related to the operation on bpf_bound_progs list
-Date: Fri, 16 Jan 2026 17:53:08 +0800
-Message-ID: <20260116095308.11441-1-luyun_611@163.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1768557605; c=relaxed/simple;
+	bh=fW48aaLNkBbdqH7KvcMJgixNgMqvTRK+gAl5/GVTNZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMAbcBkse428wPi3yMsi9+6LmEMJjP39fe+3ggmVuRBlbM8DmwkTTkjUKlfNgJmnnHS8QjQGRf2wvuRtVomBsuTXEC7JH9UaGREdmBz/V0vzDyniPmH8boFggZTTzg7JAFQUKL15TWYxZMAUHAxJk1gl3jmFBu0CTYq3Ih56iRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WCF7cVDD; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-430fbb6012bso1407513f8f.1
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 02:00:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1768557601; x=1769162401; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ik7nBSUvqjiZji8p0UMpcxyJ9CmKYvj/STnQwZRmw6o=;
+        b=WCF7cVDDVoB7pSe59ofWaHYm6WNWzgeCXj8b+qY0A56i1sLhU7jfZqSVNd09WGg+iP
+         f4eR9gPxvQR5/pHfAGNpik4PCuv6aKvY6ouYfZtAaHwrnRuZFJw3FTz4pmkHEG86FoB7
+         TMmoYc+q95nONQi9si31m7D047LidkhP8UUnwP+UOdoThlMX5CJcYB04BF9WOnets/Tg
+         L5dlHcJONq2vPjUjHvC1mCTJQ2urla/2xjO+iH5DEdnk4eUv+OCuOjTemCPEY2alMOZa
+         fWYcpaR3qVDtomJZhGypYpkv6zIeBvXluZfpLRi9Y+0snNxTaupLZlVdQB6Xr29r1t2X
+         AIQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768557601; x=1769162401;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ik7nBSUvqjiZji8p0UMpcxyJ9CmKYvj/STnQwZRmw6o=;
+        b=AKwqd1ZvZUYmC/hvIOuykhVx/9mPFhvMCVvZSs2TEoJQ9KmGYCKaJ5s3F+EoDeXZ/6
+         RubY0jX9ylx99NR389StiZ0pN6dwXAC6kQt30aK/bUMZt5JRmy3Mbo3zbRH3jqYKM22E
+         jLnZzIGBWduhFGhKEqcvLBEhfEaZQGr25pMccyzJ95QZmA8kZljkqAsUQR6LK4sVD3f4
+         b0evYTXF6L7s8vxHpSCYyHwZIMyPG+pH/BQsXoxfcEXtZmgUb4vfwGNqebh3ZM8Xf3MB
+         iCLbezbKwUje8bi8R8n+h6arBsaghhovFgGrqQayXZPPdoYcL+dq2WheBVgB9BY+JO8+
+         9+3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXp2OfB0K3hyjQoXYAb4n4phsyOM8SDD+5I6hKHVhkkA6rmYycuuk7xVGnLhcqAWuW7tulk1Nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8iDFB1Np3tZu+vP1meqdCW5oDOTHIKqa6I3fZxYDkFTepkWU4
+	9XzxjWsU6DzaLx1T8IaVwLj5g2oIfLME3nfJ/UzvHUv/gC/gY3IZWQQ7Tgs8fqVo51E=
+X-Gm-Gg: AY/fxX4JMjzavB8QwFaBw8n+kScxxwSvxlOa6EfQyYsKYxtSMhBo9RJSwrFaLWb0TYH
+	8nIFJdcn8+w7/6IuT8WY1MTLWBYLpmbk4RcjOdZvuT6jcxoit5M+Y+84LtWmDqHW0n0BvMcvqKm
+	lJjLfIOWOw5T15SqvwBSoS056weLS2TVUcNsaBp4l16U5dgmynhFw1jH/23L06BtTgX7e4UG2xU
+	LBy1Napxva+5rhhbRCFcCCx1URNyYKU/kBGhOLL4C+fcBMntapgwhW1dqABp0sFjAIhwtcELhHQ
+	slOAON+QB87Kpdbblfqwm4wTQCozx0IZzpZ6o1QBx3m0tJWmBOeKjQfv4Wvok23ro/Pwq5LiCfr
+	FbsDIAhF1YQcsdGb/qgdLAZRjeP+hBCpCLdryszfPqCkdzw8qNoPxy0s60lemYUKSF7Kn4qDdHv
+	MtxiUMDuQeiCDhLg==
+X-Received: by 2002:a05:6000:26ce:b0:432:dfea:1fa8 with SMTP id ffacd0b85a97d-43569bc5767mr3019291f8f.45.1768557601174;
+        Fri, 16 Jan 2026 02:00:01 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569921f6esm4337797f8f.4.2026.01.16.01.59.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 02:00:00 -0800 (PST)
+Date: Fri, 16 Jan 2026 10:59:57 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Marcos Paulo de Souza <mpdesouza@suse.com>
+Cc: Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jason Wessel <jason.wessel@windriver.com>,
+	Daniel Thompson <danielt@kernel.org>,
+	Douglas Anderson <dianders@chromium.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
+	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	sparclinux@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 15/19] drivers: tty: serial: mux.c: Migrate to
+ register_console_force helper
+Message-ID: <aWoMHbbn-BmmbZMg@pathway.suse.cz>
+References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+ <20251227-printk-cleanup-part3-v1-15-21a291bcf197@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgD3LJiECmppTp7dNA--.35890S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3XFW3ZF1rJF1xuw43uw4fAFb_yoW7Cr47pa
-	90qa4YkrWrXw17tw48Aw4j9rna9F1qyFW29ry7CryruFyDXryjyr15Kay5Xrs0grWUWF1S
-	q3WDCr1aqr45AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jrYFAUUUUU=
-X-CM-SenderInfo: pox130jbwriqqrwthudrp/xtbC6wWYZ2lqCoUwGwAA32
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251227-printk-cleanup-part3-v1-15-21a291bcf197@suse.com>
 
-From: Yun Lu <luyun@kylinos.cn>
+On Sat 2025-12-27 09:16:22, Marcos Paulo de Souza wrote:
+> The register_console_force function was introduced to register consoles
+> even on the presence of default consoles, replacing the CON_ENABLE flag
+> that was forcing the same behavior.
+> 
+> --- a/drivers/tty/serial/mux.c
+> +++ b/drivers/tty/serial/mux.c
+> @@ -390,7 +390,7 @@ static struct console mux_console = {
+>  	.write =	mux_console_write,
+>  	.device =	uart_console_device,
+>  	.setup =	mux_console_setup,
+> -	.flags =	CON_ENABLED | CON_PRINTBUFFER,
+> +	.flags =	CON_PRINTBUFFER,
+>  	.index =	0,
+>  	.data =		&mux_driver,
+>  };
+> @@ -547,7 +547,7 @@ static int __init mux_init(void)
+>  		mod_timer(&mux_timer, jiffies + MUX_POLL_DELAY);
+>  
+>  #ifdef CONFIG_SERIAL_MUX_CONSOLE
+> -	        register_console(&mux_console);
+> +		register_console_force(&mux_console);
 
-The netdevsim driver lacks a protection mechanism for operations on the
-bpf_bound_progs list. When the nsim_bpf_create_prog() performs
-list_add_tail, it is possible that nsim_bpf_destroy_prog() is
-simultaneously performs list_del. Concurrent operations on the list may
-lead to list corruption and trigger a kernel crash as follows:
+The situation here is the same as in 16th patch for
+ma35d1serial_console().
 
-[  417.290971] kernel BUG at lib/list_debug.c:62!
-[  417.290983] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[  417.290992] CPU: 10 PID: 168 Comm: kworker/10:1 Kdump: loaded Not tainted 6.19.0-rc5 #1
-[  417.291003] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[  417.291007] Workqueue: events bpf_prog_free_deferred
-[  417.291021] RIP: 0010:__list_del_entry_valid_or_report+0xa7/0xc0
-[  417.291034] Code: a8 ff 0f 0b 48 89 fe 48 89 ca 48 c7 c7 48 a1 eb ae e8 ed fb a8 ff 0f 0b 48 89 fe 48 89 c2 48 c7 c7 80 a1 eb ae e8 d9 fb a8 ff <0f> 0b 48 89 d1 48 c7 c7 d0 a1 eb ae 48 89 f2 48 89 c6 e8 c2 fb a8
-[  417.291040] RSP: 0018:ffffb16a40807df8 EFLAGS: 00010246
-[  417.291046] RAX: 000000000000006d RBX: ffff8e589866f500 RCX: 0000000000000000
-[  417.291051] RDX: 0000000000000000 RSI: ffff8e59f7b23180 RDI: ffff8e59f7b23180
-[  417.291055] RBP: ffffb16a412c9000 R08: 0000000000000000 R09: 0000000000000003
-[  417.291059] R10: ffffb16a40807c80 R11: ffffffffaf9edce8 R12: ffff8e594427ac20
-[  417.291063] R13: ffff8e59f7b44780 R14: ffff8e58800b7a05 R15: 0000000000000000
-[  417.291074] FS:  0000000000000000(0000) GS:ffff8e59f7b00000(0000) knlGS:0000000000000000
-[  417.291079] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  417.291083] CR2: 00007fc4083efe08 CR3: 00000001c3626006 CR4: 0000000000770ee0
-[  417.291088] PKRU: 55555554
-[  417.291091] Call Trace:
-[  417.291096]  <TASK>
-[  417.291103]  nsim_bpf_destroy_prog+0x31/0x80 [netdevsim]
-[  417.291154]  __bpf_prog_offload_destroy+0x2a/0x80
-[  417.291163]  bpf_prog_dev_bound_destroy+0x6f/0xb0
-[  417.291171]  bpf_prog_free_deferred+0x18e/0x1a0
-[  417.291178]  process_one_work+0x18a/0x3a0
-[  417.291188]  worker_thread+0x27b/0x3a0
-[  417.291197]  ? __pfx_worker_thread+0x10/0x10
-[  417.291207]  kthread+0xe5/0x120
-[  417.291214]  ? __pfx_kthread+0x10/0x10
-[  417.291221]  ret_from_fork+0x31/0x50
-[  417.291230]  ? __pfx_kthread+0x10/0x10
-[  417.291236]  ret_from_fork_asm+0x1a/0x30
-[  417.291246]  </TASK>
+Also "mux_console" is assigned to
 
-Add a mutex lock, to prevent simultaneous addition and deletion operations
-on the list.
+static int __init mux_probe(struct parisc_device *dev)
+{
+[...]
+		mux_driver.cons = MUX_CONSOLE;
 
-Fixes: 31d3ad832948 ("netdevsim: add bpf offload support")
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-Signed-off-by: Yun Lu <luyun@kylinos.cn>
----
- drivers/net/netdevsim/bpf.c       | 6 ++++++
- drivers/net/netdevsim/dev.c       | 2 ++
- drivers/net/netdevsim/netdevsim.h | 1 +
- 3 files changed, 9 insertions(+)
+		status = uart_register_driver(&mux_driver);
+[...]
+		status = uart_add_one_port(&mux_driver, port);
+[...]
+}
 
-diff --git a/drivers/net/netdevsim/bpf.c b/drivers/net/netdevsim/bpf.c
-index 49537d3c4120..5f17f68f3c08 100644
---- a/drivers/net/netdevsim/bpf.c
-+++ b/drivers/net/netdevsim/bpf.c
-@@ -244,7 +244,9 @@ static int nsim_bpf_create_prog(struct nsim_dev *nsim_dev,
- 			    &state->state, &nsim_bpf_string_fops);
- 	debugfs_create_bool("loaded", 0400, state->ddir, &state->is_loaded);
- 
-+	mutex_lock(&nsim_dev->progs_list_lock);
- 	list_add_tail(&state->l, &nsim_dev->bpf_bound_progs);
-+	mutex_unlock(&nsim_dev->progs_list_lock);
- 
- 	prog->aux->offload->dev_priv = state;
- 
-@@ -273,12 +275,16 @@ static int nsim_bpf_translate(struct bpf_prog *prog)
- static void nsim_bpf_destroy_prog(struct bpf_prog *prog)
- {
- 	struct nsim_bpf_bound_prog *state;
-+	struct nsim_dev *nsim_dev;
- 
- 	state = prog->aux->offload->dev_priv;
-+	nsim_dev = state->nsim_dev;
- 	WARN(state->is_loaded,
- 	     "offload state destroyed while program still bound");
- 	debugfs_remove_recursive(state->ddir);
-+	mutex_lock(&nsim_dev->progs_list_lock);
- 	list_del(&state->l);
-+	mutex_unlock(&nsim_dev->progs_list_lock);
- 	kfree(state);
- }
- 
-diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
-index 2683a989873e..dfd571b22107 100644
---- a/drivers/net/netdevsim/dev.c
-+++ b/drivers/net/netdevsim/dev.c
-@@ -1647,6 +1647,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
- 	nsim_dev->test1 = NSIM_DEV_TEST1_DEFAULT;
- 	nsim_dev->test2 = NSIM_DEV_TEST2_DEFAULT;
- 	spin_lock_init(&nsim_dev->fa_cookie_lock);
-+	mutex_init(&nsim_dev->progs_list_lock);
- 
- 	dev_set_drvdata(&nsim_bus_dev->dev, nsim_dev);
- 
-@@ -1785,6 +1786,7 @@ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev)
- 	devl_unregister(devlink);
- 	kfree(nsim_dev->vfconfigs);
- 	kfree(nsim_dev->fa_cookie);
-+	mutex_destroy(&nsim_dev->progs_list_lock);
- 	devl_unlock(devlink);
- 	devlink_free(devlink);
- 	dev_set_drvdata(&nsim_bus_dev->dev, NULL);
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index d1a941e2b18f..46c67983c517 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -324,6 +324,7 @@ struct nsim_dev {
- 	u32 prog_id_gen;
- 	struct list_head bpf_bound_progs;
- 	struct list_head bpf_bound_maps;
-+	struct mutex progs_list_lock;
- 	struct netdev_phys_item_id switch_id;
- 	struct list_head port_list;
- 	bool fw_update_status;
--- 
-2.43.0
+So, that it can get registered also by:
 
+  + mux_probe()
+    + uart_add_one_port()
+      + serial_ctrl_register_port()
+	+ serial_core_register_port()
+	  + serial_core_add_one_port()
+	    + uart_configure_port()
+	      + register_console()
+
+And we would need to pass the "force" information via CON_FORCE flag.
+
+Best Regards,
+Petr
 
