@@ -1,104 +1,81 @@
-Return-Path: <netdev+bounces-250412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460D0D2A929
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:12:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACC1D2A9DB
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 435D730275BC
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:12:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5139A300FE37
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27032332EA7;
-	Fri, 16 Jan 2026 03:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94DD2147FB;
+	Fri, 16 Jan 2026 03:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="WR6PwYAk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OadD1y5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0041E27B4FB;
-	Fri, 16 Jan 2026 03:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C348D18FC86;
+	Fri, 16 Jan 2026 03:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768533127; cv=none; b=KLqjCqMsu67gGuiu56g0QS+fx3x7GrCGGVBPRmayzrHi3WkyGgk/9g3MOoyS6Bo+60Pxy8KRku2Rj5cJGyAucZtWPzdILsoyZTQJzW5eZnelBb1PHT20wvBVCZzh9E+yv5NdRa0vmJ5eob+LNS+NuS8492rQPeHe+kT4HhT0rk4=
+	t=1768533397; cv=none; b=J1Gyux9kTjLHZznCE2xm2k9ncb2v1dPwYWS7rwea8mDVRTW/QEYuep9EWtH7qCA38cojE3D1AXMMAYfElA9HJp1hDSObeIUA6Bzq0GM3XIac0DLWtYdsjBGXanjM+hnakM9t3FjMQZe/Z1JvPKtboytklwmPu5dK/C9niQNw1Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768533127; c=relaxed/simple;
-	bh=bnsGwCDKBv6HzBK3XhUL3qvZhY9CIEGoTsmEbd0F+qo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=T67B6/TOzqebc0Cw6NdRLwu44ak4AhRr9XLg7MmazbKreiC7Hj9Yx8C6FtDcNUI2E5DveL9mKsVrftDpUKrc3ztB4K6xzYLzakjMEz65YqFy5T54qKIMu91qOq4X2eGNaq10NpQBQKhLteRnuDpjAQunuNqvFlTofTnLOaJ0IO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=WR6PwYAk; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60G3BgzrE224104, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1768533102; bh=bnsGwCDKBv6HzBK3XhUL3qvZhY9CIEGoTsmEbd0F+qo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=WR6PwYAkYfHpXWhwIHScSznyQB5rS3CxYtyNPGpbh7lDGQThdeiSkEiZKE2j1dWaZ
-	 d8+urc3li/ZHRdHq1/Sx2MTpq8lJzAPTdrARsvXMcVq8h3XxlmTExHFMZTjDffPzgG
-	 dbHiz6mzpMPCXsX2iaOT2wsdrDNlqw/gFI+ZRM5ZHIoiqdQ00IbK+dRmDZTS3O/4WB
-	 2boJJvmziZiFW6itxsRYCcizGAwQ87NCX27D1YVXb2h/8A6532Kd1M+Hg5OKDaT3R6
-	 9+o2SaNwdAg2Ka1cAygQWj6i+nFyx0En6oZT7MohtF7z5W03JTcohoHAvn6D48AWCm
-	 2BZNmidD0DARw==
-Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60G3BgzrE224104
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Jan 2026 11:11:42 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 16 Jan 2026 11:11:42 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([fe80::8bac:ef80:dea8:91d5]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::8bac:ef80:dea8:91d5%9]) with mapi id
- 15.02.1748.010; Fri, 16 Jan 2026 11:11:42 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: lu lu <insyelu@gmail.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        nic_swsd <nic_swsd@realtek.com>, "tiwai@suse.de"
-	<tiwai@suse.de>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] net: usb: r8152: fix transmit queue timeout
-Thread-Topic: [PATCH] net: usb: r8152: fix transmit queue timeout
-Thread-Index: AQHchQGLBs/iMEigv0CwXIii7EgMTLVRErBAgADcLoCAASPVoIAAd9qAgACSjYA=
-Date: Fri, 16 Jan 2026 03:11:42 +0000
-Message-ID: <f3fe05ea76794cd09774cd69e85623d8@realtek.com>
-References: <20260114025622.24348-1-insyelu@gmail.com>
- <3501a6e902654554b61ab5cd89dcb0dd@realtek.com>
- <CAAPueM4XheTsmb6xd3w5A3zoec-z3ewq=uNpA8tegFbtFWCfaA@mail.gmail.com>
- <1b498052994c4ed48de45b5af9a490b6@realtek.com>
- <CAAPueM65Y4zEb4UidMR-6UtCZVWYs+A7cHzYbBgJMmAZ2iLy5Q@mail.gmail.com>
-In-Reply-To: <CAAPueM65Y4zEb4UidMR-6UtCZVWYs+A7cHzYbBgJMmAZ2iLy5Q@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1768533397; c=relaxed/simple;
+	bh=B2+FCAQTC6FVsVubt6CQsBCJNComdynPbHPZmy46ChI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EYxyHZaLJRWi1MhQIj0Epgchc5a6g55azp+bGXuQkJiONb9kIoXTE8h78O5EyEdjpaHsZlnYTyqoGt1rUv9vgt1jX8U7Iur+Y/vTH5xpqeUtpyiI57jgs00ra5QWtuu9HuZKYEBjk2E8pJRTGPgXEyJ0BkE1q1RqYdS30XESZEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OadD1y5p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFD6C19421;
+	Fri, 16 Jan 2026 03:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768533397;
+	bh=B2+FCAQTC6FVsVubt6CQsBCJNComdynPbHPZmy46ChI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OadD1y5pzThcRXgoOGbwyy0e3rC1wHFHn/FBWBj07osgVMonggwCQ8i9/uRKUtQrV
+	 B6GWHgrlHd6WyvQ1VATKmGsDNNcrm7Ox0DUuCGCQHzqgL/s6qgceLdNAo++4UGLS3t
+	 5sbDj1BVZau4SPy8PTe1tUFZNYjZ0xh2OLzBOUK8ImjRU5st7F3peTEWJMl+HckT91
+	 Rb1gi7AUhdEAAM+/swupIlSqiaJXQZAuoKFOcn+NZbtiC2HMKbzIDc68P+jjLdamul
+	 1KUDgLwQXNwcgUBDpGyu4lPCPiRPyij+kXEVxSMB3gs8hqJ0I3TpVM+HoaU3Vasck3
+	 2AdDsM7LITAdg==
+Date: Thu, 15 Jan 2026 19:16:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, =?UTF-8?B?QmrDuHJu?= Mork
+ <bjorn@mork.no>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Neil
+ Armstrong <neil.armstrong@linaro.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Eric Woudstra
+ <ericwouds@gmail.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Lee
+ Jones <lee@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH v3 net-next 00/10] PHY polarity inversion via generic
+ device tree properties
+Message-ID: <20260115191635.33897ee8@kernel.org>
+In-Reply-To: <aWeXvFcGNK5T6As9@vaman>
+References: <20260111093940.975359-1-vladimir.oltean@nxp.com>
+	<aWeXvFcGNK5T6As9@vaman>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-bHUgbHUgPGluc3llbHVAZ21haWwuY29tPg0KPiBTZW50OiBGcmlkYXksIEphbnVhcnkgMTYsIDIw
-MjYgMTA6MTEgQU0NClsuLi5dDQo+ID4gICAgICAgICBuZXRpZl90eF9sb2NrKHRwLT5uZXRkZXYp
-Ow0KPiA+DQo+ID4gLSAgICAgICBpZiAobmV0aWZfcXVldWVfc3RvcHBlZCh0cC0+bmV0ZGV2KSAm
-Jg0KPiA+IC0gICAgICAgICAgIHNrYl9xdWV1ZV9sZW4oJnRwLT50eF9xdWV1ZSkgPCB0cC0+dHhf
-cWxlbikNCj4gPiArICAgICAgIGlmIChuZXRpZl9xdWV1ZV9zdG9wcGVkKHRwLT5uZXRkZXYpKSB7
-DQo+ID4gKyAgICAgICAgICAgaWYgKHNrYl9xdWV1ZV9sZW4oJnRwLT50eF9xdWV1ZSkgPCB0cC0+
-dHhfcWxlbikNCj4gPiAgICAgICAgICAgICAgICAgbmV0aWZfd2FrZV9xdWV1ZSh0cC0+bmV0ZGV2
-KTsNCj4gPiArICAgICAgICAgICBlbHNlDQo+ID4gKyAgICAgICAgICAgICAgIG5ldGlmX3RyYW5z
-X3VwZGF0ZSh0cC0+bmV0ZGV2KTsNCj4gPiArICAgICAgIH0NCj4gVGhlIHF1ZXVlIHdhcyBzdG9w
-cGVkIGJlY2F1c2UgaXQgZXhjZWVkZWQgdGhlIHRocmVzaG9sZC4gQXR0ZW1wdGluZyB0bw0KPiBy
-ZWZyZXNoIHRoZSB0aW1lIGF0IHRoaXMgcG9pbnQgaXMgY2xlYXJseSB0b28gbGF0ZS4NCg0KV2h5
-IHdvdWxkIHRoaXMgYmUgY29uc2lkZXJlZCB0b28gbGF0ZT8NCkJhc2VkIG9uIFJUTDgxNTJfVFhf
-VElNRU9VVCwgdGhlcmUgYXJlIGFib3V0IDUgc2Vjb25kcyB0bw0Kd2FrZSB0aGUgcXVldWUgb3Ig
-dXBkYXRlIHRoZSB0aW1lc3RhbXAgYmVmb3JlIGEgVFggdGltZW91dCBvY2N1cnMuDQpJIGJlbGll
-dmUgNSBzZWNvbmRzIHNob3VsZCBiZSBzdWZmaWNpZW50Lg0KDQpJZiB0aGVyZSBpcyBubyBUWCBz
-dWJtaXNzaW9uIGZvciA1IHNlY29uZHMgYWZ0ZXIgdGhlIGRyaXZlciBzdG9wcyB0aGUgcXVldWUs
-DQp0aGVuIHNvbWV0aGluZyBpcyBhbHJlYWR5IHdyb25nLg0KDQpCZXN0IFJlZ2FyZHMsDQpIYXll
-cw0KDQo=
+On Wed, 14 Jan 2026 18:48:52 +0530 Vinod Koul wrote:
+> Subject: Re: [PATCH v3 net-next 00/10] PHY polarity inversion via generic device tree properties
+
+You can submit the PR in reply to the series, but please rewrite the
+subject to a typical PR format. Patchwork does not register this reply
+as a submission.
 
