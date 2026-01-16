@@ -1,53 +1,79 @@
-Return-Path: <netdev+bounces-250457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91302D2CF25
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 08:09:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD995D2D19A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 08:22:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49C273027E08
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:09:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44C38300FED4
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3326346799;
-	Fri, 16 Jan 2026 07:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455A031A046;
+	Fri, 16 Jan 2026 07:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eRCQvuAf"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DOz03dJJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0319344035
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817EE30B52E
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768547340; cv=none; b=rKQvaHeDH3gYyEag/+7a7yIO8U2zTF5BJVyds/edXbszsSrv7IYArPUCCsD3QzFcr+4r57/9uXMNVznZgWPGMI8/I1y4Oj/KlP6QGnSEmvtvrxOAPdLW+ZA3t9tECOZz3OOgn3W1s5cxa6olL5dCZXRdFGZ807z05r40TpjS6YY=
+	t=1768548144; cv=none; b=hINkm7dwdvj8Uvs+vcmyA57rXkzJXt46gd3UYb9uGh4Ty3fiwTzKjlI0j8a99o5ZWguux/+zY74kGkJ27qzMZwh3BYmxWELIVWW2mwp5lfOEQjQa4DACt/YXSxL9XGezTir2u5zCo1PZ+oQI+IGtA9AAzJJ9tpY4cORK47cruuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768547340; c=relaxed/simple;
-	bh=GUgRfny8ILBolkzrIObt84Gwn9WtU+PYmdPIsybZBPc=;
+	s=arc-20240116; t=1768548144; c=relaxed/simple;
+	bh=ZoZCxIZIxuNG7iiq7ouEpN8AOaGaswIYZVOM5BEKY0g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d3P8a5db16oiq6+6hHoBn2hUgeDa0+jmk8/6zA3N2wSPcFtpb8QF9hgTA5qHIkuRcYuiv1TBBjE5M2jdItsdMv5+h5csxEYl7knJtdiMC0OnSazEI2CuV7RSBE7Da/Vt4owyY7OKJp0z9zBjHIcYW5BEc7Jaq6cOGYY01DDRH1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eRCQvuAf; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 407EFC1F1F4;
-	Fri, 16 Jan 2026 07:08:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CE63960732;
-	Fri, 16 Jan 2026 07:08:55 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7B91610B68919;
-	Fri, 16 Jan 2026 08:08:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768547334; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=7X4iGHOpoO4GX15j7st3JUnO9pqAPsNSvmrMO+kwytg=;
-	b=eRCQvuAfVs4WgEaFm98M6B6lq46VFaDSSJV93xTdctTsEeTEKzvxP2UinsUVkZKDKWs+wH
-	fjIe/w+h6WEA8T7Yg2tREEIN03yJ7sXapAmCVfo27raDDNUgbAQxnV/b+GViSo5o+k2Vy/
-	fwCHOEFlg6y70bDYVx1TgDx3jeIO7VFa+bpzJVNxa/0rQ3gxFAAThYaxiKPv8FlacIJgnp
-	TILGIDsqzC4Kgo2UahLjpFZ+7Nc8Fq0C49A1lwR17zPhezrSz97KjCpZ4eY3AZ1UwEHehl
-	QhwgEWviJ14cOMTdtW2F5AWCUusiTroT/iNGz1nBx5R303qDbkKRVdjPYErTPQ==
-Message-ID: <b6779c36-c969-42dd-9395-6c34de55a5d9@bootlin.com>
-Date: Fri, 16 Jan 2026 08:08:48 +0100
+	 In-Reply-To:Content-Type; b=nwDk8AkHLOOuykulfFO5fr3wJc6mjZxZjx7ygecI9XvNVFpulSLNndPkHSlauElE3fjEaEd4jP/PLm3h2OnW1+6ZhDF9PtZA+PGP/BQ/N3cT0WhbCzLENaIEAZgR6H7alzlM6M5uFNCoMOS0wGbflu5LdqgzQgFyGpcSbXVlMco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=DOz03dJJ; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-432755545fcso1010962f8f.1
+        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 23:22:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1768548141; x=1769152941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W95GN1V+oZI3tCyhJrWoqvfYp2X9bfUg8CvoDb5FSAs=;
+        b=DOz03dJJJrHhANTzRWfRIwG4CLx0lVlmsIjqaVXIAMhwfUkQMzxluDIvnt6G5tZvZr
+         4c0dlJQT35H7vKeQ2kACS7kFyjHOCBRMDhEqHMGjvAHO3J/KXmEMGQKVzcuA8Tkh5u4v
+         iSdLnjY0HoFbhIx7+jU9y4jcsGD5y9+L4A9Rbbfwe9Oajkr9Uy/QAO6wftMa4FTKMWiv
+         Xr2onvXDgcKQNOVRRMi3T/uSAL+HyazSQJuk5cqWgDP+C85At8mPoVxlZUnJY2INJNn6
+         NZOLFZwP31nUoRTSEM/hLvbT2rEi9re57qBnGAEmHczkC9DApHPsTcrZS0p+KjQiDy4r
+         ffNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768548141; x=1769152941;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W95GN1V+oZI3tCyhJrWoqvfYp2X9bfUg8CvoDb5FSAs=;
+        b=mjlPrqhBuaiJ2hJ+YPOotYFh0aKZ1eib+Qm/w7LvzZvGdC+auzNAJAqVpVU6PffqbH
+         sSEndDCvJWO8IFaM6tEeOuTLAIyderRaa2XbaBUD3i64xZU9Z8ufs61oYV1Tn3nCSNol
+         zVMBJUuAoJ8YUiyn1MlzrcjUGbqGX+7wIVDU/7fZAuYv0M3cupBS3tRu7dzaJ2cyXfM9
+         qMho5P03qb37pxPfDZc+T7NN5KwluGgh7cV1W0MU5/Jou9TjhAoLtdP5iCDO06WIly8x
+         yGh4dSToGEzsKtn0CxIJM239ARsxfdf4Hbz0/hEUCMxsYsCuooC6HjoJxv3EBHU4vskp
+         qwKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1ytWohEp3Q1t/W3MCLPdDnBZ7NxKi1W2+4Qx/ce7Y1r6pR4Qd5ek2Tz80Zz6CMQ7RBnT4nT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsNisM1/XDcdJ2cvuDKXILWtGbSe6Sa+Z9J7kCdWXoW9UNcvQ/
+	ec0aoAYvSt0NoSza83IRuzVsiWz20zgGFQL2XGZbopmPas3FktJ/3juTfEXTaRul7QU=
+X-Gm-Gg: AY/fxX7youo8zNGDhGcLwpbUiXb7HuxMJER8xZi1iS5kN797SYJMBJpHIsFLuy67PcV
+	n6bMxwGDARF4E4RpHU9ZvT4uTmejo/MMj2wTANPLvBRQknziCQePP9QmiHXHbCYlfKJPsIZlhMO
+	lNADpx3K/izyA+6AnOpPttxNna/Aqc3tSDCeTI0OcQIwnKZgJfab1kNPytl3UNbYOKzzRd0sebH
+	C6/sEXHu+9RmOfjU3UwrrTgSso3EXfa3sKjIonYFk3ViUe6h1rwNY5/f75AP0wzCm4f4+I/B+Ah
+	wZiXkCtDaev2I2eflcfatUxlRPMnG2dTCoJy0QdlBU1NfGGNv//FF2zrmtEA8eZKgA+8/iOc284
+	bND9nAa2YDUtuCQeLIuTUU9cPIvJJnIXDR8x9x83CTSjFpv5IsiIIs7WQqqt60Pe+rG2E8Jje7H
+	RooSfdL0vboy3FA5a+mw==
+X-Received: by 2002:a5d:5d81:0:b0:431:752:672b with SMTP id ffacd0b85a97d-4356998a823mr1864994f8f.14.1768548140696;
+        Thu, 15 Jan 2026 23:22:20 -0800 (PST)
+Received: from [10.31.13.216] ([82.77.28.160])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699982aasm3496749f8f.42.2026.01.15.23.22.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 23:22:20 -0800 (PST)
+Message-ID: <40b636b3-b1d3-4c67-bbfd-6f41a5b0b290@tuxon.dev>
+Date: Fri, 16 Jan 2026 09:22:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,76 +81,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/8] net: dsa: microchip: Add KSZ8463 tail tag
- handling
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>,
- =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com>
- <20260115-ksz8463-ptp-v1-5-bcfe2830cf50@bootlin.com>
- <722dcba9-d9ae-43ba-b1bf-1d577a882bef@bootlin.com>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Subject: Re: [PATCH v5 07/11] arm64: dts: microchip: add LAN969x clock header
+ file
+To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
+ alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, lee@kernel.org, andrew+netdev@lunn.ch,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+ UNGLinuxDriver@microchip.com, linusw@kernel.org, olivia@selenic.com,
+ richard.genoud@bootlin.com, radu_nicolae.pirea@upb.ro,
+ gregkh@linuxfoundation.org, richardcochran@gmail.com,
+ horatiu.vultur@microchip.com, Ryan.Wanner@microchip.com,
+ tudor.ambarus@linaro.org, kavyasree.kotagiri@microchip.com,
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org
+Cc: luka.perkov@sartura.hr
+References: <20260115114021.111324-1-robert.marko@sartura.hr>
+ <20260115114021.111324-8-robert.marko@sartura.hr>
 Content-Language: en-US
-In-Reply-To: <722dcba9-d9ae-43ba-b1bf-1d577a882bef@bootlin.com>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20260115114021.111324-8-robert.marko@sartura.hr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-
-Hi Maxime,
-
-On 1/15/26 6:05 PM, Maxime Chevallier wrote:
-> Hi Bastien,
-> 
-> On 15/01/2026 16:57, Bastien Curutchet (Schneider Electric) wrote:
->> KSZ8463 uses the KSZ9893 DSA TAG driver. However, the KSZ8463 doesn't
->> use the tail tag to convey timestamps to the host as KSZ9893 does. It
->> uses the reserved fields in the PTP header instead.
-> 
-> [ ... ]
-> 
->> +static struct sk_buff *ksz8463_rcv(struct sk_buff *skb, struct net_device *dev)
->> +{
->> +	unsigned int len = KSZ_EGRESS_TAG_LEN;
->> +	struct ptp_header *ptp_hdr;
->> +	unsigned int ptp_class;
->> +	unsigned int port;
->> +	ktime_t tstamp;
->> +	u8 *tag;
->> +
->> +	if (skb_linearize(skb))
->> +		return NULL;
->> +
->> +	/* Tag decoding */
->> +	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
->> +	port = tag[0] & KSZ8463_TAIL_TAG_EG_PORT_M;
->> +
->> +	__skb_push(skb, ETH_HLEN);
->> +	ptp_class = ptp_classify_raw(skb);
->> +	__skb_pull(skb, ETH_HLEN);
->> +	if (ptp_class == PTP_CLASS_NONE)
->> +		goto common_rcv;
->> +
->> +	ptp_hdr = ptp_parse_header(skb, ptp_class);
->> +	if (ptp_hdr) {
->> +		tstamp = ksz_decode_tstamp(get_unaligned_be32(&ptp_hdr->reserved2));
->> +		KSZ_SKB_CB(skb)->tstamp = tstamp;
-> 
-> As it is using a reserved field, is it OK to leave this field as-is when forwarding
-> this skb to userspace, or should it be zeroed first ?
-> 
-
-It doesn't seem to hurt, at least on my test setup (I'm using ptp4l in 
-userspace btw), but I agree with you: it feels safer to zero it first. 
-I'll do it in next iteration.
 
 
-Best regards,
-Bastien
+
+On 1/15/26 13:37, Robert Marko wrote:
+> LAN969x uses hardware clock indexes, so document theses in a header to make
+> them humanly readable.
+> 
+> Signed-off-by: Robert Marko<robert.marko@sartura.hr>
+
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+
 
