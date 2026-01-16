@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-250419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1394D2AEA4
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:44:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3104FD2B036
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 04:53:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 35D2D3082A31
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:43:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 188113035F4A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523893431EF;
-	Fri, 16 Jan 2026 03:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427A72857FC;
+	Fri, 16 Jan 2026 03:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBmRG28x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUUTJz4z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F314342CBB
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 03:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCC329A1;
+	Fri, 16 Jan 2026 03:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768535032; cv=none; b=nJ8QIgNA64jhBhuXaYI50Ay+4F5hoH7rVUcc/5OivnJuhg36TJEpqN/F+Uy2ggpGY1XQdZVAqZbRJqPqabrR5a+wbsOYv9mP7G5Demc1t28bGLnvZZ/HY23fkk5ceOXveErY5QqtRdUe/eawHrnSafX/xER1r+tkRKcWd+HmiF4=
+	t=1768535622; cv=none; b=Ogeqz0Q5OVLQ5bv+9bU6aCQIZ8pVLPA+oqkV79JOVEIzl1qmWBWkUuDF3p1LWQP8s/VSPDw+T3bHRMXXOy5KDscGq5zwkUOaPAcylp5VhPwuyCNMHgPouKqbfnIZCK90YrZZdtH8L/ytDVE2yszDVZEdOE4Dyy4kQSTW+v7c70M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768535032; c=relaxed/simple;
-	bh=L02Y2R7LpNrV3GT0d864plT7u3FbUklHIX6aHiChijw=;
+	s=arc-20240116; t=1768535622; c=relaxed/simple;
+	bh=ees821A/NRyoXsrx3xfbPYGegZtOUU+kLtT35pR1m6I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hSmLnRnbowMXD9qh2fmX//dbs0Oio/99BkEt3mPAS1JjtgAKmr1UBGQsG5g3amc5RHGgtvcpzpvQ1ydDmgLFF07N27bBowvAjOe83sbueEiZLiynab4o4WnKhD7yvxqEU8h7mOm10BN3Vi9+DxhqV46wI68zngIR4y7u4zTsuoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBmRG28x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4ABCC19422;
-	Fri, 16 Jan 2026 03:43:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iW/kLXYzp0HVmNGlSLFUSuPe1tapVMezzzFlzuWRuyP7roaWfzyNkbTg9oyPb4gDp773P0htYyQGhQRd3XJEY2gY1UBLspegDPbXWR5Cr8eOvt/5tfVEijRu8cVLphOi+Eke+e/mPFLarIjMMf0d6S6vDimrLlufVfP8QaSgRI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUUTJz4z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D98E0C116C6;
+	Fri, 16 Jan 2026 03:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768535031;
-	bh=L02Y2R7LpNrV3GT0d864plT7u3FbUklHIX6aHiChijw=;
+	s=k20201202; t=1768535621;
+	bh=ees821A/NRyoXsrx3xfbPYGegZtOUU+kLtT35pR1m6I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NBmRG28x6JFkZbNfde9wS4SSBkbnmxe3G33OzLZhTZeemJyNTGlBDTB+xFVRR4kAc
-	 j4qJ+CDUnMQO6sOmpvomcHOdjXWdhLtkStnE+utq6NpyzCaXCUdPRkVMG0ZRXqtfAH
-	 wQMpkZlVoOqenPGbv6DfW9HDGjLiQ6B7gUGRQwx3hdiYxttHJzswSFfrw2G15Xg64G
-	 rnqsdikqTLoW3Eq2jWA5lBtWdkDIFGObDKrQLbXsq0/eHUqFFrUOxS/up5FXQM8OD8
-	 xy1cDBKo/DFEW8nkjhH5AmLlJr0bCmidDc6M6q3sAlUBTthYnzq+Qhu79AVX2glwLG
-	 UhyfQcm6qgxtA==
+	b=fUUTJz4zzhiey11yCDXou4SYTiAR5Azs2vfoy5dsBP00Yp4sxsRc+EyJf4u9Bs8OE
+	 GccNYWkdtnPNKA5raPdyrQFjuEkg0bdvY8/d8KYaeGYQJP5QS7B5AotXa0KIsUb6Tk
+	 7FNccr4ci1Wvxj2RAfw+EZpt5n7FAczQmKleGA1Fjuqy3/UChRZdbN2UNBIEA9GQpb
+	 ZqWFgDjQtRoc3+Y6upOwA2ZFFZEOMRFrXWzvwDvDTqZxfQ+H3XLlQwXNuUSovHx3hG
+	 BenA/sCwuL2tvlsXNfpXO31YD46Un5FEKneKo+HrrWNBgmYHNUjZCpbnSpk/0KihQj
+	 rGolUTNyYf9HQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A95380AA4C;
-	Fri, 16 Jan 2026 03:40:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2D49380AA4C;
+	Fri, 16 Jan 2026 03:50:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,37 +50,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net: ethernet: dnet: remove driver
+Subject: Re: [PATCH net v2 0/2] vsock/virtio: Fix data loss/disclosure due to
+ joining of non-linear skb
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176853482352.70930.5041536219342817635.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Jan 2026 03:40:23 +0000
-References: <cef7c728-28ee-439f-b747-eb1c9394fe51@gmail.com>
-In-Reply-To: <cef7c728-28ee-439f-b747-eb1c9394fe51@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew+netdev@lunn.ch, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- vadim.fedorenko@linux.dev, lorenzo@kernel.org, maxime.chevallier@bootlin.com,
- netdev@vger.kernel.org
+ <176853541379.73880.1523933518591592704.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Jan 2026 03:50:13 +0000
+References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
+In-Reply-To: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, avkrasnov@salutedevices.com, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Jan 2026 21:11:04 +0100 you wrote:
-> This legacy platform driver was used with some Qong board. Support for this
-> board was removed with e731f3146ff3 ("Merge tag 'armsoc-soc' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc") in 2020.
-> So remove this now orphaned driver.
+On Tue, 13 Jan 2026 16:08:17 +0100 you wrote:
+> Loopback transport coalesces some skbs too eagerly. Handling a zerocopy
+> (non-linear) skb as a linear one leads to skb data loss and kernel memory
+> disclosure.
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Plug the loss/leak by allowing only linear skb join. Provide a test.
+> 
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] net: ethernet: dnet: remove driver
-    https://git.kernel.org/netdev/net-next/c/2c297957912b
+  - [net,v2,1/2] vsock/virtio: Coalesce only linear skb
+    https://git.kernel.org/netdev/net/c/0386bd321d0f
+  - [net,v2,2/2] vsock/test: Add test for a linear and non-linear skb getting coalesced
+    https://git.kernel.org/netdev/net/c/a63e5fe09592
 
 You are awesome, thank you!
 -- 
