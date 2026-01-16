@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-250401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1EB7D2A3F7
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:41:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA5AD2A463
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:44:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96628301B4B1
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:41:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4E1163012A52
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CF5337B9D;
-	Fri, 16 Jan 2026 02:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8465338925;
+	Fri, 16 Jan 2026 02:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vN+3WpFI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oED/Xl1X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E335A30DED4;
-	Fri, 16 Jan 2026 02:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9448A338920;
+	Fri, 16 Jan 2026 02:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768531269; cv=none; b=Gmir7TzegwWbAXYrpGREejihsSk9byw7KGzCN4r/UvJjtXrs5Au+L5UFXAdw+pVEKFerp87tIFMemycpJZ00vncaZ2GlSlgU1ZW/5P0tiQDNJxcEmgaQYgAu8fZxmZhbbm0PjKo1uX4+8YQGkd/EHSe1FhT/uw+VmaPxB1Cfqxc=
+	t=1768531436; cv=none; b=Fw/Pne94sjeRrHH0bsP3keGDybDkqglIn98tCJinVKzNk1kDajaW8+Dp5laY5+9LqeGgLcvfeVg56QiCE+w5p/nqS2fQYso/wyYwY4gyZAL2D7gzN0hgg54Y5uU3i//czXMFL0iQ7+QCwm2H025Dnr07xbRle/E4vbwxt3kEBc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768531269; c=relaxed/simple;
-	bh=RULr7YUHgWNRR14lLmWrwcq5L94Tp9HOfL2OuKu39fY=;
+	s=arc-20240116; t=1768531436; c=relaxed/simple;
+	bh=HnFx0WtFt9Deh/PFDnmBauXLNGIOgaT+pj23iARpuGc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oKd3XPP1+V/mr9fmtmkvoje5XVxdapKTpRRT9Bberh4xjikWSjevrCA7G2g7vcQP2cVN7w3XvvIv+ZytedMsbCr7koPxQ1/mXYAe6g43g8eHzlYQ1FbrW601pHe8OErS/p6+5zl2GiIb3UMGFhwMMVU8lF0Lvx6wJU5jOZXMHJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vN+3WpFI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0594DC116D0;
-	Fri, 16 Jan 2026 02:41:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=IQryz7f2c05A2p1EGvWTCce+GFbDCbbaA5GfF205OMZDmku4mVbeZuZI79wrm50Eg8/d/cFFbUe7nV9OAzqrRk5n8rLz3NXTcBrHzLYPW9y8luwD6svaeV6AOzAvxT7TkFCNkzcDmXm5bviR2Lb7RZCh+UOizG9iebL9+xA/1MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oED/Xl1X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B3EC19421;
+	Fri, 16 Jan 2026 02:43:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768531268;
-	bh=RULr7YUHgWNRR14lLmWrwcq5L94Tp9HOfL2OuKu39fY=;
+	s=k20201202; t=1768531434;
+	bh=HnFx0WtFt9Deh/PFDnmBauXLNGIOgaT+pj23iARpuGc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vN+3WpFIe70fUQ175HpXQb3E0qdJw/5mykMzULKlnkjUo1Z31sH2Af0le883snSVW
-	 wbN+cFwfZoTzKU0qgnY02GTMQsPFe1NyqYcZSSsD4v4Gd3kuPIQMY/aFHTInHZHoVi
-	 UeUNgJnjQQZsbII9XkJett14CgtRa1hqtAloT3+U2M8UCdV5du0Z+Wv71oc/R9C6RZ
-	 6Z++bkV0npMMiHpVLdNF3BedLX/s4k/+a+pIhouajd0Hu/81FxjkkSbPjr4TS/MF4h
-	 tUUVEtitaQaXD8za3+MigdX8k7IDeKGQnL8MXGJri88sxjPntt+xciVOaKhoREfeFo
-	 ZuHDdzuP2W+lQ==
-Date: Thu, 15 Jan 2026 18:41:07 -0800
+	b=oED/Xl1XmDR4zsnx54w/QL4FQPbC/ioUIy+daiF19ZItPIV51WwfwSG8g/UefSWQO
+	 E23kN8JvktyIxSx2tILMOO18GSIHpjbkZdSg+1nTk93L8Zkbfe2WLpw6uQAYbehKkb
+	 cgl+u9UAc9rUdpDHgRK4Pxs44kK38eKDn1xR12r10v39c1Z7uvkHu9CYVYuXK2ieUg
+	 e0iJuj62krH25/+mN+W1ObpjSkGPT7jf0CpHP+QN/199XbEWpJSAZHxvGl9ewv1JB4
+	 JajovEvkaMWAU4cFyY3vRcpvinX2jiDqD3+gYulJxylASRyoYsiAVeosL8Da6OjHqM
+	 h156s2Qx9ftrw==
+Date: Thu, 15 Jan 2026 18:43:52 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Slark Xiao" <slark_xiao@163.com>
+To: Slark Xiao <slark_xiao@163.com>
 Cc: loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
  johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
  edumazet@google.com, pabeni@redhat.com, mani@kernel.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next v6 0/8] net: wwan: add NMEA port type support
-Message-ID: <20260115184107.01975f7c@kernel.org>
-In-Reply-To: <41675d06.99df.19bc178277f.Coremail.slark_xiao@163.com>
-References: <20260115095417.36975-1-slark_xiao@163.com>
-	<41675d06.99df.19bc178277f.Coremail.slark_xiao@163.com>
+Subject: Re: [net-next v7 0/8] net: wwan: add NMEA port type support
+Message-ID: <20260115184352.6dd62bb6@kernel.org>
+In-Reply-To: <20260115114625.46991-1-slark_xiao@163.com>
+References: <20260115114625.46991-1-slark_xiao@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,17 +59,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 Jan 2026 19:43:55 +0800 (CST) Slark Xiao wrote:
-> >Sergey Ryazanov (7):
-> >  net: wwan: core: remove unused port_id field
-> >  net: wwan: core: explicit WWAN device reference counting  
-> Ignore this serial since a typo which lead to build error.
-> See next v8 version later.
+On Thu, 15 Jan 2026 19:46:17 +0800 Slark Xiao wrote:
+> The series introduces a long discussed NMEA port type support for the
+> WWAN subsystem. There are two goals. From the WWAN driver perspective,
+> NMEA exported as any other port type (e.g. AT, MBIM, QMI, etc.). From
+> user space software perspective, the exported chardev belongs to the
+> GNSS class what makes it easy to distinguish desired port and the WWAN
+> device common to both NMEA and control (AT, MBIM, etc.) ports makes it
+> easy to locate a control port for the GNSS receiver activation.
 
-Please read:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-We request that you wait with reposts _especially_ when they are caused
-by your own negligence.
--- 
-pv-bot: 24h
+I'm going to release the results of AI code review. Since you ignored
+the reposting period with this version please do not post v8 until
+next week.
 
