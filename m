@@ -1,180 +1,179 @@
-Return-Path: <netdev+bounces-250494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2821BD2F2B0
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:00:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C48D2F572
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11AF23023540
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:00:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3855A3057F56
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611B535E538;
-	Fri, 16 Jan 2026 10:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BB435F8AF;
+	Fri, 16 Jan 2026 10:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WCF7cVDD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7BOVrZc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SguTFJKn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D2B35CB95
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 10:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011E535F8C7
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 10:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768557605; cv=none; b=La8Feh3cUAAoCEEc2e9u+zsjRwe5fpaBO3awpjmFoQO3HtY8E0FA/JB4eL5dANH5hDF6HzAD8bMhild9mjKSBIz2FbU2y62lptdok49DDgodjgfjmqtyJ/zZOrEVNYl5Y2NR2i+pncx2cJkIgbPe1DDiiz4+HRfU/nMAg4eNt3A=
+	t=1768558290; cv=none; b=BINxYuDW+80ppvrH+OYKpuM6HNqxm2yZW0Rhmf8XaJG+YyWI/EhtZ5qFEBajAOe5ltBLfB9fTFJ4W2J1K9Rvdihnp87HGhACh66m2loSvSG6aeldiW13jhOXoQwNlRaYSipWKeHVBsTA/kol6ZZROZSi8HoF/iZxgfTLhHK0Zmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768557605; c=relaxed/simple;
-	bh=fW48aaLNkBbdqH7KvcMJgixNgMqvTRK+gAl5/GVTNZ0=;
+	s=arc-20240116; t=1768558290; c=relaxed/simple;
+	bh=GvKTSXpSnV61qIeIj7djXSRQdMUqOq9sB7I5GfaTK/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YMAbcBkse428wPi3yMsi9+6LmEMJjP39fe+3ggmVuRBlbM8DmwkTTkjUKlfNgJmnnHS8QjQGRf2wvuRtVomBsuTXEC7JH9UaGREdmBz/V0vzDyniPmH8boFggZTTzg7JAFQUKL15TWYxZMAUHAxJk1gl3jmFBu0CTYq3Ih56iRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WCF7cVDD; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-430fbb6012bso1407513f8f.1
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 02:00:02 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=W9kyqN2Dt7MVXy6vRk3DqwiI7uc9/G1TfmVArJ7XskruA7wZ2wMIGpKAt5ayUXTEl4aDSL2n7pZA3Tymvtc4efxDxsygftL9l7HB18Yn2EH+M9VT70gHY4YsKI+L5hLH2swdPzLiCdzen4kfdsPy4YklpQB6/WDDVrkI0ANiL6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7BOVrZc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SguTFJKn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768558286;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
+	b=A7BOVrZcSOj8NtR1qeEtI0L0SXcEF22LYwdmkdics4UTOD1aYlpGGzn9LRpZtuIrEi8Vkk
+	z59VVikqaeDdvqSKmB/JoduO0pJVyXrktQYwhQp5qob3yCHw33DnFbIGoIAwudrNewFzf3
+	Ah3uWYLC9pM7IjrBi2/Q/VGnQbedQxA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-XWDIMKP-OWKHsrbfwu9v5Q-1; Fri, 16 Jan 2026 05:11:25 -0500
+X-MC-Unique: XWDIMKP-OWKHsrbfwu9v5Q-1
+X-Mimecast-MFC-AGG-ID: XWDIMKP-OWKHsrbfwu9v5Q_1768558284
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee868f5adso11925725e9.0
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 02:11:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768557601; x=1769162401; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768558284; x=1769163084; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ik7nBSUvqjiZji8p0UMpcxyJ9CmKYvj/STnQwZRmw6o=;
-        b=WCF7cVDDVoB7pSe59ofWaHYm6WNWzgeCXj8b+qY0A56i1sLhU7jfZqSVNd09WGg+iP
-         f4eR9gPxvQR5/pHfAGNpik4PCuv6aKvY6ouYfZtAaHwrnRuZFJw3FTz4pmkHEG86FoB7
-         TMmoYc+q95nONQi9si31m7D047LidkhP8UUnwP+UOdoThlMX5CJcYB04BF9WOnets/Tg
-         L5dlHcJONq2vPjUjHvC1mCTJQ2urla/2xjO+iH5DEdnk4eUv+OCuOjTemCPEY2alMOZa
-         fWYcpaR3qVDtomJZhGypYpkv6zIeBvXluZfpLRi9Y+0snNxTaupLZlVdQB6Xr29r1t2X
-         AIQQ==
+        bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
+        b=SguTFJKn50YAKa86lhueg5kezwUXRjoOu3hY7Pjw9Y4Rbc6TcaRRm3drqTqhXguBqn
+         Cnk2E4BvDMOtzuFutNwcHBhprztlLjEKdfmWV5r+W2eNInjs7Wp4h/OduCXEbQtUVkUL
+         VoypiLNhVlpuQIK6Wa+z5ms3+MaToSYfsKlxgDNOUMAjX9hoA+8aNuL6vCrD/vlTbWVI
+         h7/bIq+NblObGEJH4n0pD8xfc9OQ0KQYvmWUChZ67t2bj3xqWv6VyNc88wk7shOw4aiG
+         FJh1fhs3LIlZATygoIHMAFIn7E8WH9LGBfFGOMuSTEIJRhDGn6mCmXXkOTFR2COFYYTN
+         4KFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768557601; x=1769162401;
+        d=1e100.net; s=20230601; t=1768558284; x=1769163084;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ik7nBSUvqjiZji8p0UMpcxyJ9CmKYvj/STnQwZRmw6o=;
-        b=AKwqd1ZvZUYmC/hvIOuykhVx/9mPFhvMCVvZSs2TEoJQ9KmGYCKaJ5s3F+EoDeXZ/6
-         RubY0jX9ylx99NR389StiZ0pN6dwXAC6kQt30aK/bUMZt5JRmy3Mbo3zbRH3jqYKM22E
-         jLnZzIGBWduhFGhKEqcvLBEhfEaZQGr25pMccyzJ95QZmA8kZljkqAsUQR6LK4sVD3f4
-         b0evYTXF6L7s8vxHpSCYyHwZIMyPG+pH/BQsXoxfcEXtZmgUb4vfwGNqebh3ZM8Xf3MB
-         iCLbezbKwUje8bi8R8n+h6arBsaghhovFgGrqQayXZPPdoYcL+dq2WheBVgB9BY+JO8+
-         9+3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXp2OfB0K3hyjQoXYAb4n4phsyOM8SDD+5I6hKHVhkkA6rmYycuuk7xVGnLhcqAWuW7tulk1Nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8iDFB1Np3tZu+vP1meqdCW5oDOTHIKqa6I3fZxYDkFTepkWU4
-	9XzxjWsU6DzaLx1T8IaVwLj5g2oIfLME3nfJ/UzvHUv/gC/gY3IZWQQ7Tgs8fqVo51E=
-X-Gm-Gg: AY/fxX4JMjzavB8QwFaBw8n+kScxxwSvxlOa6EfQyYsKYxtSMhBo9RJSwrFaLWb0TYH
-	8nIFJdcn8+w7/6IuT8WY1MTLWBYLpmbk4RcjOdZvuT6jcxoit5M+Y+84LtWmDqHW0n0BvMcvqKm
-	lJjLfIOWOw5T15SqvwBSoS056weLS2TVUcNsaBp4l16U5dgmynhFw1jH/23L06BtTgX7e4UG2xU
-	LBy1Napxva+5rhhbRCFcCCx1URNyYKU/kBGhOLL4C+fcBMntapgwhW1dqABp0sFjAIhwtcELhHQ
-	slOAON+QB87Kpdbblfqwm4wTQCozx0IZzpZ6o1QBx3m0tJWmBOeKjQfv4Wvok23ro/Pwq5LiCfr
-	FbsDIAhF1YQcsdGb/qgdLAZRjeP+hBCpCLdryszfPqCkdzw8qNoPxy0s60lemYUKSF7Kn4qDdHv
-	MtxiUMDuQeiCDhLg==
-X-Received: by 2002:a05:6000:26ce:b0:432:dfea:1fa8 with SMTP id ffacd0b85a97d-43569bc5767mr3019291f8f.45.1768557601174;
-        Fri, 16 Jan 2026 02:00:01 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569921f6esm4337797f8f.4.2026.01.16.01.59.59
+        bh=PYdYs09o1BdUi4chDtWqrhvtiarKfR63xIzMRlbqh6g=;
+        b=u9ga56HAdYwpBcBkEmYfsfnAyFhqhrG9HxbKTu6kP5QsAQbxyJNNJ+S2dJxh8GZGxg
+         r3Z1ih+QMEvtWs4LCsp8SM81b89F0jaxQBOthEbBjWRQrTeVEM5yGxzseJmyafPkhSeU
+         8HYDh/CL2wRmVVz5H1bN1k3q8MD/upxvgkSf4HWJeWO0wRP6bcUf/XKybm2AsomqunRQ
+         obfFRJHC8FB4wRekDhcWtwA6ujpyqsZ26OXxlP4wihX3HAHdkomyyzd7KS9Cd9M/K79y
+         fswSmidIPtVLvb/7jhoFf00pFpJg5UWPRJJW2Jw8STYJDPEIWNssMOjPFmgEAH/Mph24
+         n5/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVDJXD4EZMvWmGKqzfk9eXD1BTYXO/pD4m+v1rVA7WV1KdlYsPS/z/jLu61jZCaPC7fzBr5zLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLwXy9glgLi71mv1CxBx2MH0/+uWxLVgjnXgIRkHmNWT9+mUpy
+	L5wv7rytdaXpsMm2c9vR2o8W+2QJqFkb3oUwVBu8eV+1gRIzBaXVw0WNo/yhrSvFCjnpGO9uo7L
+	Rz9r6LJw4i3w+6Dg+WnvnwDl6DdD3pBvC0s4iOKOuuL/VAbaHYH89UdRZjWA9saZHyA==
+X-Gm-Gg: AY/fxX5kjb0eMSeZW4qvNs5PELo7ShOVBda4JvvH2lMsvSczVjqEuz6WiX24Q4dTfLh
+	Rr2UzrgBmGRpSZjgGuvGo6Ch6Dzu4U7sLDPW0jTSsZ7O+TLuXy7uicW8beQPq9YZ9uDEw0VWKqV
+	GFyhOZyJZePMyUJD/GUWZT30B8RbG4UcsXrVK0RAiMnhyXDslbyQvYnBZ2VRjmSjw7lCt5YVsbI
+	+dCQ8tJ9mJqcbDim9wzQaLP98UITx0WQ6cmt/7bqGhwo9V6msbShAOOLAOyiNVx1EuZcEGE8Xap
+	GiOZS2He96pOiPObsId0w/XfFIYvnfwtP+MCn0RFk/bFL0RrWr+DsKr8ilIoJ8pJYBt6iRr9SoA
+	1gIOTYSz10gEa1CLNHTkx52UdsStmRzkh4BfUEyPdDoYMU+ErNiZCE+a1yHk=
+X-Received: by 2002:a05:600c:c178:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-4801e34cd0emr32517705e9.31.1768558283730;
+        Fri, 16 Jan 2026 02:11:23 -0800 (PST)
+X-Received: by 2002:a05:600c:c178:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-4801e34cd0emr32517485e9.31.1768558283318;
+        Fri, 16 Jan 2026 02:11:23 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e8d90b3sm35848465e9.15.2026.01.16.02.11.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 02:00:00 -0800 (PST)
-Date: Fri, 16 Jan 2026 10:59:57 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 15/19] drivers: tty: serial: mux.c: Migrate to
- register_console_force helper
-Message-ID: <aWoMHbbn-BmmbZMg@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-15-21a291bcf197@suse.com>
+        Fri, 16 Jan 2026 02:11:22 -0800 (PST)
+Date: Fri, 16 Jan 2026 11:11:20 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Luigi Leonardi <leonardi@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] vsock/test: Do not filter kallsyms by symbol type
+Message-ID: <aWoKNf1AI9s1bmYM@sgarzare-redhat>
+References: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-15-21a291bcf197@suse.com>
+In-Reply-To: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
 
-On Sat 2025-12-27 09:16:22, Marcos Paulo de Souza wrote:
-> The register_console_force function was introduced to register consoles
-> even on the presence of default consoles, replacing the CON_ENABLE flag
-> that was forcing the same behavior.
-> 
-> --- a/drivers/tty/serial/mux.c
-> +++ b/drivers/tty/serial/mux.c
-> @@ -390,7 +390,7 @@ static struct console mux_console = {
->  	.write =	mux_console_write,
->  	.device =	uart_console_device,
->  	.setup =	mux_console_setup,
-> -	.flags =	CON_ENABLED | CON_PRINTBUFFER,
-> +	.flags =	CON_PRINTBUFFER,
->  	.index =	0,
->  	.data =		&mux_driver,
->  };
-> @@ -547,7 +547,7 @@ static int __init mux_init(void)
->  		mod_timer(&mux_timer, jiffies + MUX_POLL_DELAY);
->  
->  #ifdef CONFIG_SERIAL_MUX_CONSOLE
-> -	        register_console(&mux_console);
-> +		register_console_force(&mux_console);
+On Fri, Jan 16, 2026 at 09:52:36AM +0100, Michal Luczaj wrote:
+>Blamed commit implemented logic to discover available vsock transports by
+>grepping /proc/kallsyms for known symbols. It incorrectly filtered entries
+>by type 'd'.
+>
+>For some kernel configs having
+>
+>    CONFIG_VIRTIO_VSOCKETS=m
+>    CONFIG_VSOCKETS_LOOPBACK=y
+>
+>kallsyms reports
+>
+>    0000000000000000 d virtio_transport	[vmw_vsock_virtio_transport]
+>    0000000000000000 t loopback_transport
+>
+>Overzealous filtering might have affected vsock test suit, resulting in
+>insufficient/misleading testing.
+>
+>Do not filter symbols by type. It never helped much.
+>
+>Fixes: 3070c05b7afd ("vsock/test: Introduce get_transports()")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+>man nm says: 't' stands for symbol is in the text (code) section. Is this
+>correct for `static struct virtio_transport loopback_transport`?
 
-The situation here is the same as in 16th patch for
-ma35d1serial_console().
+I'm not an expert, but yeah I was expecting "d" too, but maybe since
+it's static and built-in will be in the text section?
 
-Also "mux_console" is assigned to
+BTW I just checked and for example on my 6.18.4-100.fc42.x86_64 I have:
 
-static int __init mux_probe(struct parisc_device *dev)
-{
-[...]
-		mux_driver.cons = MUX_CONSOLE;
+0000000000000000 t sock_fs_type
+0000000000000000 t proto_net_ops
+0000000000000000 t net_inuse_ops
 
-		status = uart_register_driver(&mux_driver);
-[...]
-		status = uart_add_one_port(&mux_driver, port);
-[...]
-}
+And they are all static structs of built-in modules.
+So it seems it is common.
 
-So, that it can get registered also by:
+>---
+> tools/testing/vsock/util.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  + mux_probe()
-    + uart_add_one_port()
-      + serial_ctrl_register_port()
-	+ serial_core_register_port()
-	  + serial_core_add_one_port()
-	    + uart_configure_port()
-	      + register_console()
+Thanks for the fix!
 
-And we would need to pass the "force" information via CON_FORCE flag.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Best Regards,
-Petr
+>
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index 142c02a6834a..bf633cde82b0 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -25,7 +25,7 @@ enum transport {
+> };
+>
+> static const char * const transport_ksyms[] = {
+>-	#define x(name, symbol) "d " symbol "_transport",
+>+	#define x(name, symbol) " " symbol "_transport",
+> 	KNOWN_TRANSPORTS(x)
+> 	#undef x
+> };
+>
+>---
+>base-commit: a74c7a58ca2ca1cbb93f4c01421cf24b8642b962
+>change-id: 20260113-vsock_test-kallsyms-grep-e08cd920621d
+>
+>Best regards,
+>-- 
+>Michal Luczaj <mhal@rbox.co>
+>
+
 
