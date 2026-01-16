@@ -1,85 +1,46 @@
-Return-Path: <netdev+bounces-250498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464F8D2F968
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:32:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11450D2FB26
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F14B30191A3
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:31:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3D104303DD1B
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 10:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC526322C7F;
-	Fri, 16 Jan 2026 10:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947B13587AB;
+	Fri, 16 Jan 2026 10:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="J9bPJdT8";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="OKn731lL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kumww058"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A83930DD1F;
-	Fri, 16 Jan 2026 10:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768559504; cv=pass; b=MCJ8YY0ojjxgukIABB3O1b3I2ogK33BZhLdRCPRRFyJnDOInNdNIMW0f/+td8L10AE8MDnw5+mMIx6tCAb2Uj6R58paNRkugc86RY8xlVSM2fM8BcR+dvBuFke00ZpUuJC2xJODB6EducKnsMlE9RvsR+WeDmmU5E3Znlxu3sNA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768559504; c=relaxed/simple;
-	bh=F+E86gmFwJgzHMYe1opEevnrLt7o5OIpKlmd0HhoCYo=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715FE3195E8;
+	Fri, 16 Jan 2026 10:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768560010; cv=none; b=q6tXNWf0oUn4cViZdPPouCKzeyBx0tSrq2kDr7E13gmwqykUMXOjKH3OrktrToNPUe3B3YGd5z2KZvl3ugB5DzWb78/PxLn/t7UD3Nk55rdwXS3XHa/MFbq/gr0evrCXN7YpdpoGBZFAVIKfP2hT8h7dreUE0I/42yFQVD9gkqE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768560010; c=relaxed/simple;
+	bh=/qTy21kwCbBWCmpt/uLJitE4vDc9ItDMqmxOz9/vYMY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NjZJZItokFhN2IXfqtsig+/MuiswZgr7nZAw4ecvzvLyVYux4dIBuYweFUZxFR5lzq0xyDCj5+LRBQ+8omwoUFxIq2UTOeZYHHdl3KauR5+Gu6Zl9sD0zFX2Iar+M1zxG22AhfmhmzX6lxBwDuJZN2itw5DXGGKerLpSTdchWGI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=J9bPJdT8; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=OKn731lL; arc=pass smtp.client-ip=85.215.255.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1768559480; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=VkbqpgfoGAEG5X17cx6hm+EnpXyhRUP5CP76GjQ6+Ka7P+BcYfvySoaVEX8pBagvch
-    LlMgCaY6MPiOaND/n/ub+ZNI/5i5Kj7IwzmOn0LMIu19M/SBLmV1PnSqKx7CaL0yNQe7
-    0cQStWS71YQ3xW559L4vm55zzRT8Qo/zAdm5PF9lFt23+8xhWnMFhKw2UP2riaM5nlUI
-    m5b2dY3OR2CdP+aBWpkggLW6oldUwmeyyofy8MvBBU6NeB3Wxqt++Sdg8fGtCVyJzSJM
-    MkMbQhchhUXqDPaBfAru97K4qwgHvmObE71SsUvY9rwa5O4eXMHY9SxQvSYnk6YqYOP8
-    XFyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768559480;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4Qq9gdM9vprxxFGgf7/BOYBAvs6L7HF7wuAMDd8isSI=;
-    b=cMZrjbYfxEhb2IbC3u2KrFuHmk/QvBt84jwcUfe++qxoCyrlHqUzu2MFYGecPYgs4k
-    mZgotzRcXHHawhroiSRO4DJZ0eHSi+m5KYG7P7pli9BmgLGK4dK/hTGwKQBTXvE2rwry
-    TUYbInYUUa+J9nUVhZLCArMz2ppd9LKK4fJbiMqLG7WOfDCQEMGZ+0dN/c17fQLefOsA
-    8mYMM+i9ueYGskT+eIqvsO3g6qQSmJQeg8MVtn8Xbx1V1qqckW4KSgLv2HtwjW6I3RrV
-    Ck4qQPHI44LE5LCjGxaZoHYawqtbr6hlCZDOUmp+sD/Tsoubb4VIctBbS4pAzARw4jum
-    0isQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768559480;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4Qq9gdM9vprxxFGgf7/BOYBAvs6L7HF7wuAMDd8isSI=;
-    b=J9bPJdT856n2KX3eXWgLXIOXpVWQi0WwHRdk4w/0hS8v11422yZxExNTh68VFeYroi
-    qzjBhMQnAOEiqBYoH5DUGqjVTqvCbTb0oa2FjF+3weDTZHhipyX+gKBquO6W22jm5n4p
-    HDTyQXW1Y6I9CEKdxOepMpq0du85jAnj2Y0tWNJIsOWFKdIqHDBcj8tPoaTmnvMpdrtB
-    8tyxMagcRZPoKvZvrWxAeuugHc5nkFz0l89Ve6wDWP4oJgkIkapwX0nOeuc9iyVX/fNJ
-    Tz0WDwJizbEZ4hdFw5lly7CG/x8Js9g1IL4tHusot9Y8O3Ns5pXxsgAfqLgU7QP1BlRN
-    orTg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768559480;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=4Qq9gdM9vprxxFGgf7/BOYBAvs6L7HF7wuAMDd8isSI=;
-    b=OKn731lLeZsjbtCCngXIr9uYqp0w9zeRbTBjQU7wB8B0P11/k3GLDXZ9G9x2CKDj8e
-    5fuTngaZiYnwmGUGvGCA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b20GAVKAkM
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 16 Jan 2026 11:31:20 +0100 (CET)
-Message-ID: <f2d293c1-bc6a-4130-b544-2216ec0b0590@hartkopp.net>
-Date: Fri, 16 Jan 2026 11:31:14 +0100
+	 In-Reply-To:Content-Type; b=TyjvhShn2a5nVP7LhYo8xo/Rcd6dPdkUD63Jh+F8uuu9Lcqq/2MoSODSNTaAbfvlKyE2028SwAveHk7r1zIV/DXJ/whg5ewqfiiqiE6Q1QKLvhtOWp6OrddBTaW0QV6iONaNBpVZP18yHbAgV/kL27Wbo0N4XRKFzi+LIGv4wN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kumww058; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 524C6C116C6;
+	Fri, 16 Jan 2026 10:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768560010;
+	bh=/qTy21kwCbBWCmpt/uLJitE4vDc9ItDMqmxOz9/vYMY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Kumww058sCRwJ9m0nWFE5uzc86Jl/uwLAObbiEctYkUjccxICQ4GlfcADFW530GCJ
+	 RrTu7iGRKzEwoIOFaJ9k3YgjPGjbesU7LBS05J2Jl51iR5isjdwDMoAV1ilaRH5kMq
+	 x/xdFGoYTJMKVgGHM257s8o580jJvsZZm1gQ/UFMgYy7ceZL2XSaWg5uwXAdmuPIeB
+	 TxR6+2C3gg8SPOX5zlcoygzWxirL+FNwLnNbBqg4QqJhHECPb2aZXwZ5XKGVoTjrBQ
+	 UZOGmACe6SbGMe9soqlGBHmq7JmUxhU8LNlHSD6Puqxf6k2UuiKQj/7DfmUr6j8hUK
+	 OjS6U0cNRXV5A==
+Message-ID: <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org>
+Date: Fri, 16 Jan 2026 11:40:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,128 +48,153 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [can-next 0/5] can: remove private skb headroom infrastructure
-To: Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org,
- Marc Kleine-Budde <mkl@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>
-Cc: Vincent Mailhol <mailhol@kernel.org>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- davem@davemloft.net
-References: <20260112150908.5815-1-socketcan@hartkopp.net>
- <a2b9fde3-6c50-4003-bc9b-0d6f359e7ac9@redhat.com>
+Subject: Re: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons
+ for monitoring
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, carges@cloudflare.com, kernel-team@cloudflare.com
+References: <176847978787.939583.16722243649193888625.stgit@firesoul>
 Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <a2b9fde3-6c50-4003-bc9b-0d6f359e7ac9@redhat.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <176847978787.939583.16722243649193888625.stgit@firesoul>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello Paolo,
+Hi Eric,
 
-freshly created CAN skbs only contain a fixed struct can_frame (16 
-byte!) where dev/priority/mark/tstamp are set together with
+I need an opinion on naming for drop_reasons below.
 
-skb->protocol = htons(ETH_P_CAN);
-skb->ip_summed = CHECKSUM_UNNECESSARY;
-skb->pkt_type = PACKET_LOOPBACK;
-
-All other settings that are relevant to ethernet/IP are unused and left 
-at their initialization values (e.g. network/mac/transport headers or 
-inner protocol values).
-
-A single CAN skb can be passed to the driver layer and back several 
-times. Because we need to place some additional data along with CAN skbs 
-this was formerly stored in a 16 byte private skb headroom (struct 
-can_skb_priv).
-
-IIRC we had three issues (KMSAN, etc) with the headroom as someone 
-between netif_rx() and can_rcv() was using the headroom for his purposes 
-so that the access to struct can_skb_priv via skb->head was broken and 
-not reliable for CAN skbs.
-
-Skbs are mostly used for ethernet/IP and developers do not really 
-know/care about CAN skbs. That's why this patch set aims to remove 
-private CAN skb headroom infrastructure - and to minimize the (risky) 
-interaction with other ethernet/IP code.
-
-On 15.01.26 16:37, Paolo Abeni wrote:
-
-> Could you please explain in details why the metadata_dst option has been
-> deemed unsuitable?!? I *think* something vaguely alike the following
-> would do?!?
+On 15/01/2026 13.23, Jesper Dangaard Brouer wrote:
+> Add specific drop reasons to SFQ qdisc to improve packet drop observability
+> and monitoring capabilities. This change replaces generic qdisc_drop()
+> calls with qdisc_drop_reason() to provide granular metrics about different
+> drop scenarios in production environments.
 > 
+> Two new drop reasons are introduced:
+> 
+> - SKB_DROP_REASON_QDISC_MAXFLOWS: Used when a new flow cannot be created
+>    because the maximum number of flows (flows parameter) has been
+>    reached and no free flow slots are available.
+> 
+> - SKB_DROP_REASON_QDISC_MAXDEPTH: Used when a flow's queue length exceeds
+>    the per-flow depth limit (depth parameter), triggering either tail drop
+>    or head drop depending on headdrop configuration.
+
+I noticed commit 5765c7f6e317 ("net_sched: sch_fq: add three 
+drop_reason") (Author: Eric Dumazet).
+
+  SKB_DROP_REASON_FQ_BAND_LIMIT: Per-band packet limit exceeded
+  SKB_DROP_REASON_FQ_HORIZON_LIMIT: Packet timestamp too far in future
+  SKB_DROP_REASON_FQ_FLOW_LIMIT: Per-flow packet limit exceeded
+
+Should I/we make SKB_DROP_REASON_QDISC_MAXDEPTH specific for SFQ ?
+Like naming it = SKB_DROP_REASON_SFQ_MAXDEPTH ?
+
+Currently SKB_DROP_REASON_QDISC_MAXDEPTH is only used in SFQ, but it
+might be usable in other qdisc as well.  Except that I noticed the
+meaning of SKB_DROP_REASON_FQ_FLOW_LIMIT which is basically the same.
+This made me think that perhaps I should also make it qdisc specific.
+I'm considering adding a per-flow limit to fq_codel as I'm seeing prod
+issues with the global 10240 packet limit. This also need a similar flow
+depth limit drop reason. I'm undecided which way to go, please advice.
+
+
+> The existing SKB_DROP_REASON_QDISC_OVERLIMIT is used in sfq_drop() when
+> the overall qdisc limit is exceeded and packets are dropped from the
+> longest queue.
+> 
+> These detailed drop reasons enable production monitoring systems to
+> distinguish between different SFQ drop scenarios and generate specific
+> metrics for:
+> - Flow table exhaustion (flows exceeded)
+> - Per-flow congestion (depth limit exceeded)
+> - Global qdisc congestion (overall limit exceeded)
+> 
+> This granular visibility allows operators to identify issues related
+> to traffic patterns, and optimize SFQ configuration based on
+> real-world drop patterns.
+> 
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 > ---
-> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
-> index 1fc2fb03ce3f..d6ee45631fea 100644
-> --- a/include/net/dst_metadata.h
-> +++ b/include/net/dst_metadata.h
-> @@ -13,6 +13,13 @@ enum metadata_type {
->   	METADATA_HW_PORT_MUX,
->   	METADATA_MACSEC,
->   	METADATA_XFRM,
-> +	METADATA_CAN,
-> +};
-> +
-> +struct can_md_info {
-> +	int can_iif;
-> +	int len;
-> +	int uid;
->   };
+>   include/net/dropreason-core.h |   12 ++++++++++++
+>   net/sched/sch_sfq.c           |    8 ++++----
+>   2 files changed, 16 insertions(+), 4 deletions(-)
 > 
->   struct hw_port_info {
-> @@ -38,6 +45,7 @@ struct metadata_dst {
->   		struct hw_port_info	port_info;
->   		struct macsec_info	macsec_info;
->   		struct xfrm_md_info	xfrm_info;
-> +		struct can_md_info	can_info;
->   	} u;
->   };
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index 58d91ccc56e0..e395d0ff9904 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -69,6 +69,8 @@
+>   	FN(QDISC_DROP)			\
+>   	FN(QDISC_OVERLIMIT)		\
+>   	FN(QDISC_CONGESTED)		\
+> +	FN(QDISC_MAXFLOWS)		\
+> +	FN(QDISC_MAXDEPTH)		\
+>   	FN(CAKE_FLOOD)			\
+>   	FN(FQ_BAND_LIMIT)		\
+>   	FN(FQ_HORIZON_LIMIT)		\
+
+FQ drop reason names can be seen above.
+
+> @@ -384,6 +386,16 @@ enum skb_drop_reason {
+>   	 * due to congestion.
+>   	 */
+>   	SKB_DROP_REASON_QDISC_CONGESTED,
+> +	/**
+> +	 * @SKB_DROP_REASON_QDISC_MAXFLOWS: dropped by qdisc when the maximum
+> +	 * number of flows is exceeded.
+> +	 */
+> +	SKB_DROP_REASON_QDISC_MAXFLOWS,
+> +	/**
+> +	 * @SKB_DROP_REASON_QDISC_MAXDEPTH: dropped by qdisc when a flow
+> +	 * exceeds its maximum queue depth limit.
+> +	 */
+> +	SKB_DROP_REASON_QDISC_MAXDEPTH,
+>   	/**
+>   	 * @SKB_DROP_REASON_CAKE_FLOOD: dropped by the flood protection part of
+>   	 * CAKE qdisc AQM algorithm (BLUE).
+> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+> index 96eb2f122973..e91d74127600 100644
+> --- a/net/sched/sch_sfq.c
+> +++ b/net/sched/sch_sfq.c
+> @@ -302,7 +302,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
+>   		sfq_dec(q, x);
+>   		sch->q.qlen--;
+>   		qdisc_qstats_backlog_dec(sch, skb);
+> -		qdisc_drop(skb, sch, to_free);
+> +		qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+>   		return len;
+>   	}
+>   
+> @@ -363,7 +363,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
+>   	if (x == SFQ_EMPTY_SLOT) {
+>   		x = q->dep[0].next; /* get a free slot */
+>   		if (x >= SFQ_MAX_FLOWS)
+> -			return qdisc_drop(skb, sch, to_free);
+> +			return qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_MAXFLOWS);
+>   		q->ht[hash] = x;
+>   		slot = &q->slots[x];
+>   		slot->hash = hash;
+> @@ -420,14 +420,14 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
+>   	if (slot->qlen >= q->maxdepth) {
+>   congestion_drop:
+>   		if (!sfq_headdrop(q))
+> -			return qdisc_drop(skb, sch, to_free);
+> +			return qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_MAXDEPTH);
+>   
+>   		/* We know we have at least one packet in queue */
+>   		head = slot_dequeue_head(slot);
+>   		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
+>   		sch->qstats.backlog -= delta;
+>   		slot->backlog -= delta;
+> -		qdisc_drop(head, sch, to_free);
+> +		qdisc_drop_reason(head, sch, to_free, SKB_DROP_REASON_QDISC_MAXDEPTH);
+>   
+>   		slot_queue_add(slot, skb);
+>   		qdisc_tree_reduce_backlog(sch, 0, delta);
 > 
-
-Yes. I came to the same simple extensions for data structures but then 
-looked into dst_metadata.h and the users code with mallocs, per_cpu 
-code, unclone, refcounts, etc. - which was hard to understand for me and 
-introduced complexity that is again needed and maintained by ethernet/IP 
-users only. Not really appropriate for a CAN skb that transports 16 byte 
-of data IMO.
-
-For that reason I propose the common pattern to wrap a union around 
-dual-usable skb space, which is simple efficient and easy to understand.
-
-On 15.01.26 16:37, Paolo Abeni wrote:
-
- > I don't like much that the CAN information are scattered in different
- > places (skb->hash and tunnel header section).
-
-This is not the case. According to the documentation the skb->hash is a 
-value used for RPS to identify skbs. We would use it as intended.
-
-And the tunnel header section is marked unused in CAN skbs. By setting 
-"skb->encapsulation" to false (the init value) this section is not read 
-by anyone. Wrapping a union around this dual-usable skb space is a safe 
-solution here.
-
- > Also it's unclear to me if
- > a can bus skb could end-up landing (even via completely
- > insane/intentionally evil configuration/setup) in a plain netdev 
-interface.
- >
- > In the such a case this solution will be problematic.
-
-The CAN drivers and the CAN network layer code always checks the 
-processed skbs for ETH_P_[CAN|CANFD|CANXL] and ARPHDR_CAN. So CAN skbs 
-created by the CAN netlayer can only be sent to ARPHDR_CAN devices.
-
-The only way to create weird CAN skbs is via PF_PACKET sockets that 
-sends ETH_P_CAN skbs to ethernet devices. Beyond such PF_PACKET skbs the 
-now suggested CAN skbs would not harm any driver or network layer as the 
-described skb settings do not have any problematic content.
-
-Netdev drivers can cope with it and the netlayer code using 
-ETH_P_[CAN|CANFD|CANXL] or ETH_P_ALL is fine with it too.
-
-Long story short: Using the common pattern to wrap a union around 
-dual-usable skb space is the most efficient and least risky solution IMHO.
-
-Best regards,
-Oliver
+> 
 
 
