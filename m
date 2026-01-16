@@ -1,136 +1,131 @@
-Return-Path: <netdev+bounces-250503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56662D300E6
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:05:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60360D303C5
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D2343015D1A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:02:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCEC0300957E
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38E0366DC7;
-	Fri, 16 Jan 2026 11:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377D736D510;
+	Fri, 16 Jan 2026 11:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="CSngBGWX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e78OplHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FCF366540
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 11:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A9736D504
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 11:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768561349; cv=none; b=EaCF2eIR8jIbdleAd/gVSaT//mUGBIplGgHWXFpIwTT4cGrJTwIFbECyVVw5hgTn9zd3HvfQCg8ofpmIpwgiUSRn9lM/33UGx4X7GB2JpRt6AP1XAz2xyRRescDmYbh8OVRhoxXNnmjHWakgOPdVMbQkuqlWx85IvR4zaVgDrXM=
+	t=1768562177; cv=none; b=EoszUPfcmNctlbCMbXCXQJs8h0cVXiSOxxLp7xZVXvlAEAlyZnyn4CihVXZOyW/l4LuEdOQ9d4BoJfuITT7th5llcyYPjjYaF+MIOEvIOQVQcNlIVVYQvm79fR1HJxIWk8INz9+NcgtwIDiDn/Gthr8w0QnINWkzRTlPfwC3QM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768561349; c=relaxed/simple;
-	bh=VSlCp7iUGmTUW3L4RvL1ZGxYsue9P4F1nIStK/5KbpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YHhRC4oZYQdKBaV1DfceQdnS92GJkd0DOQYKWnCda3DMqI8PZEXc81DUOYhZPRCFKIsYRPrc+2t5tdiUAGvgC5iDe5rE2o0MDDDtuxkXSq6AcBA2E5jQko9l3iB1D/LZclBu8QX5QSdRo8OqPH6Ho0HLGU5tpMqOrar2QyxPn4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=CSngBGWX; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-transfer-encoding:content-disposition
-	:content-type:content-type:mime-version:references:message-id
-	:subject:subject:from:from:date:date:received; s=oak1; t=
-	1768561335; x=1769425336; bh=VSlCp7iUGmTUW3L4RvL1ZGxYsue9P4F1nIS
-	tK/5KbpM=; b=CSngBGWXuDW30AGMDLuNUshfvMuCkJmjhA8T3/ccEQTX7pAOD1m
-	pJi/N2aGjEUg8JY82138zO3frq0pIN6cj43rcK8R6xcC8XD5+8+j2BkedX0Surug
-	nWkfoM4Nhd9plQogMn0Y2bbYdq4VcJnaOJnv045USqEPriO2PG+MDqkgKtDpNVMX
-	jKhOIcZ7lNhdErPtNrxZa2foXj3BjignUdoKqqmBD1tppK/GwtCmujB+8uoEzELm
-	hen5D5sSPJAc8tqt5irJq3bDmCbMWudooJdlTAaVwcQdV3egjh8/K6zuCA8bcIIk
-	dZiCdJHGDf/r59RLU4g1gpD0RMaBX+YbahA==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: by oak.phenome.org (Postfix);
-	Fri, 16 Jan 2026 12:02:14 +0100 (CET)
-Date: Fri, 16 Jan 2026 12:02:12 +0100
-From: Antony Antony <antony@phenome.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Antony Antony <antony@phenome.org>,
-	Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next 4/6] xfrm: add
- XFRM_MSG_MIGRATE_STATE for single SA migration
-Message-ID: <aWoatI4v84lJAC48@Antony2201.local>
-References: <cover.1767964254.git.antony@moon.secunet.de>
- <3558d8c20a0a973fd873ca6f50aef47a9caffcdc.1767964254.git.antony@moon.secunet.de>
- <aWZdTOXTn_YBKKhv@horms.kernel.org>
- <aWe_sIibKYzdWL9C@Antony2201.local>
- <aWjvUllZ7Clf3pm5@horms.kernel.org>
+	s=arc-20240116; t=1768562177; c=relaxed/simple;
+	bh=awtSa70YIOy7DkgI9qgxThmsXuEXN5au1KlV2Qk/F1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jQuokie+63Mv8UbPicI1CYFokwGwQgVmfuL48ZymrbbqehiqtGvNkr8q4yMslsnCsdRkXl7v4rdbruf6k7VLUmVj16bJMFW9S6iOvJVfPupqQphJPs1SwjJv8aqJLiYjg+3CA0pnQCPtzMUGwQdPyZxzL837L9ZuVYSadkX+s+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e78OplHw; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b872de50c91so296871766b.2
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 03:16:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768562173; x=1769166973; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=awtSa70YIOy7DkgI9qgxThmsXuEXN5au1KlV2Qk/F1o=;
+        b=e78OplHwLXu9HeNdVKiYx0yH3vQBuffMeGVmE+m8UwDjBKpdH0qW4aLAPiope6xnsV
+         U/7RfS9STu2XvafO6cXnrUvlPwCRuy2rZrFxwDV1kjeUQNVRF+zW85z9NLtWvsMWSA4e
+         9qwx341UmraBqyZzJWOgEuqrxqCYgQeSxPCsadK/ai2cPEtCz7xiWOdaQT98GN2ABhB8
+         yGnuORKD4dQNXmNyTSNwt8wS948kAfs13gtsNi+0VgdqmOZcoI9f5eKUr5KSOOO1jQvZ
+         v7DnZFpN7jFXQmL3uJWA/mjaFo9jcTIP8A6jJez/AXEtJwxV3NUszJTrRzFHIkVfuVEq
+         XAhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768562173; x=1769166973;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=awtSa70YIOy7DkgI9qgxThmsXuEXN5au1KlV2Qk/F1o=;
+        b=tNxTflVo39NqCu/w7FBLohZHCgYIHos9hZ0t4t0YdZaQ+kWLOE9uCNE0OKn7C8z4TL
+         otDqX4wdTLXYFPWksudKtPRQk3UabzB9Tv6F31IO3isTLGAiaJ1qGAYlL8LMIxrOoZ3s
+         DDiHhCHGtvcB5XiWCO8f1NBOmv+/dvZHlSdje2yz9XOBW4URfgreirSeV0dnqnArWElG
+         DyjBp+Ubyt2XRUyiwW5T8t5TJy6oAYVoFWU98Ec6oMfxdqrMPiXAO51A3Dsu1/62H+TK
+         IK/gBdUqPCCwMSybl4kRFOZIfs5egQIZS++WaXND/F72XgmiIpgYN/gSliCrsxxdpMbp
+         bT+Q==
+X-Gm-Message-State: AOJu0Yzm/uY1jm5gWTz0QT+LOylVoB2R/u8pm0L5dCS4R079pnjkWJFT
+	x1CPsryv5G/qUyINtog//oGW+rUl0xgWGt1WFrgtp1PsrWZ38PvwuK9J
+X-Gm-Gg: AY/fxX5t2i8tpwV+IfVb5/I9JT/pm9xDb+xIujySilxlw9LoK1CLNJJbyWdbu3DX28s
+	B7JIUPUBhUjlIvtqM0GHe5iXHLPhBdwM5ilDg21zAqdGeux1q8Gc5XJUbK1avDBwwSBJ2X5FgW8
+	II2S3lkujRE2qthh9+/gRC1l+Ga79h3/rQhgPa/XxRKY7+EvkqipTeRGV4rZDnQC5lSKfujgH7K
+	TCWF187aiFm6Ne9n8DLKfMxEFdSm1ZzSb8geNiYgPTAaJPXOdDz32IuZPku8tusZwkVi+Rglrkf
+	EM94QG0+yN3fqiIHn9VdVaIUMKlUll88vJYa/xpJKVxxfza+Vx0cWj8kh8bh5RkH98LhrMgQBE9
+	HTLeZNWM/fgEgap1Xsh4tWrbxWaR4yIpxtUTekKHdca2OHDSRR8jthqOy8p7f0/Xo7Q7rfAAxYT
+	K2m2noa1zENil+4k6ykU8lzIQsaZSDNPUNGeaoxofIQkHOp9xt8LHUNL20GE+3h8mvJEQU3sJHu
+	cK8rMzbA3bAGw==
+X-Received: by 2002:a17:906:fe0b:b0:b87:2e8a:e270 with SMTP id a640c23a62f3a-b879324c893mr242314466b.57.1768562172556;
+        Fri, 16 Jan 2026 03:16:12 -0800 (PST)
+Received: from ?IPV6:2001:9e8:f13f:1001:fd79:63dc:69b7:40d3? ([2001:9e8:f13f:1001:fd79:63dc:69b7:40d3])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65452bce433sm2156997a12.3.2026.01.16.03.16.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jan 2026 03:16:12 -0800 (PST)
+Message-ID: <d5c11fec-1e75-46cf-aeae-593fb6a4af09@gmail.com>
+Date: Fri, 16 Jan 2026 12:16:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aWjvUllZ7Clf3pm5@horms.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] net: sfp: add SMBus I2C block support
+Content-Language: en-US
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, Paolo Abeni
+ <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+References: <20260109101321.2804-1-jelonek.jonas@gmail.com>
+ <466efdd2-ffe2-4d2e-b964-decde3d6369b@bootlin.com>
+ <397e0cdd-86de-4978-a068-da8237b6e247@gmail.com>
+ <0c181c3d-cb68-4ce4-b505-6fc9d10495cd@bootlin.com>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <0c181c3d-cb68-4ce4-b505-6fc9d10495cd@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 15, 2026 at 01:44:50PM +0000, Simon Horman via Devel wrote:
-> On Wed, Jan 14, 2026 at 05:09:20PM +0100, Antony Antony wrote:
-> 
-> Hi Antony,
-> 
-> > Hi Simon,
-> > 
-> > On Tue, Jan 13, 2026 at 02:57:16PM +0000, Simon Horman via Devel wrote:
-> > > On Fri, Jan 09, 2026 at 02:38:05PM +0100, Antony Antony wrote:
-> 
-> ...
-> 
-> > > > +static int xfrm_send_migrate_state(const struct xfrm_user_migrate_state *um,
-> > > > +				   const struct xfrm_encap_tmpl *encap,
-> > > > +				   const struct xfrm_user_offload *xuo)
-> > > > +{
-> > > > +	int err;
-> > > > +	struct sk_buff *skb;
-> > > > +	struct net *net = &init_net;
-> > > > +
-> > > > +	skb = nlmsg_new(xfrm_migrate_state_msgsize(!!encap, !!xuo), GFP_ATOMIC);
-> > > > +	if (!skb)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	err = build_migrate_state(skb, um, encap, xuo);
-> > > > +	if (err < 0) {
-> > > > +		WARN_ON(1);
+Hi Maxime,
 
-kfree_skb(skb); replace the above line; explained bellow
+On 09.01.26 18:03, Maxime Chevallier wrote:
+> ACK, I'll gladly help with testing. This should actually be easily
+> achievable with a board that has a real i2c interface connected to the
+> SFP cage, as there's a i2c smbus emulation layer. The SMBus helpers will
+> work with a true I2C adapter, you may have to tweak the code though.
+>
+> This is relevant for modules that have a built-in PHY that you can
+> access, if you don't have any I can run some tests here, I have more
+> than enough modules...
+>
+> If you don't have time at all for that, I may give this a shot at some
+> point, but my time is a bit scarce right now :'(
+>
 
-> > > > +		return err;
-> > > 
-> > > skb seems to be leaked here.
-> > > 
-> > > Also flagged by Review Prompts.
-> > 
-> > I don't see a skb leak. It also looks similar to the functions above.
-> 
-> xfrm_get_ae() is the previous caller of nlmsg_new() in this file.
-> It calls BUG_ON() on error, so leaking is not an issue there.
-> 
-> The caller before that is xfrm_get_default() which calls kfree_skb() in
-> it's error path. Maybe I'm missing something obvious, but I was thinking
-> that approach is appropriate here too.
+I'd postpone this part if that's ok. Quite busy at the moment :(
 
-You’re right. There is a leak in the error path.
+When I come to trying to work on that, should that all be kept in
+mdio-i2c.c? I'm asking because we have a downstream implementation
+moving that SMbus stuff to mdio-smbus.c. This covers quite a lot right
+now, C22/C45 and Rollball, but just with byte access [1]. Because that
+isn't my work, I'll need to check with the original authors and adapt this
+for an upstream patch, trying to add word + block access.
 
-The new helper I added is similar to build_migrate(), but that code uses
-BUG_ON() on the error path. That feels too extreme here (even though there
-are other instances of it in the same file).
+Kind regards,
+Jonas
 
-I’ll follow the pattern in xfrm_get_default(): handle the error by freeing
-the skb (kfree_skb()) and returning an error. And no WARN_ON().
-
-I’ll send v3 shortly.
-
-thanks,
--antony
+[1] https://github.com/openwrt/openwrt/blob/66b6791abe6f08dec2924b5d9e9e7dac93f37bc4/target/linux/realtek/patches-6.12/712-net-phy-add-an-MDIO-SMBus-library.patch
 
