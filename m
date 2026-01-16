@@ -1,107 +1,109 @@
-Return-Path: <netdev+bounces-250537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4A0D32339
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:57:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C16D324FB
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 15:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C2FED300874B
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:57:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9FF430E1EE3
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4A9281368;
-	Fri, 16 Jan 2026 13:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249C128CF4A;
+	Fri, 16 Jan 2026 14:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pWgS1Xlr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ScN0bD2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82AF284B4F;
-	Fri, 16 Jan 2026 13:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B028C5AA
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 14:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768571831; cv=none; b=RN9cbFfhWOA/GaDhe+H8QEejPSTMx5PZULTVOdDoJectsQNehGQGZhvxFURjGdNakWgUC8eBEO/rgEbEDyE1RCB6s9/xQOAEU48/few887mlCsxdKT5OBX3t945gT+CFj7wSX3xVsG2G2V8nNIQEV5pEmu+BD8BJoTpxCJ0ibpw=
+	t=1768572058; cv=none; b=o5WpghacJPMlPT4YM4XSI2tWowzQFChVXN69trJpz/+MWyOJbz67gdmifIxSwWjhpqbIa2HrUgxekljmP6AzRlTDaGBPDMTJaVt5O3jInQ6S9VwICKSnk+EZwnQv4n5nXpUnzXiJsNbLUDaVioXdXzt4F62nBnuy7KvaGd9hpCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768571831; c=relaxed/simple;
-	bh=BOXkKGBmSM6KPlIEzpTpRHi9u26C38ZZt6Q013KAvXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HqbzEAsbbt3n6IFL99CKaKspPH/KLq4hv2WePdz98aNZ0uSticVL8BzqxamGYqJUHroEYsbGiCSct9GSjXGTOn+wxG9hl6wDv2cI36zTpoZauzL2uYEUjKscDzUmdwYLu83VmHAOdxshhkqg01kSzqelDqtoh899DfJJUxGvDEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pWgS1Xlr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3PCDRCP7/pLiE3Ykl6OrscgyxM5mEhILFsILD4bPkQ4=; b=pWgS1XlrWhdbt+YTdeOMUiHALS
-	hXTrisq67pvYSCk8o84Me8dFUxqkH0vPT2p0VM9gfNOsP8qaygedkqFmsftrJQq7QlSgWKrKUDJL5
-	hS3IHaTR9uzVBFGnGNvwAQR6h6WE5u//78+x05AIdRX2h6vL47gSywPZYbymSOmtadVRuzV278NnU
-	733pXMGRdPUPxP7u0HlFgtEcbUX8oIhheOHHOGbsviwXvxrmghWKlMw22Q5W5X8kom4xC9qjoTuIn
-	GVe5e6MCAga08Kb6hAZszMLgaVy7rtgh014zYfAQFbLZKJVqWC6rOnS/rcWMFYUGzILsoBd+uM0ci
-	Beff5biA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41880)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgkJz-000000002KY-2TMo;
-	Fri, 16 Jan 2026 13:57:03 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgkJx-000000003f5-1kmt;
-	Fri, 16 Jan 2026 13:57:01 +0000
-Date: Fri, 16 Jan 2026 13:57:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v5] net: sfp: extend SMBus support
-Message-ID: <aWpDrdocUvuBt-gS@shell.armlinux.org.uk>
-References: <20260116113105.244592-1-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1768572058; c=relaxed/simple;
+	bh=5HJg1+r27vjf2hpwiUI/JpMFhcLfSGQf53bp9hNPWP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GlkTnX/YgArA62CwtLs8E5Cwx+lNAARA31Pe6STlvnKMw5tHkvqXZCa4I6saG+4mVkEB88+UO0M9b2Ck6dGtzVOPiVW/gXkRbzjgW/FoX7gAEbL6M0ZuQifIFVwOZRNSJ1DAAinSaKlez+4d3/3XpomVZTYmVC+HKrqmLcU1GR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ScN0bD2r; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 985951A2785;
+	Fri, 16 Jan 2026 14:00:54 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 65FC760732;
+	Fri, 16 Jan 2026 14:00:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1AD0F10B68A9F;
+	Fri, 16 Jan 2026 15:00:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768572053; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=LB6Omhs0m/4Gl4M16+1Ov7LcTMAb+BD/AbzAvX1qW+w=;
+	b=ScN0bD2rkbsnJzdBmQtH/DP9dpZdXBRPyXJoLiqw0Egr/8d+fcjxu/JXOzuD7Lh3EdNiTJ
+	v7tAXMd6gauQtqGn/JJPnG+Pst+qEczKibMcA0GJa5gKOdur5A99w+fKvDm3Edd9E7MSqA
+	y2Q9t9BcyiQYPgdJsptZTD9EWCnQiLUzMXxIKyFaXS/4OHKttCV9xxYKbjBrSgYnHboJZt
+	NVWqL8mCoh5YNFYDi5V27stFKGJEZgF1jWGD4x6PQehqMA8x/lzmAWWN4CaJB0uv4a/Yje
+	999RIYwN0INg5c5UTr9/buj1mA5SDi83B95wUjff9hWfgHdNYHtIM9CDRoUJuA==
+Message-ID: <dc0531a3-b9b9-4b51-8ce7-f03e23ea0877@bootlin.com>
+Date: Fri, 16 Jan 2026 15:00:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116113105.244592-1-jelonek.jonas@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5] net: sfp: extend SMBus support
+To: Jonas Jelonek <jelonek.jonas@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+References: <20260116113105.244592-1-jelonek.jonas@gmail.com>
+ <6a87648c-a1e8-49a2-a201-91108669ab44@bootlin.com>
+ <6987689b-35ac-4c15-addb-1c8e54144fa7@gmail.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <6987689b-35ac-4c15-addb-1c8e54144fa7@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Jan 16, 2026 at 11:31:05AM +0000, Jonas Jelonek wrote:
-> +		max_block_size = SFP_EEPROM_BLOCK_SIZE;
-> +	} else if (functionality & I2C_FUNC_SMBUS_BYTE_DATA) {
 
-If we want to be fully flexible, then:
 
-	} else if (functionality & (I2C_FUNC_SMBUS_BYTE_DATA |
-				    I2C_FUNC_SMBUS_I2C_BLOCK)) {
+On 16/01/2026 14:43, Jonas Jelonek wrote:
+> Hi,
+> 
+> On 16.01.26 14:23, Maxime Chevallier wrote:
+>> I think Russell pointed it out, but I was also wondering the same.
+>> How do we deal with controllers that cannot do neither block nor
+>> single-byte, i.e. that can only do word access ?
+>>
+>> We can't do transfers that have an odd length. And there are some,
+>> see sfp_cotsworks_fixup_check() for example.
+>>
+>> Maybe these smbus controller don't even exist, but I think we should
+>> anyway have some log saying that this doesn't work, either at SFP
+>> access time, or at init time.
+> 
+> I tried to guard that in the sfp_i2c_configure() right now. The whole path
+> to allow SMBus transfers is only allowed if there's at least byte access. For
+> exactly the reason that we need byte access in case of odd lengths. Then,
+> it can upgrade to word or block access if available. Or did I miss anything in
+> the conditions?
 
-since if we only have SMBus I2C block, then everything is fine.
+Ah true, true. Should you need to respin, maybe add a comment for
+clueless people like myself :)
 
-However, I suggest asking I2C people whether it's possible to have a
-SMBUS that supports I2C block and/or word access but not byte access.
-Is there a heirarchy to the SMBus capabilities.
+I'll see if I can give this a test today then
 
-Also, is it possible for SMBus to support different read and write
-capabilities (since there are separate bits for read and write of
-each size.)
+Thanks
 
-So, maybe it needs to be:
+Maxime
 
-	} else if ((functionality & I2C_FUNC_SMBUS_BYTE_DATA) == I2C_FUNC_SMBUS_BYTE_DATA ||
-		   (functionality & I2C_FUNC_SMBUS_I2C_BLOCK) == I2C_FUNC_SMBUS_I2C_BLOCK) {
-
-to check that both read and write capabilities for each are set.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
