@@ -1,107 +1,79 @@
-Return-Path: <netdev+bounces-250589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522B4D37AAB
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:49:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ACF1D37AF8
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 18:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D33B300FD61
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:49:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFA1031461D3
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 17:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B9A39E6EB;
-	Fri, 16 Jan 2026 17:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDBE34677D;
+	Fri, 16 Jan 2026 17:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3mvC97IN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E6039A819
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 17:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E3C2C21F4;
+	Fri, 16 Jan 2026 17:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768585744; cv=none; b=OpOiZd7m/UJoRPuNmitKX/okyECJeZ9PtVODcvWczMwbluodEGdQpvtpi855+ouPr+JaYRLsbQc2u/yYNxM6u4vOih4a3oWkJt+FGhEM7uxl43i8vlHYIoaWFx8o7b+jPi8oS2sBgQ8QbYAqQrhehPQcnl0yT+EnTmFOwvN9L5w=
+	t=1768585855; cv=none; b=dk22HzT1kBi1UWb4WILKbC2SFMkY9YwPlYBwE8cA9giO3EIJFSBpvPD7gNDz3KazkbrRv89mB2IxiijpMA2XrF6KuxmaVFdA9Lpo9zEj9a2NH0HFUOCJVusjKLSTsGbqW4DDaxEVcN1ie2v4vDqbC7STjn6yzIP+RiuAbjfoVTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768585744; c=relaxed/simple;
-	bh=dN4c7qrRNoVrpzVIeuqwqAj8cCpJfZVwNfxAOyZXPKA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Dr48M7Kt84FkXZAn0VpAz+JO+HKN4ckhfdrbrVCLf2PlEpRcxqpr2FzhXR0GIAzbEYiO7t7Z7XLz17bAtdYWohyooFvO3y5Rkt7WdtRxyVQ44zuMgBSd1R5cWBVrNO0wiP1WORflRDPZyRlagPlK+k0RvE5+83r6J1zRAXwUc80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.0.54.236] (unknown [62.214.191.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 207344C2887195;
-	Fri, 16 Jan 2026 18:48:46 +0100 (CET)
-Message-ID: <62ad756f-f507-4030-9b01-aeb3ad3f89ea@molgen.mpg.de>
-Date: Fri, 16 Jan 2026 18:48:44 +0100
+	s=arc-20240116; t=1768585855; c=relaxed/simple;
+	bh=5SpgsjoIKRYn0rW9Mv2HD+hI9j2YH5rKZ34L7l1DLJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vBQsf7Wxql/NliITpXOiI0KXmwFMLzS9F6Frit3LjteNVHigWK+WSY4sUeFjaQvemmSERUiI2Y3TwcyOsYWMREpitN243AAlL8WCkU8I7Eb+omb3JuF4IFngG3SfBF4rcp1rBQfsKKnQ1atf3i+yW0rEGpGMS9iY2d4PbGnE+nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3mvC97IN; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lXn8WREm1ikX1NgAMR5lcnRlZLOX/Na1hyGAcAzr8AA=; b=3mvC97INayYq0Tmyyi5lofQxVD
+	s7aIVzAmP8ZkQw4JsZ0LgGcq7LRI8IVVzYZo3UsbZP2CaYJV86zErcvhFHWDIoSvqpvJrUhtGnpPJ
+	d8NFblhPfHsV9zTTVhtLQ47kbRgZDjXFoFelFPuzfOmoWjPpi5umHBRN26AOjqiidsIo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgny9-0036L5-C4; Fri, 16 Jan 2026 18:50:45 +0100
+Date: Fri, 16 Jan 2026 18:50:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Subject: Re: [PATCH v3 2/2] dt-bindings: net: micrel: Convert
+ micrel-ksz90x1.txt to DT schema
+Message-ID: <70ebc8fe-eff6-4f29-accf-7ade18c24721@lunn.ch>
+References: <20260116130948.79558-1-eichest@gmail.com>
+ <20260116130948.79558-3-eichest@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: Fix flow rule delete
- failure due to invalid validation
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Sreedevi Joshi <sreedevi.joshi@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-References: <20260113180113.2478622-1-sreedevi.joshi@intel.com>
- <f7f38dbf-3c5e-428d-a4c3-19f3a9ce18ee@molgen.mpg.de>
-Content-Language: en-US
-In-Reply-To: <f7f38dbf-3c5e-428d-a4c3-19f3a9ce18ee@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260116130948.79558-3-eichest@gmail.com>
 
-[Cc: Remove Ahmed as address bounces]
+On Fri, Jan 16, 2026 at 02:09:12PM +0100, Stefan Eichenberger wrote:
+> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> 
+> Convert the micrel-ksz90x1.txt to DT schema. Create a separate YAML file
+> for this PHY series. The old naming of ksz90x1 would be misleading in
+> this case, so rename it to gigabit, as it contains ksz9xx1 and lan8xxx
+> gigabit PHYs.
 
-Am 16.01.26 um 18:39 schrieb Paul Menzel:
+Thanks for adding the table mapping skew to real skew.
 
-> Dear Sreedevi,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 13.01.26 um 19:01 schrieb Sreedevi Joshi:
->> When deleting a flow rule using "ethtool -N <dev> delete <location>",
->> idpf_sideband_action_ena() incorrectly validates fsp->ring_cookie even
->> though ethtool doesn't populate this field for delete operations. The
->> uninitialized ring_cookie may randomly match RX_CLS_FLOW_DISC or
->> RX_CLS_FLOW_WAKE, causing validation to fail and preventing legitimate
->> rule deletions. Remove the unnecessary sideband action enable check and
->> ring_cookie validation during delete operations since action validation
->> is not required when removing existing rules.
->>
->> Fixes: ada3e24b84a0 ("idpf: add flow steering support")
->> Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
->> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->> ---
->>   drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/ 
->> net/ethernet/intel/idpf/idpf_ethtool.c
->> index 2efa3c08aba5..49cefb973f4d 100644
->> --- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
->> +++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
->> @@ -307,9 +307,6 @@ static int idpf_del_flow_steer(struct net_device 
->> *netdev,
->>       vport_config = vport->adapter->vport_config[np->vport_idx];
->>       user_config = &vport_config->user_config;
->> -    if (!idpf_sideband_action_ena(vport, fsp))
->> -        return -EOPNOTSUPP;
->> -
->>       rule = kzalloc(struct_size(rule, rule_info, 1), GFP_KERNEL);
->>       if (!rule)
->>           return -ENOMEM;
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
