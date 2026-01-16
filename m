@@ -1,161 +1,136 @@
-Return-Path: <netdev+bounces-250502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C19CD30004
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:00:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56662D300E6
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:05:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3D4E6301057E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:00:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D2343015D1A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 11:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC693624B5;
-	Fri, 16 Jan 2026 11:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38E0366DC7;
+	Fri, 16 Jan 2026 11:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgXFXUMo";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+jdHZr/"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="CSngBGWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from oak.phenome.org (unknown [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC84A35FF54
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 11:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FCF366540
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 11:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768561209; cv=none; b=KxwHp1zjGnS3x/nEJ7nsp5PJwA3hQPm76aopzEcTY9XYwhbCWYyKW0862EDPYeHR4fzTk7qCximV7Kpf3ANgCK6t4fTtAFK5zub5Fq2IyH7oWt9NKzLtHM9mGkly7GbgdM8H1AuAREv81yg8MeL5Fb7gU+LnIvZZDlJoHhuWBr4=
+	t=1768561349; cv=none; b=EaCF2eIR8jIbdleAd/gVSaT//mUGBIplGgHWXFpIwTT4cGrJTwIFbECyVVw5hgTn9zd3HvfQCg8ofpmIpwgiUSRn9lM/33UGx4X7GB2JpRt6AP1XAz2xyRRescDmYbh8OVRhoxXNnmjHWakgOPdVMbQkuqlWx85IvR4zaVgDrXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768561209; c=relaxed/simple;
-	bh=vksLTZkUWWrOReeJ5m+TZEyTyRNJeH3pyvTWA6g0a/g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YAt9MU5qR6gak582q43pcCs7dj6MYFtRDETLTOxhHNBTwfPHCzLinl14mrD3Qb8My3OKaDn2EcHbxOL6XGFemAXn7oCpGuZiVVLqEdCcoSafKUzmguRl8gE8bbcLS6olPmheBd4BFTI/HwR7j+NMCxZMXh0EUasghtc4ZC/79TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FgXFXUMo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=f+jdHZr/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768561206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9DcHDZID0O5xO6b4wZGyRTdWKoELa3pTt4TtE2mtQ60=;
-	b=FgXFXUMoQuk7jOEqM5rvEE3VfyKVeTu8+CaovjEnn2pg/L3a58qakVecP0qHNS28PZ3MV/
-	viritmjaXVFX2REkg3Ib7OCGwm5MbSdU0bXAKjamVqCe7xgZfH++dXFPZ0qYzuQmUO5yF3
-	7mgVF/5v826ly3gfecsrHEe1rHX/sMg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652--a1kCoyoObCm7bUFMkqrwA-1; Fri, 16 Jan 2026 06:00:05 -0500
-X-MC-Unique: -a1kCoyoObCm7bUFMkqrwA-1
-X-Mimecast-MFC-AGG-ID: -a1kCoyoObCm7bUFMkqrwA_1768561204
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b871d7ad66cso406741566b.1
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 03:00:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768561204; x=1769166004; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9DcHDZID0O5xO6b4wZGyRTdWKoELa3pTt4TtE2mtQ60=;
-        b=f+jdHZr/6KcG9Ptvcjn3/H1dJdOTbghHSHX5aXcNon/B6i0Z6yokuimjj8fYl4GApj
-         m62VV0a5QtXfKL4aMx0R2e6Ziao0Uq0bsui10dN3pCszyEGwsvprMpoBEXnMQd+foTmb
-         7fiqUxwYY8yKl/kz6cdhSGSi5b16ui71INjBxdr5Jlm7kimQYPdTVKzsgAopk6qLoITQ
-         Xm1Hzl+MemMJuIAUr5qoDygxXe14nCrz/ce1LUQJQpcSJ1Ifm3lsGnu0j7WLy5Q479DJ
-         3gK5EigDn3A1rOW7GeBeCwECOnE5W22WskFTeXyzJVyVeGclYQqTQKuWP2E/IYX4Z3bE
-         8xBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768561204; x=1769166004;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9DcHDZID0O5xO6b4wZGyRTdWKoELa3pTt4TtE2mtQ60=;
-        b=dbY6O7DLDG/tjhQwF2YEOww+VUG2qHd2yajwkdx9b3tZmQoZ2MZOb8yYfFpUpfjkUx
-         ybMVcJcy3ERHKDc2IAqGp7PQbDSIXWAIuSwnHXRyqYQZyF8pnuoIBZluEp2TsBsiG8J5
-         ePsn4lW3nDb6oasE1stKKb9oUlWHgmOcKe/GCiVPiqG0Y6c+JhXKwQ0wjczL3XCV/7dS
-         fnCGLKK4OMrdPH2DetU3v2yhcEJPHbOSyW3+FRyBD/shGDaMn/fF0ox/axkkUgjfkj8i
-         oSsIl+XwPOCXGaq/GIJCKI64Z3N/w9I9VVvxk9SyGrd9zByow+O8Xb+HK7mcGxjnmhxI
-         CARA==
-X-Forwarded-Encrypted: i=1; AJvYcCWn7YW00YU1RlIHb04SiLTtESOxrMtUSkDSjXOx9dQijPxOlZGdwgF5kwCPk4iFhAZgHqO/RnY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9vfLTYqRmFRaSWRlsVX6mA+oPX7DWcEiKje6VRDt7O/bbcfXy
-	7eXRsWejpShw9NvWeRXvlCpFznERL7GX1dKKY+kVYifgXxqSQpK10ukXq2dJWdDFQZ27owFNZqb
-	zqSodL7y/STRBsHkg73iBnwNUOTkY8qAI0uXwkFRJM4w5TnO9mtjzntiJSw==
-X-Gm-Gg: AY/fxX72B2FZ8OhbBwioBT10J1rxJCfcrf8FVh8zbeX1zNcwB0Mk+Sb9pZ6W8hDT5mk
-	j2ZkK3hdpRksDrkucsTxEXSF9JqAbxff4YJs5qEAy/IPTH8gw2NoxlzAmZvhQhou30ZRayeaFTb
-	/dib2bzrjH/4TsmUcSewMwjXKS+9cVb/2gZ1aVu9UYSUt6Y8twJ20t7kVtAYKgXsjhq4z+nvwdN
-	1fVyJf49Sb6Oku1fXLlpOQ8aR2JQLoXvBwwz4MHidaPjmpgZhr6lQVHT3b+ky9DRr9OYY+PfVXc
-	QbTcVtvyvU/milAE+/VUQMSUIIX0Yu7a7mQfSTdrjzNHHqS6w8HhFPx6MSPKE2jbCbz7F3lbTiJ
-	7P3rz/Uosv0Zk8UOS2kmDEru1CV5pn9KqIDSC
-X-Received: by 2002:a17:907:a48:b0:b87:672c:4108 with SMTP id a640c23a62f3a-b879385870amr281458366b.4.1768561204266;
-        Fri, 16 Jan 2026 03:00:04 -0800 (PST)
-X-Received: by 2002:a17:907:a48:b0:b87:672c:4108 with SMTP id a640c23a62f3a-b879385870amr281454866b.4.1768561203767;
-        Fri, 16 Jan 2026 03:00:03 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b87959c9b5bsm208337266b.44.2026.01.16.03.00.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 03:00:03 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id AA04B408DF9; Fri, 16 Jan 2026 12:00:00 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, carges@cloudflare.com,
- kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons
- for monitoring
-In-Reply-To: <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org>
-References: <176847978787.939583.16722243649193888625.stgit@firesoul>
- <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 16 Jan 2026 12:00:00 +0100
-Message-ID: <87ms2dzutr.fsf@toke.dk>
+	s=arc-20240116; t=1768561349; c=relaxed/simple;
+	bh=VSlCp7iUGmTUW3L4RvL1ZGxYsue9P4F1nIStK/5KbpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YHhRC4oZYQdKBaV1DfceQdnS92GJkd0DOQYKWnCda3DMqI8PZEXc81DUOYhZPRCFKIsYRPrc+2t5tdiUAGvgC5iDe5rE2o0MDDDtuxkXSq6AcBA2E5jQko9l3iB1D/LZclBu8QX5QSdRo8OqPH6Ho0HLGU5tpMqOrar2QyxPn4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=CSngBGWX; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-transfer-encoding:content-disposition
+	:content-type:content-type:mime-version:references:message-id
+	:subject:subject:from:from:date:date:received; s=oak1; t=
+	1768561335; x=1769425336; bh=VSlCp7iUGmTUW3L4RvL1ZGxYsue9P4F1nIS
+	tK/5KbpM=; b=CSngBGWXuDW30AGMDLuNUshfvMuCkJmjhA8T3/ccEQTX7pAOD1m
+	pJi/N2aGjEUg8JY82138zO3frq0pIN6cj43rcK8R6xcC8XD5+8+j2BkedX0Surug
+	nWkfoM4Nhd9plQogMn0Y2bbYdq4VcJnaOJnv045USqEPriO2PG+MDqkgKtDpNVMX
+	jKhOIcZ7lNhdErPtNrxZa2foXj3BjignUdoKqqmBD1tppK/GwtCmujB+8uoEzELm
+	hen5D5sSPJAc8tqt5irJq3bDmCbMWudooJdlTAaVwcQdV3egjh8/K6zuCA8bcIIk
+	dZiCdJHGDf/r59RLU4g1gpD0RMaBX+YbahA==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Fri, 16 Jan 2026 12:02:14 +0100 (CET)
+Date: Fri, 16 Jan 2026 12:02:12 +0100
+From: Antony Antony <antony@phenome.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Antony Antony <antony@phenome.org>,
+	Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next 4/6] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <aWoatI4v84lJAC48@Antony2201.local>
+References: <cover.1767964254.git.antony@moon.secunet.de>
+ <3558d8c20a0a973fd873ca6f50aef47a9caffcdc.1767964254.git.antony@moon.secunet.de>
+ <aWZdTOXTn_YBKKhv@horms.kernel.org>
+ <aWe_sIibKYzdWL9C@Antony2201.local>
+ <aWjvUllZ7Clf3pm5@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aWjvUllZ7Clf3pm5@horms.kernel.org>
 
-Jesper Dangaard Brouer <hawk@kernel.org> writes:
+On Thu, Jan 15, 2026 at 01:44:50PM +0000, Simon Horman via Devel wrote:
+> On Wed, Jan 14, 2026 at 05:09:20PM +0100, Antony Antony wrote:
+> 
+> Hi Antony,
+> 
+> > Hi Simon,
+> > 
+> > On Tue, Jan 13, 2026 at 02:57:16PM +0000, Simon Horman via Devel wrote:
+> > > On Fri, Jan 09, 2026 at 02:38:05PM +0100, Antony Antony wrote:
+> 
+> ...
+> 
+> > > > +static int xfrm_send_migrate_state(const struct xfrm_user_migrate_state *um,
+> > > > +				   const struct xfrm_encap_tmpl *encap,
+> > > > +				   const struct xfrm_user_offload *xuo)
+> > > > +{
+> > > > +	int err;
+> > > > +	struct sk_buff *skb;
+> > > > +	struct net *net = &init_net;
+> > > > +
+> > > > +	skb = nlmsg_new(xfrm_migrate_state_msgsize(!!encap, !!xuo), GFP_ATOMIC);
+> > > > +	if (!skb)
+> > > > +		return -ENOMEM;
+> > > > +
+> > > > +	err = build_migrate_state(skb, um, encap, xuo);
+> > > > +	if (err < 0) {
+> > > > +		WARN_ON(1);
 
-> Hi Eric,
->
-> I need an opinion on naming for drop_reasons below.
->
-> On 15/01/2026 13.23, Jesper Dangaard Brouer wrote:
->> Add specific drop reasons to SFQ qdisc to improve packet drop observability
->> and monitoring capabilities. This change replaces generic qdisc_drop()
->> calls with qdisc_drop_reason() to provide granular metrics about different
->> drop scenarios in production environments.
->> 
->> Two new drop reasons are introduced:
->> 
->> - SKB_DROP_REASON_QDISC_MAXFLOWS: Used when a new flow cannot be created
->>    because the maximum number of flows (flows parameter) has been
->>    reached and no free flow slots are available.
->> 
->> - SKB_DROP_REASON_QDISC_MAXDEPTH: Used when a flow's queue length exceeds
->>    the per-flow depth limit (depth parameter), triggering either tail drop
->>    or head drop depending on headdrop configuration.
->
-> I noticed commit 5765c7f6e317 ("net_sched: sch_fq: add three 
-> drop_reason") (Author: Eric Dumazet).
->
->   SKB_DROP_REASON_FQ_BAND_LIMIT: Per-band packet limit exceeded
->   SKB_DROP_REASON_FQ_HORIZON_LIMIT: Packet timestamp too far in future
->   SKB_DROP_REASON_FQ_FLOW_LIMIT: Per-flow packet limit exceeded
->
-> Should I/we make SKB_DROP_REASON_QDISC_MAXDEPTH specific for SFQ ?
-> Like naming it = SKB_DROP_REASON_SFQ_MAXDEPTH ?
->
-> Currently SKB_DROP_REASON_QDISC_MAXDEPTH is only used in SFQ, but it
-> might be usable in other qdisc as well.  Except that I noticed the
-> meaning of SKB_DROP_REASON_FQ_FLOW_LIMIT which is basically the same.
-> This made me think that perhaps I should also make it qdisc specific.
-> I'm considering adding a per-flow limit to fq_codel as I'm seeing prod
-> issues with the global 10240 packet limit. This also need a similar flow
-> depth limit drop reason. I'm undecided which way to go, please advice.
+kfree_skb(skb); replace the above line; explained bellow
 
-IMO, we should be reusing drop reasons where it makes sense (so
-s/FQ/QDISC/ SKB_DROP_REASON_FQ_FLOW_LIMIT), but not sure if these are
-considered UAPI (i.e., can we change the name of the existing one)?
+> > > > +		return err;
+> > > 
+> > > skb seems to be leaked here.
+> > > 
+> > > Also flagged by Review Prompts.
+> > 
+> > I don't see a skb leak. It also looks similar to the functions above.
+> 
+> xfrm_get_ae() is the previous caller of nlmsg_new() in this file.
+> It calls BUG_ON() on error, so leaking is not an issue there.
+> 
+> The caller before that is xfrm_get_default() which calls kfree_skb() in
+> it's error path. Maybe I'm missing something obvious, but I was thinking
+> that approach is appropriate here too.
 
--Toke
+You’re right. There is a leak in the error path.
 
+The new helper I added is similar to build_migrate(), but that code uses
+BUG_ON() on the error path. That feels too extreme here (even though there
+are other instances of it in the same file).
+
+I’ll follow the pattern in xfrm_get_default(): handle the error by freeing
+the skb (kfree_skb()) and returning an error. And no WARN_ON().
+
+I’ll send v3 shortly.
+
+thanks,
+-antony
 
