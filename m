@@ -1,389 +1,473 @@
-Return-Path: <netdev+bounces-250448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFAED2BE97
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:24:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FDED2C38B
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 80005300997D
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:24:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A86DE3031A03
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA4E3375D3;
-	Fri, 16 Jan 2026 05:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4466E343207;
+	Fri, 16 Jan 2026 05:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lh7X9JHX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OOPxn2d2"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012056.outbound.protection.outlook.com [40.93.195.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7770322B83;
-	Fri, 16 Jan 2026 05:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17192346A13
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 05:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768541043; cv=fail; b=Z3uj4x6psV7EkZ4jsHt4daNSYI4LLQknxTXlJBeCwsxQDTcpOMCXnSXpzWR5QD5mI/Sq3rMhRJMjCxiFAKrc5w1BGTZCG02yiKhMNIgdEr/JvONIFl84cItmZ+rDd4aE9lQldaVi9K2AcHr1DGGLCSzwTunKHh/5MTTiZWu2QeU=
+	t=1768543020; cv=fail; b=c7pAHyauatvlgEugYSBZWaMOJ241Fn8E0Lkf0SWVmficWrZUnY/oMOI7M5zCkvEstPSpr4SmAFiCbd4b9oJykHePBaRgh7HUSWPM9r2X1pFHCPyKscRcSKmpjDaIotVNLgO439iVPFZ1Qke86AIWYg7E+lEAk40liwxF3bGwGdc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768541043; c=relaxed/simple;
-	bh=Gzo5Pb67ZK2URp9j6s8twP48fr00tpXiaZhoEyw+Io0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nndofk0yRYhQlK9S2A/kTXm6/l3EWGW0+fXnUH35N/YonviI0K9p5hsvZv77lXN17DocXsCcDONyYRSJJStIOgoLn9YwYHes8JaZSlFhFuISrss5Ru0P3dipXPcPPDMkExvskwC9uUasyjvg52/kiTMGAAoyHzsj0w1s9L39wTY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lh7X9JHX; arc=fail smtp.client-ip=40.93.195.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1768543020; c=relaxed/simple;
+	bh=wED2euYk4eZgTppAl0zOCsg7LSBPD0XbWQd12mt4OMg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kdvuiISD+o1/l6Twng4FesT7YBjzj7R1ZELgPIKhVpK+tVKHGfDpD9ca9iOrzxnykgGGifWeKyQmmbT9cdJdcVREY4yGFUGdMYzjJixumHe9e592mtCSIzV1cmU6BVCP6wxTh17661khHEfpu+V4y74NOnRabj3Z2Mp9R2duFBg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OOPxn2d2; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768543018; x=1800079018;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wED2euYk4eZgTppAl0zOCsg7LSBPD0XbWQd12mt4OMg=;
+  b=OOPxn2d2q4IgszekbLwmwBpCUpx4bJZ7LYF/FvyLNm2wzJuTOO7bd/N/
+   l/eo58e8PSjwFXB6JwVTMcjTwunMdqmSaYiaw8zMGZHSspcGQFlyRBznT
+   UFBWBykCupbFhHxuPS2jsdHem+fttCmdvR1wt4Es/sEvBsOGhUpjTm/XA
+   kKjLAnkSMspZQgrHCRE2VKBqFno4SStH0i0I9DOSAK6LXQDRVi6CP0k2f
+   6ZqGnDefryCZkvgW4rEfiPH2UbD5c+C6j7ijW6ZtqDcF0D4APtpXY/BbW
+   /7kHaR1KyZOi70nJx+AQmmw6ZvIWtuVZYJG7ifaanvuVxMr4lSg0WzMR+
+   Q==;
+X-CSE-ConnectionGUID: 7O3NS7odQoaZ2XZ5dG64Lg==
+X-CSE-MsgGUID: zkngr2srS3qFcXVzZVbSQA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="87274453"
+X-IronPort-AV: E=Sophos;i="6.21,230,1763452800"; 
+   d="scan'208";a="87274453"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 21:56:57 -0800
+X-CSE-ConnectionGUID: vTuBHDJQSQm2gf6Q0d6z/w==
+X-CSE-MsgGUID: SXBeH9eGQCK9/Oh/AiOCqA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,230,1763452800"; 
+   d="scan'208";a="209639017"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 21:56:56 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 15 Jan 2026 21:56:55 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Thu, 15 Jan 2026 21:56:55 -0800
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.53) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 15 Jan 2026 21:56:55 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=scgW3E37MK50sxWQyT5q/Nds1W5OE10r3T+A6JUgLg0uXGoj5v26Bmp7IefUpWKCVgwBMuXXPTNksOuZ/esBkUSatObuhL3Ky/ssNi4uN0QEKG+ugt/Xu8sYFzz4S446hSgn7YM6jWk6nw4geXyySslfWL2YJgliCyyJ+6Cj9gM0HCQdAImHmmKRkCGpvTbSaA0eEzzwYQWFYjNL080StDy1k6HC9tXXDEjSr6CRJ8E0qibKsG5LWDojid1o4mGwB1EbLSRDQIh565SyzKIVs2U8rZJMFLM21WgrYn/zOwSktaMONdUI22ntPm4NaOFhkHHpTHxp9UHDoUUjcLQl2w==
+ b=SKEzVGY4LkQW9XCBHnJBvw/9OGgwj8VZFklEt7eyX9uTbQZjqMk8Yb5eudF6NMUwFBbdwi7AUWDNTUDfJUwqHfDuZN4tgjvXzARObR2OoVCfBYej1utJAj++t4lWwVc94Zr1esvN5sRLzLjf6q6IxDmjP2SpTUhE51paXzeHBQ0LaXztjdIIwqrmOWGvVi/H7naUtLtkl/1focmOOOIqeApx4s7nhHTLe9Cvy18qm8r7fLaBzWuvhOuexTsCI/IRXm++MQMtEuoc2ZD9g36UQgdLR5KLVqCth3QD21tOV1jZORoB3MPfUXHekBGPPmdcdFibd/Cn5ySkLPqRRO/FSw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=anPweXSQaLJSRBQTtb+0RK+AZNwlAJf3fw5bw9jtyI4=;
- b=XKYkVQb36UfxeGpPFWmC1uUzty4EasmqO/eZAHJgsdZ1moX1tEg03TgdMa5CKM6SqIdzqJmT72XQ7GMcbUb0Z46oX+rtfkP/3avWi8guarmhMbw5IHQ0RmpJPAiMiwgXXuyQ0Msx2YXgAOGG9iUMFh1kcOokgZM1Ld5R+FWFtWrPwY2gFs8/fotT4MrmGEN40jwrIc6Yd3uD+ciFFBqTLGE2W8AM082NQg6WEcn7JtBo8/vDpStpsevD455H0KY2Xu3slFvXbROGJatCPImPWq/7/oczNrW5gxKut11aKqZjJIiggniLPxvsql/4T5bl/d0C6HGpDqFyq4Kru/KrgA==
+ bh=8sa4QyCPK9oeCnagzIQoulc6KAtOakJOfUFRXWoq/yU=;
+ b=A1Hr1DZjRm4BKa/dTBuFz+nWNYlzqlFmC2OR6htUz58TSMY7VUVU7+63e6Rdl+hXPGgh7hPy5NB1SvM/RgraYpWV87jTKAkBVGfuIeV63h9Kngx3KVUhLMOyd/9fHqbT3Pw+ww/1dl2Gp1eAlVB38dGjRSWAwNwIEKRPzAx+zFYR+B7df4V15aB+mokJHn0wyRdJWa9JDhZSOENJkUZosACcKDIanZw8Teq21b3VTlxQFwZJveT+oJWu39Vrulh61rwIwRigmitNiIhRC8JWZIPQQlVEnsY2RpD7UWgfFcA1rlVCTiNy8woqMrMZhQ/zMGzlmqqWdoPI5kDPP8dVrQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=anPweXSQaLJSRBQTtb+0RK+AZNwlAJf3fw5bw9jtyI4=;
- b=lh7X9JHXKTb9O5AROPoPhe7CXMLkTYAfOPdqAFpndhUQ/0bFwz1seB51JqYfVVsKF4K9YK37JE5TKKKai+RXALTmldTTVNH3bIoybWWT5Dfyy29f8C7eoxhw6/s06I8dRMzBg7MGKUdWRUH//6MyiFH1UU8NBZHefH3NP0vzGKjiKmtXXo9NnsbgmlUBQIrsHjB2WYxSqvmy8AJsmsI9wX6rUhWOVVYAUqe1pNKK0jDK3HRMxFEPylBkOru43FE7jy+Mv2gKBOe+xviHC0q+vp1aOXspij2PzOPt/kguZPbZh3+IkGMCqDIpSZ31y34LPnHY2NHHXRXXC8r/8pIeXA==
-Received: from CY5PR11MB6462.namprd11.prod.outlook.com (2603:10b6:930:32::10)
- by SJ2PR11MB8402.namprd11.prod.outlook.com (2603:10b6:a03:545::18) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com (2603:10b6:8:f9::19) by
+ SJ5PPFC4905B1D0.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::855) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Fri, 16 Jan
- 2026 05:23:54 +0000
-Received: from CY5PR11MB6462.namprd11.prod.outlook.com
- ([fe80::10d1:11dd:5088:7559]) by CY5PR11MB6462.namprd11.prod.outlook.com
- ([fe80::10d1:11dd:5088:7559%5]) with mapi id 15.20.9520.005; Fri, 16 Jan 2026
- 05:23:54 +0000
-From: <Prathosh.Satish@microchip.com>
-To: <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<vadim.fedorenko@linux.dev>, <arkadiusz.kubalewski@intel.com>,
-	<jiri@resnulli.us>, <poros@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<mschmidt@redhat.com>
-Subject: RE: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode
- setting support
-Thread-Topic: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode
- setting support
-Thread-Index: AQHchVE53rjvGpeeJEOt0SuyhadL0rVUP9fQ
-Date: Fri, 16 Jan 2026 05:23:54 +0000
-Message-ID:
- <CY5PR11MB64627D56C60F8F76D22619F4EC8DA@CY5PR11MB6462.namprd11.prod.outlook.com>
-References: <20260114122726.120303-1-ivecera@redhat.com>
- <20260114122726.120303-4-ivecera@redhat.com>
-In-Reply-To: <20260114122726.120303-4-ivecera@redhat.com>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.6; Fri, 16 Jan
+ 2026 05:56:48 +0000
+Received: from DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::d3ba:63fc:10be:dfca]) by DS0PR11MB7958.namprd11.prod.outlook.com
+ ([fe80::d3ba:63fc:10be:dfca%7]) with mapi id 15.20.9520.003; Fri, 16 Jan 2026
+ 05:56:48 +0000
+Message-ID: <3297a59b-a788-43aa-945d-e89592c9ba8d@intel.com>
+Date: Fri, 16 Jan 2026 11:26:36 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] drm/ras: Introduce the DRM RAS infrastructure over
+ generic netlink
+To: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>, Rodrigo Vivi
+	<rodrigo.vivi@intel.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <intel-xe@lists.freedesktop.org>,
+	<dri-devel@lists.freedesktop.org>, <aravind.iddamsetty@linux.intel.com>,
+	<anshuman.gupta@intel.com>, <joonas.lahtinen@linux.intel.com>,
+	<lukas@wunner.de>, <simona.vetter@ffwll.ch>, <airlied@gmail.com>,
+	<pratik.bari@intel.com>, <joshua.santosh.ranjan@intel.com>,
+	<ashwin.kumar.kulkarni@intel.com>, <shubham.kumar@intel.com>, Lijo Lazar
+	<lijo.lazar@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>, "David S.
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+	<edumazet@google.com>, <netdev@vger.kernel.org>, Jeff Hugo
+	<jeff.hugo@oss.qualcomm.com>
+References: <20251205083934.3602030-6-riana.tauro@intel.com>
+ <20251205083934.3602030-7-riana.tauro@intel.com> <aTiWNkGmwFsxY-iO@intel.com>
+ <b986eb03-0887-4eb2-a7a7-50ef63e51096@oss.qualcomm.com>
+ <aWFruAO06O93ADjU@intel.com> <19fd4d44-b7d6-4bc2-9255-3d5159ec1435@intel.com>
+ <919c0b7e-83d7-45e8-ae96-d9fb7a10995c@oss.qualcomm.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6462:EE_|SJ2PR11MB8402:EE_
-x-ms-office365-filtering-correlation-id: 7d87dda0-abeb-4ae5-5b7f-08de54bf7139
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|376014|366016|38070700021|18082099003;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?ET13rMQyusDlXNhtVd0jl8n0O2H3AmNHVdix9iOPdJh09Ura9AJxCFkZcOqe?=
- =?us-ascii?Q?YeVaPOFCFUEUA1rmHLACxCABbmJj1HJ3BbA4XnuQK63nni5r7jqezOY+COVh?=
- =?us-ascii?Q?kcAlN0oR93wXl+UpdJRXbzLfVtFB4GvYSAt/3NeerxnQAVc3j45OBVj6fHy9?=
- =?us-ascii?Q?HTazhi+Ny1xuVFPAh1LF8q2Nj/MLQEXw7MEwdEY0uMU2e6Wq6kQ0vVnVnRzq?=
- =?us-ascii?Q?CnaOq7h9n66whd/LBgZ0e9e+64JlQ0hRWgGaAiPiSFRKRomrtFkpzlK/gn8n?=
- =?us-ascii?Q?Ir2YFELEcEpPJqmpzCz3W+4kwzzHJlhCbt0YnuAgNMkwsluEZ5xdOXKe4+RW?=
- =?us-ascii?Q?hjJ8PKBiVTnGDoDcZG6pEqLNnGx+HAWpFx0dEWhCtJdlbPhsYpJT0ZxCgafs?=
- =?us-ascii?Q?3VIZ6eM+fJWT1ybFkI9e2eooWXfMUX9Z+BIYZHL4mUQKqGxa6nQ4VMtPeS9K?=
- =?us-ascii?Q?wL/4c5Y2v1579Yrls+Rt1+9uDwSVJrvntM99fNE2dUgx0sowIyhS9Q8nHtz0?=
- =?us-ascii?Q?EAjk0AYLxPPZmd0ArWCzmNLD+HzofXwnY0O2PT4caKOSqPQH6rs1ATLqxkjt?=
- =?us-ascii?Q?8pdWDuFZCDv64GyagbS3GbLxNglQ7Ptt9AmzE97R0rZoffNpTKdDRXbEQnUH?=
- =?us-ascii?Q?cf+vZGY1PLvURmAHqWACOpibIpUTLUtnAGFGgYMvqeBfUqfiMKjbcWJhmL31?=
- =?us-ascii?Q?cRdsCgo3BUl7mZkBpx22tYYJNx5sM/35ZUpl1hEPjfzwwaGJusCVGua/L2gE?=
- =?us-ascii?Q?/wfGOGWlD5GF3x2pUdsonTDKTpc4/2sAugd/N4u3egC2aVAGE3XSbRE/+AqS?=
- =?us-ascii?Q?wWWjVq0RMUmw6lOZlAnNcjhbQ1QOT7p7pBq6XIy0ucKzq1OPnhFIzupd//c/?=
- =?us-ascii?Q?TQJk7nZsmG1HLTZCJc6r4bWaPEwz41E+pi78T1Id1rjfCfborcPlpTlAr5yp?=
- =?us-ascii?Q?46qVeJiMUC/gI1C2DHy4swxHcEhTot17B/HdQIkoQNPrhHVIz5/zRTAorR3/?=
- =?us-ascii?Q?+RepX7mDa+HKokUWqleOOAWCb7MpSRpeghGmeffdPeMRPshnLybZCopccBxl?=
- =?us-ascii?Q?OSBTXhM5NA8fRvuyF34/fLbhIXU+dujCfgPE6iFunpROE0evKLGGc5eioCgH?=
- =?us-ascii?Q?tU3306jFrSczvwbxXlHtN3OFV+N6PALMfZFkrhPP8DvUpv+rGnPRQQ4eNRuw?=
- =?us-ascii?Q?4RiiOwj5Q4tgpcP7s5nk4Opm1cFt4drZorv/tRTnC9I56CRbLLzcJc+27aGc?=
- =?us-ascii?Q?SArIfohWPPYLPLzhwlxv983eQIcTI+JXOlsqJXbi4ox0E7B0PBq9NNhSz6iQ?=
- =?us-ascii?Q?dX3CyhUnIcdBpbHSWW6u9mQa/azAevv6xYl63bfIQlrI9CHDQnTAv7yD2IvH?=
- =?us-ascii?Q?9n/zg87H7Aj8p+Yoq+K+9Tn+x3WrtG8VvlzE+HdirhnhcnmkvIsJ6WZZDkYb?=
- =?us-ascii?Q?6lAXIYz3UYQcW3oZGcqZb/kv0WdNAVSRxtejXDN6QcCPsivLl0acNt4IhZ4A?=
- =?us-ascii?Q?3Z7idJ9OnWjQZaz2ERwsAfECXQ9hB9TH+F2MHJoIhiv6dvjQvJMB9gyC9bST?=
- =?us-ascii?Q?NG3c6VI/YmXT6AIytaHsj2FdJ0ppfuQhp9VcWuAmRnbbhZr1jn1NLrkvY/Gw?=
- =?us-ascii?Q?eGqhfSwWTmp9OsT5XeSAqxE=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6462.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(38070700021)(18082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ISNMn/1iT72BfnrMKqcdCxa1lGu6sU1JKFoatiyK4uxt72Kptckb+xiGa9JA?=
- =?us-ascii?Q?xDO6OQmWPYjJUi99xxTTL1Q+lgwk2kj2Lf5h2TEMWfaIG1M89N1HRxBkk7ze?=
- =?us-ascii?Q?NW8YCKVY2ERUMYlkxDdbzPxKbMqD8SwCDnXuO/aS5B7MFj60G24alkP31/Ro?=
- =?us-ascii?Q?hwtz3vGuje9W2iqNBTlUPbvCXFCit+Bk56MCWzX9771t3OyTmOmPwIw9pxJC?=
- =?us-ascii?Q?/OHLwYQtcALEnd0krOYrvP/HlJDqr0an/1KbzJ5Nx2b1WD/IBpHJgKChr4gF?=
- =?us-ascii?Q?Rlji7aqcvOVFOKgSNUR3kmqDZqX2jAecDVjWRK82OHvYDZVSk7BEzfpHhTLw?=
- =?us-ascii?Q?FwzVpJTvPLq8jlchWwtcz7YRdZGUoKw6J0ltui8YZGGyfMesLw0f6qyh5T1/?=
- =?us-ascii?Q?ZmTl3A50pUcf9UEv+ic4Vk24BvebscVFHz+Lvykmnf6dlhGIhpL4tqh4DE9q?=
- =?us-ascii?Q?dqeFguNZ4v6YTsxh7AVW4fAauhpdWVWWL8Ikd8FB3J1jzb+fPXk5dQ/zCWfV?=
- =?us-ascii?Q?vd8Q4A8NMsdoWcQd+pk9sFjGzv59nXxEU38+VQZ+yneP0ucs4RVW0nAn1Bwd?=
- =?us-ascii?Q?NdSY0FJMN5ozwY7gdftzZJH8C/qLKNAWH9h2q8XEK3IgCx//xlFexqClNIMG?=
- =?us-ascii?Q?A7NbGr1VfHFfGXPU5lb7/SIkrrZsrDR9Cn78ZjY8UWOfUIVD60fgQ4+npzdR?=
- =?us-ascii?Q?XP0dshPWhI+V9tzx7DVUVokLOrY4Okizoe4ZKQAwea7g0LgR1D6cXhphXWHi?=
- =?us-ascii?Q?tvSuQzlx67BNdgYKcNAy1l4OBzcNNVt6J0BbAny+Y60l5Crik/lVPr3vH7WE?=
- =?us-ascii?Q?j+Ur6iyXlc8mEEipuhW0LvAyTixsSdrxkXRtSsShv4UIphUXYaWK5Jnq8EJP?=
- =?us-ascii?Q?ct2WuS6KG+FxDfHud4IEazW6Y0diOTgofBRRo16+uQ1IzxnNxcUFZ5HmTATU?=
- =?us-ascii?Q?UZsAOTV3jnHzWoIVmUMRc2sKT9hn+QFKCv1DrK+AJo7yOluAtsstYO6aPDGU?=
- =?us-ascii?Q?ztuRwB4k0t0nnvAL9XS/VTc1vUImLkhsBdv5uw8+RKqEOP6WgQs8hdUt7Tta?=
- =?us-ascii?Q?DaQW6V/L0YyjfLuCKR7qLQLX0RZ7PZzHbNAZwWGDCsE1U9EJfmzEJA6Lln4U?=
- =?us-ascii?Q?GF70FebGnq7xFpbciwm4BmZby7QSnioUa+biKb7X3R+hSlZbYzkmpogwMlNo?=
- =?us-ascii?Q?aoFjcrUxqSCh1jwa7EVPbAahILYG6XkWM1CfnBU1gcpKoDMb9dSTjF5WP3ml?=
- =?us-ascii?Q?LUqQRWT/HArjWQX4SNmKD60kXE+ItnQeIp1s0RGHI6BUDiGqdSXvsovZT/VZ?=
- =?us-ascii?Q?K1HsHb4hQwiW/IdX62gwpbFPdf3VqqawyU1LZbQzMKa5XV453XIvMSUQZsqk?=
- =?us-ascii?Q?EnYzB7PXi69dkJx17ywtMG2L0qscNGzM37+oisvFndqsgff5ShRbpczEtAMN?=
- =?us-ascii?Q?u1NolcxmJ6WsAkIVJBPOo5wOn+gaXH/rSoiHgMEFRM68PsWYmDzLTFazvG8H?=
- =?us-ascii?Q?rD1i1kjwM2hW1a19PwhNOe3TUkgZlZkt8qCXBcK4cHZft9KNBGQijI/+N3OW?=
- =?us-ascii?Q?wZK6WNAqemSb0JM1sHLHezo2Tjua4jFX2ysci4BsEe3nXvLq/8t4FaNnx4/k?=
- =?us-ascii?Q?m9VpfAk5v3ZjoxI14XAs/fOYhE95B/I/ydWVmm0R09UjYGEED4fF0tU9wWe2?=
- =?us-ascii?Q?X2IWygIhHcrAFNhs6iOu/WDgBLLJxP+1CQSfAyzXs15kQvz9GjFgB7v4dRVb?=
- =?us-ascii?Q?SWxs3y5gTg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Riana Tauro <riana.tauro@intel.com>
+In-Reply-To: <919c0b7e-83d7-45e8-ae96-d9fb7a10995c@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5P287CA0078.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1d8::6) To DS0PR11MB7958.namprd11.prod.outlook.com
+ (2603:10b6:8:f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7958:EE_|SJ5PPFC4905B1D0:EE_
+X-MS-Office365-Filtering-Correlation-Id: d28f6028-5669-4a95-14a6-08de54c40938
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S1IybmpZelArUGNPZmN4Z2dGeFVXRExIZXF0M1ZWZFY1a1YxVXMvUjZqTmxl?=
+ =?utf-8?B?Z0ZBVnBvZWVlTUIvcXkxbk4zTmh4eHgxS1p0TDUxMXR3dC9uZ1lFdTA1TVIz?=
+ =?utf-8?B?NmhIVjhHeGlOaTJDdng1RWt4RGQ1aXpQbWxXZlVOY0xYcVpkV1h1b1RuREVP?=
+ =?utf-8?B?TFIwSU5JQTNyY2EzWlR2TjNEZUJURWUxRjUwUmZidVlkZ1dvMktkY01CNVdW?=
+ =?utf-8?B?UUV0clZUNUtmbkhVUmxMVXB0cU5maEt0aWN0OWYraDA0T3NkUm5OU1hVWjJD?=
+ =?utf-8?B?UXJIbFdtdmxMeFZzVDNwWDdxWkdUamRNc0lQTTVMUnBRQWxaQmx3NXA2TzI2?=
+ =?utf-8?B?ZnVuNHp3UWsxbFdkczBwbFZsZU1aUnU1NFI2SThLajV0OWtZR1VZQlRPeXVY?=
+ =?utf-8?B?UlJ4TUZ4a3oxUXNxcEN6R3JrTVpPcVNRU1dTRjMwQlBTSVhoMmxDSzBPTm96?=
+ =?utf-8?B?UGtEMzBJcFJCR2Iwc3l1MGNzaXRWM2QzQnY1UWpWUy8rMnJ6ZDhmQ0czVjNB?=
+ =?utf-8?B?bmdkVzdVeVNkVzFYMldTUzhCUllHeWV3UTBlc3dYeHNLb2tBaUwrc3hZN2t0?=
+ =?utf-8?B?VHJoY0NIWDVFRkNHWHBpaUJDK21qbEZQeFlFbmNjbFVaQnlRMjNNTzJBNzFW?=
+ =?utf-8?B?VnR2cmgzY0VkVDhGUHRFd0lOVkdpS2pYMFpWK3VGeDA5QXp5SFRnMmE3QTFG?=
+ =?utf-8?B?UWxaZDFsK29MOXMvUVNiTTA0OTBMOEhiNW1uZGtlT0EvQlhmWUJkWm5QUUNp?=
+ =?utf-8?B?aGJxK0xBMXZ6V2pmdWljSXFyeUMweVZxd2x2Ym9GRmxNa0VURUhXVmJRSDI3?=
+ =?utf-8?B?ZHJsT2dzVDFvUm1Lci81SWlqOTNFVUNOZlQyV2hJcE81aG1tWEUvSHEzU3lv?=
+ =?utf-8?B?MnFJZTREem1OTUhxQ0t5K08rRGtHb2ZhdnZieHFQT0xkZjNpUmFJbGFsU1pv?=
+ =?utf-8?B?OGlmaXJ3SEVxYVpaQ3pOaHU5cjZBTUxZMlg0MzN6Y0NCUE95QzdZK1JTZHNM?=
+ =?utf-8?B?b0QwVlVQaHV5ZUtpTld1bkJPc3BzZGRpc2pLd0krK2IwL1pmRjFUQlhnSEgx?=
+ =?utf-8?B?M1RuZ1grSmVWazJDQnJMSGozbVc1QSt4NXBuTUlwRVUxSU9adVBoUlZBMlMx?=
+ =?utf-8?B?RVUxMlMzcStzWTArYXN4QjlvN1IwTFNoMElUS05ENU4yTmtDVHhvZjNIcjNO?=
+ =?utf-8?B?UHlmWFVtTDk0a0h6Q3poNzd3THBtYnQzOWNWT1VPMkk2NE5mOCthbXRFVE9P?=
+ =?utf-8?B?OWxyaXUzM29ha0hBSkZqNG1OMEp0MkVxS0I0Q293TFl5QWs5SlYwNEtaMjFs?=
+ =?utf-8?B?Y1VkRUhDM1FPMSt0Tk5NN2dFbG8raEJQY0VMNkJNbUZGVnlBZFZQTmFpMFVJ?=
+ =?utf-8?B?QitDOEZLeUUyb1kzSmlYM3VoMHhOYjZWUlFQeG1qeGxpRkNNclF1bVA5TWxK?=
+ =?utf-8?B?TUdjd0g2cmJKSTNER3ZZUDZsVTZ1Y1hTVngrT1Y5UjEwcnJhaUdOd0t3K0xR?=
+ =?utf-8?B?aERWeTF1WVFPTDB4L1ErOFIyRjhZODFKWHVVOUJNYUhtKy84dHU4REdWSEhD?=
+ =?utf-8?B?V2NKd3ZUSzhDSmhjZ3JaZWtvanlIbXYxNEZ6TGVEb2JpOEVSczN2cVpUcXZz?=
+ =?utf-8?B?dHl4aFpZZnlFWnpNajJsYldRRnlGd20yQTNYYW96NzdESTRmR3FnVlNHNURC?=
+ =?utf-8?B?SmtJdXd5ME4wZGduYUVhNlQ3MUlVajlRQ3lZaGNLa2IxZFh2M25lUy9XTGh1?=
+ =?utf-8?B?elJjL095dSt6NzMwUlY1K1RJNXZKL01RUnZLTTBaKzdtVlVLZkdWRnV6QUdx?=
+ =?utf-8?B?bG0xMSszOGZlZFZBS2Z4OXNtUU1FcnRyNjNKUTRmYVRsK25rMmRkNnBkV0F1?=
+ =?utf-8?B?UTRSdzZpUG9FS2VFS0NDdnNpWTQ0WEd4Rkh4WlJ6VDJ2U05ONUpGYTFjVEsr?=
+ =?utf-8?B?WFRzQkowKy9SNDhxRU8vSEV1Z2dkSkEzaWNqaWQrcWdpSFdCVnZrc2p0OW5v?=
+ =?utf-8?B?a2kwLyt6Tlh1cFBBK2JUUmVrd09IMEpMcEU4em5kYVBpNmtvcys4eUFYcGZ2?=
+ =?utf-8?B?Q1AxR0dEeEszbkRHQktTRGo5UmNScEcwSkhFY09YWGF1eThLK0NvZ08wbDRJ?=
+ =?utf-8?Q?iKkI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7958.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZVB3L1hHQ045TVBKQmJGemN4Q1RQUE9CMy96TUNEWjhZVUt0dnZuSktjd01h?=
+ =?utf-8?B?TmM4bGlkNjNjTkNSQ1NoL0xjckZmLzh5LzFuNnJiL0hRaFpoK0NYOU1SN2hy?=
+ =?utf-8?B?NlhQQVFtZnYxakVrWDVBeCt6VGw2L1hwcFYrVDI3dG9ON2IzK204STRIeDd5?=
+ =?utf-8?B?VmIxS0Z5QnV2c1g2OElPOUN2QnQxZ2JCQXJqQkZuTytpTzAySjVYTVZHTU1R?=
+ =?utf-8?B?d0orMDhNVkpWSFVDTXl3amtPVGhUTUF6WVZWVmhya1AvVGI0V2NuQnBiS05F?=
+ =?utf-8?B?RlZYWklLR0U3cTFsREZ5VVY2R0JSK2NZZmgrMVRKVTNwV3NERUg5OU1ZcC9l?=
+ =?utf-8?B?ZlB5ZW9UaVQrNVFzYWttQ1hkdGdmejZXSGwyY1BhMC83dlRTTDR4bUQvZXI3?=
+ =?utf-8?B?TmF5b3lEaDRQLzBjUDdIbU53UTJEL1dnbzJYc21JdWd6dkpsTkxTd3BGMCtG?=
+ =?utf-8?B?b1NWeWo1YmdnaThsTlVBeWViRGhUYllxZmxmMU0rbEk3Z1NvQVBRU1kyZTc2?=
+ =?utf-8?B?c2Q3VkpJNWVBdlo1ZHpHOXJqNlNZeVFUbnpFTnhuK0dMQ0NtSXJnMElKcUJ3?=
+ =?utf-8?B?Zm1IS2hZWHFsQ0p0WG1URGROcUNLVWZjQVhHT3ZYdUNXRzBCT0ZCd3FYakRV?=
+ =?utf-8?B?U2hNcmRNaVd3UEthSUxVaDFldjV6bndSK0xyMmxCcnZ3ajM5eGtaQVV6SVoz?=
+ =?utf-8?B?Ym95anpibVJndmhNTkxrQkhadTM1cWFXT1pzaEhqQmRPQVBYeWZhSXBTZDFW?=
+ =?utf-8?B?VUIwZmZnV2FlQ3R5bjNpV3dFdEtUQmZaMGhWQ1lkS1BpR0M2ZHBhL0lnZEMv?=
+ =?utf-8?B?ZjZuM1lmdGtMcmJUM0ZnZVg5VVZWa0dnZ2kxTlZaKzZlbzhaV0ZmbnBPVTl5?=
+ =?utf-8?B?Zkx6VlNhUXcvUmFLNTR3MlZ0dkovK1ovZ2RJRTNmcW5pdjh6dEhFVFk5Zko3?=
+ =?utf-8?B?cHh1S2l3SENwZ0VNQTZUelVIcWRQczFOUDNEcXYzY05ua2lqUHMwUzRWcnhi?=
+ =?utf-8?B?R1paRytwMC9IR0lWUjRUYmVGKzh4T3dONDg0L3hPY0JUbjBBck90d3ErTUpm?=
+ =?utf-8?B?OWwwMmsrZHVieU5RWjEwc3lycWpPR1VZSUxaaFJaYXRFNFR3bHNvTzdNVEZu?=
+ =?utf-8?B?QXphcUtxQkRpcTZibFpiUkhkL3FrUUJjR2R0ZS9XcVg2SmZoYm0vUExvMUFZ?=
+ =?utf-8?B?UG4zYjJHN2tHRkZNQ0o3VkludmtXeUFjRTBPQ1h3eVRqSlFxVThWMjBmckNK?=
+ =?utf-8?B?MGFrMmg0Rk5ZeGJVdGIwNW9wSXJwem5GNFY1NGZ3cW9kaXpZMjczZ0pKQlFh?=
+ =?utf-8?B?TjJ6Q3ZVM1Jub1RmV1BZWTNrUE05M1c1VS9ITkhKaldPZFhJQ09qK1FwSlBi?=
+ =?utf-8?B?V0lwb09zSk53RjZUUUEwSW45Mk0zaVplanY3ak8vY1JpWE5KY3BCMVp5L3Yr?=
+ =?utf-8?B?dlZFaUJNR24xRU5uUVpuZXhNZUFkUjZwN05FYzFkVzhjeUk3VFlpRnhpUkd1?=
+ =?utf-8?B?KzJ6YkdscUFBSy9uREl5SURzMTZvWG4wS0Q4MGoxTnlJbFB0VmlUNWRjNnlE?=
+ =?utf-8?B?blplVDFYNlNBZUx3bU9ET0orUkJkYzhpMUVOV2dxZzVSRExoK2xCWms3VVBR?=
+ =?utf-8?B?NXpHNW0wcW03cE56bG90QUdGbEJCL3ZXZ2RLajNWdWJsK1FFdDdQQmdvbTd5?=
+ =?utf-8?B?VzBGSUJBUjZpWnc5UHNiKzdoWGFEVDBYSnpBSmo3V2lCLzBwNjE1d01YZUha?=
+ =?utf-8?B?dndqUlB6KzdiTjhVYXJDTWZ6WitkbnJFNEJQRGtqZnE3NWpLSDZsbUthTkRL?=
+ =?utf-8?B?VE1NeTF6U21TNWNPN3BtWWZGUkgzWlRYSHIrZTVOMktuR21aV3Y4RnFOSXZW?=
+ =?utf-8?B?VDhpdXlIeXBJMWYzTCtHV3FmMHFsSHBMelpnVzJWeDkzWTRtM3FmWVV2TVMy?=
+ =?utf-8?B?WDF2dU5seEJUMm1uS0I3NWwwRUlhZ1N2YWQrMDA1QU9rcmlVbVFxSHp5c3A3?=
+ =?utf-8?B?b1RCeENIeEMwTXNJb1c5V2UwVGVqSkhLS1IrL2NlMStWbEkwdEZGTTI5cW5s?=
+ =?utf-8?B?NTBTVVN4NlV2ejB1MmVtNWRYakU2dG82V2lPNzZUNlhXN3VERzBJZmZvQmlo?=
+ =?utf-8?B?WCs5Qm4vYkJPZXhveEUzV1RUSTVRdTNyYkN3ZU45TFNkclB6VnBkRXpOM2Nq?=
+ =?utf-8?B?R2t1dEdKcFhDaXNhYmVCZW11SWtvRzhaWE14bzcydndac21oMEFHYll4ejRO?=
+ =?utf-8?B?OFdZZmZtQjVXVlJmMG11NmRWY2ZsQ0VzSHIwQzNMeEswUXA4VWs4cUwzWjNQ?=
+ =?utf-8?B?b1pESG1WUXRVeEQyZmNwLy96TlJiNFhkTGVGYzNFcXh4MENGYy94Zz09?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d28f6028-5669-4a95-14a6-08de54c40938
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7958.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6462.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d87dda0-abeb-4ae5-5b7f-08de54bf7139
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2026 05:23:54.8163
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2026 05:56:48.2204
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aX3OT4CqPgBbK0CAXaxIJn/ziNZFlNeh7ffmb5oxUFovNLD2EM+Bw5G16dyceE2//tLI5HqsyVpOHUjQ/km4FUzoTfp4/OvfI2AJnnn+AKQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8402
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 10ncU9H64ozRn5eUHoX3jF2Jpcff70AEI0F/f2MTYJS9kw7qhjDEB2oXlbeEKnuDSFfQS2LIND3H4NmdaaOZzw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFC4905B1D0
+X-OriginatorOrg: intel.com
 
-Reviewed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 
------Original Message-----
-From: Ivan Vecera <ivecera@redhat.com>=20
-Sent: Wednesday 14 January 2026 12:27
-To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>; Jakub Kicinski <kuba@kernel.or=
-g>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.co=
-m>; Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>; Vadim=
- Fedorenko <vadim.fedorenko@linux.dev>; Arkadiusz Kubalewski <arkadiusz.kub=
-alewski@intel.com>; Jiri Pirko <jiri@resnulli.us>; Prathosh Satish - M66066=
- <Prathosh.Satish@microchip.com>; Petr Oros <poros@redhat.com>; linux-kerne=
-l@vger.kernel.org; Michal Schmidt <mschmidt@redhat.com>
-Subject: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode setti=
-ng support
 
-EXTERNAL EMAIL: Do not click links or open attachments unless you know the =
-content is safe
+On 1/16/2026 5:09 AM, Zack McKevitt wrote:
+> 
+> 
+> On 1/13/2026 1:20 AM, Riana Tauro wrote:
+>>>>>> diff --git a/Documentation/netlink/specs/drm_ras.yaml b/ 
+>>>>>> Documentation/netlink/specs/drm_ras.yaml
+>>>>>> new file mode 100644
+>>>>>> index 000000000000..be0e379c5bc9
+>>>>>> --- /dev/null
+>>>>>> +++ b/Documentation/netlink/specs/drm_ras.yaml
+>>>>>> @@ -0,0 +1,130 @@
+>>>>>> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR 
+>>>>>> BSD-3-Clause)
+>>>>>> +---
+>>>>>> +name: drm-ras
+>>>>>> +protocol: genetlink
+>>>>>> +uapi-header: drm/drm_ras.h
+>>>>>> +
+>>>>>> +doc: >-
+>>>>>> +  DRM RAS (Reliability, Availability, Serviceability) over 
+>>>>>> Generic Netlink.
+>>>>>> +  Provides a standardized mechanism for DRM drivers to register 
+>>>>>> "nodes"
+>>>>>> +  representing hardware/software components capable of reporting 
+>>>>>> error counters.
+>>>>>> +  Userspace tools can query the list of nodes or individual error 
+>>>>>> counters
+>>>>>> +  via the Generic Netlink interface.
+>>>>>> +
+>>>>>> +definitions:
+>>>>>> +  -
+>>>>>> +    type: enum
+>>>>>> +    name: node-type
+>>>>>> +    value-start: 1
+>>>>>> +    entries: [error-counter]
+>>>>>> +    doc: >-
+>>>>>> +         Type of the node. Currently, only error-counter nodes are
+>>>>>> +         supported, which expose reliability counters for a 
+>>>>>> hardware/software
+>>>>>> +         component.
+>>>>>> +
+>>>>>> +attribute-sets:
+>>>>>> +  -
+>>>>>> +    name: node-attrs
+>>>>>> +    attributes:
+>>>>>> +      -
+>>>>>> +        name: node-id
+>>>>>> +        type: u32
+>>>>>> +        doc: >-
+>>>>>> +             Unique identifier for the node.
+>>>>>> +             Assigned dynamically by the DRM RAS core upon 
+>>>>>> registration.
+>>>>>> +      -
+>>>>>> +        name: device-name
+>>>>>> +        type: string
+>>>>>> +        doc: >-
+>>>>>> +             Device name chosen by the driver at registration.
+>>>>>> +             Can be a PCI BDF, UUID, or module name if unique.
+>>>>>> +      -
+>>>>>> +        name: node-name
+>>>>>> +        type: string
+>>>>>> +        doc: >-
+>>>>>> +             Node name chosen by the driver at registration.
+>>>>>> +             Can be an IP block name, or any name that identifies 
+>>>>>> the
+>>>>>> +             RAS node inside the device.
+>>>>>> +      -
+>>>>>> +        name: node-type
+>>>>>> +        type: u32
+>>>>>> +        doc: Type of this node, identifying its function.
+>>>>>> +        enum: node-type
+>>>>>> +  -
+>>>>>> +    name: error-counter-attrs
+>>>>>> +    attributes:
+>>>>>> +      -
+>>>>>> +        name: node-id
+>>>>>> +        type: u32
+>>>>>> +        doc:  Node ID targeted by this error counter operation.
+>>>>>> +      -
+>>>>>> +        name: error-id
+>>>>>> +        type: u32
+>>>>>> +        doc: Unique identifier for a specific error counter 
+>>>>>> within an node.
+>>>>>> +      -
+>>>>>> +        name: error-name
+>>>>>> +        type: string
+>>>>>> +        doc: Name of the error.
+>>>>>> +      -
+>>>>>> +        name: error-value
+>>>>>> +        type: u32
+>>>>>> +        doc: Current value of the requested error counter.
+>>>>>> +
+>>>>>> +operations:
+>>>>>> +  list:
+>>>>>> +    -
+>>>>>> +      name: list-nodes
+>>>>>> +      doc: >-
+>>>>>> +           Retrieve the full list of currently registered DRM RAS 
+>>>>>> nodes.
+>>>>>> +           Each node includes its dynamically assigned ID, name, 
+>>>>>> and type.
+>>>>>> +           **Important:** User space must call this operation 
+>>>>>> first to obtain
+>>>>>> +           the node IDs. These IDs are required for all subsequent
+>>>>>> +           operations on nodes, such as querying error counters.
+>>>>
+>>>> I am curious about security implications of this design.
+>>>
+>>> hmm... very good point you are raising here.
+>>>
+>>> This current design relies entirely in the CAP_NET_ADMIN.
+>>> No driver would have the flexibility to choose anything differently.
+>>> Please notice that the flag admin-perm is hardcoded in this yaml file.
+>>>
+>>>> If the complete
+>>>> list of RAS nodes is visible for any process on the system (and one 
+>>>> wants to
+>>>> avoid requiring CAP_NET_ADMIN), there should be some way to enforce
+>>>> permission checks when performing these operations if desired.
+>>>
+>>> Right now, there's no way that the driver would choose not avoid 
+>>> requiring
+>>> CAP_NET_ADMIN...
+>>>
+>>> Only way would be the admin to give the cap_net_admin to the tool with:
+>>>
+>>> $ sudo setcap cap_net_admin+ep /bin/drm_ras_tool
+>>>
+>>> but not ideal and not granular anyway...
+>>>
+>>>>
+>>>> For example, this might be implemented in the driver's definition of
+>>>> callback functions like query_error_counter; some drivers may want 
+>>>> to ensure
+>>>> that the process can in fact open the file descriptor corresponding 
+>>>> to the
+>>>> queried device before serving a netlink request. Is it enough for a 
+>>>> driver
+>>>> to simply return -EPERM in this case? Any driver that doesnt wish to 
+>>>> protect
+>>>> its RAS nodes need not implement checks in their callbacks.
+>>>
+>>> Fair enough. If we want to give the option to the drivers, then we need:
+>>>
+>>> 1. to first remove all the admin-perm flags below and leave the 
+>>> driver to
+>>> pick up their policy on when to return something or -EPERM.
+>>> 2. Document this security responsibility and list a few possibilities.
+>>> 3. In our Xe case here I believe the easiest option is to use 
+>>> something like:
+>>>
+>>> struct scm_creds *creds = NETLINK_CREDS(cb->skb);
+>>> if (!gid_eq(creds->gid, GLOBAL_ROOT_GID))
+>>>      return -EPERM
+>>
+>> The driver currently does not have access to the callback or the 
+>> skbuffer. Sending these details as param to driver won't be right as
+>> drm_ras needs to handle all the netlink buffers.
+>>
+>> How about using pre_doit & start calls? If driver has a pre callback , 
+>> it's the responsibility of the driver to check permissions/any-pre 
+>> conditions, else the CAP_NET_ADMIN permission will be checked.
+>>
+>> @Zack / @Rodrigo thoughts?
+>> @Zack Will this work for your usecase?
+>>
+>> yaml
+>> +    dump:
+>> +        pre: drm-ras-nl-pre-list-nodes
+>>
+>>
+>> drm_ras.c :
+>>
+>> +       if (node->pre_list_nodes)
+>> +                return node->pre_list_nodes(node);
+>> +
+>> +        return check_permissions(cb->skb);  //Checks creds
+>>
+>> Thanks
+>> Riana
+>>
+> 
+> I agree that a pre_doit is probably the best solution for this.
+> 
+> Not entirely sure what a driver specific implementation would look like 
+> yet, but I think that as long as the driver callback has a way to access 
+> the 'current' task_struct pointer corresponding to the user process then 
+> this approach seems like the best option from the netlink side.
+> 
+> Since this is mostly a concern for our specific use case, perhaps we can 
+> incorporate this functionality in our change down the road when we 
+> expand the interface for telemetry?
 
-Add support for .supported_modes_get() and .mode_set() callbacks to enable =
-switching between manual and automatic modes via netlink.
 
-Implement .supported_modes_get() to report available modes based on the cur=
-rent hardware configuration:
+Yeah using pre_doit we can allow driver to make decisions based on
+the private data or driver specific permissions. However we will need to 
+check the CAP_NET_ADMIN when no driver callback is implemented in the 
+netlink layer as a default .
 
-* manual mode is always supported
-* automatic mode is supported unless the dpll channel is configured
-  in NCO (Numerically Controlled Oscillator) mode
+Thank you, you can incorporate the changes when you add telemetry nodes.
 
-Implement .mode_set() to handle the specific logic required when transition=
-ing between modes:
+For now, I will retain the admin-perm in flags.
 
-1) Transition to manual:
-* If a valid reference is currently active, switch the hardware
-  to ref-lock mode (force lock to that reference).
-* If no reference is valid and the DPLL is unlocked, switch to freerun.
-* Otherwise, switch to Holdover.
+I will address the rest of the review comments and send out a new 
+revision shortly.
 
-2) Transition to automatic:
-* If the currently selected reference pin was previously marked
-  as non-selectable (likely during a previous manual forcing
-  operation), restore its priority and selectability in the hardware.
-* Switch the hardware to Automatic selection mode.
+Thank you
+Riana
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-v2:
-* added extack error messages in error paths
----
- drivers/dpll/zl3073x/dpll.c | 112 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
 
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c inde=
-x 9879d85d29af0..7d8ed948b9706 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -100,6 +100,20 @@ zl3073x_dpll_pin_direction_get(const struct dpll_pin *=
-dpll_pin, void *pin_priv,
-        return 0;
- }
-
-+static struct zl3073x_dpll_pin *
-+zl3073x_dpll_pin_get_by_ref(struct zl3073x_dpll *zldpll, u8 ref_id) {
-+       struct zl3073x_dpll_pin *pin;
-+
-+       list_for_each_entry(pin, &zldpll->pins, list) {
-+               if (zl3073x_dpll_is_input_pin(pin) &&
-+                   zl3073x_input_pin_ref_get(pin->id) =3D=3D ref_id)
-+                       return pin;
-+       }
-+
-+       return NULL;
-+}
-+
- static int
- zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
-                                 void *pin_priv, @@ -1137,6 +1151,26 @@ zl3=
-073x_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
-        return 0;
- }
-
-+static int
-+zl3073x_dpll_supported_modes_get(const struct dpll_device *dpll,
-+                                void *dpll_priv, unsigned long *modes,
-+                                struct netlink_ext_ack *extack) {
-+       struct zl3073x_dpll *zldpll =3D dpll_priv;
-+
-+       /* We support switching between automatic and manual mode, except i=
-n
-+        * a case where the DPLL channel is configured to run in NCO mode.
-+        * In this case, report only the manual mode to which the NCO is ma=
-pped
-+        * as the only supported one.
-+        */
-+       if (zldpll->refsel_mode !=3D ZL_DPLL_MODE_REFSEL_MODE_NCO)
-+               __set_bit(DPLL_MODE_AUTOMATIC, modes);
-+
-+       __set_bit(DPLL_MODE_MANUAL, modes);
-+
-+       return 0;
-+}
-+
- static int
- zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
-                      enum dpll_mode *mode, struct netlink_ext_ack *extack)=
- @@ -1217,6 +1251,82 @@ zl3073x_dpll_phase_offset_avg_factor_set(const stru=
-ct dpll_device *dpll,
-        return 0;
- }
-
-+static int
-+zl3073x_dpll_mode_set(const struct dpll_device *dpll, void *dpll_priv,
-+                     enum dpll_mode mode, struct netlink_ext_ack=20
-+*extack) {
-+       struct zl3073x_dpll *zldpll =3D dpll_priv;
-+       u8 hw_mode, mode_refsel, ref;
-+       int rc;
-+
-+       rc =3D zl3073x_dpll_selected_ref_get(zldpll, &ref);
-+       if (rc) {
-+               NL_SET_ERR_MSG_MOD(extack, "failed to get selected referenc=
-e");
-+               return rc;
-+       }
-+
-+       if (mode =3D=3D DPLL_MODE_MANUAL) {
-+               /* We are switching from automatic to manual mode:
-+                * - if we have a valid reference selected during auto mode=
- then
-+                *   we will switch to forced reference lock mode and use t=
-his
-+                *   reference for selection
-+                * - if NO valid reference is selected, we will switch to f=
-orced
-+                *   holdover mode or freerun mode, depending on the curren=
-t
-+                *   lock status
-+                */
-+               if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_REFLOCK;
-+               else if (zldpll->lock_status =3D=3D DPLL_LOCK_STATUS_UNLOCK=
-ED)
-+                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_FREERUN;
-+               else
-+                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER;
-+       } else {
-+               /* We are switching from manual to automatic mode:
-+                * - if there is a valid reference selected then ensure tha=
-t
-+                *   it is selectable after switch to automatic mode
-+                * - switch to automatic mode
-+                */
-+               struct zl3073x_dpll_pin *pin;
-+
-+               pin =3D zl3073x_dpll_pin_get_by_ref(zldpll, ref);
-+               if (pin && !pin->selectable) {
-+                       /* Restore pin priority in HW */
-+                       rc =3D zl3073x_dpll_ref_prio_set(pin, pin->prio);
-+                       if (rc) {
-+                               NL_SET_ERR_MSG_MOD(extack,
-+                                                  "failed to restore pin p=
-riority");
-+                               return rc;
-+                       }
-+
-+                       pin->selectable =3D true;
-+               }
-+
-+               hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_AUTO;
-+       }
-+
-+       /* Build mode_refsel value */
-+       mode_refsel =3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, hw_mode);
-+
-+       if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+               mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
-+
-+       /* Update dpll_mode_refsel register */
-+       rc =3D zl3073x_write_u8(zldpll->dev, ZL_REG_DPLL_MODE_REFSEL(zldpll=
-->id),
-+                             mode_refsel);
-+       if (rc) {
-+               NL_SET_ERR_MSG_MOD(extack,
-+                                  "failed to set reference selection mode"=
-);
-+               return rc;
-+       }
-+
-+       zldpll->refsel_mode =3D hw_mode;
-+
-+       if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+               zldpll->forced_ref =3D ref;
-+
-+       return 0;
-+}
-+
- static int
- zl3073x_dpll_phase_offset_monitor_get(const struct dpll_device *dpll,
-                                      void *dpll_priv, @@ -1276,10 +1386,12=
- @@ static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops =3D {  sta=
-tic const struct dpll_device_ops zl3073x_dpll_device_ops =3D {
-        .lock_status_get =3D zl3073x_dpll_lock_status_get,
-        .mode_get =3D zl3073x_dpll_mode_get,
-+       .mode_set =3D zl3073x_dpll_mode_set,
-        .phase_offset_avg_factor_get =3D zl3073x_dpll_phase_offset_avg_fact=
-or_get,
-        .phase_offset_avg_factor_set =3D zl3073x_dpll_phase_offset_avg_fact=
-or_set,
-        .phase_offset_monitor_get =3D zl3073x_dpll_phase_offset_monitor_get=
-,
-        .phase_offset_monitor_set =3D zl3073x_dpll_phase_offset_monitor_set=
-,
-+       .supported_modes_get =3D zl3073x_dpll_supported_modes_get,
- };
-
- /**
---
-2.52.0
+> 
+> Let me know what you think.
+> 
+> Zack
+> 
+>>>
+>>> or something like that?!
+>>>
+>>> perhaps drivers could implement some form of cookie or pre- 
+>>> authorization with
+>>> ioctls or sysfs, and then store in the priv?
+>>>
+>>> Thoughts?
+>>> Other options?
+>>>
+>>>>
+>>>> I dont see any such permissions checks in your driver implementation 
+>>>> which
+>>>> is understandable given that it may not be necessary for your use 
+>>>> cases.
+>>>> However, this would be a concern for our driver if we were to adopt 
+>>>> this
+>>>> interface.
+>>>
+>>> yeap, this case was entirely with admin-perm, so not needed at all...
+>>> But I see your point and this is really not giving any flexibility to
+>>> other drivers.
+>>>
+> 
+>>>>>>
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Zack
+>>>>
+>>
+> 
 
 
