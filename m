@@ -1,280 +1,91 @@
-Return-Path: <netdev+bounces-250646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D70D38753
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:22:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15821D3875E
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11B9531E65E9
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:16:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 105D5300D568
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D3C3A35BF;
-	Fri, 16 Jan 2026 20:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CA63A6405;
+	Fri, 16 Jan 2026 20:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F71rfD7h";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqnZ2UTG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o4gMIYY4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336053A63FB
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 20:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B98B3A4F41;
+	Fri, 16 Jan 2026 20:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768594546; cv=none; b=WsHVxPcOuMQwcr2rsNq8AV3kGqlwqifm1cP/3wv+JOv6hYo3jismpsETvkbYQ2uAHFKdf33cSl5Fdj4T+5K7rsFXpbyUhPSI7kdZy5oZRE3fd32Wj0n8fj0S0eU9v6RauiP2KHMd1YTrwGcTheZ4/r1YCGRtOCMxN9pX+Y3s4h8=
+	t=1768594717; cv=none; b=ltyvMY6oakIh0OHzr/V4+meiesrxmhrFxhJhjrLNAuUdGASBC96mP6SxLHKK3FchOxx6epn3hdZXW9w7iME7Uq1v4rq4IMDcs6++SipK4KRnmXy42yer3lOkBNKsXo5KFApspLgg9Fx8Rxc/5yve1La3l8lb+tImBLzGM+KzHgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768594546; c=relaxed/simple;
-	bh=SoO7meievLXiEt+HOkmT+4mC7UVVo+dr6edO43jcmvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dZ8GGG/C8qidG+aWBERiU1fnv0D+R6YLn9nCmLo975Nl5gZWeD139vKBzVyFYApku8FsDLBw2zO3gEVtjnFTPspEvM3iV6rs9Mphjv98TJg1a2/Fv9GYDEZs/2uABeYovbIcxnHXcBal20TVjBB1r8B2vKa2gpNJPKg4cS9LXbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F71rfD7h; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gqnZ2UTG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768594543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IeRZ4N2lg6mPjyH8cqV8u8lDtZLcsrjhMu6bgHYQOx8=;
-	b=F71rfD7hgMv4GDna79ZpAqr4433sX+/9wZQ9o7HSfbz+LUBZCBj5qXTz2wg6j68Yaeq6BJ
-	P8IERdUVaGDOCGIVvWGH5RwX1zOwH7OxrCg8tiAAWnHQv8RIhhVcIIsyuqjzI69XUtPp3n
-	ANKsWHTs8K5DfvL6WaRDbTh1gHGkfKw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-JOb_p7sAPUeCudhlvGeF-w-1; Fri, 16 Jan 2026 15:15:42 -0500
-X-MC-Unique: JOb_p7sAPUeCudhlvGeF-w-1
-X-Mimecast-MFC-AGG-ID: JOb_p7sAPUeCudhlvGeF-w_1768594541
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47ee7346f8bso13210925e9.2
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 12:15:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768594540; x=1769199340; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IeRZ4N2lg6mPjyH8cqV8u8lDtZLcsrjhMu6bgHYQOx8=;
-        b=gqnZ2UTGU+LVgE1pbQQ8tbCY77BwwdKIH7BtjPhuCZ77qfHsrmY6V8rnWCwZw2/PWd
-         irc/Y9bviFPlYyVLxs/Bu/JxeXNWepCkH5Ec8DMqKWuBK6xpa0Rnwg4d0a5kA4PTfbse
-         O78AZvMRSHnzwQdZIT1ncguifp3+5lGyJWfQR9fu/l1F3w18BmsGztpghQ4BJxYAS4i7
-         Bjoa4ETxyQo43lU/U8Yz1oyfVJ2qFG9/ElQbMN6b6lsqXzQWF2W3VPXi7kA0NeCzaAxN
-         KzzxHMnHWWpQSPVCBqCbSa78mHPiwVVjq+wUsWiSuMVUxYg+SRpRpH63cuNYSU8iLq7h
-         hfhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768594540; x=1769199340;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IeRZ4N2lg6mPjyH8cqV8u8lDtZLcsrjhMu6bgHYQOx8=;
-        b=P64M3+/UuHU7qXSrWhfwqN4eXsfUEM+cp9XmdVifBojQRp7j7YYHYjIOJ7Sx9UrUmA
-         PJfrQE/gKWYwjgr5ZZARM5cm2KaqszhooP7L8jV+A6848IfsvA01+RxkjK+xSxLSvkg9
-         0xz52wzaZ6pCM4hmcWW4cWKav2Z46wxOdsRh1nN1QDIhkJ4XMDaXUOL/bqPXS72E0n+d
-         gzQngzXhlwGGcvWKeL+9KyizmeZQj+jaoGM0y8SfZVegs+R/KE1huuxsD7aovPFsWgYE
-         TOBCaihdt3gLh/oJxkKSEfJ6rjNN/5uncyM62TpivHUcgMqRxkbLm/5aSUU5sSJRnqRY
-         8ylQ==
-X-Gm-Message-State: AOJu0YxbgRsJFfjF+QlIKH9UchI1jy7KNFyY/IwcStThJYUNGDo4WYWA
-	gKfeRrIU9/wbWcRVfmY06CTdXgGj2SZM3qsKdbmlFn1hu4l+u4z+pDdEJ6B4rqZ+IMaKg/eyBmu
-	YRbaQF6AAS7CUhForYghtXH0JEbBmgqeDylWqYVZ18fQSEfCWq1eMR5T2uA2mMa7gjGSRBJdQW4
-	lxiIY0/nyYyzlR0jj5CnQj4YdNbW8CkrVaBroyJ+cn/w==
-X-Gm-Gg: AY/fxX4lVvDfH4tj5xd0q2vmB5k1rV0kdYqQmJOp8eAFgqNZQig+i8XqhdFYtDGdhys
-	NqljqyTgg3VOtrG1LIEajj//24CGG0I04AOlGKDnVHcyHiQBjMFiApOFMzVwd/Lpb8mc8V7wF3x
-	+rQlqXzpOKYz6mA/xtV13E9CGEZJ87bLACi4sJkuCD7SfWtg/5KqRjPIgYu8VwQr11eeV4qi1SH
-	F84x19T3Y+JC6i/o8eaVpZYH9FJmreDNq15hpsmT0GF5xU5OcglZK2IR1uybjkmO6FWBGd6GcQk
-	RHsRl8IZHbdH70oig0gpjAMkhkuvTQjEvcZC9jOpC1++x1ZDxH5oQpKxihdPM/qy2CYuFqKZMWl
-	DkT5EqMOx2KsnLblsls40ZgqeSwQsCGtlKLZg8W51PSX6p1AKTJOE/V7vJltJ
-X-Received: by 2002:a05:600c:4e93:b0:46e:4a13:e6c6 with SMTP id 5b1f17b1804b1-4801eb09274mr39557215e9.19.1768594540432;
-        Fri, 16 Jan 2026 12:15:40 -0800 (PST)
-X-Received: by 2002:a05:600c:4e93:b0:46e:4a13:e6c6 with SMTP id 5b1f17b1804b1-4801eb09274mr39556825e9.19.1768594539909;
-        Fri, 16 Jan 2026 12:15:39 -0800 (PST)
-Received: from stex1.redhat.com (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801ea09747sm24213175e9.7.2026.01.16.12.15.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 12:15:38 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: virtualization@lists.linux.dev,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	kvm@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	linux-kernel@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>,
-	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-	Asias He <asias@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Melbin K Mathew <mlbnkm1@gmail.com>
-Subject: [PATCH RESEND net v5 4/4] vsock/test: add stream TX credit bounds test
-Date: Fri, 16 Jan 2026 21:15:17 +0100
-Message-ID: <20260116201517.273302-5-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260116201517.273302-1-sgarzare@redhat.com>
-References: <20260116201517.273302-1-sgarzare@redhat.com>
+	s=arc-20240116; t=1768594717; c=relaxed/simple;
+	bh=zmK0GOthOLIX641OEY26tPh4qGnp++jNaN4aIM+PNfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBNcH5Gz59t923sbDNDzElgIgLiF44xaY+oUpTQdspSsQr6cDZmLRWso1n+FeiyD8uPgZhVq/oJehS+7BMd5R21QRDqB0f5iuxITO79jtdDgJ8zsAJbLBaBWz5ED2ya2qsQ6Cj9L3a5pot/NQOruSwk4jG1VDIC1aJFYkdGTNWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o4gMIYY4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=64BuC7i0BR/jQxcf3caEyZGpVGJQJ4GHac2qZI2aPkQ=; b=o4gMIYY4QiquKklZUI0MIDPjhi
+	3cqCdI0YW8NGXwxrL9YhZ5s/tr40ensuR8TDbweu6dYLYG83LaDZXjG2xthQCGKNX0Fg5iGnAPSSm
+	V4wPKkLdY9gFiFswy2AiUaZDLwmxNhzKfLwye6tG6l0hF4ZJHXEgf/KJC15NikZvvC/g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vgqGv-0037GS-OH; Fri, 16 Jan 2026 21:18:17 +0100
+Date: Fri, 16 Jan 2026 21:18:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: bcmasp: Fix network filter wake for
+ asp-3.0
+Message-ID: <eccbbe58-2987-43c0-8132-ea59b064f4a7@lunn.ch>
+References: <20260116005037.540490-1-justin.chen@broadcom.com>
+ <20260116005037.540490-2-justin.chen@broadcom.com>
+ <f104b361-bc3c-4666-86e7-68fd5218eafe@lunn.ch>
+ <3949edb7-70cf-4036-b6da-df4d3d927480@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3949edb7-70cf-4036-b6da-df4d3d927480@broadcom.com>
 
-From: Melbin K Mathew <mlbnkm1@gmail.com>
+On Fri, Jan 16, 2026 at 10:55:44AM -0800, Justin Chen wrote:
+> 
+> 
+> On 1/16/26 9:23 AM, Andrew Lunn wrote:
+> > On Thu, Jan 15, 2026 at 04:50:35PM -0800, justin.chen@broadcom.com wrote:
+> > > From: Justin Chen <justin.chen@broadcom.com>
+> > > 
+> > > We need to apply the tx_chan_offset to the netfilter cfg channel or the
+> > > output channel will be incorrect for asp-3.0 and newer.
+> > 
+> > If this is a fix, should it be queued for stable?
+> > 
+> 
+> Yes, will add a fixes tag in v2. Thanks!
 
-Add a regression test for the TX credit bounds fix. The test verifies
-that a sender with a small local buffer size cannot queue excessive
-data even when the peer advertises a large receive buffer.
+Please base this patch on net, not net-next.
 
-The client:
-  - Sets a small buffer size (64 KiB)
-  - Connects to server (which advertises 2 MiB buffer)
-  - Sends in non-blocking mode until EAGAIN
-  - Verifies total queued data is bounded
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-This guards against the original vulnerability where a remote peer
-could cause unbounded kernel memory allocation by advertising a large
-buffer and reading slowly.
+    Andrew
 
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
-[Stefano: use sock_buf_size to check the bytes sent + small fixes]
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- tools/testing/vsock/vsock_test.c | 101 +++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index ad1eea0f5ab8..6933f986ef2a 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -347,6 +347,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- }
- 
- #define SOCK_BUF_SIZE (2 * 1024 * 1024)
-+#define SOCK_BUF_SIZE_SMALL (64 * 1024)
- #define MAX_MSG_PAGES 4
- 
- static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
-@@ -2230,6 +2231,101 @@ static void test_stream_accepted_setsockopt_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_stream_tx_credit_bounds_client(const struct test_opts *opts)
-+{
-+	unsigned long long sock_buf_size;
-+	size_t total = 0;
-+	char buf[4096];
-+	int fd;
-+
-+	memset(buf, 'A', sizeof(buf));
-+
-+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	sock_buf_size = SOCK_BUF_SIZE_SMALL;
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+
-+	if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK) < 0) {
-+		perror("fcntl(F_SETFL)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SRVREADY");
-+
-+	for (;;) {
-+		ssize_t sent = send(fd, buf, sizeof(buf), 0);
-+
-+		if (sent == 0) {
-+			fprintf(stderr, "unexpected EOF while sending bytes\n");
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		if (sent < 0) {
-+			if (errno == EINTR)
-+				continue;
-+
-+			if (errno == EAGAIN || errno == EWOULDBLOCK)
-+				break;
-+
-+			perror("send");
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		total += sent;
-+	}
-+
-+	control_writeln("CLIDONE");
-+	close(fd);
-+
-+	/* We should not be able to send more bytes than the value set as
-+	 * local buffer size.
-+	 */
-+	if (total > sock_buf_size) {
-+		fprintf(stderr,
-+			"TX credit too large: queued %zu bytes (expected <= %llu)\n",
-+			total, sock_buf_size);
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
-+static void test_stream_tx_credit_bounds_server(const struct test_opts *opts)
-+{
-+	unsigned long long sock_buf_size;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	sock_buf_size = SOCK_BUF_SIZE;
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+
-+	control_writeln("SRVREADY");
-+	control_expectln("CLIDONE");
-+
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -2414,6 +2510,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_accepted_setsockopt_client,
- 		.run_server = test_stream_accepted_setsockopt_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM TX credit bounds",
-+		.run_client = test_stream_tx_credit_bounds_client,
-+		.run_server = test_stream_tx_credit_bounds_server,
-+	},
- 	{},
- };
- 
--- 
-2.52.0
-
+pw-bot: cr
 
