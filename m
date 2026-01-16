@@ -1,99 +1,120 @@
-Return-Path: <netdev+bounces-250378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A90DD29E32
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:06:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58EB1D29E93
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:09:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C40E8301460B
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:06:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5EF63004ED9
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287133358C6;
-	Fri, 16 Jan 2026 02:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13A4314B6E;
+	Fri, 16 Jan 2026 02:09:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C1930E848;
-	Fri, 16 Jan 2026 02:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793DA2FFF8C;
+	Fri, 16 Jan 2026 02:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768529217; cv=none; b=Nr+GCxovcJOuGhAJMYqBaQynwvVT/770iSI5v63tI/RImIeLzMNuYrKN6S62QeKlq55zx6lnH6s+vOAIL0aAjnvGAAQaNmf6rNmt7iT1bRMZ7VlLkLn2PTCei6FF4LdY//KW3lOABwXFxCX3YHk/3t2LLErt722n6Ofk4O6sbDE=
+	t=1768529359; cv=none; b=RW6OxLT4oBio+ZjWgqssr7fths5g8B47xxXXiKGe44UfQHQs1aEZ7Zjl2DM9be9h+H3o+c+L+f+Ct0JovPRpECbFhDfsNGUrygBTmOuKqmi36CLCtmWR5BrT/7u7ClmbOA4gz5vQjv9w/HVFIsLYkXYUpXDaQOY1lGzFGQVIEfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768529217; c=relaxed/simple;
-	bh=apMdhwJVWWBTz9mFirJg+3uVvP1nm3ZxTL2WJaf0Iws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fD1Dubbqi6YsVipTytxMVqxwAFAgTY4l/ZkQRc6sTWK8tifzqnqq3FrBQJ2T7YyGyyLwj+kzHC7wu9RYkKgcEaGNdfPP83YPVAnF11G6zREFNjdk+NjFqXRB/th4zzkYDrYArtT1sIPH1eCGsL9r/BzWkO+aB+nK5WU2Hu9EjeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vgZEe-000000007yQ-1E8f;
-	Fri, 16 Jan 2026 02:06:48 +0000
-Date: Fri, 16 Jan 2026 02:06:43 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next] net: phy: intel-xway: workaround stale LEDs
- before link-up
-Message-ID: <aWmdMyJbzaoETETA@makrotopia.org>
-References: <d70a1fa9b92c7b3e7ea09b5c3216d77a8fd35265.1768432653.git.daniel@makrotopia.org>
- <dd6ddb96-7aa9-4142-b991-5f27a4276a92@lunn.ch>
+	s=arc-20240116; t=1768529359; c=relaxed/simple;
+	bh=plYdEJhyUK9bK3WO6kWX+zQQh5c4Lb5V0fZI8Dx3FZw=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=ZK3EG3422psuyHxHHR24IBUR0hxWC01flJBQCKOm396m1270z3MOFbxYlU7CrUdMKgYbRJ4IQr/hXbrDqXZZktBtPqqHxCbLHLDol69hNqkoAhqqWjBXLVasfNaqW6gr7zwRSvb/PcMMWqS7SGHcx4pOO3qy05swqM3Bug/Hffw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 16 Jan
+ 2026 10:09:15 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Fri, 16 Jan 2026 10:09:15 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v2 00/15] net: ftgmac100: Various probe cleanups
+Date: Fri, 16 Jan 2026 10:09:11 +0800
+Message-ID: <20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd6ddb96-7aa9-4142-b991-5f27a4276a92@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMedaWkC/12NywqDMBBFf0Vm3SnJ+CB01f8oLpI40UCNkqRiE
+ f+9wWWXh8M994DE0XOCR3VA5M0nv4QCdKvATjqMjH4oDCSolSQUujzO2qJ9sw6fFUkYotq4plM
+ SymiN7Px+BV8QOGPgPUNfzORTXuL3etrk5Uu0E1K0/9FNokDTKW50PShn+KnTyjxkttPdLjP05
+ 3n+AAX8EN27AAAA
+X-Change-ID: 20251208-ftgmac-cleanup-20b223bf4681
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
+	<horms@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768529355; l=2007;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=plYdEJhyUK9bK3WO6kWX+zQQh5c4Lb5V0fZI8Dx3FZw=;
+ b=/UK3aHTZvrmlMTZGpHO3To2wcYCnL2r1BPTHJLN7jXOIuyvdYTIVrc1Z02w9Lwhhcy3SZ9VLY
+ QJNnIs86TbVCYo0a8VinYTWz9dZGOlY0VUP+1fGeMW2O0I1vsqAfgQr
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 
-On Fri, Jan 16, 2026 at 02:23:18AM +0100, Andrew Lunn wrote:
-> On Thu, Jan 15, 2026 at 11:40:38PM +0000, Daniel Golle wrote:
-> > Due to a bug in some PHY internal firmware, manual control as well as
-> > polarity configuration of the PHY LEDs has no effect until a link has
-> > been detected at least once after reset. Apparently the LED control
-> > thread is not started until then.
-> > 
-> > As a workaround, clear the BMCR_ANENABLE bit for 100ms to force the
-> > firmware to start the LED thread, allowing manual LED control and
-> > respecting LED polarity before the first link comes up.
-> > 
-> > In case the legacy default LED configuration is used the bug isn't
-> > visible, so only apply the workaround in case LED configuration is
-> > present in the device tree.
-> 
-> You should consider the case of forced links, where autoneg is
-> disabled. Under such conditions, you should not leave autoneg enabled.
+The probe function of the ftgmac100 is rather complex, due to the way
+it has evolved over time, dealing with poor DT descriptions, and new
+variants of the MAC.
 
-If BMCR_ANENABLE has already been disabled after a reset we can skip
-this workaround entirely, as doing that once for more than 100ms is all
-needed for the LEDs to work properly.
+Make use of DT match data to identify the MAC variant, rather than
+looking at the compatible string all the time.
 
-However, I'm not aware of .config_init ever being run again after the
-intial attachment of the PHY and call to phy_init_hw().
+Make use of devm_ calls to simplify cleanup. This indirectly fixes
+inconsistent goto label names.
 
-All user-defined configuration happens after that, and would then remove
-the BMCR_ANENABLE bit just like it would do it if it was set by the
-hardware after reset.
-(note that BMCR_ANENABLE is set as part of the reset value of BMCR on
-this PHY)
+Always probe the MDIO bus, when it exists. This simplifies the logic a
+bit.
 
-But maybe I'm getting something wrong here?
+Move code into helpers to simply probe.
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+---
+Changes in v2:
+- Add net-next prefix.
+- [08/15] Updated commit message.
+- [04/15] Deleted {}.
+- Link to v1: https://lore.kernel.org/r/20260105-ftgmac-cleanup-v1-0-b68e4a3d8fbe@aspeedtech.com
+
+---
+Andrew Lunn (15):
+      net: ftgmac100: List all compatibles
+      net: ftgmac100: Add match data containing MAC ID
+      net: ftgmac100: Replace all of_device_is_compatible()
+      net: ftgmac100: Use devm_alloc_etherdev()
+      net: ftgmac100: Use devm_request_memory_region/devm_ioremap
+      net: ftgmac100: Use devm_clk_get_enabled
+      net: ftgmac100: Simplify error handling for ftgmac100_initial_mac
+      net: ftgmac100: Move NCSI probe code into a helper
+      net: ftgmac100: Always register the MDIO bus when it exists
+      net: ftgmac100: Simplify legacy MDIO setup
+      net: ftgmac100: Move DT probe into a helper
+      net: ftgmac100: Remove redundant PHY_POLL
+      net: ftgmac100: Simplify error handling for ftgmac100_setup_mdio
+      net: ftgmac100: Simplify condition on HW arbitration
+      net: ftgmac100: Fix wrong netif_napi_del in release
+
+ drivers/net/ethernet/faraday/ftgmac100.c | 305 +++++++++++++++++--------------
+ 1 file changed, 170 insertions(+), 135 deletions(-)
+---
+base-commit: d4596891e72cbf155d61798a81ce9d36b69bfaf4
+change-id: 20251208-ftgmac-cleanup-20b223bf4681
+
+Best regards,
+-- 
+Jacky Chou <jacky_chou@aspeedtech.com>
+
 
