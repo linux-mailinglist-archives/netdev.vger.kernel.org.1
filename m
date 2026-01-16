@@ -1,67 +1,70 @@
-Return-Path: <netdev+bounces-250516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6D5D30CD9
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:02:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA14AD30D05
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:03:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A3E73007F0F
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:02:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D749F302C9E7
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372BF37C11C;
-	Fri, 16 Jan 2026 12:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0E936C5BA;
+	Fri, 16 Jan 2026 12:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P39FDdHK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fmqLL66s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEED41E0DCB
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 12:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCE329C327
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 12:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768564949; cv=none; b=qVoIjrAX74M+CISG91P+TVaWEtrMccMDWRLGDPohcMx769CqGFADkKDUvdjadHTRUAhZWY8ljPxvcVi7DfLOxithzfEt48w0s0fk5DbVTC8r33Aj/XVvOpxcwIZO3p8YJaSMEYsDVbrukkEItGJaqDppAwkQtDVv8mpwXHj01gE=
+	t=1768564997; cv=none; b=gIyPcMh5kxxDkcrQsx2eNyxG/eo/8dCqR5sPtMdlkr6JUyo8Kq5Iy73PK/cwKOBsmRMey5nYoGFxKAWBIrAAujDaiLYcgCP2vXoKOVweBGLVTaG3hYHhGXqns6v3jseAEPqgYfjqPjPq2hzTS0eaANWa+7Z8eZTHCPtJ3CZ1nMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768564949; c=relaxed/simple;
-	bh=X4qf3eU27DL70bv5ck3IOiqNTfvbHsfrTGeivJyJjLw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i0szJnkVhTOrrwVWbwtE7IEMIiyDwRija84dZZes4uinvVQJOYFK+42O9pQjdibfibm6S0NEVl90lNq5HhdSi/9hlIQgeO8hSN/hhREyJO+iMaOiM7x2GGMN855Dqa7lLuFRC5nbPrUFF6rn5Ntbzn8mtBF/lfSD1KweNthCNSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P39FDdHK; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1768564997; c=relaxed/simple;
+	bh=5LSHpYluNT3I38fsGIFTYyyt50V6fFj6n0MDSZ220pY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QnSbBZIWQ3LCq/39AZ+voud20flg1jkZrK1cFMvL/cMM2kC9QiYwzDO1c46nZqyJIOmlK2YLlDiF5Er0qTC7W7rqVnvZeyc1JMNYd3adwoYBTkhJaZSt5BNUGz/dPWKA7Kb865aO0WYM8An+bBoSP0jNVM1zlZp9yXzEchkAQkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fmqLL66s; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768564948; x=1800100948;
+  t=1768564996; x=1800100996;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=X4qf3eU27DL70bv5ck3IOiqNTfvbHsfrTGeivJyJjLw=;
-  b=P39FDdHK9uy+aYxn+QRRNp4ERhdHAzVduofIzebS7RZL8u7lubp3jA3o
-   Zqxvg9Z/aYEFmT3SAw3YWK5ePtOadlJHvzaFaeAsCWxaCEP7bmR9Ncznj
-   s6v7vwoKZD8WlyVi4fZiqY3W14w2Zlh/A+nF+c7I2z1ilUA+5YduS2z2T
-   HW9yrJHZiNT48LRwWFk7dmklqPy4OSKxLDyFaTBSciFn2hWoh5J4hwzgj
-   4H6vICUlc4nVSzfPVGjKt00/cD5E+q3mCbugxL/D5f1A1ModW8068mHaX
-   2thGSu59AtbRcg9GPy83O9DHjsVQGV55VqOY7YsqDhHCX/Vj294HQFuL4
-   g==;
-X-CSE-ConnectionGUID: PY1SkYbiSfSZ20UZgHEkWQ==
-X-CSE-MsgGUID: I3/FYX7XTfikVVWpr1lnsQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="92542189"
+  bh=5LSHpYluNT3I38fsGIFTYyyt50V6fFj6n0MDSZ220pY=;
+  b=fmqLL66s7grakItYQ/3Azfu/J221egMf3NSdL43HOQzBoQZHO7l+V4M2
+   l44FfkDMJEhybh/vjezF+J+bQGWZ9bWy8SavOP66gM3uB/3sJbxSjz7rr
+   s/K2yWzhRW7Zx/MFbdid4twDgVjGUUBcHTaZdG/XhXnR9aPXiIimNWtLt
+   IazxVsG8OYSA7Wx+MK/BQRUpRxeJzFn9LBdLQTT3TvA0kCTriEgqwy4xq
+   U1ln3pxzBtTgNY1iqxFnwhLHGOVr1QNVSdAPe8UQEcCLCndcxM/m52t0k
+   E++UvomHAyXfoFo1Xjb1QF+VR+uG6l/laZ+KwnCAcNdak48dmlXazEoTw
+   A==;
+X-CSE-ConnectionGUID: RP/lO+MIRiuodsuOCkhs7A==
+X-CSE-MsgGUID: uEf9qCDdRDmJP+jWjZExgQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="68888346"
 X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="92542189"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 04:02:27 -0800
-X-CSE-ConnectionGUID: juPtriiURyCn/AgQmw8Oig==
-X-CSE-MsgGUID: CEBJNsVkSFKoNVdzUAb8FQ==
+   d="scan'208";a="68888346"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 04:03:15 -0800
+X-CSE-ConnectionGUID: bXkxxtW9RdmRSUOnJaJnfw==
+X-CSE-MsgGUID: 8OB1lOosT1yxsOeOHZpkfA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="205645881"
+   d="scan'208";a="209721855"
 Received: from amlin-018-252.igk.intel.com ([10.102.18.252])
-  by fmviesa009.fm.intel.com with ESMTP; 16 Jan 2026 04:02:26 -0800
+  by orviesa004.jf.intel.com with ESMTP; 16 Jan 2026 04:03:12 -0800
 From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Subject: [PATCH iwl-next 0/2] ixgbe: e610: add ACI dynamic debug
-Date: Fri, 16 Jan 2026 13:23:06 +0100
-Message-ID: <20260116122306.78200-1-piotr.kwapulinski@intel.com>
+	dan.carpenter@linaro.org,
+	horms@kernel.org,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-next 1/2] ixgbe: e610: add missing endianness conversion
+Date: Fri, 16 Jan 2026 13:23:53 +0100
+Message-ID: <20260116122353.78235-1-piotr.kwapulinski@intel.com>
 X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,38 +74,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enable dynamic debug (dyndbg) of Admin Command Interface (ACI) for e610
-adapter. Utilizes the standard dynamic debug interface. For example to
-enable dyndbg at driver load:
+Fix a possible ACI issue on big-endian platforms.
 
-insmod ixgbe.ko dyndbg='+p'
+Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-ACI debug output for e610 adapter is immediately printed into a kernel
-log (dmesg). Example output:
-
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0701, flags 0x3003, datalen 0x0060, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x8194E044 0x00600000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0: Buffer:
-ixgbe 0000:01:00.0 eth0: 00000000: 01 00 17 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000010: 1d 00 00 00 0b d5 1e 15 5e 4b 90 63 aa 0b 21 31
-ixgbe 0000:01:00.0 eth0: 00000020: 69 eb cd ab dc f8 8a fd f4 53 e2 dc 54 e0 81 fa
-ixgbe 0000:01:00.0 eth0: 00000030: 12 dc 41 82 01 00 00 00 24 20 08 26 53 08 00 00
-ixgbe 0000:01:00.0 eth0: 00000040: 08 00 14 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0009, flags 0x2003, datalen 0x0000, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x00000001 0x00000000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
-
-Piotr Kwapulinski (2):
-  ixgbe: e610: add missing endianness conversion
-  ixgbe: e610: add ACI dynamic debug
-
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 119 ++++++++++++++++--
- 1 file changed, 109 insertions(+), 10 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index c2f8189..f494e90 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -113,7 +113,8 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 
+ 	/* Descriptor is written to specific registers */
+ 	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
+-		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
++		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i),
++				le32_to_cpu(raw_desc[i]));
+ 
+ 	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
+ 	 * PF_HICR_EV
+@@ -145,7 +146,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 	if ((hicr & IXGBE_PF_HICR_SV)) {
+ 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+ 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+-			raw_desc[i] = raw_desc[i];
++			raw_desc[i] = cpu_to_le32(raw_desc[i]);
+ 		}
+ 	}
+ 
+@@ -153,7 +154,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+ 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+ 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+-			raw_desc[i] = raw_desc[i];
++			raw_desc[i] = cpu_to_le32(raw_desc[i]);
+ 		}
+ 	}
+ 
 -- 
 2.47.1
 
