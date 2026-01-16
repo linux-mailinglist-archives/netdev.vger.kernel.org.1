@@ -1,131 +1,92 @@
-Return-Path: <netdev+bounces-250531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE8FD31DB5
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:31:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C1DD31FBF
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 09D8830021D2
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:31:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D3D030A7C34
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63BE23EA86;
-	Fri, 16 Jan 2026 13:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C7E283CA3;
+	Fri, 16 Jan 2026 13:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r37QUx9F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nU5Hai/Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B334A57C9F;
-	Fri, 16 Jan 2026 13:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851CB24677A;
+	Fri, 16 Jan 2026 13:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768570293; cv=none; b=sumtetMWXh+V2M4v6aIsNqMQKIgoa/sYmKSJJewC9uE5vi1uQS4Jh4WvCIuN5VCRynIjahfaOoHnVMNDkVsaAd51AvvpF8qcUzsyiGJqzqZ1PqQRnav2zsIRPrD56O4xCBOTON9wFJqmr+QjLtYI4TCjq//RvjqtCAXdw6OAVKU=
+	t=1768570560; cv=none; b=HDaUcBBNMCVQPvZnqcLTZZCSWh/AWan6gP0E/4Q9ILHNDJyNHZ73390u9lDs3G52SxZ9M/upuFhePsn/Vzx8mDcVa6JZ4ASVTrsjFxFuUsv7Dkf1+jY+4hSk+v0KzsnXF640u4PVtdoN+TDLGnsDmdbjtuk13Nx3Gs6PW/nFZns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768570293; c=relaxed/simple;
-	bh=9Vy/jPify/JousrrmqrdrEGMFOwlyNupmvH1uKH7x20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OGMUIBmcze8lavX46wiJFOtFtbaukhU6nwJREJeel6nRhpahpmul8dM4VKU0SVw9D7ZL+gqVMSie2VdSZswATPtIczL1j+E6fF8i6k/ua7AsiZ5DWjsSyXmb6N0IusG+1gCYVwxLm6BWLXkkkFuDpQN1oB5/GNhkkonbqajPCjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r37QUx9F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE2CC116C6;
-	Fri, 16 Jan 2026 13:31:30 +0000 (UTC)
+	s=arc-20240116; t=1768570560; c=relaxed/simple;
+	bh=SbmtYTTPQ1stPOU3kQK8bglzeiGQlhHbZoKysOoSWF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VArnbv7fVuF71JMsbLHGVI/ALn1fFWMjrM8xUYn7liW7BqiT6KuyzLvLFhv3wbjnC8dK6rmz3ozYSawV460dJf22K1goE5xlgG9AbxemIvJpNyPt8lfpIMPYgtC9du4FdZZ/mebmctZf38AM4z+qG2qBI3Mx01vrw/kkd+t1ico=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nU5Hai/Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD54C116C6;
+	Fri, 16 Jan 2026 13:35:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768570293;
-	bh=9Vy/jPify/JousrrmqrdrEGMFOwlyNupmvH1uKH7x20=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r37QUx9FydQpZGmr1SBo+hN2UscCAB22c2CbRhVkD8Q/S01Ze4u+bNlNEHvH0yY6f
-	 76T0kKuHPIwp8xYXhE1rG/4+xDdGeVPRvf2phvneAbvPfmn9ZsOrBjctW3X5g8Y8Tg
-	 eqiuv9XTLK1u3Cr3m7QMMHws5CJnLik88V0qK1rLi+vSGWFpKgkbQjar943mAdTaog
-	 DZiOUPtmBDzRVIidGFgnGW9B3Ctgj1iQs4/FmTzc43bGy5f0bUHx5TvuT3C5C60qA+
-	 Rv8wuvvsuRyJYHk991ElBLoGVEvele/TSnCkTHFDzC3yOD81515qDchRzem36Sbbqu
-	 ywaaYwuvW01VA==
-Message-ID: <878bf70f-a5d5-4120-ad0a-9282478ffaeb@kernel.org>
-Date: Fri, 16 Jan 2026 14:31:29 +0100
+	s=k20201202; t=1768570560;
+	bh=SbmtYTTPQ1stPOU3kQK8bglzeiGQlhHbZoKysOoSWF8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nU5Hai/Zqwz8OuaOlWqis7wP08oXFN6dweFexYfMkjFR/zgPgq7VtwA1qdesVYdlp
+	 VsbGSX5hxNSw5wsbixlBPX/2lXn7pt52P1v6B2bhCyGU9sh1UpYooM5nBU2bFH2FBf
+	 1Lf6WYe9f1MStz+LM6b0WwWlzkxe6dfRHOtVk0mBksL33Eye6X+wiT3YoI1TmL/LR2
+	 e4Dfiv9V/dro1h3NWq+7esw6o8FCW+J5UCqnQovAWttkBW9KuOiEV8u+AqxODR/RGf
+	 O60igZnn3mk/DeliopX0pRPnw8Lfjlq2kqONODYmbQObw2QOKfDSdxNNb00RilcyHC
+	 2Ik2aGk3+962A==
+Date: Fri, 16 Jan 2026 13:35:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mark Bloch <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Shahar Shitrit <shshitrit@nvidia.com>
+Subject: Re: [PATCH net-next V2] docs: tls: Enhance TLS resync async process
+ documentation
+Message-ID: <aWo-unS9rhzTfzLU@horms.kernel.org>
+References: <1768298883-1602599-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons
- for monitoring
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, carges@cloudflare.com,
- kernel-team@cloudflare.com, Alexei Starovoitov <ast@kernel.org>,
- Yan Zhai <yan@cloudflare.com>
-References: <176847978787.939583.16722243649193888625.stgit@firesoul>
- <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org> <87ms2dzutr.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87ms2dzutr.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1768298883-1602599-1-git-send-email-tariqt@nvidia.com>
 
-
-
-On 16/01/2026 12.00, Toke Høiland-Jørgensen wrote:
-> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+On Tue, Jan 13, 2026 at 12:08:03PM +0200, Tariq Toukan wrote:
+> From: Shahar Shitrit <shshitrit@nvidia.com>
 > 
->> Hi Eric,
->>
->> I need an opinion on naming for drop_reasons below.
->>
->> On 15/01/2026 13.23, Jesper Dangaard Brouer wrote:
->>> Add specific drop reasons to SFQ qdisc to improve packet drop observability
->>> and monitoring capabilities. This change replaces generic qdisc_drop()
->>> calls with qdisc_drop_reason() to provide granular metrics about different
->>> drop scenarios in production environments.
->>>
->>> Two new drop reasons are introduced:
->>>
->>> - SKB_DROP_REASON_QDISC_MAXFLOWS: Used when a new flow cannot be created
->>>     because the maximum number of flows (flows parameter) has been
->>>     reached and no free flow slots are available.
->>>
->>> - SKB_DROP_REASON_QDISC_MAXDEPTH: Used when a flow's queue length exceeds
->>>     the per-flow depth limit (depth parameter), triggering either tail drop
->>>     or head drop depending on headdrop configuration.
->>
->> I noticed commit 5765c7f6e317 ("net_sched: sch_fq: add three
->> drop_reason") (Author: Eric Dumazet).
->>
->>    SKB_DROP_REASON_FQ_BAND_LIMIT: Per-band packet limit exceeded
->>    SKB_DROP_REASON_FQ_HORIZON_LIMIT: Packet timestamp too far in future
->>    SKB_DROP_REASON_FQ_FLOW_LIMIT: Per-flow packet limit exceeded
->>
->> Should I/we make SKB_DROP_REASON_QDISC_MAXDEPTH specific for SFQ ?
->> Like naming it = SKB_DROP_REASON_SFQ_MAXDEPTH ?
->>
->> Currently SKB_DROP_REASON_QDISC_MAXDEPTH is only used in SFQ, but it
->> might be usable in other qdisc as well.  Except that I noticed the
->> meaning of SKB_DROP_REASON_FQ_FLOW_LIMIT which is basically the same.
->> This made me think that perhaps I should also make it qdisc specific.
->> I'm considering adding a per-flow limit to fq_codel as I'm seeing prod
->> issues with the global 10240 packet limit. This also need a similar flow
->> depth limit drop reason. I'm undecided which way to go, please advice.
+> Expand the tls-offload.rst documentation to provide a more detailed
+> explanation of the asynchronous resync process, including the role
+> of struct tls_offload_resync_async in managing resync requests on
+> the kernel side.
 > 
-> IMO, we should be reusing drop reasons where it makes sense (so
-> s/FQ/QDISC/ SKB_DROP_REASON_FQ_FLOW_LIMIT), but not sure if these are
-> considered UAPI (i.e., can we change the name of the existing one)?
+> Also, add documentation for helper functions
+> tls_offload_rx_resync_async_request_start/ _end/ _cancel.
 > 
+> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  Documentation/networking/tls-offload.rst | 30 ++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> V2:
+> - Fix style issues.
 
-The UAPI definition for SKB_DROP_REASON's is interesting. In this patch
-(and Eric's commit) we insert in the middle of enum skb_drop_reason (on
-purpose), this shows the enum numbers are not UAPI.  This is because we
-want to force users to use BTF info in running kernel to resolve these IDs.
-The resolved name are IMHO UAPI as e.g. our Rust code (Cc Yan) match on
-these names and configures different sampling rates. So, changing name
-SKB_DROP_REASON_FQ_FLOW_LIMIT have the change of breaking some userspace
-tool consuming these.
+Thanks for the update.
 
-Production wise, it would be easier to have SKB_DROP_REASON_SFQ_MAXDEPTH
-and SKB_DROP_REASON_FQ_FLOW_LIMIT separate as the qdisc is part of the
-name.  Then our Rust code don't have to also decode the net_device to
-identify the qdisc involved.
-
---Jesper
+Reviewed-by: Simon Horman <horms@kernel.org>
 
