@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-250408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6BFD2A711
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:58:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 359FED2A726
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:59:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AD23301AD1E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:58:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76100301B2D8
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB34827B4F5;
-	Fri, 16 Jan 2026 02:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ABF02FE560;
+	Fri, 16 Jan 2026 02:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dnytLdQm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FdOT9TPH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D0E1F7916;
-	Fri, 16 Jan 2026 02:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F401F7916;
+	Fri, 16 Jan 2026 02:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768532332; cv=none; b=aWQdZCPwl/HRy7WtyEC856EK1FjGA9aFF1quwZJYieSTLLR6hgjegK5d+UvN1sTjln5t04slHEXQym4Ao/hjBJ36d3Y0j9Y9e2zMamNrH25ujBi0PYfBy5phKvTHPfNAAx2zFh/6bBOWQfvJ12kPaw1SDy7nQhGD3rKpaf2BDe8=
+	t=1768532335; cv=none; b=jhYguVe3TB8fDTlmWbWHJS4WME3ywsZYUH61sMtffs7BAAE6TIYl/H24Br3Kg185j/uGUw9xNQkzZsQDNRyIbARpbrCAakSd770gDVfXMVrdLZz79YlCF+7SpV2pwH+WF8ZsIkwUofRDL5ZJKSaah3/eIWRH1CKCp8m4BREcK5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768532332; c=relaxed/simple;
-	bh=Z8pz7s7wIhRbbyi0eFN+WPj/og6acecvdgN9FzzA8w4=;
+	s=arc-20240116; t=1768532335; c=relaxed/simple;
+	bh=J/VRZLz5Y13tzcUGlFZbC7tPCdmM0aLjt2QZN4qLbrg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kirc3xDuaY/RMpnaxAEtkjn0PLlk3V9HyzFeCROwS4H/NFnRQY0o1AH+vtMt70sGTzKdc+/JXaqFHg2Sg3tQvWiPWR0YZ28j97V3MF4fnk1dOBO08MjG+JpgcQQaqNmsLb4LOiJz9EfcXMslFQo03DaLJOzmg4K/Klai1XNEdnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dnytLdQm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5783DC116D0;
-	Fri, 16 Jan 2026 02:58:51 +0000 (UTC)
+	 MIME-Version; b=IQC5hvIFEEWovGwz1P3OfhzUlQk3h1NQT3FtK7M128++7DMwjPjL/aNDKBFFi5UjyJTg5Gtp63JkPN2zNL8+tIUlA5Z69pXF3naU7NIaG+uoTZs0Lut9p+tDhet7OF4t2Tul25xmpdLr0s+CtX4N4RMm/HWeC4pMQDdmJG3uilA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FdOT9TPH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4182C116D0;
+	Fri, 16 Jan 2026 02:58:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768532332;
-	bh=Z8pz7s7wIhRbbyi0eFN+WPj/og6acecvdgN9FzzA8w4=;
+	s=k20201202; t=1768532334;
+	bh=J/VRZLz5Y13tzcUGlFZbC7tPCdmM0aLjt2QZN4qLbrg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dnytLdQmwn45B3ZBFM/hT5sAyAKdFL8cS0MtmDxP7MsiosPTNfXT0MpvAg4XUmPR1
-	 9ilmf53jlm8YkeMW8Jc00GdC18E/n5VkbyRY35TuR4ZFW3xHmu5MqZhldWLAs9WUSK
-	 /f4lxWwLUTm3EtNqbHTGJ6xq8H/Hbkzv9EYuOXM3dRA+y+BjroCeUguepRPNbHs5bW
-	 HWXDCT8AAsaXSVsydq/roIP7T+Q4pURm9S1g6LaAWJgEtkvJTHu51+NaeveREFBpMY
-	 X9nW+jIvyV1Fwhk/5S6JbWK4h0Vdq7ghGQqgKK9I+Xsmal+MWtXHfobV8mowfGNh2C
-	 Fbshsj4QJPOxg==
+	b=FdOT9TPHU+LhbSrLGTtlmmXFRb1e6bgdCDXom0+7F83Nhzdx6GFQHbHoylT0WRGhY
+	 3vMt2nNaJi45xR+kJ2+XJtImNvh78p9oakYeN86wlMKpA7MvPvL4uo+5mrEJhJ6Lul
+	 /OUfOOLRHeEZZgXKS1wojHxAezR6vin9l7vDm6r693cNm9+oUpKs2qUO5/8pjyJkyK
+	 rTHvDrxtGqo9p/M3HlKefCnRkiqpfb8QFjA08pSNQ+aDQKMTmKqjdYN731LjtAe09N
+	 f8rpw+Bqo1v9arayO+ZjUyuMTbvS3iKqICfyMJXr6Jz6m4NZmOrUnfR8ffVqWuQ6oY
+	 zkDxxmGBLUocQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: rmk+kernel@armlinux.org.uk
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	mcoquelin.stm32@gmail.com,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Date: Thu, 15 Jan 2026 18:57:24 -0800
-Message-ID: <20260116025723.354031-2-kuba@kernel.org>
+Subject: Re: [net-next,12/14] net: stmmac: add support for reading inband SGMII status
+Date: Thu, 15 Jan 2026 18:58:52 -0800
+Message-ID: <20260116025852.354716-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <E1vg4w2-00000003SG5-2FH5@rmk-PC.armlinux.org.uk>
-References: <E1vg4w2-00000003SG5-2FH5@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vg4wc-00000003SGl-1dZi@rmk-PC.armlinux.org.uk>
+References: <E1vg4wc-00000003SGl-1dZi@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,88 +73,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I haven't investigated too closely if this is legit or too defensive
-TBH but since I'm sending the second one I'll include this as well..
-
-This is an AI-generated review of your patch.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: stmmac: add stmmac core serdes support
+net: stmmac: add support for reading inband SGMII status
 
-This commit adds SerDes PHY support to the stmmac core driver, moving it
-from platform glue into the integrated PCS driver. The serdes field in
-platform data is optional and NULL when not provided by platforms.
+This commit adds support for reading link status, speed, and duplex for
+SGMII links from the RGSMII status register.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 24a2555ca329..6c515f9efbe7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+> index 73fc56ce5e55..12fc5038d913 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
 
 [ ... ]
 
-> @@ -3549,12 +3550,16 @@ static void stmmac_safety_feat_configuration(struct stmmac_priv *priv)
->
->  static void stmmac_clk_rx_i_require(struct stmmac_priv *priv)
+> @@ -97,7 +107,7 @@ static void dwmac_integrated_pcs_get_state(struct phylink_pcs *pcs,
+>  					   struct phylink_link_state *state)
 >  {
-> +	dwmac_serdes_power_on(priv);
-> +	/* Only sets the SerDes mode if it wasn't already configured. */
-> +	dwmac_serdes_init_mode(priv, priv->plat->phy_interface);
+>  	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
+> -	u32 status, lpa;
+> +	u32 status, lpa, rgsmii;
+>
+>  	status = readl(spcs->base + GMAC_AN_STATUS);
+>
+> @@ -111,7 +121,35 @@ static void dwmac_integrated_pcs_get_state(struct phylink_pcs *pcs,
+>
+>  		phylink_mii_c22_pcs_decode_state(state, neg_mode, status, lpa);
+>  	} else {
+> -		state->link = false;
+> +		rgsmii = field_get(spcs->rgsmii_status_mask,
+> +				   readl(spcs->rgsmii));
+> +		state->link = !!(status & GMAC_RGSMIII_LNKSTS);
+                            ^^^^^^
 
-When priv->plat->serdes is NULL, dwmac_serdes_init_mode() will call
-phy_get_mode(NULL). Unlike other phy_* functions (phy_power_on,
-phy_power_off, phy_set_mode_ext, phy_init, phy_exit) which handle NULL
-by returning early, phy_get_mode() is an inline that directly
-dereferences the pointer:
+Should this be checking rgsmii instead of status here? The status
+variable contains the GMAC_AN_STATUS register which is equivalent to
+MII_BMSR according to the comment at line 7. In BMSR, the link status
+bit is BMSR_LSTATUS (bit 2), not bit 3.
 
-    static inline enum phy_mode phy_get_mode(struct phy *phy)
-    {
-        return phy->attrs.mode;
-    }
+GMAC_RGSMIII_LNKSTS is defined as BIT(3), which is the correct bit
+position for the RGSMII status register (matching GMAC_RGSMIIIS_LNKSTS
+in dwmac1000.h), but it appears to be applied to the wrong register
+variable.
 
-Can this NULL pointer dereference occur when a platform does not
-populate plat->serdes? The call path stmmac_open() -> dwmac_serdes_init()
-returns 0 (success) when serdes is NULL, allowing __stmmac_open() ->
-stmmac_hw_setup() -> stmmac_clk_rx_i_require() to proceed.
+The code later uses rgsmii correctly for speed and duplex extraction.
+Was the intent to use rgsmii for the link status check as well?
 
-> +	phylink_rx_clk_stop_block(priv->phylink);
->  }
+> +
+> +		if (state->link && neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
 
 [ ... ]
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-> new file mode 100644
-> index 000000000000..3003e1ae38d2
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-
-[ ... ]
-
-> +int dwmac_serdes_init(struct stmmac_priv *priv)
-> +{
-> +	size_t i;
-> +	int ret;
-> +
-> +	if (!priv->plat->serdes)
-> +		return 0;
-
-This returns success when serdes is NULL...
-
-[ ... ]
-
-> +int dwmac_serdes_init_mode(struct stmmac_priv *priv, phy_interface_t interface)
-> +{
-> +	struct phy *serdes = priv->plat->serdes;
-> +
-> +	if (phy_get_mode(serdes) == PHY_MODE_ETHERNET)
-                         ^^^^^^
-
-...but dwmac_serdes_init_mode() has no NULL check before calling
-phy_get_mode(), which will crash when serdes is NULL. Should this
-function also check for NULL serdes before calling phy_get_mode()?
-
-> +		return 0;
-> +
-> +	return dwmac_serdes_set_mode(priv, interface);
-> +}
 
