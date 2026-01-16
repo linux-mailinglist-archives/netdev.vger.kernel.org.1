@@ -1,468 +1,208 @@
-Return-Path: <netdev+bounces-250649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C68FD3877B
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:26:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B3ED3880D
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:57:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 10E9D30072A0
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:26:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 96CF230178CD
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEE0366DB5;
-	Fri, 16 Jan 2026 20:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20592F5473;
+	Fri, 16 Jan 2026 20:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E2ReKfYW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PCfHEObY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F3218E1F
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 20:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768595217; cv=fail; b=EUbzfTn3G/pTN7LYFS8g+SEF3dPBB87dWf3iaJ+vsH45GpWTow081usBoMA8QXSjlfo32GrmH3WJn8KCmBBG4yUhgDprEXWu7fLj9S+Dm6u5nlEEFP2MlBSVVplYmfu/aChIyTKqdRWJxC81PGx7BH5LDMZ2dnRKaboE3J3w8CI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768595217; c=relaxed/simple;
-	bh=QHNo1oON0AVykyqnySAdggvv0Rgi31iYXr+0pu9R8v4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cg8DWg0U8iZ5rtIkN7lbQWbE+K1QWeZFPE6FhFURcGATvuEqZX8NNWE603+5pRfLqdzp+ZoifhEw3hbKGKvxHhDYd1At+IbsufXdF1r+algtaHop+r3sQ2DOYYUxnF2mzM40siUGdJRkhan1VqgiXhSjKUq4TTmJdRZhFK5dkLk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E2ReKfYW; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768595214; x=1800131214;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=QHNo1oON0AVykyqnySAdggvv0Rgi31iYXr+0pu9R8v4=;
-  b=E2ReKfYWochcqlmuiew011XVWHyCvLFmQK62E+A8UUz6zNPP6BVmPgvc
-   Gq5YcYpjoNg2VF+u59YMaKoxvhhysCtyQwz5Ghxd+IHwT2O+90gHMj0CX
-   U1GNDaK9FFKXNcV6ujYIxYUv10eogrEfnUVz1Ss9pbiRk7y9jl6cSvDXi
-   ooqx/bIX6kG8Oyg8L2GXRmmHLn8Qx6unwXBAcCfeGcIZQss1HZlTOdYzV
-   +/3KjlzcYvQAtzfk1i1z2OUymPeEZDsl4fQBX4vxWSBb0tpypDUc04cT6
-   L23jC8JtwAOn2BJ96dfJ8cvSk6iTD2mzBSTJD2RJU0zV9M5CQtBxtz+Ed
-   w==;
-X-CSE-ConnectionGUID: 4tAxnYJ3RPCt4r2Nr0nI5A==
-X-CSE-MsgGUID: pAcuTEFaTNW9cLSotnVP2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="72501275"
-X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="72501275"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 12:26:54 -0800
-X-CSE-ConnectionGUID: 26dZvuMrTR6STiKLhd8PlA==
-X-CSE-MsgGUID: J4mahC57Tb2oMKkirKJ2HA==
-X-ExtLoop1: 1
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 12:26:53 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 16 Jan 2026 12:26:52 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Fri, 16 Jan 2026 12:26:52 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.25) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Fri, 16 Jan 2026 12:26:52 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oKJI7BPcnKp/aMtzBy8UpxSKXvyZBlQBy+9t+g7fxGgvuET7IaUuR+j1F9U+vFPYfC7e2p6Gq+ZxIRUc7Y0SY+rw1uqp5R/PdPwtzJZpmLw25a4dRL8mvIsBSV8luMQ0SdxcJobUPBkx8rGkGSY4VM5R/w8AEL+T2E9SvEsxe3BlD6pIJG5liCHoah41DHYIYjKsx5FPBXVFt0W4/8E5QgMkG/Cpxj9h2EenwqztGbCAzpxP9+JEOb5SIPEIg5OmeWgmlc81Je+hsJyPg5vrazVIxiMvTkUnxbZ1HVtOIxeb+Krrgm4GfsZIDW5uKcyIa660YnyuydYiMWfnlYE94Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gqY/+rJNH/FgnMDKu6pets/YSii/fvnt07KDjQeJuFQ=;
- b=FvB4UdW1fMqXyX9ebIoUbCg3dkNqrAjrqwu3N9VQ1nSIhjWzDvaptejM+WqxQWCJ0fVsRGgLMO17Q5GF9ZNCp669FbBy15Nd0oP54KkJ3XoFAiQqTxbWqp/YGoyz4VPgubjt9VX23DVAWIqMLOcAKrYn2N6qY/RLBMDudeKNctnm3DGL7mUcrqQEwEdAcRBglB/irISg1vFNwKLUdxK3H0bSs+vCZUI/0GFeYNGUUp9Ri7ISeduqZfKxDVbobuFzfUVrMXyboiK5qlN+vJmF2RqfmPrugXysWLndFOSSXrjayVNQDckhXqNTHiKKNBa41VUjrSXwfN1TaVuAETTT+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYYPR11MB8430.namprd11.prod.outlook.com (2603:10b6:930:c6::19)
- by LV4PR11MB9465.namprd11.prod.outlook.com (2603:10b6:408:2da::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Fri, 16 Jan
- 2026 20:26:45 +0000
-Received: from CYYPR11MB8430.namprd11.prod.outlook.com
- ([fe80::1d86:a34:519a:3b0d]) by CYYPR11MB8430.namprd11.prod.outlook.com
- ([fe80::1d86:a34:519a:3b0d%5]) with mapi id 15.20.9520.005; Fri, 16 Jan 2026
- 20:26:45 +0000
-Date: Fri, 16 Jan 2026 15:26:38 -0500
-From: Rodrigo Vivi <rodrigo.vivi@intel.com>
-To: Riana Tauro <riana.tauro@intel.com>
-CC: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>, Jakub Kicinski
-	<kuba@kernel.org>, <intel-xe@lists.freedesktop.org>,
-	<dri-devel@lists.freedesktop.org>, <aravind.iddamsetty@linux.intel.com>,
-	<anshuman.gupta@intel.com>, <joonas.lahtinen@linux.intel.com>,
-	<lukas@wunner.de>, <simona.vetter@ffwll.ch>, <airlied@gmail.com>,
-	<pratik.bari@intel.com>, <joshua.santosh.ranjan@intel.com>,
-	<ashwin.kumar.kulkarni@intel.com>, <shubham.kumar@intel.com>, Lijo Lazar
-	<lijo.lazar@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>, "David S.
- Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, <netdev@vger.kernel.org>, Jeff Hugo
-	<jeff.hugo@oss.qualcomm.com>
-Subject: Re: [PATCH v3 1/4] drm/ras: Introduce the DRM RAS infrastructure
- over generic netlink
-Message-ID: <aWqe_ulADqRZBQj_@intel.com>
-References: <20251205083934.3602030-6-riana.tauro@intel.com>
- <20251205083934.3602030-7-riana.tauro@intel.com>
- <aTiWNkGmwFsxY-iO@intel.com>
- <b986eb03-0887-4eb2-a7a7-50ef63e51096@oss.qualcomm.com>
- <aWFruAO06O93ADjU@intel.com>
- <19fd4d44-b7d6-4bc2-9255-3d5159ec1435@intel.com>
- <919c0b7e-83d7-45e8-ae96-d9fb7a10995c@oss.qualcomm.com>
- <3297a59b-a788-43aa-945d-e89592c9ba8d@intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3297a59b-a788-43aa-945d-e89592c9ba8d@intel.com>
-X-ClientProxiedBy: SJ0PR03CA0079.namprd03.prod.outlook.com
- (2603:10b6:a03:331::24) To CYYPR11MB8430.namprd11.prod.outlook.com
- (2603:10b6:930:c6::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811372D595B;
+	Fri, 16 Jan 2026 20:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768597046; cv=none; b=qQ4uowLrpqmJW5QC5MGitDnfvb9wbp7GPJUhumeAwi0XizPlo2Rc0Pb5ChXUdKUl11L6md1P+VyJvkQXxpTSDIHCmtCyBCHRr46iRcdE7hn4UEpIXoJ0ghUXC3gLPmqFKYF6pbXNK2UjIFKBTWvbsI/e6N6qEXqa+JSCwMUeDoM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768597046; c=relaxed/simple;
+	bh=XjTbnFZ/JDpcBcLK9JCRWNTy3RKDzfxWZAdFywPAsCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=euyrYyz7SbaM9Fdo1+pJ8RC8RorN+viKaqylAfr/uVYC+75C2wCk2FQuhregH8o6i31djwFlQmuVcN6e0LSWFfkz1QK7nuZ+ixhChXvgg8rucQOQGC4bIkhNE86lXtPgTs+I8I/9DfBfxwSJm4bIWZ5kBktbOM2TNlwOzPksxJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PCfHEObY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=54KFRrcEl1B0WjUdaGaFEHLkeLCSytYhQsdlx+jeMds=; b=PCfHEObYDtoy9FGBFKLOvCGSZ4
+	s713vwKEJCVHDNFif/2c7SemENeLq34W4Lf9l0j7m79bYRwIf/nC9I8vFINXcHRYLzTDxnzxLij0p
+	AwwYLcqo/OZHr+tJrB68RTMp/S/ygKnBhTPWoQ/G34FIwFtzmwV7ALsENs+DlxZ7G1KVPmjR69oj3
+	JBLW2lp/B9eD3b+SUOSgfRCZSotA4jdhEco1pD1K/3ZXyMy407wpdy1aOgx+ExlPJPYG2kbv1wo/k
+	8LRtbbx6PSA7U5hQvYdPIqdGljIcpu+Hft90cAyvrdG43bTl5KIxODVHiIJxKsSB625yAJN2l7Xha
+	TMW5wlFA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33254)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vgqsY-000000002iR-47Ya;
+	Fri, 16 Jan 2026 20:57:11 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vgqsT-000000003vq-3ny9;
+	Fri, 16 Jan 2026 20:57:05 +0000
+Date: Fri, 16 Jan 2026 20:57:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Tao Wang <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
+ resume
+Message-ID: <aWqmIRFsHkQKkXF-@shell.armlinux.org.uk>
+References: <20260115070853.116260-1-tao03.wang@horizon.auto>
+ <aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
+ <aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
+ <6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
+ <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
+ <aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
+ <aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
+ <aWp-lDunV9URYNRL@shell.armlinux.org.uk>
+ <3a93c79e-f755-4642-a3b0-1cce7d0ea0ef@bootlin.com>
+ <aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYYPR11MB8430:EE_|LV4PR11MB9465:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3b4e48a8-1df3-4b07-7967-08de553d9123
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?N9el2AuowSOeEyPjij3kZf00YNGYyOxZlmuT1XwV7Xjf46jhyxtO7I+82u?=
- =?iso-8859-1?Q?CHr0n/qpz3aywWCFt14NbwyR1zanzvHRNvHYGkX3LYcnPm7ptYzbxWpIfn?=
- =?iso-8859-1?Q?m6BruddAi14VBfkxcardqcKkZsIUnn6sR/YggHP5wEoxGOFw/mLkdJ7TjX?=
- =?iso-8859-1?Q?VNEfdh+jFHcDMwEsIA5yL5XqpsUWw/Vq98EgqTgTMIBSdpf7FSNgwf9pwX?=
- =?iso-8859-1?Q?RfPyLkmSNvzI5pqE4k44ZfLDnHflh1d0Q3XZy2V4UygFM4RBUFrEdfwB4s?=
- =?iso-8859-1?Q?1VTMapi97P3m5ZGpJpz8MI6Pi/xV8jP8pFNfbhWG826rQQlMge9om88Ro9?=
- =?iso-8859-1?Q?pBplxsBGazO2Re2l557eAOQYxxHcUq+Q+D7Rd1eYlE651KS1dqZB17GxER?=
- =?iso-8859-1?Q?9uo7q2ba7GM9Uj2a0ZoNbdRf7Oa9KnB3QxHb/b0SgX0DwJAEc8pJWuPakO?=
- =?iso-8859-1?Q?bPqi4izVLNOSfUzgQP+uu3mqKA3k418Gdngu7nN/th9KLiTjeN6AwxEqk9?=
- =?iso-8859-1?Q?Yf8vehndgUp9nc0BWJmyCL9iFS843G50AlPHLzLEMYLeXDrZvG5/B+6/gV?=
- =?iso-8859-1?Q?LP6IndnOpyKH7IIbQc6KUR37HKjhja/jky3l6V3X+YoLmhPwhziuAN1zVu?=
- =?iso-8859-1?Q?bUTaVnkxmcx/vHImP1LncHP+mbNCs69lD9Et7M6Ul8RhH9KImqaUXyg+rg?=
- =?iso-8859-1?Q?H4XSCRBPxaxWqw7TK5/d7jHIqI2rd6dj6LPhNpLxp82d26ac6FgWw0rwmi?=
- =?iso-8859-1?Q?8yMF+PONE51vNlco8J7Zd+2W+S5L3iS1NZg9oC03vm0wrYH3vPSG32dPlf?=
- =?iso-8859-1?Q?o45Aj80VHyZr0hCR9H+MauCISn/KRZblbina25E1cwMZWH7PQ3g/p2FP+Y?=
- =?iso-8859-1?Q?fQ7wDs5L1Xy1MN9EnqSDYvoyhrHW+qFEL3u7E/sdwT/Qw/1mHGCD1YuGnh?=
- =?iso-8859-1?Q?4rsveWL9TqqX26h56jv996pmVDzCUiBXPxGzz8Lx9grIiBfRvPQK8TT3KU?=
- =?iso-8859-1?Q?uhLcoKvR4MXX1Cu0fBG63cgyXs1JNL1LM5VTNKG/TdW9aA7ltOD/bhKdIV?=
- =?iso-8859-1?Q?XbV8C1y4JnEi4v52UdtqGWYS1bbTF9xLTaKcPn2TsMexQbArp/lSjV2KdS?=
- =?iso-8859-1?Q?Wde3N0ZeJT0BzjBKnwDxZuBQJfs9akrDOT7yPZwGe/vAOXFHjCET2QcoJF?=
- =?iso-8859-1?Q?HmMNpjG0ZV1RQddyi99bb2gEpwd2Ew3JO6vUV5SdGv9BbmDSBtAXKoIBO0?=
- =?iso-8859-1?Q?zv8k4BN9kAMSoKKTup9mr9R1EtHhiRSYse58l73qdsO1YX9T/7SzYzpM26?=
- =?iso-8859-1?Q?RGbYxIIodiAWbox49A0jSZMFUt2z6XmdlVvmS/af0w4n3TX1b3yiCq7ELh?=
- =?iso-8859-1?Q?MxqoH6joxqJ3A7vEZA0VGwFHCBdewqDRSzE+qIdxVPPXrqHlbj23g40enC?=
- =?iso-8859-1?Q?XgOtMzX97lpRzYJ5QNazJ81F+XqjIgaIOT2z4gaA8gNXMw7fPJCYJLz/IX?=
- =?iso-8859-1?Q?A41HTt95hg6cNHqxOGqMBw4+JIEoXJeBCFBkN+7NFMY+e+GHF0T2ykkJ6z?=
- =?iso-8859-1?Q?H8j81MAledc8lfae+7ieHoOI2n9ugZD3xAzYO/l3m4Nc4VWUsfPCKBSaOO?=
- =?iso-8859-1?Q?cwvU6/reSPgFo=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8430.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?8SFnfBYF2gobvTrAMA0TmcJu36vOBn5knhz5EP2sH6ES9ZBHFKGQ0fulSI?=
- =?iso-8859-1?Q?cY4Y0Y9LUQUc1ZTqqt14pE1eF7k8lEC8Uqxf9bhNbDNowMr/+V2NIJ390X?=
- =?iso-8859-1?Q?7epSYH9fLQ13fwDbkBI1ge/Dc4sjErrGD8SQLeBF1VS5VnpOAIwCdNSMte?=
- =?iso-8859-1?Q?wG4fteB0dJpT5KtaUNjzMQmhIVmyk52gN2hfH8E1w+8104rnF0gKaLE+Vo?=
- =?iso-8859-1?Q?eK4AGzPhPwQKPnAP6M4Zg2YDZmFayM+REL2oJJPVweo8UqRRfRA8WJNpbi?=
- =?iso-8859-1?Q?x/7AflAgg+vBEcCX5/iMyg/BTXB5p2iOFW88On1r3Rb3RtgBJarvyCaCtG?=
- =?iso-8859-1?Q?uAgMv3xGFsyE0pBLBrBdNqmO4luxrjZw53H4KHx3/834jHXkb/hpv5vtKt?=
- =?iso-8859-1?Q?bSKQJkmD7W05KfGgbGdNOkA2k+8lJ6URrWixftd4OBaV6Pzdixmu+kyI7+?=
- =?iso-8859-1?Q?dnQ2rvn8LG2uIDd9j83Vjf6ngQ5UYr1N4Z/dBn+bSO2D3fF0CNGTroN3j/?=
- =?iso-8859-1?Q?6dxq3IyC229mJEeem6Rf79vUPeiRd+6lhiKE5lVfg/qdhU1OFUHSS9Y64b?=
- =?iso-8859-1?Q?9hMy7e5iCA55D04HkOG760f/oteJGjfm/rsdtI9sqO1lgeA8r0Gt9VaDlD?=
- =?iso-8859-1?Q?iMlKk2LFpNZSk4jPGvfwrvvc/DridPDtfo9r+3DtYiDg0+2fzGnmnV2LzM?=
- =?iso-8859-1?Q?L8yusjZrroFV6pMHq26hXGMYVsbAB4v+I1/2HN6q+55eMYWsmx4DnaFEKU?=
- =?iso-8859-1?Q?065/IzdeLlbmBGqphPPlgDbYTo5rGj4oN4Sr2HqJENjEzB9EXGELmK/RPt?=
- =?iso-8859-1?Q?pydab2/zGymMLhBZy8TXAP7IHZ1C9k5yUXEc7U77fTzRG8dXH/yObu2DRk?=
- =?iso-8859-1?Q?gxGMZBRl+D5BCg1JVJonyJdCCCksHC4Y5IDyAmgtaBBMvQk69icBrexSSu?=
- =?iso-8859-1?Q?6LvL9iSriIBQiUI5S2zeOOzO8oVHtthgYOPGVhHoF2t1l/XcsJn4jop4xu?=
- =?iso-8859-1?Q?/XUJMDO5S7xUfRaxF71tXNsiteXeEBQ7ovrmcacV6aboVXd+4FspqJYCMO?=
- =?iso-8859-1?Q?NcrP2jWWsApEJ3nEEwW0cpV/iDCX1H3EWeQYWDWPvmQFLH7z+9oo7hbGDc?=
- =?iso-8859-1?Q?S8aWT0hwBMO/PmlEV5ajot0cHHrgOur2RA93IZxH4SUmX9Qu3baGBgtkh+?=
- =?iso-8859-1?Q?vg6uT9gH9uBRat8v4jMo4CTzpvWl+pathb4L973S4CkrDMvxeftCOGa6KH?=
- =?iso-8859-1?Q?8PnM5aSqxGfaKrxOn/hF1IGwgjzvIR1pIfj0jiEXU54mmN6iztK+3zYemB?=
- =?iso-8859-1?Q?CFTjbYPiv1WlRmnPXl3wSEecjsbhYGek1OTDgXjha9O7ufIiifYWGncH0E?=
- =?iso-8859-1?Q?59Svi5SZsvZoc84DkuUiahX+JLh9No0Ljnxl+aRJty6NOCsjOCAQPelBMr?=
- =?iso-8859-1?Q?/I9dSN8oje/ATgZ2lWHTeSxOsfR4o5K0Ybte7OiWaoe7JNMQyymbVoCII2?=
- =?iso-8859-1?Q?sCQsgG00q7s3H0gZQeOPH3ig2PpSGhfcuezBrg6IjSJ/1Mg5T3lT6Wy0st?=
- =?iso-8859-1?Q?fPq2fegrx8DircD+aSykwmeMSbgeEp2gTaXjbvOkwzi4z1HUO/IeAnKEYG?=
- =?iso-8859-1?Q?ypq94ZLNU2S3Ql0ZSu6R/SL3OoSgVc29Dx2gQGaxaxzMUya4EHRsztR5o0?=
- =?iso-8859-1?Q?YN34l9aADMIdL1OFeu/sa3us+q5mbSqnwEuNDAQIM6A4UAWY37VQ1Z7CSe?=
- =?iso-8859-1?Q?DSwD6HXWn9/DZYRVDUyHZDLghQntQKMZGfpUzSyMe9k2P2LDJjLeGvQD85?=
- =?iso-8859-1?Q?2k4NeQZ68w=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b4e48a8-1df3-4b07-7967-08de553d9123
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8430.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2026 20:26:45.2680
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l/VebNPxmpyk8L1IjEdTyQHkatUsO8mnYB6JJY+PdaA6SQudQV3wDtym3fXUeEaXHkJMkQrJcThmfpFWBLPOuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR11MB9465
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Jan 16, 2026 at 11:26:36AM +0530, Riana Tauro wrote:
+On Fri, Jan 16, 2026 at 07:22:39PM +0000, Russell King (Oracle) wrote:
+> Yes, because the receive DMA has stopped, which makes the FIFO between
+> the MAC and MTL fill above the threshold for sending pause frames.
 > 
+> In order to stop the disruption to my network (because it basically
+> causes *everything* to clog up) I've had to turn off pause autoneg,
+> but that doesn't affect whether or not this happens.
 > 
-> On 1/16/2026 5:09 AM, Zack McKevitt wrote:
-> > 
-> > 
-> > On 1/13/2026 1:20 AM, Riana Tauro wrote:
-> > > > > > > diff --git
-> > > > > > > a/Documentation/netlink/specs/drm_ras.yaml b/
-> > > > > > > Documentation/netlink/specs/drm_ras.yaml
-> > > > > > > new file mode 100644
-> > > > > > > index 000000000000..be0e379c5bc9
-> > > > > > > --- /dev/null
-> > > > > > > +++ b/Documentation/netlink/specs/drm_ras.yaml
-> > > > > > > @@ -0,0 +1,130 @@
-> > > > > > > +# SPDX-License-Identifier: ((GPL-2.0 WITH
-> > > > > > > Linux-syscall-note) OR BSD-3-Clause)
-> > > > > > > +---
-> > > > > > > +name: drm-ras
-> > > > > > > +protocol: genetlink
-> > > > > > > +uapi-header: drm/drm_ras.h
-> > > > > > > +
-> > > > > > > +doc: >-
-> > > > > > > +  DRM RAS (Reliability, Availability,
-> > > > > > > Serviceability) over Generic Netlink.
-> > > > > > > +  Provides a standardized mechanism for DRM drivers
-> > > > > > > to register "nodes"
-> > > > > > > +  representing hardware/software components capable
-> > > > > > > of reporting error counters.
-> > > > > > > +  Userspace tools can query the list of nodes or
-> > > > > > > individual error counters
-> > > > > > > +  via the Generic Netlink interface.
-> > > > > > > +
-> > > > > > > +definitions:
-> > > > > > > +  -
-> > > > > > > +    type: enum
-> > > > > > > +    name: node-type
-> > > > > > > +    value-start: 1
-> > > > > > > +    entries: [error-counter]
-> > > > > > > +    doc: >-
-> > > > > > > +         Type of the node. Currently, only error-counter nodes are
-> > > > > > > +         supported, which expose reliability
-> > > > > > > counters for a hardware/software
-> > > > > > > +         component.
-> > > > > > > +
-> > > > > > > +attribute-sets:
-> > > > > > > +  -
-> > > > > > > +    name: node-attrs
-> > > > > > > +    attributes:
-> > > > > > > +      -
-> > > > > > > +        name: node-id
-> > > > > > > +        type: u32
-> > > > > > > +        doc: >-
-> > > > > > > +             Unique identifier for the node.
-> > > > > > > +             Assigned dynamically by the DRM RAS
-> > > > > > > core upon registration.
-> > > > > > > +      -
-> > > > > > > +        name: device-name
-> > > > > > > +        type: string
-> > > > > > > +        doc: >-
-> > > > > > > +             Device name chosen by the driver at registration.
-> > > > > > > +             Can be a PCI BDF, UUID, or module name if unique.
-> > > > > > > +      -
-> > > > > > > +        name: node-name
-> > > > > > > +        type: string
-> > > > > > > +        doc: >-
-> > > > > > > +             Node name chosen by the driver at registration.
-> > > > > > > +             Can be an IP block name, or any name
-> > > > > > > that identifies the
-> > > > > > > +             RAS node inside the device.
-> > > > > > > +      -
-> > > > > > > +        name: node-type
-> > > > > > > +        type: u32
-> > > > > > > +        doc: Type of this node, identifying its function.
-> > > > > > > +        enum: node-type
-> > > > > > > +  -
-> > > > > > > +    name: error-counter-attrs
-> > > > > > > +    attributes:
-> > > > > > > +      -
-> > > > > > > +        name: node-id
-> > > > > > > +        type: u32
-> > > > > > > +        doc:  Node ID targeted by this error counter operation.
-> > > > > > > +      -
-> > > > > > > +        name: error-id
-> > > > > > > +        type: u32
-> > > > > > > +        doc: Unique identifier for a specific error
-> > > > > > > counter within an node.
-> > > > > > > +      -
-> > > > > > > +        name: error-name
-> > > > > > > +        type: string
-> > > > > > > +        doc: Name of the error.
-> > > > > > > +      -
-> > > > > > > +        name: error-value
-> > > > > > > +        type: u32
-> > > > > > > +        doc: Current value of the requested error counter.
-> > > > > > > +
-> > > > > > > +operations:
-> > > > > > > +  list:
-> > > > > > > +    -
-> > > > > > > +      name: list-nodes
-> > > > > > > +      doc: >-
-> > > > > > > +           Retrieve the full list of currently
-> > > > > > > registered DRM RAS nodes.
-> > > > > > > +           Each node includes its dynamically
-> > > > > > > assigned ID, name, and type.
-> > > > > > > +           **Important:** User space must call this
-> > > > > > > operation first to obtain
-> > > > > > > +           the node IDs. These IDs are required for all subsequent
-> > > > > > > +           operations on nodes, such as querying error counters.
-> > > > > 
-> > > > > I am curious about security implications of this design.
-> > > > 
-> > > > hmm... very good point you are raising here.
-> > > > 
-> > > > This current design relies entirely in the CAP_NET_ADMIN.
-> > > > No driver would have the flexibility to choose anything differently.
-> > > > Please notice that the flag admin-perm is hardcoded in this yaml file.
-> > > > 
-> > > > > If the complete
-> > > > > list of RAS nodes is visible for any process on the system
-> > > > > (and one wants to
-> > > > > avoid requiring CAP_NET_ADMIN), there should be some way to enforce
-> > > > > permission checks when performing these operations if desired.
-> > > > 
-> > > > Right now, there's no way that the driver would choose not avoid
-> > > > requiring
-> > > > CAP_NET_ADMIN...
-> > > > 
-> > > > Only way would be the admin to give the cap_net_admin to the tool with:
-> > > > 
-> > > > $ sudo setcap cap_net_admin+ep /bin/drm_ras_tool
-> > > > 
-> > > > but not ideal and not granular anyway...
-> > > > 
-> > > > > 
-> > > > > For example, this might be implemented in the driver's definition of
-> > > > > callback functions like query_error_counter; some drivers
-> > > > > may want to ensure
-> > > > > that the process can in fact open the file descriptor
-> > > > > corresponding to the
-> > > > > queried device before serving a netlink request. Is it
-> > > > > enough for a driver
-> > > > > to simply return -EPERM in this case? Any driver that doesnt
-> > > > > wish to protect
-> > > > > its RAS nodes need not implement checks in their callbacks.
-> > > > 
-> > > > Fair enough. If we want to give the option to the drivers, then we need:
-> > > > 
-> > > > 1. to first remove all the admin-perm flags below and leave the
-> > > > driver to
-> > > > pick up their policy on when to return something or -EPERM.
-> > > > 2. Document this security responsibility and list a few possibilities.
-> > > > 3. In our Xe case here I believe the easiest option is to use
-> > > > something like:
-> > > > 
-> > > > struct scm_creds *creds = NETLINK_CREDS(cb->skb);
-> > > > if (!gid_eq(creds->gid, GLOBAL_ROOT_GID))
-> > > >      return -EPERM
-> > > 
-> > > The driver currently does not have access to the callback or the
-> > > skbuffer. Sending these details as param to driver won't be right as
-> > > drm_ras needs to handle all the netlink buffers.
-> > > 
-> > > How about using pre_doit & start calls? If driver has a pre callback
-> > > , it's the responsibility of the driver to check permissions/any-pre
-> > > conditions, else the CAP_NET_ADMIN permission will be checked.
-> > > 
-> > > @Zack / @Rodrigo thoughts?
-> > > @Zack Will this work for your usecase?
-> > > 
-> > > yaml
-> > > +    dump:
-> > > +        pre: drm-ras-nl-pre-list-nodes
-> > > 
-> > > 
-> > > drm_ras.c :
-> > > 
-> > > +       if (node->pre_list_nodes)
-> > > +                return node->pre_list_nodes(node);
-> > > +
-> > > +        return check_permissions(cb->skb);  //Checks creds
-> > > 
-> > > Thanks
-> > > Riana
-> > > 
-> > 
-> > I agree that a pre_doit is probably the best solution for this.
-> > 
-> > Not entirely sure what a driver specific implementation would look like
-> > yet, but I think that as long as the driver callback has a way to access
-> > the 'current' task_struct pointer corresponding to the user process then
-> > this approach seems like the best option from the netlink side.
-> > 
-> > Since this is mostly a concern for our specific use case, perhaps we can
-> > incorporate this functionality in our change down the road when we
-> > expand the interface for telemetry?
+> It _may_ be worth testing whether adding a ndelay(500) into the
+> receive processing path, thereby making it intentionally slow,
+> allows you to reproduce the problem. If it does, then that confirms
+> that we're missing something in the dwmac4 handling for RBU.
 
-Yes, as it can be changed transparently, let's do that...
+I notice that the iMX8MP TRM says similar about the RBU bit
+(see 11.7.6.1.482.3 bit 7).
 
-> 
-> 
-> Yeah using pre_doit we can allow driver to make decisions based on
-> the private data or driver specific permissions. However we will need to
-> check the CAP_NET_ADMIN when no driver callback is implemented in the
-> netlink layer as a default .
-> 
-> Thank you, you can incorporate the changes when you add telemetry nodes.
-> 
-> For now, I will retain the admin-perm in flags.
+However, it does say that in ring mode, merely advancing the tail
+pointer should be sufficient. I can write the tail pointer register
+using devmem2, but the hardware never wakes up.
 
-Cool then, when they come with their case we remove it and force in the
-pre_doit as well.
+E.g.:
 
-ack..
+Channel 0 Current Application Receive Descriptor:
+Value at address 0x0249114c: 0xfffff910
 
-> 
-> I will address the rest of the review comments and send out a new revision
-> shortly.
-> 
-> Thank you
-> Riana
-> 
-> 
-> > 
-> > Let me know what you think.
-> > 
-> > Zack
-> > 
-> > > > 
-> > > > or something like that?!
-> > > > 
-> > > > perhaps drivers could implement some form of cookie or pre-
-> > > > authorization with
-> > > > ioctls or sysfs, and then store in the priv?
-> > > > 
-> > > > Thoughts?
-> > > > Other options?
-> > > > 
-> > > > > 
-> > > > > I dont see any such permissions checks in your driver
-> > > > > implementation which
-> > > > > is understandable given that it may not be necessary for
-> > > > > your use cases.
-> > > > > However, this would be a concern for our driver if we were
-> > > > > to adopt this
-> > > > > interface.
-> > > > 
-> > > > yeap, this case was entirely with admin-perm, so not needed at all...
-> > > > But I see your point and this is really not giving any flexibility to
-> > > > other drivers.
-> > > > 
-> > 
-> > > > > > > 
-> > > > > 
-> > > > > Thanks,
-> > > > > 
-> > > > > Zack
-> > > > > 
-> > > 
-> > 
-> 
+Channel 0 Rx Descriptor Tail Pointer:
+Value at address 0x02491128: 0xfffff910
+
+Value at address 0x02491128: 0xfffff910
+Written 0xfffff940; readback 0xfffff940
+Value at address 0x02491128: 0xfffff940
+Written 0xfffff980; readback 0xfffff980
+
+Value at address 0x0249114c: 0xfffff910
+
+So, the hardware hasn't advanced. Here's the ring state:
+
+			  RDES0     RDES1 RDES2 RDES3
+401 [0x0000007ffffff910]: 0xffd63040 0x7f 0x0 0x81000000
+402 [0x0000007ffffff920]: 0xffd64040 0x7f 0x0 0x81000000
+403 [0x0000007ffffff930]: 0xffd3f040 0x7f 0x0 0x81000000
+404 [0x0000007ffffff940]: 0xffeed040 0x7f 0x0 0x81000000
+405 [0x0000007ffffff950]: 0xfff2f040 0x7f 0x0 0x81000000
+406 [0x0000007ffffff960]: 0xffbee040 0x7f 0x0 0x81000000
+407 [0x0000007ffffff970]: 0xffbef040 0x7f 0x0 0x81000000
+408 [0x0000007ffffff980]: 0xffbf0040 0x7f 0x0 0x81000000
+
+bit 31 of RDES3 is RDES3_OWN, which when set, means the dwmac core
+has ownership of the buffer. Bit 24 means buffer 1 addresa valid
+(stored in RDES0). So, if the iMX8MP information is correct, then
+advancing 0x02491128 to point at the following descriptors should
+"wake" the receive side, but it does not.
+
+Other registers:
+
+Queue 0 Receive Debug:
+Value at address 0x02490d38: 0x002a0020
+
+bit 0 = 0 (MTL Rx Queue Write Controller Active Status not detected)
+bit 2:1 = 0 (Read controller Idle state)
+bits 5:4 = 2 (Rx Queue fill-level above flow-control activate threshold)
+bits 29:16 = 0x2a 42 packets in receive queue
+
+Because the internal queue is above the flow-control activate
+threshold, that causes the stmmac hardware to constantly spew pause
+frames, and, as the stmmac receive side is essentially stuck and won't
+make progress even when there are free buffers, the only way to release
+this state is via a software reset of the entire core.
+
+Why don't pause frames save us? Well, pause frames will only be sent
+when the receive queue fills to the activate threshold, which can only
+happen _after_ packets stop being transferred to the descriptor rings.
+In other words, it can only happen when a RBU event has been detected,
+which suspends the receiver - and it seems when that happens, it is
+irrecoverable without soft-reset on Xavier.
+
+Right now, I'm not sure what to think about this - I don't know whether
+it's the hardware that's at fault, or whether there's an issue in the
+driver. What I know for certain is what I've stated above, and the
+fact that iperf3 -R has *extremely* detrimental effects on my *entire*
+network.
+
+The reason is... you connect two Netgear switches together, they use
+flow control, and you have no way to turn that off... So, once stmmac
+starts sending pause frames, the switches queue for that port fills,
+and when further frames come in for that port, the switch sends pause
+frames to the next switch behind which stops all traffic flow between
+the two switches, severing the network. All the time that stmmac keeps
+that up, so does the switch it is connected to.
+
+If another machine happens to send a packet that needs to be queued on
+the port that stmmac is connected to (e.g. broadcast or multicast)
+then... that port starts sending pause frames back to that machine,
+severing its network connection permanently while stmmac is spewing
+pause frames.
+
+Thus, the entire network goes down, on account of _one_ machine
+repeatedly sending pause frames, preventing packet delivery.
+
+While the idea of a lossless network _seems_ like a good idea, in
+reality it gives an attacker who can get on a platform and take
+control of the ethernet NIC the ability to completely screw an entire
+network if flow control is enabled everywhere. I'm thinking at this
+point... just say no to flow control, disable it everywhere one can.
+Ethernet was designed to lose packets when it needs to, to ensure
+fairness. Flow control destroys that fairness and results in networks
+being severed.
+
+"attacker" is maybe too strong - consider what happens if the kernel
+crashes on a stmmac platform, so it can't receive packets anymore,
+and the ring fills up, causing it to start spewing pause frames.
+It's goodbye network!
+
+I'm just rambling, but I think that point is justified.
+
+Thoughts - should the kernel default to having flow control enabled
+or disabled in light of this? Should this feature require explicit
+administrative configuration given the severity of network disruption?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
