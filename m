@@ -1,211 +1,322 @@
-Return-Path: <netdev+bounces-250520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68B7D31195
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:30:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7AD9D314DA
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C30073092216
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:29:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7157F3013940
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 12:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04F01A0BD0;
-	Fri, 16 Jan 2026 12:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705F61F1932;
+	Fri, 16 Jan 2026 12:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZsRsJEf/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="LDVrAvcq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF28E1DE4EF;
-	Fri, 16 Jan 2026 12:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B65E17BCA;
+	Fri, 16 Jan 2026 12:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768566550; cv=none; b=jx/LU4Wn7cpZK2fIqEJcaF+YcAKvRknSFttYveOywTdf5gZSMHFJ/Q6A4nBeY5QW0Dnskr1SFn2DRMT3u8/ThDR61/VyGbGwhFWv4aIVYJryujUTjx1K4mq84MtHob9xnZiArJaXOmrvobJuSV+hh4Fvhuk7qDMwwx4TV+xdRe8=
+	t=1768567682; cv=none; b=o9iAkvSMEk0JhkMdOM0ZXWy/xTWQnvG0Yh1huq+4WuAEDfE+iFy4jlazETy6+YVE4bOatjsaJAd0Y5JWdhDi5HHoE5fjFQj+/4afPYDZF1UZHKnkLg9l5EEmkZRq2GoKhmCrznD5pRUUVadNqqeSyAyJwaGkFEwtpOzyLEVQ/GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768566550; c=relaxed/simple;
-	bh=xi6zM5CVklLfECdqHMYOBwNT/HjrbAQtzgaoZogHnGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AbwpwxcaK8Ti6qammFdYw1vQZ7rQR9Gp+WfTgS2bbNX2JlDyRNWWtE+n3R4tqZmmguYf+s8XYeTi3yiTja8hqpJYUJY8mjSVOcTYxcZeLbQUaF+JimQwWG3PrH3ievKnHuqbNMXN0HSUyCqRozBlI7ZTpaNOYpaVbIDmPoC/COs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZsRsJEf/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768566545; x=1800102545;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xi6zM5CVklLfECdqHMYOBwNT/HjrbAQtzgaoZogHnGk=;
-  b=ZsRsJEf/vK1anXUXmW7JYtGZI282edn0MHA6+wReWxYztmKTHpMC5ssy
-   tAHadgkXSvFTXQZBnpI08iAUsaCxSRSLRcoUP2f64bYleEpVExjBPAUpr
-   Y/HUImRlOzUfUTZFMhBM5aAh2Wu2b+bh3DKmouWkoFNnXe1IhDF+bRND5
-   C3VN8/ZS06CCSDGzCNr1NaY5hFWQB+0KNB5ycJosHRESJ5kxhw7etBt8M
-   NB3MORhHypmQRX9aeCRlTG5DFSZP91k90JVu1R2PegFsC+txzQDkXh3P/
-   k8PdBPu+2Va0N+OQSsXFUhfQoXOgjgkbL0c/IcSpLhLAgqosPDPQ8JcIm
-   Q==;
-X-CSE-ConnectionGUID: Rkx3tlRwQLybkafiz5dH/g==
-X-CSE-MsgGUID: oRSfnv43TKOv3/QHR2b6ag==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="68889869"
-X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="68889869"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 04:29:04 -0800
-X-CSE-ConnectionGUID: cciyI+moRiCnC1gkccgIFw==
-X-CSE-MsgGUID: M4jROaV+Qo67aryhk+swUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,231,1763452800"; 
-   d="scan'208";a="204384752"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 16 Jan 2026 04:28:59 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgiwi-00000000KpE-0KSC;
-	Fri, 16 Jan 2026 12:28:56 +0000
-Date: Fri, 16 Jan 2026 20:28:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Fang <wei.fang@nxp.com>, shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com, frank.li@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 14/14] net: fec: add AF_XDP zero-copy support
-Message-ID: <202601162115.ATDIXPBp-lkp@intel.com>
-References: <20260116074027.1603841-15-wei.fang@nxp.com>
+	s=arc-20240116; t=1768567682; c=relaxed/simple;
+	bh=1DZFT/iBQ2jNPK3zXoqKoM/fFDsK3uxKb0FNkehKUto=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=tNwpfrCmOou70VrV48u5In8c4X6wYlEetAnfyT0mDUK+1N6hw1v/6wPgddaVQV2CeLMvNYYlbkvx3bmxbbMyjucIjcQeWPZktbwFIPW7aBxa7dgDiUFInP4IVa3ByN+2W0czZgFURpclRfzKtrvJgK4tDYZo3jOEIuuAcz9M6Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=LDVrAvcq; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Cv+XGdsNlrOuQHJWMJtivmMYWFGXGamn47OP1Rpv/Os=; b=LDVrAvcqLAPhf7N2fZLeG76T7q
+	Zyy7iO30b5Kr7oKiY2jfZ9PewzYfd+6CeOTcpVPmUALG0RHY7JQOaAqE7YxArGMYXD/fJB/NOIead
+	OD4H8dui2w1J/oaeSH/mw8QSpOAfBjhWMcRLxuJkrkct81KT+QI+asF0Kbuyz+VuXd9vyPAJynQNI
+	GUV1Ms8D0j0vhNVNHeZZ7AjJyhsUs65JECfMAlmzdwvnE0BSHy1v9uU7xk08WlJVXgoOfudNQA8kN
+	H7LYSnYi7uHUFgNB4+xIlWRMvTyfHrnS2dC61ucbMV6ezdADWRe38LG3+HP/8cujaiWPD8trA257i
+	RaYmlaLQ==;
+Received: from [122.175.9.182] (port=3146 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vgjF1-00000007Abd-05xU;
+	Fri, 16 Jan 2026 07:47:51 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 9A9F21B23990;
+	Fri, 16 Jan 2026 18:17:43 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id 0tjnhtPYWrx0; Fri, 16 Jan 2026 18:17:39 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 97B451B23F13;
+	Fri, 16 Jan 2026 18:17:39 +0530 (IST)
+X-Virus-Scanned: amavis at couthit.local
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id nmZss4_yFM5M; Fri, 16 Jan 2026 18:17:39 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 632CD1B23990;
+	Fri, 16 Jan 2026 18:17:39 +0530 (IST)
+Date: Fri, 16 Jan 2026 18:17:39 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Andrew Davis <afd@ti.com>
+Cc: nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Kevin Hilman <khilman@baylibre.com>, rogerq <rogerq@kernel.org>, 
+	tony <tony@atomide.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
+	Andrew Lunn <andrew@lunn.ch>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
+	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
+	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
+	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
+	Murali Karicheri <m-karicheri2@ti.com>, 
+	parvathi <parvathi@couthit.com>
+Message-ID: <180076068.145887.1768567659299.JavaMail.zimbra@couthit.local>
+In-Reply-To: <2110802326.88645.1767873743162.JavaMail.zimbra@couthit.local>
+References: <20260105162546.1809714-1-parvathi@couthit.com> <20260105162546.1809714-3-parvathi@couthit.com> <84b08398-5622-45c9-a8fa-54639c1cf0b3@ti.com> <2110802326.88645.1767873743162.JavaMail.zimbra@couthit.local>
+Subject: Re: [PATCH v4 2/2] arm: dts: ti: Adds support for AM335x and AM437x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260116074027.1603841-15-wei.fang@nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
+Thread-Topic: Adds support for AM335x and AM437x
+Thread-Index: q8z9cKWgO4NEoGv8PQwa5viWNmn8o92ndJ67
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Hi Wei,
+Hi,
 
-kernel test robot noticed the following build warnings:
+> Hi,
+>=20
+>> On 1/5/26 10:21 AM, Parvathi Pudi wrote:
+>>> From: Roger Quadros <rogerq@ti.com>
+>>>=20
+>>> PRU-ICSS instance consists of two PRU cores along with various
+>>> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
+>>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
+>>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+>>>=20
+>>> The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
+>>> This patch adds the new device tree overlay file in-order to enable
+>>> PRU-ICSS instance, along with makefile changes.
+>>>=20
+>>> The TI Sitara AM437x series of devices consists of 2 PRU-ICSS instances
+>>> (PRU-ICSS0 and PRU-ICSS1). This patch adds the device tree nodes for th=
+e
+>>> PRU-ICSS1 instance to support DUAL-MAC mode of operation. Support for
+>>> Ethernet over PRU is available only for ICSS1 instance.
+>>>=20
+>>> am33xx-l4.dtsi, am4372.dtsi - Adds IEP and eCAP peripheral as child nod=
+es
+>>> of the PRUSS subsystem node.
+>>>=20
+>>> am335x-icev2-prueth.dtso, am437x-idk-evm.dts - Adds PRU-ICSS
+>>> instance node along with PRU eth port information and corresponding
+>>> port configuration. It includes interrupt mapping for packet reception,
+>>> HW timestamp collection, and PRU Ethernet ports in MII mode,
+>>>=20
+>>> GPIO configuration, boot strapping along with delay configuration for
+>>> individual PRU Ethernet port and other required nodes.
+>>>=20
+>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>>> ---
+>>>   arch/arm/boot/dts/ti/omap/Makefile            |   5 +
+>>>   .../ti/omap/am335x-icev2-prueth-overlay.dtso  | 190 +++++++++++++++++=
++
+>>>   arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 +
+>>>   arch/arm/boot/dts/ti/omap/am4372.dtsi         |  11 +
+>>>   arch/arm/boot/dts/ti/omap/am437x-idk-evm.dts  | 137 ++++++++++++-
+>>>   5 files changed, 353 insertions(+), 1 deletion(-)
+>>>   create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-over=
+lay.dtso
+>>>=20
+>>> diff --git a/arch/arm/boot/dts/ti/omap/Makefile
+>>> b/arch/arm/boot/dts/ti/omap/Makefile
+>>> index 14e500846875..c68948035eca 100644
+>>> --- a/arch/arm/boot/dts/ti/omap/Makefile
+>>> +++ b/arch/arm/boot/dts/ti/omap/Makefile
+>>> @@ -82,6 +82,10 @@ dtb-$(CONFIG_ARCH_OMAP4) +=3D \
+>>>   =09omap4-var-stk-om44.dtb \
+>>>   =09omap4-xyboard-mz609.dtb \
+>>>   =09omap4-xyboard-mz617.dtb
+>>> +
+>>> +am335x-icev2-prueth-dtbs :=3D am335x-icev2.dtb \
+>>> +=09am335x-icev2-prueth-overlay.dtbo
+>>> +
+>>>   dtb-$(CONFIG_SOC_AM33XX) +=3D \
+>>>   =09am335x-baltos-ir2110.dtb \
+>>>   =09am335x-baltos-ir3220.dtb \
+>>> @@ -100,6 +104,7 @@ dtb-$(CONFIG_SOC_AM33XX) +=3D \
+>>>   =09am335x-evmsk.dtb \
+>>>   =09am335x-guardian.dtb \
+>>>   =09am335x-icev2.dtb \
+>>> +=09am335x-icev2-prueth.dtb \
+>>>   =09am335x-lxm.dtb \
+>>>   =09am335x-mba335x.dtb \
+>>>   =09am335x-moxa-uc-2101.dtb \
+>>> diff --git a/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+>>> b/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+>>> new file mode 100644
+>>> index 000000000000..abde5119875f
+>>> --- /dev/null
+>>> +++ b/arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+>>> @@ -0,0 +1,190 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +/*
+>>> + * DT overlay for IDK AM335x
+>>> + *
+>>> + * Copyright (C) 2018 Texas Instruments Incorporated - http://www.ti.c=
+om/
+>>> + */
+>>> +
+>>> +/*
+>>> + * AM335x ICE V2 board
+>>> + * http://www.ti.com/tool/tmdsice3359
+>>> + */
+>>> +
+>>> +/dts-v1/;
+>>> +/plugin/;
+>>> +
+>>> +#include <dt-bindings/bus/ti-sysc.h>
+>>> +#include <dt-bindings/gpio/gpio.h>
+>>> +#include <dt-bindings/pinctrl/am33xx.h>
+>>> +#include <dt-bindings/clock/am3.h>
+>>> +
+>>> +&{/} {
+>>> +        /* Dual-MAC Ethernet application node on PRU-ICSS */
+>>> +        pruss_eth: pruss-eth {
+>>> +                compatible =3D "ti,am3359-prueth";
+>>> +                ti,prus =3D <&pru0>, <&pru1>;
+>>> +                sram =3D <&ocmcram>;
+>>> +                ti,mii-rt =3D <&pruss_mii_rt>;
+>>> +                ti,iep =3D <&pruss_iep>;
+>>> +                ti,ecap =3D <&pruss_ecap>;
+>>> +                interrupts =3D <20 2 2>, <21 3 3>;
+>>> +                interrupt-names =3D "rx_hp", "rx_lp";
+>>> +                interrupt-parent =3D <&pruss_intc>;
+>>> +
+>>> +                pinctrl-0 =3D <&pruss_eth_default>;
+>>> +                pinctrl-names =3D "default";
+>>> +
+>>> +                ethernet-ports {
+>>> +                        #address-cells =3D <1>;
+>>> +                        #size-cells =3D <0>;
+>>> +                        pruss_emac0: ethernet-port@0 {
+>>> +                                reg =3D <0>;
+>>> +                                phy-handle =3D <&pruss_eth0_phy>;
+>>> +                                phy-mode =3D "mii";
+>>> +                                interrupts =3D <20 2 2>, <26 6 6>, <23=
+ 6 6>;
+>>> +                                interrupt-names =3D "rx", "emac_ptp_tx=
+",
+>>> +                                                  "hsr_ptp_tx";
+>>> +                                /* Filled in by bootloader */
+>>> +                                local-mac-address =3D [00 00 00 00 00 =
+00];
+>>> +                        };
+>>> +
+>>> +                        pruss_emac1: ethernet-port@1 {
+>>> +                                reg =3D <1>;
+>>> +                                phy-handle =3D <&pruss_eth1_phy>;
+>>> +                                phy-mode =3D "mii";
+>>> +                                interrupts =3D <21 3 3>, <27 9 7>, <24=
+ 9 7>;
+>>> +                                interrupt-names =3D "rx", "emac_ptp_tx=
+",
+>>> +                                                  "hsr_ptp_tx";
+>>> +                                /* Filled in by bootloader */
+>>> +                                local-mac-address =3D [00 00 00 00 00 =
+00];
+>>> +                        };
+>>> +                };
+>>> +        };
+>>> +};
+>>> +
+>>> +&am33xx_pinmux {
+>>> +=09/* MDIO node for PRU-ICSS */
+>>> +        pruss_mdio_default: pruss_mdio_default {
+>>> +                pinctrl-single,pins =3D <
+>>> +                        /* gpmc_clk.pr1_mdio_mdclk */
+>>> +                        AM33XX_PADCONF(0x88c, PIN_OUTPUT, MUX_MODE5)
+>>> +                        /* gpmc_csn3.pr1_mdio_data */
+>>> +                        AM33XX_PADCONF(0x888, PIN_INPUT, MUX_MODE5)
+>>=20
+>> Have you regenerated this list lately? The pinmux tool usually puts the
+>> comment after the PADCONF entry. It also now also shows the pin number
+>> in the comment which is nice:
+>>=20
+>>=09AM33XX_IOPAD(0x88c, PIN_OUTPUT, MUX_MODE5) /* (V12) gpmc_clk.pr1_mdio_=
+mdclk */
+>>=09AM33XX_IOPAD(0x888, PIN_INPUT, MUX_MODE5) /* (T13) gpmc_csn3.pr1_mdio_=
+data */
+>>=20
+>> I'd recommend regenerating these nodes to match the latest pinmux tool o=
+utput.
+>>=20
+>=20
+> Sure, we will check and regenerate these nodes using the pinmux tool and
+> update accordingly.
+>=20
+>>> +                        /* gpmc_ben0_cle.gpio2_5 */
+>>> +                        AM33XX_PADCONF(0x89c, PIN_INPUT_PULLUP, MUX_MO=
+DE7)
+>>> +                        /* disable CPSW MDIO */
+>>=20
+>> Is this needed? If you disable the CPSW MDIO node the pinmux should be u=
+nset,
+>> so not sure why you are muxing these to GPIO pins.
+>>=20
+>=20
+> We will review and get back with more details on this.
+>=20
 
-[auto build test WARNING on net-next/main]
+On the AM335x board, the CPSW MDIO and PRUSS MDIO signals are routed to the=
+ same physical
+pins (as shown in the schematic, see page 10 =E2=80=9CMII_MUX=E2=80=9D in t=
+mdxice3359_sch_3h0013_v2_1a.pdf
+from https://www.ti.com/lit/zip/TIDR336 ). Because of this shared routing, =
+the pinmux
+configuration applied by U-Boot for CPSW MDIO remains active even if the CP=
+SW MDIO node is
+later disabled in Linux, and Linux does not automatically revert the pins t=
+o their reset state.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/net-fec-add-fec_txq_trigger_xmit-helper/20260116-154834
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260116074027.1603841-15-wei.fang%40nxp.com
-patch subject: [PATCH v2 net-next 14/14] net: fec: add AF_XDP zero-copy support
-config: arm-imx_v4_v5_defconfig (https://download.01.org/0day-ci/archive/20260116/202601162115.ATDIXPBp-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260116/202601162115.ATDIXPBp-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601162115.ATDIXPBp-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/freescale/fec_main.c:1040:4: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
-    1040 |                         default:
-         |                         ^
-   drivers/net/ethernet/freescale/fec_main.c:1040:4: note: insert 'break;' to avoid fall-through
-    1040 |                         default:
-         |                         ^
-         |                         break; 
-   1 warning generated.
+To prevent signal contention and ensure correct PRUSS MDIO operation, we ex=
+plicitly re-mux
+the CPSW MDIO pins to GPIO in the PRUSS pinctrl. Without this explicit reco=
+nfiguration, we
+observed PHY connection issues during startup.
 
 
-vim +1040 drivers/net/ethernet/freescale/fec_main.c
-
-61a4427b955f79d drivers/net/ethernet/freescale/fec_main.c Nimrod Andy    2014-06-12   970  
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   971  /* Init RX & TX buffer descriptors
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   972   */
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   973  static void fec_enet_bd_init(struct net_device *dev)
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   974  {
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   975  	struct fec_enet_private *fep = netdev_priv(dev);
-4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   976  	struct fec_enet_priv_tx_q *txq;
-4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   977  	struct fec_enet_priv_rx_q *rxq;
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   978  	struct bufdesc *bdp;
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   979  	unsigned int i;
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   980  	unsigned int q;
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   981  
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   982  	for (q = 0; q < fep->num_rx_queues; q++) {
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   983  		/* Initialize the receive buffer descriptors. */
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13   984  		rxq = fep->rx_queue[q];
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   985  		bdp = rxq->bd.base;
-4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13   986  
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   987  		for (i = 0; i < rxq->bd.ring_size; i++) {
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   988  
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   989  			/* Initialize the BD for every fragment in the page. */
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   990  			if (bdp->cbd_bufaddr)
-5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24   991  				bdp->cbd_sc = cpu_to_fec16(BD_ENET_RX_EMPTY);
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   992  			else
-5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24   993  				bdp->cbd_sc = cpu_to_fec16(0);
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   994  			bdp = fec_enet_get_nextdesc(bdp, &rxq->bd);
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   995  		}
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   996  
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26   997  		/* Set the last buffer to wrap */
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05   998  		bdp = fec_enet_get_prevdesc(bdp, &rxq->bd);
-bd31490718b47d9 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2025-11-19   999  		bdp->cbd_sc |= cpu_to_fec16(BD_ENET_RX_WRAP);
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1000  
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1001  		rxq->bd.cur = rxq->bd.base;
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1002  	}
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1003  
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1004  	for (q = 0; q < fep->num_tx_queues; q++) {
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1005  		/* ...and the same for transmit */
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1006  		txq = fep->tx_queue[q];
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1007  		bdp = txq->bd.base;
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1008  		txq->bd.cur = bdp;
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1009  
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1010  		for (i = 0; i < txq->bd.ring_size; i++) {
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1011  			struct page *page;
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1012  
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1013  			/* Initialize the BD for every fragment in the page. */
-5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24  1014  			bdp->cbd_sc = cpu_to_fec16(0);
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1015  
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1016  			switch (txq->tx_buf[i].type) {
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1017  			case FEC_TXBUF_T_SKB:
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1018  				if (bdp->cbd_bufaddr &&
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1019  				    !IS_TSO_HEADER(txq, fec32_to_cpu(bdp->cbd_bufaddr)))
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1020  					dma_unmap_single(&fep->pdev->dev,
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1021  							 fec32_to_cpu(bdp->cbd_bufaddr),
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1022  							 fec16_to_cpu(bdp->cbd_datlen),
-178e5f57a8d8f8f drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2017-12-22  1023  							 DMA_TO_DEVICE);
-af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1024  				dev_kfree_skb_any(txq->tx_buf[i].buf_p);
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1025  				break;
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1026  			case FEC_TXBUF_T_XDP_NDO:
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1027  				dma_unmap_single(&fep->pdev->dev,
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1028  						 fec32_to_cpu(bdp->cbd_bufaddr),
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1029  						 fec16_to_cpu(bdp->cbd_datlen),
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1030  						 DMA_TO_DEVICE);
-af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1031  				xdp_return_frame(txq->tx_buf[i].buf_p);
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1032  				break;
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1033  			case FEC_TXBUF_T_XDP_TX:
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1034  				page = txq->tx_buf[i].buf_p;
-65589e860a80369 drivers/net/ethernet/freescale/fec_main.c Byungchul Park 2025-07-21  1035  				page_pool_put_page(pp_page_to_nmdesc(page)->pp,
-f1d89a02b16bcdc drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1036  						   page, 0, false);
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1037  				break;
-f9806afd55c4ab1 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1038  			case FEC_TXBUF_T_XSK_TX:
-f9806afd55c4ab1 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1039  				xsk_buff_free(txq->tx_buf[i].buf_p);
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16 @1040  			default:
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1041  				break;
-81725cc0fbfea44 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2026-01-16  1042  			};
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1043  
-af6f4791380c320 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-08-15  1044  			txq->tx_buf[i].buf_p = NULL;
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1045  			/* restore default tx buffer type: FEC_TXBUF_T_SKB */
-20f797399035a80 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2023-07-06  1046  			txq->tx_buf[i].type = FEC_TXBUF_T_SKB;
-5cfa30397bc3677 drivers/net/ethernet/freescale/fec_main.c Johannes Berg  2016-01-24  1047  			bdp->cbd_bufaddr = cpu_to_fec32(0);
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1048  			bdp = fec_enet_get_nextdesc(bdp, &txq->bd);
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1049  		}
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1050  
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1051  		/* Set the last buffer to wrap */
-7355f2760620b38 drivers/net/ethernet/freescale/fec_main.c Troy Kisky     2016-02-05  1052  		bdp = fec_enet_get_prevdesc(bdp, &txq->bd);
-bd31490718b47d9 drivers/net/ethernet/freescale/fec_main.c Wei Fang       2025-11-19  1053  		bdp->cbd_sc |= cpu_to_fec16(BD_ENET_TX_WRAP);
-4d494cdc92b3b9a drivers/net/ethernet/freescale/fec_main.c Fugang Duan    2014-09-13  1054  		txq->dirty_tx = bdp;
-14109a59caf93e6 drivers/net/ethernet/freescale/fec.c      Frank Li       2013-03-26  1055  	}
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1056  }
-59d0f746564495c drivers/net/ethernet/freescale/fec_main.c Frank Li       2014-09-13  1057  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks and Regards,
+Parvathi.
 
