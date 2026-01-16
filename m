@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-250372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B36D2984F
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF01D29978
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CFC513028545
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:08:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 147B33014AEB
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 01:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07EC316919;
-	Fri, 16 Jan 2026 01:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9231F32ABF3;
+	Fri, 16 Jan 2026 01:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JUkH8GxV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wpYtsWoR"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A165D302CDE
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 01:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16F52594BD;
+	Fri, 16 Jan 2026 01:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768525720; cv=none; b=c/JPoclVBZOstett7oyJT+bJq8uK0R8+q6yxFD/HsRW62ey0l4Foh7lb2Q+Y0HZvyJsqNZkuskx8Eg38d4VbqSssTlUZ2CS8wKiCjXgGGvVweuKdYvNrittoJFzYKJc57XGmBSVfZTXr4zoEAj1pxBPHOGdMAUodVkHTsO/6Kvg=
+	t=1768526624; cv=none; b=FP46ljTRbu1KIVbPgxqNGpq/O/arZ/hxJirmTw6tvm50ivXVoep38SW8FrmOE5xHngZeNTYqPOBy6UEnUpdAdfJT1cMfWEvOo2N6Z//bQEYHb28f0N4tRhPhfOPcAKWUUoU+dCNEvbNH8qgbyJB24gJwLbRuwVt2rRaNW4GQ1Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768525720; c=relaxed/simple;
-	bh=PBnLKOR8WDd2cJcejUobeQj3vlJXf1e8HYY+/BpYJQI=;
+	s=arc-20240116; t=1768526624; c=relaxed/simple;
+	bh=3DwoKQ0WapLzdxrLPSfQCctcbrbNUD4rKjUcIHDL1YI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lYECCdcxKi3iCyvq+wxkob5Y11UmmbAEqPhsk4NBzJw+NipNw7BLkhNrHvwJDj0/xlM4b9WBLussUQ1Oa8JHCxFRkZSZ1AXF/4zcdNFrxaywNa0KjcDlK8mrmo1up6su1g28H5k+mF0T3ham1nGhPVyofjRqKW6H1xitOMSw8Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JUkH8GxV; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GuV3vqZa+AH5PCHv6i8GZpSeSzesv+Ti0XfzHwSf/gEON2MbyD76eeEMNkbOW/IZBKblpizB/eQQpgf9CGSI4GfeBz6fagHzMyHCwQWPB28ag9mqe9uPvEIM8NzFbQ4dgrgZrZ9Fzs7G7U+2i0r48kNq9jZEYawI+SqVR5cqJt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wpYtsWoR; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,27 +34,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LGiSUz37N9ovSZPw34TwWstspblmqZbHN8iTZJ4qCGU=; b=JUkH8GxV7ehKt+YzFs1LPmF3J7
-	yZJdJP7NGpfeasSHg/nkXKNVRrqOa62ZUUCz5s/di26PwMOxmtS8V5mWv6RJbYPLTrfMU3NeiTTuy
-	lzQYzN4FqZrFBU1XAWDJopXBwEitl44YxBUAh0kScCYJdOm1EypPoGBEomkMYpww5xKc=;
+	bh=hVBxOsANZK+UyFoJ2ZDGSu3RlMMwgHyL9ikxDVavK90=; b=wpYtsWoRaYAFSLVSKUPyHGNbp+
+	5L0xrxgSTJeJHEYOtFaIFt9acTmgIdhJaw4/FpFKJumfqkUkj+v5OZG3EAa9DlBrfLPuuMrvSwP6t
+	HzFf68JIpW+9FqnhU5hVB89hdxGI4FrmbLTLxAfCjDacimAyFD469aB4BnTWeonIkG2c=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vgYKB-0030eW-2r; Fri, 16 Jan 2026 02:08:27 +0100
-Date: Fri, 16 Jan 2026 02:08:27 +0100
+	id 1vgYYY-0030i2-KO; Fri, 16 Jan 2026 02:23:18 +0100
+Date: Fri, 16 Jan 2026 02:23:18 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Benjamin Larsson <benjamin.larsson@genexis.eu>
-Cc: Sayantan Nandy <sayantann11@gmail.com>, lorenzo@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
-	kuldeep.malik@airoha.com, aniket.negi@airoha.com,
-	rajeev.kumar@airoha.com
-Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
- frames
-Message-ID: <ce42ade7-acd9-4e6f-8e22-bf7b34261ad9@lunn.ch>
-References: <20260115084837.52307-1-sayantann11@gmail.com>
- <e86cea28-1495-4b1a-83f1-3b0f1899b85f@lunn.ch>
- <c69e5d8d-5f2b-41f5-a8e9-8f34f383f60c@genexis.eu>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next] net: phy: intel-xway: workaround stale LEDs
+ before link-up
+Message-ID: <dd6ddb96-7aa9-4142-b991-5f27a4276a92@lunn.ch>
+References: <d70a1fa9b92c7b3e7ea09b5c3216d77a8fd35265.1768432653.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,30 +68,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c69e5d8d-5f2b-41f5-a8e9-8f34f383f60c@genexis.eu>
+In-Reply-To: <d70a1fa9b92c7b3e7ea09b5c3216d77a8fd35265.1768432653.git.daniel@makrotopia.org>
 
-On Thu, Jan 15, 2026 at 08:10:20PM +0100, Benjamin Larsson wrote:
-> On 15/01/2026 18:41, Andrew Lunn wrote:
-> > On Thu, Jan 15, 2026 at 02:18:37PM +0530, Sayantan Nandy wrote:
-> > > The Industry standard for jumbo frame MTU is 9216 bytes. When using DSA
-> > > sub-system, an extra 4 byte tag is added to each frame. To allow users
-> > > to set the standard 9216-byte MTU via ifconfig,increase AIROHA_MAX_MTU
-> > > to 9220 bytes (9216+4).
-> > What does the hardware actually support? Is 9220 the real limit? 10K?
-> > 16K?
-> > 
-> > 	Andrew
-> > 
-> Hi, datasheets say 16k and I have observed packet sizes close to that on the
-> previous SoC generation EN7523 on the tx path.
+On Thu, Jan 15, 2026 at 11:40:38PM +0000, Daniel Golle wrote:
+> Due to a bug in some PHY internal firmware, manual control as well as
+> polarity configuration of the PHY LEDs has no effect until a link has
+> been detected at least once after reset. Apparently the LED control
+> thread is not started until then.
+> 
+> As a workaround, clear the BMCR_ANENABLE bit for 100ms to force the
+> firmware to start the LED thread, allowing manual LED control and
+> respecting LED polarity before the first link comes up.
+> 
+> In case the legacy default LED configuration is used the bug isn't
+> visible, so only apply the workaround in case LED configuration is
+> present in the device tree.
 
-Can you test 16K?
+You should consider the case of forced links, where autoneg is
+disabled. Under such conditions, you should not leave autoneg enabled.
 
-Does it make any difference to the memory allocation? Some drivers
-allocate receive buffers based on the MAX MTU, not the current MTU, so
-can eat up a lot of memory which is unlikely to be used. We should try
-to avoid that.
-
-Thanks
-	Andrew
+	  Andrew
 
