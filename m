@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-250650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B3ED3880D
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:57:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4F4D38816
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 22:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 96CF230178CD
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 20:57:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 246D93020CFF
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 21:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20592F5473;
-	Fri, 16 Jan 2026 20:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE0728DB49;
+	Fri, 16 Jan 2026 21:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PCfHEObY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2jeg763"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811372D595B;
-	Fri, 16 Jan 2026 20:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D060522425B
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 21:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768597046; cv=none; b=qQ4uowLrpqmJW5QC5MGitDnfvb9wbp7GPJUhumeAwi0XizPlo2Rc0Pb5ChXUdKUl11L6md1P+VyJvkQXxpTSDIHCmtCyBCHRr46iRcdE7hn4UEpIXoJ0ghUXC3gLPmqFKYF6pbXNK2UjIFKBTWvbsI/e6N6qEXqa+JSCwMUeDoM=
+	t=1768597288; cv=none; b=bP6aR6sdVWJ1LLxMqYIXiZDfjVnSCkPsaaFMgiUgb8pr9Ysjmv9s9NwxIpcrRbw21iXqBXo2eJQfRrs5Ovp7AaS/jjU+tkRrmA7g9I/EK7CnATDWW/rPk27rlR2ZFnZQrmLpAkkvJMBwCkSy/EHuMa4IAAgdDlwX6WkfqZwEtx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768597046; c=relaxed/simple;
-	bh=XjTbnFZ/JDpcBcLK9JCRWNTy3RKDzfxWZAdFywPAsCY=;
+	s=arc-20240116; t=1768597288; c=relaxed/simple;
+	bh=/Xh071rFobUifp9vg+391OtG1/GHsYcuoKH5i8JyjOg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=euyrYyz7SbaM9Fdo1+pJ8RC8RorN+viKaqylAfr/uVYC+75C2wCk2FQuhregH8o6i31djwFlQmuVcN6e0LSWFfkz1QK7nuZ+ixhChXvgg8rucQOQGC4bIkhNE86lXtPgTs+I8I/9DfBfxwSJm4bIWZ5kBktbOM2TNlwOzPksxJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PCfHEObY; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=54KFRrcEl1B0WjUdaGaFEHLkeLCSytYhQsdlx+jeMds=; b=PCfHEObYDtoy9FGBFKLOvCGSZ4
-	s713vwKEJCVHDNFif/2c7SemENeLq34W4Lf9l0j7m79bYRwIf/nC9I8vFINXcHRYLzTDxnzxLij0p
-	AwwYLcqo/OZHr+tJrB68RTMp/S/ygKnBhTPWoQ/G34FIwFtzmwV7ALsENs+DlxZ7G1KVPmjR69oj3
-	JBLW2lp/B9eD3b+SUOSgfRCZSotA4jdhEco1pD1K/3ZXyMy407wpdy1aOgx+ExlPJPYG2kbv1wo/k
-	8LRtbbx6PSA7U5hQvYdPIqdGljIcpu+Hft90cAyvrdG43bTl5KIxODVHiIJxKsSB625yAJN2l7Xha
-	TMW5wlFA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33254)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vgqsY-000000002iR-47Ya;
-	Fri, 16 Jan 2026 20:57:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vgqsT-000000003vq-3ny9;
-	Fri, 16 Jan 2026 20:57:05 +0000
-Date: Fri, 16 Jan 2026 20:57:05 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Tao Wang <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQLzeYKMwwjmQQA+rRd4fY+7Kxs3wY2x+5XMbKh68K2cpu5XoKwxFeTvy/QRzb1beRRozovylNlLEGxnb6++oCNMiln7HQk227W1F9CYVdBgy4e7OtLBKKgjv8iLvpLwguqadmVcpjOGiPmoGorno57S4o5rXNHhJabwzZccZeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2jeg763; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42fbc544b09so1723031f8f.1
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 13:01:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768597285; x=1769202085; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aXlyykM87bz8EPPmErTX2/nMizjLMi1IDXeb9kqCDiE=;
+        b=S2jeg763oGMvOb2mBNJhei7xpYnLP7JJO66GgwHTeN85bumqS2b4dc894XOOzLYvqg
+         gPRydq+IVVHDlLMhM5iqlwbYJXKnagmyqvhdgJkwVtZ+rnh163dPCKuWvnrQ7fbdvpFH
+         2gKrou1g7aEL96c1vqsUZH0opdGQr8GQePf9PB6cuoUl6NF7Vrvp7xfCH7DTaXqlbBmX
+         GB5Jii7QHPgdQaYb8mjfNaxIpHfOxJ1GViFgE639IhwyfHnotfSjAy+4NDKFYlp4oakA
+         8FRQcMZrI9Qrw5f9IPO8G+tNKYOcA/0S+FTCZhliTfvsGiP23Ao7HLPvusxldDgsGkY2
+         QAug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768597285; x=1769202085;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aXlyykM87bz8EPPmErTX2/nMizjLMi1IDXeb9kqCDiE=;
+        b=pvdYgF7R2pItii4CKvimruo8ddHy5cvloMjiRcsCC+lngBiFgzWkkW6WANME5oZcd0
+         E9f5xdinFK4HzuMKZTBRrLCFgnAT09ALV3xnlfcelqEHjNaMSIHptBVAMAFC+BrcBO1F
+         t0BvzGTls58qHm2yQh/cvf+YRB1OTEffX2R7QORAtYrIc4yRsvb35XA5U7sEwoimkwIu
+         IF7FMLjbIoXTYncAk5x5izQb2gSVCGj77/oPn3MCvUw9Geo6nP8EgQlsq+FuId2VVIYY
+         ZiMmgV6pYqi3E3QWtT8OBZ0UIuYEIRB10afaO/bpuIXmc+6yaZaBcufWpW2kiCO27DSe
+         GUPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhJGjvnIHcrLNFyraMKBgl0C183SbPDhLTsnDEl/As13909RSmJfq1jOcr/s9T55x/JfjvM5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyNV+45C6sEz8kknNO+NGt6/gDuD9xkLwSMclBy447LLxVjf0Y
+	1D1ERxNgvylEQ4Tki4Q5j55ZCF2sDfUKDPJmSxaGmGlBhZfQVuJDAts3
+X-Gm-Gg: AY/fxX5cZsly0rMifi8Xekf8kXpwA93HtEzR4JH76z1cj/az8G2G9VFrfrjDOxoP5wh
+	Naf16EChE0I9NYvVvG16HG2LBelqd+HokZJ2hk6VojiaIme7SxgF4MbFYhdB8LI11rwlTKRqNiK
+	eoCLQgPBTMdlxmQBCnNSst6Zlp3QY8zkVPdxshUKFWiUWpQSE7kjPHMJOFLfzzRdup+F/vTjSN1
+	5SBB8eVKVSqyvuj3EHL6PDZwU3tJR8Y2qRjPvifKFDOjGnsX/mB3Zuwy3xslyr9q3c+StqWJPqZ
+	MeMx48dtcgJVdVwIzj46rCmcZgJ0LdNOXLUOmE9Wxt4200GG5S/om6KqImGr4jOJD//dGnM9WRR
+	vXinob6V9Lg2aMBy7hO6nM6Fkjp6mHI9zUVEbBPByNXoDoxLxpbHTKhPOjrc0tOjWxebL4N4IjM
+	3iHZzujQ==
+X-Received: by 2002:a05:6000:4387:b0:431:1ae:a3d0 with SMTP id ffacd0b85a97d-435699810a1mr5156199f8f.25.1768597284962;
+        Fri, 16 Jan 2026 13:01:24 -0800 (PST)
+Received: from archlinux ([143.58.192.3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699982aasm7545219f8f.42.2026.01.16.13.01.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 13:01:24 -0800 (PST)
+Date: Fri, 16 Jan 2026 21:01:22 +0000
+From: Andre Carvalho <asantostc@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v10 7/7] selftests: netconsole: validate target
  resume
-Message-ID: <aWqmIRFsHkQKkXF-@shell.armlinux.org.uk>
-References: <20260115070853.116260-1-tao03.wang@horizon.auto>
- <aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
- <aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
- <6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
- <51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
- <aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
- <aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
- <aWp-lDunV9URYNRL@shell.armlinux.org.uk>
- <3a93c79e-f755-4642-a3b0-1cce7d0ea0ef@bootlin.com>
- <aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
+Message-ID: <aWqkhT_-4UoNHX6F@archlinux>
+References: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
+ <20260112-netcons-retrigger-v10-7-d82ebfc2503e@gmail.com>
+ <20260112061642.7092437c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,129 +91,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20260112061642.7092437c@kernel.org>
 
-On Fri, Jan 16, 2026 at 07:22:39PM +0000, Russell King (Oracle) wrote:
-> Yes, because the receive DMA has stopped, which makes the FIFO between
-> the MAC and MTL fill above the threshold for sending pause frames.
+On Mon, Jan 12, 2026 at 06:16:42AM -0800, Jakub Kicinski wrote:
+> On Mon, 12 Jan 2026 09:40:58 +0000 Andre Carvalho wrote:
+> > Introduce a new netconsole selftest to validate that netconsole is able
+> > to resume a deactivated target when the low level interface comes back.
+> > 
+> > The test setups the network using netdevsim, creates a netconsole target
+> > and then remove/add netdevsim in order to bring the same interfaces
+> > back. Afterwards, the test validates that the target works as expected.
+> > 
+> > Targets are created via cmdline parameters to the module to ensure that
+> > we are able to resume targets that were bound by mac and interface name.
 > 
-> In order to stop the disruption to my network (because it basically
-> causes *everything* to clog up) I've had to turn off pause autoneg,
-> but that doesn't affect whether or not this happens.
+> The new test seems to be failing in netdev CI:
 > 
-> It _may_ be worth testing whether adding a ndelay(500) into the
-> receive processing path, thereby making it intentionally slow,
-> allows you to reproduce the problem. If it does, then that confirms
-> that we're missing something in the dwmac4 handling for RBU.
+> TAP version 13
+> 1..1
+> # timeout set to 180
+> # selftests: drivers/net: netcons_resume.sh
+> # Running with bind mode: ifname
+> not ok 1 selftests: drivers/net: netcons_resume.sh # exit=1
+> -- 
+> pw-bot: cr
 
-I notice that the iMX8MP TRM says similar about the RBU bit
-(see 11.7.6.1.482.3 bit 7).
+I've finally been able to reproduce this locally. The issue is caused by the
+fact that the test currently expects that mac addresses for netdevsim devices are
+deterministic. This is the case on my setup as systemd enforces it (MACAddressPolicy=persistent).
 
-However, it does say that in ring mode, merely advancing the tail
-pointer should be sufficient. I can write the tail pointer register
-using devmem2, but the hardware never wakes up.
+I was able to disable this behaviour by setting up /etc/systemd/network/50-netdevsim.link, with:
 
-E.g.:
+[Match]
+Driver=netdevsim
 
-Channel 0 Current Application Receive Descriptor:
-Value at address 0x0249114c: 0xfffff910
+[Link]
+MACAddressPolicy=none
 
-Channel 0 Rx Descriptor Tail Pointer:
-Value at address 0x02491128: 0xfffff910
+I'm assuming this is also the behaviour on CI hosts. I have started working on a fix
+for this test and will submit v11 once that is ready. The approach I'm taking is saving and
+restoring the mac addresses once I reload netdevsim module. Example code below (needs more testing):
 
-Value at address 0x02491128: 0xfffff910
-Written 0xfffff940; readback 0xfffff940
-Value at address 0x02491128: 0xfffff940
-Written 0xfffff980; readback 0xfffff980
+function deactivate() {
+	# Start by storing mac addresses so we can be restored in reactivate
+	SAVED_DSTMAC=$(ip netns exec "${NAMESPACE}" \
+		cat /sys/class/net/"$DSTIF"/address)
+	SAVED_SRCMAC=$(mac_get "${SRCIF}")
+	# Remove low level module
+	rmmod netdevsim
+}
 
-Value at address 0x0249114c: 0xfffff910
+function reactivate() {
+	# Add back low level module
+	modprobe netdevsim
+	# Recreate namespace and two interfaces
+	set_network
+	# Restore MACs
+	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" \
+		address "${SAVED_DSTMAC}"
+	if [ "${BINDMODE}" == "mac" ]; then
+		ip link set dev "${SRCIF}" down
+		ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
+		# Rename device in order to trigger target resume, as initial
+		# when device was recreated it didnt have correct mac address.
+		ip link set dev "${SRCIF}" name "${TARGET}"
+	fi
+}
 
-So, the hardware hasn't advanced. Here's the ring state:
+The main annoyance is that to test resuming when a device was bound by mac I actually need
+to change the name of the device after restoring the mac address (since when the device 
+is registered after deactivation the mac won't match).
 
-			  RDES0     RDES1 RDES2 RDES3
-401 [0x0000007ffffff910]: 0xffd63040 0x7f 0x0 0x81000000
-402 [0x0000007ffffff920]: 0xffd64040 0x7f 0x0 0x81000000
-403 [0x0000007ffffff930]: 0xffd3f040 0x7f 0x0 0x81000000
-404 [0x0000007ffffff940]: 0xffeed040 0x7f 0x0 0x81000000
-405 [0x0000007ffffff950]: 0xfff2f040 0x7f 0x0 0x81000000
-406 [0x0000007ffffff960]: 0xffbee040 0x7f 0x0 0x81000000
-407 [0x0000007ffffff970]: 0xffbef040 0x7f 0x0 0x81000000
-408 [0x0000007ffffff980]: 0xffbf0040 0x7f 0x0 0x81000000
-
-bit 31 of RDES3 is RDES3_OWN, which when set, means the dwmac core
-has ownership of the buffer. Bit 24 means buffer 1 addresa valid
-(stored in RDES0). So, if the iMX8MP information is correct, then
-advancing 0x02491128 to point at the following descriptors should
-"wake" the receive side, but it does not.
-
-Other registers:
-
-Queue 0 Receive Debug:
-Value at address 0x02490d38: 0x002a0020
-
-bit 0 = 0 (MTL Rx Queue Write Controller Active Status not detected)
-bit 2:1 = 0 (Read controller Idle state)
-bits 5:4 = 2 (Rx Queue fill-level above flow-control activate threshold)
-bits 29:16 = 0x2a 42 packets in receive queue
-
-Because the internal queue is above the flow-control activate
-threshold, that causes the stmmac hardware to constantly spew pause
-frames, and, as the stmmac receive side is essentially stuck and won't
-make progress even when there are free buffers, the only way to release
-this state is via a software reset of the entire core.
-
-Why don't pause frames save us? Well, pause frames will only be sent
-when the receive queue fills to the activate threshold, which can only
-happen _after_ packets stop being transferred to the descriptor rings.
-In other words, it can only happen when a RBU event has been detected,
-which suspends the receiver - and it seems when that happens, it is
-irrecoverable without soft-reset on Xavier.
-
-Right now, I'm not sure what to think about this - I don't know whether
-it's the hardware that's at fault, or whether there's an issue in the
-driver. What I know for certain is what I've stated above, and the
-fact that iperf3 -R has *extremely* detrimental effects on my *entire*
-network.
-
-The reason is... you connect two Netgear switches together, they use
-flow control, and you have no way to turn that off... So, once stmmac
-starts sending pause frames, the switches queue for that port fills,
-and when further frames come in for that port, the switch sends pause
-frames to the next switch behind which stops all traffic flow between
-the two switches, severing the network. All the time that stmmac keeps
-that up, so does the switch it is connected to.
-
-If another machine happens to send a packet that needs to be queued on
-the port that stmmac is connected to (e.g. broadcast or multicast)
-then... that port starts sending pause frames back to that machine,
-severing its network connection permanently while stmmac is spewing
-pause frames.
-
-Thus, the entire network goes down, on account of _one_ machine
-repeatedly sending pause frames, preventing packet delivery.
-
-While the idea of a lossless network _seems_ like a good idea, in
-reality it gives an attacker who can get on a platform and take
-control of the ethernet NIC the ability to completely screw an entire
-network if flow control is enabled everywhere. I'm thinking at this
-point... just say no to flow control, disable it everywhere one can.
-Ethernet was designed to lose packets when it needs to, to ensure
-fairness. Flow control destroys that fairness and results in networks
-being severed.
-
-"attacker" is maybe too strong - consider what happens if the kernel
-crashes on a stmmac platform, so it can't receive packets anymore,
-and the ring fills up, causing it to start spewing pause frames.
-It's goodbye network!
-
-I'm just rambling, but I think that point is justified.
-
-Thoughts - should the kernel default to having flow control enabled
-or disabled in light of this? Should this feature require explicit
-administrative configuration given the severity of network disruption?
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Andre Carvalho
 
