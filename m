@@ -1,93 +1,117 @@
-Return-Path: <netdev+bounces-250527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F82D31A27
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:15:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8931AD31B91
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 510B53007C0E
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:15:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 188A33029F9E
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 13:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E83F24886A;
-	Fri, 16 Jan 2026 13:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qHHHHyHK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B132475E3;
+	Fri, 16 Jan 2026 13:18:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8285924BD03;
-	Fri, 16 Jan 2026 13:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703397260A
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 13:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768569316; cv=none; b=neNFcQQOnXndCY56gOsq/Z1u1G8NoVqx2wJY6heIHu2kFHn34ur3Kr62HoQzhZmxx9t9akmXBeKJ5yblTjbg+ah2efJbGr4pbGde7KeOkElM95NaitCqcCw78mf53Uk2OjHmX+W0bNqssybSL6vfO6TzEK6RwqgwPXWZBW3wczM=
+	t=1768569493; cv=none; b=G2UabAhut4zMuASWsEnefVNvA2Sk0+JlLWZoaxYkxT3E6wVI1BJMXJ6+GP+E26cskC0CprGQttt8/pDKB1am/HUO/N/3LAE4hjXSQS3J40BdDAe63vZ/T++AciyCc4+vyAhPsGyZDWuHavIDwC5shHuXCDIHwYAEjGjA2DA+OLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768569316; c=relaxed/simple;
-	bh=HNM0aFDEj7xgTPDX9mp/xW9cjC4/7xLMggF38qUP7C0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jL/SDqAPud1Uo5hgtwqKJGfmbz3yiipL1WYDOQc64cJrpsqhFu0WkE/umIP+bessOxP5n6miShQ9sdnQLo+2mvFwI02xoI7rhMDpondwV11G0VkzQT4/Q/qQ8eBIbbP+zj0FKtwAjcnRnFtn8R3jpPoSrl9jzwc9nQE19hkqfn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qHHHHyHK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MIi+xqXrSmMxoa7bCC411gtzE/+5szTyDlWOQqesDO8=; b=qHHHHyHKjnuvGrC2sV3uDo4DNK
-	jDtx5czDmpEAy2A4eMrTFcSu77z6I8lU0TRmXA3PCSNQPpWxsNtooWtBi35qJZ5RcRUbPPPrYqgRW
-	DMU7DwwRZFgbkS0g6kP+27xEe9kvz+hT6Vv//mKuPMJ/BoCm9xhEzcDyKvvMPztghMjA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vgjfO-0034it-2w; Fri, 16 Jan 2026 14:15:06 +0100
-Date: Fri, 16 Jan 2026 14:15:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v4] net: sfp: add SMBus I2C block support
-Message-ID: <0b411424-27a4-4b10-b4ab-b2c42f0a70da@lunn.ch>
-References: <20260109101321.2804-1-jelonek.jonas@gmail.com>
- <466efdd2-ffe2-4d2e-b964-decde3d6369b@bootlin.com>
- <397e0cdd-86de-4978-a068-da8237b6e247@gmail.com>
- <0c181c3d-cb68-4ce4-b505-6fc9d10495cd@bootlin.com>
- <d5c11fec-1e75-46cf-aeae-593fb6a4af09@gmail.com>
+	s=arc-20240116; t=1768569493; c=relaxed/simple;
+	bh=tzTSdOBZ0DpTikGLNjMUnRIK/wvXnKqXQddphD+OdNs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nwAPExhTOrjhLH2PdM0VHRbamF/TUuI10gXYD2rmzD4Dsgj8jvdR0oEobFwmrF5IeJ0qxnGgQNAxl5LxG/Soz3dHMt5qkpidkdZLz8uDQUANcK2gD+1O3ZeL1hurEmx8UJ5OntmAHaLZH+ihi6guw4XY0TFqdc+GreqDf3mEpe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7FCDB4C442FC79;
+	Fri, 16 Jan 2026 14:17:31 +0100 (CET)
+Message-ID: <c2a61a49-e84a-447e-a45a-61a44a5393d0@molgen.mpg.de>
+Date: Fri, 16 Jan 2026 14:17:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d5c11fec-1e75-46cf-aeae-593fb6a4af09@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/2] ixgbe: e610: add missing
+ endianness conversion
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ dan.carpenter@linaro.org, horms@kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20260116122353.78235-1-piotr.kwapulinski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260116122353.78235-1-piotr.kwapulinski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> When I come to trying to work on that, should that all be kept in
-> mdio-i2c.c? I'm asking because we have a downstream implementation
-> moving that SMbus stuff to mdio-smbus.c. This covers quite a lot right
-> now, C22/C45 and Rollball, but just with byte access [1].
+Dear Piotr,
 
-It really should be that the I2C access mechanism, and the protocol
-running on top of these accesses are orthogonal. So i could see the
-code split it mdio-i2c.c, mdio-smbus.c, mdio-rollaball.c,
-mdio-marvell.c. But only if there is no replicated between these
-files. And i'm not sure we have reached the complexity level to make
-such a split.
 
-> Because that isn't my work, I'll need to check with the original
-> authors and adapt this for an upstream patch, trying to add word +
-> block access.
+Thank you for your patch.
 
-The code should be GPL, so you should be able to just take it and
-adapt it. However, i've always had a good experience asking the
-authors, they either say yes, or point out issues with the code that
-need addressing. BTW: IANAL.
+Am 16.01.26 um 13:23 schrieb Piotr Kwapulinski:
+> Fix a possible ACI issue on big-endian platforms.
 
-     Andrew
+Please elaborate, why this is needed, and `raw_desc[i]` needs to be 
+converted.
+
+For the summary/title, you could also be more specific. Something like:
+
+ > ixgbe: e610: Convert ACI descriptor buffer(?) to little endian
+
+> Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index c2f8189..f494e90 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -113,7 +113,8 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>   
+>   	/* Descriptor is written to specific registers */
+>   	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
+> -		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
+> +		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i),
+> +				le32_to_cpu(raw_desc[i]));
+>   
+>   	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
+>   	 * PF_HICR_EV
+> @@ -145,7 +146,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>   	if ((hicr & IXGBE_PF_HICR_SV)) {
+>   		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>   			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+> -			raw_desc[i] = raw_desc[i];
+> +			raw_desc[i] = cpu_to_le32(raw_desc[i]);
+>   		}
+>   	}
+>   
+> @@ -153,7 +154,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>   	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+>   		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>   			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+> -			raw_desc[i] = raw_desc[i];
+> +			raw_desc[i] = cpu_to_le32(raw_desc[i]);
+>   		}
+>   	}
+
+
+Kind regards,
+
+Paul
 
