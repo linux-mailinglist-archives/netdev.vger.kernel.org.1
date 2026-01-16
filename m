@@ -1,227 +1,389 @@
-Return-Path: <netdev+bounces-250456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFAD1D2CA98
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 07:41:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAFAED2BE97
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 61C6C300AC9A
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 06:41:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 80005300997D
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 05:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CB734DCDF;
-	Fri, 16 Jan 2026 06:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA4E3375D3;
+	Fri, 16 Jan 2026 05:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PqkKizaY"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lh7X9JHX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012056.outbound.protection.outlook.com [40.93.195.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A5D34D90C
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 06:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768545702; cv=none; b=ASPpyA8+jXwOEkhCp7Dkc16DOOOD15dPA03QofHFf8OxOuQyAS5KN43tQrkoYnuwkfsq51GaaD2Dl6sGrwgC7mf7TvA86kTEn7JozaUxK6Wo3EMZPTOcPdZ1OExtWGLsVlYFLsDO4xCOFa4VLVjPT+bkVY+3wxhWAgksJwGfUIQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768545702; c=relaxed/simple;
-	bh=auSMoPKWCajUDwEFhG4/1C5B0ulKuOi59DJ5mdB4wqw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lwRavJvxIgmKuHTWsY686V7mX8ok24B3IcyZh9qpF6FKDGkmJa43Lt2BqQvr9uZ0Dw9DP2IO7+tCR2+SggeJOdK0lY+4FFO8TkN5ZwHocn1i7+iCn9rsLglnlzvoPidrh9cWNyvm4pNUgarFNVn2neSJSXky4k2OCq+E62VNoNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PqkKizaY; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8887f43b224so31969386d6.1
-        for <netdev@vger.kernel.org>; Thu, 15 Jan 2026 22:41:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768545700; x=1769150500; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eSj8YbqJilmqRga93ax0BVm+4H5y9SZdZjVdaZpiAbo=;
-        b=PqkKizaYm5jUwwDmwodK6hONXT4XJKnG/hBq7bA8j+UibuxbBw2vEhee0sdIy7hjHe
-         abQqN2PpqZLs+Dm6YZ+Pl2KdxRY7a/aFaQCkFxYzFtOhljCbfqhCDtv0uRxbSlJnVM53
-         kXYutJTUE9EICDxKZlZS7kwG0vShfIVRq2m6w6oSnmSe1enkCjS+q6BeB9Z905bZQT6N
-         npBwPIE6RRVJSz0EB8MYJB+iMCsE6eLAye+b/Vyf1KnoTSWD/XSDLrw5tfiMui6x2gwv
-         enKb/Z8cAQaHLpc4+mvHP61SDOvzLXc0ZZAMNZ0a5Q6uKf2HAGOQOoWV6EHMwhEg93DK
-         wVkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768545700; x=1769150500;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eSj8YbqJilmqRga93ax0BVm+4H5y9SZdZjVdaZpiAbo=;
-        b=wZwv1q7ONcjVmEzUWUZeGPxPzNWGkkK8BVm+x6FKvMhAHrxo1AWI6SodmwIe/sCjb5
-         Hzyk6Ucevxfzj+2K0WAWxitpJdBeFSiY4RW90sLIaSGm0jQ2RXPs9j8UzniCumXqKUNV
-         S2LhiZRsCjQkZin/axsiFRf9Fjkdimg5hHiZHmL7gjg3ffxPeZccobwgynDbe1apxDJX
-         AHW5PjSt5rxWsuJMv8FZ9xz/FYuWVxEG8spszK20mVfhW6cjo+rQP2HyvXfMtJNbvUuh
-         DO8gY+sEc7+vKzrmxBaTCfnpCOXVWZVEZolVeT2jhT5lKUxyT9KFNOqTXvEiG0wmYHNr
-         s87A==
-X-Forwarded-Encrypted: i=1; AJvYcCXlINIxpuH5n6jP2L+YrD6EgsR5dCJe2HIl9ACzWoGe/gHwaLyLcirmbfN0BkG/zpszx0dF1qI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTQwCkygyNDSVm2H8JGZO/vtXAc1qfYQhSP+d+sLBwPychJ/uF
-	ymnNtn3dxskqbqASist44i8NDPkkm7/75W1b+oOeKYXxs/p48V7EQjSnExzACg==
-X-Gm-Gg: AY/fxX7qlYTTeAyLoX8wKJWG65fWBOPUlx6h1IM2MmOtGJ/VRNmCWNYbqPeWCxE/o5H
-	wy/eGRkePhC9oLTOZgRZKEcpVj3oLPUvQu9HMozIKGYOUpz43ZoWYIH5B12bg+YtjUV2VtXl3Zt
-	2GmC41uo9uWdCG48zTmA+MlCc54V0KQNij7F53w/76HW262Cw3awUD+r4vJjyAXsVOLyAg0TA/S
-	hrmidHAmieJz+I/is04lcUcWR8Hr17VS57iYy0Ghdcc7TtXaDvI6w93qaIuVdzM84cpZJepbc1S
-	pEzkNTp6DYkOYCst9aGAWXPlaSZjbpM+LOTLDdpkwilY8cLqpjRD33wzrgBtPzyvCcjM7PRtiuu
-	xdA0H2Vhb1TKFvetcCdaPbHYj9gxYS9Nnyoo+5mqR/XLGU9DKFBwiAhhUuz+zvtnW3gBO9/Q9lZ
-	o+bEVTL7Tmfg==
-X-Received: by 2002:a05:690c:46ca:b0:78c:25fa:1bb7 with SMTP id 00721157ae682-793c68762a3mr13549577b3.60.1768539797365;
-        Thu, 15 Jan 2026 21:03:17 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:5e::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-793c66f326bsm5392537b3.19.2026.01.15.21.03.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 21:03:16 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: [PATCH net-next v10 0/5] net: devmem: improve cpu cost of RX token
- management
-Date: Thu, 15 Jan 2026 21:02:11 -0800
-Message-Id: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7770322B83;
+	Fri, 16 Jan 2026 05:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768541043; cv=fail; b=Z3uj4x6psV7EkZ4jsHt4daNSYI4LLQknxTXlJBeCwsxQDTcpOMCXnSXpzWR5QD5mI/Sq3rMhRJMjCxiFAKrc5w1BGTZCG02yiKhMNIgdEr/JvONIFl84cItmZ+rDd4aE9lQldaVi9K2AcHr1DGGLCSzwTunKHh/5MTTiZWu2QeU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768541043; c=relaxed/simple;
+	bh=Gzo5Pb67ZK2URp9j6s8twP48fr00tpXiaZhoEyw+Io0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nndofk0yRYhQlK9S2A/kTXm6/l3EWGW0+fXnUH35N/YonviI0K9p5hsvZv77lXN17DocXsCcDONyYRSJJStIOgoLn9YwYHes8JaZSlFhFuISrss5Ru0P3dipXPcPPDMkExvskwC9uUasyjvg52/kiTMGAAoyHzsj0w1s9L39wTY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lh7X9JHX; arc=fail smtp.client-ip=40.93.195.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=scgW3E37MK50sxWQyT5q/Nds1W5OE10r3T+A6JUgLg0uXGoj5v26Bmp7IefUpWKCVgwBMuXXPTNksOuZ/esBkUSatObuhL3Ky/ssNi4uN0QEKG+ugt/Xu8sYFzz4S446hSgn7YM6jWk6nw4geXyySslfWL2YJgliCyyJ+6Cj9gM0HCQdAImHmmKRkCGpvTbSaA0eEzzwYQWFYjNL080StDy1k6HC9tXXDEjSr6CRJ8E0qibKsG5LWDojid1o4mGwB1EbLSRDQIh565SyzKIVs2U8rZJMFLM21WgrYn/zOwSktaMONdUI22ntPm4NaOFhkHHpTHxp9UHDoUUjcLQl2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=anPweXSQaLJSRBQTtb+0RK+AZNwlAJf3fw5bw9jtyI4=;
+ b=XKYkVQb36UfxeGpPFWmC1uUzty4EasmqO/eZAHJgsdZ1moX1tEg03TgdMa5CKM6SqIdzqJmT72XQ7GMcbUb0Z46oX+rtfkP/3avWi8guarmhMbw5IHQ0RmpJPAiMiwgXXuyQ0Msx2YXgAOGG9iUMFh1kcOokgZM1Ld5R+FWFtWrPwY2gFs8/fotT4MrmGEN40jwrIc6Yd3uD+ciFFBqTLGE2W8AM082NQg6WEcn7JtBo8/vDpStpsevD455H0KY2Xu3slFvXbROGJatCPImPWq/7/oczNrW5gxKut11aKqZjJIiggniLPxvsql/4T5bl/d0C6HGpDqFyq4Kru/KrgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=anPweXSQaLJSRBQTtb+0RK+AZNwlAJf3fw5bw9jtyI4=;
+ b=lh7X9JHXKTb9O5AROPoPhe7CXMLkTYAfOPdqAFpndhUQ/0bFwz1seB51JqYfVVsKF4K9YK37JE5TKKKai+RXALTmldTTVNH3bIoybWWT5Dfyy29f8C7eoxhw6/s06I8dRMzBg7MGKUdWRUH//6MyiFH1UU8NBZHefH3NP0vzGKjiKmtXXo9NnsbgmlUBQIrsHjB2WYxSqvmy8AJsmsI9wX6rUhWOVVYAUqe1pNKK0jDK3HRMxFEPylBkOru43FE7jy+Mv2gKBOe+xviHC0q+vp1aOXspij2PzOPt/kguZPbZh3+IkGMCqDIpSZ31y34LPnHY2NHHXRXXC8r/8pIeXA==
+Received: from CY5PR11MB6462.namprd11.prod.outlook.com (2603:10b6:930:32::10)
+ by SJ2PR11MB8402.namprd11.prod.outlook.com (2603:10b6:a03:545::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Fri, 16 Jan
+ 2026 05:23:54 +0000
+Received: from CY5PR11MB6462.namprd11.prod.outlook.com
+ ([fe80::10d1:11dd:5088:7559]) by CY5PR11MB6462.namprd11.prod.outlook.com
+ ([fe80::10d1:11dd:5088:7559%5]) with mapi id 15.20.9520.005; Fri, 16 Jan 2026
+ 05:23:54 +0000
+From: <Prathosh.Satish@microchip.com>
+To: <ivecera@redhat.com>, <netdev@vger.kernel.org>
+CC: <donald.hunter@gmail.com>, <kuba@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<vadim.fedorenko@linux.dev>, <arkadiusz.kubalewski@intel.com>,
+	<jiri@resnulli.us>, <poros@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<mschmidt@redhat.com>
+Subject: RE: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode
+ setting support
+Thread-Topic: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode
+ setting support
+Thread-Index: AQHchVE53rjvGpeeJEOt0SuyhadL0rVUP9fQ
+Date: Fri, 16 Jan 2026 05:23:54 +0000
+Message-ID:
+ <CY5PR11MB64627D56C60F8F76D22619F4EC8DA@CY5PR11MB6462.namprd11.prod.outlook.com>
+References: <20260114122726.120303-1-ivecera@redhat.com>
+ <20260114122726.120303-4-ivecera@redhat.com>
+In-Reply-To: <20260114122726.120303-4-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY5PR11MB6462:EE_|SJ2PR11MB8402:EE_
+x-ms-office365-filtering-correlation-id: 7d87dda0-abeb-4ae5-5b7f-08de54bf7139
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|1800799024|376014|366016|38070700021|18082099003;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?ET13rMQyusDlXNhtVd0jl8n0O2H3AmNHVdix9iOPdJh09Ura9AJxCFkZcOqe?=
+ =?us-ascii?Q?YeVaPOFCFUEUA1rmHLACxCABbmJj1HJ3BbA4XnuQK63nni5r7jqezOY+COVh?=
+ =?us-ascii?Q?kcAlN0oR93wXl+UpdJRXbzLfVtFB4GvYSAt/3NeerxnQAVc3j45OBVj6fHy9?=
+ =?us-ascii?Q?HTazhi+Ny1xuVFPAh1LF8q2Nj/MLQEXw7MEwdEY0uMU2e6Wq6kQ0vVnVnRzq?=
+ =?us-ascii?Q?CnaOq7h9n66whd/LBgZ0e9e+64JlQ0hRWgGaAiPiSFRKRomrtFkpzlK/gn8n?=
+ =?us-ascii?Q?Ir2YFELEcEpPJqmpzCz3W+4kwzzHJlhCbt0YnuAgNMkwsluEZ5xdOXKe4+RW?=
+ =?us-ascii?Q?hjJ8PKBiVTnGDoDcZG6pEqLNnGx+HAWpFx0dEWhCtJdlbPhsYpJT0ZxCgafs?=
+ =?us-ascii?Q?3VIZ6eM+fJWT1ybFkI9e2eooWXfMUX9Z+BIYZHL4mUQKqGxa6nQ4VMtPeS9K?=
+ =?us-ascii?Q?wL/4c5Y2v1579Yrls+Rt1+9uDwSVJrvntM99fNE2dUgx0sowIyhS9Q8nHtz0?=
+ =?us-ascii?Q?EAjk0AYLxPPZmd0ArWCzmNLD+HzofXwnY0O2PT4caKOSqPQH6rs1ATLqxkjt?=
+ =?us-ascii?Q?8pdWDuFZCDv64GyagbS3GbLxNglQ7Ptt9AmzE97R0rZoffNpTKdDRXbEQnUH?=
+ =?us-ascii?Q?cf+vZGY1PLvURmAHqWACOpibIpUTLUtnAGFGgYMvqeBfUqfiMKjbcWJhmL31?=
+ =?us-ascii?Q?cRdsCgo3BUl7mZkBpx22tYYJNx5sM/35ZUpl1hEPjfzwwaGJusCVGua/L2gE?=
+ =?us-ascii?Q?/wfGOGWlD5GF3x2pUdsonTDKTpc4/2sAugd/N4u3egC2aVAGE3XSbRE/+AqS?=
+ =?us-ascii?Q?wWWjVq0RMUmw6lOZlAnNcjhbQ1QOT7p7pBq6XIy0ucKzq1OPnhFIzupd//c/?=
+ =?us-ascii?Q?TQJk7nZsmG1HLTZCJc6r4bWaPEwz41E+pi78T1Id1rjfCfborcPlpTlAr5yp?=
+ =?us-ascii?Q?46qVeJiMUC/gI1C2DHy4swxHcEhTot17B/HdQIkoQNPrhHVIz5/zRTAorR3/?=
+ =?us-ascii?Q?+RepX7mDa+HKokUWqleOOAWCb7MpSRpeghGmeffdPeMRPshnLybZCopccBxl?=
+ =?us-ascii?Q?OSBTXhM5NA8fRvuyF34/fLbhIXU+dujCfgPE6iFunpROE0evKLGGc5eioCgH?=
+ =?us-ascii?Q?tU3306jFrSczvwbxXlHtN3OFV+N6PALMfZFkrhPP8DvUpv+rGnPRQQ4eNRuw?=
+ =?us-ascii?Q?4RiiOwj5Q4tgpcP7s5nk4Opm1cFt4drZorv/tRTnC9I56CRbLLzcJc+27aGc?=
+ =?us-ascii?Q?SArIfohWPPYLPLzhwlxv983eQIcTI+JXOlsqJXbi4ox0E7B0PBq9NNhSz6iQ?=
+ =?us-ascii?Q?dX3CyhUnIcdBpbHSWW6u9mQa/azAevv6xYl63bfIQlrI9CHDQnTAv7yD2IvH?=
+ =?us-ascii?Q?9n/zg87H7Aj8p+Yoq+K+9Tn+x3WrtG8VvlzE+HdirhnhcnmkvIsJ6WZZDkYb?=
+ =?us-ascii?Q?6lAXIYz3UYQcW3oZGcqZb/kv0WdNAVSRxtejXDN6QcCPsivLl0acNt4IhZ4A?=
+ =?us-ascii?Q?3Z7idJ9OnWjQZaz2ERwsAfECXQ9hB9TH+F2MHJoIhiv6dvjQvJMB9gyC9bST?=
+ =?us-ascii?Q?NG3c6VI/YmXT6AIytaHsj2FdJ0ppfuQhp9VcWuAmRnbbhZr1jn1NLrkvY/Gw?=
+ =?us-ascii?Q?eGqhfSwWTmp9OsT5XeSAqxE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6462.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(38070700021)(18082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ISNMn/1iT72BfnrMKqcdCxa1lGu6sU1JKFoatiyK4uxt72Kptckb+xiGa9JA?=
+ =?us-ascii?Q?xDO6OQmWPYjJUi99xxTTL1Q+lgwk2kj2Lf5h2TEMWfaIG1M89N1HRxBkk7ze?=
+ =?us-ascii?Q?NW8YCKVY2ERUMYlkxDdbzPxKbMqD8SwCDnXuO/aS5B7MFj60G24alkP31/Ro?=
+ =?us-ascii?Q?hwtz3vGuje9W2iqNBTlUPbvCXFCit+Bk56MCWzX9771t3OyTmOmPwIw9pxJC?=
+ =?us-ascii?Q?/OHLwYQtcALEnd0krOYrvP/HlJDqr0an/1KbzJ5Nx2b1WD/IBpHJgKChr4gF?=
+ =?us-ascii?Q?Rlji7aqcvOVFOKgSNUR3kmqDZqX2jAecDVjWRK82OHvYDZVSk7BEzfpHhTLw?=
+ =?us-ascii?Q?FwzVpJTvPLq8jlchWwtcz7YRdZGUoKw6J0ltui8YZGGyfMesLw0f6qyh5T1/?=
+ =?us-ascii?Q?ZmTl3A50pUcf9UEv+ic4Vk24BvebscVFHz+Lvykmnf6dlhGIhpL4tqh4DE9q?=
+ =?us-ascii?Q?dqeFguNZ4v6YTsxh7AVW4fAauhpdWVWWL8Ikd8FB3J1jzb+fPXk5dQ/zCWfV?=
+ =?us-ascii?Q?vd8Q4A8NMsdoWcQd+pk9sFjGzv59nXxEU38+VQZ+yneP0ucs4RVW0nAn1Bwd?=
+ =?us-ascii?Q?NdSY0FJMN5ozwY7gdftzZJH8C/qLKNAWH9h2q8XEK3IgCx//xlFexqClNIMG?=
+ =?us-ascii?Q?A7NbGr1VfHFfGXPU5lb7/SIkrrZsrDR9Cn78ZjY8UWOfUIVD60fgQ4+npzdR?=
+ =?us-ascii?Q?XP0dshPWhI+V9tzx7DVUVokLOrY4Okizoe4ZKQAwea7g0LgR1D6cXhphXWHi?=
+ =?us-ascii?Q?tvSuQzlx67BNdgYKcNAy1l4OBzcNNVt6J0BbAny+Y60l5Crik/lVPr3vH7WE?=
+ =?us-ascii?Q?j+Ur6iyXlc8mEEipuhW0LvAyTixsSdrxkXRtSsShv4UIphUXYaWK5Jnq8EJP?=
+ =?us-ascii?Q?ct2WuS6KG+FxDfHud4IEazW6Y0diOTgofBRRo16+uQ1IzxnNxcUFZ5HmTATU?=
+ =?us-ascii?Q?UZsAOTV3jnHzWoIVmUMRc2sKT9hn+QFKCv1DrK+AJo7yOluAtsstYO6aPDGU?=
+ =?us-ascii?Q?ztuRwB4k0t0nnvAL9XS/VTc1vUImLkhsBdv5uw8+RKqEOP6WgQs8hdUt7Tta?=
+ =?us-ascii?Q?DaQW6V/L0YyjfLuCKR7qLQLX0RZ7PZzHbNAZwWGDCsE1U9EJfmzEJA6Lln4U?=
+ =?us-ascii?Q?GF70FebGnq7xFpbciwm4BmZby7QSnioUa+biKb7X3R+hSlZbYzkmpogwMlNo?=
+ =?us-ascii?Q?aoFjcrUxqSCh1jwa7EVPbAahILYG6XkWM1CfnBU1gcpKoDMb9dSTjF5WP3ml?=
+ =?us-ascii?Q?LUqQRWT/HArjWQX4SNmKD60kXE+ItnQeIp1s0RGHI6BUDiGqdSXvsovZT/VZ?=
+ =?us-ascii?Q?K1HsHb4hQwiW/IdX62gwpbFPdf3VqqawyU1LZbQzMKa5XV453XIvMSUQZsqk?=
+ =?us-ascii?Q?EnYzB7PXi69dkJx17ywtMG2L0qscNGzM37+oisvFndqsgff5ShRbpczEtAMN?=
+ =?us-ascii?Q?u1NolcxmJ6WsAkIVJBPOo5wOn+gaXH/rSoiHgMEFRM68PsWYmDzLTFazvG8H?=
+ =?us-ascii?Q?rD1i1kjwM2hW1a19PwhNOe3TUkgZlZkt8qCXBcK4cHZft9KNBGQijI/+N3OW?=
+ =?us-ascii?Q?wZK6WNAqemSb0JM1sHLHezo2Tjua4jFX2ysci4BsEe3nXvLq/8t4FaNnx4/k?=
+ =?us-ascii?Q?m9VpfAk5v3ZjoxI14XAs/fOYhE95B/I/ydWVmm0R09UjYGEED4fF0tU9wWe2?=
+ =?us-ascii?Q?X2IWygIhHcrAFNhs6iOu/WDgBLLJxP+1CQSfAyzXs15kQvz9GjFgB7v4dRVb?=
+ =?us-ascii?Q?SWxs3y5gTg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFTGaWkC/53SS2rDMBCA4asYrTNl9Jayyj1KF3qMa9PaDpZqE
- kLuXjC0Nd6564HvH4Z5sEJzT4WdmwebaelLP43s3HA8NSx1YXwn6DM7N0yg0OiEh5LmUFMHcYr
- xTqX7pCGMkGkZaICarlCnDxrh61rqTGEA4UUkblXWKNmpYdeZ2v62Jl/ZSBVGulX2dmpY15c6z
- fd1l4Wv87XqURyuLhwQsleGGx+11ngZqIaXNA1rahEbnvPjvACE5DBbqWNWWu54ueGFOc5LQEC
- nojIxB+faHa9/eY5CHuc1ICibotOtFtrTjjd/PEd1nDeAQMG71KqsMO6PYzc8P/5QiwUEHmJyy
- lipVdrx7oc3yNEe5x0geJG8cUZy5c2O91v+H9t7QHCohJeYEbPd8M/n8xvX8SiHkQMAAA==
-X-Change-ID: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
- David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>, 
- Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6462.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d87dda0-abeb-4ae5-5b7f-08de54bf7139
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2026 05:23:54.8163
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aX3OT4CqPgBbK0CAXaxIJn/ziNZFlNeh7ffmb5oxUFovNLD2EM+Bw5G16dyceE2//tLI5HqsyVpOHUjQ/km4FUzoTfp4/OvfI2AJnnn+AKQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8402
 
-This series improves the CPU cost of RX token management by adding an
-attribute to NETDEV_CMD_BIND_RX that configures sockets using the
-binding to avoid the xarray allocator and instead use a per-binding niov
-array and a uref field in niov.
+Reviewed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 
-Improvement is ~13% cpu util per RX user thread.
+-----Original Message-----
+From: Ivan Vecera <ivecera@redhat.com>=20
+Sent: Wednesday 14 January 2026 12:27
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>; Jakub Kicinski <kuba@kernel.or=
+g>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.co=
+m>; Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>; Vadim=
+ Fedorenko <vadim.fedorenko@linux.dev>; Arkadiusz Kubalewski <arkadiusz.kub=
+alewski@intel.com>; Jiri Pirko <jiri@resnulli.us>; Prathosh Satish - M66066=
+ <Prathosh.Satish@microchip.com>; Petr Oros <poros@redhat.com>; linux-kerne=
+l@vger.kernel.org; Michal Schmidt <mschmidt@redhat.com>
+Subject: [PATCH net-next v3 3/3] dpll: zl3073x: Implement device mode setti=
+ng support
 
-Using kperf, the following results were observed:
+EXTERNAL EMAIL: Do not click links or open attachments unless you know the =
+content is safe
 
-Before:
-	Average RX worker idle %: 13.13, flows 4, test runs 11
-After:
-	Average RX worker idle %: 26.32, flows 4, test runs 11
+Add support for .supported_modes_get() and .mode_set() callbacks to enable =
+switching between manual and automatic modes via netlink.
 
-Two other approaches were tested, but with no improvement. Namely, 1)
-using a hashmap for tokens and 2) keeping an xarray of atomic counters
-but using RCU so that the hotpath could be mostly lockless. Neither of
-these approaches proved better than the simple array in terms of CPU.
+Implement .supported_modes_get() to report available modes based on the cur=
+rent hardware configuration:
 
-The attribute NETDEV_A_DMABUF_AUTORELEASE is added to toggle the
-optimization. It is an optional attribute and defaults to 0 (i.e.,
-optimization on).
+* manual mode is always supported
+* automatic mode is supported unless the dpll channel is configured
+  in NCO (Numerically Controlled Oscillator) mode
 
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+Implement .mode_set() to handle the specific logic required when transition=
+ing between modes:
 
-Changes in v10:
-- add new tests for edge cases
-- add new binding->users to binding for tracking socket/rxq users
-- remove rx binding count (use xarray instead)
-- Link to v9: https://lore.kernel.org/r/20260109-scratch-bobbyeshleman-devmem-tcp-token-upstream-v9-0-8042930d00d7@meta.com
+1) Transition to manual:
+* If a valid reference is currently active, switch the hardware
+  to ref-lock mode (force lock to that reference).
+* If no reference is valid and the DPLL is unlocked, switch to freerun.
+* Otherwise, switch to Holdover.
 
-Changes in v9:
-- fixed build with NET_DEVMEM=n
-- fixed bug in rx bindings count logic
-- Link to v8: https://lore.kernel.org/r/20260107-scratch-bobbyeshleman-devmem-tcp-token-upstream-v8-0-92c968631496@meta.com
+2) Transition to automatic:
+* If the currently selected reference pin was previously marked
+  as non-selectable (likely during a previous manual forcing
+  operation), restore its priority and selectability in the hardware.
+* Switch the hardware to Automatic selection mode.
 
-Changes in v8:
-- change static branch logic (only set when enabled, otherwise just
-  always revert back to disabled)
-- fix missing tests
-- Link to v7: https://lore.kernel.org/r/20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com
-
-Changes in v7:
-- use netlink instead of sockopt (Stan)
-- restrict system to only one mode, dmabuf bindings can not co-exist
-  with different modes (Stan)
-- use static branching to enforce single system-wide mode (Stan)
-- Link to v6: https://lore.kernel.org/r/20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com
-
-Changes in v6:
-- renamed 'net: devmem: use niov array for token management' to refer to
-  optionality of new config
-- added documentation and tests
-- make autorelease flag per-socket sockopt instead of binding
-  field / sysctl
-- many per-patch changes (see Changes sections per-patch)
-- Link to v5: https://lore.kernel.org/r/20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-0-47cb85f5259e@meta.com
-
-Changes in v5:
-- add sysctl to opt-out of performance benefit, back to old token release
-- Link to v4: https://lore.kernel.org/all/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v4-0-39156563c3ea@meta.com
-
-Changes in v4:
-- rebase to net-next
-- Link to v3: https://lore.kernel.org/r/20250926-scratch-bobbyeshleman-devmem-tcp-token-upstream-v3-0-084b46bda88f@meta.com
-
-Changes in v3:
-- make urefs per-binding instead of per-socket, reducing memory
-  footprint
-- fallback to cleaning up references in dmabuf unbind if socket
-  leaked tokens
-- drop ethtool patch
-- Link to v2: https://lore.kernel.org/r/20250911-scratch-bobbyeshleman-devmem-tcp-token-upstream-v2-0-c80d735bd453@meta.com
-
-Changes in v2:
-- net: ethtool: prevent user from breaking devmem single-binding rule
-  (Mina)
-- pre-assign niovs in binding->vec for RX case (Mina)
-- remove WARNs on invalid user input (Mina)
-- remove extraneous binding ref get (Mina)
-- remove WARN for changed binding (Mina)
-- always use GFP_ZERO for binding->vec (Mina)
-- fix length of alloc for urefs
-- use atomic_set(, 0) to initialize sk_user_frags.urefs
-- Link to v1: https://lore.kernel.org/r/20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com
-
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
-Bobby Eshleman (5):
-      net: devmem: rename tx_vec to vec in dmabuf binding
-      net: devmem: refactor sock_devmem_dontneed for autorelease split
-      net: devmem: implement autorelease token management
-      net: devmem: document NETDEV_A_DMABUF_AUTORELEASE netlink attribute
-      selftests: drv-net: devmem: add autorelease tests
-
- Documentation/netlink/specs/netdev.yaml           |  12 ++
- Documentation/networking/devmem.rst               |  73 +++++++++++
- include/net/netmem.h                              |   1 +
- include/net/sock.h                                |   7 +-
- include/uapi/linux/netdev.h                       |   1 +
- net/core/devmem.c                                 | 148 ++++++++++++++++++----
- net/core/devmem.h                                 |  66 +++++++++-
- net/core/netdev-genl-gen.c                        |   5 +-
- net/core/netdev-genl.c                            |  10 +-
- net/core/sock.c                                   | 103 +++++++++++----
- net/ipv4/tcp.c                                    |  87 ++++++++++---
- net/ipv4/tcp_ipv4.c                               |  15 ++-
- net/ipv4/tcp_minisocks.c                          |   3 +-
- tools/include/uapi/linux/netdev.h                 |   1 +
- tools/testing/selftests/drivers/net/hw/devmem.py  |  98 +++++++++++++-
- tools/testing/selftests/drivers/net/hw/ncdevmem.c |  68 +++++++++-
- 16 files changed, 611 insertions(+), 87 deletions(-)
+v2:
+* added extack error messages in error paths
 ---
-base-commit: d4596891e72cbf155d61798a81ce9d36b69bfaf4
-change-id: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
+ drivers/dpll/zl3073x/dpll.c | 112 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 112 insertions(+)
 
-Best regards,
--- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c inde=
+x 9879d85d29af0..7d8ed948b9706 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -100,6 +100,20 @@ zl3073x_dpll_pin_direction_get(const struct dpll_pin *=
+dpll_pin, void *pin_priv,
+        return 0;
+ }
+
++static struct zl3073x_dpll_pin *
++zl3073x_dpll_pin_get_by_ref(struct zl3073x_dpll *zldpll, u8 ref_id) {
++       struct zl3073x_dpll_pin *pin;
++
++       list_for_each_entry(pin, &zldpll->pins, list) {
++               if (zl3073x_dpll_is_input_pin(pin) &&
++                   zl3073x_input_pin_ref_get(pin->id) =3D=3D ref_id)
++                       return pin;
++       }
++
++       return NULL;
++}
++
+ static int
+ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
+                                 void *pin_priv, @@ -1137,6 +1151,26 @@ zl3=
+073x_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
+        return 0;
+ }
+
++static int
++zl3073x_dpll_supported_modes_get(const struct dpll_device *dpll,
++                                void *dpll_priv, unsigned long *modes,
++                                struct netlink_ext_ack *extack) {
++       struct zl3073x_dpll *zldpll =3D dpll_priv;
++
++       /* We support switching between automatic and manual mode, except i=
+n
++        * a case where the DPLL channel is configured to run in NCO mode.
++        * In this case, report only the manual mode to which the NCO is ma=
+pped
++        * as the only supported one.
++        */
++       if (zldpll->refsel_mode !=3D ZL_DPLL_MODE_REFSEL_MODE_NCO)
++               __set_bit(DPLL_MODE_AUTOMATIC, modes);
++
++       __set_bit(DPLL_MODE_MANUAL, modes);
++
++       return 0;
++}
++
+ static int
+ zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
+                      enum dpll_mode *mode, struct netlink_ext_ack *extack)=
+ @@ -1217,6 +1251,82 @@ zl3073x_dpll_phase_offset_avg_factor_set(const stru=
+ct dpll_device *dpll,
+        return 0;
+ }
+
++static int
++zl3073x_dpll_mode_set(const struct dpll_device *dpll, void *dpll_priv,
++                     enum dpll_mode mode, struct netlink_ext_ack=20
++*extack) {
++       struct zl3073x_dpll *zldpll =3D dpll_priv;
++       u8 hw_mode, mode_refsel, ref;
++       int rc;
++
++       rc =3D zl3073x_dpll_selected_ref_get(zldpll, &ref);
++       if (rc) {
++               NL_SET_ERR_MSG_MOD(extack, "failed to get selected referenc=
+e");
++               return rc;
++       }
++
++       if (mode =3D=3D DPLL_MODE_MANUAL) {
++               /* We are switching from automatic to manual mode:
++                * - if we have a valid reference selected during auto mode=
+ then
++                *   we will switch to forced reference lock mode and use t=
+his
++                *   reference for selection
++                * - if NO valid reference is selected, we will switch to f=
+orced
++                *   holdover mode or freerun mode, depending on the curren=
+t
++                *   lock status
++                */
++               if (ZL3073X_DPLL_REF_IS_VALID(ref))
++                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_REFLOCK;
++               else if (zldpll->lock_status =3D=3D DPLL_LOCK_STATUS_UNLOCK=
+ED)
++                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_FREERUN;
++               else
++                       hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER;
++       } else {
++               /* We are switching from manual to automatic mode:
++                * - if there is a valid reference selected then ensure tha=
+t
++                *   it is selectable after switch to automatic mode
++                * - switch to automatic mode
++                */
++               struct zl3073x_dpll_pin *pin;
++
++               pin =3D zl3073x_dpll_pin_get_by_ref(zldpll, ref);
++               if (pin && !pin->selectable) {
++                       /* Restore pin priority in HW */
++                       rc =3D zl3073x_dpll_ref_prio_set(pin, pin->prio);
++                       if (rc) {
++                               NL_SET_ERR_MSG_MOD(extack,
++                                                  "failed to restore pin p=
+riority");
++                               return rc;
++                       }
++
++                       pin->selectable =3D true;
++               }
++
++               hw_mode =3D ZL_DPLL_MODE_REFSEL_MODE_AUTO;
++       }
++
++       /* Build mode_refsel value */
++       mode_refsel =3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, hw_mode);
++
++       if (ZL3073X_DPLL_REF_IS_VALID(ref))
++               mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
++
++       /* Update dpll_mode_refsel register */
++       rc =3D zl3073x_write_u8(zldpll->dev, ZL_REG_DPLL_MODE_REFSEL(zldpll=
+->id),
++                             mode_refsel);
++       if (rc) {
++               NL_SET_ERR_MSG_MOD(extack,
++                                  "failed to set reference selection mode"=
+);
++               return rc;
++       }
++
++       zldpll->refsel_mode =3D hw_mode;
++
++       if (ZL3073X_DPLL_REF_IS_VALID(ref))
++               zldpll->forced_ref =3D ref;
++
++       return 0;
++}
++
+ static int
+ zl3073x_dpll_phase_offset_monitor_get(const struct dpll_device *dpll,
+                                      void *dpll_priv, @@ -1276,10 +1386,12=
+ @@ static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops =3D {  sta=
+tic const struct dpll_device_ops zl3073x_dpll_device_ops =3D {
+        .lock_status_get =3D zl3073x_dpll_lock_status_get,
+        .mode_get =3D zl3073x_dpll_mode_get,
++       .mode_set =3D zl3073x_dpll_mode_set,
+        .phase_offset_avg_factor_get =3D zl3073x_dpll_phase_offset_avg_fact=
+or_get,
+        .phase_offset_avg_factor_set =3D zl3073x_dpll_phase_offset_avg_fact=
+or_set,
+        .phase_offset_monitor_get =3D zl3073x_dpll_phase_offset_monitor_get=
+,
+        .phase_offset_monitor_set =3D zl3073x_dpll_phase_offset_monitor_set=
+,
++       .supported_modes_get =3D zl3073x_dpll_supported_modes_get,
+ };
+
+ /**
+--
+2.52.0
 
 
