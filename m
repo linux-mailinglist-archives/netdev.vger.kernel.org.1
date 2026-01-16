@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-250387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C9CD29EE5
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:10:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92BFD29F81
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 03:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7FEC7301D888
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2D4030D0335
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 02:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83548334C25;
-	Fri, 16 Jan 2026 02:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D84338921;
+	Fri, 16 Jan 2026 02:10:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C49338F20;
-	Fri, 16 Jan 2026 02:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CA03376AC;
+	Fri, 16 Jan 2026 02:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768529405; cv=none; b=hL3jEh8Uy1XseU0ybsIMYxiE0oOaIHHpzXgXDLhJaiCpZFT+iKKIrkdNP/iIGpti2VWJul9q5ul3SiHBuSOzQ3fE0TOzLfIL7mqdPI0QG89zA5xo2nJ6K9VjXpQQfaNNxRpYcl+9xmr2ZRSKXwxghJ3Bl8bUSdYzi8rRkajqscI=
+	t=1768529407; cv=none; b=Crkb/pQ3LfTTJCr+4pv/gMpicNEUJyLQMXp/z0+gZoYm7+ZJC5R280SP4rHjmrAjGGFC4ctGLzEDgrKfRcvyEc42PgD/ozZAqzb7540yEMfkX+sjRi7/wHdFPcrV4h+Dgu0fyAEMF9PBQjUlfKRmcWK0yv/eBSnxMoRqryg1YY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768529405; c=relaxed/simple;
-	bh=d9aiaUKT+SF2C1xDFYAlMbp+rT/1oiUBLwArsg5vnEA=;
+	s=arc-20240116; t=1768529407; c=relaxed/simple;
+	bh=8ZKQRYwxqb4uYhpPL+/18dXxqFZ15mvf3pgcRd+jy+8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=fYixqVU/ljOUusWTN1n8u3YUkJOOWCDu3Reg0mjuQ6AUPjt6UeZ1Um8I2GUzEf7ewQoHyh/trULfhgHNJukDPbYtH9JImC7xQFA1VrRxBuEExTPq0p0SqY3XvBnR2cTT3pYYR6kmejfwLATPQD93AAKDnno4iT1S9AkiGwT3rGI=
+	 In-Reply-To:To:CC; b=GY3ZhCVdhnoOLxKz25WwryCk8/Wr98E0xSJ4VRk7nhb2oJE12Nx3RvWLN3w6gGb+hA7uQij6WjM0MOX1ClTvHbDxeCi1KH/h5EYevkkuRe0R9K1SyUjQARAit91cuMsDLuN2cz9uEopC1BhIiu6zUICMGGP/xYhZyCLLitMbhQI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -35,9 +35,9 @@ Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
  (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
  Transport; Fri, 16 Jan 2026 10:09:16 +0800
 From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Fri, 16 Jan 2026 10:09:19 +0800
-Subject: [PATCH net-next v2 08/15] net: ftgmac100: Move NCSI probe code
- into a helper
+Date: Fri, 16 Jan 2026 10:09:20 +0800
+Subject: [PATCH net-next v2 09/15] net: ftgmac100: Always register the MDIO
+ bus when it exists
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,7 +46,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20260116-ftgmac-cleanup-v2-8-81f41f01f2a8@aspeedtech.com>
+Message-ID: <20260116-ftgmac-cleanup-v2-9-81f41f01f2a8@aspeedtech.com>
 References: <20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com>
 In-Reply-To: <20260116-ftgmac-cleanup-v2-0-81f41f01f2a8@aspeedtech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -56,114 +56,77 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Lunn
 	<andrew@lunn.ch>, Jacky Chou <jacky_chou@aspeedtech.com>, Simon Horman
 	<horms@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768529355; l=3233;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768529355; l=2265;
  i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=PWRfmKe6YTLsSE6Y3HPpHPyzMAq4PFGJ6scrfjyi5Sc=;
- b=hk72WiTdc1NgqBiLPUvZmNOAJaejC5SHa2s8vlJ0GSVR0Y2ZM1scOWs8cHSLU77HzwIfNnVHt
- 3AvPQPe95lfBYqvBomv/dZClV8uJOTHiymZXJc2loLhMvxHCjB11dta
+ bh=3PMubt3+ZvyhKE+J/WvKsCqfbMgClicHATDmtsAfaJM=;
+ b=Y38++rgU7d5R+MLPLp97cyO4maqXyZClX/c8MDB5KhX2H0ZbM99gc+9tHCWvz0o5F4zXMH/jS
+ YW2buwKj4C9ADrkz6UAvoGkejzRktwArt5c9nn4orQFUk8sGK5/PMDv
 X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
  pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 
 From: Andrew Lunn <andrew@lunn.ch>
 
-To help reduce the complexity of the probe function move the NCSI
-probe code into a helper. No functional change intended.
+Both the Aspeed 2400 and 2500 and the original faraday version of the
+MAC have MDIO bus controllers as part of the MAC. Since it exists,
+always registering it makes the code simpler, and causes no harm. If
+there is no mdio node in device tree, of_mdiobus_register() will fall
+back to mdiobus_register(), making it safe.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 63 ++++++++++++++++++--------------
- 1 file changed, 36 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 3bccf34cc8a4..f1cb5dc37919 100644
+index f1cb5dc37919..931fdf3d07d1 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1837,6 +1837,39 @@ static bool ftgmac100_has_child_node(struct device_node *np, const char *name)
- 	return ret;
- }
- 
-+static int ftgmac100_probe_ncsi(struct net_device *netdev,
-+				struct ftgmac100 *priv,
-+				struct platform_device *pdev)
-+{
-+	struct device_node *np = pdev->dev.of_node;
-+	struct phy_device *phydev;
-+	int err;
-+
-+	if (!IS_ENABLED(CONFIG_NET_NCSI)) {
-+		dev_err(&pdev->dev, "NCSI stack not enabled\n");
-+		return -EINVAL;
-+	}
-+
-+	dev_info(&pdev->dev, "Using NCSI interface\n");
-+	priv->use_ncsi = true;
-+	priv->ndev = ncsi_register_dev(netdev, ftgmac100_ncsi_handler);
-+	if (!priv->ndev)
-+		return -EINVAL;
-+
-+	phydev = fixed_phy_register(&ncsi_phy_status, np);
-+	if (IS_ERR(phydev)) {
-+		dev_err(&pdev->dev, "failed to register fixed PHY device\n");
-+		return PTR_ERR(phydev);
-+	}
-+	err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-+				 PHY_INTERFACE_MODE_RMII);
-+	if (err) {
-+		dev_err(&pdev->dev, "Connecting PHY failed\n");
-+		fixed_phy_unregister(phydev);
-+	}
-+	return err;
-+}
-+
- static int ftgmac100_probe(struct platform_device *pdev)
- {
- 	const struct ftgmac100_match_data *match_data;
-@@ -1844,7 +1877,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 	struct resource *res;
- 	int irq;
- 	struct net_device *netdev;
--	struct phy_device *phydev;
- 	struct ftgmac100 *priv;
- 	struct device_node *np;
- 	int err = 0;
-@@ -1926,32 +1958,9 @@ static int ftgmac100_probe(struct platform_device *pdev)
+@@ -1957,6 +1957,14 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 		priv->txdes0_edotr_mask = BIT(15);
  	}
  
- 	if (np && of_get_property(np, "use-ncsi", NULL)) {
--		if (!IS_ENABLED(CONFIG_NET_NCSI)) {
--			dev_err(&pdev->dev, "NCSI stack not enabled\n");
--			err = -EINVAL;
--			goto err_phy_connect;
--		}
--
--		dev_info(&pdev->dev, "Using NCSI interface\n");
--		priv->use_ncsi = true;
--		priv->ndev = ncsi_register_dev(netdev, ftgmac100_ncsi_handler);
--		if (!priv->ndev) {
--			err = -EINVAL;
--			goto err_phy_connect;
--		}
--
--		phydev = fixed_phy_register(&ncsi_phy_status, np);
--		if (IS_ERR(phydev)) {
--			dev_err(&pdev->dev, "failed to register fixed PHY device\n");
--			err = PTR_ERR(phydev);
--			goto err_phy_connect;
--		}
--		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
--					 PHY_INTERFACE_MODE_RMII);
--		if (err) {
--			dev_err(&pdev->dev, "Connecting PHY failed\n");
--			goto err_phy_connect;
--		}
-+		err = ftgmac100_probe_ncsi(netdev, priv, pdev);
++	if (priv->mac_id == FTGMAC100_FARADAY ||
++	    priv->mac_id == FTGMAC100_AST2400 ||
++	    priv->mac_id == FTGMAC100_AST2500) {
++		err = ftgmac100_setup_mdio(netdev);
 +		if (err)
-+			goto err_setup_mdio;
- 	} else if (np && (of_phy_is_fixed_link(np) ||
++			goto err_phy_connect;
++	}
++
+ 	if (np && of_get_property(np, "use-ncsi", NULL)) {
+ 		err = ftgmac100_probe_ncsi(netdev, priv, pdev);
+ 		if (err)
+@@ -1965,18 +1973,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
  			  of_get_property(np, "phy-handle", NULL))) {
  		struct phy_device *phy;
+ 
+-		/* Support "mdio"/"phy" child nodes for ast2400/2500 with
+-		 * an embedded MDIO controller. Automatically scan the DTS for
+-		 * available PHYs and register them.
+-		 */
+-		if (of_get_property(np, "phy-handle", NULL) &&
+-		    (priv->mac_id == FTGMAC100_AST2400 ||
+-		     priv->mac_id == FTGMAC100_AST2500)) {
+-			err = ftgmac100_setup_mdio(netdev);
+-			if (err)
+-				goto err_setup_mdio;
+-		}
+-
+ 		phy = of_phy_get_and_connect(priv->netdev, np,
+ 					     &ftgmac100_adjust_link);
+ 		if (!phy) {
+@@ -1999,9 +1995,6 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 		 * PHYs.
+ 		 */
+ 		priv->use_ncsi = false;
+-		err = ftgmac100_setup_mdio(netdev);
+-		if (err)
+-			goto err_setup_mdio;
+ 
+ 		err = ftgmac100_mii_probe(netdev);
+ 		if (err) {
 
 -- 
 2.34.1
