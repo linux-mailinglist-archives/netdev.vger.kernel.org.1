@@ -1,86 +1,211 @@
-Return-Path: <netdev+bounces-250559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F41BD330F9
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:08:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45EE2D33190
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 16:13:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09B5C30DA59C
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 14:56:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88680309DE3A
+	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 15:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F94F3939C8;
-	Fri, 16 Jan 2026 14:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A313370E2;
+	Fri, 16 Jan 2026 15:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ArjrMqz3"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="bWI6Fwzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF5B3939A4
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 14:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64ABC2D77FF
+	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 15:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768575394; cv=none; b=CobZqGtNlf3KVGjPPOHTk6ZCGVRtXBMeXoZvLvxjAgvpdXJb5PTv2BR1E5v7NZjys2+3bMV5PtnkKiX5uPppwL2okgmqUfnR2eXbxP5zXcbOyvEaBmD9H3a20OO4+x/Hcu+brjRZZldi7/yEbCCeDDCKHrO0WVlvkyg4R//KaWI=
+	t=1768575908; cv=none; b=kYuvaOB4GEnOEXsOAHyW6HqqBLvSzIls7gX7k8K2vv5L05OAA2sqYGqx7uTxVu3colK4fDCeQJdW5ZD7C/o1+YaxUIaIOTeT61suUaCJzR0AY2nWMFtdhlHkYFanAHRwvOQvrgn8ZIbnVAJZqW2PFXQtIIY1XgWLTpWjygjD1qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768575394; c=relaxed/simple;
-	bh=G2zYjLC+mWaIMiyFjt+xCWDABJry12gRl+3sQM7aBXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EB/JnIOhYzQVhXNgbu8jVHs4BCJs12xVY5GVb+EoHZpD+s1mIHl4OAD+FTRpKpZbaz3RopAKRZXBQdEEjbjXS6LzlrQ4+yINCzDikUzVtZ5rppECcw6CQDM8xpDUyA61Bw4lU02PN+BUmuqG2QNRVPSm49NY+DG40Cm4AQGAQ0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ArjrMqz3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pZaLSwjBwhLnjVfyHqGWYgJq1s9ZezkgbaJ0D//rO7k=; b=ArjrMqz35azQ2qpmNcwP+uxvJ8
-	rB+XyOY1s7Su4+jHnldErB3tvWHZYek6P/t44UyjjrU7jHCnffBf7zbPubnJtuvMwgOWDck7NyQ0E
-	SfsjR9iN2+auvk4U3e+hzLwCEJ1YHTdzZGWhjg3FVQU1AVQLFCQ2X00kFf04NB9qyIJQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vglFP-0035QU-SK; Fri, 16 Jan 2026 15:56:23 +0100
-Date: Fri, 16 Jan 2026 15:56:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: sayantan nandy <sayantann11@gmail.com>
-Cc: Benjamin Larsson <benjamin.larsson@genexis.eu>, lorenzo@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	sayantan.nandy@airoha.com, bread.hsu@airoha.com,
-	kuldeep.malik@airoha.com, aniket.negi@airoha.com,
-	rajeev.kumar@airoha.com
-Subject: Re: [PATCH] net: airoha_eth: increase max mtu to 9220 for DSA jumbo
- frames
-Message-ID: <fc018e11-3957-4b2e-88a8-777057091923@lunn.ch>
-References: <20260115084837.52307-1-sayantann11@gmail.com>
- <e86cea28-1495-4b1a-83f1-3b0f1899b85f@lunn.ch>
- <c69e5d8d-5f2b-41f5-a8e9-8f34f383f60c@genexis.eu>
- <ce42ade7-acd9-4e6f-8e22-bf7b34261ad9@lunn.ch>
- <aded81ea-2fca-4e5b-a3a1-011ec036b26b@genexis.eu>
- <f0683837-73cd-4478-9f00-044875a0da75@lunn.ch>
- <CADJVu8XP_wBudwOrT1OLhcZ3-9Qoci8FQzw+yyxnogiC2Asx5w@mail.gmail.com>
+	s=arc-20240116; t=1768575908; c=relaxed/simple;
+	bh=qnoY7cOjPkroB4B1MgUiKP7eL0TRHOlWUIxiHkl3pYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OdJddfdvNSxGzaJKQpGiq3PJRKphbuzfVXWA0uIXKUZA7L4a1bahod+XwP1oM1G2Gu7K2KbPZxYDbLMZDcmPfYGL2mkntRNoFjjj9G2i3H11NSdhGjsjUF2hMXeMhu0jdyzoRceU6D73pjOgfI4a2e4ZTNa2WLUwSgT/AB+rnlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=bWI6Fwzz; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a0d5c365ceso16477245ad.3
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 07:05:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768575906; x=1769180706; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u0x6oEupL8FezFbLidvr5iQfcAfe+7QHzOvs8wDLBV4=;
+        b=bWI6FwzzUHNEwDsZz+oiLxXsECdprRixsx1bF1VjQk+gQSaWYLdlvedBdHymFcMVhl
+         sbPqEMOoLyn+fhG6DbTVAyxR5SY9Ilpc9gL+lyT0zRI/yOWhehYlTE0YTAnhlmPaUWDV
+         ALz6Zc6szetCnFNK0pwmLm+WbOgLyXOLlSlgljhrNRw0w8u5YWT9KvO568cXCza10aLf
+         /OhCoKiClnUOE92btWnbctU7acUazakdkv4iWYfSCnn5FrSnpBOQzxj4wbJhm+UOKmK+
+         x27RzDg4jgcgrswP8+JfgCl0iGIwh2mIvGXVFhAS0OO5v6ha785Kg7QxC+Y5sAWEsORj
+         57xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768575906; x=1769180706;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=u0x6oEupL8FezFbLidvr5iQfcAfe+7QHzOvs8wDLBV4=;
+        b=nceXY4knLmcA87frSBc/0J/mmqbgFhEdR4YwWVZgvhXUdtv0oVxLcVfwKAmqHEZYOV
+         TCaV2pxXP6R0Oj5vGC6KDWi2Gld/h2phnAKC+lu8nQjw37L3d8AuAnITzeXUq2Vy0CCa
+         5ZoTZj8i76Ek9KCtE+dB2ssEvfcVvhblw1fhopxdV8K8AOyH1Zl4yWfbMdk9J5mPUPOu
+         8ABHxR7Wp/E3MGi4eoowOPqeYbHRJOxk/b0AcP61dTeXWtQTjwjo8zmCoZJgkwrpf7XW
+         VzL36TvxlERvGa64bT/0ri7nbtQTxuxBc7FWKAJetjTaxKeLMSmDqpK5zYvZHWyse3/Q
+         hOzA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4YTeB7tLZxQf4pp7fmzLZRFDp7EGAZr4NWeVqMN68O1trVUNZ6J/5oiOcaFaOEf96kHaJm9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/Ons3YzfyBWwyI7W5p0QlZAx2Oqwe9lyFTv298zkb2jgKqAh3
+	xjRu0VJG28xW+/RfbFWGqbl1oDTTSOVU/7yfdAp+ohUTrOsdwDGOgHhLFIm6iwNa3W7wWYGr0my
+	Zo6IJJuv7Silk1jECZPnXQnuv6K8JSDK2/bSLN0cX
+X-Gm-Gg: AY/fxX5s5UQd48G4cJuZudMOXgFEViD8Zp2f5pj4VYuV1kS7ZsPKM5slI7yoIDKExLb
+	rG+rQGTWJwjeDxbtDd4d2g0x1DC7USevPxFFyB43ByNIKZCclWOPwERbn2cAjFsp9TTrKMaKso4
+	ZulDYs1mdoILKHV8C3ey0fJ96/GO0ZLXWenQuVL9O/LX9vneh6CDZWgqwSNXHWFslBeSTlRAbv3
+	N6m+pfA4IOw9aI6CnCn5hSk0AeZCZBFxJNeNPuV+pAaa6+CTO1kBQyTADqa3AERYgS0WlFGhYj4
+	QZisNH8tV+l2dQ==
+X-Received: by 2002:a17:903:41d0:b0:2a0:be7d:6501 with SMTP id
+ d9443c01a7336-2a7188befdamr27850115ad.27.1768575906537; Fri, 16 Jan 2026
+ 07:05:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADJVu8XP_wBudwOrT1OLhcZ3-9Qoci8FQzw+yyxnogiC2Asx5w@mail.gmail.com>
+References: <20260111163947.811248-1-jhs@mojatatu.com> <CAM_iQpXXiOj=+jbZbmcth06-46LoU_XQd5-NuusaRdJn-80_HQ@mail.gmail.com>
+ <CAM0EoM=VHt3VakG6n81Lt+6LFzOVKAL-uzjM2y_xuWMv5kE+JA@mail.gmail.com> <CAM_iQpUGvHLB2cZmdd=0a4KAW2+RALNH=_jZruE1sju2gBGTeA@mail.gmail.com>
+In-Reply-To: <CAM_iQpUGvHLB2cZmdd=0a4KAW2+RALNH=_jZruE1sju2gBGTeA@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 16 Jan 2026 10:04:54 -0500
+X-Gm-Features: AZwV_Qj-mUwAsnBxPvprBL7VLguE52lCx6mzCrpBlViP7VW68CC2CDN3MyC63Xo
+Message-ID: <CAM0EoMmd5L+6vnHR98i4i+rwYrwqZbAAxxBVEZ60WtD9nNKqjw@mail.gmail.com>
+Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
+	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
+	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
+	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me, 
+	William Liu <will@willsroot.io>, Savy <savy@syst3mfailure.io>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 16, 2026 at 08:09:51PM +0530, sayantan nandy wrote:
-> Hi all,
-> 
-> Thanks for the review and comments.
-> 
-> I checked the AN7581 HW and it does support MTU sizes up to 16K. However, as
-> mentioned by Benjamin, larger packets consume more DMA descriptors, and while
-> no extra buffers are allocated, this can put pressure on the descriptor rings.
+On Thu, Jan 15, 2026 at 3:17=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
+>
+> On Wed, Jan 14, 2026 at 8:34=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Tue, Jan 13, 2026 at 3:10=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail=
+.com> wrote:
+> > >
+> > > On Sun, Jan 11, 2026 at 8:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+> > > >
+> > > >
+> > > > We introduce a 2-bit global skb->ttl counter.Patch #1 describes how=
+ we puti
+> > > > together those bits. Patches #2 and patch #5 use these bits.
+> > > > I added Fixes tags to patch #1 in case it is useful for backporting=
+.
+> > > > Patch #3 and #4 revert William's earlier netem commits. Patch #6 in=
+troduces
+> > > > tdc test cases.
+> > >
+> > > 3 reasons why this patchset should be rejected:
+> > >
+> > > 1) It increases sk_buff size potentially by 1 byte with minimal confi=
+g
+> > >
+> >
+> > All distro vendors turn all options. So no change in size happens.
+> > Regardless, it's a non-arguement there is no way to resolve the mirred
+> > issue without global state.
+> > It's a twofer - fixing mirred and netem.
+>
+> This makes little sense, because otherwise people could easily add:
+>
+> struct sk_buff {
+> ....
+> #ifdef CONFIG_NOT_ENABLED_BY_DEFAULT
+>   struct a_huge_field very_big;
+> #endif
+> };
+>
+> What's the boundary?
+>
+> >
+> > > 2) Infinite loop is the symptom caused by enqueuing to the root qdisc=
+,
+> > > fixing the infinite loop itself is fixing the symptom and covering up=
+ the
+> > > root cause deeper.
+> > >
+> >
+> > The behavior of sending to the root has been around for ~20 years.
+>
+> So what?
+>
 
-Does the hardware consume DMA descriptors for the full 16K, not just
-the number of descriptors needed for the actual received packet size?
-That seems like a bad design.
+Let's say you have a filter and action (or ebpf program) that needs to
+see every packet as part of its setup. That filter is attached to the
+root qdisc. The filter is no longer seeing the duplicated packets.
 
-      Andrew
+
+> > I just saw your patches - do you mind explaining why you didnt Cc me on=
+ them?
+>
+> You were the one who refused anyone's feedback on your broken and
+> hard-coded policy in the kernel.
+>
+
+Ok, I think ive had it with you. Your claim is laughable at best. I am
+the one who wasnt taking feedback? Seriously? you literally scared
+people who could be potentially contributing to tc by your drama. You
+received feedback on all variations of your four-to-five patche  and
+you didnt listen to any. It would be a good idea to use an AI to
+summarize mailing list discussions and i hope such discussions can be
+captured as part of commits.
+
+> Please enlighten me on how we should talk to a person who refused
+> any feedback? More importantly, why should we waste time on that?
+>
+> BTW, I am sure you are on netdev.
+
+I read netdev emails only when i have time. Emails directed at me will
+be read much much sooner.
+We have rules: if you send patches, you must copy every stakeholder.
+This cant just  be based on your emotions on when this rule applies or
+not. Please make sure you do this going forward.
+
+> >
+> > > 3) Using skb->ttl makes netem duplication behavior less predictable
+> > > for users. With a TTL-based approach, the duplication depth is limite=
+d
+> > > by a kernel-internal constant that is invisible to userspace. Users
+> > > configuring nested netem hierarchies cannot determine from tc
+> > > commands alone whether their packets will be duplicated at each
+> > > stage or silently pass through when TTL is exhausted.
+> > >
+> >
+> > The patch is not using the ttl as a counter for netem, it's being
+> > treated as boolean (just like your patch is doing). We are only using
+> > this as a counter for the mirred loop use case.
+>
+> This does not change this argument for a bit. It is still hidden
+> and users are still unable to figure it out (even before your patch).
+>
+
+I am trying to make sense of what you are saying.
+The ttl being boolean is exactly as in your patch with cb.
+The goal of your patch should be to stop the loop. You are making an
+additional change so that your cb changes work and you are implying
+that the user can only understand it if better you made these extra
+changes?
+
+cheers,
+jamal
 
