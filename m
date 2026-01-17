@@ -1,125 +1,186 @@
-Return-Path: <netdev+bounces-250697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21034D38E08
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 12:10:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F410D38E0C
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 12:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E755300CB8B
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 11:10:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE3093015A82
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 11:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7B33043D5;
-	Sat, 17 Jan 2026 11:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5733F30DD00;
+	Sat, 17 Jan 2026 11:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JMeggK56"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MIWV31P1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51EB3128DF;
-	Sat, 17 Jan 2026 11:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F022F2040B6;
+	Sat, 17 Jan 2026 11:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768648204; cv=none; b=Qyvnofn90lp/RmSOtQlFCjcr6B91jQmF23t5XcWVHMRdd/VnPwF+17KN41IiajLa3gAXUkTuFj5toPAB9jfiPmysL585MHjqRqRNK0ciIBVwjfl31LmXz3hoEdGm039o395xA3ZUa4Gct1oNXEdvLbdLmqwJ8h3L7aNT6Y3lShw=
+	t=1768648620; cv=none; b=Qy+XDIO5YpDCw51Ofp9BvL7t+QFQt3wTmVz9Q3F0psjW7Mixhim/oOGhjF1d3oVdEX3eSGAVXPNNZnja+3vN4U87vwFH0rhwD/TF1jd3C6WBCCoHAsERf5M898QtVV68o7yPT6C2SVpPQKB4Ii8lSgvmyYB2a0tO1Ov0fpYzPvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768648204; c=relaxed/simple;
-	bh=7poodvKUuzOVou6yy26C68DYDDTn3cRpsimnGL1nDDI=;
+	s=arc-20240116; t=1768648620; c=relaxed/simple;
+	bh=vG3VbTxQ0ezcKDCJQGrIOXOv+kGGPwQY7ihkAARSdBk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I2vkfEpIHKDsHKAn31Tq52uenocQu9rbFK6NjFiVRGKml+fLnHQtY8yLA7ovFVHRUBQNXaUmfYUXTvpsY5sIzpFRdQr1zG+PEQx85tNHa7JsLu/mQEwyA9cEtEouaF8p4kwZMNRZzgVrJtbkJO158tjwckyKxFQGLVt1d+Hmt9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JMeggK56; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jOPle7CQdmTssFXDdVFhSB4QqaOxmM9CxYXqpbVKQco=; b=JMeggK56xm6oep9ztPotoQPnYu
-	ThsH19MPem4x4BSprEfAOw7ogoLTdjB+IXSkIxP0MAYtfINEyat8lqs9U4Ntc++2zi2nvv45s3VsF
-	C4HXnUmI1Xl1DeMMD1vaYz2cPeF2Q36J/9UQb722UgKWhOzKpz+8WMo0S6PFcBFX1MKP6PQgM8x4W
-	e9IEJDp1AGnchrawCPf2KNgh4niOs9m1kXkevcid9NzkRTRCxKwEaeabDqcZb1ixYx/Chd1QbJSwo
-	6lwm9Q523lSsaPLX0oc1/gUAVodsgM9iVw648qg5A7Xv9osyISoUzqYnAU+mducfXoJbcw5zK3kal
-	LzpVQG6g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49136)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vh4Be-000000003Yr-0IBH;
-	Sat, 17 Jan 2026 11:09:46 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vh4BX-000000004XG-0FzH;
-	Sat, 17 Jan 2026 11:09:39 +0000
-Date: Sat, 17 Jan 2026 11:09:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tao Wang <tao03.wang@horizon.auto>
-Cc: alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net v3] net: stmmac: fix transmit queue timed out after
- resume for tso
-Message-ID: <aWtt8hlsqWVF1tYz@shell.armlinux.org.uk>
-References: <aWrJvrpIAZHQS2uv@shell.armlinux.org.uk>
- <20260117075926.128979-1-tao03.wang@horizon.auto>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KO2JSUNFTFMV85Bou7pldHTA+fYL7DZLFCTaPbFGpUzQsqJkI7+ysnL7z70PdRopxCkjTTfR0CKupjYp6HsBZs0tyielr5I0IYZS1PDpYNKAkeB7t1nwmXcw6pIm0ISEIPBgXU7sosZyqnBkN6aFxT9xAf31oSex+z8XWUPncfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MIWV31P1; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768648618; x=1800184618;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vG3VbTxQ0ezcKDCJQGrIOXOv+kGGPwQY7ihkAARSdBk=;
+  b=MIWV31P1HXNKlIK7soOHXiMd7l4oUho4CJdmyhHR/nu38bOFd3opFGvF
+   /LC8Up/bdTT5J/OmOjEI9XLyNYZiROw6n48miWNpxRA/p1K7l+NXYsFeF
+   MTnvEsl8+7bkwu7inMOHlHxh8fqSZ9oyBFi6HfVwcWDRouCAGOcDN6bx1
+   nexWbk/4CNtSSxm+2Rqc9xaF3hG0fisxNTUGJiAVaOcDQ/TGPUdhlAV9y
+   hyhTPqM5p4CONowKHLf8XZ7Zi638cF4eTH5X1XRWd2ud5kOMFMM6jDkkL
+   n87e76lA74JylGFq2k6BJGMMyjxAe/Y5CqxUWLt6kDovbLgMFFEE9+zdV
+   g==;
+X-CSE-ConnectionGUID: ekT//rodTi+rl39ovKxTeQ==
+X-CSE-MsgGUID: iW76IBhqQeWpWGq4RkKz4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="73574098"
+X-IronPort-AV: E=Sophos;i="6.21,233,1763452800"; 
+   d="scan'208";a="73574098"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2026 03:16:57 -0800
+X-CSE-ConnectionGUID: 8I64+JI3TPGuBWDcQKRiyQ==
+X-CSE-MsgGUID: 4aTy5/cXTzmvMWyl8MNMCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,233,1763452800"; 
+   d="scan'208";a="205066079"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 17 Jan 2026 03:16:53 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vh4IU-00000000LnQ-34V8;
+	Sat, 17 Jan 2026 11:16:50 +0000
+Date: Sat, 17 Jan 2026 19:15:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Chen Minqiang <ptpt52@gmail.com>,
+	Xinfa Deng <xinfa.deng@gl-inet.com>
+Subject: Re: [PATCH net-next v4 3/6] net: dsa: lantiq: allow arbitrary MII
+ registers
+Message-ID: <202601171803.vxrrhXdF-lkp@intel.com>
+References: <d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260117075926.128979-1-tao03.wang@horizon.auto>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel@makrotopia.org>
 
-On Sat, Jan 17, 2026 at 03:59:22PM +0800, Tao Wang wrote:
-> > Rather than using tx_q->tx_skbuff_dma[].last_segment to determine
-> > whether the first descriptor entry is the only segment, calculate the
-> > number of descriptor entries used. If there is only one descriptor,
-> > then the first is also the last, so mark it as such.
-> 
-> This is a good idea. tx_q->tx_skbuff_dma[].last_segment no longer carries
->  much meaning and can indeed be removed altogether.
-> 
-> > +       is_last_segment = ((tx_q->cur_tx - first_entry) &
-> > +                          (priv->dma_conf.dma_tx_size - 1)) == 1;
-> 
-> Since tx_q->cur_tx may wrap around and become smaller than first_entry,
-> the following statement is more concise:
-> is_last_segment = (tx_q->cur_tx == first_entry);
+Hi Daniel,
 
-That's incorrect. We advance tx_q->cur_tx by at least one by this
-point:
+kernel test robot noticed the following build errors:
 
-        first_entry = tx_q->cur_tx;
+[auto build test ERROR on net-next/main]
 
-... fill descriptors ...
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/dt-bindings-net-dsa-lantiq-gswip-use-correct-node-name/20260117-092406
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next v4 3/6] net: dsa: lantiq: allow arbitrary MII registers
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260117/202601171803.vxrrhXdF-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260117/202601171803.vxrrhXdF-lkp@intel.com/reproduce)
 
-        /* We've used all descriptors we need for this skb, however,
-         * advance cur_tx so that it references a fresh descriptor.
-         * ndo_start_xmit will fill this descriptor the next time it's
-         * called and stmmac_tx_clean may clean up to this descriptor.
-         */
-        tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601171803.vxrrhXdF-lkp@intel.com/
 
-...
+All errors (new ones prefixed by >>):
 
-        /* If we only have one entry used, then the first entry is the last
-         * segment.
-         */
-        is_last_segment = ((tx_q->cur_tx - first_entry) &
-                           (priv->dma_conf.dma_tx_size - 1)) == 1;
+>> drivers/net/dsa/lantiq/mxl-gsw1xx.c:708:28: error: array designator index (7) exceeds array bounds (7)
+     708 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                                          ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:246:26: note: expanded from macro 'GSWIP_MAX_PORTS'
+     246 | #define GSWIP_MAX_PORTS         7
+         |                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:713:28: error: array designator index (7) exceeds array bounds (7)
+     713 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                                          ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:246:26: note: expanded from macro 'GSWIP_MAX_PORTS'
+     246 | #define GSWIP_MAX_PORTS         7
+         |                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:749:23: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     749 |                 [GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
+         |                                     ^~~~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:60:28: note: expanded from macro 'GSWIP_MII_CFGp'
+      60 | #define GSWIP_MII_CFGp(p)               (0x2 * (p))
+         |                                         ^~~~~~~~~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:748:33: note: previous initialization is here
+     748 |                 [0 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                               ^~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:750:51: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     750 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                                                 ^~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:748:33: note: previous initialization is here
+     748 |                 [0 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                               ^~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:754:23: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     754 |                 [GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
+         |                                     ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:80:27: note: expanded from macro 'GSWIP_MII_PCDU0'
+      80 | #define GSWIP_MII_PCDU0                 0x01
+         |                                         ^~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:753:33: note: previous initialization is here
+     753 |                 [0 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                               ^~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:755:51: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     755 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                                                 ^~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:753:33: note: previous initialization is here
+     753 |                 [0 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                               ^~
+   4 warnings and 2 errors generated.
 
-So, replacing this with a check for tx_q->cur_tx == first_entry
-would always be false here, unless we completely filled the ring
-with a single TSO.
+
+vim +708 drivers/net/dsa/lantiq/mxl-gsw1xx.c
+
+   701	
+   702	static const struct gswip_hw_info gsw12x_data = {
+   703		.max_ports		= GSW1XX_PORTS,
+   704		.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
+   705		.mii_cfg = {
+   706			[0 ... GSW1XX_MII_PORT - 1] = -1,
+   707			[GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
+ > 708			[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+   709		},
+   710		.mii_pcdu = {
+   711			[0 ... GSW1XX_MII_PORT - 1] = -1,
+   712			[GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
+   713			[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+   714		},
+   715		.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
+   716		.phylink_get_caps	= &gsw1xx_phylink_get_caps,
+   717		.supports_2500m		= true,
+   718		.pce_microcode		= &gsw1xx_pce_microcode,
+   719		.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
+   720		.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
+   721	};
+   722	
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
