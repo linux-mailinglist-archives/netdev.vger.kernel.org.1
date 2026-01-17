@@ -1,78 +1,130 @@
-Return-Path: <netdev+bounces-250709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18C9D38F9F
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 16:52:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 048B7D38FA6
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 17:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99A503012DD0
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 15:52:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC8913009ABB
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 16:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141BF1F3FEC;
-	Sat, 17 Jan 2026 15:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jcOeixss"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF7021E0AF;
+	Sat, 17 Jan 2026 16:03:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1768218592
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 15:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A521F4CBB
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 16:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768665141; cv=none; b=P35EvLyp44xYzUQ2BUOQnbxPfX9S/aHIDpR4HBe9uMFi7OoSg2LuebIQCV8kXdhk5l7TUyAdYFB0MEzrQG4x5ZnQp/IJcOYI+F1Dzg1v7GB8cXESMsDy98IA1M0+MfsGN24qigxMJdQ5MPMgHsGOopXmwf9rbAZQkkVA2gBEJ5A=
+	t=1768665812; cv=none; b=Tv64tKTFP1ONLtWgHdG+P/TEkBX0M25t9+H6xv331GXTT2BN6dr7AolzLrVmg7hR2za4SGZ5fdOGTxtVYTHxMI266sM5MENtfwYXYsM9u71zD76sbvmyChpJ7IrnBCek+yPd/tk+rBNVwr353OCrsYYSRlp3idxDRlAR8i/ijlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768665141; c=relaxed/simple;
-	bh=mtZUzMrDtDA6a+s7fj2NgKiGIXop2cgjC9AkN+UEQzw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ISKLSkzVS+Obaan/M3Z9wgw87NnSzRsRJ6bAtP2cB4WoOmv2cGcHRep7Fs7YEJ1n4Uer5qOP5eyBwQ+90Z1AgmE7aXWt14kV+MJ/odvq3JbIuYlo79gULsx782VjjhtLZwJnlsnKorT8N721WkRDkw8R2hvo0NFOFOAlwN7x804=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jcOeixss; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fjcLMjup/EL98uyhnXYPPhFWTLcexH36m5E5kSootac=; b=jcOeixss+C56tbrTXIOIjcwq0B
-	4E1xaaSDpMEY4HVXdbq/gUHS8BK5PdiW1rvn01bnxjbPe1BkoHyq+J0HgTydqkE+rKb9XVkE6YAUx
-	hBaytHQpPccdxZY0RthOKCWPBj23AeQvK4IqeZ8aIqF1TZRB/ZW4SOfXpvQZ3aZhGWEk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vh8b1-003Dl0-Hh; Sat, 17 Jan 2026 16:52:15 +0100
-Date: Sat, 17 Jan 2026 16:52:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: netdev@vger.kernel.org, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: macb: Replace open-coded device config
- retrieval with of_device_get_match_data()
-Message-ID: <59332b73-2838-4758-ab32-5ba418e4e20d@lunn.ch>
-References: <20260117-macb-v1-1-f092092d8c91@gmail.com>
+	s=arc-20240116; t=1768665812; c=relaxed/simple;
+	bh=Ma1E0nAO2b/GiJXUClauXrtjaKgZh5FU8rDFdNw1sZw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=rzAtuQvecvu4p+rUnyOcb6/elQwtVdUm/Kj1z7L9oIMTnZ/UPRJJnZ06jby8La2BJKg1edbJ0BQ0l2TZ28ONIxpwq0nw5DUrnB81re94GBb9OkOn3qDp0IBo6X84nqQZ/iEe9DwXPsdxuGo0Kzy4nkiD2rLcypnTk1OUcA+LIr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60HG3S2s009369;
+	Sun, 18 Jan 2026 01:03:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60HG3Sw5009366
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 18 Jan 2026 01:03:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <924f9cf5-599a-48f0-b1e3-94cd971965b0@I-love.SAKURA.ne.jp>
+Date: Sun, 18 Jan 2026 01:03:27 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260117-macb-v1-1-f092092d8c91@gmail.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Aviad Yehezkel <aviadye@mellnaox.com>, Aviv Heller <avivh@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Florian Westphal <fw@strlen.de>, Guy Shapiro <guysh@mellanox.com>,
+        Ilan Tayari <ilant@mellanox.com>,
+        Kristian Evensen <kristian.evensen@gmail.com>,
+        Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+        Raed Salem <raeds@mellanox.com>, Raed Salem <raeds@nvidia.com>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Yossi Kuperman <yossiku@mellanox.com>
+Cc: Network Development <netdev@vger.kernel.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: xfrm: question regarding NETDEV_UNREGISTER handling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav403.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Sat, Jan 17, 2026 at 09:46:18AM +0800, Kevin Hao wrote:
-> Use of_device_get_match_data() to replace the open-coded method for
-> obtaining the device config.
-> 
-> Additionally, adjust the ordering of local variables to ensure
-> compatibility with RCS.
-> 
-> Signed-off-by: Kevin Hao <haokexin@gmail.com>
+syzbot is reporting that "struct xfrm_state" refcount is leaking.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
+  ref_tracker: netdev@ffff888052f24618 has 1/1 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
+       xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
+       xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
+       xfrm_add_sa+0x34ff/0x5fa0 net/xfrm/xfrm_user.c:1022
+       xfrm_user_rcv_msg+0x58e/0xc00 net/xfrm/xfrm_user.c:3507
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+       xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3529
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-    Andrew
+Commit d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API") introduced
+xfrm_dev_state_add() which grabs a reference to "struct net_device".
+That commit called xfrm_dev_state_add() from xfrm_state_construct() and
+introduced the NETDEV_UNREGISTER case to xfrm_dev_event(), but
+xfrm_dev_unregister() was a no-op (rather than doing necessary actions
+for releasing "struct xfrm_state" which will in turn drop the reference
+to "struct net_device").
+
+Commit 152afb9b45a8 ("xfrm: Indicate xfrm_state offload errors") added
+proper error code propagation, and commit cc01572e2fb0 ("xfrm: Add SA to
+hardware at the end of xfrm_state_construct()") moved the location to call
+xfrm_dev_state_add(), but these commits did not touch NETDEV_UNREGISTER
+handling.
+
+Commit ec30d78c14a8 ("xfrm: add xdst pcpu cache") added
+xfrm_policy_cache_flush() call to xfrm_dev_unregister(), but
+commit e4db5b61c572 ("xfrm: policy: remove pcpu policy cache") removed
+xfrm_policy_cache_flush() call from xfrm_dev_unregister() and also
+removed the NETDEV_UNREGISTER case from xfrm_dev_event() because
+xfrm_dev_unregister() became no-op.
+
+Commit 03891f820c21 ("xfrm: handle NETDEV_UNREGISTER for xfrm device")
+re-introduced the NETDEV_UNREGISTER case to xfrm_dev_event(), but that
+commit chose to do the same thing for NETDEV_DOWN case and
+NETDEV_UNREGISTER case. Since xfrm_dev_down() is no-op unless
+(dev->features & NETIF_F_HW_ESP) != 0, no necessary actions are done for
+releasing "struct xfrm_state" (for at least !NETIF_F_HW_ESP case).
+
+Commit 919e43fad516 ("xfrm: add an interface to offload policy") added
+xfrm_dev_policy_flush() to xfrm_dev_down(). I don't know whether this commit
+is relevant or not.
+
+But I feel that calling xfrm_dev_state_add() and  xfrm_dev_policy_add()
+are possible for !NETIF_F_HW_ESP case. If my feeling is correct, we have
+never implemented proper NETDEV_UNREGISTER handling for releasing
+"struct xfrm_state". What actions are needed for properly releasing
+"struct xfrm_state" from NETDEV_UNREGISTER handler?
 
