@@ -1,194 +1,158 @@
-Return-Path: <netdev+bounces-250678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7785D38B34
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:21:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B48D38B56
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:47:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B1E3A300ED9B
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:21:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 871633009233
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B992773F7;
-	Sat, 17 Jan 2026 01:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875C019E992;
+	Sat, 17 Jan 2026 01:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+Qu3r5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AC1277011;
-	Sat, 17 Jan 2026 01:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C36119CD1D
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 01:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768612903; cv=none; b=tlgK1P1+AxZAmX522CT6vogz4KdEF/jR2QCus8BiDLhlY+dJ6ZIo+paQa+u+lvk9k1EjUuuoEl+HB0hCitemMQGHPZbYZnuysJ7KFamyH7FZKr/dY1Cb02bONwXfCHfdC5OXKoNPuNwmvNcLTgn5+ATymmm17vMXgjQ0s97LZeM=
+	t=1768614435; cv=none; b=bfDAijAv97+/BcC+GGuYyvP0wGs467ju/G1QF5fSBJH3Izpy6zCpbg5BEHYZtGmxX567edMojxt8AJpuURX1MpX3TSI3mH5FnOZlYHVWW8KstvmNPFA+RY0QCB2zbg2RU5tBI+KUfSFgnyuMACMDhaF2rnYld+baxNPv+OhvTBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768612903; c=relaxed/simple;
-	bh=i3bKr3GUq3j5rU9lxoTZI2SfgJJYbWKr3U1QtgV8h7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oAI1W3xqaJjGB93qreZRMPdoWd4LqQ54h0AQyK+ipWCKqzx5BlNNfJv1nr3EtAC34Dg/VChlV1rd2tbcGX43P237f7TlJfcjpURACpb2X2xMVuVVUjbjD47wEl0M8iCPY1o1+Wpizi4pwtRF0+xSzwY/HIimUYOQN/oQcm/zvKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vgv0S-000000005Hi-1z8I;
-	Sat, 17 Jan 2026 01:21:36 +0000
-Date: Sat, 17 Jan 2026 01:21:33 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
-Subject: [PATCH net-next v4 6/6] net: dsa: mxl-gsw1xx: add support for Intel
- GSW150
-Message-ID: <512b11f4bacf6b4bcc29c80085b58ae1e7b95338.1768612113.git.daniel@makrotopia.org>
-References: <cover.1768612113.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1768614435; c=relaxed/simple;
+	bh=BvuU6hrE1kad6S3+bK5hW2J5kpLldKHiQJhKeE9NW9s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ucz+QbLw5kXwAOjJnYOFVy53dvAzP6jKPU83akj0cAizNAtUl7pAUYeBp1GSfEDQB/FWbp5SASa4CbcOwbDEDo+uUSzUkifQLG26xHuFohg8fCXKhIJwqRGqcAoC6uHa4xgwLsmMz+7ZA25KTvBX4kJw4RYD3b4PXDsJnGjHcQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+Qu3r5Y; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-501469b598fso18737211cf.3
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 17:47:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768614433; x=1769219233; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DQx60645GAGQ1r8004YFDj1uRm95KZRpsaEBWEqJO9k=;
+        b=Z+Qu3r5YivQN3CuNBudcj7MvJTatWJaeTGnG6wXbihq3clIaj1iFWtaGJ5qKxlU/qR
+         m8sgB/q0Sq8+U4cYtJ7cCgs/yE3nK3zzDSIeS7URug7tNbQyhVoZtZvVp8DaLefW8WAg
+         uXm3e5k124JPJV3DpK4aEQRl2UJnGx9DVaZlK/ahRN3de6w8ZSZuEXSPx/LJpmjwzxdy
+         /o8jVR/MOacSQyGEqC4OnQvdik1gL/i7N88Tqt6m1ixFYT9T+0iJBi1Zq/Fn5tmiDc1E
+         m2pt3EKybexTRTicpvmUlk3A+HCEW0I9O3c8WNQ3bCDk5vwIAQODzoi1zy3I6rkcPuzc
+         oyzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768614433; x=1769219233;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DQx60645GAGQ1r8004YFDj1uRm95KZRpsaEBWEqJO9k=;
+        b=VEBfCZ984Ji5NPjbxT4zfcx7AtAnE9GgwJN8CZdXzOjRiN6T2wwyjyROurWzljL3Ub
+         qH9XwoRoOKV7MY4MdYjU7nZN2pzl+Q3RJillyfRjIiqUdd3Pd+M/n06JGQW9jujuuNiE
+         cypGp80NMleZmVAlqXBtro3nZQKoK0S+6nHZ740cgbM228JN0Z+cRuxTr6mS8LGw0cEL
+         m5/p1EI22VwXnQcBxA+0CaAGCU+Vo5rCAKvADUWm1QL2ZL2quo7OBGR/eT+nTw0U7OQW
+         eptMiA0ows5GHBbxeUJfZVp/qCiVPLofkBbUQCHtdy+W1xDZlDtFH1lFGv50Ia9BDTLH
+         0UGA==
+X-Gm-Message-State: AOJu0YwJ45ortRzIda7s8x5Zdm9VEBLAyBb9JpgCI+oXX19n32XYXg3L
+	PZB1QlLR8nFmgAFmyB2nEW2pNpdMDvXIPrB8rPCBZCjNhBDhG3a1X0hZHh3EelDUVfk=
+X-Gm-Gg: AY/fxX4UGVmKymy5MJoFWaKlVuPnq44Qj7DoPeqSsbNmVqzhhOIuySIt+04nNFg/rAu
+	ldnNw/WkzJbN9dtUHvMpF80HU6t+kTy2Xg0+7tfZq0LbCrSS3nHf+Y3lgRYwckb88r3pB/088xK
+	AnPio2vDMv4eLF3MGVe7vLMs0XxkT5GgHWde0X8vEtkTU5qOZP4IMfo9WpKDrjb31ECRwb3eG9E
+	hLyIu329ztyfa8iPAX7gGHOIk6ro2om87ecrOrs+GdE9fvHHOMIrjri1LrA2eiUF9qPmdvizETx
+	u7ZrCAXKOMcIpHudv5A2MHcLwylGFY4BXnKU59FxYAAbAuo1uLkJ0NnXl1glqCwRX7TATfPGCrA
+	3BKGtDsB2ZGVZbW/bJOrPi3baFbGyeUjD7za7+DcxSqjDawF2CT4X06mXIjJNutxsFYpbDeaJU5
+	8SmmmtQ/UtsVSgO+W1txJJ
+X-Received: by 2002:a05:622a:58e:b0:4ee:43b0:b053 with SMTP id d75a77b69052e-502a1ddba73mr57064661cf.9.1768614432848;
+        Fri, 16 Jan 2026 17:47:12 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e5e49b4sm36481806d6.8.2026.01.16.17.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 17:47:12 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Sat, 17 Jan 2026 09:46:18 +0800
+Subject: [PATCH net-next] net: macb: Replace open-coded device config
+ retrieval with of_device_get_match_data()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1768612113.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260117-macb-v1-1-f092092d8c91@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAOnpamkC/x3MSwqAIBRG4a3IHSdkA4W2Eg18/NYdZKERgrT3p
+ OEHh9OoIDMKzaJRxsOFz9ShBkF+t2mD5NBN0zjpUSkjD+udhEEM2hvtgqWeXhmR679ZKOGWCfW
+ m9X0/owMPu2AAAAA=
+X-Change-ID: 20260117-macb-e7efd6c76bda
+To: netdev@vger.kernel.org
+Cc: Kevin Hao <haokexin@gmail.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+X-Mailer: b4 0.14.2
 
-Add support for the Intel GSW150 (aka. Lantiq PEB7084) switch IC to
-the mxl-gsw1xx driver. This switch comes with 5 Gigabit Ethernet
-copper ports (Intel XWAY PHY11G (xRX v1.2 integrated) PHYs) as well as
-one GMII/RGMII and one RGMII port.
+Use of_device_get_match_data() to replace the open-coded method for
+obtaining the device config.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Additionally, adjust the ordering of local variables to ensure
+compatibility with RCS.
+
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
 ---
-v4: spell out mii_cfg and mii_pcdu values in struct gswip_hw_info instead
-    of using default initializer which requires diag exception
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-v3: enclose the gswip_hw_info initializers in compiler diag exception
-    to prevent triggering -Woverride-init
-
-v2: clean-up phylink_get_caps
-
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 61 ++++++++++++++++++++++++++---
- drivers/net/dsa/lantiq/mxl-gsw1xx.h |  2 +
- 2 files changed, 58 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index acc89fba2fcdd..7fc41c371b783 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -502,6 +502,14 @@ static const struct phylink_pcs_ops gsw1xx_pcs_ops = {
- 	.pcs_link_up = gsw1xx_pcs_link_up,
- };
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 2d5f3eb0953038dfcbb28db591227cbe5f6e80f0..5cfd859f3b293de3abfb827fcdfb2198f6304ae2 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5433,9 +5433,9 @@ static const struct macb_config default_gem_config = {
  
-+static void gsw1xx_phylink_get_lpi_caps(struct phylink_config *config)
-+{
-+	config->lpi_capabilities = MAC_100FD | MAC_1000FD;
-+	config->lpi_timer_default = 20;
-+	memcpy(config->lpi_interfaces, config->supported_interfaces,
-+	       sizeof(config->lpi_interfaces));
-+}
-+
- static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
- 				    struct phylink_config *config)
+ static int macb_probe(struct platform_device *pdev)
  {
-@@ -535,10 +543,32 @@ static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
- 		break;
- 	}
+-	const struct macb_config *macb_config = &default_gem_config;
+-	struct device_node *np = pdev->dev.of_node;
+ 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
++	struct device_node *np = pdev->dev.of_node;
++	const struct macb_config *macb_config;
+ 	struct clk *tsu_clk = NULL;
+ 	phy_interface_t interface;
+ 	struct net_device *dev;
+@@ -5451,13 +5451,9 @@ static int macb_probe(struct platform_device *pdev)
+ 	if (IS_ERR(mem))
+ 		return PTR_ERR(mem);
  
--	config->lpi_capabilities = MAC_100FD | MAC_1000FD;
--	config->lpi_timer_default = 20;
--	memcpy(config->lpi_interfaces, config->supported_interfaces,
--	       sizeof(config->lpi_interfaces));
-+	gsw1xx_phylink_get_lpi_caps(config);
-+}
-+
-+static void gsw150_phylink_get_caps(struct dsa_switch *ds, int port,
-+				    struct phylink_config *config)
-+{
-+	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-+				   MAC_10 | MAC_100 | MAC_1000;
-+
-+	switch (port) {
-+	case 0 ... 4: /* built-in PHYs */
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  config->supported_interfaces);
-+		break;
-+
-+	case 5: /* GMII or RGMII */
-+		__set_bit(PHY_INTERFACE_MODE_GMII,
-+			  config->supported_interfaces);
-+		fallthrough;
-+
-+	case 6: /* RGMII */
-+		phy_interface_set_rgmii(config->supported_interfaces);
-+		break;
-+	}
-+
-+	gsw1xx_phylink_get_lpi_caps(config);
- }
+-	if (np) {
+-		const struct of_device_id *match;
+-
+-		match = of_match_node(macb_dt_ids, np);
+-		if (match && match->data)
+-			macb_config = match->data;
+-	}
++	macb_config = of_device_get_match_data(&pdev->dev);
++	if (!macb_config)
++		macb_config = &default_gem_config;
  
- static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *config,
-@@ -769,11 +799,32 @@ static const struct gswip_hw_info gsw141_data = {
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
- };
- 
-+static const struct gswip_hw_info gsw150_data = {
-+	.max_ports		= GSW150_PORTS,
-+	.allowed_cpu_ports	= BIT(5) | BIT(6),
-+	.mii_cfg = {
-+		[0 ... 4] = -1,
-+		[5] = 0,
-+		[6] = 10,
-+	},
-+	.mii_pcdu = {
-+		[0 ... 4] = -1,
-+		[5] = 1,
-+		[6] = 11,
-+	},
-+	.phylink_get_caps	= gsw150_phylink_get_caps,
-+	.pce_microcode		= &gsw1xx_pce_microcode,
-+	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
-+	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-+};
-+
- /*
-  * GSW125 is the industrial temperature version of GSW120.
-  * GSW145 is the industrial temperature version of GSW140.
-  */
- static const struct of_device_id gsw1xx_of_match[] = {
-+	{ .compatible = "intel,gsw150", .data = &gsw150_data },
-+	{ .compatible = "lantiq,peb7084", .data = &gsw150_data },
- 	{ .compatible = "maxlinear,gsw120", .data = &gsw12x_data },
- 	{ .compatible = "maxlinear,gsw125", .data = &gsw12x_data },
- 	{ .compatible = "maxlinear,gsw140", .data = &gsw140_data },
-@@ -797,5 +848,5 @@ static struct mdio_driver gsw1xx_driver = {
- mdio_module_driver(gsw1xx_driver);
- 
- MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
--MODULE_DESCRIPTION("Driver for MaxLinear GSW1xx ethernet switch");
-+MODULE_DESCRIPTION("Driver for Intel/MaxLinear GSW1xx Ethernet switch");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index 38e03c048a26c..087587f62e5e1 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -10,6 +10,8 @@
- #include <linux/bitfield.h>
- 
- #define GSW1XX_PORTS				6
-+#define GSW150_PORTS				7
-+
- /* Port used for RGMII or optional RMII */
- #define GSW1XX_MII_PORT				5
- /* Port used for SGMII */
+ 	err = macb_config->clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
+ 	if (err)
+
+---
+base-commit: 46fe65a2c28ecf5df1a7475aba1f08ccf4c0ac1b
+change-id: 20260117-macb-e7efd6c76bda
+
+Best regards,
 -- 
-2.52.0
+Kevin Hao <haokexin@gmail.com>
 
 
