@@ -1,138 +1,101 @@
-Return-Path: <netdev+bounces-250744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A23D39164
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:48:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AADD3916E
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:03:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0F90F300CCFA
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 22:48:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC1D63015A83
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89282D238F;
-	Sat, 17 Jan 2026 22:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CA827281E;
+	Sat, 17 Jan 2026 23:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdlGoPd3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHFwbik7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA821F1932;
-	Sat, 17 Jan 2026 22:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EED137932
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 23:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768690129; cv=none; b=rVEK0edTF5/KcSnF5PHvvo57fsKhqtdjMUg37ll3kwvJB6mm2ipWs1zvg60LvuNyWNcc4Yrr2xqqvP1ssL0+ebyMZI2Fef7ifaa/TN67Zzx824MQ+I5pKJ08M6eiYXbDz7sSQW8YRXXTpStQ0VakIKTFiWluL2WITvbIQEw8jc8=
+	t=1768691028; cv=none; b=s21JXm5g1vjS2cVeR36IraJjsAgJPeyS1g1IIMrCRNvFbO1bCrtzbKJrMA85U53duQTc0uyoPvR5MluK9fUtj/QgOWMZxSjtf+ygcFVhs1LB2Z0S0ljo8NTOwnMYlsZTlno9szkEEU0D8dfU/HYyO8Qgp2FWhsDAr4carmQxeD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768690129; c=relaxed/simple;
-	bh=eoAiYzEULWXg85JvXinMkueaZK1CXYsvYGXVb4A1ZXw=;
+	s=arc-20240116; t=1768691028; c=relaxed/simple;
+	bh=nKoaEZWxoBnT9YjT8ZA9EgXzhmQYTJZLwV9LFBUgwk4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LRkjhcPLVtegOP9nGl09vA3C8y4vzQI6rjSA9fpRUdiM35l4Db9Qf98qeW0FozQ/w1KTU2o2k3cPqieYEWgxiXsSfrAppbcYLqS5LaLV9mLB1ZvdItDsOVeUcR52VgJ0SHWwIs7iEA3QZherCkFhy6RQB+fOcIFtrCMOUG3xWZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdlGoPd3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D65CC4CEF7;
-	Sat, 17 Jan 2026 22:48:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iGAw7OQ0yw27df/PQUB/pJF4Yv9HndqwZyndGGNNKrBmJ1bLjy/DBEtBN7REfBi/fXqWUqNdHq5yc9oRfBdScczTvr3tUzSnb7tqDX35sKKXC2UmACs8TNB2lEP+FOy34YEKKsd3CwJKzrk8fudL3vQLx2gFymr5HYvVymwxol8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHFwbik7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF0EC4CEF7;
+	Sat, 17 Jan 2026 23:03:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768690129;
-	bh=eoAiYzEULWXg85JvXinMkueaZK1CXYsvYGXVb4A1ZXw=;
+	s=k20201202; t=1768691027;
+	bh=nKoaEZWxoBnT9YjT8ZA9EgXzhmQYTJZLwV9LFBUgwk4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WdlGoPd3xUSeKCaUCX77/Cu1pCRP7hsPL1PgaOFepU5A7GYkQJ6+fHEaerTwHTkbX
-	 YU5/qQK4JiyPPwsnk4D52CvbUq9mRLkz9IeDrhTjaeuO4hqeraP897byXK/9fkzKem
-	 94Dt2pmAYzFRTNnaKmepRXlZhallnlRealw2QTuY82TQAc61UWWFTF2iasO0xniWWY
-	 /1GaBW1JfcDImvVd8uKjH7YZlB8EQmygEVYhHEPdNFUo/CHxlK1HLuFST1hGibsSyd
-	 OR5dRPzGlo9iTrVV5Dg+b2bwN9hU/opF+bkgR6BNy4qz+dzK9hlsiIRKIeHRqgen3J
-	 ZD0U6xBJAmZgg==
-Date: Sat, 17 Jan 2026 14:48:47 -0800
+	b=fHFwbik7g+dNuXTzrf+zEAsKA41oksGeO8m06Iw4lKSsu6F+hTdIaOcLp2ETBx1BX
+	 XVOmzorXWLtpT9IXqC3C2i83KbhaZlGmydZYz3ZKhvYuq6hu3W/9Eox9wMhTTb4iwh
+	 xmozTM/FRxC/c16pEOQu+EIHHJquW+olYVtXGDEc1b2aDlCSovHIbewwv6OU8bi1Rw
+	 m+p1gFcLzBehM1KY5Kdf65NyEdDm7hgeatB1hFgn5nZZ2cWsqHkR/tqL59BksuAYsd
+	 AzfGqWMFtgJT7Wt3UR5PhZUzg07jq7s5MBFshknCjHTt8ul20nWYsoo25SybtvQ2yl
+	 6tMb2uuYuCJ/Q==
+Date: Sat, 17 Jan 2026 15:03:46 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Haiyang Zhang <haiyangz@linux.microsoft.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni
- Sri Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
- <shradhagupta@linux.microsoft.com>, Saurabh Sengar
- <ssengar@linux.microsoft.com>, Aditya Garg
- <gargaditya@linux.microsoft.com>, Dipayaan Roy
- <dipayanroy@linux.microsoft.com>, Shiraz Saleem
- <shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: Re: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
- for coalesced RX packets on CQE
-Message-ID: <20260117144847.20676729@kernel.org>
-In-Reply-To: <SA3PR21MB3867D18555258EDB7FCF9ACACA8AA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
-	<1767732407-12389-2-git-send-email-haiyangz@linux.microsoft.com>
-	<20260109175610.0eb69acb@kernel.org>
-	<SA3PR21MB3867BAD6022A1CAE2AC9E202CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260112172146.04b4a70f@kernel.org>
-	<SA3PR21MB3867B36A9565AB01B0114D3ACA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260113170948.1d6fbdaf@kernel.org>
-	<SA3PR21MB38676C98AA702F212CE391E2CA8FA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260114185450.58db5a6d@kernel.org>
-	<SA3PR21MB38673CA4DDE618A5D9C4FA99CA8CA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260115181434.4494fe9f@kernel.org>
-	<SA3PR21MB3867B98BBA96FF3BA7F42F3FCA8DA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260117085850.0ece5765@kernel.org>
-	<SA3PR21MB3867D18555258EDB7FCF9ACACA8AA@SA3PR21MB3867.namprd21.prod.outlook.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuniyu@google.com, ncardwell@google.com, netdev@vger.kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ horms@kernel.org
+Subject: Re: [PATCH net-next] tcp: try to defer / return acked skbs to
+ originating CPU
+Message-ID: <20260117150346.72265ac3@kernel.org>
+In-Reply-To: <CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
+References: <20260117164255.785751-1-kuba@kernel.org>
+	<CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 17 Jan 2026 18:01:18 +0000 Haiyang Zhang wrote:
-> > > Since this feature is not common to other NICs, can we use an
-> > > ethtool private flag instead?  
-> > 
-> > It's extremely common. Descriptor writeback at the granularity of one
-> > packet would kill PCIe performance. We just don't have uAPI so NICs
-> > either don't expose the knob or "reuse" another coalescing param.  
-> 
-> I see. So how about adding a new param like below to "ethtool -C"?
-> ethtool -C|--coalesce devname [rx-cqe-coalesce on|off]
+On Sat, 17 Jan 2026 19:16:57 +0100 Eric Dumazet wrote:
+> On Sat, Jan 17, 2026 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > Running a memcache-like workload under production(ish) load
+> > on a 300 thread AMD machine we see ~3% of CPU time spent
+> > in kmem_cache_free() via tcp_ack(), freeing skbs from rtx queue.
+> > This workloads pins workers away from softirq CPU so
+> > the Tx skbs are pretty much always allocated on a different
+> > CPU than where the ACKs arrive. Try to use the defer skb free
+> > queue to return the skbs back to where they came from.
+> > This results in a ~4% performance improvement for the workload.
+>=20
+> This probably makes sense when RFS is not used.
+> Here, RFS gives us ~40% performance improvement for typical RPC workloads,
+> so I never took a look at this side :)
 
-I don't think we need on / off, just the params.
-If someone needs on / off setting - the size to 1 is basically off.
+This workload doesn't like RFS. Maybe because it has 1M sockets..
+I'll need to look closer, the patchwork queue first tho.. :)
 
-> > > When the flag is set, the CQE coalescing will be enabled and put
-> > > up to 4 pkts in a CQE. support  
-> > > Does the "size" mean the max pks per CQE (1 or 4)?  
->  [...]  
-> 
-> In "ethtool -c" output, add a new value like this?
-> rx-cqe-frames:      (1 or 4 frames/CQE for this NIC)
+> Have you tested what happens for bulk sends ?
+> sendmsg() allocates skbs and push them to transmit queue,
+> but ACK can decide to split TSO packets, and the new allocation is done
+> on the softirq CPU (assuming RFS is not used)
+>=20
+> Perhaps tso_fragment()/tcp_fragment() could copy the source
+> skb->alloc_cpu to (new)buff->alloc_cpu.
 
-SG
+I'll do some synthetic testing and get back.
 
-> > > The timeout value is not even exposed to driver, and subject to change
-> > > in the future. Also the HW mechanism is proprietary... So, can we not
-> > > "expose" the timeout value in "ethtool -c" outputs, because it's not
-> > > available at driver level?  
-> > 
-> > Add it to the FW API and have FW send the current value to the driver?  
-> 
-> I don't know where is the timeout value in the HW / FW layers. Adding 
-> new info to the HW/FW API needs other team's approval, and their work, 
-> which will need a complex process and a long time.
-> 
-> > You were concerned (in the commit msg) that there's a latency cost,
-> > which is fair but I think for 99% of users 2usec is absolutely
-> > not detectable (it takes longer for the CPU to wake). So I think it'd
-> > be very valuable to the user to understand the order of magnitude of
-> > latency we're talking about here.  
-> 
-> For now, may I document the 2us in the patch description? And add a
-> new item to the "ethtool -c" output, like "rx-cqe-usecs", label is as 
-> "n/a" for now, while we work out with other teams on the time value 
-> API at HW/FW layers? So, this CQE coalescing feature support won't be
-> blocked by this "2usec" info API for a long time?
+> Also, if workers are away from softirq, they will only process the
+> defer queue in large patches, after receiving an trigger_rx_softirq()
+> IPI.
+> Any idea of skb_defer_free_flush() latency when dealing with batches
+> of ~64 big TSO packets ?
 
-Please do it right. We are in no rush upstream. It can't be that hard
-to add a single API to the FW within a single organization..
+Not sure if there's much we can do about that.. Perhaps we should have=20
+a shrinker that flushes the defer queues? I chatted with Shakeel briefly
+and it sounded fairly straightforward.
 
