@@ -1,141 +1,106 @@
-Return-Path: <netdev+bounces-250750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8510BD391AA
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 428DED391B1
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 367D0300A844
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:29:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 584DF301672B
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764432F1FDC;
-	Sat, 17 Jan 2026 23:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FDA2DA75B;
+	Sat, 17 Jan 2026 23:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofM13A6q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1bvz8OR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA042E8B87
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 23:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55290296BA5;
+	Sat, 17 Jan 2026 23:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768692575; cv=none; b=tJJGChI45xcMb67ZZjov11watx8pO8FGBAtz3QLxzv6SmwfJLKqkUx7QeFNvp4QYi/CQ7P5gJ8NO5BSAUdovnHIH/UCmdo1fBOrYoSEtC5jsovgbD6n++mfsdOd9rcCQvMcf05BlZ744Kywbi8X4tZlN3Hl9y63wlJq9jYJvYOE=
+	t=1768692885; cv=none; b=VYiwN/TE0mckl7iXaxn6f6TaHGzuW6T1wacuqk2RT7KM73DhypAC+E3GfQ+skMzJBpDt/qbIaGWYMP82yxDkttJo8L3kGKU7yXyZnfikRXg4CzCsGKcwn8EinV0incW/nmIs/Zr8dOvQoBXc4iIZNtz4EjB5wUStbDdhOBJXD3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768692575; c=relaxed/simple;
-	bh=oJ8ubN45hryyvktcyVN+ZJXq9q0JbLOMpdq907VqWgs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N6cEvhlKtn3RBZE9pw0aSwwmP4zxfaUaoMf1WUhsarmW8M9Li5H4JTgVqoeWfQwzZ132S5m3mwdBXBujMjcoDdG9ZK4UjNaX9e25N19jTgmjrS5jQ544AHbRbXJJE4Rb1pstasoSJyd8HSYd8x4bJnzKPKaUJ3vg11qcA/5lrOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofM13A6q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F2D4C4CEF7;
-	Sat, 17 Jan 2026 23:29:34 +0000 (UTC)
+	s=arc-20240116; t=1768692885; c=relaxed/simple;
+	bh=L3qGLyR9SwRXy+ntZI7bmJgcUvoZEy9ebV7TH9Lw11g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YXw+/k1U8+84+RoKRGAc3WHDqbFeORWvaBS9gL4wsieThyY6dVGAVYD7yZigdVpx055nyVGMA0+ZX9FZgoyR2OuqknFHoU2eV3YoZ3/R5wjL6e5/L1Im0iju8JEVd0gorsKwYpM5JZgiATokXKgLdRDoggVbgbflnAlcGJ6TSwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1bvz8OR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A87FDC4CEF7;
+	Sat, 17 Jan 2026 23:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768692574;
-	bh=oJ8ubN45hryyvktcyVN+ZJXq9q0JbLOMpdq907VqWgs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ofM13A6qfNA1IPIEvOHuW4oTKqvAqiybQIgPs6ymPOSWSXUXeCZDxqf0sC0ljhKwV
-	 WqH2mlFIz6OgqFbHXgQi3+McFmmYg30iu9kjTFg32ozWSv4IBJpik07iB/wjMMhaZs
-	 2YJ59KPgcq2KIUCQaQaQH91LzU1ilR9cBmE1wTRkQW4bMNjMxdA5MNSgDqQMKhlr31
-	 8+B4vBhc33p0agfHxVtkaIw/oODNZtIoKW/k+FYlbBYmCsOxqN8CzV5Yf8lnijstxK
-	 JJvZwf1XibMcaFKTMvIM/9Jyvyvt5+mujEfNZ2UKu7FIRKbozLTL5vcjiMTkGFkGbP
-	 KCDjvV3xGdgGw==
+	s=k20201202; t=1768692885;
+	bh=L3qGLyR9SwRXy+ntZI7bmJgcUvoZEy9ebV7TH9Lw11g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P1bvz8ORYARRRgHCgHZDp3ZJ4iDul4pNQsfi3A3Wi3F3ckP+KtoK+fDQPdQPYe8pD
+	 7Nr+onPw8XqhGhEWW3Cnqd90WOcqlzXSbRa1t4DCKYo1epHqcwJurze5Uur8jeWQth
+	 pD7z+s5gxivAuM6AjdidIzqx24nBm82OOH4zjao1XQdhEKobPRRJGQ+jh641huoP/V
+	 1T0oP3q11HzwV5vnPmWJTpXWYvXsz8/i19zq6EqBT/xHuXF4VEyUhoN7LIFa/0ESJc
+	 vmYiXacPKNTRdGgmOlSbrYo9NFxLtgP9FA+ahLISOJNpPIW6+yyDDRR1CpTpFyWL+k
+	 vlS9NYnZ2zlMQ==
+Date: Sat, 17 Jan 2026 15:34:43 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: u.kleine-koenig@baylibre.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	linux@armlinux.org.uk,
-	hkallweit1@gmail.com,
-	pabeni@redhat.com
-Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
-Date: Sat, 17 Jan 2026 15:29:32 -0800
-Message-ID: <20260117232932.1005051-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
-References: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Oliver Neukum
+ <oneukum@suse.com>, linux-usb@vger.kernel.org
+Subject: Re: [PATCH] usbnet: limit max_mtu based on device's hard_mtu
+Message-ID: <20260117153443.6997a8f0@kernel.org>
+In-Reply-To: <20260114090317.3214026-1-lvivier@redhat.com>
+References: <20260114090317.3214026-1-lvivier@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, 14 Jan 2026 10:03:17 +0100 Laurent Vivier wrote:
+> The usbnet driver initializes net->max_mtu to ETH_MAX_MTU before calling
+> the device's bind() callback. When the bind() callback sets
+> dev->hard_mtu based the device's actual capability (from CDC Ethernet's
+> wMaxSegmentSize descriptor), max_mtu is never updated to reflect this
+> hardware limitation).
+> 
+> This allows userspace (DHCP or IPv6 RA) to configure MTU larger than the
+> device can handle, leading to silent packet drops when the backend sends
+> packet exceeding the device's buffer size.
+> 
+> Fix this by limiting net->max_mtu to the device's hard_mtu after the
+> bind callback returns.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-mdio: Make use of bus callbacks
+Change looks good, please add Stefano's tags, a Fixes tag pointing at
+the oldest commit in the git history where this user-visible issue can
+be reproduced (use the first tag in git history if necessary), and
+resend. Please mark the commit as [PATCH net v2] when resending.
+Start a new thread (don't reply to this one). And one more thing..
 
-This patch moves MDIO device probe/remove/shutdown callbacks from the
-device_driver level to the bus_type level, with the goal of eventually
-removing device_driver callbacks.
+> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+> index 36742e64cff7..8dbbeb8ce3f8 100644
+> --- a/drivers/net/usb/usbnet.c
+> +++ b/drivers/net/usb/usbnet.c
+> @@ -1821,9 +1821,14 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
+>  		if ((dev->driver_info->flags & FLAG_NOARP) != 0)
+>  			net->flags |= IFF_NOARP;
+>  
+> -		/* maybe the remote can't receive an Ethernet MTU */
+> -		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
+> -			net->mtu = dev->hard_mtu - net->hard_header_len;
+> +		/* limit max_mtu to the device's hard_mtu */
 
-> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-> index afdf1ad6c0e6..dea67470a7bf 100644
-> --- a/drivers/net/phy/mdio_bus.c
-> +++ b/drivers/net/phy/mdio_bus.c
+please remove these comments, we can read the code
 
-[ ... ]
+> +		if (net->max_mtu > (dev->hard_mtu - net->hard_header_len))
+> +			net->max_mtu = dev->hard_mtu - net->hard_header_len;
+> +
+> +		/* limit mtu to max_mtu */
 
-> @@ -1004,11 +1004,67 @@ static const struct attribute_group *mdio_bus_dev_groups[] = {
->  	NULL,
->  };
->
-> +/**
-> + * mdio_bus_probe - probe an MDIO device
-> + * @dev: device to probe
-> + *
-> + * Description: Take care of setting up the mdio_device structure
-> + * and calling the driver to probe the device.
-> + *
-> + * Return: Zero if successful, negative error code on failure
-> + */
-> +static int mdio_bus_probe(struct device *dev)
-> +{
-> +	struct mdio_device *mdiodev = to_mdio_device(dev);
-> +	struct device_driver *drv = dev->driver;
-> +	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
+and this one
 
-[ ... ]
-
->  const struct bus_type mdio_bus_type = {
->  	.name		= "mdio_bus",
->  	.dev_groups	= mdio_bus_dev_groups,
->  	.match		= mdio_bus_match,
->  	.uevent		= mdio_uevent,
-> +	.probe		= mdio_bus_probe,
-> +	.remove		= mdio_bus_remove,
-> +	.shutdown	= mdio_bus_shutdown,
->  };
-
-Does adding these bus-level callbacks break PHY device probing?
-
-PHY drivers register via phy_driver_register() which sets:
-
-    new_driver->mdiodrv.driver.probe = phy_probe;
-    new_driver->mdiodrv.driver.remove = phy_remove;
-
-The driver core in call_driver_probe() prioritizes bus callbacks over driver
-callbacks:
-
-    if (dev->bus->probe)
-        ret = dev->bus->probe(dev);
-    else if (drv->probe)
-        ret = drv->probe(dev);
-
-With mdio_bus_type.probe now set, phy_probe() will never be called for PHY
-devices. The same applies to phy_remove() being bypassed by mdio_bus_remove().
-
-phy_probe() performs essential initialization including setting phydev->drv,
-reading PHY abilities, configuring EEE, and setting up the state machine.
-Without this, PHY devices would fail to initialize properly.
-
-Was there a plan to update phy_driver_register() as part of this change, or
-is a separate patch needed to handle PHY drivers?
+> +		if (net->mtu > net->max_mtu)
+> +			net->mtu = net->max_mtu;
 -- 
 pw-bot: cr
 
