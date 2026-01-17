@@ -1,106 +1,134 @@
-Return-Path: <netdev+bounces-250751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428DED391B1
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:34:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF620D391B8
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 584DF301672B
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:34:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 922753005011
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FDA2DA75B;
-	Sat, 17 Jan 2026 23:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1bvz8OR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6040B2DCC1F;
+	Sat, 17 Jan 2026 23:40:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55290296BA5;
-	Sat, 17 Jan 2026 23:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B159A2D46A9;
+	Sat, 17 Jan 2026 23:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768692885; cv=none; b=VYiwN/TE0mckl7iXaxn6f6TaHGzuW6T1wacuqk2RT7KM73DhypAC+E3GfQ+skMzJBpDt/qbIaGWYMP82yxDkttJo8L3kGKU7yXyZnfikRXg4CzCsGKcwn8EinV0incW/nmIs/Zr8dOvQoBXc4iIZNtz4EjB5wUStbDdhOBJXD3E=
+	t=1768693255; cv=none; b=U+5GNdd+0M5LZWNZqXSJTUNiMWkYKqITea1V4hJsRvqLw39Gqe8ZPaqZ7ZJ6swUuIETXRNxhrxXzi0eR1/s5AXWkNQo/H6xicICztJwe5uvI1ThkH3Qdu7KPUsCTU42oxe/bxOTziGE06S5X20fuJeWoJHEaBG2ulDaWd+6uoi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768692885; c=relaxed/simple;
-	bh=L3qGLyR9SwRXy+ntZI7bmJgcUvoZEy9ebV7TH9Lw11g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YXw+/k1U8+84+RoKRGAc3WHDqbFeORWvaBS9gL4wsieThyY6dVGAVYD7yZigdVpx055nyVGMA0+ZX9FZgoyR2OuqknFHoU2eV3YoZ3/R5wjL6e5/L1Im0iju8JEVd0gorsKwYpM5JZgiATokXKgLdRDoggVbgbflnAlcGJ6TSwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1bvz8OR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A87FDC4CEF7;
-	Sat, 17 Jan 2026 23:34:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768692885;
-	bh=L3qGLyR9SwRXy+ntZI7bmJgcUvoZEy9ebV7TH9Lw11g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P1bvz8ORYARRRgHCgHZDp3ZJ4iDul4pNQsfi3A3Wi3F3ckP+KtoK+fDQPdQPYe8pD
-	 7Nr+onPw8XqhGhEWW3Cnqd90WOcqlzXSbRa1t4DCKYo1epHqcwJurze5Uur8jeWQth
-	 pD7z+s5gxivAuM6AjdidIzqx24nBm82OOH4zjao1XQdhEKobPRRJGQ+jh641huoP/V
-	 1T0oP3q11HzwV5vnPmWJTpXWYvXsz8/i19zq6EqBT/xHuXF4VEyUhoN7LIFa/0ESJc
-	 vmYiXacPKNTRdGgmOlSbrYo9NFxLtgP9FA+ahLISOJNpPIW6+yyDDRR1CpTpFyWL+k
-	 vlS9NYnZ2zlMQ==
-Date: Sat, 17 Jan 2026 15:34:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Oliver Neukum
- <oneukum@suse.com>, linux-usb@vger.kernel.org
-Subject: Re: [PATCH] usbnet: limit max_mtu based on device's hard_mtu
-Message-ID: <20260117153443.6997a8f0@kernel.org>
-In-Reply-To: <20260114090317.3214026-1-lvivier@redhat.com>
-References: <20260114090317.3214026-1-lvivier@redhat.com>
+	s=arc-20240116; t=1768693255; c=relaxed/simple;
+	bh=jiDzPClJPHyrhdJDYEW8Sl5WUuUUeH29GBlpSef73z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BvbarM23xJolLVlajQfhA+Jwn1PoyHyGlop+3G5s2ZsQNjv+QeS06lKsbvEidu4dg+clPOMtMg982z91NZuBG+YRWCHyeCZumESO/CFPdU4TN/vwyULKJvRtcjpoUVd82l354Lif285LKVr98tCY0MD3mYBgp7AxAtIvz5WK9Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vhFuT-000000008W1-1YbS;
+	Sat, 17 Jan 2026 23:40:49 +0000
+Date: Sat, 17 Jan 2026 23:40:36 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: hkallweit1@gmail.com, linux-kernel@vger.kernel.org,
+	michael@fossekall.de, linux@armlinux.org.uk, edumazet@google.com,
+	andrew@lunn.ch, olek2@wp.pl, davem@davemloft.net,
+	vladimir.oltean@nxp.com, netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [v2,2/5] net: phy: realtek: simplify C22 reg access via
+ MDIO_MMD_VEND2
+Message-ID: <aWwd9LoVI6j8JBTc@makrotopia.org>
+References: <fd49d86bd0445b76269fd3ea456c709c2066683f.1768275364.git.daniel@makrotopia.org>
+ <20260117232006.1000673-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260117232006.1000673-1-kuba@kernel.org>
 
-On Wed, 14 Jan 2026 10:03:17 +0100 Laurent Vivier wrote:
-> The usbnet driver initializes net->max_mtu to ETH_MAX_MTU before calling
-> the device's bind() callback. When the bind() callback sets
-> dev->hard_mtu based the device's actual capability (from CDC Ethernet's
-> wMaxSegmentSize descriptor), max_mtu is never updated to reflect this
-> hardware limitation).
+On Sat, Jan 17, 2026 at 03:20:06PM -0800, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > 
-> This allows userspace (DHCP or IPv6 RA) to configure MTU larger than the
-> device can handle, leading to silent packet drops when the backend sends
-> packet exceeding the device's buffer size.
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+> ---
+> net: phy: realtek: simplify C22 reg access via MDIO_MMD_VEND2
 > 
-> Fix this by limiting net->max_mtu to the device's hard_mtu after the
-> bind callback returns.
+> This commit adds support for translating MDIO_MMD_VEND2 registers back
+> to Clause-22 registers for PHYs on a C22-only bus. It also renames
+> RTL_PHYSR to RTL_VND2_PHYSR and changes the register access method in
+> several read_status functions.
+> 
+> > diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+> > index a593150b6cbb..40cae9968d20 100644
+> > --- a/drivers/net/phy/realtek/realtek_main.c
+> > +++ b/drivers/net/phy/realtek/realtek_main.c
+> 
+> [ ... ]
+> 
+> > @@ -1156,7 +1156,8 @@ static int rtlgen_read_status(struct phy_device *phydev)
+> >  	if (!phydev->link)
+> >  		return 0;
+> >
+> > -	val = phy_read(phydev, RTL_PHYSR);
+> > +	val = phy_read_paged(phydev, RTL822X_VND2_TO_PAGE(RTL_VND2_PHYSR),
+> > +			     RTL822X_VND2_TO_PAGE_REG(RTL_VND2_PHYSR));
+> 
+> This changes rtlgen_read_status() from reading C22 register MII_RESV2
+> (0x1a) directly to using paged access at page 0xa43, register 18.
 
-Change looks good, please add Stefano's tags, a Fixes tag pointing at
-the oldest commit in the git history where this user-visible issue can
-be reproduced (use the first tag in git history if necessary), and
-resend. Please mark the commit as [PATCH net v2] when resending.
-Start a new thread (don't reply to this one). And one more thing..
+Yeah. Just that this is not part of the series submitted.
+It's rather a (halucinated) partial revert of
+[v2,4/5] net: phy: realtek: demystify PHYSR register location
 
-> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-> index 36742e64cff7..8dbbeb8ce3f8 100644
-> --- a/drivers/net/usb/usbnet.c
-> +++ b/drivers/net/usb/usbnet.c
-> @@ -1821,9 +1821,14 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
->  		if ((dev->driver_info->flags & FLAG_NOARP) != 0)
->  			net->flags |= IFF_NOARP;
->  
-> -		/* maybe the remote can't receive an Ethernet MTU */
-> -		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
-> -			net->mtu = dev->hard_mtu - net->hard_header_len;
-> +		/* limit max_mtu to the device's hard_mtu */
 
-please remove these comments, we can read the code
+> 
+> rtlgen_read_status() is used by RTL8211F, RTL8211F-VD, and Generic FE-GE
+> Realtek PHY drivers. Are these Gigabit-only PHYs guaranteed to have the
+> PHYSR at the same paged location as the RTL822x 2.5GbE PHYs?
+> 
+> I notice this change is reverted in a later commit in the series:
+>   efef1a8042ec ("net: phy: realtek: demystify PHYSR register location")
+> which changes back to:
+>   val = phy_read(phydev, RTL_PHYSR);
+> 
+> with the note "Turns out that register address RTL_VND2_PHYSR (0xa434)
+> maps to Clause-22 register MII_RESV2".
+> 
+> Is the paged access in this intermediate commit correct, or could it
+> cause issues during bisection?
+> 
+> [ ... ]
+> 
+> > @@ -2127,7 +2137,7 @@ static int rtlgen_sfp_read_status(struct phy_device *phydev)
+> >  	if (!phydev->link)
+> >  		return 0;
+> >
+> > -	val = phy_read(phydev, RTL_PHYSR);
+> > +	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
+> 
+> Similarly, this changes from C22 register read to C45 MDIO_MMD_VEND2
+> access via rtlgen_read_vend2(). The SFP PHY mode uses PHY_IS_INTERNAL
+> and is used by r8169 for 2.5GbE chips in SFP mode.
 
-> +		if (net->max_mtu > (dev->hard_mtu - net->hard_header_len))
-> +			net->max_mtu = dev->hard_mtu - net->hard_header_len;
-> +
-> +		/* limit mtu to max_mtu */
+Just that, again, this is the revert, and not the actual patch I'm
+submitting. And yes, it has been tested on SFP NICs.
 
-and this one
-
-> +		if (net->mtu > net->max_mtu)
-> +			net->mtu = net->max_mtu;
--- 
-pw-bot: cr
+> 
+> This is also reverted in the same later commit to:
+>   val = phy_read(phydev, RTL_PHYSR);
+> 
+> Does rtlgen_read_vend2() work correctly for all PHYs that could be in
+> SFP mode?
+> -- 
+> pw-bot: cr
 
