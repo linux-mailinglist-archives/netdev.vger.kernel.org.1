@@ -1,87 +1,85 @@
-Return-Path: <netdev+bounces-250717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B962D38FEB
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 18:00:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF84D38FF5
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 18:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A07AA300F9D9
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 17:00:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6B9323019E33
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 17:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245382571A5;
-	Sat, 17 Jan 2026 17:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC4A218592;
+	Sat, 17 Jan 2026 17:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hiCzOMet"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B162C240611
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 17:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C5635959;
+	Sat, 17 Jan 2026 17:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768669204; cv=none; b=AWp+NZkfEanjn7KKBPMau8T4Ohvmq5TOqHSc1UxDAeTBUcgv7XwoDrupjQpnD5p11KgQ9TAhcjF2yTWLecx6d8E6uGfzwMU5ev5IR+R3BvqtwCshfk/FAJYemfTDDCjsV3RF6nnjtowbt0NiKekvu8fzF8QQQr60+ZQzSmFwMpY=
+	t=1768669596; cv=none; b=WUKz+KJ5F78sgiiqbSvaomxw+Tf8TVZGxiqzkPlsR0uSmcP7HVSiyTOhp4tsXPjnsR3NUfTfMxWh2CT5pAROG9urCEFSaXbVlAVFPXGVWKbQQF7nsIgewziTJHbRu7VDQuQ6tlzSQurB2lN1ESOGjl+eLLIb9UgW677fJZK2WCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768669204; c=relaxed/simple;
-	bh=6F9+pDuLvb8wMjYIzRip030sEnSaVkH0nbJZR7jKfiM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=K72F9MjljVFQ1tB+a4xoAHofx+QHQBfcZWtHOGcxYoxEiFy8oO2cXKG+DF6V9s/vbJnCpUc2yc3l/qgkUXG74ZvjwK0AsFToSUDmQCEZoNI8w1p4kTPr9NcyXsjgOLUavh31+n/nE+FSLsCZiopq0wJE7hIlxi0afTUIaTuiiFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-65f6d0bd852so8182845eaf.3
-        for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 09:00:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768669201; x=1769274001;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PKusMdsZlLCB78xo6BzsMeO+3r4MZV4WdR4/o1abZH0=;
-        b=jJIrb2c1bTvYA126Q8/TSH5YGuDWV7Cn8PZTn7AD4FkDViB2XLfUMurR54GO/816Je
-         YXj1SPNqKTfBhCP5EsyUlqoWrR4IdX/jpJ/RIKLQyRb/J7ZlJ7PX3c1l3dvw3sHoI2Kt
-         B1u0lGPhzDN/rJZSxQcxZpWZb+q1tC9+r7/lTkuhS5drclbHS79/repcqSwOBSUidm2i
-         gP1mXFqpJBtB79hr2YZyHmQ/DaLCM7WwMtNbUAUETfVX3Yx3r3+Rx3Y0Au6z1RF0/qFF
-         oSmbYVz6iQcOeA34yY7GsZx6BjwdFwrNLga4ouVsyLSJAn8d72xl2zLOiTqJgKyMZdzE
-         fTnw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBWm4MSncIU12a0LF9cAvW+8fM3eUqe/WZQH6N+CyK0oVh3HPHOxOtZLy3YNTOPjVkRgd/k/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUqj5IyAYcHGrUlpTQrXiCCRHnSmRZIkE0z/hEiHpVXCKUNNpH
-	+vs3HTZLXnoTEO7vVIIz9vigspGolcsgYlPRiyHjV79omlv6eoZTWY4Qt3Ys9pnjZ821bbgufXD
-	IGWb/pRu7+rhHTPjkNttfRKwU1dpB20mPXjYiLrjxvY5LLpgscDWqTBPSsDs=
+	s=arc-20240116; t=1768669596; c=relaxed/simple;
+	bh=l0dshTY8GU6EMJ8gcGBz/7Rc6DIMcfI+pdpD3/t/BlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fOHJwvmApeiLrbM7hOunuj5jioWOV3v8zn+vepTZGc809yGZHI8LDq52vCD1znxDo4QA46m5QP0OaHAU5nhm8E6jMoaIH2X1U11d4wB1Ezl7A+Tf3GqxpuoBo1X1a7vDwlHJu9puQzct21RcSsVU5v/UpaxHgLD/RLSIgQNOLfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hiCzOMet; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EAD1C4CEF7;
+	Sat, 17 Jan 2026 17:06:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768669596;
+	bh=l0dshTY8GU6EMJ8gcGBz/7Rc6DIMcfI+pdpD3/t/BlI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hiCzOMet67QTgiBJIyTLZOzf5PmawlbBamAtHhDg4b311fqeMsRgcDwyaT/CX8rHy
+	 YxYpsCUbOh9wG024AEtR7bFIBarHszxYwirsVWG/AwMkzx1ndZRJ89l8xUq/GNOMof
+	 9rMc0zLzrqyl4Od6h6tzUhRt+VpGYUQNLYqtvQLWo4da3fOQwa8LNrE3uN5ykwa0VS
+	 P5n4LK7dWiVFl929g8Wpyqqf5qtbkohfh0aRBk0pAO5YQzDNCjI7G+46EyNwYrfnO5
+	 uO83l5OBKpsV55T6rn51MZOWv2RfnyYaV71SR/7BSEduCr2V1B/NTMkAP0KwmDAFID
+	 +YfqztHbKRrtw==
+Date: Sat, 17 Jan 2026 09:06:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, Tao Wang
+ <tao03.wang@horizon.auto>, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net v2] net: stmmac: fix transmit queue timed out after
+ resume
+Message-ID: <20260117090634.26148eb4@kernel.org>
+In-Reply-To: <aWqmIRFsHkQKkXF-@shell.armlinux.org.uk>
+References: <20260115070853.116260-1-tao03.wang@horizon.auto>
+	<aWjY7m96e87cBLUZ@shell.armlinux.org.uk>
+	<aWlCs5lksxfgL6Gi@shell.armlinux.org.uk>
+	<6a946edc-297e-469a-8d91-80430d88f3e5@bootlin.com>
+	<51859704-57fd-4913-b09d-9ac58a57f185@bootlin.com>
+	<aWmLWxVEBmFSVjvF@shell.armlinux.org.uk>
+	<aWo_K0ocxs5kWcZT@shell.armlinux.org.uk>
+	<aWp-lDunV9URYNRL@shell.armlinux.org.uk>
+	<3a93c79e-f755-4642-a3b0-1cce7d0ea0ef@bootlin.com>
+	<aWqP_hhX73x_8Qs1@shell.armlinux.org.uk>
+	<aWqmIRFsHkQKkXF-@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:216:b0:659:9a49:8eca with SMTP id
- 006d021491bc7-66117a44ffbmr2699698eaf.78.1768669201514; Sat, 17 Jan 2026
- 09:00:01 -0800 (PST)
-Date: Sat, 17 Jan 2026 09:00:01 -0800
-In-Reply-To: <20260117142632.180941-1-activprithvi@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <696bc011.050a0220.3390f1.000e.GAE@google.com>
-Subject: Re: [syzbot] [hams?] memory leak in nr_add_node
-From: syzbot <syzbot+3f2d46b6e62b8dd546d3@syzkaller.appspotmail.com>
-To: activprithvi@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-hams@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Fri, 16 Jan 2026 20:57:05 +0000 Russell King (Oracle) wrote:
+> Thoughts - should the kernel default to having flow control enabled
+> or disabled in light of this? Should this feature require explicit
+> administrative configuration given the severity of network disruption?
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-
-Reported-by: syzbot+3f2d46b6e62b8dd546d3@syzkaller.appspotmail.com
-Tested-by: syzbot+3f2d46b6e62b8dd546d3@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         ea1013c1 Merge tag 'bpf-fixes' of git://git.kernel.org..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=1740b522580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d60836e327fd6756
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f2d46b6e62b8dd546d3
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=15da13fc580000
-
-Note: testing is done by a robot and is best-effort only.
+FWIW in DC historically we have seen a few NICs which have tiny buffers
+so back-pressuring up to the top of rack switch is helpful. Switches
+have more reasonable buffers. That's just NIC Tx pause, switch Rx pause
+(from downlink ports, not fabric!). Letting switches generate pause is 
+a recipe for.. not having a network. We'd need to figure out why Netgear
+does what it does in your case, IMHO.
 
