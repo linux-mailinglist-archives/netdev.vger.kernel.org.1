@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-250695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4514CD38DD6
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 11:47:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 951A2D38DD7
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 11:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 555213017EDE
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 10:47:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 787953017EEF
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 10:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF722C15AA;
-	Sat, 17 Jan 2026 10:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BB82EB84E;
+	Sat, 17 Jan 2026 10:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7nPqLzj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4kqSJ+c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987CB26E71F
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 10:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C5626E71F
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 10:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768646824; cv=none; b=EQ4K/l5KIQyJRZujMiRfDhZ2e3fBmOt6XdIySZCFgIQorE6wHitdVPouAklEszxnn144L2YpzsEuVfsLMacjrcB5rTMA1Efj+hgt8DdegvdOjjeWx0ZD48xyJSYoTCAcWIbk7OL4jzA7+ZmOtwKYIz9Gja1P+faJVWPwr3QfYVk=
+	t=1768646836; cv=none; b=bZiqPE6Bi5qGLAsoxVSmqsB02+ac7OQhNTjqMtZPby5yTLL2FECthwxJAMZaKQBvHGkO0EjIoLJHmnZTyFWgBtoi3MRCUFrfZJ/lUieVLF4TNHJCy5sgQfo6XWFZJQOBHqbvPXwd1+0DWerPgDwyX4TjiIWITHgBiltRHuvYfPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768646824; c=relaxed/simple;
-	bh=bN099H/9dabR/VhIj5t0dTA0qwnLTBFpaOlYPzOhKNw=;
+	s=arc-20240116; t=1768646836; c=relaxed/simple;
+	bh=Rl4rAKSmBZ1P2vmLgvWlWA/q88jy13J1zq0K3kcgkD4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DgdfjfdUR+Op8JTcJmoJbWzkC7qN/4FfH1AlmhsHN+uH9KiC+ogr/Yl+lKrQ3CGV2DaCVYWbMok90rvNa/Uq0p1/iXHXpiW8hpOhAslHPtr0gfE9LTdctm4uFhENlbA0aDjXcWpKwobMWS8JQ76cECvTw5ZWvpd6Kf2IL/9Hm/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7nPqLzj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 661D7C4CEF7;
-	Sat, 17 Jan 2026 10:47:03 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=trgr/pP1AzeBQMPfAyp9JnejfvPY33vNuy6Yq9qWdf7LJy3FBD50a7ZAImU8JzLUObakRzjHXyEMw/LWWQveOYL24NS19GDK7AOd4pR4sIdEJ4/zrQZR+xGYenkebC+WU1j+Dewu002iQb9N0Cup535NbKT6YqjMKignJceGDJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4kqSJ+c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6853C4CEF7;
+	Sat, 17 Jan 2026 10:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768646824;
-	bh=bN099H/9dabR/VhIj5t0dTA0qwnLTBFpaOlYPzOhKNw=;
+	s=k20201202; t=1768646835;
+	bh=Rl4rAKSmBZ1P2vmLgvWlWA/q88jy13J1zq0K3kcgkD4=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=U7nPqLzjc8dF9544uCbqKTbENCUPQZmaVIDuGmXvvSL90nUlzOfBjZIwg3EI9Exmg
-	 xNtzGUf9+rOrD63OkXEzP3HPFx6gaE2LwRLldCcsvwJgZs+aO3WMQCQWFJQHvqy2/f
-	 L26UKnTWnxjbu/XEJpohApjCT1f0PlbyqFNmXmUiPPOa3CUHZh0gT+sBQyRcJzKEsq
-	 9wcvSZyMVYzuTbpMZ/ovoPF1iMiSyXYYgbHKxW9npKjBEiHjspCfIrzeideYK9n8Zi
-	 U7lUESMrro8AhNsTASwl67lQJ5VnKPfvo8KWe8zBQjfzcqoA84vSDVQ9g8csv+HQvB
-	 snz7y1DYJjeyg==
-Message-ID: <7bc038f3-4048-4008-84c8-4f0303f0db93@kernel.org>
-Date: Sat, 17 Jan 2026 11:47:01 +0100
+	b=O4kqSJ+cs2BWmWsdYnHXRgvnsgCPaYZVFn5wFGPFQ7it7biRzNYNbO+ZgCRPF5YBY
+	 UthpBushxH+xQsZGLpqU/EY7exfHap6UpFFTZwwCcyoG8Hq6DE/6TgN4WzOydiw/63
+	 mXv49SDaN8Kmb9XhHzvcCFKq07BLNoYWvdWX9CTecZrEQAVKeiyN9KOziYW7wRXo0E
+	 +B22ycIhcEMuCJ1L4ry4K0OPDcSUxC/ic/aC0HDeJBmGgl4txVryQ44KbMihR1avrT
+	 X3QV7fp5tI9d7n3+F+plwRfv3aIcXC7OMaNzJ5HwcT9N80v8DzaSiJv50X3jxzHwsZ
+	 IM8E4aOlp6tRg==
+Message-ID: <30324c2a-8dc9-46e3-b220-4d6cd06d2480@kernel.org>
+Date: Sat, 17 Jan 2026 11:47:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,9 +48,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] net: phy: realtek: add RTL8224 pair swap support
+Subject: Re: [PATCH 2/2] net: phy: realtek: add RTL8224 polarity swap support
 To: Damien Dejean <dam.dejean@gmail.com>, netdev@vger.kernel.org
 References: <20260116173920.371523-1-dam.dejean@gmail.com>
+ <20260116173920.371523-2-dam.dejean@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -96,50 +97,45 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20260116173920.371523-1-dam.dejean@gmail.com>
+In-Reply-To: <20260116173920.371523-2-dam.dejean@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 16/01/2026 18:39, Damien Dejean wrote:
-> The RTL8224 has a register to configure a pair swap (from ABCD order to
-> DCBA) providing PCB designers more flexbility when wiring the chip. The
-> swap parameter has to be set correctly for each of the 4 ports before
-> the chip can detect a link.
+> The RTL8224 has a register to configure the polarity of every pair of
+> each port. It provides device designers more flexbility when wiring the
+> chip.
 > 
-> After a reset, this register is (unfortunately) left in a random state,
-> thus it has to be initialized. On most of the devices the bootloader
-> does it once for all and we can rely on the value set, on some other it
-> is not and the kernel has to do it.
+> Unfortunately, the register is left in an unknown state after a reset.
+> Thus on devices where the bootloader don't initialize it, the driver has
+> to do it to detect and use a link.
 > 
-> The MDI pair swap can be set in the device tree using the property
-> realtek,mdi-pair-swap. The property is set to "off" to disable the pair
-> swap, "on" to enable it, or "keep"/unset to keep the current
-> configuration.
+> The MDI polarity swap can be set in the device tree using the property
+> realtek,mdi-polarity-swap. The u32 value is a bitfield where bit[0..3]
+> control the polarity of pairs A...D.
 > 
 > Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
 > ---
->  .../bindings/net/realtek,rtl82xx.yaml         | 13 ++++
+>  .../bindings/net/realtek,rtl82xx.yaml         |  7 +++++
+>  drivers/net/phy/realtek/realtek_main.c        | 29 +++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> index 2d04d90f8b97..4abcc5cfaf5f 100644
+> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> @@ -67,6 +67,13 @@ properties:
+>        - off
+>      default: keep
+>  
+> +  realtek,mdi-polarity-swap:
+> +    description:
+> +      A bitmap to describe pair polarity swap. Bit 0 to swap polarity of pair A,
+> +      bit 1 to swap polarity of pair B, bit 2 to swap polarity of pair C and bit
+> +      3 to swap polarity of pair D.
+> +    $ref: /schemas/types.yaml#/definitions/uint32
 
-Please run scripts/checkpatch.pl on the patches and fix reported
-warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
-patches and (probably) fix more warnings. Some warnings can be ignored,
-especially from --strict run, but the code here looks like it needs a
-fix. Feel free to get in touch if the warning is not clear.
-
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument, so you will
-not CC people just because they made one commit years ago). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
-
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-
+Same problem.
 
 Best regards,
 Krzysztof
