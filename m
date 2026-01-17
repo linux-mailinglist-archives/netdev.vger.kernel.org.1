@@ -1,229 +1,119 @@
-Return-Path: <netdev+bounces-250670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87662D38A51
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 00:39:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FF9D38AB7
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9E0D9300C371
-	for <lists+netdev@lfdr.de>; Fri, 16 Jan 2026 23:39:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BABE6306DBEE
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 00:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D2F2D780A;
-	Fri, 16 Jan 2026 23:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F673BB40;
+	Sat, 17 Jan 2026 00:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CPr7Dtsn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3ZIEpKn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7552D94A7
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 23:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FBF2AD32
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 00:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768606788; cv=none; b=eRG5ARrwv4VtSCPW3Xgd9EHYc//IgUt2Y/3tbcawra3FJc8Io6PI7xQqQf2j71Pd3tGOdnKPHTcT7/NzDN6l3toOPlAUItark9GjAPUJ4Ga6HYJHAboVn4OS8Qd+oqRMh/vGA4VxrP+Jtrs9kl9AR0rbeeD6RW4CRBH1YChM3Ig=
+	t=1768609826; cv=none; b=mj9vsPooEyhJrrwjVE0TqdNBW0GyT5d+oDjzEtlWSUz4peOfgwTjZRsMS9o8w0TqCo1Hro5AFQWl2nMmJAlFwRncGiyBbyrILaoQ9+bwZkIK/EvQXePqckC8tHCmDakh5LEeGhHI9YyenCdYMidT9K50mMaKvo6HvHuzWrtiJ+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768606788; c=relaxed/simple;
-	bh=1L4Z10EN3fStlLWrOTv25Pq3Qk48HrL3c61DmZOsz6s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e9nj3gEVuK7EurziTcz59h8EY72V7ZbQHeZLK6mq01lCBztjRDKqNox+YsHoEEpAgOQ3uwZQRy0C+BRL6HtMAHnmWFYLS9RIqXmPM6dS6Xx+WUuzLPNnjrWhF5SJ/Y19FdQCkq4wClj22oEksFZLxL0Wgnw8WTLW4qqCTytro+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CPr7Dtsn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBDEC16AAE
-	for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 23:39:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768606788;
-	bh=1L4Z10EN3fStlLWrOTv25Pq3Qk48HrL3c61DmZOsz6s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CPr7Dtsnm5xqqjXRoF4zmWwxIcvihEIqjlYx3ZOjBpFWmdO+6X/jWujdQK9oaw2gp
-	 khc5ZIXwQLm32zCcGPWx58h/7b6Ar2SeZjjylFefDa0SyPZIeuCm6XPVxTVyqNILYc
-	 cGsBKMlC8DlhJQBl8v1ITDHAkqoEFnW9nnuMOmPQB8eW5+CjcfMo1mLhzsZUDYPFUe
-	 9v4fwygvZqHklVK8cdq+xo90aLrH+KhrA+JxOZ/C3EeM4rPHAzNTB3gjfXlwpPsg/y
-	 Q8Q8RCBh7QIaWDcGjgqE6LFQa5rq0PmGvEBeOg/QC57ckm0PJ4lqje94zowytehp0k
-	 N2SK0WfBEUNyw==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65089cebdb4so4056442a12.0
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 15:39:47 -0800 (PST)
-X-Gm-Message-State: AOJu0YwZs2kz51wLsIjsb0VaWzR45J9tJdu+TJeEaOt6Tx2K6h4StwV5
-	yl3DMHmgKXVaYqYo0cRBwHgeMflDdJeZ9v948G+xG+CkfnUCUv5uuC/uRMhZZ2oD0Eqj41e9XH3
-	d0Gu7c9dOf9PoTFo63kTD3GO/WFzfEA==
-X-Received: by 2002:a05:6402:3547:b0:653:10be:c89b with SMTP id
- 4fb4d7f45d1cf-654bb70fa92mr3102930a12.34.1768606786546; Fri, 16 Jan 2026
- 15:39:46 -0800 (PST)
+	s=arc-20240116; t=1768609826; c=relaxed/simple;
+	bh=luDJ/W67j2gZ4jPrGcVobjYQ4folzdqjBsuUm3FaRPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iINwJbw8EHvjvIaMXCMnmrmSYZ6rlnzu2lEex1jIFKQhIK0rHDrDU8uUR4swwP2O4BgJitz0H93FJvsoNv8GSNDxScb70NG5jpl9RVRB0oH0m51LcTbqzPTfeEsGDdV6O7XNnzt3QEsDtBhJ7ngvlqFcphz2hTKvaW6FshUAWR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l3ZIEpKn; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1233c155a42so3472042c88.1
+        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 16:30:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768609824; x=1769214624; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yp1sONmI1EVSxxcQrVc8RcvF+u7mjGF7KxmFk1Nh69s=;
+        b=l3ZIEpKnWLSSseycrj6crW/YWGRH1JxLQ4tR6AB0HyxnYh+HDuN+Ze1CGWz2DbzNRS
+         0HQrgHUUiFIlFFiE4GtVfu0ZHxUcJLtPAS7w7aR82gfE5/bPnIYpSwE7Ax7QyAYENPT5
+         gKL9tfmn4nj88Vcvq1994xsCFE1nsdBlSywfEsZ37HMuY/+n2I2TxRRVTYeEcBj1hrrO
+         S9JBuBtcCnEXrpka0atxRp2jDY3OIxS16W+dyOqLRBUsHF0fmnqEYDAlKfbGhjHuSOj6
+         N6Fj60nTOkAKr/PNZfgR7kIzM9uVwOD13Z4YtTpQxYuvXL1aBrlAojhsOh9wiyIA3dfF
+         Fafw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768609824; x=1769214624;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yp1sONmI1EVSxxcQrVc8RcvF+u7mjGF7KxmFk1Nh69s=;
+        b=KuhcYIWs5qO7UsL/oG9GIDtXLssKKpgXTolaf3ErqjSb2T6NvdHHVnfoTn378+Tcv1
+         tyIpceSbSAitnx3bJmJk+7/k8BjyFLbv4/FA6G+M1H774VcFWEQ904nzTpU0VpC/rRIa
+         stpkVfX+MoBMVbZlLWOEXHJTGlPf0JpVf7IwarwWhEslv7xUlzFS+7cp+ONDdW2zncgF
+         tVfJvyZHIiMib38EH2umIkcXzRn+Bupge1p/pbdguJTwFL1P2eaRWUgB6NC/CFFLb25U
+         kOr5pgwzGUJ6U/QtLGjsWUOmVhTQOcfRoVbcPC4MIVgu9K0lh9GMGOKf/6ld3dDs7Rk8
+         OvSw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8OAg381WnXO+4gHE2ntXLrin8U/3LPvReFScjnZgJmGRxSBaBQSsgxKxYFqpCYnU72BEf25k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgDYPc5gLba+Q4AXa4bsT/sZk1Jk86tsX9bQNhVHqQnsEw3fuR
+	KU3cDHwYk5ehbH0qSieO3hQZg7/7TrbZ3Y5niUoX8BUZ1TKduDqrzewg
+X-Gm-Gg: AY/fxX6ZFOTcHb8CXoO7hTH+OfQkZasOBcXuV3wRe6FzeVM5i3wGpZ0IoNzYk23FONV
+	ahrgb6gW2kT/baSDzv7WAbhymW08tleaFqfk8TeU+qzcPe8shU8mbZ50ZxIX/JBl7N0b497raGK
+	V60FVCBp5TFTz2LuEBgPL4BmEExfRDUKo06CV56i11NLLsQskenB95f0nc3A798PbWpxNYZpxTY
+	jF7b4rX2gQlPkRtAndi7lyX0mRs4vrCz/XWksG3DXHlX3HMZyCCZHoSnhOGnPSRUERcCsodCwon
+	9/kM1sSxur60aSJxjYnBcCIVY+8aqDLiWW43gaaZZxRVMbagSGKjVEEAGtS3rI1yZXOFfh4/IHZ
+	Q+Yhoajs16IOWUepHOcKGvWV/d0OKibOyyy4P/dvryZvjvaWJ8PnBkG8oIvloXe5b2dl+nA8FUp
+	Js/OR0166Zw+Zqf8cVQLtt
+X-Received: by 2002:a05:7022:4181:b0:11b:2138:4758 with SMTP id a92af1059eb24-1244a6f4633mr4977023c88.21.1768609824098;
+        Fri, 16 Jan 2026 16:30:24 -0800 (PST)
+Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244af10e21sm4814313c88.16.2026.01.16.16.30.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 16:30:23 -0800 (PST)
+Date: Sat, 17 Jan 2026 08:30:18 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Karol Gugala <kgugala@antmicro.com>, Mateusz Holenko <mholenko@antmicro.com>, 
+	Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next] net: ethernet: litex: use
+ devm_register_netdev() to register netdev
+Message-ID: <aWrX3KKsOke4Z-3c@inochi.infowork>
+References: <20260116003150.183070-1-inochiama@gmail.com>
+ <3e326797-b4c1-424f-8cf1-f0095e33e0bc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108182318.20935-1-ivecera@redhat.com> <20260108182318.20935-2-ivecera@redhat.com>
- <92bfc390-d706-4988-b98d-841a50f10834@redhat.com> <CAL_Jsq+m7-wop-AU-7R-=2JsUqb+2LsVTXCbZw==1XuAAQ4Tkg@mail.gmail.com>
- <a5dad0f9-001c-468f-99bc-e24c23bc9b36@redhat.com>
-In-Reply-To: <a5dad0f9-001c-468f-99bc-e24c23bc9b36@redhat.com>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 16 Jan 2026 17:39:35 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJhqp-cgj604eEgxD47gJci0d3CFYf1wC_t1c00OptTiQ@mail.gmail.com>
-X-Gm-Features: AZwV_Qgghn897CtG_q8P6welgr6_MD-NJlyOmC0cWTEkTMdvGwzWh8_gNK8Dfu8
-Message-ID: <CAL_JsqJhqp-cgj604eEgxD47gJci0d3CFYf1wC_t1c00OptTiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/12] dt-bindings: dpll: add common
- dpll-pin-consumer schema
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	linux-rdma@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
-	Petr Oros <poros@redhat.com>, Grzegorz Nitka <grzegorz.nitka@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e326797-b4c1-424f-8cf1-f0095e33e0bc@lunn.ch>
 
-On Fri, Jan 16, 2026 at 1:00=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
->
-> On 1/16/26 4:23 PM, Rob Herring wrote:
-> > On Thu, Jan 15, 2026 at 6:02=E2=80=AFAM Ivan Vecera <ivecera@redhat.com=
-> wrote:
-> >>
-> >> On 1/8/26 7:23 PM, Ivan Vecera wrote:
-> >>> Introduce a common schema for DPLL pin consumers. Devices such as Eth=
-ernet
-> >>> controllers and PHYs may require connections to DPLL pins for Synchro=
-nous
-> >>> Ethernet (SyncE) or other frequency synchronization tasks.
-> >>>
-> >>> Defining these properties in a shared schema ensures consistency acro=
-ss
-> >>> different device types that consume DPLL resources.
-> >>>
-> >>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> >>> ---
-> >>>    .../bindings/dpll/dpll-pin-consumer.yaml      | 30 +++++++++++++++=
-++++
-> >>>    MAINTAINERS                                   |  1 +
-> >>>    2 files changed, 31 insertions(+)
-> >>>    create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin=
--consumer.yaml
-> >>>
-> >>> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin-consumer=
-.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
-> >>> new file mode 100644
-> >>> index 0000000000000..60c184c18318a
-> >>> --- /dev/null
-> >>> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
-> >>> @@ -0,0 +1,30 @@
-> >>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> >>> +%YAML 1.2
-> >>> +---
-> >>> +$id: http://devicetree.org/schemas/dpll/dpll-pin-consumer.yaml#
-> >>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> >>> +
-> >>> +title: DPLL Pin Consumer
-> >>> +
-> >>> +maintainers:
-> >>> +  - Ivan Vecera <ivecera@redhat.com>
-> >>> +
-> >>> +description: |
-> >>> +  Common properties for devices that require connection to DPLL (Dig=
-ital Phase
-> >>> +  Locked Loop) pins for frequency synchronization (e.g. SyncE).
-> >>> +
-> >>> +properties:
-> >>> +  dpll-pins:
-> >>> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> >>> +    description:
-> >>> +      List of phandles to the DPLL pin nodes connected to this devic=
-e.
-> >>> +
-> >>> +  dpll-pin-names:
-> >>> +    $ref: /schemas/types.yaml#/definitions/string-array
-> >>> +    description:
-> >>> +      Names for the DPLL pins defined in 'dpll-pins', in the same or=
-der.
-> >>> +
-> >>> +dependencies:
-> >>> +  dpll-pin-names: [ dpll-pins ]
-> >>> +
-> >>> +additionalProperties: true
-> >>> diff --git a/MAINTAINERS b/MAINTAINERS
-> >>> index 765ad2daa2183..f6f58dfb20931 100644
-> >>> --- a/MAINTAINERS
-> >>> +++ b/MAINTAINERS
-> >>> @@ -7648,6 +7648,7 @@ M:      Jiri Pirko <jiri@resnulli.us>
-> >>>    L:  netdev@vger.kernel.org
-> >>>    S:  Supported
-> >>>    F:  Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> >>> +F:   Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
-> >>>    F:  Documentation/devicetree/bindings/dpll/dpll-pin.yaml
-> >>>    F:  Documentation/driver-api/dpll.rst
-> >>>    F:  drivers/dpll/
-> >>
-> >> Based on private discussion with Andrew Lunn (thanks a lot), this is
-> >> wrong approach. Referencing directly dpll-pin nodes and using their
-> >> phandles in consumers is at least unusual.
-> >>
-> >> The right approach should be referencing dpll-device and use cells
-> >> to specify the dpll pin that is used.
-> >
-> > You only need a cells property if you expect the number of cells to
-> > vary by provider.
-> >
-> > However, the DPLL device just appears to be a clock provider and
-> > consumer, so why not just use the clock binding here? Also, there is
-> > no rule that using foo binding means you have to use foo subsystem in
-> > the kernel.
->
-> Hmm, do you mean something like this example?
->
-> &dpll0 {
->      ...
->      #clock-cells =3D <2>; /* 1st pin index, 2nd pin type (input/output) =
-*/
->
->      input-pins {
->          pin@2 {
->              reg =3D <2>;
->              ...
->          };
->          pin@4 {
->              reg =3D <4>;
->              ...
->          };
->      };
->      output-pins {
->          pin@3 {
->              reg =3D <3>;
->          };
->      };
-> };
-> &phy0 {
->      ...
->      clock-names =3D "rclk0", "rclk1", "synce_ref";
->      clocks =3D <&dpll0 2 DPLL_INPUT>,
->               <&dpll0 4 DPLL_INPUT>,
->               <&dpll0 3 DPLL_OUTPUT>;
->      ...
-> };
+On Fri, Jan 16, 2026 at 06:20:05PM +0100, Andrew Lunn wrote:
+> On Fri, Jan 16, 2026 at 08:31:50AM +0800, Inochi Amaoto wrote:
+> > Use devm_register_netdev to avoid unnecessary remove() callback in
+> > platform_driver structure.
+> 
+> > -	netdev = devm_alloc_etherdev(&pdev->dev, sizeof(*priv));
+> > +	netdev = devm_alloc_etherdev(dev, sizeof(*priv));
+> >  	if (!netdev)
+> >  		return -ENOMEM;
+> 
+> The commit message does not fit the actual change.
+> 
+> You probably want to split this into multiple patches. Ideally you
+> want lots of small patches with good commit messages which are
+> obviously correct.
+> 
 
-No, clock providers are always the clock outputs, and clock consumers
-are the clock inputs. So something like this:
+In fact, I just change them by the way and it is not a obvious change,
+OK, I will split it and send a new version.
 
-&dpll0 {
-     ...
-     #clock-cells =3D <1>; /* 1st pin index */
-
-     // clocks index corresponds to input pins on dpll0 */
-     clocks =3D <&phy0 0>, <&phy0 1>, <&phy1 0>, <&phy1 1>
-};
-&phy0 {
-     ...
-     #clock-cells =3D <1>;
-     clocks =3D <&dpll0 3>;
-     ...
-};
-
-Rob
+Regards,
+Inochi
 
