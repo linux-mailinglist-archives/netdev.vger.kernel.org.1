@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-250720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06052D39003
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 18:15:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41653D39008
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 18:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0CB20301AE21
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 17:15:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9BA373019E09
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 17:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90B828504D;
-	Sat, 17 Jan 2026 17:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C197286D57;
+	Sat, 17 Jan 2026 17:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XpgrzVGB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekUoehTX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D89202997;
-	Sat, 17 Jan 2026 17:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3417D238D52;
+	Sat, 17 Jan 2026 17:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768670145; cv=none; b=OMouLzf5gXWer2BF8tT1W1X7YRjDkOmW3uB2vKAgh5YAZ+MfgLR+icymRK9VwmYp4alCfTqs3xXy7EoJG+Y3YYISuIssBdhz5gtburz6jKqt23x9odEWpjPNdY3zgHvo3YnFbDlG/XAS5cyEPtWRZwES32kYyJOq/XV0D5rGG3A=
+	t=1768670549; cv=none; b=ncl4+Qx7o5bT0qYX94+eiUbmInb6sxvbazdmPbXVRjpEPI/LBez5B9wOaPM12nA0BZn/Azq/aljgvRSfwdFN+5I2pwb7FI3C1n1tvsncOI9YdSKf/0iGqvooKoFJe+wQXKRBJyQV8xJUUozIYtzNhiDlb3sVNYf2DEVW+IJzRs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768670145; c=relaxed/simple;
-	bh=jGr49H7lELR3ftr7XRFa0Z5/p9+HvUSv+Xd//G6J90g=;
+	s=arc-20240116; t=1768670549; c=relaxed/simple;
+	bh=9ZeRVW8KCB8TM7Iuo/p0JiFXSnPhVwkmX25hYakKBYE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GInulXTDounV48/u3QbtKkbq0oPIumI3D0Q+eygpAIYALYjUtmpKnBnWGo4oe3esM43hmy5ZgtS/4Giy6kMzCBrmg82VlLluRJzXb5KhGVc4UUCKaWHFqT6MukNVIgE/eYt+jIYYHjKR7z++KErQehovpDBH2aHD8YCyWgZY+o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XpgrzVGB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E01C4CEF7;
-	Sat, 17 Jan 2026 17:15:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CRJyd7v9Bh8Rc4lPP11gBO0+3euENTwxcD0ISX8wU4+engoeqULbSLFF2MTIVWkCpel7QFg5GLG8hCWT+fUYhPNkwqgrbx5Dk4PRVW2gaX5djbPJWVani1J1YsX/H0+65HFeyU1N0Bb7PhVm7IhEYtPlTiLv8duwq4ZBmuNkRbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekUoehTX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2CCC4CEF7;
+	Sat, 17 Jan 2026 17:22:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768670145;
-	bh=jGr49H7lELR3ftr7XRFa0Z5/p9+HvUSv+Xd//G6J90g=;
+	s=k20201202; t=1768670548;
+	bh=9ZeRVW8KCB8TM7Iuo/p0JiFXSnPhVwkmX25hYakKBYE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XpgrzVGBnnizfBHo6er1szMgiQGOEY2Ws1cA5Qfl875qIUz7a/6RHGXXuXlC7ChtO
-	 l2QLfsN/7lwDEoRma+kg9TMDF61qzmvOmHnJMdT7AEtm5+EPpY+hn2N6TDq7Im+LVM
-	 lRDBnfWeZLkVqiEBqI1CTXkVJ/bjqAUIjeMNXP9u7YP5pNF0BjqsEfwcel1sBn6L/v
-	 FQNE8+CJ25/ygqxCOnX+UZWb3hxItRMkldGzoGxnh83XDt3KJOrg68CRdyH/0u1u4k
-	 elhTxv9D3Jt7uY9lrevhn7V7SY6V84GVYc/fb0uQ1FRNMS0DrElotqLReRt+U+6hT3
-	 e4/X9Nkqv/APA==
-Date: Sat, 17 Jan 2026 09:15:43 -0800
+	b=ekUoehTXqlaObA+qq5388GDt9GyOU0+SXm9/bVK9lHUUBpDr1sYpmBEohXclMyfxl
+	 Hz0F7+8lRi0O+DixktJcKgSe3yd4e7NvCwig0/t8F9tjg6AcUm38LhGcncTl21uwda
+	 07mL5yYjMwkd62Re4TGJlkxXu0NiRMGVCCcAHgy+HSMK7ADzumkxQGSHVtX7uVfR7u
+	 xvyutFHH49k8c2wGjg1OFS+N3WLgDc5OA/o5QzEhsff9d2YpIdteKruaALPuz7/IZt
+	 LcBMTXOknH0jFu8GRzxvnKPvor/fxoYhMsVsqX7VSc9r9s2J0Og6ZlcyAHTWxXIGFf
+	 cKYGyVqKxK6VA==
+Date: Sat, 17 Jan 2026 09:22:27 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, Marc
- Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol@kernel.org>,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman
- <horms@kernel.org>, davem@davemloft.net
-Subject: Re: [can-next 0/5] can: remove private skb headroom infrastructure
-Message-ID: <20260117091543.7881db1a@kernel.org>
-In-Reply-To: <f2d293c1-bc6a-4130-b544-2216ec0b0590@hartkopp.net>
-References: <20260112150908.5815-1-socketcan@hartkopp.net>
-	<a2b9fde3-6c50-4003-bc9b-0d6f359e7ac9@redhat.com>
-	<f2d293c1-bc6a-4130-b544-2216ec0b0590@hartkopp.net>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v10 7/7] selftests: netconsole: validate target
+ resume
+Message-ID: <20260117092227.741cba3b@kernel.org>
+In-Reply-To: <aWqkhT_-4UoNHX6F@archlinux>
+References: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
+	<20260112-netcons-retrigger-v10-7-d82ebfc2503e@gmail.com>
+	<20260112061642.7092437c@kernel.org>
+	<aWqkhT_-4UoNHX6F@archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,13 +65,92 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 16 Jan 2026 11:31:14 +0100 Oliver Hartkopp wrote:
-> Long story short: Using the common pattern to wrap a union around 
-> dual-usable skb space is the most efficient and least risky solution IMHO.
+On Fri, 16 Jan 2026 21:01:22 +0000 Andre Carvalho wrote:
+> On Mon, Jan 12, 2026 at 06:16:42AM -0800, Jakub Kicinski wrote:
+> > On Mon, 12 Jan 2026 09:40:58 +0000 Andre Carvalho wrote:  
+> > > Introduce a new netconsole selftest to validate that netconsole is able
+> > > to resume a deactivated target when the low level interface comes back.
+> > > 
+> > > The test setups the network using netdevsim, creates a netconsole target
+> > > and then remove/add netdevsim in order to bring the same interfaces
+> > > back. Afterwards, the test validates that the target works as expected.
+> > > 
+> > > Targets are created via cmdline parameters to the module to ensure that
+> > > we are able to resume targets that were bound by mac and interface name.  
+> > 
+> > The new test seems to be failing in netdev CI:
+> > 
+> > TAP version 13
+> > 1..1
+> > # timeout set to 180
+> > # selftests: drivers/net: netcons_resume.sh
+> > # Running with bind mode: ifname
+> > not ok 1 selftests: drivers/net: netcons_resume.sh # exit=1
+> > -- 
+> > pw-bot: cr  
+> 
+> I've finally been able to reproduce this locally. The issue is caused by the
+> fact that the test currently expects that mac addresses for netdevsim devices are
+> deterministic. This is the case on my setup as systemd enforces it (MACAddressPolicy=persistent).
 
-The concern is that we're making a precedent for, let's call it -
-not-routable-networking technology to redefine fields in skb that
-it doesn't need. From the maintainability perspective that's a big
-risk, IMHO. I fully acknowledge tho that using md dst will be a lot
-more work. Which makes this situation an unpleasant judgment call :(
+Argh, systemd strikes again :(
+
+> I was able to disable this behaviour by setting up /etc/systemd/network/50-netdevsim.link, with:
+> 
+> [Match]
+> Driver=netdevsim
+> 
+> [Link]
+> MACAddressPolicy=none
+> 
+> I'm assuming this is also the behaviour on CI hosts. 
+
+Yes, systemd changing the MAC address is racy - it does it too slowly
+and some tests start doing their thing, then systemd comes in and flips
+the address. So indeed:
+
+# cat /etc/systemd/network/99-default.link
+[Match]
+OriginalName=*
+
+[Link]
+NamePolicy=keep kernel database onboard slot path
+AlternativeNamesPolicy=database onboard slot path mac
+MACAddressPolicy=none
+
+> I have started working on a fix
+> for this test and will submit v11 once that is ready. The approach I'm taking is saving and
+> restoring the mac addresses once I reload netdevsim module. Example code below (needs more testing):
+> 
+> function deactivate() {
+> 	# Start by storing mac addresses so we can be restored in reactivate
+> 	SAVED_DSTMAC=$(ip netns exec "${NAMESPACE}" \
+> 		cat /sys/class/net/"$DSTIF"/address)
+> 	SAVED_SRCMAC=$(mac_get "${SRCIF}")
+> 	# Remove low level module
+> 	rmmod netdevsim
+> }
+> 
+> function reactivate() {
+> 	# Add back low level module
+> 	modprobe netdevsim
+> 	# Recreate namespace and two interfaces
+> 	set_network
+> 	# Restore MACs
+> 	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" \
+> 		address "${SAVED_DSTMAC}"
+> 	if [ "${BINDMODE}" == "mac" ]; then
+> 		ip link set dev "${SRCIF}" down
+> 		ip link set dev "${SRCIF}" address "${SAVED_SRCMAC}"
+> 		# Rename device in order to trigger target resume, as initial
+> 		# when device was recreated it didnt have correct mac address.
+> 		ip link set dev "${SRCIF}" name "${TARGET}"
+> 	fi
+> }
+> 
+> The main annoyance is that to test resuming when a device was bound by mac I actually need
+> to change the name of the device after restoring the mac address (since when the device 
+> is registered after deactivation the mac won't match).
+
+Workaround sounds reasonable, FWIW.
 
