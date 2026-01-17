@@ -1,158 +1,225 @@
-Return-Path: <netdev+bounces-250679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B48D38B56
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:47:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E2D38B5D
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 871633009233
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:47:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE20F302A448
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875C019E992;
-	Sat, 17 Jan 2026 01:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3520219E992;
+	Sat, 17 Jan 2026 01:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+Qu3r5Y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="esFjgEP0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C36119CD1D
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 01:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185D91ACEDF
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 01:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768614435; cv=none; b=bfDAijAv97+/BcC+GGuYyvP0wGs467ju/G1QF5fSBJH3Izpy6zCpbg5BEHYZtGmxX567edMojxt8AJpuURX1MpX3TSI3mH5FnOZlYHVWW8KstvmNPFA+RY0QCB2zbg2RU5tBI+KUfSFgnyuMACMDhaF2rnYld+baxNPv+OhvTBI=
+	t=1768614818; cv=none; b=ZbDOQv+KGhNKGGWFZwIbk7AHkcvAenIJJtYrzsOpG32D4hoAboVE3uk5tYATyLdtrwIgmAE1sljC4jgS6BWT70ktViqoDVd7M80wzjiL441D/U0RVzeVHOtxxneoMY/obz+T4dmRYlzTRxhnP+XFWuifBR3fBMDazF6eVDKBpCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768614435; c=relaxed/simple;
-	bh=BvuU6hrE1kad6S3+bK5hW2J5kpLldKHiQJhKeE9NW9s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ucz+QbLw5kXwAOjJnYOFVy53dvAzP6jKPU83akj0cAizNAtUl7pAUYeBp1GSfEDQB/FWbp5SASa4CbcOwbDEDo+uUSzUkifQLG26xHuFohg8fCXKhIJwqRGqcAoC6uHa4xgwLsmMz+7ZA25KTvBX4kJw4RYD3b4PXDsJnGjHcQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+Qu3r5Y; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-501469b598fso18737211cf.3
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 17:47:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768614433; x=1769219233; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DQx60645GAGQ1r8004YFDj1uRm95KZRpsaEBWEqJO9k=;
-        b=Z+Qu3r5YivQN3CuNBudcj7MvJTatWJaeTGnG6wXbihq3clIaj1iFWtaGJ5qKxlU/qR
-         m8sgB/q0Sq8+U4cYtJ7cCgs/yE3nK3zzDSIeS7URug7tNbQyhVoZtZvVp8DaLefW8WAg
-         uXm3e5k124JPJV3DpK4aEQRl2UJnGx9DVaZlK/ahRN3de6w8ZSZuEXSPx/LJpmjwzxdy
-         /o8jVR/MOacSQyGEqC4OnQvdik1gL/i7N88Tqt6m1ixFYT9T+0iJBi1Zq/Fn5tmiDc1E
-         m2pt3EKybexTRTicpvmUlk3A+HCEW0I9O3c8WNQ3bCDk5vwIAQODzoi1zy3I6rkcPuzc
-         oyzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768614433; x=1769219233;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DQx60645GAGQ1r8004YFDj1uRm95KZRpsaEBWEqJO9k=;
-        b=VEBfCZ984Ji5NPjbxT4zfcx7AtAnE9GgwJN8CZdXzOjRiN6T2wwyjyROurWzljL3Ub
-         qH9XwoRoOKV7MY4MdYjU7nZN2pzl+Q3RJillyfRjIiqUdd3Pd+M/n06JGQW9jujuuNiE
-         cypGp80NMleZmVAlqXBtro3nZQKoK0S+6nHZ740cgbM228JN0Z+cRuxTr6mS8LGw0cEL
-         m5/p1EI22VwXnQcBxA+0CaAGCU+Vo5rCAKvADUWm1QL2ZL2quo7OBGR/eT+nTw0U7OQW
-         eptMiA0ows5GHBbxeUJfZVp/qCiVPLofkBbUQCHtdy+W1xDZlDtFH1lFGv50Ia9BDTLH
-         0UGA==
-X-Gm-Message-State: AOJu0YwJ45ortRzIda7s8x5Zdm9VEBLAyBb9JpgCI+oXX19n32XYXg3L
-	PZB1QlLR8nFmgAFmyB2nEW2pNpdMDvXIPrB8rPCBZCjNhBDhG3a1X0hZHh3EelDUVfk=
-X-Gm-Gg: AY/fxX4UGVmKymy5MJoFWaKlVuPnq44Qj7DoPeqSsbNmVqzhhOIuySIt+04nNFg/rAu
-	ldnNw/WkzJbN9dtUHvMpF80HU6t+kTy2Xg0+7tfZq0LbCrSS3nHf+Y3lgRYwckb88r3pB/088xK
-	AnPio2vDMv4eLF3MGVe7vLMs0XxkT5GgHWde0X8vEtkTU5qOZP4IMfo9WpKDrjb31ECRwb3eG9E
-	hLyIu329ztyfa8iPAX7gGHOIk6ro2om87ecrOrs+GdE9fvHHOMIrjri1LrA2eiUF9qPmdvizETx
-	u7ZrCAXKOMcIpHudv5A2MHcLwylGFY4BXnKU59FxYAAbAuo1uLkJ0NnXl1glqCwRX7TATfPGCrA
-	3BKGtDsB2ZGVZbW/bJOrPi3baFbGyeUjD7za7+DcxSqjDawF2CT4X06mXIjJNutxsFYpbDeaJU5
-	8SmmmtQ/UtsVSgO+W1txJJ
-X-Received: by 2002:a05:622a:58e:b0:4ee:43b0:b053 with SMTP id d75a77b69052e-502a1ddba73mr57064661cf.9.1768614432848;
-        Fri, 16 Jan 2026 17:47:12 -0800 (PST)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e5e49b4sm36481806d6.8.2026.01.16.17.47.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 17:47:12 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Sat, 17 Jan 2026 09:46:18 +0800
-Subject: [PATCH net-next] net: macb: Replace open-coded device config
- retrieval with of_device_get_match_data()
+	s=arc-20240116; t=1768614818; c=relaxed/simple;
+	bh=qXgdN23yNMQAaURttp868hNhHD5PD0Z52ZxrJ3+EJsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0E4ftBkGoZpPUHn2BNsF0JRtMzOUbPeeU8DvoRjZeUfGA8qq0Wb90LS1U1dZAWjDUPh2EI7zvTDCkn0y48xRWBUKQQaRTbUux9d2dyTKBsi5NjkJ4JUKYCTaUWwNS00KnMM+HRaOQsBxhEUztwDiKi94Z21NU438DnAq3kZMj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=esFjgEP0; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768614816; x=1800150816;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qXgdN23yNMQAaURttp868hNhHD5PD0Z52ZxrJ3+EJsc=;
+  b=esFjgEP0gqZLdzMQ/9ETEp9dyxp2FeUjHvDIy1f5vDq96XcvvBtAq/Bd
+   hBX8JbmKT0CEB+SMM4JJg6A90J0xxZ/sSASMygjjSA9VAuPqhvOOms0YU
+   jHclDtaXJDwlXwvc/0pB9lGwgWvf6jf9qhkcV3lKHvM3JN7hQ5XtxyY61
+   nSHe0JFoNMMUvUHvC2EmVWkeXqyslnziltcsWlpEuqxQEa7CqsiGd2yQD
+   S3WdrSdRz8E+Hun1bcLCaFVrL8u+b5v8ocPqMtPQT1J+Lth/cLskjxsYo
+   nM0m6xGpOKmEsaz2LJ880VeXUyWNITyDZFeKdSh6fG1SL1yhYMMoVSjAo
+   w==;
+X-CSE-ConnectionGUID: bjmEhsZATWycafg5PUWM8A==
+X-CSE-MsgGUID: fIKG9nZgTvuhith60X6ncQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="73560109"
+X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
+   d="scan'208";a="73560109"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:53:36 -0800
+X-CSE-ConnectionGUID: TnTgWTMXSwiZMbMHD75aOg==
+X-CSE-MsgGUID: oKzd/2pDQUWhBTL5uX+IJA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
+   d="scan'208";a="205186320"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 16 Jan 2026 17:53:33 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vgvVK-00000000LRI-0wBq;
+	Sat, 17 Jan 2026 01:53:30 +0000
+Date: Sat, 17 Jan 2026 09:52:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>, eric.dumazet@gmail.com,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 2/3] gro: inline tcp6_gro_receive()
+Message-ID: <202601170955.0wVpALLC-lkp@intel.com>
+References: <20260116152957.1825626-3-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260117-macb-v1-1-f092092d8c91@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAOnpamkC/x3MSwqAIBRG4a3IHSdkA4W2Eg18/NYdZKERgrT3p
- OEHh9OoIDMKzaJRxsOFz9ShBkF+t2mD5NBN0zjpUSkjD+udhEEM2hvtgqWeXhmR679ZKOGWCfW
- m9X0/owMPu2AAAAA=
-X-Change-ID: 20260117-macb-e7efd6c76bda
-To: netdev@vger.kernel.org
-Cc: Kevin Hao <haokexin@gmail.com>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260116152957.1825626-3-edumazet@google.com>
 
-Use of_device_get_match_data() to replace the open-coded method for
-obtaining the device config.
+Hi Eric,
 
-Additionally, adjust the ordering of local variables to ensure
-compatibility with RCS.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
----
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 2d5f3eb0953038dfcbb28db591227cbe5f6e80f0..5cfd859f3b293de3abfb827fcdfb2198f6304ae2 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5433,9 +5433,9 @@ static const struct macb_config default_gem_config = {
- 
- static int macb_probe(struct platform_device *pdev)
- {
--	const struct macb_config *macb_config = &default_gem_config;
--	struct device_node *np = pdev->dev.of_node;
- 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
-+	struct device_node *np = pdev->dev.of_node;
-+	const struct macb_config *macb_config;
- 	struct clk *tsu_clk = NULL;
- 	phy_interface_t interface;
- 	struct net_device *dev;
-@@ -5451,13 +5451,9 @@ static int macb_probe(struct platform_device *pdev)
- 	if (IS_ERR(mem))
- 		return PTR_ERR(mem);
- 
--	if (np) {
--		const struct of_device_id *match;
--
--		match = of_match_node(macb_dt_ids, np);
--		if (match && match->data)
--			macb_config = match->data;
--	}
-+	macb_config = of_device_get_match_data(&pdev->dev);
-+	if (!macb_config)
-+		macb_config = &default_gem_config;
- 
- 	err = macb_config->clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
- 	if (err)
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-always-inline-__skb_incr_checksum_unnecessary/20260116-233745
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260116152957.1825626-3-edumazet%40google.com
+patch subject: [PATCH net-next 2/3] gro: inline tcp6_gro_receive()
+config: i386-randconfig-011-20260117 (https://download.01.org/0day-ci/archive/20260117/202601170955.0wVpALLC-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260117/202601170955.0wVpALLC-lkp@intel.com/reproduce)
 
----
-base-commit: 46fe65a2c28ecf5df1a7475aba1f08ccf4c0ac1b
-change-id: 20260117-macb-e7efd6c76bda
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601170955.0wVpALLC-lkp@intel.com/
 
-Best regards,
+All errors (new ones prefixed by >>):
+
+>> net/ipv6/ip6_offload.c:304:8: error: call to undeclared function 'udp6_gro_receive'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     304 |                 pp = udp6_gro_receive(head, skb);
+         |                      ^
+   net/ipv6/ip6_offload.c:304:8: note: did you mean 'udp_gro_receive'?
+   include/net/gro.h:419:17: note: 'udp_gro_receive' declared here
+     419 | struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+         |                 ^
+>> net/ipv6/ip6_offload.c:304:6: error: incompatible integer to pointer conversion assigning to 'struct sk_buff *' from 'int' [-Wint-conversion]
+     304 |                 pp = udp6_gro_receive(head, skb);
+         |                    ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   2 errors generated.
+
+
+vim +/udp6_gro_receive +304 net/ipv6/ip6_offload.c
+
+   215	
+   216	INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+   217								 struct sk_buff *skb)
+   218	{
+   219		const struct net_offload *ops;
+   220		struct sk_buff *pp = NULL;
+   221		struct sk_buff *p;
+   222		struct ipv6hdr *iph;
+   223		unsigned int nlen;
+   224		unsigned int hlen;
+   225		unsigned int off;
+   226		u16 flush = 1;
+   227		int proto;
+   228	
+   229		off = skb_gro_offset(skb);
+   230		hlen = off + sizeof(*iph);
+   231		iph = skb_gro_header(skb, hlen, off);
+   232		if (unlikely(!iph))
+   233			goto out;
+   234	
+   235		NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
+   236	
+   237		flush += ntohs(iph->payload_len) != skb->len - hlen;
+   238	
+   239		proto = iph->nexthdr;
+   240		ops = rcu_dereference(inet6_offloads[proto]);
+   241		if (!ops || !ops->callbacks.gro_receive) {
+   242			proto = ipv6_gro_pull_exthdrs(skb, hlen, proto);
+   243	
+   244			ops = rcu_dereference(inet6_offloads[proto]);
+   245			if (!ops || !ops->callbacks.gro_receive)
+   246				goto out;
+   247	
+   248			iph = skb_gro_network_header(skb);
+   249		} else {
+   250			skb_gro_pull(skb, sizeof(*iph));
+   251		}
+   252	
+   253		skb_set_transport_header(skb, skb_gro_offset(skb));
+   254	
+   255		NAPI_GRO_CB(skb)->proto = proto;
+   256	
+   257		flush--;
+   258		nlen = skb_gro_offset(skb) - off;
+   259	
+   260		list_for_each_entry(p, head, list) {
+   261			const struct ipv6hdr *iph2;
+   262			__be32 first_word; /* <Version:4><Traffic_Class:8><Flow_Label:20> */
+   263	
+   264			if (!NAPI_GRO_CB(p)->same_flow)
+   265				continue;
+   266	
+   267			iph2 = (struct ipv6hdr *)(p->data + off);
+   268			first_word = *(__be32 *)iph ^ *(__be32 *)iph2;
+   269	
+   270			/* All fields must match except length and Traffic Class.
+   271			 * XXX skbs on the gro_list have all been parsed and pulled
+   272			 * already so we don't need to compare nlen
+   273			 * (nlen != (sizeof(*iph2) + ipv6_exthdrs_len(iph2, &ops)))
+   274			 * memcmp() alone below is sufficient, right?
+   275			 */
+   276			 if ((first_word & htonl(0xF00FFFFF)) ||
+   277			     !ipv6_addr_equal(&iph->saddr, &iph2->saddr) ||
+   278			     !ipv6_addr_equal(&iph->daddr, &iph2->daddr) ||
+   279			     iph->nexthdr != iph2->nexthdr) {
+   280	not_same_flow:
+   281				NAPI_GRO_CB(p)->same_flow = 0;
+   282				continue;
+   283			}
+   284			if (unlikely(nlen > sizeof(struct ipv6hdr))) {
+   285				if (memcmp(iph + 1, iph2 + 1,
+   286					   nlen - sizeof(struct ipv6hdr)))
+   287					goto not_same_flow;
+   288			}
+   289		}
+   290	
+   291		NAPI_GRO_CB(skb)->flush |= flush;
+   292	
+   293		skb_gro_postpull_rcsum(skb, iph, nlen);
+   294	
+   295		if (unlikely(gro_recursion_inc_test(skb))) {
+   296			flush = 1;
+   297			goto out;
+   298		}
+   299	
+   300		if (likely(proto == IPPROTO_TCP))
+   301			pp = tcp6_gro_receive(head, skb);
+   302	#if IS_BUILTIN(CONFIG_IPV6)
+   303		else if (likely(proto == IPPROTO_UDP))
+ > 304			pp = udp6_gro_receive(head, skb);
+   305	#endif
+   306		else
+   307			pp = ops->callbacks.gro_receive(head, skb);
+   308	out:
+   309		skb_gro_flush_final(skb, pp, flush);
+   310	
+   311		return pp;
+   312	}
+   313	
+
 -- 
-Kevin Hao <haokexin@gmail.com>
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
