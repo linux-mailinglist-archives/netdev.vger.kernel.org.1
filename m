@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-250674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 521EBD38B12
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:16:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3736CD38B2D
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 02:20:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2DB63301BDF2
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:16:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C268E300ED9F
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 01:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1AB21255A;
-	Sat, 17 Jan 2026 01:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E636123D7FF;
+	Sat, 17 Jan 2026 01:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAFB6D1A7;
-	Sat, 17 Jan 2026 01:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972BD2367D3;
+	Sat, 17 Jan 2026 01:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768612593; cv=none; b=k9FHv4HT07lBZSrW+L00QaDE5xzEQmQMIdfYKcOxwKy7yKju2MQq9CB9ria8IITRJCYSjDiZ/qvPoF/yclGD6epPFE6JMf2H0zMT0lB9wFPsYtk+qXjWOsOApn4Jn4XWr4dXlOPGhn5H8e3Vd9p1TBeUPArcpTUXL31jLwCzxDs=
+	t=1768612798; cv=none; b=F6jDzbEoR0e2W37vW4cYSbJ75iJqWzA+xbA5qnRza1oTKcu0aKZ8fMk62ruVOJNUQg0GXHbX+fZZ5ERIXbw1bxoLMYTYQF4y4PPt6avPxo98IkZhA2uLE9qkB9oXXphc05fF/aekjlaZABb8OXBOEBMQW7rEyzoOYjzJeozPGVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768612593; c=relaxed/simple;
-	bh=wdvMPhLbBJdf14EkNC1FlfGLOgO10z0kw3JcBQibg2g=;
+	s=arc-20240116; t=1768612798; c=relaxed/simple;
+	bh=YYt63DbhnkiQH9fzy9pFRoBWPEcRDclX9DqGYVq+C9I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CHQ/oVmRsM0oohOSFzpJ7OJ35YOPuwGM9n4zVOFNv9ifs3ce3fdSH3Fip388uM37+FKJUOP7F0941QQNSzs6X+Na6R1rO+tJpQQeg/JdNC1+afK3jPsNYl2YB0AWdt2RAP71APzKWY6QQrR5QNV+qWDc6hivOgFfJKcspY0B16E=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vu0o3F2dydy61sgKHlMDv0bHs3GAehhX3zUhHJsKW0htqybpD8OZ9CkGqvxsNmv4jwNZmUuAJppuGba4KqqOtp19Ot/6++7jd//sdn3d0zX5Wvcr5kDSwFuN2sxqQBCjynmKaiuPtu6bWOmCn0eOA4Cw4nb2xY0oNNJi5nFniSk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vguvU-000000005FE-0rl8;
-	Sat, 17 Jan 2026 01:16:28 +0000
-Date: Sat, 17 Jan 2026 01:16:25 +0000
+	id 1vguyh-000000005GM-2fLJ;
+	Sat, 17 Jan 2026 01:19:47 +0000
+Date: Sat, 17 Jan 2026 01:19:44 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -46,9 +46,9 @@ To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
-Subject: [PATCH net-next v4 2/6] dt-bindings: net: dsa: lantiq,gswip: add
- Intel GSW150
-Message-ID: <ca8ca2c4a05185a933069917397c8d82a56af7a5.1768612113.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 3/6] net: dsa: lantiq: allow arbitrary MII
+ registers
+Message-ID: <d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel@makrotopia.org>
 References: <cover.1768612113.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,33 +60,234 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1768612113.git.daniel@makrotopia.org>
 
-Add compatible strings for the Intel GSW150 which is apparently
-identical or at least compatible with the Lantiq PEB7084 Ethernet
-switch IC.
+The Lantiq GSWIP and MaxLinear GSW1xx drivers are currently relying on a
+hard-coded mapping of MII ports to their respective MII_CFG and MII_PCDU
+registers and only allow applying an offset to the port index.
+
+While this is sufficient for the currently supported hardware, the very
+similar Intel GSW150 (aka. Lantiq PEB7084) cannot be described using
+this arrangement.
+
+Introduce two arrays to specify the MII_CFG and MII_PCDU registers for
+each port, replacing the current bitmap used to safeguard MII ports as
+well as the port index offset.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 ---
-v4: no changes
-v3: no changes
-v2: no changes
+v4: spell out mii_cfg and mii_pcdu values in struct gswip_hw_info instead
+    of using default initializer which requires diag exception
 
- Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+v3: enclose the gswip_hw_info initializers in compiler diag exception
+    to prevent triggering -Woverride-init
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-index 9c0de536bae97..97842523772f4 100644
---- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-@@ -19,6 +19,8 @@ maintainers:
- properties:
-   compatible:
-     enum:
-+      - intel,gsw150
-+      - lantiq,peb7084
-       - lantiq,xrx200-gswip
-       - lantiq,xrx300-gswip
-       - lantiq,xrx330-gswip
+v2: introduce GSWIP_MAX_PORTS macro
+
+ drivers/net/dsa/lantiq/lantiq_gswip.c        | 35 ++++++++++++++----
+ drivers/net/dsa/lantiq/lantiq_gswip.h        |  6 ++--
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c | 27 +++-----------
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 37 ++++++++++++++++----
+ 4 files changed, 68 insertions(+), 37 deletions(-)
+
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
+index b094001a7c805..0377fc0079b54 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.c
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
+@@ -463,10 +463,22 @@ static void gswip_shutdown(struct platform_device *pdev)
+ }
+ 
+ static const struct gswip_hw_info gswip_xrx200 = {
+-	.max_ports = 7,
++	.max_ports = GSWIP_MAX_PORTS,
+ 	.allowed_cpu_ports = BIT(6),
+-	.mii_ports = BIT(0) | BIT(1) | BIT(5),
+-	.mii_port_reg_offset = 0,
++	.mii_cfg = {
++		[0] = GSWIP_MII_CFGp(0),
++		[1] = GSWIP_MII_CFGp(1),
++		[2 ... 4] = -1,
++		[5] = GSWIP_MII_CFGp(5),
++		[6] = -1,
++	},
++	.mii_pcdu = {
++		[0] = GSWIP_MII_PCDU0,
++		[1] = GSWIP_MII_PCDU1,
++		[2 ... 4] = -1,
++		[5] = GSWIP_MII_PCDU5,
++		[6] = -1,
++	},
+ 	.phylink_get_caps = gswip_xrx200_phylink_get_caps,
+ 	.pce_microcode = &gswip_pce_microcode,
+ 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
+@@ -474,10 +486,20 @@ static const struct gswip_hw_info gswip_xrx200 = {
+ };
+ 
+ static const struct gswip_hw_info gswip_xrx300 = {
+-	.max_ports = 7,
++	.max_ports = GSWIP_MAX_PORTS,
+ 	.allowed_cpu_ports = BIT(6),
+-	.mii_ports = BIT(0) | BIT(5),
+-	.mii_port_reg_offset = 0,
++	.mii_cfg = {
++		[0] = GSWIP_MII_CFGp(0),
++		[1 ... 4] = -1,
++		[5] = GSWIP_MII_CFGp(5),
++		[6] = -1,
++	},
++	.mii_pcdu = {
++		[0] = GSWIP_MII_PCDU0,
++		[1 ... 4] = -1,
++		[5] = GSWIP_MII_PCDU5,
++		[6] = -1,
++	},
+ 	.phylink_get_caps = gswip_xrx300_phylink_get_caps,
+ 	.pce_microcode = &gswip_pce_microcode,
+ 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 2e0f2afbadbbc..524289db7c213 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -243,6 +243,8 @@
+ 
+ #define GSWIP_VLAN_UNAWARE_PVID	0
+ 
++#define GSWIP_MAX_PORTS		7
++
+ struct gswip_pce_microcode {
+ 	u16 val_3;
+ 	u16 val_2;
+@@ -253,8 +255,8 @@ struct gswip_pce_microcode {
+ struct gswip_hw_info {
+ 	int max_ports;
+ 	unsigned int allowed_cpu_ports;
+-	unsigned int mii_ports;
+-	int mii_port_reg_offset;
++	s16 mii_cfg[GSWIP_MAX_PORTS];
++	s16 mii_pcdu[GSWIP_MAX_PORTS];
+ 	bool supports_2500m;
+ 	const struct gswip_pce_microcode (*pce_microcode)[];
+ 	size_t pce_microcode_size;
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
+index e790f2ef75884..05b28b540661a 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
++++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
+@@ -118,15 +118,11 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
+ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 mask, u32 set,
+ 			       int port)
+ {
+-	int reg_port;
+-
+ 	/* MII_CFG register only exists for MII ports */
+-	if (!(priv->hw_info->mii_ports & BIT(port)))
++	if (priv->hw_info->mii_cfg[port] == -1)
+ 		return;
+ 
+-	reg_port = port + priv->hw_info->mii_port_reg_offset;
+-
+-	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), mask,
++	regmap_write_bits(priv->mii, priv->hw_info->mii_cfg[port], mask,
+ 			  set);
+ }
+ 
+@@ -604,28 +600,13 @@ static void gswip_mii_delay_setup(struct gswip_priv *priv, struct dsa_port *dp,
+ 	u32 tx_delay = GSWIP_MII_PCDU_TXDLY_DEFAULT;
+ 	u32 rx_delay = GSWIP_MII_PCDU_RXDLY_DEFAULT;
+ 	struct device_node *port_dn = dp->dn;
+-	u16 mii_pcdu_reg;
+ 
+ 	/* As MII_PCDU registers only exist for MII ports, silently return
+ 	 * unless the port is an MII port
+ 	 */
+-	if (!(priv->hw_info->mii_ports & BIT(dp->index)))
++	if (priv->hw_info->mii_pcdu[dp->index] == -1)
+ 		return;
+ 
+-	switch (dp->index + priv->hw_info->mii_port_reg_offset) {
+-	case 0:
+-		mii_pcdu_reg = GSWIP_MII_PCDU0;
+-		break;
+-	case 1:
+-		mii_pcdu_reg = GSWIP_MII_PCDU1;
+-		break;
+-	case 5:
+-		mii_pcdu_reg = GSWIP_MII_PCDU5;
+-		break;
+-	default:
+-		return;
+-	}
+-
+ 	/* legacy code to set default delays according to the interface mode */
+ 	switch (interface) {
+ 	case PHY_INTERFACE_MODE_RGMII_ID:
+@@ -646,7 +627,7 @@ static void gswip_mii_delay_setup(struct gswip_priv *priv, struct dsa_port *dp,
+ 	of_property_read_u32(port_dn, "rx-internal-delay-ps", &rx_delay);
+ 	of_property_read_u32(port_dn, "tx-internal-delay-ps", &tx_delay);
+ 
+-	regmap_write_bits(priv->mii, mii_pcdu_reg,
++	regmap_write_bits(priv->mii, priv->hw_info->mii_pcdu[dp->index],
+ 			  GSWIP_MII_PCDU_TXDLY_MASK |
+ 			  GSWIP_MII_PCDU_RXDLY_MASK,
+ 			  GSWIP_MII_PCDU_TXDLY(tx_delay) |
+diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
+index f8ff8a604bf53..aad1d9b80834f 100644
+--- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
++++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
+@@ -702,8 +702,16 @@ static void gsw1xx_shutdown(struct mdio_device *mdiodev)
+ static const struct gswip_hw_info gsw12x_data = {
+ 	.max_ports		= GSW1XX_PORTS,
+ 	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
+-	.mii_ports		= BIT(GSW1XX_MII_PORT),
+-	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.mii_cfg = {
++		[0 ... GSW1XX_MII_PORT - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
++	},
++	.mii_pcdu = {
++		[0 ... GSW1XX_MII_PORT - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
++	},
+ 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
+ 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
+ 	.supports_2500m		= true,
+@@ -715,8 +723,16 @@ static const struct gswip_hw_info gsw12x_data = {
+ static const struct gswip_hw_info gsw140_data = {
+ 	.max_ports		= GSW1XX_PORTS,
+ 	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
+-	.mii_ports		= BIT(GSW1XX_MII_PORT),
+-	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.mii_cfg = {
++		[0 ... GSW1XX_MII_PORT - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
++	},
++	.mii_pcdu = {
++		[0 ... GSW1XX_MII_PORT - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
++	},
+ 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
+ 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
+ 	.supports_2500m		= true,
+@@ -728,8 +744,16 @@ static const struct gswip_hw_info gsw140_data = {
+ static const struct gswip_hw_info gsw141_data = {
+ 	.max_ports		= GSW1XX_PORTS,
+ 	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
+-	.mii_ports		= BIT(GSW1XX_MII_PORT),
+-	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.mii_cfg = {
++		[0 ... GSWIP_MAX_PORTS - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
++	},
++	.mii_pcdu = {
++		[0 ... GSWIP_MAX_PORTS - 1] = -1,
++		[GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
++		[GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
++	},
+ 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
+ 	.phylink_get_caps	= gsw1xx_phylink_get_caps,
+ 	.pce_microcode		= &gsw1xx_pce_microcode,
 -- 
 2.52.0
 
