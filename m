@@ -1,144 +1,186 @@
-Return-Path: <netdev+bounces-250735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08622D390B9
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 21:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 738AED390BA
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 21:06:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8646F3011404
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 20:05:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35DD53011415
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 20:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD04C28C5AA;
-	Sat, 17 Jan 2026 20:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640052DB7B4;
+	Sat, 17 Jan 2026 20:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="k2AgYhTA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z6zYN1gd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66902C0285
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 20:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEB92C3260;
+	Sat, 17 Jan 2026 20:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768680317; cv=none; b=W51xEbI4XPR19q1S1ktGUEFWTxGcZNirloiPV8T6hnDVNa4nRjILQ84j47tdleu7rgpHYB6E1S6TxvS10Ic5kR1+Y4XDJhorYlkYvVKtPB+bM5f5fro0FsyAKydaUYWVPfviPI40bQdiUA+56pCklwXliyFiI97fkyG6Ld/SABs=
+	t=1768680382; cv=none; b=nHfiifkLgp0UpebYfNIHPzT4YVCEyaRIG1myoY20fEkE8RioQVJa1xdn3W+WdL39H9iUMlyCsRHwXEKQctTMgvV92/nD6sWIs9dxvl8YvdS0dHPqEbofZKn27xjbMcUwfzAOpOBElFQVl6MX/dXkIiWoQpl1bxPRC0UYqmUOImo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768680317; c=relaxed/simple;
-	bh=n2LVIKE8ZiR9aYmjZerRzi9yBOiJUQKGPSysXwqGtJA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u9O3I2bX4PckWzGW+j0D/G6Yk7VMvZ6NetWK3M4JMcdMmW9D9fA34JCuVfFnCmglMZfcQTnz9U77is6oRlNGU6ynJIvj5zl90EnvNqLS9qJtq1I8UgXbTMYcgOY3aF0Nw6p4lLUWONyDWZf5DmycEFDSwM+JxDPF9wd47l2Rb+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=k2AgYhTA; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 0B1BC207BB;
-	Sat, 17 Jan 2026 21:05:14 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J4AvGca9VE5W; Sat, 17 Jan 2026 21:05:13 +0100 (CET)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 6BE9F20799;
-	Sat, 17 Jan 2026 21:05:13 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 6BE9F20799
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1768680313;
-	bh=r3hAE2A+zDdOJDJFW4KMv77chLumUwpJhoZC9biMaO0=;
-	h=From:To:CC:Subject:Date:From;
-	b=k2AgYhTASuzGiCQRf5eGAoNQcg3SOo0gbdOkYWe+TMRC7KT8SKrDYJ5TTNbun9ub2
-	 JV2+x7dyINbNQFv29HoB3myIA/7LxSD9al+dxajrf9dJMrsDe92TZn6AkCk1a8ezJv
-	 Flx/9+Qts2RTNB/gFyfXavYwJKKYlg9LfoFZ8jMo+Pgp98FWn0DM5QmNhzXsXcnqwX
-	 m/tQ+T3NIbdO7SVhdah/xd2BWMdeTIZl3JW117ifi7AGZ6F7AmeIrgECPN4CxlxQFK
-	 jtf71G0YInEDP07lZtj3Zb0gznYb84zSkdzlK97DXUFUhvBKIZ7/ZSzahmhcBPU5XH
-	 B6TSjNIs9GTYg==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sat, 17 Jan
- 2026 21:05:12 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	<netdev@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Chiachang Wang <chiachangwang@google.com>, Yan Yan
-	<evitayan@google.com>, <devel@linux-ipsec.org>
-Subject: [PATCH ipsec-next v2 0/4] xfrm: XFRM_MSG_MIGRATE_STATE new netlink message
-Date: Sat, 17 Jan 2026 21:04:56 +0100
-Message-ID: <cover.1768679141.git.antony.antony@secunet.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1768680382; c=relaxed/simple;
+	bh=fOZgjOuBCw0no2cxvS4r+Bsj585gNaEZ6J0UTuO8GbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDVsOnZCZoH7aEaknvQICXjS8iw54Z+zkcJbD6fldD9q3V9VHuh+1ETLT4TK9FOUQeh9zkErk8VFLg8ylnI6I4rOXdYgXYd9JFmiSNREn5CUR0mY9iao1TAB5Mgpla6NlRb5ahk+4fM3/fr7lj/66q+2fa26Iai0/+b5MiuqdWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z6zYN1gd; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768680380; x=1800216380;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fOZgjOuBCw0no2cxvS4r+Bsj585gNaEZ6J0UTuO8GbQ=;
+  b=Z6zYN1gdj8CbI8pzFVF5SvwKM/X5f5SrohvtfkUyeNV7k2tHS12th3zk
+   HREHN7soXDgf9md/NtkDSe6Gh69l1CauXS2NOXlHVFJp4lOD2+EZOviZm
+   gFP+Qd2RbpY44UasjRIxPIgAfvcXKKFaNGdnVUDvl2NXnUgTgRXKWwiPB
+   RxSvKDKoEJ4lpmeVxPa5nK96nmIoPEo/S9H9ehnwUlJYq8o4V4syR2fc7
+   H0rHXvsaJZdcldd0rKp6xKoK3XvKjZGb7LVh60i7uoAUD3N8ZRkrmDRf3
+   U8HzJEOMxibXhRCII/YNOIbie3jLmyw+R+cW1Ub2i3X2KFXlpImxOFLZO
+   Q==;
+X-CSE-ConnectionGUID: DmVNPGidQAWb/crLnDsr9g==
+X-CSE-MsgGUID: X6wW0q61Tt62zHO77+lBIQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11674"; a="69689556"
+X-IronPort-AV: E=Sophos;i="6.21,234,1763452800"; 
+   d="scan'208";a="69689556"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2026 12:06:20 -0800
+X-CSE-ConnectionGUID: m8AkgbwuR1er30YtN7ckWQ==
+X-CSE-MsgGUID: x/W48Gm5SCiclzdEc3q1JA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,234,1763452800"; 
+   d="scan'208";a="236793823"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 17 Jan 2026 12:06:15 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vhCYm-00000000MBc-3ZoO;
+	Sat, 17 Jan 2026 20:06:12 +0000
+Date: Sun, 18 Jan 2026 04:05:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Chen Minqiang <ptpt52@gmail.com>,
+	Xinfa Deng <xinfa.deng@gl-inet.com>
+Subject: Re: [PATCH net-next v4 3/6] net: dsa: lantiq: allow arbitrary MII
+ registers
+Message-ID: <202601180336.eVmDVfHL-lkp@intel.com>
+References: <d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
- (10.32.0.172)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel@makrotopia.org>
 
-The current XFRM_MSG_MIGRATE interface is tightly coupled to policy and
-SA migration, and it lacks the information required to reliably migrate
-individual SAs. This makes it unsuitable for IKEv2 deployments,
-dual-stack setups (IPv4/IPv6), and scenarios where policies are managed
-externally (e.g., by other daemons than IKE daemon).
+Hi Daniel,
 
-Mandatory SA selector list
-The current API requires a non-empty SA selector list, which does not
-reflect IKEv2 use case.
-A single Child SA may correspond to multiple policies,
-and SA discovery already occurs via address and reqid matching. With
-dual-stack Child SAs this leads to excessive churn: the current method
-would have to be called up to six times (in/out/fwd × v4/v6) on SA,
-while the new method only requires two calls.
+kernel test robot noticed the following build errors:
 
-Selectors lack SPI (and marks)
-XFRM_MSG_MIGRATE cannot uniquely identify an SA when multiple SAs share
-the same policies (per-CPU SAs, SELinux label-based SAs, etc.). Without
-the SPI, the kernel may update the wrong SA instance.
+[auto build test ERROR on net-next/main]
 
-Reqid cannot be changed
-Some implementations allocate reqids based on traffic selectors. In
-host-to-host or selector-changing scenarios, the reqid must change,
-which the current API cannot express.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/dt-bindings-net-dsa-lantiq-gswip-use-correct-node-name/20260117-092406
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/d5cbb8c5917197d44b62d39c9799212d1b3fe390.1768612113.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next v4 3/6] net: dsa: lantiq: allow arbitrary MII registers
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20260118/202601180336.eVmDVfHL-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260118/202601180336.eVmDVfHL-lkp@intel.com/reproduce)
 
-Because strongSwan and other implementations manage policies
-independently of the kernel, an interface that updates only a specific
-SA - with complete and unambiguous identification - is required.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601180336.eVmDVfHL-lkp@intel.com/
 
-XFRM_MSG_MIGRATE_STATE provides that interface. It supports migration
-of a single SA via xfrm_usersa_id (including SPI) and we fix
-encap removal in this patch set, reqid updates, address changes,
-and other SA-specific parameters. It avoids the structural limitations
-of XFRM_MSG_MIGRATE and provides a simpler, extensible mechanism for
-precise per-SA migration without involving policies.
+All errors (new ones prefixed by >>):
 
-New migration steps: first install block policy, remove the old policy,
-call XFRM_MSG_MIGRATE_STATE for each state, then re-install the
-policies and remove the block policy.
+   In file included from drivers/net/dsa/lantiq/mxl-gsw1xx.c:23:
+>> drivers/net/dsa/lantiq/mxl-gsw1xx.h:14:49: error: array index range in initializer exceeds array bounds
+      14 | #define GSW1XX_MII_PORT                         5
+         |                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:708:18: note: in expansion of macro 'GSW1XX_MII_PORT'
+     708 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                  ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.h:14:49: note: (near initialization for 'gsw12x_data.mii_cfg')
+      14 | #define GSW1XX_MII_PORT                         5
+         |                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:708:18: note: in expansion of macro 'GSW1XX_MII_PORT'
+     708 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                  ^~~~~~~~~~~~~~~
+>> drivers/net/dsa/lantiq/mxl-gsw1xx.h:14:49: error: array index range in initializer exceeds array bounds
+      14 | #define GSW1XX_MII_PORT                         5
+         |                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:713:18: note: in expansion of macro 'GSW1XX_MII_PORT'
+     713 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                  ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.h:14:49: note: (near initialization for 'gsw12x_data.mii_pcdu')
+      14 | #define GSW1XX_MII_PORT                         5
+         |                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:713:18: note: in expansion of macro 'GSW1XX_MII_PORT'
+     713 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS] = -1,
+         |                  ^~~~~~~~~~~~~~~
+   In file included from drivers/net/dsa/lantiq/mxl-gsw1xx.c:22:
+   drivers/net/dsa/lantiq/lantiq_gswip.h:60:41: warning: initialized field overwritten [-Woverride-init]
+      60 | #define GSWIP_MII_CFGp(p)               (0x2 * (p))
+         |                                         ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:749:37: note: in expansion of macro 'GSWIP_MII_CFGp'
+     749 |                 [GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
+         |                                     ^~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:60:41: note: (near initialization for 'gsw141_data.mii_cfg[5]')
+      60 | #define GSWIP_MII_CFGp(p)               (0x2 * (p))
+         |                                         ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:749:37: note: in expansion of macro 'GSWIP_MII_CFGp'
+     749 |                 [GSW1XX_MII_PORT] = GSWIP_MII_CFGp(0),
+         |                                     ^~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:750:65: warning: initialized field overwritten [-Woverride-init]
+     750 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:750:65: note: (near initialization for 'gsw141_data.mii_cfg[6]')
+   drivers/net/dsa/lantiq/lantiq_gswip.h:80:41: warning: initialized field overwritten [-Woverride-init]
+      80 | #define GSWIP_MII_PCDU0                 0x01
+         |                                         ^~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:754:37: note: in expansion of macro 'GSWIP_MII_PCDU0'
+     754 |                 [GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
+         |                                     ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/lantiq_gswip.h:80:41: note: (near initialization for 'gsw141_data.mii_pcdu[5]')
+      80 | #define GSWIP_MII_PCDU0                 0x01
+         |                                         ^~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:754:37: note: in expansion of macro 'GSWIP_MII_PCDU0'
+     754 |                 [GSW1XX_MII_PORT] = GSWIP_MII_PCDU0,
+         |                                     ^~~~~~~~~~~~~~~
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:755:65: warning: initialized field overwritten [-Woverride-init]
+     755 |                 [GSW1XX_MII_PORT + 1 ... GSWIP_MAX_PORTS - 1] = -1,
+         |                                                                 ^
+   drivers/net/dsa/lantiq/mxl-gsw1xx.c:755:65: note: (near initialization for 'gsw141_data.mii_pcdu[6]')
 
-Antony Antony (4):
-  xfrm: remove redundant assignments
-  xfrm: allow migration from UDP encapsulated to non-encapsulated ESP
-  xfrm: rename reqid in xfrm_migrate
-  xfrm: add XFRM_MSG_MIGRATE_STATE for single SA migration
 
- include/net/xfrm.h          |   3 +-
- include/uapi/linux/xfrm.h   |  11 +++
- net/key/af_key.c            |  10 +--
- net/xfrm/xfrm_policy.c      |   4 +-
- net/xfrm/xfrm_state.c       |  34 +++-----
- net/xfrm/xfrm_user.c        | 164 +++++++++++++++++++++++++++++++++++-
- security/selinux/nlmsgtab.c |   3 +-
- 7 files changed, 198 insertions(+), 31 deletions(-)
+vim +14 drivers/net/dsa/lantiq/mxl-gsw1xx.h
 
----
-v1->v2: dropped 6/6. That check is already there where the func is called
-	- merged patch 4/6 and 5/6, to fix use uninitialized value
-	- fix commit messages
-v2->v3: fix commit message
-	- fixes to error path
----
--antony
+22335939ec907c Daniel Golle 2025-11-03  11  
+22335939ec907c Daniel Golle 2025-11-03  12  #define GSW1XX_PORTS				6
+22335939ec907c Daniel Golle 2025-11-03  13  /* Port used for RGMII or optional RMII */
+22335939ec907c Daniel Golle 2025-11-03 @14  #define GSW1XX_MII_PORT				5
+22335939ec907c Daniel Golle 2025-11-03  15  /* Port used for SGMII */
+22335939ec907c Daniel Golle 2025-11-03  16  #define GSW1XX_SGMII_PORT			4
+22335939ec907c Daniel Golle 2025-11-03  17  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
