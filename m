@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-250691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9C8D38D04
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 07:53:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74503D38D28
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 09:00:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B238301DBB9
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 06:53:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E450D30060E5
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 08:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7C830C62E;
-	Sat, 17 Jan 2026 06:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E6830AAA9;
+	Sat, 17 Jan 2026 08:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hk83zeIu"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b="MsacfGes"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw03.horizon.ai (mailgw03.horizon.ai [42.62.85.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCD12F39B8
-	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 06:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781ED32A3C5
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 07:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.62.85.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768632809; cv=none; b=Db2hsfgoPaT6auJW4GCs3zD3Cp4/vWgirQslG1L7H/FVVjW7vtfJb9vRPVK6rdYfkzetPjfoWtAKltFFPXWf+0vZoiAkA3qSqe329D5sQoyx3tbLjou0fttrkDLCfz7Sh9ZfofATS8DG8UowbtSU11GyIMTcsbAUtxkzdK5jYoc=
+	t=1768636800; cv=none; b=lDfJuHVwfuVWUUMZfNnUECFo9lHnzQ1FiWZu1RMlDaQt4HXLR4Ivhfc9py9XHeXQ+IHu0MP6ogxPpS5U0wCJP8SLPJhocMTJTyAZAyIFnbn5XYELxSE0lu2xZ9dCW/pT7cOtDCbkXBoLks/DnwWpHO/Z6Sqj/ijzYN9ypBNGBPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768632809; c=relaxed/simple;
-	bh=wa6vuB9JRnirEiTJdbuYjUdjPSbw4Z5u3/ha86tPljk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CQ9CEXtL+V6AEbLEEsXAtASLxMXZZcoNRJau/K5/bYgTjVsuka6isywsbA7s78Irn9Dk3PJww/g0jJj0jbtF0E9/42tN2SIs8t5EXiyGeyjRQ0wtniKh6k4Imod9gdMhN9nLQYyJ/YSuoioyoas0h+2tMHqOZieyAkzoQ7DwB4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hk83zeIu; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bc29d64b39dso948707a12.3
-        for <netdev@vger.kernel.org>; Fri, 16 Jan 2026 22:53:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768632807; x=1769237607; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jl+ikO1mWiP4R9MtrTZgFyugi2SRJMPKhkoPAYsVxK0=;
-        b=hk83zeIu05NT3c5oEVgCvqdb057LaSEV+iUbDtsSMbXTjA7CGPrlDccB/lafZ5ROo/
-         /scNh5F4DIc8yuAyVzV0o7DzEpEPhTfRyjQ21BuVjiYytAZHhfzbuYwOC9JhfJ7ijg+j
-         RUGWPTJiL+UG3n6JmV5ZG7xa6FWWLOdi2uC4LtL9/u6wK8e99mSuy6I5BWNokd6XEln+
-         X1aZKZM413nPy9NNWeRIM77mcuLdQqFchmKk/ZcwMtS+ZxV2qvxk61ofpVytSpCCEQjO
-         OjohvTBonhIc7oSVdHQX0O6BOADj1tT3bZzODvA170rE0wRQmbHn3La3qI2+El3dW0uF
-         mYiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768632807; x=1769237607;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Jl+ikO1mWiP4R9MtrTZgFyugi2SRJMPKhkoPAYsVxK0=;
-        b=CrJ8ii/fLVszIPZ9jqzJzRgb0v/au9KSsvhJ36bmNnIP5hCP/e1Lvj/ZgJ16up+IVr
-         g6QpxEQGx4rfEjnFhU79f0NbX3heveVe/kn8FG766/cmvDINfDq/2TJfaNAZ32kKgK7Z
-         seBtoXGRAwlNuqXfsVpIMaHXjBln5Vwv2Usc5LC9lTXZffvIlGr3t6EsF8ZnJIonkH2g
-         N0P8hnzAV8gAL/V4ekTr9qTGh0e4nGxQ+sA9/cdpXftzBJ1zeuzDXX0EbvFzaP108PBl
-         wLaPei1IIwTHT2cSyxLfdT/CiJcNHKvDcq9VnazmeyQFkPE9Fzw0uSz7DEsbQhBiMvqj
-         iahA==
-X-Forwarded-Encrypted: i=1; AJvYcCUb5peN6ACSO+o4PwzQpTADPLMAHZjautBcGMEpzrJEu8wt8equiQo57lHrCj9luRwUeBUn2jc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzsfod2sjQw+eRRp58aMzCpL0ZNhiYrInWe7NMLNj00rY6Jlre+
-	W99dh5jZ5NlZPTWT11VVS+ODjdMc68bLm9FmXiJ5XKlV1BpiP324Nagw
-X-Gm-Gg: AY/fxX7P3VxITexOdfAywqf6ynLQWK2huJXxgGH2Rmpd+BayFLRurpp11XLOGtCCfxs
-	a/t5d7vVmnuiiQXWOx4RGPpinrQtSlXTa90bIS9dQpSDerswunQgO0uH4OqQISVTDM8a+k54idR
-	CZz8c2QD5XmUddbLfqwmFe5gzp0UMbm+ob3NEFkRMz4FAJxrBGs9uAgskyBBFN/Ke6ka9HEu5Cp
-	1Yp52/YK2nUSA0i1zgmXQ8NW6vIwaAeFRT22zCJX3C+4z/LS9Eo97NYrFrGRbQdQ5jZV07ILQNf
-	J9QNs2BPUG0mmnY2PuNLMTqCx5GOr/aFEDldtiALp/2sBGVebkWBT52l/8m+HVpM465hV6DOGYW
-	R2kwnSIfbCXChvBbxpYbaH+UDeRx16n7FF8p4w6sSVj6aW3j/vS9ZpV52nv4Rhq2aVVR1zILsT2
-	k1A4KmzzLEOSYZXbiV/LHrxmtvmXI7
-X-Received: by 2002:a17:90b:2e08:b0:340:54a1:d703 with SMTP id 98e67ed59e1d1-3527329cef9mr4740206a91.35.1768632807329;
-        Fri, 16 Jan 2026 22:53:27 -0800 (PST)
-Received: from localhost.localdomain ([111.125.235.106])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c5edf355ca7sm3711091a12.27.2026.01.16.22.53.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 22:53:27 -0800 (PST)
-From: Prithvi Tambewagh <activprithvi@gmail.com>
-To: syzbot+df52f4216bf7b4d768e7@syzkaller.appspotmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Prithvi Tambewagh <activprithvi@gmail.com>
-Subject: Testing for netrom: fix KASAN slab-use-after-free in nr_dec_obs()
-Date: Sat, 17 Jan 2026 12:23:13 +0530
-Message-Id: <20260117065313.32506-1-activprithvi@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <69694da9.050a0220.58bed.002a.GAE@google.com>
-References: <69694da9.050a0220.58bed.002a.GAE@google.com>
+	s=arc-20240116; t=1768636800; c=relaxed/simple;
+	bh=kiy7jjnwu41yVzlHymSVTjyCswIwRjtWFH4Lz2ixVhM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iAbkf0uJJdmE6svKLY1pnUy3AGVl45LfYjXnWAu5X0xB3Z3NvMbFhCK2vJAZPUJ+cNVwG5RPdKKyjfantLdEwnOPVCTdUmNqHE2kdVBOzpUoADbMbKSv0PLjXQfb2Tz4vLjb48fyUhEJK7ym8cOGRY15KvCz5tq4djDjk4t97rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto; spf=pass smtp.mailfrom=horizon.auto; dkim=pass (1024-bit key) header.d=horizon.auto header.i=@horizon.auto header.b=MsacfGes; arc=none smtp.client-ip=42.62.85.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=horizon.auto
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=horizon.auto
+DKIM-Signature: v=1; a=rsa-sha256; d=horizon.auto; s=horizonauto; c=relaxed/simple;
+	q=dns/txt; i=@horizon.auto; t=1768636780; x=2632550380;
+	h=From:Sender:Reply-To:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kiy7jjnwu41yVzlHymSVTjyCswIwRjtWFH4Lz2ixVhM=;
+	b=MsacfGeswgrQY6iSTOWPcAkdP80isLgr3FUhztPJjrV5IXyvuZYZytocdigzWA7O
+	cHyx6ATaXoHKEdNcqNAc+OKwf0m7FM7TpN0yOKTuxvYy1pYFtTjsghR5ZtA469Ip
+	iyfL83/bQM+6el7RAImcRjhCSmli53q+h2zTXATeiZI=;
+X-AuditID: 0a0901b2-df5da70000001406-19-696b416ca045
+Received: from mailgw03.horizon.ai ( [10.69.1.10])
+	by mailgw03.horizon.ai (Anti-spam for msg) with SMTP id 9E.27.05126.C614B696; Sat, 17 Jan 2026 15:59:40 +0800 (HKT)
+Received: from wangtao-VirtualBox.hobot.cc (10.9.0.252) by
+ exchange003.hobot.cc (10.69.1.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2308.27; Sat, 17 Jan 2026
+ 15:59:38 +0800
+From: Tao Wang <tao03.wang@horizon.auto>
+To: <linux@armlinux.org.uk>
+CC: <alexandre.torgue@foss.st.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <maxime.chevallier@bootlin.com>,
+	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<tao03.wang@horizon.auto>
+Subject: Re: [PATCH net v3] net: stmmac: fix transmit queue timed out after resume for tso
+Date: Sat, 17 Jan 2026 15:59:22 +0800
+Message-ID: <20260117075926.128979-1-tao03.wang@horizon.auto>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <aWrJvrpIAZHQS2uv@shell.armlinux.org.uk>
+References: <aWrJvrpIAZHQS2uv@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="y"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: exchange004.hobot.cc (10.9.15.112) To exchange003.hobot.cc
+ (10.69.1.10)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOIsWRmVeSWpSXmKPExsXC5crIpZvjmJ1pMLVBxOLny2mMFssf7GC1
+	mHO+hcXi6bFH7BaP+k+wWVzY1sdqsbBtCYvF5V1z2CwOTd3LaPHy9TZmi3l/17JaHFsgZvHt
+	9BtGB16Py9cuMnvMW1PtsWXlTSaPp/1b2T12zrrL7rFgU6nHplWdbB47d3xm8ni/7yqbx+dN
+	cgFcUVw2Kak5mWWpRfp2CVwZhyZ1MxWcYa2YtPs1ewPjaZYuRk4OCQETibmrHjJ2MXJxCAms
+	YJQ4f6ufFcJ5zihxemo3M0gVm4CGxN2p14A6ODhEBKQljs3RAKlhFrjPJHHs6G5GkBphgSiJ
+	D99PsIHUsAioSuxpqgMJ8wrYSlxsfMoEsUxe4vqUA4wgJZwCphKPD5eAhIWAbthxYSIzRLmg
+	xMmZT8BuYwaa0n0EopUZqLV562xmiHoVieaT89khRspJvN6wnw3CjpHYPukY2wRGoVlIRs1C
+	MmoWklELGJlXMQrnJmbmpJcbGOtl5BdlVuXn6SVmbmIExR0n46YdjEsWfNQ7xMjEwXiIUYKD
+	WUmE98L7rEwh3pTEyqrUovz4otKc1OJDjNIcLErivNqKcZlCAumJJanZqakFqUUwWSYOTqkG
+	po4pISUHJGcHN19RKWO86J6x+OAa1eoXCyuMj4YpnPsffO1Q6sxjzJ/1ikv1LS2N3es2T60V
+	ZkiTu1YttaD1apPpVtFzLpK3f+ekKrEfnRoVlOnb56xs6mWgGcjYPUXs7L+ZDG8/Ri0OVTh0
+	xeasyz7fM7t15mb9iQ07/Wf16wBWuzOvd7Ex+VXsn3byd+pRDZ7AxwUzv7R9ZnbPWTS1nnXC
+	iwkrNpcsONsdkXabyzcml7FM0fZDUrfotOye7ZXrbrkJyFyPuragiCFW6Iz2qV8Gcm1f7icy
+	9xpaF8fZiKdqHRNkUX+o2v/8+GpB34jtGr77bZ7+1fxXzM41Y66CePhC9QsOBuF9BooTj9kr
+	sRRnJBpqMRcVJwIAVpPlbSoDAAA=
 
-#syz test upstream be548645527a131a097fdc884b7fca40c8b86231
+> Rather than using tx_q->tx_skbuff_dma[].last_segment to determine
+> whether the first descriptor entry is the only segment, calculate the
+> number of descriptor entries used. If there is only one descriptor,
+> then the first is also the last, so mark it as such.
 
-Signed-off-by: Prithvi Tambewagh <activprithvi@gmail.com>
----
- net/netrom/nr_route.c | 1 -
- 1 file changed, 1 deletion(-)
+This is a good idea. tx_q->tx_skbuff_dma[].last_segment no longer carries
+ much meaning and can indeed be removed altogether.
 
-diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
-index b94cb2ffbaf8..788e375537fe 100644
---- a/net/netrom/nr_route.c
-+++ b/net/netrom/nr_route.c
-@@ -466,7 +466,6 @@ static int nr_dec_obs(void)
- 				nr_neigh = s->routes[i].neighbour;
- 
- 				nr_neigh->count--;
--				nr_neigh_put(nr_neigh);
- 
- 				if (nr_neigh->count == 0 && !nr_neigh->locked)
- 					nr_remove_neigh(nr_neigh);
+> +       is_last_segment = ((tx_q->cur_tx - first_entry) &
+> +                          (priv->dma_conf.dma_tx_size - 1)) == 1;
 
-base-commit: be548645527a131a097fdc884b7fca40c8b86231
--- 
-2.34.1
-
+Since tx_q->cur_tx may wrap around and become smaller than first_entry,
+the following statement is more concise:
+is_last_segment = (tx_q->cur_tx == first_entry);
 
