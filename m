@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-250749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09900D3919D
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:20:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8510BD391AA
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 00:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D1DE63005006
-	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:20:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 367D0300A844
+	for <lists+netdev@lfdr.de>; Sat, 17 Jan 2026 23:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FDB2DF153;
-	Sat, 17 Jan 2026 23:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764432F1FDC;
+	Sat, 17 Jan 2026 23:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQFMITC+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofM13A6q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754101F239B;
-	Sat, 17 Jan 2026 23:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA042E8B87
+	for <netdev@vger.kernel.org>; Sat, 17 Jan 2026 23:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768692010; cv=none; b=rfBCtgHgQGz+8kQTvHnaxU2YN9hSc8VA0qNffR1JaxyVtkbIj3iIVEPpPwFEXpIUXxIGFb3p+1HQLPgf+7G6Vis/pUg0vMDZRgznCGTPcSabzKAcW5mIFFg/R6xITqJ0WPZcLo/S4HGS48uh52w0yg1CtoGwkE7pWKI2pn3XEgc=
+	t=1768692575; cv=none; b=tJJGChI45xcMb67ZZjov11watx8pO8FGBAtz3QLxzv6SmwfJLKqkUx7QeFNvp4QYi/CQ7P5gJ8NO5BSAUdovnHIH/UCmdo1fBOrYoSEtC5jsovgbD6n++mfsdOd9rcCQvMcf05BlZ744Kywbi8X4tZlN3Hl9y63wlJq9jYJvYOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768692010; c=relaxed/simple;
-	bh=pxhkgYoWbdsgiCuc5Rs9dZLmf5rnoA9KQE8DwQul9yI=;
+	s=arc-20240116; t=1768692575; c=relaxed/simple;
+	bh=oJ8ubN45hryyvktcyVN+ZJXq9q0JbLOMpdq907VqWgs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VaEyCQQ0RplDexhUDA6ETjUeSrb8hXG5+7OKgomJ+Lwg7QhamqK5IjCiLKhjGo0joqG4OL++0JQTE2C/kIFZO1DsrDXm6AVKzdXRInZGVinb3GAesH5SCUhpfV0jHoEhnPpQnQ24tGNHRzPEY3bzFca94Asb0wHEOZxy623+WK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQFMITC+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FCE8C4CEF7;
-	Sat, 17 Jan 2026 23:20:09 +0000 (UTC)
+	 MIME-Version; b=N6cEvhlKtn3RBZE9pw0aSwwmP4zxfaUaoMf1WUhsarmW8M9Li5H4JTgVqoeWfQwzZ132S5m3mwdBXBujMjcoDdG9ZK4UjNaX9e25N19jTgmjrS5jQ544AHbRbXJJE4Rb1pstasoSJyd8HSYd8x4bJnzKPKaUJ3vg11qcA/5lrOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofM13A6q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F2D4C4CEF7;
+	Sat, 17 Jan 2026 23:29:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768692010;
-	bh=pxhkgYoWbdsgiCuc5Rs9dZLmf5rnoA9KQE8DwQul9yI=;
+	s=k20201202; t=1768692574;
+	bh=oJ8ubN45hryyvktcyVN+ZJXq9q0JbLOMpdq907VqWgs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZQFMITC+eiCs2FGVHNgVkhJDAiHnDXzupAWKdbyaMp+M10SoqxXxn2G0RCs6lFXmU
-	 YzQkEPPtGUhJ2TOWrdKa2V3OUBeDRwV/2wDvDZP5k7q6j1ZhrT0+zl58+1MvszS7Th
-	 yOZovvGP6b3wxSPd26NSBMN2KmvLFhtd1Fkw/KHmj63DS+RPaETzAHNXnBS42LcSt0
-	 LoYLuO7kT4KehxUWt1CEnLjvanxnGGrDa49PX/P8qhWeBRL5Wkum0ji0fnRA1HfIw7
-	 nkjccQ364r9EMPPdPmSnHr7quHnaPliFOuSDcSNfWWkPh3YHb0ZOcYHVN0Dl94VbJ7
-	 sLTgs+n+WO2bQ==
+	b=ofM13A6qfNA1IPIEvOHuW4oTKqvAqiybQIgPs6ymPOSWSXUXeCZDxqf0sC0ljhKwV
+	 WqH2mlFIz6OgqFbHXgQi3+McFmmYg30iu9kjTFg32ozWSv4IBJpik07iB/wjMMhaZs
+	 2YJ59KPgcq2KIUCQaQaQH91LzU1ilR9cBmE1wTRkQW4bMNjMxdA5MNSgDqQMKhlr31
+	 8+B4vBhc33p0agfHxVtkaIw/oODNZtIoKW/k+FYlbBYmCsOxqN8CzV5Yf8lnijstxK
+	 JJvZwf1XibMcaFKTMvIM/9Jyvyvt5+mujEfNZ2UKu7FIRKbozLTL5vcjiMTkGFkGbP
+	 KCDjvV3xGdgGw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: daniel@makrotopia.org
+To: u.kleine-koenig@baylibre.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	hkallweit1@gmail.com,
-	linux-kernel@vger.kernel.org,
-	michael@fossekall.de,
-	linux@armlinux.org.uk,
-	edumazet@google.com,
-	andrew@lunn.ch,
-	olek2@wp.pl,
-	davem@davemloft.net,
-	vladimir.oltean@nxp.com,
 	netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	linux@armlinux.org.uk,
+	hkallweit1@gmail.com,
 	pabeni@redhat.com
-Subject: Re: [v2,2/5] net: phy: realtek: simplify C22 reg access via MDIO_MMD_VEND2
-Date: Sat, 17 Jan 2026 15:20:06 -0800
-Message-ID: <20260117232006.1000673-1-kuba@kernel.org>
+Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
+Date: Sat, 17 Jan 2026 15:29:32 -0800
+Message-ID: <20260117232932.1005051-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <fd49d86bd0445b76269fd3ea456c709c2066683f.1768275364.git.daniel@makrotopia.org>
-References: <fd49d86bd0445b76269fd3ea456c709c2066683f.1768275364.git.daniel@makrotopia.org>
+In-Reply-To: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
+References: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,64 +68,74 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: phy: realtek: simplify C22 reg access via MDIO_MMD_VEND2
+mdio: Make use of bus callbacks
 
-This commit adds support for translating MDIO_MMD_VEND2 registers back
-to Clause-22 registers for PHYs on a C22-only bus. It also renames
-RTL_PHYSR to RTL_VND2_PHYSR and changes the register access method in
-several read_status functions.
+This patch moves MDIO device probe/remove/shutdown callbacks from the
+device_driver level to the bus_type level, with the goal of eventually
+removing device_driver callbacks.
 
-> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-> index a593150b6cbb..40cae9968d20 100644
-> --- a/drivers/net/phy/realtek/realtek_main.c
-> +++ b/drivers/net/phy/realtek/realtek_main.c
-
-[ ... ]
-
-> @@ -1156,7 +1156,8 @@ static int rtlgen_read_status(struct phy_device *phydev)
->  	if (!phydev->link)
->  		return 0;
->
-> -	val = phy_read(phydev, RTL_PHYSR);
-> +	val = phy_read_paged(phydev, RTL822X_VND2_TO_PAGE(RTL_VND2_PHYSR),
-> +			     RTL822X_VND2_TO_PAGE_REG(RTL_VND2_PHYSR));
-
-This changes rtlgen_read_status() from reading C22 register MII_RESV2
-(0x1a) directly to using paged access at page 0xa43, register 18.
-
-rtlgen_read_status() is used by RTL8211F, RTL8211F-VD, and Generic FE-GE
-Realtek PHY drivers. Are these Gigabit-only PHYs guaranteed to have the
-PHYSR at the same paged location as the RTL822x 2.5GbE PHYs?
-
-I notice this change is reverted in a later commit in the series:
-  efef1a8042ec ("net: phy: realtek: demystify PHYSR register location")
-which changes back to:
-  val = phy_read(phydev, RTL_PHYSR);
-
-with the note "Turns out that register address RTL_VND2_PHYSR (0xa434)
-maps to Clause-22 register MII_RESV2".
-
-Is the paged access in this intermediate commit correct, or could it
-cause issues during bisection?
+> diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+> index afdf1ad6c0e6..dea67470a7bf 100644
+> --- a/drivers/net/phy/mdio_bus.c
+> +++ b/drivers/net/phy/mdio_bus.c
 
 [ ... ]
 
-> @@ -2127,7 +2137,7 @@ static int rtlgen_sfp_read_status(struct phy_device *phydev)
->  	if (!phydev->link)
->  		return 0;
+> @@ -1004,11 +1004,67 @@ static const struct attribute_group *mdio_bus_dev_groups[] = {
+>  	NULL,
+>  };
 >
-> -	val = phy_read(phydev, RTL_PHYSR);
-> +	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
+> +/**
+> + * mdio_bus_probe - probe an MDIO device
+> + * @dev: device to probe
+> + *
+> + * Description: Take care of setting up the mdio_device structure
+> + * and calling the driver to probe the device.
+> + *
+> + * Return: Zero if successful, negative error code on failure
+> + */
+> +static int mdio_bus_probe(struct device *dev)
+> +{
+> +	struct mdio_device *mdiodev = to_mdio_device(dev);
+> +	struct device_driver *drv = dev->driver;
+> +	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
 
-Similarly, this changes from C22 register read to C45 MDIO_MMD_VEND2
-access via rtlgen_read_vend2(). The SFP PHY mode uses PHY_IS_INTERNAL
-and is used by r8169 for 2.5GbE chips in SFP mode.
+[ ... ]
 
-This is also reverted in the same later commit to:
-  val = phy_read(phydev, RTL_PHYSR);
+>  const struct bus_type mdio_bus_type = {
+>  	.name		= "mdio_bus",
+>  	.dev_groups	= mdio_bus_dev_groups,
+>  	.match		= mdio_bus_match,
+>  	.uevent		= mdio_uevent,
+> +	.probe		= mdio_bus_probe,
+> +	.remove		= mdio_bus_remove,
+> +	.shutdown	= mdio_bus_shutdown,
+>  };
 
-Does rtlgen_read_vend2() work correctly for all PHYs that could be in
-SFP mode?
+Does adding these bus-level callbacks break PHY device probing?
+
+PHY drivers register via phy_driver_register() which sets:
+
+    new_driver->mdiodrv.driver.probe = phy_probe;
+    new_driver->mdiodrv.driver.remove = phy_remove;
+
+The driver core in call_driver_probe() prioritizes bus callbacks over driver
+callbacks:
+
+    if (dev->bus->probe)
+        ret = dev->bus->probe(dev);
+    else if (drv->probe)
+        ret = drv->probe(dev);
+
+With mdio_bus_type.probe now set, phy_probe() will never be called for PHY
+devices. The same applies to phy_remove() being bypassed by mdio_bus_remove().
+
+phy_probe() performs essential initialization including setting phydev->drv,
+reading PHY abilities, configuring EEE, and setting up the state machine.
+Without this, PHY devices would fail to initialize properly.
+
+Was there a plan to update phy_driver_register() as part of this change, or
+is a separate patch needed to handle PHY drivers?
 -- 
 pw-bot: cr
 
