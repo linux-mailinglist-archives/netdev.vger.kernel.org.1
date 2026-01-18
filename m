@@ -1,171 +1,124 @@
-Return-Path: <netdev+bounces-250891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF2AD39759
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:07:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 895C8D3975E
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5CB5E3003517
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:07:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1F81300724C
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5742732FA18;
-	Sun, 18 Jan 2026 15:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4653733342E;
+	Sun, 18 Jan 2026 15:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="gejngjRB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxYhoSao"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB5C171CD
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEA5A41
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768748871; cv=none; b=fR4AN4hBdh46SktFbwnd1daqel4u35TXwhff6dkmUD5ONJF4Edkk9kG1WmjDDUD9awhg/ZhqCh/2XPBAdrJ5XujyyeW9hJ/Ofc2cSnQZrHK0qELKvyp4gKkXEKaMJWZHss7OduSXXz5ceH1PnwqVAar8Sbjo4HMblmaLtmXqfoI=
+	t=1768749328; cv=none; b=tca2s74jCxmFXLRyRss3slUMhL+0TSqD0b3oU/Zb4Er79ULPIPIBi7+qjCCD/i9uln0EhbfuybuUJqugXt0LnpeQqtrMGiBbhzbVgFjAxpZxPJbps9DZHWggdqm3DacA+hz12go+qNHXJNj8JhZ4eUA3e9AoBSoBXwuCXMQcyxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768748871; c=relaxed/simple;
-	bh=dpqvH7H8rUH2piOvDS/yiPzGDDDFTTSZ2G6LYOuPskI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T3+LKSJcp4o8NKrl9uHpYBjVJM1KR12Mqfb+kz2SqiLQI9YyjJ/BHqYutTyltEGxnnM7Tn04ZoUKWXQQC9lJxj19NeQhevC4ua3Dh9SeHXzu1T7+09kVDh+RWglWruNuN5IuPbEDEMU4leFihSARwjYeEYRerCotCEySag9Jfbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=gejngjRB; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-34b75fba315so1622863a91.3
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:07:49 -0800 (PST)
+	s=arc-20240116; t=1768749328; c=relaxed/simple;
+	bh=Vh+GAtBl7HAnqugz8MWAJsOzLN95UAPEEh8yzwvGASY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GtK1WLX9FdI/aPmklCURqTMs0pt6B6OFpv6r95Uk39bhlq1W5FX5II9a1sKmX3guwQnh8sZ5tVhzKampwNP7V3nen4Do6a55FVDxIR3Au/7Q7Er5E5ZAwCC8OM1n7xQOkAr3+uSFS4vrGdWZFxAmfmSxH+3GJZK1VPHndHDOXnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MxYhoSao; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-81ef4b87291so1807977b3a.0
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:15:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768748869; x=1769353669; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IQtO51Cmo/SxOlbLdLL2eQhvPXFAj23Z7YCB7bUk4eQ=;
-        b=gejngjRBkGLRAahTNvaYOvsXFmv3biEpwSXc1Q6iX9z/X/J53IFZct61Rz3XCeo50I
-         UeQQ9EgyBNOfbzASctwgHI+9tGSTt0NU6CybS+2zVGyK0nMMvGenpUR6Gw1kBWtiR1P+
-         MDgRO9zr/+X0lVnJUvdl+epjn3vWjvcrS0bzd+CyelbTnmSZ4koZ0LqAC/cZauVqR78b
-         PtCj49jVWZAx2X4M92dKNomTCjW65RoI6yfwC7Lp+9nfpe+/a7ntLi7jZqgupgIRf7hI
-         7jyG61xHb8fmbDahZe3LdVqE7xov9GGuhMztsAjYXMfMaely69VmJqGjyMX8qOKaA7KX
-         wgsg==
+        d=gmail.com; s=20230601; t=1768749326; x=1769354126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VDuxeJ3zGZzz2StfINBnfIwS/QxkpqVo4B4BfFpkzgA=;
+        b=MxYhoSaos57pxyBailkHIkmrgBjTXBVShu6HmS1+d3ifKrm1WLcU++Ka6oj3WetQLB
+         RGWMdiu8lH0C8y/77vOqQ3G8A10GA/XbbRs6Af/PpAnPfezpmojkVuj/TPtqlMQMRsrC
+         xsP2peRrudMGKsXvdC0leqSzcUNG6X7K/1F+d2GVEm2qHY+bGYd/F2NFai24PhU4jO8z
+         sjx5If8GVWKBPdg2eMGYnpbis4tRuqk96maS3V/A+7qK0n5p0ykKUlW+4yC8ZooyoOqu
+         tgIvQSmBTZShWVEN89yFQ6xdAo69lnTcaAMxvB1nIz8iLBwkNItBYtE/4G7N4rSorJ0p
+         2KyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768748869; x=1769353669;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IQtO51Cmo/SxOlbLdLL2eQhvPXFAj23Z7YCB7bUk4eQ=;
-        b=nT0t5EcpKiu8hH9X/1zU9FeLnhyg5gDekymyNSmGckUC874E8PVfhum8dWwC3db4ft
-         1RO50p1+bVM1vymdHP60Mypbp7OqgBG+0GsJZSWeIstSRNJnyeX0wGv8qERur/wir7fa
-         tO4ssC5QQqfMm7CpiZIQbGNEx7UShS/VgO539odThNptu6VoWEmS/EGkdRt7s4/KJo3C
-         SD0D8SJtYCh/OZl5AblFnemIWC5G7zXUSmq0wSoqJ3MVRBtMSWRf1r6egZtIvZKTchk1
-         fJTd1uSP+twYdGwl3HPJz8xvuZdvA0gVI3E5lzPYniGDwFACwxg2aW7dS0GLlQSLJjg6
-         LM3g==
-X-Gm-Message-State: AOJu0YxpxpvrRgF/w4NgCjfzDvOQi3NvLXgl2K/S+vXt5YZxa8lsmzom
-	n85mUCqfjgcHe+LL1LbEtvEvfXYIfg0zqpkLtktnSumBWU87NT7Cun/bALNGz1VakGltqkKUdyF
-	LE5Yi6p4GSSPitfttLj5nRcY5dmfwF3ab70+5Qe2b
-X-Gm-Gg: AY/fxX4Wm+3yrbwYfJMvpYFf8oSzxJ+JaPT6cKDxTmjEXq+coIXdtNofLO108FKhDo2
-	74bukZwsxaH8PuLtVKIvSeIlp7Oz6zemdIQShVEaRC5koaEmkpbTmE0tAlX1hra2FGYT0TEodI1
-	GArgYnvoFty+i+EEwKZQc8sQAqZMrOJ2tfiJodojga+95hdOjeLE8KQDUuTlS4kLvNjmZRg9Cri
-	uwzgBkhyxVSuW6VnEBRbv5q2ln6Fjt1qQi+jqEhh8m+WgbdKpErbAMRhvDHlxpSmN/OF1Fn5YQ1
-	lOM=
-X-Received: by 2002:a17:90b:350e:b0:340:e529:5572 with SMTP id
- 98e67ed59e1d1-35272ee0e56mr7858152a91.8.1768748868802; Sun, 18 Jan 2026
- 07:07:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768749326; x=1769354126;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VDuxeJ3zGZzz2StfINBnfIwS/QxkpqVo4B4BfFpkzgA=;
+        b=YKCWq6wcbwTH+rGdN4UYMj9JYgroOZOyCfPTzGRs2E9WXP6fCr9/8t6JfBiCh8uon5
+         g0P0xI3aaPlaB8HWYsWNju/Z7rbdF7VyvyTFpVMkejdyk98sW/ViVoe7MWt4qjzO792x
+         NL8DVnBFeq7AvcpTG4z7bxYleYwrJwsigah5EpDFu2z52gaK7aSzaTNoi8RIF/4DA3uT
+         P/VXbveOc/hqTWbXEIR1jpqDCr+5mNY+2SEvPOSkNV9L/0HfNxEPQXeM71tTbN1TPPVK
+         lD0o923h90jGCorU/j1AJwlKbmgzmZ+dYRN9QVgzNPt+uzQQRHUVdv2NHnx2tRzOXdB9
+         ajMw==
+X-Forwarded-Encrypted: i=1; AJvYcCX613hEQV4UiA/sjvWOWi+jOKCOgbqtJ1wEcNYcXZuue234CNichVNmjDnJuOJUxsmePapPtQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTPO8ye+6TgU4fylZBWh5PG8QyuRY3taC4yaDzKkp+anOH2q6q
+	vX83cXv8Fq8aeNhuNOke0TqNd8RrE78CCOH3fa/udK7lxmd4Y5IjrDoe
+X-Gm-Gg: AY/fxX59QmC2X5RZw8+kvZ1bQvmWFlSz+WLKXlGwEhKBdvYzKJLFOhsVRuPvwRVJnL3
+	OcHErtW6wLvxLkPCZhkJM/tu7LQxXsueSqwOf7at31Z828e+SJdmkRoivJzoOO38VW8fv7e7fPe
+	2EIILAVkcprfe/n8Lr1ARJYYJ72OD3t6yHI8vy+iFSIqO4lVH7NPjZdYUBatTupaUcskHvhtXVt
+	LPrnb2DA7wc5SRcJ9VUMJO71bdYr6Fet4TGz6opZg+JmfAybxNmHX+WzxT75ejFhtVqGsfj/3tj
+	GFBFwymgzwe0xwq0nHyfKsyqyoAzlQ/gcTCN96yeF++v5Q9lBd3sPhnYhR6hV0puVVpClGD3Zq+
+	iPNjnVZgRxjVpUxWV8iM3A3ClYTkg8XEEKGs7vmF4h1f9sLjZpKCVZd3hh6rjAD99+tkk4CFovd
+	0=
+X-Received: by 2002:a05:6a00:22c8:b0:81c:446d:6bd0 with SMTP id d2e1a72fcca58-81f9fbf102fmr7761652b3a.23.1768749326272;
+        Sun, 18 Jan 2026 07:15:26 -0800 (PST)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81fa10bcf66sm6835603b3a.18.2026.01.18.07.15.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jan 2026 07:15:25 -0800 (PST)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com
+Subject: [PATCH net] selftests: net: amt: wait longer for connection before sending packets
+Date: Sun, 18 Jan 2026 15:14:50 +0000
+Message-ID: <20260118151450.776858-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260118061515.930322-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20260118061515.930322-1-xiyou.wangcong@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 18 Jan 2026 10:07:37 -0500
-X-Gm-Features: AZwV_QjVPfNZLKMK_bneNC3DV8UNYY95SR3_NSTolF4ks3DTk6Ur7eeXo2s8KhM
-Message-ID: <CAM0EoMn=bx-AMR0RbFmSj8MjWTxLtB_xo5419AW18paZ9r1wDQ@mail.gmail.com>
-Subject: Re: [Patch net v8 0/9] netem: Fix skb duplication logic and prevent
- infinite loops
-To: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	William Liu <will@willsroot.io>, Savy <savy@syst3mfailure.io>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 18, 2026 at 1:16=E2=80=AFAM Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
->
-> This patchset fixes the infinite loops due to duplication in netem, the
-> real root cause of this problem is enqueuing to the root qdisc, which is
-> now changed to enqueuing to the same qdisc. This is more reasonable,
-> more intuitive from users' perspective, less error-prone and more elegant
-> from kernel developers' perspective.
->
-> Please see more details in patch 4/9 which contains two pages of detailed
-> explanation including why it is safe and better.
->
-> This reverts the offending commits from William which clearly broke
-> mq+netem use cases, as reported by two users.
->
-> All the TC test cases pass with this patchset.
->
+There is a sleep 2 in send_mcast4() to wait for the connection to be
+established between the gateway and the relay.
 
-These patches should not be considered for any review because they are
-not following the rules that are set for the community. The rules,
-which are well documented, state that you must cc all stakeholders.
-When someone does this _on purpose_ such as Cong, some accountability
-needs to be imposed. I would say totally ignoring these patches is one
-option. Otherwise anyone can just throw a tantrum and decide those
-rules dont apply to them. Either that or we modify the rules to state
-it is ok to do this..
+However, some tests fail because packets are sometimes sent before the
+connection is fully established.
 
-cheers,
-jamal
+So, increase the waiting time to make the tests more reliable.
 
-> ---
-> v8: Fixed test 7c3b
->
-> v7: Fixed a typo in subject
->     Fixed a missing qdisc_tree_reduce_backlog()
->     Added a new selftest for backlog validation
->
-> v6: Dropped the init_user_ns check patch
->     Reordered the qfq patch
->     Rebased to the latest -net branch
->
-> v5: Reverted the offending commits
->     Added a init_user_ns check (4/9)
->     Rebased to the latest -net branch
->
-> v4: Added a fix for qfq qdisc (2/6)
->     Updated 1/6 patch description
->     Added a patch to update the enqueue reentrant behaviour tests
->
-> v3: Fixed the root cause of enqueuing to root
->     Switched back to netem_skb_cb safely
->     Added two more test cases
->
-> v2: Fixed a typo
->     Improved tdc selftest to check sent bytes
->
-> Cong Wang (9):
->   net_sched: Check the return value of qfq_choose_next_agg()
->   Revert "net/sched: Restrict conditions for adding duplicating netems
->     to qdisc tree"
->   Revert "selftests/tc-testing: Add tests for restrictions on netem
->     duplication"
->   net_sched: Implement the right netem duplication behavior
->   selftests/tc-testing: Add a nested netem duplicate test
->   selftests/tc-testing: Add a test case for prio with netem duplicate
->   selftests/tc-testing: Add a test case for mq with netem duplicate
->   selftests/tc-testing: Update test cases with netem duplicate
->   selftests/tc-testing: Add a test case for HTB with netem
->
->  net/sched/sch_netem.c                         |  67 +++-----
->  net/sched/sch_qfq.c                           |   2 +
->  .../tc-testing/tc-tests/infra/qdiscs.json     | 144 ++++++++++++++----
->  .../tc-testing/tc-tests/qdiscs/netem.json     |  90 +++--------
->  4 files changed, 153 insertions(+), 150 deletions(-)
->
-> --
-> 2.34.1
->
->
+Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+ tools/testing/selftests/net/amt.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+index 3ef209cacb8e..fe2497d9caff 100755
+--- a/tools/testing/selftests/net/amt.sh
++++ b/tools/testing/selftests/net/amt.sh
+@@ -246,7 +246,7 @@ test_ipv6_forward()
+ 
+ send_mcast4()
+ {
+-	sleep 2
++	sleep 5
+ 	ip netns exec "${SOURCE}" bash -c \
+ 		'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
+ }
+-- 
+2.43.0
+
 
