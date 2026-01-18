@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-250900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A53D397B1
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:01:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AAF4D397B6
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:07:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8AF3D30088BE
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:01:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD9013005B91
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27861D416C;
-	Sun, 18 Jan 2026 16:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97091FF7B3;
+	Sun, 18 Jan 2026 16:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UWARjCTE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WgApr0jE"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4152D515;
-	Sun, 18 Jan 2026 16:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519E3171CD;
+	Sun, 18 Jan 2026 16:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768752109; cv=none; b=f9lMFrsAzEekFuUsPgnRC+B3xwTXAcA6PahgNy6Eygre6JTWNSk+sr9XNiBCrTl2tpkADJrstvVlGsIbegQ3PVWXleIgZrzi4Ea+wpTLFzCKSb94OBfysT4ctAnNfXbAZItB6/Ce2nR8zB2O/kACiVQ1R+wL7rVSjJZFhaITrR8=
+	t=1768752422; cv=none; b=tAjF/gVtwifUlGnw2EwuSBcF/bXGbqs3TcN6e35J0IdOeDlu5BzAH1wQ92nWtRQNQihQdxjVrCuuGeZjgB4OyImw1hvhk0xTQJlgbQsEyNjZe+YWdgYvJO2tR534EEtpxCRTwJR05n4dbeJKR84GWHbyKNZrApR5WFOvIoG5urQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768752109; c=relaxed/simple;
-	bh=2tPLVtUcmlNgzcjePqKEikVmIKnrzXJ8VIH0ipbvnQ4=;
+	s=arc-20240116; t=1768752422; c=relaxed/simple;
+	bh=PYYKQHME8BcbdvvjgN3DNo0ndMOEmx5iegw/X+KE/V0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nrvHh187tg74agCx+9YB8vrlt3ldTvnuGXiPehjmZQ3J8Vs58rARhS8WukARULVHlSwY68Fq2NrS/mj0kHTgnQcQ3O8FKhk01SKiP0t+fB2JcEPxSk++oTaZ88ez5QLszk2urtG1o0rhc1Xa614jnapr+8XhYdlNIJeSndci4yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UWARjCTE; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUTCJWsRfPJM3w2B/qH+x8i6X4UcrJdjkQuMmOQ9mkyg5zbB2WpAeNeJ682c6ZN3EbX//CDSZiEGCpdvJDngRrROy1hzSlxDAjkYkIOjOZURAips73/hGRynx0lZW8LEwsHAk12/MbNpw7Om7T8qxV6+OV1uEA4cdo/ev9js0t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WgApr0jE; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,30 +34,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vnYChq4ZvENtM2GcteLuTihPDAtrBEYkDAjTfXG0beM=; b=UWARjCTEMhMnxzI07W4B+QF957
-	T1TPeU1kk2XUtUdT2yehio5sUVqlvtTZ81PZUJSldlpK1AqSm8Cj/lDu6RYyh35kKrwEhObVYhWX+
-	h/W/rmBdw578Qa9VjCO4M+M6ogPQ+5u/x6mS+JU7CmTaH4eXoh3aEEbp4xrAoxXb9gvw=;
+	bh=i4gSKN9gBKNJlYD3KQYNpAc2MI48Gajd+JBAqcB6IUk=; b=WgApr0jEJOLNDcPMYH95uQumKn
+	upw2qR1wHjhQu0XI3v9seXHHEzZ9C+EvN6xopI8hLYZzIQZeYiDyZeAoKCKMkOhWq6NhXwzme1z6y
+	dypmsm20ssyd8KPbAoflyjjCiB1bTdnhm+3S0xK/BQcibBhE6HdfiKQRSzqBlfeMZWUY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vhVDe-003Min-JD; Sun, 18 Jan 2026 17:01:38 +0100
-Date: Sun, 18 Jan 2026 17:01:38 +0100
+	id 1vhVIj-003Mkq-O4; Sun, 18 Jan 2026 17:06:53 +0100
+Date: Sun, 18 Jan 2026 17:06:53 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Mikhail Anikin <mikhail.anikin@solid-run.com>,
-	Rabeeh Khoury <rabeeh@solid-run.com>,
-	Yazan Shhady <yazan.shhady@solid-run.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: sfp: support 25G long-range modules (extended
- compliance code 0x3)
-Message-ID: <e04e8bec-a7c5-4e2d-bdd8-fdf79c29deba@lunn.ch>
-References: <20260118-sfp-25g-lr-v1-0-2daf48ffae7f@solid-run.com>
- <20260118-sfp-25g-lr-v1-2-2daf48ffae7f@solid-run.com>
+Subject: Re: [PATCH net-next v6 2/3] net: dsa: yt921x: Return early for
+ failed MIB read
+Message-ID: <5afaff9c-7be2-4464-b675-4bf70aaa17af@lunn.ch>
+References: <20260118013019.1078847-1-mmyangfl@gmail.com>
+ <20260118013019.1078847-3-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,45 +61,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260118-sfp-25g-lr-v1-2-2daf48ffae7f@solid-run.com>
+In-Reply-To: <20260118013019.1078847-3-mmyangfl@gmail.com>
 
-On Sun, Jan 18, 2026 at 04:07:38PM +0200, Josua Mayer wrote:
-> The extended compliance code value SFF8024_ECC_100GBASE_ER4_25GBASE_ER
-> (0x3) means either 4-lane 100G or single lane 25G.
-
-Is there a way to tell them apart?
-
-If it is a QSFP, it means 4-lane 100G? You can however split it into
-4x 25GBASE_ER, if the MAC supports port spitting? If it is an SFP, it
-must mean 25GBASE_ER because the SFP only supports a single lane?
-
-> Set 25000baseLR_Full mode supported in addition to the already set
-> 100000baseLR4_ER4_Full, and handle it in sfp_select_interface.
+On Sun, Jan 18, 2026 at 09:30:15AM +0800, David Yang wrote:
+> This patch does not change anything effectively, but serves as a
+> prerequisite for another patch.
 > 
-> This fixes detection of 25G capability for two SFP fiber modules:
-> 
-> - GigaLight GSS-SPO250-LRT
-> - FS SFP-25G23-BX20-I
-
-Are these SFPs or QSFPs?
-
-> Signed-off-by: Josua Mayer <josua@solid-run.com>
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
 > ---
->  drivers/net/phy/sfp-bus.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  drivers/net/dsa/yt921x.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
-> index b945d75966d5..2caa0e0c4ec8 100644
-> --- a/drivers/net/phy/sfp-bus.c
-> +++ b/drivers/net/phy/sfp-bus.c
-> @@ -247,6 +247,7 @@ static void sfp_module_parse_support(struct sfp_bus *bus,
->  	case SFF8024_ECC_100GBASE_LR4_25GBASE_LR:
->  	case SFF8024_ECC_100GBASE_ER4_25GBASE_ER:
->  		phylink_set(modes, 100000baseLR4_ER4_Full);
-> +		phylink_set(modes, 25000baseLR_Full);
+> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+> index 5e4e8093ba16..fe08385445d2 100644
+> --- a/drivers/net/dsa/yt921x.c
+> +++ b/drivers/net/dsa/yt921x.c
+> @@ -707,6 +707,12 @@ static int yt921x_read_mib(struct yt921x_priv *priv, int port)
+>  		WRITE_ONCE(*valp, val);
+>  	}
+>  
+> +	if (res) {
+> +		dev_err(dev, "Failed to %s port %d: %i\n", "read stats for",
+> +			port, res);
+> +		return res;
+> +	}
 
-Given the question above, i'm wondering if it is as simple as this, or
-we need to look at the type of SFP?
+I know you are just moving code around, so i can understand a straight
+cut/paste.
+
+However, when i look at the code, what is the point of %s and the
+constant "read stats for"?
 
 	Andrew
 
