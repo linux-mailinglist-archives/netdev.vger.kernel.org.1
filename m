@@ -1,141 +1,230 @@
-Return-Path: <netdev+bounces-250839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E039DD394E0
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:16:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 167F1D394F2
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EB7C30056D9
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:15:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E89D300B282
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9725322C73;
-	Sun, 18 Jan 2026 12:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9045D234973;
+	Sun, 18 Jan 2026 12:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HicVBiYe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RX9JbIzc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6563A2EDD69
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56E8CA4E
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768738514; cv=none; b=qPhX1MMJLIqnXwJpxZGaTPtBzCvoavyRjUVhshprjOjQnKCzARdXR/5+IaoTt6rgLEmBEojNCwRztQp55UPQ0Onie9NyOS5bVO3v87mzo5e4CLh5qLXColBHI1aC/6qnpY9h+dcxf3MqdWTGY+SacatXLkkQrsFFB7C7Qg/eq9c=
+	t=1768739528; cv=none; b=Wm5f/I1O3OCze87kRmQhMzdeAcvoMiX+sd0E1yZDnL5sZ91huADnS4mZwUgz+B8ecwO0uvpUJDg0OW6y5rdaZ0f4G+QQ7ZzotBqpa+3IKZiBCFKNPP8vHRNWtZ+WIy0zPd/W2vj09MptEm6CsSWWJO5oAxFsCKKQFnkltgyU5SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768738514; c=relaxed/simple;
-	bh=QhL7WC1Zv7OucwsyKUjh2GJfaJlGqkEggth7ZsN+e2E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlrMroYUo12/0HyfcxNWbgLcdNRcq/NWVSypLZcQlgPGj2Z6WjEVwVdoLoi/1orId2CvxAlMXbHTllwdhYzi1tSMQThjWP5DDy3NjXaqcNLbmOHhNOj2Xql0yLIhFpaGp4omq05Tqg0AkJr/Z6Ib+e2u7lCQ1nQtPE3rCKLFsWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HicVBiYe; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1768739528; c=relaxed/simple;
+	bh=XHu82F7uTR3r3wrdSA26znqApoPuEgp+Ef67L5YTaj0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ARjy5dWBtMenup3BpUrCCAytHCAvj1a9FWQ0GHHQwi6fWdOUpVLu66qntND/rFZaoW8iBC3YhF0GrcjTYcTxkdRtkZ/h6BWdI9/zr9AF7WcekPKGM8MjMHs8luDSy5whiQO0qzVceLbbOLAVoVmJEcMOuSqYNoPWlPZW3l5wZgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RX9JbIzc; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-88a35a00502so34890626d6.0
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:15:13 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c53919fbfcso864836085a.2
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:32:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768738512; x=1769343312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QhL7WC1Zv7OucwsyKUjh2GJfaJlGqkEggth7ZsN+e2E=;
-        b=HicVBiYeQo4simt0Tcu7tvdAUq8/wG1ATuWF28CHtJOXFbQc8gOyBQOw/SZtxHM9/T
-         DpZsOKXvVdGTxVU6zjMWqMVgKj6KHegFXTwc2dJUA/QTm/aq/Eed3wJiZxdUCGGdpli8
-         ZCfxWC8kWxUVSeV8jLK8megx3XB1XocuETlfAbqFdIAwBlugdCBh6qbsUHHce+t5+sZF
-         1E8lmsGAkX/n5jdlyrDr6oVuRhIR69oyn8doJTlCWNGuLlkNg1RAWQ6snquQA+l4Ejdj
-         3VeVC4m+F9j2Znm/H5E5TALuhx8C3TRs/p+k+ViQ+/vFtGFSW1d9sAR6wjVl6Z+qfb8U
-         dhwQ==
+        d=google.com; s=20230601; t=1768739526; x=1769344326; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xQFer1o50tJZlORKfOv5x8x5Nn49QkQuW5AEvHfXNBc=;
+        b=RX9JbIzcfuVQHKgmzNBGlSkk7J88xsvmXe+EXRoEPYhZnumznb/RxgVG+8UaK2K25H
+         kU2Yqm9lbZ5Sf+bVvmktTu5PQouJgxJuyFC6PFKpxWJQfsL5gn7hfV4HpctKyD/Bs9Sm
+         kkGtkHUKrrPIpXEhEKWAdEbyCpGfoD7yMFYgT/MuxTNqf6pww2vbm7sVpuNZfrsbBAcS
+         UZPhzZO8ooIRiiyAUdlpbMVK2Wrhmg5NlDeF3rf8XGrMlti7/7mTKe/FKteg9G/0Pe6N
+         Um4SrGsUUOdwSYQdx1u2y5kb90xqG0QrujObgOTMaPUN69J+w6F34KN4ODUHeejmjMFo
+         Wamw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768738512; x=1769343312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QhL7WC1Zv7OucwsyKUjh2GJfaJlGqkEggth7ZsN+e2E=;
-        b=fWAMKSr1ko4222JHqZsmTuBA+eT27bV/ydLgkCiwhgLR4eK9SOznMZBScyZJ2ccZ/r
-         gEGr90s17sk/DcllelD81T1lAKdTTQl4xeoUyP+N5dY+7GzxCkUfMWNAAJ37YVevlg0O
-         5LD3LlfrvZ2378rs/zukOkY5J501vykidQ22uhavKk1p2GU+ZliyYdCbUhZgERQvDKI4
-         9OnOht/i/F+XCPiHQQt0+vhPeaGZkOuJAacilEpT9udVwbB0y4mIAhN6o3aGNRha+xWc
-         dRC59LX8t+odSUXya8pX0WxUALBv987vzOGqR4ELT3RwsCZEgvB/vA75fzq5oCDWewTA
-         0SLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWm86bB5V33geJTIE0gN3GeM6LohOmDhx56snrfi7e6Qx19HrnEoh5EVHhyHY20MpO3hVnNgyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFdzx+Tbcfl8EYGTfeAUORbnFr0RyczWz3gQO+ccpjrIgV63j4
-	f8mTF4pF60+ztxqJhh/drzuf8++pKpvh5AuwPTEQtlMq2CuMsCIm1hZKkKElHIqoKNIj/HcriZw
-	ZOnwlcwpzM8mI27+t0KxyD20rjI+lluzVTtbWUkjU
-X-Gm-Gg: AY/fxX7t/EA7PwK5ItNBpECEc9g3D6BUcTD6R23JUqy1jxgoyfXM8YOOb7pH4+lsgjb
-	U2xdYXvnt3widQ83fWji234oz7qyjazsELpBmhIPJvlX/w4TXOnGAv8l6OEBu9PtDy1iGcbo6dr
-	twoHkn4RFvWl7U/eBBTsI6hhdPw5cpsh+ulTQEHYmxHJbpmqszmlOO+/oH8rcdfeM6B4CKYty/A
-	bzGWQXMA5jbkvjdgrvWrhZM50eOGEkMR6B7noUXft2jGj1hLHDQt5+FtaAHpD3BWx/mel1ukBFA
-	758HMeI=
-X-Received: by 2002:ac8:5a48:0:b0:501:4d61:f02b with SMTP id
- d75a77b69052e-502a1f33411mr97121201cf.59.1768738511937; Sun, 18 Jan 2026
- 04:15:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768739526; x=1769344326;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xQFer1o50tJZlORKfOv5x8x5Nn49QkQuW5AEvHfXNBc=;
+        b=AHzJR2sPoW8EuKl7XRXPWYFB8ehrbBdbnBkCJzzkLVuV/msWOBqgx/GNfgeiiF3oCm
+         46g/pREyCT6f6aouAnrfB2OXsWVxWmUjpY2DoO+9cbzJ411NcNNG95U6p8N8OB34IixD
+         7I81WrCEcK7foQRhzq8/Sji75Dv7nmPClbFSbb4Ol0XfOh2JBtRp6/ECQmVTrRFdSbJV
+         uWHaLRmB+fifXoe5OfKR3zJZYSXaA+5PRU5KhotSMDyjOAGOhzZDBPOIOEp9yw4xyjYS
+         fPPOmAyHcnqabEm5dUc4HXAZLlC2xtgSPrwjHsnsrXva4RH89GAwgx+5HLFsZykuf4lL
+         FNrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUf/mg3AdFCqPkyejzQ/vlczaZZFzj9FFEAN4sxPkG5o7g3PzF/tLydwY1YxY8AaEDq4grFrc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCxngbcMHuRMMfWovDzCKH8ih3MDwL/iG0fpApRNTZITBKC97H
+	D5mtANtnp/GwqQE9Og4kEIW3MnQ9CLjehe8HhZSuc556Lgg2GtgRb55WLmpr/o7QJ6ubnJOuDHR
+	Ej1v3wdDXssqOcA==
+X-Received: from qknsw2.prod.google.com ([2002:a05:620a:4bc2:b0:8c3:9707:a7ad])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:8a08:b0:8c6:a723:77c with SMTP id af79cd13be357-8c6a723082bmr845567585a.60.1768739525908;
+ Sun, 18 Jan 2026 04:32:05 -0800 (PST)
+Date: Sun, 18 Jan 2026 12:32:04 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260117164255.785751-1-kuba@kernel.org> <CANn89iKmuoXJtw4WZ0MRZE3WE-a-VtfTiWamSzXX0dx8pUcRqg@mail.gmail.com>
- <20260117150346.72265ac3@kernel.org>
-In-Reply-To: <20260117150346.72265ac3@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260118123204.2315993-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: move tcp_rate_skb_delivered() to tcp_input.c
 From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 18 Jan 2026 13:15:00 +0100
-X-Gm-Features: AZwV_QhZi1p9UddCn9gEVMrkyuqRiqYsBc8xqoQcVQ8Mmpm30vdSNKtzbqzwEJU
-Message-ID: <CANn89iJ8+5OaWS2VzJqo4QVN6VY9zJvrJfP0TGRGv85mj09kjA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: try to defer / return acked skbs to
- originating CPU
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kuniyu@google.com, ncardwell@google.com, netdev@vger.kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com, andrew+netdev@lunn.ch, 
-	horms@kernel.org
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 18, 2026 at 12:03=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Sat, 17 Jan 2026 19:16:57 +0100 Eric Dumazet wrote:
-> > On Sat, Jan 17, 2026 at 5:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > Running a memcache-like workload under production(ish) load
-> > > on a 300 thread AMD machine we see ~3% of CPU time spent
-> > > in kmem_cache_free() via tcp_ack(), freeing skbs from rtx queue.
-> > > This workloads pins workers away from softirq CPU so
-> > > the Tx skbs are pretty much always allocated on a different
-> > > CPU than where the ACKs arrive. Try to use the defer skb free
-> > > queue to return the skbs back to where they came from.
-> > > This results in a ~4% performance improvement for the workload.
-> >
-> > This probably makes sense when RFS is not used.
-> > Here, RFS gives us ~40% performance improvement for typical RPC workloa=
-ds,
-> > so I never took a look at this side :)
->
-> This workload doesn't like RFS. Maybe because it has 1M sockets..
-> I'll need to look closer, the patchwork queue first tho.. :)
->
-> > Have you tested what happens for bulk sends ?
-> > sendmsg() allocates skbs and push them to transmit queue,
-> > but ACK can decide to split TSO packets, and the new allocation is done
-> > on the softirq CPU (assuming RFS is not used)
-> >
-> > Perhaps tso_fragment()/tcp_fragment() could copy the source
-> > skb->alloc_cpu to (new)buff->alloc_cpu.
->
-> I'll do some synthetic testing and get back.
->
-> > Also, if workers are away from softirq, they will only process the
-> > defer queue in large patches, after receiving an trigger_rx_softirq()
-> > IPI.
-> > Any idea of skb_defer_free_flush() latency when dealing with batches
-> > of ~64 big TSO packets ?
->
-> Not sure if there's much we can do about that.. Perhaps we should have
-> a shrinker that flushes the defer queues? I chatted with Shakeel briefly
-> and it sounded fairly straightforward.
+tcp_rate_skb_delivered() is only called from tcp_input.c.
+Move it there and make it static.
 
-I was mostly concerned about latency spikes, I did some tests here and
-this seems fine.
-(I assume you asked Shakeel about the extra memory being held in the
-per-cpu queue, and pcp implications ?)
+Both gcc and clang are (auto)inlining it, TCP performance
+is increased at a small space cost.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/2 grow/shrink: 3/0 up/down: 509/-187 (322)
+Function                                     old     new   delta
+tcp_sacktag_walk                            1682    1867    +185
+tcp_ack                                     5230    5405    +175
+tcp_shifted_skb                              437     586    +149
+__pfx_tcp_rate_skb_delivered                  16       -     -16
+tcp_rate_skb_delivered                       171       -    -171
+Total: Before=22566192, After=22566514, chg +0.00%
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/tcp.h    |  2 --
+ net/ipv4/tcp_input.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_rate.c  | 44 --------------------------------------------
+ 3 files changed, 44 insertions(+), 46 deletions(-)
+
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 15f9b20f851fe322f4417ff403c3965436aa3f9f..25143f156957288f5b8674d4d27b805e92c592c8 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1356,8 +1356,6 @@ static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
+ void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
+ 
+ /* From tcp_rate.c */
+-void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
+-			    struct rate_sample *rs);
+ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
+ 		  bool is_sack_reneg, struct rate_sample *rs);
+ void tcp_rate_check_app_limited(struct sock *sk);
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 198f8a0d37be04f78da9268a230c9494b50b672a..dc8e256321b03da0ef97b4512d2cb5f202501dfa 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -1637,6 +1637,50 @@ static u8 tcp_sacktag_one(struct sock *sk,
+ 	return sacked;
+ }
+ 
++/* When an skb is sacked or acked, we fill in the rate sample with the (prior)
++ * delivery information when the skb was last transmitted.
++ *
++ * If an ACK (s)acks multiple skbs (e.g., stretched-acks), this function is
++ * called multiple times. We favor the information from the most recently
++ * sent skb, i.e., the skb with the most recently sent time and the highest
++ * sequence.
++ */
++static void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
++				   struct rate_sample *rs)
++{
++	struct tcp_skb_cb *scb = TCP_SKB_CB(skb);
++	struct tcp_sock *tp = tcp_sk(sk);
++	u64 tx_tstamp;
++
++	if (!scb->tx.delivered_mstamp)
++		return;
++
++	tx_tstamp = tcp_skb_timestamp_us(skb);
++	if (!rs->prior_delivered ||
++	    tcp_skb_sent_after(tx_tstamp, tp->first_tx_mstamp,
++			       scb->end_seq, rs->last_end_seq)) {
++		rs->prior_delivered_ce  = scb->tx.delivered_ce;
++		rs->prior_delivered  = scb->tx.delivered;
++		rs->prior_mstamp     = scb->tx.delivered_mstamp;
++		rs->is_app_limited   = scb->tx.is_app_limited;
++		rs->is_retrans	     = scb->sacked & TCPCB_RETRANS;
++		rs->last_end_seq     = scb->end_seq;
++
++		/* Record send time of most recently ACKed packet: */
++		tp->first_tx_mstamp  = tx_tstamp;
++		/* Find the duration of the "send phase" of this window: */
++		rs->interval_us = tcp_stamp_us_delta(tp->first_tx_mstamp,
++						     scb->tx.first_tx_mstamp);
++
++	}
++	/* Mark off the skb delivered once it's sacked to avoid being
++	 * used again when it's cumulatively acked. For acked packets
++	 * we don't need to reset since it'll be freed soon.
++	 */
++	if (scb->sacked & TCPCB_SACKED_ACKED)
++		scb->tx.delivered_mstamp = 0;
++}
++
+ /* Shift newly-SACKed bytes from this skb to the immediately previous
+  * already-SACKed sk_buff. Mark the newly-SACKed bytes as such.
+  */
+diff --git a/net/ipv4/tcp_rate.c b/net/ipv4/tcp_rate.c
+index 98eb346f986ef24969f804c3b55acbf60d2ec299..f0f2ef377043d797eb0270be1f54e65b21673f02 100644
+--- a/net/ipv4/tcp_rate.c
++++ b/net/ipv4/tcp_rate.c
+@@ -34,50 +34,6 @@
+  * ready to send in the write queue.
+  */
+ 
+-/* When an skb is sacked or acked, we fill in the rate sample with the (prior)
+- * delivery information when the skb was last transmitted.
+- *
+- * If an ACK (s)acks multiple skbs (e.g., stretched-acks), this function is
+- * called multiple times. We favor the information from the most recently
+- * sent skb, i.e., the skb with the most recently sent time and the highest
+- * sequence.
+- */
+-void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
+-			    struct rate_sample *rs)
+-{
+-	struct tcp_sock *tp = tcp_sk(sk);
+-	struct tcp_skb_cb *scb = TCP_SKB_CB(skb);
+-	u64 tx_tstamp;
+-
+-	if (!scb->tx.delivered_mstamp)
+-		return;
+-
+-	tx_tstamp = tcp_skb_timestamp_us(skb);
+-	if (!rs->prior_delivered ||
+-	    tcp_skb_sent_after(tx_tstamp, tp->first_tx_mstamp,
+-			       scb->end_seq, rs->last_end_seq)) {
+-		rs->prior_delivered_ce  = scb->tx.delivered_ce;
+-		rs->prior_delivered  = scb->tx.delivered;
+-		rs->prior_mstamp     = scb->tx.delivered_mstamp;
+-		rs->is_app_limited   = scb->tx.is_app_limited;
+-		rs->is_retrans	     = scb->sacked & TCPCB_RETRANS;
+-		rs->last_end_seq     = scb->end_seq;
+-
+-		/* Record send time of most recently ACKed packet: */
+-		tp->first_tx_mstamp  = tx_tstamp;
+-		/* Find the duration of the "send phase" of this window: */
+-		rs->interval_us = tcp_stamp_us_delta(tp->first_tx_mstamp,
+-						     scb->tx.first_tx_mstamp);
+-
+-	}
+-	/* Mark off the skb delivered once it's sacked to avoid being
+-	 * used again when it's cumulatively acked. For acked packets
+-	 * we don't need to reset since it'll be freed soon.
+-	 */
+-	if (scb->sacked & TCPCB_SACKED_ACKED)
+-		scb->tx.delivered_mstamp = 0;
+-}
+-
+ /* Update the connection delivery information and generate a rate sample. */
+ void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
+ 		  bool is_sack_reneg, struct rate_sample *rs)
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
