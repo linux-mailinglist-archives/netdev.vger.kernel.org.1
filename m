@@ -1,133 +1,128 @@
-Return-Path: <netdev+bounces-250776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CAACD3922C
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 03:25:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAD80D3922D
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 03:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD01C300A872
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 02:25:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23985300ACC6
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 02:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E501DE3B5;
-	Sun, 18 Jan 2026 02:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0A71DF987;
+	Sun, 18 Jan 2026 02:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rqt/4Cba"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbUSK2D9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D231D798E
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 02:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FC8500972
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 02:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768703125; cv=none; b=pvAvwJBMgWpFjWHrd8I2n5OZcgz3YUJw1O62uuu/yHqcOltQfrFXb0LH/Y4HKUDvG/P97xkT+bbk/Uas3tArrrmsU+qeNEddHD9r89teF24TjrNf6wKLTdrnuOSw17jfcTMZDlW1GRrjZpaQNw62W/Ly5Labm4qIvdPnXgfw5aE=
+	t=1768703253; cv=none; b=Vz8lwgwTs4w9F8aoFpDe0Juu2yfRd+SZcff61tAXdP7DpejZkbDeOY7n4aFLAwc1mXWawJdevtoqO45k9L6L+U9ZBrk/NSnLscoarQcu24//3cpcA0Ur6z2fcxKzEWxg5YO7rqoyovvrxgpJwqOza4zqBXE7A6IZbZZMoB82a0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768703125; c=relaxed/simple;
-	bh=2BD3JAeeroFtMFLqnpeyffIMVZ/JAGp4c5SerlDlAFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zssu0IIbIzqW12DiSV2wf8HP4cy5o0KyX/UW0oZuJtJ39YC6ZOUzxfdUNFR+1/ovxNGsFlg/g23pMqBBb1F23JBzrLt28nuyo3af+tl/qzOkCVRXc3q/kVO74nV/3wOuBV5PiFHGWyBIIaCvNQopfv53m9qQ4Cs77N9ZkVqbQD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rqt/4Cba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1256EC4CEF7;
-	Sun, 18 Jan 2026 02:25:24 +0000 (UTC)
+	s=arc-20240116; t=1768703253; c=relaxed/simple;
+	bh=XJx7OrWTx8CWXS5JpPnHJFl4mXuiTR+YYFBuo4cagSI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YIYI5+V7NLqnvyPI28cRtNtfhlMUr5XUft1f5C9J7zx0NsscobdsOLk+3BFW5v2a44ydrbqif1u9Q7pkPXmZ43xraV4lUNdeor+/P/jf4cUZqXWeGrIvOzLVp/zeqgQjx4zg/RQO+sgc8T3lgYeOuocwRKYtRWrDEyODxAFIGI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbUSK2D9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DDA8C4CEF7;
+	Sun, 18 Jan 2026 02:27:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768703124;
-	bh=2BD3JAeeroFtMFLqnpeyffIMVZ/JAGp4c5SerlDlAFM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rqt/4Cbas1PSoC4ZtbmgG9Ea9MZFVBfqBINN+fVPdcIpKdgHPjGZ78dsVq4T/Lg0S
-	 vLbpOBtNEVNJZNVVj6w2yywqhtI5zMvWSzsIa8BJqzhzBUTNIKJX46hpqLhjldGBYB
-	 tN+6kkMHK3BmBm9qR4oEjKPD33GlQ+JauHClSXBu8RZCBmYpWVTOzJEvky+WiFa3T5
-	 7LS4tFJiNNW/xyyqKjjgWEzdHF6q23n+dA9HYOBYNlsAzel1/hk3Y1/UEz3LMxfc7X
-	 FRRa5KtlxNyhLYA71pTmuTdaoPYF4g33zR9lxTOWo6WQvCX5uz+sKLqNX0BZTqkXn8
-	 kRhwBaR3qivuQ==
-Date: Sat, 17 Jan 2026 18:25:23 -0800
+	s=k20201202; t=1768703252;
+	bh=XJx7OrWTx8CWXS5JpPnHJFl4mXuiTR+YYFBuo4cagSI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lbUSK2D9RQVjC03OLRLm9cUIlVWfqLNImCiZ2k4pWJSn6fsRhLtcwzpUNHy3uC6HG
+	 M06lfWtLKSpNv0XM7OuBUQkbHCS8v4WdrCKoBMHmBuLRlJXNJ5capa5NY6TyAyuobO
+	 yj+idvclSgLCGWzd5Ar1c/JXbebkp+jWngGO1XXaZEPkwTEHIPqQTouVFcQSs5laqL
+	 l127hF1n2AYnivpDxx/tw6TmkPhgHkrepRJ0ad8cA02ZsuaJedIU2lWproEX+zr9jX
+	 LfnTLPxx01y1HWVpW4mmm1TdKFbfjcKoL8gG0185XlIoawyQnkrYSJkKAVpkgc45Qb
+	 Gg5zhX+kaW32Q==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org, Madhu Chittim
- <madhu.chittim@intel.com>, joshua.a.hay@intel.com, Milena Olech
- <milena.olech@intel.com>, Aleksandr Loktionov
- <aleksandr.loktionov@intel.com>, Samuel Salin <Samuel.salin@intel.com>
-Subject: Re: [PATCH net-next 01/10] idpf: introduce local idpf structure to
- store virtchnl queue chunks
-Message-ID: <20260117182523.6b6c91e7@kernel.org>
-In-Reply-To: <20260115234749.2365504-2-anthony.l.nguyen@intel.com>
-References: <20260115234749.2365504-1-anthony.l.nguyen@intel.com>
-	<20260115234749.2365504-2-anthony.l.nguyen@intel.com>
+To: petrm@nvidia.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	horms@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com
+Subject: Re: [net-next,5/8] net: core: neighbour: Inline neigh_update_notify() calls
+Date: Sat, 17 Jan 2026 18:26:30 -0800
+Message-ID: <20260118022629.1105469-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <e1528224375ebd8789994668a286fb3105dbb2c4.1768225160.git.petrm@nvidia.com>
+References: <e1528224375ebd8789994668a286fb3105dbb2c4.1768225160.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 15 Jan 2026 15:47:38 -0800 Tony Nguyen wrote:
-> +/**
-> + * idpf_queue_id_reg_chunk - individual queue ID and register chunk
+I'm a bit behind so I haven't validated this myself TBH,
+but in the interest of time perhaps you can TAL?
 
-missing the word struct
+This is an AI-generated review of your patch.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: core: neighbour: Make another netlink notification atomically
 
-> + * @qtail_reg_start: queue tail register offset
-> + * @qtail_reg_spacing: queue tail register spacing
-> + * @type: queue type of the queues in the chunk
-> + * @start_queue_id: starting queue ID in the chunk
-> + * @num_queues: number of queues in the chunk
-> + */
-> +struct idpf_queue_id_reg_chunk {
-> +	u64 qtail_reg_start;
-> +	u32 qtail_reg_spacing;
-> +	u32 type;
-> +	u32 start_queue_id;
-> +	u32 num_queues;
-> +};
+This commit moves the netlink notification call in neigh_timer_handler()
+earlier, into the critical section before neigh_probe() releases the lock,
+to fix a race where notifications could reflect stale state.
+
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 635d71c6420f..5512dd7035b1 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+
+[ ... ]
+
+Earlier in the function, when max probes are exhausted, there is this code:
+
+        if ((neigh->nud_state & (NUD_INCOMPLETE | NUD_PROBE)) &&
+            atomic_read(&neigh->probes) >= neigh_max_probes(neigh)) {
+                ...
+                notify = 1;
+                goto out;
+        }
+
+Then the new code places __neigh_notify() here:
+
+> @@ -1180,6 +1180,10 @@ static void neigh_timer_handler(struct timer_list *t)
+>  		if (!mod_timer(&neigh->timer, next))
+>  			neigh_hold(neigh);
+>  	}
 > +
-> +/**
-> + * idpf_queue_id_reg_info - struct to store the queue ID and register chunk
-
-ditto
-
-> + *			    info received over the mailbox
-> + * @num_chunks: number of chunks
-> + * @queue_chunks: array of chunks
-> + */
-> +struct idpf_queue_id_reg_info {
-> +	u16 num_chunks;
-> +	struct idpf_queue_id_reg_chunk *queue_chunks;
-> +};
-
-> +static int
-> +idpf_vport_init_queue_reg_chunks(struct idpf_vport_config *vport_config,
-> +				 struct virtchnl2_queue_reg_chunks *schunks)
-> +{
-> +	struct idpf_queue_id_reg_info *q_info = &vport_config->qid_reg_info;
-> +	u16 num_chunks = le16_to_cpu(schunks->num_chunks);
+> +	if (notify)
+> +		__neigh_notify(neigh, RTM_NEWNEIGH, 0, 0);
 > +
-> +	kfree(q_info->queue_chunks);
-> +
-> +	q_info->num_chunks = num_chunks;
+>  	if (neigh->nud_state & (NUD_INCOMPLETE | NUD_PROBE)) {
+>  		neigh_probe(neigh);
+>  	} else {
+> @@ -1187,10 +1191,8 @@ static void neigh_timer_handler(struct timer_list *t)
+> out:
+>  		write_unlock(&neigh->lock);
+>  	}
+> -
+> -	if (notify) {
+> -		neigh_notify(neigh, RTM_NEWNEIGH, 0, 0);
+> +	if (notify)
+>  		call_netevent_notifiers(NETEVENT_NEIGH_UPDATE, neigh);
+> -	}
 
-AI review complains that this is set before the alloc, so if alloc
-fails the struct is in inconsistent state. I didn't check if this is
-defensive programming or the callers handle this error correctly.
-But seems easy to fix, so maybe let's?
+When the neighbor exhausts max probes and transitions to NUD_FAILED or
+NUD_STALE, the code sets notify = 1 and then does goto out. This jumps
+directly to the out: label, skipping the new __neigh_notify() call.
 
-> +	q_info->queue_chunks = kcalloc(num_chunks, sizeof(*q_info->queue_chunks),
-> +				       GFP_KERNEL);
-> +	if (!q_info->queue_chunks)
-> +		return -ENOMEM;
-> +
-> +	for (u16 i = 0; i < num_chunks; i++) {
-> +		struct idpf_queue_id_reg_chunk *dchunk = &q_info->queue_chunks[i];
-> +		struct virtchnl2_queue_reg_chunk *schunk = &schunks->chunks[i];
-> +
-> +		dchunk->qtail_reg_start = le64_to_cpu(schunk->qtail_reg_start);
-> +		dchunk->qtail_reg_spacing = le32_to_cpu(schunk->qtail_reg_spacing);
-> +		dchunk->type = le32_to_cpu(schunk->type);
-> +		dchunk->start_queue_id = le32_to_cpu(schunk->start_queue_id);
-> +		dchunk->num_queues = le32_to_cpu(schunk->num_queues);
-> +	}
-> +
--- 
-pw-bot: cr
+The old code called neigh_notify() after the out: label, so the netlink
+notification was always sent when notify was set. With this change, the
+goto out path no longer sends the netlink notification to userspace,
+though it still calls call_netevent_notifiers() for kernel-internal
+listeners.
+
+Is this an oversight? Should the __neigh_notify() call be placed before the
+goto out, or should the goto out path have its own __neigh_notify() call?
 
