@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-250911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B39A6D398A1
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 18:52:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0FFD398A2
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 18:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B7EB30088A4
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:52:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F372C3009573
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBF12FD68A;
-	Sun, 18 Jan 2026 17:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07362FD7B3;
+	Sun, 18 Jan 2026 17:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LBCyL86U"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F1PFhJyW"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B542356A4
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03552FD691
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768758740; cv=none; b=aJPdtS3rxaYnt2qaBu4DhLCg/ClkEv7wRNEw519aBIKxpTnvaXqLw7jdHOiH0hOB0SbPhyeob7ziSzMyedZFBD14JAyQz1TWWGPb9jpfGaqDe5paDtRJX64cEHw4pesVdc1cGSOKjyr+YWSkMqBMqakB5o9kW+TCaAfZ5+quXa4=
+	t=1768758743; cv=none; b=NHf9jtC5BtNl9DzMv/9ZOzETiS14Wkp8T8zjveGKOu8vQlQft26HyuyAIqt3ex26cYI3DaZ4nEPLdk65WPcbikS89MEFAPB9H1hQAt0V1NYhzSx2kclpegZBXmh6B4r6a8Km6HnVsn8AZDQ+SXSdRyhCKWDEnNY1j/meevGRWKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768758740; c=relaxed/simple;
-	bh=MOuVqo23n0E8mTJYERWPyLbIOukPssp+mVzANySagYA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tUE2r+OaClR6YVgRheTib8dF10+fC0ZDj6jggchc9lae17nwowiXXvOxHzzqhBAtE17T1iLyRCHD3Mo98Uz5nXwqMfWYjAnLo8p1oibrmOyY/+P5/N9gOzldqGqaL+WdCxSYGFqXoNso4Minn6MGRDj4REyVj80UqaqdCjYWaY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LBCyL86U; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1768758743; c=relaxed/simple;
+	bh=qEG8W+iXPCChN+rsqU7ShDmWYPWBLq9atvzzf+9ff/c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=inc1nsYw6UTIskLJlQ+jNpccZVLrmIFjLBZgwiY1RBjzAP9KWRaRhEH/l1cTfqrEfiwX9I/uXbRxOcRFouocN/I+fHCVei2VUXITFxLY1Uzz9d5tuq1U0qyT01QhNtbN6KE2T2R+J3nvzmjodsvty2gSExm3uNASasptyfeWWcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F1PFhJyW; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-78f92e123f5so47969697b3.2
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 09:52:19 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-78d694a1eb2so36336427b3.0
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 09:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768758738; x=1769363538; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0soLYoLD2HEfbC5aYG8vVqwAVSj2C6MMeQGZIYPijrU=;
-        b=LBCyL86U6dpsv5G8O5/+y1hst38gDNZ60Mp287kBVd1XRg/kqsf5xu5czcr8ROs10e
-         ISiFDXchqrm5gXu9JzYpiHyBVzT5NTadFVaykyqk1wzrT4BWa+RzefR7X5LDM15QTF08
-         xMNGDToSuz75deGRa3OWSKwaCs5ANPZNwcrbyNRmVszNQikL2vtyt9kW/6pupo1P7nJG
-         tEI+MKKPLsZCppDjTrAsPOHCb6lSgUqVmdxovg/I5xR24o06DN3tRgULg4+MBS39a3mh
-         xh2tyHn9PTkQefCItI9n0PzNJILJn8iDPqOudTBc/ryP8GKnw6m3YF7A+NiTaZJNsbB7
-         ddfQ==
+        d=google.com; s=20230601; t=1768758740; x=1769363540; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PsOFJn4EZiKQ337yr9Dz5asIEvy6XfYTAcnE7gOIqmc=;
+        b=F1PFhJyWYtU2hTR10n3m7ukzO76PB4OJ1Opt0rdFHs42Q1533VSRL7+Ai06OID8CUv
+         LY/edur9XovUMLWriOmAzquBMO6Ng2ZaWqxdy/4Q6GqzwGqr0iGjDxBoaZ3vO3A8RqvP
+         +511UBcY0MYc82q2S7TsgBBxNAuAfhfASqgrgliRPL+K06NHvG8uzrYS8HG7lWcSqz22
+         MIdXdG4awIFPFAH1Qp7x0ie34nA1jSKWc4MUDIgNz8rw+VHSEjlD1TfZwtNBW0n7TaRE
+         scqaxfUsdJ2bJO00HkW57AxTMKXZGfZ35PeUpJl/m3HtFxreJLvveZH+Drf66/CTzuUv
+         MMXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768758738; x=1769363538;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0soLYoLD2HEfbC5aYG8vVqwAVSj2C6MMeQGZIYPijrU=;
-        b=tZhn+Cq2IUMcI337qntbSOQI+5CnMU9TnsIm9rKpGoMq1YnoMXvi9vivPvGmQ5Bh7/
-         EzoEtI5WkfK97LJ9CJgIbL6mEI26wS3n4xLh83BQyxkHV6rp8AZovZe6DskfHMKkLHHU
-         oH02W0DToI3jvz1f6UP/GPqVImIJf1aLK82d2emBQ4SI2oz0zaOFbjTT3hflRl2KY+/3
-         B8stAPfsahyeEOSzIMYvSK1Q6L4QTxhnZ5l1Q5RekQtKcHWgTFQSHOMsDv5CiV/OhMKW
-         9CKquDMhG310JJqsMp79HG8ptix3SBLFWEM3X1RVO2eO7eeTIwIl49ZEmktnbJczZIbD
-         +I+w==
-X-Forwarded-Encrypted: i=1; AJvYcCWTFXfFedgex66S0O6e3S1M1BAH1ea7Ga/3cpIu8z7OG0eWrQ5CjOTuHZI9ZjKA/jHQEZ+5nyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZCj5bIwQRv4F0FfHrN+Q0bIPQIBqE3KOXfWE4iH3D0Rl5ALcC
-	2dPxZSxntBp9SKF2qA/TZJFBlQ5z12LLGa8B32bzgsN1wr/DJkznX2Jtw2YdLladq50h73uGxiY
-	tK3TS/VPH7sAygw==
-X-Received: from yxse4.prod.google.com ([2002:a53:d804:0:b0:649:2245:becc])
+        d=1e100.net; s=20230601; t=1768758740; x=1769363540;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PsOFJn4EZiKQ337yr9Dz5asIEvy6XfYTAcnE7gOIqmc=;
+        b=MKRslTnRV4d+ubMQk07z3G4PFlT9y7ZFDNO+EPx5wrz6iW+LM+7XFzh9Sr9B1S98U6
+         RUo47jIPFGcg6vtwv+FsLqf54uQWqxMANB+UFIKIS7miFnRxVRz2rjnsNiP49p4y8Fh4
+         hg5ugOIcl89k37Nfwj25KBrWsBewaMSY4M1Tk3KwoktvE6TDmd28/w3WqzJYkC1tnbHf
+         /g0DhRJM1hM6z1yhfiYYQs171AfhteoB6RmZ5dtevJHkSD/lPmmbEGR9oCrXEOksn+HT
+         utKx4JO6RpP/0oh3KMIxwGdMtfQ52wree1AV+wJzcYJpFIl+wHAGWbK95g7ro/dcWt/t
+         OD2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXhucCwVBFNQkD2JqE5EDdIFQkfTpBfRUsTGq4ypdu6Z5uL5rr+iER4JlJSUFH4y97Gf8jPF1M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yybs831EMmfuLDqYNvUdY1sItboauN1udMSkWSwAnyX0h8iemUP
+	yX4pBcI+5ZMVzvzoz2fI3NR1HdgCm7xkKzblRjYyI1987xc5gqO0x97GOQ+2jI2XQco/AMWOOLv
+	mGZgTMrcqEDWIyA==
+X-Received: from yxzz17-n1.prod.google.com ([2002:a05:690e:1551:10b0:646:e5d7:6a37])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690e:1506:b0:649:2589:fa04 with SMTP id 956f58d0204a3-6492589fe00mr3404265d50.1.1768758738259;
- Sun, 18 Jan 2026 09:52:18 -0800 (PST)
-Date: Sun, 18 Jan 2026 17:52:12 +0000
+ 2002:a05:690c:c512:b0:789:61ca:88f6 with SMTP id 00721157ae682-793c523ce57mr160830907b3.4.1768758739697;
+ Sun, 18 Jan 2026 09:52:19 -0800 (PST)
+Date: Sun, 18 Jan 2026 17:52:13 +0000
+In-Reply-To: <20260118175215.2871535-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260118175215.2871535-1-edumazet@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260118175215.2871535-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/3] gro: inline tcp6_gro_{receive,complete}
+Message-ID: <20260118175215.2871535-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/3] net: always inline __skb_incr_checksum_unnecessary()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -77,51 +80,37 @@ Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On some platforms, GRO stack is too deep and causes cpu stalls.
+clang does not inline this helper in GRO fast path.
 
-Decreasing call depths by one shows a 1.5 % gain on Zen2 cpus.
-(32 RX queues, 100Gbit NIC, RFS enabled, tcp_rr with 128 threads and 10,000 flows)
+We can save space and cpu cycles.
 
-We can go further by inlining ipv6_gro_{receive,complete}
-and take care of IPv4 if there is interest.
-
-Note: two temporary __always_inline will be replaced with
-      inline_for_performance when available.
-
-v2: dealt with udp6_gro_receive()/udp6_gro_complete()
-    missing declarations (kernel test robot <lkp@intel.com>)
-    for CONFIG_MITIGATION_RETPOLINE=n
-
-Cumulative size increase for this series (of 3):
-
-$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.3
-add/remove: 2/2 grow/shrink: 5/1 up/down: 1572/-471 (1101)
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.1
+add/remove: 0/2 grow/shrink: 2/0 up/down: 156/-218 (-62)
 Function                                     old     new   delta
-ipv6_gro_receive                            1069    1846    +777
-ipv6_gro_complete                            433     733    +300
-tcp6_check_fraglist_gro                        -     272    +272
-tcp6_gro_complete                            227     306     +79
+tcp6_gro_complete                            227     311     +84
 tcp4_gro_complete                            325     397     +72
-ipv6_offload_init                            218     274     +56
-__pfx_tcp6_check_fraglist_gro                  -      16     +16
 __pfx___skb_incr_checksum_unnecessary         32       -     -32
 __skb_incr_checksum_unnecessary              186       -    -186
-tcp6_gro_receive                             959     706    -253
-Total: Before=22592724, After=22593825, chg +0.00%
+Total: Before=22592724, After=22592662, chg -0.00%
 
-Eric Dumazet (3):
-  net: always inline __skb_incr_checksum_unnecessary()
-  gro: inline tcp6_gro_receive()
-  gro: inline tcp6_gro_complete()
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/linux/skbuff.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- include/linux/skbuff.h   |  2 +-
- include/net/gro.h        |  5 ++---
- include/net/tcp.h        |  2 --
- net/ipv6/Makefile        |  2 +-
- net/ipv6/ip6_offload.c   | 43 ++++++++++++++++++++--------------------
- net/ipv6/tcpv6_offload.c | 12 +++++------
- 6 files changed, 31 insertions(+), 35 deletions(-)
-
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 86737076101d4a8452e90fe78adcdcfdefb79169..e6bfe5d0c5252b2e7540e1fef9317aab83feced2 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4763,7 +4763,7 @@ static inline void __skb_decr_checksum_unnecessary(struct sk_buff *skb)
+ 	}
+ }
+ 
+-static inline void __skb_incr_checksum_unnecessary(struct sk_buff *skb)
++static __always_inline void __skb_incr_checksum_unnecessary(struct sk_buff *skb)
+ {
+ 	if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
+ 		if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
 -- 
 2.52.0.457.g6b5491de43-goog
 
