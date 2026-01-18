@@ -1,124 +1,162 @@
-Return-Path: <netdev+bounces-250892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895C8D3975E
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:15:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D20ED3976C
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1F81300724C
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:15:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F39003004512
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4653733342E;
-	Sun, 18 Jan 2026 15:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F51532E739;
+	Sun, 18 Jan 2026 15:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxYhoSao"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A/U93Q4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEA5A41
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8BF284671
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768749328; cv=none; b=tca2s74jCxmFXLRyRss3slUMhL+0TSqD0b3oU/Zb4Er79ULPIPIBi7+qjCCD/i9uln0EhbfuybuUJqugXt0LnpeQqtrMGiBbhzbVgFjAxpZxPJbps9DZHWggdqm3DacA+hz12go+qNHXJNj8JhZ4eUA3e9AoBSoBXwuCXMQcyxk=
+	t=1768749899; cv=none; b=KWCqpPgdxVDYURWRu0QbCCY87NBTcBYfk7EfdiagBVd6o1lc2JFsR/J1GCd7C98BMSNbSru+EmW3Q+3zs3APD08eNnUy1OoRwALv3mp6Y53lDPNReNr4jIiitlq1WjCZR/poYpwQ93iAGmeMWkNlwDThr1vGMnVY+oPrZxooov4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768749328; c=relaxed/simple;
-	bh=Vh+GAtBl7HAnqugz8MWAJsOzLN95UAPEEh8yzwvGASY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GtK1WLX9FdI/aPmklCURqTMs0pt6B6OFpv6r95Uk39bhlq1W5FX5II9a1sKmX3guwQnh8sZ5tVhzKampwNP7V3nen4Do6a55FVDxIR3Au/7Q7Er5E5ZAwCC8OM1n7xQOkAr3+uSFS4vrGdWZFxAmfmSxH+3GJZK1VPHndHDOXnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MxYhoSao; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-81ef4b87291so1807977b3a.0
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:15:26 -0800 (PST)
+	s=arc-20240116; t=1768749899; c=relaxed/simple;
+	bh=VHmiJuMJbPDpWxV4IYXEc28L56C4UEafSbGq24gbvpc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rlCmd8JJyZsxouPD6f/0nzfjXP5DJk3bbig9bqBDKxexq1/hIkYK1we1jFsrx7TlLJy9osKc92F60fzkr7p4Xaj95qZhxLWytmUOT0OCxpiShedgzZRWRCp+lrivQqiTvY13FyefOk1TSPvWVWkh2BryQOqDJLpUvicFeVRY+J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A/U93Q4D; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6a87029b6so564067585a.1
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:24:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768749326; x=1769354126; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VDuxeJ3zGZzz2StfINBnfIwS/QxkpqVo4B4BfFpkzgA=;
-        b=MxYhoSaos57pxyBailkHIkmrgBjTXBVShu6HmS1+d3ifKrm1WLcU++Ka6oj3WetQLB
-         RGWMdiu8lH0C8y/77vOqQ3G8A10GA/XbbRs6Af/PpAnPfezpmojkVuj/TPtqlMQMRsrC
-         xsP2peRrudMGKsXvdC0leqSzcUNG6X7K/1F+d2GVEm2qHY+bGYd/F2NFai24PhU4jO8z
-         sjx5If8GVWKBPdg2eMGYnpbis4tRuqk96maS3V/A+7qK0n5p0ykKUlW+4yC8ZooyoOqu
-         tgIvQSmBTZShWVEN89yFQ6xdAo69lnTcaAMxvB1nIz8iLBwkNItBYtE/4G7N4rSorJ0p
-         2KyQ==
+        d=google.com; s=20230601; t=1768749897; x=1769354697; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2LHv3OrSa9OqYQbqrtUVrMolbL3HFUqKriN4YFc7z+I=;
+        b=A/U93Q4Dvmo390GXhKWWL3r1pzJCGt0IzXXdazndzPK3M3VoBjWFLDFAGG8nKVgdWG
+         pVc7ng92QRVzJSDgTBeNipF/rQGDIKlqUm2lJyTqFhJM4zeaKiwFVQaCr8+RtKZE0/kx
+         v1XiukK576dw6AROa10+oQDCZLHVDbJi+mKWafwoqz9Ot+d0llGD7U6DGJMwCg4exIj9
+         2yslnS0zannmaC4GB8gHaQGVOP5ShugvAXzTA1Cdxo06nCnNchK9F0Mpr2q+yCbnkm0U
+         NBfyaILVYqnD1Fc/t3rKSvJkMZP/NKkhTfCUsd3oj0oULrxp6LbwXdZEP0sT2UKaso3R
+         ZTRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768749326; x=1769354126;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VDuxeJ3zGZzz2StfINBnfIwS/QxkpqVo4B4BfFpkzgA=;
-        b=YKCWq6wcbwTH+rGdN4UYMj9JYgroOZOyCfPTzGRs2E9WXP6fCr9/8t6JfBiCh8uon5
-         g0P0xI3aaPlaB8HWYsWNju/Z7rbdF7VyvyTFpVMkejdyk98sW/ViVoe7MWt4qjzO792x
-         NL8DVnBFeq7AvcpTG4z7bxYleYwrJwsigah5EpDFu2z52gaK7aSzaTNoi8RIF/4DA3uT
-         P/VXbveOc/hqTWbXEIR1jpqDCr+5mNY+2SEvPOSkNV9L/0HfNxEPQXeM71tTbN1TPPVK
-         lD0o923h90jGCorU/j1AJwlKbmgzmZ+dYRN9QVgzNPt+uzQQRHUVdv2NHnx2tRzOXdB9
-         ajMw==
-X-Forwarded-Encrypted: i=1; AJvYcCX613hEQV4UiA/sjvWOWi+jOKCOgbqtJ1wEcNYcXZuue234CNichVNmjDnJuOJUxsmePapPtQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTPO8ye+6TgU4fylZBWh5PG8QyuRY3taC4yaDzKkp+anOH2q6q
-	vX83cXv8Fq8aeNhuNOke0TqNd8RrE78CCOH3fa/udK7lxmd4Y5IjrDoe
-X-Gm-Gg: AY/fxX59QmC2X5RZw8+kvZ1bQvmWFlSz+WLKXlGwEhKBdvYzKJLFOhsVRuPvwRVJnL3
-	OcHErtW6wLvxLkPCZhkJM/tu7LQxXsueSqwOf7at31Z828e+SJdmkRoivJzoOO38VW8fv7e7fPe
-	2EIILAVkcprfe/n8Lr1ARJYYJ72OD3t6yHI8vy+iFSIqO4lVH7NPjZdYUBatTupaUcskHvhtXVt
-	LPrnb2DA7wc5SRcJ9VUMJO71bdYr6Fet4TGz6opZg+JmfAybxNmHX+WzxT75ejFhtVqGsfj/3tj
-	GFBFwymgzwe0xwq0nHyfKsyqyoAzlQ/gcTCN96yeF++v5Q9lBd3sPhnYhR6hV0puVVpClGD3Zq+
-	iPNjnVZgRxjVpUxWV8iM3A3ClYTkg8XEEKGs7vmF4h1f9sLjZpKCVZd3hh6rjAD99+tkk4CFovd
-	0=
-X-Received: by 2002:a05:6a00:22c8:b0:81c:446d:6bd0 with SMTP id d2e1a72fcca58-81f9fbf102fmr7761652b3a.23.1768749326272;
-        Sun, 18 Jan 2026 07:15:26 -0800 (PST)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81fa10bcf66sm6835603b3a.18.2026.01.18.07.15.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jan 2026 07:15:25 -0800 (PST)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: ap420073@gmail.com
-Subject: [PATCH net] selftests: net: amt: wait longer for connection before sending packets
-Date: Sun, 18 Jan 2026 15:14:50 +0000
-Message-ID: <20260118151450.776858-1-ap420073@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1768749897; x=1769354697;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2LHv3OrSa9OqYQbqrtUVrMolbL3HFUqKriN4YFc7z+I=;
+        b=CC7ox2+N7nWf5rf+7x1bf3qwrBcKOgzrefMgF2mNiQ6E9i7ome+byiZeg3LRcaVqcp
+         iDpm8kxWRHIPGgm2qIoPF+elzLR0/PKFJhywUbHAUGtIr01Z0HA/+j+KXCNtVAfuv7hV
+         ZJOvG0ex2XIfOrxq7E3mGLX43D4wHmdq9dPKLG0oGXqs7wGj7HJJb4ikROgRisTgykco
+         d3QwiMdUOVpl1gFB14ibYxAlHnBTgo86O3qlktQzMwjv521VebFim9PkvXDlwH5eUcIa
+         fNMb7GBClD9rOvQWG/ONdxNC7zq1X1rXXJQJh8lj7/e+zkCU/j1BX/xOdAFPYbcTMJnu
+         YUqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXY+Rse7G7JADrASkyBL+xf0Wfp2ccRFe6VWQRe/fmqbwmAPXOOa2GgcV1rTRWlTlL9wDV077o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymfV2v6urqE/A3FKxttzv4GOTg+lOmtrGbbP6dA0iJq0utSKGr
+	QMD0cuSFLKW23BEVx6/oVVQjyF3KDaxvyFgPwKZ9ScU55iYvfytlKEfXboN8wp03b6YnTJw28ui
+	Mo+ozGOQW5lieKw==
+X-Received: from qkaj7.prod.google.com ([2002:a05:620a:a47:b0:8c5:308b:42d0])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:191e:b0:8b2:ec00:7840 with SMTP id af79cd13be357-8c6a6704482mr1232976285a.27.1768749897014;
+ Sun, 18 Jan 2026 07:24:57 -0800 (PST)
+Date: Sun, 18 Jan 2026 15:24:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260118152448.2560414-1-edumazet@google.com>
+Subject: [PATCH] compiler_types: Introduce inline_for_performance
+From: Eric Dumazet <edumazet@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Nicolas Pitre <npitre@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
 
-There is a sleep 2 in send_mcast4() to wait for the connection to be
-established between the gateway and the relay.
+inline keyword is often ignored by compilers.
 
-However, some tests fail because packets are sometimes sent before the
-connection is fully established.
+We need something slightly stronger in networking fast paths
+but __always_inline is too strong.
 
-So, increase the waiting time to make the tests more reliable.
+Instead, generalize idea Nicolas used in commit d533cb2d2af4
+("__arch_xprod64(): make __always_inline when optimizing for performance")
 
-Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+This will help CONFIG_CC_OPTIMIZE_FOR_SIZE=y users keeping
+their kernels small.
+
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/176847720679.3956289.12601442580224129560.git-patchwork-notify@kernel.org/T/#m2d7e201372a8aae1ce62a0b548e55fd4fe804909
+Cc: Nicolas Pitre <npitre@baylibre.com>
 ---
- tools/testing/selftests/net/amt.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/include/asm/div64.h   |  6 +-----
+ include/asm-generic/div64.h    |  6 +-----
+ include/linux/compiler_types.h | 10 ++++++++++
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
-index 3ef209cacb8e..fe2497d9caff 100755
---- a/tools/testing/selftests/net/amt.sh
-+++ b/tools/testing/selftests/net/amt.sh
-@@ -246,7 +246,7 @@ test_ipv6_forward()
+diff --git a/arch/arm/include/asm/div64.h b/arch/arm/include/asm/div64.h
+index d3ef8e416b27d22d38bf084e091b0e4795f74bd4..877dfc4c4c7344849eec2109b66c2825561719dc 100644
+--- a/arch/arm/include/asm/div64.h
++++ b/arch/arm/include/asm/div64.h
+@@ -52,11 +52,7 @@ static inline uint32_t __div64_32(uint64_t *n, uint32_t base)
  
- send_mcast4()
+ #else
+ 
+-#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+-static __always_inline
+-#else
+-static inline
+-#endif
++static inline_for_performance
+ uint64_t __arch_xprod_64(uint64_t m, uint64_t n, bool bias)
  {
--	sleep 2
-+	sleep 5
- 	ip netns exec "${SOURCE}" bash -c \
- 		'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
- }
+ 	unsigned long long res;
+diff --git a/include/asm-generic/div64.h b/include/asm-generic/div64.h
+index 25e7b4b58dcf55a395b9db72e01f2cd220da58a0..9893356fff55679304f68833c11c8ae9052b9cea 100644
+--- a/include/asm-generic/div64.h
++++ b/include/asm-generic/div64.h
+@@ -134,11 +134,7 @@
+  * Hoping for compile-time optimization of  conditional code.
+  * Architectures may provide their own optimized assembly implementation.
+  */
+-#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+-static __always_inline
+-#else
+-static inline
+-#endif
++static inline_for_performance
+ uint64_t __arch_xprod_64(const uint64_t m, uint64_t n, bool bias)
+ {
+ 	uint32_t m_lo = m;
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index d3318a3c257775d4f44e8f2eb7911ac52eefecc5..58b3de1f4c2540b6ffabd916948396ac8df9ba8f 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -248,6 +248,16 @@ struct ftrace_likely_data {
+  */
+ #define inline inline __gnu_inline __inline_maybe_unused notrace
+ 
++/*
++ * Compilers might decide to ignore inline hint.
++ * Functions that are performance critical can use inline_for_performance.
++ */
++#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
++#define inline_for_performance __always_inline
++#else
++#define inline_for_performance
++#endif
++
+ /*
+  * gcc provides both __inline__ and __inline as alternate spellings of
+  * the inline keyword, though the latter is undocumented. New kernel
+
+base-commit: e84d960149e71e8d5e4db69775ce31305898ed0c
 -- 
-2.43.0
+2.52.0.457.g6b5491de43-goog
 
 
