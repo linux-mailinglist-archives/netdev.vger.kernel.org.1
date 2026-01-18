@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-250893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D20ED3976C
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:25:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FB3D3976F
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F39003004512
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:24:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0073530019ED
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F51532E739;
-	Sun, 18 Jan 2026 15:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66BA31ED66;
+	Sun, 18 Jan 2026 15:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A/U93Q4D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YqwhWPO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8BF284671
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFB7339857
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768749899; cv=none; b=KWCqpPgdxVDYURWRu0QbCCY87NBTcBYfk7EfdiagBVd6o1lc2JFsR/J1GCd7C98BMSNbSru+EmW3Q+3zs3APD08eNnUy1OoRwALv3mp6Y53lDPNReNr4jIiitlq1WjCZR/poYpwQ93iAGmeMWkNlwDThr1vGMnVY+oPrZxooov4=
+	t=1768750184; cv=none; b=ZFRZeooB8XM9/e5Xwzn6S1R4XeL13c8VgRX0OT8+wJ147x4obBs1wqw/cX+48oOSjwlMg90rGSgEZvn1+rs7VPzBuYgjPKTK4HPZSRJQ6W92Txx7sIh8Xp4CiScihwEeGKFKJwI5bARfu13GibghBaBy0zDHgkrXQFb8fAIageY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768749899; c=relaxed/simple;
-	bh=VHmiJuMJbPDpWxV4IYXEc28L56C4UEafSbGq24gbvpc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rlCmd8JJyZsxouPD6f/0nzfjXP5DJk3bbig9bqBDKxexq1/hIkYK1we1jFsrx7TlLJy9osKc92F60fzkr7p4Xaj95qZhxLWytmUOT0OCxpiShedgzZRWRCp+lrivQqiTvY13FyefOk1TSPvWVWkh2BryQOqDJLpUvicFeVRY+J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A/U93Q4D; arc=none smtp.client-ip=209.85.222.201
+	s=arc-20240116; t=1768750184; c=relaxed/simple;
+	bh=bShlVpj4pB52s2txpgx0hP1V22Ovxrd/vun45LLiAJ4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pSaN+ZOzUecsQDfvZrkt2UAtACG9PSt//xPUIhsVVh+SvrLmDkBRp6CVomqgzFctOK47SGnW57kl2naibqrm++pi7cIDg5+Px+b6GDiUB4ZBHb5SA+9LrQS86RP48jjsCgPvsfx7+x6YJUt3dwi/+afm1/vedMEFf8cjeeLzfrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YqwhWPO6; arc=none smtp.client-ip=74.125.224.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6a87029b6so564067585a.1
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:24:57 -0800 (PST)
+Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-648f70e3483so6045925d50.1
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:29:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768749897; x=1769354697; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768750182; x=1769354982; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=2LHv3OrSa9OqYQbqrtUVrMolbL3HFUqKriN4YFc7z+I=;
-        b=A/U93Q4Dvmo390GXhKWWL3r1pzJCGt0IzXXdazndzPK3M3VoBjWFLDFAGG8nKVgdWG
-         pVc7ng92QRVzJSDgTBeNipF/rQGDIKlqUm2lJyTqFhJM4zeaKiwFVQaCr8+RtKZE0/kx
-         v1XiukK576dw6AROa10+oQDCZLHVDbJi+mKWafwoqz9Ot+d0llGD7U6DGJMwCg4exIj9
-         2yslnS0zannmaC4GB8gHaQGVOP5ShugvAXzTA1Cdxo06nCnNchK9F0Mpr2q+yCbnkm0U
-         NBfyaILVYqnD1Fc/t3rKSvJkMZP/NKkhTfCUsd3oj0oULrxp6LbwXdZEP0sT2UKaso3R
-         ZTRw==
+        bh=nIBB0Ti9FT7xMDL0AI4YSly1VfYPMeTn0yKoc96NmF0=;
+        b=YqwhWPO6w0gFZWdJ8nqKw0CbSIVH8qLayhVjcPTHXKyMjcQ5StvuSp8oLt1GK3Hnph
+         ibUkh2Z4KskJ0vTeYBlJTWlOLTk+u+qZgz/E9eSY8bkNAr4AIFlLh0WR/WMrabPbj5Ws
+         tvl42zHkDzMD8+MjPXspSQWkssk0/VIXZJ1iWsyLsF718WXVY3CoYhlsY3tlICNspz4a
+         r57xVhkui5Aq0xDIe+o4k8M3PE7WE8wKAIMCu6aZzhpLx6gnoY3uGdLtrMzS1g30sasG
+         FTbnoytvLkdXlFmDdPFycXLl5Vg9t+7QdsrGfMCma4NwftwkBYYERPrX+Nqzxb+cLiMl
+         Ul3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768749897; x=1769354697;
+        d=1e100.net; s=20230601; t=1768750182; x=1769354982;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2LHv3OrSa9OqYQbqrtUVrMolbL3HFUqKriN4YFc7z+I=;
-        b=CC7ox2+N7nWf5rf+7x1bf3qwrBcKOgzrefMgF2mNiQ6E9i7ome+byiZeg3LRcaVqcp
-         iDpm8kxWRHIPGgm2qIoPF+elzLR0/PKFJhywUbHAUGtIr01Z0HA/+j+KXCNtVAfuv7hV
-         ZJOvG0ex2XIfOrxq7E3mGLX43D4wHmdq9dPKLG0oGXqs7wGj7HJJb4ikROgRisTgykco
-         d3QwiMdUOVpl1gFB14ibYxAlHnBTgo86O3qlktQzMwjv521VebFim9PkvXDlwH5eUcIa
-         fNMb7GBClD9rOvQWG/ONdxNC7zq1X1rXXJQJh8lj7/e+zkCU/j1BX/xOdAFPYbcTMJnu
-         YUqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXY+Rse7G7JADrASkyBL+xf0Wfp2ccRFe6VWQRe/fmqbwmAPXOOa2GgcV1rTRWlTlL9wDV077o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymfV2v6urqE/A3FKxttzv4GOTg+lOmtrGbbP6dA0iJq0utSKGr
-	QMD0cuSFLKW23BEVx6/oVVQjyF3KDaxvyFgPwKZ9ScU55iYvfytlKEfXboN8wp03b6YnTJw28ui
-	Mo+ozGOQW5lieKw==
-X-Received: from qkaj7.prod.google.com ([2002:a05:620a:a47:b0:8c5:308b:42d0])
+        bh=nIBB0Ti9FT7xMDL0AI4YSly1VfYPMeTn0yKoc96NmF0=;
+        b=lVdtfqSmvc5z0410N2CsUR60/Z25Mr/B2eNgF4YnWkcCUWhMwAQDlwp3AfhFfR3DG7
+         YHmjXJ9CgWfuWZyny1+VBGTuM1iZ3w6HRKWkQZvA72E3D8/+LHXynPoAmIAVm7zTdcUj
+         c3BhlLM0hXqW1pmvc7JRmrIqz9Majcm4JmbPSO1Ga5FOTfrjHBLyQCoQE43i9Cxr/G47
+         szEqKgB38k0W4G7SKlnFFLi9xLaqtmDQjA8PniDrL0w2gr2n8huvBG2fP3IBMsBke2by
+         4mYWjn3RHxHp5N08OiDB4gbwTRwJVN/b1Ok6Q8owSXkW81kC2Aru560E7DAoOvEti4tp
+         88UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5RjOFH44vQ/pJN+LQOcaXJfKQxxW/2xEFg6xbCbizIZEx15BznKE4pISKJxHuumsMpnFFmUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfSkPqZMmlRxWNZcBwmBjn5TOF29sUq0CRouHGk6WqWg5rBHok
+	2vSZdXBN8DPmd5qkZ215kiIuHsgh6J6GBpEamVms7X0IFudweNEKrx3Vo1qCxZzqdYpmo6nSL0y
+	ZNL5tLnVUovxK+w==
+X-Received: from yxup2.prod.google.com ([2002:a53:ee82:0:b0:640:d681:9c24])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:191e:b0:8b2:ec00:7840 with SMTP id af79cd13be357-8c6a6704482mr1232976285a.27.1768749897014;
- Sun, 18 Jan 2026 07:24:57 -0800 (PST)
-Date: Sun, 18 Jan 2026 15:24:48 +0000
+ 2002:a05:690e:bce:b0:645:5207:10ef with SMTP id 956f58d0204a3-6490a605415mr7620793d50.18.1768750182033;
+ Sun, 18 Jan 2026 07:29:42 -0800 (PST)
+Date: Sun, 18 Jan 2026 15:29:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,94 +68,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260118152448.2560414-1-edumazet@google.com>
-Subject: [PATCH] compiler_types: Introduce inline_for_performance
+Message-ID: <20260118152941.2563857-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: annotate data-race in ndisc_router_discovery()
 From: Eric Dumazet <edumazet@google.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Nicolas Pitre <npitre@baylibre.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot <syzkaller@googlegroups.com>, Rocco Yue <rocco.yue@mediatek.com>
 Content-Type: text/plain; charset="UTF-8"
 
-inline keyword is often ignored by compilers.
+syzbot found that ndisc_router_discovery() could read and write
+in6_dev->ra_mtu without holding a lock [1]
 
-We need something slightly stronger in networking fast paths
-but __always_inline is too strong.
+This looks fine, IFLA_INET6_RA_MTU is best effort.
 
-Instead, generalize idea Nicolas used in commit d533cb2d2af4
-("__arch_xprod64(): make __always_inline when optimizing for performance")
+Add READ_ONCE()/WRITE_ONCE() to document the race.
 
-This will help CONFIG_CC_OPTIMIZE_FOR_SIZE=y users keeping
-their kernels small.
+Note that we might also reject illegal MTU values
+(mtu < IPV6_MIN_MTU || mtu > skb->dev->mtu) in a future patch.
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
+[1]
+BUG: KCSAN: data-race in ndisc_router_discovery / ndisc_router_discovery
+
+read to 0xffff888119809c20 of 4 bytes by task 25817 on cpu 1:
+  ndisc_router_discovery+0x151d/0x1c90 net/ipv6/ndisc.c:1558
+  ndisc_rcv+0x2ad/0x3d0 net/ipv6/ndisc.c:1841
+  icmpv6_rcv+0xe5a/0x12f0 net/ipv6/icmp.c:989
+  ip6_protocol_deliver_rcu+0xb2a/0x10d0 net/ipv6/ip6_input.c:438
+  ip6_input_finish+0xf0/0x1d0 net/ipv6/ip6_input.c:489
+  NF_HOOK include/linux/netfilter.h:318 [inline]
+  ip6_input+0x5e/0x140 net/ipv6/ip6_input.c:500
+  ip6_mc_input+0x27c/0x470 net/ipv6/ip6_input.c:590
+  dst_input include/net/dst.h:474 [inline]
+  ip6_rcv_finish+0x336/0x340 net/ipv6/ip6_input.c:79
+...
+
+write to 0xffff888119809c20 of 4 bytes by task 25816 on cpu 0:
+  ndisc_router_discovery+0x155a/0x1c90 net/ipv6/ndisc.c:1559
+  ndisc_rcv+0x2ad/0x3d0 net/ipv6/ndisc.c:1841
+  icmpv6_rcv+0xe5a/0x12f0 net/ipv6/icmp.c:989
+  ip6_protocol_deliver_rcu+0xb2a/0x10d0 net/ipv6/ip6_input.c:438
+  ip6_input_finish+0xf0/0x1d0 net/ipv6/ip6_input.c:489
+  NF_HOOK include/linux/netfilter.h:318 [inline]
+  ip6_input+0x5e/0x140 net/ipv6/ip6_input.c:500
+  ip6_mc_input+0x27c/0x470 net/ipv6/ip6_input.c:590
+  dst_input include/net/dst.h:474 [inline]
+  ip6_rcv_finish+0x336/0x340 net/ipv6/ip6_input.c:79
+...
+
+value changed: 0x00000000 -> 0xe5400659
+
+Fixes: 49b99da2c9ce ("ipv6: add IFLA_INET6_RA_MTU to expose mtu value")
+Reported-by: syzbot <syzkaller@googlegroups.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Link: https://lore.kernel.org/netdev/176847720679.3956289.12601442580224129560.git-patchwork-notify@kernel.org/T/#m2d7e201372a8aae1ce62a0b548e55fd4fe804909
-Cc: Nicolas Pitre <npitre@baylibre.com>
+Cc: Rocco Yue <rocco.yue@mediatek.com>
 ---
- arch/arm/include/asm/div64.h   |  6 +-----
- include/asm-generic/div64.h    |  6 +-----
- include/linux/compiler_types.h | 10 ++++++++++
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ net/ipv6/ndisc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/div64.h b/arch/arm/include/asm/div64.h
-index d3ef8e416b27d22d38bf084e091b0e4795f74bd4..877dfc4c4c7344849eec2109b66c2825561719dc 100644
---- a/arch/arm/include/asm/div64.h
-+++ b/arch/arm/include/asm/div64.h
-@@ -52,11 +52,7 @@ static inline uint32_t __div64_32(uint64_t *n, uint32_t base)
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index 59d17b6f06bfd19f4a5e0457f4f20ce7185894c1..f6a5d8c73af9721741c11b543e5abeecdbf2079f 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -1555,8 +1555,8 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+ 		memcpy(&n, ((u8 *)(ndopts.nd_opts_mtu+1))+2, sizeof(mtu));
+ 		mtu = ntohl(n);
  
- #else
+-		if (in6_dev->ra_mtu != mtu) {
+-			in6_dev->ra_mtu = mtu;
++		if (READ_ONCE(in6_dev->ra_mtu) != mtu) {
++			WRITE_ONCE(in6_dev->ra_mtu, mtu);
+ 			send_ifinfo_notify = true;
+ 		}
  
--#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
--static __always_inline
--#else
--static inline
--#endif
-+static inline_for_performance
- uint64_t __arch_xprod_64(uint64_t m, uint64_t n, bool bias)
- {
- 	unsigned long long res;
-diff --git a/include/asm-generic/div64.h b/include/asm-generic/div64.h
-index 25e7b4b58dcf55a395b9db72e01f2cd220da58a0..9893356fff55679304f68833c11c8ae9052b9cea 100644
---- a/include/asm-generic/div64.h
-+++ b/include/asm-generic/div64.h
-@@ -134,11 +134,7 @@
-  * Hoping for compile-time optimization of  conditional code.
-  * Architectures may provide their own optimized assembly implementation.
-  */
--#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
--static __always_inline
--#else
--static inline
--#endif
-+static inline_for_performance
- uint64_t __arch_xprod_64(const uint64_t m, uint64_t n, bool bias)
- {
- 	uint32_t m_lo = m;
-diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
-index d3318a3c257775d4f44e8f2eb7911ac52eefecc5..58b3de1f4c2540b6ffabd916948396ac8df9ba8f 100644
---- a/include/linux/compiler_types.h
-+++ b/include/linux/compiler_types.h
-@@ -248,6 +248,16 @@ struct ftrace_likely_data {
-  */
- #define inline inline __gnu_inline __inline_maybe_unused notrace
- 
-+/*
-+ * Compilers might decide to ignore inline hint.
-+ * Functions that are performance critical can use inline_for_performance.
-+ */
-+#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-+#define inline_for_performance __always_inline
-+#else
-+#define inline_for_performance
-+#endif
-+
- /*
-  * gcc provides both __inline__ and __inline as alternate spellings of
-  * the inline keyword, though the latter is undocumented. New kernel
-
-base-commit: e84d960149e71e8d5e4db69775ce31305898ed0c
 -- 
 2.52.0.457.g6b5491de43-goog
 
