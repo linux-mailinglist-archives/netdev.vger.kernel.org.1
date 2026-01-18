@@ -1,94 +1,123 @@
-Return-Path: <netdev+bounces-250834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E84D394A8
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:03:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DE6D394CA
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23E13300D48D
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:03:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 396923002D40
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4F52D77E6;
-	Sun, 18 Jan 2026 12:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839FA32A3DE;
+	Sun, 18 Jan 2026 12:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ze/35401"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ins++WRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB5A218827
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EAC32A3EB
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768737790; cv=none; b=LxziAeEe64YRX/3TByo7rCJ/Rr/DL4GP8Pa1gZwNsvQ2I/jSj+ZsRqr+OJ6MDnF+lNkMAtupSmrNugy2TU23d6a2EnZjuijnCrnQ6sNTL11DpCNxbfRzb9jeVx7vy+sEEKw2dLu1dD7mr25m/pOQe/0SIJ3jxtmVhwiwOYb3yYw=
+	t=1768738191; cv=none; b=kEmsN2dJI9wIIwHU1ZKQWhmF6KLYiQM2XillzW8J1hTN8H1QkPV6WrbppC6Sb9DD1FW5grXEY91Q/tVhFbsw/QP4vOm8K2hBs70lHV+RtmWJRtgLm51j4ifm/UhC9rOYoy3AQvu7ZtM4Lhh5RQvcSKa+tGZd9caR7mu8gcs2f1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768737790; c=relaxed/simple;
-	bh=MWuwn9svUpXUNyTJI82Pkl9AqetdFirCQVqd5w/pCZw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ilqC73RrRZ2kiAH51m06KPdc8CpWqiOm4gi1g5gzBWMkqtfsvUCYkgEEGbMt4VYALGRoO4di5Kri2q9u16g4iPTM5aUAYeatkz+njncrWrRoITHV/9xRfDRRywyraQFBCUUiZjB9EHQRxG5uPwBrY4H9g7doJiS86bBYkEPhTrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ze/35401; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768737787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sapUqr2OXLXuwQlCf/VHjgpvD1V1dsv5E3o93uphOFQ=;
-	b=Ze/35401qnC6PdsKCvIHNHqb8TJCBGo43ZzV1Y6gUcQtKgcETLIrRVrI6OoL5tp4CwUekg
-	qeZcyPNbQpeumbjOLLrikS322LytCQOju0cy1vBb5lgbkcx/ug3P+8XqoSdqkBMBk85VYo
-	E41A8+gZ0okiPH9DO26C2s93PTxUQDU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-4GrXCCwIO6CfvJkL-zKMfw-1; Sun,
- 18 Jan 2026 07:03:04 -0500
-X-MC-Unique: 4GrXCCwIO6CfvJkL-zKMfw-1
-X-Mimecast-MFC-AGG-ID: 4GrXCCwIO6CfvJkL-zKMfw_1768737783
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C63318005AF;
-	Sun, 18 Jan 2026 12:03:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9A87A18001D5;
-	Sun, 18 Jan 2026 12:03:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260118002427.1037338-2-kuba@kernel.org>
-References: <20260118002427.1037338-2-kuba@kernel.org> <89226.1768426612@warthog.procyon.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org
-Subject: Re: [net,v2] rxrpc: Fix data-race warning and potential load/store tearing
+	s=arc-20240116; t=1768738191; c=relaxed/simple;
+	bh=oIapkYs3xDFoevrWEZZ3AVCEJUqTZBSkVtZ85yZms3o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qyg8RDfEGs8XN3zwY8rZGcodmlxzK+bPb7+60tFPlGBwHw6xs3nLnrTGM7KV24kNoCF7HghGUKvXt0bYqIHDSFfgzwy02KekMq0vW9IxtjaW8CiPb13YALRS0ODhKBYLG3s7YLOTWKgNy+w1cHUUUjKKlm1cMthdpHu0usyylQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ins++WRl; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-480142406b3so16046235e9.1
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:09:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768738188; x=1769342988; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gwp+QKiOKKp+AXua/S36PO6UojBYyN4K9i+b9F3mXRk=;
+        b=ins++WRlCD6xsf0SmfmxsAA2m+21Xi+0IbzwukykSod5oveDLNTdCM/tIoqEH0o5ip
+         JZjy5JygbXyY0pwNt3IKshQjb9x06CJQL4XwXt4U43AcBmk87TpQrep+UvHdroHSWM4S
+         Mwumus0/Q3ouzMua6moI7g7/siFlZXpGDi+CAfSjlBk1Q5AqZpDjBzU7JtbtdFEjImLb
+         zYHDwfszLHxSPQjwbq5DOqeTB+ULJuUu1Zm/WbUELk+daMTe6XjnrAITrHQbkc7UgACy
+         JFocTKfIYiOSHY/ZdJMWsE2lCIB1i0wti+yHBUT0rfEFPlP4lx/BZtekt9VYbdlkuI5N
+         gwPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768738188; x=1769342988;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gwp+QKiOKKp+AXua/S36PO6UojBYyN4K9i+b9F3mXRk=;
+        b=hjPvs6cJ+c5BDf9YXkg5ijZo8BsBlI0PXlr+yem+fKw9yuEa2hx7mI80l3UbZ37qvY
+         eHqERp8HvndScki6A2s1e0eojJr2VWABjbIYuTGippa4JDAQZ+dV5/FeKeUctBjhovzV
+         XPudl2+3y095twLrhMJx/aUViXuLpDm4QdXenf2oIAfa/CGMBgiCJSfp9vuue2yXdO8t
+         dQLUM/haN0z3B69o1CflrBurRnskAUjtXGDzgFU5c4l43TXjZy281AAM+Jnw9AcvV2kI
+         XdSa74Vr6k7GY+XEPfjKCXxK7pVDnrTLeDtkD3xHgZhA8c83DQI/+9utJe5Ac3GANTW/
+         6Njg==
+X-Gm-Message-State: AOJu0YyamJSSfn7VK/G7S3nCxZLW3Q56/iBOZYrxWOUtRpayIcpX9swF
+	elmwli1Z33sQEGToilcMuP8G/NKqRwF3jX80VfOopjxgLiYukOmnjwtjVDfJT8+pXwo=
+X-Gm-Gg: AY/fxX68kiC/QTRQQY1ZFRkhrj6OTHa/41aPZQkfVrKUA/6dgB1DMCqbnr2RgDZ/aZH
+	UJq2IZprNF4DVPnoyVIc89ttLCXY+tCyC4VfM/it8mp7mZNTIuRBUu2I+9xGOOb5Tv306I88vd1
+	+yHQiidCdzLjQVRTh0NeSbMc4l9PPE5mwC3FtGlr7M7AzIsXiEpzhA8t7dSlpVe7jCsVX+Fv1In
+	lt9ljEP1ss9PNb7Z8oBYMSvOndP6r+MDCqXss1dIEhJ6xYL7MdJtNPCXXSPLdcNfg6zQ5+I7RFh
+	kiUgPFqFaItMipaQqoUQnR5Q+93i1eqYFV3Rv8QDfUB/3SaOEfEdtij5unVI8uokNM/d1x+UQEt
+	tofa0E0EG4XoWHHAdyD/QvPz/40y2uryE9ESudFZoqiBmIYLSpwfQD3gRLZaG6nxvWVsP+s4CbM
+	tJp7/p0c+ahusH5ZrfRwGfyysT
+X-Received: by 2002:a05:600c:4e50:b0:47e:e2ec:9947 with SMTP id 5b1f17b1804b1-4801e34dfdamr97759745e9.33.1768738188121;
+        Sun, 18 Jan 2026 04:09:48 -0800 (PST)
+Received: from Arch-Spectre.dur.ac.uk ([129.234.0.168])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e886829sm138661265e9.8.2026.01.18.04.09.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jan 2026 04:09:47 -0800 (PST)
+From: Yicong Hui <yiconghui@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Yicong Hui <yiconghui@gmail.com>
+Subject: [PATCH net-next v2 0/3] Fix typos in network driver code comments
+Date: Sun, 18 Jan 2026 12:09:58 +0000
+Message-ID: <20260118121001.136806-1-yiconghui@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <916126.1768737781.1@warthog.procyon.org.uk>
-Date: Sun, 18 Jan 2026 12:03:01 +0000
-Message-ID: <916127.1768737781@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+Fix various minor typos and mispellings in 3 different driver
+subdirectories in drivers/net/ethernet
 
-> > +		   (s32)now - (s32)peer->last_tx_at,
->                                  ^^^^^^^^^^^^^^^^^
-> 
-> Should this read use READ_ONCE(peer->last_tx_at) for consistency with the
-> data-race fix?  The new rxrpc_peer_get_tx_mark() uses READ_ONCE for the
-> same field, and the same seq_printf uses READ_ONCE for recent_srtt_us and
-> recent_rto_us on the following lines.
+---
+v2:
+* Separate patch into patch-set of 3 separated by subdirectory
+* Fix all typos in the subdirectory rather than just "Software"
+* Sent to net-next rather than net
 
-I suppose.  Racing doesn't matter here as it's just displaying the value;
-tearing might matter, but it's now a 32-bit field.
+v1:https://lore.kernel.org/all/aV0tI5nFOd_yQirr@horms.kernel.org/t/#u
 
-David
+Yicong Hui (3):
+  net/benet: Fix typos in driver code comments
+  net/micrel: Fix typos in micrel driver code comments
+  net/xen-netback: Fix mispelling of "Software" as "Softare"
+
+ drivers/net/ethernet/emulex/benet/be.h         |  8 ++++----
+ drivers/net/ethernet/emulex/benet/be_cmds.c    |  6 +++---
+ drivers/net/ethernet/emulex/benet/be_cmds.h    |  6 +++---
+ drivers/net/ethernet/emulex/benet/be_ethtool.c |  6 +++---
+ drivers/net/ethernet/emulex/benet/be_hw.h      |  6 +++---
+ drivers/net/ethernet/emulex/benet/be_main.c    | 16 ++++++++--------
+ drivers/net/ethernet/micrel/ks8842.c           |  4 ++--
+ drivers/net/ethernet/micrel/ks8851_common.c    |  2 +-
+ drivers/net/ethernet/micrel/ks8851_spi.c       |  4 ++--
+ drivers/net/ethernet/micrel/ksz884x.c          |  4 ++--
+ drivers/net/xen-netback/hash.c                 |  2 +-
+ 11 files changed, 32 insertions(+), 32 deletions(-)
+
+-- 
+2.52.0
 
 
