@@ -1,126 +1,110 @@
-Return-Path: <netdev+bounces-250899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F8BAD3978A
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:40:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A53D397B1
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:01:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5224D300AFEF
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 15:40:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AF3D30088BE
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 16:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653A533291A;
-	Sun, 18 Jan 2026 15:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27861D416C;
+	Sun, 18 Jan 2026 16:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aHx2FsHX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UWARjCTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2222836E
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 15:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4152D515;
+	Sun, 18 Jan 2026 16:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768750813; cv=none; b=PYBmop2abgTo9i3NGBdnjGHlSb2PaV7K0LQpAUiC4iPU9sBg+gu5Y3zmVrFM56OCoQY2FqV1EHODbqfad+JdYDvfxdRlV8A5lA/fiiL19cna9H/NwSR7k/psdYq7GzG4ZLLDCmgMXcIGnQRsE9IJgl4KY5BCXXbLHSx+E/TAcA0=
+	t=1768752109; cv=none; b=f9lMFrsAzEekFuUsPgnRC+B3xwTXAcA6PahgNy6Eygre6JTWNSk+sr9XNiBCrTl2tpkADJrstvVlGsIbegQ3PVWXleIgZrzi4Ea+wpTLFzCKSb94OBfysT4ctAnNfXbAZItB6/Ce2nR8zB2O/kACiVQ1R+wL7rVSjJZFhaITrR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768750813; c=relaxed/simple;
-	bh=fa1gz/HKm6O5cLz4U/b6OZOC9lZvrZiBiGt0N+CAGbU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dB/jJGkg4Zl/muya/1Oj+JXs4OWmEpvX5S9AWUVc5zmMW8mj1XIVamQ/+yzTmAiSfeBX/wClGnl6xVPXpLppMyC7t3I0CS/0bGQiujtVT8Y528D8iLeBk2oCGbSglG0vEpnOPBakcFAymK6/51L5XnwVnoPm3mFruSUyYq0M7PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aHx2FsHX; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-502b0aa36feso10786541cf.1
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 07:40:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768750811; x=1769355611; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fa1gz/HKm6O5cLz4U/b6OZOC9lZvrZiBiGt0N+CAGbU=;
-        b=aHx2FsHXQd3kwh3+8fp1woUOetceFktkrNdns/rlRFX7Ne0L1zpLM/vLTj5W4JcSRG
-         0hGeBQxOK9SWzGGgOuAjAxyzKTb5EpSaXRlIrEgxpDD9ux+3iRPhWY+dP1y7ObNa5m68
-         4sjX4Ii99ReHdTPEsj8E9dKAvpkanT/u571Xkr1zU7B/vkHG+lAAG8g8ZPuYy8HYui51
-         86TC71OURLOLIFT0dddnYvsX/0axtr4oIEO+9oYa5pbpDMbjkm3ZFJ6PEr7mnbVgQbaP
-         Vp3R90yMlkMCWGUx6aHBYaZoxOvQnZMRqkpqbQorh88TEKBFzA8DHG1T0sAY4g7lIDeQ
-         8uwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768750811; x=1769355611;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fa1gz/HKm6O5cLz4U/b6OZOC9lZvrZiBiGt0N+CAGbU=;
-        b=vfrS+mPi1hNyMASQRFHEYMPRfzVYvhtQbDm8RcL0y8ygJeH4PN638PJusQ+EXQbSW3
-         6b+HDJivc+1RT6jBGJZKg20camaQox7o+b1UOni6exDbxNqH8NqYn+qo4vk0wzcrglYN
-         OQ9y6s+/EZwTfttL+izquYE3xoEYMzKV+allwlDHIQY94gjiyPOFlTWPudDS9Dji8r+r
-         eTO7KCMN3j7RCcsllr226DNj6BpGhac5DxGfUM+xy+KfbeILFLMVM5pgjoOpi2Gcmct4
-         vhV7mjXS5QRnfBLCwNAGOaJOtwiqWBUCdxUmwGokwoxjEbfANXD5A45iIPXoyVL2P5sW
-         QjeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxT6Kzpecuu915NC8WhH8QFiHiJsxYimiNSxm30n98i5X/VcDV1s9Wd6xz7xYqbi4IRaXlsOA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNrzPtvtPnls5VyiSZirhLvTirhRuIQ0iE/V/1p9jojtZ6Zx+E
-	DWB1NJY+uBFDhbPLyAY0g7NGQW5ZapIkyC2y+nHf0peiC6MQroMrNgCCAerwrQyvjyCSkPNA+q/
-	w8z11NAKlYxQtkafn0RhAw9RZR0FssAZH7v3XtCDv
-X-Gm-Gg: AY/fxX46PzMTYDR9Qtofl4IR1okYIIyZj2XYj4ZDiCuPXOviI4YhHX3bgtQ+g5ZTXt7
-	Q543PMh0xAJoEnBH00MBiE2UKCni4F/bQL4ylCvu1zyukxOhcif0lJrcEyak7YsUbJrMHuDHlSu
-	wWVq5Dd0+RrCYH1GO7+99drofG4T0w1mmJ6Nku1Axv1DC+13Ngfap1tNASujrUMkcXJLfhmR99X
-	bKOubm4AVLP+ND+6T0vHVgnlTMgk5yR4SouZXvNqNDwmYLfljdUR6GB0vC/Ykr4HGDJcobX
-X-Received: by 2002:ac8:7f0a:0:b0:4f1:8bfd:bdc0 with SMTP id
- d75a77b69052e-5019f912733mr196508001cf.39.1768750810630; Sun, 18 Jan 2026
- 07:40:10 -0800 (PST)
+	s=arc-20240116; t=1768752109; c=relaxed/simple;
+	bh=2tPLVtUcmlNgzcjePqKEikVmIKnrzXJ8VIH0ipbvnQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nrvHh187tg74agCx+9YB8vrlt3ldTvnuGXiPehjmZQ3J8Vs58rARhS8WukARULVHlSwY68Fq2NrS/mj0kHTgnQcQ3O8FKhk01SKiP0t+fB2JcEPxSk++oTaZ88ez5QLszk2urtG1o0rhc1Xa614jnapr+8XhYdlNIJeSndci4yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UWARjCTE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vnYChq4ZvENtM2GcteLuTihPDAtrBEYkDAjTfXG0beM=; b=UWARjCTEMhMnxzI07W4B+QF957
+	T1TPeU1kk2XUtUdT2yehio5sUVqlvtTZ81PZUJSldlpK1AqSm8Cj/lDu6RYyh35kKrwEhObVYhWX+
+	h/W/rmBdw578Qa9VjCO4M+M6ogPQ+5u/x6mS+JU7CmTaH4eXoh3aEEbp4xrAoxXb9gvw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vhVDe-003Min-JD; Sun, 18 Jan 2026 17:01:38 +0100
+Date: Sun, 18 Jan 2026 17:01:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Mikhail Anikin <mikhail.anikin@solid-run.com>,
+	Rabeeh Khoury <rabeeh@solid-run.com>,
+	Yazan Shhady <yazan.shhady@solid-run.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: sfp: support 25G long-range modules (extended
+ compliance code 0x3)
+Message-ID: <e04e8bec-a7c5-4e2d-bdd8-fdf79c29deba@lunn.ch>
+References: <20260118-sfp-25g-lr-v1-0-2daf48ffae7f@solid-run.com>
+ <20260118-sfp-25g-lr-v1-2-2daf48ffae7f@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260118152448.2560414-1-edumazet@google.com> <aWz89X0y6UNH59I7@strlen.de>
-In-Reply-To: <aWz89X0y6UNH59I7@strlen.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 18 Jan 2026 16:39:59 +0100
-X-Gm-Features: AZwV_QhMpVmXiCR59uw8xjJwtnGFB02TAzx_DglFXkQfqFXIxwTcKmzoczfN5Ro
-Message-ID: <CANn89iKqeiiA_-1otsWj8=fLc9s4LPgrN9RNsh7iBkuGDaf3cQ@mail.gmail.com>
-Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
-To: Florian Westphal <fw@strlen.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Nicolas Pitre <npitre@baylibre.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260118-sfp-25g-lr-v1-2-2daf48ffae7f@solid-run.com>
 
-On Sun, Jan 18, 2026 at 4:32=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Eric Dumazet <edumazet@google.com> wrote:
-> > -#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-> > -static __always_inline
-> > -#else
-> > -static inline
-> > -#endif
-> > +static inline_for_performance
->
-> ..
->
-> > -#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-> > -static __always_inline
-> > -#else
-> > -static inline
-> > -#endif
-> > +static inline_for_performance
->
-> ..
->
-> > +#ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-> > +#define inline_for_performance __always_inline
-> > +#else
-> > +#define inline_for_performance
-> > +#endif
->
-> Should that read
->
-> #else
-> +#define inline_for_performance inline
->
-> instead?
+On Sun, Jan 18, 2026 at 04:07:38PM +0200, Josua Mayer wrote:
+> The extended compliance code value SFF8024_ECC_100GBASE_ER4_25GBASE_ER
+> (0x3) means either 4-lane 100G or single lane 25G.
 
-Damn, of course !
+Is there a way to tell them apart?
+
+If it is a QSFP, it means 4-lane 100G? You can however split it into
+4x 25GBASE_ER, if the MAC supports port spitting? If it is an SFP, it
+must mean 25GBASE_ER because the SFP only supports a single lane?
+
+> Set 25000baseLR_Full mode supported in addition to the already set
+> 100000baseLR4_ER4_Full, and handle it in sfp_select_interface.
+> 
+> This fixes detection of 25G capability for two SFP fiber modules:
+> 
+> - GigaLight GSS-SPO250-LRT
+> - FS SFP-25G23-BX20-I
+
+Are these SFPs or QSFPs?
+
+> Signed-off-by: Josua Mayer <josua@solid-run.com>
+> ---
+>  drivers/net/phy/sfp-bus.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
+> index b945d75966d5..2caa0e0c4ec8 100644
+> --- a/drivers/net/phy/sfp-bus.c
+> +++ b/drivers/net/phy/sfp-bus.c
+> @@ -247,6 +247,7 @@ static void sfp_module_parse_support(struct sfp_bus *bus,
+>  	case SFF8024_ECC_100GBASE_LR4_25GBASE_LR:
+>  	case SFF8024_ECC_100GBASE_ER4_25GBASE_ER:
+>  		phylink_set(modes, 100000baseLR4_ER4_Full);
+> +		phylink_set(modes, 25000baseLR_Full);
+
+Given the question above, i'm wondering if it is as simple as this, or
+we need to look at the type of SFP?
+
+	Andrew
 
