@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-250824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A7AD393EA
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 11:15:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B092D393CD
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 11:08:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 60DFC30031B5
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 10:15:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58797300463E
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 10:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A282BE7C3;
-	Sun, 18 Jan 2026 10:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3F12D8379;
+	Sun, 18 Jan 2026 10:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="afZ6jmAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7882BE7D1;
-	Sun, 18 Jan 2026 10:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2952DBF45;
+	Sun, 18 Jan 2026 10:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768731343; cv=none; b=ExKJC54X6lbsANTG1tIvYbig4m348vOQO96uJyDZwFElnA+THzeIv4TJDh5YJVpK+8nKm6SbSFaQBzvzyQAtLv1WdBJ1yzPn4+uAWZ1Z4CHLld32+Eot3/nXGURp3NsKEUt4/6ScWOH6hhTc2Of/3tuf/UZnv+eN/1MJicN2X0k=
+	t=1768730908; cv=none; b=HqJKbWeSh+FZUPrRoVf8FUZ6U3V07pRkyUn+8zJw7hDJvGK7L+aBqgLmbruHP2LRLuRbaBBs6vQOtYldhorrUGcLMkwUE7pJDONWUAGVwhHhs2CkDoyDpS9cVpb0vmImAEriPN3Q09peImPFsGc3U93NlW0PymdK9pSQ/xeYkBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768731343; c=relaxed/simple;
-	bh=SUwlnXQPyg4COSmH9BKT1CCGZCUeOYlp1zUHDF473As=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ph+MS55EQ69UFIRCAUiUrFE4FlxA0q+ilxaLTi+DIByAwt1nBEm4xfYlUVDmtduUVb3SMuXsgYdyb2yEB7dzki0Tg1/53SlIMtrORK2BkHsvNocfTlnGFsz1ZEO5maZFH52ijighIU1T+OBrtz3Ijktjy7DSpxUlXwJUymowWsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
-Received: from localhost.localdomain (unknown [116.25.94.187])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3108da648;
-	Sun, 18 Jan 2026 18:00:08 +0800 (GMT+08:00)
-From: Chukun Pan <amadeus@jmu.edu.cn>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Yixun Lan <dlan@gentoo.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1768730908; c=relaxed/simple;
+	bh=zfG9kR6GVytGzJo0EGQoTa6uMlq3njmHNwkLqAF/SGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g8w1ZlYC3qJCxqL6AhkbO2pQmlb2peQLEIkZEYhnw2IzFNzg6CH2WU3ARAXH7vdHMPV9Ao3HyYw6+eEWSxHBEyETm/5WYRA60HDjrJIV1boUn4Df9HeRNQRwN59bY6yvGi2VMbj3dlXFZLZu3WYUAZIz1Qhvy7j5FSYywuhd7/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=afZ6jmAo; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gykQHQfAXfGx+5mcrgwAVp3gTYmzOFfNes+NNjpoUjk=; b=afZ6jmAobpwl3nv90bjh5cQDLP
+	rT0PLqvLQt3p1ixKGks/TSBYIMQ3lM9Sey+nzKRhsd4/Z2rqnxqnGn6+1EzyXX6u6A6s0hlwu1hFE
+	EMofF3I4mdKYyR7bCgZe2gtE3oTpTrm9fOI4ymXGqqVoESebCFbHX8Y6UKw2lFbhohvR5GpV0X084
+	aBcyZDSLyn+k2Ayn+9NwXGiDD9AK1VAhp4BWdHOA3oJbcz/KJNjQyAzDtXDm73+FdP6TQ/GnilhMm
+	B398TAji6ZO5NKlKroUtGoyVl9yL+mEOxbPvAS27bXg9N/TrYj0zfqHWjPPn+ZeFRx0BSLkN2M8yq
+	zPduy8Iw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41614)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vhPhf-0000000047p-3qWx;
+	Sun, 18 Jan 2026 10:08:15 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vhPhc-000000005Vf-2krW;
+	Sun, 18 Jan 2026 10:08:12 +0000
+Date: Sun, 18 Jan 2026 10:08:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S . Miller" <davem@davemloft.net>,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	spacemit@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Chukun Pan <amadeus@jmu.edu.cn>
-Subject: [PATCH 1/1] net: spacemit: Check netif_carrier_ok when reading stats
-Date: Sun, 18 Jan 2026 18:00:00 +0800
-Message-Id: <20260118100000.224793-1-amadeus@jmu.edu.cn>
-X-Mailer: git-send-email 2.25.1
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Subject: Re: [PATCH net-next v5] net: sfp: extend SMBus support
+Message-ID: <aWyxDI6-sKc6BNQE@shell.armlinux.org.uk>
+References: <20260116113105.244592-1-jelonek.jonas@gmail.com>
+ <6a87648c-a1e8-49a2-a201-91108669ab44@bootlin.com>
+ <6987689b-35ac-4c15-addb-1c8e54144fa7@gmail.com>
+ <5e7c71f6-80dd-408b-a346-888e6febf07a@lunn.ch>
+ <fcf7b3f2-eaf3-4da6-ab9a-a83acc9692b0@bootlin.com>
+ <fe1bf7b6-d024-447c-a672-e84f4e77f8d7@lunn.ch>
+ <91442f3f-0da9-4c52-89ce-2ca0a3188836@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9bd08c367e03a2kunm70d59ed02d74ec
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCGR5LVhkdGUsaTx8fQx1MQlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlKSk1VSU5VQk9VSkNMWVdZFhoPEhUdFFlBWU9LSFVKS0lCQ0NMVUpLS1VLWQ
-	Y+
+In-Reply-To: <91442f3f-0da9-4c52-89ce-2ca0a3188836@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Currently, when the interface is not linked up, reading the interface
-stats will print several timeout logs. Add a netif_carrier_ok check to
-the emac_stats_update function to avoid this situation:
+On Sun, Jan 18, 2026 at 10:43:12AM +0100, Jonas Jelonek wrote:
+> Looking at the SFP MSA [1], some sentences sound like one could assume
+> byte access is needed at least for SFP. In Section B4, there are statements
+> like:
+> - "The memories are organized as a series of 8-bit data words that can be
+>     addressed individually..."
+> - "...provides sequential or random access to 8 bit parameters..."
+> - "The protocol ... sequentially transmits one or more 8-bit bytes..."
+> 
+> But that may be too vague and I can't judge if that's a valid argument to not
+> care about word-only here.
 
-root@OpenWrt:~# ubus call network.device status
-[  120.365060] k1_emac cac81000.ethernet eth1: Read stat timeout
+There's a whole bunch of documents. You also need to look at SFF-8472.
+This contains the following paragraph:
 
-Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
-Signed-off-by: Chukun Pan <amadeus@jmu.edu.cn>
----
- drivers/net/ethernet/spacemit/k1_emac.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ To guarantee coherency of the diagnostic monitoring data, the host is
+ required to retrieve any multi-byte fields from the diagnostic
+ monitoring data structure (e.g. Rx Power MSB - byte 104 in A2h, Rx
+ Power LSB - byte 105 in A2h) by the use of a single two-byte read
+ sequence across the 2-wire interface.
 
-diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-index c85dc742c404..d7972f247bcc 100644
---- a/drivers/net/ethernet/spacemit/k1_emac.c
-+++ b/drivers/net/ethernet/spacemit/k1_emac.c
-@@ -1080,8 +1080,10 @@ static void emac_stats_update(struct emac_priv *priv)
- 
- 	assert_spin_locked(&priv->stats_lock);
- 
--	if (!netif_running(priv->ndev) || !netif_device_present(priv->ndev)) {
--		/* Not up, don't try to update */
-+	if (!netif_running(priv->ndev) ||
-+	    !netif_carrier_ok(priv->ndev) ||
-+	    !netif_device_present(priv->ndev)) {
-+		/* Not up or link, don't try to update */
- 		return;
- 	}
- 
+Hence why we don't allow hwmon when only byte accesses are available.
+
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
