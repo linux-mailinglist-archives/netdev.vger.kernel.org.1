@@ -1,150 +1,94 @@
-Return-Path: <netdev+bounces-250918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84123D39960
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 20:25:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B842CD3999A
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 20:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 74D723004D1A
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 19:25:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 638813008FA8
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 19:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A34E275B05;
-	Sun, 18 Jan 2026 19:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6FC1AAE13;
+	Sun, 18 Jan 2026 19:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZ5WgrQh"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="lOGx5lhC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77A52222B7
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 19:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768764322; cv=pass; b=s8N4VUA12WxuZh6e4QiFsphuIQY+kmpTxCcCT5CnvCeDBiD3iK1vRF1zKWCFy1HSgxPum5b/PchTPPZhVCv+rhwN9mQ3pMvdSoOfFIOhCpNUhDYHxDgLmyMIib+XyGob6st0ScaOipWLiZ+98Kjj1tqyTjZpx7ZKBDW0B78i/hw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768764322; c=relaxed/simple;
-	bh=WhD/UumB13TxrhUCW41ZL1h+RYsVEF75G29LEngcAxA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MtquxSRkS8xBAV7y/UFHH5QykZwyK3i4A8g93xmSBxAuTAKPH/ZBKSZ8Z9PkIg8OOUlmOzfeqg8S7WBc4MPN5nEgt97ZGRm9UjcOatCRe7btVQsyrIkj0BtpUEcm754+x7t3Y+yXQ30qGtugDpkuyvY83AblcXh0PxiW5R8I054=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZ5WgrQh; arc=pass smtp.client-ip=209.85.161.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-65d096dd0ceso824385eaf.3
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 11:25:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768764320; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IWNh6htF4JXLkE/cph1VKq+I38XuWmR936sclRivVlIv3uMosCNSS2kdgHX///4l4l
-         QGs9m1Ue7CGJWg7XUGWsrmcXoAVjy35ECi7wVwG3HSnwOpCrH5YC3J36RUUxQ76Bhu7A
-         Fk584rz27Rx4PuuZY4u9qUPUHEatz/me5TOECw/MY9yAZDtU02Tjw1Z9sBQiFqE6PHTM
-         y9LseSrLE9DTEiFLmwW2d+hr93yFVEwGnfEaMYojuZWMFmf6Iju4i580r521UrHJLWNB
-         pALnN30erELI6NKH9pO+LopgKt4PDnJ8JpS+sD7bQC71FE/iN+DEjEgL9nqfTJaPdZ4E
-         WRnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QODdiHLpLICiLOPXx9zlScC1nqZ34S9VHP1dAsw4ohA=;
-        fh=1ffhz1LCn+XjckKwJV4d58j3PNJFvGXtZYChy/J7jCo=;
-        b=DdAtCNZo19GLhf4L1EPizER1A+fabGNipDRnnPcb3PjNYmBzemEjyYCcxJwakgSXil
-         MOiNPwY/pRvO2qMYa3wbOl/4JpCOB8MIeVODNVT6gC8VSnfi/bS9tGJvjDp6kKnX3uR6
-         4+vJ4aP6GOFjhuatRXfz+X033gO/XbYq5tfz0+xm5xpiO8S5J6YiFhFDt/NQ/BcBUBWA
-         pBfmVDduBmFMpc7ioifHN1Zl0kUMHzV7FpLdCCr3aoBt4wKjPHl4Lqm+FWhB7kOuHXmG
-         zA6G2w2eRQIYVHYSdJh8z4WXM0IEnU7Ul0ZcY1RTZbJQcs3NFP1Qcr3FK94yY1XJZYDj
-         D1pw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768764320; x=1769369120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QODdiHLpLICiLOPXx9zlScC1nqZ34S9VHP1dAsw4ohA=;
-        b=mZ5WgrQhplhabYRAgtd6bsOdimY8OJi1Y+h43dZjPS/tkL0FJiYOi65sk+dlJ83BkM
-         rOHfxnPVPdlG+yQgpfyw+QAESJ9nWYqjyAYKZxUv/pCZfeDwJM7xlHwD3TS9m8LzXfFi
-         P6ECA66sOYKJQNJZUPckPtUA26WVBaVT0kO0QHKdQSwrZ+e6XHm7gLwbps3zKB5f7MhB
-         WxfC3KtN1tqu4STWv+hW9GTZj9pCWck24DSETQyTY0uO99AiJr+MAkncTC30FC357VUe
-         mEDu/ra64LE+VkfYZYHtHcxB31nuBAapxY5ICCyMRvIdGnml2pgj/oVnDd7pPq4j4ltq
-         1p6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768764320; x=1769369120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QODdiHLpLICiLOPXx9zlScC1nqZ34S9VHP1dAsw4ohA=;
-        b=H/sWQr4fftvUkmS5yjssdB+NxXiKGEfrxvsN+sXbr62C48KdWMOVdJCgB2Rp60QU7w
-         Xpu4rzkX6QpZT0BLzjpjMaMZ5w2t+Y8Yc21nNH5L3Wp0JJikpVHqAOii/RnU7SfqwtoB
-         k7WLX1daQTAo8nD9uns98JWNWBiKpHWdpeAEWbzctHFMHBCRVzcPkql7QEXy5xZ4DPyr
-         jhjo9SRDu0RVwmznAlOVVZeM0JN/7vUV+20eXyZZu+frNzgddbHf9q1ShBJqJFHqysrY
-         PvsSGvdfEbwi/Hm+VuYLZsBLUbc6pfQgybthHI2Y93Z9loBBeIcotWmI3u44XCbMjB2y
-         sUtQ==
-X-Gm-Message-State: AOJu0YzhmiVC/hmlY9dsAOmeX5W38wHoQmvpmqSp/QDC/DuEzHDulyEF
-	nByRUy5zA4iylWbfwJ0k9Jb3qXSWM207YtxZCZP9wWm2P5LiTwI8a3LTCrAvBhaGVzPTu0gFxpL
-	6XwKarc3j+0OX5pjQ0hsi7WyxDLuwBBg=
-X-Gm-Gg: AY/fxX6P98Abu8pvlIHKsYVZvcbpcOKzJqPWrQVeBSXtMJxrzy1//xxbF1Ke/JQ78GO
-	d4C2HUiXYSVanVc8tNFYniAHeXlNlYuxXFs0JdZu3JMf4zTPbp/76Pu16klPFqNTZlm54Smz2qe
-	3rhEuToP5Qfzea0E8bhsORQM88BK2RApQKLtzvOoC8fnFgodn3xj3wzCo97HhmRmQMEC77nq6l4
-	a99IsMWj3ArC2Mi25PXHtHLlkV1s6YeiDnlXx/BrsCUsLFsfYiDSdJz53q8w2IQL2pKnsHnmfh6
-	Atu5XMxBvKHjMzMA/vlMz/rLPMyDdKtSodyw6mLKjY+Kxu6fyLgZgiWigd7J
-X-Received: by 2002:a05:6820:210e:b0:659:890b:3f9 with SMTP id
- 006d021491bc7-661188d5ca0mr3708668eaf.4.1768764319929; Sun, 18 Jan 2026
- 11:25:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C300CA4E;
+	Sun, 18 Jan 2026 19:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768765645; cv=none; b=ioQKFrWOXPHG2y0905eGe9Qj07IWZSk433ehGPTOa55XY8IZrhPYdZ77+BfiMME3NMTZ8UhxQVwRj9BsASlBehZ+GijvwAUCU9sTPqc4hK4+122uv6Vs0FQitIkq/dmx5Uqu2mNKklnKpNT4DavqHUY/DVPz31p+iEg/HVRuzO8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768765645; c=relaxed/simple;
+	bh=vUzjgbm0D4u8uUB+cP7JQ1rJKEMnH4LcAXAXOSwptbI=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DAiZcsRtCzN24eFhLjrWGNvg69ocv0vWyohCgvHGujQNjFv2OuRpRZOwxQKQ7ZrHgMlN0ghi0Bpk/QIoMaRvsb1o3EX0QBOZcvv9IiQ3zVytIMnpTFCFVgzRkFC4d+HSlVlF+hCAGuKe05ORrD5URGCQPXFQdSBIdUttuI3cymE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=lOGx5lhC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0A7C116D0;
+	Sun, 18 Jan 2026 19:47:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1768765645;
+	bh=vUzjgbm0D4u8uUB+cP7JQ1rJKEMnH4LcAXAXOSwptbI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lOGx5lhCmbXPXMJ55k+rLvjOMXEEV6nnae1xuNyXciyQ0mJ1cXDQWhitqJU07CFFN
+	 zIg5yg32ok9zTuR/q4ddzkAGOCgAD9IHYEnG8OddMDbMYwk9AlPO9aJYvWmANemJ+z
+	 vPuSDQC4fj28DO1syDXS+v/3yNoz8FyrjPnjMHDQ=
+Date: Sun, 18 Jan 2026 11:47:24 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Nicolas Pitre <npitre@baylibre.com>
+Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
+Message-Id: <20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org>
+In-Reply-To: <20260118152448.2560414-1-edumazet@google.com>
+References: <20260118152448.2560414-1-edumazet@google.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260118013019.1078847-1-mmyangfl@gmail.com> <20260118013019.1078847-3-mmyangfl@gmail.com>
- <5afaff9c-7be2-4464-b675-4bf70aaa17af@lunn.ch>
-In-Reply-To: <5afaff9c-7be2-4464-b675-4bf70aaa17af@lunn.ch>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Mon, 19 Jan 2026 03:24:44 +0800
-X-Gm-Features: AZwV_QhoqgBmX5NTPwohLzXhrsUytNlbMgVaPz08WmDZqV1yMSPtGz_cJzAPlJw
-Message-ID: <CAAXyoMPFDRyKqZiFsH7cCQzBg6z5KO5mUpLf8jjpCcQhD09-zw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 2/3] net: dsa: yt921x: Return early for failed
- MIB read
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 19, 2026 at 12:06=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Sun, Jan 18, 2026 at 09:30:15AM +0800, David Yang wrote:
-> > This patch does not change anything effectively, but serves as a
-> > prerequisite for another patch.
-> >
-> > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > ---
-> >  drivers/net/dsa/yt921x.c | 11 +++++++----
-> >  1 file changed, 7 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> > index 5e4e8093ba16..fe08385445d2 100644
-> > --- a/drivers/net/dsa/yt921x.c
-> > +++ b/drivers/net/dsa/yt921x.c
-> > @@ -707,6 +707,12 @@ static int yt921x_read_mib(struct yt921x_priv *pri=
-v, int port)
-> >               WRITE_ONCE(*valp, val);
-> >       }
-> >
-> > +     if (res) {
-> > +             dev_err(dev, "Failed to %s port %d: %i\n", "read stats fo=
-r",
-> > +                     port, res);
-> > +             return res;
-> > +     }
->
-> I know you are just moving code around, so i can understand a straight
-> cut/paste.
->
-> However, when i look at the code, what is the point of %s and the
-> constant "read stats for"?
->
->         Andrew
+On Sun, 18 Jan 2026 15:24:48 +0000 Eric Dumazet <edumazet@google.com> wrote:
 
-The error format is used many times across the file, so using the same
-string helps reduce the data size a bit.
+> inline keyword is often ignored by compilers.
+> 
+> We need something slightly stronger in networking fast paths
+> but __always_inline is too strong.
+> 
+> Instead, generalize idea Nicolas used in commit d533cb2d2af4
+> ("__arch_xprod64(): make __always_inline when optimizing for performance")
+> 
+> This will help CONFIG_CC_OPTIMIZE_FOR_SIZE=y users keeping
+> their kernels small.
+
+This is good.  __always_inline is ambiguous and the name lacks
+commentary value.
+
+If we take away __always_inline's for-performance role then what
+remains?  __always_inline is for tricky things where the compiler needs
+to be coerced into doing what we want?
+
+IOW, I wonder if we should take your concept further, create more
+fine-grained controls over this which have self-explanatory names.
+
+
+
+mm/ alone has 74 __always_inlines, none are documented, I don't know
+why they're present, many are probably wrong.
+
+Shit, uninlining only __get_user_pages_locked does this:
+
+   text	   data	    bss	    dec	    hex	filename
+ 115703	  14018	     64	 129785	  1faf9	mm/gup.o
+ 103866	  13058	     64	 116988	  1c8fc	mm/gup.o-after
+
+
 
