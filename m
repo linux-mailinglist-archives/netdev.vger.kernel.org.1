@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-250838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34164D394DD
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:14:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06131D394DC
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:14:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41D22306216F
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:10:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38E5F305CABB
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805C632B989;
-	Sun, 18 Jan 2026 12:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C6B32ABEC;
+	Sun, 18 Jan 2026 12:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFZK12uV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJNBcfU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B491632B98E
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCBC32AAB8
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768738199; cv=none; b=C7f2IN1deypfUaRQPRnz6itXOwY1+bTJ+YACcZTTZs5N8x9PfQvkr2smNAmqOCuWAz7M9w+4QPkvPNYqPUoe3QvanvUloxseQEPMACR77zpjKPzIbyis8FfutSiLkzIv7G419LMpy08nQ83zz8T+AEKfL+h1+xb1yv0sIXF2Eak=
+	t=1768738198; cv=none; b=TsEiEjf2ya6XCExRJUOky+NmhlKH/4RYX4CZxE/x9GX508I+CFcMQ3JLggXnHxxYKVv/jzZaPhFf224TT/9P1Css70q5R8IuNpfpo5mLZaejjoQl9iTQEv6TNgIO7wjztU4Oksboiyna3yMqW8Of4VH7kxbte1xbp+vytpalzkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768738199; c=relaxed/simple;
-	bh=hjP6L/XQKWvMQgY4uYKAMsXrmG+RNpjdL5M/l3wgAvc=;
+	s=arc-20240116; t=1768738198; c=relaxed/simple;
+	bh=MW+N51v5WgRbDBiGoWVdusM1RQlch5ALs7Q29Ez16fE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u3UVf/7Lxj39gJjVcVtbUoTyCa7ZK6Mb6wySx7Ku8wCnpoh9Qc7kFvmZBhxTvICkZuz5ZSva/TP1viArSRkd0onRsUDPTZx08uu0lyLRI4+fgBwPivko/toXano6hb6jIuCAcEkd177qaTq7FFLtKIlTyuMnPeG0jkb0pPeGyqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DFZK12uV; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=i87uk6G0q2oR3jhQBGdTUE4Qm88xvNhSx19SIH3ncYMJ9aoPwcRtO9uTQMGTrC+LvHTViZ7fb6smS5jvPGocD+psgRxUEsIIoJGoDhV/qFegmLgxkDi8g7AdkLZSK5//RNFIuLo26jKhwinsZZDVIYG1dt0xjn3V+BdMzYmFREU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJNBcfU8; arc=none smtp.client-ip=209.85.128.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso22322635e9.2
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:09:52 -0800 (PST)
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-47ee3a63300so31923805e9.2
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:09:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768738191; x=1769342991; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768738193; x=1769342993; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y6M4GdVcc0onBFZmKSw0N1uzgLv84XPmgy7pOdhOiFk=;
-        b=DFZK12uV0ZubAxI5PiZ6Cz+422U4DYxAJ0MRxLyAR2Xk+wck9/Iqc1y8+dvo+kfCjD
-         S3/XbNnQjteZiV26n/dzxshJvA+sgsUsygo4fXBKgPA2K1E7Vr4pCCaiudZxMsv208YK
-         PLbd7a+8i2sp9cLyFo262gFsouwxg2QZdtXQp8BlUOmalJYqCugW8QPn2lE96SbLAXIJ
-         5me0lw8wEvr9EAC1yloEK8J5zaLNcwVI4wa/yT/VWEYboqhYpbCYQ08DrYldCKnvQDB7
-         54KX3pXyHPN9ZroFyyoYBBLj174xYkv2WPVDnk9b6m9Mc2ysA8xXZb/eM7Kw2Mxfu7Uw
-         4YuA==
+        bh=GZM51dbvVuRPfudKUOjkv/I+szqU4KPnDbRK7ZQAV0I=;
+        b=aJNBcfU8C3acq7NIw0b1X2BP5dwBcGzOdcjq6N7Z3nX8lFzLH25hC5azYZMyklwsE+
+         YC/YdZ8Z/zJxieD1lh77GwPOOaEH9n6soKgRFdoDU/tOdK3DshkxLoLMJv03B6EfuNBH
+         3kLsvcdffO6Y1iQ7UkDE8ydsbEPUg0X/OWU8oTdqlmga8m/cy5MBGtR3c2ELZgiYmVOP
+         vY3Gv0G2/Ld/nOiISn75sSQZdMXV+Z+JjTvGWSiYyOv9C2ELp/hHbkJgrldN2kgQCmGn
+         IZcLr0X1Zp/N4MuocML2wwHQzcJgpxa3L/fzARxzfr+67Eet8s/OHvHJZ/T1JnrXb4R7
+         zsQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768738191; x=1769342991;
+        d=1e100.net; s=20230601; t=1768738193; x=1769342993;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Y6M4GdVcc0onBFZmKSw0N1uzgLv84XPmgy7pOdhOiFk=;
-        b=ulj9Yeq5uBL4abfMgcCqeoMuC5drJtDEmZD8WZ7ojNl4YwWXBQF5hy5UaYInpeUzAD
-         7ZKFp9v6q+3oon0YghhuWpLFe0kxSMNcJiPQkzTpztZ01SqThZs+wKdHHJRcZwOkvyQ0
-         wD9B2p9f1PaTfzA70L4VTCD97iGo1wuXBV/XaiNVnQeOftkLAi0dtzJI7xxoVqxAj/uX
-         HvJFcCgEcok6JB1zx5ouxj5S8CLL9iYba4q//U0EoFIczMSIG7MzOnasozY38v2fhC2w
-         jwetYqrqpozm3Aw1EWOWUoWW/2fTHd9TIm+Hj2XfqC/cy7W4ErwtnK+0pFuFdDLKPw93
-         dbBA==
-X-Gm-Message-State: AOJu0Ywhn+e3F5pwYmdHDAnkkTdDuFN4t3Gzh/sU2z5x6RUDytzUFMI3
-	sVq+2mbUudWVBe+XljuPRudZzbrFYA1DlGn4mpF4KJc1+Mwm9RE4QJVN
-X-Gm-Gg: AY/fxX77WeQGIUhYcFQuWlvKvg1I+lexSCPrbC2cp1eyqoDgPTtDh3WXb2v4F48dYmj
-	5s99mKdsrW/7LUluYQydm8bQL56aFnXOq54PQwgGagIDJHAjxLvrzZ8nD4G3NPXolwgQ3jujY9P
-	cg4VlLnd/5yCnsEs1ZMH9PzoiEmZ1YY/R6eycmmwqwI8KeXwvSdfOWXdsMpkeOeE4RrSxw45LHm
-	tChy8ns+x35WKB7JPv4wCKSQRrzGsJoYfu4OcJTaNWP346QOav70sl9fCp2cWKrQSw0cWNQNWF9
-	ZVqPad9Acp+Kl+WeGEj83JzjmEVCMNFHi/zAeibRuAHHTnGAydbPViTq2EqK7IU/7DaC1CZ75zK
-	omC1K4LfREMuaPR8VxGSotz2YWyI397Q6a7y3nWmmCRinLZOH5G6iXdUCT5uFNeQfIIQcOOWGaX
-	nzEfIu/eO48rrG3l1dVxsMzfLC
-X-Received: by 2002:a05:600c:3486:b0:480:29f1:120d with SMTP id 5b1f17b1804b1-48029f11458mr44090385e9.11.1768738191100;
-        Sun, 18 Jan 2026 04:09:51 -0800 (PST)
+        bh=GZM51dbvVuRPfudKUOjkv/I+szqU4KPnDbRK7ZQAV0I=;
+        b=I9HK24dyiA89o1kiYCJgsLFLEVqidjcYa9L0JpdhbR2iVNOTAIoQWTqovajUiV0J1Q
+         k3CJgl9nmC2s/m982pW9OkHPdrQppgj7Doy1cm3mBbhvx8oPg1xnuSF+cuZ5Q31kOtmR
+         lfDX8XyXYRj9YVa1+2oXMQJ78OL1lGrdZUToKqmcVC1HpUdzTAfEEDAXwRfzSq9Lt8+f
+         3fUOnnVE+xNGOAzLWG2vArkwhXLp0+wR04a6cuUeR9xJ4wkVtwDPjfMQEXjd+Qvr3bPd
+         x0Mxy/CXMnp/ZwRwhwoq2SMt+xCtEViRAOIKgeNs00Ue4N1VP+XereDH35fMd7Uiq0Nd
+         HmsQ==
+X-Gm-Message-State: AOJu0YwPYuTtW7Ec4vHH6eP3Qd66R8i1i72UevYqpwtyy009MBVSjrIu
+	cCRKBRkH57fJF9wCf+z4oF9kOUXlQFGMip7T8xBiGj0B5YNv2Gi+gaCi
+X-Gm-Gg: AY/fxX5X6xRSxcvvfat8cK+JNHnkJHJOPPE+7p2scbyXzg3BGuj1/YqCc82c1QUy78L
+	Y0RMa0M02URbYkopnYLQxyPZAdmiDDbwvu9rFaJejuPYfHQS554mHxyGQTZoP93SvFZ7absxBSc
+	dXLghkkdrCSHD2EJg/HJAkYlvw3CM3xb1TYwlxOeJgjgUGXND2NUCuhlZKt3qWX0HrJY6+i+ee9
+	rZ0M2o7FQYaPN1LChftdPqCOhNJ809iWoGMC49ZkArHenRa1o/tdhyjFTARP8ah2gXLQlWjTiYu
+	7yyB2UfVW9t+htljVIiU6zKBDH8/b6laH8IumRHLNjzBRxjYF7S5f0ymHaTZ5AWTl6TRldTYgyy
+	xHyGmqARUiEmse/i8FwM1I97cQGZIkRPlLUFLN2+sjk0NOm0I5GcBL2RQ7wPGI9/AFm9PH45JDE
+	7L5IwuR0d76I9KDWT1WxFgykUkCWUvVnTy93Y=
+X-Received: by 2002:a05:600c:4e50:b0:47d:18b0:bb9a with SMTP id 5b1f17b1804b1-4801e34dafbmr99734575e9.33.1768738192676;
+        Sun, 18 Jan 2026 04:09:52 -0800 (PST)
 Received: from Arch-Spectre.dur.ac.uk ([129.234.0.168])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e886829sm138661265e9.8.2026.01.18.04.09.50
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801e886829sm138661265e9.8.2026.01.18.04.09.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jan 2026 04:09:50 -0800 (PST)
+        Sun, 18 Jan 2026 04:09:52 -0800 (PST)
 From: Yicong Hui <yiconghui@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org
@@ -78,9 +78,9 @@ Cc: netdev@vger.kernel.org,
 	skhan@linuxfoundation.org,
 	david.hunter.linux@gmail.com,
 	Yicong Hui <yiconghui@gmail.com>
-Subject: [PATCH net-next v2 2/3] net/micrel: Fix typos in micrel driver code comments
-Date: Sun, 18 Jan 2026 12:10:00 +0000
-Message-ID: <20260118121001.136806-3-yiconghui@gmail.com>
+Subject: [PATCH net-next v2 3/3] net/xen-netback: Fix mispelling of "Software" as "Softare"
+Date: Sun, 18 Jan 2026 12:10:01 +0000
+Message-ID: <20260118121001.136806-4-yiconghui@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260118121001.136806-1-yiconghui@gmail.com>
 References: <20260118121001.136806-1-yiconghui@gmail.com>
@@ -92,96 +92,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix various typos and misspellings in code comments in the
-drivers/net/ethernet/micrel directory
+Fix misspelling of "software" as "softare" in xen-netback code comment.
 
 Signed-off-by: Yicong Hui <yiconghui@gmail.com>
 ---
- drivers/net/ethernet/micrel/ks8842.c        | 4 ++--
- drivers/net/ethernet/micrel/ks8851_common.c | 2 +-
- drivers/net/ethernet/micrel/ks8851_spi.c    | 4 ++--
- drivers/net/ethernet/micrel/ksz884x.c       | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/net/xen-netback/hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/micrel/ks8842.c b/drivers/net/ethernet/micrel/ks8842.c
-index 541c41a9077a..b7cf2ee9115f 100644
---- a/drivers/net/ethernet/micrel/ks8842.c
-+++ b/drivers/net/ethernet/micrel/ks8842.c
-@@ -242,7 +242,7 @@ static void ks8842_reset(struct ks8842_adapter *adapter)
- 		msleep(10);
- 		iowrite16(0, adapter->hw_addr + REG_GRR);
- 	} else {
--		/* The KS8842 goes haywire when doing softare reset
-+		/* The KS8842 goes haywire when doing software reset
- 		* a work around in the timberdale IP is implemented to
- 		* do a hardware reset instead
- 		ks8842_write16(adapter, 3, 1, REG_GRR);
-@@ -312,7 +312,7 @@ static void ks8842_reset_hw(struct ks8842_adapter *adapter)
- 	/* aggressive back off in half duplex */
- 	ks8842_enable_bits(adapter, 32, 1 << 8, REG_SGCR1);
- 
--	/* enable no excessive collison drop */
-+	/* enable no excessive collision drop */
- 	ks8842_enable_bits(adapter, 32, 1 << 3, REG_SGCR2);
- 
- 	/* Enable port 1 force flow control / back pressure / transmit / recv */
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
-index bb5138806c3f..8048770958d6 100644
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -480,7 +480,7 @@ static int ks8851_net_open(struct net_device *dev)
-  * ks8851_net_stop - close network device
-  * @dev: The device being closed.
+diff --git a/drivers/net/xen-netback/hash.c b/drivers/net/xen-netback/hash.c
+index 45ddce35f6d2..c6b2eba3511b 100644
+--- a/drivers/net/xen-netback/hash.c
++++ b/drivers/net/xen-netback/hash.c
+@@ -3,7 +3,7 @@
   *
-- * Called to close down a network device which has been active. Cancell any
-+ * Called to close down a network device which has been active. Cancel any
-  * work, shutdown the RX and TX process and then place the chip into a low
-  * power state whilst it is not being used.
-  */
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
-index c862b13b447a..a161ae45743a 100644
---- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -39,7 +39,7 @@ static int msg_enable;
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License version 2
+- * as published by the Free Softare Foundation; or, when distributed
++ * as published by the Free Software Foundation; or, when distributed
+  * separately from the Linux kernel or incorporated into other
+  * software packages, subject to the following license:
   *
-  * The @lock ensures that the chip is protected when certain operations are
-  * in progress. When the read or write packet transfer is in progress, most
-- * of the chip registers are not ccessible until the transfer is finished and
-+ * of the chip registers are not accessible until the transfer is finished and
-  * the DMA has been de-asserted.
-  */
- struct ks8851_net_spi {
-@@ -298,7 +298,7 @@ static unsigned int calc_txlen(unsigned int len)
- 
- /**
-  * ks8851_tx_work - process tx packet(s)
-- * @work: The work strucutre what was scheduled.
-+ * @work: The work structure what was scheduled.
-  *
-  * This is called when a number of packets have been scheduled for
-  * transmission and need to be sent to the device.
-diff --git a/drivers/net/ethernet/micrel/ksz884x.c b/drivers/net/ethernet/micrel/ksz884x.c
-index cdde19b8edc4..60223f03482d 100644
---- a/drivers/net/ethernet/micrel/ksz884x.c
-+++ b/drivers/net/ethernet/micrel/ksz884x.c
-@@ -1166,7 +1166,7 @@ struct ksz_port_info {
-  * @tx_cfg:		Cached transmit control settings.
-  * @rx_cfg:		Cached receive control settings.
-  * @intr_mask:		Current interrupt mask.
-- * @intr_set:		Current interrup set.
-+ * @intr_set:		Current interrupt set.
-  * @intr_blocked:	Interrupt blocked.
-  * @rx_desc_info:	Receive descriptor information.
-  * @tx_desc_info:	Transmit descriptor information.
-@@ -2096,7 +2096,7 @@ static void sw_dis_prio_rate(struct ksz_hw *hw, int port)
- }
- 
- /**
-- * sw_init_prio_rate - initialize switch prioirty rate
-+ * sw_init_prio_rate - initialize switch priority rate
-  * @hw: 	The hardware instance.
-  *
-  * This routine initializes the priority rate function of the switch.
 -- 
 2.52.0
 
