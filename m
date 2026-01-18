@@ -1,158 +1,115 @@
-Return-Path: <netdev+bounces-250841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5558ED39521
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:54:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA9CD39529
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 13:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3AF9F300D418
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:54:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 49BE730194C8
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 12:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAC032E698;
-	Sun, 18 Jan 2026 12:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCE632E6A2;
+	Sun, 18 Jan 2026 12:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="BrxklBTZ";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="ajyxqJXo"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nYurh6nX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED34D32D0FD;
-	Sun, 18 Jan 2026 12:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.167
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768740849; cv=pass; b=bS3fQQuJjnXVdLet5+WlcGqxvFdfUWFKi7pC5JfbalJfzwnK6VLawSLbuV7Sd2p3xvFFkw9bNoKE9Mx+VFEepIs8O4VwzuxQNPbXlQihbmCzjmA+wFQcyjmyiTGQw3Nga0TeS6g1VoZabSpKQt5IkBdsJmY/Rrfjd+T2gITO8SA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768740849; c=relaxed/simple;
-	bh=WSCk2+9J55rg98cNOSH4gCTL/xL2Y9fkhPcPq+4Pw/I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OYXPezlUxYfm+zVxXtbU/0efBjTk0GXd6MoB5tuYdd7/YizLE0rPyxUj9LKqaqxS2ZY/+fI8T1mJSwbi+uLe+aRBaTSuDdtXXdvS4N7kKFzVzCuQQ40rR04dbMzYlF9qi9zKrErV0oB8bglzTG2aMPQIjolyI/oMCB59UdpQ2Rc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=BrxklBTZ; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=ajyxqJXo; arc=pass smtp.client-ip=81.169.146.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1768740835; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=RgYzCTobg30EbKRdIE5FQB44wEASQPN2Jt031rP5+aAy8bYZ3mzEXMTpyhahNWAff1
-    C/28D9wqR50dbI/a9JWQ9rxnV5xn+djntP324rPG7sjokryKmhr5LlwaOuGimyXQp9Of
-    cG5az2PVqtTw6TS7aZsMdO5CI/Q1Iy682pQdWElHJEfOw4mk28yfSE32LE8O9r1FVgCa
-    l/aN3iG3uDWP/EA80kCOvuQYgGx5Bas7OpGYafrRh5jJ9UZoO01qoK9wMD/Uwyy2m0iF
-    /bzr9nR+lVNUg+3T5jwgKs+sw/5+Y7hi68RjlFmiEqGuoFX+iPRqsAnOn+G8atLXinxs
-    hUEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768740835;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=lpOdbUvayTjEL+7w/+S9lDkpcIMTNQxOBEL16QWQ96g=;
-    b=lWkZIVQ8JfUID5zQ/c2Wz9pjk3PPweO0PL1QepOFIBYQw1aHQAUO780TrTVPgG8G2R
-    2wfxkzooqqDO4iIQ5dQTB/pYIHdXt8tPDHVqGGL1+DHSr0Wmmbok99G4DPCO62jp9Ya7
-    lytlGzP7oyUwZS+Cc/hhK+xvCAhGDtmbJoTeYVR2bknPW6G8abjXYWPEskTiTqI+SZa1
-    zIjilNIBZm4gtSLh2GgAmrnJCT2gQHxhZt8LgeY112Vnhmz6F6hFRH+KOLc8K5PIrUZB
-    IhahqI8hzuCqnlmDBRCOZ9BclBn3gj3cL13ZrLvDRwC0nunU1iVrmcfP5S4moc6CcHxQ
-    sLeg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768740835;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=lpOdbUvayTjEL+7w/+S9lDkpcIMTNQxOBEL16QWQ96g=;
-    b=BrxklBTZuTep3YXu1phxqe520Ft9xbtghdcy8XoPqnFNjtGBpkUvU4IzNzD9E5aENx
-    /+h/j153nlbLx9vKlxAD2pHhLiHe7PxZr9CXqkX4aza2+ha13L+td+UwN/z+zMmUPat+
-    HmFwCQJkKS9stf/bmtrhBsU/qBUlKGrMvNx7LkpQPvOCwlF1LwUPZ10/zFSvxb4hM7qF
-    StG08h/qgHfB7qM/kP6g1PodXyY+JsRD0h8XlacOGDLOIp9KdWAnrWfkII6MDs5+wcHh
-    AXGxOPAyrRbUc6rgeTHh1dUM6xgs4+Fw5sYt0iKMFWmglrf+RiQEWDZdrr4q8f0zA6bq
-    QosQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768740835;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=lpOdbUvayTjEL+7w/+S9lDkpcIMTNQxOBEL16QWQ96g=;
-    b=ajyxqJXoh49D1Z2E7lEm3jy+CWs7VdRak90mIL4dku5+ozzZs9QuPF57Aq6tczsyTd
-    lMgRQQP48NeWrQ/0giCw==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b20ICrsMrE
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sun, 18 Jan 2026 13:53:54 +0100 (CET)
-Message-ID: <dfbcab83-095d-4ed1-ae98-baada95d4cad@hartkopp.net>
-Date: Sun, 18 Jan 2026 13:53:49 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8632032D7FF
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 12:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768741015; cv=none; b=ip9zFKUVC6tFaBqgz6DUfEyb25P1vRLPgYBFJZxVZwbAIDWUwIUhDjr3oP3FW5EZbc+Sx+ZMvEm8nWT1qCPFlpKVuLCY9K6l3dZ3r3zhU/loRqOVFUoaCZhC/iq/fCBIv2elvkF9svbPyw8s40JRbczUYdaiwst+ltnbdFVsyro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768741015; c=relaxed/simple;
+	bh=62HYj/ZcUKlmj3QaojvdKZAilxIz+qBawy2FHsZ8X/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SfXFFmXy3hoSnZz7E93HQAF5DxglnzRjLc0hBpxlEipN8kNnCDsImvFLl1Gkb7KD0QAV7jc8gat+hK7YTX2+Ispi4DyykJHTgHaGTODfVl7G1gc4EsSY2hJgYhlmqB+6lvp7u9ErgAWKXlbn8BKjQfl3AUVcIUptUtQpCpV9xUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nYurh6nX; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42fb03c3cf2so2316395f8f.1
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 04:56:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1768741011; x=1769345811; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5vuppoT7xEbD8pTBXyzO8MGSdOfeAdBaep+fRisqsu8=;
+        b=nYurh6nXKUgh7bpdP9uHR2IVaOj1BGzecSS+jhWwD9E+aY1jgYba3c/jdfXWiB/bu3
+         bjDAzVqxsCSixYlBjEbdusSkES6Lqqe1t+esyBUJauFQNnWQMVTYTPbcbLzmGpyW47J9
+         bLdOuv/WOIMmWvY46v+Y9EAJEkp2l3aZxvPi2iP+6nyYmiOYObBquEVSMy0DjBROKb1O
+         MrMQbOvniYrIMUV6BbtzLPT2tg/HG5bpaeeChhQXrGDVIuJo2h+GYH6iMKkNuMQmYtCx
+         8roWGMczfSRy/qhJhI42VvnpdHSI5ip8VW5PsYnPCLQUv/SccbilreLjtzHNvm76ljz9
+         ZFpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768741011; x=1769345811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5vuppoT7xEbD8pTBXyzO8MGSdOfeAdBaep+fRisqsu8=;
+        b=bSOFLGqefbFWbCaAkX5MUur+ypvFDkhi2ZiTPbJavi8xCGXHe2JTcUD7m+RcV2vXt1
+         oux/j4GP/pkeTWEwAvo9K3H38wUTU2K8p6acFTjyTKPyFMi34Bg5N9BMm+LkuD+WCrX+
+         WdHGv0bmD9HYZGqD1AHigoodI8+E8fGxKUcDna3mTZ17XqNNQcnmRamzGrKojVjeBOkk
+         e6PqOsRh7s3yTBNVJfaOV8TQEJMTGBc1PIXssGm1Zg7pEt6bE7LFLeaBjh31PMWh4Z95
+         M9EL+MXqg5+ln0LUSFMxERHgzzlGBsjv4OQCfT1dXeaeH/o/J6kp7z/PVfQe5HW0G1i5
+         A5fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVK96JLE/pwctKKwS8FV4XBlrRcz/adJBiBjzRQ5d6WVkUxFvJHS07wNTGkz9tIR/kzJUsms+I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXOuQggtBFZTp/uHVF6bA8DLa9DmTfietQPY91jKvuJgKtvlP7
+	5ccNO9L+lTGA6PsQor3JxizEyxE8tuvzJQDkJvC4WA8okv6HNycpQU1zlQ2F00xeG+8=
+X-Gm-Gg: AY/fxX7YwjWdOU3/Lr6Vg8tXRZ2hPctycJj4C+h04ZvJrsN9pzm+c2EiX+3XXXWl/hw
+	MdK9R21lB1cKhvY5vfnbKNwGWAYOuYYbMRcSqhWJMFgzzwGgjaKn54hVt3jXxMBEgHxLvx0y0j7
+	gx5+jwQj0ZdAkJz4xR29DUMe1HwMwkbnsDvfe4+Cg5MDo4Bnv5OOHuhAa58SaE6DQ9ctCa9BcHI
+	t3BRYAUuWGwoZxbIdR+YHh0EMTqQ6ljgeKBOElkJPxuB8nXHgLt9vB7+8rYEZOAsIDYPEBz6Sge
+	aa7+ApsqIzP7LvgMcptp79sDb8fijM+GoTIVKP1C70Ozb3tSuQ9WrCFIdEGbi11WpStGytgntYS
+	sGGvDq7XRZLcDgBFd6rxwVJFGMUNfDi+dSrOPaxb4OezgaTixy427jLjoyPyWyixasuVkhsNk4R
+	xFvbWrmZklfXEbIkgQj9Eb/uZmUI0=
+X-Received: by 2002:a5d:588d:0:b0:430:ff81:2965 with SMTP id ffacd0b85a97d-4356a060dc4mr9673825f8f.49.1768741010676;
+        Sun, 18 Jan 2026 04:56:50 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356992201csm17368207f8f.2.2026.01.18.04.56.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jan 2026 04:56:50 -0800 (PST)
+Date: Sun, 18 Jan 2026 15:56:47 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	horms@kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next 1/2] ixgbe: e610: add missing endianness
+ conversion
+Message-ID: <aWzYj1cfVuhHpGCO@stanley.mountain>
+References: <20260116122353.78235-1-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [can-next 0/5] can: remove private skb headroom infrastructure
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org,
- Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
- <mailhol@kernel.org>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- davem@davemloft.net
-References: <20260112150908.5815-1-socketcan@hartkopp.net>
- <a2b9fde3-6c50-4003-bc9b-0d6f359e7ac9@redhat.com>
- <f2d293c1-bc6a-4130-b544-2216ec0b0590@hartkopp.net>
- <20260117091543.7881db1a@kernel.org>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20260117091543.7881db1a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260116122353.78235-1-piotr.kwapulinski@intel.com>
 
-
-On 17.01.26 18:15, Jakub Kicinski wrote:
-> On Fri, 16 Jan 2026 11:31:14 +0100 Oliver Hartkopp wrote:
->> Long story short: Using the common pattern to wrap a union around
->> dual-usable skb space is the most efficient and least risky solution IMHO.
+On Fri, Jan 16, 2026 at 01:23:53PM +0100, Piotr Kwapulinski wrote:
+> Fix a possible ACI issue on big-endian platforms.
 > 
-> The concern is that we're making a precedent for, let's call it -
-> not-routable-networking technology to redefine fields in skb that
-> it doesn't need. From the maintainability perspective that's a big
-> risk, IMHO. I fully acknowledge tho that using md dst will be a lot
-> more work. Which makes this situation an unpleasant judgment call :(
-> 
+> Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
 
-I checked out more of the "destination cache" code, the dst_metadata and 
-its users.
+Intel has a lot of code which assume that it will only run on little
+endian systems...  Which is probably a fair assumption, honestly.
+For example:
+drivers/platform/x86/intel/uncore-frequency/uncore-frequency-common.c:90 store_attr() warn: passing casted pointer '&input' to 'kstrtobool()' 32 vs 1.
+drivers/net/ethernet/intel/i40e/i40e_common.c:4345 i40e_led_get_reg() warn: passing casted pointer 'reg_val' to 'i40e_read_phy_register_clause45()' 32 vs 16.
+I seem them on occasion when I'm reviewing static checker warnings but
+I ignore them because Intel chips are little endian.
 
-And also this scary union in struct sk_buff:
+I don't have a problem with fixing Sparse endianness warnings, but the
+commit message should really say that it doesn't affect real life.
 
-union {
-         struct {
-                 unsigned long   _skb_refdst;
-                 void            (*destructor)(struct sk_buff *skb);
-         };
-         struct list_head        tcp_tsorted_anchor;
-#ifdef CONFIG_NET_SOCK_MSG
-         unsigned long           _sk_redir;
-#endif
-};
+regards,
+dan carpenter
 
-Despite the fact that the required 8 bytes content for the CAN skb has 
-nothing to do with destinations or other of these above use cases that 
-share the unsigned long pointer magic above, I doubt that the current 
-flow of CAN skbs between socket layer, driver layer and forth and back 
-would survive this.
-
-My first approach to "just" extend the skb header space for CAN skbs did 
-not work out because people obviously have other things in mind with 
-skb->head. I'm sure I can count the days until something breaks with the 
-CAN specific SKB data when attaching them to the next infrastructure 
-build for ethernet/IP use cases for the same reason.
-
-After all these experiences I would tend to add the required 8 bytes 
-directly to struct sk_buff covered by "#if IS_ENABLED(CONFIG_CAN)".
-
-Or save those 8 bytes by using the "inner protocol space" and 
-additionally setting skb->encapsulation to false. Which is a safe thing 
-to protect the CAN specific content against accidentally assaults and 
-can be clearly proved to be correct.
-
-Best regards,
-Oliver
 
