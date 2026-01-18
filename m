@@ -1,80 +1,101 @@
-Return-Path: <netdev+bounces-250783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1EFD3923C
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 03:34:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607E1D39241
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 03:49:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0906330049F5
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 02:34:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1C533014616
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 02:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B1F1C862E;
-	Sun, 18 Jan 2026 02:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C942189BB6;
+	Sun, 18 Jan 2026 02:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2nJxDCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC477405A;
-	Sun, 18 Jan 2026 02:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8FFFBF0;
+	Sun, 18 Jan 2026 02:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768703657; cv=none; b=ueGJqICRaA5ad6GEhBiJdO+RPUVPqLmKXlw9D8u5L+I8OkHzHNWbRzptFoZixI02LCD31pQfoLa94aPEXrWUzwfyc9R76SvkA3PMDtEtv8J/y5EnISYT4+B7Y+DSKxrvTF4glVaKS3V1mivMC/94xOLg//Q/MiYHvXEcN6dvSsY=
+	t=1768704554; cv=none; b=IoylvN67Ad1CkvbYasU9XCR6JjLy9Ont1TxATjH2aiH9+l84b7NvsNGfe1BdFbCRPVle5cE8h966o6OJWDz9T8LKmEXj1cyYt9yrnz2hq/EJXUFQQUD231rBXyamEF7v4xchD5nkgd5a82axHzswrzJP9pdglEGVObWUf8Y98Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768703657; c=relaxed/simple;
-	bh=2G0v2Edbib0zJWAzHp+XmFwmDhzo3gTwgZkHFi/3mCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l353Iat9K0yTpoj89t4UwT9b0kExwYRVf+vf9TXDL0wEEI6JhekM7NjrAt70JNyzsz6n0Yx9qJFVnjBWsiB+iqU3yNgvostzfHT3UpkrFSHR4HrE+Zi0m2MNT4ga1T1IOr4Bb8REiFG92uYPbGNTbN6Ue6XytyJNOZCVH/ToCn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vhIc5-000000000Wm-2ltB;
-	Sun, 18 Jan 2026 02:34:01 +0000
-Date: Sun, 18 Jan 2026 02:33:52 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: fchan@maxlinear.com, hkallweit1@gmail.com, jpovazanec@maxlinear.com,
-	yweng@maxlinear.com, davem@davemloft.net, andrew@lunn.ch,
-	linux@armlinux.org.uk, edumazet@google.com,
-	ajayaraman@maxlinear.com, john@phrozen.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	lrosu@maxlinear.com, bxu@maxlinear.com, pabeni@redhat.com
-Subject: Re: [net-next] net: phy: intel-xway: workaround stale LEDs before
- link-up
-Message-ID: <aWxGkAUlvyleFC1A@makrotopia.org>
-References: <d70a1fa9b92c7b3e7ea09b5c3216d77a8fd35265.1768432653.git.daniel@makrotopia.org>
- <20260118022907.1106701-1-kuba@kernel.org>
- <20260117183145.6f6a7d7e@kernel.org>
+	s=arc-20240116; t=1768704554; c=relaxed/simple;
+	bh=f8lMJjuptCPHYA5hUktASOtoFhrTgmJMaKCtGm+gKh8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eIiFq/sQdL1GH4Fp7WLM+lToo33phOKjTvfZd+zA2snAQhKqF9jiHXuGF1/Jj/BVF9sgOgrFwb+HazCgBQ66ezqY9npVlpZeA2VwioSg88Y6LLGQ6/xAE9vwYa0GZ2/mwTZSMAZWpT7D6qsbyLlBjd+VVRDEGeUGcVJn7wkplv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2nJxDCK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2830C4CEF7;
+	Sun, 18 Jan 2026 02:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768704553;
+	bh=f8lMJjuptCPHYA5hUktASOtoFhrTgmJMaKCtGm+gKh8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=U2nJxDCKWP0aii4ClL3wtF/1bPyn4LEFvTzIXggzL2e0F+IRsG+H+TDX+PlxwQybQ
+	 QOw6laHA/lPmpAvHaNEz/QNJG+HphUceZLyvKnhQZCnMc3eCuR1wFNRKmZimfLPkE6
+	 1eUdh+o7DDTWa/VBnCxEWLP/MMCivpViECOAZq+JJ6nf5AmI3ayAt94Kb6FcFbxPcU
+	 GuGNyUE4d+0YH10G9aI9as6MMUumkKLmAwPUwY5cQ34wj+f5rSRpJ/G6Gz7xIZfts2
+	 Ii8jhQQ7SBVfntyDl0knvtP5B59sVfFyRECjuTD4V+6loqYQK70iHPTVTAlGCKP23u
+	 4GqqYo8MBpfvg==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	allison.henderson@oracle.com
+Subject: [PATCH net-next v1 0/3] net/rds: RDS-TCP bug fix collection, subset 2: lock contention, state machine bugs, message drops
+Date: Sat, 17 Jan 2026 19:49:08 -0700
+Message-ID: <20260118024911.1203224-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260117183145.6f6a7d7e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jan 17, 2026 at 06:31:45PM -0800, Jakub Kicinski wrote:
-> On Sat, 17 Jan 2026 18:29:07 -0800 Jakub Kicinski wrote:
-> > > @@ -286,8 +287,33 @@ static int xway_gphy_config_init(struct phy_device *phydev)
-> > >  		return err;
-> > >
-> > >  	/* Use default LED configuration if 'leds' node isn't defined */
-> > > -	if (!of_get_child_by_name(np, "leds"))
-> > > +	if (!of_get_child_by_name(np, "leds")) {
-> > >  		xway_gphy_init_leds(phydev);
-> > > +	} else {  
-> > 
-> > Does this leak the device_node reference returned by of_get_child_by_name()?
-> 
-> Of course this is a pre-existing issue but could you fix it first
-> in net then proceed with this submission? Otherwise we'll have a
-> conflict.
+From: Allison Henderson <allison.henderson@oracle.com>
 
-Ack. I'll send the fix for this to net first, then resend this patch
-after the merge of net-next and net.
+Hi all,
+
+This is subset 2 of the RDS-TCP bug fix collection series I posted last
+Oct.  The greater series aims to correct multiple rds-tcp bugs that
+can cause dropped or out of sequence messages.  I've broken it down into
+smaller sets to make reviews more manageable.
+
+In this set, we correct a few RDS/TCP connection handling issues, lock
+contention issues, and message some loss bugs.
+
+The entire set can be viewed in the rfc here:
+https://lore.kernel.org/netdev/20251022191715.157755-1-achender@kernel.org/
+
+Questions, comments, flames appreciated!
+Thanks!
+Allison
+
+Gerd Rausch (2):
+  net/rds: No shortcut out of RDS_CONN_ERROR
+  net/rds: rds_tcp_accept_one ought to not discard messages
+
+Håkon Bugge (1):
+  net/rds: Change return code from rds_send_xmit() when lock is taken
+
+ net/rds/connection.c |   5 ++
+ net/rds/rds.h        |  65 +++++++++++++---------
+ net/rds/recv.c       |   4 ++
+ net/rds/send.c       |   4 +-
+ net/rds/tcp.c        |  27 ++++-----
+ net/rds/tcp.h        |  22 +++++++-
+ net/rds/tcp_listen.c | 128 +++++++++++++++++++++++++++++++------------
+ 7 files changed, 172 insertions(+), 83 deletions(-)
+
+-- 
+2.43.0
+
 
