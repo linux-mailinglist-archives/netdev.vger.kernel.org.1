@@ -1,170 +1,165 @@
-Return-Path: <netdev+bounces-250908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551C9D39897
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 18:35:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB5AD398A0
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 18:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2EA9730056E8
-	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:35:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E62C730011A7
+	for <lists+netdev@lfdr.de>; Sun, 18 Jan 2026 17:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472672F39CF;
-	Sun, 18 Jan 2026 17:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AE42FD69F;
+	Sun, 18 Jan 2026 17:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3HWkvEK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3BA18oM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84522F261C
-	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8952FCBF5
+	for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768757718; cv=none; b=DCma3Qrob4dUC3zMqg8Tc+dnKMoT+wd3iZms9LQkF6a0uFRRys1tUlMv/Jb4ylm25Lxkvgh/AnKnRdT9rGHowe7d3EhC+Ehg9QrYQYMfyZ5va/rjblwiFjKllmxcMvK/UWFp3wSe+kdWPmWGwHTii/IY8kIGQFEPyv/1SycXR4A=
+	t=1768758334; cv=none; b=DgICz2crxMfgR62veyE6GAbP5NlUTHD890mR86lAk6yRDhzl+vRRvZyhkHhHU+MzJ7rm0Snw8S9OLHG1t5SiK04EhPaMaHMeHq6z1URSysIVVypsIpPGuJT/q16SiqZ89xdQa2MVhuwdwGaDIjh+xp2Y2LodHdhG1pw2d7DIqvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768757718; c=relaxed/simple;
-	bh=1XjJMml5OQHthHhA3ZJ+DGh77+QauGSNKbPL+AXXDOA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q74uP3M06vwqdKq4lysN5BIajYMjanypw7NVMBHfLkbMe2bEA3gvggngozJTDoOIYp31fM8USBbNQ9znv33FmUiXJ+YN//MBnsOUqMWPRe3975Zh4U8foA3haup8izSHDrXOo7Qh9VYhj+qeSLm2MYg0a2/lmoQXI6KM1r+jTXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3HWkvEK; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1768758334; c=relaxed/simple;
+	bh=VcjR+Y1iNWZSa1ZtxEzMaBCTuPx9pXxpzhpYI/x/o48=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iTyTEcCP6sIffpLqSblZD7fGuYWEUPjT8SIjvgxiKNLwSvhRtYbU53v66PBolGZVUNs6rGeJBCN8Dg9JyYzBZXn0r3fCp8rtLIwg5olJk1lgDnj049Yu6oWfO6C1H5RwiKJhh3I2Cihto+/H+thPYLtYftOAZfyoa+9DBbNZLfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3BA18oM; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b876c0d5318so489627366b.0
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 09:35:16 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64b92abe63aso7085735a12.0
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 09:45:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768757715; x=1769362515; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pGZEHCPvQHmUu6ZZAHCVz+kl9sfR9JLyuBUpjMnyHL8=;
-        b=h3HWkvEKKGJzTpxkwG9bvkRXr5RPqRabGvsoGSv304WVI1dyZqMCsqAObaJ1SDhCF/
-         WtbWaujJHUaHqoTWFpvthfeHIUJwusghfpSIAUzOE3kCInyrUjhGkACgD7oshWWBDG/A
-         XyQfnrB9u2TDPzA+42vVKD453juaeh7QQ3nB335Yh8HO6cLJO8ypUjwO38EtzMXyq4/Y
-         YkdKN8mhfpOVy/xKeNfPbAHUMngf9ZYplSjtup5qpi7jVO19BEFErHktTqK2meWtnTVK
-         vFGAfew8p0QbiiBAId6QlOPzGVB0Fk64cVc1V4Q2WkGjQ+lTaKy8uDnFCEgV+3HRsoau
-         rmGg==
+        d=gmail.com; s=20230601; t=1768758330; x=1769363130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PbagKvzCIQaOeLMD21+nxd4UKX2WNLT5bVzVk/tS3pc=;
+        b=M3BA18oMmjUmADEe403rh92JvTWHfJCcY48LxqKL1hxU/xNRYO4P1I+s+d5Kojjg/D
+         hY0Ioo6uA5GwfHoMf1Q1llyfqbp/liVpI7OapIk5cmoxODPRxbD8G6FfNVUALCGE1LbB
+         MDau6kmCzdF0ZVVVdOiFRX2bcCqlCQVhrVMZEr6POMGnbiICD62EO2dmcW8wLZPLW8ta
+         /A/ETvbfyys1Er8ifMxG8rrXODPLxnRalcx6HSAjp2jaj3JLgZkiaFkMRHJ7LOWtNn/8
+         lG8xtzT6T0wPkQQrBecBuuBEwF0wXmwQapECu9MaMDOCNfIV5BG7Ms9Ohz9nxQapx2va
+         Bz5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768757715; x=1769362515;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pGZEHCPvQHmUu6ZZAHCVz+kl9sfR9JLyuBUpjMnyHL8=;
-        b=Wvp9W9nS6F80I0qRrenYHXXAsHtOPJx3qmIasdO+/4r5CKWo1WVBTHvoauusjA3y40
-         UWxw05e8lRz+QceyFio6tReVZqPe0VPxP0VrUEjuzz/N/bWaJZiyt/4K95ENAls+wRdH
-         k/KGabjGl/vJCnw3a/Exm2pzl+AgC9TeWVj33FzpGZSwHoyPt2LneA+biRUirmLWj7vE
-         TR9/V+I3njskahz/R6XLmCgyH3DJy3KWkHRxhU9Xph0sJD8e+IYhK9U4yIsyZ72p2FS/
-         KRe8EmXMPF2U+MtJcM38aQar1IY2Ubm32Zqir6Fkf5JMfMs4Rg2lFFPrBYj3o1KGl5i2
-         Zdgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqNKejY1MQ8O6F6J/90DZvMRZGLKh1j+5zYmhwCWCqpnsf4Ap2fESRpIA2t8HmEA5PGULR6Yw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8iqZ0pH49Y4Pn33QsGqzn7Eh4/+qtDyqi+XjvpCfzG/Zm21tm
-	CWTxXajE0yk5W86mYuLOzD3GZDRNhvBVQEkg8azCBzubPV1waHfZ2iop
-X-Gm-Gg: AY/fxX7LBiduYutBrWQGKfK8oEXhPibEteHewS4ACJX48Vuf5fWC11br5QlzOYkeLD1
-	fy91Dovo6KfMwW1GRKlu9L8KgzS6AecHogpiZOTWopTmi41IjjtOeixnKsaLCDsPmhIAHXToq7F
-	VVxq+t1VFqMUyAbr8riic0b5gI5wNNoKrrbHAVuwpyiuVfWzQM6b5VPARAa3C9vLOdMeaWzcPLb
-	3KV6RUk9eD5lhWBtmZuS4jqxA2xd1gDPVYxLyBjS+8fHonJfiVEu2PtMR9Q/RzAsFqV0xFPd2yz
-	dDPfOmswtYCNf0NR/7IohvpwsG/YzGON9z09AvNKAkuW0EvjbLqZX5scL/lIkILE8EfYEYnalw3
-	QgX90o58hUO4thZ7B5r2oujWjbWiavsiJcpmg1EkDtGvO9fEjMOCijS9L06+RE9x+Y6f8OHYM6i
-	LVMm+AlBAd2+0=
-X-Received: by 2002:a17:907:1c02:b0:b80:a31:eb08 with SMTP id a640c23a62f3a-b879302426amr752483166b.55.1768757714447;
-        Sun, 18 Jan 2026 09:35:14 -0800 (PST)
-Received: from osama ([2a02:908:1b4:dac0:5466:5c6:1ae0:13b7])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-654533cc4b9sm8173672a12.18.2026.01.18.09.35.13
+        d=1e100.net; s=20230601; t=1768758330; x=1769363130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PbagKvzCIQaOeLMD21+nxd4UKX2WNLT5bVzVk/tS3pc=;
+        b=f0m9wubJvOsqcQJyDjOugeU8ipdOevuN7O8fpUx6XxO4e13kj/Rz3LPKPmHkChJb5p
+         obJ1Pcu0OkVaaX7gWvIIa7P1aXRH1pUdL9HOZ4GOsbf7bp8CWzugTEHV+dBCDrcfuPC/
+         lt3WqliNqpEi6sdL/Z93hTsWU3Ig8JbR6JVCevSQZ8uE2YWgMUQ2iwFhW+/iG76zaCjm
+         8/mDEVlPquOzMu8BhNvkFe1XbK8DSkE6SU61d8tSSK2e+BM95pvLyrnLn/rkugiqOVsM
+         j7KL88yfDdNjFRPF4k5YXGv/ay1jhi/bq0Okw8HLjLG3Yiig3j1r2wADgt6h+BRsGGd2
+         xUtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfECnFyfCqd9iG8yGxRoQP2taOIwOvWShrMbRv1mh+dO426ezBRr8nWuLPyn9wnWMfA1prbfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5CH9gDwgjD5x5MYt8eXaIrcqJBWVlffbHLcX8SxSfQwY1kuaG
+	sNfRQ1zsvt+i5YutiVX7xYNafva8xjFsTkGfWeJfvjglEd9WZr4tM2R2
+X-Gm-Gg: AY/fxX6UaeSfrUl+f0kqxAMrCCZoxLGuQAoj+SSoU7PTUQMs8SrCdtmwPFrANlukOdm
+	9884HHtSz0ugPyQi56ea0q2+aNfK5H8fJLiAuxBoAouoUhXL8KkseJt9UzWCz9u1WI0ka1ApXLC
+	ZKUmKU01VpZQF1FCBY/uoTiRe7GxqQNY7Tzf+QQijddWACgAodD6aWjz3YVGXmfiy2vPMM01Oca
+	92tQHkJs3WKLPlEG3TUnvByIYPjxID8fLlsyiiNlOFeOigErZi4Uf0ZNTK8IwuhLBcp/SdyW2xj
+	/gtvpJdsD01GPK2h8smTzsRPOGsY8xZBJOu4g3Sr9cbsAwvjegoHXURdx1rNI05LUE5OWCXOBfp
+	WpwS1a1t2YPyjyzxBRD/UtVciPQ+f70Ttp4G5/uvzlYu06R1vhKU7+oEaFkOSZkA2Y+6IiHTVxC
+	qlL35e7ZBwDTFWAw==
+X-Received: by 2002:a05:6402:3491:b0:64b:5562:c8f4 with SMTP id 4fb4d7f45d1cf-654524cf27fmr7018655a12.7.1768758330277;
+        Sun, 18 Jan 2026 09:45:30 -0800 (PST)
+Received: from osama.. ([2a02:908:1b4:dac0:5466:5c6:1ae0:13b7])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65452bce411sm8105189a12.7.2026.01.18.09.45.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jan 2026 09:35:13 -0800 (PST)
-Date: Sun, 18 Jan 2026 18:35:11 +0100
+        Sun, 18 Jan 2026 09:45:28 -0800 (PST)
 From: Osama Abdelkader <osama.abdelkader@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Osama Abdelkader <osama.abdelkader@gmail.com>,
 	Sjur Braendeland <sjur.brandeland@stericsson.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com,
 	stable@vger.kernel.org
-Subject: Re: [PATCH] net: caif: fix memory leak in ldisc_receive
-Message-ID: <aW0Zz9SNbxJRxghp@osama>
-References: <20260118144800.18747-1-osama.abdelkader@gmail.com>
- <2026011805-bamboo-disband-926a@gregkh>
+Subject: [PATCH v2] net: caif: fix memory leak in ldisc_receive
+Date: Sun, 18 Jan 2026 18:44:16 +0100
+Message-ID: <20260118174422.10257-1-osama.abdelkader@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2026011805-bamboo-disband-926a@gregkh>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 18, 2026 at 04:02:44PM +0100, Greg Kroah-Hartman wrote:
-> On Sun, Jan 18, 2026 at 03:47:54PM +0100, Osama Abdelkader wrote:
-> > Add NULL pointer checks for ser and ser->dev in ldisc_receive() to
-> > prevent memory leaks when the function is called during device close
-> > or in race conditions where tty->disc_data or ser->dev may be NULL.
-> > 
-> > The memory leak occurred because netdev_alloc_skb() would allocate an
-> > skb, but if ser or ser->dev was NULL, the function would return early
-> > without freeing the allocated skb. Additionally, ser->dev was accessed
-> > before checking if it was NULL, which could cause a NULL pointer
-> > dereference.
-> > 
-> > Reported-by: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com
-> > Closes:
-> > https://syzkaller.appspot.com/bug?extid=f9d847b2b84164fa69f3
-> 
-> Please do not wrap this line.
+Add NULL pointer checks for ser and ser->dev in ldisc_receive() to
+prevent memory leaks when the function is called during device close
+or in race conditions where tty->disc_data or ser->dev may be NULL.
 
-OK.
+The memory leak occurred because ser->dev was accessed before checking
+if ser or ser->dev was NULL, which could cause a NULL pointer
+dereference or use of freed memory. Additionally, set tty->disc_data
+to NULL in ldisc_close() to prevent receive_buf() from using a freed
+ser pointer after the line discipline is closed.
 
-> 
-> > Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
-> > CC: stable@vger.kernel.org
-> > Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
-> > ---
-> >  drivers/net/caif/caif_serial.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> > index c398ac42eae9..0ec9670bd35c 100644
-> > --- a/drivers/net/caif/caif_serial.c
-> > +++ b/drivers/net/caif/caif_serial.c
-> > @@ -152,12 +152,16 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
-> >  	int ret;
-> >  
-> >  	ser = tty->disc_data;
-> > +	if (!ser)
-> > +		return;
-> 
-> Can this ever be true?
+Reported-by: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=f9d847b2b84164fa69f3
+Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
+CC: stable@vger.kernel.org
+Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
+---
+v2:
+1.Combine NULL pointer checks for ser and ser->dev in ldisc_receive()
+2.Set tty->disc_data = NULL in ldisc_close() to prevent receive_buf()
+from using a freed ser pointer after close.
+3.Add NULL pointer check for ser in ldisc_close()
+---
+ drivers/net/caif/caif_serial.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Yes, when the line discipline is changed, tty_set_termios_ldisc() sets tty->disc_data = NULL
-> 
-> >  	/*
-> >  	 * NOTE: flags may contain information about break or overrun.
-> >  	 * This is not yet handled.
-> >  	 */
-> >  
-> > +	if (!ser->dev)
-> > +		return;
-> 
-> Why is this check here and not just merged together with the one you
-> added above?  And how can ->dev be NULL?
+diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+index c398ac42eae9..970237a3ccca 100644
+--- a/drivers/net/caif/caif_serial.c
++++ b/drivers/net/caif/caif_serial.c
+@@ -152,6 +152,8 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
+ 	int ret;
+ 
+ 	ser = tty->disc_data;
++	if (!ser || !ser->dev)
++		return;
+ 
+ 	/*
+ 	 * NOTE: flags may contain information about break or overrun.
+@@ -170,8 +172,6 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
+ 		return;
+ 	}
+ 
+-	BUG_ON(ser->dev == NULL);
+-
+ 	/* Get a suitable caif packet and copy in data. */
+ 	skb = netdev_alloc_skb(ser->dev, count+1);
+ 	if (skb == NULL)
+@@ -355,11 +355,15 @@ static void ldisc_close(struct tty_struct *tty)
+ {
+ 	struct ser_device *ser = tty->disc_data;
+ 
++	if (!ser)
++		return;
++
+ 	tty_kref_put(ser->tty);
+ 
+ 	spin_lock(&ser_lock);
+ 	list_move(&ser->node, &ser_release_list);
+ 	spin_unlock(&ser_lock);
++	tty->disc_data = NULL;
+ 	schedule_work(&ser_release_work);
+ }
+ 
+-- 
+2.43.0
 
-I'm going to combine them in v2.
-If ser exists, ser->dev should be non-NULL (they're created together), but the check is defensive.
-
-> 
-> And where is the locking to prevent this from changing right after you
-> check it?
-> 
-
-I'm going to address that in v2.
-
-> thanks,
-> 
-> greg k-h
-
-Thanks,
-Osama
 
