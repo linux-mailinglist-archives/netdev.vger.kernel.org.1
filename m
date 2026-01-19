@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-250941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C71D39C18
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 02:45:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69AE4D39C19
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 02:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EE65D300160D
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 01:45:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E59633001824
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 01:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDF36BB5B;
-	Mon, 19 Jan 2026 01:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACC91DF723;
+	Mon, 19 Jan 2026 01:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUVIeRYz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoUDXfYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4001F200110
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B548D6BB5B
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768787123; cv=none; b=c+cdZ2jkTCIOLdr57yVNtmcxDNbm7ChrjkRVtfwud0+pkUjbRXdlI6Gllsh3VFhrcVBOQov93u0cAN/yueM4HXQSZI/YHkJb1/Xa0w4ijh2xPHELdXZFaZJFw2jnu483zjhPhbxGqzLTSTdjPayxz6yS1KL129ovx82RB2jO+LA=
+	t=1768787140; cv=none; b=nh+5AUFIoqsy2B4XK3cYMtX2gHEexfzDRKHK7GEbQecF82e2kwXpSiweQ+k3zmpMkeHLFIF4T/G3BmM1Mir3xIRCheIHrwidAfWbcHxCMRA5as/UGqKSQHgjro+GWXF1/ONbwQYnMrit6Wj7pzvxSaOKDPOY6SU84jYtAeBj4s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768787123; c=relaxed/simple;
-	bh=5h2I0YxtJwPsjkMG3LKxuVHco95YcSlv7gHxMC0uIpU=;
+	s=arc-20240116; t=1768787140; c=relaxed/simple;
+	bh=7ZLTOzeksxEPo2l2v3dDm/2Abty3Gbxin0k2GNGZEeg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uebqgoL+SPUl9fY9H1HTwFRy3La3LdrVkAT2UVPQD+63XfvmurJ7ybpYeQK2DNPIHjMFYSyheLBsEzbZWlb+7V3WiXWGT1SxFcDM6kAf5E9yjc9rN6OAmVPhIxYL54CKSj0NaRspBR6THdp5w7PKNIl5YDQ4ixa6Nst+Y5HBNPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUVIeRYz; arc=none smtp.client-ip=74.125.82.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=ififUlyV3U8hpFJECVmDceXvgdgxcrI3sc2prwwmKkuoznrOiHAxmyKRAmP76sQmQw96jsRyNXWzbgELFUy9TNj8AFv0RX+BWhTvRRqqnD5Xnjm5Vi9bkIdu9Op4OyJP8lDP+eDF8anaNuRt2Hrws+vjLbBLXaH7Y2wFAe4hAo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoUDXfYd; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1233bb90317so2954890c88.1
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:45:22 -0800 (PST)
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2b04fcfc0daso4462392eec.0
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 17:45:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768787121; x=1769391921; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768787138; x=1769391938; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQSVsnHg+O3hcpMh47evjUqhwH0d7PCJ/jfr3jwWCIE=;
-        b=cUVIeRYzrbTX2DaItH/uaBeIROoR7Lbyg7892DQkPAtQew7uReexSwfR+Bs4GTk+Au
-         lMpPzaErZpFsuPdLMn7S26LnxI0bsrWX2IE8nTzvI4aje4uiUYR+35Rud2JpfQnaD3ho
-         VNTe6IB70xnQWYB1yxtlBa2/F5B6iHspE2R77SXhFwm+yMky1evbGMRd9j8EOOhGr/ZM
-         zR3mMjQ1BxVP6YPqYQAvsZLe0TK5NWC6+47IcztAjR9AXxhe+j0voVTHbZEJl5wilbc2
-         Cry7Vm0L12ZzoVg7WwBTjwlsFUljLELELKxLwCEMfY1RhQccV/ezvfdzRZyEHDdqaGT9
-         A6PQ==
+        bh=aLNuYLeQh7kmecjdwrL3iJaysp/c6/WIw7e3NiVC8xs=;
+        b=IoUDXfYdAJ24BvCs+j7zrAr0cYnUFJGwKihgNt1fuPQHpykI3AfeY5GUVxf8IaagRI
+         eK1m2h7HYdeTZ7JCxpzy5cmEctL+Th1gRTP78I1seUivIwQbTG3ElndybC45NYtc+Whi
+         +uqXP6zfjqaNl/M0e49u36zXU4OKWAVl0BOUyuzoiwaUg0vH6a8quEnHdujyxhIdRYKq
+         ci0eu2dpw0AM/bdEPq9w7WfdBgQEBI1pJnbpDTOQokbpXryKqhqsOMWhhOmPk2gtCNOr
+         p11Kzvx6gX1wvDC2PF53Kpum9KRv7lHFukRiZh+Lz8rRlqxWDAPKe4Mt6Rw9u6Rrk0HB
+         qkmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768787121; x=1769391921;
+        d=1e100.net; s=20230601; t=1768787138; x=1769391938;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZQSVsnHg+O3hcpMh47evjUqhwH0d7PCJ/jfr3jwWCIE=;
-        b=mbSGhrnGQ5NrT0Yi2WMbpuExRA1LLLq+r5EmTYGMSdD1VhfdjGt8PVXckx1hUDiSx2
-         +13yUHumh/ulg/GuyeetMm1TsC0UtJtBQFGZncFBu59mdZ2JypaDCy8VSS7V1MeoInxm
-         tS3DpVvkWUIRAUbxjFvNoWrTUyw9MTmHERQ1hIpTr8R74AUd/q5KM3CdlEv0eo7AvXfH
-         Fd95Gp5EmuO+gNEDPTDlEpg5TLaryo0PNg/HfnVIaIkgs3ihIeGm2t1bs4dIB8eHVbrV
-         hjK6m1iWYrgLGuhJEJKeVg2FTmL6hVNNijgeBhxG2B7cih6smb1Vc2Pp4gpkpphBAyYi
-         qtsQ==
-X-Gm-Message-State: AOJu0YxlAEasFlG2toAIRc8kQkL5FYxDNn5Ta9xyMmTuflPLI10GlF/w
-	4Bm1TfbJKvSmM/lz8TDCHXdmO0sYCY7QqHKlU6YpWZzdipODAFgQx6Q=
-X-Gm-Gg: AY/fxX583PKD7Dc1nRtsoA39nf5YQHrN+in+SeEGi7K5iqY03f8nuGQLQRNL27fnGwI
-	ICGzTUVrZs9ZxX297o0HE1MsD/iEPXYrM0HW6ACnCe8RDq71tVuY4y5Vg1YbAAGm/+Y4yf12sty
-	tPmM1+vNmnCfLMJMFYYE8bEzZrEZxiBfnT/WzJu4q984BCRUqPoTh7+V/p024/hkrTbfEB1VJQm
-	P2vTiu0YAxKVyBug3yjWatoD5WADgho1IjSeWGCi/LaTpvwvPrJL1IATaA3QinWKlDg0z3UJFi8
-	IltO+EasdeZiebD8ntTkmx+Q9L0GOxSroT+ad9Pc7CpLZvwidHk3DoguNhNAhTrLdy3jSYm2Cy+
-	bEWmvdyBmWeh0uHk4uMzRpRFeWZrnBL7NPfvpBJ2JHoDq5Ox5srVGWVZKp+OuiwYQubztSoQI1Q
-	jmr6qJLiNZR5/I6/weTUu4vlGlTJ5TrLnXDUK0qnMt0cUtq946fsW87BG2bZ7HY7dKhv7VdEN/H
-	aUrhSdPujxdazv3
-X-Received: by 2002:a05:7022:2486:b0:119:e569:f865 with SMTP id a92af1059eb24-1244a923b8fmr6685305c88.2.1768787120925;
-        Sun, 18 Jan 2026 17:45:20 -0800 (PST)
+        bh=aLNuYLeQh7kmecjdwrL3iJaysp/c6/WIw7e3NiVC8xs=;
+        b=YkrG/rf2z8qm1Gmdl7dHCdyS3/oHZd4J8d48tDVompOvJPL+2gX0s3UsRfnCiBzxbT
+         ZMjYoJihWqCiDjKXxNiSnOzuXdhMOiNpkK9GyJinUtjhgUtno8oTLEMZYcXLDZfh036n
+         a/p538ZFdI61VmrN9ahqFny3pXAvhQJBMWHgWz8NWbuaxKtZYTN4+hm6lOARzSfhFssG
+         UxPArswU5N3HAht/r3NwYU/IinR+HkmK2ZTcyngkd235LQL6Tm/c9Eq21XzjqaKHJgxE
+         x4dIH3k/VsrkhDVp17R0sbhKXwGJMV4djFCGnxDVQnHZ10qP1QUIlLVtbkZmBnuGI0wp
+         BUFg==
+X-Gm-Message-State: AOJu0YytfNheZeLW2Xz8tXLJPTAgi6irboPEwPq/wX/a/nmGHBvzk7te
+	gSWPxq+cXskJfmwGlLuSSvJJPBbQH059ttaoVCCyv9rX5WXiltIktqc=
+X-Gm-Gg: AY/fxX7XN62Xh7r12tEYwUVsNSyMt+h4gBjaNKbhpcVLbwHdvQY3CHC3gj2ZlXP1tYH
+	+lJUIAkUcXpnRWWjJiaLlUxcmL50vXH9x/isQH3TEr0QcQ3YQMJdaMiyXvwR+BdTf6pGiYKo98k
+	vcBHS6/FvkcTMDdeEn3LuOdZHfH7Q4gitr3TuZqikQtCJAQe7fCDo7CZpFRTxgNL6Q+ORW1ydbf
+	r7NYOb4ayPLmhwsa4btEamu2j5a2J6xfVC3WUtXh5K2EnbidEWbjtLnt0109ZZSZiEgaO+8/vpe
+	ZStMYr4DMu15NztdzEVGKIM3FkXdVEpFWyFHD44l86Z2Iwd9zrDOtO4FeKY3xg0W/N1ZjtO8Dj/
+	96mTf7AHFBeFqx1S2KYtU6GQxOL7yFwW9mGKONW/Tdt5hJtX5YCyrTQMX9euO+5ZTsg2F7Nq9S5
+	0Ikmnc/PM6k2Qs3PjouJh+9teK6qGmHed6UFSr799Fb6reKvtkdbPndieqLBdMEOXMyAoFuMk6m
+	8xGbg==
+X-Received: by 2002:a05:7022:b98:b0:11a:273c:dd98 with SMTP id a92af1059eb24-1244a724cacmr7685802c88.20.1768787137840;
+        Sun, 18 Jan 2026 17:45:37 -0800 (PST)
 Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ac5842csm13609302c88.1.2026.01.18.17.45.20
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244aefa7c5sm14340229c88.10.2026.01.18.17.45.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jan 2026 17:45:20 -0800 (PST)
-Date: Sun, 18 Jan 2026 17:45:19 -0800
+        Sun, 18 Jan 2026 17:45:37 -0800 (PST)
+Date: Sun, 18 Jan 2026 17:45:36 -0800
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Daniel Borkmann <daniel@iogearbox.net>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
@@ -80,10 +80,11 @@ Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
 	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
 	dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v7 07/16] xsk: Extend xsk_rcv_check validation
-Message-ID: <aW2Mr5Wbd4S2QJbS@mini-arch>
+Subject: Re: [PATCH net-next v7 08/16] xsk: Proxy pool management for leased
+ queues
+Message-ID: <aW2MwPYcBosCvdg6@mini-arch>
 References: <20260115082603.219152-1-daniel@iogearbox.net>
- <20260115082603.219152-8-daniel@iogearbox.net>
+ <20260115082603.219152-9-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,18 +93,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260115082603.219152-8-daniel@iogearbox.net>
+In-Reply-To: <20260115082603.219152-9-daniel@iogearbox.net>
 
 On 01/15, Daniel Borkmann wrote:
-> xsk_rcv_check tests for inbound packets to see whether they match
-> the bound AF_XDP socket. Refactor the test into a small helper
-> xsk_dev_queue_valid and move the validation against xs->dev and
-> xs->queue_id there.
-> 
-> The fast-path case stays in place and allows for quick return in
-> xsk_dev_queue_valid. If it fails, the validation is extended to
-> check whether the AF_XDP socket is bound against a leased queue,
-> and if the case then the test is redone.
+> Similarly to the net_mp_{open,close}_rxq handling for leased queues, proxy
+> the xsk_{reg,clear}_pool_at_qid via netif_get_rx_queue_lease_locked such
+> that in case a virtual netdev picked a leased rxq, the request gets through
+> to the real rxq in the physical netdev. The proxying is only relevant for
+> queue_id < dev->real_num_rx_queues since right now its only supported for
+> rxqs.
 > 
 > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > Co-developed-by: David Wei <dw@davidwei.uk>
