@@ -1,112 +1,184 @@
-Return-Path: <netdev+bounces-251074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9858ED3A90E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:36:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B376BD3A911
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7ACED30CC4B3
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:34:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF3F030F1857
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4921935B120;
-	Mon, 19 Jan 2026 12:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8581335B13C;
+	Mon, 19 Jan 2026 12:34:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="N9QaNvM9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f4V0kyss"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C9A35B140;
-	Mon, 19 Jan 2026 12:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8838A28FFE7;
+	Mon, 19 Jan 2026 12:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826079; cv=none; b=brSAoCc/N5YufctjbsJaGGLyvNQmKivj8DkeZ/ij31Yny8KSJgrtcySaHoFga4duSdm+3/Hug8G7vlid97p8q3LKH+xqP4v7wbAsDR1zf7mbI/1MuPxhxRZiSzowmHCZ8xVi4heBNn4xsnk4IGiSN8bvknSwflsDGCeJGisvHNY=
+	t=1768826084; cv=none; b=C9SjFbmuYwhezyLDPd4yvFcYPp35FCwROuoY9vqEgowgo0aXgVgDwEy26Nf5DsJAjS+5b0F1YgyOlZjrxjsi0FDtdM8+epCKhQ3ZFyA/RsIq2+5eNwOZOCXNHf5FvDltmxwTuY9/EVPzCjsMgTHuisj3bVSVZaCE1sR1qrz/y74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826079; c=relaxed/simple;
-	bh=XFlK9F8mCmxc52EP9cPh0kMubVtKS5FFg+3+IrJ8Bt0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y5m/sQBn0/WTv8yvB5+wxWsCLlOX5TaCO47oIqb4U3mgqcPeIkZt2GnkUZVwh7YqJTEevWU6bwYqV5OY/lnB9rEZYwY+7/b28lpsfOksXtS7fijjbvHYlO0nzkA8XEhtBlf7pV+swkD5t+Gd0yfBTPa7WBMM1VasDlBkplfT3Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=N9QaNvM9; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60JCYFEk82926860, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1768826055; bh=XFlK9F8mCmxc52EP9cPh0kMubVtKS5FFg+3+IrJ8Bt0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=N9QaNvM99G/xV+3Rfkf7KlboCZK73jseCGlXw6XWVOiaRCIg+HrDwLuC/akvlXmAE
-	 qiXKGvI/p9gml1Ks+9DwaY8WlYu4CotWxa+hUD1RZ9IsMRqCv1fStXQFr10tiHC7I9
-	 4rIqpv21NGqSK6jprgCTFX7Y7f/czUOQ7SXQbeq1EWuxiMwTX0AX85w+oU2qlLQNk7
-	 2zRpTOZQu6/1f9slgVGsnpXp02ABkih0GPCwpU9Y8i433jzUYvebq+KGNQ5lvDqP3K
-	 sI06GycoT7wZaaJmKdVG14oeWdmyzkUU3+uh8wU2uPBVWlDjq0oYSaTsJmx+pv6teY
-	 GR9GwmCvfx8yw==
-Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60JCYFEk82926860
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Jan 2026 20:34:15 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Mon, 19 Jan 2026 20:34:16 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Mon, 19 Jan 2026 20:34:15 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([fe80::8bac:ef80:dea8:91d5]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::8bac:ef80:dea8:91d5%9]) with mapi id
- 15.02.1748.010; Mon, 19 Jan 2026 20:34:15 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: lu lu <insyelu@gmail.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        nic_swsd <nic_swsd@realtek.com>, "tiwai@suse.de"
-	<tiwai@suse.de>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] net: usb: r8152: fix transmit queue timeout
-Thread-Topic: [PATCH] net: usb: r8152: fix transmit queue timeout
-Thread-Index: AQHchQGLBs/iMEigv0CwXIii7EgMTLVRErBAgADcLoCAASPVoIAAd9qAgACSjYD//8agAIAE7krA//+/4oCAAOJ1wA==
-Date: Mon, 19 Jan 2026 12:34:15 +0000
-Message-ID: <cd80f6df5c184549a3705efa61d40d58@realtek.com>
-References: <20260114025622.24348-1-insyelu@gmail.com>
- <3501a6e902654554b61ab5cd89dcb0dd@realtek.com>
- <CAAPueM4XheTsmb6xd3w5A3zoec-z3ewq=uNpA8tegFbtFWCfaA@mail.gmail.com>
- <1b498052994c4ed48de45b5af9a490b6@realtek.com>
- <CAAPueM65Y4zEb4UidMR-6UtCZVWYs+A7cHzYbBgJMmAZ2iLy5Q@mail.gmail.com>
- <f3fe05ea76794cd09774cd69e85623d8@realtek.com>
- <CAAPueM57HHjvyCtBf5TEy2rn6+1ab7_aeSpJ0Kv4xUYt+SfFtg@mail.gmail.com>
- <ae7e8fc22fcf415d9eb5e4d36ed74231@realtek.com>
- <CAAPueM6_GQLcqz+xxKVDOaUZZrDNOnYB_tQ2gaxrUKnDQSZ9cg@mail.gmail.com>
-In-Reply-To: <CAAPueM6_GQLcqz+xxKVDOaUZZrDNOnYB_tQ2gaxrUKnDQSZ9cg@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1768826084; c=relaxed/simple;
+	bh=Mkl0P4UVCtewya7IlQvFxF2rpNhPVtWfFlJKQphdGEw=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=mifW2JZXqje/k8P4h0zPMi2PVFugEbAlxDm5WILORn9Z7diZXryJhygbYEg6FHW0ILQ+Vwcm/BSNi6vqfFsseGI7iq+sNT/vJiqD1gNcjHgmtZAGQeYE5WnHEvAeVS1eHc02GJ02O3uDPn2gXPNG8ck3NH5pu/JgCmwuTuupSs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f4V0kyss; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tDh4p51oLv7FOb/arX7mMuMExGy4+nCEFyLLly8x3eE=; b=f4V0kyss7JVm9mNGMqTOVtJno0
+	rj3eDB2bJT/qW4aImOasG1/2iR1pH61kaCgXpJWmrzhaKaOn69aDUrBSM8NJaOHYALKzXgPfx5z0/
+	jwqZA7xgIqOGxhctybUTcmhem/0HxNdVURX06uoilYZNXVwGT5NrAsfoIQSuRmK5A+WIoiaTC9rFU
+	Wv5j36ze0JAcrjIlPkhenxHcg3awWTb8caaTV+rx/HVGwNPJ5fnso7ND3G9oaA4U8pNTVTbtSejOZ
+	9yK24tFr+sXuPXYDLm0vycK1oCLrcQlbw1/9M7IbScSqXEnOGtMn9RZ3alERJgu6SBH8Qeu27LuiM
+	Gu4loP7A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46532 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vhoSa-0000000053c-3azv;
+	Mon, 19 Jan 2026 12:34:21 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vhoSX-00000005H1x-0N69;
+	Mon, 19 Jan 2026 12:34:17 +0000
+In-Reply-To: <aW4kakF3Ly7VaxN6@shell.armlinux.org.uk>
+References: <aW4kakF3Ly7VaxN6@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH net-next 08/14] net: stmmac: handle integrated PCS
+ phy_intf_sel separately
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vhoSX-00000005H1x-0N69@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 19 Jan 2026 12:34:17 +0000
 
-bHUgbHUgPGluc3llbHVAZ21haWwuY29tPg0KPiBTZW50OiBNb25kYXksIEphbnVhcnkgMTksIDIw
-MjYgMjo1OCBQTQ0KWy4uLl0NCj4gPiBUaGVyZWZvcmUsIHdoYXQgbmVlZHMgdG8gYmUgZG9uZSBp
-cyB0byB1cGRhdGUgdGhlIHRpbWVzdGFtcCB3aGVuIHRoZSBUWCBxdWV1ZSBpcyBzdG9wcGVkLg0K
-PiA+IFVwZGF0aW5nIHRyYW5zX3N0YXJ0IHdoaWxlIHRoZSBUWCBxdWV1ZSBpcyBub3Qgc3RvcHBl
-ZCBpcyB1c2VsZXNzLg0KPiBpZiAobmV0aWZfcXVldWVfc3RvcHBlZCh0cC0+bmV0ZGV2KSkgew0K
-PiAgICAgaWYgKHNrYl9xdWV1ZV9sZW4oJnRwLT50eF9xdWV1ZSkgPCB0cC0+dHhfcWxlbikNCj4g
-ICAgICAgICBuZXRpZl93YWtlX3F1ZXVlKHRwLT5uZXRkZXYpOw0KPiAgICAgZWxzZQ0KPiAgICAg
-ICAgIG5ldGlmX3RyYW5zX3VwZGF0ZSh0cC0+bmV0ZGV2KTsNCj4gfQ0KPiBUaGlzIGNoYW5nZSBj
-b250aW51b3VzbHkgdXBkYXRlcyB0aGUgdHJhbnNfc3RhcnQgdmFsdWUsIGV2ZW4gd2hlbiB0aGUN
-Cj4gVFggcXVldWUgaGFzIGJlZW4gc3RvcHBlZCBhbmQgaXRzIGxlbmd0aCBleGNlZWRzIHRoZSB0
-aHJlc2hvbGQuDQo+IFRoaXMgbWF5IHByZXZlbnQgdGhlIHdhdGNoZG9nIHRpbWVyIGZyb20gZXZl
-ciB0aW1pbmcgb3V0LCB0aGVyZWJ5DQo+IG1hc2tpbmcgcG90ZW50aWFsIHRyYW5zbWlzc2lvbiBz
-dGFsbCBpc3N1ZXMuDQo+IA0KPiBUaGUgdGltZXN0YW1wIHNob3VsZCBiZSB1cGRhdGVkIG9ubHkg
-dXBvbiBzdWNjZXNzZnVsIFVSQiBzdWJtaXNzaW9uIHRvDQo+IGFjY3VyYXRlbHkgcmVmbGVjdCB0
-aGF0IHRoZSB0cmFuc3BvcnQgbGF5ZXIgaXMgc3RpbGwgb3BlcmF0aW9uYWwuDQoNCkFsdGhvdWdo
-IEkgdGhpbmsgYSBVUkIgZXJyb3IgYW5kIGEgdHJhbnNtaXNzaW9uIHN0YWxsIGFyZSBkaWZmZXJl
-bnQsDQpJIGFtIGZpbmUgd2l0aCB0aGUgc2ltcGxlciBhcHByb2FjaCBpbiB2Mi4NCg0KQmVzdCBS
-ZWdhcmRzLA0KSGF5ZXMNCg0K
+The dwmac core has no support for SGMII without using its integrated
+PCS. Thus, PHY_INTF_SEL_SGMII is only supported when this block is
+present, and it makes no sense for stmmac_get_phy_intf_sel() to decode
+this.
+
+None of the platform glue users that use stmmac_get_phy_intf_sel()
+directly accept PHY_INTF_SEL_SGMII as a valid mode.
+
+Check whether a PCS will be used by the driver for the interface mode,
+and if it is the integrated PCS, query the integrated PCS for the
+phy_intf_sel_i value to use.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 15 ++++++++++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c  |  9 +++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h  |  2 ++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 6c515f9efbe7..5254d9d19ffe 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3135,8 +3135,6 @@ int stmmac_get_phy_intf_sel(phy_interface_t interface)
+ 		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
+ 	else if (phy_interface_mode_is_rgmii(interface))
+ 		phy_intf_sel = PHY_INTF_SEL_RGMII;
+-	else if (interface == PHY_INTERFACE_MODE_SGMII)
+-		phy_intf_sel = PHY_INTF_SEL_SGMII;
+ 	else if (interface == PHY_INTERFACE_MODE_RMII)
+ 		phy_intf_sel = PHY_INTF_SEL_RMII;
+ 	else if (interface == PHY_INTERFACE_MODE_REVMII)
+@@ -3150,13 +3148,24 @@ static int stmmac_prereset_configure(struct stmmac_priv *priv)
+ {
+ 	struct plat_stmmacenet_data *plat_dat = priv->plat;
+ 	phy_interface_t interface;
++	struct phylink_pcs *pcs;
+ 	int phy_intf_sel, ret;
+ 
+ 	if (!plat_dat->set_phy_intf_sel)
+ 		return 0;
+ 
+ 	interface = plat_dat->phy_interface;
+-	phy_intf_sel = stmmac_get_phy_intf_sel(interface);
++
++	/* Check whether this mode uses a PCS */
++	pcs = stmmac_mac_select_pcs(&priv->phylink_config, interface);
++	if (priv->integrated_pcs && pcs == &priv->integrated_pcs->pcs) {
++		/* Request the phy_intf_sel from the integrated PCS */
++		phy_intf_sel = stmmac_integrated_pcs_get_phy_intf_sel(priv,
++								    interface);
++	} else {
++		phy_intf_sel = stmmac_get_phy_intf_sel(interface);
++	}
++
+ 	if (phy_intf_sel < 0) {
+ 		netdev_err(priv->dev,
+ 			   "failed to get phy_intf_sel for %s: %pe\n",
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+index 718e5360fca3..cf7337e9ed3e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+@@ -106,6 +106,15 @@ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
+ 	}
+ }
+ 
++int stmmac_integrated_pcs_get_phy_intf_sel(struct stmmac_priv *priv,
++					   phy_interface_t interface)
++{
++	if (interface == PHY_INTERFACE_MODE_SGMII)
++		return PHY_INTF_SEL_SGMII;
++
++	return -EINVAL;
++}
++
+ int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
+ 			       u32 int_mask)
+ {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index 887c4ff302aa..845bcad9d0f7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -43,6 +43,8 @@ phylink_pcs_to_stmmac_pcs(struct phylink_pcs *pcs)
+ 
+ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
+ 			       struct stmmac_extra_stats *x);
++int stmmac_integrated_pcs_get_phy_intf_sel(struct stmmac_priv *priv,
++					   phy_interface_t interface);
+ int stmmac_integrated_pcs_init(struct stmmac_priv *priv, unsigned int offset,
+ 			       u32 int_mask);
+ 
+-- 
+2.47.3
+
 
