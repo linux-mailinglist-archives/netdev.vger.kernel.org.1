@@ -1,183 +1,369 @@
-Return-Path: <netdev+bounces-251040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56B2D3A4E9
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:24:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A989D3A4F5
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:26:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DAA94302D884
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:24:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C7D43008576
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776002FF66A;
-	Mon, 19 Jan 2026 10:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8E13090E4;
+	Mon, 19 Jan 2026 10:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lwLVVrYW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xGVvfW0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD6E336EFE
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 10:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768818277; cv=none; b=c+JzrflEt6XA2Cexm4BDP8rxz9a4RNgGVYqosKACRZ/M3ixIJ6UcqmSf79QmOv1fZVk3FTgfgFoWH5U8+j8Qw4A1I1R+ekTSewjVn22CdixmMpawN9aNZHCxIc/Q92lK3mIUzvL6K6ogwV6gAKG6zRt5ClZXXb5KN15J7A5AMxY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768818277; c=relaxed/simple;
-	bh=GQFcCgB9R8zm685nHCYu33zEwGKEBFqhbL7sxn4dsY4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mDbuWmjXRutpmOWwCZYOmT+ZAHKVQ5q4UxYOF/t4X+WMtRILUTsOwnWeeaGfqYCQPStbhfFzDVtgCCmf0LCNY8hEM1Lxi8XwdzdSHpX4PmrrlN2FxdA/qKLKUD1zE7xfjUZ96Kjx167sQaQbl3l+I/3rdacRc1FmrbUI+ayS68g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lwLVVrYW; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768818262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WKbhwHETp9lQVp4X1qT343o8DBHuZUjbE2HkDCgnbz0=;
-	b=lwLVVrYWS8wYW2NcNkFcCGIkE39tSlTWlPHtjkFRQxCTNoiZenYIS9X0dybG0p8IQTRprJ
-	euxXzI6inQ7FcdD2ty0qptWdnUmWouzm0ZpQ64z4RWMkEiktpjSKVxYkr66zkvCnFOgMuS
-	c+PzUTqlJ0e1ViZ8tCdm7+4YknmnLrs=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	kerneljasonxing@gmail.com,
-	lance.yang@linux.dev,
-	jiayuan.chen@linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Leon Huang Fu <leon.huangfu@shopee.com>
-Subject: [PATCH net-next v4] page_pool: Add page_pool_release_stalled tracepoint
-Date: Mon, 19 Jan 2026 18:21:19 +0800
-Message-ID: <20260119102119.176211-1-leon.hwang@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A0A336EFE
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 10:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768818366; cv=pass; b=QJPX4AaIvWOy5j/vHp1sTfP8DES69mBvy9sLlLR6B38HjCuP0jO+IqYxDEa62vaCp/35cZ5+IUN7buQirfgx4aOV7vld0n48OcT39SJBoRFZoG8qp8cMwrSDdY/wogKywiynjG32tGC42xXOjSTqkv4v+AjC+L8nrCunHv/CgXg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768818366; c=relaxed/simple;
+	bh=uNntyXr7AJhY4PKLBcdKqqGDyUCo3SZi8I219IiMBz8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jLiInoDwYVroOdnGY2kjL1xAypccouUrJ1ezi2izF48R3acCSjIZ5fEF8eZ08dOR+t1fi+pmDvtgrm4HQYBsZdh7HcKfXIf2luFgLA80C6WGzERPeXbdiaR6iVMl5G7MPExF/6zpyBerYvuk6K47OBfvzbrVPx3bqd/m3oNqBhg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xGVvfW0i; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5014db8e268so63095081cf.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 02:26:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768818364; cv=none;
+        d=google.com; s=arc-20240605;
+        b=D4RApZ8Iypji6r9uZSuQVGgFMY3VqqoqYPX/IOU2raTYWVHj+V5IfFEF7TlDFdtgVf
+         kB556Uu76lsUVaFu8HK12+rUfeqlaXK2EzChR1IjRdFa37JK+yHVA/wjAtydKAuBTMaQ
+         9lFZIUeNtOMf2s4aOT8t1Zk/mz35IYwx0WvuZqeCQ4fieW2Eyja1kh2OMTFZOJqIzILV
+         MMZJCHh54Rd2fjqRsNStH2lbqCCfciR7K7q93k4jdDvqfsA92xnROq1ensCNS/qMP64o
+         GOvrWJ300+h8LohOqwaZPSNEljXQ93DI4pedKB6UfiYRUaCbK2Jz1lwpA7EfIS/qpS4L
+         vs2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=F4NwGxIjE/P/7HcKEe1N4JNWtmLeyphTTJ8/D3wuloY=;
+        fh=C0awgnOSVNgcGk3FqU07qlU0XCbhmYG2AzUmeCKKShI=;
+        b=evxKXiG/9BYwHm7rRBwIH688UF0GFJEW9KOzE1Nmr5h+XkKDkl2LzfCQbmsqLd1VCy
+         hW8qsAYTQiJGqTBFghUQOjn6zEow+QwLfTk3fZaJE/K+lgRQ9aF1VB/QjF5VcjXlf+CW
+         9KPZPxWvgqiAxn71UYPXh8WzD3cg8eHePZXiBkStnakFgvqwJ5JjMn68CyXaV2HNTZBM
+         A5LalFs3JFh0DOHt0KGFA/9VN3eBPYUcZBRy+5pGwM4wAxdLZ74/TZCVr78Ydqe1RjBO
+         NrKqIn0SQEy+fEkumiWljfD3faIj5RKKnn2xypdAHvuH2VfqRN8zJpGzw5QaxmbAlJaV
+         KSqw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768818364; x=1769423164; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F4NwGxIjE/P/7HcKEe1N4JNWtmLeyphTTJ8/D3wuloY=;
+        b=xGVvfW0iR4p5v98vd1yjMkH/ryqRCMcXj34IKB2D88/dwUMMPb+W2OGLszuO0vbsoP
+         Z4RncJdw7eTzMT7r3aUJcn+XyOgDoZI4FocGCXWib89pzeAziss+ZGesddfYRq7ScpxA
+         sm8i3bFoTmFULG4qwvXfu3kCk7K9Rpb/3UmbYgAKIvKQR4dsfM40E75k4NV/Q0eaA27v
+         mJ41FHhDqgc2MTg0gepMS6SMUPHLRmgeXFPeLDhu++DOlT2g1TEg45+xqhNKgHapatio
+         1mcOsS46L7W6oayg62uGXMDXPZz+QxxXNRV0wGPewBWOSbX56RMntLCnKYKgNoTWWqY/
+         Bggg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768818364; x=1769423164;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=F4NwGxIjE/P/7HcKEe1N4JNWtmLeyphTTJ8/D3wuloY=;
+        b=PNFzCO7tDTKeoQboOgyGES0kbzCQ5d960/KOXAjIXoSLLYGiONErX5QPEZ+qHo1OgO
+         tPgLOEIO8ucJTG/bBGVieg1p4PbBygopaIShc+qRy4oBPfkBCNS7bPRLOLfP28Po2tgx
+         rDbb04AkPAQI60t5t8AgJwJ3Crv31/lcaHHFG01yrxIZV1ktzt/hDv5pQhWzUbkaPxTH
+         pfxJ9FThXKq2YJlaly2IXRBLXgd7jhr2OTHXnBwEuFJvoeabeMUnzMuvRUw5X0pfKS2p
+         ozAGxdUuE+q9CZTJAKGCg9csaeDP0up9SpmdiNw28Ti6l8BPP1rtGax8i2Jiafc0GtZC
+         3BGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+cDSI6lB6LVLphdDlHKo6RwU5jvES0LJ1j6KsRZY387+usgEqq61zZrGrZFl75Rj35ok7d8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJg1MkigTxoIq6r9pmQz47Fu2nGE7swgM3bfWEOGvE2toiPkJ5
+	pQMu2YguLkqQqA44Z2gmOXFieFJGEspgUKwlGKW0nb1eWCTh92QsUk2p64+csItCPexWCZ2DWyt
+	7FfSqOtVKF7mPNAG1qZ4C0FoE2zkVUV4qqfBLbxgt
+X-Gm-Gg: AY/fxX6Pvn0OXchoc0Dp3B+EhWM34pzuhT+Oin5hz98mO2Sg4/7jI65Op31vdgHCIry
+	4QHzcnsALoRDdNmb2p9tD4WFjRAlhpbZhFSPaTTe8mrl1iPBM80imMJIGExipStknfv/ms62UPF
+	ceVSAC3E44Gr2V+eBr3NHv0DAdOunFt5DNL3JCED5It4WPfXJbdCYnPgBIAgyhczbQAgeblaLaj
+	1+3Aeqmolgv/NbPGsITeAyQz1v2zAxTCf2qkWtK65E+7YiC15YR3Jt9FClIEkBOM9HYGjM6sq3b
+	Px83Uw==
+X-Received: by 2002:ac8:5d05:0:b0:4f4:d29a:40e7 with SMTP id
+ d75a77b69052e-502a1fb455emr161534131cf.74.1768818363373; Mon, 19 Jan 2026
+ 02:26:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260118152448.2560414-1-edumazet@google.com> <20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org>
+ <20260118225802.5e658c2a@pumpkin> <20260118160125.82f645575f8327651be95070@linux-foundation.org>
+ <20260119093339.024f8d57@pumpkin>
+In-Reply-To: <20260119093339.024f8d57@pumpkin>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Jan 2026 11:25:52 +0100
+X-Gm-Features: AZwV_Qh27pn7vfJqFZEwCdeBUBLbESVkEl2ET9PCF3Yvuh13c_xFZySsmlEArjM
+Message-ID: <CANn89iJVQe=wedLheJmjZjOTJsWHijT0jZs=iRxKssJZbjAxHw@mail.gmail.com>
+Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Nicolas Pitre <npitre@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce a new tracepoint to track stalled page pool releases,
-providing better observability for page pool lifecycle issues.
+On Mon, Jan 19, 2026 at 10:33=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Sun, 18 Jan 2026 16:01:25 -0800
+> Andrew Morton <akpm@linux-foundation.org> wrote:
+>
+> > On Sun, 18 Jan 2026 22:58:02 +0000 David Laight <david.laight.linux@gma=
+il.com> wrote:
+> >
+> > > > mm/ alone has 74 __always_inlines, none are documented, I don't kno=
+w
+> > > > why they're present, many are probably wrong.
+> > > >
+> > > > Shit, uninlining only __get_user_pages_locked does this:
+> > > >
+> > > >    text      data     bss     dec     hex filename
+> > > >  115703     14018      64  129785   1faf9 mm/gup.o
+> > > >  103866     13058      64  116988   1c8fc mm/gup.o-after
+> > >
+> > > The next questions are does anything actually run faster (either way)=
+,
+> > > and should anything at all be marked 'inline' rather than 'always_inl=
+ine'.
+> > >
+> > > After all, if you call a function twice (not in a loop) you may
+> > > want a real function in order to avoid I-cache misses.
+> >
+> > yup
+>
+> I had two adjacent strlen() calls in a bit of code, the first was an
+> array (in a structure) and gcc inlined the 'word at a time' code, the
+> second was a pointer and it called the library function.
+> That had to be sub-optimal...
+>
+> > > But I'm sure there is a lot of code that is 'inline_for_bloat' :-)
+> >
+> > ooh, can we please have that?
+>
+> Or 'inline_to_speed_up_benchmark' and the associated 'unroll this loop
+> because that must make it faster'.
+>
+> > I do think that every always_inline should be justified and commented,
+> > but I haven't been energetic about asking for that.
+>
+> Apart from the 4-line functions where it is clearly obvious.
+> Especially since the compiler can still decide to not-inline them
+> if they are only 'inline'.
+>
+> > A fun little project would be go through each one, figure out whether
+> > were good reasons and if not, just remove them and see if anyone
+> > explains why that was incorrect.
+>
+> It's not just always_inline, a lot of the inline are dubious.
+> Probably why the networking code doesn't like it.
 
-Problem:
-Currently, when a page pool shutdown is stalled due to inflight pages,
-the kernel only logs a warning message via pr_warn(). This has several
-limitations:
+Many __always_inline came because of clang's reluctance to inline
+small things, even if the resulting code size is bigger and slower.
 
-1. The warning floods the kernel log after the initial DEFER_WARN_INTERVAL,
-   making it difficult to track the progression of stalled releases
-2. There's no structured way to monitor or analyze these events
-3. Debugging tools cannot easily capture and correlate stalled pool
-   events with other network activity
+It is a bit unclear, this seems to happen when callers are 'big
+enough'. noinstr (callers) functions are also a problem.
 
-Solution:
-Add a new tracepoint, page_pool_release_stalled, that fires when a page
-pool shutdown is stalled. The tracepoint captures:
-- pool: pointer to the stalled page_pool
-- inflight: number of pages still in flight
-- sec: seconds since the release was deferred
+Let's take the list_add() call from dev_gro_receive() : clang does not
+inline it, for some reason.
 
-The implementation also modifies the logging behavior:
-- pr_warn() is only emitted during the first warning interval
-  (DEFER_WARN_INTERVAL to DEFER_WARN_INTERVAL*2)
-- The tracepoint is fired always, reducing log noise while still
-  allowing monitoring tools to track the issue
+After adding __always_inline to list_add() and __list_add() we have
+smaller and more efficient code,
+for real workloads, not only benchmarks.
 
-This allows developers and system administrators to:
-- Use tools like perf, ftrace, or eBPF to monitor stalled releases
-- Correlate page pool issues with network driver behavior
-- Analyze patterns without parsing kernel logs
-- Track the progression of inflight page counts over time
+$ scripts/bloat-o-meter -t net/core/gro.o.old net/core/gro.o.new
+add/remove: 2/4 grow/shrink: 2/1 up/down: 86/-130 (-44)
+Function                                     old     new   delta
+dev_gro_receive                             1795    1845     +50
+.Ltmp93                                        -      16     +16
+.Ltmp89                                        -      16     +16
+napi_gro_frags                               968     972      +4
+.Ltmp94                                       16       -     -16
+.Ltmp90                                       16       -     -16
+.Ltmp83                                       16       -     -16
+.Ltmp0                                      8396    8364     -32
+list_add                                      50       -     -50
 
-Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
----
-v3 -> v4:
- - Collect Reviewed-by from Steven, thanks.
- - Collect Acked-by from Jesper, thanks.
- - https://lore.kernel.org/netdev/20260102071745.291969-1-leon.hwang@linux.dev/
+Over the whole kernel (and also using __always_inline for
+list_add_tail(), __list_del(), list_del()) we have a similar outcome:
 
-v2 -> v3:
- - Print id using '%u'.
- - https://lore.kernel.org/netdev/20260102061718.210248-1-leon.hwang@linux.dev/
-
-v1 -> v2:
- - Drop RFC.
- - Store 'pool->user.id' to '__entry->id' (per Steven Rostedt).
- - https://lore.kernel.org/netdev/20251125082207.356075-1-leon.hwang@linux.dev/
----
- include/trace/events/page_pool.h | 24 ++++++++++++++++++++++++
- net/core/page_pool.c             |  6 ++++--
- 2 files changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/include/trace/events/page_pool.h b/include/trace/events/page_pool.h
-index 31825ed30032..a851e0f6a384 100644
---- a/include/trace/events/page_pool.h
-+++ b/include/trace/events/page_pool.h
-@@ -113,6 +113,30 @@ TRACE_EVENT(page_pool_update_nid,
- 		  __entry->pool, __entry->pool_nid, __entry->new_nid)
- );
- 
-+TRACE_EVENT(page_pool_release_stalled,
-+
-+	TP_PROTO(const struct page_pool *pool, int inflight, int sec),
-+
-+	TP_ARGS(pool, inflight, sec),
-+
-+	TP_STRUCT__entry(
-+		__field(const struct page_pool *, pool)
-+		__field(u32,			  id)
-+		__field(int,			  inflight)
-+		__field(int,			  sec)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->pool		= pool;
-+		__entry->id		= pool->user.id;
-+		__entry->inflight	= inflight;
-+		__entry->sec		= sec;
-+	),
-+
-+	TP_printk("page_pool=%p id=%u inflight=%d sec=%d",
-+		  __entry->pool, __entry->id, __entry->inflight, __entry->sec)
-+);
-+
- #endif /* _TRACE_PAGE_POOL_H */
- 
- /* This part must be outside protection */
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 265a729431bb..01564aa84c89 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1222,8 +1222,10 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	    (!netdev || netdev == NET_PTR_POISON)) {
- 		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
- 
--		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
--			__func__, pool->user.id, inflight, sec);
-+		if (sec >= DEFER_WARN_INTERVAL / HZ && sec < DEFER_WARN_INTERVAL * 2 / HZ)
-+			pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
-+				__func__, pool->user.id, inflight, sec);
-+		trace_page_pool_release_stalled(pool, inflight, sec);
- 		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
- 	}
- 
--- 
-2.52.0
-
+$ size vmlinux.old vmlinux.new
+   text    data     bss     dec     hex filename
+39037635 23688605 4254712 66980952 3fe0c58 vmlinux.old
+39035644 23688605 4254712 66978961 3fe0491 vmlinux.new
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 2/6 grow/shrink: 103/52 up/down: 6179/-6473 (-294)
+Function                                     old     new   delta
+__list_del_entry                               -     672    +672
+__do_semtimedop                             1819    2204    +385
+__pfx___list_del_entry                         -     256    +256
+tracer_alloc_buffers                         760     920    +160
+ext4_orphan_add                             1122    1254    +132
+madvise_cold_or_pageout_pte_range           2202    2328    +126
+iommu_sva_bind_device                        744     865    +121
+copy_page_range                            12353   12473    +120
+psi_trigger_create                           767     886    +119
+power_supply_register_extension              540     658    +118
+srcu_gp_start_if_needed                     1440    1548    +108
+fanout_add                                   996    1097    +101
+kvm_dev_ioctl                               1507    1599     +92
+relay_open                                   681     761     +80
+lru_lazyfree                                 784     863     +79
+input_register_device                       1602    1680     +78
+seccomp_notify_ioctl                        1882    1959     +77
+__iommu_probe_device                        1203    1279     +76
+spi_register_controller                     1748    1823     +75
+copy_process                                4112    4186     +74
+newseg                                       825     898     +73
+optimize_kprobe                              210     282     +72
+do_msgsnd                                   1290    1362     +72
+__bmc_get_device_id                         3332    3404     +72
+iscsi_queuecommand                           948    1019     +71
+hci_register_dev                             667     737     +70
+tcf_register_action                          518     586     +68
+memcg_write_event_control                   1083    1147     +64
+handle_one_recv_msg                         3307    3371     +64
+btf_module_notify                           1669    1733     +64
+tcf_mirred_init                             1229    1292     +63
+register_stat_tracer                         340     403     +63
+qdisc_get_stab                               596     658     +62
+io_submit_one                               2056    2117     +61
+fuse_dev_do_read                            1186    1247     +61
+bpf_map_offload_map_alloc                    622     683     +61
+zswap_setup                                  584     644     +60
+register_acpi_bus_type                       109     169     +60
+ipv6_add_addr                               1007    1067     +60
+mraid_mm_register_adp                       1379    1438     +59
+mlock_folio_batch                           3137    3196     +59
+register_ife_op                              230     288     +58
+perf_event_alloc                            2591    2649     +58
+intel_iommu_domain_alloc_nested              498     556     +58
+lru_deactivate_file                         1280    1336     +56
+fib_create_info                             2567    2623     +56
+iscsi_register_transport                     533     588     +55
+ext4_register_li_request                     448     503     +55
+do_msgrcv                                   1536    1589     +53
+net_devmem_bind_dmabuf                      1036    1088     +52
+init_one_iommu                               309     360     +51
+shmem_get_folio_gfp                         1379    1429     +50
+dev_gro_receive                             1795    1845     +50
+.Ltmp68                                      160     208     +48
+.Ltmp337                                      48      96     +48
+.Ltmp204                                      48      96     +48
+dm_get_device                                501     548     +47
+vfs_move_mount                               509     555     +46
+intel_nested_attach_dev                      391     435     +44
+fw_devlink_dev_sync_state                    212     255     +43
+bond_ipsec_add_sa                            406     447     +41
+bd_link_disk_holder                          459     499     +40
+bcm_tx_setup                                1414    1454     +40
+devl_linecard_create                         401     440     +39
+copy_tree                                    677     716     +39
+fscrypt_setup_encryption_info               1479    1517     +38
+region_del                                   631     668     +37
+devlink_nl_rate_new_doit                     501     536     +35
+.Ltmp57                                       48      80     +32
+.Ltmp126                                      48      80     +32
+netdev_run_todo                             1341    1372     +31
+ipmi_create_user                             411     442     +31
+pci_register_host_bridge                    1675    1705     +30
+p9_read_work                                 961     990     +29
+acpi_device_add                              859     888     +29
+mntput_no_expire_slowpath                    603     631     +28
+vmemmap_remap_pte                            499     524     +25
+move_cluster                                 160     184     +24
+handle_userfault                            2035    2059     +24
+rdtgroup_mkdir                              1500    1522     +22
+clk_notifier_register                        474     489     +15
+bpf_event_notify                             311     326     +15
+dm_register_path_selector                    245     256     +11
+bpf_crypto_register_type                     209     220     +11
+usb_driver_set_configuration                 232     242     +10
+parse_gate_list                              912     921      +9
+devl_rate_leaf_create                        266     274      +8
+bt_accept_enqueue                            465     473      +8
+__flush_workqueue                           1233    1240      +7
+dev_forward_change                           772     778      +6
+thermal_add_hwmon_sysfs                      861     865      +4
+set_node_memory_tier                        1027    1031      +4
+napi_gro_frags                               968     972      +4
+mei_cl_notify_request                       1067    1071      +4
+mb_cache_shrink                              447     451      +4
+kfence_guarded_free                          764     768      +4
+blk_mq_try_issue_directly                    606     610      +4
+__neigh_update                              2452    2456      +4
+__folio_freeze_and_split_unmapped           3198    3202      +4
+rwsem_down_write_slowpath                   1595    1598      +3
+eventfs_create_dir                           477     480      +3
+alloc_vmap_area                             1967    1970      +3
+unix_add_edges                               618     620      +2
+hid_connect                                 1529    1530      +1
+dwc_prep_dma_memcpy                          637     638      +1
+scsi_eh_test_devices                         700     699      -1
+acpi_extract_power_resources                 559     558      -1
+deactivate_slab                              758     756      -2
+__team_options_change_check                  220     218      -2
+sock_map_update_common                       524     521      -3
+rcu_nocb_gp_kthread                         2710    2707      -3
+memsw_cgroup_usage_register_event             19      16      -3
+kthread                                      564     561      -3
+st_add_path                                  457     453      -4
+flow_block_cb_setup_simple                   543     539      -4
+ep_try_send_events                           875     871      -4
+elv_register                                 524     520      -4
+__mptcp_move_skbs_from_subflow              1318    1314      -4
+__check_limbo                                460     456      -4
+__bpf_list_add                               277     273      -4
+trim_marked                                  375     370      -5
+megaraid_mbox_runpendq                       345     340      -5
+ipmi_timeout_work                           1813    1808      -5
+handle_new_recv_msgs                         419     414      -5
+mei_cl_send_disconnect                       186     180      -6
+mei_cl_send_connect                          186     180      -6
+mptcp_sendmsg                               1776    1769      -7
+deferred_split_folio                         561     554      -7
+pcibios_allocate_resources                   879     871      -8
+find_css_set                                1690    1682      -8
+af_alg_sendmsg                              2384    2376      -8
+isolate_migratepages_block                  4113    4104      -9
+posixtimer_send_sigqueue                     950     939     -11
+mei_irq_write_handler                       1350    1338     -12
+dpm_prepare                                 1173    1161     -12
+dpll_xa_ref_pin_add                          679     667     -12
+css_set_move_task                            513     501     -12
+cache_mark                                   583     571     -12
+scsi_queue_rq                               3449    3434     -15
+mtd_queue_rq                                1068    1053     -15
+link_css_set                                 323     308     -15
+key_garbage_collector                       1119    1104     -15
+do_dma_probe                                1664    1649     -15
+configfs_new_dirent                          306     290     -16
+.Ltmp69                                      208     192     -16
+xfrm_state_walk                              677     660     -17
+__dpll_pin_register                          761     742     -19
+i2c_do_add_adapter                          1018     998     -20
+complete_io                                  421     401     -20
+fsnotify_insert_event                        390     368     -22
+scsi_eh_ready_devs                          3026    2997     -29
+.Ltmp71                                      128      96     -32
+.Ltmp58                                      128      96     -32
+.Ltmp127                                      80      48     -32
+migrate_pages_batch                         4623    4584     -39
+.Ltmp338                                      96      48     -48
+.Ltmp205                                      96      48     -48
+__pfx_list_del                               256       -    -256
+__pfx_list_add_tail                          384       -    -384
+__pfx_list_add                               656       -    -656
+list_del                                     944       -    -944
+list_add_tail                               1360       -   -1360
+list_add                                    2212       -   -2212
+Total: Before=3D25509319, After=3D25509025, chg -0.00%
 
