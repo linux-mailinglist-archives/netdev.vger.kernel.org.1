@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-251151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41262D3AEA0
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:15:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE76D3AE9E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:14:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4223F3010ABF
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:09:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9022D3073F6E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EA538756B;
-	Mon, 19 Jan 2026 15:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6B3387376;
+	Mon, 19 Jan 2026 15:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZU9mmU8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vjm6LsRZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F60B387376
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A302C387370
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768835395; cv=none; b=b/sMoD9hSQP7DXR1jDbdjCLwN9YtZ7hLRLnE1ExxEBlkxEW9PL772tdVSQlkcHphM0P5AsUj7mkN1AR20arD4oGpkXtecwyUeY3/vbDLnVceSpwCTK4bQ3mwDVCeSWwi3uFs06MJM67LrGgjbNthSo4PBIYHkeXCNAEmFzsHFDc=
+	t=1768835401; cv=none; b=a3Z7UdZ7QLRvNGdrmMB8K+SSBIesdF5YwPnqcHx7lWseE9IKK2bR5IGdqhg74y6Mt19FQHpPRT7I9izOE0wFbnAYgghXsS+5a9pdWi8TS3JvnmdILB4SFn80FuEf58NUsCCuzUxZS3mrPRWKoFIagyTPJFSVYbDynLMyXtS1MYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768835395; c=relaxed/simple;
-	bh=i21ZAavZEiaMF0I2WSKTxVx1JM2vf3qFC1DujkWpRxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ut4RSky+eWOa6NvrGtOnYrrkZIw4yBY9RQju3myLdrggLWN3S1gB2Bd800fpSbttdv018kgp3kRr7xP+9gy8Mih/yr/6C+BOonXZaH0yoqy1MQxYcvC5yee9Q9hlQhT+n/dG/X1/9EjaZ5RdLUc1X1J4bW4+rrp589otLop859I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZU9mmU8; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1768835401; c=relaxed/simple;
+	bh=C96QrX/xSmOOjKB2fNVlg/63Ha9D2slq9q3DUEuGCHI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=G1voaTWX3XRW7GoaFo9/MxNvAnV0YN8S02SL7P4FEYPIUY4/ZegY/+bLZicpr4VOPJ8kAL09+SQ4TYrAnnlIhre1tCWSZyMWQKvwfb0FA5OMdJvOMzDdVRNwMh4GBsKxtx1CKzqcHVRlVJPph2R+m2GsDk+zAMzWMJWnEStlyts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vjm6LsRZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768835393;
+	s=mimecast20190719; t=1768835398;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HvvwsZg9OJT+YgieidGw02/J1Hpk54QokqRuZ34MdTY=;
-	b=SZU9mmU8aHj8kQ3vYg1gnhiwBG77Sds8jwiZFiAVfrHXrHw25qnDW1fCDWxyA2bjnmNyPg
-	Vwss9EkjmVOzL2IfftkeivIlkO+hAWsVGalje4ABIivqbsKIzH0mweTUJHnyIkOxdz7iIJ
-	HxWPhzc48IFi451vtaFUlObo5UD92M4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FAr9wkGHL+pKC066IOIiZ2djZthAqFS8fHCBDD+5lDM=;
+	b=Vjm6LsRZhr1zf3Tcr/L/0tsAz7zKAqXSPMt3ma9Ss5op8Dgmlbs/1XVwPNzHrJT2qpxabb
+	9uadjQjP+OegxGlpIy0a1PCvg8nQ1xNjhQ7itlv+RNYPYNGcoGFAythQqC50+zt5tJgLGH
+	M5STYTUcFRYRFLdqlwsJUumaWDReCjQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-6JkBUByFONCnzr3518CImQ-1; Mon,
- 19 Jan 2026 10:09:50 -0500
-X-MC-Unique: 6JkBUByFONCnzr3518CImQ-1
-X-Mimecast-MFC-AGG-ID: 6JkBUByFONCnzr3518CImQ_1768835389
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-131-99QRQ8EMOb-a3zFQ_NB2sw-1; Mon,
+ 19 Jan 2026 10:09:55 -0500
+X-MC-Unique: 99QRQ8EMOb-a3zFQ_NB2sw-1
+X-Mimecast-MFC-AGG-ID: 99QRQ8EMOb-a3zFQ_NB2sw_1768835393
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8B14180045C;
-	Mon, 19 Jan 2026 15:09:48 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 238231956048;
+	Mon, 19 Jan 2026 15:09:53 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.32.246])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 964A219560A2;
-	Mon, 19 Jan 2026 15:09:43 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2BEE019560A2;
+	Mon, 19 Jan 2026 15:09:48 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -67,9 +69,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	petrm@nvidia.com,
 	razor@blackwall.org,
 	idosch@nvidia.com
-Subject: [PATCH v4 net-next 00/10] geneve: introduce double tunnel GSO/GRO support
-Date: Mon, 19 Jan 2026 16:09:22 +0100
-Message-ID: <cover.1768820066.git.pabeni@redhat.com>
+Subject: [PATCH v4 net-next 01/10] net: introduce mangleid_features
+Date: Mon, 19 Jan 2026 16:09:23 +0100
+Message-ID: <ec64bb86298c31608eee9558842da25c47669f9c.1768820066.git.pabeni@redhat.com>
+In-Reply-To: <cover.1768820066.git.pabeni@redhat.com>
+References: <cover.1768820066.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,99 +83,91 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-This is the [belated] incarnation of topic discussed in the last Neconf
-[1].
+Some/most devices implementing gso_partial need to disable the GSO partial
+features when the IP ID can't be mangled; to that extend each of them
+implements something alike the following[1]:
 
-In container orchestration in virtual environments there is a consistent
-usage of double UDP tunneling - specifically geneve. Such setup lack
-support of GRO and GSO for inter VM traffic.
+	if (skb->encapsulation && !(features & NETIF_F_TSO_MANGLEID))
+		features &= ~NETIF_F_TSO;
 
-After commit b430f6c38da6 ("Merge branch 'virtio_udp_tunnel_08_07_2025'
-of https://github.com/pabeni/linux-devel") and the qemu cunter-part, VMs
-are able to send/receive GSO over UDP aggregated packets.
+in the ndo_features_check() op, which leads to a bit of duplicate code.
 
-This series introduces the missing bit for full end-to-end aggregation
-in the above mentioned scenario. Specifically:
+Later patch in the series will implement GSO partial support for virtual
+devices, and the current status quo will require more duplicate code and
+a new indirect call in the TX path for them.
 
-- introduces a new netdev feature set to generalize existing per device
-driver GSO admission check.1
-- adds GSO partial support for the geneve and vxlan drivers
-- introduces and use a geneve option to assist double tunnel GRO
-- adds some simple functional tests for the above.
+Introduce the mangleid_features mask, allowing the core to disable NIC
+features based on/requiring MANGLEID, without any further intervention
+from the driver.
 
-The new device features set is not strictly needed for the following
-work, but avoids the introduction of trivial `ndo_features_check` to
-support GSO partial and thus possible performance regression due to the
-additional indirect call. Such feature set could be leveraged by a
-number of existing drivers (intel, meta and possibly wangxun) to avoid
-duplicate code/tests. Such part has been omitted here to keep the series
-small.
+The same functionality could be alternatively implemented adding a single
+boolean flag to the struct net_device, but would require an additional
+checks in ndo_features_check().
 
-Both GSO partial support and double GRO support have some downsides.
-With the first in place, GSO partial packets will traverse the network
-stack 'downstream' the outer geneve UDP tunnel and will be visible by
-the udp/IP/IPv6 and by netfilter. Currently only H/W NICs implement GSO
-partial support and such packets are visible only via software taps.
+Also note that [1] is incorrect if the NIC additionally implements
+NETIF_F_GSO_UDP_L4, mangleid_features transparently handle even such a
+case.
 
-Double UDP tunnel GRO will cook 'GSO partial' like aggregate packets,
-i.e. the inner UDP encapsulation headers set will still carry the
-wire-level lengths and csum, so that segmentation considering such
-headers parts of a giant, constant encapsulation header will yield the
-correct result.
-
-The correct GSO packet layout is applied when the packet traverse the
-outermost geneve encapsulation.
-
-Both GSO partial and double UDP encap are disabled by default and must
-be explicitly enabled via, respectively ethtool and geneve device
-configuration.
-
-Finally note that the GSO partial feature could potentially be applied
-to all the other UDP tunnels, but this series limits its usage to geneve
-and vxlan devices.
-
-Link: https://netdev.bots.linux.dev/netconf/2024/paolo.pdf [1]
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
 v3 -> v4:
-  - better mangleid handling in patch 1
-  - use xfail_on_slow in patch 10
-v3: https://lore.kernel.org/netdev/cover.1768410519.git.pabeni@redhat.com/
+ - ensure mangleid_features includes TSO_MANGLEID for better code
+   in gso_features_check() - Eric
+ - some changelog clarifications.
+---
+ include/linux/netdevice.h | 5 ++++-
+ net/core/dev.c            | 8 +++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-v2 -> v3:
-  - addressed AI-reported possible UaF
-v2: https://lore.kernel.org/netdev/cover.1768250796.git.pabeni@redhat.com/
-
-v1 -> v2:
-  - addressed AI and checker feedback
-  - more stable self-tests
-  - avoid GRO cells for double encap GSO pkts
-v1: https://lore.kernel.org/netdev/cover.1764056123.git.pabeni@redhat.com/#t
-
-Paolo Abeni (10):
-  net: introduce mangleid_features
-  geneve: expose gso partial features for tunnel offload
-  vxlan: expose gso partial features for tunnel  offload
-  geneve: add netlink support for GRO hint
-  geneve: constify geneve_hlen()
-  geneve: pass the geneve device ptr to geneve_build_skb()
-  geneve: add GRO hint output path
-  geneve: extract hint option at GRO stage
-  geneve: use GRO hint option in the RX path
-  selftests: net: tests for add double tunneling GRO/GSO
-
- Documentation/netlink/specs/rt-link.yaml      |   3 +
- drivers/net/geneve.c                          | 557 ++++++++++++++++--
- drivers/net/vxlan/vxlan_core.c                |  16 +-
- include/linux/netdevice.h                     |   5 +-
- include/net/udp_tunnel.h                      |  32 +
- include/uapi/linux/if_link.h                  |   1 +
- net/core/dev.c                                |   8 +-
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/config            |   1 +
- .../testing/selftests/net/double_udp_encap.sh | 393 ++++++++++++
- 10 files changed, 978 insertions(+), 39 deletions(-)
- create mode 100755 tools/testing/selftests/net/double_udp_encap.sh
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d99b0fbc1942..23a698b70de1 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1830,7 +1830,9 @@ enum netdev_reg_state {
+  *				and drivers will need to set them appropriately.
+  *
+  *	@mpls_features:	Mask of features inheritable by MPLS
+- *	@gso_partial_features: value(s) from NETIF_F_GSO\*
++ *	@gso_partial_features: value(s) from NETIF_F_GSO
++ *	@mangleid_features:	Mask of features requiring MANGLEID, will be
++ *				disabled together with the latter.
+  *
+  *	@ifindex:	interface index
+  *	@group:		The group the device belongs to
+@@ -2219,6 +2221,7 @@ struct net_device {
+ 	netdev_features_t	vlan_features;
+ 	netdev_features_t	hw_enc_features;
+ 	netdev_features_t	mpls_features;
++	netdev_features_t	mangleid_features;
+ 
+ 	unsigned int		min_mtu;
+ 	unsigned int		max_mtu;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 2661b68f5be3..3f12061ae474 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3802,7 +3802,7 @@ static netdev_features_t gso_features_check(const struct sk_buff *skb,
+ 				    inner_ip_hdr(skb) : ip_hdr(skb);
+ 
+ 		if (!(iph->frag_off & htons(IP_DF)))
+-			features &= ~NETIF_F_TSO_MANGLEID;
++			features &= ~dev->mangleid_features;
+ 	}
+ 
+ 	/* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,
+@@ -11385,6 +11385,12 @@ int register_netdevice(struct net_device *dev)
+ 	if (dev->hw_enc_features & NETIF_F_TSO)
+ 		dev->hw_enc_features |= NETIF_F_TSO_MANGLEID;
+ 
++	/* Any mangleid feature disables TSO_MANGLEID; including the latter
++	 * in mangleid_features allows for better code in the fastpath.
++	 */
++	if (dev->mangleid_features)
++		dev->mangleid_features |= NETIF_F_TSO_MANGLEID;
++
+ 	/* Make NETIF_F_HIGHDMA inheritable to VLAN devices.
+ 	 */
+ 	dev->vlan_features |= NETIF_F_HIGHDMA;
 -- 
 2.52.0
 
