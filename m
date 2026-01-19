@@ -1,153 +1,155 @@
-Return-Path: <netdev+bounces-251034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59F2D3A322
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:34:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72051D3A349
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5F0930169BE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:33:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EAB230038C3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F17296BA5;
-	Mon, 19 Jan 2026 09:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F46350D78;
+	Mon, 19 Jan 2026 09:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUQIJxJa"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="vkfazezO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966B8197A7D
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9622B247291
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815225; cv=none; b=bQglzTJXGPfULoUscRjhSpTJX2c+ztnjiarQbGJB78PMEpVDZeMqaohRk7wUp6RCOqTwhlWAzkCDoW2ibwboq0AFR4xbr9FGOHhsTGN6pYG9W8uqjJwOClnmpiqozjng8vR5O1JRjc1y6p7uGQHCmWobySUKSdVNNBSHAMXzPgg=
+	t=1768815638; cv=none; b=UQXLnzrfc/DmvpuRWE+PgoMfpHgPjcy4m8oPcIKy75hxKDDEohQgjO4HILxdylrlAGY3lqwyMgHMlgf/Hz8s+XnfBpwmuFq/dxqfrbJrNc9pntqDyk9vQx43+oRE+egXE5FRHG16CiIpxM2JUMpKYp3pNo9QrU5zZoTcToDaalE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815225; c=relaxed/simple;
-	bh=Qfq+YGyJejMJFEyBEHzlzdNJQfj1V+dSrryNwTI+upA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gjd39TJ05aW0EdAgvJYMiXc+pUWOLARo1YDMLOHNjJMQshwgk5BCvZzisezsNtD/1UChbJLQnKYT/e+7gdcR73zCS+WVYuZ3jePSiZq8VfbyYYjgvmaatOX9Qp6WctMmm7f6z0TttOtF4Ok7tUm2TiJSPUJfh8lihaOGAnG16io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUQIJxJa; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47ee3da7447so25180755e9.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:33:43 -0800 (PST)
+	s=arc-20240116; t=1768815638; c=relaxed/simple;
+	bh=ZnDvlhRBDUBVsMZvEMZNqDnvf79Xo9/jr2jIUmXIFYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VGXPoUu+Kq0qgxSlzsdNgmrOzBtKKo7VWtGR2NY/Pg+VLco9YKISk8/vACbKzmopK9b9ucUeqcwUTlv2Op97in+EScYN69YZEVklxJBtpOjnAmpeGi2AwDkqK8SITjwKeSWK5TNUbQtz3NJpWcCGv0btKVFfyS9kYm/PEhOX9dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=vkfazezO; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47f3b7ef761so21274875e9.0
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:40:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768815222; x=1769420022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vxFUMINiROnPGneWmNkTLgSLfIoIsEZfiy7Cs/FTrhE=;
-        b=WUQIJxJamOOepf+j+NyCMHAatXMTR58D/UAXrQfiR71AqCtJybBlx5YVNzeTuCAYiL
-         7c+T1ZBJyO+NYGxeuRcowrZ+2VOyXw8JWHYeC9WBuKAV+FGI4M0XNQnWje4mVRHPSf0Q
-         UMoNnyvIQPMdZ6iEQ3/WAaD1FY60I02MH3XzXXPXWQuweh22TEXfZXpSbnL0cdhv3Mxp
-         1kQIDHf+p9U7qqF3FbK8TARu8Zvi0C0fvEJ9UXBPYNgpvCRfpdFVWpvH2BEXqTk0dIgJ
-         kb1I8vvzKuNALs6eM20qsRq9P5RIsruWm4YWlA/HHbo6cfq/RixY9goJocjJ9Fr5YU6N
-         x+lQ==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1768815634; x=1769420434; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G0tfLHZjioonH3s8pCxwjKiUeh2LK//GGZEDTJFRhKg=;
+        b=vkfazezOLxhS1L1OamA0MU+2tws0+863COc6r6loeFzOOwZjdRRVEAqReGbYImwBGu
+         1kCIGmFcIK8MxuZdaaM5J8yJddyFqVuOYm0YFKgGyGe5d1N81jst0oLs4Uhj+0C88ztB
+         d1nz5uq+T2NCG5MlVgj0vQtANfqTwvIL5P6bj4/HjerUNZbbqmZsuXqw2UyBUCIxghZ2
+         qCYYBLsrY83UDwCll3KzdKYD2Mb8GbAvAeW1bVXilraT+rBwrflhSCHmtlMFouCkspmX
+         tFzGl0Uin9rXMbLZljMZ4eDRcl/eHM+4KLJfUC+G1ZXJUI0rdHLz6wi20M5Uf8sxzTXb
+         FYJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815222; x=1769420022;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vxFUMINiROnPGneWmNkTLgSLfIoIsEZfiy7Cs/FTrhE=;
-        b=vgX+93TKPXuqEglehbv+XtwNef7os31MzpM42rHiMahtZxHtV1ZqBQDHNi56eTk6RX
-         cMRqrUCYX/KgGgYdOBXMkZ2cDD3+vY6Dz39WVvqKzGodKXfOVWYyVwZFsufX8l24RcTi
-         /GB/kdBFt392gFOhV3QrGGtxkC1QWJ0sMV5AHjo5bMoj1v4Y2TflfzYFacb55kR5EbG8
-         0fbJq7k4utQycyo7dG3c0zbnt62E0xpwK1cMw5mDetrGY3+oY6N0Ghjsb5pzu+lXztxt
-         pizKviTkrLW8trrTOnU7MXiGieL7HigQAqQGl1WsyWavvN5KeelPN+DSLu8+e0PFzFjy
-         /l4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWT9K7nJopjdCnSTIlO14oxLaCbusCPNAI3Qk+dHm0Bm9w5NXPQaZRE2qE4Oz4gsaLixIdHsSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa2864FpgswFaKD2Ug9mTROC2sm+d221OetJrtDi7Ns+TNvzZu
-	MMecdP9QuKP7bBovyx8e6hECnveAD0ntdz9gIO43tXXv2poPraA/3uhB
-X-Gm-Gg: AY/fxX64nBcdz9t/SRPe15+nWijCpT3KHyK6W/Gc6YpcqGIT046nc16IRh/FZujQcRa
-	h5Glt9vjOA05XcBOjEWkdy6aoVUii4gzyoWv5uu+0wIYUqCPk2SCiHYEkWUD/ezZvnl966/3iE7
-	M4EVApEM/e5TWGG/qc0dcFYKNTnGYtJEAoAIHd4r0JsW2RcDHOLq3sRKqZTP7MtPE0S8NqAYdQU
-	9MORyvkq5Z7hMm2NmEI0wBRlpUCnSpiNL2iZM+wxhJnncQyp4dmVhMnzhRV02v4efo9oC6346dE
-	Xxpt8L3RIg4/hRyN8/nJ+5UOgEWT1J8gNmJRaN2vTXFnhh6ODBYRi/MVhT/r/4gPkHQtbUgSTMN
-	CEOe3YNP4XIXLiW9W+Q/lTz7W8LPZ3h9fpy5M0TmC9ugq43q3EF6w0BJ69JxgIoic89bX064rZ3
-	JRHG3wvQgHIJt4G6i1jVUFM+ry0dVZ4rTWwPwiqUsoXQrJtJ7Mr3vk
-X-Received: by 2002:a05:600c:5291:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-4801e2eef8bmr108328255e9.3.1768815221752;
-        Mon, 19 Jan 2026 01:33:41 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4289b83csm239739415e9.3.2026.01.19.01.33.41
+        d=1e100.net; s=20230601; t=1768815634; x=1769420434;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G0tfLHZjioonH3s8pCxwjKiUeh2LK//GGZEDTJFRhKg=;
+        b=ZsNz+VhStsdQxgSCV5XPEOm3gVyYqoHR1jI4oebOhYDorqbNRO7+SaCixx72+LVzRf
+         KUT7TSn80OdYFAuxDpF7cLyeF6XuhPmujqAyoVcrUgm+ym2+geHaXwWAL7kkMijmA6C7
+         caX4QtFeFltFwzINsmkTuDP7rQTjZfdxi6bZdA+7ZBOo/L8Xl6H/ZNJg3b32Jg7dYu0w
+         OxdBFG0EKkXU4npdgXdqyW0HA7TSlA297u60MRc4ui9vP9PTE62BtxbBLYrpPwrY8C2h
+         afWyVsFTWC3UqpNnAJ8BkciZa5ZLZFIUkPdqOKz6dDzqRms22OI14TYyJK8Z43WbL2Jh
+         ERDQ==
+X-Gm-Message-State: AOJu0YyA2bDJOAbTcj74B4Q4MD+tKfng4GPWNxf8NO0D48Qk+I5S1XKk
+	SotHaeq4TypepliBs6ul64ctjOtALUHubXyb4kaDSjPHckkY50jU0i2n92Gq//U4WGzgsuXRiT0
+	2/xUR
+X-Gm-Gg: AY/fxX6sYZ0+EuyBRlCtvd90OCiuYQ6MkheYft8woD4YoZo0VMgXEKPwHwKzqkUwkcT
+	XA/TCxMCrq8hYQUYIF53y4rOl/LiPpizmV7/7EaoEA/NsswbehlVzdJvWIIMbfxx0kkwTQgGLCo
+	vI4fuXHEbQJoeIhXpUlvhzjQ5fY0S/MRh4IL0PnMnx8Wykp6oOw0No26C4A2W3imX088Xa2yaNK
+	xCp0tvWyrlRJdi37yyQ/FUvuYLE0iXTAtNafdVlJ/uQdgOokn452Py0X2GMD/LoYdHB15p2LZgA
+	PDMukWNaGfcZf9eTregEEVyonxiVe51QevzGWKy7GwzASd7NoSOVcmPmw+2S9J3pIWXpzRkd8pZ
+	LCvLZ2jwBLnzomsiqX0VATkpdyNagakEkIpn0k81KtefZMGgrWmciuU5ftLcj2RGqw/hFFDlGp6
+	TiZq/JaLft1bnh/MjkdT4ZCj8lEEOxulTNSLWvhj1RY5bSn8k9M5XoYOfo/wrJ4KZIbJBDpMyf
+X-Received: by 2002:a05:600c:4e50:b0:47e:e946:3a59 with SMTP id 5b1f17b1804b1-4801e3503fbmr130220275e9.34.1768815633945;
+        Mon, 19 Jan 2026 01:40:33 -0800 (PST)
+Received: from localhost (p200300f65f20eb040fd825a50706214d.dip0.t-ipconnect.de. [2003:f6:5f20:eb04:fd8:25a5:706:214d])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4801e8caceesm182069815e9.13.2026.01.19.01.40.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 01:33:41 -0800 (PST)
-Date: Mon, 19 Jan 2026 09:33:39 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Eric Dumazet <edumazet@google.com>, linux-kernel
- <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Nicolas Pitre <npitre@baylibre.com>
-Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
-Message-ID: <20260119093339.024f8d57@pumpkin>
-In-Reply-To: <20260118160125.82f645575f8327651be95070@linux-foundation.org>
-References: <20260118152448.2560414-1-edumazet@google.com>
-	<20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org>
-	<20260118225802.5e658c2a@pumpkin>
-	<20260118160125.82f645575f8327651be95070@linux-foundation.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Mon, 19 Jan 2026 01:40:33 -0800 (PST)
+Date: Mon, 19 Jan 2026 10:40:32 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, linux@armlinux.org.uk, hkallweit1@gmail.com, pabeni@redhat.com
+Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
+Message-ID: <4ltztdbct4ce6elmnn7wx5fzh4lywlfbjrn75pdju7cdsw4q2j@ubq7qaa4regr>
+References: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
+ <20260117232932.1005051-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-
-On Sun, 18 Jan 2026 16:01:25 -0800
-Andrew Morton <akpm@linux-foundation.org> wrote:
-
-> On Sun, 18 Jan 2026 22:58:02 +0000 David Laight <david.laight.linux@gmail.com> wrote:
-> 
-> > > mm/ alone has 74 __always_inlines, none are documented, I don't know
-> > > why they're present, many are probably wrong.
-> > > 
-> > > Shit, uninlining only __get_user_pages_locked does this:
-> > > 
-> > >    text	   data	    bss	    dec	    hex	filename
-> > >  115703	  14018	     64	 129785	  1faf9	mm/gup.o
-> > >  103866	  13058	     64	 116988	  1c8fc	mm/gup.o-after  
-> > 
-> > The next questions are does anything actually run faster (either way),
-> > and should anything at all be marked 'inline' rather than 'always_inline'.
-> > 
-> > After all, if you call a function twice (not in a loop) you may
-> > want a real function in order to avoid I-cache misses.  
-> 
-> yup
-
-I had two adjacent strlen() calls in a bit of code, the first was an
-array (in a structure) and gcc inlined the 'word at a time' code, the
-second was a pointer and it called the library function.
-That had to be sub-optimal...
-
-> > But I'm sure there is a lot of code that is 'inline_for_bloat' :-)  
-> 
-> ooh, can we please have that?
-
-Or 'inline_to_speed_up_benchmark' and the associated 'unroll this loop
-because that must make it faster'.
-
-> I do think that every always_inline should be justified and commented,
-> but I haven't been energetic about asking for that.
-
-Apart from the 4-line functions where it is clearly obvious.
-Especially since the compiler can still decide to not-inline them
-if they are only 'inline'.
-
-> A fun little project would be go through each one, figure out whether
-> were good reasons and if not, just remove them and see if anyone
-> explains why that was incorrect.
-
-It's not just always_inline, a lot of the inline are dubious.
-Probably why the networking code doesn't like it.
-
-Maybe persuade Linus to do some of that.
-He can use his 'god' bit to just change them.
-
-	David
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jeie2bjeg2jhiq56"
+Content-Disposition: inline
+In-Reply-To: <20260117232932.1005051-1-kuba@kernel.org>
 
 
+--jeie2bjeg2jhiq56
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
+MIME-Version: 1.0
 
+Hello Jakub,
+
+On Sat, Jan 17, 2026 at 03:29:32PM -0800, Jakub Kicinski wrote:
+> Does adding these bus-level callbacks break PHY device probing?
+>=20
+> PHY drivers register via phy_driver_register() which sets:
+>=20
+>     new_driver->mdiodrv.driver.probe =3D phy_probe;
+>     new_driver->mdiodrv.driver.remove =3D phy_remove;
+>=20
+> The driver core in call_driver_probe() prioritizes bus callbacks over dri=
+ver
+> callbacks:
+>=20
+>     if (dev->bus->probe)
+>         ret =3D dev->bus->probe(dev);
+>     else if (drv->probe)
+>         ret =3D drv->probe(dev);
+>=20
+> With mdio_bus_type.probe now set, phy_probe() will never be called for PHY
+> devices. The same applies to phy_remove() being bypassed by mdio_bus_remo=
+ve().
+>=20
+> phy_probe() performs essential initialization including setting phydev->d=
+rv,
+> reading PHY abilities, configuring EEE, and setting up the state machine.
+> Without this, PHY devices would fail to initialize properly.
+>=20
+> Was there a plan to update phy_driver_register() as part of this change, =
+or
+> is a separate patch needed to handle PHY drivers?
+
+I think the concern is valid. I'll look into this and send an update
+when I convinced myself that I'm not breaking anything.
+
+Best regards
+Uwe
+
+--jeie2bjeg2jhiq56
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlt/A4ACgkQj4D7WH0S
+/k4GiAf/TlIqRlDEomfU50E0GgRFhDP6zMg8GChvMzbHDpW9CiwTYLjzD9BKoTHj
+cA+ONmFEyC2cYNrHYjpqcKmlaHsWAHMKtFPKNdQQUDEcy7gfU1B5ps5OD3JQq3ah
+fbqkklpmPnLI6DPmc7010aZaaYDzeQit2bTh+3XPqQP7nBpJ+lR5jhSOKzKoKKKq
+AgIwhG/Tpp/qjWF6GQ0HuH7uWRcmNekcj0p+YQgqXBDMKedFjCYmO0wh76Htg8vo
+slxZWg1wb7Fh6mpgVtD/WAntuhehqiUHAD8KIqDyatOpl0YuIJRGIDEu1l2P9bC6
+Q72Y4QrojgOn1qFHGHZasWAiYv3N1g==
+=Myok
+-----END PGP SIGNATURE-----
+
+--jeie2bjeg2jhiq56--
 
