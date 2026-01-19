@@ -1,174 +1,164 @@
-Return-Path: <netdev+bounces-251208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30685D3B4FA
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:58:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E07FD3B505
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AAD9D3008CAB
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:57:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 390633005FE3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B9432E721;
-	Mon, 19 Jan 2026 17:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E03246782;
+	Mon, 19 Jan 2026 17:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b="mPvIMiYO"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="myG8Q4cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9132B9A6;
-	Mon, 19 Jan 2026 17:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB32329C4D
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768845476; cv=none; b=RERYH08vSvbbtRwajUIVYHg0N3QDVRw75EyD6ZURYzhG/TFp76vJdJHQXDzOAeRkLIUKWyh/qyB5tE0+yc8KimUHQUHUFWaggd6mjV6WI5I3zmTmtBykUxziX5GhTfJ29apXDf91SaWbVXHPV8KKHYLFjeJ3nd+IIuzcOOBf/mo=
+	t=1768845568; cv=none; b=PLwDdAXGmf1lEHrIFBh/svobww8AYDIv1QuWc1Z0+7xCDTPHRUT75LWfnGBM8NCjxLgzsDpPibaSUqKyUXHy85avvg0EQ6ky29gl+Q+aH6Ioc0DtuQH0v73Q9bxuOr7jCiDkl4J1FVI41+MEwcUisRhyTLK/FeISRvaWMHeEPGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768845476; c=relaxed/simple;
-	bh=aeAMwDy300xtVjO1yTpgW+rQwqZyPI7I8i814Kjmu6k=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=nFy2e3+AAddj9yX8BBuIbGkWlmF0YJKzy7WxywoKvl1LJaj+hr16qKpRwF44DkoUDaiS84QE/WgaRfizu0Wza8C9XJ1aCfr/oh83mZAhzJQXNpS9b8Td4/PbJx34fdmBM4GE/+r+ea02UChS4v2/WYwZoiuJueVzy+9wb47MG8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com; spf=pass smtp.mailfrom=tuxedocomputers.com; dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b=mPvIMiYO; arc=none smtp.client-ip=157.90.84.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedocomputers.com
-Received: from [192.168.178.76] (business-24-134-207-61.pool2.vodafone-ip.de [24.134.207.61])
-	(Authenticated sender: g.gottleuber@tuxedocomputers.com)
-	by mail.tuxedocomputers.com (Postfix) with ESMTPSA id 0507B2FC0052;
-	Mon, 19 Jan 2026 18:57:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedocomputers.com;
-	s=default; t=1768845469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9neysObSDag5TO86XuxLkbvz/mjlkH1pwb0MRj36kJY=;
-	b=mPvIMiYOzVg0ObOlBlitMjIQzlqSrkFae/PwrieuBn0X2NJJRz/UDThIQAeOstVZQ5MBFJ
-	nA2zlPShY78k5srUy8PBEdJ5iRBbNCRyKAgcIwtPmom1dHgO4z2NJXIGIpL/DZpBe1Dpjt
-	V1EaGyMPowt52U6J1za5tU2Wt6ETfn0=
-Authentication-Results: mail.tuxedocomputers.com;
-	auth=pass smtp.auth=g.gottleuber@tuxedocomputers.com smtp.mailfrom=ggo@tuxedocomputers.com
-Content-Type: multipart/mixed; boundary="------------eBBAZgy1CXJ4IyGkpFjVDyhb"
-Message-ID: <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
-Date: Mon, 19 Jan 2026 18:57:48 +0100
+	s=arc-20240116; t=1768845568; c=relaxed/simple;
+	bh=fqnBmmKNJnxT27ie1o//zlHYXwovFi430BqGDVGM48w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q4jQqErVz9KUtfqjWOVCDTNIxnj/LXX5e1Ob78g/KmzJ+5Ht8D+PHBwhRu56Dlkxa/6NGiuNOCo6xsSCP3kv9TX+E3vxYxfMzqVSjYbwxrv9xe4ET0bvAZDDoZWLqizolVWsSc8cparD90cyj7q+8bMD4Y/FBRpXzzPXqXS1/uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=myG8Q4cr; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from ms-a2 (79.192.13.160.dy.iij4u.or.jp [160.13.192.79])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 60JHxOXB045334
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 20 Jan 2026 02:59:24 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=eWDwRtRTexg9fRSSarLkYLweDMl64Lud9EANHQPjlRk=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:To:Subject:Date:Message-ID;
+        s=rs20251215; t=1768845564; v=1;
+        b=myG8Q4crrYCXilnOST2tC5ZSmZEUJqmEVxjKqKr+hL5ADzEMQGC/BrqU+S0D3JsS
+         ElfcLK++qAN1hwQqv7Hk9Tdw3cOkzoMqfuySBauxZxTnMOYdOY/0tfS7d+vz0KOD
+         vbK5UQvC4ZShEgAvymWqtDvL2Ly/+9Iq3l+hupQGhhG8cfFJcX90E23sgsno3KRG
+         dpTUXQbCLYPLLsmHHt57zio+NP6Pib+4/ITtSLLlkOst92vqUCuICQuGgvu2GaaC
+         /OfMnpQ5mWL6VoTMS+vdGXATZnJqFAYolowLdlWdEX5vsq+PBSZ1GOc/OHoVrX5K
+         wULvXCyzdo0YBJUpZnLUdA==
+From: Kohei Enju <kohei@enjuk.jp>
+To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kohei.enju@gmail.com,
+        Takashi Kozu <takkozu@amazon.com>, Kohei Enju <kohei@enjuk.jp>
+Subject: [PATCH v1 iwl-next] igb: set skb hash type from RSS_TYPE
+Date: Mon, 19 Jan 2026 17:58:27 +0000
+Message-ID: <20260119175922.199950-1-kohei@enjuk.jp>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
- Motorcomm YT6801
-To: Georg Gottleuber <ggo@tuxedocomputers.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Yao Zi <me@ziyao.cc>, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- Frank.Sae@motor-comm.com, hkallweit1@gmail.com, vladimir.oltean@nxp.com,
- wens@csie.org, jszhang@kernel.org, 0x1207@gmail.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jeffbai@aosc.io,
- kexybiscuit@aosc.io, Christoffer Sandberg <cs@tuxedocomputers.com>
-References: <20260109093445.46791-2-me@ziyao.cc>
- <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
- <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
- <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
- <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
-Content-Language: en-US
-From: Georg Gottleuber <ggo@tuxedocomputers.com>
-In-Reply-To: <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
+Content-Transfer-Encoding: 8bit
 
-This is a multi-part message in MIME format.
---------------eBBAZgy1CXJ4IyGkpFjVDyhb
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+igb always marks the RX hash as L3 regardless of RSS_TYPE in the
+advanced descriptor, which may indicate L4 (TCP/UDP) hash. This can
+trigger unnecessary SW hash recalculation and breaks toeplitz selftests.
 
-Am 19.01.26 um 18:45 schrieb Georg Gottleuber:
-> Hi,
-> 
-> thanks for the quick reply.
-> 
-> Am 19.01.26 um 16:43 schrieb Russell King (Oracle):
->> On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
->>> Hi,
->>>
->>> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
->>> revealed that tx is only 100Mbit/s:
->>>
-> ...
->>>
->>> With our normally used DKMS module, Ethernet works with full-duplex and
->>> gigabit. Attached are some logs from lspci and dmesg. Do you have any
->>> idea how I can debug this further?
->>
->> My suggestion would be:
->>
->> - Look at the statistics, e.g.
->>
->>    ip -s li sh dev enp2s0
-> 
-> That looks good (after iperf):
-> 
-> 2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
-> mode DEFAULT group default qlen 1000
->     link/ether ba:90:88:24:49:4f brd ff:ff:ff:ff:ff:ff
->     RX:  bytes packets errors dropped  missed   mcast
->        2091654   31556      0       0       0       0
->     TX:  bytes packets errors dropped carrier collsns
->       88532451    1518      0       0       0       0
-> 
-> 
->> - apply
->>   https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
->>   to enable more statistics to work, and check the network driver
->>   statistics:
->>
->>    ethtool --statistics enp2s0
->>
->> to see if there's any clues for what is going on.
-> 
-> That looks also good, I think. I saved it before and after the test with
-> iperf. See attachments.
+Use RSS_TYPE from pkt_info to set the correct PKT_HASH_TYPE_*
 
-Oh, there was something else interesting in dmesg. See attachment.
+Tested by toeplitz.py with the igb RSS key get/set patches applied as
+they are required for toeplitz.py (see Link below).
+ # ethtool -N $DEV rx-flow-hash udp4 sdfn
+ # ethtool -N $DEV rx-flow-hash udp6 sdfn
+ # python toeplitz.py | grep -E "^# Totals"
 
-> Regards,
-> Georg
+Without patch:
+ # Totals: pass:0 fail:12 xfail:0 xpass:0 skip:0 error:0
 
---------------eBBAZgy1CXJ4IyGkpFjVDyhb
-Content-Type: text/plain; charset=UTF-8; name="dmesg_motorcomm.txt"
-Content-Disposition: attachment; filename="dmesg_motorcomm.txt"
-Content-Transfer-Encoding: base64
+With patch:
+ # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-WyAgICAwLjkzMzQ4MF0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogZXJyb3IgLUVO
-T0VOVDogZmFpbGVkIHRvIHJlYWQgbWFjYTBsciBmcm9tIGVGdXNlClsgICAgMC45MzM0ODNd
-IGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IGVGdXNlIGNvbnRhaW5zIG5vIHZhbGlk
-IE1BQyBhZGRyZXNzClsgICAgMC45MzM0ODVdIGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAw
-LjA6IGZhbGxiYWNrIHRvIHJhbmRvbSBNQUMgYWRkcmVzcwpbICAgIDAuOTMzOTQxXSBkd21h
-Yy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBVc2VyIElEOiAweDEwLCBTeW5vcHN5cyBJRDog
-MHg1MgpbICAgIDAuOTMzOTQzXSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiAJRFdN
-QUM0LzUKWyAgICAwLjkzMzk1NV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogRE1B
-IEhXIGNhcGFiaWxpdHkgcmVnaXN0ZXIgc3VwcG9ydGVkClsgICAgMC45MzM5NTZdIGR3bWFj
-LW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IFJYIENoZWNrc3VtIE9mZmxvYWQgRW5naW5lIHN1
-cHBvcnRlZApbICAgIDAuOTMzOTU3XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBU
-WCBDaGVja3N1bSBpbnNlcnRpb24gc3VwcG9ydGVkClsgICAgMC45MzM5NThdIGR3bWFjLW1v
-dG9yY29tbSAwMDAwOjAyOjAwLjA6IFdha2UtVXAgT24gTGFuIHN1cHBvcnRlZApbICAgIDAu
-OTMzOTYxXSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBUU08gc3VwcG9ydGVkClsg
-ICAgMC45MzM5NjJdIGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IEVuYWJsZSBSWCBN
-aXRpZ2F0aW9uIHZpYSBIVyBXYXRjaGRvZyBUaW1lcgpbICAgIDAuOTMzOTY0XSBkd21hYy1t
-b3RvcmNvbW0gMDAwMDowMjowMC4wOiBFbmFibGVkIEwzTDQgRmxvdyBUQyAoZW50cmllcz0y
-KQpbICAgIDAuOTMzOTY1XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBFbmFibGVk
-IFJGUyBGbG93IFRDIChlbnRyaWVzPTEwKQpbICAgIDAuOTMzOTY2XSBkd21hYy1tb3RvcmNv
-bW0gMDAwMDowMjowMC4wOiBUU08gZmVhdHVyZSBlbmFibGVkClsgICAgMC45MzM5NjddIGR3
-bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IFNQSCBmZWF0dXJlIGVuYWJsZWQKWyAgICAw
-LjkzMzk2OF0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogVXNpbmcgNDgvNDggYml0
-cyBETUEgaG9zdC9kZXZpY2Ugd2lkdGgKWyAgICAxLjMwMjAxNF0gZHdtYWMtbW90b3Jjb21t
-IDAwMDA6MDI6MDAuMCBlbnAyczA6IHJlbmFtZWQgZnJvbSBldGgwClsgICAgNS43NTMyNTld
-IGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjAgZW5wMnMwOiBSZWdpc3RlciBNRU1fVFlQ
-RV9QQUdFX1BPT0wgUnhRLTAKWyAgICA1Ljc1NzUyOV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6
-MDI6MDAuMCBlbnAyczA6IFBIWSBbc3RtbWFjLTIwMDowMF0gZHJpdmVyIFtZVDg1MzFTIEdp
-Z2FiaXQgRXRoZXJuZXRdIChpcnE9UE9MTCkKWyAgICA1Ljc2ODQ0Ml0gZHdtYWMtbW90b3Jj
-b21tIDAwMDA6MDI6MDAuMCBlbnAyczA6IEVuYWJsaW5nIFNhZmV0eSBGZWF0dXJlcwpbICAg
-IDUuNzY4NjY5XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wIGVucDJzMDogUFRQIG5v
-dCBzdXBwb3J0ZWQgYnkgSFcKWyAgICA1Ljc2ODY3M10gZHdtYWMtbW90b3Jjb21tIDAwMDA6
-MDI6MDAuMCBlbnAyczA6IGNvbmZpZ3VyaW5nIGZvciBwaHkvZ21paSBsaW5rIG1vZGUKWyAg
-ICA4Ljg0NzAwOV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMCBlbnAyczA6IExpbmsg
-aXMgVXAgLSAxR2Jwcy9GdWxsIC0gZmxvdyBjb250cm9sIHJ4L3R4Cg==
+Link: https://lore.kernel.org/intel-wired-lan/20260119084511.95287-5-takkozu@amazon.com/
+Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+---
+If a Fixes tag is needed, it would be Fixes: 42bdf083fe70 ("net: igb
+calls skb_set_hash").
 
---------------eBBAZgy1CXJ4IyGkpFjVDyhb--
+I'm not sure this qualifies as a fix, since the RX hash marking has been
+wrong for a long time without reported issues. So I'm leaning toward
+omitting Fixes.
+---
+ drivers/net/ethernet/intel/igb/e1000_82575.h | 21 ++++++++++++++++++++
+ drivers/net/ethernet/intel/igb/igb_main.c    | 18 +++++++++++++----
+ 2 files changed, 35 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/e1000_82575.h b/drivers/net/ethernet/intel/igb/e1000_82575.h
+index 63ec253ac788..a855bc10f5d4 100644
+--- a/drivers/net/ethernet/intel/igb/e1000_82575.h
++++ b/drivers/net/ethernet/intel/igb/e1000_82575.h
+@@ -87,6 +87,27 @@ union e1000_adv_rx_desc {
+ 	} wb;  /* writeback */
+ };
+ 
++#define E1000_RSS_TYPE_NO_HASH		 0
++#define E1000_RSS_TYPE_HASH_TCP_IPV4	 1
++#define E1000_RSS_TYPE_HASH_IPV4	 2
++#define E1000_RSS_TYPE_HASH_TCP_IPV6	 3
++#define E1000_RSS_TYPE_HASH_IPV6_EX	 4
++#define E1000_RSS_TYPE_HASH_IPV6	 5
++#define E1000_RSS_TYPE_HASH_TCP_IPV6_EX	 6
++#define E1000_RSS_TYPE_HASH_UDP_IPV4	 7
++#define E1000_RSS_TYPE_HASH_UDP_IPV6	 8
++#define E1000_RSS_TYPE_HASH_UDP_IPV6_EX	 9
++
++#define E1000_RSS_TYPE_MASK		GENMASK(3, 0) /* 4-bits (3:0) = mask 0x0F */
++
++#define E1000_RSS_L4_TYPES_MASK	\
++	(BIT(E1000_RSS_TYPE_HASH_TCP_IPV4)	| \
++	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6)	| \
++	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6_EX)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV4)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6)	| \
++	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6_EX))
++
+ #define E1000_RXDADV_HDRBUFLEN_MASK      0x7FE0
+ #define E1000_RXDADV_HDRBUFLEN_SHIFT     5
+ #define E1000_RXDADV_STAT_TS             0x10000 /* Pkt was time stamped */
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 8dab133296ca..ef0cbf532716 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -8824,10 +8824,20 @@ static inline void igb_rx_hash(struct igb_ring *ring,
+ 			       union e1000_adv_rx_desc *rx_desc,
+ 			       struct sk_buff *skb)
+ {
+-	if (ring->netdev->features & NETIF_F_RXHASH)
+-		skb_set_hash(skb,
+-			     le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
+-			     PKT_HASH_TYPE_L3);
++	u16 rss_type;
++
++	if (!(ring->netdev->features & NETIF_F_RXHASH))
++		return;
++
++	rss_type = le16_to_cpu(rx_desc->wb.lower.lo_dword.pkt_info) &
++		   E1000_RSS_TYPE_MASK;
++
++	if (!rss_type)
++		return;
++
++	skb_set_hash(skb, le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
++		     (E1000_RSS_L4_TYPES_MASK & BIT(rss_type)) ?
++		     PKT_HASH_TYPE_L4 : PKT_HASH_TYPE_L3);
+ }
+ 
+ /**
+-- 
+2.51.0
+
 
