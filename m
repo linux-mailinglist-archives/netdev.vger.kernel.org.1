@@ -1,112 +1,116 @@
-Return-Path: <netdev+bounces-250959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC30BD39D4E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 05:04:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1C8D39D54
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 05:05:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AD923006A62
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 04:04:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A5BB300660F
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 04:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E89825C6F9;
-	Mon, 19 Jan 2026 04:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E6E264A97;
+	Mon, 19 Jan 2026 04:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GNgm9b+2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AayLtz1r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DC31E32A2;
-	Mon, 19 Jan 2026 04:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B396625782D
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 04:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768795486; cv=none; b=KGGXy0GSxEUSrp6D84fnMZhPkqclDw+ooyGbn23jisE4PYI2dH0TYIQ/6wDv2zOplF++rWOw3AwDAZmAfOorM08MM6wzw+4ym21Qbv4fBK6e0+zKMZXm1rqT5RO9md8B0ecEc0tuwR8uewt7GmoipnD+kBleE1HiM6y955QkkVA=
+	t=1768795498; cv=none; b=dvt0sqFTdYCaNRXB1PVOuR0aSBknnWetwJmbFOVlHc20pHgWU+7oGTKYbdG+YC3afHm5f/ivy/FVMF6NmaUdozjhNG+oIxw3y6fh0w6fjmMusodMlVtl9jMBrRWXoeP+FRifnIZdnsXevlG/a6zBfL/vH9xyy4yKTo6EbuuPX0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768795486; c=relaxed/simple;
-	bh=kDCuwHROHTcQ/JxEnEtQyMKS+aJ03khn2rNimU71amQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BFdm3yfqw8Oo2rhnEhDNJ+5qJwgI2m2Ig9vakVrkS/GJr/ciwrg994VEOJEat27Ahm2XFngw71iZomZ1LbY1II7+D8Q/5Tp3v2GNNEYXuGMOcXXYOKOKqA2mSwUGyutLEpvfOoE4WSjP6DuEQmjRbuf0Rj+rSV2HHBm6OFJX5aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GNgm9b+2; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60J2TY2t1312470;
-	Sun, 18 Jan 2026 20:04:36 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=rqPA/tOf7fu0M8iGQeGktARMq
-	Qmr+R7zGxebNlwoAUg=; b=GNgm9b+2LwIymQZ2TGr86ymfQqkqudmfEBx7lxaRy
-	YSu/tVh9DPDZgr4aBj2YqVhIH0t7QBG3lXadXjNittr6gdfXGsPMgNZgUYQdaEUe
-	OLxW5OqdTmeLbF4KWOnZIy5bUjTG2bJ91xbHcYwxMzCHkqExmjAKup3ZGkvHvGBs
-	qr9bWJDxn6kgHPmXZgVJIMA4/xh6xzk9TmaKkWdQKIcWuSAzQ4h9iUOoKykiVeOo
-	jyJiNz/U0cz6k5mtrCJNpCVgUnRY8F1z2jmGMQ5PvgH6T+32GsU96wchQ3lyTj3S
-	yRAseb00+NKIE/2btIVGgNwgnox6WSgG26vtZU8Ji1Rhw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bsbvfr3kh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 18 Jan 2026 20:04:36 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 18 Jan 2026 20:04:50 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 18 Jan 2026 20:04:50 -0800
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id BF3863F707F;
-	Sun, 18 Jan 2026 20:04:32 -0800 (PST)
-Date: Mon, 19 Jan 2026 09:34:31 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next v4 01/13] octeontx2-af: npc: cn20k: Index
- management
-Message-ID: <aW2tT6pkI-bJ3394@rkannoth-OptiPlex-7090>
-References: <20260113101658.4144610-1-rkannoth@marvell.com>
- <20260113101658.4144610-2-rkannoth@marvell.com>
- <20260117163959.5e949a25@kernel.org>
+	s=arc-20240116; t=1768795498; c=relaxed/simple;
+	bh=e6W/QWKMilaDQrE7rliH6vK8V6KAclqW+44W/IXn6I8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jofzo9I2Bti5DBcB6URGEHpWZB3+ZSMjnyf3z/yBKON4hnJUPQcuMIqxwPlOmV9h2yeKrYhnCXYNcsIIcOLHBaa0bxVRdwkCwBsVuY3wlubHYEl3N/WrivDwkHsjDGk9S+9cp1Tbcq/JQc+9zLjzIGxWa2db2SHvK2gKgXuxBT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AayLtz1r; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1233bc1117fso2446651c88.0
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 20:04:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768795497; x=1769400297; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a4KxwmlBlOeG/SijIjUydp6Wq7QE+G7DwqwSIAw1kKc=;
+        b=AayLtz1rlUF8ioLXVDuuo0Ru39novV//ECvi6BIyZOrgLj/8hAO93+GsB3cNdluiFy
+         AGBmOO+OB/v6xqq1PVzmS2/JLXklJ/6y+5O6niAsph79JOorO7ME7AAWGTtXkooh4fIR
+         TW1qbsEIy4NwIMWRWLQ+9NHsauKVnxztIGCzgewNVhYxZzosLPc0kueOFO+cV7Y2SQJg
+         6t1rWSjQIrXGY3UCz1uSdx2PTzt7I6YcGhZ0XDEgqryLZNHdg1x+XM2PC9Lnf9+PYltz
+         gWPr+DlWZVA5tOdaLRP42b0DBfzGsQX/voKUy5ZlKL7Y0i5I+L/5a0AQVXVrP0BBs5xq
+         YHzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768795497; x=1769400297;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a4KxwmlBlOeG/SijIjUydp6Wq7QE+G7DwqwSIAw1kKc=;
+        b=QOdq0m+RE5sM17hPh3q4TrajsoVDplBvnH+sRJkBgvKcKGvdpKdt3PSFCrUzkOt3SG
+         WIviPHTLPh9bjzamp5mYW+wqPRIjvkjv1quRjAiQ0XMGy2JN9OaVPp/Sq1fMZJ6tigGb
+         coH3OwZzt1BmRyMU6AtJoabQBb6WyggkqIEGKWG6VClZfCMaRx5Iov/9fJBbCm+Q8mKd
+         Yw9wXD1IoRcwUn+LXoUhOJa6LAQVJCPvmVfa7uLOm1vJ9UYddZjWYMQ0fGfxxoYBm2UZ
+         RFo9DaSXc2DrT2GPUUSAtwKYZA+2/+rmSUtIYzqU8f1QNc7Oag7VgmS3+NxkW4zS03OL
+         00jg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOfifh/QrX+ryfhnghclqdqqV6JVwCSH/8+JBLYrrV59y0/sSxCkwnM3SFfkaqf5rxbXBONZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMv8HEjKh/k13n3QEGPuo9oOSEMHXhdiP5fb9BnDIgqkApqaKu
+	S5RkPWDAWQ6KLIlw7WYXAtA3gbW8/K7UmTPl8CZFnstG6Fyfu9qVA+m3
+X-Gm-Gg: AY/fxX5pRcGizgwxcQeqY+OOIeuKsJNvrs/aG/QAU1oPapPTO4rHo7H2gFp4iAo95ve
+	XpZUB7OxI+IfLuGhJ3B0I2tvGVoz/zC/HV8BRkdtF5wcOHmp+XTItvbgpMXWk/1kXuU/f7agStr
+	aRkpWmQvFf50F7DEzvFIzEMySkTzh/9AjpG+DnQB9R0Rf3M51aFw3DPdVhVWxL/m29AnsGjYM67
+	hpur9k/1/n537u7aXh351TErWMpAtGQ3J5xPn9MrNHO7hGf+HpszLChI2CVXvBTH23PHeoP1+eh
+	7iZwSj/FKaAyloakz0/jj5Bkk3xmZYH/7CaldMaNucm1mQW63PdPxlmkqSIn5zfho0FIensYyLW
+	/wbDhgwRkCYBmPBvEvFxdr99cSqxRwY/zL/IXRRQDoKJQQNPayvieEQ/rzdjGFlayyDG/4WEL6+
+	aSws/qAtFk/A==
+X-Received: by 2002:a05:7301:9c92:b0:2b6:e793:caf7 with SMTP id 5a478bee46e88-2b6e793cc47mr871823eec.18.1768795496562;
+        Sun, 18 Jan 2026 20:04:56 -0800 (PST)
+Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b3503a30sm12828922eec.13.2026.01.18.20.04.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jan 2026 20:04:56 -0800 (PST)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Karol Gugala <kgugala@antmicro.com>,
+	Mateusz Holenko <mholenko@antmicro.com>,
+	Gabriel Somlo <gsomlo@gmail.com>,
+	Joel Stanley <joel@jms.id.au>
+Cc: Inochi Amaoto <inochiama@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH net-next v2 0/2] net: ethernet: litex: minor improvment for the codebase
+Date: Mon, 19 Jan 2026 12:04:43 +0800
+Message-ID: <20260119040446.741970-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260117163959.5e949a25@kernel.org>
-X-Proofpoint-ORIG-GUID: Ywa44XuTKfbxTmr5RbFrDyIr3nsK8djE
-X-Proofpoint-GUID: Ywa44XuTKfbxTmr5RbFrDyIr3nsK8djE
-X-Authority-Analysis: v=2.4 cv=ebgwvrEH c=1 sm=1 tr=0 ts=696dad54 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=fLNZezRRMFmasL0oagIA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDAzMCBTYWx0ZWRfXxcivG1jE3xWX
- v7rwKP0OxX351c5GpviWoD4tOYXbbxC5654s8M6W9Fbmd2n7sH8MQXPKatDPwPs56HTQuCJLEIm
- 1n+tI8Ezke5oQ528t8KCHcNnMjj6yEHpaUw++K3RND4LaS4CXD02hrLFYBweg/zfsonx58CPTKG
- 7qHS/z5eWl8gC5AiagPCr4C256DpfVb6Q04LuTT0vqmCum9/z4TSAf12JroXw5fJ+n/Vghdqh3B
- 2IyY8LNDVBXP+hfPcU7nfRGds/y7340nHrrrMvpx0jnwwNp6f4WNgVbvQWuCduMGM/YM4qdXcmK
- 3CgnaoT0g6oiKWKrkvv9+wtyZh1rAnQhLRZ9vZ4C9riAPr+jA8hA/g3TWKC4SlDUocqhkfoKfnu
- QLe0lS4G76o6mEKbXh0msIo/lBpcuVdbvjSKUxiyFbfJHAjx15qquEI2dWsUv/4VDTOLJdR6G6w
- 6tNFWyfKOS3K1PMv7BA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-17_03,2026-01-18_02,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
-On 2026-01-18 at 06:09:59, Jakub Kicinski (kuba@kernel.org) wrote:
-> On Tue, 13 Jan 2026 15:46:46 +0530 Ratheesh Kannoth wrote:
-> > +static void npc_subbank_srch_order_dbgfs_usage(struct rvu *rvu)
-> > +{
-> > +	dev_err(rvu->dev,
-> > +		"Usage: echo \"[0]=[8],[1]=7,[2]=30,...[31]=0\" > <debugfs>/subbank_srch_order\n");
-> > +}
->
+Improve the litex code for using the device managed function to register
+netdev and replace all the "pdev->dev" with dev pointer instead.
 
-> - please try to finish up the devlink array config thing instead.
-> debugfs is for debug.
-ACK.
+Change from v1:
+- https://lore.kernel.org/netdev/20260116003150.183070-1-inochiama@gmail.com/
+1. separate the original patch into two patches.
 
-> I'll release the AI code review results,
->but as mentioned on Wednesday
+Inochi Amaoto (2):
+  net: ethernet: litex: use devm_register_netdev() to register netdev
+  net: ethernet: litex: use device pointer to simplify code.
+
+ drivers/net/ethernet/litex/litex_liteeth.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
+
+--
+2.52.0
+
 
