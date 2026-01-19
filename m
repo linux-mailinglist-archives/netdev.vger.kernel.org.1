@@ -1,188 +1,222 @@
-Return-Path: <netdev+bounces-251057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0156AD3A778
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:55:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D5ADD3A7B9
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:03:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D4F930CDD5B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:52:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B2C8730049FB
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB4C318ED8;
-	Mon, 19 Jan 2026 11:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69318358D3B;
+	Mon, 19 Jan 2026 12:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="F23Wo5fw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dhw7hgNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1BA318EDD
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4396314A62
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 12:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768823572; cv=none; b=mK+Q8rEwCx0jicNuPJbMZLsayaiqkq2XTz+HN1t5NH4FBc1XHCHUQJn//XPKr0zUZlRu975xMhL5oDqgFKYPGIVFgAvG0WhL8aMph4CTiqYBwWZHxwQwb+q4OIM3w9xCBPltylQsCIcsXcrqdmzLRGooqqP1eydXeqPrzu3S/YQ=
+	t=1768824215; cv=none; b=JF4SfJL0DER9in919f8jq0dd8xuWAmL/+ik3r+hmhRWerUdOl9DEQSOHpHd+DQrQhHXxE7FO9rAto/eNAUyKCaJfkpjI9vfVo0EAoanw0zn7tlBRSy87qoeDSeh8DZ7jpJS8LdC3tBEURiz4AUws/RUwklAMSXzVNylSzBjN0Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768823572; c=relaxed/simple;
-	bh=XjmEkDhy70C9BPaUIKs8e1nglyFuMhkb7Yn1iqBTdVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tFbEF24jSu6Z6dYhoTjYo+g+Dw4SO452JaC9u6Uql9/Hl0j9pkEKU3L42if5NAWnOoS/QH7CnOqWvj6ThRjz4wQG7Snvl3GT+lj0vGyno1m1GYzDFfaw27h3WHLEuXyMY/96sFV5mgdj2oX+GsY1eM1fSZvzJ0dsmHM9EFfF2qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=F23Wo5fw; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2a2bff5f774so13476125ad.2
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768823563; x=1769428363;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o/toLEsajSo6fO5hRJUdPGrIZ19DquBDTOLbcgJFlJU=;
-        b=JZzUP4MqqxRud+7BJeAMvljmJVqrRUVzeP5H2WQmSMN+MiQSb7N1lnhH741mbk3GEK
-         VYHfSU7UutrBReHBdQjTttdPgs5Gi40hvChjRiee3fA1HYLNbFSwbd843UsP4IEYjNxx
-         bcwU5Yfh2xp4nMRv0T4k0bTnhQBFlA3IxKbSbgz2Sxzt0UTKq+DA5WmUzqRkq7kDTIIZ
-         t6AyXcOtdPylrpRKT07kO7j2INwGhOWupBp+ZVIntHVZMvhLVLtkqZkhW2l3igOR8+Mc
-         mQ7A/3/kH/gVo/Dl48Xeaw9HkaWJPOuv56K7VhM2C6uvPhr5nU8TkietEo5nedjShTKV
-         BKjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXMTkxQ8Pb1Z2qIN1qaar0/WChZlzSnkpxrcW4xyW8CivyVC1hgU+a2IZva/K8NE4G7ilB5LmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8XpSrleKtuSLXyWAYgNwTcrZvQvPvAAibVVoMxK9QDwRRRD//
-	tiYOEnLgBXjLsWaJMg6iklcUjZXB6yc64HrZ5iwlnqVs12FIYAX/G4jDjKqWcowZuRdtOG+gr5t
-	X6N+bcKsVOysfpMC9Oc1eE9QDINP7Wf81wwyfW2SGA69iN6DXhO2Ge76OS1MF3HXwJhEhGUuJGY
-	hZaF5tzsn5TAdQsiSzQ0fYYsstM8vUpFxEepQATMY21Fu+voro+6ne4MxajwJWf0kvbDZ09PdSY
-	Az6+8xZaaEflRiNuJsDrUFCtBRaYns=
-X-Gm-Gg: AZuq6aLbibJkGQ3HAnPPwdBCCgCply/K1uYnWuFWaEXMlNryI8w6JJw+8M8+eR+8UiX
-	UyoN4eHSJ5RBZ+PI2zT1Cr1hKzxR9ZxVrgh7TrS5y98ZrFkydd7Te/s5Kvk0rWO2NhbKN0yI3mG
-	583LbLfxvO1WsbfxjqBlgA25moU2tjNILCV6+iMLMXXtjD8D5GWE0De+Sa9PSjuF2ilN9vXeYYk
-	pg/U+4Fh1ZmkgN91ORhe0DEN4IKvfXooPuKvyHwAZ3EQhfdRuF9UHMwNZW9USBF5mleUHraHqKD
-	mpdztpPhHSZktMME1z3p26/tosn8HvYFv57oKUKvoklgZruxz76jVsv4a0V7k8TCQXUPnpel3sR
-	23RNK5JjxlVrGLDrhMeQm3UBbsOeZFCzBj8oo7+04emNzAyKV8c/7np6AK2rqVHn4aFJ4F0t0Yu
-	PvW9gZMbVAza7DeX+mjxFg4lJg5jI8JZUBZ6YULo3wJq9BCXKUHQed3dDVE4ZvgA==
-X-Received: by 2002:a17:902:d492:b0:295:745a:800a with SMTP id d9443c01a7336-2a717525512mr75002785ad.2.1768823563179;
-        Mon, 19 Jan 2026 03:52:43 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a719395eb2sm14677815ad.41.2026.01.19.03.52.42
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Jan 2026 03:52:43 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8c52de12a65so116378885a.2
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:42 -0800 (PST)
+	s=arc-20240116; t=1768824215; c=relaxed/simple;
+	bh=8I29BCfIKiLgtdEVGUIyfgW5ObtzvtJM9btdY9aaQXE=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tspNc4f8MXY9nxSg1qVPdQj3P90QILNEMq3pJ4tsXt17A7w9VwmBn+losO0GznfAAf5Xrq/TgjVrdIBzFtHIf843WTEB9DCzMMiBpJTyiGpSdQ3+s3AqdvtrzRyRdZbWXc95ac+COlsLxTqJ13StRUl9yzjQa4KDH0IMmG5a3yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dhw7hgNP; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-480142406b3so20333555e9.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 04:03:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1768823562; x=1769428362; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o/toLEsajSo6fO5hRJUdPGrIZ19DquBDTOLbcgJFlJU=;
-        b=F23Wo5fwQvVFRkHhHhqcR9lpNJ6LF7PVZdTf/zH3ptgW5YVd6leI4om435lU4ELIdJ
-         lazrLlWh3eyOPOy3JU0J5PevpR5f/HBipLDIARwNQSKLi2edMrSgvmjdPc7Wddpc4fNC
-         S1U+5QiGeyxjqYcJulwxt1bv7VRqYvEi3zsps=
-X-Forwarded-Encrypted: i=1; AJvYcCWmsrqRA/makCHKV3mqj1eprz7bbrvSFNKSCuDImMUSD0+em9xsFzKrAR0Z2KlqisTBpJev29g=@vger.kernel.org
-X-Received: by 2002:a05:620a:2a05:b0:8b2:e177:fb18 with SMTP id af79cd13be357-8c6a67bc788mr1083870085a.9.1768823561512;
-        Mon, 19 Jan 2026 03:52:41 -0800 (PST)
-X-Received: by 2002:a05:620a:2a05:b0:8b2:e177:fb18 with SMTP id af79cd13be357-8c6a67bc788mr1083863185a.9.1768823559509;
-        Mon, 19 Jan 2026 03:52:39 -0800 (PST)
-Received: from keerthanak-ph5-dev.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a71bf2b0sm772878885a.12.2026.01.19.03.52.36
+        d=gmail.com; s=20230601; t=1768824212; x=1769429012; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kzaz1i9qc6G7xsP+1FC5njEiUedEPzYKnb9i6e2a56w=;
+        b=Dhw7hgNPaDHaDD1COvglU9JeUdScoVHUI72cio5sxGyByUXJTHoDLt7hQtJpLTjiZ+
+         B7eYt4vPaNBsB0d9M5+eE7x5Rdj9hnsXIYDQW2PSg3ivYMYUE/0aHtHGWiKCwXbD4I9+
+         pOezuh3tG+jhBLXtlg3jXOOqju7zW0ayu3bSSHGm52gDOuy/kT78SUjcsm+jCRpCF/ja
+         AcFcgJSufA5HSybR3hLgGTDPEQOFmQlxukFFYdhB7RHtzLqltZV88KRflVEqPTOVVM9I
+         IlSmhTMKUDELsH1Wjc1tJPIygYGrUh1kEY2Qg6EnSsBQVlQWazOd9bN1iuS5l5E31E+t
+         U1tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768824212; x=1769429012;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kzaz1i9qc6G7xsP+1FC5njEiUedEPzYKnb9i6e2a56w=;
+        b=T9LVoArlssNei6j2E8btn1AKFZLElb8m0kz9KzP8K7Uf9TiW+UmQHftJva6b1EPmeK
+         Ju82DgBnuXeCNhqm0A9DUf61EMzQOaIsNo3lhj5xEL2rT6Q9lAd3z4477rt1so6bt3nO
+         +W8LZvIFt8O0B83j8wDyPXV+P5aGPA7r0N70Y7kLrhNexaA+AjKtvFnGTY/22qwwccZ7
+         zQ287HMDP74DzNql7hxAc1Y1djmjXJd86SWOH0oNypRjoWxXB1olVwViwXUIiI2y4wOY
+         a+YqqXaj0vxnrk6hc7gNkAKsWSNrHizr581ibc+NB4hGW6XLd8k43P28ZnyqajmgtFIU
+         zueQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCC0PPvvUMQSGXXlFpjDAUEu/yNtYXnDj0N49ayF7hZh6qD6rQ/wYRSsKOI2rvrujPwwDMQwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywc8ET+6/09zkx0icYsQ17x3hE0xdgt0H2l1ZrsUGZaez4U4xkM
+	GFsU49v2yESmrbZt7FnSyM+A8qr1dIxkVTatOJ0Uv9Pmafvopw0bfx2l
+X-Gm-Gg: AY/fxX7Kgr+Yrkbj7eFKVVcdlSFzqnSp00uvK8ShUypZUf8zPsarsaAwAieZQ1ofJB2
+	biuq0cpueoY1MVBfZBxzwQeuNauSZoZTYJDPfvC1U9qBk3di4wKwlTDxZnSxL3KNkS+SY1XP11e
+	vbtjVA6d/jVhh+ZiTRdbzFfa9OL+vROxW7t/GwiTZTCD7vqWsANY6IWS20GyP2jB+sxc493phbP
+	vaHyBEMxPiIzu9VX0DtrmK/djC8R6VryD7rVVkhAJPEZe03xCmfBA6shaYrU/siW5ya62rVz4yZ
+	uxzJ+br984CUNPlCr5jXosNobM5eKAJWyaNIbqqCXJ9ls7/qHdluZXCGnmxR+ALRHH3fCfG2BhX
+	sn+NeGcIQ2+igwGMBgOYcgwrBmboALoDTu3+xst2xGKt+kvW1LYvJm9d5+eSFsOR2lS1f9Sunvh
+	XlKFbG77vSbPkbwDY1vS9Kyot5sH1SQGG/F3nEezg=
+X-Received: by 2002:a05:600c:1f12:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-4801e2fc37bmr117353555e9.3.1768824211594;
+        Mon, 19 Jan 2026 04:03:31 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-88-81.ip49.fastwebnet.it. [93.34.88.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801fe3b01csm83250955e9.5.2026.01.19.04.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 03:52:38 -0800 (PST)
-From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yoshfuji@linux-ipv6.org,
-	dsahern@kernel.org,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Sasha Levin <sashal@kernel.org>,
-	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
-Subject: [PATCH v5.15-v6.1 2/2] tls: Use __sk_dst_get() and dst_dev_rcu() in get_netdev_for_sock().
-Date: Mon, 19 Jan 2026 11:49:10 +0000
-Message-ID: <20260119114910.1414976-3-keerthana.kalyanasundaram@broadcom.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260119114910.1414976-1-keerthana.kalyanasundaram@broadcom.com>
-References: <20260119114910.1414976-1-keerthana.kalyanasundaram@broadcom.com>
+        Mon, 19 Jan 2026 04:03:31 -0800 (PST)
+Message-ID: <696e1d93.050a0220.7cbaa.5b25@mx.google.com>
+X-Google-Original-Message-ID: <aW4dkcDb8LikqH-y@Ansuel-XPS.>
+Date: Mon, 19 Jan 2026 13:03:29 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+References: <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
+ <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
+ <aWfdY53PQPcqTpYv@lore-desk>
+ <e8b48d9e-f5ba-400b-8e4a-66ea7608c9ae@lunn.ch>
+ <aWgaHqXylN2eyS5R@lore-desk>
+ <13947d52-b50d-425e-b06d-772242c75153@lunn.ch>
+ <aWoAnwF4JhMshN1H@lore-desk>
+ <aWvMhXIy5Qpniv39@lore-desk>
+ <30f44777-776f-49b1-b2f5-e1918e8052fd@lunn.ch>
+ <aW4QixwAJHaHWBBc@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aW4QixwAJHaHWBBc@lore-desk>
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+On Mon, Jan 19, 2026 at 12:07:55PM +0100, Lorenzo Bianconi wrote:
+> > > Airoha folks reported the NPU hw can't provide the PCIe Vendor/Device ID info
+> > > of the connected WiFi chip.
+> > > I guess we have the following options here:
+> > > - Rely on the firmware-name property as proposed in v1
+> > > - Access the PCIe bus from the NPU driver during probe in order to enumerate
+> > >   the PCIe devices and verify WiFi chip PCIe Vendor/Device ID
+> > > - During mt76 probe trigger the NPU fw reload if required. This approach would
+> > >   require adding a new callback in airoha_npu ops struct (please note I have
+> > >   not tested this approach and I not sure this is really doable).
+> > 
+> > What i'm wondering about is if the PCIe slots are hard coded in the
+> > firmware.  If somebody builds a board using different slots, they
+> > would then have different firmware? Or if they used the same slots,
+> > but swapped around the Ethernet and the WiFi, would it need different
+> > firmware?
+> 
+> As pointed out by Benjamin, the NPU is a generic Risc-V cpu cluster and it is
+> used to move packets from/to ethernet DMA rings to/from WiFi DMA rings without
+> involving the host cpu (similar to what we have for MTK with WED module).
+> I think the PCIe slot info is not necessary for the NPU to work since it is
+> configured by ethernet (airoha-eth) and wireless drivers (mt76) with DMA ring
+> addresses to use via the airoha npu ops APIs, NPU just moves data between the
+> DMA rings according to my understanding.
+> 
+> > 
+> > So is the firmware name a property of the board?
+> 
+> We need to run different binaries on the NPU based on the MT76 WiFi chip
+> available on the board since the MT76 DMA rings layout changes between MT76 SoC
+> revisions (e.g. Egle MT7996 vs Kite MT7992). In this sense, I agree, the
+> firmware name is a board property.
+> 
+> > 
+> > If the PCIe slots are actually hard coded in the NPU silicon, cannot
+> > be changed, then we might have a different solution, the firmware name
+> > might be placed into a .dtsi file, or even hard coded in the driver?
+> 
+> IIUC what you mean here, it seems the solution I proposed in v1 (using
+> firmware-name property), right?
+> In this case we can't hard code the firmware name in the NPU driver since
+> we can't understand the MT76 WiFi chip revision running on the board at
+> the moment (MT76 would need to provide this info during MT76 probe,
+> please take a look to the option 3 in my previous email).
+> 
+> > 
+> > > What do you think? Which one do you prefer?
+> > 
+> > I prefer to try to extract more information for the Airoha folks. What
+> > actually defines the firmware? Does the slots used matter? Does it
+> > matter what device goes in what slots? Is it all hard coded in
+> > silicon? Is there only one true hardware design and if you do anything
+> > else your board design is FUBAR, never to be supported?
+> 
+> I think the firmware is defined by the board hw configuration (e.g. MT76
+> SoC revision) and not by the specific PCIe slot used.
+> I do not think we have these info hardcoded in the silicon since NPU is a
+> generic RiscV cpu (this has been confirmed by airoha folks).
+> 
 
-[ Upstream commit c65f27b9c3be2269918e1cbad6d8884741f835c5 ]
+Just to make sure everything is clear and talking on this in very
+simple words, there isn't anything ""hardcoded"" or strange.
 
-get_netdev_for_sock() is called during setsockopt(),
-so not under RCU.
+For """""""reasons""""""" (I assume space constraints or NPU CPU
+limitation) it's not possible to have a single NPU firmware to support
+both WiFi card.
 
-Using sk_dst_get(sk)->dev could trigger UAF.
+The NPU do simple task like configuring WED registers and handling DMA
+descriptor/some WiFi offload. Such configuration is specific to the WiFi
+card and it's not the same between MT7996 and MT7992.
 
-Let's use __sk_dst_get() and dst_dev_rcu().
+This is why specific firmware is needed. The specific NPU firmware have
+support for only ONE of the 2 WiFi card and doesn't support configuring
+and handling stuff for the other. (the code is not built in the
+firmware)
 
-Note that the only ->ndo_sk_get_lower_dev() user is
-bond_sk_get_lower_dev(), which uses RCU.
+From the kernel side (in the MT76 code) we just instruct the NPU to
+start offloading stuff (if present) and all the SoC feature for WiFi
+offload are used. (WED, special DMA path, ...)
 
-Fixes: e8f69799810c ("net/tls: Add generic NIC offload infrastructure")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Link: https://patch.msgid.link/20250916214758.650211-6-kuniyu@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[ Keerthana: Backport to v5.15-v6.1 ]
-Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
----
- net/tls/tls_device.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+The possible combination that NPU can be used currently are the
+following:
+- Ethernet offload (all NPU firmware)
+- Ethernet offload + WiFi MT7996 (NPU firmware with MT7996 support)
+- Ethernet offload + WiFi MT7992 (NPU firmware with MT7992 support)
 
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index c51377a15..e79bce6db 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -125,17 +125,19 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
- /* We assume that the socket is already connected */
- static struct net_device *get_netdev_for_sock(struct sock *sk)
- {
--	struct dst_entry *dst = sk_dst_get(sk);
--	struct net_device *netdev = NULL;
-+	struct net_device *dev, *lowest_dev = NULL;
-+	struct dst_entry *dst;
- 
--	if (likely(dst)) {
--		netdev = netdev_sk_get_lowest_dev(dst->dev, sk);
--		dev_hold(netdev);
-+	rcu_read_lock();
-+	dst = __sk_dst_get(sk);
-+	dev = dst ? dst_dev_rcu(dst) : NULL;
-+	if (likely(dev)) {
-+		lowest_dev = netdev_sk_get_lowest_dev(dev, sk);
-+		dev_hold(lowest_dev);
- 	}
-+	rcu_read_unlock();
- 
--	dst_release(dst);
--
--	return netdev;
-+	return lowest_dev;
- }
- 
- static void destroy_record(struct tls_record_info *record)
+The NPU makes use of feature already present in the SoC and makes use of
+reserved space in RAM for DMA handling so it really don't care of where
+the WiFi card is present (this is what I mean with nothing is hardcoded)
+
+I hope we are not getting annoying with insisting on the firmware-names
+solution.
+
+My personal taste on this is that hardcoding the name in the driver
+seems a bit wrong and creating a way to dynamically select the firmware
+based on what is present in the hardware would be great but would
+introduce LOTS of COMPLEXITY for WiFi router that ship with a single
+WiFi card and would have their own dedicated .dts
+
+To make this generic enough an idea might be to have simple .dtsi with
+prefilled firmware names.
+
+- en7581-npu-mt7992.dtsi
+- en7581-npu-mt7996.dtsi
+
+But they would only contain a single node with a single string.
+
+Hope this more practical explaination clears any doubt of the
+implementation.
+
 -- 
-2.43.7
-
+	Ansuel
 
