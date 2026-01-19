@@ -1,134 +1,176 @@
-Return-Path: <netdev+bounces-250977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0D7D39E1A
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:57:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84F7D39E37
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C15183055F70
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 05:55:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 542C33016CF4
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB7225F797;
-	Mon, 19 Jan 2026 05:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3278F23EA95;
+	Mon, 19 Jan 2026 06:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ROIjLr3k"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CuRYGPr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45699265CA6
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FC32367D3;
+	Mon, 19 Jan 2026 06:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768802119; cv=none; b=GqjfP9bailv6wYGO7OTWS5BInBRElG+QhNflzEGrpzx561s4nWpPwoiurB6TwCQJcb5k0B5PS/XB3vQAlXcqRmQ7Vy+9Lq3W5CGWBU1BCulgo6cv5QffwGCxUo9GCZpDqs9ZEvdffl+9ixYDd+pis8pch5eFOG0aLIT9/O4jDz4=
+	t=1768802751; cv=none; b=YMeWyIZlMtqyy6Sy55Qeoq90ZYIBM9rStNAuXgMh+HqxWzDxTmhErsNRAKdA6LED9M3HpHVrjoaAElD09zS3wOymqlQGJHBDddyo1KSq0SFnjtLKzQlZutczn8AoDENKxe+va/6KoTKdneiEmarfinZ+dmeRgA0WsoUveeH23Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768802119; c=relaxed/simple;
-	bh=Uy6C4b+WcCdVg81/oqrdtyg+fGwUM7l7vLt0awGGvnM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HxA1gf3S0NFX4Wvc/vSWc8IdbSaTnBj8z1gIBIqBea5kvY0Uw7yukqz2Opkw7mgI45o8Oi3yugFI6BsyZExKkB7L7RwzX0IAmVvpIBCYfobXQc4fnp+pPbbP14Qo7U/SXmQFLj+Uq3oO6XJoQQSaM4MmFI8Ux43S4+q+8QuMvbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ROIjLr3k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768802111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9RUc9xBJNSYAfdXCE6GVASEQbjxNXlsHBbIujMtK0qY=;
-	b=ROIjLr3k4E1xSfVe0l2DOwqpauo1mNSpWHWJ6OzAESzckaddTpQ9UQ9/LWv1QqY02mpavN
-	3PW973Gn3Q7XFP8G9OmRPBSmTuXNgh6JTPI/XArBYc/0MQ6HWdaoymcwulBLM/b8glijmg
-	OpCCunQGaYpL4bQcE6rGV6B2m69OA1Y=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-230-VTJcjRCqPUCOnyqhAxHO1g-1; Mon,
- 19 Jan 2026 00:55:09 -0500
-X-MC-Unique: VTJcjRCqPUCOnyqhAxHO1g-1
-X-Mimecast-MFC-AGG-ID: VTJcjRCqPUCOnyqhAxHO1g_1768802108
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 01DBF1956095;
-	Mon, 19 Jan 2026 05:55:08 +0000 (UTC)
-Received: from S2.redhat.com (unknown [10.72.112.143])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3C0CF19560B2;
-	Mon, 19 Jan 2026 05:55:03 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: lulu@redhat.com,
-	dtatulea@nvidia.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH v3 3/3] vdpa/mlx5: update MAC address handling in mlx5_vdpa_set_attr()
-Date: Mon, 19 Jan 2026 13:53:53 +0800
-Message-ID: <20260119055447.229772-4-lulu@redhat.com>
-In-Reply-To: <20260119055447.229772-1-lulu@redhat.com>
+	s=arc-20240116; t=1768802751; c=relaxed/simple;
+	bh=KF0g6CHmfmERbfVIxwq63SZYa6Rer2UpccORI6pdfF0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlLleQuWdND0ZD07Dgbthlk4PClhtWjV7V0fVbnDwfTCVjI6JkFERjbXfOap4E17HY4lvUPRbOCmPEmJvxQWmvdbv1Pc4jalODvpVG/TIGWtrhh1PdgIb+HJdu1F7UosQVm0P3+ssxK/rMXt6cjrwJrTntqxTflb9rlLw82BCyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CuRYGPr7; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60ILdO1R1256085;
+	Sun, 18 Jan 2026 22:05:43 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=rp273GIKufFn1mAUwJh3uCQU7
+	ZMnIM3nSE0nl5ZS3B8=; b=CuRYGPr7wpNPohUGCWTrIssEvzL52Xj59xGQv5ukD
+	6vNl1CdpewsJElsUm15klMI6YC83oZHmbC4E7CHPKhqtKyehsDuUqoLqubddG6qo
+	6ojekWZl5/QAkuTCJblKZJFEf2d+dugCR+hajzanbrpqywtqCQzhr2xYSU8OuO8L
+	ihOI/y+Pgw1wJpQdXP+YjJ7XJhem7l11HZWoEvo7LdEh/eKc8s+ph3duBuVRWzqh
+	9n/D46qFbdLz5WAP0X8bZ48eNnAQfEV9/CdSWyLhNQvVDssqgvrqB0SPYjiIr7zn
+	0Jbu7crbFdVpGJcd1grYJS/WeC7bqnxxcCEjUk2mv9EWQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bryjc94sr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 Jan 2026 22:05:43 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 18 Jan 2026 22:05:42 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 18 Jan 2026 22:05:42 -0800
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id EAECA3F707B;
+	Sun, 18 Jan 2026 22:05:39 -0800 (PST)
+Date: Mon, 19 Jan 2026 11:35:38 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Cindy Lu <lulu@redhat.com>
+CC: <dtatulea@nvidia.com>, <mst@redhat.com>, <jasowang@redhat.com>,
+        <netdev@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 2/3] vdpa/mlx5: reuse common function for MAC address
+ updates
+Message-ID: <aW3JstEHDXjj80OL@test-OptiPlex-Tower-Plus-7010>
 References: <20260119055447.229772-1-lulu@redhat.com>
+ <20260119055447.229772-3-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260119055447.229772-3-lulu@redhat.com>
+X-Proofpoint-GUID: CDwML-LI4tNZFIK_HwHMS2-qs9frUmkv
+X-Proofpoint-ORIG-GUID: CDwML-LI4tNZFIK_HwHMS2-qs9frUmkv
+X-Authority-Analysis: v=2.4 cv=RuDI7SmK c=1 sm=1 tr=0 ts=696dc9b7 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=20KFwNOVAAAA:8 a=Ikd4Dj_1AAAA:8 a=nN6_Z0fRexQVMCHuv28A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDA0NSBTYWx0ZWRfXz+jyjxIxDx/k
+ +uLypZtIl2KCR+VQmcQ6nQdEQ60vjUJjnjmJBOQ+K1k2EW4HkpsLPHQWAAQnE/rIJUVgBn1sJgX
+ wzcJ0hifGw6X5qiSE/sFWjODW2cJkBkaow6S3sN1K1OBZRh/2bdHR9jolb73C1mya1NoqrhDIbL
+ oFDcnIYc09VDTDtqN2S3FvBp+o/OEqW2V0hpdEhJZYEUlFqEf1DD+AQCNgU4ikbHGtcls3vZCm0
+ s+KbZ4teK298Dw3i+Izxx8Ec3FYdz61qosg267WpNeI+m1EudC7P+Q+yOf+V5jAIknRkKG0khnD
+ 50hVBxRxHvn9cH4CdB9OuYlmKQ+cQ/cpkQ1zN5OZ+EEmII9k/JPU8yxeHPQV3mUdzxQNEXBBRoA
+ Ibvc3RJKsSIM2ZDHHVOm+NS/24HWZNr1XLxfw171W2ztl4FlTSHON65C02R0KiI9QWQNQX4C6OC
+ 3INu+BJW/Ifac4Xgn4w==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-19_01,2026-01-18_02,2025-10-01_01
 
-Improve MAC address handling in mlx5_vdpa_set_attr() to ensure that
-old MAC entries are properly removed from the MPFS table before
-adding a new one. The new MAC address is then added to both the MPFS
-and VLAN tables.
-
-This change fixes an issue where the updated MAC address would not
-take effect until QEMU was rebooted.
-
-Signed-off-by: Cindy Lu <lulu@redhat.com>
-
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index 7a39843de243..ed9aa0c2191a 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -4055,17 +4055,15 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
- static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *dev,
- 			      const struct vdpa_dev_set_config *add_config)
- {
--	struct virtio_net_config *config;
- 	struct mlx5_core_dev *pfmdev;
- 	struct mlx5_vdpa_dev *mvdev;
- 	struct mlx5_vdpa_net *ndev;
- 	struct mlx5_core_dev *mdev;
--	int err = 0;
-+	int err = -EOPNOTSUPP;
- 
- 	mvdev = to_mvdev(dev);
- 	ndev = to_mlx5_vdpa_ndev(mvdev);
- 	mdev = mvdev->mdev;
--	config = &ndev->config;
- 
- 	down_write(&ndev->reslock);
- 
-@@ -4078,9 +4076,8 @@ static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
- 			goto out;
- 		}
- 		pfmdev = pci_get_drvdata(pci_physfn(mdev->pdev));
--		err = mlx5_mpfs_add_mac(pfmdev, config->mac);
--		if (!err)
--			ether_addr_copy(config->mac, add_config->net.mac);
-+		err = mlx5_vdpa_change_mac(ndev, pfmdev,
-+					   (u8 *)add_config->net.mac);
- 	}
- 
- out:
--- 
-2.51.0
-
+On 2026-01-19 at 11:23:52, Cindy Lu (lulu@redhat.com) wrote:
+> Factor out MAC address update logic and reuse it from handle_ctrl_mac().
+> 
+> This ensures that old MAC entries are removed from the MPFS table
+> before adding a new one and that the forwarding rules are updated
+> accordingly. If updating the flow table fails, the original MAC and
+> rules are restored as much as possible to keep the software and
+> hardware state consistent.
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> 
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 131 ++++++++++++++++--------------
+>  1 file changed, 71 insertions(+), 60 deletions(-)
+> 
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 6e42bae7c9a1..7a39843de243 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -2125,86 +2125,97 @@ static void teardown_steering(struct mlx5_vdpa_net *ndev)
+>  	mlx5_destroy_flow_table(ndev->rxft);
+>  }
+>  
+> -static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
+> +static int mlx5_vdpa_change_mac(struct mlx5_vdpa_net *ndev,
+> +				struct mlx5_core_dev *pfmdev,
+> +				const u8 *new_mac)
+>  {
+> -	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+> -	struct mlx5_control_vq *cvq = &mvdev->cvq;
+> -	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
+> -	struct mlx5_core_dev *pfmdev;
+> -	size_t read;
+> -	u8 mac[ETH_ALEN], mac_back[ETH_ALEN];
+> +	struct mlx5_vdpa_dev *mvdev = &ndev->mvdev;
+> +	u8 old_mac[ETH_ALEN];
+>  
+> -	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
+> -	switch (cmd) {
+> -	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
+> -		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, (void *)mac, ETH_ALEN);
+> -		if (read != ETH_ALEN)
+> -			break;
+> +	if (is_zero_ether_addr(new_mac))
+> +		return -EINVAL;
+>  
+> -		if (!memcmp(ndev->config.mac, mac, 6)) {
+> -			status = VIRTIO_NET_OK;
+> -			break;
+> +	if (!is_zero_ether_addr(ndev->config.mac)) {
+> +		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
+> +			mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
+> +				       ndev->config.mac);
+> +			return -EIO;
+>  		}
+> +	}
+>  
+> -		if (is_zero_ether_addr(mac))
+> -			break;
+> +	if (mlx5_mpfs_add_mac(pfmdev, (u8 *)new_mac)) {
+> +		mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
+> +			       new_mac);
+> +		return -EIO;
+> +	}
+>  
+> -		if (!is_zero_ether_addr(ndev->config.mac)) {
+> -			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
+> -				mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
+> -					       ndev->config.mac);
+> -				break;
+> -			}
+> -		}
+> +	/* backup the original mac address so that if failed to add the forward rules
+> +	 * we could restore it
+> +	 */
+> +	memcpy(old_mac, ndev->config.mac, ETH_ALEN);
+        can we use "ether_addr_copy" instead of memcpy?
+Thanks,
+Hariprasad k	
 
