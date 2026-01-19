@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-251056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0243D3A76B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:52:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0156AD3A778
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 402BD300533E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:52:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D4F930CDD5B
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD595318BB6;
-	Mon, 19 Jan 2026 11:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB4C318ED8;
+	Mon, 19 Jan 2026 11:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="V1j/l9jC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="F23Wo5fw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f100.google.com (mail-pj1-f100.google.com [209.85.216.100])
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8F531987B
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1BA318EDD
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768823562; cv=none; b=PZoEGHpkzKdYohah1Fv50Ub41odRhgtT1AC5/4zcQ5Pw2XNT8xvgSAgXRuGpVmD5igHaLLeBbk3roWlvwd05t338gqIF98xn1VcXU9Q/Qs0BZY9ahm1K9X+jk7j8pFQshGky8imHMyJdzEIAm97wgqFmVD/KxYNxVni3FGCLN7g=
+	t=1768823572; cv=none; b=mK+Q8rEwCx0jicNuPJbMZLsayaiqkq2XTz+HN1t5NH4FBc1XHCHUQJn//XPKr0zUZlRu975xMhL5oDqgFKYPGIVFgAvG0WhL8aMph4CTiqYBwWZHxwQwb+q4OIM3w9xCBPltylQsCIcsXcrqdmzLRGooqqP1eydXeqPrzu3S/YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768823562; c=relaxed/simple;
-	bh=7s21PiKqoDI2UWcnusRjQAy1HY+xab4PIu+TPyMO0+E=;
+	s=arc-20240116; t=1768823572; c=relaxed/simple;
+	bh=XjmEkDhy70C9BPaUIKs8e1nglyFuMhkb7Yn1iqBTdVE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cGHoFmEAEiH3EHESwwLKd0fq85hyrmKAhrU4g+JvaK3/gzpXOUP6KOCjoNbu9LsHO7p1RVeMeAs0oxI3Nt20fqPMsXMSx1JaNkEyLRtUw0TyyCuBWOmLfHE2THcY2ZbfRq2cxdOVbcL5N7WvqhOHvVytTNgcXY0RFavyb97LTH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=V1j/l9jC; arc=none smtp.client-ip=209.85.216.100
+	 MIME-Version; b=tFbEF24jSu6Z6dYhoTjYo+g+Dw4SO452JaC9u6Uql9/Hl0j9pkEKU3L42if5NAWnOoS/QH7CnOqWvj6ThRjz4wQG7Snvl3GT+lj0vGyno1m1GYzDFfaw27h3WHLEuXyMY/96sFV5mgdj2oX+GsY1eM1fSZvzJ0dsmHM9EFfF2qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=F23Wo5fw; arc=none smtp.client-ip=209.85.214.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f100.google.com with SMTP id 98e67ed59e1d1-34c27ea32a3so231618a91.2
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:38 -0800 (PST)
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2a2bff5f774so13476125ad.2
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768823558; x=1769428358;
+        d=1e100.net; s=20230601; t=1768823563; x=1769428363;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N7MKZiatBshCjLhK/wnOMzSh/LSYhDXgYWq/2BVz61M=;
-        b=L0d3mUuGrQA5yxCYYl8NU4kbeSL3BJ3ahlQpIxqEF9xUQBchPdtMYPXg8inVihPagK
-         SRP3zp8sN3A7vnlmLVsdke2GqNFGsIHQeVw5bdjttxe2QdFX8HSdsJBHnBNroQWt/CbR
-         5/ZHDZkJKyYflwo//zemjedegPzsVGayAc7Z7ND4JYPW6p9KnxpX9f1JbTDaw9j7utWZ
-         1bfWzfAAc+uIvc1299CPrpdmzhvWjfZlTUSGpigjcS0S06rdUUx9XqQYPfw+cVxMSJPn
-         b1aSMwy89C/OsFvrEkQC+OZOX9T1Vdr7RSxUmQuaAujLU11WxCQPjzmVk7kZ0/Z0IIXv
-         ku8w==
-X-Forwarded-Encrypted: i=1; AJvYcCVNd5L4wZkvBEsyiqVozj2Yyen2YyHjc6ZnrbvjKN/L2SpfE7ko1x/byHzffLNTY+Xd48JQiWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM5x2m88/S3n/fxthvXbpC7u4Xy0dlVX5BKYyYcDyoeH7T7E6M
-	42wNZe4WsNAMZagiQOOuOsbJ9ZQ0S4hQIRP18Di1K1flK30rj66ekh6QpU/+qZPgzQOc8jvA1dM
-	SY0Cs/ied5qEM0yUZRaXmhYJQxAr2N7y26rBO6tfYB0qqLH0BzEqX3vfDMjMVLbR3fB1BEHgaNg
-	slnERXYx1qxFC/7+jyUQb6V+ST4JMEWrguRfVbYCNY1GS6CacK2JNo0D375L45gNKq6PtxJm3MY
-	MQ8zffZY5RJIoCyGWq+nXpb1tIKTHw=
-X-Gm-Gg: AZuq6aLjaj+URU2zX16KYQl0XrJezNI1Zz5biH5VndsbbJBtpOKvdYl89nT9dscyDWs
-	VY1zOLUi7pug3pogzJeKnYjHnInpW6TpNvnOhIkbuRM7Avyvd+gygyb3dnD5rnOmsLzXZ88Zmrf
-	pEst4owGmfYhon8D7aMwZ5HwrUz/zwTut5qaj0CUBUQVe4/1uIZKjHDX13RP5Kq/NFWylKrED8h
-	KT+ijofFcRbrjfe+nWWapMNlNv3n3m4y6KL6CiltxZtRxJR2QbgYL9B/7G7lpmAEhmX3Ubl8AFf
-	kc2IfAKZD4/k1wh0IYIh1i4jf3mx0LgmtdAsnWqn19Rj97XLlUQavoe6ypWRKfRbJKdGWWDwE+Z
-	vvFkB797DFK37Y0mfTb6XzfgaYiWlK7CHNuspVLcfEioqZczpIfqPjyziQdUcO2PlwEGbvPZpud
-	Xc/GhIJ9icIWfaVCGalNInlnkWRQsMLS/ePSO8JaC5n6YhRDV71Xl+2lrFKBE=
-X-Received: by 2002:a17:90b:58e4:b0:340:b8f2:250c with SMTP id 98e67ed59e1d1-35272ec84efmr7306096a91.1.1768823558177;
-        Mon, 19 Jan 2026 03:52:38 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-35273124917sm1478022a91.6.2026.01.19.03.52.37
+        bh=o/toLEsajSo6fO5hRJUdPGrIZ19DquBDTOLbcgJFlJU=;
+        b=JZzUP4MqqxRud+7BJeAMvljmJVqrRUVzeP5H2WQmSMN+MiQSb7N1lnhH741mbk3GEK
+         VYHfSU7UutrBReHBdQjTttdPgs5Gi40hvChjRiee3fA1HYLNbFSwbd843UsP4IEYjNxx
+         bcwU5Yfh2xp4nMRv0T4k0bTnhQBFlA3IxKbSbgz2Sxzt0UTKq+DA5WmUzqRkq7kDTIIZ
+         t6AyXcOtdPylrpRKT07kO7j2INwGhOWupBp+ZVIntHVZMvhLVLtkqZkhW2l3igOR8+Mc
+         mQ7A/3/kH/gVo/Dl48Xeaw9HkaWJPOuv56K7VhM2C6uvPhr5nU8TkietEo5nedjShTKV
+         BKjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMTkxQ8Pb1Z2qIN1qaar0/WChZlzSnkpxrcW4xyW8CivyVC1hgU+a2IZva/K8NE4G7ilB5LmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8XpSrleKtuSLXyWAYgNwTcrZvQvPvAAibVVoMxK9QDwRRRD//
+	tiYOEnLgBXjLsWaJMg6iklcUjZXB6yc64HrZ5iwlnqVs12FIYAX/G4jDjKqWcowZuRdtOG+gr5t
+	X6N+bcKsVOysfpMC9Oc1eE9QDINP7Wf81wwyfW2SGA69iN6DXhO2Ge76OS1MF3HXwJhEhGUuJGY
+	hZaF5tzsn5TAdQsiSzQ0fYYsstM8vUpFxEepQATMY21Fu+voro+6ne4MxajwJWf0kvbDZ09PdSY
+	Az6+8xZaaEflRiNuJsDrUFCtBRaYns=
+X-Gm-Gg: AZuq6aLbibJkGQ3HAnPPwdBCCgCply/K1uYnWuFWaEXMlNryI8w6JJw+8M8+eR+8UiX
+	UyoN4eHSJ5RBZ+PI2zT1Cr1hKzxR9ZxVrgh7TrS5y98ZrFkydd7Te/s5Kvk0rWO2NhbKN0yI3mG
+	583LbLfxvO1WsbfxjqBlgA25moU2tjNILCV6+iMLMXXtjD8D5GWE0De+Sa9PSjuF2ilN9vXeYYk
+	pg/U+4Fh1ZmkgN91ORhe0DEN4IKvfXooPuKvyHwAZ3EQhfdRuF9UHMwNZW9USBF5mleUHraHqKD
+	mpdztpPhHSZktMME1z3p26/tosn8HvYFv57oKUKvoklgZruxz76jVsv4a0V7k8TCQXUPnpel3sR
+	23RNK5JjxlVrGLDrhMeQm3UBbsOeZFCzBj8oo7+04emNzAyKV8c/7np6AK2rqVHn4aFJ4F0t0Yu
+	PvW9gZMbVAza7DeX+mjxFg4lJg5jI8JZUBZ6YULo3wJq9BCXKUHQed3dDVE4ZvgA==
+X-Received: by 2002:a17:902:d492:b0:295:745a:800a with SMTP id d9443c01a7336-2a717525512mr75002785ad.2.1768823563179;
+        Mon, 19 Jan 2026 03:52:43 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a719395eb2sm14677815ad.41.2026.01.19.03.52.42
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Jan 2026 03:52:38 -0800 (PST)
+        Mon, 19 Jan 2026 03:52:43 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c52d47dfceso81402285a.3
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:37 -0800 (PST)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8c52de12a65so116378885a.2
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1768823557; x=1769428357; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1768823562; x=1769428362; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N7MKZiatBshCjLhK/wnOMzSh/LSYhDXgYWq/2BVz61M=;
-        b=V1j/l9jC5hw3TTW/oKI/nSloeHMC2DVcjv1xKb+ipq3aDZJqfPQHOlcZfNbiPa5+iM
-         Q+wMHaKo/xq/gbfYOQNa49PY72PBiqsYRuYk+FyaNmiup83i85QpwxcXFmpZq+Ybhxsf
-         jX6aOjo54Qh6DP1QLDGgmS4e0+pfWB0R/38Es=
-X-Forwarded-Encrypted: i=1; AJvYcCUS1ShzorWO+mNvpsAPtVJ3ytTzQMYGl3I9IZIMORgPeMbt4+M3LAxiUWjZuYbm5rDJre+VeSY=@vger.kernel.org
-X-Received: by 2002:a05:620a:cd0:b0:8c6:a707:dae7 with SMTP id af79cd13be357-8c6a707dafdmr885239585a.1.1768823556955;
-        Mon, 19 Jan 2026 03:52:36 -0800 (PST)
-X-Received: by 2002:a05:620a:cd0:b0:8c6:a707:dae7 with SMTP id af79cd13be357-8c6a707dafdmr885236885a.1.1768823556365;
-        Mon, 19 Jan 2026 03:52:36 -0800 (PST)
+        bh=o/toLEsajSo6fO5hRJUdPGrIZ19DquBDTOLbcgJFlJU=;
+        b=F23Wo5fwQvVFRkHhHhqcR9lpNJ6LF7PVZdTf/zH3ptgW5YVd6leI4om435lU4ELIdJ
+         lazrLlWh3eyOPOy3JU0J5PevpR5f/HBipLDIARwNQSKLi2edMrSgvmjdPc7Wddpc4fNC
+         S1U+5QiGeyxjqYcJulwxt1bv7VRqYvEi3zsps=
+X-Forwarded-Encrypted: i=1; AJvYcCWmsrqRA/makCHKV3mqj1eprz7bbrvSFNKSCuDImMUSD0+em9xsFzKrAR0Z2KlqisTBpJev29g=@vger.kernel.org
+X-Received: by 2002:a05:620a:2a05:b0:8b2:e177:fb18 with SMTP id af79cd13be357-8c6a67bc788mr1083870085a.9.1768823561512;
+        Mon, 19 Jan 2026 03:52:41 -0800 (PST)
+X-Received: by 2002:a05:620a:2a05:b0:8b2:e177:fb18 with SMTP id af79cd13be357-8c6a67bc788mr1083863185a.9.1768823559509;
+        Mon, 19 Jan 2026 03:52:39 -0800 (PST)
 Received: from keerthanak-ph5-dev.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a71bf2b0sm772878885a.12.2026.01.19.03.52.33
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a71bf2b0sm772878885a.12.2026.01.19.03.52.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 03:52:35 -0800 (PST)
+        Mon, 19 Jan 2026 03:52:38 -0800 (PST)
 From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org
@@ -104,11 +104,13 @@ Cc: davem@davemloft.net,
 	vamsi-krishna.brahmajosyula@broadcom.com,
 	yin.ding@broadcom.com,
 	tapas.kundu@broadcom.com,
-	Sharath Chandra Vurukala <quic_sharathv@quicinc.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Sasha Levin <sashal@kernel.org>,
 	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
-Subject: [PATCH v5.15-v6.1 1/2] net: Add locking to protect skb->dev access in ip_output
-Date: Mon, 19 Jan 2026 11:49:09 +0000
-Message-ID: <20260119114910.1414976-2-keerthana.kalyanasundaram@broadcom.com>
+Subject: [PATCH v5.15-v6.1 2/2] tls: Use __sk_dst_get() and dst_dev_rcu() in get_netdev_for_sock().
+Date: Mon, 19 Jan 2026 11:49:10 +0000
+Message-ID: <20260119114910.1414976-3-keerthana.kalyanasundaram@broadcom.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20260119114910.1414976-1-keerthana.kalyanasundaram@broadcom.com>
 References: <20260119114910.1414976-1-keerthana.kalyanasundaram@broadcom.com>
@@ -121,120 +123,65 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-From: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
 
-[ Upstream commit 1dbf1d590d10a6d1978e8184f8dfe20af22d680a]
+[ Upstream commit c65f27b9c3be2269918e1cbad6d8884741f835c5 ]
 
-In ip_output() skb->dev is updated from the skb_dst(skb)->dev
-this can become invalid when the interface is unregistered and freed,
+get_netdev_for_sock() is called during setsockopt(),
+so not under RCU.
 
-Introduced new skb_dst_dev_rcu() function to be used instead of
-skb_dst_dev() within rcu_locks in ip_output.This will ensure that
-all the skb's associated with the dev being deregistered will
-be transnmitted out first, before freeing the dev.
+Using sk_dst_get(sk)->dev could trigger UAF.
 
-Given that ip_output() is called within an rcu_read_lock()
-critical section or from a bottom-half context, it is safe to introduce
-an RCU read-side critical section within it.
+Let's use __sk_dst_get() and dst_dev_rcu().
 
-Multiple panic call stacks were observed when UL traffic was run
-in concurrency with device deregistration from different functions,
-pasting one sample for reference.
+Note that the only ->ndo_sk_get_lower_dev() user is
+bond_sk_get_lower_dev(), which uses RCU.
 
-[496733.627565][T13385] Call trace:
-[496733.627570][T13385] bpf_prog_ce7c9180c3b128ea_cgroupskb_egres+0x24c/0x7f0
-[496733.627581][T13385] __cgroup_bpf_run_filter_skb+0x128/0x498
-[496733.627595][T13385] ip_finish_output+0xa4/0xf4
-[496733.627605][T13385] ip_output+0x100/0x1a0
-[496733.627613][T13385] ip_send_skb+0x68/0x100
-[496733.627618][T13385] udp_send_skb+0x1c4/0x384
-[496733.627625][T13385] udp_sendmsg+0x7b0/0x898
-[496733.627631][T13385] inet_sendmsg+0x5c/0x7c
-[496733.627639][T13385] __sys_sendto+0x174/0x1e4
-[496733.627647][T13385] __arm64_sys_sendto+0x28/0x3c
-[496733.627653][T13385] invoke_syscall+0x58/0x11c
-[496733.627662][T13385] el0_svc_common+0x88/0xf4
-[496733.627669][T13385] do_el0_svc+0x2c/0xb0
-[496733.627676][T13385] el0_svc+0x2c/0xa4
-[496733.627683][T13385] el0t_64_sync_handler+0x68/0xb4
-[496733.627689][T13385] el0t_64_sync+0x1a4/0x1a8
-
-Changes in v3:
-- Replaced WARN_ON() with  WARN_ON_ONCE(), as suggested by Willem de Bruijn.
-- Dropped legacy lines mistakenly pulled in from an outdated branch.
-
-Changes in v2:
-- Addressed review comments from Eric Dumazet
-- Used READ_ONCE() to prevent potential load/store tearing
-- Added skb_dst_dev_rcu() and used along with rcu_read_lock() in ip_output
-
-Signed-off-by: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
+Fixes: e8f69799810c ("net/tls: Add generic NIC offload infrastructure")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20250730105118.GA26100@hu-sharathv-hyd.qualcomm.com
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Link: https://patch.msgid.link/20250916214758.650211-6-kuniyu@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[ Keerthana: Backported the patch to v5.15-v6.1 ]
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[ Keerthana: Backport to v5.15-v6.1 ]
 Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
 ---
- include/net/dst.h    | 12 ++++++++++++
- net/ipv4/ip_output.c | 16 +++++++++++-----
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ net/tls/tls_device.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/dst.h b/include/net/dst.h
-index 3a1a6f94a..20a76e532 100644
---- a/include/net/dst.h
-+++ b/include/net/dst.h
-@@ -555,6 +555,18 @@ static inline void skb_dst_update_pmtu_no_confirm(struct sk_buff *skb, u32 mtu)
- 		dst->ops->update_pmtu(dst, NULL, skb, mtu, false);
- }
- 
-+static inline struct net_device *dst_dev_rcu(const struct dst_entry *dst)
-+{
-+	/* In the future, use rcu_dereference(dst->dev) */
-+	WARN_ON_ONCE(!rcu_read_lock_held());
-+	return READ_ONCE(dst->dev);
-+}
-+
-+static inline struct net_device *skb_dst_dev_rcu(const struct sk_buff *skb)
-+{
-+	return dst_dev_rcu(skb_dst(skb));
-+}
-+
- struct dst_entry *dst_blackhole_check(struct dst_entry *dst, u32 cookie);
- void dst_blackhole_update_pmtu(struct dst_entry *dst, struct sock *sk,
- 			       struct sk_buff *skb, u32 mtu, bool confirm_neigh);
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 543d02910..79cf1385e 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -420,17 +420,23 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index c51377a15..e79bce6db 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -125,17 +125,19 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
+ /* We assume that the socket is already connected */
+ static struct net_device *get_netdev_for_sock(struct sock *sk)
  {
--	struct net_device *dev = skb_dst(skb)->dev, *indev = skb->dev;
-+	struct net_device *dev, *indev = skb->dev;
-+	int ret_val;
-+
+-	struct dst_entry *dst = sk_dst_get(sk);
+-	struct net_device *netdev = NULL;
++	struct net_device *dev, *lowest_dev = NULL;
++	struct dst_entry *dst;
+ 
+-	if (likely(dst)) {
+-		netdev = netdev_sk_get_lowest_dev(dst->dev, sk);
+-		dev_hold(netdev);
 +	rcu_read_lock();
-+	dev = skb_dst_dev_rcu(skb);
- 
- 	IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
- 
- 	skb->dev = dev;
- 	skb->protocol = htons(ETH_P_IP);
- 
--	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
--			    net, sk, skb, indev, dev,
--			    ip_finish_output,
--			    !(IPCB(skb)->flags & IPSKB_REROUTED));
-+	ret_val = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-+				net, sk, skb, indev, dev,
-+				ip_finish_output,
-+				!(IPCB(skb)->flags & IPSKB_REROUTED));
++	dst = __sk_dst_get(sk);
++	dev = dst ? dst_dev_rcu(dst) : NULL;
++	if (likely(dev)) {
++		lowest_dev = netdev_sk_get_lowest_dev(dev, sk);
++		dev_hold(lowest_dev);
+ 	}
 +	rcu_read_unlock();
-+	return ret_val;
- }
- EXPORT_SYMBOL(ip_output);
  
+-	dst_release(dst);
+-
+-	return netdev;
++	return lowest_dev;
+ }
+ 
+ static void destroy_record(struct tls_record_info *record)
 -- 
 2.43.7
 
