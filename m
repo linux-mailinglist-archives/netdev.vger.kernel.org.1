@@ -1,177 +1,139 @@
-Return-Path: <netdev+bounces-251092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E9DD3AA8E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:42:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB4FD3AAD7
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:55:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C614D303E67D
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:42:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 06538300C370
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A48F36AB7D;
-	Mon, 19 Jan 2026 13:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C07636E489;
+	Mon, 19 Jan 2026 13:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OYiIrJRs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52EF36A020
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 13:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AAB33ADA9
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 13:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768830146; cv=none; b=uRGwVZX6Ipj8e1GCKmAUVK352gMTeVjn7Va6+m3kMnx6OtffLj8Br7DKoFF7stvUXGW4+tfupksHioW1v+hfTbxhmKnR4FwbUuuaGyI4d1Y3ju8YoFE+pvv9RUJ4N0FoezPXjnf2ujzr+GlxX/PebbfBRsZD6yP0+ukfnL7kkdA=
+	t=1768830882; cv=none; b=ZbADoDh7tXAJ8FSk2QCj5lP5lqJnxO5F4GT4y9j7LPf10y0VrcuYkfXQ4Mn5xr4ck26cG40E2rwFpRzuThr1h7lGdSx56REToZOefd1bd3bf0BBlO8jqVBpgFod/k2VitiorZNEd8BfgK625eKWYxlpQ3zAkKUtAdKTDEmNgM0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768830146; c=relaxed/simple;
-	bh=FMLcUUKCHc94/oLuNfGCQc4E6ZGfdlUDKBXGmEjPQ8A=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RXxWO/pxrXEi5wECVoNKeKvtMJswCdScATzl/oFjHyi1T11nGgkK/aLZvJ4emFrPhZSbzc3BerFxNtK37QMDrjy+lYvXzntEIrvjPVwjzu2u3eKJD+r98qv6IT1TuGFagFoEtMydrhWfVA8ygUqyn/P8646g8hXvL2vjj0YsfVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-45c903d0c2dso4440753b6e.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:42:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768830144; x=1769434944;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1768830882; c=relaxed/simple;
+	bh=lo81BFx/Ulv0xcaPTgRdmV6KO1F84bHVc1SQVycS4S4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ud1FWbk090/j0eRbZ5TvEiVNnFbGHNkeaFEqi95hil6hSosR7kcHsjTSmH9+VCzc8MIUNXwnKk4rPaq8jfV7R69+ug3hwcbtMEXTTh0+k2VhikqyHzx6mCXSh49/VZQtBmddBnhShyXbKVwwLmvB5EK+P7AIfHFmHdLOh31royI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OYiIrJRs; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42fbc544b09so2859808f8f.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:54:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768830878; x=1769435678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2XDY1/DfyQ23j23GzmXoCuFXSYNZFVLA6MfwMPKtank=;
-        b=A5TJi3ZDhpBHQPTri1rIyzOm6gVget2kgMjNRHMfDVyy5oNyZaDvBSaVsuElcyYsbf
-         rmgTYlK9wVYG2trVK2b9vgx0UBjcjrGG9DGEtfOkIDgbVnQIOLy4U6CDecWCkP/TBVSb
-         haUJCytCCVkqcxFX6n4Eziep5yJGkCgieN5yezwPHHN2l94tLi4SnJR269qszT8g1+AQ
-         +PbUgCwgQpX35VC4u8FjAwV6vBaAOF/OMeI4kX8W9dm5EmciYlLpifvIUNsue9qHK+Yx
-         Qeu0B3MxNhbCSklyiaMgZGZd6vZWfMr8rsk15g8FTOzhG3G34KxgZvkvSbL6u5vf6Wqe
-         VcYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVizFpDudDF8XMuAGzZNPzJLIl/hdPWVuIhtszncyUlQy83XRBavKo2hVkQ2HzDjQQLiTQ0AAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9aLun/j1qyLRr18toA3Nav/zxJ2mMlSBKR4Zf3haivSO78cPm
-	zcbBvzkUNcQ8Nvf8NjiBNYp3y+DLRRGQS6a6yS0ITxZcmPIKxAejbt1jEfqYFJd3bHBfo2rVJnf
-	H7y/6XDTd7TlcEpQeqRNRea/bxswuvkIx3Gq1cGh7uVANMsdX+CyR3UT3wcg=
+        bh=MPy6cjzmHwuoEQvvRHEOfQ3zwGp51DN3ulInpeNRzkQ=;
+        b=OYiIrJRseciC2w1wnZYx/HQx+/0wX9AA+uU2X5/x12E/i8fcD9BBGk2WIj8Vzl3nQ2
+         heoHllWVgyETGz3o9UJgZUj2iw1g5A5wmNYoC6B6US3c9/XQGop6MP/TI4iL4MetxhRY
+         Kgm5v0Ns51mj3FsZElRH0eS5inpYEalQgzOnzZJg34NDzxt6sEx55JnBLY9QqwL0TAZM
+         yKR9AQMFWpTfpCIbn+BPlWKV+6IlkWqzjZnim0bEJWKxZhSFiE9zCJqz4FO0cu+JXDSh
+         KRlwuTmdMrX0dyEWK65U+OJAyPp+Pq2QXSV3yn85P+XNHgTTnyyXX46U0HrzUcZZQLQD
+         EG4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768830878; x=1769435678;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MPy6cjzmHwuoEQvvRHEOfQ3zwGp51DN3ulInpeNRzkQ=;
+        b=I8NyoaPJWz8OCc8vYeDUAqKEtfEMssyNiiGJL7PWxnE1O5uUqcjuM/tmhiiZHeyr/D
+         Y19ZHupZ4aclmvjP76TvDSjkwnF+Fh42Z8cAOwTL1QnjwLtKvrqy5og00PliYNcJ+eCL
+         LUAg9VtTbbqU2BiKHwLiqDVY7ZG6yrjXN0NQYqrwXSoIUyB4kwlwq5YQe8agC3iUr8CQ
+         5qIGm8DAsT8VpGjrrqwDJWcDUGrIVHSwTgV9rjFPPnU8gOhYoVnU7cJQlA2wOUPcJ5Zf
+         /2fSRFXLaB0+h9ouWQJKW3NEVPKohX7n4rdrxS+MXUesvSY+a21Us7ZE9x+vGx7CS25M
+         b2JQ==
+X-Gm-Message-State: AOJu0YwKKSsVNhrakC35M1hrG0UD300erVgv4Gex2+a2F5fAxWbfr+4R
+	B+TsqJPULbr7E6fTmy7FLzSSWJspdrwwiFxa9T6h2TS5svpuqWu0wzOA/Ssqsg==
+X-Gm-Gg: AZuq6aJ5XNE5yZ6qU/Ys+ypsI5N+42qANfoKF0bcrsvFRhnRG8XOfApVWGdwhVKG9g8
+	Lz0IO7ehMGsbRjpax9lvlZx/aAuNG+YUhriaXuK9zG5xkKHF4F+Emgf7KA4KyxXd86suTae++JO
+	9G/BdZwy5O/ukQGamVr6i6Gn2Fq9+dJzuAfhY3GiX3qhCKyhNfyPH7hWDX5YfFLZTjbLWlcQ9PX
+	hGapyim4CJtkzGwL7c49DuS56AM+hRczK1k9A0c773Fq3ycvUJaecwxHL0UrbDHCZI+GqP+JpJz
+	rlx6RUiIc5dzVY8bx1Tvoyrficq8xfRcDS/UMlVxuXwgXguXEPQ9yI56PZuo/kBUI+j0PNUGa+6
+	/d7z4Boizwk9G+sMyyDqXH6aGV7VdgIhBGL1GZwlQOBjmWModbVHtG+niBU6ZXsqqz74cVxr2WP
+	MXcGC3ZHXZx+uW3nUdVgVj48XB7VJ7GCvlXwE0zPeSCYZnMgmCcvwJbbkHqAhpPwpt5BSqMwPGl
+	hvX4v3tNB34Ie9HJZcR9SL6/cvdT9gQ2MwRPa4am8llmscEMRjmwZZ2TWF2CCpk
+X-Received: by 2002:a05:6000:3110:b0:431:48f:f78f with SMTP id ffacd0b85a97d-4356996f2f0mr12962136f8f.1.1768830877534;
+        Mon, 19 Jan 2026 05:54:37 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569921f6esm22810483f8f.4.2026.01.19.05.54.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jan 2026 05:54:36 -0800 (PST)
+Message-ID: <7ab5309d-8654-4fa8-9a1e-24b948bccba2@gmail.com>
+Date: Mon, 19 Jan 2026 13:54:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1b0d:b0:65f:6cc6:6023 with SMTP id
- 006d021491bc7-66117a19629mr4228397eaf.76.1768830143889; Mon, 19 Jan 2026
- 05:42:23 -0800 (PST)
-Date: Mon, 19 Jan 2026 05:42:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <696e34bf.a70a0220.34546f.04ad.GAE@google.com>
-Subject: [syzbot] [wireless?] general protection fault in ieee80211_put_srates_elem
-From: syzbot <syzbot+81cd9dc1596563141d19@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 0/9] Add support for providers with large rx
+ buffer
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Alexander Duyck <alexanderduyck@fb.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan
+ <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Ankit Garg <nktgrg@google.com>, Tim Hostetler <thostet@google.com>,
+ Alok Tiwari <alok.a.tiwari@oracle.com>, Ziwei Xiao <ziweixiao@google.com>,
+ John Fraker <jfraker@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Joe Damato <joe@dama.to>,
+ Mina Almasry <almasrymina@google.com>,
+ Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, David Wei
+ <dw@davidwei.uk>, Yue Haibing <yuehaibing@huawei.com>,
+ Haiyue Wang <haiyuewa@163.com>, Jens Axboe <axboe@kernel.dk>,
+ Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, dtatulea@nvidia.com, kernel-team@meta.com,
+ io-uring@vger.kernel.org
+References: <cover.1768493907.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <cover.1768493907.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 1/15/26 17:11, Pavel Begunkov wrote:
+> Note: it's net/ only bits and doesn't include changes, which shoulf be
+> merged separately and are posted separately. The full branch for
+> convenience is at [1], and the patch is here:
 
-syzbot found the following issue on:
+Looks like patchwork says the patches don't apply, but the branch
+still merges well. Alternatively, I can rebase on top of net-next
+and likely delay the final io_uring commit to one release after.
 
-HEAD commit:    54e82e93ca93 Merge tag 'core_urgent_for_v6.19_rc4' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17bceb9a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=513255d80ab78f2b
-dashboard link: https://syzkaller.appspot.com/bug?extid=81cd9dc1596563141d19
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13924b9a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d46852580000
+-- 
+Pavel Begunkov
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-54e82e93.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f3befb5f53a4/vmlinux-54e82e93.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/92820ca1dbd8/bzImage-54e82e93.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+81cd9dc1596563141d19@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000003: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
-CPU: 0 UID: 0 PID: 3030 Comm: kworker/u4:13 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_put_srates_elem+0x42/0x640 net/mac80211/util.c:3272
-Code: 18 89 54 24 28 48 89 f3 49 89 fe 49 bc 00 00 00 00 00 fc ff df e8 ae 3f e3 f6 48 89 5c 24 38 4c 8d 6b 18 4d 89 ef 49 c1 ef 03 <43> 0f b6 04 27 84 c0 0f 85 19 05 00 00 41 8b 5d 00 31 ff 89 de e8
-RSP: 0018:ffffc9000981f7b8 EFLAGS: 00010206
-RAX: ffffffff8addc7b2 RBX: 0000000000000000 RCX: ffff888038e9c980
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88801a1bb000
-RBP: 0000000000000001 R08: 0000000000000001 R09: ffffffff8df41aa0
-R10: dffffc0000000000 R11: ffffed100343d00b R12: dffffc0000000000
-R13: 0000000000000018 R14: ffff88801a1bb000 R15: 0000000000000003
-FS:  0000000000000000(0000) GS:ffff88808d414000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f709ef1fa30 CR3: 0000000053e50000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- ieee80211_mesh_build_beacon+0xa83/0x1b50 net/mac80211/mesh.c:1093
- ieee80211_mesh_rebuild_beacon+0xc7/0x170 net/mac80211/mesh.c:1147
- ieee80211_mesh_finish_csa+0x131/0x210 net/mac80211/mesh.c:1542
- ieee80211_set_after_csa_beacon net/mac80211/cfg.c:4085 [inline]
- __ieee80211_csa_finalize net/mac80211/cfg.c:4133 [inline]
- ieee80211_csa_finalize+0x633/0x1150 net/mac80211/cfg.c:4155
- cfg80211_wiphy_work+0x2ab/0x450 net/wireless/core.c:438
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:ieee80211_put_srates_elem+0x42/0x640 net/mac80211/util.c:3272
-Code: 18 89 54 24 28 48 89 f3 49 89 fe 49 bc 00 00 00 00 00 fc ff df e8 ae 3f e3 f6 48 89 5c 24 38 4c 8d 6b 18 4d 89 ef 49 c1 ef 03 <43> 0f b6 04 27 84 c0 0f 85 19 05 00 00 41 8b 5d 00 31 ff 89 de e8
-RSP: 0018:ffffc9000981f7b8 EFLAGS: 00010206
-RAX: ffffffff8addc7b2 RBX: 0000000000000000 RCX: ffff888038e9c980
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88801a1bb000
-RBP: 0000000000000001 R08: 0000000000000001 R09: ffffffff8df41aa0
-R10: dffffc0000000000 R11: ffffed100343d00b R12: dffffc0000000000
-R13: 0000000000000018 R14: ffff88801a1bb000 R15: 0000000000000003
-FS:  0000000000000000(0000) GS:ffff88808d414000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd6f05c5e0 CR3: 000000001206c000 CR4: 0000000000352ef0
-----------------
-Code disassembly (best guess):
-   0:	18 89 54 24 28 48    	sbb    %cl,0x48282454(%rcx)
-   6:	89 f3                	mov    %esi,%ebx
-   8:	49 89 fe             	mov    %rdi,%r14
-   b:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
-  12:	fc ff df
-  15:	e8 ae 3f e3 f6       	call   0xf6e33fc8
-  1a:	48 89 5c 24 38       	mov    %rbx,0x38(%rsp)
-  1f:	4c 8d 6b 18          	lea    0x18(%rbx),%r13
-  23:	4d 89 ef             	mov    %r13,%r15
-  26:	49 c1 ef 03          	shr    $0x3,%r15
-* 2a:	43 0f b6 04 27       	movzbl (%r15,%r12,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 19 05 00 00    	jne    0x550
-  37:	41 8b 5d 00          	mov    0x0(%r13),%ebx
-  3b:	31 ff                	xor    %edi,%edi
-  3d:	89 de                	mov    %ebx,%esi
-  3f:	e8                   	.byte 0xe8
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
