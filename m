@@ -1,188 +1,156 @@
-Return-Path: <netdev+bounces-250980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43EB0D39E72
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:25:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27491D39E99
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3AC6C302219F
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:25:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E9FD300E031
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7020D26B2DA;
-	Mon, 19 Jan 2026 06:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0292026FA5B;
+	Mon, 19 Jan 2026 06:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWqe0ygg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ch8uM8nv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDC12550D5;
-	Mon, 19 Jan 2026 06:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F7626CE1E
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 06:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768803916; cv=none; b=R5616oyRmto+cwzFusOpRPIVMsuqQEjWmcBt0QfBqXcmzzBIQQLI4gsJM4+aQ89JEzkKO23ECNQYU9HUlPdb8N7NkTbw8uIOD9eAAs1MKLbduYG263kX04slPjoYUodpSD7KlZBccntA7uR0qNbfF2k6HIy3cOxLm0Pu5qos6Do=
+	t=1768804476; cv=none; b=tBPeeul8V87zFjGISp+hNotGb4bMdM3qQukAZB4GpY+qCidGye9RvPm6y+g/cqDO5NrHE39h2xiYXtLPUv4ty9u7n/vzPwBB1Fvf9BvW15kl6jczt14G+LQYQvmL3+oc0wiAHrCknplI72ZSmfUrGMsV+d+wHDg9p6hkOgUB8Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768803916; c=relaxed/simple;
-	bh=hrLfJZN98wDHwiiS6sK917nZ5lAJjvKHlHlZhidDSEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fBtFgY3zLy49ML+F6MNo6lo6nGnt0NE7gq+/B7RLj1aDL2/4cBM8Jh9TJyIFByRa2MfcL63H7EgVtwSy2YxYilalaUb1SSYzg/Wfno6AFVyUX8HE2oaNi5iFi8kAkpTBiGT4lW26mcNlGAVFXcCKAHV39sWc8QIW1tLnSfadKfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWqe0ygg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FE06C116C6;
-	Mon, 19 Jan 2026 06:25:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768803915;
-	bh=hrLfJZN98wDHwiiS6sK917nZ5lAJjvKHlHlZhidDSEs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bWqe0yggxFwmo/EFnmWtBaRfMhVjGSEpjbt92ZB1mDPq+tTpjH2xUUfZBsBK/tan4
-	 CO2KB4CRGpNQ/zFS5uL9b9f7mV7Scci/pI/VRWZoKYdbHEQ+KlOgQ5YoGn5bOWzh0I
-	 Jfou+nIMyzYaAmSRdHnzaEeuZzWeyGKN3BVLXp0Qu85x7FGPgF4rxqqCsSCUtJTMiL
-	 JDOVIWXaHtbcjcmduX23WantHzLRuILG+N0lYCNWgxOs1JyLqb04Ph2v4tF2nyN+D3
-	 2cep81s3BUu6pcHxQQNb245MaOsOV8nJt7M7elztFDGRb9jWiZvVX/ALS6ICvEtj/m
-	 c7Pby45NwHhzw==
-Message-ID: <7dfab6ea-fec3-4ddb-a6b7-db692e39474c@kernel.org>
-Date: Mon, 19 Jan 2026 07:25:11 +0100
+	s=arc-20240116; t=1768804476; c=relaxed/simple;
+	bh=ZAFtvc1Z7KU3XRunl8wn48JhlkoHpQ1IjxvalaK9BBM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o1OCbiT7RbEbOO//WgVHJ4RohBGuQ1Ebb6GHrXuchicVubon5D9ayCMioNwmVPRHkjDyXbeRTODtGRefvj4IVU/VQZjVM+jHLCsRjL/s1rT5tZFzpZVcRNgPbFrq5iexQl/L1wl40gXCymSl5FzboWoab/86FEubrCMgfZiYx5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ch8uM8nv; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34c30f0f12eso2218494a91.1
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 22:34:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768804475; x=1769409275; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O7ypBHDBNdyMjE+aygf+T74/TrmyZiWsKZCNBe7Qtqw=;
+        b=ch8uM8nvq6mgzWZBSY63W9wXbv673n8s2vZ9x1E58JxVRX6IzSmmIxkaiW3ptZgs5O
+         OCfg4sKKRctElWlt/y1Bh8dMGhfX0+PwK3X97I0Y9GPc4dh59M4xnSo9cdI2KXRPXZRL
+         xVlQl5mqjxMW0jjfBCRkYTyL9w9J01Mghy1lmBxFFIisoDQ1RDRsVQRS1Qp/2DpuQnga
+         ujG+7V1Ag/bxHUQCM02p/Z+fUzqqNd94dXXAol1aVLjMXKBkwtANFjyupmzzRUcA7/fc
+         wHjWF8BfizGw7ZdNIVY2Kz69On0rEcyCIw8z27raa54fyY7ikJEV+h/vteWVQuLKO6LL
+         xRZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768804475; x=1769409275;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O7ypBHDBNdyMjE+aygf+T74/TrmyZiWsKZCNBe7Qtqw=;
+        b=HPfzMBgfxnTFwW04P/o206UYnw/E4FatoqAistpNo5bpw5HolsIEv3QtfweSe2Ay7I
+         eAriL/rWCZRIMD3d/6HqQKWkA4pS+tvTHlZtj0c9Io8MqPQeMAwhzR/GUtCsLoc+P6LH
+         h7tJ2IOB+VwMToZY91KjZu4x+9agZyPLFxpljTpgHDfIlUowYy+YWVSHFAFe90SpXKtz
+         i9bx9+4Zv/XK7CIzOAKxw3n8KSUsGf0KBO25/hj6N17zVxRsSjNICFVpgbTbBQmBG9Ha
+         JKXgPgs/FJdyWkSWWbTymI1b/7jdc7DGT3S81M9abO+ZjehtfrfUPvFxiyNty9E8CYbx
+         nX2g==
+X-Forwarded-Encrypted: i=1; AJvYcCWAVghwmGja8XR5uYOSXdt3JjsVpAGwhOJW+2zxO9x6ygEdb+3rlF+OXWnKD6/zgh7Yarksk5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhHxrZkIF1inhJFfa35dIkrv8GlJYyHqnG/Q7CfaVrYypAczEx
+	xwI7Vi1O9A1yjNOftCYX+jCKBhlP4nr1srGitETrL8v2KnGxE1mBr106
+X-Gm-Gg: AZuq6aJf73ZJiq+q/qAR3lcAPQnKXxBeRQCj2vHrBzmNwLmTK3vrxlcEMkPp5nliTYV
+	JAbzWGOHMPscfFih2yhvCCIIslDmkZJq5a9kpihuAWbgnYnFu+DhcTVFBGqhe5Pt+vkXTGKYcrF
+	daCzXv7AD0KQxYiV0OMSw4ZxH2gzh8pUauvUvFZg44ab0Haeon61imJZFf+ixPir2UXjxlAy+zp
+	OPM/4yT+CIy/5Dn7IQ2J5sXDmn/SL2vEq4VegFTiTLHeg9F3xFIeg0RuBpnUEsuzSC0MFhpHFJs
+	luPWrnZfak189CJ7Z4RySE+M4m1vJqhROUGWtFpBG4p86hrzEp7vKKx9DbYWBdpj/RDi3jVVKXJ
+	hbyM/XMnSO5GOQsvlDN/hbH2s5+gXMYPEXgPdfUEptJ5oQPOtd0NKVi9MbMbvOriQXOAaRlmcGU
+	ezNa79KdOBKqUG7zS3DqfcDB3n46Tzxvq4+e/Oqdq4REaZ2mhz
+X-Received: by 2002:a17:90b:4ece:b0:34c:fe7e:850c with SMTP id 98e67ed59e1d1-35272ec4ac9mr8480444a91.1.1768804474729;
+        Sun, 18 Jan 2026 22:34:34 -0800 (PST)
+Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35273121a65sm8184664a91.13.2026.01.18.22.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jan 2026 22:34:34 -0800 (PST)
+From: Jeongjun Park <aha310510@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	syzbot+999115c3bf275797dc27@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH] netrom: fix double-free in nr_route_frame()
+Date: Mon, 19 Jan 2026 15:33:59 +0900
+Message-Id: <20260119063359.10604-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: caif: fix memory leak in ldisc_receive
-To: Osama Abdelkader <osama.abdelkader@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sjur Braendeland <sjur.brandeland@stericsson.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com,
- stable@vger.kernel.org
-References: <20260118174422.10257-1-osama.abdelkader@gmail.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20260118174422.10257-1-osama.abdelkader@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 18. 01. 26, 18:44, Osama Abdelkader wrote:
-> Add NULL pointer checks for ser and ser->dev in ldisc_receive() to
-> prevent memory leaks when the function is called during device close
-> or in race conditions where tty->disc_data or ser->dev may be NULL.
-> 
-> The memory leak occurred because ser->dev was accessed before checking
-> if ser or ser->dev was NULL, which could cause a NULL pointer
-> dereference or use of freed memory. Additionally, set tty->disc_data
-> to NULL in ldisc_close() to prevent receive_buf() from using a freed
-> ser pointer after the line discipline is closed.
-> 
-> Reported-by: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=f9d847b2b84164fa69f3
-> Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
-> CC: stable@vger.kernel.org
-> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
-> ---
-> v2:
-> 1.Combine NULL pointer checks for ser and ser->dev in ldisc_receive()
-> 2.Set tty->disc_data = NULL in ldisc_close() to prevent receive_buf()
-> from using a freed ser pointer after close.
-> 3.Add NULL pointer check for ser in ldisc_close()
-> ---
->   drivers/net/caif/caif_serial.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> index c398ac42eae9..970237a3ccca 100644
-> --- a/drivers/net/caif/caif_serial.c
-> +++ b/drivers/net/caif/caif_serial.c
-> @@ -152,6 +152,8 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
->   	int ret;
->   
->   	ser = tty->disc_data;
-> +	if (!ser || !ser->dev)
+In nr_route_frame(), old_skb is immediately freed without checking if
+nr_neigh->ax25 pointer is NULL. Therefore, if nr_neigh->ax25 is NULL,
+the caller function will free old_skb again, causing a double-free bug.
 
-NACK. If receive_buf is called with NULL tty->disc_data (outside of 
-ldisc open-close window), it's a bug one layer up. I.e. another race in 
-old bad tiocsti().
+Therefore, to prevent this, we need to modify it to check whether
+nr_neigh->ax25 is NULL before freeing old_skb.
 
-> +		return;
->   
->   	/*
->   	 * NOTE: flags may contain information about break or overrun.
-> @@ -170,8 +172,6 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
->   		return;
->   	}
->   
-> -	BUG_ON(ser->dev == NULL);
-> -
->   	/* Get a suitable caif packet and copy in data. */
->   	skb = netdev_alloc_skb(ser->dev, count+1);
->   	if (skb == NULL)
-> @@ -355,11 +355,15 @@ static void ldisc_close(struct tty_struct *tty)
->   {
->   	struct ser_device *ser = tty->disc_data;
->   
-> +	if (!ser)
+Cc: <stable@vger.kernel.org>
+Reported-by: syzbot+999115c3bf275797dc27@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/69694d6f.050a0220.58bed.0029.GAE@google.com/
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ net/netrom/nr_route.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Meaning close can be called twice? Or without open? Really?
-
-> +		return;
-> +
->   	tty_kref_put(ser->tty);
->   
->   	spin_lock(&ser_lock);
->   	list_move(&ser->node, &ser_release_list);
->   	spin_unlock(&ser_lock);
-> +	tty->disc_data = NULL;
-
-This wouldn't hurt, but should not be needed since:
-dd42bf119714 tty: Prevent ldisc drivers from re-using stale tty fields
-
-thanks,
--- 
-js
-suse labs
+diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
+index b94cb2ffbaf8..9cc29ae85b06 100644
+--- a/net/netrom/nr_route.c
++++ b/net/netrom/nr_route.c
+@@ -752,7 +752,7 @@ int nr_route_frame(struct sk_buff *skb, ax25_cb *ax25)
+ 	unsigned char *dptr;
+ 	ax25_cb *ax25s;
+ 	int ret;
+-	struct sk_buff *skbn;
++	struct sk_buff *nskb, *oskb;
+ 
+ 	/*
+ 	 * Reject malformed packets early. Check that it contains at least 2
+@@ -811,14 +811,16 @@ int nr_route_frame(struct sk_buff *skb, ax25_cb *ax25)
+ 	/* We are going to change the netrom headers so we should get our
+ 	   own skb, we also did not know until now how much header space
+ 	   we had to reserve... - RXQ */
+-	if ((skbn=skb_copy_expand(skb, dev->hard_header_len, 0, GFP_ATOMIC)) == NULL) {
++	nskb = skb_copy_expand(skb, dev->hard_header_len, 0, GFP_ATOMIC);
++
++	if (!nskb) {
+ 		nr_node_unlock(nr_node);
+ 		nr_node_put(nr_node);
+ 		dev_put(dev);
+ 		return 0;
+ 	}
+-	kfree_skb(skb);
+-	skb=skbn;
++	oskb = skb;
++	skb = nskb;
+ 	skb->data[14]--;
+ 
+ 	dptr  = skb_push(skb, 1);
+@@ -837,6 +839,9 @@ int nr_route_frame(struct sk_buff *skb, ax25_cb *ax25)
+ 	nr_node_unlock(nr_node);
+ 	nr_node_put(nr_node);
+ 
++	if (ret)
++		kfree_skb(oskb);
++
+ 	return ret;
+ }
+ 
+--
 
