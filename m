@@ -1,87 +1,71 @@
-Return-Path: <netdev+bounces-251169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03062D3AF49
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:39:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E7AD3AF63
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:44:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 652FC30010CD
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:38:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28EE83001FC5
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E05389DE0;
-	Mon, 19 Jan 2026 15:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB1038B9A7;
+	Mon, 19 Jan 2026 15:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzq35x+y"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HmJkkmpm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CDA1A285
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A516238B9B1;
+	Mon, 19 Jan 2026 15:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768837137; cv=none; b=Azb5Q4DG1UScdOc0d+QfR+Vats+fUR+SSCNBxQS7uSEppsAiPT977YAWaqyoPqA6MQTks3XWR44XAAdUTAr9r/TL2DyZgDxRamh/2EeQvKs4J6FgNJny/zubPxJeUZdy3pR0VTSWSq60aoRkkA+YkoAxOV0u6mVzQIWuSzveLl0=
+	t=1768837452; cv=none; b=fXq5AikIDKlEfVxWYIXvng5XaeEwf3HDdF8YbQoUZU68w1tKGftL0dNzt3CVFoD2ZGZRWrtIOl6iE68OIVo4JrvG4ZEsCGqj5tPXnMjePmP6UICrpfDFrL5rP7n+RlYWKX+KfcqhEqL9/IGGg4Id4sdiX97danlZMvbEvh56/6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768837137; c=relaxed/simple;
-	bh=jXHKJrXJSnEOQxUgddZjiad7A9U2BlElWaNWeUFGA/I=;
+	s=arc-20240116; t=1768837452; c=relaxed/simple;
+	bh=hoaRJky72TDMbUW4ehDh/qVmWU/lQsORlAtpr/L7ZUs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBZ0Nly2DUAW4Edjv3zCUAhDCPOtiTKu6V416SMldfnNuRHXUaPYu3N1bCmlKuWwNO2auDaPYgzkaF8KQA1REoUWHWyvATm8yG9yEZLlcSoa8aIdXVkQu1Q+5bNCxnO0rnMTyOIxXbljbzYCY5lRhx6vcA+e/QIRXTDVjVo/TlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzq35x+y; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47ee57c478eso1998265e9.1
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 07:38:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768837134; x=1769441934; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0OlaBMXpZRh2mRF/zIL7zkkXWi1bK1vG4lbJ+gzlq2A=;
-        b=hzq35x+y6xN6+XOjL8lbFswuatU11hID7TGbtmZDyfiaAitDg+oiR0KUXflQX7zmOP
-         JyojV75nzeaoG+U9crQzppNlhsdwFq/vfkp8FWiefbxipwP+JLsUusTvS+ri/vGL1xix
-         SC913n4bDNST7YBrqRoM3L9YcUBK7Pe667uGY1Ds5VE/h+x2/aLteHENHylTZ/OS/yPE
-         6bAEAdeBZ53BvOzsl45sO0CyQZa1gItFT4aBm3EZSpGiMchNQ6Ia0ckdS1980SPcSCBc
-         Ev5l6W0NYZyKzD2Zd6wuUiRwpA0Xb3CEWx8jt9eIO/AQP594kkzoKIRpctAEf71+J51z
-         tbHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768837134; x=1769441934;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0OlaBMXpZRh2mRF/zIL7zkkXWi1bK1vG4lbJ+gzlq2A=;
-        b=xFM/I8407f+1WaE2uqP25QemOxd3RafDoJkdVWcdhmLH8cAB0tOMwiqMnzNfDRIoR9
-         iaKInfhcOPp/UhyoxzHXNzhYBWetMtPE3XW4w6tJb2W0DuihAFav09HoqaOmvA1eBn8f
-         oO87imamtF6rAHLuonYxSyuoDKOckOJt+b2KSZiCBdIByPEXzlL5nwM/yD3TUqzrlNJy
-         SICkBX1kIcwjPn9T0+GrMdxjcuuo4yDgcYSjPUTbLn4EJyIFVLqeS+gd8qHqKNEeEK05
-         oy7tAHqHCNIRUtiZw+8vWwH8xiyQCSM25cytunvqGt5ecnO65B2IHgYl1vz+W5pPLQ8n
-         DH7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXSBgioabq7AOuQ7UmpFJ9uZ4MRjmzDi3fGjQUV2n4SzZZru4vPd3JuZjc7PQqZgz4Vznl0bsI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3EQSbObCt4FGjF13r+hei5OsSS4NyznBg2VxhcAOS0E7fi69G
-	ahzjoaD7SxVnlXkZaag8yaMRyOKRUodmWxlCBo6uYyX9etU8VfXWztlc
-X-Gm-Gg: AY/fxX7PVEwlMBjV67Q//C9PTYKsPLTI8KWS9PJeLMMVaB4/DZrK9vlhUlXmLY+e/AG
-	p4tW8OA12tdx60XyJ59IJMQDa1fd46YSAG/KEsoreDYn09GzChWiJNOwsnxdbVIMgV28EI+SL8J
-	L6c4FmEIzxRwfNsivvNCOzjOIPiiqBhWw+tygSPUZKS/hJUOVUJa7dsZaarH9ICSBzrTv0inMEU
-	B3mQ4IIog4BUC33B6ntz1XhoLe6faEowuSq0x3O+Cx07RdntHQG0QxRpKsycBSBGjQwPGIwk70M
-	t5QfgyvO41IeDHIPHJz2aDE/ld3qzpBQLxHJk81Vq2HGWyq4GK6fvKLel44VuyFtRBEpmbPbJZI
-	O/XmugHte/xIdUZaEU51vihAE3PyOA58GeoitmUMjuof5WH0/fBV+TfEfHQsufUoFquWWI1BjOr
-	fryFHYi4O3kSI5yA==
-X-Received: by 2002:a05:600c:3594:b0:47e:e20e:bbbc with SMTP id 5b1f17b1804b1-4801e2f2845mr105772655e9.1.1768837133999;
-        Mon, 19 Jan 2026 07:38:53 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:619a:24df:1726:f869])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cefdsm23190982f8f.24.2026.01.19.07.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 07:38:53 -0800 (PST)
-Date: Mon, 19 Jan 2026 17:38:50 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/4] net: dsa: ks8995: Add shutdown callback
-Message-ID: <20260119153850.r7m7qf7wsb6lvwwe@skbuf>
-References: <20260119-ks8995-fixups-v2-0-98bd034a0d12@kernel.org>
- <20260119-ks8995-fixups-v2-1-98bd034a0d12@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9eWGpte9NKDiwN5icBI4Z0rQnlIJqi/rHYIgA7V7oAYBN4Q2e5gDvpuJAGOWk95Utn9XV4QJSJ8kSRUFXKwalcd+cg5s4w1KWpk+FizAFYeIKBrXxhSf1J7raWWPZ2OK9Th1IO4pkOsLEMlgtTPLAlAgxVV3+83ak4+OE3QdIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HmJkkmpm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OdUaoSCio5puaeEe+IXYRT66N1Ls4wbMpbo4oPDQLsE=; b=HmJkkmpmk2E6djd/Aucm1PAm+P
+	oa9Y9tr5QEVJ3waQyLIHcEzb+EoTSGXotpvVcxeoykh7MgPN4P3oDy11d8ER9qgj16YKgx5/teuK4
+	f/fkGuhS/ykGSKUEjo1Zh6pUAnyu7vFNDWt1zLK26HYqPYgv8YkyBwjKnprlYnMg1NN+FcQFVZ3Ok
+	BDhZxZdHe4qzYAVSSNPe3/5BWtQM6sFmzVs4DpchChJSrFbGm3PoagncOyLGGxWTbCjducqEHZpEO
+	7IrTlf+BpD0a2Dp0gGfAfMKW+oTMCqA4GSO/Fjl7wZuLXxZfMiHc6zwr1K+wSbo9AVpHtqwBCmTrA
+	4crlQW0w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36966)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vhrQ1-000000005N0-0Asu;
+	Mon, 19 Jan 2026 15:43:53 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vhrPs-000000006gH-2ofS;
+	Mon, 19 Jan 2026 15:43:44 +0000
+Date: Mon, 19 Jan 2026 15:43:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Georg Gottleuber <ggo@tuxedocomputers.com>
+Cc: Yao Zi <me@ziyao.cc>, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
+	vladimir.oltean@nxp.com, wens@csie.org, jszhang@kernel.org,
+	0x1207@gmail.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, jeffbai@aosc.io, kexybiscuit@aosc.io
+Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
+ Motorcomm YT6801
+Message-ID: <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
+References: <20260109093445.46791-2-me@ziyao.cc>
+ <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
+ <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,17 +74,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260119-ks8995-fixups-v2-1-98bd034a0d12@kernel.org>
+In-Reply-To: <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Jan 19, 2026 at 03:30:05PM +0100, Linus Walleij wrote:
-> The DSA framework requires that dsa_switch_shutdown() be
-> called when the driver is shut down.
+On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
+> Hi,
 > 
-> Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")
+> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
+> revealed that tx is only 100Mbit/s:
+> 
+> ## YT6801 TX
+> 
+> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+> [  5]   0.00-1.00   sec  8.75 MBytes  73.3 Mbits/sec    0    164 KBytes
+> 
+> [  5]   1.00-2.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
+> 
+> [  5]   2.00-3.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
+> 
+> [  5]   3.00-4.00   sec  8.12 MBytes  68.2 Mbits/sec    0    164 KBytes
+> 
+> [  5]   4.00-5.00   sec  8.62 MBytes  72.3 Mbits/sec    0    164 KBytes
+> 
+> [  5]   5.00-6.00   sec  8.50 MBytes  71.3 Mbits/sec    0    164 KBytes
+> 
+> [  5]   6.00-7.00   sec  8.25 MBytes  69.2 Mbits/sec    0    164 KBytes
+> 
+> [  5]   7.00-8.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
+> 
+> [  5]   8.00-9.00   sec  8.50 MBytes  71.3 Mbits/sec    0    164 KBytes
+> 
+> [  5]   9.00-10.00  sec  8.62 MBytes  72.3 Mbits/sec    0    164 KBytes
+> 
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.00  sec  85.2 MBytes  71.5 Mbits/sec    0             sender
+> [  5]   0.00-10.05  sec  84.4 MBytes  70.5 Mbits/sec
+> receiver
+> 
+> 
+> ## YT6801 RX
+> 
+> [ ID] Interval           Transfer     Bitrate
+> [  5]   0.00-1.00   sec   112 MBytes   939 Mbits/sec
+> [  5]   1.00-2.00   sec   112 MBytes   941 Mbits/sec
+> [  5]   2.00-3.00   sec   112 MBytes   941 Mbits/sec
+> [  5]   3.00-4.00   sec   112 MBytes   942 Mbits/sec
+> [  5]   4.00-5.00   sec   112 MBytes   942 Mbits/sec
+> [  5]   5.00-6.00   sec   112 MBytes   943 Mbits/sec
+> [  5]   6.00-7.00   sec   112 MBytes   941 Mbits/sec
+> [  5]   7.00-8.00   sec   112 MBytes   942 Mbits/sec
+> [  5]   8.00-9.00   sec   112 MBytes   942 Mbits/sec
+> [  5]   9.00-10.00  sec   112 MBytes   941 Mbits/sec
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.04  sec  1.10 GBytes   941 Mbits/sec   88             sender
+> [  5]   0.00-10.00  sec  1.10 GBytes   941 Mbits/sec
+> receiver
+> 
+> With our normally used DKMS module, Ethernet works with full-duplex and
+> gigabit. Attached are some logs from lspci and dmesg. Do you have any
+> idea how I can debug this further?
 
-$ git tag --contains a7fe8b266f65
-v6.18
+My suggestion would be:
 
-We are in the RC stage for v6.19, so this is 'net' material, not
-'net-next', the patch has already made it into a released kernel.
+- Look at the statistics, e.g.
+
+   ip -s li sh dev enp2s0
+
+- apply
+  https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
+  to enable more statistics to work, and check the network driver
+  statistics:
+
+   ethtool --statistics enp2s0
+
+to see if there's any clues for what is going on.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
