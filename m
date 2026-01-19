@@ -1,134 +1,110 @@
-Return-Path: <netdev+bounces-251210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828CFD3B510
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:01:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 053C8D3B512
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9C7C30A3A35
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:00:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DCED7305FFC8
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C37732ED24;
-	Mon, 19 Jan 2026 18:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8571232D7DE;
+	Mon, 19 Jan 2026 18:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BxoPuxfv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jpvFwI6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E32C32ED31
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768845603; cv=pass; b=RqsydtmttxYFjp2CnAdkrBKyvjTfRIbZbgbVoy2ndGKcHrkJdcGnOj+Fpsuj2RcFXHwSN4sAJmacznJsQm/JFLV5yJf02ne4REPxnR2mlcd6vtCco5f0JTdRcbxoomyChIuOZbS1oxx5wl+S93igfBTRUNkquDGrG9VvvjvBJF0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768845603; c=relaxed/simple;
-	bh=LHo5efg8CgLD6lt9DbenrpXRwBIRAyaPdhr0/HDvpMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mQcnObKU01+to5N49KqpmHHVZEyjHu87DenGGTUG+T5gT9YNqllA1S4mBq55tXWQuIZQ5Leqcb6B78EQI1DEDJNEaBvszetkOABI2ouiuWnLl2ztyP62DI6h2FfKB7i4YnhS1BC6CvPVxsHZQGNg+pLis2QD3rjQhpJgUHzRL4Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BxoPuxfv; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5014e8a42aeso49093331cf.2
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:59:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768845598; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WYgyyGiw7muYm/N54cq/QJ48mKCmBeAt2/rxCR5aCbUU4nuFFnr6xOVoD1YRv9dsWM
-         Yu8baOS7POAX8tMdQO9SNiuFR/CYo8BMO0elHvpkbgy4AZmo9Kl8BKjtA/k1va1SaGCc
-         jN5bG2J9lYQetf1k+9MnJV6YK9bw0egcR2zGZV50Hx+UuTCAJRNJKrvTdB/GF7lWixsw
-         1NCsm2UVuPgpgB2m0gpk+bIBYsSX9AVnQNdlxKDvpB9EB33GPnLld/jQ9Z0LM8y9q5AU
-         SSRXqO9xhKJn+Pytej9mzT/2RYCb8Yhs7OusvQZv9UsyWliFvi7l769L1B2eggSA2QB2
-         E0qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=LHo5efg8CgLD6lt9DbenrpXRwBIRAyaPdhr0/HDvpMI=;
-        fh=ih2sBE3mQ2/fblzgbLkyuBRGc+40+wtlwCCvOr0X3vI=;
-        b=GCiVcVQn/iuWiy17tNb+NAqGOHpd0rymLNWAap820uUOlWc5p7hxfQZRCbVXbxu1Tg
-         ipEMIMRzTl2PT1BwlHZKFzbK4Jozb4WqCatehzT1umSG1OfhzhHj7QfVNDaioTPB3+bl
-         m32t+W6zTX6v9FLC/FCFYugkvDXI+ILI3AFkuqMbv5ESHd/OM/av8f3h9waHlNj3JVmJ
-         zw8+wJe9253zQiL1fZMX0VW8I+BThC+YQg/vwfDvKwpwsQSW6QeInNHnXbPnv4IStmFp
-         W2QgZOQeaCQsBUtd1qwQc6a3qt9rOeJGplA5cOgl8bc2ukpbijZqmb+RjC2nc6ykJO0F
-         Qumg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768845598; x=1769450398; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LHo5efg8CgLD6lt9DbenrpXRwBIRAyaPdhr0/HDvpMI=;
-        b=BxoPuxfvnTyWHZQhMq8KCvC3mU3ZteFSOwRzKnDZ2BLL24Mwj/lne6W+hbzeD1TW4G
-         dEHRCpiO2pRCLSAoYPOY9itXGEJ4AXMuRxHLxFb8jC1+VUFsRSu/ni6nxYfBnMw1t8aa
-         dvnFNrbJVRtbtotW+z1QT9yaLoQS/+DphWixaTZNbvdcDx1bGSg+1yaSbGR9bJMYnD3j
-         q7NsmGK+a3VBILbJ1uCvku9om3R3EOKJgZiV2Fv7m0dpFvASiUR2pQ0v7MfOzGT6c562
-         KJC3xQweqdltWo+8hAby/cmfUUbx/d4EvU4pQ+PbVB+0tFAyQelm8XTGacItrLOg2VSU
-         5cBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768845598; x=1769450398;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LHo5efg8CgLD6lt9DbenrpXRwBIRAyaPdhr0/HDvpMI=;
-        b=CAN+N+dJ6VSgIft8GysDaj7sz4Nk7DJG3F04kV9nACJDn/RVBuJeDs37yDZNCz/VW7
-         diVVwK/6DDuUh+1JOCg8PnYZxCezKXXfw0DrujKvh2njPiFBVR3AjDC86burvIyRU4wC
-         Ot26vR466RY0WgLDH8duiZ66GcpQ4+5hmBtwAiRdOqk5EnggCEKc+lgmoWPRNkAszXYk
-         g0wC7ye1d+qNlQpqOAa9gOSRkkOvqBPIkjcuFdJhTBgLDKUUuv/7cSddETLszA/UgXiX
-         6B5OnkFNeAzK5u/lIiZ50aocSB9BSb1cMoElUPKzjWZpQ7FB3B8pvJFIAnprjabN4PRB
-         M9uQ==
-X-Gm-Message-State: AOJu0YwgxnOWE78OojzORxKGwpQqjfwpSI9R6otnXnQtk95vIOZ2vxtl
-	ipFjJ0quXXNJgllIwOBB5FmruyY8oZtLXE3lmu+FXrp/QIWqs8OUlgOI+tOSz37Tbsgic6NNFu0
-	s+O2TiNwRU/EGfEWe94qbj9awLYHQPYWtPBJSVCea
-X-Gm-Gg: AY/fxX4sQSFqdKkMpC2YlUUhWBAMaIjLrESAbSlheXiUK6iKx/y+L/B3nn1C8upUlJd
-	HhlgvI0Afl9wzh6XPt2yjePopU0gzrzyPziyoWQrBHIu3lZvgbQRA7WrM2cFKXQoOrd7QwV3Yqf
-	STNTBNqse+JKkQE/s+4c5qKHe8HxRGgZmxPREFXuVldKW9kFurbYASoyLjW5mE9/A4to3fIvWLP
-	PIq7C5vyiI7F+usYDq+x7NL89YdywAUGkOm1nKMdqWGZTVdOL1k33yWc4S4p+D5Kt+9m7HOsAv2
-	CaaULOs=
-X-Received: by 2002:a05:622a:356:b0:4ee:49b8:fb81 with SMTP id
- d75a77b69052e-502a177b60amr199991471cf.61.1768845597498; Mon, 19 Jan 2026
- 09:59:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CCB2C21DD
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 18:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768845608; cv=none; b=DN8S+Onv1ooYC4k3tYURb9CUiHzPSpFwJkhHu+xxlQQ9WQ+htuHEt0r4bXDS+xVQWSyHiQqcens8RDhnL2WyJDd5O1PyDz1OnBOCEYhhrIhc5nlkexTm/wyjSp9er9+RN1BW6vJmNTeFd5jRNRS1dXdmexpneHqDigSGueiQsps=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768845608; c=relaxed/simple;
+	bh=aJVowhlGOK5Lzc+ge24qME0qcPOZEOxjGJ92Tsx6RX4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=naWlltOwMEjJiP6uqMh1JLocfCmyBA6cdyqqw91bKq+gYidFO1wijASrknLp6En+u+K8JfjFbFwI/cvJHaaS9FlbPaUC2rOtlpzi3Mbi9gTtZ6mqZiUvcK29qwTzuk1hJAMgW64g5PwyG/+SYVMG5lk+XkEilGO7jX1Mecsw/3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jpvFwI6t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF29C116C6;
+	Mon, 19 Jan 2026 18:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768845607;
+	bh=aJVowhlGOK5Lzc+ge24qME0qcPOZEOxjGJ92Tsx6RX4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jpvFwI6tX1wmBqxwRLEy8qOTKzukdoEirEj5U+sTVuNB3uv63xmL2/O6nePEhqt/t
+	 M0LXzHSaKgCuvmokjbrraqjqvctUL7uE/uqOmqVzz/YcDveLdL7juUFDllSpVRjiLM
+	 tJTARMenj8AyyD/uubhMvkzRnwkWYgL+e5EydKcS++wL5vLRn7VwK4tOMujkz24la9
+	 DE7rZWTyplcRTfEbljpX5APqRowYA3D39uG/Iq3vdKen3KJ8ZNyiY91QQK1i3L+U3y
+	 Jhj4yAqXS1fy97NLDQNDTgMY5GyFVw0XLQrdPKKEaSFHEhC1KcIi0Su/f6F3FG+sB6
+	 xvyNASFq1d5yw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 01CDA3806905;
+	Mon, 19 Jan 2026 18:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119162720.1463859-1-mmyangfl@gmail.com>
-In-Reply-To: <20260119162720.1463859-1-mmyangfl@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 19 Jan 2026 18:59:45 +0100
-X-Gm-Features: AZwV_Qgbc4ou8ErH-5XVKLl9nYMf59iH7JV60bo76qy64EVbM0CTi0OkQh8LZ1o
-Message-ID: <CANn89iLuo+A3M0BSXKJwwsd4T+crXe8u0KiAns7=ks1TXnWaeQ@mail.gmail.com>
-Subject: Re: [PATCH net] idpf: Fix data race in idpf_net_dim
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>, Phani Burra <phani.r.burra@intel.com>, 
-	Willem de Bruijn <willemb@google.com>, Alan Brady <alan.brady@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Joshua Hay <joshua.a.hay@intel.com>, 
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] l2tp: avoid one data-race in l2tp_tunnel_del_work()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176884560579.82416.4300596156942866885.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 18:00:05 +0000
+References: <20260115092139.3066180-1-edumazet@google.com>
+In-Reply-To: <20260115092139.3066180-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+7312e82745f7fa2526db@syzkaller.appspotmail.com, jchapman@katalix.com
 
-On Mon, Jan 19, 2026 at 5:28=E2=80=AFPM David Yang <mmyangfl@gmail.com> wro=
-te:
->
-> In idpf_net_dim(), some statistics protected by u64_stats_sync, are read
-> and accumulated in ignorance of possible u64_stats_fetch_retry() events.
-> The correct way to copy statistics is already illustrated by
-> idpf_add_queue_stats(). Fix this by reading them into temporary variables
-> first.
->
-> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-> Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
+Hello:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-It seems ovs_vport_get_upcall_stats() has a similar bug, are you
-interested to fix it as well ?
+On Thu, 15 Jan 2026 09:21:39 +0000 you wrote:
+> We should read sk->sk_socket only when dealing with kernel sockets.
+> 
+> syzbot reported the following data-race:
+> 
+> BUG: KCSAN: data-race in l2tp_tunnel_del_work / sk_common_release
+> 
+> write to 0xffff88811c182b20 of 8 bytes by task 5365 on cpu 0:
+>   sk_set_socket include/net/sock.h:2092 [inline]
+>   sock_orphan include/net/sock.h:2118 [inline]
+>   sk_common_release+0xae/0x230 net/core/sock.c:4003
+>   udp_lib_close+0x15/0x20 include/net/udp.h:325
+>   inet_release+0xce/0xf0 net/ipv4/af_inet.c:437
+>   __sock_release net/socket.c:662 [inline]
+>   sock_close+0x6b/0x150 net/socket.c:1455
+>   __fput+0x29b/0x650 fs/file_table.c:468
+>   ____fput+0x1c/0x30 fs/file_table.c:496
+>   task_work_run+0x131/0x1a0 kernel/task_work.c:233
+>   resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+>   __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
+>   exit_to_user_mode_loop+0x1fe/0x740 kernel/entry/common.c:75
+>   __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+>   syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
+>   syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
+>   syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
+>   do_syscall_64+0x1e1/0x2b0 arch/x86/entry/syscall_64.c:100
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> [...]
 
-Thanks !
+Here is the summary with links:
+  - [net] l2tp: avoid one data-race in l2tp_tunnel_del_work()
+    https://git.kernel.org/netdev/net/c/7a29f6bf60f2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
