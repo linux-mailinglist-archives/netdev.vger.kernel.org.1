@@ -1,134 +1,235 @@
-Return-Path: <netdev+bounces-251050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 854CFD3A657
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:09:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC94D3A69D
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:19:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 746B8302550E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:08:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BA6233002B8A
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AD33590DD;
-	Mon, 19 Jan 2026 11:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lOKqtFkb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE982EAB6B;
+	Mon, 19 Jan 2026 11:19:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D313590D9
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1069C18A921
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768820913; cv=none; b=tPEyB/FfXoPWgAbMNcuSjRqbv4jExbQjgXHwGqN0obij6Mv4RJJnd4KN9VucOic94mSKCFS/UGrLY5IPP3vSaoj8sEr8CwjmgaU073wTOS6LBWEQqN1BKQHWpTb6RclM0QeoBdt7T7pPDuWtG7leEfOx9WjrDOeEuGlqs7pSHtE=
+	t=1768821597; cv=none; b=IXJwXKxU0wvH8awPLNm93imp4BFHHPu5rPy85UXIt2mhyFGnXfPL+vOhi67OPg1/leSch/a2kMr25/6cPLoJHM+CtHkVIeHpjk0skrTRyfg47fOIJ2+YYXM0lSKNkLBiVHs+HuE47gRowN6K8DkIFODT4+2lWPrS/leoJQzZSxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768820913; c=relaxed/simple;
-	bh=r0zdOyYcIl2us2Z7PYxZRD6ZD6u18Wv8v4Zhh6NmzoQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RveGVzKxkDkJbS3lW+rTBXduJBTB7gpXtapSGS0Xfv7BHSjz3b/yR64DHqd+vMIyQYaWQmYRzBDViT64dKktiCOz3VG4K4OWUsmH5hRDywMPBzgDtHVZUsYt6csyk98Ruhcxcs3Y6BldmDLRnWOJ8uXsM3Yhv8SftFFzttUDAcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lOKqtFkb; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60J7EMgp1824128;
-	Mon, 19 Jan 2026 03:08:18 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=4gHbJe53rkw95x7pgyN6gpZ3/
-	M3PAtGilj0WtCNCXs0=; b=lOKqtFkbg7xgbsqO2iIX7x0KpaM2KZOPCmlV5FkVl
-	gDZHvCDOlEzQiEDhrKQ5GJ5sxakhz5aVvwo/is1awUVFE49apvgYRPYn4+S9LC3J
-	ydTU3RsAqgJziE/VgUFLFzPQJL6cBLjGymryqOChC2MmATO0z5g3PJvLeM/oiAVI
-	IdUb6nhlBEkv2oB6HE3t9TXk1hIOjjlV80XebBtWVovYWZc4vMbvNeTbuEC4SqTr
-	qbKAnE0TVgQB3QYJz9tctLdZIWxkBN6UJm/a3RBeMK16u0WVoPPs9oz483iixnMa
-	8Jd8lLtRnpPiuE/TQKZQJnt0hVe5fVPpcsyVFNeJ0kxnw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bsg208cu4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Jan 2026 03:08:17 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 19 Jan 2026 03:08:32 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 19 Jan 2026 03:08:32 -0800
-Received: from kernel-ep2 (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with SMTP id 6E80A3F7051;
-	Mon, 19 Jan 2026 03:08:12 -0800 (PST)
-Date: Mon, 19 Jan 2026 16:38:11 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-CC: <sd@queasysnail.net>, <bbhushan2@marvell.com>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>, <jerinj@marvell.com>, <hkelam@marvell.com>,
-        <gakula@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
-        <george.cherian@marvell.com>, <netdev@vger.kernel.org>,
-        <alok.a.tiwarilinux@gmail.com>
-Subject: Re: [PATCH net-next] octeontx2: cn10k: fix RX flowid TCAM mask
- handling
-Message-ID: <20260119110811.GA1492101@kernel-ep2>
-References: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
+	s=arc-20240116; t=1768821597; c=relaxed/simple;
+	bh=/ltd1+c5YWGyNpS6QpyjLfhudiWIpJGJB/Bwx90g930=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=hS5aWf5mqafv0IcOdagBuxMO+cRv3nkCePLLZ1wpJnVpbZjcR5xq9Ajhux5UOY4Z2zY4zhKz2o9PVorve0JKvWYmGtqmErrFXHVLUXZ75oyD1Mg3g0N3A4vYzwlKd9q+m1vhUSLIP+LjqmaahIuBFuXiPVCZ0YD2T4Qip5wK9hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60JBJlp0099231;
+	Mon, 19 Jan 2026 20:19:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60JBJlag099225
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 19 Jan 2026 20:19:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <537343f7-c580-43b0-9ad2-691701b9fb8e@I-love.SAKURA.ne.jp>
+Date: Mon, 19 Jan 2026 20:19:44 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
-X-Proofpoint-ORIG-GUID: HBW3Upl3ybiahIt5diQrwsE4X3B-Z7Hn
-X-Authority-Analysis: v=2.4 cv=XPY9iAhE c=1 sm=1 tr=0 ts=696e10a1 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=yPCof4ZbAAAA:8 a=M5GUcnROAAAA:8 a=T7My_dRlYyChwkeLhiYA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=8_z660xuARpGUQqPBE_n:22
-X-Proofpoint-GUID: HBW3Upl3ybiahIt5diQrwsE4X3B-Z7Hn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDA5MiBTYWx0ZWRfXzpSM1RnavjM2
- Pnk/BDdxzX9iIj5AroxbW9lZ6AsdehLJlKhWZ8xoV9bIygU41o+CKV09Mh3oowJOGK3LpvOwimk
- 7MULog7kipv9Z9MdxQoVyHngIqBXU5P+imU1fGdznXpHPd2ptutsYEzp6SLak0wkhsctEkGEDO9
- +kbrJ55APwtpTnl3G+Z1ePaO/z9bpvLJRCisELOoMY5xmxSrRg8WaxxMdmJN5fjvQuYsEPs65Ml
- 11LF6AzjZ90GnYME2MTpDdKt1zdTz31tJwEY0UQDiHHiV+PErI1aIHNd3imXnGMlcTZbsb1aFRL
- g2K7Jmka4Qp9VZaIX82ZzBlqYT6ph6xU6/AFznabJBKZl7YrtZHbwhL7nboALZojpMGF2uRFxkO
- /+fKaRx2mCHU9wKskJuKb7qz+ewTNG1+55RMpNzUeZKBPVEyjlC+haYhOkQhF42GSOeDffteNEd
- 0OhuKUr62x7u1wU803A==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-19_02,2026-01-19_02,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] xfrm: force flush upon NETDEV_UNREGISTER event
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Aviad Yehezkel <aviadye@mellnaox.com>, Aviv Heller <avivh@mellanox.com>,
+        Boris Pismenny <borisp@mellanox.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Florian Westphal <fw@strlen.de>, Guy Shapiro <guysh@mellanox.com>,
+        Ilan Tayari <ilant@mellanox.com>,
+        Kristian Evensen <kristian.evensen@gmail.com>,
+        Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+        Raed Salem <raeds@mellanox.com>, Raed Salem <raeds@nvidia.com>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Yossi Kuperman <yossiku@mellanox.com>
+Cc: Network Development <netdev@vger.kernel.org>
+References: <924f9cf5-599a-48f0-b1e3-94cd971965b0@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <924f9cf5-599a-48f0-b1e3-94cd971965b0@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav403.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On 2026-01-16 at 22:17:12, Alok Tiwari (alok.a.tiwari@oracle.com) wrote:
-> The RX flowid programming initializes the TCAM mask to all ones, but
-> then overwrites it when clearing the MAC DA mask bits. This results
-> in losing the intended initialization and may affect other match fields.
-> 
-> Update the code to clear the MAC DA bits using an AND operation, making
-> the handling of mask[0] consistent with mask[1], where the field-specific
-> bits are cleared after initializing the mask to ~0ULL.
-> 
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-This has no impact in functionality and it is better to be consistent with
-mask[1]. Thanks for the change.
+syzbot is reporting that "struct xfrm_state" refcount is leaking.
 
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
+  ref_tracker: netdev@ffff888052f24618 has 1/1 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
+       xfrm_dev_state_add+0x3a5/0x1080 net/xfrm/xfrm_device.c:316
+       xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
+       xfrm_add_sa+0x34ff/0x5fa0 net/xfrm/xfrm_user.c:1022
+       xfrm_user_rcv_msg+0x58e/0xc00 net/xfrm/xfrm_user.c:3507
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+       xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3529
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-> ---
->  drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> index 4c7e0f345cb5..060c715ebad0 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-> @@ -328,7 +328,7 @@ static int cn10k_mcs_write_rx_flowid(struct otx2_nic *pfvf,
->  
->  	req->data[0] = FIELD_PREP(MCS_TCAM0_MAC_DA_MASK, mac_da);
->  	req->mask[0] = ~0ULL;
-> -	req->mask[0] = ~MCS_TCAM0_MAC_DA_MASK;
-> +	req->mask[0] &= ~MCS_TCAM0_MAC_DA_MASK;
->  
->  	req->data[1] = FIELD_PREP(MCS_TCAM1_ETYPE_MASK, ETH_P_MACSEC);
->  	req->mask[1] = ~0ULL;
-> -- 
-> 2.50.1
-> 
+Currently, the NETDEV_UNREGISTER case in xfrm_dev_event() is no-op
+when (dev->features & NETIF_F_HW_ESP) == 0. Since xfrm_dev_state_add()
+and xfrm_dev_policy_add() take a reference to "struct net_device", the
+corresponding NETDEV_UNREGISTER handler must release that reference.
+Flush dev state and dev policy, without checking whether to flush, when
+NETDEV_UNREGISTER event fires.
+
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+WARNING: This patch is just an analogy case of net/can/j1939 module.
+This patch is completely untested and might not solve this problem, for
+reproducer is not available for this problem. I appreciate if someone
+can write a test code for this problem.
+
+ drivers/net/bonding/bond_main.c |  2 +-
+ include/net/xfrm.h              |  5 ++---
+ net/xfrm/xfrm_device.c          | 15 ++++++++++++---
+ net/xfrm/xfrm_policy.c          |  4 ++--
+ net/xfrm/xfrm_state.c           |  4 ++--
+ 5 files changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 3d56339a8a10..bbb6bc4b30cd 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -3824,7 +3824,7 @@ static int bond_master_netdev_event(unsigned long event,
+ 	case NETDEV_UNREGISTER:
+ 		bond_remove_proc_entry(event_bond);
+ #ifdef CONFIG_XFRM_OFFLOAD
+-		xfrm_dev_state_flush(dev_net(bond_dev), bond_dev, true);
++		xfrm_dev_state_flush(dev_net(bond_dev), bond_dev, true, false);
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 		break;
+ 	case NETDEV_REGISTER:
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 0a14daaa5dd4..b19e7b1fbda2 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1765,9 +1765,8 @@ struct xfrmk_spdinfo {
+ struct xfrm_state *xfrm_find_acq_byseq(struct net *net, u32 mark, u32 seq, u32 pcpu_num);
+ int xfrm_state_delete(struct xfrm_state *x);
+ int xfrm_state_flush(struct net *net, u8 proto, bool task_valid);
+-int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid);
+-int xfrm_dev_policy_flush(struct net *net, struct net_device *dev,
+-			  bool task_valid);
++int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid, bool force);
++int xfrm_dev_policy_flush(struct net *net, struct net_device *dev, bool task_valid, bool force);
+ void xfrm_sad_getinfo(struct net *net, struct xfrmk_sadinfo *si);
+ void xfrm_spd_getinfo(struct net *net, struct xfrmk_spdinfo *si);
+ u32 xfrm_replay_seqhi(struct xfrm_state *x, __be32 net_seq);
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 52ae0e034d29..ec094aeb1604 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -537,13 +537,21 @@ static int xfrm_api_check(struct net_device *dev)
+ static int xfrm_dev_down(struct net_device *dev)
+ {
+ 	if (dev->features & NETIF_F_HW_ESP) {
+-		xfrm_dev_state_flush(dev_net(dev), dev, true);
+-		xfrm_dev_policy_flush(dev_net(dev), dev, true);
++		xfrm_dev_state_flush(dev_net(dev), dev, true, false);
++		xfrm_dev_policy_flush(dev_net(dev), dev, true, false);
+ 	}
+ 
+ 	return NOTIFY_DONE;
+ }
+ 
++static int xfrm_dev_unregister(struct net_device *dev)
++{
++	xfrm_dev_state_flush(dev_net(dev), dev, true, true);
++	xfrm_dev_policy_flush(dev_net(dev), dev, true, true);
++
++	return NOTIFY_DONE;
++}
++
+ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void *ptr)
+ {
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+@@ -556,8 +564,9 @@ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void
+ 		return xfrm_api_check(dev);
+ 
+ 	case NETDEV_DOWN:
+-	case NETDEV_UNREGISTER:
+ 		return xfrm_dev_down(dev);
++	case NETDEV_UNREGISTER:
++		return xfrm_dev_unregister(dev);
+ 	}
+ 	return NOTIFY_DONE;
+ }
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 62486f866975..a451dff25c52 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -1855,14 +1855,14 @@ int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
+ EXPORT_SYMBOL(xfrm_policy_flush);
+ 
+ int xfrm_dev_policy_flush(struct net *net, struct net_device *dev,
+-			  bool task_valid)
++			  bool task_valid, bool forced)
+ {
+ 	int dir, err = 0, cnt = 0;
+ 	struct xfrm_policy *pol;
+ 
+ 	spin_lock_bh(&net->xfrm.xfrm_policy_lock);
+ 
+-	err = xfrm_dev_policy_flush_secctx_check(net, dev, task_valid);
++	err = forced ? 0 : xfrm_dev_policy_flush_secctx_check(net, dev, task_valid);
+ 	if (err)
+ 		goto out;
+ 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 98b362d51836..29a124291331 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -958,7 +958,7 @@ int xfrm_state_flush(struct net *net, u8 proto, bool task_valid)
+ }
+ EXPORT_SYMBOL(xfrm_state_flush);
+ 
+-int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid)
++int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid, bool forced)
+ {
+ 	struct xfrm_state *x;
+ 	struct hlist_node *tmp;
+@@ -966,7 +966,7 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 	int i, err = 0, cnt = 0;
+ 
+ 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
+-	err = xfrm_dev_state_flush_secctx_check(net, dev, task_valid);
++	err = forced ? 0 : xfrm_dev_state_flush_secctx_check(net, dev, task_valid);
+ 	if (err)
+ 		goto out;
+ 
+-- 
+2.47.3
+
+
 
