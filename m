@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-251194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED918D3B3CB
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:18:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 230F1D3B421
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:25:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 111F1301F7F7
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:06:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D6C331718AF
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871F030C608;
-	Mon, 19 Jan 2026 17:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6F1314A95;
+	Mon, 19 Jan 2026 17:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p/6XDHG8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+zY1UOE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654EE2BF001
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BEB313523;
+	Mon, 19 Jan 2026 17:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768842391; cv=none; b=jAK5hRPFl3BNh84VdaCG4R2mZ0UFAUyyWU0fYqf1LBWweiNJlzq42rUL+ELCBHJprQqDNrW/H+UbBbWUhi1fC8+zolZ1NlsSv9UbfcPnW09Hg4YqkQHtR9gXNrzngEuOo0QCA95+m93R49Yek96FX4tYLutjfRdqSbpRj4CibsI=
+	t=1768842558; cv=none; b=ieT0qYiqPkqgMeqsqLU99tN0D6Mg6GJ7YJGN8uCVYniADGPXtNUd/dk6BLN5ytCz9RSEXr8CxyeDkyAXYtIz9BEvoqv8px9UBD7m8WjPOI4jODgMU7QVJ50Y4ad475oXXod08PIRMeZ+qziKhPbvo/noIa89/c3JwWsBHTwQFaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768842391; c=relaxed/simple;
-	bh=orCnM2MC4J6qS8mGSwmIakNy2ziCX2tvJHqhr9oY1V4=;
+	s=arc-20240116; t=1768842558; c=relaxed/simple;
+	bh=cahfTJDbZdVnGQYk03DTEf+iNDlTr5tp19jvjxAz+0Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eIbdk4hxq0yxqNiYxsvq74fLwyl3irwxQoarbq1vsL8EKtJ2K+ITWULPcnR1oE2H+ytbOFNEXAPNKV16o0C85QSRUjvJfXnX0cuOi4b9KRnmQ39i4TYnA+iDsiV4xytWM+r6d4WM3C5ajmKQvGkDwceX24RmcOH10D+jqpMMaA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p/6XDHG8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CBCAC116C6;
-	Mon, 19 Jan 2026 17:06:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gdFeLMqGr0yNYROGHBkEyb7gDmeKvA+aOhC7MX+N9PKVKcmNUmHVS84aD+Qkb6YrPD3oA7bM7pe1h8Pq/5DdtpwNYznSj6ESUdFU4g0V+tnvM2L0smnpwlc4+V2DicNzrQTtkfs4Vhld3DqVxIgqdZqxHbRZta+3RtGAOllkDyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+zY1UOE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F500C116C6;
+	Mon, 19 Jan 2026 17:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768842390;
-	bh=orCnM2MC4J6qS8mGSwmIakNy2ziCX2tvJHqhr9oY1V4=;
+	s=k20201202; t=1768842557;
+	bh=cahfTJDbZdVnGQYk03DTEf+iNDlTr5tp19jvjxAz+0Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p/6XDHG86AKSbtHyBguSRsIF1oCZc/M/aNHCsZo/1EcI8rdB+vbZHdTXaJI5ICWOZ
-	 kUqI5ny9moTJUg2fNJ5Ll3ZccOGUzqfmFgfyH4IxJxDn8FUcLK9hIf64BlaX23qoCZ
-	 sA11Ik2TG+V981pNZVtT0gbFU1UQJY7uI4i5evtJSbxeZclsHB9Ii2xGUsypSDTDd6
-	 xx6E6q5ccQmgPfnPpwcxCpNCa0dF012PX8wtF67aPCYhZJAMmcDE2eK9o21eWfGWFg
-	 i6lrsUasoIog21nTNCCuWJ+t9GR6lY08knJtnx4HTyObT+IqRg8zJcflj4wj4AwmZr
-	 Pk5avS16TpfTg==
-Date: Mon, 19 Jan 2026 09:06:29 -0800
+	b=l+zY1UOEXxJ8+Bly6cbY00KGO35QHSxNlYzJHTZZySxLKGNbc89fd3rYJJTls+pNe
+	 YlKG1mJxKbbIk1Nnpi7ngxRkQkBiKTDiD+3+rJr1VHzKL6MFddUO7l95Wh6yDkk5un
+	 uWLyY5plEe1Hs2Ozc8L/LRsZIS5/eSZflMpFjjqnwJAXDodMNfuYnWFcjWoapt9DWT
+	 CcH25+bvDSrVxRvIPeOZCjGa/80HRxFWW8VsJ7qiS1ra3Z5FEPYHnApP0zAOEeceNE
+	 VhuckJLw6gQE115nyWxe75aNGWGHPzXvwcvcRlw+CugyL3tZR42aGU9aCM2dqVYqQk
+	 42IK4BwjYOd0g==
+Date: Mon, 19 Jan 2026 09:09:16 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: <netdev@vger.kernel.org>, pabeni@redhat.com,
- syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Mazin Al Haddad <mazin@getstate.dev>
-Subject: Re: [PATCH net v3] ip6_gre: use skb_vlan_inet_prepare() instead of
- pskb_inet_may_pull()
-Message-ID: <20260119090629.20d202e8@kernel.org>
-In-Reply-To: <20260119112512.28196-1-fw@strlen.de>
-References: <20260119112512.28196-1-fw@strlen.de>
+To: Xu Du <xudu@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/7] selftest: tun: Refactor tun_delete to
+ use tuntap_helpers
+Message-ID: <20260119090916.1fe303a4@kernel.org>
+In-Reply-To: <58c5767a8a82352fb784d8d51ec844055b6d7ff2.1768800198.git.xudu@redhat.com>
+References: <cover.1768800198.git.xudu@redhat.com>
+	<58c5767a8a82352fb784d8d51ec844055b6d7ff2.1768800198.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,15 +60,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 19 Jan 2026 12:24:57 +0100 Florian Westphal wrote:
-> From: Eric Dumazet <edumazet@google.com>
-> 
-> I added skb_vlan_inet_prepare() helper in the cited commit, hinting
-> that we would need to use it more broadly.
+On Mon, 19 Jan 2026 13:40:00 +0800 Xu Du wrote:
+>  # YNL files, must be before "include ..lib.mk"
+>  YNL_GEN_FILES := busy_poller
+> -YNL_GEN_PROGS := netlink-dumps
+> +YNL_GEN_PROGS := \
+> +	netlink-dumps \
+> +	tun \
+>  TEST_GEN_FILES += $(YNL_GEN_FILES)
 
-I _think_ this makes GRE forwarding tests a bit unhappy:
+You're missing the terminating comment:
 
-https://netdev.bots.linux.dev/contest.html?branch=net-next-2026-01-19--12-00&executor=vmksft-forwarding&pw-n=0&pass=0
+# end of TEST_GEN_PROGS
+
+so the \ at the end makes the next line a part of YNL_GEN_PROGS.
+
+Please try running this series thru:
+https://github.com/linux-netdev/nipa/tree/main?tab=readme-ov-file#running-locally
+
+Since it's a selftest-only series you can use:
+
+  --disable-test patch/build_32bit patch/build_allmodconfig_warn \
+                 patch/build_clang patch/build_clang_rust
+
+to skip kernel builds which take rather long time.
 -- 
 pw-bot: cr
 
