@@ -1,95 +1,153 @@
-Return-Path: <netdev+bounces-251083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3D9D3A9E4
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:06:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3180AD3A9F4
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 12991300816C
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:06:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DD8A3045F4E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C21364E9C;
-	Mon, 19 Jan 2026 13:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BAB7364E87;
+	Mon, 19 Jan 2026 13:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="q6ISchpd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F9336405C
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 13:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FB729D280;
+	Mon, 19 Jan 2026 13:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768828000; cv=none; b=GDr9TOntgUuLwTbKquMDJGdOCXFZYVtbNKclasYvZKeM2Z0ZKESUfzuNPLVyXc9pqGih+iktnGABUyRa7yGJzEHlIw6eobJ8pCIkwAZYYtXX3Y3zdKEHQFSIMqLq1EkPx3BsegG/jxE27vYIJM00wJ9ietpAOlc4Kr+HZ+Hy+J4=
+	t=1768828175; cv=none; b=L54N0rUZrmi5Nenx0Nbf44yROrULW3U76Ldfxxn4nk1r2m3I/Vt/m1c0INHQ+x9hQlbMNI9P+i1U9O/W5zPBqr24YX6jdbQxywcRqcrBUAnz1hp7vY9PkprTdipZ5mFgUzy1eZ9ni5VVCIvbEzWlJzaI7bjKQLBLr+M4W6+jIww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768828000; c=relaxed/simple;
-	bh=/Us8lcYjnMs3hYNfxM80VN6XaA/JNtNkcccthYwsPC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gjs+RzCnWsJr2hkXoPmDLP+5onRZwqXP6rZ47IMJ3qEGbPsI+DsWwmbSVKrWSQzU6OYI4iKYsjqurVsfTwDNTUAhedAOJUIvYCBJRVqny5JPP+mwZNBE/MhwqTz6CIN3Yibv4eAT38buN4mPwqL7WNS2KhBuH18I6CHvfwdXi6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-4043b27ddeaso2523916fac.1
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:06:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768827998; x=1769432798;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CJJUuT8FNDqR2jqcibTan0S0h66UkUo2QatHFq2fuGY=;
-        b=kZkr9EVbQpqu229eixyKkQmBJlna2FHon6EH07YmUOK0yYjLBage8MbkeIzlENHmz3
-         PeVECzO/w/+Lv26cJaEJsdp0YxQQnClndwfMH9r4oD1mkIaX52X/Oe1fifiMxMGhX9i6
-         plQW93rSWyDaYNRNBvyiT/iU7Vm1EkQl+reLSRDXkSbgDawIUBCIFs7+0W5GEhI4IzvD
-         LqqwPJkxfAGBob3l4KAMUHInwlfK75qonBQjdtrmU/Hfsdg0ebv1+bV1zMOua2A5gK6h
-         AA3pOP2m1sPbNKsunqIk9O9XCcaABZJgkkjYBM9XRjgQc7nkyCkNq/DJVO3tx9yDF3CJ
-         mcdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdF59SgFwyuRtDyNI5E7QDAuX782hB3vcglv2wXMaAKv515gUEAhWB/6vtSPpIpVudJyw8Ylg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDv8U6mPfWL6fUGcNImyxetL9oeiUbUXvS80AhTL9KqUGwrqSo
-	iDI1xfSHs16qVYA0LNWLxLNaHaT0wp5j0qRQoI/NvCV5Vcuw8dkJSpaR
-X-Gm-Gg: AZuq6aKzoRusmq5ydKiM+bsbxID7Y0fyOZLkr4mkY0HefHxl1tu+q8DoGt+9wDmpA92
-	R3E74RTYX6Yipo7B8OrTJTDhUYz6U4b5rHH8dBnWh65BFOv2S2U9b8EiCJeaozY4JjB/QjuiehO
-	oGszg+WziOrF4YdtfTAFfnTeZdE93GWVIfkO2AYYD5vrO3eV6mZ2ewiykR4yqhWOVIn9GRcN+NU
-	OIKLDyZLVBiuixnB0NA2SSB2x5eu4xUOZgOh5c6NACjkso7NISmn8tLDqDTTQZgdhpAPH7Ya2xt
-	mz3Ao9PlZoyUd+/2r4Zc1PTfBuLdXs/irOOH5xprWEEgB3ivY0o3Sz/cyMj3h2JyzTuG0FcMTFb
-	XuiXK6hAKjBo42N2JASTnRhaCYiR0DkielcJUh68eNg+FZdIl//cGek7oqiOYvyORjI6GoV38Rx
-	6dyw==
-X-Received: by 2002:a05:6870:2111:b0:3e8:9dfb:8a21 with SMTP id 586e51a60fabf-4044c4b8903mr5238979fac.42.1768827998302;
-        Mon, 19 Jan 2026 05:06:38 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff:47::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044bd5cf99sm6454072fac.17.2026.01.19.05.06.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 05:06:37 -0800 (PST)
-Date: Mon, 19 Jan 2026 05:06:35 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 4/7] netconsole: clear dev_name for devices
- bound by mac
-Message-ID: <eajjf6bdzw444nw2ggucsqcedhskheu4a3qogati2kxg6nj6c7@5iuyvjsp7nnp>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-4-4de36aebcf48@gmail.com>
+	s=arc-20240116; t=1768828175; c=relaxed/simple;
+	bh=gwTDCSKqc8LSu9yPNc5jngp7QL67XyPXB2CAD6UZF+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=duQ7YEd0+JcQRMLDxqBukQStAJmMsUqiG0CVLzecFCKE7nqnxYjVoT6mj0SgmNX88C59GSCcG3i0knNeJJgKml7stDf1sBJvCQCcaSMJOpJL38JSUTJ6WV/t/HPJO0FTH6kjB1V/6N9arLf0y+20oRZhnTpxtsNMWYpvr66yjd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=q6ISchpd; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1768828174; x=1800364174;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=gwTDCSKqc8LSu9yPNc5jngp7QL67XyPXB2CAD6UZF+E=;
+  b=q6ISchpd019gSAkZLQZSJAqkH0aJf+COr20XZ3cm7ffDYxd6jJ03p0Po
+   4zFstduVlNs0fEg6SJCk4xMOStFwgt47ZA4qmYhuddcMx8Oja8/4/LnMc
+   IdgWPZk5GQ6kGdnonqQ2nJzGKwuRV35SUpTcBW20Snpj2eOFrEdrfWBxu
+   wb/Uyddv7IFQtv1BZi0M6LV3fYS0GOilQogTpZDN43pBkUAKYRxPEpk63
+   c1qHX0uFphpnbTWCw9JBPWWCc6TE49qlpUgX3CvE7sZFSCS5GtzbzbgWY
+   nLMnLSmXBB/Z6EZO/ta6Ory4gr8BZy0y2DO01LIUdUfGKuRL2erX7Gxgw
+   Q==;
+X-CSE-ConnectionGUID: MCMdS/2MS9W3q5v2vYq8nw==
+X-CSE-MsgGUID: ohbf7MsMRqSUEgskF7U23Q==
+X-IronPort-AV: E=Sophos;i="6.21,238,1763449200"; 
+   d="scan'208";a="283467428"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jan 2026 06:09:23 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Mon, 19 Jan 2026 06:08:10 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Mon, 19 Jan 2026 06:08:04 -0700
+Message-ID: <402feb92-104b-4fe0-b223-a85afd60d084@microchip.com>
+Date: Mon, 19 Jan 2026 14:08:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260118-netcons-retrigger-v11-4-4de36aebcf48@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 8/9] net: macb: convert to use .get_rx_ring_count
+To: Breno Leitao <leitao@debian.org>, Ajit Khaparde
+	<ajit.khaparde@broadcom.com>, Sriharsha Basavapatna
+	<sriharsha.basavapatna@broadcom.com>, Somnath Kotur
+	<somnath.kotur@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Felix Fietkau
+	<nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Shay
+ Agroskin" <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
+	"David Arinzon" <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
+	"Bryan Whitehead" <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Raju Rangoju <Raju.Rangoju@amd.com>, Potnuri Bharat Teja
+	<bharat@chelsio.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, Jiawen Wu
+	<jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
+ <20260115-grxring_big_v2-v1-8-b3e1b58bced5@debian.org>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20260115-grxring_big_v2-v1-8-b3e1b58bced5@debian.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 18, 2026 at 11:00:24AM +0000, Andre Carvalho wrote:
-> This patch makes sure netconsole clears dev_name for devices bound by mac
-> in order to allow calling setup_netpoll on targets that have previously
-> been cleaned up (in order to support resuming deactivated targets).
+On 15/01/2026 at 15:37, Breno Leitao wrote:
+> Use the newly introduced .get_rx_ring_count ethtool ops callback instead
+> of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
 > 
-> This is required as netpoll_setup populates dev_name even when devices are
-> matched via mac address. The cleanup is done inside netconsole as bound
-> by mac is a netconsole concept.
-> 
-> Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Looks good to me:
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+
+Thanks, best regards,
+   Nicolas
+
+> ---
+>   drivers/net/ethernet/cadence/macb_main.c | 11 ++++++++---
+>   1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 2d5f3eb09530..8135c5c2a51a 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -3850,6 +3850,13 @@ static int gem_get_all_flow_entries(struct net_device *netdev,
+>          return 0;
+>   }
+> 
+> +static u32 gem_get_rx_ring_count(struct net_device *netdev)
+> +{
+> +       struct macb *bp = netdev_priv(netdev);
+> +
+> +       return bp->num_queues;
+> +}
+> +
+>   static int gem_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
+>                  u32 *rule_locs)
+>   {
+> @@ -3857,9 +3864,6 @@ static int gem_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
+>          int ret = 0;
+> 
+>          switch (cmd->cmd) {
+> -       case ETHTOOL_GRXRINGS:
+> -               cmd->data = bp->num_queues;
+> -               break;
+>          case ETHTOOL_GRXCLSRLCNT:
+>                  cmd->rule_cnt = bp->rx_fs_list.count;
+>                  break;
+> @@ -3941,6 +3945,7 @@ static const struct ethtool_ops gem_ethtool_ops = {
+>          .set_ringparam          = macb_set_ringparam,
+>          .get_rxnfc                      = gem_get_rxnfc,
+>          .set_rxnfc                      = gem_set_rxnfc,
+> +       .get_rx_ring_count              = gem_get_rx_ring_count,
+>   };
+> 
+>   static int macb_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+> 
+> --
+> 2.47.3
+> 
+
 
