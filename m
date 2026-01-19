@@ -1,161 +1,119 @@
-Return-Path: <netdev+bounces-251269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF34CD3B784
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:45:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948CFD3B787
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:45:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFAE33006631
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:44:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CAFA73016FB3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6192E3387;
-	Mon, 19 Jan 2026 19:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACCC2BD597;
+	Mon, 19 Jan 2026 19:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="lq8kv+Tb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gajNBoG2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNzJeqk6"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0673728B7DB;
-	Mon, 19 Jan 2026 19:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC71226B2DA;
+	Mon, 19 Jan 2026 19:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768851896; cv=none; b=pKpfdnNQLWFrHQrBwMWbjTL1QZ7r/McGbq8QwvYjkL6X8k9WZPwhgT1lmHRRKWVzirTiulbSaTTOJ2vvUq664vuwdacNzuso+nPMWc5j/n5JrEWuA7WBJYRfAqzbFS9y1yi4dqqFOGf4LeXjoTX7wkcumpmuxlU/Sa8cN21E/kY=
+	t=1768851953; cv=none; b=JZJRgKpVm0OSYnFycsFRqBcLKb9Pda0yh2EEi9Z39MfNbxQJ75PFj3hLtef6Bf5NevVwwb66xZzNik1yGNJtBqAg52Nfc+Nh9brzhGyrSrf94LSr9hb5rwqGpR3gi350tD8N6UQB1PCDMiU6X7hHy9FdFY6XLL9Xc2p6wNt2u1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768851896; c=relaxed/simple;
-	bh=bDFDEVaTCBBAYbGrOAKDIkCm0xGtvcaeQwUDe9QhOXA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=FIEWtxOJmYMZV9NufSEWfvgb1zehaL9gi2ZO/QpwptrZZ50ApJNN9j6IweAD3vIQu3IsNtI1axO7+ZTTJgs/PgZg9rfhR9ylqQ98B9YVJd/G0ZChsTnra6Zlm6l+2Z8I/o/ScGWgcC5Tg8A18pFaPToBcPqa9S2hh574NxYbTqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (2048-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=lq8kv+Tb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gajNBoG2; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluxnic.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 27FD91D002EB;
-	Mon, 19 Jan 2026 14:44:53 -0500 (EST)
-Received: from phl-frontend-01 ([10.202.2.160])
-  by phl-compute-05.internal (MEProxy); Mon, 19 Jan 2026 14:44:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
-	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1768851892; x=1768938292; bh=LoVesKvEDZ
-	v1Cg5uKpzhYtUwqzCfdIo4UCFjeKjmD1A=; b=lq8kv+TbQsU5zKfbNXe4EWlvP8
-	rbetP0mVzYEasv/PNbF5IR7RD7qoJtpRRCvmD1pEhNkq6+glcJYQjbGrY2gea4d5
-	ZWCtgjYJPVYYpUmsb7vq+LSkuvMUTpE4TsSiicuOva9bX+kc48daWYCVNMfVfPm9
-	XtvBFMGy4eHZ3aSH8mjypUM7f2J9hNgcyU9nY3V7p/+r1AsL5p067JkaYUxc8pa5
-	/4ccq8Y8IMSARYPWrMq05zA07tZQPMfRYzjEN47nYuICpWvThn9HBqIo9JjaRfgO
-	Vg9nWB+SRMcWwQDXDQC5BdrgWjdNP0+uWX92zkTMcS0w+UYPOff4oRxQfsmQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1768851892; x=1768938292; bh=LoVesKvEDZv1Cg5uKpzhYtUwqzCfdIo4UCF
-	jeKjmD1A=; b=gajNBoG2fkUp5vFZUoOvwaukQOqNzOhjkyPRlthYWwYIwU3dTq/
-	FRcDjt0u6ShrLY9hRrRwlUHgXPtpsZII/DDB38D1Kx8lDT0VEIsd8yNkMmUdNkkG
-	PKPhjH3GRNmyDv1AuSSjmuFNfros198YaBC+sbxAThMtdZcpS55DyV/Z9HoGn+Hl
-	IM9cqrwZvaXHU90RHKraxl+c0qj7cimZv8Eo1arg4MJQVuRx1wqfxQ8ZHeRPgR1T
-	cJPdTvqVKiwc9B7Nyu0IPAlRAczb70ukfKvaZmDLaiD+Eycni8StyYk+eHJScPDj
-	z3nYvdUx4dGEW7oG7T/aQbrieCrHdFMovVA==
-X-ME-Sender: <xms:tIluaeUIN8Mxwi3ueBMYLYlHMke1xjEhyD_onm3ACXuWtNdDLXluBg>
-    <xme:tIluaUmlcc6UfVCocX7-vYQI4t3sKufm-ssLX1YxN0mNcxzh3eCdDgiIbpb1zJzui
-    htI0MA8xCw7p9PMHJ1wJ-a7Sk3P3rCmm-Q3M2agJcMgw4JJ3aiX9rg>
-X-ME-Received: <xmr:tIluaZCEbdbCL5dyTEhPcxHpPqrYEF9kq1PWYljltz5IDcS_EiHWix10PAQcG4pD7Nt4chvtTKcu03Qj-G_5dzT-7jVio3Q1kRiV6dMd>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddufeekgeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevufgjkfhfgggtsehttdertddttddvnecuhfhrohhmpefpihgtohhlrghs
-    ucfrihhtrhgvuceonhhitghosehflhhugihnihgtrdhnvghtqeenucggtffrrghtthgvrh
-    hnpefgvedvhfefueejgefggfefhfelffeiieduvdehffduheduffekkefhgeffhfefveen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihgtoh
-    esfhhluhignhhitgdrnhgvthdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphho
-    uhhtpdhrtghpthhtohepuggrvhhiugdrlhgrihhghhhtrdhlihhnuhigsehgmhgrihhlrd
-    gtohhmpdhrtghpthhtohepvghrihgtrdguuhhmrgiivghtsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuh
-    gsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhu
-    nhgurghtihhonhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtoh
-    hmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:tIluaTjPMqcv6LNRcltvYXRW53MrPhZH64La8yYApxxb_vgnR0W6Gg>
-    <xmx:tIluaWzbMfEfkRn20g8vGCVxKglQ6ruawC9ZKGhOHq3c6bw8eaxYLQ>
-    <xmx:tIluaU1VoZ_BwonYWvm0SBK2Fq8mibYSQWfjI2QTcn3P4sRvkiJtgA>
-    <xmx:tIluab9UbtpBOWej-gZFIWz-TTvi1c9KzgnXkZBNdyU0TjQ1OIjtiw>
-    <xmx:tIluaYXed53nvSQVDaweCLKS_yD9JuX4wo3konXT1zqCRLyvXi6ZjMiU>
-Feedback-ID: i58514971:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 19 Jan 2026 14:44:52 -0500 (EST)
-Received: from xanadu (xanadu.lan [192.168.1.120])
-	by yoda.fluxnic.net (Postfix) with ESMTPSA id E79FC14FCE51;
-	Mon, 19 Jan 2026 14:44:51 -0500 (EST)
-Date: Mon, 19 Jan 2026 14:44:51 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-To: David Laight <david.laight.linux@gmail.com>
-cc: Andrew Morton <akpm@linux-foundation.org>, 
-    Eric Dumazet <edumazet@google.com>, 
-    linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, 
-    Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
-In-Reply-To: <20260119190341.39c3d04c@pumpkin>
-Message-ID: <05853n16-s64r-6976-q763-p9262p5o176n@syhkavp.arg>
-References: <20260118152448.2560414-1-edumazet@google.com> <20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org> <20260118225802.5e658c2a@pumpkin> <681985ss-q84n-r802-90pq-0837pr1463p5@syhkavp.arg> <20260119190341.39c3d04c@pumpkin>
+	s=arc-20240116; t=1768851953; c=relaxed/simple;
+	bh=5iF8rd9rwv5q19FHNihsZl4aiMJx7bgWjmDodKvvKZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Gf1Ff2F65hZweS5LkugUf/LRE8ZxmG/6Qi6qOWiHtitBE5vO4ejkybeq/dZJwBuZAlS6FWnWJe6iPKkByvOL5FT/k4EChNh0jCaQBjlgNK16kWyE2BlLIBi2jZ2ThMzROkfyJKMCY1Y8H90p5gyLH+sPx0Qr3vy5Jv/WPUlIX9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNzJeqk6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27AB1C116C6;
+	Mon, 19 Jan 2026 19:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768851952;
+	bh=5iF8rd9rwv5q19FHNihsZl4aiMJx7bgWjmDodKvvKZo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SNzJeqk6DxOrYIIgqDZTLDoj9jmlOpVJlJfPMzZ1nRFs+2Ld5Xt+m7MlYByT4ajEp
+	 hACI/sM5r0GAAfIUqA15BFk56WI0WeNp1xgiK5mqlOcuDJjpAGVMBhGR4bvrB9wq6O
+	 jZCqHsusRmBkGrQsjskRJKSfD4t7UYKVc7FVgRcw657CoqS1irfzH9ieE6brMX8iZX
+	 afHT6lbXr7lXNCc5NRw7oOdARcfzODjtBa+57k2DCxkjJR7NUMy/LhkFEFZTpfj1Ox
+	 PyTF1JGE2eEPIOM+2+7DVYPWecFqO6e8SVcVO4dH+PjxFkoD1sS1BPARtwYPDk3bpd
+	 Fs9GJVHdZx6xw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: bhargava.marreddy@broadcom.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew+netdev@lunn.ch,
+	vikas.gupta@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	pabeni@redhat.com,
+	rajashekar.hudumula@broadcom.com,
+	rahul-rg.gupta@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	ajit.khaparde@broadcom.com,
+	michael.chan@broadcom.com
+Subject: Re: [v5,net-next,6/8] bng_en: Add support to handle AGG events
+Date: Mon, 19 Jan 2026 11:45:50 -0800
+Message-ID: <20260119194550.1264743-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260116193732.157898-7-bhargava.marreddy@broadcom.com>
+References: <20260116193732.157898-7-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 
-On Mon, 19 Jan 2026, David Laight wrote:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-> On Mon, 19 Jan 2026 10:47:51 -0500 (EST)
-> Nicolas Pitre <nico@fluxnic.net> wrote:
-> 
-> > On Sun, 18 Jan 2026, David Laight wrote:
-> > 
-> > > On 32bit you probably don't want to inline __arch_xprod_64(), but you do
-> > > want to pass (bias ? m : 0) and may want separate functions for the
-> > > 'no overflow' case (if it is common enough to worry about).  
-> > 
-> > You do want to inline it. Performance quickly degrades otherwise.
-> 
-> If it isn't inlined you want a real C function in div.c (or similar),
-> not the compiler generating a separate body in the object file of each
-> file that uses it.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+bng_en: Add support to handle AGG events
 
-Yes you absolutely do in this very particular case. This relies on a 
-long sequence of code that collapses to only a few assembly instructions 
-due to constant propagation. But most of the time gcc is not smart 
-enough to realize that (strangely enough it used to be fine more than 10 
-years ago). The corresponding function is not only slower but actually 
-creates bigger code from the argument passing handling overhead.
+This patch adds AGG event handling in the RX path to receive packet data
+on AGG rings, enabling Jumbo and HDS functionality.
 
-> > And __arch_xprod_64() exists only for 32bit btw.
-> 
-> I wonder how much of a mess gcc makes of that code.
-> I added asm functions for u64 mul_add(u32 a, u32 b, u32 c) calculating
-> a * b + c without explicit zero extending any of the 32 bit values.
-> Without that gcc runs out of registers and starts spilling to stack
-> instead of just generating 'mul; add; adc $0'.
+> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+> index dffb8c17babe..d6c8557fcb19 100644
+> --- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
 
-Here this is different. Let me copy the definition:
+[ ... ]
 
-* Prototype: uint64_t __arch_xprod_64(const uint64_t m, uint64_t n, bool bias)
-* Semantic:  retval = ((bias ? m : 0) + m * n) >> 64
-* 
-* The product is a 128-bit value, scaled down to 64 bits.
-* Hoping for compile-time optimization of  conditional code.
-* Architectures may provide their own optimized assembly implementation.
+> @@ -284,14 +487,25 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+>  	if (len <= bn->rx_copybreak) {
+>  		skb = bnge_copy_skb(bnapi, data_ptr, len, dma_addr);
+>  		bnge_reuse_rx_data(rxr, cons, data);
+> -		if (!skb)
+> +		if (!skb) {
+> +			if (agg_bufs)
+> +				bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0,
+> +						       agg_bufs);
+>  			goto oom_next_rx;
+> +		}
+>  	} else {
+>  		skb = bnge_rx_skb(bn, rxr, cons, data, data_ptr, dma_addr, len);
+>  		if (!skb)
+>  			goto oom_next_rx;
+>  	}
 
-ARM32 provides its own definition. Last time I checked, RV32 already 
-produced optimal code from the default C implementation.
+In the copy path (small packets), when bnge_copy_skb() returns NULL, the code
+properly calls bnge_reuse_rx_agg_bufs() to recycle the AGG buffers. However,
+in the large packet path (else branch), when bnge_rx_skb() returns NULL, are
+the AGG buffers being leaked? At this point the completion ring consumer has
+already been advanced past the AGG completions by bnge_agg_bufs_valid(), but
+without calling bnge_reuse_rx_agg_bufs() the AGG ring producer won't be
+updated with replacement buffers.
 
-> But 64bit systems without a 64x64=>128 multiply (ie without u128
-> support) also need the 'multiply in 32bit chunks' code.
-
-Again this is only for 32-bit systems. 64-bit systems use none of that.
-
-
-Nicolas
+Should the large packet path also reuse AGG buffers on allocation failure,
+similar to the copy path?
+-- 
+pw-bot: cr
 
