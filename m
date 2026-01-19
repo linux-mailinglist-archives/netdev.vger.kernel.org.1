@@ -1,186 +1,148 @@
-Return-Path: <netdev+bounces-250985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7423DD39F23
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:58:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB393D39F25
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E1B683000EAE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:58:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B3DFB3012954
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0747A28B7DA;
-	Mon, 19 Jan 2026 06:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A9E28AB0B;
+	Mon, 19 Jan 2026 06:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVEQ9HWY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8XuBhCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5E428A72B;
-	Mon, 19 Jan 2026 06:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9512728850C
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 06:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768805904; cv=none; b=TWJWOVyfuZJZQko95U41NmKVJFggIA8G/df65sogMzbyihGVKFgZKyqHN1SesSBBoKY5e8dFw7N0vf7ejULNHGhpPgeX9EEn6t6acDHxaUMGC1idgqhrLn0hbddwmL0NtYkDJzBhi4U/NyJJGmJK2CgkERdof59vZd1th5Q/aEM=
+	t=1768805922; cv=none; b=T9GbHJfLNvI9ce5VZghrf1MpOfZ+wk4v/gpjdpKDRyhzeK9K7qv0bW+pZGGBJRMBC8Ldmt6zQ9AcDtbt0LnFuBa8jEG7Wn1/rPWDju1ZAbjV+IVfsnHr6JT+sAjGPd3SnmnkCNWmBFxr7kaTxOTtYO2kiO4PvPrZhbrDaKl0N5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768805904; c=relaxed/simple;
-	bh=Qin/Cq4LI8Tf76hSE9SdisNwPce9efdvqoc1FgGdrI8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eyLOuf9gjVifSN4CdJ6PDyycmPzF3XBM5Jn9biCGylDacWFq3T/+37gAl19IIT4FbGVAtmHyaSapNPJv6ob1ZNtSr8+8RhIgGfu5YYGxo10vAhaA9oB4g1faoHCRj7838BYuqTEoy3mz2al28ku1eWUTX0MhMOxBDsKZTpnvvGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVEQ9HWY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5687C116C6;
-	Mon, 19 Jan 2026 06:58:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768805904;
-	bh=Qin/Cq4LI8Tf76hSE9SdisNwPce9efdvqoc1FgGdrI8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YVEQ9HWYGdTe1JYR1nh4DoRvVYJZoZoaEhJhIVfuasLgwhEmVWZN8kPT01C6BU25N
-	 7aVX49VFWwHLLGa5qSJjIjXbtYXvIO493LBoOwSq/ZEbufR2kkQM5gkwh0t/MYMNyo
-	 bHLkUMEj96ANtgIZ2RxRNuPfdaG7mOsaZ46mN6Ryp2v8SzYV6iUwQRrqy0IKhhccjY
-	 LrLuD9/yD+05a4MN0+qzsXkqbWnyrCUEYKzVEOOH9gQiSqpufAUq5mOrh0wdnkxdlU
-	 9QbjQcloTfJbqI8YxSrTM/r5VvfX1oWmva4ZxjK6Ln7VVbGjhVFEOU+LAqlbJ0PKKH
-	 +obITXZHDuIBA==
-Message-ID: <9a7c53ac-d208-457f-9940-ca821b08df1e@kernel.org>
-Date: Mon, 19 Jan 2026 07:58:19 +0100
+	s=arc-20240116; t=1768805922; c=relaxed/simple;
+	bh=0BwQeahUPD8CqR4tKlGaMTqzMmoD49vM7xWLtA81blY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=obZ8ITA0kSGMAvTJi0Fd2IbMesIi5I4MJHRyhd2EpvKQhxw+sM7HoGaIZe1mfKKbmEeLR2seJEXhwDH21Qg3wSq7rswIer88MD4hxUMeKwDlb/jrziZ21Jf5bRE6PCAFvqslkNKPD9F8Uo/1Nw1es3x5kleaUaNr2GRXjPnGtSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8XuBhCj; arc=none smtp.client-ip=209.85.128.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-793fdbb8d3aso157797b3.3
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 22:58:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768805919; x=1769410719; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VixfVNO0CFNlNWWSbG+RCuPGrtUhPs3GIPuSoRoHegU=;
+        b=h8XuBhCj/lG9L0u1QVjZu0hun0KXRexV1eSfZobfZequE+rGc3Hch5oc/ksklb/CD7
+         YSyHsTnZ3DKXAEhYCL3W71BXpSJv2BzvIyUsEq84V5HbailQp7m7M3Hhp1XuBllqy7Qp
+         VyGtNTDI4B9r7BLOZp6AV50yaeehhCAe9+DsBMoKbmBkcybG0uUNwQesSSYgV3IcOHOS
+         Es9pOO/SFaBtg/EB1g+WzPazU8QV0rlYtp1I2EXGLyoe+ZJMWozHuGQ7eQS/tAkew8bK
+         QeqgamXKiTYuaRuHt1fQjY4fzmE4FhK7UznoCI/3yLPGRUaJZtPl0g9SNganN8CZexiZ
+         otrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768805919; x=1769410719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VixfVNO0CFNlNWWSbG+RCuPGrtUhPs3GIPuSoRoHegU=;
+        b=raIp58b30gZh3olIbzqEE/c+FPDTlqZwQKyPlxkr0WdYkMWAgRCMPHXu4jdmOpsrTS
+         A6AuRICH0fQ6+XFgskB2Jneh/fEMgc9a/gcciOFHkYHEPfKcGac38/Gs3jjOZujkwQE5
+         +bKCUFLaiJT7qu/GCr7AgjD5vkuqEKYDryW3ykBazywbjzMXUELbXoYPtC5QFzFs4vFm
+         xqOxwmsrHRA8GHWUXsqan1qML4w+KPS+cD6i4emvqk5vQWoXUvI5HN60uHQjMfRS1lZ9
+         bMZUkVKRYRk7qW70L+Qmz3+pfEswpu6GTEsxhk+mt+NsmWBksXiHSFpkQS/sMfDM7iZd
+         OBNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUj3jWui9PjE3LEKR9yqCBgjhHdAgNgWEglMJpr2TN0e5mZG8fYGHCIMPgGaMTjWvyb+NfiCKQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7TaSNhibV1fIGlxhCXVrBUhL5FAxDixdaJ6yAGU3T3IRnGS9s
+	LMXyn0C9JRwnR7Xl5SZRkuZL26aMUuoIS7OsPi/WHkXNKyLzDMMXZ+1+8V0B2Iu1XelEk2uOuCC
+	VqJaphtLaBQfjX4Xjl//yePY9xD84BKo=
+X-Gm-Gg: AZuq6aJnyDF8UEJz6D8atqPF9zbh3ndrGBKsG6rZWFw9gGvCnJcidjqezwc/8LASCBE
+	QUzxX/KvT7pIObhLr0WULHXNTk2ucvXHyO0rlAW/HKEg8ucYFhWOSY0jJXzMBIaXnQnZE4W93ax
+	wRsOrsdHssliGDwzoP9F05f1B8na3snJ+ql/MdxLKlp7QhpE4OVnoAkzVdt4DUm6AnxPdwNHw4C
+	A4jVjU45I756Yghi1+tlh3nvUWr3WMX1XNYPlp9hm2xlJRbfBMVVFRy7GvqYUzf8oz7J5miYFzD
+	Ynikjb/7vZl/fhA=
+X-Received: by 2002:a05:690c:d8c:b0:78f:a544:c45d with SMTP id
+ 00721157ae682-793c52b199bmr77213547b3.20.1768805919615; Sun, 18 Jan 2026
+ 22:58:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: caif: fix memory leak in ldisc_receive
-To: Osama Abdelkader <osama.abdelkader@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sjur Braendeland <sjur.brandeland@stericsson.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com,
- stable@vger.kernel.org
-References: <20260118174422.10257-1-osama.abdelkader@gmail.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20260118174422.10257-1-osama.abdelkader@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260114025622.24348-1-insyelu@gmail.com> <3501a6e902654554b61ab5cd89dcb0dd@realtek.com>
+ <CAAPueM4XheTsmb6xd3w5A3zoec-z3ewq=uNpA8tegFbtFWCfaA@mail.gmail.com>
+ <1b498052994c4ed48de45b5af9a490b6@realtek.com> <CAAPueM65Y4zEb4UidMR-6UtCZVWYs+A7cHzYbBgJMmAZ2iLy5Q@mail.gmail.com>
+ <f3fe05ea76794cd09774cd69e85623d8@realtek.com> <CAAPueM57HHjvyCtBf5TEy2rn6+1ab7_aeSpJ0Kv4xUYt+SfFtg@mail.gmail.com>
+ <ae7e8fc22fcf415d9eb5e4d36ed74231@realtek.com>
+In-Reply-To: <ae7e8fc22fcf415d9eb5e4d36ed74231@realtek.com>
+From: lu lu <insyelu@gmail.com>
+Date: Mon, 19 Jan 2026 14:58:27 +0800
+X-Gm-Features: AZwV_Qj0XvqXEOCiPSfKd8c0lFcU4MlofMkQbn7Xgg8yWggEh_lv825eXz0ujMc
+Message-ID: <CAAPueM6_GQLcqz+xxKVDOaUZZrDNOnYB_tQ2gaxrUKnDQSZ9cg@mail.gmail.com>
+Subject: Re: [PATCH] net: usb: r8152: fix transmit queue timeout
+To: Hayes Wang <hayeswang@realtek.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>, 
+	nic_swsd <nic_swsd@realtek.com>, "tiwai@suse.de" <tiwai@suse.de>, 
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18. 01. 26, 18:44, Osama Abdelkader wrote:
-> Add NULL pointer checks for ser and ser->dev in ldisc_receive() to
-> prevent memory leaks when the function is called during device close
-> or in race conditions where tty->disc_data or ser->dev may be NULL.
-> 
-> The memory leak occurred because ser->dev was accessed before checking
-> if ser or ser->dev was NULL, which could cause a NULL pointer
-> dereference or use of freed memory. Additionally, set tty->disc_data
-> to NULL in ldisc_close() to prevent receive_buf() from using a freed
-> ser pointer after the line discipline is closed.
-> 
-> Reported-by: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=f9d847b2b84164fa69f3
-> Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
-> CC: stable@vger.kernel.org
-> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
-> ---
-> v2:
-> 1.Combine NULL pointer checks for ser and ser->dev in ldisc_receive()
-> 2.Set tty->disc_data = NULL in ldisc_close() to prevent receive_buf()
-> from using a freed ser pointer after close.
-> 3.Add NULL pointer check for ser in ldisc_close()
-> ---
->   drivers/net/caif/caif_serial.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-> index c398ac42eae9..970237a3ccca 100644
-> --- a/drivers/net/caif/caif_serial.c
-> +++ b/drivers/net/caif/caif_serial.c
-> @@ -152,6 +152,8 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
->   	int ret;
->   
->   	ser = tty->disc_data;
-> +	if (!ser || !ser->dev)
-> +		return;
->   
->   	/*
->   	 * NOTE: flags may contain information about break or overrun.
-> @@ -170,8 +172,6 @@ static void ldisc_receive(struct tty_struct *tty, const u8 *data,
->   		return;
->   	}
->   
-> -	BUG_ON(ser->dev == NULL);
-> -
->   	/* Get a suitable caif packet and copy in data. */
->   	skb = netdev_alloc_skb(ser->dev, count+1);
+Hayes Wang <hayeswang@realtek.com> =E4=BA=8E2026=E5=B9=B41=E6=9C=8819=E6=97=
+=A5=E5=91=A8=E4=B8=80 10:51=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Original Message-----
+> > From: lu lu <insyelu@gmail.com>
+> [...]
+> > if (netif_queue_stopped(tp->netdev)) {
+> >     if (skb_queue_len(&tp->tx_queue) < tp->tx_qlen)
+> >         netif_wake_queue(tp->netdev);
+> >     else
+> >         netif_trans_update(tp->netdev);
+> > }
+> > The first time xmit stops the transmit queue, the queue is not full,
+> > and it is successfully woken up afterward =E2=80=94 OK.
+> > The second time xmit stops the transmit queue, the network watchdog
+> > times out immediately because the transmit timestamp was not refreshed
+> > when the queue was last resumed =E2=80=94 FAIL.
+> > This scenario is logically possible.
+>
+> This situation should not happen, because trans_start is also updated whe=
+n the driver stops the TX queue.
+>
+> https://elixir.bootlin.com/linux/v6.18.6/source/include/linux/netdevice.h=
+#L3629
+>
+> A TX timeout occurs only if the TX queue has been stopped for longer than=
+ RTL8152_TX_TIMEOUT.
+> It should not occur immediately when the driver stops the TX queue.
+Thank you for the correction! Upon review, I confirmed that
+netif_tx_stop_queue() already updates trans_start,
+so the timeout scenario I originally envisioned does not actually occur.
 
-Wait, the reported error is memory leak of mem allocated here. So both 
-ser and ser->dev appear to be valid?
+>
+> Therefore, what needs to be done is to update the timestamp when the TX q=
+ueue is stopped.
+> Updating trans_start while the TX queue is not stopped is useless.
+if (netif_queue_stopped(tp->netdev)) {
+    if (skb_queue_len(&tp->tx_queue) < tp->tx_qlen)
+        netif_wake_queue(tp->netdev);
+    else
+        netif_trans_update(tp->netdev);
+}
+This change continuously updates the trans_start value, even when the
+TX queue has been stopped and its length exceeds the threshold.
+This may prevent the watchdog timer from ever timing out, thereby
+masking potential transmission stall issues.
 
-So instead, does netif_rx() return an error few lines below for some 
-reason? So should skb just be freed in that path?
+The timestamp should be updated only upon successful URB submission to
+accurately reflect that the transport layer is still operational.
 
-         if (skb == NULL)
-                 return;
-         skb_put_data(skb, data, count);
-
-         skb->protocol = htons(ETH_P_CAIF);
-         skb_reset_mac_header(skb);
-         debugfs_rx(ser, data, count);
-         /* Push received packet up the stack. */
-         ret = netif_rx(skb);
-         if (!ret) {
-                 ser->dev->stats.rx_packets++;
-                 ser->dev->stats.rx_bytes += count;
-         } else
-                 ++ser->dev->stats.rx_dropped;
-
-Not calling skb_free() in this else path _is_ a BUG™ in any case IMO.
-
-thanks,
--- 
-js
-suse labs
+Best regards,
+insyelu
 
