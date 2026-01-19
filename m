@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-250988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DEFCD39F3A
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:01:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EA6D39F40
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:02:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D09143001618
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:01:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D217F3028D55
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE362757EA;
-	Mon, 19 Jan 2026 07:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B4E280A5B;
+	Mon, 19 Jan 2026 07:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="OuOzs2Vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.77.159])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36291D5178;
-	Mon, 19 Jan 2026 07:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.77.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5BB248868;
+	Mon, 19 Jan 2026 07:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768806095; cv=none; b=XwbhKGAHwPbAM9W+eDc9HW+Xf7jqV8RQ3Z8YZaMNlqctr7xVd3g8KcNwusgdyC2mm521cRM0lzDPD7rs7M1WnFCfzlliku0XD6yZXHmxa2CaSP9v8MjiVx9XqdNoIbUHFaXhHMgMRtdl/B7qn5YXS9e+NCsb+vkhJigtlDEpeuU=
+	t=1768806106; cv=none; b=rMvGeIITUJeFcEbVw6zO1jGtfSs1Xs2k4rF9QNxaFM5WshCKcmzAVpPDeY+VQVmeuMd87q1Xyp0xiUeo2lurcAC6t9ZM4gHVNw9jgnVuTFVGDaN3PS29R27201kNJxxFntHNvyCKw7c17xGv3CNz+WU2a2Dvp5t4C/FJ2V6UU5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768806095; c=relaxed/simple;
-	bh=p++eGDU18qNaDHKlm+MfGwZRNnRdFvBnX9YwVUnfVVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W1C24HLuURLEuFV2mo4iCqOCHwoauMzNOnBOg9H2ykrngTZFQ1oAZ/xildfIa0vZ1bAwMq2fOZDXespQ+RBSCkTsh7dIPnXYIFsslFUkxLQaod4I2VcHfMkLe8BwTNm3sNZx2HJ4+pJXYegZHW4rXAmZOPHOrr7DVvFaRonpieo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.77.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz21t1768806008t6c87112f
-X-QQ-Originating-IP: mIAif3bZUK1yQVuig9ts5P1vjtF3dD+EPNao51SynRk=
-Received: from w-MS-7E16.trustnetic.com ( [125.120.182.22])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 19 Jan 2026 15:00:02 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 12972063070728144324
-EX-QQ-RecipientCnt: 10
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
+	s=arc-20240116; t=1768806106; c=relaxed/simple;
+	bh=/mPzcOFnR+DJ7sQbJe0/MhbXYRMVe7CaQUUrrTZtw5w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CtKE5iJLvr9G6nXhTo2dW/56yKG8iJA+Pm8JF3rYgZIeaw74eSmBUA6BXpKZGuLqDp8PskdpLp4mD0Ou75RV291+dJLtn/lPwhaSWug+uJpTRnwEkLIduAIKsKJsV0dPFD47rMsg1Hs0NF/4tdwfnZgdIurbCIfjwucOfZ+5zVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=OuOzs2Vl; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=5Z
+	T4eOMOPEjuysxlu8qzlilHeXFFA5Hk46LzGu0qs7Q=; b=OuOzs2VlAFURVH8QZo
+	TqWwwcPWawvvVWJokT1PzwNajmgycgj11FERnRhE32JCAXHCDUgMhN3U42i2yE9z
+	7HkfdhGbSJo6Zk+5wzXf2boA50VrmPwJB35sDJGcetGP92Dk+lAoZLZJdI2Ka52P
+	KKqtNpdEwbx9KKz3ZvdmkwbAM=
+Received: from haiyue-pc.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wBH2pqN1m1pYgxtGw--.2S2;
+	Mon, 19 Jan 2026 15:00:31 +0800 (CST)
+From: Haiyue Wang <haiyuewa@163.com>
+To: netdev@vger.kernel.org
+Cc: Haiyue Wang <haiyuewa@163.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: txgbe: remove the redundant data return in SW-FW mailbox
-Date: Mon, 19 Jan 2026 14:59:35 +0800
-Message-ID: <2914AB0BC6158DDA+20260119065935.6015-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.48.1
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v1] mctp i2c: align function parameter indentation
+Date: Mon, 19 Jan 2026 15:00:06 +0800
+Message-ID: <20260119070022.378216-1-haiyuewa@163.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,68 +59,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MgQMqdBY7dCn8xClDGMHEXA/3EE0/rkYRG7jmCLIKclwILTm86POhslo
-	9IfDlnCb1kHvHkH586egi/ZLFL+WTFRFi2T3PN3Akmyt43RqaLvZ70D0IQuY3xr6F3k8TGb
-	XsqJBJWbWa4ALDWXvLKwL05AH1hldANs8MwGHwbR49JGDeYiMowpRGnMdacKeRg4DDUKpl+
-	ogeFRVT93olJBbhuVq3pD0BOvrhVWKU+PF3aIqUMPRIgHTdNfpWYjg1n3A2PiuYLMwfYmXT
-	SbpYMGTSHYdXCNbwK5PskMSi0+680YQcZqTGV3rW+paG1Xou2tY5hGZsZqaiNjXfX47k8JV
-	fXdSwulvphJtkkEiYmC5/ChyRD/0V1/0qS/bazHlv6uXKDZmI9bZZlEUNUwIihuFpqO77cW
-	QGo/2xIPNTzdxSa2BhF/am+ZXQLgIGcCSHKv9kVMLq5fXXYzU8Obph68bQYDgNxF1ZOEPIW
-	6wzRBVOKd1/R/8rUGU7ElXDi6RmBNNwGuKhogDVCZbPbhbPzXwSL7DIrsoHB71/xBO7ZB6Z
-	wVkctOlB6P9v9PIO8LEjUng5SBIxq1syZdmK0YUqWxRiHEivg+3RC2hcdMVTUd8v7ffWEvn
-	uf5AN9dGqKBE8OLiUSmJ/z0897s/7yVXwmhXXMBgbhKeMOHWeBLY7iM7c1Dgi7X1YGxOIAz
-	cyTeIiJWbeBu/SzQ7PO5QYFv5SLPRu6wa1YZT0Yab4JLbOlxwzKuWnvjwhq4mRwEGvhmISx
-	2/J3SgkIhOkSLblG2WzXnyHdseg/Ib0dWy/141bzW8cOfpSCL1Jayz9vDcZI5ikiyUds8R4
-	55ry+S1yZbQYlDUcVAtI3/uINwxrNQxsBr9ZL9pYl59bXyLlljaoQNcqY5u04pPYBXzSvRB
-	rou1s05YdvGrah+9OF4uOPiMmYC09G71AoPu+LHcPDuy/DnOcKKUVvlRXNtMv2NZl0qlgn1
-	wJ0bnlrfYXp0uLrjUkBQLf7CjsH+NBCSE5YcwRCGzmnAtD/cuNutVkQMCFsBPY1wrc4TWyK
-	xZPWt3osoPiA1q01VN1hHexaGMu4QB7qJKSbRcf+qLhUIlmX1p79WHPnAQyE9R4gwW08Pa5
-	ZMSpBcX83NU7aGGd++mZMeoNafrA5NL/ar+4rwErGH6
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
+X-CM-TRANSID:_____wBH2pqN1m1pYgxtGw--.2S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrtr4UWFWDXw4rGw47Zr13Jwb_yoW3trX_Cr
+	1jyrWxGr4UKFnaq3y3Ca9xt348Kw1jvF4kGFySqF98A34qyF4DuF4kAr13Cry5Zw48Aasx
+	CFnxJr17Aay7GjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRKgAw7UUUUU==
+X-CM-SenderInfo: 5kdl53xhzdqiywtou0bp/xtbCzQ+O+Wlt1o-8nAAA3I
 
-For these two firmware mailbox commands, in txgbe_test_hostif() and
-txgbe_set_phy_link_hostif(), there is no need to read data from the
-buffer.
+Align parameters of mctp_i2c_header_create() to improve readability
+and match kernel coding style. No functional change.
 
-Under the current setting, OEM firmware will cause the driver to fail to
-probe. Because OEM firmware returns more link information, with a larger
-OEM structure txgbe_hic_ephy_getlink. However, the current driver does
-not support the OEM function. So just fix it in the way that does not
-involve reading the returned data.
-
-Fixes: d84a3ff9aae8 ("net: txgbe: Restrict the use of mismatched FW versions")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Signed-off-by: Haiyue Wang <haiyuewa@163.com>
 ---
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/mctp/mctp-i2c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index 62d7f47d4f8d..f0514251d4f3 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -70,7 +70,7 @@ int txgbe_test_hostif(struct wx *wx)
- 	buffer.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index f782d93f826e..362eaebf7c5b 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -578,7 +578,7 @@ static void mctp_i2c_flow_release(struct mctp_i2c_dev *midev)
  
- 	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
--					WX_HI_COMMAND_TIMEOUT, true);
-+					 WX_HI_COMMAND_TIMEOUT, false);
- }
- 
- int txgbe_read_eeprom_hostif(struct wx *wx,
-@@ -148,7 +148,7 @@ static int txgbe_set_phy_link_hostif(struct wx *wx, int speed, int autoneg, int
- 	buffer.duplex = duplex;
- 
- 	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
--					 WX_HI_COMMAND_TIMEOUT, true);
-+					 WX_HI_COMMAND_TIMEOUT, false);
- }
- 
- static void txgbe_get_link_capabilities(struct wx *wx, int *speed,
+ static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
+ 				  unsigned short type, const void *daddr,
+-	   const void *saddr, unsigned int len)
++				  const void *saddr, unsigned int len)
+ {
+ 	struct mctp_i2c_hdr *hdr;
+ 	struct mctp_hdr *mhdr;
 -- 
-2.48.1
+2.52.0
 
 
