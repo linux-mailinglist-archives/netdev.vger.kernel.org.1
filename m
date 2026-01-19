@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-251168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABECD3AF41
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:36:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03062D3AF49
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2355A303526D
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:36:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 652FC30010CD
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E6F38B7AF;
-	Mon, 19 Jan 2026 15:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E05389DE0;
+	Mon, 19 Jan 2026 15:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y6behdOw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzq35x+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994F033ADA9
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CDA1A285
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768836998; cv=none; b=eVfHaCFp1EYFf8/D2+xwSj1tIc26mWs2kgKvrgXpbcdKfFzbkV4xN7ZH+JB41Zse+nT6h6s72oathezX7Xp/sM/PN0yTtx2nwW0FdGfpPFscu8AQxuBpPUHPWY0v4lYf/ph8jjIzF1OK4K1wJ6VUpQkfka88EfiTJzSKZtC57ec=
+	t=1768837137; cv=none; b=Azb5Q4DG1UScdOc0d+QfR+Vats+fUR+SSCNBxQS7uSEppsAiPT977YAWaqyoPqA6MQTks3XWR44XAAdUTAr9r/TL2DyZgDxRamh/2EeQvKs4J6FgNJny/zubPxJeUZdy3pR0VTSWSq60aoRkkA+YkoAxOV0u6mVzQIWuSzveLl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768836998; c=relaxed/simple;
-	bh=e88EAJWlPwazHImhiAb0XFQNxdwL8O9wnAEVl5EVpDQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DPocCtpRgL+an/FGmjE80zHCsm4UwhnKpyI0Ot5Cb/jLp5cpimQM42wZuH26BcFiNK+cdVEXwNRB3b8Rc5z7oIew/rAoM5oYy512lVcISOmF2sbNqtHJdwFkX3NKf7jU4e/YPBSPRtoOHXwM6eH/et0pdX4Gmp5x/P4A3hpZeL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y6behdOw; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id CE114C214CC;
-	Mon, 19 Jan 2026 15:36:07 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C710660731;
-	Mon, 19 Jan 2026 15:36:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 69AF310B6B147;
-	Mon, 19 Jan 2026 16:36:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768836993; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=e88EAJWlPwazHImhiAb0XFQNxdwL8O9wnAEVl5EVpDQ=;
-	b=Y6behdOw9Tape1gyqVI8+dOtAddglnwZP/wAIEjt38AZDN72qmzY1J0hjo6HxqENO+0CY4
-	DjF24GLVXRsJQZFyQYaSatGbICfmSf8IanPVBSPjO5y1QAnS9avpFt97gju8+/q9iX+7UE
-	eEL8f0gdLqpD22oNWlQX5ahCbM5X0mZyKfONRlXRzyUk+6G0pIZw0bFKmYvg4EVowyoiFH
-	x4MO9PlAu89Po3wyWUC6WOoh2/GME51ixbHO31BAx3LaSr7Ilnwim4CpTlfmqo27c2dbep
-	jZUzCDk8GCfo/zAQbHMzW0CKEzDaK5c+l5+ikBIcBKQezAF/UWE+9dCDikgkxQ==
-Date: Mon, 19 Jan 2026 16:36:29 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Tariq Toukan
- <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net: remove legacy way to get/set HW
- timestamp config
-Message-ID: <20260119163629.2e626ec8@kmaincent-XPS-13-7390>
-In-Reply-To: <20260116062121.1230184-1-vadim.fedorenko@linux.dev>
-References: <20260116062121.1230184-1-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1768837137; c=relaxed/simple;
+	bh=jXHKJrXJSnEOQxUgddZjiad7A9U2BlElWaNWeUFGA/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZBZ0Nly2DUAW4Edjv3zCUAhDCPOtiTKu6V416SMldfnNuRHXUaPYu3N1bCmlKuWwNO2auDaPYgzkaF8KQA1REoUWHWyvATm8yG9yEZLlcSoa8aIdXVkQu1Q+5bNCxnO0rnMTyOIxXbljbzYCY5lRhx6vcA+e/QIRXTDVjVo/TlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzq35x+y; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47ee57c478eso1998265e9.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 07:38:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768837134; x=1769441934; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0OlaBMXpZRh2mRF/zIL7zkkXWi1bK1vG4lbJ+gzlq2A=;
+        b=hzq35x+y6xN6+XOjL8lbFswuatU11hID7TGbtmZDyfiaAitDg+oiR0KUXflQX7zmOP
+         JyojV75nzeaoG+U9crQzppNlhsdwFq/vfkp8FWiefbxipwP+JLsUusTvS+ri/vGL1xix
+         SC913n4bDNST7YBrqRoM3L9YcUBK7Pe667uGY1Ds5VE/h+x2/aLteHENHylTZ/OS/yPE
+         6bAEAdeBZ53BvOzsl45sO0CyQZa1gItFT4aBm3EZSpGiMchNQ6Ia0ckdS1980SPcSCBc
+         Ev5l6W0NYZyKzD2Zd6wuUiRwpA0Xb3CEWx8jt9eIO/AQP594kkzoKIRpctAEf71+J51z
+         tbHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768837134; x=1769441934;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0OlaBMXpZRh2mRF/zIL7zkkXWi1bK1vG4lbJ+gzlq2A=;
+        b=xFM/I8407f+1WaE2uqP25QemOxd3RafDoJkdVWcdhmLH8cAB0tOMwiqMnzNfDRIoR9
+         iaKInfhcOPp/UhyoxzHXNzhYBWetMtPE3XW4w6tJb2W0DuihAFav09HoqaOmvA1eBn8f
+         oO87imamtF6rAHLuonYxSyuoDKOckOJt+b2KSZiCBdIByPEXzlL5nwM/yD3TUqzrlNJy
+         SICkBX1kIcwjPn9T0+GrMdxjcuuo4yDgcYSjPUTbLn4EJyIFVLqeS+gd8qHqKNEeEK05
+         oy7tAHqHCNIRUtiZw+8vWwH8xiyQCSM25cytunvqGt5ecnO65B2IHgYl1vz+W5pPLQ8n
+         DH7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXSBgioabq7AOuQ7UmpFJ9uZ4MRjmzDi3fGjQUV2n4SzZZru4vPd3JuZjc7PQqZgz4Vznl0bsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3EQSbObCt4FGjF13r+hei5OsSS4NyznBg2VxhcAOS0E7fi69G
+	ahzjoaD7SxVnlXkZaag8yaMRyOKRUodmWxlCBo6uYyX9etU8VfXWztlc
+X-Gm-Gg: AY/fxX7PVEwlMBjV67Q//C9PTYKsPLTI8KWS9PJeLMMVaB4/DZrK9vlhUlXmLY+e/AG
+	p4tW8OA12tdx60XyJ59IJMQDa1fd46YSAG/KEsoreDYn09GzChWiJNOwsnxdbVIMgV28EI+SL8J
+	L6c4FmEIzxRwfNsivvNCOzjOIPiiqBhWw+tygSPUZKS/hJUOVUJa7dsZaarH9ICSBzrTv0inMEU
+	B3mQ4IIog4BUC33B6ntz1XhoLe6faEowuSq0x3O+Cx07RdntHQG0QxRpKsycBSBGjQwPGIwk70M
+	t5QfgyvO41IeDHIPHJz2aDE/ld3qzpBQLxHJk81Vq2HGWyq4GK6fvKLel44VuyFtRBEpmbPbJZI
+	O/XmugHte/xIdUZaEU51vihAE3PyOA58GeoitmUMjuof5WH0/fBV+TfEfHQsufUoFquWWI1BjOr
+	fryFHYi4O3kSI5yA==
+X-Received: by 2002:a05:600c:3594:b0:47e:e20e:bbbc with SMTP id 5b1f17b1804b1-4801e2f2845mr105772655e9.1.1768837133999;
+        Mon, 19 Jan 2026 07:38:53 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d501:d900:619a:24df:1726:f869])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cefdsm23190982f8f.24.2026.01.19.07.38.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 07:38:53 -0800 (PST)
+Date: Mon, 19 Jan 2026 17:38:50 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/4] net: dsa: ks8995: Add shutdown callback
+Message-ID: <20260119153850.r7m7qf7wsb6lvwwe@skbuf>
+References: <20260119-ks8995-fixups-v2-0-98bd034a0d12@kernel.org>
+ <20260119-ks8995-fixups-v2-1-98bd034a0d12@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260119-ks8995-fixups-v2-1-98bd034a0d12@kernel.org>
 
-On Fri, 16 Jan 2026 06:21:20 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+On Mon, Jan 19, 2026 at 03:30:05PM +0100, Linus Walleij wrote:
+> The DSA framework requires that dsa_switch_shutdown() be
+> called when the driver is shut down.
+> 
+> Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")
 
-> With all drivers converted to use ndo_hwstamp callbacks the legacy way
-> can be removed, marking ioctl interface as deprecated.
->=20
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+$ git tag --contains a7fe8b266f65
+v6.18
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+We are in the RC stage for v6.19, so this is 'net' material, not
+'net-next', the patch has already made it into a released kernel.
 
