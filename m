@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-251126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D018D3ABF6
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:31:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95608D3AC37
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5755D3037BCF
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:23:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C92F30CA3BC
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF76389475;
-	Mon, 19 Jan 2026 14:23:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8529E38A9B1;
+	Mon, 19 Jan 2026 14:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IE/H7Dlf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpF5eZ0X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9E6389462;
-	Mon, 19 Jan 2026 14:23:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614AB38A728;
+	Mon, 19 Jan 2026 14:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768832580; cv=none; b=jvGCSFH+tp7wCN4sshZDRG/OjEojU699WQ+txrt/cDVSHzjhsz5OU2hBDFxniGKxONN75nAIT+oJkxGaepe/t6EKT5YtMdUachZMWlnvkUlj+URLutXoGCc+ao2sKL7ImInGXyjR80DKG+E1V4J48Ak+L7layQPSph2uQiv6YG4=
+	t=1768832582; cv=none; b=Or5yPl0vOtCss6TkdsTfTdx+5ybnP34Q2PQeHycGKMblkE4264FSUq9+WiYc733SEnxGGDktc7JTCfD/2OC4gW2vVGKM/lGrUOzBHsuf8H5tP804s98WoPyTsAfZS84cq8iHTRDiUIOFOvJ54i09ytUiBOuVIEENNO/tCaynYpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768832580; c=relaxed/simple;
-	bh=bc+SMSo/BEsJV6kKQTjJ2iqWRMvIFdUr7/HiGEtsBWA=;
+	s=arc-20240116; t=1768832582; c=relaxed/simple;
+	bh=3rseO2VdOcdRR2kY2+qI+fLi8ZuR3zafi9NP2SKUHYU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Rv56rksG99ByurfeXAV6tnHqJXQI2sGVJX8hCq0beLoaHzkeFHea/yNZULdycpVQrRgd/Xm74L8JrVZEym25i0FK9KxovB5RoFSiC/tgH3dM3gM4jSEeC+KSQvTfVXJWtoETiFniUHEXuguFmScHK/V3P7OBMuBkUb7l6+wuP9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IE/H7Dlf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E27C116C6;
-	Mon, 19 Jan 2026 14:23:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=E2rGEjG5iLtObexKaSNJuodsNohv5fsBE54DSn8OT2pTXJPwGF09kVpVgnwEkGVfnRrHrZfTvvGzimHROU4KPnsGHx0k7IIfkUgowAIt+HI/L5Cmo44lcsxqHwB4mX6Erd8skrGOJ4iVaJevtvEpJcedm5eTAis+w2zb0C0H93Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpF5eZ0X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE223C19424;
+	Mon, 19 Jan 2026 14:23:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768832580;
-	bh=bc+SMSo/BEsJV6kKQTjJ2iqWRMvIFdUr7/HiGEtsBWA=;
+	s=k20201202; t=1768832582;
+	bh=3rseO2VdOcdRR2kY2+qI+fLi8ZuR3zafi9NP2SKUHYU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IE/H7DlfJUzKatGr0A6P/cCX7S5Wrp5fMfrW+nnZ8pbrE8a9QY5945FI8T6A1O6Nn
-	 9cVNqaY16Wo/W2mqRIP7qtErikO0PhDvLnXFcSkHmLn9B6EBgNDnNtk7ZRjZ66xwZQ
-	 MToXnPZWalDSyqTOSq91+HCHvpR8EETdfavr1ko6lOXScMSPLGfnf2soZ+SfuCxL1Q
-	 rEXM3eSgrz1GKZtGfvrSqoRIP2UYvgzwXBYwkYZ5hUO40Wr80wTF/PdYuYcgfTPVNH
-	 qMO2lbtlSW+0eaUwPpBgJd0UWV8u0dbjI4gppp4gq778vzHYLYHc5+q6k26ktXhDVf
-	 h3xbNKkfizJlQ==
+	b=OpF5eZ0XqUx1N1nQZtIDYb3qTLD+bifKq2xeEtoSjuq8avJ5cMn6xDb036Nzoegyq
+	 6178kR67yRzcRaL5jIIAIFUVHGlCUP1SAt50r6QXqoVRC7Ldhd2pIbvOejFpqnxZCU
+	 kKg1oSX2t6vI6G1A+roD7fuVmMsE9MDsa9adnaVI6uWhv6Ud2nB3Ktip9x0b7cocRt
+	 dFLvZJjSzNSXNjg3jkqd7CtSS1hPng/QfEEYr3FmSTk3bddEsAerb/R0yBw5UQ5CFc
+	 qsiFHir7WCVOZYGwkW9QjRK7zJzkXiDwNalqs+65bsx9Z1qoFC+f7HW+ok5yy70T1o
+	 TlUVZ9SEGnd3Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78B503A55FAF;
-	Mon, 19 Jan 2026 14:19:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A923A55FAF;
+	Mon, 19 Jan 2026 14:19:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,45 +50,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] net: pcs: rzn1-miic: Support configurable
- PHY_LINK polarity
+Subject: Re: [PATCH net-next v2 0/2] selftests: net: improve error handling in
+ passive TFO test
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176883237003.1426077.11987009309110128646.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Jan 2026 14:19:30 +0000
-References: <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: 
- <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
-Cc: clement.leger@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, hkallweit1@gmail.com,
- linux@armlinux.org.uk, geert+renesas@glider.be, magnus.damm@gmail.com,
- linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- biju.das.jz@bp.renesas.com, fabrizio.castro.jz@renesas.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com
+ <176883237152.1426077.2316516849712377834.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 14:19:31 +0000
+References: <cover.1768312014.git.yk@y-koj.net>
+In-Reply-To: <cover.1768312014.git.yk@y-koj.net>
+To: Yohei Kojima <yk@y-koj.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch, Markus.Elfring@web.de
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Jan 2026 17:35:53 +0000 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Tue, 13 Jan 2026 23:11:53 +0900 you wrote:
+> This series improves error handling in the passive TFO test by (1)
+> fixing a broken behavior when the child processes failed (or timed out),
+> and (2) adding more error handlng code in the test program.
 > 
-> Hi all,
-> 
-> This series adds support for configuring the active level of MIIC
-> PHY_LINK status signals on Renesas RZ/N1 and RZ/T2H/N2H platforms.
+> The first patch fixes the behavior that the test didn't report failure
+> even if the server or the client process exited with non-zero status.
+> The second patch adds error handling code in the test program to improve
+> reliability of the test.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/2] dt-bindings: net: pcs: renesas,rzn1-miic: Add phy_link property
-    https://git.kernel.org/netdev/net-next/c/98e8039a3b14
-  - [net-next,v3,2/2] net: pcs: rzn1-miic: Add PHY_LINK active-level configuration support
-    https://git.kernel.org/netdev/net-next/c/61f1139a4765
+  - [net-next,v2,1/2] selftests: net: fix passive TFO test to fail if child processes failed
+    https://git.kernel.org/netdev/net-next/c/52b485973043
+  - [net-next,v2,2/2] selftests: net: improve error handling in passive TFO test
+    https://git.kernel.org/netdev/net-next/c/342e31254f02
 
 You are awesome, thank you!
 -- 
