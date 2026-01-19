@@ -1,59 +1,48 @@
-Return-Path: <netdev+bounces-251222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECE9CD3B567
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:19:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C90CD3B56A
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A27E3062E0F
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:19:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4455B3000B25
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFED529D280;
-	Mon, 19 Jan 2026 18:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C7D30F52F;
+	Mon, 19 Jan 2026 18:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IavuXq8c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfHTsFU/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1337405A;
-	Mon, 19 Jan 2026 18:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8640830B512
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 18:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768846746; cv=none; b=muZT7Km/h1iTd/24NYt06OzXO9jAMsSmakxhyw91Np6/e1Ek/SnxBSsgCnxiyypQUeSRdFtGd+ubF0Db1e3cS4EOGVOCZ+IygMvidDL6gZSdlpS4PdHMxa4nvoZqL+bn2R5yjWnKllZpDNTidFdPUnSojsbkiDRDHVPQlLXKKFg=
+	t=1768846808; cv=none; b=mS09G4o9wjoDN9GNZr3Ga2qt8F/Xmkx+5yPFT2S0nJqJ8eFSbN7uZn1fDv4z4qqftfScoIzLG0PMgotuy4oG0d69RnPXpv0kuwXGhbGRHoF7LUL4EwDg+WUnW//Q8KtwLM+vY+1hTY3Hi538J1aOaJU6orbOERpLBNTxfR7rOnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768846746; c=relaxed/simple;
-	bh=HmPpNmlQBm5dHmjTPJMwAhTXAREvQqoHoP+T81cr63A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ps/kdUds3A3h04pBZ2XC2lwCDP5T7KdMOEDbfvFNTMIyozWktvRN4h/RBk1jQYdEBUwrri0ij6owZTMUmcmHAlGSp+Q686rBROzffCOUqhEFAbUaduhYkcTO3356PB87AWdT/TbfIpY2wDzQ9Hul3jcjtncQU1bBDiB6au3PQFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IavuXq8c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1109C116C6;
-	Mon, 19 Jan 2026 18:19:05 +0000 (UTC)
+	s=arc-20240116; t=1768846808; c=relaxed/simple;
+	bh=faPOCLZKJVU/zamNNsx72NQDAHgJRXZ/aEAuEYR70Ls=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TPB2xcXzVCQZa9JembQVu2bS2lFM064UhBnd/ffMfyM8X4aHebnAE3h1usjXcx+o4EsQWYlCkjqPg2+bhyB6fn4Ej3QQ4CdDl5RA2FK8AW/9Gt64lZu/BPzxcyKjRr34iTNEF6cidFI22GL/te9NhJCgtwxC9mtrNGmkIh2aylQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfHTsFU/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 218FCC116C6;
+	Mon, 19 Jan 2026 18:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768846746;
-	bh=HmPpNmlQBm5dHmjTPJMwAhTXAREvQqoHoP+T81cr63A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IavuXq8c+OZrPxNxe6F3PKqrMA3cbihgPSMlx5UHslxl5rE7CGL2B8Rz10C1xqxvC
-	 X/NKKsv9aoIKXCbBpRK20dy3WnrCYFrnDjIHwIQK5kdk6Dzn8yb7puWk1ivBolA7AK
-	 x6xIMYKFdysLKWVtYaVijGsiRnUhTkYTw+GeCkoSWC4v/CDKUu8uObhgca9lHQVcK/
-	 wa5ho8RtNi89g+ksvbtk0eT/2Uh7ThNlpO1mdSKI1JEZ/Q8MaexoJNjIlUxSHhKolJ
-	 6F028EEbF6XFbBKhxX6Es8AgEvl15vROCWjb4EFxVjjaRtxfsMhTaOTvH7GfNFw4WX
-	 v/N/pbJjD/ALQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: mkl@pengutronix.de
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	stable@vger.kernel.org,
-	kernel@pengutronix.de,
-	socketcan@hartkopp.net,
-	davem@davemloft.net,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [net,2/7] can: gs_usb: gs_usb_receive_bulk_callback(): unanchor URL on usb_submit_urb() error
-Date: Mon, 19 Jan 2026 10:19:03 -0800
-Message-ID: <20260119181904.1209979-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260116200323.366877-3-mkl@pengutronix.de>
-References: <20260116200323.366877-3-mkl@pengutronix.de>
+	s=k20201202; t=1768846808;
+	bh=faPOCLZKJVU/zamNNsx72NQDAHgJRXZ/aEAuEYR70Ls=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MfHTsFU/FQ+53v5IOrUasNGCLvDD1fAybXBm516D3uKfUnPL9ASrh1LgmslTwqXKZ
+	 s9pgCz6Xk0fU2LTUtR3O7zTwEyP5UNQ+u6gMI+Snq4v0IeNuSq7zjIH0QjLz036JmE
+	 6OtiaOk1EgYxCL7cbdn8muUcZi0Oukko8DApzxgsIWiPSHjDnhZ1A4IzUvjsajTEZ3
+	 +/1pqr1NQ9qw/9LFd77698wGOUW9reffQBk9yZRgf2Om+cpsqiJisUnLqgCst3NxVh
+	 H5LXnXkdQZfig5WcLpe9ruITfcJPamI7TXTJF+4xV6dW2bAA3iHk7tYRbkAsAWbSyW
+	 LYvrIbDkksH2g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3EC1B3806905;
+	Mon, 19 Jan 2026 18:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,58 +50,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] octeontx2: cn10k: fix RX flowid TCAM mask
+ handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176884680604.87873.3267605677897414797.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 18:20:06 +0000
+References: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: sd@queasysnail.net, bbhushan2@marvell.com, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, sbhatta@marvell.com, jerinj@marvell.com,
+ hkelam@marvell.com, gakula@marvell.com, lcherian@marvell.com,
+ sgoutham@marvell.com, george.cherian@marvell.com, netdev@vger.kernel.org,
+ alok.a.tiwarilinux@gmail.com
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Hello:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-can: gs_usb: gs_usb_receive_bulk_callback(): unanchor URL on usb_submit_urb() error
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This patch fixes an infinite loop in gs_can_close() by unanchoring the URB
-when usb_submit_urb() fails after re-anchoring. It also adds an error
-message for non-ENODEV/ESHUTDOWN failures.
+On Fri, 16 Jan 2026 08:47:12 -0800 you wrote:
+> The RX flowid programming initializes the TCAM mask to all ones, but
+> then overwrites it when clearing the MAC DA mask bits. This results
+> in losing the intended initialization and may affect other match fields.
+> 
+> Update the code to clear the MAC DA bits using an AND operation, making
+> the handling of mask[0] consistent with mask[1], where the field-specific
+> bits are cleared after initializing the mask to ~0ULL.
+> 
+> [...]
 
-Link: https://patch.msgid.link/20260116-can_usb-fix-reanchor-v1-1-9d74e7289225@pengutronix.de
+Here is the summary with links:
+  - [net-next] octeontx2: cn10k: fix RX flowid TCAM mask handling
+    https://git.kernel.org/netdev/net/c/ab9b218a1521
 
-> diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
-> index d093babbc320..192338b481f2 100644
-> --- a/drivers/net/can/usb/gs_usb.c
-> +++ b/drivers/net/can/usb/gs_usb.c
-> @@ -754,6 +754,10 @@ static void gs_usb_receive_bulk_callback(struct urb *urb)
->  	usb_anchor_urb(urb, &parent->rx_submitted);
->
->  	rc = usb_submit_urb(urb, GFP_ATOMIC);
-> +	if (!rc)
-> +		return;
-> +
-> +	usb_unanchor_urb(urb);
->
->  	/* USB failure take down all interfaces */
->  	if (rc == -ENODEV) {
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-[ ... ]
 
-> +	} else if (rc != -ESHUTDOWN && net_ratelimit()) {
-> +		netdev_info(netdev, "failed to re-submit IN URB: %pe\n",
-> +			    ERR_PTR(urb->status));
-
-Two issues with this error message:
-
-1. The message prints urb->status, but shouldn't it print rc instead? The
-   variable rc holds the actual error from usb_submit_urb(), while urb->status
-   contains the completion status from the previous callback invocation (which
-   would typically be 0 for success since we only reach resubmit_urb on
-   successful URB completion). Other CAN USB drivers like usb_8dev print the
-   return value from usb_submit_urb() in similar error paths.
-
-2. The local variable netdev is uninitialized when gs_usb_receive_bulk_callback()
-   reaches this code path via the short read case. The function declares netdev
-   at the top without initialization, and the short read check at the beginning
-   of the function jumps directly to resubmit_urb without ever assigning netdev.
-   If usb_submit_urb() then fails with an error other than -ENODEV or -ESHUTDOWN,
-   this code will pass the uninitialized netdev pointer to netdev_info().
-
->  	}
->  }
 
