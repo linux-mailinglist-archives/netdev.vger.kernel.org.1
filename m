@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-251011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E7FD3A225
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:54:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E186D3A240
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A64730086D0
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:54:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC82C3040673
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC8D3502AA;
-	Mon, 19 Jan 2026 08:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5934F3502AA;
+	Mon, 19 Jan 2026 08:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ynO91ZaH"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="RxaqWGhc"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7203D2A1CF;
-	Mon, 19 Jan 2026 08:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD27350A19;
+	Mon, 19 Jan 2026 08:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768812873; cv=none; b=MjEPzK3xPlcZJ6i4l7clocFNgNywvqKFLBEOp35P6XRcEeGuedcp2tl+nc9UDYV39uE4wSrElN0cPiztPlFKVL6JLM2hGvYBCtbnn//8ZR0GtSCnyhgLxVx6OyBwq2vF3JzMmkTRK+A+ohjBbxNunMvnLlqIMkBDvL2k8tQh9Z8=
+	t=1768812895; cv=none; b=bAUxVfKtcs4jAM2H3TEbNPlcbQ3ur+Nk4h8Or7sbElmwPEBXzYwUIk8cwXZTKg/B0h6PIf+ujp7tC8zip5ENx2oyWmfSxoF0Hp7kC/w1fethekAuvwThcm8GV+3/dFfpV3xDiQPwe2XqryQHtFVOVyWawPLXmofzHZ4CdqsfItE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768812873; c=relaxed/simple;
-	bh=McBfmnnEkA+VZYmqzhNi4kRUbW9eYfFWPDIlaRVdc2A=;
+	s=arc-20240116; t=1768812895; c=relaxed/simple;
+	bh=LzcMArRqWgQcXTYwxwzbB/77qDsZHUl+i9EJBPhIESE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tTFPLdm5doTs4yaClW258tldZh3eJGshwoTh2vd5uSxlzynlzk/gMjj1uWZvZxPyqlA8s0pz3wu5hIJlqd2fYLtBIOQpdC5ds2hd3mQoCSXBc5p0rQRP8NQSHwIkbC0tCcJtmXbKF14PmPjHJTEzZtn69iDnGTS5FGf575wHvj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ynO91ZaH; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=qtEFznKRj5D1RP/TONTS6uvNPVl3socqm8BXoWmvLrEGb6FCw1eV0QcVpnbFoujaBTy/7/un4MHIbsmdyOOxzobLHP3pQ+SmlIPHtszrQevwWCuVLNaTJEeS/LztRw6ReYXFhFbDSUJJgWIQp0rDtJ0jpwcr6DUE9nJAW1h+q6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=RxaqWGhc; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id B21E02074B;
-	Mon, 19 Jan 2026 09:54:29 +0100 (CET)
+	by mx1.secunet.com (Postfix) with ESMTP id 43D5620660;
+	Mon, 19 Jan 2026 09:54:42 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oXTVLUwhd0DD; Mon, 19 Jan 2026 09:54:29 +0100 (CET)
+ with ESMTP id 98DJpn7bfa6I; Mon, 19 Jan 2026 09:54:41 +0100 (CET)
 Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 96B7A207BE;
-	Mon, 19 Jan 2026 09:54:28 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 96B7A207BE
+	by mx1.secunet.com (Postfix) with ESMTPS id ABB3B201C7;
+	Mon, 19 Jan 2026 09:54:41 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com ABB3B201C7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1768812868;
-	bh=5BQ439mslfuweEeq26rQ7YLVOhzXbgR+eNZ0ziniS8Q=;
+	s=202301; t=1768812881;
+	bh=/JZWnbbYRAp9By2lYmPnf7Ew4d2bXhxV2boUsU8eHb4=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=ynO91ZaHWpNkzwo+KtJetZdEubVG/KQbbk7xxcIxnW0Xp+beQyeDkDKouZY20Lajw
-	 l/TjRFUIRkj88r8fTr5wcSwkXdl2lTc8cnK3Ag1JEEpFFpED/L932aqFU0LmQ5nhMm
-	 eVLWjrI8otXebM4AcNITQdvN4FJEiB78hnEG4vJ5edJiHr5uugZEaMwipTJEC9UmHO
-	 /t1YJFIDVbiD+Ix4bImIWxUPXFVnNsZf4YKbP7nufMLQpyb9Uh2cQnmireuKIIhGb8
-	 inMzfKea7yD22PB6JksKOXqm7tUZly3VCB1tFojUNtopcN7fTz75jbOa98EfGCfcws
-	 p4u1GBYDihScg==
+	b=RxaqWGhc/1vTeoONZe8cRa3yAbg5pxMEDzGMLOaHJuwXovhebO5dEHa6P612pVM0x
+	 g1z3l2bYerloX3Bi6hDFUztbnwgQUag/96I9/f1GI118QDG1HOxpXkGsFPBt8xy5eC
+	 SoOeg9eQHLizE4tlTlMW2r23LPI0dZ/d/NdnAdLQXwfsHRKoAY9396WVKgJAJLTSUF
+	 CZ+8nQA9gyJwVYcLde/sXPDGS3SeTaG58UFjPZJo7uRv0OC8PSbkd0dZAdmAzDNHKR
+	 YG2NuqR7IukmOUC3OGZ1PWu8l1NRpluZbXPO4K4fJD5huB2LpcDTmuXI2dVmW6XBo1
+	 vt5NAc7g6tFqg==
 Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
  (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 19 Jan
- 2026 09:54:27 +0100
+ 2026 09:54:40 +0100
 From: Antony Antony <antony.antony@secunet.com>
 To: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
 	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
@@ -65,9 +65,9 @@ CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
 	<pabeni@redhat.com>, Chiachang Wang <chiachangwang@google.com>, Yan Yan
 	<evitayan@google.com>, <devel@linux-ipsec.org>, Simon Horman
 	<horms@kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH ipsec-next v4 2/5] xfrm: remove redundant assignments
-Date: Mon, 19 Jan 2026 09:54:08 +0100
-Message-ID: <564f0e34f10b89448988cdf3ed933987707d268a.1768811736.git.antony.antony@secunet.com>
+Subject: [PATCH ipsec-next v4 3/5] xfrm: allow migration from UDP encapsulated to non-encapsulated ESP
+Date: Mon, 19 Jan 2026 09:54:27 +0100
+Message-ID: <1dca41a449546d20a236c517272f2d6a34510deb.1768811736.git.antony.antony@secunet.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <cover.1768811736.git.antony.antony@secunet.com>
 References: <cover.1768811736.git.antony.antony@secunet.com>
@@ -79,46 +79,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-02.secunet.de
  (10.32.0.172)
 
-This assignments are overwritten within the same function further down
+The current code prevents migrating an SA from UDP encapsulation to
+plain ESP. This is needed when moving from a NATed path to a non-NATed
+one, for example when switching from IPv4+NAT to IPv6.
 
-commit e8961c50ee9cc ("xfrm: Refactor migration setup
-during the cloning process")
-x->props.family = m->new_family;
+Only copy the existing encapsulation during migration if the encap
+attribute is explicitly provided.
 
-Which actually moved it in the
-commit e03c3bba351f9 ("xfrm: Fix xfrm migrate issues
-when address family changes")
-
-And the initial
-commit 80c9abaabf428 ("[XFRM]: Extension for dynamic
-update of endpoint address(es)")
-
-added x->props.saddr = orig->props.saddr; and
-memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
+Note: PF_KEY's SADB_X_MIGRATE always passes encap=NULL and never
+supported encapsulation in migration. PF_KEY is deprecated and was
+in feature freeze when UDP encapsulation was added to xfrm.
 
 Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
-v1->v2: remove extra saddr copy, previous line
----
- net/xfrm/xfrm_state.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/xfrm/xfrm_state.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 9e14e453b55c..4fd73a970a7a 100644
+index 4fd73a970a7a..f5f699f5f98e 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -1980,8 +1980,6 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
- 	x->props.mode = orig->props.mode;
- 	x->props.replay_window = orig->props.replay_window;
- 	x->props.reqid = orig->props.reqid;
--	x->props.family = orig->props.family;
--	x->props.saddr = orig->props.saddr;
+@@ -2008,14 +2008,8 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+ 	}
+ 	x->props.calgo = orig->props.calgo;
 
- 	if (orig->aalg) {
- 		x->aalg = xfrm_algo_auth_clone(orig->aalg);
+-	if (encap || orig->encap) {
+-		if (encap)
+-			x->encap = kmemdup(encap, sizeof(*x->encap),
+-					GFP_KERNEL);
+-		else
+-			x->encap = kmemdup(orig->encap, sizeof(*x->encap),
+-					GFP_KERNEL);
+-
++	if (encap) {
++		x->encap = kmemdup(encap, sizeof(*x->encap), GFP_KERNEL);
+ 		if (!x->encap)
+ 			goto error;
+ 	}
 --
 2.39.5
 
