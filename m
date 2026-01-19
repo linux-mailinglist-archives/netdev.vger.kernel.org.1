@@ -1,155 +1,174 @@
-Return-Path: <netdev+bounces-251035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72051D3A349
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:40:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661F3D3A3E3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6EAB230038C3
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:40:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EEEC33087CE0
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F46350D78;
-	Mon, 19 Jan 2026 09:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E313093C4;
+	Mon, 19 Jan 2026 09:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="vkfazezO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeNy9/X1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9622B247291
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116EB3093C7;
+	Mon, 19 Jan 2026 09:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815638; cv=none; b=UQXLnzrfc/DmvpuRWE+PgoMfpHgPjcy4m8oPcIKy75hxKDDEohQgjO4HILxdylrlAGY3lqwyMgHMlgf/Hz8s+XnfBpwmuFq/dxqfrbJrNc9pntqDyk9vQx43+oRE+egXE5FRHG16CiIpxM2JUMpKYp3pNo9QrU5zZoTcToDaalE=
+	t=1768816460; cv=none; b=TbZh94qFZ3xquTmeS14VWFmYw7BU0YQmAJo7Q60Zs323UltxH+K0R7VnY3F0c7gOa1Z5IapgKxXEe6iWcJz0oFnp+KCWNeEsfBeyTtgldo1YvmoojBqnatFiceDqStC1myfQyTmGeGMZDZSpjU/H9uG95G+ok/uqxKndb4c0SGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815638; c=relaxed/simple;
-	bh=ZnDvlhRBDUBVsMZvEMZNqDnvf79Xo9/jr2jIUmXIFYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGXPoUu+Kq0qgxSlzsdNgmrOzBtKKo7VWtGR2NY/Pg+VLco9YKISk8/vACbKzmopK9b9ucUeqcwUTlv2Op97in+EScYN69YZEVklxJBtpOjnAmpeGi2AwDkqK8SITjwKeSWK5TNUbQtz3NJpWcCGv0btKVFfyS9kYm/PEhOX9dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=vkfazezO; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47f3b7ef761so21274875e9.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:40:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1768815634; x=1769420434; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0tfLHZjioonH3s8pCxwjKiUeh2LK//GGZEDTJFRhKg=;
-        b=vkfazezOLxhS1L1OamA0MU+2tws0+863COc6r6loeFzOOwZjdRRVEAqReGbYImwBGu
-         1kCIGmFcIK8MxuZdaaM5J8yJddyFqVuOYm0YFKgGyGe5d1N81jst0oLs4Uhj+0C88ztB
-         d1nz5uq+T2NCG5MlVgj0vQtANfqTwvIL5P6bj4/HjerUNZbbqmZsuXqw2UyBUCIxghZ2
-         qCYYBLsrY83UDwCll3KzdKYD2Mb8GbAvAeW1bVXilraT+rBwrflhSCHmtlMFouCkspmX
-         tFzGl0Uin9rXMbLZljMZ4eDRcl/eHM+4KLJfUC+G1ZXJUI0rdHLz6wi20M5Uf8sxzTXb
-         FYJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815634; x=1769420434;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G0tfLHZjioonH3s8pCxwjKiUeh2LK//GGZEDTJFRhKg=;
-        b=ZsNz+VhStsdQxgSCV5XPEOm3gVyYqoHR1jI4oebOhYDorqbNRO7+SaCixx72+LVzRf
-         KUT7TSn80OdYFAuxDpF7cLyeF6XuhPmujqAyoVcrUgm+ym2+geHaXwWAL7kkMijmA6C7
-         caX4QtFeFltFwzINsmkTuDP7rQTjZfdxi6bZdA+7ZBOo/L8Xl6H/ZNJg3b32Jg7dYu0w
-         OxdBFG0EKkXU4npdgXdqyW0HA7TSlA297u60MRc4ui9vP9PTE62BtxbBLYrpPwrY8C2h
-         afWyVsFTWC3UqpNnAJ8BkciZa5ZLZFIUkPdqOKz6dDzqRms22OI14TYyJK8Z43WbL2Jh
-         ERDQ==
-X-Gm-Message-State: AOJu0YyA2bDJOAbTcj74B4Q4MD+tKfng4GPWNxf8NO0D48Qk+I5S1XKk
-	SotHaeq4TypepliBs6ul64ctjOtALUHubXyb4kaDSjPHckkY50jU0i2n92Gq//U4WGzgsuXRiT0
-	2/xUR
-X-Gm-Gg: AY/fxX6sYZ0+EuyBRlCtvd90OCiuYQ6MkheYft8woD4YoZo0VMgXEKPwHwKzqkUwkcT
-	XA/TCxMCrq8hYQUYIF53y4rOl/LiPpizmV7/7EaoEA/NsswbehlVzdJvWIIMbfxx0kkwTQgGLCo
-	vI4fuXHEbQJoeIhXpUlvhzjQ5fY0S/MRh4IL0PnMnx8Wykp6oOw0No26C4A2W3imX088Xa2yaNK
-	xCp0tvWyrlRJdi37yyQ/FUvuYLE0iXTAtNafdVlJ/uQdgOokn452Py0X2GMD/LoYdHB15p2LZgA
-	PDMukWNaGfcZf9eTregEEVyonxiVe51QevzGWKy7GwzASd7NoSOVcmPmw+2S9J3pIWXpzRkd8pZ
-	LCvLZ2jwBLnzomsiqX0VATkpdyNagakEkIpn0k81KtefZMGgrWmciuU5ftLcj2RGqw/hFFDlGp6
-	TiZq/JaLft1bnh/MjkdT4ZCj8lEEOxulTNSLWvhj1RY5bSn8k9M5XoYOfo/wrJ4KZIbJBDpMyf
-X-Received: by 2002:a05:600c:4e50:b0:47e:e946:3a59 with SMTP id 5b1f17b1804b1-4801e3503fbmr130220275e9.34.1768815633945;
-        Mon, 19 Jan 2026 01:40:33 -0800 (PST)
-Received: from localhost (p200300f65f20eb040fd825a50706214d.dip0.t-ipconnect.de. [2003:f6:5f20:eb04:fd8:25a5:706:214d])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4801e8caceesm182069815e9.13.2026.01.19.01.40.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 01:40:33 -0800 (PST)
-Date: Mon, 19 Jan 2026 10:40:32 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, linux@armlinux.org.uk, hkallweit1@gmail.com, pabeni@redhat.com
-Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
-Message-ID: <4ltztdbct4ce6elmnn7wx5fzh4lywlfbjrn75pdju7cdsw4q2j@ubq7qaa4regr>
-References: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
- <20260117232932.1005051-1-kuba@kernel.org>
+	s=arc-20240116; t=1768816460; c=relaxed/simple;
+	bh=J4nwEZIVoATz20DGRTmblZGUhdJB+XrPtB67DJbiZVc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RGV0JjQHTIUvVgvjosZ4RDCADA1pG5y8JRM3UFphrND4OGKj+Bz5jKxsY1eLHaeaYrFCw14lvz93v4YqijQqJ/SSw2Auvyk5kdtgjTJgS47MXBQZ2CgmxcL32675Sl2AEOODXEq002RYFJtJ86mktv/dOaicGHpSARFFNgTJ0iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeNy9/X1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E2E3C116C6;
+	Mon, 19 Jan 2026 09:54:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768816459;
+	bh=J4nwEZIVoATz20DGRTmblZGUhdJB+XrPtB67DJbiZVc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FeNy9/X1lS5XBkqNN/aX3doUGJOHyD12yaWxh58XQsIHL3TmOHyF1AU4Lei8Vjfxj
+	 URkbyKgGRe4/dotfOjsbnBWmcrz83gWmu1JK/TBClBEGecp6pauy64106AXmWJ3lxy
+	 pBuPWM65/qpYC1po0XI1ixvOPCaJegw/CxHWeQTOjQtDyu8rJIsFa/efGYNIHrLSJZ
+	 Zm/Dq7g1BAFfaw9r/XDUizkEj/tPn1O05vYQZjXMqXiOZ2H+NNCba+YD4xjOgBMuBC
+	 Sl+Hh8GjFha+91s/SE2YdZT1rDI+qMNn9zW18csB+jWSaz4U8NEkD2sBGc/f7Mqj/D
+	 hIlX9VJI8XWfg==
+Message-ID: <34a10265-e6de-489d-b079-6f6c5cc48dc7@kernel.org>
+Date: Mon, 19 Jan 2026 10:54:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jeie2bjeg2jhiq56"
-Content-Disposition: inline
-In-Reply-To: <20260117232932.1005051-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
+ tracepoint
+To: Leon Hwang <leon.hwang@linux.dev>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, kerneljasonxing@gmail.com,
+ lance.yang@linux.dev, jiayuan.chen@linux.dev, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Leon Huang Fu <leon.huangfu@shopee.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>,
+ kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+References: <20260102071745.291969-1-leon.hwang@linux.dev>
+ <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+ <20260104084347.5de3a537@kernel.org>
+ <8dc3765b-e97f-4937-b6b9-872a83ba1e26@linux.dev>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <8dc3765b-e97f-4937-b6b9-872a83ba1e26@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---jeie2bjeg2jhiq56
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [RESEND,net-next] mdio: Make use of bus callbacks
-MIME-Version: 1.0
 
-Hello Jakub,
+On 19/01/2026 09.49, Leon Hwang wrote:
+> 
+> 
+> On 5/1/26 00:43, Jakub Kicinski wrote:
+>> On Fri, 2 Jan 2026 12:43:46 +0100 Jesper Dangaard Brouer wrote:
+>>> On 02/01/2026 08.17, Leon Hwang wrote:
+>>>> Introduce a new tracepoint to track stalled page pool releases,
+>>>> providing better observability for page pool lifecycle issues.
+>>>
+>>> In general I like/support adding this tracepoint for "debugability" of
+>>> page pool lifecycle issues.
+>>>
+>>> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3],
+>>> which gives us the ability to get events and list page_pools from userspace.
+>>> I've not used this myself (yet) so I need input from others if this is
+>>> something that others have been using for page pool lifecycle issues?
+>>
+>> My input here is the least valuable (since one may expect the person
+>> who added the code uses it) - but FWIW yes, we do use the PP stats to
+>> monitor PP lifecycle issues at Meta. That said - we only monitor for
+>> accumulation of leaked memory from orphaned pages, as the whole reason
+>> for adding this code was that in practice the page may be sitting in
+>> a socket rx queue (or defer free queue etc.) IOW a PP which is not
+>> getting destroyed for a long time is not necessarily a kernel issue.
+>>
 
-On Sat, Jan 17, 2026 at 03:29:32PM -0800, Jakub Kicinski wrote:
-> Does adding these bus-level callbacks break PHY device probing?
->=20
-> PHY drivers register via phy_driver_register() which sets:
->=20
->     new_driver->mdiodrv.driver.probe =3D phy_probe;
->     new_driver->mdiodrv.driver.remove =3D phy_remove;
->=20
-> The driver core in call_driver_probe() prioritizes bus callbacks over dri=
-ver
-> callbacks:
->=20
->     if (dev->bus->probe)
->         ret =3D dev->bus->probe(dev);
->     else if (drv->probe)
->         ret =3D drv->probe(dev);
->=20
-> With mdio_bus_type.probe now set, phy_probe() will never be called for PHY
-> devices. The same applies to phy_remove() being bypassed by mdio_bus_remo=
-ve().
->=20
-> phy_probe() performs essential initialization including setting phydev->d=
-rv,
-> reading PHY abilities, configuring EEE, and setting up the state machine.
-> Without this, PHY devices would fail to initialize properly.
->=20
-> Was there a plan to update phy_driver_register() as part of this change, =
-or
-> is a separate patch needed to handle PHY drivers?
+What monitoring tool did production people add metrics to?
 
-I think the concern is valid. I'll look into this and send an update
-when I convinced myself that I'm not breaking anything.
+People at CF recommend that I/we add this to prometheus/node_exporter.
+Perhaps somebody else already added this to some other FOSS tool?
 
-Best regards
-Uwe
+https://github.com/prometheus/node_exporter
 
---jeie2bjeg2jhiq56
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+>>> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only
+>>> Page Pools associated with a net_device can be listed".  Don't we want
+>>> the ability to list "invisible" page_pool's to allow debugging issues?
+>>>
+>>>    [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
+>>>    [2] https://docs.kernel.org/userspace-api/netlink/index.html
+>>>    [3] https://docs.kernel.org/netlink/specs/netdev.html
+>>>    [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
+>>
+>> The documentation should probably be updated :(
+>> I think what I meant is that most _drivers_ didn't link their PP to the
+>> netdev via params when the API was added. So if the user doesn't see the
+>> page pools - the driver is probably not well maintained.
+>>
+>> In practice only page pools which are not accessible / visible via the
+>> API are page pools from already destroyed network namespaces (assuming
+>> their netdevs were also destroyed and not re-parented to init_net).
+>> Which I'd think is a rare case?
+>>
+>>> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
+>>> notification is only generated once (in page_pool_destroy) and not when
+>>> we retry in page_pool_release_retry (like this patch).  In that sense,
+>>> this patch/tracepoint is catching something more than netlink provides.
+>>> First I though we could add a netlink notification, but I can imagine
+>>> cases this could generate too many netlink messages e.g. a netdev with
+>>> 128 RX queues generating these every second for every RX queue.
+>>
+>> FWIW yes, we can add more notifications. Tho, as I mentioned at the
+>> start of my reply - the expectation is that page pools waiting for
+>> a long time to be destroyed is something that _will_ happen in
+>> production.
+>>
+>>> Guess, I've talked myself into liking this change, what do other
+>>> maintainers think?  (e.g. netlink scheme and debugging balance)
+>>
+>> We added the Netlink API to mute the pr_warn() in all practical cases.
+>> If Xiang Mei is seeing the pr_warn() I think we should start by asking
+>> what kernel and driver they are using, and what the usage pattern is :(
+>> As I mentioned most commonly the pr_warn() will trigger because driver
+>> doesn't link the pp to a netdev.
+> 
+> Hi Jakub, Jesper,
+> 
+> Thanks for the discussion. Since netlink notifications are only emitted
+> at page_pool_destroy(), the tracepoint still provides additional
+> debugging visibility for prolonged page_pool_release_retry() cases.
+> 
+> Steven has reviewed the tracepoint [1]. Any further feedback would be
+> appreciated.
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlt/A4ACgkQj4D7WH0S
-/k4GiAf/TlIqRlDEomfU50E0GgRFhDP6zMg8GChvMzbHDpW9CiwTYLjzD9BKoTHj
-cA+ONmFEyC2cYNrHYjpqcKmlaHsWAHMKtFPKNdQQUDEcy7gfU1B5ps5OD3JQq3ah
-fbqkklpmPnLI6DPmc7010aZaaYDzeQit2bTh+3XPqQP7nBpJ+lR5jhSOKzKoKKKq
-AgIwhG/Tpp/qjWF6GQ0HuH7uWRcmNekcj0p+YQgqXBDMKedFjCYmO0wh76Htg8vo
-slxZWg1wb7Fh6mpgVtD/WAntuhehqiUHAD8KIqDyatOpl0YuIJRGIDEu1l2P9bC6
-Q72Y4QrojgOn1qFHGHZasWAiYv3N1g==
-=Myok
------END PGP SIGNATURE-----
+This change looks good as-is:
 
---jeie2bjeg2jhiq56--
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+Your patch[0] is marked as "Changes Requested".
+I suggest you send a V4 with my Acked-by added.
+
+--Jesper
+
+[0] 
+https://patchwork.kernel.org/project/netdevbpf/patch/20260102071745.291969-1-leon.hwang@linux.dev/
+
+
+
 
