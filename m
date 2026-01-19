@@ -1,222 +1,213 @@
-Return-Path: <netdev+bounces-251058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D5ADD3A7B9
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:03:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1DFD3A849
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B2C8730049FB
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:03:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A6093004B9F
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69318358D3B;
-	Mon, 19 Jan 2026 12:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978F434D4FA;
+	Mon, 19 Jan 2026 12:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dhw7hgNP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2panOLtA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011019.outbound.protection.outlook.com [40.93.194.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4396314A62
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 12:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768824215; cv=none; b=JF4SfJL0DER9in919f8jq0dd8xuWAmL/+ik3r+hmhRWerUdOl9DEQSOHpHd+DQrQhHXxE7FO9rAto/eNAUyKCaJfkpjI9vfVo0EAoanw0zn7tlBRSy87qoeDSeh8DZ7jpJS8LdC3tBEURiz4AUws/RUwklAMSXzVNylSzBjN0Fo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768824215; c=relaxed/simple;
-	bh=8I29BCfIKiLgtdEVGUIyfgW5ObtzvtJM9btdY9aaQXE=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tspNc4f8MXY9nxSg1qVPdQj3P90QILNEMq3pJ4tsXt17A7w9VwmBn+losO0GznfAAf5Xrq/TgjVrdIBzFtHIf843WTEB9DCzMMiBpJTyiGpSdQ3+s3AqdvtrzRyRdZbWXc95ac+COlsLxTqJ13StRUl9yzjQa4KDH0IMmG5a3yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dhw7hgNP; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-480142406b3so20333555e9.1
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 04:03:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768824212; x=1769429012; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kzaz1i9qc6G7xsP+1FC5njEiUedEPzYKnb9i6e2a56w=;
-        b=Dhw7hgNPaDHaDD1COvglU9JeUdScoVHUI72cio5sxGyByUXJTHoDLt7hQtJpLTjiZ+
-         B7eYt4vPaNBsB0d9M5+eE7x5Rdj9hnsXIYDQW2PSg3ivYMYUE/0aHtHGWiKCwXbD4I9+
-         pOezuh3tG+jhBLXtlg3jXOOqju7zW0ayu3bSSHGm52gDOuy/kT78SUjcsm+jCRpCF/ja
-         AcFcgJSufA5HSybR3hLgGTDPEQOFmQlxukFFYdhB7RHtzLqltZV88KRflVEqPTOVVM9I
-         IlSmhTMKUDELsH1Wjc1tJPIygYGrUh1kEY2Qg6EnSsBQVlQWazOd9bN1iuS5l5E31E+t
-         U1tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768824212; x=1769429012;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kzaz1i9qc6G7xsP+1FC5njEiUedEPzYKnb9i6e2a56w=;
-        b=T9LVoArlssNei6j2E8btn1AKFZLElb8m0kz9KzP8K7Uf9TiW+UmQHftJva6b1EPmeK
-         Ju82DgBnuXeCNhqm0A9DUf61EMzQOaIsNo3lhj5xEL2rT6Q9lAd3z4477rt1so6bt3nO
-         +W8LZvIFt8O0B83j8wDyPXV+P5aGPA7r0N70Y7kLrhNexaA+AjKtvFnGTY/22qwwccZ7
-         zQ287HMDP74DzNql7hxAc1Y1djmjXJd86SWOH0oNypRjoWxXB1olVwViwXUIiI2y4wOY
-         a+YqqXaj0vxnrk6hc7gNkAKsWSNrHizr581ibc+NB4hGW6XLd8k43P28ZnyqajmgtFIU
-         zueQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCC0PPvvUMQSGXXlFpjDAUEu/yNtYXnDj0N49ayF7hZh6qD6rQ/wYRSsKOI2rvrujPwwDMQwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc8ET+6/09zkx0icYsQ17x3hE0xdgt0H2l1ZrsUGZaez4U4xkM
-	GFsU49v2yESmrbZt7FnSyM+A8qr1dIxkVTatOJ0Uv9Pmafvopw0bfx2l
-X-Gm-Gg: AY/fxX7Kgr+Yrkbj7eFKVVcdlSFzqnSp00uvK8ShUypZUf8zPsarsaAwAieZQ1ofJB2
-	biuq0cpueoY1MVBfZBxzwQeuNauSZoZTYJDPfvC1U9qBk3di4wKwlTDxZnSxL3KNkS+SY1XP11e
-	vbtjVA6d/jVhh+ZiTRdbzFfa9OL+vROxW7t/GwiTZTCD7vqWsANY6IWS20GyP2jB+sxc493phbP
-	vaHyBEMxPiIzu9VX0DtrmK/djC8R6VryD7rVVkhAJPEZe03xCmfBA6shaYrU/siW5ya62rVz4yZ
-	uxzJ+br984CUNPlCr5jXosNobM5eKAJWyaNIbqqCXJ9ls7/qHdluZXCGnmxR+ALRHH3fCfG2BhX
-	sn+NeGcIQ2+igwGMBgOYcgwrBmboALoDTu3+xst2xGKt+kvW1LYvJm9d5+eSFsOR2lS1f9Sunvh
-	XlKFbG77vSbPkbwDY1vS9Kyot5sH1SQGG/F3nEezg=
-X-Received: by 2002:a05:600c:1f12:b0:471:14af:c715 with SMTP id 5b1f17b1804b1-4801e2fc37bmr117353555e9.3.1768824211594;
-        Mon, 19 Jan 2026 04:03:31 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-88-81.ip49.fastwebnet.it. [93.34.88.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4801fe3b01csm83250955e9.5.2026.01.19.04.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 04:03:31 -0800 (PST)
-Message-ID: <696e1d93.050a0220.7cbaa.5b25@mx.google.com>
-X-Google-Original-Message-ID: <aW4dkcDb8LikqH-y@Ansuel-XPS.>
-Date: Mon, 19 Jan 2026 13:03:29 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
- EN7581-7996 support
-References: <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
- <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
- <aWfdY53PQPcqTpYv@lore-desk>
- <e8b48d9e-f5ba-400b-8e4a-66ea7608c9ae@lunn.ch>
- <aWgaHqXylN2eyS5R@lore-desk>
- <13947d52-b50d-425e-b06d-772242c75153@lunn.ch>
- <aWoAnwF4JhMshN1H@lore-desk>
- <aWvMhXIy5Qpniv39@lore-desk>
- <30f44777-776f-49b1-b2f5-e1918e8052fd@lunn.ch>
- <aW4QixwAJHaHWBBc@lore-desk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A6522CBF1;
+	Mon, 19 Jan 2026 12:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768824645; cv=fail; b=pLwvOMyVfZ+xPOq7Ac4p1eRcdDep8RS6ZIekr0uUd0O2EO0DSHsXB823GvqUe5E0Bayv1uwiojcda5H1NDBf3ID1KeSuA6JJH4EoED4EaucANDW1c1ZZShfj20eYRxq2IoyXlBPRUJf8mjyzEZdU61i85O/OCgEUAVPFNej+5EQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768824645; c=relaxed/simple;
+	bh=5AYiR2MxSwPXYLWbyiUD6TrfRy25rbBuq8xcKTZd4Ts=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OXZBJNuaqMDd+y2rtJokyx5P8/b0GxXj5s59kFyIRyqXWuwx9eZ+Luf/H0dnNxF95o855EbgfbLkLsiaKT3QnR+Jo+50owjkG+niat7N6Hyyyq5F48+KEs26JvWCLN3IMlKcwCt4ud3ghUSX1nTV5vJN8JKcDcdNdoReJnHiNrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2panOLtA; arc=fail smtp.client-ip=40.93.194.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nwfdZ/0sfbEQQIdaezufurEpr260JgLKZ7Xwfo8aUL6A+nOqmZL+fy+eRdGM1DeZoA0b7PH5bI9QZKlSs3hjbsTd5Zy5FHVnKN7vbkOGBTy5ZXF3BYhRRVPQ0UUuWbfB7eoIKBhTrIrvX8RVBLB7vjuIqSieBskah8WSO1/gCaz6igfJzhJqHN1xf0JDkw5w4ykUdsgKeFVERU6iE+0ePx8Az1SotZ6TvKLzxPpCnjP8zDDuDDiedN2Efz80QR7m1v/fDacmNgnmjqgq/ZEFpqrtugpp+zPtZsUM/LUvWuYVR+2p4nBgL2ySpIxrWpdaSQ5jIk4dXOkFJZkuEEVgMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tcQtomXfPDa0hSsnMCmielc2XnY0M+O/1AKtV645RAk=;
+ b=YV7qabgHrA5NqFKioq5B3fHwQ0akY7DhIYZpdrUNK6aY5Iuxo8er8ThAOgVUbpPG9jZrZM/VXbZoIMgrdPHFidJMqKVIhxRt12zPu70oZD/9v3kIL/JzQ7I2BJnYZbErty0J+Tg0WGjlst7KhH1TLNMIy8fKT1FQ07UeCCuEBBzaZ0xLbYBQ9CyWtlLchXlrN/eA0CJfOO6kBOtFtQel4x9+7WdY12JmTtj7CGuJ0S2gTtCizxeX+71mEKqbqUVCdfZDBmbLAOnrhYoo4a2enYEIdvodnUAe12GNnQtkydY/RfHcVcIhwfr0l3ZXD/2at8oI15yFbVXAJKhpDy67+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tcQtomXfPDa0hSsnMCmielc2XnY0M+O/1AKtV645RAk=;
+ b=2panOLtA9wFccZF9ta4vrfUj2+GH6ldIxe7EXJ6T3gq1nOQMpYqcn/k69BOiNIKSnMMtXEgYdmNzSLzYchTQITL8X+Hid/n3WyahVesLzqUwIw1fb9QXdBhHn63ws/gjy1i1ou/IzjlwXh8LYEm69mUSLcnD73ot2lnXh430+yw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
+ by PH0PR12MB7839.namprd12.prod.outlook.com (2603:10b6:510:286::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
+ 2026 12:10:40 +0000
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421]) by PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421%5]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
+ 12:10:40 +0000
+Message-ID: <fee2cc4f-5001-4734-b0e0-ae548801329d@amd.com>
+Date: Mon, 19 Jan 2026 17:40:25 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 6/9] net: xgbe: convert to use .get_rx_ring_count
+To: Breno Leitao <leitao@debian.org>,
+ Ajit Khaparde <ajit.khaparde@broadcom.com>,
+ Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
+ David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
+ Bryan Whitehead <bryan.whitehead@microchip.com>,
+ UNGLinuxDriver@microchip.com, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Potnuri Bharat Teja <bharat@chelsio.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20260115-grxring_big_v2-v1-0-b3e1b58bced5@debian.org>
+ <20260115-grxring_big_v2-v1-6-b3e1b58bced5@debian.org>
+Content-Language: en-US
+From: "Rangoju, Raju" <raju.rangoju@amd.com>
+In-Reply-To: <20260115-grxring_big_v2-v1-6-b3e1b58bced5@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0080.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9a::22) To PH7PR12MB6395.namprd12.prod.outlook.com
+ (2603:10b6:510:1fd::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aW4QixwAJHaHWBBc@lore-desk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|PH0PR12MB7839:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0fbd2df-7804-4159-d23b-08de5753c2e4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YUZGN3oxZHEzSmdtNzBEMnNtckREWkhMWm5yanpBQ0R1Uy9ocW5WRXNPQmZZ?=
+ =?utf-8?B?a0V4Q1NKcnduMFNHMFhSYUFydCtTNll1UFJaYnVxK05ucHdSWDYvSU9VaUFz?=
+ =?utf-8?B?Mm5sd2xyWUhWMEZ2Qnd5eTczTzhPRENNK3ZSZHF3U2JKcWtzRjVBa2tmYkN6?=
+ =?utf-8?B?SFh4OGIySVZjRXRZdzZWejhycjhFNGZyUlFhOXFJR0x4YllzL2Qrd3VQcmEz?=
+ =?utf-8?B?SjlHOXBGb2dxdktXY3U0YmI2cDNWY1ZpSUoyQWdkWjBrVjlqZXhZcWdob0Vr?=
+ =?utf-8?B?QjdFNWtpa2MxckFmbmt2R2MxR09veHh2M1JOYnNOZnVTdGFpZ25mNVNFZ2tM?=
+ =?utf-8?B?RnRVUUlkeXpyNEo0NFYxUTdFUlVTNmdsTFF2dmVvaFZJQXQ2eFlZaGNyekJn?=
+ =?utf-8?B?TExPZWxwY0E1L2djY0NCckhhc1Y0aHNGaWEvc0tmMVRYL1FEN0padzVsMW5u?=
+ =?utf-8?B?eHpDLzhaNXVIMUkrd1o1SUFmaEkzVTdFNHhwRTEwaVpGZEVTNHJCNlB6OVBl?=
+ =?utf-8?B?aUVLeXdtNkF1b1dlaFVwbFVCVG5TcFZKWk4vaThudTFicFJaaHNmWUdMS29n?=
+ =?utf-8?B?UDk2cmlHNWU5bFFqQ0ZOS3hoMWVCdDUyYkhLcTJ6OGJJZ1lYYTRocjJwcGJO?=
+ =?utf-8?B?bGd0cG9MdW5TQmtISXh3NVVrd0wxOTlja2hLSGpzNmV4QkVzdFZmY3FzNDg0?=
+ =?utf-8?B?SHNzS0dOWUg4UDJGTTVtWG9rMkRBTTg2dFFPNVpaUE1JaXpic0NiR3U5WWY0?=
+ =?utf-8?B?TFdkK2RJYi9UNFFFY2hGY3UvYTJVbTN0aE94WGV4bEJUU1pJOHAxaWdkRW5Q?=
+ =?utf-8?B?N3RMT29abmtPQTREemlLS1NtQW5iQi91OElvWlpwK1JBT0ZtbmtzVzVLK0h4?=
+ =?utf-8?B?K0R0OFdSZzc3N2lXZmx1dlg3UlJQM01jRWNhNnBuUmZrSHhjZEp2MlhPVmIr?=
+ =?utf-8?B?bFdFSWxXZkZGNDFTWnFJbHl3ZWY0VkFSTlRQalQ2amZacFNWMEpvL3JoamJH?=
+ =?utf-8?B?MmwzZmJGN3J4RTNacVRCUzc2UWpXeUtBaDdpZXY2ZnRYbWc1SFNZeVh1TlJm?=
+ =?utf-8?B?MnVPYVhZS2VPQlBrbk9zNGZ2dTlSTGNtVEg3QzFPMHhIZWVncHUxdjZzTW9l?=
+ =?utf-8?B?RTJ6NHlvNUNCMUgxMC83WVhsZ0FBMW1SNk5vRHg1QWVmem1QdmxHaDNkWlZi?=
+ =?utf-8?B?aElhaGdxMCtsWDZIK2h4eTBVdUpnMVRwdlJ0L1JRcTE3V3Zjcy9kQWdZS2cr?=
+ =?utf-8?B?NldxNUtNa2w2RkFQcENFY2pVM0hsVG9zMnE4dHpEMFJERUpyV2g4U1FxZHEy?=
+ =?utf-8?B?VW1tcDZQZTU3Y015RHNnQ2swdUV5em4wRHpBVE9FY20raUVnZ0NMV2dMUjNE?=
+ =?utf-8?B?NHVNeGNjWWNPbVhVcUxRdjI4UFJpTUU0ZjJBKzFtVi90dWJKb3VkYUJXdFhR?=
+ =?utf-8?B?RjVvcS9oaHl4K3pjRUtkdzA1dzhNL2R0MW1nUjdSc3ZWcXFLckFZYmFTYXRS?=
+ =?utf-8?B?QTFCTzV1dWRTUHNxL1ZrYW9ZMkdRU3N3TnRYNFl1RnY5bnU3K0YvTjF6TW5L?=
+ =?utf-8?B?cVVnem5FL3RZVjJpQ1hJSGo2a05aNGQ1aGhmVlhhYnNnb2NQNWIxZ2RiSnpO?=
+ =?utf-8?B?bVNzNEFZdWNzVHNodGRleW1jR3IwTmpXbitYN3lBQWFGQ0t1SklBbnN3Z0tP?=
+ =?utf-8?B?VlovQnpYNWtqS2FOdk14VTRMSG9SUW8rY0NqLzJDRXJHNlJyVFN0bHBZTnl0?=
+ =?utf-8?B?a3g1NnBheVZjVXZlckdtY0FwdHBaRDFtUThJUDdobkVUblNmQnBHd083SDJz?=
+ =?utf-8?B?U3RwL2Rxa3ZSY05NZ0lwdE90RUxDNWZ5bE05aTVpcnhxZ3IvS256eHF2OXBs?=
+ =?utf-8?B?alRYNWVRZnJ3N01JT0ljZW1GdzZWVjZ3Uk1KODl0VnQ5NmVSSmloV2pmbVZC?=
+ =?utf-8?B?cHB4MlRIaGpsby9tVG83RUVEcDA5U1QxcEw2UW02UDBmb3FFOFlhR05maGYr?=
+ =?utf-8?B?SFZWa1FTdXp5bHdhRkRyanRaWHpjOEpnRVpnVXBhZnRqdS9yRi91bW1zaXhq?=
+ =?utf-8?B?Q2xwdTZyNTZaemRwWmlMcEhjSWhwTXc2WjJxZnBpakRyUVhsNzYzZnF1TGx3?=
+ =?utf-8?B?bEV1VVhwN3NJZm1wWEhuV2REME5PUFYxZndlOGlacCt2MHlkaGN3RjVJamxh?=
+ =?utf-8?B?MlE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d2Zxc2hPMDBta2liUG5qREFPcG5LbytNZHhWaW1KL2F5ZXovbGJYcVp0aVdw?=
+ =?utf-8?B?eWQ4UVNWOHdZZVdHYzFZNWJVWU9CanlUTlMwZTRCZitocTNMclovT1hOTEd2?=
+ =?utf-8?B?QUVSaUhiWkFxMTlhSWVDNDhzMStnc1ZQUUxPcUJVMmNyQjV6bFVONjJjUzZV?=
+ =?utf-8?B?eUtkWlV2MXFxTjdVRnBuejZvbi9JR0FKZVQ3WitybE8rVzVhYmZiUit6bG5z?=
+ =?utf-8?B?aE1jeDk5S3lTeS9MZXQxRHp2cTJtRCtHenhaWmVmQ3JZUmxWbnRBdldITHhI?=
+ =?utf-8?B?cGVYUk11Q08zY3V3dExBLzhPaGZyT1dndzR4NnI5Nk81TGJIem1OeDQwSStM?=
+ =?utf-8?B?VU9QUVFKU0NyWXVKdDJPTmc3RFcvZVdvVjh5MWVCRlYrbU11d28reXNWdU1h?=
+ =?utf-8?B?VHUxTmdrL29aN2RpRjJkSGxLUDFKS3dVM1FRNlMvUjU2UWthUE02RUthdFBU?=
+ =?utf-8?B?RVBoUWo1dDRFbjZHeGU5dnhEQXNsNWdDOEVGdklQTmNsUlYrTytOQ2RDRGNT?=
+ =?utf-8?B?RzBYaFB0NTg5NDFDR1ZldWJROW1VZDlZaGdoZ1dFWjA1NTZDY0tnd0tBWmVk?=
+ =?utf-8?B?c2d2THlUOENqRWs2bDdVbm1mR0RsVG1KS1VwbWordURlVFRXYXBlUXhqU2hZ?=
+ =?utf-8?B?b2RDR0xETVFicWYvN2hXOTJZNTZDZFdtaHl4aWI3ck9UaWZKc1NEaTIySHpO?=
+ =?utf-8?B?Q0lpVVBCSVlDL0htZG9oSzdRRFFDTU9jK2VCU1dwcjFlbzFTWWM2M2RnNWY3?=
+ =?utf-8?B?VnE0bFpCMnE4cUVDZHA4Sit3MUc4WTluY3JEZm5VQ1Z1b0NjQldMNEE5RXJ3?=
+ =?utf-8?B?RkZSOER6LzZVMExVK01hQmtXUGYzQkU5eHRYdTR4WEdZckVxenUxQVZZSkJi?=
+ =?utf-8?B?c0ExQmd0ZnlBcEpCcmg3VGNDRlZsY3daZFVJS3NjNDluOWJ0L0Y3M2ZGSVgw?=
+ =?utf-8?B?WEE2dU4waHh4UGcwNXpyU0N2QWdTU0o2NmdxNitvajdSQXQ2L0xCOFhHYkQ3?=
+ =?utf-8?B?ZzNwWUtZTGxJUnRSWmhxQTZmMkMvYUo5N04yb0gzemhxdWFDSHVyNmpuSFdM?=
+ =?utf-8?B?bEM2RG1NZ1QzbDQzRlZHSG1LblljTHRXbTRubG45VC9sWVUrN05PbDJFK1N0?=
+ =?utf-8?B?V1VVTThhUThETlB0N1VBdHZhV2srdlhKQVRGN3JlakNmS2J2YVNCL0cvVEdN?=
+ =?utf-8?B?b0x0bGdTMitTS3pVM1lVNnFLOThRcWFXbCtkUWx6TjV3ZlFrYWJzWnFrcWQx?=
+ =?utf-8?B?VWpZbmtjR0M5NlV3dmFOR2xOeVhBZDEveHQwUHZnQThLTjdTV2VZUlRmaWJ2?=
+ =?utf-8?B?YW9qVEx6NFJ3OUI2YTJ6dkdoOHFURGM5SHk4cG1oOUc5dUhuZVF3REFqZTZH?=
+ =?utf-8?B?TENrd1ZrTlk0WUdjazc1UXlsTmN5RW9SMit1R09velZKb3ZaK1owMDhkUFBp?=
+ =?utf-8?B?RmpuNGM1S20zV0dFY3ZPZnU5ZHNxKzVCVFRvRGt0QlQ1Y2E3dk9jZ1VlcElP?=
+ =?utf-8?B?eklxQldEN1UxbU1XdGttMVVDMnJGTnE5TWU2UEpoMHJaaU5ldFJGWW92anNT?=
+ =?utf-8?B?LzhGNmZ1dGxnR29Nb29uWDZxZ0doYW9tMXdPdDM2dnk2N0lwK3ZDaUFBMlpG?=
+ =?utf-8?B?SEp5MFJSTzk3ZVNEdDZPNVN4VStOaEhCN0JOZzQ5bUFhMFNwNmljZnJzTyth?=
+ =?utf-8?B?ZEJSaHJKNXlJMkErOGg2RnJzSExoZ2NZdktUYUExb2pESHN6V21Md0c2YU1u?=
+ =?utf-8?B?VVFUUSs1ZGxCMTRldEl1U3JaWGh0TXlBLzBJeE04WWUvN0djcm9SZWl4U1hI?=
+ =?utf-8?B?dlN4V2JVOUxiWVRqVGlka2I3M0FEMkZQZzh1OHhsZGViK2YyT3poa2dYZUFG?=
+ =?utf-8?B?ZTg4b25yTzdGT29PS29EeVE3ZW5rRDl6NDZpd0pHbTdvblRQMFNJcGtJMzlG?=
+ =?utf-8?B?cEZCdUc5SU0rUEpUUml0QS9od1JPWmxNclpodytDdEd5UG1aV2w3L1ZsYTJ6?=
+ =?utf-8?B?eGVPbnFmOEU0WmVlTm9uelJGV0s2NGx1a0drN3o0bVdGL0czMmIwTG5mZFR0?=
+ =?utf-8?B?Mm52aHNzcCszWkxaSDFwVjhyMU1aRHZSS1QyalhzRmlUbkVyMkkybXllNWhn?=
+ =?utf-8?B?UzJ5QlJZMW5qdTJmYkpDQ3FoSU8xbS92MHIySzg0cGFiNlNET3A2Y003NnEr?=
+ =?utf-8?B?L1dZa1AwVVJReXdJaWIyaE8wcVhOQ2ZwK1NiQnJWeHU3eWNpejJscGd6NEZi?=
+ =?utf-8?B?b2Frc2xvSllJclhKQ2FMaGF0MnljcUlUbStYYm5IdXcrbG5ycjFYSHpQQUlR?=
+ =?utf-8?B?MW5xek9UMWV6bXdRSElwc0ZGWUZGcnJoNTlQZ00remF3bHpxYlVKdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0fbd2df-7804-4159-d23b-08de5753c2e4
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 12:10:40.1705
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1RQq9f1Ay842bWsCE6w4cHsmDZx/drqCQQ9QDYha/ddOk91nkC72qygVfnVBvRNkXZyiQt6jJfXXBGO1KKzPiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7839
 
-On Mon, Jan 19, 2026 at 12:07:55PM +0100, Lorenzo Bianconi wrote:
-> > > Airoha folks reported the NPU hw can't provide the PCIe Vendor/Device ID info
-> > > of the connected WiFi chip.
-> > > I guess we have the following options here:
-> > > - Rely on the firmware-name property as proposed in v1
-> > > - Access the PCIe bus from the NPU driver during probe in order to enumerate
-> > >   the PCIe devices and verify WiFi chip PCIe Vendor/Device ID
-> > > - During mt76 probe trigger the NPU fw reload if required. This approach would
-> > >   require adding a new callback in airoha_npu ops struct (please note I have
-> > >   not tested this approach and I not sure this is really doable).
-> > 
-> > What i'm wondering about is if the PCIe slots are hard coded in the
-> > firmware.  If somebody builds a board using different slots, they
-> > would then have different firmware? Or if they used the same slots,
-> > but swapped around the Ethernet and the WiFi, would it need different
-> > firmware?
+
+
+On 1/15/2026 8:07 PM, Breno Leitao wrote:
+> Use the newly introduced .get_rx_ring_count ethtool ops callback instead
+> of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
 > 
-> As pointed out by Benjamin, the NPU is a generic Risc-V cpu cluster and it is
-> used to move packets from/to ethernet DMA rings to/from WiFi DMA rings without
-> involving the host cpu (similar to what we have for MTK with WED module).
-> I think the PCIe slot info is not necessary for the NPU to work since it is
-> configured by ethernet (airoha-eth) and wireless drivers (mt76) with DMA ring
-> addresses to use via the airoha npu ops APIs, NPU just moves data between the
-> DMA rings according to my understanding.
+> Since ETHTOOL_GRXRINGS was the only command handled by xgbe_get_rxnfc(),
+> remove the function entirely.
 > 
-> > 
-> > So is the firmware name a property of the board?
-> 
-> We need to run different binaries on the NPU based on the MT76 WiFi chip
-> available on the board since the MT76 DMA rings layout changes between MT76 SoC
-> revisions (e.g. Egle MT7996 vs Kite MT7992). In this sense, I agree, the
-> firmware name is a board property.
-> 
-> > 
-> > If the PCIe slots are actually hard coded in the NPU silicon, cannot
-> > be changed, then we might have a different solution, the firmware name
-> > might be placed into a .dtsi file, or even hard coded in the driver?
-> 
-> IIUC what you mean here, it seems the solution I proposed in v1 (using
-> firmware-name property), right?
-> In this case we can't hard code the firmware name in the NPU driver since
-> we can't understand the MT76 WiFi chip revision running on the board at
-> the moment (MT76 would need to provide this info during MT76 probe,
-> please take a look to the option 3 in my previous email).
-> 
-> > 
-> > > What do you think? Which one do you prefer?
-> > 
-> > I prefer to try to extract more information for the Airoha folks. What
-> > actually defines the firmware? Does the slots used matter? Does it
-> > matter what device goes in what slots? Is it all hard coded in
-> > silicon? Is there only one true hardware design and if you do anything
-> > else your board design is FUBAR, never to be supported?
-> 
-> I think the firmware is defined by the board hw configuration (e.g. MT76
-> SoC revision) and not by the specific PCIe slot used.
-> I do not think we have these info hardcoded in the silicon since NPU is a
-> generic RiscV cpu (this has been confirmed by airoha folks).
-> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
 
-Just to make sure everything is clear and talking on this in very
-simple words, there isn't anything ""hardcoded"" or strange.
+Reviewed-by: Raju Rangoju <Raju.Rangoju@amd.com>
 
-For """""""reasons""""""" (I assume space constraints or NPU CPU
-limitation) it's not possible to have a single NPU firmware to support
-both WiFi card.
 
-The NPU do simple task like configuring WED registers and handling DMA
-descriptor/some WiFi offload. Such configuration is specific to the WiFi
-card and it's not the same between MT7996 and MT7992.
-
-This is why specific firmware is needed. The specific NPU firmware have
-support for only ONE of the 2 WiFi card and doesn't support configuring
-and handling stuff for the other. (the code is not built in the
-firmware)
-
-From the kernel side (in the MT76 code) we just instruct the NPU to
-start offloading stuff (if present) and all the SoC feature for WiFi
-offload are used. (WED, special DMA path, ...)
-
-The possible combination that NPU can be used currently are the
-following:
-- Ethernet offload (all NPU firmware)
-- Ethernet offload + WiFi MT7996 (NPU firmware with MT7996 support)
-- Ethernet offload + WiFi MT7992 (NPU firmware with MT7992 support)
-
-The NPU makes use of feature already present in the SoC and makes use of
-reserved space in RAM for DMA handling so it really don't care of where
-the WiFi card is present (this is what I mean with nothing is hardcoded)
-
-I hope we are not getting annoying with insisting on the firmware-names
-solution.
-
-My personal taste on this is that hardcoding the name in the driver
-seems a bit wrong and creating a way to dynamically select the firmware
-based on what is present in the hardware would be great but would
-introduce LOTS of COMPLEXITY for WiFi router that ship with a single
-WiFi card and would have their own dedicated .dts
-
-To make this generic enough an idea might be to have simple .dtsi with
-prefilled firmware names.
-
-- en7581-npu-mt7992.dtsi
-- en7581-npu-mt7996.dtsi
-
-But they would only contain a single node with a single string.
-
-Hope this more practical explaination clears any doubt of the
-implementation.
-
--- 
-	Ansuel
 
