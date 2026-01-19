@@ -1,115 +1,88 @@
-Return-Path: <netdev+bounces-251185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9AED3B287
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:53:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 913A6D3B2FB
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:01:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7E97313C02E
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:45:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B773312D0D1
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D4C330305;
-	Mon, 19 Jan 2026 16:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE48732ED2E;
+	Mon, 19 Jan 2026 16:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWMViCUy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekaV+yxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAFC32FA20
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 16:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB57B32ED2C;
+	Mon, 19 Jan 2026 16:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768840808; cv=none; b=LnSpFUVr8djZIbO4k7EQWYnHbxTRzeUMQgnDnH48glj30N8i+TEgBpYAiHVnquETE6PUStPWn8/BHL8qsG6+c2NMRShKwPjvShRS0IJNLtoYqkcBE1fVD7noJ0sRuhLRdhl6IMHWn5sL/Rc3B8Xv+1lK5ezOvON0hS6lNI0Iuq4=
+	t=1768841304; cv=none; b=tLc79xT3kGiWXPHxuKEzLPsHpc/kIJ/rz/qA9PmpWE+/Zh8Bd5cRLjQQnCP0lt1bouwB5YQJupy7iAgNS1ejs/uNY2uERvWxOO1IjVOspPn3tTMT/fMY3fN6xH5pUJgrlulXjuatwoyJhdnmKwsYsMLIoBFu4HTJRm4ko874570=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768840808; c=relaxed/simple;
-	bh=1+Iy1o5F36ViLRu5I85oZkieSfpCy+H8ACvtKM4qNHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iDs4yGeufsu7GKxkrs4TJZhaHpT5zAChkqMD4ieMSW0HkL/X06lUmCq+iedMzCVXu6OdkTwkrvJ59xw/NYnTE3DVSJ+FhYptIaGF2UsyQ8u7WI4xcYB3XhjygIUakSiX6TBLRaPq8We/He9RcrU8VOk2KzFcCUYAA4/NP/CYx+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWMViCUy; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47ee26a760eso1757915e9.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:40:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768840806; x=1769445606; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i2jNAdYmt/Vut8OKA3dCVLNXldFS3y4ks0/GOYBiREU=;
-        b=nWMViCUyRmQkFs4H26gvGFgo3/Wn3qvPgrzAWefpkDwmPBTKSjAK3SDbE6OrdY7Ixq
-         nsoNPVREfX0hirdgz/65taa3o3ipnvTe7x2TlInEOXlz/scCzuX50JNGaVuJ33OJ993Z
-         bFO4y6yo9uRtD9rnmph3m8wEwmDbouCwXmRAtvVd84NpIrwkjh3edJ8ULcdZ8P34WhKy
-         mxnSdMFb+oyDSyI7DrOEJLaD2JpcvKQPrpTV2pslFgIQWAwHUqSCMtaCNiESloavZskh
-         pAu2gT0CX8uRKvCPUo3XMNr+pofvWKzgGFGAFXvVuEdgPilTDDULnBPRKOP0icMRdeXp
-         bSkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768840806; x=1769445606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i2jNAdYmt/Vut8OKA3dCVLNXldFS3y4ks0/GOYBiREU=;
-        b=TWQZIaQywiTexChtLcTSWCiUORAcLAInxD128G8+70vxenQIdCUxDEQ11/cYFblBTS
-         o4ZBe32HW35TeU8WyFY6ZY632aPQMuLD/77188cuvgTAKzhku6P3RT/8ZsfiFp0MHy0i
-         i+muXlZIMxPgcjmB1JuyhVSWV2zg8+//zXSO8708ho0bR9M9m4IDsedWvJqNmblWVGFL
-         buwxYxrMs+BPfI76to5i1cqW994BI7m/gBzbF5/3eTsvuWd6xPpxPuh7WNHbGmBlzSVW
-         tZoDKNNHF/4OyooDWEMouPiwmZjvN4M4cYsrE/EWxvJt10H+gn2/nrNG0115kPX1O7kZ
-         l/NA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSpId/tILEEv1Dw23F3bVsPnzuorD5QWeHNHMs08EywOwbBMXR7IwCaQZ/l2qaZ62A7dnX1sE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzErfCLv14hpa30JR4btp20ZOmOrM+Ru5aQHpxjdz5B52OroZ8S
-	JhPQnGjlfsITQsGFq5cGw5fYSu+K3MsJ2dOMf2DvUcWyZXf7pfQdboPH
-X-Gm-Gg: AY/fxX4G9LjKRNoN8KSI+kZOXdLLiy+MzJxuy2YEGQ+Z1yVBvzpwBW01Dw1yxG2n8ou
-	3AIbEHzUgRfghER3e6es2V4X3nctZrdVzbHfqumCgc3JWBYVITg+ds4MUfTP9FvENjY6FI+nmVE
-	e7QsEkdGiIVcZyuyll+CA8sQsS9ja9qm96pkYwoia48xxZ1E/+2alb2bp4nr7K5g6TnrP0bxOf0
-	mu+5ptHL9oIbwYRZXob8osnYc2A2nm+XiDzPxXjR/JD4HPqiP2taRQIkkt/VcMLoy4smJlJbl5o
-	y+Wq+ER9+3Da4Z7qvE1w0yrVux8H6YpeT54bFQmSjPSenqsTnCS2iEM82IB/xYcnPzz4YTczefd
-	z/VPrm/Y9toGc/sspF5iQLYBH2fts5bW5Q3MqbzYlOMREDyOPlIhJEhQoMD/bORVT2PARJg4iGH
-	RrDaw=
-X-Received: by 2002:a05:600c:444b:b0:480:1f6b:d4a2 with SMTP id 5b1f17b1804b1-480214e6bb8mr82016735e9.7.1768840805547;
-        Mon, 19 Jan 2026 08:40:05 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:619a:24df:1726:f869])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4b2755absm321727125e9.15.2026.01.19.08.40.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 08:40:04 -0800 (PST)
-Date: Mon, 19 Jan 2026 18:40:02 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linus Walleij <linusw@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/4] net: dsa: ks8995: Add shutdown callback
-Message-ID: <20260119164002.uzzlmchebn7ye2l5@skbuf>
-References: <20260119-ks8995-fixups-v2-0-98bd034a0d12@kernel.org>
- <20260119-ks8995-fixups-v2-1-98bd034a0d12@kernel.org>
- <20260119153850.r7m7qf7wsb6lvwwe@skbuf>
- <20260119083341.148109c2@kernel.org>
+	s=arc-20240116; t=1768841304; c=relaxed/simple;
+	bh=FsHQ9qlTxxYa5NDTX3USAelpH419g21o139xDdfBEC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jBNb0YgS+Rl/vID62iD/dyBOcrM2Ha0bAZxezGgyE9IfXp4Uv0rF46sGN/HXDZESjuTTOFCNVcUQenQlBp+/xLwYfU/qw2VhTx4poFr66Ql/5bZlmcI2HTdPDm6kB9HY20woAAWcZEXjTINXmtbM6BwhUSma5NhdaXztemfmH7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekaV+yxZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7868C116C6;
+	Mon, 19 Jan 2026 16:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768841304;
+	bh=FsHQ9qlTxxYa5NDTX3USAelpH419g21o139xDdfBEC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ekaV+yxZfQGMy2ZSYQ+N9Ek9DxLVehclxjFVxjxav6XpdxDGuXb8xE8TC25bu19Gc
+	 wdzfYWmT9CYLeHCJZ9nHMs+6vBXLKEGgcd8QNP9abcbrz40h4TBPiLIn2ihC++2+Xx
+	 y9LYPvFfbbaWtIkMnTCRKoY6hJaUtfuq3dhoohdYH2nunV6wMbQDggRWu0CL0WyQSd
+	 vR0OrqFhBROr+ZV5eipxwLbolxicz7x2/DhWlkXNYTOYHqZiQ0bP8c69PPlYaYsvIC
+	 MLLLFB9WtWY94Wd1zFvlPLeKqTGBOtxNkz+2aP2WrNahsSxmoIJr4g0dpX1+E1j9uU
+	 4PfOp67FFA4fQ==
+Date: Mon, 19 Jan 2026 08:48:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyue Wang <haiyuewa@163.com>
+Cc: netdev@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>, Matt
+ Johnston <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next v1] mctp i2c: align function parameter
+ indentation
+Message-ID: <20260119084823.5c2aa9b8@kernel.org>
+In-Reply-To: <20260119070022.378216-1-haiyuewa@163.com>
+References: <20260119070022.378216-1-haiyuewa@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260119083341.148109c2@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 19, 2026 at 08:33:41AM -0800, Jakub Kicinski wrote:
-> On Mon, 19 Jan 2026 17:38:50 +0200 Vladimir Oltean wrote:
-> > On Mon, Jan 19, 2026 at 03:30:05PM +0100, Linus Walleij wrote:
-> > > The DSA framework requires that dsa_switch_shutdown() be
-> > > called when the driver is shut down.
-> > > 
-> > > Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")  
-> > 
-> > $ git tag --contains a7fe8b266f65
-> > v6.18
-> > 
-> > We are in the RC stage for v6.19, so this is 'net' material, not
-> > 'net-next', the patch has already made it into a released kernel.
-> 
-> The AI code review points out that the DSA docs/you suggest mutual
-> exclusion with .remove. Do we also want this to be addressed?
+On Mon, 19 Jan 2026 15:00:06 +0800 Haiyue Wang wrote:
+> Align parameters of mctp_i2c_header_create() to improve readability
+> and match kernel coding style. No functional change.
 
-Oh, yes, I didn't get that far into actual code review.
+Quoting documentation:
+
+  Clean-up patches
+  ~~~~~~~~~~~~~~~~
+  
+  Netdev discourages patches which perform simple clean-ups, which are not in
+  the context of other work. For example:
+  
+  * Addressing ``checkpatch.pl``, and other trivial coding style warnings
+  * Addressing :ref:`Local variable ordering<rcs>` issues
+  * Conversions to device-managed APIs (``devm_`` helpers)
+  
+  This is because it is felt that the churn that such changes produce comes
+  at a greater cost than the value of such clean-ups.
+  
+  Conversely, spelling and grammar fixes are not discouraged.
+  
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
+-- 
+pw-bot: cr
 
