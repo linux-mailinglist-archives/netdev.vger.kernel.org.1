@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-251156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C66AD3AE81
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:11:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5869BD3AEA9
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:15:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C8F230194CC
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B0EB030BBDE3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF74366DDC;
-	Mon, 19 Jan 2026 15:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB7038944E;
+	Mon, 19 Jan 2026 15:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wp8/Cp50"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LysO04kv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E65387376
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A743876B7
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 15:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768835419; cv=none; b=pxa11+lgYp1/7UAVwaHAUIbJDiBZSMuSkIkoY3O1tUgUsc962Mo8O/48ewtgX9xlHgpF5gRN6xS5uBQWSU9Mqh+FxRmKrcS+DQ6Kwh9jZZN5bz4qJ5EyMOT58d7IVcJZ6hrw3XGejc/5c3lGYEfWHylilOvISS2+Ixa1SNzKibA=
+	t=1768835426; cv=none; b=WzLKOy9pFVI6wCozgrt4nn1LsvVJF4Y+nyXtMOFai/lMDXyJTNsU2J5+SjJYaFHzRL+816UiNhC1+2QCHNApeV9c6KDdXOPjdLZWy0xR9Rj5q5+/JzHI1MxFe1ChIK9e+dCZBMDxQ8rlkYX2UI0NPr9xZsbQsS3ms9tG5cUMtnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768835419; c=relaxed/simple;
-	bh=32gyJBTof7beOS7A0kGCqGT+eOw5nhUEBLKXw1rh+l4=;
+	s=arc-20240116; t=1768835426; c=relaxed/simple;
+	bh=B/3oUYzm3WrUbuK88eN3N+QsmsoERC19BOF3e1wvhMY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FN2RytVar8tLNoZYGXuURuxksURvgm/28zwphZt1ZY6hWHVZ5t0Y/X1efnZgFiP1wcipnf+0KFW0QWjGKTqSMYTika62d1qx/PnBsocpBEnqlG3PfdhPRyUoktbgWLGtnMwAP/MeypDqqk9uBkcERYs2g3XDrF6kWpw0ZlNnFTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wp8/Cp50; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=QR2sSvR2EWQtx5Zv9aAywk5YmxYRTlXcInacSCYemSfYKxaztPNvcHIx0l6KPVLcri1uHBZcJQQGJkf+RkIAYWYX1PtmCId8q23Q5o5QTwd+V/ThDQZ61ZxFDFRAC/GSxbl9PuM3vpM/P5Kk7WSVNRDQljmq8hs4fXqTuPtkiWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LysO04kv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768835417;
+	s=mimecast20190719; t=1768835423;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lzQPChliMgYZWy9bavBhufvwhif7bSLIs3dECz5HYaM=;
-	b=Wp8/Cp502u5Ys+5sq1i1XmhUKaHIjqft07J3PH06XTTvJqXnVxp/eBCzQkT27Td6f2LUan
-	G8DFcDKp9VHiQV6DHP0PUeTh/Wv01B/ztSwSZ+DuLsGv7nJhq/N+6AzzkqPscDzU4WI6GM
-	jPxn04fUDGczryPlTwBq2KLEikvKBns=
+	bh=a+PUKC5Eo434Sp4euB0T5SQCzrI87wOZWHOHhZ2GZPo=;
+	b=LysO04kvNoU87+oGycHe0pn0fU0oMw2XxscA7yUGL2rLwFYhOxeDTrfKmVZ1MvUNvNhzWV
+	wOrVFZL6L4yvDr0W4IIqTXbw9A8vGy+kl76P9ZTjpQ80NCyQEvy43By/eP5bT2rLYWp7bL
+	B1lQMgcHR/KxNKdDzER+BUCZZ6qtrG8=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-247-9B7l97lfM0W3tzX3156Scw-1; Mon,
- 19 Jan 2026 10:10:12 -0500
-X-MC-Unique: 9B7l97lfM0W3tzX3156Scw-1
-X-Mimecast-MFC-AGG-ID: 9B7l97lfM0W3tzX3156Scw_1768835411
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-FQf53_AEPAy0yBYz_OJAtw-1; Mon,
+ 19 Jan 2026 10:10:18 -0500
+X-MC-Unique: FQf53_AEPAy0yBYz_OJAtw-1
+X-Mimecast-MFC-AGG-ID: FQf53_AEPAy0yBYz_OJAtw_1768835415
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0BF991954B06;
-	Mon, 19 Jan 2026 15:10:11 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53FF01956054;
+	Mon, 19 Jan 2026 15:10:15 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.32.246])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3A92F19560A2;
-	Mon, 19 Jan 2026 15:10:06 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 81B4319560A2;
+	Mon, 19 Jan 2026 15:10:11 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -69,9 +69,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	petrm@nvidia.com,
 	razor@blackwall.org,
 	idosch@nvidia.com
-Subject: [PATCH v4 net-next 05/10] geneve: constify geneve_hlen()
-Date: Mon, 19 Jan 2026 16:09:27 +0100
-Message-ID: <bbbb7da798eb2cb6251331b31d5d65f70b119d80.1768820066.git.pabeni@redhat.com>
+Subject: [PATCH v4 net-next 06/10] geneve: pass the geneve device ptr to geneve_build_skb()
+Date: Mon, 19 Jan 2026 16:09:28 +0100
+Message-ID: <a7a88a99d274441114f64a9314ac2e444dbe29f6.1768820066.git.pabeni@redhat.com>
 In-Reply-To: <cover.1768820066.git.pabeni@redhat.com>
 References: <cover.1768820066.git.pabeni@redhat.com>
 Precedence: bulk
@@ -83,44 +83,90 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Such helper does not modify the argument; constifying it will additionally
-simplify later patches.
-
-Additionally move the definition earlier, still for later's patchesi sake.
+Instead of handing to it the geneve configuration in multiple arguments.
+This already avoids some code duplication and we are going to pass soon
+more arguments to such function.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/geneve.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/geneve.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 8719ad66837e..e99fa8c37486 100644
+index e99fa8c37486..780cc6611f00 100644
 --- a/drivers/net/geneve.c
 +++ b/drivers/net/geneve.c
-@@ -365,6 +365,11 @@ static void geneve_uninit(struct net_device *dev)
- 	gro_cells_destroy(&geneve->gro_cells);
- }
+@@ -775,10 +775,11 @@ static void geneve_build_header(struct genevehdr *geneveh,
  
-+static int geneve_hlen(const struct genevehdr *gh)
-+{
-+	return sizeof(*gh) + gh->opt_len * 4;
-+}
-+
- /* Callback from net/ipv4/udp.c to receive packets */
- static int geneve_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ static int geneve_build_skb(struct dst_entry *dst, struct sk_buff *skb,
+ 			    const struct ip_tunnel_info *info,
+-			    bool xnet, int ip_hdr_len,
+-			    bool inner_proto_inherit)
++			    const struct geneve_dev *geneve, int ip_hdr_len)
  {
-@@ -497,11 +502,6 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
- 	return sock;
- }
+ 	bool udp_sum = test_bit(IP_TUNNEL_CSUM_BIT, info->key.tun_flags);
++	bool inner_proto_inherit = geneve->cfg.inner_proto_inherit;
++	bool xnet = !net_eq(geneve->net, dev_net(geneve->dev));
+ 	struct genevehdr *gnvh;
+ 	__be16 inner_proto;
+ 	bool double_encap;
+@@ -830,8 +831,6 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 			   struct geneve_dev *geneve,
+ 			   const struct ip_tunnel_info *info)
+ {
+-	bool inner_proto_inherit = geneve->cfg.inner_proto_inherit;
+-	bool xnet = !net_eq(geneve->net, dev_net(geneve->dev));
+ 	struct geneve_sock *gs4 = rcu_dereference(geneve->sock4);
+ 	const struct ip_tunnel_key *key = &info->key;
+ 	struct rtable *rt;
+@@ -842,7 +841,7 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
  
--static int geneve_hlen(struct genevehdr *gh)
--{
--	return sizeof(*gh) + gh->opt_len * 4;
--}
--
- static struct sk_buff *geneve_gro_receive(struct sock *sk,
- 					  struct list_head *head,
- 					  struct sk_buff *skb)
+-	if (skb_vlan_inet_prepare(skb, inner_proto_inherit))
++	if (skb_vlan_inet_prepare(skb, geneve->cfg.inner_proto_inherit))
+ 		return -EINVAL;
+ 
+ 	if (!gs4)
+@@ -925,8 +924,8 @@ static int geneve_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 		}
+ 	}
+ 
+-	err = geneve_build_skb(&rt->dst, skb, info, xnet, sizeof(struct iphdr),
+-			       inner_proto_inherit);
++	err = geneve_build_skb(&rt->dst, skb, info, geneve,
++			       sizeof(struct iphdr));
+ 	if (unlikely(err))
+ 		return err;
+ 
+@@ -943,8 +942,6 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 			    struct geneve_dev *geneve,
+ 			    const struct ip_tunnel_info *info)
+ {
+-	bool inner_proto_inherit = geneve->cfg.inner_proto_inherit;
+-	bool xnet = !net_eq(geneve->net, dev_net(geneve->dev));
+ 	struct geneve_sock *gs6 = rcu_dereference(geneve->sock6);
+ 	const struct ip_tunnel_key *key = &info->key;
+ 	struct dst_entry *dst = NULL;
+@@ -954,7 +951,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	__be16 sport;
+ 	int err;
+ 
+-	if (skb_vlan_inet_prepare(skb, inner_proto_inherit))
++	if (skb_vlan_inet_prepare(skb, geneve->cfg.inner_proto_inherit))
+ 		return -EINVAL;
+ 
+ 	if (!gs6)
+@@ -1017,8 +1014,7 @@ static int geneve6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 			ttl = key->ttl;
+ 		ttl = ttl ? : ip6_dst_hoplimit(dst);
+ 	}
+-	err = geneve_build_skb(dst, skb, info, xnet, sizeof(struct ipv6hdr),
+-			       inner_proto_inherit);
++	err = geneve_build_skb(dst, skb, info, geneve, sizeof(struct ipv6hdr));
+ 	if (unlikely(err))
+ 		return err;
+ 
 -- 
 2.52.0
 
