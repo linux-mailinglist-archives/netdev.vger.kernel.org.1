@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-251130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE717D3AC19
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:35:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF29D3AC1C
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A91B13053B9B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:24:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1B6C6301D8BB
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DA838A70C;
-	Mon, 19 Jan 2026 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EAA38F242;
+	Mon, 19 Jan 2026 14:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPqZ9IPO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhMQ7u7Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625BF37E310;
-	Mon, 19 Jan 2026 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC8038E113
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 14:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768832589; cv=none; b=J6S/AZ7uv7LFrjgHiRIM8UgT8KWkYW0lUeeo1tzLQHBsaV2i26G50RSaNHkidMqfAn3g1n8Fvh8k8jUlZ2WBt6eSfmeQu1LYEABuPq8YuwjTsPIKsdZbCBaOBHaSqws+vJNN4k/X5cn3ZgLAtawKlrYn8cbD+prHWohInZUT+gU=
+	t=1768832590; cv=none; b=UHSPtCgZ1xIr2dvy4S9UVlsaPdYb6nh1uRq3vPCbZpFQahwjNkZX5APMh63MHwMroLHKhKc9i1njvwnvuGcpbApqdu0Hbjo4WS46n2mjMBEkSb2e+XY0PZY38YhySHXWOJccZnFrDRZq4NFf7K6+k1CYFrFuIKvL7HzxZSiVR6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768832589; c=relaxed/simple;
-	bh=LJjLnN6amfNiPTJ+6xJqaY/dxPRnWRtRyXDuhcLzBzA=;
+	s=arc-20240116; t=1768832590; c=relaxed/simple;
+	bh=O7xmf1lJJAvnhNXByYOsSQC9xzWJJEsMfhN2SVGjWto=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CyO8qVAgSTlngO/7YAFLu6k4/uuql6urVlCUs5ofNGA0iHRWbepN037sJHTv7JacvZm6Q/XrUxy3hVkJAQd1rBLEFchWCsDb+WXEwk8t6614W2QpgKDJVXESLVT3t0GMq7sX4z4qRDqKl28oT34zeXBWELyUsJHFclJmlWEXaFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPqZ9IPO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3811C19423;
-	Mon, 19 Jan 2026 14:23:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QQEAJJZXTyrxWz8NlqOCUVeTIRutxwMJPKSJWU0ShG3vlE/Bvv4k4VD8wS9CfIhrF1Lv9jCM7xSIK7VKmNzZsZpmEngBfGWFvwIDxmx2aqh/id4aWc/XGT/WGz2urZJ8aGtS37jNsVbx6D4j+YBv514fRe2/2p6T/dHabSAJUWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhMQ7u7Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7290FC19423;
+	Mon, 19 Jan 2026 14:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768832589;
-	bh=LJjLnN6amfNiPTJ+6xJqaY/dxPRnWRtRyXDuhcLzBzA=;
+	s=k20201202; t=1768832590;
+	bh=O7xmf1lJJAvnhNXByYOsSQC9xzWJJEsMfhN2SVGjWto=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uPqZ9IPObY9iR0mrzkaUt+LQ1bIX5B72FelCBk4UNy7DhODyn0BsAXhWaXZc6PIYl
-	 OLxjwKo5YgUn1/B9Q+PSr1ugS7noRaObpcUEA0E2xKsdDirWP9kjknF9gi0QmBSuBa
-	 BORTJ3PKBgpMzQPyc5NivReIwkMX5sffp6Z+eyc07EGPQ+LQ2QNFa+RZc3XeP0WTqA
-	 uYsCbTzZnT0c62q3gDsPAdOWA40GYPDCXdD61jOmRHdy9TM4N7/GgoVj1CfWIRdtfC
-	 vTkBmby1TWr6QC09OW2hqsyDXcr2rFtusIVoe2OHFs0mEyGkKI9RKsQlbPtbqFDZgd
-	 K8Q9KqwYVsipw==
+	b=uhMQ7u7ZG/dBtZJynJu88fN9Sp5K0Hk/pEVgvWLVhAQLx4K2vUvLqsXM+xmVc6ohU
+	 AA4a9quGfZeaiZDg/9n76gN9hzrgVBnwNavGxvS6MyeYQiKu13zfWLaTiEdT8gspb4
+	 zVIeCXpEo5+JT16PmQTwNm0jSSR8gQ/WiFStUwXQrT5LO64gmeAp24b3JCuYnucMAU
+	 o2cczOB+7DahNSlsahsgYrF2IxUWE7HpmDDvfhR6PZR6wlxdk+18PsjNsEDh/w66C6
+	 yY0/J9l57XW06NIvaePtVB1gEnUDMSn9YNBq2QazKH2kgKrwfmDr9cvfeJ74MKnvvV
+	 b+R9tQi7QSdFg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2B803A55FAF;
-	Mon, 19 Jan 2026 14:19:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 787423A55FAF;
+	Mon, 19 Jan 2026 14:19:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,40 +50,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: usb: sr9700: remove code to drive
- nonexistent
- MII
+Subject: Re: [PATCH net-next] tcp: move tcp_rate_skb_sent() to tcp_output.c
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176883237855.1426077.10049516839695920541.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Jan 2026 14:19:38 +0000
-References: <20260113040649.54248-1-enelsonmoore@gmail.com>
-In-Reply-To: <20260113040649.54248-1-enelsonmoore@gmail.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+ <176883238002.1426077.5540815214056969724.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 14:19:40 +0000
+References: <20260114165109.1747722-1-edumazet@google.com>
+In-Reply-To: <20260114165109.1747722-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Jan 2026 20:06:38 -0800 you wrote:
-> This device does not have a MII, even though the driver
-> contains code to drive one (because it originated as a copy of the
-> dm9601 driver). It also only supports 10Mbps half-duplex
-> operation (the DM9601 registers to set the speed/duplex mode
-> are read-only). Remove all MII-related code and implement
-> sr9700_get_link_ksettings which returns hardcoded correct
-> information for the link speed and duplex mode. Also add
-> announcement of the link status like many other Ethernet
-> drivers have.
+On Wed, 14 Jan 2026 16:51:09 +0000 you wrote:
+> It is only called from __tcp_transmit_skb() and __tcp_retransmit_skb().
+> 
+> Move it in tcp_output.c and make it static.
+> 
+> clang compiler is now able to inline it from __tcp_transmit_skb().
+> 
+> gcc compiler inlines it in the two callers, which is also fine.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: usb: sr9700: remove code to drive nonexistent MII
-    https://git.kernel.org/netdev/net-next/c/171e8ed48276
+  - [net-next] tcp: move tcp_rate_skb_sent() to tcp_output.c
+    https://git.kernel.org/netdev/net-next/c/f10ab9d3a7ea
 
 You are awesome, thank you!
 -- 
