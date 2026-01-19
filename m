@@ -1,95 +1,82 @@
-Return-Path: <netdev+bounces-251287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212B4D3B81B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 21:20:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11201D3B821
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 21:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B52343008E02
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:20:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5EDC3300B356
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56D52BEC41;
-	Mon, 19 Jan 2026 20:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D08F2EBDEB;
+	Mon, 19 Jan 2026 20:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZT5rrgmF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sr78xs/I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931D5265CA8
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 20:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9612E7BD3;
+	Mon, 19 Jan 2026 20:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768854012; cv=none; b=Y7iN+KHN/Grm/MzQ9meVbCx4n2YrFbbkvLLxvMuQJXV6m5y+rwlHVQGkPfx10wO38eyGOa2mn+88SSCx+dLiOXTafoV5gP/efYaHa29lovPV31Xtr8CB8bvsikYlh4dnpAyaCEzzYvEZMmkAzUParTnENxrTUPAyPezSW/GuWkg=
+	t=1768854125; cv=none; b=KDFb2wdFXoirPi4UZPzeN5TuMggoYsSokGJHEja+xAAHXbniEyzZF3l476wBXewopd9hWTn2AioCLZUC38PeBMVNuWE2ZxasVN+uP6wsMrPx5jhxUyihJRZfKJdfXTE6LMB2Y/7R0xC2xUIkRQh6Wzt8C1+EFZhHfUUbGsyqjDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768854012; c=relaxed/simple;
-	bh=wvK3Zd6V6eiO6j1ryz1b7EuxshxMrcRo0utuLa1/Be0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=n5jiQaACjkthIDZt+Q0LW5/zhcvPbk0Bb2sOCRQbawWaB5BvPXd8qb2dIM3XRFoZGSoMzG96jr8wBRqs0keh0NFP+0Ok/Tc0CqgBWfoC2hJbRs5lZ5meFDx3AlDqRHqIiHDH1dfVxVjHHGqIuOcHJmLdgg4MbFUHmN8KFuoqjWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZT5rrgmF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F3E2C116C6;
-	Mon, 19 Jan 2026 20:20:12 +0000 (UTC)
+	s=arc-20240116; t=1768854125; c=relaxed/simple;
+	bh=Yy3X/BAgxUsw+7jxErv41X2LtK0A2Px3bMZ5Nmop+EI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BbEHIvQwi/TdOSyraSVUDjtaOe0AtWKrbcaF7qs/rE7ORzee5RlpEPtU943uxebUsxgt+nhNlAVi5vM2QPhyY6zuMaZ1V18hAq6FK0o58cvNDjlu50eF6v++OqqBmQfIUVvbcPVNcTEtWlKq0h/JvJIOz1e9MF/vscMd6OaJFf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sr78xs/I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF023C19422;
+	Mon, 19 Jan 2026 20:22:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768854012;
-	bh=wvK3Zd6V6eiO6j1ryz1b7EuxshxMrcRo0utuLa1/Be0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZT5rrgmF2Bhok0Wtl3yLl4AVvFuxoWuDeSwFFS+TWbSMnTJfJ1kwcyWkIRBdux55W
-	 MCuTjDaI00ryObZh2q+C4mjKre8s/eU5kvjogDVCdRqmEmffyXRR6RZHoRzxWcJNVC
-	 todV3pbvJm7xSh8k6ae8qJ0eIqE8r2PUBXY5SED4mntY9iuKSyXMxAWa/fafsAZwOT
-	 Rm0BaoX80fs7zX3OqZThtc8rV7S9bbBTQdb1cnZkLbq6NfoeKsTxIT/Sz9TB2dYWyT
-	 wpXNT8oCu7v+/niMPG6tqXL9s8wqTOtiUr+p2NFetMpdzXv2VqHlLzPH15JiHwWnEw
-	 fPXZzrnpfRxKQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3ECB43806907;
-	Mon, 19 Jan 2026 20:20:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1768854124;
+	bh=Yy3X/BAgxUsw+7jxErv41X2LtK0A2Px3bMZ5Nmop+EI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sr78xs/IzjfhaiPSKibT3ZElg1QKI7TtftSWc7mpM0MeW8byJ5D0CC0nprn0uFVNM
+	 /Ozmr7KE+WmIFLZFJInnH1AQp3NDv01fnmlulUnq8aWKPdk2yaydMwu90EawfWh4KP
+	 sGkL5vmBk/p4mszZlVMV4l83AuWhyTFghtMDUM2EAvKS6C+4lOiPMGf1j+fy15hH0V
+	 d1jbjizUfAmNzldiqTxbOWGpb02g5FgIfPNBNZDUpl9QANryJ5xD9HOu2F7mTjJDiI
+	 cojVifXPfJM3yTBoXy9xv8I05MykEMNErG/n/m0M8E5GmRCOsT/rP9E7pBx/blwWsi
+	 xevxCuif283sg==
+Date: Mon, 19 Jan 2026 12:22:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Mahesh Bandewar <maheshb@google.com>, Shuah Khan
+ <shuah@kernel.org>, linux-kselftest@vger.kernel.org, Liang Li
+ <liali@redhat.com>
+Subject: Re: [PATCHv2 net-next 2/3] bonding: restructure ad_churn_machine
+Message-ID: <20260119122203.5113b16f@kernel.org>
+In-Reply-To: <20260114064921.57686-3-liuhangbin@gmail.com>
+References: <20260114064921.57686-1-liuhangbin@gmail.com>
+	<20260114064921.57686-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] net/sched: teql: Enforce hierarchy placement
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176885400979.123996.17622042838765819298.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Jan 2026 20:20:09 +0000
-References: <20260114160243.913069-1-jhs@mojatatu.com>
-In-Reply-To: <20260114160243.913069-1-jhs@mojatatu.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
- netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- victor@mojatatu.com, km.kim1503@gmail.com, security@kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, 14 Jan 2026 06:49:20 +0000 Hangbin Liu wrote:
+> The current ad_churn_machine implementation only transitions the
+> actor/partner churn state to churned or none after the churn timer expire=
+s.
+> However, IEEE 802.1AX-2014 specifies that a port should enter the none
+> state immediately once the actor=E2=80=99s port state enters synchronizat=
+ion.
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Paolo, how do you feel about his patch with 2+ weeks until final?
+The first patch is definitely suitable for net. If this one is not
+it should not have a Fixes tag. I'd lean towards getting them all
+into -rc7 if we can.
 
-On Wed, 14 Jan 2026 11:02:40 -0500 you wrote:
-> GangMin Kim <km.kim1503@gmail.com> managed to create a UAF on qfq by inserting
-> teql as a child qdisc and exploiting a qlen sync issue.
-> teql is not intended to be used as a child qdisc. Lets enforce that rule in
-> patch #1. Although patch #1 fixes the issue, we prevent another potential qlen
-> exploit in qfq in patch #2 by enforcing the child's active status is not
-> determined by inspecting the qlen. In patch #3 we add a tdc test case.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] net/sched: Enforce that teql can only be used as root qdisc
-    https://git.kernel.org/netdev/net/c/50da4b9d07a7
-  - [net,2/3] net/sched: qfq: Use cl_is_active to determine whether class is active in qfq_rm_from_ag
-    https://git.kernel.org/netdev/net/c/d837fbee9245
-  - [net,3/3] selftests/tc-testing: Try to add teql as a child qdisc
-    https://git.kernel.org/netdev/net/c/2460f31e6e44
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+BTW please make sure to CC Nik (based on the Fixes tag I think).
+Always run get_maintainers on the patches.
+--=20
+pw-bot: cr
 
