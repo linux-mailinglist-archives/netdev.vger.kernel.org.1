@@ -1,130 +1,174 @@
-Return-Path: <netdev+bounces-251207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB86D3B4EF
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:55:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30685D3B4FA
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:58:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30E1E3045DC0
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:55:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AAD9D3008CAB
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1474729BDB4;
-	Mon, 19 Jan 2026 17:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B9432E721;
+	Mon, 19 Jan 2026 17:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tkwg8RUx"
+	dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b="mPvIMiYO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F0C224AF0
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9132B9A6;
+	Mon, 19 Jan 2026 17:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768845313; cv=none; b=t9U+mW4IrssMbxAqqMzscsr+8pPRMS03HrpNB3bA9VOZs8QJyIXKOnlKkeTPoNFO1//Ous2coiGrKUyQ7YSH1y5o7l4YLp50tv2H7icpihFCVUhe7TF4gkpa1B9/SlJ0R9BBIx09zAHxQlqy9Rf6enpea7ecQ1dLepTYFd4uPDk=
+	t=1768845476; cv=none; b=RERYH08vSvbbtRwajUIVYHg0N3QDVRw75EyD6ZURYzhG/TFp76vJdJHQXDzOAeRkLIUKWyh/qyB5tE0+yc8KimUHQUHUFWaggd6mjV6WI5I3zmTmtBykUxziX5GhTfJ29apXDf91SaWbVXHPV8KKHYLFjeJ3nd+IIuzcOOBf/mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768845313; c=relaxed/simple;
-	bh=78apE6QDQFXHCk78vSNGl4G1wcUc/cubI9J+4istziY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=GsbhKDMoekEjZ14M0YXQDcHPwC0boI4C1sPOTwBbTE/B4+VpRRTphbh6XrqqVuC+aU/G/3DsLhqLb13E5Xg3RnGa5a00tlSw5FGCdSp0CO4iCBuIFaszF7DeHlpXF9o7aMb25foPLyDdGDSqtGHwVka7QjsrbXdhvHhbWw/rbX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tkwg8RUx; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-432755545fcso2546161f8f.1
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:55:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768845310; x=1769450110; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MGYHe/UIiw9sHb9OX9ESyD3Q3OvR6ABMCUV+kc7Ihrw=;
-        b=Tkwg8RUxjVPvtLa44aeeorJUrak56I+quGqW4wo7E/OIP9XQ4eUTYfX88nvsHkAaUN
-         d1cUcmoBPT/8+RMm3M3V/WKgOyZbPNZBtUgu+nV+PmspMujPDT9YBsSYcdgWLqTqoye/
-         lzhftXT0PALdgnfEnN/oBIm7S8ECcoM/MwpuothFy61z8eHnios0dUZj8spO0vDyjlBf
-         1m9ry3nWI6oLzhFpsBbgtAud2gEAadHiYX15B/0sbiU3PXNCvSklRp/Ad3WhcittVtto
-         b3X26gboYsWsiPyudibHkfxLGVZHVQoYAs+QM7xoo8jEHY1811sJ1rCdeN7i3IXRqKDL
-         eU1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768845310; x=1769450110;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MGYHe/UIiw9sHb9OX9ESyD3Q3OvR6ABMCUV+kc7Ihrw=;
-        b=XiFqHCOHosVcLJnk9jV+EdrThracF8bL31/I59GoB2xF/F0KYzwlI4H5unYB0YEBVq
-         gx3ZGdE8IVU/u1IU06H5LuzYHKjV2t9FWvBxL4ouyu6kaciSmuJdvfoQ4Tx8PIcn7cvV
-         qRQtepZlVhFpFUL4i3L3c2dcoA+y2xp/c3sl9bnNKofc5/V3q5PEAeDP6kX5q9KTu9I3
-         pMyq/0tEs4q6+V6fr3N6BSMn2PtVhFik6z0dYjFRKp7gw/Pz16tXwVNjCkJ5UbVm4JYJ
-         MboHnFjj8fRIN+mNxw8kzgIG0MSfn0W+Q5A+Hg7wQsmds/pxqLN9VukihfJf7riszGhz
-         Pz2Q==
-X-Gm-Message-State: AOJu0YyX0i3YmxqzKrdtgRe5aStT03GDR/feGwDlmdx6n0ZuQ8cWrSw2
-	qkLh9jUnYjupLRKsALvh1pA2UP1JKJ5wcj1bf1rgbOzJQlvgquTLR9WclkRz2Q==
-X-Gm-Gg: AZuq6aJWkL3STmN4qcqB8crDu4d3c44OeIYKlhIADpK+nG8oDd9pyl1cPAgibf+Q8lX
-	qVwLc0irL+ektfvBk+K2JGSmz8Evvs0t9F8TpXaO6vyh8SuLJTIdE3pDVyLh3ZY1cnGfTX3nJdM
-	Axmx23QmC2YrQn5JPi66tMm7RiSL0SFj/AFgLt61+KShKQOUHc7wfifwv5Dk2SSDtgnh5lZ78J4
-	zc0XRy4JIKroqiuniAyhgRI/7s5iNS9vmjl9/AJgJa2Wr6ZPqiLiZm9XiT9bLqYz1jxtBQKmuaf
-	036If90YE/49HdpSQW/mJ/3wwLxvnQ4edMdkLtuNhI4KXuZXepC3zBizh4fVFF0L6pymyvt4OjV
-	Us9DxS/uUUQI0sXcl4SX6p4HeAoVAkGStVcC2BrXQH8bo90LnByakhKTjt825Wl52tNDq/ke1Hr
-	6kiTVCkWA5N/bFFJ2mj+JK52kwDIMZloFEQ+NXDPm7j/U=
-X-Received: by 2002:a05:6000:1845:b0:431:266:d138 with SMTP id ffacd0b85a97d-4356998b5ffmr17127203f8f.25.1768845309680;
-        Mon, 19 Jan 2026 09:55:09 -0800 (PST)
-Received: from smtpclient.apple ([2001:912:1ac0:1e00:1c4e:5f16:dd3a:1cf8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569926ff1sm24334242f8f.13.2026.01.19.09.55.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Jan 2026 09:55:09 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1768845476; c=relaxed/simple;
+	bh=aeAMwDy300xtVjO1yTpgW+rQwqZyPI7I8i814Kjmu6k=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=nFy2e3+AAddj9yX8BBuIbGkWlmF0YJKzy7WxywoKvl1LJaj+hr16qKpRwF44DkoUDaiS84QE/WgaRfizu0Wza8C9XJ1aCfr/oh83mZAhzJQXNpS9b8Td4/PbJx34fdmBM4GE/+r+ea02UChS4v2/WYwZoiuJueVzy+9wb47MG8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com; spf=pass smtp.mailfrom=tuxedocomputers.com; dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b=mPvIMiYO; arc=none smtp.client-ip=157.90.84.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedocomputers.com
+Received: from [192.168.178.76] (business-24-134-207-61.pool2.vodafone-ip.de [24.134.207.61])
+	(Authenticated sender: g.gottleuber@tuxedocomputers.com)
+	by mail.tuxedocomputers.com (Postfix) with ESMTPSA id 0507B2FC0052;
+	Mon, 19 Jan 2026 18:57:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedocomputers.com;
+	s=default; t=1768845469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9neysObSDag5TO86XuxLkbvz/mjlkH1pwb0MRj36kJY=;
+	b=mPvIMiYOzVg0ObOlBlitMjIQzlqSrkFae/PwrieuBn0X2NJJRz/UDThIQAeOstVZQ5MBFJ
+	nA2zlPShY78k5srUy8PBEdJ5iRBbNCRyKAgcIwtPmom1dHgO4z2NJXIGIpL/DZpBe1Dpjt
+	V1EaGyMPowt52U6J1za5tU2Wt6ETfn0=
+Authentication-Results: mail.tuxedocomputers.com;
+	auth=pass smtp.auth=g.gottleuber@tuxedocomputers.com smtp.mailfrom=ggo@tuxedocomputers.com
+Content-Type: multipart/mixed; boundary="------------eBBAZgy1CXJ4IyGkpFjVDyhb"
+Message-ID: <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+Date: Mon, 19 Jan 2026 18:57:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
-Subject: Re: [PATCH 1/2] net: phy: realtek: add RTL8224 pair swap support
-From: Damien Dejean <dam.dejean@gmail.com>
-In-Reply-To: <bde1d3a9-6378-49a9-bcc2-00f4038f5558@lunn.ch>
-Date: Mon, 19 Jan 2026 18:54:21 +0100
-Cc: netdev@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <0EE90427-54F7-40BF-81FF-B7DA76544338@gmail.com>
-References: <20260116173920.371523-1-dam.dejean@gmail.com>
- <bde1d3a9-6378-49a9-bcc2-00f4038f5558@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>,
- krzk@kernel.org
-X-Mailer: Apple Mail (2.3864.300.41.1.7)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
+ Motorcomm YT6801
+To: Georg Gottleuber <ggo@tuxedocomputers.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Yao Zi <me@ziyao.cc>, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Frank.Sae@motor-comm.com, hkallweit1@gmail.com, vladimir.oltean@nxp.com,
+ wens@csie.org, jszhang@kernel.org, 0x1207@gmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jeffbai@aosc.io,
+ kexybiscuit@aosc.io, Christoffer Sandberg <cs@tuxedocomputers.com>
+References: <20260109093445.46791-2-me@ziyao.cc>
+ <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
+ <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+ <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
+ <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
+Content-Language: en-US
+From: Georg Gottleuber <ggo@tuxedocomputers.com>
+In-Reply-To: <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
 
-Hi Andrew, Krzysztof,
+This is a multi-part message in MIME format.
+--------------eBBAZgy1CXJ4IyGkpFjVDyhb
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for your feedbacks.
+Am 19.01.26 um 18:45 schrieb Georg Gottleuber:
+> Hi,
+> 
+> thanks for the quick reply.
+> 
+> Am 19.01.26 um 16:43 schrieb Russell King (Oracle):
+>> On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
+>>> Hi,
+>>>
+>>> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
+>>> revealed that tx is only 100Mbit/s:
+>>>
+> ...
+>>>
+>>> With our normally used DKMS module, Ethernet works with full-duplex and
+>>> gigabit. Attached are some logs from lspci and dmesg. Do you have any
+>>> idea how I can debug this further?
+>>
+>> My suggestion would be:
+>>
+>> - Look at the statistics, e.g.
+>>
+>>    ip -s li sh dev enp2s0
+> 
+> That looks good (after iperf):
+> 
+> 2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
+> mode DEFAULT group default qlen 1000
+>     link/ether ba:90:88:24:49:4f brd ff:ff:ff:ff:ff:ff
+>     RX:  bytes packets errors dropped  missed   mcast
+>        2091654   31556      0       0       0       0
+>     TX:  bytes packets errors dropped carrier collsns
+>       88532451    1518      0       0       0       0
+> 
+> 
+>> - apply
+>>   https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
+>>   to enable more statistics to work, and check the network driver
+>>   statistics:
+>>
+>>    ethtool --statistics enp2s0
+>>
+>> to see if there's any clues for what is going on.
+> 
+> That looks also good, I think. I saved it before and after the test with
+> iperf. See attachments.
 
-On 16 Jan 2026, at 19:10, Andrew Lunn <andrew@lunn.ch> wrote:
->=20
-> Does the PHY support auto MDI-X, where it figures out a working
-> combination at link up time? That allows you to use crossed or not
-> crossed cables.
+Oh, there was something else interesting in dmesg. See attachment.
 
-It does support auto MDI-X, it=E2=80=99s possible to read the status of =
-it after a cable is connected. However this is different from the swap =
-mechanism I=E2=80=99m introducing here.
+> Regards,
+> Georg
 
->=20
-> Anyway, the DT property you are adding seems to be the same as
-> marvell,mdi-cfg-order. See commit:
->=20
-> 1432965bf5ce ("dt-bindings: net: marvell,aquantia: add property to =
-override MDI_CFG")
->=20
->> +  realtek,mdi-pair-swap:
->=20
-> Maybe call this realtek,mdi-cfg-order and use the same binding?
+--------------eBBAZgy1CXJ4IyGkpFjVDyhb
+Content-Type: text/plain; charset=UTF-8; name="dmesg_motorcomm.txt"
+Content-Disposition: attachment; filename="dmesg_motorcomm.txt"
+Content-Transfer-Encoding: base64
 
-It looks like the same mechanism, thanks for the reference. The aquantia =
-implementation looks more straightforward, let me rework the patchs to =
-have a similar implementation.
+WyAgICAwLjkzMzQ4MF0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogZXJyb3IgLUVO
+T0VOVDogZmFpbGVkIHRvIHJlYWQgbWFjYTBsciBmcm9tIGVGdXNlClsgICAgMC45MzM0ODNd
+IGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IGVGdXNlIGNvbnRhaW5zIG5vIHZhbGlk
+IE1BQyBhZGRyZXNzClsgICAgMC45MzM0ODVdIGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAw
+LjA6IGZhbGxiYWNrIHRvIHJhbmRvbSBNQUMgYWRkcmVzcwpbICAgIDAuOTMzOTQxXSBkd21h
+Yy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBVc2VyIElEOiAweDEwLCBTeW5vcHN5cyBJRDog
+MHg1MgpbICAgIDAuOTMzOTQzXSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiAJRFdN
+QUM0LzUKWyAgICAwLjkzMzk1NV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogRE1B
+IEhXIGNhcGFiaWxpdHkgcmVnaXN0ZXIgc3VwcG9ydGVkClsgICAgMC45MzM5NTZdIGR3bWFj
+LW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IFJYIENoZWNrc3VtIE9mZmxvYWQgRW5naW5lIHN1
+cHBvcnRlZApbICAgIDAuOTMzOTU3XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBU
+WCBDaGVja3N1bSBpbnNlcnRpb24gc3VwcG9ydGVkClsgICAgMC45MzM5NThdIGR3bWFjLW1v
+dG9yY29tbSAwMDAwOjAyOjAwLjA6IFdha2UtVXAgT24gTGFuIHN1cHBvcnRlZApbICAgIDAu
+OTMzOTYxXSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBUU08gc3VwcG9ydGVkClsg
+ICAgMC45MzM5NjJdIGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IEVuYWJsZSBSWCBN
+aXRpZ2F0aW9uIHZpYSBIVyBXYXRjaGRvZyBUaW1lcgpbICAgIDAuOTMzOTY0XSBkd21hYy1t
+b3RvcmNvbW0gMDAwMDowMjowMC4wOiBFbmFibGVkIEwzTDQgRmxvdyBUQyAoZW50cmllcz0y
+KQpbICAgIDAuOTMzOTY1XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wOiBFbmFibGVk
+IFJGUyBGbG93IFRDIChlbnRyaWVzPTEwKQpbICAgIDAuOTMzOTY2XSBkd21hYy1tb3RvcmNv
+bW0gMDAwMDowMjowMC4wOiBUU08gZmVhdHVyZSBlbmFibGVkClsgICAgMC45MzM5NjddIGR3
+bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjA6IFNQSCBmZWF0dXJlIGVuYWJsZWQKWyAgICAw
+LjkzMzk2OF0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMDogVXNpbmcgNDgvNDggYml0
+cyBETUEgaG9zdC9kZXZpY2Ugd2lkdGgKWyAgICAxLjMwMjAxNF0gZHdtYWMtbW90b3Jjb21t
+IDAwMDA6MDI6MDAuMCBlbnAyczA6IHJlbmFtZWQgZnJvbSBldGgwClsgICAgNS43NTMyNTld
+IGR3bWFjLW1vdG9yY29tbSAwMDAwOjAyOjAwLjAgZW5wMnMwOiBSZWdpc3RlciBNRU1fVFlQ
+RV9QQUdFX1BPT0wgUnhRLTAKWyAgICA1Ljc1NzUyOV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6
+MDI6MDAuMCBlbnAyczA6IFBIWSBbc3RtbWFjLTIwMDowMF0gZHJpdmVyIFtZVDg1MzFTIEdp
+Z2FiaXQgRXRoZXJuZXRdIChpcnE9UE9MTCkKWyAgICA1Ljc2ODQ0Ml0gZHdtYWMtbW90b3Jj
+b21tIDAwMDA6MDI6MDAuMCBlbnAyczA6IEVuYWJsaW5nIFNhZmV0eSBGZWF0dXJlcwpbICAg
+IDUuNzY4NjY5XSBkd21hYy1tb3RvcmNvbW0gMDAwMDowMjowMC4wIGVucDJzMDogUFRQIG5v
+dCBzdXBwb3J0ZWQgYnkgSFcKWyAgICA1Ljc2ODY3M10gZHdtYWMtbW90b3Jjb21tIDAwMDA6
+MDI6MDAuMCBlbnAyczA6IGNvbmZpZ3VyaW5nIGZvciBwaHkvZ21paSBsaW5rIG1vZGUKWyAg
+ICA4Ljg0NzAwOV0gZHdtYWMtbW90b3Jjb21tIDAwMDA6MDI6MDAuMCBlbnAyczA6IExpbmsg
+aXMgVXAgLSAxR2Jwcy9GdWxsIC0gZmxvdyBjb250cm9sIHJ4L3R4Cg==
 
-
-> Changes to DT bindings should be in a patch of its own.
-
-Thanks for the notice, I missed that when I ran checkpatch.
-
-Damien
-
+--------------eBBAZgy1CXJ4IyGkpFjVDyhb--
 
