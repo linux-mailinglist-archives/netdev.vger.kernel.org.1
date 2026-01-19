@@ -1,123 +1,96 @@
-Return-Path: <netdev+bounces-250999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA73DD3A0C3
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E67ECD3A175
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70C0B3004B84
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:55:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 778FB313E9D7
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D461338F4A;
-	Mon, 19 Jan 2026 07:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3m9jW0v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C05C33B96B;
+	Mon, 19 Jan 2026 08:19:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7F23385AB
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 07:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D69332EB9
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768809331; cv=none; b=rM6iwyuKGLFIkmPStSujcytU0aqJ4A1UF/rWB+5zySQvgCr4EIwqpULA7RDXHT0n1y5/BzsOAxTN4b8/6plVK1T6kMBGwkf4aHoc34e8WrI0kB9dj3e+A5DXnDIsrarLQlKMseWe8urzXQwz5pubcyiBlZL642fHVmxVtf8xOgw=
+	t=1768810767; cv=none; b=uoQ2JvCKvAOk6mw8xmQ7mvBZmJyG0mw++qELVEPqxb9vwFx/2K8R0ShbKZFfmu/lzpNoE0a/DPcB16MlZnFj0t9uga2GR3gC7A2PUwLWtn0rSreeQexUeFboSC9t2TzRElreQfzsx8QRdGl4wcJK9f68t8TP/9W4aHu7vW0wDmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768809331; c=relaxed/simple;
-	bh=D3BIbdokThuqChGIJiAOyjtWlnSmJF0CybBLz8VDIaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VGPyy3IX7QKjDQAg1oXnxu9LYApHRYi7IdBQ2+dWajaZpPo/OeWuxURXeFKwcGfDfdnOGnVc+lj4r7mSIc53um+Psb5tvoqqr6ion9IZrkVKxv2DaIPxo/U2vhm/SzfiZJV+idjunE9UHKwVWJaaMI8CbNZffc1ucJeuMQSxyH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W3m9jW0v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768809327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NReIhTTUCZSSWOSG7kLsOU9Hbcxq2RDCscu9pS+Jra8=;
-	b=W3m9jW0v6b8FXb06blpjKPZz3AaQ34NZu20YU72l3PAQO4v++lsxHO9RRn33o/a8jesOWH
-	GggkEEAkyiqhWSdBp1vF1d6+CcNhYn0gMbhVsnweh5uCton9vHykTeViHsc8zkdz4JSuGB
-	NRKia5OtUdBWvP/IUilNV1NsjL9wrGg=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-328-lIZVW_0EMgqarlCQmQtC9w-1; Mon,
- 19 Jan 2026 02:55:23 -0500
-X-MC-Unique: lIZVW_0EMgqarlCQmQtC9w-1
-X-Mimecast-MFC-AGG-ID: lIZVW_0EMgqarlCQmQtC9w_1768809322
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 699CB180044D;
-	Mon, 19 Jan 2026 07:55:22 +0000 (UTC)
-Received: from lenovo-t14s.redhat.com (unknown [10.45.224.165])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1889430001A7;
-	Mon, 19 Jan 2026 07:55:19 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-usb@vger.kernel.org,
-	Oliver Neukum <oneukum@suse.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	Stefano Brivio <sbrivio@redhat.com>
-Subject: [PATCH net v2] usbnet: limit max_mtu based on device's hard_mtu
-Date: Mon, 19 Jan 2026 08:55:18 +0100
-Message-ID: <20260119075518.2774373-1-lvivier@redhat.com>
+	s=arc-20240116; t=1768810767; c=relaxed/simple;
+	bh=Jb3FKv07DCzw86c6lQOtvV9wn5Qbc0cIexkfIx/2GCQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ac63Bp3a4q/jZO5Rq3QH7UXrNjBeq6WQtiR1/5oJFeEv86yRCxufltDIO92otFNCm6g1kYo5Re71N7mJL6W16MwD3t47WnC4Zlj1XIGQG40mNRxrY1tum5rP2OlQOG0y7XnNpOw5S8fOrfJEJ5yJ1ijYy5Bz2pcmlYcsLukCmQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7cfd3cbaeedso7636661a34.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 00:19:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768810765; x=1769415565;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ni2tG3D0/GMousFMArbvuVSn5vpRnsJtfyimarHsdLU=;
+        b=gK7b+14XKoiQBjCbVW2C8WhPZjSUfzt46Mlt1EqNr7rHMI3Rc80NjISpbKMWVfW4WM
+         VckP5spbcNAfjUMdTYCItfsUxwRI0b7vUDCH+KO+jJLSOlMcqa7AmnL55oGtDZxiMVJO
+         CpymMwemfQeUXruEAIOCRBVgtlsfaq3QaiW2plkHvoEAdSzDP4YRplgLaq6m7gjQosPR
+         rQx0PdN6yD2PSjgoZZrSpm/a72B5v4U2y3jMeox3p9BDjI8urnq2qpnQLjHlRLKUCmNY
+         NAKAEezMMygjpRGPQTTtqtf3aKBGLsMJoQWFJZYofNHv3ZIYx1FgRzfLrnxA9pFVC87w
+         H/rA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSszegfhs6qgHrn2hEH5a9AXfS6lnAQl3zSoOrbn7edBoR0jt8YfcG+wkfn4Latsky/p4LO5M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjcFhYY0wCaVwvA5hec7GnvzgrgQ328XvYp449Jg+FK+uAKXAO
+	PZtsh+5HTg1thxDzrkiFvRsuJ2aNO/uLh8onGdq2+Hmi3du+p/ytPEoHiM+Kl273a9aEd0NuQc5
+	vVOCfaFIgNuUxWL2WceHnBmNZAVa9i38Xot4Kk+W7H5F1wyabckmq7MPzHVg=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Received: by 2002:a05:6820:997:b0:65f:5c88:67a8 with SMTP id
+ 006d021491bc7-66117a3a2dbmr3962051eaf.74.1768810764914; Mon, 19 Jan 2026
+ 00:19:24 -0800 (PST)
+Date: Mon, 19 Jan 2026 00:19:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <696de90c.a70a0220.34546f.0435.GAE@google.com>
+Subject: [syzbot] Monthly bridge report (Jan 2026)
+From: syzbot <syzbot+list1e4b7a4bd5a6b9f5fd40@syzkaller.appspotmail.com>
+To: bridge@lists.linux.dev, idosch@nvidia.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, razor@blackwall.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The usbnet driver initializes net->max_mtu to ETH_MAX_MTU before calling
-the device's bind() callback. When the bind() callback sets
-dev->hard_mtu based the device's actual capability (from CDC Ethernet's
-wMaxSegmentSize descriptor), max_mtu is never updated to reflect this
-hardware limitation).
+Hello bridge maintainers/developers,
 
-This allows userspace (DHCP or IPv6 RA) to configure MTU larger than the
-device can handle, leading to silent packet drops when the backend sends
-packet exceeding the device's buffer size.
+This is a 31-day syzbot report for the bridge subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bridge
 
-Fix this by limiting net->max_mtu to the device's hard_mtu after the
-bind callback returns.
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 7 issues are still open and 39 have already been fixed.
 
-See https://gitlab.com/qemu-project/qemu/-/issues/3268 and
-    https://bugs.passt.top/attachment.cgi?bugid=189
+Some of the still happening issues:
 
-Fixes: f77f0aee4da4 ("net: use core MTU range checking in USB NIC drivers")
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Link: https://bugs.passt.top/show_bug.cgi?id=189
-Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+Ref Crashes Repro Title
+<1> 52      Yes   INFO: rcu detected stall in br_handle_frame (6)
+                  https://syzkaller.appspot.com/bug?extid=f8850bc3986562f79619
+<2> 5       No    KMSAN: uninit-value in netif_skb_features (4)
+                  https://syzkaller.appspot.com/bug?extid=1543a7d954d9c6d00407
+<3> 1       No    WARNING in br_nf_local_in (2)
+                  https://syzkaller.appspot.com/bug?extid=9c5dd93a81a3f39325c2
+
 ---
- drivers/net/usb/usbnet.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 36742e64cff7..1093c2a412d9 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1821,9 +1821,12 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 		if ((dev->driver_info->flags & FLAG_NOARP) != 0)
- 			net->flags |= IFF_NOARP;
- 
--		/* maybe the remote can't receive an Ethernet MTU */
--		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
--			net->mtu = dev->hard_mtu - net->hard_header_len;
-+		if (net->max_mtu > (dev->hard_mtu - net->hard_header_len))
-+			net->max_mtu = dev->hard_mtu - net->hard_header_len;
-+
-+		if (net->mtu > net->max_mtu)
-+			net->mtu = net->max_mtu;
-+
- 	} else if (!info->in || !info->out)
- 		status = usbnet_get_endpoints(dev, udev);
- 	else {
--- 
-2.52.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
