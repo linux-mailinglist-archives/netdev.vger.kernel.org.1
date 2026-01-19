@@ -1,331 +1,134 @@
-Return-Path: <netdev+bounces-251177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E571DD3B051
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:18:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1B2D3B147
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 54BCB3010500
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:18:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6CB783038101
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203F42EB5CD;
-	Mon, 19 Jan 2026 16:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268E02EDD41;
+	Mon, 19 Jan 2026 16:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C2D2DFA40;
-	Mon, 19 Jan 2026 16:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDEF2EA473
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 16:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768839515; cv=none; b=EEAQTOXlXzJhBPcWAa3fd08QVs9r5W5gC7NnAxhvyeHEAsIQcEcW61CDA9efK9KKUO3TwN9Uv310DS0xLlnL6Dmu6rKq/3DA9Hpw5tMfSJkfsjuUKmqisNxoED+5g/rHJmfITjhla10g1SH39CDZiE0hHHvWw7veudX7l49uZRA=
+	t=1768840013; cv=none; b=Y9Ip3d0RR7/Rkj1Kp6gE85BDrTFcQqeN4lZatKQb2fSLSX9jMdb/7iSX77H34EwKutpOywYRx43+4po6DqSofdSLvrcj51vebQQ9AtsTUtZHT/zqNfS7ukszda9QiGaON4sbHB1m8ol6TAA4yotD7ONMbbr1/NmEShoxeTgy06w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768839515; c=relaxed/simple;
-	bh=mMVLqKds6AeiX/SS6lLZ6drmbBesQbKv3ImiFWuUCMU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PvKfgVPyFojJLAM/3S0QXVC1cufZBtzth0hr2CSnfVP/7WvsRRmRGY+2glh/o3zRPdNpvgqQuGNnZYu2yLaFDSP+SLJG84X13hfw8d1dy3NmN7iw2DFlZPczPrK4uV91tr4JYP3YxCVORE+oSWL74u0XuzTx3UfgUzf8HIX5Ta0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E586A4C442F9C9;
-	Mon, 19 Jan 2026 17:17:36 +0100 (CET)
-Message-ID: <cadf7215-34d2-4514-abc8-ddc72a85d6f7@molgen.mpg.de>
-Date: Mon, 19 Jan 2026 17:17:36 +0100
+	s=arc-20240116; t=1768840013; c=relaxed/simple;
+	bh=DzwnTBOKZrW1VnGMIzybUOHJNbRRFkalswYuPe8RZYM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eSAyttNk7YZJZj4qpJDPF8ckSJ3DJv+644uSWiURdDHm5enUjvH7NOpdQ67tOEf/KAoq5AC/x5Re0vj87PJr9z1ZfzyTZILiMzLkB2BMjY/PGTp9pNt0+uYmIMJZaBGIC8BghQ1DJwHsHUfqpLkT2uNjhjXPUYO0tOSiVMELJOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5636dce976eso3466796e0c.0
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:26:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768840010; x=1769444810;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lHeLbzKTRLrsHU7Yrs3oNyJNjYmQgDzjREnwpGNLYz4=;
+        b=SSQg/w7Lwk4VClB5nW9z7mJLg3pEhy+Vdb1ylPYNHCJkA7XdkUb2Cl5HfIcEgDV2S9
+         i2BMOOoo4yrZ8I2gppIiSOKTZGzhB1+NjUyJhDy4hS6kM9753OFR6HaDqjl9ePnB7fBL
+         OQj+OwwEwOVJxsEcGbZmoYreVnXAPyxThFTRpPrNlET3OPPCJ1i1VzhnXGVNJ8rrBZT7
+         5tGVeBv0FJy779+QM2y41TVui6fx7+5ZpUbGStqbtU9sx/gww1/P5AE/OeV9ga1PzMtP
+         WHXq46x/awqrPoyshQPLqelTFT+fXStntlvsoiFLd3HbCH3FfpYqlvnNeauZvTEiTHj6
+         NNmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVai7C9cy6IO0kDATwBaRb4uAj+h2NfWk75dtb3Y0E/LYkd2GFGMUtL2s+QHk0TAUik1B86lP4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdL7Phr9T/LqUjSAmMFoPMqxkAyZHCQAoMYL11XmZd32qpgnoA
+	QINuKoaunsQ5mTDRUTLFZxXaCqW1BcSKhoK7Djjzr2nVbPBbqUR4PDenvf/2lGAO
+X-Gm-Gg: AY/fxX6coGax4tpwuqNXQvLEiQ6xyaPeFhhvB3lS+1C+RX4z/Kl6c0Mnz7+10wOdw1l
+	PtFPxXtEjfqkdynOfgNA3JKFxcHU86H16BhMrVhnPIH+9VrnmHhzOomto9C0jKRDDLRgeft0+Im
+	CFNZlyD0YLI3UkhWE/9RIwbSL4AwC/h1PgUkLO36HUBECLU9NlsjRq7zpLUSX8uxPS+Sx8KX6WK
+	Hzc7OIx1eph4HDnd5hToioibfUMF52n3bv8jynkWZUu5aerUFHQCwNrQDlotm889y/5pr8mrQ5o
+	A6YDnqu1he2RXF6t0dhYvz53Ll11sDgbiEErkYFcl4c2mZ22FfKJ4T+JfEG4W3hIpiEzIWeRpkh
+	inR20z+JomSwaryEOmfzrOVwcjuhrj7WKjJJWaAwn+V2A7lV/jddGAi0a+JXHrSvU9gyIzk3WOl
+	sSDAayThe47Em1E73oHCZG9GttbFghWi1MNYgcNLzv4sQ2/Dea
+X-Received: by 2002:a05:6122:35c7:b0:563:62ce:b28a with SMTP id 71dfb90a1353d-563b63da5eamr3111323e0c.5.1768840010252;
+        Mon, 19 Jan 2026 08:26:50 -0800 (PST)
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com. [209.85.222.44])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563b6fdb07asm2771702e0c.2.2026.01.19.08.26.49
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jan 2026 08:26:49 -0800 (PST)
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-93f63c8592cso3772374241.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:26:49 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW08mmoLIaU3AP2HZGzKmREXJTHM9VGgYUfC6kMFSEQ+B+YSxZ6wKl2KO5OGN61hhqX2OfiNV0=@vger.kernel.org
+X-Received: by 2002:a05:6102:304b:b0:5ef:a24a:50b5 with SMTP id
+ ada2fe7eead31-5f19253ba4amr5672990137.18.1768840008742; Mon, 19 Jan 2026
+ 08:26:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: reshuffle and group Rx
- and Tx queue fields by cachelines
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- nxne.cnse.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260119160843.3854173-1-aleksander.lobakin@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260119160843.3854173-1-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <e4822cf4aa03fed067f5df7cd4f3496828abc638.1768487199.git.geert+renesas@glider.be>
+ <20260117163304.20caae7c@kernel.org>
+In-Reply-To: <20260117163304.20caae7c@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 19 Jan 2026 17:26:37 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdX9J9QPp16aDD-_2Q-chWANWeTyS6Dw=xJdkm8r-sPyFw@mail.gmail.com>
+X-Gm-Features: AZwV_Qg5syuFPC8HV97bsY14SXc1tA3fkUNNUbrr7vpIH4FRUVjB7jL1flr_3_M
+Message-ID: <CAMuHMdX9J9QPp16aDD-_2Q-chWANWeTyS6Dw=xJdkm8r-sPyFw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net/tcp_sigpool: Enable compile-testing
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Dear Alexander,
+Hi Jakub,
 
+On Sun, 18 Jan 2026 at 01:33, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 15 Jan 2026 15:27:26 +0100 Geert Uytterhoeven wrote:
+> > Since commit 37a183d3b7cdb873 ("tcp: Convert tcp-md5 to use MD5 library
+> > instead of crypto_ahash"), TCP_SIGPOOL is only selected by TCP_AO.
+> > However, the latter depends on 64BIT, so tcp_sigpool can no longer be
+> > built on 32-bit platforms at all.
+> >
+> > Improve compile coverage on 32-bit by allowing the user to enable
+> > TCP_SIGPOOL when compile-testing.  Add a dependency on CRYPTO, which is
+> > always fulfilled when selected by TCP_AO.
+>
+> I don't see why we'd care. I understand COMPILE_TEST when the symbol
+> is narrowed down to a very unusual platform. But this is doing the
+> opposite, it's _adding_ a very unusual platform on which, as you say,
 
-Thank you for your patch.
+(I wouldn't claim it is a "very unusual platform". 32-bit won't be dead
+ for at least a decade ;-)
 
-Am 19.01.26 um 17:08 schrieb Alexander Lobakin:
-> Place the fields in ice_{rx,tx}_ring used in the same pieces of
-> hotpath code closer to each other and use
-> __cacheline_group_{begin,end}_aligned() to isolate the read mostly,
-> read-write, and cold groups into separate cachelines similarly
-> to idpf.
-> 
-> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
-> Applies cleanly to today's next-queue.
-> 
-> Testing hints:
-> 
-> No functional changes in this patch, there's no way it could break
-> anything. If you want, you can test basic XDP actions (PASS, DROP)
-> and compare the performance before and after the patch.
+> this code cannot be used today. If this code regresses and someone
+> wants to start using it on 32b they'll have to fix it.
+>
+> Please LMK if I'm misunderstanding or there's another argument (not
+> mentioned in the commit message).
 
-It’d be great if the numbers could be added to the commit message.
+In general, we want to be able to test-compile as much code as possible
+on all platforms, but not bother everyone who configures and builds a
+kernel for his system.  Until commit 37a183d3b7cdb873, that included
+the tcp_sigpool code, and any build regressions would be caught soon,
+and fixed (presumably).  Of course that still doesn't guarantee the
+code would actually work on 32-bit, but successful compilation is a
+first step...
 
-> ---
->   drivers/net/ethernet/intel/ice/ice_txrx.h     | 122 ++++++++++--------
->   drivers/net/ethernet/intel/ice/ice_ethtool.c  |   1 -
->   drivers/net/ethernet/intel/ice/ice_txrx.c     |   1 -
->   drivers/net/ethernet/intel/ice/ice_txrx_lib.c |   3 -
->   4 files changed, 70 insertions(+), 57 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-> index e3c682723107..557b5e656bb0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-> @@ -267,34 +267,49 @@ struct ice_tstamp_ring {
->   } ____cacheline_internodealigned_in_smp;
->   
->   struct ice_rx_ring {
-> -	/* CL1 - 1st cacheline starts here */
-> +	__cacheline_group_begin_aligned(read_mostly);
->   	void *desc;			/* Descriptor ring memory */
->   	struct page_pool *pp;
->   	struct net_device *netdev;	/* netdev ring maps to */
-> -	struct ice_vsi *vsi;		/* Backreference to associated VSI */
->   	struct ice_q_vector *q_vector;	/* Backreference to associated vector */
->   	u8 __iomem *tail;
-> -	u16 q_index;			/* Queue number of ring */
-> -
-> -	u16 count;			/* Number of descriptors */
-> -	u16 reg_idx;			/* HW register index of the ring */
-> -	u16 next_to_alloc;
->   
->   	union {
->   		struct libeth_fqe *rx_fqes;
->   		struct xdp_buff **xdp_buf;
->   	};
->   
-> -	/* CL2 - 2nd cacheline starts here */
-> -	struct libeth_fqe *hdr_fqes;
-> +	u16 count;			/* Number of descriptors */
-> +	u8 ptp_rx;
-> +
-> +	u8 flags;
-> +#define ICE_RX_FLAGS_CRC_STRIP_DIS	BIT(2)
-> +#define ICE_RX_FLAGS_MULTIDEV		BIT(3)
-> +#define ICE_RX_FLAGS_RING_GCS		BIT(4)
-> +
-> +	u32 truesize;
-> +
->   	struct page_pool *hdr_pp;
-> +	struct libeth_fqe *hdr_fqes;
-> +
-> +	struct bpf_prog *xdp_prog;
-> +	struct ice_tx_ring *xdp_ring;
-> +	struct xsk_buff_pool *xsk_pool;
-> +
-> +	/* stats structs */
-> +	struct ice_ring_stats *ring_stats;
-> +	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
->   
-> +	u32 hdr_truesize;
-> +
-> +	struct xdp_rxq_info xdp_rxq;
-> +	__cacheline_group_end_aligned(read_mostly);
-> +
-> +	__cacheline_group_begin_aligned(read_write);
->   	union {
->   		struct libeth_xdp_buff_stash xdp;
->   		struct libeth_xdp_buff *xsk;
->   	};
-> -
-> -	/* CL3 - 3rd cacheline starts here */
->   	union {
->   		struct ice_pkt_ctx pkt_ctx;
->   		struct {
-> @@ -302,75 +317,78 @@ struct ice_rx_ring {
->   			__be16 vlan_proto;
->   		};
->   	};
-> -	struct bpf_prog *xdp_prog;
->   
->   	/* used in interrupt processing */
->   	u16 next_to_use;
->   	u16 next_to_clean;
-> +	__cacheline_group_end_aligned(read_write);
->   
-> -	u32 hdr_truesize;
-> -	u32 truesize;
-> -
-> -	/* stats structs */
-> -	struct ice_ring_stats *ring_stats;
-> -
-> +	__cacheline_group_begin_aligned(cold);
->   	struct rcu_head rcu;		/* to avoid race on free */
-> -	/* CL4 - 4th cacheline starts here */
-> +	struct ice_vsi *vsi;		/* Backreference to associated VSI */
->   	struct ice_channel *ch;
-> -	struct ice_tx_ring *xdp_ring;
-> -	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
-> -	struct xsk_buff_pool *xsk_pool;
-> -	u16 rx_hdr_len;
-> -	u16 rx_buf_len;
-> +
->   	dma_addr_t dma;			/* physical address of ring */
-> +	u16 q_index;			/* Queue number of ring */
-> +	u16 reg_idx;			/* HW register index of the ring */
->   	u8 dcb_tc;			/* Traffic class of ring */
-> -	u8 ptp_rx;
-> -#define ICE_RX_FLAGS_CRC_STRIP_DIS	BIT(2)
-> -#define ICE_RX_FLAGS_MULTIDEV		BIT(3)
-> -#define ICE_RX_FLAGS_RING_GCS		BIT(4)
-> -	u8 flags;
-> -	/* CL5 - 5th cacheline starts here */
-> -	struct xdp_rxq_info xdp_rxq;
-> +
-> +	u16 rx_hdr_len;
-> +	u16 rx_buf_len;
-> +	__cacheline_group_end_aligned(cold);
->   } ____cacheline_internodealigned_in_smp;
->   
->   struct ice_tx_ring {
-> -	/* CL1 - 1st cacheline starts here */
-> -	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
-> +	__cacheline_group_begin_aligned(read_mostly);
->   	void *desc;			/* Descriptor ring memory */
->   	struct device *dev;		/* Used for DMA mapping */
->   	u8 __iomem *tail;
->   	struct ice_tx_buf *tx_buf;
-> +
->   	struct ice_q_vector *q_vector;	/* Backreference to associated vector */
->   	struct net_device *netdev;	/* netdev ring maps to */
->   	struct ice_vsi *vsi;		/* Backreference to associated VSI */
-> -	/* CL2 - 2nd cacheline starts here */
-> -	dma_addr_t dma;			/* physical address of ring */
-> -	struct xsk_buff_pool *xsk_pool;
-> -	u16 next_to_use;
-> -	u16 next_to_clean;
-> -	u16 q_handle;			/* Queue handle per TC */
-> -	u16 reg_idx;			/* HW register index of the ring */
-> +
->   	u16 count;			/* Number of descriptors */
->   	u16 q_index;			/* Queue number of ring */
-> -	u16 xdp_tx_active;
-> +
-> +	u8 flags;
-> +#define ICE_TX_FLAGS_RING_XDP		BIT(0)
-> +#define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
-> +#define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
-> +#define ICE_TX_FLAGS_TXTIME		BIT(3)
-> +
-> +	struct xsk_buff_pool *xsk_pool;
-> +
->   	/* stats structs */
->   	struct ice_ring_stats *ring_stats;
-> -	/* CL3 - 3rd cacheline starts here */
-> +	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
-> +
-> +	struct ice_tstamp_ring *tstamp_ring;
-> +	struct ice_ptp_tx *tx_tstamps;
-> +	__cacheline_group_end_aligned(read_mostly);
-> +
-> +	__cacheline_group_begin_aligned(read_write);
-> +	u16 next_to_use;
-> +	u16 next_to_clean;
-> +
-> +	u16 xdp_tx_active;
-> +	spinlock_t tx_lock;
-> +	__cacheline_group_end_aligned(read_write);
-> +
-> +	__cacheline_group_begin_aligned(cold);
->   	struct rcu_head rcu;		/* to avoid race on free */
->   	DECLARE_BITMAP(xps_state, ICE_TX_NBITS);	/* XPS Config State */
->   	struct ice_channel *ch;
-> -	struct ice_ptp_tx *tx_tstamps;
-> -	spinlock_t tx_lock;
-> -	u32 txq_teid;			/* Added Tx queue TEID */
-> -	/* CL4 - 4th cacheline starts here */
-> -	struct ice_tstamp_ring *tstamp_ring;
-> -#define ICE_TX_FLAGS_RING_XDP		BIT(0)
-> -#define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
-> -#define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
-> -#define ICE_TX_FLAGS_TXTIME		BIT(3)
-> -	u8 flags;
-> +
-> +	dma_addr_t dma;			/* physical address of ring */
-> +	u16 q_handle;			/* Queue handle per TC */
-> +	u16 reg_idx;			/* HW register index of the ring */
->   	u8 dcb_tc;			/* Traffic class of ring */
-> +
->   	u16 quanta_prof_id;
-> +	u32 txq_teid;			/* Added Tx queue TEID */
-> +	__cacheline_group_end_aligned(cold);
->   } ____cacheline_internodealigned_in_smp;
->   
->   static inline bool ice_ring_ch_enabled(struct ice_tx_ring *ring)
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 8d8569d06119..4f79dc73a8ad 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -3388,7 +3388,6 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
->   				 */
->   				rx_rings[i].next_to_use = 0;
->   				rx_rings[i].next_to_clean = 0;
-> -				rx_rings[i].next_to_alloc = 0;
->   				*vsi->rx_rings[i] = rx_rings[i];
->   			}
->   			kfree(rx_rings);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> index e8e1acbd5a7d..40d7252caee0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -582,7 +582,6 @@ void ice_zero_rx_ring(struct ice_rx_ring *rx_ring)
->   		     PAGE_SIZE);
->   	memset(rx_ring->desc, 0, size);
->   
-> -	rx_ring->next_to_alloc = 0;
->   	rx_ring->next_to_clean = 0;
->   	rx_ring->next_to_use = 0;
->   }
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> index f7006ce5104a..66d211aa0833 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> @@ -20,9 +20,6 @@ void ice_release_rx_desc(struct ice_rx_ring *rx_ring, u16 val)
->   
->   	rx_ring->next_to_use = val;
->   
-> -	/* update next to alloc since we have filled the ring */
-> -	rx_ring->next_to_alloc = val;
-> -
->   	/* QRX_TAIL will be updated with any tail value, but hardware ignores
->   	 * the lower 3 bits. This makes it so we only bump tail on meaningful
->   	 * boundaries. Also, this allows us to bump tail on intervals of 8 up to
+As the maintainer, the decision is yours, though.
 
-The diff looks good.
+Gr{oetje,eeting}s,
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+                        Geert
 
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Kind regards,
-
-Paul
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
