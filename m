@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-251063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E747ED3A893
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:21:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D11D3A8AE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8648D3028B38
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:20:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03C9930263D3
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B3F326926;
-	Mon, 19 Jan 2026 12:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE7B253950;
+	Mon, 19 Jan 2026 12:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TO4XBn0e"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LJvrFQ/9"
 X-Original-To: netdev@vger.kernel.org
 Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013055.outbound.protection.outlook.com [40.107.162.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4056127E1D7;
-	Mon, 19 Jan 2026 12:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE2732572D;
+	Mon, 19 Jan 2026 12:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768825219; cv=fail; b=mZ3VVnRa3JLacG48jfyrPJOpMkLJunw9/MAjucZsYgKpG7GsYSeg/j+CicwH2SbyhaPbwR7PXZAgQ4GGP3SMlhR/qB3VgSc3bwXAZ6cNDsGQMxnRCMzrLiffYbhbJDWatYigBBUXWNL+MWpwpny4wSOaJc3vfoclmBE7wDBKXy0=
+	t=1768825246; cv=fail; b=P6xj7czduvTiA6aIQdT7vx4jtBsoij0aAUoHOFLMZKVA2LpxMOW7XafkJ9R6jgqyasQE8leMiCG7lLDzhwNVmOeZ40FpA0wuHlhT8yAHmMg847xYj5lCAgfPCA87210lruyLl1JQEUrT9DEpakuQLzZGmsSc365t2zcd/WCvD0A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768825219; c=relaxed/simple;
-	bh=NUKqHHjrZkw0JYeIbXGjWTjwM37ewhL7GgeGBbh8ne8=;
+	s=arc-20240116; t=1768825246; c=relaxed/simple;
+	bh=f752+lldwHFx4IBdMAT/CGr1f19NBqa/arLwl8LG3l8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TWHCRgAjd/qtv3CHGx7FdeCJ+MTUVuMzvxJQ9kO+5XOZbW0y1MUzKXMhtT5FK+U0IGymuQz8iYRjp4hnSeKbhFQ+cDnZIZS9FdngnYA4ycWpg5ivX/iuEaDDneuSvTTBDNehsDSfHIcT0PNp69syRpOi1DG4XE1//GH8Ml0ulIo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TO4XBn0e; arc=fail smtp.client-ip=40.107.162.55
+	 Content-Type:MIME-Version; b=cRHv70TsMYnXMGDtY2hIvELcVghYOff5dBl3zM9nOvYzq7D8RQkBAQksIpaeUPM/dBRdau4HGQOMWNEavUqaIYiVqeYdih5eftoL4Ooipc3kYKWiMR3ZpH/g8HaNRO4irQEggjNg5fcNjt4lxcXjnrqKjp/TnCKYr67VMncpzwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LJvrFQ/9; arc=fail smtp.client-ip=40.107.162.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tva0Mm8sU6L0H8H2ESvVCQFaNHYTLVNUVvLHfRZsEm8g8BB3hYg08dBu6BQNG7m3v7+aVrNVzlomCqlKg8BlHgUgb3c8HZX6+3Ob5MDJExAwq1+/gU5ctuUIgozwAMEQ245es73B0LxjpOHaMJMehJFMVH+1VcQciUXeRmQa6vD3SLNxWD0icfQxk+R7Fd+MlfhoDrKxOfsw/8VjO6fGRtqj6gvlsaBL6MvurcrUv8Bon6P1S1wzz189iAiov+pHbQYU70wXKqdV73QU1bpVn/JQLHP6eNUsPSCxqGjf3psSKpFmDk3DxMNnwzDvIBXAaEayfFOgg84sg1VBRXCsvQ==
+ b=YCxZqbOdjQbW3Ee0gAoH4/M200vOm2AhRr0E5h24uvCZ91omi4zJCfvVAsZKadIq1VnH1A8NhSpxo5utmDTI+2tIGQQBlNl/cDiSRQBfy4Lujeqg3qD3UvaIROw8E37LUP4/5tNuYmSRZHxRpr5RDX/fjdX/xlyV7U92T5CS96Z6kN3CIt5CWl10WjuKlx99mBhUsUwaqSo3lJcPEisH1ZN+kqkEPWEuyRCU84IXxqimjLBiHB4EKy1ziFqR3hAx2ofUIY6DBFJJV847deQwNgvwXZqHyjKrMZ8FZbrS3/rPPXhK3TsZFWeHxP5gntdRuukxF+gOG9hXnCFGYrNYaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gq6/RxXI62xZitCYidjzrU1mfoZIsL5NDFo7oz4c+qM=;
- b=pb8x0rLfcJNFMBV3+zneNa000MRNImuxF5tVXD3dsrVHJ67H9ulEHLaI0MnA4CzVtRr+MnGn0Ko0BOUJUVOusxxslm0tL6w5TKTkUyO1qVHdEV69k8foVnur+Xr9TJeBLd+blGG4caIJxc5LFuPUrt0x+G7LQ7LidLwHi+/EGh4CWl0LTA1PvlHmD392q3Eb5drpEs+u+v6iFUBtXFLIk0yQiIjzvzKKRWJTGT/wErcPpfhDLfBg93gsW+9Mkz6GLS5lNtQR3P1/YObqFiR+8U4+vtHG2LhY6/3PG6VHfmyXP/4h65MYtoJNfjo+3aZPDoGzVutaIubkduuIBQ9Ayg==
+ bh=4MUnuiCqXo2VKjJUqmcWUoc7LlCgZislxZ9Lu/Ksgjs=;
+ b=CbKmuX+or7FAYT1zr06QlPl/PtFYZFgV/h0mf6/jdvP3+JcBHcnscs18uqo/mm8UBlZ2Gg+hCNFCIWWi//z0Q0NVYVC9UdIR/CPY4z8BA45rylnj3U2fu7knDxlckvaOKWU9j3llf/45N/jrzSoaI0p0iwEco3Gk1EWEfpxFeMKXPTGRZVFA9EBT0Vzs7nL7VTsZSeqb10n+RJR5syjn2zWiDvmANP0GBCk49oh86bGjHGM/M4LRrV2mpj3ht2HfSpaocLjWHlRjgdeTetsV593VTclTkMSgYZjiI97AI+BAM8jW0r7S2R1P5EOcJMFY3HLZ0qI11VOkZy6chJDQrQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gq6/RxXI62xZitCYidjzrU1mfoZIsL5NDFo7oz4c+qM=;
- b=TO4XBn0eNDEIW3MJJDif8dIjd0v+a3CbFj/N3xLXoopNKeaNE3Y7viThn3BlPOsBK9w/0mj8jfmPqKWuw/63GdXRdXqCxzoytBL5bMd3myp8TYL6aE8C/R7StTjQ4SiQmkpsm89jbpbujJxUPRQEdbi7lmhTGLyPLap44EeGsRFd6NmiOg1qH0PqjgU2VAn3hB0jtwFzCdLJPOtScPLTA5DWcZ8ucs1h1zPUV0G6OeK6PyK+BXwCitTSouPqeocGGue6Ntrm2HqmtFB8GNaWy1ME74MyYE4DiX7ByctFCPY9q/b0dKxK3b3ICQgG5bnkv0hswhcrENJcrHiSjIyO0A==
+ bh=4MUnuiCqXo2VKjJUqmcWUoc7LlCgZislxZ9Lu/Ksgjs=;
+ b=LJvrFQ/9EDu2yuj/5i8TRp2gl6rkJ/zmRLdmPjOA4mnzEOqVLVsdWOxlxXyjUhhiPT9nZkvxvEADrPiH3iH1qI/kxllNUKxsv8J6fjFIOvOC/P0gagoylAywYuawKPx9JBpMvOG/zzVZdJR6r/gqAapqM0REtbAKz2tNm25lqfNJh27cTgNBjDqbhEmM4B29dAtOHWBHTfP3X8D5iVMY8k9ZDQ7NImdC5HuPBVyZM+xMycUTJykkPow6JehJR9N4L0xV1Sy/enKVBy8jjo/SKG3BT+CpdHa3rfTUzoNLXrDYfr+yV4BCeSaDBrbeG4qKZ8RSe18r6tOgti30/EpSTQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
  by PAXPR04MB9156.eurprd04.prod.outlook.com (2603:10a6:102:22f::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
- 2026 12:20:07 +0000
+ 2026 12:20:08 +0000
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
- 12:20:07 +0000
+ 12:20:08 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -64,9 +64,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net-next 3/4] net: dsa: sja1105: let phylink help with the replay of link callbacks
-Date: Mon, 19 Jan 2026 14:19:53 +0200
-Message-Id: <20260119121954.1624535-4-vladimir.oltean@nxp.com>
+Subject: [PATCH v3 net-next 4/4] net: dsa: sja1105: re-merge sja1105_set_port_speed() and sja1105_set_port_config()
+Date: Mon, 19 Jan 2026 14:19:54 +0200
+Message-Id: <20260119121954.1624535-5-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260119121954.1624535-1-vladimir.oltean@nxp.com>
 References: <20260119121954.1624535-1-vladimir.oltean@nxp.com>
@@ -83,248 +83,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PAXPR04MB9156:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8d03062-7981-4329-21c6-08de5755152e
+X-MS-Office365-Filtering-Correlation-Id: 7cf9ee9b-5c16-4a38-0eae-08de575515c5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|366016|52116014|19092799006|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QUTVudPAuCCjVyXW0w/AKaRbLOBDqNnQC3tddkoqio0YuuOJ+6ZyGj4XjSfk?=
- =?us-ascii?Q?MU8K7+1dRxumbkaSg1f9l02iCKnnXmB16ElsyWSIqeEvnknxlDY0HQYpgVYV?=
- =?us-ascii?Q?ZgD01PPGnBhMI7aQIG9Gk/G+o7b2vf3LL6yg2LU69NMXwIPIYbwol9AafEKG?=
- =?us-ascii?Q?3tJvFmIiZleD3kB1l+Gs+6hkmwxuJWVAOK8EwWA+LAKYSIUsiPpnoLGmdIcV?=
- =?us-ascii?Q?H601dbyWgaIf3LokNV73FJ2KZg0Z2KS3Mx++84iJI+6kP601Rc0DD6xoq44I?=
- =?us-ascii?Q?2D9nhSOfNqCX8ZwZPJV3lFZRkeqjF2fgOfxSL3bZEDiilgrBrZSy7KOFlc4f?=
- =?us-ascii?Q?dCwn6cGrFdKhHcIvcjsTGl/CB7xr5gDXwGws+UUT3wjLPeWMv0V9AGd4cwuo?=
- =?us-ascii?Q?uZW0g9dmhYF8Zecl0WdDptIYQhOqUiNIt4CUz+01bkv/gtr8Oo5J3a/iwZ60?=
- =?us-ascii?Q?/RLuwILuAHtUL9GTqKx+upo3rS4MvugJM2LRlvDt2fNrrwtclDLEWQwHd/XN?=
- =?us-ascii?Q?w2RCqntXP4fSZb+9YB35fkFAuQnthqk/jbGQWqTsEOyxk/R8eAGiu9tFhJ8E?=
- =?us-ascii?Q?ChFj7Y6JG4qO3+wuHntslPPelgcvnVfDjEx4IyjPb81x4qCOE/RM5MPwBt0Y?=
- =?us-ascii?Q?S9nlOEMFp9y77j30o3u+zViixVkeJL/uuoyUgqBMb1O3oX3WZQX0XjhyRkAY?=
- =?us-ascii?Q?TYh5grpAD9mMuQ2tqMcCmrtXIgXYiA9DoFAVo6NTlDn5kFsXlOk0ZLShKO2W?=
- =?us-ascii?Q?Ej0nNsmIrlUmX/szUOxlntxmGE2CeW5OaBZk6qffusH7jeDHKM/j2ef8QJ/b?=
- =?us-ascii?Q?DztmocLO12FbNiNx5AHaiDMYZbSKgBrTRaXvQOFxjH8UeY8SfNJV6njAcFC3?=
- =?us-ascii?Q?A8gxa8pfYFh5m7xTc2ybqev4yIH/rBJTaifq5uDbHGPD5MvJun5T9l/JoyAe?=
- =?us-ascii?Q?TWGbN32TmsQK5jiMEdN74JYboQFvHdyOqHS+QfTcb9ZLsTdH5OoMekGW+XXP?=
- =?us-ascii?Q?wWFPGGc0fYc/Cn+oKIwlap3eMBQXr87ZIvXo6nrmzhW/ykN/jg933rY2SKPf?=
- =?us-ascii?Q?ejAyZndz/qEPG2Eo3nqr9YdYADDv9wjBUeFutxWVPJtKcBRjUCRH7MiPgwSn?=
- =?us-ascii?Q?udQW16EOstsJGEkqQOacKMYDMhyYk2aKtvTHo82MtCjrGaKre4US/Y6W0feU?=
- =?us-ascii?Q?kHpiBQRtO6/2R4VT/ZyJ053GvXEnt5DfWyc9pGxfxHcD+WYsI86T18G/pAz8?=
- =?us-ascii?Q?2IPfmI36prhVDOikRNkEJsenxIqRijRUdOQCQayZx1E9iiPXzEiPoiO3rd/c?=
- =?us-ascii?Q?cGkOCYQ4QBSULISWnx/0kgXt+eYaiLjfbHV2uROn1vg9JZU9AirYx/5OHUX3?=
- =?us-ascii?Q?K2DpCfWBBmTcd2KrWaX2nxrsw5Ti0SY6URZ3IzO550G3BPPK6TBaScLkdv1J?=
- =?us-ascii?Q?zezofllmRIEart0CsPw8Iemax/er2KqSm01h0YR92bC4fNGgTi/pBtQQAx38?=
- =?us-ascii?Q?7zplZRaDqgCDnKN4YQx12JMtQNsQpA9zWAppU1J+kUx4kpaZVVPSYIyMkpzJ?=
- =?us-ascii?Q?nyBrbc/Cj1qN5XH1PBzAA2J5scoUheawQfzFmtKTkudGL/kv8vCA7TlWWiQ8?=
- =?us-ascii?Q?gNECwsZ5yVp/TCGZUXZSjiM=3D?=
+	=?us-ascii?Q?GwbkTNq1DhJ6Kf5F7FrICNvkOIGsGzZ4pmLQP248CNt0hhKJC+dTI2qLH8cl?=
+ =?us-ascii?Q?HnPJSQzxG60pAXv3xCfQAWlSBQPnRvHhHoTDniOP7/gjV0yx5W1bmpTKs2I3?=
+ =?us-ascii?Q?Xb9wnuIlPTtqnDkfwzObZnZ3zj1h1C2umGYdDeXdH9JhC+tP+IAr+7o8/coX?=
+ =?us-ascii?Q?ZeB2GfOlVDY150V7SP7w5N6AexO59QEWj/6cPFC+DyrBJYTIEykC9xd8tfNj?=
+ =?us-ascii?Q?4N+DDJTffux+cPvYiUIl7zXclZkE4TlAq/ASx5qJAfT2l0tNhAuhw41HaV3V?=
+ =?us-ascii?Q?yb7VEA6beXFn637HF8JJX8ezXCqeRLgkYFS5LfzQf2kGeQ5rFz42Vl2nX65K?=
+ =?us-ascii?Q?DxXIh3Gkpr//Yb+n8DRFLC/At8/mhCRMDRTPy8Uw5dMYTkSKRsHzlGgw6O/X?=
+ =?us-ascii?Q?OXAdm60yP9DuMiKgjkVK6k6RCbwhnFHQzQoLxRt98/MONulTBJImpGZsPD8K?=
+ =?us-ascii?Q?wHYQsQHGIZbkR0cIWfiaWogPpyj8mttVPipcAWuFxtQ1Idu/gk494pB7JM1B?=
+ =?us-ascii?Q?KPUaUjGXOmhfOjhJ/h1p2flL6TWKOrYE1EvPFTQIHMps0t0YxkxXpxDSczMl?=
+ =?us-ascii?Q?VVg5OerEuqpt3yTbUCL0Ir6uK2NLe/MYnU+TAuTIeiSLfyZaW35cEzz7C1xF?=
+ =?us-ascii?Q?nF/n5UgIPljxT88DDEuQFZe9wxMjmMQjbLLfRMCbYB/+j7d57s1WqiSf5FKi?=
+ =?us-ascii?Q?VPGSSTNcS1Zp+xTq0Qs5CV/Q1at5BI94che8ynZvFfN33/VaKgwgia6pAsRp?=
+ =?us-ascii?Q?MHY6IbYSewpiSfoijQEenzdewVjQUZJfU24JS3iCyeeiODzTSqguGY7ctWsm?=
+ =?us-ascii?Q?f6N6L6aRkcTo7VmqSrPGCUaHHJ29voT70X8JE5KwBW5hH7hTYvo7beNsa6aY?=
+ =?us-ascii?Q?tH1DOdSO1gQu1p95bklMjf/MqPvSJ5EXHQaBBU3JnzpqxTIArwiORkGDpadD?=
+ =?us-ascii?Q?Fv7buRjWYpmDQfL6Hafcmu6rXAdFK+sCXmIRXL/u9gVtZlwm5OeSN/dGfpYG?=
+ =?us-ascii?Q?0SZtVkssQLe0KszwmI5x1ZZva6UJy9uYpL2PzYULJyc1Q1UWlyIHCBV9brrB?=
+ =?us-ascii?Q?LTkkyM+5YQN+alhdasWOyRgXJYJZXBYzAE3lUuOWlYiuiLqcVv0QbhBMqC9o?=
+ =?us-ascii?Q?arDXp0hBuc3wOEsCMMLvVRj1lnymUOP5ouIci9c45iVjsTeX+Aa2Q3aThSUZ?=
+ =?us-ascii?Q?wRpig5GM0+BpG4HWlQMISAOOG0/oYyJpBo/TmSAeYDaL34tnK7/wSX7TmKKN?=
+ =?us-ascii?Q?dJjE1Hqc0YVkrSj6GQyD+1S7KFmxl0avXgvN84ZWOeRw4L5/z0WOxxdXO3OJ?=
+ =?us-ascii?Q?viQMPRhqrca+M72EV9Vmm8dXqHGFtbfLgAYQW9I+j/T3CH0SFcTK9YjBsKqd?=
+ =?us-ascii?Q?dFPzJKurRSUuIx0gwXi2HIUM66diSG4/LgGfqIViZpmmEiIyl4V9Ixj6zupX?=
+ =?us-ascii?Q?xnAm0EIbiq43eSdB+LkdaBfVBf4yYoQDoDnA15k4e9MksWXKUa1px8coyfz3?=
+ =?us-ascii?Q?6n4lpqEU3A7/7KqqR/k/nDziH+A/UJI5Jg4IwGjIKghMek6F7hqab3f705nz?=
+ =?us-ascii?Q?Grc5VqT6fy9A3accYAo6hE9BfQZbOSVMk3aaWqZgTBu67qeFpG4Br5vGyywM?=
+ =?us-ascii?Q?3hf37XV/VgX9hU7yicsSDbI=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(19092799006)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Dj34WgLRILI6tJ67fE2cDyW3f5k85V4NUDyV+1TfcDylvu1I4dUH1PWBknAb?=
- =?us-ascii?Q?vIm1yywiUf8U/IH2pcKzsgXZRIsSARwn2CFypM5c92P5xJ4kX0oZbaPt4H8Q?=
- =?us-ascii?Q?KSt3NCxAw3UDgrVHaD9XH+IdJQziR0QCjNwKuL1yF2gqEGvODwAYrMs0Y1xG?=
- =?us-ascii?Q?zEsKX8RgfnJnbDY9SwzFipdXKoRUxZIwJWbz4bkFu5I+OnGT36CtiZ41EPJR?=
- =?us-ascii?Q?J+0SG937j3T2q/Vv/xS/7r033BHtTjH3+Sl/pAdGo1LufaeeNVlzrAFK09Zf?=
- =?us-ascii?Q?aVaLJXARUiNqDP2Ippw0ESSXrmSKoIW1qZlG6RHvH2ekz1XRh1DVL3CCcXFs?=
- =?us-ascii?Q?KFs2WCLcjXhVDCmCfMN7TK/HXPj+O6T9t7NQt1i3LkgR9QNkoQIT3fSLYxGx?=
- =?us-ascii?Q?VwL70pVcQ8lClRql+fJZLeYn08jIx9xZD3gaBuYon55wt3KIA3Ifr/cBZ4uj?=
- =?us-ascii?Q?wQ9XTDRi1xzYH0Z8Dr8pgJ2OSuBwnvcMqAPTfplbTglwXdaTvUnIeDDrK6fo?=
- =?us-ascii?Q?bChEyIEGHyx39HyYEqGGrzxQKJvg5lKEVczkpOVgMBEH+NTqmsyfEzzSrTeH?=
- =?us-ascii?Q?Ajxibh/PU9+unxY4sKFLuBvWb51d+1+85jfRrBWO+RteafmBbnHbd4I+qNkt?=
- =?us-ascii?Q?NsHsIpEg3bL6Pup7WYLbeLcyNzzJwf60l1W+UBKDvsOFSjqSuTP56/6OIFx2?=
- =?us-ascii?Q?lbHfhUK8dH2+M/h5evmAyLmta5iiNOMnyCBeV8R/INO1tfVVXTqhkZwShsrC?=
- =?us-ascii?Q?9E7gbQhfaaYhrzGXs3o02TqoFi0XdL5lcwtRAN77Oln47gVBF6yZP33w74x5?=
- =?us-ascii?Q?nf+qp4b9T/Rxw5xGHLQgo/rrRcrEKptfhQ4uPPUOzEX2XN2smo8S9oEA8QmK?=
- =?us-ascii?Q?LjEU34tawcTeapreShbyV3P7rRRjnTwiBtkSq1cMhByYWRE1fNRjkORp1JVH?=
- =?us-ascii?Q?h6EsaYroWp9VXWdHTX/ALSgz/SzYpK826/B65jHvJKbOf8+9dzm9/CdD1XiK?=
- =?us-ascii?Q?i8S8jlGLZkvpkg4iZBu+/jswoKLyA23YSn9Xb8Kngx+Qo6bdViQ2Am5mlkRv?=
- =?us-ascii?Q?0EvQ6HuRCVJN93QzrTfbW6liIPQt4OXpCn1s0QfKDDPWhk93J9vxiqcU8X4g?=
- =?us-ascii?Q?YlYZ4d7raIVsUcF+/b3qx8ZIq+f4ftwVMjPITq1gkIc3/4eZonS7Pn5j+LbS?=
- =?us-ascii?Q?NxhW4cF1DZ3bivFjBP/UOm7Ur1S9aOF9MLdTPf0/dQy643sojarc1btjJOLp?=
- =?us-ascii?Q?Pa0n7ryIKDGxBrAu2wfhFMgAfLVpE9x5jQyg+0vZ0sT/2uDSRJKRSxKnr1b3?=
- =?us-ascii?Q?9rq0rqwsvNPIM/OLUXKJNHWoVo5IrBHlowJ9ay0kQoLcGN+3D8Blz3uiF5u5?=
- =?us-ascii?Q?RJ80YWMhh5kxhLLJMQoK8KbstbWJBl8NveLjBkwU/HQlDx7/Ndhk9N17rbNt?=
- =?us-ascii?Q?e3yrgpDK1VNuJorPRBcEiQL2SjNJwYkfVhcVHAzrNG0rk5VxwEUuu2zqBRsO?=
- =?us-ascii?Q?qAlRthCNVOix2sR6RD9jTrX/M6xAKcz5qtYzvc6HLivAl6e5ldFutvaOkgsu?=
- =?us-ascii?Q?jJXvV+zOKn5gumzh1B4k27BHwcHOBRWHHvKlXygv0ZkbEO8Mpv2MzJEf0Sj0?=
- =?us-ascii?Q?OVWsdFjbGTz9bhb+YR2fceWm0LRsHsAbeEk8GJ6bGtou4OCAI+SV58FnFIgq?=
- =?us-ascii?Q?9WG1+Cc+Ayut9a0dgc/rkNoDqcLKg4Km1UVVycCADeU6jRXrEPJUudDSxGe2?=
- =?us-ascii?Q?HPECz5+Ivg=3D=3D?=
+	=?us-ascii?Q?fyfRHr1eVG1WqDDxl9LqnJAv85T4YgKRx6lIf40vb+S4Jg9Q6Wb9O/dSrptc?=
+ =?us-ascii?Q?6sEf2GD1n0DHCWQdTfc70wZirvwEBQXClPgIrpBVZy98Gx9BuA84TE7xmgjc?=
+ =?us-ascii?Q?Xcnqc3eTQBYamfJPgCOCyiqvsN955OLRNVjh/L8LyaZQ7f9R+Rh08qTISuxL?=
+ =?us-ascii?Q?JI6wa2ipJrnyin40CiRRZQNYvs/wh/wT5T2nncoIC7i85mydFtwB86VB1qbt?=
+ =?us-ascii?Q?akGjveo8uoGNuRnhmiHYkb6oQq6MTN40r5NsSR9TYTipYP1a4OdsaPehm00+?=
+ =?us-ascii?Q?0exXYGXVaLFGplZThFPnNZTW8oOzV63VOkGQcJ1M5rJOvRPSkJ1peg1PNjye?=
+ =?us-ascii?Q?sGmPDQEGcVac2t7PIUbiWxhatxonK44Qw5JrV+XUh8FnrakiDn9H83wd+Mte?=
+ =?us-ascii?Q?t0LYsgbxLyEss4mwDd+3Fjaa05JTkfrvAnTOpaZr4mJtNUfxYpUKY7lVwtRa?=
+ =?us-ascii?Q?y+M6vhLVxOKHb2CyeQmn9E1VeSTf4URVrdcK1CIB0eADwola0RyFvOO86WYf?=
+ =?us-ascii?Q?PImPl637BVToj7Z4RAkbkbvW9JUiNVn+tbJ3ApnA3d7SDMY8eakcyjENSIMt?=
+ =?us-ascii?Q?X9h94T8S2M+CIFptXwQ06sjVLRFtBGxnH1Pd3EK/FTyp7s8WnI2mLNmfF1Tm?=
+ =?us-ascii?Q?LqKEVwd0fOLPTMxanTFb+DJGC+ws9Kyf0Vt6he0mocA4Nh4K70e/0Xo1e2p9?=
+ =?us-ascii?Q?LBf/lm7oHqcGVhaDRNeGog1WjYgRf4oggGxm5eXGkKzxZUM8gO9p3Bc7MoxT?=
+ =?us-ascii?Q?IL6lqzzhmDuAa/Af5lydLQgz8rCvP2aAGlP6tIDMmeRu9/ySzJf9o+trXE4G?=
+ =?us-ascii?Q?EFMAiebG6cKEeoQKOGWZ0mT04uOv+uYNuofgj/sUD0Xzl4+LuiszYttJ6D5q?=
+ =?us-ascii?Q?YKjXYAmbiSUIx0nvnIB7vjTDDXOHo5eJ4eFRXv4Syn4jODjVHFhESsFenEFG?=
+ =?us-ascii?Q?OtsqPWuSRXLYzLELo+QMAk1LxzsjHu7L5k2YAQvS3JD3O6VF7nT1kd3DqH2I?=
+ =?us-ascii?Q?yNTkru+elk7n+KyIU6zJZgZZ1NmULa0gaulVOYsyiQbbjNj2KlXXA48CnTE4?=
+ =?us-ascii?Q?TK0xR1BkzqggpjZ38z8sXtlagU7C08eCVBBCNRBi+TEKH3AD1SYKD6EIXHFn?=
+ =?us-ascii?Q?37E3RcgJIUJLCGO51QdJmne9SePGxqfrQ4qAzkCmqxAGXPUZslbsIkKTnoOX?=
+ =?us-ascii?Q?GIiHc2yBdq0wlFk2GvljXJ+ZjmMW54QpIcf3DaPRFzw7IM1UNHwINAa6YVHd?=
+ =?us-ascii?Q?5z+QCCAJSgmiYuEbjSuOsqdXez0D/6vGj8ldHFQbVeV3BmnWmWZvcL+gvSdK?=
+ =?us-ascii?Q?B8zjJ68jy0n7I647tZTlv3W9AghsGuh0Iv+djlwIXXgV5zJ/npA8OWOzkLAF?=
+ =?us-ascii?Q?lBhrIQao6avZKYENRbqzfzQQ4l9DG2z0c2KHSHcptVacboVCcH0mv0+SyuHb?=
+ =?us-ascii?Q?NqYEpA9b8H5CTHg/dGSOP/vJIrZf5Iow0m56/tAL5/JoQ4A8hkwxTutsERgA?=
+ =?us-ascii?Q?hqceo2fTmYKV2+KX7BO77kAIHaawladhlH5YklXY+lyLqJgNPW6+VBQDVCsH?=
+ =?us-ascii?Q?6CPgphzYJQ0KDV9RIzhOVicIvecHyiBkeuiKZ//0UHzuXKInws8ZGCpxAe2d?=
+ =?us-ascii?Q?CGJaEduJhNZOlCopsQM1whc9DnuQQ5hClUBAfktOXztax8apq0IYCrPmX7v8?=
+ =?us-ascii?Q?8K1m2aVNisQC+iPgWmYffbaXM+wT6arJHb3m31vkMGEa2KFv2wssjCU3v12C?=
+ =?us-ascii?Q?Dz0fAclF1w=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8d03062-7981-4329-21c6-08de5755152e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cf9ee9b-5c16-4a38-0eae-08de575515c5
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 12:20:07.4052
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 12:20:08.3593
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5Pyka763qpzuT6JZ4sRTTC+tK8dC1HhAI0X7Dj9MTaNJmLp6hxx8ceoJtb2OF1iPSlzREbk3gwKN8d2JD01PTw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8g6ISLTsHizJpnFiPvPBfF0ha+Ay+g49v09jGQCOrUoZpBKRkugssRafNEh8OnvglXRAjqNAIlM3V4fy/ldsqg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9156
 
-sja1105_static_config_reload() changes major settings in the switch and
-it requires a reset. A use case is to change things like Qdiscs (but see
-sja1105_reset_reasons[] for full list) while PTP synchronization is
-running, and the servo loop must not exit the locked state (s2).
-Therefore, stopping and restarting the phylink instances of all ports is
-not desirable, because that also stops the phylib state machine, and
-retriggers a seconds-long auto-negotiation process that breaks PTP.
-Thus, saving and restoring the link management settings is handled
-privately by the driver.
+Commit a18891b55703 ("net: dsa: sja1105: simplify static configuration
+reload") split sja1105_mac_link_up() -> sja1105_adjust_port_config()
+into two separate:
 
-The method got progressively more complex as SGMII support got added,
-because this is handled through the xpcs phylink_pcs component, to which
-we don't have unfettered access. Nonetheless, the switch reset line is
-hardwired to also reset the XPCS, creating a situation where it loses
-state and needs to be reprogrammed at a moment in time outside phylink's
-control.
+- sja1105_set_port_speed()
+- sja1105_set_port_config()
 
-Although commits 907476c66d73 ("net: dsa: sja1105: call PCS
-config/link_up via pcs_ops structure") and 41bf58314b17 ("net: dsa:
-sja1105: use phylink_pcs internally") made the sja1105 <-> xpcs
-interaction slightly prettier, we still depend heavily on the PCS being
-"XPCS-like", because to back up its settings, we read the MII_BMCR
-register, through a mdiobus_c45_read() operation, breaking all layering
-separation.
+in order to pick up the second sja1105_set_port_config() and reuse it
+for the sja1105_static_config_reload() procedure which involves saving
+and restoring MAC and PCS settings.
 
-With the existence of phylink link callback replay helpers, we can do
-away with all this custom code and become even more PCS-agnostic, even
-though the reset domain is tightly coupled.
-
-This creates the unique opportunity to simplify away even more code than
-just the xpcs handling from sja1105_static_config_reload().
-The sja1105_set_port_config() method is also invoked from
-sja1105_mac_link_up(). And since that is now called directly by
-phylink - we can just remove it from sja1105_static_config_reload().
-This makes it possible to re-merge sja1105_set_port_speed() and
-sja1105_set_port_config() in a later change.
-
-Note that my only setups with sja1105 where the xpcs is used is with the
-xpcs on the CPU-facing port (fixed-link). Thus, I cannot test xpcs + PHY.
-But the replay procedure walks through all ports, and I did test a
-regular RGMII user port + a PHY.
-
-ptp4l[54.552]: master offset          5 s2 freq    -931 path delay       764
-ptp4l[55.551]: master offset         22 s2 freq    -913 path delay       764
-ptp4l[56.551]: master offset         13 s2 freq    -915 path delay       765
-ptp4l[57.552]: master offset          5 s2 freq    -919 path delay       765
-ptp4l[58.553]: master offset         13 s2 freq    -910 path delay       765
-ptp4l[59.553]: master offset         13 s2 freq    -906 path delay       765
-ptp4l[60.553]: master offset          6 s2 freq    -909 path delay       765
-ptp4l[61.553]: master offset          6 s2 freq    -907 path delay       765
-ptp4l[62.553]: master offset          6 s2 freq    -906 path delay       765
-ptp4l[63.553]: master offset         14 s2 freq    -896 path delay       765
-$ ip link set br0 type bridge vlan_filtering 1
-[   63.983283] sja1105 spi2.0 sw0p0: Link is Down
-[   63.991913] sja1105 spi2.0: Link is Down
-[   64.009784] sja1105 spi2.0: Reset switch and programmed static config. Reason: VLAN filtering
-[   64.020217] sja1105 spi2.0 sw0p0: Link is Up - 1Gbps/Full - flow control off
-[   64.030683] sja1105 spi2.0: Link is Up - 1Gbps/Full - flow control off
-ptp4l[64.554]: master offset       7397 s2 freq   +6491 path delay       765
-ptp4l[65.554]: master offset         38 s2 freq   +1352 path delay       765
-ptp4l[66.554]: master offset      -2225 s2 freq    -900 path delay       764
-ptp4l[67.555]: master offset      -2226 s2 freq   -1569 path delay       765
-ptp4l[68.555]: master offset      -1553 s2 freq   -1563 path delay       765
-ptp4l[69.555]: master offset       -865 s2 freq   -1341 path delay       765
-ptp4l[70.555]: master offset       -401 s2 freq   -1137 path delay       765
-ptp4l[71.556]: master offset       -145 s2 freq   -1001 path delay       765
-ptp4l[72.558]: master offset        -26 s2 freq    -926 path delay       765
-ptp4l[73.557]: master offset         30 s2 freq    -877 path delay       765
-ptp4l[74.557]: master offset         47 s2 freq    -851 path delay       765
-ptp4l[75.557]: master offset         29 s2 freq    -855 path delay       765
+Now that these settings are restored by phylink itself, the driver no
+longer needs to call its own sja1105_set_port_config(), and the
+splitting is unnatural. Merge the functions back, which is to say that
+the only supported internal code path is to submit the MAC Configuration
+Table entry to hardware after phylink has dictated what we should set it
+to.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/dsa/sja1105/sja1105_main.c | 58 ++++----------------------
- 1 file changed, 8 insertions(+), 50 deletions(-)
+ drivers/net/dsa/sja1105/sja1105_main.c | 26 +++-----------------------
+ 1 file changed, 3 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index aa2145cf29a6..3936d63f0645 100644
+index 3936d63f0645..2a4a0fe20dae 100644
 --- a/drivers/net/dsa/sja1105/sja1105_main.c
 +++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -2280,14 +2280,12 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
+@@ -1260,7 +1260,9 @@ static int sja1105_set_port_speed(struct sja1105_private *priv, int port,
+ 				  int speed_mbps)
  {
- 	struct ptp_system_timestamp ptp_sts_before;
- 	struct ptp_system_timestamp ptp_sts_after;
--	u16 bmcr[SJA1105_MAX_NUM_PORTS] = {0};
--	u64 mac_speed[SJA1105_MAX_NUM_PORTS];
  	struct sja1105_mac_config_entry *mac;
- 	struct dsa_switch *ds = priv->ds;
-+	struct dsa_port *dp;
- 	s64 t1, t2, t3, t4;
--	s64 t12, t34;
--	int rc, i;
--	s64 now;
-+	s64 t12, t34, now;
++	struct device *dev = priv->ds->dev;
+ 	u64 speed;
 +	int rc;
  
- 	mutex_lock(&priv->fdb_lock);
- 	mutex_lock(&priv->mgmt_lock);
-@@ -2299,13 +2297,9 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
- 	 * switch wants to see in the static config in order to allow us to
- 	 * change it through the dynamic interface later.
+ 	/* On P/Q/R/S, one can read from the device via the MAC reconfiguration
+ 	 * tables. On E/T, MAC reconfig tables are not readable, only writable.
+@@ -1305,26 +1307,6 @@ static int sja1105_set_port_speed(struct sja1105_private *priv, int port,
  	 */
--	for (i = 0; i < ds->num_ports; i++) {
--		mac_speed[i] = mac[i].speed;
--		mac[i].speed = priv->info->port_speed[SJA1105_SPEED_AUTO];
--
--		if (priv->pcs[i])
--			bmcr[i] = mdiobus_c45_read(priv->mdio_pcs, i,
--						   MDIO_MMD_VEND2, MDIO_CTRL1);
-+	dsa_switch_for_each_available_port(dp, ds) {
-+		phylink_replay_link_begin(dp->pl);
-+		mac[dp->index].speed = priv->info->port_speed[SJA1105_SPEED_AUTO];
- 	}
+ 	mac[port].speed = speed;
  
- 	/* No PTP operations can run right now */
-@@ -2359,44 +2353,8 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
- 			goto out;
- 	}
+-	return 0;
+-}
+-
+-/* Write the MAC Configuration Table entry and, if necessary, the CGU settings,
+- * after a link speedchange for this port.
+- */
+-static int sja1105_set_port_config(struct sja1105_private *priv, int port)
+-{
+-	struct sja1105_mac_config_entry *mac;
+-	struct device *dev = priv->ds->dev;
+-	int rc;
+-
+-	/* On P/Q/R/S, one can read from the device via the MAC reconfiguration
+-	 * tables. On E/T, MAC reconfig tables are not readable, only writable.
+-	 * We have to *know* what the MAC looks like.  For the sake of keeping
+-	 * the code common, we'll use the static configuration tables as a
+-	 * reasonable approximation for both E/T and P/Q/R/S.
+-	 */
+-	mac = priv->static_config.tables[BLK_IDX_MAC_CONFIG].entries;
+-
+ 	/* Write to the dynamic reconfiguration tables */
+ 	rc = sja1105_dynamic_config_write(priv, BLK_IDX_MAC_CONFIG, port,
+ 					  &mac[port], true);
+@@ -1380,9 +1362,7 @@ static void sja1105_mac_link_up(struct phylink_config *config,
+ 	struct sja1105_private *priv = dp->ds->priv;
+ 	int port = dp->index;
  
--	for (i = 0; i < ds->num_ports; i++) {
--		struct phylink_pcs *pcs = priv->pcs[i];
--		unsigned int neg_mode;
+-	if (!sja1105_set_port_speed(priv, port, speed))
+-		sja1105_set_port_config(priv, port);
 -
--		mac[i].speed = mac_speed[i];
--		rc = sja1105_set_port_config(priv, i);
--		if (rc < 0)
--			goto out;
--
--		if (!pcs)
--			continue;
--
--		if (bmcr[i] & BMCR_ANENABLE)
--			neg_mode = PHYLINK_PCS_NEG_INBAND_ENABLED;
--		else
--			neg_mode = PHYLINK_PCS_NEG_OUTBAND;
--
--		rc = pcs->ops->pcs_config(pcs, neg_mode, priv->phy_mode[i],
--					  NULL, true);
--		if (rc < 0)
--			goto out;
--
--		if (neg_mode == PHYLINK_PCS_NEG_OUTBAND) {
--			int speed = SPEED_UNKNOWN;
--
--			if (priv->phy_mode[i] == PHY_INTERFACE_MODE_2500BASEX)
--				speed = SPEED_2500;
--			else if (bmcr[i] & BMCR_SPEED1000)
--				speed = SPEED_1000;
--			else if (bmcr[i] & BMCR_SPEED100)
--				speed = SPEED_100;
--			else
--				speed = SPEED_10;
--
--			pcs->ops->pcs_link_up(pcs, neg_mode, priv->phy_mode[i],
--					      speed, DUPLEX_FULL);
--		}
--	}
-+	dsa_switch_for_each_available_port(dp, ds)
-+		phylink_replay_link_end(dp->pl);
++	sja1105_set_port_speed(priv, port, speed);
+ 	sja1105_inhibit_tx(priv, BIT(port), false);
+ }
  
- 	rc = sja1105_reload_cbs(priv);
- 	if (rc < 0)
 -- 
 2.34.1
 
