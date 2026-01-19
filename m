@@ -1,124 +1,99 @@
-Return-Path: <netdev+bounces-251025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943F9D3A2F3
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:28:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18799D3A2F9
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA77A3006AAB
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:28:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEF0A30062CC
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6116A33E34D;
-	Mon, 19 Jan 2026 09:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594E5354AFE;
+	Mon, 19 Jan 2026 09:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BPkFrCJI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9C3KrYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46224355039
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DB0346AC6
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768814892; cv=none; b=D/X91xr0eetVLHTEcnLztdsFYP8SLFkJqXkHj5W6QftISY0T6611PVDLbuEPRfyPmr7B7zKgMQFLbNrFmhwRN14ZrbOpuv2kvtw6POnhWEYrk0rchF4A5k3FxA2cb3LA16rOKvGskysToIvLA7aLUNFs1O60ipAcPGU0eDBWVe4=
+	t=1768814942; cv=none; b=D6jPWyMHx21FqCGKlUuonqL3I9GA6IsF1xmDMSQL5lgG4AWzYLysrTlpWCLSY+0OBdRfoCcEfMdapoiriitcQVWmplB0LPJnvOrT039J5goY2UARn545N4bixQLMMU0tJmpu7lpr7W49mjdIjqTrojRucTFEzQo/N4QHKXe8APc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768814892; c=relaxed/simple;
-	bh=/rbsgtwh0IFmobpYZIg0T/1qRai3iU7Ujtclbpd0ZlU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hlu5JsxPhBJBwd2OqXGz/zRJkjzJCvlleY6Dl6kBI6SwyCXp4OZTwNlkrLhrCit3zsGPFTibWms92zOFiakfqONCG5pjEDARrR9MXdV36Jcpow09GRSaVjWnhw/t/Cv2FTtpJGqmt6doqYEQe3aH99HOB7sFFC6uTE+X2xtdR7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BPkFrCJI; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 1A0A61A291C;
-	Mon, 19 Jan 2026 09:27:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DC34660731;
-	Mon, 19 Jan 2026 09:27:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9701710B69822;
-	Mon, 19 Jan 2026 10:27:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768814878; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QO0a3o9xTofyckkMjL1Y/gdZw32YkbHo0CE1eCRMHCI=;
-	b=BPkFrCJIXEObVHgwmOFiAVu4V3QldAy8U2FZjIRU3PYtj8BQ+3uH9pxG/cucWuIpmc57nt
-	1Wx2nj4+UEMv/TClfb03AT1v/EY6cg8tWFLd/6zt1zJDuTkmWHX5fz70Usmw6weHbx9pXo
-	sdHqgk95XC9wxcVLbh0gS85HWqYMfr4cslsaOdmjvXFI9Jjt0ciRdXoz9S7E/sezOIEPZU
-	bvCxPZ/n7JgCAFTvCNY8NeBjZCQErTxFqnrPAZHeMG4NGFYKsqTap+asaz2FzjOw/28HdU
-	QFScPtUlRYzXA+ffyNfk9fm5Gi9qfQndCTw7B26fsxD2p8fHk2P6PT0BXHoLBg==
-Message-ID: <b8cafe50-c87b-4bd4-a47e-d11c11c16f7c@bootlin.com>
-Date: Mon, 19 Jan 2026 10:27:52 +0100
+	s=arc-20240116; t=1768814942; c=relaxed/simple;
+	bh=XjQxaNaJtfrGY2pwNPROWy9ibNGhYmBFzU+ohE9RW38=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ROJlvKOn45A7eLzhAxyO+IACpxVWf6ny+94tVsHowIBdik7c2wpsZmRBoEh6VGhV2VAm5qSnQmiymisJo9i9J2+l69bbJT1IWFmlf7dgZfgx+bCQwlWoMO/AnMsfkTzEqdlBC+p3/OTQ7pGqMWBj1wEXDV7rVeoKTuNEZci6puY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9C3KrYD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3628FC116C6;
+	Mon, 19 Jan 2026 09:28:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768814941;
+	bh=XjQxaNaJtfrGY2pwNPROWy9ibNGhYmBFzU+ohE9RW38=;
+	h=Date:From:To:Cc:Subject:From;
+	b=t9C3KrYD3BLeoj3psIkEaVq+cyl2NMrUe/8DZUEVKoiHx90K2udqw/VJ8LA027Pg6
+	 +AQxd0kq6drapLGcg64+km9gffloHYyUe1ERBLtypazOp8cXHLJSFKHCYcWFkm52ot
+	 CPBoa5O8k5xmHijF5sm0j7IEOVn3AjV4sg2VtAUjzJ3NGFUvx8+RZnccM6j0Qtc/vl
+	 aMzeIzBJHZaxgYdIPL7Vaqs0xb8W5itq73cezIeoYPr17xojtoM1LXYdr6Pp9WsP81
+	 1XfLGWESGXaURSHG0ouJSNVvpKtOSlqV5IGk4mNsns/mLSpeeCx261GtggPcUeXd6U
+	 EiFxPYVwcN1pg==
+Date: Mon, 19 Jan 2026 14:58:47 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: PTP framework for non-IEEE 1588 clocks
+Message-ID: <vmwwnl3zv26lmmuqp2vqltg2fudalpc5jrw7k6ifg6l5cwlk3j@i7jm62zcsl67>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next v2 1/2] net: phy: marvell: 88e1111: define
- gigabit features
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Josua Mayer <josua@solid-run.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260101-cisco-1g-sfp-phy-features-v2-0-47781d9e7747@solid-run.com>
- <20260101-cisco-1g-sfp-phy-features-v2-1-47781d9e7747@solid-run.com>
- <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Russell, Josua,
+Hi Jakub et al.,
 
-On 02/01/2026 13:47, Russell King (Oracle) wrote:
+This is a follow-up of the recent discussion [1] around using PTP framework for
+device clocks which doesn't the follow IEEE 1588 standard, but just provide the
+high precision clock source to the host machine for time synchronization.
 
-> If the operational mode of the PHY is reconfigured at runtime, then I
-> think it would be reasonable to re-read the supported linkmodes.
-> However, I think this will cause issues for phylink, as currently it
-> wants to know the link modes that are supported so it can choose an
-> appropriate interface mode.
+Jakub raised the concern on exposing these kind of high precision clocks as PTP
+clocks during the referenced patch review and also during [2]. I agree that the
+concern is technically valid as these clock are not following the IEEE 1588
+standard.
 
-Russell, I agree that your patches for phydev->supported_interfaces
-are required, but I also think we need another piece of the puzzle to
-solve Josua's issue.
+I then looked into the existing PTP drivers and noticed that many drivers like
+ptp_kvm, ptp_vmclock, and ptp_s390 fall into the above category. But that could
+be because no one cared about them being non-conformant so far. So I'm not using
+them as an excuse.
 
-From what I get, it's impossible from the PHY driver's perspective only,
-to know which configuration the PHY is in, i.e. is it in :
+Then I looked into creating a new framework which just registers as a simple
+posix clock and supporting posix_clock_operations::clock_getres operation as a
+start. However, it feels like it would be a stripped down version of PTP
+framework, with a new class, and chardev interface.
 
- 1000X to 1000T
- SGMII to 1000T
- SGMII to something else ?
+Creating such new interfaces means, we should also teach the tools like phc2sys
+(for -a option) to learn about this new interface/class.
 
-This is one of the issues I was facing with the SGMII to 100FX adapters.
+So my question is, is it really worth the effort to create a new framework for
+providing a subset of the existing framework's functionality? Even if such
+framework gets introduced, should the existing non-IEEE 1588 drivers be
+converted? I personally think it is not a good idea since that will break the
+userspace tooling, but leaving them as is could also induce confusion.
 
-Selecting the right phy_interface, is one thing, but it doesn't address
-the fact that whe don't know which linkmodes to put in phydev->supported.
+I'm looking for other suggestions as well, thanks!
 
-The approach I took to address that is in patch 3 of this series [1] :
+- Mani
 
- - The SFP's eeprom should ideally store information about the MDI of the
-  module, is it outputing fiber at 1G, at 100M, is it BaseT, etc.
+[1] https://lore.kernel.org/mhi/20250821180247.29d0f4b3@kernel.org/
+[2] https://lore.kernel.org/all/20250815113814.5e135318@kernel.org/
 
- - in sfp_sm_probe_phy(), we have the sfp_module_caps fully parsed, with
-   fixups and quirks applied, so what I do is store a pointer to those in
-   struct phy_device
-
- - The PHY driver can then use that in its .get_features() to report the
-   proper linkmodes.
-
-Of course, this may not be the right approach. What do we trust more, the SFP
-eeprom, or the PHY's reported linkmodes through features discovery ?
-
-IMO relying on the SFP subsystem to build a proper list of linkmodes we can
-achieve on the module is a bit better, as we have the opportunity to apply
-fixups and quirks.
-
-Maxime
-
-[1] : https://lore.kernel.org/all/20260114225731.811993-1-maxime.chevallier@bootlin.com/#t
+-- 
+மணிவண்ணன் சதாசிவம்
 
