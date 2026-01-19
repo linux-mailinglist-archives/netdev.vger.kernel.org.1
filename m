@@ -1,157 +1,123 @@
-Return-Path: <netdev+bounces-251170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E7AD3AF63
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:44:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A098AD3AF80
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28EE83001FC5
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:44:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 95673300722A
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB1038B9A7;
-	Mon, 19 Jan 2026 15:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D114435A955;
+	Mon, 19 Jan 2026 15:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HmJkkmpm"
+	dkim=pass (2048-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="u4iPjZmL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IdYfZQRs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A516238B9B1;
-	Mon, 19 Jan 2026 15:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E61326D4F7;
+	Mon, 19 Jan 2026 15:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768837452; cv=none; b=fXq5AikIDKlEfVxWYIXvng5XaeEwf3HDdF8YbQoUZU68w1tKGftL0dNzt3CVFoD2ZGZRWrtIOl6iE68OIVo4JrvG4ZEsCGqj5tPXnMjePmP6UICrpfDFrL5rP7n+RlYWKX+KfcqhEqL9/IGGg4Id4sdiX97danlZMvbEvh56/6U=
+	t=1768837674; cv=none; b=lyjKAHAQ03Mx39XhIVuMgtCDI/d2K8fn7+OgkKNWqRn6zCTxisKbySdiiWDmYBlM56W+6m8O4GFsUQmy3lJUdrh1AH21MqfWwZIoIH0dMhgXtXKxKtHOKopTqS+sq4g/NAtZEy+dwBnxTKdBqiAOacunDJTG3mnPrAV36e50j0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768837452; c=relaxed/simple;
-	bh=hoaRJky72TDMbUW4ehDh/qVmWU/lQsORlAtpr/L7ZUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l9eWGpte9NKDiwN5icBI4Z0rQnlIJqi/rHYIgA7V7oAYBN4Q2e5gDvpuJAGOWk95Utn9XV4QJSJ8kSRUFXKwalcd+cg5s4w1KWpk+FizAFYeIKBrXxhSf1J7raWWPZ2OK9Th1IO4pkOsLEMlgtTPLAlAgxVV3+83ak4+OE3QdIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HmJkkmpm; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OdUaoSCio5puaeEe+IXYRT66N1Ls4wbMpbo4oPDQLsE=; b=HmJkkmpmk2E6djd/Aucm1PAm+P
-	oa9Y9tr5QEVJ3waQyLIHcEzb+EoTSGXotpvVcxeoykh7MgPN4P3oDy11d8ER9qgj16YKgx5/teuK4
-	f/fkGuhS/ykGSKUEjo1Zh6pUAnyu7vFNDWt1zLK26HYqPYgv8YkyBwjKnprlYnMg1NN+FcQFVZ3Ok
-	BDhZxZdHe4qzYAVSSNPe3/5BWtQM6sFmzVs4DpchChJSrFbGm3PoagncOyLGGxWTbCjducqEHZpEO
-	7IrTlf+BpD0a2Dp0gGfAfMKW+oTMCqA4GSO/Fjl7wZuLXxZfMiHc6zwr1K+wSbo9AVpHtqwBCmTrA
-	4crlQW0w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36966)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vhrQ1-000000005N0-0Asu;
-	Mon, 19 Jan 2026 15:43:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vhrPs-000000006gH-2ofS;
-	Mon, 19 Jan 2026 15:43:44 +0000
-Date: Mon, 19 Jan 2026 15:43:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Georg Gottleuber <ggo@tuxedocomputers.com>
-Cc: Yao Zi <me@ziyao.cc>, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
-	vladimir.oltean@nxp.com, wens@csie.org, jszhang@kernel.org,
-	0x1207@gmail.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, jeffbai@aosc.io, kexybiscuit@aosc.io
-Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
- Motorcomm YT6801
-Message-ID: <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
-References: <20260109093445.46791-2-me@ziyao.cc>
- <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
- <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+	s=arc-20240116; t=1768837674; c=relaxed/simple;
+	bh=3n+aMrybGK6RbNqVpIj099xwp6WPmN9y4ds7bG9BiP4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=uU1TIZHT5rDbw8TCqzAFtOMSwcKVqJstAnQ5VbwcYrwd+6/9vW0oqKz0EyF5dO8qBOICHYvR0o3hSeeB/6BlZYjXvU7Tq0Be1DH6X7NQ9q46X9SCFWWAvYZKgOSup+4KlGq/R1A9mzDnNFNohRtcqAY7t0lN9hPbrMxgvwktf60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (2048-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=u4iPjZmL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IdYfZQRs; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 50F6514006A0;
+	Mon, 19 Jan 2026 10:47:52 -0500 (EST)
+Received: from phl-frontend-02 ([10.202.2.161])
+  by phl-compute-05.internal (MEProxy); Mon, 19 Jan 2026 10:47:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1768837672; x=1768924072; bh=3n+aMrybGK
+	6RbNqVpIj099xwp6WPmN9y4ds7bG9BiP4=; b=u4iPjZmL1QDl7xZyv+fdQDB1Eg
+	IzvRHv5sbZ1qPNaUPAjjLMsRQX/cwcNvu3I0TVJe5DpUaGBmUppb/nmoXsGVPL5k
+	kdfVeIIDBnLwCiouiT8Y203tWuhgXbKxW7dFes9/U19XqVAzvlAzQyIPrW21Mc/y
+	9g09tGRgoigJCVLzcv6uTtzm6g0Girqpx1fNWTlcymdmh1E0+Zotkac659HhJOJy
+	sXHdQZpSUtTEs28wiFu9Xarg2f94d8EsTbbQRtkEtrCNtjDFOjXu+P8O8nCoALJr
+	U9f6buROq3ZpBEQv3C85TCHXZ4TNwe/fAVCb9RmSKFWcN+8twEHqEQmJeUOA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1768837672; x=1768924072; bh=3n+aMrybGK6RbNqVpIj099xwp6WPmN9y4ds
+	7bG9BiP4=; b=IdYfZQRsLpGglcz/caQBojI+VEFw5YbjXPhSolcTRGNqEsFtM6W
+	BkPKlugCY5kVkqu+9MOpK4CQOK4d849hQ1RujyRQH7nrBNK6FmxiZHA8jUNc+hTE
+	TJKpOXOqE3k6ASW8vwB0OWe2eBG3+ZVZsafLEdstJvMW7/8JeHiVrtrrgetg6MlB
+	gIKeaxYu3pNAS7V9tAOhQGgEUin/CpXy+aqX25iAOg6QC2Ojy39fW3zqqbpy/MhA
+	gO3+p5EvXbw0C1HVS7LTON5FSWeQLCavJ67eV1gRvQOw0emyEL+B6YrvhbW+dOkw
+	wZ7piTaj7kpX4lYYcIMHHoAh/AV8DtHa33A==
+X-ME-Sender: <xms:J1Juad-XLh-t0xdjx5wbiUjfA7ZJfvhj3tfzpY-zx2J79ZBTKA16oQ>
+    <xme:J1JuabshxvuvPJdUFFSMWZCqISjVjnKUTdCaMLnBhA-r8GsPfuCcwHOv7NahMF82p
+    Y-qORom58yYdmN4rLzEpeT9ycRi_5f4QMXFdqEtvfSX2DmMdbFwa60>
+X-ME-Received: <xmr:J1JuaRrtTKDwwdRgbiXa_wssM-jh9HJcmCPYyGV-9jK1GFnvd3vtI-aDFDuK0121Xo-CAmbgCEr-iecqLwBOcUyMNaOtJr4jfcRf0rbp>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddufeejleeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevufgjkfhfgggtsehttdertddttddvnecuhfhrohhmpefpihgtohhlrghs
+    ucfrihhtrhgvuceonhhitghosehflhhugihnihgtrdhnvghtqeenucggtffrrghtthgvrh
+    hnpefgvedvhfefueejgefggfefhfelffeiieduvdehffduheduffekkefhgeffhfefveen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihgtoh
+    esfhhluhignhhitgdrnhgvthdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphho
+    uhhtpdhrtghpthhtohepuggrvhhiugdrlhgrihhghhhtrdhlihhnuhigsehgmhgrihhlrd
+    gtohhmpdhrtghpthhtohepvghrihgtrdguuhhmrgiivghtsehgmhgrihhlrdgtohhmpdhr
+    tghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuh
+    gsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhu
+    nhgurghtihhonhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:J1JuafpNdl7LOYjOLyoFoyka_osWPf3U485Mpap9Web_27258dSznA>
+    <xmx:J1JuaQYgqbMjpiaA7TL88ktFtfx7aCpQyDo-MgIUF2hOC2AVGXooqg>
+    <xmx:J1Juad_mA168yElqmp97nQWFl7MHUp-4IYEvJ_UqffI5BLNEOVw95A>
+    <xmx:J1Juael7x0e5nAutEY_KkNn2dhrsrYsWi9f8oFwjsxDtIx0e3BjzKQ>
+    <xmx:KFJuaW9jMi7Nvq2R-NJ4O48E6Cbg2P2JfpMvqGiVjqQr-d9B7Qt-jwfX>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 19 Jan 2026 10:47:51 -0500 (EST)
+Received: from xanadu (xanadu.lan [192.168.1.120])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id 2C21014FCB7F;
+	Mon, 19 Jan 2026 10:47:51 -0500 (EST)
+Date: Mon, 19 Jan 2026 10:47:51 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: David Laight <david.laight.linux@gmail.com>
+cc: Andrew Morton <akpm@linux-foundation.org>, 
+    Eric Dumazet <edumazet@google.com>, 
+    linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, 
+    Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
+In-Reply-To: <20260118225802.5e658c2a@pumpkin>
+Message-ID: <681985ss-q84n-r802-90pq-0837pr1463p5@syhkavp.arg>
+References: <20260118152448.2560414-1-edumazet@google.com> <20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org> <20260118225802.5e658c2a@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
 
-On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
-> Hi,
-> 
-> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
-> revealed that tx is only 100Mbit/s:
-> 
-> ## YT6801 TX
-> 
-> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> [  5]   0.00-1.00   sec  8.75 MBytes  73.3 Mbits/sec    0    164 KBytes
-> 
-> [  5]   1.00-2.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
-> 
-> [  5]   2.00-3.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
-> 
-> [  5]   3.00-4.00   sec  8.12 MBytes  68.2 Mbits/sec    0    164 KBytes
-> 
-> [  5]   4.00-5.00   sec  8.62 MBytes  72.3 Mbits/sec    0    164 KBytes
-> 
-> [  5]   5.00-6.00   sec  8.50 MBytes  71.3 Mbits/sec    0    164 KBytes
-> 
-> [  5]   6.00-7.00   sec  8.25 MBytes  69.2 Mbits/sec    0    164 KBytes
-> 
-> [  5]   7.00-8.00   sec  8.62 MBytes  72.4 Mbits/sec    0    164 KBytes
-> 
-> [  5]   8.00-9.00   sec  8.50 MBytes  71.3 Mbits/sec    0    164 KBytes
-> 
-> [  5]   9.00-10.00  sec  8.62 MBytes  72.3 Mbits/sec    0    164 KBytes
-> 
-> - - - - - - - - - - - - - - - - - - - - - - - - -
-> [ ID] Interval           Transfer     Bitrate         Retr
-> [  5]   0.00-10.00  sec  85.2 MBytes  71.5 Mbits/sec    0             sender
-> [  5]   0.00-10.05  sec  84.4 MBytes  70.5 Mbits/sec
-> receiver
-> 
-> 
-> ## YT6801 RX
-> 
-> [ ID] Interval           Transfer     Bitrate
-> [  5]   0.00-1.00   sec   112 MBytes   939 Mbits/sec
-> [  5]   1.00-2.00   sec   112 MBytes   941 Mbits/sec
-> [  5]   2.00-3.00   sec   112 MBytes   941 Mbits/sec
-> [  5]   3.00-4.00   sec   112 MBytes   942 Mbits/sec
-> [  5]   4.00-5.00   sec   112 MBytes   942 Mbits/sec
-> [  5]   5.00-6.00   sec   112 MBytes   943 Mbits/sec
-> [  5]   6.00-7.00   sec   112 MBytes   941 Mbits/sec
-> [  5]   7.00-8.00   sec   112 MBytes   942 Mbits/sec
-> [  5]   8.00-9.00   sec   112 MBytes   942 Mbits/sec
-> [  5]   9.00-10.00  sec   112 MBytes   941 Mbits/sec
-> - - - - - - - - - - - - - - - - - - - - - - - - -
-> [ ID] Interval           Transfer     Bitrate         Retr
-> [  5]   0.00-10.04  sec  1.10 GBytes   941 Mbits/sec   88             sender
-> [  5]   0.00-10.00  sec  1.10 GBytes   941 Mbits/sec
-> receiver
-> 
-> With our normally used DKMS module, Ethernet works with full-duplex and
-> gigabit. Attached are some logs from lspci and dmesg. Do you have any
-> idea how I can debug this further?
+On Sun, 18 Jan 2026, David Laight wrote:
 
-My suggestion would be:
+> On 32bit you probably don't want to inline __arch_xprod_64(), but you do
+> want to pass (bias ? m : 0) and may want separate functions for the
+> 'no overflow' case (if it is common enough to worry about).
 
-- Look at the statistics, e.g.
+You do want to inline it. Performance quickly degrades otherwise.
+Numbers are in the commit log where I introduced that change.
 
-   ip -s li sh dev enp2s0
+And __arch_xprod_64() exists only for 32bit btw.
 
-- apply
-  https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
-  to enable more statistics to work, and check the network driver
-  statistics:
 
-   ethtool --statistics enp2s0
-
-to see if there's any clues for what is going on.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Nicolas
 
