@@ -1,232 +1,155 @@
-Return-Path: <netdev+bounces-251005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87406D3A1F9
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:46:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9A6D3A20E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEB583038F4D
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:45:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AA3473002165
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF1834AAEA;
-	Mon, 19 Jan 2026 08:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FAE3502B8;
+	Mon, 19 Jan 2026 08:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DBFVe4+K"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U2EUKKnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C566234A3D6
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768812344; cv=fail; b=j4/o8z7osgMGSVJvaGOf+3TnC/5+1hTA4WWiX8T9D1cQCVan3RV647Rg+jnNFkZ0ayCRIVS7ly740tKHIZSZehwF6lso7LXCefchq8waniP+tPs94Znl1G5busLmMVNswRBrXVidQ0kYnQDSUWHjAlDFoaDfWNJPyBEZ4lws21Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768812344; c=relaxed/simple;
-	bh=SCKH1XX3Knr5WNmrWjAmPtjAEJIksjRL7csft/AULso=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Dns1LZLOPI+dv5RUNNRXIP7AWRHOOR7QuLxLafv43MDchWwMOlit3UAnboXhQ33ar0hQD3HH0kOqTKMPrZ3enVVmFSWsP3SzxdqAQdkgi3iVpFBx7GuohjD92jBEHIA3e9TnZlMjHB95MQna2DRs0bC7VYv+LMIxStKN+dTNSDw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DBFVe4+K; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768812340; x=1800348340;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=SCKH1XX3Knr5WNmrWjAmPtjAEJIksjRL7csft/AULso=;
-  b=DBFVe4+KF7/5zgmwM+05LHaQzFMVKeyobmd3vy0MJ6t7X+tw5Q48kZDd
-   U4+w3jKjpxT8SV4Wkbd8UMqVcDsU+mTERSMfgeD0cCdm/YEzAmogB6iui
-   3lkKll6Qf3Iyn2kVPq0E84MHzIZ2qIMB3Vr6cU0zX0mm+kc9bj/lGzD3W
-   JoZJcgON5BgqFbBmqVN0FGz5JCGZLNRXyWK78MlyDOXfEdtz/C+ZutSYc
-   soVkHHLKWDUlrenZ+jDAgvdX+Staxyu9fEY58u7t1RgjpTbwITH7l21zb
-   +U9//rELSXy1nzxWlB+sU5FMA35nCahWYS/oJJuugD1/Y+cXzRKN4CQfS
-   A==;
-X-CSE-ConnectionGUID: foz1/FUyShOE3egKjiV1dw==
-X-CSE-MsgGUID: u9Cm88EWQbecW551kMek+Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="69219356"
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="69219356"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2026 00:45:38 -0800
-X-CSE-ConnectionGUID: 92V8wutWSKGfZbJckd6Mkw==
-X-CSE-MsgGUID: 5tfd0WDHQZywVzpPhVit9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="210318551"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2026 00:45:38 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 19 Jan 2026 00:45:19 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Mon, 19 Jan 2026 00:45:19 -0800
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.65) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 19 Jan 2026 00:45:19 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NLgAP5C3jW1xWVvrA1ChQwZLURQWNJh/7grwgsjJvGPZMsTlDl9Sfop6UF8ZWaFG3nBA9OZGsPYgZ3hlfuZoSIZ/57tg9nZENVD7uuBXZN4bLmiMOWAZ5EArlqdsupEj693b5sF0Zeutkzmgfqb14xsyP2WGwePOLHL/bFa+ElR/UTkdmxKKV3IF3uo7HMPFbS906tUI9qgBMFlUGYfSALM4Fz+XN/TzZVWNwXh58X8KdFn8M9nn7BERWmlORxXxwNJ7GgoeJxNqTyWnHKX0BsQdmjGonJWXmYkWM68Hs1u6+4S9V8rvN+byBM7+1zhYubCSarcxC0f+QDzk5Smq8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S0tlwgLXPUotKRiwDbvtxhdyJKLTSV33MqUuUrIsBi4=;
- b=UQE+7iE9BG8Zu5XnKzPitacaODANxhTZ9xZ9qFfCSd1BSRivdPIl2OW1zbcWR8XeMwObA29o+vKWPcmHKdqorv89mfDsClcf7SmkXKqybIGAPmbap5BFGLQZxmZKrZT3JZ68z8DTLUXegCiRRaHFqkr5NMcVK+P1wVm0SB7XhI5c9QhxmaK4h5W7LpxNU53R+XrTGdy1l/9iRZBhmheH8uAEWSoRv5PfXUmpv6BcGmX7LWXa5WQWu2ujmezn2mlHwssZoCY/+35ozaOLy/FC7POThs3N2cAmZXBSncM+TwdVpdaui3M2h8qqnSEp6ITk2q/yZwBsSue4/otQ10+zvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5890.namprd11.prod.outlook.com (2603:10b6:303:188::18)
- by CY5PR11MB6091.namprd11.prod.outlook.com (2603:10b6:930:2d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
- 2026 08:45:12 +0000
-Received: from MW4PR11MB5890.namprd11.prod.outlook.com
- ([fe80::b3b8:941:41d9:9d77]) by MW4PR11MB5890.namprd11.prod.outlook.com
- ([fe80::b3b8:941:41d9:9d77%5]) with mapi id 15.20.9499.005; Mon, 19 Jan 2026
- 08:45:12 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-Subject: RE: [PATCH iwl-next v1 6/7] ixgbe: replace EEE enable flag with state
- enum
-Thread-Topic: [PATCH iwl-next v1 6/7] ixgbe: replace EEE enable flag with
- state enum
-Thread-Index: AQHcg85kJDamQr0bY0uRVFA7Ug4/pLVOq/wAgAFgrWCAABnsgIAJEV0g
-Date: Mon, 19 Jan 2026 08:45:12 +0000
-Message-ID: <MW4PR11MB589023306C8055BD6A937557F088A@MW4PR11MB5890.namprd11.prod.outlook.com>
-References: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
- <20260112140108.1173835-7-jedrzej.jagielski@intel.com>
- <8f976990-1087-4ba0-a06d-c0538c39d2a3@lunn.ch>
- <PH0PR11MB59027E7BBF8EF6121DF24DDCF08EA@PH0PR11MB5902.namprd11.prod.outlook.com>
- <cb9f2295-0f1d-48a3-ab53-3d51c2930f94@lunn.ch>
-In-Reply-To: <cb9f2295-0f1d-48a3-ab53-3d51c2930f94@lunn.ch>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5890:EE_|CY5PR11MB6091:EE_
-x-ms-office365-filtering-correlation-id: aa08f671-2cb2-4808-24ee-08de57370f2b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?W+LA6s9/MUYKaMiHUe0jjSMs6uPw426GIrLDb5LPlkTjD2VGJ5q37lk6KFjl?=
- =?us-ascii?Q?pcdWpCFLr5oHLlSaQ4BAnfA5QJL0meQ2NBjlc+Ae5gpziTrRzuhT6n1oGIXi?=
- =?us-ascii?Q?gZGhmwJ22Gk7H/esRKISc2ELnvz6Din/08ZDGqIfTwmpKEORqi+EKsfGpBrP?=
- =?us-ascii?Q?xVyagsG1x0IqYzZhXhABSk5Eo9srUA6XYRyNoz0MtvNvQxHBnChTzj0kEq+w?=
- =?us-ascii?Q?juP3JcQuqJPUwkuyaOoQRVf6yOuGtsFjXic3rICzRKAK8z0HFufWYCz/YycW?=
- =?us-ascii?Q?+wjgpIY0orXeeJvdfXA9rwNYIPqt7rk2tIbPWVxBb7GVFlMKVyK8/rUxqclj?=
- =?us-ascii?Q?9XELnYGnGt0IP3E7+5DH3AifpbbxNW9dWPEdlMEkcnFu2p8dRPDXu1k9k9Os?=
- =?us-ascii?Q?VkSt9R8rU3kc8IuAw9Oo04wZhT0kVQyICuPmprjerKooLn+TXSppu7gojK7H?=
- =?us-ascii?Q?RCUhIpPvh2HZ0Tm+XYUCduNjU0DxeFlRdq3j9g1aNLcvZk+LUOzqLreYaKZJ?=
- =?us-ascii?Q?W601sJgUZ4YFA4pae7H9AdVHACgWQ0/ZZiCuHimyFPm17gq5q7z4UlFrkGe4?=
- =?us-ascii?Q?HLjsw9WhtbKPzQOteauD+/p+ERfm2gcbu7ARbzXFqywfLs0i9fl46294E6Me?=
- =?us-ascii?Q?+yTE7IYDD4Lox4tstWkcthYlYyzzpzanpCvgIgUfj0dylZGXztwdR6iCOECd?=
- =?us-ascii?Q?ksGUUHVrRbHC0ZqnlsSF9fKh9flv+muAcNQR2Tnvh/q/UwEqhT0vAG2PjHiT?=
- =?us-ascii?Q?mLbxf4EelclhQQQmO4XlQLxEnzRB74uH8ilZyGpDetRrpnt4aj0i7HSLMSoS?=
- =?us-ascii?Q?BivqzkP+FtqWs5YvSG/NmUTMdhNRuTVLbicmbH5BXpkitHefH38ul+xMkggO?=
- =?us-ascii?Q?ii04jnZIWDrual3TP5Snvu7xDfVf6a7j7JZo6BHG2wDDuE5/zuo79/qwKIl7?=
- =?us-ascii?Q?wPWhZ8PPn493JppAFIISVEXySGNzJGbkoMfvU+dtSSGbRefklxrHSHJWgDQa?=
- =?us-ascii?Q?N71EqyUfpAdbmZp7mQ7kh+qDN4SqSaCUiu328wsG3M+H5VivntbhtgFY3eGd?=
- =?us-ascii?Q?UONEgdCASHC8CiPa76fFixl5cLgE43KCv6TARUCqIPer0Dx77AN/Tb8+enX9?=
- =?us-ascii?Q?ahvZpsnOWTT5fUMf4AF8n5q6OnmPg8tkYZqWs3oDiA7DgtnpoBBlO45+qVa8?=
- =?us-ascii?Q?WYyB/9FjFBLoPvKwg+poM8h0Vp4J2sXzk8JOdqB8act0FCXftoCw5fhtVkLw?=
- =?us-ascii?Q?XgScAggnKYkyPkkEPvsqvIQNghHlP0YQiyYxFPzusDKxRsxQTtq2kziAQ7YV?=
- =?us-ascii?Q?KEqUCtCINNP4qUqT0TiO4+hNHYfnQn8adzYieVUfvQzKGG11XN+UHQTD6Ef/?=
- =?us-ascii?Q?6aY1WmLuTYqfPM2dorlYA+fZT2iPJyaBXWEFMkkTKSalS6fCG7q9yRL3bFYY?=
- =?us-ascii?Q?UEzj8PdgA//FV1NgIQhJEy1uaTn6fHanxAaM4eMpF3Bs4nLskzjr+hojWmMM?=
- =?us-ascii?Q?JKkmmI6JfOKUESIaRia5PE7h+LvB4NUsaTB2Sdxl4ZwZXN2B3CLOGtkIgIVp?=
- =?us-ascii?Q?S6lpXnwZdqjVZwaNY6vGsQ7b8+yZhpcEE4Lmn0su8FOW56FhQhN1paArN5bK?=
- =?us-ascii?Q?Ck8kvXEuljUlV2UCUOjuhXM=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5890.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Nn0ao1JN+ht9j1IaMfW+nwP1zpyBxoNnEUIq/mhiFvuMIcgpK2uwDayGhwxm?=
- =?us-ascii?Q?P7HCdgB5N/ZWfzQme4DxZ+p5Bs4SvAa/NQExEhlN5+XuYv4K9oyVIX4I0FY0?=
- =?us-ascii?Q?74tlBEMVlrpprWxRzDnYEBDNKfTf3u1U9Qp/vuKGfTAEHxxb14vvqP2QaGo0?=
- =?us-ascii?Q?32uex5ntKolccPFjqk5xkO0LW4USDhYJgHeRGhFRaF4JuCM4htHHXjGwG+hu?=
- =?us-ascii?Q?0sN8qggJ/o65HQCF2EAhYvASkFxcTrWUFdf6TGvrDY2ZZC7tnUNMu51NrioW?=
- =?us-ascii?Q?HoLCODa5kWKEiVHZCrl401yRLwuBKUYqklPxjsbVPSVPkAVZA6wrU1xYPBsM?=
- =?us-ascii?Q?pIlk0gJhbPA/bgzdKHfFiMT9y9q5RiverPH4aMsugIErcfLaM37YZvFrUcyo?=
- =?us-ascii?Q?X6cq0R+8HNg5A89Wjp8CbHDyUDS/V4HJIGJK410mLci7GIikNCUk2JlEj7mU?=
- =?us-ascii?Q?Df6u2JpCUB6XPEzHkZCbmHWCB2epjYLQB/BfKONeyurDDrh2+wMz5PwzqDYu?=
- =?us-ascii?Q?LMyyw5kQOES4QiG+52Wrn/kWvKoWRvAugkPOWev7PB0cExG8HUw3b2LDFjIV?=
- =?us-ascii?Q?DFqGBBF9gTNJiOSdtgQ8UlIne8Hn2gOapJQ4asSHKVzV7RB5kKcmEEioAI5a?=
- =?us-ascii?Q?4MNN7X0VmL293Cs1I+kRGmtAV4ZTygVJ6EBRJVtuhUXw+SqDLb9OI7O21o8d?=
- =?us-ascii?Q?o+qE3SY6zD55sJyunCtuZgMda89E66vwsjsPFyydABYkxxKVEcaBqesEZgMf?=
- =?us-ascii?Q?sNaQz1porRD2cvKjl+oJwPL6SX1CsoILqaDeDy7GfUu0IZQF8S7Mp5NxN0Tn?=
- =?us-ascii?Q?K79kHYkEoYA4Qo7kvZsVTjAmIS+8wW8htc4orZZrvYK4sahYqyQRxDD0I19Y?=
- =?us-ascii?Q?FWb6lfPbRFG5fCWPGh3B6yeLbJ6eKDieuGsalsnQ8Gqckk8Y4QGfcBp3siHr?=
- =?us-ascii?Q?Nd6/go4J8NeXfA8Vi6+zafepAxWAmy4R4x2FDbFGriN1/ST1j6fQMrlyKf20?=
- =?us-ascii?Q?zaoLc1J2fNlQZHGpcdj+in8mCiLnMUNi5SHBvWIUsrAoRpLhp6//iv2wGshA?=
- =?us-ascii?Q?sEUQLyUmM3y5WATsh5VB5pbymfRZgVPquNIunknYyc8763+algY268/bCCMx?=
- =?us-ascii?Q?1wqyU0nd8HEXxEeIyzX3A73k77gariff18cdmoOsMNbCACw7waHZ9NBiwDmA?=
- =?us-ascii?Q?LDi3K6IEXI/Hz3UN71ZMdFt1fEd5x2sFZzMoTIbb6pW3t4CBYKLcXW6ddnAP?=
- =?us-ascii?Q?pW6aWjXb6JhCM3L2qnEH+AwgxX4IIIzsRyj9KEUp6pF/lcNo6YVzplj3YlFa?=
- =?us-ascii?Q?9oLP+3W0ZH17auhJatzdqTXFtPVAOcw0ORB+d9bzQ1fF6bJ8sMk6+CTdhx5L?=
- =?us-ascii?Q?DQJyyoaLsLgy3jeHHQTMyBUXyUr7k8gBNnJOWCNRcoVqgd2ALdtt/DBmbrH/?=
- =?us-ascii?Q?tAUxYUCQAvvn8zuOW9IdqnhsIHj0JkZj/+Tty5EuQvcW3cGrjKzCWBTKQzYM?=
- =?us-ascii?Q?xWj5TzZPB4f0T1QXxJSO9W39SnTGtNU2/dqNvBMbBoNd4UPHwWlimU9A2ru1?=
- =?us-ascii?Q?gA+xZ08MolefUY3jVlDsaFSoZaWQ4TkuHajCRwtLR+KYE3nSGDUItLfgWzZb?=
- =?us-ascii?Q?kTfDmJ29nSNkrYNpBMIk+eC8k3K6RAcDXrvxtQdIAAJRb9PMBTQU++ilDzvm?=
- =?us-ascii?Q?4g4wkkp2cthN0gUPSakgl++BZzOqRKsTL99yZMyfjJJAr8xlbmL28E3xF2Gc?=
- =?us-ascii?Q?QbNZgprFvA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1983333A008
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 08:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768812616; cv=none; b=tu5IJaQfLUlaVvDD/ksgE0t+Mim+LZMRND5DlLpIfC34TcI/a9T1x1wjHo8lVvOo4W1APSBjfH9Hu+zLs3HaAdbJZrjp6pwF6pNDlQUhBPCwZea3hwj8veaNSzAsYzy1MNaqkRWIzwaaGdm0LeStC80tv58dUzBZ7SuiNCEKJWU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768812616; c=relaxed/simple;
+	bh=84ETkUfpc3EswQvnB2lM/Q2ffz1tmPudt+ruJY+u4aw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nA2K92A28U4ywoxSDuJPLu5t8nFgDODjKtJxBHVuXrNMBX297HBFCjXKfUc5Whs9dReH5SL73eG0B9/jdjfRVp+MpGcdqeB3JG1nbOzLTF3oCzh4+PZ4J+SBh3uUIX8+KatifFZTPbVaHVZ9n8ogInCrYVJLVVDki2ZEB8EAL8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U2EUKKnz; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8dc3765b-e97f-4937-b6b9-872a83ba1e26@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768812600;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CJnFBuVeKy2seKUMYgvEGmFX+m+0gIR/n54nnj5zXCE=;
+	b=U2EUKKnzZTcZW+2kot9Xseo/1FRep+r+OC8Ha0An9OPuzah0NdoxUMdi5waz23MjoCkBUM
+	W057bD5cGyRLJHFvTr2xGpU8SlfsyB5LZgGtBHNnlMz7/xJnvxpRWShToda22hHlxDkzMr
+	DB/4k3CLbcHT8MjqH9GY8siroY1a8ko=
+Date: Mon, 19 Jan 2026 16:49:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5890.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa08f671-2cb2-4808-24ee-08de57370f2b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jan 2026 08:45:12.1987
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ID5kJXT64q8mo8loswWK+XcLzqkeXW3It/f6ufMcEcP4Zye8tFlwHMn87lRNsEYZQMsaIFNBLWC0Z9L3BfW8KgaBBs/3AHsnuux1aWjtewY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6091
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
+ tracepoint
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, kerneljasonxing@gmail.com,
+ lance.yang@linux.dev, jiayuan.chen@linux.dev, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Leon Huang Fu <leon.huangfu@shopee.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>,
+ kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+References: <20260102071745.291969-1-leon.hwang@linux.dev>
+ <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+ <20260104084347.5de3a537@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leon Hwang <leon.hwang@linux.dev>
+In-Reply-To: <20260104084347.5de3a537@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Andrew Lunn <andrew@lunn.ch>=20
-Sent: Tuesday, January 13, 2026 3:16 PM
 
->> OK, so you mean it's redundant? There's no need to explicitly state that
->> EEE needs to be disabled when it i not capable of beeing still on due=20
->> to unsupported link conditions?
->> Probably i would need to check how E610 behaves in such scenario.
->
->It would depend on what your firmware is doing, but if it is
->implemented correctly, there should not be any need to change the
->configuration. ethtool_keee->eee_active should indicate the status of
->the negotiation. If you are in a link mode which does not support EEE,
->so it is turned off in the MAC, set it to false. supported_eee,
->advertising_eee lp_advertised should not care about the current link
->mode or the value of eee_active.
->
->And you probably want to check for how phylink and phylib handle this,
->since they are the most used implementation and so the reference.
->
->      Andrew
->
 
-i've checked the scenario and, indeed, EEE gets reenabled once link
-conditions are meet again even without driver intervention.
-Thanks for pointing me that.
-In that case i will remove link enablement/disablement on driver side,
-but i am wondering whether leaving logging trace on link condition
-change (EEE gets disabled due to unsupported link conditions) would be
-beneficial
-WDUT?
-then keeping tristate EEE would be required i believe
+On 5/1/26 00:43, Jakub Kicinski wrote:
+> On Fri, 2 Jan 2026 12:43:46 +0100 Jesper Dangaard Brouer wrote:
+>> On 02/01/2026 08.17, Leon Hwang wrote:
+>>> Introduce a new tracepoint to track stalled page pool releases,
+>>> providing better observability for page pool lifecycle issues.
+>>
+>> In general I like/support adding this tracepoint for "debugability" of
+>> page pool lifecycle issues.
+>>
+>> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3], 
+>> which gives us the ability to get events and list page_pools from userspace.
+>> I've not used this myself (yet) so I need input from others if this is 
+>> something that others have been using for page pool lifecycle issues?
+> 
+> My input here is the least valuable (since one may expect the person
+> who added the code uses it) - but FWIW yes, we do use the PP stats to
+> monitor PP lifecycle issues at Meta. That said - we only monitor for
+> accumulation of leaked memory from orphaned pages, as the whole reason
+> for adding this code was that in practice the page may be sitting in
+> a socket rx queue (or defer free queue etc.) IOW a PP which is not
+> getting destroyed for a long time is not necessarily a kernel issue.
+> 
+>> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only 
+>> Page Pools associated with a net_device can be listed".  Don't we want 
+>> the ability to list "invisible" page_pool's to allow debugging issues?
+>>
+>>   [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
+>>   [2] https://docs.kernel.org/userspace-api/netlink/index.html
+>>   [3] https://docs.kernel.org/netlink/specs/netdev.html
+>>   [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
+> 
+> The documentation should probably be updated :(
+> I think what I meant is that most _drivers_ didn't link their PP to the
+> netdev via params when the API was added. So if the user doesn't see the
+> page pools - the driver is probably not well maintained.
+> 
+> In practice only page pools which are not accessible / visible via the
+> API are page pools from already destroyed network namespaces (assuming
+> their netdevs were also destroyed and not re-parented to init_net).
+> Which I'd think is a rare case?
+> 
+>> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
+>> notification is only generated once (in page_pool_destroy) and not when
+>> we retry in page_pool_release_retry (like this patch).  In that sense,
+>> this patch/tracepoint is catching something more than netlink provides.
+>> First I though we could add a netlink notification, but I can imagine
+>> cases this could generate too many netlink messages e.g. a netdev with
+>> 128 RX queues generating these every second for every RX queue.
+> 
+> FWIW yes, we can add more notifications. Tho, as I mentioned at the
+> start of my reply - the expectation is that page pools waiting for
+> a long time to be destroyed is something that _will_ happen in
+> production.
+> 
+>> Guess, I've talked myself into liking this change, what do other
+>> maintainers think?  (e.g. netlink scheme and debugging balance)
+> 
+> We added the Netlink API to mute the pr_warn() in all practical cases.
+> If Xiang Mei is seeing the pr_warn() I think we should start by asking
+> what kernel and driver they are using, and what the usage pattern is :(
+> As I mentioned most commonly the pr_warn() will trigger because driver
+> doesn't link the pp to a netdev.
+
+Hi Jakub, Jesper,
+
+Thanks for the discussion. Since netlink notifications are only emitted
+at page_pool_destroy(), the tracepoint still provides additional
+debugging visibility for prolonged page_pool_release_retry() cases.
+
+Steven has reviewed the tracepoint [1]. Any further feedback would be
+appreciated.
+
+Thanks,
+Leon
+
+[1]
+https://lore.kernel.org/netdev/20260102104504.7f593441@gandalf.local.home/
+
+
 
