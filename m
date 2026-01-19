@@ -1,95 +1,119 @@
-Return-Path: <netdev+bounces-250982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBD6D39E9B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:36:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C31D39ECA
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E9A0300CA05
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:36:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AB383037CE5
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:39:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2856A271450;
-	Mon, 19 Jan 2026 06:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E41C26E71F;
+	Mon, 19 Jan 2026 06:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="N2/BxeaP"
+	dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b="OaV/p7Vz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender-pp-o93.zoho.in (sender-pp-o93.zoho.in [103.117.158.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32872741B5;
-	Mon, 19 Jan 2026 06:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768804577; cv=none; b=Ulcts0f2KPRvnsznScOeT36WHdJa+xdcU0ZUYGEYx+nvjBAammIY1G8LP2X41gJ5U+rbPgMV3MTIXMzEqfMIcd6InjaYResstvXA29Kxj2sGBoJIAfVaWa7NLeVqaT49l5PxbUj9UkC8zMLJzflM2uBMMcS/6pCCgyw5WdnHhLQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768804577; c=relaxed/simple;
-	bh=5dtS4ga/Ke+/MmRChzMAycuj4CPnSmMhUgaeOvlfUpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0oBbtucAXWduKQAHVUGoPPAc5DCvhJksm6m5noqAz3EJIqVFTXaP8C2zNn5oQsx7+WG6vPRu+c7OFI/QRWEWUbcnZnjehG+Cfq1s7OlO+WruW6GKOXlEdVrgCkmQ+aHxMq5UK2msac3d0UzpSgXi5p7VgrngOsvZUcjm1OqrW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=N2/BxeaP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E4DC116C6;
-	Mon, 19 Jan 2026 06:36:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1768804577;
-	bh=5dtS4ga/Ke+/MmRChzMAycuj4CPnSmMhUgaeOvlfUpc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N2/BxeaPXR7cSw4oy0ewzGwWvwHHCZ4a+mUgyXD3psF+QKYceNz3cUJ95PPdpJPGb
-	 puJssOwDrwgFQEBsTapttUPMy+UcUmlC+dm1EuCV0zpcEbeYgorhzxHrVbMmVzSSpK
-	 HZkgTYzsjsPcBY60d7knpoxD7MVn+h/JZ6TuTghU=
-Date: Mon, 19 Jan 2026 07:36:12 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Osama Abdelkader <osama.abdelkader@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4330226E175
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 06:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=103.117.158.93
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768804744; cv=pass; b=OpsyMIrl5ZSTs8NZz8bqBIT9lhP8EWI/G1CT4rARMQwjdv+Uu4yOR1kliNRBY+hqJgxOTV7jtyciT6uk575Sm8tPzkz2YrEBefqugV9duX4cV56+hCyHno97SdTUwW0fNpNCN60jStXkCuDvRq0Q8XtJCl30ZjavIaQGQa0S1+Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768804744; c=relaxed/simple;
+	bh=fEhaqK+fzB5PHZVmOyCZRiBx7k/3CMNRhcpPDuhfbYo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MPy8fHIfJQr5LkT9Gz7iqz2wa0w/wxdiX2kTeM0laK7ERK+KoGXYxpAp0cBTRm1fuJ5g/4oakL2UjsS1PkWPEhvXbXiXY+AiVw8DBy8MAf6P2AlJZe0QVnlYXpBlNyr9OLRKwJ9E8dNeXOtq/8jB72taTQMH9LmH0rhtRTQbC38=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in; spf=pass smtp.mailfrom=zohomail.in; dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b=OaV/p7Vz; arc=pass smtp.client-ip=103.117.158.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zohomail.in
+ARC-Seal: i=1; a=rsa-sha256; t=1768804668; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=eH67j+FiWu1bq90lddCqF7Pah0xd7vPXwrpu2s1TtWd2+VLux78plPlewUDltStc1i74/W7eXz7r+zqHqgPKnqfADMfBJCJ8l3h8bTmIZENI5dEljRS5e4xNn0F0ZKAjcanK/EaXwObLV+D9SlGRdHABxJ2EOuKDdJ/cWQEHKCA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1768804668; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=S1DYyxhh8r1LOgubjCvsaO9OllBcKvtcT+22BlOLsTI=; 
+	b=Ny7Ql9UHFAmdH0mf0W3z+KO/jFg2Rz8518Bav11gVuXfICKp10e3Mozi0rzcU5HOPCbQ7dImJ+zZCCBEnD/ku7j6uKR98rGSFfL8kglkLIwDaK27KPBaoN1xelmbIKiHxpsh+jCiwQctSqQXkbHfb4utSlNV1yK+Lg19KKYF4C0=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=zohomail.in;
+	spf=pass  smtp.mailfrom=kshitiz.bartariya@zohomail.in;
+	dmarc=pass header.from=<kshitiz.bartariya@zohomail.in>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1768804668;
+	s=zoho; d=zohomail.in; i=kshitiz.bartariya@zohomail.in;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=S1DYyxhh8r1LOgubjCvsaO9OllBcKvtcT+22BlOLsTI=;
+	b=OaV/p7VzBXviFAWMUZGBYczvKVsn4DcSUicktZ1QKVeOw9zjziYVOfUmPr+pVDOk
+	lrVRWIDmvRQSzLzXRdWf3doLiNfLmMGonoXynJJRgfag3LEbqiGN1D22xV1ic0dPmKZ
+	Ec+4oJJlLXik8Wl3hKrBq5zthG/JDyRMLi7GVg1k=
+Received: by mx.zoho.in with SMTPS id 1768804661659312.3357861596362;
+	Mon, 19 Jan 2026 12:07:41 +0530 (IST)
+From: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Sjur Braendeland <sjur.brandeland@stericsson.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: caif: fix memory leak in ldisc_receive
-Message-ID: <2026011910-jubilance-supervise-00a0@gregkh>
-References: <20260118174422.10257-1-osama.abdelkader@gmail.com>
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+Subject: [PATCH net-next] netfilter: arptables: use xt_entry_foreach() in copy_entries_to_user()
+Date: Mon, 19 Jan 2026 12:07:04 +0530
+Message-ID: <20260119063704.12989-1-kshitiz.bartariya@zohomail.in>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260118174422.10257-1-osama.abdelkader@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Sun, Jan 18, 2026 at 06:44:16PM +0100, Osama Abdelkader wrote:
-> Add NULL pointer checks for ser and ser->dev in ldisc_receive() to
-> prevent memory leaks when the function is called during device close
-> or in race conditions where tty->disc_data or ser->dev may be NULL.
-> 
-> The memory leak occurred because ser->dev was accessed before checking
-> if ser or ser->dev was NULL, which could cause a NULL pointer
-> dereference or use of freed memory. Additionally, set tty->disc_data
-> to NULL in ldisc_close() to prevent receive_buf() from using a freed
-> ser pointer after the line discipline is closed.
-> 
-> Reported-by: syzbot+f9d847b2b84164fa69f3@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=f9d847b2b84164fa69f3
-> Fixes: 9b27105b4a44 ("net-caif-driver: add CAIF serial driver (ldisc)")
-> CC: stable@vger.kernel.org
-> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
-> ---
-> v2:
-> 1.Combine NULL pointer checks for ser and ser->dev in ldisc_receive()
-> 2.Set tty->disc_data = NULL in ldisc_close() to prevent receive_buf()
-> from using a freed ser pointer after close.
-> 3.Add NULL pointer check for ser in ldisc_close()
+Replace the manual offset-based iteration with xt_entry_foreach(),
+thereby removing FIXME. The byte offset semantics and user ABI
+are preserved.
 
-I see no locking fixes, so I don't see how this will really work.
+Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+---
+ net/ipv4/netfilter/arp_tables.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-How do the other ldisc drivers handle this same issue?
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index 1cdd9c28ab2d..9f82ce0fcaa5 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -684,12 +684,11 @@ static int copy_entries_to_user(unsigned int total_size,
+ 
+ 	loc_cpu_entry = private->entries;
+ 
+-	/* FIXME: use iterator macros --RR */
+-	/* ... then go back and fix counters and names */
+-	for (off = 0, num = 0; off < total_size; off += e->next_offset, num++){
++	num = 0;
++	xt_entry_foreach(e, loc_cpu_entry, total_size) {
+ 		const struct xt_entry_target *t;
+ 
+-		e = loc_cpu_entry + off;
++		off = (unsigned char *)e - (unsigned char *)loc_cpu_entry;
+ 		if (copy_to_user(userptr + off, e, sizeof(*e))) {
+ 			ret = -EFAULT;
+ 			goto free_counters;
+@@ -707,6 +706,7 @@ static int copy_entries_to_user(unsigned int total_size,
+ 			ret = -EFAULT;
+ 			goto free_counters;
+ 		}
++		num++;
+ 	}
+ 
+  free_counters:
+-- 
+2.50.1 (Apple Git-155)
 
-thanks,
-
-greg k-h
 
