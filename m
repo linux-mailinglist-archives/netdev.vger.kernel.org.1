@@ -1,171 +1,134 @@
-Return-Path: <netdev+bounces-251049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC82AD3A649
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:08:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854CFD3A657
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0416C30049EF
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:07:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 746B8302550E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725893590CA;
-	Mon, 19 Jan 2026 11:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AD33590DD;
+	Mon, 19 Jan 2026 11:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXtnwdpT"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lOKqtFkb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1371359703;
-	Mon, 19 Jan 2026 11:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D313590D9
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768820878; cv=none; b=UjliAJZbslkC5Rpx0Y9HGz6tUBYg9xNw/OIFrR4qT+t44gWKuNRiGI68dUWDAUKxQp0hQBtvVQwlLXbFs1N1G3+HiaHfyj+3GQGwxNqUNAh7GnGQj86sxOP+gnjO8vvsXqO2Vn1PgNu29j2s7JQLA0E9s0Q8G6HaDaaOv2nS+nU=
+	t=1768820913; cv=none; b=tPEyB/FfXoPWgAbMNcuSjRqbv4jExbQjgXHwGqN0obij6Mv4RJJnd4KN9VucOic94mSKCFS/UGrLY5IPP3vSaoj8sEr8CwjmgaU073wTOS6LBWEQqN1BKQHWpTb6RclM0QeoBdt7T7pPDuWtG7leEfOx9WjrDOeEuGlqs7pSHtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768820878; c=relaxed/simple;
-	bh=XGp1ly3M8msIpsMceEw/gMyV9HMm+0pOXJC/6DgB8Fo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E9k5SsdUI+FM2ID1S2x2m7b4YzrlOI+38bLlu4U4uOMaixaXx8G9eJfWnanyZHpPLJerA3g6HORVqhfZCfYg23jcgb3suCvqQ17f6SrD5xY/jLJaH/jlWbk68cL7wmfY5qx1FyO4fR0s0xv6rXkcn72luzE9bwlu8YxUjd7qhJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXtnwdpT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42BD9C19422;
-	Mon, 19 Jan 2026 11:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768820877;
-	bh=XGp1ly3M8msIpsMceEw/gMyV9HMm+0pOXJC/6DgB8Fo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VXtnwdpTpk1JAv2utnVYpbBPUwDSJKup88ycL7YA/UZ0dz/gtOSe0u43Z0Lh0SKeb
-	 bPgvkyHxDSsGGDcMr/nklUxpL7oVCSZF8ltacS3gqOrsUEChOAbgbWQ+mzU9iXSr43
-	 1IDGSXTCD6HGjI3YGvZ8noHk2g9fh4+4Y2IavFkqMYKpCZxOWGk6klutRiLfllUMl+
-	 8z9rTD0boj8lvVHS8BanonmH5BWOat3MqJflGr15O8HBDk2yOW8F9fRX32WUJgFOAu
-	 VWuo8I/uskefPRvosrUusEcsGA4ODArNcWrpYMbZblQhiVHOwv4EJDl8E8k+Nb+vRU
-	 7jMTmDSPyrsiQ==
-Date: Mon, 19 Jan 2026 12:07:55 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
- EN7581-7996 support
-Message-ID: <aW4QixwAJHaHWBBc@lore-desk>
-References: <76bbffa8-e830-4d02-a676-b494616568a2@lunn.ch>
- <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
- <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
- <aWfdY53PQPcqTpYv@lore-desk>
- <e8b48d9e-f5ba-400b-8e4a-66ea7608c9ae@lunn.ch>
- <aWgaHqXylN2eyS5R@lore-desk>
- <13947d52-b50d-425e-b06d-772242c75153@lunn.ch>
- <aWoAnwF4JhMshN1H@lore-desk>
- <aWvMhXIy5Qpniv39@lore-desk>
- <30f44777-776f-49b1-b2f5-e1918e8052fd@lunn.ch>
+	s=arc-20240116; t=1768820913; c=relaxed/simple;
+	bh=r0zdOyYcIl2us2Z7PYxZRD6ZD6u18Wv8v4Zhh6NmzoQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RveGVzKxkDkJbS3lW+rTBXduJBTB7gpXtapSGS0Xfv7BHSjz3b/yR64DHqd+vMIyQYaWQmYRzBDViT64dKktiCOz3VG4K4OWUsmH5hRDywMPBzgDtHVZUsYt6csyk98Ruhcxcs3Y6BldmDLRnWOJ8uXsM3Yhv8SftFFzttUDAcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lOKqtFkb; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60J7EMgp1824128;
+	Mon, 19 Jan 2026 03:08:18 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=4gHbJe53rkw95x7pgyN6gpZ3/
+	M3PAtGilj0WtCNCXs0=; b=lOKqtFkbg7xgbsqO2iIX7x0KpaM2KZOPCmlV5FkVl
+	gDZHvCDOlEzQiEDhrKQ5GJ5sxakhz5aVvwo/is1awUVFE49apvgYRPYn4+S9LC3J
+	ydTU3RsAqgJziE/VgUFLFzPQJL6cBLjGymryqOChC2MmATO0z5g3PJvLeM/oiAVI
+	IdUb6nhlBEkv2oB6HE3t9TXk1hIOjjlV80XebBtWVovYWZc4vMbvNeTbuEC4SqTr
+	qbKAnE0TVgQB3QYJz9tctLdZIWxkBN6UJm/a3RBeMK16u0WVoPPs9oz483iixnMa
+	8Jd8lLtRnpPiuE/TQKZQJnt0hVe5fVPpcsyVFNeJ0kxnw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bsg208cu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Jan 2026 03:08:17 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 19 Jan 2026 03:08:32 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 19 Jan 2026 03:08:32 -0800
+Received: from kernel-ep2 (unknown [10.29.36.53])
+	by maili.marvell.com (Postfix) with SMTP id 6E80A3F7051;
+	Mon, 19 Jan 2026 03:08:12 -0800 (PST)
+Date: Mon, 19 Jan 2026 16:38:11 +0530
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+CC: <sd@queasysnail.net>, <bbhushan2@marvell.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>, <jerinj@marvell.com>, <hkelam@marvell.com>,
+        <gakula@marvell.com>, <lcherian@marvell.com>, <sgoutham@marvell.com>,
+        <george.cherian@marvell.com>, <netdev@vger.kernel.org>,
+        <alok.a.tiwarilinux@gmail.com>
+Subject: Re: [PATCH net-next] octeontx2: cn10k: fix RX flowid TCAM mask
+ handling
+Message-ID: <20260119110811.GA1492101@kernel-ep2>
+References: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jQ3aUfoTq/ymejtM"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <30f44777-776f-49b1-b2f5-e1918e8052fd@lunn.ch>
+In-Reply-To: <20260116164724.2733511-1-alok.a.tiwari@oracle.com>
+X-Proofpoint-ORIG-GUID: HBW3Upl3ybiahIt5diQrwsE4X3B-Z7Hn
+X-Authority-Analysis: v=2.4 cv=XPY9iAhE c=1 sm=1 tr=0 ts=696e10a1 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=yPCof4ZbAAAA:8 a=M5GUcnROAAAA:8 a=T7My_dRlYyChwkeLhiYA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=8_z660xuARpGUQqPBE_n:22
+X-Proofpoint-GUID: HBW3Upl3ybiahIt5diQrwsE4X3B-Z7Hn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE5MDA5MiBTYWx0ZWRfXzpSM1RnavjM2
+ Pnk/BDdxzX9iIj5AroxbW9lZ6AsdehLJlKhWZ8xoV9bIygU41o+CKV09Mh3oowJOGK3LpvOwimk
+ 7MULog7kipv9Z9MdxQoVyHngIqBXU5P+imU1fGdznXpHPd2ptutsYEzp6SLak0wkhsctEkGEDO9
+ +kbrJ55APwtpTnl3G+Z1ePaO/z9bpvLJRCisELOoMY5xmxSrRg8WaxxMdmJN5fjvQuYsEPs65Ml
+ 11LF6AzjZ90GnYME2MTpDdKt1zdTz31tJwEY0UQDiHHiV+PErI1aIHNd3imXnGMlcTZbsb1aFRL
+ g2K7Jmka4Qp9VZaIX82ZzBlqYT6ph6xU6/AFznabJBKZl7YrtZHbwhL7nboALZojpMGF2uRFxkO
+ /+fKaRx2mCHU9wKskJuKb7qz+ewTNG1+55RMpNzUeZKBPVEyjlC+haYhOkQhF42GSOeDffteNEd
+ 0OhuKUr62x7u1wU803A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-19_02,2026-01-19_02,2025-10-01_01
 
+On 2026-01-16 at 22:17:12, Alok Tiwari (alok.a.tiwari@oracle.com) wrote:
+> The RX flowid programming initializes the TCAM mask to all ones, but
+> then overwrites it when clearing the MAC DA mask bits. This results
+> in losing the intended initialization and may affect other match fields.
+> 
+> Update the code to clear the MAC DA bits using an AND operation, making
+> the handling of mask[0] consistent with mask[1], where the field-specific
+> bits are cleared after initializing the mask to ~0ULL.
+> 
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+This has no impact in functionality and it is better to be consistent with
+mask[1]. Thanks for the change.
 
---jQ3aUfoTq/ymejtM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
 
-> > Airoha folks reported the NPU hw can't provide the PCIe Vendor/Device I=
-D info
-> > of the connected WiFi chip.
-> > I guess we have the following options here:
-> > - Rely on the firmware-name property as proposed in v1
-> > - Access the PCIe bus from the NPU driver during probe in order to enum=
-erate
-> >   the PCIe devices and verify WiFi chip PCIe Vendor/Device ID
-> > - During mt76 probe trigger the NPU fw reload if required. This approac=
-h would
-> >   require adding a new callback in airoha_npu ops struct (please note I=
- have
-> >   not tested this approach and I not sure this is really doable).
->=20
-> What i'm wondering about is if the PCIe slots are hard coded in the
-> firmware.  If somebody builds a board using different slots, they
-> would then have different firmware? Or if they used the same slots,
-> but swapped around the Ethernet and the WiFi, would it need different
-> firmware?
-
-As pointed out by Benjamin, the NPU is a generic Risc-V cpu cluster and it =
-is
-used to move packets from/to ethernet DMA rings to/from WiFi DMA rings with=
-out
-involving the host cpu (similar to what we have for MTK with WED module).
-I think the PCIe slot info is not necessary for the NPU to work since it is
-configured by ethernet (airoha-eth) and wireless drivers (mt76) with DMA ri=
-ng
-addresses to use via the airoha npu ops APIs, NPU just moves data between t=
-he
-DMA rings according to my understanding.
-
->=20
-> So is the firmware name a property of the board?
-
-We need to run different binaries on the NPU based on the MT76 WiFi chip
-available on the board since the MT76 DMA rings layout changes between MT76=
- SoC
-revisions (e.g. Egle MT7996 vs Kite MT7992). In this sense, I agree, the
-firmware name is a board property.
-
->=20
-> If the PCIe slots are actually hard coded in the NPU silicon, cannot
-> be changed, then we might have a different solution, the firmware name
-> might be placed into a .dtsi file, or even hard coded in the driver?
-
-IIUC what you mean here, it seems the solution I proposed in v1 (using
-firmware-name property), right?
-In this case we can't hard code the firmware name in the NPU driver since
-we can't understand the MT76 WiFi chip revision running on the board at
-the moment (MT76 would need to provide this info during MT76 probe,
-please take a look to the option 3 in my previous email).
-
->=20
-> > What do you think? Which one do you prefer?
->=20
-> I prefer to try to extract more information for the Airoha folks. What
-> actually defines the firmware? Does the slots used matter? Does it
-> matter what device goes in what slots? Is it all hard coded in
-> silicon? Is there only one true hardware design and if you do anything
-> else your board design is FUBAR, never to be supported?
-
-I think the firmware is defined by the board hw configuration (e.g. MT76
-SoC revision) and not by the specific PCIe slot used.
-I do not think we have these info hardcoded in the silicon since NPU is a
-generic RiscV cpu (this has been confirmed by airoha folks).
-
-Regards,
-Lorenzo
-
->=20
->      Andrew
-
---jQ3aUfoTq/ymejtM
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaW4QiwAKCRA6cBh0uS2t
-rHVjAP9ln1d7sXNSxkRsNknfKKihlRjELAPrblwXHVcTQkn0TwD/WBoeIZMbQe9k
-Bf2zPPl1UuZ2iwviFi92j0LWHYa8hgs=
-=EOBi
------END PGP SIGNATURE-----
-
---jQ3aUfoTq/ymejtM--
+> ---
+>  drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+> index 4c7e0f345cb5..060c715ebad0 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+> @@ -328,7 +328,7 @@ static int cn10k_mcs_write_rx_flowid(struct otx2_nic *pfvf,
+>  
+>  	req->data[0] = FIELD_PREP(MCS_TCAM0_MAC_DA_MASK, mac_da);
+>  	req->mask[0] = ~0ULL;
+> -	req->mask[0] = ~MCS_TCAM0_MAC_DA_MASK;
+> +	req->mask[0] &= ~MCS_TCAM0_MAC_DA_MASK;
+>  
+>  	req->data[1] = FIELD_PREP(MCS_TCAM1_ETYPE_MASK, ETH_P_MACSEC);
+>  	req->mask[1] = ~0ULL;
+> -- 
+> 2.50.1
+> 
 
