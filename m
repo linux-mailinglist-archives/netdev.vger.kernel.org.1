@@ -1,251 +1,153 @@
-Return-Path: <netdev+bounces-251033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B1DD3A318
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:31:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C59F2D3A322
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 464BD300FE3F
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:30:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5F0930169BE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 09:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A858A350D78;
-	Mon, 19 Jan 2026 09:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F17296BA5;
+	Mon, 19 Jan 2026 09:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X1ndaabW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUQIJxJa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B5C268690
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966B8197A7D
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815023; cv=none; b=gm9ZFcPadNscXvmRjrSW5RJGwDP6799Ob94uBfOQVlOTakvjiu/p9yUqLD2O/sBrJ7YgWm1i0Ewpt+nDGnzkjyyXVBQQO5tDYCwDqW7fZIP+T11fwJjN9ZcrFQbiWNLl4DKCB8NQ6n6Mg1qxCqqEQfd+nhofw2LasKYhjqrH5m0=
+	t=1768815225; cv=none; b=bQglzTJXGPfULoUscRjhSpTJX2c+ztnjiarQbGJB78PMEpVDZeMqaohRk7wUp6RCOqTwhlWAzkCDoW2ibwboq0AFR4xbr9FGOHhsTGN6pYG9W8uqjJwOClnmpiqozjng8vR5O1JRjc1y6p7uGQHCmWobySUKSdVNNBSHAMXzPgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815023; c=relaxed/simple;
-	bh=TQ9VJE1U3xvPPvaZTsUmcFO9h7ihdqQGpK5YKrq3A+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bCrioZMh+sY5UfW/MTM+eSbeXNXvLVkjpdDkx7yz8HrqhUGbHK1rVvOhZK8oim+Dz9eHtkiTQAeE9ORyF7qdtKKO2qm47ga1jiNE5inokWF9+pz1pZSn5EncKKH9iYICmykcw0q55Y9KAOwiLoDTjniWqOeBlg1LqxFQDG9Po1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X1ndaabW; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5013d163e2fso42742121cf.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:30:21 -0800 (PST)
+	s=arc-20240116; t=1768815225; c=relaxed/simple;
+	bh=Qfq+YGyJejMJFEyBEHzlzdNJQfj1V+dSrryNwTI+upA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gjd39TJ05aW0EdAgvJYMiXc+pUWOLARo1YDMLOHNjJMQshwgk5BCvZzisezsNtD/1UChbJLQnKYT/e+7gdcR73zCS+WVYuZ3jePSiZq8VfbyYYjgvmaatOX9Qp6WctMmm7f6z0TttOtF4Ok7tUm2TiJSPUJfh8lihaOGAnG16io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUQIJxJa; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47ee3da7447so25180755e9.0
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 01:33:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768815021; x=1769419821; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768815222; x=1769420022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WLDd66u9zAy67Tl6sY/Or445elKO0v/MjPLWBa8TQAE=;
-        b=X1ndaabW4rgpR1FbrPkCDiaHZCMlX2E7XVoHYHHdeHbIwJ8YEzJH+pdB6esGPCxUYp
-         +qBYquhadpCBovhtAfKN57WpT2k7KU3V5EDwge2b++ubXNwgB1zmFyOzarI2D+Gszg7H
-         apnUkaaohlpsjZVawuMfwCDfNnHKtU3vn25+zUDT2QpuAdFGVg/IuLTyrJfk/iet/KSz
-         lbTH6+0cFysf0jVmPxVTaCSIV8n3l37iR+h+Ju620RxPJicajT/PxI8J8EqrTpQW2hss
-         tSiABbsdgviKiVdaIS1QpylIg1XX/m+KuHoRji0Ln0sac6Juz4I72/KmjB9C2jnNFeZb
-         UTdg==
+        bh=vxFUMINiROnPGneWmNkTLgSLfIoIsEZfiy7Cs/FTrhE=;
+        b=WUQIJxJamOOepf+j+NyCMHAatXMTR58D/UAXrQfiR71AqCtJybBlx5YVNzeTuCAYiL
+         7c+T1ZBJyO+NYGxeuRcowrZ+2VOyXw8JWHYeC9WBuKAV+FGI4M0XNQnWje4mVRHPSf0Q
+         UMoNnyvIQPMdZ6iEQ3/WAaD1FY60I02MH3XzXXPXWQuweh22TEXfZXpSbnL0cdhv3Mxp
+         1kQIDHf+p9U7qqF3FbK8TARu8Zvi0C0fvEJ9UXBPYNgpvCRfpdFVWpvH2BEXqTk0dIgJ
+         kb1I8vvzKuNALs6eM20qsRq9P5RIsruWm4YWlA/HHbo6cfq/RixY9goJocjJ9Fr5YU6N
+         x+lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768815021; x=1769419821;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1768815222; x=1769420022;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WLDd66u9zAy67Tl6sY/Or445elKO0v/MjPLWBa8TQAE=;
-        b=kjCWheU7V5EGIT1PJ1dD+aCGOrb2KM5+UrjiotijsDOA6PgtzqkpxPHKDpO60nk5yj
-         OIQgHpzv4BEyaceiGGmq5U/Fzy3us5SumBaftF5zhf27NEG3cfb1JceQBECuOsFmBId9
-         1D84oWR8auqAZilM159qYWQWhi/tWfwP0QkUILzOtm3FGIfGjCNDkbJZCQoSnyHPrn7x
-         4lWTUfrocaNqjKrvZtF14Xsb/s9GMr3Z4ufVU5GkcY/jUtVe+HEz9OxKrEPhzWgPt4JA
-         EKMNZIF6yHNxXidEJkSyk/bFprH13S8y+SFMsoVDd1x6ApcHr/CxPv5Q0nYBsdXWT2oQ
-         56VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnLfLocBiVUS4W+97L4onChgXhKqBFBWbKxG1opN6rwwG/Ld+PO7w8RfMOa+yj+iP41Sb2wOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt0ALKQW2bPC07DRpQrwZyhRggkvI7fL23XGArwsudhMuMCk3h
-	c64qPaK+wQ9is50r3lhLHwJVU0WRkC96+KpTYn1ux9bbGNF+Hgzy1VW2Ic/i07/MPAQZORv4TLs
-	vqZVk8LOEJ6+y2hCmBAGHFg51yIPQuOFDkk1dLWbr
-X-Gm-Gg: AY/fxX6eKGPRVYeQ7Kua2YPOMCREd7spvfBMq+7Ekqpyfw+YCdY3vkoKBVrupwZ0FL2
-	HH4ocDW5xAbf2arsfZYdhDjBZXi/+ce4zyrTp+b9mYwVwlUUjUpTox26PVAiSL6XlCDV/oxZNs2
-	S9VD4o0dzpq4bJUk5fvSwy0tnm4SSuKY9qVYdAOpKlH1CaYDCuGEsEisvHgjARi3Q6Cns/QhaVk
-	yGJEDKwdLSM4c9CwtA6dQm+Mjk026TGjVxpY13mQOSO4CXz+sWaq+4fMQwan6JgMbLgs+k=
-X-Received: by 2002:ac8:7f13:0:b0:4f1:e97b:2896 with SMTP id
- d75a77b69052e-502a1f0db54mr169319081cf.46.1768815020668; Mon, 19 Jan 2026
- 01:30:20 -0800 (PST)
+        bh=vxFUMINiROnPGneWmNkTLgSLfIoIsEZfiy7Cs/FTrhE=;
+        b=vgX+93TKPXuqEglehbv+XtwNef7os31MzpM42rHiMahtZxHtV1ZqBQDHNi56eTk6RX
+         cMRqrUCYX/KgGgYdOBXMkZ2cDD3+vY6Dz39WVvqKzGodKXfOVWYyVwZFsufX8l24RcTi
+         /GB/kdBFt392gFOhV3QrGGtxkC1QWJ0sMV5AHjo5bMoj1v4Y2TflfzYFacb55kR5EbG8
+         0fbJq7k4utQycyo7dG3c0zbnt62E0xpwK1cMw5mDetrGY3+oY6N0Ghjsb5pzu+lXztxt
+         pizKviTkrLW8trrTOnU7MXiGieL7HigQAqQGl1WsyWavvN5KeelPN+DSLu8+e0PFzFjy
+         /l4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWT9K7nJopjdCnSTIlO14oxLaCbusCPNAI3Qk+dHm0Bm9w5NXPQaZRE2qE4Oz4gsaLixIdHsSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa2864FpgswFaKD2Ug9mTROC2sm+d221OetJrtDi7Ns+TNvzZu
+	MMecdP9QuKP7bBovyx8e6hECnveAD0ntdz9gIO43tXXv2poPraA/3uhB
+X-Gm-Gg: AY/fxX64nBcdz9t/SRPe15+nWijCpT3KHyK6W/Gc6YpcqGIT046nc16IRh/FZujQcRa
+	h5Glt9vjOA05XcBOjEWkdy6aoVUii4gzyoWv5uu+0wIYUqCPk2SCiHYEkWUD/ezZvnl966/3iE7
+	M4EVApEM/e5TWGG/qc0dcFYKNTnGYtJEAoAIHd4r0JsW2RcDHOLq3sRKqZTP7MtPE0S8NqAYdQU
+	9MORyvkq5Z7hMm2NmEI0wBRlpUCnSpiNL2iZM+wxhJnncQyp4dmVhMnzhRV02v4efo9oC6346dE
+	Xxpt8L3RIg4/hRyN8/nJ+5UOgEWT1J8gNmJRaN2vTXFnhh6ODBYRi/MVhT/r/4gPkHQtbUgSTMN
+	CEOe3YNP4XIXLiW9W+Q/lTz7W8LPZ3h9fpy5M0TmC9ugq43q3EF6w0BJ69JxgIoic89bX064rZ3
+	JRHG3wvQgHIJt4G6i1jVUFM+ry0dVZ4rTWwPwiqUsoXQrJtJ7Mr3vk
+X-Received: by 2002:a05:600c:5291:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-4801e2eef8bmr108328255e9.3.1768815221752;
+        Mon, 19 Jan 2026 01:33:41 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4289b83csm239739415e9.3.2026.01.19.01.33.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 01:33:41 -0800 (PST)
+Date: Mon, 19 Jan 2026 09:33:39 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Eric Dumazet <edumazet@google.com>, linux-kernel
+ <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, Nicolas Pitre <npitre@baylibre.com>
+Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
+Message-ID: <20260119093339.024f8d57@pumpkin>
+In-Reply-To: <20260118160125.82f645575f8327651be95070@linux-foundation.org>
+References: <20260118152448.2560414-1-edumazet@google.com>
+	<20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org>
+	<20260118225802.5e658c2a@pumpkin>
+	<20260118160125.82f645575f8327651be95070@linux-foundation.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
- <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
- <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com>
- <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
- <CACwEKLp42TwpK_3FEp85bq81eA1zg3777guNMonW9cm2i7aN2Q@mail.gmail.com>
- <CAA3_Gnqo37RxLi2McF0=oRPZSw_P3Kya_3m3JBA2s6c0vaf5sw@mail.gmail.com>
- <CANn89iL8FnPG9bD6zW0eHmeSNzc33SJgrUR7Aab4PFG-O4nfTw@mail.gmail.com> <CAA3_GnpijQeBNVOqy6QtUMDjhy_ku_b54uf30zfEq=etMTqKrA@mail.gmail.com>
-In-Reply-To: <CAA3_GnpijQeBNVOqy6QtUMDjhy_ku_b54uf30zfEq=etMTqKrA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 19 Jan 2026 10:30:09 +0100
-X-Gm-Features: AZwV_QhxRpJqBgoK-ulYvwewt0kMLo2qcwrj75TKGoAP71sOOxiRakoi0iLllZc
-Message-ID: <CANn89iK-Ojmi4kCZwXhFq-pG5PacLs=m71Jtw4zRpxaPEbJdhg@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
-To: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
-Cc: pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 19, 2026 at 6:36=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=A4=
-=AA <kota.toda@gmo-cybersecurity.com> wrote:
->
-> Thanks for your quick response.
->
-> The following information is based on Linux kernel version 6.12.65,
-> the latest release in the 6.12 tree.
-> The kernel config is identical to that of the kernelCTF instance
-> (available at: https://storage.googleapis.com/kernelctf-build/releases/lt=
-s-6.12.65/.config)
->
->
-> This type confusion occurs in several locations, including,
-> for example, `ipgre_header` (`header_ops->create`),
-> where the private data of the network device is incorrectly cast as
-> `struct ip_tunnel *`.
->
-> ```
-> static int ipgre_header(struct sk_buff *skb, struct net_device *dev,
->       unsigned short type,
->       const void *daddr, const void *saddr, unsigned int len)
-> {
->   struct ip_tunnel *t =3D netdev_priv(dev);
->   struct iphdr *iph;
->   struct gre_base_hdr *greh;
-> ...
-> ```
->
-> When a bond interface is given to this function,
-> it should not reference the private data as `struct ip_tunnel *`,
-> because the bond interface uses the private data as `struct bonding *`.
-> (quickly confirmed by seeing drivers/net/bonding/bond_netlink.c:909)
->
-> ```
-> struct rtnl_link_ops bond_link_ops __read_mostly =3D {
->     .kind            =3D "bond",
->     .priv_size        =3D sizeof(struct bonding),
-> ...
-> ```
->
-> The stack trace below is the backtrace of all stack frame during a
-> call to `ipgre_header`.
->
-> ```
-> ipgre_header at net/ipv4/ip_gre.c:890
-> dev_hard_header at ./include/linux/netdevice.h:3156
-> packet_snd at net/packet/af_packet.c:3082
-> packet_sendmsg at net/packet/af_packet.c:3162
-> sock_sendmsg_nosec at net/socket.c:729
-> __sock_sendmsg at net/socket.c:744
-> __sys_sendto at net/socket.c:2213
-> __do_sys_sendto at net/socket.c:2225
-> __se_sys_sendto at net/socket.c:2221
-> __x64_sys_sendto at net/socket.c:2221
-> do_syscall_x64 at arch/x86/entry/common.c:47
-> do_syscall_64 at arch/x86/entry/common.c:78
-> entry_SYSCALL_64 at arch/x86/entry/entry_64.S:121
-> ```
->
-> This causes memory corruption during subsequent operations.
->
-> The following stack trace shows a General Protection Fault triggered
-> when sending a packet
-> to a bonding interface that has an IPv4 GRE interface as a slave.
->
-> ```
-> [    1.712329] Oops: general protection fault, probably for
-> non-canonical address 0xdead0000cafebabe: 0000 [#1] SMP NOPTI
-> [    1.712972] CPU: 0 UID: 1000 PID: 205 Comm: exp Not tainted 6.12.65 #1
-> [    1.713344] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS Arch Linux 1.17.0-2-2 04/01/2014
-> [    1.713890] RIP: 0010:skb_release_data+0x8a/0x1c0
-> [    1.714162] Code: c0 00 00 00 49 03 86 c8 00 00 00 0f b6 10 f6 c2
-> 01 74 48 48 8b 70 28 48 85 f6 74 3f 41 0f b6 5d 00 83 e3 10 40 f6 c6
-> 01 75 24 <48> 8b 06 ba 01 00 00 00 4c 89 f7 48 8b 00 ff d0 0f 1f 00 41
-> 8b6
-> [    1.715276] RSP: 0018:ffffc900007cfcc0 EFLAGS: 00010246
-> [    1.715583] RAX: ffff888106fe12c0 RBX: 0000000000000010 RCX: 000000000=
-0000000
-> [    1.716036] RDX: 0000000000000017 RSI: dead0000cafebabe RDI: ffff88810=
-59c4a00
-> [    1.716504] RBP: ffffc900007cfe10 R08: 0000000000000010 R09: 000000000=
-0000000
-> [    1.716955] R10: 0000000000000000 R11: 0000000000000000 R12: 000000000=
-0000002
-> [    1.717429] R13: ffff888106fe12c0 R14: ffff8881059c4a00 R15: ffff88810=
-6e57000
-> [    1.717866] FS:  0000000038e54380(0000) GS:ffff88813bc00000(0000)
-> knlGS:0000000000000000
-> [    1.718350] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.718703] CR2: 00000000004bf480 CR3: 00000001009ec001 CR4: 000000000=
-0772ef0
-> [    1.719109] PKRU: 55555554
-> [    1.719297] Call Trace:
-> [    1.719461]  <TASK>
-> [    1.719611]  sk_skb_reason_drop+0x58/0x120
-> [    1.719891]  packet_sendmsg+0xbcb/0x18f0
-> [    1.720166]  ? pcpu_alloc_area+0x186/0x260
-> [    1.720421]  __sys_sendto+0x1e2/0x1f0
-> [    1.720691]  __x64_sys_sendto+0x24/0x30
-> [    1.720948]  do_syscall_64+0x58/0x120
-> [    1.721174]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [    1.721509] RIP: 0033:0x42860d
-> [    1.721713] Code: c3 ff ff ff ff 64 89 02 eb b9 0f 1f 00 f3 0f 1e
-> fa 80 3d 5d 4a 09 00 00 41 89 ca 74 20 45 31 c9 45 31 c0 b8 2c 00 00
-> 00 0f 05 <48> 3d 00 f0 ff ff 77 6b c3 66 2e 0f 1f 84 00 00 00 00 00 55
-> 489
-> [    1.722837] RSP: 002b:00007fff597e95e8 EFLAGS: 00000246 ORIG_RAX:
-> 000000000000002c
-> [    1.723315] RAX: ffffffffffffffda RBX: 00000000000003e8 RCX: 000000000=
-042860d
-> [    1.723721] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000=
-0000310
-> [    1.724103] RBP: 00007fff597e9880 R08: 0000000000000000 R09: 000000000=
-0000000
-> [    1.724565] R10: 0000000000000000 R11: 0000000000000246 R12: 00007fff5=
-97e99f8
-> [    1.725010] R13: 00007fff597e9a08 R14: 00000000004b7828 R15: 000000000=
-0000001
-> [    1.725441]  </TASK>
-> [    1.725594] Modules linked in:
-> [    1.725790] ---[ end trace 0000000000000000 ]---
-> [    1.726057] RIP: 0010:skb_release_data+0x8a/0x1c0
-> [    1.726339] Code: c0 00 00 00 49 03 86 c8 00 00 00 0f b6 10 f6 c2
-> 01 74 48 48 8b 70 28 48 85 f6 74 3f 41 0f b6 5d 00 83 e3 10 40 f6 c6
-> 01 75 24 <48> 8b 06 ba 01 00 00 00 4c 89 f7 48 8b 00 ff d0 0f 1f 00 41
-> 8b6
-> [    1.727285] RSP: 0018:ffffc900007cfcc0 EFLAGS: 00010246
-> [    1.727623] RAX: ffff888106fe12c0 RBX: 0000000000000010 RCX: 000000000=
-0000000
-> [    1.728052] RDX: 0000000000000017 RSI: dead0000cafebabe RDI: ffff88810=
-59c4a00
-> [    1.728467] RBP: ffffc900007cfe10 R08: 0000000000000010 R09: 000000000=
-0000000
-> [    1.728908] R10: 0000000000000000 R11: 0000000000000000 R12: 000000000=
-0000002
-> [    1.729323] R13: ffff888106fe12c0 R14: ffff8881059c4a00 R15: ffff88810=
-6e57000
-> [    1.729744] FS:  0000000038e54380(0000) GS:ffff88813bc00000(0000)
-> knlGS:0000000000000000
-> [    1.730236] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.730597] CR2: 00000000004bf480 CR3: 00000001009ec001 CR4: 000000000=
-0772ef0
-> [    1.730988] PKRU: 55555554
-> ```
->
+On Sun, 18 Jan 2026 16:01:25 -0800
+Andrew Morton <akpm@linux-foundation.org> wrote:
 
-OK thanks.
+> On Sun, 18 Jan 2026 22:58:02 +0000 David Laight <david.laight.linux@gmail.com> wrote:
+> 
+> > > mm/ alone has 74 __always_inlines, none are documented, I don't know
+> > > why they're present, many are probably wrong.
+> > > 
+> > > Shit, uninlining only __get_user_pages_locked does this:
+> > > 
+> > >    text	   data	    bss	    dec	    hex	filename
+> > >  115703	  14018	     64	 129785	  1faf9	mm/gup.o
+> > >  103866	  13058	     64	 116988	  1c8fc	mm/gup.o-after  
+> > 
+> > The next questions are does anything actually run faster (either way),
+> > and should anything at all be marked 'inline' rather than 'always_inline'.
+> > 
+> > After all, if you call a function twice (not in a loop) you may
+> > want a real function in order to avoid I-cache misses.  
+> 
+> yup
 
-I will repeat my original feedback : I do not see any barriers in the
-patch you sent.
+I had two adjacent strlen() calls in a bit of code, the first was an
+array (in a structure) and gcc inlined the 'word at a time' code, the
+second was a pointer and it called the library function.
+That had to be sub-optimal...
 
-Assuming bond_setup_by_slave() can be called multiple times during one
-master lifetime, I do not think your patch is enough.
+> > But I'm sure there is a lot of code that is 'inline_for_bloat' :-)  
+> 
+> ooh, can we please have that?
 
-Also, please clarify what happens with stacks of two or more bonding device=
-s ?
+Or 'inline_to_speed_up_benchmark' and the associated 'unroll this loop
+because that must make it faster'.
+
+> I do think that every always_inline should be justified and commented,
+> but I haven't been energetic about asking for that.
+
+Apart from the 4-line functions where it is clearly obvious.
+Especially since the compiler can still decide to not-inline them
+if they are only 'inline'.
+
+> A fun little project would be go through each one, figure out whether
+> were good reasons and if not, just remove them and see if anyone
+> explains why that was incorrect.
+
+It's not just always_inline, a lot of the inline are dubious.
+Probably why the networking code doesn't like it.
+
+Maybe persuade Linus to do some of that.
+He can use his 'god' bit to just change them.
+
+	David
+
+
+
 
