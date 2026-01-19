@@ -1,206 +1,282 @@
-Return-Path: <netdev+bounces-250964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B9C7D39DC1
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:27:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856BAD39DD6
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8C318300102C
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 05:27:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 848E83004F3B
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 05:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2704533067D;
-	Mon, 19 Jan 2026 05:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DDE311952;
+	Mon, 19 Jan 2026 05:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U3XZ9bED"
+	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="vGo2lUOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F75330320
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768800454; cv=none; b=b9LLESbjhm2OO68qjtfW31/ZolvgxoIat0O09CXQzqaQ+Ks9yMpDrOUn/0WTbItnLj9/H2PwXEEt/LlvC24FM/+rnzaYt5lBtBLLjSIal+RIuogRvzjiC6j5/mCXgzNbHkD8e/lgt3VA5QIUCtVyYYQUAmlTdV3kL3qgrdZR3PA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768800454; c=relaxed/simple;
-	bh=GQyIKVnUIV+o89ZaVPW/6Orx8v9FcnDa0Oajgp1SONE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=AdWV+pPQmshO4ZYzKdg7V0nzumnGv2yPelUGwOl7+eJGrJZTDl7KymeIMCUmIo+ZtXJd4dCYXCsk4GGlk2Cvt8HVrVs2JT4UHDE/wlWu38CBsfa6GBRQnfhxl91FAzP2G53ukt7qGw9ehp35jNYHpm3Ey7sSv5UbENxlGMy0mLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=U3XZ9bED; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-4801c2fae63so21323455e9.2
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 21:27:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BA413A3F7
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768800980; cv=pass; b=Umajxh0gDwLN2bDUfLr1hjqhIFwU8S1/bZyb3fUlfGZfLuq8pi2JoeJyOkR4gsmTfCYuiSWf9wyOB1+1cdHTUIhOuhgbr0hEt/+o4jZluwZHSj98xS4SzyHRZOb98Cc8/EZIjEq7ntv2cO/+ge7q5NJxcF7qaxPwPDUjUt+t+Fc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768800980; c=relaxed/simple;
+	bh=pmFunN1tivUicaz50zBAmtcCQOoz4Xig64J24f2upYY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pjcoTeGfwuGWS5XHQJtzB3zRXPxC4wzswPmccAHDU5nmtDB7P+P+H23oVtk/Oj5+Snh7Y1CdjIZTsAymQML+O5tKpYAUP2SuBTsFcsGYfEKOWHgvCKAW35WA2d8bWlZfqd7gyPW8xanG/9hkN7gu+KYSu24PYaRk2n4VyTaQNAE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=vGo2lUOS; arc=pass smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-430f5ecaa08so1763748f8f.3
+        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 21:36:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768800977; cv=none;
+        d=google.com; s=arc-20240605;
+        b=LXQiG17dYV89BhMLH73gDp3nX2ND3fEF0WbU9kpZuRDRDY4Pp2x6XGk9xlN9E7xIs3
+         k23bKDmNsWoo4i9/Qy5pDA6QAE6q/SRLCxhkQDFZArbNrSeaXM2fWK/T4GvHhaBXzDnk
+         TmTge8LtJCAWYSB8cN4/Iw4mc6HgaWB7UzGwSgvvnhDkPdWybCWOT7Wldcj1PYlI0gpt
+         0OmglgXP+516h1K2knuIlDqxqMyA+PeIHgqw6GQPEmomQXe7ANPbWFcWlgAZ6Nhj6FBJ
+         N19Xr+Ur/gkgXZhAzb75f4iIV62psKBcHYRJs5dVDTd3e0B38t7ghH8hwcpULJXz2Ke3
+         lD2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=/AHZwn8sKOj0g/0V6Pc0Jb8sQ9rvm5bvjlgIp9vt/BY=;
+        fh=JQ4K06u/x/q1Mg6BK8peLgismuxKx0TTijDbLyQbYTk=;
+        b=SwtkBffqWyOjLKOC8RzegUyluK5LupvLfF5AKZ1wdip1FwOdS04E81yUKtAAVPVMAt
+         eQ89tilBrjiovDgNKNYE8AagFQXVmpWyrp27k+aAthglwaMkzp3H4vvQe2LozIKvEPHa
+         HkrZ+mqaJGp8LGC27C1zzIpCPRPfVgLMShwpExfNRRJ4iOa7CSIY+ePpBMtX3DegKOeC
+         eOMkSuLyED+K7TPP/Hng2DjfBvjM2jCFPaq+5sPdCxhxlkw1eTRp1lTE9iBZ4QtzOV5B
+         iHl2hGhIIpR9BN7lhuE3fqBFIlM87whz9x/c7R4vFoy0/a782Q10jy2s9QBZKEdm4Bqx
+         1unA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1768800449; x=1769405249; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KcHNJUeHYBB6SOgT0QQnF8ZJgMw39mShpamAL4iiy6o=;
-        b=U3XZ9bED9kW2q5ElW4AXCLhN9XrwCQ0AIRSB7FLxYso+CehkA+vIVj0IhafFfkuJfa
-         v6ae3tdjRTRIr9zEdj6TDIxwbNh9KAECU7twr9w32djVXG5eg+cXk1YfwXE6bfI1oWda
-         2dSOmn3EodaxxgPQztU4qTwpxrl9yvnoK/yd6ibxEILhJ8APe76F8iXt0+zFnnJ/zUjM
-         5o43ghGzW9tsoXay+12ldeWOT6EM1K9tAMIvzP/wj8vsAkdJC6SEu/l5XPfDLxUxXBjn
-         E/kCm9qy7ETduHRr/h54rMDq/MTjqf6O2QeAP5YsjPSb+Yo5IA4sPv5ZR0y9AWpOicc/
-         EskA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768800449; x=1769405249;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmo-cybersecurity.com; s=google; t=1768800977; x=1769405777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KcHNJUeHYBB6SOgT0QQnF8ZJgMw39mShpamAL4iiy6o=;
-        b=nSqukzRgBFQYPMcgeqZXUkOE9nm4IzCx3xrNW3o6OcjEUS/EO0SISA6K/KrjNqr39K
-         VBvaSWzsjau2mYIe95n8/+01HnvkOL1P5s9hiE2zlDHZyzzziR/dnm55fMzsaASjCk6u
-         84OzEjNhsO7eM41VpJcB0xOJiXI6lOIWBnNWhUh5bXud6aEjOLxjvCoTivATbGhlk+mf
-         FUzB9EiMHtEoRpd6EHd42CsCZGU7MAwfX1xIYi1IKhrhKRcQNv4tRM9GPYOxKDen/mB+
-         gZgreJWkZTANoBbbU0ek62VEjNMvsws/CAQi85UyK75gXIyB4srK/Rbn3ok7yVqad3UI
-         sjZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3qByAMCnQDNxzsVuIb+kpuBa+W1raXE0pzDv8GVb0uwDla3fdBPvIx+7mHfB682+sTNz9yUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHe+zyepOYcD2PDx815ohGy56H67FcQU3tTKXcfFa/fzvP8dV/
-	bq42pzpFBHlLkAfsrab7kFwUTlpJ9QpB+rxfFOui1Wf7PNZ/Yr60FG3zWu6UYWjwer0=
-X-Gm-Gg: AY/fxX4pc+CIslHvKRxCtUJJ0PIhQlmbt02QUId5NMOSY0y8XVqA+X3EYnmnvhR9rOf
-	780BLHvGM9nBJKVaph2sWVi9okGJN5bftYnUkbTDBVCHybgYS85kyQ4WQnPQ8n9NQfzQbUAWo3S
-	52I/2ZZTE/tdAgu57ZpPprP07zyRXaNA1aVUGJBl7QoGVVOpMq+P4t3LNDSK/WPhmDFAUNaliCr
-	zdFKv0WpRoQnVDUWgZCn63sakNWqhaItQ0Jqe4frl0nsNSI6WufdaOINCQQXoUYn6gdY500mmW2
-	+SmrxbBTstZlIQ6+avk9ID07T2mZ+W9O05NEJvsL3HXmd/2xwtYrtt/9HvHmWYexbRDi0GIm+ct
-	TlfvKXKZeqSdMckLnFGTPPxlkebhm+XSZUHsWoQ2vgs4Nf72zUZQFGrjPC9yuTfYUc0nNHeaftd
-	8MXTuzNK6GOJd+iXul
-X-Received: by 2002:a05:600c:4f8a:b0:477:7b16:5f88 with SMTP id 5b1f17b1804b1-4801e2f90camr128220315e9.6.1768800449052;
-        Sun, 18 Jan 2026 21:27:29 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699980e5sm20818492f8f.41.2026.01.18.21.27.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jan 2026 21:27:28 -0800 (PST)
-Date: Mon, 19 Jan 2026 08:27:25 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chiachang Wang <chiachangwang@google.com>,
-	Yan Yan <evitayan@google.com>, devel@linux-ipsec.org,
-	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org
-Subject: Re: [PATCH ipsec-next v2 4/4] xfrm: add XFRM_MSG_MIGRATE_STATE for
- single SA migration
-Message-ID: <202601190605.ZVkgcUYl-lkp@intel.com>
+        bh=/AHZwn8sKOj0g/0V6Pc0Jb8sQ9rvm5bvjlgIp9vt/BY=;
+        b=vGo2lUOS/+0Ofe7I0fpuGN1I55owSQiFKE6Bd3aF31VP+tbcmPJ+8XAfnRMeSknh6p
+         KSfYIhGGJlmEhNZFAFQJo1zrPGJVblUZkm+HyS1OnTYgLc+sH7B34Q/FbTKmwcRJPmj1
+         8uftraq82KcW/DP8RNbcRUxmmxAPJXd2452fyZddGhGPmOC0ZAeeLA+k36aiGQAjuHe1
+         TNNOaMcUOVzaoJrrEtOOWFSuWJxuWitF8N7yRy+VDG451257WYabjHfrb2qV4xCYP4m4
+         fvyvBzhi99bcgs8jznPrNGEAXUhai1fn9xPsOB4ggVDiKmFmDOWzzs3/afEyk4ujIzZo
+         MBOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768800977; x=1769405777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/AHZwn8sKOj0g/0V6Pc0Jb8sQ9rvm5bvjlgIp9vt/BY=;
+        b=dG/+/7ZRb0tGcCnEkdv8FHkHdVK8pwHQMkKSuwbQVnRQGEEK1ERTZVsNSJz7fbkHS3
+         rwge+3UdXKKUV1eyQMbbRPNncUiD1WtQV628QUuEhf/jRjHrlL/mHMFaZ8aRXuhnJikn
+         vX3O9TEfJfn8UE8lJWbV49AasaOxwpYq3xM+/VHKz67stKFErVbE+Unni5mG8VM+yyqm
+         87Rpiautq2ShdninjOulx592roKermUgO1B/0TQrSLH17HhMNvXnRXBizKg7TpgTKPRx
+         qolyHaXee3vbtiHtOR9dzKNYbArpYhjMXWBA5HnADouhyUTnRX63KTfpxKx7evXreocL
+         2iZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXl1ExkrkXmnnn48bd37LTK3S2l6ToaWjlBs0yNgkTMN9FJc+FTMJ3YsKy7mnLLwCckswexVf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6DuP9jjjG1otjOHclxjbud/9pzmNSABFDjRYRBsqQdNs7g0/z
+	vK6vjtwCYkraWLiDCGGiSS+ERsuE/V06j8v29HE0J+f2J4BXm51XrsT1ILC0rELg9lBYX9G2R+e
+	vmHsk6q3kOzR/idk560xVDyjl/1ZlTl73D3/QAaZKiQ==
+X-Gm-Gg: AZuq6aKHrhJSlJxkHA9d9tLPRRW6O+qarRWcrMElAa8IGpfabdPV2QVKr4rCcdlEy7v
+	KRIs8JeS8a/JxPaM4hdhuqd3AeL9dJL/DABvOaQFUwS1VH6vYU8mNqyTKSUNEw63PrVFtMBUhmT
+	nCdqn+AGjzZHBKGejiThkle4Jdf9g4UgatYCp5eI/BrpuYM9mmNroF0hZolJvmdp8wcSCimToYy
+	nV8RtkE4JLecuVq6vXrftBC0MDSS6g7ZCB0bcYz6fKG42NfGIrQSQKfePrwRhMmEhG1eCEngIsR
+	MQclK/fswrE642KJ+GVoT02FpQ==
+X-Received: by 2002:a05:6000:2085:b0:432:c0e6:cfcc with SMTP id
+ ffacd0b85a97d-4356a029c8emr13158192f8f.23.1768800976937; Sun, 18 Jan 2026
+ 21:36:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <951cb30ac3866c6075bc7359d0997dbffc3ce6da.1768679141.git.antony.antony@secunet.com>
+References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
+ <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
+ <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com>
+ <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
+ <CACwEKLp42TwpK_3FEp85bq81eA1zg3777guNMonW9cm2i7aN2Q@mail.gmail.com>
+ <CAA3_Gnqo37RxLi2McF0=oRPZSw_P3Kya_3m3JBA2s6c0vaf5sw@mail.gmail.com> <CANn89iL8FnPG9bD6zW0eHmeSNzc33SJgrUR7Aab4PFG-O4nfTw@mail.gmail.com>
+In-Reply-To: <CANn89iL8FnPG9bD6zW0eHmeSNzc33SJgrUR7Aab4PFG-O4nfTw@mail.gmail.com>
+From: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Date: Mon, 19 Jan 2026 14:36:04 +0900
+X-Gm-Features: AZwV_QhqLBcmX3NkzHszzN6BHk8S3x0foOSuvxMbmN81wAwJu0zi8IYU_2ZGcFo
+Message-ID: <CAA3_GnpijQeBNVOqy6QtUMDjhy_ku_b54uf30zfEq=etMTqKrA@mail.gmail.com>
+Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
+To: Eric Dumazet <edumazet@google.com>
+Cc: pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>, 
+	=?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Antony,
+Thanks for your quick response.
 
-kernel test robot noticed the following build warnings:
+The following information is based on Linux kernel version 6.12.65,
+the latest release in the 6.12 tree.
+The kernel config is identical to that of the kernelCTF instance
+(available at: https://storage.googleapis.com/kernelctf-build/releases/lts-=
+6.12.65/.config)
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Antony-Antony/xfrm-remove-redundant-assignments/20260118-041031
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/951cb30ac3866c6075bc7359d0997dbffc3ce6da.1768679141.git.antony.antony%40secunet.com
-patch subject: [PATCH ipsec-next v2 4/4] xfrm: add XFRM_MSG_MIGRATE_STATE for single SA migration
-config: hexagon-randconfig-r072-20260118 (https://download.01.org/0day-ci/archive/20260119/202601190605.ZVkgcUYl-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
-smatch version: v0.5.0-8985-g2614ff1a
+This type confusion occurs in several locations, including,
+for example, `ipgre_header` (`header_ops->create`),
+where the private data of the network device is incorrectly cast as
+`struct ip_tunnel *`.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202601190605.ZVkgcUYl-lkp@intel.com/
+```
+static int ipgre_header(struct sk_buff *skb, struct net_device *dev,
+      unsigned short type,
+      const void *daddr, const void *saddr, unsigned int len)
+{
+  struct ip_tunnel *t =3D netdev_priv(dev);
+  struct iphdr *iph;
+  struct gre_base_hdr *greh;
+...
+```
 
-New smatch warnings:
-net/xfrm/xfrm_user.c:3299 xfrm_do_migrate_state() warn: missing error code? 'err'
+When a bond interface is given to this function,
+it should not reference the private data as `struct ip_tunnel *`,
+because the bond interface uses the private data as `struct bonding *`.
+(quickly confirmed by seeing drivers/net/bonding/bond_netlink.c:909)
 
-Old smatch warnings:
-net/xfrm/xfrm_user.c:1024 xfrm_add_sa() warn: missing error code? 'err'
-net/xfrm/xfrm_user.c:2248 xfrm_add_policy() warn: missing error code? 'err'
-net/xfrm/xfrm_user.c:3018 xfrm_add_acquire() warn: missing error code 'err'
+```
+struct rtnl_link_ops bond_link_ops __read_mostly =3D {
+    .kind            =3D "bond",
+    .priv_size        =3D sizeof(struct bonding),
+...
+```
 
-vim +/err +3299 net/xfrm/xfrm_user.c
+The stack trace below is the backtrace of all stack frame during a
+call to `ipgre_header`.
 
-d3019c1db87425 Antony Antony 2026-01-17  3240  static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
-d3019c1db87425 Antony Antony 2026-01-17  3241  				 struct nlattr **attrs, struct netlink_ext_ack *extack)
-d3019c1db87425 Antony Antony 2026-01-17  3242  {
-d3019c1db87425 Antony Antony 2026-01-17  3243  	int err = -ESRCH;
-d3019c1db87425 Antony Antony 2026-01-17  3244  	struct xfrm_state *x;
-d3019c1db87425 Antony Antony 2026-01-17  3245  	struct net *net = sock_net(skb->sk);
-d3019c1db87425 Antony Antony 2026-01-17  3246  	struct xfrm_encap_tmpl *encap = NULL;
-d3019c1db87425 Antony Antony 2026-01-17  3247  	struct xfrm_user_offload *xuo = NULL;
-d3019c1db87425 Antony Antony 2026-01-17  3248  	struct xfrm_migrate m = { .old_saddr.a4 = 0,};
-d3019c1db87425 Antony Antony 2026-01-17  3249  	struct xfrm_user_migrate_state *um = nlmsg_data(nlh);
-d3019c1db87425 Antony Antony 2026-01-17  3250  
-d3019c1db87425 Antony Antony 2026-01-17  3251  	if (!um->id.spi) {
-d3019c1db87425 Antony Antony 2026-01-17  3252  		NL_SET_ERR_MSG(extack, "Invalid SPI 0x0");
-d3019c1db87425 Antony Antony 2026-01-17  3253  		return -EINVAL;
-d3019c1db87425 Antony Antony 2026-01-17  3254  	}
-d3019c1db87425 Antony Antony 2026-01-17  3255  
-d3019c1db87425 Antony Antony 2026-01-17  3256  	err = copy_from_user_migrate_state(&m, um);
-d3019c1db87425 Antony Antony 2026-01-17  3257  	if (err)
-d3019c1db87425 Antony Antony 2026-01-17  3258  		return err;
-d3019c1db87425 Antony Antony 2026-01-17  3259  
-d3019c1db87425 Antony Antony 2026-01-17  3260  	x = xfrm_user_state_lookup(net, &um->id, attrs, &err);
-d3019c1db87425 Antony Antony 2026-01-17  3261  
-d3019c1db87425 Antony Antony 2026-01-17  3262  	if (x) {
-d3019c1db87425 Antony Antony 2026-01-17  3263  		struct xfrm_state *xc;
-d3019c1db87425 Antony Antony 2026-01-17  3264  
-d3019c1db87425 Antony Antony 2026-01-17  3265  		if (!x->dir) {
-d3019c1db87425 Antony Antony 2026-01-17  3266  			NL_SET_ERR_MSG(extack, "State direction is invalid");
-d3019c1db87425 Antony Antony 2026-01-17  3267  			err = -EINVAL;
-d3019c1db87425 Antony Antony 2026-01-17  3268  			goto error;
-d3019c1db87425 Antony Antony 2026-01-17  3269  		}
-d3019c1db87425 Antony Antony 2026-01-17  3270  
-d3019c1db87425 Antony Antony 2026-01-17  3271  		if (attrs[XFRMA_ENCAP]) {
-d3019c1db87425 Antony Antony 2026-01-17  3272  			encap = kmemdup(nla_data(attrs[XFRMA_ENCAP]),
-d3019c1db87425 Antony Antony 2026-01-17  3273  					sizeof(*encap), GFP_KERNEL);
-d3019c1db87425 Antony Antony 2026-01-17  3274  			if (!encap) {
-d3019c1db87425 Antony Antony 2026-01-17  3275  				err = -ENOMEM;
-d3019c1db87425 Antony Antony 2026-01-17  3276  				goto error;
-d3019c1db87425 Antony Antony 2026-01-17  3277  			}
-d3019c1db87425 Antony Antony 2026-01-17  3278  		}
-d3019c1db87425 Antony Antony 2026-01-17  3279  		if (attrs[XFRMA_OFFLOAD_DEV]) {
-d3019c1db87425 Antony Antony 2026-01-17  3280  			xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
-d3019c1db87425 Antony Antony 2026-01-17  3281  				      sizeof(*xuo), GFP_KERNEL);
-d3019c1db87425 Antony Antony 2026-01-17  3282  			if (!xuo) {
-d3019c1db87425 Antony Antony 2026-01-17  3283  				err = -ENOMEM;
-d3019c1db87425 Antony Antony 2026-01-17  3284  				goto error;
-d3019c1db87425 Antony Antony 2026-01-17  3285  			}
-d3019c1db87425 Antony Antony 2026-01-17  3286  		}
-d3019c1db87425 Antony Antony 2026-01-17  3287  		xc = xfrm_state_migrate(x, &m, encap, net, xuo, extack);
-d3019c1db87425 Antony Antony 2026-01-17  3288  		if (xc) {
-d3019c1db87425 Antony Antony 2026-01-17  3289  			xfrm_state_delete(x);
-d3019c1db87425 Antony Antony 2026-01-17  3290  			xfrm_send_migrate_state(um, encap, xuo);
-d3019c1db87425 Antony Antony 2026-01-17  3291  			err = 0;
-d3019c1db87425 Antony Antony 2026-01-17  3292  		} else {
-d3019c1db87425 Antony Antony 2026-01-17  3293  			if (extack && !extack->_msg)
-d3019c1db87425 Antony Antony 2026-01-17  3294  				NL_SET_ERR_MSG(extack, "State migration clone failed");
-d3019c1db87425 Antony Antony 2026-01-17  3295  			err = -EINVAL;
-d3019c1db87425 Antony Antony 2026-01-17  3296  		}
-d3019c1db87425 Antony Antony 2026-01-17  3297  	} else {
-d3019c1db87425 Antony Antony 2026-01-17  3298  		NL_SET_ERR_MSG(extack, "Can not find state");
-d3019c1db87425 Antony Antony 2026-01-17 @3299  		return err;
+```
+ipgre_header at net/ipv4/ip_gre.c:890
+dev_hard_header at ./include/linux/netdevice.h:3156
+packet_snd at net/packet/af_packet.c:3082
+packet_sendmsg at net/packet/af_packet.c:3162
+sock_sendmsg_nosec at net/socket.c:729
+__sock_sendmsg at net/socket.c:744
+__sys_sendto at net/socket.c:2213
+__do_sys_sendto at net/socket.c:2225
+__se_sys_sendto at net/socket.c:2221
+__x64_sys_sendto at net/socket.c:2221
+do_syscall_x64 at arch/x86/entry/common.c:47
+do_syscall_64 at arch/x86/entry/common.c:78
+entry_SYSCALL_64 at arch/x86/entry/entry_64.S:121
+```
 
-s/err/-ESRCH/.  err is zero/success here.
+This causes memory corruption during subsequent operations.
 
-d3019c1db87425 Antony Antony 2026-01-17  3300  	}
-d3019c1db87425 Antony Antony 2026-01-17  3301  error:
-d3019c1db87425 Antony Antony 2026-01-17  3302  	xfrm_state_put(x);
-d3019c1db87425 Antony Antony 2026-01-17  3303  	kfree(encap);
-d3019c1db87425 Antony Antony 2026-01-17  3304  	kfree(xuo);
-d3019c1db87425 Antony Antony 2026-01-17  3305  	return err;
-d3019c1db87425 Antony Antony 2026-01-17  3306  }
+The following stack trace shows a General Protection Fault triggered
+when sending a packet
+to a bonding interface that has an IPv4 GRE interface as a slave.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+```
+[    1.712329] Oops: general protection fault, probably for
+non-canonical address 0xdead0000cafebabe: 0000 [#1] SMP NOPTI
+[    1.712972] CPU: 0 UID: 1000 PID: 205 Comm: exp Not tainted 6.12.65 #1
+[    1.713344] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[    1.713890] RIP: 0010:skb_release_data+0x8a/0x1c0
+[    1.714162] Code: c0 00 00 00 49 03 86 c8 00 00 00 0f b6 10 f6 c2
+01 74 48 48 8b 70 28 48 85 f6 74 3f 41 0f b6 5d 00 83 e3 10 40 f6 c6
+01 75 24 <48> 8b 06 ba 01 00 00 00 4c 89 f7 48 8b 00 ff d0 0f 1f 00 41
+8b6
+[    1.715276] RSP: 0018:ffffc900007cfcc0 EFLAGS: 00010246
+[    1.715583] RAX: ffff888106fe12c0 RBX: 0000000000000010 RCX: 00000000000=
+00000
+[    1.716036] RDX: 0000000000000017 RSI: dead0000cafebabe RDI: ffff8881059=
+c4a00
+[    1.716504] RBP: ffffc900007cfe10 R08: 0000000000000010 R09: 00000000000=
+00000
+[    1.716955] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000000=
+00002
+[    1.717429] R13: ffff888106fe12c0 R14: ffff8881059c4a00 R15: ffff888106e=
+57000
+[    1.717866] FS:  0000000038e54380(0000) GS:ffff88813bc00000(0000)
+knlGS:0000000000000000
+[    1.718350] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.718703] CR2: 00000000004bf480 CR3: 00000001009ec001 CR4: 00000000007=
+72ef0
+[    1.719109] PKRU: 55555554
+[    1.719297] Call Trace:
+[    1.719461]  <TASK>
+[    1.719611]  sk_skb_reason_drop+0x58/0x120
+[    1.719891]  packet_sendmsg+0xbcb/0x18f0
+[    1.720166]  ? pcpu_alloc_area+0x186/0x260
+[    1.720421]  __sys_sendto+0x1e2/0x1f0
+[    1.720691]  __x64_sys_sendto+0x24/0x30
+[    1.720948]  do_syscall_64+0x58/0x120
+[    1.721174]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    1.721509] RIP: 0033:0x42860d
+[    1.721713] Code: c3 ff ff ff ff 64 89 02 eb b9 0f 1f 00 f3 0f 1e
+fa 80 3d 5d 4a 09 00 00 41 89 ca 74 20 45 31 c9 45 31 c0 b8 2c 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 6b c3 66 2e 0f 1f 84 00 00 00 00 00 55
+489
+[    1.722837] RSP: 002b:00007fff597e95e8 EFLAGS: 00000246 ORIG_RAX:
+000000000000002c
+[    1.723315] RAX: ffffffffffffffda RBX: 00000000000003e8 RCX: 00000000004=
+2860d
+[    1.723721] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00310
+[    1.724103] RBP: 00007fff597e9880 R08: 0000000000000000 R09: 00000000000=
+00000
+[    1.724565] R10: 0000000000000000 R11: 0000000000000246 R12: 00007fff597=
+e99f8
+[    1.725010] R13: 00007fff597e9a08 R14: 00000000004b7828 R15: 00000000000=
+00001
+[    1.725441]  </TASK>
+[    1.725594] Modules linked in:
+[    1.725790] ---[ end trace 0000000000000000 ]---
+[    1.726057] RIP: 0010:skb_release_data+0x8a/0x1c0
+[    1.726339] Code: c0 00 00 00 49 03 86 c8 00 00 00 0f b6 10 f6 c2
+01 74 48 48 8b 70 28 48 85 f6 74 3f 41 0f b6 5d 00 83 e3 10 40 f6 c6
+01 75 24 <48> 8b 06 ba 01 00 00 00 4c 89 f7 48 8b 00 ff d0 0f 1f 00 41
+8b6
+[    1.727285] RSP: 0018:ffffc900007cfcc0 EFLAGS: 00010246
+[    1.727623] RAX: ffff888106fe12c0 RBX: 0000000000000010 RCX: 00000000000=
+00000
+[    1.728052] RDX: 0000000000000017 RSI: dead0000cafebabe RDI: ffff8881059=
+c4a00
+[    1.728467] RBP: ffffc900007cfe10 R08: 0000000000000010 R09: 00000000000=
+00000
+[    1.728908] R10: 0000000000000000 R11: 0000000000000000 R12: 00000000000=
+00002
+[    1.729323] R13: ffff888106fe12c0 R14: ffff8881059c4a00 R15: ffff888106e=
+57000
+[    1.729744] FS:  0000000038e54380(0000) GS:ffff88813bc00000(0000)
+knlGS:0000000000000000
+[    1.730236] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.730597] CR2: 00000000004bf480 CR3: 00000001009ec001 CR4: 00000000007=
+72ef0
+[    1.730988] PKRU: 55555554
+```
 
+
+2026=E5=B9=B41=E6=9C=8815=E6=97=A5(=E6=9C=A8) 20:07 Eric Dumazet <edumazet@=
+google.com>:
+>
+> On Thu, Jan 15, 2026 at 11:33=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=
+=A4=AA <kota.toda@gmo-cybersecurity.com> wrote:
+> >
+> > Hello, Eric and other maintainers,
+> >
+> > I hope you=E2=80=99re doing well. I=E2=80=99m following up on our email=
+, sent during
+> > the holiday season, in case it got buried.
+> >
+> > When you have a moment, could you please let us know if you had a
+> > chance to review it?
+> >
+> > Thank you in advance, and I look forward to your response.
+> >
+>
+> I think it would be nice to provide an actual stack trace of the bug,
+> on a recent kernel tree.
+>
+> We had recent patches dealing with dev->hard_header_len changes.
 
