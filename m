@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-251323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9D8D3BAFE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 23:42:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33DFBD3BAFF
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 23:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3C7E0300462F
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 22:42:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0E9A230049DA
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 22:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BAF271456;
-	Mon, 19 Jan 2026 22:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7010C3033DE;
+	Mon, 19 Jan 2026 22:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+qEu45h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFVdWwd1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96D21A256B
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 22:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5A01A256B
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 22:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768862545; cv=none; b=Op0M9zkCtfqHA2C3cH2oLTqEFqKE6LC3+cAQV0ZJ29fLzrnoffusb0CCGfjAOT72B5UB4h1SOPxeljcgwRm1HJUqD4DtZqbdf7UWRmfT9WZq+uFLYsbV+9lV/1cCF8Fews5ogl2bLHqlQIQFOnuRPLPGZ2O6kSl/HEqEjHBtoDY=
+	t=1768862549; cv=none; b=TV+CjWeRVetapeJ+bMss2UAY4qtCjS+gnox7bRUCIirKr002bAeqriyF5w1CPinXPrY7ZsNb+cRJnwryBHBCzyjIXpWazFT6Ks+jvPwz6K7uQJMtr7FC/6dckIaOumolTquSsWa+m/YmZG1WfN2OwtwnAralDNBD/zh2UsM0ePE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768862545; c=relaxed/simple;
-	bh=tkX+tD9U5oooed5Xc7XrbMPPC9KCKgt3geH6UYnrjJM=;
+	s=arc-20240116; t=1768862549; c=relaxed/simple;
+	bh=lAMAP95ZqXxCSN4yx8liWUf7aaeGECTBKXoNnKqG2to=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V+59sdKWO4h0Lpw7SAPwwMwVhO/YeMds75xyW1SVoxQWaaWRLqK2e0As/1hMK/DQIkp9Yev03RId1/aqP22NHEOLr6yL8zNf1TZruUHI1Ol0MCPVFlpSsmqiekSi/xg+1sduRcTxakRMaWip9BibluR5gliUsXOyNFC717rpBAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+qEu45h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7D71C116C6;
-	Mon, 19 Jan 2026 22:42:24 +0000 (UTC)
+	 MIME-Version; b=slVUqibytTx/Drplaoo4bpvLIEThZZqh/qXWHBsB8pY9uG25Gb7AgLQmAUBr2rmUMh3D0mCcaALQf31kuw4PYk7HoGWpiyyxnafEF8Ehs+BTLwnzfDFKSzmvCA4GPR+9IxyF2WVkjXvFcmNi7GDdEuhp8yoRfV0Bd0/E6dheHIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFVdWwd1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42E6CC116C6;
+	Mon, 19 Jan 2026 22:42:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768862545;
-	bh=tkX+tD9U5oooed5Xc7XrbMPPC9KCKgt3geH6UYnrjJM=;
+	s=k20201202; t=1768862548;
+	bh=lAMAP95ZqXxCSN4yx8liWUf7aaeGECTBKXoNnKqG2to=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P+qEu45h9sQ6EMejKSZDEQgCRp4iK54HvMgM3f1UjXtGAjadZiJBSHVClWIx0Q6By
-	 egZDPMjGigCywb7wpkwMQntD6vVhZ/e2YTkp3aJ6JSVz9GH7x8Kvik1XIXFKTllkNB
-	 GqyOMQUGPiuxWikKlL252iVzeILhRgmRc55e5edlVZa1FRhHTb2tu+4xKcClrnDe+m
-	 UYZIEUeCLGKBzu2BFV/TXAlvVDBVCI95eJQG2Mp7CTyyUrumwgmrEI18xXP9QS1+X6
-	 0bN3NUhTrWf4pmPnBS6o399VOV+kd7mahkli48xUsfs0qKM4EFqahzAFjZm+5BE46y
-	 0sNVoWA1CtalA==
+	b=EFVdWwd1i7fnj/hWbSiMNa3NG0wN4aY1BjnWwRaW9gRccisu15VVjDeCJsl2E9omg
+	 2tl6ddUK9GkUzm1OcuYkt90xE4tods7keyA4mclGRspTNIWvp/AKmG7ix9CEvVBjuI
+	 bNA8sHpJ/ePEYlxbmTlTJnQxfNkx1IA8ydQdkRME4LjktYWGk/Ps9bDnulGbmRALFp
+	 XG46bCVgeeZDNdxNddc22Fi6hrZWMIR4okVC6naLvVpHrjw1uIjouFMX9I++yAxwRW
+	 NKSU0kHvmwobeDdG4dQP6N22eooLGv5HmnXBMNKSBHWyYN+uYtrh3g3zMc1J88Hiel
+	 t6tvUpAO2p2+w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: xuanzhuo@linux.alibaba.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -55,12 +55,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	edumazet@google.com,
 	lulie@linux.alibaba.com,
 	lukas.bulwahn@redhat.com
-Subject: Re: [net-next,v20,4/6] eea: create/destroy rx,tx queues for netdevice open and stop
-Date: Mon, 19 Jan 2026 14:42:17 -0800
-Message-ID: <20260119224217.1362965-1-kuba@kernel.org>
+Subject: Re: [net-next,v20,6/6] eea: introduce callback for ndo_get_stats64
+Date: Mon, 19 Jan 2026 14:42:25 -0800
+Message-ID: <20260119224225.1363113-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260115031042.104164-5-xuanzhuo@linux.alibaba.com>
-References: <20260115031042.104164-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20260115031042.104164-7-xuanzhuo@linux.alibaba.com>
+References: <20260115031042.104164-7-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,144 +74,63 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-eea: create/destroy rx,tx queues for netdevice open and stop
+eea: introduce callback for ndo_get_stats64
 
-This commit adds netdevice open and stop operations for the EEA driver,
-including TX and RX queue allocation/deallocation and NAPI setup.
+This commit adds ndo_get_stats64 support for the Alibaba Elastic Ethernet
+Adapter driver. The eea_stats() function iterates over RX and TX queues
+to collect packet and byte statistics using u64_stats_sync primitives.
 
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-> new file mode 100644
-> index 000000000000..f3e648960918
-> --- /dev/null
-> +++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-
-[ ... ]
-
-> +static void eea_tx_meta_put_and_unmap(struct eea_net_tx *tx,
-> +				      struct eea_tx_meta *meta)
+> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> index 2eba43a82ebc..440f5f11e055 100644
+> --- a/drivers/net/ethernet/alibaba/eea/eea_net.c
+> +++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
+> @@ -269,6 +269,52 @@ static int eea_netdev_open(struct net_device *netdev)
+> 	return err;
+>  }
+>
+> +static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
 > +{
-> +	struct eea_tx_meta *head;
-> +
-> +	head = meta;
-> +
-> +	while (true) {
-> +		dma_unmap_single(tx->dma_dev, meta->dma_addr,
-> +				 meta->dma_len, DMA_TO_DEVICE);
-> +
-> +		meta->data = NULL;
-> +
-> +		if (meta->next) {
-> +			meta = meta->next;
-> +			continue;
-> +		}
-> +
-> +		break;
-> +	}
-> +
-> +	meta->next = tx->free;
-> +	tx->free = head;
-> +}
-> +
-> +static void eea_meta_free_xmit(struct eea_net_tx *tx,
-> +			       struct eea_tx_meta *meta,
-> +			       bool in_napi,
-> +			       struct eea_tx_cdesc *desc,
-> +			       struct eea_sq_free_stats *stats)
-> +{
-> +	struct sk_buff *skb = meta->skb;
-> +
-> +	if (!skb) {
-> +		netdev_err(tx->enet->netdev,
-> +			   "tx meta->skb is null. id %d num: %d\n",
-> +			   meta->id, meta->num);
-> +		return;
-> +	}
-> +
-> +	if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && desc)) {
-> +		struct skb_shared_hwtstamps ts = {};
-> +
-> +		ts.hwtstamp = EEA_DESC_TS(desc) + tx->enet->hw_ts_offset;
-> +		skb_tstamp_tx(skb, &ts);
-> +	}
-> +
-> +	stats->bytes += meta->skb->len;
-> +	napi_consume_skb(meta->skb, in_napi);
-> +}
-
-[ ... ]
-
-> +static u32 eea_clean_tx(struct eea_net_tx *tx)
-> +{
-> +	struct eea_sq_free_stats stats = {0};
-> +	struct eea_tx_cdesc *desc;
-> +	struct eea_tx_meta *meta;
-> +
-> +	while ((desc = ering_cq_get_desc(tx->ering))) {
-> +		++stats.packets;
-> +
-> +		meta = &tx->meta[le16_to_cpu(desc->id)];
-> +
-> +		eea_meta_free_xmit(tx, meta, true, desc, &stats);
-> +
-> +		ering_cq_ack_desc(tx->ering, meta->num);
-> +		eea_tx_meta_put_and_unmap(tx, meta);
-> +	}
-> +
-> +	return stats.packets;
-> +}
-
-[ ... ]
-
-> +static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
-> +{
-> +	const struct skb_shared_info *shinfo = skb_shinfo(skb);
-> +	u32 hlen = skb_headlen(skb);
-> +	struct eea_tx_meta *meta;
-> +	dma_addr_t addr;
-> +	int i, err;
-> +	u16 flags;
-> +
-> +	addr = dma_map_single(tx->dma_dev, skb->data, hlen, DMA_TO_DEVICE);
-> +	if (unlikely(dma_mapping_error(tx->dma_dev, addr)))
-> +		return -ENOMEM;
-
-[ ... ]
-
-> +static void eea_free_meta(struct eea_net_tx *tx, struct eea_net_cfg *cfg)
-> +{
-> +	struct eea_sq_free_stats stats;
-> +	struct eea_tx_meta *meta;
+> +	struct eea_net *enet = netdev_priv(netdev);
+> +	u64 packets, bytes;
+> +	u32 start;
 > +	int i;
 > +
-> +	while ((meta = eea_tx_meta_get(tx)))
-> +		meta->skb = NULL;
+> +	/* This function is protected by RCU. Here uses enet->tx and enet->rx
+> +	 * to check whether the TX and RX structures are safe to access. In
+> +	 * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+> +	 * and enet->tx are set to NULL, and synchronize_net is called.
+> +	 */
 > +
-> +	for (i = 0; i < cfg->tx_ring_depth; i++) {
-> +		meta = &tx->meta[i];
-> +
-> +		if (!meta->skb)
-> +			continue;
-> +
-> +		eea_meta_free_xmit(tx, meta, false, NULL, &stats);
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> +	if (enet->rx) {
+> +		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
+> +			struct eea_net_rx *rx = enet->rx[i];
 
-In eea_clean_tx(), after calling eea_meta_free_xmit(), there is a call to
-eea_tx_meta_put_and_unmap() which performs dma_unmap_single() for the DMA
-mappings.
+The comment states this function is protected by RCU, but enet->rx is read
+without READ_ONCE() or rcu_dereference(). Since eea_free_rxtx_q_mem() can
+set enet->rx to NULL concurrently (before calling synchronize_net()), should
+the pointer be loaded with READ_ONCE() to prevent the compiler from
+re-reading it between the NULL check and the array access?
 
-Here in eea_free_meta(), only eea_meta_free_xmit() is called but
-eea_tx_meta_put_and_unmap() is not. The DMA mappings created in
-eea_tx_post_skb() via dma_map_single() and skb_frag_dma_map() would not
-be unmapped when the device is closed with pending TX packets. Does this
-leak DMA mappings?
+Similarly, enet->tx below has the same pattern. The RCU documentation
+recommends using rcu_dereference() for pointers that are accessed under
+RCU protection and may be concurrently modified.
 
 > +
-> +		meta->skb = NULL;
+> +			do {
+> +				start = u64_stats_fetch_begin(&rx->stats.syncp);
+> +				packets = u64_stats_read(&rx->stats.packets);
+> +				bytes = u64_stats_read(&rx->stats.bytes);
+> +			} while (u64_stats_fetch_retry(&rx->stats.syncp,
+> +						       start));
+> +
+> +			tot->rx_packets += packets;
+> +			tot->rx_bytes   += bytes;
+> +		}
 > +	}
 > +
-> +	kvfree(tx->meta);
-> +	tx->meta = NULL;
-> +}
--- 
-pw-bot: cr
+> +	if (enet->tx) {
+> +		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
+> +			struct eea_net_tx *tx = &enet->tx[i];
+
+[ ... ]
 
