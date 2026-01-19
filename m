@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-251268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B01D3B762
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:36:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD26D3B78A
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:46:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2FAFF306A405
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:36:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1168A300BBB7
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F423B2DC77F;
-	Mon, 19 Jan 2026 19:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F762773F7;
+	Mon, 19 Jan 2026 19:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iv4X1MZa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d99QQLeX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB132D7DF3
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 19:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F04F26B2DA;
+	Mon, 19 Jan 2026 19:45:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768851387; cv=none; b=O64qsrEaBbZhmeJai39//Ibp+MjqW4mP3o+4tLdDPUx9/dUKuBgVuDytLfpIR4w+v1Z9K5VIXEWNXPhGr7LfRoLm4I3Mk/HuqAgUZQue57LlPXk0nBaZhi9OWUXltFp54iTY1OvETeq+xe5ptTicuODvoTC7xvPq6CmDm5xo/2Q=
+	t=1768851946; cv=none; b=u8FC/z0MNSU6bCfyZvLa797oZkNFBuqaz2zUbcs8jV4Yd4BScfTB/nb1teW0ePUwik1Srg42/PHkBd7CyWHVbtHAcv/xFA8XFFMgbSSetozOR8SdiFmC1EB1bhOMgvcJELakSDLncnTsc4P0e6wvA1EI2V8IzKpacIT1A2PHjr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768851387; c=relaxed/simple;
-	bh=n+79UUo0vjH04ePNO2YSSxR1uFmtREdFYXUzVVfaFV8=;
+	s=arc-20240116; t=1768851946; c=relaxed/simple;
+	bh=X341cbVx+itPu3t/oJstdoSWqS2saf1YeOR3B3Pa+R8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lpwrV0rV8aYLVpC7TG78INOegh7BRlPeAzE49E0lrk0UqxFsQmsQlHJOAoPeJ6lCWS3fLD28s/CZJx0x/ESoL3QmbHFo50hHf5bVfaegocErCP4j/BAeFbuO3oe1KOYgdI/yzN3f+EcAh7bBKHSX01RXp1cpd1IFzinyAwClsk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iv4X1MZa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3675CC116C6;
-	Mon, 19 Jan 2026 19:36:27 +0000 (UTC)
+	 MIME-Version; b=RnudB/2YYiNIiJYW5UA8YmJmYulCNKuLQXYSimG4AKMZgbhnqc+QQiZH2NzT70JKiMZGqCqHl3o76y2FDcKV1aLHgXvTGaeif/4c2urIB6FPVSMrZJXjH79YtUZXcJons8ia3tqMo/kQ4KnIYKVuctPCmbXIGl6P6zvCvFwzbFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d99QQLeX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25275C116C6;
+	Mon, 19 Jan 2026 19:45:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768851387;
-	bh=n+79UUo0vjH04ePNO2YSSxR1uFmtREdFYXUzVVfaFV8=;
+	s=k20201202; t=1768851945;
+	bh=X341cbVx+itPu3t/oJstdoSWqS2saf1YeOR3B3Pa+R8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Iv4X1MZaEsJadtHF8Es3byO+ENgRO+6DJ5JZfajmUCg73Ga6M679uJxLsLeJl9Boa
-	 3T+H+Cjjd0lftl9sxNL3wURlWZ7TmzZupYfNncTweWT+/6hLBl3cZ0qwybRacB7VK8
-	 i0y4ETlm097LrjboCB9nAq5KjYOO5fbn7J9WNflYDGK2yH95vcilpaT1NXdDyyJjB0
-	 hA+SgrJ+ZCn0Of01DsOUy8TarbTbIXTTCi8Hl7UJEqcy/OWvQ37InIYIrpk2/KZ3/2
-	 TxhMGMJOqCVRHLfH6geKNBdbVFQ48Qs56WC/twptHHO72+75srFuhtpUCAMQ0xHs4p
-	 dw8wopS0NTpPg==
+	b=d99QQLeXX4eO61EWPaqwfQUyJbOnXBszqV6oLWUWqGONMh4bsOwk7VK4hE9doWyEZ
+	 RGfS4wBPGIZzpTVkZk9mvR9G+KL1TyZ5xZ9qGXJRvt2SyMYnNar5FqyGgqBbamVyX6
+	 ZJQ69vR9TiMU3EmZkjmXoUYdqeJHkVStw+6apnw/RPPO735JFUfQXd3L0qMg5g7Ikm
+	 Zeo2qi3OILDMZfM34tlHot5yIYPulN4KeA9Tou1+y04YHOTyawRLDuWhOjfmTIALx2
+	 GBe70GWxMWs0muQERzI868AER2eON1CxbYClcDMwcpqH6DkeSYmi8kyeYXxB3/X3/k
+	 aZEypPSc05ZzQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: pvalerio@redhat.com
+To: jelonek.jonas@gmail.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
+	maxime.chevallier@bootlin.com,
+	bjorn@mork.no,
 	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
+	linux@armlinux.org.uk,
 	pabeni@redhat.com,
-	lorenzo@kernel.org,
-	claudiu.beznea@tuxon.dev,
-	nicolas.ferre@microchip.com,
-	theo.lebrun@bootlin.com,
+	linux-kernel@vger.kernel.org,
+	andrew@lunn.ch,
 	netdev@vger.kernel.org,
+	hkallweit1@gmail.com,
 	edumazet@google.com
-Subject: Re: [net-next,8/8] cadence: macb: introduce xmit support
-Date: Mon, 19 Jan 2026 11:36:26 -0800
-Message-ID: <20260119193626.1255791-1-kuba@kernel.org>
+Subject: Re: [net-next,v5] net: sfp: extend SMBus support
+Date: Mon, 19 Jan 2026 11:41:17 -0800
+Message-ID: <20260119194117.1258120-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260115222531.313002-9-pvalerio@redhat.com>
-References: <20260115222531.313002-9-pvalerio@redhat.com>
+In-Reply-To: <20260116113105.244592-1-jelonek.jonas@gmail.com>
+References: <20260116113105.244592-1-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,84 +71,74 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-cadence: macb: introduce xmit support
+net: sfp: extend SMBus support
 
-This patch adds XDP_TX verdict support and introduces the ndo_xdp_xmit
-function for XDP redirection.  It updates macb_tx_unmap() to handle both
-skbs and xdp frames.
+This patch extends SMBus support in the SFP driver from single-byte
+accesses to also support SMBus I2C block and word access, enabling more
+SMBus controllers to work with SFP modules.
 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index afd8c0f2d895..32f8629bcb25 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+> index 84bef5099dda..8f0b34a93ae8 100644
+> --- a/drivers/net/phy/sfp.c
+> +++ b/drivers/net/phy/sfp.c
 
 [ ... ]
 
-> @@ -983,7 +994,7 @@ static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
->  	}
+> @@ -759,31 +773,55 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
+> +static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
+> +			   size_t len)
+>  {
+>  	union i2c_smbus_data smbus_data;
+>  	u8 bus_addr = a2 ? 0x51 : 0x50;
+> +	size_t this_len, transferred;
+> +	u32 functionality;
+>  	u8 *data = buf;
+>  	int ret;
 >
->  	if (tx_buff->ptr) {
-> -		napi_consume_skb(tx_buff->ptr, budget);
-> +		release_buff(tx_buff->ptr, tx_buff->type, budget);
->  		tx_buff->ptr = NULL;
->  	}
->  }
-
-[ ... ]
-
-> +static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
-> +				 struct net_device *dev, bool dma_map,
-> +				 dma_addr_t addr)
-> +{
-
-[ ... ]
-
-> +	if (dma_map) {
-> +		mapping = dma_map_single(&bp->pdev->dev,
-> +					 xdpf->data,
-> +					 xdpf->len, DMA_TO_DEVICE);
-> +		if (unlikely(dma_mapping_error(&bp->pdev->dev, mapping))) {
-> +			err = -ENOMEM;
-> +			goto unlock;
-> +		}
-> +	} else {
-> +		mapping = addr;
-> +		dma_sync_single_for_device(&bp->pdev->dev, mapping,
-> +					   xdpf->len, DMA_BIDIRECTIONAL);
-> +	}
-
-[ ... ]
-
-> +	tx_buff->ptr = xdpf;
-> +	tx_buff->type = buff_type;
-> +	tx_buff->mapping = mapping;
-                          ^^^^^^^
-
-For XDP_TX (dma_map=false), the mapping here is the page pool's DMA address
-passed via the addr parameter.  Later, macb_tx_unmap() unconditionally calls
-dma_unmap_single() when tx_buff->mapping is non-zero.
-
-Should macb_tx_unmap() skip the DMA unmap for MACB_TYPE_XDP_TX buffers?
-Page pool manages its own DMA mappings, and calling dma_unmap_single() on
-them appears incorrect.  For comparison, stmmac_tx_clean() explicitly
-checks "buf_type != STMMAC_TXBUF_T_XDP_TX" before unmapping.
-
-[ ... ]
-
-> +	case XDP_TX:
-> +		xdpf = xdp_convert_buff_to_frame(&xdp);
+> +	functionality = i2c_get_functionality(sfp->i2c);
 > +
-> +		if (!xdpf || macb_xdp_submit_frame(queue->bp, xdpf, dev, false,
-> +						   addr))
-> +			act = XDP_DROP;
-> +		goto out;
+>  	while (len) {
+> -		smbus_data.byte = *data;
+> -		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+> -				     I2C_SMBUS_WRITE, dev_addr,
+> -				     I2C_SMBUS_BYTE_DATA, &smbus_data);
+> -		if (ret)
+> +		this_len = min(len, sfp->i2c_max_block_size);
+> +
+> +		if (this_len > 2 &&
+> +		    functionality & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) {
+> +			smbus_data.block[0] = this_len;
+> +			memcpy(&smbus_data.block[1], data, this_len);
+> +
+> +			ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+> +					     I2C_SMBUS_WRITE, dev_addr,
+> +					     I2C_SMBUS_WORD_DATA, &smbus_data);
+                                             ^^^^^^^^^^^^^^^^^
 
-When xdp_convert_buff_to_frame() returns NULL, this sets act = XDP_DROP but
-then unconditionally executes "goto out", which skips the page_pool_put_full_page()
-call that handles XDP_DROP.  Could this leak the page when
-xdp_convert_buff_to_frame() fails due to insufficient headroom?
+Should this be I2C_SMBUS_I2C_BLOCK_DATA instead of I2C_SMBUS_WORD_DATA?
 
-When macb_xdp_submit_frame() fails, it internally calls release_buff() which
-returns the page, so that path seems fine.  But the xdpf == NULL case appears
-to need a "break" instead of falling through to "goto out".
+The code checks for I2C_FUNC_SMBUS_WRITE_I2C_BLOCK support and sets up
+smbus_data.block[] with the length byte and data for a block transfer,
+but then calls i2c_smbus_xfer() with I2C_SMBUS_WORD_DATA protocol.
+
+For comparison, the read function correctly uses I2C_SMBUS_I2C_BLOCK_DATA
+when I2C_FUNC_SMBUS_READ_I2C_BLOCK is supported:
+
+    if (this_len > 2 &&
+        functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
+            smbus_data.block[0] = this_len;
+            ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+                                 I2C_SMBUS_READ, dev_addr,
+                                 I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
+
+With I2C_SMBUS_WORD_DATA, only 2 bytes from smbus_data.word would be
+written instead of the this_len bytes set up in smbus_data.block[].
+The pointer then advances by transferred (this_len) bytes, effectively
+skipping data that was never written to the device.
+
+> +			transferred = this_len;
+
+[ ... ]
+-- 
+pw-bot: cr
 
