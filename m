@@ -1,96 +1,168 @@
-Return-Path: <netdev+bounces-251085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BE5D3A9F2
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:10:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3AFD3AA0F
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 36E8430022DF
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:10:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3D74F30161D7
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 13:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2DA364EAB;
-	Mon, 19 Jan 2026 13:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2002366DD7;
+	Mon, 19 Jan 2026 13:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZBuxTvZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75671364E87
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 13:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768828213; cv=none; b=fRoJjDT8SOPGVCrCpxO5i9g8zRE31zMKIGlNIxea+0ofPCvR2YXIeDGC9D3y5HShDUKCyHee7it5zFN1w7RVDG/JqoUmKf1m0u4ErCIbQBEX33OQhtAPCfGip2FPcIGWozjKWRzZyIybEn6Bdh/sPrB3PVx5OpYUnv91pLmeAYY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768828213; c=relaxed/simple;
-	bh=7Zau4Q3L+wZoTMe0dwbmPaGjdSy92gfx9V0yzD0gCIM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bxtfs8oi2u/VR0qr2hddLKYQLdUkdvkYb97A9l/A1ZLLHSOeYCC3j35edWuNZPmDAW0I63DZiD6h3c76VprdTwH51Aj6AUavAZuuntYyTpsSlYTzD6IKJcYfyR4z1JeTIjaPOhs6B+NlpPHzCFIWHA24TQSuqkJKaHpTZpXcS3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDED366DB8
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 13:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768828595; cv=pass; b=tE5R9Nd11TCIC2/BLmr45xaAucfM6vQIB8Y16FZmA505bLz6HqrKtZ1bkREK9i2wkGOV6yNHpW7gp8RJPj/B9TeUjf+vbvFFLoBDH6ODJQ2ZmjAQtlDYD6/OoMrc6jUBMSS9xJ8b+ZvU9O3QQw4daB5GBhdbsNed9hbqJUGJxdE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768828595; c=relaxed/simple;
+	bh=HDgZzyCVwi6dTQrQdHlplTvT19WWgr0rTwBPV63gNaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wasxc6pXUStsUdVUzfkhBdUQe7HRc9EMkP1QR566qUbenhJqaIuae7DPOTuFUdgJIWmO9ATCiUGzowGZ3D+iGJzz/nt9QCsUEUnXXGfHo/o0oR+Ihu2TMbNPsL/nBBJAWRNmg/KbWCTEdP8GILmnlbfGP+MH3guPktB925Rehuo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CZBuxTvZ; arc=pass smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-4041500d9c3so2790747fac.2
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:10:12 -0800 (PST)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-655afbca977so5051292a12.2
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 05:16:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768828592; cv=none;
+        d=google.com; s=arc-20240605;
+        b=S+dA9S4NsXliX04RLWScdirBrbC9oc79sjdf5kLv4Y9sGgraSmRBCBmqp45CSbz/vs
+         3luuYbAUSKrIPg3G0wJ/dPsOJ3zcOtLVHKSDDYSXzHMKL/xiVSfoQ951PYzQ4t4j9VlT
+         8lJcvweNTitOAV3dJ5Mt2qpKz4ChJkbC41oKauNAEVLFyscdFs13Xyt/ubZs/dSlQwkb
+         gapbS43shy3sJJAFpXBboCBdgSqyiLCcUDYTvODkc+zruHNOiRddI2hagjllQnmM4qvg
+         +lw06WED5beu/3Aj/e9pzSFdLvVQKXTLYSNV82TCXKzU7A7K2s9ZpLRsPKn2B0vnosN7
+         aGKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IAc+TnrR7AyLva3poJVGcilw95QVmliW65exvyfTaYI=;
+        fh=pwU4IO+Bh5nN0zcXqAFpudQHoa8Wdht2p3eNlmWunyQ=;
+        b=h4N8QQxcEJJhzgu5TGfixh1x1xo4XCryB4rSo8Oi+xVX1TuwKe+xYVq7PjIXiDKAxH
+         hhsbbIxFOsa0p1l8GcVPxOgsQLGcGJsQjWs5dJO1T3++jRRo1KAbeYKKhpk2G4RqHVou
+         LI9Xt+VM+MflICzSJ3IieLH4CbNxVq5Q8qUiWnaJpRYjtnp9zWQ0tu1EAxyHQAULNsRA
+         PDeglesQr6YRBcEftTgFI5da+c7WNZcvoVse5XHZ5G35D6jSqjsxOtlM6Dwh62z9S2Ko
+         WnutSCsH8NFB5EE+40GuZUgTWA2mUavOfmlB7/0u0Wsp0ji81zOpl0Ubdn35TpCZVz1t
+         ZYCQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768828592; x=1769433392; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IAc+TnrR7AyLva3poJVGcilw95QVmliW65exvyfTaYI=;
+        b=CZBuxTvZ5ag+zmmjbyPQYyq84rZ79dRLa+W9dlZIB0uk2wrirGUUWEwQTrDxi/hf6G
+         XBusCQgaL8UqHco3eCQ8JUYSMk8RS/5uToSr3bbeczVdm13SnRgMcFO6XJiV1mYhUt1b
+         p9P+sv6sA+RPGt7Yj6fIRGgjvUtGcjOiLCwr+E/wJczCzgZmKIYSCRhruXy83Rsjxqlj
+         85ghhzys15Skc6Yu8PPJhaqghgYtjYEqIcNEz6YLJc3DUkz/2LxPfAalAK5xjsK9bzE/
+         dEwQGi9SbvPjjRjM6uz9LRuHVCutDMyuLE/cT6SFwGgrniz3wEoLW6Do8Z+kFZPMN4YG
+         LfJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768828211; x=1769433011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pcJjT+zAvg6W3xCA74ueew1cpFbuijNuFU3eUN6vwuI=;
-        b=FlzyB0yP3Uy+8wwNaht+uGRV3mVTtQtRddK7JEam17rzH4Uxtkx0gV2BQh5FvDBX3V
-         fpMZgPIiGM19rVEP+ByqksQKkl123wV7FYjAJGtAtwm8PfoWgi0QszZzezCINd+RCar0
-         cFOr2x7O3oDzZdNQb4ZpHJIVqDI0G3UST8ukAUpPO34QFeK4hVvFWMXHwXpY1HHbwfWu
-         OTB+BLC2dYIbla99YS1yWN61iSBAW8YQYyQSyOPb1+CKKqpaubJxJtEksv9qnkg/7oMe
-         BKlhtTw00yvOe/pktBhZNt6ZkJYG/wUUxAYt1zwYZ0fu1fD6xZsZwSLy4pR7L7OCqFUP
-         WCkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKYwTBOmud0d99SBOlnWLjCIn611AkcdvJW/V6P5r7ZBpK2nZNi6j2O5TFc8cMxvGCuhtQbQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/bMl3XmFVYdYnnJuQIbObeiRGNmzGT4FAKN5HL/TWKtD7KtWp
-	QEHRU9VQPKPw+jsKLWJbe/PtWI6J/Xr6wPMsn8/BDswHqCDOJ6/pZvj+
-X-Gm-Gg: AY/fxX6lOuW2lQHFSHURvKCnqXZmOuExtB64CKxyssdwu0vRiPkO6Z23OabjaBVfVVz
-	1M/dJkw9OR3rR3CH4mn5HWEG4E5JLXIQtKXrfV7bD1XBtMgY8u2idFCRbeaKmyb/Gmr3os4Htfx
-	zjn5BHpsOJCwZAu/3kSokIXf8oTSu8EkhN7VJKRYQ/Ak3P3BPc4YMf3oeZJgvPZ1JSvSpV2LW9c
-	nOvNgXi1Zsz/qlf2CTr7c7baqPRNHHYrjneOqQm4fCOLJK417XbLYU9gXiG2Jr61pWGlECFD4l8
-	uTkh15k5QkEObRnYS9/XudJ5wVInUjjiNv0lLWtTpScwDORLUPRtrBA8IzSjm1U4bEBrzNBn7Us
-	9bEm3mPBI/OJ2D2KsUuVZ72RdCCWSdjDXtupqgnvQ5sCd/iK6YKjz7Kh4bl8tr5s6ZsSzFQG4o5
-	Z8BA==
-X-Received: by 2002:a05:687c:2719:b0:3ec:2fc8:97a2 with SMTP id 586e51a60fabf-4044c1cf3d4mr3903361fac.19.1768828211425;
-        Mon, 19 Jan 2026 05:10:11 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff:48::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044bb51d4csm6787856fac.6.2026.01.19.05.10.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 05:10:11 -0800 (PST)
-Date: Mon, 19 Jan 2026 05:10:09 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 5/7] netconsole: introduce helpers for
- dynamic_netconsole_mutex lock/unlock
-Message-ID: <ss4qejqrx2vtzbv7gpq3n3b2na2hqg6jmjuzc7jgfubjuie2cq@ql56alvspndg>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-5-4de36aebcf48@gmail.com>
+        d=1e100.net; s=20230601; t=1768828592; x=1769433392;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IAc+TnrR7AyLva3poJVGcilw95QVmliW65exvyfTaYI=;
+        b=Lb0FPO188S/IGjwe30HvbZFMb410DIFXr5Ou2dkxhn/U1ZNwvg9wCmbn3a/B+5NwsD
+         gAHx7am3kH0tdC0VH4/f+dBpeMQH5K8M1uHdIbr5OFbojO5cVli3/raqVaUlL8tAs2OL
+         gH9A7BZX8hodY8q0+HasqX5tzru7+s02vXdy/akbOwJyqNTTlOoXK/+td9c02LPcLohV
+         6jUNmvCFZF5wl0UloMXFAnQNXgPU2xZhn6AKIOZmKiAKqEil10Z/OdZ9rgkybgGx2OWx
+         LPbdIfYECBHfUeCn3HQ39Llzw7HrozQtIAqJPe7pjJaOpUs3y+n1WcVOzIAsw/OAOj+e
+         mg6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWvgZTvpEBwghr2EwfwRzV5jxRrcPoa0ogW3+/x0+cpkTof8E+0bnaakFBNa3JeOljGWBu3y70=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6U/KhaR9MNcILhBnSPNj/ZJKUuUqDDyUP3JYFVqQ4DwB4dTFU
+	0gs/gx6QJw+2yd9FsCqDkzvQJyCqkhw2WG2t1mYcPWGXck3L/Bz0drburRiw398c50K1DoRf+og
+	49u3fCRwXAumwdz7Beb3WBYLSCyQ8k6U=
+X-Gm-Gg: AY/fxX6TyJ2VQfDmOYKir19ajIeCIwb7O4ccemQ1SFFxRnAUGLKpk59wq/cXq6sKp1+
+	iBSNCWJnjADKMO/Djqck9iaQS8q6t3zP9cxjKFW8T/C6NEC4IxSVN1nNCWh+tx0xsUy/RC4jana
+	L/0ZH8AHoZRL/AkfhNTUG4adPUy5bXlVB4+xH1xv3joOB78otAe986OrbraUU7tHi6A/uYWqWPH
+	5J2EsaoZVINW9PczcvUZV1925s6Ko8kTPX0zLMtz1iKOojfTNkPF/XuOLDKAVE0J25REau6
+X-Received: by 2002:a05:6402:210e:b0:64d:65d:2314 with SMTP id
+ 4fb4d7f45d1cf-65452ad66a6mr8335728a12.23.1768828591954; Mon, 19 Jan 2026
+ 05:16:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260118-netcons-retrigger-v11-5-4de36aebcf48@gmail.com>
+References: <20260118151450.776858-1-ap420073@gmail.com> <CANn89i+Zd2W_u665D=MExotaHtnnyqu8Z+LgfbDy2trmtqcAkw@mail.gmail.com>
+In-Reply-To: <CANn89i+Zd2W_u665D=MExotaHtnnyqu8Z+LgfbDy2trmtqcAkw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Mon, 19 Jan 2026 22:16:19 +0900
+X-Gm-Features: AZwV_QhCIwm8bHvGxgAOcsrXlHct4ndvTuoi11iKhYCLL0QT9KVopXRoEk_Jsbc
+Message-ID: <CAMArcTU1nkAee2LNpv35nAGXbOipez4sNoMjz9AL622PCoOy8w@mail.gmail.com>
+Subject: Re: [PATCH net] selftests: net: amt: wait longer for connection
+ before sending packets
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 18, 2026 at 11:00:25AM +0000, Andre Carvalho wrote:
-> This commit introduces two helper functions to perform lock/unlock on
-> dynamic_netconsole_mutex providing no-op stub versions when compiled
-> without CONFIG_NETCONSOLE_DYNAMIC and refactors existing call sites to
-> use the new helpers.
-> 
-> This is done following kernel coding style guidelines, in preparation
-> for an upcoming change. It avoids the need for preprocessor conditionals
-> in the call site and keeps the logic easier to follow.
-> 
-> Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+On Mon, Jan 19, 2026 at 12:38=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Hi Eric,
+Thanks a lot for the review!
+
+> On Sun, Jan 18, 2026 at 4:15=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > There is a sleep 2 in send_mcast4() to wait for the connection to be
+> > established between the gateway and the relay.
+> >
+> > However, some tests fail because packets are sometimes sent before the
+> > connection is fully established.
+> >
+> > So, increase the waiting time to make the tests more reliable.
+> >
+> > Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >  tools/testing/selftests/net/amt.sh | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftes=
+ts/net/amt.sh
+> > index 3ef209cacb8e..fe2497d9caff 100755
+> > --- a/tools/testing/selftests/net/amt.sh
+> > +++ b/tools/testing/selftests/net/amt.sh
+> > @@ -246,7 +246,7 @@ test_ipv6_forward()
+> >
+> >  send_mcast4()
+> >  {
+> > -       sleep 2
+> > +       sleep 5
+>
+> 1) Have you considered using wait_local_port_listen instead ?
+>
+> 2) What about send_mcast6() ?
+>
+
+Thanks, I've testing using use wait_local_port_listen instead of sleep,
+it's working very well.
+So, I will add the wait_local_port_listen() to send_mcast4() and replace
+sleep with wait_local_port_listen in the send_mcast6() in the v2.
+The sleep in send_mcast4() is still needed because of waiting for
+establishment of amt tunnel.
+
+Thanks a lot!
+Taehee Yoo
+
+> >         ip netns exec "${SOURCE}" bash -c \
+> >                 'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 40=
+00' &
+> >  }
+> > --
+> > 2.43.0
+> >
 
