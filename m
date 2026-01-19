@@ -1,129 +1,135 @@
-Return-Path: <netdev+bounces-251196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE48D3B3B9
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:16:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEA8D3B4A7
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:41:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D0D33045CCE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:16:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3CD21300C621
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA45F324712;
-	Mon, 19 Jan 2026 17:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8E9326D4F;
+	Mon, 19 Jan 2026 17:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMFxGtQJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dwa+jPfv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C414322557
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768843010; cv=pass; b=tZSJSH9uCgJlKHo8Ni99okKT0uwtVrL4so1bsncQCPsUfxLoN4m3mSDL5wne1jXJJrM642b4wDO7gRSMNWTDmP81Ynz3qGAh4ftFreWc6nSZxFNrhFxWErw/UnSbJlYd1g7acbJ/tavb4tSnLgeUTZ+4Frn1KOcqFnbQpSx7FBA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768843010; c=relaxed/simple;
-	bh=ZsGcxa3/dujvAI4Rmb4qGNPcgAP3/YJKOOLBJnfEpuA=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F80C324712
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 17:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768843079; cv=none; b=tUF/7tN/Uh4+zJAZcN+5SKs7yDe+a8j4n82CUoMALl0QAyj1X/y6+aIeJ2s9nRailFFNERckVYJEp9D6sDxKJ5Vosx1LdvgsjvMAp4tQIfSxzTNjVSY6G6A4ldNS7VpmWe3vpFfTgG/I4D5l8ybio7UQDGnrO1O7HShtQqui+Pg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768843079; c=relaxed/simple;
+	bh=ADvx/vtkJQObKzKCefW3y94i48pRPTxXZghaI4g7rWw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KJKJGDxptpPFepNe4t0UM+HHHodeSOxa9YMaGnZSDkn20Xii89lehGarJPy1K3tLGTMY7mD0xCF520/J0M9Acpc9R6gnMj0eJwNSe5RzO3umaEBjJVjKjD4KlI0s/Q9s2k3A4fwwEbyVxvEroZeDFNNh52WRHcScK3oCqyz1KwY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMFxGtQJ; arc=pass smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-432d256c2a9so4445690f8f.3
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:16:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768843007; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YNCxzi94HbRK62JG7CFpeCoLasdonjXec6PYYuOV/lXEXD/MIxyvwzBhns5mwFIcrQ
-         8PwasuDqZoW4IK7GoRsE6S9EaqMfk8oT0L5XMhPkW3Wr3iJ/D0pltSeUKlHaTWHOeMyo
-         M5U0vpCMGyIa9hu4zYNKkiQF+9gWO8qpZOsF4BY5nvIbKWOfgqNMWcAPOQ8dSrn5xFdx
-         7WAmcOxfVFfPZrLDffHFF8LSxBwQ+HzFVOENOtNtoN3OMtIXkatALn30t3XgFCPvLc/K
-         mmUH2hmn2nzAqxbzp5vN28BbfROsjwWC1/kRFiySPdcKk4lEg/VqUIJ6KHImE87KyLN5
-         1HqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fWkUXehTFxDxM5oaQU46NekzR5HsGH8LROOWkLyzh8s=;
-        fh=SRG37YUPAZ28waVa3Wq/KyUQkAFUDoE0nz4gMDlUj8w=;
-        b=i/m5bQrw4xQzua5CejZ6YY74VSa7FzEjOQ332wr0oomZpBiikb6qldfWoZvETJXQBQ
-         ku90JhKrHOyh4h2AttaUtTMrxpj1WMzuKwLBaO565/G6GP+z6Sk8DxeycyjG1CqT160T
-         e20hEkvtU1dDFaxcKeJKHNcStTEnctXZ0BDjH5an7dyfAVsp0jhx0wA8wXK9ZCe67reC
-         R/nzqd00MpvcA6RNZVNrUrF/Fl4tHoTqG/W10zvoOotTXO+k96R+pXCoJE+gdEjiBDdq
-         GPE1uC0Mt8LdcH4rLVf35v83oXhC2IYGWimMMp21g7KpjliboYZYHkqiCZOMTD48i6jp
-         o6RQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	 To:Cc:Content-Type; b=H0uNTdgtPRDYS4DArNzMoKnRmOzrR3iF10wdk/YP5n8YO+Vym0SME+2Yt6+tqxI9hIO5l6B+ScxNMyIw1Mm6shoKpxUj4k/Wl3eVrXecJaWx9pG1VZ4Xjs80t5L2zhBakIjwYq9cgL2FSEb8Z8GqU2Fbjhq7xbFSylWRYrfYTPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dwa+jPfv; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-502b0aa36feso19175871cf.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 09:17:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768843007; x=1769447807; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768843076; x=1769447876; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fWkUXehTFxDxM5oaQU46NekzR5HsGH8LROOWkLyzh8s=;
-        b=HMFxGtQJB8yNIu+iVcfduKq8+H3jqRLpQiFPcT2JeIgJqtgWOvjV1F8lqYWHMHDzsc
-         Jrb6SODsSSIx7IcLImFT2MJpUHgtO3YcCA7+kiosGu8mS3zsCcmkN/Fl8V/M3zAM0KbS
-         k4XJ6ah/+Yz4Av71A+4SJI2jj91J0fri16+gggYbliR0aRVXwQtAtv0LI+5RWDaoQg1O
-         75+GfZh77gq2hQhpuTHRHe3L5ObCCWiciWE/7oXWaMitr+L2vXSVFA3i/raNZZDz7dwT
-         xzBz9k+irhxfskVD+xVxSiwt7DV/3Em9ij5ppgQslSEz7xJ0czzdzptalO2dbO2sEFWO
-         3yrA==
+        bh=UN/1ZXBVkE0YCxV+8LGTP1CpvjdUshk+ugxYnLOMxIs=;
+        b=Dwa+jPfvDN93FV4MmW94Yz4BAxkXjFro1xSFl2vd8t/J8aIbmiXXagAbIxFnB91DVx
+         HNT8KjvuGq7h6MpArJOXq6eUFLVCz9H+Jopc9IKwgVdYfSO1AHoM70Q4+XA4lW5Kub5f
+         RRLR46W9U+VizNjjsnxzmdxycjclXyVzSJ0S+qfm7+S0XqHw53dG1LwzY2b5uaoXLxFs
+         /j/0Wh5Fi/LyL75n3WOaCKpsYfbvvHcrwpSKisb/GW7qFs6IUjkft5uh3djeXyLFYdh3
+         inUHSkPngGlrNMSbTS2H77ntKR0ALsA183ZLXgRjRsWxYMKBgFk/9LL33/Xjy3zn1crj
+         7a8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768843007; x=1769447807;
+        d=1e100.net; s=20230601; t=1768843076; x=1769447876;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fWkUXehTFxDxM5oaQU46NekzR5HsGH8LROOWkLyzh8s=;
-        b=Da5Sl/WbDD/9yDAjUyzP8wBWZpt3AHh/sJTLEiIh5Cn2OeEFKZdDHjkVJx4o8NPwuh
-         LGtDnq8DVXlQnn/RsNnLOKr30GTEbbpfcoJu0nq/9xoi+/+sXI/us8cP8SWdMaw3m0Sz
-         YNd5cffbVKwoUx4FrwhRI2LbW8oOq+z8NcUEzhr1NCAnjZjk+JB+ziOuS8Ltpj25gMhP
-         qwPHljX+zauqt0E2ByCsSb1ggk70Omo9ot34UDXAllnh7soBAvop+egSdnP6/kBsNX3D
-         6Z0nO0Q97VlYMYIG1UxHAlpfGN3okn9f/7BqYBw4UTsTwSdj7+28X12KtbPgEalcHNtn
-         aQVA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9eOH+9Y3DDmO6uz/DCTfNpbvtuu5UvPxWvAbSC+fGrjIJrRDgJSCFGbPXu8qa8n9KDr6ksxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5dZCDe4kZxrvJlf80OAM+dt3EaVw1631EpDI2EPUKJmzMl3/a
-	ISRQOJv+/d2Iw6OwOuUq6CExvgse6eGAqTO7273U6c+Mt7YuBfesEm3C4qhjmtcDUtBKxOrIVuh
-	SiGB2WMzCnDBGcYSjrvM+6l3ykfh4B4w=
-X-Gm-Gg: AZuq6aIFQsiJSroEJAxfzcMY8c+FbGFcYL6957UHJYHK6yYSedZkmNhaj822TvB/Syh
-	0vVRIsCA76VtkT9qhdbkVr6tyYZkwjDi7nBd9CyScvthHQiM9V4EgXUE+vZ9mF3USQe0b4qkYFS
-	LTkU0NNSLA+8mCENAC7lC2TMzfWdKoUiLBSdEiE6DPOZXXdQLaJtYDNWKvV49pKlb+B5uyDDkkG
-	mGvyu+t3nSMI+byw4UfiCztTLcZOtQmrTIn+Q12zR5S64zdNwViTqN/Ec3Q2MGOrP0/6EU078XU
-	35TVuQTfwZDt3tLLcpb8/kCyiQNz2L6Th06thG81D35cWXer3+hiMAk=
-X-Received: by 2002:a05:6000:2282:b0:430:fc63:8d0 with SMTP id
- ffacd0b85a97d-4356a0773aemr14767256f8f.36.1768843007458; Mon, 19 Jan 2026
- 09:16:47 -0800 (PST)
+        bh=UN/1ZXBVkE0YCxV+8LGTP1CpvjdUshk+ugxYnLOMxIs=;
+        b=SZGzBmlG/RrjGZL5h8LOreux1W/JEsSHyEuuYQ3gPeUAlvhjP+F8+7r39Bn5Wgz3X8
+         hofIC5kRa1EBkg/WATmAMriZflVf2dp/WtS79t+FTyfxj5q1DhZO5hJprnREVuMlM2xZ
+         MVcJI5IEMxDhsbs1HrVLaq3VMeoZBlg7Eq/wALlCfaCjcZAC3ifRpslvi/giNRyBliSt
+         6dIDPK+ZR3tGZiRyBFlfPNxe9/3E8+USPa+j8utWAX4G7Kgt2iHaD/GyyS8utEaSa02o
+         n9V1fut+9RgHaXhj7DKIFJcex9XS12GjF1IoJ9SgTHb78o0HVJu9PSVLX6KpJboGdG35
+         7+kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUT6KK+jdm6nxN91+iix6a80Xr6UIQ3/m/imS3Iq0mcR6XZ2GFmn1FWoRkoJzECAwR38nHfAJM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJlEHJPqhTVA6zv+0IBuWnG4TTA9AESQCsWTLFYXbgZNNbR6Xt
+	c4YBTo1blB20NypvRihDTCq+84wDUy2WOwNw06z3vIUO3NV97Ex4Cs0X2tFG1f574EJ2uiF4LZ4
+	yxckSK+o7iWpFPk19GeDnVA2JyE8Nz0bd8wTIPNGl
+X-Gm-Gg: AY/fxX7fjSX2DVA0p9kfanMe30Tj8S347EoQDV7BQRQiDVcaBMKWRNG8bocNt8x3YY2
+	zybbs0pJQrTY5WSi85sAOm9FfPouq4O738Ft8NytM1H5CBQVieSP91+jr7J4Jbhho/NUBDgVVMf
+	93A6I83dt+F5o8FSfALp6z8M5HcLFOhO0IyTRZVRxelvV/WZ9wWXJYW3eibycIzN880rDZhELHW
+	YImbP38atoKdyFEggtX35YHwK4v3giJOydJhowPy0PzI8Z4ieGHFUta9s7NYt4uucxvfe+V
+X-Received: by 2002:a05:622a:413:b0:4f3:4b53:a914 with SMTP id
+ d75a77b69052e-501982dc9f0mr215552691cf.9.1768843076064; Mon, 19 Jan 2026
+ 09:17:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119091615.1880992-1-sun.jian.kdev@gmail.com>
-In-Reply-To: <20260119091615.1880992-1-sun.jian.kdev@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 19 Jan 2026 09:16:36 -0800
-X-Gm-Features: AZwV_QhGkCpvhEfASfQzOJSn-VdxNup-v3_JeJot5VLuqsiIqW0y6hGuFkj_iBM
-Message-ID: <CAADnVQ+j8Q5+2KSsaddj3nmU1EkuRAt8XwM=zcSrfQfY+A1PsA@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: nf_flow_table_bpf: add prototype for bpf_xdp_flow_lookup()
-To: Sun Jian <sun.jian.kdev@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	netfilter-devel <netfilter-devel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+References: <20260119112512.28196-1-fw@strlen.de> <20260119090629.20d202e8@kernel.org>
+In-Reply-To: <20260119090629.20d202e8@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Jan 2026 18:17:45 +0100
+X-Gm-Features: AZwV_QiqHWKN3sEVuusxtOhhrgwgF5YU6jgo4I56r-kpc9W-dTXzNXF7TB_IiBE
+Message-ID: <CANn89iJOz_PQ_N4e=FS+toEDfLw-Ei9SwV6LU9Jmsvhtyxb7SQ@mail.gmail.com>
+Subject: Re: [PATCH net v3] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, davem@davemloft.net, 
+	Mazin Al Haddad <mazin@getstate.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 19, 2026 at 1:16=E2=80=AFAM Sun Jian <sun.jian.kdev@gmail.com> =
-wrote:
+On Mon, Jan 19, 2026 at 6:06=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Sparse reports:
+> On Mon, 19 Jan 2026 12:24:57 +0100 Florian Westphal wrote:
+> > From: Eric Dumazet <edumazet@google.com>
+> >
+> > I added skb_vlan_inet_prepare() helper in the cited commit, hinting
+> > that we would need to use it more broadly.
 >
->   netfilter/nf_flow_table_bpf.c:58:45:
->     symbol 'bpf_xdp_flow_lookup' was not declared. Should it be static?
+> I _think_ this makes GRE forwarding tests a bit unhappy:
 >
-> bpf_xdp_flow_lookup() is exported as a __bpf_kfunc and must remain
-> non-static. Add a forward declaration to provide an explicit prototype
-> , only to silence the sparse warning.
+> https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2026-01-19--=
+12-00&executor=3Dvmksft-forwarding&pw-n=3D0&pass=3D0
+> --
 
-No. Ignore the warning. Sparse is incorrect.
-We have hundreds of such bogus warnings. Do NOT attempt to send
-more patches to "fix" them.
+I was unsure about ip6erspan_tunnel_xmit() change, I think I started
+full tests days ago but probably was distracted.
 
-pw-bot: cr
+I had :
+
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index d19d86ed43766bbc8ec052113be02ab231a5272c..9e214c355e6ce15fa828866ae20=
+fa8fe321b4bf7
+100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -881,7 +881,7 @@ static netdev_tx_t ip6gre_tunnel_xmit(struct sk_buff *s=
+kb,
+        __be16 payload_protocol;
+        int ret;
+
+-       if (!pskb_inet_may_pull(skb))
++       if (skb_vlan_inet_prepare(skb, true))
+                goto tx_err;
+
+        if (!ip6_tnl_xmit_ctl(t, &t->parms.laddr, &t->parms.raddr))
+@@ -929,7 +929,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct
+sk_buff *skb,
+        __u32 mtu;
+        int nhoff;
+
+-       if (!pskb_inet_may_pull(skb))
++       if (skb_vlan_inet_prepare(skb, false))
+                goto tx_err;
+
+        if (!ip6_tnl_xmit_ctl(t, &t->parms.laddr, &t->parms.raddr))
 
