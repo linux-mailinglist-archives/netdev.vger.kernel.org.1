@@ -1,148 +1,83 @@
-Return-Path: <netdev+bounces-251200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F657D3B448
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:29:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0CDD3B461
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:32:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6936B300B9C1
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:29:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 152E3305B5B1
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 17:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A89328B64;
-	Mon, 19 Jan 2026 17:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB0432936F;
+	Mon, 19 Jan 2026 17:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mxp8bKGC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNN+NuuS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427943033E4;
-	Mon, 19 Jan 2026 17:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE0C246782;
+	Mon, 19 Jan 2026 17:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768843752; cv=none; b=dvxiV/7LYfbCk/2MHkN9bvZ/I0Qx0Bgvltlm3pEKtRZv4Tkee2fq7GstD/JK6B5qL8p4S7v22FuPbJRHI9ET+6j2qu+RQC3hqTbWQj6bFrOsioeercVB+mDrJnSY1YKl3Q+U31NY71bA8BSwc8qO04bErNjA7HopvxqWhhIL9VM=
+	t=1768843967; cv=none; b=iohSJMGF+VffazIsbbRgBPROjwLeH1QCSaMjhDaHxJU4/4yLhMmxU4OpzmVDimqVcjhWYDgmQU1hx9y/dxPUbTT9hsmciGKg3lrNkuW4kROwfxU9FUrFF+qLIS61nFOXvTMt4k1ZUh09VVjTWMPpqKSl/Y/MCnFlQmZMGnBvkSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768843752; c=relaxed/simple;
-	bh=ubEIagtdtoo0yEiArJTE7L2QRrt+LUrcsn80+nIiLMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bdKydINGGIODv9sBKa7ARWiv496Ghv/eShuRNBkFxvIz3DPQ+UMqZgGX3FCE+qLAlInlISuTMItnxkKr8H0skz8PpuciGKA54nM2iuXs5Ycnt8zYVJ9qKoCS3fSoRKISv76sZ0bPGirpHs64xpsJgngvMf/zixBapFN+eFYxjYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mxp8bKGC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6DA0C19425;
-	Mon, 19 Jan 2026 17:29:08 +0000 (UTC)
+	s=arc-20240116; t=1768843967; c=relaxed/simple;
+	bh=MzgYz2ei5YMI3c3oVwoXo7ns5PaAQ6jk5W9GQyBetvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OcPw6/V2KfB0IBAkvEd9EPLfWhz0xuCu50+PGQZEysoP7WDUusQwXfqDfHY5W67ezIFoN+Ged5gafuakoX1pzKhfIyPmDTy7vzqKU0590HDR1zYJvQGnArYz/EpPpsn9vB5OnAA1BnYGEYFOkjfij1lgT7cF/bMO9BV4EpsM5EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNN+NuuS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D639C116C6;
+	Mon, 19 Jan 2026 17:32:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768843751;
-	bh=ubEIagtdtoo0yEiArJTE7L2QRrt+LUrcsn80+nIiLMQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Mxp8bKGCbFu5X3E746KzGYRuLVaCSeVZ/JBChu10a5Ufv2nVq/pKcwJCyQ+pj3f1O
-	 1E+k1aZFjRezL8jwUof8dMXRaMx3Ke8+OpYy73jsc0wwHcXvQVA2yrChQ6X6btEcQd
-	 lNLjuRvB4nLW32wQlF4Zaymx+LNnd8JyKeEVrpl7vxdUkInXvLhBy4XmCJaZSmd0T9
-	 JGynFC3M0qZhNKqZq+4QgVzMikwKTglJ1MGdaAibPWjMKx5T8GBdVCEubWqgjdxiyH
-	 6lFUrGP7UDfi2IqK43LfZL+QmiDsbIhdHF+HkY35cwmqib8bvWMw1iiQoHko+F4EfI
-	 aLM3XQo0H9ZjA==
-Date: Mon, 19 Jan 2026 17:29:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: Junjie Cao <junjie.cao@intel.com>
-Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	linux-wireless@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
-	Avraham Stern <avraham.stern@intel.com>,
-	Daniel Gabay <daniel.gabay@intel.com>,
-	Krishnanand Prabhu <krishnanand.prabhu@intel.com>,
-	Luca Coelho <luciano.coelho@intel.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	stable@vger.kernel.org, Yao Zi <ziyao@disroot.org>,
-	Benjamin Berg <benjamin.berg@intel.com>
-Subject: Re: [PATCH] wifi: iwlwifi: ptp: Fix potential race condition in PTP
- removal
-Message-ID: <aW5p4jVhcz70ZFl4@horms.kernel.org>
-References: <20260115161529.85720-1-junjie.cao@intel.com>
+	s=k20201202; t=1768843966;
+	bh=MzgYz2ei5YMI3c3oVwoXo7ns5PaAQ6jk5W9GQyBetvg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gNN+NuuSGkr3B8IGo0N0iqWCQOjVVKoPVnCE04Y0pliehP5Sd1H13WALyuHNqdVRH
+	 jEHniJE0YD2RyhVfbQGJXldxeUhVGj5Xzz7aMxvqyhWwCAPLjG7UXC67oGf5Tptluq
+	 ypc+Rjb0JcWqBxNvwNXscl1O8avJl+H6L9rQdg9ml2WqIHxLDKuPOtMQZwCmLp1Qj3
+	 +qrk9nXEbJlE5w7g80qqdg577JX2YuAD7Zc5KGRe7ECXtot2iy6cOE2CRpPCwj5iYE
+	 sw7iedYMLvVmwM37GtOILTgudxfkA6NicqqMZpOEQjUpw8/UUBEaDB/vkcF8M/T/d0
+	 wG7PG/VWcRXnw==
+Date: Mon, 19 Jan 2026 09:32:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [net-next,v4,05/13] octeontx2-af: npc: cn20k: Allocate default
+ MCAM indexes
+Message-ID: <20260119093245.0544f5ce@kernel.org>
+In-Reply-To: <aW2oKKg73zwRNals@rkannoth-OptiPlex-7090>
+References: <20260113101658.4144610-6-rkannoth@marvell.com>
+	<20260118004024.1044368-1-kuba@kernel.org>
+	<aW2oKKg73zwRNals@rkannoth-OptiPlex-7090>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260115161529.85720-1-junjie.cao@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-+ Yao Zi and Benjamin Berg
+On Mon, 19 Jan 2026 09:12:32 +0530 Ratheesh Kannoth wrote:
+> > > -	if (attach->nixlf)
+> > > +	if (attach->nixlf) {
+> > >  		rvu_attach_block(rvu, pcifunc, BLKTYPE_NIX, 1, attach);
+> > > +		if (is_cn20k(rvu->pdev)) {
+> > > +			err = npc_cn20k_dft_rules_alloc(rvu, pcifunc);
+> > > +			if (err)
+> > > +				goto exit;  
+> >                         ^^^^
+> >
+> > When npc_cn20k_dft_rules_alloc() fails after rvu_attach_block() has
+> > already attached the NIX LF, the error path jumps to exit without
+> > detaching NIX. The caller (otx2_init_rsrc in otx2_pf.c) assumes that on
+> > error nothing was attached, so it does not call otx2_detach_resources().
+> >
+> > Could this leave NIX LF attached without proper cleanup on allocation
+> > failure?  
+> There is no proper error handling done for rvu_attach_block function (in existing code)
+> We can address this later as different patch ?
 
-On Fri, Jan 16, 2026 at 12:15:29AM +0800, Junjie Cao wrote:
-> iwl_mvm_ptp_remove() and iwl_mld_ptp_remove() call
-> cancel_delayed_work_sync() only after ptp_clock_unregister() and after
-> partially clearing ptp_data state.
-> 
-> This creates a race where the delayed work (iwl_mvm_ptp_work /
-> iwl_mld_ptp_work) can run while teardown is in progress and observe a
-> partially modified PTP state. In addition, the work may re-arm itself,
-> extending the teardown window and risking execution after driver
-> resources have been released.
-> 
-> Move cancel_delayed_work_sync() before ptp_clock_unregister() to ensure
-> the delayed work is fully stopped before any PTP cleanup begins. This
-> follows the standard pattern used by other Intel PTP drivers such as
-> e1000e, igb, ixgbe, and ice.
-> 
-> Fixes: d1e879ec600f ("wifi: iwlwifi: add iwlmld sub-driver")
-> Fixes: 1595ecce1cf3 ("wifi: iwlwifi: mvm: add support for PTP HW clock (PHC)")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Junjie Cao <junjie.cao@intel.com>
-
-Thinking out loud: The two cited commits were introduced in
-the same upstream release - v6.4 - so from a backporting PoV
-it seems reasonable to address these issues in one patch.
-Though I do think it would be best to think of these
-as two things and thus warranting two patches.
-
-That notwithstanding, the changes look good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-Context left intact below for the benefit of Yao Zi and Benjamin Berg.
-
-> ---
->  drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 2 +-
->  drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-> index 231920425c06..b40182320801 100644
-> --- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-> +++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-> @@ -319,10 +319,10 @@ void iwl_mld_ptp_remove(struct iwl_mld *mld)
->  			       mld->ptp_data.ptp_clock_info.name,
->  			       ptp_clock_index(mld->ptp_data.ptp_clock));
->  
-> +		cancel_delayed_work_sync(&mld->ptp_data.dwork);
->  		ptp_clock_unregister(mld->ptp_data.ptp_clock);
->  		mld->ptp_data.ptp_clock = NULL;
->  		mld->ptp_data.last_gp2 = 0;
->  		mld->ptp_data.wrap_counter = 0;
-> -		cancel_delayed_work_sync(&mld->ptp_data.dwork);
->  	}
->  }
-> diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-> index 1da6260e238c..2b01ca36a1b5 100644
-> --- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-> +++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-> @@ -325,11 +325,11 @@ void iwl_mvm_ptp_remove(struct iwl_mvm *mvm)
->  			       mvm->ptp_data.ptp_clock_info.name,
->  			       ptp_clock_index(mvm->ptp_data.ptp_clock));
->  
-> +		cancel_delayed_work_sync(&mvm->ptp_data.dwork);
->  		ptp_clock_unregister(mvm->ptp_data.ptp_clock);
->  		mvm->ptp_data.ptp_clock = NULL;
->  		memset(&mvm->ptp_data.ptp_clock_info, 0,
->  		       sizeof(mvm->ptp_data.ptp_clock_info));
->  		mvm->ptp_data.last_gp2 = 0;
-> -		cancel_delayed_work_sync(&mvm->ptp_data.dwork);
->  	}
->  }
-> -- 
-> 2.43.0
-> 
+Different patch, yes, but _before_ these patches are merged.
 
