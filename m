@@ -1,355 +1,85 @@
-Return-Path: <netdev+bounces-251280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B59D3B7BA
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:54:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 942A5D3B7CE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CAE48303AAD7
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:54:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1527B30069BE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D262E8B7C;
-	Mon, 19 Jan 2026 19:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88951299948;
+	Mon, 19 Jan 2026 19:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PXWm+5GW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVhUZEew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7ED2E7635
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 19:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666452BD0B
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 19:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768852444; cv=none; b=G1n3Lhxi/Uh+7FbRpnZLInezVQqnQ1p83r+qDKbEnBIG7eI5u3gc5bGYTIfOxcFL7sFn0c8SvJZZca+JeoX0gQ2Tzn5Yl2NkLxlbq99o/Fgt3ibuciLQkTjIRfGd4z/82rwPztrluBz46I1caeCvOEl5QB53XdYLIS1lvZicptA=
+	t=1768852632; cv=none; b=ee+c2MsnMO+/h42YokGBZKj87MEoOnpfi2DVecjA65QVeWVE+DVQU0tHh8NDETmPHjk/BlSxXvYh/m0aHsf8PR5xuYdEdC6luy4kTd1Qf150rD6a/+mo6t07P4yM++S7bcYtyWewxZhyeAS60jYIesOh8eRwmZmp7IOOsWHsbOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768852444; c=relaxed/simple;
-	bh=enheyffyzeRQuTMmVfRf9X1OoExDglgi7I1CfaKQ4F4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DCoGJwRhCxOVan20AH/FspZv9IVp30RQuWTnFTYQfSuWU1mvp6DBWWp6jarvFnz951v1nPOovqxTx86OBwmJKqRpjuT/tvK+mjHtM+HB/yBfSeESK4YL3paliEg9lhzZBwgmoUcGZlX6ZtXLWWK2vtnCYsqzMRl9oJY1/c5xqso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PXWm+5GW; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b876f3f603eso788614866b.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:54:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768852441; x=1769457241; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HLqhUFO5VO0ft/TfIoPNJ2fKHKmLQpH/DMD1yoEvhbQ=;
-        b=PXWm+5GWqfIEFpo1g4nlwj2ekIs/lVpkC2z64BLJuuirgdSox4Mmuir8NmhwetUlTx
-         tOill6LYqrbNkTrWMt+Vw4QSbjnoHf8hMWrSczjmGxwTVTvMAhRu5co9Cdn93zCMQZL/
-         2hi4RDpJOwLbEOnmV23A84igNbM0RXSZilIRPADkZyVNdEV6CupbFiaPwAGZuVuxUx8V
-         UHMLOEiYEkWjW59L60AheRFxuR5PdCoQqXpwOMd1HqjslMrDDSrGU1XRzpophQEPBYAN
-         POcOJ8ijQKCsOAm9SOhHjyOmKrDCnM5uJwfOhDmpbWmj1n+LYEO45jHB6d6PX8JOn9Y7
-         DY9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768852441; x=1769457241;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HLqhUFO5VO0ft/TfIoPNJ2fKHKmLQpH/DMD1yoEvhbQ=;
-        b=dYUhvxjM7n0r47zj+VzZ+sq4ppTXPzavRuPCGYq4LG7OWftgfDU+WgiXqgdxcSF8iz
-         b25ZcteLOwP9OhapyhAgFEWzYNUKm+04PYRP6akLG8R2V8c3ue58Y6V+fMeGQB9F/Vh9
-         omQBO/LcTjxX4Aag2Tht9VmjhKwhUhPM39NtoGn+pIallyYrn6fkRONApZqHgf/yA0E8
-         5/83qO+fme/lbPlej2um5QTVDVrov6nq0OMtGPW909hCCZjaTHJrQXaSaseN2Ib8GMDP
-         j6aRFd5prUn8Mnk6rP4PK1FCid5UYWc+iCx006sQe6VLSzCzImIwOfmbGwyv8PoL+1nI
-         R84A==
-X-Forwarded-Encrypted: i=1; AJvYcCXnn6O+V1St9dFpS++gnljWJHBoO1cVuKUEOrnjKaVWRaO4z4ysdX6vJmUjDW6QXIFMuYrBpPM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYG1HlGAZvWqCn/8hRHJ0mkkstvLdRCttGz8Ihu58vUtwLqJ/w
-	bLVKSBSHpbNBTjLZu3AxwS7KFVGQJFWubhH2GDxJn+U2D9hbmcFAKiLW42aPCeIm5UQ=
-X-Gm-Gg: AY/fxX74T8LSjlvz3WrQCC8LJFwVO4zykzv9vo94bsVg2PXjBzl8DY3dRTt3EI55uSh
-	vELWTT8KPmMYOF51rqY04+mTyGg2GRzhd9JzF8zTTNjnsstfV6KMJqWrZHilgDi/np0kKrXV17B
-	Tun0iU1XEePcDKI8lb+Yr615eRw0a4KULxRq2DWAu0c8/JtNgZrMQRFzRbhMh9Y0T0DZbcvUb+1
-	PNCtRZ+CwbJ1arW6kd9dibbw0KBnOAC/2xjMMoYitE7sLVIQOykAdf7ProuuS4Q7Z6Zx1rfQjCL
-	rIyzG45NJPC0k/9g0o2hV/0Q0x+nyUunbIIgd1Gv8Cf4eZEjMbM9BH5JAPuV0v2m7plC6P8pxYQ
-	4yhttCqacbjWl1Cna+lVa8d+HX0mPqfrvggPGr1+qjIsDbNeLWycHSfcsF2vVYJdNp9rhkYOIF/
-	KZR9AtZjQmR5F6fvgXqaUl9trhmiR0xOmoDKqu4np0nEud4IgV3oJ9pPY3nkU=
-X-Received: by 2002:a17:906:f592:b0:b86:fca7:3dc2 with SMTP id a640c23a62f3a-b87968d4b0bmr992663166b.10.1768852440951;
-        Mon, 19 Jan 2026 11:54:00 -0800 (PST)
-Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65452bce213sm11290957a12.2.2026.01.19.11.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 11:54:00 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 19 Jan 2026 20:53:54 +0100
-Subject: [PATCH bpf-next 4/4] selftests/bpf: Remove tests for
- prologue/epilogue with kfuncs
+	s=arc-20240116; t=1768852632; c=relaxed/simple;
+	bh=L6lKQTsELvWQwFIGmSW9bT065pJpiDWMj+eoLUYLGh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pCiVAQ+zPRmQpykdj5UxGjPQPwMF7FRiLQKmX8YaNSkutMl/DuVlqRklNsbKxPy2wHOn6m4ZUvf3o6xTjCT7xeQNJ7mFGginRaKPSXkMH0yTpryq3Anf/AvbYBGwBAyVxXCKios2TEYxU7z2b+ptVveHVmRsyDfh4zUsGOLU9E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVhUZEew; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94E2EC116C6;
+	Mon, 19 Jan 2026 19:57:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768852632;
+	bh=L6lKQTsELvWQwFIGmSW9bT065pJpiDWMj+eoLUYLGh4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QVhUZEewmfssyfLLbm1JX/JTVd+/6cGxyr0k8dhZm8z1W7yvA7LtcRnIXbQB1Qikc
+	 dVs28FFhRMkTK7eG7oAGOkgrty/GRAX0PYhP2KwhlQDmwNURj9iYCG/sNYSz1kgk32
+	 074xIczLsFa1uUD3hgDxRWOoFL48LZlMoIFhifLo4gqbNWaqY0mz6VGE6lNpJr/pou
+	 mUOCrseuiv4svw6ZSPZBxk2Ch9xQNs9PmS8K8+sXk2m4ADnPJqBsD4aZSGfA3Qe6+C
+	 DSpHfH5hIzep/9cU7N8q+zZIqtYieMY3IhRMpxgurbl9/hXdJUhyq7Czax4ypVXwvc
+	 xZofzA1aqqv2g==
+Date: Mon, 19 Jan 2026 11:57:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemb@google.com>
+Cc: Kevin Yang <yyd@google.com>, Harshitha Ramamurthy
+ <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, David Miller
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Joshua Washington <joshwash@google.com>, Gerhard
+ Engleder <gerhard@engleder-embedded.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: extend ndo_get_tstamp for other
+ timestamp types
+Message-ID: <20260119115710.6fdde8c0@kernel.org>
+In-Reply-To: <20260115222300.1116386-1-yyd@google.com>
+References: <20260115222300.1116386-1-yyd@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260119-skb-meta-bpf-emit-call-from-prologue-v1-4-e8b88d6430d8@cloudflare.com>
-References: <20260119-skb-meta-bpf-emit-call-from-prologue-v1-0-e8b88d6430d8@cloudflare.com>
-In-Reply-To: <20260119-skb-meta-bpf-emit-call-from-prologue-v1-0-e8b88d6430d8@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Amery Hung <ameryhung@gmail.com>, 
- netdev@vger.kernel.org, kernel-team@cloudflare.com
-X-Mailer: b4 0.15-dev-07fe9
 
-Remove pro_epilogue_with_kfunc test program and its supporting code in
-bpf_testmod. This test exercised calling kfuncs from prologue and epilogue,
-which is no longer supported after the switch to direct helper calls.
+On Thu, 15 Jan 2026 22:22:59 +0000 Kevin Yang wrote:
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- .../selftests/bpf/prog_tests/pro_epilogue.c        |  2 -
- .../selftests/bpf/progs/pro_epilogue_with_kfunc.c  | 88 ---------------------
- .../testing/selftests/bpf/test_kmods/bpf_testmod.c | 92 ----------------------
- 3 files changed, 182 deletions(-)
+Other than expediency why implementing this in drivers makes sense?
+There will be very little driver specific logic here.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/pro_epilogue.c b/tools/testing/selftests/bpf/prog_tests/pro_epilogue.c
-index 5d3c00a08a88..509883e6823a 100644
---- a/tools/testing/selftests/bpf/prog_tests/pro_epilogue.c
-+++ b/tools/testing/selftests/bpf/prog_tests/pro_epilogue.c
-@@ -6,7 +6,6 @@
- #include "epilogue_tailcall.skel.h"
- #include "pro_epilogue_goto_start.skel.h"
- #include "epilogue_exit.skel.h"
--#include "pro_epilogue_with_kfunc.skel.h"
- 
- struct st_ops_args {
- 	__u64 a;
-@@ -56,7 +55,6 @@ void test_pro_epilogue(void)
- 	RUN_TESTS(pro_epilogue);
- 	RUN_TESTS(pro_epilogue_goto_start);
- 	RUN_TESTS(epilogue_exit);
--	RUN_TESTS(pro_epilogue_with_kfunc);
- 	if (test__start_subtest("tailcall"))
- 		test_tailcall();
- }
-diff --git a/tools/testing/selftests/bpf/progs/pro_epilogue_with_kfunc.c b/tools/testing/selftests/bpf/progs/pro_epilogue_with_kfunc.c
-deleted file mode 100644
-index a5a8f08ac8fb..000000000000
---- a/tools/testing/selftests/bpf/progs/pro_epilogue_with_kfunc.c
-+++ /dev/null
-@@ -1,88 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
--
--#include <vmlinux.h>
--#include <bpf/bpf_tracing.h>
--#include "bpf_misc.h"
--#include "../test_kmods/bpf_testmod.h"
--#include "../test_kmods/bpf_testmod_kfunc.h"
--
--char _license[] SEC("license") = "GPL";
--
--void __kfunc_btf_root(void)
--{
--	bpf_kfunc_st_ops_inc10(NULL);
--}
--
--static __noinline __used int subprog(struct st_ops_args *args)
--{
--	args->a += 1;
--	return args->a;
--}
--
--__success
--/* prologue */
--__xlated("0: r8 = r1")
--__xlated("1: r1 = 0")
--__xlated("2: call kernel-function")
--__xlated("3: if r0 != 0x0 goto pc+5")
--__xlated("4: r6 = *(u64 *)(r8 +0)")
--__xlated("5: r7 = *(u64 *)(r6 +0)")
--__xlated("6: r7 += 1000")
--__xlated("7: *(u64 *)(r6 +0) = r7")
--__xlated("8: goto pc+2")
--__xlated("9: r1 = r0")
--__xlated("10: call kernel-function")
--__xlated("11: r1 = r8")
--/* save __u64 *ctx to stack */
--__xlated("12: *(u64 *)(r10 -8) = r1")
--/* main prog */
--__xlated("13: r1 = *(u64 *)(r1 +0)")
--__xlated("14: r6 = r1")
--__xlated("15: call kernel-function")
--__xlated("16: r1 = r6")
--__xlated("17: call pc+")
--/* epilogue */
--__xlated("18: r1 = 0")
--__xlated("19: r6 = 0")
--__xlated("20: call kernel-function")
--__xlated("21: if r0 != 0x0 goto pc+6")
--__xlated("22: r1 = *(u64 *)(r10 -8)")
--__xlated("23: r1 = *(u64 *)(r1 +0)")
--__xlated("24: r6 = *(u64 *)(r1 +0)")
--__xlated("25: r6 += 10000")
--__xlated("26: *(u64 *)(r1 +0) = r6")
--__xlated("27: goto pc+2")
--__xlated("28: r1 = r0")
--__xlated("29: call kernel-function")
--__xlated("30: r0 = r6")
--__xlated("31: r0 *= 2")
--__xlated("32: exit")
--SEC("struct_ops/test_pro_epilogue")
--__naked int test_kfunc_pro_epilogue(void)
--{
--	asm volatile (
--	"r1 = *(u64 *)(r1 +0);"
--	"r6 = r1;"
--	"call %[bpf_kfunc_st_ops_inc10];"
--	"r1 = r6;"
--	"call subprog;"
--	"exit;"
--	:
--	: __imm(bpf_kfunc_st_ops_inc10)
--	: __clobber_all);
--}
--
--SEC("syscall")
--__retval(22022) /* (PROLOGUE_A [1000] + KFUNC_INC10 + SUBPROG_A [1] + EPILOGUE_A [10000]) * 2 */
--int syscall_pro_epilogue(void *ctx)
--{
--	struct st_ops_args args = {};
--
--	return bpf_kfunc_st_ops_test_pro_epilogue(&args);
--}
--
--SEC(".struct_ops.link")
--struct bpf_testmod_st_ops pro_epilogue_with_kfunc = {
--	.test_pro_epilogue = (void *)test_kfunc_pro_epilogue,
--};
-diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-index bc07ce9d5477..1a5c163455de 100644
---- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-@@ -1400,85 +1400,6 @@ static int bpf_test_mod_st_ops__test_pro_epilogue(struct st_ops_args *args)
- 	return 0;
- }
- 
--static int bpf_cgroup_from_id_id;
--static int bpf_cgroup_release_id;
--
--static int st_ops_gen_prologue_with_kfunc(struct bpf_insn *insn_buf, bool direct_write,
--					  const struct bpf_prog *prog)
--{
--	struct bpf_insn *insn = insn_buf;
--
--	/* r8 = r1; // r8 will be "u64 *ctx".
--	 * r1 = 0;
--	 * r0 = bpf_cgroup_from_id(r1);
--	 * if r0 != 0 goto pc+5;
--	 * r6 = r8[0]; // r6 will be "struct st_ops *args".
--	 * r7 = r6->a;
--	 * r7 += 1000;
--	 * r6->a = r7;
--	 * goto pc+2;
--	 * r1 = r0;
--	 * bpf_cgroup_release(r1);
--	 * r1 = r8;
--	 */
--	*insn++ = BPF_MOV64_REG(BPF_REG_8, BPF_REG_1);
--	*insn++ = BPF_MOV64_IMM(BPF_REG_1, 0);
--	*insn++ = BPF_CALL_KFUNC(0, bpf_cgroup_from_id_id);
--	*insn++ = BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 0, 5);
--	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_6, BPF_REG_8, 0);
--	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_7, BPF_REG_6, offsetof(struct st_ops_args, a));
--	*insn++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_7, 1000);
--	*insn++ = BPF_STX_MEM(BPF_DW, BPF_REG_6, BPF_REG_7, offsetof(struct st_ops_args, a));
--	*insn++ = BPF_JMP_IMM(BPF_JA, 0, 0, 2);
--	*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_0);
--	*insn++ = BPF_CALL_KFUNC(0, bpf_cgroup_release_id);
--	*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_8);
--	*insn++ = prog->insnsi[0];
--
--	return insn - insn_buf;
--}
--
--static int st_ops_gen_epilogue_with_kfunc(struct bpf_insn *insn_buf, const struct bpf_prog *prog,
--					  s16 ctx_stack_off)
--{
--	struct bpf_insn *insn = insn_buf;
--
--	/* r1 = 0;
--	 * r6 = 0;
--	 * r0 = bpf_cgroup_from_id(r1);
--	 * if r0 != 0 goto pc+6;
--	 * r1 = stack[ctx_stack_off]; // r1 will be "u64 *ctx"
--	 * r1 = r1[0]; // r1 will be "struct st_ops *args"
--	 * r6 = r1->a;
--	 * r6 += 10000;
--	 * r1->a = r6;
--	 * goto pc+2
--	 * r1 = r0;
--	 * bpf_cgroup_release(r1);
--	 * r0 = r6;
--	 * r0 *= 2;
--	 * BPF_EXIT;
--	 */
--	*insn++ = BPF_MOV64_IMM(BPF_REG_1, 0);
--	*insn++ = BPF_MOV64_IMM(BPF_REG_6, 0);
--	*insn++ = BPF_CALL_KFUNC(0, bpf_cgroup_from_id_id);
--	*insn++ = BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 0, 6);
--	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_FP, ctx_stack_off);
--	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
--	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_6, BPF_REG_1, offsetof(struct st_ops_args, a));
--	*insn++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_6, 10000);
--	*insn++ = BPF_STX_MEM(BPF_DW, BPF_REG_1, BPF_REG_6, offsetof(struct st_ops_args, a));
--	*insn++ = BPF_JMP_IMM(BPF_JA, 0, 0, 2);
--	*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_0);
--	*insn++ = BPF_CALL_KFUNC(0, bpf_cgroup_release_id);
--	*insn++ = BPF_MOV64_REG(BPF_REG_0, BPF_REG_6);
--	*insn++ = BPF_ALU64_IMM(BPF_MUL, BPF_REG_0, 2);
--	*insn++ = BPF_EXIT_INSN();
--
--	return insn - insn_buf;
--}
--
--#define KFUNC_PRO_EPI_PREFIX "test_kfunc_"
- static int st_ops_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
- 			       const struct bpf_prog *prog)
- {
-@@ -1488,9 +1409,6 @@ static int st_ops_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
- 	    strcmp(prog->aux->attach_func_name, "test_pro_epilogue"))
- 		return 0;
- 
--	if (!strncmp(prog->aux->name, KFUNC_PRO_EPI_PREFIX, strlen(KFUNC_PRO_EPI_PREFIX)))
--		return st_ops_gen_prologue_with_kfunc(insn_buf, direct_write, prog);
--
- 	/* r6 = r1[0]; // r6 will be "struct st_ops *args". r1 is "u64 *ctx".
- 	 * r7 = r6->a;
- 	 * r7 += 1000;
-@@ -1514,9 +1432,6 @@ static int st_ops_gen_epilogue(struct bpf_insn *insn_buf, const struct bpf_prog
- 	    strcmp(prog->aux->attach_func_name, "test_pro_epilogue"))
- 		return 0;
- 
--	if (!strncmp(prog->aux->name, KFUNC_PRO_EPI_PREFIX, strlen(KFUNC_PRO_EPI_PREFIX)))
--		return st_ops_gen_epilogue_with_kfunc(insn_buf, prog, ctx_stack_off);
--
- 	/* r1 = stack[ctx_stack_off]; // r1 will be "u64 *ctx"
- 	 * r1 = r1[0]; // r1 will be "struct st_ops *args"
- 	 * r6 = r1->a;
-@@ -1587,13 +1502,6 @@ static void st_ops_unreg(void *kdata, struct bpf_link *link)
- 
- static int st_ops_init(struct btf *btf)
- {
--	struct btf *kfunc_btf;
--
--	bpf_cgroup_from_id_id = bpf_find_btf_id("bpf_cgroup_from_id", BTF_KIND_FUNC, &kfunc_btf);
--	bpf_cgroup_release_id = bpf_find_btf_id("bpf_cgroup_release", BTF_KIND_FUNC, &kfunc_btf);
--	if (bpf_cgroup_from_id_id < 0 || bpf_cgroup_release_id < 0)
--		return -EINVAL;
--
- 	return 0;
- }
- 
+After thinking about it for 1 minute my intuition would be for drivers
+to just expose necessary information, in-kernel consumers should
+"enable" the sync for all netdevs during init, and then convert
+the timestamps into REALTIME / MONOTONIC by calling some helper?
 
+Also AI code review says:
+
+> +		mult = mult_frac(GVE_HWTS_REAL_CC_NOMINAL,
+> +				 real_ns - priv->ts_real.last_sync_ns,
+> +				 priv->last_sync_nic_counter - prev_nic);
+
+Can this divide by zero? 
 -- 
-2.43.0
-
+pw-bot: cr
 
