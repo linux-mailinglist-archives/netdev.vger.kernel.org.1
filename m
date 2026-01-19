@@ -1,67 +1,55 @@
-Return-Path: <netdev+bounces-251272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DC8CD3B789
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:46:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FC0D3B78E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 20:46:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9D39A3016F98
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:45:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4D66830049DA
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B062DB786;
-	Mon, 19 Jan 2026 19:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035EA270EDF;
+	Mon, 19 Jan 2026 19:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfxHnXWv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKpGqHP5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC092DAFA4;
-	Mon, 19 Jan 2026 19:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F2221ABAA;
+	Mon, 19 Jan 2026 19:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768851957; cv=none; b=dNv2NM92ULTUv1eO8DZHzZWLsKd/o1tUHHGdpjPGF9gz4cpwjDKYZ5XUVp+VJb+4wj5K2hsl95H1c9NMieRtFCJ9rKTC9Awd10c+dgGAw+HNj9R5N7z8BmjsooX19A26nv3VbNQk71SodtsVBgLhUxDTSf7QJYhxzCLEdQK35ko=
+	t=1768852010; cv=none; b=ttOaeJESkaxXeZx9M9DAUkt8UTYZsshzMcekiKM8+lXDQy8rYHd5bq/B+UI1YTl5s+KtyublKIK3unJFpZ8MBIdJSqNezJfflHtSgKR2hRrVCxR13CkfBOvDaFlFd7vHqNS1HnqHGD5gvMO74HkDz/ovVS18bxby3/KG5BtKU50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768851957; c=relaxed/simple;
-	bh=fDWSKoLf6xiGrPGaL47iQ4/AVpN/ayfSFbJOyM1bnN0=;
+	s=arc-20240116; t=1768852010; c=relaxed/simple;
+	bh=4UQ2NAS1iZ0RAtjKM4tifvX/yPeV8vl11NrVnc6K0IA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=opP4ZM0R1ML2/5USzMkgd+HRenSOiemO/JxbxCjjxkc8San+nc8YZ1bG1NjInwaHRJx9qQvmmSXiBtHlLXvLVVcEoB4+4ey+iwW3I3vlT2Pm5qVMOq1HAHsEMUMBa39ZIcmYDsSI3MMMpQuNDBJcT/N8BsPytBwNaQ5MurfhKKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfxHnXWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B766C116C6;
-	Mon, 19 Jan 2026 19:45:54 +0000 (UTC)
+	 MIME-Version; b=krjJyE34Q69owez4WjE4IBfnwjaGDcjMAfXXEksRIVoAz+S7wJMByZ7yAtQydqSirIbWwQ1ZmQQoTYpeogODLAxhqfcXV7OaJzTv9l6CSGgHvCrvZ9PE6Thuyel+lcPfVWz+graFAUdTl67v+H02FsVrMp/lehwNoVPflTwafI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKpGqHP5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B380C116C6;
+	Mon, 19 Jan 2026 19:46:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768851954;
-	bh=fDWSKoLf6xiGrPGaL47iQ4/AVpN/ayfSFbJOyM1bnN0=;
+	s=k20201202; t=1768852010;
+	bh=4UQ2NAS1iZ0RAtjKM4tifvX/yPeV8vl11NrVnc6K0IA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rfxHnXWvsOuFtQ/xyKSFe2H1jnlc8Pn0wgQsf9r+Xl+vO71/Qjcn00LitgN/PsMeb
-	 FLOSp99fSyylHUUjSVYQoHRbLOPVdi/O58Olj+bXAaBaWMz8sAIEuRwstmCZXbl8fJ
-	 VrsRO5xYMyNp1AaMoZApSPDNOURLg1/aBhNPlfTEI3xniOm9EKQIx6XfIkseV9MUW+
-	 li798MgWFBeZzhi0ZcN5fsCSB1akuy1IZGcFg71pie+qYxFOfd6/X73IiIghmKob7N
-	 5/bd7138Ifk/Gxo8VeBsjpG00XEfuVCiowyuTvEj1wiZ96aNQWcXLVmiPhsdZH3Ly0
-	 gMAtWawj69W4Q==
+	b=FKpGqHP5TtXl9t8Cj07DPYQa3JONDWn6MkDyoYBqFVE1BEo/G0WNAAhlAGuLcS135
+	 rCR455MHC5yqkoGSK+yGKTPQcPQ5XXaWtV5tNnDA1p7/531c0MuomMIhZfMwKBv0Zn
+	 ynC5gl2fybsfSfynIYpHjGyB+C1bWjYAKDM/PNSubc7i3/HjzD0b8MnUXVcgtyOaAa
+	 sQ2URbpzlLCm+gNE+78pqYaO/hhMpHafh0L867VMZAeUZcIbpqAUKjaD+PXJpFdwjg
+	 UomJMG7iuwOm7GFAxufUaHgb4JXUf5eGxG71VybQFmteYi32wAGBAH7SGKaTwcmo1N
+	 T0wbf1p19w3bw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: bhargava.marreddy@broadcom.com
+To: hkelam@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
-	vikas.gupta@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	pabeni@redhat.com,
-	rajashekar.hudumula@broadcom.com,
-	rahul-rg.gupta@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pavan.chebbi@broadcom.com,
-	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	horms@kernel.org,
-	ajit.khaparde@broadcom.com,
-	michael.chan@broadcom.com
-Subject: Re: [v5,net-next,8/8] bng_en: Add support for TPA events
-Date: Mon, 19 Jan 2026 11:45:53 -0800
-Message-ID: <20260119194553.1264793-1-kuba@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next,PatchV2,1/2] octeontx2-af: Mailbox handlers to fetch DMAC filter drop counter
+Date: Mon, 19 Jan 2026 11:46:46 -0800
+Message-ID: <20260119194646.1265255-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260116193732.157898-9-bhargava.marreddy@broadcom.com>
-References: <20260116193732.157898-9-bhargava.marreddy@broadcom.com>
+In-Reply-To: <20260117165520.2215073-2-hkelam@marvell.com>
+References: <20260117165520.2215073-2-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,127 +63,54 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-bng_en: Add support for TPA events
+octeontx2-af: Mailbox handlers to fetch DMAC filter drop counter
 
-This patch enables TPA (Transparent Packet Aggregation) functionality
-in the VNIC and adds functions to handle TPA events for LRO/GRO
-processing.
+This patch adds mailbox handler support to read the DMAC filter drop
+counter from CGX and RPM MAC blocks.
 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-
-[ ... ]
-
-> @@ -159,10 +159,9 @@ enum {
->  #define MAX_TPA_MASK	(MAX_TPA - 1)
->  #define MAX_TPA_SEGS	0x3f
->
-> -#define BNGE_AGG_IDX_BMAP_SIZE	(MAX_TPA / BITS_PER_LONG)
->  struct bnge_tpa_idx_map {
->  	u16		agg_id_tbl[1024];
-> -	unsigned long	agg_idx_bmap[BNGE_AGG_IDX_BMAP_SIZE];
-> +	DECLARE_BITMAP(agg_idx_bmap, MAX_TPA);
->  };
-
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> index 3abd750a4bd7..aef0087174b7 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
 
 [ ... ]
 
-> +static u16 bnge_tpa_alloc_agg_idx(struct bnge_rx_ring_info *rxr, u16 agg_id)
+> +int rvu_mbox_handler_cgx_get_dmacflt_dropped_pktcnt(struct rvu *rvu,
+> +						    struct msg_req *req,
+> +						    struct cgx_dmac_filter_drop_cnt *rsp)
 > +{
-> +	struct bnge_tpa_idx_map *map = rxr->rx_tpa_idx_map;
-> +	u16 idx = agg_id & MAX_TPA_MASK;
+> +	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+> +	struct mac_ops *mac_ops;
+> +	u8 cgx_id, lmac_id;
+> +	void *cgxd;
 > +
-> +	if (test_bit(idx, map->agg_idx_bmap)) {
-> +		idx = find_first_zero_bit(map->agg_idx_bmap, MAX_TPA);
-> +		if (idx >= MAX_TPA)
-> +			return INVALID_HW_RING_ID;
-> +	}
-> +	__set_bit(idx, map->agg_idx_bmap);
-> +	map->agg_id_tbl[agg_id] = idx;
-                        ^^^^^^
+> +	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
+> +	cgxd = rvu_cgx_pdata(cgx_id, rvu);
+> +	mac_ops = get_mac_ops(cgxd);
+> +
+> +	if (!mac_ops->get_dmacflt_dropped_pktcnt)
+              ^^^^^^^^^
 
-The agg_id_tbl array is 1024 elements, but agg_id comes from hardware via
-TPA_START_AGG_ID() which uses mask RX_TPA_START_CMP_AGG_ID_P5 (0xffff << 16),
-allowing values up to 65535. Can this write out of bounds when
-agg_id >= 1024?
+Can mac_ops be NULL here? When a PF is not CGX-mapped, pf2cgxlmac_map[pf]
+returns 0xFF, which extracts cgx_id=0xF. Then rvu_cgx_pdata() returns
+NULL if cgx_id >= cgx_cnt_max. Subsequently, get_mac_ops(NULL) returns
+NULL, and this line would dereference a NULL pointer.
 
-For reference, the bnxt driver uses a different mask (0x0fff << 16),
-limiting agg_id to 0-4095.
+Other similar handlers in this file check is_pf_cgxmapped() or
+is_cgx_config_permitted() before proceeding with the CGX operations.
+For example, rvu_mbox_handler_cgx_fec_stats() and
+rvu_mbox_handler_cgx_features_get() both validate the PF mapping first.
 
-> +	return idx;
+Should this handler also include a validation check like:
+
+    if (!is_pf_cgxmapped(rvu, pf))
+        return 0;
+
+> +		return 0;
+> +
+> +	rsp->count =  mac_ops->get_dmacflt_dropped_pktcnt(cgxd, lmac_id);
+> +	return 0;
 > +}
-
-[ ... ]
-
-> +static u16 bnge_lookup_agg_idx(struct bnge_rx_ring_info *rxr, u16 agg_id)
-> +{
-> +	struct bnge_tpa_idx_map *map = rxr->rx_tpa_idx_map;
-> +
-> +	return map->agg_id_tbl[agg_id];
-                             ^^^^^^
-
-Same concern here - the array lookup has no bounds check on agg_id.
-
-> +}
-
-[ ... ]
-
-> +static void bnge_tpa_start(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
-> +			   u8 cmp_type, struct rx_tpa_start_cmp *tpa_start,
-> +			   struct rx_tpa_start_cmp_ext *tpa_start1)
-> +{
-> +	struct bnge_sw_rx_bd *cons_rx_buf, *prod_rx_buf;
-> +	struct bnge_tpa_info *tpa_info;
-> +	u16 cons, prod, agg_id;
-> +	struct rx_bd *prod_bd;
-> +	dma_addr_t mapping;
-> +
-> +	agg_id = TPA_START_AGG_ID(tpa_start);
-> +	agg_id = bnge_tpa_alloc_agg_idx(rxr, agg_id);
-> +	if (unlikely(agg_id == INVALID_HW_RING_ID)) {
-> +		netdev_warn(bn->netdev, "Unable to allocate agg ID for ring %d, agg 0x%x\n",
-> +			    rxr->bnapi->index, TPA_START_AGG_ID(tpa_start));
-> +		bnge_sched_reset_rxr(bn, rxr);
-> +		return;
-> +	}
-> +	cons = tpa_start->rx_tpa_start_cmp_opaque;
-> +	prod = rxr->rx_prod;
-> +	cons_rx_buf = &rxr->rx_buf_ring[cons];
-> +	prod_rx_buf = &rxr->rx_buf_ring[RING_RX(bn, prod)];
-> +	tpa_info = &rxr->rx_tpa[agg_id];
-> +
-> +	if (unlikely(cons != rxr->rx_next_cons ||
-> +		     TPA_START_ERROR(tpa_start))) {
-> +		netdev_warn(bn->netdev, "TPA cons %x, expected cons %x, error code %x\n",
-> +			    cons, rxr->rx_next_cons,
-> +			    TPA_START_ERROR_CODE(tpa_start1));
-> +		bnge_sched_reset_rxr(bn, rxr);
-> +		return;
-                ^^^^^^
-
-When this error path is taken, bnge_tpa_alloc_agg_idx() has already set
-a bit in map->agg_idx_bmap but there is no corresponding call to
-bnge_free_agg_idx(). Will this leak the TPA index, eventually
-exhausting the available indices and causing subsequent TPA_START
-events to fail?
-
-> +	}
-
-[ ... ]
-
-> +static void bnge_tpa_agg(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
-> +			 struct rx_agg_cmp *rx_agg)
-> +{
-> +	u16 agg_id = TPA_AGG_AGG_ID(rx_agg);
-> +	struct bnge_tpa_info *tpa_info;
-> +
-> +	agg_id = bnge_lookup_agg_idx(rxr, agg_id);
-> +	tpa_info = &rxr->rx_tpa[agg_id];
-
-If bnge_lookup_agg_idx() returns a garbage value due to out-of-bounds
-read, does this risk accessing invalid memory here as well?
-
-> +
-> +	tpa_info->agg_arr[tpa_info->agg_count++] = *rx_agg;
-> +}
+-- 
+pw-bot: cr
 
