@@ -1,78 +1,122 @@
-Return-Path: <netdev+bounces-251183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32F4D3B3C6
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:18:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 557ACD3B35C
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E8EC23138C34
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:45:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 912DE31079BF
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 16:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526B5329E49;
-	Mon, 19 Jan 2026 16:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341492E888A;
+	Mon, 19 Jan 2026 16:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNdag6Q4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LlvqXKJa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F33B2DC333;
-	Mon, 19 Jan 2026 16:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119FF2C3252
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 16:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768840681; cv=none; b=pUY+9GKJZQwAaaGfDFPgfssKiZZQsX7+L2RwI0HcGXdOuKYKYuo/2DhT3AOdh27B4YKEJw5qtcJDtr609fIQQWhlBeb0otXTKeu3FPlphuU1UqpYnWYAg+Zf2NPZbf4E5gOoIl11XVnkLKrBHJJFRZmGaTloH8K1m1L4cxE+cxU=
+	t=1768840801; cv=none; b=dqW+zc1OqHvVSDjLrHW+It/PtrfR4mEwQMTVMnVhlwOewHLszBJ7+jWoDDYpX93htQB6PfcKe2HmmfyYk4k5wZ5UTkNU34m1y6L9Rv05cIvYgZk3A5ZH4B3+LOyFMrAwr/n+n0OVPGEMnIOzdrDTgKPSBq36/T4RiF91zz+Coh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768840681; c=relaxed/simple;
-	bh=6/bsTBTtsVmOU6fHbUlSb+w0De5KxZ7QdY7r++zX1go=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RpFqP6KMzvpP1IARboTAD+NzISHYxzAMVYbuQNxA8GJTgDwgwGl/BPZQi1hzHARSD9HI2FviKiQapQ9kwAURkNVXZhQIooesE/gPz9RWqGtVljfAj3nGa06yXO4zXwgs/JLfGxmNL0ba2IAOykbKaIIHqkq71umKLXescuWUAUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNdag6Q4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E91B1C116C6;
-	Mon, 19 Jan 2026 16:37:59 +0000 (UTC)
+	s=arc-20240116; t=1768840801; c=relaxed/simple;
+	bh=FwA00Qj6SIpCup/e+CsmfjGU8+jsNtiuUTx7m643M80=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jBEovl/pysHwqpVcZ6ucv0AbP0ft3ocBrRTSamdoKVZABsspJGXg10hjTsKzAtW39I9eHgnqjfj20JFtM7QgPIOer9n6tgRJDOcZrXh1R9ncKCZkTIuLVfmgSqdBjPbu+m0ZY/HakUWkGtFCYIUZX4g9hk+wI+J5aLAA5I4VKcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LlvqXKJa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F8DCC116C6;
+	Mon, 19 Jan 2026 16:39:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768840680;
-	bh=6/bsTBTtsVmOU6fHbUlSb+w0De5KxZ7QdY7r++zX1go=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bNdag6Q4SY66xfpb38F01mNNzPt9osUxYd48ITeT8r6zuzEARF4yCoxZiugJmpzQF
-	 cTm4BFwMnjtidVppkvOh3eYrWcLcsa5Wbt9u0myBRaY8uuNirAkkc1znxXjKMZu+0v
-	 6tFUTT+iaI6oBx4qoE1EJWXXukBkNgppfki2zJj2wCcaCdgx+uiG2pIaqh/BsYWHpe
-	 o8hC5RVNuosVlSHYR1IHaj6Yngx0zUPvSsxtlHm2UZ5JPifdQQvhEO78KeHOe4B490
-	 su0k4HHftLq88LxQ4sF3mtG5UwJ1zo5/CUob4xrDvAeOCjj+0JWGfbi5QQOzuJunkH
-	 GsrBO6ZxRdiOA==
-Date: Mon, 19 Jan 2026 08:37:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Hwang <leon.hwang@linux.dev>
-Cc: netdev@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt
- <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Leon
- Huang Fu <leon.huangfu@shopee.com>
-Subject: Re: [PATCH net-next v4] page_pool: Add page_pool_release_stalled
- tracepoint
-Message-ID: <20260119083759.5deeaa3c@kernel.org>
-In-Reply-To: <20260119102119.176211-1-leon.hwang@linux.dev>
-References: <20260119102119.176211-1-leon.hwang@linux.dev>
+	s=k20201202; t=1768840800;
+	bh=FwA00Qj6SIpCup/e+CsmfjGU8+jsNtiuUTx7m643M80=;
+	h=From:Date:Subject:To:Cc:From;
+	b=LlvqXKJa9rTI3wtjTwnpulp7vZyoqwvueGyoXUZvg2L7MF0rwbnMEIeVbP+rGwmzv
+	 5OKZyqpYGKnq3dDC0n60AyJroZ1YODX9+bp/Tg5zWN34SzLUdIrUodXoplJIOMZD7A
+	 54BC6KeVDHArMUPxN3NEgMPgWmcXK5TNHnryRHnC0zPhE7X2sQQ27R/SZQ/s8FWtfO
+	 50ighej7YFkBBMZojvLXKrZ3pIl6y+xq7DgSw8xvRgfxb9IM8GTyJJv0rEvyL/fzsV
+	 dSt3sH1gSytIybi/kNYPdJjUmkerUQxrXddmnwSAl/PkcAqo0koudZMrNL2Oe7Xyiz
+	 wmtDL30gs/sdA==
+From: Simon Horman <horms@kernel.org>
+Date: Mon, 19 Jan 2026 16:39:37 +0000
+Subject: [PATCH net-next] octeontx2-pf: Remove unnecessary bounds check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260119-oob-v1-1-a4147e75e770@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEhebmkC/x3MSwqAIBRG4a3IHSeoA8G2Eg16/NadaKiEIO49a
+ fjB4TTKSIxMs2iU8HLmGAb0JOi4t3BB8jlMRhmrtHYyxl0C1sMd3p7G0yifBM/1vywUUGRALbT
+ 2/gHfyFdRXwAAAA==
+X-Change-ID: 20260119-oob-ee6fe9cf6d2f
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>, 
+ Geetha sowjanya <gakula@marvell.com>, 
+ Subbaraya Sundeep <sbhatta@marvell.com>, 
+ Hariprasad Kelam <hkelam@marvell.com>, 
+ Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-On Mon, 19 Jan 2026 18:21:19 +0800 Leon Hwang wrote:
-> Introduce a new tracepoint to track stalled page pool releases,
-> providing better observability for page pool lifecycle issues.
+active_fec is a 2-bit unsigned field, and thus can only have the values
+0-3. So checking that it is less than 4 is unnecessary.
 
-Sorry, I really want you to answer the questions from the last
-paragraph of:
+Simplify the code by dropping this check.
 
- https://lore.kernel.org/netdev/20260104084347.5de3a537@kernel.org/
--- 
-pw-bot: cr
+As it no longer fits well where it is, move FEC_MAX_INDEX to towards the
+top of the file. And add the prefix OXT2.  I believe this is more
+idiomatic.
+
+Flagged by Smatch as:
+  ...//otx2_ethtool.c:1024 otx2_get_fecparam() warn: always true condition '(pfvf->linfo.fec < 4) => (0-3 < 4)'
+
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index 8918be3ce45e9ae2e1f2fbc6396df0ab6c85bc22..a0340f3422bf90af524f682fc1fbe211d64c129c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -66,6 +66,8 @@ static const struct otx2_stat otx2_queue_stats[] = {
+ 	{ "frames", 1 },
+ };
+ 
++#define OTX2_FEC_MAX_INDEX 4
++
+ static const unsigned int otx2_n_dev_stats = ARRAY_SIZE(otx2_dev_stats);
+ static const unsigned int otx2_n_drv_stats = ARRAY_SIZE(otx2_drv_stats);
+ static const unsigned int otx2_n_queue_stats = ARRAY_SIZE(otx2_queue_stats);
+@@ -1031,15 +1033,14 @@ static int otx2_get_fecparam(struct net_device *netdev,
+ 		ETHTOOL_FEC_BASER,
+ 		ETHTOOL_FEC_RS,
+ 		ETHTOOL_FEC_BASER | ETHTOOL_FEC_RS};
+-#define FEC_MAX_INDEX 4
+-	if (pfvf->linfo.fec < FEC_MAX_INDEX)
+-		fecparam->active_fec = fec[pfvf->linfo.fec];
++
++	fecparam->active_fec = fec[pfvf->linfo.fec];
+ 
+ 	rsp = otx2_get_fwdata(pfvf);
+ 	if (IS_ERR(rsp))
+ 		return PTR_ERR(rsp);
+ 
+-	if (rsp->fwdata.supported_fec < FEC_MAX_INDEX) {
++	if (rsp->fwdata.supported_fec < OTX2_FEC_MAX_INDEX) {
+ 		if (!rsp->fwdata.supported_fec)
+ 			fecparam->fec = ETHTOOL_FEC_NONE;
+ 		else
+
+
+
 
