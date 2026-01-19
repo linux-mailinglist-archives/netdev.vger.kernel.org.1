@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-251225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7965D3B56B
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:20:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B05D3B56E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 19:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CCB8B301D320
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:20:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B2AE300E405
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 18:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C56531A54E;
-	Mon, 19 Jan 2026 18:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A03366DDC;
+	Mon, 19 Jan 2026 18:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aArkZcxb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGhseh83"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795C22C11F0;
-	Mon, 19 Jan 2026 18:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BCC3644DA;
+	Mon, 19 Jan 2026 18:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768846816; cv=none; b=BKLCDMOaJJwORXMxea4dKeCsWXX0EYM8AHcvnHREiwUaEkMj8lJtsuQ12ZCJYz9pVc1XovXPJCpLAwDLBNl+f34LUddM4NjZQxcsHvYI2BAC0G3CWwRJ5Wkfnkt/5UO00OquJmGKbJapIj0gbl9wEvqjlP878CBNxbD0SoPZiL4=
+	t=1768846818; cv=none; b=C+OcIUKuO+MM+nLpNBLQM0dbCDRC++G5hDlg/EBorMZd/a8hZP3Pd+aotovcq8dv6/DBpG5BCehLh7h3o9r4jT80KMhfn8fNDLFvcVlFiM0Rq3+8EkMtxfhKZM4hjHeuFV9YQRqJ0ZEN4dr/YzKuFcKhdodgyG7cUhWWEy0lA6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768846816; c=relaxed/simple;
-	bh=IiA6fpt9sS6XEZzDCR7dYFKgTG2n75DyD0GjRxVt89E=;
+	s=arc-20240116; t=1768846818; c=relaxed/simple;
+	bh=KL9gjHn4r0yJVDgVRuRcfSxW2l2bnCFvqscBEwQO6j8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LbGZi2wLtatNg4T4A7L2Wq8pojWty8osN2AMHzX1zTqYCMq3tK1e7fKM0L/x5GD+VuaHepNfbDahVBE/nwyrYQqvCxb9kwMSE/kjRHxLxQXF/A8MbnuZG/9zrOSN/I+hxCNvOUG/fGJcGo0JcQBpyul3sg/8nVdHE63j+BNDgTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aArkZcxb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A92EC116C6;
-	Mon, 19 Jan 2026 18:20:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=i7jG3P04tPWBO79SNWqaXA/3HdsCdWeYDKF9IP2szqhG2YG1e0o8hjvoj9K69j+HnFxp/pV+/zszfOt+wB6qX6B46S3PjBSiAQ09+pf8zabGMXhz5TrDwLFWYWgmC+8AGwRmO6z9O+Qqjpu8j2MGV4vmvcGPutUnoP31ovVcV70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGhseh83; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 926F9C116C6;
+	Mon, 19 Jan 2026 18:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768846816;
-	bh=IiA6fpt9sS6XEZzDCR7dYFKgTG2n75DyD0GjRxVt89E=;
+	s=k20201202; t=1768846817;
+	bh=KL9gjHn4r0yJVDgVRuRcfSxW2l2bnCFvqscBEwQO6j8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aArkZcxbHSsEnLeu4d9RaBlGtrORuAfuOf5tLuPx8hkzBA/iTN8bjkzlFlT+lH/1J
-	 iCuaIWWuXMnpccsWW7G7oExlbhjtj+2Gkfbebm6eKM0kQ6aUoUHzmxqkc4dh3g6Vmw
-	 QGDWrfRa7aAGDtRpUaH9QfemkukHWGlpP8y1YqbZN4zyAIn428A6BwCyaartevof0y
-	 ljMXWSpM7d4CmaWpUDajuVLCnEkwTtOhnkKHa/F9pRLvXViNxWGVM52+O0aGuXT2JD
-	 F5ITkL+KJVK6khT1JTG6BMuJD8Ovx0kHnu6wM4O37vyzBRaeE0TKqEnVTGXoK3OTmC
-	 CPkxGEKiYS0Ww==
+	b=hGhseh83fSagWmBl5Uc56dl6nMvkz3tSghS1cM4YCKIn4MjglBfMSN4ImiZarBzU4
+	 ugFH/CfZ7GnKZ5S7SLnurGWEVHPgHqqulv1UQtSMUngmlkNnmB220Gt+qVYDszhbfN
+	 dUP4wsSmAkiOy0o9MW7HfWRgm34p62oro+pTCv/6cVjrFTLiveG1dwbmRKlJL6M8D5
+	 DR94mARI6t6AgscUvu4tJpoUOapnTQdGsB0qiwc3RFw4j24ksMB8diOzBMxfCaq6Qv
+	 GbCUAnhys1dleRDYeJXwCWwy/+U/hqQTa0P5a03+3mSzNvUpREiPlNFgXby9e25Gup
+	 0d3+zfZdfI8lw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7C0A63806905;
-	Mon, 19 Jan 2026 18:20:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B8EBA3806905;
+	Mon, 19 Jan 2026 18:20:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,42 +50,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/2] dsa: mxl-gsw1xx: Support R(G)MII slew
- rate
- configuration
+Subject: Re: [PATCH net-next v2] selftests: net: csum: Fix printk format in
+ recv_get_packet_csum_status()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176884681403.87873.4349909262577129629.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Jan 2026 18:20:14 +0000
-References: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
-In-Reply-To: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
-To: A. Sverdlin <alexander.sverdlin@siemens.com>
-Cc: netdev@vger.kernel.org, hauke@hauke-m.de, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- daniel@makrotopia.org
+ <176884681553.87873.17149819008459175901.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 18:20:15 +0000
+References: 
+ <8b69b40826553c1dd500d9d25e45883744f3f348.1768556791.git.chleroy@kernel.org>
+In-Reply-To: 
+ <8b69b40826553c1dd500d9d25e45883744f3f348.1768556791.git.chleroy@kernel.org>
+To: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 14 Jan 2026 11:45:02 +0100 you wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+On Fri, 16 Jan 2026 10:48:55 +0100 you wrote:
+> Following warning is encountered when building selftests on powerpc/32.
 > 
-> Maxlinear GSW1xx switches offer slew rate configuration bits for R(G)MII
-> interface. The default state of the configuration bits is "normal", while
-> "slow" can be used to reduce the radiated emissions. Add the support for
-> the latter option into the driver as well as the new DT bindings.
+>   CC       csum
+> csum.c: In function 'recv_get_packet_csum_status':
+> csum.c:710:50: warning: format '%lu' expects argument of type 'long unsigned int', but argument 4 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
+>   710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+>       |                                                ~~^
+>       |                                                  |
+>       |                                                  long unsigned int
+>       |                                                %u
+>   711 |                               cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
+>       |                               ~~~~~~~~~~~~
+>       |                                 |
+>       |                                 size_t {aka unsigned int}
+> csum.c:710:63: warning: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'unsigned int' [-Wformat=]
+>   710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
+>       |                                                             ~~^
+>       |                                                               |
+>       |                                                               long unsigned int
+>       |                                                             %u
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v5,1/2] dt-bindings: net: dsa: lantiq,gswip: add MaxLinear R(G)MII slew rate
-    https://git.kernel.org/netdev/net-next/c/4cc265663da5
-  - [net-next,v5,2/2] net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
-    https://git.kernel.org/netdev/net-next/c/dbf24ab58fec
+  - [net-next,v2] selftests: net: csum: Fix printk format in recv_get_packet_csum_status()
+    https://git.kernel.org/netdev/net-next/c/d321d505edb6
 
 You are awesome, thank you!
 -- 
