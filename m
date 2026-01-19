@@ -1,148 +1,124 @@
-Return-Path: <netdev+bounces-250986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-250988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB393D39F25
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:58:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DEFCD39F3A
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 08:01:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3DFB3012954
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 06:58:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D09143001618
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 07:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A9E28AB0B;
-	Mon, 19 Jan 2026 06:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8XuBhCj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE362757EA;
+	Mon, 19 Jan 2026 07:01:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.77.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9512728850C
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 06:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36291D5178;
+	Mon, 19 Jan 2026 07:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.77.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768805922; cv=none; b=T9GbHJfLNvI9ce5VZghrf1MpOfZ+wk4v/gpjdpKDRyhzeK9K7qv0bW+pZGGBJRMBC8Ldmt6zQ9AcDtbt0LnFuBa8jEG7Wn1/rPWDju1ZAbjV+IVfsnHr6JT+sAjGPd3SnmnkCNWmBFxr7kaTxOTtYO2kiO4PvPrZhbrDaKl0N5w=
+	t=1768806095; cv=none; b=XwbhKGAHwPbAM9W+eDc9HW+Xf7jqV8RQ3Z8YZaMNlqctr7xVd3g8KcNwusgdyC2mm521cRM0lzDPD7rs7M1WnFCfzlliku0XD6yZXHmxa2CaSP9v8MjiVx9XqdNoIbUHFaXhHMgMRtdl/B7qn5YXS9e+NCsb+vkhJigtlDEpeuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768805922; c=relaxed/simple;
-	bh=0BwQeahUPD8CqR4tKlGaMTqzMmoD49vM7xWLtA81blY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=obZ8ITA0kSGMAvTJi0Fd2IbMesIi5I4MJHRyhd2EpvKQhxw+sM7HoGaIZe1mfKKbmEeLR2seJEXhwDH21Qg3wSq7rswIer88MD4hxUMeKwDlb/jrziZ21Jf5bRE6PCAFvqslkNKPD9F8Uo/1Nw1es3x5kleaUaNr2GRXjPnGtSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8XuBhCj; arc=none smtp.client-ip=209.85.128.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-793fdbb8d3aso157797b3.3
-        for <netdev@vger.kernel.org>; Sun, 18 Jan 2026 22:58:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768805919; x=1769410719; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VixfVNO0CFNlNWWSbG+RCuPGrtUhPs3GIPuSoRoHegU=;
-        b=h8XuBhCj/lG9L0u1QVjZu0hun0KXRexV1eSfZobfZequE+rGc3Hch5oc/ksklb/CD7
-         YSyHsTnZ3DKXAEhYCL3W71BXpSJv2BzvIyUsEq84V5HbailQp7m7M3Hhp1XuBllqy7Qp
-         VyGtNTDI4B9r7BLOZp6AV50yaeehhCAe9+DsBMoKbmBkcybG0uUNwQesSSYgV3IcOHOS
-         Es9pOO/SFaBtg/EB1g+WzPazU8QV0rlYtp1I2EXGLyoe+ZJMWozHuGQ7eQS/tAkew8bK
-         QeqgamXKiTYuaRuHt1fQjY4fzmE4FhK7UznoCI/3yLPGRUaJZtPl0g9SNganN8CZexiZ
-         otrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768805919; x=1769410719;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VixfVNO0CFNlNWWSbG+RCuPGrtUhPs3GIPuSoRoHegU=;
-        b=raIp58b30gZh3olIbzqEE/c+FPDTlqZwQKyPlxkr0WdYkMWAgRCMPHXu4jdmOpsrTS
-         A6AuRICH0fQ6+XFgskB2Jneh/fEMgc9a/gcciOFHkYHEPfKcGac38/Gs3jjOZujkwQE5
-         +bKCUFLaiJT7qu/GCr7AgjD5vkuqEKYDryW3ykBazywbjzMXUELbXoYPtC5QFzFs4vFm
-         xqOxwmsrHRA8GHWUXsqan1qML4w+KPS+cD6i4emvqk5vQWoXUvI5HN60uHQjMfRS1lZ9
-         bMZUkVKRYRk7qW70L+Qmz3+pfEswpu6GTEsxhk+mt+NsmWBksXiHSFpkQS/sMfDM7iZd
-         OBNg==
-X-Forwarded-Encrypted: i=1; AJvYcCUj3jWui9PjE3LEKR9yqCBgjhHdAgNgWEglMJpr2TN0e5mZG8fYGHCIMPgGaMTjWvyb+NfiCKQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7TaSNhibV1fIGlxhCXVrBUhL5FAxDixdaJ6yAGU3T3IRnGS9s
-	LMXyn0C9JRwnR7Xl5SZRkuZL26aMUuoIS7OsPi/WHkXNKyLzDMMXZ+1+8V0B2Iu1XelEk2uOuCC
-	VqJaphtLaBQfjX4Xjl//yePY9xD84BKo=
-X-Gm-Gg: AZuq6aJnyDF8UEJz6D8atqPF9zbh3ndrGBKsG6rZWFw9gGvCnJcidjqezwc/8LASCBE
-	QUzxX/KvT7pIObhLr0WULHXNTk2ucvXHyO0rlAW/HKEg8ucYFhWOSY0jJXzMBIaXnQnZE4W93ax
-	wRsOrsdHssliGDwzoP9F05f1B8na3snJ+ql/MdxLKlp7QhpE4OVnoAkzVdt4DUm6AnxPdwNHw4C
-	A4jVjU45I756Yghi1+tlh3nvUWr3WMX1XNYPlp9hm2xlJRbfBMVVFRy7GvqYUzf8oz7J5miYFzD
-	Ynikjb/7vZl/fhA=
-X-Received: by 2002:a05:690c:d8c:b0:78f:a544:c45d with SMTP id
- 00721157ae682-793c52b199bmr77213547b3.20.1768805919615; Sun, 18 Jan 2026
- 22:58:39 -0800 (PST)
+	s=arc-20240116; t=1768806095; c=relaxed/simple;
+	bh=p++eGDU18qNaDHKlm+MfGwZRNnRdFvBnX9YwVUnfVVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W1C24HLuURLEuFV2mo4iCqOCHwoauMzNOnBOg9H2ykrngTZFQ1oAZ/xildfIa0vZ1bAwMq2fOZDXespQ+RBSCkTsh7dIPnXYIFsslFUkxLQaod4I2VcHfMkLe8BwTNm3sNZx2HJ4+pJXYegZHW4rXAmZOPHOrr7DVvFaRonpieo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.77.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz21t1768806008t6c87112f
+X-QQ-Originating-IP: mIAif3bZUK1yQVuig9ts5P1vjtF3dD+EPNao51SynRk=
+Received: from w-MS-7E16.trustnetic.com ( [125.120.182.22])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 19 Jan 2026 15:00:02 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12972063070728144324
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: txgbe: remove the redundant data return in SW-FW mailbox
+Date: Mon, 19 Jan 2026 14:59:35 +0800
+Message-ID: <2914AB0BC6158DDA+20260119065935.6015-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260114025622.24348-1-insyelu@gmail.com> <3501a6e902654554b61ab5cd89dcb0dd@realtek.com>
- <CAAPueM4XheTsmb6xd3w5A3zoec-z3ewq=uNpA8tegFbtFWCfaA@mail.gmail.com>
- <1b498052994c4ed48de45b5af9a490b6@realtek.com> <CAAPueM65Y4zEb4UidMR-6UtCZVWYs+A7cHzYbBgJMmAZ2iLy5Q@mail.gmail.com>
- <f3fe05ea76794cd09774cd69e85623d8@realtek.com> <CAAPueM57HHjvyCtBf5TEy2rn6+1ab7_aeSpJ0Kv4xUYt+SfFtg@mail.gmail.com>
- <ae7e8fc22fcf415d9eb5e4d36ed74231@realtek.com>
-In-Reply-To: <ae7e8fc22fcf415d9eb5e4d36ed74231@realtek.com>
-From: lu lu <insyelu@gmail.com>
-Date: Mon, 19 Jan 2026 14:58:27 +0800
-X-Gm-Features: AZwV_Qj0XvqXEOCiPSfKd8c0lFcU4MlofMkQbn7Xgg8yWggEh_lv825eXz0ujMc
-Message-ID: <CAAPueM6_GQLcqz+xxKVDOaUZZrDNOnYB_tQ2gaxrUKnDQSZ9cg@mail.gmail.com>
-Subject: Re: [PATCH] net: usb: r8152: fix transmit queue timeout
-To: Hayes Wang <hayeswang@realtek.com>
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>, 
-	nic_swsd <nic_swsd@realtek.com>, "tiwai@suse.de" <tiwai@suse.de>, 
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MgQMqdBY7dCn8xClDGMHEXA/3EE0/rkYRG7jmCLIKclwILTm86POhslo
+	9IfDlnCb1kHvHkH586egi/ZLFL+WTFRFi2T3PN3Akmyt43RqaLvZ70D0IQuY3xr6F3k8TGb
+	XsqJBJWbWa4ALDWXvLKwL05AH1hldANs8MwGHwbR49JGDeYiMowpRGnMdacKeRg4DDUKpl+
+	ogeFRVT93olJBbhuVq3pD0BOvrhVWKU+PF3aIqUMPRIgHTdNfpWYjg1n3A2PiuYLMwfYmXT
+	SbpYMGTSHYdXCNbwK5PskMSi0+680YQcZqTGV3rW+paG1Xou2tY5hGZsZqaiNjXfX47k8JV
+	fXdSwulvphJtkkEiYmC5/ChyRD/0V1/0qS/bazHlv6uXKDZmI9bZZlEUNUwIihuFpqO77cW
+	QGo/2xIPNTzdxSa2BhF/am+ZXQLgIGcCSHKv9kVMLq5fXXYzU8Obph68bQYDgNxF1ZOEPIW
+	6wzRBVOKd1/R/8rUGU7ElXDi6RmBNNwGuKhogDVCZbPbhbPzXwSL7DIrsoHB71/xBO7ZB6Z
+	wVkctOlB6P9v9PIO8LEjUng5SBIxq1syZdmK0YUqWxRiHEivg+3RC2hcdMVTUd8v7ffWEvn
+	uf5AN9dGqKBE8OLiUSmJ/z0897s/7yVXwmhXXMBgbhKeMOHWeBLY7iM7c1Dgi7X1YGxOIAz
+	cyTeIiJWbeBu/SzQ7PO5QYFv5SLPRu6wa1YZT0Yab4JLbOlxwzKuWnvjwhq4mRwEGvhmISx
+	2/J3SgkIhOkSLblG2WzXnyHdseg/Ib0dWy/141bzW8cOfpSCL1Jayz9vDcZI5ikiyUds8R4
+	55ry+S1yZbQYlDUcVAtI3/uINwxrNQxsBr9ZL9pYl59bXyLlljaoQNcqY5u04pPYBXzSvRB
+	rou1s05YdvGrah+9OF4uOPiMmYC09G71AoPu+LHcPDuy/DnOcKKUVvlRXNtMv2NZl0qlgn1
+	wJ0bnlrfYXp0uLrjUkBQLf7CjsH+NBCSE5YcwRCGzmnAtD/cuNutVkQMCFsBPY1wrc4TWyK
+	xZPWt3osoPiA1q01VN1hHexaGMu4QB7qJKSbRcf+qLhUIlmX1p79WHPnAQyE9R4gwW08Pa5
+	ZMSpBcX83NU7aGGd++mZMeoNafrA5NL/ar+4rwErGH6
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
 
-Hayes Wang <hayeswang@realtek.com> =E4=BA=8E2026=E5=B9=B41=E6=9C=8819=E6=97=
-=A5=E5=91=A8=E4=B8=80 10:51=E5=86=99=E9=81=93=EF=BC=9A
->
-> Original Message-----
-> > From: lu lu <insyelu@gmail.com>
-> [...]
-> > if (netif_queue_stopped(tp->netdev)) {
-> >     if (skb_queue_len(&tp->tx_queue) < tp->tx_qlen)
-> >         netif_wake_queue(tp->netdev);
-> >     else
-> >         netif_trans_update(tp->netdev);
-> > }
-> > The first time xmit stops the transmit queue, the queue is not full,
-> > and it is successfully woken up afterward =E2=80=94 OK.
-> > The second time xmit stops the transmit queue, the network watchdog
-> > times out immediately because the transmit timestamp was not refreshed
-> > when the queue was last resumed =E2=80=94 FAIL.
-> > This scenario is logically possible.
->
-> This situation should not happen, because trans_start is also updated whe=
-n the driver stops the TX queue.
->
-> https://elixir.bootlin.com/linux/v6.18.6/source/include/linux/netdevice.h=
-#L3629
->
-> A TX timeout occurs only if the TX queue has been stopped for longer than=
- RTL8152_TX_TIMEOUT.
-> It should not occur immediately when the driver stops the TX queue.
-Thank you for the correction! Upon review, I confirmed that
-netif_tx_stop_queue() already updates trans_start,
-so the timeout scenario I originally envisioned does not actually occur.
+For these two firmware mailbox commands, in txgbe_test_hostif() and
+txgbe_set_phy_link_hostif(), there is no need to read data from the
+buffer.
 
->
-> Therefore, what needs to be done is to update the timestamp when the TX q=
-ueue is stopped.
-> Updating trans_start while the TX queue is not stopped is useless.
-if (netif_queue_stopped(tp->netdev)) {
-    if (skb_queue_len(&tp->tx_queue) < tp->tx_qlen)
-        netif_wake_queue(tp->netdev);
-    else
-        netif_trans_update(tp->netdev);
-}
-This change continuously updates the trans_start value, even when the
-TX queue has been stopped and its length exceeds the threshold.
-This may prevent the watchdog timer from ever timing out, thereby
-masking potential transmission stall issues.
+Under the current setting, OEM firmware will cause the driver to fail to
+probe. Because OEM firmware returns more link information, with a larger
+OEM structure txgbe_hic_ephy_getlink. However, the current driver does
+not support the OEM function. So just fix it in the way that does not
+involve reading the returned data.
 
-The timestamp should be updated only upon successful URB submission to
-accurately reflect that the transport layer is still operational.
+Fixes: d84a3ff9aae8 ("net: txgbe: Restrict the use of mismatched FW versions")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Best regards,
-insyelu
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+index 62d7f47d4f8d..f0514251d4f3 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+@@ -70,7 +70,7 @@ int txgbe_test_hostif(struct wx *wx)
+ 	buffer.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
+ 
+ 	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
+-					WX_HI_COMMAND_TIMEOUT, true);
++					 WX_HI_COMMAND_TIMEOUT, false);
+ }
+ 
+ int txgbe_read_eeprom_hostif(struct wx *wx,
+@@ -148,7 +148,7 @@ static int txgbe_set_phy_link_hostif(struct wx *wx, int speed, int autoneg, int
+ 	buffer.duplex = duplex;
+ 
+ 	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
+-					 WX_HI_COMMAND_TIMEOUT, true);
++					 WX_HI_COMMAND_TIMEOUT, false);
+ }
+ 
+ static void txgbe_get_link_capabilities(struct wx *wx, int *speed,
+-- 
+2.48.1
+
 
