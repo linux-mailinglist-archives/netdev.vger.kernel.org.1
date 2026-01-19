@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-251123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FA5D3ABBB
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:24:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80FDD3ABC4
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 57CE730101CA
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:23:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 350603007C24
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E95937F0FE;
-	Mon, 19 Jan 2026 14:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2053816E3;
+	Mon, 19 Jan 2026 14:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fd7gEMKh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DF99WfJj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB9D37F8BB;
-	Mon, 19 Jan 2026 14:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FC53815E5;
+	Mon, 19 Jan 2026 14:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768832576; cv=none; b=Rv35RJMHAsKKkinp6JvWQTFcCAh/YiVApV9FYY9Im60TtisyL+wEmB0HUSSsGSF//gF3z1BmfVFXz38L5xfxdzqmiDp4OVv/gzq05NOAygidicfvm2ci55aIlXwCTphbl/3clmhwm4p8nzogw41Fh4GO3FRKECxyeAMwScSkNxY=
+	t=1768832577; cv=none; b=OaBTCJZZ9reM5jAM/yBzDQ6PufPhZsR++IWJ5qsUi7eidS+/IRYz2unBxm+mJbCZr94LxeYgwe2sy1MsMTrScdA5lU2wyZC2Np+59Q5ldnLNPa2zoo1AvCExefAqWrO3fHbls+1heAO5uId84KTMxKghPsGQT6cTbD0Hr2cLTPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768832576; c=relaxed/simple;
-	bh=ECIb465qm6AbJk6DuW36tEygSGmQ3RAq9oydfNAzbG4=;
+	s=arc-20240116; t=1768832577; c=relaxed/simple;
+	bh=MyIAeS1uUeVDWCzjzrQV+J8OKiXUEyIqbdIfDImm2fE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FALzMTbm0Y6GFxvXCVd60WwbWbT5VYg9wV4ULqSiTS0jjaO3nEvS91Qdki3cjFixy8W9Brsr2XDza3/7pecP4/lbLzUa2ADQ+KEwyNjB2y0y6KbbU4JncGNdUrUbFzZ7/4BxEbWyKOKzlZ3vU7egjJzqiYDAxVPX7lMxH+y4CxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fd7gEMKh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9486C116C6;
-	Mon, 19 Jan 2026 14:22:55 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bgvmYkQmUcafP5+HWCWX10j8p8AHCmoSEhYHYN9DlES7nQFc5z8fB68ofIEH1RXGEWftcerprfO7M61rWx0n94QTtpGnjqZY0hNpYrK1JWg41kfgKGqCKu281r4RzjtSGSA+dzJzWHFRHfG3LxZyMCV+C8Z7e5cqmza6EcHWxcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DF99WfJj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB06C19423;
+	Mon, 19 Jan 2026 14:22:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768832576;
-	bh=ECIb465qm6AbJk6DuW36tEygSGmQ3RAq9oydfNAzbG4=;
+	s=k20201202; t=1768832577;
+	bh=MyIAeS1uUeVDWCzjzrQV+J8OKiXUEyIqbdIfDImm2fE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Fd7gEMKhdgXRtU8KShud49/bCBi0Abx7X2/MKpg4ypjCGNShkZcL8QHh5oG75qSDC
-	 wXMzTV019SMUhnQl1OhtxpffUgtXPAsTZ8xTPcDHW+jf7Xqa9vnQ31iz4dUxz/X6lK
-	 YSPDLh5I2/4W2UnTjPrWXowwsTz63/qrijT7RAh7W9PMpgUyVnAhxXTZdXI0eiIRfc
-	 ooc8wbQ3xP1ENkeiY/NOHB94apZqL5lzLVVp3fn7uZZ2m80eSP712vURGpemZ8z0V8
-	 4QVDbExtfcVoWVjsojmCM5F5wdgHtLtUm2T1yU4JCoyIrl2IqVcvEObShSjFSXa1Jl
-	 03dtp0Y/iqzzQ==
+	b=DF99WfJj41PZ08oCZq8i0jeVELg/RsaO4TZPGbe5D8iPUvsn9ebpL0nJEd2z6YQg8
+	 rFSAy+/U+VoLCs+i/FDxM2tLpez0kbU5xPHOa+OyyL4uiO1VFzDQxLDx3Pk9pY9zba
+	 9SzS2ic90AB90wFYlue3e4Z/GfZ3sZjajRRPRof7T/pkuGaykgzneNf6c+1hoOh7qT
+	 iHUFcZJZ0xnvBhgf/iVa1uQAkqVGMRCi3zaW4hEMH26g/PmrxuNK9TwlDbIBsCI2ry
+	 U8i+Z78Yg91tvp3uGBAfXMiYjwREIbMYIfYCvkVlR9PQemLzEKdjdur/52UQxzzfxS
+	 qkGNXSDvoYlxA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2C803A55FAF;
-	Mon, 19 Jan 2026 14:19:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78A383A55FAF;
+	Mon, 19 Jan 2026 14:19:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,42 +50,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/3] uapi: Use UAPI definitions of INT_MAX and INT_MIN
+Subject: Re: [PATCH net-next] net: ethernet: ti: cpsw_ale: Remove obsolete
+ macros
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176883236571.1426077.1683546457075624017.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Jan 2026 14:19:25 +0000
-References: <20260113-uapi-limits-v2-0-93c20f4b2c1a@linutronix.de>
-In-Reply-To: <20260113-uapi-limits-v2-0-93c20f4b2c1a@linutronix.de>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Cthomas=2Eweissschuh=40linutronix=2Ede=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, andrew@lunn.ch, pablo@netfilter.org,
- kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, arnd@arndb.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+ <176883236709.1426077.4771810536434158261.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Jan 2026 14:19:27 +0000
+References: <20260114144425.3973272-1-stefan.wiehler@nokia.com>
+In-Reply-To: <20260114144425.3973272-1-stefan.wiehler@nokia.com>
+To: Stefan Wiehler <stefan.wiehler@nokia.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, s-vadapalli@ti.com, rogerq@kernel.org,
+ linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 13 Jan 2026 08:44:16 +0100 you wrote:
-> Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
-> dependency on a libc, which UAPI headers should not do.
-> 
-> Introduce and use equivalent UAPI constants.
-> 
-> Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+On Wed, 14 Jan 2026 15:44:25 +0100 you wrote:
+> - ALE_VERSION_MAJOR/MINOR are no longer used following the transition to
+>   regmaps in commit bbfc7e2b9ebe ("net: ethernet: ti: cpsw_ale: use
+>   regfields for ALE registers")
+> - ALE_VERSION_IR3 is unused since entry mask bits are no longer
+>   hardcoded with commit b5d31f294027 ("net: ethernet: ti: ale: optimize
+>   ale entry mask bits configuartion")
+> - ALE_VERSION_IR4 has never been used since its introduction in commit
+>   ca47130a744b ("net: netcp: ale: update to support unknown vlan
+>   controls for NU switch")
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/3] uapi: add INT_MAX and INT_MIN constants
-    https://git.kernel.org/netdev/net-next/c/ca9d74eb5f6a
-  - [v2,2/3] ethtool: uapi: Use UAPI definition of INT_MAX
-    https://git.kernel.org/netdev/net-next/c/a8a11e5237ae
-  - [v2,3/3] netfilter: uapi: Use UAPI definition of INT_MAX and INT_MIN
-    https://git.kernel.org/netdev/net-next/c/0b3877bec78b
+  - [net-next] net: ethernet: ti: cpsw_ale: Remove obsolete macros
+    https://git.kernel.org/netdev/net-next/c/799759e610d3
 
 You are awesome, thank you!
 -- 
