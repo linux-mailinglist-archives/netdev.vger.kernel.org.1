@@ -1,185 +1,179 @@
-Return-Path: <netdev+bounces-251044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34FCBD3A5AE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:50:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE05D3A5D8
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 91EB1300F653
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:50:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2777C300CCCE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 10:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFA03587CF;
-	Mon, 19 Jan 2026 10:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978B933DEF3;
+	Mon, 19 Jan 2026 10:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhIQoHO1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wk1nGg+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586003587A3
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 10:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EE03090E4;
+	Mon, 19 Jan 2026 10:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768819823; cv=none; b=EpJ4OlKcBjsPicoYc2cqXP9bANXrHHuizkQav44fC2I1zVCn7BActoQMvzAeUhICRCQrJJtbc+/60Lu6pjcjIx+qBA+QrFF8mAWpQknywY0Klh0+GnQ8xtB4H1aCMdRqG4j69oeRmpQYeKRw9HwnZaBCxrHoG/wgb/IM3upuS6A=
+	t=1768819945; cv=none; b=es5p1ff6PuPxqt2gfB6E0d9AzUpBfsomsEmvpwku2DAM0A76cyC6NXnB1K/7q1EV0rKZe8qqkLx7p6SsaAao+GCRnPPui5brl6HtW1h0qLt+GgZFVo9L52jnn3nfDwng7ZArlIFVVkr7B2b+aYuPCWxIytWAWIaNB6EpvHhs6dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768819823; c=relaxed/simple;
-	bh=1OdxoGGYasc9V4+/2xWHjGW4ZBzQQu01djJnm8nwOYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oQ3cSY21OJUedRq3azH4FP7BL/WeN9IAIOpTmRRj/NClNlZ+DwW03sRjoMBDYGTTWgLUvYfnsKjfmBSsTnPCChm5qwEXJGwFcgY0idwLz0AM2lZO2nRgfgE87+ShjTguOsbLElxEP/Z29I1XCkQk1WVgfgVqhF8M00fGNaUIzAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZhIQoHO1; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42fb4eeb482so2233894f8f.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 02:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768819820; x=1769424620; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EsYrqDgfDLls2j3U850tzatLT/AOiSnBFqwVPzknSNs=;
-        b=ZhIQoHO1EOdVSYm3LjvlwSa1Ch9JlqpV/n04W2aqVHdG/xD9Ot2YL+0VP30kQ4YPeN
-         LkDBwjtBY2fFgShgQdEXMKsqk4Ym5xIux5VOFfYRbiKgc1lGfEgkdHgXdBJAkwKdhyYv
-         kUIu5304ROLnpj/0MWfDMAxn0mUeLpIdsUTFQZ0O1VC+uVkzZNAuwyQ5iJUx+spzmqGa
-         gfh6DJ3G65wf4nO6FgjkQ46zB4lJ21xz93kwhYQ7Zy2teZKpsDVJOVoh3nZRkTqMYpd9
-         J6t3iVaVcR5mD0Ehw529c5g/oN+tFVMRilkAxAaT7OShhjmB2FvSeYdFz3B4LeJQpnu7
-         voxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768819820; x=1769424620;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EsYrqDgfDLls2j3U850tzatLT/AOiSnBFqwVPzknSNs=;
-        b=dlzgEnPiMg+TFULmRgcZuY060FocDla36tK2/7cLy+uW2cCVLVj0xqMubMjTvKHWAH
-         RlAXAb9J/16A9219OcT66VUBfqnmNTcs0+Jg9rXX4ZtlKyqWOtUUh3JnumRb2tN6gR3o
-         m+dc6EJb5OneEWC3sIQfX04tW3lEz5bg6p1O+TnmY4/QqzkZDifDYMeKD+CvSoetgBAg
-         7wuOuVAxiR+I4rFaD/RpWtBrUUaXuipTMi5rRPBzQAg9qaO8FtwLqKnU63l4VsZuxmk2
-         URC4YHgKMkS5nHgWMLHL03veTdL1mVVvP69p06eVID4+Hyv7H/O7aWQRs6n/uUbuTZ1L
-         dHmw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9LVNYW5srx6DS9YrvJaQtVDAvMLt+b4kwqjBVpT58U4uLD6SpRS+bIBD/mWnUZaW4jfXeDnE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxmvv1skEI+G3ivsst7z6foR6e7sqZmkc59EhXldCjuZ4a4wIWn
-	h7oX+85X3jJ8zHLMwupsYFcxdJ+OQGlLyMIyirhnvbSxzO4IBwACfBP9
-X-Gm-Gg: AZuq6aK1SnwcsUtnRzz6RfyJpIsg5btNMf1qvYHpR0MmLklAFpgOpgVeZxj/l5dKT/X
-	tEn4DFVwKQ0sYh1V3/qQUHiFvusH/BtlG8HHnf1SKTuOzensIfd4m1TtM/i1opeevYj9UAj0N4w
-	KTKzwDcn5O07Hi7GTcTScK1teqorlnrdSll+z/ID/50kkAxUXoqgeqbae6zGy0h//kzmVeBpYle
-	I86WqfOL/1nsgrwIFGec3ejduEf0mLmmoM3ZtZ5Kbamw4xRme53Z4iDtORr19PkcKYTtBKzpUhQ
-	3vTjO+mnnLxT+QT5KdTlCas5ImOuMVa2yXxo5PweiWg+X6xoEZOPgJyLsf12hQkAMICVYqwCAjr
-	8Dzfhk6mHVE9s6skBOCd9Okq3wstGRFJoenGAU/lSQRGIUefUf5XpRyGiFnuUwbTPHKOmIgRY1O
-	NgXzX6rEL4V7f7C07rBOxBnNemkuNXXQkUpZvp8oR2RbmJJY6gZx5P
-X-Received: by 2002:a05:6000:4202:b0:432:a9fb:68f8 with SMTP id ffacd0b85a97d-4356a02643dmr11691111f8f.1.1768819819422;
-        Mon, 19 Jan 2026 02:50:19 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569927007sm22062014f8f.16.2026.01.19.02.50.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 02:50:19 -0800 (PST)
-Date: Mon, 19 Jan 2026 10:50:17 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel
- <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Nicolas Pitre <npitre@baylibre.com>
-Subject: Re: [PATCH] compiler_types: Introduce inline_for_performance
-Message-ID: <20260119105017.262276b5@pumpkin>
-In-Reply-To: <CANn89iJVQe=wedLheJmjZjOTJsWHijT0jZs=iRxKssJZbjAxHw@mail.gmail.com>
-References: <20260118152448.2560414-1-edumazet@google.com>
-	<20260118114724.cb7b7081109e88d4fa3c5836@linux-foundation.org>
-	<20260118225802.5e658c2a@pumpkin>
-	<20260118160125.82f645575f8327651be95070@linux-foundation.org>
-	<20260119093339.024f8d57@pumpkin>
-	<CANn89iJVQe=wedLheJmjZjOTJsWHijT0jZs=iRxKssJZbjAxHw@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1768819945; c=relaxed/simple;
+	bh=KTk7rBsdF55q5dIDdnFErwwiNSSTQc6Ru37W5lcxSpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aGmqQBkoL4LvvEBCurK4S1AZI8HJ7YKMmg8Cgfn2o3JtlCulxWmrGKeD2QgkHUXsJmVXVhCr28eUs82jy/Twg6DeKOAp3+W/Us76Byl32SrmHeQ90fr3Y7wxp4+6okhSM0Btg4yGz13VzjFYxPsLgfmRvsHuIbGYyYer9xn6p24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wk1nGg+b; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jkfog8orQPAtXcrla4R7RaKKejAgfkvHzC7VCvoMVmw=; b=wk1nGg+bvub1hSX+niZ5Zw1nFO
+	DuMBxTDq17WtgjC22tWprZw3Wli6Tn1nWTrX6NzMsr/wuL0WDVXh4VBKMNA8KrZz/la/hkY2c/y8h
+	Iboor2mHlrjdcOW1fen0QTvx86aygSXOpEYw6TnDQnIkxLDi0o9cYiNBhdBGh1w5OyPuohZtP7B16
+	VtgfUV6NjjQbR4KucjRw4HoTZxLmutpd64Z1cRku0oCmxoPilSwjv/v3bqjZn9b6+9uZxa8C/3J+k
+	8jCHpc6CqG6FIMaOFfLIwsmut6cmp8tP/IIz/VOjl+bNPCNiiBehBEdcTq/uSuVU7979jwb5o0OnT
+	cv/7jIoQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42524)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vhmrq-000000004tb-3vX5;
+	Mon, 19 Jan 2026 10:52:19 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vhmrp-000000006Uc-2khF;
+	Mon, 19 Jan 2026 10:52:17 +0000
+Date: Mon, 19 Jan 2026 10:52:17 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC net-next v2 1/2] net: phy: marvell: 88e1111: define
+ gigabit features
+Message-ID: <aW4M4TqdHtEH10U1@shell.armlinux.org.uk>
+References: <20260101-cisco-1g-sfp-phy-features-v2-0-47781d9e7747@solid-run.com>
+ <20260101-cisco-1g-sfp-phy-features-v2-1-47781d9e7747@solid-run.com>
+ <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
+ <aVfOW3y0LTcwQncB@shell.armlinux.org.uk>
+ <c2b6af56-57f7-4658-9e6f-e671be19e300@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c2b6af56-57f7-4658-9e6f-e671be19e300@solid-run.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, 19 Jan 2026 11:25:52 +0100
-Eric Dumazet <edumazet@google.com> wrote:
-
-> On Mon, Jan 19, 2026 at 10:33=E2=80=AFAM David Laight
-> <david.laight.linux@gmail.com> wrote:
+On Mon, Jan 19, 2026 at 08:30:12AM +0000, Josua Mayer wrote:
+> Hi Russell,
+> 
+> Thank you for the extensive feedback!
+> 
+> On 02/01/2026 15:55, Russell King (Oracle) wrote:
+> > On Fri, Jan 02, 2026 at 12:47:06PM +0000, Russell King (Oracle) wrote:
+> >> I do have patches that add phydev->supported_interfaces which are
+> >> populated at probe time to inform phylink which host interface modes
+> >> that the PHY can be reconfigured between - and this overrides the
+> >> linkmode-derivation of that information - it basically becomes:
+> >>
+> >>          phy_interface_and(interfaces, phy->supported_interfaces,
+> >>                            pl->config->supported_interfaces);
+> >>          interface = phylink_choose_sfp_interface(pl, interfaces);
+> >>          if (interface == PHY_INTERFACE_MODE_NA) {
+> >>                  phylink_err(pl, "selection of interface for PHY failed\n");
+> >>                  return -EINVAL;
+> >>          }
+> >>
+> >>          phylink_dbg(pl, "copper SFP: chosen %s interface\n",
+> >>                      phy_modes(interface));
+> >>
+> >>          ret = phylink_attach_phy(pl, phy, interface);
+> >>
+> >> and phylink_attach_phy() will result in the PHY driver's config_init
+> >> being called, configuring the appropriate operating mode for the
+> >> PHY, which can then be used to update phydev->supported as appropriate.
+> >>
+> >> phylink will then look at phydev->supported once the above has
+> >> completed when it will do so in phylink_bringup_phy().
+> >>
+> >> Deriving the host side PHY interface mode from the link modes has
+> >> always been rather sketchy.
+> > These patches can be found at:
 > >
-> > On Sun, 18 Jan 2026 16:01:25 -0800
-> > Andrew Morton <akpm@linux-foundation.org> wrote:
-> > =20
-> > > On Sun, 18 Jan 2026 22:58:02 +0000 David Laight <david.laight.linux@g=
-mail.com> wrote:
-> > > =20
-> > > > > mm/ alone has 74 __always_inlines, none are documented, I don't k=
-now
-> > > > > why they're present, many are probably wrong.
-> > > > >
-> > > > > Shit, uninlining only __get_user_pages_locked does this:
-> > > > >
-> > > > >    text      data     bss     dec     hex filename
-> > > > >  115703     14018      64  129785   1faf9 mm/gup.o
-> > > > >  103866     13058      64  116988   1c8fc mm/gup.o-after =20
-> > > >
-> > > > The next questions are does anything actually run faster (either wa=
-y),
-> > > > and should anything at all be marked 'inline' rather than 'always_i=
-nline'.
-> > > >
-> > > > After all, if you call a function twice (not in a loop) you may
-> > > > want a real function in order to avoid I-cache misses. =20
-> > >
-> > > yup =20
+> > http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
 > >
-> > I had two adjacent strlen() calls in a bit of code, the first was an
-> > array (in a structure) and gcc inlined the 'word at a time' code, the
-> > second was a pointer and it called the library function.
-> > That had to be sub-optimal...
-> > =20
-> > > > But I'm sure there is a lot of code that is 'inline_for_bloat' :-) =
-=20
-> > >
-> > > ooh, can we please have that? =20
+> > See:
 > >
-> > Or 'inline_to_speed_up_benchmark' and the associated 'unroll this loop
-> > because that must make it faster'.
-> > =20
-> > > I do think that every always_inline should be justified and commented,
-> > > but I haven't been energetic about asking for that. =20
+> > net: phylink: use phy interface mode bitmaps for SFP PHYs
+> > net: phy: add supported_interfaces to Aquantia AQR113C
+> > net: phy: add supported_interfaces to marvell10g PHYs
+> > net: phy: add supported_interfaces to marvell PHYs
+> > net: phy: add supported_interfaces to bcm84881
+> > net: phy: add supported_interfaces to phylib
 > >
-> > Apart from the 4-line functions where it is clearly obvious.
-> > Especially since the compiler can still decide to not-inline them
-> > if they are only 'inline'.
-> > =20
-> > > A fun little project would be go through each one, figure out whether
-> > > were good reasons and if not, just remove them and see if anyone
-> > > explains why that was incorrect. =20
+> > The reason I didn't end up pushing them (they're almost six years old)
+> > is because I decided that the host_interfaces approach wasn't a good
+> > idea, and dropped those patches. Marek Behún took my patches for
+> > host_interfaces and they were merged in 2022. I had already junked
+> > the host_interfaces approach.
 > >
-> > It's not just always_inline, a lot of the inline are dubious.
-> > Probably why the networking code doesn't like it. =20
->=20
-> Many __always_inline came because of clang's reluctance to inline
-> small things, even if the resulting code size is bigger and slower.
->=20
-> It is a bit unclear, this seems to happen when callers are 'big
-> enough'. noinstr (callers) functions are also a problem.
->=20
-> Let's take the list_add() call from dev_gro_receive() : clang does not
-> inline it, for some reason.
->=20
-> After adding __always_inline to list_add() and __list_add() we have
-> smaller and more efficient code,
-> for real workloads, not only benchmarks.
+> > The problem is that we now have two ways that PHY drivers configure
+> > their interface mode - one where config_init() decides on its own
+> > based on the host_interfaces supplied to it, and this approach above
+> > where phylink attempts to choose the interface based on what the
+> > PHY and host (and datapath) can support. These two approaches are
+> > mutually incompatible if we get both phylink _and_ the PHY driver
+> > attempting to do the same thing.
+> 
+> All this left me puzzled.
+> 
+> I understand that .features / get_features happens too early
+> and doesn't account for different host interfaces.
+> 
+> Further populating supported bitmask before config_init is wrong
+> at least for this module where supported link-modes are different
+> per host interface.
+> 
+> The marvell10g.c driver which now uses the host_interfaces bitmask
+> is now extending the supported_interfaces bitmask in config_init.
+> Yet I didn't understand what it means.
+> 
+>  From phy.h:
+> 
+>   * @possible_interfaces: bitmap if interface modes that the attached PHY
+>   *             will switch between depending on media speed.
 
-That falls into the '4-line function' category.
-Where s/inline/always_inline/ makes sense.
+Note, I said *supported* not *possible*. They're two different things.
 
-> list_add                                    2212       -   -2212
+The supported mask is the list of interfaces that the PHY has support
+for e.g. 88x3310 can support 10GBASE-R, 5GBASE-R, 2500BASE-X, SGMII,
+USXGMII, and a few others that I can't recall off the top of my head.
+This needs to be known before attaching to the PHY to allow the
+operating mode to be chosen.
 
-How many copies of list_add() is that... clearly a few.
-Generating a real function for a 'static inline' in a header is stupid.
-Pretty much the intent for those is to get them inlined.
+The possible mask is "we've configured it for this operating mode,
+now which of those interfaces will we switch between depending on the
+media"
 
-I'm sure there was a suggestion to make inline mean 'always inline',
-except there are places where it would just be bloat.
+Both are the host side.
 
-	David
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
