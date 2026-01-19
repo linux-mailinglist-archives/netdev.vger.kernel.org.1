@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-251100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D041D3AB16
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:03:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5F3D3AB43
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5A9DF300AC93
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:03:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC7F830A4BDE
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F099D36C587;
-	Mon, 19 Jan 2026 14:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4424C36E47F;
+	Mon, 19 Jan 2026 14:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="McYHLsoU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y9I5nMCn"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEAC36D513;
-	Mon, 19 Jan 2026 14:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235F130FF30;
+	Mon, 19 Jan 2026 14:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768831389; cv=none; b=YZsstVupKqq1JmbNQWp4ZYcrZMhGqigWGo8Svagi4zophJ+JFKouMBg09rCbRbQdC6WoNkwypRmL36Mtw3lDKDLnFhsS9S7PiJtLmhk+7VizhZS3+UpjGcwS0C35qjItctP+9uISFedcIhaGRg3dS18L/WpMiNtuIDZWk7wKzkA=
+	t=1768831485; cv=none; b=rjxEp/OUrMB6/PvRdjx34mqSSl+VOYfQHd3rV1Axgb6heo/0tvG1wph9AqFkFV3m6FlEKg/CDUdE5PHy26oRSqyBkz7rEjPhxqLp2ti043FrLLxm+cr9bLsHfP6P4RqCnWMU9tfn8DPNOUzoxty/y2YlGtP9vR423epMiJjYVsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768831389; c=relaxed/simple;
-	bh=zy7qGyHcgXKTbVBu7KbB87S9Xan5KyuqjsKyQptoqsE=;
+	s=arc-20240116; t=1768831485; c=relaxed/simple;
+	bh=VbSSmsgeCeEqen19Ot1xUCONBpHTnwPjssuuU8Y1I60=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNBRbEOyjdz0wWSfxLBenQl8mmCVHgkvFNiljli4EvUOclaXyPtEUdgoKgzDKc5HInwvAAhSVjPftrc9k/BtkJznPrUbx9V2R+QMxV8mVeYuoUyMsMij0SmAGAcRnmgzf3oYZ7a4oIgW28Rh4iZrZI2Uh7ewu99/mOgp/J2gjbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=McYHLsoU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RVJhMHq8ld88SqHnXA6hXJehvsR4bZGlV03k7YNUTL8=; b=McYHLsoU+BccPO2uVchv/KfFuU
-	uPvI7rOtllIB1vlBKUEzW0QnLBCjnXsR1dzM/Onb9eSEpJnzs0DFF7Q6A4Hq/i5FO7WS+et2clfum
-	qasKMZ3mrVPV91xzmnrLzPsYKRFpzyMS9/4H9y8OK4KATRa/A+yHRVvS9V0N3LLeja2PlCTEWMKpD
-	qO5a5rCM3DJiUlgzhGmbFyddGt6bv5L5xhQS1Z6PQaAWPwMbomEB8fNaTnGSGywyblcOXd7Eh0Xlk
-	CO6pqOHaCOfS+SsCCwKHUYGnPtklqSw7iDO2O3/ZiWhZhfpdU88EopNNElVWC6ZNhaE/qDMVr8iUF
-	y+MlY7Cg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37842)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vhpqT-000000005GR-3aqB;
-	Mon, 19 Jan 2026 14:03:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vhpqS-000000006bq-27WA;
-	Mon, 19 Jan 2026 14:03:04 +0000
-Date: Mon, 19 Jan 2026 14:03:04 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DKnwwh4TtUhU5fDqPvdUTWmwQOvNp8XEfJCq0sHG5eXDM4pOXaEVm6VlIyess02NX95IbvjL2oGIdBck3sSZJ9gJ4x6pUSn2D8Rx/OViUB2zE/CgYAr189WGdrKuViJ3Qey6NubXxfsIvDbBcc9htI9FkzHU4YgL61E7XPmt9nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y9I5nMCn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=T0rl3SMhzSTIAUIp4+rR+1cMtdJOvQXiZGRrtdfINPM=; b=Y9I5nMCnbG8ouhn6DeqAN+7SUT
+	Ekkdoaqk+ZJbli/QK35eSVEF8Dssh8nvRD7e4yWodA2vxW8vmlRYZQI3ckcZNG2XiBBY860rTWJFe
+	tuXBJh6sWjFmoVMXS/cC3Tt7TQrER1bb5X3TNETy0e7Ru4lWKiY6eQudT6yW7TKCDTd4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vhprn-003VE9-KF; Mon, 19 Jan 2026 15:04:27 +0100
+Date: Mon, 19 Jan 2026 15:04:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 2/4] net: phylink: introduce helpers for
- replaying link callbacks
-Message-ID: <aW45mL8EdXPtvwtU@shell.armlinux.org.uk>
-References: <20260119121954.1624535-1-vladimir.oltean@nxp.com>
- <20260119121954.1624535-3-vladimir.oltean@nxp.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+Message-ID: <cd1fd7b4-64a1-4b73-86aa-d3621ed814b4@lunn.ch>
+References: <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
+ <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
+ <aWfdY53PQPcqTpYv@lore-desk>
+ <e8b48d9e-f5ba-400b-8e4a-66ea7608c9ae@lunn.ch>
+ <aWgaHqXylN2eyS5R@lore-desk>
+ <13947d52-b50d-425e-b06d-772242c75153@lunn.ch>
+ <aWoAnwF4JhMshN1H@lore-desk>
+ <aWvMhXIy5Qpniv39@lore-desk>
+ <30f44777-776f-49b1-b2f5-e1918e8052fd@lunn.ch>
+ <aW4QixwAJHaHWBBc@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,43 +75,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260119121954.1624535-3-vladimir.oltean@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <aW4QixwAJHaHWBBc@lore-desk>
 
-On Mon, Jan 19, 2026 at 02:19:52PM +0200, Vladimir Oltean wrote:
-> Some drivers of MAC + tightly integrated PCS (example: SJA1105 + XPCS
-> covered by same reset domain) need to perform resets at runtime.
+> > So is the firmware name a property of the board?
 > 
-> The reset is triggered by the MAC driver, and it needs to restore its
-> and the PCS' registers, all invisible to phylink.
-> 
-> However, there is a desire to simplify the API through which the MAC and
-> the PCS interact, so this becomes challenging.
-> 
-> Phylink holds all the necessary state to help with this operation, and
-> can offer two helpers which walk the MAC and PCS drivers again through
-> the callbacks required during a destructive reset operation. The
-> procedure is as follows:
-> 
-> Before reset, MAC driver calls phylink_replay_link_begin():
-> - Triggers phylink mac_link_down() and pcs_link_down() methods
-> 
-> After reset, MAC driver calls phylink_replay_link_end():
-> - Triggers phylink mac_config() -> pcs_config() -> mac_link_up() ->
->   pcs_link_up() methods.
-> 
-> MAC and PCS registers are restored with no other custom driver code.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> We need to run different binaries on the NPU based on the MT76 WiFi chip
+> available on the board since the MT76 DMA rings layout changes between MT76 SoC
+> revisions (e.g. Egle MT7996 vs Kite MT7992). In this sense, I agree, the
+> firmware name is a board property.
 
-This approach looks reasonable from a quick glance (which is all I
-currently have time to do at the moment.)
+O.K, lets go with v1 then. List the firmware filename in the board
+.dts file.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+     Andrew
 
