@@ -1,141 +1,136 @@
-Return-Path: <netdev+bounces-251054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A88D3A70C
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:39:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B34CD3A76F
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 12:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F0265302BBBE
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:38:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 037303063F74
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 11:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD8C28D8D1;
-	Mon, 19 Jan 2026 11:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EDD7318EDD;
+	Mon, 19 Jan 2026 11:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HywpMgEw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UxeO3Jbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69380846F
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1736B318B9A
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 11:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768822713; cv=none; b=MgM7gKREsx4napeIZlB6dOfDUVyDJ2jjA5k93eWP85Kl7FBid/uLnknGEm2BfK1WqijV4k7xq7X8a2Z2FFfyViRuFYLd7lscEZXLZrzsuBr4qBGlqycRIOlB4lTNAUbTzjzC05u20QKEFyOeVZfaGsRmmPLoy/QkB1W7BPV/Noc=
+	t=1768823557; cv=none; b=deK0pAq29PmUTmV5eIkBvQA9RlD0NmsiT+PNl+mFvYzB88d5qV79Y9A+x3BU85AyNtWG79VyJIkRDmvCCpE+PuHx5LQo8Sf1lua3SfqpRQB+i7OCB9IdiWaTm08yW1Eca9DGu4UTB97uDQwOfDXsomzS64QGJGS32ms4Ws9Z4rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768822713; c=relaxed/simple;
-	bh=cntmWMzUKE5gwf3tkVHGDNT7Q0ZbaacON2u3VmU+rrc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rO/E5pGwlRZD1CCaJn4EbbMreMxwnXzM40n40/zkrxEl9BjhHWcywNtcQThV2suwyjrMYBeY4p4dY9a9osSX0U6dGsAWRoSpag7BeHl102WfmPYrXELkTAodp2lcpbEBr6BwDY06EEURKxiC93BDIwJsqwLS9EL0js+NWDY5gDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HywpMgEw; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50146fcf927so44947371cf.0
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:38:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768822711; x=1769427511; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0k3Awf9rgyQjObvkpmEnEoMiyeZVjM1YlDDV6KpWYk4=;
-        b=HywpMgEwkGM7uzpxdGqI+bMUxAVhF1vEIw4ZhvKRiJcTj+gznvzQ5dBNVL2JIZFbyR
-         eVdAqcOh8aLqfkkSpVb0xVlRXYCyPaBg2NHqt/mUJmwUU6P1mNNlEJDvk4bfEg9EsXr9
-         Qic2dNjE36FwBFT8vvLdveJcoq4ZLtApbUb+Du7L4IDbVjcaLCJQ6UcYRRkMBnBic2oO
-         nY3whZaYk9RrW4RZc7syQIyqpxQBicNU+/HR4k88kx4DWp9+53IGKLGnnYMiiheXtZUt
-         91dfeGRJLD08s753fjVnM4cBFj53I/WrKeVhbxVIqKEkNcyNrS5k3BnNaJT5c4fALBFn
-         vHWw==
+	s=arc-20240116; t=1768823557; c=relaxed/simple;
+	bh=uSEkHsH1REtKl3xcr1eJo/cD8PSr1EaGnbXhvaEtR94=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qbI+5nP1qd3OH4aTMJXeW2KN+71RmS/xZTRF/ce7mUAlCi40XfHtRikBrnsbor4Li+SS1Q811sBeGWt06NVbTnQs2HeluoZXrfKwT//US1EXtXSfCzxMAh7K8Jym7bDTw61xLVcADUwYbbctBO7kAU8zI016osQVGPNlaK6NTr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=UxeO3Jbq; arc=none smtp.client-ip=209.85.210.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-81ea900c5dfso339168b3a.3
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768822711; x=1769427511;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0k3Awf9rgyQjObvkpmEnEoMiyeZVjM1YlDDV6KpWYk4=;
-        b=S3NaMXaZf1oVkozT+Nbf9lBGFTDKACt/6snFCVCj8hn2+33nNVgG7REUDMHqm/RYz3
-         uC77eFt+bisYNd9zdf0gKhllMpUdoQXnJjcjdFS5K5r0QZy3DuJrxKYdUEpE5IWad63/
-         MEOQ9+3fxOPVNEdBaMgKf63edu1jIvqJAKInUlXuPemv60Bf5IXGJApmo0zXIV04TSjJ
-         7r0G/TVmPv0q+8bLWy6Rdt+y/4E0T5wdiFSS9AtK2R8k3Y77uhtBFhpXtyWiMvgf8EZa
-         Mu2UVytG7Wu42u9kaQ4f1zKTpstHPPzDYZtrs8yHGhDiZE9zSkBpFGICqsYoP5KW1YcH
-         51BQ==
-X-Gm-Message-State: AOJu0YwyK2nGasjvfFOmnKvFEGOATR9F+uBIyAzughaJx1vxRX6KCzHh
-	IbKE8lZNw1pjWaeQYdEERn37acBTy2o7wDXTZJR4PEXTVRQBnYTlm6z6hJ2qyN2N8j+K7nZgf39
-	aEDMKMq/WXZY8aZC577LaUbc25KrSmcIJ5QwFXiOA
-X-Gm-Gg: AY/fxX47EtLpUW5Z0cEK9uddajEjZzB4Vj+8XBUHCe70V/GJny4+2g3NGa/0hx2aei6
-	0ygGqe0xcmvV6lKyWIvPhU7EUT+GUvceAk4ytEGFE4IttIBWrxlPtq+PFv899A7VFatNRoLh9wN
-	BgAEZZ/6dV6gn8GqlteGdomYb5GNDqvSNG6xLWq57FqPBXdNKggGwxVtRz9gA58cCIConhUMRtQ
-	/5nWr/9qCacp28274SBlF+LsCKhZ7thDK0Tm7tK9Z14SRSsHIfShssQysP0OdlrOE8K9Es=
-X-Received: by 2002:ac8:7d16:0:b0:4ff:7eaf:6fa1 with SMTP id
- d75a77b69052e-502a156ae5dmr153563511cf.11.1768822710799; Mon, 19 Jan 2026
- 03:38:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768823555; x=1769428355;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dc2NcPIsYn4GHcEHnwWFmYEwoZXJ29FY+pyN3/3N0k8=;
+        b=j+nYF6kD8eBzvvBDOg1+TgWdqfYBjOU/QzxXrCMOr8b24LdI6nLOWTdGRHzjX7OKcu
+         lihQV6ZTYnuMaiXibgnGlTXKcDxfOkFpmrTAl84J32GX4YZ2IVDDWOP0AD4s6G5EhWO5
+         +5iMdSS4yllJ+B4qGvC5cM/AAEA80XAZeGdMa8jhiYlu59/O+bTv/43PqFL+aCc3dPeM
+         IQ5RATTuTMCfSAkmuu7bBXmFlztzU9JZXSRD8vbLYLCD+/JUgtToXKEQQTQPvT/+s5mg
+         SZUdeJuytrQAj+vGw6ff6CktHZk/He0o3L12cBp5DU531dRC6usAv37jznSqRLmw9AC+
+         dlAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKV0kMM/6H8mY5Yq2X+/CPfrA8X5B2RYa32PSADFlciJRWLygW60lGiRyuGHnppCUIMB2FEXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzncOhd81XgfRi4yBnh5tb8Yn4OsIMWZpj1gEz5s1nGjd6SYBTL
+	5otgaeySFI7bOaWIaJdpI+/7qwUdSM7qL0T1TMAqXf6QXk4522fPjQWcokrluS6HcO8kfmInnWP
+	Jnt5QS2rP/e4xwm3ml+zZx7EwIlcz7bu0HISxWG+tRod3iVzzmANQXl7o1JfzXbJ1Z4hmNje8jW
+	ykbhdgkuZ3JJDWXjSjzGVoM3B/J/yP0sv9fNDSo3eVvJKgN/8EeohG7ERivFyp48BUnFLsWZnMe
+	4CGFjpRXyvWfmQwmgahsGcuvKp5AJs=
+X-Gm-Gg: AY/fxX6TIpVCWUre8294VdvtyEBAQEaHv9+nep7zrCDzMlAX7CaDarbU3fZ39thkKIH
+	5A8/JYxOWNckmf3k8dzP3OE7XkljhrtDwbZJM2oQM9WXC8BvWEjTs+urzwpirm+Vkva4/lyTR8i
+	MhVZ0AyChlf8xWW45tf65iRUWw0NTAI6aWpOwTGY0g4wdpC6ocua8ct0OdzSmi3/4bhd0Egi40z
+	I+Y0xBpp7RRzedL5bq6TbPXXs+1BMCYqdkX0IH5jcTiYmmeKptUjctNOaxorJHZTsnfiBJYVKwi
+	xsAiSce1Me+jzJ52jnIVjd/jsQNCWiYt8bJV8dFg7/1mU0ZUtXK/+VMV3G4z3Sg8VBIXZYd6uW+
+	Y02J5AgU+AywXaMnfJ+K5PxjBtEwLdNRlsyquM8agmTgYiWAkeLJwng+syohmU7DNeBDEoWzvzR
+	GEITrB4LllGyVwXSlvrWpORbJSQsdh5OCEpWvXpaXfuAcaYPE6I8Z5rxOCaGxxvD9V
+X-Received: by 2002:a05:6a20:12c5:b0:35d:fce2:cb28 with SMTP id adf61e73a8af0-38dfe9ca3e3mr8072028637.8.1768823555562;
+        Mon, 19 Jan 2026 03:52:35 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-c5edf2bfb6esm487225a12.8.2026.01.19.03.52.35
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 19 Jan 2026 03:52:35 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c536c9d2f7so160905385a.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 03:52:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1768823554; x=1769428354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dc2NcPIsYn4GHcEHnwWFmYEwoZXJ29FY+pyN3/3N0k8=;
+        b=UxeO3JbqnbXagaa7QFNEcZf0J3D1OxQh+2fttI5wqB4e5O1Z+VhtirxwdO6BOHHDSS
+         4dy36JY+NXKgQ8vLaZirHMzge6FfSOUIGoStnbud/vY0o4eQveDCtwGlCOB6BjhUI6CT
+         HnuvTQ9o7BPZfgAm6TCJSnHZ5vCb5Mi0FSRao=
+X-Forwarded-Encrypted: i=1; AJvYcCW8aDb9XyLo3Oc+IP0kOVt7bJDOagzotQl1SlnX5JUhJfNdwLJBNoOZqMm8ERdaghCGaQM1Nfc=@vger.kernel.org
+X-Received: by 2002:a05:620a:178a:b0:8b2:1f8d:f11d with SMTP id af79cd13be357-8c6a6703cdcmr1146997485a.2.1768823554188;
+        Mon, 19 Jan 2026 03:52:34 -0800 (PST)
+X-Received: by 2002:a05:620a:178a:b0:8b2:1f8d:f11d with SMTP id af79cd13be357-8c6a6703cdcmr1146994885a.2.1768823553648;
+        Mon, 19 Jan 2026 03:52:33 -0800 (PST)
+Received: from keerthanak-ph5-dev.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a71bf2b0sm772878885a.12.2026.01.19.03.52.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 03:52:32 -0800 (PST)
+From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	yoshfuji@linux-ipv6.org,
+	dsahern@kernel.org,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com,
+	yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com,
+	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Subject: [PATCH v5.15-v6.1 0/2] Backport fixes for CVE-2025-40149
+Date: Mon, 19 Jan 2026 11:49:08 +0000
+Message-ID: <20260119114910.1414976-1-keerthana.kalyanasundaram@broadcom.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119112512.28196-1-fw@strlen.de>
-In-Reply-To: <20260119112512.28196-1-fw@strlen.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 19 Jan 2026 12:38:19 +0100
-X-Gm-Features: AZwV_Qgjrjj4cIBMKe0pYQTORTTXcQrzW9omFStAvrR7aUKFDIeHL8wuv5qqINE
-Message-ID: <CANn89i+Akf5vcL2zzgWrfs7D=h2pov5DmKKckw+3XK9Sjav=yw@mail.gmail.com>
-Subject: Re: [PATCH net v3] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, kuba@kernel.org, 
-	davem@davemloft.net, Mazin Al Haddad <mazin@getstate.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On Mon, Jan 19, 2026 at 12:25=E2=80=AFPM Florian Westphal <fw@strlen.de> wr=
-ote:
->
-> From: Eric Dumazet <edumazet@google.com>
->
-> I added skb_vlan_inet_prepare() helper in the cited commit, hinting
-> that we would need to use it more broadly.
->
-> syzbot confirmed this was the case in ip6_gre.
->
-> uninit-value in ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6ta=
-ble_mangle.c:72
->  ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
->  ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
->  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
->  nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
->  nf_hook include/linux/netfilter.h:269 [inline]
->  __ip6_local_out+0x5ac/0x640 net/ipv6/output_core.c:143
->  ip6_local_out+0x4c/0x210 net/ipv6/output_core.c:153
->  ip6tunnel_xmit+0x129/0x460 include/net/ip6_tunnel.h:161
->  ip6_tnl_xmit+0x341a/0x3860 net/ipv6/ip6_tunnel.c:1281
->
-> Uninit was stored to memory at:
->  ip6_tnl_xmit+0x34f7/0x3860 net/ipv6/ip6_tunnel.c:1277
->  __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
->  ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
->  ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
->
-> Uninit was created at:
->  slab_post_alloc_hook mm/slub.c:4091 [inline]
->  slab_alloc_node mm/slub.c:4134 [inline]
->  __do_kmalloc_node mm/slub.c:4263 [inline]
->  __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4283
->  kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
->  pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
->  skb_realloc_headroom+0x140/0x2b0 net/core/skbuff.c:2355
->  ip6_tnl_xmit+0x2106/0x3860 net/ipv6/ip6_tunnel.c:1227
->  __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
->  ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
->  ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
->
-> Fixes: d8a6213d70ac ("geneve: fix header validation in geneve[6]_xmit_skb=
-")
-> Reported-by: syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D6023ea32e206eef7920a
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Mazin Al Haddad <mazin@getstate.dev>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  v3: pass 'true' argument to skb_vlan_inet_prepare to not change network
->  header offset.
+Following commit is a pre-requisite for the commit c65f27b9c
+- 1dbf1d590 (net: Add locking to protect skb->dev access in ip_output)
 
-Ah right, this escaped my radar, thanks Florian !
+Kuniyuki Iwashima (1):
+  tls: Use __sk_dst_get() and dst_dev_rcu() in get_netdev_for_sock().
+
+Sharath Chandra Vurukala (1):
+  net: Add locking to protect skb->dev access in ip_output
+
+ include/net/dst.h    | 12 ++++++++++++
+ net/ipv4/ip_output.c | 16 +++++++++++-----
+ net/tls/tls_device.c | 17 ++++++++++-------
+ 3 files changed, 33 insertions(+), 12 deletions(-)
+
+-- 
+2.43.7
+
 
