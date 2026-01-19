@@ -1,105 +1,84 @@
-Return-Path: <netdev+bounces-251136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3813D3AC8A
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:43:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83A5D3AC02
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 15:33:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 607F0307521F
-	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:26:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0233E3110A2E
+	for <lists+netdev@lfdr.de>; Mon, 19 Jan 2026 14:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466FE3803D4;
-	Mon, 19 Jan 2026 14:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D7C35CB95;
+	Mon, 19 Jan 2026 14:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TTI43zyr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YwpUWWPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241B83803D1
-	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 14:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A833659E9
+	for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 14:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768832738; cv=none; b=sIJYs8wdugvGoeB93XM7UlA6vtV9zUyC4RDslU+KHnVA+hEpKJdunGeS2QLH0UJ0osXlNs5hqXH5mGKGRvv1JGzkPDPBYSWqF2mFej3ntbKIhryPWXdPMsCcAeMeFge16Yhcx4khVe4ywBfsM3zA0mRrOfXAge7HB9kOAWs4yXQ=
+	t=1768832771; cv=none; b=Wf1dl2HYeTd5FCrFTmnG7jZqgCy5nH4esQDwI09f5nFmTGX4jpu0HtUtsDstePnTvPh22G3r7HV1nyohRemVnw2ctOcvu4hyls9P0ES4TOU6mvmVpEURWWj0LDu2CXzXgsUAEhXUAL4nRJccGT3vVIfmARjfsc4t5BC6N5nttCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768832738; c=relaxed/simple;
-	bh=/ER5iS0uk9Jn1K4b37O66soNnZ0w9ZKXJGHhyHdR1bI=;
+	s=arc-20240116; t=1768832771; c=relaxed/simple;
+	bh=NK7F76R7iNrrVjxo1QUhsfEojWx77yUJX3OwpQv/viI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GzXRY79l9xHBmmsNR5o8sU3a2UA6atnpyDGkigtDQ5S8Z+erQnJ+NmDyephtDEWdjO5D8VSyzmc7/UH9aPvHSiOS/uIRei7dH8SJg+9QfcpWVjXwWt4jL4sYv0no6gCRsU0nUYx6vUjdSvpEzahG+MQXM7I0F5HpiIxnuNrmM6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TTI43zyr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6FD5C116C6;
-	Mon, 19 Jan 2026 14:25:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768832738;
-	bh=/ER5iS0uk9Jn1K4b37O66soNnZ0w9ZKXJGHhyHdR1bI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TTI43zyrcPhynM60Zwkwsn1NGqAiNMUNssUWkeyuEebZy3lJz7+to2kczo3D6KaSe
-	 SWDaTSim3U9Am8Rgc1tvU07Y4pKur2+daWQwZaDwzJqnXuLev7EiePKVwE1l4u34hv
-	 0ZY+oRib+DPv0WiOFu/1D0DpOGRJdxI2If5jW/SvxJcOWDxkrosMJlt1VYpOnFoEQc
-	 voAAU2CM3X6gJII+n9QFl/12EFqHxr3pWRJntMAHVk97JXxoCVf05rrb0sgMpW9cvJ
-	 68aokBcVHOpmFJeCQXrlP4QJu6xMdIvnBE5SCDk6F0e+4JKRopmhoH3cMZDmnZwOmA
-	 RVgZXo2AoyViw==
-Date: Mon, 19 Jan 2026 19:55:19 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Wen Gu <guwen@linux.alibaba.com>
-Subject: Re: PTP framework for non-IEEE 1588 clocks
-Message-ID: <2r55e3ohmijdubdwrwagmvfwhehocdqwmmbpmwz4owxpxtenwf@fgzrm3pvve4w>
-References: <vmwwnl3zv26lmmuqp2vqltg2fudalpc5jrw7k6ifg6l5cwlk3j@i7jm62zcsl67>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pDNASwVQw7DVfnugcBJjxuYNc3TWw6GlISc+E/IH4jF1heUv2KQ18fCq25I7A2bN0p5G+SgKL+OXBYwscVKR0Fwq+tedzWhSZML6MWtLot5mACeHpZvn1wQNSf8o5RLdB5EQ/y/qb9OpiDil/p2/5/jPFYcllcItQnJTgiljMNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YwpUWWPy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xfpHbLD0lfcxO5zc/kGX8zLRlFIUbZY41QPpyljPP3c=; b=YwpUWWPy5k5IazfLWBKi3MdjBL
+	Bh9ICL8flh3YGaQ67Xl/BA1tcXdi3TrnUcP5WFxBDED1X73MC77SKcalxBfbBWwDgNKYMAeJZ/BS0
+	PGAHEQmoXlpZXjZd01JVse+RPvvOE9ziGzl3ixxCuV3rbMMK0DRCeeiwCqshvtOMPUb4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vhqCk-003VYy-DY; Mon, 19 Jan 2026 15:26:06 +0100
+Date: Mon, 19 Jan 2026 15:26:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v1 6/7] ixgbe: replace EEE enable flag with
+ state enum
+Message-ID: <4263db7a-fe7d-4bd7-a33b-54fd0a8d570d@lunn.ch>
+References: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
+ <20260112140108.1173835-7-jedrzej.jagielski@intel.com>
+ <8f976990-1087-4ba0-a06d-c0538c39d2a3@lunn.ch>
+ <PH0PR11MB59027E7BBF8EF6121DF24DDCF08EA@PH0PR11MB5902.namprd11.prod.outlook.com>
+ <cb9f2295-0f1d-48a3-ab53-3d51c2930f94@lunn.ch>
+ <MW4PR11MB589023306C8055BD6A937557F088A@MW4PR11MB5890.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <vmwwnl3zv26lmmuqp2vqltg2fudalpc5jrw7k6ifg6l5cwlk3j@i7jm62zcsl67>
+In-Reply-To: <MW4PR11MB589023306C8055BD6A937557F088A@MW4PR11MB5890.namprd11.prod.outlook.com>
 
-On Mon, Jan 19, 2026 at 02:59:02PM +0530, Manivannan Sadhasivam wrote:
-> Hi Jakub et al.,
-> 
-> This is a follow-up of the recent discussion [1] around using PTP framework for
-> device clocks which doesn't the follow IEEE 1588 standard, but just provide the
-> high precision clock source to the host machine for time synchronization.
-> 
-> Jakub raised the concern on exposing these kind of high precision clocks as PTP
-> clocks during the referenced patch review and also during [2]. I agree that the
-> concern is technically valid as these clock are not following the IEEE 1588
-> standard.
-> 
-> I then looked into the existing PTP drivers and noticed that many drivers like
-> ptp_kvm, ptp_vmclock, and ptp_s390 fall into the above category. But that could
-> be because no one cared about them being non-conformant so far. So I'm not using
-> them as an excuse.
-> 
-> Then I looked into creating a new framework which just registers as a simple
-> posix clock and supporting posix_clock_operations::clock_getres operation as a
-> start. However, it feels like it would be a stripped down version of PTP
-> framework, with a new class, and chardev interface.
-> 
-> Creating such new interfaces means, we should also teach the tools like phc2sys
-> (for -a option) to learn about this new interface/class.
-> 
-> So my question is, is it really worth the effort to create a new framework for
-> providing a subset of the existing framework's functionality? Even if such
-> framework gets introduced, should the existing non-IEEE 1588 drivers be
-> converted? I personally think it is not a good idea since that will break the
-> userspace tooling, but leaving them as is could also induce confusion.
-> 
-> I'm looking for other suggestions as well, thanks!
-> 
+> i've checked the scenario and, indeed, EEE gets reenabled once link
+> conditions are meet again even without driver intervention.
+> Thanks for pointing me that.
+> In that case i will remove link enablement/disablement on driver side,
+> but i am wondering whether leaving logging trace on link condition
+> change (EEE gets disabled due to unsupported link conditions) would be
+> beneficial
+> WDUT?
+> then keeping tristate EEE would be required i believe
 
-Just found this thread which discusses the same problem:
-https://lore.kernel.org/all/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com/
+The current phylib/phylink code does not log this. There is also not
+much the user can do about it, if EEE is disabled, other than throw
+the ixgbe out and get a card which does implement EEE at lower speeds.
 
-I'll chime into it and this thread can be ignored, thanks!
-
-- Mani
-
--- 
-மணிவண்ணன் சதாசிவம்
+    Andrew
 
