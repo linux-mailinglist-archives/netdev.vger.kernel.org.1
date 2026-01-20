@@ -1,234 +1,136 @@
-Return-Path: <netdev+bounces-251447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC659D3C5DD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:45:36 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1975D3C621
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E66585A92A0
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:38:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8F4CD6C8667
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5479B410D31;
-	Tue, 20 Jan 2026 10:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEFB3B95F8;
+	Tue, 20 Jan 2026 10:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNdSpgAi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZiSUcfw1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DdV/SEW6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3993410D07;
-	Tue, 20 Jan 2026 10:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F66B37BE86
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768905293; cv=none; b=hXIjOuASiqb08Zeyz2e5CAulO/9OTVW9/3lIO0L8bOB1nbBXxvmvBI60pHP3vZIgUlQ/HGzl58KzfPO2yH34GxfUSkMS8bhe2WfKf4hOFSZz3Ydy2h5b7gQEOWO/BINq7ZCWmOhk7ChNgOGfu9fNbsg5KxvqsEWFTq2KyaRhBrI=
+	t=1768903730; cv=none; b=l/KobanfQn38BW3r4EAW2mrryoltbqk3Yy9ZehJGMdzDsjTnWvx0qHFPIJz3yi9ih9yLnhudFC1n4zCf4qwgbJ72puWUo16rnlJ/8JnRgARfX2JQKSAgdjidWV/wNGT/FDdMHe/B/PNVz6jDI3Pw8gyvk8fqMjw68cdM+6cX9RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768905293; c=relaxed/simple;
-	bh=iC3XdbETtmivl7MiNG080jOCyV8qw/2J329iqKv9uzM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nM2emJbyuABxov+wc7DmL0w78vXhsNwyDwsECgLCnnCEzjtr5Z8tOnBi6CVymDVf4g3u49qBSx0FzhdkDNOOLgE6gULvmj8ShBPb0Za0ar4bWAD9Lh8mUVuSXmITzmcwEkXbFVRYdP2+bWbiOIdLEVswkJI17w6IbQ9fSBAr8OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iNdSpgAi; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768905291; x=1800441291;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iC3XdbETtmivl7MiNG080jOCyV8qw/2J329iqKv9uzM=;
-  b=iNdSpgAi/sqn5rIcrW5PUkrN0VK6FUT4ymjyDxSVU3rJ8KsGK9JrURKr
-   AOj+BMxuyVimwOcBCbd1RkKV/geDBS8VIauSN7Z+2nm/tUSpFyCuSG/of
-   80aQkqfHvOkUfS10FMlPaNcCBlFC+DnUTXLTiqJxu7nNkWL4CNW0JXCjC
-   JllZ6xhWbFUWdQev5n2e4vAgLT/o844dUbl4DDzOaCIrHUSaYmX21YxuJ
-   BpdDi2ni95p9oYfgpnjH4p1V4m6zR/02CqyaLEGCcIMuCX34yMTEJoWxb
-   dNlqz2rz6z9lXyOdXQHt0p3IskkzJ++LGEQq47CE7iZ4E7G7831A3ZsBU
-   A==;
-X-CSE-ConnectionGUID: soH+Eci3RLaWgBE4ArP2Vg==
-X-CSE-MsgGUID: eXxREXPlQmq3puwiNU8lUg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="70161748"
-X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="70161748"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 02:34:50 -0800
-X-CSE-ConnectionGUID: ipVBg8rASC6sTNAfBhD0LA==
-X-CSE-MsgGUID: lNdC1XsPSC+zrigQGNbj/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="210935856"
-Received: from hpe-dl385gen10.igk.intel.com ([10.91.240.117])
-  by fmviesa004.fm.intel.com with ESMTP; 20 Jan 2026 02:34:49 -0800
-From: Jakub Slepecki <jakub.slepecki@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	jakub.slepecki@intel.com,
-	aleksandr.loktionov@intel.com
-Subject: [PATCH iwl-next v3 4/8] ice: allow overriding lan_en, lb_en in switch
-Date: Tue, 20 Jan 2026 11:34:35 +0100
-Message-ID: <20260120103440.892326-5-jakub.slepecki@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260120103440.892326-1-jakub.slepecki@intel.com>
-References: <20260120103440.892326-1-jakub.slepecki@intel.com>
+	s=arc-20240116; t=1768903730; c=relaxed/simple;
+	bh=H8E5ZexNwUvepWRnAB8kom9407PvcV1LCFOFpBHsJ7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e/1UN0LZ3sE5hDBpkeCyYW7As8LiJs2aSK57dLCmPkbUXS4z6rqefR9yy71wL/OiAI0DZ9hL0XHZ1zF03zDG4ysAmyONxoxBff/RRgcpbJWorYVKuT9C0GPvWfRDU1atajnYoCOaNHNbY+pETBYH4qwLsH1lxeLAk1Im2M7n96g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZiSUcfw1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DdV/SEW6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768903727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H8E5ZexNwUvepWRnAB8kom9407PvcV1LCFOFpBHsJ7Q=;
+	b=ZiSUcfw1/s/HITg2mEY2w6UQIytWHNqdy+FV2wAbSA0XEOvQ7m96K6TaXWBbPXvwjoY0I2
+	/mGOgzWhmzZKo3JP6xrDcE7MkbnBVxvNHnbTMmEyaAEQBjUwlIgT5y/nRd3aO9IQ9K2FEu
+	Yjdz0oQ0zb562RpibYdx6euuoq7u7aI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-82-ic07H3CmOPKL8pg4uU0apA-1; Tue, 20 Jan 2026 05:08:46 -0500
+X-MC-Unique: ic07H3CmOPKL8pg4uU0apA-1
+X-Mimecast-MFC-AGG-ID: ic07H3CmOPKL8pg4uU0apA_1768903725
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-432a9ef3d86so2408305f8f.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 02:08:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768903724; x=1769508524; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H8E5ZexNwUvepWRnAB8kom9407PvcV1LCFOFpBHsJ7Q=;
+        b=DdV/SEW6MMybPTLHGVg2BrudHoQCh47XlwOtwkKQXk0lRKhUIN9g4wB0eVma/YuUUf
+         Q/GetDZMRQjsIYnuELAcPjACDB6T5v2rqweiuD+/Md2oXU0e6QWPH4O0iEtQc66XN8dT
+         cR2gJYG7Z8yn9BSpAmJb2938KM1aBxWhkc7GU9M9LVWhszeigWuzGKuenLPPtiMsZx8s
+         uyP7FURJrnSP6usgvjy4eLhGJqt6jf19vvsexToNpUPqFe4oFRrZkbYF100DsfzttDlH
+         gkSjWzJe0VqcAfMoP9Dxb3Uv6+/jeNoUc7YCFjCHvsoxgr15sHAgPuksTAoTsnb2XLAt
+         bImg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768903724; x=1769508524;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H8E5ZexNwUvepWRnAB8kom9407PvcV1LCFOFpBHsJ7Q=;
+        b=vP8vZsfUYHgq2f7wpiEfVksz+guERqLN+r6BTkLgBoFyrAlRBzJMr4jmTV9gdKiEf8
+         lO2ZbRRbE2aY2/VPjGqlRV9rC/n94t3WDj7ct1hM0gvyZn2eve1uK2bnuaFXUKmkoY/C
+         XCnS04w9cR4KKgp0DMHmUbTqkjYXuL8xXSS0DQHwNDBjlCxgTG5//j+hjEu2MFj/zqrQ
+         sVNwfxTRr0nO+a6qWuk1nOZojMpzlXVAU9+tiPNJvc1t7XJP7X7ueskXfO5wYxG+UUf9
+         91rgLq657GApYJQxUiKiiCNKDjCXYKSdz3koxEzIXn++5T4s6fz7mXL4rDLWKlThUmy1
+         SBLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMbx6vpI7blaSCbEIV/D1ZS2hav/3XwQ14RnZ6yBWLGhihobnIknJ28BGUuofp9xDDCiVhYRo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGf5lZC3OlndcRz0KoO2w335ndNOyvLXY4IgpPnmcdK5viIDhF
+	5x1PtoRqT4s9N8E/a1kdXQa81zxDT7i6PfM6OIGs/Wex7MkLG1z/1xl/2MPRtaSKkZt22Ko90KA
+	nWlO75vZ0o74uTtpusSrIRd3gJOgprd3ADAflp1YcQDHcLr4XlHtMlu9PzdoAyqFRiQ==
+X-Gm-Gg: AZuq6aK0Lu6Y2KYy0Mbw18ymB0y9PAc6qXeN5yjrD/oOKSJ51MJVkpI7Q9dUGX2MZtk
+	x3+2XxpURaEcyU9WTCV7AhIJFpJp7A26ABBNHAFguEQZ2IaYuSHVZjcPtRkpz6bPeLkDm1+gkcD
+	ZdqjNZL8oKs2y9OUmcFvvstT7zNGbqcIf//vTU36dwpaIm8ZSepCjeEU1iYyrkIxapvlENCVjB2
+	NTT5tn2bzc3vYSXaAFaLtbVIft51mSMgtYKN//mMLvxcHqBPlwdom1tlHBT+qlF/MH6Ow3JhgEH
+	Ze043v5tnP09zmaJIuknnIdtImJkkyCpoeEeX/2as9OKjCidibSXC+OgMGK5109D1HJOHg/KN3L
+	OrwVcExgSX5qv
+X-Received: by 2002:a05:6000:25c8:b0:430:f41f:bd42 with SMTP id ffacd0b85a97d-4356a0662e3mr18086970f8f.57.1768903724441;
+        Tue, 20 Jan 2026 02:08:44 -0800 (PST)
+X-Received: by 2002:a05:6000:25c8:b0:430:f41f:bd42 with SMTP id ffacd0b85a97d-4356a0662e3mr18086936f8f.57.1768903724027;
+        Tue, 20 Jan 2026 02:08:44 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.93.113])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356997eb1fsm28563115f8f.35.2026.01.20.02.08.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jan 2026 02:08:43 -0800 (PST)
+Message-ID: <f35ba439-bb32-4c62-a057-29f45f95083e@redhat.com>
+Date: Tue, 20 Jan 2026 11:08:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: airoha_eth: increase max MTU to 9220 for DSA jumbo
+ frame support the industry standard for jumbo frame MTU is 9216 bytes. When
+ using DSA sub-system, an extra 4 byte tag is added to each frame. To allow
+ users to set the standard 9216-byte MTU via ifconfig ,increase AIROHA_MAX_MTU
+ to 9220 bytes (9216+4).
+To: Sayantan Nandy <sayantann11@gmail.com>, lorenzo@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, sayantan.nandy@airoha.com, bread.hsu@airoha.com,
+ kuldeep.malik@airoha.com, aniket.negi@airoha.com
+References: <20260115064043.45589-1-sayantann11@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260115064043.45589-1-sayantann11@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Currently, lan_en and lb_en are determined based on switching mode,
-destination MAC, and the lookup type, action type and flags of the rule
-in question.  This gives little to no options for the user (such as
-ice_fltr.c) to enforce rules to behave in a specific way.
+On 1/15/26 7:40 AM, Sayantan Nandy wrote:
+> This change ensures compatibility with common network equipment and jumbo frame configurations.
 
-Such functionality is needed to work with pairs of rules, for example,
-when handling MAC forward to LAN together with MAC,VLAN forward to
-loopback rules pair.  This case could not be easily deduced in a context
-of a single filter without adding some guessing logic or a specialized
-flag.
+It looks like that a significant amount of the description landed in the
+subject, which is not good.
 
-Add a slightly more generic flag to the lan_en and lb_en themselves
-for the ice_fltr.c to request specific destination flags later on,
-for example, to override both values:
+Please reformat the changelog carefully.
 
-    struct ice_fltr_info fi;
-    fi.lb_en = ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED;
-    fi.lan_en = ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED;
+Also it looks like this is intended to address a bug; if so it should
+target the 'net' tree and include a Fixes tag.
 
-Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
----
-I considered a resend or bumping the old thread, because we did not finish
-the discussion last time with Aleksandr, but I feel like this version
-addresses most if not all of the points that were made.  One exception is
-that I did not split the fields, but that was only one of the solutions.
-Nonetheless, this should be overall a good starting point for a
-discussion.
+Thanks,
 
-Changes in v3:
-  - LB_LAN masks and values no longer rely on boolean promotion.
-  - ice_fill_sw_info() deals with u8 the entire time instead of building
-    building lb_en and lan_en values at the end from booleans.
-
-Changes in v2:
-  - Use FIELD_GET et al. when handling fi.lb_en and fi.lan_en.
-  - Rename /LB_LAN/s/_MASK/_M/ because one of uses would need to break
-    line
----
- drivers/net/ethernet/intel/ice/ice_switch.c | 25 +++++++++++++--------
- drivers/net/ethernet/intel/ice/ice_switch.h | 19 +++++++++++++---
- 2 files changed, 32 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 04e5d653efce..3caccd798220 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -2534,12 +2534,14 @@ int ice_get_initial_sw_cfg(struct ice_hw *hw)
-  *
-  * This helper function populates the lb_en and lan_en elements of the provided
-  * ice_fltr_info struct using the switch's type and characteristics of the
-- * switch rule being configured.
-+ * switch rule being configured.  Elements are updated only if their FORCE bit
-+ * is not set.
-  */
- static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
- {
--	fi->lb_en = false;
--	fi->lan_en = false;
-+	u8 lan_en = fi->lan_en;
-+	u8 lb_en = fi->lb_en;
-+
- 	if ((fi->flag & ICE_FLTR_TX) &&
- 	    (fi->fltr_act == ICE_FWD_TO_VSI ||
- 	     fi->fltr_act == ICE_FWD_TO_VSI_LIST ||
-@@ -2549,7 +2551,7 @@ static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
- 		 * packets to the internal switch that will be dropped.
- 		 */
- 		if (fi->lkup_type != ICE_SW_LKUP_VLAN)
--			fi->lb_en = true;
-+			FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lb_en, 1);
- 
- 		/* Set lan_en to TRUE if
- 		 * 1. The switch is a VEB AND
-@@ -2578,14 +2580,19 @@ static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
- 			     !is_unicast_ether_addr(fi->l_data.mac.mac_addr)) ||
- 			    (fi->lkup_type == ICE_SW_LKUP_MAC_VLAN &&
- 			     !is_unicast_ether_addr(fi->l_data.mac.mac_addr)))
--				fi->lan_en = true;
-+				FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M,
-+					     &lan_en, 1);
- 		} else {
--			fi->lan_en = true;
-+			FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lan_en, 1);
- 		}
- 	}
- 
- 	if (fi->flag & ICE_FLTR_TX_ONLY)
--		fi->lan_en = false;
-+		FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lan_en, 0);
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, lb_en))
-+		fi->lb_en = lb_en;
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, lan_en))
-+		fi->lan_en = lan_en;
- }
- 
- /**
-@@ -2669,9 +2676,9 @@ ice_fill_sw_rule(struct ice_hw *hw, struct ice_fltr_info *f_info,
- 		return;
- 	}
- 
--	if (f_info->lb_en)
-+	if (FIELD_GET(ICE_FLTR_INFO_LB_LAN_VALUE_M, f_info->lb_en))
- 		act |= ICE_SINGLE_ACT_LB_ENABLE;
--	if (f_info->lan_en)
-+	if (FIELD_GET(ICE_FLTR_INFO_LB_LAN_VALUE_M, f_info->lan_en))
- 		act |= ICE_SINGLE_ACT_LAN_ENABLE;
- 
- 	switch (f_info->lkup_type) {
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
-index 671d7a5f359f..137eae878ab1 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-@@ -72,6 +72,14 @@ enum ice_src_id {
- 	ICE_SRC_ID_LPORT,
- };
- 
-+#define ICE_FLTR_INFO_LB_LAN_VALUE_M BIT(0)
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_M BIT(1)
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED			 \
-+	(FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_VALUE_M, 1) |  \
-+	 FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_FORCE_M, 1))
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED			 \
-+	(FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_FORCE_M, 1))
-+
- struct ice_fltr_info {
- 	/* Look up information: how to look up packet */
- 	enum ice_sw_lkup_type lkup_type;
-@@ -131,9 +139,14 @@ struct ice_fltr_info {
- 	 */
- 	u8 qgrp_size;
- 
--	/* Rule creations populate these indicators basing on the switch type */
--	u8 lb_en;	/* Indicate if packet can be looped back */
--	u8 lan_en;	/* Indicate if packet can be forwarded to the uplink */
-+	/* Following members have two bits: VALUE and FORCE.  Rule creation will
-+	 * populate VALUE bit of these members based on switch type, but only if
-+	 * their FORCE bit is not set.
-+	 *
-+	 * See ICE_FLTR_INFO_LB_LAN_VALUE_M and ICE_FLTR_INFO_LB_LAN_FORCE_M.
-+	 */
-+	u8 lb_en;	/* VALUE bit: packet can be looped back */
-+	u8 lan_en;	/* VALUE bit: packet can be forwarded to the uplink */
- };
- 
- struct ice_update_recipe_lkup_idx_params {
--- 
-2.43.0
+Paolo
 
 
