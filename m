@@ -1,174 +1,170 @@
-Return-Path: <netdev+bounces-251565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJJiKurWb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:26:34 +0100
+	id 8AXzNDPfb2n8RwAAu9opvQ
+	(envelope-from <netdev+bounces-251571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:01:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420444A528
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:26:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 858A34AF23
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:01:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B28E25CE3BA
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:56:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5295562C14D
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D944318BBC;
-	Tue, 20 Jan 2026 16:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7E8449EBE;
+	Tue, 20 Jan 2026 17:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QdsDEYyp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62725221FA0;
-	Tue, 20 Jan 2026 16:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860CE4418FB
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 17:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768927863; cv=none; b=l5hWTJK68aJQxLrOOmmxHtz65sSsc0kCO4bpfjRSHi2lzhwuTMC9FX+C6F2eR+sffUVZHW8hsptI4eVnPOV2HOtTAqLVNvE41T7JhKtBCfsqNUBPyvGwa4EhdSUfp+E4aNmFKjKl8E5gMj5IJAqi038RJLBYtQCiGhtTg/3nQOQ=
+	t=1768931705; cv=none; b=Y66CWQhRMv05vdydYlSkCSqFsUip/mv7AsF0IzHKCWpMM/IaSX8YZDgTYDSQ6nRCxj1akv0kC8J/WmY4WWUwV5eok9ShVAvnZA4MplGVDp+H6jybMB5OPSGtHLY/cAo3YiOKrf9OMifAA6bgjbABibwOkr+vFrvDsdQkbbKAqkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768927863; c=relaxed/simple;
-	bh=wUXrmIrqo2oH1Q4Q/12fl8mQxOKQGMsh7C8PTCf3vR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DBo8ERHLXHYmunJx2QKmjJzJyF7h8zfyfYLxl1gw7NTTVWHLSHdiMFTE3w6UMRNP4NJUzfigryQfCGC84bq1BdoJ2D7NWhr5cb8KPud5inOK6MvEQ5TvFk/yoHny5pXFNxGEIhduc70MOywjXFOFrTbm5VxSVVZ1ZqhMPXQ1M0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BDA4C4C2887191;
-	Tue, 20 Jan 2026 17:50:06 +0100 (CET)
-Message-ID: <8cfba7ca-03d0-46fe-92fa-5d4a119fc31e@molgen.mpg.de>
-Date: Tue, 20 Jan 2026 17:50:05 +0100
+	s=arc-20240116; t=1768931705; c=relaxed/simple;
+	bh=KS8mCNBYfPwO900RIuZ97F5SmyGc3OhWN2Izos81IfA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JTuZ7vVE5xe5VpMZH6KmckuHHaKyKuJHWqFyoS3BdJ0LMtZKF8hmhFj1B+e5DMdK8eSUXD+O0F97AX/sgY6Ga89uPkPVrgDDPLWKazj/mEUrYIRB018tjUK1/uGgViYr1QuV0w9OzVRVX981O6kusdt+LGWoFqu18ydg40zCxsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QdsDEYyp; arc=none smtp.client-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2b4520f6b32so7774123eec.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:55:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768931704; x=1769536504; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1Zkk8Rbl5UtyAFvKLFxnlSYhtBzOt3i2r/yOWe3G6LM=;
+        b=QdsDEYyp1nQu9i0VDh0MQvtMzZTlMZFk2coVgfRqGYRlBEY4B8dnMGIuA5hXrTxEC1
+         JMcsTejg5t97f1JRitW3HI720QK129l4Z8qQ7Mwn7GPgBHyR0DjOzxBMlMqZLae2bgke
+         HXRdYqR80d0rnZgaReH64BB24/LXONjR1AbbctU9XE9jWp7Xy8z2MTjCykKT8kOxN5wA
+         jMdpdUaTRbeG1gsVjhb83WwWhWz+o1mymhF5fR6U28pIlBMT5nbMsdM0qwMwlJw1L4Gh
+         tgrIknfldBiqB04DraAusko5duhzhR3ZP1504Yjl8kaT0iSIR0o1mCyFQE0RPjxBlawb
+         yU3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768931704; x=1769536504;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Zkk8Rbl5UtyAFvKLFxnlSYhtBzOt3i2r/yOWe3G6LM=;
+        b=CNyF2TCT7KhH1w6IHYg1IpUizmmVi4AS3IvTuhuqeeHs0s+Ox29ohTcR82LaNF5Cbw
+         h8PAP7Hi40oP2YWfmqc+mUm4KpZ8uazj/CmNpvul5yHYJM2Nfg4PJRQJt72IIAyTYEeR
+         oDTFr46E/e2wBssnU5rzH592XtgcrSf3HThT1SE+BYq9AItS0IaAvcZC1x7G7v+Wdjvk
+         Xu62l3AiV4HXjnsCR5iWdKGEQVb2mMuscZeijY/I4DIXsSrs4mgftO0ZDBWiLju4/3Sk
+         ioWyP9TylK8iZbZChqS2ohjPkenOFheKjAp/H7i00BoG9CAAQ36y5PFQB/6N7FzqDznY
+         MvsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWW2SAMdrcQY5mrVND17fecW0gF/d1W/OQXrPjvV9ZSS/nWGP0ie7o9zocv7ona5eZUDXpOHmE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqILX4Cr6ykMkPtjZXbYUfFHl6WTpGEEJhT1Esbh8jfpK418zi
+	W6JqMQDE3KXnoc9gow8kzSrYCiIwCTFUSDWGUAtHEA6FqezM16557X/w
+X-Gm-Gg: AZuq6aJFNrqdjuqPgqylTnqr258X9b8e4duu9huz2MN865mXfi2jmstxLbbU13xO06C
+	MsY0MGQNUfAbe4VnDGoIh2e13IfsZEtjQ8hJ5AWy1yLTV+coA958pAzKnYOhVfJCvtkAmb0LGH0
+	kVX60x2yzvSh9GHhjdVNPZBgu1FCpxti8TcFbTAVXQR5zrzEVFZN0CFFWEJ6HCG1fj3vqC13WQ4
+	LmCTegWQR0miH/nKowKEfF3PB4GBSaaaziIaSpniQahGlRxWV+Px7eVvFDYNflmKpiRtgwUOfmi
+	k/TiU22X1vLaKj6I7TCYZAzpjKwyC86dFInvVUSY2bIhU70kDP+0spFcL09Drugw9BtwzhMDEYP
+	v3AOx99hfT9mmQ55FUtFdlhESocQFHRgy4kOIVT4NaH+oyPTqxlfS8WkgaAybWgNWW8t8h7CtOI
+	UY30NyEipHgO6hyNbXzEbVA9pWosbuhOj5hbcvd/tpoHcmYlLL0PXw0XJGjx8N/8dvv8/j
+X-Received: by 2002:a05:7300:6ca1:b0:2b0:5a77:5753 with SMTP id 5a478bee46e88-2b6fd78df36mr1990065eec.21.1768931703406;
+        Tue, 20 Jan 2026 09:55:03 -0800 (PST)
+Received: from ?IPv6:2a03:83e0:115c:1:b08c:bb3d:92b9:704d? ([2620:10d:c090:500::3:93b1])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b34c0f7fsm17960598eec.3.2026.01.20.09.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 09:55:03 -0800 (PST)
+Message-ID: <5ca8756f0387e5b2be47e9522b1f4b5fc149768d.camel@gmail.com>
+Subject: Re: [PATCH bpf RESEND v2 1/2] bpf: Fix memory access flags in
+ helper prototypes
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Zesen Liu <ftyghome@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh	 <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo	
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski	
+ <mattbobrowski@google.com>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Daniel Xu
+ <dxu@dxuuu.xyz>, 	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, Shuran Liu	
+ <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, Haoran Ni	
+ <haoran.ni.cs@gmail.com>
+Date: Tue, 20 Jan 2026 09:54:59 -0800
+In-Reply-To: <B91D5A7E-4967-416D-A2AC-CD3428F3C702@gmail.com>
+References: <20260118-helper_proto-v2-0-ab3a1337e755@gmail.com>
+	 <20260118-helper_proto-v2-1-ab3a1337e755@gmail.com>
+	 <55f01664fc714615206cc8d100cabf4f310f2302.camel@gmail.com>
+	 <B91D5A7E-4967-416D-A2AC-CD3428F3C702@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net] idpf: Fix data race in idpf_net_dim
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
- Phani Burra <phani.r.burra@intel.com>, Willem de Bruijn
- <willemb@google.com>, Alan Brady <alan.brady@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Joshua Hay <joshua.a.hay@intel.com>, intel-wired-lan@lists.osuosl.org,
- linux-kernel@vger.kernel.org
-References: <20260119162720.1463859-1-mmyangfl@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260119162720.1463859-1-mmyangfl@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.24 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[mpg.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-251565-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251571-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,goodmis.org,efficios.com,davemloft.net,redhat.com,dxuuu.xyz,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,molgen.mpg.de:mid]
-X-Rspamd-Queue-Id: 420444A528
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 858A34AF23
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Dear David,
+On Tue, 2026-01-20 at 11:39 +0800, Zesen Liu wrote:
+> [...]
+>=20
+> > On Jan 20, 2026, at 04:24, Eduard Zingerman <eddyz87@gmail.com> wrote:
+> >=20
+> > Q: why ARG_PTR_TO_UNINIT_MEM here, but not for a previous function and
+> >   not for snprintf variants?
+>=20
+> For bpf_get_stack_proto_raw_tp, I chose ARG_PTR_TO_UNINIT_MEM to be consi=
+stent with its siblings:
+>=20
+> =E2=80=A2 bpf_get_stack_proto_tp (bpf_trace.c:1425)
+> =E2=80=A2 bpf_get_stack_proto (stackmap.c:525)
+> =E2=80=A2 bpf_get_stack_sleepable_proto (stackmap.c:541)
+>=20
+> All of these are wrappers around the same core function bpf_get_stack() /=
+ __bpf_get_stack(), passing the buffer with identical semantics, and all us=
+e ARG_PTR_TO_UNINIT_MEM.
 
-
-Thank you for your patch.
-
-Am 19.01.26 um 17:27 schrieb David Yang:
-> In idpf_net_dim(), some statistics protected by u64_stats_sync, are read
-> and accumulated in ignorance of possible u64_stats_fetch_retry() events.
-> The correct way to copy statistics is already illustrated by
-> idpf_add_queue_stats(). Fix this by reading them into temporary variables
-> first.
-
-It’d be great if you also documented a test case.
-
-> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-> Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->   drivers/net/ethernet/intel/idpf/idpf_txrx.c | 16 +++++++++++-----
->   1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> index 97a5fe766b6b..66ba645e8b90 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> @@ -3956,7 +3956,7 @@ static void idpf_update_dim_sample(struct idpf_q_vector *q_vector,
->   static void idpf_net_dim(struct idpf_q_vector *q_vector)
->   {
->   	struct dim_sample dim_sample = { };
-> -	u64 packets, bytes;
-> +	u64 packets, bytes, pkts, bts;
-
-The new variable names are ambiguous. Would _tmp or so be better?
-
->   	u32 i;
->   
->   	if (!IDPF_ITR_IS_DYNAMIC(q_vector->tx_intr_mode))
-> @@ -3968,9 +3968,12 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
->   
->   		do {
->   			start = u64_stats_fetch_begin(&txq->stats_sync);
-> -			packets += u64_stats_read(&txq->q_stats.packets);
-> -			bytes += u64_stats_read(&txq->q_stats.bytes);
-> +			pkts = u64_stats_read(&txq->q_stats.packets);
-> +			bts = u64_stats_read(&txq->q_stats.bytes);
->   		} while (u64_stats_fetch_retry(&txq->stats_sync, start));
-> +
-> +		packets += pkts;
-> +		bytes += bts;
->   	}
->   
->   	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->tx_dim,
-> @@ -3987,9 +3990,12 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
->   
->   		do {
->   			start = u64_stats_fetch_begin(&rxq->stats_sync);
-> -			packets += u64_stats_read(&rxq->q_stats.packets);
-> -			bytes += u64_stats_read(&rxq->q_stats.bytes);
-> +			pkts = u64_stats_read(&rxq->q_stats.packets);
-> +			bts = u64_stats_read(&rxq->q_stats.bytes);
->   		} while (u64_stats_fetch_retry(&rxq->stats_sync, start));
-> +
-> +		packets += pkts;
-> +		bytes += bts;
->   	}
->   
->   	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->rx_dim,
-
-
-Kind regards,
-
-Paul
+Ack, makes sense, thank you for explaining.
 
