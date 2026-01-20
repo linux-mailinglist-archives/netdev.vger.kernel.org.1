@@ -1,129 +1,126 @@
-Return-Path: <netdev+bounces-251529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251530-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qA1yGRjIb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251529-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:23:20 +0100
+	id 2BMLDuiub2lBGgAAu9opvQ
+	(envelope-from <netdev+bounces-251530-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:35:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1744961E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:23:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C56A947B20
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:35:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7DC7A80932C
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:09:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CA5187ABD20
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16D74657DC;
-	Tue, 20 Jan 2026 15:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0526477E2B;
+	Tue, 20 Jan 2026 15:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFeeKXF3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tda9PqQf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69BD4657CA;
-	Tue, 20 Jan 2026 15:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10D11C01;
+	Tue, 20 Jan 2026 15:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768924209; cv=none; b=ASfrxL0YkflfcQ0CoPOR+oZgqTD+qRXff9NQLaSi3gaxkP1xV5DiCVtCp9jcIrD+luZ0xZARVDSe4h8ScqGtG7Ls8r61/o1dewPtuUMhp/BlCLOGD0yRMCcPmiN5eJ8ydUbcTjTUmIIsODYoABdZbzBkcH/twuMiCbi4eDlU9gs=
+	t=1768924430; cv=none; b=TcuZoxpRafURRHCXlCud8gzxMfX06LGlz7oBkt5yrTDcCJ94BsyLQEeB7IYaOMfJfCkVyz9lgU6sZTLAqH4AbHsrCcFrxo9zpdNcY2D+KCQ6/l/JoRlKvC4QeZCj0lQTJQw9zGxlRL1w2t6uMjlbV3s0b7C/XMr85qlATfPsDvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768924209; c=relaxed/simple;
-	bh=ZZjyt8cua4ZkqKAaWQbTM7HPeZDV7dBhN5cbqpQholY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WN5fo00GkNM0qxNKt3XLsibf7IM6NhqmWPrazW33c/ityIYb+I35YKKEMfr+P4ebB2rwVP7lwWS3YOtWdYvWvGsAR+5fmu/ngP+tvyfPuW/Gbjdf4e6kyjB3wlfAyNnyiIkvbDq+YOIm1JiR+cO6gZmu+chWeWVviOwjD2ooPF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFeeKXF3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4017CC19422;
-	Tue, 20 Jan 2026 15:50:07 +0000 (UTC)
+	s=arc-20240116; t=1768924430; c=relaxed/simple;
+	bh=2lyQ956y/cjzj/E2Ndhkr/nFnx1nEeiq4PAxUbapuuU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ZVJIHOfGIoHuSYYBKcFyBvCQdYwBWhBItxuZBWeZecRtSMsT2wn2NVAyAM6EM9MicQ5PFAJCq+9k0wiX3UWVtNQtguWVnPwyoj3B+DBJtaRLdBPZdsxj1xnlR7I1WjorqAmkoUHzPyeyOTT6m9tOm7AwR3hEZF3XiXrtS7+iVk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tda9PqQf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DF38C2BCB6;
+	Tue, 20 Jan 2026 15:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768924207;
-	bh=ZZjyt8cua4ZkqKAaWQbTM7HPeZDV7dBhN5cbqpQholY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kFeeKXF3fgZQVa3KD1dAlMJEgbMat9ZsH3Rpv6SZWKznGxAmGTAdeGfpATJA2AYOW
-	 1CnTwDrIiUj5KZTFzWBlrB8oFnQENbCuja+6eJOcyKFjPapj3En8xcq6rVJmR2BNpR
-	 UiW4kZ4FkCc5WSuzaKgpeu0XYZcRZ0zqbisATHfYduCT9wpRI/SE9g2ZeHcu3zd8Yu
-	 2ssRgTiTs+81ZIdjpki977rR6LBNunVSBgjBOmRsya2lzYxiBBV70ITJC6B8Q1ShG9
-	 rLfaKStzZUzGOig3L/iMQNLCrweWdFdJ02uy/b7+sNwINJoPnkfn6XfED3vyW2KMQv
-	 eBB+EEn/BTCHA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 11A193806671;
-	Tue, 20 Jan 2026 15:50:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1768924430;
+	bh=2lyQ956y/cjzj/E2Ndhkr/nFnx1nEeiq4PAxUbapuuU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=tda9PqQf6mdU5ZN2ASc03cnbHIaazXkfER9jbCeHOVDKmaYXcnps15COS5KzH9sk9
+	 q8b4Aa0lwNs26Nrq6ObHD2+UYOeAUb+PmoWGV4v5Rf0qj/hRiRV4irKDn7SxXLsI+X
+	 A4C8phW1WNMqXH4vQKTyAJm2LWz5zZCMnVB4HfGGA+q2YSbruVNNX+9c3/nu6Xi8ZW
+	 7biB1Ph8RRFoUdg7mXSUjARCaQhrJ3IcDgm92qSiY8USKG5kSK4pQSSiSljFezBN7H
+	 tatat8ZmbUyGWWnHJ2hZCQ3YnD6MOGK2P+BYCAfmLdIcWadbT8fFTEyV7Dv9shvaDl
+	 ZSEpuqTQeljdA==
+From: Lee Jones <lee@kernel.org>
+To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+ claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+ vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, 
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com, 
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org, 
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+ Robert Marko <robert.marko@sartura.hr>
+Cc: luka.perkov@sartura.hr, Conor Dooley <conor.dooley@microchip.com>
+In-Reply-To: <20251229184004.571837-3-robert.marko@sartura.hr>
+References: <20251229184004.571837-3-robert.marko@sartura.hr>
+Subject: Re: (subset) [PATCH v4 02/15] dt-bindings: mfd:
+ atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+Message-Id: <176892442293.2297977.2838802915163703902.b4-ty@kernel.org>
+Date: Tue, 20 Jan 2026 15:53:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] vsock/test: Do not filter kallsyms by symbol type
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176892420460.101865.5448435086952120781.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Jan 2026 15:50:04 +0000
-References: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
-In-Reply-To: <20260116-vsock_test-kallsyms-grep-v1-1-3320bc3346f2@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: sgarzare@redhat.com, leonardi@redhat.com, kuba@kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Mailer: b4 0.15-dev-52d38
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-251530-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251529-lists,netdev=lfdr.de,netdevbpf];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 1B1744961E
+X-Rspamd-Queue-Id: C56A947B20
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 16 Jan 2026 09:52:36 +0100 you wrote:
-> Blamed commit implemented logic to discover available vsock transports by
-> grepping /proc/kallsyms for known symbols. It incorrectly filtered entries
-> by type 'd'.
+On Mon, 29 Dec 2025 19:37:43 +0100, Robert Marko wrote:
+> Add binding documentation for Microchip LAN969x.
 > 
-> For some kernel configs having
 > 
->     CONFIG_VIRTIO_VSOCKETS=m
->     CONFIG_VSOCKETS_LOOPBACK=y
-> 
-> [...]
 
-Here is the summary with links:
-  - [net] vsock/test: Do not filter kallsyms by symbol type
-    https://git.kernel.org/netdev/net/c/5d54aa40c7b7
+Applied, thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[02/15] dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+        commit: 41d1f3cf1f52c75f72ce1a3e2f2ee82e7c6eb59a
 
+--
+Lee Jones [李琼斯]
 
 
