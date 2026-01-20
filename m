@@ -1,149 +1,179 @@
-Return-Path: <netdev+bounces-251517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFH+LvnscGk+awAAu9opvQ
-	(envelope-from <netdev+bounces-251517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:12:57 +0100
+	id 8JPpD1TXb2n8RwAAu9opvQ
+	(envelope-from <netdev+bounces-251532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:28:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9DE58FD8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:12:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E570C4A5EC
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E1F67089C5
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 14:39:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A1AC9690C7
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AE844D694;
-	Tue, 20 Jan 2026 14:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFCF334373;
+	Tue, 20 Jan 2026 16:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jFYrdIlD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UyO+c4Py"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C3D44104B;
-	Tue, 20 Jan 2026 14:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1A33314B9
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768919412; cv=none; b=NTzPNIdlhzRvFYmmmO+q6xOXl1l6OyQoKNXXlwIR+P0aY1596m8F5GRn3wERwCZdo59n9He109a7MKw5GaFwPhsWbGpf5vVQBrmaGWGE1QXLxbfe7cR/Pl5KMWUNA+jBKmC0r9WD7iUf/OL+Q/VctV+PECgJsYYuWJweS7LUWEA=
+	t=1768924821; cv=none; b=Z6atMHkUCDRaAV1j60rxDYapkCFhUobcaAEbxz07xGl0GSiKAodgoAMjra32aUdBa89hUBS/KKYfnS1fBkObZDe4FjMhw79+9eQbvDE417Y70kOj8b+1Ch9WPGsLBfrunVqG55IGoBumDYvyQH+NW878vCeHOL2k8TN8GSKBhB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768919412; c=relaxed/simple;
-	bh=kCqO2ZJkcDyyuTwrrkKrfVhZlwsoYyDv6tsJCP9WnZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WYhXsRRYB2p94050+ZlHDBI24qHvNYwYDKOUuVjmpNhQPrNNThcghQ6vUSet2d8jBM8ziCfKjlM1DzkbBANvlf6nmH+G5ddQ4SMZ8IY+a5Cf8U6nWF8Rn4mAqtTlIlQ5q0hGttp7JLNLGpbpgxdI2WIAtVRVFTqCOiGJHIcIri4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jFYrdIlD; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=oTXEVLgDumVCBFxpbO8s07ckXDCKC5Us7m6vOmueETk=;
-	b=jFYrdIlD6scNu1lCaG+lOb4ovAPAm3AE9S1DxjPS7XzWJTmJ91siw+9jJyf+J11uZU12gG9yH
-	LrnTfdTLhSwbMToijlqDkRUVizKzS3vHaCZhmU4HQ65F+hNejkdJvNhi2AWqUghbMyFPrVX1hO0
-	jCqW7GUZ1Ef7kIbZk0dcWgE=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dwV4x21Srz1prMB;
-	Tue, 20 Jan 2026 22:26:41 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 85C1840569;
-	Tue, 20 Jan 2026 22:30:06 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 20 Jan 2026 22:30:05 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
-	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
-	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
-	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>
-Subject: [PATCH net-next v01 5/5] hinic3: RQ use RQ_CTXT_PREF_CI_HI instead of SQ_CTXT_PREF_CI_HI
-Date: Tue, 20 Jan 2026 22:29:51 +0800
-Message-ID: <bcc9edc740edefa8f192ce1ec8dae2e089f061db.1768915707.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1768915707.git.zhuyikai1@h-partners.com>
-References: <cover.1768915707.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1768924821; c=relaxed/simple;
+	bh=IB+sIXEjGEhU9cqcsuNosGFcQqX5n9sKNDGU5mhonx8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiimXBxRQXSADq6YERZ/K2ZrDU5hbKh/uw8PfQ39q2Uv9JtCfjJEc70gtlIb3Vb2sEO6OxrIssjthVWN5S5oYuclCTmr0huDSzieiEGw7OyevmQ70B5EjRM7AUYJRxpqm1fIhGwQyOA0rZHNRxghC0ENYSWuS9hy1BM/P3KEgrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UyO+c4Py; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-81f3d6990d6so3298588b3a.3
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:00:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768924819; x=1769529619; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ayo5jQZPeaTZqwD9/xDSR/da6D6Deuo6ebApFmbkVFM=;
+        b=UyO+c4PyElHC5I/PVdjmqMq9rLYRC8UrYJTG7X1iLbsB4yd5gpsffjH8WOWQZxXMJE
+         SiJbFD51O9/8aKIHBVdSLvAfoRHQgwUaFxkKiH5WzkozI9/mzKUnMbsTv2BQ0dxBOakZ
+         ypCgTOuFx5MrWATlxgRO+NMiYvtMIL4QtBQb0MXTkqM51M6UfcdNhrJMPvJu1jR0NyIU
+         z5IF0GrHtOeWegVH9Ab7nHyseYI8RZxwb79zrJG6zvCTyFBe470UW+/gaHmY0wc0MTJ/
+         o7OxLqx5MTO21lngRhMjbdSPJjUpCsbxMKqz+oj2hy0CaETmEdjLv/orvmbH7DGUKgia
+         6jIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768924819; x=1769529619;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ayo5jQZPeaTZqwD9/xDSR/da6D6Deuo6ebApFmbkVFM=;
+        b=X0KjnTDFTlAJFD8F8YHmGGlqjN1QWTzRwq0eDxuGkDKuFkFRTCmT0PLJSjZzT8I/gJ
+         M8Hboce+1GoCCyRHZ26Inzuy3IvF1REKoxvY6wcqyLBCJbyNlynnj2eB9k+5ZnhZ0dcG
+         4wT6BJMSrUXkVYBJRXEtsMEtxei4Ko+JTWugER3hFf40lPk2mR8i7h1kjrqJKuJFQ6Qp
+         VIyN2/bf+aOldyqOkT6JXwS+FHB+33uzjFaCJW4JZCENr0u5B1eMbNO6msY3YUblBfjS
+         wW54oK4lizgoktQy9v7L9DSp5icM2HpJ21o9T8AWdMHVnK0z4IZShVkyj+uiIpi0GvLw
+         zSYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlcMafbvaorAHsjkJo74G1bkMmlzAmzgDwRUvzxgdjbR9m2EUJx6uzhEDpP9l2M9UjHB7WXKw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAJ8zUMSUefGyeJGckbntVoaE60J2qS0dfgGbPxJqiDvq5L0ml
+	Bscg9noHWcS/fwdkxfOSQGkH/HymCu5NZ4jE+09UgCVyn1jRwUFDMIyk
+X-Gm-Gg: AY/fxX6zFJeFd3JlzDwVYBQxQk7KETEVqxlueXzTYZ0oQBsEmdH+rfAa2LLwxYi2ZfJ
+	y4rIklroE9vPB1N4mCJci2MH8vbgNJhBAuvHHa5k6P7WLkNi+th4dcY6dKQaqkEvFwJ3kiC8Xi2
+	X0QlInnihWk0LqUdVI0Uzhshc4pQGHOhMvKhJ0K96TPnt6Mevs4qLf5H6TsJDHaqIiygsfRaYTw
+	FASKZAi12CzHQH4poxDCBxClWwNmTcw3R9cFeoLRIzUZCNMuQTvguMkYvWieUbZTeogwVxglSLg
+	sjsVU2FmDgMtoklHzP6qaXzX8ZFi9VIuK9psE7NzPrCuIslYkGaNOFkqER2oF5RFdLZm5Q0oglN
+	29gPCnVLkHcRjV8xGQSm31R/+JmYOFD5rUlnUTdEqFkN735jntgFbM2wwuSiwgZt0YmoscmRn6V
+	XT7qTvwTc6l5I=
+X-Received: by 2002:a05:6a21:103:b0:35e:e604:f78b with SMTP id adf61e73a8af0-38dfe590340mr15226404637.3.1768924818506;
+        Tue, 20 Jan 2026 08:00:18 -0800 (PST)
+Received: from inspiron ([111.125.231.221])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c5edf32d68asm12193550a12.18.2026.01.20.08.00.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 08:00:18 -0800 (PST)
+Date: Tue, 20 Jan 2026 21:30:08 +0530
+From: Prithvi <activprithvi@gmail.com>
+To: dranch@trinnet.net, f6bvp@free.fr
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+3f2d46b6e62b8dd546d3@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: Testing for netrom: fix memory leak in nr_add_node
+Message-ID: <20260120160008.2kylsycgrpzcwvak@inspiron>
+References: <20260117142632.180941-1-activprithvi@gmail.com>
+ <f108f1f4-cdd3-4b14-ad24-d1ef328ca316@free.fr>
+ <46f8fefa-f549-0b8b-d37e-0d608c5ee5f6@trinnet.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100013.china.huawei.com (7.202.181.12)
-X-Spamd-Result: default: False [1.04 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46f8fefa-f549-0b8b-d37e-0d608c5ee5f6@trinnet.net>
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	DATE_IN_PAST(1.00)[24];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251517-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-251532-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DMARC_POLICY_ALLOW(0.00)[huawei.com,quarantine];
-	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[trinnet.net,free.fr];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_SPF_SOFTFAIL(0.00)[~all];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	FROM_NEQ_ENVFROM(0.00)[activprithvi@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,h-partners.com:email,h-partners.com:mid]
-X-Rspamd-Queue-Id: BD9DE58FD8
+	TO_DN_NONE(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,3f2d46b6e62b8dd546d3];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: E570C4A5EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Separate the CTX_PREF_CI_HI of rq and sq to improve readability.
+On Mon, Jan 19, 2026 at 07:37:07PM -0800, David Ranch wrote:
+> 
+> Thanks for catching that Bernard and I sure wish kernel committers would
+> test their code before committing it! Does the kernel show any sort of
+> diagnostic information before it resets?  An oops on the serial console,
+> etc?
+> 
+> --David
+> KI6ZHD
+> 
+> 
+> On 01/19/2026 01:06 PM, F6BVP wrote:
+> > 
+> > Proposed patch is lethal to netrom module and kernel causing a reboot
+> > after a few minutes running ROSE / FPAC node f6bvp.
+> > 
+> > Bernard, f6bvp
+> > 
+> 
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
----
- drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Hello Bernard and David,
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-index d86cd1ba4605..90887d2bb127 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-@@ -162,6 +162,9 @@ struct hinic3_clean_queue_ctxt {
- #define SQ_CTXT_WQ_BLOCK_SET(val, member)  \
- 	FIELD_PREP(SQ_CTXT_WQ_BLOCK_##member##_MASK, val)
- 
-+/* reuse SQ macro for RQ because the hardware format is identical */
-+#define RQ_CTXT_PREF_CI_HI(val)            SQ_CTXT_PREF_CI_HI(val)
-+
- #define RQ_CTXT_PI_IDX_MASK                GENMASK(15, 0)
- #define RQ_CTXT_CI_IDX_MASK                GENMASK(31, 16)
- #define RQ_CTXT_CI_PI_SET(val, member)  \
-@@ -629,7 +632,8 @@ static void hinic3_rq_prepare_ctxt(struct hinic3_io_queue *rq,
- 			    RQ_CTXT_PREF_SET(RQ_WQ_PREFETCH_THRESHOLD, CACHE_THRESHOLD));
- 
- 	rq_ctxt->pref_ci_owner =
--		cpu_to_le32(RQ_CTXT_PREF_SET(SQ_CTXT_PREF_CI_HI(ci_start), CI_HI) |
-+		cpu_to_le32(RQ_CTXT_PREF_SET(RQ_CTXT_PREF_CI_HI(ci_start),
-+					     CI_HI) |
- 			    RQ_CTXT_PREF_SET(1, OWNER));
- 
- 	rq_ctxt->pref_wq_pfn_hi_ci =
--- 
-2.43.0
+Thank you very much for your feedback. I sincerely apologize for the
+instability caused due to this patch. I take this instability very 
+seriously.
+
+Unfortunately I am on a low-end backup system right now which does not have 
+resources to build or boot custom kernels effectively, locally. That's why, 
+it has been difficult for me to test the patch locally due to which I have 
+been relying on syzbot for testing. I am grateful for your feedback by 
+testing that patch on your setup.
+
+I will work on investigating further why the kernel isn't stable with this
+patch and try to create a better fix for this bug. 
+
+Thanks a lot Bernard for testing this patch. In case you get any crash 
+dump or similar information, it would be very helpful to understand the issue 
+and fix it. 
+
+Thank you very much and best regards,
+Prithvi
 
 
