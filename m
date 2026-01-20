@@ -1,109 +1,145 @@
-Return-Path: <netdev+bounces-251655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251656-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIFlNkoQcGlyUwAAu9opvQ
-	(envelope-from <netdev+bounces-251655-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:31:22 +0100
+	id SIwiBDIPcGlyUwAAu9opvQ
+	(envelope-from <netdev+bounces-251656-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:26:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D4E4DD39
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:31:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8BC4DC4D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:26:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 527A496E098
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:20:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 299CD7CF6ED
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF8540FD85;
-	Tue, 20 Jan 2026 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66D03D7D9E;
+	Tue, 20 Jan 2026 23:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Xlz2cAjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFD33B52FE;
-	Tue, 20 Jan 2026 23:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268FD2DEA70;
+	Tue, 20 Jan 2026 23:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768951217; cv=none; b=msHNLpAZ48raA9IclX/rgLGXe6BKKZMFmLX46BdsnKZ07bkD49fItmw8+THQgpUlu/cx3gT0FvVs7MxhG71vjD080jIVSPdD3WPgAWJCI7xaDIGnnFAg8OEoxz+pGaInhghwF9BKLlqqYeGw78/4kFAHjjDI2kJIQ3OpmN9a9Ro=
+	t=1768951264; cv=none; b=He/W7yvjDN1XIdFg7aCFJi1riDdua0FDaj/WQHQFrZ98Hk0vvkIXHewRcvEvV1sNWBk7JLsVYqQZJf0kMB8nNT5b/OYfqc36r6qPKIASIMDKbjLuQ2OE80vTBu4/iASX/W+U21wJ4o0K3uNnZE+HtL9MtT1eosPB+xVt96ZbN/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768951217; c=relaxed/simple;
-	bh=F0yHXtmpIxcTfkWf3PjyLYYBWYljo+hj5xQHYjzEAlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BSnmgv7KyJJMjgF8zQ4hiQeMSMyNtGvBjWqtslblUhMsuIPHZsTqjk4Kjcr1Q9v+BQWp0uFvCaPxlHNgOgSbku1ZNQjcB8fDhBwc0/jeCOn+raCUDmJIKAuREbn6z595vtkOgLmaOb8FlbPsDg0t4o6QtixlEB8J9lBNRLqwmco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 269E1602AB; Wed, 21 Jan 2026 00:20:12 +0100 (CET)
-Date: Wed, 21 Jan 2026 00:20:11 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Konstantin Khorenko <khorenko@virtuozzo.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: netfilter: avoid RULE_REPLACE error when
- zeroing rule counters
-Message-ID: <aXANq__7K0_fhq2D@strlen.de>
-References: <20260120231106.328585-1-aleksey.oladko@virtuozzo.com>
+	s=arc-20240116; t=1768951264; c=relaxed/simple;
+	bh=EOo9r3TrGOlPCzXXLeiaU0t5lefaqILPEHn82lGwLHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Iy6vrcFLT9wiODoXl51LaPE+LEWChbJbV7b94UVKYj03mquWhSTgWfR/fNKsVyPcEl3v378NPKSF8CGIX52ZmJgocfeol6772squPnaFf+TbSDwYlIG9gyiL6nRK8K1NYJsLXrtHdweqr5T7ljfrkp4OzZnWMMMvW+ApDOCZR6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=fail (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Xlz2cAjS reason="signature verification failed"; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [IPV6:2601:646:8081:9483:12c5:bc8e:d949:3497] ([IPv6:2601:646:8081:9483:12c5:bc8e:d949:3497])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 60KNKNir080295
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 20 Jan 2026 15:20:40 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 60KNKNir080295
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025122301; t=1768951242;
+	bh=TyVCzCgQKQUFRX26Pu8MkQHNVCDWfMBAt0MAhktz1fY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Xlz2cAjSDtxaY6byoGvYUO33ZXBH7NnXU+2iqWNiJS9IsirvT7SMBT3VGjN8oFcYL
+	 6L2mEsuCj23a69+jkcjgPRGYu3PKRnXVHIaxjakdow/dWFEMd8qyg7ocJKazCcQW+M
+	 ceIzGwZpRU6ngPz6KPc5/IAbEtqWaBrXecbbxQlTatSfld9EGWMkBW0AYfz8lHO1xI
+	 qs8M/o2UGdDrYA7rRx+t19PoGtsyM+2UMZde1KqwRieO2Qc6oTum4hqO7uUIWIWAMq
+	 bFXerA9NJt6bwTWAcfMEEmSdPmxND85HZY+3Ixa8fLqZd4RMgM6HCfC/KCiRbeW+ss
+	 yNBVAW8CylWJw==
+Message-ID: <0f257cd0-27cf-4c11-b79c-724f4e22c4bf@zytor.com>
+Date: Tue, 20 Jan 2026 15:20:18 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120231106.328585-1-aleksey.oladko@virtuozzo.com>
-X-Spamd-Result: default: False [-1.26 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [klibc] [PATCH net-next] net: uapi: Provide an UAPI definition of
+ 'struct sockaddr'
+To: Arnd Bergmann <arnd@arndb.de>,
+        =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+        Eric Dumazet <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemb@google.com>,
+        Xi Ruoyao <libc-alpha@sourceware.org>,
+        "Carlos O'Donell" <carlos@redhat.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Rich Felker <dalias@libc.org>
+Cc: Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        linux-api@vger.kernel.org, klibc@zytor.com
+References: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
+ <934ca004-0aef-49a4-a4f1-3d39a2e71864@app.fastmail.com>
+ <0fc5b4ef-c468-416f-a065-f64989d75378@zytor.com>
+ <212d2e51-abc1-47bb-8666-755917cad889@app.fastmail.com>
+Content-Language: en-US, sv-SE
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <212d2e51-abc1-47bb-8666-755917cad889@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	R_DKIM_REJECT(1.00)[zytor.com:s=2025122301];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zytor.com : No valid SPF,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-251656-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
+	DKIM_TRACE(0.00)[zytor.com:-];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[hpa@zytor.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TAGGED_FROM(0.00)[bounces-251655-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,strlen.de:mid]
-X-Rspamd-Queue-Id: C1D4E4DD39
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,zytor.com:mid]
+X-Rspamd-Queue-Id: DB8BC4DC4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Aleksei Oladko <aleksey.oladko@virtuozzo.com> wrote:
-> diff --git a/tools/testing/selftests/net/netfilter/rpath.sh b/tools/testing/selftests/net/netfilter/rpath.sh
-> index 24ad41d526d9..90cc21233235 100755
-> --- a/tools/testing/selftests/net/netfilter/rpath.sh
-> +++ b/tools/testing/selftests/net/netfilter/rpath.sh
-> @@ -125,8 +125,24 @@ netns_ping() { # (netns, args...)
->  }
->  
->  clear_counters() {
-> -	[ -n "$iptables" ] && ip netns exec "$ns2" "$iptables" -t raw -Z
-> -	[ -n "$ip6tables" ] && ip netns exec "$ns2" "$ip6tables" -t raw -Z
-> +	if [ -n "$iptables" ]; then
-> +		if ! ip netns exec "$ns2" "$iptables" -t raw -Z 2>/dev/null; then
-> +			ip netns exec "$ns2" "$iptables" -L PREROUTING -t raw -n --line-numbers | \
+On 2026-01-20 14:31, Arnd Bergmann wrote:
+>> 
+> I must have accidentally cut that from my reply, sorry.
+> Looking at it again now, I think I ran into problems with the
+> flexible array that was removed from the in-kernel sockaddr
+> structure in commit 2b5e9f9b7e41 ("net: Convert struct sockaddr
+> to fixed-size "sa_data[14]""), so there is a good chance it works
+> now with the (once more) fixed-size version.
+> 
+> The other problem is that the structures that embed 'sockaddr'
+> are used a lot inside of the kernel, in particular in 'ifreq',
+> so changing the uapi sockaddr to __kernel_sockaddr requires
+> additional changes wherever the struct members are passed
+> by reference.
+>
 
-I would prefer to SKIP in this case rather than working around
-userspace bugs.
+Well, the kernel should do what opting-in libcs do:
+
+#define sockaddr __kernel_sockaddr
+
+or
+
+struct sockaddr { struct __kernel_sockaddr; };
+
+... now when we have ms extensions turned on. Unfortunately gcc/clang don't
+support them without the option even with __extension__, so user space is
+limited to using macros.
+
+	-hpa
+
 
