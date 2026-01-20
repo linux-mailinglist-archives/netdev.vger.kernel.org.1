@@ -1,197 +1,231 @@
-Return-Path: <netdev+bounces-251557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251558-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJ4ANYTNb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251557-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:46:28 +0100
+	id gMaxOa/Ab2kOMQAAu9opvQ
+	(envelope-from <netdev+bounces-251558-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:51:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F0549BF5
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:46:28 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5435648DF8
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:51:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 48D4776B918
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:47:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 278F996DA02
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE4644B69B;
-	Tue, 20 Jan 2026 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462813314A4;
+	Tue, 20 Jan 2026 16:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37rFqslp"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="enorTZHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856802777FC
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768927113; cv=pass; b=iRmc+ZEYjWGDRnjklWL5TMBzwf3bmQCM6O2SoMu2XsGZKIAABvxjKWTqRxOXsK1khCAE+4e2CJgDsaHI8gGSCN4/y5Z57aAyaIMzZnDwnuwJx5OaiqQsNkDzMImK6oXcod7zY7T6SCbN6kpYU0nzt4lRer5lfhfN89LP7dHugR0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768927113; c=relaxed/simple;
-	bh=9P080f24t5ZtF1Umwv/OIBX+xNUA/VUVkCQvbqkf4FY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a044ozdVeyATTiFNISjgYj3etsekvPcUBhFOG4SwAx/Y4VZB8ALV6VfXehGCvYCI4OWObTcbR9xzOL/ZIOwBx78nVFqZ3zCjRxt6W+uN6C+BGRU8InRM1zYakimdVf3rzZ8IUkFsQr7mBMb5lRohGy06sp87CUnlQJk57RyO3sQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=37rFqslp; arc=pass smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7927b1620ddso162417b3.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:38:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768927110; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Jxb5u/L9BMe/4kfsJeAeD8QUnCxikSv+Bx9zYgbmgKifaMkw43lj6MhWE4cTybEtn6
-         Nr55VT+bk+Q5FHW+HAfzoTI04Ds2zJ26ggwHmP/iKHImKATwGo51hl9IvJLcgeOx00PX
-         vZ0txNS4KX1l6nAvBuzc/9REMEh08Top6eTR1wZm0WevgWLnVeACY8EPMFhYfIH0Fxyq
-         WpfHyl7BCRwQFgZEjSQNq9GlJgeS34d+2+wLRH91GmBfxjK6Pz721GBTANP5Wfd/Hokr
-         Mjm2okFBjMc62jfSHqLIVE52ETWSgf4eVS1+mTCT5vA2/sMyG1qdPv+5vxRkXAg+INs9
-         7daw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
-        fh=iX7uFn3OVQnyKu9yWVVc9DMdvy+lry2yudm3R78UdsY=;
-        b=kbRef6Zs3HJIYW6gpGaPl7uK5mvrM9gzI4ZbaQ+lrFRg4jfMW3dreVjIF9XTHZCRhS
-         eoWNihvuCSPdnB5jjYBF33RMn9bRSJP2h33fwjpBAVeu8Gc7g2uwitlfdNA2xLikcPwZ
-         jr+NZ8rtAdXkM5C3uc0B/YIJJVvLG/W/Z24oyj6F9cXr9+8lPiwykibFyZ+nelcE4t3C
-         ht9BOHydTBhlyl9J1mnQ34EB9h4A0YnfydHB1vEToMQ0UFPz54fyP7UwUC8WIFW3MJ/Y
-         VZOxl2yNp6w/y2Drw92BbfoJoklICtNv2Y+M+vSN1MI3xvem+d4yHdPZxtC/aG+dwVTo
-         9HCw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9D0313551
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768927482; cv=none; b=j18K/fl7ktLtHbQvUDMqIB88tyanqV/7YbbpX//ZfOYPqP0kk4KjiZLSsWm7B5s7zWqIcvo919cPER3O84rRLGteS3ScHF/i/EYQlOxyoAys+axzzF2bE5HAMPxmnluIo5Y5MJlV8wVv2TjzOntSFmtN0hAPii3p/0AoYJufYGk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768927482; c=relaxed/simple;
+	bh=aUDhPKL0hM8JEgf53e07so1yz09QTsbUMmEPM++MMC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dRC/FdlYBuPwhK5/rmYrKeudxsVkpjSkH+hTctZBQPEQjp2xMTo7snBD08gp5c8Np1MlXsLzQ/Dv4alRCfjMvp3bSFp9dmQUnqecR7nEdRSGuY/H7G/lHqQNdY5iXYjTImPZNGQQG/jksq1iGxntZzzGKFZfgUGaBRoVzRv/cV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=enorTZHH; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8b2f0f9e4cbso1562385a.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:44:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768927110; x=1769531910; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
-        b=37rFqslp26V5ypKp6lxyLMQWajX5j3WJToHs8Ka1TshCFokUgOgvc6T+G/Ag634Wc+
-         mkcEO8YWNqeUn4S/gKXfEXexoJ0NWdqd0lUx1P6dRqiwkVSV1NrGRBNFP0PRp5ZPCmx7
-         YuUM2QUqKy7RgZf88+sstUeaCiux82d6HNA/vb95h7cXOIlE3v+iHjbBuf8jHLDNntFk
-         t949D1shNkVdj9JZsAvAbLwuXmBO99ViMgEn96OiPdRso4a9yGGlKyrqwK2APtsCOirh
-         uXjVwHinR9DtRV+89xrUzfQCk6S9Nq6MYg69Os47p+DS/4cexBYhxfUUoVgFU9u7izp/
-         FLCA==
+        d=ziepe.ca; s=google; t=1768927479; x=1769532279; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=byK9CbCzUXPvYH8hMBYCGjlZe3ysbsipoknrt4q5MYA=;
+        b=enorTZHHb2rEovvaqsHlJudTAyqhy1O+b6Wb9hMirBr3bEDZcElB++EhFMTigB6DNN
+         g/5LhzI3JIgnahlwdRTRt4XxSlT1UHF7t0P7XiGBm4w296ImJAO3juGTZH1hiWQsVERe
+         Hs7hs0ESDrEo3XIH757I+XTnWNoN3QMlMOLXsKa110lwqqOJeojAC+9bzc15VrPQ9Bst
+         Nt9II4GuZja6VvAjbE0pNFpsGIXcG9aQJqiii62oK/+nQ9dAMlXfPc5hhvkWEtaGDVXO
+         IBiT40k7MZs4mDeMIIWqaqZ9CwpO/sYnK9wG52P5SoSVI89RnqLH2qCxElydmideAxh2
+         YGrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768927110; x=1769531910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
-        b=JV/qFib5NH8yBvkY20Q4mr2In7rNT+fJd8PoQAtMdfRL6KqOviU+TS9R/utEro7IX0
-         tQ8D1nOuDpv1cNzRPL11EBtq5a/K0EDkS40bUtX5CWt/Nb1uECe64VAbMNVIer3xxP6q
-         4ERqMzk+A86z9LhyXW/V20oR/BPKiTkR60B9W5bBgq7lnfcg/i8LZLP3gHv4ORtI1Bz1
-         d2XgcbJCkwzhGTzbrXgZBi6UUkcRqu5c5xTf7r+b+b4CqetPSa/nJHqujVExD75wR/7Z
-         2eLpmu/P+8ZthmhwYygytsWdxvcAoUk014+uPQGVkRE94XIjc39uvgqWTWZNLQ9RB1V+
-         JHkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjNuwlj913lFN5W4o8Fco5hh142O9GhT6tJDIk/SurAcI2IgsI1xMGiX5yw3IlTuUPDoQ/Fn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIzVINrAUhOdkcxysCAGuuaoAEJxkqnXnH4U6JC5Mq/fuvFtuH
-	SE7+sHdmtfg9KYiXGtj2CWNnRnNUUyROvX39Xnb48Q2jFmld1JuDecOkooyOLqyuKcXw38yrvPs
-	DYoYnWNyB/qpFsb+p8pkTstGeOadXiyB6tYG4SbXp
-X-Gm-Gg: AZuq6aJlu0LPGN8mO2Op8vS7z+KxsjZDZ6Sg6RXZT8hTEfEs+Z6OZnOQxoN3Xoi1Y6E
-	IgI4f92MAJZz2inkm23BuucFJUz/TxuL302wxfHJ236Zx+Ewg9oLElRIQRte1i0OMvcQWP7iEZF
-	ZltfwdViskJlb9WkMMrURmRhXrw7LIpDqnYIPY3sgL8/o1PLg6RNh5EWbm0erGE13Xshv7/3h5k
-	3fTfocnNosmI9uXgH0JbrKMTcJEwHjeQdtJsc/DD4dA0VYaK+HtdirBqUpi8kuSWa7Hhr3+
-X-Received: by 2002:a05:690c:6e88:b0:787:a126:5619 with SMTP id
- 00721157ae682-793b321c097mr147961457b3.11.1768927109995; Tue, 20 Jan 2026
- 08:38:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768927479; x=1769532279;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=byK9CbCzUXPvYH8hMBYCGjlZe3ysbsipoknrt4q5MYA=;
+        b=UQ1OM0a6J0wXsJY8jxBe4PEmtPDedBbhOgpdFwTs2BLdHXjpFnRXVbcJdLH8ljz2UG
+         iiVXsxv6olESQ38suNtV1/DW2QpxLPNglKFqjMalvY26xLyPCT2ZY4T3CreC/mD8HiMK
+         N3mvhyRDGokq/FtvGeUbNULlVVmAmbxDL96YMFXMdc6GePWcj9IfGuMFYjNPAYX8ro9j
+         r07StMI38Y0I0T/niUmVjsxzOb2hRKaCFujW1zepXn7JIlzmQRgAeVMz5DNBVWXQz90o
+         4rLCR1U9lAJ4QCNUJjjM1y0sgaKYUcC8NW6N7AQtrs8gckDwOaqXVAFbQz40LVIdgNqj
+         1ACA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtCoxnWwFx3DmXOL+/2R7SQ/jd+5BOxWsssSxP4tlmV/1LndJt5Emr+wIqLEw54eVIHg8AZSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3PR0QRKdkzz9BGh1Hav0r4uxaT7ZSq65s2aQAIxNvNR3M/Fgl
+	QbA8BmMDkWFREmhfFTFaYrAYPhbEdI1J2XjoaOQRSyHNAPKIgjGfRtJ/PdWxy6mvtsA=
+X-Gm-Gg: AY/fxX4VibCHlzKCD9WTJSEUWu4taTSffGISSKisb8OqHT1WSHP6hrh3JrSPfQTnV4S
+	GawzRI0T/iSL9ZdFCVpwI5hr/JrUFRw2Z4IHslDAswCagB98s9FkLt5hdUIfq7lr5qEy/MRpvw8
+	6cixOHxXcJ+rwmNgIvkdBiwJBSdMNUQHSyo/rliLSdkwgqHPH7zIJgCzQGxMgumC0B8510N0OUh
+	1XUZ7I1dfmJtqcR0O+bOs4/ZdSGx0o2BljDTGxWWSajsamlvYdfCQMv4p4oZDWfhfLgdJdJWAA2
+	t5nfudU4O2wlj4cq6aLDRVwniaWPaqXjfDQAx7zwbc4ZysVV1ka8wDFbgDOtzeQ32aeoevF+uAd
+	xCAvUjOy5jrCCTLJe2jlWrc7HoGLIWfpunvj7ScTYC2brYCqTftqxV+tpSkTIdvjlHe2sCh66f7
+	q3KQxB0COHvIgry3Tghm+O6+ueaG4ckUBnuOp9Is/Woe1UoAhOJ+v91fvhNK8QbcrUjEc=
+X-Received: by 2002:a05:620a:4011:b0:89f:cc73:386 with SMTP id af79cd13be357-8c6a6479374mr2212242085a.13.1768927479473;
+        Tue, 20 Jan 2026 08:44:39 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a72507d5sm1084693385a.32.2026.01.20.08.44.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 08:44:38 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1viEqM-00000005YT2-14LN;
+	Tue, 20 Jan 2026 12:44:38 -0400
+Date: Tue, 20 Jan 2026 12:44:38 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Edward Srouji <edwards@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Michael Guralnik <michaelgur@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH rdma-next v2 02/11] IB/core: Introduce FRMR pools
+Message-ID: <20260120164438.GR961572@ziepe.ca>
+References: <20251222-frmr_pools-v2-0-f06a99caa538@nvidia.com>
+ <20251222-frmr_pools-v2-2-f06a99caa538@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260118175215.2871535-1-edumazet@google.com> <20260120073057.5ef3a5e1@kernel.org>
- <CANn89iL-w7ES=OsNQhLTZjxVdfOJxU2s7wRXJF6HkKSAZM2FBg@mail.gmail.com>
- <CANn89iJUh-3xDWkXhNatmBj2tWd1dLHXLbE6YT9EA2Lmb_yCLQ@mail.gmail.com> <20260120082942.3c62738b@kernel.org>
-In-Reply-To: <20260120082942.3c62738b@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Jan 2026 17:38:18 +0100
-X-Gm-Features: AZwV_QhLxX9RoidDYE7G7QuKfaTGa4FmCz-uSD2gHY76CilqyWGZAQAuif9xsck
-Message-ID: <CANn89iKEJrHZ2cHzkqKXz0ibCusUUcxATJz7H_WH=HptfVQ=6A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/3] gro: inline tcp6_gro_{receive,complete}
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.46 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251222-frmr_pools-v2-2-f06a99caa538@nvidia.com>
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251557-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251558-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[ziepe.ca];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 88F0549BF5
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,ziepe.ca:mid,ziepe.ca:dkim]
+X-Rspamd-Queue-Id: 5435648DF8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 5:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 20 Jan 2026 16:44:52 +0100 Eric Dumazet wrote:
-> > On Tue, Jan 20, 2026 at 4:41=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > > > Still not good?
-> > > >
-> > > > net/ipv6/udp_offload.c:136:17: error: static declaration of =E2=80=
-=98udp6_gro_receive=E2=80=99 follows non-static declaration
-> > > >   136 | struct sk_buff *udp6_gro_receive(struct list_head *head, st=
-ruct sk_buff *skb)
-> > > >       |                 ^~~~~~~~~~~~~~~~
-> > > > In file included from net/ipv6/udp_offload.c:16:
-> > > > ./include/net/gro.h:408:17: note: previous declaration of =E2=80=98=
-udp6_gro_receive=E2=80=99 with type =E2=80=98struct sk_buff *(struct list_h=
-ead *, struct sk_buff *)=E2=80=99
-> > > >   408 | struct sk_buff *udp6_gro_receive(struct list_head *, struct=
- sk_buff *);
-> > > >       |                 ^~~~~~~~~~~~~~~~
-> > > > net/ipv6/udp_offload.c:168:29: error: static declaration of =E2=80=
-=98udp6_gro_complete=E2=80=99 follows non-static declaration
-> > > >   168 | INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buf=
-f *skb, int nhoff)
-> > > >       |                             ^~~~~~~~~~~~~~~~~
-> > > > ./include/net/gro.h:409:5: note: previous declaration of =E2=80=98u=
-dp6_gro_complete=E2=80=99 with type =E2=80=98int(struct sk_buff *, int)=E2=
-=80=99
-> > > >   409 | int udp6_gro_complete(struct sk_buff *, int);
-> > > >       |     ^~~~~~~~~~~~~~~~~
-> > >
-> > > Oh well, I thought I tested this stuff.
-> >
-> > Interesting... clang (our default compiler for kernel) does not complai=
-n at all.
->
-> Well, at least I _think_ it's this series, haven't tested.
-> It breaks in the kselftests, no allmodconfig, here's the full config:
->
-> https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill-dbg/results/48=
-2021/config
->
-> Also possible that it's a silent conflict with another pending series.
+On Mon, Dec 22, 2025 at 02:40:37PM +0200, Edward Srouji wrote:
+> +static int compare_keys(struct ib_frmr_key *key1, struct ib_frmr_key *key2)
+> +{
+> +	int res;
+> +
+> +	res = key1->ats - key2->ats;
+> +	if (res)
+> +		return res;
+> +
+> +	res = key1->access_flags - key2->access_flags;
+> +	if (res)
+> +		return res;
+> +
+> +	res = key1->vendor_key - key2->vendor_key;
+> +	if (res)
+> +		return res;
+> +
+> +	res = key1->kernel_vendor_key - key2->kernel_vendor_key;
+> +	if (res)
+> +		return res;
 
-To clarify : clang does not see an error, gcc does.
+This stuff should be using cmp_int().
 
-I removed the INDIRECT_CALLABLE_SCOPE from both functions for v3.
+> +static struct ib_frmr_pool *ib_frmr_pool_find(struct ib_frmr_pools *pools,
+> +					      struct ib_frmr_key *key)
+> +{
+> +	struct rb_node *node = pools->rb_root.rb_node;
+> +	struct ib_frmr_pool *pool;
+> +	int cmp;
+> +
+> +	/* find operation is done under read lock for performance reasons.
+> +	 * The case of threads failing to find the same pool and creating it
+> +	 * is handled by the create_frmr_pool function.
+> +	 */
+> +	read_lock(&pools->rb_lock);
+> +	while (node) {
+> +		pool = rb_entry(node, struct ib_frmr_pool, node);
+> +		cmp = compare_keys(&pool->key, key);
+> +		if (cmp < 0) {
+> +			node = node->rb_right;
+> +		} else if (cmp > 0) {
+> +			node = node->rb_left;
+> +		} else {
+> +			read_unlock(&pools->rb_lock);
+> +			return pool;
+> +		}
 
-Thanks.
+Use the rb_find() helper
+
+> +static struct ib_frmr_pool *create_frmr_pool(struct ib_device *device,
+> +					     struct ib_frmr_key *key)
+> +{
+> +	struct rb_node **new = &device->frmr_pools->rb_root.rb_node,
+> +		       *parent = NULL;
+> +	struct ib_frmr_pools *pools = device->frmr_pools;
+> +	struct ib_frmr_pool *pool;
+> +	int cmp;
+> +
+> +	pool = kzalloc(sizeof(*pool), GFP_KERNEL);
+> +	if (!pool)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	memcpy(&pool->key, key, sizeof(*key));
+> +	INIT_LIST_HEAD(&pool->queue.pages_list);
+> +	spin_lock_init(&pool->lock);
+> +
+> +	write_lock(&pools->rb_lock);
+> +	while (*new) {
+> +		parent = *new;
+> +		cmp = compare_keys(
+> +			&rb_entry(parent, struct ib_frmr_pool, node)->key, key);
+> +		if (cmp < 0)
+> +			new = &((*new)->rb_left);
+> +		else
+> +			new = &((*new)->rb_right);
+> +		/* If a different thread has already created the pool, return
+> +		 * it. The insert operation is done under the write lock so we
+> +		 * are sure that the pool is not inserted twice.
+> +		 */
+> +		if (cmp == 0) {
+> +			write_unlock(&pools->rb_lock);
+> +			kfree(pool);
+> +			return rb_entry(parent, struct ib_frmr_pool, node);
+> +		}
+> +	}
+> +
+> +	rb_link_node(&pool->node, parent, new);
+
+I think this is rb_find_add() ?
+
+Jason
 
