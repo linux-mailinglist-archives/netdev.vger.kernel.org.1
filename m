@@ -1,232 +1,157 @@
-Return-Path: <netdev+bounces-251624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCX0LW0EcGmUUgAAu9opvQ
-	(envelope-from <netdev+bounces-251624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:40:45 +0100
+	id 6IlfJDH7b2mUUgAAu9opvQ
+	(envelope-from <netdev+bounces-251625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:01:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A5F4D1D4
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:40:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B44CA8F
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 97269801739
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:48:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5BF364F560
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D413D3CE7;
-	Tue, 20 Jan 2026 21:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA333D4114;
+	Tue, 20 Jan 2026 21:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pE+n3ZUQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OGkIU3Ur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1962E3C1982
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 21:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768945688; cv=none; b=dn1Se7SC+xQFMHQKR5MeTXGF9hjY4yzoK4frU0DGUK2kaAxNkt1PpjqR6rrc9LmMI74Z797BhSAZ66vqWyFOZ4OVWq7WiC7q32dJx6pXQRahfhD8vBFbqY1NtXI2jDA7UEVZqocJuVL6vaYUZc1/3guzWYSRCRWkM5kcTTi00Uw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768945688; c=relaxed/simple;
-	bh=i28nqnjE3Ex45/rzyt01knAs2L4DKyr5l1YvZcqtgng=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=amtI/knqHVkGR7GNG+nWqent5PYmDMd5gQweXkjADnHsjZH6q3twkfQqAS5BYTT5e4XDtc4jnkbDvar3G7GCwCP3v+bYBAT1xN2mQ/OmIwMzbscLlRvtN/iVDbZWo8VmydjsPdCOuZY42ihA4uQNN//AYTXpVBW4s4PuFExZsjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pE+n3ZUQ; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419CA395266
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 21:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768946020; cv=pass; b=EU+pHQA4snRPyECE1vu1/aTkEVWPdNMwpbPgK9TW17yD/GAdnOc+iWLmqa+MXOG7vE+U6QxZ379OKXWQuFjtKsPE3IM3Duxd/hPbEpabXuNOi8GjnS/A+us82COexH+Yw9AJXIQsG36FgKdHlzP3DIXyf6H9hpg2J9HiOQ1h3g0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768946020; c=relaxed/simple;
+	bh=OOkg9g07Qtf5oqCWy3DAcEVTf+vF40cuy2xsIZ4sY4g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RagDZJw1VsvBv2CoV/EEGdtA6KPaj0u1Gu+ffn0m3Z6FSvWm0beUXAMuzE3ZvlR7yenYb+WI+xotzU0wnUGLsCLctomLJCoHnvSEf/wh7t82NGFoEF13yGW3oFQYMEj6QyvVUuJqN3h+XmnyulInSyHYMw/+HPI7iLRFEffRQOw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OGkIU3Ur; arc=pass smtp.client-ip=74.125.82.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29f25e494c2so3164165ad.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 13:48:05 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-124566b6693so8667467c88.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 13:53:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768946017; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Abe+A+7CO0r3i+F1t3jP8HlJeRbSeztobAR/ulW7MQIaZkm9hYllTYe+DEANJhoDw/
+         pWw54Wx7bpse9V5iLAPJvSykT8708xpVA8hj0zMQjSnm5ps/qGPCB823qTUw3c4aCM3+
+         noFRfd2Tx7fS2kh6iNtKMq6woIVD9ZfbOyBaMJu1ymPZJKQfQvt3Tgry6U29FzajCmos
+         U8LIXja+DTLZAT+c2+z2j0V3haMQzSMOUXb0cWfJ//lSCSETtqcAMA3UIQYCoJLE1XMv
+         j8//MqqKmjF1x+dNOJKEwwY5ItL/8ibadCUKOjKISOgMCseWCzf5IsHUB0IU/PzoWnmR
+         ejhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OOkg9g07Qtf5oqCWy3DAcEVTf+vF40cuy2xsIZ4sY4g=;
+        fh=023w3GgbKm/+MuA8/OSUG5Rfggo3dVt1dM2gVFdhp28=;
+        b=DoEoS4KSHU8rIh9JEqFuAw+cCIDHb79qeV9SnV1pmKwjiotSrGZVPcgbBQUrO2Krfz
+         zRuN5Wb+JUt1dxS7etZ8gqUHgWAtgbh+GeVEoFZqWF55TEckVweIOsN1eI544fxyQfzG
+         u+PeNTiYebXm+DTAusmn34zxPIFQLk2lWjU52j5vZjZF4swVeR++G87skUzPkml1zbtz
+         3mGnBOoD7j+oJ/XFqQZLYQgEzCMreqOfuYvv8RDZqMqfHCuwvLHWKg15gZQih+LEO/og
+         XLCKCRjjrMrcUAyA9SdtA1BBtwLY2PtICwqcHHTAbLG9jd3kvMbtJolrRB+pqTG1RArv
+         4xow==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768945684; x=1769550484; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkdujCmDy/y/ym1vwY/RAZu/68Y7uCiFUVKsLditgxk=;
-        b=pE+n3ZUQaTYqOFEYcfUhqIOGSGvqBmG8w6NqsdGyx0nLyxneZGD13Ca1qsJUTBR7WR
-         0svaJmMclOiAvyaF/S1CWzLctWdeHjkc2DNGgMxFHO6PmF8DdOk/7DhAoU9zTiylLFDT
-         OWC5OLp6E9zK9mnjbBu0tBI0/giKtFB/GSmSCq68n7NutwDYxW+nkgyFXd3QjrnmtJtN
-         eq8AY5y+VPuXjSDOtj6NT0Nlw/1x43Yj4EJwwbw1Aepkcd/AsM/8g18kizYs8wm4azVL
-         D/xfMGPhH+nfbGD5BHji2hhD0Lmc3fW6+x6O+zSZJjuDunc1l1Oqx/z/O6Ix0tofwaXy
-         Ki1A==
+        d=google.com; s=20230601; t=1768946017; x=1769550817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OOkg9g07Qtf5oqCWy3DAcEVTf+vF40cuy2xsIZ4sY4g=;
+        b=OGkIU3UrcCkMKYd1TQoYwBJqO6+nmt2RA3Ww1nfF4NN7bEU7QSoQlL/mVyrFuLEuop
+         whNllC0R4oB3sfLqU0YFQ7VaiSe6ItYQboJU4+ic7hH+N28cDBcePiACyDz0CXz2MNtT
+         hlhi+VN7HeAcjLIrVQsqc59yLb46mWzlVnXVX0GlHeanggtsboZjkmbcuMiGIMPA4uUH
+         ejfn8U2qKh3hPUqBJNDFGIhDbSKVrq4Pc67E+SeY7EzrjluUBBewqQUPS3MMxThar38v
+         pYu3N6sS+H/yzEqhIykSxomW8GLm0PIOujRLLbtLAhN/3i0+WGEHh3PQOrBoZh5ScWDZ
+         36zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768945684; x=1769550484;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkdujCmDy/y/ym1vwY/RAZu/68Y7uCiFUVKsLditgxk=;
-        b=D+qe1ESkv8KeyPhgCrPNn6nsHPgI627buqcDkSgKCEW2Fh6+Ft9c6W4oR34kRbcmoa
-         AbQCGS39kkGiZWBNwF3LAGa6bcKAJLiWevWP+lW2IlVzvQQR3a+6m2mTahNTxMqjTTKn
-         IID/9x2KbAsDOtWge9G/fXmRY6VMU6+251+8L5SbNeNq3b8sfeSp50BmleX1Lqx1DNVI
-         G+m0dLlpGEMANzmTQxFgSbJ7yAiWDxKyW53/5Pq6H7lKdK7dMg6vBr6F8RKH0KRgtK3B
-         QHtH/pk71vuoMciOUtBErXv3iR9YzDxiOIo3JONDOrLeFvMA9CbAofXcRTehCIN3RYav
-         I+Cw==
-X-Gm-Message-State: AOJu0Yw+c8MwWOoXH6H3tbSj4dhboBQC+y86fmn0/xYnmOmpOekfcBuH
-	EKZKqqdmtHfqjGTCiugc7d/wkQA1wlVbTrE3BqPgWcYo7wKj5deiA0VBbHpuwJj5N1fCcD/IgwO
-	uuZqnTw==
-X-Received: from pllg4.prod.google.com ([2002:a17:902:7404:b0:2a0:98e6:379f])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2c08:b0:2a0:c92e:a378
- with SMTP id d9443c01a7336-2a71756b899mr142022805ad.7.1768945684209; Tue, 20
- Jan 2026 13:48:04 -0800 (PST)
-Date: Tue, 20 Jan 2026 21:47:16 +0000
-In-Reply-To: <CAFWXMN3WexdQEsjZRGumLuyA8phXmSte_j7JTAjL_v11ZxAmtg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1768946017; x=1769550817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OOkg9g07Qtf5oqCWy3DAcEVTf+vF40cuy2xsIZ4sY4g=;
+        b=Nofgq/3P3kC9jjdheTaNP4X48koH0bPx5h11Ek3UKv2aJJv2Z678PNAPTS1wT4OZGP
+         1JUjrHNGsoRh8Xxp7bjwYkWoEl9BvsI6YQon+/+2Rr487hu5hNe9VhSKJy5iFIcZ00Zj
+         HDqQeh7NyiQkN4SIvQ2mrxKHh9w2LLZyb1N0dHR9WSyB+hqM87tGLk89FCp8CWjjw6bI
+         yWmdY6pfNL9g40TA6FRE5FfpoqtWYTqAqDJljW52xiUABv3r+snvBuaSeKchd3sMRz/B
+         ntg52VTPOzQ2iOCuABR+nFnYZntSdiE6whjfI3vi59C0qxUahD07RTvoO7E3PtMr+jx9
+         lkLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVi58QzZLlzRGyjWFQW3qMjLDjW/wIRTxrp/n7bmDs4+hfrfucCj7swEz4qwE+EQuPR98y2nK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPKcKKFDIH4oMtv73pzfGomcRBa6EzZf4f778FO+EdBSlZe88p
+	NyqSMtkpUhrvzS7fGfSS1buKquSJIObIKhnMdDNxy8/dHqmdLy/q0P/goOrUMU9Kq4IktAgJwaB
+	m2GuIAkQc3GR+l8oqm7T5AudBoFiUx9i+jz39cX+H
+X-Gm-Gg: AY/fxX6r5/rwksMME3a6/FzpXO2Ma/b9mrWn28Zk+uRPtTzcVrZ6Uj7/9rADFsip6+E
+	azclZo8C0qLOxkiGU7jWug2sYz4o60iVPF399ZDcKtjTIXpSqhnp9nq2IzibfVAyDV2sMDo5mqL
+	pQlS3Bbd8e6lKJDTR1rW6X/+pdpN14AnR/xPRu7KxijgNSUBLCB7ib56mV/6QyzXiVl/WTKvz7Q
+	Sxa0M4Y9Kia1qXgCEUBtAJ1HKqIA8LM82WmwZR3omvVjjaDXhGiDH7ywd9j/la4ogYmVnjZAKwK
+	xrKPqHljy0CMNYD6bS4bapQqGKri/8jGz2a09X8MV/BVX3U42qCJODzVCH1/0zayRqaU
+X-Received: by 2002:a05:7022:e28:b0:119:e569:f262 with SMTP id
+ a92af1059eb24-1244b3359e7mr13971228c88.11.1768946016799; Tue, 20 Jan 2026
+ 13:53:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAFWXMN3WexdQEsjZRGumLuyA8phXmSte_j7JTAjL_v11ZxAmtg@mail.gmail.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260120214802.270100-1-kuniyu@google.com>
-Subject: Re: [RFC] net: ipv4: optional early cleanup of half-closed TCP sockets
+MIME-Version: 1.0
+References: <20260120125353.1470456-1-edumazet@google.com>
+In-Reply-To: <20260120125353.1470456-1-edumazet@google.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: gopalmalaviya53@gmail.com
-Cc: netdev@vger.kernel.org
+Date: Tue, 20 Jan 2026 13:53:25 -0800
+X-Gm-Features: AZwV_QhDty59E6gd0eGviuWFVgNNWxmTDQmV25jeTZD-k4DKZSQl5Vnu4o3NcgM
+Message-ID: <CAAVpQUANrWn4sRLWYrMkFEkm0Qc+=6=WPjftBcx3+dHrHxgdPA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: preserve const qualifier in tcp_rsk() and inet_rsk()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251624-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-251625-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	DKIM_TRACE(0.00)[google.com:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 62A5F4D1D4
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 6B9B44CA8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Gopal Malaviya <gopalmalaviya53@gmail.com>
-Date: Wed, 21 Jan 2026 02:03:39 +0530
-> Hi,
-> 
-> Background:
-> 
-> I am looking into cases where TCP sockets that transition into
-> half-closed states (CLOSE_WAIT or FIN_WAIT2 after receipt of FIN)
-> remain available long enough to be reused by userland connection
-> pools. In some HTTP client workloads, especially those involving
-> frequent requests with large request bodies, reuse of such sockets
-> can lead to follow-up failures such as timeouts or premature close
-> events on subsequent operations.
-> 
-> This behavior is compliant with TCP semantics, but application-level
-> connection pools may incorrectly assume that a socket is still usable
-> as long as it has not been explicitly closed.
-> 
-> Problem:
-> 
-> When a remote peer closes its send side early, the local socket
-> enters a half-closed state as described in RFC 793, RFC 1122, and
-> RFC 9293. These states are correct and expected. However, sockets
-> in CLOSE_WAIT or FIN_WAIT2 may persist long enough to be returned
-> to userland pools, even though practical data exchange is no longer
-> possible.
-> 
-> For workloads that rely heavily on persistent connection reuse,
-> this can cause intermittent and difficult-to-diagnose failures.
-> 
-> Proposal:
-> 
-> Introduce an optional sysctl:
-> 
->     net.ipv4.tcp_aggressive_halfclose = 0 (default)
-> 
-> When enabled:
-> 
->   - Upon receiving FIN and transitioning into CLOSE_WAIT or FIN_WAIT2,
->     the socket is marked as a candidate for early teardown.
-> 
->   - After a short configurable grace period (seconds or keepalive
->     probes), if the socket remains half-closed, the kernel performs
->     a normal teardown using existing mechanisms (e.g. tcp_done()).
-> 
->   - Sockets handled in this mode would also avoid TIME_WAIT reuse,
->     ensuring they are not inadvertently returned to userland.
-> 
-> A secondary sysctl could control the grace interval, for example:
-> 
->     net.ipv4.tcp_aggressive_halfclose_grace = <seconds>
-> 
-> Default TCP behavior remains unchanged unless explicitly enabled.
-> 
-> Rationale:
-> 
-> The intent is to provide an opt-in mechanism for environments where
-> reuse of half-closed sockets interacts poorly with application-managed
-> connection pools. The proposal does not modify semantics for established
-> connections, connection setup, or orderly close initiated locally.
-> 
-> RFC 793, RFC 1122, and RFC 9293 define the TCP state machine and
-> half-close behavior but allow implementations flexibility in resource
-> management and socket lifetime. This proposal aims to use that
-> flexibility in a narrowly-scoped and optional manner.
-> 
-> Implementation notes (initial thoughts):
-> 
->   - Tag sockets on FIN reception when entering CLOSE_WAIT or FIN_WAIT2.
->   - Apply a short timer or probe-based grace period.
->   - On expiry, perform standard teardown.
->   - Avoid TIME_WAIT reuse for sockets marked for aggressive half-close.
->   - Keep all behavior gated behind sysctl(s).
-> 
-> Request for feedback:
-> 
-> Before preparing a full patch series, I would appreciate feedback on:
-> 
->   - Whether the general idea is acceptable as an opt-in extension.
->   - Preferred naming and placement of the sysctl(s).
->   - Whether a grace period is preferred over immediate teardown.
->   - Any interactions with existing timers or state transitions
->     that should be considered.
->   - Any related prior discussions worth reviewing.
+On Tue, Jan 20, 2026 at 4:53=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> We can change tcp_rsk() and inet_rsk() to propagate their argument
+> const qualifier thanks to container_of_const().
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-You can implement the logic in userspace,
-e.g. with "ss --kill" :
-
-1. Create CLOSE-WAIT and FIN-WAIT-2 sockets
-
-  # python3
-  >>> from socket import *
-  >>> s = socket()
-  >>> s.listen()
-  >>> c = socket()
-  >>> c.connect(s.getsockname())
-  >>> s1, _ = s.accept()
-  >>> c
-  <socket.socket fd=6, family=2, type=1, proto=0, laddr=('127.0.0.1', 46490), raddr=('127.0.0.1', 58241)>
-  >>> c.close()
-
-  # ss -tan
-  ...
-  CLOSE-WAIT 1      0  127.0.0.1:58241      127.0.0.1:46490
-  FIN-WAIT-2 0      0  127.0.0.1:46490      127.0.0.1:58241
-
-2. Close them
-
-  # ss --kill -t sport == 46490
-  ...
-  FIN-WAIT-2 0      0  127.0.0.1:46490      127.0.0.1:58241
-
-  # ss --kill -t dport == 46490
-  ...
-  CLOSE-WAIT 1      0  127.0.0.1:58241      127.0.0.1:46490
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
