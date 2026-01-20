@@ -1,74 +1,100 @@
-Return-Path: <netdev+bounces-251483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EO20G9CEcGktYAAAu9opvQ
-	(envelope-from <netdev+bounces-251483-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:48:32 +0100
+	id 8JmHNPERcGlyUwAAu9opvQ
+	(envelope-from <netdev+bounces-251485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:38:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7935305B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:48:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCB74DF1A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C6CA26A11C2
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 12:42:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E6E4860BBA2
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 12:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8404B42B75F;
-	Tue, 20 Jan 2026 12:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0300042983C;
+	Tue, 20 Jan 2026 12:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jFYrdIlD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OCZ1cgQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012058.outbound.protection.outlook.com [52.101.48.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D89842B72C;
-	Tue, 20 Jan 2026 12:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768912744; cv=none; b=NMBQ/2HzHcceQm1RXtc13Pldi+/6LFzD7p+y9RhVuoWRqiyIOrcmkXCBZ9i1oBJmWPOCMJF7kaHSpgJrd/npKbzUCe8TcJJmyPsy4A8sjIgJVD/4Qorna6fdNmxk+RIVp3nGudeG1iL+cIyCxo2H9TemnaGHW1EYPUKgJ8kGRRA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768912744; c=relaxed/simple;
-	bh=kCqO2ZJkcDyyuTwrrkKrfVhZlwsoYyDv6tsJCP9WnZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SqmWl3X9Hjkb8isDM2FCEZGxgxfTGOzuPfYqpRm6Tf3rhfOus9034V+Zb6c4DddIuJbqgllh2yrAxewRaevgP+dfZRVrORZsDNa/ITxtQkeYnpo6Kk8mb9iI8b9lnVASpoyY7XPB5BRAeglkZUgTo1Hq5SStuB3HkQd3cAW6d6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jFYrdIlD; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=oTXEVLgDumVCBFxpbO8s07ckXDCKC5Us7m6vOmueETk=;
-	b=jFYrdIlD6scNu1lCaG+lOb4ovAPAm3AE9S1DxjPS7XzWJTmJ91siw+9jJyf+J11uZU12gG9yH
-	LrnTfdTLhSwbMToijlqDkRUVizKzS3vHaCZhmU4HQ65F+hNejkdJvNhi2AWqUghbMyFPrVX1hO0
-	jCqW7GUZ1Ef7kIbZk0dcWgE=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dwRck2hqpz1prLv;
-	Tue, 20 Jan 2026 20:35:34 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 924AA20104;
-	Tue, 20 Jan 2026 20:38:59 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B46429821;
+	Tue, 20 Jan 2026 12:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768913268; cv=fail; b=LVOwECsyvn6e1GOXYnaj+/RzyEMiOoxIoVCMv3iu5kGHhXquzIysb+lDgDrglCboLi4EQi/SHZ6jDz9LIRsANcP02JVWSyx4uuQy2yE0ZnonFsHaivvq2eRzqaRfom5ikLxaMkImGqIvL487pSQlhU9VadlfB91kH+N9PJtnmko=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768913268; c=relaxed/simple;
+	bh=cCFKi8WfjuFK9OVPxaiQM6DTThLqT7F8JjMgWfEyqHU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QQMw6b9j2LpnrYo6At79TmqUnWTWEHNNyuFRoM5/gXCOX3dD8Uzd/+U9ap4WCw+lLYUNLDACwNUuYTQXaClAZlIjIZfsmFmDfUxAx6M8oQKvO4B8EO1eIbJCPWy+4ygVvcQGgWUxneeDl19t234WDhgZNOsZcj6ASBp4uICGpKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OCZ1cgQf; arc=fail smtp.client-ip=52.101.48.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=P2gJM6yufOhfJ+1sxserfM30MWnWao3tfsqdMrDhJfsURLJsc5nccJzOB8kVBWNpgXSdKZ9d0xpwxAb2+nXqKzShy1I0lsGEmDLXv4bl47um5HJGG8gXuCX5ztm5iS4iWygHPptIPZh5Yk1rjWp0EVDSyr84G2cYnDQcbyR/+B26OYeZ5kZCsjumI+v1+IHLia1JwXXMaVqAL/TGLSR5az+YZ64BW7gjENTzilLN/u3mF91xnAB3eUWu33eONWzaIT29t/p2pe9ZNnvKRbQxg1lPi2KVdn0CMHARo3ou3H9pKZkOmGeLL+LFtjV4xlMD3lBRnizq/QQdCmOFIqaaWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kxsck0M6oO75P4LPqNt7j44OGCo9lh9z+aZRMMNAVaA=;
+ b=t7GLUSpfhT1weP8U64Laums7fiu+as28q9t2Vfom7G2eLUBlrk2nu7YRgz61TmbQo6ZTH/CZwJmEar5e6fS1vAW1ctTDh43RDValMQBNkpGcivD+R3vVlEjZL/VGHd+9/aKxWXOeRVEFMawvhbNQ/k4zTTUs28s0haQQgZyUSBth8ScRlTYmIqYhVb72D0NxQMyw101VyGbriydjlmLd/oaEVwhZHfbsyx6ThPt6+HK/kAZhZtKJAnFA7YWoxZ5KYiq/iXohFHI8/jbKB88FSscGLJaeRBqpF9JHe9/TpVvVRazYU8YvYxSPbQo/zHmrNPO5flrIkC2g84V1sXrC0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kxsck0M6oO75P4LPqNt7j44OGCo9lh9z+aZRMMNAVaA=;
+ b=OCZ1cgQfIS64KfyqKQLu1s10Ip+JkEbJp8nsPQwRzjTO0U6H55i4n+gxsql8+PxCIwGOSUlNczjl8HqZRTzxITIxSWGE9HakmuTy81lJEYHLh+b2f7gHgrt4Xl7co1d+Z3PWDC1OmxpGZ0fOLh6qvEXwujLSA96Mlt4Ghr/Tp1c+SVI1RkVFhkHyEYVzoODo+pOrX38tdwMI+IMO4/fWhKQVK0tSn1o86ZpBvq+A7/c++aPjDLej38Et3dI46oOGAx8xCxuxhuZr0GMKRymuO1GW2iCouBgb9JL5RrdNEqq6EuBWt9XGl4JdZl1Bo8qffpdt41Hmwl5h2IwvZyYrHg==
+Received: from SJ0P220CA0006.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::29)
+ by BN5PR12MB9463.namprd12.prod.outlook.com (2603:10b6:408:2a9::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.13; Tue, 20 Jan
+ 2026 12:47:42 +0000
+Received: from MWH0EPF000A6732.namprd04.prod.outlook.com
+ (2603:10b6:a03:41b:cafe::f9) by SJ0P220CA0006.outlook.office365.com
+ (2603:10b6:a03:41b::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.12 via Frontend Transport; Tue,
+ 20 Jan 2026 12:47:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ MWH0EPF000A6732.mail.protection.outlook.com (10.167.249.24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9542.4 via Frontend Transport; Tue, 20 Jan 2026 12:47:42 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 20 Jan
+ 2026 04:47:31 -0800
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 20 Jan 2026 20:38:58 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
-	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
-	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
-	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>
-Subject: [PATCH net v01 5/5] hinic3: RQ use RQ_CTXT_PREF_CI_HI instead of SQ_CTXT_PREF_CI_HI
-Date: Tue, 20 Jan 2026 20:38:43 +0800
-Message-ID: <3e9283e95663ddb23c2f1e5fef05f893af94e8e8.1768911232.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1768911232.git.zhuyikai1@h-partners.com>
-References: <cover.1768911232.git.zhuyikai1@h-partners.com>
+ 15.2.2562.20; Tue, 20 Jan 2026 04:47:31 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Tue, 20 Jan 2026 04:47:28 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Joe Damato
+	<joe@dama.to>, Stanislav Fomichev <sdf@fomichev.me>,
+	<linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Nimrod Oren
+	<noren@nvidia.com>
+Subject: [PATCH net] selftests: net: fix wrong boolean evaluation in __exit__
+Date: Tue, 20 Jan 2026 14:47:33 +0200
+Message-ID: <20260120124733.604590-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,72 +103,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemf100013.china.huawei.com (7.202.181.12)
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6732:EE_|BN5PR12MB9463:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30b8a3a3-07ac-4eba-f619-08de58221a07
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EUltaRW1cn/YHLX3piH0LJdqpOeY6rSBk/bDb0VfmORi+VxLtlfZrCulLc/L?=
+ =?us-ascii?Q?0ii5pG9+3VL130a5Z4nMzQPZPpwwNSGZdQNV+tqUjSc7Lv5r71zQpRxMQNwr?=
+ =?us-ascii?Q?A53MXkrbv3/9yLzox3/8Hf04/RTd4Q17uRbBwE77k4JudGyh70bLJgJNs1er?=
+ =?us-ascii?Q?w1rCfoevj4yc4SuSBRKIvKomkVcUUyqozND28UIDNZ4g+MELqAN65X4WdjxP?=
+ =?us-ascii?Q?W6Z0EAS+fkPBOanGUkrLhaicKF622o2kvZWCZW5E74bk65H7MDdzZ+UA01r/?=
+ =?us-ascii?Q?JVXmKW56ZpheUQP6XkCRfj4y+mDLHLDWOkx5tcawANEaUHSUU3DgM0JloSVa?=
+ =?us-ascii?Q?eWGW8tvqmr3DLbImnYCHT8JTy8RLmvccNxqEKrE83s0WkGL60zzutWdsuhLB?=
+ =?us-ascii?Q?dvnrQ89qz5eNFmWseri43SCKuYkcpAdsPr2dn7HA26aUvz096wH7KFfVel/5?=
+ =?us-ascii?Q?FMAi4PfuC9sLxKW+sVOpdbCOhV3r09GuQVTUeTfYOZtWh3YUe5L1pmu788II?=
+ =?us-ascii?Q?HtlZSrHswiEKzlaC/WxKMSobBHHLy6rV21Olb8N9CoPRVfgNwKty3lDCMXe8?=
+ =?us-ascii?Q?Q4NFI0Qkb++z2xxAiuZPjbm007Qbxe16SHi7sZRM2ZtIuD2te/3g3rN929CD?=
+ =?us-ascii?Q?FPqe1L9CJSOwswu9/ao7dpNWMGv+9DZEL8VX6hEbcsmv2Y6nUKFZ2modhgqu?=
+ =?us-ascii?Q?Yxfo+T3rwzCOLuTT/6sv5coZGkK8Ny2pyAPa38jav51yvt89OXVuJATyTYya?=
+ =?us-ascii?Q?NmZH6U49VvqaxJt+J0njj/GT6fTaKrjenHpQydQhDM5SekGXjapZ+8aUxo3s?=
+ =?us-ascii?Q?lY8yxir66QsmEI/UdjEXHma5bTZbM0mVHS6ckndqstwpXMcWSSyuHwqA6hdM?=
+ =?us-ascii?Q?vyTNkZzIL3FFRg3c8gka4c5k90A26POt587aZgp8/rnbJV3Eh/pAOVIiZbmO?=
+ =?us-ascii?Q?4DrfjfKABgJ6745XsmpcmHt5cz60vbkMMkiT9xMsZ8DPN6XjgpPl0ge5sFuh?=
+ =?us-ascii?Q?DXEE+Bw2T24BPJmG1NEvrKf4FG/3+II4RurexamSVz10JJAa+Qd/ag/vlR2C?=
+ =?us-ascii?Q?6eH3+2k/EeklKr2WQsUFPjHpEiVpn/diy6IOyDlvYvw+iNllGwU+Z6Quq28N?=
+ =?us-ascii?Q?uLGpZO0RFud6WiN38FANbS73fByKA/AEs8dQNIv4yPJw/lDBxAKMa6t/kYWg?=
+ =?us-ascii?Q?eh54CuxG1wUxx3sO0uRIldLqS0M8YRbs9HpvJMYqp4vbMtegtNj443PFCgeI?=
+ =?us-ascii?Q?u56ZI0rMaRGxrjzhBs2s3GFWyjz2I25xwYLPYivqy5UAPGzD4wxQPQMEqy8P?=
+ =?us-ascii?Q?03U1k/3DSq4HiMiSnHhu4/JdbC9UPNGaJgMqoAzgV5trSLgLxbswRWTcWxJR?=
+ =?us-ascii?Q?eei+18emsPX8t6b35/5i4OMeX4rWWec7WYKLGkMzPGDYmS6StMX7VH6Q/Z2e?=
+ =?us-ascii?Q?FX9kqqbdwBNiRFaKtoW0j9rOwXMoTf3dcC8x0aToBSLvGhFpnieTQc1XOOms?=
+ =?us-ascii?Q?oOSd1uLdJlCnrik7q12kiHwWL62dcCQRMbcgYkW2ELYpG2UIj8ATzC5rwJu1?=
+ =?us-ascii?Q?nH1yxhWeCsc5UTPNaZUaOPtcEfHDBv/Area+jgXv+bL1AOmj1b3V/4URnVYk?=
+ =?us-ascii?Q?Wr7Dyn6DqtjzQKvnFd2/PMnV/9FU2K1Wtr+wdF7BzaK6mw0GyZRbp9Wz8tbz?=
+ =?us-ascii?Q?6Da34Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2026 12:47:42.1202
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30b8a3a3-07ac-4eba-f619-08de58221a07
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000A6732.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9463
+X-Spamd-Result: default: False [3.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251483-lists,netdev=lfdr.de];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251485-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DMARC_POLICY_ALLOW(0.00)[huawei.com,quarantine];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	DMARC_POLICY_ALLOW(0.00)[nvidia.com,reject];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,huawei.com:email,huawei.com:dkim]
-X-Rspamd-Queue-Id: 7B7935305B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,nvidia.com:email,nvidia.com:mid];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 7BCB74DF1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Separate the CTX_PREF_CI_HI of rq and sq to improve readability.
+The __exit__ method receives ex_type as the exception class when an
+exception occurs. The previous code used implicit boolean evaluation:
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
+    terminate = self.terminate or (self._exit_wait and ex_type)
+                                                   ^^^^^^^^^^^
+
+In Python, the and operator can be used with non-boolean values, but it
+does not always return a boolean result.
+
+This is probably not what we want, because 'self._exit_wait and ex_type'
+could return the actual ex_type value (the exception class) rather than
+a boolean True when an exception occurs.
+
+Use explicit `ex_type is not None` check to properly evaluate whether
+an exception occurred, returning a boolean result.
+
+Fixes: 6e9a12f85a75 ("selftests: net: terminate bkg() commands on exception")
+Reviewed-by: Nimrod Oren <noren@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
 ---
- drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/lib/py/utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-index d86cd1ba4605..90887d2bb127 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-@@ -162,6 +162,9 @@ struct hinic3_clean_queue_ctxt {
- #define SQ_CTXT_WQ_BLOCK_SET(val, member)  \
- 	FIELD_PREP(SQ_CTXT_WQ_BLOCK_##member##_MASK, val)
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index 106ee1f2df86..dc1db78b5304 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -137,7 +137,7 @@ class bkg(cmd):
  
-+/* reuse SQ macro for RQ because the hardware format is identical */
-+#define RQ_CTXT_PREF_CI_HI(val)            SQ_CTXT_PREF_CI_HI(val)
-+
- #define RQ_CTXT_PI_IDX_MASK                GENMASK(15, 0)
- #define RQ_CTXT_CI_IDX_MASK                GENMASK(31, 16)
- #define RQ_CTXT_CI_PI_SET(val, member)  \
-@@ -629,7 +632,8 @@ static void hinic3_rq_prepare_ctxt(struct hinic3_io_queue *rq,
- 			    RQ_CTXT_PREF_SET(RQ_WQ_PREFETCH_THRESHOLD, CACHE_THRESHOLD));
+     def __exit__(self, ex_type, ex_value, ex_tb):
+         # Force termination on exception
+-        terminate = self.terminate or (self._exit_wait and ex_type)
++        terminate = self.terminate or (self._exit_wait and ex_type is not None)
+         return self.process(terminate=terminate, fail=self.check_fail)
  
- 	rq_ctxt->pref_ci_owner =
--		cpu_to_le32(RQ_CTXT_PREF_SET(SQ_CTXT_PREF_CI_HI(ci_start), CI_HI) |
-+		cpu_to_le32(RQ_CTXT_PREF_SET(RQ_CTXT_PREF_CI_HI(ci_start),
-+					     CI_HI) |
- 			    RQ_CTXT_PREF_SET(1, OWNER));
  
- 	rq_ctxt->pref_wq_pfn_hi_ci =
 -- 
-2.43.0
+2.40.1
 
 
