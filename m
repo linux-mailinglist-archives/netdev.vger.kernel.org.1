@@ -1,130 +1,135 @@
-Return-Path: <netdev+bounces-251409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4D0D3C3BE
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:38:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72622D3C3C8
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E07EB50A2DB
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:27:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6C35E52A335
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273793D7D97;
-	Tue, 20 Jan 2026 09:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CFE3D349F;
+	Tue, 20 Jan 2026 09:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2oaYKzO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SFtTGZHF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2FA3D7D7E
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768900982; cv=none; b=eqbntmOY+TewFsDXLHNtXrDqZF/Vo6H11J+z2oZEZSg5LjSgD4T+O2bnlW/1csmQ6mIX8jsDgY+kUCHdPTZ/LV0ozBbGgFl/YYvSc7lcQ68I/eORHN0w5SC4bTwzgk3On6lT0HcSZg3Tn0JdlTNAJGoqJxmQNmF5cLL22LZyKeE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768900982; c=relaxed/simple;
-	bh=CSmRzLwnwCsA/vnTMKg639sKOpJB+31aFmQ83gXmJ/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u/XKg3a+Dy7DZQXuN5CD7RLL2eU27dW/erxxpPj1olVxHSB4anrAAzt6SbjyCix2vVK9nOtOixiPDUXDGeiAzfN+iqFnLZYPUUGnz7iwBzBr9YVS5f5Gq+LI00pKLU3HSkHwqmDnbYAekz6WPW6lt4u8BMv/3VCdcklE94xdH6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h2oaYKzO; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-81f4a1a3181so2772632b3a.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:23:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1263A1E88
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768901265; cv=pass; b=QgdjEIEIySuwnfP683EayRm0QErRGHaymI8hIwDWWbDnRBMIRM4DRWGQbxVuJhXRTCyHdmg3KEFbgj142bhZDLbTF2qepP/8RELEEIMAtuZzOP99KqzOutnfitIA3g+D7w9GhT3RDAdUBPR+hzmY2zd7Q/bUvU0pEo5f3emS1zw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768901265; c=relaxed/simple;
+	bh=VFm+9wwtgk8aq4k8dQkzu3uNUhmEdxvmn8yiOGHPluU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hKHcrbV5gOWpYsl3sIF/zDnGb98vAnuw4sc7cJXzeEBMy5PY7ATzsE/f1BLUZGtRTZhSjCOdCGfpsyUN99R3G2MpU774ceFVSODScBBZ/WaViLChc8Iy5Un3vwjmm07jhg4G/Fzf0zad9g2IaOAsIf23AkFQeWmOML9b8UtA97o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SFtTGZHF; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-501506f448bso29287451cf.3
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:27:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768901262; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H1UPT7/Zx9nkK91hSuvVNdAFMf5cHdktyHwzYkbLVipVxB6gaQyUeEZCMI5trdNnGu
+         wJYLDhzFXzN3pTTgGkpTPZYgFSLGr45R68xtcRYZWhM51dlNe/rnfeiCdbhcQYbBp6FZ
+         vteJjofeupoZRNPCN8y1O1ugp+g1qU0gKAiSbDD2XFUtrb75NLmD1diWuZ2QihTYhdir
+         SrkbfrXy8BaR6c84M6CBS+Q0HdAP/GC330xOfGkEERBq7SRHtgd4bUO5OelHEZPrV3m0
+         aYsF6BkiO02QrawMn1CN+yo5EjBvQZoIPc3l5WJPsfHKhHbe2z7ZoT1E13sMPc2c4fkN
+         9ipw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VFm+9wwtgk8aq4k8dQkzu3uNUhmEdxvmn8yiOGHPluU=;
+        fh=L8lOlWONXFKge5q9IubxyVIN5opvY1SRpwkDqgJAHco=;
+        b=LRQpDXt7MSNxJVqxfD8BlTSWNUIcbiblCa1ZbdO/xm743I2VXDPzy4wusfzgOhc623
+         i1Shnz5Bkh/5E9Z3XBeXmXkaMqLfy/Ne5P+uET/J5MLsvVrFLeiKhjDaKSNJktRMcVv3
+         g2jvBv/LiJXFZAUIP+9vSQnx9cPjFllazhop6QC4lJcT2UP0RjDx5qk55HC/h4zxgPE9
+         ZcOBsYmH7ZRrjhAwH6xjGWiC7HcjQSgr5bQlfhzuNjwotAjjp963L22q0UjsinMGthzM
+         oYrTYLmAOJEe115nXpNEyji5HPSsunh1FO8cpeHQMyNvs2G5VkAi+CCIY++6EbZrzyV/
+         vZgA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768900980; x=1769505780; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1768901262; x=1769506062; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eaEU7JqPQPZcp4mwlpZjeBbbu3WMdRPp729xKwSniOE=;
-        b=h2oaYKzOuK3JCKmEomsMC6kSiO/2RovGhDd+VD2xnB+EEYmyNvJ3iH4jcniGlBcMPC
-         NebJVB3nAaFOXs+kgswAxUSLVWBoIQYUdZIQICCZh7xRTLhsKxR3OLqcwPxdqD3dptQV
-         fMupfCfvM214RCkk4/dEL64ImFQW6WY+w7fMlksN2nYAPEo+j8cNcnL7vOSdfMXS756y
-         l8CcEAeEPX5VzVWlZf/LkmLe9Ds8SfhzUro9GZHvF8pqSljxAFJQ5+rf/SyFmZ7FJWXs
-         hkZc8KoqXZwNT2zpItCgB8HJKxutpjNn7r+dqw93R/RXazmyApKYNO+TZ/Oz0FeDDyMd
-         p2vQ==
+        bh=VFm+9wwtgk8aq4k8dQkzu3uNUhmEdxvmn8yiOGHPluU=;
+        b=SFtTGZHF9NsJIabBnvYroZCzVEpdC2Hb+eE2ztAAX+AP/pxQ2GQn7gUzykX3xJE1T9
+         Ic3+0XhwYEuVO/+V7CTqq8bK8EbVBGm14wXQZAdOhxbgZZMUMf9Znai9ninsnRo+wuBU
+         tu+6U1tkqdA6QIiB0ZZEWgrBSf0CwqLCg11DMnxlCHHx1KnfwFltcwLKdvLS81XGy3Ib
+         L/g09oZlVwkvnAM5lZhMgbe4I3ro46YYjP41sN8IevjoS/Ikjp6uK/5GoMwOTCddfmBZ
+         od9r0TIDu2IfiN9us/4iZw1g2e/ZpWXGGBJWpcln/Gof4PS9uLDQvaUkilSORvAE5IYo
+         jpkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768900980; x=1769505780;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1768901262; x=1769506062;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=eaEU7JqPQPZcp4mwlpZjeBbbu3WMdRPp729xKwSniOE=;
-        b=EShEQTW+XKOyXA0uDEX4GuLk1ZQKqVEcMsb2WotGNOz443xtaj7AwJ+BEjcuQpnoEY
-         ZWubwzkzz8w2N17u33UEBuYg6JmW8OSKLocHVNfDNnu8FWEbb/azCg50oT1BAhITBCbX
-         UlyPUWYWuhdtOomdv3hbG+l6r88NF+Pjf812pK7NDcE/jGZRyoeexHUt+VoY7+6GfrPP
-         41WQsZxM5EM5+LLvFpi24MD6GSwY0rZfaLO6mD3kVjPdf7CcDlUr+GeyCVDTIgD8aJgE
-         U1+SlBi6flKk4mizzQGYkl3mx0eZf2t429tqS+cceSJNp4UYSF0YKBCWlT9lPh00E4TC
-         znjg==
-X-Gm-Message-State: AOJu0YwtNIQDI6ikxtin8ZGFQoPbgqZL3ewD971wxMK8uwQdkapZDDNH
-	m1kYA7Q3qeynNVkWW1w8tyj4tfQpwwsw60ZdtjJlp3WgjUlaWpqmMfhu3Qh09g==
-X-Gm-Gg: AY/fxX5Q+f5R0Oe7rRDrvq0ixhcN/EiZYlt+owX/28lm5yn2MrIevggEr59/73FznzQ
-	32XphANgJOaau6NqhV9WnfsB5zdIZ8Nv0HvUdHK9P1d03hiSThCWRxJIGHI9emC6fLb5ylSCcLl
-	S6M9wFNbR/cBxwJhqFXPdW3qKE5Q+egVABB8sMpyVLqTpdp6iiiWuV5XTUJpCzkI3C28gu9OPeG
-	OroQNMS4FeynlytJVvSlzT3P88KQt1fg6XjlX7ghGZYQ/jyudG0JI/OElgzJxut69NIUSaLfR0W
-	t7SMubLLWOy1YP4brPZa+HRhideYWXj6RM+4U5UTrdE5T8aeDVtV5kbWwl6x3gfeiurHxf4g9CF
-	rg5TwcTjVVm2Roba8Vat0+hMT2/OGRS33oa0oizf2SNbrWtey7qMN2ixA9GMoM4Gw8KV1bGfgjY
-	hwVlQV65S2W7Uxo9rRAl+mXljZ29TpTFsIEFqJNRmPvJHjSf5WRznkHA==
-X-Received: by 2002:a05:6a20:2d08:b0:38d:fc34:c88d with SMTP id adf61e73a8af0-38dfe7b6e2dmr14284967637.55.1768900979811;
-        Tue, 20 Jan 2026 01:22:59 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a719412d38sm107330435ad.87.2026.01.20.01.22.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 01:22:59 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	Breno Leitao <leitao@debian.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 4/4] vxlan: vnifilter: fix memcpy with u64_stats
-Date: Tue, 20 Jan 2026 17:21:32 +0800
-Message-ID: <20260120092137.2161162-5-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260120092137.2161162-1-mmyangfl@gmail.com>
-References: <20260120092137.2161162-1-mmyangfl@gmail.com>
+        bh=VFm+9wwtgk8aq4k8dQkzu3uNUhmEdxvmn8yiOGHPluU=;
+        b=Oms7J9CS8VivYbmCn1i8jf17xRT+LKy/Djh8R3ux0wVa+OCmqrD3m3qWC0m3Etv3bm
+         tQKSeJ6qGF4n9gSIbOxFLAww7V9QYjkj5HPaVbqWTrB2OXDlrh6kurBp7U9ndhSQzLOh
+         i34wi6O4fZ6Sgzs4O/cHVCfciB/V6YfPkh2T+DySrWdLpVxVIhOLf/8xfcreuUBDG3bl
+         81HCixrClLgUxXSDwv/xaATT5aAN5fKwfVWFJIo5S9iB0amLiJCPS5iKWJmo5O2HmbfD
+         3VJpFGT1q5ML9WiMFBsyXzc3llPoFR4XfoPJ+8LU8CuLmo51uZrGfePYgrvjf2jS+A5E
+         ONeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWeK/b5YKroIdbvbn67HkInnnfOcWoL6zSxyZIXTIU4BBxBs/U7UuRmtrHkwHmQi5KKz3nCzIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4BOUjWKh/H8WCzMyPt5n2ivsYw5cL5C3VcYBpL3Kk1T+uES/k
+	CyU2CTH6PGWRsg5JeVW6fNhlawZMzqJ6DNy6tJiUuf9DIYndoMHlWWJvGmca2spo6fKgQK67o0Q
+	wKYS/GnSGefvzr3zi+vz1dEGqM4/DhiFNKrt1xi3d
+X-Gm-Gg: AY/fxX6FUmR4mux61WpnrJddQH5utvyKA5Xk2ZrXBopDTuH1R5lTCbb1JzggX83noiv
+	6EmhF3Y8IFwAgWK2oXUzcRDpILd3pUMQMD+sZcvBJnN9UWOc18njfyE8WdDuy/WByRXhe/sn8j6
+	3TiK8f/Y5uUqMr/mP3GGfGggqfxHIoJRbCQHrPMwVAD1PY6X4LXvMcWHVCY/2DhUGDGdA3bT/9+
+	wg9vTP3ldHVZLObMlzxoQ51t47pU4J8wI7u/l2+oMouTaWhJWkKVpltKdgAGUhCMnGEyt8=
+X-Received: by 2002:a05:622a:180e:b0:501:47d3:217a with SMTP id
+ d75a77b69052e-502d829a969mr10411241cf.25.1768901262067; Tue, 20 Jan 2026
+ 01:27:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260119185852.11168-1-chia-yu.chang@nokia-bell-labs.com> <20260119185852.11168-2-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20260119185852.11168-2-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Jan 2026 10:27:30 +0100
+X-Gm-Features: AZwV_Qh2C6qterbUps9ipHoZiFx2JUtmLIyzTtH8Kko470SyemAziOwyIlRmsJc
+Message-ID: <CANn89i+44At=GtWMjksjjMmARZONeVAAiDgqAP2jXWSK3BxJLQ@mail.gmail.com>
+Subject: Re: [PATCH v9 net-next 01/15] tcp: try to avoid safer when ACKs are thinned
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: pabeni@redhat.com, parav@nvidia.com, linux-doc@vger.kernel.org, 
+	corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
+	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net, 
+	liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 64bit arches, struct u64_stats_sync is empty and provides no help
-against load/store tearing. memcpy() should not be considered atomic
-against u64 values. Use u64_stats_copy() instead.
+On Mon, Jan 19, 2026 at 7:59=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
+>
+> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+>
+> Add newly acked pkts EWMA. When ACK thinning occurs, select
+> between safer and unsafe cep delta in AccECN processing based
+> on it. If the packets ACKed per ACK tends to be large, don't
+> conservatively assume ACE field overflow.
+>
+> This patch uses the existing 2-byte holes in the rx group for new
+> u16 variables withtout creating more holes. Below are the pahole
+> outcomes before and after this patch:
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/vxlan/vxlan_vnifilter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-index adc89e651e27..cde897d92f24 100644
---- a/drivers/net/vxlan/vxlan_vnifilter.c
-+++ b/drivers/net/vxlan/vxlan_vnifilter.c
-@@ -126,7 +126,7 @@ static void vxlan_vnifilter_stats_get(const struct vxlan_vni_node *vninode,
- 		pstats = per_cpu_ptr(vninode->stats, i);
- 		do {
- 			start = u64_stats_fetch_begin(&pstats->syncp);
--			memcpy(&temp, &pstats->stats, sizeof(temp));
-+			u64_stats_copy(&temp, &pstats->stats, sizeof(temp));
- 		} while (u64_stats_fetch_retry(&pstats->syncp, start));
- 
- 		dest->rx_packets += temp.rx_packets;
--- 
-2.51.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
