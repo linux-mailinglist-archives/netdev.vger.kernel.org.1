@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-251361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D5ED3C055
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:26:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EB8D3C021
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC838508FDD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 07:06:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8C0BE5403E7
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 07:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCFC36C599;
-	Tue, 20 Jan 2026 07:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469F338B7BD;
+	Tue, 20 Jan 2026 07:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LlcVGwHN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BIpbwsK8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E8736999B
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 07:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B953815DB
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 07:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768892779; cv=none; b=fOtxbD3n1hcYyX3k1fLFF8Zy1SKrcUU1XfGWt2P6V3cwtu13NzzDj1Rv8zUYG2+RF+JXJiBhK2QVK6EJ/FNte15R7nwadqx3rKSrrQMNoX+X4lMQdaE7RDCdMA2560BGm3ZlP95ZVlvQLSYWzJeA9J50gkE3JdkaDzgGzoSn3Xs=
+	t=1768892790; cv=none; b=ZoTaVPMEM0Cfk5FhfeArXPaSwwRVbV8Rnzo8xgu8gGugNxZAf46DCMX+KoW8caGpr7HmbJlPVRzSBH8xXZn7YblNDFvnRtKiSPfwJCCAp0i4l8Yq+2RYdGBskS7AvB1iuoDtlq8H/cAb/GAm917CuXd8+cTpQ1mVcEaw/p1vtjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768892779; c=relaxed/simple;
-	bh=1TZK5fhyrxC/WB5sP/wiLMfRj4jIbse4KsMa+ws3+jU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c0vqp7TJmLbQ4qSndMw0+q6MNjLFjrL3E7YVAj+2sdhEVQcd2aQpTR3NXNfji+Ldk9mWu7MHgylifkRywrG2/7kzEq5ecDeFPU4SewMuzBjXR3pxvnGXEUB/wieaJof8PpQCsphiudxbaf1Dq04+KdjjiigTCR4/1N6RoN+YkXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LlcVGwHN; arc=none smtp.client-ip=209.85.214.196
+	s=arc-20240116; t=1768892790; c=relaxed/simple;
+	bh=bkEnpN35ROgLb1TaATahFCU+nYmJUOdqiUA5VNDzRiY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=F/f5N8BGFg9QnT4fFrYFk0MxO29x66+vA6c77Jx73RRQ53R+Mm9dgIm9uY3SMRZo0b0mP3S0IlrVNzNw3zO7jQ6wR8ltrz5YkkN8qB5M9BrId2Ff4QEnSrLxxyyss6UUHwM9aQ1N3Rqq3I696p+aFJzgI8j2EcjyJ8XTRFS4ddo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BIpbwsK8; arc=none smtp.client-ip=209.85.214.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2a0833b5aeeso51399335ad.1
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 23:06:14 -0800 (PST)
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2a0c20ee83dso45739535ad.2
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 23:06:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768892769; x=1769497569; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6k2o46vNuTzPIheaA8GctSKLua8DVfbF5bh98uIEOBs=;
-        b=LlcVGwHNAccCKm5daWRmSKFd/90GJ8vdq79Xalve6JxGkUwZ/P4bqRzUe2Shbunc/6
-         NOS5ZtKgpK5HA/4+urzzf5Yv7fSA82/ZPS4/akj+/IPCmPqDgQs0MAHEnECseFL/zror
-         /L4s8QPx5FcvfSaA2EHnwRW0GaSJZyUyFh5KT50DLnJn28xXhJfG0hME/WKnwjupAvGb
-         VKov0RBEGAT9A9VEojAgO6PdygkcPz2pOnacR+b38+vq9hVUfGyb+exbBYUoB7nZVg0C
-         aopMM5qR0zMGPNjmSRyDU2GmkcypGj7s0hhpuH+j2kD12te983jiLFHlLx5Q37/wr79b
-         OYwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768892769; x=1769497569;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768892778; x=1769497578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6k2o46vNuTzPIheaA8GctSKLua8DVfbF5bh98uIEOBs=;
-        b=EYTsjR3jtCUys0t2s4pKYsHfDHvtgGtvjhK0cJDY/fKP8SIFxgScrFTX7+fC5zyWi5
-         qmViT6MFZOjzjgLHvrx6Pv/V8qOwfLLmBzdkM1b/FPKElQ0kVmvqZj3HOpFRrSzRed2x
-         Ij8uZrJSjqHyoxN0StbZFezD+xqQUT5cfE6Tx9yIdbE+cvuF72RY3XuRtRgpRsSwDABI
-         qgMlVudDqVuEmXlz2pSf3hpy6ss0PNTbbjo+CIb0UHP5VByRlssgPBZHJlPRq63P8D6c
-         Hhkb2P41086ZsOQqNrOpaUAqAGP4Z/x229lPTJOZmHSAiaTm8XZ/ObpfxKJ7moMFABJf
-         bwqw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6yIMLniW130AHewSUrp/Xh9J1NKBfRdrWSZBYsSsrGZT6BsiNMcSM1Fq2eWOGxm4ypPn9O7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcVBxvl31zsGi1lq3MzUUcBtvIN5frnIIKezEbMNV/onrmubg9
-	eXxHAUNL10Yd31uGZW+4RuNDXL1uAUWHHWo1Z0WK4ng9/3r4Iknt0KHJ
-X-Gm-Gg: AZuq6aI8VNMZcv6j+nHH/YxlJgRooo6+Djg5sONFy6jiYljA2Os7I110UibQf5kUfYG
-	nsFjJmiuxUAUnAM8EeXAwG5+z0Fbk0dkYFhnjOBBxYI57h3/3NZp0pSKnOMTeQMQXLvOiH+0urm
-	J6PiRpgixSY/8IpoDnAoZZhDnG/27z4Mp/7iOh1vu+xZwyZVc9ziaNAoXrTombIQCkmgoo+sLNg
-	dnxc96okOwYaUw9KamAfaQeUD0oFx+wbsKb7tiHG0UtTviBY1sBBDW/Z36YZbhrH9O/68vvOstt
-	/QZ7UAKMgzY2vNB9BIwh/WaY2J/FjS8MGwZulhILfVT6TOlkvB29mv/0o3FN6pA6aUR9C8zRFWG
-	u5BzVTVRicEebfqsjN/1jp7PoqRnCWj6ycfy/eYLiB+3HUc18xjkSVE3Qi6dgI0eJJmeO9OiaTG
-	jz9u0CZX7r
-X-Received: by 2002:a17:903:17c3:b0:2a0:ed13:398e with SMTP id d9443c01a7336-2a71892193cmr102832235ad.49.1768892769464;
-        Mon, 19 Jan 2026 23:06:09 -0800 (PST)
+        bh=AoyD4uV9eCRwWiRSuwU/fXn0oAa1lUGxNCw5PqJhjBU=;
+        b=BIpbwsK8IFYvCZ5UM6BF2qr/i7osYi3MA2+M0lEvSqHQZMB7VpEkGSrGTrqxQPMsVt
+         xffOdLinNu8OWRhyJ02aZ2eDeS/nugwYSGWlw4KLjNsfPG8vynnNzWi66SIHDvK5V/GD
+         /2qipx/jpeol5mIg1oe05eSfOmtJ45bAC/z/VQ8Gp0HSo6uDxpTIxoatzullIsxzb+0y
+         tNRiF1E/KG/FwyJcNl2ZYpkv0fWN5hiYmV70w5qznyUqmZebvIb0OVjvsCVzPJkWLWeU
+         7BWhuIjM7tT//vqyvXofo4qckw0DTktmhTr//XRKFRttrFkIDvbAEOFRL//2jm1/HV3e
+         q23g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768892778; x=1769497578;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AoyD4uV9eCRwWiRSuwU/fXn0oAa1lUGxNCw5PqJhjBU=;
+        b=tP92Nv5fphmXLIMqAOgucWuGAsReCc11KZNKZQ9W+oZVbSwF0jyvPR4xclrZqRmLz1
+         9ZH8egEZAlfgSlsg45StkVcw+FTw4YQ+umgEC7v+e4dosT0KAzbcfC043UhIzLVLoxPW
+         c8sf2txu7JiLpupAcmbQMeSTwQEEX3T2+gAZZaf7TuRC7J6vfJjSUk90rq0p1ru0E8nb
+         w2h8nvRGv77Ox4+mi270EzERv/VvxEfiWDgeu/hDhFcTYv7mFdIhQNEmKKyfukS/SiKO
+         fXDWqL4OoVBzNhcFLWw25FMbfVC8VocPLoonTPsyoVvFKoASh7GNljtmAHybp6g9VVwm
+         GOXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOs2mO9up4yvBOcQmNxxLGOcGqXfcORlbWQ4z8Ey8RpGxG2fIKX6DXZv1Cg5qMIZ0KX9AixP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv2Fmc5P757tqmLTblc+kvfjwz0lf1g7bBDU/Azzq5Cfom8kvY
+	rKvePAKElZE+Q6bjwbl+liv6stV7RC1/7RSLjOt87LLLr+sWZHbbEZxC
+X-Gm-Gg: AZuq6aJ+Bxltq64Kip8LCXrXALB0TuKtvZvj9ixXrDD8LSb51OL+Gm9iVLMqST31dtO
+	HqebMqHtP89DJHOzVfU/dY/E3SH1lO9GilcRRib/TkBLEIb5WvKox9tgCJ1lnt08PX6SqHIDD/J
+	bJG3OzuVSh8TdZGv0lOBS5Lo8nhwppyJFl5F1lV3L27Uj9ahbCI6+b/p8zeHHgEEAIZINlCC0Qq
+	Tmo7myPTNCQQlITYLGPKfnMXBhMTpyI///6BtPXNhNsAVDxAPeqiX08iBoDih7aJmZTMiRJcPfH
+	xlsT1Z53t6Fyru6Pl2XC5JfLj+BxuY6pwvIVZh8pNsg1TZ1vYlaZ2sx6Avifo5+lFHLh6mWjRA+
+	Wy91wqgeHqbQXT+YatTAkK5CDS1f1TnLsyOyXvhjTmZuPl9cQeqRjduwmOiG+0E8Z/b5J9yLb+k
+	SpGJ30zS/R
+X-Received: by 2002:a17:903:1a2e:b0:298:6a79:397b with SMTP id d9443c01a7336-2a7176cc35bmr123268025ad.56.1768892778110;
+        Mon, 19 Jan 2026 23:06:18 -0800 (PST)
 Received: from 7950hx ([103.173.155.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190ce534sm111695665ad.27.2026.01.19.23.06.01
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190ce534sm111695665ad.27.2026.01.19.23.06.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 23:06:09 -0800 (PST)
+        Mon, 19 Jan 2026 23:06:17 -0800 (PST)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: ast@kernel.org,
@@ -96,10 +98,12 @@ Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v6 0/2] bpf, x86: inline bpf_get_current_task() for x86_64
-Date: Tue, 20 Jan 2026 15:05:53 +0800
-Message-ID: <20260120070555.233486-1-dongml2@chinatelecom.cn>
+Subject: [PATCH bpf-next v6 1/2] bpf, x86: inline bpf_get_current_task() for x86_64
+Date: Tue, 20 Jan 2026 15:05:54 +0800
+Message-ID: <20260120070555.233486-2-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260120070555.233486-1-dongml2@chinatelecom.cn>
+References: <20260120070555.233486-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,39 +113,64 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Inline bpf_get_current_task() and bpf_get_current_task_btf() for x86_64
-to obtain better performance, and add the testcase for it.
+to obtain better performance.
 
-Changes since v5:
-* remove unnecessary 'ifdef' and __description in the selftests
-* v5: https://lore.kernel.org/bpf/20260119070246.249499-1-dongml2@chinatelecom.cn/
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+---
+v5:
+- don't support the !CONFIG_SMP case
 
-Changes since v4:
-* don't support the !CONFIG_SMP case
-* v4: https://lore.kernel.org/bpf/20260112104529.224645-1-dongml2@chinatelecom.cn/
+v4:
+- handle the !CONFIG_SMP case
 
-Changes since v3:
-* handle the !CONFIG_SMP case
-* ignore the !CONFIG_SMP case in the testcase, as we enable CONFIG_SMP
-  for x86_64 in the selftests
+v3:
+- implement it in the verifier with BPF_MOV64_PERCPU_REG() instead of in
+  x86_64 JIT.
+---
+ kernel/bpf/verifier.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-Changes since v2:
-* implement it in the verifier with BPF_MOV64_PERCPU_REG() instead of in
-  x86_64 JIT (Alexei).
-
-Changes since v1:
-* add the testcase
-* remove the usage of const_current_task
-
-Menglong Dong (2):
-  bpf, x86: inline bpf_get_current_task() for x86_64
-  selftests/bpf: test the jited inline of bpf_get_current_task
-
- kernel/bpf/verifier.c                         | 22 +++++++++++++++++++
- .../selftests/bpf/prog_tests/verifier.c       |  2 ++
- .../selftests/bpf/progs/verifier_jit_inline.c | 20 +++++++++++++++++
- 3 files changed, 44 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_jit_inline.c
-
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 9de0ec0c3ed9..c4e2ffadfb1f 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -17739,6 +17739,10 @@ static bool verifier_inlines_helper_call(struct bpf_verifier_env *env, s32 imm)
+ 	switch (imm) {
+ #ifdef CONFIG_X86_64
+ 	case BPF_FUNC_get_smp_processor_id:
++#ifdef CONFIG_SMP
++	case BPF_FUNC_get_current_task_btf:
++	case BPF_FUNC_get_current_task:
++#endif
+ 		return env->prog->jit_requested && bpf_jit_supports_percpu_insn();
+ #endif
+ 	default:
+@@ -23319,6 +23323,24 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+ 			insn      = new_prog->insnsi + i + delta;
+ 			goto next_insn;
+ 		}
++
++		/* Implement bpf_get_current_task() and bpf_get_current_task_btf() inline. */
++		if ((insn->imm == BPF_FUNC_get_current_task || insn->imm == BPF_FUNC_get_current_task_btf) &&
++		    verifier_inlines_helper_call(env, insn->imm)) {
++			insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, (u32)(unsigned long)&current_task);
++			insn_buf[1] = BPF_MOV64_PERCPU_REG(BPF_REG_0, BPF_REG_0);
++			insn_buf[2] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_0, 0);
++			cnt = 3;
++
++			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
++			if (!new_prog)
++				return -ENOMEM;
++
++			delta    += cnt - 1;
++			env->prog = prog = new_prog;
++			insn      = new_prog->insnsi + i + delta;
++			goto next_insn;
++		}
+ #endif
+ 		/* Implement bpf_get_func_arg inline. */
+ 		if (prog_type == BPF_PROG_TYPE_TRACING &&
 -- 
 2.52.0
 
