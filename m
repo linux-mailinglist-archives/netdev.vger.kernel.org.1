@@ -1,386 +1,159 @@
-Return-Path: <netdev+bounces-251427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DFCD3C52B
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:28:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A666D3C510
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:24:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 14B3E58535E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:05:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0157F585E5E
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A043DA7E6;
-	Tue, 20 Jan 2026 10:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC1C3D3319;
+	Tue, 20 Jan 2026 10:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WmTrImry"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVxs1BlG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwEjSH+w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA863D412E;
-	Tue, 20 Jan 2026 10:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A0B3A1A5D
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768903454; cv=none; b=no68leMUvVbR0VEFoETjyXYORur0xkq2eb5oO7ahROe6oOkEe2aROJgezbsZ/qMIv5FRo/r9nDBFEkitAhIkuyXukxtO0QkpwzAEsj7U8UA84byzAmMdvZb+JKGj8PNYJCcfbVCrkwpiWUZ8bvLBHLOp/I91MZVQkENQJ2CU5CA=
+	t=1768903477; cv=none; b=JZyaPpZe0gv4eDW4ZDrchSFM7lOdDv3pEJHfuTMZNz1dK41bIXacxlw+K9jrRnyOp4+Q0NmWLRp1ksBdFaWJe9a5Oo6SN7Pr9urXa8Iz1ZW2z61kw0+QUkW4YsgqB+9hU7Vd6xs50mRptSxUZ/AqJCXfu/JoUzQeNtF8vWsRLxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768903454; c=relaxed/simple;
-	bh=BvIq7z1BB8V6P5e6oowzDXoJR5h48I1M82SB4KDFu/A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VssXkYoQPEPjqq2vUVPzgTb76xpYRneK1vYSnEhI5+cdFp9t0dTGwcyXhjhffWawKwJvH0PKccCyGtjluL1yqlewOUIgJIBNRR1kiLTx8oZECmKraplchh8F7ew2irV9uOpx/nFa2fdiNpKEgZVgR+pML6JJc+Gi8ErrdzL7H40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WmTrImry; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60K8YGLp3900117;
-	Tue, 20 Jan 2026 02:03:56 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=R
-	Luo9n0E92qf2XvZI6Nxxn5e1DYLIZQ3UyGEITprJ4E=; b=WmTrImryFZTYSLeNN
-	cmCTO59OzATKk49hdCXpaT1O9tyoWSKQ2tWQhqetJnXYnBBVDKWKYU735R423Ceu
-	gv7yvLk5fJGpUbUaeCAvK+9W7B0aSC2kjjCtUn5UObKoP24SPeAPZvoMinxwzVga
-	4IvnVj12RxiVOo1N9lrZDG7oJBM6ggHLQqCh1Rg0M94+Txdt2rfMLp938m+B1YhM
-	jvnNk6oXUZG270crgbQGydfz4aLjxcoFvdgOs3BRpCO9kU6+Bq+a0iRz/7nJ30wB
-	5MYaqC2R0NbNatO40Xz+Rssu+ca7ZQv544cv3HSxtjhBIAb9CW4YtzBSRTdvgrOf
-	q47/w==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bt6aa85dx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Jan 2026 02:03:56 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 20 Jan 2026 02:04:10 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 20 Jan 2026 02:04:10 -0800
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 1A9255B6936;
-	Tue, 20 Jan 2026 02:03:50 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        <bbhushan2@marvell.com>
-Subject: [net-next PatchV3 2/2] Octeontx2-pf: Add support for DMAC_FILTER trap
-Date: Tue, 20 Jan 2026 15:33:41 +0530
-Message-ID: <20260120100341.2479814-3-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260120100341.2479814-1-hkelam@marvell.com>
-References: <20260120100341.2479814-1-hkelam@marvell.com>
+	s=arc-20240116; t=1768903477; c=relaxed/simple;
+	bh=RYkZyLqJ90IZtrT6SNyMGnHInu7O7ZOy96fwuZZjuzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f4sX4F+uQk8A3XKlL/ErFij0Isi5v08haCFhAupn2pe9q5rFJ9rxpHwO6hnb15i8J5I2fxie8uD72qV4xfT5W/BkDXu8R7HrXmVXNI3u3Qg7mxpGfz5oNFYvbUYtgAJyjQRlXc0Oncvw1cFOQ5u1AAg3ALA77IoWhtSPvbZ2TlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NVxs1BlG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GwEjSH+w; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768903474;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w+FKwnioUTqyK6Y6ArRUSCC3M3FO8NWsXoRptKXlqbs=;
+	b=NVxs1BlG8HYIO1jOIs5tOjFR3QSp1pYkp6x7hGctlA0iQyegTO6mVlVHHQ458qqHRdEK8U
+	FtlJaaVX5JhC0/eX26GDQdzuUl1yQmnz4viq2imKqutyiiIUFX7tlhmZVPT1u/+9/wldav
+	bskyJ7tQa9KIEsdpZuuti4usrelwOgM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-361-3Z_fyhcNN32Iu1cr8_8WuQ-1; Tue, 20 Jan 2026 05:04:33 -0500
+X-MC-Unique: 3Z_fyhcNN32Iu1cr8_8WuQ-1
+X-Mimecast-MFC-AGG-ID: 3Z_fyhcNN32Iu1cr8_8WuQ_1768903472
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430f5dcd4cdso2915821f8f.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 02:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768903472; x=1769508272; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w+FKwnioUTqyK6Y6ArRUSCC3M3FO8NWsXoRptKXlqbs=;
+        b=GwEjSH+wu/rsj6VirQBI8w4dln+vRXnJnz1V7rUdZyEDywXjC5CwE82yoZxsVkBk7Y
+         TpHPGO7hJGRI7rjM6PTMweZSdCsaAZ6B9dMUCV20QPQ04Xw68vuBrUv+di1eH9cyXzMB
+         QRtSRo7Aj+H5zHS3LhOad1vAyoPDcIRmIliO9GOZFdYr0whBIv0eqYl0Oezhf5kjNcoN
+         5rWyU7LmeOHre1JX5vizH0u0d1FiZ5nLYlFUQD5BMh/3i1O4c6ME2s9NHnLP6X/SnQUU
+         6R8jzL8idhtKNV8kAtF/fJmq94p91Me5peG2PcH1uqJN8UMOJgrMl+Vq44pjfbyDTuM3
+         isvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768903472; x=1769508272;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w+FKwnioUTqyK6Y6ArRUSCC3M3FO8NWsXoRptKXlqbs=;
+        b=AoXbDtEbImLR+hZvw3hijAjv/ThioYQeYtzTDuR4G49TH8PtClqQD44LW8r/zFHkBV
+         q7HP5wAIBz6N69DIcZZjN0p9NqstQRmaD0zlOwW+PL6yBROZQCkj2jnsogfCSuZBobCy
+         pW1OG3R5Iko4onIXV4D6YWh+L+2CuAG0nEOGMZFPXqroe8pDvvfbRag2eG3QJJ0BJmwP
+         +obVnRVtTPrdEVkvtf831vMbOfqUFv7yM69hKV75nq8vZVqAF5pUoDXNNe0XR7bS1q77
+         K+bo+cWj1+XPjxl9vYvyVPfYOxIVHGrP5kCukZLiNOQ6VPcmXaUbWZTonIaNLqY6u89i
+         8vdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdVTl+BUIu/VS9HkLSEsEbYiOgxj/coVtFN9Hyd3GZR6E3hGAykPh4+NXfgc45hz52xDS8noQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUQFVp/uNAzm/NTxNkq0xQtLxOsGfpHjdCDr+OUswGb0j87Uq4
+	G79T2P4kbpzkbZcFY9x27vB4xAeyFNTAQevp8qWisUoHPalnyyu+XPPExnHbCFCzytabK1t5DhO
+	7YqTGRywjtv1kPAzziosIaKdfKEkmdyz/w7CswZcx1QtiX5tf6/GrgDgNfQ==
+X-Gm-Gg: AZuq6aLcMQqf7gW1xDQ6lmvM0itcOyRbM3k+KmpRVVIx1hSBqzEj5pXNzoif1wilFPd
+	pgq8Kuoif3Dg4zpKK3tyAzBWt27D9EVBRT7qdur3eKMfGGKZzGVVenJuVD01bbSGW3pDuJEks57
+	aLi20RH5CrdBNaMQZr6O8hgkmPR6wLzU7AQ7s2psdwOu+7nOq97ztCo6RO6cTcHTmt83lTIcUDJ
+	3LN0FdTZ0Utzc4BO4szpKMD0l72VxN7JrZAg/eWpzvfF/e6Bp44bw4nwVxhQZRrT/f7BTbHGJEf
+	bT/BruqzEWAiwuRzPeVp7NqPdUInAOo7sTUfBQ/pTCff/tbcWUoAQkhw9MwSPiMI/kgGMhy4RrN
+	snZ1oG0YXkBgv
+X-Received: by 2002:a05:6000:4202:b0:432:a9fb:68f8 with SMTP id ffacd0b85a97d-4356a02643dmr16221640f8f.1.1768903471622;
+        Tue, 20 Jan 2026 02:04:31 -0800 (PST)
+X-Received: by 2002:a05:6000:4202:b0:432:a9fb:68f8 with SMTP id ffacd0b85a97d-4356a02643dmr16221591f8f.1.1768903471171;
+        Tue, 20 Jan 2026 02:04:31 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.93.113])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4358f12ee69sm3803557f8f.11.2026.01.20.02.04.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jan 2026 02:04:30 -0800 (PST)
+Message-ID: <d9096361-8f51-4865-af59-531649a5f42e@redhat.com>
+Date: Tue, 20 Jan 2026 11:04:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=IZOKmGqa c=1 sm=1 tr=0 ts=696f530c cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=fdgcc8vwWq-MLF2QXq0A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: o7EXYVLXIN1mHhWSub-zKgHJpEb1wcvl
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDA4MyBTYWx0ZWRfX753Qkncq2avt
- sH2TH2oVkod/VH/gAiYM+Nd8TlGawwgcqQedwv6aBCKREd3L0QJ+QDOv1AA8YDctCOj2aIfHUT6
- fkVkkaxjM183jd+8sZdj3DPmDEtZXAHu9SIyc3NHARXi6NbiGKhUS0QidHj/kPNLfgrsJ74cpZ0
- kW0lN79hPkPBmGMr/LyQzgyinFUs00ZRny1QZMNpbBKaokFfJXv8h+IU7BTEVTeoynz5QgUxNJ0
- p/UBICMmfsMNRMVHQZtGcBpEreKe9GjUG5uyO9uPTmzG3ughzZBxf78qRfz/u4E8JKo4rFJj6Xe
- IHopzVLD1nrg+sx9p8MviAeKnFYdTEj0VfG1DX6opmS0Yl3+uBVrdejYcCGwlf/37TCTCvrMlrC
- WupZ3HYwOp0DpJ98vUaDvOcKsGAcuPutKXN4D64j2U9JPVjoOp1HFTkM5JX6pcY7xQaIgDFf0QA
- LD5l3abvcFGZZnTtIJw==
-X-Proofpoint-GUID: o7EXYVLXIN1mHhWSub-zKgHJpEb1wcvl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-20_02,2026-01-19_03,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 5/5] eth: fbnic: Update RX mbox timeout value
+To: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, jacob.e.keller@intel.com,
+ kernel-team@meta.com, kuba@kernel.org, lee@trager.us,
+ sanman.p211993@gmail.com
+References: <20260115003353.4150771-1-mohsin.bashr@gmail.com>
+ <20260115003353.4150771-6-mohsin.bashr@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260115003353.4150771-6-mohsin.bashr@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This patch adds support for DMAC_FILTER trap.
+On 1/15/26 1:33 AM, Mohsin Bashir wrote:
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+> index b62b1d5b1453..f1c992f5fe94 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+> @@ -252,7 +252,7 @@ fbnic_flash_component(struct pldmfw *context,
+>  		goto err_no_msg;
+>  
+>  	while (offset < size) {
+> -		if (!wait_for_completion_timeout(&cmpl->done, 15 * HZ)) {
 
-devlink trap show
-pci/0002:02:00.0:
-  name otx2_dmac_filter type drop generic false action trap group l2_drops
+flash completion timeout was 15 secs
 
-to get counter
-devlink -s trap show
-pci/0002:02:00.0:
-  name otx2_dmac_filter type drop generic false action trap group l2_drops
-    stats:
-        rx:
-          bytes 0 packets 0 dropped 0
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> index 1ecd777aaada..b40f68187ad5 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> @@ -36,6 +37,7 @@ struct fbnic_fw_mbx {
+>   *                       + INDEX_SZ))
+>   */
+>  #define FBNIC_FW_MAX_LOG_HISTORY		14
+> +#define FBNIC_MBX_RX_TO_SEC			10
+>  
+>  struct fbnic_fw_ver {
+>  	u32 version;
+> @@ -129,6 +131,13 @@ struct fbnic_fw_completion *__fbnic_fw_alloc_cmpl(u32 msg_type,
+>  struct fbnic_fw_completion *fbnic_fw_alloc_cmpl(u32 msg_type);
+>  void fbnic_fw_put_cmpl(struct fbnic_fw_completion *cmpl_data);
+>  
+> +static inline unsigned long
+> +fbnic_mbx_wait_for_cmpl(struct fbnic_fw_completion *cmpl)
+> +{
+> +	return wait_for_completion_timeout(&cmpl->done,
+> +					   FBNIC_MBX_RX_TO_SEC * HZ);
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
-V3 * Address issues on otx2_devlink_traps_register error path, 
-     suggested by Claude Code 
+Timeout for all events is now 10 seconds. Is that intentional? Could
+that cause unexpected timeout on flash update?
 
-V2 * fix warnings reported by kernel test robot
-
- .../marvell/octeontx2/nic/otx2_devlink.c      | 167 ++++++++++++++++++
- .../marvell/octeontx2/nic/otx2_devlink.h      |  23 ++-
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   5 +
- 3 files changed, 194 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-index a72694219df4..fdbcb87be5be 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-@@ -6,6 +6,17 @@
- 
- #include "otx2_common.h"
- 
-+static struct devlink_trap_group otx2_trap_groups_arr[] = {
-+	/* No policer is associated with following groups (policerid == 0)*/
-+	DEVLINK_TRAP_GROUP_GENERIC(L2_DROPS, 0),
-+};
-+
-+static struct otx2_trap otx2_trap_items_arr[] = {
-+	{
-+		.trap = OTX2_TRAP_DROP(DMAC_FILTER, L2_DROPS),
-+	},
-+};
-+
- /* Devlink Params APIs */
- static int otx2_dl_mcam_count_validate(struct devlink *devlink, u32 id,
- 				       union devlink_param_value val,
-@@ -189,11 +200,93 @@ static int otx2_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- }
- #endif
- 
-+static struct otx2_trap_item *
-+otx2_devlink_trap_item_lookup(struct otx2_devlink *dl, u16 trap_id)
-+{
-+	struct otx2_trap_data *trap_data = dl->trap_data;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(otx2_trap_items_arr); i++) {
-+		if (otx2_trap_items_arr[i].trap.id == trap_id)
-+			return &trap_data->trap_items_arr[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+static int otx2_trap_init(struct devlink *devlink,
-+			  const struct devlink_trap *trap, void *trap_ctx)
-+{
-+	struct otx2_devlink *otx2_dl = devlink_priv(devlink);
-+	struct otx2_trap_item *trap_item;
-+
-+	trap_item = otx2_devlink_trap_item_lookup(otx2_dl, trap->id);
-+	if (WARN_ON(!trap_item))
-+		return -EINVAL;
-+
-+	trap_item->trap_ctx = trap_ctx;
-+	trap_item->action = trap->init_action;
-+
-+	return 0;
-+}
-+
-+static int otx2_trap_action_set(struct devlink *devlink,
-+				const struct devlink_trap *trap,
-+				enum devlink_trap_action action,
-+				struct netlink_ext_ack *extack)
-+{
-+	/* Currently, driver does not support trap action altering */
-+	return -EOPNOTSUPP;
-+}
-+
-+static int
-+otx2_trap_drop_counter_get(struct devlink *devlink,
-+			   const struct devlink_trap *trap,
-+			   u64 *p_drops)
-+{
-+	struct otx2_devlink *otx2_dl = devlink_priv(devlink);
-+	struct otx2_nic *pfvf = otx2_dl->pfvf;
-+	struct cgx_dmac_filter_drop_cnt *rsp;
-+	struct msg_req *req;
-+	int err;
-+
-+	if (trap->id != DEVLINK_TRAP_GENERIC_ID_DMAC_FILTER)
-+		return -EINVAL;
-+
-+	/* send mailbox to AF */
-+	mutex_lock(&pfvf->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_cgx_get_dmacflt_dropped_pktcnt(&pfvf->mbox);
-+	if (!req) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	err = otx2_sync_mbox_msg(&pfvf->mbox);
-+	if (err)
-+		goto fail;
-+
-+	rsp = (struct cgx_dmac_filter_drop_cnt *)
-+			otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
-+	if (IS_ERR(rsp)) {
-+		err = PTR_ERR(rsp);
-+		goto fail;
-+	}
-+	*p_drops = rsp->count;
-+
-+fail:
-+	mutex_unlock(&pfvf->mbox.lock);
-+	return err;
-+}
-+
- static const struct devlink_ops otx2_devlink_ops = {
- #ifdef CONFIG_RVU_ESWITCH
- 	.eswitch_mode_get = otx2_devlink_eswitch_mode_get,
- 	.eswitch_mode_set = otx2_devlink_eswitch_mode_set,
- #endif
-+	.trap_init = otx2_trap_init,
-+	.trap_action_set = otx2_trap_action_set,
-+	.trap_drop_counter_get = otx2_trap_drop_counter_get,
- };
- 
- int otx2_register_dl(struct otx2_nic *pfvf)
-@@ -242,3 +335,77 @@ void otx2_unregister_dl(struct otx2_nic *pfvf)
- 	devlink_free(dl);
- }
- EXPORT_SYMBOL(otx2_unregister_dl);
-+
-+int otx2_devlink_traps_register(struct otx2_nic *pf)
-+{
-+	const u32 groups_count = ARRAY_SIZE(otx2_trap_groups_arr);
-+	const u32 traps_count = ARRAY_SIZE(otx2_trap_items_arr);
-+	struct devlink *devlink = priv_to_devlink(pf->dl);
-+	struct otx2_trap_data *trap_data;
-+	struct otx2_trap *otx2_trap;
-+	int err, i;
-+
-+	trap_data = kzalloc(sizeof(*trap_data), GFP_KERNEL);
-+	if (!trap_data)
-+		return -ENOMEM;
-+
-+	trap_data->trap_items_arr = kcalloc(traps_count,
-+					    sizeof(struct otx2_trap_item),
-+					    GFP_KERNEL);
-+	if (!trap_data->trap_items_arr) {
-+		err = -ENOMEM;
-+		goto err_trap_items_alloc;
-+	}
-+
-+	trap_data->dl = pf->dl;
-+	trap_data->traps_count = traps_count;
-+	pf->dl->trap_data = trap_data;
-+
-+	err = devlink_trap_groups_register(devlink, otx2_trap_groups_arr,
-+					   groups_count);
-+	if (err)
-+		goto err_groups_register;
-+
-+	for (i = 0; i < traps_count; i++) {
-+		otx2_trap = &otx2_trap_items_arr[i];
-+		err = devlink_traps_register(devlink, &otx2_trap->trap, 1,
-+					     pf);
-+		if (err)
-+			goto err_trap_register;
-+	}
-+
-+	return 0;
-+
-+err_trap_register:
-+	for (i--; i >= 0; i--) {
-+		otx2_trap = &otx2_trap_items_arr[i];
-+		devlink_traps_unregister(devlink, &otx2_trap->trap, 1);
-+	}
-+	devlink_trap_groups_unregister(devlink, otx2_trap_groups_arr,
-+				       groups_count);
-+err_groups_register:
-+	pf->dl->trap_data = NULL;
-+	kfree(trap_data->trap_items_arr);
-+err_trap_items_alloc:
-+	kfree(trap_data);
-+	return err;
-+}
-+
-+void otx2_devlink_traps_unregister(struct otx2_nic *pf)
-+{
-+	struct otx2_trap_data *trap_data = pf->dl->trap_data;
-+	struct devlink *devlink = priv_to_devlink(pf->dl);
-+	const struct devlink_trap *trap;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(otx2_trap_items_arr); ++i) {
-+		trap = &otx2_trap_items_arr[i].trap;
-+		devlink_traps_unregister(devlink, trap, 1);
-+	}
-+
-+	devlink_trap_groups_unregister(devlink, otx2_trap_groups_arr,
-+				       ARRAY_SIZE(otx2_trap_groups_arr));
-+	kfree(trap_data->trap_items_arr);
-+	kfree(trap_data);
-+	pf->dl->trap_data = NULL;
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
-index c7bd4f3c6c6b..d127d54941bf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
-@@ -8,13 +8,34 @@
- #ifndef	OTX2_DEVLINK_H
- #define	OTX2_DEVLINK_H
- 
-+#define OTX2_TRAP_DROP(_id, _group_id)					\
-+	DEVLINK_TRAP_GENERIC(DROP, DROP, _id,				\
-+			     DEVLINK_TRAP_GROUP_GENERIC_ID_##_group_id, \
-+			     DEVLINK_TRAP_METADATA_TYPE_F_IN_PORT)
-+struct otx2_trap {
-+	struct devlink_trap trap;
-+};
-+
-+struct otx2_trap_item {
-+	enum devlink_trap_action action;
-+	void *trap_ctx;
-+};
-+
-+struct otx2_trap_data {
-+	struct otx2_devlink *dl;
-+	struct otx2_trap_item *trap_items_arr;
-+	u32 traps_count;
-+};
-+
- struct otx2_devlink {
- 	struct devlink *dl;
- 	struct otx2_nic *pfvf;
-+	struct otx2_trap_data *trap_data;
- };
- 
- /* Devlink APIs */
- int otx2_register_dl(struct otx2_nic *pfvf);
- void otx2_unregister_dl(struct otx2_nic *pfvf);
--
-+void otx2_devlink_traps_unregister(struct otx2_nic *pfvf);
-+int otx2_devlink_traps_register(struct otx2_nic *pfvf);
- #endif /* RVU_DEVLINK_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index a7feb4c392b3..2fafdf405c33 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3282,6 +3282,10 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (err)
- 		goto err_mcam_flow_del;
- 
-+	err = otx2_devlink_traps_register(pf);
-+	if (err)
-+		goto err_mcam_flow_del;
-+
- 	/* Initialize SR-IOV resources */
- 	err = otx2_sriov_vfcfg_init(pf);
- 	if (err)
-@@ -3514,6 +3518,7 @@ static void otx2_remove(struct pci_dev *pdev)
- 	/* Disable link notifications */
- 	otx2_cgx_config_linkevents(pf, false);
- 
-+	otx2_devlink_traps_unregister(pf);
- 	otx2_unregister_dl(pf);
- 	unregister_netdev(netdev);
- 	cn10k_ipsec_clean(pf);
--- 
-2.34.1
+/P
 
 
