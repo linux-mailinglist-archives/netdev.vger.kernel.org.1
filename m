@@ -1,100 +1,374 @@
-Return-Path: <netdev+bounces-251433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520F6D3C50E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:24:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A01D3C550
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7AC0E589B62
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:13:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A59293EA173
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DBF3D668B;
-	Tue, 20 Jan 2026 10:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88903B95F6;
+	Tue, 20 Jan 2026 10:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rBMPbugF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AsiUxk54"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9C03624CC;
-	Tue, 20 Jan 2026 10:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58F03A89B6
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768903982; cv=none; b=dZ7ohhHQbsuHDFmptu9ZY+mvHHBedus7oXU6TP62/9tcISUBiAVn+IRVwRenFVM5ocJ1l5zKl+hs8s57qoIsQARC7PaGM5SgunKMMKc/TA4w2PegwAc89DQck7ECHgkalfxsz3mE1jRJJBEH7V7OflE/pzgcbwKXqvKopPFVBwc=
+	t=1768903996; cv=none; b=PX8DpE6CIqreC3u621yeF1Zs0iexJKVG8qVfACW6Ny8RYOOme9RtQpgFU0uutzlRkCDS7z7W/2iI+jTrG0vRqMbFMlrIwNuJB79QcvhHyBh8ASV0A84mEwqQ5o30lM4cZVIa6jhDFG7vK9KUMP+KYg2JtpPN71SYrzdHfskcB90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768903982; c=relaxed/simple;
-	bh=fVcL5XtGvi4X3+0G8pp2kIcJKmEDhVX3PeqbJdpboaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HZAl2NoTQC5ukhXUSPS53EU4AAOupcsjT1b6SZRikubx7KXs4cj7mcRK8olyXkLw6DyerZD+bvo7C5yqN55E56m61rQcizx4GPOrq1enV53oaCzBEMUBWfc7jTs0pxQ2k9jCo6AUaodDyV6hhfzJqox+kpwBL/5BdGymWr9fG0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rBMPbugF; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MfnfHEO5iuaJRI+62YTPm5+K8bMNJD7kcoNtFyzxGKs=; b=rBMPbugFWYyVL5qpyUg71WmJgk
-	NsW+d5r8l/3OJR/bH+uny7K63JHwn6EexwsD9LgRY6e5O2AoGA0soxQOIcSdqKe3mQ+gXM9DhhvNo
-	3KG7Z5FvIKpjDOcFokazR26jpXg0ukCqkxia45m632A7Xe22PwgqMfLqJI9IRIo84tkzvOmWADB0M
-	pv42xrrZ6Rzee5VmvTyIbxH8lOov3zAKwed6WTCS3yxxp6LYPcbJ4QgQ/AJPkBTRGUHVtYWQa06FJ
-	UO4Ic0BM3GjKTXZWTbufGLAIVl3iNTAXQw9/5JLdrWJoHlNavESs15lsvZcwxIGTgY+VGhp3SaXto
-	6nDc20Fg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43312)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vi8jC-00000000645-2Cga;
-	Tue, 20 Jan 2026 10:12:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vi8j8-000000007RE-1CJk;
-	Tue, 20 Jan 2026 10:12:46 +0000
-Date: Tue, 20 Jan 2026 10:12:46 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-phy@lists.infradead.org,
-	davem@davemloft.net, maxime.chevallier@bootlin.com,
-	alexandre.torgue@foss.st.com, mohd.anwar@oss.qualcomm.com,
-	neil.armstrong@linaro.org, hkallweit1@gmail.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	edumazet@google.com, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vkoul@kernel.org,
-	andrew@lunn.ch, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <aW9VHt6meEJFxV0I@shell.armlinux.org.uk>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
- <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
- <20260120081844.7e6aq2urhxrylywi@skbuf>
+	s=arc-20240116; t=1768903996; c=relaxed/simple;
+	bh=0N6Si2DMijNBlex5Z64O16nWQXHFszwtp8niTAJM1I0=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=gW3tmhSarn9w7AL+fOXFBjX0RJ6vfTG9TDftGIth2Z/9lfD6qjRpLZGBLut1tLtjhu4uDPSC6wjRbAhcLOt03GpT1011PpI0KnUG3M7FsKGeUlSV+qKZ6G88WSmFQAFWf4Kf1uvMnCnlWkXLsYsy+XbWVxFWnSIISgMNIK4bAWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AsiUxk54; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768903993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GUliOwYELnDtzBvwJRk7cYJ7y2k4MPGFFS9G25f+omo=;
+	b=AsiUxk541sR5Qivc0gPwLmyfaSu2oVUmXTcPBIvafh3AiNdvf82QUCR1jySTKFQqQhZfSx
+	NinvUrMymbf5xI78/EMyM1z4Ba29u54VE38BjhE3kH3yYZY/F5MBvib+0GbGM6HXAk4u7h
+	uOVrNbVPeuKWqy34x04NI24YnGWNDKw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-501-M_sDiZO2N2OInxfIy5BM_Q-1; Tue,
+ 20 Jan 2026 05:13:12 -0500
+X-MC-Unique: M_sDiZO2N2OInxfIy5BM_Q-1
+X-Mimecast-MFC-AGG-ID: M_sDiZO2N2OInxfIy5BM_Q_1768903991
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4203918005B8;
+	Tue, 20 Jan 2026 10:13:10 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DB14E1955F43;
+	Tue, 20 Jan 2026 10:13:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com,
+    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    stable@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] rxrpc: Fix data-race warning and potential load/store tearing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120081844.7e6aq2urhxrylywi@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1107123.1768903985.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 20 Jan 2026 10:13:05 +0000
+Message-ID: <1107124.1768903985@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-First, I'll say I'm on a very short fuse today; no dinner last night,
-at the hospital up until 5:30am, and a fucking cold caller rang the door
-bell at 10am this morning. Just fucking our luck.
+    =
 
-On Tue, Jan 20, 2026 at 10:18:44AM +0200, Vladimir Oltean wrote:
-> Isn't it sufficient to set pl->pcs to NULL when pcs_enable() fails and
-> after calling pcs_disable(), though?
+Fix the following:
 
-No. We've already called mac_prepare(), pcs_pre_config(),
-pcs_post_config() by this time, we're past the point of being able to
-unwind.
+        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_=
+data_packet
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+which is reporting an issue with the reads and writes to ->last_tx_at in:
+
+        conn->peer->last_tx_at =3D ktime_get_seconds();
+
+and:
+
+        keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
+
+The lockless accesses to these to values aren't actually a problem as the
+read only needs an approximate time of last transmission for the purposes
+of deciding whether or not the transmission of a keepalive packet is
+warranted yet.
+
+Also, as ->last_tx_at is a 64-bit value, tearing can occur on a 32-bit
+arch.
+
+Fix both of these by switching to an unsigned int for ->last_tx_at and onl=
+y
+storing the LSW of the time64_t.  It can then be reconstructed at need
+provided no more than 68 years has elapsed since the last transmission.
+
+Fixes: ace45bec6d77 ("rxrpc: Fix firewall route keepalive")
+Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/r/695e7cfb.050a0220.1c677c.036b.GAE@google=
+.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: stable@kernel.org
+---
+ Changes
+ =3D=3D=3D=3D=3D=3D=3D
+ ver #3)
+  - Use READ_ONCE() in the proc file read as well.
+
+ ver #2)
+  - Fix a format specifier to match the change in type of last_tx_at.
+
+ net/rxrpc/ar-internal.h |    9 ++++++++-
+ net/rxrpc/conn_event.c  |    2 +-
+ net/rxrpc/output.c      |   14 +++++++-------
+ net/rxrpc/peer_event.c  |   17 ++++++++++++++++-
+ net/rxrpc/proc.c        |    4 ++--
+ net/rxrpc/rxgk.c        |    2 +-
+ net/rxrpc/rxkad.c       |    2 +-
+ 7 files changed, 36 insertions(+), 14 deletions(-)
+
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index 5b7342d43486..36d6ca0d1089 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -387,7 +387,7 @@ struct rxrpc_peer {
+ 	struct rb_root		service_conns;	/* Service connections */
+ 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
+ 	unsigned long		app_data;	/* Application data (e.g. afs_server) */
+-	time64_t		last_tx_at;	/* Last time packet sent here */
++	unsigned int		last_tx_at;	/* Last time packet sent here (time64_t LSW) *=
+/
+ 	seqlock_t		service_conn_lock;
+ 	spinlock_t		lock;		/* access lock */
+ 	int			debug_id;	/* debug ID for printks */
+@@ -1379,6 +1379,13 @@ void rxrpc_peer_keepalive_worker(struct work_struct=
+ *);
+ void rxrpc_input_probe_for_pmtud(struct rxrpc_connection *conn, rxrpc_ser=
+ial_t acked_serial,
+ 				 bool sendmsg_fail);
+ =
+
++/* Update the last transmission time on a peer for keepalive purposes. */
++static inline void rxrpc_peer_mark_tx(struct rxrpc_peer *peer)
++{
++	/* To avoid tearing on 32-bit systems, we only keep the LSW. */
++	WRITE_ONCE(peer->last_tx_at, ktime_get_seconds());
++}
++
+ /*
+  * peer_object.c
+  */
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 232b6986da83..98ad9b51ca2c 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -194,7 +194,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connectio=
+n *conn,
+ 	}
+ =
+
+ 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, ioc, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(chan->call_debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_final_resend);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 8b5903b6e481..d70db367e358 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -275,7 +275,7 @@ static void rxrpc_send_ack_packet(struct rxrpc_call *c=
+all, int nr_kv, size_t len
+ 	rxrpc_local_dont_fragment(conn->local, why =3D=3D rxrpc_propose_ack_ping=
+_for_mtu_probe);
+ =
+
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	call->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(call->peer);
+ 	if (ret < 0) {
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_ack);
+@@ -411,7 +411,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+ =
+
+ 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, sizeof(pkt));
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_abort);
+@@ -698,7 +698,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 			ret =3D 0;
+ 			trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags,
+ 					    rxrpc_txdata_inject_loss);
+-			conn->peer->last_tx_at =3D ktime_get_seconds();
++			rxrpc_peer_mark_tx(conn->peer);
+ 			goto done;
+ 		}
+ 	}
+@@ -711,7 +711,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 	 */
+ 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ =
+
+ 	if (ret =3D=3D -EMSGSIZE) {
+ 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
+@@ -797,7 +797,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *co=
+nn)
+ =
+
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr, rxrpc_tx_point_conn_abort);
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ }
+ =
+
+ /*
+@@ -917,7 +917,7 @@ void rxrpc_send_keepalive(struct rxrpc_peer *peer)
+ 		trace_rxrpc_tx_packet(peer->debug_id, &whdr,
+ 				      rxrpc_tx_point_version_keepalive);
+ =
+
+-	peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(peer);
+ 	_leave("");
+ }
+ =
+
+@@ -973,7 +973,7 @@ void rxrpc_send_response(struct rxrpc_connection *conn=
+, struct sk_buff *response
+ 	if (ret < 0)
+ 		goto fail;
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	return;
+ =
+
+ fail:
+diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
+index 7f4729234957..9d02448ac062 100644
+--- a/net/rxrpc/peer_event.c
++++ b/net/rxrpc/peer_event.c
+@@ -237,6 +237,21 @@ static void rxrpc_distribute_error(struct rxrpc_peer =
+*peer, struct sk_buff *skb,
+ 	spin_unlock_irq(&peer->lock);
+ }
+ =
+
++/*
++ * Reconstruct the last transmission time.  The difference calculated sho=
+uld be
++ * valid provided no more than ~68 years elapsed since the last transmiss=
+ion.
++ */
++static time64_t rxrpc_peer_get_tx_mark(const struct rxrpc_peer *peer, tim=
+e64_t base)
++{
++	s32 last_tx_at =3D READ_ONCE(peer->last_tx_at);
++	s32 base_lsw =3D base;
++	s32 diff =3D last_tx_at - base_lsw;
++
++	diff =3D clamp(diff, -RXRPC_KEEPALIVE_TIME, RXRPC_KEEPALIVE_TIME);
++
++	return diff + base;
++}
++
+ /*
+  * Perform keep-alive pings.
+  */
+@@ -265,7 +280,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
+_net *rxnet,
+ 		spin_unlock_bh(&rxnet->peer_hash_lock);
+ =
+
+ 		if (use) {
+-			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
++			keepalive_at =3D rxrpc_peer_get_tx_mark(peer, base) + RXRPC_KEEPALIVE_=
+TIME;
+ 			slot =3D keepalive_at - base;
+ 			_debug("%02x peer %u t=3D%d {%pISp}",
+ 			       cursor, peer->debug_id, slot, &peer->srx.transport);
+diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
+index d803562ca0ac..59292f7f9205 100644
+--- a/net/rxrpc/proc.c
++++ b/net/rxrpc/proc.c
+@@ -296,13 +296,13 @@ static int rxrpc_peer_seq_show(struct seq_file *seq,=
+ void *v)
+ =
+
+ 	now =3D ktime_get_seconds();
+ 	seq_printf(seq,
+-		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6llus %8d %8d\n",
++		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6ds %8d %8d\n",
+ 		   lbuff,
+ 		   rbuff,
+ 		   refcount_read(&peer->ref),
+ 		   peer->cong_ssthresh,
+ 		   peer->max_data,
+-		   now - peer->last_tx_at,
++		   (s32)now - (s32)READ_ONCE(peer->last_tx_at),
+ 		   READ_ONCE(peer->recent_srtt_us),
+ 		   READ_ONCE(peer->recent_rto_us));
+ =
+
+diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
+index dce5a3d8a964..43cbf9efd89f 100644
+--- a/net/rxrpc/rxgk.c
++++ b/net/rxrpc/rxgk.c
+@@ -678,7 +678,7 @@ static int rxgk_issue_challenge(struct rxrpc_connectio=
+n *conn)
+ =
+
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+ 	if (ret > 0)
+-		conn->peer->last_tx_at =3D ktime_get_seconds();
++		rxrpc_peer_mark_tx(conn->peer);
+ 	__free_page(page);
+ =
+
+ 	if (ret < 0) {
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 3657c0661cdc..a756855a0a62 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -694,7 +694,7 @@ static int rxkad_issue_challenge(struct rxrpc_connecti=
+on *conn)
+ 		return -EAGAIN;
+ 	}
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr,
+ 			      rxrpc_tx_point_rxkad_challenge);
+ 	_leave(" =3D 0");
+
 
