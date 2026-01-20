@@ -1,174 +1,145 @@
-Return-Path: <netdev+bounces-251536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251537-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sOo0HKu+b2kOMQAAu9opvQ
-	(envelope-from <netdev+bounces-251536-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:43:07 +0100
+	id IFuTN56yb2nHMAAAu9opvQ
+	(envelope-from <netdev+bounces-251537-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:51:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D428548C19
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:43:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B8A47FB5
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECDD9A04D75
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:32:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E34F284BE4D
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C4233439F;
-	Tue, 20 Jan 2026 16:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9ADA410D3B;
+	Tue, 20 Jan 2026 16:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IT6R9Mdh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfLD+gN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193E0334694
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F696324B1D
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768925869; cv=none; b=M28UuzLr7Xe+RPWaxCLEEd+THVrRTlEiKXDW4t3SUXvVToPOyel4hIHBqD3+s6vl1ChMSip4sbWkqmhAHK9cDkjrAelD0hvL1mrl1HtT9eMo6o/z6Kd/mvQ3xpYsR3kC2jYe2AknQGAr6L8pK9HHjXSy2t2QbvGxzfLgT97k1Fw=
+	t=1768925946; cv=none; b=qYegIDfQoiWjJocn/pFpBHCtno1e8tnLxvEfq+6DRw9BllHrVByxBHCFZRvLgSsWSHarMi08G/hCOCFAgsV62ucQ6Lwt8V2TBuspcHvMeoxw3QpTvyuFB7RpjQHI55+JnnbGtcUSujWZBz39APuzShCpgvZ+cVJ/nxTdvlk21m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768925869; c=relaxed/simple;
-	bh=A1bpwayInKC3xoS8sBW+Ss6JExuba7Y64eDC7kXzPR8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T/kKlHcZoGkKribWola2BPLyAsSRnSJDnpF0qYtJGSSAu1QNSbNR0/5V3c2q6epZtlg7xOlqzvZ6H+MbB5WtZ3gBRKJSkj2p9Qj0htHJN6lyFuXKpnNPc3VAgdZG2I67kDuXx6g7xF6NGyWruhWquM5oQ9Zb2TSrxyNxsmGqFS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IT6R9Mdh; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6b4058909so673131385a.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:17:46 -0800 (PST)
+	s=arc-20240116; t=1768925946; c=relaxed/simple;
+	bh=i3AS3XFt/Sr4J1+lIdtOfvf95xuYKpL21JsZ5ylj76w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OEwkUtlrejePbTRaKA0BuUpwU7lZdTL4HKJtUv0/dI/BU67PYz0/8wvx4tmATo//RibWnvmLGxiHOwWNob4Zm8JMvVhJ2T3Wmjj6zr5lHF8c3Vt9Yj2Ac6eXag6gpRh+hnwdD5PcAUxW23o9s3gAXaVWIkoFhzc7GHsm67iuRNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfLD+gN2; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-382f9930e54so51272461fa.1
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:19:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768925866; x=1769530666; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SDtjAf8U5bgsUGsfPHUl8gtWnxZbtbccG6M9wC/879Q=;
-        b=IT6R9MdhNt/f/ofN/LfOOcmmpZmiwaAARW4lxg4RkkPYjWVv4smrJWuPPY6p01iTC7
-         NgfX9sW2qlBVxo9UADTMqqXde9O0gSmQqsw7F3d6AvN1msUd5qmJ1H3z7l6IGcpd9+h9
-         X+jJu7xDTZy/rxhyCqUos53Jz0zRqKhhcPNbWVtkI9mUJGcPjcnCEiO08dkLOpuWXPAb
-         xr4T5beTCR5YbxlBwyAB/4dfiQCpyrL7DJ1QNIA2lLNAYKZGNaIRcEAO+zqjgDcLhSKi
-         nTREis08yNVf2JNtqOeXEAzXmQlffUAPHU3VcToIEqd4DfNEfp5aaP+NyGyNcaGZdg/3
-         vx3A==
+        d=gmail.com; s=20230601; t=1768925943; x=1769530743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5yr5X0nrRei570DaZtZdU7iwu6O5gxcfI5XJskshP+M=;
+        b=LfLD+gN2Pv4pze3+TqOVdQ4x3i05pFwp5BpbJFGAfK4eqRW/mEyj2LB7rZlyNdOE9K
+         UmJucnZmgli/b4wipTAgVIcbU8gbG0S7ui6CaBpAG/A+BkUngp3VLLbBI9jQsyhwC+Yy
+         EKAeFzySj698hWXSWo0YZQKEd2b45YyDomjE+91cu1owKL0x1F4kWRhpAbk6zTYSnM1M
+         yGCBScNko7fV4VW2UJATYHGb/tTMjGHnPkyzLF9DUWQQUWGfT1YzHTD6TDmVIwbvtxEG
+         hwAWrZz6nr06/yZtZIlMWZsA8yEXO6AcPklvEjGaYkgWmSm0JjhLKboXqtKTsLSBOXuq
+         Huwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768925866; x=1769530666;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SDtjAf8U5bgsUGsfPHUl8gtWnxZbtbccG6M9wC/879Q=;
-        b=AfIL7o5tdz02bua6o7VSwBS/qvtfGSUVU8mYvFyqzaCnjbfPfw+fYhLrG82Me8+x8L
-         rZlpivHq3ELlBVS8z10t48fc6N3KF7iV+/nnxJZ+Jf8DAH6CaeCXX1501bJHLyQEnZoa
-         utPmSKHfHZAiIVIyFY43OgTqLkptmMplvQDHU1m8Kq3gkblLBdwlhX9IFIjyEwImmzRC
-         h+qx1hPBly4hfF3LZGD5oHZE8ohDBm33MtdOHLYb//1v7BaHnNYEgWOIXr/IRJczk/kr
-         CZD+mfbT95z4/r1xmBgOaGqm8I2zNNAkA1yvA71/y6vz2sNW1/OXtx2KriOw8eFtaCFS
-         zm/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVTFV/GZJ95JHrJx37weixZUuhy4lri3tXYVc/FBGqFyk7w4R6oxqivQv8XI6bdIX/ifroU48s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJwneD5kpVS3FS+bOBxaxQNQH1eqEpQTq75m1dfvqtYsl1n/Ok
-	/goex1BwQqG5h7HufU2yCLHvZNc1ZXvsYn6E5nJp0Us5OJUJGDYodQXoc+dtI5StaaDeKavpInf
-	6bdu/YlI4Ctf+bg==
-X-Received: from qknwd25.prod.google.com ([2002:a05:620a:7299:b0:8c5:5b1b:d60c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1a92:b0:8c5:391f:1db7 with SMTP id af79cd13be357-8c6a6789295mr2078264385a.64.1768925865734;
- Tue, 20 Jan 2026 08:17:45 -0800 (PST)
-Date: Tue, 20 Jan 2026 16:17:44 +0000
+        d=1e100.net; s=20230601; t=1768925943; x=1769530743;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5yr5X0nrRei570DaZtZdU7iwu6O5gxcfI5XJskshP+M=;
+        b=o0UBaqiQJIUF7nYsFQvTsUwuMYAT2yAuoXtmWyICNGT5R5/eBZ3e2GxxSfyt3iZWGe
+         gE8aLGAXyTv7Y1TrJCedcoFsCOd9WAVTkFKBkn4goltpWgG9Gou1AYYwP0Vz+TUWp4Qp
+         1ch8g0Nb7O1GbP46UmwElxLqKfYoOn1VMQ2TO41CJY5NHDmLDFCrSQfgCiQaKqtz+9dL
+         0XwLeylodil2HzU0aiNU8W25Tn9s/cBM2xKKc13nMVLcy63mM7aiCXJvnCq5ruWJvZfp
+         SWf+ODATj/llkiuNLJvGjM6IXseTPXVjt9E1JuK7S+99igNZcD71Kid519/LAram933R
+         Pmsg==
+X-Gm-Message-State: AOJu0YwHndwOf5rOziWMKiyiJsyLHd+tEN+6UCUYXxU88ivye+/HcoA9
+	Hv2JhW8r0gF7Yxvyl61/8itv6j6FZEByC4SgLhsRiSA8l3TAfWuddTQmqFDFgmko
+X-Gm-Gg: AZuq6aI2EwSfonZt12nl3MV36V7fXfTtu2/+02qFMLyLC/LNNTF3mmC0othomh484Dp
+	J4vu4QsCjsfJnz2mR/Zc1Zr+kFsyszOyQ4r2h8gUMwEsuhZOO4Wh3ZBRbHJDuKD67iwWm0gug6r
+	Jt4PrTYQDO13CT8ZHucFEU8vQiW4xkmh4ciLMK8VISAbsqjNsDnEbCr8KtUbkGZLc8lVM+bfOKr
+	d+hzlE6KMfADq8s2pdxcNjqeO4gJH8n8AkRKS1a/Sm1nNaz+ubYQWUB+0nNZt0tjbiAjT3SmsrI
+	m+0+a7dAha+eQ9ttVqBpNhv9rxiatYlv4brz8I0BkWzjhIDfeED0gFSHbRFPZ59kIb549vlAHk6
+	RuwV+XgXjB673Qgia2wyxbNTEpyMlq1v763C+W17U1slyQwSGyxGZy58v7y1pqh1kssmWd+08VJ
+	YJtnKJrZIfLfZOK/dS7p6ssW97GxDdhxDQC+JbiJA3kTV19w==
+X-Received: by 2002:a2e:8507:0:b0:37f:d634:ba27 with SMTP id 38308e7fff4ca-3836efbe978mr49149291fa.9.1768925942690;
+        Tue, 20 Jan 2026 08:19:02 -0800 (PST)
+Received: from huawei-System-Product-Name.. ([159.138.216.23])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38384e790d7sm40561531fa.24.2026.01.20.08.19.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 08:19:02 -0800 (PST)
+From: Dmitry Skorodumov <dskr99@gmail.com>
+X-Google-Original-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: netdev@vger.kernel.org
+Cc: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Subject: [PATCH net 0/3] ipvlan: Deduplicate ipv4/ipv6 addr_validator_event code
+Date: Tue, 20 Jan 2026 19:18:33 +0300
+Message-ID: <20260120161852.639238-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260120161744.1893263-1-edumazet@google.com>
-Subject: [PATCH net] bonding: provide a net pointer to __skb_flow_dissect()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+c46409299c70a221415e@syzkaller.appspotmail.com, 
-	Matteo Croce <mcroce@redhat.com>, Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	RCPT_COUNT_TWO(0.00)[2];
+	TAGGED_FROM(0.00)[bounces-251537-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251536-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com,redhat.com,fomichev.me];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dskr99@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	TAGGED_RCPT(0.00)[netdev,c46409299c70a221415e];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,fomichev.me:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: D428548C19
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,huawei.com:mid]
+X-Rspamd-Queue-Id: 87B8A47FB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-After 3cbf4ffba5ee ("net: plumb network namespace into __skb_flow_dissect")
-we have to provide a net pointer to __skb_flow_dissect(),
-either via skb->dev, skb->sk, or a user provided pointer.
+This is a bit stylish patches: The code to handle ipv4 and ipv6
+address change are exactly the same. We don't need separate
+functions for them. Just look whether we are called
+with ipvlan_addr4_notifier_block or with ipvlan_addr6_notifier_block
 
-In the following case, syzbot was able to cook a bare skb.
+The changed functionality is already covered
+with existing selftests/net/ipvtap_test.sh
 
-WARNING: net/core/flow_dissector.c:1131 at __skb_flow_dissect+0xb57/0x68b0 net/core/flow_dissector.c:1131, CPU#1: syz.2.1418/11053
-Call Trace:
- <TASK>
-  bond_flow_dissect drivers/net/bonding/bond_main.c:4093 [inline]
-  __bond_xmit_hash+0x2d7/0xba0 drivers/net/bonding/bond_main.c:4157
-  bond_xmit_hash_xdp drivers/net/bonding/bond_main.c:4208 [inline]
-  bond_xdp_xmit_3ad_xor_slave_get drivers/net/bonding/bond_main.c:5139 [inline]
-  bond_xdp_get_xmit_slave+0x1fd/0x710 drivers/net/bonding/bond_main.c:5515
-  xdp_master_redirect+0x13f/0x2c0 net/core/filter.c:4388
-  bpf_prog_run_xdp include/net/xdp.h:700 [inline]
-  bpf_test_run+0x6b2/0x7d0 net/bpf/test_run.c:421
-  bpf_prog_test_run_xdp+0x795/0x10e0 net/bpf/test_run.c:1390
-  bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703
-  __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6182
-  __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
-  __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
-  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
-  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-  do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
+Dmitry Skorodumov (3):
+  ipvlan: const-specifier for functions that use iaddr
+  ipvlan: Common code from v6/v4 validator_event
+  ipvlan: common code to handle ipv6/ipv4 address events
 
-Fixes: 58deb77cc52d ("bonding: balance ICMP echoes in layer3+4 mode")
-Reported-by: syzbot+c46409299c70a221415e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/696faa23.050a0220.4cb9c.001f.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Matteo Croce <mcroce@redhat.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/bonding/bond_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ipvlan/ipvlan.h      |   2 +-
+ drivers/net/ipvlan/ipvlan_core.c |   2 +-
+ drivers/net/ipvlan/ipvlan_main.c | 182 +++++++++++++------------------
+ 3 files changed, 79 insertions(+), 107 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 0aca6c937297def91d5740dfd456800432b5e343..e7caf400a59cbd9680adea3d1b8ab7a22c78f7e6 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -4096,8 +4096,9 @@ static bool bond_flow_dissect(struct bonding *bond, struct sk_buff *skb, const v
- 	case BOND_XMIT_POLICY_ENCAP23:
- 	case BOND_XMIT_POLICY_ENCAP34:
- 		memset(fk, 0, sizeof(*fk));
--		return __skb_flow_dissect(NULL, skb, &flow_keys_bonding,
--					  fk, data, l2_proto, nhoff, hlen, 0);
-+		return __skb_flow_dissect(dev_net(bond->dev), skb,
-+					  &flow_keys_bonding, fk, data,
-+					  l2_proto, nhoff, hlen, 0);
- 	default:
- 		break;
- 	}
 -- 
-2.52.0.457.g6b5491de43-goog
+2.43.0
 
 
