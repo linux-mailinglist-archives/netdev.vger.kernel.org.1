@@ -1,142 +1,205 @@
-Return-Path: <netdev+bounces-251347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF4CD3BDFD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 04:40:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5020ED3BE22
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 05:10:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7899234B9F7
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 03:40:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A601A4E0CAC
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 04:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1F63314D0;
-	Tue, 20 Jan 2026 03:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852C133A6FE;
+	Tue, 20 Jan 2026 04:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gw/BMzIS"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Hi5gjZXH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BE93314DA
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 03:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D140C33A6F6
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 04:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768880397; cv=none; b=ZxKWYJMowHH6IQb5HrXcsEB7D44i4fyPYZTtfsF0YlyvlxI3AJ5dwAdL37xrKTSm0YsK1YAwed/6XjFTZM50rvw2axLiKWNg7f3h32yhWqg845qiFOrs07hYFY0C77ESwo6nXSXrSJ+KlA6SKtKz9G1Xxq67vLmnls1pKHlSrEQ=
+	t=1768882195; cv=none; b=kLfueserbWOieFnEe3hPLOVScW+IVBf5Vsl2nNHY9jKvtcPcTqTWJ3ZetM3YIiTGWNUU5SC6d94/BJYJnjCQfiTxPDHinWKj8BqBXSh93yskfQ9LdOMOTRjTeVoO43l5RJockJtlR8TSkIkxVEiz6hbbqzsjg1Mis1AjfUG2lyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768880397; c=relaxed/simple;
-	bh=PkQnT9HrASsJc7IurqBQq+Uzv9yailjV38eVPJVHhAg=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=EytkeGOc3mhAANKAQNKLpuzvFhzPt69QxXtUCwHS7HSiX4TPTMFB6QYkEtSZBn0gGHpt0bFloxFwZ3acPnTZPIKhT5hwoPONMTgHSuKnQWsOzZWU63HYnhvZbfJrooHiHZ3GSb0pEU1Q8PEvB2alW2H1KbKnRhrTnEtPrZZa+oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gw/BMzIS; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-64455a2a096so4007529d50.3
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 19:39:55 -0800 (PST)
+	s=arc-20240116; t=1768882195; c=relaxed/simple;
+	bh=4G8l5k6weanXKozxN4JF5V9Fs42XkHux3mZge0qViVA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m1V2xfPqtuLfbM5bOhy7ylF1FDyxXut0e/h6PdZVy905VQD1mykv7dlO+I+PzwZdlYqwMDizMTSZUIGifV7KI1063N1XDEMTaxMydoIQqxu8OFpMO34JJAXkthH7fFOnCZ5jQE3KsK7JqzPMfozuMU4PS7vK1LJhsOu+jOv5n7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Hi5gjZXH; arc=none smtp.client-ip=52.34.181.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768880395; x=1769485195; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+f2e7dJ5whTj9SkU/TlgqUpo4cL0LQRd5uYBnJ44hS4=;
-        b=Gw/BMzISSY9TwPlVTqjdrPv5xoy9IucnPOywTAMIcOG2d12GuE3BvIM86jkEIbbzWG
-         jpQfag4w2e4OcO7fVhb82Tjtz+ElJSnDDkyjXAu43uJK5vVfwcnHiJJUyKUf8z8+5IR+
-         ErBQ5n6LqGlXzEtzS2F3wWMRj2F7UTcD6E6/XRnDugIhEVvynaqHWLQZtrQ8po/oN3KV
-         y5kbkfdOZZSZRtz0wHQVRcklTCp1KWbX5UXdKBG9bHhL7aEcdaqiokMuDW7n04SUGRXw
-         BkO9TQs5GWdB/TKji+PeaIXS+mlcUhQdE/GFtMW8BktTG+Y2Lu3w/rzkaUe91V3llMjG
-         6v1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768880395; x=1769485195;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+f2e7dJ5whTj9SkU/TlgqUpo4cL0LQRd5uYBnJ44hS4=;
-        b=m4beC0nl14Ygcm4YrY0IJ6Vq4Ikrf+0uSH9CiiiE4Z5LUxGJcduDSP6XdAK2DqNiCB
-         Oq08S5CDW5ffPzx1cfNW/dGMVUP72tC3Qhgyk9YLC1FV1dShXyPZLA4VJV7cnOCsaRmQ
-         su/Q4c0TIa5DBZeiMlSkE/JR6JSu52yKK3a9R8eIaVYh+8sB/yPgIO78ICZwECVMAak7
-         NCUzqVKt8zDgVw1v64anzdhYkw1QZqukfUY9mV2QljagcWFgotdrO9RI9/0ZP1FoCsaz
-         YTpqtyfEXpjBYIP/v5wX7QGZ6W9aJzGbEDfpM0Kk6QCqgLlAHYzs66UhjZtME0yW5s7x
-         3WKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwY3Ec+UHPhzB887xjLbyr2MWs+kzQC8L32g/A6yioPPmFHRijHLVPGke/3aZ28/jELApyxPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGeu97fsSkSzik2xxDKAysDF3hI2rqCNQWWa+DX02oaEpG2abx
-	G7arg1C+9Muq2u21jkjviSCg81SiRPgm3+9JgDXqLZXfypvFZu4H2otS
-X-Gm-Gg: AZuq6aL4l49JvOKHL7O/mU4+z4qUU3pBV1fEHGSPr+3qvQ+ZXeEaD0tBVtX1vwzhD7x
-	PV8l+TgvRDYEV6MEZLcx5s60V+pIexf7ihJw0DdEfjDsFS5H8hOO3zLeEBifvMY9hJNlDyfxgoI
-	b6OPDlC2ClZUmfTYJTDRW/+zlN+Zw7OF7kK48LePmAs/JFLL9Z/fuhRhDmEn0x9Ak255NDc1+vi
-	Phaya8e6zlev1K+Y5LN1HjHog9GZnNBhrr/Ye11yX769mgvI6YzOBIUjq+3CXay66HGcHUSmjiR
-	TP7ktapJEDRvZufGYRJzrtF+YEl98TP8b4U8lGN7doa5dQ0QYur9eG726OrvHcLhCrAqMmndDv2
-	WcJ64of4Wzr9m+lIAvVIfWxyo+OQIoEARl7EMVPH6m8Y/yW+E1sFFXwdDcdTs7wImk7U2mQwqmB
-	xB5AhEq7Hl3fJN8etEC7IQiuT9uFOBI3bBx/owGbeRJWZ26IThu9z5mK9BrKVtv5PWlf0=
-X-Received: by 2002:a05:690c:dd3:b0:794:35b:af5e with SMTP id 00721157ae682-7940a0e6771mr11618687b3.5.1768880394417;
-        Mon, 19 Jan 2026 19:39:54 -0800 (PST)
-Received: from smtpclient.apple (2607-8700-5500-8678-0000-0000-0000-0002.16clouds.com. [2607:8700:5500:8678::2])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-793c68d305dsm47643947b3.55.2026.01.19.19.39.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Jan 2026 19:39:53 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768882193; x=1800418193;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=O9ZU9K6r9ey5QSCUFUoJneb2msolBKA4lldbC697eK0=;
+  b=Hi5gjZXHZ+gJRAXMuqfbrikdCh8jHJ3x1aAMgrYKdebKGSIm+8rJKmf1
+   DGEE9vhFDwkspJoAqKpMO7d0dA3GC9v+4X7aTe3MWx6qhM1PCRY1o3WE5
+   6JR3eoz1n5X+rV1e/4ftZ+h9EzcZ1BKTpEUis96YjCEcOWrPM9HvZX7AB
+   yleDXfor4h5z97Qf+/rAR9xeTk3BLcJvXFfJ6gJKtq72BkhS5b/ssUvSV
+   X27qiFgPCW8KSgKSDsIUVaNQbXIwFBWaZOiuAd4aBChcQOIHuZ/gyGib0
+   YllXV8987olsy307YzHDlQfq9jpnYY8QvCBY9zKYX84I9YT22iQtctOY5
+   A==;
+X-CSE-ConnectionGUID: UR6KsHMsSgKY/UEhXwa9IQ==
+X-CSE-MsgGUID: kT+Eth0qQMWhIxTtzLv2wg==
+X-IronPort-AV: E=Sophos;i="6.21,239,1763424000"; 
+   d="scan'208";a="11176209"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 04:09:51 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:23499]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.231:2525] with esmtp (Farcaster)
+ id 93351dc0-42f3-42df-8453-5ad81db6cc28; Tue, 20 Jan 2026 04:09:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 93351dc0-42f3-42df-8453-5ad81db6cc28
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 20 Jan 2026 04:09:48 +0000
+Received: from 603e5f7bc1fe.amazon.com (10.37.244.13) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 20 Jan 2026 04:09:46 +0000
+From: Takashi Kozu <takkozu@amazon.com>
+To: <aleksandr.loktionov@intel.com>
+CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>,
+	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <piotr.kwapulinski@intel.com>,
+	<pmenzel@molgen.mpg.de>, <przemyslaw.kitszel@intel.com>,
+	<takkozu@amazon.com>, <enjuk@amazon.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 1/3] igb: prepare for RSS key get/set support
+Date: Tue, 20 Jan 2026 13:09:39 +0900
+Message-ID: <20260120040938.95789-2-takkozu@amazon.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <IA3PR11MB898693239F08B055E714E430E588A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <IA3PR11MB898693239F08B055E714E430E588A@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
-Subject: Re: [PATCH bpf RESEND v2 1/2] bpf: Fix memory access flags in helper
- prototypes
-From: Zesen Liu <ftyghome@gmail.com>
-In-Reply-To: <55f01664fc714615206cc8d100cabf4f310f2302.camel@gmail.com>
-Date: Tue, 20 Jan 2026 11:39:31 +0800
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>,
- Matt Bobrowski <mattbobrowski@google.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Daniel Xu <dxu@dxuuu.xyz>,
- bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org,
- Shuran Liu <electronlsr@gmail.com>,
- Peili Gao <gplhust955@gmail.com>,
- Haoran Ni <haoran.ni.cs@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B91D5A7E-4967-416D-A2AC-CD3428F3C702@gmail.com>
-References: <20260118-helper_proto-v2-0-ab3a1337e755@gmail.com>
- <20260118-helper_proto-v2-1-ab3a1337e755@gmail.com>
- <55f01664fc714615206cc8d100cabf4f310f2302.camel@gmail.com>
-To: Eduard Zingerman <eddyz87@gmail.com>
-X-Mailer: Apple Mail (2.3864.300.41.1.7)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-[...]
+> From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+> To: Takashi Kozu <takkozu@amazon.com>,
+> "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+> Cc: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+> "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+> "davem@davemloft.net" <davem@davemloft.net>,
+> "edumazet@google.com" <edumazet@google.com>,
+> "kuba@kernel.org" <kuba@kernel.org>,
+> "pabeni@redhat.com" <pabeni@redhat.com>,
+> "intel-wired-lan@lists.osuosl.org"
+> <intel-wired-lan@lists.osuosl.org>,
+> "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+> "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
+> "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 1/3] igb: prepare for RSS key get/set support
+> Date: Mon, 19 Jan 2026 10:19:02 +0000 [thread overview]
+> Message-ID: <IA3PR11MB898693239F08B055E714E430E588A@IA3PR11MB8986.namprd11.prod.outlook.com> (raw)
+> In-Reply-To: <20260119084511.95287-6-takkozu@amazon.com>
+> 
+> 
+> 
+> > -----Original Message-----
+> > From: Takashi Kozu <takkozu@amazon.com>
+> > Sent: Monday, January 19, 2026 9:45 AM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
+> > Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
+> > andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> > kuba@kernel.org; pabeni@redhat.com; intel-wired-lan@lists.osuosl.org;
+> > netdev@vger.kernel.org; Loktionov, Aleksandr
+> > <aleksandr.loktionov@intel.com>; pmenzel@molgen.mpg.de; Kwapulinski,
+> > Piotr <piotr.kwapulinski@intel.com>; Takashi Kozu <takkozu@amazon.com>
+> > Subject: [PATCH iwl-next v3 1/3] igb: prepare for RSS key get/set
+> > support
+> >
+> > Store the RSS key inside struct igb_adapter and introduce the
+> > igb_write_rss_key() helper function. This allows the driver to program
+> > the E1000 registers using a persistent RSS key, instead of using a
+> > stack-local buffer in igb_setup_mrqc().
+> >
+> > Signed-off-by: Takashi Kozu <takkozu@amazon.com>
+> > ---
+> > drivers/net/ethernet/intel/igb/igb.h | 3 +++
+> > drivers/net/ethernet/intel/igb/igb_ethtool.c | 21
+> > ++++++++++++++++++++
+> > drivers/net/ethernet/intel/igb/igb_main.c | 8 ++++----
+> > 3 files changed, 28 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/igb/igb.h
+> > b/drivers/net/ethernet/intel/igb/igb.h
+> > index 0fff1df81b7b..8c9b02058cec 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb.h
+> > +++ b/drivers/net/ethernet/intel/igb/igb.h
+> > @@ -495,6 +495,7 @@ struct hwmon_buff {
+> > #define IGB_N_PEROUT 2
+> > #define IGB_N_SDP 4
+> > #define IGB_RETA_SIZE 128
+> > +#define IGB_RSS_KEY_SIZE 40
+> >
+> > enum igb_filter_match_flags {
+> > IGB_FILTER_FLAG_ETHER_TYPE = 0x1,
+> > @@ -655,6 +656,7 @@ struct igb_adapter {
+> > struct i2c_client *i2c_client;
+> > u32 rss_indir_tbl_init;
+> > u8 rss_indir_tbl[IGB_RETA_SIZE];
+> > + u8 rss_key[IGB_RSS_KEY_SIZE];
+> >
+> > unsigned long link_check_timeout;
+> > int copper_tries;
+> > @@ -735,6 +737,7 @@ void igb_down(struct igb_adapter *); void
+> > igb_reinit_locked(struct igb_adapter *); void igb_reset(struct
+> > igb_adapter *); int igb_reinit_queues(struct igb_adapter *);
+> > +void igb_write_rss_key(struct igb_adapter *adapter);
+> > void igb_write_rss_indir_tbl(struct igb_adapter *); int
+> > igb_set_spd_dplx(struct igb_adapter *, u32, u8); int
+> > igb_setup_tx_resources(struct igb_ring *); diff --git
+> > a/drivers/net/ethernet/intel/igb/igb_ethtool.c
+> > b/drivers/net/ethernet/intel/igb/igb_ethtool.c
+> > index 10e2445e0ded..5107b0de4fa3 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
+> > +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
+> > @@ -3016,6 +3016,27 @@ static int igb_set_rxnfc(struct net_device
+> > *dev, struct ethtool_rxnfc *cmd)
+> > return ret;
+> > }
+> >
+> > +/**
+> > + info.plist igb_write_rss_key - Program the RSS key into device registers
+> > + info.plist @adapter: board private structure
+> > + info.plist
+> > + info.plist Write the RSS key stored in adapter->rss_key to the E1000 hardware
+> > registers.
+> > + info.plist Each 32-bit chunk of the key is read using get_unaligned_le32()
+> > and
+> > +written
+> > + info.plist to the appropriate register.
+> > + */
+> > +void igb_write_rss_key(struct igb_adapter *adapter) {
+> Opening brace placement violates kernel coding style. For functions,
+> the opening brace should be on the next line, not on the same line as the function declaration.
+> Or is it my mail-client issue?
 
-> On Jan 20, 2026, at 04:24, Eduard Zingerman <eddyz87@gmail.com> wrote:
->=20
-> Q: why ARG_PTR_TO_UNINIT_MEM here, but not for a previous function and
->   not for snprintf variants?
+From my side, the opening brace is correctly on the next line.
 
-For bpf_get_stack_proto_raw_tp, I chose ARG_PTR_TO_UNINIT_MEM to be =
-consistent with its siblings:
+```
++void igb_write_rss_key(struct igb_adapter *adapter)
++{
+```
 
-=E2=80=A2 bpf_get_stack_proto_tp (bpf_trace.c:1425)
-=E2=80=A2 bpf_get_stack_proto (stackmap.c:525)
-=E2=80=A2 bpf_get_stack_sleepable_proto (stackmap.c:541)
+> > + ASSERT_RTNL();
+> > +
+> > + struct e1000_hw *hw = &adapter->hw;
+> Declarations should be at the start of the block.
+> I think ASSERT_RTNL(); can be moved down safely?
 
-All of these are wrappers around the same core function bpf_get_stack() =
-/ __bpf_get_stack(), passing the buffer with identical semantics, and =
-all use ARG_PTR_TO_UNINIT_MEM.=
+Thanks for pointing out. I'll fix this.
 
