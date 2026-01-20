@@ -1,166 +1,223 @@
-Return-Path: <netdev+bounces-251467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKKoFC5fcGkVXwAAu9opvQ
-	(envelope-from <netdev+bounces-251467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:07:58 +0100
+	id mA0mL7wucGkEXAAAu9opvQ
+	(envelope-from <netdev+bounces-251468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:41:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005EE51567
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:07:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 650E34F3C0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 76D67643354
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:50:39 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AEE9C644F16
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED893EF0C9;
-	Tue, 20 Jan 2026 11:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7ECE3D6488;
+	Tue, 20 Jan 2026 11:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fTudAju2"
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="H93G9koU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-e104.zoho.com (sender4-pp-e104.zoho.com [136.143.188.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9507636C58F;
-	Tue, 20 Jan 2026 11:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768909828; cv=none; b=VPfV+jkUwPrmILvCKCAb2an/OVHkXylLMq/jURpifeZCFCP4HgCfe79sscJYwxfgX2QfdjwWBYXCA1EeAHQsfdz6ERunbbcGoBSiex/xU3UkUZ+BnVltZENXz4Q+kvYFhbdlOAKJjirBvc8gU6OZcRelRwy56LN13f2HssWeA/g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768909828; c=relaxed/simple;
-	bh=uICr/bxdlfjRWKIQHOuu8bOjJbNsoFQIwXIixEaGIoI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rFpDAx+QOGkgzmgD0T6FF61tUerpf+1t3DtPKiW9x2XT/xgh6JwBRxUUfh6x5FSVXzhxdXJpNZkGZL03w1Zew9RMSsaKVZktL6+MrdCU0CL9GcozYy8sas4mSwxnFc/xllvpEm5cf8COUEG4zPPJFva4lr3XXJZEpR3VnLp+CcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fTudAju2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4C1C16AAE;
-	Tue, 20 Jan 2026 11:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768909828;
-	bh=uICr/bxdlfjRWKIQHOuu8bOjJbNsoFQIwXIixEaGIoI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fTudAju2sTMHc86jX3C+3A+ukVQK4vde1ON/2pzw1zNZldYRjlCMgF8revhuYYFGh
-	 umBBwbyqVzihZ+41o0n9sMsuem+ugaUkbCUV8vj0bu8GdpOVAh/ZFPZsb2kdWdVm8f
-	 YJLwTEXly6AZ/QLWYRz3VWR813NOXiXkJoayMb5x6oh8hb/84Exxl2YZ1m+zvZQM3I
-	 lsWd+iQU1l9EtQtfV2tGzMMxu9g0PdZ3YcIhdbfSXpeOgSeA3E9446mV+aJ/PosaN4
-	 g7R8noWQn/Vy6ZXaPDwhphx5tWCiW218HRFeTW5Vnk5gyAN6SWKDcEwjSVkE24xkMU
-	 DFNMztWVwBBkA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B8D8D38068DF;
-	Tue, 20 Jan 2026 11:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E2A3A4F49;
+	Tue, 20 Jan 2026 11:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768909985; cv=pass; b=SOdFAW7fZgL7G5s1a8UzW11OIGS5dWkEkD0/vaDjDYanUla0ur9o/u82UvFQFK8d3ZGos90Ghjw/H4CZfVZUmatU0l2a9C9H5HC4OMnVh540A/xer5UKftromNyRCsfWceRxbJ6TXZsP/X2NJ3GxF3+gYFDrmRrCrqEQqg+Io/o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768909985; c=relaxed/simple;
+	bh=typ9DRDW/UZrdqUbxJVjVT/pFbErm7WXkgSfUwUwKnQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZdaA6R0AGPUIatRWw6RAoPFPyCgQt6T2reAGjlcMzGhfn5/l1R3EQa7+J7pMM8R3XHE6IDxIu3byyFgqeoYvICpSCTe2nZ9oYIe36G8PLdXmcKVGl/eSoohO/DJDnkFQpjsTQm7uwfa9PRjTjWeCj8Fjs68CdxIVZjNhJvXpxmc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=H93G9koU; arc=pass smtp.client-ip=136.143.188.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+ARC-Seal: i=1; a=rsa-sha256; t=1768909942; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=fZYlA20MpnCAAE6j+0DCq9moaidbQBsSNz5CKTGqNeqR486iQZxOODnoLjJmmCcAKtFU4W6MhgP1rdW+YmmhVaUYB37ZP2JKFav7PgD0bTpabVStulZiL1DGF7yAA0Uu3WYdjVi0JkEEb8P+ddy8qUFX8uwWUjdd89dPruoTRkY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1768909942; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=b4kQK07yZhhPFzrCdW/yDpOPtjD5rDSvxImSrZvPL50=; 
+	b=fwaptDbABs0YsovqUkkBNhijXIminCEIZdLE2z/DmZXBID5iB/K4PebM7q7xkEBVWjJct5c9Q8IFkEgp4nJwv2FzYBScttXldEtASA6Mm1e4cE2q7pT9T6WoziRVsOPHmryXSn3uHHyxB1P0V6lEDMFMjnNEXiXnjsYrLnP+SnU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=ziyao.cc;
+	spf=pass  smtp.mailfrom=me@ziyao.cc;
+	dmarc=pass header.from=<me@ziyao.cc>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1768909942;
+	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
+	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
+	bh=b4kQK07yZhhPFzrCdW/yDpOPtjD5rDSvxImSrZvPL50=;
+	b=H93G9koU74SssZBM7MI/sPL3jbgL7588I0azFtI1XjrzS9pnzVWfZqOLeWfl2/Ku
+	dk96/lIzXVEiVHAYP3hLc+pjdpctGAoamdLjYmZ2q4o7/B9kia3OTERTZqV0l27u7tl
+	zKOclfitWLSCD1yNLad6+UhJOIHNkODGqfXkE/UQ=
+Received: by mx.zohomail.com with SMTPS id 1768909940542709.5656112173529;
+	Tue, 20 Jan 2026 03:52:20 -0800 (PST)
+Date: Tue, 20 Jan 2026 11:52:07 +0000
+From: Yao Zi <me@ziyao.cc>
+To: Georg Gottleuber <ggo@tuxedocomputers.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, Frank.Sae@motor-comm.com,
+	hkallweit1@gmail.com, vladimir.oltean@nxp.com, wens@csie.org,
+	jszhang@kernel.org, 0x1207@gmail.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, jeffbai@aosc.io, kexybiscuit@aosc.io,
+	Christoffer Sandberg <cs@tuxedocomputers.com>
+Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
+ Motorcomm YT6801
+Message-ID: <aW9sZwDpQu88BRPG@pie>
+References: <20260109093445.46791-2-me@ziyao.cc>
+ <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
+ <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+ <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
+ <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
+ <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+ <aW7sW91DrgZ6FMrv@pie>
+ <1be6caa4-abbd-4f3b-8c63-b637f0f9ed15@tuxedocomputers.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v7 00/16] netkit: Support for io_uring zero-copy
- and
- AF_XDP
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176890982554.757566.17882816780312694183.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Jan 2026 11:50:25 +0000
-References: <20260115082603.219152-1-daniel@iogearbox.net>
-In-Reply-To: <20260115082603.219152-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
- willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
- martin.lau@kernel.org, jordan@jrife.io, maciej.fijalkowski@intel.com,
- magnus.karlsson@intel.com, dw@davidwei.uk, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-X-Spamd-Result: default: False [-0.46 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1be6caa4-abbd-4f3b-8c63-b637f0f9ed15@tuxedocomputers.com>
+X-ZohoMailClient: External
+X-Spamd-Result: default: False [9.34 / 15.00];
+	URIBL_BLACK(7.50)[ziyao.cc:dkim];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,jrife.io,intel.com,davidwei.uk,bytedance.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_ALLOW(0.00)[ziyao.cc:s=zmail];
+	GREYLIST(0.00)[pass,meta];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251467-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251468-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[18];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[ziyao.cc,quarantine];
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[me@ziyao.cc,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,motor-comm.com,gmail.com,nxp.com,csie.org,vger.kernel.org,aosc.io,tuxedocomputers.com];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[ziyao.cc:+];
 	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 005EE51567
-X-Rspamd-Action: no action
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziyao.cc:dkim,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 650E34F3C0
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 15 Jan 2026 09:25:47 +0100 you wrote:
-> Containers use virtual netdevs to route traffic from a physical netdev
-> in the host namespace. They do not have access to the physical netdev
-> in the host and thus can't use memory providers or AF_XDP that require
-> reconfiguring/restarting queues in the physical netdev.
+On Tue, Jan 20, 2026 at 10:42:28AM +0100, Georg Gottleuber wrote:
 > 
-> This patchset adds the concept of queue leasing to virtual netdevs that
-> allow containers to use memory providers and AF_XDP at native speed.
-> Leased queues are bound to a real queue in a physical netdev and act
-> as a proxy.
 > 
-> [...]
+> Am 20.01.26 um 03:45 schrieb Yao Zi:
+> > On Mon, Jan 19, 2026 at 06:57:48PM +0100, Georg Gottleuber wrote:
+> >> Am 19.01.26 um 18:45 schrieb Georg Gottleuber:
+> >>> Hi,
+> >>>
+> >>> thanks for the quick reply.
+> >>>
+> >>> Am 19.01.26 um 16:43 schrieb Russell King (Oracle):
+> >>>> On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
+> >>>>> Hi,
+> >>>>>
+> >>>>> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
+> >>>>> revealed that tx is only 100Mbit/s:
+> >>>>>
+> >>> ...
+> >>>>>
+> >>>>> With our normally used DKMS module, Ethernet works with full-duplex and
+> >>>>> gigabit. Attached are some logs from lspci and dmesg. Do you have any
+> >>>>> idea how I can debug this further?
+> >>>>
+> >>>> My suggestion would be:
+> >>>>
+> >>>> - Look at the statistics, e.g.
+> >>>>
+> >>>>    ip -s li sh dev enp2s0
+> >>>
+> >>> That looks good (after iperf):
+> >>>
+> >>> 2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
+> >>> mode DEFAULT group default qlen 1000
+> >>>     link/ether ba:90:88:24:49:4f brd ff:ff:ff:ff:ff:ff
+> >>>     RX:  bytes packets errors dropped  missed   mcast
+> >>>        2091654   31556      0       0       0       0
+> >>>     TX:  bytes packets errors dropped carrier collsns
+> >>>       88532451    1518      0       0       0       0
+> >>>
+> >>>
+> >>>> - apply
+> >>>>   https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
+> >>>>   to enable more statistics to work, and check the network driver
+> >>>>   statistics:
+> >>>>
+> >>>>    ethtool --statistics enp2s0
+> >>>>
+> >>>> to see if there's any clues for what is going on.
+> >>>
+> >>> That looks also good, I think. I saved it before and after the test with
+> >>> iperf. See attachments.
+> >>
+> >> Oh, there was something else interesting in dmesg. See attachment.
+> >>
+> >>> Regards,
+> >>> Georg
+> > 
+> >> [    0.933480] dwmac-motorcomm 0000:02:00.0: error -ENOENT: failed to read maca0lr from eFuse
+> >> [    0.933483] dwmac-motorcomm 0000:02:00.0: eFuse contains no valid MAC address
+> >> [    0.933485] dwmac-motorcomm 0000:02:00.0: fallback to random MAC address
+> > 
+> > Some vendors didn't write a MAC address to the eFuse. With these YT6801
+> > chips, the failure is expected.
+> 
+> I believe we have a fixed address, as our DKMS driver always uses it (it
+> is also displayed in the BIOS).
+> 
+> > Which DKMS driver do you use? Could you read out a permanent address
+> > with your DKMS driver? If not, this piece of log should have nothing to
+> > do with the rate problem.
+> 
+> DKMS module we use:
+> https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801
+> 
+> Apparently, your driver can also read the permanent address. I rebooted
+> nine times to test it, and it worked nine times. So it was probably a
+> glitch that doesn't occur very often.
 
-Here is the summary with links:
-  - [net-next,v7,01/16] net: Add queue-create operation
-    https://git.kernel.org/netdev/net-next/c/a5546e18f77c
-  - [net-next,v7,02/16] net: Implement netdev_nl_queue_create_doit
-    https://git.kernel.org/netdev/net-next/c/31127deddef4
-  - [net-next,v7,03/16] net: Add lease info to queue-get response
-    https://git.kernel.org/netdev/net-next/c/9e2103f36110
-  - [net-next,v7,04/16] net, ethtool: Disallow leased real rxqs to be resized
-    https://git.kernel.org/netdev/net-next/c/ff8889ff9107
-  - [net-next,v7,05/16] net: Proxy net_mp_{open,close}_rxq for leased queues
-    https://git.kernel.org/netdev/net-next/c/0caa9a8ddec3
-  - [net-next,v7,06/16] net: Proxy netdev_queue_get_dma_dev for leased queues
-    https://git.kernel.org/netdev/net-next/c/804bf334d08a
-  - [net-next,v7,07/16] xsk: Extend xsk_rcv_check validation
-    https://git.kernel.org/netdev/net-next/c/1ecea95dd3b5
-  - [net-next,v7,08/16] xsk: Proxy pool management for leased queues
-    https://git.kernel.org/netdev/net-next/c/0073d2fd679d
-  - [net-next,v7,09/16] netkit: Add single device mode for netkit
-    https://git.kernel.org/netdev/net-next/c/b5c3fa4a0b16
-  - [net-next,v7,10/16] netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
-    https://git.kernel.org/netdev/net-next/c/b5ef109d22d4
-  - [net-next,v7,11/16] netkit: Add netkit notifier to check for unregistering devices
-    https://git.kernel.org/netdev/net-next/c/eef51113f8af
-  - [net-next,v7,12/16] netkit: Add xsk support for af_xdp applications
-    https://git.kernel.org/netdev/net-next/c/920da3634194
-  - [net-next,v7,13/16] selftests/net: Add bpf skb forwarding program
-    https://git.kernel.org/netdev/net-next/c/61d99ce3dfc2
-  - [net-next,v7,14/16] selftests/net: Add env for container based tests
-    https://git.kernel.org/netdev/net-next/c/6be87fbb2776
-  - [net-next,v7,15/16] selftests/net: Make NetDrvContEnv support queue leasing
-    https://git.kernel.org/netdev/net-next/c/ab771c938d9a
-  - [net-next,v7,16/16] selftests/net: Add netkit container tests
-    https://git.kernel.org/netdev/net-next/c/931420a2fc36
+Thanks for the hint. I'm sure I've encountered similar cases once or
+twice during development, but it stopped happening later, so I
+considered it's somehow fixed. I'll test more and see what's going wrong
+here.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> Do you have any ideas on how I can further debug the rate problem?
 
+Sadly I don't have any good suggestions. The Motorcomm glue is
+mysterious and totally undocumented, so it's hard to find out what's
+missing or wrong. I had to debug the driver by modifying this and vendor
+driver and then comparing behavior differences.
 
+Do you build the driver into the kernel, or as a module? I'll try to
+reproduce your case locally and investigate it, but as a hobbyist I
+cannot make any promises, really sorry about it.
+
+Best regards,
+Yao Zi
 
