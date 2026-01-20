@@ -1,165 +1,192 @@
-Return-Path: <netdev+bounces-251522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOqIGHymb2lDEgAAu9opvQ
-	(envelope-from <netdev+bounces-251522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:59:56 +0100
+	id EHmwEeiob2kZEwAAu9opvQ
+	(envelope-from <netdev+bounces-251527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:10:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5C946F19
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:59:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C04D47210
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 17:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D37DB9CCECF
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 15:34:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 19EF450E6EB
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08B82580F3;
-	Tue, 20 Jan 2026 15:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520CB32E13E;
+	Tue, 20 Jan 2026 15:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTm6pm0U"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yktCWCHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A717A1531E8;
-	Tue, 20 Jan 2026 15:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768922124; cv=none; b=V3U0MhiT5NKSuT7OLQICbIXOtNe5C/oKaTyCsIqTPx3LwMa/OpvLuTO7GMLazPAUhN+OtjlE1B2XwLosM0SH5qRVXcJ3OXi8jhzud9EZ2H7tir26p7QXuLbfWsm6pF/c7orGsmXctScJtN7kUbX6vWLItDfzUs1cfNyyeGuYTuw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768922124; c=relaxed/simple;
-	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EzEy85kqJ/2Z+LMoThi5rMTg30Nv+y4s5oJbfL6KtV1t6+EM9nk+x7tOnQemBr2j1V/QCxZoozQV6tdQ+dx/ojGdxFbb0bcPAVFqCnNoYpPPtS6uVaBCHUjcDguU83O7RU/XIImmqztEh8xsCBsXySbCmjruTmCoWjT5gi21C40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTm6pm0U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B042EC16AAE;
-	Tue, 20 Jan 2026 15:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768922124;
-	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dTm6pm0UbqrACPX84K25WsKI0mLcsga30LnGZ0xAs1QeHOq8GuYQb0tsVAj/1PyOk
-	 AN1JtPlGK2Lo1SN6drBYr1dVy9fdgzrRQCr2v1Zr5WaI0DgPDkYpbpHSPBc0lzPVxT
-	 mDodJS2/jqZjTXVaKaFD5qjNt2270SzYmLSpr9NA2qekfz0PdVSlZLmHpnEvNYJ+eY
-	 A07k9S1Ry7xxwMicubb01dCJM4tNlasnq386AOzVL87vqKI0T34pSKz9QNypV2LDxE
-	 2HWPcTW6E/V+Ce+TphpVMpakDh1WcI3tzKUwZtHRXG5Gb8k9H87NfGW6D+dQQz/FfZ
-	 kpuAsAsDnxf/g==
-Date: Tue, 20 Jan 2026 15:15:14 +0000
-From: Will Deacon <will@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
- HK_TYPE_DOMAIN
-Message-ID: <aW-cAlJCtI5Qtify@willie-the-truck>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-30-frederic@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE2832B9BE
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 15:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768923697; cv=pass; b=SdmWu08xfvFu9k+1URkRcmBCzy5n3cngtiGpHRMH7pJoZ1IfdsJULU8F8UYHUwdsaNkwXpZY+mM9MbAXKOOxNA15pQI8ELGY/8PV2792Rwwhebzr/Sns1vQW99n6j3opCylIbpgiaAbqlLM/E+RIF/1U0JVXr4mBtgDeSbK37Xw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768923697; c=relaxed/simple;
+	bh=Fluxb/WbD/JJZE4JUd4fxNTtxOC2Fm+ZRwi6K7z/+x0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DIgWye9/5L9TfIiSBz2ca1zZ+/6H/43jXqHrC/yjdI2jQ7OhzCL/pmbLg01fgPUrLlHO4FYtNQ10ND6U9JY2PWMzC09vzieSn0/ZsLBkM/s3HgDROphTrafP8IpnBl96l0Tos0WIjusKLW2DoMe0lUWCxaiD5fudphqFgd5M6kg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yktCWCHQ; arc=pass smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8c6aaf3cd62so449863385a.3
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 07:41:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768923694; cv=none;
+        d=google.com; s=arc-20240605;
+        b=f+jMxudjkEKwkCbk2aWu4Pq4AC30AXdxIyXy3lEXubr+fhsSPfEYEMgD2evWNqMWBH
+         vndxWntj1rPNn/LR+dh7kwkpGEnUAI3SxdcDcRSQTDLE8JsAoRt5LKFmCithDFeUEHyt
+         iFA9EQDsdtJ4Yn3ziZ8UeP/C8dMTX8w9pZKvUCqXiwobadATXLkaYFw24SHNXCZdj/Rb
+         rLDGQ6UMkTv1ZDrc0SOcw1kp3usLPGKi92kZ3wO27fGu1QmmfyuFxoNL9pQoAO9VDORI
+         XUkxioWEjxynVRVHAnE0dMydVNHkkNPqdeqzkCACCPpWJyrhEflmD7OxpexLquATeSVD
+         AJsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rWu4y7/zpK5Cmgzt2Qcn88dqo/y5xHK+1+dmR8ssiJs=;
+        fh=o2AY5SU8dOwopWqVEhadDRb45wcuxnc0b6BG6dj676E=;
+        b=DdkWEsX33pSlDLKcxGkYRiYLQj+fXNcIbwbRuzXSM3l1q7tmnKBNJyjqcW1lt7oyBz
+         frf9v1dWG6tq7NHpwMTZT3yKkodMRRaA01qVEP7Nd0xprWXJnuPUFqMyMYdqArazdcGK
+         XBoi2X7uh/1wnn8YoG917rNrnjoyAvSk8ifybXKcjdtXlVRuU1TJw8xUd5lSeNeG+Oq1
+         JHH/K0vAoQJj5nM3Qv6K0G62fjK19ii++3DeER1M6Zn8Int4Tx7R9Ud4lcEr9fXIkshJ
+         MIDNAI+DNFxQKu4hh/mketp0PMyc/NuMejGaRPFibtsg+bcxzeE29chah2EqeKhoq0cw
+         xE7g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768923694; x=1769528494; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rWu4y7/zpK5Cmgzt2Qcn88dqo/y5xHK+1+dmR8ssiJs=;
+        b=yktCWCHQGRWGPcBkueXZ/7KGxqYmspHChLrLkMdc1WlqO3IeIbvdGlldng4frSmC3w
+         lE6GLGrocItpqbVodiuPQQaBg1dobiwboE6Cc5270SwtKZ+8ZAvSTjyQCyqZUFTS44jb
+         kthr0Lt5OO1UiK+ZwVpF1TP3q6dUwtb11Y1UkwKlaTxcsr1kAblRMl7gQq/Iueir0XVo
+         Q5XFbKZpWJrA2MlPp/R/R+WJTCXlefbCesVYywTZIDltkMAakx+MS2KGv9LAsuFKrtyg
+         ulF4HC538kNXX71XUYBr4QRgBWaIkpIcpq5667swnWdTRcbSqKT0b6R8kdLtskvkYfMk
+         xNCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768923694; x=1769528494;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rWu4y7/zpK5Cmgzt2Qcn88dqo/y5xHK+1+dmR8ssiJs=;
+        b=gHBn6DeQqcbviOesxO5bSMmbWadZP0uh5CNKitHB7+S5PgHzfQaErx1WkT4+97tb5G
+         lZ+Mq9VX0mtGczGWXxajXZZ7J41xT+81Fnk0jN77Ei1iVToKV6RyrTDx6ZTo/ZszI2BS
+         pFj4nFMjEQMKH3JkONdoX7H285yC+bEsxde/wyHE2QVQ4ErZ5utR3OvrF/trtGpF8aSZ
+         Z9cZuX135WCXxyDuMPWbDZirJWo7sB94NIsSZx+6U5KV1tcNvkSCeyp3RGmPGRQ8uOcw
+         k3utYq5AZDQHTt4kQZdIjzTP6X0vh8+LVRwQ/Ei/HuGEvATM67GXmSQLQPl4CIG/+DcR
+         1JFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTL47IKTxPChme/JkMt3d3j1QWjtl9NmUouylC24ugbuNg2tRWB6RKAQOSbu1E/qJIHkaRES4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZK/qVnWriIRjfbSvWZdAk4T0nDWVKiOsJYQJmWRoIL4KmT7QN
+	C2ENgSvgcCh6lQmP5/3HSW1xCqMaQRLw3LrY+WWIq6/cVNEk/t/6DbQW9oI5jG9kLotvM6ebqGw
+	Ypu6K5JuGNIrh10yfP1UJBppjmDPMrGAsB3racFvz
+X-Gm-Gg: AY/fxX6PrLCCnLJhs9wZQsphI/Z3GERoDiIpR1W8fHxSazuwnf+y4SG76ZyyWoc+iAq
+	+3U4nJ7U0O4ZqeLEm3/Ugi+23oSTPezFi2dCxgGnNNkjdx4m75SNSqSeXMot3+Rrjt/QSX4rLMU
+	ewNHUmjesWjXyoVQGHs4mmnOnFxehA6RoEnAbedoH4HilTziGmswMPqUSyDsBEHf6Kjig7efsJi
+	gELt1Ix7NUhch5DkOacj+LLUNG6kgb83iyYqnBQB0jjTbclRzTNhcnxMlHLvp8ifM7J7cJzq1R8
+	dQnZm74=
+X-Received: by 2002:ac8:598d:0:b0:4f4:de04:2434 with SMTP id
+ d75a77b69052e-502d84b0bdfmr25784171cf.11.1768923694258; Tue, 20 Jan 2026
+ 07:41:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260101221359.22298-30-frederic@kernel.org>
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+References: <20260118175215.2871535-1-edumazet@google.com> <20260120073057.5ef3a5e1@kernel.org>
+In-Reply-To: <20260120073057.5ef3a5e1@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Jan 2026 16:41:23 +0100
+X-Gm-Features: AZwV_QiVuLRNYYgv4V8HfqtP9vG3l-gtsnc33EhOe-DORfIA6NqeikO-gMB3EfY
+Message-ID: <CANn89iL-w7ES=OsNQhLTZjxVdfOJxU2s7wRXJF6HkKSAZM2FBg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 0/3] gro: inline tcp6_gro_{receive,complete}
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251522-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251527-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[will@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 0F5C946F19
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 9C04D47210
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Frederic,
+On Tue, Jan 20, 2026 at 4:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sun, 18 Jan 2026 17:52:12 +0000 Eric Dumazet wrote:
+> > On some platforms, GRO stack is too deep and causes cpu stalls.
+> >
+> > Decreasing call depths by one shows a 1.5 % gain on Zen2 cpus.
+> > (32 RX queues, 100Gbit NIC, RFS enabled, tcp_rr with 128 threads and 10=
+,000 flows)
+> >
+> > We can go further by inlining ipv6_gro_{receive,complete}
+> > and take care of IPv4 if there is interest.
+> >
+> > Note: two temporary __always_inline will be replaced with
+> >       inline_for_performance when available.
+> >
+> > v2: dealt with udp6_gro_receive()/udp6_gro_complete()
+> >     missing declarations (kernel test robot <lkp@intel.com>)
+> >     for CONFIG_MITIGATION_RETPOLINE=3Dn
+>
+> Still not good?
+>
+> net/ipv6/udp_offload.c:136:17: error: static declaration of =E2=80=98udp6=
+_gro_receive=E2=80=99 follows non-static declaration
+>   136 | struct sk_buff *udp6_gro_receive(struct list_head *head, struct s=
+k_buff *skb)
+>       |                 ^~~~~~~~~~~~~~~~
+> In file included from net/ipv6/udp_offload.c:16:
+> ./include/net/gro.h:408:17: note: previous declaration of =E2=80=98udp6_g=
+ro_receive=E2=80=99 with type =E2=80=98struct sk_buff *(struct list_head *,=
+ struct sk_buff *)=E2=80=99
+>   408 | struct sk_buff *udp6_gro_receive(struct list_head *, struct sk_bu=
+ff *);
+>       |                 ^~~~~~~~~~~~~~~~
+> net/ipv6/udp_offload.c:168:29: error: static declaration of =E2=80=98udp6=
+_gro_complete=E2=80=99 follows non-static declaration
+>   168 | INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb=
+, int nhoff)
+>       |                             ^~~~~~~~~~~~~~~~~
+> ./include/net/gro.h:409:5: note: previous declaration of =E2=80=98udp6_gr=
+o_complete=E2=80=99 with type =E2=80=98int(struct sk_buff *, int)=E2=80=99
+>   409 | int udp6_gro_complete(struct sk_buff *, int);
+>       |     ^~~~~~~~~~~~~~~~~
 
-On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
-> When none of the allowed CPUs of a task are online, it gets migrated
-> to the fallback cpumask which is all the non nohz_full CPUs.
-> 
-> However just like nohz_full CPUs, domain isolated CPUs don't want to be
-> disturbed by tasks that have lost their CPU affinities.
-> 
-> And since nohz_full rely on domain isolation to work correctly, the
-> housekeeping mask of domain isolated CPUs should always be a superset of
-> the housekeeping mask of nohz_full CPUs (there can be CPUs that are
-> domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
-> CPUs that are not domain isolated):
-> 
-> 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
-> 
-> Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
-> tasks and since this cpumask can be modified at runtime, make sure
-> that 32 bits support CPUs on ARM64 mismatched systems are not isolated
-> by cpusets.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> Reviewed-by: Waiman Long <longman@redhat.com>
-> ---
->  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
->  include/linux/cpu.h            |  4 ++++
->  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
->  3 files changed, 33 insertions(+), 6 deletions(-)
-
-tbh, I'd also be fine just saying that isolation isn't reliable on these
-systems and then you don't need to add the extra arch hook.
-
-Whatever you prefer, but please can you update the text in
-Documentation/arch/arm64/asymmetric-32bit.rst to cover the interaction
-between the asymmetric stuff and cpu isolation?
-
-Cheers,
-
-Will
+Oh well, I thought I tested this stuff.
 
