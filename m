@@ -1,231 +1,170 @@
-Return-Path: <netdev+bounces-251558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251561-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMaxOa/Ab2kOMQAAu9opvQ
-	(envelope-from <netdev+bounces-251558-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:51:43 +0100
+	id 4HOFHNC9b2lTMQAAu9opvQ
+	(envelope-from <netdev+bounces-251561-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:39:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5435648DF8
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:51:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 382D748B77
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 278F996DA02
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:49:52 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E4309849431
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462813314A4;
-	Tue, 20 Jan 2026 16:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC7D34BA59;
+	Tue, 20 Jan 2026 16:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="enorTZHH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nLrG5gYL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9D0313551
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C249346FA7
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768927482; cv=none; b=j18K/fl7ktLtHbQvUDMqIB88tyanqV/7YbbpX//ZfOYPqP0kk4KjiZLSsWm7B5s7zWqIcvo919cPER3O84rRLGteS3ScHF/i/EYQlOxyoAys+axzzF2bE5HAMPxmnluIo5Y5MJlV8wVv2TjzOntSFmtN0hAPii3p/0AoYJufYGk=
+	t=1768927749; cv=none; b=B8mstq9A4vtNHzNJxEdDocEAcLFBdEyTRo3D9vsjYRrg0vkjXbAGlX1Rc7LKddcGE3at6BQCb50sJ2gbVfvugxpl6EJj5UGAYxaIfrMu7p7LKfnU80yzcRndclg71maOpOsHpiYOTf+OwY5h94uMjoBWWNYPoMd1m9MSiB4veUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768927482; c=relaxed/simple;
-	bh=aUDhPKL0hM8JEgf53e07so1yz09QTsbUMmEPM++MMC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dRC/FdlYBuPwhK5/rmYrKeudxsVkpjSkH+hTctZBQPEQjp2xMTo7snBD08gp5c8Np1MlXsLzQ/Dv4alRCfjMvp3bSFp9dmQUnqecR7nEdRSGuY/H7G/lHqQNdY5iXYjTImPZNGQQG/jksq1iGxntZzzGKFZfgUGaBRoVzRv/cV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=enorTZHH; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8b2f0f9e4cbso1562385a.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:44:40 -0800 (PST)
+	s=arc-20240116; t=1768927749; c=relaxed/simple;
+	bh=s0EAgvM3EckJgVkgwySwALr22oijvhhzdOCY8ic2YvM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h2FWP+aaNa4Riv29Onk5PmyZSmNzs+4G1ViaaIvI6DJFc1UgoWZauNhnzy2PZmAFWY7A66P/kkdHnobCNdyKKuVIpLQO9zROik9aL6IMGoWTQZcJ0wKybPmza00uCo4yitTLxtSgtaDRTgHqBs/nKwIW4FfseDnYp40fzlr4gnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nLrG5gYL; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-890587d4e87so160988196d6.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:49:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1768927479; x=1769532279; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=byK9CbCzUXPvYH8hMBYCGjlZe3ysbsipoknrt4q5MYA=;
-        b=enorTZHHb2rEovvaqsHlJudTAyqhy1O+b6Wb9hMirBr3bEDZcElB++EhFMTigB6DNN
-         g/5LhzI3JIgnahlwdRTRt4XxSlT1UHF7t0P7XiGBm4w296ImJAO3juGTZH1hiWQsVERe
-         Hs7hs0ESDrEo3XIH757I+XTnWNoN3QMlMOLXsKa110lwqqOJeojAC+9bzc15VrPQ9Bst
-         Nt9II4GuZja6VvAjbE0pNFpsGIXcG9aQJqiii62oK/+nQ9dAMlXfPc5hhvkWEtaGDVXO
-         IBiT40k7MZs4mDeMIIWqaqZ9CwpO/sYnK9wG52P5SoSVI89RnqLH2qCxElydmideAxh2
-         YGrg==
+        d=google.com; s=20230601; t=1768927746; x=1769532546; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ptuvyZao7Ss1Jo8ZUaPMdH5mHX4osio1f0VA6b4OTkE=;
+        b=nLrG5gYL5ocCw/dhBwZnheNHN0LNwFoLmCRBYzwa/KclkESXI45hw3nMIU9OoXTTBG
+         ZrJYInTzEWW0co+/ksnAy5qdNU5eIXHtoJMixzDm83UbjTLgboXRwnvN9+19Xrl8+JM1
+         ZoSkNu9tm+PMyQj78uGU/+bs5QFRkB8kJFZ6s3xuGyLCSmuyPONKCUXz9TSvF4DOTWEh
+         apJYp4He/qNi6UaM1y9cyWictGOGJTODyIudEwFOsajWvz6fdy1UEUZRBYqH1PWhIU/T
+         d0UEtffCUjkQ31JRWt5z3Cage7IcjTXldMjW55CnphTyjAAAK2taxdTEfYbOwKc2A11+
+         dD/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768927479; x=1769532279;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=byK9CbCzUXPvYH8hMBYCGjlZe3ysbsipoknrt4q5MYA=;
-        b=UQ1OM0a6J0wXsJY8jxBe4PEmtPDedBbhOgpdFwTs2BLdHXjpFnRXVbcJdLH8ljz2UG
-         iiVXsxv6olESQ38suNtV1/DW2QpxLPNglKFqjMalvY26xLyPCT2ZY4T3CreC/mD8HiMK
-         N3mvhyRDGokq/FtvGeUbNULlVVmAmbxDL96YMFXMdc6GePWcj9IfGuMFYjNPAYX8ro9j
-         r07StMI38Y0I0T/niUmVjsxzOb2hRKaCFujW1zepXn7JIlzmQRgAeVMz5DNBVWXQz90o
-         4rLCR1U9lAJ4QCNUJjjM1y0sgaKYUcC8NW6N7AQtrs8gckDwOaqXVAFbQz40LVIdgNqj
-         1ACA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtCoxnWwFx3DmXOL+/2R7SQ/jd+5BOxWsssSxP4tlmV/1LndJt5Emr+wIqLEw54eVIHg8AZSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3PR0QRKdkzz9BGh1Hav0r4uxaT7ZSq65s2aQAIxNvNR3M/Fgl
-	QbA8BmMDkWFREmhfFTFaYrAYPhbEdI1J2XjoaOQRSyHNAPKIgjGfRtJ/PdWxy6mvtsA=
-X-Gm-Gg: AY/fxX4VibCHlzKCD9WTJSEUWu4taTSffGISSKisb8OqHT1WSHP6hrh3JrSPfQTnV4S
-	GawzRI0T/iSL9ZdFCVpwI5hr/JrUFRw2Z4IHslDAswCagB98s9FkLt5hdUIfq7lr5qEy/MRpvw8
-	6cixOHxXcJ+rwmNgIvkdBiwJBSdMNUQHSyo/rliLSdkwgqHPH7zIJgCzQGxMgumC0B8510N0OUh
-	1XUZ7I1dfmJtqcR0O+bOs4/ZdSGx0o2BljDTGxWWSajsamlvYdfCQMv4p4oZDWfhfLgdJdJWAA2
-	t5nfudU4O2wlj4cq6aLDRVwniaWPaqXjfDQAx7zwbc4ZysVV1ka8wDFbgDOtzeQ32aeoevF+uAd
-	xCAvUjOy5jrCCTLJe2jlWrc7HoGLIWfpunvj7ScTYC2brYCqTftqxV+tpSkTIdvjlHe2sCh66f7
-	q3KQxB0COHvIgry3Tghm+O6+ueaG4ckUBnuOp9Is/Woe1UoAhOJ+v91fvhNK8QbcrUjEc=
-X-Received: by 2002:a05:620a:4011:b0:89f:cc73:386 with SMTP id af79cd13be357-8c6a6479374mr2212242085a.13.1768927479473;
-        Tue, 20 Jan 2026 08:44:39 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6a72507d5sm1084693385a.32.2026.01.20.08.44.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 08:44:38 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1viEqM-00000005YT2-14LN;
-	Tue, 20 Jan 2026 12:44:38 -0400
-Date: Tue, 20 Jan 2026 12:44:38 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Edward Srouji <edwards@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Michael Guralnik <michaelgur@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH rdma-next v2 02/11] IB/core: Introduce FRMR pools
-Message-ID: <20260120164438.GR961572@ziepe.ca>
-References: <20251222-frmr_pools-v2-0-f06a99caa538@nvidia.com>
- <20251222-frmr_pools-v2-2-f06a99caa538@nvidia.com>
+        d=1e100.net; s=20230601; t=1768927746; x=1769532546;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ptuvyZao7Ss1Jo8ZUaPMdH5mHX4osio1f0VA6b4OTkE=;
+        b=j9gyn5jmUIAWKbRjG7CqQP9KQZFbxpOWqkx5tuPTQO1GJShcQ4bgDA3g3yQAyiWt1d
+         2UI8rk6+kciSfcwzFsvHmCmeitbtZrNaA90EgnSb2LsSpYS3aNSw6WcJ4+8jQJGuPugc
+         PE1uTm7cMdlNGol5puzSGr4anPmXHcwScu94eMrxCFgiMyDCTXzeNz6waDkMYxycwKHl
+         Rx5Q8j0z0DMTcG0dY6M0uqgvBL3myDxsuBKQLPHRpo8Szqswu3XivoZFwRsdPlb3cc7u
+         sTbP2/kaeceB9JREvGR+th1S+Br58qQCNx+RqI6aaEct2fGIkojDmOiWkONp8VKFnC67
+         LMmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnswGFxq6xLXZsl7a3WYU1suskDEax0WIjJPhtLO/vheANeL7nr17cf59SbzYQrrf9b7Q1yPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqYufuEj/EONTwg54ZE5EU9gKg0r9TgmfgxNQwt27t8EDE2Ygx
+	fguvT3jI0/0Q6dQbhTr50P3IqXGC7lmSDNG/GgfPXD8S+A/mdccSAK7WcUuw515xKV4ANc7ZDlC
+	Z8YkaCbpBXk6WQA==
+X-Received: from qvbgc11.prod.google.com ([2002:a05:6214:230b:b0:888:db8:f9a7])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:821a:10b0:894:6492:73da with SMTP id 6a1803df08f44-8946492741cmr26595696d6.2.1768927746027;
+ Tue, 20 Jan 2026 08:49:06 -0800 (PST)
+Date: Tue, 20 Jan 2026 16:49:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251222-frmr_pools-v2-2-f06a99caa538@nvidia.com>
-X-Spamd-Result: default: False [0.04 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260120164903.1912995-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 0/3] gro: inline tcp6_gro_{receive,complete}
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251558-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251561-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,ziepe.ca:mid,ziepe.ca:dkim]
-X-Rspamd-Queue-Id: 5435648DF8
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 382D748B77
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Dec 22, 2025 at 02:40:37PM +0200, Edward Srouji wrote:
-> +static int compare_keys(struct ib_frmr_key *key1, struct ib_frmr_key *key2)
-> +{
-> +	int res;
-> +
-> +	res = key1->ats - key2->ats;
-> +	if (res)
-> +		return res;
-> +
-> +	res = key1->access_flags - key2->access_flags;
-> +	if (res)
-> +		return res;
-> +
-> +	res = key1->vendor_key - key2->vendor_key;
-> +	if (res)
-> +		return res;
-> +
-> +	res = key1->kernel_vendor_key - key2->kernel_vendor_key;
-> +	if (res)
-> +		return res;
+On some platforms, GRO stack is too deep and causes cpu stalls.
 
-This stuff should be using cmp_int().
+Decreasing call depths by one shows a 1.5 % gain on Zen2 cpus.
+(32 RX queues, 100Gbit NIC, RFS enabled, tcp_rr with 128 threads and 10,000 flows)
 
-> +static struct ib_frmr_pool *ib_frmr_pool_find(struct ib_frmr_pools *pools,
-> +					      struct ib_frmr_key *key)
-> +{
-> +	struct rb_node *node = pools->rb_root.rb_node;
-> +	struct ib_frmr_pool *pool;
-> +	int cmp;
-> +
-> +	/* find operation is done under read lock for performance reasons.
-> +	 * The case of threads failing to find the same pool and creating it
-> +	 * is handled by the create_frmr_pool function.
-> +	 */
-> +	read_lock(&pools->rb_lock);
-> +	while (node) {
-> +		pool = rb_entry(node, struct ib_frmr_pool, node);
-> +		cmp = compare_keys(&pool->key, key);
-> +		if (cmp < 0) {
-> +			node = node->rb_right;
-> +		} else if (cmp > 0) {
-> +			node = node->rb_left;
-> +		} else {
-> +			read_unlock(&pools->rb_lock);
-> +			return pool;
-> +		}
+We can go further by inlining ipv6_gro_{receive,complete}
+and take care of IPv4 if there is interest.
 
-Use the rb_find() helper
+Note: two temporary __always_inline will be replaced with
+      inline_for_performance when/if available.
 
-> +static struct ib_frmr_pool *create_frmr_pool(struct ib_device *device,
-> +					     struct ib_frmr_key *key)
-> +{
-> +	struct rb_node **new = &device->frmr_pools->rb_root.rb_node,
-> +		       *parent = NULL;
-> +	struct ib_frmr_pools *pools = device->frmr_pools;
-> +	struct ib_frmr_pool *pool;
-> +	int cmp;
-> +
-> +	pool = kzalloc(sizeof(*pool), GFP_KERNEL);
-> +	if (!pool)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	memcpy(&pool->key, key, sizeof(*key));
-> +	INIT_LIST_HEAD(&pool->queue.pages_list);
-> +	spin_lock_init(&pool->lock);
-> +
-> +	write_lock(&pools->rb_lock);
-> +	while (*new) {
-> +		parent = *new;
-> +		cmp = compare_keys(
-> +			&rb_entry(parent, struct ib_frmr_pool, node)->key, key);
-> +		if (cmp < 0)
-> +			new = &((*new)->rb_left);
-> +		else
-> +			new = &((*new)->rb_right);
-> +		/* If a different thread has already created the pool, return
-> +		 * it. The insert operation is done under the write lock so we
-> +		 * are sure that the pool is not inserted twice.
-> +		 */
-> +		if (cmp == 0) {
-> +			write_unlock(&pools->rb_lock);
-> +			kfree(pool);
-> +			return rb_entry(parent, struct ib_frmr_pool, node);
-> +		}
-> +	}
-> +
-> +	rb_link_node(&pool->node, parent, new);
+v3: removed INDIRECT_CALLABLE_SCOPE on udp6_gro_receive()
+    and udp6_gro_complete(), as gcc complained (Jakub)
 
-I think this is rb_find_add() ?
+v2: dealt with udp6_gro_receive()/udp6_gro_complete()
+    missing declarations (kernel test robot <lkp@intel.com>)
+    for CONFIG_MITIGATION_RETPOLINE=n
 
-Jason
+Cumulative size increase for this series (of 3):
+
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.3
+add/remove: 2/2 grow/shrink: 5/1 up/down: 1572/-471 (1101)
+Function                                     old     new   delta
+ipv6_gro_receive                            1069    1846    +777
+ipv6_gro_complete                            433     733    +300
+tcp6_check_fraglist_gro                        -     272    +272
+tcp6_gro_complete                            227     306     +79
+tcp4_gro_complete                            325     397     +72
+ipv6_offload_init                            218     274     +56
+__pfx_tcp6_check_fraglist_gro                  -      16     +16
+__pfx___skb_incr_checksum_unnecessary         32       -     -32
+__skb_incr_checksum_unnecessary              186       -    -186
+tcp6_gro_receive                             959     706    -253
+Total: Before=22592724, After=22593825, chg +0.00%
+
+Eric Dumazet (3):
+  net: always inline __skb_incr_checksum_unnecessary()
+  gro: inline tcp6_gro_receive()
+  gro: inline tcp6_gro_complete()
+
+ include/linux/skbuff.h   |  2 +-
+ include/net/gro.h        |  5 ++---
+ include/net/tcp.h        |  2 --
+ net/ipv6/Makefile        |  2 +-
+ net/ipv6/ip6_offload.c   | 43 ++++++++++++++++++++--------------------
+ net/ipv6/tcpv6_offload.c | 12 +++++------
+ net/ipv6/udp_offload.c   |  3 +--
+ 7 files changed, 32 insertions(+), 37 deletions(-)
+
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
