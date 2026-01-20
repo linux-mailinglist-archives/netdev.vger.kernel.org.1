@@ -1,188 +1,197 @@
-Return-Path: <netdev+bounces-251551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFxIO6nOb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:51:21 +0100
+	id aJ4ANYTNb2mgMQAAu9opvQ
+	(envelope-from <netdev+bounces-251557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:46:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 676F149CCD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:51:21 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F0549BF5
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:46:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F8B868D6F3
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:44:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 48D4776B918
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD82322C65;
-	Tue, 20 Jan 2026 16:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE4644B69B;
+	Tue, 20 Jan 2026 16:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="XVsqPf5y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37rFqslp"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic313-56.consmr.mail.ne1.yahoo.com (sonic313-56.consmr.mail.ne1.yahoo.com [66.163.185.31])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5104F2FB0B9
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.31
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768926856; cv=none; b=pVxFD9G5gZVnrRD4I/Z6TEavN5SpCe0ejGhNyj1WQLGHbd8XXp5B/cz3HkhvYBs08DnwDLQa+cGfWqn1Xo+y38Cgr/d1vfR/wSncbOxkYSVVphTLaYcR+Iz1m7H48l/y0SGSCjEUQUhX50bv74gwTnnz94CwEyxn7gqZX8oh5IM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768926856; c=relaxed/simple;
-	bh=OyOaWwBvHND5r3TfmA5EfR/0ZZhhdD9apaXkw0UcDzQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b9w9YHhKZ4fgqcChQzV7fEyeZsHPhIAvFEsRC+MwodyXDieAEmaxMzrVE8EGiPiVEUuWEcGzkNPf/CC8CApxHsxB310+hi3dr3OZxQ8PxkI1vtwOZF0+z0rC2Wj8hJnGHVBCasQirGBHvL0rJ4xOlbTyO4Z0PSPIwpIX/v+Vpyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=XVsqPf5y; arc=none smtp.client-ip=66.163.185.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1768926854; bh=NWYeVvUmPkhrr6EVYaqNHPu/ef7X6jiiHaSE1eZ3j9I=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=XVsqPf5yrXmnvtW2YX2pzJvLARk5v2F/scXYsagRB018xcdCtG13t71vvBvSIj5noPvjzJNEeqJ15HT5vr+AYaiZXUg7H5IVdXP0g9VPZP4gOVh2y9WUHeMB+nvhJmxbPQnoHu/wiSQQHzSwlA9mHbO7xe5bHvhUTU/bmson/1oRUlk//i/ux0AHmTRbUqAiEfgoCFLlmuaRt2P+QX2Su4VqGOdxykHp2zqLxtsCxC1ryq6C8oSWFh26oV9DWDPO6txRoRn8ViTiyaflkGPbMEm/TP3jLvw6sth8Ecy0fSXfRnQ3qKICzPc/yyeV4M8CPE78N/rAiaLm8Oy8GN2F8A==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1768926854; bh=ELjhW1hW4TJISD+NSnemQwo3Ho24Yc+Ska6Xu9Oltty=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=SsVLVYh3RcHH6A5rWe927L2CXNcm/Ts4n+9TSJJDGQJHyH1pWHN7kx7EYlNRkU34FdJ7057OznAAvV39ME0ARPDqAxNGWuQToADLeTUOuYY3/CRSgAkc6JIfYcdwNs4ZZjfJAFk1/YBRbSAw1yw6rYihBB/ZZEAc7W1dgbjaU0ywIvTmvAACzqIKGjiezaV1DeuTQ+AcWsHEmOEOgR7k1nRAccsXTijtHB07DF5Zh3ICFhPkdfWvwbVZUN5ynFOBRagNKNDebJrBU8ObyOD+cvZ+W5Kchz1QSENrwQBAwz8V+1kxFVIaGXi5E27+a6M1TZrXtrBnwnK5gs1R9JT6ow==
-X-YMail-OSG: 413JwU4VM1kIaO_MHgVKXuk9bahYeU6C3CT5uop1RNQlGZAMhFgjTdsfyo0qvn8
- VeU454rplSrtdFkqWFMqRyCzhbl1BjUjGEwALR9mw.ypSmsDJ1BZxiuzNSZ8etqCbURUJgPhoKsB
- zyHc1FT1zwf1Dtl7AWBXs2V5t5fziG3A2UEDRmoN3f7dolEPLtLXWHPiH3Y16YjrwezuTO02nP3H
- qp4KAwALMBqTPVlmr7ZdtR0AWBnubrWn27k5yjoQjHAMk3.MfXz_DJXTE00tHRr9tTf1B4IJTfrp
- uZv3R3U9WA06pyaE6p6q2_DU_DS1fJHKG9.GIzWithCNyAtablhntvoC_yKvJNLG0dGuDJ5MW58U
- hwujs3MVEqFTGWIHcSD2BK_8G3MGBTD_DbUPLZboaLI_aU3SCaJUlWMrNt.GTjjEvZDqr0aO4CBa
- Rou7NTc3xOvAuTk9ZPEuUN202WVebwmym.53JiGryVXnF5HGPgvP4_o9Q2Nvdx4CXxbaUxi8eUnN
- EgC3tCRs.3rUe.6gzVpQPuwEM3dIUK.kE5Ecr5t7R026x1c.2iYw.gj6JIQ22f8P10850NKoe_hE
- wn_aQ9pHUDZECwx_5WrXZbk42K3IRcjgD.xsY88yu.cZWvBkawmWIUq2kkc.YDE.4GKvgLXa7w0e
- rmClrTsEFOunNol2ExeNXhacA.U7Y6k3jz4.rMc0PHHpU8BsBjmIYFvDq_R7thOWlDEVQu2iNU0x
- sJzz.M2rheg5_nKerQ5cD59qqITKPaOZeKygnMWXqwAJvo6EkMQF4qEj2Kuib4ujT7hozOiiphQz
- bQFbahrdx0PvySNOGQRdVLgx3Y_9jpg9iAqiL8g0zJmh5DXUEIy94MAoSzrbCJTdtn.SPzw_pyNx
- rm5I24XY1m.hms7OgC0bvwaVYgUHqok5aZhMAEBkk7Zl5adhS7AI512HD05dLsviXtcel43oOIBO
- Y5SdThjA94Nx00dNU0sPPMKE3OM3o5ZL5b0TvIaZ6iRazpptnI712hfultiCnxKTk1YXMXCz1CIL
- 3dp6fhY0HPajAm2xmtV5YmifYTyD.eT1p2i5oLs2Ec7WjDi5ab1Qk5GER89dwfdwu3NJGOtSQNuO
- Yqj6Derjv3TJ3o30slBApzWwLrSzaCpIEWEYts8X9rRSMF_sScF3CNXP7YTsAtos8aj5h7Vv4rr0
- 4TKAaxS9ep5qwIIhRECZVE1kPTBWQ42.84Zq5wVIzJCX22hjzVhUozdj0cHnjGaB.HJ0eo0O0Imf
- 6vijcHrvaxWSkHPD_Cg6az.k5UtC.s5OCeBz3bpo0foMOOHqVoKk2VJ9PV4xM7KE.nIy.tF0rlMf
- kdp5FizX1i1J6.aA7WVUp6jSDSFAXWtdikwuev3Tg8M5wy5NUZhbODu54FSdq1x1Sgnt55KBlzNH
- TL3Y0Fbywkk6BSoQvGdxEZ5JS5pS3DQWHOHkIn0WYY0MfrR0iXqrhH9F0qDSV_ag2r9rYryr1e5Y
- O52i68TlxeinXSx13er2ISOM3fhRQV0WO0C2xyq0OoBjZzggdSTv7IfNFBkT2_9ce_nmy_I4GeLK
- AZVQ98p9THOXQC7ZgI5kkXPy15fMWPukBJUuqWayRZwde2fKMEN5dlIQUpf.I55Hbc8.1PfGg1sX
- mC4fnDHydCsbymTEUJHwDpVlCDnvS9QIoI6xT9qko.vnH53CgKJrBQywOP0pB5c6WSg5dv.VYoxa
- XK1pO.hKBQ4Hj5553rVAQIORKCChYBg6j1OZhM.mZ9pN4XPAtAS0qfG7zpXhh4i7XkLCz6722C45
- 0_Htf7rkconJ07TkgvbY1U5MQQZOXPqiYXRafNZxB7bJ8Sde3LWAJEomOW54E57mSEtiw52pvV6M
- SkDCUkqQGvCka6DZB3VZTk6WF2s4rFfcFzbYfnRRM6ptk25J3tbk7J4BVcVELYY4zxhM6qeXtAON
- UPm5fjnjWa7PHg210k22d_mmnjGvuquHls.Mj1Vji4lpodurFkOwisMgI9CFllOXkOWEFyHLL2Uh
- wutD8IuuoP8sjpFFyOHWCIvyIVdJW.a9fk19D1UBD2kCD3UVBffP0mMWRlQLT_6oGRJ6LGZy_WlW
- qX3POfLckObLMsgELTwBYwq9YBJRMEr27hYN2fbMke.eDpItG9D9ga_J9g35DMpaRG_6zzl_QJwd
- 1AzGaTWpU.AGE1JS_eyyKbmnnjOS1D6h0c8FDXo8gn2ERcoa7Sdsw
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: 19023c60-5bd2-4886-9527-b507e8028b39
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.ne1.yahoo.com with HTTP; Tue, 20 Jan 2026 16:34:14 +0000
-Received: by hermes--production-ir2-6fcf857f6f-qlcdw (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID f7e44a787d022ef3a77c635f4d49e855;
-          Tue, 20 Jan 2026 16:34:09 +0000 (UTC)
-From: Marek Mietus <mmietus97@yahoo.com>
-To: netdev@vger.kernel.org,
-	sd@queasysnail.net,
-	kuba@kernel.org
-Cc: Jason@zx2c4.com,
-	Marek Mietus <mmietus97@yahoo.com>
-Subject: [PATCH net-next v6 11/11] net: tipc: convert tipc_udp_xmit to use a noref dst
-Date: Tue, 20 Jan 2026 17:33:48 +0100
-Message-ID: <20260120163348.24248-1-mmietus97@yahoo.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260120162451.23512-1-mmietus97@yahoo.com>
-References: <20260120162451.23512-1-mmietus97@yahoo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856802777FC
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768927113; cv=pass; b=iRmc+ZEYjWGDRnjklWL5TMBzwf3bmQCM6O2SoMu2XsGZKIAABvxjKWTqRxOXsK1khCAE+4e2CJgDsaHI8gGSCN4/y5Z57aAyaIMzZnDwnuwJx5OaiqQsNkDzMImK6oXcod7zY7T6SCbN6kpYU0nzt4lRer5lfhfN89LP7dHugR0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768927113; c=relaxed/simple;
+	bh=9P080f24t5ZtF1Umwv/OIBX+xNUA/VUVkCQvbqkf4FY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a044ozdVeyATTiFNISjgYj3etsekvPcUBhFOG4SwAx/Y4VZB8ALV6VfXehGCvYCI4OWObTcbR9xzOL/ZIOwBx78nVFqZ3zCjRxt6W+uN6C+BGRU8InRM1zYakimdVf3rzZ8IUkFsQr7mBMb5lRohGy06sp87CUnlQJk57RyO3sQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=37rFqslp; arc=pass smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7927b1620ddso162417b3.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:38:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768927110; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Jxb5u/L9BMe/4kfsJeAeD8QUnCxikSv+Bx9zYgbmgKifaMkw43lj6MhWE4cTybEtn6
+         Nr55VT+bk+Q5FHW+HAfzoTI04Ds2zJ26ggwHmP/iKHImKATwGo51hl9IvJLcgeOx00PX
+         vZ0txNS4KX1l6nAvBuzc/9REMEh08Top6eTR1wZm0WevgWLnVeACY8EPMFhYfIH0Fxyq
+         WpfHyl7BCRwQFgZEjSQNq9GlJgeS34d+2+wLRH91GmBfxjK6Pz721GBTANP5Wfd/Hokr
+         Mjm2okFBjMc62jfSHqLIVE52ETWSgf4eVS1+mTCT5vA2/sMyG1qdPv+5vxRkXAg+INs9
+         7daw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
+        fh=iX7uFn3OVQnyKu9yWVVc9DMdvy+lry2yudm3R78UdsY=;
+        b=kbRef6Zs3HJIYW6gpGaPl7uK5mvrM9gzI4ZbaQ+lrFRg4jfMW3dreVjIF9XTHZCRhS
+         eoWNihvuCSPdnB5jjYBF33RMn9bRSJP2h33fwjpBAVeu8Gc7g2uwitlfdNA2xLikcPwZ
+         jr+NZ8rtAdXkM5C3uc0B/YIJJVvLG/W/Z24oyj6F9cXr9+8lPiwykibFyZ+nelcE4t3C
+         ht9BOHydTBhlyl9J1mnQ34EB9h4A0YnfydHB1vEToMQ0UFPz54fyP7UwUC8WIFW3MJ/Y
+         VZOxl2yNp6w/y2Drw92BbfoJoklICtNv2Y+M+vSN1MI3xvem+d4yHdPZxtC/aG+dwVTo
+         9HCw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768927110; x=1769531910; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
+        b=37rFqslp26V5ypKp6lxyLMQWajX5j3WJToHs8Ka1TshCFokUgOgvc6T+G/Ag634Wc+
+         mkcEO8YWNqeUn4S/gKXfEXexoJ0NWdqd0lUx1P6dRqiwkVSV1NrGRBNFP0PRp5ZPCmx7
+         YuUM2QUqKy7RgZf88+sstUeaCiux82d6HNA/vb95h7cXOIlE3v+iHjbBuf8jHLDNntFk
+         t949D1shNkVdj9JZsAvAbLwuXmBO99ViMgEn96OiPdRso4a9yGGlKyrqwK2APtsCOirh
+         uXjVwHinR9DtRV+89xrUzfQCk6S9Nq6MYg69Os47p+DS/4cexBYhxfUUoVgFU9u7izp/
+         FLCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768927110; x=1769531910;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1WTGG2ytHaY23kSUxsu1UAySzMOYsXMBO8CWz9PWhsI=;
+        b=JV/qFib5NH8yBvkY20Q4mr2In7rNT+fJd8PoQAtMdfRL6KqOviU+TS9R/utEro7IX0
+         tQ8D1nOuDpv1cNzRPL11EBtq5a/K0EDkS40bUtX5CWt/Nb1uECe64VAbMNVIer3xxP6q
+         4ERqMzk+A86z9LhyXW/V20oR/BPKiTkR60B9W5bBgq7lnfcg/i8LZLP3gHv4ORtI1Bz1
+         d2XgcbJCkwzhGTzbrXgZBi6UUkcRqu5c5xTf7r+b+b4CqetPSa/nJHqujVExD75wR/7Z
+         2eLpmu/P+8ZthmhwYygytsWdxvcAoUk014+uPQGVkRE94XIjc39uvgqWTWZNLQ9RB1V+
+         JHkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjNuwlj913lFN5W4o8Fco5hh142O9GhT6tJDIk/SurAcI2IgsI1xMGiX5yw3IlTuUPDoQ/Fn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIzVINrAUhOdkcxysCAGuuaoAEJxkqnXnH4U6JC5Mq/fuvFtuH
+	SE7+sHdmtfg9KYiXGtj2CWNnRnNUUyROvX39Xnb48Q2jFmld1JuDecOkooyOLqyuKcXw38yrvPs
+	DYoYnWNyB/qpFsb+p8pkTstGeOadXiyB6tYG4SbXp
+X-Gm-Gg: AZuq6aJlu0LPGN8mO2Op8vS7z+KxsjZDZ6Sg6RXZT8hTEfEs+Z6OZnOQxoN3Xoi1Y6E
+	IgI4f92MAJZz2inkm23BuucFJUz/TxuL302wxfHJ236Zx+Ewg9oLElRIQRte1i0OMvcQWP7iEZF
+	ZltfwdViskJlb9WkMMrURmRhXrw7LIpDqnYIPY3sgL8/o1PLg6RNh5EWbm0erGE13Xshv7/3h5k
+	3fTfocnNosmI9uXgH0JbrKMTcJEwHjeQdtJsc/DD4dA0VYaK+HtdirBqUpi8kuSWa7Hhr3+
+X-Received: by 2002:a05:690c:6e88:b0:787:a126:5619 with SMTP id
+ 00721157ae682-793b321c097mr147961457b3.11.1768927109995; Tue, 20 Jan 2026
+ 08:38:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260118175215.2871535-1-edumazet@google.com> <20260120073057.5ef3a5e1@kernel.org>
+ <CANn89iL-w7ES=OsNQhLTZjxVdfOJxU2s7wRXJF6HkKSAZM2FBg@mail.gmail.com>
+ <CANn89iJUh-3xDWkXhNatmBj2tWd1dLHXLbE6YT9EA2Lmb_yCLQ@mail.gmail.com> <20260120082942.3c62738b@kernel.org>
+In-Reply-To: <20260120082942.3c62738b@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Jan 2026 17:38:18 +0100
+X-Gm-Features: AZwV_QhLxX9RoidDYE7G7QuKfaTGa4FmCz-uSD2gHY76CilqyWGZAQAuif9xsck
+Message-ID: <CANn89iKEJrHZ2cHzkqKXz0ibCusUUcxATJz7H_WH=HptfVQ=6A@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 0/3] gro: inline tcp6_gro_{receive,complete}
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-251557-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TAGGED_FROM(0.00)[bounces-251551-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[zx2c4.com,yahoo.com];
-	FREEMAIL_FROM(0.00)[yahoo.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[yahoo.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DMARC_POLICY_ALLOW(0.00)[yahoo.com,reject];
-	FROM_NEQ_ENVFROM(0.00)[mmietus97@yahoo.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,vger.kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 676F149CCD
+	DKIM_TRACE(0.00)[google.com:+];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 88F0549BF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-tipc_udp_xmit unnecessarily references the dst_entry from the
-dst_cache when interacting with the cache.
+On Tue, Jan 20, 2026 at 5:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 20 Jan 2026 16:44:52 +0100 Eric Dumazet wrote:
+> > On Tue, Jan 20, 2026 at 4:41=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > > > Still not good?
+> > > >
+> > > > net/ipv6/udp_offload.c:136:17: error: static declaration of =E2=80=
+=98udp6_gro_receive=E2=80=99 follows non-static declaration
+> > > >   136 | struct sk_buff *udp6_gro_receive(struct list_head *head, st=
+ruct sk_buff *skb)
+> > > >       |                 ^~~~~~~~~~~~~~~~
+> > > > In file included from net/ipv6/udp_offload.c:16:
+> > > > ./include/net/gro.h:408:17: note: previous declaration of =E2=80=98=
+udp6_gro_receive=E2=80=99 with type =E2=80=98struct sk_buff *(struct list_h=
+ead *, struct sk_buff *)=E2=80=99
+> > > >   408 | struct sk_buff *udp6_gro_receive(struct list_head *, struct=
+ sk_buff *);
+> > > >       |                 ^~~~~~~~~~~~~~~~
+> > > > net/ipv6/udp_offload.c:168:29: error: static declaration of =E2=80=
+=98udp6_gro_complete=E2=80=99 follows non-static declaration
+> > > >   168 | INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buf=
+f *skb, int nhoff)
+> > > >       |                             ^~~~~~~~~~~~~~~~~
+> > > > ./include/net/gro.h:409:5: note: previous declaration of =E2=80=98u=
+dp6_gro_complete=E2=80=99 with type =E2=80=98int(struct sk_buff *, int)=E2=
+=80=99
+> > > >   409 | int udp6_gro_complete(struct sk_buff *, int);
+> > > >       |     ^~~~~~~~~~~~~~~~~
+> > >
+> > > Oh well, I thought I tested this stuff.
+> >
+> > Interesting... clang (our default compiler for kernel) does not complai=
+n at all.
+>
+> Well, at least I _think_ it's this series, haven't tested.
+> It breaks in the kselftests, no allmodconfig, here's the full config:
+>
+> https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill-dbg/results/48=
+2021/config
+>
+> Also possible that it's a silent conflict with another pending series.
 
-Reduce this overhead by avoiding the redundant refcount increments.
+To clarify : clang does not see an error, gcc does.
 
-This change is safe as both ipv4 and ip6 support noref xmit under RCU
-which is already the case for tipc_udp_xmit.
+I removed the INDIRECT_CALLABLE_SCOPE from both functions for v3.
 
-Signed-off-by: Marek Mietus <mmietus97@yahoo.com>
----
- net/tipc/udp_media.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c
-index ba4ff5b3354f..cc1ef043aaf0 100644
---- a/net/tipc/udp_media.c
-+++ b/net/tipc/udp_media.c
-@@ -175,7 +175,7 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
- 	int ttl, err;
- 
- 	local_bh_disable();
--	ndst = dst_cache_get(cache);
-+	ndst = dst_cache_get_rcu(cache);
- 	if (dst->proto == htons(ETH_P_IP)) {
- 		struct rtable *rt = dst_rtable(ndst);
- 
-@@ -191,14 +191,13 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
- 				err = PTR_ERR(rt);
- 				goto tx_error;
- 			}
--			dst_cache_set_ip4(cache, &rt->dst, fl.saddr);
-+			dst_cache_steal_ip4(cache, &rt->dst, fl.saddr);
- 		}
- 
- 		ttl = ip4_dst_hoplimit(&rt->dst);
- 		udp_tunnel_xmit_skb(rt, ub->ubsock->sk, skb, src->ipv4.s_addr,
- 				    dst->ipv4.s_addr, 0, ttl, 0, src->port,
- 				    dst->port, false, true, 0);
--		ip_rt_put(rt);
- #if IS_ENABLED(CONFIG_IPV6)
- 	} else {
- 		if (!ndst) {
-@@ -215,13 +214,12 @@ static int tipc_udp_xmit(struct net *net, struct sk_buff *skb,
- 				err = PTR_ERR(ndst);
- 				goto tx_error;
- 			}
--			dst_cache_set_ip6(cache, ndst, &fl6.saddr);
-+			dst_cache_steal_ip6(cache, ndst, &fl6.saddr);
- 		}
- 		ttl = ip6_dst_hoplimit(ndst);
- 		udp_tunnel6_xmit_skb(ndst, ub->ubsock->sk, skb, NULL,
- 				     &src->ipv6, &dst->ipv6, 0, ttl, 0,
- 				     src->port, dst->port, false, 0);
--		dst_release(ndst);
- #endif
- 	}
- 	local_bh_enable();
--- 
-2.51.0
-
+Thanks.
 
