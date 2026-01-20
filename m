@@ -1,332 +1,155 @@
-Return-Path: <netdev+bounces-251637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0ETyEX0QcGlyUwAAu9opvQ
-	(envelope-from <netdev+bounces-251637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:32:13 +0100
+	id MAcWMDAVcGlyUwAAu9opvQ
+	(envelope-from <netdev+bounces-251638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:52:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3BFB4DD64
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:32:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CAA4E255
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:52:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B215AE7958
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 22:47:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CAD30B4D351
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D9A3C1FED;
-	Tue, 20 Jan 2026 22:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0013EFD20;
+	Tue, 20 Jan 2026 23:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="nzcu8OmS"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="u4lTxDEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24420.protonmail.ch (mail-24420.protonmail.ch [109.224.244.20])
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED252F0C6E
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 22:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8766F3BC4F9;
+	Tue, 20 Jan 2026 23:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768949251; cv=none; b=o2WUkpMycwQwdIoRuWvlDPoHgrpxGGsUy/JcjbMI+2PmyZu8VMWbkbOS7TZbuKzf2AVGD6XqRgAqOlogG4xg97aOXjATTdAen3uBKsrIT8xFcM4AT3koEDLjtmHNnxcY+l3nAjlnCuIjt66ghEK4AwGQqE1HGpHivFNFYi6nuGw=
+	t=1768950155; cv=none; b=rfLZwVmW7V1JbsxZ/CgSYrN0gi8B04TTQzsBEhfIcoNKTDRk1pPRPnFlLJV9TOtvwrRCYIIrXiSgapDSghXWBFHfZHb2dnalx8psydl4HERrOz8EPDvrPNsByTKXn/vNirOiJgufnRS4CYASFZqpOY3iUPls3Z2Fe3qHbpvexms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768949251; c=relaxed/simple;
-	bh=KfEzSf2Psni+NH58GWquJU9gb7ZJf/dDBWnlpGF8ajY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZbLhpIzBMqCKUHst1cLryF2i/1NrpFeayhsd8GLL58sD8qO6gdL03LyG816cfnZoLVl0B5Kuk35EgsQ3OACH/3Z8EG5PDH5ei+sf0gRAkzuZsuch9yOFowG20ukC3vB4IEcvbJocbvzy0NcO/w+0fx98w711lhG9Vusrz+bD7oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=nzcu8OmS; arc=none smtp.client-ip=109.224.244.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1768949246; x=1769208446;
-	bh=lPRtFBw9Utc5TQLt3X4PQUZMdzsfO4LaX087YkLyS0w=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=nzcu8OmSg9Ro4dLyDyMHg2mRQlm7wwDn5ZQF5KKvBMlvUu9gyL75coacoxz/ApNo+
-	 pQ00GY2ddBZF061x4S+7TDBrh3cWDVv9WR8O/80DTFrolz9hEK2EhEIoEOv2vKonKa
-	 Pv68oksbxrejCLV6oNNyuU3dTCFdhgy3/O0yutV+jQA5QIjcBoFM/dMqdohszww1FS
-	 3/eHH4hYOyqfAbJWNsNT+4xclSkHl6vJgcFQSa/S4IWRe/u126XfidKF2bIiRTz7of
-	 lW+qCrQawoRe7wwgB2FPBzGBRoAqHVxlGvKXrqiz7Mf9lV1GURKSMOsGLfQQQoL4vY
-	 vZFBh2jd/+mug==
-Date: Tue, 20 Jan 2026 22:47:19 +0000
-To: Victor Nogueira <victor@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] net/sched: act_gate: fix schedule updates with RCU swap
-Message-ID: <gwO399q2_pH73eDkd2OatN9SsR8aHtm8CbVIEPOf0nuxXjqbjY6vgCqNyFya75mMVicn8NwUgG8zaNFkR_JuZmFk0UcWNCHlpzSxFbaycf4=@1g4.org>
-In-Reply-To: <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com>
-References: <20260120004720.1886632-1-p@1g4.org> <20260120004720.1886632-2-p@1g4.org> <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 002e9e46bde3210a0919590bb776202a3ae03279
+	s=arc-20240116; t=1768950155; c=relaxed/simple;
+	bh=7dIGmphmOa9A0XAO6S9InjNv1e/PuEM8Ak4ck95o6IQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NziHCx5wUdDqz7/+QuPovr+f3L33jR2S+hGLW225ZGpYlk3cgCL8hxmxsNtmmLgEPTcEhunyV57Uf8dr5bdMnwrUr2Xytv2En2eIHwakhtjkX4I1yiTcXCeAkutv+61+Xpbp2OvcPpooZvKTV+O3Kb6jj6Xen/QUWAyJV7UYOJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=u4lTxDEx; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
+	Content-Type; bh=ZTAtFTgk7uARkJXJYDNwpGg25TMStLOOPYSoCkPmX8Y=; b=u4lTxDExsdK+
+	XaSEkYemRQFxwEHrSsHUV1apoYb8Z/Pw+azEasitQJNIeVxbRmhDGhF7KTJN8qoIb4GZn8MST+uGF
+	WU6pu6DttzB1/ZUL6RWvUeLsWYmz+T5ysTOtjjY5F0jgT7y1GHff611IljnCPa9v0FyrlV6iHJPgI
+	qKy7V2uDF1EVtleHtKzz60lg/sUPCvwnzD4uXLKJhDFB1umuFkGtEj1/MmN5+RX63l7Q8XFxFUTA6
+	1VQrCSa1lnkfpEIeTB6yyKKR79Q40Q/Um+TBuTF1Ok2Qrur8O1MDmiuJoyTSq7ghwAUwQ+z5KzBDl
+	q6Lv3BPuDnM/Df2q2PHY2A==;
+Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
+	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aleksey.oladko@virtuozzo.com>)
+	id 1viKjT-00Fh5d-27;
+	Wed, 21 Jan 2026 00:02:15 +0100
+Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 60KN2OKT328360
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 20 Jan 2026 23:02:24 GMT
+Received: (from root@localhost)
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 60KN2LHU328359;
+	Tue, 20 Jan 2026 23:02:21 GMT
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Subject: [PATCH 0/6] selftests: forwarding: skip tests when kernel or userspace support is missing
+Date: Tue, 20 Jan 2026 23:02:02 +0000
+Message-ID: <20260120230208.328337-1-aleksey.oladko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251637-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[1g4.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251638-lists,netdev=lfdr.de];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_POLICY_ALLOW(0.00)[virtuozzo.com,quarantine];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,act_gate_ops.net_id:url,mojatatu.com:email,1g4.org:mid,1g4.org:dkim]
-X-Rspamd-Queue-Id: B3BFB4DD64
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,virtuozzo.com:mid,virtuozzo.com:dkim]
+X-Rspamd-Queue-Id: 35CAA4E255
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-act_gate is not just a list and a timer. It is a small state machine that k=
-eeps runtime gating insulated from control plane updates using tcf_lock, th=
-e hrtimer, and the PENDING bit. The live decision variables are protected, =
-but the schedule backing store (the entries list) was still being mutated o=
-r freed on the control path, so updates were not transactional and could ex=
-pose partially constructed schedules or freed nodes to concurrent readers. =
-The fix is to treat the schedule as an immutable published object: validate=
- and build off to the side, publish atomically, then retire after readers d=
-rain (RCU). That preserves the original goal of not interfering with the ga=
-te.
+Hi,
 
-I=E2=80=99m trying to strike the right balance of input validation for stab=
-le. I kept this as one patch because the validate and build before publish =
-path is part of making the RCU update model correct. I did try implementing=
- the additional validation independently first, but it did not meaningfully=
- reduce the size or complexity because the RCU swap still requires a fully =
-formed schedule object before publish. Without preliminary validation, it i=
-s easy to corrupt the timer state or end up with undefined schedule behavio=
-r. At minimum, I think we need:
-  - interval > 0: prevents zero length entries and immediate refire loops
-  - at least one entry: avoids empty schedule deref and undefined state
-  - cycle time > 0: required for division and close time computations
-  - overflow checks: prevent wrap or underflow in close time arithmetic
+Several forwarding selftests currently assume that certain kernel
+features or tc/ip capabilities are always present. When this is no the
+case (e.g. kernel built without specific CONFIG options or older
+iproute2).
 
-I can do the conversion without these checks, but the resulting behavior wo=
-uld be fragile. If there is guidance on what validation level you would pre=
-fer here (minimal representable range checks vs stricter sane inputs), I am=
- happy to align with it.
+This series adds explicit feature probing and conditional skips to
+avoid false negatives.
 
-thanks
-Paul
+Summary of changes:
+1. forwarding/lib: skip tests that require LAG devices when the team
+   driver is not supported (CONFIG_NET_TEAM disabled)
+2. forwarding/sch_ets: skip tests if the cls_basic module is not
+   available (CONFIG_NET_CLS_BASIC disabled)
+3. forwarding/lib introduce run_cmd_grep helper to probe userspace
+   feature support by matching keywords in command help output
+4. forwarding/tc_flower_cfm: skip test when tc does not support cfm
+5. forwarding/tc_flower_l2_miss: skip test when tc does not support
+   l2_miss
+6. forwarding/router_mpath_seed: skip tests then ip does not support
+   hw_stats
 
+Aleksei Oladko (6):
+  selftests: forwarding: lib: skip test if team driver is not supported
+  selftests: forwarding: sch_ets: skip test if cls_basic module is
+    missing
+  selftests: forwarding: lib: add run_cmd_grep helper for feature
+    probing
+  selftests: forwarding: tc_flower_cfm: skip tests if tools or feats are
+    missing
+  selftests: forwarding: tc_flower_l2_miss: skip tests if tools or feats
+    are missing
+  selftests: forwarding: router_mpath_seed: skip tests if tools or feats
+    are missing
 
-On Tuesday, January 20th, 2026 at 3:04 PM, Victor Nogueira <victor@mojatatu=
-.com> wrote:
+ tools/testing/selftests/net/forwarding/lib.sh | 33 ++++++++++++++++++-
+ .../net/forwarding/router_mpath_seed.sh       |  2 ++
+ .../selftests/net/forwarding/sch_ets_core.sh  |  1 +
+ .../selftests/net/forwarding/tc_flower_cfm.sh |  2 ++
+ .../net/forwarding/tc_flower_l2_miss.sh       |  2 ++
+ 5 files changed, 39 insertions(+), 1 deletion(-)
 
->=20
->=20
-> On 19/01/2026 21:48, Paul Moses wrote:
->=20
-> > Switch act_gate parameters to an RCU-protected pointer and update sched=
-ule
-> > changes using a prepare-then-swap pattern. This avoids races between th=
-e
-> > timer/data paths and configuration updates, and cancels the hrtimer
-> > before swapping schedules.
-> >=20
-> > A gate action replace could free and swap schedules while the hrtimer
-> > callback or data path still dereferences the old entries, leaving a
-> > use-after-free window during updates. The deferred swap and RCU free
-> > close that window. A reproducer is available on request.
-> >=20
-> > Also clear params on early error for newly created actions to avoid
-> > leaving a dangling reference.
-> > [...]
-> > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-> > index c1f75f2727576..3ee07c3deaf97 100644
-> > --- a/net/sched/act_gate.c
-> > +++ b/net/sched/act_gate.c
-> > @@ -6,6 +6,7 @@
-> > #include <linux/kernel.h>
-> > #include <linux/string.h>
-> > #include <linux/errno.h>
-> > +#include <linux/limits.h>
->=20
->=20
-> Do you really need to include this?
->=20
-> > [...]
-> > @@ -69,12 +71,14 @@ static enum hrtimer_restart gate_timer_func(struct =
-hrtimer *timer)
-> > {
-> > struct tcf_gate *gact =3D container_of(timer, struct tcf_gate,
-> > hitimer);
-> > - struct tcf_gate_params *p =3D &gact->param;
-> > + struct tcf_gate_params *p;
->=20
->=20
-> When adding/editing local variables, you should adhere to the
-> reverse xmas tree style [1].
->=20
-> > spin_lock(&gact->tcf_lock);
->=20
->=20
-> Shouldn't you call rcu_read_lock before this line now?
->=20
-> > + p =3D rcu_dereference_protected(gact->param,
-> > + lockdep_is_held(&gact->tcf_lock));
-> > [...]
-> > static int tcf_gate_init(struct net *net, struct nlattr *nla,
-> > @@ -296,20 +296,26 @@ static int tcf_gate_init(struct net *net, struct =
-nlattr *nla,
-> > struct netlink_ext_ack *extack)
-> > {
-> > struct tc_action_net *tn =3D net_generic(net, act_gate_ops.net_id);
-> > - enum tk_offsets tk_offset =3D TK_OFFS_TAI;
-> > - bool bind =3D flags & TCA_ACT_FLAGS_BIND;
-> > struct nlattr *tb[TCA_GATE_MAX + 1];
-> > struct tcf_chain *goto_ch =3D NULL;
-> > - u64 cycletime =3D 0, basetime =3D 0;
-> > - struct tcf_gate_params *p;
-> > - s32 clockid =3D CLOCK_TAI;
-> > + struct tcf_gate_params *p, *oldp;
-> > struct tcf_gate *gact;
-> > struct tc_gate *parm;
-> > - int ret =3D 0, err;
-> > - u32 gflags =3D 0;
-> > - s32 prio =3D -1;
-> > + struct tcf_gate_params newp =3D { };
->=20
->=20
-> Abide by reverse xmas tree when adding local variables.
->=20
-> > [...]
-> > + bool clockid_set =3D false;
->=20
->=20
-> I could be missing something, but I don't believe you need this
-> boolean.
->=20
-> > [...]
-> > @@ -323,6 +329,7 @@ static int tcf_gate_init(struct net *net, struct nl=
-attr *nla,
-> >=20
-> > if (tb[TCA_GATE_CLOCKID]) {
-> > clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
-> > + clockid_set =3D true;
-> > switch (clockid) {
->=20
->=20
-> Instead of using clockid_set and repeating the switch statament.
-> You could put this if-statement after you already have oldp and do the
-> following:
->=20
-> if (tb[TCA_GATE_CLOCKID]) {
-> clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
-> switch (clockid) {
-> case CLOCK_REALTIME:
-> tk_offset =3D TK_OFFS_REAL;
-> break;
-> case CLOCK_MONOTONIC:
-> tk_offset =3D TK_OFFS_MAX;
-> break;
-> case CLOCK_BOOTTIME:
-> tk_offset =3D TK_OFFS_BOOT;
-> break;
-> case CLOCK_TAI:
-> tk_offset =3D TK_OFFS_TAI;
-> break;
-> default:
-> NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
-> return -EINVAL;
-> }
-> } else if (ret !=3D ACT_P_CREATED) {
-> clockid =3D oldp->tcfg_clockid;
->=20
-> tk_offset =3D gact->tk_offset;
->=20
-> }
->=20
-> > [...]
-> > - if (tb[TCA_GATE_CYCLE_TIME])
-> > + if (ret =3D=3D ACT_P_CREATED)
-> > + update_timer =3D true;
-> > [...]
->=20
->=20
-> Here you are assigning update_timer to true when the op is a create...
->=20
-> > [...]
-> > + if (update_timer && ret !=3D ACT_P_CREATED)
-> > + hrtimer_cancel(&gact->hitimer);
->=20
->=20
-> .. however in the if-statement where it is used you are only allowing
-> updates. This looks weird.
->=20
-> > [...]
-> > +free_p:
-> > + release_entry_list(&p->entries);
-> > + kfree(p);
->=20
->=20
-> The 2 lines of code above are being repeated below and in
-> tcf_gate_params_release. You should put them in a common function.
->=20
-> > +release_new_entries:
-> > + release_entry_list(&newp.entries);
-> > +put_chain:
-> > if (goto_ch)
-> > tcf_chain_put_by_act(goto_ch);
-> > release_idr:
-> > - /* action is not inserted in any list: it's safe to init hitimer
-> > - * without taking tcf_lock.
-> > - */
-> > - if (ret =3D=3D ACT_P_CREATED)
-> > - gate_setup_timer(gact, gact->param.tcfg_basetime,
-> > - gact->tk_offset, gact->param.tcfg_clockid,
-> > - true);
-> > + if (ret =3D=3D ACT_P_CREATED) {
-> > + p =3D rcu_dereference_protected(gact->param, 1);
-> > + if (p) {
-> > + release_entry_list(&p->entries);
-> > + kfree(p);
-> > + rcu_assign_pointer(gact->param, NULL);
-> > + }
-> > + }
-> > tcf_idr_release(*a, bind);
->=20
->=20
-> Also, the AI review [2] pointed out a real issue.
-> It's easy to reproduce by running something like:
->=20
-> tc action add action gate base-time 200000000000ns \
-> sched-entry close 0ns index 10
->=20
-> I think overall you have the right idea - RCU seems like a good fit here.
-> The issue is that this patch is confusing because it seems like you are
-> trying to fix the bug and perform cleanups at the same time.
-> If that is the case, can you try breaking this patch into two? Do one to
-> fix the bug (introducing RCU and etc) and another for the cleanups.
->=20
-> [1]
-> https://www.kernel.org/doc/html/v6.3/process/maintainer-netdev.html#local=
--variable-ordering-reverse-xmas-tree-rcs
-> [2]
-> https://netdev-ai.bots.linux.dev/ai-review.html?id=3Dcdc17d0d-fd59-41a8-9=
-c8d-1a42699167fd#patch-0
->=20
-> cheers,
-> Victor
+-- 
+2.43.0
+
 
