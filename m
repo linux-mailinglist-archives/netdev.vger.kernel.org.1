@@ -1,116 +1,163 @@
-Return-Path: <netdev+bounces-251349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1631D3BE51
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 05:22:13 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2D5D3BE53
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 05:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 573FF34A4BB
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 04:20:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 009324EA750
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 04:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B63F33C1B0;
-	Tue, 20 Jan 2026 04:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42E533D4E3;
+	Tue, 20 Jan 2026 04:19:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D80D33C188;
-	Tue, 20 Jan 2026 04:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B330033D505;
+	Tue, 20 Jan 2026 04:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768882641; cv=none; b=NEIxRzfOegfOhivdL3vZB9WbYDesXnclpdn9us/J/aq/s2hqdUkUeyIVTMIJ7gu20Dx6f9JXeMsyqWJzYoJ6sCfYdwNkqJUCbSiozwqMAcPeLBlLT13/2jKmaw7UcpYYYmI+4lIscxyX+8HuLkRqepzccpwiDC2NLQY4frXuWMQ=
+	t=1768882788; cv=none; b=U++h/l/L4XWK4OLEO1zQWMSjEzAErtwkeG5R+0dMq6jZaM+iwWgMrV659msKjkFzES3s9bMU2qA6VgraYIJMlMydXDyfO7i30cwHCLOjsbRBCwAmr1BmDhN8fv2e+yd6cVWTX+0UNg5fw6HS+yfV16AhK02QdAsGDF1/SYcI++w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768882641; c=relaxed/simple;
-	bh=ygUdyNkfE2jAIcPl2nsg7XS1NoJnGgnoD7iI5CL6pEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VjVJp0UjhiZavlnxTTKiRW9J0YzLzKimKZciJFrRSZCYUIvebGP3bwvq1jfxGVIxfqpTO/Fh5fQ8c3kQFxrLHHFYHKxLjGQyJqvZdS5U4L3a5Xjty6R9zS/orIbia4doeaur9fGui8Om+jOgaAJUO6JkkgASCifw/Ir+NHs8mvo=
+	s=arc-20240116; t=1768882788; c=relaxed/simple;
+	bh=enHYcu960fFoW3PDKIuCWxyuA6jr1IeRQ0MrDK6FHgM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=haNElnekydZK335VEzkgw6wmqUCpX15WgOqKDTtk9IfyCy8g4capQ10IfksnDkaP9ucm8wneRwQa7z5FiJTWEgz3xyxLWIfe6MAgjUpq8s7Z9WgXm0wFKDsoeB+zztWenpONy0xtOR6W5FcddKRRRDm9VkfZ6LPkSVChWxXLcU8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [10.213.18.194] (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAAXqg21AW9pXw+3BQ--.1431S2;
-	Tue, 20 Jan 2026 12:16:54 +0800 (CST)
-Message-ID: <f63d455c-7593-4382-86ef-9c31a1ebd283@iscas.ac.cn>
-Date: Tue, 20 Jan 2026 12:16:53 +0800
+Received: from [127.0.0.2] (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowACXKAxPAm9pZCG3BQ--.23154S2;
+	Tue, 20 Jan 2026 12:19:28 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Date: Tue, 20 Jan 2026 12:19:23 +0800
+Subject: [PATCH net-next] net: spacemit: Clarify stat timeout comments and
+ messages
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] net: spacemit: Check netif_carrier_ok when reading
- stats
-To: Andrew Lunn <andrew@lunn.ch>, Chukun Pan <amadeus@jmu.edu.cn>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dlan@gentoo.org,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org, pabeni@redhat.com,
- spacemit@lists.linux.dev
-References: <e3890633-351d-401d-abb1-5b2625c2213b@iscas.ac.cn>
- <20260119141620.1318102-1-amadeus@jmu.edu.cn>
- <48757af2-bbea-4185-8cc9-2ef51dbc8373@lunn.ch>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <48757af2-bbea-4185-8cc9-2ef51dbc8373@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:zQCowAAXqg21AW9pXw+3BQ--.1431S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFy5KryruFyxJr18CryxuFg_yoW8WF1kpF
-	43Kw4Fyr1kt3W0qF1Ika1DA3409rZ5tFy5Gr1Fg3s3Aa15Xr1Svr4fKrWjgFyUWryvgw1j
-	vr1qvF4YvFWDAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvvb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
-	8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
-	c7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-	IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
-	IFyTuYvjxUgHanUUUUU
+Message-Id: <20260120-k1-ethernet-clarify-stat-timeout-v1-1-108cf928d1b3@iscas.ac.cn>
+X-B4-Tracking: v=1; b=H4sIAEoCb2kC/y2N3QqCQBBGX0Xmugl3AylfJQqmdcyhXGt2FEN89
+ 7afy8Ph+84CiVU4QV0soDxJkiFmcJsCQkfxyihNZvClr0rnS7w5ZOtYIxuGO6m0L0xGhiY9D6N
+ h471rQ7Mjoj3km4dyK/M3cYTPKvJscPoZ5eeYm/bXF0qMYeh7sbqYqq07oAZ3XlY4resbjlthk
+ awAAAA=
+X-Change-ID: 20260120-k1-ethernet-clarify-stat-timeout-d221fcd3aaa8
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Yixun Lan <dlan@gentoo.org>
+Cc: Chukun Pan <amadeus@jmu.edu.cn>, 
+ Michael Opdenacker <michael.opdenacker@rootcommit.com>, 
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ Vivian Wang <wangruikang@iscas.ac.cn>
+X-Mailer: b4 0.14.3
+X-CM-TRANSID:zQCowACXKAxPAm9pZCG3BQ--.23154S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXF17KrykAF47AFy7AF4DXFb_yoW5CrWDp3
+	yYkasavr1ktF4YvFsrAr4UJw1fZw4vgFyUuFnFy395ZFn8tFy8Xr10kFWj9FyqkrW8WryY
+	qr4UCFs8CF4DAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gryl42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUnBTYUUUUU
 X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On 1/19/26 23:09, Andrew Lunn wrote:
->> root@OpenWrt:~# ethtool -S eth1
->> [   71.725539] k1_emac cac81000.ethernet eth1: Read stat timeout
->> NIC statistics:
->>      rx_drp_fifo_full_pkts: 0
->>      rx_truncate_fifo_full_pkts: 0
->>
->> I just discovered that adding "motorcomm,auto-sleep-disabled" to disable
->> the sleep mode of the MotorComm PHY prevents the problem from occurring.
-> This suggests that when the PHY stops the reference clock, the MAC
-> hardware stops working. It needs that clock to access
-> statistics. Keeping the clock ticking will increase power usage a
-> little.
+Someone did run into this timeout in the wild [1], and it turns out to
+be related to the PHY reference clock stopping.
 
-As per suggestion from Chukun, adding realtek,aldps-enable to the DTS on
-BananaPi F3 (with, obviously, a Realtek PHY) also reproduces this
-problem. So this is a good indication that it really is a problem with
-this power saving thing.
+Improve the comments and error message prints around this to reflect the
+better understanding of how this could happen. This patch doesn't fix
+the problem, but should direct anyone running into it in the future to
+know it is probably a PHY problem, and have a better idea what to do.
 
-> I wounder if anything else stops working? There are some MACs whos DMA
-> engine stop working without the reference clock. That can cause
-> problems during both probe and remove, or open and close.
+Link: https://lore.kernel.org/r/20260119141620.1318102-1-amadeus@jmu.edu.cn/ # [1]
+Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+---
+* Chukun: If you think changing the DTS for the PHY is appropriate, you
+can send the DTS patch separately - that one should go through the
+spacemit SoC tree.
 
-At least DMA reset seems to work in this case, so it's probably not as
-big of a problem, but at least I would conclude that the HW design
-didn't have the reference clock stopping in mind. AFAICT from the DTS
-files a bunch of other boards also have motorcomm,auto-sleep-disabled so
-at least SpacemiT isn't alone in this.
+FWIW, the same timeout thing also happens on the vendor provided OS
+images for the OrangePi RV2, and AFAICT at least the statistics part is
+not recoverable.
 
-> So it would be nice to have a better understanding of this. If this
-> turns out to be true, maybe a comment by this poll_read_timeout()
-> indicating if it does timeout, the PHY might be the problem.
+So until/unless we manage to get more information on how this works
+under the hood, I think we just don't bother handling the case where the
+PHY can just stop running, since the hardware certainly doesn't seem to
+expect it.
+---
+ drivers/net/ethernet/spacemit/k1_emac.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-I'll send a patch updating the comments and error prints.
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 220eb5ce7583..387f26ff7714 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -1099,7 +1099,14 @@ static int emac_read_stat_cnt(struct emac_priv *priv, u8 cnt, u32 *res,
+ 					100, 10000);
+ 
+ 	if (ret) {
+-		netdev_err(priv->ndev, "Read stat timeout\n");
++		/*
++		 * If you run into this, one possibility is that even though the
++		 * interface is up the PHY may have stopped its clock anyway for
++		 * power saving. This MAC doesn't like that, so configure your
++		 * PHY to not do that.
++		 */
++		dev_err_ratelimited(&priv->ndev->dev,
++				    "Read stat timeout. PHY clock stopped?\n");
+ 		return ret;
+ 	}
+ 
+@@ -1148,16 +1155,20 @@ static void emac_stats_update(struct emac_priv *priv)
+ 	assert_spin_locked(&priv->stats_lock);
+ 
+ 	if (!netif_running(priv->ndev) || !netif_device_present(priv->ndev)) {
+-		/* Not up, don't try to update */
++		/*
++		 * Not up, don't try to update. If the PHY is stopped, reading
++		 * stats would time out.
++		 */
+ 		return;
+ 	}
+ 
+ 	for (i = 0; i < sizeof(priv->tx_stats) / sizeof(*tx_stats); i++) {
+ 		/*
+-		 * If reading stats times out, everything is broken and there's
+-		 * nothing we can do. Reading statistics also can't return an
+-		 * error, so just return without updating and without
+-		 * rescheduling.
++		 * If reading stats times out anyway, the stat registers will be
++		 * stuck, and we can't really recover from that.
++		 *
++		 * Reading statistics also can't return an error, so just return
++		 * without updating and without rescheduling.
+ 		 */
+ 		if (emac_tx_read_stat_cnt(priv, i, &res))
+ 			return;
 
-Thanks,
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20260120-k1-ethernet-clarify-stat-timeout-d221fcd3aaa8
+
+Best regards,
+-- 
 Vivian "dramforever" Wang
 
 
