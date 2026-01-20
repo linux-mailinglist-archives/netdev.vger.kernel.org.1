@@ -1,331 +1,183 @@
-Return-Path: <netdev+bounces-251418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA9B8D3C465
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:00:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B863D3C484
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F3F426CAD5A
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:43:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 29B1B6CAFC3
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED313BFE47;
-	Tue, 20 Jan 2026 09:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9583C1FCC;
+	Tue, 20 Jan 2026 09:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z801guAJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8+JF6mM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="clDBS6kH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7412345CC7
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768901803; cv=fail; b=TbI7W5YQd41LBAiAel9c8ZemRvFfa76eomVNmFTvqTHKBggahlLSiBnPdHnziGt6JAdf5BvqhhkPM4d7x7AUFVvS7ud2HRPYLlM/61SEBYc5CvX+kXtln2ed25VvcRnk571Ct5UUD60NnEk32flJcWRnvLZNK+/bklh8EI0TYcU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768901803; c=relaxed/simple;
-	bh=IgpKovq2JNtFeiKEH//w0e1p8uDPtJum3rFWMnnlASE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XvZ2FSW+yOLJfl37PX2TumjUWBegb/K2iQOY+8RL1MH90e4NcWNZ0K/i1AERWTnk8nNubPgi+246BodIUa1b3x8w7uotc1soapSDUgoyr/rAbHxXdx08EIFnWYyq6q36DjlTMVt3Tb4KzwSdQKYDEq5u1otBkLGEh8oQnZszOIw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z801guAJ; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768901802; x=1800437802;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IgpKovq2JNtFeiKEH//w0e1p8uDPtJum3rFWMnnlASE=;
-  b=Z801guAJ5Z77Zsy0N+qSVu7uk+2ElCrtb7PMFv784wD1DFUON+GC5K+c
-   GYmmMq5GIfNjqYknMYK0eLINocl+hTBJ8ZhW36AywYSTM7uTsSXnnFZmH
-   0e+6sV7/U+sLqxbuD2w2Jao6VGQSf0khZVBlpD1OtSYQVv35ASpTUIIWV
-   LG7jGsHl6jmzYVM1qhYTq/MCG/XVe3611owCODtdCWTctH8SimzyLw5Z6
-   n7MplEGJLavUODNAlhL+oBD3T04GZUj92YxLrXgnzfnhEouQ7Up53KM18
-   p54noIGuEbtFZtlUP/t1G7PrepcbdL3xmG7atKvG8wbYrHPfJf+mjF1jf
-   g==;
-X-CSE-ConnectionGUID: sZu3mH+ySeCF9o/R3tRKMw==
-X-CSE-MsgGUID: 4Ky580JIRqqqdQTt9mjEpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="70077453"
-X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="70077453"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 01:36:42 -0800
-X-CSE-ConnectionGUID: q/uJurBVSBaH3uTLN/5LuA==
-X-CSE-MsgGUID: i/vmvEhZRK+5Es/NPF2DnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="206423603"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 01:36:40 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Tue, 20 Jan 2026 01:36:40 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Tue, 20 Jan 2026 01:36:40 -0800
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.60) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Tue, 20 Jan 2026 01:36:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cBBe2jiWRzstwfboFGljj9AXwYy8vLAJpcwXvWwu8/yhoaCeyRKB/iVwpMCh90mhz4IKVbs9dxHJcn/cTpCn3cCybywDYW2QzxP2tJTZVB2U22n3E6vKUHwaSziIRoXeIfhw+EJVRM6LCXvoJUBlyJEtgS7baXH3XElowrkF/M1yIUyzs0+LJkr3tfrFBPy/I4NDHeIp5SooIuwb7VU0Zphvi1rpIAe4IMQqwhRcKrU+SX/FwF2G3zkHjf35rbg6c4+IkyrlC9CTgS2KxcUjzPIsJIXrTrPKHKHOtfs2OoPrxqEmbRdbV4CcK/zot10oPy+IrSlem9YbraKSIXjUJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZwpA+gBiVGtyk82fZAoUKZLDDwrhYiOuaHkOp+lWQsQ=;
- b=SXHSz9uayUJYjbOSTi7klhs2xCHtPZpDkN9b0K0LBAu79/SZ/XZLqoy9ntL9eTWuhJQx4/k415bTEpbowZXfA2MYQP851qJrzhuEdqQqKzXBoavkoj4UqoxumLnJF5QP3GwNPqY6eiDjjWufmD/PAlE7t86GCWaaf9ZlnHRSkA0jEr3BpQxH5s4wUY5mpvdrLGnSB2+rVosDdZpN9A/uepBWdTVySd8zOSpsan4URUP7qyPd3wYBYnMEoK/QSZRPvdBzqmhvZyD+NMTfhAEYfxN0MLOj5ENT3GPwTGjvbenJjh4Wu662ryUhdYArTodq+yUGUISU/ZPO6Z4vgRuF8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by IA1PR11MB8246.namprd11.prod.outlook.com (2603:10b6:208:445::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
- 2026 09:36:37 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9542.008; Tue, 20 Jan 2026
- 09:36:37 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Takashi Kozu <takkozu@amazon.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pmenzel@molgen.mpg.de"
-	<pmenzel@molgen.mpg.de>, "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>,
-	"enjuk@amazon.com" <enjuk@amazon.com>
-Subject: RE: [PATCH iwl-next v4 1/3] igb: prepare for RSS key get/set support
-Thread-Topic: [PATCH iwl-next v4 1/3] igb: prepare for RSS key get/set support
-Thread-Index: AQHcifAhwDEHAuKmjUKpTOv4HmQBG7VazJPA
-Date: Tue, 20 Jan 2026 09:36:37 +0000
-Message-ID: <IA3PR11MB8986FEC18B95A9787BF12CAEE589A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260120093441.70075-5-takkozu@amazon.com>
- <20260120093441.70075-6-takkozu@amazon.com>
-In-Reply-To: <20260120093441.70075-6-takkozu@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA1PR11MB8246:EE_
-x-ms-office365-filtering-correlation-id: 3863502f-c452-40af-5e38-08de580768b9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?jrA9gF9+SHL39AMltm40avYQxI/jfpK8pCSq9t0Ns44I8QDaFm247o7PzlP5?=
- =?us-ascii?Q?IAluGvtr2XRlvtu8WjlNI5diEox1+gwtUk7CtH19LgRAqSYiYA5UDtM2cGGf?=
- =?us-ascii?Q?2/9pGr6Ltesq2Y4cs3qSClRmFJuZF6uxUfzMp51cu1ARg6A/MFPd02z3GwzC?=
- =?us-ascii?Q?65llrS2JTlK3MgpTmKwe+qwz3LbWpxGlwct4YDUF0Rad+rOJ9Qcja18sHfmb?=
- =?us-ascii?Q?dkzJPCyQUTgQ1HN9yzR9Xb5t3L+ID8ciS9kfZryhGHsAOkmO8yBy24SJhpjX?=
- =?us-ascii?Q?jjHJuy31HRxRU0kU4tbsZ51UjWiL7oQFrKOc8AWa8UGlQNWnkdxarorSdVU+?=
- =?us-ascii?Q?aUZHwy7+hvcfhfWfyD6oNQuvYfvTcmXidI4/l+MVTEKlaE8PIpzDDClxS9Ac?=
- =?us-ascii?Q?nf6pBHMQ8Cqj6tZ0vxUoqiJQS3H6FZno8d4fPXMY65I6IDCdyl/Ye2BSwiD0?=
- =?us-ascii?Q?eht0ZCRvq/sVJ+Kp9HNl9Y21CVIzPm1OStyzzf3jERrb3XS/l8KFAZOGWAIZ?=
- =?us-ascii?Q?Xsx6/tLZW1yRqchx1X8/xjtZqLJd268dyQZWhGSi1D0JEqf4qfTCJBexB3hU?=
- =?us-ascii?Q?bAIBwQQXpnpLNg79oa1F4wKXEf3xfCNYmxL94yHRHZZFnCQBeXzj4rZECb5C?=
- =?us-ascii?Q?nuohLyuHbHK/LZ0dAKxTSQgDNmcfogwzjgzA7bYG/bNdc0/i3NTetSxqiqI2?=
- =?us-ascii?Q?95ncWoyLolobn4QegzJT1YqVul+8FkyvEV5Xodhyy4bi9H+M90ttbA/7bFeD?=
- =?us-ascii?Q?zrOiruWtN+4rU+kMnu8phZCEVXQnxYvJoWISDIOLp6nUTmhYHJ+koEYaIywm?=
- =?us-ascii?Q?+bppeoHVDNqACZA8omMOtfTZu+AjbTzFSknvxjaOYXakbhdnZrQnEcV1lRIo?=
- =?us-ascii?Q?YEBqHb7ehDXwjjVlOjvItDA33zfjAQKEItDiDQtnLjJ1AxfpkQ8Ry5XuCpF3?=
- =?us-ascii?Q?mMsMo3FzA4n5a5G9ALa619tGYwyVREmTHClbvZzpa7HyWqSsmHbp79GLOZ6j?=
- =?us-ascii?Q?HFEZnVSF5YmxbnsTjhxGz7aEFak1lUHLDaV+8pyK8rS+cNd8DLMleBd1CT92?=
- =?us-ascii?Q?tzOlAYz3oZgN8OHv2W2y0Y6lwq/n6O/7cJngoBl2DaOM7s+H24w2E9OklkAL?=
- =?us-ascii?Q?4M7sNE7u0XewMXn0HCUEbE0h8gHaX5skNPsqsx4ApN89V1wIjVot2WCpFyGk?=
- =?us-ascii?Q?FzBTmrTtPewoTmhOzRgTBMfYNbglaX/EwmAjYw3/aVCCXp2dFb1Sd7KtGo5r?=
- =?us-ascii?Q?UBqvX8NeUp1Am6kaMtG3MqXKpiKAEBn6fqoOamANCvM6BbcTap7C7rjIKQi4?=
- =?us-ascii?Q?JP9XQwz/v/WOJzmpL1xqYQStpRlyjm/dkLYV1sAgwHEbJ+NV1YrQ2Fwf7S1z?=
- =?us-ascii?Q?el5O0sGOGOIWPIEZr4fqpZAzSn5/AU/KhyJ4tkSEnSdCve3hcf3q28XcXpBC?=
- =?us-ascii?Q?BAzK7WyXX/Sc7LgrWexpvSkRxrFWSAjJ+AbKeDLvdiPcuCZYGy4rlz7j5qpH?=
- =?us-ascii?Q?U8YmSBVCozDSMqJbSJuhNrnnvdryFoE+t4keGbRqMLg1Tmgs1bnetTt5Tj0p?=
- =?us-ascii?Q?8IIljGYU/dQ+bs7ESmRc8plBGKdb4gyJrDbkPvq1WtNZkrEAVgg2EHTeAJy3?=
- =?us-ascii?Q?Q1ckzZEgp8mTW3c6vt/jvjA=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?G4g5lRHglw3IuUDrxiObqNcwLu8GEOWqoGcX3ksbb209trSZPkchP6x/j9uU?=
- =?us-ascii?Q?sJBFxMTm57lSrwt9E4DuK2WCulcFZcPWb3aquOpZSg9FZAEOCE4mWw1DpJeK?=
- =?us-ascii?Q?u/IpRxypLD+reGHYX8PLIuSs1dN9Mfvdo81i3ntpWRBEOOuh2P9TFiw/IA5j?=
- =?us-ascii?Q?lU2Vw+lYkUuPwVnb1oytyTD41TXLkvO17ks9n1O4lEPKXt2pPm1cCfJb/cmn?=
- =?us-ascii?Q?fSJezRn1mRecfnm8/CRQwgNsv5g7/nHtmF/hz8GU/184l/PksYxjoDHsY270?=
- =?us-ascii?Q?a3jQZcmEJ+ZbkHZTsSHd7XB1BM/nBh3n/VJ9bQgrgaUin4QgzTue1MvD+bal?=
- =?us-ascii?Q?YvwN/rPK19fQb8vK1N/KZ8FScc7rHUOxoTvXZJyPWAsQm6XVNgElRk9k4mtB?=
- =?us-ascii?Q?/BmaN5okGB/7NxtaHatCKSiWp9qlQ9UxtaLBFSDmdX5/U11I+EBF1fSMCMnj?=
- =?us-ascii?Q?v2umLYK5M/HY2nmfLswrhLw2YfYZyl8Hzctv8JLpMdC8JwpJUUzyQsVD61yh?=
- =?us-ascii?Q?VjKnDMNhnTrAc7lgiyLUcAhG+eVjakJP3zXfXf01tiR1FE7KYjEMG435Jlt+?=
- =?us-ascii?Q?Gj1/uFO5xnwr2guNcfcu7Tt9HCynU13XAMMgqlCAqtvAUOGx7/sYCklthNm+?=
- =?us-ascii?Q?7/13DmjXd6k6XxOtQDzOY3F18lk1Eo8v3j1Q0lzPge7qj26/YqfkslJPa2yc?=
- =?us-ascii?Q?A3iw/LlSzbsoVfHDhMoXdS7k3EgbJQT7hb5uCNsk2LXINv3qNms49pV42wmV?=
- =?us-ascii?Q?DZaQqfnkF9gwJuTyQVB/4lX5qje7Jva3/P6WTknYTXTphRuGrDYyIvh2lcG8?=
- =?us-ascii?Q?TEcLZzzZW4eZ0r/wu97o4EBPfWXeAB38FZN9qJcWk1GrabmI5/GcCddaMNEt?=
- =?us-ascii?Q?ijNupXLiLLPDEMRZPVFFXKJ1SaBF0sYV9dJIFAVhKneDrPvWYSbbkkrbVp5A?=
- =?us-ascii?Q?YgR4iOr2AdpzhJjaoP/K5roXrzlKU9wlAGkctq0621vDAZBfBttLPOjmCE1t?=
- =?us-ascii?Q?nlFLp1cRPxSKWspH8UIrsLzeGdfKSFoADV20bodbShue9R5nXakO7DLmpCJi?=
- =?us-ascii?Q?iqK+fLFHapQmkMvAVxYU7iR5jm/MD2XANrJWwNU9dl8cVVbzf7cTyMNEhJev?=
- =?us-ascii?Q?4UxabFvCF+mZDXgjivDN4pVMGnbf0arIF6e+HUDtq2bozDC6zOnJscce6gxm?=
- =?us-ascii?Q?WccN+vP+5IdNptN0EoxCGphX83ViMa4m02twR26jUkM5zIlS1Pe65/B9WbdH?=
- =?us-ascii?Q?vJdtAICw7lx0CLToYsKjPcwkxXyz1MEGqZCUHtb6HeWTYA3vFETlC2pZZE9+?=
- =?us-ascii?Q?ZOwreoPuBZucujpg7oC+x1RVhKLrHUtB4SCyELhDDTOSymuJSZfvUntI2ATo?=
- =?us-ascii?Q?NcNw+Py28jbuPKXIYXERf0hK3x1qiE++ptYACz934u4/hfL+ClZomTLcLtq9?=
- =?us-ascii?Q?HjVKqabRtet+BjE8Xj/+kkVrjomISmAF2103qCAHzKJP8vxIF2A1hpC+jS4b?=
- =?us-ascii?Q?6+/+/bE6Veh+sll35+r4Z6Ceb8xLuuqcHjdeT+myneY465ghKjY9B3xNFrJC?=
- =?us-ascii?Q?Uoroc/PzDqAw1AhCsXWr0NDte4Y3MwwRVvffwVfOJQnpXoywofceRAuhPaSn?=
- =?us-ascii?Q?TZF7NumhnmJ+YJlNes1a8Zr7sNMx5SJTmfObCvL8RlZmk+hqmLmj3j6VOfXd?=
- =?us-ascii?Q?U0tw6Kv25M7v/4Hj4fi3Wbzy/6r+yy1/xFnFThx2j2XaIfji/iq48GJyG+ua?=
- =?us-ascii?Q?yehmnLyqF5x4i+r7E25z/9cR80dab0I=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93273366DD7
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768901862; cv=none; b=JMqZcEmKk9k6RVBdExCCD1osgvrGpyHw4sgl5wDazEjvyYxKcwikZC/Yn3J8lOjufAfIK+k6pizpw6BQaI3VEUmc6MpL0gQm5qS62ff5/vnutvzvW26PlIUdLwOFuliAK3+sTzYqOFjWaKGdhsrB8qOqZvVOyqFZH+QqYATlvNY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768901862; c=relaxed/simple;
+	bh=gJ8LRdePpGdfZIJ/xvuV9faBPChp54PHBmUoMXirzAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l2ynJQaU4zvwbHSiuWZeA+bKQAgo4Neuo2A0GtC0P8OuCROte7pW2he34FrASW/CoFbyVhXe7pqYsGeR6AQQE8W1AhA+fbgJj5HQh7qOh2eXJQCcQNrukKrqZywIUAfBjlxon+GOH10+yWiHhA3ykXkHr8MyBEUPAmpJqRNOIdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K8+JF6mM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=clDBS6kH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768901859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
+	b=K8+JF6mMHL76bZxS+ci6CY7KEnR5jdjxJGutZ+fuCfQlF0fbr47SzwJjAOKJRQ0ugF1xb0
+	2Y71nRwmVtTchM1c6Un9PoE5UDZrtlTG8co6aH7HiMY+vimmGji2SprwxZjyjaG8yEzvWS
+	uC2gzmgydR7cJT0JMc9UHzoDT7IdtXQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-353-KRoHfOuzPriqyqW6nDbTaw-1; Tue, 20 Jan 2026 04:37:37 -0500
+X-MC-Unique: KRoHfOuzPriqyqW6nDbTaw-1
+X-Mimecast-MFC-AGG-ID: KRoHfOuzPriqyqW6nDbTaw_1768901856
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430fcfe4494so5249658f8f.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:37:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768901856; x=1769506656; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
+        b=clDBS6kHuU02e+svmRR7saf/d/7sXPtTCBrZqdainfUer3Ca8mC7vbq2mu+aFLdw3Q
+         I8aR/8hdlZSmln8sl3WNdIz6E+GzjWZGfvs9g7rMcQj1tic2Lr9Y+iJ9JE/ydbWCuKp5
+         gbADY0103aGNyrfR/uFtF7+cZsOAaT0Q4eUlF3cIawQK/LLEZVlDzsdJMwO5niDelrC/
+         iBthyFfxBDJdzuBix0iny0V/TJ0PUXFbcQrRrVd6BC4ZaN9b0lw9iOlovBcjTklRd0pp
+         93gLowV0g6E+Oiz9wnlUStpTnPpaVnj7b5r1xJWDeDWXtdwk7hkGkVwDtRJo5oapXJHG
+         4HhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768901856; x=1769506656;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
+        b=kOHIbs2iISU4yMEgRLBUnHi98K7Av2DopXYAgRTj1wzZHrZZGXlUYlZYU/s9hukNI4
+         AN3ynFDDg/1KwfCEI0T63dkluhHbEbtFPz638okkxRvLK/IjyUfbKPNyIpoUMXj6K7s3
+         ZvVwr5RhVnLrM80aQGzUanCcHzBFJaJTgDuI+2daNJmfFo8l+ekwpmnhtM2d3LZtoeqa
+         x2lhrrJLwsCnxDBP2S8xfHz1nq8yhPq4YDngYpW1t7qmvQlTJvsT9PCvlzR6zDCxAwfX
+         gh6pccZJz9xX3vHA8ZYbdohCgM6tQvfIa2EPX71bfAgzGW7B6SWZhpCqpv9bG2ky5GEF
+         ZVUw==
+X-Gm-Message-State: AOJu0YydCzbHZ+3EVEblsv2zB82VsRPtBZFPOkeKVoe6KP6HfmzLkRdR
+	T0r/JO62u6mR2zbDsC00IqPe5VjTEPvp/pC7sPTIV2kLFl/QKeVpztaFcGuElVcwa7hxXeXRcmB
+	6HHugXlzTQf9iAgle3Mr4U3D4Iuomxzo+c+hZLI2sSpwI7Zo7DnK0wY2Krw==
+X-Gm-Gg: AZuq6aJgwgSYgknpjHxsMmR31teViZiiOjxHZ5OXllQ7fceeK6aP+LgPPTozlAg55lU
+	z1gcxfjdHQ/Ma0Z4Ca55cpXzFppBBgObxRr5778YK3gX9eLxwqrLnt+MFG4ep23DMkLJ8iaUhKm
+	8c6diYpy2YM9L9XbuohEXtVDJXdhLozCbyH7vPgcJPCOm7+cwDBuLL1ri+gB+Zo7dfhQkcq6tym
+	9x5ptEx1MnqsThhcoRCyDH5HxRJyKC22bPRwibNw7w65cmQKptmb9b/N39mSRQyOZ83yIw3e7I2
+	y2jwdYGdIaUFNPpdZPgcVzGb+ffgLJSCaOeYBdqiCNe2igd4OgxYmWtHXyGSlGAxYzxAqjxcbV+
+	Q5guinKGS8ZJc7qostdmVLznqu3w5HQiYwSK6h5fh2mS11dCM7+ymo69AlEo=
+X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167510f8f.24.1768901855985;
+        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
+X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167470f8f.24.1768901855514;
+        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cefdsm27663754f8f.24.2026.01.20.01.37.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 01:37:34 -0800 (PST)
+Date: Tue, 20 Jan 2026 10:37:12 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>, 
+	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Simon Horman <horms@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Arseniy Krasnov <AVKrasnov@sberdevices.ru>, 
+	Asias He <asias@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH RESEND net v5 0/4] vsock/virtio: fix TX credit handling
+Message-ID: <aW9L0xiwotBnRMw2@sgarzare-redhat>
+References: <20260116201517.273302-1-sgarzare@redhat.com>
+ <20260119101734.01cbe934@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3863502f-c452-40af-5e38-08de580768b9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2026 09:36:37.8016
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GmZd8azpBnXXH6tUfvPdrRSmXqXYTHdf3mdfnx3Ld3YZ1wu5Cpf1t6+1lrL+WeySub3qN4xYfL80vmDOTR4mEA0CALDbq2PzBxSmlDsbwIk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8246
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260119101734.01cbe934@kernel.org>
+
+On Mon, Jan 19, 2026 at 10:17:34AM -0800, Jakub Kicinski wrote:
+>On Fri, 16 Jan 2026 21:15:13 +0100 Stefano Garzarella wrote:
+>> Resend with the right cc (sorry, a mistake on my env)
+>
+>Please don't resend within 24h unless asked to:
+>https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
+
+Sorry for that, I'll avoid in the future.
+
+>
+>> The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till
+>> v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
+>>
+>> Since it's a real issue and the original author seems busy, I'm sending
+>> the v5 fixing my comments but keeping the authorship (and restoring mine
+>> on patch 2 as reported on v4).
+>
+>Does not apply to net:
+>
+>Switched to a new branch 'vsock-virtio-fix-tx-credit-handling'
+>Applying: vsock/virtio: fix potential underflow in virtio_transport_get_credit()
+>Applying: vsock/test: fix seqpacket message bounds test
+>Applying: vsock/virtio: cap TX credit to local buffer size
+>Applying: vsock/test: add stream TX credit bounds test
+>error: patch failed: tools/testing/vsock/vsock_test.c:2414
+>error: tools/testing/vsock/vsock_test.c: patch does not apply
+>Patch failed at 0004 vsock/test: add stream TX credit bounds test
+>hint: Use 'git am --show-current-patch=diff' to see the failed patch
+>hint: When you have resolved this problem, run "git am --continue".
+>hint: If you prefer to skip this patch, run "git am --skip" instead.
+>hint: To restore the original branch and stop patching, run "git am --abort".
+>hint: Disable this message with "git config set advice.mergeConflict false"
+>
+>Did you generate against net-next or there's some mid-air collision?
+>(if the former please share the resolution for the resulting conflict;))
+
+Ooops, a new test landed in net, this should be the resolution:
+
+diff --cc tools/testing/vsock/vsock_test.c
+index 668fbe9eb3cc,6933f986ef2a..000000000000
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@@ -2414,11 -2510,11 +2510,16 @@@ static struct test_case test_cases[] =
+                 .run_client = test_stream_accepted_setsockopt_client,
+                 .run_server = test_stream_accepted_setsockopt_server,
+         },
+  +      {
+  +              .name = "SOCK_STREAM virtio MSG_ZEROCOPY coalescence corruption",
+  +              .run_client = test_stream_msgzcopy_mangle_client,
+  +              .run_server = test_stream_msgzcopy_mangle_server,
+  +      },
++       {
++               .name = "SOCK_STREAM TX credit bounds",
++               .run_client = test_stream_tx_credit_bounds_client,
++               .run_server = test_stream_tx_credit_bounds_server,
++       },
+         {},
+   };
 
 
+If you prefer I can send a v6. In the mean time I pushed the branch 
+here: 
+https://github.com/stefano-garzarella/linux/tree/vsock_virtio_fix_tx_credit
 
-> -----Original Message-----
-> From: Takashi Kozu <takkozu@amazon.com>
-> Sent: Tuesday, January 20, 2026 10:35 AM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
-> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com; intel-wired-lan@lists.osuosl.org;
-> netdev@vger.kernel.org; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; pmenzel@molgen.mpg.de; Kwapulinski,
-> Piotr <piotr.kwapulinski@intel.com>; enjuk@amazon.com; Takashi Kozu
-> <takkozu@amazon.com>
-> Subject: [PATCH iwl-next v4 1/3] igb: prepare for RSS key get/set
-> support
->=20
-> Store the RSS key inside struct igb_adapter and introduce the
-> igb_write_rss_key() helper function. This allows the driver to program
-> the E1000 registers using a persistent RSS key, instead of using a
-> stack-local buffer in igb_setup_mrqc().
->=20
-> Signed-off-by: Takashi Kozu <takkozu@amazon.com>
-> ---
->  drivers/net/ethernet/intel/igb/igb.h         |  3 +++
->  drivers/net/ethernet/intel/igb/igb_ethtool.c | 21
-> ++++++++++++++++++++
->  drivers/net/ethernet/intel/igb/igb_main.c    |  8 ++++----
->  3 files changed, 28 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/igb/igb.h
-> b/drivers/net/ethernet/intel/igb/igb.h
-> index 0fff1df81b7b..8c9b02058cec 100644
-> --- a/drivers/net/ethernet/intel/igb/igb.h
-> +++ b/drivers/net/ethernet/intel/igb/igb.h
-> @@ -495,6 +495,7 @@ struct hwmon_buff {
->  #define IGB_N_PEROUT	2
->  #define IGB_N_SDP	4
->  #define IGB_RETA_SIZE	128
-> +#define IGB_RSS_KEY_SIZE	40
->=20
->  enum igb_filter_match_flags {
->  	IGB_FILTER_FLAG_ETHER_TYPE =3D 0x1,
-> @@ -655,6 +656,7 @@ struct igb_adapter {
->  	struct i2c_client *i2c_client;
->  	u32 rss_indir_tbl_init;
->  	u8 rss_indir_tbl[IGB_RETA_SIZE];
-> +	u8 rss_key[IGB_RSS_KEY_SIZE];
->=20
->  	unsigned long link_check_timeout;
->  	int copper_tries;
-> @@ -735,6 +737,7 @@ void igb_down(struct igb_adapter *);  void
-> igb_reinit_locked(struct igb_adapter *);  void igb_reset(struct
-> igb_adapter *);  int igb_reinit_queues(struct igb_adapter *);
-> +void igb_write_rss_key(struct igb_adapter *adapter);
->  void igb_write_rss_indir_tbl(struct igb_adapter *);  int
-> igb_set_spd_dplx(struct igb_adapter *, u32, u8);  int
-> igb_setup_tx_resources(struct igb_ring *); diff --git
-> a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> index b507576b28b2..a93069b761a6 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> @@ -3019,6 +3019,27 @@ static int igb_set_rxnfc(struct net_device
-> *dev, struct ethtool_rxnfc *cmd)
->  	return ret;
->  }
->=20
-> +/**
-> + * igb_write_rss_key - Program the RSS key into device registers
-> + * @adapter: board private structure
-> + *
-> + * Write the RSS key stored in adapter->rss_key to the E1000 hardware
-> registers.
-> + * Each 32-bit chunk of the key is read using get_unaligned_le32()
-> and
-> +written
-> + * to the appropriate register.
-> + */
-> +void igb_write_rss_key(struct igb_adapter *adapter) {
-> +	struct e1000_hw *hw =3D &adapter->hw;
-> +
-> +	ASSERT_RTNL();
-> +
-> +	for (int i =3D 0; i < IGB_RSS_KEY_SIZE / 4; i++) {
-> +		u32 val =3D get_unaligned_le32(&adapter->rss_key[i * 4]);
-> +
-> +		wr32(E1000_RSSRK(i), val);
-> +	}
-> +}
-> +
->  static int igb_get_eee(struct net_device *netdev, struct ethtool_keee
-> *edata)  {
->  	struct igb_adapter *adapter =3D netdev_priv(netdev); diff --git
-> a/drivers/net/ethernet/intel/igb/igb_main.c
-> b/drivers/net/ethernet/intel/igb/igb_main.c
-> index dbea37269d2c..c703011b19ec 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -4050,6 +4050,9 @@ static int igb_sw_init(struct igb_adapter
-> *adapter)
->=20
->  	pci_read_config_word(pdev, PCI_COMMAND, &hw->bus.pci_cmd_word);
->=20
-> +	/* init RSS key */
-> +	netdev_rss_key_fill(adapter->rss_key, sizeof(adapter-
-> >rss_key));
-> +
->  	/* set default ring sizes */
->  	adapter->tx_ring_count =3D IGB_DEFAULT_TXD;
->  	adapter->rx_ring_count =3D IGB_DEFAULT_RXD; @@ -4525,11 +4528,8
-> @@ static void igb_setup_mrqc(struct igb_adapter *adapter)
->  	struct e1000_hw *hw =3D &adapter->hw;
->  	u32 mrqc, rxcsum;
->  	u32 j, num_rx_queues;
-> -	u32 rss_key[10];
->=20
-> -	netdev_rss_key_fill(rss_key, sizeof(rss_key));
-> -	for (j =3D 0; j < 10; j++)
-> -		wr32(E1000_RSSRK(j), rss_key[j]);
-> +	igb_write_rss_key(adapter);
->=20
->  	num_rx_queues =3D adapter->rss_queues;
->=20
-> --
-> 2.52.0
+Thanks,
+Stefano
 
-
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
