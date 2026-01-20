@@ -1,109 +1,61 @@
-Return-Path: <netdev+bounces-251363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC65ED3C01A
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:14:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35557D3C0B1
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DC00D402FC1
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 07:07:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92311505AC5
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 07:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E4438A9B8;
-	Tue, 20 Jan 2026 07:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7680E392B99;
+	Tue, 20 Jan 2026 07:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjTn3U7R"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="hEdU2e7n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59C337F0E4
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 07:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B28364E85;
+	Tue, 20 Jan 2026 07:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768892795; cv=none; b=X1PiPdmTlOy3/AI2FgvmoRvbaHgTQAQPPjMmq5e2inuMMGHHfltTt3jUc+59UVL2yeUvQJl6Az95V2uSngekZ9e0dyy0+b5Xsx9a+JmM5RchT1nVESrQIMTe/GdRmQRsLp4ffGZulMauoGkVGK5Cmc7Nw5lMvXXVLuDVmT6wfAU=
+	t=1768893702; cv=none; b=VdXL7B+W5ZaeWD0xstomifGZ0j0doadt7/JOLsZ1aZImbNHJWmXodxRzCaO7q3Phw6pxiBvwIjp0CrM4rdTjD2YwncvEXtSunUp1e2bwTTh+H5AkIFNOkB+ZN0Be3ay6ksDywbZYmZr38fz7slsRq4DeHXngsxJSpJOXnKXQCqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768892795; c=relaxed/simple;
-	bh=N2XC72YuwbVooj49gSUC23yr6OLWGEsBRVB0n5dcYww=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ggKW3Acks1aFMViMO3I3fE0sbCzegotUxnXg8t5K585jfsuzHD3Rklriw53uNXfqdyMABHmvlvlAgGwPNETDV8CA/N2qVgJAcmDuuEYUBOUe9msW22v9iW2k13Km0VfdvaIfe1K2i/8HdplgNsv7TthFonC7/xopy4taZAs31n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjTn3U7R; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2a0d0788adaso32438605ad.3
-        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 23:06:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768892787; x=1769497587; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h8e96Wx1n0qpGbVjK3mBfOV2yV5DDoKmdYehuYIVGJg=;
-        b=mjTn3U7R+YpbF4E4Uwyr2sfKTXoqfgg5d5jg4DI9l2NI245ny0GbuiRF7Cjo6IbKjo
-         tES1nUVdTFWq4JMrC5q6EoL4B47I1S4FZ2Iu9oJDXTVL3k+juLmQ9V2Pu0B/3h4XUtMz
-         idsKnU2a3Tb4Z2nb6eKlWwA4Z1sEWHCv3z6VfjBYJWdmJfHTr1Zi/xEpB+6dtsHgXy3n
-         SBnXGJyhDDqISt4Co3atOsA4tnnEsJFQ1TcPA5Xkgaw7wgDSApXOBz/BtIiJCOU0oB0y
-         hjllQf6aSG9DFXX8+gsxS9yQzQzVGq5FhS5x5nsMUfrCOGAa4TMf68f5VdjlREkS2x8x
-         kF+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768892787; x=1769497587;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h8e96Wx1n0qpGbVjK3mBfOV2yV5DDoKmdYehuYIVGJg=;
-        b=ernCS5H6rQUqoAicjlUaHTxctqWVKlkljGBndFxlPwFEFe150o3FXke/RvQYYP5IGS
-         97bsg5as7Y9V1htUVALA/5oNbTqvTleIO2URSkdu5wB+K9M0ByOVuZI+bOyU5M4uxoX2
-         OuB34YO/Peze5pSKrLbuoxHSiYcnhkNX3sMrm2jC0/oqBW/69UqFY5zkdlGY/3aL9BSZ
-         zVJIaUrqvK6MUbEXQ6DjvEcuv55N5AXIKevDjFNBg1vC7wSVO7eeiZrjxyq9Pb4P3QWs
-         R2due6PycZ0ze/sRArimCTr84xZYSBb5nZ0kv8lhyfofYbgj8XPFgVkoPkIVlw76b8q3
-         HuSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTYxbHqQ5zWv3+B+R+4AbyUzsPXK9KGQhVatFUWrsW8IWBXhRqGqwIWch66XaFdhgGNL219Do=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywpk0yIoVJHjhpSqNECqxd1jXX+F9Zve1AB43kIlQZ044vVtLu+
-	e4MkM8Bwizo/VYVTFtBsV8kJO0KCFqxEpgdMu1ibfAP6cp8vuXmPqEc1
-X-Gm-Gg: AZuq6aJxudrLqvGl6yH5iC1DXwkrPED+vTkTCkidD9p9ZAi4FtiCpT5RCYW6bnyG8+N
-	DVNSsrOwcUL2Ad9N1ICo3pO+pzNC/KmKtBGcU5c6C2a70CTpKtdOFcmJrmP33SNmrT1K+wmp1j/
-	SYDEot5dCkS2j/+Pm/1CY4Fg25II8w+0kMDurOU29tbqIR9VPHlGKFPypo6hEt6jENrh2Ha+jwU
-	0c8Y3wTllfaHwk91Gz7c1jmv0bA5iPj2ZoFBF4Llh2SBOKpu5bHZLoWFGW26rOuUw8Fkf/vY+7k
-	qg57XcjUz1kawxNzVuhHU98m4mJmuG9sYE2MFDabKVwn/MgFB82EZPye/o5nTRhcjSC2h1ubLmi
-	+hbcmK+5vbnNdHYvPAO2LV2t1vibtemkBWXeJ1MeBRcVLrx0+keOoje0kfwWhYn1jqM85B5kbSk
-	VqHch+8CkJ
-X-Received: by 2002:a17:902:da88:b0:2a0:d364:983b with SMTP id d9443c01a7336-2a76b39df9dmr7779905ad.60.1768892786963;
-        Mon, 19 Jan 2026 23:06:26 -0800 (PST)
-Received: from 7950hx ([103.173.155.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190ce534sm111695665ad.27.2026.01.19.23.06.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 23:06:26 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: ast@kernel.org,
-	eddyz87@gmail.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v6 2/2] selftests/bpf: test the jited inline of bpf_get_current_task
-Date: Tue, 20 Jan 2026 15:05:55 +0800
-Message-ID: <20260120070555.233486-3-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260120070555.233486-1-dongml2@chinatelecom.cn>
-References: <20260120070555.233486-1-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1768893702; c=relaxed/simple;
+	bh=p8cAsH+U0zreVFn8XkbRD0x58b2kMBRfvTpcETKZl5w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lkXlsPGYNeWAWqjBTv5JotPZ1vF+HBvMxHX+s/2dv1k2Doy73TsD+KiGVsZy1kIyuJ/fMJKw8VakdJjXvwuswwb9Y4bH6t4/9rVzyLZGn+Ucg7t3MMfZGKwGqd3E2Wi0Vie2fK1S6ShjWCQ//6wUof/Xoi6W1S+UGJDwMfrAq7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=hEdU2e7n; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Fn
+	8sH/UPGAA1+BoMne6Uvp98j9WI73paMY45+Og8aWs=; b=hEdU2e7ngBfssFCG2O
+	Vh6rK9A6lE03kYCxhIHmuUaZ8JLsY91aVSGIS4oWHYXufaWNgipoZPgH8OxERnkY
+	TugTe6lSk0okFt0fVAWDtqFcrrnkaa76TJsOBc0E6WOQi6UA5lc5WhiDxFT4bhlB
+	9PlUxBdXFerSvHn5J5K33EmZc=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3P_e4LG9pP7D_Hw--.20586S2;
+	Tue, 20 Jan 2026 15:20:26 +0800 (CST)
+From: Slark Xiao <slark_xiao@163.com>
+To: loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gustavoars@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Slark Xiao <slark_xiao@163.com>
+Subject: [net] Revert "net: wwan: mhi_wwan_mbim: Avoid -Wflex-array-member-not-at-end warning"
+Date: Tue, 20 Jan 2026 15:20:18 +0800
+Message-Id: <20260120072018.29375-1-slark_xiao@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,66 +63,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3P_e4LG9pP7D_Hw--.20586S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxArWUXw48Kw15Jw4fWr1UAwb_yoW5Zw4UpF
+	4jk3yFvr4kGw1UWw4UAF4fZFWaqwn7K34Iy34Y9a4FqFnxtr15GFy8uFyrCrWYkayDuF13
+	tFWUKF45ZF1kWw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRiYFJUUUUU=
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbC5xpv02lvLLqyyQAA3q
 
-Add the testcase for the jited inline of bpf_get_current_task().
+This reverts commit eeecf5d3a3a484cedfa3f2f87e6d51a7390ed960.
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+This change lead to MHI WWAN device can't connect to internet.
+I found a netwrok issue with kernel 6.19-rc4, but network works
+well with kernel 6.18-rc1. After checking, this commit is the
+root cause.
+
+Before appliing this serial changes on MHI WWAN network, we shall
+revert this change in case of v6.19 being impacted.
+
+Fixes: eeecf5d3a3a4 ("net: wwan: mhi_wwan_mbim: Avoid -Wflex-array-member-not-at-end warning")
+Signed-off-by: Slark Xiao <slark_xiao@163.com>
 ---
-v6:
-* remove unnecessary 'ifdef' and __description
----
- .../selftests/bpf/prog_tests/verifier.c       |  2 ++
- .../selftests/bpf/progs/verifier_jit_inline.c | 20 +++++++++++++++++++
- 2 files changed, 22 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_jit_inline.c
+ drivers/net/wwan/mhi_wwan_mbim.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/verifier.c b/tools/testing/selftests/bpf/prog_tests/verifier.c
-index 38c5ba70100c..2ae7b096bd64 100644
---- a/tools/testing/selftests/bpf/prog_tests/verifier.c
-+++ b/tools/testing/selftests/bpf/prog_tests/verifier.c
-@@ -111,6 +111,7 @@
- #include "verifier_xdp_direct_packet_access.skel.h"
- #include "verifier_bits_iter.skel.h"
- #include "verifier_lsm.skel.h"
-+#include "verifier_jit_inline.skel.h"
- #include "irq.skel.h"
+diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+index cf6d3e2a007b..1d7e3ad900c1 100644
+--- a/drivers/net/wwan/mhi_wwan_mbim.c
++++ b/drivers/net/wwan/mhi_wwan_mbim.c
+@@ -78,9 +78,8 @@ struct mhi_mbim_context {
  
- #define MAX_ENTRIES 11
-@@ -253,6 +254,7 @@ void test_verifier_bits_iter(void) { RUN(verifier_bits_iter); }
- void test_verifier_lsm(void)                  { RUN(verifier_lsm); }
- void test_irq(void)			      { RUN(irq); }
- void test_verifier_mtu(void)		      { RUN(verifier_mtu); }
-+void test_verifier_jit_inline(void)               { RUN(verifier_jit_inline); }
+ struct mbim_tx_hdr {
+ 	struct usb_cdc_ncm_nth16 nth16;
+-
+-	/* Must be last as it ends in a flexible-array member. */
+ 	struct usb_cdc_ncm_ndp16 ndp16;
++	struct usb_cdc_ncm_dpe16 dpe16[2];
+ } __packed;
  
- static int init_test_val_map(struct bpf_object *obj, char *map_name)
+ static struct mhi_mbim_link *mhi_mbim_get_link_rcu(struct mhi_mbim_context *mbim,
+@@ -109,20 +108,20 @@ static int mhi_mbim_get_link_mux_id(struct mhi_controller *cntrl)
+ static struct sk_buff *mbim_tx_fixup(struct sk_buff *skb, unsigned int session,
+ 				     u16 tx_seq)
  {
-diff --git a/tools/testing/selftests/bpf/progs/verifier_jit_inline.c b/tools/testing/selftests/bpf/progs/verifier_jit_inline.c
-new file mode 100644
-index 000000000000..4ea254063646
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/verifier_jit_inline.c
-@@ -0,0 +1,20 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <vmlinux.h>
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_misc.h"
-+
-+SEC("fentry/bpf_fentry_test1")
-+__success __retval(0)
-+__arch_x86_64
-+__jited("	addq	%gs:{{.*}}, %rax")
-+__arch_arm64
-+__jited("	mrs	x7, SP_EL0")
-+int inline_bpf_get_current_task(void)
-+{
-+	bpf_get_current_task();
-+
-+	return 0;
-+}
-+
-+char _license[] SEC("license") = "GPL";
+-	DEFINE_RAW_FLEX(struct mbim_tx_hdr, mbim_hdr, ndp16.dpe16, 2);
+ 	unsigned int dgram_size = skb->len;
+ 	struct usb_cdc_ncm_nth16 *nth16;
+ 	struct usb_cdc_ncm_ndp16 *ndp16;
++	struct mbim_tx_hdr *mbim_hdr;
+ 
+ 	/* Only one NDP is sent, containing the IP packet (no aggregation) */
+ 
+ 	/* Ensure we have enough headroom for crafting MBIM header */
+-	if (skb_cow_head(skb, __struct_size(mbim_hdr))) {
++	if (skb_cow_head(skb, sizeof(struct mbim_tx_hdr))) {
+ 		dev_kfree_skb_any(skb);
+ 		return NULL;
+ 	}
+ 
+-	mbim_hdr = skb_push(skb, __struct_size(mbim_hdr));
++	mbim_hdr = skb_push(skb, sizeof(struct mbim_tx_hdr));
+ 
+ 	/* Fill NTB header */
+ 	nth16 = &mbim_hdr->nth16;
+@@ -135,11 +134,12 @@ static struct sk_buff *mbim_tx_fixup(struct sk_buff *skb, unsigned int session,
+ 	/* Fill the unique NDP */
+ 	ndp16 = &mbim_hdr->ndp16;
+ 	ndp16->dwSignature = cpu_to_le32(USB_CDC_MBIM_NDP16_IPS_SIGN | (session << 24));
+-	ndp16->wLength = cpu_to_le16(struct_size(ndp16, dpe16, 2));
++	ndp16->wLength = cpu_to_le16(sizeof(struct usb_cdc_ncm_ndp16)
++					+ sizeof(struct usb_cdc_ncm_dpe16) * 2);
+ 	ndp16->wNextNdpIndex = 0;
+ 
+ 	/* Datagram follows the mbim header */
+-	ndp16->dpe16[0].wDatagramIndex = cpu_to_le16(__struct_size(mbim_hdr));
++	ndp16->dpe16[0].wDatagramIndex = cpu_to_le16(sizeof(struct mbim_tx_hdr));
+ 	ndp16->dpe16[0].wDatagramLength = cpu_to_le16(dgram_size);
+ 
+ 	/* null termination */
+@@ -585,8 +585,7 @@ static void mhi_mbim_setup(struct net_device *ndev)
+ {
+ 	ndev->header_ops = NULL;  /* No header */
+ 	ndev->type = ARPHRD_RAWIP;
+-	ndev->needed_headroom =
+-			struct_size_t(struct mbim_tx_hdr, ndp16.dpe16, 2);
++	ndev->needed_headroom = sizeof(struct mbim_tx_hdr);
+ 	ndev->hard_header_len = 0;
+ 	ndev->addr_len = 0;
+ 	ndev->flags = IFF_POINTOPOINT | IFF_NOARP;
 -- 
-2.52.0
+2.25.1
 
 
