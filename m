@@ -1,183 +1,215 @@
-Return-Path: <netdev+bounces-251419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B863D3C484
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:05:21 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C504D3C469
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 29B1B6CAFC3
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:43:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F177252929C
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9583C1FCC;
-	Tue, 20 Jan 2026 09:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8617E3D6666;
+	Tue, 20 Jan 2026 09:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8+JF6mM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="clDBS6kH"
+	dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b="gTQHtTy1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.tuxedocomputers.com (mail.tuxedocomputers.com [157.90.84.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93273366DD7
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6DB3D667B;
+	Tue, 20 Jan 2026 09:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=157.90.84.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768901862; cv=none; b=JMqZcEmKk9k6RVBdExCCD1osgvrGpyHw4sgl5wDazEjvyYxKcwikZC/Yn3J8lOjufAfIK+k6pizpw6BQaI3VEUmc6MpL0gQm5qS62ff5/vnutvzvW26PlIUdLwOFuliAK3+sTzYqOFjWaKGdhsrB8qOqZvVOyqFZH+QqYATlvNY=
+	t=1768902158; cv=none; b=Q8vv5u2aH9xFGxUV7wSNJeXTaZZVXwDaj+O3wBgQJVW6TdCvTuXDVZZLGsS4ArGX6oIXQ53Cy9k452pAzpUWXwdIBrjAHMMFb0EtWuIYnevPfCnnJuT2hCoH2JkKdl5Ed7Tkh27aGjcRwiA1NLGHAmQOqEzfD3TsGhfGERTK10Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768901862; c=relaxed/simple;
-	bh=gJ8LRdePpGdfZIJ/xvuV9faBPChp54PHBmUoMXirzAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l2ynJQaU4zvwbHSiuWZeA+bKQAgo4Neuo2A0GtC0P8OuCROte7pW2he34FrASW/CoFbyVhXe7pqYsGeR6AQQE8W1AhA+fbgJj5HQh7qOh2eXJQCcQNrukKrqZywIUAfBjlxon+GOH10+yWiHhA3ykXkHr8MyBEUPAmpJqRNOIdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K8+JF6mM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=clDBS6kH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768901859;
+	s=arc-20240116; t=1768902158; c=relaxed/simple;
+	bh=m/Rm4Z1i+hXaPuyBGKr5un226xoXe2uru+r1u2Qz+rg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OmYykW4GdZ0uN1s8oI0vMA6ovPTziH2L4aTRfov8YLnLnFFJ8BD8sEcNgQpU+Ko66ZRdXSSwqdTeO3Ogx1jT7AAUj2qev91SQ7IwpyhcJbLqq9+ySaGU7AyyOVR2XCn0nAEA6UlYDH7izHE83FHoU000M7PBpbFfMD5gkhAZUnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com; spf=pass smtp.mailfrom=tuxedocomputers.com; dkim=pass (1024-bit key) header.d=tuxedocomputers.com header.i=@tuxedocomputers.com header.b=gTQHtTy1; arc=none smtp.client-ip=157.90.84.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tuxedocomputers.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxedocomputers.com
+Received: from [192.168.178.76] (business-24-134-207-61.pool2.vodafone-ip.de [24.134.207.61])
+	(Authenticated sender: g.gottleuber@tuxedocomputers.com)
+	by mail.tuxedocomputers.com (Postfix) with ESMTPSA id 9594F2FC0059;
+	Tue, 20 Jan 2026 10:42:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxedocomputers.com;
+	s=default; t=1768902150;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-	b=K8+JF6mMHL76bZxS+ci6CY7KEnR5jdjxJGutZ+fuCfQlF0fbr47SzwJjAOKJRQ0ugF1xb0
-	2Y71nRwmVtTchM1c6Un9PoE5UDZrtlTG8co6aH7HiMY+vimmGji2SprwxZjyjaG8yEzvWS
-	uC2gzmgydR7cJT0JMc9UHzoDT7IdtXQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-KRoHfOuzPriqyqW6nDbTaw-1; Tue, 20 Jan 2026 04:37:37 -0500
-X-MC-Unique: KRoHfOuzPriqyqW6nDbTaw-1
-X-Mimecast-MFC-AGG-ID: KRoHfOuzPriqyqW6nDbTaw_1768901856
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430fcfe4494so5249658f8f.2
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:37:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768901856; x=1769506656; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-        b=clDBS6kHuU02e+svmRR7saf/d/7sXPtTCBrZqdainfUer3Ca8mC7vbq2mu+aFLdw3Q
-         I8aR/8hdlZSmln8sl3WNdIz6E+GzjWZGfvs9g7rMcQj1tic2Lr9Y+iJ9JE/ydbWCuKp5
-         gbADY0103aGNyrfR/uFtF7+cZsOAaT0Q4eUlF3cIawQK/LLEZVlDzsdJMwO5niDelrC/
-         iBthyFfxBDJdzuBix0iny0V/TJ0PUXFbcQrRrVd6BC4ZaN9b0lw9iOlovBcjTklRd0pp
-         93gLowV0g6E+Oiz9wnlUStpTnPpaVnj7b5r1xJWDeDWXtdwk7hkGkVwDtRJo5oapXJHG
-         4HhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768901856; x=1769506656;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-        b=kOHIbs2iISU4yMEgRLBUnHi98K7Av2DopXYAgRTj1wzZHrZZGXlUYlZYU/s9hukNI4
-         AN3ynFDDg/1KwfCEI0T63dkluhHbEbtFPz638okkxRvLK/IjyUfbKPNyIpoUMXj6K7s3
-         ZvVwr5RhVnLrM80aQGzUanCcHzBFJaJTgDuI+2daNJmfFo8l+ekwpmnhtM2d3LZtoeqa
-         x2lhrrJLwsCnxDBP2S8xfHz1nq8yhPq4YDngYpW1t7qmvQlTJvsT9PCvlzR6zDCxAwfX
-         gh6pccZJz9xX3vHA8ZYbdohCgM6tQvfIa2EPX71bfAgzGW7B6SWZhpCqpv9bG2ky5GEF
-         ZVUw==
-X-Gm-Message-State: AOJu0YydCzbHZ+3EVEblsv2zB82VsRPtBZFPOkeKVoe6KP6HfmzLkRdR
-	T0r/JO62u6mR2zbDsC00IqPe5VjTEPvp/pC7sPTIV2kLFl/QKeVpztaFcGuElVcwa7hxXeXRcmB
-	6HHugXlzTQf9iAgle3Mr4U3D4Iuomxzo+c+hZLI2sSpwI7Zo7DnK0wY2Krw==
-X-Gm-Gg: AZuq6aJgwgSYgknpjHxsMmR31teViZiiOjxHZ5OXllQ7fceeK6aP+LgPPTozlAg55lU
-	z1gcxfjdHQ/Ma0Z4Ca55cpXzFppBBgObxRr5778YK3gX9eLxwqrLnt+MFG4ep23DMkLJ8iaUhKm
-	8c6diYpy2YM9L9XbuohEXtVDJXdhLozCbyH7vPgcJPCOm7+cwDBuLL1ri+gB+Zo7dfhQkcq6tym
-	9x5ptEx1MnqsThhcoRCyDH5HxRJyKC22bPRwibNw7w65cmQKptmb9b/N39mSRQyOZ83yIw3e7I2
-	y2jwdYGdIaUFNPpdZPgcVzGb+ffgLJSCaOeYBdqiCNe2igd4OgxYmWtHXyGSlGAxYzxAqjxcbV+
-	Q5guinKGS8ZJc7qostdmVLznqu3w5HQiYwSK6h5fh2mS11dCM7+ymo69AlEo=
-X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167510f8f.24.1768901855985;
-        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
-X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167470f8f.24.1768901855514;
-        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cefdsm27663754f8f.24.2026.01.20.01.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 01:37:34 -0800 (PST)
-Date: Tue, 20 Jan 2026 10:37:12 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>, 
-	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Simon Horman <horms@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Arseniy Krasnov <AVKrasnov@sberdevices.ru>, 
-	Asias He <asias@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH RESEND net v5 0/4] vsock/virtio: fix TX credit handling
-Message-ID: <aW9L0xiwotBnRMw2@sgarzare-redhat>
-References: <20260116201517.273302-1-sgarzare@redhat.com>
- <20260119101734.01cbe934@kernel.org>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LCzxEb+8ueeOySlg2UP4MwhwZpBa7+sdZeU/qKjCHNU=;
+	b=gTQHtTy1KnJqFDTw7HSdWYwz5u4qpI3RvpMTkOxpilHtpNbGsFn+B7muvDK+vORTC7G0qX
+	zWcK57ONMW77KQtcfIOkXbYfB8HbH4mmvbe9+MI/LbEwYQigY3vYD8u9yzAvM9TROZTtC3
+	5zBU1nk2OOahoYifL2zo75U/eZNrF0o=
+Authentication-Results: mail.tuxedocomputers.com;
+	auth=pass smtp.auth=g.gottleuber@tuxedocomputers.com smtp.mailfrom=ggo@tuxedocomputers.com
+Message-ID: <1be6caa4-abbd-4f3b-8c63-b637f0f9ed15@tuxedocomputers.com>
+Date: Tue, 20 Jan 2026 10:42:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260119101734.01cbe934@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
+ Motorcomm YT6801
+To: Yao Zi <me@ziyao.cc>, Georg Gottleuber <ggo@tuxedocomputers.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Frank.Sae@motor-comm.com,
+ hkallweit1@gmail.com, vladimir.oltean@nxp.com, wens@csie.org,
+ jszhang@kernel.org, 0x1207@gmail.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, jeffbai@aosc.io, kexybiscuit@aosc.io,
+ Christoffer Sandberg <cs@tuxedocomputers.com>
+References: <20260109093445.46791-2-me@ziyao.cc>
+ <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
+ <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+ <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
+ <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
+ <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+ <aW7sW91DrgZ6FMrv@pie>
+Content-Language: en-US
+From: Georg Gottleuber <ggo@tuxedocomputers.com>
+Autocrypt: addr=g.gottleuber@tuxedocomputers.com; keydata=
+ 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
+ bsxTTcOuRnk=
+In-Reply-To: <aW7sW91DrgZ6FMrv@pie>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 19, 2026 at 10:17:34AM -0800, Jakub Kicinski wrote:
->On Fri, 16 Jan 2026 21:15:13 +0100 Stefano Garzarella wrote:
->> Resend with the right cc (sorry, a mistake on my env)
->
->Please don't resend within 24h unless asked to:
->https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
 
-Sorry for that, I'll avoid in the future.
 
->
->> The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till
->> v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
+Am 20.01.26 um 03:45 schrieb Yao Zi:
+> On Mon, Jan 19, 2026 at 06:57:48PM +0100, Georg Gottleuber wrote:
+>> Am 19.01.26 um 18:45 schrieb Georg Gottleuber:
+>>> Hi,
+>>>
+>>> thanks for the quick reply.
+>>>
+>>> Am 19.01.26 um 16:43 schrieb Russell King (Oracle):
+>>>> On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
+>>>>> Hi,
+>>>>>
+>>>>> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
+>>>>> revealed that tx is only 100Mbit/s:
+>>>>>
+>>> ...
+>>>>>
+>>>>> With our normally used DKMS module, Ethernet works with full-duplex and
+>>>>> gigabit. Attached are some logs from lspci and dmesg. Do you have any
+>>>>> idea how I can debug this further?
+>>>>
+>>>> My suggestion would be:
+>>>>
+>>>> - Look at the statistics, e.g.
+>>>>
+>>>>    ip -s li sh dev enp2s0
+>>>
+>>> That looks good (after iperf):
+>>>
+>>> 2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
+>>> mode DEFAULT group default qlen 1000
+>>>     link/ether ba:90:88:24:49:4f brd ff:ff:ff:ff:ff:ff
+>>>     RX:  bytes packets errors dropped  missed   mcast
+>>>        2091654   31556      0       0       0       0
+>>>     TX:  bytes packets errors dropped carrier collsns
+>>>       88532451    1518      0       0       0       0
+>>>
+>>>
+>>>> - apply
+>>>>   https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
+>>>>   to enable more statistics to work, and check the network driver
+>>>>   statistics:
+>>>>
+>>>>    ethtool --statistics enp2s0
+>>>>
+>>>> to see if there's any clues for what is going on.
+>>>
+>>> That looks also good, I think. I saved it before and after the test with
+>>> iperf. See attachments.
 >>
->> Since it's a real issue and the original author seems busy, I'm sending
->> the v5 fixing my comments but keeping the authorship (and restoring mine
->> on patch 2 as reported on v4).
->
->Does not apply to net:
->
->Switched to a new branch 'vsock-virtio-fix-tx-credit-handling'
->Applying: vsock/virtio: fix potential underflow in virtio_transport_get_credit()
->Applying: vsock/test: fix seqpacket message bounds test
->Applying: vsock/virtio: cap TX credit to local buffer size
->Applying: vsock/test: add stream TX credit bounds test
->error: patch failed: tools/testing/vsock/vsock_test.c:2414
->error: tools/testing/vsock/vsock_test.c: patch does not apply
->Patch failed at 0004 vsock/test: add stream TX credit bounds test
->hint: Use 'git am --show-current-patch=diff' to see the failed patch
->hint: When you have resolved this problem, run "git am --continue".
->hint: If you prefer to skip this patch, run "git am --skip" instead.
->hint: To restore the original branch and stop patching, run "git am --abort".
->hint: Disable this message with "git config set advice.mergeConflict false"
->
->Did you generate against net-next or there's some mid-air collision?
->(if the former please share the resolution for the resulting conflict;))
+>> Oh, there was something else interesting in dmesg. See attachment.
+>>
+>>> Regards,
+>>> Georg
+> 
+>> [    0.933480] dwmac-motorcomm 0000:02:00.0: error -ENOENT: failed to read maca0lr from eFuse
+>> [    0.933483] dwmac-motorcomm 0000:02:00.0: eFuse contains no valid MAC address
+>> [    0.933485] dwmac-motorcomm 0000:02:00.0: fallback to random MAC address
+> 
+> Some vendors didn't write a MAC address to the eFuse. With these YT6801
+> chips, the failure is expected.
 
-Ooops, a new test landed in net, this should be the resolution:
+I believe we have a fixed address, as our DKMS driver always uses it (it
+is also displayed in the BIOS).
 
-diff --cc tools/testing/vsock/vsock_test.c
-index 668fbe9eb3cc,6933f986ef2a..000000000000
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@@ -2414,11 -2510,11 +2510,16 @@@ static struct test_case test_cases[] =
-                 .run_client = test_stream_accepted_setsockopt_client,
-                 .run_server = test_stream_accepted_setsockopt_server,
-         },
-  +      {
-  +              .name = "SOCK_STREAM virtio MSG_ZEROCOPY coalescence corruption",
-  +              .run_client = test_stream_msgzcopy_mangle_client,
-  +              .run_server = test_stream_msgzcopy_mangle_server,
-  +      },
-+       {
-+               .name = "SOCK_STREAM TX credit bounds",
-+               .run_client = test_stream_tx_credit_bounds_client,
-+               .run_server = test_stream_tx_credit_bounds_server,
-+       },
-         {},
-   };
+> Which DKMS driver do you use? Could you read out a permanent address
+> with your DKMS driver? If not, this piece of log should have nothing to
+> do with the rate problem.
 
+DKMS module we use:
+https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801
 
-If you prefer I can send a v6. In the mean time I pushed the branch 
-here: 
-https://github.com/stefano-garzarella/linux/tree/vsock_virtio_fix_tx_credit
+Apparently, your driver can also read the permanent address. I rebooted
+nine times to test it, and it worked nine times. So it was probably a
+glitch that doesn't occur very often.
 
-Thanks,
-Stefano
+Do you have any ideas on how I can further debug the rate problem?
+
+> Note some out-of-tree driver derived from the vendor one fallback to a
+> static MAC address[1], so it doesn't mean your eFuse has MAC address
+> written if you only observe the MAC address doesn't change between
+> reboots.
+> 
+> Best regards,
+> Yao Zi
+> 
+> [1]: https://github.com/ziyao233/yt6801-vendor-driver/blob/0efb3e86702ad2b19e7f9d19172a8e1df143e8c7/fuxi-gmac-common.c#L17-L32
 
 
