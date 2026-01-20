@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-251443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F9ECD3C5E1
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:46:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id D31D6D3C633
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:53:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 640FF5C4B87
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:36:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4819726F62
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510F1407573;
-	Tue, 20 Jan 2026 10:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA3140F8EA;
+	Tue, 20 Jan 2026 10:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FwCiG1cp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VJPrHc7I"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B38E407568;
-	Tue, 20 Jan 2026 10:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0E33F075E;
+	Tue, 20 Jan 2026 10:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768905286; cv=none; b=rVdp0apkwTo8kVkLszXTGNcFkFf0M0rO/0w/mn1dtWNarOiPlbIueM/wWq9xUFFmS05y0NO+G9B+8iyZuKRPzb1qoIJ1GMopZN/Ak4y4X7inti45um9oTdroX/akPCg017PLA9gqjUca4JwFq3VrYjTtCJtexRmP4jXwGi1XL+A=
+	t=1768905287; cv=none; b=nYMRgKi0vN/wtofAHVvcIh9ZdzYQcQmWZqAYY1ypmrQgMrJRV5zIX8uv/OlkusMrYn++CTs8Um8eY+HfsbjHEa4cYwZ5zt1j+OhkSVsH62jYdcMPflpRWJoEPZT7WgiUjcXeewvv/MzGP/o+UMdiqcKfimVzOS5kvPQNuvw4l6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768905286; c=relaxed/simple;
-	bh=2JpWh8dIf4yeI7M+/s717Byn0Z1WOd8UO8wUvY6ozzg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cs7u4hIyWUzyYJfY5QtUh0JQEXzeDVEbofRAlVbvPUblZQhOA5QXJwuijiAWiBf12lqsDGiD1Dnr+AV8P7hsHAPn8aj+JfRvm8rl/1vIvVpGZ5Kr6ssiJ9IETvuFoTjNiGegK39Kr1dTtts8k34bwRIak7uNXCwCkV577KUgTl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FwCiG1cp; arc=none smtp.client-ip=198.175.65.18
+	s=arc-20240116; t=1768905287; c=relaxed/simple;
+	bh=AwWlBBz026f2nkwvTcJ3OLUW52WxYFLm2Wz5hZ0v4yo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=G51fN7Z8tpnbmu2xk1vjukGj16UdK54O1oIiwzpS0lJ8RXhM04bClxtR93dR4C2poipCdCYQudWfxy4X/l+1Dui7s0Q+iWcaOpywwlfVEDJYBvauTCYWNoLNeLdSgvYxUpqp4UPoZ0R6oU/CURs+KZZIpqP5V87sQAKwjrgHMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VJPrHc7I; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768905284; x=1800441284;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2JpWh8dIf4yeI7M+/s717Byn0Z1WOd8UO8wUvY6ozzg=;
-  b=FwCiG1cpvEAu2wIv+6rvv2/WowrnUhqcyxDFziHnSRNARj15nzCW/qAG
-   PHi7ynUrc5rLTBfE0EMbWXsUs99Tqm5O9/tyWCk4RjZLPLUJrgbipoefe
-   CiPNN/RsbuftxxItprn83OKeLqwF4MOzpSmGgGFqL1wv/4fXT4IFrngCa
-   e8HnqBUvKPcEE9l7xb2nYrfuRGOPLq8/zflNrUk6VLAggaRPcRWhhb6xl
-   jFcubHcYISrm3U/svstWjFn1yF+PT66N6bwKox7p7E5Z3ayjEPY3B4lex
-   7jdT40lSKVw14CqdwOaPjFoD1dRL2jfGVbiYo5Mvwxnpz6AGgz29JspyA
+  t=1768905285; x=1800441285;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AwWlBBz026f2nkwvTcJ3OLUW52WxYFLm2Wz5hZ0v4yo=;
+  b=VJPrHc7IZ+ZCdKPevHmiBsBAWR6h0jwgVuuvcnKT83f9eFctmrDJFGK4
+   mcegvTU12+DW/J7dtGEC0ERogG5FbkPQZMlB2kuYxB6nBQg4bV8LTls9S
+   PJ37Yata+ojfzLZ4JBl+XXbg+Zgtavo4+kXsMD9L+9zzioiSVn0gPzLYt
+   CmzdfBhZLS76dwllMI7YNLnkGnp0bOxnSITzjiSMpE7Kgi8qdOScOSA9C
+   WJfJrHNw4OykNFovIchDGF6p2Q7xFF836tNxGvB3ej9rBRZ3qv4AQujkP
+   7ETaR9jZcg4gL9GA8fC/yqgY71iFaJ2/iXpGlVLknCHZ+A3Vb0Wub9Ct/
    Q==;
-X-CSE-ConnectionGUID: OL3ZQqUXQYy67BSaEe9+4w==
-X-CSE-MsgGUID: abXXecePTryF9l3yK5yXqA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="70161725"
+X-CSE-ConnectionGUID: 05l9kJCDQJO/J9Rg7iXS+A==
+X-CSE-MsgGUID: u70CkskgSJGIlsnwA6rvjA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="70161731"
 X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="70161725"
+   d="scan'208";a="70161731"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 02:34:43 -0800
-X-CSE-ConnectionGUID: qiPffr16S3aR977f0cT+zA==
-X-CSE-MsgGUID: STtrC8BySFmzypuaoBOerw==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 02:34:44 -0800
+X-CSE-ConnectionGUID: 4BGJFGOEQIiU8fDqeyCbuQ==
+X-CSE-MsgGUID: ghSQDjC1Qvq1JstJpuIj2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
-   d="scan'208";a="210935839"
+   d="scan'208";a="210935842"
 Received: from hpe-dl385gen10.igk.intel.com ([10.91.240.117])
-  by fmviesa004.fm.intel.com with ESMTP; 20 Jan 2026 02:34:41 -0800
+  by fmviesa004.fm.intel.com with ESMTP; 20 Jan 2026 02:34:43 -0800
 From: Jakub Slepecki <jakub.slepecki@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: linux-kernel@vger.kernel.org,
@@ -66,97 +67,69 @@ Cc: linux-kernel@vger.kernel.org,
 	michal.swiatkowski@linux.intel.com,
 	jakub.slepecki@intel.com,
 	aleksandr.loktionov@intel.com
-Subject: [PATCH iwl-next v3 0/8] ice: in VEB, prevent "cross-vlan" traffic
-Date: Tue, 20 Jan 2026 11:34:31 +0100
-Message-ID: <20260120103440.892326-1-jakub.slepecki@intel.com>
+Subject: [PATCH iwl-next v3 1/8] ice: in dvm, use outer VLAN in MAC,VLAN lookup
+Date: Tue, 20 Jan 2026 11:34:32 +0100
+Message-ID: <20260120103440.892326-2-jakub.slepecki@intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260120103440.892326-1-jakub.slepecki@intel.com>
+References: <20260120103440.892326-1-jakub.slepecki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 
-Currently, packets that match MAC address of a VF will be sent to loopback
-even if they would cross VLAN boundaries.  Effectively, this drops them.
-In this patch series, we aim to address this behaviour by adding MAC,VLAN
-to complement what MAC-only filters do to select packets for loopback.
+In double VLAN mode (DVM), outer VLAN is located a word earlier in
+the field vector compared to the single VLAN mode.  We already modify
+ICE_SW_LKUP_VLAN to use it but ICE_SW_LKUP_MAC_VLAN was left untouched,
+causing the lookup to match any packet with one or no layer of Dot1q.
+This change enables to fix cross-vlan loopback traffic using MAC,VLAN
+lookups.
 
-To reproduce the issue have an E810 ($pfa) connected to another adapter
-($pfb), then:
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
 
-    # echo 2 >/sys/class/net/$pfa/device/sriov_numvfs
-    # ip l set $pfa vf 0 vlan 4
-    # ip l set $pfa vf 1 vlan 7
-    # ip l set $pfa_vf0 netns $pfa_vf0_netns up
-    # ip l set $pfa_vf1 netns $pfa_vf1_netns up
-    # ip netns exec $pfa_vf0_netns ip a add 10.0.0.1/24 dev $pfa_vf0
-    # ip netns exec $pfa_vf1_netns ip a add 10.0.0.2/24 dev $pfa_vf1
+---
+No changes in v3.
+No changes in v2.
+---
+ drivers/net/ethernet/intel/ice/ice_vlan_mode.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-And for the $pfb:
-
-    # echo 2 >/sys/class/net/$pfb/device/sriov_numvfs
-    # ip l set $pfb vf 0 trust on spoof off vlan 4
-    # ip l set $pfb vf 1 trust on spoof off vlan 7
-    # ip l add $br type bridge
-    # ip l set $pfb_vf0 master $br up
-    # ip l set $pfb_vf1 master $br up
-    # ip l set $br up
-
-We expect $pfa_vf0 to be able to reach $pfa_vf1 through the $br on
-the link partner.  Instead, ARP is unable to resolve 10.0.0.2/24.
-ARP request is fine because it's broadcastd and bounces off $br, but
-ARP reply is stuck in the internal switch because the destination MAC
-matches $pfa_vf0 and filter restricts it to the loopback.
-
-In testing I used: ip utility, iproute2-6.1.0, libbpf 1.3.0
-
-Changes in v3:
-  - Improve structure of reproduction description in cover letter.
-  - LB_LAN masks and values no longer rely on boolean promotion.
-  - ice_fill_sw_info() deals with u8 the entire time instead of building
-    building lb_en and lan_en values at the end from booleans.
-  - Refer to reproduction in cover letter in current 5/8.
-  - Fixed some slip-ups "this patch" and "this commit" in commit
-    messages across the series.  I did not consider this change for
-    reviewed-by drop.
-
-Changes in v2:
-  - Use FIELD_GET et al. when handling fi.lb_en and fi.lan_en.
-  - Rename /LB_LAN/ s/_MASK/_M/ because one of uses would need to break
-    line.
-  - Close open parenthesis in ice_vsi_update_bridge_mode() description.
-  - Explain returns in ice_vsi_update_bridge_mode().
-
-v2: https://lore.kernel.org/intel-wired-lan/20251125083456.28822-1-jakub.slepecki@intel.com/T/
-v1: https://lore.kernel.org/intel-wired-lan/20251120162813.37942-1-jakub.slepecki@intel.com/T/
-
-Jakub Slepecki (7):
-  ice: in dvm, use outer VLAN in MAC,VLAN lookup
-  ice: allow creating mac,vlan filters along mac filters
-  ice: do not check for zero mac when creating mac filters
-  ice: allow overriding lan_en, lb_en in switch
-  ice: update mac,vlan rules when toggling between VEB and VEPA
-  ice: add functions to query for vsi's pvids
-  ice: in VEB, prevent "cross-vlan" traffic from hitting loopback
-
-Michal Swiatkowski (1):
-  ice: add mac vlan to filter API
-
- drivers/net/ethernet/intel/ice/ice_fltr.c     | 104 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_fltr.h     |  10 +-
- drivers/net/ethernet/intel/ice/ice_lib.c      |  56 ++++++++++
- drivers/net/ethernet/intel/ice/ice_lib.h      |   2 +
- drivers/net/ethernet/intel/ice/ice_main.c     |  56 +++++++---
- drivers/net/ethernet/intel/ice/ice_switch.c   |  79 +++++++++----
- drivers/net/ethernet/intel/ice/ice_switch.h   |  13 ++-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   8 +-
- .../net/ethernet/intel/ice/ice_vlan_mode.c    |  12 ++
- 9 files changed, 295 insertions(+), 45 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_vlan_mode.c b/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
+index fb526cb84776..68a7b05de44e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
++++ b/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
+@@ -198,6 +198,7 @@ static bool ice_is_dvm_supported(struct ice_hw *hw)
+ #define ICE_SW_LKUP_VLAN_LOC_LKUP_IDX			1
+ #define ICE_SW_LKUP_VLAN_PKT_FLAGS_LKUP_IDX		2
+ #define ICE_SW_LKUP_PROMISC_VLAN_LOC_LKUP_IDX		2
++#define ICE_SW_LKUP_MAC_VLAN_LOC_LKUP_IDX		4
+ #define ICE_PKT_FLAGS_0_TO_15_FV_IDX			1
+ static struct ice_update_recipe_lkup_idx_params ice_dvm_dflt_recipes[] = {
+ 	{
+@@ -234,6 +235,17 @@ static struct ice_update_recipe_lkup_idx_params ice_dvm_dflt_recipes[] = {
+ 		.mask_valid = false,  /* use pre-existing mask */
+ 		.lkup_idx = ICE_SW_LKUP_PROMISC_VLAN_LOC_LKUP_IDX,
+ 	},
++	{
++		/* Similarly to ICE_SW_LKUP_VLAN, change to outer/single VLAN in
++		 * DVM
++		 */
++		.rid = ICE_SW_LKUP_MAC_VLAN,
++		.fv_idx = ICE_EXTERNAL_VLAN_ID_FV_IDX,
++		.ignore_valid = true,
++		.mask = 0,
++		.mask_valid = false,
++		.lkup_idx = ICE_SW_LKUP_MAC_VLAN_LOC_LKUP_IDX,
++	},
+ };
+ 
+ /**
 -- 
 2.43.0
 
