@@ -1,199 +1,187 @@
-Return-Path: <netdev+bounces-251489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKKrJJIpcGmyWwAAu9opvQ
-	(envelope-from <netdev+bounces-251489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:19:14 +0100
+	id oHRoGZx7cGktYAAAu9opvQ
+	(envelope-from <netdev+bounces-251490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:09:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFFC4EF77
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:19:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF48529DC
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BBCE905C69
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 13:40:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 914135CB937
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 13:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC0B42E01F;
-	Tue, 20 Jan 2026 13:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F806426693;
+	Tue, 20 Jan 2026 13:39:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p2KvMF4B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rk8i5ZQN"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012018.outbound.protection.outlook.com [40.93.195.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC427436347
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 13:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768916224; cv=fail; b=e5OFXxv9BjxxGR/svLbkajCxLOIBq15laAfZwQkgxEo+sSN6wOu4GUo+QVzdmCKwyXYqksc5WeOQgeRsmOSOEntfLX5ftTzlTtBEU6zBtLhsXmyc4L2MIFfSwwfEjrML/76Orvb1qnrj7PLfuVuoeknazwpHEXOWKoqf8mZXIGs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768916224; c=relaxed/simple;
-	bh=lp8TRzCbryobFOw5wbUQ80LQoTuBHFyGP4rk6EEqqqk=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=po4gl/+tfrjBY22G6YfAnbjVCRQE3vZSG7jykmak04eUJcmTIzeBouFTzl6ivmW7wsj1U1jmmYPbJSYGmbDSlJI7SW8uXqzGGrM/IBPleCikkvKLW7bYx8LvNeJ+pW1aONdPIbA+AC35p8/nkhiyqp5FQ1PN1YQqIGkcXb2+8Bw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p2KvMF4B; arc=fail smtp.client-ip=40.93.195.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AtcgQ/N30oAZVUJjPV5AONfN7clfqbZd2Pukz1fT7L0hdrKSNQePYMGmz/sKs28CaTWGKtk4jRRbf2gfzaqTnA/SOgIT1cCqasCiLD3m6jL340xBzhI+exSpuXSS83unJczICkMMbwz4iSlveijNUSYgHC9dkpVzNKrNF2r7fzDzVxXNP58ijAC8BXtWJCnmm/vtxHautoHIq6yvsqtQT0NY1/EauW3PuBQ1yIpGzlPAV7VzH9u27lXUW6RY2kCloP4JV41GEEEIbyO3IlYS0RwNfO1MA4r2d+qkkpnwF21fxuS3TzszwTYqECYandoHzFtonj1GZeoEcoCu1iSVOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lp8TRzCbryobFOw5wbUQ80LQoTuBHFyGP4rk6EEqqqk=;
- b=nOEmpqdCbXtrhTibdnAYIaxghz2lcWgV5s200uXhWnJVl5AFEOTLM5GMFluYSUrtjcxUzzEOG7RddH8BkY9Ubcbxnfxq1DJBuvz2DnWb2SAI8Q1bUvb/bpg0gRp4xNyRfavdr2w3ZPjU6BhAgxcN9Z4zf9BQ9ckqy9QipOUCokDE1oHYsugDwaKtO7CPpgyAMvrP19rFFj8uvIMCqmyjItqT61DdvGAfAFW9bnH/FzBf94XSPninusbklQL4BI2vYGU7JX1NpwzR+Y2gviN3G11Sw/dWf2XBNqIOIY9nW7DLqdTnp19TFBm7GIR0L+y82pZzpp79t1IIgsdiQ8epew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=blackwall.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lp8TRzCbryobFOw5wbUQ80LQoTuBHFyGP4rk6EEqqqk=;
- b=p2KvMF4Bf9bbORQay8pd3hKI2hdPJ0M6FvR6AdyCWIIiXeNzYi1ER29M3eSPWktTjPP7jswsdw2QnHGPCmBAH0bV4qZiWDytfz7ryyyOP7+lmOetm0k1f7kQHhPxOTTs9yMfRFILExn/MIlNl/5QI3h4S2P1ck2diQuzgf6t0e7Ha8I/hoJ+/q8JmDbKxp45a47LGeSVUqhkxcUGRPqpJOuZfMCUo2DnMB6qexfUIZH/kDmnrbHgypB8WX1F7ICf3DYq/iIDDH+hmuMUJFcZu51KoYm9Y1xeZm1/FKUWWbaqlZcHwcTTjy7xl2zCMjv8cIptabAVVemnC+lzkWoBsQ==
-Received: from DM6PR01CA0005.prod.exchangelabs.com (2603:10b6:5:296::10) by
- CH3PR12MB9283.namprd12.prod.outlook.com (2603:10b6:610:1cd::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
- 2026 13:36:59 +0000
-Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
- (2603:10b6:5:296:cafe::af) by DM6PR01CA0005.outlook.office365.com
- (2603:10b6:5:296::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.13 via Frontend Transport; Tue,
- 20 Jan 2026 13:37:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.4 via Frontend Transport; Tue, 20 Jan 2026 13:36:59 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 20 Jan
- 2026 05:36:47 -0800
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 20 Jan
- 2026 05:36:40 -0800
-References: <cover.1768820066.git.pabeni@redhat.com>
- <e3738b0f-a18c-48ff-993d-eb8a1e989dd9@redhat.com>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Simon
- Horman" <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, "Willem de
- Bruijn" <willemdebruijn.kernel@gmail.com>, <sdf@fomichev.me>,
-	<petrm@nvidia.com>, <razor@blackwall.org>, <idosch@nvidia.com>
-Subject: Re: [PATCH v4 net-next 00/10] geneve: introduce double tunnel
- GSO/GRO support
-Date: Tue, 20 Jan 2026 14:30:11 +0100
-In-Reply-To: <e3738b0f-a18c-48ff-993d-eb8a1e989dd9@redhat.com>
-Message-ID: <873440iexn.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56962344025
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 13:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768916390; cv=none; b=aJjTrXDoT5ZkJcYqFDxqzJ1nKdq5lzEXX9qpSaVAxEFBaNmIj8Cuc+IqfytqkSPe0nxKm0RTabswNkn7t6oqrVctK09/RgFS8/F8D3UlR/AZtivzT99JewkLhnUiIzk7d9cXDztUxrFM6caP7pkbPainViNmGzBSQqTG2TvWwMM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768916390; c=relaxed/simple;
+	bh=pbO8eNAYDGYW5sX787ND9xeTQ8SshIYR4qMQ+fZMQ60=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t5skiLWWXxDRjo48T5igjRrN7IT+OvVBgitppB5AnoKIeaVf8clu1QfLqI3o6wjG9x3v+GEjESuhXDH8/p71U6JATzn+MNtahbewEFThXl2ljZ0seVC4bw+CJfYTgRLRxID5c+F6Krb/TfvOtnPFgHlQsZmgS1ZNNN9R2eEHebE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rk8i5ZQN; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-81f5381d168so4835439b3a.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 05:39:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768916386; x=1769521186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dsGr9dkGYMgZzi70MY6htwKKf+SUzE4Qn2hRD6kPTBw=;
+        b=Rk8i5ZQNrtuVAcil/0lI5fJ6CJTtLsf2WRnIGSHPzhFwjUW9ciDwjRDvZuV55VuOYQ
+         r4yBBRbkPWs0lANygYtCTHVnbT9fB/NG1+JfREoJUMl7dyAYj2idG0tP0mCT7NAHaIsX
+         vndtwih30SIvIwV61xo+hlQyfxRHgj3onXeNI9ijvbp+us0+3BtQ5nZ+tUq/SctXaKEp
+         CRr/dJ95S2TPwJNpm3gBQPqqHgV+t3gEkO/I/70xhU4YgAwgj1YHbcAeTsIDKBlcdwep
+         TEs4f6f5S3whxXrnDpgYDpV4XG2yq28vgTRpX11Xk0rJqC11x1hhrEK0nveym3T7lfr8
+         ocog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768916386; x=1769521186;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dsGr9dkGYMgZzi70MY6htwKKf+SUzE4Qn2hRD6kPTBw=;
+        b=ZuJ1CfAbOtRHDClBpEcmvJXsj1holFcKZFkNxU3THCspI20tcdVLGBau6VBo+CK6DT
+         zftrE4iJ33zyRseEIvuxXfIfMNhuF/h10dTScP65JYATxqgBc6o+ZZ/oanGuU3i1CLSL
+         NpW7QlezaRdBjRhDkzMphvB4/TM2x1rD2Q9rKEJKENhQ0RXEw9pEwH+4C+2E+CnnZQta
+         pdWQ3gtEKgwpFwHz45QBIPOnqxltA+D1FqiqnOjAkb8hDIK7f8LpIYkrScrA9JUOHQ3R
+         yAjNMduE/jDMsc7e/N9AjiB2YV3UAIeL3V1tkVaM1rqpipjbtb8Q8IsitrCrXf37xbFB
+         iwhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUkLNJab4ni73/dPDA95MK1X8bA4CW/bgg+ZUDwUFhFRDDcGlT03OFa2EmPpfLrA+O6UBGKjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4j4oD6ut0ipkFPgDlHJdQKiUiBpx+1Uhxl6XbKYTzsiaaZC7S
+	xBAYyq4WdhI7i3iLbJXqgnmxxN3Y6UtPx6vqErcCXi5b9CKkjYvxIp5g2MvIwQ==
+X-Gm-Gg: AZuq6aL+Q9tGMo3ap74gUmAAPd0S/HmDF7n4NR4gip7Feiblh/NcO67PIMw4mnetEa3
+	M0WJW9oLiUmEPnMgpaevgyCMfOy59WqzwXXDLPDmzuA/jGF3Ip9LE6kia16/Whn1jkXZm54j1qT
+	u7fI5AJSne3Xos2c5ucF8q6LuAdo+uobx9FamhRfdZi2nwp7k4br9J5VQFXDobheiqLaWsbUlaD
+	aaEaqaQGcKkO4GZi83Cy0FLbqMKDSrslTQtOWTMrPP0qQsB2HON4rqvFqrpF7gdxjzrM9JbSdSy
+	j3QnBWbXKv2WrdQmgh1HjwwTSEPYf7Xk1VgqZIRpJfFZRqdIp87HP/2H+vJbDCH4xYjrHXxPJRC
+	cJ1oRoCJeuJ0X6fkxWU55kDYYrV9nl0TxfQ3Y09g4SUQqMhWP0du4h7sKLzH2f0RHnNSUCVHULX
+	o=
+X-Received: by 2002:a05:6a00:1a89:b0:81f:b1d4:b486 with SMTP id d2e1a72fcca58-81fe87b2883mr1615438b3a.8.1768916385606;
+        Tue, 20 Jan 2026 05:39:45 -0800 (PST)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81fa1094e23sm12322373b3a.4.2026.01.20.05.39.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 05:39:44 -0800 (PST)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com
+Subject: [PATCH net v2] selftests: net: amt: wait longer for connection before sending packets
+Date: Tue, 20 Jan 2026 13:39:30 +0000
+Message-ID: <20260120133930.863845-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|CH3PR12MB9283:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5333947f-46d4-4987-a7c8-08de5828fca8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?yWciT5XKkUH16dmm/2dJdsASBUScAKIFARKPAZLuZueKpZ4BWRLFvFnrhUM3?=
- =?us-ascii?Q?mvj/bEZXruD44T62tARz677hUlL+47NgTNix78Z8Po3pUKZ2H2lZWruSNDIz?=
- =?us-ascii?Q?VB1GM5oJbGEez9/oF5dHq0qPiqEqBxmFTNhAejNhdtS4ZzFn8rRtfMsS+2rq?=
- =?us-ascii?Q?ZwpTNSXl5DoWjcQ5GE13PTQdpnpBRhJKblMnBjsHje23sCQ8AajVff0OkeK6?=
- =?us-ascii?Q?Ym0ORYbwtDujW8iTDILO9nyPH/dKWc7X7RDfLI5edhp/BAJBtGkrcj8ZLPgw?=
- =?us-ascii?Q?3QSV9r1+Uzd7dg/FEdpSpVKsbVQRzoWF7KlUzFFqZ0gHS9ddEFtnnWTztaji?=
- =?us-ascii?Q?AkVPrO2shNxDPEG28BgW1qrTxcxuNCJMIBB/AcBUBYpslWIV0++Hd3f+Ei5c?=
- =?us-ascii?Q?gB5NaQLoBz1l0G3/kQ2hehbMQFbP3tDEQcGpiJXxsRta+DvLwqszLNfTy1T7?=
- =?us-ascii?Q?ZUjIhlrOIt3njqYxi1NJ6e0Y0otP92WOFyF+k6W9hScV3E1IIAfjPucHrgbD?=
- =?us-ascii?Q?/eQgp78sHOex6zo5gMKinV6HvdaVwb8Fre+YR9ISi6e308LWmStzjN4Xo5gl?=
- =?us-ascii?Q?cVwBg6MZ7RjPEXUEEZ6jvP1JXP9MvNrKKK4z8QjDPm9ncbzFzBrVRM2a2dVf?=
- =?us-ascii?Q?kGoD4BsB+ZrS/0VsNx0cOBpgyDwS81WcS09Rg1jgNUPpBhDNQY3sGo3zpP/+?=
- =?us-ascii?Q?1hX4ktC4KZKOJHStE7dV8C8K15oFIIL7ZD2dCRmfWhTZ0Jy7SoQOpqXRvPkq?=
- =?us-ascii?Q?slicXzlVXcYgpKsrqVi7VOBBI+QhRfHvYlKXz941O2BJBC4wxsOp0vtG5VP3?=
- =?us-ascii?Q?Bktxe04Bkivw5AUGv57QrakqnsFa647ORyT4+EVGCKkULgn62GuNrnYRTQI8?=
- =?us-ascii?Q?KxayVNXa5bmQIMZoRsvUeG6cDd3h5Gb4FDjUk2xfFc0s1FHE0C4kkcVV4zha?=
- =?us-ascii?Q?87EMEmtMekScCn0UN2Ku9lqlsS1A0SNgZsfBFmR5xUmWQTmKuxyFiNw4F0Gq?=
- =?us-ascii?Q?OPbXqXnITEvrjYk+btZpkQFn3knVQijZdrEZv6QJyzAhDE8uMWO3EW1g81FY?=
- =?us-ascii?Q?I2ziNHiiDHp6KnFZ8i4c/uLiOlbP2HvF/SdHfnplsMxPa5HntMQWt5f5+Z0I?=
- =?us-ascii?Q?ZxMdQdUoDgu/ZSiGDIQEEHyeezyIt4HMlL7XAX8b6bLzxyRwX9qx6mYfdtcg?=
- =?us-ascii?Q?ThzhUHDrEBpdQp3xWkcMdhKvM/5eKfdSooujt1fGC1631om71z4o4zwCX7C3?=
- =?us-ascii?Q?UWzAlf3bUVEOWc1dnV51sCFxQ104JV+l4rva3CJXHUFUSCdyvqbAYxBUM3uG?=
- =?us-ascii?Q?NAxWijntyy2Vheaw0uNVxc2ynKsxCXVqgZigoZky1+qeg2PgJaQb05RrD/PC?=
- =?us-ascii?Q?BlangWr1DerySis3Hx5IkBolkyJCKi8z4FX4TQLpy4KfMWn0AnzWVv0Wufas?=
- =?us-ascii?Q?1KiYvrBM56xLXiOAarOHZ61zeT3NusyCOmXa015NIxcG1uooJFmDxzYbgVPk?=
- =?us-ascii?Q?VCv/2srg/zucJOXb2w8KGW79U19PmrDJap0ft6c2CGZ5g9ZqEF26SULVLNjL?=
- =?us-ascii?Q?q4MI3OYR/0/bWLxTDRjNibd9nmpzp4AKUijldH918al6zyevwL4LGMHHUhBl?=
- =?us-ascii?Q?wtoMFHej/cpdvrXEaeCuemYSDkSjQnLGu+Vg8DokzAlk9saJ9JAeb+0Kt2qD?=
- =?us-ascii?Q?K5u3hQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2026 13:36:59.2580
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5333947f-46d4-4987-a7c8-08de5828fca8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DB.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9283
-X-Spamd-Result: default: False [2.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch,fomichev.me,nvidia.com,blackwall.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251489-lists,netdev=lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[nvidia.com,reject];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-251490-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ap420073@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 0DFFC4EF77
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 0DF48529DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Both send_mcast4() and send_mcast6() use sleep 2 to wait for the tunnel
+connection between the gateway and the relay, and for the listener
+socket to be created in the LISTENER namespace.
 
-Paolo Abeni <pabeni@redhat.com> writes:
+However, tests sometimes fail because packets are sent before the
+connection is fully established.
 
-> It looks like the last 3 patches did not land on the ML. I have no idea
-> about the root cause. I'll wait a bit more and I'll resend the whole series.
+Increase the waiting time to make the tests more reliable, and use
+wait_local_port_listen() to explicitly wait for the listener socket.
 
-FWIW I didn't get the last three e-mails to my e-mail either. It must
-have gotten lost somewhere along the way.
+Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+
+v2:
+ - Add wait_local_port_listen() to both send_mcast4() and send_mcast6()
+
+ tools/testing/selftests/net/amt.sh | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+index 3ef209cacb8e..663744305e52 100755
+--- a/tools/testing/selftests/net/amt.sh
++++ b/tools/testing/selftests/net/amt.sh
+@@ -73,6 +73,8 @@
+ #       +------------------------+
+ #==============================================================================
+ 
++source lib.sh
++
+ readonly LISTENER=$(mktemp -u listener-XXXXXXXX)
+ readonly GATEWAY=$(mktemp -u gateway-XXXXXXXX)
+ readonly RELAY=$(mktemp -u relay-XXXXXXXX)
+@@ -246,14 +248,15 @@ test_ipv6_forward()
+ 
+ send_mcast4()
+ {
+-	sleep 2
++	sleep 5
++	wait_local_port_listen ${LISTENER} 4000 udp
+ 	ip netns exec "${SOURCE}" bash -c \
+ 		'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
+ }
+ 
+ send_mcast6()
+ {
+-	sleep 2
++	wait_local_port_listen ${LISTENER} 6000 udp
+ 	ip netns exec "${SOURCE}" bash -c \
+ 		'printf "%s %128s" 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6000' &
+ }
+-- 
+2.43.0
+
 
