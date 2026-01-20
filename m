@@ -1,323 +1,305 @@
-Return-Path: <netdev+bounces-251540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251584-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4M5EAlLAb2lsMQAAu9opvQ
-	(envelope-from <netdev+bounces-251540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:50:10 +0100
+	id sCx9I2zSb2mgMQAAu9opvQ
+	(envelope-from <netdev+bounces-251584-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:07:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3639748DA8
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:50:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD57F4A03F
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 24F1846D5BA
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:34:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CDF10A81BBD
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7AF44D6A6;
-	Tue, 20 Jan 2026 16:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDv9LIz0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DC53C00BB;
+	Tue, 20 Jan 2026 18:26:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C281F44CF39
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AEF33B97B
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 18:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768925965; cv=none; b=XdJWHSQPBi6hUwEq5GV2/H/y+RqCt+3RpccdtiS0tzxhIeULz6hoe9DzkllKvLX0u1d93F3K4wgLKlr53NMXLPzI7nvA+pssbVtIQYRaD3krIuBZAFQ/nl8PkUYgv/Ohm0wqv7/lUquDuNT/Ijs/HAHrPLfASAfNYLHslPupPzg=
+	t=1768933603; cv=none; b=cSe5NY1IQn0cNRNhYoKTgBZGC5VaWBeJLThN9WZOVVBLT9zPVABZtuzfKLwphJ8xes5VrFyDaewwFsM1i3TdW3Y1W67xHH1DEmuZeZCEFHQprqh3eMMhQFYACBdBXN0ll/UsHY/BcAMgxekqaxbYYmeRDPisvx7Dgar7D8ZhKw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768925965; c=relaxed/simple;
-	bh=0Ze5qPbZr/CD4GrrNtSahxVQmMNdSSXiafXF63g98Lk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n6lyTNtobF/V3FQu+x6orpuvM0egLYoQkC6Pw9Cj1ipoeJmEPjiUduXKvnzBoJyi3dEdHWEzh17qaoeDouqqNdCnfk3e3QT0BUA//sHYDXF6LXX36OFpIGfWEH3IkxbDfiaOzWRsi8DOUtES0fWvHXP0fEPizUncDn/WhcRfExI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDv9LIz0; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1768933603; c=relaxed/simple;
+	bh=URguZv+z+GzFNe+cJ2zMPSHRjgwbLnOTJ/PrC+X4qs0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=JEAA0r5fZK930F9y3xcKvXCHJx+qw+0H3GyuSD6MeXa1IGcSM94pEvpzfFHa6We4OtFKy8MkSjFs5vJAJ56b3CqEphaJAV3hSdOsDEzdpsgYD8CssZsvRuiNIGy+LsIjnBa8MBUe6uJjwJ8sGtZkS0mjeXW4YDRHjCkICiIBjAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-382fb6d38f7so40040201fa.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:19:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768925962; x=1769530762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CnU6wvo/eukSL1UUkOOfW8Bq0esgoFWYEdwYnwASYLM=;
-        b=EDv9LIz0jebmRTeqlSTiSlo9KCbNPAqsTeRjOCZ5o5mZbxt2syKM1o57wSW5VSi4M2
-         Nxx2OK41Y/FCTelO1720lbAkOtVFk0CyjYIgLJYhNnTNx0K+osdUZB7Gvkw9wIYJUbi/
-         5ArC9eA4YkBfI/rKoHeOy8K4FU7EnByCuBbq6Yx2eF7TB95xUdKJS5ao5POfCfYhUwGQ
-         ACgmP3XSEWkPnbnGFX7TmvsLpeAxIDG8miQzLhGWROEPTg3kVzVbMF1f+5hnmYXH4o12
-         +qCgSDfQOIU6AOMER/kvIYiIP9M82B9015oITc5FyBhK2H4oRjlRdFgds4URUDGLGGWi
-         jifA==
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-81e93c5961cso4710984b3a.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:26:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768925962; x=1769530762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CnU6wvo/eukSL1UUkOOfW8Bq0esgoFWYEdwYnwASYLM=;
-        b=GjWqw+3JcIUWUf7z+YRXYOT+Ajq3nkfp5wSGh+1EwzRSHmmk9Iv7LIdk6yrkgHAJQK
-         pwDhlcyX+DupRZwkkfpZpZeeCs1nk7TOdtgw6lKl7Y56756vte4uF4dTgvgc9Y/s4Nae
-         03GZ7hn/2iZx5/QeI1er5sj4ihuBnLHJusHNmXPE5OSIzE3S1zfJT5cdjWRg2/lhuAnG
-         JjrhWlAJxV+t8+qRf5LB9rCJ9ZXkU9QvV/dRn7ypI7Ev993OJ1FnV60NKxxtnV0mS1v1
-         ipu4zIKK+vdJT2myWuMDbVWg4LRz0INroESMgy/n2g9bEhrjnE1wVi5Ar49kgz8FLVH0
-         vykA==
-X-Gm-Message-State: AOJu0YwXdavzsWslForjdu2A/iJtSUHtLuPS0EAS3gTa8ItuQorHOI66
-	56t5JPRrjOriF5wLiNuQaltgR3xUlyWRb6GhAjrc4tU52W2+X3WKQO6qlXtlihr0
-X-Gm-Gg: AZuq6aLFnsqcxbrFpYJFEp1ZdX/Di193AQxtvV4fLih3X75usvUqIY4NOziym+HLG4h
-	jcpO4Cu6fFzQincBkfaX07FwS2TYwkBW96BHcSE5o4Umn3Xz8H2zIaeF3y+qzqzC3hIRhs40dRr
-	ziSmltPMAdgYxc0lHnUA7fOKU4XTOe4zM6wrj4Mo1gcUBovzWUonfu0mqF5DOdGHb9EjHLR0ehw
-	CEb8d8k5xDLyej7N3mCzSCo7Yr2MlSCaiOB+oG+zEg9BYCO+87IrbgBL/cyh/jejBrqnlZS+js7
-	JEmUS47/564K1KqSakcAQ9syhrNRcJTwud3eFkcTJYyFn8dw3GfwrvUSeOay+RlTK6JYgJ2pRvM
-	GHln/XnaKDQajYI11S7VxWXTQVpeUXCIeJ7L/LSbF+EiNny5iQi/AoilmmKck8sxRzuPaCrRpUp
-	t7IFDYBj3aBIi74fSP9+RtgmQFTYCyxgXvfNjb92sHyXJ90A==
-X-Received: by 2002:a05:651c:221a:b0:383:5ea:e9be with SMTP id 38308e7fff4ca-385a54a1bc0mr9036821fa.32.1768925961392;
-        Tue, 20 Jan 2026 08:19:21 -0800 (PST)
-Received: from huawei-System-Product-Name.. ([159.138.216.23])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38384e790d7sm40561531fa.24.2026.01.20.08.19.20
+        d=1e100.net; s=20230601; t=1768933601; x=1769538401;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=04o5YPIM/ynG9CDHLB19er8qSsbuftkYbcHCNFB6R4Q=;
+        b=mi7sU6SyA0r4uNdurNJOnoKlmD3CjivWWht39iGpqdPmqoiCPsFzLVyha/CsMzwtp9
+         qQI26kEEGOyS2bHJ74n5b1LPEPC+XFI4Qq40S9idXlCE80plLfU+Rhz8yMimGTCtYAP2
+         JhHk3nYLFkylSztIa8W9N4tLVaMNIkGGoIHl+4BnTSKjH3czBQqXb4v+QfrsJfnGgl2r
+         38shvC1oX20FFZL9nfCuEBMrgGO2ZoPrFMvV+lOnE3Yn0NMsk4KqKNWw1xU0Nft1uQn6
+         hCzfcWkOuIE+e9qIDU2XYNty5Sc/IduxNcJ/snhAUwnxDNLipH6IuxWJamTTS0DZr6V+
+         LOjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVWWsf6LOjAulixj1Vur+lvhXW/oXyifydYcgBYw1UCfypiTMwVgwhmpVBPwfMY8aQzjaiTQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIgkshGEpNdhRt9TcjtYm+VS+j5emmfGl1+LXGQ2c8jFTNFz7A
+	uRdEUYFmOJPKv9rDpJd4YFRTpQihvCJHi+J7oVvTsRXrYQeVcOH9sLl1
+X-Gm-Gg: AZuq6aLfA4BFscAVaNA7Nc/COj5ZxaHqx7mvuiHpn4ASY8jiXYCVN5cnWVSpEH+OfWM
+	NfaM/a9QgKLnscMixqAge8/+EXf/4Bqjzya9vkQcAfIqLRnBIVtihqbd9glbdYbhAUa6cJXE/VN
+	p2yNov0G57GKVCbrGBYLH/5n2a1pbLzJFqkKnjFli700SuMJOwZFkZLI5A7vw7/XEpF7eFjL3pB
+	FAZVz2KrloaRhIj1PYTB7Rbzv7VXW6SA69X62arc7BIAmjB7KJhsb9bvDuVedzlHtO0TRH4za/m
+	H1UJ8AJHqL6sFhu1Sm1nmGTFCq7y027qWX6A/DkkWSi0C1ft5tmyZPdgw0QdoGPfdQvfDiRPTtv
+	4gaJ3IjATN1chV6SwlNvziUxmcYR5+Bub290QESY8N2ZwY3WVqjgjklGQkF5f9SQUM6ORPyJUd1
+	80FWPdqLKDtL7x
+X-Received: by 2002:a05:6808:bd1:b0:453:7a2a:62cd with SMTP id 5614622812f47-45e8aa74004mr810527b6e.50.1768926248216;
+        Tue, 20 Jan 2026 08:24:08 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:53::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044bd5b00esm9168566fac.15.2026.01.20.08.24.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 08:19:21 -0800 (PST)
-From: Dmitry Skorodumov <dskr99@gmail.com>
-X-Google-Original-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 3/3] ipvlan: common code to handle ipv6/ipv4 address events
-Date: Tue, 20 Jan 2026 19:18:36 +0300
-Message-ID: <20260120161852.639238-4-skorodumov.dmitry@huawei.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260120161852.639238-1-skorodumov.dmitry@huawei.com>
-References: <20260120161852.639238-1-skorodumov.dmitry@huawei.com>
+        Tue, 20 Jan 2026 08:24:07 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Tue, 20 Jan 2026 08:23:49 -0800
+Subject: [PATCH net-next v2 3/5] netconsole: convert to NBCON console
+ infrastructure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260120-nbcon-v2-3-b61f960587a8@debian.org>
+References: <20260120-nbcon-v2-0-b61f960587a8@debian.org>
+In-Reply-To: <20260120-nbcon-v2-0-b61f960587a8@debian.org>
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ pmladek@suse.com, john.ogness@linutronix.de
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, 
+ mpdesouza@suse.com, kernel-team@meta.com
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5459; i=leitao@debian.org;
+ h=from:subject:message-id; bh=URguZv+z+GzFNe+cJ2zMPSHRjgwbLnOTJ/PrC+X4qs0=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpb6widhBlttuzOawbHxAveWRni5+IZPIISE4jr
+ 8QIE6VCjaCJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaW+sIgAKCRA1o5Of/Hh3
+ bWNTD/97j5o5CuRXZxOvUp9rq3WeHpW32Bs2KxnvW29M7PYhsa2Pw/c+NyqFAP0OxkfxHxeLwX+
+ BbBe5OlpBebjbryO0kzQdXnNlOpolQanFpaNExqtnqdqWpvhtO3DvtEefBESftjwQemUg+QCjPG
+ aA3bpuILcNA6YZOTa10lBD2doTuh7wSO9OcWTc6ywxHwXkRdTYE9BoR3eCZ3ElVXw8V0MA9O65o
+ PN/wcDm1njBNl+Y2h7Gs/fZDuM6mZPUJEVo5zIB02sPwv2Jhj6Jd7QZ4DgtIUlMm03n9gOwKSj2
+ wZEOS/XSDrTSaiFs8ZPypV/s0oHM5XVHcGsNSlu8k1qrxYgS5xLW8QNs+c+urFD6pm3nvIt+BbP
+ YLA7RdiUYVuP1zWQHguMTm7GrLvGK9VDFsc97fn0y/OQIjGP4C/IY3uRM+hHaSRmnfaL+J5ndku
+ 1B/OslgDhCOK+r+2wrIaGFIUpRLpSm4D/H1ucPT8LR3Nvb6ksGFvfg+F/nqnWZNToSH9uDlMA08
+ n7CIf0tfiWkFf/Ey/hbcGejXtQ090KBnScZyxPExEEnZ28WnPMEibrBi4Bo7JhOykoaGlsg3jpI
+ Qzz2tMQnq+hcJ5zHsmJQwqcxuUkbxKcDIDL6VH+g47UBWRrZ1E3vneiHumEJ4WBU59teLt/VlCs
+ zKTK06U/ezAuV7A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Spamd-Result: default: False [0.24 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FREEMAIL_TO(0.00)[vger.kernel.org,kernel.org,huawei.com,fomichev.me,gmail.com,google.com];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[debian.org];
+	TAGGED_FROM(0.00)[bounces-251584-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251540-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dskr99@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,huawei.com:email,huawei.com:mid]
-X-Rspamd-Queue-Id: 3639748DA8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: AD57F4A03F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Both IPv4 and IPv6 addr-event functions are very similar. Refactor
-to use common funcitons.
+Convert netconsole from the legacy console API to the NBCON framework.
+NBCON provides threaded printing which unblocks printk()s and flushes in
+a thread, decoupling network TX from printk() when netconsole is
+in use.
 
-Get rid of separate functions for ipvlan_addrX_event()
-and check whether we are called for ipv4 or ipv6 by
-looking at "notifier_block *nblock" argument
+Since netconsole relies on the network stack which cannot safely operate
+from all atomic contexts, mark both consoles with
+CON_NBCON_ATOMIC_UNSAFE. (See discussion in [1])
 
-Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+CON_NBCON_ATOMIC_UNSAFE restricts write_atomic() usage to emergency
+scenarios (panic) where regular messages are sent in threaded mode.
+
+Implementation changes:
+- Unify write_ext_msg() and write_msg() into netconsole_write()
+- Add device_lock/device_unlock callbacks to manage target_list_lock
+- Use nbcon_enter_unsafe()/nbcon_exit_unsafe() around network
+  operations.
+  - If nbcon_enter_unsafe() fails, just return given netconsole lost
+    the ownership of the console.
+- Set write_thread and write_atomic callbacks (both use same function)
+
+Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ipvlan/ipvlan_main.c | 112 +++++++++++--------------------
- 1 file changed, 41 insertions(+), 71 deletions(-)
+ drivers/net/netconsole.c | 97 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 60 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index dda891911ea4..88b32998ce54 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -905,93 +905,45 @@ static int ipvlan_addr_validator_event(struct net_device *dev,
- 	return ret;
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index dc3bd7c9b0498..c5d7e97fe2a78 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1709,22 +1709,6 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 				   sysdata_len);
  }
  
--#if IS_ENABLED(CONFIG_IPV6)
--static int ipvlan_add_addr6(struct ipvl_dev *ipvlan, struct in6_addr *ip6_addr)
-+static int ipvlan_add_addr_event(struct ipvl_dev *ipvlan, const void *iaddr,
-+				 bool is_v6)
+-static void write_ext_msg(struct console *con, const char *msg,
+-			  unsigned int len)
+-{
+-	struct netconsole_target *nt;
+-	unsigned long flags;
+-
+-	if ((oops_only && !oops_in_progress) || list_empty(&target_list))
+-		return;
+-
+-	spin_lock_irqsave(&target_list_lock, flags);
+-	list_for_each_entry(nt, &target_list, list)
+-		if (nt->extended && nt->enabled && netif_running(nt->np.dev))
+-			send_ext_msg_udp(nt, msg, len);
+-	spin_unlock_irqrestore(&target_list_lock, flags);
+-}
+-
+ static void send_msg_udp(struct netconsole_target *nt, const char *msg,
+ 			 unsigned int len)
  {
- 	int ret = -EINVAL;
- 
- 	spin_lock_bh(&ipvlan->port->addrs_lock);
--	if (ipvlan_addr_busy(ipvlan->port, ip6_addr, true))
--		netif_err(ipvlan, ifup, ipvlan->dev,
--			  "Failed to add IPv6=%pI6c addr for %s intf\n",
--			  ip6_addr, ipvlan->dev->name);
--	else
--		ret = ipvlan_add_addr(ipvlan, ip6_addr, true);
--	spin_unlock_bh(&ipvlan->port->addrs_lock);
--	return ret;
--}
--
--static void ipvlan_del_addr6(struct ipvl_dev *ipvlan, struct in6_addr *ip6_addr)
--{
--	return ipvlan_del_addr(ipvlan, ip6_addr, true);
--}
--
--static int ipvlan_addr6_event(struct notifier_block *unused,
--			      unsigned long event, void *ptr)
--{
--	struct inet6_ifaddr *if6 = (struct inet6_ifaddr *)ptr;
--	struct net_device *dev = (struct net_device *)if6->idev->dev;
--	struct ipvl_dev *ipvlan = netdev_priv(dev);
--
--	if (!ipvlan_is_valid_dev(dev))
--		return NOTIFY_DONE;
--
--	switch (event) {
--	case NETDEV_UP:
--		if (ipvlan_add_addr6(ipvlan, &if6->addr))
--			return NOTIFY_BAD;
--		break;
--
--	case NETDEV_DOWN:
--		ipvlan_del_addr6(ipvlan, &if6->addr);
--		break;
-+	if (ipvlan_addr_busy(ipvlan->port, iaddr, is_v6)) {
-+		if (is_v6) {
-+			netif_err(ipvlan, ifup, ipvlan->dev,
-+				  "Failed to add IPv6=%pI6c addr on %s intf\n",
-+				  iaddr, ipvlan->dev->name);
-+		} else {
-+			netif_err(ipvlan, ifup, ipvlan->dev,
-+				  "Failed to add IPv4=%pI4 on %s intf.\n",
-+				  iaddr, ipvlan->dev->name);
-+		}
-+	} else {
-+		ret = ipvlan_add_addr(ipvlan, iaddr, is_v6);
+@@ -1739,29 +1723,62 @@ static void send_msg_udp(struct netconsole_target *nt, const char *msg,
  	}
--
--	return NOTIFY_OK;
--}
--#endif
--
--static int ipvlan_add_addr4(struct ipvl_dev *ipvlan, struct in_addr *ip4_addr)
--{
--	int ret = -EINVAL;
--
--	spin_lock_bh(&ipvlan->port->addrs_lock);
--	if (ipvlan_addr_busy(ipvlan->port, ip4_addr, false))
--		netif_err(ipvlan, ifup, ipvlan->dev,
--			  "Failed to add IPv4=%pI4 on %s intf.\n",
--			  ip4_addr, ipvlan->dev->name);
--	else
--		ret = ipvlan_add_addr(ipvlan, ip4_addr, false);
- 	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 	return ret;
  }
  
--static void ipvlan_del_addr4(struct ipvl_dev *ipvlan, struct in_addr *ip4_addr)
--{
--	return ipvlan_del_addr(ipvlan, ip4_addr, false);
--}
--
--static int ipvlan_addr4_event(struct notifier_block *unused,
--			      unsigned long event, void *ptr)
-+static int ipvlan_addr_event(struct net_device *dev, unsigned long event,
-+			     const void *iaddr, bool is_v6)
+-static void write_msg(struct console *con, const char *msg, unsigned int len)
++/**
++ * netconsole_write - Generic function to send a msg to all targets
++ * @wctxt: nbcon write context
++ * @extended: "true" for extended console mode
++ *
++ * Given an nbcon write context, send the message to the netconsole targets
++ */
++static void netconsole_write(struct nbcon_write_context *wctxt, bool extended)
  {
--	struct in_ifaddr *if4 = (struct in_ifaddr *)ptr;
--	struct net_device *dev = (struct net_device *)if4->ifa_dev->dev;
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
--	struct in_addr ip4_addr;
+-	unsigned long flags;
+ 	struct netconsole_target *nt;
  
- 	if (!ipvlan_is_valid_dev(dev))
- 		return NOTIFY_DONE;
+ 	if (oops_only && !oops_in_progress)
+ 		return;
+-	/* Avoid taking lock and disabling interrupts unnecessarily */
+-	if (list_empty(&target_list))
+-		return;
  
- 	switch (event) {
- 	case NETDEV_UP:
--		ip4_addr.s_addr = if4->ifa_address;
--		if (ipvlan_add_addr4(ipvlan, &ip4_addr))
-+		if (ipvlan_add_addr_event(ipvlan, iaddr, is_v6))
- 			return NOTIFY_BAD;
- 		break;
- 
- 	case NETDEV_DOWN:
--		ip4_addr.s_addr = if4->ifa_address;
--		ipvlan_del_addr4(ipvlan, &ip4_addr);
-+		ipvlan_del_addr(ipvlan, iaddr, is_v6);
- 		break;
+-	spin_lock_irqsave(&target_list_lock, flags);
+ 	list_for_each_entry(nt, &target_list, list) {
+-		if (!nt->extended && nt->enabled && netif_running(nt->np.dev)) {
+-			/*
+-			 * We nest this inside the for-each-target loop above
+-			 * so that we're able to get as much logging out to
+-			 * at least one target if we die inside here, instead
+-			 * of unnecessarily keeping all targets in lock-step.
+-			 */
+-			send_msg_udp(nt, msg, len);
+-		}
++		if (nt->extended != extended || !nt->enabled ||
++		    !netif_running(nt->np.dev))
++			continue;
++
++		/* If nbcon_enter_unsafe() fails, just return given netconsole
++		 * lost the ownership, and iterating over the targets will not
++		 * be able to re-acquire.
++		 */
++		if (!nbcon_enter_unsafe(wctxt))
++			return;
++
++		if (extended)
++			send_ext_msg_udp(nt, wctxt->outbuf, wctxt->len);
++		else
++			send_msg_udp(nt, wctxt->outbuf, wctxt->len);
++
++		nbcon_exit_unsafe(wctxt);
  	}
- 
-@@ -1001,8 +953,11 @@ static int ipvlan_addr4_event(struct notifier_block *unused,
- static int ipvlan_addr_validator_event_cb(struct notifier_block *nblock,
- 					  unsigned long event, void *ptr);
- 
-+static int ipvlan_addr_event_cb(struct notifier_block *unused,
-+				unsigned long event, void *ptr);
-+
- static struct notifier_block ipvlan_addr4_notifier_block __read_mostly = {
--	.notifier_call = ipvlan_addr4_event,
-+	.notifier_call = ipvlan_addr_event_cb,
- };
- 
- static struct notifier_block ipvlan_addr4_vtor_notifier_block __read_mostly = {
-@@ -1013,13 +968,10 @@ static struct notifier_block ipvlan_notifier_block __read_mostly = {
- 	.notifier_call = ipvlan_device_event,
- };
- 
--#if IS_ENABLED(CONFIG_IPV6)
- static struct notifier_block ipvlan_addr6_notifier_block __read_mostly = {
--	.notifier_call = ipvlan_addr6_event,
-+	.notifier_call = ipvlan_addr_event_cb,
- };
- 
--#endif
--
- static struct notifier_block ipvlan_addr6_vtor_notifier_block __read_mostly = {
- 	.notifier_call = ipvlan_addr_validator_event_cb,
- };
-@@ -1045,6 +997,24 @@ static int ipvlan_addr_validator_event_cb(struct notifier_block *nblock,
- 					   &i6vi->i6vi_addr, true);
- }
- 
-+static int ipvlan_addr_event_cb(struct notifier_block *nblock,
-+				unsigned long event, void *ptr)
-+{
-+	struct inet6_ifaddr *if6;
-+	struct net_device *dev;
-+
-+	if (nblock == &ipvlan_addr4_notifier_block) {
-+		struct in_ifaddr *if4 = (struct in_ifaddr *)ptr;
-+
-+		dev = if4->ifa_dev->dev;
-+		return ipvlan_addr_event(dev, event, &if4->ifa_address, false);
-+	}
-+
-+	if6 = (struct inet6_ifaddr *)ptr;
-+	dev = if6->idev->dev;
-+	return ipvlan_addr_event(dev, event, &if6->addr, true);
 +}
 +
- static int __init ipvlan_init_module(void)
- {
- 	int err;
++static void netconsole_write_ext(struct console *con __always_unused,
++				 struct nbcon_write_context *wctxt)
++{
++	netconsole_write(wctxt, true);
++}
++
++static void netconsole_write_basic(struct console *con __always_unused,
++				   struct nbcon_write_context *wctxt)
++{
++	netconsole_write(wctxt, false);
++}
++
++static void netconsole_device_lock(struct console *con __always_unused,
++				   unsigned long *flags)
++{
++	spin_lock_irqsave(&target_list_lock, *flags);
++}
++
++static void netconsole_device_unlock(struct console *con __always_unused,
++				     unsigned long flags)
++{
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+ }
+ 
+@@ -1924,15 +1941,21 @@ static void free_param_target(struct netconsole_target *nt)
+ }
+ 
+ static struct console netconsole_ext = {
+-	.name	= "netcon_ext",
+-	.flags	= CON_ENABLED | CON_EXTENDED,
+-	.write	= write_ext_msg,
++	.name = "netcon_ext",
++	.flags = CON_ENABLED | CON_EXTENDED | CON_NBCON | CON_NBCON_ATOMIC_UNSAFE,
++	.write_thread = netconsole_write_ext,
++	.write_atomic = netconsole_write_ext,
++	.device_lock = netconsole_device_lock,
++	.device_unlock = netconsole_device_unlock,
+ };
+ 
+ static struct console netconsole = {
+-	.name	= "netcon",
+-	.flags	= CON_ENABLED,
+-	.write	= write_msg,
++	.name = "netcon",
++	.flags = CON_ENABLED | CON_NBCON | CON_NBCON_ATOMIC_UNSAFE,
++	.write_thread = netconsole_write_basic,
++	.write_atomic = netconsole_write_basic,
++	.device_lock = netconsole_device_lock,
++	.device_unlock = netconsole_device_unlock,
+ };
+ 
+ static int __init init_netconsole(void)
+
 -- 
-2.43.0
+2.47.3
 
 
