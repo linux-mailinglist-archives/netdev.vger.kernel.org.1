@@ -1,155 +1,174 @@
-Return-Path: <netdev+bounces-251562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCyKH9nab2n8RwAAu9opvQ
-	(envelope-from <netdev+bounces-251562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:43:21 +0100
+	id GJJiKurWb2mgMQAAu9opvQ
+	(envelope-from <netdev+bounces-251565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:26:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C824AA86
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:43:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 420444A528
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 20:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6271774CF7F
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:55:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B28E25CE3BA
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B27734CFC0;
-	Tue, 20 Jan 2026 16:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GJ5P+UEM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D944318BBC;
+	Tue, 20 Jan 2026 16:51:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C102734C9AF
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62725221FA0;
+	Tue, 20 Jan 2026 16:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768927752; cv=none; b=fFIQ1ZHIaE3Ei2A5obyLzj9w4FnEbj4CjXcs3z26QNfMh1y/SirjGsaJHKfCYh/9n2SgV2phoy4C9dgi/Qp48EVFxCtPONl+2Q943blD2uxj231VFTbHDfD26GgfhBri4CRBb0b2o5WClwV/cDuyWSrBk1f0Zu4iFG4aSRwfS8Q=
+	t=1768927863; cv=none; b=l5hWTJK68aJQxLrOOmmxHtz65sSsc0kCO4bpfjRSHi2lzhwuTMC9FX+C6F2eR+sffUVZHW8hsptI4eVnPOV2HOtTAqLVNvE41T7JhKtBCfsqNUBPyvGwa4EhdSUfp+E4aNmFKjKl8E5gMj5IJAqi038RJLBYtQCiGhtTg/3nQOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768927752; c=relaxed/simple;
-	bh=qEG8W+iXPCChN+rsqU7ShDmWYPWBLq9atvzzf+9ff/c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GXqxSqVE+cxf5f92UJ1H/GOnb3q00yOX4foVw+i5IeWg0Tu06fwEWephf88wwYA2alPVuXaTuN5+vkP7BXxJJkabrWFtyVjkZ/0RmBJWDnVyB+fVRalK4rpJijPRWVJ9PNRXB6EG0yN3ZOzy0pIRyJKlY9zJUVuu8M+xA2IUYSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GJ5P+UEM; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5014b22d678so74281511cf.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:49:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768927748; x=1769532548; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PsOFJn4EZiKQ337yr9Dz5asIEvy6XfYTAcnE7gOIqmc=;
-        b=GJ5P+UEM9ALZ/SH8B5YF91HNxT8CPwWC+EA1z357JN34GpUgxKVcv6vWotphwo3UMU
-         nvizmVEUQ3tYFLtZ2ZhbP+EWx4YwBEj1T9Y+0AqtlNdZhogQyDBlixufgV2PwtzTsDZh
-         pIIjn/8zbrFaUep1FsryagDY6o53/aaX7hRgVugHyk4J0Nhy8SBN+K08/kDwQCJ+FDhr
-         GaSMQ2ffKR5xR7FmDEsIvo5u2Y6zwo2c7EVxTKkmvS4xTi+gXIY519UrQ1Iwhs15mR2G
-         0yuln9iroUXlK5vAZXN7Fj3X1WkWozcQKNhtOVgwdyxHNmRPZ0U+CLFSD8kumLoYj9VA
-         3Jqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768927748; x=1769532548;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PsOFJn4EZiKQ337yr9Dz5asIEvy6XfYTAcnE7gOIqmc=;
-        b=m7VI654lxAocQDXNxWenzVaG/Ui4uOhBTNPSSmykaEIxhnacAU7ndi+LM2xtDHpaly
-         8iv/Rq2UC+gwvEZIQbaBOBUhtd48TpzySmFvlOthmBNalmq8RAd4pCS9TwFO+MoWpHWc
-         gYyj+S0395/P1q67mK0IUeqtXvE/069L468DuzAYbdw2bFMEWhhyIsX7KwZGfAL0dL9r
-         mqw4p6Z4i6t9FforMa1DWL1W4IeQNn5BhndXEiCQjXJi91aEjpmpIRefG5yjBTfgukId
-         QsgnabopxnKv7N986m2FCaaLJYJMDk4C94RP7zNovrcZ0DnolROcMieI3g5jwGVJltsi
-         fFLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrlGOWv6FR1MrYdSXhCEcoY2uqdMIH5E+aYREd9qHfEja0fxe+Ss7KppSu6uQBbuXHguWER/I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxryiUKrLX/jIozaqlVrJG9aPpdvfsmPEAF4ocIeAb7vB8QrScw
-	6+v0MueVIYSnB5GosKS+diiOYD7hoiaAGYimXbMVTVad6DfS6imFD928UQsKrDXI3UwLJuUDCqz
-	3Qa34urg5387MnA==
-X-Received: from qvbre3.prod.google.com ([2002:a05:6214:5e03:b0:88a:2fb9:2b69])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7dcc:0:b0:501:4a86:f5f1 with SMTP id d75a77b69052e-502d85351b7mr28744701cf.71.1768927747661;
- Tue, 20 Jan 2026 08:49:07 -0800 (PST)
-Date: Tue, 20 Jan 2026 16:49:01 +0000
-In-Reply-To: <20260120164903.1912995-1-edumazet@google.com>
+	s=arc-20240116; t=1768927863; c=relaxed/simple;
+	bh=wUXrmIrqo2oH1Q4Q/12fl8mQxOKQGMsh7C8PTCf3vR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DBo8ERHLXHYmunJx2QKmjJzJyF7h8zfyfYLxl1gw7NTTVWHLSHdiMFTE3w6UMRNP4NJUzfigryQfCGC84bq1BdoJ2D7NWhr5cb8KPud5inOK6MvEQ5TvFk/yoHny5pXFNxGEIhduc70MOywjXFOFrTbm5VxSVVZ1ZqhMPXQ1M0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BDA4C4C2887191;
+	Tue, 20 Jan 2026 17:50:06 +0100 (CET)
+Message-ID: <8cfba7ca-03d0-46fe-92fa-5d4a119fc31e@molgen.mpg.de>
+Date: Tue, 20 Jan 2026 17:50:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260120164903.1912995-1-edumazet@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260120164903.1912995-2-edumazet@google.com>
-Subject: [PATCH v3 net-next 1/3] net: always inline __skb_incr_checksum_unnecessary()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.04 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] idpf: Fix data race in idpf_net_dim
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+ Phani Burra <phani.r.burra@intel.com>, Willem de Bruijn
+ <willemb@google.com>, Alan Brady <alan.brady@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Joshua Hay <joshua.a.hay@intel.com>, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org
+References: <20260119162720.1463859-1-mmyangfl@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260119162720.1463859-1-mmyangfl@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.24 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251562-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[mpg.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-251565-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: E8C824AA86
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,molgen.mpg.de:mid]
+X-Rspamd-Queue-Id: 420444A528
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-clang does not inline this helper in GRO fast path.
+Dear David,
 
-We can save space and cpu cycles.
 
-$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.1
-add/remove: 0/2 grow/shrink: 2/0 up/down: 156/-218 (-62)
-Function                                     old     new   delta
-tcp6_gro_complete                            227     311     +84
-tcp4_gro_complete                            325     397     +72
-__pfx___skb_incr_checksum_unnecessary         32       -     -32
-__skb_incr_checksum_unnecessary              186       -    -186
-Total: Before=22592724, After=22592662, chg -0.00%
+Thank you for your patch.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/skbuff.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Am 19.01.26 um 17:27 schrieb David Yang:
+> In idpf_net_dim(), some statistics protected by u64_stats_sync, are read
+> and accumulated in ignorance of possible u64_stats_fetch_retry() events.
+> The correct way to copy statistics is already illustrated by
+> idpf_add_queue_stats(). Fix this by reading them into temporary variables
+> first.
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 86737076101d4a8452e90fe78adcdcfdefb79169..e6bfe5d0c5252b2e7540e1fef9317aab83feced2 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4763,7 +4763,7 @@ static inline void __skb_decr_checksum_unnecessary(struct sk_buff *skb)
- 	}
- }
- 
--static inline void __skb_incr_checksum_unnecessary(struct sk_buff *skb)
-+static __always_inline void __skb_incr_checksum_unnecessary(struct sk_buff *skb)
- {
- 	if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
- 		if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
--- 
-2.52.0.457.g6b5491de43-goog
+It’d be great if you also documented a test case.
 
+> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
+> Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> ---
+>   drivers/net/ethernet/intel/idpf/idpf_txrx.c | 16 +++++++++++-----
+>   1 file changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 97a5fe766b6b..66ba645e8b90 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -3956,7 +3956,7 @@ static void idpf_update_dim_sample(struct idpf_q_vector *q_vector,
+>   static void idpf_net_dim(struct idpf_q_vector *q_vector)
+>   {
+>   	struct dim_sample dim_sample = { };
+> -	u64 packets, bytes;
+> +	u64 packets, bytes, pkts, bts;
+
+The new variable names are ambiguous. Would _tmp or so be better?
+
+>   	u32 i;
+>   
+>   	if (!IDPF_ITR_IS_DYNAMIC(q_vector->tx_intr_mode))
+> @@ -3968,9 +3968,12 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
+>   
+>   		do {
+>   			start = u64_stats_fetch_begin(&txq->stats_sync);
+> -			packets += u64_stats_read(&txq->q_stats.packets);
+> -			bytes += u64_stats_read(&txq->q_stats.bytes);
+> +			pkts = u64_stats_read(&txq->q_stats.packets);
+> +			bts = u64_stats_read(&txq->q_stats.bytes);
+>   		} while (u64_stats_fetch_retry(&txq->stats_sync, start));
+> +
+> +		packets += pkts;
+> +		bytes += bts;
+>   	}
+>   
+>   	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->tx_dim,
+> @@ -3987,9 +3990,12 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
+>   
+>   		do {
+>   			start = u64_stats_fetch_begin(&rxq->stats_sync);
+> -			packets += u64_stats_read(&rxq->q_stats.packets);
+> -			bytes += u64_stats_read(&rxq->q_stats.bytes);
+> +			pkts = u64_stats_read(&rxq->q_stats.packets);
+> +			bts = u64_stats_read(&rxq->q_stats.bytes);
+>   		} while (u64_stats_fetch_retry(&rxq->stats_sync, start));
+> +
+> +		packets += pkts;
+> +		bytes += bts;
+>   	}
+>   
+>   	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->rx_dim,
+
+
+Kind regards,
+
+Paul
 
