@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-251647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFqkLmcRcGlyUwAAu9opvQ
-	(envelope-from <netdev+bounces-251647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:36:07 +0100
+	id GNwtFc8NcGlyUwAAu9opvQ
+	(envelope-from <netdev+bounces-251648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:20:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFA24DE71
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:36:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B797C4DB3F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 00:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 27F5EB2D3C7
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:07:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C07205AE177
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 23:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E6C40B6C7;
-	Tue, 20 Jan 2026 23:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072AB413239;
+	Tue, 20 Jan 2026 23:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="eUyqsVAE"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nrGk7IGG"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB8B33A9D0;
-	Tue, 20 Jan 2026 23:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A083F23C2;
+	Tue, 20 Jan 2026 23:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768950379; cv=none; b=guxzmEH4BYpiYzcpihHMUdufO0Xct14111G4Z05xCploj4rbZjAiwA4HKLs8eL58bSyu7qjeedGBb2frc/O6ReMwS/g5dzZMvxvTFoPADIxVjh/HuHEy4MlHxwH7EWEtdWvrD+EpYyHIgPdz/3wO677TlacyWHoY3+6yGa8u4tM=
+	t=1768950380; cv=none; b=ch2DmtDUph3hpi/cTv9ZOZ1T38LGmiVeJ9z86wT1Is91pKvzaWNs3l8ubS24djp4UD/DozvL1DmTXmM7tkkKS/ww+QHkCCpjhgnqucw20yi9t92U6Vj7FUQYQgI/2n4QmJOUvbYv3+XJDvSdfYFfMECMzdidUkICvQJaM+s9sp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768950379; c=relaxed/simple;
-	bh=PYt5Mke4qdl7AY/Bq6eopSHaK8Yv2ImgE6fasnT9WZc=;
+	s=arc-20240116; t=1768950380; c=relaxed/simple;
+	bh=kG0DFN6CxRYRGm89iojhHsVoORMw2BVOr7qSQCqG7mY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MFVpI6k06sAk5OMhPDMXLnluMj1FLLBYJgm1LXc4bzFXnH7L0bMaD3vz48rMiYkeRgnmm9nZ/WIZkWgjpgsINaptbcwGhBe+RFyMk3MzQFuMAyapbzIFd1hww7TxPfm0KYztTz0yIEVbr1VxAlDqJUynJwFYZ+7WADC4a3yUxoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=eUyqsVAE; arc=none smtp.client-ip=130.117.225.111
+	 MIME-Version; b=mmWURyBXVlV61l53/B+XbqUKFBAz3uxkR+xstXNyiBPrhh/D2l1w9jsNPzb+MqnNcgHCr9xwQUADpeGE9CqEO1mKDPeCwVhebuHQjXdXq05ksZ2+l0LS9iki2/p7MSnjMEtstHarPw9zNz/HrO60vNUgnRdewgbimf344gtO0BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=nrGk7IGG; arc=none smtp.client-ip=130.117.225.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=zDznKs8Ffi8fgQGVRkdCZeupx/TlrbfK+5Yc7AYTcyc=; b=eUyqsVAEWtY5
-	yydDqOgCRQbV2gY2JZdmdo0Xbga1C+td4R4m8XR3IdZwuHX8O/Xo/EZVhV3CLDT8E4KWF/KdYhFl2
-	56Lymrl676WQsM/3Um2P3bVEhiB4Jt3wJ1yB6zJDmP20OD5MGE5uuC2HmyRxUPjK2MWYqDiJqAfVW
-	s3+DConPmvsWytxtoD0vQxgwTqsyUhuZGx0yG5PdDWHO/S5IuyBqlx0hpb3+7y9cDo8iJCyJlmdKa
-	Vq0tiFGfFN88OPdCaKxjo/WwQa+ZEvCnPXc/bIKavQSHaB364N4AoKetKizkToa5DUdbZZZQgjJa+
-	OF+4biHAvYB0rw2apieh/A==;
+	Content-Type; bh=5kp5amFk0WvUViKQl4hXNv+X4iisrwrDGiUpdJQxW90=; b=nrGk7IGGleis
+	4bpmhRyyDcYR4Y6CTF0rhSs6a4ISu1M6AsO+aPyd/NSeoql+FYmPVr0aGwVfUUkqTHMC8fu8/vYre
+	+kCvchEGLOXH2G5YeSYOEV1xLLN6aurpUWamOOCXqK1TZXiYQ9mOAaEB9tl3gevcsDUtioGmseioZ
+	m+KupjRYXitwdN7a5K9KD73bnf8xgOhJymQiGSBeJls3dHGp61kjk2y0xzBbx+/+DEXC616/pKedd
+	GYMOMJqh2jYb52YVpyOr5Ekq876hWF4HQDpYE0eZaBhxVsxCthfrMLRmMIE34OlJl91GBmJy9NyKB
+	2V27GOqycwsLNfUhFIFDSA==;
 Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
 	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <aleksey.oladko@virtuozzo.com>)
-	id 1viKn9-00Fnsq-0f;
-	Wed, 21 Jan 2026 00:06:03 +0100
+	id 1viKnA-00Fnsx-18;
+	Wed, 21 Jan 2026 00:06:04 +0100
 Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
-	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 60KN6CKp328458
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 60KN6DxV328462
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 20 Jan 2026 23:06:12 GMT
+	Tue, 20 Jan 2026 23:06:13 GMT
 Received: (from root@localhost)
-	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 60KN6C3h328457;
-	Tue, 20 Jan 2026 23:06:12 GMT
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 60KN6Dke328461;
+	Tue, 20 Jan 2026 23:06:13 GMT
 From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
 To: "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -64,10 +64,10 @@ To: "David S . Miller" <davem@davemloft.net>,
         Shuah Khan <shuah@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Subject: [PATCH 2/5] selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
-Date: Tue, 20 Jan 2026 23:05:55 +0000
-Message-ID: <20260120230558.328423-3-aleksey.oladko@virtuozzo.com>
+        Konstantin Khorenko <khorenko@virtuozzo.com>
+Subject: [PATCH 3/5] selftests: net: run reuseport tests in netns to avoid port conflicts
+Date: Tue, 20 Jan 2026 23:05:56 +0000
+Message-ID: <20260120230558.328423-4-aleksey.oladko@virtuozzo.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260120230558.328423-1-aleksey.oladko@virtuozzo.com>
 References: <20260120230558.328423-1-aleksey.oladko@virtuozzo.com>
@@ -89,12 +89,12 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	TAGGED_FROM(0.00)[bounces-251647-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251648-lists,netdev=lfdr.de];
 	DMARC_POLICY_ALLOW(0.00)[virtuozzo.com,quarantine];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -103,42 +103,112 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,ovs-dpctl.py:url,pmtu.sh:url,virtuozzo.com:email,virtuozzo.com:dkim,virtuozzo.com:mid]
-X-Rspamd-Queue-Id: 3CFA24DE71
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,reuseport_bpf_cpu.sh:url,reuseport_bpf_numa.sh:url,virtuozzo.com:email,virtuozzo.com:dkim,virtuozzo.com:mid,reuseport_dualstack.sh:url,reuseport_bpf.sh:url]
+X-Rspamd-Queue-Id: B797C4DB3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The pmtu.sh kselftest configures OVS using ovs-dpctl.py and falls back
-to ovs-vsctl only when ovs-dpctl.py fails. However, ovs-dpctl.py exits
-with a success status when the installed pyroute2 package version is
-lower than 0.6, even though the OVS datapath is not configured.
+From: Konstantin Khorenko <khorenko@virtuozzo.com>
 
-As a result, pmtu.sh assumes that the setup was successful and
-continues running the test, which later fails due to the missing
-OVS configuration.
+Some net kselftests use fixed ports which overlap with process-exporter
+service already running on the host. When such a conflict happens,
+the test fail with:
 
-Fix the exit code handling in ovs-dpctl.py so that pmtu.sh can detect
-that the setup did not complete successfully and fall back to
-ovs-vsctl.
+  failed to bind receive socket: Address already in use
 
-Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Instead of changing port numbers, run the affected tests in isolated
+network namespace to avoid conflicts with running daemons.
+
+Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
 ---
- tools/testing/selftests/net/openvswitch/ovs-dpctl.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/net/Makefile               | 12 ++++++++----
+ tools/testing/selftests/net/reuseport_bpf.sh       |  4 ++++
+ tools/testing/selftests/net/reuseport_bpf_cpu.sh   |  4 ++++
+ tools/testing/selftests/net/reuseport_bpf_numa.sh  |  4 ++++
+ tools/testing/selftests/net/reuseport_dualstack.sh |  4 ++++
+ 5 files changed, 24 insertions(+), 4 deletions(-)
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_cpu.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_numa.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_dualstack.sh
 
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index b521e0dea506..848f61fdcee0 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -2583,7 +2583,7 @@ def main(argv):
-     prverscheck = pyroute2.__version__.split(".")
-     if int(prverscheck[0]) == 0 and int(prverscheck[1]) < 6:
-         print("Need to upgrade the python pyroute2 package to >= 0.6.")
--        sys.exit(0)
-+        sys.exit(1)
- 
-     parser = argparse.ArgumentParser()
-     parser.add_argument(
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b66ba04f19d9..a160e0d816d9 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -64,6 +64,10 @@ TEST_PROGS := \
+ 	psock_snd.sh \
+ 	reuseaddr_ports_exhausted.sh \
+ 	reuseport_addr_any.sh \
++	reuseport_bpf.sh \
++	reuseport_bpf_cpu.sh \
++	reuseport_bpf_numa.sh \
++	reuseport_dualstack.sh
+ 	route_hint.sh \
+ 	route_localnet.sh \
+ 	rps_default_mask.sh \
+@@ -142,6 +146,10 @@ TEST_GEN_FILES := \
+ 	psock_tpacket \
+ 	reuseaddr_ports_exhausted \
+ 	reuseport_addr_any \
++	reuseport_bpf \
++	reuseport_bpf_cpu \
++	reuseport_bpf_numa \
++	reuseport_dualstack \
+ 	rxtimestamp \
+ 	sctp_hello \
+ 	skf_net_off \
+@@ -169,10 +177,6 @@ TEST_GEN_PROGS := \
+ 	ipv6_fragmentation \
+ 	proc_net_pktgen \
+ 	reuseaddr_conflict \
+-	reuseport_bpf \
+-	reuseport_bpf_cpu \
+-	reuseport_bpf_numa \
+-	reuseport_dualstack \
+ 	sk_bind_sendto_listen \
+ 	sk_connect_zero_addr \
+ 	sk_so_peek_off \
+diff --git a/tools/testing/selftests/net/reuseport_bpf.sh b/tools/testing/selftests/net/reuseport_bpf.sh
+new file mode 100755
+index 000000000000..75014a5462a1
+--- /dev/null
++++ b/tools/testing/selftests/net/reuseport_bpf.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++./in_netns.sh ./reuseport_bpf
+diff --git a/tools/testing/selftests/net/reuseport_bpf_cpu.sh b/tools/testing/selftests/net/reuseport_bpf_cpu.sh
+new file mode 100755
+index 000000000000..243dc5bee014
+--- /dev/null
++++ b/tools/testing/selftests/net/reuseport_bpf_cpu.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++./in_netns.sh ./reuseport_bpf_cpu
+diff --git a/tools/testing/selftests/net/reuseport_bpf_numa.sh b/tools/testing/selftests/net/reuseport_bpf_numa.sh
+new file mode 100755
+index 000000000000..eccab95a3202
+--- /dev/null
++++ b/tools/testing/selftests/net/reuseport_bpf_numa.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++./in_netns.sh ./reuseport_bpf_numa
+diff --git a/tools/testing/selftests/net/reuseport_dualstack.sh b/tools/testing/selftests/net/reuseport_dualstack.sh
+new file mode 100755
+index 000000000000..82cc8e345a83
+--- /dev/null
++++ b/tools/testing/selftests/net/reuseport_dualstack.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++./in_netns.sh ./reuseport_dualstack
 -- 
 2.43.0
 
