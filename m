@@ -1,289 +1,188 @@
-Return-Path: <netdev+bounces-251390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90AF2D3C256
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:42:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A10ED3C264
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1C1D4605623
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:27:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B3F105C9DBA
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAB33D4126;
-	Tue, 20 Jan 2026 08:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909143AA1BF;
+	Tue, 20 Jan 2026 08:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNkYY7XN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G43801pa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF08347BC5
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09291341063
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768897132; cv=none; b=L9x9XNf42KotyCzxgozjQyEw4twVIabYaYM8ZDzEqJFY9RLwpt1seYiD7Dw4HueHRz3F3e3Ir28vXjDvUHiTv8QU2QNT1I3ME7j3X6skszkRuWI1nnVvB+kb0CCnAS7uj4bMOT4YE/5heCD1vMT277jgZrDgg5lg/7/EXp70npQ=
+	t=1768897774; cv=none; b=JiMxLVBgKO57S+HGPsAqb0pwKtNT1hrfxYk8MmkduTnKIcUAbfEbwT93sTqU8BmykJTb4/sTBvRkVJurLfHQZI1q+ZzKkkBFcP2ODwkaNw1FIuKuW2IDPJZ9Ta2JN66OCnqourlrMfganIV10Gym1IFlecyNYKw4VYb9sGVi4+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768897132; c=relaxed/simple;
-	bh=qyvzLqcm1Y8bkz0o1wMAZLeFnBMWPFkiUHTVVHF4rys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iTscaOB1tOv66x13Y7PBJBi02MLXd8WEDPGiF3FTGFawAXa9LjikHS88WaTkyxy11Nkxgy2171Js1J+iBa1hY/kGCfZPuweNIb0Oqx+/RmtK8iNprhXu+Bl+vBY8rNwVj0TT3Rzgp3qyNIeXaMKpIBqpNIZYno3MB8h17HGSYNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNkYY7XN; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1768897774; c=relaxed/simple;
+	bh=W9qdqjI867EXujfA1lB2A9WGNgOq4xDjQzueH0l+Gs8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=h40WrBND9c0fq7rMlzvfcIAysaTAawxcqHMK5ptz2upMuBI2lgPzrMoUuoazLpjgToUseePnB1ITFktHaF7kgaYMnuM906bvmN34fiskhfSigMeh98A16T7ibHpglEjWeDaaG+R9+WW4V82LbijM3HJ/goTnd3J8SAe0g6fGMMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G43801pa; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b86ff9ff9feso58630566b.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:18:49 -0800 (PST)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-81e8a9d521dso3058503b3a.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:29:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768897128; x=1769501928; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TJbdw+xcDYuOTpLf6yNuSRnoYdJpj1gSQsdBtW0Vq6o=;
-        b=PNkYY7XNtNYF0GzHt0GUf83gwU2vahRqOJ3chslV0fwZ9/xNzFF8D/XjJ/5EsDPEC1
-         ThQu+tgt6xp0UQezP9N5esqpd/WR1WiheRm3okKBtsUsFYR6MPSDekmA+lIlss/vP97q
-         yBvgf0pxKWwtarDcRLGrBP5trdfASoW/aYoivJZzaALNfTXbaXEU6CbrwgFPlKfl580m
-         DddFKFc7aPYfrk3vL870STFs5iDc92C674MnVvvMwZhBgYfeuPijyiIwbFm0wyPzdOeA
-         SrUQI9j+Vrr5GABQS2REWBPzIOQW3e5vd8YKmSnCLLggLvQxyYtDXqf/btBAaV+deGes
-         G7mg==
+        d=gmail.com; s=20230601; t=1768897772; x=1769502572; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xjDUsPk8fY36wyI2DKjFv73iBZj8W3INU7HTBWcMBpo=;
+        b=G43801paBJ7nfzab5dHxkE3MEXtT+3hacC6g41/NODCSuZtdXR/cKOnyIzCxwPWtRr
+         hW/kjSs4tVew/kq2bLfpohzzYJAjWrizXTIgm9UZS1vsptpi8u4c+JK699W242JImJwP
+         uoXBXDqVdOnYuu3kOQxkEYORFS/G5GTOUX8hr5FTHF5OVCEg+VXHAqVMQn5uP9YcKPy1
+         NXOGBTAmLBF5h9ysOSxPEbiU8EulkiVw3NlEwrJSLvv4UIlf9641FBwXizha5yRD2j5x
+         kthXV15EW5oUqoDMP3Wl5LnHTvyufrIJHxvzU9/lWuorlEc7yRYj0F5IyacIh1or4dbX
+         /rqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768897128; x=1769501928;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TJbdw+xcDYuOTpLf6yNuSRnoYdJpj1gSQsdBtW0Vq6o=;
-        b=fznX1wZdVcDqAoi187j+EnhaKCDBc8gYVb7bbEMBliA07hKFkOGyqeqylDTHLqzqSR
-         NUXigpyphH8WFdgsSvBjHjhNnPP99JJaC27R3mzuXtJUCq7gPINouMGKI6BOM8s3Xavr
-         TKvt26cYq4+af+wNM7nkypKgiwzVnLfLkSAM4FR8JNx1pQJJKXRlHZkJe80GdPwAAUod
-         wvH6j8o9V83gHLg+LUc2+hetNrKRwQiFwZWi3vYN3r+s5POOEBRfX5+9TsuLjBt8gmVj
-         2z7RJMNc0KgXzhBAllGR3eJfG2ldUdH+gfnvA+2qh2Am+pTKAqgufQ4bh75F+JVARucr
-         azDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTB5iX4NNYi/fQ4BYutom9wZVkEzlojWelt89Mzwg0idW0jiALOhNrwLhnf8Xu4LKEYU8Rz3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxPmskg3FaNWqYeltTSwRhPkTgA+5xEnHnfP3ZeFygX+hZCNUN
-	zrgAo6IPH1S58u0A+a1i2dSyteJpEx6H8Z0wMqv3Xd7yxbZ4OMNW28mM
-X-Gm-Gg: AY/fxX6Yq5zjx4OJ6LSDO1LoA+3YswKPVEFBRwiBN48Ai34BNbRklQZcjoMLZK3397u
-	BWmT9Wdij1D4y/h/IiGkzebX11r/U+ImbOlds8Bx25URgUKO3C48qZDt07wu4BhRLdXnfckaekd
-	x4IGF3nF0XnP24sjB1e3o6SAKAllVEiTszacEjLZk7oa2aANy9w/p+dj6JGGYT0+aIDth9tLvrT
-	9KkQcCCkmdM7nleFJ22kpnnBJsvTBu6Z64heIVE2O1yt08ulvhepSC+Wz0vRl8fxYzuSMRlZJJ0
-	R7asDGAV2twSSFQKPphGa8i+l+GdEv8kKVHeqt0cOZIn+MQB64ZJmpBBYP+lheyH5IbO3/leklE
-	xd0DTxld7aGyuKtTzSmeTPZuf68Q60NH1mdu2AARcr0UggS2Cxh7YCi8ZLCkTZVlZu5IkxdrrMy
-	cIn8s=
-X-Received: by 2002:a17:907:3c8a:b0:b87:6f58:a844 with SMTP id a640c23a62f3a-b8792b3a359mr743051066b.0.1768897127986;
-        Tue, 20 Jan 2026 00:18:47 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:619a:24df:1726:f869])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8795c38208sm1344223966b.71.2026.01.20.00.18.46
+        d=1e100.net; s=20230601; t=1768897772; x=1769502572;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjDUsPk8fY36wyI2DKjFv73iBZj8W3INU7HTBWcMBpo=;
+        b=Je8uAR6c3MmIjQscSFjoHlVv5FocIY9v69D5wgbt7GhAWXYQuVfjPqHnu5eG+tkJcu
+         /AO7mno/Gju7UC86Kk/2EgBfCznot0dCt8mcW0WHskxjsZgzHnTtKiNC8qXaeTbC55ZT
+         WHV29HBVKBM/Ch4fVwxyCZk83vgNt95D04IruDZahFGckdQmtNYKogJ8+lgDuDAKup6u
+         2XjdzvZqg7ubmpd32+c58/NC/8LUR6BNLe4ppUeV9K+y8EQ++ywmp21mc6l0iIcwR8e6
+         gmSU4piyWt8dwwhUtbzoYlhiFPMVocyTMWc+6BL1RqKjNncWakWEWZQMp9UK7u7QLkA3
+         Skrw==
+X-Forwarded-Encrypted: i=1; AJvYcCW79OqeaLHHvz0c8004rY+A50MlnJu2bwtSTA3ruSJgVc1+mCNPrq5HlMagdGwmn9JMsBj+Z08=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5kndPgUY09QdVY4Z2DDCtig2mPD+09e+EJOYBC4+q4zdRb0lU
+	MnwNi+PnAp8BiygUPfw/uLvcQWBmTSFo2TmZAdbMH6TCbDj4uNUf3Yrh
+X-Gm-Gg: AY/fxX4QOh8RqZOGnYO6HLScmEPoQVv2AnXs35xoeiC+JQ2OkEP+gvk7883A0QajNuq
+	j3+TiG+KTrWcmhYSWtw+/o0/+Zj/Ks9GGWam/HZ9a4e7Y6CJNOpLEqtp3TT72ubJrGERnkeItNa
+	yKcLOREnf/kMq45IjfWwVZOQLP5y2Yp9gzDh+DUVclxHAbLn73/2s5eccuH6fe/96NdFBUqF68h
+	bVe3Iv2Cp+R4aSzWn4mVSxDmuQN55RsjINPWhNRGIhgKEifHUCnMdk6lHmlF1DhLNRuQkcOLCF2
+	SyfDod+F6cqLXl8oZEtbJyVIkjRWNswDNTfZHWnC4JNlGTXrjl3OMq9X0WcX7S2GeA0j1+g9DZy
+	/HG9QVZXiOBTsjIbqv+YsCwt+oo+YdPcpkIKp3KCO/g7SYPdj04S6N5AB/g7zvYSFViK28UMHnx
+	2YV8it7afb
+X-Received: by 2002:a05:6a00:139d:b0:81f:4999:ae46 with SMTP id d2e1a72fcca58-81fa1862010mr11150464b3a.48.1768897771925;
+        Tue, 20 Jan 2026 00:29:31 -0800 (PST)
+Received: from [127.0.0.1] ([38.207.158.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81fa12b51d9sm11282275b3a.65.2026.01.20.00.29.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 00:18:47 -0800 (PST)
-Date: Tue, 20 Jan 2026 10:18:44 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-phy@lists.infradead.org,
-	davem@davemloft.net, maxime.chevallier@bootlin.com,
-	alexandre.torgue@foss.st.com, mohd.anwar@oss.qualcomm.com,
-	neil.armstrong@linaro.org, hkallweit1@gmail.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	edumazet@google.com, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vkoul@kernel.org,
-	andrew@lunn.ch, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <20260120081844.7e6aq2urhxrylywi@skbuf>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
- <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
+        Tue, 20 Jan 2026 00:29:31 -0800 (PST)
+From: Zesen Liu <ftyghome@gmail.com>
+Subject: [PATCH bpf-next v3 0/2] bpf: Fix memory access flags in helper
+ prototypes
+Date: Tue, 20 Jan 2026 16:28:45 +0800
+Message-Id: <20260120-helper_proto-v3-0-27b0180b4e77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAL48b2kC/42Oy2rDMBBFfyVoXRXNyHq0q/5HKUUej2JBYhnZm
+ JTgf69iKGShRZd3LueeuYuFS+JFvJ/uovCWlpSnGvTLSdAYpjPLNNQsUKEBRCVHvsxcvueS1yx
+ jb9l24LGzTlRkLhzT7Zj7FP0c5cS3VXzVZkzLmsvP4dng6NuTG0gl69WyGt46xOHjfA3p8kr5+
+ jBUyCpQrgVBDAZ1JIr/h1h7x8qjA6In6PHyhn9vtmCscEfGYk8UTPAtI/gGFHodQGvHzphn477
+ vv4pbIx6OAQAA
+X-Change-ID: 20251220-helper_proto-fb6e64182467
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
+ Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2372; i=ftyghome@gmail.com;
+ h=from:subject:message-id; bh=W9qdqjI867EXujfA1lB2A9WGNgOq4xDjQzueH0l+Gs8=;
+ b=owGbwMvMwCXWI1/u+8bXqJ3xtFoSQ2a+zeP2AzrqMZ+Od/UXpW0yPnTD7M9ON82K9WzirOE8B
+ 9+/kT/bUcrCIMbFICumyNL7w/Duykxz4202Cw7CzGFlAhnCwMUpABMRfMPIcMRUIvi4Qm4SF5/b
+ 9TBzzsW6ateP5/KXr323tiR+1+HbYowMW77VJD5x8Paoq5/0dP5Ki69VbzOVTlv1Pf09JVRJzWc
+ LPwA=
+X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
+ fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
 
-On Tue, Jan 20, 2026 at 05:04:53AM +0000, Russell King (Oracle) wrote:
-> On Mon, Jan 19, 2026 at 11:21:25AM -0800, Jakub Kicinski wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> > ---
-> > net: stmmac: add stmmac core serdes support
-> > 
-> > This commit adds SerDes PHY support to the stmmac core driver, moving it
-> > from platform glue into the integrated PCS driver. The SerDes is managed
-> > through phy_init/phy_exit for lifecycle and phy_power_on/phy_power_off
-> > for the power state.
-> > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> > > index 2f826fe7229b..4d1902f3a58f 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> > 
-> > [ ... ]
-> > 
-> > > static int dwmac_integrated_pcs_enable(struct phylink_pcs *pcs)
-> > > {
-> > > 	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
-> > > +	struct stmmac_priv *priv = spcs->priv;
-> > > +	int ret;
-> > >
-> > > -	stmmac_mac_irq_modify(spcs->priv, 0, spcs->int_mask);
-> > > +	ret = dwmac_serdes_power_on(priv);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	if (spcs->interface != PHY_INTERFACE_MODE_NA) {
-> > > +		ret = dwmac_serdes_set_mode(priv, spcs->interface);
-> > > +		if (ret)
-> > > +			return ret;
-> >                         ^^^^^^^^^^
-> > 
-> > If dwmac_serdes_set_mode() fails here, doesn't this leave the SerDes in
-> > a powered-on state? dwmac_serdes_power_on() succeeded at this point but
-> > there's no corresponding dwmac_serdes_power_off() call before returning
-> > the error.
-> > 
-> > Looking at phylink_major_config(), it appears to discard the return
-> > value from phylink_pcs_enable(), so the caller won't know to call
-> > pcs_disable() to clean up the power state.
-> 
-> This AI analysis is incorrect.
-> 
-> By the time phylink_pcs_enable() has been called, the PCS is already
-> plumbed in to phylink. It _will_ have phylink_pcs_disable() called on
-> it at some point in the future, either by having the PCS displaced
-> by another in a subsequent phylink_major_config(), or by a driver
-> calling phylink_stop().
-> 
-> If we clean up here, then we will call dwmac_serdes_power_off() twice.
-> 
-> Yes, it's not "nice" but that's the way phylink is right now, and
-> without reworking phylink to record that pcs_enable() has failed
-> to avoid a subsequent pcs_disable(), and to stop the major config
-> (which then potentially causes a whole bunch of other issues). I
-> don't even want to think about that horrid scenario at the moment.
+Hi,
 
-Isn't it sufficient to set pl->pcs to NULL when pcs_enable() fails and
-after calling pcs_disable(), though?
+This series adds missing memory access flags (MEM_RDONLY or MEM_WRITE) to
+several bpf helper function prototypes that use ARG_PTR_TO_MEM but lack the
+correct flag. It also adds a new check in verifier to ensure the flag is
+specified.
 
-I had to deal with the same issue when preparing patches that integrate
-SerDes support into the Lynx PCS.
+Missing memory access flags in helper prototypes can lead to critical
+correctness issues when the verifier tries to perform code optimization.
+After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type
+tracking"), the verifier relies on the memory access flags, rather than
+treating all arguments in helper functions as potentially modifying the
+pointed-to memory.
 
-I had these patches (please pardon the unadapted commit messages for the
-present situation):
+Using ARG_PTR_TO_MEM alone without flags does not make sense because:
 
--- >8 --
-Subject: [PATCH] net: phylink: handle return code from phylink_pcs_enable()
+- If the helper does not change the argument, missing MEM_RDONLY causes the
+   verifier to incorrectly reject a read-only buffer.
+- If the helper does change the argument, missing MEM_WRITE causes the
+   verifier to incorrectly assume the memory is unchanged, leading to
+   errors in code optimization.
 
-I am trying to make phylink_pcs_ops :: pcs_enable() something that is
-handled sufficiently carefully by phylink, such that we can expect that
-when we return an error code here, no other phylink_pcs_ops call is
-being made. This way, the API can be considered sufficiently reliable to
-allocate memory in pcs_enable() which is freed in pcs_disable().
+We have already seen several reports regarding this:
 
-Currently this does not take place. The pcs_enable() method has an int
-return code, which is ignored. If the PCS returns an error, the
-initialization of the phylink instance is not stopped, but continues on
-like a train, most likely triggering faults somewhere else.
+- commit ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's
+   output buffer") adds MEM_WRITE to bpf_d_path;
+- commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name
+   args") adds MEM_WRITE to bpf_sysctl_get_name.
 
-Like this:
+This series looks through all prototypes in the kernel and completes the
+flags. It also adds check_mem_arg_rw_flag_ok() and wires it into
+check_func_proto() to statically restrict ARG_PTR_TO_MEM from appearing
+without memory access flags. 
 
-$ ip link set endpmac2 up
-fsl_dpaa2_eth dpni.1 endpmac2: configuring for c73/10gbase-kr link mode
-fsl_dpaa2_eth dpni.1 endpmac2: pcs_enable() failed: -ENOMEM // added by me
-Unable to handle kernel paging request at virtual address fffffffffffffff4
-Call trace:
- mtip_backplane_get_state+0x34/0x2b4
- lynx_pcs_get_state+0x30/0x180
- phylink_resolve+0x2c0/0x764
- process_scheduled_works+0x228/0x330
- worker_thread+0x28c/0x450
+Changelog
+=========
 
-Do a minimal handling of the error by clearing pl->pcs, so that we lose
-access to its ops, and thus are unable to call anything else (which
-would be invalid anyway).
+v3:
+  - Rebased to bpf-next to address check_func_proto() signature changes, as
+    suggested by Eduard Zingerman.
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+v2:
+  - Add missing MEM_RDONLY flags to protos with ARG_PTR_TO_FIXED_SIZE_MEM.
+
+Thanks,
+
+Zesen Liu
+
 ---
- drivers/net/phy/phylink.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Zesen Liu (2):
+      bpf: Fix memory access flags in helper prototypes
+      bpf: Require ARG_PTR_TO_MEM with memory flag
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 32ffa4f9e5b2..a8459116b701 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1315,8 +1315,15 @@ static void phylink_major_config(struct phylink *pl, bool restart,
- 		}
- 	}
- 
--	if (pl->pcs_state == PCS_STATE_STARTING || pcs_changed)
--		phylink_pcs_enable(pl->pcs);
-+	if (pl->pcs_state == PCS_STATE_STARTING || pcs_changed) {
-+		err = phylink_pcs_enable(pl->pcs);
-+		if (err < 0) {
-+			phylink_err(pl, "pcs_enable() failed: %pe\n",
-+				    ERR_PTR(err));
-+			pl->pcs = NULL;
-+			return;
-+		}
-+	}
- 
- 	err = phylink_pcs_config(pl->pcs, pl->pcs_neg_mode, state,
- 				 !!(pl->link_config.pause & MLO_PAUSE_AN));
--- >8 --
-
--- >8 --
-Subject: [PATCH] net: phylink: suppress pcs->ops->pcs_get_state() calls after
- phylink_stop()
-
-I am attempting to make phylink_pcs_ops :: pcs_disable() treated
-sufficiently carefully by phylink so as to be able to free memory
-allocations from this PCS callback, and do not suffer from faults
-attempting to access that memory later from other phylink_pcs callbacks.
-
-Currently, nothing prevents this situation from happening:
-
-$ ip link set endpmac2 up
-$ ip link set endpmac2 down
-$ ethtool endpmac2
-Unable to handle kernel paging request at virtual address 0000100000000034
-Call trace:
- __mutex_lock+0xb8/0x574
- __mutex_lock_slowpath+0x14/0x20
- mutex_lock+0x24/0x58
- mtip_backplane_get_state+0x44/0x24c
- lynx_pcs_get_state+0x30/0x180
- phylink_ethtool_ksettings_get+0x178/0x218
- dpaa2_eth_get_link_ksettings+0x54/0xa4
- __ethtool_get_link_ksettings+0x68/0xa8
- linkmodes_prepare_data+0x44/0xc4
- ethnl_default_doit+0x118/0x39c
- genl_rcv_msg+0x29c/0x314
- netlink_rcv_skb+0x11c/0x134
- genl_rcv+0x34/0x4c
-
-However, the case where "ethtool endpmac2" is executed as the first
-thing (before the interface is brought up) does not crash. What's
-different is that second situation is that phylink_major_config() did
-not run yet, so pl->pcs is still NULL inside phylink_mac_pcs_get_state().
-In plain English, "as long as the PCS is disabled, the link is naturally
-down, no need to ask".
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+ kernel/bpf/helpers.c     |  2 +-
+ kernel/bpf/syscall.c     |  2 +-
+ kernel/bpf/verifier.c    | 17 +++++++++++++++++
+ kernel/trace/bpf_trace.c |  6 +++---
+ net/core/filter.c        | 20 ++++++++++----------
+ 5 files changed, 32 insertions(+), 15 deletions(-)
 ---
- drivers/net/phy/phylink.c | 1 +
- 1 file changed, 1 insertion(+)
+base-commit: efad162f5a840ae178e7761c176c49f433c7bb68
+change-id: 20251220-helper_proto-fb6e64182467
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index a8459116b701..f78d0e0f7cfb 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2527,6 +2527,7 @@ void phylink_stop(struct phylink *pl)
- 	pl->pcs_state = PCS_STATE_DOWN;
+Best regards,
+-- 
+Zesen Liu <ftyghome@gmail.com>
 
- 	phylink_pcs_disable(pl->pcs);
-+	pl->pcs = NULL;
- }
- EXPORT_SYMBOL_GPL(phylink_stop);
-
--- >8 --
 
