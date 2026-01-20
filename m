@@ -1,47 +1,52 @@
-Return-Path: <netdev+bounces-251333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5E2D3BC3E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 01:01:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8230D3BCA2
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 01:48:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2929C3040A60
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 00:01:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B7AA2302783D
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 00:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A04199FB0;
-	Tue, 20 Jan 2026 00:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101E91DE4CE;
+	Tue, 20 Jan 2026 00:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="QRdLLYtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB2A149C6F
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1E91AA7BF
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.129.93.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768867270; cv=none; b=bE3fpDMQarggMoImW2eGzk++xvaWddj4WuHh5+sTbwp4mMFTExQHLLCz+vyH9TZ7DJ+zvUQIbD1uRY1JtDXEZklY1PB4W2lGBvgmde4/wMv0+RUGFVgvVn+kMF27r610v92v7l8vHfA/CZmcAC+N8DJvo+9sqh+V/ZpSagoWJqk=
+	t=1768870129; cv=none; b=UOn6GnrE50CmFxm63W2UDvbHjd0+ZSZ+lVPGcL8VcjYOnShj7EClcMI/gBjeeOiEprBzvIw0KEjfvj6zIMz4PXmEZcXSML0uWA9VHOG7D+e9x/SGikzLFnRdpGEDiFh4/bph4wzfiwTq1MS3+VZsvFoMSuygleo+TzpeDpjFtpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768867270; c=relaxed/simple;
-	bh=eARXrDalK2XMNY9fhPqlkzJ8SDghSSdVP0qkC98TgUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jsVjMFMHKEZh8DMG3qfOLKnL7Lsr+FQQgNN3gvpvucofyfaTTS274qWRqj/Bw7/6nUctv8fgYuT8+YVSDztZYRHZZqPg51CLEzExp5+jbpYho4H1e4lUVWVB5KhhssT/uRwSGLJCZCzS8SmFAq/Kjq35IWI6irx03oAwU1sdu7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 48E2E6033F; Tue, 20 Jan 2026 01:01:06 +0100 (CET)
-Date: Tue, 20 Jan 2026 01:01:01 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com,
-	davem@davemloft.net, Mazin Al Haddad <mazin@getstate.dev>
-Subject: Re: [PATCH net v3] ip6_gre: use skb_vlan_inet_prepare() instead of
- pskb_inet_may_pull()
-Message-ID: <aW7FvS8wE2zNDDZ2@strlen.de>
-References: <20260119112512.28196-1-fw@strlen.de>
- <20260119090629.20d202e8@kernel.org>
- <CANn89iJOz_PQ_N4e=FS+toEDfLw-Ei9SwV6LU9Jmsvhtyxb7SQ@mail.gmail.com>
+	s=arc-20240116; t=1768870129; c=relaxed/simple;
+	bh=4svxBZQ3RPxlhAENJZN/CF6IXpMwFIpjnBX33bl4DLM=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ttcQQg5Trib3ezG1IFCXspS4YTGzM0xtWPbMCmIOBgGL6L3OlQLfD4irdtDVnSQDQRaSvPfkbxkV4PYYwpq+bAYYnywIs7urjHEv51JwcYayT3n32I85UeFcbdNYgkl3rVlRQeomxefWKB8X6qnTlZmB6XsfndaciYMoIKpQw7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=QRdLLYtq; arc=none smtp.client-ip=57.129.93.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1768870108; x=1769129308;
+	bh=ZkEBgcbthzeyCZGFSk1PGFkY9eDCiL/ndFf14lfNB9k=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=QRdLLYtqB5xX9xLLcfz77d+uVn/eU+MJkFg1o4+HvIzIYcxUhAVkGykADZ4btWAHw
+	 wMmmt3YqUuSPkRPHpe4kXtyNGkkcoE7fr2vT5jS7N5Zm6NC5nbeDCEWp21f/Ji+en0
+	 JjXu3WP3kP2rhRpMNPouDHywztz7AiPG4XeBOuBxfD2xxeJn2IxB5tlzNoCHlDP4tN
+	 iMurei7oJIfE4lfGVWPBo9uOmPEYdPJkfJIrI8gMlp6ioLzA8VEFlRaFqSJbYz9yL2
+	 V7DMW7EncOZZEC9RXLf9udy5taauVZG+vdir74t4uoFBk0zqGoviKlS0x8+98FjWNR
+	 Rb1ZNTIP+A3WA==
+Date: Tue, 20 Jan 2026 00:48:21 +0000
+To: netdev@vger.kernel.org
+From: Paul Moses <p@1g4.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, Paul Moses <p@1g4.org>
+Subject: [PATCH net v2 0/2] net: sched: act_gate: fix update races and infoleak
+Message-ID: <20260120004720.1886632-1-p@1g4.org>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: 95d34b41a6eeee5445f72e890bbf123da97a4a6c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,47 +54,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJOz_PQ_N4e=FS+toEDfLw-Ei9SwV6LU9Jmsvhtyxb7SQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-Eric Dumazet <edumazet@google.com> wrote:
-> On Mon, Jan 19, 2026 at 6:06 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Mon, 19 Jan 2026 12:24:57 +0100 Florian Westphal wrote:
-> > > From: Eric Dumazet <edumazet@google.com>
-> > >
-> > > I added skb_vlan_inet_prepare() helper in the cited commit, hinting
-> > > that we would need to use it more broadly.
-> >
-> > I _think_ this makes GRE forwarding tests a bit unhappy:
-> >
-> > https://netdev.bots.linux.dev/contest.html?branch=net-next-2026-01-19--12-00&executor=vmksft-forwarding&pw-n=0&pass=0
-> > --
-> 
-> I was unsure about ip6erspan_tunnel_xmit() change, I think I started
-> full tests days ago but probably was distracted.
-> 
-> I had :
-> 
-> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-> index d19d86ed43766bbc8ec052113be02ab231a5272c..9e214c355e6ce15fa828866ae20fa8fe321b4bf7
-> 100644
-> --- a/net/ipv6/ip6_gre.c
-> +++ b/net/ipv6/ip6_gre.c
-> @@ -881,7 +881,7 @@ static netdev_tx_t ip6gre_tunnel_xmit(struct sk_buff *skb,
->         __be16 payload_protocol;
->         int ret;
-> 
-> -       if (!pskb_inet_may_pull(skb))
-> +       if (skb_vlan_inet_prepare(skb, true))
->                 goto tx_err;
+This series fixes act_gate schedule update races by switching to a
+prepare-then-swap model with an RCU-protected params pointer, so the
+hrtimer/datapath never observe partially updated or freed schedules.
+Old params are freed via call_rcu() after the swap.
 
-It has to be either true or false depending on test case 8-/
+It also zero-initializes the netlink dump struct to prevent padding
+information leaks, and tightens schedule/timing validation to avoid
+misprogramming the hrtimer on invalid inputs.
 
-gre_gso.sh needs this to be set to true, skbs don't have a mac
-header: with "false": skb nhoff gets munged from 0 to 14.
+Changes since v1:
+- Drop tc-testing changes; no test updates required
+- Validation fixes: base/cycle range checks + derived cycle overflow guard
+- Fix create/update corner cases: avoid oldp deref on create, publish param=
+s
+  only after full init, fix partial schedule copy cleanup
+- Timer handling: cancel/reprogram only when required
+- Keep dump struct zero-init without unrelated code motion
 
-But in mirror_gre.sh test case, skbs do have a mac header:
-"true" munges nh offset from 14 to 0 and test fails.
+Patches:
+ 1/2 net/sched: act_gate: fix schedule updates with RCU swap
+ 2/2 net/sched: act_gate: zero-initialize netlink dump struct
+
+--
+2.52.GIT
+
 
