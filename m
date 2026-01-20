@@ -1,104 +1,108 @@
-Return-Path: <netdev+bounces-251436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B5FD3C519
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:25:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C150D3C5A7
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 52B9E586C40
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:15:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8514E6A83DA
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B37B3D666F;
-	Tue, 20 Jan 2026 10:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20D83D7D9F;
+	Tue, 20 Jan 2026 10:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VJlC1K2g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AyvlNeeD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854A134677E;
-	Tue, 20 Jan 2026 10:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B013D7D8C;
+	Tue, 20 Jan 2026 10:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768904090; cv=none; b=FcjWc0bXhgD4Q8SpHKLAqjjq3pFl7Td3APgHj09cHg8wwlvJLjPsrQswR2Lm1zLbYLR0WP+T/C4EhcdXoGH9/0AKNGcECxaXqCD/simlofUqlOMN+b3KiOVqk/3roiglYnWgowvAYE0WFIvXJ7L1Ene50LpfNPToBPJBVqZUe8I=
+	t=1768904270; cv=none; b=ArRD18E6t0mYJpYM5FcVBm5Mmm5gNE7Kam/mONPwFFMIqCdYc5TNOND+Y722tI4aCPKDEn6SzCaKXcOE7jK73WHmxmLQpgLj+kpl8JeUEgNnxcnGoJj4Z+kTFLohlU1+t1dtgXrmg7EEBYy5/Jt5idY7ElF96K36NB8IAWujPpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768904090; c=relaxed/simple;
-	bh=buP/szZwt17JVG9BnbMq/pjgBL+/a7djpPYDhAKOW+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1R4uK8uGDWIoCpmJOftMKLmqUEcBTyy5S6vIHi2IhncetC+EsDFO/Q9a3rAPuMYvmgX4FT4EzyPE7X8MNDhPYnR69+vfyaToTXLC403Hb4xq8zTDQLkYUkg/OZMebZbmME6AtqNf0W5U7wDMiawCwX636MegjgcStdvPqW1O6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VJlC1K2g; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9Yv+dpRQRMN5qyhSBXjej37h+nZntknJMic+/TUR9+o=; b=VJlC1K2gyJ9/otBfB1zskPXFfG
-	W24edyx/d7uS+k2Lr5Px/mwPserfDD0u0ythB0g/la0lT0fiK/XOl6VikBxGutkeQz8Dr1DAdlZm6
-	nhCCtkJSBoSPzlzDbLoSnAsEMSvsTR1l3dzC0zT9U3rTjWQCUDGJBixA6hMRwoHi4+9J+97gE0EI8
-	q4wrj32W+vmtiKrQ0S3BRAaqfJO+6dQIgjDK+jDV4RVMnrojaFCPLJzwFqNl78mW3Yw5Ah6fyc1ib
-	7q7kehaZ0n6exkqc7VXbWW5Z76+ZyUrodOlwZGR25zdXb8d/Mse00/lPaGbZdCJcxg9f6RAnCEE6l
-	0eSB3V7A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42602)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vi8kz-0000000064a-0tA1;
-	Tue, 20 Jan 2026 10:14:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vi8kw-000000007RQ-3W81;
-	Tue, 20 Jan 2026 10:14:38 +0000
-Date: Tue, 20 Jan 2026 10:14:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-phy@lists.infradead.org,
-	davem@davemloft.net, maxime.chevallier@bootlin.com,
-	alexandre.torgue@foss.st.com, mohd.anwar@oss.qualcomm.com,
-	neil.armstrong@linaro.org, hkallweit1@gmail.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	edumazet@google.com, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vkoul@kernel.org,
-	andrew@lunn.ch, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <aW9VjieyiZCNbb-G@shell.armlinux.org.uk>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
- <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
- <20260120084227.j2wgbmjsrpmycpgn@skbuf>
+	s=arc-20240116; t=1768904270; c=relaxed/simple;
+	bh=KO+K1i+AhFEyWElV5V29fhgrpXDoQ8qehhOTJGwc4xo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L+uJN5rvaKfIEJmZYptE8esu9A4j0bOdhfbqi1/OkrfFkIFdizMK9KIh9P6OvRIhuK8wy0nfKvLH7sNNopMur05EXjPYcB4MSF8sdTgAOwD3BNnjBtEvbvCdBkiJcMp4KOuuZyCAQFThtWuNmEQuAiL7J8EYO6aSvnlBxeve/00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AyvlNeeD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94BFDC16AAE;
+	Tue, 20 Jan 2026 10:17:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768904270;
+	bh=KO+K1i+AhFEyWElV5V29fhgrpXDoQ8qehhOTJGwc4xo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=AyvlNeeD+z+5r8oFKfnkDh7hAQc96IEoFclF/RDuQ+bgidBpDJePKCFT60rvyEU0E
+	 oSaYX6yvovRPTlJYAdzhdpfq2Eym4jxiVuqPNMR/F+9mWkI8vW8z79Ct7EVW8d/OVj
+	 HEeF0RGAhwg18nxls4K0MkE3R5pekCj7QEMkV995NUu9LainqMTzd56rTOfV4rMbqB
+	 heIGUM9s5mf5Atk7gn4mVLIv18nIHag11G/VPmmI3zk91Oy7nK/g6649HdjwZQLd2y
+	 3yFR+tACAS8OS4ik+X3aEnDySKldljelZeUx9ePgYELGP1Z+SITVBtlEaJav9XNUH7
+	 X+ClNHFRbAUng==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next v4 0/2] airoha: Add the capability to read
+ firmware binary names from dts for Airoha NPU driver
+Date: Tue, 20 Jan 2026 11:17:16 +0100
+Message-Id: <20260120-airoha-npu-firmware-name-v4-0-88999628b4c1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120084227.j2wgbmjsrpmycpgn@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NQQ6CMBCF4auYrq2ZThHRlfcwLko7SKMWMlXUE
+ O5uIS40Rpf/S+abXkRiT1FsZr1g6nz0TUiRzWfC1iYcSHqXWiBgDgpW0nhuaiNDe5WV5/PNMMl
+ gziR1RksANMroSqTzlqny94ne7VPXPl4afkyfOjWuL1Thb7RTEqSDUmVFma8UVNsjcaDTouGDG
+ NUO3yX9R8IkYWFL7VADQv4l6Xdp/UfSSbKlKQoit86t/ZCGYXgCRbU9EFUBAAA=
+X-Change-ID: 20260107-airoha-npu-firmware-name-34e5002a1a3f
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
 
-On Tue, Jan 20, 2026 at 10:42:27AM +0200, Vladimir Oltean wrote:
-> More to the point, if dwmac_integrated_pcs_enable() fails at
-> dwmac_serdes_power_on() (thus, the SerDes is _not_ powered on), by your
-> own admission of this PCS calling convention, sooner or later
-> dwmac_integrated_pcs_disable() -> dwmac_serdes_power_off() will still be
-> called, leading to a negative phy->power_count.
-> 
-> That is to say, if the model is "irrespective of whether pcs_enable()
-> succeeds or fails mid way, pcs_disable is called anyway()", then these
-> methods are not prepared to handle that reliably.
+This patch is needed because NPU firmware binaries are board specific since
+they depend on the MediaTek WiFi chip used on the board (e.g. MT7996 or
+MT7992). This is a preliminary patch to enable MT76 NPU offloading if
+the Airoha SoC is equipped with MT7996 (Eagle) WiFi chipset.
 
-That's the way it currently is, and it's been this way in the
-major_config path for a very long time. If anything fails in that
-path, we can't report the error back up to anyone, and the netdev
-is effectively dead.
+---
+Changes in v4:
+- Add missing MODULE_FIRMWARE definitions for EN7581_7996_FIRMWARE
+  binaries
+- Link to v3: https://lore.kernel.org/r/20260119-airoha-npu-firmware-name-v3-0-cba88eed96cc@kernel.org
 
+Changes in v3:
+- Roll-back to approach proposed in v1 using firmware-name property
+- Link to v2: https://lore.kernel.org/r/20260113-airoha-npu-firmware-name-v2-0-28cb3d230206@kernel.org
+
+Changes in v2:
+- Introduce "airoha,en7581-npu-7996" compatible string to specify the
+  firmware and drop "firmware-name" property
+- Link to v1: https://lore.kernel.org/r/20260112-airoha-npu-firmware-name-v1-0-d0b148b6710f@kernel.org
+
+---
+Lorenzo Bianconi (2):
+      dt-bindings: net: airoha: npu: Add firmware-name property
+      net: airoha: npu: Add the capability to read firmware names from dts
+
+ .../devicetree/bindings/net/airoha,en7581-npu.yaml |  7 ++++
+ drivers/net/ethernet/airoha/airoha_npu.c           | 46 +++++++++++++++++++---
+ 2 files changed, 47 insertions(+), 6 deletions(-)
+---
+base-commit: 4515ec4ad58a37e70a9e1256c0b993958c9b7497
+change-id: 20260107-airoha-npu-firmware-name-34e5002a1a3f
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
