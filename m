@@ -1,73 +1,104 @@
-Return-Path: <netdev+bounces-251356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BEBD3BE9D
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 06:05:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBE2D3BE9F
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 06:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F39E0355A48
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 05:05:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C9F1D3530B6
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 05:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EBA36164A;
-	Tue, 20 Jan 2026 05:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456B93612FE;
+	Tue, 20 Jan 2026 05:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZTZDLJy8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ar9cdeXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F58358D38;
-	Tue, 20 Jan 2026 05:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBDD35FF77
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 05:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768885508; cv=none; b=DWDFejuhE4dK/TeMesgxalv2w4uqfPlGZW+1Bcrffp7hRr4LaP7FiZaOTfKl5WYOy1wplktpb+pNKeoSZEAMUE+DnqPM206H/tLznhG6bJv/MIU+Pd9h2hmC+SD6EZ9BeaNV4B7NfCb8pKC9NZNNzMprYqUn3uzCxmmynpvvsew=
+	t=1768885553; cv=none; b=KyAVRFjWGuXDsjk647iYSB1UZS0V/1xzK/zozvlg50ET9AF6ZrzLVDoSg0qcTZQtyPkw+7/ax3yUlE+6TrZYFmcusx5lapsu5G8bQP4CECeq+1hMqmiBSJrjNWwIly18WvvkTxrE5QOa9P1y5yvFXGXGAp5A5E3c0US1yATG7d8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768885508; c=relaxed/simple;
-	bh=BrIXmvybUtoWY4wENWrhxh7+xxm2r7BqU2j1hKLg/G4=;
+	s=arc-20240116; t=1768885553; c=relaxed/simple;
+	bh=PC4UrdjLqaW0iLhVA9Sz3l4QXzyP/7m+HKjSOXpuvYc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bPKTgc4Vxq3oSNIMVsTFWE39yynrCqiBEuLGe2dXvF5eiPxLHNL+zWWTWlV3XecPZQ3eT+Z2m+BepByNOT72foaXpokuRzGJYLWG03Fg4ByWDM51/J0ctPr5tuJW4iz1VUynIXoksJMPguQWPJTeISineHAkj6gAKP/oREVlPf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZTZDLJy8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wCN4UYMt+Rx9hUfDdniW1Dw+n2P8tOWoG81cAbW5WLA=; b=ZTZDLJy8AtdAVEYsVuFeC7mDKa
-	uqcRNQ3b5NqGxITW36UeV/zro1ZtWcMy7ec+fSFOg1es3Z1d06YQfxeHw3FG2kmC07/YObcV3gTb8
-	aARNhEQZR4bvFJA5sZRxDN7DurNgQ9+5GCqBgbKu7mUIXt/3wx/sHJWfx09jYEouEMxiLKmhgPaNu
-	sFXgMjYw7twYE+jl/TdOcy0GJNScd+FPGLfbg6qY4ySI+la+/N5KmtzDmwS2+WwgdM5jm3Vd5+DQ5
-	GrrOuyciKjra04i3y4zgH6yU4yuGKHPnA61cyJKRTFbl0Sx8IuCJUq2Mu0IePKXBYWNlBoAd3wlJG
-	fV3zK6qQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46264)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vi3vE-000000005rn-1wmm;
-	Tue, 20 Jan 2026 05:04:56 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vi3vB-000000007Am-2N4p;
-	Tue, 20 Jan 2026 05:04:53 +0000
-Date: Tue, 20 Jan 2026 05:04:53 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-phy@lists.infradead.org, davem@davemloft.net,
-	maxime.chevallier@bootlin.com, alexandre.torgue@foss.st.com,
-	mohd.anwar@oss.qualcomm.com, neil.armstrong@linaro.org,
-	hkallweit1@gmail.com, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, edumazet@google.com,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	vkoul@kernel.org, andrew@lunn.ch, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJTmmZCE8jJEMyh2lbvMlaSIwZE06Iq2yaZUGLhbWnbp8VPudVGd00UN/Uuvb/9EpUJ49n5SvfbqhNUQwucHf4dkTyHmNaHnPeh7Utx1lK3imHeuzIt0z8EQUKq8G4e+9tXx3NdQ9UTmvyW08afSVmTy49e370VOd6ErHiz7Aqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ar9cdeXJ; arc=none smtp.client-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1233c155a42so6379195c88.1
+        for <netdev@vger.kernel.org>; Mon, 19 Jan 2026 21:05:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768885549; x=1769490349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gFedj4f11o/3T9vWUp8OttHw6rjgwlEi4dqKoM80zmU=;
+        b=Ar9cdeXJXB4htFKCh+kHdDLQZF8B6yRc05KRIA9ESLIVLV35SjF7NJ0UHmPPRMnH5e
+         1Pn7j3eUZpb4rqg84OE4f1H6giGUsn6NH/88a16jseZ/NB5hZyRyA3CxPowQ+TQM7DcB
+         PIGg2yDAYfgv5spq5hvHiORzuEjG4TnoBovhQV07lbrOCmam81fTSGgNeXPFZwpfqGcn
+         N3MCh6bFf7zdVD1uU0KLVQ8vIpTHCoxbaC4A3yOOkcbi2pHHmKvxjWPJ4gQI5NETGNsk
+         e5QGzomxi/a+BI1vvCaNQfpo0NosxIsRLo9kvg2BBhlmZRZqd4lpKlI/hax+MnSfmLae
+         f+gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768885549; x=1769490349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gFedj4f11o/3T9vWUp8OttHw6rjgwlEi4dqKoM80zmU=;
+        b=hX2X/737TjpHzgjxU5AkxtGgS8iEnn95AbSKKWKVkXk2dx0YFw+346FS5xhE9H/dTe
+         KH23cPoWSmKJd2cU99B9inK69RT4kP7zJ6Fv8DOvEnrhkyP5+wzoQRNE9rbkkZ2u+zMa
+         79+vRkeJ5OicQNp0PYZhLeatz5ILsBsdBtMPuLqILiaKm4oPk76yMrP1+Z8KcNymdbbo
+         kRlmrI4hmsw36M+IS72BRW9GaeuF44+6y1VrhGTMLep7oI02SH8yjR9qUj0zAOYClbBM
+         /DmiMaH6s0pN0MqtP3aoRNdEYoFJ2EIIKzUnYbf3yLWUjeTXu2y1LtLQ/zFGa09k7Sn5
+         B4HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpSin1VxeCKJrvvcmslmVdFUanbKKcTZdRWqIn7Kj6zjVS1kyNIV8631HcbpbYJwEYoCaAZQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVbUBYRtLO2amWI2YjN+YWPcAtW/pK8wZMwKsRlaRjLIPmiwyR
+	eKeeOO090rzk/K0OSqxMduRB1fWsFl0Q37ZxKbXR+Fjb14x4aIlatale
+X-Gm-Gg: AY/fxX4FNbLFfIRbxoYkRWMai4hnnQtkkZuKx0R6hs9Tx/O483gQqwANuuAyGriFo4o
+	jIoXOa4xBv3f3mBVt1TGWRhPff3G2BYegVJBd6JYiXUbirMmQPwJ8YjsIaMPe4DoVcuVL9ukmTC
+	9nNR25j0DQCWdEJmMoMQOlrlRhfAK5F1Qr1JN5rPhmNbYuVN5GgS/4upEjn4//VUkZ6BQuRMx7S
+	N5VMH8W93E7sIvzqty5s3PqjlW+GTKee+rRarjVSmPo4jIoogFvC7BUvvdjEKMGXXqOKdigQs99
+	UGb2YAxcpaHL8tCtZgjgpzo3dWeVwhoU4srgmGOs8jQN89txdKeSmCs+zAckriemjK7h4zUsTRt
+	IgYY3TWyOe61HeCq6JEhmEziGQbxdEIfj9Y8L0jQxiVeDqaCy0xdqklF1LSCZbrHVCsmIPMu9wX
+	9YEmSOoIIRwZLQ67CYgpIf
+X-Received: by 2002:a05:7022:672a:b0:119:e56b:98bf with SMTP id a92af1059eb24-1246aac3151mr600082c88.38.1768885549389;
+        Mon, 19 Jan 2026 21:05:49 -0800 (PST)
+Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244af10736sm19178432c88.14.2026.01.19.21.05.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 21:05:48 -0800 (PST)
+Date: Tue, 20 Jan 2026 13:05:39 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Yanteng Si <siyanteng@cqsoftware.com.cn>, 
+	Yao Zi <ziyao@disroot.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Choong Yong Liang <yong.liang.choong@linux.intel.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Shangjuan Wei <weishangjuan@eswincomputing.com>, Boon Khai Ng <boon.khai.ng@altera.com>, 
+	Quentin Schulz <quentin.schulz@cherry.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, spacemit@lists.linux.dev, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: Add glue layer for Spacemit K3
+ SoC
+Message-ID: <aW8MJpERR3TmsiKg@inochi.infowork>
+References: <20260120043609.910302-1-inochiama@gmail.com>
+ <20260120043609.910302-4-inochiama@gmail.com>
+ <aW8LAFhCRWlMVemz@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,72 +107,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260119192125.1245102-1-kuba@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <aW8LAFhCRWlMVemz@shell.armlinux.org.uk>
 
-On Mon, Jan 19, 2026 at 11:21:25AM -0800, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On Tue, Jan 20, 2026 at 04:56:32AM +0000, Russell King (Oracle) wrote:
+> On Tue, Jan 20, 2026 at 12:36:08PM +0800, Inochi Amaoto wrote:
+> > Adds Spacemit dwmac driver support on the Spacemit K3 SoC.
 > 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net: stmmac: add stmmac core serdes support
+> Some more information would be useful. E.g. describing why you need to
+> fix the RGMII mode.
 > 
-> This commit adds SerDes PHY support to the stmmac core driver, moving it
-> from platform glue into the integrated PCS driver. The SerDes is managed
-> through phy_init/phy_exit for lifecycle and phy_power_on/phy_power_off
-> for the power state.
-> 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> > index 2f826fe7229b..4d1902f3a58f 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-> 
-> [ ... ]
-> 
-> > static int dwmac_integrated_pcs_enable(struct phylink_pcs *pcs)
-> > {
-> > 	struct stmmac_pcs *spcs = phylink_pcs_to_stmmac_pcs(pcs);
-> > +	struct stmmac_priv *priv = spcs->priv;
-> > +	int ret;
-> >
-> > -	stmmac_mac_irq_modify(spcs->priv, 0, spcs->int_mask);
-> > +	ret = dwmac_serdes_power_on(priv);
-> > +	if (ret)
-> > +		return ret;
+
+OK. I will add this.
+
+> > +/* ctrl register bits */
+> > +#define PHY_INTF_RGMII			BIT(3)
+> > +#define PHY_INTF_MII			BIT(4)
 > > +
-> > +	if (spcs->interface != PHY_INTERFACE_MODE_NA) {
-> > +		ret = dwmac_serdes_set_mode(priv, spcs->interface);
-> > +		if (ret)
-> > +			return ret;
->                         ^^^^^^^^^^
+> > +#define WAKE_IRQ_EN			BIT(9)
+> > +#define PHY_IRQ_EN			BIT(12)
+> > +
+> > +/* dline register bits */
+> > +#define RGMII_RX_DLINE_EN		BIT(0)
+> > +#define RGMII_RX_DLINE_STEP		GENMASK(5, 4)
+> > +#define RGMII_RX_DLINE_CODE		GENMASK(15, 8)
+> > +#define RGMII_TX_DLINE_EN		BIT(16)
+> > +#define RGMII_TX_DLINE_STEP		GENMASK(21, 20)
+> > +#define RGMII_TX_DLINE_CODE		GENMASK(31, 24)
+> > +
+> > +#define MAX_DLINE_DELAY_CODE		0xff
+> > +
+> > +struct spacemit_dwmac {
+> > +	struct device *dev;
+> > +	struct clk *tx;
+> > +};
 > 
-> If dwmac_serdes_set_mode() fails here, doesn't this leave the SerDes in
-> a powered-on state? dwmac_serdes_power_on() succeeded at this point but
-> there's no corresponding dwmac_serdes_power_off() call before returning
-> the error.
+> This structure seems unused.
 > 
-> Looking at phylink_major_config(), it appears to discard the return
-> value from phylink_pcs_enable(), so the caller won't know to call
-> pcs_disable() to clean up the power state.
 
-This AI analysis is incorrect.
+Yeah, I forgot this, will remove in the next version.
 
-By the time phylink_pcs_enable() has been called, the PCS is already
-plumbed in to phylink. It _will_ have phylink_pcs_disable() called on
-it at some point in the future, either by having the PCS displaced
-by another in a subsequent phylink_major_config(), or by a driver
-calling phylink_stop().
+> > +
+> > +/* Note: the delay step value is at 0.1ps */
+> > +static const unsigned int k3_delay_step_10x[4] = {
+> > +	367, 493, 559, 685
+> > +};
+> > +
+> > +static int spacemit_dwmac_set_delay(struct regmap *apmu,
+> > +				    unsigned int dline_offset,
+> > +				    unsigned int tx_code, unsigned int tx_config,
+> > +				    unsigned int rx_code, unsigned int rx_config)
+> > +{
+> > +	unsigned int mask, val;
+> > +
+> > +	mask = RGMII_RX_DLINE_STEP | RGMII_TX_DLINE_CODE | RGMII_TX_DLINE_EN |
+> > +	       RGMII_TX_DLINE_STEP | RGMII_RX_DLINE_CODE | RGMII_RX_DLINE_EN;
+> > +	val = FIELD_PREP(RGMII_TX_DLINE_CODE, tx_config) |
+> > +	      FIELD_PREP(RGMII_TX_DLINE_CODE, tx_code) | RGMII_TX_DLINE_EN |
+> > +	      FIELD_PREP(RGMII_TX_DLINE_CODE, rx_config) |
+> > +	      FIELD_PREP(RGMII_RX_DLINE_CODE, rx_code) | RGMII_RX_DLINE_EN;
+> 
+> These FIELD_PREP() fields look wrong. Did you mean to use DLINE_CODE
+> both tx_config and tx_code, and did you mean to use TX_DLINE_CODE for
+> rx_config ?
+> 
 
-If we clean up here, then we will call dwmac_serdes_power_off() twice.
+This should be RGMII_TX_DLINE_CODE. This is a copy paste error, I
+will fix it.
 
-Yes, it's not "nice" but that's the way phylink is right now, and
-without reworking phylink to record that pcs_enable() has failed
-to avoid a subsequent pcs_disable(), and to stop the major config
-(which then potentially causes a whole bunch of other issues). I
-don't even want to think about that horrid scenario at the moment.
+> > +	plat_dat->clk_tx_i = devm_clk_get_enabled(&pdev->dev, "tx");
+> > +	if (IS_ERR(plat_dat->clk_tx_i))
+> > +		return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat->clk_tx_i),
+> > +				     "failed to get tx clock\n");
+> 
+> You set plat_dat->clk_tx_i, but you don't point
+> plat_dat->set_clk_tx_rate at anything, which means the stmmac core
+> does nothing with this.
+> 
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Yes, the vendor told me that the internal tx clock rate will be auto
+changed when the speed rate is changed. So no software interaction
+is needed.
+
+> Given the last two points, has RGMII mode been tested on this
+> hardware?
+> 
+
+In fact I only tested the rgmii-id, which does not change the internal
+id. I will try the rgmii mode.
+
+Regards,
+Inochi
 
