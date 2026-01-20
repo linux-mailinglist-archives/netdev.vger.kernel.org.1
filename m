@@ -1,275 +1,155 @@
-Return-Path: <netdev+bounces-251342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C683D3BD91
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 03:40:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF15D3BD9E
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 03:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D768D30268DD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 02:40:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4152130076A1
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 02:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BACF221F15;
-	Tue, 20 Jan 2026 02:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316793594A;
+	Tue, 20 Jan 2026 02:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="RQZiVrjU"
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="kdjjMOe3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F90F19F135;
-	Tue, 20 Jan 2026 02:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768876842; cv=none; b=WsnY5MxHk96Xb+fScLKBPahoHGSJRetvpQuV49w6S0VzAYLgogVsFJ/ihnV5Z7kM6fMNL6v8iJXxou+WvMXksFPaoFmywIqIeo5IiMSB7H4hNMe3RhNcWo0v89leZRiWvO7LJxxpF+brmIerkpzFFYDd0SviHrKX1VFcgZmrPAo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768876842; c=relaxed/simple;
-	bh=0RlVdHe//tMrY9/TaAgUPqkBM4kgKDUVl8S3tiU4ELA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rYcbfbXsLA5u3T5ittmRyBdEx9CN0rEJN3LRymTwPM4T+BeLngitm9mBLK0WF0kqB0Sv4KWygnwNLZv0oZt9WMU3vbo3qOlmM05pROL1qlspjyV/pmLCSP0hAGkQfS48zjOpGauPJYFIV9pYROlF4nQqZnpzvIlPUuEXG5kHhOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=RQZiVrjU; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60JNlDPn3603844;
-	Mon, 19 Jan 2026 18:40:30 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=Bp3bEe1EaWglwdXuwJrg4fm
-	SqbhmxbpTUp3u4lHnDc0=; b=RQZiVrjUT9pGSL6bw/7Qfgf763FZJypJD9Y2yc+
-	7WGjil85DM6gDkWjzHvkxzVFaRH+RUsxWtBIgmYhhxtvlO1nMmnZX7BJSdA/5kYy
-	0ShnvXlYuRvnIBsZ5eQto/6pm6WVdqGNQMONFGEA2nonw+Vptt08rNkMd8LiZV7w
-	cSBM1ZuFw9YBvphwApTPYBlBNvQCab10yWgKnVrFkvUvvIqQyxm8wcW8X5pAVeUC
-	W++xvXdJ9OcmwMnDIct6QMM9fz4KCxOR67S+gxWEQWwZSkAVXt416cSUuQ0yLtj7
-	AZ8C+W00LvLaIICJRXJW3//2XfbGxphutF/zyIzD6+5axvA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bsg209tbw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Jan 2026 18:40:30 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 19 Jan 2026 18:40:45 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 19 Jan 2026 18:40:45 -0800
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id F014C3F709A;
-	Mon, 19 Jan 2026 18:40:26 -0800 (PST)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net] octeontx2-af: Fix error handling
-Date: Tue, 20 Jan 2026 08:10:12 +0530
-Message-ID: <20260120024012.1292307-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC43282EB;
+	Tue, 20 Jan 2026 02:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768877222; cv=pass; b=IGNSZ/mqkXHEcB3nmfnjLuJpv08bRbqemYr7Aa8CmCqJnRxgG52j6Yt2EE39FlCxucq5Fpdk7o4H2Z52Vs1t2ZwRSd92Vpjw7MveZn56NIAqlLM+/m9YVMT9p7ncU+kxeRmtke72GgL3BAq69sWlgjzY+8of4jZvN/mNyxxxEQw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768877222; c=relaxed/simple;
+	bh=nhXN26JoolIL1Xdbhpbg2sS+g8m8nFWQLCaLh4k2mWo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qqtT81AXxotWMm7ypa1Q4Bn5Znuvlsgv/lE9CdYQI8RKT9NtzsSjdqg+/l3mgxJmWNaS4BOjaow4dCm6EHjee9H50/eStFqOnBerOTPiDSvYa3bI/bDh6wEbky8FQLu1TJ3+ukgUgoOPsG+z0xk386klbxwhYJIEygevxN4y78s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=kdjjMOe3; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+ARC-Seal: i=1; a=rsa-sha256; t=1768877167; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=NnWRPGbaN0dmLD60QyM9bYRNLcfe3vwzP5oAbDViH0nj8hHSd09li1mpl46+pH+8e69Z5aNklwZ+sJ25/B7AKflQnjtIabRwEXbytyyu67a24bhv1Ewcy+1NPw9+R9RQjtuKoFOg2iCq/3hLhcg9aBjsMNQ531LtCfqXineeNhM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1768877167; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=rhwkVzwjdK5+6aY3khIq+NuvaXHHwgKguTzRHkWnsLc=; 
+	b=EGudDtRpFRKowYoR5L51Dpn+9CvHunPsBdTdIgOgHUk48QpCSH4fURp6rsnLIZIQSPbRCz4UaRk1cPpo4loz0L1eRrHbhBUpwMKfiMs+uXK+UgEx0P/4IApchSYJzUrBfgL867oA3wRMzSt3hOjPZfFvoAjRj4qWbQ4CplQVZYI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=ziyao.cc;
+	spf=pass  smtp.mailfrom=me@ziyao.cc;
+	dmarc=pass header.from=<me@ziyao.cc>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1768877167;
+	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
+	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
+	bh=rhwkVzwjdK5+6aY3khIq+NuvaXHHwgKguTzRHkWnsLc=;
+	b=kdjjMOe3jq86dEtQu6s4ye06+AMocUwVULxywfMyO4Tmxp6V47R6zm8T/dpISUfF
+	EWgzII/+m2DvgtnjZo7gB9Ywxr5H390uvORT1yyWA5GaKcHGlh1F72bchm1zdnFlgs4
+	Np9cd5PKA/MM1+EXpsqLWRc7koC7CddkVDcLL5wo=
+Received: by mx.zohomail.com with SMTPS id 17688771633341009.492207247847;
+	Mon, 19 Jan 2026 18:46:03 -0800 (PST)
+Date: Tue, 20 Jan 2026 02:45:47 +0000
+From: Yao Zi <me@ziyao.cc>
+To: Georg Gottleuber <ggo@tuxedocomputers.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, Frank.Sae@motor-comm.com,
+	hkallweit1@gmail.com, vladimir.oltean@nxp.com, wens@csie.org,
+	jszhang@kernel.org, 0x1207@gmail.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, jeffbai@aosc.io, kexybiscuit@aosc.io,
+	Christoffer Sandberg <cs@tuxedocomputers.com>
+Subject: Re: [PATCH RESEND net-next v6 0/3] Add DWMAC glue driver for
+ Motorcomm YT6801
+Message-ID: <aW7sW91DrgZ6FMrv@pie>
+References: <20260109093445.46791-2-me@ziyao.cc>
+ <176827502141.1659151.5259885987231026081.git-patchwork-notify@kernel.org>
+ <147b700c-cae2-4286-b532-ec408e00b004@tuxedocomputers.com>
+ <aW5RMKqwpYTZ9uFH@shell.armlinux.org.uk>
+ <be9b5704-ac9c-4cd5-aead-37433c4305a8@tuxedocomputers.com>
+ <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: AwP0iH78lb8is3LdxVKEXuWiCrXSEA0F
-X-Authority-Analysis: v=2.4 cv=XPY9iAhE c=1 sm=1 tr=0 ts=696eeb1e cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=IO1IhOr4ACUM0QXF5BIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: AwP0iH78lb8is3LdxVKEXuWiCrXSEA0F
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDAyMSBTYWx0ZWRfXx2egeDURy0Xy
- 61Akf5Gqsnl5mj0+Z8PX9lMbRjaFS1vqXcNHqhnWMr/vqsIsqW0RamXqWkhwJZu3EaDpe8XOWGA
- TDiprUxP15UVJFKq/QVJcDO/i5i+x8z3PtuuOxpx465JwU/sUttrCxbkf9PWh0553N6Od8gr4+m
- SNzbbcVCqkOo4JF74lDYzQY2qfLaAhB0La8zKHgI2t1y9TRXzOf7J80O+s/9891uw37F5EpacsI
- S6K8vINdrQS25hC/iZxXIpEv5lG4NYk0YTUxK5dQirg9dCWLt3qQQHJbk5UYCXdumM4vRSYOtR8
- d+aJ1yHCr85rn6+Ut2EJSfziNa3DxzrHXYo/0wPkbUpSOIMcSTJvlLzfTbbY3tRZlxFn70tggjK
- NROdkSpCT8CkKsEzLd6E+d4W/bF96d3kIgtd8t5HJMprevrHbVAHYvzxEx2jKdd7Nsz+87+fZWQ
- STNISVlJvhFaNpxpuIA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-20_01,2026-01-19_03,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+X-ZohoMailClient: External
 
-rvu_mbox_handler_attach_resources() was not handling
-errors properly
+On Mon, Jan 19, 2026 at 06:57:48PM +0100, Georg Gottleuber wrote:
+> Am 19.01.26 um 18:45 schrieb Georg Gottleuber:
+> > Hi,
+> > 
+> > thanks for the quick reply.
+> > 
+> > Am 19.01.26 um 16:43 schrieb Russell King (Oracle):
+> >> On Mon, Jan 19, 2026 at 04:33:17PM +0100, Georg Gottleuber wrote:
+> >>> Hi,
+> >>>
+> >>> I tested this driver with our TUXEDO InfinityBook Pro AMD Gen9. Iperf
+> >>> revealed that tx is only 100Mbit/s:
+> >>>
+> > ...
+> >>>
+> >>> With our normally used DKMS module, Ethernet works with full-duplex and
+> >>> gigabit. Attached are some logs from lspci and dmesg. Do you have any
+> >>> idea how I can debug this further?
+> >>
+> >> My suggestion would be:
+> >>
+> >> - Look at the statistics, e.g.
+> >>
+> >>    ip -s li sh dev enp2s0
+> > 
+> > That looks good (after iperf):
+> > 
+> > 2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP
+> > mode DEFAULT group default qlen 1000
+> >     link/ether ba:90:88:24:49:4f brd ff:ff:ff:ff:ff:ff
+> >     RX:  bytes packets errors dropped  missed   mcast
+> >        2091654   31556      0       0       0       0
+> >     TX:  bytes packets errors dropped carrier collsns
+> >       88532451    1518      0       0       0       0
+> > 
+> > 
+> >> - apply
+> >>   https://lore.kernel.org/r/E1vgtBc-00000005D6v-040n@rmk-PC.armlinux.org.uk
+> >>   to enable more statistics to work, and check the network driver
+> >>   statistics:
+> >>
+> >>    ethtool --statistics enp2s0
+> >>
+> >> to see if there's any clues for what is going on.
+> > 
+> > That looks also good, I think. I saved it before and after the test with
+> > iperf. See attachments.
+> 
+> Oh, there was something else interesting in dmesg. See attachment.
+> 
+> > Regards,
+> > Georg
 
-Fixes: 746ea74241fa0 ("octeontx2-af: Add RVU block LF provisioning support")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/af/rvu.c   | 86 ++++++++++++++-----
- 1 file changed, 63 insertions(+), 23 deletions(-)
+> [    0.933480] dwmac-motorcomm 0000:02:00.0: error -ENOENT: failed to read maca0lr from eFuse
+> [    0.933483] dwmac-motorcomm 0000:02:00.0: eFuse contains no valid MAC address
+> [    0.933485] dwmac-motorcomm 0000:02:00.0: fallback to random MAC address
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index 2d78e08f985f..9b898d718fbf 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -1396,7 +1396,6 @@ static void rvu_detach_block(struct rvu *rvu, int pcifunc, int blktype)
- 	if (blkaddr < 0)
- 		return;
- 
--
- 	block = &hw->block[blkaddr];
- 
- 	num_lfs = rvu_get_rsrc_mapcount(pfvf, block->addr);
-@@ -1551,8 +1550,8 @@ static int rvu_get_attach_blkaddr(struct rvu *rvu, int blktype,
- 	return -ENODEV;
- }
- 
--static void rvu_attach_block(struct rvu *rvu, int pcifunc, int blktype,
--			     int num_lfs, struct rsrc_attach *attach)
-+static int rvu_attach_block(struct rvu *rvu, int pcifunc, int blktype,
-+			    int num_lfs, struct rsrc_attach *attach)
- {
- 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
- 	struct rvu_hwinfo *hw = rvu->hw;
-@@ -1562,21 +1561,21 @@ static void rvu_attach_block(struct rvu *rvu, int pcifunc, int blktype,
- 	u64 cfg;
- 
- 	if (!num_lfs)
--		return;
-+		return -EINVAL;
- 
- 	blkaddr = rvu_get_attach_blkaddr(rvu, blktype, pcifunc, attach);
- 	if (blkaddr < 0)
--		return;
-+		return -EFAULT;
- 
- 	block = &hw->block[blkaddr];
- 	if (!block->lf.bmap)
--		return;
-+		return -ESRCH;
- 
- 	for (slot = 0; slot < num_lfs; slot++) {
- 		/* Allocate the resource */
- 		lf = rvu_alloc_rsrc(&block->lf);
- 		if (lf < 0)
--			return;
-+			return -EFAULT;
- 
- 		cfg = (1ULL << 63) | (pcifunc << 8) | slot;
- 		rvu_write64(rvu, blkaddr, block->lfcfg_reg |
-@@ -1587,6 +1586,8 @@ static void rvu_attach_block(struct rvu *rvu, int pcifunc, int blktype,
- 		/* Set start MSIX vector for this LF within this PF/VF */
- 		rvu_set_msix_offset(rvu, pfvf, block, lf);
- 	}
-+
-+	return 0;
- }
- 
- static int rvu_check_rsrc_availability(struct rvu *rvu,
-@@ -1724,22 +1725,31 @@ int rvu_mbox_handler_attach_resources(struct rvu *rvu,
- 	int err;
- 
- 	/* If first request, detach all existing attached resources */
--	if (!attach->modify)
--		rvu_detach_rsrcs(rvu, NULL, pcifunc);
-+	if (!attach->modify) {
-+		err = rvu_detach_rsrcs(rvu, NULL, pcifunc);
-+		if (err)
-+			return err;
-+	}
- 
- 	mutex_lock(&rvu->rsrc_lock);
- 
- 	/* Check if the request can be accommodated */
- 	err = rvu_check_rsrc_availability(rvu, attach, pcifunc);
- 	if (err)
--		goto exit;
-+		goto fail1;
- 
- 	/* Now attach the requested resources */
--	if (attach->npalf)
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_NPA, 1, attach);
-+	if (attach->npalf) {
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_NPA, 1, attach);
-+		if (err)
-+			goto fail1;
-+	}
- 
--	if (attach->nixlf)
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_NIX, 1, attach);
-+	if (attach->nixlf) {
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_NIX, 1, attach);
-+		if (err)
-+			goto fail2;
-+	}
- 
- 	if (attach->sso) {
- 		/* RVU func doesn't know which exact LF or slot is attached
-@@ -1749,33 +1759,63 @@ int rvu_mbox_handler_attach_resources(struct rvu *rvu,
- 		 */
- 		if (attach->modify)
- 			rvu_detach_block(rvu, pcifunc, BLKTYPE_SSO);
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_SSO,
--				 attach->sso, attach);
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_SSO,
-+				       attach->sso, attach);
-+		if (err)
-+			goto fail3;
- 	}
- 
- 	if (attach->ssow) {
- 		if (attach->modify)
- 			rvu_detach_block(rvu, pcifunc, BLKTYPE_SSOW);
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_SSOW,
--				 attach->ssow, attach);
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_SSOW,
-+				       attach->ssow, attach);
-+		if (err)
-+			goto fail4;
- 	}
- 
- 	if (attach->timlfs) {
- 		if (attach->modify)
- 			rvu_detach_block(rvu, pcifunc, BLKTYPE_TIM);
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_TIM,
--				 attach->timlfs, attach);
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_TIM,
-+				       attach->timlfs, attach);
-+		if (err)
-+			goto fail5;
- 	}
- 
- 	if (attach->cptlfs) {
- 		if (attach->modify &&
- 		    rvu_attach_from_same_block(rvu, BLKTYPE_CPT, attach))
- 			rvu_detach_block(rvu, pcifunc, BLKTYPE_CPT);
--		rvu_attach_block(rvu, pcifunc, BLKTYPE_CPT,
--				 attach->cptlfs, attach);
-+		err = rvu_attach_block(rvu, pcifunc, BLKTYPE_CPT,
-+				       attach->cptlfs, attach);
-+		if (err)
-+			goto fail6;
- 	}
- 
--exit:
-+	return 0;
-+
-+fail6:
-+	if (attach->timlfs)
-+		rvu_detach_block(rvu, pcifunc, BLKTYPE_TIM);
-+
-+fail5:
-+	if (attach->ssow)
-+		rvu_detach_block(rvu, pcifunc, BLKTYPE_SSOW);
-+
-+fail4:
-+	if (attach->sso)
-+		rvu_detach_block(rvu, pcifunc, BLKTYPE_SSO);
-+
-+fail3:
-+	if (attach->nixlf)
-+		rvu_detach_block(rvu, pcifunc, BLKTYPE_NIX);
-+
-+fail2:
-+	if (attach->npalf)
-+		rvu_detach_block(rvu, pcifunc, BLKTYPE_NPA);
-+
-+fail1:
- 	mutex_unlock(&rvu->rsrc_lock);
- 	return err;
- }
--- 
-2.43.0
+Some vendors didn't write a MAC address to the eFuse. With these YT6801
+chips, the failure is expected.
 
+Which DKMS driver do you use? Could you read out a permanent address
+with your DKMS driver? If not, this piece of log should have nothing to
+do with the rate problem.
+
+Note some out-of-tree driver derived from the vendor one fallback to a
+static MAC address[1], so it doesn't mean your eFuse has MAC address
+written if you only observe the MAC address doesn't change between
+reboots.
+
+Best regards,
+Yao Zi
+
+[1]: https://github.com/ziyao233/yt6801-vendor-driver/blob/0efb3e86702ad2b19e7f9d19172a8e1df143e8c7/fuxi-gmac-common.c#L17-L32
 
