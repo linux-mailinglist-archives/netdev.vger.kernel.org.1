@@ -1,135 +1,163 @@
-Return-Path: <netdev+bounces-251412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63B1AD3C3EE
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:43:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7689DD3C439
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 34FA454535D
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:37:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 53B54547E2B
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434743D1CBC;
-	Tue, 20 Jan 2026 09:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8005C3E95B1;
+	Tue, 20 Jan 2026 09:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cfLiBtRU"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="gbR5dbee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.83.148.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B553AE703
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768901501; cv=pass; b=LKJcCRmwYYOwvaUj6nmPQxQVZcczyCdbJAkn25Ll44sZmDHZJUrSphQoJfuVkAeq4gzShCRy6kj533jbnP1Grh5+aYhSIV9qep8m3HCiFeLiUvaxGfDYfNDCcAHatq9NdxjYFkRj6gPzdXwU7yQKZkvg+SYpi577SOieQ7GlAr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768901501; c=relaxed/simple;
-	bh=r2OPr/mJb/5L9shYQDg8Js1LfKdBpkN1T6SX5DgIz24=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z6zfhRlfJgRcDkMZK0pxEDCxj9W6pb7eilaIFnr8ofYQkEN8I7e04dd7Zamz/mfhA6dRupbXhuAYYMM76L7btzgA1ZleBVm6Z7PJeEakMqgGg4PzX8lFx9fxMp5ssRZBMfmEnFxLBooN0p93DhRvLlOP7o92yZmLtTWk4Xx+fmU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cfLiBtRU; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5014453a0faso46610031cf.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:31:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768901498; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bOxh5DIC82+4mAyP31s2t2l3z7U63iSZy+ahxtcdavhlbdaU2EIRfTIEVdzwfz/lzz
-         FhkoNikkPfr/meF9LmWGZXPO5RDBvE8djK0zLJzSXxytMUH4efahOn3mpGxF+Unbpc0X
-         ACJfTtV1Kv8NFFv3cNvaXTExIt7ygEtc7XuopJji1ds0Wdyu09TFxUjUgHa+GCWVswbo
-         k1F2OrSEp7jkBW0iw4WENRlb9w6me19woNAB718I3uB56tIk3bvbEOReEPv6qGAp84jF
-         HSKAM3bVkJfzBef7IGNZDLGLt1JhY3nWDSwjuxFl+2d22cJ9AS2TFjOQh3iBLLz/3Brs
-         3j5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=r2OPr/mJb/5L9shYQDg8Js1LfKdBpkN1T6SX5DgIz24=;
-        fh=cKZN4CB2LVnZ5qiJTyKg7DMPLYgEbS0BuVvN+yE3yBA=;
-        b=jq8NJJO1ZvJIacG8k00RAFZoQ+ZaLzsZt7SgAAPLJ3PVbdKibjVtuGYkGZa+A6dVOp
-         cQHShGgY1isb938y/IUJjGaJX0y7moVSwgnhfIkMuDyZRhe+eqgtrUrxc3/5joIVMkuW
-         b7RfX65pfSe9UyYxIfGBnDpUHxWYqvGY+/4XtttutuvCG1rJuOrQUn3HgvlQELQN3rJR
-         ktKnxfVIjCPd5Zu8XsMUgG0G4MwCoCZ1S1YkXCWWzIB92uN+9gdY1/+NBQ7Pp8F82cqs
-         e3PKhlz+su4H3qrS+zC+cwhcUfN1+NSrUbhWQjYjjk3+3omKGbwMBWHxapeHnhkq1P46
-         D+Yw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF123D669A
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.83.148.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768901698; cv=none; b=rRYGtB8i1qjvgZN2w2RH2zlfXjD+fbg7cVHxAQZMKoFKE3dlEQcp9se4IEzXZKA9vZ9vyFNR0Ft2aO/ShZuVcqYsyFFYAfhmAnsboijAcDuZ7be+NbbQ2ITFLQwn8wmsSA71rYayTqrL+2Gig+hFwReCKQ/DV8NonpyWuhxwPeQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768901698; c=relaxed/simple;
+	bh=Dfd+jxj7LcW33ePC6v21142p1t602mHVj0fWLL0UW7w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I6LZ/jHgW+EtpzkvMP90SGjaU4oAnFCLHaE7UgUvv3P6+kAMnTKvfU+JgZTrFvm7jdq4/JFQ9Los7YdEZ+F4hLVjkszU8T93tZ53UmVAztQ0oWN4pVEDus1yV8u6/sgD3x3yV3QRI2e4qWpngAIXStrnx2BQRILiZc9Q3aaRNbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=gbR5dbee; arc=none smtp.client-ip=35.83.148.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768901498; x=1769506298; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r2OPr/mJb/5L9shYQDg8Js1LfKdBpkN1T6SX5DgIz24=;
-        b=cfLiBtRUY91o1o/2kdjpF6ig7LYi7EPEZBSDpd6sW+a+YUXfBhjr2fEpeJHr/015Cc
-         y3f+JrmBg1mKHTe05WzmWcYGC03H178P2oJgzcw/O9Fm6NRXwFO8u2bWbUpEkHP9mLvp
-         t+xAIGzN4zaDvXk1aK93G4QDnyRb3DLhJ73yFixua2wxE32One8eS93fCOLb+uiNxmAy
-         BScqEPXqiiXneMfSKZwiWmSonyS3UrrWuGo6aNOAzDakMSUK85syqFqGfWFLiWPXPyVH
-         Ze4Q3kxWmFwXuahQBxI7ix6gS2n5U+Jn5xmg1ALoVlYeiXEz5IVEQq/KSULpY1uXg2cQ
-         u3vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768901498; x=1769506298;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=r2OPr/mJb/5L9shYQDg8Js1LfKdBpkN1T6SX5DgIz24=;
-        b=rtcINhsD5T20KUbrcCMd3IkXO0R5pYq4wqQrOTWuB1LDQSonFZ0IVdz97/kLGtFq/Y
-         ISh2vEPfAhY12pOmMknobNIJ/vRLpKrFtXfqZBhwerEvWDjBSviryUeZyZ8X4rXV6aoH
-         c8I+JKxCNm8/97rsSn3v+NsqDqfGo0C8mTTE6nxi0aR5zrtmZeYmfUGw5SfASFYDpLr9
-         Kg8j09BywVyQyMSffCOVzjpd19bCE1zqD0NsKwwSo3GE5jf7QBfsG1wcG1+NZPqAA/64
-         9BcQQM9TC0seUrdsCp2CVPrLws3kNiR28waMqEOgom3/rNSfXWrRT61f7rJFPebhXfXJ
-         pbLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWM9Wi2vVf9Ok6WN7PB/mJWh4ZQ3k38Rr3ujjDYAzwHnUX032Vh4ax5jKEGsLqx6opfTQS+i5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZicczcubgK0WtBl1mTVG9JDG2wEEeWMCBG+MkA9lDxDz53zyy
-	AnEAM5xzOd4GgzMvurU1tG3pvGImj7JajesTsnDl7oXgz3+xeLTt6hngMx1gK03M22hvdV2vTiF
-	I8anYlg6P3N2wnfM4PhNNc4bUWOAvGVJEOBvmTEBX
-X-Gm-Gg: AY/fxX6qqmh0uDGo+TRD8TH91HgufafTJOQ1we8lMU0vYjCnj63m2vEBinLP8KlNXah
-	haTXwn5ZZxJUhaXVvXpizbmUPiq2Z2TIY4KgqCcsNtKzN7xkEPBlvR8fPxTgNn9Roqe1cjTMFGq
-	dvqa8zFQ/syinBiIekTvEecYlAMdw7CzaM8Kyxz/8lrZR/8RV0lFZVpsbKvsHvUJ5miUxvRhhkS
-	dG3YuEUMqQMfFh+4Scrf9or5zZw57haAVGABT1pAF05S7zcz9F1uH9B27rw1VRZKfIg4Gc=
-X-Received: by 2002:a05:622a:c8:b0:501:51b6:cd3e with SMTP id
- d75a77b69052e-502d84eabe5mr13635181cf.29.1768901497982; Tue, 20 Jan 2026
- 01:31:37 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768901696; x=1800437696;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xOTRJDjlbK2HDPXI2qW3j9y8/qH4C71a3aPXSATt7xY=;
+  b=gbR5dbeeR5VdunOGfxHK/KFW0zs9eW6iPlmlhAMI5qVA9WTcTFwzQLtx
+   jZwpvADl06WLjIFxtsv69coqA4VyuwUgX6vch6AP7SH/4R3gViOg3pZgn
+   FF6ZDo8MKy9e4FqruxpJLIGAi2bREFOE8wjzA01qkhd7j9qDT9qMk3JnW
+   pHuXjqCC+F6dVjkq0SnT0n4dDrFVFjLBNEozdx2SNXv9vOoze5++VGgzm
+   rTK1LE/8sW9Iyt8K0EJGFqcI3ZAAxrH//FYXVelDlBqZySiCAUOQAJBTy
+   qanEJcywTFrLB2iC458l51AJtCKrXKcZN6BEQ+DmOuhDCzBExhETjuuW0
+   A==;
+X-CSE-ConnectionGUID: uKUR499aRZ+HudH4dc5WMw==
+X-CSE-MsgGUID: cbRWkT0wSYKaGCIACE36Cg==
+X-IronPort-AV: E=Sophos;i="6.21,240,1763424000"; 
+   d="scan'208";a="10968869"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 09:34:53 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:9157]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.244:2525] with esmtp (Farcaster)
+ id 4663bcf1-7421-44bd-9c5f-0abee9b6f853; Tue, 20 Jan 2026 09:34:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 4663bcf1-7421-44bd-9c5f-0abee9b6f853
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 20 Jan 2026 09:34:53 +0000
+Received: from 603e5f7bc1fe.amazon.com (10.37.244.13) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Tue, 20 Jan 2026 09:34:51 +0000
+From: Takashi Kozu <takkozu@amazon.com>
+To: <anthony.l.nguyen@intel.com>
+CC: <przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <aleksandr.loktionov@intel.com>,
+	<pmenzel@molgen.mpg.de>, <piotr.kwapulinski@intel.com>, <enjuk@amazon.com>,
+	Takashi Kozu <takkozu@amazon.com>
+Subject: [PATCH iwl-next v4 0/3] igb: add RSS key get/set support
+Date: Tue, 20 Jan 2026 18:34:37 +0900
+Message-ID: <20260120093441.70075-5-takkozu@amazon.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119185852.11168-1-chia-yu.chang@nokia-bell-labs.com> <20260119185852.11168-3-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20260119185852.11168-3-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Jan 2026 10:31:26 +0100
-X-Gm-Features: AZwV_Qj1Jnn01ns8cO1Mwqdo9iNbvBF-noKKnseassUVD5Rb4EGhtZz-4l3C_i8
-Message-ID: <CANn89i++X8hRu5nc4ChyYxf=J1kT0QF0sMOW8BLkwpNWi+bkiw@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 02/15] gro: flushing when CWR is set
- negatively affects AccECN
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, parav@nvidia.com, linux-doc@vger.kernel.org, 
-	corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
-	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net, 
-	liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Mon, Jan 19, 2026 at 7:59=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com>=
- wrote:
->
-> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
->
-> As AccECN may keep CWR bit asserted due to different
-> interpretation of the bit, flushing with GRO because of
-> CWR may effectively disable GRO until AccECN counter
-> field changes such that CWR-bit becomes 0.
->
-> There is no harm done from not immediately forwarding the
-> CWR'ed segment with RFC3168 ECN.
+This series adds ethtool get/set support for the RSS hash key in the igb
+driver.
+- `ethtool -x <dev>` to display the RSS key
+- `ethtool -X <dev> hkey <key>` to configure the RSS key
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Without patch:
+
+# ethtool -x $DEV | grep key -A1
+RSS hash key:
+Operation not supported
+# ethtool -X $DEV hkey 00:00:00:00:00:00:00:00:00:00:00:00:000
+Cannot set RX flow hash configuration:
+  Hash key setting not supported
+
+
+With patch:
+
+# ethtool -x $DEV | grep key -A1
+RSS hash key:
+86:5d:11:56:bd:6f:20:38:3b:f8:bb:df:00:3a:b0:24:95:9f:f9:f4:25:a3:01:3e:4a:15:d6:7c:4d:af:39:7e:4a:95:f2:fd:f6:b6:26:f7
+
+# ethtool -X $DEV hkey 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+# ethtool -x $DEV | grep key -A1
+RSS hash key:
+00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+
+<Changelog>
+  v4: 
+      - modify the position of the declaration in the igb_write_rss_key() so that it is at the start of the block.
+
+  v3: 
+      - add ASSERT_RTNL() to explicitly show that an rtnl lock is being used
+      - Move netdev_rss_key_fill() function from igb_setup_mrqc() to igb_sw_init()
+      - Add kernel-doc header to igb_write_rss_key()
+
+      <Test>
+      - tools/testing/selftests/drivers/net/hw/rss_api.py is successful
+      Run the following command
+
+      # NETIF=enp0s3 python tools/testing/selftests/drivers/net/hw/rss_api.py | grep -v "# Exception" 
+
+      Then, I checked the diffs before and after applying the patch
+
+      $ diff beforePatch.txt afterPatch.txt 
+      9c9
+      < not ok 6 rss_api.test_rxfh_nl_set_key
+      ---
+      > ok 6 rss_api.test_rxfh_nl_set_key
+      16c16
+      < # Totals: pass:4 fail:8 xfail:0 xpass:0 skip:0 error:0
+      ---
+      > # Totals: pass:5 fail:7 xfail:0 xpass:0 skip:0 error:0
+
+      The failing tests originally fails due to hardware.
+
+      - tools/testing/selftests/drivers/net/hw/toeplitz.py is untested since there is no actual hardware, but since the logic around wr32() is preserved as it is, key writing to the device remain the same.
+      
+
+  v2: Fix typos (igc_* → igb_*) 
+      https://lore.kernel.org/intel-wired-lan/20260108052020.84218-5-takkozu@amazon.com/T/
+
+  v1: https://lore.kernel.org/all/20251205082106.4028-5-takkozu@amazon.com/
+
+Takashi Kozu (3):
+  igb: prepare for RSS key get/set support
+  igb: expose RSS key via ethtool get_rxfh
+  igb: allow configuring RSS key via ethtool set_rxfh
+
+ drivers/net/ethernet/intel/igb/igb.h         |  4 +
+ drivers/net/ethernet/intel/igb/igb_ethtool.c | 86 ++++++++++++++------
+ drivers/net/ethernet/intel/igb/igb_main.c    |  9 +-
+ 3 files changed, 69 insertions(+), 30 deletions(-)
+
+-- 
+2.52.0
+
 
