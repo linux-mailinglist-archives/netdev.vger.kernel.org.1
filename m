@@ -1,218 +1,592 @@
-Return-Path: <netdev+bounces-251585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mJNkGlHPb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:54:09 +0100
+	id sGX/K1bPb2mgMQAAu9opvQ
+	(envelope-from <netdev+bounces-251586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:54:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC1849D92
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:54:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EAA49D9A
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:54:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 13EC38A678E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:29:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 863607ECBCB
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D93C44103A;
-	Tue, 20 Jan 2026 18:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EEC3E9F6B;
+	Tue, 20 Jan 2026 18:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACbmQf4m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hjlPxybX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DB743C06F
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 18:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768933629; cv=pass; b=T3dOnXkRHlcu9tzohN8+ZG8VVKeDHMAovP4j7TBiqTlky1HZDRBU17ZWcDlu1cNl1zofftKSiBh2fsVPv1sOF0cH9xp8IrsuYdUp6wUuxKQNEqQQpmkGCRtJr3ayjY7wn4VL/x98VafHdzq16VrAKZQYdmaclBPuwQNm+yhqBDc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768933629; c=relaxed/simple;
-	bh=WjyrYejoNDCqoUNnjbJPM5/Ul8BkhwhbjYspZsnE/ZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZOUUCJ4ZyGCOGvbm0cGhXOpgpapXge2kKJD6fRWkGBPdy5CXbMqS0mGb4EoKCzsRPDE/K44LUuyqNRWmbweR7I7zXHrPc8rE3rSFezfVDLX4m9+yB+jwYEKL/y1m5ui1IwmwlY20fBbZ29HwAELv41SOkI3PO+yoOc74HPhnFS0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ACbmQf4m; arc=pass smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-93f573ba819so2077933241.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:27:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768933626; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PeTocd1+Ccj0vmNXZI4gG4f3PbSZYhJBGWlD99l7SM7TUzeBkCr3ql9pkMLi4moZKM
-         WO0mX7rp7IGyZPwav/EsP+taLPn9KPh855pZ0sTOhzfdYHq4lg8Sh6QrkqAgLvVOnIVX
-         WgkhZ7NEhx25ZBskfxdx8pfv0o8mhuzWLH3NW9BRO+lGvsE44snAHrlxAIX7XBgg3ZfM
-         /j4RlQJt/HJ6UhELaW8hmLwkeiBuwRVxdj1ob2XrCWCn3k9bJeF9LFJwhvoKu4Pz4PjF
-         +xuQHvBwDYCJtN3H0HKyzSGYz9f8IcXz/tp7Wpe+PJ2VUY9dweZvxAsy2nuYNeQzNVqr
-         TO1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=05dxE5YDetF9DljE4cqyNw51lJAscnnJTYEC67eYOGU=;
-        fh=WH7lMV2ZUh0XixLi7mmftMBZg8XTxWXlc8KkFHGyvgs=;
-        b=R6AXP68qcsHIwA/hgRPL/+upltTzw25+TNhQcF/ugqBtgdKA5FAnf6Mlki62NFXnSC
-         z0dLzQM0OYrH5wJdUI22AjBHHMhKsY/OGJst5JhD6dAixpxaKFhS4MWZnmKBxJFXL5Gd
-         2F2+56QkolXJlA/lxeW6m4SNwFFFpUIN4cdC0N1N2EL1MypUvV1mBp1aD9z7xFnuvh5c
-         TBnT9Wwtqyyp9NHpxJP5R4MQvgz3X2UX+qhaU8AWo9xDyWF71d5+8bPKvtAB4IbZjdZQ
-         cli6+W5M/qZAlNM9D1mWUdiPh80Y8sMwvxGgBgiwjMdGqm7rWT6cSx2RTR94euO9FjTQ
-         9IBQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768933626; x=1769538426; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=05dxE5YDetF9DljE4cqyNw51lJAscnnJTYEC67eYOGU=;
-        b=ACbmQf4mZhkRLKPwnEnnL46lB+PREy5Kuh2h0m9/UssPfRBgsXGO7SpqEo+9057pmB
-         gAEIDd3GK+HDaiIekDHp19kk8RJs5N5TWLdm2RuzFk6sKozxnFhkU+suCitbwXTd9KoY
-         sHrXstSd6CYZ4XM/+XZ89sYGY4s9FVdB5BlOxX5jbkzxJvpW+tHWmxsCObUQgJ7VQOkx
-         mwHfmyAEEa90VZc1WMmKCrAtycqZ5Eki6onz1XAKSzc75FagQ6+fhjJ/qXF/1uvP0G2k
-         R5JACr8Xhzx4LOlo2AqEcy7CExsUj57a3ALwdddqVWd7U7sF+DII9BiFBpMVANvUDps4
-         qPRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768933626; x=1769538426;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=05dxE5YDetF9DljE4cqyNw51lJAscnnJTYEC67eYOGU=;
-        b=dtTMWNwm5p361pbAu329LUvUQO5l3fL/nT1U/VNUG4e16bjYtF/5i0D/Zf2GL1/VYm
-         LZ8EpfQSy+AnRBESx1+METaJDoQQPXpq5eMheXt8EIifgiMYf6ehhOYk5Efmf49Ol6dn
-         mWT/t06OJZDw2aC1lRodF0bA1yV6TY3CCDFihBgZiT2Z4k9/to8p54hE07zul2KKpfFd
-         YXVHyeOy8eXb8FCeR5ijvpsixpucBoN8Dd5iHr3q/JFOu5EOGkH8YWwK8xIU1Lxh1l99
-         8lY4pZNUCE6RIJsjRNB+SHMzmXXLVZsZkyhPCUvpRNyqjm7FhNoUDM48D7i1c4tE86B1
-         P4LQ==
-X-Gm-Message-State: AOJu0Yz8l6kOC+7EbuVYYWPEhz2k3FvRxR4uuJElbowu+ZUvRv+MMOq0
-	M2xMWXIaFYboi0fwETjPo7YqX/0GWrkZ7ITl8IHEHcV9+UjwgrY9nQ+yvEqssrOMG38dmhVAYxt
-	E2vIQ1eaof62R4r3cZ2Ek5K0AMACbeSU=
-X-Gm-Gg: AZuq6aLk99GeNJXN3//DSrfyv7DFU/9COCv2lL4XD7d8hAjy2OLmqduMCNdB90OaFML
-	ykxnyangbH+plzBGePjeJP07cTwFFBDASUhIWNB0nUl1unSWNF8EZGaqvEXkmTJFXMgUtfH0G6j
-	esos03R2mJUTjGhnOKDOcTGLnsfJdU78NZQZ81gt5ciYw5qChhwLdKt5Hfn70KPdvH4a/WRzh8C
-	gq7WIDwbUARnUm+IkCrHC8PZE/IqKNREfmBt9VCu+awbxXbFs6zHRlTRwjjrqh509GC5bgMWrND
-	X/t/e7xfrKvm3Ka03OWM+4JKU+MFwvrI04WpWYKJkA==
-X-Received: by 2002:a05:6102:3910:b0:5db:f031:84ce with SMTP id
- ada2fe7eead31-5f1a5579199mr4695639137.29.1768933625876; Tue, 20 Jan 2026
- 10:27:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D464243E4A9;
+	Tue, 20 Jan 2026 18:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768933815; cv=none; b=IcKQL2ruTf9ek8erLErbKGt6GLe4ASbk7Q2NavvGxK55as45GaeD/QhnLrCQYRjW4IIoAgFULengdoH4kwS79bPqBmvQ4IsdXSNZBN2Er41Ml6OrJE1la5c3/avK/AqmTJrFOhM8vsfX/6jkWTSnM1TUWdjQ49bMni1Scd3Ym2A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768933815; c=relaxed/simple;
+	bh=km3HjgnU7wgjaUhMxS9FwHTpr+q5UFHbNek+XbOadRk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AOswDdUpR5+sTtg4MtmmV+S4XpFI9pw+uJMD/qr4FXPi9LClqaMYSP0FMieM3HAsSW+HHcxEdrRwIoWh1kSUF7INraoqzZjRxLjyU/GkMlFB9bI4w2XSpFfWlCtAbWCxsQNnaNq2RNjKhKRM8QmeuKbWk0QpO1z6uBtqpC5S7JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hjlPxybX; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768933813; x=1800469813;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=km3HjgnU7wgjaUhMxS9FwHTpr+q5UFHbNek+XbOadRk=;
+  b=hjlPxybXS1dlTTKt7w+dtjIMh/bBS1BtD/FPanGXUjSGiM8oqWvHgvDf
+   I4BmYpAdO3lukJ1S0c3qIlVpBSv8Y/gl+4uiqFdsSb6JVpd5xABcg04GC
+   WhRQFXC1ydSikf1Xm8tMER6fCz8NP+MbCuqm0TBwsbySHWb6z3s5gHnPH
+   eAg2khYVpErJrBTorRnVnf9JLlzek4qKdk2aoddKdIHrQRwcMoaBljrbY
+   FJc+rCJIxX430cbXB2Baznxz//lOtw/lOy4Aut+fdBteNiGNG1PCo2c1a
+   YZHsnSCTwGuTT0esukePjbsanRB26QHfNTGT0elOhrm5wUvsMmEe0nL/N
+   w==;
+X-CSE-ConnectionGUID: h0EybezHSLGHOuqRYmPWKg==
+X-CSE-MsgGUID: u28sx2jLR0qbCLRme7Yuig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="70060402"
+X-IronPort-AV: E=Sophos;i="6.21,241,1763452800"; 
+   d="scan'208";a="70060402"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 10:30:12 -0800
+X-CSE-ConnectionGUID: 2SqOv8OmTG6sgUYYd8Os6g==
+X-CSE-MsgGUID: /H0rTdYRT1GWA+ucnLUVZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,241,1763452800"; 
+   d="scan'208";a="206245824"
+Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.108.33]) ([10.125.108.33])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 10:30:09 -0800
+Message-ID: <120e42c4-9ba8-4f4b-a06c-61888fc961d1@intel.com>
+Date: Tue, 20 Jan 2026 11:30:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFfO_h4kZQu6CY_U6cfakQ7Zozo8fg-LpQ_n5UiLZDVhqxMC4A@mail.gmail.com>
- <CANn89iLu1DTn9xeqpWAfiKPajh-bkhss4awNWzUd2=0iZRQEWg@mail.gmail.com>
-In-Reply-To: <CANn89iLu1DTn9xeqpWAfiKPajh-bkhss4awNWzUd2=0iZRQEWg@mail.gmail.com>
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Wed, 21 Jan 2026 00:26:55 +0600
-X-Gm-Features: AZwV_QgO7_gzkcibKJWs83NEexL220V0UjZGbx9YsMnfJ1_Q5-b1apvXTsjHbh8
-Message-ID: <CAFfO_h4cX0+L=ieA_JF7QBvH-dDYsHnTUuN4gApguqxVpWyy2g@mail.gmail.com>
-Subject: Re: Question about timeout bug in recvmmsg
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, ncardwell@google.com, kuniyu@google.com, 
-	willemdebruijn.kernel@gmail.com, willemb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 00/38] NTB transport backed by PCI EP embedded DMA
+To: Koichiro Den <den@valinux.co.jp>, Frank.Li@nxp.com, cassel@kernel.org,
+ mani@kernel.org, kwilczynski@kernel.org, kishon@kernel.org,
+ bhelgaas@google.com, geert+renesas@glider.be, robh@kernel.org,
+ vkoul@kernel.org, jdmason@kudzu.us, allenbh@gmail.com, jingoohan1@gmail.com,
+ lpieralisi@kernel.org
+Cc: linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
+ iommu@lists.linux.dev, ntb@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+ magnus.damm@gmail.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+ corbet@lwn.net, skhan@linuxfoundation.org,
+ andriy.shevchenko@linux.intel.com, jbrunet@baylibre.com, utkarsh02t@gmail.com
+References: <20260118135440.1958279-1-den@valinux.co.jp>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20260118135440.1958279-1-den@valinux.co.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-251585-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251586-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[valinux.co.jp,nxp.com,kernel.org,google.com,glider.be,kudzu.us,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,arndb.de,linuxfoundation.org,8bytes.org,kernel.org,arm.com,gmail.com,lwn.net,linux.intel.com,baylibre.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dorjoychy111@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.jiang@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 3EC1849D92
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: 76EAA49D9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Eric,
 
-On Wed, Jan 21, 2026 at 12:14=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Tue, Jan 20, 2026 at 7:09=E2=80=AFPM Dorjoy Chowdhury <dorjoychy111@gm=
-ail.com> wrote:
-> >
-> > (Note: I had posted this before in
-> > https://lore.kernel.org/netdev/CAFfO_h5k7n7pJrSimuUaexwbMh9s+f0_n6jJ0TX=
-4=3D+ywQyUaeg@mail.gmail.com/
-> > but got no reply, so trying again. I would really appreciate
-> > suggestions on this request. Thanks!)
-> >
-> > Hi,
-> > Hope everyone is doing well. I came upon this timeout bug in the
-> > recvmmsg system call from this URL:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=3D75371 . I am not familiar
-> > with the linux kernel code. I thought it would be a good idea to try
-> > to fix it and as a side effect I can get to know the code a bit
-> > better. As far as I can see, the system call eventually goes through
-> > the do_recvmmsg function in the net/socket.c file. There is a while
-> > loop that checks for timeout after the call to ___sys_recvmmsg(...).
-> > So this probably is still a bug where if the socket was not configured
-> > with any SO_RCVTIMEO (i.e., sk_rcvtimeo in struct sock), the call can
-> > block indefinitely. Is this considered something that should ideally
-> > be fixed?
-> >
-> > If this is something that should be fixed, I can try to take a look
-> > into it. I have tried to follow the codepath a bit and from what I
-> > understand, if we keep following the main function calls i.e.,
-> > do_recvmmsg, ___sys_recvmmsg ... we eventually reach
-> > tcp_recvmsg_locked function in net/ipv4/tcp.c (there are of course
-> > other ipv6, udp code paths as well). In this function, the timeo
-> > variable represents the timeout I think and it gets the timeout value
-> > from the sock_rcvtimeo function. I think this is where we need to use
-> > the smaller one between sk_rcvtimeo and the remaining timeout
-> > (converted to 'long' from struct timespec) from the recvmmsg call (we
-> > need to consider the case of timeout values 0 here of course). It
-> > probably would have been easier if we could add a new member in struct
-> > sock after sk_rcvtimeo, that way the change would only have to be in
-> > sock_rcvtimeo function implementation. But this new timeout  value
-> > from the recvmmsg call probably doesn't make sense to be part of
-> > struct sock. So we need to pass this remaining timeout from
-> > do_recvmmsg all the way to tcp_recvmsg_locked (and similar other
-> > places) and do the check for smaller between the passed parameter and
-> > return value from sock_rcvtimeo function. As we need to pass a new
-> > timeout parameter anyway, it probably then makes sense to move the
-> > sock_rcvtimeo call all the way up the call chain to do_recvmmsg and
-> > compare and send the finalized timeout value to the function calls
-> > upto tcp_recvmsg_locked, right?
-> >
-> > I would really appreciate any suggestion about this issue so that I
-> > can try to fix it. Thank you!
->
-> I think it is too late to change behavior, set in stone for more than 18 =
-years.
->
-> This could break many applications.
 
-Understood. Thanks!
+On 1/18/26 6:54 AM, Koichiro Den wrote:
+> Hi,
+> 
+> This is RFC v4 of the NTB/PCI/dmaengine series that introduces an
+> optional NTB transport variant where payload data is moved by a PCI
+> embedded-DMA engine (eDMA) residing on the endpoint side.
 
-If there are other smaller fixes/improvements that need to be looked
-into, I can take a look if anyone can point me to them. I would
-appreciate any suggestion on this.
+Just a fly by comment. This series is huge. I do suggest break it down to something more manageable to prevent review fatigue from patch reviewers. For example, linux network sub-system has a rule to restrict patch series to no more than 15 patches. NTB sub-system does not have that rule. But maybe split out the dmaengine changes and the hardware specific dw-edma bits from the ntb core changes.
 
-Regards,
-Dorjoy
+DJ
+ 
+> 
+> The primary target is Synopsys DesignWare PCIe endpoint controllers that
+> integrate a DesignWare eDMA instance (dw-edma). In the remote
+> embedded-DMA mode, payload is transferred by DMA directly between the
+> two systems' memory, and NTB Memory Windows are used primarily for
+> control/metadata and for exposing the endpoint eDMA resources (register
+> window + linked-list rings) to the host.
+> 
+> Compared to the existing cpu/dma memcpy-based implementation, this
+> approach avoids window-backed payload rings and the associated extra
+> copies, and it is less sensitive to scarce MW space. This also enables
+> scaling out to multiple queue pairs, which is particularly beneficial
+> for ntb_netdev. On R-Car S4, preliminary iperf3 results show 10~20x
+> throughput improvement. Latency improvements are also observed.
+> 
+> RFC history:
+>   RFC v3: https://lore.kernel.org/all/20251217151609.3162665-1-den@valinux.co.jp/
+>   RFC v2: https://lore.kernel.org/all/20251129160405.2568284-1-den@valinux.co.jp/
+>   RFC v1: https://lore.kernel.org/all/20251023071916.901355-1-den@valinux.co.jp/
+> 
+> Parts of RFC v3 series have already been split out and posted separately
+> (see "Kernel base / dependencies" section below). However, feedback on
+> the remaining parts led to substantial restructuring and code changes,
+> so I am sending an RFC v4 as a refreshed version of the full series.
+> 
+> RFC v4 is still a large, cross-subsystem series. At this RFC stage,
+> I am sending the full picture in a single set to make it easier to
+> review the overall direction and architecture. Once the direction is
+> agreed upon and no further large restructuring appears necessary, I will stop
+> posting the new RFC-tagged revisions and continue development on
+> separate threads, split by sub-topic.
+> 
+> Many thanks for all the reviews and feedback from multiple perspectives.
+> 
+> 
+> Software architecture overview (RFC v4)
+> =======================================
+> 
+> A major change in RFC v4 is the software layering and module split.
+> 
+> The existing memcpy-based transport and the new remote embedded-DMA
+> transport are implemented as two independent NTB client drivers on top
+> of a shared core library:
+> 
+>                        +--------------------+
+>                        | ntb_transport_core |
+>                        +--------------------+
+>                            ^            ^
+>                            |            |
+>         ntb_transport -----+            +----- ntb_transport_edma
+>        (cpu/dma memcpy)                   (remote embedded DMA transfer)
+>                                                        |
+>                                                        v
+>                                                  +-----------+
+>                                                  |  ntb_edma |
+>                                                  +-----------+
+>                                                        ^
+>                                                        |
+>                                                +----------------+
+>                                                |                |
+>                                           ntb_dw_edma         [...]
+> 
+> Key points:
+>   * ntb_transport_core provides the queue-pair abstraction used by upper
+>     layer clients (e.g. ntb_netdev).
+>   * ntb_transport is the legacy shared-memory transport client (CPU/DMA
+>     memcpy).
+>   * ntb_transport_edma is the remote embedded-DMA transport client.
+>   * ntb_transport_edma relies on an ntb_edma backend registry.
+>     This RFC provides an initial DesignWare backend (ntb_dw_edma).
+>   * Transport selection is per-NTB device via the standard
+>     driver_override mechanism. To enable that, this RFC adds
+>     driver_override support to ntb_bus. This allows mixing transports
+>     across multiple NTB ports and provides an explicit fallback path to
+>     the legacy transport.
+> 
+> So, if ntb_transport / ntb_transport_edma are built as loadable modules,
+> you can just run modprobe ntb_transport as before and the original cpu/dma
+> memcpy-based implementation will be active. If they are built-in, whether
+> ntb_transport or ntb_transport_edma are bound by default depends on
+> initcall order. Regarding how to switch the driver, please see Patch 34
+> ("Documentation: driver-api: ntb: Document remote embedded-DMA transport")
+> for details.
+> 
+> 
+> Data flow overview (remote embedded-DMA transport)
+> ==================================================
+> 
+> At a high level:
+>   * One MW is reserved as an "eDMA window". The endpoint exposes the
+>     eDMA register block plus LL descriptor rings through that window, so
+>     the peer can ioremap it and drive DMA reads remotely.
+>   * Remaining MWs carry only small control-plane rings used to exchange
+>     buffer addresses and completion information.
+>   * For RC->EP traffic, the RC drives endpoint DMA read channels through
+>     the peer-visible eDMA window.
+>   * For EP->RC traffic, the endpoint uses its local DMA write channels.
+> 
+> The following figures illustrate the data flow when ntb_netdev sits on
+> top of the transport:
+> 
+>      Figure 1. RC->EP traffic via ntb_netdev + ntb_transport_edma
+>                    backed by ntb_edma/ntb_dw_edma
+> 
+>              EP                                   RC
+>           phys addr                            phys addr
+>             space                                space
+>              +-+                                  +-+
+>              | |                                  | |
+>              | |                ||                | |
+>              +-+-----.          ||                | |
+>     EDMA REG | |      \     [A] ||                | |
+>              +-+----.  '---+-+  ||                | |
+>              | |     \     | |<---------[0-a]----------
+>              +-+-----------| |<----------[2]----------.
+>      EDMA LL | |           | |  ||                | | :
+>              | |           | |  ||                | | :
+>              +-+-----------+-+  ||  [B]           | | :
+>              | |                ||  ++            | | :
+>           ---------[0-b]----------->||----------------'
+>              | |            ++  ||  ||            | |
+>              | |            ||  ||  ++            | |
+>              | |            ||<----------[4]-----------
+>              | |            ++  ||                | |
+>              | |           [C]  ||                | |
+>           .--|#|<------------------------[3]------|#|<-.
+>           :  |#|                ||                |#|  :
+>          [5] | |                ||                | | [1]
+>           :  | |                ||                | |  :
+>           '->|#|                                  |#|--'
+>              |#|                                  |#|
+>              | |                                  | |
+> 
+>      Figure 2. EP->RC traffic via ntb_netdev + ntb_transport_edma
+>                   backed by ntb_edma/ntb_dw_edma
+> 
+>              EP                                   RC
+>           phys addr                            phys addr
+>             space                                space
+>              +-+                                  +-+
+>              | |                                  | |
+>              | |                ||                | |
+>              +-+                ||                | |
+>     EDMA REG | |                ||                | |
+>              +-+                ||                | |
+>     ^        | |                ||                | |
+>     :        +-+                ||                | |
+>     : EDMA LL| |                ||                | |
+>     :        | |                ||                | |
+>     :        +-+                ||  [C]           | |
+>     :        | |                ||  ++            | |
+>     :     -----------[4]----------->||            | |
+>     :        | |            ++  ||  ||            | |
+>     :        | |            ||  ||  ++            | |
+>     '----------------[2]-----||<--------[0-b]-----------
+>              | |            ++  ||                | |
+>              | |           [B]  ||                | |
+>           .->|#|--------[3]---------------------->|#|--.
+>           :  |#|                ||                |#|  :
+>          [1] | |                ||                | | [5]
+>           :  | |                ||                | |  :
+>           '--|#|                                  |#|<-'
+>              |#|                                  |#|
+>              | |                                  | |
+> 
+>     0-a. configure remote embedded DMA (program endpoint DMA registers)
+>     0-b. DMA-map and publish destination address (DAR)
+>     1.   network stack builds skb (copy from application/user memory)
+>     2.   consume DAR, DMA-map source address (SAR) and kick DMA transfer
+>     3.   DMA transfer (payload moves between RC/EP memory)
+>     4.   consume completion (commit)
+>     5.   network stack delivers data to application/user memory
+> 
+>     [A]: Dedicated MW that aggregates DMA regs and LL (peer ioremaps it)
+>     [B]: Control-plane ring buffer for "produce"
+>     [C]: Control-plane ring buffer for "consume"
+> 
+> 
+> Kernel base / dependencies
+> ==========================
+> 
+> This series is based on:
+> 
+>   - next-20260114 (commit b775e489bec7)
+> 
+> plus the following seven unmerged patch series or standalone patches:
+> 
+>   - [PATCH v4 0/7] PCI: endpoint/NTB: Harden vNTB resource management
+>     https://lore.kernel.org/all/20251202072348.2752371-1-den@valinux.co.jp/
+> 
+>   - [PATCH v2 0/2] NTB: ntb_transport: debugfs cleanups
+>     https://lore.kernel.org/all/20260107042458.1987818-1-den@valinux.co.jp/
+> 
+>   - [PATCH v3 0/9] dmaengine: Add new API to combine configuration and descriptor preparation
+>     https://lore.kernel.org/all/20260105-dma_prep_config-v3-0-a8480362fd42@nxp.com/
+> 
+>   - [PATCH v8 0/5] PCI: endpoint: BAR subrange mapping support
+>     https://lore.kernel.org/all/20260115084928.55701-1-den@valinux.co.jp/
+> 
+>   - [PATCH] PCI: endpoint: pci-epf-vntb: Use array_index_nospec() on mws_size[] access
+>     https://lore.kernel.org/all/20260105075606.1253697-1-den@valinux.co.jp/
+> 
+>   - [PATCH] dmaengine: dw-edma: Fix MSI data values for multi-vector IMWr interrupts
+>     https://lore.kernel.org/all/20260105075904.1254012-1-den@valinux.co.jp/
+> 
+>   - [PATCH v2 01/11] dmaengine: dw-edma: Add spinlock to protect DONE_INT_MASK and ABORT_INT_MASK
+>     https://lore.kernel.org/imx/20260109-edma_ll-v2-1-5c0b27b2c664@nxp.com/
+>     (only this single commit is cherry-picked from the series)
+> 
+> 
+> Patch layout
+> ============
+> 
+>   1. dw-edma / DesignWare EP helpers needed for remote embedded-DMA (export
+>      register/LL windows, IRQ routing control, etc.)
+> 
+>      Patch 01 : dmaengine: dw-edma: Export helper to get integrated register window
+>      Patch 02 : dmaengine: dw-edma: Add per-channel interrupt routing control
+>      Patch 03 : dmaengine: dw-edma: Poll completion when local IRQ handling is disabled
+>      Patch 04 : dmaengine: dw-edma: Add notify-only channels support
+>      Patch 05 : dmaengine: dw-edma: Add a helper to query linked-list region
+> 
+>   2. NTB EPF/core + vNTB prep (mwN_offset + versioning, MSI vector
+>      management, new ntb_dev_ops helpers, driver_override, vntb glue)
+> 
+>      Patch 06 : NTB: epf: Add mwN_offset support and config region versioning
+>      Patch 07 : NTB: epf: Reserve a subset of MSI vectors for non-NTB users
+>      Patch 08 : NTB: epf: Provide db_vector_count/db_vector_mask callbacks
+>      Patch 09 : NTB: core: Add mw_set_trans_ranges() for subrange programming
+>      Patch 10 : NTB: core: Add .get_private_data() to ntb_dev_ops
+>      Patch 11 : NTB: core: Add .get_dma_dev() to ntb_dev_ops
+>      Patch 12 : NTB: core: Add driver_override support for NTB devices
+>      Patch 13 : PCI: endpoint: pci-epf-vntb: Support BAR subrange mappings for MWs
+>      Patch 14 : PCI: endpoint: pci-epf-vntb: Implement .get_private_data() callback
+>      Patch 15 : PCI: endpoint: pci-epf-vntb: Implement .get_dma_dev()
+> 
+>   3. ntb_transport refactor/modularization and backend infrastructure
+> 
+>      Patch 16 : NTB: ntb_transport: Move TX memory window setup into setup_qp_mw()
+>      Patch 17 : NTB: ntb_transport: Dynamically determine qp count
+>      Patch 18 : NTB: ntb_transport: Use ntb_get_dma_dev()
+>      Patch 19 : NTB: ntb_transport: Rename ntb_transport.c to ntb_transport_core.c
+>      Patch 20 : NTB: ntb_transport: Move internal types to ntb_transport_internal.h
+>      Patch 21 : NTB: ntb_transport: Export common helpers for modularization
+>      Patch 22 : NTB: ntb_transport: Split core library and default NTB client
+>      Patch 23 : NTB: ntb_transport: Add transport backend infrastructure
+>      Patch 24 : NTB: ntb_transport: Run ntb_set_mw() before link-up negotiation
+> 
+>   4. ntb_edma backend registry + DesignWare backend + transport client
+> 
+>      Patch 25 : NTB: hw: Add remote eDMA backend registry and DesignWare backend
+>      Patch 26 : NTB: ntb_transport: Add remote embedded-DMA transport client
+> 
+>   5. ntb_netdev multi-queue support
+> 
+>      Patch 27 : ntb_netdev: Multi-queue support
+> 
+>   6. Renesas R-Car S4 enablement (IOMMU, DTs, quirks)
+> 
+>      Patch 28 : iommu: ipmmu-vmsa: Add PCIe ch0 to devices_allowlist
+>      Patch 29 : iommu: ipmmu-vmsa: Add support for reserved regions
+>      Patch 30 : arm64: dts: renesas: Add Spider RC/EP DTs for NTB with remote DW PCIe eDMA
+>      Patch 31 : NTB: epf: Add per-SoC quirk to cap MRRS for DWC eDMA (128B for R-Car)
+>      Patch 32 : NTB: epf: Add an additional memory window (MW2) barno mapping on Renesas R-Car
+> 
+>   7. Documentation updates
+> 
+>      Patch 33 : Documentation: PCI: endpoint: pci-epf-vntb: Update and add mwN_offset usage
+>      Patch 34 : Documentation: driver-api: ntb: Document remote embedded-DMA transport
+> 
+>   8. pci-epf-test / pci_endpoint_test / kselftest coverage for remote eDMA
+> 
+>      Patch 35 : PCI: endpoint: pci-epf-test: Add pci_epf_test_next_free_bar() helper
+>      Patch 36 : PCI: endpoint: pci-epf-test: Add remote eDMA-backed mode
+>      Patch 37 : misc: pci_endpoint_test: Add remote eDMA transfer test mode
+>      Patch 38 : selftests: pci_endpoint: Add remote eDMA transfer coverage
+> 
+> 
+> Tested on
+> =========
+> 
+> * 2x Renesas R-Car S4 Spider (RC<->EP connected with OCuLink cable)
+> * Kernel base as described above
+> 
+> 
+> Performance notes
+> =================
+> 
+> The primary motivation remains improving throughput/latency for ntb_transport
+> users (typically ntb_netdev). On R-Car S4, the earlier prototype (RFC v3)
+> showed roughly 10-20x throughput improvement in preliminary iperf3 tests and
+> lower ping RTT. I have not yet re-measured after the v4 refactor and
+> module split.
+> 
+> 
+> Changelog
+> =========
+> 
+> RFCv3->RFCv4 changes:
+>   - Major refactor of the transport layering:
+>     - Introduce ntb_transport_core as a shared library module.
+>     - Split the legacy shared-memory transport client (ntb_transport) and the
+>       remote embedded-DMA transport client (ntb_transport_edma).
+>     - Add driver_override support for ntb_bus and use it for per-port transport
+>       selection.
+>   - Introduce a vendor-agnostic remote embedded-DMA backend registry (ntb_edma)
+>     and add the initial DesignWare backend (ntb_dw_edma).
+>   - Rebase to next-20260114 and move several prerequisite/fixup patchsets into
+>     separate threads (listed above), including BAR subrange mapping support and
+>     dw-edma fixes.
+>   - Add PCI endpoint test coverage for the remote embedded-DMA path:
+>     - extend pci-epf-test / pci_endpoint_test
+>     - add a kselftest variant to exercise remote-eDMA transfers
+>     Note: to keep the changes as small as possible, I added a few #ifdefs
+>     in the main test code. Feedback on whether/how/to what extent this
+>     should be split into separate modules would be appreciated.
+>   - Expand documentation (Documentation/driver-api/ntb.rst) to describe transport
+>     variants, the new module structure, and the remote embedded-DMA data flow.
+>   - Addressed other feedbacks from the RFC v3 thread.
+> 
+> RFCv2->RFCv3 changes:
+>   - Architecture
+>     - Have EP side use its local write channels, while leaving RC side to
+>       use remote read channels.
+>     - Abstraction/HW-specific stuff encapsulation improved.
+>   - Added control/config region versioning for the vNTB/EPF control region
+>     so that mismatched RC/EP kernels fail early instead of silently using an
+>     incompatible layout.
+>   - Reworked BAR subrange / multi-region mapping support:
+>     - Dropped the v2 approach that added new inbound mapping ops in the EPC
+>       core.
+>     - Introduced `struct pci_epf_bar.submap` and extended DesignWare EP to
+>       support BAR subrange inbound mapping via Address Match Mode IB iATU.
+>     - pci-epf-vntb now provides a subrange mapping hint to the EPC driver
+>       when offsets are used.
+>   - Changed .get_pci_epc() to .get_private_data()
+>   - Dropped two commits from RFC v2 that should be submitted separately:
+>     (1) ntb_transport debugfs seq_file conversion
+>     (2) DWC EP outbound iATU MSI mapping/cache fix (will be re-posted separately)
+>   - Added documentation updates.
+>   - Addressed assorted review nits from the RFC v2 thread (naming/structure).
+> 
+> RFCv1->RFCv2 changes:
+>   - Architecture
+>     - Drop the generic interrupt backend + DW eDMA test-interrupt backend
+>       approach and instead adopt the remote eDMA-backed ntb_transport mode
+>       proposed by Frank Li. The BAR-sharing / mwN_offset / inbound
+>       mapping (Address Match Mode) infrastructure from RFC v1 is largely
+>       kept, with only minor refinements and code motion where necessary
+>       to fit the new transport-mode design.
+>   - For Patch 01
+>     - Rework the array_index_nospec() conversion to address review
+>       comments on "[RFC PATCH 01/25]".
+> 
+> RFCv3: https://lore.kernel.org/all/20251217151609.3162665-1-den@valinux.co.jp/
+> RFCv2: https://lore.kernel.org/all/20251129160405.2568284-1-den@valinux.co.jp/
+> RFCv1: https://lore.kernel.org/all/20251023071916.901355-1-den@valinux.co.jp/
+> 
+> Thank you for reviewing,
+> 
+> 
+> Koichiro Den (38):
+>   dmaengine: dw-edma: Export helper to get integrated register window
+>   dmaengine: dw-edma: Add per-channel interrupt routing control
+>   dmaengine: dw-edma: Poll completion when local IRQ handling is
+>     disabled
+>   dmaengine: dw-edma: Add notify-only channels support
+>   dmaengine: dw-edma: Add a helper to query linked-list region
+>   NTB: epf: Add mwN_offset support and config region versioning
+>   NTB: epf: Reserve a subset of MSI vectors for non-NTB users
+>   NTB: epf: Provide db_vector_count/db_vector_mask callbacks
+>   NTB: core: Add mw_set_trans_ranges() for subrange programming
+>   NTB: core: Add .get_private_data() to ntb_dev_ops
+>   NTB: core: Add .get_dma_dev() to ntb_dev_ops
+>   NTB: core: Add driver_override support for NTB devices
+>   PCI: endpoint: pci-epf-vntb: Support BAR subrange mappings for MWs
+>   PCI: endpoint: pci-epf-vntb: Implement .get_private_data() callback
+>   PCI: endpoint: pci-epf-vntb: Implement .get_dma_dev()
+>   NTB: ntb_transport: Move TX memory window setup into setup_qp_mw()
+>   NTB: ntb_transport: Dynamically determine qp count
+>   NTB: ntb_transport: Use ntb_get_dma_dev()
+>   NTB: ntb_transport: Rename ntb_transport.c to ntb_transport_core.c
+>   NTB: ntb_transport: Move internal types to ntb_transport_internal.h
+>   NTB: ntb_transport: Export common helpers for modularization
+>   NTB: ntb_transport: Split core library and default NTB client
+>   NTB: ntb_transport: Add transport backend infrastructure
+>   NTB: ntb_transport: Run ntb_set_mw() before link-up negotiation
+>   NTB: hw: Add remote eDMA backend registry and DesignWare backend
+>   NTB: ntb_transport: Add remote embedded-DMA transport client
+>   ntb_netdev: Multi-queue support
+>   iommu: ipmmu-vmsa: Add PCIe ch0 to devices_allowlist
+>   iommu: ipmmu-vmsa: Add support for reserved regions
+>   arm64: dts: renesas: Add Spider RC/EP DTs for NTB with remote DW PCIe
+>     eDMA
+>   NTB: epf: Add per-SoC quirk to cap MRRS for DWC eDMA (128B for R-Car)
+>   NTB: epf: Add an additional memory window (MW2) barno mapping on
+>     Renesas R-Car
+>   Documentation: PCI: endpoint: pci-epf-vntb: Update and add mwN_offset
+>     usage
+>   Documentation: driver-api: ntb: Document remote embedded-DMA transport
+>   PCI: endpoint: pci-epf-test: Add pci_epf_test_next_free_bar() helper
+>   PCI: endpoint: pci-epf-test: Add remote eDMA-backed mode
+>   misc: pci_endpoint_test: Add remote eDMA transfer test mode
+>   selftests: pci_endpoint: Add remote eDMA transfer coverage
+> 
+>  Documentation/PCI/endpoint/pci-vntb-howto.rst |   19 +-
+>  Documentation/driver-api/ntb.rst              |  193 ++
+>  arch/arm64/boot/dts/renesas/Makefile          |    2 +
+>  .../boot/dts/renesas/r8a779f0-spider-ep.dts   |   37 +
+>  .../boot/dts/renesas/r8a779f0-spider-rc.dts   |   52 +
+>  drivers/dma/dw-edma/dw-edma-core.c            |  207 +-
+>  drivers/dma/dw-edma/dw-edma-core.h            |   10 +
+>  drivers/dma/dw-edma/dw-edma-v0-core.c         |   26 +-
+>  drivers/iommu/ipmmu-vmsa.c                    |    7 +-
+>  drivers/misc/pci_endpoint_test.c              |  633 +++++
+>  drivers/net/ntb_netdev.c                      |  341 ++-
+>  drivers/ntb/Kconfig                           |   13 +
+>  drivers/ntb/Makefile                          |    2 +
+>  drivers/ntb/core.c                            |   68 +
+>  drivers/ntb/hw/Kconfig                        |    1 +
+>  drivers/ntb/hw/Makefile                       |    1 +
+>  drivers/ntb/hw/edma/Kconfig                   |   28 +
+>  drivers/ntb/hw/edma/Makefile                  |    5 +
+>  drivers/ntb/hw/edma/backend.c                 |   87 +
+>  drivers/ntb/hw/edma/backend.h                 |  102 +
+>  drivers/ntb/hw/edma/ntb_dw_edma.c             |  977 +++++++
+>  drivers/ntb/hw/epf/ntb_hw_epf.c               |  199 +-
+>  drivers/ntb/ntb_transport.c                   | 2458 +---------------
+>  drivers/ntb/ntb_transport_core.c              | 2523 +++++++++++++++++
+>  drivers/ntb/ntb_transport_edma.c              | 1110 ++++++++
+>  drivers/ntb/ntb_transport_internal.h          |  261 ++
+>  drivers/pci/controller/dwc/pcie-designware.c  |   26 +
+>  drivers/pci/endpoint/functions/pci-epf-test.c |  497 +++-
+>  drivers/pci/endpoint/functions/pci-epf-vntb.c |  380 ++-
+>  include/linux/dma/edma.h                      |  106 +
+>  include/linux/ntb.h                           |   88 +
+>  include/uapi/linux/pcitest.h                  |    3 +-
+>  .../pci_endpoint/pci_endpoint_test.c          |   17 +
+>  33 files changed, 7855 insertions(+), 2624 deletions(-)
+>  create mode 100644 arch/arm64/boot/dts/renesas/r8a779f0-spider-ep.dts
+>  create mode 100644 arch/arm64/boot/dts/renesas/r8a779f0-spider-rc.dts
+>  create mode 100644 drivers/ntb/hw/edma/Kconfig
+>  create mode 100644 drivers/ntb/hw/edma/Makefile
+>  create mode 100644 drivers/ntb/hw/edma/backend.c
+>  create mode 100644 drivers/ntb/hw/edma/backend.h
+>  create mode 100644 drivers/ntb/hw/edma/ntb_dw_edma.c
+>  create mode 100644 drivers/ntb/ntb_transport_core.c
+>  create mode 100644 drivers/ntb/ntb_transport_edma.c
+>  create mode 100644 drivers/ntb/ntb_transport_internal.h
+> 
+
 
