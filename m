@@ -1,139 +1,116 @@
-Return-Path: <netdev+bounces-251422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2363DD3C4A9
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:10:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53685D3C500
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C11E46A8313
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 09:56:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A04A57214F4
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7CD345CA3;
-	Tue, 20 Jan 2026 09:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0628B3D6696;
+	Tue, 20 Jan 2026 10:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3sjtQ1x9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SrCXhQVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09EB3A7F51
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 09:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768903013; cv=pass; b=RGgLHRfk6qz3W/7tytPUeMAsbLPzJZ9391MR7/ACErBmFORutgaxV4ttJso/Cg2JlTXKxKC4ld6rYfcpgOqyfJqZWTi7sObfTsW9K0ReSgFSSIqjDqFgYciBejq4E55i0jdwZIAg5jOoJ+DPSRj1ZdErr+etdGCmQGoUJ88uo4w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768903013; c=relaxed/simple;
-	bh=DCIjvxqnB0B7Gd0SJ6C+JyGFfo1rtrAw0nwrgUxl/bU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hDAPYI6sYR3mamL4Bu5E+y1M5o3eoIIdQsXY+PVdUuAJMg/dsrGkC5o+z+JrmoNE3aOxeGtPuaCUZBw4x5J14+LZAs6vYheOwZd/RYkaOtJz/h/iFX+CWa+W8Chn5tUcA65GIqNAMc+KwblxshOmq39CniEAXo8CuB4Q5IZHR9o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3sjtQ1x9; arc=pass smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5014d4ddb54so55629931cf.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 01:56:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768903011; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dXEgWlftCBdqe0cydXlv08HDVlGv+nG2V6u7pk0iHNcrXv8BT+3MxF8dxpvdGn5LR9
-         wgQpAMyDX41EtMNpNm9XETBKWCfIRqqVKzUhRAcZfCMJW9JIgbki6oFm/f3qboILM5QV
-         1ScxYfpMoRic0iJELuD5T9seWbKu3Fe0f5UjbsuMafPDaA1G2MY1mJ3ghx+BSKpb5P7v
-         YVNorQcTeXKVb28DvYWhtwLyDR+rB0rDqO6wPoGSbvdSWPSrBtkk0LBuvl+kisEU+EdG
-         yQGg2DDJY5Zy3xJQ8OjlYNSvBVEj/buVR8QHICPFqcy2JbSX1ZRFCdHtX6WaqGntQ++Z
-         YFZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DCIjvxqnB0B7Gd0SJ6C+JyGFfo1rtrAw0nwrgUxl/bU=;
-        fh=ZOpZvj0+7zbbiK13ggQut6r+HELTf9mmn3vTwTn1Rzw=;
-        b=SMv1Yg9cLuqJtFDMq/pSdIq6S+104umF1mtn95DHs2erlCpR/0R1Aept5pu8BrT17z
-         6YNmQaSW6JgnlHbvpasXauxYOtPZYfxUZ/ZbZbEt4sA20/flwi0C8cKPt2cQ5PnAv5pH
-         BoCZmaTrb/wtQdUGuVR3EYhS+9kNxiais6KBHx/KaltfXedU38fbL1Y2MzcJQDCJrWFl
-         uKgys+uLu8BLMN02cFAXTQiW4Wv0R0/Xhyw8FFxfDBC6J4vQuFir31aDpKF7eHaHMxp0
-         1yE/BhMHTs8ueVe4wjWpxK9Z4likgXL8vyYKb3JVVUPaYXoc0wyapfLtrvGZtXJaWn60
-         r71g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768903011; x=1769507811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DCIjvxqnB0B7Gd0SJ6C+JyGFfo1rtrAw0nwrgUxl/bU=;
-        b=3sjtQ1x9WmRvbdYB06aePiearuKrghc0l2W/2s0AEik+5hKq6QlTBKAsMVRl9/LRT0
-         i2i+q7iKvKng2K621u7/hzupoRZquXkthX6XaBBR6N2yNmJU2VDfovpnJiPACbZSPyn0
-         32bUBEZn3E5RqZYd5Olxu4G40D1/6zK+qnBo1XEBKsq+8flch6FDQ54uALk8dyBkrES/
-         l3Z0xK1WGGesc4V2W78cUG9JKAWtmFfSTt0KXrEbRE2y1DJxfze2do4uujC7BrEShkpO
-         fVBCYHHrIAmjPyV7HJm8Sf9j6AcYQqin+sgBrYW6y2RsnwW4aJh9GAeknshdsrFdqclp
-         /z8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768903011; x=1769507811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DCIjvxqnB0B7Gd0SJ6C+JyGFfo1rtrAw0nwrgUxl/bU=;
-        b=bKDGvhFLI6ZlIFDIrnItfhKpAZpG8dSXcwVLE1PLXKbZuHjxO1Ogli3Md4qajMIC8N
-         1f+XY9+jRcM0DPnAcpvq468H3CI3l0STKxN3aWMU/fj9w7E0lVJQ4BtI9BWwpNgHlGgm
-         NYpFSkfueP31QskUHMxrtgVsHFssqEVuJDooCvUDDQnu/3UvDNLYt5fXNWDsiFaDjn8v
-         GJbj5MuhZEjmZs7hdTC3yFYhq41NbjucpuDbrc47Hd2A5FKiaMNcsoSUFxOvOnZrOOff
-         BoMWcJsKfvnuov2gA6B42IY3gxOHaMn0TPDw05lgpc6TqnyCdwBjdDX4EubH60FewVjb
-         0DdA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZVhrQJacgSsduLXo7fFg53UKTD2ABzdGAXdRFd1XPN9uuxR3/wjm3UtXNrUAF2S1FbGYMuLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnViRwjJPUGgEiX8QsHYbt6JYOCWKEGAcu4ltKD+gP6snIiRLy
-	SkIr8MGp5+n8WrGlz7xl4cX5Sz58PBROzvbqiV596mdqMOgX7uXDzJoFXKJW7WJCUvEgSEg1JJ6
-	VQ3czWeId/RoB1h3Lz9NjcbWeMjsI6nlowtUu8H+2
-X-Gm-Gg: AY/fxX5Bp6imGB4Uv7+1mFOTwphN0LR+8EaponR+SF1R7GdbxaI/6aSN3dEfMqlLm9k
-	V52NCq3kCzVbTmaO9xntvwanpfhe6E75C5KehBkSye/g3GtpeOLqE2REZA+Du7lUesGqvB2F0B+
-	S/QeEDEtiBVC5jWIcDLnl/I/XEpeOOHi1YLTATUr3P6D82lUqyPtM9+jxWpNmg07bSpzcOIXfGM
-	GTs7V0r90fi7goJLgb9i/p1Qu4ukgcohazRjJZ82TEou76www6JFPoQPiWfJhGbH95xCbI=
-X-Received: by 2002:a05:622a:1794:b0:4e8:b9fd:59f0 with SMTP id
- d75a77b69052e-502a179c31emr197588841cf.61.1768903010232; Tue, 20 Jan 2026
- 01:56:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB633D2FF8;
+	Tue, 20 Jan 2026 10:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768903220; cv=none; b=hSlZWNbBgIBq6RJq79gsEoIWvOPPYM/FiS1tUJMUeUlNbaqdJ1mgDJW+GxSq+VPtJrQwaR0iLPuyi1DJryWR3Dn6orJ4KHsMgPrVj7Miu687eDRiOKquDWUi1hIi/EQNnwdgNbfbIkH+vpRYxzJdOjOUzr1xePvKj0Q5/pv0AiI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768903220; c=relaxed/simple;
+	bh=b2n5kG0JEndNa7HHXCIfoTBimaf+cfdFNox0IXsVlnc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MBQpk8yOVoZe2T5JHf4Yh7e7hKEDtwaqwW5rq35TTI3C9es7EXF3lWGIPL+N94DjHJtwx5tMjt8dALEE3gacuv5tWKVLYGLGXTCvXesBzeACqp51/H3JDgHF1ELSdJ2p6XB0AJa5d38TIgMJQHS0ttDSUic7+YcEsUHZSGbdBVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SrCXhQVD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A79C16AAE;
+	Tue, 20 Jan 2026 10:00:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768903220;
+	bh=b2n5kG0JEndNa7HHXCIfoTBimaf+cfdFNox0IXsVlnc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SrCXhQVDkP1GWJFrUzKS+Ewo60ZQGqrujVlMuicBT7l6FTuCq9c+ESt02UjsevEF1
+	 8hrpN4fQQcPTLVy+B4lKzBPaZO8UPrjg4esURkkda3FMgq6Urs6A4q+5JzwRxSttod
+	 kqiAmJL6KfWdcZA9lZ/DhkDqSkFlOECzt/IJwbj1JKtJwW4GRgxhBtSZd6SCQxasP8
+	 ql6OubbnakUnTbrMcjdsZc1UfvqlF6qL0MnZ7dbZmNcEsTkTkMn9cmX6hNeNPzKW84
+	 wqpCDqLdWMLVKqUo7wyVgICg+kRoZ0nX2OlgesXRs1m5EsF00Tuy6VVivql/COe/Tv
+	 KGYY5yaIqK3jQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0216E38068DF;
+	Tue, 20 Jan 2026 10:00:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119185852.11168-1-chia-yu.chang@nokia-bell-labs.com> <20260119185852.11168-6-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20260119185852.11168-6-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Jan 2026 10:56:39 +0100
-X-Gm-Features: AZwV_Qi434Atr1gPGVfzbX7Cut4_5_Pnu1U9A-PDsd4oFP08xwfXslULTipllTc
-Message-ID: <CANn89i+P_g8XB++mQ-MMXSSaTURLsohqnxHBcVpVrBBBoru91w@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 05/15] tcp: disable RFC3168 fallback
- identifier for CC modules
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, parav@nvidia.com, linux-doc@vger.kernel.org, 
-	corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
-	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net, 
-	liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v11 0/9] net: hinic3: PF initialization
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176890321754.717702.14796258240197928726.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Jan 2026 10:00:17 +0000
+References: <cover.1768375903.git.zhuyikai1@h-partners.com>
+In-Reply-To: <cover.1768375903.git.zhuyikai1@h-partners.com>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: zhuyikai1@h-partners.com, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ andrew+netdev@lunn.ch, Markus.Elfring@web.de, pavan.chebbi@broadcom.com,
+ alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, luosifu@huawei.com, guoxin09@huawei.com,
+ zhoushuai28@huawei.com, wulike1@huawei.com, shijing34@huawei.com,
+ luoyang82@h-partners.com
 
-On Mon, Jan 19, 2026 at 7:59=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com>=
- wrote:
->
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> When AccECN is not successfully negociated for a TCP flow, it defaults
-> fallback to classic ECN (RFC3168). However, L4S service will fallback
-> to non-ECN.
->
-> This patch enables congestion control module to control whether it
-> should not fallback to classic ECN after unsuccessful AccECN negotiation.
-> A new CA module flag (TCP_CONG_NO_FALLBACK_RFC3168) identifies this
-> behavior expected by the CA.
->
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
+Hello:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 14 Jan 2026 16:38:19 +0800 you wrote:
+> This is [1/3] part of hinic3 Ethernet driver second submission.
+> With this patch hinic3 becomes a complete Ethernet driver with
+> pf and vf.
+> 
+> The driver parts contained in this patch:
+> Add support for PF framework based on the VF code.
+> Add PF management interfaces to communicate with HW.
+> Add 8 netdev ops to configure NIC features.
+> Support mac filter to unicast and multicast.
+> Add HW event handler to manage port and link status.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v11,1/9] hinic3: Add PF framework
+    https://git.kernel.org/netdev/net-next/c/53200a8605d7
+  - [net-next,v11,2/9] hinic3: Add PF management interfaces
+    https://git.kernel.org/netdev/net-next/c/a30cc9b27790
+  - [net-next,v11,3/9] hinic3: Add .ndo_tx_timeout and .ndo_get_stats64
+    https://git.kernel.org/netdev/net-next/c/f47872bed40f
+  - [net-next,v11,4/9] hinic3: Add .ndo_set_features and .ndo_fix_features
+    https://git.kernel.org/netdev/net-next/c/721df7639c83
+  - [net-next,v11,5/9] hinic3: Add .ndo_features_check
+    https://git.kernel.org/netdev/net-next/c/2467a0466028
+  - [net-next,v11,6/9] hinic3: Add .ndo_vlan_rx_add/kill_vid and .ndo_validate_addr
+    https://git.kernel.org/netdev/net-next/c/0f9e2d957474
+  - [net-next,v11,7/9] hinic3: Add adaptive IRQ coalescing with DIM
+    https://git.kernel.org/netdev/net-next/c/b35a6fd37a00
+  - [net-next,v11,8/9] hinic3: Add mac filter ops
+    https://git.kernel.org/netdev/net-next/c/aebd95b00a3a
+  - [net-next,v11,9/9] hinic3: Add HW event handler
+    https://git.kernel.org/netdev/net-next/c/cb36f89b1001
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
