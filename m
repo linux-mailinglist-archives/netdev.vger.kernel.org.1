@@ -1,250 +1,252 @@
-Return-Path: <netdev+bounces-251609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMzPEfvsb2m+UQAAu9opvQ
-	(envelope-from <netdev+bounces-251609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 22:00:43 +0100
+	id EO1JGPnpb2m+UQAAu9opvQ
+	(envelope-from <netdev+bounces-251610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:47:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85EF4BE3C
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 22:00:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBFB34BB89
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E81A88E0AAB
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:42:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B4CCA05FE2
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE2847B438;
-	Tue, 20 Jan 2026 19:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7088547D936;
+	Tue, 20 Jan 2026 19:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="c23KRbGj"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Xl/VhU/8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fdIKl0IJ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Xl/VhU/8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fdIKl0IJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FD944BC89
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 19:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D4C47CC94
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 19:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768938129; cv=none; b=mdsuJ9NcqBP50bLKbgMQIdxUmDShhAqRumOyCXzUjSJL7oeNmqsmhpKXgTJveb8xe0+AlyJ2PdPC1oSlhCC5hGoXSEYfGNoH99KDzTB8O3N63ldQERgNPldHB/DBuWRoQHlDtgxSufSy8pHqTCnWyh4p52XxreFtb77rphPCJmo=
+	t=1768938303; cv=none; b=gsG02kTu2Xix0HXYpmPY3/hQz4fzGQ6NysRPWmjO1sC4E51FsYUpBnxwFVw1/5yPCYCleMq9/qnC7vtrMUuOFIgGzJYex8nbH5VaXJq1gBIyzyKyhQDZFac3wiCis8JSVMsOyMTEsOhX+NQnuQ/t6x1DRtBeMDwKmeAKLAhoqGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768938129; c=relaxed/simple;
-	bh=GZ1p+HqV7KqAGO52zVx0hi6GLjR1nwg1KP14+R79c7Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RStvXwhMfok73i/4JQVamVHfcC9VTsZgRvweEOtvl1eDCBagT7MupwGUBYioTA2SzD4Epl4AU7Py0WmBMsSj4YIZQFrR1tcgag+xVniZnXg0AZaiETn4cOzSojHqlK9YcoqrRvErwL9Xt+gwzaF8EDguw2oRt1AkKZgtx3P/iN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=c23KRbGj; arc=none smtp.client-ip=209.85.219.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-8804f1bd6a7so51003616d6.2
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 11:42:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768938126; x=1769542926;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3o0kX59oQsIDgSNDDrsm01GVqwHkP/rCJPQYdRB3/Fk=;
-        b=L9CJsqxUnhlz/uuPGdAjetI1LtbBsaFuMwvIuRl6mNIdG+2Iu8vtEPtnaCYTUMb7xt
-         tbDvl1Sj54W0/kdeoBAwbWaLY8hDG4TBTVM8Xve6Z6mLMUgn4EG6JzdSMX0UUN8Ka5Wq
-         LQN9mQ1Z03tVgf0wBxY3pVUU1tVvWTbODtiqU3TM0ov/fPND64F2ODrr5ZCbueno4Z4P
-         wUfcj+OuK551gFaEAQvxQB67I8HvrrUVjKv46vWWQTDz7qAZbcGPp2ub0UJHj3RFShop
-         6IQmxu/ca7Lm6S15EtbM3V6CdNc7oi8Ss8nxUYPMCWJLMVgMR0BgcRArGTPtLkakBEiJ
-         f45w==
-X-Gm-Message-State: AOJu0YyRLhEHd8Js01rQ0ij3yI3xCYC65zoi8k4MuMzGDywunnOQeNso
-	u5ByTU3DHbbeBIokL69wsOggeTWBR00hLHJAXAwRdRKqLw2HM5E27ATIgbTGWKCpeE9fYu+Ua22
-	D0rPdPS9LvaV3aQV1SQke+a7JkZQ9nmtCS4u9zV93gm74kTnkM+Ax58joKzevgXYtALZvwsnx6C
-	c+fwNsy3C1o/NyrUU8QNfHDcBjlOSaESQ66jJGND8LZueQPSPCj3Kd670Hcq9s8MBs77jzyp0rX
-	J5BTVy3pw==
-X-Gm-Gg: AZuq6aIyDWINqz+eGBjfTOtJl9cyJ7br7mryEDjSQdUo7G0JciC2lNwuvvplJyCCT9U
-	wXzkWxebIAJduvKhLcMs0BsWiA1GxPo6feaVzWztnW+Y0n42GqtnKm/YeXp2kOQeoDrPbu56CdP
-	cohinDl0Y6j0ZF23iqDGwxv6rqZ/V/3jb6Dn3GmEJ3eyI391q2MCh1FMBiugVzRSi/XIF5Gypd5
-	Vcczyz69NkdEJi4qTltAP9RSMp7Qp9sHgqyIdrlJbMrNehHfixNr9h3SZoaN9swjfl4SEAjkpbW
-	k8IeHBoemDuo90ApdPHbNajqS/U9qHrjD4TJbgXnP4DGiizk6Zbr2Wu0LOKXCZHh0ljm/PRfVbP
-	qEc1JaIYLoGgE47TtZelpRLKNayAzBuA1dtR19FzGULgkDgP+30OjG4kFE/FvCmA4OmgpCjyfnZ
-	C55pfV9diypdrzdTeC+nllh55orAG0r2JxIHAjc7cZ1vQ=
-X-Received: by 2002:a05:6214:19c4:b0:880:4695:4626 with SMTP id 6a1803df08f44-89463865ffbmr45487826d6.15.1768938126366;
-        Tue, 20 Jan 2026 11:42:06 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8942e6cd881sm10026036d6.18.2026.01.20.11.42.06
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Jan 2026 11:42:06 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-890587d4e87so165819836d6.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 11:42:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1768938125; x=1769542925; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3o0kX59oQsIDgSNDDrsm01GVqwHkP/rCJPQYdRB3/Fk=;
-        b=c23KRbGjeOskyYM5Bx6dyaps21cbhI0yY6bhoctdxMWJDedD0MBmuHgDPClGIdoV1c
-         59CzihT8yohp1UZqzHy1xJUtwv3F4H/EtRDaVdvE0SdzTQOyHdWoJHHXSWbXS+8L3Q/v
-         qROq/yLQ+R1CaEdGxH5aNpBNPQEjY/5owoNOk=
-X-Received: by 2002:a05:6214:d08:b0:880:48c6:ad02 with SMTP id 6a1803df08f44-894638f6297mr39800296d6.52.1768938125211;
-        Tue, 20 Jan 2026 11:42:05 -0800 (PST)
-X-Received: by 2002:a05:6214:d08:b0:880:48c6:ad02 with SMTP id 6a1803df08f44-894638f6297mr39799986d6.52.1768938124798;
-        Tue, 20 Jan 2026 11:42:04 -0800 (PST)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e6c9b83sm110887586d6.46.2026.01.20.11.42.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 11:42:04 -0800 (PST)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	florian.fainelli@broadcom.com,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next v2 2/2] net: bcmasp: streamline early exit and fix leak
-Date: Tue, 20 Jan 2026 11:41:54 -0800
-Message-Id: <20260120194154.2047656-3-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260120194154.2047656-1-justin.chen@broadcom.com>
-References: <20260120194154.2047656-1-justin.chen@broadcom.com>
+	s=arc-20240116; t=1768938303; c=relaxed/simple;
+	bh=fnHTYKoRmjsneSKmJmk5uNghMHCy+6dx8CZiiPq1vYQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=N/5pa9t7AG2VXvvISqxr8XJrKZo6WqPuA48J15DbgjzYPajTLkBO5SX2pq/K5C2aMr2uFK+9Mc+vOETcR4j2870VBiWrnd6KkXRn7/3MkQl3KCULmYChoEsrQeR/uaVA9lbkBcj3WryflcElKKdaZU6PR1pxjAsgrtFgoLbqxZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Xl/VhU/8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fdIKl0IJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Xl/VhU/8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fdIKl0IJ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A39925BCCF;
+	Tue, 20 Jan 2026 19:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768938298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oB8L91jGPNcK38t02Oh2/Lp/HdtpKCMAVWKjAGV+TL4=;
+	b=Xl/VhU/8WQ8msMdAlcXAdo0sZQqQzDPjRU2TCD7Q4qGqDxPzX1qYsajKPls2CmwUEr7K89
+	g8YyjNn3x2X72Yeq9ZOHcfufoSMgYERzvKfSvq7rjT4NOqeyjpbgYmP3/ITZZg5oiJ9Exu
+	89WBKizi6v69SyB6SZt/F++CNXbW3E8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768938298;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oB8L91jGPNcK38t02Oh2/Lp/HdtpKCMAVWKjAGV+TL4=;
+	b=fdIKl0IJS7zT6/o4a94BQx+6ccxZN2f9fCaIc1af1Cr8eRp7bfQJAkQhD/HSNIWjy8JdIE
+	qyXa9i5NQ7RL8iAg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="Xl/VhU/8";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=fdIKl0IJ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768938298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oB8L91jGPNcK38t02Oh2/Lp/HdtpKCMAVWKjAGV+TL4=;
+	b=Xl/VhU/8WQ8msMdAlcXAdo0sZQqQzDPjRU2TCD7Q4qGqDxPzX1qYsajKPls2CmwUEr7K89
+	g8YyjNn3x2X72Yeq9ZOHcfufoSMgYERzvKfSvq7rjT4NOqeyjpbgYmP3/ITZZg5oiJ9Exu
+	89WBKizi6v69SyB6SZt/F++CNXbW3E8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768938298;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oB8L91jGPNcK38t02Oh2/Lp/HdtpKCMAVWKjAGV+TL4=;
+	b=fdIKl0IJS7zT6/o4a94BQx+6ccxZN2f9fCaIc1af1Cr8eRp7bfQJAkQhD/HSNIWjy8JdIE
+	qyXa9i5NQ7RL8iAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2A7BF3EA63;
+	Tue, 20 Jan 2026 19:44:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id BGtJBzrbb2lwFgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 20 Jan 2026 19:44:58 +0000
+Message-ID: <f22691c9-63c6-444a-899f-adac93a2bbbf@suse.de>
+Date: Tue, 20 Jan 2026 20:44:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 net-next v2] selftests: ipv6_icmp: add tests for
+ ICMPv6 handling
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <20260107153841.5030-1-fmancera@suse.de>
+ <20260107153841.5030-2-fmancera@suse.de>
+ <72d45fe9-c058-4944-b7a2-260b7259096f@kernel.org>
+ <1660abed-e6ad-4657-8736-599ab9114f68@suse.de>
+ <604c7b1d-f366-4faa-9abd-bae8ae73b561@kernel.org>
+ <061a4df2-2ccd-449f-a21b-4ffa03be4533@suse.de>
+Content-Language: en-US
+In-Reply-To: <061a4df2-2ccd-449f-a21b-4ffa03be4533@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [1.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-251609-lists,netdev=lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[broadcom.com,reject];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[suse.de,none];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-251610-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: E85EF4BE3C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,fcnal-test.sh:url]
+X-Rspamd-Queue-Id: CBFB34BB89
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix an early exit cleanup leak by unregistering of_phy_fixed_link()
+On 1/20/26 8:24 PM, Fernando Fernandez Mancera wrote:
+> On 1/8/26 4:20 PM, David Ahern wrote:
+>> On 1/8/26 4:24 AM, Fernando Fernandez Mancera wrote:
+>>> On 1/7/26 5:41 PM, David Ahern wrote:
+>>>> On 1/7/26 8:38 AM, Fernando Fernandez Mancera wrote:
+>>>>> +icmpv6_to_vrf_based_local_address()
+>>>>> +{
+>>>>> +    local rc
+>>>>> +    local lldummy
+>>>>> +
+>>>>> +    echo
+>>>>> +    echo "ICMPv6 to VRF based local address"
+>>>>> +
+>>>>> +    setup
+>>>>> +
+>>>>> +    lldummy=$(get_linklocal dummy0)
+>>>>> +
+>>>>> +    if [ -z "$lldummy" ]; then
+>>>>> +        echo "Failed to get link local address for dummy0"
+>>>>> +        return 1
+>>>>> +    fi
+>>>>> +
+>>>>> +    run_cmd "$NS_EXEC sysctl -w 
+>>>>> net.ipv6.conf.all.keep_addr_on_down=1"
+>>>>> +
+>>>>> +    # create VRF and setup
+>>>>> +    run_cmd "$IP link add vrf0 type vrf table 10"
+>>>>> +    run_cmd "$IP link set vrf0 up"
+>>>>> +    run_cmd "$IP link set dummy0 master vrf0"
+>>>>
+>>>> run_cmd "$IP -6 addr add ::1 dev vrf0 nodad"
+>>>>
+>>>> makes the VRF device the loopback.
+>>>>
+>>>>> +
+>>>>> +    # route to reach 2001:db8::1/128 on VRF device and back to ::1
+>>>>> +    run_cmd "$IP -6 route add 2001:db8:1::1/64 dev vrf0"
+>>>>> +    run_cmd "$IP -6 route add ::1/128 dev vrf0 table 10"
+>>>>
+>>>> and then this route add should not be needed. This is how fcnal-test.sh
+>>>> works.
+>>>>
+>>>
+>>> Oh neat! Thanks.
+>>>
+>>>>> +
+>>>>> +    # ping6 to link local address
+>>>>> +    run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
+>>>>> +    log_test $? 0 "Ping to link local address on VRF context"
+>>>>> +
+>>>>> +    # ping6 to link local address from localhost (::1)
+>>>>> +    run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
+>>>>
+>>>> -I vrf0 should be needed for all VRF tests. I suspect your current
+>>>> passing tests are because you have a single setup step and then run
+>>>> non-VRF test followed by VRF test. Really you need to do the setup,
+>>>> run_test, cleanup for each test.
+>>>>
+>>>
+>>> You are right here about the cleanup, although the tests are passing
+>>> even if the cleanup is properly done or if `-t
+>>> icmpv6_to_vrf_based_local_address`. I don't see why they should not 
+>>> pass.
+>>
+>> Without ::1 on the vrf device there is no valid address. ie., ::1 is in
+>> the default vrf and dummy0 is in the VRF so it should not be allowed.
+>> Something is off.
+> 
+> Yes, what is off is the setup but see comment below, please disregard 
+> the test file I created.
+> 
+>>>
+>>> I am changing them to use `-I vrf0` because it makes more sense.
+>>
+>> I should have asked yesterday: how do these tests differ from what is
+>> done in fcnal-test.sh - ipv4_ping and ipv6_ping? Those tests cover
+>> loopback, linklocal address and global address combined with vrf and 
+>> no vrf.
+>>
+>>
+> 
+> Sorry for my late reply. About fcnal-test.sh - ipv6_ping, I didn't know 
+> this existed, sorry. The main difference is that they do not use -I ::1. 
+> Indeed, if `-I ::1` case is added for pinging a configured local address 
+> it fails. Both, vrf and no vrf.
+> 
 
-Streamline the bcmasp_probe early exit. As support for other
-functionality is added(i.e. ptp), it is easier to keep track of early
-exit cleanup when it is all in one place.
+Correction: only on no-vrf scenario, as vrf scenario uses `-I $VRF` it 
+is fine.
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c   | 27 ++++++++++---------
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c  |  5 +++-
- 2 files changed, 18 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 36df7d1a9be3..aa6d8606849f 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1317,6 +1317,8 @@ static int bcmasp_probe(struct platform_device *pdev)
- 
- 	bcmasp_core_init_filters(priv);
- 
-+	bcmasp_init_wol(priv);
-+
- 	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
- 	if (!ports_node) {
- 		dev_warn(dev, "No ports found\n");
-@@ -1328,16 +1330,14 @@ static int bcmasp_probe(struct platform_device *pdev)
- 		intf = bcmasp_interface_create(priv, intf_node, i);
- 		if (!intf) {
- 			dev_err(dev, "Cannot create eth interface %d\n", i);
--			bcmasp_remove_intfs(priv);
--			ret = -ENOMEM;
--			goto of_put_exit;
-+			of_node_put(ports_node);
-+			ret = -EINVAL;
-+			goto err_cleanup;
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
- 		i++;
- 	}
--
--	/* Check and enable WoL */
--	bcmasp_init_wol(priv);
-+	of_node_put(ports_node);
- 
- 	/* Drop the clock reference count now and let ndo_open()/ndo_close()
- 	 * manage it for us from now on.
-@@ -1352,19 +1352,20 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	list_for_each_entry(intf, &priv->intfs, list) {
- 		ret = register_netdev(intf->ndev);
- 		if (ret) {
--			netdev_err(intf->ndev,
--				   "failed to register net_device: %d\n", ret);
--			bcmasp_wol_irq_destroy(priv);
--			bcmasp_remove_intfs(priv);
--			goto of_put_exit;
-+			dev_err(dev, "failed to register net_device: %d\n", ret);
-+			goto err_cleanup;
- 		}
- 		count++;
- 	}
- 
- 	dev_info(dev, "Initialized %d port(s)\n", count);
- 
--of_put_exit:
--	of_node_put(ports_node);
-+	return ret;
-+
-+err_cleanup:
-+	bcmasp_wol_irq_destroy(priv);
-+	bcmasp_remove_intfs(priv);
-+
- 	return ret;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 6cddd3280cb8..f3b8d94f4791 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -1228,7 +1228,7 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 		netdev_err(intf->ndev, "invalid PHY mode: %s for port %d\n",
- 			   phy_modes(intf->phy_interface), intf->port);
- 		ret = -EINVAL;
--		goto err_free_netdev;
-+		goto err_unregister_fixed_link;
- 	}
- 
- 	ret = of_get_ethdev_address(ndev_dn, ndev);
-@@ -1252,6 +1252,9 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 
- 	return intf;
- 
-+err_unregister_fixed_link:
-+	if (of_phy_is_fixed_link(ndev_dn))
-+		of_phy_deregister_fixed_link(ndev_dn);
- err_free_netdev:
- 	free_netdev(ndev);
- err:
--- 
-2.34.1
+> I am preparing a v3 adding a scenario to that test instead of creating 
+> new ones.
+> 
+> Thank you very much David for all this feedback,
+> Fernando.
+> 
 
 
