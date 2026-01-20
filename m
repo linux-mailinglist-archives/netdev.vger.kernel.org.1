@@ -1,181 +1,183 @@
-Return-Path: <netdev+bounces-251452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFzQN6VqcWmaGgAAu9opvQ
-	(envelope-from <netdev+bounces-251452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:09:09 +0100
+	id sCLBEYFQcGlvXQAAu9opvQ
+	(envelope-from <netdev+bounces-251453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 05:05:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525455FD42
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:09:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010A550C67
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 05:05:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D733E7C6DB8
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:44:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3BB7F5E203C
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E0941323B;
-	Tue, 20 Jan 2026 10:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05A340756F;
+	Tue, 20 Jan 2026 10:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bLarUOM4"
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="UfbY76hC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CE3410D26
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8313E9F82;
+	Tue, 20 Jan 2026 10:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768905663; cv=pass; b=SiyxNBCUoPopmKSriDXQpFNIDamEXe01F58kwOFnZG5MYmmUs0rLm8NopRjavXbyrtgkGkxEP81B5XoDWdFFMdpWdaVyaJllVDxHYBYTLvVeIQNVGyk4F0WJhLUu483vuei6+5t/5/OUiTHtP0BCRnBFULKLYTyD8lHvUO0UyrY=
+	t=1768906654; cv=pass; b=hc0WYYOGV8GW2yUFYpvoEUe9Pe5soBIKruSrJU9gYPEeSiwekdwUdHZBTjibzmWLGgYJ74brp6DKBbQoplAKDsViRvMekDZEts4Ysl3hX5W3SLtPqjKD2U4W936/fFsyDftDpvOgwKHWVoaKC3lmekwHdHYI8qbqyQMqooIwQDA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768905663; c=relaxed/simple;
-	bh=FFii1bsKXobctKhMNLtq5d1Ip3RYu1nQ6MH14Bs+3t8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O1lkHn94stmr0lv5jI4BYjden3+KnDHpD2r8dO1m+Faa8pWY4eC/cEufOe+rLU0TUV/VeTZmqFPnKQvjMnBPltssOQc7Rl/Je2nHpUNef7MDtgDZHNOXNX5AW3ap66XOeULfbgb+xBoH8ZCNynfmxX51f9Cu6FRihsYa3bTMRjg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bLarUOM4; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-502b0aa36feso25495671cf.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 02:41:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768905660; cv=none;
-        d=google.com; s=arc-20240605;
-        b=I7ff/2UpIFTA5UsD10ezOqMcXMraaKBBxfNK5iz92hhxX3J38mqKKRLm6FoJBSDPFh
-         TCmPRN7Cw6RgHH8Gj8X5nXnsNAM4sEJ2SM4s2v6xL9ve2BA4xZsFOP0N3p1/yntxx7O3
-         WRyo7BsR9/1K+uP9va0OBkIy59b14xzJH148rT8Vk0XWycOFynj3E5nainAs0eGxXld2
-         yUKOtbCt5TvxxvTaVZXOoqDg5XhMH6EuQKhyir7ryHKvJ8xmp1zfgWPhwZM/fyGH4Lrk
-         KFFwHsHrEM1EmZpkjw+cI8EkuGNT1XhpeQfxHleWwFuYEa2UQctVl0joRMrMFSft8okQ
-         mfiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FFii1bsKXobctKhMNLtq5d1Ip3RYu1nQ6MH14Bs+3t8=;
-        fh=KiKz5OHTL/y0NJT1Zxd8IcC4ial+xCmsw1uJpQW8PZw=;
-        b=gc+PvU7/viuymPGKPPmDjR61xKTqD5WKs962iunO2P35sfuCtPj/F7pbVfH6rt3oZ+
-         0VGJeMBCriGJodEMEQIJbuBKu94ZDGmoEClfFcfZLyQx2Z76cqp1n7RybvZ9EUnjXHFN
-         6Xbpui7qzXhxl7W2qXKiz93Oyk2EVNTcAOjxd/xg5b7HdnzKfPVpZmm8mpF1Yv8Q05hY
-         G571sOru//4Vkv8A4H8yIq5+dI42BvFNciQsH6RIyWhUQiZ+vUP1a0UeVYIAWeh5/v3B
-         DXRlavi1FuugPGEmPTBeiutzm2Ix7srs/WQKvm6kt48MKjQ6m0LZHN81dichpqmu++ui
-         htXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768905660; x=1769510460; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FFii1bsKXobctKhMNLtq5d1Ip3RYu1nQ6MH14Bs+3t8=;
-        b=bLarUOM4KWKl8f8jZgqdcCHw3/BWGLLM0Lee/em0TyNUn56jxnJiCCMwImFosoG8BG
-         bZ4ByuHgsMz229Eg7TzNOWTJZjiKMzDRETJfukjRdQEjYMCehR+z4Y7pAI9Q2auCxG7E
-         e1Y54T0Hw7PqbKEqIZgANAaOQL9U5/pRC8TAKKDsc79lCOYpctfKAhJ2Q0SXP2DqD2fe
-         f1u1/sh1/2CY3SJYi11hp/VEgmCZuNhxk/9RtFJ+F5kkn6NkkA1HU1Hl+vwEhd7LTXRv
-         yw2bhlQNHF5yNZqfgxWMhFfvo0XmZUQNedyaSYVtNgkhtW/bP8azuPcC+vXn6D3LFXAM
-         ph/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768905660; x=1769510460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FFii1bsKXobctKhMNLtq5d1Ip3RYu1nQ6MH14Bs+3t8=;
-        b=SOkyIGvVc6C8BUEtJ0P6RebZK4sbiYalHmNnu5RYQrTZO8q/sEVJJ/h0qRN9Cmx/bV
-         1IR1HEoA66Abx6SJlYBGjhR9wsxnlKXaPzpA3pUui+m2eO2IUy6xxK/hpJ++u6ThpY/D
-         FjRot3zye7QyTsO1o0v/PPA3t/aUUlUXDL06Cg/nsz4gMFQvn3siraZY7kycq26sw3T3
-         wJW7K7oEDaOcC1qY9C+S5uYlL5gQpxFtQGwjuFTNzXRoqaqF6iU2kHLQ7UcHO992oWX1
-         QrAkLyJ6+V+vbeSoIeu2SF354ULUh1W7mKemEXBKCyUlCsmJ39DTdiBLDgsx47uZ+Llo
-         6v7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWtp3q6F0mDfCFcCEFOnRV8AMxJhDWKy+6V9ypxwUZDjRXlsxhd8+fmvqyGOWWP+JyyDzYxsPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKHJL6B7pQuiVpbrEH26qWe6aVBbRvXMT+8UTgC2kIE0ylVTXl
-	HvNwhs7CMTIgyOyV3yni5C4b4cBlQtmXuGy++BbMiBDghUN2EPhvIKHKKMU39hp1z4VY77Tz7Sf
-	GaU6bULfZkVvWuo7sKkrkz8VdvBZg869WpkwL1+ON
-X-Gm-Gg: AY/fxX787Ok5ZJ9TtPrSAU33t5DVbqAIgrwvLemSll4EoNj9aEq9mB1bQ6Nqtd5llkE
-	qPjEwRD1e0Mzpc1bZXhTJSHJeNPmwV4fzN0YNJWxGtsAbwWIwu8hUVpxiKuIh75IEnNShj2Gl4g
-	RWOgrgfoOYP4UF3m7DNshRTOEp4xEKQ39WwUuotfRg95qazByc74trq5Ldeh3vv8BLnAtPsGvT5
-	ywX6VL1/jQYiGVyrppqxrpXawl9qkCjeIRcuTAxKn4tAfZP+kIcePRFDszw07TA4HRZox4ZcO9W
-	Aw/SHg==
-X-Received: by 2002:ac8:7d16:0:b0:4ff:7eaf:6fa1 with SMTP id
- d75a77b69052e-502a156ae5dmr191196621cf.11.1768905659838; Tue, 20 Jan 2026
- 02:40:59 -0800 (PST)
+	s=arc-20240116; t=1768906654; c=relaxed/simple;
+	bh=hLhhaaiGUK4UAPYUo2Wht+3suThBEz9Cj77yr1RmrCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EpudcmA2hZGJs/+tFpmU8VmPmdI25O1yejkUsr5fdCs6zT8A0eYyzeDAgc1/lUR4ZK21hJXurv77F4Tko7zOjYqqrfznPeoQvtk/8kLpuwskQ6hMwtk7OYxOGn0zigh7R43XAdiRgHm8NzPyYSE2X3FXT3y0L0rZcbfHyJFhQxU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=UfbY76hC; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+ARC-Seal: i=1; a=rsa-sha256; t=1768906567; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Ak6+zhg/djoSET/jxpadpQyRcrriZ+Hb4IrbOf1xk69NlUklGQMlAFWHFwmYe3Yesq3b5hQ22GYGsF+HGH1Bt05MaD92p74uwnxUUFvPhFQ84McpHwHIm1iz+EQW9QgEc5Xc5zFv6FwCsoa2iYSN8/h5UXVatAvvTisNw1EldZo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1768906567; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ONSVQRKcPO7Hdq9rjeCJBLbi+rJef9ClGejj6CnM0wY=; 
+	b=NOJakvj5baRnkmXoB7LumnUit/KQxGV92PkXR478iuA98Tdt3Of/28od+qlx0Eepp+TIkIeLBAt5wPapNsAjtx9Doj78v/gkaJqNN5QnZPeD1wRDB6IAZiGhCl9gjGgBF3uF+8QEDy5fAE724YLlr0+UDLbM8smzAJ233CuTkzg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=ziyao.cc;
+	spf=pass  smtp.mailfrom=me@ziyao.cc;
+	dmarc=pass header.from=<me@ziyao.cc>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1768906567;
+	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
+	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
+	bh=ONSVQRKcPO7Hdq9rjeCJBLbi+rJef9ClGejj6CnM0wY=;
+	b=UfbY76hCP8zX5WETuGgn6VZM3NN+FjaN8LWv69wwAVNk0zvq8H3HC8pdZHJp2V4c
+	sfOY8cbsd+bhCiZhPaWpES7/nq72N3qz3r2DaTdaXMj1PJmH1Q7eUkPXygOtrxsg6XT
+	wISiqo24iESoNSprYd3gvxcv3ZhFDNNxXiO9pccg=
+Received: by mx.zohomail.com with SMTPS id 1768906565127972.0399174349235;
+	Tue, 20 Jan 2026 02:56:05 -0800 (PST)
+Date: Tue, 20 Jan 2026 10:55:43 +0000
+From: Yao Zi <me@ziyao.cc>
+To: Inochi Amaoto <inochiama@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Yanteng Si <siyanteng@cqsoftware.com.cn>,
+	Yao Zi <ziyao@disroot.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Quentin Schulz <quentin.schulz@cherry.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: Add support for Spacemit
+ K3 dwmac
+Message-ID: <aW9fL7r0AM0flALJ@pie>
+References: <20260120043609.910302-1-inochiama@gmail.com>
+ <20260120043609.910302-2-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119185852.11168-1-chia-yu.chang@nokia-bell-labs.com> <20260119185852.11168-10-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20260119185852.11168-10-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Jan 2026 11:40:48 +0100
-X-Gm-Features: AZwV_Qhir59xi47UnYx9OyC5NKVZCvDNZj7hbofVsggQLWG8gFaqMb9MOW1Nco4
-Message-ID: <CANn89iJPE=rCExzfFw-eKe5PiukTnmUogaLJSXgo6JfDeZiezQ@mail.gmail.com>
-Subject: Re: [PATCH v9 net-next 09/15] tcp: accecn: retransmit SYN/ACK without
- AccECN option or non-AccECN SYN/ACK
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, parav@nvidia.com, linux-doc@vger.kernel.org, 
-	corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
-	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net, 
-	liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260120043609.910302-2-inochiama@gmail.com>
+X-ZohoMailClient: External
+X-Spamd-Result: default: False [9.34 / 15.00];
+	URIBL_BLACK(7.50)[ziyao.cc:dkim];
 	SUSPICIOUS_RECIPS(1.50)[];
-	DATE_IN_PAST(1.00)[37];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,nvidia.com,vger.kernel.org,lwn.net,kernel.org,google.com,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251452-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[ziyao.cc:s=zmail];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gentoo.org,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,armlinux.org.uk,cqsoftware.com.cn,disroot.org,nxp.com,bp.renesas.com,linux.intel.com,bootlin.com,eswincomputing.com,altera.com,cherry.de,st.com,synopsys.com];
+	GREYLIST(0.00)[pass,body];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	TAGGED_FROM(0.00)[bounces-251453-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com,gmail.com];
+	DMARC_POLICY_ALLOW(0.00)[ziyao.cc,quarantine];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[me@ziyao.cc,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33]
-X-Rspamd-Queue-Id: 525455FD42
-X-Rspamd-Action: no action
+	DKIM_TRACE(0.00)[ziyao.cc:+];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 010A550C67
+X-Rspamd-Action: add header
+X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-On Mon, Jan 19, 2026 at 7:59=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com>=
- wrote:
->
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> For Accurate ECN, the first SYN/ACK sent by the TCP server shall set the
-> ACE flag (see Table 1 of RFC9768) and the AccECN option to complete the
-> capability negotiation. However, if the TCP server needs to retransmit su=
-ch
-> a SYN/ACK (for example, because it did not receive an ACK acknowledging i=
-ts
-> SYN/ACK, or received a second SYN requesting AccECN support), the TCP ser=
-ver
-> retransmits the SYN/ACK without the AccECN option. This is because the
-> SYN/ACK may be lost due to congestion, or a middlebox may block the AccEC=
-N
-> option. Furthermore, if this retransmission also times out, to expedite
-> connection establishment, the TCP server should retransmit the SYN/ACK wi=
-th
-> (AE,CWR,ECE) =3D (0,0,0) and without the AccECN option, while maintaining
-> AccECN feedback mode.
->
+On Tue, Jan 20, 2026 at 12:36:06PM +0800, Inochi Amaoto wrote:
+> The GMAC IP on Spacemit K3 is almost a standard Synopsys DesignWare
+> MAC (version 5.40a) with some extra clock.
+> 
+> Add necessary compatible string for this device.
+> 
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   3 +
+>  .../bindings/net/spacemit,k3-dwmac.yaml       | 107 ++++++++++++++++++
+>  2 files changed, 110 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/spacemit,k3-dwmac.yaml
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+...
+
+> diff --git a/Documentation/devicetree/bindings/net/spacemit,k3-dwmac.yaml b/Documentation/devicetree/bindings/net/spacemit,k3-dwmac.yaml
+> new file mode 100644
+> index 000000000000..58dd98f79e8a
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/spacemit,k3-dwmac.yaml
+
+...
+
+> +  clocks:
+> +    minItems: 3
+> +    items:
+> +      - description: GMAC main clock
+> +      - description: PTP clock
+> +      - description: TX clock
+> +      - description: PHY clock
+
+Why does the MAC require "phy" clock? Shouldn't this be handled in PHY
+driver instead, or I get its meaning wrong?
+
+Also, I don't see "phy" clock is acquired anywhere in the driver. Is it
+really necessary for the MAC?
+
+Best regards,
+Yao Zi
 
