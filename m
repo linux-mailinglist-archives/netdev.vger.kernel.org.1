@@ -1,189 +1,174 @@
-Return-Path: <netdev+bounces-251535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251536-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFYUOMTFb2mgMQAAu9opvQ
-	(envelope-from <netdev+bounces-251535-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:13:24 +0100
+	id sOo0HKu+b2kOMQAAu9opvQ
+	(envelope-from <netdev+bounces-251536-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:43:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55D2A49346
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:13:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D428548C19
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 18:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5679D9C49E6
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:29:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECDD9A04D75
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 16:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AE931AA83;
-	Tue, 20 Jan 2026 16:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C4233439F;
+	Tue, 20 Jan 2026 16:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IT6R9Mdh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4BA314A67
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193E0334694
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 16:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768925734; cv=none; b=ru+/a6Vr+YXiTRTQZ4qlGZaZzEFLmiPJMj1AYRuvJuMQIS3ZqL05/nMWFMP7DgtSkDrnz8DMB1lzMXdDzGTLh1rBVFD0PcRbCZYvyIjUs/G9k30KT/SmM8BrvWs74EepilzAYuCe03Ax8BP292jIfA3dl54+L2JaEfJE54aQDmU=
+	t=1768925869; cv=none; b=M28UuzLr7Xe+RPWaxCLEEd+THVrRTlEiKXDW4t3SUXvVToPOyel4hIHBqD3+s6vl1ChMSip4sbWkqmhAHK9cDkjrAelD0hvL1mrl1HtT9eMo6o/z6Kd/mvQ3xpYsR3kC2jYe2AknQGAr6L8pK9HHjXSy2t2QbvGxzfLgT97k1Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768925734; c=relaxed/simple;
-	bh=Twa0jOFil5YiUIIWht/Y+QEC8GMD8rP/HD43jjr9t24=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LyOjCWCOJIAiOSZRk+tn1hQB+aZx+fa44mhy24MknCMFROM5oXUgvGwT0liisJqj6b+1Un7uGJng73UCdtkVFjLzP+rLGae9QtZVzPKi6HzXUqEYPifIrVZw+GLWCrSvcZFHknmF5c0ZDA2fvx55Hqlqb7/GY/eUZ89DUei8/88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-4081db82094so4000998fac.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:15:33 -0800 (PST)
+	s=arc-20240116; t=1768925869; c=relaxed/simple;
+	bh=A1bpwayInKC3xoS8sBW+Ss6JExuba7Y64eDC7kXzPR8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T/kKlHcZoGkKribWola2BPLyAsSRnSJDnpF0qYtJGSSAu1QNSbNR0/5V3c2q6epZtlg7xOlqzvZ6H+MbB5WtZ3gBRKJSkj2p9Qj0htHJN6lyFuXKpnNPc3VAgdZG2I67kDuXx6g7xF6NGyWruhWquM5oQ9Zb2TSrxyNxsmGqFS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IT6R9Mdh; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6b4058909so673131385a.3
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:17:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768925866; x=1769530666; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SDtjAf8U5bgsUGsfPHUl8gtWnxZbtbccG6M9wC/879Q=;
+        b=IT6R9MdhNt/f/ofN/LfOOcmmpZmiwaAARW4lxg4RkkPYjWVv4smrJWuPPY6p01iTC7
+         NgfX9sW2qlBVxo9UADTMqqXde9O0gSmQqsw7F3d6AvN1msUd5qmJ1H3z7l6IGcpd9+h9
+         X+jJu7xDTZy/rxhyCqUos53Jz0zRqKhhcPNbWVtkI9mUJGcPjcnCEiO08dkLOpuWXPAb
+         xr4T5beTCR5YbxlBwyAB/4dfiQCpyrL7DJ1QNIA2lLNAYKZGNaIRcEAO+zqjgDcLhSKi
+         nTREis08yNVf2JNtqOeXEAzXmQlffUAPHU3VcToIEqd4DfNEfp5aaP+NyGyNcaGZdg/3
+         vx3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768925732; x=1769530532;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1768925866; x=1769530666;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZufEKCYQ3g1YhCFtyBBjkiGEIMWxhwcBQ1yp8jpI5wg=;
-        b=b+2DAGzoVR8huVuuy3106PtYYncJHYoZkd703uwq7RT4xhUe822HfOT517Mke1lIFG
-         n4RVo8oPn6Qh2orUTF0T5Jg5ybZPJb5XzbA3pFmGelClOy2PfGzFmiUbWRnw+SDwjL42
-         KuEofY2HnWKGajpXxmrV+3PVpYgiPvTLsAiJcOAFeh+D8VYlt1qITK8HUK6CIcTo8teT
-         ajLdC/Do2MSwoKGQLkhQQv2a+YYa68+A4xeDW+NSCptYq4cXyw9GciYeUqnRI1zzskg8
-         SKJ890SF4CFTsQbOy9IXAVMlim9h9mghYobKzURSYEPO/ke7QaAQHb6goPHNUIeSgzIY
-         M7PA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIQTHkEGnTJpmhSv+nsbJc9uIKyYRg+C6KaAExkYl/DlSAa2j5P4bW2GSLWvkYfi8yTeNQOp0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD8Vne0iGj9FiZ9Ilnn7gtlWCvz8ZFXOBgx7FmidzgqgwyYZe8
-	2pw5L/W0b9A50kAMNI5TxCGMX6u7Y2gZV9ck2mat53U/6B7ID4pLO+6Jo2hLS2G3gPVmZTBI12x
-	vXdFiYFpw87FqlJZ9xQW5OR+UT1mZGROdXO2xsKEYCByzgzI/IZ1gEPznGNM=
+        bh=SDtjAf8U5bgsUGsfPHUl8gtWnxZbtbccG6M9wC/879Q=;
+        b=AfIL7o5tdz02bua6o7VSwBS/qvtfGSUVU8mYvFyqzaCnjbfPfw+fYhLrG82Me8+x8L
+         rZlpivHq3ELlBVS8z10t48fc6N3KF7iV+/nnxJZ+Jf8DAH6CaeCXX1501bJHLyQEnZoa
+         utPmSKHfHZAiIVIyFY43OgTqLkptmMplvQDHU1m8Kq3gkblLBdwlhX9IFIjyEwImmzRC
+         h+qx1hPBly4hfF3LZGD5oHZE8ohDBm33MtdOHLYb//1v7BaHnNYEgWOIXr/IRJczk/kr
+         CZD+mfbT95z4/r1xmBgOaGqm8I2zNNAkA1yvA71/y6vz2sNW1/OXtx2KriOw8eFtaCFS
+         zm/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVTFV/GZJ95JHrJx37weixZUuhy4lri3tXYVc/FBGqFyk7w4R6oxqivQv8XI6bdIX/ifroU48s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJwneD5kpVS3FS+bOBxaxQNQH1eqEpQTq75m1dfvqtYsl1n/Ok
+	/goex1BwQqG5h7HufU2yCLHvZNc1ZXvsYn6E5nJp0Us5OJUJGDYodQXoc+dtI5StaaDeKavpInf
+	6bdu/YlI4Ctf+bg==
+X-Received: from qknwd25.prod.google.com ([2002:a05:620a:7299:b0:8c5:5b1b:d60c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:1a92:b0:8c5:391f:1db7 with SMTP id af79cd13be357-8c6a6789295mr2078264385a.64.1768925865734;
+ Tue, 20 Jan 2026 08:17:45 -0800 (PST)
+Date: Tue, 20 Jan 2026 16:17:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a4a:e901:0:b0:660:ffa9:c3fc with SMTP id
- 006d021491bc7-66117a09263mr6325955eaf.66.1768925731909; Tue, 20 Jan 2026
- 08:15:31 -0800 (PST)
-Date: Tue, 20 Jan 2026 08:15:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <696faa23.050a0220.4cb9c.001f.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in __skb_flow_dissect (7)
-From: syzbot <syzbot+c46409299c70a221415e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260120161744.1893263-1-edumazet@google.com>
+Subject: [PATCH net] bonding: provide a net pointer to __skb_flow_dissect()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+c46409299c70a221415e@syzkaller.appspotmail.com, 
+	Matteo Croce <mcroce@redhat.com>, Stanislav Fomichev <sdf@fomichev.me>
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=a94030c847137a18];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : No valid SPF, No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251535-lists,netdev=lfdr.de,c46409299c70a221415e];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251536-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com,redhat.com,fomichev.me];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	R_DKIM_NA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,syzkaller.appspot.com:url,goo.gl:url]
-X-Rspamd-Queue-Id: 55D2A49346
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev,c46409299c70a221415e];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,fomichev.me:email,appspotmail.com:email]
+X-Rspamd-Queue-Id: D428548C19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+After 3cbf4ffba5ee ("net: plumb network namespace into __skb_flow_dissect")
+we have to provide a net pointer to __skb_flow_dissect(),
+either via skb->dev, skb->sk, or a user provided pointer.
 
-syzbot found the following issue on:
+In the following case, syzbot was able to cook a bare skb.
 
-HEAD commit:    dfdf77465620 net: airoha: Fix typo in airoha_ppe_setup_tc_..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=159d4052580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
-dashboard link: https://syzkaller.appspot.com/bug?extid=c46409299c70a221415e
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9f2960b575f2/disk-dfdf7746.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3b48823d17c0/vmlinux-dfdf7746.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/852fefdd1d14/bzImage-dfdf7746.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c46409299c70a221415e@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
 WARNING: net/core/flow_dissector.c:1131 at __skb_flow_dissect+0xb57/0x68b0 net/core/flow_dissector.c:1131, CPU#1: syz.2.1418/11053
-Modules linked in:
-CPU: 1 UID: 0 PID: 11053 Comm: syz.2.1418 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:__skb_flow_dissect+0xb57/0x68b0 net/core/flow_dissector.c:1131
-Code: 55 00 00 80 3d 94 c5 36 06 01 0f 85 b3 55 00 00 e8 be 8d 8b f8 e9 83 f9 ff ff e8 b4 8d 8b f8 e9 b0 03 00 00 e8 aa 8d 8b f8 90 <0f> 0b 90 e9 16 ff ff ff e8 9c 8d 8b f8 c6 05 5d c5 36 06 01 48 c7
-RSP: 0000:ffffc900033a7100 EFLAGS: 00010287
-RAX: ffffffff8935c70e RBX: 0000000000000001 RCX: 0000000000080000
-RDX: ffffc9000d75c000 RSI: 0000000000000539 RDI: 000000000000053a
-RBP: ffffc900033a7718 R08: ffffffff893562c8 R09: ffffffff8df41aa0
-R10: ffffc900033a77a0 R11: fffff52000674efe R12: dffffc0000000000
-R13: ffffffff893562c8 R14: 0000000000000000 R15: ffffffff8f825fd0
-FS:  00007fea4dbe96c0(0000) GS:ffff888125f1f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c38c723 CR3: 00000000294c6000 CR4: 00000000003526f0
 Call Trace:
  <TASK>
- bond_flow_dissect drivers/net/bonding/bond_main.c:4093 [inline]
- __bond_xmit_hash+0x2d7/0xba0 drivers/net/bonding/bond_main.c:4157
- bond_xmit_hash_xdp drivers/net/bonding/bond_main.c:4208 [inline]
- bond_xdp_xmit_3ad_xor_slave_get drivers/net/bonding/bond_main.c:5139 [inline]
- bond_xdp_get_xmit_slave+0x1fd/0x710 drivers/net/bonding/bond_main.c:5515
- xdp_master_redirect+0x13f/0x2c0 net/core/filter.c:4388
- bpf_prog_run_xdp include/net/xdp.h:700 [inline]
- bpf_test_run+0x6b2/0x7d0 net/bpf/test_run.c:421
- bpf_prog_test_run_xdp+0x795/0x10e0 net/bpf/test_run.c:1390
- bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703
- __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6182
- __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fea4cd8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fea4dbe9038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007fea4cfe5fa0 RCX: 00007fea4cd8f749
-RDX: 0000000000000059 RSI: 0000200000000600 RDI: 000000000000000a
-RBP: 00007fea4ce13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fea4cfe6038 R14: 00007fea4cfe5fa0 R15: 00007ffdb8efbed8
- </TASK>
+  bond_flow_dissect drivers/net/bonding/bond_main.c:4093 [inline]
+  __bond_xmit_hash+0x2d7/0xba0 drivers/net/bonding/bond_main.c:4157
+  bond_xmit_hash_xdp drivers/net/bonding/bond_main.c:4208 [inline]
+  bond_xdp_xmit_3ad_xor_slave_get drivers/net/bonding/bond_main.c:5139 [inline]
+  bond_xdp_get_xmit_slave+0x1fd/0x710 drivers/net/bonding/bond_main.c:5515
+  xdp_master_redirect+0x13f/0x2c0 net/core/filter.c:4388
+  bpf_prog_run_xdp include/net/xdp.h:700 [inline]
+  bpf_test_run+0x6b2/0x7d0 net/bpf/test_run.c:421
+  bpf_prog_test_run_xdp+0x795/0x10e0 net/bpf/test_run.c:1390
+  bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703
+  __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6182
+  __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
+  __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
+  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
+  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+  do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
 
-
+Fixes: 58deb77cc52d ("bonding: balance ICMP echoes in layer3+4 mode")
+Reported-by: syzbot+c46409299c70a221415e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/696faa23.050a0220.4cb9c.001f.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Matteo Croce <mcroce@redhat.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/bonding/bond_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 0aca6c937297def91d5740dfd456800432b5e343..e7caf400a59cbd9680adea3d1b8ab7a22c78f7e6 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -4096,8 +4096,9 @@ static bool bond_flow_dissect(struct bonding *bond, struct sk_buff *skb, const v
+ 	case BOND_XMIT_POLICY_ENCAP23:
+ 	case BOND_XMIT_POLICY_ENCAP34:
+ 		memset(fk, 0, sizeof(*fk));
+-		return __skb_flow_dissect(NULL, skb, &flow_keys_bonding,
+-					  fk, data, l2_proto, nhoff, hlen, 0);
++		return __skb_flow_dissect(dev_net(bond->dev), skb,
++					  &flow_keys_bonding, fk, data,
++					  l2_proto, nhoff, hlen, 0);
+ 	default:
+ 		break;
+ 	}
+-- 
+2.52.0.457.g6b5491de43-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
