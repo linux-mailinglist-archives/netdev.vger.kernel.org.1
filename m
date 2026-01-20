@@ -1,76 +1,79 @@
-Return-Path: <netdev+bounces-251434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A01D3C550
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:32:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B1BD3C535
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 11:29:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A59293EA173
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:13:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6272C6234AC
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88903B95F6;
-	Tue, 20 Jan 2026 10:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1023D666F;
+	Tue, 20 Jan 2026 10:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AsiUxk54"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="M8132bni"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58F03A89B6
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875AF3D3306
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 10:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768903996; cv=none; b=PX8DpE6CIqreC3u621yeF1Zs0iexJKVG8qVfACW6Ny8RYOOme9RtQpgFU0uutzlRkCDS7z7W/2iI+jTrG0vRqMbFMlrIwNuJB79QcvhHyBh8ASV0A84mEwqQ5o30lM4cZVIa6jhDFG7vK9KUMP+KYg2JtpPN71SYrzdHfskcB90=
+	t=1768904024; cv=none; b=cydeos0d54Rxpvhbx4xviPdmXDa250+umGh48auNmDuz0HPVSlr5OKuPtLmlVfWznKNL0KL1rbnVnYAgKz0HgL4mM12ptQbSFKb5QQGIi9pf2EbfAtThYkxUsh+K5n82KKO3ld6ZRGfDXMeGmi5TPwbdIsS1fFZdm0v9Q/ckgLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768903996; c=relaxed/simple;
-	bh=0N6Si2DMijNBlex5Z64O16nWQXHFszwtp8niTAJM1I0=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=gW3tmhSarn9w7AL+fOXFBjX0RJ6vfTG9TDftGIth2Z/9lfD6qjRpLZGBLut1tLtjhu4uDPSC6wjRbAhcLOt03GpT1011PpI0KnUG3M7FsKGeUlSV+qKZ6G88WSmFQAFWf4Kf1uvMnCnlWkXLsYsy+XbWVxFWnSIISgMNIK4bAWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AsiUxk54; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768903993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GUliOwYELnDtzBvwJRk7cYJ7y2k4MPGFFS9G25f+omo=;
-	b=AsiUxk541sR5Qivc0gPwLmyfaSu2oVUmXTcPBIvafh3AiNdvf82QUCR1jySTKFQqQhZfSx
-	NinvUrMymbf5xI78/EMyM1z4Ba29u54VE38BjhE3kH3yYZY/F5MBvib+0GbGM6HXAk4u7h
-	uOVrNbVPeuKWqy34x04NI24YnGWNDKw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-501-M_sDiZO2N2OInxfIy5BM_Q-1; Tue,
- 20 Jan 2026 05:13:12 -0500
-X-MC-Unique: M_sDiZO2N2OInxfIy5BM_Q-1
-X-Mimecast-MFC-AGG-ID: M_sDiZO2N2OInxfIy5BM_Q_1768903991
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4203918005B8;
-	Tue, 20 Jan 2026 10:13:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DB14E1955F43;
-	Tue, 20 Jan 2026 10:13:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com,
-    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-    stable@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] rxrpc: Fix data-race warning and potential load/store tearing
+	s=arc-20240116; t=1768904024; c=relaxed/simple;
+	bh=LxIDAbtpbU5pekGzjiILRlKIhr11Ph/hYmBNm1SIeHc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BdWMFBeP8JLxnykTs0WdCqJR1Nwwtcw+RFtj6QTIfx4kpmNeAaSR+lYt3TiYV24LJy47Aii/f5s03nWhH+Zaa54nY+nrOQ6YmwPcrAl98UA15gU+evDxSN/8r+RHjfQPL4L1HzJfjIB9vRr0/Wv29OU+jmxozWQWJLZEWHAB/y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=M8132bni; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60K9aIE8831983;
+	Tue, 20 Jan 2026 02:13:25 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=wu5ofytX/u1BIADLswgq2rREe
+	C3a8rMljsdWHeCYReI=; b=M8132bniLbHsHBJvyzrTL3VZzRlMZ8TUMR3aogom/
+	dNWlYpoJ/vnggtr+PWxZVaZk6dEVb1+eDFTmgHpJ8sayBEcvmgIbU0syoXqDR3NB
+	OypK7sXneL672kXuV7FzaROEvFEqvfgz3cpdLPj7QYkbF4U4zL+p1tHUBNPN2gxx
+	gZORT2/5E91O6VPmisZdr5dLwUfG6HZpPGJDaF/AAib//z4oy+FCRXjLZORbPmhw
+	ExZ+zDUAaxggY0KZ9Re5fBYipV1yD+UgZWFmJ+4x1ZeQN+KDiJ9JocpSXtlyQZl1
+	2WYwCof2weKOK+qMkHWn/dQvWJktDG1D9ThPFNkKB32sg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bt77dg26x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Jan 2026 02:13:25 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 20 Jan 2026 02:13:39 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 20 Jan 2026 02:13:39 -0800
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id A28AC5B6936;
+	Tue, 20 Jan 2026 02:13:21 -0800 (PST)
+Date: Tue, 20 Jan 2026 15:43:20 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+CC: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Sunil
+ Goutham" <sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Bharat Bhushan
+	<bbhushan2@marvell.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] octeontx2-pf: Remove unnecessary bounds check
+Message-ID: <aW9VQPJ0wY/A4hmd@test-OptiPlex-Tower-Plus-7010>
+References: <20260119-oob-v1-1-a4147e75e770@kernel.org>
+ <e384d38a-ccfa-4888-b057-4306a297e749@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,297 +81,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1107123.1768903985.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Jan 2026 10:13:05 +0000
-Message-ID: <1107124.1768903985@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Disposition: inline
+In-Reply-To: <e384d38a-ccfa-4888-b057-4306a297e749@linux.dev>
+X-Proofpoint-ORIG-GUID: DWS8e7Qq3f9cZHsMnOXP5HexG3vaaZhx
+X-Authority-Analysis: v=2.4 cv=MZRhep/f c=1 sm=1 tr=0 ts=696f5545 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=s0aMi5Xf_MiYTxNsjKgA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIwMDA4NCBTYWx0ZWRfXz4uDjDeI9t7Z
+ Z0h4NzrfhYPLQN7dxtST+2eXbYqKB2HT5z1+V1loS4Hh1IkIpdenJiACg+RC+m7SDG4WTM62MoJ
+ kfIV13t2UkdFMuitW5TVzZt2h6m8rMeeRlqlfrii0EQPs7eDa+BbwbN9rYw3eBuCXDx7NvBh9NF
+ r+XfhVwNNbvclgqHZd/FJ1PaO/OvQNafr+FO6+AZRfZcNz2AeeSoKhQ29yOfn7est2BtiRtr89c
+ kBXFAmkS0D6RFEzVkV2v/5+J/ILer14iORtSLhMNV74OXO6qkIwlGCDRaVOL/yHcz1/+LJH0Z78
+ UeL833UKlgDLuIIYENITLvod6XuQXIaVVbVyv/1hs+s1JIq/MBVBGIWZiP7TvaUCYNOBKSFc3oa
+ Wt/4uEjNu/dZr9lJP3wkpuxRt95G0J1ERWasEIPKretLnlcB1yDXDT2cEfEuMdbiiQ+0zcrBVvA
+ pXg7l87Mh6SfiWkrC9w==
+X-Proofpoint-GUID: DWS8e7Qq3f9cZHsMnOXP5HexG3vaaZhx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-20_02,2026-01-19_03,2025-10-01_01
 
-    =
-
-Fix the following:
-
-        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_=
-data_packet
-
-which is reporting an issue with the reads and writes to ->last_tx_at in:
-
-        conn->peer->last_tx_at =3D ktime_get_seconds();
-
-and:
-
-        keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
-
-The lockless accesses to these to values aren't actually a problem as the
-read only needs an approximate time of last transmission for the purposes
-of deciding whether or not the transmission of a keepalive packet is
-warranted yet.
-
-Also, as ->last_tx_at is a 64-bit value, tearing can occur on a 32-bit
-arch.
-
-Fix both of these by switching to an unsigned int for ->last_tx_at and onl=
-y
-storing the LSW of the time64_t.  It can then be reconstructed at need
-provided no more than 68 years has elapsed since the last transmission.
-
-Fixes: ace45bec6d77 ("rxrpc: Fix firewall route keepalive")
-Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/r/695e7cfb.050a0220.1c677c.036b.GAE@google=
-.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@kernel.org
----
- Changes
- =3D=3D=3D=3D=3D=3D=3D
- ver #3)
-  - Use READ_ONCE() in the proc file read as well.
-
- ver #2)
-  - Fix a format specifier to match the change in type of last_tx_at.
-
- net/rxrpc/ar-internal.h |    9 ++++++++-
- net/rxrpc/conn_event.c  |    2 +-
- net/rxrpc/output.c      |   14 +++++++-------
- net/rxrpc/peer_event.c  |   17 ++++++++++++++++-
- net/rxrpc/proc.c        |    4 ++--
- net/rxrpc/rxgk.c        |    2 +-
- net/rxrpc/rxkad.c       |    2 +-
- 7 files changed, 36 insertions(+), 14 deletions(-)
-
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 5b7342d43486..36d6ca0d1089 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -387,7 +387,7 @@ struct rxrpc_peer {
- 	struct rb_root		service_conns;	/* Service connections */
- 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
- 	unsigned long		app_data;	/* Application data (e.g. afs_server) */
--	time64_t		last_tx_at;	/* Last time packet sent here */
-+	unsigned int		last_tx_at;	/* Last time packet sent here (time64_t LSW) *=
-/
- 	seqlock_t		service_conn_lock;
- 	spinlock_t		lock;		/* access lock */
- 	int			debug_id;	/* debug ID for printks */
-@@ -1379,6 +1379,13 @@ void rxrpc_peer_keepalive_worker(struct work_struct=
- *);
- void rxrpc_input_probe_for_pmtud(struct rxrpc_connection *conn, rxrpc_ser=
-ial_t acked_serial,
- 				 bool sendmsg_fail);
- =
-
-+/* Update the last transmission time on a peer for keepalive purposes. */
-+static inline void rxrpc_peer_mark_tx(struct rxrpc_peer *peer)
-+{
-+	/* To avoid tearing on 32-bit systems, we only keep the LSW. */
-+	WRITE_ONCE(peer->last_tx_at, ktime_get_seconds());
-+}
-+
- /*
-  * peer_object.c
-  */
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index 232b6986da83..98ad9b51ca2c 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -194,7 +194,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connectio=
-n *conn,
- 	}
- =
-
- 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, ioc, len);
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	if (ret < 0)
- 		trace_rxrpc_tx_fail(chan->call_debug_id, serial, ret,
- 				    rxrpc_tx_point_call_final_resend);
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 8b5903b6e481..d70db367e358 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -275,7 +275,7 @@ static void rxrpc_send_ack_packet(struct rxrpc_call *c=
-all, int nr_kv, size_t len
- 	rxrpc_local_dont_fragment(conn->local, why =3D=3D rxrpc_propose_ack_ping=
-_for_mtu_probe);
- =
-
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
--	call->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(call->peer);
- 	if (ret < 0) {
- 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
- 				    rxrpc_tx_point_call_ack);
-@@ -411,7 +411,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
- =
-
- 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, sizeof(pkt));
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	if (ret < 0)
- 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
- 				    rxrpc_tx_point_call_abort);
-@@ -698,7 +698,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
-truct rxrpc_send_data_req
- 			ret =3D 0;
- 			trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags,
- 					    rxrpc_txdata_inject_loss);
--			conn->peer->last_tx_at =3D ktime_get_seconds();
-+			rxrpc_peer_mark_tx(conn->peer);
- 			goto done;
- 		}
- 	}
-@@ -711,7 +711,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
-truct rxrpc_send_data_req
- 	 */
- 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- =
-
- 	if (ret =3D=3D -EMSGSIZE) {
- 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
-@@ -797,7 +797,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *co=
-nn)
- =
-
- 	trace_rxrpc_tx_packet(conn->debug_id, &whdr, rxrpc_tx_point_conn_abort);
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- }
- =
-
- /*
-@@ -917,7 +917,7 @@ void rxrpc_send_keepalive(struct rxrpc_peer *peer)
- 		trace_rxrpc_tx_packet(peer->debug_id, &whdr,
- 				      rxrpc_tx_point_version_keepalive);
- =
-
--	peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(peer);
- 	_leave("");
- }
- =
-
-@@ -973,7 +973,7 @@ void rxrpc_send_response(struct rxrpc_connection *conn=
-, struct sk_buff *response
- 	if (ret < 0)
- 		goto fail;
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	return;
- =
-
- fail:
-diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
-index 7f4729234957..9d02448ac062 100644
---- a/net/rxrpc/peer_event.c
-+++ b/net/rxrpc/peer_event.c
-@@ -237,6 +237,21 @@ static void rxrpc_distribute_error(struct rxrpc_peer =
-*peer, struct sk_buff *skb,
- 	spin_unlock_irq(&peer->lock);
- }
- =
-
-+/*
-+ * Reconstruct the last transmission time.  The difference calculated sho=
-uld be
-+ * valid provided no more than ~68 years elapsed since the last transmiss=
-ion.
-+ */
-+static time64_t rxrpc_peer_get_tx_mark(const struct rxrpc_peer *peer, tim=
-e64_t base)
-+{
-+	s32 last_tx_at =3D READ_ONCE(peer->last_tx_at);
-+	s32 base_lsw =3D base;
-+	s32 diff =3D last_tx_at - base_lsw;
-+
-+	diff =3D clamp(diff, -RXRPC_KEEPALIVE_TIME, RXRPC_KEEPALIVE_TIME);
-+
-+	return diff + base;
-+}
-+
- /*
-  * Perform keep-alive pings.
-  */
-@@ -265,7 +280,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
-_net *rxnet,
- 		spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 		if (use) {
--			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
-+			keepalive_at =3D rxrpc_peer_get_tx_mark(peer, base) + RXRPC_KEEPALIVE_=
-TIME;
- 			slot =3D keepalive_at - base;
- 			_debug("%02x peer %u t=3D%d {%pISp}",
- 			       cursor, peer->debug_id, slot, &peer->srx.transport);
-diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
-index d803562ca0ac..59292f7f9205 100644
---- a/net/rxrpc/proc.c
-+++ b/net/rxrpc/proc.c
-@@ -296,13 +296,13 @@ static int rxrpc_peer_seq_show(struct seq_file *seq,=
- void *v)
- =
-
- 	now =3D ktime_get_seconds();
- 	seq_printf(seq,
--		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6llus %8d %8d\n",
-+		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6ds %8d %8d\n",
- 		   lbuff,
- 		   rbuff,
- 		   refcount_read(&peer->ref),
- 		   peer->cong_ssthresh,
- 		   peer->max_data,
--		   now - peer->last_tx_at,
-+		   (s32)now - (s32)READ_ONCE(peer->last_tx_at),
- 		   READ_ONCE(peer->recent_srtt_us),
- 		   READ_ONCE(peer->recent_rto_us));
- =
-
-diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
-index dce5a3d8a964..43cbf9efd89f 100644
---- a/net/rxrpc/rxgk.c
-+++ b/net/rxrpc/rxgk.c
-@@ -678,7 +678,7 @@ static int rxgk_issue_challenge(struct rxrpc_connectio=
-n *conn)
- =
-
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
- 	if (ret > 0)
--		conn->peer->last_tx_at =3D ktime_get_seconds();
-+		rxrpc_peer_mark_tx(conn->peer);
- 	__free_page(page);
- =
-
- 	if (ret < 0) {
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index 3657c0661cdc..a756855a0a62 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -694,7 +694,7 @@ static int rxkad_issue_challenge(struct rxrpc_connecti=
-on *conn)
- 		return -EAGAIN;
- 	}
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	trace_rxrpc_tx_packet(conn->debug_id, &whdr,
- 			      rxrpc_tx_point_rxkad_challenge);
- 	_leave(" =3D 0");
-
+On 2026-01-20 at 02:47:48, Vadim Fedorenko (vadim.fedorenko@linux.dev) wrote:
+> On 19/01/2026 16:39, Simon Horman wrote:
+> > active_fec is a 2-bit unsigned field, and thus can only have the values
+> > 0-3. So checking that it is less than 4 is unnecessary.
+> > 
+> > Simplify the code by dropping this check.
+> > 
+> > As it no longer fits well where it is, move FEC_MAX_INDEX to towards the
+> > top of the file. And add the prefix OXT2.  I believe this is more
+> > idiomatic.
+> > 
+> > Flagged by Smatch as:
+> >    ...//otx2_ethtool.c:1024 otx2_get_fecparam() warn: always true condition '(pfvf->linfo.fec < 4) => (0-3 < 4)'
+> > 
+> > No functional change intended.
+> > Compile tested only.
+> > 
+> > Signed-off-by: Simon Horman <horms@kernel.org>
+> > ---
+> >   drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c | 9 +++++----
+> >   1 file changed, 5 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > index 8918be3ce45e9ae2e1f2fbc6396df0ab6c85bc22..a0340f3422bf90af524f682fc1fbe211d64c129c 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > @@ -66,6 +66,8 @@ static const struct otx2_stat otx2_queue_stats[] = {
+> >   	{ "frames", 1 },
+> >   };
+> > +#define OTX2_FEC_MAX_INDEX 4
+> > +
+> >   static const unsigned int otx2_n_dev_stats = ARRAY_SIZE(otx2_dev_stats);
+> >   static const unsigned int otx2_n_drv_stats = ARRAY_SIZE(otx2_drv_stats);
+> >   static const unsigned int otx2_n_queue_stats = ARRAY_SIZE(otx2_queue_stats);
+> > @@ -1031,15 +1033,14 @@ static int otx2_get_fecparam(struct net_device *netdev,
+> >   		ETHTOOL_FEC_BASER,
+> >   		ETHTOOL_FEC_RS,
+> >   		ETHTOOL_FEC_BASER | ETHTOOL_FEC_RS};
+> > -#define FEC_MAX_INDEX 4
+> > -	if (pfvf->linfo.fec < FEC_MAX_INDEX)
+> > -		fecparam->active_fec = fec[pfvf->linfo.fec];
+> > +
+> > +	fecparam->active_fec = fec[pfvf->linfo.fec];
+> >   	rsp = otx2_get_fwdata(pfvf);
+> >   	if (IS_ERR(rsp))
+> >   		return PTR_ERR(rsp);
+> > -	if (rsp->fwdata.supported_fec < FEC_MAX_INDEX) {
+> > +	if (rsp->fwdata.supported_fec < OTX2_FEC_MAX_INDEX) {
+> >   		if (!rsp->fwdata.supported_fec)
+> >   			fecparam->fec = ETHTOOL_FEC_NONE;
+> >   		else
+> 
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com> 
 
