@@ -1,219 +1,177 @@
-Return-Path: <netdev+bounces-251398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA8AD3C30E
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:10:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FB70D3C2F9
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 10:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E05634C6F9A
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:59:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1EEA74C8380
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 08:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6303B95E1;
-	Tue, 20 Jan 2026 08:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3E63BB9EF;
+	Tue, 20 Jan 2026 08:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SgaExgCt"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PTb7GYkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8708A36C5A2
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768899536; cv=pass; b=ql4OFwXDq1nuZw1y0/tTiOPj5kolVJ7aDgJOeK8XNMegeRg8cahjXRwMIME9GHTKgbiBlpWkhL4pUMDAiE6UeobPKS5+0eIDBeYx1vkLIe4aR2kChH8zruAljFv6RYsLELGmwcjtPY2r2kkx2SYXfMsmgj4/c0Ygb5LebU5HDzI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768899536; c=relaxed/simple;
-	bh=h165TuRJW9FjE57mMdfwxufQ/20l+c36z+6txXFw0Pg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J0rDA/IEPX34+1eVXim2j/OmxvQJpC5eR2wPMWWjoO+NAqf1/3kxGUSUjBlHWbiGkYvgqcor64lB3ruMukzSIof8SQCNI2BDkbpPyqCCtvlIefh7ey8yWLVtNTuN/4U4exh/2Ak4y7dwzNrezhJyyg4HinRxbWnwLICERr9k9Mc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SgaExgCt; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5029901389dso32704551cf.2
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:58:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768899533; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XviIFrW1TPlD0D0WOVTAU8VIw+WKkOre4fZSWhSA8On9HLV3gA6T3RFALdbnl8S9+b
-         jQT9NxE0fSoAasBLrdCSc4tJT2fCh5MYX3SR1tPgRL3BTaSug89NQgBgfO72gtfkas7a
-         AQy9siq9jFRlhiOdXyVDPoA0komIibhGXepYONbQGvHvg+c+XDBE8YxyyKDGiAmGlkUX
-         1ddPEn45KuJmMBXzXq1lfIzw3f/P2z76+z6qtMOSrzEHi469f/QXg9D7zMLoXP/83b2l
-         v4uTKyYnJ3OHqabXfFytp1b93LqfF6vLvfJiuo+tNIiP4TjKuckJzrtGsAbPQFCNnv02
-         zgsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=l+agG2OZwmk/+ua1s4s74T98J3xHS11obEy2hTP/NnE=;
-        fh=IPAvFu7bmBd59IBE9ZPym+fJHZnrULi85wCGeenxvHI=;
-        b=eaObzYJng2ErJG3SKZXBFUOvojwoQnhU+kq1wYLMKQKp4AyN9XeKShIadwTRnqBpor
-         iqe9TmaQa19FT9xR5J1gvFdwGI/EklrAGx99kbO6wv/uIysLYP1C2jQXvaVKPdNfHzWB
-         i3NLtySTeF/4cQIyTekimrgtVC7SrxMV1shaMt0qWIv59KrzSHNRTa5xYkVIrfkphgjU
-         1LDlJ9+0esKyKt87xg7lwrGXr1IPe+WE+b7NNL16sqx9UUOmWSw0CLm/Z7ndEL7xihxb
-         jNqZsdwMLKDkQLm0f9o48BAVld48inpkL0MrQXBtdeIvjD3ZGe+itHpI5qgxIyAGoIiO
-         xp2A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7783B95EB
+	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 08:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768899562; cv=none; b=HhePrtwftnS8ipp7n0ZOV7TdTn43EYKPz+k+KinD5Rynenff2gydM+Ukhl33zOWLU16hPHH4IgA4GHIRHoYih3+tNMaMdCDiBq2BlNjcIjxiDVtiRSWmtLQdkI3YaV0Ueq2J2JQmiuPjkSOlE/ej17CVzWLXTkshH326uXzqDCg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768899562; c=relaxed/simple;
+	bh=DGWvUmNWBI3cmvoyS6O985pWqbg2oxnZqeZ1Mrp2RyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aQgvONEBmkxBL1zR8f8sbKoy2Hzyer8CGolt1HuM6Vz4V2BwmsocKIdIyfVWE0Uf4yrcQoRs370OBO4yy0m7znJ2T6oPUw3NEmm9t1kYxXcO9cEl7vlYdAIa9AWZXkotWOkaRWMF8N9tZhavvbqyqOoei1J59fNSa/5YfkOd/0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PTb7GYkp; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4358fb60802so206176f8f.1
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 00:59:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768899533; x=1769504333; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+agG2OZwmk/+ua1s4s74T98J3xHS11obEy2hTP/NnE=;
-        b=SgaExgCt+bgToS9pHPtaUPYCe4+VWG66AKaRQHS2i8O0mU2Om0wzGNqH1oMT8qpJ8o
-         wv3n0Ip4jAdtKefIa721L2J6bOgo42wZJlCoHNknQHin4pCTcL6ZEP13w4FxGCb/YeAc
-         b2R819NYYGwibuUeZSI2AyzrsLmckUGSK7p6XIMatya3ZANua+LnUgs6vJEAv5IHwEvh
-         m2hltJBBzphBnpfztWpIu48GTfg07kkZifCTtdvAcjGerCP+bk4aJE17Eeyi0ZQfDLRR
-         k6dq0dXEypjDJPr7kFsW0HRkHiZ76KkjaO8iwsvnyUVii82js6EUg0wwL+iX/OBaZjtx
-         r9DQ==
+        d=suse.com; s=google; t=1768899559; x=1769504359; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ALcRfu9s9R3EXYRBCz4TWxhxv7i+sOPbGmKIee8iWRE=;
+        b=PTb7GYkpswvvTVeRxUGnhrZoazIlr2kHeJIleqvtFXnQFBv9KWfRixOGBv/4UGdTt8
+         GfyNDh+hwzn6F19emEGuhQ5vgqxLrhm74S8w36gJN7JslgK/C/D8zriBunDifRD9w5y8
+         et/rzcT+YnwJQVowUcd0X3JzntTvDKKNRk5asjuf5kH7fLeAeqmoj5l4TUvCxzCCUY+E
+         W/glVQsjUpCfMMpQiypyqTDhpUKKXBTLXL3RPd5vqbBssCh+ay8LDBGiqZOxiBLUnCjL
+         dblrVJOJYGdpEYTmS15XtDJQb8EFEt/gxmzOcoHJYFyA0YGDqaEcWJnORHLeXsebMvhi
+         mhww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768899533; x=1769504333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=l+agG2OZwmk/+ua1s4s74T98J3xHS11obEy2hTP/NnE=;
-        b=D2vf4TbSF+rGNRsoM43cxwK81YgaHAJxbSos95abu6AtSg1lwb+16UI4sQMFfowt4L
-         rQkI7Tfjkphz40dHH1SIidVcvVzSizb5t54SRX5o4xFki+ore6XU7eF5s9EepMD1x/Wz
-         ETCU91eiIbqalV/t+WNQXJulLSAlboE4gHkyRNelcli7nWhhNd8j0WQhI/MG9CImrRSU
-         8+Sw4WzozoNVEnwvJB1x3X2PtpTIkonOP519G+tf98xKy8ds1C9u1Q0aESHjAb4osivH
-         Kxb4W7Zg21b61K5YasP4OMzA2YuS2BVvxsch3aD3qK9kpoDOI5i2DAaE6Sz2E0ra46Fs
-         Zehw==
-X-Gm-Message-State: AOJu0YzIv4WAgP2T0zTKJmfDv3I2zlrZO4kRB0oJJtAzcd2lR7RKm6vu
-	/Aib5sjolccHTzEsXmoJTPbtSaqBEy7MgbnhqKmM5VBdyXSksiP4peqb+fbBKByDWEzmNRugo85
-	qgeQpik/XuioK/We9YTjOYy5M3Ejea1uIk6yV4x71W7Rcs+lU2QH0HRN4+6Y=
-X-Gm-Gg: AY/fxX7RtyUoYiaZvNgObzUNC5LFoqre0l5bL8r/rbyhxaDPT1lGseYEvolNgyb8xvl
-	QpHJWMWhHfhhGR1zAC355VDu5d0uJfJvbtC95a4UCg4Ku6zYcumjVKFJOqOxmZDl4CDxvSadZNH
-	eAry+0+VD2Kvnwgg5gM77U+hihVXhBl+BP/Lg9D6fabUxBxDgAHEK8S9HSopXOyQlhayhXnC7dI
-	kobzIp3t4fqW2KPnBwqgnQN9+7UFDiIiwB5Db5SzpfzCZgTYN4KKD3Zi73FLtR+MC+i9ww=
-X-Received: by 2002:ac8:5f82:0:b0:502:9e4c:266b with SMTP id
- d75a77b69052e-502d8560e2dmr10841571cf.42.1768899532882; Tue, 20 Jan 2026
- 00:58:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768899559; x=1769504359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ALcRfu9s9R3EXYRBCz4TWxhxv7i+sOPbGmKIee8iWRE=;
+        b=wHYTx/NmNIKNgKfYcxyegPGMyZfd43UZlG/SEY8Qhk33HdX3JNGMQsRi6sglDEAbwj
+         SOUirMR1ZjAIIgAsbdPoNvUuFXc9RdTTURczunZ+Ot9Bm6dxmcfAP+hXAuErS5qiJ/8w
+         k9rb8nuTg60eh7C0ZIPXTjL+xMQatjQJiBucAh6ZWlvcjDd6LVwRXBkVYEI1OCGAM20m
+         yhDsN7EYwmCZdWDArnWMZjnTNmIPMYnsHBhpZDG4rKLvEloBdAPE+m0ZYFoemD0oMCja
+         vOBmh5Bonvi3eXpZxZKbVGf7xfqRVfvcvQ1BX5e8KZej2R8KF9SMd/u1q5OjVsyWYFvw
+         GJJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUElgjSczc27YKRRUbRRtxrabTjieowjXdxZGv4ZPlOJRxR3CDCg+hiYqY20oq4o8SxmecYOxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUEh0v0bOe6qwq9n8NM0fMjUWdRnuRI4dtzoYPm96+KPJ1K8ue
+	9+zWAEhmi329DNjObYRrZTO5U3wlvrhbWBYHjp924lS84DUMv23Stx3MlunQ9H2/DoE=
+X-Gm-Gg: AZuq6aJJgQUUhAvNtkmdpyBGb2hsHG1+TeWB3qhIuh/U5qHHzIMwyhDoIKq3Bp4Ro5D
+	cbCsxtaF3SezNaDlsyZFFREic1SPRsM124ceLb7/omfd/es1EsCEHnVi6N8vi9S3MhhN6vnmJxd
+	5nZi32eW76TY6cwTBMYmUHjzmVxynwC3e/RO3vVev8L5sbrIbatj5TCLp+4FO29hJ3oqHzT8VEg
+	tCwXJl3GosVHfACyJ5F+LSMT8UJDYWTibJE3Ot8W08ZCfP8nGCpKPXrw4OMiKyDZMCvX85yeXOW
+	ygwsMN/OiFl0RX4jf2vafl1O2Gx23EY0mYKZzRiiKE9+v21+dCfT/Zv8Vix4Q1ZnHkYIpjTJMcV
+	DVy7BPLdnd8ifImnMR6cX2H2+uOTEmhK4YvGZvFdEeOTlzLbldbXNMqYbd7+DnwpLY3hpoIU8Fk
+	aOGXw9afXCL0HpaA==
+X-Received: by 2002:a05:6000:2082:b0:432:dcb1:68bc with SMTP id ffacd0b85a97d-434df0ed27fmr23403774f8f.23.1768899559176;
+        Tue, 20 Jan 2026 00:59:19 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356997df75sm28295155f8f.29.2026.01.20.00.59.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jan 2026 00:59:18 -0800 (PST)
+Date: Tue, 20 Jan 2026 09:59:16 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: John Ogness <john.ogness@linutronix.de>, osandov@osandov.com,
+	mpdesouza@suse.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+	kernel-team@meta.com, Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <aW9D5M0o9_8hdVvt@pathway.suse.cz>
+References: <87eco09hgb.fsf@jogness.linutronix.de>
+ <aWECzkapsFFPFKNP@pathway.suse.cz>
+ <875x9a6cpw.fsf@jogness.linutronix.de>
+ <44upa7szd563kggh4xolznmfcwfnhrrh5guvecp6pzlvp5qvic@w7hxtzy7huzf>
+ <jakydyx5dprrzgbsb6lorgpova46jbhq5tecwwtiihkhyi6ofy@olsrizfk52je>
+ <aWpekVlhRpD4CaDI@pathway.suse.cz>
+ <aWpfDKd64DLX32Hl@pathway.suse.cz>
+ <6tryrckp7mah2qghxu5fktrwexoik6anplubfvybushtcgocq5@kg6ln44istyk>
+ <aW446yxd-FQ1JJ9Q@pathway.suse.cz>
+ <bvmrtic6pr52cxwf6mis526zz4sbxstxjd2wiqkd2emueatv33@eccynoxgjgo2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1768820066.git.pabeni@redhat.com> <ec64bb86298c31608eee9558842da25c47669f9c.1768820066.git.pabeni@redhat.com>
-In-Reply-To: <ec64bb86298c31608eee9558842da25c47669f9c.1768820066.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Jan 2026 09:58:41 +0100
-X-Gm-Features: AZwV_QgNfvS4_jxtO5G6uMaor-6jBeCWF-VU-bdvUtQVmKAFWu1Q4WoObk1cRJg
-Message-ID: <CANn89iL1sJMe-j9n6--gdRwwkjpAD0TdDrS43N5g3=9HWUCOtQ@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 01/10] net: introduce mangleid_features
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, sdf@fomichev.me, 
-	petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bvmrtic6pr52cxwf6mis526zz4sbxstxjd2wiqkd2emueatv33@eccynoxgjgo2>
 
-On Mon, Jan 19, 2026 at 4:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Some/most devices implementing gso_partial need to disable the GSO partia=
-l
-> features when the IP ID can't be mangled; to that extend each of them
-> implements something alike the following[1]:
->
->         if (skb->encapsulation && !(features & NETIF_F_TSO_MANGLEID))
->                 features &=3D ~NETIF_F_TSO;
->
-> in the ndo_features_check() op, which leads to a bit of duplicate code.
->
-> Later patch in the series will implement GSO partial support for virtual
-> devices, and the current status quo will require more duplicate code and
-> a new indirect call in the TX path for them.
->
-> Introduce the mangleid_features mask, allowing the core to disable NIC
-> features based on/requiring MANGLEID, without any further intervention
-> from the driver.
->
-> The same functionality could be alternatively implemented adding a single
-> boolean flag to the struct net_device, but would require an additional
-> checks in ndo_features_check().
->
-> Also note that [1] is incorrect if the NIC additionally implements
-> NETIF_F_GSO_UDP_L4, mangleid_features transparently handle even such a
-> case.
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v3 -> v4:
->  - ensure mangleid_features includes TSO_MANGLEID for better code
->    in gso_features_check() - Eric
->  - some changelog clarifications.
-> ---
->  include/linux/netdevice.h | 5 ++++-
->  net/core/dev.c            | 8 +++++++-
->  2 files changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index d99b0fbc1942..23a698b70de1 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1830,7 +1830,9 @@ enum netdev_reg_state {
->   *                             and drivers will need to set them appropr=
-iately.
->   *
->   *     @mpls_features: Mask of features inheritable by MPLS
-> - *     @gso_partial_features: value(s) from NETIF_F_GSO\*
-> + *     @gso_partial_features: value(s) from NETIF_F_GSO
-> + *     @mangleid_features:     Mask of features requiring MANGLEID, will=
- be
-> + *                             disabled together with the latter.
->   *
->   *     @ifindex:       interface index
->   *     @group:         The group the device belongs to
-> @@ -2219,6 +2221,7 @@ struct net_device {
->         netdev_features_t       vlan_features;
->         netdev_features_t       hw_enc_features;
->         netdev_features_t       mpls_features;
-> +       netdev_features_t       mangleid_features;
->
->         unsigned int            min_mtu;
->         unsigned int            max_mtu;
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 2661b68f5be3..3f12061ae474 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3802,7 +3802,7 @@ static netdev_features_t gso_features_check(const s=
-truct sk_buff *skb,
->                                     inner_ip_hdr(skb) : ip_hdr(skb);
->
->                 if (!(iph->frag_off & htons(IP_DF)))
-> -                       features &=3D ~NETIF_F_TSO_MANGLEID;
-> +                       features &=3D ~dev->mangleid_features;
->         }
->
->         /* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,
-> @@ -11385,6 +11385,12 @@ int register_netdevice(struct net_device *dev)
->         if (dev->hw_enc_features & NETIF_F_TSO)
->                 dev->hw_enc_features |=3D NETIF_F_TSO_MANGLEID;
->
-> +       /* Any mangleid feature disables TSO_MANGLEID; including the latt=
-er
-> +        * in mangleid_features allows for better code in the fastpath.
-> +        */
-> +       if (dev->mangleid_features)
-> +               dev->mangleid_features |=3D NETIF_F_TSO_MANGLEID;
-> +
+On Mon 2026-01-19 08:34:42, Breno Leitao wrote:
+> Hello Petr,
+> 
+> On Mon, Jan 19, 2026 at 03:00:11PM +0100, Petr Mladek wrote:
+> > > Context: netconsole outputs the message in a different way, similarly to the
+> > > printk dictionary. I.e, taskname and cpu come after, one entry per line:
+> > > 
+> > >   <message>
+> > >    SUBSYSTEM=net
+> > >    DEVICE=+pci:0000:00:1f.6
+> > >    cpu=42
+> > >    taskname=NetworkManager
+> > >    ...
+> > 
+> > BTW.1: I see that netconsole actually does not show pid. So that we do not
+> >        need the trick with caller_id2. But people might want to add it in
+> >        the future.
+> 
+> Correct, I haven't found the pid important when aggregating messages in
+> the a fleet of hosts.
 
-It is a bit unclear why you test for anything being set in mangleid_feature=
-s
+Good to know.
 
-I would force here the bit, without any condition ?
+> > BTW.2: I also noticed that sysdata_append_msgid() uses netconsole-specific
+> >        message counter.
+> > 
+> >        Note that each message has its own sequence number. It is the
+> >        .seq member in struct printk_info. It is printed in the extended
+> >        console output, see info_print_ext_header(). So it is printed
+> >        even on netconsole when this extended format is used.
+> > 
+> >        I wonder if the netconsole-specific counter was added
+> >        intentionally.
+> 
+> The addition was intentional. The purpose was to monitor the number of
+> lost netconsole messages.
+> 
+> Originally we were using printk seq number to track "lost" message, later
+> we discovered that some message numbers were never sent to netconsole
+> , either due to  different loglevel or supressed message. Thus, using
+> .seq was not useful to track lost netconsole message.
+> 
+> As a result, netconsole now increments the sequence number only when
+> a packet is sent over the wire. Therefore, any gap in the "sequence"
+> indicates that a packet was lost.
 
-      dev->mangleid_features |=3D NETIF_F_TSO_MANGLEID;
+Makes perfect sense.
 
+> Back o this current patch, I've tested it internally and run a test for
+> hours without any current issue in terms of task->comm/cpu. 
+> How would you prefer to proceed to get the patch in?
 
+Is the netconsole part ready for mainline?
 
->         /* Make NETIF_F_HIGHDMA inheritable to VLAN devices.
->          */
->         dev->vlan_features |=3D NETIF_F_HIGHDMA;
-> --
-> 2.52.0
->
+If yes, I would suggest to send the full patchset for review and
+it might go in via the networking tree.
+
+If no, then we could try to get in at least the printk part
+for 6.20. I would personally use the variant with caller_id2
+just to be on the safe side.
+
+Note that AFAIK, there are no conflicting changes on the printk side
+floating around.
+
+Best Regards,
+Petr
 
