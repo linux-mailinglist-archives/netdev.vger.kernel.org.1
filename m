@@ -1,244 +1,196 @@
-Return-Path: <netdev+bounces-251591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251592-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBLCNAPzb2m+UQAAu9opvQ
-	(envelope-from <netdev+bounces-251591-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 22:26:27 +0100
+	id GGf3Ad3lb2lhUQAAu9opvQ
+	(envelope-from <netdev+bounces-251592-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:30:21 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4399F4C3AD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 22:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D48E4B4F3
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 21:30:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6CFB9A21243
-	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:10:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D7926AA745A
+	for <lists+netdev@lfdr.de>; Tue, 20 Jan 2026 19:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1CD46AF25;
-	Tue, 20 Jan 2026 19:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lnoAN5CK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9042B477E5F;
+	Tue, 20 Jan 2026 19:18:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1BC423A64
-	for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 19:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768936226; cv=pass; b=Zf+8JEcjgxlyHYKVf+TtVNRqq4ufvtXY1nWB0bwNAfnBXa7hbS8Tuh3UVqBs2AkSHeTiLsaafFsgKPxWUnh51ljPz0NwCghhuG7dRwoLeau4SYlnzhaR/6GNGaqG+R8sLVbf0yz5o9nhQ7RTfcJ4Jb9g1+J4hC0pxe5+bRK5/Us=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768936226; c=relaxed/simple;
-	bh=RQ2JCHSug0z4VTY2t3zlvOkPl2dYMopfE1CEATGUSFc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fIs25MlY76qVdjPWrWAXer40bimez/Vm7wyhDEMGJv6Y8TkdDIdruofC3Hyu1iDFreCz+L12+FPeEmkXnXIMLdtmht9ZTtdukI6IQzLYXf5S95RDW21htgByEu0FeBDwJX3zN2S8bwxXxyJNkWQu9QLVpbX4O7HLrOYXVO3jay8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lnoAN5CK; arc=pass smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-65f59501dacso4072340eaf.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 11:10:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768936223; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S/xzJKGVAXWQp1PKNFy/nLVfYI0EJVMnT/bJq8NbVD8eg5dk2RqFkGfzdBDiIcIOvg
-         0SIjeo/s66gfmxdokRwr65fw53lrncEikYCQM9ltVKMFbq55xQdD44kq+ZUjiffXnpAo
-         ukt2Sx4FRnic4f7XTuQ2QfyWUBQC5fe4PElJA3x/EzFRKvhzjBGRA7+DFyoOT2xhEZPo
-         yUAL9dCG9rQ3kUgyraXvmChAwOzJ/w69QoAz4UU02btz1DEZxqqZwCOplpywFC5OeRd4
-         F+F3P7LKBTFwlwPjIuOnLiB8mF3c1Y9Mz6qe8qmQk78ZT6T+iRmBb7m6m1eplSVn5n+h
-         2vcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+Csf/X+A6Yj7XM/zwDG6j8QqnjMgcQ6DA65ZzCNcagU=;
-        fh=/gGgJtzrP/fSON9itFOOjXTfQ8dw6O4zTTAnpv/wkBw=;
-        b=ery7GtkPgFRsmYfeuW1Z0GjR6ibq0Qe/vJSg72Qkjtd/oXRFBhfaDDm4hQOyNHHT6c
-         U1t9sfRrx7ZlyJ12BWinF6vv5Cel5btViTXj+tzdcHYKc4SLjpndRfV4qNXwsLXQz5xn
-         9fvbFoAoAGBKtmhdc+9sgFC/XmqoQsyym1HxgRv+2okmMUstOdOUIIUddf+BtITOY4vy
-         v6A1+ZmPtTBZO78Z2VHg0/V7/1M3rnm8PoTbaArERae07di6E9Rnkkua8INwIavDdzJ0
-         2r9uSEKYBH7MXut1IG+wPC4CB6AIGoZVyUON3gRVdqViK5b9dNmxqAmkitWZpbSaHvwY
-         bTqw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768936223; x=1769541023; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Csf/X+A6Yj7XM/zwDG6j8QqnjMgcQ6DA65ZzCNcagU=;
-        b=lnoAN5CK7uP0U4jtz9xDfkdr03B/K4SdAW9hfWYU2OQHf8e3BWGTarGuppTgqdEilj
-         mo9fZhN8EOPxA4OhUe2wkbUL0TJQ2nf3kRD6LxsnMbbLeCMTl78nKJ767O/QgyA5VgK9
-         ORPN5NcvEJmirpQzM4PmD3FihQcp6qwiCHqxWaGNSYkWQJx7TAWEYxxYLlQypFPVBKRv
-         fyiqBYSmZEXL3U8CCnNsCrRyGNUdVU5NHFyNHNLm0c6Tss40gSzBj6NUK2yJ8+cZr1kC
-         wg4NCO6tUPG1R6E3K1zX9OAuKn90vVovVZV9DmAybSvIhC+kS2M+lgi20CLyq1zj54Ca
-         T7eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768936223; x=1769541023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+Csf/X+A6Yj7XM/zwDG6j8QqnjMgcQ6DA65ZzCNcagU=;
-        b=L+nvotqjksBpgqjP4JrslE9fUfH4lEKBfjtvvz8kRnJ5ckzSQqfqT8rXx/rnGwJV1A
-         9U6idWNIfQcE8h3jTcQzW3SIoTAgeLWLx5flJHJXGzhbodh2USnkzAZGovt1uJukHZsg
-         I4c0ApD3hAYq/mTyprflgtGTFXa1qEspCNdne/cfDM8VZH4P1gFwvp/SvoFvnuz0lXf3
-         neA+1KgHn9M4xunu9VnW0mMvjwChWpj2vIddgJXgPcID/pivQ36GkysAyWkKA+kUGg1g
-         Ob9SKHxTUvwOd4NAFvJZgLBALTh3dZtgLPqsERM21+C/jAGF0w19yrr7b6x+XjasD89O
-         zdbQ==
-X-Gm-Message-State: AOJu0YyyN16CLxLcrJcQ6mduWYEUvwRTuAOQK5HL5JrQmW9hlS7Fz3sO
-	keJ/qgnqJ75Ju5KjKgzlAdGgzlRxrl5XnwMbneXe6bFiphyGTxlu5w4c2DdojeMpAYIrvshv4dm
-	MrihPh0rH81Ib5K0rzQllg4zUJtZQxJ8=
-X-Gm-Gg: AY/fxX5/7hEaBgQ26pS95DSEghVx/OldKFErt6bqePfiJBo4eqypiswn1W3xxvPsNJB
-	kegjM8x+ynmTOsBRblgTXo5OSIWieO3jZneWa+/vlYqmXNprgmIXgy6SyZkWZ8613oxNkuIGQFz
-	RQSga3Y8jjGX5ZleLCgSOtRe3kpAGEjUUt+PFGXBwd8myO101o+YA9hTXRmNFXeZh9+fGHLl5f2
-	fFYHlc6yHv2b98sSCQNn6zAVVUf3CHlfhKcY/K9UG1F3NgJc0i5S43zDo7zIKbKf960gEaBJUjN
-	YKS5p1ur/XMJcwysCMXb5ZETm3IO/QIilgOcBB55BvfIJKp5DHWcqLy/C6I6
-X-Received: by 2002:a05:6820:f00a:b0:65f:6a70:2324 with SMTP id
- 006d021491bc7-662b00940c8mr1223440eaf.56.1768936223274; Tue, 20 Jan 2026
- 11:10:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922F8477E3A;
+	Tue, 20 Jan 2026 19:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768936691; cv=none; b=tJ4rf7TmEPNEJmSyJkvWeBO69/Z6q/+Vpheu1ZGDdYo1ZmFL3obYxz1s73+JNOOkBxZO3AtlYTGROkAJctAeFuWHmf1ykTMHPJRgkwhgcZ0s0A1vb0hs98WEznmpcV9x10i1cBGKD5HYtugrKOSb8tJAM+kcbh6SAesCPN9+27s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768936691; c=relaxed/simple;
+	bh=yFe+RDwHgYFendKzYSDvhlCgj2LUow7ykJ+nJUr85m4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hb+kChEH1wjs9p5f6AIZ4KYLrlQ6F55ZS1q+ij30sM7qoBVQjaVSBWMIFE9IbAKgnCuRElc/w4IkbZCelVwevKUqEoOPkW7YT3ULVM8R2Dz4J6LeXf6S+LgvR1ztVibkp5KoHFSaA66IkLbHn2N77ktjoSfxma6KgS+ytEpc/uY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 50F24602AB; Tue, 20 Jan 2026 20:18:07 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next 00/10] Subject: netfilter: updates for net-next
+Date: Tue, 20 Jan 2026 20:17:53 +0100
+Message-ID: <20260120191803.22208-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119162720.1463859-1-mmyangfl@gmail.com> <8cfba7ca-03d0-46fe-92fa-5d4a119fc31e@molgen.mpg.de>
-In-Reply-To: <8cfba7ca-03d0-46fe-92fa-5d4a119fc31e@molgen.mpg.de>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Wed, 21 Jan 2026 03:09:47 +0800
-X-Gm-Features: AZwV_QjxhMmCVLVMg326Zu3TrNeYwemKLCUFGwJp4YRXr5m1z-pDq9pWaByfCFQ
-Message-ID: <CAAXyoMPxG5DbfMoLztWL3W78Xf3TMMVvkKJFD8L3Dup2-hMyyA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH net] idpf: Fix data race in idpf_net_dim
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Phani Burra <phani.r.burra@intel.com>, Willem de Bruijn <willemb@google.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Joshua Hay <joshua.a.hay@intel.com>, 
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.24 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251591-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mail.gmail.com:mid,mpg.de:email]
-X-Rspamd-Queue-Id: 4399F4C3AD
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TAGGED_FROM(0.00)[bounces-251592-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 8D48E4B4F3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 12:50=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
-> wrote:
->
-> Dear David,
->
->
-> Thank you for your patch.
->
-> Am 19.01.26 um 17:27 schrieb David Yang:
-> > In idpf_net_dim(), some statistics protected by u64_stats_sync, are rea=
-d
-> > and accumulated in ignorance of possible u64_stats_fetch_retry() events=
-.
-> > The correct way to copy statistics is already illustrated by
-> > idpf_add_queue_stats(). Fix this by reading them into temporary variabl=
-es
-> > first.
->
-> It=E2=80=99d be great if you also documented a test case.
->
+Hi,
 
-Sorry, I didn't get what "documente a test case" means. Triggering the
-bug would require precise timing between the writer and reader. If
-u64_stats_fetch_retry() returns true you already know the previous
-critical section was invalid, which is documented in u64_stats_sync.h.
+The following patchset contains Netfilter fixes for *net-next*:
 
-> > Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-> > Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
-> > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > ---
-> >   drivers/net/ethernet/intel/idpf/idpf_txrx.c | 16 +++++++++++-----
-> >   1 file changed, 11 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/=
-ethernet/intel/idpf/idpf_txrx.c
-> > index 97a5fe766b6b..66ba645e8b90 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > @@ -3956,7 +3956,7 @@ static void idpf_update_dim_sample(struct idpf_q_=
-vector *q_vector,
-> >   static void idpf_net_dim(struct idpf_q_vector *q_vector)
-> >   {
-> >       struct dim_sample dim_sample =3D { };
-> > -     u64 packets, bytes;
-> > +     u64 packets, bytes, pkts, bts;
->
-> The new variable names are ambiguous. Would _tmp or so be better?
->
-> >       u32 i;
-> >
-> >       if (!IDPF_ITR_IS_DYNAMIC(q_vector->tx_intr_mode))
-> > @@ -3968,9 +3968,12 @@ static void idpf_net_dim(struct idpf_q_vector *q=
-_vector)
-> >
-> >               do {
-> >                       start =3D u64_stats_fetch_begin(&txq->stats_sync)=
-;
-> > -                     packets +=3D u64_stats_read(&txq->q_stats.packets=
-);
-> > -                     bytes +=3D u64_stats_read(&txq->q_stats.bytes);
-> > +                     pkts =3D u64_stats_read(&txq->q_stats.packets);
-> > +                     bts =3D u64_stats_read(&txq->q_stats.bytes);
-> >               } while (u64_stats_fetch_retry(&txq->stats_sync, start));
-> > +
-> > +             packets +=3D pkts;
-> > +             bytes +=3D bts;
-> >       }
-> >
-> >       idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->tx_dim,
-> > @@ -3987,9 +3990,12 @@ static void idpf_net_dim(struct idpf_q_vector *q=
-_vector)
-> >
-> >               do {
-> >                       start =3D u64_stats_fetch_begin(&rxq->stats_sync)=
-;
-> > -                     packets +=3D u64_stats_read(&rxq->q_stats.packets=
-);
-> > -                     bytes +=3D u64_stats_read(&rxq->q_stats.bytes);
-> > +                     pkts =3D u64_stats_read(&rxq->q_stats.packets);
-> > +                     bts =3D u64_stats_read(&rxq->q_stats.bytes);
-> >               } while (u64_stats_fetch_retry(&rxq->stats_sync, start));
-> > +
-> > +             packets +=3D pkts;
-> > +             bytes +=3D bts;
-> >       }
-> >
-> >       idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->rx_dim,
->
->
-> Kind regards,
->
-> Paul
+1) Speed up nftables transactions after earlier transaction failed.
+   Due to a (harmeless) bug we remained in slow paranoia mode until a
+   successful transaction completes.
+
+2) Allow generic tracker to resolve clashes, this avoids very rare
+   packet drops.  From Yuto Hamaguchi.
+
+3) Increase the cleanup budget to 64 entries in nf_conncount to reap
+   more entries in one go, from Fernando Fernandez Mancera.
+
+4) Allow icmp trackers to resolve clashes, this avoids very rare
+   initial packet drop with test cases that have high-frequency pings.
+   After this all trackers except tcp and sctp allow clash resolution.
+
+5) Disentangle netfilter headers, don't include nftables/xtables headers
+   in subsystems that are unrelated.
+
+6) Don't rely on implicit includes coming from nf_conntrack_proto_gre.h.
+
+7) Allow nfnetlink_queue nfq instance struct to get accounted via memcg,
+   from Scott Mitchell.
+
+8) Reject bogus xt target/match data upfront via netlink policiy in
+   nft_compat interface rather than relying on x_tables API to do it.
+
+9) Fix nf_conncount breakage when trying to limit loopback flows via
+   prerouting rule, from Fernando Fernandez Mancera.
+   This is a recent breakage but not seen as urgent enough to rush this
+   via net tree at this late stage in development cycle.
+
+10) Fix a possible off-by-one when parsing tcp option in xtables tcpmss
+    match.  Also handled via -next due to late stage in development
+    cycle.
+
+0003-netfilter-nf_conncount-increase-the-connection-clean.patch fixes commit from v5.19-rc1~159^2~45^2~2
+0008-netfilter-nft_compat-add-more-restrictions-on-netlin.patch fixes commit from v3.13-rc1~105^2~186^2~8
+0009-netfilter-nf_conncount-fix-tracking-of-connections-f.patch fixes commit from nf-next-25-11-28~6
+
+
+Please, pull these changes from:
+The following changes since commit 77b9c4a438fc66e2ab004c411056b3fb71a54f2c:
+
+  Merge branch 'netkit-support-for-io_uring-zero-copy-and-af_xdp' (2026-01-20 12:25:29 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-01-20
+
+for you to fetch changes up to 735ee8582da3d239eb0c7a53adca61b79fb228b3:
+
+  netfilter: xt_tcpmss: check remaining length before reading optlen (2026-01-20 16:23:38 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-next-26-01-20
+
+----------------------------------------------------------------
+Fernando Fernandez Mancera (2):
+  netfilter: nf_conncount: increase the connection clean up limit to 64
+  netfilter: nf_conncount: fix tracking of connections from localhost
+
+Florian Westphal (6):
+  netfilter: nf_tables: reset table validation state on abort
+  netfilter: nf_conntrack: enable icmp clash support
+  netfilter: don't include xt and nftables.h in unrelated subsystems
+  netfilter: nf_conntrack: don't rely on implicit includes
+  netfilter: nft_compat: add more restrictions on netlink attributes
+  netfilter: xt_tcpmss: check remaining length before reading optlen
+
+Scott Mitchell (1):
+  netfilter: nfnetlink_queue: nfqnl_instance GFP_ATOMIC -> GFP_KERNEL_ACCOUNT allocation
+
+Yuto Hamaguchi (1):
+  netfilter: nf_conntrack: Add allow_clash to generic protocol handler
+
+ include/linux/audit.h                         |  1 -
+ .../linux/netfilter/nf_conntrack_proto_gre.h  |  3 -
+ include/net/netfilter/nf_conntrack.h          |  1 +
+ include/net/netfilter/nf_conntrack_count.h    |  1 +
+ include/net/netfilter/nf_conntrack_tuple.h    |  2 +-
+ include/net/netfilter/nf_tables.h             |  1 -
+ net/bridge/netfilter/nf_conntrack_bridge.c    |  3 +-
+ net/netfilter/nf_conncount.c                  | 30 ++++++--
+ net/netfilter/nf_conntrack_bpf.c              |  1 +
+ net/netfilter/nf_conntrack_h323_main.c        |  1 +
+ net/netfilter/nf_conntrack_netlink.c          |  1 +
+ net/netfilter/nf_conntrack_proto_generic.c    |  1 +
+ net/netfilter/nf_conntrack_proto_gre.c        |  2 +
+ net/netfilter/nf_conntrack_proto_icmp.c       |  1 +
+ net/netfilter/nf_conntrack_proto_icmpv6.c     |  1 +
+ net/netfilter/nf_flow_table_ip.c              |  2 +
+ net/netfilter/nf_flow_table_offload.c         |  1 +
+ net/netfilter/nf_flow_table_path.c            |  1 +
+ net/netfilter/nf_nat_ovs.c                    |  3 +
+ net/netfilter/nf_nat_proto.c                  |  1 +
+ net/netfilter/nf_synproxy_core.c              |  1 +
+ net/netfilter/nf_tables_api.c                 |  8 ++
+ net/netfilter/nfnetlink_queue.c               | 75 +++++++++----------
+ net/netfilter/nft_compat.c                    | 13 +++-
+ net/netfilter/nft_flow_offload.c              |  1 +
+ net/netfilter/nft_synproxy.c                  |  1 +
+ net/netfilter/xt_tcpmss.c                     |  2 +-
+ net/sched/act_ct.c                            |  2 +
+ net/sched/act_ctinfo.c                        |  1 +
+ 29 files changed, 102 insertions(+), 60 deletions(-)
+
+-- 
+2.52.0
 
