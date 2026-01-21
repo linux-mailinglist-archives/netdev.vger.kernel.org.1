@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-251679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPN2B+8mcGmyWwAAu9opvQ
-	(envelope-from <netdev+bounces-251679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:07:59 +0100
+	id OJ5QGncncGmyWwAAu9opvQ
+	(envelope-from <netdev+bounces-251680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:10:15 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD96E4EE21
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:07:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C65F4EE85
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A4D89481F6
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:07:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EAD1C842F17
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18A02DF6E6;
-	Wed, 21 Jan 2026 01:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95122E62DA;
+	Wed, 21 Jan 2026 01:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvATIDtL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VC+4dAny"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B84624DD09;
-	Wed, 21 Jan 2026 01:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F8A2DECAA;
+	Wed, 21 Jan 2026 01:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768957671; cv=none; b=isn+tbBW4Vau9KheXXzUoDdN1wAsN5E6uz74fJtnty7ZuNfv/yrYI1dgYoMxQBTPsVxtW9Y3SUiG42zW+DdVd4/paW7bqYOGXT39DORze+1EP3l8X8whjF37tfdWHZBYSZpVmj1adjmVvb0RWbgR8cNy3muCWPFLtey74XhAATs=
+	t=1768957808; cv=none; b=S8EP69PXIDirytKGIiUWcjDydmUd/Mg2mcVo/Rax0W1LF4dAmnhikR516Euwiy/FJU0kMfTsjbFVswJjfgm+cYFrXWQTq7p6N6Qq5+inaHz/+MtwkxIvQdsJaEdwfFJmvcgLLtEBla0IvmZL3fyPiAyuOuwGfv7VVdpk4UEdOdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768957671; c=relaxed/simple;
-	bh=oOpcGukiPPewh4Q7E0yytjx4AC+fAjQGqYtWozM5MOs=;
+	s=arc-20240116; t=1768957808; c=relaxed/simple;
+	bh=BxaNh7NlfTOD8Pd851C5gREI76ONSHj0XlS1kksYByo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T+7O164Z8HtjJRUqqZygvQXhBRpJjiICmeMXNpUxiojc8la1PH5iYlwAF4OohbHrjCY91PEFc6v/zMdlgLGlJfdqOfMtUTv3mYUllRRtL1NnE3It8g+L5NCBtaPpvDoj/gV9kuEnTypuE5SpTbhSD06wX47WViV0wjAM+j3ew6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvATIDtL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 620F6C19423;
-	Wed, 21 Jan 2026 01:07:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=IQAeuCDFhcxDLusLjsd/6QpRxdG3wT4P2aUFLt+LPPId237qqWdry3sW0RTIa+Wgn3+QF+ZbburoQhJ7dxyYgrJQTQfF1tiiLksjlnN0uw1JDxtYPr6PWIHDedexS7vSIOgp+4syEZkqtz4JidSBywnpL44X9rqojXArhEz52iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VC+4dAny; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0DFC19423;
+	Wed, 21 Jan 2026 01:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768957671;
-	bh=oOpcGukiPPewh4Q7E0yytjx4AC+fAjQGqYtWozM5MOs=;
+	s=k20201202; t=1768957808;
+	bh=BxaNh7NlfTOD8Pd851C5gREI76ONSHj0XlS1kksYByo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GvATIDtL+LoiOGpWcaGgXeYAugG3mjd2IkpG38tw2Pawrvi8V2BQk9xpAzHIRhx47
-	 L+x+WQOGofrRe1jKb0EqVyrCVbWF47Dh4S/d17wkz+8gkvBOUEM7N2i0yauTedTK78
-	 GHxc+f0WhICLFZaM6AZcvXiQFPlh/sdwpr592pgpZbUdIEjAC4UpP9v3whLnyO3hbx
-	 l6zPzy6hkKi0ahjhWtI6WVqjbJNLgCfiAfY4Qnaw9uklCuxkJo0EApoJVaXLUlB2DM
-	 pWUKDXub7krn93x33HdxtVPVp5cVxoS5YUVbZ1wRag3smlajhahJ+yJUG5dtC4aThU
-	 b1zA8eg2PL9RA==
-Date: Tue, 20 Jan 2026 17:07:49 -0800
+	b=VC+4dAnyLorb0XoMiORXp/RxEMsK4AjzTUVsVy0st2nAnd7ExgJghmzn9m8jVtFfa
+	 pU3DF26PD5FEtP0fTXllKqXfnePgFh+hn8JP0W6fHVAJ2ZEqX5bh5AcEK+72g9RuP8
+	 SUmYh9c249K87SZcLQL0mZAE/jALYbyf/Z5pEVLVp8kGgyHU5jt12OtvARpW7AgccS
+	 xs+VzInip1B5in+e2v4zUn/TiDPj0jmrqGVrldqbxPtflOp3jT0DOx8KCJUC/V+Qj1
+	 eMLkRcjb+I4Ly0jFyJP5hgwx/sRb3UaKhZRemS8WTg15E2eExpEdvQ4vFBGuPWc/IC
+	 yS/b+IKn/9xSw==
+Date: Tue, 20 Jan 2026 17:10:07 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, David Ahern
- <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>, Arnd Bergmann
- <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asml.silence@gmail.com,
- matttbe@kernel.org, skhawaja@google.com, Bobby Eshleman
- <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 0/5] net: devmem: improve cpu cost of RX
- token management
-Message-ID: <20260120170749.101e8bcc@kernel.org>
-In-Reply-To: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
+To: "Jian Zhang" <zhangjian.3032@bytedance.com>
+Cc: "Jeremy Kerr" <jk@codeconstruct.com.au>, "Matt Johnston"
+ <matt@codeconstruct.com.au>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <mkl@pengutronix.de>
+Subject: Re: [PATCH net-next v2 v2 1/2] net: mctp-i2c: notify user space on
+ TX failure
+Message-ID: <20260120171007.23667da5@kernel.org>
+In-Reply-To: <20260116085840.1946398-1-zhangjian.3032@bytedance.com>
+References: <20260116085840.1946398-1-zhangjian.3032@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,59 +75,37 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251679-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-251680-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: BD96E4EE21
+X-Rspamd-Queue-Id: 1C65F4EE85
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 15 Jan 2026 21:02:11 -0800 Bobby Eshleman wrote:
-> This series improves the CPU cost of RX token management by adding an
-> attribute to NETDEV_CMD_BIND_RX that configures sockets using the
-> binding to avoid the xarray allocator and instead use a per-binding niov
-> array and a uref field in niov.
-> 
-> Improvement is ~13% cpu util per RX user thread.
-> 
-> Using kperf, the following results were observed:
-> 
-> Before:
-> 	Average RX worker idle %: 13.13, flows 4, test runs 11
-> After:
-> 	Average RX worker idle %: 26.32, flows 4, test runs 11
-> 
-> Two other approaches were tested, but with no improvement. Namely, 1)
-> using a hashmap for tokens and 2) keeping an xarray of atomic counters
-> but using RCU so that the hotpath could be mostly lockless. Neither of
-> these approaches proved better than the simple array in terms of CPU.
-> 
-> The attribute NETDEV_A_DMABUF_AUTORELEASE is added to toggle the
-> optimization. It is an optional attribute and defaults to 0 (i.e.,
-> optimization on).
+On Fri, 16 Jan 2026 16:58:39 +0800 Jian Zhang wrote:
+> Report local transmit errors from the MCTP I2C transport using
+> sock_queue_err_skb(), allowing the socket layer to be notified
+> of failed transmissions.
 
-IDK if the cmsg approach is still right for this flow TBH.
-IIRC when Stan talked about this a while back we were considering doing
-this via Netlink. Anything that proves that the user owns the binding
-would work. IIUC the TCP socket in this design just proves that socket
-has received a token from a given binding right?
+Shouldn't you hide this behind a setsockopt() knob?
+Existing applications will not expect having to service the error queue.
+-- 
+pw-bot: cr
 
