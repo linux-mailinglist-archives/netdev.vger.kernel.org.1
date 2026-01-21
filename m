@@ -1,327 +1,232 @@
-Return-Path: <netdev+bounces-251677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMBYI2EmcGmyWwAAu9opvQ
-	(envelope-from <netdev+bounces-251677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:05:37 +0100
+	id YK4PFHomcGmyWwAAu9opvQ
+	(envelope-from <netdev+bounces-251678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:06:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75C514EDCA
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:05:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB844EDDF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A69155EFB78
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:03:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C124356C00
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D4D2EC569;
-	Wed, 21 Jan 2026 01:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EE52DF6E6;
+	Wed, 21 Jan 2026 01:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="tDuwti9h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W42p5o1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24420.protonmail.ch (mail-24420.protonmail.ch [109.224.244.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90912F49F6
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768957260; cv=none; b=Ez3dI0962GxG2te0jrx1Not5wPMOwVRfyRZPknColBWpuM7O4KzB8qOiWe0pSUtvr7s7PKr+stfY4RLjv8y/28O++6p0FgLadzO6ciqTHIGdCH0WebJ5XMRoSHTuYez5LPIbwAqDnVzfPOXpLt0NXsLL4hKiHspSRiV3nmS9jVk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768957260; c=relaxed/simple;
-	bh=CnaT38/nM5eJZKaIAtAjjZs1hrA7oB6PNhCCVgDt9Qc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yj1v+CwcDGIf3IC3bCXaFXd8YtZJOlrXtFVZ9gT63Nk52fQfOEzepor3xTFOs/6cLfXrC+GjyFE2wkf/j3pQqgmXbIdPS5QnKwACo4gUZzgX767Ulnf8h0X+6O8/iR0Cy9DbHwx7HI+Kk/hguAwb7IXNsuVzM0qfo59u3q0KfTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=tDuwti9h; arc=none smtp.client-ip=109.224.244.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1768957250; x=1769216450;
-	bh=NLDSvOYskVTfiZx0y65vt1Itpp011SQmy12fPuc5Uqw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=tDuwti9haxFetenj4OPe69hebmWgXsKrlwF/Y/4fCUmwngHZL4bBOsmtvmlk/vPct
-	 3tcsrd2hXcxMCa7dKGXlJdzNbhrbOSGyutbpDvbJjOUmAJpRfurZfCHy48Rhi89CW/
-	 PE9ffu7znHJ1p0Jfe0+w1/BhStr0gBTmRBuWOGKOc7Bd/h2Ek8kW+FR1zv87W8rMK0
-	 vTza/aaQQjaYyhq6X58kw+bEa44n/T/2WK2uRnWuqmTpun5Z5zp8gadWqDEl71vWBZ
-	 yb5w/37sfirLAuIp4GH7W2JNZnqmiEVbTAcCFIsBlrLdzknVqRqPoFkVtDVXi4ymsp
-	 s9sIbT9IiK+xQ==
-Date: Wed, 21 Jan 2026 01:00:46 +0000
-To: Victor Nogueira <victor@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] net/sched: act_gate: fix schedule updates with RCU swap
-Message-ID: <4v-I_ZuHhZBLG3lGttZ9HHAT8n_AggP70Rw2IDrj5w6BK_Ol2VoPsR9eP-BKBlLToLNNCElTtbXdTRdD1wsR3QzlCoSaBi6R7SCPn6CDk5c=@1g4.org>
-In-Reply-To: <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com>
-References: <20260120004720.1886632-1-p@1g4.org> <20260120004720.1886632-2-p@1g4.org> <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: af3c17544d46021292a59f613bdf5bcf65d1f89b
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AD229CB24
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768957556; cv=pass; b=hkBn8qMXmyZwivw1ZXr/7bNIIpEsaFBEisHUGhRb/EJnvlqoF3PPXak0LOuNh7ch4rGjxiBPbeN3XlsryzW7/fZba6MVNaIW4BvnFcrO07oi6wK5id2J1sU07YtTCfoe68ibxyYYaw7/ldJrN+n8rgQX4uBy1GtUdVGkRCgTquA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768957556; c=relaxed/simple;
+	bh=8pqa8OYjP+H2tR1BiFys92JI6YisCfB390EDUyM1WRk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MnTctHhTrpmDsi2iSnNxLv6sgDiPwdt9vSGvP4j/nqynptfixMSP9P/sdfDd4916UDuecThqQW73nD2D8YxNLCanMeH1PXgQXWFbciWuOme4OfMLFKA8yNeiv3hiiGA2OotL2+3BaOr2xpgEIF9dZEjrS6N9TmreedjLdTGPIqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W42p5o1n; arc=pass smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so52965ad.2
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 17:05:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768957554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Vn2Mg/4bT0RucJVsv4Mc9T8WSkFTO76E4bZd5mKKFiaOpC8S5s4at3BP7ltqK5jLd8
+         yNPXlZ3mdqRo/6gebOaqwDLz+4iniOo5JaG4J/iD+R9YnyTNM7it5Ms1ymyJF41FYhCX
+         PYBeW1e4H4r5sQtt51Ptc2/iq6r1DLmwqhyZL4buFStKX5c8E66tRNVED2kZWFwko4HL
+         I9YpTjP0quRCyk69hbPOE/fpmyLEjy2UgArb2t8aB6rWt1s23UTPfBy90dIEOOGT0df1
+         G7vy+A5FKZyVCWqMKcqAiEuoPbyJUxNkr9G/LN+FC/V3EtgZGPyplUftSeDNpMI/GRip
+         DjvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1a7S46mgXCuKnRd5PdX0m/bRNgh1wac44gddSPH2LfI=;
+        fh=nmL9j9GXIfL4MEniDenG4JByNS7WuiVFgTzNBgzkpgU=;
+        b=QOrQPCJRbogWFawxhrgJf+cMArn4lDsmhRlq74X7XoyIfqX7iN4OAU5BON3XgTDc7z
+         85EVgfD/C9qu81rErwrZmvBwjYB5TqwaCOQ/aq+UkRyYqKE5qcD1JftMPmXGXbQ0XyeG
+         5yCcmKnywKwnN6kMsVM+2obY64Cnta518QCmp+lPKE9NwND7BtFa8nfP6pahOCjytfVk
+         eqCmbrECvqmY7/vtuHsCeW/WAaLtJqs4Aoxg6Q4vHneHmMqHjzcxHl6QBCzxVns9FZ9j
+         lpy3k+AyhTStotelJgrfLE5FjaW92qtx3bP3Ils0zzFBK0I0fGjf/HKmoCasuRlxPZrL
+         zNzQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768957554; x=1769562354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1a7S46mgXCuKnRd5PdX0m/bRNgh1wac44gddSPH2LfI=;
+        b=W42p5o1nHPSQpoaK0IJBSSLyySjXHyKLfNEE5sAViaNnHBk3vt9VUKXezBYP67iBWY
+         nmkS//o/6iL9trXQBdvZ99sRwzF6Jo6LWGmvFhIiD6Dy1J12+Ye85UqWbKM8WzCQY8UC
+         QOCYFT9o2eOYd/ndoIGB3yIoHc0p+TGcL/Dj8sPkWq24r4VT+iqz1kNscfOi1jKiRGOX
+         Xjo8hpNhKD6voa2CeXjr7MuG9RF9ctgJ+nVu+e9QmNEqHMH4IxcGQLERpRhJxM0oKvTP
+         FepClyia8+0JetAQalbPs1PtzRXKuWiyJeO+/XWsYY0D757lgkiMm8Jc6fXMvoDH+hO6
+         JrRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768957554; x=1769562354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1a7S46mgXCuKnRd5PdX0m/bRNgh1wac44gddSPH2LfI=;
+        b=t15WG2OcYu12bDjwSRHPIXLug7ubdTL1KBIla10moIt7IDtvhqYj3Ln2nNW3pLYtMw
+         21o/ozNUvzl3omrji5Aq2N9VIAFJKrZY3hDDIdv6f2hbETzAJrsVyn4gl+kyZM65LFr7
+         aSsXOf+JXRHbpl7FWgP/qtOJ6HCCvZlcHB8Swyvi+bj3DIucc3v3f61dwnMMvL7CLsKG
+         pcPMi3pJnQK+FdMKW7ASuVUs1KAvbfxDMv8QJ/3r+vKG7zvPjBAQNFfTJoMCYGuTpeeU
+         mwtBJ2qCPJEFwX8dLTrR8VUV9IOKhoCIkKEP59/roP03acMA2JPScbnLo8WcjbDBhuP+
+         Od7g==
+X-Forwarded-Encrypted: i=1; AJvYcCV1kCJAzOltLD7widjuuOiCKqn8hFfroMoWRYm9e9D8Ffy9D2o0TyfDycTCiaYluJQ+QJzJJOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGkuS3SSObNwoGpzg/XUKllCCaNILzur+4Mg7hFyLMlBU4qHcR
+	V/0qohh3glte2AVdNmZ5y9yN2ShYJblTdFcyR6zMUanebbAJD8GYI4PUpyO/W/TFo1+ojQaxMH5
+	jq4/hpXOKrKrv1EEofnOGyme6znY1b6E=
+X-Gm-Gg: AZuq6aJdGyTtOrlaj9/0V8ZrY0s+ZhBbame7Q5HX6L7uKpglvdWcDnSmPhh3PeXJrtE
+	JC83Mp0Zuh4KowZTBlToR+AizUhNOAVSua28h9xZYa7BxMxivh8C0r9ONo7rsFSYvw69Tu4aqHg
+	YYnL21uCIHKFlSX2lDvr1tgrDAfypKM5lTkhFnqtduNwCWZodZkPn/BCRUE8iYlxDTXLaAjgPLy
+	zVarblZ7hgrQrtlbzGfUzaJ6PI91PxzS/vufaGHgtc2yzb6NIdjBMp3v3l5yqJY2Ti+bJQ4cUgs
+	WhlT+JcwdYI=
+X-Received: by 2002:a17:902:e842:b0:2a1:14dd:573 with SMTP id
+ d9443c01a7336-2a7698f3e16mr31237755ad.23.1768957554251; Tue, 20 Jan 2026
+ 17:05:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260120070555.233486-1-dongml2@chinatelecom.cn> <20260120070555.233486-3-dongml2@chinatelecom.cn>
+In-Reply-To: <20260120070555.233486-3-dongml2@chinatelecom.cn>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Tue, 20 Jan 2026 17:05:42 -0800
+X-Gm-Features: AZwV_QhHH4eFAffWBHjf2jaxTKvjTuSmLWouBdzaCGqxpzoDbl1L3nV1kK1LavU
+Message-ID: <CAEf4BzYzT2OUQ37BvzTRyo5Ah_t_CXv=AJixtAmU_pgr8eLpLg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v6 2/2] selftests/bpf: test the jited inline of bpf_get_current_task
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: ast@kernel.org, eddyz87@gmail.com, davem@davemloft.net, dsahern@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251677-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-251678-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[1g4.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,davemloft.net,iogearbox.net,linux.dev,fomichev.me,google.com,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,act_gate_ops.net_id:url,1g4.org:mid,1g4.org:dkim,mojatatu.com:email]
-X-Rspamd-Queue-Id: 75C514EDCA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,chinatelecom.cn:email]
+X-Rspamd-Queue-Id: EAB844EDDF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Also, the AI review [2] pointed out a real issue.
-> It's easy to reproduce by running something like:
+On Mon, Jan 19, 2026 at 11:06=E2=80=AFPM Menglong Dong <menglong8.dong@gmai=
+l.com> wrote:
 >
-> tc action add action gate base-time 200000000000ns \
->   sched-entry close 0ns index 10
+> Add the testcase for the jited inline of bpf_get_current_task().
+>
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
+> v6:
+> * remove unnecessary 'ifdef' and __description
+> ---
+>  .../selftests/bpf/prog_tests/verifier.c       |  2 ++
+>  .../selftests/bpf/progs/verifier_jit_inline.c | 20 +++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/progs/verifier_jit_inline=
+.c
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/verifier.c b/tools/te=
+sting/selftests/bpf/prog_tests/verifier.c
+> index 38c5ba70100c..2ae7b096bd64 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/verifier.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/verifier.c
+> @@ -111,6 +111,7 @@
+>  #include "verifier_xdp_direct_packet_access.skel.h"
+>  #include "verifier_bits_iter.skel.h"
+>  #include "verifier_lsm.skel.h"
+> +#include "verifier_jit_inline.skel.h"
+>  #include "irq.skel.h"
+>
+>  #define MAX_ENTRIES 11
+> @@ -253,6 +254,7 @@ void test_verifier_bits_iter(void) { RUN(verifier_bit=
+s_iter); }
+>  void test_verifier_lsm(void)                  { RUN(verifier_lsm); }
+>  void test_irq(void)                          { RUN(irq); }
+>  void test_verifier_mtu(void)                 { RUN(verifier_mtu); }
+> +void test_verifier_jit_inline(void)               { RUN(verifier_jit_inl=
+ine); }
+>
+>  static int init_test_val_map(struct bpf_object *obj, char *map_name)
+>  {
+> diff --git a/tools/testing/selftests/bpf/progs/verifier_jit_inline.c b/to=
+ols/testing/selftests/bpf/progs/verifier_jit_inline.c
+> new file mode 100644
+> index 000000000000..4ea254063646
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/verifier_jit_inline.c
+> @@ -0,0 +1,20 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <vmlinux.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include "bpf_misc.h"
+> +
+> +SEC("fentry/bpf_fentry_test1")
+> +__success __retval(0)
+> +__arch_x86_64
+> +__jited("      addq    %gs:{{.*}}, %rax")
+> +__arch_arm64
+> +__jited("      mrs     x7, SP_EL0")
 
-This was never allowed. A zero interval has always been invalid for a gate =
-schedule entry. Clang pointed out a no-op branch I added by mistake and the=
- AI review picked it up, but the intent was simply to mirror the existing b=
-ase-time / cycle-time range checks we already have. Functionally it=
-=E2=80=99s redundant because we were already rejecting this case via the ex=
-isting validation e.g.:
+I was confused to see this, as your patch actually implements inlining
+only on x86-64. And then it turned out that on arm64 we inline this in
+JIT. But Eduard also noticed that we actually SKIP this test on arm64
+because of missing LLVM dependency, so that's not great.
 
-    if (cycle > (u64)S64_MAX - entry->interval) { ... }
+So we should do something about silently skipped tests at least...
 
-    if (interval =3D=3D 0) {
-        NL_SET_ERR_MSG(extack, "Invalid interval for schedule entry");
-        return -EINVAL;
-    }
-
-I will prepare and test v3 with your first 8 suggestions and await further =
-input on best practices for avoiding a monolithic patch and on appropriate =
-levels of validation in this specific case.
-
-Thanks
-Paul
-
-
-On Tuesday, January 20th, 2026 at 3:04 PM, Victor Nogueira <victor@mojatatu=
-.com> wrote:
-
->=20
->=20
-> On 19/01/2026 21:48, Paul Moses wrote:
->=20
-> > Switch act_gate parameters to an RCU-protected pointer and update sched=
-ule
-> > changes using a prepare-then-swap pattern. This avoids races between th=
-e
-> > timer/data paths and configuration updates, and cancels the hrtimer
-> > before swapping schedules.
-> >=20
-> > A gate action replace could free and swap schedules while the hrtimer
-> > callback or data path still dereferences the old entries, leaving a
-> > use-after-free window during updates. The deferred swap and RCU free
-> > close that window. A reproducer is available on request.
-> >=20
-> > Also clear params on early error for newly created actions to avoid
-> > leaving a dangling reference.
-> > [...]
-> > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-> > index c1f75f2727576..3ee07c3deaf97 100644
-> > --- a/net/sched/act_gate.c
-> > +++ b/net/sched/act_gate.c
-> > @@ -6,6 +6,7 @@
-> > #include <linux/kernel.h>
-> > #include <linux/string.h>
-> > #include <linux/errno.h>
-> > +#include <linux/limits.h>
->=20
->=20
-> Do you really need to include this?
->=20
-> > [...]
-> > @@ -69,12 +71,14 @@ static enum hrtimer_restart gate_timer_func(struct =
-hrtimer *timer)
-> > {
-> > struct tcf_gate *gact =3D container_of(timer, struct tcf_gate,
-> > hitimer);
-> > - struct tcf_gate_params *p =3D &gact->param;
-> > + struct tcf_gate_params *p;
->=20
->=20
-> When adding/editing local variables, you should adhere to the
-> reverse xmas tree style [1].
->=20
-> > spin_lock(&gact->tcf_lock);
->=20
->=20
-> Shouldn't you call rcu_read_lock before this line now?
->=20
-> > + p =3D rcu_dereference_protected(gact->param,
-> > + lockdep_is_held(&gact->tcf_lock));
-> > [...]
-> > static int tcf_gate_init(struct net *net, struct nlattr *nla,
-> > @@ -296,20 +296,26 @@ static int tcf_gate_init(struct net *net, struct =
-nlattr *nla,
-> > struct netlink_ext_ack *extack)
-> > {
-> > struct tc_action_net *tn =3D net_generic(net, act_gate_ops.net_id);
-> > - enum tk_offsets tk_offset =3D TK_OFFS_TAI;
-> > - bool bind =3D flags & TCA_ACT_FLAGS_BIND;
-> > struct nlattr *tb[TCA_GATE_MAX + 1];
-> > struct tcf_chain *goto_ch =3D NULL;
-> > - u64 cycletime =3D 0, basetime =3D 0;
-> > - struct tcf_gate_params *p;
-> > - s32 clockid =3D CLOCK_TAI;
-> > + struct tcf_gate_params *p, *oldp;
-> > struct tcf_gate *gact;
-> > struct tc_gate *parm;
-> > - int ret =3D 0, err;
-> > - u32 gflags =3D 0;
-> > - s32 prio =3D -1;
-> > + struct tcf_gate_params newp =3D { };
->=20
->=20
-> Abide by reverse xmas tree when adding local variables.
->=20
-> > [...]
-> > + bool clockid_set =3D false;
->=20
->=20
-> I could be missing something, but I don't believe you need this
-> boolean.
->=20
-> > [...]
-> > @@ -323,6 +329,7 @@ static int tcf_gate_init(struct net *net, struct nl=
-attr *nla,
-> >=20
-> > if (tb[TCA_GATE_CLOCKID]) {
-> > clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
-> > + clockid_set =3D true;
-> > switch (clockid) {
->=20
->=20
-> Instead of using clockid_set and repeating the switch statament.
-> You could put this if-statement after you already have oldp and do the
-> following:
->=20
-> if (tb[TCA_GATE_CLOCKID]) {
-> clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
-> switch (clockid) {
-> case CLOCK_REALTIME:
-> tk_offset =3D TK_OFFS_REAL;
-> break;
-> case CLOCK_MONOTONIC:
-> tk_offset =3D TK_OFFS_MAX;
-> break;
-> case CLOCK_BOOTTIME:
-> tk_offset =3D TK_OFFS_BOOT;
-> break;
-> case CLOCK_TAI:
-> tk_offset =3D TK_OFFS_TAI;
-> break;
-> default:
-> NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
-> return -EINVAL;
-> }
-> } else if (ret !=3D ACT_P_CREATED) {
-> clockid =3D oldp->tcfg_clockid;
->=20
-> tk_offset =3D gact->tk_offset;
->=20
-> }
->=20
-> > [...]
-> > - if (tb[TCA_GATE_CYCLE_TIME])
-> > + if (ret =3D=3D ACT_P_CREATED)
-> > + update_timer =3D true;
-> > [...]
->=20
->=20
-> Here you are assigning update_timer to true when the op is a create...
->=20
-> > [...]
-> > + if (update_timer && ret !=3D ACT_P_CREATED)
-> > + hrtimer_cancel(&gact->hitimer);
->=20
->=20
-> .. however in the if-statement where it is used you are only allowing
-> updates. This looks weird.
->=20
-> > [...]
-> > +free_p:
-> > + release_entry_list(&p->entries);
-> > + kfree(p);
->=20
->=20
-> The 2 lines of code above are being repeated below and in
-> tcf_gate_params_release. You should put them in a common function.
->=20
-> > +release_new_entries:
-> > + release_entry_list(&newp.entries);
-> > +put_chain:
-> > if (goto_ch)
-> > tcf_chain_put_by_act(goto_ch);
-> > release_idr:
-> > - /* action is not inserted in any list: it's safe to init hitimer
-> > - * without taking tcf_lock.
-> > - */
-> > - if (ret =3D=3D ACT_P_CREATED)
-> > - gate_setup_timer(gact, gact->param.tcfg_basetime,
-> > - gact->tk_offset, gact->param.tcfg_clockid,
-> > - true);
-> > + if (ret =3D=3D ACT_P_CREATED) {
-> > + p =3D rcu_dereference_protected(gact->param, 1);
-> > + if (p) {
-> > + release_entry_list(&p->entries);
-> > + kfree(p);
-> > + rcu_assign_pointer(gact->param, NULL);
-> > + }
-> > + }
-> > tcf_idr_release(*a, bind);
->=20
->=20
-> Also, the AI review [2] pointed out a real issue.
-> It's easy to reproduce by running something like:
->=20
-> tc action add action gate base-time 200000000000ns \
-> sched-entry close 0ns index 10
->=20
-> I think overall you have the right idea - RCU seems like a good fit here.
-> The issue is that this patch is confusing because it seems like you are
-> trying to fix the bug and perform cleanups at the same time.
-> If that is the case, can you try breaking this patch into two? Do one to
-> fix the bug (introducing RCU and etc) and another for the cleanups.
->=20
-> [1]
-> https://www.kernel.org/doc/html/v6.3/process/maintainer-netdev.html#local=
--variable-ordering-reverse-xmas-tree-rcs
-> [2]
-> https://netdev-ai.bots.linux.dev/ai-review.html?id=3Dcdc17d0d-fd59-41a8-9=
-c8d-1a42699167fd#patch-0
->=20
-> cheers,
-> Victor
+> +int inline_bpf_get_current_task(void)
+> +{
+> +       bpf_get_current_task();
+> +
+> +       return 0;
+> +}
+> +
+> +char _license[] SEC("license") =3D "GPL";
+> --
+> 2.52.0
+>
 
