@@ -1,185 +1,160 @@
-Return-Path: <netdev+bounces-251958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFO2KnP7cGmgbAAAu9opvQ
-	(envelope-from <netdev+bounces-251958-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:14:43 +0100
+	id sCeMMoYOcWlEcgAAu9opvQ
+	(envelope-from <netdev+bounces-251959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:36:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502CF59C1C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:14:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B6B5AA00
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BB4C370BF50
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:40:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5CAF89AFD58
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292B6481FCB;
-	Wed, 21 Jan 2026 15:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FEF481FAE;
+	Wed, 21 Jan 2026 15:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="AmkUiZfS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mUkHvPWy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24422.protonmail.ch (mail-24422.protonmail.ch [109.224.244.22])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3043A1E79
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 15:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71709421F05;
+	Wed, 21 Jan 2026 15:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769009193; cv=none; b=AykmGy4Snq/BKiqWpNWbYa4KQV5oeFIhqMXDEdGTq1mcmLnhUK7VzRHnv06pI5pt4uhxcGIK2BHdHmGL+ObNdF0/F4FLQv/RLpqoZzfpQ52bUlRzP7QfV7TO1bvt7O9CfPGsG3m/9KSAkCP+RhXpTp4zSTf1nmt0qtzi955A31k=
+	t=1769009628; cv=none; b=IPKUSYsK8RJGLHPTyLAgbH14tf3n9btzwSdix2Y/ItX5GTtKWhpcBCRG6yBomCKtbEMiT5ZXEKs6yBbjz6rY6Hgc3JTQJ45aUNMkjWnugOLrPnnsr6EmKUXcUNAw2LE+d3m3K+e+3V+tZVVoR3gk+yUBOCUlPR4lvqE/t7bLW2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769009193; c=relaxed/simple;
-	bh=oyBymticbDwZrPsHMr0S4yRd+VTTt5K56aJcq45Byjs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W5cW6E9RfviPqR63mBYsMC/CAcDxbx4sz60NNHQOncltsyIEg8gOO4Werftc3KV6BjfG0cba0cUHO1oSpK4INIoQTgfVbDefC2ZSbKwow1blz18zLRNfsXMRkbQrQgUIAkIzdUKhZ+du5Lt0sWFBfatkWQTPNXuxTlkCo2ON9hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=AmkUiZfS; arc=none smtp.client-ip=109.224.244.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1769009188; x=1769268388;
-	bh=7UQ5Pf+imMikWLYZlBN3h7Sffeu9yLrQkBOWdCS3OO8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=AmkUiZfSOskraquHLtlLEp0aCJiZZ0PZKJRpYYx9/dUbhq9dzITXhNHKwvqP7dEKs
-	 velKWx2hPyA0+DSIHmbxrMcg08pBuyDfEwPAfL4tAe8eR3ChGnSEgTW3eS9BDoDeDD
-	 10kj3/AHHUkabSMUuiuzFfkK4N+U6iMHMgvufxSehHjsAnyj7C5unR8ypCiBfLFVHk
-	 2KrU2GIQTuTB80Fo8/IfgWUXqrQHCrc9oOWwQb+x+VDuA+mrbGNR1HtCSIrrh1D25k
-	 UHQcwtoZgxZzKYXzZHVxNtur9R/FDXlpnaWYyEC4+Qk0A9H5fcK8o2Me7+8Tf9EfPZ
-	 n+aX4Jc6xk3Cw==
-Date: Wed, 21 Jan 2026 15:26:22 +0000
-To: Eric Dumazet <edumazet@google.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/7] net/sched: act_gate: zero-initialize netlink dump struct
-Message-ID: <iSkQcHVqeUy7WNAqfrY9xUAibm1YtrTUPIhZ_yjoHmyDissbQj04N2-quW8BURs4cddEB6bDp0BfXh0LfdYwUYKQudEaHv-4TjEOTI_rCic=@1g4.org>
-In-Reply-To: <CANn89i+zuXMZ1Jx226rPG0nHKmRjL1s-m56xk-KD6nWLdrY1Gg@mail.gmail.com>
-References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-2-p@1g4.org> <CANn89i+8_ZDxVGwQmo_44iCRs5Wexwxy1Wfhw4WmYg3qA7_t1A@mail.gmail.com> <BSn2a6IWtM_DnDrcd-qDBm8cXAwXPo3xj1l4Eu4SWy3BS2UW8Aw7-gXW6uo_DaCipnvmSxgDeGEQrnZ-pjqRKSOPPUW0usVN8M1lp1J-soM=@1g4.org> <CANn89iK_VqOThsWX2b-JwvF8suBVmKEmMm9D9SeZJBamDwfPog@mail.gmail.com> <YAOV0f1EtmF5tiEGoQMdsnQAKJSrqcg3h9hqnxDdba8MmAprjNHfcDBKselH1vYNZLb672n_zDJZpgjkVn0nHDS0Jh7BKQrh0uGwJYp2hEk=@1g4.org> <CANn89i+zuXMZ1Jx226rPG0nHKmRjL1s-m56xk-KD6nWLdrY1Gg@mail.gmail.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: 2df979a47a544552cb4e4b1739c691bd58331a3c
+	s=arc-20240116; t=1769009628; c=relaxed/simple;
+	bh=ActRY6ccNAJGp7Z1DF66+N/QLwqyaNsIMzLbkZkJCKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCKKtPqAGwpCpgFR44leo0dcZ9SanCbQdx40lQiySTMIiXkKat5xjFa0sXhjoCrsa3BnIFaJjLPUGN+mxa0k7Ac3XNgxzB6Q19VrVTzy+zy4JlTGvaTrfdG1hjvCZfcf2lsixUr+jUo7TdzHLB8I2gUlJ3hd35TKPXbHVu6LYVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mUkHvPWy; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769009627; x=1800545627;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ActRY6ccNAJGp7Z1DF66+N/QLwqyaNsIMzLbkZkJCKU=;
+  b=mUkHvPWy1B0b/+LqwhwCajWQa4D32yw4+mz2lZ25ORLOQUcJvZyrArbC
+   OhTwgm18CdWMibXI/aWGqoyaNrjvV2951Q1BVsESn6JwntdiUvuRAhU5z
+   2M841JOFtc4RGV9KHpHhGiM9+o8Dn/cooMo+EonsX1N0ExSKnT9nXbhZq
+   Y1j4LXyAUdENvHRHj6F+FJIrB457cdtJcmQOjbUEdeoR16eQmkjrcx6LY
+   +2kDV1ev6RN6zi4eag5dQ2Oo5qhLxm9V343vm2dY7DcNUaRpzm+jEGeXN
+   RD+TZt/2mbx1uH6xgnucVhqhCOaANo38uGSgUnxgiBkyQCjjAElFg/o5A
+   w==;
+X-CSE-ConnectionGUID: nPC4Ry0pS7KqyWRcMUd9iQ==
+X-CSE-MsgGUID: KfL0iJPPQ0e8R7/usCb1/Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="95717865"
+X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
+   d="scan'208";a="95717865"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 07:33:46 -0800
+X-CSE-ConnectionGUID: 42re4ESAS7iG7qWNlIeoTQ==
+X-CSE-MsgGUID: igiMfa5HR/CgXmZYy9uPvQ==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 21 Jan 2026 07:33:43 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1viaDE-00000000RLV-1IhP;
+	Wed, 21 Jan 2026 15:33:40 +0000
+Date: Wed, 21 Jan 2026 23:33:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Dmitry Skorodumov <dskr99@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net 2/3] ipvlan: Common code from v6/v4 validator_event
+Message-ID: <202601220042.cudmSYUb-lkp@intel.com>
+References: <20260120161852.639238-3-skorodumov.dmitry@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.46 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260120161852.639238-3-skorodumov.dmitry@huawei.com>
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251958-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251959-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DMARC_POLICY_ALLOW(0.00)[1g4.org,quarantine];
-	DKIM_TRACE(0.00)[1g4.org:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,huawei.com,google.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,1g4.org:email,1g4.org:dkim,1g4.org:mid,cppreference.com:url]
-X-Rspamd-Queue-Id: 502CF59C1C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 69B6B5AA00
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Was looking at tcfg_gate_entry and tcf_gate along with this instance of nla=
-_put, but I can't find my notes and I don't see the path currently. Like I =
-said, remove it, I don't care.
+Hi Dmitry,
 
-    if (nla_put(skb, TCA_GATE_PARMS, sizeof(opt), &opt))
-        goto nla_put_failure;
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Skorodumov/ipvlan-const-specifier-for-functions-that-use-iaddr/20260121-021651
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260120161852.639238-3-skorodumov.dmitry%40huawei.com
+patch subject: [PATCH net 2/3] ipvlan: Common code from v6/v4 validator_event
+config: csky-randconfig-r073-20260121 (https://download.01.org/0day-ci/archive/20260122/202601220042.cudmSYUb-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 15.2.0
+smatch version: v0.5.0-8985-g2614ff1a
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260122/202601220042.cudmSYUb-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601220042.cudmSYUb-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ipvlan/ipvlan_main.c:1023:30: warning: 'ipvlan_addr6_vtor_notifier_block' defined but not used [-Wunused-variable]
+    1023 | static struct notifier_block ipvlan_addr6_vtor_notifier_block __read_mostly = {
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-I have months invested into the UAF though and only just in the past 24 hou=
-rs was able to stabilize into user space, so no effort whatsoever has been =
-put into defeating kaslr or anything requiring infoleak.
+vim +/ipvlan_addr6_vtor_notifier_block +1023 drivers/net/ipvlan/ipvlan_main.c
 
-Look forward to more input on the much larger issue at hand.=20
+8c54904ac0f545 Dmitry Skorodumov 2026-01-20  1022  
+3ad7d2468f79fc Krister Johansen  2017-06-08 @1023  static struct notifier_block ipvlan_addr6_vtor_notifier_block __read_mostly = {
+8c54904ac0f545 Dmitry Skorodumov 2026-01-20  1024  	.notifier_call = ipvlan_addr_validator_event_cb,
+3ad7d2468f79fc Krister Johansen  2017-06-08  1025  };
+8c54904ac0f545 Dmitry Skorodumov 2026-01-20  1026  
 
-Thanks
-Paul
-
-
-
-
-On Wednesday, January 21st, 2026 at 8:03 AM, Eric Dumazet <edumazet@google.=
-com> wrote:
-
->
->
-> On Wed, Jan 21, 2026 at 3:01=E2=80=AFPM Paul Moses p@1g4.org wrote:
->
-> > padding? why does fzero-init-padding-bits exist?
->
->
-> Which padding are you referring to?
->
-> $ pahole -C tc_gate --hex net/sched/act_gate.o
-> struct tc_gate {
-> __u32 index; /* 0 0x4 /
-> __u32 capab; / 0x4 0x4 /
-> int action; / 0x8 0x4 /
-> int refcnt; / 0xc 0x4 /
-> int bindcnt; / 0x10 0x4 /
->
-> / size: 20, cachelines: 1, members: 5 /
-> / last cacheline: 20 bytes */
-> };
->
-> I see no padding.
->
-> > On Wednesday, January 21st, 2026 at 7:48 AM, Eric Dumazet edumazet@goog=
-le.com wrote:
-> >
-> > > On Wed, Jan 21, 2026 at 2:39=E2=80=AFPM Paul Moses p@1g4.org wrote:
-> > >
-> > > > Yes, it's not proven so you might be right, I knew it was 4 bytes a=
-t best. We can do next or toss it, I don't feel strongly either way.
-> > >
-> > > These bytes are cleared by C compilers.
-> > >
-> > > https://en.cppreference.com/w/c/language/struct_initialization.html
-> > >
-> > > Only holes might be left uninitialized.
-> > >
-> > > > On Wednesday, January 21st, 2026 at 7:25 AM, Eric Dumazet edumazet@=
-google.com wrote:
-> > > >
-> > > > > On Wed, Jan 21, 2026 at 2:20=E2=80=AFPM Paul Moses p@1g4.org wrot=
-e:
-> > > > >
-> > > > > > Zero-initialize the dump struct before selective assignment to =
-avoid
-> > > > > > leaking stack padding in netlink replies. This matches other ac=
-tions
-> > > > > > (e.g. act_connmark) that zero-init their dump structs.
-> > > > > >
-> > > > > > Fixes: a51c328df310 ("net: qos: introduce a gate control flow a=
-ction")
-> > > > > > Cc: stable@vger.kernel.org
-> > > > > > Signed-off-by: Paul Moses p@1g4.org
-> > > > > > ---
-> > > > >
-> > > > > I do not see a bug to fix, current code is fine.
-> > > > >
-> > > > > act_connmark problem was that "struct tc_connmark" had a 16bit ho=
-le.
-> > > > >
-> > > > > No such issue for struct tc_gate.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
