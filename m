@@ -1,235 +1,210 @@
-Return-Path: <netdev+bounces-252054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPA2EHZAcWn2fgAAu9opvQ
-	(envelope-from <netdev+bounces-252054-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:09:10 +0100
+	id uBWjKuZHcWn2fgAAu9opvQ
+	(envelope-from <netdev+bounces-252055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:40:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32115DD2C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:09:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAF95E292
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:40:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E30DDB2C1CC
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 20:56:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6719F66CAFB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85725423A83;
-	Wed, 21 Jan 2026 20:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1EF426EB4;
+	Wed, 21 Jan 2026 21:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="wgJ4vhPI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQeqyJeM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299D742317A;
-	Wed, 21 Jan 2026 20:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769028967; cv=none; b=sYSgwBZui8a/2zLzWbR36sZYSrw9WkvR10zBI3sLXinXLI8mC55Q27Eqc2WXeZalXVRZ5yQErowBHUWz7X9Ukz/SlUqPsRFF6OCZjGkENJQD5sOIt91G4ilK7K/6yKN9/ZQIDGksMd/DfiuAD2I21oTaA1h3YtZWJc62H6UjUoQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769028967; c=relaxed/simple;
-	bh=9c2aN3sKqlycUaVBM4faJ8YchGyPwKANJZQK2n0ZgGc=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=tPQNkAH1UhawuX7Df2SKtAOoG7t95NLz6wCvXqF0O2wKpf3fMs6c54HTy6JQ6XIUaf9A61UMbnif5PKeN7qGC8K1WxaT4PVCcHhsYWKS95gKKouCK2qSdpZPj38t2rK6AaD3Tmdea4wDAUs7abG39O2m9worevkUQZa6O61zTnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=wgJ4vhPI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02E9BC4CEF1;
-	Wed, 21 Jan 2026 20:56:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1769028964;
-	bh=9c2aN3sKqlycUaVBM4faJ8YchGyPwKANJZQK2n0ZgGc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=wgJ4vhPI4ZuqWfn5f95uSj9dcbjm5PvLaRj/uNLJy8MsMCRAGP/H9odeyQh8OkRvr
-	 W6zEckqL7UziwR+RJeDyL2a9c8Sftac9KGA6sYqApr5cfLlo8NeNkb2Bx/Ngdej61M
-	 7ftnd3/LypZLRJ4URK54hnSZKToFndBEmpeSxsA8=
-Date: Wed, 21 Jan 2026 12:56:03 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Qiliang Yuan <realwujing@gmail.com>
-Cc: david@kernel.org, mhocko@suse.com, vbabka@suse.cz, willy@infradead.org,
- lance.yang@linux.dev, hannes@cmpxchg.org, surenb@google.com,
- jackmanb@google.com, ziy@nvidia.com, weixugc@google.com, rppt@kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH v5] mm/page_alloc: boost watermarks on atomic allocation
- failure
-Message-Id: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
-In-Reply-To: <20260121065740.35616-1-realwujing@gmail.com>
-References: <20260121065740.35616-1-realwujing@gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4920426EC9
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 21:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769029673; cv=pass; b=JP4meTsnSPBiVJakXp6zbwVZXfMt3S5KUBO41vcIZANjKZHjMT1DJkZjOJR0faUHzreFUvi+XRYOdFA5PO0LbiCzrcJn1DBupWyDSZqnunlOE28VCIeowCh5nOUTpjI2C761Fz4eNjuir94Sj34NCbd5gf2XT2LHnGvPl6xysck=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769029673; c=relaxed/simple;
+	bh=vIrtZLlR9y3VX65/B/Uk/Cvhdyt5IYMtPMqdkwsTUis=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=au5vrUPb3S4XMUQcsHkowoAL/8BGA7megQLcVGurjcuG0LQ12iAs4RbSOFAjGOJtDUyKFkOJ1L7sgg6zbAsCqvv3no/nu97qH7Kmejt/DYHoPjcxCsBCaFD/W/SQH29F9PIPVX6aLMyoK1EQGH27YQh0tGNx/e6IbO0xyfG/kgk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQeqyJeM; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50299648ae9so24821cf.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:07:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769029667; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GoSHvTNb2XmAqjD+ljW7ZxAVn+VOOyBAn8tFKjQGZP8V3+B3Ug4q9/zyS5yS6qiiSt
+         vuw2jVDHDtcs8WsglYovHL8sioE3lnnf5dS7lZLJupr7NIdzNB2GSBnKuY7US6pI7OQj
+         UQfoatx4uJjnj3pkpBDkjN0PBS3GI6sY1smYRJw1YpPwKLO31t4+MabjOijjj1Bw6F2T
+         rFGi8PcqoqCmFCX4vv7+lKZ1NzcIAX1yi6I/E5hS2pWlRqmbc6AtLVhUjfZI+Lm/EH+e
+         QdQrr+C8ohll4i6XhR0FyMMohiCXNU+lvjqbhILz16xvtlaex1qGn7E1mfOf6jgonbEq
+         QGBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vIrtZLlR9y3VX65/B/Uk/Cvhdyt5IYMtPMqdkwsTUis=;
+        fh=Y4FzKJO6r3n7lpDaIqoPefam9ddU6ezeVhjFO/t5OYA=;
+        b=hzPnmP27ouhwCEsfVAyv/5aekzjMs4+GaVWcd7HrUjrAFcAiC8/CiH7+uIqhkiGQA0
+         ml9JwjU1oYtQzqVPneB1ULWr0uHz5Y+segGjLgWdLdg2DB6BGDHY6OiNgEFpFYJhcYqc
+         s9stQ5wpwnjzO5eoBMOOgLgPdV1jn+f02AvOxoB75eCj60nXpYRbcrt5b8fEeUKBxn84
+         iHm2CQ5pFSQQ2aTQLJccExlB7+9eMc4V/i4E0EBTCnk+9sD3l0NNVF7ze2uaW+V4XEJg
+         MM2F2SFk3FTk8G6a4n0lHSZeRlJ7RGnVLFWPAub0MvS0Itd2MZEzs4hI/VKxFH2FecrT
+         8x7w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769029667; x=1769634467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vIrtZLlR9y3VX65/B/Uk/Cvhdyt5IYMtPMqdkwsTUis=;
+        b=SQeqyJeMzhPwZVMwezMEbd/Zhg8Dp6ruPVSwYPG/XOz1e5uRFg4ksHfL9QtwxIXHfV
+         ptsIQ574V8qsD33A49aSXeEswthUWZu5q6OQztfVTUw7XbIFmX846CwEnmrdARgi0BjU
+         zW+RSaH54PmqgSyE94iTpD5KkQkJuB7dTvgCBAZrBsTukd0VDNS4AAz8vhsmKBCUi1w8
+         1ifEVM2pldEUht8y33DONlblUvkvItE8LdsGiEAalcWBpOdcJwEgFFB1fPfsK9/Xauwa
+         nLv/48DFgjdTL2tP+n9XWtHP7ZtH+5DEbrDkDmTKHv7LvY8Q/2pTKlCTs+gyEPbrygm/
+         tJow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769029667; x=1769634467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vIrtZLlR9y3VX65/B/Uk/Cvhdyt5IYMtPMqdkwsTUis=;
+        b=uJfAHgl7rysHUWyP2tVr0CX/x8UIdMBQKTC1SPE2Ellw4d3qSU8JhOhvtPst3ZsF2i
+         X8n/5JpFEYX7o1LiB8v0sO0nGnR/PZtwIpWsKUn72qLyPisfWhQ9e5uXvNDVMuTjkz3V
+         hDNfX/kO0hvNXQGG8W1uBzRgqZMHrury8hARU7bc7OIxRT1LBTojr+EvC9QIXLCnGZH3
+         /Syv21TxKLOTxVKwUMgN3rriETpxNo/VXzxyyV7Fu1hnOJlAfIZOEwRm7rquZKCD6446
+         BgTrg9s/bF5mOwm18tqjd35J2ixjH8ltJrnQOZ8wBIiWnKsocS9PipmNhQDeieg8CLVA
+         EUUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXny7+pmEaJFDHFIK9ABkRT7v235bfKtzOcCOHTZ/SMrZ01BoWSdcQRQ7l4ohV6d+ccExAx8bY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx17Ho4dcfDJ+e02Dv4lcNUBOT/8IzSBfzeEs62hkXWDVXhgpLF
+	aZ9XjOdjrUsOq9UD82/C/LYzlCI52HDXLVvJ2ARxiu/+oDlt87o+JojwQEAVcH3iExHDzKcvoAn
+	Yb8nzkCzl+Me48cx72OILnEv92d95nLFi/KII4rUf
+X-Gm-Gg: AZuq6aIq5kCcMMbbOUlNHxY1g3+O5pv04HASKghIu5XPXRGQgdFMyawdlZ41hi5dYlH
+	aEuyGRuMDFGJOFFQEIbj5vts9Bs+H7oYS+t+Qd34pA8QLD1kgFUrpMlu5tb6Om2KmCr0dsDN36M
+	e8HqbzOyhaHInmTR0iAJXETO9Q6KR8ImGmn4Fwk6Z9znSULNrGjIhrMkKMtNdlTANiNPCGx2Ko6
+	ASKcjHiR/AluP9EvpmXjzV8PtME1YSarm3YpwWfQZabHngKTjYTZQR0bE4dg6pNbPjWXDxL7d5d
+	p7G3VWgINZyOLaC1ahPjJWOgaPZPJaXxxEgTS6rgADi3Z7ppAQLIbSllPpmr
+X-Received: by 2002:a05:622a:10d:b0:4b7:9a9e:833f with SMTP id
+ d75a77b69052e-502ece23329mr407501cf.7.1769029666268; Wed, 21 Jan 2026
+ 13:07:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
+MIME-Version: 1.0
+References: <20260121143215.14717-1-chia-yu.chang@nokia-bell-labs.com> <20260121125504.32ea788c@kernel.org>
+In-Reply-To: <20260121125504.32ea788c@kernel.org>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Wed, 21 Jan 2026 16:07:29 -0500
+X-Gm-Features: AZwV_QjMA9pxvIgwt5ruSX8S6CumDWx8tec6mJvW5t5NdsFW525cQ4qDlmi2IZ8
+Message-ID: <CADVnQym58ujAwozxSgMNxcCBvTf5JVYrzEoDuBFTjheY-PoHHQ@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 00/15] AccECN protocol case handling series
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: chia-yu.chang@nokia-bell-labs.com, pabeni@redhat.com, edumazet@google.com, 
+	parav@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org, 
+	dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
+	stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, andrew+netdev@lunn.ch, donald.hunter@gmail.com, 
+	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org, 
+	linux-kselftest@vger.kernel.org, ij@kernel.org, 
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+	vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[linux-foundation.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252055-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252054-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	FREEMAIL_CC(0.00)[nokia-bell-labs.com,redhat.com,google.com,nvidia.com,vger.kernel.org,lwn.net,kernel.org,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,linux-foundation.org:mid,linux-foundation.org:dkim]
-X-Rspamd-Queue-Id: C32115DD2C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,nokia-bell-labs.com:email,mail.gmail.com:mid,linux.dev:url]
+X-Rspamd-Queue-Id: 4EAF95E292
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 21 Jan 2026 01:57:40 -0500 Qiliang Yuan <realwujing@gmail.com> wrote:
+On Wed, Jan 21, 2026 at 3:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 21 Jan 2026 15:32:00 +0100 chia-yu.chang@nokia-bell-labs.com
+> wrote:
+> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> >
+> > Hello,
+> >
+> > Plesae find the v10 AccECN case handling patch series, which covers
+> > several excpetional case handling of Accurate ECN spec (RFC9768),
+> > adds new identifiers to be used by CC modules, adds ecn_delta into
+> > rate_sample, and keeps the ACE counter for computation, etc.
+>
+> Looks like we went in the wrong directions, multiple tests are failing
+> now:
+>
+> https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2026-01-21--=
+18-00&executor=3Dvmksft-packetdrill&pw-n=3D0&pass=3D0
 
-> Atomic allocations (GFP_ATOMIC) are prone to failure under heavy memory
-> pressure as they cannot enter direct reclaim. This patch introduces a
-> 'Soft Boost' mechanism to mitigate this.
-> 
-> When a GFP_ATOMIC request fails or enters the slowpath, the preferred
-> zone's watermark_boost is increased. This triggers kswapd to proactively
-> reclaim memory, creating a safety buffer for future atomic bursts.
-> 
-> To prevent excessive reclaim during packet storms, a 1-second debounce
-> timer (last_boost_jiffies) is added to each zone to rate-limit boosts.
-> 
-> This approach reuses existing watermark_boost infrastructure, ensuring
-> minimal overhead and asynchronous background reclaim via kswapd.
-> 
-> Allocation failure logs:
-> [38535644.718700] node 0: slabs: 1031, objs: 43328, free: 0
-> [38535644.725059] node 1: slabs: 339, objs: 17616, free: 317
-> [38535645.428345] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-> [38535645.436888] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-> [38535645.447664] node 0: slabs: 940, objs: 40864, free: 144
-> [38535645.454026] node 1: slabs: 322, objs: 19168, free: 383
-> [38535645.556122] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-> [38535645.564576] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-> [38535649.655523] warn_alloc: 59 callbacks suppressed
-> [38535649.655527] swapper/100: page allocation failure: order:0, mode:0x480020(GFP_ATOMIC), nodemask=(null)
-> [38535649.671692] swapper/100 cpuset=/ mems_allowed=0-1
+Looks like the first two are failing because the v10 series has a
+different layout for tcp_info than what packetdrill currently expects:
 
-This seems sensible to me - dynamically boost reserves in response to
-sustained GFP_ATOMIC allocation failures.
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/483641/3=
+0-tcp-accecn-delivered-updates-pkt/stdout
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/483641/5=
+8-tcp-accecn-delivered-falseoverflow-detect-pkt/stdout
 
-It's very much a networking thing and I expect the networking people
-have been looking at these issues for years.  So let's start by cc'ing
-them!
+Chia-Yu, can you please post a patch for packetdrill to make it expect
+the new layout from the v10 series?
 
-Obvious question, which I think was asked before: what about gradually
-decreasing those reserves when the packet storm has subsided?
+For the third one:
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/packetdrill/results/483641/6=
+9-tcp-accecn-client-accecn-options-lost-pkt/stdout
 
-> v4:
->   - Introduced watermark_scale_boost and gradual decay via balance_pgdat.
+... it looks like the test line that says:
 
-And there it is, but v5 removed this.  Why?
++.002 ... 0.052 connect(4, ..., ...) =3D 0
 
-Or perhaps I'm misreading the implementation.
+needs to be changed to:
 
->   - Added proactive soft-boosting when entering slowpath.
-> v3:
->   - Moved debounce timer to per-zone to avoid cross-node interference.
->   - Optimized candidate zone selection to reduce global reclaim pressure.
-> v2:
->   - Added basic debounce logic and scaled boosting strength based on zone size.
-> v1:
->   - Initial proposal: Basic watermark boost on atomic allocation failure.
-> ---
->  include/linux/mmzone.h |  1 +
->  mm/page_alloc.c        | 29 ++++++++++++++++++++++++++++-
->  2 files changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-> index 75ef7c9f9307..8e37e4e6765b 100644
-> --- a/include/linux/mmzone.h
-> +++ b/include/linux/mmzone.h
-> @@ -882,6 +882,7 @@ struct zone {
->  	/* zone watermarks, access with *_wmark_pages(zone) macros */
->  	unsigned long _watermark[NR_WMARK];
->  	unsigned long watermark_boost;
-> +	unsigned long last_boost_jiffies;
->  
->  	unsigned long nr_reserved_highatomic;
->  	unsigned long nr_free_highatomic;
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index c380f063e8b7..1faace9e2dc5 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -2189,12 +2189,31 @@ static inline bool boost_watermark(struct zone *zone)
->  
->  	max_boost = max(pageblock_nr_pages, max_boost);
->  
-> -	zone->watermark_boost = min(zone->watermark_boost + pageblock_nr_pages,
-> +	zone->watermark_boost = min(zone->watermark_boost +
-> +		max(pageblock_nr_pages, zone_managed_pages(zone) >> 10),
++.002 ... 0.102 connect(4, ..., ...) =3D 0
 
-">> 10" is a magic number.  What is the reasoning behind choosing this
-value?
+It seems like running the tests before emailing the patches should
+have caught these 3 issues?
 
->  		max_boost);
->  
->  	return true;
->  }
->  
-> +static void boost_zones_for_atomic(struct alloc_context *ac, gfp_t gfp_mask)
-> +{
-> +	struct zoneref *z;
-> +	struct zone *zone;
-> +	unsigned long now = jiffies;
-> +
-> +	for_each_zone_zonelist(zone, z, ac->zonelist, ac->highest_zoneidx) {
-> +		/* 1 second debounce to avoid spamming boosts in a burst */
-> +		if (time_after(now, zone->last_boost_jiffies + HZ)) {
-> +			zone->last_boost_jiffies = now;
-> +			if (boost_watermark(zone))
-> +				wakeup_kswapd(zone, gfp_mask, 0, ac->highest_zoneidx);
-> +			/* Only boost the preferred zone to be precise */
-> +			break;
-> +		}
-> +	}
-> +}
-> +
->  /*
->   * When we are falling back to another migratetype during allocation, should we
->   * try to claim an entire block to satisfy further allocations, instead of
-> @@ -4742,6 +4761,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
->  	if (page)
->  		goto got_pg;
->  
-> +	/* Proactively boost for atomic requests entering slowpath */
-> +	if ((gfp_mask & GFP_ATOMIC) && order == 0)
-> +		boost_zones_for_atomic(ac, gfp_mask);
-> +
->  	/*
->  	 * For costly allocations, try direct compaction first, as it's likely
->  	 * that we have enough base pages and don't need to reclaim. For non-
-> @@ -4947,6 +4970,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
->  		goto retry;
->  	}
->  fail:
-> +	/* Boost watermarks on atomic allocation failure to trigger kswapd */
-> +	if (unlikely(page == NULL && (gfp_mask & GFP_ATOMIC) && order == 0))
-> +		boost_zones_for_atomic(ac, gfp_mask);
-> +
->  	warn_alloc(gfp_mask, ac->nodemask,
->  			"page allocation failure: order:%u", order);
->  got_pg:
-> -- 
-> 2.51.0
+Chia-Yu, can you please make sure you run all the AccECN packetdrill
+tests with the latest kernel and latest packetdrill binary you are
+proposing, before posting a v11 kernel patch series and packetdrill
+patch?
+
+Thanks,
+neal
 
