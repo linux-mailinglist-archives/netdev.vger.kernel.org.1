@@ -1,293 +1,466 @@
-Return-Path: <netdev+bounces-251893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251898-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFIRFgnccGnCaQAAu9opvQ
-	(envelope-from <netdev+bounces-251893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:00:41 +0100
+	id CPYBHtzdcGnCaQAAu9opvQ
+	(envelope-from <netdev+bounces-251898-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:08:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EC258135
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:00:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E84AB5827A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A071046BDBF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:38:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4B2499C65A0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A778478E52;
-	Wed, 21 Jan 2026 13:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D07481FDE;
+	Wed, 21 Jan 2026 13:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fMc1pKDC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HfeUaDpU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0BC2D5C74;
-	Wed, 21 Jan 2026 13:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002667; cv=fail; b=K3kJDysKMQF+yhmBaWN/N69CovcpcnTp5KaQ9YH3QXtqLXD/PMpwzMnmktzP8y2X9p6fnasLj9y4HkEzNitfOqr1AiK14S+cRb0KCvB6hUTvzaP9HyLv/b9KiUcEOYNAB26h1Q5paKAhg7uKNJtfb39UX4UkJNWYPCS4o33vnmg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002667; c=relaxed/simple;
-	bh=TvtflOPDWtaCCvE+GOWPiQDCpdiHKaKGGCi6m6TJzVs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YSOr8y6PMsBoqDqzPhFp5tp6yxySXdPqgC1vuk5TbFDCvsvrFu3gIy8FVvK4coYuCcQbm+AB0LiOgAfbeuIMMLI2CofDB8hvaOk1KivF4Q4S/D9J5Q1oswv8tHfou6aJANcHyfNFY+nTtymKfjouHDLo5wIAO1dO/PSM266Pais=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fMc1pKDC; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769002665; x=1800538665;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TvtflOPDWtaCCvE+GOWPiQDCpdiHKaKGGCi6m6TJzVs=;
-  b=fMc1pKDCy4C40pohVW7PnHH72jnm7+N4SLb3eVCKWHzdCRMNgmTsgy0k
-   UDzUCfFbKB+HgwoOIRMyWgXCpHfynW0pOnHRidLZJskXjETL+w12xv2nt
-   9AEHqrsKXwaxg8vTlDbKTkpJB86rj2+zzWJuXpdAJNSedoBq1RcR4GizI
-   5ALcYjEmJIcALtpwWYIOeyaLLcUQgzavPcZKhyn0KW3yqR0QvAeWWtLMg
-   yiHkK0tBX3AN9Qy7RuIotiFlftsSZuF5z4+7uU7/Cg+dl+/f1n4ctKwUW
-   zbEyPFbJGbZblf1VjFHKqI7UGRQL2ty3Ekcp/jcm7QHTDY5Wm2xgNKGB+
-   w==;
-X-CSE-ConnectionGUID: BzJFj1szRsCOha08/CcaPw==
-X-CSE-MsgGUID: ziIEnZmsQ8mRsOEuKXby1A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="81673365"
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="81673365"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 05:37:44 -0800
-X-CSE-ConnectionGUID: bLAuT7ytTiWrHshp5RFniw==
-X-CSE-MsgGUID: m+br48VRSNKSNSo/UCDVsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="206689307"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 05:37:44 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 21 Jan 2026 05:37:43 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Wed, 21 Jan 2026 05:37:43 -0800
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.58) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 21 Jan 2026 05:37:43 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Yj1ceiEkSo7Qbv4hlAFdBIgbcSWdF9p7uOudDi5HANOHvn2r3nsUPCwBaaQz+vE7k/lnT4GLHUq1o1fz/w0LDBfr6C8yvZx/8negfox6Z6vjth31N3l4Bl5A0H4gaVjwE+iN0CW1Goz+YJUN4odJL/aSAILEkuZcAbZI8ZmiscxIR8hP2MgnbTlGJ35p2K2eGKVQxXMlZv9e3GWs2N6T520XhIUQ0sWY53WK07IN9HHpXn32xlbnSIYiLeNLOtjYVW8CQjhBlx2XMbb2DMsXpzdNRUcRi9ZX1LVHC34e8TyORcwISJN9bwPLakCTPUf8/v3JnAR7ejL0AYXRZ9ktDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NFcvQ3m3VYgLPiLEkX30316wvMI7MnALoomLbg0sKpE=;
- b=vqZW9SH+vxBWFjj3Vm3B5V0V0sX8AGI7j+xlazUHXadwrXB7EGAJpehLsg/f5hYGENh7dcDLjVQSkSGG1J0+0Fl+0FGdHlb81X3WzQ47/8YVpTuQQ+I7ltQa7AL4gfZzhNNHE2C6+VeiowvsW0K2+bREII/PKY7Q9duvdtjXt8Xj3fNwTYusgN04MggPwrI5igPgfRkDQbcJ4q0frXmkPuV6siAuBQoIUsJAA9iHNY15uVxVDxuu+Hz8MRBDEZRH0MU8HQe38jTjh2unu7zdC9fHejzmmGtGGhFu9eHNvnD9vbSj/fP1pohTJ4x+xbI7tZwebG5nx14ad8/omFHhoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from LV4PR11MB9491.namprd11.prod.outlook.com (2603:10b6:408:2de::14)
- by DS0PR11MB7959.namprd11.prod.outlook.com (2603:10b6:8:fd::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.9; Wed, 21 Jan 2026 13:37:35 +0000
-Received: from LV4PR11MB9491.namprd11.prod.outlook.com
- ([fe80::f110:9a4f:b4cb:2eeb]) by LV4PR11MB9491.namprd11.prod.outlook.com
- ([fe80::f110:9a4f:b4cb:2eeb%7]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
- 13:37:35 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: "Vecera, Ivan" <ivecera@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jiri Pirko
-	<jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Michal Michalik
-	<michal.michalik@intel.com>, "Olech, Milena" <milena.olech@intel.com>, "open
- list" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net] dpll: Prevent duplicate registrations
-Thread-Topic: [PATCH net] dpll: Prevent duplicate registrations
-Thread-Index: AQHcitX/4OZPvpX57keVL223l6X5+7VcoFFA
-Date: Wed, 21 Jan 2026 13:37:35 +0000
-Message-ID: <LV4PR11MB9491BC664A5ADA3D0DA7F1559B96A@LV4PR11MB9491.namprd11.prod.outlook.com>
-References: <20260121130012.112606-1-ivecera@redhat.com>
-In-Reply-To: <20260121130012.112606-1-ivecera@redhat.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV4PR11MB9491:EE_|DS0PR11MB7959:EE_
-x-ms-office365-filtering-correlation-id: a1da1f8b-4f09-40d2-3af4-08de58f23cd0
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?H6nxuVf6u9xfOIO3jrPwe3mp+yOnsvRDg2UuGsBjrw7CuQ+/JyaJORqE1kAx?=
- =?us-ascii?Q?NLCJJxC1DmxMfY0ty3RW8R66Po1a0wHFqtoLysl9z+xAK0B7FqCakeW9h2KG?=
- =?us-ascii?Q?aTrtAT62FeoqPBMmLlaYUGMAo95hIq4qBVSkb3Bx9rRshz9MTuvIqvmMVgYF?=
- =?us-ascii?Q?t6JD9fO7a1c5RmsT1wNel3lhA1Jaqk9Gk4CDL4nnCGzrb0GxL0KvjAKWLt1y?=
- =?us-ascii?Q?CoZsXqDi+ZIlptRaMxvlSIB3+4uaiIhtEB8cWjN4P0MVOZyNqZP3ZstbxHmh?=
- =?us-ascii?Q?3gdb/9vv6hmAOvYb1NQx5Pww9cirD5/9YKeIstu9Zgh8Dmzu0YCaagThLnkJ?=
- =?us-ascii?Q?Kav+stBfSD0HF1//mthEfVjLwxjmRvQuKNP53/TZZCfO3PYNwCVgN2bbHur3?=
- =?us-ascii?Q?AZAdvpxI9oN94IHGleMdSIfQbEdLCaCez4VBANnaVHZEEBavhWF0jKdlMtZe?=
- =?us-ascii?Q?S/faoYLzbsUR7O11qjl5wmj6OxM95Nn3tp/WUK4l3a3AtsLo6MgQ+5WDjnGE?=
- =?us-ascii?Q?narCZ0mLyUX4yYsUfV+Q58bTx/uOQMSYJKZe62VvFI52lcRlz/3iWEqz8NZr?=
- =?us-ascii?Q?5NWUrnVaWgZv7DB0iHXGKLGbxqQlEf9Q/oIYWis0ZA8FKCMhgGSuXqr7pqag?=
- =?us-ascii?Q?8AKPVp4RL6IpObG+CrhWYcRPui/X5p1w5mDr76chyw49bWTMUreg+L3EqWVp?=
- =?us-ascii?Q?2cGlqvOXKqhRG2xtfIPwMrk1nPki2m5STdPI5OkI2wwX42rS826IL7RcvApa?=
- =?us-ascii?Q?X87X9wZBmkVlzWcojMWv8THUHyd0FmHCPfpkU4GKMhPgPLs2Znl1JRrGx+tk?=
- =?us-ascii?Q?uWzrvCl3pNXNxoP9e3Kn8Ih8pCdyLEAtjKiI94nq/OU3pCS1Q+6Lts986RIN?=
- =?us-ascii?Q?bdJlqgho/+5jG7Utmu7D50C7PmBfyaxHs/vkqufEF18YmJPEYAgrpxxKOe6r?=
- =?us-ascii?Q?sldiQNgFuQV34i827eih/P4EAlSEVhsYxHaAivrlU+NItbC7XbZnQ7zIrWD9?=
- =?us-ascii?Q?TGVcD+tlsUmtA9rqxns5Xsagw1I0hdGMG/eYQE8avbBXkoehC7JKTGGa1Cpa?=
- =?us-ascii?Q?BQjZ6mZmqDY6JkX68w8XySLdamux2SOKUPV4S7uhOF/4qfAv/S2kufiggFpN?=
- =?us-ascii?Q?ApTWbSUCRWUBkIwkEC60CTBEpXrCCiYTlYqfQirGnEyqTeB2ux4M+ptR3Sgx?=
- =?us-ascii?Q?Puijymn9AB4UvaEBUZMSu7ghgpLTn1+Q++3OmwNFv/w4GdI1K8B5FQkc2eTF?=
- =?us-ascii?Q?jq2RnFDED0e8GdUwnbQLNzW8W2Utsb0pzSqB3l3+knmTpfaFx83LYN85OF/M?=
- =?us-ascii?Q?Xofe1beruAxBH6hy84s/QkRxXa9lb9xdMADEOFkI3z/T2Q4HdCwvUdwU8s+O?=
- =?us-ascii?Q?W9ALrdqSm89MNSmPQDLPxs+OLxS1nb/vRKBBMt34nyOf51S8vYFjxXqd063C?=
- =?us-ascii?Q?5zjao2qttscde/Y3b0vB0XJ2xkQwmyr3b1uxvU8R8wCdalgJslIkD4awBtkL?=
- =?us-ascii?Q?HAJZXCPP90VpTLcKo+PA8jb9Lro++XO0HqgxBtb2moA/FGVlyeuWJB94/RIp?=
- =?us-ascii?Q?+h6lDIOAsh0vM/+B80PSlRPhBe2jDvg4HS0L1xNk0Yu7r0Zay+Ypof6Nxgx+?=
- =?us-ascii?Q?4Nqlq8vRXen66LCn4G9etYE=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV4PR11MB9491.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+rvcRpMy8KzvG4N2SiGApV7mzDdsoGSdddSDwAGtHYWO6WQx0Mc7bQx9kFf3?=
- =?us-ascii?Q?0Amr7jTJ8nmVO6vkcASalWBMYh0vB4mitbWf8Q7olALo3IWMgnT56szFtqJx?=
- =?us-ascii?Q?XnxpfNTeHoSQM7IdeG05JF0x2tJa/rtuoKPhPi1Ix0JUu7BIKOpZtK/LvG8o?=
- =?us-ascii?Q?26DJro3TKb/rtZTv8AnGSBy73YDdI7JmbUx6cK6X37Cnbun7RfZvdTjyMzHq?=
- =?us-ascii?Q?PlbFrKNCXqHkEJZEHGJtbz4IIvzeNqU2XFfHbQ+PY9VmyWmIfVONum+v8H8u?=
- =?us-ascii?Q?lNbMuxXAtU3qVRF9/z38FGCJctsIkFMupMHdaaSsIQazTj9A2cknG3Jfjs30?=
- =?us-ascii?Q?3M32uyQh+no2lNxPF4X6AqR+kbg1WoVEUp1l5tBYBXkGnAEN0io4SrIEYGyW?=
- =?us-ascii?Q?qPSTynUuwNxkdDTYgE5Y2cLJU3q4kTtcKi4xq2gmxsOZbGXQvgK6/24WoUhV?=
- =?us-ascii?Q?WgLaNGDl9JAI76H9OHdWc/xK+J3hLEMbnrgYMW+zEmTi7qYp1/qT4Z+Mfff3?=
- =?us-ascii?Q?N2jB811zyP6fotoacYrdsispbpKnM3iJZfDi2jh8R4inNjs52mo4QMy0lArL?=
- =?us-ascii?Q?RAM5mM4t6b1MycgwK5uZYWtPyYMZj+gasdFr80uKntQyCNZRM93BRMLIrGT0?=
- =?us-ascii?Q?XpG3S8EDb6sfOf4LS781XUoK2VRZgshVDvqFV53qgt8XbUF7pIUgurcsdsbM?=
- =?us-ascii?Q?Gn9GAkbjlkkXDKFQKH6lMpDZaJICc4z1NLd+TVrgfAHo8srGVuBc7+Hu03Ty?=
- =?us-ascii?Q?lY3YPcNdlz/3PAsiOWeoYhFOWj1SebdBYkqNcK8z7R47QIpb6vf1tErKXeMG?=
- =?us-ascii?Q?DmxeOZDK55LQClvL/9mkkpZJcvWtwcpYxq5nzWpBv+f7bvJlYRfZXHJ8ooSd?=
- =?us-ascii?Q?ho1QXt8jLfDT4uPx9EYES1iTQFK1GRrk7lv9EiSezkKFW1vGiaMMBKgHq+EA?=
- =?us-ascii?Q?RXv3Vt0G9hedCCHjtEgtmwjHnmDRSebDQOaHmF1ekCkO3PfKBVhMVFoRJAZP?=
- =?us-ascii?Q?1o/dVzdEqUolyuwhJKNa4X56mKRCXRHaPfrVXKi8Y/mb0O1kzPUCVaAZfn2C?=
- =?us-ascii?Q?CsiCPCbnTeD6WCIHHX/NttF2Olq5FHezqQGcr4AxTtxG5dAQvTbh0uCyE/UD?=
- =?us-ascii?Q?hl+YXQU7RIrSn2XNZwghtzFqnDEX0nsZR2KtpG/NhFidBYO6nXXfL/QFEpKq?=
- =?us-ascii?Q?f1+fWFzD0elZTnTR+HRYQbNEEsbAZKEhYLmPskGaWSFD25xvwK6GRVQMaqLQ?=
- =?us-ascii?Q?uqekwZJ41F3CNdCRFE7jRNxOXwNzz+527o7iZkVAitjJOBvxJwYJ/gj/eBgN?=
- =?us-ascii?Q?I/1gjFqCGmHnuBYnpWf/DjP9wlom0Y5FzuV2v6yvPNa27FzBqqVp7LF0RIlo?=
- =?us-ascii?Q?PY8enhv2EKIS/g3lZRDqOoPMr4Jb9YvPl2l+FUDl8a0AJxaLtyYh8Q54/onX?=
- =?us-ascii?Q?YhheiHqr3ljFPeErtp82wzWQKRN770ynqwD5UEUhpCGAVE4y4qDtY6dyKEHn?=
- =?us-ascii?Q?zQ+oFdWXqsCY0M7zymudBFnajA7hUmOndUfbj0eX+eXMHgE4r3OXXZzr1W/i?=
- =?us-ascii?Q?jZ6dwB/AuxA8VxSXxuH4EBVwWK7kDcaxKLUrVhx2HPundBBua9EEzj+EotC9?=
- =?us-ascii?Q?2xbHHFDyEY275iDbAsIQWdyWAy44d4w1t6IfI3RQn5UP+uBmNwWc5rI7PFe5?=
- =?us-ascii?Q?WwDjLxer0P8xySusj5KbRm42jK+q2SzLLGDxIyuxcKg4ojFpTdVpJ1hEtL1Z?=
- =?us-ascii?Q?SH/wJrWNhkNFb5dLSUQDxLklll3lKOw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668A036A038
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769002694; cv=none; b=ERSV7kiHylr2m47P59HjAMac7nl4ms/cX9FOC2l6d+K0yXmeiCafbK7qz9MTBqmRO84StpRiGBn5Nwu1XU4BtYjwnd0I4ujnzOdFWVw55ytZmYJm8UqUXPwR8+94kdoX5WmnRVCc2BpPTGENNbNOBv7IS7ryQ7b1bdsgzY9noIo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769002694; c=relaxed/simple;
+	bh=iR6XHmJFA879/yyIsPoScf2YIt0jLu7HWFtTK+winkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jDAh7mLneGKza/Cm72LGkY5wBwG5eByDEVVEavZ1lYe6aqMh+yvogkNAuzBBK2nktZjVaqAocPw7BZi8F5b94xH49qU7PUw/Gd7P72tGSUh8BONMolte1gRWoLvkbMH5xS9cKRIdG74uNF8Xw5C4z3XT9oGtfHiDGIwR4Cez1gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HfeUaDpU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769002691;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RVCIb6rbCzcctUz+w8XKQqVbZ4BIMGpGw5n1QrjosmA=;
+	b=HfeUaDpUfIiIZ3NarpLTM+6MJKUcCTv53TPoCdvhzUbk/P+2FROw1egyqM6vG25dkU6A2I
+	qgVSVn2P/41drO5l2zPDWzvUvfJ5LJr64uva/sAEO7sYeg1HO17PsD8pvaPQq1F8Lt64ZJ
+	SHVay2Arm7uovM0gKcPk4dqOZt4fbDU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-GqaFi-aoPYapcbedFS0t9Q-1; Wed,
+ 21 Jan 2026 08:38:07 -0500
+X-MC-Unique: GqaFi-aoPYapcbedFS0t9Q-1
+X-Mimecast-MFC-AGG-ID: GqaFi-aoPYapcbedFS0t9Q_1769002686
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07B6C180047F;
+	Wed, 21 Jan 2026 13:38:06 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.44.33.242])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7229730002D5;
+	Wed, 21 Jan 2026 13:38:02 +0000 (UTC)
+From: Felix Maurer <fmaurer@redhat.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jkarrenpalo@gmail.com,
+	tglx@linutronix.de,
+	mingo@kernel.org,
+	allison.henderson@oracle.com,
+	petrm@nvidia.com,
+	antonio@openvpn.net,
+	bigeasy@linutronix.de
+Subject: [PATCH net-next 8/9] hsr: Update PRP duplicate discard KUnit test for new algorithm
+Date: Wed, 21 Jan 2026 14:37:35 +0100
+Message-ID: <df57cc66c54d5be097b78ce367a51551bcf69cd8.1769001553.git.fmaurer@redhat.com>
+In-Reply-To: <cover.1769001553.git.fmaurer@redhat.com>
+References: <cover.1769001553.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV4PR11MB9491.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1da1f8b-4f09-40d2-3af4-08de58f23cd0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2026 13:37:35.8233
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5sbmD8deqfN3r53ImbZN7HQKaIEvojP9iDX/YROSEk+zL0EDl65z1aqiHCJFSOLXTARxPmZq+Pf56LaktzwYQVZ78i/gzG/1n+fd8G1vEsg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7959
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251893-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251898-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,intel.com:email,intel.com:dkim];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 69EC258135
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: E84AB5827A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->From: Ivan Vecera <ivecera@redhat.com>
->Sent: Wednesday, January 21, 2026 2:00 PM
->
->Modify the internal registration helpers dpll_xa_ref_{dpll,pin}_add()
->to reject duplicate registration attempts.
->
->Previously, if a caller attempted to register the same pin multiple
->times (with the same ops, priv, and cookie) on the same device, the core
->silently increments the reference count and return success. This behavior
->is incorrect because if the caller makes these duplicate registrations
->then for the first one dpll_pin_registration is allocated and for others
->the associated dpll_pin_ref.refcount is incremented. During the first
->unregistration the associated dpll_pin_registration is freed and for
->others WARN is fired.
->
->Fix this by updating the logic to return `-EEXIST` if a matching
->registration is found to enforce a strict "register once" policy.
->
->Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->---
-> drivers/dpll/dpll_core.c | 12 ++++--------
-> 1 file changed, 4 insertions(+), 8 deletions(-)
->
->diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->index a461095efd8a..8879a7235156 100644
->--- a/drivers/dpll/dpll_core.c
->+++ b/drivers/dpll/dpll_core.c
->@@ -83,10 +83,8 @@ dpll_xa_ref_pin_add(struct xarray *xa_pins, struct
->dpll_pin *pin,
-> 		if (ref->pin !=3D pin)
-> 			continue;
-> 		reg =3D dpll_pin_registration_find(ref, ops, priv, cookie);
->-		if (reg) {
->-			refcount_inc(&ref->refcount);
->-			return 0;
->-		}
->+		if (reg)
->+			return -EEXIST;
-> 		ref_exists =3D true;
-> 		break;
-> 	}
->@@ -164,10 +162,8 @@ dpll_xa_ref_dpll_add(struct xarray *xa_dplls, struct
->dpll_device *dpll,
-> 		if (ref->dpll !=3D dpll)
-> 			continue;
-> 		reg =3D dpll_pin_registration_find(ref, ops, priv, cookie);
->-		if (reg) {
->-			refcount_inc(&ref->refcount);
->-			return 0;
->-		}
->+		if (reg)
->+			return -EEXIST;
-> 		ref_exists =3D true;
-> 		break;
-> 	}
->--
->2.52.0
+With the new duplicate discard algorithm from the earlier patches, the
+KUnit test for the algorithm needs to be updated. The updates are done in a
+way to match the original intends pretty closely. Currently, there is much
+knowledge about the actual algorithm baked into the tests (especially the
+expectations) which may need some redesign in the future.
 
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Felix Maurer <fmaurer@redhat.com>
+---
+ net/hsr/hsr_framereg.c         |  11 ++-
+ net/hsr/hsr_framereg.h         |   4 +
+ net/hsr/prp_dup_discard_test.c | 154 +++++++++++++++------------------
+ 3 files changed, 80 insertions(+), 89 deletions(-)
+
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index a8cb94faf139..207a51c8d039 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -11,6 +11,7 @@
+  * Same code handles filtering of duplicates for PRP as well.
+  */
+ 
++#include <kunit/visibility.h>
+ #include <linux/if_ether.h>
+ #include <linux/etherdevice.h>
+ #include <linux/slab.h>
+@@ -293,8 +294,8 @@ static void hsr_forget_seq_block(struct hsr_node *node,
+  * expire after time (in low traffic situations) or when they are replaced in
+  * the backing fixed size buffer (in high traffic situations).
+  */
+-static struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
+-					       u16 block_idx)
++VISIBLE_IF_KUNIT struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
++							 u16 block_idx)
+ {
+ 	struct hsr_seq_block *block, *res;
+ 	size_t block_sz;
+@@ -325,6 +326,7 @@ static struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
+ 
+ 	return block;
+ }
++EXPORT_SYMBOL_IF_KUNIT(hsr_get_seq_block);
+ 
+ /* Use the Supervision frame's info about an eventual macaddress_B for merging
+  * nodes that has previously had their macaddress_B registered as a separate
+@@ -618,10 +620,7 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+ 
+ 	return hsr_check_duplicate(frame, 0);
+ }
+-
+-#if IS_MODULE(CONFIG_PRP_DUP_DISCARD_KUNIT_TEST)
+-EXPORT_SYMBOL(prp_register_frame_out);
+-#endif
++EXPORT_SYMBOL_IF_KUNIT(prp_register_frame_out);
+ 
+ static struct hsr_port *get_late_port(struct hsr_priv *hsr,
+ 				      struct hsr_node *node)
+diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
+index 1e297268d1d4..93fc7ae49306 100644
+--- a/net/hsr/hsr_framereg.h
++++ b/net/hsr/hsr_framereg.h
+@@ -74,6 +74,10 @@ bool hsr_is_node_in_db(struct list_head *node_db,
+ 
+ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
+ 
++#if IS_ENABLED(CONFIG_KUNIT)
++struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node, u16 block_idx);
++#endif
++
+ #define HSR_SEQ_BLOCK_SHIFT 7 /* 128 bits */
+ #define HSR_SEQ_BLOCK_SIZE (1 << HSR_SEQ_BLOCK_SHIFT)
+ #define HSR_SEQ_BLOCK_MASK (HSR_SEQ_BLOCK_SIZE - 1)
+diff --git a/net/hsr/prp_dup_discard_test.c b/net/hsr/prp_dup_discard_test.c
+index e86b7b633ae8..a7a5beb52d62 100644
+--- a/net/hsr/prp_dup_discard_test.c
++++ b/net/hsr/prp_dup_discard_test.c
+@@ -4,6 +4,8 @@
+ #include "hsr_main.h"
+ #include "hsr_framereg.h"
+ 
++MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
++
+ struct prp_test_data {
+ 	struct hsr_port port;
+ 	struct hsr_port port_rcv;
+@@ -13,37 +15,53 @@ struct prp_test_data {
+ 
+ static struct prp_test_data *build_prp_test_data(struct kunit *test)
+ {
++	size_t block_sz;
++
+ 	struct prp_test_data *data = kunit_kzalloc(test,
+ 		sizeof(struct prp_test_data), GFP_USER);
+ 	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, data);
+ 
++	data->node.seq_port_cnt = 1;
++	block_sz = hsr_seq_block_size(&data->node);
++	data->node.block_buf = kunit_kcalloc(test, HSR_MAX_SEQ_BLOCKS, block_sz,
++					     GFP_ATOMIC);
++	KUNIT_EXPECT_NOT_ERR_OR_NULL(test, data);
++	xa_init(&data->node.seq_blocks);
++
+ 	data->frame.node_src = &data->node;
+ 	data->frame.port_rcv = &data->port_rcv;
+ 	data->port_rcv.type = HSR_PT_SLAVE_A;
+-	data->node.seq_start[HSR_PT_SLAVE_A] = 1;
+-	data->node.seq_expected[HSR_PT_SLAVE_A] = 1;
+-	data->node.seq_start[HSR_PT_SLAVE_B] = 1;
+-	data->node.seq_expected[HSR_PT_SLAVE_B] = 1;
+-	data->node.seq_out[HSR_PT_MASTER] = 0;
+-	data->node.time_out[HSR_PT_MASTER] = jiffies;
+ 	data->port.type = HSR_PT_MASTER;
+ 
+ 	return data;
+ }
+ 
+-static void check_prp_counters(struct kunit *test,
+-			       struct prp_test_data *data,
+-			       u16 seq_start_a, u16 seq_expected_a,
+-			       u16 seq_start_b, u16 seq_expected_b)
++static void check_prp_frame_seen(struct kunit *test, struct prp_test_data *data,
++				 u16 sequence_nr)
++{
++	u16 block_idx, seq_bit;
++	struct hsr_seq_block *block;
++
++	block_idx = sequence_nr >> HSR_SEQ_BLOCK_SHIFT;
++	block = xa_load(&data->node.seq_blocks, block_idx);
++	KUNIT_EXPECT_NOT_NULL(test, block);
++
++	seq_bit = sequence_nr & HSR_SEQ_BLOCK_MASK;
++	KUNIT_EXPECT_TRUE(test, test_bit(seq_bit, block->seq_nrs[0]));
++}
++
++static void check_prp_frame_unseen(struct kunit *test,
++				   struct prp_test_data *data, u16 sequence_nr)
+ {
+-	KUNIT_EXPECT_EQ(test, data->node.seq_start[HSR_PT_SLAVE_A],
+-			seq_start_a);
+-	KUNIT_EXPECT_EQ(test, data->node.seq_start[HSR_PT_SLAVE_B],
+-			seq_start_b);
+-	KUNIT_EXPECT_EQ(test, data->node.seq_expected[HSR_PT_SLAVE_A],
+-			seq_expected_a);
+-	KUNIT_EXPECT_EQ(test, data->node.seq_expected[HSR_PT_SLAVE_B],
+-			seq_expected_b);
++	u16 block_idx, seq_bit;
++	struct hsr_seq_block *block;
++
++	block_idx = sequence_nr >> HSR_SEQ_BLOCK_SHIFT;
++	block = hsr_get_seq_block(&data->node, block_idx);
++	KUNIT_EXPECT_NOT_NULL(test, block);
++
++	seq_bit = sequence_nr & HSR_SEQ_BLOCK_MASK;
++	KUNIT_EXPECT_FALSE(test, test_bit(seq_bit, block->seq_nrs[0]));
+ }
+ 
+ static void prp_dup_discard_forward(struct kunit *test)
+@@ -54,52 +72,48 @@ static void prp_dup_discard_forward(struct kunit *test)
+ 	data->frame.sequence_nr = 2;
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	KUNIT_EXPECT_EQ(test, jiffies, data->node.time_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, data->frame.sequence_nr,
+-			   data->frame.sequence_nr + 1, 1, 1);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ }
+ 
+-static void prp_dup_discard_inside_dropwindow(struct kunit *test)
++static void prp_dup_discard_drop_duplicate(struct kunit *test)
+ {
+-	/* Normal situation, other LAN ahead by one. Frame is dropped */
+ 	struct prp_test_data *data = build_prp_test_data(test);
+-	unsigned long time = jiffies - 10;
+ 
+-	data->frame.sequence_nr = 1;
+-	data->node.seq_expected[HSR_PT_SLAVE_B] = 3;
+-	data->node.seq_out[HSR_PT_MASTER] = 2;
+-	data->node.time_out[HSR_PT_MASTER] = time;
++	data->frame.sequence_nr = 2;
++	KUNIT_EXPECT_EQ(test, 0,
++			prp_register_frame_out(&data->port, &data->frame));
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	KUNIT_EXPECT_EQ(test, 1,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, 2, data->node.seq_out[HSR_PT_MASTER]);
+-	KUNIT_EXPECT_EQ(test, time, data->node.time_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, 2, 2, 2, 3);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ }
+ 
+-static void prp_dup_discard_node_timeout(struct kunit *test)
++static void prp_dup_discard_entry_timeout(struct kunit *test)
+ {
+ 	/* Timeout situation, node hasn't sent anything for a while */
+ 	struct prp_test_data *data = build_prp_test_data(test);
++	struct hsr_seq_block *block;
++	u16 block_idx;
+ 
+ 	data->frame.sequence_nr = 7;
+-	data->node.seq_start[HSR_PT_SLAVE_A] = 1234;
+-	data->node.seq_expected[HSR_PT_SLAVE_A] = 1235;
+-	data->node.seq_start[HSR_PT_SLAVE_B] = 1234;
+-	data->node.seq_expected[HSR_PT_SLAVE_B] = 1234;
+-	data->node.seq_out[HSR_PT_MASTER] = 1234;
+-	data->node.time_out[HSR_PT_MASTER] =
+-		jiffies - msecs_to_jiffies(HSR_ENTRY_FORGET_TIME) - 1;
++	KUNIT_EXPECT_EQ(test, 0,
++			prp_register_frame_out(&data->port, &data->frame));
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
++
++	data->frame.sequence_nr = 11;
++	KUNIT_EXPECT_EQ(test, 0,
++			prp_register_frame_out(&data->port, &data->frame));
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
++
++	block_idx = data->frame.sequence_nr >> HSR_SEQ_BLOCK_SHIFT;
++	block = hsr_get_seq_block(&data->node, block_idx);
++	block->time = jiffies - msecs_to_jiffies(HSR_ENTRY_FORGET_TIME) - 1;
+ 
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	KUNIT_EXPECT_EQ(test, jiffies, data->node.time_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, data->frame.sequence_nr,
+-			   data->frame.sequence_nr + 1, 1234, 1234);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
++	check_prp_frame_unseen(test, data, 7);
+ }
+ 
+ static void prp_dup_discard_out_of_sequence(struct kunit *test)
+@@ -107,50 +121,36 @@ static void prp_dup_discard_out_of_sequence(struct kunit *test)
+ 	/* One frame is received out of sequence on both LANs */
+ 	struct prp_test_data *data = build_prp_test_data(test);
+ 
+-	data->node.seq_start[HSR_PT_SLAVE_A] = 10;
+-	data->node.seq_expected[HSR_PT_SLAVE_A] = 10;
+-	data->node.seq_start[HSR_PT_SLAVE_B] = 10;
+-	data->node.seq_expected[HSR_PT_SLAVE_B] = 10;
+-	data->node.seq_out[HSR_PT_MASTER] = 9;
++	/* initial frame, should be accepted */
++	data->frame.sequence_nr = 9;
++	KUNIT_EXPECT_EQ(test, 0,
++			prp_register_frame_out(&data->port, &data->frame));
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	/* 1st old frame, should be accepted */
+ 	data->frame.sequence_nr = 8;
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, data->frame.sequence_nr,
+-			   data->frame.sequence_nr + 1, 10, 10);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	/* 2nd frame should be dropped */
+ 	data->frame.sequence_nr = 8;
+ 	data->port_rcv.type = HSR_PT_SLAVE_B;
+ 	KUNIT_EXPECT_EQ(test, 1,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	check_prp_counters(test, data, data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1);
+ 
+ 	/* Next frame, this is forwarded */
+ 	data->frame.sequence_nr = 10;
+ 	data->port_rcv.type = HSR_PT_SLAVE_A;
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, data->frame.sequence_nr,
+-			   data->frame.sequence_nr + 1, 9, 9);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	/* and next one is dropped */
+ 	data->frame.sequence_nr = 10;
+ 	data->port_rcv.type = HSR_PT_SLAVE_B;
+ 	KUNIT_EXPECT_EQ(test, 1,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	check_prp_counters(test, data, data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1,
+-			   data->frame.sequence_nr + 1);
+ }
+ 
+ static void prp_dup_discard_lan_b_late(struct kunit *test)
+@@ -158,43 +158,31 @@ static void prp_dup_discard_lan_b_late(struct kunit *test)
+ 	/* LAN B is behind */
+ 	struct prp_test_data *data = build_prp_test_data(test);
+ 
+-	data->node.seq_start[HSR_PT_SLAVE_A] = 9;
+-	data->node.seq_expected[HSR_PT_SLAVE_A] = 9;
+-	data->node.seq_start[HSR_PT_SLAVE_B] = 9;
+-	data->node.seq_expected[HSR_PT_SLAVE_B] = 9;
+-	data->node.seq_out[HSR_PT_MASTER] = 8;
+-
+ 	data->frame.sequence_nr = 9;
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, 9, 10, 9, 9);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	data->frame.sequence_nr = 10;
+ 	KUNIT_EXPECT_EQ(test, 0,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	KUNIT_EXPECT_EQ(test, data->frame.sequence_nr,
+-			data->node.seq_out[HSR_PT_MASTER]);
+-	check_prp_counters(test, data, 9, 11, 9, 9);
++	check_prp_frame_seen(test, data, data->frame.sequence_nr);
+ 
+ 	data->frame.sequence_nr = 9;
+ 	data->port_rcv.type = HSR_PT_SLAVE_B;
+ 	KUNIT_EXPECT_EQ(test, 1,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	check_prp_counters(test, data, 10, 11, 10, 10);
+ 
+ 	data->frame.sequence_nr = 10;
+ 	data->port_rcv.type = HSR_PT_SLAVE_B;
+ 	KUNIT_EXPECT_EQ(test, 1,
+ 			prp_register_frame_out(&data->port, &data->frame));
+-	check_prp_counters(test, data,  11, 11, 11, 11);
+ }
+ 
+ static struct kunit_case prp_dup_discard_test_cases[] = {
+ 	KUNIT_CASE(prp_dup_discard_forward),
+-	KUNIT_CASE(prp_dup_discard_inside_dropwindow),
+-	KUNIT_CASE(prp_dup_discard_node_timeout),
++	KUNIT_CASE(prp_dup_discard_drop_duplicate),
++	KUNIT_CASE(prp_dup_discard_entry_timeout),
+ 	KUNIT_CASE(prp_dup_discard_out_of_sequence),
+ 	KUNIT_CASE(prp_dup_discard_lan_b_late),
+ 	{}
+-- 
+2.52.0
 
 
