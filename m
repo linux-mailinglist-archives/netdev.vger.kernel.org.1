@@ -1,293 +1,242 @@
-Return-Path: <netdev+bounces-252098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Kt0GwVRcWkKCQAAu9opvQ
-	(envelope-from <netdev+bounces-252098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:19:49 +0100
+	id kKljOmZScWkKCQAAu9opvQ
+	(envelope-from <netdev+bounces-252099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:25:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D2B5EB1D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:19:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81BEC5EC2E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1D6DA8677AB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:15:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B08B686D406
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ED544E03B;
-	Wed, 21 Jan 2026 22:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB63244A707;
+	Wed, 21 Jan 2026 22:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHjsEK28"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SmjPFrz2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1204418E7
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 22:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769033547; cv=none; b=slRZeqAZr5dysz7heDpnuTKFomHuVMJ++rhiLahTt0mrWT2FWUSxKFOMaVM9gUKwdFpn3ZiOY1fUpjIhEjvakpUj4H0mvH4eiZBMtghrfeVKg1nhbhvBsM6+05KNIXiFIF0huYKUfb+J2bSX62g2DmPei2FtzV1bAbMKmf+WfKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769033547; c=relaxed/simple;
-	bh=JAQQN7P77tr97fU7vyuVMrvCiNP4sSFAq43cZhTlmi0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NZwGhSpA0hQPP1Awaw1iIQzasoefZpAe8hDhVbHzAsNXmYOgtYj03PYTDUe08FEtMMPvqGjUks0r0ldds4tUrOIrgE46n70FD0NYepGB104gVgTnR/yx84zbvCg9EEsNHKqPNttH/eBbnPBHmECYoYs2NJ/Tdlz4+I2Kytq6jEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHjsEK28; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6494a3d92f5so464447d50.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:12:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDF243CEC4
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 22:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769033883; cv=pass; b=nytVLMPd/JRLsZA0kZrh9uT5aJ60rUWkdkEwOceypJJWpLg0nXWFjETKgflUF9VsSB1LfpFXZl0A6jzkxeTEGzNlA1+bx98y4cKaY3XXVVe9z0lgn63TZfuwYIn5BxwTChifMbT8hIvvg0O/vjXIhJkN87HIXTiSVrQxojSrC28=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769033883; c=relaxed/simple;
+	bh=okRy1IbB/C7/nsmreF0CIQby9JoQgbM5OnwU4BhTTm4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j6ORh6BC4bCJ5f0m8bI5TCQolzGH6JKjYup2Yk3pwJvraDJdt1GNCRZxf++mdYPooAd1SsOJauz2w8a3zI3faaNCjMOh/u2YZRsuRytbTeNVwYxdCryH52fw5R/FJJSvOfXKY7q5JknIlNvUsJQa4S42vIPo0V3oTuxdPpWgv/I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SmjPFrz2; arc=pass smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-5f52b0728ccso156874137.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:18:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769033881; cv=none;
+        d=google.com; s=arc-20240605;
+        b=d9DSF2X2Mu6bGYtTUjwXXiMyHtjvrEuZe21eECtjA5kpJlcMvhaII/hROVsvvXmgki
+         0W8LgUTPIvRfJ4nMwjE0qaHmvIh9VdXBZEq7wrUf6miPEpnxWJJUUBV/hDKe4kD88YH1
+         9QOrjsY8CfMZZPStbMX8WIBoWMJm+U6EXQDBam9pA8IKbIVeS0oBKb2SYOJ6OfY8pIyN
+         HpVrODP9nii0MbBSSddStIoSQTtrcEe1vQfFSiz9w/lBRCdK9ielmGTBUUvvJHiVvu53
+         CrPIEt7RbZwvnB8xvEXBMOmR0BWnc2fy31W5g0MmgH9qnuowfBI4OjipSElxe94pFcXY
+         Evbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=9A3bDgQ29yFgGpz1l+NhIUpPbzjtRClNWYncXyZN3wc=;
+        fh=iXMFX/DltXXm7WjNEQykVMET0lniBK4Pub6hhjpNz0A=;
+        b=VqS5zw3Nbr2i5yJcGzpkcaW/7BnEqtYlt5yaFXnUGch5PzW5en64RpjDwX2iLvc4k7
+         5t8KPuTK8dPbmrRa9TZ0YijCnRFmH8R67Cl4klfqe4QMChpCgHNz9dYG6DDf30VlHdXN
+         ffh0Ol9lNHNcEl+RGxbR6aaFZgssgqOe9d7+nymGDjUFN+N1vH+vnrTSDUha4JTCojSI
+         lxNe2z43flCcmrNEnxhWFnPObvtSFHLyWZ8eoz93HyWcOzgfAHY6AW4OkJCEloOA63hr
+         LT9TZdBtdpjpp4IEjH5ob5ngV3Ku2JcqMomPH8bpwwZ94N9YIz4B8ltSNBy1mYmbW4ro
+         ZYjg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769033530; x=1769638330; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2mpdsMRuLW1cRrssyJH9GNY+tfbuaJ3H6voxC/Fdtqg=;
-        b=EHjsEK28MO6BZ3JsqhVJmLDyEWLSWbkF9pNAa34jS5BeY9tLpZcpMEeX279xsvLjhw
-         e7e527ca9P3bStmp5w40AHBT5GTOyRY8eyHMQWDXr/GrKiqcnzI0/CtT7tf9PCIQW586
-         3XNnihqOCXsd+Z3PMFWnvh76nMQfVEm1tDdZdOIwCmJB9MCDfGXEpqYkAkp3edZbjArs
-         jBRej2Ac5y6gIheucYSdMpBIFToHvgAQkCfTZUeh4QaWCKG9nPKyyMFxbAgpnCEbfmXD
-         z7E1c8FIQEf2Hn1FyRU0ALXCaesSwSQ9Bakjm75EWXV9gA5hpjd1BB84YozeV5uc1oel
-         RBCg==
+        d=purestorage.com; s=google2022; t=1769033881; x=1769638681; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9A3bDgQ29yFgGpz1l+NhIUpPbzjtRClNWYncXyZN3wc=;
+        b=SmjPFrz25hD28QLxHjPOp+k7oW3f12M35tj9qkOhsywsX/6pEJKZenRMylpMIYV93T
+         ysLTvFOtvswHw3vYWGCGow9VpwofcOSUQ+TqD6uFEIHzt/Pcd0x2EXl05AQcVAbYDZC/
+         jl4SGzraFYN1W/FAXtkqSHPMm26pEqzmTiUSMl5pHXMKWgcK84qjryKuf9Yprd8Krnrt
+         5nRxqinagIKwAdf70O6CLDbPkN7itTJpXjBIG0zXs/50QZA4p56d51fl7krLbLC09dbg
+         O7iZ9KicoWR4h3sgfW3ZXqUWNiN1j0Z2TwY544te8LtiTC2emHWlHtDJjz8WqLHO8UnA
+         cY0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769033530; x=1769638330;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2mpdsMRuLW1cRrssyJH9GNY+tfbuaJ3H6voxC/Fdtqg=;
-        b=RR/jT6BSPaaGFXRz0Bux/bTtL4PRPbevR80vrn/95bA1vpYEPIurWcZYP0dRTb67KZ
-         s2CC0E418PDhJSWwAHwdIa07u3UjwEdiJ7xkwYBIrshQPv9Z9VT8X0dFI5Mc4m6Cugu7
-         A2eyw/EoCso0rAPhS+OJK7R3BS6aoXe2l6OR0wBrgzuq9y+daS+3ya3oyldvHB+feFrI
-         CKHs7F4DOAgwgzulpyVFLVHrFNlQbxmoNCV67gD3gCrtEUwYgnlJP/UF4CVAzKBvxBqA
-         xXl4CanWX41H5wPJMfbxm9FGprO3V9Tm+lzPLU80qR/ADKN1C1ideohNRyRIaCwnAIt3
-         AmTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVoV5Zlo6I+iG/hI0rkjKaisfTtDH/cgqUPZWDRb9vONt2JVL0eCTpG8BzNWSax2gKgx6iVDj8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzama1xoCp3QMNmGcngVckAfkL00gSybQ82wvsdBD7BjEdKnr9a
-	vpH6ipUtA/KzUnmtDavs+ywbc2twd2yO4+0ic8T3T56rfcvO0mSHKQ2o
-X-Gm-Gg: AZuq6aIIVdyPlsRxMqd0affnqM5LK92MCXCEYtKRcd4PHfkuoGp/Hu2+3Kt2+CXKBLg
-	f9mFPKyE0g+CIYTIYSscZ6p7BUWOmtQ2iQltE4bRi+ZVNAiCIqrxoNTPxSSpzVlM6Kxj9C0c66p
-	p3aSU8Ig025aUjlEQxeL6POAIFLEnPiP/dYGQ4ULr6tVmD4cg8pL97/jrI3Nk9WeuM15RemeT4f
-	/S9WRNgpAQ4fwI4yU1rEwl6moMgYDYYvpSBvIXxbL5V+oHVkeUKWfU7IHYzHteBhdCzTxlf7CdU
-	xqEotw7l2WQtNmDX4QKiLnZzLKt4Xk6yvAkkNR7H8uZahGNfCs7k9dcigWhCv7UorpfzNLc/EHx
-	xFC1KlMV7Z+qRe1M2+GIZpOsmFH0EPjBpSZLvMVMd0/8E434zhfpgeiCbFPYrLZkw2U2cQVi/G9
-	Y4Jx/dbZQp
-X-Received: by 2002:a53:d013:0:b0:644:472d:db04 with SMTP id 956f58d0204a3-6493c84922emr5253487d50.55.1769033529707;
-        Wed, 21 Jan 2026 14:12:09 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:2::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6494080138fsm2463523d50.20.2026.01.21.14.12.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 14:12:09 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 21 Jan 2026 14:11:52 -0800
-Subject: [PATCH net-next v16 12/12] selftests/vsock: add tests for
- namespace deletion
+        d=1e100.net; s=20230601; t=1769033881; x=1769638681;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9A3bDgQ29yFgGpz1l+NhIUpPbzjtRClNWYncXyZN3wc=;
+        b=KY6usRiIPNpTufG7YQj4iWr9skohF0wjLWMc6rclqI7WI3WcZzFAH57Z1zPeyV2uCS
+         FZSoAmN8pB666FEKMFouJsE9oRg3F81aaQhmRPXVtQew2MOenio0tVugWk1igVtuBeel
+         P1ueGZqPWJUCt2kXe9EoGGmHlnMwo6M6dN39229xHOAM/jBJtOTRIdSiB8M8Y4LOL+t8
+         sNUusIjoydLlOnmKXTvnuL3l7bVRB1u/lwvQkvuRISvW2emCjUn9mHkpBhyynCTG9W6h
+         qTWyzJdfQb8UEyzWbisMPtljhp48KVnOIMbmg2JQAsPIWN5RyQAljnPx34QkfkKPly1T
+         7cSg==
+X-Gm-Message-State: AOJu0YxHxCSY/3O/+iBy7iD+weP5trusuE5IQ/ggJU+nsccscSTizuZk
+	Sh7Sqv0ajW6r2C71CLUIJTNYBZFBxKqsJ9F/jeVj67owf2fbyNfAxeVic5FpcMC3CkmwJiCsXwX
+	2wurGxV1bF9WWSsk0MfIurF1Eeg9q5czmB6cB3pjnTw==
+X-Gm-Gg: AZuq6aI087Q427HENoWhnpL07VSxBzDDB1R7CMh7x89CwkOekI2JDYkxpwuX5s9FYcB
+	xJNKSJCtCgIR7AWElkaYbl9XggX9n3ASJRntpfDLAQiCXUI2RFHunS/PTeLekEBD9CMZhWzg/rm
+	hN5gbPy59/vfUtYrIxXVbJKZzfRGZBVO2WmLSe7q2Z8GnHayoUK3o7u5v4kmxO0j+OPd8AjOslt
+	sGdHxLGIp2/wwQIIg/EAqGvdj+tcFwzBt9eqmaCKRyKGffrT5T8QHmXxOETFh3TVzvL+fA=
+X-Received: by 2002:a05:6102:290f:b0:5f1:4c53:3c21 with SMTP id
+ ada2fe7eead31-5f1a551ef6bmr4956245137.24.1769033880782; Wed, 21 Jan 2026
+ 14:18:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-vsock-vmtest-v16-12-2859a7512097@meta.com>
-References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
-In-Reply-To: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
- Vishnu Dasa <vishnu.dasa@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, berrange@redhat.com, 
- Sargun Dhillon <sargun@sargun.me>, linux-doc@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
+References: <20260102184708.24618-1-rjethwani@purestorage.com>
+ <20260102184708.24618-2-rjethwani@purestorage.com> <20260105172745.5cc67e79@kernel.org>
+In-Reply-To: <20260105172745.5cc67e79@kernel.org>
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+Date: Wed, 21 Jan 2026 14:17:49 -0800
+X-Gm-Features: AZwV_QibQ8TAG7Cm40waHNCj6UpTpw7MHvE4vII915BuDRrvriGaj3yZH0RXj3Y
+Message-ID: <CAKaoeS3Kps61Wbk+EtEpbijemj=_vpHK0w35BBGfMuDCHnXuFg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] tls: TLS 1.3 hardware offload support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, saeedm@nvidia.com, 
+	tariqt@nvidia.com, mbloch@nvidia.com, borisp@nvidia.com, 
+	john.fastabend@gmail.com, sd@queasysnail.net, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252098-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,redhat.com,sargun.me,gmail.com,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,nvidia.com,gmail.com,queasysnail.net,davemloft.net];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252099-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_POLICY_ALLOW(0.00)[purestorage.com,reject];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
+	R_SPF_SOFTFAIL(0.00)[~all];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:email,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: A4D2B5EB1D
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,purestorage.com:dkim,mail.gmail.com:mid,dummy_content_type_frag.page:url]
+X-Rspamd-Queue-Id: 81BEC5EC2E
 X-Rspamd-Action: no action
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+ in
+> I don't see you handling re-keying, which is supported in SW.
 
-Add tests that validate vsock sockets are resilient to deleting
-namespaces. The vsock sockets should still function normally.
+Added hardware offload key update support in v4
 
-The function check_ns_delete_doesnt_break_connection() is added to
-re-use the step-by-step logic of 1) setup connections, 2) delete ns,
-3) check that the connections are still ok.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
-Changes in v13:
-- remove tests that change the mode after socket creation (this is not
-  supported behavior now and the immutability property is tested in other
-  tests)
-- remove "change_mode" behavior of
-  check_ns_changes_dont_break_connection() and rename to
-  check_ns_delete_doesnt_break_connection() because we only need to test
-  namespace deletion (other tests confirm that the mode cannot change)
+> > The upstream Broadcom bnxt_en driver does not yet support kTLS offload.
+> > Testing was performed using the out-of-tree driver version
+> > bnxt_en-1.10.3-235.1.154.0, which works without modifications.
+>
+> It's a bit odd to mention that you tested some out of tree code.
+> Glad it works, but I don't see the relevance upstream. Please drop
+> the mentions of Broadcom until the driver has TLS offload support added.
 
-Changes in v11:
-- remove pipefile (Stefano)
+Removed Broadcom bnxt_en out-of-tree driver mention in v4
 
-Changes in v9:
-- more consistent shell style
-- clarify -u usage comment for pipefile
----
- tools/testing/selftests/vsock/vmtest.sh | 84 +++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
+> > --- a/net/tls/tls_device.c
+> > +++ b/net/tls/tls_device.c
+> > @@ -319,6 +319,36 @@ static void tls_device_record_close(struct sock *sk,
+> >       struct tls_prot_info *prot = &ctx->prot_info;
+> >       struct page_frag dummy_tag_frag;
+> >
+> > +     /* TLS 1.3: append content type byte before tag.
+> > +      * Record structure: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
+> > +      * The content type is encrypted with the ciphertext for authentication.
+> > +      */
+> > +     if (prot->version == TLS_1_3_VERSION) {
+> > +             struct page_frag dummy_content_type_frag;
+> > +             struct page_frag *content_type_pfrag = pfrag;
+> > +
+> > +             /* Validate record type range */
+> > +             if (unlikely(record_type < TLS_RECORD_TYPE_CHANGE_CIPHER_SPEC ||
+> > +                          record_type > TLS_RECORD_TYPE_ACK)) {
+> > +                     pr_err_once("tls_device: invalid record type %u\n",
+> > +                                 record_type);
+> > +                     return;
+>
+> This check is really odd. Why is it relevant, and yet not relevant
+> enough to handle cleanly? On a quick look it appears that the user
+> can set whatever content type they want.
+>
+Removed record_type check from tls_device_record_close() in v4
 
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-index a9eaf37bc31b..dc8dbe74a6d0 100755
---- a/tools/testing/selftests/vsock/vmtest.sh
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -68,6 +68,9 @@ readonly TEST_NAMES=(
- 	ns_same_local_loopback_ok
- 	ns_same_local_host_connect_to_local_vm_ok
- 	ns_same_local_vm_connect_to_local_host_ok
-+	ns_delete_vm_ok
-+	ns_delete_host_ok
-+	ns_delete_both_ok
- )
- readonly TEST_DESCS=(
- 	# vm_server_host_client
-@@ -135,6 +138,15 @@ readonly TEST_DESCS=(
- 
- 	# ns_same_local_vm_connect_to_local_host_ok
- 	"Run vsock_test client in VM in a local ns with server in same ns."
-+
-+	# ns_delete_vm_ok
-+	"Check that deleting the VM's namespace does not break the socket connection"
-+
-+	# ns_delete_host_ok
-+	"Check that deleting the host's namespace does not break the socket connection"
-+
-+	# ns_delete_both_ok
-+	"Check that deleting the VM and host's namespaces does not break the socket connection"
- )
- 
- readonly USE_SHARED_VM=(
-@@ -1287,6 +1299,78 @@ test_vm_loopback() {
- 	return "${KSFT_PASS}"
- }
- 
-+check_ns_delete_doesnt_break_connection() {
-+	local pipefile pidfile outfile
-+	local ns0="global0"
-+	local ns1="global1"
-+	local port=12345
-+	local pids=()
-+	local rc=0
-+
-+	init_namespaces
-+
-+	pidfile="$(create_pidfile)"
-+	if ! vm_start "${pidfile}" "${ns0}"; then
-+		return "${KSFT_FAIL}"
-+	fi
-+	vm_wait_for_ssh "${ns0}"
-+
-+	outfile=$(mktemp)
-+	vm_ssh "${ns0}" -- \
-+		socat VSOCK-LISTEN:"${port}",fork STDOUT > "${outfile}" 2>/dev/null &
-+	pids+=($!)
-+	vm_wait_for_listener "${ns0}" "${port}" "vsock"
-+
-+	# We use a pipe here so that we can echo into the pipe instead of using
-+	# socat and a unix socket file. We just need a name for the pipe (not a
-+	# regular file) so use -u.
-+	pipefile=$(mktemp -u /tmp/vmtest_pipe_XXXX)
-+	ip netns exec "${ns1}" \
-+		socat PIPE:"${pipefile}" VSOCK-CONNECT:"${VSOCK_CID}":"${port}" &
-+	pids+=($!)
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -e '"${pipefile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if [[ "$1" == "vm" ]]; then
-+		ip netns del "${ns0}"
-+	elif [[ "$1" == "host" ]]; then
-+		ip netns del "${ns1}"
-+	elif [[ "$1" == "both" ]]; then
-+		ip netns del "${ns0}"
-+		ip netns del "${ns1}"
-+	fi
-+
-+	echo "TEST" > "${pipefile}"
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -s '"${outfile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if grep -q "TEST" "${outfile}"; then
-+		rc="${KSFT_PASS}"
-+	else
-+		rc="${KSFT_FAIL}"
-+	fi
-+
-+	terminate_pidfiles "${pidfile}"
-+	terminate_pids "${pids[@]}"
-+	rm -f "${outfile}" "${pipefile}"
-+
-+	return "${rc}"
-+}
-+
-+test_ns_delete_vm_ok() {
-+	check_ns_delete_doesnt_break_connection "vm"
-+}
-+
-+test_ns_delete_host_ok() {
-+	check_ns_delete_doesnt_break_connection "host"
-+}
-+
-+test_ns_delete_both_ok() {
-+	check_ns_delete_doesnt_break_connection "both"
-+}
-+
- shared_vm_test() {
- 	local tname
- 
+> > +
+> > +             if (unlikely(pfrag->size - pfrag->offset < prot->tail_size) &&
+> > +                 !skb_page_frag_refill(prot->tail_size, pfrag, sk->sk_allocation)) {
+> > +                     /* Out of memory: use pre-populated dummy_page */
+> > +                     dummy_content_type_frag.page = dummy_page;
+> > +                     dummy_content_type_frag.offset = record_type;
+> > +                     content_type_pfrag = &dummy_content_type_frag;
+> > +             } else {
+> > +                     /* Current pfrag has space or allocation succeeded - write content type */
+> > +                     *(unsigned char *)(page_address(pfrag->page) + pfrag->offset) =
+> > +                             record_type;
+>
+> wrap at 80chars and please refactor this long line into something more
+> readable.
+>
 
--- 
-2.47.3
+Refactored in v4
 
+> > +             }
+> > +             tls_append_frag(record, content_type_pfrag, prot->tail_size);
+> > +     }
+> > +
+> >       /* append tag
+> >        * device will fill in the tag, we just need to append a placeholder
+> >        * use socket memory to improve coalescing (re-using a single buffer
+> > @@ -335,7 +365,7 @@ static void tls_device_record_close(struct sock *sk,
+> >
+> >       /* fill prepend */
+> >       tls_fill_prepend(ctx, skb_frag_address(&record->frags[0]),
+> > -                      record->len - prot->overhead_size,
+> > +                      (record->len - prot->overhead_size) + prot->tail_size,
+> >                        record_type);
+> >  }
+> >
+> > @@ -1089,7 +1119,8 @@ int tls_set_device_offload(struct sock *sk)
+> >       }
+> >
+> >       crypto_info = &ctx->crypto_send.info;
+> > -     if (crypto_info->version != TLS_1_2_VERSION) {
+> > +     if (crypto_info->version != TLS_1_2_VERSION &&
+> > +         crypto_info->version != TLS_1_3_VERSION) {
+> >               rc = -EOPNOTSUPP;
+> >               goto release_netdev;
+> >       }
+>
+> Are all existing drivers rejecting TLS 1.3 sessions?
+> These days we prefer for drivers to explicitly opt into new features
+> to avoid surprises.
+
+Yes, currently the following 3 drivers support tls offload and all of
+them reject  TLS 1.3 sessions.
+- drivers/net/ethernet/chelsio/inline_crypto/chtls
+- drivers/net/ethernet/fungible/funeth/
+- drivers/net/ethernet/mellanox/mlx5/core/en_accel/
 
