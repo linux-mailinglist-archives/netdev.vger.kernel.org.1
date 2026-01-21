@@ -1,319 +1,193 @@
-Return-Path: <netdev+bounces-251777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wESbFFBlcGkVXwAAu9opvQ
-	(envelope-from <netdev+bounces-251777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:34:08 +0100
+	id mCegE+JmcGkVXwAAu9opvQ
+	(envelope-from <netdev+bounces-251778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:40:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9425190C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:34:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828C1519D4
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 06:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3DBA34E6AE4
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 05:34:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DB27E46584F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 05:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAB140758E;
-	Wed, 21 Jan 2026 05:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0538D37BE92;
+	Wed, 21 Jan 2026 05:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgGlOLU4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jq1KAf4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67323F23C4
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 05:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC38D3ECBC5;
+	Wed, 21 Jan 2026 05:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768973637; cv=none; b=fYIqUWlhrzf4/hOdqW1/7pYC74f49aLnJtVLnkPRM4Y3uSjopW5BQKfxy1+4+Un8cpjKwyCYr4spGNXHFAFng/OczUVoKtYxc1JHSOil3+NV3ntrnIeGsmIE2fr8Lx0w0uCQl8THjw12WDiAdY8XSO0dOqh1Jld7e6RNMR+8/r4=
+	t=1768974043; cv=none; b=nRKV0MSVHCSiMg98qTZ8Rl+NmSryaheXxBLYBBTnkGIANrHai7WTDIaOv2gDnCLEVie5erI9ws4E5T7tm+PruHdV7eKD3eJjrU2twWvidx7HtZmu3W86kjXIhQN/OhAmaoMAz/DW4gqRTHXz7ccfK2w2xU5DMKN236l46SurBIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768973637; c=relaxed/simple;
-	bh=Cc7McXfM53XA8joxZklxQZYIsEwBSDIZEKAZdeQ/7uQ=;
+	s=arc-20240116; t=1768974043; c=relaxed/simple;
+	bh=Zx+SBvi0ayiSjILiYD+XZDq1nslSNFB+Y/17FI4keB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esDfnfS9gH/2nPwNCrt9kvWnX0cZjj/x7fZpCOG3FoRw5HSqt6+gcSks/m++jZo2CHc0FFh0fykeTq6UK215r/YgXGPqFiux8sHyJq2UVfzwqnQ5J+mFvYHE5g/2+8uY7kbiyp94PWNZVe1Hw2ijKEE0x0yqLCWwMY8TujzYfuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgGlOLU4; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-78fc0f33998so57846127b3.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 21:33:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768973634; x=1769578434; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=h3UPoz+4dGK8MYLy8d1alrE5wWkl0RR3HxeTS6m1CsA=;
-        b=KgGlOLU4yDh8kc9AiUI757njsyokT4Cf6fA044cNwggVqLkn/noDq7sgLa4FFh9SXJ
-         5t0AiKNmm1aYLVBOxsOO+DTwSmZRjmoUM3YliUtA2tsQBfxywqA7JjMmlLWU6uJpUSwo
-         H+i8ILusCJJXN7jV1vuBW93OOjwpkNvG1H2zvqEjd0XHFqza+FZgOXMmnNLI/iPaqL8N
-         L48c2lUQSoS/aNWjQWRBhJi6DolKn1xVk8+O9oELIQz0fCYqi/usqQFUqUF04c9quZQ0
-         wBnWiGFjTJ87Qm+E8SeCRl64996aYaOwZ+wunAOpwQ6pCLvMprIzpuh8EbyyzrPLXPbD
-         DU3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768973634; x=1769578434;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h3UPoz+4dGK8MYLy8d1alrE5wWkl0RR3HxeTS6m1CsA=;
-        b=D3s8E9L2K7fNILTv9hZO+JXMsRZN/dQuG1V4/3i8u3WJLweNbTLkIsemXHZ5EMzhqC
-         fSM85H8qz7wFBbO/y/Ej7jr16jG4paURI5D75vdjfUW3Pg2yJAINpjn0IpjM/hB5AvQ0
-         YdoqvMYHTckzsMDiX1cqsPaMu1KMdChHhXYgqUEZGYneG5hjnlWQmU78pRkA62X0PWHi
-         GVwqf4WMKJeIryCPk5p1hSh8Pt5HwrGAOHlDm4nbEW0HUyVIJBzAcmRo1Zte/hfoMz/D
-         PmIOanQNnbSLgYPptjD3WNDYySI/EpqM7gH2D+FsJuZNwVKeLYW+LqwZE0XMLdELPQKf
-         m5Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCXH1B8ll6JVufz02+sXIRykQ3hzAR3jp3JnHm7dsnqRheqYPKF/u+5SXO829GWT4ZhhwoIlpzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNAk8Sdq4VB8BCC7AWrPuqskJOH8uwySEG+OZxzUtfJ8ASSvoU
-	uH+Wm9GlqxAsphp5+OhQMz4nOhNKtydaiHB5b77YNKpeuSWKt/pi3Uzd
-X-Gm-Gg: AZuq6aKOywkqHfMOMAel0XSvpuKaLrhQFxY50Co1K509wK/+NVqXFMQD/QKQilLJX3Z
-	UNrED6E/WybNC0UWT4r9tmx93hHDIy0ThavFh+6pBA67wJLVFG26ZVXau39nJjG5GEqqoQtDpfq
-	7dtSWJHJyNdKVpTJGHSwXsg7GtK9d8Sd2lJp78J5TupkgxfPYxNU8KxlPneYnmR8kvOjn2BdTHt
-	CblMOLHpfETm19A7JysbXshCDI+li7CxdZELT5NLFTZVDfUJgTdqSqk+vOjVKoBq6ZputqxiTHa
-	e/pkFKCv/80OeE9LcwOzacnSAD1GSJyE/FAQlEvYCkQ3hPISZ/W5B4JXgsA3jhBiyNwwHsgg+xx
-	gUZmKji9cG1mz8Vcd5JHYpzSQf1p5CYwd1qW/aL86MpgNgQThu4hxIB8fkIuhFzWpFH5qAHlOeA
-	uFBkNtJPYx+imJVNDkG0fSGiz1bqLRYSbF+iY=
-X-Received: by 2002:a05:690c:4b11:b0:787:cddb:ec2d with SMTP id 00721157ae682-7940a12058amr83337797b3.19.1768973634255;
-        Tue, 20 Jan 2026 21:33:54 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:74::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-649170bebaesm7400355d50.21.2026.01.20.21.33.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 21:33:53 -0800 (PST)
-Date: Tue, 20 Jan 2026 21:33:52 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 3/5] net: devmem: implement autorelease
- token management
-Message-ID: <aXBlQJnsJ6PbqysE@devvm11784.nha0.facebook.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
- <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-3-686d0af71978@meta.com>
- <20260120170042.43f038a2@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BGP67ngLSL2Vn/jDAZNqdjug18CMnYsPBFinuRozYZscZGzpxQyHQzHgzfTffv7UfA5cwVaFKpDMvG26jDYV7l7leIey5Q6sqiyWZ6U1OoA1RQFALRNwSPSueENEjPv0Tuuc5eXGIA71noFl4ViLeZzU8KcwPQqMkkGdPRn/eyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jq1KAf4q; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768974041; x=1800510041;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Zx+SBvi0ayiSjILiYD+XZDq1nslSNFB+Y/17FI4keB4=;
+  b=Jq1KAf4q66IAYsdr/DZ8L0xiOU+NT5aMlkLig9U99TFEOkVopF6Pa/ee
+   8VlrCAXon+krdUYTApe2TI3DqI8nLSDk5QshNxHHIkoL5nbIa8vGbFGxA
+   K8s1x4y3rvoCEbVjIV+MLxMB6KDI3CDSndisbjagLFb41Tz+ZRJeuFe5y
+   fTtHUsNy6r8kmCHmoHc1P7Nw63L81MwmnqXIR6edfCHAgrLKlAsPHsWnK
+   0/8YlMLTMwMqcE+JsZuH+fSwF9wzCRoJH+gLGY2Eyc9UCOI906GC0FfWI
+   sisOYB60zxbo57k7UR3UyAK55TSDzzVMH8J9C8VkHvzFy5GM024SvClqT
+   w==;
+X-CSE-ConnectionGUID: k5gTnfsURMyTVvd0QzmhjA==
+X-CSE-MsgGUID: +ptonkJtTci0ilEEF5mbsA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="87608238"
+X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
+   d="scan'208";a="87608238"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 21:40:39 -0800
+X-CSE-ConnectionGUID: yIdPUrdgSiybgm4rI91ngg==
+X-CSE-MsgGUID: HUtRvEKGQIavCBzlQuTQmQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
+   d="scan'208";a="210796208"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 20 Jan 2026 21:40:34 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1viQxD-00000000Q27-2Z5X;
+	Wed, 21 Jan 2026 05:40:31 +0000
+Date: Wed, 21 Jan 2026 13:40:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	pmladek@suse.com, john.ogness@linutronix.de
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+	mpdesouza@suse.com, kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 4/5] netconsole: Use printk context for CPU
+ and task information
+Message-ID: <202601211304.r9ecHy9L-lkp@intel.com>
+References: <20260120-nbcon-v2-4-b61f960587a8@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260120170042.43f038a2@kernel.org>
-X-Spamd-Result: default: False [-0.46 / 15.00];
+In-Reply-To: <20260120-nbcon-v2-4-b61f960587a8@debian.org>
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
-	TAGGED_FROM(0.00)[bounces-251777-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-251778-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,kvack.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: BA9425190C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 828C1519D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 05:00:42PM -0800, Jakub Kicinski wrote:
-> On Thu, 15 Jan 2026 21:02:14 -0800 Bobby Eshleman wrote:
-> > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> > index 596c306ce52b..a5301b150663 100644
-> > --- a/Documentation/netlink/specs/netdev.yaml
-> > +++ b/Documentation/netlink/specs/netdev.yaml
-> > @@ -562,6 +562,17 @@ attribute-sets:
-> >          type: u32
-> >          checks:
-> >            min: 1
-> > +      -
-> > +        name: autorelease
-> > +        doc: |
-> > +          Token autorelease mode. If true (1), leaked tokens are automatically
-> > +          released when the socket closes. If false (0), leaked tokens are only
-> > +          released when the dmabuf is torn down. Once a binding is created with
-> > +          a specific mode, all subsequent bindings system-wide must use the
-> > +          same mode.
-> > +
-> > +          Optional. Defaults to false if not specified.
-> > +        type: u8
-> 
-> if you plan to have more values - u32, if not - flag
-> u8 is 8b value + 24b of padding, it's only useful for proto fields
-> 
-> >  operations:
-> >    list:
-> > @@ -769,6 +780,7 @@ operations:
-> >              - ifindex
-> >              - fd
-> >              - queues
-> > +            - autorelease
-> >          reply:
-> >            attributes:
-> >              - id
-> 
-> >  static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
-> > +static DEFINE_MUTEX(devmem_ar_lock);
-> > +DEFINE_STATIC_KEY_FALSE(tcp_devmem_ar_key);
-> > +EXPORT_SYMBOL(tcp_devmem_ar_key);
-> 
-> I don't think you need the export, perhaps move the helper in here in
-> the first place (while keeping the static inline wrapper when devmem=n)?
-> 
-> > +	if (autorelease)
-> > +		static_branch_enable(&tcp_devmem_ar_key);
-> 
-> This is user-controlled (non-root), right? So I think we need 
-> the deferred version of key helpers. 
-> 
-> > -	if (direction == DMA_TO_DEVICE) {
-> > -		binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-> > -					      sizeof(struct net_iov *),
-> > -					      GFP_KERNEL);
-> > -		if (!binding->vec) {
-> > -			err = -ENOMEM;
-> > -			goto err_unmap;
-> > -		}
-> > +	binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-> > +				      sizeof(struct net_iov *),
-> > +				      GFP_KERNEL | __GFP_ZERO);
-> 
-> make it a kvcalloc() while we're touching it, pls
-> 
-> > +	if (!binding->vec) {
-> > +		err = -ENOMEM;
-> > +		goto err_unmap;
-> >  	}
-> >  
-> >  	/* For simplicity we expect to make PAGE_SIZE allocations, but the
-> > @@ -306,25 +386,41 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >  			niov = &owner->area.niovs[i];
-> >  			niov->type = NET_IOV_DMABUF;
-> >  			niov->owner = &owner->area;
-> > +			atomic_set(&niov->uref, 0);
-> 
-> Isn't it zero'ed during alloc?
-> 
-> >  			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
-> >  						      net_devmem_get_dma_addr(niov));
-> > -			if (direction == DMA_TO_DEVICE)
-> > -				binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
-> > +			binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
-> >  		}
-> >  
-> >  		virtual += len;
-> >  	}
-> >  
-> 
-> > +	if (info->attrs[NETDEV_A_DMABUF_AUTORELEASE])
-> > +		autorelease =
-> > +			!!nla_get_u8(info->attrs[NETDEV_A_DMABUF_AUTORELEASE]);
-> 
-> nla_get_u8_default() 
-> 
-> >  	priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
-> >  	if (IS_ERR(priv))
-> >  		return PTR_ERR(priv);
-> 
-> > +static noinline_for_stack int
-> > +sock_devmem_dontneed_manual_release(struct sock *sk,
-> > +				    struct dmabuf_token *tokens,
-> > +				    unsigned int num_tokens)
-> > +{
-> > +	struct net_iov *niov;
-> > +	unsigned int i, j;
-> > +	netmem_ref netmem;
-> > +	unsigned int token;
-> > +	int num_frags = 0;
-> > +	int ret = 0;
-> > +
-> > +	if (!sk->sk_devmem_info.binding)
-> > +		return -EINVAL;
-> > +
-> > +	for (i = 0; i < num_tokens; i++) {
-> > +		for (j = 0; j < tokens[i].token_count; j++) {
-> > +			size_t size = sk->sk_devmem_info.binding->dmabuf->size;
-> > +
-> > +			token = tokens[i].token_start + j;
-> > +			if (token >= size / PAGE_SIZE)
-> > +				break;
-> > +
-> > +			if (++num_frags > MAX_DONTNEED_FRAGS)
-> > +				return ret;
-> > +
-> > +			niov = sk->sk_devmem_info.binding->vec[token];
-> > +			if (atomic_dec_and_test(&niov->uref)) {
-> 
-> Don't you need something like "atomic dec non zero and test" ?
-> refcount has refcount_dec_not_one() 🤔️
-> 
+Hi Breno,
 
-Good point, that would be better for sure.
+kernel test robot noticed the following build errors:
 
-> > +				netmem = net_iov_to_netmem(niov);
-> > +				WARN_ON_ONCE(!napi_pp_put_page(netmem));
-> > +			}
-> > +			ret++;
-> > +		}
-> 
-> >  frag_limit_reached:
-> > -	xa_unlock_bh(&sk->sk_user_frags);
-> > +	xa_unlock_bh(&sk->sk_devmem_info.frags);
-> 
-> may be worth separating the sk_devmem_info change out for clarity
-> 
-> >  	for (k = 0; k < netmem_num; k++)
-> >  		WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-> 
-> > @@ -2503,7 +2506,15 @@ void tcp_v4_destroy_sock(struct sock *sk)
-> >  
-> >  	tcp_release_user_frags(sk);
-> >  
-> > -	xa_destroy(&sk->sk_user_frags);
-> > +	if (!net_devmem_autorelease_enabled() && sk->sk_devmem_info.binding) {
-> > +		net_devmem_dmabuf_binding_user_put(sk->sk_devmem_info.binding);
-> > +		net_devmem_dmabuf_binding_put(sk->sk_devmem_info.binding);
-> > +		sk->sk_devmem_info.binding = NULL;
-> > +		WARN_ONCE(!xa_empty(&sk->sk_devmem_info.frags),
-> > +			  "non-empty xarray discovered in autorelease off mode");
-> > +	}
-> > +
-> > +	xa_destroy(&sk->sk_devmem_info.frags);
-> 
-> Let's wrap this up in a helper that'll live in devmem.c
+[auto build test ERROR on 956f569c90ab507559342d289f4c923adfbf06f5]
 
-All of the above SGTM!
+url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/printk-Add-execution-context-task-name-CPU-to-printk_info/20260121-033457
+base:   956f569c90ab507559342d289f4c923adfbf06f5
+patch link:    https://lore.kernel.org/r/20260120-nbcon-v2-4-b61f960587a8%40debian.org
+patch subject: [PATCH net-next v2 4/5] netconsole: Use printk context for CPU and task information
+config: csky-randconfig-r134-20260121 (https://download.01.org/0day-ci/archive/20260121/202601211304.r9ecHy9L-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 13.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260121/202601211304.r9ecHy9L-lkp@intel.com/reproduce)
 
-Thanks,
-Bobby
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601211304.r9ecHy9L-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/netconsole.c: In function 'sysdata_append_cpu_nr':
+>> drivers/net/netconsole.c:1365:31: error: 'struct nbcon_write_context' has no member named 'cpu'
+    1365 |                          wctxt->cpu);
+         |                               ^~
+   drivers/net/netconsole.c: In function 'sysdata_append_taskname':
+>> drivers/net/netconsole.c:1373:31: error: 'struct nbcon_write_context' has no member named 'comm'
+    1373 |                          wctxt->comm);
+         |                               ^~
+   drivers/net/netconsole.c: In function 'sysdata_append_cpu_nr':
+>> drivers/net/netconsole.c:1366:1: warning: control reaches end of non-void function [-Wreturn-type]
+    1366 | }
+         | ^
+   drivers/net/netconsole.c: In function 'sysdata_append_taskname':
+   drivers/net/netconsole.c:1374:1: warning: control reaches end of non-void function [-Wreturn-type]
+    1374 | }
+         | ^
+
+
+vim +1365 drivers/net/netconsole.c
+
+  1359	
+  1360	static int sysdata_append_cpu_nr(struct netconsole_target *nt, int offset,
+  1361					 struct nbcon_write_context *wctxt)
+  1362	{
+  1363		return scnprintf(&nt->sysdata[offset],
+  1364				 MAX_EXTRADATA_ENTRY_LEN, " cpu=%u\n",
+> 1365				 wctxt->cpu);
+> 1366	}
+  1367	
+  1368	static int sysdata_append_taskname(struct netconsole_target *nt, int offset,
+  1369					   struct nbcon_write_context *wctxt)
+  1370	{
+  1371		return scnprintf(&nt->sysdata[offset],
+  1372				 MAX_EXTRADATA_ENTRY_LEN, " taskname=%s\n",
+> 1373				 wctxt->comm);
+  1374	}
+  1375	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
