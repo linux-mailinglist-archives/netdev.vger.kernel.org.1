@@ -1,195 +1,154 @@
-Return-Path: <netdev+bounces-251795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251796-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHhcN0eHcGlaYQAAu9opvQ
-	(envelope-from <netdev+bounces-251795-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:59:03 +0100
+	id iEZxC/KLcGkEYQAAu9opvQ
+	(envelope-from <netdev+bounces-251796-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:18:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D9F53258
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:59:03 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6B353624
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:18:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB3F04E8718
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 07:58:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DB8EF4EA8FA
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2986838B7DB;
-	Wed, 21 Jan 2026 07:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3DMvwDV";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7P1G63L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E575477E32;
+	Wed, 21 Jan 2026 08:15:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1AE44BCB7
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 07:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C021543C06D
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 08:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768982301; cv=none; b=SjusJAqeIBPSB8aSJcmbuEQOSUV48rt/ToSPhiVH3Gow6zp1kb+eLBik5KP70QWjDmMDRGD0hKQw8SbOSKWCotllyY+mAicJMWzcb32bbAta2r60bUjKQQckw+06gP4whValsX6t+8eL+NfBheA3deE2pJpAXA0rdl5psoDh1FQ=
+	t=1768983315; cv=none; b=hn4ht9TOMZ5uSqPvTEBFQphKphimQyQUxS7tHDw3UsbCPYuCxdvXeLTwqnOUlOrBUuKlzhPmOyH+Q/4fEEQ4xNqr2lWn2ChmE41f1GNsg08QPVxa2UtnZt/7djV/sg5yMoQjptMKlTOi4SYvqs3k+QS/HhopN6BjCWZBDbU7tXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768982301; c=relaxed/simple;
-	bh=yvTAb2zyJxbyGLlRHGT89BitSAH1SZdALJsqlZ+b2z4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=udPRCK8S5r4sNRa9xB0vU03tmg/7/r4BV6WTt3ZVkUUrOSOG3Iio3YMCKS5buBCLAT6jscHmZcNzjggHhzP5o2wU8dyvIEB4EFAQPMVds1Rb+C/lM4RZSfDS7Wa83ZMcgfyBUQc4i7P1BKNPNJmIbNs0YhoruQMV4uw0QtT9py0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3DMvwDV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=K7P1G63L; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768982298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
-	b=c3DMvwDVAindHXglwcwdgszjrOV8/vecj9EMP1aLixRty6MhR32xsHHcr7hv+AELvtEG66
-	ft1y85eWuJ6VlZ5acUieIugLqeoVf9mhVD6HmgAmTk3TQkbzf63TjTKwQVM6fsqEJx0GWK
-	j4hz8tBYNyYwpqauJseKKrha4VipfdE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-676-QDr5AGcrN8eZPQxfitKaDg-1; Wed, 21 Jan 2026 02:58:16 -0500
-X-MC-Unique: QDr5AGcrN8eZPQxfitKaDg-1
-X-Mimecast-MFC-AGG-ID: QDr5AGcrN8eZPQxfitKaDg_1768982295
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee71f0244so54845845e9.0
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 23:58:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768982295; x=1769587095; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
-        b=K7P1G63LGX6IvHLuqQdZZEm28D5707Ixxr2p9sk9M2pIdU//6UxhnbEe1kI1P9nbAf
-         2VuOUz3cPpkGv/iI3b9YeWgDGZqKQtQA7w6jjJwky9iTnUa0nWNH1PiQTswza3Vv+b/F
-         k94V8Js3H7mMO+zfxlF3Xfms5FbYvuNTsrnVU90nzEm/PY1oLDYtrb5M/IeVxkKg2h/q
-         aucKT3CiEmF8IfgjYufgmRW7Q1uAnoq/F8z28Zv/aVJrzUcExpKtzvyF0ecUsif7qhgd
-         I3pY/R5OYvtw0au+zAZ7Ti30v7cbtJyPagD2o9mKyNuhHT8xe/PUCQm/MGfLQMnd1i1f
-         CBkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768982295; x=1769587095;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
-        b=bnNdnGNUPe/2azCcy7WAE00uS+qG5Wa3h9JIRPFfj7mAdHgg1yZVXn0ETBPzbYlFgS
-         GWDaIm0Bllr6e5Z7bzMUSGwzfne5wI8dGMdgkl67bOFYXXfmkN+u+Gn95sb2ttMzlRaa
-         s9/ZGGYq5/dxcxyD+AQfpSglr49mMVbmWXYRXXGZs9m1kDVkRSw6pbeTdT2++p+Zndix
-         ncMLBJAZW3mmHih8vphNKmIoBmlfPqtzvoT2QWb3SXGoyvDqgByzBwGYgqOQWSd7W1e6
-         EsA2U/pXVJmHBhOImC1W/TwI7enTRbcZjZW3DnuDiIIVsZdi3qEfQ8ZEkyRzc3i6Dfey
-         5vVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHlEGoSpgwjIAVWgIebfudoHxDPj3DXYWinb6tmP/1cFeTME3p8cT0uDNGhBbPJJvvVTzg15g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX6QncghAXTrAEO6zwmzG1I1WxGPU9FJoPDJqzfpIW1oqFCFLK
-	5Ylr4/92tByk61UYAStx2tITp7w7bTlbxrEcdWASSpukUoE7REqOCzDLGegjhScBfHVDGqEJmG6
-	2BPuVeOrJbfDJnbuvCS5eXAFu2gQfhb+341vz0KOLGvxOda8fHlm0WhIo9w==
-X-Gm-Gg: AZuq6aKWlDB3gADnjgCEs3yDzRZhO7d9uCBR7WztjR8fSbms08sqgjQVHomDetXfe0h
-	Wu1uKU1dyK28TtG5v1JTxC14jfOs4KNTud5JXvI0WA+u/TxqyV/rgyodBUPfxOuZBSLG7Q7x0HY
-	rlTG6vrz+MWO8/Ahzsz0rI8CckDoMDgtSX1jApS0gvoAIuRRnMUiwm8ZWpkGzpTVId2aYWWDqF+
-	0AMjrLTsrEPfXohxvx5r7+wBGZrMBe5zsZ3VV6983HiqVEjWnfzJGSPc6eaeVrWVb4Xj4yucp5n
-	GZByESN5R7O/2L748/SRB1agSw+9H8QXPwXHHamst51jiLyvsaIjXG7E/q1uah3nUShR4INCBnf
-	FSjcPOAJYf9FD
-X-Received: by 2002:a05:600c:1387:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-4801e30ba55mr255746925e9.15.1768982295372;
-        Tue, 20 Jan 2026 23:58:15 -0800 (PST)
-X-Received: by 2002:a05:600c:1387:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-4801e30ba55mr255746565e9.15.1768982295020;
-        Tue, 20 Jan 2026 23:58:15 -0800 (PST)
-Received: from [192.168.88.32] ([216.128.11.175])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48042c56f4asm13906205e9.15.2026.01.20.23.58.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jan 2026 23:58:14 -0800 (PST)
-Message-ID: <eaac2f5e-842e-4a18-a7a0-8a7ba2794ef9@redhat.com>
-Date: Wed, 21 Jan 2026 08:58:13 +0100
+	s=arc-20240116; t=1768983315; c=relaxed/simple;
+	bh=pU4aApN+W+Q2oftkBig1imZGm/hVUTq4yYFgQ7KJORA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uJr/U7Wm/A/J/4RMoxg3h6ozWbmd8lupDPXBC/3MMiMJDvnFFpra8vCrZUaKx79D1GbpCym7LR2g2QSZ8NJ0m2dPoK4FHQtyi82e1DCzR93fU3lNUtvLQLZdlXz+oj/bzCoot3SmyOZBNgJ7w722neDfLZAMtJ6e0P6PAXQA+yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0B0ED5BCCA;
+	Wed, 21 Jan 2026 08:15:11 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5AF593EA63;
+	Wed, 21 Jan 2026 08:15:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id XS7yFA6LcGn7cAAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Wed, 21 Jan 2026 08:15:10 +0000
+Date: Wed, 21 Jan 2026 09:15:09 +0100
+Message-ID: <878qdrs7oy.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,	Michael Ellerman
+ <mpe@ellerman.id.au>,	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,	Alex Deucher
+ <alexander.deucher@amd.com>,	Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>,	David Airlie <airlied@gmail.com>,	Simona Vetter
+ <simona@ffwll.ch>,	"Creeley, Brett" <bcreeley@amd.com>,	Andrew Lunn
+ <andrew+netdev@lunn.ch>,	"David S. Miller" <davem@davemloft.net>,	Eric
+ Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,	Paolo
+ Abeni <pabeni@redhat.com>,	Bjorn Helgaas <bhelgaas@google.com>,	Jaroslav
+ Kysela <perex@perex.cz>,	Takashi Iwai <tiwai@suse.com>,	Han Gao
+ <gaohan@iscas.ac.cn>,	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,	amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,	linux-sound@vger.kernel.org,
+	linux-riscv@lists.infradead.org,	sophgo@lists.linux.dev
+Subject: Re: [PATCH v2 4/4] ALSA: hda/intel: Raise msi_addr_mask to dma_bits
+In-Reply-To: <20260121-pci-msi-addr-mask-v2-4-f42593168989@iscas.ac.cn>
+References: <20260121-pci-msi-addr-mask-v2-0-f42593168989@iscas.ac.cn>
+	<20260121-pci-msi-addr-mask-v2-4-f42593168989@iscas.ac.cn>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.1 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next 2/3] bonding: restructure ad_churn_machine
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
- Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Mahesh Bandewar <maheshb@google.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- Liang Li <liali@redhat.com>
-References: <20260114064921.57686-1-liuhangbin@gmail.com>
- <20260114064921.57686-3-liuhangbin@gmail.com>
- <20260119122203.5113b16f@kernel.org>
- <71e30492-7644-4d4f-aaab-9a505f8faae3@redhat.com>
- <20260120151109.2d483bd8@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260120151109.2d483bd8@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Score: -4.00
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : No valid SPF, No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-251795-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com,iscas.ac.cn,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-251796-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tiwai@suse.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 56D9F53258
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: BE6B353624
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 1/21/26 12:11 AM, Jakub Kicinski wrote:
-> On Tue, 20 Jan 2026 09:29:14 +0100 Paolo Abeni wrote:
->> On 1/19/26 9:22 PM, Jakub Kicinski wrote:
->>> On Wed, 14 Jan 2026 06:49:20 +0000 Hangbin Liu wrote:  
->>>> The current ad_churn_machine implementation only transitions the
->>>> actor/partner churn state to churned or none after the churn timer expires.
->>>> However, IEEE 802.1AX-2014 specifies that a port should enter the none
->>>> state immediately once the actor’s port state enters synchronization.  
->>>
->>> Paolo, how do you feel about his patch with 2+ weeks until final?
->>> The first patch is definitely suitable for net. If this one is not
->>> it should not have a Fixes tag. I'd lean towards getting them all
->>> into -rc7 if we can.  
->>
->> My personal preference would be for 2/3 landing into net-next: the code
->> looks correct to me, but refactor has IMHO still to much potential for
->> regressions do land directly into net and the blamed commit is quite old.
->>
->> I suggested targeting net-next while retaining the Fixes tag as we
->> already had complex fixes landing into net-next in the past.
+On Wed, 21 Jan 2026 04:49:40 +0100,
+Vivian Wang wrote:
 > 
-> The appropriate way to delay propagation of the fix to add:
+> The code was originally written using no_64bit_msi, which restricts the
+> device to 32-bit MSI addresses.
 > 
-> Cc: <stable@vger.kernel.org> # after 4 weeks
+> Since msi_addr_mask is introduced, use DMA_BIT_MASK(dma_bits) instead of
+> DMA_BIT_MASK(32) here for msi_addr_mask, describing the restriction more
+> precisely and allowing these devices to work on platforms with MSI
+> doorbell address above 32-bit space, as long as it is within the
+> hardware's addressable space.
 > 
-> not to merge things into -next.
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> 
+> ---
+> v2: No changes
+> 
+> hda/intel maintainers: I don't know if this is the correct restriction.
+> Please help with checking. Thanks.
 
-I went over the code as carefully as I could and I don't see any obvious
-problem, so I don't have a so strong opinion vs net, but to hopefully
-clarify: my thinking is that this is net-next material because it's an
-invasive refactor with behavior change. My preference would be let the
-code be tested in next/net-next for a while before landing into mainline.
+The quirk is used only for AMD graphics chips, so this should
+(hopefully) work.
 
-/P
+Acked-by: Takashi Iwai <tiwai@suse.de>
 
+
+thanks,
+
+Takashi
 
