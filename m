@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-251938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251939-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONm1C8P1cGmgbAAAu9opvQ
-	(envelope-from <netdev+bounces-251938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:50:27 +0100
+	id 2EVQD873cGmgbAAAu9opvQ
+	(envelope-from <netdev+bounces-251939-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:59:10 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7A55979E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:50:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F84659943
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DC23A2CF25
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:48:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6FF38A4C43D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBF04BCADA;
-	Wed, 21 Jan 2026 14:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A3A4C0431;
+	Wed, 21 Jan 2026 14:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="pSBbPTQp"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UODvhtRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2E14BCAD5;
-	Wed, 21 Jan 2026 14:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4123A7F58;
+	Wed, 21 Jan 2026 14:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006097; cv=none; b=bqtcMWYgZm5Z0nR2Rc+CbGCvTb6HHdD4H2dB8iIEAMvUdJzY86glbOpNhKz73FtyXUqAtPL3beH6vrHKoA4MEE5hPMSgq/lj9E92BdBDjiwhl71RfX5GwihnTaEY9NF+QnXCJz830OrPdYN8tj5MNWwUpVC1gTiZu8/9F2986n4=
+	t=1769006104; cv=none; b=oIyV7/VKs+fnxudjjJGaoW/bHjtbddsGCB804SZ5mpm2+xqXOYPgw6eSpGG/sYaBOL8WsQGM4XbEm8v3jYHShTmFUKLXttXIwZaOqHp84nEnOMn8Kg2vqvFc8MwoB5c8hme1a5KInHf/5I2QpgObc9sMC8Wj3ncX8JlLSizSdiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006097; c=relaxed/simple;
-	bh=zvY9YEG+wOzSsIgZFouqI4EOQZ2ONGmU/Ic/rZTtxy4=;
+	s=arc-20240116; t=1769006104; c=relaxed/simple;
+	bh=4kTJcLmYGzRCj4IKX4oNLKlCTvwFwEiSzIa5dY7keno=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ydy/jLeJ01U08fK5R74d8x6lNU0oC9HVSSmYrvstRntaXO/dKYErJ3daHl8BSLlljGmxlTTxJxwHKebHwFo5S0Vwuhzo2uUwPLr7Mv2d4twsBiXGjzoQK6k4YL0Rkx8ND9qFT32HG/JYcyK7+G50vqEEa9u5ghFmAYfQTUNwHJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=pSBbPTQp; arc=none smtp.client-ip=52.12.53.23
+	 MIME-Version:Content-Type; b=psBlANAyqCPb/+Tdqsl2AVXmVE6w+MKuWliRgxREuhSvngff5IC109sAVer3oF7p50vErnffY6fkmQiLpSH/tn1rm/rIMVRf9eKAVRineXLazAx3eEWPI5tRdpyDuec4jeEIBAGyLIQXz4YiRFiyvjp1H4fB4CmvNabyZA2JdJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UODvhtRk; arc=none smtp.client-ip=52.35.192.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769006096; x=1800542096;
+  t=1769006102; x=1800542102;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Tnl6MqmXsFXKs7o7pIswHuCAMSMn0lU/0P5sxp57FXE=;
-  b=pSBbPTQppXTfXcjlolhZu+vSL/cPMNe52lc+Vca8x6k2zycksfZd+kc5
-   +XLn1eVyDjdFA//oQSH+67ZlmQQYFpeYZrMrFHkgyURp01foscO/Zj4Fo
-   ff3pJJWWqtmF78RJ/9AkakACHvYRdNdVE8Xd7/8vBui/24Z1R7VHHmsj6
-   n+AQIX7fZMyyIoRn1GUe09UMQbPRGawU2eqQtbB1ls4XH9z6j94QEisOk
-   yqyUhUDsdAGWAIXn8pJNgWp5Fj9sM31I1TsxWBv0hOQojs3opPuAmuXdx
-   Jbp5j7cguL3o6BNqA5SjdH2c5s01YQOBEPT/E+mUw4TU6nwhhkhePBRnU
+  bh=0rhk6SMiUX4DX71gJT40pzZWSzRz9RPlP3yDXcP1Qj8=;
+  b=UODvhtRk1GDZ5HXknWzBcUVt8lmZmP7r1Ik16hBfUU6OWkL3a/euCWsq
+   o9e4e/rty55mMNAGSW7AVsjvkaCWE64yZhdjnVOosf8/NlnSjMzgsQgwq
+   c5lo40zq+FeGCb3JU52gKNYFoPvZxkPpJPFRC7KHTskyb08f+dvguifVf
+   7AlV6m2NER6HhDol3QqA0fUx2YdLs4dsqnzcZQI4fd/dsG4MJnx+RS5Bk
+   o+HM++5DInuWMITDfrkwTVkcTRTWqTm/xXaAfHe2dhbhXPn05YqrW192p
+   JPc4Zq6GKr0MX1TEpO3z2lZkSCAJiLVSBzHdWUx34m7LPxql3m0CMYNv5
    g==;
-X-CSE-ConnectionGUID: muGqYszjRRueXSRfH2RDHw==
-X-CSE-MsgGUID: RvVEGyqhSSCT3oMZS3n8eA==
+X-CSE-ConnectionGUID: XfwFkXjbQFi3pm5sENoVEA==
+X-CSE-MsgGUID: +/0dyjK6QTuQ7fAQU9OwOg==
 X-IronPort-AV: E=Sophos;i="6.21,242,1763424000"; 
-   d="scan'208";a="11186516"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:34:53 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:25276]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.221:2525] with esmtp (Farcaster)
- id eb4cb863-62b9-4ba4-84ae-0280611100c6; Wed, 21 Jan 2026 14:34:53 +0000 (UTC)
-X-Farcaster-Flow-ID: eb4cb863-62b9-4ba4-84ae-0280611100c6
+   d="scan'208";a="11093535"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:35:02 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:18279]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.244:2525] with esmtp (Farcaster)
+ id 40835c61-feff-4f8f-89b1-4b3d3f82deb9; Wed, 21 Jan 2026 14:35:02 +0000 (UTC)
+X-Farcaster-Flow-ID: 40835c61-feff-4f8f-89b1-4b3d3f82deb9
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:53 +0000
+ Wed, 21 Jan 2026 14:35:00 +0000
 Received: from dev-dsk-itazur-1b-11e7fc0f.eu-west-1.amazon.com (172.19.66.53)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:50 +0000
+ Wed, 21 Jan 2026 14:34:57 +0000
 From: Takahiro Itazuri <itazur@amazon.com>
 To: <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
 	<richardcochran@gmail.com>, <dwmw2@infradead.org>, <andrew+netdev@lunn.ch>,
@@ -77,9 +77,9 @@ CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
  Graf" <graf@amazon.de>, <mzxreary@0pointer.de>, Marco Cali
 	<xmarcalx@amazon.co.uk>, David Woodhouse <dwmw@amazon.co.uk>, "Takahiro
  Itazuri" <itazur@amazon.co.uk>
-Subject: [PATCH v6 6/7] ptp: ptp_vmclock: remove dependency on CONFIG_ACPI
-Date: Wed, 21 Jan 2026 14:33:43 +0000
-Message-ID: <20260121143402.3092-7-itazur@amazon.com>
+Subject: [PATCH v6 7/7] ptp: ptp_vmclock: return TAI not UTC
+Date: Wed, 21 Jan 2026 14:33:44 +0000
+Message-ID: <20260121143402.3092-8-itazur@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260121143402.3092-1-itazur@amazon.com>
 References: <20260121143402.3092-1-itazur@amazon.com>
@@ -91,7 +91,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 X-Spamd-Result: default: False [-5.96 / 15.00];
 	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251938-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251939-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,gmail.com,infradead.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -116,89 +116,64 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	DKIM_TRACE(0.00)[amazon.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,amazon.es:email,amazon.co.uk:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,amazon.co.uk:email,amazon.es:email];
 	PRECEDENCE_BULK(0.00)[];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: CA7A55979E
+X-Rspamd-Queue-Id: 9F84659943
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Now that we added device tree support we can remove dependency on
-CONFIG_ACPI.
+To output UTC would involve complex calculations about whether the time
+elapsed since the reference time has crossed the end of the month when
+a leap second takes effect. I've prototyped that, but it made me sad.
+
+Much better to report TAI, which is what PHCs should do anyway.
+And much much simpler.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Signed-off-by: Babis Chalios <bchalios@amazon.es>
 ---
- drivers/ptp/Kconfig       |  2 +-
- drivers/ptp/ptp_vmclock.c | 12 ++++++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ drivers/ptp/ptp_vmclock.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
-index 5f8ea34d11d6..b93640ca08b7 100644
---- a/drivers/ptp/Kconfig
-+++ b/drivers/ptp/Kconfig
-@@ -134,7 +134,7 @@ config PTP_1588_CLOCK_KVM
- config PTP_1588_CLOCK_VMCLOCK
- 	tristate "Virtual machine PTP clock"
- 	depends on X86_TSC || ARM_ARCH_TIMER
--	depends on PTP_1588_CLOCK && ACPI && ARCH_SUPPORTS_INT128
-+	depends on PTP_1588_CLOCK && ARCH_SUPPORTS_INT128
- 	default PTP_1588_CLOCK_KVM
- 	help
- 	  This driver adds support for using a virtual precision clock
 diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
-index b5e264264051..55ec3cda3995 100644
+index 55ec3cda3995..6cf63a86c997 100644
 --- a/drivers/ptp/ptp_vmclock.c
 +++ b/drivers/ptp/ptp_vmclock.c
-@@ -501,6 +501,7 @@ static void vmclock_remove(void *data)
- 		misc_deregister(&st->miscdev);
- }
+@@ -83,13 +83,13 @@ static uint64_t mul_u64_u64_shr_add_u64(uint64_t *res_hi, uint64_t delta,
  
-+#if IS_ENABLED(CONFIG_ACPI)
- static acpi_status vmclock_acpi_resources(struct acpi_resource *ares, void *data)
+ static bool tai_adjust(struct vmclock_abi *clk, uint64_t *sec)
  {
- 	struct vmclock_state *st = data;
-@@ -584,6 +585,7 @@ static int vmclock_probe_acpi(struct device *dev, struct vmclock_state *st)
+-	if (likely(clk->time_type == VMCLOCK_TIME_UTC))
++	if (clk->time_type == VMCLOCK_TIME_TAI)
+ 		return true;
  
- 	return 0;
- }
-+#endif /* CONFIG_ACPI */
+-	if (clk->time_type == VMCLOCK_TIME_TAI &&
++	if (clk->time_type == VMCLOCK_TIME_UTC &&
+ 	    (le64_to_cpu(clk->flags) & VMCLOCK_FLAG_TAI_OFFSET_VALID)) {
+ 		if (sec)
+-			*sec += (int16_t)le16_to_cpu(clk->tai_offset_sec);
++			*sec -= (int16_t)le16_to_cpu(clk->tai_offset_sec);
+ 		return true;
+ 	}
+ 	return false;
+@@ -350,9 +350,9 @@ static struct ptp_clock *vmclock_ptp_register(struct device *dev,
+ 		return NULL;
+ 	}
  
- static irqreturn_t vmclock_of_irq_handler(int __always_unused irq, void *_st)
- {
-@@ -627,11 +629,11 @@ static int vmclock_setup_notification(struct device *dev,
- 	if (!(le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
- 		return 0;
+-	/* Only UTC, or TAI with offset */
++	/* Accept TAI directly, or UTC with valid offset for conversion to TAI */
+ 	if (!tai_adjust(st->clk, NULL)) {
+-		dev_info(dev, "vmclock does not provide unambiguous UTC\n");
++		dev_info(dev, "vmclock does not provide unambiguous time\n");
+ 		return NULL;
+ 	}
  
--	if (has_acpi_companion(dev)) {
-+#if IS_ENABLED(CONFIG_ACPI)
-+	if (has_acpi_companion(dev))
- 		return vmclock_setup_acpi_notification(dev);
--	} else {
--		return vmclock_setup_of_notification(dev);
--	}
-+#endif
-+	return vmclock_setup_of_notification(dev);
- }
- 
- static void vmclock_put_idx(void *data)
-@@ -651,9 +653,11 @@ static int vmclock_probe(struct platform_device *pdev)
- 	if (!st)
- 		return -ENOMEM;
- 
-+#if IS_ENABLED(CONFIG_ACPI)
- 	if (has_acpi_companion(dev))
- 		ret = vmclock_probe_acpi(dev, st);
- 	else
-+#endif
- 		ret = vmclock_probe_dt(dev, st);
- 
- 	if (ret) {
 -- 
 2.47.3
 
