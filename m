@@ -1,208 +1,236 @@
-Return-Path: <netdev+bounces-251860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251861-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBzxDDfKcGkNZwAAu9opvQ
-	(envelope-from <netdev+bounces-251860-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:44:39 +0100
+	id WK3PESnLcGkNZwAAu9opvQ
+	(envelope-from <netdev+bounces-251861-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:48:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A0556FC6
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:44:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3013570BF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 803D572CE22
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:37:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C78665A5064
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C3748A2D0;
-	Wed, 21 Jan 2026 12:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQ/TNF0/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2YJyP0e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7710B47ECC2;
+	Wed, 21 Jan 2026 12:39:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCD448A2B9
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28553E9F7E
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768998963; cv=none; b=AYYa87iSVWDl6Tt7DUDQxoi1C+Q6vs7IUffzSvrrb8j79s/MXWu6Px967U4oqs7nQBbwutex97i+Rflm4slyONtmKU2osCU/4JCLJDDSOy/CcEdWANeGWPWb5Jx3XpGFPeQ0h3CR56yQt2nBQHGJS/2xuI5vwIxtXBfUsI2kNfc=
+	t=1768999193; cv=none; b=SWiKrssrGNqXa3ETLHOVqPKTBg0YsJYgJQYT4OAXK7YdTK+Wn71XRHNimHALDyQ5FjsntneMDQpSRkifXzuNPobSCXzQiOnQq7UDKz+9LoJAkPYS7vWkbSCwW2sjud7VupwnGsmuRAQgL8XGTVVNmGvmRe4iLSPw672J93Xt7rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768998963; c=relaxed/simple;
-	bh=mha0I0VeVP1yXEtwsIMyiWq7J0MEXEEXF4v+brwB7Ss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AFqPOmdouPUq1X2hkgD0CpmZB3bJSi+mAi1Lhf1JwTZ40yw0WVOu5J1Z7wTePvFazYvQXoI/h32o52HUzs0TNUqsZtGp0POriUbBHmeyRkn6ETrl3lPRAqSI5ofTHq7Fye5wOHchtbypLOJaF0aewQttkEW+XT6+oA6SSaeLlzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KQ/TNF0/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2YJyP0e; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768998960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
-	b=KQ/TNF0/jsR1ZYVlVbn5nL2dTXQQ4Cp91gq8JdBGYbJv0WzRAHoycBGiI3q/YZrFIwLP8i
-	fRiIlEnUiYOdNg7EQDlMGuz34Pls6RrPtABLc5+wizr3LW+uDSJuJhv7FHTYn2s038N05z
-	yEX9iG4Ent2W1xm0aXUVq9B4jyJCVGo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-58-Cc8Y572hOhqkvQuzmUUegQ-1; Wed, 21 Jan 2026 07:35:59 -0500
-X-MC-Unique: Cc8Y572hOhqkvQuzmUUegQ-1
-X-Mimecast-MFC-AGG-ID: Cc8Y572hOhqkvQuzmUUegQ_1768998958
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47ee8808ffbso48397835e9.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 04:35:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768998958; x=1769603758; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
-        b=e2YJyP0eTNS932V2wD03A9ExfaNr0MsBa0cSDjf0VDWECGqEuH2K52zFG9cwSlu+FG
-         CUavymRALV6Zv71/tRFiTPuJm5ugs1xKqay7LK50HI+xxebSkQSSS5watxOyh6bLGYy4
-         /m1bNIM69axgme56u3fghXKdOsxgJQIQdDDmIFuvYKubWCjKwnevysCszJNrOBTbj8p8
-         y4B++MEFLAUAAPHxEkjgQ2amuKDeA2pw+gaxKkWWApvc7AjNN348EDXanAcdTaVntBsW
-         YmTqT3TOv0dWDXMIwqawRXPldASbXoGgUjvrbyO4Nla6+kbiNT1oaZKt+W5HbT/4XSlg
-         Erig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768998958; x=1769603758;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
-        b=Dh7TNxqTis8eaVfhXvddGScaFulJl8RQDZPJQDsvkdlrA7T0ZYRotz54iu4lyEGqAf
-         YD4QhWVT0fLs8CQJESLENbw2rJY/10hKAY7/geRmK8GvC5JpT5iSeaPKIeF9GsU+nKiA
-         /tUGyhFPVafhJJMDtGTNP5WIMB/L7dioseSA04YNbcL2tT87Y7dvnRM4wL0WrvMSGgir
-         Ky5PxiXZV7+mSVDKoOw7zOvml7s8cEka7KuqXxMHtCkr48cO5FzwpIzaZgeQ1gT7bXht
-         bf4Slm6d2hmnYbylCfAmAtx65vZpkYMXZuduFwNJazbcc+wI3rOsxpnubjdMZ1CZ9X62
-         nHLA==
-X-Gm-Message-State: AOJu0Yy728HIBVhERc7JtvWLzVAqGA99HXhK82X7CFcdo3b3yAzhErFz
-	or2fOp+yXLa1wJtAmjgdPMMCBNM9rHBW9wT0EUazzpdt/92nIG04o3VvtjqBSKNewpYbM00tVyu
-	rjriCNjdA5e0CnUgBh+RJ/AhseF4vsfP1C/dlmvpNZDpNx2zhE4v94d1puA==
-X-Gm-Gg: AZuq6aJbgQFhh811v+FivTKGXzGeV97PJiVG5b/ZD48hCR3sqRnGH3JjVhWkC0tZcth
-	t2TX3W2gEXWxx9zT08xE8XO9h3gu4giQa+KfdGJec9527caWYFsBjIWa78vz/vIrdYgcoBTEf+K
-	SgYt+b+AsMAHDHVVt5dBBEEpDF+FZRsO/YzMsYclI7I2q6pELe246cbAB4TuNmilAJ5bSZ3sWrH
-	TBiUQv/6rR/IKbN9HZ9kUUt+b/BPAYFQ6Zcw9lfqbcSfcnptJhzbuHaEXbPiBr3gOy4CtVea//h
-	RBauwtGQSFsO3VgTUrYEUl98nBNdTI5kxPF15YIUjikDGsP7+reYpznBMvPY2ny9NbW3XNfapUj
-	hoGhRdaX4zrLWrb/7uwj1ilaIEDoHFo4=
-X-Received: by 2002:a05:600c:3ba8:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-4801e34651dmr231392775e9.30.1768998957678;
-        Wed, 21 Jan 2026 04:35:57 -0800 (PST)
-X-Received: by 2002:a05:600c:3ba8:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-4801e34651dmr231392355e9.30.1768998957206;
-        Wed, 21 Jan 2026 04:35:57 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4289b83csm362908205e9.3.2026.01.21.04.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 04:35:56 -0800 (PST)
-Date: Wed, 21 Jan 2026 07:35:53 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Asias He <asias@redhat.com>
-Subject: Re: [PATCH net v6 0/4] vsock/virtio: fix TX credit handling
-Message-ID: <20260121073547-mutt-send-email-mst@kernel.org>
-References: <20260121093628.9941-1-sgarzare@redhat.com>
+	s=arc-20240116; t=1768999193; c=relaxed/simple;
+	bh=EiAFAOuMzwV4r2tGLN/QrCYwsZ2sDe6erK3vFeRjUb0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gB2PdM2DA3V6hJzC86J/sMWkiy44caEOLpapAeKqP3HaC41nC9RlQzdTYVTUr9c0mFOabQuDzJ/90AlDvy/GIRrrW3z+QSJZ1PjvTpEwNP74MdJSe0NTqDZ+nkkDn/eUl302n//e/Ax3nER5bLeAdjMeN7rAgfZUAOu5aOgdKRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
+Received: from [2a02:578:851f:1502:391e:c5f5:10e2:b9a3] (helo=deadeye)
+	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1viXUk-001b9x-1d;
+	Wed, 21 Jan 2026 12:39:33 +0000
+Received: from ben by deadeye with local (Exim 4.99.1)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1viXUi-00000001N9M-0q4Q;
+	Wed, 21 Jan 2026 13:39:32 +0100
+Message-ID: <e4dcf5497e3840706b2e13d10c7efff1819c14a6.camel@decadent.org.uk>
+Subject: Re: Bug#1126015: linux-image-6.17.13+deb14-rt-amd64: ethtool -x
+ <sfc-net-driver-ifname> causes: rtmutex deadlock detected
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Salvatore Bonaccorso <carnil@debian.org>, linux-net-drivers@amd.com, 
+ Edward Cree <ecree.xilinx@gmail.com>
+Cc: 1126015@bugs.debian.org, Damir Mansurov <damir.mansurov@oktetlabs.ru>, 
+ netdev <netdev@vger.kernel.org>
+Date: Wed, 21 Jan 2026 13:39:27 +0100
+In-Reply-To: <aXBdvYZIePCFGtY9@eldamar.lan>
+References: 
+	<176891113233.1085.14440184213728685693.reportbug@elrond.oktetlabs.ru>
+	 <176891113233.1085.14440184213728685693.reportbug@elrond.oktetlabs.ru>
+	 <aXBdvYZIePCFGtY9@eldamar.lan>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-SHs7cU34VmZt4tx1w0v2"
+User-Agent: Evolution 3.56.2-8 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121093628.9941-1-sgarzare@redhat.com>
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-SA-Exim-Connect-IP: 2a02:578:851f:1502:391e:c5f5:10e2:b9a3
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
+X-Spamd-Result: default: False [-1.86 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-251860-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-251861-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[decadent.org.uk];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[debian.org,amd.com,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ben@decadent.org.uk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 98A0556FC6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,oktetlabs.ru:email,decadent.org.uk:mid]
+X-Rspamd-Queue-Id: E3013570BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 10:36:24AM +0100, Stefano Garzarella wrote:
-> The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till v4.
-> Since it's a real issue and the original author seems busy, I'm sending
-> the new version fixing my comments but keeping the authorship (and restoring
-> mine on patch 2 as reported on v4).
 
+--=-SHs7cU34VmZt4tx1w0v2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Control: tag -1 - moreinfo
+Control: tag -1 upstream
 
-> v6:
-> - Rebased on net tree since there was a conflict on patch 4 with another
->   test added.
-> - No code changes.
-> 
-> v5: https://lore.kernel.org/netdev/20260116201517.273302-1-sgarzare@redhat.com/
-> v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
-> 
-> >From Melbin K Mathew <mlbnkm1@gmail.com>:
-> 
-> This series fixes TX credit handling in virtio-vsock:
-> 
-> Patch 1: Fix potential underflow in get_credit() using s64 arithmetic
-> Patch 2: Fix vsock_test seqpacket bounds test
-> Patch 3: Cap TX credit to local buffer size (security hardening)
-> Patch 4: Add stream TX credit bounds regression test
-> 
-> The core issue is that a malicious guest can advertise a huge buffer
-> size via SO_VM_SOCKETS_BUFFER_SIZE, causing the host to allocate
-> excessive sk_buff memory when sending data to that guest.
-> 
-> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
-> 32 guest vsock connections advertising 2 GiB each and reading slowly
-> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB; the system only
-> recovered after killing the QEMU process.
-> 
-> With this series applied, the same PoC shows only ~35 MiB increase in
-> Slab/SUnreclaim, no host OOM, and the guest remains responsive.
-> 
-> Melbin K Mathew (3):
->   vsock/virtio: fix potential underflow in virtio_transport_get_credit()
->   vsock/virtio: cap TX credit to local buffer size
->   vsock/test: add stream TX credit bounds test
-> 
-> Stefano Garzarella (1):
->   vsock/test: fix seqpacket message bounds test
-> 
->  net/vmw_vsock/virtio_transport_common.c |  30 +++++--
->  tools/testing/vsock/vsock_test.c        | 112 ++++++++++++++++++++++++
->  2 files changed, 133 insertions(+), 9 deletions(-)
-> 
-> -- 
-> 2.52.0
+On Wed, 2026-01-21 at 06:01 +0100, Salvatore Bonaccorso wrote:
+> Control: severity -1 important
+> Control: tags -1 + moreinfo
+>=20
+> Hi Damir,
+>=20
+> On Tue, Jan 20, 2026 at 03:12:12PM +0300, Damir Mansurov wrote:
+> > Package: src:linux
+> > Version: 6.17.13-1
+> > Severity: critical
+> > Justification: breaks the whole system
+> > X-Debbugs-Cc: debian-amd64@lists.debian.org, damir.mansurov@oktetlabs.r=
+u
+> > User: debian-amd64@lists.debian.org
+> > Usertags: amd64
+> >=20
+> > I am trying to read the receive flow hash indirection table from a NIC =
+serviced by the sfc driver and I get a hung system.
+> >=20
+> > $ ethtool -x enp1s0f0np0
+> > Jan 20 14:30:30 kernel: ------------[ cut here ]------------
+> > Jan 20 14:30:30 kernel: rtmutex deadlock detected
+> > Jan 20 14:30:30 kernel: WARNING: CPU: 2 PID: 1194 at kernel/locking/rtm=
+utex.c:1674 __rt_mutex_slowlock_locked.constprop.0+0x1e8/0x220
+> > Jan 20 14:30:30 kernel: Modules linked in: rpcsec_gss_krb5 nfsv4 dns_re=
+solver nfs lockd grace netfs 8021q garp stp llc mrp binfmt_misc nls_ascii n=
+ls_cp437 vfat fat intel_rapl_msr intel_rapl_common x86_pkg_temp_thermal int=
+el_powerclamp coretemp kvm_intel kvm jc42 dell_smbios ppdev dell_wmi_descri=
+ptor platform_profile dcdbas irqbypass ghash_clmulni_intel mgag200 aesni_in=
+tel drm_client_lib rapl drm_shmem_helper at24 drm_kms_helper intel_cstate i=
+ntel_uncore vga16fb i2c_algo_bit vgastate pcspkr acpi_cpufreq parport_pc pa=
+rport intel_vbtn sparse_keymap joydev ipmi_ssif evdev button ie31200_edac s=
+g onload(OE) acpi_ipmi ipmi_si ipmi_watchdog sfc_resource(OE) ipmi_devintf =
+ipmi_msghandler drm efi_pstore configfs auth_rpcgss sunrpc nfnetlink autofs=
+4 ext4 crc16 mbcache jbd2 crc32c_cryptoapi hid_generic usbhid hid dm_mod sd=
+_mod iTCO_wdt ahci intel_pmc_bxt iTCO_vendor_support watchdog tg3 libahci x=
+hci_pci ehci_pci video sfc xhci_hcd libphy ehci_hcd wmi battery libata usbc=
+ore mdio_bus mtd scsi_mod i2c_i801 fan usb_common i2c_smbus scsi_common
+> > Jan 20 14:30:30 kernel:  lpc_ich
+> > Jan 20 14:30:30 kernel: CPU: 2 UID: 1100 PID: 1194 Comm: ethtool Tainte=
+d: G        W  OE       6.17.13+deb14-rt-amd64 #1 PREEMPT_{RT,(full)}  Debi=
+an 6.17.13-1=20
+> > Jan 20 14:30:30 kernel: Tainted: [W]=3DWARN, [O]=3DOOT_MODULE, [E]=3DUN=
+SIGNED_MODULE
+> > Jan 20 14:30:30 kernel: Hardware name: Dell Inc. PowerEdge R220/05Y15N,=
+ BIOS 1.4.0 10/23/2014
+> > Jan 20 14:30:30 kernel: RIP: 0010:__rt_mutex_slowlock_locked.constprop.=
+0+0x1e8/0x220
+> > Jan 20 14:30:30 kernel: Code: 00 4c 89 e6 48 89 ef e8 b6 35 ca 00 41 83=
+ fd dd 0f 85 d7 fe ff ff 48 89 ef e8 f4 9c ca 00 48 c7 c7 6c 51 5d a9 e8 a8=
+ 00 f6 ff <0f> 0b 66 90 b8 01 00 00 00 87 43 18 e8 c7 3e fb ff eb ef bf 01 =
+00=20
+> > Jan 20 14:30:30 kernel: RSP: 0018:ffffcdc24208f5a0 EFLAGS: 00010246
+> > Jan 20 14:30:30 kernel: RAX: 0000000000000000 RBX: ffff8b14d3888000 RCX=
+: 0000000000000027
+> > Jan 20 14:30:30 kernel: RDX: ffff8b1617f1ce88 RSI: 0000000000000001 RDI=
+: ffff8b1617f1ce80
+> > Jan 20 14:30:30 kernel: RBP: ffff8b14ca3d9150 R08: 0000000000000000 R09=
+: ffffcdc24208f378
+> > Jan 20 14:30:30 kernel: R10: ffffffffa9ee3e48 R11: 00000000ffffefff R12=
+: ffffcdc24208f5a0
+> > Jan 20 14:30:30 kernel: R13: 00000000ffffffdd R14: ffffcdc24208f648 R15=
+: ffffffffa9168880
+> > Jan 20 14:30:30 kernel: FS:  00007f1bb6609b80(0000) GS:ffff8b166d501000=
+(0000) knlGS:0000000000000000
+> > Jan 20 14:30:30 kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 00000000800500=
+33
+> > Jan 20 14:30:30 kernel: CR2: 000055f2ef901700 CR3: 000000013b2c4001 CR4=
+: 00000000001726f0
+> > Jan 20 14:30:30 kernel: Call Trace:
+> > Jan 20 14:30:30 kernel:  <TASK>
+> > Jan 20 14:30:30 kernel:  rt_mutex_slowlock.constprop.0+0x4d/0xc0
+> > Jan 20 14:30:30 kernel:  efx_mcdi_rx_pull_rss_config+0x28/0x60 [sfc]=
+=20
+> > Jan 20 14:30:30 kernel:  efx_ethtool_get_rxfh+0x3b/0xd0 [sfc]=20
+> > Jan 20 14:30:30 kernel:  rss_prepare.isra.0+0x1c9/0x330
+[...]
+>=20
+> Futhermore the kernel is tained with OOT module, afaics this might be
+> sfc_resource. That is you still would need to check if the problem is
+> trigerable without loading OOT module.
 
+sfc_resource isn't involved in this (and nor is RT).  The deadlock seems
+to be quite straightforward:
+
+1. In net/ethtool/rss.c, rss_prepare_get() locks the net device's
+   rss_lock and calls its driver's get_rxfh operation
+2. In drivers/net/ethernet/sfc/ethtool_common.c, efx_ethtool_get_rxfh()
+   calls the chip's rx_pull_rss_config operation
+3. In drivers/net/ethernet/sfc/mcdi_filters.c,
+   efx_mcdi_rx_pull_rss_config() locks the net device's rss_lock
+
+Step 3 seems to be a workaround for missing locking in the ethtool core.
+Since that locking was added to the ethtool core in 6.17, it needs to be
+removed from the sfc driver from that version onward.
+
+Ben.
+
+--=20
+Ben Hutchings
+I'm always amazed by the number of people who take up solipsism because
+they heard someone else explain it. - E*Borg on alt.fan.pratchett
+
+--=-SHs7cU34VmZt4tx1w0v2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmlwyP8ACgkQ57/I7JWG
+EQkK1BAAkfPsvGbrnIgmDCC/2225k9Uue3dsyd1a+UUn20UrJ1iQTMDeLFk04laR
+Zptg1wHuhTtg/btr4lfPiCfxekgKgBEvyoFrSoCexUa+fH71PcH2nIteSydjLDVO
+Eyl9iSIAyD+8foGtO8PEJMZ1Aa6Fw3GIPIA1m+tYR9aqP94MCk0ZnyTazghbxAUO
+/lj0D3hCr3YWtXZAQl8YArPk/wbd4WLRtu1isjtXOjTvqhiL3V1jUz9ElikAAvRR
+kVOvngeqlJ5JWm3BWXnMfLqUrGX0hnMXLUlValzxVQwaNjU8W1k29MylAiTcYYwd
+opEpf5FjlZ4q16XZo+4QqlvJHM+RQvjf6WokR2fGG9hmgdhltM1WJQACDYombr2m
+3vXZY4IA/h6pCFEK4FkaGhTKILZhhFSM6DJSGM9JbGr2RXSs+vo9OuwIM6JmhJez
+F6vLTeBvRm0eGzLomgSzNzJmehLsq49vOepIILzumLtNSku+AzP6n87vm4TJqmfX
+RuvwCXdFfZJwL8VlsI1ZWecHXnp25zTLN7IH1/duIVVxbZVAEoK5klKApK6YTwLM
+47+7vJWKgir2Uc4WYd7HVzc4mKS4ilsJnyEZBB1nGdYLPXQqmRPR1LWBvggw/zZT
+9oiwjmTR90+wt5x0OmRNyFjXiK/Esr4HgNr5ck0DCfZC9EFvjv0=
+=oU0W
+-----END PGP SIGNATURE-----
+
+--=-SHs7cU34VmZt4tx1w0v2--
 
