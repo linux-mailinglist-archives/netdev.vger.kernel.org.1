@@ -1,183 +1,166 @@
-Return-Path: <netdev+bounces-251686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251687-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kACuDIQscGniWwAAu9opvQ
-	(envelope-from <netdev+bounces-251686-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:31:48 +0100
+	id kJHOFPAscGniWwAAu9opvQ
+	(envelope-from <netdev+bounces-251687-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:33:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF94F1F8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:31:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E7B4F23E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1760E7AF5F3
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:31:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 735BC8AFC79
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 01:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF2D21FF48;
-	Wed, 21 Jan 2026 01:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F8C3009EE;
+	Wed, 21 Jan 2026 01:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h50dDHrN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsL66bGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7407A20B212
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9D9301037
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768959097; cv=none; b=JAoq9NBlqoa4fTMOmQefFfQaNSwsXvR+U7WouEkaecJG4IF6pRN/IIEfGFw5wn8P0yeubhzLykD1CHFMrntw8o08ZsPYnEsXvt/hoX7Np4bu9VKkiEsVUidQgNdeykx8dKUVWVmpAkOwd9iJ9J6r/TZw7jVz7R9owiiVtA+KdLw=
+	t=1768959180; cv=none; b=nEr199+tYnalZz95BqCxwHP7V0oPDEBNHHX/IF5/JUT/kcSvSJnzM8/fLhA4gG9UluRpiqGqyZjzKuj9MlVcz5IsqpYne+bIRmdjwSAmHMzZIzNPt9X92A/SY/Jk5tpjPs5m+FijYIImsMTBkiSsXtMU/nPfk2UH4lw97j0t3Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768959097; c=relaxed/simple;
-	bh=dEcCU3CGTGTpN7l/rN2LrkYLiTkUZ0f52QXFuNFvEZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FYKFsvwcY8oi2G4OTkR9GR2JrbIaklmzcIgPDpz2znokJuTpnxkvQOFB7hY7eMY3s9lXKYvTcH7VOmuc0UoQosI5vk2HjgwWULo5yaTBhfRWfrdMCGEVPize7RvMUpF3/giJtgps2IprBihYy1+Dx7zexvywk99ew+alx5tEK2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h50dDHrN; arc=none smtp.client-ip=209.85.128.172
+	s=arc-20240116; t=1768959180; c=relaxed/simple;
+	bh=hT9gGp+GTStA+p0XTftxURymXw7pEgxx81yY6VDE3+A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XCDRF5+SOsGsFuYUFlRwV//E7yYu463xs4Zninu//i97WZIteehaIsgJMJZhaG6nqoNQ4kx9ThfiIekx6UZ1lS1DqnZ1A+9XvZzp+pCLCnVc4Ugh6F+cutEJkba/aXL5cuku6CIMUHTSI8b1Vy83ldhC0fhSaknyRnhlboHq3jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsL66bGD; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7941578064bso5224537b3.2
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 17:31:31 -0800 (PST)
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2ae61424095so5995627eec.1
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 17:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768959090; x=1769563890; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8iE0KBKIYKbBU2Zh8l50G8fq2WUoVHBO7RlhN61jto=;
-        b=h50dDHrNERTJ1JhLzkHKw+qQXwiVbuaQQR89ZbxOVAM/qTicqyHz+TmJptauGGBaPZ
-         cCAggqeULVjUU76rRqpnBRdWR4QMjo80ll7nemToQy3qLO6DuUagQlrdWjU0NincmOUH
-         CUGqSdo1bZJxWKGKatI5KDK0aYbiufIJWM0QBGiZ/n5L+e2/7u0EWBPvmGCebn2meFvw
-         wIWs+f+K5uv71tfkmc64xZBGFvQJhpstftvXfcn6UFTvzAAnwBKCMkwthhdCdhz4Eo3A
-         HGhRKe+s0yn1+B0sfkbjkDvmQ/7EIt+01z9dHbvQIEU6qrmkh2JjlHEwoGZ8ed/Ox6Ww
-         784w==
+        d=gmail.com; s=20230601; t=1768959173; x=1769563973; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hT9gGp+GTStA+p0XTftxURymXw7pEgxx81yY6VDE3+A=;
+        b=nsL66bGDl5jBZ3i3dYtIhunMBjsiOoQ9kL2L6NHXfTarSY5ZmS87UelzwSk67u8cCk
+         uDk8rLK5Ublm+xbCtwTikS7fIb+hft3zJJ6SHZxJrki/GlYZnOIVwkuiQ0rh6L4eiHit
+         Pxr2sVvQtUEpTxnbvWlRNorKK5ifc8e0D+83EWQF0gsfCWWfpTwXhb0RAKEDxMfzKZ0E
+         49t+ZwXTpW4zzu2WJA9HepGEKVz0zPh4C7fCizMy6PC3GbXazNemXi8yGYeKc6vg5vZN
+         juTOMAUXqn5Aia95dhqimkH6gjcWxC/SZIuG4iOIVDgKso9fjsJf/47WH105HL1gL7yl
+         UXoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768959090; x=1769563890;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E8iE0KBKIYKbBU2Zh8l50G8fq2WUoVHBO7RlhN61jto=;
-        b=hwEZsjEJ7dXXY1+twUkAdlexrOAzz9BIwjzBA5+SPHhjkHR3GOaJzu89PvysQsx1pV
-         BboRzAMWOKcq4IYGjTHBocAGmZOyshOLfNQiEjJEH7+2f5/h1I75eMqAO0LzNQAjypcV
-         6Bkn8Gtlii6ljeh/bDM3R8+iE04TqddQv8t1pcsy0BUau92E+jBjBoL1djPewxzfZuem
-         pAobRsRwwIr6NDcxgtgX/yplY3X47UgAUumoGmuQr0kqBzgYOkreh2tD31iGmKbx+QlQ
-         SfItzIkQqbeD8pUkAIMT4NBd7g9jXrH45uHbBfxbgjTJ1RMBCteVIxk1YYB3KwW/+S+E
-         RQpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXMKD6WKOoiiz3aYRQ2gji8GHG0Hnn1Jau40r+rd3f0DJHVjg8gux+gQX+WTyGD4zOLl+ELiA4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS5O2fIWYO7FYU1K/vhhHJtVdHAx+JuYE+4GHwVlD7mjwv6cgi
-	VtGvfJcj3PlIXjmj0zOuQZt/l1pseT4XngmXGVC4ZfCiweWczMlhc0M1
-X-Gm-Gg: AZuq6aI8T5xbfyVlnF2TwAmJG0AkFr6Afa2AfhpYePELWhoG8pWNF6i9DttB0esddeH
-	Obaf8V7oOVrgFmP91sjazlOll/VazyjslUUYxkC8MzN4keDfzODiOjrxnOLBKFsv+LVtSB36xVz
-	hTCNPS83+74kkxVzQ7CuAwF8Uf5uLcf+dgxvnAYvh0uQ+bg0KDBu5smX88NgyUKZ/faarAVkGSx
-	ByM77gZpRkGVV4Qz3TQV8nwNw2t05YTasfIN0N429cppBtk/NXiMnFUlc5zYpZDcQwzYI/ZvdSV
-	9gdsnMKykOqhlGL/zhqp+R2zvoWRT3uH7EUlpHS1VGGQU3SuS3+j9ZE1M77jZHIpS81Krg1sY/Q
-	/YjO2C5j6wKxztSl+a+8HUx+7totXDMJNy3ZpZUYyjCOiZdeB6VvFV6Nvs3Eeq9A+VyuGR3ngww
-	j9ZQs2nbcXE66No6aWLtgny0k8V1RHp7F1Tw==
-X-Received: by 2002:a05:690c:6184:b0:78f:a535:93d4 with SMTP id 00721157ae682-793c52b1e63mr140115457b3.25.1768959089914;
-        Tue, 20 Jan 2026 17:31:29 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:7::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-793c66ee062sm59397217b3.15.2026.01.20.17.31.29
+        d=1e100.net; s=20230601; t=1768959173; x=1769563973;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hT9gGp+GTStA+p0XTftxURymXw7pEgxx81yY6VDE3+A=;
+        b=G0iWzYQN59Ib9J01Vq4sCb+coJyLygwac0g+341SfmsaqppD/Oi/VXK48Zf46W7oiW
+         P4VZvjdRkWP5U8GYxtSKgUpkMhq9Pwf9N6ziahUCjIObUNQP9hOVLmxtrcF8xo/yD1Uq
+         JUZEMa8RcIahtqhUq0wD3JU76rOg08CJ1LYUtJMA2Wrk8hUi43tC5W2vGGiy8yUIpOWY
+         FkBak0ZCh/9K4xB9I44wxvxQiPtVmW9MleQ4YIpNmpNhhsnzj0nPSJVbFYGv9B6s/E0/
+         dmnLBhyR8pnFjxzyZIXmGLKu5L/4sg8YVf/5dPYpGaPjbkX0S3gpa8HP+Bfeig/QB3ZH
+         fpRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVpMD7oM+9UAtYcA1MyCZg/HjJs4F+XI9shylwgHDZExjhm4eNyHOd0CAZTEKy03QuhpPhsmnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMJdmeqgad/br4NvuJlVc/oDfoxwFbInsf5wNgXWTsqHpDvXqU
+	hjmWfcxqCy/xaYiSgTbwpwxwrFQG/mvGMh3I2ctO7FQpHAbdNmfSsYfE
+X-Gm-Gg: AZuq6aKk7XdKzZYCx1S939TwjMrBSZas6ljxAxLgmbn95XxOnt+dnxJ1W22JB3cZEjl
+	OB2sCom2qIL+SZIaXnvTakykOuWI5KPpLhepgIVW2IL7uVv59yyqlSzS7uaSmWwYhytSVE53JGW
+	MCOG3XgMw+ZQ5EKKH+9p6YKjkP6RrSo1XUd4ah6J4ROu2byzzYkxkRw9u3d/+B5JKF278GTKiy0
+	HEO1UT+sOp6VYx5IpdHHnafGOaaCBLxXp1WPQpFjW4VKmgviIOi7/68DlQXCXdE1vY+w0Lc9WsT
+	ZxOs8ADUbYYLcQUYKnWOaJDpykVQGHRDx6VHkXn3EYMQjHEGGNUrLCETn4oxh0FIAZYm3PruIkL
+	Jl2J+AoC2XoO7XDsABQ2eufbb6hkKqopC5uU/nC9SqiOZjrUFd111jiPEsEGqpOV0bAWGzpTeAh
+	Vft3sjMcIrH9pzUNjSZHuHjkGOILLqop92ar6wHlZCtyG9TPSOvHtXqvSKXaFrNKiprMOm
+X-Received: by 2002:a05:7300:690a:b0:2a4:3593:c7cc with SMTP id 5a478bee46e88-2b6b471331amr10168060eec.12.1768959172969;
+        Tue, 20 Jan 2026 17:32:52 -0800 (PST)
+Received: from ?IPv6:2a03:83e0:115c:1:6a7d:961b:9e54:4392? ([2620:10d:c090:500::2:634c])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b34c11c4sm19194701eec.1.2026.01.20.17.32.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 17:31:29 -0800 (PST)
-Date: Tue, 20 Jan 2026 17:31:27 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: net: forwarding: cleanup veth peers created
- via NUM_NETIFS
-Message-ID: <aXAsb+sCbyeD/xkL@devvm11784.nha0.facebook.com>
-References: <20260120230905.328528-1-aleksey.oladko@virtuozzo.com>
+        Tue, 20 Jan 2026 17:32:52 -0800 (PST)
+Message-ID: <bac96afe1a99c6a12cd85285c677f4eedcada066.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v6 2/2] selftests/bpf: test the jited inline of
+ bpf_get_current_task
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Menglong Dong <menglong.dong@linux.dev>, Menglong Dong
+	 <menglong8.dong@gmail.com>, Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ daniel@iogearbox.net, 	andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, 	john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, 	jolsa@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ netdev@vger.kernel.org, 	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 20 Jan 2026 17:32:49 -0800
+In-Reply-To: <5071056.31r3eYUQgx@7940hx>
+References: <20260120070555.233486-1-dongml2@chinatelecom.cn>
+	 <20260120070555.233486-3-dongml2@chinatelecom.cn>
+	 <CAEf4BzYzT2OUQ37BvzTRyo5Ah_t_CXv=AJixtAmU_pgr8eLpLg@mail.gmail.com>
+	 <5071056.31r3eYUQgx@7940hx>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260120230905.328528-1-aleksey.oladko@virtuozzo.com>
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	TAGGED_FROM(0.00)[bounces-251686-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251687-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	FREEMAIL_TO(0.00)[linux.dev,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eddyz87@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lib.sh:url,bridge_activity_notify.sh:url,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,devvm11784.nha0.facebook.com:mid]
-X-Rspamd-Queue-Id: 1CAF94F1F8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: F3E7B4F23E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 11:09:05PM +0000, Aleksei Oladko wrote:
-> Some net/forwarding kselftests set NUM_NETIFS, causing lib.sh to create
-> the requested number of veth peer interfaces.
-> 
-> These interfaces are not removed when the tests finish, leaving stale
-> veth devices in the system. This can cause subsequent tests to fail,
-> for example min_max_mtu.sh.
-> 
-> Ensure that veth peers created via NUM_NETIFS are properly removed at
-> the end of the tests to avoid interference between test runs.
-> 
-> Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index a9034f0bb58b..ae7699c0c7e5 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -597,6 +597,10 @@ vrf_cleanup()
->  	ip -6 rule del pref 32765
->  	ip -4 rule add pref 0 table local
->  	ip -4 rule del pref 32765
-> +
-> +	for ((i = 1; i <= NUM_NETIFS; i=$i+2)); do
+On Wed, 2026-01-21 at 09:28 +0800, Menglong Dong wrote:
 
-I'd suggest 'i = i + 2' here instead of "i=$i+2", as it seems closer to the rest of lib.sh
-style.
+[...]
 
-> +		ip link delete dev ${NETIFS[p$i]} 2>/dev/null || true
-> +	done
->  }
->  
->  adf_vrf_prepare()
-> -- 
-> 2.43.0
-> 
+> Do you mean that the CI of arm64 doesn't use LLVM for the selftests?
+> I noted that. I found that there are other similar "__jited" testings for
+> arm64, is there anything we can do?
+>=20
+> PS: I tested the arm64 locally, and it works fine.
+>=20
+> >=20
+> > So we should do something about silently skipped tests at least...
+>=20
+> Like a warning?
 
-I see that some tests that set NUM_NETIFS do not seem to call
-vrf_cleanup() (e.g. bridge_activity_notify.sh), so I think those tests
-will still leak?
+Yes, probably llvm-devel or libs dependency is missing,
+hence jit related selftests are skipped. Same thing for x86.
+Discussed with Andrii making llvm an opt-out dependency:
+fail selftests compilation if libraries are not found and SKIP_LLVM is not =
+set.
+We plan to address CI config issue tomorrow.
 
-Maybe lib.sh needs a remove_netif() to go along with create_netif(), and
-then tests can call it from their 'cleanup()' EXIT handlers? This avoids
-the mismatch between vrf_prepare() not creating devices but
-vrf_cleanup() removing them.
-
-Thanks,
-Bobby
+[...]
 
