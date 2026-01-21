@@ -1,337 +1,551 @@
-Return-Path: <netdev+bounces-252028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kO8XIo8ccWmodQAAu9opvQ
-	(envelope-from <netdev+bounces-252028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:35:59 +0100
+	id aMlbNjk2cWnKfQAAu9opvQ
+	(envelope-from <netdev+bounces-252029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:25:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8DB5B58B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:35:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 763F75D26F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7C8E174DE49
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:25:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1ECD8A0FA49
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FD839341F;
-	Wed, 21 Jan 2026 18:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8472727F017;
+	Wed, 21 Jan 2026 18:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1mHXSwk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFFDNx1S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F227436B05B
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFC9344055
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769019882; cv=none; b=RzJNnbBSPbjPnmaG7EcEtVBnTMSG86w+GoxIuQTdCeYFNKVfaR6UPG5NGtw85xnioHGNG/7oF4lNWo2OGyKfRY2UaYXr/HHPSHuKhbH85V54Hvo0x5VL2Y0Tfr0+laaQYi2D2xqOUiS/ooU9AQXz6zjIQ3gNVoBeuhywr0RKauI=
+	t=1769021110; cv=none; b=gFoXF7o0lHYR/mx1hBiCfNUDqQGA3VqxlTnWj1+p9pAjEz3lQTCPWiMTxwsCO7SiDf5AfVE5LQ7eP8mD3VdM/x6DBsS8egtgCmeQop1YnvlFRLaYlzpRreio0dcBVbjSuxbsoUbO+84TtCyIn6jD//4cEp4sTg6NResTOZTU/Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769019882; c=relaxed/simple;
-	bh=5foRD+XYdggu1Kg1ROkRGTuBP0YuzBsFR3l3Gq3NRDk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BrnoJ6szRmaEJjNBcWUW1fW33LSm8CjVNLMwH6tgw2YVvJrp8qmUboTsfR5xzyYoAWoK4Eq0O6nt3CIwFKpSEgvZqNTOPh2239lD/6MWkUcchlki4Os/xEb2wF8phKHRd+naclj8pyybInl658EnIt7uPia6WH+53ipNMQUT7VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1mHXSwk; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2a78e381fc1so589525ad.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 10:24:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769019877; x=1769624677; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xVjRoasFG/sB0MpTfb46SvA5d7ZE0DXe29Yv2eIU8xo=;
-        b=f1mHXSwkUitqLqdPf29HX/mF+s8tuVfWqQq4xfvYqwAXuxmfTb5Z+eDQAjupFIh1AN
-         1ZfOXYt7R7ErqEikz31wav5AUkXZZFIqsDyVlM2lCiMwjm4hkWDEWNPf8i8Xz5tayFIe
-         n61ZghaamOwO5VYB/Oy+FZAnaVkekQE7doe9PoqtdVRKrSCtnc18V00kHYIp4ut0AYb3
-         ANMNQRfXiNtw8Ow6MlsYKC27T3+w1KElNdzWYxtHHy7m9aOSJJTYLitJsUSghP+PRJHl
-         A18WU+gShzEAKwK0puouyKSmGDT0g7vTZewWlgLK0NTBKTKCkpWEeMqPHSv0uXQvyFdZ
-         II1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769019877; x=1769624677;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xVjRoasFG/sB0MpTfb46SvA5d7ZE0DXe29Yv2eIU8xo=;
-        b=j0s0irEmopMccuPO63SOufRaXTQrvQRGNklMGBXRnemaTpIyNHLt4NUCui91zMjirW
-         fxDhlqFuVgwFbSgV9ZDTSEgyuMT1mKMxme0ICBRD5Einwpw2AErQIBsN8pylWyMv7bJ+
-         OlGMZ0jcmeoCwN4vPXXJ4w46QGDIa67n/gxLOFBdAT89cX/oluKBBmSIs/0mP7NSb0eI
-         PoBSe/bnLJ+RflPOrCgZwTuvsLr3yHE3GJyghCNLUu26NlUyMeLgo+iO1g33ynYRHjia
-         hRudxkuRQjM+m+FRJcQ0Mj2EcGbOqjhOx0V6Fh6NiaWX2HOpxXMgLhyj2FlhjIba62TD
-         5ZVA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOrJPtizPZEQpRrvy0vldb0q+o8hxdFuZ14fVQeqTYpoLpvNHhXbEOgJRiPf9W3lv2jMxguqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUtP9Uq1/iZD6A2ngg9RXPhbcVdbOqhnxzXA2siCAjwGa911Q1
-	+wpjfN107pbHFKRwiv7CNsN2uPUJHDHF0vAde9FQu6ak7tD6xWAZc73Q
-X-Gm-Gg: AZuq6aIi9ZKB6QqzmkJremoyMqO1p8Sep1ePDnR7jcymv0YBgFjURq/w1deaktg2rKH
-	hgoJ0pgfRXv8eT7BpvWi2rlJBWVjI+WS6DTaPQiX7RfOII1gm6vhuYuQv6pGzgzhiDhPFmoUtin
-	0HGu/GFTdblJ4Krp3tJoC4Hf1URct1elK82TdIWGE9S8eb2DsWXkfRkMMmrxjqTL682i5TFcYD5
-	qGCV9K5mnnsnQx6Aj6Dc5p1iE1UjxIvYAzcQ7/wbrmC2Is4iGOHIiyIn4izi+2dz6DOKiMlrbzK
-	JT0H2TQYRztViDic5RvjQ4/6vZnALFZcbUEOgOSyVNOrSIo6HPDGzYb4e6CJDyC1WqMqH3ly4UK
-	4glqsfL59/O8mlIe415xa4fXlEW4LOaSMxEOs8spFrVGlgBPsk9p/K2DO+J9ZDmE9bIgTwtYMUd
-	hog3683I1s4cQUdFFO
-X-Received: by 2002:a17:903:2f04:b0:295:20b8:e104 with SMTP id d9443c01a7336-2a7177e9c74mr156003005ad.58.1769019876742;
-        Wed, 21 Jan 2026 10:24:36 -0800 (PST)
-Received: from rakuram-MSI ([2405:201:d027:f80f:3dfc:481a:1cd0:e1a3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190aa340sm159511995ad.3.2026.01.21.10.24.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 10:24:36 -0800 (PST)
-From: Rakuram Eswaran <rakuram.e96@gmail.com>
-To: socketcan@hartkopp.net
-Cc: corbet@lwn.net,
-	linux-can@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	mailhol@kernel.org,
-	mkl@pengutronix.de,
-	netdev@vger.kernel.org,
-	rakuram.e96@gmail.com
-Subject: Re: [PATCH 2/2] docs: can: update SocketCAN documentation for CAN XL
-Date: Wed, 21 Jan 2026 23:54:25 +0530
-Message-ID: <20260121182429.16624-1-rakuram.e96@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: 6a99ce41-2200-49d7-9a6c-29e9311b46ab@hartkopp.net 
-References: <6a99ce41-2200-49d7-9a6c-29e9311b46ab@hartkopp.net>
+	s=arc-20240116; t=1769021110; c=relaxed/simple;
+	bh=fdPEOI4fS84lKR25tqzd47PtlD0nvo8A1+4VuBxP/tE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CNfvyUSBvJwCzVHVKehqLOkxNe5BJXB+rXfO/mAichRnXlgkmcWaP9/xQDR9lO1OeiMJtjaClYnOhd1G7hv7JNy2KYwNn0aM4q/t315YADYLh1UXGnbq/zypxf0K87ufRyvSh4Xq6Cq8XblmzbnLvwBZY/o5ulmt43vya2v2S24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFFDNx1S; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769021108; x=1800557108;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=fdPEOI4fS84lKR25tqzd47PtlD0nvo8A1+4VuBxP/tE=;
+  b=jFFDNx1S2+X5xqoKvl5xBFjMEGAfnmp4KEpp+++rVGzahInI3CBBIHaL
+   VF/2pwvgOEH8arstAc3WAATZcsXpP++PFsKZyFgFuHamfN8kReJh3SNkE
+   L5RCDHNHinFtHpS3R9d4uzhBGtKcR7oEui8v1JfgIzlbzjQF5D+poZ1FC
+   NjGqcvBZL7WhTZ65bd9eYPNEel/GCfm4c0pj04Znmesac5kawSCW1F1+V
+   Puca0yC3n8bUvf/EI2w6Ehiz00LVn3l9uQPzWVU6A8LA+JvpCwe6Vhr4z
+   77EO0NmtNzBYqRnV5Cn1515JSv/VuA/XjEFXfMdcXiGRgDw3Dx2dZBw21
+   Q==;
+X-CSE-ConnectionGUID: P4+8A3iYTkiQEBPgE6JHYw==
+X-CSE-MsgGUID: NwG/a31BRmWaltWDUGId5Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="73880942"
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="73880942"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 10:45:07 -0800
+X-CSE-ConnectionGUID: ig9VBlc5Qka3mQjjI/4tBw==
+X-CSE-MsgGUID: hHkzlCX4R4S7nOVwvX8V0g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="210962923"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.90]) ([10.166.28.90])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 10:45:06 -0800
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Wed, 21 Jan 2026 10:44:19 -0800
+Subject: [PATCH iwl-net] ice: PTP: fix missing timestamps on E825 hardware
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Message-Id: <20260121-jk-e825c-fix-missing-timetamps-v1-1-f090eabfc823@intel.com>
+X-B4-Tracking: v=1; b=H4sIAIYecWkC/x2NwQrCMBAFf6Xs2YUkxRL9FfEQmtd2q4klG1Qo/
+ XeDx4FhZidFEShdu50K3qLyyg3sqaNxCXkGS2xMzrjBWDvw+mB4dx55ki8nUZU8c5WEGtKmHGM
+ Il8l43/egFtkKmvgf3Eg+T86odD+OH437FJp5AAAA
+X-Change-ID: 20260116-jk-e825c-fix-missing-timetamps-ddaa9f08833e
+To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
+ Przemyslaw Korba <przemyslaw.korba@intel.com>, netdev@vger.kernel.org, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Anthony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.15-dev-f4b34
+X-Developer-Signature: v=1; a=openpgp-sha256; l=15912;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=fdPEOI4fS84lKR25tqzd47PtlD0nvo8A1+4VuBxP/tE=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxCuZX3lv+anHyjqHaq1qZ72cHJ83Q/OW/8uftmy1Mmp
+ c5SRuZvHaUsDGJcDLJiiiwKDiErrxtPCNN64ywHM4eVCWQIAxenAExk7VlGhg4e1cg2rlsTV5uu
+ 1CqUd1LU7ztuF7K4g3FNS8Dprx0rtjH8jzbx09317IvSf06G+EeP/ItfmU05V9QU9+KTWN/sA5N
+ ncwIA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_CC(0.00)[lwn.net,vger.kernel.org,kernel.org,pengutronix.de,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252029-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252028-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rakurame96@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,can-cia.org:url]
-X-Rspamd-Queue-Id: 2D8DB5B58B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 763F75D26F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 18 Jan 2026 at 23:53, Oliver Hartkopp <socketcan@hartkopp.net> wrote:
->
->
-> On 18.01.26 15:41, Rakuram Eswaran wrote:
-> > On Tue, 13 Jan 2026 at 21:45, Oliver Hartkopp <socketcan@hartkopp.net> wrote:
-> >>
->
-> >>>    The length of the two CAN(FD) frame structures define the maximum transfer
-> >>>    unit (MTU) of the CAN(FD) network interface and skbuff data length. Two
-> >>> -definitions are specified for CAN specific MTUs in include/linux/can.h:
-> >>> +definitions are specified for CAN specific MTUs in include/uapi/linux/can.h:
-> >>
-> >> No.
-> >>   From the user perspective he has to include include/linux/can.h
-> >>
-> >> Better "MTUs in the linux/can.h include file:"
-> >>
-> >
-> > Can I just incude linux/can.h or include/linux/can.h? As in the current
-> > document include/linux/can.h is used.
-> >
->
-> If you look into the code you need e.g.
->
-> #include <linux/can.h>
-> #include <linux/can/raw.h>
->
-> So I would name it the linux/can.h include file.
->
+The E825 hardware currently has each PF handle the PFINT_TSYN_TX cause of
+the miscellaneous OICR interrupt vector. The actual interrupt cause
+underlying this is shared by all ports on the same quad:
 
-Hi Oliver,
+  ┌─────────────────────────────────┐
+  │                                 │
+  │   ┌────┐ ┌────┐ ┌────┐ ┌────┐   │
+  │   │PF 0│ │PF 1│ │PF 2│ │PF 3│   │
+  │   └────┘ └────┘ └────┘ └────┘   │
+  │                                 │
+  └────────────────▲────────────────┘
+                   │
+                   │
+  ┌────────────────┼────────────────┐
+  │             PHY QUAD            │
+  └───▲────────▲────────▲────────▲──┘
+      │        │        │        │
+  ┌───┼──┐ ┌───┴──┐ ┌───┼──┐ ┌───┼──┐
+  │Port 0│ │Port 1│ │Port 2│ │Port 3│
+  └──────┘ └──────┘ └──────┘ └──────┘
 
-Ah, now I understand what I did wrong in my interpretation. I replaced
-all instances of include/linux/can.h to linux/can.h include file.
+If multiple PFs issue Tx timestamp requests near simultaneously, it is
+possible that the correct PF will not be interrupted and will miss its
+timestamp. Understanding why is somewhat complex.
 
-> >>
-> >> What about the PWM settings here?
-> >> When TMS is "on" the PWM values can be automatically calculated or set
-> >> manually. There's also no CAN XL TDC when TMS=on as the TDC is a
-> >> mixed-mode requirement for non-TMS transceivers.
-> >>
-> >
-> > Can I add the PWM settings under new heading (CAN XL PWM) or is it fine
-> > to keep the content under the same heading (CAN XL TDC)?
-> >
->
-> Yes. I would propose a new section
->
-> CAN XL TMS (Transceiver Mode Setting / PWM)
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> The Transceiver Mode Setting (TMS) switches the RX/TX lines between the
-> CAN XL controller and the CAN XL transceiver into the "Fast Mode" by
-> enabling a PWM protocol.
->
-> In the Fast Mode a different sample point is used and the PWM ratio is
-> calculated automatically or can be set manually.
->
+Consider the following sequence of events:
 
-Ok, will add this section. In the below article, I saw a table named
-"CAN transceiver modes signaled". Can I add them here or above content
-is fine?
+  CPU 0:
+  Send Tx packet on PF 0
+  ...
+  PF 0 enqueues packet with Tx request          CPU 1, PF1:
+  ...                                           Send Tx packet on PF1
+  ...                                           PF 1 enqueues packet with Tx request
 
-https://www.can-cia.org/can-knowledge/can-xl
+  HW:
+  PHY Port 0 sends packet
+  PHY raises Tx timestamp event interrupt
+  MAC raises each PF interrupt
 
-> >> There's one big difference between CC/FD and XL frames when you
-> >> read/write it to CAN_RAW sockets:
-> >>
-> >> For CAN CC and CAN FD you write struct can(fd)_frame's with CAN_MTU
-> >> resp. CANFD_MTU lengths - no matter about the data length (cf->len).
-> >>
-> >> When you read/write CAN XL frames you are reading and writing the
-> >> CANXL_HDR_SIZE + the length of the data.
-> >>
-> >> So only in the case of writing 2048 byte data, you write 2060 bytes.
-> >>
-> >> The minimum size for read/write is CANXL_HDR_SIZE + CANXL_MIN_DLEN == 13
-> >>
-> >
-> > Good point! I will add this information along with an example. I will go
-> > through your code and decide what to add. Does the example code should
-> > focus only on CAN XL frames or also on CC/FD frames?
->
+  CPU 0, PF0:                                   CPU 1, PF1:
+  ice_misc_intr() checks for Tx timestamps      ice_misc_intr() checks for Tx timestamp
+  Sees packet ready bit set                     Sees nothing available
+  ...                                           Exits
+  ...
+  ...
+  HW:
+  PHY port 1 sends packet
+  PHY interrupt ignored because not all packet timestamps read yet.
+  ...
+  Read timestamp, report to stack
 
-Here, I added a updated content for PWM section and Application considerations
-for CAN XL section.
+Because the interrupt event is shared for all ports on the same quad, the
+PHY will not raise a new interrupt for any PF until all timestamps are
+read.
 
-CAN XL TMS (Transceiver Mode Setting / PWM)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In the example above, the second timestamp comes in for port 1 before the
+timestamp from port 0 is read. At this point, there is no longer an
+interrupt thread running that will read the timestamps, because each PF has
+checked and found that there was no work to do. Applications such as ptp4l
+will timeout after waiting a few milliseconds. Eventually, the watchdog
+service task will re-check for all quads and notice that there are
+outstanding timestamps, and issue a software interrupt to recover. However,
+by this point it is far too late, and applications have already failed.
 
-The Transceiver Mode Setting (TMS) switches the RX/TX lines between the
-CAN XL controller and the CAN SIC XL transceiver into the "Fast Mode" by
-enabling a PWM protocol.
+All of this occurs because of the underlying hardware behavior. The PHY
+cannot raise a new interrupt signal until all outstanding timestamps have
+been read.
 
-In the Fast Mode, a different sample point is used and the PWM ratio is
-either calculated automatically or can be set manually.
+As a first step to fix this, switch the E825C hardware to the
+ICE_PTP_TX_INTERRUPT_ALL mode. In this mode, only the clock owner PF will
+respond to the PFINT_TSYN_TX cause. Other PFs disable this cause and will
+not wake. In this mode, the clock owner will iterate over all ports and
+handle timestamps for each connected port.
 
-Application considerations for CAN XL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This matches the E822 behavior, and is a necessary but insufficient step to
+resolve the missing timestamps.
 
-For user space applications the following rules are important when
-handling CAN XL:
+Even with use of the ICE_PTP_TX_INTERRUPT_ALL mode, we still sometimes miss
+a timestamp event. The ice_ptp_tx_tstamp_owner() does re-check the ready
+bitmap, but does so before re-enabling the OICR interrupt vector. It also
+only checks the ready bitmap, but not the software Tx timestamp tracker.
 
-- Use ``struct canxl_frame`` as basic data structure when CAN XL traffic
-  is expected.
-- Set CANXL_XLF in ``canxl_frame.flags`` for all valid CAN XL frames.
-- Ensure that undefined bits in ``canxl_frame.flags`` are kept at zero.
-- Respect the configured device MTU; do not send frames larger than
-  the MTU announced by the kernel.
-- For mixed-mode controllers, be prepared to handle Classical CAN,
-  CAN FD and CAN XL frames on the same interface and choose the frame
-  structure according to the socket/protocol semantics (e.g. dedicated
-  CAN XL APIs when available).
-- There's one big difference between CC/FD and XL frames when you
-  read/write it to CAN_RAW sockets:
-    - For CAN CC and CAN FD, struct can(fd)_frame's with CAN_MTU/CANFD_MTU
-      lengths.
-    - Read/write of CAN XL frames you are reading and writing the
-      CANXL_HDR_SIZE + the length of the data.
-    - The minimum size for read/write is CANXL_HDR_SIZE + CANXL_MIN_DLEN == 13.   
+To avoid risk of losing a timestamp, refactor the logic to check both the
+software Tx timestamp tracker bitmap *and* the hardware ready bitmap.
+Additionally, do this outside of ice_ptp_process_ts() after we have already
+re-enabled the OICR interrupt.
 
-> When the CAN_RAW socket enables the CAN XL support you have to deal with
-> all kind of CAN frames. IMO is makes sense to show an example that deals
-> with all three types of frames.
->
-> >> Here is an example that I've been implemented recently that shows a good
-> >> example how to handle CC/FD/XL frames, when they are all enabled on the
-> >> CAN_RAW socket:
-> >>
-> >> https://github.com/hartkopp/can-utils/commit/bf0cae218af9b1c1f5eabad7f3704b88ab642e00
-> >>
-> >> Feel free to pick the code for some example.
-> >>
-> >> But please do not reference the commit as it is in my private repo and
-> >> not yet integrated in the official can-utils repo.
-> >>
+Remove the checks from the ice_ptp_tx_tstamp(), ice_ptp_tx_tstamp_owner(),
+and the ice_ptp_process_ts() functions. This results in ice_ptp_tx_tstamp()
+being nothing more than a wrapper around ice_ptp_process_tx_tstamp() so we
+can remove it.
 
-I had gone through the code and picked the below code for example. I add the
-code here. Kindly let me know if I need to add anything extra. 
+Add the ice_ptp_tx_tstamps_pending() function which returns a boolean
+indicating if there are any pending Tx timestamps. First, check the
+software timestamp tracker bitmap. In ICE_PTP_TX_INTERRUPT_ALL mode, check
+*all* ports software trackers. If a tracker has outstanding timestamp
+requests, return true. Additionally, check the PHY ready bitmap to confirm
+if the PHY indicates any outstanding timestamps.
 
-/* CAN CC/FD/XL frame union */
-union cfu {
-	struct can_frame cc;
-	struct canfd_frame fd;
-	struct canxl_frame xl;
-};
+In the ice_misc_thread_fn(), call ice_ptp_tx_tstamps_pending() just before
+returning from the IRQ thread handler. If it returns true, write to
+PFINT_OICR to trigger a PFINT_OICR_TSYN_TX_M software interrupt. This will
+force the handler to interrupt again and complete the work even if the PHY
+hardware did not interrupt for any reason.
 
-struct sockaddr_can addr;
-static union cfu cu;
+This results in the following new flow for handling Tx timestamps:
 
-// open CAN_RAW socket
-s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+1) send Tx packet
+2) PHY captures timestamp
+3) PHY triggers MAC interrupt
+4) clock owner executes ice_misc_intr() with PFINT_OICR_TSYN_TX flag set
+5) ice_ptp_ts_irq() returns IRQ_WAKE_THREAD
+7) The interrupt thread wakes up and kernel calls ice_misc_intr_thread_fn()
+8) ice_ptp_process_ts() is called to handle any outstanding timestamps
+9) ice_irq_dynamic_ena() is called to re-enable the OICR hardware interrupt
+   cause
+10) ice_ptp_tx_tstamps_pending() is called to check if we missed any more
+    outstanding timestamps, checking both software and hardware indicators.
 
-/* try to switch the socket into CAN FD mode */
-setsockopt(s, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfx_on, sizeof(canfx_on));
-setsockopt(s, SOL_CAN_RAW, CAN_RAW_XL_FRAMES, &canfx_on, sizeof(canfx_on));
-/* try to enable the CAN XL VCID pass through mode */
-setsockopt(s, SOL_CAN_RAW, CAN_RAW_XL_VCID_OPTS, &vcid_opts, sizeof(vcid_opts));
+With this change, it should no longer be possible for new timestamps to
+come in such a way that we lose an interrupt. If a timestamp comes in
+before the ice_ptp_tx_tstamps_pending() call, it will be noticed by at
+least one of the software bitmap check or the hardware bitmap check. If the
+timestamp comes in *after* this check, it should cause a timestamp
+interrupt as we have already read all timestamps from the PHY and the OICR
+vector has been re-enabled.
 
-addr.can_family = AF_CAN;
+Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |  13 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c |  20 ++--
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 148 +++++++++++++++++-------------
+ 3 files changed, 103 insertions(+), 78 deletions(-)
 
-// create the sockaddr binding
-if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("bind");
-		return 1;
-	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 27016aac4f1e..8489bd842710 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -304,8 +304,9 @@ void ice_ptp_extts_event(struct ice_pf *pf);
+ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
+ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx);
+ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx);
+-enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
++void ice_ptp_process_ts(struct ice_pf *pf);
+ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf);
++bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf);
+ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
+ 			     struct ptp_system_timestamp *sts);
+ 
+@@ -345,16 +346,18 @@ static inline void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx)
+ 
+ static inline void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx) { }
+ 
+-static inline bool ice_ptp_process_ts(struct ice_pf *pf)
+-{
+-	return true;
+-}
++static inline void ice_ptp_process_ts(struct ice_pf *pf) { }
+ 
+ static inline irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
+ {
+ 	return IRQ_HANDLED;
+ }
+ 
++static inline bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
++{
++	return false;
++}
++
+ static inline u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
+ 					   struct ptp_system_timestamp *sts)
+ {
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 08268f1a03da..2e5d7925999c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3314,18 +3314,20 @@ static irqreturn_t ice_misc_intr_thread_fn(int __always_unused irq, void *data)
+ 	if (ice_is_reset_in_progress(pf->state))
+ 		goto skip_irq;
+ 
+-	if (test_and_clear_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread)) {
+-		/* Process outstanding Tx timestamps. If there is more work,
+-		 * re-arm the interrupt to trigger again.
+-		 */
+-		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
+-			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
+-			ice_flush(hw);
+-		}
+-	}
++	if (test_and_clear_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread))
++		ice_ptp_process_ts(pf);
+ 
+ skip_irq:
+ 	ice_irq_dynamic_ena(hw, NULL, NULL);
++	ice_flush(hw);
++
++	if (ice_ptp_tx_tstamps_pending(pf)) {
++		/* If any new Tx timestamps happened while in interrupt,
++		 * re-arm the interrupt to trigger it again.
++		 */
++		wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
++		ice_flush(hw);
++	}
+ 
+ 	return IRQ_HANDLED;
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 0b7c2a13ab04..b5cef6396319 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -573,6 +573,9 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 	pf = ptp_port_to_pf(ptp_port);
+ 	hw = &pf->hw;
+ 
++	if (!tx->init)
++		return;
++
+ 	/* Read the Tx ready status first */
+ 	if (tx->has_ready_bitmap) {
+ 		err = ice_get_phy_tx_tstamp_ready(hw, tx->block, &tstamp_ready);
+@@ -674,14 +677,9 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 	pf->ptp.tx_hwtstamp_good += tstamp_good;
+ }
+ 
+-/**
+- * ice_ptp_tx_tstamp_owner - Process Tx timestamps for all ports on the device
+- * @pf: Board private structure
+- */
+-static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
++static void ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
+ {
+ 	struct ice_ptp_port *port;
+-	unsigned int i;
+ 
+ 	mutex_lock(&pf->adapter->ports.lock);
+ 	list_for_each_entry(port, &pf->adapter->ports.ports, list_node) {
+@@ -693,49 +691,6 @@ static enum ice_tx_tstamp_work ice_ptp_tx_tstamp_owner(struct ice_pf *pf)
+ 		ice_ptp_process_tx_tstamp(tx);
+ 	}
+ 	mutex_unlock(&pf->adapter->ports.lock);
+-
+-	for (i = 0; i < ICE_GET_QUAD_NUM(pf->hw.ptp.num_lports); i++) {
+-		u64 tstamp_ready;
+-		int err;
+-
+-		/* Read the Tx ready status first */
+-		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
+-		if (err)
+-			break;
+-		else if (tstamp_ready)
+-			return ICE_TX_TSTAMP_WORK_PENDING;
+-	}
+-
+-	return ICE_TX_TSTAMP_WORK_DONE;
+-}
+-
+-/**
+- * ice_ptp_tx_tstamp - Process Tx timestamps for this function.
+- * @tx: Tx tracking structure to initialize
+- *
+- * Returns: ICE_TX_TSTAMP_WORK_PENDING if there are any outstanding incomplete
+- * Tx timestamps, or ICE_TX_TSTAMP_WORK_DONE otherwise.
+- */
+-static enum ice_tx_tstamp_work ice_ptp_tx_tstamp(struct ice_ptp_tx *tx)
+-{
+-	bool more_timestamps;
+-	unsigned long flags;
+-
+-	if (!tx->init)
+-		return ICE_TX_TSTAMP_WORK_DONE;
+-
+-	/* Process the Tx timestamp tracker */
+-	ice_ptp_process_tx_tstamp(tx);
+-
+-	/* Check if there are outstanding Tx timestamps */
+-	spin_lock_irqsave(&tx->lock, flags);
+-	more_timestamps = tx->init && !bitmap_empty(tx->in_use, tx->len);
+-	spin_unlock_irqrestore(&tx->lock, flags);
+-
+-	if (more_timestamps)
+-		return ICE_TX_TSTAMP_WORK_PENDING;
+-
+-	return ICE_TX_TSTAMP_WORK_DONE;
+ }
+ 
+ /**
+@@ -2666,32 +2621,94 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
+ 		return idx + tx->offset;
+ }
+ 
+-/**
+- * ice_ptp_process_ts - Process the PTP Tx timestamps
+- * @pf: Board private structure
+- *
+- * Returns: ICE_TX_TSTAMP_WORK_PENDING if there are any outstanding Tx
+- * timestamps that need processing, and ICE_TX_TSTAMP_WORK_DONE otherwise.
+- */
+-enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
++void ice_ptp_process_ts(struct ice_pf *pf)
+ {
+ 	switch (pf->ptp.tx_interrupt_mode) {
+ 	case ICE_PTP_TX_INTERRUPT_NONE:
+ 		/* This device has the clock owner handle timestamps for it */
+-		return ICE_TX_TSTAMP_WORK_DONE;
++		return;
+ 	case ICE_PTP_TX_INTERRUPT_SELF:
+ 		/* This device handles its own timestamps */
+-		return ice_ptp_tx_tstamp(&pf->ptp.port.tx);
++		ice_ptp_process_tx_tstamp(&pf->ptp.port.tx);
++		return;
+ 	case ICE_PTP_TX_INTERRUPT_ALL:
+ 		/* This device handles timestamps for all ports */
+-		return ice_ptp_tx_tstamp_owner(pf);
++		ice_ptp_tx_tstamp_owner(pf);
++		return;
+ 	default:
+ 		WARN_ONCE(1, "Unexpected Tx timestamp interrupt mode %u\n",
+ 			  pf->ptp.tx_interrupt_mode);
+-		return ICE_TX_TSTAMP_WORK_DONE;
++		return;
+ 	}
+ }
+ 
++static bool ice_port_has_timestamps(struct ice_ptp_tx *tx)
++{
++	bool more_timestamps;
++
++	scoped_guard(spinlock_irqsave, &tx->lock) {
++		if (!tx->init)
++			return false;
++
++		more_timestamps = !bitmap_empty(tx->in_use, tx->len);
++	}
++
++	return more_timestamps;
++}
++
++static bool ice_any_port_has_timestamps(struct ice_pf *pf)
++{
++	struct ice_ptp_port *port;
++
++	scoped_guard(mutex, &pf->adapter->ports.lock) {
++		list_for_each_entry(port, &pf->adapter->ports.ports,
++				    list_node) {
++			struct ice_ptp_tx *tx = &port->tx;
++
++			if (ice_port_has_timestamps(tx))
++				return true;
++		}
++	}
++
++	return false;
++}
++
++bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
++{
++	struct ice_hw *hw = &pf->hw;
++	unsigned int i;
++
++	/* Check software indicator */
++	switch (pf->ptp.tx_interrupt_mode) {
++	case ICE_PTP_TX_INTERRUPT_NONE:
++		return false;
++	case ICE_PTP_TX_INTERRUPT_SELF:
++		if (ice_port_has_timestamps(&pf->ptp.port.tx))
++			return true;
++		break;
++	case ICE_PTP_TX_INTERRUPT_ALL:
++		if (ice_any_port_has_timestamps(pf))
++			return true;
++		break;
++	default:
++		WARN_ONCE(1, "Unexpected Tx timestamp interrupt mode %u\n",
++			  pf->ptp.tx_interrupt_mode);
++		break;
++	}
++
++	/* Check hardware indicator */
++	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
++		u64 tstamp_ready = 0;
++		int err;
++
++		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
++		if (err || tstamp_ready)
++			return true;
++	}
++
++	return false;
++}
++
+ /**
+  * ice_ptp_ts_irq - Process the PTP Tx timestamps in IRQ context
+  * @pf: Board private structure
+@@ -2741,7 +2758,9 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
+ 		return IRQ_WAKE_THREAD;
+ 	case ICE_MAC_E830:
+ 		/* E830 can read timestamps in the top half using rd32() */
+-		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
++		ice_ptp_process_ts(pf);
++
++		if (ice_ptp_tx_tstamps_pending(pf)) {
+ 			/* Process outstanding Tx timestamps. If there
+ 			 * is more work, re-arm the interrupt to trigger again.
+ 			 */
+@@ -3194,8 +3213,9 @@ static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
+ {
+ 	switch (pf->hw.mac_type) {
+ 	case ICE_MAC_GENERIC:
+-		/* E822 based PHY has the clock owner process the interrupt
+-		 * for all ports.
++	case ICE_MAC_GENERIC_3K_E825:
++		/* E82x hardware has the clock owner process timestamps for
++		 * all ports.
+ 		 */
+ 		if (ice_pf_src_tmr_owned(pf))
+ 			pf->ptp.tx_interrupt_mode = ICE_PTP_TX_INTERRUPT_ALL;
 
-// The minimum size for read/write is CANXL_HDR_SIZE + CANXL_MIN_DLEN == 13 bytes 
-// (12 bytes of header + minimum 1 byte data)
-if (cu.xl.flags & CANXL_XLF) {
-    if (nbytes != (int)CANXL_HDR_SIZE + cu.xl.len) {
-        printf("nbytes = %d\n", nbytes);
-        fprintf(stderr, "read: no CAN XL frame\n");
-        return 1;
-    }
-    rx_id = cu.xl.prio & CANXL_PRIO_MASK; /* remove VCID value */
-    data = cu.xl.data;
-    framelen = cu.xl.len;
-} else {
-    /* mark dual-use struct canfd_frame */
-    if (nbytes == CAN_MTU)
-        cu.fd.flags = 0;
-    else if (nbytes == CANFD_MTU)
-        cu.fd.flags |= CANFD_FDF;
-    else {
-        fprintf(stderr, "read: incomplete CAN CC/FD frame\n");
-        return 1;
-    }
-    rx_id = cu.fd.can_id;
-    data = cu.fd.data;
-    framelen = cu.fd.len;
-}
+---
+base-commit: d41f8acf7a86de68d8e1d0d5ab288ca5a003ae29
+change-id: 20260116-jk-e825c-fix-missing-timetamps-ddaa9f08833e
 
->
-> Best regards,
-> Oliver
->
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
-Best Regards,
-Rakuram.
 
