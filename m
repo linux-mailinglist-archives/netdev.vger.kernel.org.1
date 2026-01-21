@@ -1,208 +1,183 @@
-Return-Path: <netdev+bounces-252037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252038-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wCmPNmMjcWl8eQAAu9opvQ
-	(envelope-from <netdev+bounces-252037-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 20:05:07 +0100
+	id ELz0Kps4cWnKfQAAu9opvQ
+	(envelope-from <netdev+bounces-252038-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:35:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305405BC8C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 20:05:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585E35D599
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:35:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 52A6E5C5C63
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:52:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1BFB43A285E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFAFD347BD9;
-	Wed, 21 Jan 2026 18:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DA13A8FF4;
+	Wed, 21 Jan 2026 18:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="YG5ejmNG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCobc10W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94945275844
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769021451; cv=pass; b=h201MgjnxwvBg6XVm5sRZl/CVINu34pYLsI9J9Re/YyLKYMkCAMDkdR1plkSbh83niv0qPl55Ddat4t1lZZjsXLH1d5U3V4Lfij+SPlcx4NFshzfRDAWN0/YrqgYY9Z+4Io4WGmrQPU1TmOCrpfi0HkY+QbYLvlxypi8kmP71Bc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769021451; c=relaxed/simple;
-	bh=zaws6EmeMTGq5AKHGbFBsOId4T95J+FmRUAbPAZ/qpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q4M/mCJzhfuFJ5WI8FGZ0iu6nx+fCJhvRUEzkJWdw7Cg2rEzZZcL0FnGUAxwn89KCy/zCutefP0/OSd8sC25BQzYOPiYSUWnPGt8mZMK8DMpunGn9kkC88RPdlK4KByo06IidyaosJKgN4Mp2ZfSJuVMU3AYQg1PsQB0nosz4v8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=YG5ejmNG; arc=pass smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a07fac8aa1so1270535ad.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 10:50:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769021449; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GMNGHXETAXZZc114hI1+t/3e0aoTV1s6ls5HkcUZCBC07fsOMA+UegYCJqvM+gBtRW
-         UdpW9ltLbhYu8Oiongd6lJUwfU3Zjp5+ulDhxaR16dG5DVgmSXMN6QFwq+/sCllBkw75
-         CN0wyXHvOt8EZbADEuF9Cw2Fo1QfpWKDHz04xMos0/sPHaCANAEbr8YqU0ayvzV/bYpo
-         bpOl+URyhOGZX/I+cnz52La7KPyvu9VPBJ1zuZ111ZrQHjvO1EsY3zgKnaXCjkscW9bz
-         4xPhMXNnmayTZ453qViSf6gRYKq720i+Xp8BmmtGSjwzjEuGDzQPcphVr9gKyiwZnpj/
-         NGMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zaws6EmeMTGq5AKHGbFBsOId4T95J+FmRUAbPAZ/qpg=;
-        fh=uSF1fWAiYiXb95F5Oten3m1ib0QPh2tpGvWeeaYhlv0=;
-        b=KWdXOkI1x+hTib9gGsBDFLg7GsDCYkgICC1v6vBzD39f0U2qkcnOAY5qDahl/pJOTQ
-         Uv9wiDQHR6lNh3JRMYthbNxK7PUmjWtFiPGfrz+vv/7cpRBv2JOiIWz/NOkEtwaG7o23
-         4sAaVDOM07RwYiNfKIYyek4QlsJKFUcz3jaRgn78GauQT9BrOmAwh2uXqlV5n3QPbisZ
-         oF+gGAAornfhS62B5JWs8dUSQSpxSewYUkTypGpSRHTnUt9Ebdjr3RoUfRD4ofDTPGzP
-         Ip6QsY8fD9sv/+NFBX9lV/HMQjse03eyWpzka9jXsXQ9Z3LhnyRV501fmi1bqenjCQzN
-         8ifw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC923A7E06
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769021949; cv=none; b=H6kQ3MTCKBq5LpIsjEsRkOFUoqhdNVPGpe11mwemzMzGJUlstwm+fVPrgf5r1iVbRIbHDnmQNLc8xpOah87gqDtq8F1iroP9KTF0jMYwTxbyRTjI4PFFkuo0RjHlOVjm9V9058+eUf4ARLs/hULMDeU8axesRu46aq58BJ/ZO0E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769021949; c=relaxed/simple;
+	bh=wrxxGjfP+5GnkRibkSGpyCxIsIz43rN4YQvaQ7oPfIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k6MaxKM+0UFBhtC/fMkZajJpUQcLQO5aT/9ON19eRSDNu3PXeWhDFa29f9rkcTHkWj/s2EDB546TEBZvEJG07YD6u/ZIbSHFjgd0Anh9Z8XDnjbuFESrq7oa2wkT/qOwRMmDF5tirQBE2U8sOPhWlNThCQPiFqnQpv6b2nV+MhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCobc10W; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4801d24d91bso1739165e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 10:59:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769021449; x=1769626249; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769021946; x=1769626746; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zaws6EmeMTGq5AKHGbFBsOId4T95J+FmRUAbPAZ/qpg=;
-        b=YG5ejmNGeG9uQD6os3S+5wncDKXjEwgiXeweIABBzCuoQvirKQDqqjjt5zZQzYkaN0
-         wpwaigsoxI2593SXlljdT2qTPvUN+fl4PYFPNg/85BusR6zBRidsUWKDbkoSTfQuWzyV
-         Gx9XGA/NCAgyrW2polw1AVK3hPID3eJylTyLcwG7KlLpYfr1BVoXeaSEjwmjwM+YsrgK
-         KfyXHbMnv06VonWTGLiNfSjNajWZJ3to2t/EqeEevRjX88FQ7WfXRi20KxdTzM6jdVn8
-         8blBDrqoDXEHkPLLGzZ5mh7fvEI14k4gxUpAXAGLh6VGOpQTkGi6vUiokOfZrUF+jg07
-         137Q==
+        bh=v3CiRXfW7OiyeqDRS/V5H9jo7jqnwu85t2dfMJoFCM0=;
+        b=QCobc10W8qh+W1kpAc54iwiZcOtuAkIgrjliU3QHFE3QfrE0ZElvW/B8q4Fu0Avo6b
+         J7Tl1wtv6oz7OvvXArZGOh4PNag0ch/56cJdZye2pvyjoe/bCkh3s+suNIa4Se4XPsxm
+         68PFZ8kuHOFYnLxowd7ufvcJFD9phNt8cDE3yn+1+2dMXsdv9Iw3ajMS3CXhfnoQOFOH
+         jg0XBcX29zU5DTN8AH6VNwG1MpBbptPi0kdlsrRo7UvE93VMghaAoyWQsjsOer9R0h1q
+         nGdD3TcAVvC3iiOg7/1h+0QZYom3x61VXzj0wrUt0m5s8/jpcN7TlC0mrspnNbvuXpKs
+         a/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769021449; x=1769626249;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1769021946; x=1769626746;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=zaws6EmeMTGq5AKHGbFBsOId4T95J+FmRUAbPAZ/qpg=;
-        b=qKXZLKpaDxICy/Jvr0joO/V2OKvZ9X6AXAhPF8FA1NL21oEF9C2Sqo3vsmyboaJk/Q
-         X+10AcwU5IiiNKgMkazbXAGqE2cZfP5qYmgOuEDno2XKGDVMoyHdQWqJps1Dvg/XMuMt
-         HDGMwHGi+rUtpe49CCN3/dG+7OVpsrzjDZ/C5QidO0nnRVW/UG9mszyjxW4xJuACvptx
-         THYsuKLVmHj0rqSK9xyEunID5SLD3YsBWVLsWAzCRh3aB94G3erMCybHpsJBWJBOhDL8
-         b8ww2t2zYg7Z13fYfYnAMk524WNgXLA055+1OdPscwEV8d72oCbzZ/1eN5+Fg4abgEJL
-         8sIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFMWTq+/feO9y2Lv47Mqb9vgAH5b1Kuy0bWmVhd2dxDkHqVR6EIZ/55KM/DJzb63i/WPnJ97I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2UKprCDwmxLsNn8dksC3vjl1DP4QQxyZmzwdL4TyQaAfNagYH
-	qfZIW3MpI20/vDvNchx2hzGjjEy0aJ1H5yWuOcEnl0N/wpsgzsflJTYbChED86INEmNnPMuAZXL
-	Dxgj+c1PjFua4W2uYrqvCUvREY6vV75NS109tTmYcgx/w6zhhjRuPLA==
-X-Gm-Gg: AZuq6aIN8jVYes9uEpNTTtuCSzdwR87luaIV117ISy+KHISXiUCx5jpa+HmLS6r/WLS
-	k7KaQDioimo8hKJVFQnPvHeGjjJtvM+Pbp3a76oq/mA7cerA18PNm5IVwmAEhOiiN6utzIV1Mje
-	2xkYUW8YxY6P5U/+pmGfP7QqSoz0iQxVxAubCXMF9VikZhJCrElNeuNrYkMP4VKm6TYjfRBNZpr
-	2Mr7yQSoCaK9E/+6WM6gharlipA19mFWlv2MxO0uvS+eBiJ0rXAM8RzQ0lKbpvPikECai31pOX4
-	MiY=
-X-Received: by 2002:a17:902:db04:b0:2a0:bb05:df55 with SMTP id
- d9443c01a7336-2a76951f3a7mr54485465ad.21.1769021448764; Wed, 21 Jan 2026
- 10:50:48 -0800 (PST)
+        bh=v3CiRXfW7OiyeqDRS/V5H9jo7jqnwu85t2dfMJoFCM0=;
+        b=b/H6DYNTRa0sGzYlqP7J9AJNJAF6uDWIiEMC7b7LHp8wEFQ7mv5VYurqOT8Sp5pWcX
+         VAEx1ffCOicOrtnOtOVXjPzZo1wHRH6XfUS7DfDyxkjkUr9351kTucL14uGfSbz6yTLu
+         oZEEyuKbErF0zFWR6RxVIJxQc+q6LXz2XlxFrkYPc8bIk4G5zXlYBkIEbTTp5fFPWvJK
+         4UEKFBMnaiOc2U2to+ZmD65E6/zVeueE+qGThnJL02kWvW78QrtissoZg+Hsz1wAlt8P
+         BZ0znVlW7Gw3oGJzSz0/p6KefP5OlM7BH1ugsJ+62eCrcg0HS+V1lPm98yXfcQPf6ox1
+         cvDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEKnRPDU2OSmNX7QSnTE3GZPdfdBWqcAz3F/XY1RhivmlS+UwBL4nHxnfQpqA0JFPEjTtIQu0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyth4DpGLrITQhOyhiX8l7Te5NQ0gCN9x26wUDPJhefYtc1nlvu
+	A8uZ+y1gkidhPv2D04GdjxQrO7JUBG/evwhKfA9iPcGfqzLRT8Q8qK5h3DgDHw==
+X-Gm-Gg: AZuq6aKxlD3NcpeuGfAiZSNt1Dkpz0bi+u4xliP1CcE6LQcZYzIjOR14LMMkSVn41nb
+	Gz9v0nE4FH68Uz5ewo3rHcaR7z13RNy8diddjrfyk+ZoiXcvqqvp6mvk9OCEIpRePPDr+PpXvnl
+	mwmS1+ab7vrVOFuNS+BWHLRnjs/MkRlfkfDOB3IUYOvqGwQ53LrJsYdR3iPM/iodA1hCF8Xt4EX
+	V7+jtBxwPc6wsW6ekJdSjjJrJff+IOmFuKhur6uuQosbWw6NbPO0XBs/AYEowi4ZQE+l6Ww/qHs
+	Q66Kc6QIElFeCuFYq8c1fowPawueSj4O4+9yvdKZgtjIp1L/4eFZ1CPv7MylTOb4qEECM0bnSBA
+	Em/r6oJbzZ2q/hjkf8Ulw1qZ8lQhP5M+NtvgFXXV35QoT9R9ulqUvcCZpQZsv/8ZJPaImlcaE8n
+	gJvdtMsVblRwDMwh2zP2Lqxsv8PIdw+x6PujVScJf/qmW3JfpVvYLh
+X-Received: by 2002:a05:600c:1f87:b0:480:1e92:dc65 with SMTP id 5b1f17b1804b1-4803e7f3c8emr99522385e9.31.1769021945554;
+        Wed, 21 Jan 2026 10:59:05 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804245320dsm9691175e9.0.2026.01.21.10.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jan 2026 10:59:05 -0800 (PST)
+Date: Wed, 21 Jan 2026 18:59:03 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Andy Shevchenko
+ <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Mika
+ Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH v2 03/16] bitmap: Use FIELD_PREP() in expansion of
+ FIELD_PREP_WM16()
+Message-ID: <20260121185903.201abe71@pumpkin>
+In-Reply-To: <CAMuHMdUo_Xow2YwMaDzPUW8w-3O12nqguzvoR6ij0X3R+syvOA@mail.gmail.com>
+References: <20251212193721.740055-1-david.laight.linux@gmail.com>
+	<20251212193721.740055-4-david.laight.linux@gmail.com>
+	<CAMuHMdV3WAxshZL9gw4+NeovX-9FjUZrk+coUAA7+=y6GmPECA@mail.gmail.com>
+	<CAMuHMdUo_Xow2YwMaDzPUW8w-3O12nqguzvoR6ij0X3R+syvOA@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260118061515.930322-1-xiyou.wangcong@gmail.com>
- <CAM0EoMn=bx-AMR0RbFmSj8MjWTxLtB_xo5419AW18paZ9r1wDQ@mail.gmail.com> <aXEIJEiRJb3hfP5n@horms.kernel.org>
-In-Reply-To: <aXEIJEiRJb3hfP5n@horms.kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 21 Jan 2026 13:50:36 -0500
-X-Gm-Features: AZwV_QiMLAgEMNblQvq8lLwPiE4VpwETVsvv5r1_OiEsuu2M3lwtxzU0HbM_h9k
-Message-ID: <CAM0EoMno99TjydUogh13tnWks-o7crt6mz1g7X5hyVF9ASmmfw@mail.gmail.com>
-Subject: Re: [Patch net v8 0/9] netem: Fix skb duplication logic and prevent
- infinite loops
-To: Simon Horman <horms@kernel.org>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, William Liu <will@willsroot.io>, Savy <savy@syst3mfailure.io>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252038-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252037-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,redhat.com,resnulli.us,davemloft.net,google.com,mojatatu.com,lunn.ch,willsroot.io,syst3mfailure.io,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[gmail.com,rasmusvillemoes.dk,vger.kernel.org,bootlin.com,huawei.com,melexis.com,intel.com,quicinc.com,infradead.org,kernel.org,davemloft.net,linux.intel.com,collabora.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 305405BC8C
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,linux-m68k.org:email,glider.be:email]
+X-Rspamd-Queue-Id: 585E35D599
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 12:08=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Sun, Jan 18, 2026 at 10:07:37AM -0500, Jamal Hadi Salim wrote:
-> > On Sun, Jan 18, 2026 at 1:16=E2=80=AFAM Cong Wang <xiyou.wangcong@gmail=
-.com> wrote:
+On Wed, 21 Jan 2026 17:52:29 +0100
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+
+> On Wed, 21 Jan 2026 at 17:50, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Fri, 12 Dec 2025 at 20:38, <david.laight.linux@gmail.com> wrote:  
+> > > From: David Laight <david.laight.linux@gmail.com>
 > > >
-> > > This patchset fixes the infinite loops due to duplication in netem, t=
-he
-> > > real root cause of this problem is enqueuing to the root qdisc, which=
- is
-> > > now changed to enqueuing to the same qdisc. This is more reasonable,
-> > > more intuitive from users' perspective, less error-prone and more ele=
-gant
-> > > from kernel developers' perspective.
+> > > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
+> > > not be used outside bitfield) and open-coding the generation of the
+> > > masked value, just call FIELD_PREP() and add an extra check for
+> > > the mask being at most 16 bits.
+> > > The extra check is added after calling FIELD_PREP() to get a sane
+> > > error message if 'mask' isn't constant.
 > > >
-> > > Please see more details in patch 4/9 which contains two pages of deta=
-iled
-> > > explanation including why it is safe and better.
+> > > Remove the leading _ from the formal parameter names.
+> > > Prefix the local variables with _wm16_ to hopefully make them
+> > > unique.
 > > >
-> > > This reverts the offending commits from William which clearly broke
-> > > mq+netem use cases, as reported by two users.
-> > >
-> > > All the TC test cases pass with this patchset.
-> > >
+> > > Signed-off-by: David Laight <david.laight.linux@gmail.com>  
 > >
-> > These patches should not be considered for any review because they are
-> > not following the rules that are set for the community. The rules,
-> > which are well documented, state that you must cc all stakeholders.
-> > When someone does this _on purpose_ such as Cong, some accountability
-> > needs to be imposed. I would say totally ignoring these patches is one
-> > option. Otherwise anyone can just throw a tantrum and decide those
-> > rules dont apply to them. Either that or we modify the rules to state
-> > it is ok to do this..
->
-> I'd prefer if we applied Hanlon's razor here and attribute this to
-> carelessness rather than mailce.
->
+> > Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>  
+> 
+> Oops, just noticed  commit 2fb6915fa22dc552
+> ("compiler_types.h: add "auto" as a macro for "__auto_type""),
+> so you want to do s/__auto_type/auto/g.
 
-Making a mistake is one thing. I made a mistake by not Ccing Stephen
-the other day. When I realized i hadnt, I immediately followed up,
-sent him an apology, and pointed him to the thread.
-This isn't the first time Cong has done this. So i dont believe this
-was carelessness at all. See this thread:
-https://lore.kernel.org/netdev/CAM_iQpUGvHLB2cZmdd=3D0a4KAW2+RALNH=3D_jZruE=
-1sju2gBGTeA@mail.gmail.com/#t
-He posted the patchset a few hours after i responded to him.
+That wasn't there when I was writing the series.
+I knew it was coming but didn't want build breakages.
 
-> Please let's find a way to move this forward
+	David
 
-I am not going to review this patch as it stands right now. If Cong
-wants to explain himself, I may reconsider (which does not imply i
-will accept this patch).
-If you apply this patch as is - then it is only fair we fix the rules
-to show this as an example of where such rules can be ignored.
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
 
-cheers,
-jamal
 
