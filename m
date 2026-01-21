@@ -1,111 +1,77 @@
-Return-Path: <netdev+bounces-252101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBPNE4pVcWkNEwAAu9opvQ
-	(envelope-from <netdev+bounces-252101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:39:06 +0100
+	id yBehGmljcWkHGgAAu9opvQ
+	(envelope-from <netdev+bounces-252102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:38:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F6E5EF1E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:39:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1794A5F98C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C2FF6545012
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:38:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7E1F8503EC2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 23:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6300844BC80;
-	Wed, 21 Jan 2026 22:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D87A3ECBF8;
+	Wed, 21 Jan 2026 23:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iulFsUZd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BeikHttw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65983EF0D8
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 22:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2247926E719;
+	Wed, 21 Jan 2026 23:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769035047; cv=none; b=un1Jxtc9iOyqQ5I3UEo1zkybaXYgDvGW+5NfbnQ87wFE67GDTxelINIKyZBhxGLFYRA7BLhuB98yyrnzcJezGAHNLFnch9Z+3CueiFZ8e1RuKEARpbUadaRd4PHWcA+WguBWnZHv5rc5UiQyqqfiA0HYVGKHmMmPhXHYOwnWLT0=
+	t=1769038686; cv=none; b=CBqgvAUMmaH/5AV1aO86edpDo5ZiMHnKEF4DL0wG6jPjXMtH7FnDYUfwetZcBR9JB625iSzXcT8ULlIfwvBdCJFF8k33PBsL5nie9uet9su0MTOeqp8MUl6rii8e5vIUapNSD94juOKrROzX3XHU2HfDvspC+oMRXbtrSiqC9Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769035047; c=relaxed/simple;
-	bh=SlWwyculiBABzhQdRSWezuPYqL5XqkaaZzBL+IrKxxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pw5ve0EjTFD5YrH5+c/newPpqieZcY7xBNQ+0FuoLqYF0kLhcNoRsHAuNYkySNC171b/U7ILjRTsei7S8YfU41uZUy/qlLifUf40ePt5B9ZeX/aGPu4nW5OacQNqJtf8wo9kSYaIrrAukUEf8TKegk92PamdY9fhtqgsOQL/iHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iulFsUZd; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2b720bb90d0so379250eec.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:37:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769035044; x=1769639844; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pgjMJi+m/42Lvq5w641HEHT7p6jawBc1Rvrn2olmX9o=;
-        b=iulFsUZdcfU2RmfnBl3Xo0JAL3ZrrW6bB5wKZJlzpAYyjN7he+yvxN+IRvpt423oRg
-         Gdwy3aw2VzKQmDyN9N4FufRxaf0TrcsprdRcCtegQxAQOrnatB+v8rgwxjQSyam2ypvp
-         yO2ophwmoWOyVONDK0+4hECDbeby9Jy+kIFrsZ7BmOIUQV0I+4VmhCdf71GEpMhfNcnF
-         EN2UcLI7If3b6CaKFqiC6H5X6rHuPgnTI2FxEZsIrY7/Cxii+BClBpmxF/fyAmnQ3eLK
-         3wNeZuFZktGiQ5gHWBTIl0JBzy955FAyK6QzrS0XKCx0yEavcD8o/IRPof3ChelvrDt6
-         kNeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769035044; x=1769639844;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pgjMJi+m/42Lvq5w641HEHT7p6jawBc1Rvrn2olmX9o=;
-        b=HNxT462A+8CCwb/Y5fSyuH5f6X2g2vdRsLLSGIrS77pUnTRZpPWUSCWJSAdyOtPbF8
-         AXOBPDWYN0AYmpD4l+FyxHdpQokmFglMXctq2LbypOSNh6qenwri5DZr0faVIEdB//Nx
-         f/k4flp8emTp+s6veOn3WTEakJzR2BAHpBmDHMzjpA/oP6+GbcmWpkqZy75Mn/2v+h1L
-         Wjj/9yEREwUllSfJqJFFZMi7ZPhE1g03NFh8yUQ6EDM8B39OR/kk/AU1GMgzjfTu+FZ/
-         FJPEwACnKtzt8vysjObY3fNMgQ/zZb3GWXkCxFhZ990LUyTx6jMljSnm7G29KqD7pFmC
-         C2JA==
-X-Forwarded-Encrypted: i=1; AJvYcCWiaOgKGib2jdWA/49y3dw+Hx8fpX9AazfUN3zkm+MWv/zd2SLMUI9UHE6lKOjMG5oFLzJcyU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTZgHvLGOIFSmzDXcGAOEi7BN332LZ3bsLh9umsBGNlzX+2khi
-	wCdm7ojDnBjKwea1UeT7OQvJTQ+3uWiT8EMEDnIeINGsZsQkuoXaYc6Q
-X-Gm-Gg: AZuq6aIXhnfBXTBXCsgTLh7AvFhRXSAk30fd22xA0xUeuxJBb3P1/DeK3t3nrkzrquF
-	2jEB2hC2Espx0kFSIqs1awywuNR3IRm5ihiYIa19mXhM1O4crKyBNYajDjoIw515npZwbisETFC
-	ThrCPcwV04vSbdU8P4NsrYxppt8PywcsM57JCg8/+avAHMalybTJwH5kBzTUXs6hSy0WS44Gdq9
-	pEvW/3p+rpidxy0Q7w3gyVtnl6aYyKxae72INfVmOhS9/+FPO1mPD/KqpoPQwEo/4vaWwuR2qa+
-	6CByQYiy5TCCl5pc3DqYxHeKznOTeGmVab7n+yociic8WacTY6D6Q13MyD99VSRj2PDFWwuTaiK
-	oM8L9VSfHGANeb0pM7an8PGoS02G2YpAVG/tNuzCYidB2XyunClm/l7W0n13QvA3diDK3khhwie
-	IZQUgyRbddpA==
-X-Received: by 2002:a05:7300:8b14:b0:2ae:5555:4880 with SMTP id 5a478bee46e88-2b6b4713257mr14102244eec.13.1769035043476;
-        Wed, 21 Jan 2026 14:37:23 -0800 (PST)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b70d7f729bsm6725736eec.16.2026.01.21.14.37.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 14:37:23 -0800 (PST)
-Date: Thu, 22 Jan 2026 06:37:12 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, 
-	"Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Inochi Amaoto <inochiama@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Yao Zi <ziyao@disroot.org>, 
-	Yanteng Si <siyanteng@cqsoftware.com.cn>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Chen-Yu Tsai <wens@kernel.org>, 
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>, Shangjuan Wei <weishangjuan@eswincomputing.com>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Boon Khai Ng <boon.khai.ng@altera.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Quentin Schulz <quentin.schulz@cherry.de>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	spacemit@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add glue layer for Spacemit
- K3 SoC
-Message-ID: <aXFVAoChTPZhjnGu@inochi.infowork>
-References: <20260121071315.940130-1-inochiama@gmail.com>
- <20260121071315.940130-4-inochiama@gmail.com>
- <aXDBCsfaNrgfGjNK@shell.armlinux.org.uk>
- <73bf2977-ad1a-45fa-9b06-5df083c060a8@lunn.ch>
+	s=arc-20240116; t=1769038686; c=relaxed/simple;
+	bh=weaJN1Iequ/ZyzA1DPueH31401FC5DUZbpwwcPNyzmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=PSu/uhoqpkaoWwWlUi+KefqclK3Qpq9AiFSrGJ89zmZK8jMf0J+vtXjACLp8NYjUs2T1oM1fjFdez+2CaK7GRoJrkGZtdILDaF4+FW/YAZKbpuEgJSUPpA45k5lSKpo8xojR5lUZPG6tyRsLa1APp1mBnJT716FL2vg2Hck+ciA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BeikHttw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54A20C4CEF1;
+	Wed, 21 Jan 2026 23:38:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769038685;
+	bh=weaJN1Iequ/ZyzA1DPueH31401FC5DUZbpwwcPNyzmQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=BeikHttwrCy8vR2Z2txVC+OK5mggBSlKkHUlak+4qJNsLFrRy2lVin2znkr8uhTQV
+	 hDrmRILtEmj7vUJozkGZqTtkC7jUFLFbW93vmaGTVqr/Sn5lqEpjj1cfK583XK2h1W
+	 cWE3lMXXh6kONxTUrzilJiZU5A5Y89Zu2yn7RIUyGceGoUtYvSK8Y5rNZvlAy9u9iN
+	 R2s2BfJMHAxgIvFEovn2WRV21tJsbeLz8tsu8o8CSDoBDHmaPSHQj2jCW8PFkiE8aJ
+	 ocO0pWswC8u3eMGvxOnwCJab2Y+7vdjDnkfCiO1CZLrXf1aJX6D22EoP5AUFp1+EdI
+	 qGoPNveHv3RcA==
+Date: Wed, 21 Jan 2026 17:38:04 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	"Creeley, Brett" <bcreeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-sound@vger.kernel.org,
+	linux-riscv@lists.infradead.org, sophgo@lists.linux.dev,
+	Thomas Gleixner <tglx@kernel.org>
+Subject: Re: [PATCH v2 2/4] PCI/MSI: Check msi_addr_mask in
+ msi_verify_entries()
+Message-ID: <20260121233804.GA1221537@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -114,89 +80,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73bf2977-ad1a-45fa-9b06-5df083c060a8@lunn.ch>
+In-Reply-To: <20260121-pci-msi-addr-mask-v2-2-f42593168989@iscas.ac.cn>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252102-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252101-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gentoo.org,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,disroot.org,cqsoftware.com.cn,nxp.com,bp.renesas.com,linux.intel.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com,iscas.ac.cn,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[inochiama@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: E7F6E5EF1E
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 1794A5F98C
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 02:45:24PM +0100, Andrew Lunn wrote:
-> On Wed, Jan 21, 2026 at 12:05:30PM +0000, Russell King (Oracle) wrote:
-> > On Wed, Jan 21, 2026 at 03:13:11PM +0800, Inochi Amaoto wrote:
-> > > +	mask = RGMII_RX_DLINE_STEP | RGMII_TX_DLINE_CODE | RGMII_TX_DLINE_EN |
-> > > +	       RGMII_TX_DLINE_STEP | RGMII_RX_DLINE_CODE | RGMII_RX_DLINE_EN;
-> > > +	val = FIELD_PREP(RGMII_TX_DLINE_STEP, tx_config) |
-> > > +	      FIELD_PREP(RGMII_TX_DLINE_CODE, tx_code) | RGMII_TX_DLINE_EN |
-> > > +	      FIELD_PREP(RGMII_RX_DLINE_STEP, rx_config) |
-> > > +	      FIELD_PREP(RGMII_RX_DLINE_CODE, rx_code) | RGMII_RX_DLINE_EN;
-> > 
-> > So your reply where you basically stated that all the RGMII.*DLINE.*
-> > constants here should be the same was nonsense. How can we trust your
-> > replies?
-> > 
-> > > +static int spacemit_dwmac_fix_delay(struct plat_stmmacenet_data *plat_dat,
-> > > +				    struct regmap *apmu,
-> > > +				    unsigned int dline_offset,
-> > > +				    unsigned int tx_delay, unsigned int rx_delay)
-> > > +{
-> > > +	bool mac_rxid = rx_delay != 0;
-> > > +	bool mac_txid = tx_delay != 0;
-> > > +	unsigned int rx_config = 0;
-> > > +	unsigned int tx_config = 0;
-> > > +	int rx_code;
-> > > +	int tx_code;
-> > > +
-> > > +	plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
-> > > +								  mac_txid,
-> > > +								  mac_rxid);
-> > 
-> > Maybe Andrew can confirm, but this function was to fix up existing
-> > broken DT, and shouldn't be used by brand new drivers.
-> 
-> Hi Russell, thanks for pointing this out.
-> 
-> This function should not be used in this case. MAC drivers in general
-> only add small delays, in order to do fine tuning. The PHY adds the
-> 2ns delay. There are however some MACs who cannot disable their 2ns
-> delay, or have historically been broken, and add 2ns delay. In such
-> cases, the phy_interface passed to the PHY needs masking, to indicate
-> the PHY should not add the 2ns delays. That is what this function
-> does.
-> 
-> Please don't call it. Pass phy_interface as is to the PHY.
-> 
+[+cc Thomas, thread at https://lore.kernel.org/r/20260121-pci-msi-addr-mask-v2-0-f42593168989@iscas.ac.cn]
 
-Great, I will remove this call and pass the phy_interface.
+On Wed, Jan 21, 2026 at 11:49:38AM +0800, Vivian Wang wrote:
+> Instead of a 32-bit/64-bit dichotomy, check the MSI address against
+> msi_addr_mask.
+> 
+> This allows platforms with MSI doorbell above 32-bit address space to
+> work with devices without full 64-bit MSI address support, as long as
+> the doorbell is within addressable range of MSI of the device.
+> 
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> 
+> ---
+> v2: No changes
+> ---
+>  drivers/pci/msi/msi.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/pci/msi/msi.c b/drivers/pci/msi/msi.c
+> index 48f5f03d1479..2ecbcd6c436a 100644
+> --- a/drivers/pci/msi/msi.c
+> +++ b/drivers/pci/msi/msi.c
+> @@ -321,14 +321,17 @@ static int msi_setup_msi_desc(struct pci_dev *dev, int nvec,
+>  static int msi_verify_entries(struct pci_dev *dev)
+>  {
+>  	struct msi_desc *entry;
+> +	u64 address;
+>  
+>  	if (dev->msi_addr_mask == DMA_BIT_MASK(64))
+>  		return 0;
+>  
+>  	msi_for_each_desc(entry, &dev->dev, MSI_DESC_ALL) {
+> -		if (entry->msg.address_hi) {
+> -			pci_err(dev, "arch assigned 64-bit MSI address %#x%08x but device only supports 32 bits\n",
+> -				entry->msg.address_hi, entry->msg.address_lo);
+> +		address = (u64)entry->msg.address_hi << 32 |
+> +			  entry->msg.address_lo;
+> +		if (address & ~dev->msi_addr_mask) {
+> +			pci_err(dev, "arch assigned 64-bit MSI address %llx above device MSI address mask %llx\n",
 
-Regards,
-Inochi
+Use %#llx so it's clear these addresses are hex.  The previous message
+did that, not sure why you dropped it.
+
+> +				address, dev->msi_addr_mask);
+>  			break;
+>  		}
+>  	}
+> 
+> -- 
+> 2.52.0
+> 
 
