@@ -1,53 +1,86 @@
-Return-Path: <netdev+bounces-252040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOwAI38/cWnKfQAAu9opvQ
-	(envelope-from <netdev+bounces-252040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:05:03 +0100
+	id UIQdMVU4cWnKfQAAu9opvQ
+	(envelope-from <netdev+bounces-252042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:34:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671045DC66
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:05:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3A75D545
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:34:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8169836A14C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:13:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 63284A4F493
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAD53ACA7A;
-	Wed, 21 Jan 2026 19:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FA63C1976;
+	Wed, 21 Jan 2026 19:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X2YdqJFD"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LjYZfC7X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F5D399A48;
-	Wed, 21 Jan 2026 19:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AF73793C8
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 19:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769022816; cv=none; b=tiz0xXhbtdM5Vk8wJS3jsi7NiYCLxgcdrVed2SM4gc+SYpkkkJboGvqYy3QTH7lfVyDW6fMmU7YkHFuCWUIuoMMG/sLr9d47f8Nvhmq65P9OmfQjHoH99BF7iC4NQVABSLpBsLtDYu67Qol8skCKpRFIdk7I2ObOq5O2mJ93LN0=
+	t=1769024580; cv=none; b=SwXjBDPlAk/XNtgbvCacezN0UCbYsSprhpEM06A4FXt+Z/EbjRJcJ4vKSc4fszeaoxZD0Bc1WbQWWja+BnDR0J5nsOjlFAxdnKTMp5yy55IjDWnDQ4iJJNESZS8Aur9MIDnn6vXqvB5wPaFZAbYcIX4kPtjjH4evi1fPrtx15Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769022816; c=relaxed/simple;
-	bh=frjdgFHf9a79mI7D3cY4adbV50gFplryV6+N2KLJSm4=;
+	s=arc-20240116; t=1769024580; c=relaxed/simple;
+	bh=F1jquYdbse0f+h5PoDNJ9pGakn5CxPZjQwcYQH1T+jk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cAtpp+eShpmhQEZgxMIe9a979XrYFyuYky3YmxcqjrnrRZjeEhqJT3KdMpd/mIzpATmv95AkUPiVH8wS7ygSo7bmnwambn4RRZ4M8wUJSanB0nFt0WiFy12+jpXHt8q6xqFurhzgnocQ4y1vHzyPT9eg5i+kuK1WzKxjJb+Syzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X2YdqJFD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86EA0C19422;
-	Wed, 21 Jan 2026 19:13:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769022815;
-	bh=frjdgFHf9a79mI7D3cY4adbV50gFplryV6+N2KLJSm4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X2YdqJFDAcjvY2ZLHHPKqMNVZ9pI2//cnu/sr0DCm9ubZ20cqKxVbMmMjppw1U8Ct
-	 nacGz3CiLNBEdi0hl7FnVT82fVeE93J3JqfO7BZT2r6zeUX++YQRZMDuazzBLWp6vX
-	 EmgAV8jqZcgRLmEbIOw5uYioW4Dc9kH3mIC4G3kHuxgGclDClxDuagT4KczHnl4z/L
-	 x/wImFBKYj+TAZDhgfBtiVEJqir61rfq2xuGNQTZa8pZvrvrWmGQ9Pl280E/6ed7ga
-	 XwNb7oojNfTNJX1JMgnVk+HfhcnPU7ekDfPXnNGGB+q+UCyMQWfE9gvsy1NJjN6twJ
-	 DjGmJX1L2mUZQ==
-Message-ID: <412b91a2-15f3-4a5f-8f1a-249c9d79cb41@kernel.org>
-Date: Wed, 21 Jan 2026 20:13:31 +0100
+	 In-Reply-To:Content-Type; b=Ojr2BpKQmDsdaofLmajzJoFbg9LSZdBNmky79B/DW1yB+sql8NgN9uarnPgjlxQWS/4nFf5SrlcQEsKWxnlM0IF3bjwVD8y/s0918K6wZtpXzHAv/9QfZ6ENnCcNwcTtiVHIH/udZ10ea3yBNmVMYfJftWlpXDY8WXubWxpve6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LjYZfC7X; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2b70abe3417so399637eec.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 11:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769024578; x=1769629378; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DQvGCJmxpkROPmN9OrxKrrBVJtlOjFG6UFxmO3kVd3M=;
+        b=LjYZfC7XW0ReDqdceYyCRzzO8cO0INzBeniWDhuOMniY2c2GQJurt3n3LxFA6n3Ikf
+         IpCsWwWTZ9NOZhLEqy3f1zxDjNXj4kVtJVkNvXelBaKTmRLNclmi1H1TkMzLQWUtk0kq
+         xztRmMel9QKg2MPg9Ujp30IGlj7KhYvOA1iEpS3W2bu3pP06GIwPa90jnb7qK5kaM3HN
+         AqQXhBFsOQ3yA0MDSOgYJJBdKCIvhEadBASwf2ardiv2U0dh18g/99yGnsMl7cQm7y27
+         5W0q8INYGL73nq8mQMohbbQIuooL2yc2lqbMeW43c5oUvi9gOYZxjEOoRWu14MyzEXpO
+         TR5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769024578; x=1769629378;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DQvGCJmxpkROPmN9OrxKrrBVJtlOjFG6UFxmO3kVd3M=;
+        b=b/P23WKAXzEjYM0BIHZ11XGJhrm3JH83ZmgRR22XWX8nG/qANR9XudvLrw3ieH0y3g
+         60dtCIwS1qUaOQC3h/2D/Vw15kIEeO0+zot0riQoCCav7KwUYy6D+EW73u43osbSIJzl
+         up1OjesB8maK6jOTCpbaMZBtsmZy8FUkhF548dC2XOB4uruuB+5qSX6P/f5e/rTYf0he
+         f8OUZqOl2qC6cnw+iMBUpdEnW3RFUnwhF2lyp8kO2qpzAwqxg0QfWJbyeKN8rVuc5Y3F
+         NxkZYYWLgiE2op1iGIFil6oSQq69ute8D6t8DvY9KhjZmGbfCuqkdR4NIRQYzVFT3a8v
+         q5sA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5CFnEyhSdh6kUm0Qv2/yMxZvSb4Otaf1ULthrLrQfAED6uG4LBgDz9l/py8LJDrrb8FWDf3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySSexQ0rcvzGscAF1MkTxnT4+DFgC/fUBMNBJLL42nHfTdUnlb
+	VuCE0cNmku0u5BYcVdFAlilVsCVocNWbbmF7MZzF8ArMqpVUHq62J9ellQGl5zE8Gg==
+X-Gm-Gg: AZuq6aKBQk8F+KxxKMWDYKHEluJDl5tmMOS3ADlObnDtAxDOssNxiZC9041PVd13xjh
+	9JBYRDt+xmd+vdH6HO2g0ea4iawmQAZCFnR+4JHZ+2kLMMefAo4ebsYng3q3vm/+G5oy41qCqws
+	O49Gc+kUalP3NIgwxtrlfO8ZCyaFzvaajZGt0X/aTSxMu11tMuTg8J7KR6z6zEbvV6p89wXPFH8
+	TtO2HVWPygv1d85he2+kqgjtDVAprr5nebSacGFSWaXXSJffVnJxRf8fKHrsAE6D8/qXzKXdcrv
+	9RCcCSCwBkLTbdWHQ9ZYXjr3lFE6kRyC5J7iy8Lf7bgfzjAj2ZYIi4mhqEntVnFrVYFXyZtATPg
+	PWvimUEWm8a5ICueI0VAAfwb4tU2+eGHGwESXqEesZscjoDT/N+2VJV6xQ91qjQhxGwJhFlqMuM
+	s6MWO/VjCfvMUIUbY0zKjhEpehv9Di28Ei
+X-Received: by 2002:a05:7300:cd8a:b0:2b7:1320:f280 with SMTP id 5a478bee46e88-2b71320f4f2mr1913474eec.15.1769024577414;
+        Wed, 21 Jan 2026 11:42:57 -0800 (PST)
+Received: from ?IPV6:2804:14d:5c54:4efb::1c9d? ([2804:14d:5c54:4efb::1c9d])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7171be2dcsm3022869eec.11.2026.01.21.11.42.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jan 2026 11:42:56 -0800 (PST)
+Message-ID: <e58a29bc-3512-47ce-80cd-6c96a879c9cc@mojatatu.com>
+Date: Wed, 21 Jan 2026 16:42:50 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,123 +88,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons
- for monitoring
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- carges@cloudflare.com, kernel-team@cloudflare.com,
- Yan Zhai <yan@cloudflare.com>
-References: <176847978787.939583.16722243649193888625.stgit@firesoul>
- <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org>
- <20260120162616.463c8af1@kernel.org>
+Subject: Re: [PATCH net v3 2/7] net/sched: act_gate: add RCU support for
+ parameter update
+To: Paul Moses <p@1g4.org>, netdev@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20260121131954.2710459-1-p@1g4.org>
+ <20260121131954.2710459-3-p@1g4.org>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20260120162616.463c8af1@kernel.org>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20260121131954.2710459-3-p@1g4.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk,cloudflare.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252042-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252040-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 671045DC66
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mojatatu.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 3E3A75D545
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-
-On 21/01/2026 01.26, Jakub Kicinski wrote:
-> On Fri, 16 Jan 2026 11:40:06 +0100 Jesper Dangaard Brouer wrote:
->> On 15/01/2026 13.23, Jesper Dangaard Brouer wrote:
->>> Add specific drop reasons to SFQ qdisc to improve packet drop observability
->>> and monitoring capabilities. This change replaces generic qdisc_drop()
->>> calls with qdisc_drop_reason() to provide granular metrics about different
->>> drop scenarios in production environments.
->>>
->>> Two new drop reasons are introduced:
->>>
->>> - SKB_DROP_REASON_QDISC_MAXFLOWS: Used when a new flow cannot be created
->>>     because the maximum number of flows (flows parameter) has been
->>>     reached and no free flow slots are available.
->>>
->>> - SKB_DROP_REASON_QDISC_MAXDEPTH: Used when a flow's queue length exceeds
->>>     the per-flow depth limit (depth parameter), triggering either tail drop
->>>     or head drop depending on headdrop configuration.
->>
->> I noticed commit 5765c7f6e317 ("net_sched: sch_fq: add three
->> drop_reason") (Author: Eric Dumazet).
->>
->>    SKB_DROP_REASON_FQ_BAND_LIMIT: Per-band packet limit exceeded
->>    SKB_DROP_REASON_FQ_HORIZON_LIMIT: Packet timestamp too far in future
->>    SKB_DROP_REASON_FQ_FLOW_LIMIT: Per-flow packet limit exceeded
->>
->> Should I/we make SKB_DROP_REASON_QDISC_MAXDEPTH specific for SFQ ?
->> Like naming it = SKB_DROP_REASON_SFQ_MAXDEPTH ?
+On 21/01/2026 10:20, Paul Moses wrote:
+> Make gact->param RCU-protected and reclaim old params via call_rcu(). This
+> follows the pattern used by other actions: act_pedit swaps params with
+> rcu_replace_pointer() and defers free via call_rcu() (commit 52cf89f78c01bf),
+> act_connmark uses rcu_replace_pointer() under tcf_lock (commit 288864effe3388),
+> and act_tunnel_key does the same under lockdep (commit 445d3749315f34).
 > 
-> FWIW FLOW_LIMIT is more intuitive to me, but I'm mostly dealing with
-> fq so probably because that's the param name there.
-> 
-> I'd prefer the reuse (just MAXDEPTH, I don't see equivalent of
-> MAXFLOWS?). We assign multiple names the same values in the enum to
-> avoid breaking FQ users.
+> Dump readers in act_ct and act_pedit already use rcu_read_lock() +
+> rcu_dereference() (commits 554e66bad84ce4 and 9d096746572616), so act_gate
+> must keep old params alive past updates as well.
+> [...]
 
-I've taken a detailed look at how we consume this in production and what
-Prometheus metrics that we generate. My conclusion is that, we want to
-keep the Eric's approach of having qdisc specific drop-reason (that
-relates to qdisc tunables), but extend this with a prefix
-"SKB_DROP_REASON_QDISC_xxx". This is what I implemented in [v2] like
-"SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS".  The QDISC_ prefix enables pattern
-matching for qdisc-related drops allowing monitoring tools to match this
-for categorizing new/future drop reasons into same qdisc category.
-
-For Prometheus drop_reason metrics the decision was to omit the
-net_device label to keep the metric counts manageable and avoid
-exploding the number of time series (lower cardinality, less storage).
-Without qdisc-specific names in the enum, we'd be forced to add back the
-net_device label, which would explode our time series count.
-
-The FQ flow_limit and SFQ depth parameters have different semantics: FQ
-uses exact flow classification while SFQ uses stochastic hashing. They
-also have different defaults (FQ: 100 packets, SFQ: 127 packets). Having
-the same drop_reason for both would obscure which qdisc's tunable needs
-adjustment when analyzing production drops.
-
-Having more enum numbers for drop reasons is essentially free, while
-keeping metrics per net_device is expensive in terms of storage and
-query performance.
-
---Jesper
-
-[v2] 
-https://lore.kernel.org/all/176885213069.1172320.14270453855073120526.stgit@firesoul/
-
-
-
+I think you could've transformed patches 2, 3, 4 into a single patch.
+Since all of them are RCU-related changes and they sometimes overwrite
+each other.
 
