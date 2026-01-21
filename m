@@ -1,371 +1,308 @@
-Return-Path: <netdev+bounces-252050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252025-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EiEMRRAcWn2fgAAu9opvQ
-	(envelope-from <netdev+bounces-252050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:07:32 +0100
+	id wJmmNp0hcWl8eQAAu9opvQ
+	(envelope-from <netdev+bounces-252025-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:57:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7F65DCF1
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:07:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A7285BA6A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EBDA980261B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:50:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45847AEDE3F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BC0394474;
-	Wed, 21 Jan 2026 19:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91740399A48;
+	Wed, 21 Jan 2026 17:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQeI1TkO"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PMPm28i4";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="K91KD46c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DA8338929
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 19:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769025041; cv=none; b=LEzFdMMifTnms6+PY/oQeu17VUitPz1FieJELLF1WWW7ZHZ3RrhawX3KFhCFFLQcqN7i47gG7Dur8ePh5xoVu7GROYzT7HVdBhiGswj9gXg+d2s0wBIjpeWUMjRs6lCx+AFBtyu2kOoMFE6okiVQemllOYEbprQ0xVdlARrrwFw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769025041; c=relaxed/simple;
-	bh=Lu0kHih9UWQeJ+lp2O4spjT0NK81+eYFDqsV1ZmCcuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bbTAvYswUa7WBJFJKyXpE9Orpb9Xom6zrlbRQMND6TAF073CePDoPCn8Kd9Rc75JrSHrlo1CRvvoQlyKOLJS7U6XE8DxiYB65dq+rn63Z2EJJRUP/nC46QtDqhYTUzgpMpxiV7iYD4HkQTMustmChHpJkoMTIWlT+rNX6wKC2So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQeI1TkO; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5013c912f9fso1694521cf.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 11:50:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2305238A288;
+	Wed, 21 Jan 2026 17:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769017839; cv=fail; b=XTqpmLehFsV2DzwrO5fqr4FL5qptYxQZkpWMUYQMHs6XWkOBckW7oVlSaqi2Hp92PHYoxI1yVMWY3A2p9ruaVc8NH9rL5BKy2hZcU3RRJY+/0an6r/hjKWBR3mXqiRZwA3oU+qJxjsbb1iJJR/50BX9NH0Cipv77CTZmcu0s5Nc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769017839; c=relaxed/simple;
+	bh=oZrnuCOv//64/A8DECtGY2qQvLtx0B/LD6jElKmaCBw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OGRxj+NQcSFWXBrn7mc9wl2trBdQWOCvipkIApkeMj7VvwcMLyRwum0ePh1/+LhTC8YDZj+3JKB1wRkwft8If/XADmHsnvJ/pEf6baOf2+/mYTRiOwCfZ481iphaPbUnKaJm4lodKwSuQPcfDjs92JFjeDpWSISKZOUqbFfm1lc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=PMPm28i4; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=K91KD46c; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60LEvG163028845;
+	Wed, 21 Jan 2026 17:50:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=oZrnuCOv//64/A8DECtGY2qQvLtx0B/LD6jElKmaCBw=; b=
+	PMPm28i4UBesAdCPZbk+a9QFPnbd22cSXMX+uRpkoLnD7aRo4Tr16KDFRGSUHhbr
+	mlxUPI/lTcEmIt755MjkGWNjvPePOzAfEtTT77CALSrt7RcbBVLoRGdrzUddOyoF
+	oGqoGNFxLHTN1buNLvacSRRR/cUXaP7NDC4kVuP/qKcRusompAq+sl0M8fJVC5vn
+	XHjai3AecJol/zHf2JwM1yW/lSMmGrxE3ZUT0JMIRPbSajKeJSrHTWcdrO0bCpR2
+	XLOE9Bc93swg1dko9P5zfCXi3JNUehYsQBcWEmTxvYm21vTOK8JGu5NG+9+SNAkG
+	8tBIeGjDdQEaolZCMKHCGg==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4br10vxbhf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Jan 2026 17:50:24 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 60LGgNLo008362;
+	Wed, 21 Jan 2026 17:50:24 GMT
+Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11011031.outbound.protection.outlook.com [40.93.194.31])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4br0vbm6b8-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Jan 2026 17:50:24 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ogJMUgepj+LfELaFR3ZmqfoNG1Rt4tzbRnm4ulWsPYbiomZBmm5eik3hXv32GhnxmmOGZUEB5uVX/l8KSrWB++r93ad/lUZ75s3m/kpgUZiGMCfLRoUNVDKBt7fExXpJ1qitcBySlZFF/qQaBJRE9hznmQXwo2P07TEZesOKJsrLkvwWgtadsWXMJCRYWwpWz7KGVTt20FtWBpH2W9/TJTa74HJh1hqg+yTf/m8ISghQCrJVwnzcK+8kGre2qWH1mdT0PIC6yY+v/um7gyumHU3tK7neBJ9w82Zfknsx3bJzOn8qhVGBjjF9E1LaYIpAZt+cSXgjQIFG2mSHS9z89Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oZrnuCOv//64/A8DECtGY2qQvLtx0B/LD6jElKmaCBw=;
+ b=O87SCQETL0jh+EaX8UvAtH+ChhPr+UJJ5jEfkj+0/DubMm0k5HPSyBKf14Ho4sm/o8wTngDeLox1icB+wYoFElLeGiBCXdelbkeUni9sVZa/As731qxct82HgGL3PnpXtACWJPxPAunjlLjsjllOR+5EH+ujwgUismhBiFcG2GQPzJZbNq/Wb+RlvdVpKQMx52mjUzd5JrXoBEo+i6iLYX47yqmPjonblf9LwNoLxnFLGr9ZzNV2nMg/lBQ08zk+oBtdakTVIXfkJIA+DcbpmbiLZloF4FXCk2cAmwlOxYhvQDCIr3A6iDNgfS2MhPkp118e0612bIGbzZIF2hKYTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769025038; x=1769629838; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOPRZD47F8f143cIEqQqsk0mY0SdG+TC6tAqQjFOOoM=;
-        b=FQeI1TkOQRxeoxjXaEohPw7B4A++uLWOYj6mmbUTr7cYCHcgpJjZRbsq3f5+fP3Jha
-         XvqMzF1CF2giy6n5NspuuY+LiZr8JHqyjizWCadvm+smj2qxedlf5bUbGnqAxbbl57Sr
-         fuRl11oCcNsIZN66xbvDMVw+J/bkuDQhONnBhZupk9e6XZMsMM3jMJTwCMqIaO7FfB6g
-         X+oQiXXAIfMaXTJm/WfE7vJFFTfeUHWGbIE4sQFArPSjFKZqZrDgpcQRJ6qJzrdX2auT
-         nmfYz6bY9YiF6rvdub3RJBD6m0tzWzzLGvHEc0biCAhNh/s2BugubgpkI4X3CM1iNJ8Y
-         QggA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769025038; x=1769629838;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iOPRZD47F8f143cIEqQqsk0mY0SdG+TC6tAqQjFOOoM=;
-        b=MWJ4UpT4N5c+yi5fxBb9mdyHfarLhI0RZD+UYf6vl872bp8ygiNC0bE+7+FHFnH0ay
-         Mvx9XbK++Xlo7zLGN4gfcl3NjVzI6F6fGnDmFO/Msasa6vnOWK+ccQrl7nwDWEGm7Duv
-         XlgDCgMg/xA5LSMk81mVuPwP2cG6PjwdfO9/Wfugg4+HDfi3ehWnkXV6epFrunBi7Q5V
-         8Y3MXubXJRaIJe7tNG93s6jj5tn248xGlF1bY/lbFFjPbvScsaIheLZzyTIz83TA+neZ
-         OPcN+o8Vu3CRaftZ9Fy369PqMLqiI9SCEkAQoeDTLMCYAz3loxjSRK8l56w+fX5XplHx
-         C9CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTR2rca5bV7CyeE5V+9xGkgQNcoehdTWVzDWtz5wja9RcqJ/aUI/YanGQVOhAA7xk2dv2xrHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFNdcKTDeddUnU+yNRds4sAZ1OdNxVBD9R1g5WW3mCZvN7TSkz
-	z57bvDvFnXrzB4wDM8r4sPdbCtG58DcRWAdV8DtV5f6LPqato5huDdFVpOgh3Q==
-X-Gm-Gg: AZuq6aJeS1aNtjxXzm6hSXwP4ndx5Qz1UWwma0HCIHjmBh3PdXuPLgmRq1G+L6a3QJA
-	TRWzHkvi73KmBM4UEvv95I+VrCatvY3yW89FXuBtEJAWwdZ6Pm78tBodknujMZabAMYTBVX6UOn
-	y7PL237JrDKvppJjK9m32Y1uLricADn/GetBwjHLjmwFOdnGx5fjLwYgH2s7GCIE8MCd9wkDBgH
-	oIa72pMWSD47yEYohmrjD9gwTIZ8VMvJ6nraUed/j03T4SS8TxnYn/MBnC4N6C2vlnBchpoijUP
-	9Vs7RiLG1ZQUC+2sbX2+v0o0at3dextDCk/osHTWwPMEgFsxxT3q7Ygkt1ouxcG5iymLJ1gK/mB
-	OTI1z4WAZxaK1D/lPocRkm0N9oq99Ymi77n59HnoplL4m47fx+cQUitFVi0lnBmVx53WGHDHHyY
-	IdMkGKCcEnWtN7af3A7+2AOJLHW1LHHX0fq8FxA546T/mjlg==
-X-Received: by 2002:a05:690c:6089:b0:792:7113:a305 with SMTP id 00721157ae682-793c671a7f3mr146815807b3.29.1769017778141;
-        Wed, 21 Jan 2026 09:49:38 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:40::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-793c66f6f97sm68737717b3.16.2026.01.21.09.49.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 09:49:37 -0800 (PST)
-Date: Wed, 21 Jan 2026 09:49:36 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>, linux-doc@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v15 01/12] vsock: add netns to vsock core
-Message-ID: <aXERsFJLz9b9Fzce@devvm11784.nha0.facebook.com>
-References: <20260116-vsock-vmtest-v15-0-bbfd1a668548@meta.com>
- <20260116-vsock-vmtest-v15-1-bbfd1a668548@meta.com>
- <aXDYfYy3f1NQm5A0@sgarzare-redhat>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oZrnuCOv//64/A8DECtGY2qQvLtx0B/LD6jElKmaCBw=;
+ b=K91KD46cy+ZC/Vj4MHDULSbmn9N8KHm7+dKwZHh9YHih/9L1uPYmcYupsqtDypKsUNhnCmQRBpCq2Q8VJl4mdZnNkChhxyzrxoebRaQw9TRVgcZIrKIdWaHgDX6HBcAV6RbqvvA4r6o1eT7TAbBLghdDWPpcWVl3tJR9YHHYWgc=
+Received: from DM4PR10MB7404.namprd10.prod.outlook.com (2603:10b6:8:180::7) by
+ DM4PR10MB5944.namprd10.prod.outlook.com (2603:10b6:8:aa::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9542.9; Wed, 21 Jan 2026 17:50:20 +0000
+Received: from DM4PR10MB7404.namprd10.prod.outlook.com
+ ([fe80::42e:713d:d4c8:793f]) by DM4PR10MB7404.namprd10.prod.outlook.com
+ ([fe80::42e:713d:d4c8:793f%6]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
+ 17:50:19 +0000
+From: Allison Henderson <allison.henderson@oracle.com>
+To: "kuba@kernel.org" <kuba@kernel.org>,
+        "achender@kernel.org"
+	<achender@kernel.org>
+CC: "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 0/3] net/rds: RDS-TCP bug fix collection,
+ subset 2: lock contention, state machine bugs, message drops
+Thread-Topic: [PATCH net-next v1 0/3] net/rds: RDS-TCP bug fix collection,
+ subset 2: lock contention, state machine bugs, message drops
+Thread-Index: AQHciCUNKWoUq50qKUWSkuJ8Z8r0W7Vb9lmAgAD2K4A=
+Date: Wed, 21 Jan 2026 17:50:19 +0000
+Message-ID: <83b05fbb38b2610b77d665850662a6f8c594f8cf.camel@oracle.com>
+References: <20260118024911.1203224-1-achender@kernel.org>
+	 <20260120190913.20a16e15@kernel.org>
+In-Reply-To: <20260120190913.20a16e15@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.52.3-0ubuntu1.1 
+autocrypt: addr=allison.henderson@oracle.com; prefer-encrypt=mutual;
+ keydata=mQGNBGMrSUYBDADDX1fFY5pimVrKxscCUjLNV6CzjMQ/LS7sN2gzkSBgYKblSsCpzcbO/
+ qa0m77Dkf7CRSYJcJHm+euPWh7a9M/XLHe8JDksGkfOfvGAc5kkQJP+JHUlblt4hYSnNmiBgBOO3l
+ O6vwjWfv99bw8t9BkK1H7WwedHr0zI0B1kFoKZCqZ/xs+ZLPFTss9xSCUGPJ6Io6Yrv1b7xxwZAw0
+ bw9AA1JMt6NS2mudWRAE4ycGHEsQ3orKie+CGUWNv5b9cJVYAsuo5rlgoOU1eHYzU+h1k7GsX3Xv8
+ HgLNKfDj7FCIwymKeir6vBQ9/Mkm2PNmaLX/JKe5vwqoMRCh+rbbIqAs8QHzQPsuAvBVvVUaUn2XD
+ /d42XjNEDRFPCqgVE9VTh2p1Ge9ovQFc/zpytAoif9Y3QGtErhdjzwGhmZqbAXu1EHc9hzrHhUF8D
+ I5Y4v3i5pKjV0hvpUe0OzIvHcLzLOROjCHMA89z95q1hcxJ7LnBd8wbhwN39r114P4PQiixAUAEQE
+ AAbQwQWxsaXNvbiBIZW5kZXJzb24gPGFsbGlzb24uaGVuZGVyc29uQG9yYWNsZS5jb20+iQHUBBMB
+ CgA+AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEElfnzzkkP0cwschd6yD6kYDBH6bMFAmiSe
+ HYFCQkpljAACgkQyD6kYDBH6bOHnAv8C3/OEAAJtZcvJ7OVhwzq0Qq60hWPXFBf5dCEtPxiXTJQHk
+ SDl0ShPJ6LW1WzRSnaPl/qVSAqM1/xDxRe6xk0gpSsSPc27pcMryJ5NHPZF8lfDY80bYcGvi1rIdy
+ KD0/HUmh6+ccB6FVBtWTYuA5PAlVOvwvo3uJ6aQiGPwcGO48jZnIBth96uqLIyOF+UFBvpDj6qbfF
+ WlJ8ejX8lmC7XiY8ZKYZOFfI7BRTQxrmsJS2M+3kRTmGgsb6bbPhaIVNn68Su6/JSE85BvuJshZT0
+ BmNdWOwui6NbXrHgyee0brVKbngCfE4+RZIzleoydbHP2GnBtaF2okhnUWS/pNKsOYBa3k8IXdygc
+ CbiXmjs3fIf+8HIm0Vzmgjbi5auS4d+tB+8M22/HWdxmdAB0sHUFMtC8weYpVxvnpGAsPvy166nR5
+ YpVdigugCZkaObALjkJzNXGcC4fuHcqZ2LVHh9FsjyQaemcj8Y6jlm4xUXgyiz7hkTNsWJZDUz5kV
+ axLm
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR10MB7404:EE_|DM4PR10MB5944:EE_
+x-ms-office365-filtering-correlation-id: b836a238-6a63-4f8d-2a2c-08de59158b24
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?NW9HdTJKOGlYdjFXeDkrbzVua1JKMnF6dlZ5aTdkSDJMeFovMG9XZS9ucFZG?=
+ =?utf-8?B?SUlmZThuZUkyc3haTWxkYjFvZHR5R2ltM1QwcWg5RmN1bU1LOVBobVFHSUtz?=
+ =?utf-8?B?ZThFWWtaR3FRekt3VDN2bTRWVUpzQWx2OTg3TGVGR0lGTStGSzFIcldtYkpW?=
+ =?utf-8?B?K2gyc1FXM1lPS1ZPd1E2VkxwWWMvQUpzbmhIOHJ3ak1mUGtJSG9hWmR4VDRQ?=
+ =?utf-8?B?R3owNW4xU3B2SVlOMGFla0lBUW1kSXJmQkFKTEtYMHhvRC9mSVduZkhlRy9a?=
+ =?utf-8?B?Z2lTbVk2L3ZaSUMvZG9zc2w0T1NUYnNUY2FJamtZRjNCWlpxVElhZTlXa2la?=
+ =?utf-8?B?Mm1TOFhLUTFTbmY1dHZmNFdBMmh2T3lva2FnbEcrZlJYaWI1bjhyR0xWd0NE?=
+ =?utf-8?B?bHZHNlhHNDY4RzdQYlZnc2hFRmVtcWFxU2NjNmhpN0grQUlBek9aaGp2c0RX?=
+ =?utf-8?B?VGxDSUs0NG9KRm9jbHIwUDRxN3lDb05tVUY4TVZkLzB4QllOdWkyM09BcTcw?=
+ =?utf-8?B?NUc4R0hMcnBIaFlkaUJnZ1MxRDE1VXR2a3RDSENVc3FUblJ6UHl3ZU5VSW43?=
+ =?utf-8?B?N2QxRVRSMzUzTUVVa1FLd3NiTmJYMml6TGFwL2EzdGJISExMdTRCRTM4U3M3?=
+ =?utf-8?B?RnY5UDJXRmFQSHNBamlaQUdvNU5jRlczSkRuQW9Ed3Fsb2xSeERBVllCNVRq?=
+ =?utf-8?B?MnliOG83a25FSEUzenNMWmxRUU9wWXUrL1BoWlJQTFZvWE1IS1l0bzc5aFBz?=
+ =?utf-8?B?OVZ4RUJQRVBsbDFMYjhpaW51QVBZWDRHc1hQTCs1bGNuYTA4cUt6SWZEYWdX?=
+ =?utf-8?B?Q3dGdnYvenVWKytrYWladzhzNUJ3dklKMEtmZHdkaEVKSWFWLzY4OE4zV1RM?=
+ =?utf-8?B?OHFGZU1tR2cwajltVmwxM0s1TUpqVXEwWTlrT2lvMWFwZW1oSEVtczhsbmdY?=
+ =?utf-8?B?bW5KZzM3WTJyNFlTNmVBcnFMenlOL3I4TjJraTF5ZURnMkIrbksxZnNRb3Y0?=
+ =?utf-8?B?K04zZzlIOU9vTDBGTFpZaTE3R3A4UGRHcGV1U0F2aVdpUHFXaXhEeUM2cDZ0?=
+ =?utf-8?B?RmlQckxTNTdUVkg0S3pYSjQ4Vk1pd3h3Z3RFcFcxUTJUZUo3bnVIQzRwY0tu?=
+ =?utf-8?B?ODQ5Y3pXUlUrUGxWVk5DMUdVZmtHcXlyZ25LMm9jZVZNalNRY0U1OTRmV0hn?=
+ =?utf-8?B?VXFYNTFES3liSTZ5MkJpWTVoLzI2OGRySk1CaGxJdTRiU0NvWWNlS3ROa2Qx?=
+ =?utf-8?B?bHdyTXhqQ2F3aDJ0TVhxcEFGWUlSVEtuekJzMlVOUDlSQTlYVGlOZnNEdE4r?=
+ =?utf-8?B?akk5UURicUR5VldYWnliTWM4M0cxNmxuMGJ2YzZDWVVqUTd2Z0dtOXRQSHVY?=
+ =?utf-8?B?RDhqNVZuWGI4aDYrOEpmM24yTzcrYlNOTkxEV3NCc2FEU2VUbDcxVm94Tmlt?=
+ =?utf-8?B?Z21rc0Ixb2VUZVdaWE9IVkwxTnVnZTlsWSsvbHB2WEozVHBLdlZvZE13b0FI?=
+ =?utf-8?B?OVZiTFpEUVN1SDIySk1HL0pZOVlhTmRqNUxZMHlsZW1iaHkvUks5MldmS1li?=
+ =?utf-8?B?SW5sY0x4T2RMZTVNMHVOQlc4ODQ3dXdYaGtkdUlxa0dac0lpYzJKdW9HTUpH?=
+ =?utf-8?B?YkhsTE9RUmZ5YnVKVVZYRUZ6M2c0bWl2a05qb2EwZW1oYjNPQitVR1N4aFBl?=
+ =?utf-8?B?RFY1bnpsdWlNWHA0eWs5QXVoMFk3b3g3THI5SEJSK2Q5dUdFR2lmU1J0N0la?=
+ =?utf-8?B?dWRsdXI4Njg3ckZUSGExdkFEem0yWm1wQ2lrdllqc0tqbktRRDBWVnlWbHpJ?=
+ =?utf-8?B?djZIY096WFBHZUNjckhIM3hiV2hZQi8xc2xkem03TFZ6QWxGU1cyVy9tUmNY?=
+ =?utf-8?B?aW9YWHp6YjhPTVdMcGMrRHR6b0srd01FUlBqVUxEeit3Z1dmbXhYTUwwQmM3?=
+ =?utf-8?B?ZG1RR0RNWWl1djF0R3VzcC90b1lMeXAwTjNlVTFZVlF5VXVCM0tlUWpNS0J2?=
+ =?utf-8?B?cTA2MFF0SEhFNUtBSjVRSTJaS2JJdEEyYnNtQkE2aDhWWE1XcStJckl0aDR5?=
+ =?utf-8?B?a01jMlQ0NzNrY2NFRmw2Y243WHVxcW1QK1NWTWFEWTNjdFNTYi9vS25XajVF?=
+ =?utf-8?B?aXVBOGcvZ2NWbmw1RXdDOFgyT2tZajF0ekxjOWh4MElhbDdzanc1N1djN3NY?=
+ =?utf-8?Q?z3VxJb2YWj8HyDKB7CItYMo=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB7404.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Tm1BTWpYNFYyN1BTWjhPL0R1K25aeXhoMHZueDlzbDdmY0t5VkRjaHFodDNL?=
+ =?utf-8?B?akxrRVhhMytkYkczeFZwMTVTMVlnTlpsaEIybG1XMENwVkY2Ni83ZHJZdmlZ?=
+ =?utf-8?B?eXZkbm13SXY0Q29Falhhak5MZ3JmcVFDSFB3bGJRM1NoVTBuQ214SGhEaWND?=
+ =?utf-8?B?YXJBWGkycVh2YU1EYmtMb2pITFZ6ZUFqNzNLbHFRbjFIOXYzQnNHQ3J3TGFr?=
+ =?utf-8?B?dTdKbE5IQW1ja3RFWUJsNXpoQ01yaTdYaytGNW50ck9vQXUvUVFaYnRlVDBm?=
+ =?utf-8?B?WE1FVHpzeW8xWDEwYzFJZmZ0S284SXJNek10T3BmdXVNMzJhdVpUVXE2UEIw?=
+ =?utf-8?B?d05PQUlJVVF0VmUrdzhESjZQSWNqTUJTbjdrT25GSVFrVENtUFZWRmc2WEQw?=
+ =?utf-8?B?MFpHYVdVQ3BHZnB5ZmdHOHVQTXlxcUZMc2NjZlNpaXMzaFliRlFHcmFBYkVl?=
+ =?utf-8?B?ellVK0xNTWJ3VkZIcUhLMDkxeStYUnhUQ0tiT0JPbkRva0dsQ1dMTWZFeGgr?=
+ =?utf-8?B?aHFUOG9COEdhOXhWbTNyejBnbUFuQjUzalRKV0NZWDl6eGhYc2lvU0VIU29r?=
+ =?utf-8?B?aWhLemg2dmtoVzhGRlh6S1pGbEM2UWt5ZFBhMllTR3RnKzhuZXJVUE1BQ2ZH?=
+ =?utf-8?B?WE1ZeUJlMTB5Vm44MkJyY2J2S1N5am9ESXl4eTR5MWdIKzJXbUdsaDdMbFNn?=
+ =?utf-8?B?Wi9sUC9OL2R3dEh1UXljRDVBTlFuSDJSUUtTZE9WNVRNc0Fmb1lHaE83MVlS?=
+ =?utf-8?B?RVJxbGIyYjhqTEY0ejhjZlAya1hyYkZDeWo5eksxNDh1RkprM1dSNlRRcUxG?=
+ =?utf-8?B?SVFYdFJhQTlmRjBYbFpsVkgweHpKT2xPV083TmE0U0pzNnY4SUJMNTg1RjVQ?=
+ =?utf-8?B?ZTdub1BHdmlpT0pMR2ZyM2tnMU5rN1B2V1JFVjQ2T0g4bzZydk1EYVBOc0Mw?=
+ =?utf-8?B?YWFuOXpONDBzemMrTWVMd29RMVF5UWhYYnNsK2ROeDlFcmtnYUl1eW5NWDJq?=
+ =?utf-8?B?cGc2WjVqVlVxaytmamw0Ry9YR211OXg4ekhQZHU2cjFOSktPbmVaTE9UaU5H?=
+ =?utf-8?B?VHQrY1JJenVETXNZbmZPem5NMzBIVkV2SFRtcFpjN2srRGZQbzNrWlZnWUhB?=
+ =?utf-8?B?TWpTbnFTbTJweGFxcmFab2d6aE03VWRSRkF3K1gwMW5Wek9YL2lvSnJMYUVi?=
+ =?utf-8?B?S0VVc3Y4cnZKWW9qZzF6TGZSVTdpY3hFdmhzVXp4ZkZ2SzhYZE5Zd0p2VmNn?=
+ =?utf-8?B?cmNuRFFhQlZQUjUxSWpyaVAvQ2pjdG9pMWFySWhJdHZ2anlzYUFXM29OYk04?=
+ =?utf-8?B?clFaYW84ZVU3Vnp0ODVyTURIQWkzd1FMZWt1TVh5bE5HMFZjdnhBSjFSRXpX?=
+ =?utf-8?B?dHFKa2tJMU1pTmZjWW1Sd3IxalZBMEJXOWY0dEF6Ykk3OHdLb2l6KzJvTjAw?=
+ =?utf-8?B?dS9NaENyaUpubjJhT0xPb3BTSGRTN3ZQeDBYanpEbTZLRFhBQ296VmkxSG5R?=
+ =?utf-8?B?a2EvNjNHQXplRmJWZUFpMFdqekpJcGd2RGJYNnpUNktDSnVESXc0dmtQczhF?=
+ =?utf-8?B?QklhejlpRjNMdUtRZjJhUGJnZGZuc3oyNlVZQlR0RzFvOWNXRW9aZU1Jc05S?=
+ =?utf-8?B?dzdXd2tYTlhPMnREeHVqOXlzcS8vcllPSXkwbG5raGh0WTZ3S0EvZUpLdVl6?=
+ =?utf-8?B?OXdMdVVET2hwbWYzQnNUSitrM2NKQUNCdCs0dy8reWhGQ2JyUzZSbGhOTUEw?=
+ =?utf-8?B?VWdnU2tZT3ZBMHdiY0RsODBORHdMclI2VHZYSVRldGI1UHdzSjJxL3lBSHdP?=
+ =?utf-8?B?SmpTMTBNMUwvbHBHMUJRL3RESU15UnpGOXdaTXMxR3o0ZlY3dUxMeldrNjdL?=
+ =?utf-8?B?M1NBd2VWQ1d1MzRMUFVIY3ZsY1c0a3JvR1NHRk1ldW90UEk5SHRZck9RZWJQ?=
+ =?utf-8?B?U0c3RkMzYURJeWFZT2RzTHJxL3pJOUFKV2puaXlkSllxcXl0L3o0MlZnbEI1?=
+ =?utf-8?B?QnowWms4dWxabklPbTZsY0orWnZ4VUVUZlR2WWMrL0FQRE5WV2tacDZmTjdy?=
+ =?utf-8?B?Uk03TDBIamVoZXFUZzlFblJNdGRveEtTODB3NHoxQWl1eTgrRG92VGtodTlx?=
+ =?utf-8?B?Q1E1RTdHajQrNVpRZHdvRXBHaVFrMUFFMVlpNmZ4dnRYZFMrT0NVTzIvVkhP?=
+ =?utf-8?B?b2FUV090cjRwOGVPVFEzbXUydWxJSkFBWklzTTlXMWtnZUFqU21YS25mTDlI?=
+ =?utf-8?B?L2FVZm92THdwRmhzN3NHVFJiSmw5ZVZVdCtwZ2Q5VTdNem1YUzNnTHZIMXFR?=
+ =?utf-8?B?UzNWRkt3a2pMQm5hWVFLVGRhdVdvL0lPQ0Q3SVFhYUN6am9aTGs3Z0RHbDBJ?=
+ =?utf-8?Q?+8DuvDBM4c9B2WJ4=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E3CD8F556913CD4988046A3EBC092F73@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXDYfYy3f1NQm5A0@sgarzare-redhat>
-X-Spamd-Result: default: False [-1.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	54rBv7bqayZ5AoJSK28ovQARshy33u1yIs2PYI4uJZncIl9+TlrksKtkC+cCIQsme3gNAsRO0FllR6tw60O+9LKfSNbFTdPgevgkTIFqW4oCOsn/73rvEywwe2tSaeb7FUlkSYubuej9+zW6w8VPfL0YP4GTZb2T1B62fYRjay1po2tPWH3pTUo20Xrfins+emUKjz0wHRxFKXuVqUvA1MJcpY1VQJWj8fww1J5qt+EC/jpAGlGlsJr64vMdu8Hn1j7liRT43MMwj42UdRaHPTJpm6smwsvobVPwi+R6qCHKwK9qFp1y7Yf6IWpKrsmVw2re4+AKSVAOPRaNvJwZCUUlQTmE4CHIH+QQSld2DXz2F4SrUvTzhdNHQO7z9arkNtWTGjShjNaIng0uwJmIx0BQeATbqcILS6ZNwq3hL5vc9i14PoWgRiirnySeisn4v9NSOE/XmM2MMCHw/qNjVE9ojm/OxwLO8fWszRDa9Jy5R7dqFCH6CBXzoGyhBbuDvtDlLjhS0z2OKFKDWF7WAH9Pd9pd+amlBRU4jCg9LMfuh6dMJjVgDHZE4zhbeMKNYHkv8hoWRPWbVKkw4wXvnBYRxkaCNHBablY0oQ9uEEE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB7404.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b836a238-6a63-4f8d-2a2c-08de59158b24
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2026 17:50:19.5639
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Wu0Gjf/YdPGE8yz7twK4TAACwfvSl+T6L/xk7zhT0nEYuaAGerLaQv0gIYts9+c8SkuBYsZEQznYxlemS3SUd4HRm8jeKrldcBXC70KgaBs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB5944
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-21_03,2026-01-20_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 spamscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2601150000
+ definitions=main-2601210150
+X-Authority-Analysis: v=2.4 cv=H4nWAuYi c=1 sm=1 tr=0 ts=697111e0 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=GoEa3M9JfhUA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=9H1DK0361B21q2DoH20A:9 a=QEXdDO2ut3YA:10
+ a=ZXulRonScM0A:10
+X-Proofpoint-GUID: r1GB36GNHoD6svJhdmbW8BxnY4aouHRr
+X-Proofpoint-ORIG-GUID: r1GB36GNHoD6svJhdmbW8BxnY4aouHRr
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIxMDE1MCBTYWx0ZWRfX//5IiZVa6+tC
+ O/w2VOtRhe5FKuPs8tdXFvVOoZ6TKUUfhfY2cNok78HBC4wGN/4XTA3nGPSZ4Y75veDwYUETexx
+ 9S0ap6I7xfMSwnYfD3bswDMQeVRQ/N61FpjgKy0vvxHZAqqpnhgKKGx+40lWjMjdjJgzV49kGHc
+ kmyJQ7tNprBdryTLqWJpzFpfrWpv73DPoLh6hxPCFQaE0xCYVESr8jH0684w6THbV/LbW6at7Zz
+ djPjjl9VTwpDnqKvVkBtzFykdz2d/d4Q9qdKDpR7zLNC0G3/fNr67EyjMJMvdyN4A680x/scwJK
+ wDSI+es3nFA/wMlib2LpnAS9u5xCW7VjIScGvf6orf8WbCVuJGIfSUis2iV3PKmNfJbzzaLx5Mw
+ v0UO+ah+Ao1B5T/yjrF4yvHahrfnXxgEqgiZFyfDkTTtXaxqoy9GHxAVvAPcUvga2TkbgDQmM2W
+ XltHGtnvHS7AgQHlvIw==
+X-Spamd-Result: default: False [1.14 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252050-lists,netdev=lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252025-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[oracle.com,reject];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[allison.henderson@oracle.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,devvm11784.nha0.facebook.com:mid]
-X-Rspamd-Queue-Id: 6D7F65DCF1
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 8A7285BA6A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 03:48:13PM +0100, Stefano Garzarella wrote:
-> On Fri, Jan 16, 2026 at 01:28:41PM -0800, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add netns logic to vsock core. Additionally, modify transport hook
-> > prototypes to be used by later transport-specific patches (e.g.,
-> > *_seqpacket_allow()).
-> > 
-> > Namespaces are supported primarily by changing socket lookup functions
-> > (e.g., vsock_find_connected_socket()) to take into account the socket
-> > namespace and the namespace mode before considering a candidate socket a
-> > "match".
-> > 
-> > This patch also introduces the sysctl /proc/sys/net/vsock/ns_mode to
-> > report the mode and /proc/sys/net/vsock/child_ns_mode to set the mode
-> > for new namespaces.
-> > 
-> > Add netns functionality (initialization, passing to transports, procfs,
-> > etc...) to the af_vsock socket layer. Later patches that add netns
-> > support to transports depend on this patch.
-> 
-> nit: maybe we should mention here why we changed the random port allocation
-> 
-> (not a big deal, only if you need to resend)
-> 
-> > 
-> > dgram_allow(), stream_allow(), and seqpacket_allow() callbacks are
-> > modified to take a vsk in order to perform logic on namespace modes. In
-> > future patches, the net will also be used for socket
-> > lookups in these functions.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > Changes in v15:
-> > - make static port in __vsock_bind_connectible per-netns
-> > - remove __net_initdata because we want the ops beyond just boot
-> > - add vsock_init_ns_mode kernel cmdline parameter to set init ns mode
-> > - use if (ret || !write) in __vsock_net_mode_string() (Stefano)
-> > - add vsock_net_mode_global() (Stefano)
-> > - hide !net == VSOCK_NET_MODE_GLOBAL inside vsock_net_mode() (Stefano)
-> > - clarify af_vsock.c comments on ns_mode/child_ns_mode (Stefano)
-> > 
-> > Changes in v14:
-> > - include linux/sysctl.h in af_vsock.c
-> > - squash patch 'vsock: add per-net vsock NS mode state' into this patch
-> >  (prior version can be found here):
-> >  https://lore.kernel.org/all/20251223-vsock-vmtest-v13-1-9d6db8e7c80b@meta.com/)
-> > 
-> > Changes in v13:
-> > - remove net_mode and replace with direct accesses to net->vsock.mode,
-> >  since this is now immutable.
-> > - update comments about mode behavior and mutability, and sysctl API
-> > - only pass NULL for net when wanting global, instead of net_mode ==
-> >  VSOCK_NET_MODE_GLOBAL. This reflects the new logic
-> >  of vsock_net_check_mode() that only requires net pointers (not
-> >  net_mode).
-> > - refactor sysctl string code into a re-usable function, because
-> >  child_ns_mode and ns_mode both handle the same strings.
-> > - remove redundant vsock_net_init(&init_net) call in module init because
-> >  pernet registration calls the callback on the init_net too
-> > 
-> > Changes in v12:
-> > - return true in dgram_allow(), stream_allow(), and seqpacket_allow()
-> >  only if net_mode == VSOCK_NET_MODE_GLOBAL (Stefano)
-> > - document bind(VMADDR_CID_ANY) case in af_vsock.c (Stefano)
-> > - change order of stream_allow() call in vmci so we can pass vsk
-> >  to it
-> > 
-> > Changes in v10:
-> > - add file-level comment about what happens to sockets/devices
-> >  when the namespace mode changes (Stefano)
-> > - change the 'if (write)' boolean in vsock_net_mode_string() to
-> >  if (!write), this simplifies a later patch which adds "goto"
-> >  for mutex unlocking on function exit.
-> > 
-> > Changes in v9:
-> > - remove virtio_vsock_alloc_rx_skb() (Stefano)
-> > - remove vsock_global_dummy_net, not needed as net=NULL +
-> >  net_mode=VSOCK_NET_MODE_GLOBAL achieves identical result
-> > 
-> > Changes in v7:
-> > - hv_sock: fix hyperv build error
-> > - explain why vhost does not use the dummy
-> > - explain usage of __vsock_global_dummy_net
-> > - explain why VSOCK_NET_MODE_STR_MAX is 8 characters
-> > - use switch-case in vsock_net_mode_string()
-> > - avoid changing transports as much as possible
-> > - add vsock_find_{bound,connected}_socket_net()
-> > - rename `vsock_hdr` to `sysctl_hdr`
-> > - add virtio_vsock_alloc_linear_skb() wrapper for setting dummy net and
-> >  global mode for virtio-vsock, move skb->cb zero-ing into wrapper
-> > - explain seqpacket_allow() change
-> > - move net setting to __vsock_create() instead of vsock_create() so
-> >  that child sockets also have their net assigned upon accept()
-> > 
-> > Changes in v6:
-> > - unregister sysctl ops in vsock_exit()
-> > - af_vsock: clarify description of CID behavior
-> > - af_vsock: fix buf vs buffer naming, and length checking
-> > - af_vsock: fix length checking w/ correct ctl_table->maxlen
-> > 
-> > Changes in v5:
-> > - vsock_global_net() -> vsock_global_dummy_net()
-> > - update comments for new uAPI
-> > - use /proc/sys/net/vsock/ns_mode instead of /proc/net/vsock_ns_mode
-> > - add prototype changes so patch remains c)mpilable
-> > ---
-> > Documentation/admin-guide/kernel-parameters.txt |  14 +
-> > MAINTAINERS                                     |   1 +
-> > drivers/vhost/vsock.c                           |   6 +-
-> > include/linux/virtio_vsock.h                    |   4 +-
-> > include/net/af_vsock.h                          |  61 ++++-
-> > include/net/net_namespace.h                     |   4 +
-> > include/net/netns/vsock.h                       |  21 ++
-> > net/vmw_vsock/af_vsock.c                        | 328 ++++++++++++++++++++++--
-> > net/vmw_vsock/hyperv_transport.c                |   7 +-
-> > net/vmw_vsock/virtio_transport.c                |   9 +-
-> > net/vmw_vsock/virtio_transport_common.c         |   6 +-
-> > net/vmw_vsock/vmci_transport.c                  |  26 +-
-> > net/vmw_vsock/vsock_loopback.c                  |   8 +-
-> > 13 files changed, 444 insertions(+), 51 deletions(-)
-> > 
-> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > index a8d0afde7f85..b6e3bfe365a1 100644
-> > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > @@ -8253,6 +8253,20 @@ Kernel parameters
-> > 			            them quite hard to use for exploits but
-> > 			            might break your system.
-> > 
-> > +	vsock_init_ns_mode=
-> > +			[KNL,NET] Set the vsock namespace mode for the init
-> > +			(root) network namespace.
-> > +
-> > +			global      [default] The init namespace operates in
-> > +			            global mode where CIDs are system-wide and
-> > +			            sockets can communicate across global
-> > +			            namespaces.
-> > +
-> > +			local       The init namespace operates in local mode
-> > +			            where CIDs are private to the namespace and
-> > +			            sockets can only communicate within the same
-> > +			            namespace.
-> > +
-> 
-> My comment on v14 was more to start a discussion :-) sorry to not be clear.
-
-No worries, resending with this included started a good discussion so
-not for nil.
-
-> 
-> I briefly discussed it with Paolo in chat to better understand our policy
-> between cmdline parameters and module parameters, and it seems that both are
-> discouraged.
-> 
-> So he asked me if we have a use case for this, and thinking about it, I
-> don't have one at the moment. Also, if a user decides to set all netns to
-> local, whether init_net is local or global doesn't really matter, right?
-> 
-> So perhaps before adding this, we should have a real use case.
-> Perhaps more than this feature, I would add a way to change the default of
-> all netns (including init_net) from global to local. But we can do that
-> later, since all netns have a way to understand what mode they are in, so we
-> don't break anything and the user has to explicitly change it, knowing that
-> they are breaking compatibility with pre-netns support.\
-> 
-> 
-> That said, at this point, maybe we can remove this, documenting that
-> init_net is always global, and if we have a use case in the future, we can
-> add this (or something else) to set the init_net mode (or change the default
-> for all netns).
-> 
-> Let's wait a bit before next version to wait a comment from Paolo or Jakub
-> on this. But I'm almost fine with both ways, so:
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> > 	vt.color=	[VT] Default text color.
-> > 			Format: 0xYX, X = foreground, Y = background.
-> > 			Default: 0x07 = light gray on black.
-> 
-> [...]
-> 
-> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > index a3505a4dcee0..3fc8160d51df 100644
-> > --- a/net/vmw_vsock/af_vsock.c
-> > +++ b/net/vmw_vsock/af_vsock.c
-> 
-> [...]
-> 
-> > @@ -235,33 +303,42 @@ static void __vsock_remove_connected(struct
-> > vsock_sock *vsk)
-> > 	sock_put(&vsk->sk);
-> > }
-> > 
-> 
-> In the v14 I suggested to add some documentation on top of the vsock_find*()
-> vs vsock_find_*_net() to explain better which one should be used by
-> transports.
-> 
-> Again is not a big deal, we can fix later if you don't need to resend.
-> 
-> Thanks,
-> Stefano
-
-Sorry about that slipping through the cracks, will add to v16.
-
-I'll resend with:
-
-1. revert init ns cmdline
-2. update this message about why the port allocation changes
-3. fix the vmtest missing ns arg bug that Kuba mentioned
-4. update documentation on top of vsock_find* / vsock_find_*_net
-5. update documentation on top of af_vsock.c w/ note about init_ns
-having its mode fixed to global
-
-Unless any prior feedback slipped, I think this captures everything
-pending? 
-
-Best,
-Bobby
+T24gVHVlLCAyMDI2LTAxLTIwIGF0IDE5OjA5IC0wODAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
+Cj4gT24gU2F0LCAxNyBKYW4gMjAyNiAxOTo0OTowOCAtMDcwMCBBbGxpc29uIEhlbmRlcnNvbiB3
+cm90ZToNCj4gPiBuZXQvcmRzOiBSRFMtVENQIGJ1ZyBmaXggY29sbGVjdGlvbiwgc3Vic2V0IDI6
+IGxvY2sgY29udGVudGlvbiwgc3RhdGUgbWFjaGluZSBidWdzLCBtZXNzYWdlIGRyb3BzDQo+IA0K
+PiBJZiB0aGVzZSBhcmUgYnVnIGZpeGVzIHRoZXkgbXVzdCBoYXZlIEZpeGVzIHRhZ3MgYW5kIHRh
+cmdldCBuZXQuDQo+IElmIHRoZXkgYXJlIHJlc2lsaWVuY3kgaW1wcm92ZW1lbnRzIHBsZWFzZSBk
+b24ndCBjYWxsIHRoZW0gYnVnDQo+IGZpeGVzIGFuZCByZW1vdmUgdGhlIEZpeGVzIHRhZyBvbiBw
+YXRjaCAyLg0KDQpIaSBKYWt1YiwNCg0KU3VyZSwgSSB3aWxsIGRyb3AgdGhlICJidWcgZml4ZXMi
+IGxhbmd1YWdlIGFuZCByZW1vdmUgdGhlIEZpeGVzIHRhZyBmcm9tIHBhdGNoIDIuIEFsc28sIHdl
+IG5vdGljZWQgYSBwb3RlbnRpYWwgcmFjZSBpbg0KcGF0Y2ggMSwgc28gSSdtIGdvaW5nIHRvIGhv
+bGQgb2ZmIG9uIHRoYXQgcGF0Y2ggZm9yIG5vdy4gSWYgdGhhdCBzb3VuZHMgZ29vZCwgSSdsbCBz
+ZW5kIHYyICB3aXRoIHRob3NlIGNoYW5nZXMuDQoNClRoYW5rcyBmb3IgdGhlIHJldmlld3MhDQpB
+bGxpc29uDQo=
 
