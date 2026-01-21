@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-251887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CP40OBvZcGkOaAAAu9opvQ
-	(envelope-from <netdev+bounces-251887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:48:11 +0100
+	id mOh3ET3acGnCaQAAu9opvQ
+	(envelope-from <netdev+bounces-251888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:53:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50A7857DFE
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:48:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E26DE57F2E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:53:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6610868B7F8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:36:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 25B0F700B30
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A253530F95B;
-	Wed, 21 Jan 2026 13:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65052355049;
+	Wed, 21 Jan 2026 13:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIEu6npy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWeJ4ZNO"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8256E33F364
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D67410D39
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002487; cv=none; b=YjrwYTiM4etEK7TFaP8V4OG58axf0e/4F7kNu1yaYVU++Wwq+cE9HdrJr6i08UWah34cbgSRMRouJ3DUkyJ7OTnsKFukrXsEAGEOVjkWfi1XKVkTbxeNvrS4TgzdJ2Blme+qqCoOI23h7XoWrbI3nuwMWxKFV0EAXIGLE4u1cys=
+	t=1769002500; cv=none; b=FZ/kgLf1b/e7Xqio80Y9ZI6bPFc4PAr8cTqT9eePVfCo72yFaCZX2Z+tkicGQgggjl59gqs49pHcL52nvy48raCMTzZDuTUIVHo59C85oEe3N89VsaXRt5IB4+XwMzgIs4C4w0+CVQu+hUyYyMsKItfoGxpy9g+9rIA2sFpTQs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002487; c=relaxed/simple;
-	bh=aszCK4ALNITHGcsBCg9fnoG3jYqCs+dNP5hasyoS/no=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IfDXUnevwLeX4RlcRi7stNA8+VFkg36vdKNsH1WS/ZyyLPlRyArEmG1ktTsrF61pXu4p/JdXsxPYmRsKgbGRLaK/EvTogo5klIG/0lALuYQQwgfqO5CO2I8Oy2oVJViWBFxBdyDF/jiBscmQq7+NcTp/CY8Bv1WR61CvUCf9KBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gIEu6npy; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1769002500; c=relaxed/simple;
+	bh=fCrg/ZRJ8hmiozup4J1AYVqgB98IlDPIXl++9eMruFM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=a4/xfdndBii84k+HqKlJosh28Hmjm6o2mOfI8b4NhACkuvnewhVtSV09JF4M9/qQi4dhQCpFN7cwYXsqFGmL9iLfRqouvVQObi0eqpSKrU2O7AnY8BDY1GssX85t+mCKqSkqcBZUS2YZ44wLXRmr5G8A2nXTkSNxOqNOKVp45cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HWeJ4ZNO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769002484;
+	s=mimecast20190719; t=1769002497;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7xC2gSrqoiWq1wXXC1hRJ0Iqf2UCJoSv+BOnaUYhJJo=;
-	b=gIEu6npy1q7dd9jBLMxzsKhqttdY7u/ghOe/auTGyjoX9iKtCzLnmKKvbaU8lJZIazeirM
-	DYEh0lsJxri1ZWlC1gMfvu9DFb8jSIirl+8Kx0apCrBrM+ME6V1mQufVxGwNfLGqRtdMk1
-	caqryOJ7DxcJOChpCmpGZd4LsxCQtnI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eiU0dFYh+XpgJWD0fxT9udmXLukEC1cYnJOUWd1GfQU=;
+	b=HWeJ4ZNO2FjCQ54RnA1F0foR71yYg5XBlSQeFOS8ch+/cG3HiTY5XgRapxOB6qDSPA7yhd
+	Fz/n2Wpl6z8Y5U6L+Fb/to+jc02FJqrLZfr9GUnLWW3tSpIONcq8iDPI4THwLFIv8LfYz1
+	AdeqntEOb6g5IFggmwq3m4Dbuz3PvA8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-CHg5AXBLM7W8ABuqjbPh0g-1; Wed,
- 21 Jan 2026 08:34:41 -0500
-X-MC-Unique: CHg5AXBLM7W8ABuqjbPh0g-1
-X-Mimecast-MFC-AGG-ID: CHg5AXBLM7W8ABuqjbPh0g_1769002479
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-515-8aWJ_DORNvqBwhOAes4jEQ-1; Wed,
+ 21 Jan 2026 08:34:53 -0500
+X-MC-Unique: 8aWJ_DORNvqBwhOAes4jEQ-1
+X-Mimecast-MFC-AGG-ID: 8aWJ_DORNvqBwhOAes4jEQ_1769002491
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 48849180034A;
-	Wed, 21 Jan 2026 13:34:39 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B7B5019560B2;
+	Wed, 21 Jan 2026 13:34:51 +0000 (UTC)
 Received: from thinkpad.redhat.com (unknown [10.44.33.242])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8FD0819560AB;
-	Wed, 21 Jan 2026 13:34:35 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E44619560AB;
+	Wed, 21 Jan 2026 13:34:47 +0000 (UTC)
 From: Felix Maurer <fmaurer@redhat.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -74,9 +76,11 @@ Cc: davem@davemloft.net,
 	petrm@nvidia.com,
 	antonio@openvpn.net,
 	bigeasy@linutronix.de
-Subject: [PATCH net-next 0/9] hsr: Implement more robust duplicate discard algorithm
-Date: Wed, 21 Jan 2026 14:32:59 +0100
-Message-ID: <cover.1769001553.git.fmaurer@redhat.com>
+Subject: [PATCH net-next 1/9] selftests: hsr: Add ping test for PRP
+Date: Wed, 21 Jan 2026 14:33:00 +0100
+Message-ID: <5062f256874904dab6e07cd0b15ea7b518d90b28.1769001553.git.fmaurer@redhat.com>
+In-Reply-To: <cover.1769001553.git.fmaurer@redhat.com>
+References: <cover.1769001553.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,7 +98,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251887-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251888-lists,netdev=lfdr.de];
 	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
@@ -113,115 +117,187 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 50A7857DFE
+X-Rspamd-Queue-Id: E26DE57F2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The duplicate discard algorithms for PRP and HSR do not work reliably
-with certain link faults. Especially with packet loss on one link, the
-duplicate discard algorithms drop valid packets. For a more thorough
-description see patches 4 (for PRP) and 6 (for HSR).
-
-This patchset replaces the current algorithms (based on a drop window
-for PRP and highest seen sequence number for HSR) with a single new one
-that tracks the received sequence numbers individually (descriptions
-again in patches 4 and 6).
-
-The changes will lead to higher memory usage and more work to do for
-each packet. But I argue that this is an acceptable trade-off to make
-for a more robust PRP and HSR behavior with faulty links. After all,
-both protocols are to be used in environments where redundancy is needed
-and people are willing to setup special network topologies to achieve
-that.
-
-Some more reasoning on the overhead and expected scale of the deployment
-from the RFC discussion:
-
-> As for the expected scale, there are two dimensions: the number of nodes
-> in the network and the data rate with which they send.
->
-> The number of nodes in the network affect the memory usage because each
-> node now has the block buffer. For PRP that's 64 blocks * 32 byte =
-> 2kbyte for each node in the node table. A PRP network doesn't have an
-> explicit limit for the number of nodes. However, the whole network is a
-> single layer-2 segment which shouldn't grow too large anyways. Even if
-> one really tries to put 1000 nodes into the PRP network, the memory
-> overhead (2Mbyte) is acceptable in my opinion.
->
-> For HSR, the blocks would be larger because we need to track the
-> sequence numbers per port. I expect 64 blocks * 80 byte = 5kbyte per
-> node in the node table. There is no explicit limit for the size of an
-> HSR ring either. But I expect them to be of limited size because the
-> forwarding delays add up throughout the ring. I've seen vendors limiting
-> the ring size to 50 nodes with 100Mbit/s links and 300 with 1Gbit/s
-> links. In both cases I consider the memory overhead acceptable.
->
-> The data rates are harder to reason about. In general, the data rates
-> for HSR and PRP are limited because too high packet rates would lead to
-> very fast re-use of the 16bit sequence numbers. The IEC 62439-3:2021
-> mentions 100Mbit/s links and 1Gbit/s links. I don't expect HSR or PRP
-> networks to scale out to, e.g., 10Gbit/s links with the current
-> specification as this would mean that sequence numbers could repeat as
-> often as every ~4ms. The default constants in the IEC standard, which we
-> also use, are oriented at a 100Mbit/s network.
->
-> In my tests with veth pairs, the CPU overhead didn't lead to
-> significantly lower data rates. The main factor limiting the data rate
-> at the moment, I assume, is the per-node spinlock that is taken for each
-> received packet. IMHO, there is a lot more to gain in terms of CPU
-> overhead from making this lock smaller or getting rid of it, than we
-> loose with the more accurate duplicate discard algorithm in this patchset.
->
-> The CPU overhead of the algorithm benefits from the fact that in high
-> packet rate scenarios (where it really matters) many packets will have
-> sequence numbers in already initialized blocks. These packets just have
-> additionally: one xarray lookup, one comparison, and one bit setting. If
-> a block needs to be initialized (once every 128 packets plus their 128
-> duplicates if all sequence numbers are seen), we will have: one
-> xa_erase, a bunch of memory writes, and one xa_store.
->
-> In theory, all packets could end up in the slow path if a node sends
-> every 128th packet to us. If this is sent from a well behaving node, the
-> packet rate wouldn't be an issue anymore, though.
-
-Thanks,
-   Felix
+Add a selftest for PRP that performs a basic ping test on IPv4 and IPv6,
+over the plain PRP interface and a VLAN interface, similar to the existing
+ping test for HSR. The test first checks reachability of the other node,
+then checks for no loss and no duplicates.
 
 Signed-off-by: Felix Maurer <fmaurer@redhat.com>
-
 ---
-
-Changes since the RFC:
-  - link: https://lore.kernel.org/netdev/cover.1766433800.git.fmaurer@redhat.com/
-  - Extended the new algorithm to HSR
-  - shellcheck'ing and checkpatch'ing
-  - Updated the KUnit test
-
-Felix Maurer (9):
-  selftests: hsr: Add ping test for PRP
-  selftests: hsr: Check duplicates on HSR with VLAN
-  selftests: hsr: Add tests for faulty links
-  hsr: Implement more robust duplicate discard for PRP
-  selftests: hsr: Add tests for more link faults with PRP
-  hsr: Implement more robust duplicate discard for HSR
-  selftests: hsr: Add more link fault tests for HSR
-  hsr: Update PRP duplicate discard KUnit test for new algorithm
-  MAINTAINERS: Assign hsr selftests to HSR
-
- MAINTAINERS                                   |   1 +
- net/hsr/hsr_framereg.c                        | 357 ++++++++++-------
- net/hsr/hsr_framereg.h                        |  39 +-
- net/hsr/prp_dup_discard_test.c                | 154 ++++---
- tools/testing/selftests/net/hsr/Makefile      |   2 +
- tools/testing/selftests/net/hsr/hsr_ping.sh   | 207 +++-------
- .../testing/selftests/net/hsr/link_faults.sh  | 376 ++++++++++++++++++
- tools/testing/selftests/net/hsr/prp_ping.sh   | 146 +++++++
- tools/testing/selftests/net/hsr/settings      |   2 +-
- 9 files changed, 903 insertions(+), 381 deletions(-)
- create mode 100755 tools/testing/selftests/net/hsr/link_faults.sh
+ tools/testing/selftests/net/hsr/Makefile    |   1 +
+ tools/testing/selftests/net/hsr/prp_ping.sh | 146 ++++++++++++++++++++
+ 2 files changed, 147 insertions(+)
  create mode 100755 tools/testing/selftests/net/hsr/prp_ping.sh
 
---
+diff --git a/tools/testing/selftests/net/hsr/Makefile b/tools/testing/selftests/net/hsr/Makefile
+index 4b6afc0fe9f8..1886f345897a 100644
+--- a/tools/testing/selftests/net/hsr/Makefile
++++ b/tools/testing/selftests/net/hsr/Makefile
+@@ -5,6 +5,7 @@ top_srcdir = ../../../../..
+ TEST_PROGS := \
+ 	hsr_ping.sh \
+ 	hsr_redbox.sh \
++	prp_ping.sh \
+ # end of TEST_PROGS
+ 
+ TEST_FILES += hsr_common.sh
+diff --git a/tools/testing/selftests/net/hsr/prp_ping.sh b/tools/testing/selftests/net/hsr/prp_ping.sh
+new file mode 100755
+index 000000000000..503e39502801
+--- /dev/null
++++ b/tools/testing/selftests/net/hsr/prp_ping.sh
+@@ -0,0 +1,146 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++ipv6=true
++
++source ./hsr_common.sh
++
++optstring="h4"
++usage() {
++	echo "Usage: $0 [OPTION]"
++	echo -e "\t-4: IPv4 only: disable IPv6 tests (default: test both IPv4 and IPv6)"
++}
++
++while getopts "$optstring" option;do
++	case "$option" in
++	"h")
++		usage "$0"
++		exit 0
++		;;
++	"4")
++		ipv6=false
++		;;
++	"?")
++		usage "$0"
++		exit 1
++		;;
++esac
++done
++
++setup_prp_interfaces()
++{
++	echo "INFO: Preparing interfaces for PRP"
++# Two PRP nodes, connected by two links (treated as LAN A and LAN B).
++#
++#       vethA ----- vethA
++#     prp1             prp2
++#       vethB ----- vethB
++#
++#     node1           node2
++
++	# Interfaces
++	ip link add vethA netns "$node1" type veth peer name vethA netns "$node2"
++	ip link add vethB netns "$node1" type veth peer name vethB netns "$node2"
++
++	# MAC addresses will be copied from LAN A interface
++	ip -net "$node1" link set address 00:11:22:00:00:01 dev vethA
++	ip -net "$node2" link set address 00:11:22:00:00:02 dev vethA
++
++	# PRP
++	ip -net "$node1" link add name prp1 type hsr \
++		slave1 vethA slave2 vethB supervision 45 proto 1
++	ip -net "$node2" link add name prp2 type hsr \
++		slave1 vethA slave2 vethB supervision 45 proto 1
++
++	# IP addresses
++	ip -net "$node1" addr add 100.64.0.1/24 dev prp1
++	ip -net "$node1" addr add dead:beef:0::1/64 dev prp1 nodad
++	ip -net "$node2" addr add 100.64.0.2/24 dev prp2
++	ip -net "$node2" addr add dead:beef:0::2/64 dev prp2 nodad
++
++	# All links up
++	ip -net "$node1" link set vethA up
++	ip -net "$node1" link set vethB up
++	ip -net "$node1" link set prp1 up
++
++	ip -net "$node2" link set vethA up
++	ip -net "$node2" link set vethB up
++	ip -net "$node2" link set prp2 up
++}
++
++setup_vlan_interfaces()
++{
++	# Interfaces
++	ip -net "$node1" link add link prp1 name prp1.2 type vlan id 2
++	ip -net "$node2" link add link prp2 name prp2.2 type vlan id 2
++
++	# IP addresses
++	ip -net "$node1" addr add 100.64.2.1/24 dev prp1.2
++	ip -net "$node1" addr add dead:beef:2::1/64 dev prp1.2 nodad
++
++	ip -net "$node2" addr add 100.64.2.2/24 dev prp2.2
++	ip -net "$node2" addr add dead:beef:2::2/64 dev prp2.2 nodad
++
++	# All links up
++	ip -net "$node1" link set prp1.2 up
++	ip -net "$node2" link set prp2.2 up
++}
++
++do_ping_tests()
++{
++	local netid="$1"
++
++	echo "INFO: Initial validation ping"
++
++	do_ping "$node1" "100.64.$netid.2"
++	do_ping "$node2" "100.64.$netid.1"
++	stop_if_error "Initial validation failed on IPv4"
++
++	do_ping "$node1" "dead:beef:$netid::2"
++	do_ping "$node2" "dead:beef:$netid::1"
++	stop_if_error "Initial validation failed on IPv6"
++
++	echo "INFO: Longer ping test."
++
++	do_ping_long "$node1" "100.64.$netid.2"
++	do_ping_long "$node2" "100.64.$netid.1"
++	stop_if_error "Longer ping test failed on IPv4."
++
++	do_ping_long "$node1" "dead:beef:$netid::2"
++	do_ping_long "$node2" "dead:beef:$netid::1"
++	stop_if_error "Longer ping test failed on IPv6."
++}
++
++run_ping_tests()
++{
++	echo "INFO: Running ping tests"
++	do_ping_tests 0
++}
++
++run_vlan_ping_tests()
++{
++	vlan_challenged_prp1=$(ip net exec "$node1" ethtool -k prp1 | \
++		grep "vlan-challenged" | awk '{print $2}')
++	vlan_challenged_prp2=$(ip net exec "$node2" ethtool -k prp2 | \
++		grep "vlan-challenged" | awk '{print $2}')
++
++	if [[ "$vlan_challenged_prp1" = "off" || \
++	      "$vlan_challenged_prp2" = "off" ]]; then
++		echo "INFO: Running VLAN ping tests"
++		setup_vlan_interfaces
++		do_ping_tests 2
++	else
++		echo "INFO: Not Running VLAN tests as the device does not support VLAN"
++	fi
++}
++
++check_prerequisites
++trap cleanup_all_ns EXIT
++
++setup_ns node1 node2
++setup_prp_interfaces
++
++run_ping_tests
++run_vlan_ping_tests
++
++exit $ret
+-- 
 2.52.0
 
 
