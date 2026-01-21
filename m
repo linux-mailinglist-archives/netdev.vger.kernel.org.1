@@ -1,467 +1,340 @@
-Return-Path: <netdev+bounces-251946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EYWKijxcGk+awAAu9opvQ
-	(envelope-from <netdev+bounces-251946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:48 +0100
+	id 8LC2LxPxcGk+awAAu9opvQ
+	(envelope-from <netdev+bounces-251947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342E65934F
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F5E759341
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 89781A21E57
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:04:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A2E5A54F6C5
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9004C8FF7;
-	Wed, 21 Jan 2026 14:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9595649250C;
+	Wed, 21 Jan 2026 14:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxAYAXVQ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRjmRTpM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YCRWD+mF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38E84C8FEE
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006906; cv=none; b=LIYS0z3xgtCdgPszu/7HeqEdrSMwONTEjdy+3r5mLqnJvzbefr5yjAcRfrRz4qfz3hIdEHqLxpInfmfoRuSJxzoMAjBvZ9m+in3xkymURF734UCYU5Ie+9Ir+RmxzKyEHz//bMk5FlJ6DC2l8ZBb4+J7oOHOz3NyIDlRitOOvR8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006906; c=relaxed/simple;
-	bh=QUpRm5BO1PsMpJA/m+7TudemIjgPpKiHIo5jnkzHoIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nuD6vpMxR0hBw3G0eUql6BTi5vJwC80FX1FNaeqyJJZX6nXofBvRy2ZjG0Zi+X59SlgVHsbh5lZQsW5iOET17Fn55ugz2QcUdknna4oXWqGsiVW88/lSPQhEI+zFX5kwMdgK4BTZetfg2jmFEF2WYEDm1wxO7hBIAZqjbHln3gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OxAYAXVQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YRjmRTpM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769006902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
-	b=OxAYAXVQGfCqEXQ8ha9r7E0hNuArMvJZgThYPDfb2/rOn1VUti8BF2CNnLZYaVMXifHZbS
-	HzrWZ6JMmJwGaX3gok3FNjN0ZhXiUzZmfCGGcpecEtsSzN+ZuVuJ6ICAnE0grtJe0sytnj
-	8g96krKJDzmpuZ2FOyvQ7K5EYngfC04=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-Y1YTTFPPMd2HhGVUfFB5Bg-1; Wed, 21 Jan 2026 09:48:19 -0500
-X-MC-Unique: Y1YTTFPPMd2HhGVUfFB5Bg-1
-X-Mimecast-MFC-AGG-ID: Y1YTTFPPMd2HhGVUfFB5Bg_1769006898
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so56973925e9.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 06:48:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FBA4921A2
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769007231; cv=pass; b=hupECv6iFCiOT6fB2FO4UaZdgVZ0sYYlSiZ2KqpTw03WmTQMc5niBXDgJDyrORUCnplfrHGVL23quXZxx8UFQtmN8wMCQQLfDA/K0I1j5b4V31U3KSTCKkjJFb5RR5dPvtVHQ00Sk/w14O09tw61QrXryEInIc4z+KFs6fO/ENk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769007231; c=relaxed/simple;
+	bh=fzzbb3QnFJsxDqCdwHKZh0HE+sgF9Ktls9W4VFfaNa0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FQbkuEuqfB+L3CQpypitQGNXGob+reLyAYITTkdhAhA/tGLbQbvLVbToRjkrDts8vG4NgZwjgtqvT5jsH8URX0bIdsPAgWkdB0vsg7ASBf0G3XmhYWFSugseGUS1GbMOz/aAD3VePMxjWA4ooxfMBJnfUp7eQuW5NKQOwZoW3Lc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YCRWD+mF; arc=pass smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88a2fe9e200so61420366d6.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 06:53:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769007227; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TipJbEchkm5ts7/6gfJPLH0guSUO+HfL8LAzpbAQDJSZZeuDNU6HG36W/HhW0iD3Sh
+         w65UxU1cUi1rMzIi33RUZD6eI8TnCLfYKLfgUEVy7F6NSscvRThsxILlDsui2HSvVOsk
+         hwG1Vpv4zL19TmoKSKCiaXUs6djxnkpclsp6sWzglWa5OF7Y/Yb1qKlcrH7qemonCpQk
+         J15GgMZlHdG2VxfKZbHBrsvHkUmTWEkd2ee71dKiZJROZGgtJztpYuD8z+GnNVXlXXJW
+         TNXQVgdwsG/onO8d/cg2/4xG8rBcD/QW1VRmDh89LPxte6cDN5K2kwJtVEFXcfoz64wS
+         wfSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=c9qXnOSUTaJRqoKVmmvJ/aC55OLxhDJSo/Of+Pk4eZE=;
+        fh=3COc+ie51acMPQDWAuZqebie+gyVLYtILNS0CjIQ0us=;
+        b=k6FZ/PWzTJAIEXcRPIPEEXU0naAL5BqNXtjyi9QuGQPJGwa8FnWuUSVokw+JRf197H
+         Md6vf+3d2ZgDiovEXY+L5oZ0s/qfpma5Hn4XC4PEbcVPSt9p/JHOkaJKZ3rSC1LroLWf
+         ezAgJwwF4NL7m+K+NbbFSDFLNqIq7Fsd2mhLf0usEKpjiMMqWAMnXdOF4eEs5o7z7gb0
+         ELg4PRpZNMnSCmlVMpu7TTMhoupiVrXfDrGydD0Sb5ffMYmFCgsqbMSQ8gKTccA8fAAo
+         j9+oK7faifCTyW5LYIJ2H6dGaId5jk32eOrrQ3BfPdQXnDPrv72yK35nZ06AjEVRc263
+         Bygw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769006898; x=1769611698; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
-        b=YRjmRTpMJdzf8jSCZR5c6CUp2tqRg1IYXX7KFzzPx+S1hKu0rBPBEabK10izkFbZb7
-         8aTnKUHGysBsdMwSM6i9tSiwT71ZCiKtR2fQRqKUiZmonS6Z8AyvmSmolPtWBVzi7hid
-         EriDanVwNTHpbXWDo6tL0DmgFyKRtm45oqiTwimWc6fGHGZqX9bFE4/tqm8Mrcrc5sMj
-         x3yLAIEr2mCNho2mM2Zl7hYMhul16caalRx/hFxITRdpOGTsUitDlvoxNGSWYIWp3/L4
-         vieFfk4GkGCcCeXe+jUnyK529YJzuOzknU5KJP4gS1gW7Uht45DCb4t/gtJJAyN3p+jr
-         Zv8Q==
+        d=google.com; s=20230601; t=1769007227; x=1769612027; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c9qXnOSUTaJRqoKVmmvJ/aC55OLxhDJSo/Of+Pk4eZE=;
+        b=YCRWD+mFIOKM5HQ3+01g/xz3wtxwx5SlnwrWw6d/uiMV6QbsHYC00G3TdvAI9D0ZxM
+         DDAs26O+GVH632Ai3G0rxdJK2k7b1gR2EgCcyoyQpQiYjvtH1NdsL3wEJXulolQM7nlh
+         zJoNwGDfmclV1Hw/rkc+dDMIvZjqhgs0SWN2m2fHpsBcbTBwCH7LoLI1QjeWR6r3rkKL
+         91yrpTuIjkt2VCPGbo1eMBFcxaRqd5GoW9M9f0pdCnp74lTJtSxaGRjJra76P1NPxq9u
+         71ENWv4plPZmGy8AZDgxGA1kIKBSuIc9HaHDoS6ntwNsa2zKFDddEg7JxbvquIyEa0MO
+         qO3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769006898; x=1769611698;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
-        b=AnW8/I4trj1xOhnsvS7Cwjz5WsYo0LA7p6jov3L01c8rGwzC8o9Q1EKennFJHIGLWY
-         w7WIBmynOXmYB9eXkK0rn80MTzumx8Z99wuwM92NwUe6uuYTjRdRq9ipicrD5Jlnar9w
-         9VPa+8TMwh1NrtPFeBGjF6nwoMG2r6S0YuH8XVzhonsy39rrT5ONGXrzlzWd8uLsgDQs
-         ONMMkgYhZfZawKHZdiPXvShZgpWfr88ogn99G1XsywLNu83em77PMQPm2Zra1bVGm+Qs
-         mDCATBLJSqbJ4JJP5+p5ANe2IHnbW0XOD4A+qSOIYfxg5SGL+Z2jT/hxmx2b2J4pqxwJ
-         7RFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhDrYx46L3D5jsLSYjycOpoYCyRQbiGAfMopgGk2xndK3fipaKju/5I5345iwo6bgtx37qNxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHLe+JvNehuAhT33g2xBJgWr5GGdO9R4Kkt6YCCdNZRSb7IqvH
-	m1gKfTjAEiZ68yDhEDRFvgiIjaXrLOKrJt+4EHkuyfN6jm5vdgA3MKFKTd2QOb0gmgouk7+Nu80
-	c6BNv8q1+x8BolNi2RJ9setEZ9EJEcyGV955x4WqEIdfalgBoqHtBZkaymQ==
-X-Gm-Gg: AZuq6aLhlfV1Z/5sXmnKNC+bVdaNOr1OAY8kIA3ZzBZ0kGH8BLeDBbR/zvM3naE5W5w
-	jMYyN/XY1RjfoNPFSYwEgi0nfgpyFNK/KK8e8hIPs0WPosIjjSwDjvZWX6SZ+iaPry8uWkGXssE
-	nqZKowaLMuvuVF5IE2YZy/IAEl5E5aGA3k0IjoxwDaawRStAdC+TlDERJyMJ6C3v2H5KqdFUZWw
-	zOdqmxqwc6HzM2i7XPHI+hl52SRzNy5yCX85VJyoRo5vWbBlMN8cBlsVElG4u9doEzn04B4TsM1
-	2CsXaX9H4Sg2+mMvNGkmH2gbljHp2s1yZskM3YGfM3I2ZpoPXg2dhO5fqSuUOPygyjspmpxIxJF
-	Wb6k9V6SZKWlxjqQALK/9kDXA5g5c7N3qQWkuIolkGxY+xg/p1YM6ONwaLEM=
-X-Received: by 2002:a05:600c:820b:b0:47a:9560:ec28 with SMTP id 5b1f17b1804b1-4803e7a2d1dmr73114045e9.13.1769006898440;
-        Wed, 21 Jan 2026 06:48:18 -0800 (PST)
-X-Received: by 2002:a05:600c:820b:b0:47a:9560:ec28 with SMTP id 5b1f17b1804b1-4803e7a2d1dmr73113705e9.13.1769006897944;
-        Wed, 21 Jan 2026 06:48:17 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48042c5965fsm22479875e9.17.2026.01.21.06.48.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 06:48:16 -0800 (PST)
-Date: Wed, 21 Jan 2026 15:48:13 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
-	linux-doc@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v15 01/12] vsock: add netns to vsock core
-Message-ID: <aXDYfYy3f1NQm5A0@sgarzare-redhat>
-References: <20260116-vsock-vmtest-v15-0-bbfd1a668548@meta.com>
- <20260116-vsock-vmtest-v15-1-bbfd1a668548@meta.com>
+        d=1e100.net; s=20230601; t=1769007227; x=1769612027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=c9qXnOSUTaJRqoKVmmvJ/aC55OLxhDJSo/Of+Pk4eZE=;
+        b=uDVFdlNZ2d7j8ImyXfjpk3Wtu/9WMr9x7teJYxoA+pGo5//t3WAvbZBdaDUmktjeQp
+         o/lhcUpWM9LXX5cMaS25IOodpGbZe4f/vTTy2xrIy9ZG8FWLTNC7q2ue0lmr6Yi4oLs5
+         HStMbJlmpkvImBrqjA7aYUvYKD+ZRyyy5Ja5jzwTZS2+32PfWvduXNOYycrSYNoE5OAM
+         CGugmWVE9I7MzCEWwkc8pBFF93M91ZzMISsV+uMgjR+g7RD4EuJfTTzwb1mwgbB+YhN2
+         0eQQrURTXm4/SS2wnMBusLu7/zX7zwFX1gH4QpS/DNa/hvZBQ0WKs9DtCeVn15GxToWA
+         89ew==
+X-Forwarded-Encrypted: i=1; AJvYcCU8oYxzQ5IzRNiUYGSVOKla+Ic15avuQpJfX2DARG2Irmz4j6XIpMRsRfDXnzxJLl/rE0FHt8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx4/giVDdwnG24mDamm65b420cLeDiRbOT+wO1ZTcbUK/C50BM
+	9LXe41Lw8yoqwi2WIxFLQBrfrlkGgu5ImyE1Pj+3OXV5KsPiG40jay3RHqUb/x7AD+IgFpIDLFB
+	I9BHSSEKaz5VCuT5KcDTft+0jv3bJHg8cKMZ5XqUt
+X-Gm-Gg: AZuq6aIiqIQu8c0y4LNL61UTe7LWe+qoM1MK9gL2VoGwl7/XDoijnNYL64vf83zFyA7
+	GQB6+1nKXHv9Be51q8Hr7w9wssB7JylyTfVpm8PrJF9G5o9qypph+9VtYjy+hDEmGCGCyKpyr1E
+	E9AMSn4/rfYlrm0XA0kH/EJjp5GPqqy5Xt2yI8Z9k5m+UQsYkydon/SQ5GwW9ivtkjJiKQedAru
+	N2cp+fp0acv8omiZxklxjQ4wUwcY+VHZZXbG2h2N73nfsDTIHwDVC/BvR7VYphbp8cc2FY=
+X-Received: by 2002:a05:622a:11ce:b0:4ed:a7ba:69c with SMTP id
+ d75a77b69052e-502a17dbec7mr276708241cf.83.1769007227139; Wed, 21 Jan 2026
+ 06:53:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260116-vsock-vmtest-v15-1-bbfd1a668548@meta.com>
-X-Spamd-Result: default: False [-1.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+References: <20260121143215.14717-1-chia-yu.chang@nokia-bell-labs.com> <20260121143215.14717-13-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20260121143215.14717-13-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 21 Jan 2026 15:53:36 +0100
+X-Gm-Features: AZwV_QiGb7YuJm7CkwrDqLPsRX6j1FfwcEyo2MwarcIKsN7ZaUyiwGIstnxbToI
+Message-ID: <CANn89iLvMkeKG_VBrJi3vA5agDxc5+VLz_L3JNT0ALsRUF32xg@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 12/15] tcp: accecn: detect loss ACK w/ AccECN
+ option and add TCP_ACCECN_OPTION_PERSIST
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: pabeni@redhat.com, parav@nvidia.com, linux-doc@vger.kernel.org, 
+	corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
+	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	andrew+netdev@lunn.ch, donald.hunter@gmail.com, ast@fiberby.net, 
+	liuhangbin@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251946-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,nvidia.com,vger.kernel.org,lwn.net,kernel.org,google.com,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
+	TAGGED_FROM(0.00)[bounces-251947-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	DKIM_TRACE(0.00)[google.com:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,meta.com:email]
-X-Rspamd-Queue-Id: 342E65934F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nokia-bell-labs.com:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 2F5E759341
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Jan 16, 2026 at 01:28:41PM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Wed, Jan 21, 2026 at 3:32=E2=80=AFPM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
 >
->Add netns logic to vsock core. Additionally, modify transport hook
->prototypes to be used by later transport-specific patches (e.g.,
->*_seqpacket_allow()).
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 >
->Namespaces are supported primarily by changing socket lookup functions
->(e.g., vsock_find_connected_socket()) to take into account the socket
->namespace and the namespace mode before considering a candidate socket a
->"match".
+> Detect spurious retransmission of a previously sent ACK carrying the
+> AccECN option after the second retransmission. Since this might be caused
+> by the middlebox dropping ACK with options it does not recognize, disable
+> the sending of the AccECN option in all subsequent ACKs. This patch
+> follows Section 3.2.3.2.2 of AccECN spec (RFC9768).
 >
->This patch also introduces the sysctl /proc/sys/net/vsock/ns_mode to
->report the mode and /proc/sys/net/vsock/child_ns_mode to set the mode
->for new namespaces.
+> Also, a new AccECN option sending mode is added to tcp_ecn_option sysctl:
+> (TCP_ECN_OPTION_PERSIST), which ignores the AccECN fallback policy and
+> persistently sends AccECN option once it fits into TCP option space.
 >
->Add netns functionality (initialization, passing to transports, procfs,
->etc...) to the af_vsock socket layer. Later patches that add netns
->support to transports depend on this patch.
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
+>
+> ---
+> v5:
+> - Add empty line between variable declarations and code
+> ---
+>  Documentation/networking/ip-sysctl.rst |  4 +++-
+>  include/linux/tcp.h                    |  3 ++-
+>  include/net/tcp_ecn.h                  |  2 ++
+>  net/ipv4/sysctl_net_ipv4.c             |  2 +-
+>  net/ipv4/tcp_input.c                   | 10 ++++++++++
+>  net/ipv4/tcp_output.c                  |  7 ++++++-
+>  6 files changed, 24 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
+rking/ip-sysctl.rst
+> index bc9a01606daf..28c7e4f5ecf9 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -482,7 +482,9 @@ tcp_ecn_option - INTEGER
+>         1 Send AccECN option sparingly according to the minimum option
+>           rules outlined in draft-ietf-tcpm-accurate-ecn.
+>         2 Send AccECN option on every packet whenever it fits into TCP
+> -         option space.
+> +         option space except when AccECN fallback is triggered.
+> +       3 Send AccECN option on every packet whenever it fits into TCP
+> +         option space even when AccECN fallback is triggered.
+>         =3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>         Default: 2
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 683f38362977..32b031d09294 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -294,7 +294,8 @@ struct tcp_sock {
+>         u8      nonagle     : 4,/* Disable Nagle algorithm?             *=
+/
+>                 rate_app_limited:1;  /* rate_{delivered,interval_us} limi=
+ted? */
+>         u8      received_ce_pending:4, /* Not yet transmit cnt of receive=
+d_ce */
+> -               unused2:4;
+> +               accecn_opt_sent:1,/* Sent AccECN option in previous ACK *=
+/
+> +               unused2:3;
+>         u8      accecn_minlen:2,/* Minimum length of AccECN option sent *=
+/
+>                 est_ecnfield:2,/* ECN field for AccECN delivered estimate=
+s */
+>                 accecn_opt_demand:2,/* Demand AccECN option for n next AC=
+Ks */
+> diff --git a/include/net/tcp_ecn.h b/include/net/tcp_ecn.h
+> index bf7d3f9f22c7..41b593ece1dd 100644
+> --- a/include/net/tcp_ecn.h
+> +++ b/include/net/tcp_ecn.h
+> @@ -29,6 +29,7 @@ enum tcp_accecn_option {
+>         TCP_ACCECN_OPTION_DISABLED =3D 0,
+>         TCP_ACCECN_OPTION_MINIMUM =3D 1,
+>         TCP_ACCECN_OPTION_FULL =3D 2,
+> +       TCP_ACCECN_OPTION_PERSIST =3D 3,
+>  };
+>
+>  /* Apply either ECT(0) or ECT(1) based on TCP_CONG_ECT_1_NEGOTIATION fla=
+g */
+> @@ -413,6 +414,7 @@ static inline void tcp_accecn_init_counters(struct tc=
+p_sock *tp)
+>         tp->received_ce_pending =3D 0;
+>         __tcp_accecn_init_bytes_counters(tp->received_ecn_bytes);
+>         __tcp_accecn_init_bytes_counters(tp->delivered_ecn_bytes);
+> +       tp->accecn_opt_sent =3D 0;
+>         tp->accecn_minlen =3D 0;
+>         tp->accecn_opt_demand =3D 0;
+>         tp->est_ecnfield =3D 0;
+> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+> index a1a50a5c80dc..385b5b986d23 100644
+> --- a/net/ipv4/sysctl_net_ipv4.c
+> +++ b/net/ipv4/sysctl_net_ipv4.c
+> @@ -749,7 +749,7 @@ static struct ctl_table ipv4_net_table[] =3D {
+>                 .mode           =3D 0644,
+>                 .proc_handler   =3D proc_dou8vec_minmax,
+>                 .extra1         =3D SYSCTL_ZERO,
+> -               .extra2         =3D SYSCTL_TWO,
+> +               .extra2         =3D SYSCTL_THREE,
+>         },
+>         {
+>                 .procname       =3D "tcp_ecn_option_beacon",
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 8b774019a3a6..472bd57913ae 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -4863,6 +4863,8 @@ static void tcp_dsack_extend(struct sock *sk, u32 s=
+eq, u32 end_seq)
+>
+>  static void tcp_rcv_spurious_retrans(struct sock *sk, const struct sk_bu=
+ff *skb)
+>  {
+> +       struct tcp_sock *tp =3D tcp_sk(sk);
+> +
+>         /* When the ACK path fails or drops most ACKs, the sender would
+>          * timeout and spuriously retransmit the same segment repeatedly.
+>          * If it seems our ACKs are not reaching the other side,
+> @@ -4882,6 +4884,14 @@ static void tcp_rcv_spurious_retrans(struct sock *=
+sk, const struct sk_buff *skb)
+>         /* Save last flowlabel after a spurious retrans. */
+>         tcp_save_lrcv_flowlabel(sk, skb);
+>  #endif
+> +       /* Check DSACK info to detect that the previous ACK carrying the
+> +        * AccECN option was lost after the second retransmision, and the=
+n
+> +        * stop sending AccECN option in all subsequent ACKs.
+> +        */
+> +       if (tcp_ecn_mode_accecn(tp) &&
+> +           TCP_SKB_CB(skb)->seq =3D=3D tp->duplicate_sack[0].start_seq &=
+&
+> +           tp->accecn_opt_sent)
+> +               tcp_accecn_fail_mode_set(tp, TCP_ACCECN_OPT_FAIL_SEND);
+>  }
 
-nit: maybe we should mention here why we changed the random port 
-allocation
+tcp_rcv_spurious_retrans() has two callers.
 
-(not a big deal, only if you need to resend)
+tcp_send_dupack() checked dsack is enabled.
+
+tcp_data_queue() : No such check.
+
+So I wonder if tp->duplicate_sack[0].start_seq could contain garbage ?
+
+Perhaps test tp->rx_opt.dsack ?
 
 >
->dgram_allow(), stream_allow(), and seqpacket_allow() callbacks are
->modified to take a vsk in order to perform logic on namespace modes. In
->future patches, the net will also be used for socket
->lookups in these functions.
+>  static void tcp_send_dupack(struct sock *sk, const struct sk_buff *skb)
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 042e7e9b13cc..0cbba38ea87a 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -713,9 +713,12 @@ static void tcp_options_write(struct tcphdr *th, str=
+uct tcp_sock *tp,
+>                 if (tp) {
+>                         tp->accecn_minlen =3D 0;
+>                         tp->accecn_opt_tstamp =3D tp->tcp_mstamp;
+> +                       tp->accecn_opt_sent =3D 1;
+>                         if (tp->accecn_opt_demand)
+>                                 tp->accecn_opt_demand--;
+>                 }
+> +       } else if (tp) {
+> +               tp->accecn_opt_sent =3D 0;
+>         }
 >
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Changes in v15:
->- make static port in __vsock_bind_connectible per-netns
->- remove __net_initdata because we want the ops beyond just boot
->- add vsock_init_ns_mode kernel cmdline parameter to set init ns mode
->- use if (ret || !write) in __vsock_net_mode_string() (Stefano)
->- add vsock_net_mode_global() (Stefano)
->- hide !net == VSOCK_NET_MODE_GLOBAL inside vsock_net_mode() (Stefano)
->- clarify af_vsock.c comments on ns_mode/child_ns_mode (Stefano)
+>         if (unlikely(OPTION_SACK_ADVERTISE & options)) {
+> @@ -1187,7 +1190,9 @@ static unsigned int tcp_established_options(struct =
+sock *sk, struct sk_buff *skb
+>         if (tcp_ecn_mode_accecn(tp)) {
+>                 int ecn_opt =3D READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_e=
+cn_option);
 >
->Changes in v14:
->- include linux/sysctl.h in af_vsock.c
->- squash patch 'vsock: add per-net vsock NS mode state' into this patch
->  (prior version can be found here):
->  https://lore.kernel.org/all/20251223-vsock-vmtest-v13-1-9d6db8e7c80b@meta.com/)
+> -               if (ecn_opt && tp->saw_accecn_opt && !tcp_accecn_opt_fail=
+_send(tp) &&
+> +               if (ecn_opt && tp->saw_accecn_opt &&
+> +                   (ecn_opt >=3D TCP_ACCECN_OPTION_PERSIST ||
+> +                    !tcp_accecn_opt_fail_send(tp)) &&
+>                     (ecn_opt >=3D TCP_ACCECN_OPTION_FULL || tp->accecn_op=
+t_demand ||
+>                      tcp_accecn_option_beacon_check(sk))) {
+>                         opts->use_synack_ecn_bytes =3D 0;
+> --
+> 2.34.1
 >
->Changes in v13:
->- remove net_mode and replace with direct accesses to net->vsock.mode,
->  since this is now immutable.
->- update comments about mode behavior and mutability, and sysctl API
->- only pass NULL for net when wanting global, instead of net_mode ==
->  VSOCK_NET_MODE_GLOBAL. This reflects the new logic
->  of vsock_net_check_mode() that only requires net pointers (not
->  net_mode).
->- refactor sysctl string code into a re-usable function, because
->  child_ns_mode and ns_mode both handle the same strings.
->- remove redundant vsock_net_init(&init_net) call in module init because
->  pernet registration calls the callback on the init_net too
->
->Changes in v12:
->- return true in dgram_allow(), stream_allow(), and seqpacket_allow()
->  only if net_mode == VSOCK_NET_MODE_GLOBAL (Stefano)
->- document bind(VMADDR_CID_ANY) case in af_vsock.c (Stefano)
->- change order of stream_allow() call in vmci so we can pass vsk
->  to it
->
->Changes in v10:
->- add file-level comment about what happens to sockets/devices
->  when the namespace mode changes (Stefano)
->- change the 'if (write)' boolean in vsock_net_mode_string() to
->  if (!write), this simplifies a later patch which adds "goto"
->  for mutex unlocking on function exit.
->
->Changes in v9:
->- remove virtio_vsock_alloc_rx_skb() (Stefano)
->- remove vsock_global_dummy_net, not needed as net=NULL +
->  net_mode=VSOCK_NET_MODE_GLOBAL achieves identical result
->
->Changes in v7:
->- hv_sock: fix hyperv build error
->- explain why vhost does not use the dummy
->- explain usage of __vsock_global_dummy_net
->- explain why VSOCK_NET_MODE_STR_MAX is 8 characters
->- use switch-case in vsock_net_mode_string()
->- avoid changing transports as much as possible
->- add vsock_find_{bound,connected}_socket_net()
->- rename `vsock_hdr` to `sysctl_hdr`
->- add virtio_vsock_alloc_linear_skb() wrapper for setting dummy net and
->  global mode for virtio-vsock, move skb->cb zero-ing into wrapper
->- explain seqpacket_allow() change
->- move net setting to __vsock_create() instead of vsock_create() so
->  that child sockets also have their net assigned upon accept()
->
->Changes in v6:
->- unregister sysctl ops in vsock_exit()
->- af_vsock: clarify description of CID behavior
->- af_vsock: fix buf vs buffer naming, and length checking
->- af_vsock: fix length checking w/ correct ctl_table->maxlen
->
->Changes in v5:
->- vsock_global_net() -> vsock_global_dummy_net()
->- update comments for new uAPI
->- use /proc/sys/net/vsock/ns_mode instead of /proc/net/vsock_ns_mode
->- add prototype changes so patch remains c)mpilable
->---
-> Documentation/admin-guide/kernel-parameters.txt |  14 +
-> MAINTAINERS                                     |   1 +
-> drivers/vhost/vsock.c                           |   6 +-
-> include/linux/virtio_vsock.h                    |   4 +-
-> include/net/af_vsock.h                          |  61 ++++-
-> include/net/net_namespace.h                     |   4 +
-> include/net/netns/vsock.h                       |  21 ++
-> net/vmw_vsock/af_vsock.c                        | 328 ++++++++++++++++++++++--
-> net/vmw_vsock/hyperv_transport.c                |   7 +-
-> net/vmw_vsock/virtio_transport.c                |   9 +-
-> net/vmw_vsock/virtio_transport_common.c         |   6 +-
-> net/vmw_vsock/vmci_transport.c                  |  26 +-
-> net/vmw_vsock/vsock_loopback.c                  |   8 +-
-> 13 files changed, 444 insertions(+), 51 deletions(-)
->
->diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->index a8d0afde7f85..b6e3bfe365a1 100644
->--- a/Documentation/admin-guide/kernel-parameters.txt
->+++ b/Documentation/admin-guide/kernel-parameters.txt
->@@ -8253,6 +8253,20 @@ Kernel parameters
-> 			            them quite hard to use for exploits but
-> 			            might break your system.
->
->+	vsock_init_ns_mode=
->+			[KNL,NET] Set the vsock namespace mode for the init
->+			(root) network namespace.
->+
->+			global      [default] The init namespace operates in
->+			            global mode where CIDs are system-wide and
->+			            sockets can communicate across global
->+			            namespaces.
->+
->+			local       The init namespace operates in local mode
->+			            where CIDs are private to the namespace and
->+			            sockets can only communicate within the same
->+			            namespace.
->+
-
-My comment on v14 was more to start a discussion :-) sorry to not be 
-clear.
-
-I briefly discussed it with Paolo in chat to better understand our 
-policy between cmdline parameters and module parameters, and it seems 
-that both are discouraged.
-
-So he asked me if we have a use case for this, and thinking about it, I 
-don't have one at the moment. Also, if a user decides to set all netns 
-to local, whether init_net is local or global doesn't really matter, 
-right?
-
-So perhaps before adding this, we should have a real use case.
-Perhaps more than this feature, I would add a way to change the default 
-of all netns (including init_net) from global to local. But we can do 
-that later, since all netns have a way to understand what mode they are 
-in, so we don't break anything and the user has to explicitly change it, 
-knowing that they are breaking compatibility with pre-netns support.\
-
-
-That said, at this point, maybe we can remove this, documenting that 
-init_net is always global, and if we have a use case in the future, we 
-can add this (or something else) to set the init_net mode (or change the 
-default for all netns).
-
-Let's wait a bit before next version to wait a comment from Paolo or 
-Jakub on this. But I'm almost fine with both ways, so:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-> 	vt.color=	[VT] Default text color.
-> 			Format: 0xYX, X = foreground, Y = background.
-> 			Default: 0x07 = light gray on black.
-
-[...]
-
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index a3505a4dcee0..3fc8160d51df 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
-
-[...]
-
->@@ -235,33 +303,42 @@ static void __vsock_remove_connected(struct 
->vsock_sock *vsk)
-> 	sock_put(&vsk->sk);
-> }
->
-
-In the v14 I suggested to add some documentation on top of the 
-vsock_find*() vs vsock_find_*_net() to explain better which one should 
-be used by transports.
-
-Again is not a big deal, we can fix later if you don't need to resend.
-
-Thanks,
-Stefano
-
->-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->+static struct sock *__vsock_find_bound_socket_net(struct sockaddr_vm *addr,
->+						  struct net *net)
-> {
-> 	struct vsock_sock *vsk;
->
-> 	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
->-		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
->-			return sk_vsock(vsk);
->+		struct sock *sk = sk_vsock(vsk);
->+
->+		if (vsock_addr_equals_addr(addr, &vsk->local_addr) &&
->+		    vsock_net_check_mode(sock_net(sk), net))
->+			return sk;
->
-> 		if (addr->svm_port == vsk->local_addr.svm_port &&
-> 		    (vsk->local_addr.svm_cid == VMADDR_CID_ANY ||
->-		     addr->svm_cid == VMADDR_CID_ANY))
->-			return sk_vsock(vsk);
->+		     addr->svm_cid == VMADDR_CID_ANY) &&
->+		     vsock_net_check_mode(sock_net(sk), net))
->+			return sk;
-> 	}
->
-> 	return NULL;
-> }
->
->-static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
->-						  struct sockaddr_vm *dst)
->+static struct sock *
->+__vsock_find_connected_socket_net(struct sockaddr_vm *src,
->+				  struct sockaddr_vm *dst, struct net *net)
-> {
-> 	struct vsock_sock *vsk;
->
-> 	list_for_each_entry(vsk, vsock_connected_sockets(src, dst),
-> 			    connected_table) {
->+		struct sock *sk = sk_vsock(vsk);
->+
-> 		if (vsock_addr_equals_addr(src, &vsk->remote_addr) &&
->-		    dst->svm_port == vsk->local_addr.svm_port) {
->-			return sk_vsock(vsk);
->+		    dst->svm_port == vsk->local_addr.svm_port &&
->+		    vsock_net_check_mode(sock_net(sk), net)) {
->+			return sk;
-> 		}
-> 	}
->
->@@ -304,12 +381,13 @@ void vsock_remove_connected(struct vsock_sock *vsk)
-> }
-> EXPORT_SYMBOL_GPL(vsock_remove_connected);
->
->-struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
->+struct sock *vsock_find_bound_socket_net(struct sockaddr_vm *addr,
->+					 struct net *net)
-> {
-> 	struct sock *sk;
->
-> 	spin_lock_bh(&vsock_table_lock);
->-	sk = __vsock_find_bound_socket(addr);
->+	sk = __vsock_find_bound_socket_net(addr, net);
-> 	if (sk)
-> 		sock_hold(sk);
->
->@@ -317,15 +395,22 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
->
-> 	return sk;
-> }
->+EXPORT_SYMBOL_GPL(vsock_find_bound_socket_net);
->+
->+struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
->+{
->+	return vsock_find_bound_socket_net(addr, NULL);
->+}
-> EXPORT_SYMBOL_GPL(vsock_find_bound_socket);
->
->-struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->-					 struct sockaddr_vm *dst)
->+struct sock *vsock_find_connected_socket_net(struct sockaddr_vm *src,
->+					     struct sockaddr_vm *dst,
->+					     struct net *net)
-> {
-> 	struct sock *sk;
->
-> 	spin_lock_bh(&vsock_table_lock);
->-	sk = __vsock_find_connected_socket(src, dst);
->+	sk = __vsock_find_connected_socket_net(src, dst, net);
-> 	if (sk)
-> 		sock_hold(sk);
->
->@@ -333,6 +418,13 @@ struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->
-> 	return sk;
-> }
->+EXPORT_SYMBOL_GPL(vsock_find_connected_socket_net);
->+
->+struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->+					 struct sockaddr_vm *dst)
->+{
->+	return vsock_find_connected_socket_net(src, dst, NULL);
->+}
-> EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
->
-> void vsock_remove_sock(struct vsock_sock *vsk)
-
 
