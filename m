@@ -1,148 +1,126 @@
-Return-Path: <netdev+bounces-251899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4DIFBmrdcGnCaQAAu9opvQ
-	(envelope-from <netdev+bounces-251899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:06:34 +0100
+	id oAivJd3YcGkOaAAAu9opvQ
+	(envelope-from <netdev+bounces-251900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:47:09 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A39458242
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AD657CB5
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D8492A2A29E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:39:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 15C9162D2E0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D740648A2A9;
-	Wed, 21 Jan 2026 13:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8678239341C;
+	Wed, 21 Jan 2026 13:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jKfBm+/s"
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="ATITGszw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail-06.mail-europe.com (mail-06.mail-europe.com [85.9.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0588D48A2BE
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F203F3BC4EF;
+	Wed, 21 Jan 2026 13:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002697; cv=none; b=LSHppXIYrKFxbQKlVtOfzTmHKXhF4LlaRUxMEDWmA9p2s+dVjM8zs/qnoPJXkXNVpLG6+o/MVDuKeikqu0HMbvV/MwxYzQsCa5cA/6Iy4rnUWv1DfWrtWwYRdu2cLQWa6jnK1rfvKsPksNoBkOhBt2mFtHiZuiGfAXf4szvoSzM=
+	t=1769002800; cv=none; b=vBBwMgwYztXmilik6kXhl1Ih60ujNEclsHIJiCTYDBNLb5lqhHcKo89qutvVJUFfkBrFT7PpOAqSBYKwNDUoLGcxj861tRgUCDHkC26c9nYCbS8W0LTcoCWfCCdwHmgfrQVUStwhSXJ5nzGAdEJZqbQyMDQx3QcR6NnHYcDgMqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002697; c=relaxed/simple;
-	bh=9UYDg2NtKSYx0cAymNYgrRU3tRNoT6ojnkckLTkJrOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zctk8TYJwiupACEDzXYPblSw9jLxO9ZLGFPT9Ib0PT2nolnFGOwMrtNI7f57hSbu6axK88t6aqumDg6L7uOr3skiAswYG31BG8N/lQb0sDzuXdeIB6xT2WCLIKz6T3V+f1DeTHdOpjH+XR/nG8GLfGZcdz4RaZD48Dg0+rNYc7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jKfBm+/s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769002695;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0+t5ikSuWWuMge/uJAfw1c8Rur5ydyVTP3mADUQkPvs=;
-	b=jKfBm+/slo39ojML0Wshr09zoM+BBpyXt8u00oh7CQSKNZNOdfV+Ihm12bkDayrZfWOBji
-	fD4Udi8fiMM1Ry/HvzFnNVjX5EilEwEvMrxXkYjV28CP+XbJhXeRgqc16JyhDJLODR75Xi
-	CwxLzFWEp1RRAqkOSud60oYTHCbSa+Q=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-195-D_vLlJ-dOX6HFdKv9xfYIw-1; Wed,
- 21 Jan 2026 08:38:11 -0500
-X-MC-Unique: D_vLlJ-dOX6HFdKv9xfYIw-1
-X-Mimecast-MFC-AGG-ID: D_vLlJ-dOX6HFdKv9xfYIw_1769002690
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0034B1954B1B;
-	Wed, 21 Jan 2026 13:38:10 +0000 (UTC)
-Received: from thinkpad.redhat.com (unknown [10.44.33.242])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7A1B630001A2;
-	Wed, 21 Jan 2026 13:38:06 +0000 (UTC)
-From: Felix Maurer <fmaurer@redhat.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jkarrenpalo@gmail.com,
-	tglx@linutronix.de,
-	mingo@kernel.org,
-	allison.henderson@oracle.com,
-	petrm@nvidia.com,
-	antonio@openvpn.net,
-	bigeasy@linutronix.de
-Subject: [PATCH net-next 9/9] MAINTAINERS: Assign hsr selftests to HSR
-Date: Wed, 21 Jan 2026 14:37:36 +0100
-Message-ID: <8f44e4f6e7715f0e6e35d67eae41e01664020405.1769001553.git.fmaurer@redhat.com>
-In-Reply-To: <cover.1769001553.git.fmaurer@redhat.com>
-References: <cover.1769001553.git.fmaurer@redhat.com>
+	s=arc-20240116; t=1769002800; c=relaxed/simple;
+	bh=RmqCf2wR5mujk0thtN0HVfxp4irGJYjIkh+aH0XjYy4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=la0a4dWVzB+XCTWZmKlDHOmpLql6CpjoYK0L/WS/77f15N937TXhonevk3AEyygPDQ9xVOPmirnyD159ZT67aMBUq5ustSx2Ovvv5klgGaFsU+EnIwn0sSdzjyki4Qr0BtvCCM0Tij5wLpDZA6JLFOqnE0r4cqK31L+f97be2/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=ATITGszw; arc=none smtp.client-ip=85.9.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1769002788; x=1769261988;
+	bh=RmqCf2wR5mujk0thtN0HVfxp4irGJYjIkh+aH0XjYy4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=ATITGszwYIQbcxcSRILU1ZSV9Alw8VZfYlmYyxIuca9eYMwPGJ3WGjEVjIo+o4iPi
+	 OAARotb1riwyD8DWKsplci+J8Ez8sbBJ2wRquwOqWPqqxorU+jggQn/iDi4amkzUBO
+	 Z18yCumz+S6LxunVL7bLEwmF1y1B44ocbzcERG/GW06mWclHSl8ttPMcAm8mR1mCdc
+	 NpDxJKp+xQZL7GdXrwLgs0pxeeRWy617XUTeAkTGdIWt5bPOnnoo7elYlkY+PFix9E
+	 WBBlI0J8xP8HYYOFsGU7cnYbn8RKcmaoaQLGYPVrCxky8J7rWxcQaY/62X2T7YgtFM
+	 zmHyJGiCUaFnw==
+Date: Wed, 21 Jan 2026 13:39:42 +0000
+To: Eric Dumazet <edumazet@google.com>
+From: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/7] net/sched: act_gate: zero-initialize netlink dump struct
+Message-ID: <BSn2a6IWtM_DnDrcd-qDBm8cXAwXPo3xj1l4Eu4SWy3BS2UW8Aw7-gXW6uo_DaCipnvmSxgDeGEQrnZ-pjqRKSOPPUW0usVN8M1lp1J-soM=@1g4.org>
+In-Reply-To: <CANn89i+8_ZDxVGwQmo_44iCRs5Wexwxy1Wfhw4WmYg3qA7_t1A@mail.gmail.com>
+References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-2-p@1g4.org> <CANn89i+8_ZDxVGwQmo_44iCRs5Wexwxy1Wfhw4WmYg3qA7_t1A@mail.gmail.com>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: b2a462617249e0597036a82c08d089850476b13a
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251899-lists,netdev=lfdr.de];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251900-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DMARC_POLICY_ALLOW(0.00)[1g4.org,quarantine];
+	DKIM_TRACE(0.00)[1g4.org:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 8A39458242
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,1g4.org:email,1g4.org:dkim,1g4.org:mid]
+X-Rspamd-Queue-Id: D0AD657CB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Despite the HSR subsystem being orphaned at the moment due to the original
-maintainer being unreachable for a while, assign the selftests to the
-subsystem for the future.
+Yes, it's not proven so you might be right, I knew it was 4 bytes at best. =
+We can do next or toss it, I don't feel strongly either way.
 
-Signed-off-by: Felix Maurer <fmaurer@redhat.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On Wednesday, January 21st, 2026 at 7:25 AM, Eric Dumazet <edumazet@google.=
+com> wrote:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e36689cd7cc7..b973b88f9192 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11461,6 +11461,7 @@ HSR NETWORK PROTOCOL
- L:	netdev@vger.kernel.org
- S:	Orphan
- F:	net/hsr/
-+F:	tools/testing/selftests/net/hsr/
- 
- HT16K33 LED CONTROLLER DRIVER
- M:	Robin van der Gracht <robin@protonic.nl>
--- 
-2.52.0
-
+>=20
+>=20
+> On Wed, Jan 21, 2026 at 2:20=E2=80=AFPM Paul Moses p@1g4.org wrote:
+>=20
+> > Zero-initialize the dump struct before selective assignment to avoid
+> > leaking stack padding in netlink replies. This matches other actions
+> > (e.g. act_connmark) that zero-init their dump structs.
+> >=20
+> > Fixes: a51c328df310 ("net: qos: introduce a gate control flow action")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Paul Moses p@1g4.org
+> > ---
+>=20
+>=20
+> I do not see a bug to fix, current code is fine.
+>=20
+> act_connmark problem was that "struct tc_connmark" had a 16bit hole.
+>=20
+> No such issue for struct tc_gate.
 
