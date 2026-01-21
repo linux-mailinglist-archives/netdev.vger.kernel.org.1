@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-251965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251966-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFbyJjQPcWlEcgAAu9opvQ
-	(envelope-from <netdev+bounces-251965-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:39:00 +0100
+	id 4AGjLw0JcWmPcQAAu9opvQ
+	(envelope-from <netdev+bounces-251966-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:12:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B1AB5AA93
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:39:00 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A62575A5B3
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 174E962F70A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:02:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B28F138C0D1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4363348BD48;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9220448C3EF;
 	Wed, 21 Jan 2026 15:56:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f67.google.com (mail-oa1-f67.google.com [209.85.160.67])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EB14779A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0559644A701
 	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 15:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.67
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769010987; cv=none; b=j4iA4VdkpvpSZ0L3Cu+ZV9HiOnigk9wTYlg1+VkDGPC8QFkeBquTylp5gZ+V8GvpR62elSktG6NZw+suJMhtbqVkylrbpBjV1bVqZ8m4ezg9gZz86dPP2SH2zT/bWHnTNUbix0aO18XcDbgu3LL6locUMYizht56IiQYftaJM0o=
+	t=1769010987; cv=none; b=iUN+bnuZs9pim8Nm8WrbofmOBElJGP2qA+oWYGxyoD5lP9YyuHoYdO9ANsYq10flaXO7xxbSqbsKVJJmszbELmbWV1OWmIPmrpKRmrtVn9kRQ3tAR5iPwR8hZF61eggjLd/Rf0bjs8Dzhk4i7F73Lecm7QRD0VVkfN9jIcEwTSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769010987; c=relaxed/simple;
-	bh=T8U9YBL53JqT7WigLAduxBIVpfy/A2owaIdOZQB9pK8=;
+	bh=KiK6mfmbvfAjTMgI1Nxjqq2yBnQ7fftuW5wYTWWOth8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LEziCHdL7znfm+SLi3E2DH7iACRtgp318YzyDmkgYkuH8M+1/WMpB7TIZDMpPDgGYccQft8Zt8sy6NkZO6p3PICzGTTwt312Nf1OzDzoaHliwQ5QDn5LKQVKmeTK9TxqAN8xcsA5E1HJ6sBgTmMWfNOQkkskdQFCKuIyzge7PzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.67
+	 In-Reply-To:To:Cc; b=O5lOCwyiLQ9YAzjPPLcksayMXpLJj2BBxeP8LunsTDeLTMKH0/JgtXVPXOKUXpBxUN/nI8bvx8XKxd9rGvh7RM/6nNLdX5ZPsA0aihwUkxCPVGiZp0T+tcn+sG5lhwiTMnglYC/c2MjlHO+f4fgFIDzkR1mKzcuCIzCzCEZS7M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f67.google.com with SMTP id 586e51a60fabf-4044d3ff57bso15382fac.0
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-40427db1300so23319fac.0
         for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 07:56:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769010983; x=1769615783;
+        d=1e100.net; s=20230601; t=1769010984; x=1769615784;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Ek0t028DajpwRbdMOHJ1y71aPEyjkP5BEsLC81+5e0M=;
-        b=iWPzyLz9byGZb98P9QNoKO+Dz1eNdUodsS1kvqYO84DzORymHYu8WWdDN0HSvyUrCG
-         boNCPikRnz49WDFfDPKSZmEOPOvPqAaQXWPipkOFnjQfYGLEdFXi2DA2zflzuaxsO8k1
-         Cc7DI95Wgj4nJsXE0rUEEEez8ZF920HZFiG3jFqLLh/8dUpj3KCLmXCsTT99XioDcpFx
-         oIe58nfnwIY68ihnjer7cRggZRmBxyte1DOCId8hgAtDDfVn0MG5+Kou3OO9GiPIqI8p
-         zU57hzJmor7CwpQ7TdPprzLF9/vxKhlrNkE8V5TF2tdkS69PiFipfw3lMWrQ19sh4tbJ
-         Z5Yw==
-X-Gm-Message-State: AOJu0YzAnuvcg5ehhPnqWgOQXudKNgOy9WIiqBMyOu8D1BPMbjAHzQIH
-	drpzaYDqn3QwKVIHpxy06QNHQdhoFLKhPwAQk11+a29Qz3L/eFcv5Wr7
-X-Gm-Gg: AZuq6aIG6IxFX1Ie/+3vOiyQAZl+mFs9PKEWzDm7aYPsrsF4SJA1ghZmlo7JYsZcZ+h
-	26YlxRbvbD/Lte0akB6y1CEJ+UFaph3YALGxNMvZ2TqkT261iM8qSbBzTGrf8DZfFCkWJWEsSPH
-	tjpMziv0ohl4r0fTInuwvQDnx8Vmf1/RqkfmXRK8dyqkXyDysrqnRzUAOofn8bCs1aZrEOOOouy
-	TpaAA1iz2P8RzLrT+5jA6nFTthBLDVBUlQO2YMSlh9ZBufQxVjXViH+TdK7EUGmZXEuX5F6vVYy
-	moFBOiWU12Ey4aydqzY/3S4PnqRa/8RDaUZy4JWvDwqc0wN/bQ9qzPTggoatnQXmqyzRZPauMfY
-	qK0hAG51uDWsgWA5MVidx7A5Zh7t3mmjH3+KQeh5HNPMWZz/aScFDS+QVQcgMJXhuBEyUVB491X
-	Mw2w==
-X-Received: by 2002:a05:6820:458d:b0:65f:6d50:e41a with SMTP id 006d021491bc7-661188d51efmr5368293eaf.15.1769010982826;
-        Wed, 21 Jan 2026 07:56:22 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:73::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044baf52f3sm10966601fac.2.2026.01.21.07.56.22
+        bh=obI4wQS/LQ9vhDitZWs7Cx+s8XoRN4vJudvn3e5+msk=;
+        b=a/D12rqkxC/BGp1OIKBTWhxoKqwONuM8ma6a3B4Js2jHfwBU1YBtycHgReD9/wHmfR
+         vomWjNozPJdHZwHgaMT5o2P1DkdVmqfRVlJ1qHNFL/Wjp61SRTDxZ3Gj0RJ4RCaPsa0l
+         R5nnainTwwr90a7+wDvksGmaYoK9pm3Esgqtx/kdcB++dX+emsK3AHxilncCv/354120
+         TGCf446lNk/UN5G+wpoMhpPVJOtgm4EPhHtUDMWr7ZZ7CTWPeiUVzq+63Oap4vYAZ7i/
+         hU8wgt8TnnpuNp2Y8vAI6y40MUUjqlmopgaCQFZzNkoD2oN64zcGsumtS0iwwz3/0ieZ
+         6lNA==
+X-Gm-Message-State: AOJu0YxsXyC1eHvKlmTotp9iyQXJmjG60BsOJBnKBBkYqkCv6OugS4BE
+	KhLSnhj+4oUHp3feLXX6ep2QJQz+TpmMiB5eGC2hlAPuchtz3yc59z7w
+X-Gm-Gg: AZuq6aL2RNCX8UNUpMcBnNZtGIu5HvcYe87OVB0pZ5fDTmdBlgHtFpDLBtUXSE64e57
+	xBbhs4Qskzf654tGv9HcylIwsE9WutyWAyJLQcf8qXcUiQv3v//EC6Ab+MHT64VzCN7uhYr7zxf
+	llguXShHtSTYHEnhfiaGRfJNY4NtwJCdJxOW3R/EbeCun+S5vTaXZj+jEGV780Ky/tHNgTJmfbZ
+	RDBl8R6TLe4sLo8Jx/FwpH9zM35qb46eEa/xdyca1ggiihYQddhNUhgzkq2Wxb4pccwA72ePXE3
+	j7U34fobdwBMcYD5LZk35WzPJTCFgo8JLE9ZsBPiP4gv/MTVdSUn/n2de8dTvi4mQ1LOIb0NVN1
+	t/9ozfhD/83cnv2/gw2E/7tYINxuFQutRYssBvipxFvkKh8Jw5Qf4suwEwomeN5SWT8iIeTq9zZ
+	gF9fz1iRybDWeE
+X-Received: by 2002:a05:6870:96ab:b0:404:3569:5a41 with SMTP id 586e51a60fabf-4044c48851bmr8465128fac.43.1769010983920;
+        Wed, 21 Jan 2026 07:56:23 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:50::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044bb51d4csm11180043fac.6.2026.01.21.07.56.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 07:56:22 -0800 (PST)
+        Wed, 21 Jan 2026 07:56:23 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Date: Wed, 21 Jan 2026 07:54:40 -0800
-Subject: [PATCH net-next 3/9] net: nfp: convert to use .get_rx_ring_count
+Date: Wed, 21 Jan 2026 07:54:41 -0800
+Subject: [PATCH net-next 4/9] net: mana: convert to use .get_rx_ring_count
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-grxring_big_v4-v1-3-07655be56bcf@debian.org>
+Message-Id: <20260121-grxring_big_v4-v1-4-07655be56bcf@debian.org>
 References: <20260121-grxring_big_v4-v1-0-07655be56bcf@debian.org>
 In-Reply-To: <20260121-grxring_big_v4-v1-0-07655be56bcf@debian.org>
 To: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
@@ -93,20 +93,20 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
  linux-net-drivers@amd.com, Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1605; i=leitao@debian.org;
- h=from:subject:message-id; bh=T8U9YBL53JqT7WigLAduxBIVpfy/A2owaIdOZQB9pK8=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpcPch+6e/Eu+iQKP10pTrr3CuNmT6FBdEQqk9M
- xMfYtB4256JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXD3IQAKCRA1o5Of/Hh3
- bQcsD/45AXMgZGsQVC3J9pUfksTc1zQn1m85PMlFNKytYDezn7OrWQabGu98CEQ/ymbdPzZScix
- j3P16XF7hrTPu18ir6yQ1p0vHBYbgHTyZduh/10/ZqD1Wjt5twHKeDSwVrSSKI5m8/ao//PpQ5T
- 5g+CoNBuuAHZH0dK/U3jaWUQYhblyFoYJE/6LBDcIGOdAF2fOscjXfXD0lQe2FCYHIms2Mo3qXq
- 7yCGgpbIu9v9bVvFoGf5vE38eIb+o5qwcKvu0bNa8/JGWnHaZJFqnXyM0cUaJeSL1g//EsviHx6
- mUxC6Cvt3DQW24HTiV3b+8r2w1wskZeDbix23XbmcCEeipg1XgUvWoSRb7wyxzCvQA23kv82H+l
- 6yVwpoSAD1Fe2rH0QS+wkkr5VUakvdufnE/ajUGEs5g+ptYA7S5YeqtVDlONQB1lkX7jXMs/W76
- dIXqBNeNKmqEEL7VuQ/ES1PR52/XYKTXByWcDGbp1WvLB9nVWEWrhrm8XEl4gsoo1rhoDoPcxib
- xKDiUs6sb37qHSZCfF885e6jhUh5IHEPgN+Sr3YEyqhmxi/XYZafLNuSFEuCbHL8q289u3iC4hl
- 1T5VTD3cvXEcBZyD0xsUzap9CWNxbqssjWJwp00B3fCYVB0raH/qSKLtHAEi517Zh8fzuclqokw
- cE+RB1zkrcsNTyg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1650; i=leitao@debian.org;
+ h=from:subject:message-id; bh=KiK6mfmbvfAjTMgI1Nxjqq2yBnQ7fftuW5wYTWWOth8=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpcPchuDZz2+z3ebNhVWvJuTRSz6BSL//QPW796
+ 671I66a6waJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXD3IQAKCRA1o5Of/Hh3
+ bZ65EACXI508P/RfwmkFR+L8D8KIHhJLLGUTsHGVjf7f9Uzbxq1t5/rrWDTt0LzUqDjFooCLwyJ
+ NAPPf9u9UEpKrVBeJ5qG7lNHbk6Ky/b8SEiGGZKVJPV3dqIzhhaiuIVNkrIDXjbqfjdT9Sg2wDv
+ pzvi3YTkEd0kWWdk78owEkZQAezX8WB1kNjAxyuukT+ODvCFQVHhFPhzdiQ8Bun+WouGUtNveAd
+ +EWtKYH5fKPUucNkEkLhlbEhMC/ebXKNXQueOamJj+ntMcFXgidY1pdwefIqtoYe2JcU3LcgID0
+ MyCeNp8I5LkPIETtF/XiDk9Lceuw7D6bSPHDcWeRQMjMLHrAzIH0i6aWXn9h2HmGP8xCx2ocgPs
+ d4wlIEwi29qh0/t4snIuu+3KsnggeGblNdrnywSZL034mOuzRQQlts+GlszBXLeV9mVoHitLTiY
+ K+IujBqywA39DOWRCUHjCleMUH2/ygr1YN03sHmm612ZLHoJbPpCrQG/24G0q2IWlxkydxMQhxQ
+ lfXJsFAipVTTZRJqYsNen+XbQKYSGiyNb2nDQC21kmGrX+cIVcgkgUG6zyyHV0MgrXTmbs/8Whm
+ 5ddLIlmTa2w15UOJOSRLnGcQ8K8ZqEt7y4CFh1TvVZseEhRiu9MooSRKujESwSL8EWbytf50r+w
+ 2NVXroXMqRDJzMg==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Spamd-Result: default: False [0.24 / 15.00];
@@ -117,7 +117,7 @@ X-Spamd-Result: default: False [0.24 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_TO(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,microsoft.com,fb.com,meta.com,gmail.com,amd.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251965-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251966-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DMARC_NA(0.00)[debian.org];
 	RCPT_COUNT_TWELVE(0.00)[25];
@@ -129,60 +129,62 @@ X-Spamd-Result: default: False [0.24 / 15.00];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 4B1AB5AA93
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: A62575A5B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Use the newly introduced .get_rx_ring_count ethtool ops callback instead
 of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
 
+Since ETHTOOL_GRXRINGS was the only command handled by mana_get_rxnfc(),
+remove the function entirely.
+
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/microsoft/mana/mana_ethtool.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-index 16c828dd5c1a3..e88b1c4732a57 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
-@@ -1435,15 +1435,19 @@ static int nfp_net_get_fs_loc(struct nfp_net *nn, u32 *rule_locs)
- 	return 0;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+index 0e2f4343ac67f..f2d220b371b5d 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+@@ -282,18 +282,11 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
+ 	}
  }
  
-+static u32 nfp_net_get_rx_ring_count(struct net_device *netdev)
-+{
-+	struct nfp_net *nn = netdev_priv(netdev);
-+
-+	return nn->dp.num_rx_rings;
-+}
-+
- static int nfp_net_get_rxnfc(struct net_device *netdev,
- 			     struct ethtool_rxnfc *cmd, u32 *rule_locs)
+-static int mana_get_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *cmd,
+-			  u32 *rules)
++static u32 mana_get_rx_ring_count(struct net_device *ndev)
  {
- 	struct nfp_net *nn = netdev_priv(netdev);
+ 	struct mana_port_context *apc = netdev_priv(ndev);
  
- 	switch (cmd->cmd) {
+-	switch (cmd->cmd) {
 -	case ETHTOOL_GRXRINGS:
--		cmd->data = nn->dp.num_rx_rings;
+-		cmd->data = apc->num_queues;
 -		return 0;
- 	case ETHTOOL_GRXCLSRLCNT:
- 		cmd->rule_cnt = nn->fs.count;
- 		return 0;
-@@ -2501,6 +2505,7 @@ static const struct ethtool_ops nfp_net_ethtool_ops = {
- 	.get_sset_count		= nfp_net_get_sset_count,
- 	.get_rxnfc		= nfp_net_get_rxnfc,
- 	.set_rxnfc		= nfp_net_set_rxnfc,
-+	.get_rx_ring_count	= nfp_net_get_rx_ring_count,
- 	.get_rxfh_indir_size	= nfp_net_get_rxfh_indir_size,
- 	.get_rxfh_key_size	= nfp_net_get_rxfh_key_size,
- 	.get_rxfh		= nfp_net_get_rxfh,
+-	}
+-
+-	return -EOPNOTSUPP;
++	return apc->num_queues;
+ }
+ 
+ static u32 mana_get_rxfh_key_size(struct net_device *ndev)
+@@ -520,7 +513,7 @@ const struct ethtool_ops mana_ethtool_ops = {
+ 	.get_ethtool_stats	= mana_get_ethtool_stats,
+ 	.get_sset_count		= mana_get_sset_count,
+ 	.get_strings		= mana_get_strings,
+-	.get_rxnfc		= mana_get_rxnfc,
++	.get_rx_ring_count	= mana_get_rx_ring_count,
+ 	.get_rxfh_key_size	= mana_get_rxfh_key_size,
+ 	.get_rxfh_indir_size	= mana_rss_indir_size,
+ 	.get_rxfh		= mana_get_rxfh,
 
 -- 
 2.47.3
