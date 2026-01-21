@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-251845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251846-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNZmFdCocGnwYwAAu9opvQ
-	(envelope-from <netdev+bounces-251845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 11:22:08 +0100
+	id qAKOJhiscGkgZAAAu9opvQ
+	(envelope-from <netdev+bounces-251846-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 11:36:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E605355239
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 11:22:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B093554E7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 11:36:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D6C0B7CC2EC
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:08:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DA56889728
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08E2480953;
-	Wed, 21 Jan 2026 10:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DF948164B;
+	Wed, 21 Jan 2026 10:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENTKLDkQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SG/yBWQ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BE8481644
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 10:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A51481FDC
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 10:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768989940; cv=none; b=SYqRVwFd+ALqeXyQJabm3sjvhmmrraGU+ldq4ZTEq6f4XnMADaFJCfLfzOx8OfsObvzqFdcN8W9xr9zgOLkbSSF373rM/GHxY5brN7UE1zxBsUmmCb5tzrMBit5Jks2z35IOBtTALulB8jW7tosaJ+1QfvloAPGFjAw+kAFcalc=
+	t=1768989946; cv=none; b=DZyJmjyDAXPghmIuPx2w35yKimRKceTiS9JsxmVrj7+Cn73Ldc/a7zEI71/tulS97N/2Wywa+FgXRLvvXovnJaajm/2+b5sTWE2K0XMJUUnvvNGx9h+Wee8owzt3BgP+nv0moLH0c+H6dVNMxCcMGVWK7IViVIIMaD3KS9X0hlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768989940; c=relaxed/simple;
-	bh=IW/J3BC4sBFf77HVbLDQ/7RXXPHxJ/yVkWFmZ09sdKs=;
+	s=arc-20240116; t=1768989946; c=relaxed/simple;
+	bh=YIjj8p88xswOjIMLr7gLxFIpv8gfxcKe7WDs7dQEI5o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q/oKpq9jZMa1qbFbgzGCMBBBcGM5hmfSDhCb4qEic0JkSI7wR+9feU1HcQxy4QYmNBYJOAZVxkFO+vu6tVVfWAJ/F7dUQ9T1OV1p5wIPBByARhyCpon1joXv55pC5PUgvB7jlNyu8zFPoeAXT2+U72xHa/2nD1TJG5Q4vwNGSUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ENTKLDkQ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=ASIHivJqA+wMk0rV10JBhsinNJngTEO+bvZCTquN5m1/g44VWeKNNTUHGZ51brmynKGclmKEXIvrkMxAUJysuuGQHGYGxJUdvZaaE+sSYYfIc73OmyYch3QlXCmSudXrHGiy+SulWSg6PbxiSpSa+CdSiKNa06pXP+m7Iy8+lZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SG/yBWQ3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768989937;
+	s=mimecast20190719; t=1768989943;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A1m0qOaHDYsbEfL0bqKIdJZXWJLusY3meo2/38YBqgU=;
-	b=ENTKLDkQ9QsCj7HrGog+/l98tMVYuhKUS7sd5007Nh0F17YlPzyNGeKFEyQ11SNMARuFZ5
-	p2EJlqyPpazhuevmMxvuTrYnfYC6AjzXJrw1YnZV/41KaFCmS7DDshdheluWG0xkG7CYBl
-	neyCjd7TScpyYPmyQ1g5LCDe6PUbUL8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=HjHbBns596A0PY7jXZNde0DLsbGoZFg3uEUoRR2OeSY=;
+	b=SG/yBWQ3XbcAJ9Gq0FVhDZKtZAoSbPeGH8Q54A8apDoHjhoxlBdSw6Z77nC5OPPCbaodXf
+	AQKluLIuNvWG/XyfbFJ4eKitpT37BfdyHmRWskger34TZrSAxhOydizp/fn3AHkGlgo7fV
+	sO5rEs3HLpv2RGT6pK3g59RkIaN/8mo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-368---ncxqYYNNGZdpFX2hzbfw-1; Wed,
- 21 Jan 2026 05:05:33 -0500
-X-MC-Unique: --ncxqYYNNGZdpFX2hzbfw-1
-X-Mimecast-MFC-AGG-ID: --ncxqYYNNGZdpFX2hzbfw_1768989931
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-343-khqJnk7uO7iu1KYcpABseA-1; Wed,
+ 21 Jan 2026 05:05:39 -0500
+X-MC-Unique: khqJnk7uO7iu1KYcpABseA-1
+X-Mimecast-MFC-AGG-ID: khqJnk7uO7iu1KYcpABseA_1768989938
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C937D1956096;
-	Wed, 21 Jan 2026 10:05:31 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5346C19560A6;
+	Wed, 21 Jan 2026 10:05:38 +0000 (UTC)
 Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.72.116.124])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 46B981800665;
-	Wed, 21 Jan 2026 10:05:26 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 22D081800665;
+	Wed, 21 Jan 2026 10:05:32 +0000 (UTC)
 From: Xu Du <xudu@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -72,9 +72,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v6 4/7] selftest: tun: Add helpers for GSO over UDP tunnel
-Date: Wed, 21 Jan 2026 18:04:58 +0800
-Message-ID: <b5787b8c269f43ce11e1756f1691cc7fd9a1e901.1768979440.git.xudu@redhat.com>
+Subject: [PATCH net-next v6 5/7] selftest: tun: Add test for sending gso packet into tun
+Date: Wed, 21 Jan 2026 18:04:59 +0800
+Message-ID: <a988dbc9ca109e4f1f0b33858c5035bce8ebede3.1768979440.git.xudu@redhat.com>
 In-Reply-To: <cover.1768979440.git.xudu@redhat.com>
 References: <cover.1768979440.git.xudu@redhat.com>
 Precedence: bulk
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251845-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251846-lists,netdev=lfdr.de];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -110,490 +110,208 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,geneve.family:url]
-X-Rspamd-Queue-Id: E605355239
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 2B093554E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In preparation for testing GSO over UDP tunnels, enhance the test
-infrastructure to support a more complex data path involving a TUN
-device and a GENEVE udp tunnel.
-
-This patch introduces a dedicated setup/teardown topology that creates
-both a GENEVE tunnel interface and a TUN interface. The TUN device acts
-as the VTEP (Virtual Tunnel Endpoint), allowing it to send and receive
-virtio-net packets. This setup effectively tests the kernel's data path
-for encapsulated traffic.
-
-Note that after adding a new address to the UDP tunnel, we need to wait
-a bit until the associated route is available.
-
-Additionally, a new data structure is defined to manage test parameters.
-This structure is designed to be extensible, allowing different test
-data and configurations to be easily added in subsequent patches.
+The test constructs a raw packet, prepends a virtio_net_hdr,
+and writes the result to the TUN device. This mimics the behavior
+of a vm forwarding a guest's packet to the host networking stack.
 
 Signed-off-by: Xu Du <xudu@redhat.com>
 ---
 v4 -> v5:
  - Use Geneve instead of VXLAN due to missing YNL support.
 
-v1 -> v2:
- - Explicitly wait for successful target route lookup before transmitting
-   the packets.
- - Add UDP connect() to verify remote reachability.
- - Abstract address assignment logic into helpers.
+v3 -> v4:
+ - Expand the buffer to accommodate the maximum length of test packets.
 
- tools/testing/selftests/net/tun.c | 425 ++++++++++++++++++++++++++++++
- 1 file changed, 425 insertions(+)
+v1 -> v2:
+ - Correct spelling of 'recieve' to 'receive'.
+ - Avoid busy waiting caused by recv() returning empty.
+
+ tools/testing/selftests/net/tun.c | 144 ++++++++++++++++++++++++++++--
+ 1 file changed, 135 insertions(+), 9 deletions(-)
 
 diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-index d9030bdd2e06..ec089355312b 100644
+index ec089355312b..f0ddb5d37683 100644
 --- a/tools/testing/selftests/net/tun.c
 +++ b/tools/testing/selftests/net/tun.c
-@@ -15,6 +15,80 @@
- #include "kselftest_harness.h"
- #include "tuntap_helpers.h"
+@@ -75,7 +75,34 @@ static struct in6_addr param_ipaddr6_inner_src = {
+ #define UDP_TUNNEL_OUTER_IPV4 (UDP_TUNNEL_GENEVE_4IN4 | UDP_TUNNEL_GENEVE_6IN4)
+ #define UDP_TUNNEL_INNER_IPV4 (UDP_TUNNEL_GENEVE_4IN4 | UDP_TUNNEL_GENEVE_4IN6)
  
-+static const char param_dev_geneve_name[] = "geneve1";
-+static unsigned char param_hwaddr_outer_dst[] = { 0x00, 0xfe, 0x98,
-+						  0x14, 0x22, 0x42 };
-+static unsigned char param_hwaddr_outer_src[] = { 0x00, 0xfe, 0x98,
-+						  0x94, 0xd2, 0x43 };
-+static unsigned char param_hwaddr_inner_dst[] = { 0x00, 0xfe, 0x98,
-+						  0x94, 0x22, 0xcc };
-+static unsigned char param_hwaddr_inner_src[] = { 0x00, 0xfe, 0x98,
-+						  0x94, 0xd2, 0xdd };
++#define UDP_TUNNEL_GENEVE_4IN4_HDRLEN                        \
++	(ETH_HLEN + 2 * sizeof(struct iphdr) + GENEVE_HLEN + \
++	 2 * sizeof(struct udphdr))
++#define UDP_TUNNEL_GENEVE_6IN6_HDRLEN                          \
++	(ETH_HLEN + 2 * sizeof(struct ipv6hdr) + GENEVE_HLEN + \
++	 2 * sizeof(struct udphdr))
++#define UDP_TUNNEL_GENEVE_4IN6_HDRLEN                               \
++	(ETH_HLEN + sizeof(struct iphdr) + sizeof(struct ipv6hdr) + \
++	 GENEVE_HLEN + 2 * sizeof(struct udphdr))
++#define UDP_TUNNEL_GENEVE_6IN4_HDRLEN                               \
++	(ETH_HLEN + sizeof(struct ipv6hdr) + sizeof(struct iphdr) + \
++	 GENEVE_HLEN + 2 * sizeof(struct udphdr))
 +
-+static struct in_addr param_ipaddr4_outer_dst = {
-+	__constant_htonl(0xac100001),
-+};
++#define UDP_TUNNEL_HDRLEN(type)                                             \
++	((type) == UDP_TUNNEL_GENEVE_4IN4 ? UDP_TUNNEL_GENEVE_4IN4_HDRLEN : \
++	 (type) == UDP_TUNNEL_GENEVE_6IN6 ? UDP_TUNNEL_GENEVE_6IN6_HDRLEN : \
++	 (type) == UDP_TUNNEL_GENEVE_4IN6 ? UDP_TUNNEL_GENEVE_4IN6_HDRLEN : \
++	 (type) == UDP_TUNNEL_GENEVE_6IN4 ? UDP_TUNNEL_GENEVE_6IN4_HDRLEN : \
++					    0)
 +
-+static struct in_addr param_ipaddr4_outer_src = {
-+	__constant_htonl(0xac100002),
-+};
++#define UDP_TUNNEL_MSS(type) (ETH_DATA_LEN - UDP_TUNNEL_HDRLEN(type))
++#define UDP_TUNNEL_MAX(type, is_tap) \
++	(ETH_MAX_MTU - UDP_TUNNEL_HDRLEN(type) - ((is_tap) ? ETH_HLEN : 0))
 +
-+static struct in_addr param_ipaddr4_inner_dst = {
-+	__constant_htonl(0xac100101),
-+};
-+
-+static struct in_addr param_ipaddr4_inner_src = {
-+	__constant_htonl(0xac100102),
-+};
-+
-+static struct in6_addr param_ipaddr6_outer_dst = {
-+	{ { 0x20, 0x02, 0x0d, 0xb8, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } },
-+};
-+
-+static struct in6_addr param_ipaddr6_outer_src = {
-+	{ { 0x20, 0x02, 0x0d, 0xb8, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 } },
-+};
-+
-+static struct in6_addr param_ipaddr6_inner_dst = {
-+	{ { 0x20, 0x02, 0x0d, 0xb8, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } },
-+};
-+
-+static struct in6_addr param_ipaddr6_inner_src = {
-+	{ { 0x20, 0x02, 0x0d, 0xb8, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 } },
-+};
-+
-+#define VN_ID 1
-+#define VN_PORT 4789
-+#define UDP_SRC_PORT 22
-+#define UDP_DST_PORT 48878
-+#define IPPREFIX_LEN 24
-+#define IP6PREFIX_LEN 64
-+#define TIMEOUT_SEC 10
-+#define TIMEOUT_USEC 100000
-+#define MAX_RETRIES 20
-+
-+#define UDP_TUNNEL_GENEVE_4IN4 0x01
-+#define UDP_TUNNEL_GENEVE_6IN4 0x02
-+#define UDP_TUNNEL_GENEVE_4IN6 0x04
-+#define UDP_TUNNEL_GENEVE_6IN6 0x08
-+
-+#define UDP_TUNNEL_OUTER_IPV4 (UDP_TUNNEL_GENEVE_4IN4 | UDP_TUNNEL_GENEVE_6IN4)
-+#define UDP_TUNNEL_INNER_IPV4 (UDP_TUNNEL_GENEVE_4IN4 | UDP_TUNNEL_GENEVE_4IN6)
-+
-+#define TUN_VNET_TNL_SIZE sizeof(struct virtio_net_hdr_v1_hash_tunnel)
-+
-+struct geneve_setup_config {
-+	int family;
-+	union {
-+		struct in_addr r4;
-+		struct in6_addr r6;
-+	} remote;
-+	__be32 vnid;
-+	__be16 vnport;
-+	unsigned char hwaddr[6];
-+	uint8_t csum;
-+};
-+
- static int tun_attach(int fd, char *dev)
+ #define TUN_VNET_TNL_SIZE sizeof(struct virtio_net_hdr_v1_hash_tunnel)
++#define MAX_VNET_TUNNEL_PACKET_SZ                                       \
++	(TUN_VNET_TNL_SIZE + ETH_HLEN + UDP_TUNNEL_GENEVE_6IN6_HDRLEN + \
++	 ETH_MAX_MTU)
+ 
+ struct geneve_setup_config {
+ 	int family;
+@@ -408,15 +435,23 @@ FIXTURE(tun_vnet_udptnl)
+ FIXTURE_VARIANT(tun_vnet_udptnl)
  {
- 	struct ifreq ifr;
-@@ -67,6 +141,202 @@ static int tun_delete(char *dev)
- 	return ip_link_del(dev);
+ 	int tunnel_type;
+-	bool is_tap;
++	int gso_size;
++	int data_size;
++	int r_num_mss;
++	bool is_tap, no_gso;
+ };
+ 
+ /* clang-format off */
+ #define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
+-	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##udptnl) {                 \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1mss) {                  \
++		/* send a single MSS: fall back to no GSO */                 \
+ 		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type),                            \
++		.data_size = UDP_TUNNEL_MSS(type),                           \
++		.r_num_mss = 1,                                              \
+ 		.is_tap = true,                                              \
+-	}
++		.no_gso = true,                                              \
++	};
+ /* clang-format on */
+ 
+ TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_GENEVE_4IN4, 4in4);
+@@ -544,14 +579,105 @@ FIXTURE_TEARDOWN(tun_vnet_udptnl)
+ 	EXPECT_EQ(ret, 0);
  }
  
-+static int tun_open(char *dev, const int flags, const int hdrlen,
-+		    const int features, const unsigned char *mac_addr)
-+{
-+	struct ifreq ifr = { 0 };
-+	int fd, sk = -1;
-+
-+	fd = open("/dev/net/tun", O_RDWR);
-+	if (fd < 0) {
-+		perror("open");
-+		return -1;
-+	}
-+
-+	ifr.ifr_flags = flags;
-+	if (ioctl(fd, TUNSETIFF, (void *)&ifr) < 0) {
-+		perror("ioctl(TUNSETIFF)");
-+		goto err;
-+	}
-+	strcpy(dev, ifr.ifr_name);
-+
-+	if (hdrlen > 0) {
-+		if (ioctl(fd, TUNSETVNETHDRSZ, &hdrlen) < 0) {
-+			perror("ioctl(TUNSETVNETHDRSZ)");
-+			goto err;
-+		}
-+	}
-+
-+	if (features) {
-+		if (ioctl(fd, TUNSETOFFLOAD, features) < 0) {
-+			perror("ioctl(TUNSETOFFLOAD)");
-+			goto err;
-+		}
-+	}
-+
-+	sk = socket(PF_INET, SOCK_DGRAM, 0);
-+	if (sk < 0) {
-+		perror("socket");
-+		goto err;
-+	}
-+
-+	if (ioctl(sk, SIOCGIFFLAGS, &ifr) < 0) {
-+		perror("ioctl(SIOCGIFFLAGS)");
-+		goto err;
-+	}
-+
-+	ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
-+	if (ioctl(sk, SIOCSIFFLAGS, &ifr) < 0) {
-+		perror("ioctl(SIOCSIFFLAGS)");
-+		goto err;
-+	}
-+
-+	if (mac_addr && flags & IFF_TAP) {
-+		ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
-+		memcpy(ifr.ifr_hwaddr.sa_data, mac_addr, ETH_ALEN);
-+
-+		if (ioctl(sk, SIOCSIFHWADDR, &ifr) < 0) {
-+			perror("ioctl(SIOCSIFHWADDR)");
-+			goto err;
-+		}
-+	}
-+
-+out:
-+	if (sk >= 0)
-+		close(sk);
-+	return fd;
-+
-+err:
-+	close(fd);
-+	fd = -1;
-+	goto out;
-+}
-+
-+static size_t sockaddr_len(int family)
-+{
-+	return (family == AF_INET) ? sizeof(struct sockaddr_in) :
-+				     sizeof(struct sockaddr_in6);
-+}
-+
-+static int geneve_fill_newlink(struct rt_link_newlink_req *req, void *data)
-+{
-+	struct geneve_setup_config *cfg = data;
-+
-+#define SET_GENEVE_REMOTE rt_link_newlink_req_set_linkinfo_data_geneve_remote
-+#define SET_GENEVE_REMOTE6 rt_link_newlink_req_set_linkinfo_data_geneve_remote6
-+
-+	rt_link_newlink_req_set_address(req, cfg->hwaddr, ETH_ALEN);
-+	rt_link_newlink_req_set_linkinfo_data_geneve_id(req, cfg->vnid);
-+	rt_link_newlink_req_set_linkinfo_data_geneve_port(req, cfg->vnport);
-+	rt_link_newlink_req_set_linkinfo_data_geneve_udp_csum(req, cfg->csum);
-+
-+	if (cfg->family == AF_INET)
-+		SET_GENEVE_REMOTE(req, cfg->remote.r4.s_addr);
-+	else
-+		SET_GENEVE_REMOTE6(req, &cfg->remote.r6,
-+				   sizeof(cfg->remote.r6));
-+
-+	return 0;
-+}
-+
-+static int geneve_create(const char *dev, int family, void *remote,
-+			 void *hwaddr)
-+{
-+	struct geneve_setup_config geneve;
-+
-+	memset(&geneve, 0, sizeof(geneve));
-+	geneve.vnid = VN_ID;
-+	geneve.vnport = htons(VN_PORT);
-+	geneve.csum = 1;
-+	geneve.family = family;
-+	if (family == AF_INET)
-+		memcpy(&geneve.remote.r4, remote, sizeof(struct in_addr));
-+	else
-+		memcpy(&geneve.remote.r6, remote, sizeof(struct in6_addr));
-+	memcpy(geneve.hwaddr, hwaddr, ETH_ALEN);
-+
-+	return ip_link_add(dev, "geneve", geneve_fill_newlink, (void *)&geneve);
-+}
-+
-+static int set_pmtu_discover(int fd, bool is_ipv4)
-+{
-+	int level, name, val;
-+
-+	if (is_ipv4) {
-+		level = SOL_IP;
-+		name = IP_MTU_DISCOVER;
-+		val = IP_PMTUDISC_DO;
-+	} else {
-+		level = SOL_IPV6;
-+		name = IPV6_MTU_DISCOVER;
-+		val = IPV6_PMTUDISC_DO;
-+	}
-+
-+	return setsockopt(fd, level, name, &val, sizeof(val));
-+}
-+
-+static int udp_socket_open(struct sockaddr_storage *ssa, bool do_frag,
-+			   bool do_connect, struct sockaddr_storage *dsa)
-+{
-+	struct timeval to = { .tv_sec = TIMEOUT_SEC };
-+	int fd, family = ssa->ss_family;
-+	int salen = sockaddr_len(family);
-+
-+	fd = socket(family, SOCK_DGRAM, 0);
-+	if (fd < 0)
-+		return -1;
-+
-+	if (bind(fd, (struct sockaddr *)ssa, salen) < 0) {
-+		perror("bind");
-+		goto err;
-+	}
-+
-+	if (do_connect && connect(fd, (struct sockaddr *)dsa, salen) < 0) {
-+		perror("connect");
-+		goto err;
-+	}
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &to, sizeof(to)) < 0) {
-+		perror("setsockopt(SO_RCVTIMEO)");
-+		goto err;
-+	}
-+
-+	if (!do_frag && set_pmtu_discover(fd, family == AF_INET) < 0) {
-+		perror("set_pmtu_discover");
-+		goto err;
-+	}
-+	return fd;
-+
-+err:
-+	close(fd);
-+	return -1;
-+}
-+
-+static void parse_route_rsp(struct rt_route_getroute_rsp *rsp, void *rtm_type)
-+{
-+	*(uint8_t *)rtm_type = rsp->_hdr.rtm_type;
-+}
-+
-+static int ip_route_check(const char *intf, int family, void *addr)
-+{
-+	uint8_t rtm_type, table = RT_TABLE_LOCAL;
-+	int retries = MAX_RETRIES;
-+
-+	while (retries-- > 0) {
-+		if (ip_route_get(intf, family, table, addr, parse_route_rsp,
-+				 &rtm_type) == 0 &&
-+		    rtm_type == RTN_LOCAL)
-+			break;
-+
-+		usleep(TIMEOUT_USEC);
-+	}
-+
-+	if (retries < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
- FIXTURE(tun)
+-TEST_F(tun_vnet_udptnl, basic)
++static int build_gso_packet_into_tun(const FIXTURE_VARIANT(tun_vnet_udptnl) *
++					     variant,
++				     uint8_t *buf)
  {
- 	char ifname[IFNAMSIZ];
-@@ -129,4 +399,159 @@ TEST_F(tun, reattach_close_delete)
- 	EXPECT_EQ(tun_delete(self->ifname), 0);
- }
- 
-+FIXTURE(tun_vnet_udptnl)
-+{
-+	char ifname[IFNAMSIZ];
-+	int fd, sock;
-+};
-+
-+FIXTURE_VARIANT(tun_vnet_udptnl)
-+{
-+	int tunnel_type;
-+	bool is_tap;
-+};
-+
-+/* clang-format off */
-+#define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##udptnl) {                 \
-+		.tunnel_type = type,                                         \
-+		.is_tap = true,                                              \
-+	}
-+/* clang-format on */
-+
-+TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_GENEVE_4IN4, 4in4);
-+TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_GENEVE_6IN4, 6in4);
-+TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_GENEVE_4IN6, 4in6);
-+TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_GENEVE_6IN6, 6in6);
-+
-+static void assign_ifaddr_vars(int family, int is_outer, void **srcip,
-+			       void **dstip, void **srcmac, void **dstmac)
-+{
-+	if (is_outer) {
-+		if (family == AF_INET) {
-+			*srcip = (void *)&param_ipaddr4_outer_src;
-+			*dstip = (void *)&param_ipaddr4_outer_dst;
-+		} else {
-+			*srcip = (void *)&param_ipaddr6_outer_src;
-+			*dstip = (void *)&param_ipaddr6_outer_dst;
-+		}
-+		*srcmac = param_hwaddr_outer_src;
-+		*dstmac = param_hwaddr_outer_dst;
-+	} else {
-+		if (family == AF_INET) {
-+			*srcip = (void *)&param_ipaddr4_inner_src;
-+			*dstip = (void *)&param_ipaddr4_inner_dst;
-+		} else {
-+			*srcip = (void *)&param_ipaddr6_inner_src;
-+			*dstip = (void *)&param_ipaddr6_inner_dst;
-+		}
-+		*srcmac = param_hwaddr_inner_src;
-+		*dstmac = param_hwaddr_inner_dst;
-+	}
-+}
-+
-+static void assign_sockaddr_vars(int family, int is_outer,
-+				 struct sockaddr_storage *src,
-+				 struct sockaddr_storage *dst)
-+{
-+	src->ss_family = family;
-+	dst->ss_family = family;
-+
-+	if (family == AF_INET) {
-+		struct sockaddr_in *s4 = (struct sockaddr_in *)src;
-+		struct sockaddr_in *d4 = (struct sockaddr_in *)dst;
-+
-+		s4->sin_addr = is_outer ? param_ipaddr4_outer_src :
-+					  param_ipaddr4_inner_src;
-+		d4->sin_addr = is_outer ? param_ipaddr4_outer_dst :
-+					  param_ipaddr4_inner_dst;
-+		if (!is_outer) {
-+			s4->sin_port = htons(UDP_SRC_PORT);
-+			d4->sin_port = htons(UDP_DST_PORT);
-+		}
-+	} else {
-+		struct sockaddr_in6 *s6 = (struct sockaddr_in6 *)src;
-+		struct sockaddr_in6 *d6 = (struct sockaddr_in6 *)dst;
-+
-+		s6->sin6_addr = is_outer ? param_ipaddr6_outer_src :
-+					   param_ipaddr6_inner_src;
-+		d6->sin6_addr = is_outer ? param_ipaddr6_outer_dst :
-+					   param_ipaddr6_inner_dst;
-+		if (!is_outer) {
-+			s6->sin6_port = htons(UDP_SRC_PORT);
-+			d6->sin6_port = htons(UDP_DST_PORT);
-+		}
-+	}
-+}
-+
-+FIXTURE_SETUP(tun_vnet_udptnl)
-+{
-+	int ret, family, prefix, flags, features;
+-	int ret;
+-	char cmd[256] = { 0 };
++	int pktlen, hlen, proto, inner_family, outer_family;
 +	int tunnel_type = variant->tunnel_type;
-+	struct sockaddr_storage ssa, dsa;
++	int payload_len = variant->data_size;
++	int gso_size = variant->gso_size;
++	uint8_t *outer_udph, *cur = buf;
 +	void *sip, *dip, *smac, *dmac;
++	bool is_tap = variant->is_tap;
+ 
+-	sprintf(cmd, "ip addr show %s > /dev/null 2>&1", param_dev_geneve_name);
+-	ret = system(cmd);
+-	ASSERT_EQ(ret, 0);
++	hlen = (is_tap ? ETH_HLEN : 0) + UDP_TUNNEL_HDRLEN(tunnel_type);
++	inner_family = (tunnel_type & UDP_TUNNEL_INNER_IPV4) ? AF_INET :
++							       AF_INET6;
++	outer_family = (tunnel_type & UDP_TUNNEL_OUTER_IPV4) ? AF_INET :
++							       AF_INET6;
 +
-+	flags = (variant->is_tap ? IFF_TAP : IFF_TUN) | IFF_VNET_HDR |
-+		IFF_MULTI_QUEUE | IFF_NO_PI;
-+	features = TUN_F_CSUM | TUN_F_UDP_TUNNEL_GSO |
-+		   TUN_F_UDP_TUNNEL_GSO_CSUM | TUN_F_USO4 | TUN_F_USO6;
-+	self->fd = tun_open(self->ifname, flags, TUN_VNET_TNL_SIZE, features,
-+			    param_hwaddr_outer_src);
-+	ASSERT_GE(self->fd, 0);
++	cur += build_virtio_net_hdr_v1_hash_tunnel(cur, is_tap, hlen, gso_size,
++						   outer_family, inner_family);
 +
-+	family = (tunnel_type & UDP_TUNNEL_OUTER_IPV4) ? AF_INET : AF_INET6;
-+	prefix = (family == AF_INET) ? IPPREFIX_LEN : IP6PREFIX_LEN;
-+	assign_ifaddr_vars(family, 1, &sip, &dip, &smac, &dmac);
++	pktlen = hlen + payload_len;
++	assign_ifaddr_vars(outer_family, 1, &sip, &dip, &smac, &dmac);
 +
-+	ret = ip_addr_add(self->ifname, family, sip, prefix);
-+	ASSERT_EQ(ret, 0);
-+	ret = ip_neigh_add(self->ifname, family, dip, dmac);
-+	ASSERT_EQ(ret, 0);
-+	ret = ip_route_check(self->ifname, family, sip);
-+	ASSERT_EQ(ret, 0);
++	if (is_tap) {
++		proto = outer_family == AF_INET ? ETH_P_IP : ETH_P_IPV6;
++		pktlen -= ETH_HLEN;
++		cur += build_eth(cur, proto, dmac, smac);
++	}
 +
-+	ret = geneve_create(param_dev_geneve_name, family, dip,
-+			    param_hwaddr_inner_src);
-+	ASSERT_EQ(ret, 0);
++	if (outer_family == AF_INET) {
++		pktlen = pktlen - sizeof(struct iphdr);
++		cur += build_ipv4_header(cur, IPPROTO_UDP, pktlen, dip, sip);
++	} else {
++		pktlen = pktlen - sizeof(struct ipv6hdr);
++		cur += build_ipv6_header(cur, IPPROTO_UDP, 0, pktlen, dip, sip);
++	}
 +
-+	family = (tunnel_type & UDP_TUNNEL_INNER_IPV4) ? AF_INET : AF_INET6;
-+	prefix = (family == AF_INET) ? IPPREFIX_LEN : IP6PREFIX_LEN;
-+	assign_ifaddr_vars(family, 0, &sip, &dip, &smac, &dmac);
++	outer_udph = cur;
++	assign_ifaddr_vars(inner_family, 0, &sip, &dip, &smac, &dmac);
 +
-+	ret = ip_addr_add(param_dev_geneve_name, family, sip, prefix);
-+	ASSERT_EQ(ret, 0);
-+	ret = ip_neigh_add(param_dev_geneve_name, family, dip, dmac);
-+	ASSERT_EQ(ret, 0);
-+	ret = ip_route_check(param_dev_geneve_name, family, sip);
-+	ASSERT_EQ(ret, 0);
++	pktlen -= sizeof(struct udphdr);
++	proto = inner_family == AF_INET ? ETH_P_IP : ETH_P_IPV6;
++	cur += build_udp_header(cur, UDP_SRC_PORT, VN_PORT, pktlen);
++	cur += build_geneve_header(cur, VN_ID);
++	cur += build_eth(cur, proto, dmac, smac);
 +
-+	assign_sockaddr_vars(family, 0, &ssa, &dsa);
-+	self->sock = udp_socket_open(&ssa, false, true, &dsa);
-+	ASSERT_GE(self->sock, 0);
++	pktlen = sizeof(struct udphdr) + payload_len;
++	if (inner_family == AF_INET)
++		cur += build_ipv4_header(cur, IPPROTO_UDP, pktlen, dip, sip);
++	else
++		cur += build_ipv6_header(cur, IPPROTO_UDP, 0, pktlen, dip, sip);
++
++	cur += build_udp_packet(cur, UDP_DST_PORT, UDP_SRC_PORT, payload_len,
++				inner_family, false);
++
++	build_udp_packet_csum(outer_udph, outer_family, false);
++
++	return cur - buf;
 +}
 +
-+FIXTURE_TEARDOWN(tun_vnet_udptnl)
++static int
++receive_gso_packet_from_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
++			       const FIXTURE_VARIANT(tun_vnet_udptnl) * variant,
++			       int *r_num_mss)
 +{
-+	int ret;
++	uint8_t packet_buf[MAX_VNET_TUNNEL_PACKET_SZ];
++	int len, total_len = 0, socket = self->sock;
++	int payload_len = variant->data_size;
 +
-+	if (self->sock != -1)
-+		close(self->sock);
++	while (total_len < payload_len) {
++		len = recv(socket, packet_buf, sizeof(packet_buf), 0);
++		if (len <= 0) {
++			if (len < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
++				perror("recv");
++			break;
++		}
 +
-+	ret = ip_link_del(param_dev_geneve_name);
-+	EXPECT_EQ(ret, 0);
++		(*r_num_mss)++;
++		total_len += len;
++	}
 +
-+	ret = tun_delete(self->ifname);
-+	EXPECT_EQ(ret, 0);
++	return total_len;
 +}
 +
-+TEST_F(tun_vnet_udptnl, basic)
++TEST_F(tun_vnet_udptnl, send_gso_packet)
 +{
-+	int ret;
-+	char cmd[256] = { 0 };
++	uint8_t pkt[MAX_VNET_TUNNEL_PACKET_SZ];
++	int r_num_mss = 0;
++	int ret, off;
 +
-+	sprintf(cmd, "ip addr show %s > /dev/null 2>&1", param_dev_geneve_name);
-+	ret = system(cmd);
-+	ASSERT_EQ(ret, 0);
-+}
++	memset(pkt, 0, sizeof(pkt));
++	off = build_gso_packet_into_tun(variant, pkt);
++	ret = write(self->fd, pkt, off);
++	ASSERT_EQ(ret, off);
 +
++	ret = receive_gso_packet_from_tunnel(self, variant, &r_num_mss);
++	ASSERT_EQ(ret, variant->data_size);
++	ASSERT_EQ(r_num_mss, variant->r_num_mss);
+ }
+ 
  TEST_HARNESS_MAIN
 -- 
 2.52.0
