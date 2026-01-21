@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-251982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251983-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cH44Gs4UcWkEdgAAu9opvQ
-	(envelope-from <netdev+bounces-251982-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:02:54 +0100
+	id mOsNLV8LcWmPcQAAu9opvQ
+	(envelope-from <netdev+bounces-251983-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:22:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B36D5AF2A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:02:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22EDB5A767
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:22:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA8F7B0EDF0
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:16:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C2B8B0F7A1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855AD43D4E5;
-	Wed, 21 Jan 2026 16:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA871358D2A;
+	Wed, 21 Jan 2026 16:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSLcvp1q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vb8v5CXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F85F2EFDBB
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2050244105A
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769011962; cv=none; b=jbE9GKPBRHFl9rUwe2V3s6TWNc3x9Ekl8rjK4ud1aFc2HjCK9BkgCXQ8G4rf1DAivS2kqFvi+xHTrtd25Kfadz8WGyhdHRFmiWGW6raiL0wz2VLPcg5nSvkX+V+c80UC7VFcgMjtYmYtLoCZZQeyRgSx12KVa9BtH/SRsrJfSAo=
+	t=1769011964; cv=none; b=U5kMuBA+AMb/OO5uCFcn+ujM2p17pUO+dX6dibZnp/+wuArDVN9X4TDISAxkVcaVPU0/S5s0E7qJ6e6z8bxH05AmEVRZ0nWaAS+5nmEJ70N+sg/RSQgIN8CNenZ3p9/Ed/fMRshJiM5qVEgUSd97494O17/U0qE9g0Cf4HrsP9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769011962; c=relaxed/simple;
-	bh=6M3g81YZSfLYzX5ZTZqxxy74rnPlNJmmTzRr6My2emQ=;
+	s=arc-20240116; t=1769011964; c=relaxed/simple;
+	bh=32gyJBTof7beOS7A0kGCqGT+eOw5nhUEBLKXw1rh+l4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LoiOspp+2c45MvptGt6/AgovZo7jdBnAHlXcZTGhrPm1RgqzGo5Ga88Hu9FX9fBcU4F6zwZ9pX2buE10sX6U/1fwGd9w9Rdiry35hvONH9AYIsLtd95ICsIcNXwMBhBnnlxo+uLtkGxojW9ZgmXhq1KjZAIz4Ai7wsoNG+tdEvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PSLcvp1q; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=WWncmBJ4yX05mSyj4AXFLGD7QRaq695P+RE/sw8qSs1HnIuJKOiaiu+xcoHFmeXOa6YmRDOIV9L5YT8LOWRy0kiaUkKFvx45YinHvnWUG9qfS9LJGB23QHAUeoQS6PhXc4vgHOqwIAmfvGjjNtgOd5yiAY4wAGoHTGhJ3bCzIvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vb8v5CXy; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769011959;
+	s=mimecast20190719; t=1769011962;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tSPU8K2vTOlyXbF9JdKeyVsBUzEeyiygD9NQ70hDYdA=;
-	b=PSLcvp1q+gN6E+NPVApBQHczHOfn2hdCm/ncnGIO5Rh/v+Bw61VvNgSngIiwYm0AyUdJL5
-	ssIlx6+ku3PkShhzrQru/s1KeGErsBTZD9jWt0cwG3j2/++fJhkzw95evsqsXG+1+Xp5QE
-	iceH4a9CETTTcITDrqvqys2Xhj3rMTc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=lzQPChliMgYZWy9bavBhufvwhif7bSLIs3dECz5HYaM=;
+	b=Vb8v5CXywuyA2DLOgIeVUz/XikwIeVCSzpZCi0mDxWubHieGDfvrR+p7g4PiDwohABoCQ7
+	aA/OgoO0t333NdZgsz9AzhkPwc67l6W9/k9mw6QXYjYodxsYqgD9VKaB3keTBjNnEeVknb
+	/ZKHXVAUvpcAqNeCtFrGZUsinTj61ng=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-bqZBSJNMMJKEPN8INS1UDg-1; Wed,
- 21 Jan 2026 11:12:33 -0500
-X-MC-Unique: bqZBSJNMMJKEPN8INS1UDg-1
-X-Mimecast-MFC-AGG-ID: bqZBSJNMMJKEPN8INS1UDg_1769011951
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-395-TBzajgghNQuQy3V1dXDlGg-1; Wed,
+ 21 Jan 2026 11:12:38 -0500
+X-MC-Unique: TBzajgghNQuQy3V1dXDlGg-1
+X-Mimecast-MFC-AGG-ID: TBzajgghNQuQy3V1dXDlGg_1769011954
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C0061955D42;
-	Wed, 21 Jan 2026 16:12:28 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9E34180058C;
+	Wed, 21 Jan 2026 16:12:32 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.225.3])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9E5DA18001D5;
-	Wed, 21 Jan 2026 16:12:24 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F0A6418001D5;
+	Wed, 21 Jan 2026 16:12:28 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -76,9 +76,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	petrm@nvidia.com,
 	razor@blackwall.org,
 	idosch@nvidia.com
-Subject: [PATCH v5 net-next 04/10] geneve: add netlink support for GRO hint
-Date: Wed, 21 Jan 2026 17:11:30 +0100
-Message-ID: <2295d4e4d1e919a3189425141bbc71c7850a2de0.1769011015.git.pabeni@redhat.com>
+Subject: [PATCH v5 net-next 05/10] geneve: constify geneve_hlen()
+Date: Wed, 21 Jan 2026 17:11:31 +0100
+Message-ID: <ea9e279b9544e8644194508dd9a4320ee455fa95.1769011015.git.pabeni@redhat.com>
 In-Reply-To: <cover.1769011015.git.pabeni@redhat.com>
 References: <cover.1769011015.git.pabeni@redhat.com>
 Precedence: bulk
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251982-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251983-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -113,164 +113,53 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TO_DN_SOME(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 1B36D5AF2A
+X-Rspamd-Queue-Id: 22EDB5A767
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Allow configuring and dumping the new device option, and cache its value
-into the geneve socket itself.
-The new option is not tie to it any code yet.
+Such helper does not modify the argument; constifying it will additionally
+simplify later patches.
+
+Additionally move the definition earlier, still for later's patchesi sake.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v1 -> v2:
-  - use nla_put_flag() to dump the GRO_HINT nl info
----
- Documentation/netlink/specs/rt-link.yaml |  3 +++
- drivers/net/geneve.c                     | 29 ++++++++++++++++++++----
- include/uapi/linux/if_link.h             |  1 +
- 3 files changed, 29 insertions(+), 4 deletions(-)
+ drivers/net/geneve.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index 6beeb6ee5adf..df4b56beb818 100644
---- a/Documentation/netlink/specs/rt-link.yaml
-+++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -1914,6 +1914,9 @@ attribute-sets:
-         name: port-range
-         type: binary
-         struct: ifla-geneve-port-range
-+      -
-+        name: gro-hint
-+        type: flag
-   -
-     name: linkinfo-hsr-attrs
-     name-prefix: ifla-hsr-
 diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 64ea4b970376..8719ad66837e 100644
+index 8719ad66837e..e99fa8c37486 100644
 --- a/drivers/net/geneve.c
 +++ b/drivers/net/geneve.c
-@@ -56,6 +56,7 @@ struct geneve_config {
- 	bool			collect_md;
- 	bool			use_udp6_rx_checksums;
- 	bool			ttl_inherit;
-+	bool			gro_hint;
- 	enum ifla_geneve_df	df;
- 	bool			inner_proto_inherit;
- 	u16			port_min;
-@@ -84,6 +85,7 @@ struct geneve_dev {
- 
- struct geneve_sock {
- 	bool			collect_md;
-+	bool			gro_hint;
- 	struct list_head	list;
- 	struct socket		*sock;
- 	struct rcu_head		rcu;
-@@ -659,13 +661,15 @@ static void geneve_sock_release(struct geneve_dev *geneve)
- 
- static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
- 					    sa_family_t family,
--					    __be16 dst_port)
-+					    __be16 dst_port,
-+					    bool gro_hint)
- {
- 	struct geneve_sock *gs;
- 
- 	list_for_each_entry(gs, &gn->sock_list, list) {
- 		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
--		    geneve_get_sk_family(gs) == family) {
-+		    geneve_get_sk_family(gs) == family &&
-+		    gs->gro_hint == gro_hint) {
- 			return gs;
- 		}
- 	}
-@@ -676,12 +680,14 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
- {
- 	struct net *net = geneve->net;
- 	struct geneve_net *gn = net_generic(net, geneve_net_id);
-+	bool gro_hint = geneve->cfg.gro_hint;
- 	struct geneve_dev_node *node;
- 	struct geneve_sock *gs;
- 	__u8 vni[3];
- 	__u32 hash;
- 
--	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst);
-+	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET,
-+			      geneve->cfg.info.key.tp_dst, gro_hint);
- 	if (gs) {
- 		gs->refcnt++;
- 		goto out;
-@@ -694,6 +700,7 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
- 
- out:
- 	gs->collect_md = geneve->cfg.collect_md;
-+	gs->gro_hint = gro_hint;
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (ipv6) {
- 		rcu_assign_pointer(geneve->sock6, gs);
-@@ -1257,6 +1264,7 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
- 	[IFLA_GENEVE_DF]		= { .type = NLA_U8 },
- 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
- 	[IFLA_GENEVE_PORT_RANGE]	= NLA_POLICY_EXACT_LEN(sizeof(struct ifla_geneve_port_range)),
-+	[IFLA_GENEVE_GRO_HINT]		= { .type = NLA_FLAG },
- };
- 
- static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -1607,10 +1615,18 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- 		cfg->inner_proto_inherit = true;
- 	}
- 
-+	if (data[IFLA_GENEVE_GRO_HINT]) {
-+		if (changelink) {
-+			attrtype = IFLA_GENEVE_GRO_HINT;
-+			goto change_notsup;
-+		}
-+		cfg->gro_hint = true;
-+	}
-+
- 	return 0;
- change_notsup:
- 	NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
--			    "Changing VNI, Port, endpoint IP address family, external, inner_proto_inherit, and UDP checksum attributes are not supported");
-+			    "Changing VNI, Port, endpoint IP address family, external, inner_proto_inherit, gro_hint and UDP checksum attributes are not supported");
- 	return -EOPNOTSUPP;
+@@ -365,6 +365,11 @@ static void geneve_uninit(struct net_device *dev)
+ 	gro_cells_destroy(&geneve->gro_cells);
  }
  
-@@ -1793,6 +1809,7 @@ static size_t geneve_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT */
- 		nla_total_size(0) +	 /* IFLA_GENEVE_INNER_PROTO_INHERIT */
- 		nla_total_size(sizeof(struct ifla_geneve_port_range)) + /* IFLA_GENEVE_PORT_RANGE */
-+		nla_total_size(0) +	 /* IFLA_GENEVE_GRO_HINT */
- 		0;
++static int geneve_hlen(const struct genevehdr *gh)
++{
++	return sizeof(*gh) + gh->opt_len * 4;
++}
++
+ /* Callback from net/ipv4/udp.c to receive packets */
+ static int geneve_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ {
+@@ -497,11 +502,6 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
+ 	return sock;
  }
  
-@@ -1865,6 +1882,10 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 	if (nla_put(skb, IFLA_GENEVE_PORT_RANGE, sizeof(ports), &ports))
- 		goto nla_put_failure;
- 
-+	if (geneve->cfg.gro_hint &&
-+	    nla_put_flag(skb, IFLA_GENEVE_GRO_HINT))
-+		goto nla_put_failure;
-+
- 	return 0;
- 
- nla_put_failure:
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 3b491d96e52e..e9b5f79e1ee1 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1443,6 +1443,7 @@ enum {
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
- 	IFLA_GENEVE_PORT_RANGE,
-+	IFLA_GENEVE_GRO_HINT,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
+-static int geneve_hlen(struct genevehdr *gh)
+-{
+-	return sizeof(*gh) + gh->opt_len * 4;
+-}
+-
+ static struct sk_buff *geneve_gro_receive(struct sock *sk,
+ 					  struct list_head *head,
+ 					  struct sk_buff *skb)
 -- 
 2.52.0
 
