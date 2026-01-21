@@ -1,176 +1,185 @@
-Return-Path: <netdev+bounces-251901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cK2jNCzicGkhawAAu9opvQ
-	(envelope-from <netdev+bounces-251901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:26:52 +0100
+	id GEChBqblcGk+awAAu9opvQ
+	(envelope-from <netdev+bounces-251902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:41:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3F05866C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:26:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED51588F7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:41:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 71B3B666F69
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:46:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AAB81A43ED6
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97806346FC6;
-	Wed, 21 Jan 2026 13:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960724949EE;
+	Wed, 21 Jan 2026 13:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5b+lJUiF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jUU72z7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5562030FC1F;
-	Wed, 21 Jan 2026 13:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769003165; cv=none; b=b/66lrxzmwu2sQKlJ5XaF1MaP+LqGZ/3GpZwH59o6vu+zoGhi71cOM5vutS+voREsiUEtmSEtpj/rNFwm0l9vBJYWeKnBMFC6T+HQWbQ1EtvFwA2wwjl41OlH2YejMF2k8njurovIaPgqy4YvcTNaoFb7kOSb8Ekl8YJ2IRlN60=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769003165; c=relaxed/simple;
-	bh=TNCu1diURZVRHV/wlAOkTYXVb/7LpU8vSsy5ih5Ik6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qcpt/l6t+SpzcKBl2gotUacuiq2Lx/a1JovJotL5teh8j3aqkCGdG7eiVADQCZDSqHpuJG2nmouSknHYjCXUGpUYlwXFJq0t4H0H5rbRMOeTvD65eSWUg7cmmZDE1dnkTCgYJGXGjHwrHsNDJnrFgdimNnKG92hM8gM2GOmPVg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5b+lJUiF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GA0E+2lExoLTrBoxDpukALnUWndmDpxiv7DFZKJpltk=; b=5b+lJUiFPwVO4dTWd/qFReIVHI
-	7f99yyhyqXgdhUMCdDHEPQCqc1MLMgQKanORtkFU4U6RCDNpUqvSXjBSwcTdCc7xJv69ahZoiVGVN
-	k8+LEDN5Wjx8rpjwbhFUTfrwdpdMpHdB3asxlQfgxxUCsjamsFoUEg21HcN8Scc4H/oo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1viYWS-003p7S-MM; Wed, 21 Jan 2026 14:45:24 +0100
-Date: Wed, 21 Jan 2026 14:45:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Inochi Amaoto <inochiama@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Yao Zi <ziyao@disroot.org>,
-	Yanteng Si <siyanteng@cqsoftware.com.cn>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Shangjuan Wei <weishangjuan@eswincomputing.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Quentin Schulz <quentin.schulz@cherry.de>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add glue layer for Spacemit
- K3 SoC
-Message-ID: <73bf2977-ad1a-45fa-9b06-5df083c060a8@lunn.ch>
-References: <20260121071315.940130-1-inochiama@gmail.com>
- <20260121071315.940130-4-inochiama@gmail.com>
- <aXDBCsfaNrgfGjNK@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05C24949E0
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769003332; cv=pass; b=ibePCgQRJJ4L6GY7X9xwm7M7w7O3twLGZA2IZ3zMjauBb+nJ1ilPokiOhju4bd8zun2rIwddcgmGX5oaJEyPKsBClpQI+eGoxvmFxVqtFfAamWQK6UXHn9GD20qhfOxp0rRK9N4eCQ4UlT29VC4M6j392ICxyCSIBAgo4EkDki0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769003332; c=relaxed/simple;
+	bh=cP7+lodeQJW67tiROuU4iCdrxhUkaMFq+EWtWSOxqhs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kBiV0C79OhIqhwrpczl/3/bMFvH0a0t9G5V2UqJaAx+OSDDdfZqI3yQsq5JQVGuIiD9eiOKUK+SVVU8y24SoVD1ofgLc42lqp5owumX6Y9Bflh020U+I/M93ghRc2Qa3Y7PJr01SVI14zSRl+OwEzchAdCDo1B+/pwfXKZ7xPjE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jUU72z7Y; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5013d163e2fso66267701cf.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 05:48:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769003329; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Zq6OHbKvjVx+js4BDUB6aFi8zhLyj0R746SzfFlnWMAC+diGT1Ixk2oYxGcLv4Svf1
+         5X4IaUR/BYI5RLn1LpnLk2f/CWMM4El/bfyud94XqEupTm+RNJ20huxREDLAUllDT6In
+         AMv7XjbyeR5eXNl+mtqM8HcqtT1JM5m8hV9zeQfb6xyFnrG/OywCLGLyCtSlpf1b/Bsr
+         A+0pw/VKbTuyMuv6ANvBpL5WmVLX3BJVu09uGMJdkd48yqvBT5K8i3HrEWDPXWeuAqd/
+         Hfx0ZYaPvgYiUll4ZLyTVXyUu2lrwZiPixV0x1J1tpKeqwFAid9q+WfHcFcN5xBKz6dU
+         l1ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cP7+lodeQJW67tiROuU4iCdrxhUkaMFq+EWtWSOxqhs=;
+        fh=IpzcrSmtkeKabWHPYZDrW9m2DQN4Y9K54CPvV9TpZ90=;
+        b=D0nlMgX4W/PQLzSkJSAozY6mNkERBzNNYaS7Umqnohe7esixemn3xcuuycrWxJeWWG
+         tTLIyHpzem8BImEv69Eb52k+8FUUXPFCY+CUjD7slLbKK/0i2/ADgbUmgzY3DeKTn3jA
+         K8PhD1XIYtOcawjuKc6R02O24LL6FF+kzgQLIpqw1UIdE0aHJTcXWNHOMyQUIry5me8J
+         F6kXgillyO1Oa//1DFGTgZo4U7LFKfe1FQej3LcU8rzsbK6bPHik0Tzkuq6j3ZpIhlN1
+         0ud3qRFzFvYodJmhIyo/zNjy9F1l0cijPdFXWtvPOFhwyNN44UimV19KAZ7h5jhykpn5
+         /6WA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769003329; x=1769608129; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cP7+lodeQJW67tiROuU4iCdrxhUkaMFq+EWtWSOxqhs=;
+        b=jUU72z7YCEOCM9xWJ2XbVh3EiIW1784rDdoT76xjfSYFNyP76lTfW01kQ3H+GqW2+5
+         /MRW+mdG5xOlvuKlFUyfRvFazbVT4K1Rn9NW/baH7V0kk6Qubc/PtkCJtIu7PYo0WDV8
+         WnoCSg3glYDaSlpF8P9ZldT/fKVz98Eas9UBYxVKUQHFVyeso/b8nV9YIIOVrh6d1t+R
+         e3ZsdJVipteGdcHEUDUq9u5HtWUQY8vB9CRY2sbGzCiAAHted5GJ+Z9eV2epMzKZTwRq
+         tiUtpU6nwEba9hdOmkvm1A0Df+0QoNJQVnEHaChjMUSQXcJVF4DH40z8COSC8ofPDIPr
+         6DkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769003329; x=1769608129;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cP7+lodeQJW67tiROuU4iCdrxhUkaMFq+EWtWSOxqhs=;
+        b=nsPWJoiFXoBVk/tmkneHBqQGTzQCySxYltqTkZU7JxZAmg4Us3aLjMwhKIJXM2tidz
+         eeWINEuzEPYDiY8Rw8jfIjky5aThNIClyQzj3dWgFRcwrJG0xDn1oESMYTYMgY2MJ32Y
+         qmReLdPKYUqxs0UQhdpNcfxeoMKYYyvWcHzuGgJ2YgxWRnTf/tipAadxKzSceQMMDbNH
+         0EBVjLOtRchKhpETbLyi0vtOjI6DIWxINIks4I/uWj8EFIP4uOnUfXeBJwx7yuzwyago
+         Nhzt+yx56GxZgErUxq8jWTukFqxLgbebjkgNgdUr8Jf+ZYwtpbLAU7ZrwEF7sp8KfpNd
+         5uVA==
+X-Gm-Message-State: AOJu0YxTwAQ9moyoabCDjKR5YB4C/rmaY5ziVYPxahK91dIOjrvvEf3D
+	KbGCGdoQx/FSw9RB1nSJyei9U7BdKB5gU5Q9hOnphkdKEj0EYsmVeEFcuOlbyChcrRrDe6Kgzmh
+	nKZ8TR1TErwYw1CTqULPIhhH3G99d2ZgNxovWV68Ts9GeeSAOtVp6JxM189Y=
+X-Gm-Gg: AZuq6aLkgcv62hcmrnzTzgU145OSabKLl6q//XhhKvQdNaeGtnuuDejhZNMHCcIEMi4
+	3xt1MgmAGdx+YETp1/KSpeQvu3CT6SCdhEnOjlhyU73qkjY+q8giVYA6YFLc2sTxQ0qCeEcsXDd
+	KdVu7qw5PsT6/vcABsusNMdzT8J8NoQqYdJmhFhxqtOKqVPJ8ok0I9JMO1hc4LF7waBovs3Sih2
+	87Vw6YUnH1Rc1kPEwNIJY2jGLKzjGmmw1xP7xoQngpehAqJEmswBuN4yH3gL46GHMOs2JglJbxw
+	Z0EyLA==
+X-Received: by 2002:a05:622a:1a9b:b0:4f0:2afc:3b80 with SMTP id
+ d75a77b69052e-502a1f32911mr243056121cf.56.1769003329341; Wed, 21 Jan 2026
+ 05:48:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXDBCsfaNrgfGjNK@shell.armlinux.org.uk>
+References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-2-p@1g4.org>
+ <CANn89i+8_ZDxVGwQmo_44iCRs5Wexwxy1Wfhw4WmYg3qA7_t1A@mail.gmail.com> <BSn2a6IWtM_DnDrcd-qDBm8cXAwXPo3xj1l4Eu4SWy3BS2UW8Aw7-gXW6uo_DaCipnvmSxgDeGEQrnZ-pjqRKSOPPUW0usVN8M1lp1J-soM=@1g4.org>
+In-Reply-To: <BSn2a6IWtM_DnDrcd-qDBm8cXAwXPo3xj1l4Eu4SWy3BS2UW8Aw7-gXW6uo_DaCipnvmSxgDeGEQrnZ-pjqRKSOPPUW0usVN8M1lp1J-soM=@1g4.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 21 Jan 2026 14:48:37 +0100
+X-Gm-Features: AZwV_QjfkzxcsqX79MNZYV42WjEJav4hyCpBb914c2qgdnj1wjV5tfKlXRSh1Pw
+Message-ID: <CANn89iK_VqOThsWX2b-JwvF8suBVmKEmMm9D9SeZJBamDwfPog@mail.gmail.com>
+Subject: Re: [PATCH net v3 1/7] net/sched: act_gate: zero-initialize netlink
+ dump struct
+To: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251901-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gentoo.org,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,disroot.org,cqsoftware.com.cn,nxp.com,bp.renesas.com,linux.intel.com,eswincomputing.com,altera.com,bootlin.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com];
-	RCPT_COUNT_TWELVE(0.00)[39];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[lunn.ch,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251902-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	DKIM_TRACE(0.00)[google.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 7E3F05866C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mail.gmail.com:mid,cppreference.com:url,1g4.org:email]
+X-Rspamd-Queue-Id: 7ED51588F7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 12:05:30PM +0000, Russell King (Oracle) wrote:
-> On Wed, Jan 21, 2026 at 03:13:11PM +0800, Inochi Amaoto wrote:
-> > +	mask = RGMII_RX_DLINE_STEP | RGMII_TX_DLINE_CODE | RGMII_TX_DLINE_EN |
-> > +	       RGMII_TX_DLINE_STEP | RGMII_RX_DLINE_CODE | RGMII_RX_DLINE_EN;
-> > +	val = FIELD_PREP(RGMII_TX_DLINE_STEP, tx_config) |
-> > +	      FIELD_PREP(RGMII_TX_DLINE_CODE, tx_code) | RGMII_TX_DLINE_EN |
-> > +	      FIELD_PREP(RGMII_RX_DLINE_STEP, rx_config) |
-> > +	      FIELD_PREP(RGMII_RX_DLINE_CODE, rx_code) | RGMII_RX_DLINE_EN;
-> 
-> So your reply where you basically stated that all the RGMII.*DLINE.*
-> constants here should be the same was nonsense. How can we trust your
-> replies?
-> 
-> > +static int spacemit_dwmac_fix_delay(struct plat_stmmacenet_data *plat_dat,
-> > +				    struct regmap *apmu,
-> > +				    unsigned int dline_offset,
-> > +				    unsigned int tx_delay, unsigned int rx_delay)
-> > +{
-> > +	bool mac_rxid = rx_delay != 0;
-> > +	bool mac_txid = tx_delay != 0;
-> > +	unsigned int rx_config = 0;
-> > +	unsigned int tx_config = 0;
-> > +	int rx_code;
-> > +	int tx_code;
-> > +
-> > +	plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
-> > +								  mac_txid,
-> > +								  mac_rxid);
-> 
-> Maybe Andrew can confirm, but this function was to fix up existing
-> broken DT, and shouldn't be used by brand new drivers.
+On Wed, Jan 21, 2026 at 2:39=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
+>
+> Yes, it's not proven so you might be right, I knew it was 4 bytes at best=
+. We can do next or toss it, I don't feel strongly either way.
+>
 
-Hi Russell, thanks for pointing this out.
+These bytes are cleared by C compilers.
 
-This function should not be used in this case. MAC drivers in general
-only add small delays, in order to do fine tuning. The PHY adds the
-2ns delay. There are however some MACs who cannot disable their 2ns
-delay, or have historically been broken, and add 2ns delay. In such
-cases, the phy_interface passed to the PHY needs masking, to indicate
-the PHY should not add the 2ns delays. That is what this function
-does.
+https://en.cppreference.com/w/c/language/struct_initialization.html
 
-Please don't call it. Pass phy_interface as is to the PHY.
+Only holes might be left uninitialized.
 
-       Andrew
+> On Wednesday, January 21st, 2026 at 7:25 AM, Eric Dumazet <edumazet@googl=
+e.com> wrote:
+>
+> >
+> >
+> > On Wed, Jan 21, 2026 at 2:20=E2=80=AFPM Paul Moses p@1g4.org wrote:
+> >
+> > > Zero-initialize the dump struct before selective assignment to avoid
+> > > leaking stack padding in netlink replies. This matches other actions
+> > > (e.g. act_connmark) that zero-init their dump structs.
+> > >
+> > > Fixes: a51c328df310 ("net: qos: introduce a gate control flow action"=
+)
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Paul Moses p@1g4.org
+> > > ---
+> >
+> >
+> > I do not see a bug to fix, current code is fine.
+> >
+> > act_connmark problem was that "struct tc_connmark" had a 16bit hole.
+> >
+> > No such issue for struct tc_gate.
 
