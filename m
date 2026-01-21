@@ -1,55 +1,90 @@
-Return-Path: <netdev+bounces-251733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251734-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFOILZU/cGnXXAAAu9opvQ
-	(envelope-from <netdev+bounces-251733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:53:09 +0100
+	id iGTXDhRAcGnXXAAAu9opvQ
+	(envelope-from <netdev+bounces-251734-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:55:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6240E500D4
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:53:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7A050152
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4DCD74AFF1E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:50:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 98115A4015F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782973563E0;
-	Wed, 21 Jan 2026 02:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567A1347FE6;
+	Wed, 21 Jan 2026 02:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RtwFYmds"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A428TEJc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B72356A01
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 02:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927F9271A9A;
+	Wed, 21 Jan 2026 02:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768963814; cv=none; b=ju4AmUKb0a4wRBzR2eECo8HffZ8ougL18h7eqlXvccCbccLmMY/1Bpcxis7cnAY4wSxTE72XpZaI3aMKwPqPCkw+r99BRc6gkkhzCC6V9tjmWEiClkui2blrWFUJ7iiqDJqxdDzXcRRSCmOcWfVMa2aQRoVnHZOq6cI88oprnmA=
+	t=1768964080; cv=none; b=W2+Ba1AU1IGCKPX1R9em1ef+pz1mwnUYJ69L1C/Wbz5qFa3ZERe7Lwzb+RagWBpyU8KlYG9q3FVKNfeGbbnLb131qiA1P2OvRgVrn8Yr3mz/zxCHWKMrqKyudmNiRTtUVUW5vl3thXsxtPEvb98ND4um3K42x0PaiH7UfH5frBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768963814; c=relaxed/simple;
-	bh=fzwzjEOguhqxtPmDFwmJbUnBC5u2GCMsDqLQoCGlGZ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m/AbbTpfw09m2Nwt/cjKMEru3WQck8ynAK5kT8JuP4UBRiFPR0gm5pU0cYQPA+sS2sBBvwQw4n9SS0+aQg0jCNDsDLlQxN63dS++WISuvftEZz6lZlBcW9wG6OFrrCFjO/9iQ+phgOeYex2+tE05usOzsU+CWTGF7VSVxPXqlrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RtwFYmds; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3388EC16AAE;
-	Wed, 21 Jan 2026 02:50:14 +0000 (UTC)
+	s=arc-20240116; t=1768964080; c=relaxed/simple;
+	bh=TIlXfufaQqj6LTdjbzk1q92qYzxDMCtuVIRH+l5iFZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=j7UVwGsHXDB2pN4zuK+aetoWhaLFqRM3HwYW7OC+yc0Zwnj6hJdzAXrihDp53TKz/VyrJV2RW+qzH+WsU+mzel/hCkDE33urYlFugQPbmnt4XFUTRo2S10mgfOvFwAvNQzOeA3EZHphgUPn1pxKlwPgP3KJdgoNpPHtMWGUnOQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A428TEJc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF009C16AAE;
+	Wed, 21 Jan 2026 02:54:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768963814;
-	bh=fzwzjEOguhqxtPmDFwmJbUnBC5u2GCMsDqLQoCGlGZ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RtwFYmdsc4v3RQcgzL8wBVwNfTtXEN/vOI+7iiWbTK5n0GNPReT0W4bqA7CBil+lB
-	 3cgUByNNzqx8dWDv9QV3x3LxB9Gsl0AmXhUBKofxKPIcKlZhmnZ2h1e0W1Lx7KOxEd
-	 UkKtKzVFiCTKNtxNQ2pqdr8/eEBLZmg01/22JEG18vAvYroOr51TJfUEexDIzzeYdI
-	 /BYkVYJoRj4m0SqiA1RAYD8+DWQ9Ax3RVj+ePmXSWLW6mx0jnRu9E2Hf0NOCWDzqkO
-	 lqxhDCZBpzJdGqEo2ed9LUaXZPh6LG3Oll4H69ZxVrvmDE+8L8qt3h24R+nf0+KPUP
-	 fh/RVqL0S6vEA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8CC1380820D;
-	Wed, 21 Jan 2026 02:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1768964080;
+	bh=TIlXfufaQqj6LTdjbzk1q92qYzxDMCtuVIRH+l5iFZU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=A428TEJchUatkmEAey+yhDf1jtpU4cdJjHdKGMhIAMKPgPczAikb2496oVHVtixNq
+	 5iCGnH0TChP9PGq1SGnf4vkogSdrJK1DyHqbIH5uBuRIpNSbue+7VCD/irIUe00IqC
+	 lP0FpIcaDi6okYKNJWGvGWapp53FH6FKN65tmR9G1YojFkO/MpYQGQ1dBautXNGgk1
+	 6prR/osTet9ZnIEtXDqGKQixNnTSE0e/8V3BA9S5ibOTpsgL4ExX4sXc7rYafN960W
+	 kdFJ3aH+iZnMqKThqiCQ7muWPGGEodVgqkofKNr801+Io0kYKM6fSLdASctjCcq7BC
+	 +Lf8jZDjia2EQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: bobbyeshleman@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	sgarzare@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	horms@kernel.org,
+	bobbyeshleman@meta.com,
+	corbet@lwn.net,
+	xuanzhuo@linux.alibaba.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	pabeni@redhat.com,
+	kys@microsoft.com,
+	vishnu.dasa@broadcom.com,
+	longli@microsoft.com,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stefanha@redhat.com,
+	berrange@redhat.com,
+	decui@microsoft.com,
+	bryan-bt.tan@broadcom.com,
+	eperezma@redhat.com,
+	wei.liu@kernel.org,
+	davem@davemloft.net,
+	shuah@kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	edumazet@google.com,
+	virtualization@lists.linux.dev,
+	sargun@sargun.me
+Subject: Re: [net-next,v15,06/12] selftests/vsock: prepare vm management helpers for namespaces
+Date: Tue, 20 Jan 2026 18:54:21 -0800
+Message-ID: <20260121025420.1999992-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260116-vsock-vmtest-v15-6-bbfd1a668548@meta.com>
+References: <20260116-vsock-vmtest-v15-6-bbfd1a668548@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,75 +92,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: macb: Replace open-coded device config
- retrieval with of_device_get_match_data()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176896381134.703462.10725162835746447441.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Jan 2026 02:50:11 +0000
-References: <20260117-macb-v1-1-f092092d8c91@gmail.com>
-In-Reply-To: <20260117-macb-v1-1-f092092d8c91@gmail.com>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: netdev@vger.kernel.org, nicolas.ferre@microchip.com,
- claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251733-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251734-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 6240E500D4
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,linux.dev:url]
+X-Rspamd-Queue-Id: EE7A050152
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+In case you need to respin..
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is an AI-generated review of your patch.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+selftests/vsock: prepare vm management helpers for namespaces
 
-On Sat, 17 Jan 2026 09:46:18 +0800 you wrote:
-> Use of_device_get_match_data() to replace the open-coded method for
-> obtaining the device config.
-> 
-> Additionally, adjust the ordering of local variables to ensure
-> compatibility with RCS.
-> 
-> Signed-off-by: Kevin Hao <haokexin@gmail.com>
-> 
-> [...]
+This commit adds namespace support to VM management helpers and wrapper
+functions, requiring callers to explicitly pass "init_ns" for the init
+namespace. The commit message states "No functional changes for existing
+tests. All have been updated to pass 'init_ns' explicitly."
 
-Here is the summary with links:
-  - [net-next] net: macb: Replace open-coded device config retrieval with of_device_get_match_data()
-    https://git.kernel.org/netdev/net-next/c/1be080b78fd3
+> diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+> index c2bdc293b94c..1d03acb62347 100755
+> --- a/tools/testing/selftests/vsock/vmtest.sh
+> +++ b/tools/testing/selftests/vsock/vmtest.sh
+> @@ -135,7 +135,18 @@ del_namespaces() {
+>  }
+>
+>  vm_ssh() {
+> -	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost "$@"
+> +	local ns_exec
+> +
+> +	if [[ "${1}" == init_ns ]]; then
+> +		ns_exec=""
+> +	else
+> +		ns_exec="ip netns exec ${1}"
+> +	fi
+> +
+> +	shift
+> +
+> +	${ns_exec} ssh -q -o UserKnownHostsFile=/dev/null -p "${SSH_HOST_PORT}" localhost "$@"
+> +
+>  	return $?
+>  }
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The vm_ssh() function now expects a namespace as its first argument, but
+run_shared_vm_test() still calls vm_ssh without this parameter:
 
+    vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
+    vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
+    vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
+    vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
 
+When called as "vm_ssh -- dmesg", the "--" is interpreted as the namespace
+argument. Since "--" does not equal "init_ns", the function sets
+ns_exec="ip netns exec --" which is invalid. The shift then consumes "--"
+and the command becomes "ip netns exec -- ssh ... dmesg" which will fail.
+
+Interestingly, the v9 version of this patch on lore correctly updated these
+calls to pass "init_ns", but this change appears to have been lost between
+v9 and v15. The fix for this regression is present later in the series in
+commit 3ae984505e00 ("selftests/vsock: add vm_dmesg_{warn,oops}_count()
+helpers").
+
+[ ... ]
 
