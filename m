@@ -1,175 +1,139 @@
-Return-Path: <netdev+bounces-251862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251863-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAXzJ0XNcGkOaAAAu9opvQ
-	(envelope-from <netdev+bounces-251862-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:57:41 +0100
+	id yHkIFU/McGkOaAAAu9opvQ
+	(envelope-from <netdev+bounces-251863-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:53:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65CB7572B7
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:57:40 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED65571E2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:53:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C6D6D9E649E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:46:02 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AC6684C7296
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08CF44CAE2;
-	Wed, 21 Jan 2026 12:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C848F47B428;
+	Wed, 21 Jan 2026 12:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="TsbuY5Rb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSkBcFaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1F72E414
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768999386; cv=pass; b=DAAhtZswrsCiktJ0T+UNU9h5sgBuHec3QmPsPKiOwmXmgF7CTYJPOY3DRdp7YmCnD/A9kItLSTw71xfFrvBaabCHVK/NsA+tHh4DwZ19/qDA54gxJMFZ9S9S0QIpizTG0C47fOc+oM/5bjO/EvALFtdL+8ZdfagA0jauHX33eeo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768999386; c=relaxed/simple;
-	bh=F4W8QEgzjnO8NfDhGCcs69hZH5D3mlX7mCIdRwUXGEw=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5C3481A86
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768999474; cv=none; b=iF5BlRr2t6bz2eF9naqEC3m+14uyHxyzGAmXrtOV/S+jBPyUtZwcgz4gQFtdc28pHibVdMB4aZ5YQBdKWC6ry9WWeVLUhcR7bjgJa2QINxNl4/rdON4ok26mwtBLX7f9QetWvjTEGHVmu3GPyQokoF/N4uErW6qQMoDAqkIKTsg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768999474; c=relaxed/simple;
+	bh=jxOrB8wfEeC2m9GMBQa+QZHxO/B1NDwQHQf6JSIEBVs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gigqft/lNa+YoDmDIxtlBC9slquFSc9mfcz0/6kCgMpErUvfRYyqef+fjHEEncYINGRuILH+1zDOYIU1bc7JXuDpmx82O3LgNgO/hZk1U/PjgCnQJN7Py27sGnLGbKstXs0awfGlOA/AqjDAh2rlpen38zmxBeORsIWqh7hDdeU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=TsbuY5Rb; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-6446c924f9eso5422836d50.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 04:43:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768999384; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KjM6jbaoAkcb72Yppq3pYiF5yZIBBHVIaAcwZrWKBIDMID10POpTHckYWRhbJTlEom
-         vSPwRAZ5/drM3Q7awURRKzHO5F0W2wGExcQf5rIHTe7IP5t5wVWK6qymwZjAKH++Fel9
-         riRwOl8loaYs5Cbf6A3WRzOEUbSxeuoWHdB2j7BbaWImxdHbMNkvm38Ok7p3QhV1dEpD
-         zx+mP0nf4HBEKrIgbTCNVzhSk9S63mGh46wOsDTqAx33UjsyhhgpvnuVnijNlY7fClvl
-         ACp154H7/LfZzLlQgkYNLWhbKAopDOrafgHWgeVayx+91KwuNG4BetomlE4TkjKuGWiC
-         EzSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zzquMhNeBJPqbj4nPsbpAdeLaivWEBnUHnDMfWUomS8=;
-        fh=8UDauyIvQmqvtQyg6OX+MrsOKHsmZJ56qg3arIzpy9M=;
-        b=GnS0xXE7CnzpF31qnqbUsx/WJrtaBA36ELYspNOpvhHGs7uyrBw8GfFtDEr8KXKvfo
-         ImFliH9SQ3KtrQIWeuo+Q0sNy9nSX+PLCyItkY+Aw3fzyeDq7h2ywR3POEicBOtz5EwU
-         gJakszwJf4pvmOUjhTuhL1TNH0cljD6P62S6agkIq34eLkpCAjYk6Gk+MFNoICEZfjAs
-         f2BHe/H2KncvucLIvEjBNIjrbhTLFXY/cRINPqnRnlv2hnqj8Q4tcZKZGWRbZeiHVx7W
-         9WnE8JijpPhXOCqRvS78UKuvUT2NdSnGljLwZ9CJwQK11J7W637m51UWEzBo/j/NdOB7
-         dE4Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768999384; x=1769604184; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zzquMhNeBJPqbj4nPsbpAdeLaivWEBnUHnDMfWUomS8=;
-        b=TsbuY5Rb+KFhYuvC8KhNTsrPdEJw1hJdvtnItIE63h5atl8t1tKFEfgXRbVycRm7P6
-         8GVCnbd3+VyYeGy040QMlvDeOtBlPhwAFrHDeytyu5d9pnlJKOQlo70uU8ITGVE5F0kq
-         T8iBRpq7KkDVtlZJcCKdqhk6dQOKcwsyeDpSbDCsktGp+fUMWq4YP8KJEcbAyWIggOvN
-         SNLWK6O7DqWhkTHU/VUx9gCXZe3+/mxcdblex2S0dlhDATmApBjdH86W2qHP4PVdgRJG
-         mF1qE6k6meLeUThbxj0OuSNyXvlR4+olbrMg+CrEFwjTKGQKUFuAhl364FbC7subqop8
-         Qzgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768999384; x=1769604184;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zzquMhNeBJPqbj4nPsbpAdeLaivWEBnUHnDMfWUomS8=;
-        b=UCpKnE300pVHL2idPHdkzl+4G8PlERVkh4tML6DlfGzZVBwCHhxKdryZle6zUIIdnE
-         Mat1dydIV/DF8Lyx5xhUgwpkVnL71DxHHVY/Y/GKAa08QPfFGTg4ho4AZj3S+P8KP3Rs
-         b7G/FwOQNdzBR0xEdJVcr3RDeR6RO6JNWnfdc+NfnltKiiimRB3odUw2jb0DFYLaQpPS
-         e6eiW9u5pd5SNSPp6vXv2lgu8XuRKDj/OQtB8xKGXRQTyP4+zCDcYkRKZSTeX105Pjms
-         3KdAhkFJdGayoAfeXQNVQadLmXRq5SmeVBafWbmwZp5hG9nYf0O9m04mK3N/oLOC/CAM
-         mkuA==
-X-Gm-Message-State: AOJu0Ywv+WyDLtNBU+pqv0Hyyisch9ptx+WBhzGc2YMR9yFcagX+dEE8
-	56epzbj7HjLd51/LJeWwJyeLNUuV9Pb5v2+DmDFnTCNxRIx02F4VQZh4BdSzb8qiDF8jpnGtyhR
-	EXSaNqjgMcsZACo87izxsSAQ06Ny4hBYx2gOaKw1RI1B9RMleDBk=
-X-Gm-Gg: AZuq6aJOjG0RDeV5thiOUUcU8PjcinDGfnoOrAfXOEba9dWUCd+F19KyUZ4jmRPxR1W
-	K1bDW/1cAVbJe1d1YKn+EQhmjBYBp666tFZnPY9nJKwybStQIvhiWDuWfrxIrDInRaxpp2HHiWA
-	LyWzmBzOj3oZCqoNr4/hwI6Sh4lk93um6ZdZwECbEQlGLJ3D2VM83rAfKArPECADlMvy9Jg6ASZ
-	H0L141rXIC0MirFf1hLDVWwsv6QRYxEP8cVfwYDdrt4/MkyTN9jmSRToENFhWF34GabkWsI+TX8
-	gi588/OSRA==
-X-Received: by 2002:a05:690e:e8b:b0:646:4f86:4f1b with SMTP id
- 956f58d0204a3-649164cd9e6mr15934562d50.61.1768999384151; Wed, 21 Jan 2026
- 04:43:04 -0800 (PST)
+	 To:Cc:Content-Type; b=BqCNs+1qrlVL+HC6JWA69YFThcec7HGQOEXplKF65O9mDZpt/B9ljcYtzbO/h8TC3tE5RveYuXk/m/XjNa8dKqyyQIy5VZVm6YB3cTMWCRQryR9KoHt8SolBn4GlfD6LtapvC6yu2ei1D23DwaYkaTXfkJXJjFotIAd0rqlXExE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tSkBcFaB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89DB3C2BCFC
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768999473;
+	bh=jxOrB8wfEeC2m9GMBQa+QZHxO/B1NDwQHQf6JSIEBVs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tSkBcFaBbZKibs5kVPOyBS2H8PmTauBESCSL+Uwgla7l1IPLG7ugTJqOT/c7/WJED
+	 z2PgR6Cqiho3fzbKqjLPG1QL7BK6p+Em96KUWf6DOiI+5VC+oQZNvgo9ScF/NeYq0W
+	 nmQPcl97qd3txxyvjCF1Oua5hmkG+gruuC2O20O4qrxV5vncGLiCz4IRK0hgyuetg5
+	 OSPC1T1fxTDD9PtM5sVB2uXqjQ5k8EocivxTTjqh1fCSj0veoZmjnKP+ieppSU/y3u
+	 YdnmilYNvb2Z5M+1ZdUUCqK+VWzaIC5vcamTTMZm2OsGLrtbUSdHp4GS0MrSx93bSV
+	 GG4dHr5OW5+4g==
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-646d9eb45afso5688965d50.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 04:44:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU4E76lnRLNlBws3nmfzSBDIfUE4E04KfeZWorRK8Tp08hvez+5tmKH+ZaBmULOn/I+rZXJ8Lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmfC+g78+00UXK7tYKUAZD6dDYSS+rctTAiI1hNUAPXjtuc93b
+	uuhilhX6vQhoxErGClsLMNIkujUltI99SkSkcVzXFP7jDDj5+bKoT3+Db9E0uiqvHBX0zupNOos
+	vUuXSvaCiKc8pbQK8ygqB3iY1i+W5PxA=
+X-Received: by 2002:a05:690e:12cc:b0:649:40f7:f20e with SMTP id
+ 956f58d0204a3-64940f7fb03mr3287094d50.46.1768999472553; Wed, 21 Jan 2026
+ 04:44:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120004720.1886632-1-p@1g4.org> <20260120004720.1886632-2-p@1g4.org>
- <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com> <4v-I_ZuHhZBLG3lGttZ9HHAT8n_AggP70Rw2IDrj5w6BK_Ol2VoPsR9eP-BKBlLToLNNCElTtbXdTRdD1wsR3QzlCoSaBi6R7SCPn6CDk5c=@1g4.org>
-In-Reply-To: <4v-I_ZuHhZBLG3lGttZ9HHAT8n_AggP70Rw2IDrj5w6BK_Ol2VoPsR9eP-BKBlLToLNNCElTtbXdTRdD1wsR3QzlCoSaBi6R7SCPn6CDk5c=@1g4.org>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Wed, 21 Jan 2026 09:42:53 -0300
-X-Gm-Features: AZwV_Qg7ofwKki90DQFLtomP2kQYfAp7dIw3Gs39PWW6oR7LS18XId3KbNW5jeQ
-Message-ID: <CA+NMeC-wBDTvwvxAy5Za5Dq0wXpqYHNVPV_wKk-kfpSyAWCPPw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net/sched: act_gate: fix schedule updates with RCU swap
-To: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260115114021.111324-1-robert.marko@sartura.hr> <20260115114021.111324-7-robert.marko@sartura.hr>
+In-Reply-To: <20260115114021.111324-7-robert.marko@sartura.hr>
+From: Linus Walleij <linusw@kernel.org>
+Date: Wed, 21 Jan 2026 13:44:21 +0100
+X-Gmail-Original-Message-ID: <CAD++jLmitNVhWmUf9BBqLR2_WsAR7V-+ykVJsLK3MuOSUKQF0A@mail.gmail.com>
+X-Gm-Features: AZwV_Qgthmlr5E7M3bcNO1COpCtqKG_0WAWJfZBTcClME9lzo2DlyQIrR9yT_Bs
+Message-ID: <CAD++jLmitNVhWmUf9BBqLR2_WsAR7V-+ykVJsLK3MuOSUKQF0A@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
+ add LAN969x
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	lee@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, olivia@selenic.com, richard.genoud@bootlin.com, 
+	radu_nicolae.pirea@upb.ro, gregkh@linuxfoundation.org, 
+	richardcochran@gmail.com, horatiu.vultur@microchip.com, 
+	Ryan.Wanner@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, lars.povlsen@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, luka.perkov@sartura.hr, 
+	Conor Dooley <conor.dooley@microchip.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[kernel.org,microchip.com,bootlin.com,tuxon.dev,gondor.apana.org.au,davemloft.net,lunn.ch,google.com,redhat.com,selenic.com,upb.ro,linuxfoundation.org,gmail.com,linaro.org,vger.kernel.org,lists.infradead.org,sartura.hr];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-251863-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251862-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mojatatu-com.20230601.gappssmtp.com:dkim,1g4.org:email]
-X-Rspamd-Queue-Id: 65CB7572B7
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,mail.gmail.com:mid,sartura.hr:email]
+X-Rspamd-Queue-Id: EED65571E2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 10:00=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
+Hi Robert,
+
+On Thu, Jan 15, 2026 at 12:41=E2=80=AFPM Robert Marko <robert.marko@sartura=
+.hr> wrote:
+
+> Document LAN969x compatibles for SGPIO.
 >
-> > Also, the AI review [2] pointed out a real issue.
-> > It's easy to reproduce by running something like:
-> >
-> > tc action add action gate base-time 200000000000ns \
-> >   sched-entry close 0ns index 10
->
-> This was never allowed. A zero interval has always been invalid for a gat=
-e schedule entry
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
-The issue is not whether this is valid or not (as you said, it isn't).
-The issue is that, with your patch, this will result in a null-ptr deref.
-You can avoid this by initialising the timer before calling tcf_idr_release=
-.
+Should I just merge this one patch to the pinctrl tree?
+Looks good to me.
 
-> [...]
-> I will prepare and test v3 with your first 8 suggestions and await furthe=
-r input on best practices for avoiding a monolithic patch and on appropriat=
-e levels of validation in this specific case.
-
-Ok, the main suggestion is to logically break down (as much as possible),
-the introduction of RCU and the other additional cleanups/checks.
-
-cheers,
-Victor
+Yours,
+Linus Walleij
 
