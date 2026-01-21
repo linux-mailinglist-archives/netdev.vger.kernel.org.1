@@ -1,165 +1,191 @@
-Return-Path: <netdev+bounces-251909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251911-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SG0jHfPtcGk+awAAu9opvQ
-	(envelope-from <netdev+bounces-251909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:17:07 +0100
+	id sGrYIIHncGk+awAAu9opvQ
+	(envelope-from <netdev+bounces-251911-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:49:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D849159093
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:17:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4EE258BD1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:49:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0549CA4C962
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:25:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A0199AEFC7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0FF340D92;
-	Wed, 21 Jan 2026 14:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE25848B376;
+	Wed, 21 Jan 2026 14:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qKQqQLAt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfOipWvp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696E433D4EA;
-	Wed, 21 Jan 2026 14:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12EF48AE19;
+	Wed, 21 Jan 2026 14:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769005244; cv=none; b=ii9EPAYtpDkIWrSsTRTuu6ANzCw5IMUXC7CW/vOEkg5TEDM7/QgmN6InHUfRSz6+CVBESnWqdcRb0z1S3YSET+qHXwm0nIZHXHa0L3ZNr3hXJJyxv/lnbync1LozDEj/Pu0hTcK70IlbnsvEVvis1I8AdLwC4w7HVrSsSXTTnjM=
+	t=1769005436; cv=none; b=ZgMHCE1WKZ0NnEaMnzF+Ef2uBa1BWGcM0Oj3ZtQYvrf0zxVBqpElpQEVLhGwe1UOWiKgbFmEg5Rn8ktU9nzvK/RqD0W6zYZe8KjQlKVVdAnZ385WwaNZ5p5hDf6reMRMiWa+wzkIuoLn4Z0laKYdjwVGlWKPvD/oyoIGcs9kT1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769005244; c=relaxed/simple;
-	bh=nECRXUddvBB6r882YwmQmC1NCKzawqob/o0ecaEnuoM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ChAbpKwIWYK/W/zlSKQoahO7k6aOVSFBXW/as16f1VpTZxssUGkKZcMP/8gRDyk9nxGTVpoLfp+xBhRkqOk3hwAIBhkWoP0JR4rGyoeNpw+dq/bnKHfFMofh3I2h15cMsydjf+uvRhO6S5UXwxjcQ/B8mSZyqKlW9fUPHQ3I8lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qKQqQLAt; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769005231; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=4F4Z+wmFIYVbLHvWeOOQXSgEYrKMraRbThlYduC1oZ4=;
-	b=qKQqQLAtXK1GxNUN4qxzQ89TRCJgj9rRs7da7L+7dQXVRwKhp0cqVaGOxzOxHn548K0MICjJSbjFCw1YDre9cOdMeynVPMi1oQQI8ok/UFkKg+tvrmFWhmrECgVKQOaCpf70dlbYqOjMN5cngGFBwX+qybK7bdXjUROWg5bGouA=
-Received: from 30.221.145.201(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WxYTFJ9_1769005228 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Jan 2026 22:20:29 +0800
-Message-ID: <711e54ef-97db-4e01-b0d8-bcf2dea61fe6@linux.alibaba.com>
-Date: Wed, 21 Jan 2026 22:20:28 +0800
+	s=arc-20240116; t=1769005436; c=relaxed/simple;
+	bh=B5sSQisIlXD4nZ3RrXRQtajYlHIWif9ztQX/M/g69EA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=PdYnT9uDFeoiZdpvQYGsNqWpUZ1rRGaobI6d/ZkvQep4J1VqZupLYadDmB4QguYug1IL1cBcnmWWaWT5eJn1KTYEbC9GOXC0IBFjRgkbqJO4A1RDTt+lnD348hWHBnzhRZ7P+a0g6j65S0faJ/ab+6pwTldsamWRaGPcBFSjJD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfOipWvp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2C563C4CEF1;
+	Wed, 21 Jan 2026 14:23:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769005436;
+	bh=B5sSQisIlXD4nZ3RrXRQtajYlHIWif9ztQX/M/g69EA=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=SfOipWvpBWOHqHLsX6uq7KtY0lJsMZxhIllpbnfKPdVysw7RQTfXPdiog2POsOlN1
+	 oSqGrNTwVLbhPPJDnjizrnXWEkui6KkySd18r64//lyhIT2NUmhGnu3YENRfjpQ79G
+	 FDEdMM9PxMkKOxouyQlV9duFjoBjEZpP5gk41qOSXyvuaKyla4sOjPopWO6S33700D
+	 5vqKpo3rI9KlaJ92BmNS2R0BqkdSBHdvftNSw/Czk2r5VFFQH+wq/zewhvgXfyZSJF
+	 W30H90NtEiKrI46J0EfQBpRR+GSfIUGgMoA9kpor7Xa1JtiBXapeMYRewiVesH3sWz
+	 Ci8P3b/Ti5wHg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205FDC44502;
+	Wed, 21 Jan 2026 14:23:56 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH RFC v2 0/4] Support multi-channel IRQs in stmmac platform
+ drivers
+Date: Wed, 21 Jan 2026 15:23:34 +0100
+Message-Id: <20260121-dwmac_multi_irq-v2-0-3b829230d071@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
- using the /dev/ptpX API
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <richardcochran@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Dust Li <dust.li@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, David Woodhouse <dwmw2@infradead.org>,
- virtualization@lists.linux.dev, Nick Shi <nick.shi@broadcom.com>,
- Sven Schnelle <svens@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-clk@vger.kernel.org
-References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
- <yg3ikpcwukvv6z6gf6zzkoxlgu37ihauqpm2pkhmxuz6hsxfcc@eaeqykdvkh5v>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <yg3ikpcwukvv6z6gf6zzkoxlgu37ihauqpm2pkhmxuz6hsxfcc@eaeqykdvkh5v>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-7.46 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-B4-Tracking: v=1; b=H4sIAGbhcGkC/2WNQQ6CMBREr0L+2pK2QrWuTEw8gFtDCJZWfmIpt
+ ogY0rvb4NLlm8m8WSBojzrAIVvA6wkDuj4B32Sguqa/a4JtYuCUl4xTSdq3bVRtX48Ra/RPItu
+ 9EbQQXCkGaTV4bXBejVe4nE9QpbDDMDr/WV8mtlY/ISv+hBMjlGxFKXhzo1qa3dGFkPfzkCtno
+ YoxfgGY+nkStQAAAA==
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
+ Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
+ NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ imx@lists.linux.dev, devicetree@vger.kernel.org, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1769005434; l=2399;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=B5sSQisIlXD4nZ3RrXRQtajYlHIWif9ztQX/M/g69EA=;
+ b=pgjYDJ88uMv/4DQOQtw/xXYRyF4ixkVKWEeXizqK7gttm+9hvXWp8ZGRCTrjfTcOhFQNNsezZ
+ WZerk30IkCjCBuYFC61kg7HBiw2PtFwLmi7+HeTJX+Y0p2kH0fJkaV1
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-251909-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[linutronix.de,gmail.com,vger.kernel.org,kernel.org,linux.alibaba.com,lunn.ch,infradead.org,lists.linux.dev,broadcom.com,linux.ibm.com,redhat.com];
-	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-251911-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: D849159093
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_REPLYTO(0.00)[jan.petrous@oss.nxp.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.nxp.com:mid,oss.nxp.com:replyto,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,nxp.com:email]
+X-Rspamd-Queue-Id: E4EE258BD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+The stmmac core supports two interrupt modes, controlled by the
+flag STMMAC_FLAG_MULTI_MSI_EN:
 
+- When the flag is set, the driver uses multi-channel IRQ mode (Multi-IRQ).
+- Otherwise, a single IRQ line is requested (aka MAC-IRQ):
 
-On 2026/1/19 22:48, Manivannan Sadhasivam wrote:
-> Hi Wen,
-> 
-> On Fri, Jan 09, 2026 at 10:56:56AM +0800, Wen Gu wrote:
->>
->> Hi all,
->>
->> This is an RFC to discuss the appropriate upstream home and maintenance
->> model for a class of devices/drivers which expose a high-precision clock
->> to userspace via the existing PHC interface (/dev/ptpX + standard PTP_*
->> ioctls), but are not tied to a traditional NIC/IEEE1588 packet
->> timestamping pipeline.
->>
-> 
-> Thanks for starting the discussion. I sent out an email just today on this
-> topic [1] and learned about this thread afterwards.
+static int stmmac_request_irq(struct net_device *dev)
+{
+        /* Request the IRQ lines */
+        if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+                ret = stmmac_request_irq_multi_msi(dev);
+        else
+                ret = stmmac_request_irq_single(dev);
+}
 
-[...]
+At present, only PCI drivers (Intel and Loongson) make use of the Multi-IRQ
+mode. This concept can be extended to DT-based embedded glue drivers
+(dwmac-xxx.c).
 
-> 
-> Some Qcom MHI devices expose the high precision clock derived from GNSS/Cellular
-> network over the MHI registers and we recently sent out a series exposing them
-> as PHC [2]. Since this driver is closely tied with MHI bus, we added it as a
-> part of drivers/bus/mhi/.
-> 
-Hi Manivannan,
+This series adds support for reading per-channel IRQs from the DT node and
+reuses the existing STMMAC_FLAG_MULTI_MSI_EN flag to enable multi-IRQ
+operation in platform drivers.
 
-Thanks for the note and for sharing the MHI PHC use case.
+The final decision if Multi-IRQ gets enabled remains on glue driver
+to allow implementing any reguirements/limitions the focused platform
+needs.
 
-Yes, this is very similar to what motivated this RFC, there are more and
-more PHC providers which are not tied to NIC/IEEE 1588.
+NXP S32G2/S32G3/S32R SoCs integrate the DWMAC IP with multi-channel
+interrupt support. The dwmac-s32.c driver change is provided as an example of
+enabling multi-IRQ mode for non-PCI drivers.
 
-[...]
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+---
+Changes in v2:
+- Fixed incorrect buffer len for 'rx-queue-%d' property check
+- Added backward compatibility to not break old settings
+- Fixed DT example in yaml
+- Link to v1: https://lore.kernel.org/r/20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com
 
->>
->> Introducing a new clock type or a new userspace API (e.g. /dev/XXX) would
->> require widespread userspace changes, duplicated tooling, and long-term
->> fragmentation. This RFC is explicitly NOT proposing a new userspace API.
->>
-> 
-> +1
-> 
+---
+Jan Petrous (OSS) (4):
+      net: stmmac: platform: read channels irq
+      dt-bindings: net: nxp,s32-dwmac: Declare per-queue interrupts
+      arm64: dts: s32: set Ethernet channel irqs
+      stmmac: s32: enable support for Multi-IRQ mode
 
-[...]
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 42 +++++++++++++++++++---
+ arch/arm64/boot/dts/freescale/s32g2.dtsi           | 26 ++++++++++++--
+ arch/arm64/boot/dts/freescale/s32g3.dtsi           | 26 ++++++++++++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    | 13 ++++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 38 +++++++++++++++++++-
+ 5 files changed, 132 insertions(+), 13 deletions(-)
+---
+base-commit: cb015814f8b6eebcbb8e46e111d108892c5e6821
+change-id: 20251209-dwmac_multi_irq-9d8f60462cc1
 
-> 
-> If we get a consensus to move forward with exposing the device clocks as PHC, we
-> will respin the MHI driver and would love to get an ACK from the (new)
-> maintainers.
-> 
-> - Mani
-> 
-> [1] https://lore.kernel.org/all/vmwwnl3zv26lmmuqp2vqltg2fudalpc5jrw7k6ifg6l5cwlk3j@i7jm62zcsl67/
-> [2] https://lore.kernel.org/mhi/20250818-tsc_time_sync-v1-0-2747710693ba@oss.qualcomm.com/
-> 
+Best regards,
+-- 
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
 
 
