@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-251935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCzgI270cGmgbAAAu9opvQ
-	(envelope-from <netdev+bounces-251935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:44:46 +0100
+	id YK9NG5z0cGmgbAAAu9opvQ
+	(envelope-from <netdev+bounces-251936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:45:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 338CA59679
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:44:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C32596AC
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:45:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 075AA744A2B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:46:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 395DF88F014
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297A84BC029;
-	Wed, 21 Jan 2026 14:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D424BC027;
+	Wed, 21 Jan 2026 14:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="P+wPNkDh"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nQMs9/OI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.68.102])
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D12A449ED0;
-	Wed, 21 Jan 2026 14:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.68.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750B946AF34;
+	Wed, 21 Jan 2026 14:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006077; cv=none; b=D/ikCnJxrO4n5sJRE2QB0mAxCpthpa9t4IVnLJdHHSg1TI6grs//Dt4SGJhWFu3rAy0PLKGNQF94nl633IorrPgUYcJnabNaVkSbqlWu8u5PZEZNtGTZ2elirt/1y0MUIL6vsjWlEAFlNuy1qbujEpr/k0UTKI3Q7comy6hhrOo=
+	t=1769006086; cv=none; b=lVg+YpXZWSotfq70bgJivdFG+ihO5d4tZSX/CxCn0pmEph0eeX0soXoHdxyDDsz6GPhhWhb6F800Crm7RH2vFav41vwAFJh9uHttkSKnCCd25WBDO+fsiAP3ngEx+Ju7WzIY8D/flKDPvhHxXLD1LJ4JxwBHD5zrRGe+GafWwbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006077; c=relaxed/simple;
-	bh=V+qFlUU26dtxhI42O1LyyPXxUUYrP0KuA+/fr8CCTWo=;
+	s=arc-20240116; t=1769006086; c=relaxed/simple;
+	bh=Wyjt5j0MSPUTGhX5/gxgjd9pNhNBVOCn12i3hU16UUE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fFbkZUKoBHlrfVtQVVPnDNfHvU5v1q+ziOGhvVOzQ6jONx4nc7XB4z4H/UR9lLONfw8Ka0tnHclBIArx8DdzM9x5+hr9tmDlDn3584ffM4nW8yBT7tNySk3XNxGYZjqmmDof3UTGFK+Ru6D4o46fHzBL5ozfzuqv+d/aGsha9Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=P+wPNkDh; arc=none smtp.client-ip=44.246.68.102
+	 MIME-Version:Content-Type; b=DuC/PD1nZ9SSOXcgxIyMG+6S5gSH5hiskOiPk0CKtnGsOWBxDuDQNFdt7O6r93Rw9/GJXiF9ZNODUnDKPSGOWp/KjkXpj+XxsEyf+iSTPP67HIZdFuw2ik1mEUCO/8Zq5xiqvFlIY/uIvehfVjuc9ADSSKhQx2+x6h0droCOvAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nQMs9/OI; arc=none smtp.client-ip=52.35.192.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769006074; x=1800542074;
+  t=1769006083; x=1800542083;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GnB0Zjrn1rkk2yBuHfgwsZRUTblWJqAEa2P5e7SgUS8=;
-  b=P+wPNkDh/jpDeVbAm/57wdJv6KeFS1owp8F5uQpRRtq9Iq/td6A728Ry
-   CsFzQlLGsluSbdnxLRsbr1S+f75m/5lqQM73w/nyMvTeXmih8y6JV1KvP
-   Dy8KXqUWc+wK3TI6CmehDRGob32T/K4olsx/SedsHgM6v4aSJV1J2aDtk
-   7T1kBHLZHUv+WKKo4Whu+ARk0RXd+WhJixId/5uGj+/s+HfD+yRjHa1JF
-   xCtCDaZ6soSWkw096L5ig+FCo4Hrxou+JbqyT2HgDEauVxbbh+pul64BY
-   IJ7/jrKH9qvBi+AwxdYv/HmM5zqHI35sIe+YHKQcROQmb45QWnFmwl/b/
+  bh=uW31CrHkZb/NKZG8IVePzIRSaNVbZs1c92ImhXgCTzY=;
+  b=nQMs9/OIf8O78wfswpTzbKmDDpwl+mbl23yIPzxrJTg6NpFEFF9IJEjC
+   NmJhTFGfE/Gy/joWtnV39UgWPIVpSmQL9NFxZqoHcoSiZYib/jwZtn2wq
+   gJ9OZSNPSH/7glnbsAzOVzNJbzFmEvzifT4XcWntckV5RDhQanbJZLjUe
+   KKwn4fpV9f6QVTAmxwkmkdjD/CLzWNi7Oe5IGkP97mFNPSiARDxEPM7iO
+   HdXAJo248LJkQ/SPcr3aklyh9X08wpnk3lpylY7IGMp2zaGYx/uL3wU59
+   iHhDoEe4NiAC+xADRfS1lpj3/yTvs3Anf4T29QAnrA95BUY2cH6pdQaAI
    w==;
-X-CSE-ConnectionGUID: C4fGUt72Qdixu8U/aQwc9g==
-X-CSE-MsgGUID: Cu5NmpH2RCqP8y3vkUNV9g==
+X-CSE-ConnectionGUID: 6ur7NnJSRD662DUteQOM1Q==
+X-CSE-MsgGUID: c/a+aS3BSTeEwi/hd+K/nQ==
 X-IronPort-AV: E=Sophos;i="6.21,242,1763424000"; 
-   d="scan'208";a="11311079"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:34:32 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:6551]
+   d="scan'208";a="11093519"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:34:39 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:10765]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.220:2525] with esmtp (Farcaster)
- id 78ead78d-5660-4e66-8e07-c138e99f30b6; Wed, 21 Jan 2026 14:34:32 +0000 (UTC)
-X-Farcaster-Flow-ID: 78ead78d-5660-4e66-8e07-c138e99f30b6
+ id 22e797d9-6f2d-4454-ac8c-6cbfa32f8b23; Wed, 21 Jan 2026 14:34:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 22e797d9-6f2d-4454-ac8c-6cbfa32f8b23
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
  EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:31 +0000
+ Wed, 21 Jan 2026 14:34:38 +0000
 Received: from dev-dsk-itazur-1b-11e7fc0f.eu-west-1.amazon.com (172.19.66.53)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:28 +0000
+ Wed, 21 Jan 2026 14:34:35 +0000
 From: Takahiro Itazuri <itazur@amazon.com>
 To: <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
 	<richardcochran@gmail.com>, <dwmw2@infradead.org>, <andrew+netdev@lunn.ch>,
@@ -77,9 +77,9 @@ CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
  Graf" <graf@amazon.de>, <mzxreary@0pointer.de>, Marco Cali
 	<xmarcalx@amazon.co.uk>, David Woodhouse <dwmw@amazon.co.uk>, "Takahiro
  Itazuri" <itazur@amazon.co.uk>
-Subject: [PATCH v6 3/7] dt-bindings: ptp: Add amazon,vmclock
-Date: Wed, 21 Jan 2026 14:33:40 +0000
-Message-ID: <20260121143402.3092-4-itazur@amazon.com>
+Subject: [PATCH v6 4/7] ptp: ptp_vmclock: Add device tree support
+Date: Wed, 21 Jan 2026 14:33:41 +0000
+Message-ID: <20260121143402.3092-5-itazur@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260121143402.3092-1-itazur@amazon.com>
 References: <20260121143402.3092-1-itazur@amazon.com>
@@ -91,7 +91,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 X-Spamd-Result: default: False [-5.96 / 15.00];
 	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251935-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251936-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,gmail.com,infradead.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -116,98 +116,168 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	DKIM_TRACE(0.00)[amazon.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,devicetree.org:url,amazon.es:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,amazon.co.uk:email,4.196.180.0:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,amazon.co.uk:email,amazon.es:email];
 	PRECEDENCE_BULK(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 338CA59679
+X-Rspamd-Queue-Id: D3C32596AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-The vmclock device provides a PTP clock source and precise timekeeping
-across live migration and snapshot/restore operations.
+Add device tree support to the ptp_vmclock driver, allowing it to probe
+via device tree in addition to ACPI.
 
-The binding has a required memory region containing the vmclock_abi
-structure and an optional interrupt for clock disruption notifications.
-
-The full spec is at https://uapi-group.org/specifications/specs/vmclock/
+Handle optional interrupt for clock disruption notifications, mirroring
+the ACPI notification behaviour.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Signed-off-by: Babis Chalios <bchalios@amazon.es>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 ---
- .../bindings/ptp/amazon,vmclock.yaml          | 46 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 47 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
+ drivers/ptp/ptp_vmclock.c | 70 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 62 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml b/Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
-new file mode 100644
-index 000000000000..357790df876f
---- /dev/null
-+++ b/Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
-@@ -0,0 +1,46 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/ptp/amazon,vmclock.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
+index 38b2bacb755e..8605e441fad7 100644
+--- a/drivers/ptp/ptp_vmclock.c
++++ b/drivers/ptp/ptp_vmclock.c
+@@ -14,10 +14,13 @@
+ #include <linux/file.h>
+ #include <linux/fs.h>
+ #include <linux/init.h>
++#include <linux/io.h>
++#include <linux/interrupt.h>
+ #include <linux/kernel.h>
+ #include <linux/miscdevice.h>
+ #include <linux/mm.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
+@@ -535,7 +538,7 @@ vmclock_acpi_notification_handler(acpi_handle __always_unused handle,
+ 	wake_up_interruptible(&st->disrupt_wait);
+ }
+ 
+-static int vmclock_setup_notification(struct device *dev, struct vmclock_state *st)
++static int vmclock_setup_acpi_notification(struct device *dev)
+ {
+ 	struct acpi_device *adev = ACPI_COMPANION(dev);
+ 	acpi_status status;
+@@ -548,10 +551,6 @@ static int vmclock_setup_notification(struct device *dev, struct vmclock_state *
+ 	if (!adev)
+ 		return -ENODEV;
+ 
+-	/* The device does not support notifications. Nothing else to do */
+-	if (!(le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
+-		return 0;
+-
+ 	status = acpi_install_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY,
+ 					     vmclock_acpi_notification_handler,
+ 					     dev);
+@@ -586,6 +585,55 @@ static int vmclock_probe_acpi(struct device *dev, struct vmclock_state *st)
+ 	return 0;
+ }
+ 
++static irqreturn_t vmclock_of_irq_handler(int __always_unused irq, void *_st)
++{
++	struct vmclock_state *st = _st;
 +
-+title: Virtual Machine Clock
++	wake_up_interruptible(&st->disrupt_wait);
++	return IRQ_HANDLED;
++}
 +
-+maintainers:
-+  - David Woodhouse <dwmw2@infradead.org>
++static int vmclock_probe_dt(struct device *dev, struct vmclock_state *st)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	struct resource *res;
 +
-+description:
-+  The vmclock device provides a precise clock source and allows for
-+  accurate timekeeping across live migration and snapshot/restore
-+  operations. The full specification of the shared data structure is
-+  available at https://uapi-group.org/specifications/specs/vmclock/
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!res)
++		return -ENODEV;
 +
-+properties:
-+  compatible:
-+    const: amazon,vmclock
++	st->res = *res;
 +
-+  reg:
-+    description:
-+      Specifies the shared memory region containing the vmclock_abi structure.
-+    maxItems: 1
++	return 0;
++}
 +
-+  interrupts:
-+    description:
-+      Interrupt used to notify when the contents of the vmclock_abi structure
-+      have been updated.
-+    maxItems: 1
++static int vmclock_setup_of_notification(struct device *dev)
++{
++	struct platform_device *pdev = to_platform_device(dev);
++	int irq;
 +
-+required:
-+  - compatible
-+  - reg
++	irq = platform_get_irq(pdev, 0);
++	if (irq < 0)
++		return irq;
 +
-+additionalProperties: false
++	return devm_request_irq(dev, irq, vmclock_of_irq_handler, IRQF_SHARED,
++				"vmclock", dev->driver_data);
++}
 +
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    ptp@80000000 {
-+      compatible = "amazon,vmclock";
-+      reg = <0x80000000 0x1000>;
-+      interrupts = <GIC_SPI 36 IRQ_TYPE_EDGE_RISING>;
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index da9dbc1a4019..0dd35070fe9b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21025,6 +21025,7 @@ PTP VMCLOCK SUPPORT
- M:	David Woodhouse <dwmw2@infradead.org>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
- F:	drivers/ptp/ptp_vmclock.c
- F:	include/uapi/linux/vmclock-abi.h
++static int vmclock_setup_notification(struct device *dev,
++				      struct vmclock_state *st)
++{
++	/* The device does not support notifications. Nothing else to do */
++	if (!(le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
++		return 0;
++
++	if (has_acpi_companion(dev)) {
++		return vmclock_setup_acpi_notification(dev);
++	} else {
++		return vmclock_setup_of_notification(dev);
++	}
++}
++
+ static void vmclock_put_idx(void *data)
+ {
+ 	struct vmclock_state *st = data;
+@@ -606,7 +654,7 @@ static int vmclock_probe(struct platform_device *pdev)
+ 	if (has_acpi_companion(dev))
+ 		ret = vmclock_probe_acpi(dev, st);
+ 	else
+-		ret = -EINVAL; /* Only ACPI for now */
++		ret = vmclock_probe_dt(dev, st);
+ 
+ 	if (ret) {
+ 		dev_info(dev, "Failed to obtain physical address: %d\n", ret);
+@@ -654,6 +702,7 @@ static int vmclock_probe(struct platform_device *pdev)
+ 		return ret;
+ 
+ 	init_waitqueue_head(&st->disrupt_wait);
++	dev->driver_data = st;
+ 	ret = vmclock_setup_notification(dev, st);
+ 	if (ret)
+ 		return ret;
+@@ -690,8 +739,6 @@ static int vmclock_probe(struct platform_device *pdev)
+ 		return -ENODEV;
+ 	}
+ 
+-	dev->driver_data = st;
+-
+ 	dev_info(dev, "%s: registered %s%s%s\n", st->name,
+ 		 st->miscdev.minor ? "miscdev" : "",
+ 		 (st->miscdev.minor && st->ptp_clock) ? ", " : "",
+@@ -706,11 +753,18 @@ static const struct acpi_device_id vmclock_acpi_ids[] = {
+ };
+ MODULE_DEVICE_TABLE(acpi, vmclock_acpi_ids);
+ 
++static const struct of_device_id vmclock_of_ids[] = {
++	{ .compatible = "amazon,vmclock", },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, vmclock_of_ids);
++
+ static struct platform_driver vmclock_platform_driver = {
+ 	.probe		= vmclock_probe,
+ 	.driver	= {
+ 		.name	= "vmclock",
+ 		.acpi_match_table = vmclock_acpi_ids,
++		.of_match_table = vmclock_of_ids,
+ 	},
+ };
  
 -- 
 2.47.3
