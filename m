@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-251895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKQyKpHbcGnCaQAAu9opvQ
-	(envelope-from <netdev+bounces-251895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:58:41 +0100
+	id kPQgDxjgcGnCaQAAu9opvQ
+	(envelope-from <netdev+bounces-251897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:18:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1570D58091
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:58:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E33058478
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:17:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 149BDA29793
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:39:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 87CE4A29CCE
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1343B8BAE;
-	Wed, 21 Jan 2026 13:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C8F48167F;
+	Wed, 21 Jan 2026 13:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G587cyEl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fuzU3ShF"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5C02D5C74
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636413D333C
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002684; cv=none; b=I63P946GWb0fqyTkjaOTKoKCUZKI/Hwcl9PeqCr1VUCidNXcBHT6m0QnWrUSsFOp/ShLptlCnmPcan23W6TMQ7h27gu6ySIvWCEXg29OkHTLblDPqVXqXFEhO9EA2IZqhnGfmixajC5Bywwc1z3x+G2RWG+9DAH4HK+BxWa4VcM=
+	t=1769002693; cv=none; b=MHC6Eqmx7SwvS86WbVGf+4jR78FYYejn7DUa+OglCHCEkDIy5/oQQ/Wd69TKSRbHibclJqClRPqiyCfR6m98w85ksHYy6X/CKEg43V3X8x9iWc8cCobI7posqqs0zi1yJdiLa6x2XSDGpAwYr3ZyqGM2C7Zqfk4YJZNNm9dfyjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002684; c=relaxed/simple;
-	bh=MuJAPpb1Oc8ptj8mC7zpqpszMtgZIlmKtgIGAExPLYE=;
+	s=arc-20240116; t=1769002693; c=relaxed/simple;
+	bh=lD53xhZmZIsN8dGZabUOcGQw2Tk01aD/syqE/Tdd4tk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uPFac5uMQ40IZ2s4xl6eCtFqp85RXEFBHdCjo2/Jftb3pXCOXBtUM/51OxhvNW7nBHR43uZeo7wzgSV7TeX0yjnFm4u/11Mc0Tyzi+iwUMRx5yCVrLqsvUpW+fisgKI2F0lxTJdUsiKwtZZSqlb+Dpi3VdC+KsbwMsWNVu2qgU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G587cyEl; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=fgJyQFrCuGm6WoJ3/updumktbjzmoBQFXsdGQ+BFQGl/wNKlENqleT1CarXQ/JXhkuhOtggw7xFHE1B2ySwk4Rf50xNXxdCkyGoJ/YzSezoFosqfI31MgfxKvC+osI5IC+vziWp/blEz7ivp5tbwExWNXsETEKiAm1UP0wB2b6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fuzU3ShF; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769002681;
+	s=mimecast20190719; t=1769002689;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PA3aNbqlhEgRwfeto58/rliWwLesJhTUoebjyIk2+w8=;
-	b=G587cyElTpMc520n8gQBuuUuBEXAgCwp2P/ABpXXyjKAJVaXsBUo4b3qxZIoibHQQThpGq
-	ufDZBJInDq1793/OxnZYZ5uN3NXqqB1DkpU1kohXy0J46ELqFIwYMCTpq6S79Q7uBsVh8u
-	1IlyAWUk9Fx3HOsd23hjhmFKzC5uXTU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=+eGc6YLkO6LE47mYDzcTdhgvTBzyZaxc1DJMa4T9mLY=;
+	b=fuzU3ShFBZ7WS/LhrPRXIdkJDAmRKSEDzhpM740a9qQVLrv3/2owxPrzkplqLgym8Fwh0X
+	x3qze0aZsNm4WmXjqqDv/mdwdytntmFiB7u0T0OX2qumXOXqzkXfb5qXp2NB6+pFmL/E32
+	bTXj5XUxjXDDPUYX1w47AHjRn9Vf8V0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-354-ZVEjbyYLMte6q2MN6ccx1Q-1; Wed,
- 21 Jan 2026 08:37:55 -0500
-X-MC-Unique: ZVEjbyYLMte6q2MN6ccx1Q-1
-X-Mimecast-MFC-AGG-ID: ZVEjbyYLMte6q2MN6ccx1Q_1769002673
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-398-Sza0BezyOHee89J2gP3R1g-1; Wed,
+ 21 Jan 2026 08:38:00 -0500
+X-MC-Unique: Sza0BezyOHee89J2gP3R1g-1
+X-Mimecast-MFC-AGG-ID: Sza0BezyOHee89J2gP3R1g_1769002678
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A701E18005B4;
-	Wed, 21 Jan 2026 13:37:53 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2411F1954B1B;
+	Wed, 21 Jan 2026 13:37:58 +0000 (UTC)
 Received: from thinkpad.redhat.com (unknown [10.44.33.242])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2AA3E30002D2;
-	Wed, 21 Jan 2026 13:37:49 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1D1AA30001A2;
+	Wed, 21 Jan 2026 13:37:53 +0000 (UTC)
 From: Felix Maurer <fmaurer@redhat.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -75,10 +75,11 @@ Cc: davem@davemloft.net,
 	allison.henderson@oracle.com,
 	petrm@nvidia.com,
 	antonio@openvpn.net,
-	bigeasy@linutronix.de
-Subject: [PATCH net-next 5/9] selftests: hsr: Add tests for more link faults with PRP
-Date: Wed, 21 Jan 2026 14:37:32 +0100
-Message-ID: <8d66ee5f25f6638a27ca2ae1264a5c1c718df8b2.1769001553.git.fmaurer@redhat.com>
+	bigeasy@linutronix.de,
+	Yoann Congal <yoann.congal@smile.fr>
+Subject: [PATCH net-next 6/9] hsr: Implement more robust duplicate discard for HSR
+Date: Wed, 21 Jan 2026 14:37:33 +0100
+Message-ID: <a58f3b542fd8564c5d9576a10a9d6c9a7f318931.1769001553.git.fmaurer@redhat.com>
 In-Reply-To: <cover.1769001553.git.fmaurer@redhat.com>
 References: <cover.1769001553.git.fmaurer@redhat.com>
 Precedence: bulk
@@ -90,180 +91,520 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251895-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251897-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 1570D58091
+X-Rspamd-Queue-Id: 9E33058478
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add tests where one link has different rates of packet loss or reorders
-packets. PRP should still be able to recover from these link faults and
-show no packet loss.  However, it is acceptable to receive some level of
-duplicate packets. This matches the current specification (IEC
-62439-3:2021) of the duplicate discard algorithm that requires it to be
-"designed such that it never rejects a legitimate frame, while occasional
-acceptance of a duplicate can be tolerated." The rate of acceptable
-duplicates in this test is intentionally high (10%) to make the test
-stable, the values I observed in the worst test cases (20% loss) are around
-5% duplicates.
+The HSR duplicate discard algorithm had even more basic problems than the
+described for PRP in the previous patch. It relied only on the last
+received sequence number to decide if a new frame should be forwarded to
+any port. This does not work correctly in any case where frames are
+received out of order. The linked bug report claims that this can even
+happen with perfectly fine links due to the order in which incoming frames
+are processed (which can be unexpected on multi-core systems). The issue
+also occasionally shows up in the HSR selftests. The main reason is that
+the sequence number that was last forwarded to the master port may have
+skipped a number which will in turn never be delivered to the host.
 
+As the problem (we accidentally skip over a sequence number that has not
+been received but will be received in the future) is similar to PRP, we can
+apply a similar solution. The duplicate discard algorithm based on the
+"sparse bitmap" works well for HSR if it is extended to track one bitmap
+for each port (A, B, master, interlink). To do this, change the sequence
+number blocks to contain a flexible array member as the last member that
+can keep chunks for as many bitmaps as we need. This design makes it easy
+to reuse the same algorithm in a potential PRP RedBox implementation.
+
+The duplicate discard algorithm functions are modified to deal with
+sequence number blocks of different sizes and to correctly use the array of
+bitmap chunks. There is a notable speciality for HSR: the port type has a
+special port type NONE with value 0. This leads to the number of port types
+being 5 instead of actually 4. To save memory, remove the NONE port from
+the bitmap (by subtracting 1) when setting up the block buffer and when
+accessing the bitmap chunks in the array.
+
+Removing the old algorithm allows us to get rid of a few fields that are
+not needed any more: time_out and seq_out for each port. We can also remove
+some functions that were only necessary for the previous duplicate discard
+algorithm.
+
+The removal of seq_out is possible despite its previous usage in
+hsr_register_frame_in: it was used to prevent updates to time_in when
+"invalid" sequence numbers were received. With the new duplicate discard
+algorithm, time_in has no relevance for the expiry of sequence numbers
+anymore. They will expire based on the timestamps in the sequence number
+blocks after at most 400ms. There is no need that a node "re-registers" to
+"resume communication": after 400ms, all sequence numbers are accepted
+again. Also, according to the IEC 62439-3:2021, all nodes are supposed to
+send no traffic for 500ms after boot to lead exactly to this expiry of seen
+sequence numbers. time_in is still used for pruning nodes from the node
+table after no traffic has been received for 60sec. Pruning is only needed
+if the node is really gone and has not been sending any traffic for that
+period.
+
+seq_out was also used to report the last incoming sequence number from a
+node through netlink. I am not sure how useful this value is to userspace
+at all, but added getting it from the sequence number blocks. This number
+can be outdated after node merging until a new block has been added.
+
+Reported-by: Yoann Congal <yoann.congal@smile.fr>
+Closes: https://lore.kernel.org/netdev/7d221a07-8358-4c0b-a09c-3b029c052245@smile.fr/
 Signed-off-by: Felix Maurer <fmaurer@redhat.com>
 ---
- .../testing/selftests/net/hsr/link_faults.sh  | 79 +++++++++++++++++--
- 1 file changed, 74 insertions(+), 5 deletions(-)
+ net/hsr/hsr_framereg.c | 216 +++++++++++++++++++++--------------------
+ net/hsr/hsr_framereg.h |  20 ++--
+ 2 files changed, 124 insertions(+), 112 deletions(-)
 
-diff --git a/tools/testing/selftests/net/hsr/link_faults.sh b/tools/testing/selftests/net/hsr/link_faults.sh
-index 1d48f1c2fd2e..0c03445a2bdd 100755
---- a/tools/testing/selftests/net/hsr/link_faults.sh
-+++ b/tools/testing/selftests/net/hsr/link_faults.sh
-@@ -11,10 +11,16 @@ ALL_TESTS="
- 	test_cut_link_hsrv1
- 	test_clean_prp
- 	test_cut_link_prp
-+	test_packet_loss_prp
-+	test_high_packet_loss_prp
-+	test_reordering_prp
- "
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index d9745199494a..a8cb94faf139 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -19,23 +19,6 @@
+ #include "hsr_framereg.h"
+ #include "hsr_netlink.h"
  
--# The tests are running ping for 5sec with a relatively short interval with a
--# cut link, which should be recoverable by HSR/PRP.
-+# The tests are running ping for 5sec with a relatively short interval in
-+# different scenarios with faulty links (cut links, packet loss, delay,
-+# reordering) that should be recoverable by HSR/PRP. The ping interval (10ms)
-+# is short enough that the base delay (50ms) leads to a queue in the netem
-+# qdiscs which is needed for reordering.
- 
- setup_hsr_topo()
+-/* seq_nr_after(a, b) - return true if a is after (higher in sequence than) b,
+- * false otherwise.
+- */
+-static bool seq_nr_after(u16 a, u16 b)
+-{
+-	/* Remove inconsistency where
+-	 * seq_nr_after(a, b) == seq_nr_before(a, b)
+-	 */
+-	if ((int)b - a == 32768)
+-		return false;
+-
+-	return (((s16)(b - a)) < 0);
+-}
+-
+-#define seq_nr_before(a, b)		seq_nr_after((b), (a))
+-#define seq_nr_before_or_eq(a, b)	(!seq_nr_after((a), (b)))
+-
+ bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
  {
-@@ -158,6 +164,7 @@ check_ping()
- {
- 	local node="$1"
- 	local dst="$2"
-+	local accepted_dups="$3"
- 	local ping_args="-q -i 0.01 -c 400"
- 
- 	log_info "Running ping $node -> $dst"
-@@ -176,7 +183,9 @@ check_ping()
- 		loss="${BASH_REMATCH[1]}"
- 	fi
- 
--	check_err "$dups" "Unexpected duplicate packets (${dups})"
-+	if [ "$dups" -gt "$accepted_dups" ]; then
-+		check_err 1 "Unexpected duplicate packets (${dups})"
-+	fi
- 	if [ "$loss" != "0%" ]; then
- 		check_err 1 "Unexpected packet loss (${loss})"
- 	fi
-@@ -195,7 +204,7 @@ test_clean()
- 		return
- 	fi
- 
--	check_ping "$node1" "100.64.0.2"
-+	check_ping "$node1" "100.64.0.2" 0
- 
- 	log_test "${tname}"
- }
-@@ -235,7 +244,7 @@ test_cut_link()
- 		log_info "Cutting link"
- 		ip -net "$node1" link set vethB down
- 	) &
--	check_ping "$node1" "100.64.0.2"
-+	check_ping "$node1" "100.64.0.2" 0
- 
- 	wait
- 	log_test "${tname}"
-@@ -257,6 +266,66 @@ test_cut_link_prp()
- 	test_cut_link "PRP"
+ 	if (!hsr->redbox || !is_valid_ether_addr(hsr->macaddress_redbox))
+@@ -163,18 +146,16 @@ void prp_handle_san_frame(bool san, enum hsr_port_type port,
+ 		node->san_b = true;
  }
  
-+test_packet_loss()
-+{
-+	local proto="$1"
-+	local loss="$2"
-+
-+	RET=0
-+	tname="${FUNCNAME[0]} - ${proto}, ${loss}"
-+
-+	setup_topo "$proto"
-+	if ((RET != ksft_pass)); then
-+		log_test "${tname} setup"
-+		return
-+	fi
-+
-+	# Packet loss with lower delay makes sure the packets on the lossy link
-+	# arrive first.
-+	tc -net "$node1" qdisc add dev vethA root netem delay 50ms
-+	tc -net "$node1" qdisc add dev vethB root netem delay 20ms loss "$loss"
-+
-+	check_ping "$node1" "100.64.0.2" 40
-+
-+	log_test "${tname}"
-+}
-+
-+test_packet_loss_prp()
-+{
-+	test_packet_loss "PRP" "20%"
-+}
-+
-+test_high_packet_loss_prp()
-+{
-+	test_packet_loss "PRP" "80%"
-+}
-+
-+test_reordering()
-+{
-+	local proto="$1"
-+
-+	RET=0
-+	tname="${FUNCNAME[0]} - ${proto}"
-+
-+	setup_topo "$proto"
-+	if ((RET != ksft_pass)); then
-+		log_test "${tname} setup"
-+		return
-+	fi
-+
-+	tc -net "$node1" qdisc add dev vethA root netem delay 50ms
-+	tc -net "$node1" qdisc add dev vethB root netem delay 50ms reorder 20%
-+
-+	check_ping "$node1" "100.64.0.2" 40
-+
-+	log_test "${tname}"
-+}
-+
-+test_reordering_prp()
-+{
-+	test_reordering "PRP"
-+}
-+
- cleanup()
+-/* Allocate an hsr_node and add it to node_db. 'addr' is the node's address_A;
+- * seq_out is used to initialize filtering of outgoing duplicate frames
+- * originating from the newly added node.
++/* Allocate an hsr_node and add it to node_db. 'addr' is the node's address_A.
+  */
+ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+ 				     struct list_head *node_db,
+-				     unsigned char addr[],
+-				     u16 seq_out, bool san,
++				     unsigned char addr[], bool san,
+ 				     enum hsr_port_type rx_port)
  {
- 	cleanup_all_ns
+ 	struct hsr_node *new_node, *node;
+ 	unsigned long now;
++	size_t block_sz;
+ 	int i;
+ 
+ 	new_node = kzalloc(sizeof(*new_node), GFP_ATOMIC);
+@@ -190,8 +171,6 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+ 	now = jiffies;
+ 	for (i = 0; i < HSR_PT_PORTS; i++) {
+ 		new_node->time_in[i] = now;
+-		new_node->time_out[i] = now;
+-		new_node->seq_out[i] = seq_out;
+ 	}
+ 
+ 	if (san && hsr->proto_ops->handle_san_frame)
+@@ -206,9 +185,13 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+ 			goto out;
+ 	}
+ 
+-	new_node->block_buf = kcalloc(HSR_MAX_SEQ_BLOCKS,
+-				      sizeof(struct hsr_seq_block),
+-				      GFP_ATOMIC);
++	if (hsr->prot_version == PRP_V1)
++		new_node->seq_port_cnt = 1;
++	else
++		new_node->seq_port_cnt = HSR_PT_PORTS - 1;
++
++	block_sz = hsr_seq_block_size(new_node);
++	new_node->block_buf = kcalloc(HSR_MAX_SEQ_BLOCKS, block_sz, GFP_ATOMIC);
+ 	if (!new_node->block_buf)
+ 		goto out;
+ 
+@@ -243,7 +226,6 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+ 	struct ethhdr *ethhdr;
+ 	struct prp_rct *rct;
+ 	bool san = false;
+-	u16 seq_out;
+ 
+ 	if (!skb_mac_header_was_set(skb))
+ 		return NULL;
+@@ -280,24 +262,13 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+ 		/* Check if skb contains hsr_ethhdr */
+ 		if (skb->mac_len < sizeof(struct hsr_ethhdr))
+ 			return NULL;
+-
+-		/* Use the existing sequence_nr from the tag as starting point
+-		 * for filtering duplicate frames.
+-		 */
+-		seq_out = hsr_get_skb_sequence_nr(skb) - 1;
+ 	} else {
+ 		rct = skb_get_PRP_rct(skb);
+-		if (rct && prp_check_lsdu_size(skb, rct, is_sup)) {
+-			seq_out = prp_get_skb_sequence_nr(rct);
+-		} else {
+-			if (rx_port != HSR_PT_MASTER)
+-				san = true;
+-			seq_out = HSR_SEQNR_START;
+-		}
++		if (!rct && rx_port != HSR_PT_MASTER)
++			san = true;
+ 	}
+ 
+-	return hsr_add_node(hsr, node_db, ethhdr->h_source, seq_out,
+-			    san, rx_port);
++	return hsr_add_node(hsr, node_db, ethhdr->h_source, san, rx_port);
+ }
+ 
+ static bool hsr_seq_block_is_old(struct hsr_seq_block *block)
+@@ -326,6 +297,7 @@ static struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
+ 					       u16 block_idx)
+ {
+ 	struct hsr_seq_block *block, *res;
++	size_t block_sz;
+ 
+ 	block = xa_load(&node->seq_blocks, block_idx);
+ 
+@@ -335,10 +307,11 @@ static struct hsr_seq_block *hsr_get_seq_block(struct hsr_node *node,
+ 	}
+ 
+ 	if (!block) {
+-		block = &node->block_buf[node->next_block];
++		block_sz = hsr_seq_block_size(node);
++		block = node->block_buf + node->next_block * block_sz;
+ 		hsr_forget_seq_block(node, block);
+ 
+-		memset(block, 0, sizeof(*block));
++		memset(block, 0, block_sz);
+ 		block->time = jiffies;
+ 		block->block_idx = block_idx;
+ 
+@@ -415,8 +388,7 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
+ 	if (!node_real)
+ 		/* No frame received from AddrA of this node yet */
+ 		node_real = hsr_add_node(hsr, node_db, hsr_sp->macaddress_A,
+-					 HSR_SEQNR_START - 1, true,
+-					 port_rcv->type);
++					 true, port_rcv->type);
+ 	if (!node_real)
+ 		goto done; /* No mem */
+ 	if (node_real == node_curr)
+@@ -463,8 +435,6 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
+ 			node_real->time_in_stale[i] =
+ 						node_curr->time_in_stale[i];
+ 		}
+-		if (seq_nr_after(node_curr->seq_out[i], node_real->seq_out[i]))
+-			node_real->seq_out[i] = node_curr->seq_out[i];
+ 	}
+ 
+ 	xa_for_each(&node_curr->seq_blocks, idx, src_blk) {
+@@ -473,8 +443,10 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
+ 
+ 		merge_blk = hsr_get_seq_block(node_real, src_blk->block_idx);
+ 		merge_blk->time = min(merge_blk->time, src_blk->time);
+-		bitmap_or(merge_blk->seq_nrs, merge_blk->seq_nrs,
+-			  src_blk->seq_nrs, HSR_SEQ_BLOCK_SIZE);
++		for (i = 0; i < node_real->seq_port_cnt; i++) {
++			bitmap_or(merge_blk->seq_nrs[i], merge_blk->seq_nrs[i],
++				  src_blk->seq_nrs[i], HSR_SEQ_BLOCK_SIZE);
++		}
+ 	}
+ 	spin_unlock_bh(&node_real->seq_out_lock);
+ 	node_real->addr_B_port = port_rcv->type;
+@@ -551,60 +523,28 @@ void hsr_addr_subst_dest(struct hsr_node *node_src, struct sk_buff *skb,
+ void hsr_register_frame_in(struct hsr_node *node, struct hsr_port *port,
+ 			   u16 sequence_nr)
+ {
+-	/* Don't register incoming frames without a valid sequence number. This
+-	 * ensures entries of restarted nodes gets pruned so that they can
+-	 * re-register and resume communications.
+-	 */
+-	if (!(port->dev->features & NETIF_F_HW_HSR_TAG_RM) &&
+-	    seq_nr_before(sequence_nr, node->seq_out[port->type]))
+-		return;
+-
+ 	node->time_in[port->type] = jiffies;
+ 	node->time_in_stale[port->type] = false;
+ }
+ 
+-/* 'skb' is a HSR Ethernet frame (with a HSR tag inserted), with a valid
+- * ethhdr->h_source address and skb->mac_header set.
+- *
+- * Return:
+- *	 1 if frame can be shown to have been sent recently on this interface,
+- *	 0 otherwise, or
+- *	 negative error code on error
+- */
+-int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+-{
+-	struct hsr_node *node = frame->node_src;
+-	u16 sequence_nr = frame->sequence_nr;
+-
+-	spin_lock_bh(&node->seq_out_lock);
+-	if (seq_nr_before_or_eq(sequence_nr, node->seq_out[port->type]) &&
+-	    time_is_after_jiffies(node->time_out[port->type] +
+-	    msecs_to_jiffies(HSR_ENTRY_FORGET_TIME))) {
+-		spin_unlock_bh(&node->seq_out_lock);
+-		return 1;
+-	}
+-
+-	node->time_out[port->type] = jiffies;
+-	node->seq_out[port->type] = sequence_nr;
+-	spin_unlock_bh(&node->seq_out_lock);
+-	return 0;
+-}
+-
+-/* PRP duplicate discard algorithm: we maintain a bitmap where we set a bit for
++/* Duplicate discard algorithm: we maintain a bitmap where we set a bit for
+  * every seen sequence number. The bitmap is split into blocks and the block
+  * management is detailed in hsr_get_seq_block(). In any case, we err on the
+  * side of accepting a packet, as the specification requires the algorithm to
+  * be "designed such that it never rejects a legitimate frame, while occasional
+  * acceptance of a duplicate can be tolerated." (IEC 62439-3:2021, 4.1.10.3).
++ * While this requirement is explicit for PRP, applying it to HSR does no harm
++ * either.
+  *
+- * 'port' is the outgoing interface
+  * 'frame' is the frame to be sent
++ * 'port_type' is the type of the outgoing interface
+  *
+  * Return:
+  *	 1 if frame can be shown to have been sent recently on this interface,
+  *	 0 otherwise
+  */
+-int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
++static int hsr_check_duplicate(struct hsr_frame_info *frame,
++			       unsigned int port_type)
+ {
+ 	u16 sequence_nr, seq_bit, block_idx;
+ 	struct hsr_seq_block *block;
+@@ -613,20 +553,8 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+ 	node = frame->node_src;
+ 	sequence_nr = frame->sequence_nr;
+ 
+-	// out-going frames are always in order
+-	if (frame->port_rcv->type == HSR_PT_MASTER) {
+-		spin_lock_bh(&node->seq_out_lock);
+-		node->time_out[port->type] = jiffies;
+-		node->seq_out[port->type] = sequence_nr;
+-		spin_unlock_bh(&node->seq_out_lock);
++	if (WARN_ON_ONCE(port_type >= node->seq_port_cnt))
+ 		return 0;
+-	}
+-
+-	/* for PRP we should only forward frames from the slave ports
+-	 * to the master port
+-	 */
+-	if (port->type != HSR_PT_MASTER)
+-		return 1;
+ 
+ 	spin_lock_bh(&node->seq_out_lock);
+ 
+@@ -636,11 +564,9 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+ 		goto out_new;
+ 
+ 	seq_bit = hsr_seq_block_bit(sequence_nr);
+-	if (test_and_set_bit(seq_bit, block->seq_nrs))
++	if (test_and_set_bit(seq_bit, block->seq_nrs[port_type]))
+ 		goto out_seen;
+ 
+-	node->time_out[port->type] = jiffies;
+-	node->seq_out[port->type] = sequence_nr;
+ out_new:
+ 	spin_unlock_bh(&node->seq_out_lock);
+ 	return 0;
+@@ -650,6 +576,49 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+ 	return 1;
+ }
+ 
++/* HSR duplicate discard: we check if the same frame has already been sent on
++ * this outgoing interface. The check follows the general duplicate discard
++ * algorithm.
++ *
++ * 'port' is the outgoing interface
++ * 'frame' is the frame to be sent
++ *
++ * Return:
++ *	 1 if frame can be shown to have been sent recently on this interface,
++ *	 0 otherwise
++ */
++int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
++{
++	return hsr_check_duplicate(frame, port->type - 1);
++}
++
++/* PRP duplicate discard: we only consider frames that are received on port A
++ * or port B and should go to the master port. For those, we check if they have
++ * already been received by the host, i.e., master port. The check uses the
++ * general duplicate discard algorithm, but without tracking multiple ports.
++ *
++ * 'port' is the outgoing interface
++ * 'frame' is the frame to be sent
++ *
++ * Return:
++ *	 1 if frame can be shown to have been sent recently on this interface,
++ *	 0 otherwise
++ */
++int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
++{
++	// out-going frames are always in order
++	if (frame->port_rcv->type == HSR_PT_MASTER)
++		return 0;
++
++	/* for PRP we should only forward frames from the slave ports
++	 * to the master port
++	 */
++	if (port->type != HSR_PT_MASTER)
++		return 1;
++
++	return hsr_check_duplicate(frame, 0);
++}
++
+ #if IS_MODULE(CONFIG_PRP_DUP_DISCARD_KUNIT_TEST)
+ EXPORT_SYMBOL(prp_register_frame_out);
+ #endif
+@@ -802,6 +771,39 @@ void *hsr_get_next_node(struct hsr_priv *hsr, void *_pos,
+ 	return NULL;
+ }
+ 
++/* Fill the last sequence number that has been received from node on if1 by
++ * finding the last sequence number sent on port B; accordingly get the last
++ * received sequence number for if2 using sent sequence numbers on port A.
++ */
++static void fill_last_seq_nrs(struct hsr_node *node, u16 *if1_seq, u16 *if2_seq)
++{
++	struct hsr_seq_block *block;
++	unsigned int block_off;
++	size_t block_sz;
++	u16 seq_bit;
++
++	spin_lock_bh(&node->seq_out_lock);
++
++	// Get last inserted block
++	block_off = (node->next_block - 1) & (HSR_MAX_SEQ_BLOCKS - 1);
++	block_sz = hsr_seq_block_size(node);
++	block = node->block_buf + node->next_block * block_sz;
++
++	if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_B - 1],
++			  HSR_SEQ_BLOCK_SIZE)) {
++		seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_B - 1],
++					HSR_SEQ_BLOCK_SIZE);
++		*if1_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
++	}
++	if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_A - 1],
++			  HSR_SEQ_BLOCK_SIZE)) {
++		seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_A - 1],
++					HSR_SEQ_BLOCK_SIZE);
++		*if2_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
++	}
++	spin_unlock_bh(&node->seq_out_lock);
++}
++
+ int hsr_get_node_data(struct hsr_priv *hsr,
+ 		      const unsigned char *addr,
+ 		      unsigned char addr_b[ETH_ALEN],
+@@ -842,8 +844,10 @@ int hsr_get_node_data(struct hsr_priv *hsr,
+ 		*if2_age = jiffies_to_msecs(tdiff);
+ 
+ 	/* Present sequence numbers as if they were incoming on interface */
+-	*if1_seq = node->seq_out[HSR_PT_SLAVE_B];
+-	*if2_seq = node->seq_out[HSR_PT_SLAVE_A];
++	*if1_seq = 0;
++	*if2_seq = 0;
++	if (hsr->prot_version != PRP_V1)
++		fill_last_seq_nrs(node, if1_seq, if2_seq);
+ 
+ 	if (node->addr_B_port != HSR_PT_NONE) {
+ 		port = hsr_port_get_hsr(hsr, node->addr_B_port);
+diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
+index d4d1fa70039f..1e297268d1d4 100644
+--- a/net/hsr/hsr_framereg.h
++++ b/net/hsr/hsr_framereg.h
+@@ -82,15 +82,18 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
+ #define hsr_seq_block_index(sequence_nr) ((sequence_nr) >> HSR_SEQ_BLOCK_SHIFT)
+ #define hsr_seq_block_bit(sequence_nr) ((sequence_nr) & HSR_SEQ_BLOCK_MASK)
+ 
++#define DECLARE_BITMAP_FLEX_ARRAY(name, bits) \
++	unsigned long name[][BITS_TO_LONGS(bits)]
++
+ struct hsr_seq_block {
+ 	unsigned long		time;
+ 	u16			block_idx;
+-	DECLARE_BITMAP(seq_nrs, HSR_SEQ_BLOCK_SIZE);
++	DECLARE_BITMAP_FLEX_ARRAY(seq_nrs, HSR_SEQ_BLOCK_SIZE);
+ };
+ 
+ struct hsr_node {
+ 	struct list_head	mac_list;
+-	/* Protect R/W access to seq_out and seq_blocks */
++	/* Protect R/W access seq_blocks */
+ 	spinlock_t		seq_out_lock;
+ 	unsigned char		macaddress_A[ETH_ALEN];
+ 	unsigned char		macaddress_B[ETH_ALEN];
+@@ -98,17 +101,22 @@ struct hsr_node {
+ 	enum hsr_port_type	addr_B_port;
+ 	unsigned long		time_in[HSR_PT_PORTS];
+ 	bool			time_in_stale[HSR_PT_PORTS];
+-	unsigned long		time_out[HSR_PT_PORTS];
+ 	/* if the node is a SAN */
+ 	bool			san_a;
+ 	bool			san_b;
+-	u16			seq_out[HSR_PT_PORTS];
+ 	bool			removed;
+-	/* PRP specific duplicate handling */
++	/* Duplicate detection */
+ 	struct xarray		seq_blocks;
+-	struct hsr_seq_block	*block_buf;
++	void			*block_buf;
+ 	unsigned int		next_block;
++	unsigned int		seq_port_cnt;
+ 	struct rcu_head		rcu_head;
+ };
+ 
++static inline size_t hsr_seq_block_size(struct hsr_node *node)
++{
++	WARN_ON_ONCE(node->seq_port_cnt == 0);
++	return struct_size_t(struct hsr_seq_block, seq_nrs, node->seq_port_cnt);
++}
++
+ #endif /* __HSR_FRAMEREG_H */
 -- 
 2.52.0
 
