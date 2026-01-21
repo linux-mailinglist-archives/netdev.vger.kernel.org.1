@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-251987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kK1fA5QWcWmodQAAu9opvQ
-	(envelope-from <netdev+bounces-251987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:10:28 +0100
+	id aDGgDNkFcWmgbAAAu9opvQ
+	(envelope-from <netdev+bounces-251988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:59:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C90B5B108
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:10:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBC85A3E9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0490764E30C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:17:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4752B200D9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F9D3C1983;
-	Wed, 21 Jan 2026 16:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26DF747A0B5;
+	Wed, 21 Jan 2026 16:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eV9qhWpu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmFnnjBk"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF2323A9BD
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C52423A85
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769011983; cv=none; b=YAfuNX2lGxLeOnuGvq3l8R+qCDzZa6IY9SGrUNcXJzSQE0N/uwyvKfQQbWjKKXg5lGMkal9u8l+zzGAqbW5DGTdpcGfbXb9edrT+yrt5zn8DloLnBbfAgGU537AFFc9f5Ashb4xxOXjhj12ZRWHoB9G3hdot/c/6VrPfR0E1JiA=
+	t=1769011988; cv=none; b=mfU+8KTys5vDA1KIXeWzJEfCw1srEOdRV8H/boxy4EdIIjbUzpiqKqCRiM5RfJOrvhN0hASfaK4VbP7o6YsjV7W7m3k2p2VzG34fHH1hdSzR9VlVf/zhv9PkyZGndBypHLhopubSXRyOoae0yBgTh+bqq0dvvkAYvl1TSwqzWkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769011983; c=relaxed/simple;
-	bh=yZsbVwRy2spuwvUdODnJI4TupXGW7CHS/JhPCUzjK/Q=;
+	s=arc-20240116; t=1769011988; c=relaxed/simple;
+	bh=p8RaxsVAwV1jY3wu0PYV2U94OYD/sSFWQprZn6WrA+E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dqWaq7ej2dQIZnw2aojqtAIPZ7kuS+HPmuFL3NFgpx7KI1/sSIA/ipFCD48vW0mw29v9EvT01bM+WxqYM6R3dRKFKFWxtS6mrwCIu70WysRS8QCV9iqklZM0RMECbkag15RCFmqtPAowJUWMYznYo02K1i9iD9Xcqwdk4xTNkE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eV9qhWpu; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=nhG5ngb/ZgfGbzyRRwFna5sT+Ws0Vs3CVigy9Si1gPszvSQD0EC1UmHpph6BL1/nH16i4kU66hNA2T3oPcC3roUZC7QVLoqUvObNGYqd+ZngCEtcLPs/aw7iCW7/+y8/1C0LuX04oDQoo4AJewMEwEWVZ3fZPa46PwcH6Yh86b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AmFnnjBk; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769011980;
+	s=mimecast20190719; t=1769011983;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VgPusNiSpXE3l5vzWBnNwxUOaNQs/OmX1VUEj+DC7LM=;
-	b=eV9qhWpuU+b8Juiwz3CB7RJueb0v9svkS6getdmd+xmFs0bsSZYi+O9lgI38fVbmUbX2+J
-	r/uK3Ani3ondCly10uUpB1JeY4wq8DOOorhmxEFNaXNhB4uP1C/avGwLZWAvZ0FJN32How
-	p50+DU3xZO8B4+X5IunvdwnnKyaz82I=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=R350v4NZb92rcK636RJga6sGbdNCvbPGnoUXK2ix8Po=;
+	b=AmFnnjBk7J0vuJBkVCLf/mjCi0GyGBtZBiYAG5bOrxGCMSbpYzKtl+Oq0kFbcb/5eJMiVp
+	TIJfkAJ/H2PoWeEDQ+XU8+13bTpNm2A8mc7NoGRDPSa2AmD1P7A4zScdKfxa766juFhe5n
+	PswqSoJkRV0jjS6KMCWHRvsHchHUBp8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-oPOZ1-J0MsORYpEA-Exmgg-1; Wed,
- 21 Jan 2026 11:12:53 -0500
-X-MC-Unique: oPOZ1-J0MsORYpEA-Exmgg-1
-X-Mimecast-MFC-AGG-ID: oPOZ1-J0MsORYpEA-Exmgg_1769011970
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-327-CcO84MppNKmffBd_eQnBtg-1; Wed,
+ 21 Jan 2026 11:12:55 -0500
+X-MC-Unique: CcO84MppNKmffBd_eQnBtg-1
+X-Mimecast-MFC-AGG-ID: CcO84MppNKmffBd_eQnBtg_1769011974
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D1F9719541A7;
-	Wed, 21 Jan 2026 16:12:49 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1321E18005B0;
+	Wed, 21 Jan 2026 16:12:54 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.225.3])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1EB3D18001D5;
-	Wed, 21 Jan 2026 16:12:45 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 516881800240;
+	Wed, 21 Jan 2026 16:12:50 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -76,9 +76,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	petrm@nvidia.com,
 	razor@blackwall.org,
 	idosch@nvidia.com
-Subject: [PATCH v5 net-next 09/10] geneve: use GRO hint option in the RX path
-Date: Wed, 21 Jan 2026 17:11:35 +0100
-Message-ID: <4a9a390588a429191e0ffe48ccdd288bb69e567e.1769011015.git.pabeni@redhat.com>
+Subject: [PATCH v5 net-next 10/10] selftests: net: tests for add double tunneling GRO/GSO
+Date: Wed, 21 Jan 2026 17:11:36 +0100
+Message-ID: <61f2c98ba0f73057c2d6f6cb62eb807abd90bf6b.1769011015.git.pabeni@redhat.com>
 In-Reply-To: <cover.1769011015.git.pabeni@redhat.com>
 References: <cover.1769011015.git.pabeni@redhat.com>
 Precedence: bulk
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251987-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251988-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -117,289 +117,461 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 7C90B5B108
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,lib.sh:url]
+X-Rspamd-Queue-Id: 9FBC85A3E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-At the GRO stage, when a valid hint option is found, try match the whole
-nested headers and try to aggregate on the inner protocol; in case of hdr
-mismatch extract the nested address and port to properly flush on a
-per-inner flow basis.
+Create a simple, netns-based topology with double, nested UDP tunnels and
+perform TSO transfers on top.
 
-On GRO completion, the (unmodified) nested headers will be considered part
-of the (constant) outer geneve encap header so that plain UDP tunnel
-segmentation will yield valid wire packets.
+Explicitly enable GSO and/or GRO and check the skb layout consistency with
+different configuration allowing (or not) GSO frames to be delivered on
+the other end.
 
-In the geneve RX path, when processing a GSO packet carrying a GRO hint
-option, update the nested header length fields from the wire packet size to
-the GSO-packet one. If the nested header additionally carries a checksum,
-convert it to CSUM-partial.
-
-Finally, when the RX path leverages the GRO hints, skip the additional GRO
-stage done by GRO cells: otherwise the already set skb->encapsulation flag
-will foul the GRO cells complete step to use touch the innermost IP header
-when it should update the nested csum, corrupting the packet.
+The trickest part is account in a robust way the aggregated/unaggregated
+packets with double encapsulation: use a classic bpf filter for it.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- v1 -> v2:
-   - reload hdrs after possible pskb_may_pull()
-   - skip GRO cells for double encap gro pkts
----
- drivers/net/geneve.c | 183 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 176 insertions(+), 7 deletions(-)
+v3 -> v4:
+  - use xfail_on_slow and moved the main tests loop in its own function
+  - deduplicated some code in create_ns_gso()
+  - consistently re-intented all multi-line statements
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 2e1f85b8af4e..0949d4579171 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -259,9 +259,8 @@ static struct geneve_dev *geneve_lookup_skb(struct geneve_sock *gs,
- 
- /* geneve receive/decap routine */
- static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
--		      struct sk_buff *skb)
-+		      struct sk_buff *skb, const struct genevehdr *gnvh)
- {
--	struct genevehdr *gnvh = geneve_hdr(skb);
- 	struct metadata_dst *tun_dst = NULL;
- 	unsigned int len;
- 	int nh, err = 0;
-@@ -362,8 +361,12 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
- 		}
- 	}
- 
-+	/* Skip the additional GRO stage when hints are in use. */
- 	len = skb->len;
--	err = gro_cells_receive(&geneve->gro_cells, skb);
-+	if (skb->encapsulation)
-+		err = netif_rx(skb);
+v1 -> v2:
+  - fixed a few shellcheck issues
+  - added bpf filter to improve accounting
+---
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/config            |   1 +
+ .../testing/selftests/net/double_udp_encap.sh | 393 ++++++++++++++++++
+ 3 files changed, 395 insertions(+)
+ create mode 100755 tools/testing/selftests/net/double_udp_encap.sh
+
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b66ba04f19d9..063155f42cd7 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -22,6 +22,7 @@ TEST_PROGS := \
+ 	cmsg_so_mark.sh \
+ 	cmsg_so_priority.sh \
+ 	cmsg_time.sh \
++	double_udp_encap.sh \
+ 	drop_monitor_tests.sh \
+ 	fcnal-ipv4.sh \
+ 	fcnal-ipv6.sh \
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 1e1f253118f5..61b866dca311 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -76,6 +76,7 @@ CONFIG_NET_DROP_MONITOR=m
+ CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+ CONFIG_NETFILTER_XTABLES_LEGACY=y
++CONFIG_NETFILTER_XT_MATCH_BPF=m
+ CONFIG_NETFILTER_XT_MATCH_LENGTH=m
+ CONFIG_NETFILTER_XT_MATCH_POLICY=m
+ CONFIG_NETFILTER_XT_NAT=m
+diff --git a/tools/testing/selftests/net/double_udp_encap.sh b/tools/testing/selftests/net/double_udp_encap.sh
+new file mode 100755
+index 000000000000..9aaf97cdf141
+--- /dev/null
++++ b/tools/testing/selftests/net/double_udp_encap.sh
+@@ -0,0 +1,393 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++source lib.sh
++
++# shellcheck disable=SC2155 # prefer RO variable over return value from cmd
++readonly CLI="$(dirname "$(readlink -f "$0")")/../../../net/ynl/pyynl/cli.py"
++
++readonly SRC=1
++readonly DST=2
++
++readonly NET_V4=192.168.1.
++readonly NET_V6=2001:db8::
++readonly OL1_NET_V4=172.16.1.
++readonly OL1_NET_V6=2001:db8:1::
++readonly OL2_NET_V4=172.16.2.
++readonly OL2_NET_V6=2001:db8:2::
++
++trap cleanup_all_ns EXIT
++
++# shellcheck disable=SC2329 # can't figure out usage trough a variable
++is_ipv6() {
++	if [[ $1 =~ .*:.* ]]; then
++		return 0
++	fi
++	return 1
++}
++
++# shellcheck disable=SC2329 # can't figure out usage trough a variable
++create_gnv_endpoint() {
++	local -r netns=$1
++	local -r bm_rem_addr=$2
++	local -r gnv_dev=$3
++	local -r gnv_id=$4
++	local opts=$5
++	local gnv_json
++	local rem
++
++	if is_ipv6 "$bm_rem_addr"; then
++		rem=remote6
 +	else
-+		err = gro_cells_receive(&geneve->gro_cells, skb);
- 	if (likely(err == NET_RX_SUCCESS))
- 		dev_dstats_rx_add(geneve->dev, len);
- 
-@@ -564,6 +567,86 @@ geneve_opt_gro_hint_validate_csum(const struct sk_buff *skb,
- 	return !csum_fold(csum_add(psum, csum));
- }
- 
-+static int geneve_post_decap_hint(const struct sock *sk, struct sk_buff *skb,
-+				  unsigned int gh_len,
-+				  struct genevehdr **geneveh)
-+{
-+	const struct geneve_opt_gro_hint *gro_hint;
-+	unsigned int len, total_len, hint_off;
-+	struct ipv6hdr *ipv6h;
-+	struct iphdr *iph;
-+	struct udphdr *uh;
-+	__be16 p;
++		rem=remote
++	fi
 +
-+	hint_off = geneve_sk_gro_hint_off(sk, *geneveh, &p, &len);
-+	if (!hint_off)
-+		return 0;
++	# add ynl opt separator, if needed
++	[ -n "$opts" ] && opts=", $opts"
 +
-+	if (!skb_is_gso(skb))
-+		return 0;
++	gnv_json="{ \"id\": $gnv_id, \"$rem\": \"$bm_rem_addr\"$opts }"
++	ip netns exec "$netns" "$CLI" --family rt-link --create --excl \
++	   --do newlink  --json "{\"ifname\": \"$gnv_dev\",
++	       \"linkinfo\": {\"kind\":\"geneve\",
++	       \"data\": $gnv_json } }" > /dev/null
++	ip -n "$netns" link set dev "$gnv_dev" up
++}
 +
-+	gro_hint = geneve_opt_gro_hint(*geneveh, hint_off);
-+	if (unlikely(!pskb_may_pull(skb, gro_hint->nested_hdr_len)))
-+		return -ENOMEM;
++# shellcheck disable=SC2329 # can't figure out usage trough a variable
++create_vxlan_endpoint() {
++	local -r netns=$1
++	local -r bm_rem_addr=$2
++	local -r vxlan_dev=$3
++	local -r vxlan_id=$4
++	local -r opts_str=$5
++	local oldifs
++	local -a opts
++	local opt
 +
-+	*geneveh = geneve_hdr(skb);
-+	gro_hint = geneve_opt_gro_hint(*geneveh, hint_off);
++	# convert the arguments from yaml format
++	oldifs=$IFS
++	IFS=','
++	for opt in $opts_str; do
++		local pattern='"port":'
 +
-+	/*
-+	 * Validate hints from untrusted source before accessing
-+	 * the headers; csum will be checked later by the nested
-+	 * protocol rx path.
-+	 */
-+	if (unlikely(skb_shinfo(skb)->gso_type & SKB_GSO_DODGY &&
-+		     !geneve_opt_gro_hint_validate(skb->data, gro_hint)))
-+		return -EINVAL;
++		[ -n "$opt" ] || continue
 +
-+	ipv6h = (void *)skb->data + gro_hint->nested_nh_offset;
-+	iph = (struct iphdr *)ipv6h;
-+	total_len = skb->len - gro_hint->nested_nh_offset;
-+	if (total_len > GRO_LEGACY_MAX_SIZE)
-+		return -E2BIG;
++		opts+=("${opt/$pattern*/dstport}" "${opt/$pattern/}")
++	done
++	IFS=$oldifs
++	[ ${#opts[@]} -gt 0 ] || opts+=("dstport" "4789")
 +
-+	/*
-+	 * After stripping the outer encap, the packet still carries a
-+	 * tunnel encapsulation: the nested one.
-+	 */
-+	skb->encapsulation = 1;
++	ip -n "$netns" link add "$vxlan_dev" type vxlan id "$vxlan_id" \
++	   remote "$bm_rem_addr" "${opts[@]}"
++	ip -n "$netns" link set dev "$vxlan_dev" up
++}
 +
-+	/* GSO expect a valid transpor header, move it to the current one. */
-+	skb_set_transport_header(skb, gro_hint->nested_tp_offset);
++create_ns() {
++	local nested_opt='"port":6082'
++	local create_endpoint
++	local options="$1"
++	local feature
++	local dev
++	local id
++	local ns
 +
-+	/* Adjust the nested IP{6} hdr to actual GSO len. */
-+	if (gro_hint->nested_is_v6) {
-+		ipv6h->payload_len = htons(total_len - sizeof(*ipv6h));
-+	} else {
-+		__be16 old_len = iph->tot_len;
++	RET=0
 +
-+		iph->tot_len = htons(total_len);
++	#  +-------------+    +-------------+
++	#  | NS_SRC      |    | NS_NST_DST  |
++	#  |             |    |             |
++	#  |   gnv_nst1  |    |  gnv_nst2   |
++	#  |   +         |    |         +   |
++	#  |   |         |    |         |   |
++	#  |   +         |    |         +   |
++	#  |  gnv1       |    |        gnv2 |
++	#  |   +         |    |         +   |
++	#  |   |         |    |         |   |
++	#  |   + veth1 +--------+ veth2 +   |
++	#  |             |    |             |
++	#  +-------------+    +-------------+
 +
-+		/* For IPv4 additionally adjust the nested csum. */
-+		csum_replace2(&iph->check, old_len, iph->tot_len);
-+		ip_send_check(iph);
-+	}
++	setup_ns NS_SRC NS_DST
 +
-+	/* Adjust the nested UDP header len and checksum. */
-+	uh = udp_hdr(skb);
-+	uh->len = htons(skb->len - gro_hint->nested_tp_offset);
-+	if (uh->check) {
-+		len = skb->len - gro_hint->nested_nh_offset;
-+		skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL_CSUM;
-+		if (gro_hint->nested_is_v6)
-+			uh->check = ~udp_v6_check(len, &ipv6h->saddr,
-+						  &ipv6h->daddr, 0);
++	# concatenate caller provided options and default one
++	[ -n "$2" ] && nested_opt="$nested_opt,$2"
++
++	ip link add name "veth$SRC" netns "$NS_SRC" type veth \
++	   peer name "veth$DST" netns "$NS_DST"
++	case "$ENCAP" in
++	vxlan)
++		create_endpoint=create_vxlan_endpoint
++		dev=vx
++		;;
++	geneve)
++		create_endpoint=create_gnv_endpoint
++		dev=gnv
++		;;
++	esac
++
++	id=1
++	for ns in "${NS_LIST[@]}"; do
++		ip -n "$ns" link set dev "veth$id" up
++
++		# ensure the sender can do large write just after 3whs
++		ip netns exec "$ns" \
++		   sysctl -qw net.ipv4.tcp_wmem="4096 4194304 4194304"
++
++		# note that 3 - $SRC == $DST and 3 - $DST == $SRC
++		if [ $FAMILY = "4" ]; then
++			ip -n "$ns" addr add dev "veth$id" "$NET_V4$id/24"
++			$create_endpoint "$ns" "$NET_V4$((3 - id))" \
++			   "$dev$id" 4 "$options"
++			ip -n "$ns" addr add dev "$dev$id" "$OL1_NET_V4$id/24"
++
++			# nested tunnel devices
++			# pmtu can't be propagated to upper layer devices;
++			# need manual adjust
++			$create_endpoint "$ns" "$OL1_NET_V4$((3 - id))" \
++			   "$dev"_nst"$id" 40 "$nested_opt"
++			ip -n "$ns" addr add dev "$dev"_nst"$id" \
++			   "$OL2_NET_V4$id/24"
++			ip -n "$ns" link set dev "$dev"_nst"$id" mtu 1392
 +		else
-+			uh->check = ~udp_v4_check(len, iph->saddr,
-+						  iph->daddr, 0);
-+	} else {
-+		skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL;
-+	}
-+	return 0;
++			ip -n "$ns" addr add dev "veth$id" "$NET_V6$id/64" \
++			   nodad
++			$create_endpoint "$ns" "$NET_V6$((3 - id))" \
++			   "$dev"6"$id" 6 "$options"
++			ip -n "$ns" addr add dev "$dev"6"$id" \
++			   "$OL1_NET_V6$id/64" nodad
++
++			$create_endpoint "$ns" "$OL1_NET_V6$((3 - id))" \
++			   "$dev"6_nst"$id" 60 "$nested_opt"
++			ip -n "$ns" addr add dev "$dev"6_nst"$id" \
++			   "$OL2_NET_V6$id/64" nodad
++			ip -n "$ns" link set dev "$dev"6_nst"$id" mtu 1352
++		fi
++		id=$((id+1))
++	done
++
++	# enable GRO heuristic on the veth peer and ensure UDP L4 over tunnel is
++	# actually segmented
++	for feature in tso tx-udp_tnl-segmentation; do
++		ip netns exec "$NS_SRC" ethtool -K "veth$SRC" \
++		   "$feature" off 2>/dev/null
++	done
 +}
 +
- /* Callback from net/ipv4/udp.c to receive packets */
- static int geneve_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- {
-@@ -605,7 +688,18 @@ static int geneve_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
- 		goto drop;
- 	}
- 
--	geneve_rx(geneve, gs, skb);
-+	/*
-+	 * After hint processing, the transport header points to the inner one
-+	 * and we can't use anymore on geneve_hdr().
-+	 */
-+	geneveh = geneve_hdr(skb);
-+	if (geneve_post_decap_hint(sk, skb, sizeof(struct genevehdr) +
-+				   opts_len, &geneveh)) {
-+		DEV_STATS_INC(geneve->dev, rx_errors);
-+		goto drop;
-+	}
++create_ns_gso() {
++	local dev
 +
-+	geneve_rx(geneve, gs, skb, geneveh);
- 	return 0;
- 
- drop:
-@@ -696,11 +790,87 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
- 	return sock;
- }
- 
-+static bool geneve_hdr_match(struct sk_buff *skb,
-+			     const struct genevehdr *gh,
-+			     const struct genevehdr *gh2,
-+			     unsigned int hint_off)
-+{
-+	const struct geneve_opt_gro_hint *gro_hint;
-+	void *nested, *nested2, *nh, *nh2;
-+	struct udphdr *udp, *udp2;
-+	unsigned int gh_len;
-+
-+	/* Match the geneve hdr and options */
-+	if (gh->opt_len != gh2->opt_len)
-+		return false;
-+
-+	gh_len = geneve_hlen(gh);
-+	if (memcmp(gh, gh2, gh_len))
-+		return false;
-+
-+	if (!hint_off)
-+		return true;
-+
-+	/*
-+	 * When gro is present consider the nested headers as part
-+	 * of the geneve options
-+	 */
-+	nested = (void *)gh + gh_len;
-+	nested2 = (void *)gh2 + gh_len;
-+	gro_hint = geneve_opt_gro_hint(gh, hint_off);
-+	if (!memcmp(nested, nested2, gro_hint->nested_hdr_len))
-+		return true;
-+
-+	/*
-+	 * The nested headers differ; the packets can still belong to
-+	 * the same flow when IPs/proto/ports match; if so flushing is
-+	 * required.
-+	 */
-+	nh = nested + gro_hint->nested_nh_offset;
-+	nh2 = nested2 + gro_hint->nested_nh_offset;
-+	if (gro_hint->nested_is_v6) {
-+		struct ipv6hdr *iph = nh, *iph2 = nh2;
-+		unsigned int nested_nlen;
-+		__be32 first_word;
-+
-+		first_word = *(__be32 *)iph ^ *(__be32 *)iph2;
-+		if ((first_word & htonl(0xF00FFFFF)) ||
-+		    !ipv6_addr_equal(&iph->saddr, &iph2->saddr) ||
-+		    !ipv6_addr_equal(&iph->daddr, &iph2->daddr) ||
-+		    iph->nexthdr != iph2->nexthdr)
-+			return false;
-+
-+		nested_nlen = gro_hint->nested_tp_offset -
-+			      gro_hint->nested_nh_offset;
-+		if (nested_nlen > sizeof(struct ipv6hdr) &&
-+		    (memcmp(iph + 1, iph2 + 1,
-+			    nested_nlen - sizeof(struct ipv6hdr))))
-+			return false;
-+	} else {
-+		struct iphdr *iph = nh, *iph2 = nh2;
-+
-+		if ((iph->protocol ^ iph2->protocol) |
-+		    ((__force u32)iph->saddr ^ (__force u32)iph2->saddr) |
-+		    ((__force u32)iph->daddr ^ (__force u32)iph2->daddr))
-+			return false;
-+	}
-+
-+	udp = nested + gro_hint->nested_tp_offset;
-+	udp2 = nested2 + gro_hint->nested_tp_offset;
-+	if (udp->source != udp2->source || udp->dest != udp2->dest ||
-+	    udp->check != udp2->check)
-+		return false;
-+
-+	NAPI_GRO_CB(skb)->flush = 1;
-+	return true;
++	create_ns "$@"
++	if [ "$ENCAP" = "geneve" ]; then
++		dev=gnv
++	else
++		dev=vx
++	fi
++	[ "$FAMILY" = "6" ] && dev="$dev"6
++	ip netns exec "$NS_SRC" ethtool -K "$dev$SRC" \
++	   tx-gso-partial on \
++	   tx-udp_tnl-segmentation on \
++	   tx-udp_tnl-csum-segmentation on
 +}
 +
- static struct sk_buff *geneve_gro_receive(struct sock *sk,
- 					  struct list_head *head,
- 					  struct sk_buff *skb)
- {
- 	unsigned int hlen, gh_len, off_gnv, hint_off;
-+	const struct geneve_opt_gro_hint *gro_hint;
- 	const struct packet_offload *ptype;
- 	struct genevehdr *gh, *gh2;
- 	struct sk_buff *pp = NULL;
-@@ -729,7 +899,6 @@ static struct sk_buff *geneve_gro_receive(struct sock *sk,
- 	/* The GRO hint/nested hdr could use a different ethernet type. */
- 	hint_off = geneve_sk_gro_hint_off(sk, gh, &type, &gh_len);
- 	if (hint_off) {
--		const struct geneve_opt_gro_hint *gro_hint;
- 
- 		/*
- 		 * If the hint is present, and nested hdr validation fails, do
-@@ -750,8 +919,7 @@ static struct sk_buff *geneve_gro_receive(struct sock *sk,
- 			continue;
- 
- 		gh2 = (struct genevehdr *)(p->data + off_gnv);
--		if (gh->opt_len != gh2->opt_len ||
--		    memcmp(gh, gh2, gh_len)) {
-+		if (!geneve_hdr_match(skb, gh, gh2, hint_off)) {
- 			NAPI_GRO_CB(p)->same_flow = 0;
- 			continue;
- 		}
-@@ -787,6 +955,7 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
- 	gh = (struct genevehdr *)(skb->data + nhoff);
- 	gh_len = geneve_hlen(gh);
- 	type = gh->proto_type;
-+	geneve_opt_gro_hint_off(gh, &type, &gh_len);
- 
- 	/* since skb->encapsulation is set, eth_gro_complete() sets the inner mac header */
- 	if (likely(type == htons(ETH_P_TEB)))
++create_ns_gso_gro() {
++	create_ns_gso "$@"
++	ip netns exec "$NS_DST" ethtool -K "veth$DST" gro on
++	ip netns exec "$NS_SRC" ethtool -K "veth$SRC" tx off >/dev/null 2>&1
++}
++
++run_test() {
++	local -r dst=$NET$DST
++	local -r msg=$1
++	local -r total_size=$2
++	local -r encappkts=$3
++	local inner_proto_offset=0
++	local inner_maclen=14
++	local rx_family="-4"
++	local ipt=iptables
++	local bpf_filter
++	local -a rx_args
++	local wire_pkts
++	local rcvpkts
++	local encl=8
++	local dport
++	local pkts
++	local snd
++
++	if [ $FAMILY = "6" ]; then
++		ipt=ip6tables
++	else
++		# rx program does not support '-6' and implies ipv6 usage by
++		# default
++		rx_args=("$rx_family")
++	fi
++
++	# The received can only check fixed size packet
++	pkts=$((total_size / GSO_SIZE))
++	if [ -n "$4" ]; then
++		wire_pkts=$4
++	elif [ $((total_size % GSO_SIZE)) -eq 0 ]; then
++		wire_pkts=1
++		rx_args+=("-l" "$GSO_SIZE")
++	else
++		wire_pkts=2
++		pkts=$((pkts + 1))
++	fi
++
++	if [ "$ENCAP" = "geneve" ]; then
++		dport=6081
++	else
++		dport=4789
++	fi
++
++	# Either:
++	# - IPv4, nested tunnel carries UDP over IPv4, with dport 6082,
++	#   innermost is TCP over IPv4 on port 8000
++	# - IPv6, nested tunnel carries UDP over IPv6, with dport 6082,
++	#   innermost is TCP over IPv6 on port 8000
++	# The nested tunnel port is 6082 and the nested encap len is 8
++	# regardless of the encap type (no geneve opts).
++	# In inherit protocol mode there is no nested mac hdr and the nested
++	# l3 protocol type field belongs to the geneve hdr.
++	[ "$USE_HINT" = true ] && encl=16
++	[ "$INHERIT" = true ] && inner_maclen=0
++	[ "$INHERIT" = true ] && inner_proto_offset=-4
++	local inner=$((inner_maclen+encl))
++	local proto=$((inner_maclen+encl+inner_proto_offset))
++	bpf_filter=$(nfbpf_compile "(ip &&
++		ip[$((40+encl))] == 0x08 && ip[$((41+encl))] == 0x00 &&
++		ip[$((51+encl))] == 0x11 &&
++		ip[$((64+encl))] == 0x17 && ip[$((65+encl))] == 0xc2 &&
++		ip[$((76+proto))] == 0x08 && ip[$((77+proto))] == 0x00 &&
++		ip[$((87+inner))] == 0x6 &&
++		ip[$((100+inner))] == 0x1f && ip[$((101+inner))] == 0x40) ||
++		(ip6 &&
++		ip6[$((60+encl))] == 0x86 && ip6[$((61+encl))] == 0xdd &&
++		ip6[$((68+encl))] == 0x11 &&
++		ip6[$((104+encl))] == 0x17 && ip6[$((105+encl))] == 0xc2 &&
++		ip6[$((116+proto))] == 0x86 && ip6[$((117+proto))] == 0xdd &&
++		ip6[$((124+inner))] == 0x6 &&
++		ip6[$((160+inner))] == 0x1f && ip6[$((161+inner))] == 0x40)")
++
++	# ignore shorts packet, to avoid arp/mld induced noise
++	ip netns exec "$NS_SRC" "$ipt" -A OUTPUT -p udp --dport "$dport" \
++	   -m length --length 600:65535 -m bpf --bytecode "$bpf_filter"
++	ip netns exec "$NS_DST" "$ipt" -A INPUT -p udp --dport "$dport" \
++	   -m length --length 600:65535 -m bpf --bytecode "$bpf_filter"
++	ip netns exec "$NS_DST" ./udpgso_bench_rx -C 2000 -t -R 100 \
++	   -n "$pkts" "${rx_args[@]}" &
++	local pid=$!
++	wait_local_port_listen "$NS_DST" 8000 tcp
++	ip netns exec "$NS_SRC" ./udpgso_bench_tx -"$FAMILY" -t -M 1 \
++	   -s "$total_size" -D "$dst"
++	local ret=$?
++	check_err "$ret" "client failure exit code $ret"
++	wait "$pid"
++	ret=$?
++	check_err "$ret" "sever failure exit code $ret"
++
++	snd=$(ip netns exec "$NS_SRC" "$ipt"-save -c |
++	    grep "dport $dport" | sed -e 's/\[//' -e 's/:.*//')
++
++	[ "$snd" = "$wire_pkts" ]
++	# shellcheck disable=SC2319 # known false positive
++	check_err $? "send $snd packets on the lowest link, expected $wire_pkts"
++
++	rcvpkts=$(ip netns exec "$NS_DST" "$ipt"-save -c | \
++	   grep "dport $dport" | sed -e 's/\[//' -e 's/:.*//')
++
++	[ "$rcvpkts" = "$encappkts" ]
++	check_err $? "received $rcvpkts $ENCAP packets, expected $encappkts"
++	log_test "$msg"
++}
++
++run_tests() {
++	for FAMILY in 4 6; do
++		NET=$OL2_NET_V4
++		GSO_SIZE=1340 # 1392 - 20 - 32
++
++		if [ $FAMILY = 6 ]; then
++			NET=$OL2_NET_V6
++			GSO_SIZE=1280 # 1352 - 40 - 32
++		fi
++
++		echo "IPv$FAMILY"
++
++		unset USE_HINT
++		unset INHERIT
++
++		# "geneve" must be last encap in list, so that later
++		# test cases will run on it
++		for ENCAP in "vxlan" "geneve"; do
++			create_ns
++			run_test "No GSO - $ENCAP" $((GSO_SIZE * 4)) 4 4
++			cleanup_all_ns
++
++			create_ns_gso
++			run_test "GSO without GRO - $ENCAP" $((GSO_SIZE * 4)) \
++			   4 1
++			cleanup_all_ns
++
++			# IPv4 only test
++			[ $FAMILY = "4" ] || continue
++			create_ns_gso
++			ip netns exec "$NS_SRC" \
++			   sysctl -qw net.ipv4.ip_no_pmtu_disc=1
++			run_test "GSO disable due to no fixedid - $ENCAP" \
++			   $((GSO_SIZE * 4)) 4 4
++			cleanup_all_ns
++		done
++
++		# GRO tests imply/require geneve encap, the only one providing
++		# GRO hints
++		create_ns_gso_gro
++		run_test "double tunnel GRO, no hints" $((GSO_SIZE * 4)) 4
++		cleanup_all_ns
++
++		# hint option is expected for all the following tests in the RX
++		# path
++		USE_HINT=true
++		create_ns_gso_gro \
++		   '"gro-hint":1,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1' \
++		   '"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1'
++		run_test "double tunnel GRO" $((GSO_SIZE * 4)) 1
++		cleanup_all_ns
++
++		create_ns_gso_gro '"gro-hint":1,"udp-csum":1' '"udp-csum":1'
++		run_test "double tunnel GRO - csum complete" $((GSO_SIZE * 4))\
++		   1
++		cleanup_all_ns
++
++		create_ns_gso_gro '"gro-hint":1' \
++		   '"udp-csum":0,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1'
++		run_test "double tunnel GRO - no nested csum" \
++		   $((GSO_SIZE * 4)) 1
++		cleanup_all_ns
++
++		create_ns_gso_gro \
++		   '"gro-hint":1,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1' \
++		   '"udp-csum":1'
++		run_test "double tunnel GRO - nested csum, outer 0-csum, skip"\
++		   $((GSO_SIZE * 4)) 4
++		cleanup_all_ns
++
++		INHERIT=true
++		create_ns_gso_gro '"gro-hint":1,"udp-csum":1' \
++		   '"udp-csum":1,"inner-proto-inherit":1'
++		run_test "double tunnel GRO - nested inherit proto" \
++		   $((GSO_SIZE * 4)) 1
++		cleanup_all_ns
++		unset INHERIT
++
++		create_ns_gso_gro '"gro-hint":1'
++		run_test "double tunnel GRO - short last pkt" \
++		   $((GSO_SIZE * 4 + GSO_SIZE / 2)) 2
++		cleanup_all_ns
++	done
++}
++
++require_command nfbpf_compile
++require_command jq
++
++# tcp retransmisions will break the accounting
++xfail_on_slow run_tests
++exit "$EXIT_STATUS"
 -- 
 2.52.0
 
