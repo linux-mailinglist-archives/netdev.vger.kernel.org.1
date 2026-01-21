@@ -1,176 +1,208 @@
-Return-Path: <netdev+bounces-251859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CDzYKVzJcGkNZwAAu9opvQ
-	(envelope-from <netdev+bounces-251859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:41:00 +0100
+	id QBzxDDfKcGkNZwAAu9opvQ
+	(envelope-from <netdev+bounces-251860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:44:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FF1E56EE6
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:41:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A0556FC6
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 88DAA4FBC92
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:35:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 803D572CE22
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 12:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69263E9F9C;
-	Wed, 21 Jan 2026 12:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C3748A2D0;
+	Wed, 21 Jan 2026 12:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="nRZPBbDk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQ/TNF0/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2YJyP0e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DB2280324
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768998926; cv=pass; b=QCi9n9JntBoPgX0L7szuIqwnBci++fffDV8q4fl40RLFhSQpbny/Skq7nwkl4Rmvds8CPD/Gj9ZASBog9KzhPSiSfEWjKAhuEueaqkGwi6CI3SuQ+m27/Ybu7gCXc7uWj6VMO/7gb6+1sOTdK1rVdtHOTqhbjzB1cZArc6RK9pY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768998926; c=relaxed/simple;
-	bh=609IdniIhM5s9yVyBkRF8UQSbuSI291Te2DEagXPIwo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gFbUwiY8APDUFlF9WZQXryZ9m2NMIkjW6tqKXnUyl18YCeWTSWET/SbNbj/vG5tu6AYb6+EMUUk8FVxuKaeaAWNGrWCDH/ou4sD50aYafLSIzVHCPZktWDtevU5rLYCqu5VU/x9wZw1FaZ2JJ3bmBspOnUCK5/5V6Yh8uqFkjHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=nRZPBbDk; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-64669a2ecb5so1251993d50.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 04:35:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768998924; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PUriY5XQcA+uqjPs9bKg/1DE4zgIDDHsEjtJMSejEwqo7Cb3XROgdsS7Cu6+4F+vQu
-         Hsg7XOBfBXpYQQGWIZQj08QbEU0FLWPjNDdJ0aOeXJn9VRRpp+1R//N7WBMPILwMr5cx
-         NVh1fcwjssl+eSZEIInx3nrqoTHxmxIFT4hkFtJPC996TN0eopXPoZcSB1jRMKgiLMEe
-         1G8uwkgFlfpXOlDRvuKeDvM/iHJ97iM5T/y4JxVqPupxrUFwik8oPYVOyKOd7LtzVFip
-         0/9NYK5bUZ71Dxa5fagkHchOpGHwehuV0mQnrzbH28wHi/ON+M0Q9t8pAFIh0eZFLy6V
-         LuAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=h24m7IYRVboGNSvzoCdzZL4vm/l2kIr0FMfsrOCBUd8=;
-        fh=8UDauyIvQmqvtQyg6OX+MrsOKHsmZJ56qg3arIzpy9M=;
-        b=B9IPkh7U97lyhl3q5IkM6z1to9wReWfC4rFhZlAyhabWGOmnqCzssBk0YpSEwWiG90
-         JCqtJp849tLtgWB4UTlkotAiTpMEXtqGNPADG8Xpdw0mZuShNMSiKliJQ7DLqlVvNlUK
-         2J16xuQ46Utua9Vet1oZFyp3yj6g59Vv0sV0WF5JHrVNh6nf3npGeAFkYG5ef7uisTDd
-         IeE04hFKgAAvaqn2rNiW19PvJa138jUfg/iXgE+84ybGOGHwYnBSUdxQgu+zwfK/woQM
-         yD3FPrismCP4Q5fZ1Y9G5QD6TiLtxYMJ//qv2qfO5xKlUA497LsskC1ck5FDvQRIpsc9
-         v40Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCD448A2B9
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 12:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768998963; cv=none; b=AYYa87iSVWDl6Tt7DUDQxoi1C+Q6vs7IUffzSvrrb8j79s/MXWu6Px967U4oqs7nQBbwutex97i+Rflm4slyONtmKU2osCU/4JCLJDDSOy/CcEdWANeGWPWb5Jx3XpGFPeQ0h3CR56yQt2nBQHGJS/2xuI5vwIxtXBfUsI2kNfc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768998963; c=relaxed/simple;
+	bh=mha0I0VeVP1yXEtwsIMyiWq7J0MEXEEXF4v+brwB7Ss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AFqPOmdouPUq1X2hkgD0CpmZB3bJSi+mAi1Lhf1JwTZ40yw0WVOu5J1Z7wTePvFazYvQXoI/h32o52HUzs0TNUqsZtGp0POriUbBHmeyRkn6ETrl3lPRAqSI5ofTHq7Fye5wOHchtbypLOJaF0aewQttkEW+XT6+oA6SSaeLlzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KQ/TNF0/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2YJyP0e; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768998960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
+	b=KQ/TNF0/jsR1ZYVlVbn5nL2dTXQQ4Cp91gq8JdBGYbJv0WzRAHoycBGiI3q/YZrFIwLP8i
+	fRiIlEnUiYOdNg7EQDlMGuz34Pls6RrPtABLc5+wizr3LW+uDSJuJhv7FHTYn2s038N05z
+	yEX9iG4Ent2W1xm0aXUVq9B4jyJCVGo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-58-Cc8Y572hOhqkvQuzmUUegQ-1; Wed, 21 Jan 2026 07:35:59 -0500
+X-MC-Unique: Cc8Y572hOhqkvQuzmUUegQ-1
+X-Mimecast-MFC-AGG-ID: Cc8Y572hOhqkvQuzmUUegQ_1768998958
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47ee8808ffbso48397835e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 04:35:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768998924; x=1769603724; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h24m7IYRVboGNSvzoCdzZL4vm/l2kIr0FMfsrOCBUd8=;
-        b=nRZPBbDkQqfy7W5qd1QsOz0qHVFqTKNEdPUVyw+7tvfeSyBPVPazf/pc646IsF7Fkf
-         HkUC/PV7HdBW8EvakWRgxbsGpWuZakaa5q42XH6P/xz7LFlGm77kaSg2YngrXTuHfDhI
-         +DxAjz3eWjVuhSHE01p2a4bAlvjLlPJm5MNwWXG8ufJ050ITcHEKoeBsj21Dv0lzfRa4
-         o4zDzblcxc9CJAH8pL+puN3LnVaD1Nw/AS/HU6i8FMWTXUtBjdTAAyBm/WZVsGn+WPtO
-         Z5lbE+DA5VnRAiTIvGJw9fgQOm0ex5lnS58HLsieLXfF6t1kOknvjM0e7TWo4rHJkJX7
-         gb1w==
+        d=redhat.com; s=google; t=1768998958; x=1769603758; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
+        b=e2YJyP0eTNS932V2wD03A9ExfaNr0MsBa0cSDjf0VDWECGqEuH2K52zFG9cwSlu+FG
+         CUavymRALV6Zv71/tRFiTPuJm5ugs1xKqay7LK50HI+xxebSkQSSS5watxOyh6bLGYy4
+         /m1bNIM69axgme56u3fghXKdOsxgJQIQdDDmIFuvYKubWCjKwnevysCszJNrOBTbj8p8
+         y4B++MEFLAUAAPHxEkjgQ2amuKDeA2pw+gaxKkWWApvc7AjNN348EDXanAcdTaVntBsW
+         YmTqT3TOv0dWDXMIwqawRXPldASbXoGgUjvrbyO4Nla6+kbiNT1oaZKt+W5HbT/4XSlg
+         Erig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768998924; x=1769603724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h24m7IYRVboGNSvzoCdzZL4vm/l2kIr0FMfsrOCBUd8=;
-        b=VccQhG7WsFP23Spllke667PKnDmkQPnVRDoB68fuQWr4QDpjFoXL7idmi7hejvpUni
-         UFTbxRw6Erk5hniJu1DukB6YjxX4lVpCJD4TO4xtVxeL6daNF8hH/HtwuEDXb13zIJqc
-         67AdYHVhEJvgffrOxEVFAdSWVYo0xnLlbo2qIwHTB5FxwXKU9ca3L5keeh6tMP5+N3BE
-         bL+5izcwty39mVZA8lEjCsCf8rYJmwD1cOiEwppD9f1JhkbHHHW4kLeDQ6sjOUoEOFZb
-         KCWRo6m1/X5mOyKfvyxpqB5dVxpibE5NJ2qez9iDjUY0SiTvSTmr2nOkww7zdXLuEJaj
-         13vQ==
-X-Gm-Message-State: AOJu0Yw0U8G9615AFYskKw3Yotc6Z0A7RkaLQ0t2t0jr5VVPwoUrEJLe
-	3JOvcYtEbEG9IOkXe09LXdHSxG6dIzB7sRmLh1IypunQ3Su0kKrsVOTyG7v+VM+aaHb02KypQTD
-	VfU0ZiDh5aIgc5KPDeSeorDGi5rH1Xb1T8jGOQIPy
-X-Gm-Gg: AZuq6aIgHgEkD+7AhN1JPbquCQ00CDxq0SNFJ8/4E1ZhKWXvJ22mJyyubpCiVFLTw4p
-	og0B+53yiMCk745jLYfbNdJdsXgasc9iZzqKuFijO2VJ/Tiypn/EMZw5hR2fkj70Lk4I9jo8/BN
-	xAHUHjAF4azCWOiEl7qCpHrw8V56wlJax+KNhVjnA80P4YGW7hCaBSekRFvyKoZCMNhVWVpurO+
-	4kcJGd7CbM6QIxzsWR99UuAEhSizwXhlnEUr6L13TvpnUoMWA/izf/gZvon0y14IGtb6dpDxaTI
-	N+C2768UHQ==
-X-Received: by 2002:a05:690e:140f:b0:63f:b6c0:23f8 with SMTP id
- 956f58d0204a3-6490a67fcf2mr14852507d50.33.1768998923702; Wed, 21 Jan 2026
- 04:35:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768998958; x=1769603758;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xnPI8AJirXqjwQZgXHxL6NbBtlFdMp2kOfgYwwE6c8I=;
+        b=Dh7TNxqTis8eaVfhXvddGScaFulJl8RQDZPJQDsvkdlrA7T0ZYRotz54iu4lyEGqAf
+         YD4QhWVT0fLs8CQJESLENbw2rJY/10hKAY7/geRmK8GvC5JpT5iSeaPKIeF9GsU+nKiA
+         /tUGyhFPVafhJJMDtGTNP5WIMB/L7dioseSA04YNbcL2tT87Y7dvnRM4wL0WrvMSGgir
+         Ky5PxiXZV7+mSVDKoOw7zOvml7s8cEka7KuqXxMHtCkr48cO5FzwpIzaZgeQ1gT7bXht
+         bf4Slm6d2hmnYbylCfAmAtx65vZpkYMXZuduFwNJazbcc+wI3rOsxpnubjdMZ1CZ9X62
+         nHLA==
+X-Gm-Message-State: AOJu0Yy728HIBVhERc7JtvWLzVAqGA99HXhK82X7CFcdo3b3yAzhErFz
+	or2fOp+yXLa1wJtAmjgdPMMCBNM9rHBW9wT0EUazzpdt/92nIG04o3VvtjqBSKNewpYbM00tVyu
+	rjriCNjdA5e0CnUgBh+RJ/AhseF4vsfP1C/dlmvpNZDpNx2zhE4v94d1puA==
+X-Gm-Gg: AZuq6aJbgQFhh811v+FivTKGXzGeV97PJiVG5b/ZD48hCR3sqRnGH3JjVhWkC0tZcth
+	t2TX3W2gEXWxx9zT08xE8XO9h3gu4giQa+KfdGJec9527caWYFsBjIWa78vz/vIrdYgcoBTEf+K
+	SgYt+b+AsMAHDHVVt5dBBEEpDF+FZRsO/YzMsYclI7I2q6pELe246cbAB4TuNmilAJ5bSZ3sWrH
+	TBiUQv/6rR/IKbN9HZ9kUUt+b/BPAYFQ6Zcw9lfqbcSfcnptJhzbuHaEXbPiBr3gOy4CtVea//h
+	RBauwtGQSFsO3VgTUrYEUl98nBNdTI5kxPF15YIUjikDGsP7+reYpznBMvPY2ny9NbW3XNfapUj
+	hoGhRdaX4zrLWrb/7uwj1ilaIEDoHFo4=
+X-Received: by 2002:a05:600c:3ba8:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-4801e34651dmr231392775e9.30.1768998957678;
+        Wed, 21 Jan 2026 04:35:57 -0800 (PST)
+X-Received: by 2002:a05:600c:3ba8:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-4801e34651dmr231392355e9.30.1768998957206;
+        Wed, 21 Jan 2026 04:35:57 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f4289b83csm362908205e9.3.2026.01.21.04.35.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jan 2026 04:35:56 -0800 (PST)
+Date: Wed, 21 Jan 2026 07:35:53 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Asias He <asias@redhat.com>
+Subject: Re: [PATCH net v6 0/4] vsock/virtio: fix TX credit handling
+Message-ID: <20260121073547-mutt-send-email-mst@kernel.org>
+References: <20260121093628.9941-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120004720.1886632-1-p@1g4.org> <20260120004720.1886632-2-p@1g4.org>
- <bff53f0a-2c94-46b2-bb49-b05d10ae420e@mojatatu.com> <gwO399q2_pH73eDkd2OatN9SsR8aHtm8CbVIEPOf0nuxXjqbjY6vgCqNyFya75mMVicn8NwUgG8zaNFkR_JuZmFk0UcWNCHlpzSxFbaycf4=@1g4.org>
-In-Reply-To: <gwO399q2_pH73eDkd2OatN9SsR8aHtm8CbVIEPOf0nuxXjqbjY6vgCqNyFya75mMVicn8NwUgG8zaNFkR_JuZmFk0UcWNCHlpzSxFbaycf4=@1g4.org>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Wed, 21 Jan 2026 09:35:12 -0300
-X-Gm-Features: AZwV_Qg4IJvbjcPkkd12nOg6R7TlbuDONp9DjdoNwNbpgpNIh0g51NPdN2LFABU
-Message-ID: <CA+NMeC__K6Z4MyEK8DPTQc38AejwzfyWHckyr63zwL8ZqT24_w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net/sched: act_gate: fix schedule updates with RCU swap
-To: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121093628.9941-1-sgarzare@redhat.com>
+X-Spamd-Result: default: False [-1.96 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251859-lists,netdev=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-251860-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mail.gmail.com:mid,1g4.org:email,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 1FF1E56EE6
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 98A0556FC6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 7:47=E2=80=AFPM Paul Moses <p@1g4.org> wrote:
-> [...]
-> I=E2=80=99m trying to strike the right balance of input validation for st=
-able. I kept this as one patch because the validate and build before publis=
-h path is part of making the RCU update model correct. I did try implementi=
-ng the additional validation independently first, but it did not meaningful=
-ly reduce the size or complexity because the RCU swap still requires a full=
-y formed schedule object before publish. Without preliminary validation, it=
- is easy to corrupt the timer state or end up with undefined schedule behav=
-ior. At minimum, I think we need:
->   - interval > 0: prevents zero length entries and immediate refire loops
->   - at least one entry: avoids empty schedule deref and undefined state
->   - cycle time > 0: required for division and close time computations
->   - overflow checks: prevent wrap or underflow in close time arithmetic
->
-> I can do the conversion without these checks, but the resulting behavior =
-would be fragile. If there is guidance on what validation level you would p=
-refer here (minimal representable range checks vs stricter sane inputs), I =
-am happy to align with it.
+On Wed, Jan 21, 2026 at 10:36:24AM +0100, Stefano Garzarella wrote:
+> The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till v4.
+> Since it's a real issue and the original author seems busy, I'm sending
+> the new version fixing my comments but keeping the authorship (and restoring
+> mine on patch 2 as reported on v4).
 
-I'd say, for starters, try to keep as much of the original code as possible
-whilst introducting RCU. If you think it's still not "ready", you can post
-as RFC. Then we can add more checks (if necessary) as we go.
-I believe this approach will result in cleaner, more maintainable code.
 
-cheers,
-Victor
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> v6:
+> - Rebased on net tree since there was a conflict on patch 4 with another
+>   test added.
+> - No code changes.
+> 
+> v5: https://lore.kernel.org/netdev/20260116201517.273302-1-sgarzare@redhat.com/
+> v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
+> 
+> >From Melbin K Mathew <mlbnkm1@gmail.com>:
+> 
+> This series fixes TX credit handling in virtio-vsock:
+> 
+> Patch 1: Fix potential underflow in get_credit() using s64 arithmetic
+> Patch 2: Fix vsock_test seqpacket bounds test
+> Patch 3: Cap TX credit to local buffer size (security hardening)
+> Patch 4: Add stream TX credit bounds regression test
+> 
+> The core issue is that a malicious guest can advertise a huge buffer
+> size via SO_VM_SOCKETS_BUFFER_SIZE, causing the host to allocate
+> excessive sk_buff memory when sending data to that guest.
+> 
+> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+> 32 guest vsock connections advertising 2 GiB each and reading slowly
+> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB; the system only
+> recovered after killing the QEMU process.
+> 
+> With this series applied, the same PoC shows only ~35 MiB increase in
+> Slab/SUnreclaim, no host OOM, and the guest remains responsive.
+> 
+> Melbin K Mathew (3):
+>   vsock/virtio: fix potential underflow in virtio_transport_get_credit()
+>   vsock/virtio: cap TX credit to local buffer size
+>   vsock/test: add stream TX credit bounds test
+> 
+> Stefano Garzarella (1):
+>   vsock/test: fix seqpacket message bounds test
+> 
+>  net/vmw_vsock/virtio_transport_common.c |  30 +++++--
+>  tools/testing/vsock/vsock_test.c        | 112 ++++++++++++++++++++++++
+>  2 files changed, 133 insertions(+), 9 deletions(-)
+> 
+> -- 
+> 2.52.0
+
 
