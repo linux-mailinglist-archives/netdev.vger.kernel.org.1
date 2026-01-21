@@ -1,185 +1,467 @@
-Return-Path: <netdev+bounces-251945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251946-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDT8NaLtcGk+awAAu9opvQ
-	(envelope-from <netdev+bounces-251945-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:15:46 +0100
+	id 2EYWKijxcGk+awAAu9opvQ
+	(envelope-from <netdev+bounces-251946-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A24B5904C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:15:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 342E65934F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DE7C1A6E61C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:58:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 89781A21E57
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B2D4A33FF;
-	Wed, 21 Jan 2026 14:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9004C8FF7;
+	Wed, 21 Jan 2026 14:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e9bH30Xy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxAYAXVQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRjmRTpM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB394A2E3F;
-	Wed, 21 Jan 2026 14:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38E84C8FEE
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 14:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006824; cv=none; b=YhBBRoK51OB+uCreJSDfOItN4CCWEH2NuswbfxJ3SEHZdUzOsBai8AvlModjtlK05tTuUkJlmR3sjYJq8bIUskt9bkBrQMBfhHASszLpYgAQVdZZ19M+ULrb+Y9XEHeTmxuiSi6hnUX4lHvU7Aau6YWkKYU7td4x75rZ/FSjOKI=
+	t=1769006906; cv=none; b=LIYS0z3xgtCdgPszu/7HeqEdrSMwONTEjdy+3r5mLqnJvzbefr5yjAcRfrRz4qfz3hIdEHqLxpInfmfoRuSJxzoMAjBvZ9m+in3xkymURF734UCYU5Ie+9Ir+RmxzKyEHz//bMk5FlJ6DC2l8ZBb4+J7oOHOz3NyIDlRitOOvR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006824; c=relaxed/simple;
-	bh=gxrQhTzqiEfgykGYtFJd73MPaMjNwkc3LNo3263Q0sU=;
+	s=arc-20240116; t=1769006906; c=relaxed/simple;
+	bh=QUpRm5BO1PsMpJA/m+7TudemIjgPpKiHIo5jnkzHoIA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BrRsBvWeABrMOZade+CJHh56+zK0JQqHlplbbItV+dkSy0jHuO2wyrUuGd1r6dqseS62Ipv4S9t6BOBXgEbhFo6algKuQt64cIJ7s2J+uf+wmqmGP2lDkBOFv8byoLXAYWA9oztinSVv225OYbQAFnT2TGgJ4SJ6my3yOjAIkxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e9bH30Xy; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iStF1+0UpaSNBxFtH2LAPTY4dVGLGH3AvGpTjjJnIHU=; b=e9bH30XyD6pkMJHTgoZwJ7SBsQ
-	0CLCJyQaHxcYuc61vX87CjlwIjH755e5RfCQJ0Wfv4lNRlzSX2yX9k/kwo8QWMtpWhfVnPgANvDB9
-	kl123aZe/rSEj8KpIBeh0lPIAMVOWTc19dGF+NdztKgvvnA+5BX7opil0piY56CwJO20tSmz1Xlko
-	pzBMbMVUUyaGXSsIrFSc5JdeRIYiwiAV1GpaVlXdZ0VTRxn+jcebBR5roWfde62EU7wcfzvg9tR3Q
-	9GmdzF0i47FizmPYPrE1/KUuNR/fwPn0E/d24rqa7i7R6bhkesWWIr0GN+RCRzFGiFUEkdThXAtTj
-	trX0GOiA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36082)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1viZTt-000000007c8-10Ub;
-	Wed, 21 Jan 2026 14:46:49 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1viZTm-0000000005o-2xDz;
-	Wed, 21 Jan 2026 14:46:42 +0000
-Date: Wed, 21 Jan 2026 14:46:42 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-phy@lists.infradead.org,
-	davem@davemloft.net, maxime.chevallier@bootlin.com,
-	alexandre.torgue@foss.st.com, mohd.anwar@oss.qualcomm.com,
-	neil.armstrong@linaro.org, hkallweit1@gmail.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	edumazet@google.com, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vkoul@kernel.org,
-	andrew@lunn.ch, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <aXDm0jVOYOZ9l6Wu@shell.armlinux.org.uk>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
- <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
- <20260120081844.7e6aq2urhxrylywi@skbuf>
- <aW9VHt6meEJFxV0I@shell.armlinux.org.uk>
- <20260120121114.2aedgu42i2wax3yp@skbuf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nuD6vpMxR0hBw3G0eUql6BTi5vJwC80FX1FNaeqyJJZX6nXofBvRy2ZjG0Zi+X59SlgVHsbh5lZQsW5iOET17Fn55ugz2QcUdknna4oXWqGsiVW88/lSPQhEI+zFX5kwMdgK4BTZetfg2jmFEF2WYEDm1wxO7hBIAZqjbHln3gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OxAYAXVQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YRjmRTpM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769006902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
+	b=OxAYAXVQGfCqEXQ8ha9r7E0hNuArMvJZgThYPDfb2/rOn1VUti8BF2CNnLZYaVMXifHZbS
+	HzrWZ6JMmJwGaX3gok3FNjN0ZhXiUzZmfCGGcpecEtsSzN+ZuVuJ6ICAnE0grtJe0sytnj
+	8g96krKJDzmpuZ2FOyvQ7K5EYngfC04=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-471-Y1YTTFPPMd2HhGVUfFB5Bg-1; Wed, 21 Jan 2026 09:48:19 -0500
+X-MC-Unique: Y1YTTFPPMd2HhGVUfFB5Bg-1
+X-Mimecast-MFC-AGG-ID: Y1YTTFPPMd2HhGVUfFB5Bg_1769006898
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so56973925e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 06:48:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769006898; x=1769611698; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
+        b=YRjmRTpMJdzf8jSCZR5c6CUp2tqRg1IYXX7KFzzPx+S1hKu0rBPBEabK10izkFbZb7
+         8aTnKUHGysBsdMwSM6i9tSiwT71ZCiKtR2fQRqKUiZmonS6Z8AyvmSmolPtWBVzi7hid
+         EriDanVwNTHpbXWDo6tL0DmgFyKRtm45oqiTwimWc6fGHGZqX9bFE4/tqm8Mrcrc5sMj
+         x3yLAIEr2mCNho2mM2Zl7hYMhul16caalRx/hFxITRdpOGTsUitDlvoxNGSWYIWp3/L4
+         vieFfk4GkGCcCeXe+jUnyK529YJzuOzknU5KJP4gS1gW7Uht45DCb4t/gtJJAyN3p+jr
+         Zv8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769006898; x=1769611698;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VUJ1S4k/wjMiGcuwXZdRwnP1r4qcoeHu/Fk7TCF9Czg=;
+        b=AnW8/I4trj1xOhnsvS7Cwjz5WsYo0LA7p6jov3L01c8rGwzC8o9Q1EKennFJHIGLWY
+         w7WIBmynOXmYB9eXkK0rn80MTzumx8Z99wuwM92NwUe6uuYTjRdRq9ipicrD5Jlnar9w
+         9VPa+8TMwh1NrtPFeBGjF6nwoMG2r6S0YuH8XVzhonsy39rrT5ONGXrzlzWd8uLsgDQs
+         ONMMkgYhZfZawKHZdiPXvShZgpWfr88ogn99G1XsywLNu83em77PMQPm2Zra1bVGm+Qs
+         mDCATBLJSqbJ4JJP5+p5ANe2IHnbW0XOD4A+qSOIYfxg5SGL+Z2jT/hxmx2b2J4pqxwJ
+         7RFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWhDrYx46L3D5jsLSYjycOpoYCyRQbiGAfMopgGk2xndK3fipaKju/5I5345iwo6bgtx37qNxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHLe+JvNehuAhT33g2xBJgWr5GGdO9R4Kkt6YCCdNZRSb7IqvH
+	m1gKfTjAEiZ68yDhEDRFvgiIjaXrLOKrJt+4EHkuyfN6jm5vdgA3MKFKTd2QOb0gmgouk7+Nu80
+	c6BNv8q1+x8BolNi2RJ9setEZ9EJEcyGV955x4WqEIdfalgBoqHtBZkaymQ==
+X-Gm-Gg: AZuq6aLhlfV1Z/5sXmnKNC+bVdaNOr1OAY8kIA3ZzBZ0kGH8BLeDBbR/zvM3naE5W5w
+	jMYyN/XY1RjfoNPFSYwEgi0nfgpyFNK/KK8e8hIPs0WPosIjjSwDjvZWX6SZ+iaPry8uWkGXssE
+	nqZKowaLMuvuVF5IE2YZy/IAEl5E5aGA3k0IjoxwDaawRStAdC+TlDERJyMJ6C3v2H5KqdFUZWw
+	zOdqmxqwc6HzM2i7XPHI+hl52SRzNy5yCX85VJyoRo5vWbBlMN8cBlsVElG4u9doEzn04B4TsM1
+	2CsXaX9H4Sg2+mMvNGkmH2gbljHp2s1yZskM3YGfM3I2ZpoPXg2dhO5fqSuUOPygyjspmpxIxJF
+	Wb6k9V6SZKWlxjqQALK/9kDXA5g5c7N3qQWkuIolkGxY+xg/p1YM6ONwaLEM=
+X-Received: by 2002:a05:600c:820b:b0:47a:9560:ec28 with SMTP id 5b1f17b1804b1-4803e7a2d1dmr73114045e9.13.1769006898440;
+        Wed, 21 Jan 2026 06:48:18 -0800 (PST)
+X-Received: by 2002:a05:600c:820b:b0:47a:9560:ec28 with SMTP id 5b1f17b1804b1-4803e7a2d1dmr73113705e9.13.1769006897944;
+        Wed, 21 Jan 2026 06:48:17 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48042c5965fsm22479875e9.17.2026.01.21.06.48.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jan 2026 06:48:16 -0800 (PST)
+Date: Wed, 21 Jan 2026 15:48:13 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
+	linux-doc@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v15 01/12] vsock: add netns to vsock core
+Message-ID: <aXDYfYy3f1NQm5A0@sgarzare-redhat>
+References: <20260116-vsock-vmtest-v15-0-bbfd1a668548@meta.com>
+ <20260116-vsock-vmtest-v15-1-bbfd1a668548@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20260120121114.2aedgu42i2wax3yp@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+In-Reply-To: <20260116-vsock-vmtest-v15-1-bbfd1a668548@meta.com>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : No valid SPF,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251945-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[kernel.org,lists.infradead.org,davemloft.net,bootlin.com,foss.st.com,oss.qualcomm.com,linaro.org,gmail.com,vger.kernel.org,google.com,lunn.ch,redhat.com,st-md-mailman.stormreply.com];
+	TAGGED_FROM(0.00)[bounces-251946-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 4A24B5904C
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,meta.com:email]
+X-Rspamd-Queue-Id: 342E65934F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Jan 20, 2026 at 02:11:14PM +0200, Vladimir Oltean wrote:
-> On Tue, Jan 20, 2026 at 10:12:46AM +0000, Russell King (Oracle) wrote:
-> > First, I'll say I'm on a very short fuse today; no dinner last night,
-> > at the hospital up until 5:30am, and a fucking cold caller rang the door
-> > bell at 10am this morning. Just fucking our luck.
-> 
-> Sorry to hear that.
-> 
-> > On Tue, Jan 20, 2026 at 10:18:44AM +0200, Vladimir Oltean wrote:
-> > > Isn't it sufficient to set pl->pcs to NULL when pcs_enable() fails and
-> > > after calling pcs_disable(), though?
-> >
-> > No. We've already called mac_prepare(), pcs_pre_config(),
-> > pcs_post_config() by this time, we're past the point of being able to
-> > unwind.
-> 
-> I'm set out to resolve a much smaller problem.
-> 
-> Calling it a full "unwind" is perhaps a bit much, because pcs_pre_config()
-> and pcs_post_config() don't have unwinding equivalents, unlike how
-> pcs_enable() has pcs_disable(). I don't see what API convention would be
-> violated if phylink decided to drop a PCS whose enable() returned an error.
+On Fri, Jan 16, 2026 at 01:28:41PM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Add netns logic to vsock core. Additionally, modify transport hook
+>prototypes to be used by later transport-specific patches (e.g.,
+>*_seqpacket_allow()).
+>
+>Namespaces are supported primarily by changing socket lookup functions
+>(e.g., vsock_find_connected_socket()) to take into account the socket
+>namespace and the namespace mode before considering a candidate socket a
+>"match".
+>
+>This patch also introduces the sysctl /proc/sys/net/vsock/ns_mode to
+>report the mode and /proc/sys/net/vsock/child_ns_mode to set the mode
+>for new namespaces.
+>
+>Add netns functionality (initialization, passing to transports, procfs,
+>etc...) to the af_vsock socket layer. Later patches that add netns
+>support to transports depend on this patch.
 
-While pcs_pre_config() and pcs_post_config() do not have unwinding
-equivalents (what would they be?) the issue here is that these could
-have changed any state that isn't simply undone by calling
-pcs_disable().
+nit: maybe we should mention here why we changed the random port 
+allocation
 
-For example, pcs_pre_config() could have reprogrammed signal routing,
-clocking, or power supplies to blocks.
+(not a big deal, only if you need to resend)
 
-This already applies to Marvell DSA pcs-639x.c, where the pre/post
-config hooks change the power state of the PCS block (for errata
-handling), and the only way that gets undone is via a call to
-pcs_disable() which explicitly disables IRQs and power for the PCS. Its
-pcs_disable() isn't a strict reversal of pcs_enable(), it does more.
+>
+>dgram_allow(), stream_allow(), and seqpacket_allow() callbacks are
+>modified to take a vsk in order to perform logic on namespace modes. In
+>future patches, the net will also be used for socket
+>lookups in these functions.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+>Changes in v15:
+>- make static port in __vsock_bind_connectible per-netns
+>- remove __net_initdata because we want the ops beyond just boot
+>- add vsock_init_ns_mode kernel cmdline parameter to set init ns mode
+>- use if (ret || !write) in __vsock_net_mode_string() (Stefano)
+>- add vsock_net_mode_global() (Stefano)
+>- hide !net == VSOCK_NET_MODE_GLOBAL inside vsock_net_mode() (Stefano)
+>- clarify af_vsock.c comments on ns_mode/child_ns_mode (Stefano)
+>
+>Changes in v14:
+>- include linux/sysctl.h in af_vsock.c
+>- squash patch 'vsock: add per-net vsock NS mode state' into this patch
+>  (prior version can be found here):
+>  https://lore.kernel.org/all/20251223-vsock-vmtest-v13-1-9d6db8e7c80b@meta.com/)
+>
+>Changes in v13:
+>- remove net_mode and replace with direct accesses to net->vsock.mode,
+>  since this is now immutable.
+>- update comments about mode behavior and mutability, and sysctl API
+>- only pass NULL for net when wanting global, instead of net_mode ==
+>  VSOCK_NET_MODE_GLOBAL. This reflects the new logic
+>  of vsock_net_check_mode() that only requires net pointers (not
+>  net_mode).
+>- refactor sysctl string code into a re-usable function, because
+>  child_ns_mode and ns_mode both handle the same strings.
+>- remove redundant vsock_net_init(&init_net) call in module init because
+>  pernet registration calls the callback on the init_net too
+>
+>Changes in v12:
+>- return true in dgram_allow(), stream_allow(), and seqpacket_allow()
+>  only if net_mode == VSOCK_NET_MODE_GLOBAL (Stefano)
+>- document bind(VMADDR_CID_ANY) case in af_vsock.c (Stefano)
+>- change order of stream_allow() call in vmci so we can pass vsk
+>  to it
+>
+>Changes in v10:
+>- add file-level comment about what happens to sockets/devices
+>  when the namespace mode changes (Stefano)
+>- change the 'if (write)' boolean in vsock_net_mode_string() to
+>  if (!write), this simplifies a later patch which adds "goto"
+>  for mutex unlocking on function exit.
+>
+>Changes in v9:
+>- remove virtio_vsock_alloc_rx_skb() (Stefano)
+>- remove vsock_global_dummy_net, not needed as net=NULL +
+>  net_mode=VSOCK_NET_MODE_GLOBAL achieves identical result
+>
+>Changes in v7:
+>- hv_sock: fix hyperv build error
+>- explain why vhost does not use the dummy
+>- explain usage of __vsock_global_dummy_net
+>- explain why VSOCK_NET_MODE_STR_MAX is 8 characters
+>- use switch-case in vsock_net_mode_string()
+>- avoid changing transports as much as possible
+>- add vsock_find_{bound,connected}_socket_net()
+>- rename `vsock_hdr` to `sysctl_hdr`
+>- add virtio_vsock_alloc_linear_skb() wrapper for setting dummy net and
+>  global mode for virtio-vsock, move skb->cb zero-ing into wrapper
+>- explain seqpacket_allow() change
+>- move net setting to __vsock_create() instead of vsock_create() so
+>  that child sockets also have their net assigned upon accept()
+>
+>Changes in v6:
+>- unregister sysctl ops in vsock_exit()
+>- af_vsock: clarify description of CID behavior
+>- af_vsock: fix buf vs buffer naming, and length checking
+>- af_vsock: fix length checking w/ correct ctl_table->maxlen
+>
+>Changes in v5:
+>- vsock_global_net() -> vsock_global_dummy_net()
+>- update comments for new uAPI
+>- use /proc/sys/net/vsock/ns_mode instead of /proc/net/vsock_ns_mode
+>- add prototype changes so patch remains c)mpilable
+>---
+> Documentation/admin-guide/kernel-parameters.txt |  14 +
+> MAINTAINERS                                     |   1 +
+> drivers/vhost/vsock.c                           |   6 +-
+> include/linux/virtio_vsock.h                    |   4 +-
+> include/net/af_vsock.h                          |  61 ++++-
+> include/net/net_namespace.h                     |   4 +
+> include/net/netns/vsock.h                       |  21 ++
+> net/vmw_vsock/af_vsock.c                        | 328 ++++++++++++++++++++++--
+> net/vmw_vsock/hyperv_transport.c                |   7 +-
+> net/vmw_vsock/virtio_transport.c                |   9 +-
+> net/vmw_vsock/virtio_transport_common.c         |   6 +-
+> net/vmw_vsock/vmci_transport.c                  |  26 +-
+> net/vmw_vsock/vsock_loopback.c                  |   8 +-
+> 13 files changed, 444 insertions(+), 51 deletions(-)
+>
+>diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+>index a8d0afde7f85..b6e3bfe365a1 100644
+>--- a/Documentation/admin-guide/kernel-parameters.txt
+>+++ b/Documentation/admin-guide/kernel-parameters.txt
+>@@ -8253,6 +8253,20 @@ Kernel parameters
+> 			            them quite hard to use for exploits but
+> 			            might break your system.
+>
+>+	vsock_init_ns_mode=
+>+			[KNL,NET] Set the vsock namespace mode for the init
+>+			(root) network namespace.
+>+
+>+			global      [default] The init namespace operates in
+>+			            global mode where CIDs are system-wide and
+>+			            sockets can communicate across global
+>+			            namespaces.
+>+
+>+			local       The init namespace operates in local mode
+>+			            where CIDs are private to the namespace and
+>+			            sockets can only communicate within the same
+>+			            namespace.
+>+
 
-We already declare the interface to be dead on pcs_post_config()
-failure, but we don't do that for pcs_enable() failure.
+My comment on v14 was more to start a discussion :-) sorry to not be 
+clear.
 
-Maybe I need to explicitly state that pcs_disable() does not directly
-balance pcs_enable(), but that _and_ the effects of pcs_pre_config()
-and pcs_post_config(). However, that itself will add to the problems.
-What if pcs_pre_config() and pcs_post_config() succeed but not
-pcs_enable()? pcs-639x needs pcs_disable() to be called, but if we
-require pcs_disable() to be balanced with a successful call to
-pcs_enable(), that messes up that driver, and pretty much makes it
-impossible to work around the errata.
+I briefly discussed it with Paolo in chat to better understand our 
+policy between cmdline parameters and module parameters, and it seems 
+that both are discouraged.
 
-If you feel strongly about this, then the only thing I can think of
-doing is to move this SerDes support out of stmmac and into phylink
-(which is a point I already raised in the cover message) so that
-its failure can be dealt with at the higher level, where we can
-ensure that phy_power_off() is balaced with phy_power_on(). However,
-that means pushing even more of the stmmac specific "we need the
-clocks running to access registers XYZ or reset" weirdness into
-phylink.
+So he asked me if we have a use case for this, and thinking about it, I 
+don't have one at the moment. Also, if a user decides to set all netns 
+to local, whether init_net is local or global doesn't really matter, 
+right?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So perhaps before adding this, we should have a real use case.
+Perhaps more than this feature, I would add a way to change the default 
+of all netns (including init_net) from global to local. But we can do 
+that later, since all netns have a way to understand what mode they are 
+in, so we don't break anything and the user has to explicitly change it, 
+knowing that they are breaking compatibility with pre-netns support.\
+
+
+That said, at this point, maybe we can remove this, documenting that 
+init_net is always global, and if we have a use case in the future, we 
+can add this (or something else) to set the init_net mode (or change the 
+default for all netns).
+
+Let's wait a bit before next version to wait a comment from Paolo or 
+Jakub on this. But I'm almost fine with both ways, so:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+> 	vt.color=	[VT] Default text color.
+> 			Format: 0xYX, X = foreground, Y = background.
+> 			Default: 0x07 = light gray on black.
+
+[...]
+
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index a3505a4dcee0..3fc8160d51df 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+
+[...]
+
+>@@ -235,33 +303,42 @@ static void __vsock_remove_connected(struct 
+>vsock_sock *vsk)
+> 	sock_put(&vsk->sk);
+> }
+>
+
+In the v14 I suggested to add some documentation on top of the 
+vsock_find*() vs vsock_find_*_net() to explain better which one should 
+be used by transports.
+
+Again is not a big deal, we can fix later if you don't need to resend.
+
+Thanks,
+Stefano
+
+>-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+>+static struct sock *__vsock_find_bound_socket_net(struct sockaddr_vm *addr,
+>+						  struct net *net)
+> {
+> 	struct vsock_sock *vsk;
+>
+> 	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
+>-		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
+>-			return sk_vsock(vsk);
+>+		struct sock *sk = sk_vsock(vsk);
+>+
+>+		if (vsock_addr_equals_addr(addr, &vsk->local_addr) &&
+>+		    vsock_net_check_mode(sock_net(sk), net))
+>+			return sk;
+>
+> 		if (addr->svm_port == vsk->local_addr.svm_port &&
+> 		    (vsk->local_addr.svm_cid == VMADDR_CID_ANY ||
+>-		     addr->svm_cid == VMADDR_CID_ANY))
+>-			return sk_vsock(vsk);
+>+		     addr->svm_cid == VMADDR_CID_ANY) &&
+>+		     vsock_net_check_mode(sock_net(sk), net))
+>+			return sk;
+> 	}
+>
+> 	return NULL;
+> }
+>
+>-static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
+>-						  struct sockaddr_vm *dst)
+>+static struct sock *
+>+__vsock_find_connected_socket_net(struct sockaddr_vm *src,
+>+				  struct sockaddr_vm *dst, struct net *net)
+> {
+> 	struct vsock_sock *vsk;
+>
+> 	list_for_each_entry(vsk, vsock_connected_sockets(src, dst),
+> 			    connected_table) {
+>+		struct sock *sk = sk_vsock(vsk);
+>+
+> 		if (vsock_addr_equals_addr(src, &vsk->remote_addr) &&
+>-		    dst->svm_port == vsk->local_addr.svm_port) {
+>-			return sk_vsock(vsk);
+>+		    dst->svm_port == vsk->local_addr.svm_port &&
+>+		    vsock_net_check_mode(sock_net(sk), net)) {
+>+			return sk;
+> 		}
+> 	}
+>
+>@@ -304,12 +381,13 @@ void vsock_remove_connected(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(vsock_remove_connected);
+>
+>-struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+>+struct sock *vsock_find_bound_socket_net(struct sockaddr_vm *addr,
+>+					 struct net *net)
+> {
+> 	struct sock *sk;
+>
+> 	spin_lock_bh(&vsock_table_lock);
+>-	sk = __vsock_find_bound_socket(addr);
+>+	sk = __vsock_find_bound_socket_net(addr, net);
+> 	if (sk)
+> 		sock_hold(sk);
+>
+>@@ -317,15 +395,22 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+>
+> 	return sk;
+> }
+>+EXPORT_SYMBOL_GPL(vsock_find_bound_socket_net);
+>+
+>+struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+>+{
+>+	return vsock_find_bound_socket_net(addr, NULL);
+>+}
+> EXPORT_SYMBOL_GPL(vsock_find_bound_socket);
+>
+>-struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+>-					 struct sockaddr_vm *dst)
+>+struct sock *vsock_find_connected_socket_net(struct sockaddr_vm *src,
+>+					     struct sockaddr_vm *dst,
+>+					     struct net *net)
+> {
+> 	struct sock *sk;
+>
+> 	spin_lock_bh(&vsock_table_lock);
+>-	sk = __vsock_find_connected_socket(src, dst);
+>+	sk = __vsock_find_connected_socket_net(src, dst, net);
+> 	if (sk)
+> 		sock_hold(sk);
+>
+>@@ -333,6 +418,13 @@ struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+>
+> 	return sk;
+> }
+>+EXPORT_SYMBOL_GPL(vsock_find_connected_socket_net);
+>+
+>+struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+>+					 struct sockaddr_vm *dst)
+>+{
+>+	return vsock_find_connected_socket_net(src, dst, NULL);
+>+}
+> EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
+>
+> void vsock_remove_sock(struct vsock_sock *vsk)
+
 
