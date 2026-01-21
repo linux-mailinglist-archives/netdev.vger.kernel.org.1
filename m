@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-251932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LWVDIP1cGmgbAAAu9opvQ
-	(envelope-from <netdev+bounces-251932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:49:23 +0100
+	id eGgaFPDqcGk+awAAu9opvQ
+	(envelope-from <netdev+bounces-251933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:04:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE1F59754
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E68E158E72
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 16:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 728447626DB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:45:08 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 465917632EB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3F23BB9EF;
-	Wed, 21 Jan 2026 14:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A363480967;
+	Wed, 21 Jan 2026 14:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="dSBBJYVi"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tdy0eYmE"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+Received: from pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.83.148.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E91538BF76;
-	Wed, 21 Jan 2026 14:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71998423A64;
+	Wed, 21 Jan 2026 14:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.83.148.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006056; cv=none; b=JT+sPtkGH6sXkPFI61Pk2gHTpd/x8tqNgA1fN80gxrRBRBeoW/UOdKeAU69KZdPEZ11XUCZBrFLEYCvvatxpVd0qOHPrC5zoxiUZgZcCCjy5ghiH8PGzuC9o2kYEZ/ycjmb+lAs3PkHpx5ZjYihDn//WuMeicRzzA8k0DdyJ2Is=
+	t=1769006062; cv=none; b=j0JKPfrGBuQjIgHFLSN5CpItJ/oz4ucKDWS8QHKQT5RW1l4BNE8tfj9NeQPWqtfXgCg1Il0X4rgfKUAUduMv/57fRAqcHRiR3/AcCkG2gBngDwNNjYt6GxDOzZ+o8mA6UBS0rY8Cc/1B9nZYVJhe5jOpwsXFC6w0UhVHpcRsp70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006056; c=relaxed/simple;
-	bh=UkybVa4iglQJevh4tjQXjAarTyAQN26qkiccOPSAoFo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d1G7MjerIDYrl5ZBBYo0KTWZWuO0+BOXFrxSsZivpHvTeoDdvq2Y5ubgwBrL3D9xPYOdhJK8Nc6bRpj0SfEiSOtwD46fnGThq1HN1NSjhaM+U54OlMzaeXiwZe6r1gAmemMit4vlJCay5KbzHf3EaU3uN3hXh4lVLfXT0dZjJD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=dSBBJYVi; arc=none smtp.client-ip=34.218.115.239
+	s=arc-20240116; t=1769006062; c=relaxed/simple;
+	bh=MPUpUJgzzfHudJXEi5vg0C4okW8qVV8H4BssMKuJ9vc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F0P1dZKG4e0IImHZ8vSGm7MEh5XVbcWAGDkY+JHKsaiU77CLUj0/fF87xRx6+zWfrcn++4nepn9avyG2Be6O1Jwwu0h+ehPVX1zq2fFTTaB/MwqsKSD48nbjuuGt9h8QQ/0kkXe5z0lED1H8Wm26P7ZsTViHIuWXA2K5gIspqDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tdy0eYmE; arc=none smtp.client-ip=35.83.148.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769006054; x=1800542054;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ELHgxPhylfHIGisXjkEpjfj6a2UfPL6W+WX8Ou3bPmM=;
-  b=dSBBJYViic3UJaPgRxPsEVsJWne9kinwP3J7ljoq161wzqWPYpZpJ5pT
-   WSyybnOEmJnc9w0eT36gsw2NHZtahNwUGl+juvAlHzXk19alRyMqcrzUE
-   LBOwSkNR/0mSuuN3z6Qi1Lgig/Lkn5QXt+colDCJkAKt3FZOHTgmPzTpX
-   gdo5nTpQYage9/UbCWwS5yHOYyaPTBMsf3xt9Lpfs5P/b/SVdZqho9yPR
-   wSjaU/QDYsbAcX0+7KguYbBhrjh5JnrklXWR6z9mBHrp28d0VUY/FQGiR
-   7+fsOZB+tUwWeoCgwZgIbTa11PoiaXKDwLcWD4E1aMtaTjwYiqahek8fP
-   w==;
-X-CSE-ConnectionGUID: EAIQxHMeRLujC6TPSY48pQ==
-X-CSE-MsgGUID: gGg1lajBR7eKhiKcKl05Eg==
+  t=1769006060; x=1800542060;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oKwikhUEneq7kTC3ndykcYJektlKHtMVROcOvRNkC0s=;
+  b=Tdy0eYmEUQzNp7qTRXK22cp009URlr2IyL4P63bYbhMwlYu1Q93geW1c
+   tVkjTfSuD/nGjaoZogKnpSGnABQTF2wq7wDRLaRuzgY1pbzkWme+cUNpq
+   xT7m6KZeKkqlEoZkeLgco53VZMgksPihjB6mQUSTgn96Z6IVlkpViwV96
+   ENWzZz3XifCZ6BJJCX15QeQke5cDZadbseQQy0+h6xvNJdnGHQ0Y2Jtf1
+   b0+AHu0P6Ibtw3QNWcBfRLYZ0m6SbfuWecDFOEit61heeTchyCk2jWtod
+   5e47lo+ggEkSoNpy4PP84hVD4qA8GW2jydif+mcGG1StRNaEW+3YwcL/l
+   Q==;
+X-CSE-ConnectionGUID: W+lsB/mDRYGqtppXNXnRFQ==
+X-CSE-MsgGUID: Opv0/6nQRmOBvmtnU6E1jw==
 X-IronPort-AV: E=Sophos;i="6.21,242,1763424000"; 
-   d="scan'208";a="11118581"
+   d="scan'208";a="11089716"
 Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:34:10 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:25172]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.231:2525] with esmtp (Farcaster)
- id 8368d7a3-840b-441c-8759-77408f989319; Wed, 21 Jan 2026 14:34:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 8368d7a3-840b-441c-8759-77408f989319
+  by internal-pdx-out-014.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 14:34:17 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:19109]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.11:2525] with esmtp (Farcaster)
+ id 52e7a185-456f-449e-b682-b71aedfc8ed8; Wed, 21 Jan 2026 14:34:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 52e7a185-456f-449e-b682-b71aedfc8ed8
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
  EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:10 +0000
+ Wed, 21 Jan 2026 14:34:17 +0000
 Received: from dev-dsk-itazur-1b-11e7fc0f.eu-west-1.amazon.com (172.19.66.53)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 21 Jan 2026 14:34:07 +0000
+ Wed, 21 Jan 2026 14:34:14 +0000
 From: Takahiro Itazuri <itazur@amazon.com>
 To: <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
 	<richardcochran@gmail.com>, <dwmw2@infradead.org>, <andrew+netdev@lunn.ch>,
@@ -76,10 +77,12 @@ CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
  Graf" <graf@amazon.de>, <mzxreary@0pointer.de>, Marco Cali
 	<xmarcalx@amazon.co.uk>, David Woodhouse <dwmw@amazon.co.uk>, "Takahiro
  Itazuri" <itazur@amazon.co.uk>
-Subject: [PATCH v6 0/7] ptp: vmclock: Add VM generation counter and ACPI notification
-Date: Wed, 21 Jan 2026 14:33:37 +0000
-Message-ID: <20260121143402.3092-1-itazur@amazon.com>
+Subject: [PATCH v6 1/7] ptp: vmclock: add vm generation counter
+Date: Wed, 21 Jan 2026 14:33:38 +0000
+Message-ID: <20260121143402.3092-2-itazur@amazon.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260121143402.3092-1-itazur@amazon.com>
+References: <20260121143402.3092-1-itazur@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +91,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
+X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 X-Spamd-Result: default: False [-5.96 / 15.00];
 	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
@@ -102,7 +105,7 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251932-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251933-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,gmail.com,infradead.org,lunn.ch,davemloft.net,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -113,102 +116,70 @@ X-Spamd-Result: default: False [-5.96 / 15.00];
 	DKIM_TRACE(0.00)[amazon.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,checkpatch.pl:url];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.uk:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,amazon.es:email];
 	PRECEDENCE_BULK(0.00)[];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: CBE1F59754
+X-Rspamd-Queue-Id: E68E158E72
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Similarly to live migration, starting a VM from some serialized state
-(aka snapshot) is an event which calls for adjusting guest clocks, hence
-a hypervisor should increase the disruption_marker before resuming the
-VM vCPUs, letting the guest know.
+From: "Babis Chalios" <bchalios@amazon.es>
 
-However, loading a snapshot, is slightly different than live migration,
-especially since we can start multiple VMs from the same serialized
-state. Apart from adjusting clocks, the guest needs to take additional
-action during such events, e.g. recreate UUIDs, reset network
-adapters/connections, reseed entropy pools, etc. These actions are not
-necessary during live migration. This calls for a differentiation
-between the two triggering events.
+Similar to live migration, loading a VM from some saved state (aka
+snapshot) is also an event that calls for clock adjustments in the
+guest. However, guests might want to take more actions as a response to
+such events, e.g. as discarding UUIDs, resetting network connections,
+reseeding entropy pools, etc. These are actions that guests don't
+typically take during live migration, so add a new field in the
+vmclock_abi called vm_generation_counter which informs the guest about
+such events.
 
-We differentiate between the two events via an extra field in the
-vmclock_abi, called vm_generation_counter. Whereas hypervisors should
-increase the disruption marker in both cases, they should only increase
-vm_generation_counter when a snapshot is loaded in a VM (not during live
-migration).
+Hypervisor advertises support for vm_generation_counter through the
+VMCLOCK_FLAG_VM_GEN_COUNTER_PRESENT flag. Users need to check the
+presence of this bit in vmclock_abi flags field before using this flag.
 
-Additionally, we attach an ACPI notification to VMClock. Implementing
-the notification is optional for the device. VMClock device will declare
-that it implements the notification by setting
-VMCLOCK_FLAG_NOTIFICATION_PRESENT bit in vmclock_abi flags. Hypervisors
-that implement the notification must send an ACPI notification every
-time seq_count changes to an even number. The driver will propagate
-these notifications to userspace via the poll() interface.
+Signed-off-by: Babis Chalios <bchalios@amazon.es>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ include/uapi/linux/vmclock-abi.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Changes:
-
-* RFC -> v1:
-  - Made the notification support optional. Hypervisor needs to
-    advertise support for the notification via a flag in vmclock_abi.
-    Subsequently, poll() will return POLLHUP when the feature is not
-    supported, to avoid having userspace blocking indefinitely waiting
-    for events that won't arrive
-  - Reworded the comment around vm_generation_counter field to avoid
-    speaking about "jumping forward in time".
-* v1 -> v2:
-  - Correctly handle failures when calling vmclock_setup_notification to
-    setup notifications.
-  - Use atomic_t for fst->seq and handle the case of concurrent
-    read()/poll() accesses.
-  - Initialize fst->seq to 0 rather than what is currently stored in the
-    shared page. This is to avoid reading odd numbers.
-  - Add DT bindings similar to existing VMGenID ones.
-* v2 -> v3:
-  - Include missing header file and drop unused variables in PATH 2/4.
-  - Include missing Reviewed-by in PATCH 1/4.
-  - Fix DT node name to be generic (s/vmclock/ptp).
-  - Include missing maintainers.
-* v3 -> v4:
-  - Added bindings file as maintained by David as part for PTP VMCLOCK
-    SUPPORT.
-  - Use le64_to_cpu() to access clk->flags.
-  - Reference public specification.
-  - Pass struct vmclock_state * in the of IRQ handler
-  - Included three new patches from David:
-    * Making ACPI optional for the driver.
-    * Adding "VMCLOCK" to ACPI match.
-    * Return TAI instead of UTC.
-* v4 -> v5:
-  - Use IF_ENABLED instead of #ifdef
-  - Use reverse christmas tree order in variable declaration
-  - Fix empty changelog
-* v5 -> v6:
-  - Fix blank line CHECKs reported by checkpatch.pl
-
-Chalios, Babis (2):
-  ptp: vmclock: add vm generation counter
-  ptp: vmclock: support device notifications
-
-David Woodhouse (5):
-  dt-bindings: ptp: Add amazon,vmclock
-  ptp: ptp_vmclock: Add device tree support
-  ptp: ptp_vmclock: add 'VMCLOCK' to ACPI device match
-  ptp: ptp_vmclock: remove dependency on CONFIG_ACPI
-  ptp: ptp_vmclock: return TAI not UTC
-
- .../bindings/ptp/amazon,vmclock.yaml          |  46 ++++
- MAINTAINERS                                   |   1 +
- drivers/ptp/Kconfig                           |   2 +-
- drivers/ptp/ptp_vmclock.c                     | 196 ++++++++++++++++--
- include/uapi/linux/vmclock-abi.h              |  20 ++
- 5 files changed, 251 insertions(+), 14 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml
-
+diff --git a/include/uapi/linux/vmclock-abi.h b/include/uapi/linux/vmclock-abi.h
+index 2d99b29ac44a..937fe00e4f33 100644
+--- a/include/uapi/linux/vmclock-abi.h
++++ b/include/uapi/linux/vmclock-abi.h
+@@ -115,6 +115,12 @@ struct vmclock_abi {
+ 	 * bit again after the update, using the about-to-be-valid fields.
+ 	 */
+ #define VMCLOCK_FLAG_TIME_MONOTONIC		(1 << 7)
++	/*
++	 * If the VM_GEN_COUNTER_PRESENT flag is set, the hypervisor will
++	 * bump the vm_generation_counter field every time the guest is
++	 * loaded from some save state (restored from a snapshot).
++	 */
++#define VMCLOCK_FLAG_VM_GEN_COUNTER_PRESENT     (1 << 8)
+ 
+ 	__u8 pad[2];
+ 	__u8 clock_status;
+@@ -177,6 +183,15 @@ struct vmclock_abi {
+ 	__le64 time_frac_sec;		/* Units of 1/2^64 of a second */
+ 	__le64 time_esterror_nanosec;
+ 	__le64 time_maxerror_nanosec;
++
++	/*
++	 * This field changes to another non-repeating value when the guest
++	 * has been loaded from a snapshot. In addition to handling a
++	 * disruption in time (which will also be signalled through the
++	 * disruption_marker field), a guest may wish to discard UUIDs,
++	 * reset network connections, reseed entropy, etc.
++	 */
++	__le64 vm_generation_counter;
+ };
+ 
+ #endif /*  __VMCLOCK_ABI_H__ */
 -- 
 2.47.3
 
