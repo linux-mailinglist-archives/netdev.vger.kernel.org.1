@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-252049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GASlB5pAcWn2fgAAu9opvQ
-	(envelope-from <netdev+bounces-252049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:09:46 +0100
+	id EJg1Nmw7cWnKfQAAu9opvQ
+	(envelope-from <netdev+bounces-252051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:47:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD7A5DD4A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:09:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A75F5D913
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7E8218011FF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:50:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C29D35A29AE
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 19:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF51E37F8C9;
-	Wed, 21 Jan 2026 19:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462FF3BC4DD;
+	Wed, 21 Jan 2026 19:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWD+Gz30"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LspJr7xB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9F7338929
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 19:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3ED357729;
+	Wed, 21 Jan 2026 19:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769025006; cv=none; b=s9CSKcINyLzpJs4f5j97OGbCqezzIWEC0t+B6v/29Vl+Y2sTl9tITvSbaI6iABjqO2//HPgza4TFuRbXvCeTGufR3tZ3XyUBb6ILsJU3EJgpxa0Fx6OHmp+NJ7xokly1ITPLD6xiZ4aea65uQaSf913OGZ3iVsQKLMUv4+A12Co=
+	t=1769025343; cv=none; b=BSIB4nCUL42tOP5FFyxLVyMZieKMOkI2+sGMOe9mheCfAbIgwa5aNeRbn6LJ8I5GoicRZOMjyAtumRrb+J20BxKVDkBwYHUPF4AexfNrZ2++J9gDWtHlCyjBBgYyiOh4x3tdlHKY37rU159osviOtj7E43vP8xg/k+Q37SNWPOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769025006; c=relaxed/simple;
-	bh=hK5zvF0xQcdNDqLevJUPsy8UJt+QCtUX+8/Z0JPxSDU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eKPcmIyhj+N9fJqDTyUspdOqWV1RBBfO0+KrRKC6OOShN+l+yL7EYV4VCmn7j+Jii3fxtumNWoVyuZZ7B8/nFhXtMZu/6uYP5nUfL9U2uNXUJe6/Is1X8uhy6mLoFTxc6Ayq5pSx3uNFisZ7zOtWmAqy/Ckc/avgnBQTscXK6gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWD+Gz30; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4919C4CEF1;
-	Wed, 21 Jan 2026 19:50:04 +0000 (UTC)
+	s=arc-20240116; t=1769025343; c=relaxed/simple;
+	bh=8p5uyubsxxpFkaOAIvKe/2g67L691Fv8Sx46a8BUkoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=To9BNWyn8Fn+j++LNDDEh+pE0yEzURqlFb2xjKKd1f2jMKEiT0VTkrKVi+ezTPIBN7LyeItOL1hhIeIPCU+J3IMBxda/pkYhhn8TALkOMjbwWiIl2Pz1GUP+VN9HTU/3ewJ53/DmBXL8TNreE2FFqQE/ejELcq0AHHJYWb+GYKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LspJr7xB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF506C4CEF1;
+	Wed, 21 Jan 2026 19:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769025006;
-	bh=hK5zvF0xQcdNDqLevJUPsy8UJt+QCtUX+8/Z0JPxSDU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=hWD+Gz30VKjiqZn+3qAJ0BlW4Dxy/mQR3AflyxgN+7wYh5Jg0cCv4ROwjm42OeN1v
-	 2ktWnloat8Pso+Igybo/Q2Ipf5vMmevLsL9J86FiJU1t2f7MPW6cpZ0B+JjJIZJDgZ
-	 CFiTsQnZxTYKW2CFfowOrzfxRMWNwPo3dIs3kzyStNe3c6iEw6QDd64om4OXdeRe8Q
-	 SmoLOwrAHfjZuvsR0Up2BjRW3ImiO4L8z5dg9OwDSdge5GdZNoAdnWSaRqht40pWvd
-	 HZk5TIRzOTsyM83vuNec/9QyOI91FNzxIaEg/Z7jVOR/1x/uHFXqsGq3OcaDIIBEK9
-	 xED/H4IaWR7eg==
+	s=k20201202; t=1769025342;
+	bh=8p5uyubsxxpFkaOAIvKe/2g67L691Fv8Sx46a8BUkoU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LspJr7xBizgVrkTbSS+i6MsCzkJgClWH9MlKsTQ7fRmeirau8M5HhROwYB9NrlDYn
+	 saBejI1co0neKoSJEqCeoB9Jcpv0fBtvwTB4picPj+D0wQnB8lUNNhJfca9yfPwDv4
+	 BtFjD1K0y6wwpJSSbK4XakEG0NbDcFBN+dXQNnN5hK/biWzkx4UH/E5mLPsuSqmy6K
+	 GaS3a9+0veJkrTo8N4n77a2hVVd9IwY83ij5E6NBVAh37zTnM+QxlOasBWk6yqiUbr
+	 7Ua2RjEHp5/gJCKFOfKU9tiwIMKyeMu7R4t7EzoAk2s+FGid8TIEKbM9UM3Z4SooxF
+	 LfCPV43VvOfEw==
+Date: Wed, 21 Jan 2026 19:55:38 +0000
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 21 Jan 2026 19:49:52 +0000
-Subject: [PATCH] net: phy: Grammar update for comment in genphy_update_link
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net/tcp_sigpool: Enable compile-testing
+Message-ID: <aXEvOqjkMPXk28x2@horms.kernel.org>
+References: <e4822cf4aa03fed067f5df7cd4f3496828abc638.1768487199.git.geert+renesas@glider.be>
+ <20260117163304.20caae7c@kernel.org>
+ <CAMuHMdX9J9QPp16aDD-_2Q-chWANWeTyS6Dw=xJdkm8r-sPyFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-phy-gra-v1-1-8b4d178939de@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAN8tcWkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDQyND3YKMSt30okTd5EQjYwMLU6Nky+REJaDqgqLUtMwKsEnRsbW1AGj
- rFy1ZAAAA
-X-Change-ID: 20260121-phy-gra-ca230852c9ca
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdX9J9QPp16aDD-_2Q-chWANWeTyS6Dw=xJdkm8r-sPyFw@mail.gmail.com>
 X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
@@ -74,54 +75,74 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-252049-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252051-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: ADD7A5DD4A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 4A75F5D913
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enhance the grammar of the comment in genphy_update_link()
-describing momentary link drop handling.
+On Mon, Jan 19, 2026 at 05:26:37PM +0100, Geert Uytterhoeven wrote:
+> Hi Jakub,
+> 
+> On Sun, 18 Jan 2026 at 01:33, Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Thu, 15 Jan 2026 15:27:26 +0100 Geert Uytterhoeven wrote:
+> > > Since commit 37a183d3b7cdb873 ("tcp: Convert tcp-md5 to use MD5 library
+> > > instead of crypto_ahash"), TCP_SIGPOOL is only selected by TCP_AO.
+> > > However, the latter depends on 64BIT, so tcp_sigpool can no longer be
+> > > built on 32-bit platforms at all.
+> > >
+> > > Improve compile coverage on 32-bit by allowing the user to enable
+> > > TCP_SIGPOOL when compile-testing.  Add a dependency on CRYPTO, which is
+> > > always fulfilled when selected by TCP_AO.
+> >
+> > I don't see why we'd care. I understand COMPILE_TEST when the symbol
+> > is narrowed down to a very unusual platform. But this is doing the
+> > opposite, it's _adding_ a very unusual platform on which, as you say,
+> 
+> (I wouldn't claim it is a "very unusual platform". 32-bit won't be dead
+>  for at least a decade ;-)
+> 
+> > this code cannot be used today. If this code regresses and someone
+> > wants to start using it on 32b they'll have to fix it.
+> >
+> > Please LMK if I'm misunderstanding or there's another argument (not
+> > mentioned in the commit message).
+> 
+> In general, we want to be able to test-compile as much code as possible
+> on all platforms, but not bother everyone who configures and builds a
+> kernel for his system.  Until commit 37a183d3b7cdb873, that included
+> the tcp_sigpool code, and any build regressions would be caught soon,
+> and fixed (presumably).  Of course that still doesn't guarantee the
+> code would actually work on 32-bit, but successful compilation is a
+> first step...
+> 
+> As the maintainer, the decision is yours, though.
 
-Found by inspection.
+Thanks Geert,
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/phy/phy_device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In my understanding COMPILE_TEST is about expanding compile-test coverage,
+and that is what this patch does.
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index f624218bf3664f36d58332ac1c78f01334dab0ce..8a3eb1839a3d7748d94ef95593c2283eae9f8665 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2472,7 +2472,7 @@ int genphy_update_link(struct phy_device *phydev)
- 	/* The link state is latched low so that momentary link
- 	 * drops can be detected. Do not double-read the status
- 	 * in polling mode to detect such short link drops except
--	 * the link was already down.
-+	 * if the link was already down.
- 	 */
- 	if (!phy_polling_mode(phydev) || !phydev->link) {
- 		status = phy_read(phydev, MII_BMSR);
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-
-
+I do notice this patch has been marked as Changes Requested in patchwork.
+So maybe repost to re-activate it?
 
