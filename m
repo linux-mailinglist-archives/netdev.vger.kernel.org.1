@@ -1,166 +1,173 @@
-Return-Path: <netdev+bounces-252014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FVqGIgNcWlEcgAAu9opvQ
-	(envelope-from <netdev+bounces-252014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:31:52 +0100
+	id gMCnJsEocWniewAAu9opvQ
+	(envelope-from <netdev+bounces-252015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 20:28:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45A35A8EB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 18:31:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9415C278
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 20:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CB32276FE5C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:22:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 166B17901A1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 17:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0903A8FF4;
-	Wed, 21 Jan 2026 16:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB1E3BFE41;
+	Wed, 21 Jan 2026 17:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dkczaqt9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmbMiNob"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEA7337BA6;
-	Wed, 21 Jan 2026 16:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769014777; cv=none; b=CMGiF3drPfUkEJLoGrB45AMzWVWBj+gvfTOpumIjZZCNnR33zh6t5F41ttxqpOBTPKv8afcOamBB7jYoc2YVMuySVUgCYqeR5EbxmMx9tGM1KH/kolVCrSL5kMijvnk7ynHBLhwpfpJXxoXXuLnhVwrcSyLgP/VvBp+tmEYZShc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769014777; c=relaxed/simple;
-	bh=ruJcwsyHlH9v6pfiG+6Y7INjT5x/5/341UtTiiGk9QY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HScQJl3/W8ttBB0hl8hEMW4DjASBCtoZbGU13J5g1pBOpmGcbN23ohDX+1UXaxNL3tHOhy+KxiXs1fcQfxV6ptrEW3QzEEtuzc3iZZnJI3IJhJxP8fdVaZZ8Cj9oEN8jcAfmyhvivQebMvODPmAJFdBO6ZPHuRbsBLqg3YVUvhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dkczaqt9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A076FC4CEF1;
-	Wed, 21 Jan 2026 16:59:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769014776;
-	bh=ruJcwsyHlH9v6pfiG+6Y7INjT5x/5/341UtTiiGk9QY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Dkczaqt9URThweOArTTVF9tgMo8wL7yk4qz8J8GHzRixXbqTpRMpQ8sMCRN6JGphh
-	 6Hu2/qQUC9kgvRzs/JwFfxkabaqUSx17/HVb5P/NYsrbDKqPpEpvKY37oxRn9qECZO
-	 vA7XWcIUdjrg50dpDWeuODPXyvNKkeX60rvaPhLmvkbD0TZq2KtvYm1VMIR0peV+Dl
-	 KicHYz9GrEFZOYquGPSBMtAWPGCFQKRUVlKAC5KWmP6zx9FN0HDgfhXYyXEag6MH6n
-	 xTD753x3paV9ANUYP1AQrGrTkT8x2s2JkBypZ2s6QpVbfARVIqaVq7f03efFBC6jAV
-	 slq+aHnkjVQZQ==
-Date: Wed, 21 Jan 2026 16:59:29 +0000
-From: Simon Horman <horms@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH v7 net-next 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aXEF8elDd4GmyziX@horms.kernel.org>
-References: <cover.1768707226.git.daniel@makrotopia.org>
- <15b0adf5074c601e033fd2338fb27fb666b5d16b.1768707226.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F7536C582
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 17:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769014908; cv=pass; b=b1LtsIaqJjIj2sHm4lBZebVDqMTPmSNR//WJ45TnPKT6Oaa+Ld9TW/QLi/F5jVrdQdrLYul4Opd0DTj3riHqTqiVYP6PqFy2m9HuqYjiO12s1DUMxagpga43EJ0Td2/BVCcQK35xh/h7V2keIGYV1X4r7B+f27dkQv79wwaLGuE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769014908; c=relaxed/simple;
+	bh=SLOCQgI2ErXSdd85hQa3lFR65w2KRZdCPX1tctcCccA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qZP/0ygBYhTzNVgltMGDQl0j+xG4sc5zQwJw7l+ojsHtopn4Io2STInJmne581BpCnPV5t+zhaqDlPI0Hb8MeNcCiA0DytTZTwPJ8Nt8uoyoDP+oyufPsWqky8+sJBPOVyM0C8vQEOI/EKODHQUmx/HO7J4DtCtsyAb05jTYFqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmbMiNob; arc=pass smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4359019da8cso38382f8f.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 09:01:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769014905; cv=none;
+        d=google.com; s=arc-20240605;
+        b=h1/Q9Ee3u/7U0PP2M0ytO8TUEGLPsR11uCy7PbgtEABcRY8Le7ftYFlplWkgujbSNT
+         g73fskgxSTTv9869wsDSYWot7jPky27yqi+2NJCK35418uUSb6D8cO5XzrvsSxuTjLsO
+         zL14iVQXlGxg+UpTSkjdQYGhVEqjWoa4vVnj2hL+5ej7g77itC64IiRVhl5KGLmDY2lY
+         LPNMkO7rlhrOZ5gzjeCIVsTEU0B796/21/GTr3TC6TemuyAyla9uclmrEi3nHwqeq6+i
+         WL+4HBLxvcrBDp+dm8N5LRjNqXboNhfTrOYRj7lYNt8W7yY1zLKvIt/zkfnSAaYe0Sg0
+         U6yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Kw3x/IwmBAZeFPJZDjWdx/Cquty/Ye+Fg3dbgiOuCng=;
+        fh=hPLuwSJQnwM3A1MxaaAdaOlTsMXF4Kob+LePDtFB0nA=;
+        b=fucRO9cSCBjJGy/Ix0WTmFN5r6RzL6+7vN2RXPiz/PfzjYCRdbg/C0au9YE1Y5yAcn
+         SBJAZ1aY25jn1jsFcPXAnuQPGzCBYEPDih9HSdDOEo4zycxXk1R9HjZTGgFjYDdj68Uq
+         LjK9RylW+lroW6r4eJy10wsCaYtJaAVjSxQRHDWxr1rcYfWRQ0vxNFLJxh0sOOHokUQS
+         nlVZkDSGBiKyNs1/GO49w6zT2DgRDwbtfIda9lQGCIpcOhwoIOtdSEYusuGlqDwAvVS4
+         IZQjhs3d9h/Ki3aK2ZwvcrYJeF5mDydYoOZ6JHWhxExyLly95LysDX64C3MpSEd4Mx4O
+         FPyA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769014905; x=1769619705; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kw3x/IwmBAZeFPJZDjWdx/Cquty/Ye+Fg3dbgiOuCng=;
+        b=WmbMiNobuZmY+7pwondkzhvyQAxVbdBm6w4E/COavfAaCFOk9MjfKbkIwFiG9SmDcp
+         jw4MEgkHR17hEnktNiaDSqCS5ycdJT/wdk5ocK+qQSISpY2ZOgEV61R++JE5QZujCjqs
+         /PIxGQMPcK/Zflnp040FtztrFB2cAC6CQNOWPipqPv/8i70iKC0unHTnUM4rK49tLjEY
+         lnz/oE2QKwhD/xEHOZp/19W1EKPD8Kyw0Aeu4MNnXmTd4kn1eSSWyk6oHi8xCw/6U5+A
+         iNJVHVLOrNmfcEnrfq0eoaLsuGcy2gVX1LHEy7kFmVW0LlQz7cUZJKejdfaZ2HeDFZkT
+         Zlhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769014905; x=1769619705;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Kw3x/IwmBAZeFPJZDjWdx/Cquty/Ye+Fg3dbgiOuCng=;
+        b=M2SH4bX4bHk4uMMoDXAEswBuEjGnZjWcAcai1OBz4w0bhUiG6s/gms04d8QxQICkYd
+         5L36we3Y2oMPhnsB3Uo5x8hznJFq9xcI8OxB0GxnOn8NLk70OizG4fZDXEgyx6Ori/ve
+         L7MTjSIAvNqGXiXSKi5QSFRamuWtL1HfIfuYHVhX54mCJgnRUvS3jeqJoNbuQFUwKC8O
+         aUsUGF8FYa0VbUD3yD9UUzt691E/yWzQGRY40gHBFNYPmrCPDFivqdiULAvpNErF85ZG
+         8FTGZM3w1dBcPyTpetr6xGoYE44TnxIsN1XHe8Fv33nSpDpj9zHWtyh8pg6OLMTd75/D
+         NRMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX68XakLlalAQmdyW3oxwkno5BMhUmQXuOzPfIO3Wi2Ic3CpdMvkCvW03dqeRfJvsPPgOsoIfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZpbT0ARv6k8jnhEMEd4nld0/Ibs5iTZvdxVGnKOA6bQU/iQLl
+	MMyAGwWP3+f73lFc+6osZkW6dSdFRLP+rU98v9M5M1WpyCIqWC4X9LqnT4aYHc9Hzeck3is++xF
+	y2xslaLMM7nQKqeExgX3ukj0LbQDAKGs=
+X-Gm-Gg: AZuq6aJz81XYcW6RZZGgpRtLTQ+c2P5TdMxKN/5MCyUZqWd2gIp4CudQl/yGxjkPprK
+	GxL/n/Sk3D4+K0NwJl69ONJmd/wXmA8sxzkfaQ+7eeLR/47798tk0kYXztZo1REeswT3njT08Os
+	sTVCnCdO1sTXSmVolJsRzYkcwrboeJFLOyfPrQy88PaaOLIfDtTOuDz2+vRm6btANiemCg622qt
+	PT6uigy1O+PIK/yDulgls/RC/vNhZFXBsDUQp1OOKsZln2vNMV9+oewyoWrG/mx5v+bvq/PSDpl
+	vWhIR7RwTa9xc7JHTqy2Fdc8czgzN1N8DWzsyPTB6qS8cKVIyhtRcuCrEW8wsWQs2hOebA==
+X-Received: by 2002:a05:6000:2409:b0:435:8e14:9877 with SMTP id
+ ffacd0b85a97d-4358e1498b9mr10547200f8f.60.1769014905117; Wed, 21 Jan 2026
+ 09:01:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15b0adf5074c601e033fd2338fb27fb666b5d16b.1768707226.git.daniel@makrotopia.org>
+References: <20260119-skb-meta-bpf-emit-call-from-prologue-v1-0-e8b88d6430d8@cloudflare.com>
+ <20260119-skb-meta-bpf-emit-call-from-prologue-v1-3-e8b88d6430d8@cloudflare.com>
+ <8eb725d8d0878a7a1b582fdfacf05d20a2542304.camel@gmail.com> <87h5sfthoj.fsf@cloudflare.com>
+In-Reply-To: <87h5sfthoj.fsf@cloudflare.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 21 Jan 2026 09:01:33 -0800
+X-Gm-Features: AZwV_QhJ1NjX1m-MohDCdnXL25Iz6eQYI8PRkmCyiBK89IAx0ByAzxBlEJS-IeY
+Message-ID: <CAADnVQJLZX1UsdqWjCB57PxJQQXnXN5ZMY5M+shnxP6t=wT8yQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/4] bpf: Remove kfunc support in prologue and epilogue
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Amery Hung <ameryhung@gmail.com>, Network Development <netdev@vger.kernel.org>, 
+	kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	TAGGED_FROM(0.00)[bounces-252014-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252015-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,fomichev.me,google.com,cloudflare.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: C45A35A8EB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,mail.gmail.com:mid,cloudflare.com:email]
+X-Rspamd-Queue-Id: 3C9415C278
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Jan 18, 2026 at 03:46:07AM +0000, Daniel Golle wrote:
+On Wed, Jan 21, 2026 at 1:54=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> On Mon, Jan 19, 2026 at 02:55 PM -08, Eduard Zingerman wrote:
+> > I think that patches #3 and #4 have to be swapped, otherwise there is
+> > a selftest failure when only patches #1-3 are applied:
+> >
+> >   #281/17  pro_epilogue/syscall_pro_epilogue:FAIL
+> >
+> > If we want to keep selftests passing for arbitrary bisects.
+>
+> I don't have an opinion. I assumed it'd get applied as a batch without
+> fast forward, so bisect would be going over merge commits.
 
-...
-
-> +static int mxl862xx_isolate_port(struct dsa_switch *ds, int port)
-> +{
-> +	struct mxl862xx_bridge_port_config br_port_cfg = {};
-> +	struct mxl862xx_bridge_alloc br_alloc = {};
-> +	int ret;
-> +
-> +	ret = MXL862XX_API_READ(ds->priv, MXL862XX_BRIDGE_ALLOC, br_alloc);
-> +	if (ret) {
-> +		dev_err(ds->dev, "failed to allocate a bridge for port %d\n", port);
-> +		return ret;
-> +	}
-> +
-> +	br_port_cfg.bridge_id = br_alloc.bridge_id;
-> +	br_port_cfg.bridge_port_id = DSA_MXL_PORT(port);
-> +	br_port_cfg.mask = MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_ID |
-> +			   MXL862XX_BRIDGE_PORT_CONFIG_MASK_BRIDGE_PORT_MAP |
-> +			   MXL862XX_BRIDGE_PORT_CONFIG_MASK_MC_SRC_MAC_LEARNING |
-> +			   MXL862XX_BRIDGE_PORT_CONFIG_MASK_VLAN_BASED_MAC_LEARNING;
-> +	br_port_cfg.src_mac_learning_disable = true;
-> +	br_port_cfg.vlan_src_mac_vid_enable = false;
-> +	br_port_cfg.vlan_dst_mac_vid_enable = false;
-> +	br_port_cfg.bridge_port_map[0] = DSA_MXL_CPU_PORTS(ds);
-
-Hi Daniel,
-
-.bridge_port_id, .mask, and elements of .bridge_port_map[]
-are little-endian integers. But are being assigned host byte-order
-values here and elsewhere.
-
-Flagged by Sparse [1].
-
-[1] This particular commit, from Al Viro's tree:
-    https://git.kernel.org/pub/scm/linux/kernel/git/viro/sparse.git/commit/?id=2634e39bf02697a18fece057208150362c985992
-    To address this mess:
-    https://lore.kernel.org/all/bf5b9a62-a120-421e-908d-1404c42e0b60@kernel.org/
-
-> +
-> +	return MXL862XX_API_WRITE(ds->priv, MXL862XX_BRIDGEPORT_CONFIGSET, br_port_cfg);
-> +}
-
-...
-
--- 
-pw-bot: cr
+I think 'bisect over merge commits' is rarely the case.
+It's better to reorder as Eduard suggested just to be safe.
 
