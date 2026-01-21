@@ -1,200 +1,259 @@
-Return-Path: <netdev+bounces-251807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEU9Gh6PcGkaYgAAu9opvQ
-	(envelope-from <netdev+bounces-251807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:32:30 +0100
+	id 4O3tKgKPcGkaYgAAu9opvQ
+	(envelope-from <netdev+bounces-251801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:32:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D196E539B4
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:32:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6147C539A5
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8EF297E100C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:25:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D7D5D7E01AD
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68E647A0BD;
-	Wed, 21 Jan 2026 08:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC01478E35;
+	Wed, 21 Jan 2026 08:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jaThl1eo"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mY5+RIjW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C6047A0AA
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 08:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70763126A3
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 08:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768983871; cv=none; b=H+r7Yp7q8L6rmM6B/XN8Rhwq9mfgmi8b+4Lnll/amLPNMf26RV5a4cEPjVQWUxpAc4sJQRI3aS1C/Igt0u2LgT9zdypU6Ee2AdekEQZS99+QCVZOS6cN+woHuBqRuijBPYZdxV2FOxQ+LiGM6y5An6cHxsHetZ23Fi+pt4jmOfc=
+	t=1768983861; cv=none; b=jOU13Rtq5EUWRUmoKmvMNcJpmPzr7BAar1oQ/BmxtN8q1QGxHWLdUCsQtAbGmFCBhtntJJjq2a1KsFiHpWxuCc2xzyg0yOeq68suiAyIiHK0WEEQMBrZULVSr7SCLnY0xMITGXpEvl9LKLh+elj/ExZtfx+DHF4fpB0xeDFc/wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768983871; c=relaxed/simple;
-	bh=sSFv0IdAf9sQinLXNohXO+H7ajTSZl9Iu+sA6q9NtgI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPQ1kYhw44lrhjpXa5gLBVBmzuhs5u2SD5gQhz25V3YiDL5LUT3O0jwmww7Vdn9/P+gsA2K0c66kHWBlXnRmzNioqcfhMf7332c6IlsEHgwttW/I07pHwT5b+8AunvnmoYIDO55QnCOrnU8BUt2x3Aqm0kIGSLiyv+Puab1D2lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jaThl1eo; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-352f60d6c2fso469722a91.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 00:24:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768983867; x=1769588667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpk5WVvh/foJx73m2kZTvwGkZZ/a/ld0lKy/L+I+Z1w=;
-        b=jaThl1eoY7BtYXQ7/97xutwdB9+A6bwF4q/dhJehBUOA22Yc96zAsrX3oSZQPNWw43
-         qN/6goMTuWKHJP78kGugMwLh4Mo1Pn2fQ2WZMAiTkmRCsnoZwz4WS4+cRnLZ1ex50gO5
-         VqxjPhQgzuz1l0LvsNuaGnS+DV42bs195adWzT2h+wKN3xpy7yiIrrYbZUNJLxtkl5RT
-         sZKBkT5xaCUqNm/N7OTxJmzk4ujpsD31fmRkxRkWwrUSFp/kmAyHYiSo+pfdhCwYE4Hp
-         Zef9J9GyQ8+ciAGVuBCuk3ppHHNqBd4zxpwxvNapNV3fJjCAe14kI+0pUjUNnyFd+qTt
-         y9VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768983867; x=1769588667;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kpk5WVvh/foJx73m2kZTvwGkZZ/a/ld0lKy/L+I+Z1w=;
-        b=Tgsl/Wc/XU/cJjJjPrgmNeBOubNP3oF9Zu8t+IMn18R82/6wqORsT9P96CDowcBvPy
-         2V65gQXdUd0a+wZ3N1td7vp+cSWlefJ24tkyA9mB1oJdGSxEtAXJTS4osbJPrrNWBh0V
-         pn33Zp9twW8NAiEdIs3MiHfrSN3QhylfS4gORv8+/n3OPe8Ion7/YpGOIevByfNZPYoW
-         0xoB1CkgfMW6E9NZrN4j73fk5/r/pJi/JTvjOzV7KZKCOsNAABJjv/CDYyzw2tc3CIoo
-         1kJKeoQ0w6Ykm6Tc1F/l8NGO/lCQXFkmri6RQx0IGMhfYtmm9mRxyY8Pd9p7N35HGPrI
-         8NIw==
-X-Gm-Message-State: AOJu0YzYRTDGSSgyV3mIjKRPzhQEQmLmdptJoUzIH8tRcVbH1yctPr8X
-	7PdeH62/05s/fz50VneW9KNyfaig7UYhJsiLAFWIEhOVcaknz+E7f2R3uFBlEg==
-X-Gm-Gg: AZuq6aKXK2a4L/OFrxtuqWOwaeAIkbstWb3VmFBt3D6Ij6agz8Aca7MpP5Qq1EpCByv
-	AeRFviVDwU5CNOsQoCk1aFWVILjPNnIincX3syZDVcpW4qhO5RJWF18xiU4Fqxg2xRlpkLAEHZ4
-	jJegZBlr3D7etB6mvYdQrW+4KWansDza7Lv59+jaX8Sb8BjpXR8FIvbaox6OTbPvnnmUm6NWLLR
-	PmUF5jlSJk8svm69GVFte/f0z/U36YzerhMVf2s8AEx4ri6C7ptJLLww5CMa4AxXVGWbe3tKk2H
-	3jqoE2wMtYPrB/X8ALFw7lQm8hxFJha+pRECd/fNVjdP21iRUi8Pp0cUuATO+hJoPhfKr/DO6gz
-	/2hk7oa7rK8aiN6fj+0IrSMUepolQKouRLYy80Z64Ma3ujeWP9yeF56MszC511YnTZD8FQYJaNA
-	UhlmJqW02JHLJnuLI4hI2J/TRINOkngIbif8woWCB1T3zAKMYOmRmE3g==
-X-Received: by 2002:a17:90b:37d0:b0:33b:8ac4:1ac4 with SMTP id 98e67ed59e1d1-3527329c896mr15564081a91.35.1768983866637;
-        Wed, 21 Jan 2026 00:24:26 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-352c150faa1sm4265728a91.7.2026.01.21.00.24.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 00:24:26 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
+	s=arc-20240116; t=1768983861; c=relaxed/simple;
+	bh=k9Ftpo4TKY96S2kIUgH02c5k8qvcBDKSOqDGp70zMOI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N+9Zz6TcaZGiS6PyhCfpdimP7SghItOcou7xe4zs7gZw2tupUAwWBeJ36qCadwB+DSUXRkwEcKXWBHZFxN043Z0/3e2giHcY8aXVpUXLCh7Qq2JRJ92UliVfR2MdztpQYrdEaMyq0TtEmY6B605DXXRTRNHW9ND+1/GK4s7Iesg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mY5+RIjW; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1768983854; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=6peaobB0gLNEx/Evg7sITUuD/jdB3Bl1lq9YrDRIanU=;
+	b=mY5+RIjWwuQVgrg4MRQsQwGlso39YXg7OVyIxTV3ubNGd8OUj4DLr04WRPhKcrCcL1jm0PSV/RJ37NzdeKqmRkjNHhkL2+z9qQWXCmNjPoTQnjQCZQR7h42HEzBkTQwN2Hw3vQ6uKHwaDAGdHDRdWdKzWAtpXn5ChPdf1/NPAs8=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WxXSK1B_1768983853 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 21 Jan 2026 16:24:13 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: ifb: use u64_stats_t with u64_stats_sync properly
-Date: Wed, 21 Jan 2026 16:23:44 +0800
-Message-ID: <20260121082348.2388314-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Dong Yibo <dong100@mucse.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [PATCH net-next v21 0/6] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Wed, 21 Jan 2026 16:24:07 +0800
+Message-Id: <20260121082413.130681-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 5331a73da237
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-5.96 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251807-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-251801-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: D196E539B4
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 6147C539A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 64bit arches, struct u64_stats_sync is empty and provides no help
-against load/store tearing. Convert to u64_stats_t to ensure atomic
-operations.
+Add a driver framework for EEA that will be available in the future.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/ifb.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+This driver is currently quite minimal, implementing only fundamental
+core functionalities. Key features include: I/O queue management via
+adminq, basic PCI-layer operations, and essential RX/TX data
+communication capabilities. It also supports the creation,
+initialization, and management of network devices (netdev). Furthermore,
+the ring structures for both I/O queues and adminq have been abstracted
+into a simple, unified, and reusable library implementation,
+facilitating future extension and maintenance.
 
-diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
-index d3dc0914450a..6da801748189 100644
---- a/drivers/net/ifb.c
-+++ b/drivers/net/ifb.c
-@@ -39,8 +39,8 @@
- #define TX_Q_LIMIT    32
- 
- struct ifb_q_stats {
--	u64 packets;
--	u64 bytes;
-+	u64_stats_t packets;
-+	u64_stats_t bytes;
- 	struct u64_stats_sync	sync;
- };
- 
-@@ -81,8 +81,8 @@ static int ifb_close(struct net_device *dev);
- static void ifb_update_q_stats(struct ifb_q_stats *stats, int len)
- {
- 	u64_stats_update_begin(&stats->sync);
--	stats->packets++;
--	stats->bytes += len;
-+	u64_stats_inc(&stats->packets);
-+	u64_stats_add(&stats->bytes, len);
- 	u64_stats_update_end(&stats->sync);
- }
- 
-@@ -163,16 +163,16 @@ static void ifb_stats64(struct net_device *dev,
- 	for (i = 0; i < dev->num_tx_queues; i++,txp++) {
- 		do {
- 			start = u64_stats_fetch_begin(&txp->rx_stats.sync);
--			packets = txp->rx_stats.packets;
--			bytes = txp->rx_stats.bytes;
-+			packets = u64_stats_read(&txp->rx_stats.packets);
-+			bytes = u64_stats_read(&txp->rx_stats.bytes);
- 		} while (u64_stats_fetch_retry(&txp->rx_stats.sync, start));
- 		stats->rx_packets += packets;
- 		stats->rx_bytes += bytes;
- 
- 		do {
- 			start = u64_stats_fetch_begin(&txp->tx_stats.sync);
--			packets = txp->tx_stats.packets;
--			bytes = txp->tx_stats.bytes;
-+			packets = u64_stats_read(&txp->tx_stats.packets);
-+			bytes = u64_stats_read(&txp->tx_stats.bytes);
- 		} while (u64_stats_fetch_retry(&txp->tx_stats.sync, start));
- 		stats->tx_packets += packets;
- 		stats->tx_bytes += bytes;
-@@ -248,7 +248,7 @@ static void ifb_fill_stats_data(u64 **data,
- 		start = u64_stats_fetch_begin(&q_stats->sync);
- 		for (j = 0; j < IFB_Q_STATS_LEN; j++) {
- 			offset = ifb_q_stats_desc[j].offset;
--			(*data)[j] = *(u64 *)(stats_base + offset);
-+			(*data)[j] = u64_stats_read((u64_stats_t *)(stats_base + offset));
- 		}
- 	} while (u64_stats_fetch_retry(&q_stats->sync, start));
- 
--- 
-2.51.0
+v21:
+    Fix two issues from the previous version:
+    1, a DMA unmap operation was missing.
+    2, RCU APIs were not used in eea_stats. Although the standard practice when
+        using RCU would require adding the __rcu annotation to both the rx and
+        tx fields, in many cases these fields are read without needing RCU
+        protection.  Therefore, I do not want to add the __rcu annotation.
+        Instead, I use a spin lock to protect modifications to rx and tx.
+
+v20:
+    Fix the partially initialized structure passed to db. @Jakub
+    http://lore.kernel.org/all/20260113172353.2ae6ef81@kernel.org
+
+v19:
+    fix the comments from @Simon Horman
+
+v18:
+    v17 with [PATCH] prefix.
+
+v17:
+    1. In `eea_adminq_dev_status`, uniformly use `enet->cfg.rx_ring_num`.
+    2. Add a `struct eea_net_cfg *cfg` parameter to `eea_free_rx` and
+        `eea_free_tx`. When called in the normal path, pass `enet->cfg` as
+        the argument; when called during initialization, pass the temporary
+        `cfg` instead.
+    3. Move the `.ndo_get_stats64` callback into `eea_net.c`.
+    4. In the `.ndo_get_stats64` callback, add a comment explaining how the TX
+        and RX statistics are protected by RCU.
+
+       /* This function is protected by RCU. Here uses enet->tx and enet->rx
+        * to check whether the TX and RX structures are safe to access. In
+        * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
+        * and enet->tx are set to NULL, and synchronize_net is called.
+        */
+
+
+v16:
+    1. follow the advices from @ALOK TIWARI
+       http://lore.kernel.org/all/5ff95a71-69e5-4cb6-9b2a-5224c983bdc2@oracle.com
+
+v15:
+    1. remove 'default m' from eea kconfig
+    2. free the resources when open failed.
+
+v14:
+    1. some tiny fixes
+
+v13:
+    1. fix some tiny fixes @Simon
+
+v12:
+    I encountered some issues with sending the v11 patches, as they were quite
+    messy. Therefore, I'm resending them as v12.
+
+v11:
+    1. remove auto clean __free(kfree)
+    2. some tiny fixes
+
+v10:
+    1. name the jump labels after the target @Jakub
+    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
+v9:
+    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
+
+v8: 1. rename eea_net_tmp to eea_net_init_ctx
+    2. rm code that allocs memory to destroy queues
+    3. some other minor changes
+
+v7: 1. remove the irrelative code from ethtool commit
+    2. build every commits with W12
+
+v6: Split the big one commit to five commits
+v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
+v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
+v3: Thanks for the comments from Paolo Abenchi
+v2: Thanks for the comments from Simon Horman and Andrew Lunn
+v1: Thanks for the comments from Simon Horman and Andrew Lunn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Xuan Zhuo (6):
+  eea: introduce PCI framework
+  eea: introduce ring and descriptor structures
+  eea: probe the netdevice and create adminq
+  eea: create/destroy rx,tx queues for netdevice open and stop
+  eea: introduce ethtool support
+  eea: introduce callback for ndo_get_stats64
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/alibaba/Kconfig          |  28 +
+ drivers/net/ethernet/alibaba/Makefile         |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
+ drivers/net/ethernet/alibaba/eea/eea_adminq.c | 421 ++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
+ drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.c    | 236 ++++++
+ .../net/ethernet/alibaba/eea/eea_ethtool.h    |  49 ++
+ drivers/net/ethernet/alibaba/eea/eea_net.c    | 644 ++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_net.h    | 201 +++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.c    | 587 +++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
+ drivers/net/ethernet/alibaba/eea/eea_ring.c   | 266 ++++++
+ drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
+ drivers/net/ethernet/alibaba/eea/eea_rx.c     | 789 ++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_tx.c     | 404 +++++++++
+ 19 files changed, 4033 insertions(+)
+ create mode 100644 drivers/net/ethernet/alibaba/Kconfig
+ create mode 100644 drivers/net/ethernet/alibaba/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
+ create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
+
+--
+2.32.0.3.g01195cf9f
 
 
