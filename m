@@ -1,399 +1,333 @@
-Return-Path: <netdev+bounces-251799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIqRLrmNcGkaYgAAu9opvQ
-	(envelope-from <netdev+bounces-251799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:26:33 +0100
+	id sLjRH/GNcGkaYgAAu9opvQ
+	(envelope-from <netdev+bounces-251800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:27:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10BE6538CD
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:26:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD32538F9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A31584EDBBD
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:21:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B113E724DFD
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F73A3EDAA7;
-	Wed, 21 Jan 2026 08:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kuEScU7V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917D7478840;
+	Wed, 21 Jan 2026 08:21:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D86945BD7B;
-	Wed, 21 Jan 2026 08:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768983673; cv=fail; b=dPdfNZ67IfUggpY1ZBNM/giDAu8kNYW81eIaoEqW/Zc+uyTWURLy8xe78k/KTJhfDS0qBtgAwzq7Ao4pHsYupo+ha37gB8tTmCuHCdX4lAX3drfpKeCZ6JX+Qac6MdQAmZg0Fh3GLd7CZgM0/ym89/ADaXy3ZvgIvx6PFKdghf8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768983673; c=relaxed/simple;
-	bh=V+WrHf30hu/60BlOkwaQMjkDC0tSlqAC4nay0w2/wBk=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VOuYE4eQov9dvsNS6sy4Gfi8tdm3mI7Czp7qcS3TG3SacDtyYvQbryM14fUuzmUTxsYKPkXJxfleFzwIeWBnDGsK2SgKkSPbYkP5OSZxK/kpIMWpq6lkB6odIa8/Rmqeu/j/Ta/n8G4bAz+oKO3vZPzBOpneYHKLuwHYECcG9dA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kuEScU7V; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768983672; x=1800519672;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=V+WrHf30hu/60BlOkwaQMjkDC0tSlqAC4nay0w2/wBk=;
-  b=kuEScU7VJiyKbqInndL752p405liIgGHpyQJqdwImA+wBIMlv+zF5Xgb
-   XcGJie/bnpbv2J9s4KOkGxfzRUiLMlcqmo09wd2DFZy0TgpuhTTrojyw/
-   Rx5wQFm3yUpENHy1tLwpRI1qjO0wBUGk3QHNBlcJwtmhLK85asKbW9iZ4
-   K08Q/dAKlpt9AZ15h7ToOWFh68KIZgenLTHMebLA60Fs2tYnyXwnaYwLr
-   +mabj+D7ZqXKTHL469eEsaaDvOnyLhonqP6bsnucZwe1hiEoyuUB7UczR
-   dmABjvYf82k51j4jaLy1YQ4lBqwv1JDtH3qOT0pMFAUY+AkzkNU4JhVny
-   Q==;
-X-CSE-ConnectionGUID: 5i6qcrYtS+GOdxkpzX2EXw==
-X-CSE-MsgGUID: NlVDmVkKQUWC4pLjTp7qOA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="80509454"
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="80509454"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 00:21:10 -0800
-X-CSE-ConnectionGUID: wleWaXTdQ/2Po+rYbofLHg==
-X-CSE-MsgGUID: X87xhaOIRyyM5kM1MAvuPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="206800837"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 00:21:09 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 21 Jan 2026 00:21:08 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Wed, 21 Jan 2026 00:21:08 -0800
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.18)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 21 Jan 2026 00:21:07 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UX6yya+G94YOp47M8rHCUKw1HhQR8WA3vHOUstAtl7NzEahCd+ZTh6++2bZHtrDVxWCq0HafI5yvCocigPv+l1GOx4OXCAu9jimgMumk0wg5Te4Ko4g7MeGJl9bztkB95Wgk78nd9OVjKjcAXSd35Fn72hOU4HeCZZFsV85h3dRrGj9vU36mmOHEAeiC9tiUGOrC60wHMnJphMY4n6UODUDzw1FuCeAxGy2t7b/T4UK28ILQ44L6OyN44PniQV+T1YW2pwkFJWjJdctzvhNcyM7IEp53QAKMPhByMrZfQqddFJ88tjeV0mn76rlwt9m/G8AzV4xASaWRClBMHuS8tQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VKFVaYW1oXP1D+ewbVbme54fbyp23qQrawiQpdQIWyw=;
- b=GB3agtDZwKwQhIIp1/eu3cFnBe7eTRriGIfZ1vfF5Uvw5Mc/Otw1/+wCj2xDbfW7xPkCMbVzP/HLpl7oNPJHnAOdRR2XSwB40Ei4wJ+Ntntm1p9SF6Mw78aYr3+Op2MZE43nuIvdxFZlj1qY4tqRwPHTrSN7xGvuyp6bCxh5ph8BR59XtxPfWi4sPGVgyQgEc9kxGjwtwwmICwMJMm9DhoOHLvyVb7TcuBUuElSSTTvjSh/uck0Ejb3R9/YlNrpp1IVvANrD23H53TveTQWNPJVcrWePCe3Byau6SBoiVkXmYmxBrJTO+RPvPPhf2yY8hwobHtLhMohKy5bqFgrCbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by CY5PR11MB6210.namprd11.prod.outlook.com (2603:10b6:930:26::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Wed, 21 Jan
- 2026 08:20:59 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
- 08:20:59 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Aaron, Ma" <aaron.ma@canonical.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH] ice: Fix PTP NULL pointer dereference
- during VSI rebuild
-Thread-Topic: [Intel-wired-lan] [PATCH] ice: Fix PTP NULL pointer dereference
- during VSI rebuild
-Thread-Index: AQHciqrT3PBxCXi+00WqPyJfn/jyhLVcRpow
-Date: Wed, 21 Jan 2026 08:20:59 +0000
-Message-ID: <IA3PR11MB898667FBC0C4394FF41B003DE596A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260121075106.401770-1-aaron.ma@canonical.com>
-In-Reply-To: <20260121075106.401770-1-aaron.ma@canonical.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CY5PR11MB6210:EE_
-x-ms-office365-filtering-correlation-id: 14260eaf-4e90-4672-d69d-08de58c601ef
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700021|921020;
-x-microsoft-antispam-message-info: =?us-ascii?Q?tN4mq26tZXFNbZ3x2e4D0ssqwtPYX/z+QPC16VNZite4yXSr9lnf0wfaXFlz?=
- =?us-ascii?Q?bbaHgnTu1YLp3/+kDBkaRAJrAuZbfLZHYfbTqW2AybT12U6DC0z2jm4F6sPr?=
- =?us-ascii?Q?H4i95EdnsaoL/rPQpivWCsWRPpXlJJVA1GOuadpuJY+Ok5qLRmf8flcuik/2?=
- =?us-ascii?Q?412SniYHsdSY3vx+7fQ8gmm2eSs6XKvloUE+AvjgEmXRR/CU0EdVyyWXgaFW?=
- =?us-ascii?Q?E5EtzMcAL6ALlGESynCojuCDPMY/Ua3e8OgOTU6B38qanfhcXj5GQnXo5uWu?=
- =?us-ascii?Q?eRZ9yVT29Bs783M4P5XpSKNKalCBlT8LQvaXO9bZzgupMLVA/ubfrz5OHvgp?=
- =?us-ascii?Q?lfyBdCftLKo5tUXHZUqL5j+64XXEVNk+W+BjVDpPGjjFzvVWCq3VpB/R+jdg?=
- =?us-ascii?Q?U3YoyE8/TdUQ0otrEbcvXsYRwIiMYppx9qw5vneCwFXAU98DjfUdkW77vcfU?=
- =?us-ascii?Q?QUDxLaUu0M/oanqZMinUcXBp0EvQY7f5nG1vld6vNR66LPaN7kWASqlGoRhz?=
- =?us-ascii?Q?Lr3S5sAUBDkDXm0RrtgGGkmb0GNktLBolsORPRiiL6xZ2+sRQSFhX2qvi2dr?=
- =?us-ascii?Q?fJgtkMW3hbQwOqLSSch97213DPA4DCJjND/aJRK2Ux4fcXUG0oJnB+XI3+os?=
- =?us-ascii?Q?T7zBDpPrvbtinFyORHhtUnMksATzTNJZJsZV/8gSPFKBk4sFPfDWkoojM2Lq?=
- =?us-ascii?Q?JesTNgJX0WKYg1wY2FIMRkEGJ0AzjGFWEgYqpNBAU5whtTnMmrEkn0pfQaw/?=
- =?us-ascii?Q?0pcvrSpbWULj8MxRi3qPoF/VjWPllCG4/J3+DODU6lKsBKH0hsUoVcDq7NBB?=
- =?us-ascii?Q?cVa1ELcg2L4pYEqc20jGAumeFQzuA6emXTCpDQwYWc0/Oy5wUjQHtVP4Idm1?=
- =?us-ascii?Q?khSHpVM/CzNaD5gMRX2x5o/n+oCtNwraLv8I5CUIY9KcQWpeaIWK/SV45b4W?=
- =?us-ascii?Q?q11KC6cgj6deDoThPSTeKEbjdYonZNZyXQV7uEaFxC4aldCkJyXsQ1Xb+dBm?=
- =?us-ascii?Q?ZiQnr6hPo+ltslaC9IKkyPrZPx9pysblYMhjhUfIIe+QoFdTVm7HZg46UUyk?=
- =?us-ascii?Q?/DFJntuaXSm5pSrf5LQIpVcWKtBIEVurpgtZymz4D3PVrmjrX3ngipvMAMJH?=
- =?us-ascii?Q?g7XHKMEJCdxR6g+BLEr9Dm0H9gYeRyaPQrd2aomdcANuLvt7ZUb1GcLWOA6I?=
- =?us-ascii?Q?LroUZ14ueEHNTLKCtB3PfDObiTRibxHkKVDBGbXdE44JllEvu+Sgxuc6z+Nz?=
- =?us-ascii?Q?hblRJM1aZHnmHpFTX/QOSY7L64OSY9RW7B0l+QwXE5zO0f1/4iHCw1WaiImI?=
- =?us-ascii?Q?3dY4o9JXN2eVqpKz0nnaVR8ZTvOaqfddfclMgPDxHeKe+43771QGKXLBqO8G?=
- =?us-ascii?Q?D/Ergf4Ul8BRsHrXVU2E1+7LPldKrJ6j7vCpfajjxts7PuGQ3YpCfhMfu5eV?=
- =?us-ascii?Q?r20TmrVmuiL8K+Y474+AZGXw972Gf07BE3PMl6farigCWdmpEmZ4TUGTaxMQ?=
- =?us-ascii?Q?SF3qw6A9GmO7pKZc8w00VSNfnW7aoZqL5KPv647YnQpIjxs9ApJ/XM+l05xA?=
- =?us-ascii?Q?9CVCJR9SWEfl9ljmcl0NwGU2Ey07srKpp3dHymU640Gy8++dshm68Sj6eI1t?=
- =?us-ascii?Q?nfe8K3XsOXFM5t2JOnp1Gt46MI32Bs7RJskujGM16UyL?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DVzniXCjmYtFiW4J+JgSyszsW3KfDRkX1vtbORWKrlj9F5N4vMLngEJqnS87?=
- =?us-ascii?Q?w48Y4+JSo1VHHHWdoygZ3E9QhTkpQfRk2lE9rWJpl29YcVlxUNYgV1eSe5zp?=
- =?us-ascii?Q?IYAKs9KQZsdmzbHIu9OYXYkpABmYJ+5lYSzlPhJCbwfvg9kn4nMronUaBCu/?=
- =?us-ascii?Q?d/3c+HOCzB9+Iwf4B/KGVwkuIPmnl5xbWol0JpOYT5jWnWaLgEDomKSJm3hn?=
- =?us-ascii?Q?MV9pXkNUB4FpEwRt1BqAenhCB+lw8rzk6ij/9BS5fLMfgmXgUAX5z8KXbvOF?=
- =?us-ascii?Q?q0OVLaGoSgc5FxOjCjt5fVPopAOo1+VedIuGfvjrUf5AGVDy8zMHe33Km+kE?=
- =?us-ascii?Q?bIsZI4sQ8AvwujZ4ke/WhI6GxhKt+utxjL6JVOPbng6ReZtJU+/jA1JXQ81C?=
- =?us-ascii?Q?Os+2ZIz1d53wWN0vmJ50vr+TgOgk9YKCCxwgWiWVFaJBF6UlGwhLiDSgaur8?=
- =?us-ascii?Q?HIIkyRVWn57ZB1/rXQsCTDIxpvjMAuau7YKPpyOdVzVKVkiVoJzj8h0/FaSt?=
- =?us-ascii?Q?VhrXoL2B4K+IsGksun3FnK1B7f/GI+mQL+oo2TUgAOywUd8jRJuk2f3HA9+T?=
- =?us-ascii?Q?3HC9oV8MIYimxmKvWeb6ilB2rF38gFHfFQYFZV7smeLi4UAhMyrlzxRYAAGS?=
- =?us-ascii?Q?4HpDfO+uY7uyo7paeA9QlaWqoM+YEqOElwknbiIdBGIGjHQhFb4knJbPu+lk?=
- =?us-ascii?Q?nN10frLrgdXNiyvSZrX+b5auW3oNgkNCEeBCbNJ3ISx2pz9lRmpLf4uqm4Xp?=
- =?us-ascii?Q?n2YqBLyR8E+nK2A7ufgIk5aMCo398DVFthEVhjRXVfLWgTbKwBJXyyyUMzAY?=
- =?us-ascii?Q?gaPMLil4KTYwAPnUH8/DOmUwb8ZxCXLKTOH9LFKTM2wZdihPRJFHCgVIt8HB?=
- =?us-ascii?Q?Kfyq8rfN7PMaYRbA+jnj1hGtp7hPn5a5gdEDvuyayR+7ORuzf7Kto4JdHXiU?=
- =?us-ascii?Q?P0DntzMM5+P8tAEhloV586MBMobxwXWHxFRifDvq7Xnh/yrSYSgzaGxxhtzz?=
- =?us-ascii?Q?XaPp1RavLmR4qKIEYFwfDAdaV/+P1edR2B12aBl6YX2uvBaY+vsgCeziqhf+?=
- =?us-ascii?Q?lB66Efi8TEF81xwf1h77Br5d8lvHGAYx5GTLWNG0cBf1yAEigZzEza/tQGif?=
- =?us-ascii?Q?goefRU+rmGcXTHSdqjvkXsTEM3hFAbhqXfuQaXcwEzsYu+zWKy2F/Cb5gH/p?=
- =?us-ascii?Q?7rE6fouJkkx32n8zW950cTqaTFa0ijWWcCghX5QoTo2Tg2lSA56gdHJoW2U8?=
- =?us-ascii?Q?5dVw9IzHCmcexDp/ZUvGewL0X3qHp8xl8wFYT3on2XpHeh7S+wQsirOpl66X?=
- =?us-ascii?Q?1Vxgl/pv9JMNyM0Omo0LZiSbfIK4rtqZQXHpyr44Fveow4THLxt59LqFvPDG?=
- =?us-ascii?Q?e8vw1QUI93lPHTYx6JaUb+nbFSLKo0rpNOMhrnB3S81Wed2umT8W5qWXpmPn?=
- =?us-ascii?Q?5bsXePASHpOrI8g6leB4ktRxQ7WU/q+d4XYrQHZhrXqpPhnzbKwF/CUF/ciP?=
- =?us-ascii?Q?qIplps9wZr5nGn0gGOAvwNz3ohbmObOUNMkOLzNv3ITBETWf+C1pEqfO5v9A?=
- =?us-ascii?Q?GFfsqzzUpcl/wlmWeP86NiivU3Aqlbu3eDHF4wr61C7kgJFoAl/CD7iDG6+x?=
- =?us-ascii?Q?NbliUvHLKWJb7FbukppLygITd2q82vJvt7gv4t4q438ypKKdfjTRpWH8Kdlq?=
- =?us-ascii?Q?KbX8lgcJu+TH97AyHGr7wCAQoYbAOlQOEHVP+Ib7QjglUlDmzAuiXw9yzhmy?=
- =?us-ascii?Q?S5YhPMxiGMnl23lBtASGVQWErmMvkS4=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8095C44A727
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 08:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768983716; cv=none; b=flOPSiy2pV91Hp8JKDXAw3JnvSHta31KNz44hOXkftvpydtgce5jwNTEiHvJYFvp+AWPngRhGJTDRXTq0FaG1/9NW7nEFxg7i4fDwMBY+GqS79CzvA6WjPPAJqVmPNK5rKLRYXXmeRL19ByAqm7xMEbwzwJID024XQcJTXBTzHQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768983716; c=relaxed/simple;
+	bh=6VoSJVX3L1PH/is+uWV+PCC2WPyoHVpex22Lsinpsho=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hn9Ul+O67wO9/4gVTGlCbpJmzLar629L03uB9x54K8AkI1RXHCs0p43dNeUNmKOPUPMhrsMF2MLymzfGMJqI4Aug3FLeDtPTcv2Uukvk6XzYNLLrWgJC+d2r+UxmHkGL5uTGagW5Y5HqFV3x6MvyibO/acbVONJN/vm3E5vKiyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E049133689;
+	Wed, 21 Jan 2026 08:21:45 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3B4903EA63;
+	Wed, 21 Jan 2026 08:21:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8K9NDZmMcGm6dwAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Wed, 21 Jan 2026 08:21:45 +0000
+Date: Wed, 21 Jan 2026 09:21:44 +0100
+Message-ID: <874iofs7dz.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,	Michael Ellerman
+ <mpe@ellerman.id.au>,	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,	Alex Deucher
+ <alexander.deucher@amd.com>,	Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>,	David Airlie <airlied@gmail.com>,	Simona Vetter
+ <simona@ffwll.ch>,	"Creeley, Brett" <bcreeley@amd.com>,	Andrew Lunn
+ <andrew+netdev@lunn.ch>,	"David S. Miller" <davem@davemloft.net>,	Eric
+ Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,	Paolo
+ Abeni <pabeni@redhat.com>,	Bjorn Helgaas <bhelgaas@google.com>,	Jaroslav
+ Kysela <perex@perex.cz>,	Takashi Iwai <tiwai@suse.com>,	Han Gao
+ <gaohan@iscas.ac.cn>,	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,	amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,	linux-sound@vger.kernel.org,
+	linux-riscv@lists.infradead.org,	sophgo@lists.linux.dev
+Subject: Re: [PATCH v2 1/4] PCI/MSI: Conservatively generalize no_64bit_msi into msi_addr_mask
+In-Reply-To: <20260121-pci-msi-addr-mask-v2-1-f42593168989@iscas.ac.cn>
+References: <20260121-pci-msi-addr-mask-v2-0-f42593168989@iscas.ac.cn>
+	<20260121-pci-msi-addr-mask-v2-1-f42593168989@iscas.ac.cn>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.1 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14260eaf-4e90-4672-d69d-08de58c601ef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2026 08:20:59.2424
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WoB19eR8NKjMSsmSvYdmRwxdZkmKRWOFWZV6qUBVP3oUCHD3P568hn1oiGvRT3JWSzi5xBFNeWaVQFypcVUYxZLtgoLH9tVsyYB++mOII+4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6210
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.54 / 15.00];
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Level: 
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : No valid SPF, No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	TAGGED_FROM(0.00)[bounces-251799-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,canonical.com:email,intel.com:email,intel.com:dkim,lunn.ch:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,IA3PR11MB8986.namprd11.prod.outlook.com:mid,osuosl.org:email];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com,iscas.ac.cn,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-251800-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 10BE6538CD
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tiwai@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,iscas.ac.cn:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: DCD32538F9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Wed, 21 Jan 2026 04:49:37 +0100,
+Vivian Wang wrote:
+> 
+> Some PCI devices have PCI_MSI_FLAGS_64BIT in the MSI capability, but
+> implement less than 64 address bits. This breaks on platforms where such
+> a device is assigned an MSI address higher than what's reachable.
+> 
+> Currently, we deal with this with a single no_64bit_msi flag, and
+> (notably on powerpc) forces 32-bit MSI address for these devices.
+> However, on some platforms the MSI doorbell address is above 32-bit but
+> within device ability.
+> 
+> As a first step to enabling MSI on those combinations of devices and
+> platforms, conservatively generalize the single-bit flag no_64bit_msi
+> into msi_addr_mask. (The name msi_addr_mask is chosen to avoid confusion
+> with msi_mask.)
+> 
+> The translation is essentially:
+> 
+> - no_64bit_msi = 1    ->    msi_addr_mask = DMA_BIT_MASK(32)
+> - no_64bit_msi = 0    ->    msi_addr_mask = DMA_BIT_MASK(64)
+> - if (no_64bit_msi)   ->    if (msi_addr_mask < DMA_BIT_MASK(64))
+> 
+> Since no values other than DMA_BIT_MASK(32) and DMA_BIT_MASK(64) is
+> used, no functional change is intended. Future patches that make use of
+> intermediate values of msi_addr_mask will follow, allowing devices that
+> cannot use full 64-bit addresses for MSI to work on platforms with MSI
+> doorbell above 32-bit address space.
+> 
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+
+For the sound part:
+
+Acked-by: Takashi Iwai <tiwai@suse.de>
 
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Aaron Ma via Intel-wired-lan
-> Sent: Wednesday, January 21, 2026 8:51 AM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; intel-wired-lan@lists.osuosl.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH] ice: Fix PTP NULL pointer
-> dereference during VSI rebuild
->=20
-> Fix race condition where PTP periodic work runs while VSI is being
-> rebuilt, accessing NULL vsi->rx_rings.
->=20
-> The sequence was:
-> 1. ice_ptp_prepare_for_reset() cancels PTP work 2. ice_ptp_rebuild()
-> immediately queues PTP work 3. VSI rebuild happens AFTER
-> ice_ptp_rebuild() 4. PTP work runs and accesses NULL vsi->rx_rings
->=20
-> Fix: Keep PTP work cancelled during rebuild, only queue it after VSI
-> rebuild completes in ice_rebuild().
->=20
-> Added ice_ptp_queue_work() helper function to encapsulate the logic
-> for queuing PTP work, ensuring it's only queued when PTP is supported
-> and the state is ICE_PTP_READY.
->=20
-> Error log:
-> [  121.392544] ice 0000:60:00.1: PTP reset successful [  121.392692]
-> BUG: kernel NULL pointer dereference, address: 0000000000000000 [
-> 121.392712] #PF: supervisor read access in kernel mode [  121.392720]
-> #PF: error_code(0x0000) - not-present page [  121.392727] PGD 0 [
-> 121.392734] Oops: Oops: 0000 [#1] SMP NOPTI
-> [  121.392746] CPU: 8 UID: 0 PID: 1005 Comm: ice-ptp-0000:60 Tainted:
-> G S                  6.19.0-rc6+ #4 PREEMPT(voluntary)
-> [  121.392761] Tainted: [S]=3DCPU_OUT_OF_SPEC [  121.392773] RIP:
-> 0010:ice_ptp_update_cached_phctime+0xbf/0x150 [ice] [  121.393042]
-> Call Trace:
-> [  121.393047]  <TASK>
-> [  121.393055]  ice_ptp_periodic_work+0x69/0x180 [ice] [  121.393202]
-> kthread_worker_fn+0xa2/0x260 [  121.393216]  ?
-> __pfx_ice_ptp_periodic_work+0x10/0x10 [ice] [  121.393359]  ?
-> __pfx_kthread_worker_fn+0x10/0x10 [  121.393371]  kthread+0x10d/0x230
-> [  121.393382]  ? __pfx_kthread+0x10/0x10 [  121.393393]
-> ret_from_fork+0x273/0x2b0 [  121.393407]  ? __pfx_kthread+0x10/0x10 [
-> 121.393417]  ret_from_fork_asm+0x1a/0x30 [  121.393432]  </TASK>
->=20
-> Fixes: 803bef817807d ("ice: factor out ice_ptp_rebuild_owner()")
-> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+thanks,
+
+Takashi
+
+
+> 
 > ---
->  drivers/net/ethernet/intel/ice/ice_main.c |  3 +++
-> drivers/net/ethernet/intel/ice/ice_ptp.c  | 26 ++++++++++++++++++-----
-> drivers/net/ethernet/intel/ice/ice_ptp.h  |  5 +++++
->  3 files changed, 29 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
-> b/drivers/net/ethernet/intel/ice/ice_main.c
-> index 1851e9932cefe..2f5961573842d 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -7814,6 +7814,9 @@ static void ice_rebuild(struct ice_pf *pf, enum
-> ice_reset_req reset_type)
->=20
->  	/* Restore timestamp mode settings after VSI rebuild */
->  	ice_ptp_restore_timestamp_mode(pf);
-> +
-> +	/* Start PTP periodic work after VSI is fully rebuilt */
-> +	ice_ptp_queue_work(pf);
->  	return;
->=20
->  err_vsi_rebuild:
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index 4c8d20f2d2c0a..8e5d93acaf108 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2817,6 +2817,20 @@ static void ice_ptp_periodic_work(struct
-> kthread_work *work)
->  				   msecs_to_jiffies(err ? 10 : 500));  }
->=20
-> +/**
-> + * ice_ptp_queue_work - Queue PTP periodic work for a PF
-> + * @pf: Board private structure
-> + *
-> + * Helper function to queue PTP periodic work after VSI rebuild
-> completes.
-> + * This ensures that PTP work only runs when VSI structures are
-> ready.
-> + */
-> +void ice_ptp_queue_work(struct ice_pf *pf) {
-> +	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags) &&
-> +	    pf->ptp.state =3D=3D ICE_PTP_READY)
-> +		kthread_queue_delayed_work(pf->ptp.kworker, &pf-
-> >ptp.work, 0); }
-> +
->  /**
->   * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or
-> rebuild
->   * @pf: Board private structure
-> @@ -2835,10 +2849,15 @@ static void ice_ptp_prepare_rebuild_sec(struct
-> ice_pf *pf, bool rebuild,
->  		struct ice_pf *peer_pf =3D ptp_port_to_pf(port);
->=20
->  		if (!ice_is_primary(&peer_pf->hw)) {
-> -			if (rebuild)
-> +			if (rebuild) {
-> +				/* TODO: When implementing rebuild=3Dtrue:
-> +				 * 1. Ensure secondary PFs' VSIs are
-> rebuilt
-> +				 * 2. Call ice_ptp_queue_work(peer_pf)
-> after VSI rebuild
-> +				 */
-Shouldn't we resolve all TODOs before merging?
-
-
->  				ice_ptp_rebuild(peer_pf, reset_type);
-> -			else
-> +			} else {
->  				ice_ptp_prepare_for_reset(peer_pf,
-> reset_type);
-> +			}
->  		}
+> 
+> v2: Minor rewording. No code changes.
+> 
+> checkpatch complains about the comment include/linux/pci.h, which I have
+> formatted similarly with other comments in the vicinity.
+> ---
+>  arch/powerpc/platforms/powernv/pci-ioda.c           | 2 +-
+>  arch/powerpc/platforms/pseries/msi.c                | 4 ++--
+>  drivers/gpu/drm/radeon/radeon_irq_kms.c             | 2 +-
+>  drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 2 +-
+>  drivers/pci/msi/msi.c                               | 2 +-
+>  drivers/pci/msi/pcidev_msi.c                        | 2 +-
+>  drivers/pci/probe.c                                 | 7 +++++++
+>  include/linux/pci.h                                 | 8 +++++++-
+>  sound/hda/controllers/intel.c                       | 2 +-
+>  9 files changed, 22 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
+> index b0c1d9d16fb5..1c78fdfb7b03 100644
+> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
+> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
+> @@ -1666,7 +1666,7 @@ static int __pnv_pci_ioda_msi_setup(struct pnv_phb *phb, struct pci_dev *dev,
+>  		return -ENXIO;
+>  
+>  	/* Force 32-bit MSI on some broken devices */
+> -	if (dev->no_64bit_msi)
+> +	if (dev->msi_addr_mask < DMA_BIT_MASK(64))
+>  		is_64 = 0;
+>  
+>  	/* Assign XIVE to PE */
+> diff --git a/arch/powerpc/platforms/pseries/msi.c b/arch/powerpc/platforms/pseries/msi.c
+> index a82aaa786e9e..7473c7ca1db0 100644
+> --- a/arch/powerpc/platforms/pseries/msi.c
+> +++ b/arch/powerpc/platforms/pseries/msi.c
+> @@ -383,7 +383,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
+>  	 */
+>  again:
+>  	if (type == PCI_CAP_ID_MSI) {
+> -		if (pdev->no_64bit_msi) {
+> +		if (pdev->msi_addr_mask < DMA_BIT_MASK(64)) {
+>  			rc = rtas_change_msi(pdn, RTAS_CHANGE_32MSI_FN, nvec);
+>  			if (rc < 0) {
+>  				/*
+> @@ -409,7 +409,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
+>  		if (use_32bit_msi_hack && rc > 0)
+>  			rtas_hack_32bit_msi_gen2(pdev);
+>  	} else {
+> -		if (pdev->no_64bit_msi)
+> +		if (pdev->msi_addr_mask < DMA_BIT_MASK(64))
+>  			rc = rtas_change_msi(pdn, RTAS_CHANGE_32MSIX_FN, nvec);
+>  		else
+>  			rc = rtas_change_msi(pdn, RTAS_CHANGE_MSIX_FN, nvec);
+> diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> index 9961251b44ba..d550554a6f3f 100644
+> --- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> +++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> @@ -252,7 +252,7 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
+>  	 */
+>  	if (rdev->family < CHIP_BONAIRE) {
+>  		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
+> -		rdev->pdev->no_64bit_msi = 1;
+> +		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(32);
 >  	}
+>  
+>  	/* force MSI on */
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> index 70d86c5f52fb..0671deae9a28 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> @@ -331,7 +331,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  
+>  #ifdef CONFIG_PPC64
+>  	/* Ensure MSI/MSI-X interrupts lie within addressable physical memory */
+> -	pdev->no_64bit_msi = 1;
+> +	pdev->msi_addr_mask = DMA_BIT_MASK(32);
+>  #endif
+>  
+>  	err = ionic_setup_one(ionic);
+> diff --git a/drivers/pci/msi/msi.c b/drivers/pci/msi/msi.c
+> index 34d664139f48..48f5f03d1479 100644
+> --- a/drivers/pci/msi/msi.c
+> +++ b/drivers/pci/msi/msi.c
+> @@ -322,7 +322,7 @@ static int msi_verify_entries(struct pci_dev *dev)
+>  {
+>  	struct msi_desc *entry;
+>  
+> -	if (!dev->no_64bit_msi)
+> +	if (dev->msi_addr_mask == DMA_BIT_MASK(64))
+>  		return 0;
+>  
+>  	msi_for_each_desc(entry, &dev->dev, MSI_DESC_ALL) {
+> diff --git a/drivers/pci/msi/pcidev_msi.c b/drivers/pci/msi/pcidev_msi.c
+> index 5520aff53b56..0b0346813092 100644
+> --- a/drivers/pci/msi/pcidev_msi.c
+> +++ b/drivers/pci/msi/pcidev_msi.c
+> @@ -24,7 +24,7 @@ void pci_msi_init(struct pci_dev *dev)
+>  	}
+>  
+>  	if (!(ctrl & PCI_MSI_FLAGS_64BIT))
+> -		dev->no_64bit_msi = 1;
+> +		dev->msi_addr_mask = DMA_BIT_MASK(32);
 >  }
-> @@ -2984,9 +3003,6 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum
-> ice_reset_req reset_type)
->=20
->  	ptp->state =3D ICE_PTP_READY;
->=20
-> -	/* Start periodic work going */
-> -	kthread_queue_delayed_work(ptp->kworker, &ptp->work, 0);
-> -
->  	dev_info(ice_pf_to_dev(pf), "PTP reset successful\n");
->  	return;
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h
-> b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> index 27016aac4f1e8..428f7f79343a7 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> @@ -317,6 +317,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf,
-> void ice_ptp_init(struct ice_pf *pf);  void ice_ptp_release(struct
-> ice_pf *pf);  void ice_ptp_link_change(struct ice_pf *pf, bool
-> linkup);
-> +void ice_ptp_queue_work(struct ice_pf *pf);
->  #else /* IS_ENABLED(CONFIG_PTP_1588_CLOCK) */
->=20
->  static inline int ice_ptp_hwtstamp_get(struct net_device *netdev, @@
-> -383,6 +384,10 @@ static inline void ice_ptp_link_change(struct ice_pf
-> *pf, bool linkup)  {  }
->=20
-> +static inline void ice_ptp_queue_work(struct ice_pf *pf) { }
+>  
+>  void pci_msix_init(struct pci_dev *dev)
+> diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
+> index 41183aed8f5d..a2bff57176a3 100644
+> --- a/drivers/pci/probe.c
+> +++ b/drivers/pci/probe.c
+> @@ -2047,6 +2047,13 @@ int pci_setup_device(struct pci_dev *dev)
+>  	 */
+>  	dev->dma_mask = 0xffffffff;
+>  
+> +	/*
+> +	 * Assume 64-bit addresses for MSI initially. Will be changed to 32-bit
+> +	 * if MSI (rather than MSI-X) capability does not have
+> +	 * PCI_MSI_FLAGS_64BIT. Can also be overridden by driver.
+> +	 */
+> +	dev->msi_addr_mask = DMA_BIT_MASK(64);
 > +
->  static inline int ice_ptp_clock_index(struct ice_pf *pf)  {
->  	return -1;
-> --
-> 2.43.0
-
+>  	dev_set_name(&dev->dev, "%04x:%02x:%02x.%d", pci_domain_nr(dev->bus),
+>  		     dev->bus->number, PCI_SLOT(dev->devfn),
+>  		     PCI_FUNC(dev->devfn));
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 864775651c6f..0fe32fef0331 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -377,6 +377,13 @@ struct pci_dev {
+>  					   0xffffffff.  You only need to change
+>  					   this if your device has broken DMA
+>  					   or supports 64-bit transfers.  */
+> +	u64		msi_addr_mask;	/* Mask of the bits of bus address for
+> +					   MSI that this device implements.
+> +					   Normally set based on device
+> +					   capabilities. You only need to
+> +					   change this if your device claims
+> +					   to support 64-bit MSI but implements
+> +					   fewer than 64 address bits. */
+>  
+>  	struct device_dma_parameters dma_parms;
+>  
+> @@ -441,7 +448,6 @@ struct pci_dev {
+>  
+>  	unsigned int	is_busmaster:1;		/* Is busmaster */
+>  	unsigned int	no_msi:1;		/* May not use MSI */
+> -	unsigned int	no_64bit_msi:1;		/* May only use 32-bit MSIs */
+>  	unsigned int	block_cfg_access:1;	/* Config space access blocked */
+>  	unsigned int	broken_parity_status:1;	/* Generates false positive parity */
+>  	unsigned int	irq_reroute_variant:2;	/* Needs IRQ rerouting variant */
+> diff --git a/sound/hda/controllers/intel.c b/sound/hda/controllers/intel.c
+> index 1e8e3d61291a..c9542ebdf7e2 100644
+> --- a/sound/hda/controllers/intel.c
+> +++ b/sound/hda/controllers/intel.c
+> @@ -1905,7 +1905,7 @@ static int azx_first_init(struct azx *chip)
+>  
+>  	if (chip->msi && chip->driver_caps & AZX_DCAPS_NO_MSI64) {
+>  		dev_dbg(card->dev, "Disabling 64bit MSI\n");
+> -		pci->no_64bit_msi = true;
+> +		pci->msi_addr_mask = DMA_BIT_MASK(32);
+>  	}
+>  
+>  	pci_set_master(pci);
+> 
+> -- 
+> 2.52.0
+> 
 
