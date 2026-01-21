@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-251724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251725-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMPtM/I9cGnXXAAAu9opvQ
-	(envelope-from <netdev+bounces-251724-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:46:10 +0100
+	id 8NiAKSo+cGnXXAAAu9opvQ
+	(envelope-from <netdev+bounces-251725-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:47:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7904FFED
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:46:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 111735000C
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DB27B410118
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:43:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0CACF94D124
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 02:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D48F355815;
-	Wed, 21 Jan 2026 02:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2613563C5;
+	Wed, 21 Jan 2026 02:40:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIetLn1G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNAGz1rl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234EB35580D;
-	Wed, 21 Jan 2026 02:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EF23559EC
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 02:40:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768963242; cv=none; b=N1w9AF3EVDGjipOxxBBi7VsW3DCRB+YrAjwzoFgv0wazanJCKVQnKlMG4q9LxoI/cIkFEngYtHAr1gD11wfyVpehsiX1h/+1oMVEr5vBUsLGb3yFXUe2Gb/M9woA8aOVWf0HiQby1ro/VIEXiF71Jr5/Q4hkzp+QkK1LgaUmEwM=
+	t=1768963243; cv=none; b=hhJcSc5EqvfGDzXLcMlElzrakDww3x0dYY3CWwXFm2V8prH7BwmF7UKLxmz24Uznr5YSVk6339k3wAKAVEvzeVfloS+5DV48nJDM2gOc6wpXBkp35O4wcF+KhMJhf7aFg0ART8gM2b08YBHAIGhQ+flQJMlLLeaMfGDc7ldkv3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768963242; c=relaxed/simple;
-	bh=KSM/996KvsYGXQgLqRHjxAdgZDlRmMt3bbuzVe+HEts=;
+	s=arc-20240116; t=1768963243; c=relaxed/simple;
+	bh=snQAkAyHQVTE4HY2nNW7RPI/BYN6/uWJMrXAwg+TG5M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Rzqcqu/CeI0Nm+MMuWEeNgrB1w/tQbxAPVyVX9LgL0WxViR01KVX3OwRT/9kA6fppCD+ZWYmLFamp4V+FHKXSnNag4BsEaQ3hdlKjrKwKitgrKaufVrq83FNn4tn+mPMlF1OeLYj81jJOcHDGk6Obxlq3KG8DcASEYOhapphxhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIetLn1G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA751C16AAE;
-	Wed, 21 Jan 2026 02:40:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NqHXJUyNdL33g2bbjd9IEwiJG1Llq+/4mzDJgmlSKpejfd0+hCpnbtaqS1Xg+z0OloWQGGtQHfChOe9lZTeNrqWl4zgDgJhpHTeXiB7rABz/fWpKDfCRA1BF6O8MCDGwTt+QQIU0a1kmH3Bck5EDn7+fnf8/sGmjFQbHYCg43dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sNAGz1rl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8341C16AAE;
+	Wed, 21 Jan 2026 02:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768963241;
-	bh=KSM/996KvsYGXQgLqRHjxAdgZDlRmMt3bbuzVe+HEts=;
+	s=k20201202; t=1768963242;
+	bh=snQAkAyHQVTE4HY2nNW7RPI/BYN6/uWJMrXAwg+TG5M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VIetLn1GYtMKBWXqBzXuLKpO5H2Ou2ORNXKh8bnPtaKnvXGG15TOK7pY77VrH5q1h
-	 DwMmvlkXYEndCf1+Fx378BC1v3gH6YOo9gQmvzrTpbP5Arm0fg1VFqp51HEmzU+H5c
-	 y16AfuN2sthyrhcreRKQj1Ov8HSvs71AYkB+q4d3W94xEAONG1ujW03AmCTScCC3Qj
-	 SiB4jVuzsBbZedUx/U7qADVKbHDaKwhLtuPrRIR4B4duhyXUHAUEhop2niysTYSN0q
-	 P+RLgre6fxINk9NYIIt2zS9Lkzkgtw+3dn6QljyyzXRWozwMNyUoX61R60uINX3fHE
-	 UFtmwZIHH6rgA==
+	b=sNAGz1rle4H5YhImpKfhNEMreVJkcr4D7rqIUh8moTjuwwrp0vIU7SWB+XDmzQ+RW
+	 sRScNLudsz5RKAzGfguZ4tLEc6WMsVKU2d6MrGvsxqvqn86r6Ndd7AsJjWN0Xe46BH
+	 Bkx7rj0xsicRjFXjLNZHKeN1c8/3qro/Ch/LWrFkbgNiDaQdBFG9QtkfiEmSZvewWj
+	 urHBxHckczC4pvCw74NRIc1XqshMzpSX1nP7IvPTsKZItxtfAwsEI1lQHGDatYi6kA
+	 0IOD3KXjzk85zhZWcWx8VE7iwMoNisVAiFhbBZvT8FJ1MsqEX4GR+3Apv7VqnLxNlc
+	 3B2Y7UJoGZNSw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EEAA380820D;
-	Wed, 21 Jan 2026 02:40:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BC9A380820D;
+	Wed, 21 Jan 2026 02:40:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,18 +57,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] Convert the Micrel bindings to DT schema
+Subject: Re: [PATCH net-next] octeontx2-pf: Remove unnecessary bounds check
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176896323909.699622.9160745595214081259.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Jan 2026 02:40:39 +0000
-References: <20260116130948.79558-1-eichest@gmail.com>
-In-Reply-To: <20260116130948.79558-1-eichest@gmail.com>
-To: Stefan Eichenberger <eichest@gmail.com>
+ <176896324035.699622.6044623078189456935.git-patchwork-notify@kernel.org>
+Date: Wed, 21 Jan 2026 02:40:40 +0000
+References: <20260119-oob-v1-1-a4147e75e770@kernel.org>
+In-Reply-To: <20260119-oob-v1-1-a4147e75e770@kernel.org>
+To: Simon Horman <horms@kernel.org>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com,
+ netdev@vger.kernel.org
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -77,53 +77,50 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-251724-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-251725-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NO_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 7B7904FFED
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 111735000C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 16 Jan 2026 14:09:10 +0100 you wrote:
-> Convert the device tree bindings for the Micrel PHYs and switches to DT
-> schema.
+On Mon, 19 Jan 2026 16:39:37 +0000 you wrote:
+> active_fec is a 2-bit unsigned field, and thus can only have the values
+> 0-3. So checking that it is less than 4 is unnecessary.
 > 
-> Changes since v2:
->  - Remove maxItems from clock-names (Rob)
->  - Add Reviewd-by tag (Rob)
->  - Kept the micrel,rmii-referenc-clock-select-25-mhz property in if/then
->    schema to make validator happy (discussed with Rob)
+> Simplify the code by dropping this check.
+> 
+> As it no longer fits well where it is, move FEC_MAX_INDEX to towards the
+> top of the file. And add the prefix OXT2.  I believe this is more
+> idiomatic.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/2] dt-bindings: net: micrel: Convert to DT schema
-    https://git.kernel.org/netdev/net-next/c/4dd29c654b0a
-  - [v3,2/2] dt-bindings: net: micrel: Convert micrel-ksz90x1.txt to DT schema
-    https://git.kernel.org/netdev/net-next/c/283d58723887
+  - [net-next] octeontx2-pf: Remove unnecessary bounds check
+    https://git.kernel.org/netdev/net-next/c/2ec113ee41b6
 
 You are awesome, thank you!
 -- 
