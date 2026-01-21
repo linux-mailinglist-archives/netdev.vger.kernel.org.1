@@ -1,183 +1,190 @@
-Return-Path: <netdev+bounces-252066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CB6iHpBLcWn2fgAAu9opvQ
-	(envelope-from <netdev+bounces-252066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:56:32 +0100
+	id GIPBJR9McWn2fgAAu9opvQ
+	(envelope-from <netdev+bounces-252067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:58:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4725E5E8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:56:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E855E664
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 22:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9BFBF84A515
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:50:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4A0B86AD92D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 21:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7383AE714;
-	Wed, 21 Jan 2026 21:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010D140FDAE;
+	Wed, 21 Jan 2026 21:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="TuyS/Se0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SSZJesAI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E857E42B72F
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 21:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E04397AAC
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 21:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769032208; cv=none; b=Ii4jPy34XYzidrMzp/vxqN2UVdiKnzAne/WS2RRScyJi7sAdA1Y3OJr46aiEsQgxOY5Y03I//ET/zhEr78Bv8ehXJ6Cx426TAdXijN7NkyGU52GSrcyF4KTo1/b4exOqsTTo7JLEzF0lfGgjpGNy8geaXBjyQeYFvHVqa1z9Tpo=
+	t=1769032401; cv=none; b=gFbE0EtbGCTfRE82el634zq4nUo7bfWJCaid6CXCVeM2mPnqm1CvtVsF6EcSFlb82+1lyYtCaehtX85egrUj7kE4bDmcBc0SgTMDXQbeQUVoTht60gTr1V7/fBddorO+k61nNOw8wPcPIPlmfQwiFL6JhdZSd/R+hQjbrzfjHAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769032208; c=relaxed/simple;
-	bh=f0XtGBQbCFOrd3Lq8WEDogq8qdP2aAPuJxjV8kZYyxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=swzzDsV97fxra7mo9X1rHJB6/L7LaaFsP1EJrsJtbjmiSEcyHLwQMQlpr/CfPWeGlycyvWdyOVGSEHVbFcxILWlZt1tYeZ6yTduYM+/tfSeyBXkFhFVavQIJAvURgrxIjVHuIhE4B2oZVkcj9bpJNPNV1ffm4m6SDP0s9sfSbPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=TuyS/Se0; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b71347ac0aso466141eec.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:50:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1769032205; x=1769637005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LBJ+f7+TYiG375b9KrrBw24eToFYbOENYmfabxxmOsA=;
-        b=TuyS/Se0nQlTzVnNpgsllCbW2OZajoiZn5pnxR84JGe1i94rAXwlbMaH6l1E/dIXE8
-         MPqh/i6REEw+t/KWO0R9hP97iLZzkEphDqQh6P4m/abV9gPp2JtsMeQBdcQVJLZf7ZeU
-         gsogDZeTQ8du4N8Sy0VsbOTV7FNnO1MQGSSX+28pevka/nGer+gBLZDsieJXBPaxL4OY
-         I4+PV4lTI8lg8e19D0DRLIeufRXO7txfLPdZfTbhse0mk8hkVpNQ30F1eNwPqpZqc8v3
-         Ucvbt73jksPUBll6g/u8EuXTUtfqXhD0hTLxn0PPRsLfqySGJw6Q/9bE1D/cKqniRua7
-         QPVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769032205; x=1769637005;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LBJ+f7+TYiG375b9KrrBw24eToFYbOENYmfabxxmOsA=;
-        b=P1Pu8LJMpmeCodO/YxTRrLmUmBQSdo5ZDJdqYgdx3XHeOtbJP8TezjKViPcl6ppAY6
-         jAzZYUXNc9IxNZeOodVhNW4B5y/7ShDRPBescrLGZ1OtphSlzHNTVqEn+tpUgkK+fm5M
-         ZkP6l7M7I931x44NlmWnYipsFcyRKkRYnyBdksUHxnfHGzu3v9YjUz1IwzSMMeFadUEJ
-         z2nj5HHCS5QkduJOOzN5Q/WU/7tP5htTlhtxBAVMJl0iSVQXOzinLcddLKaHO65WcBoJ
-         ChlrAGiuSFlAG5KB2DTgQT5rE0KN70Yxvg6GnaNEpokY3M0hqOU/NMY1orzQNQlo5XsI
-         /DNw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/7ywYWmYzYBIm9jB1OTDMUSFE6XyTqd1tOpHm1AdLR8kulcCyGPSJYG0cctTWW46E0wF6OjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOb727qGoQXjFqD9O8F3aSNIX16Z+avpKRARlrFAwUovXa5ITT
-	9gZdJ8ErS42PN0+SioTOm6fVaO9SxT/XEbUdp9fMaSDqlqb9cIILxr576aNIcZf8TLAQibOHh6z
-	PxKKxsw==
-X-Gm-Gg: AZuq6aL0Pik5gEkjuZM0GxxOu+8r8aB/x3X1sHfneHx2/pOLPUCBYeZSWinDKuKgw1Z
-	FaXJEhLSGfcQlMKRlZENzr8oID/eLHOvu7u3HUEEFfMo14qAKllicNIaQbQgXNS9SpTvafIgzrn
-	Wg/I8FyUezz+v/VsAFsIzGyJzUHoICQ6RO7gbzE44e3JsVTyOevFmTlZ5WPVs/uBtsVOAgROfU7
-	Jdsu7yofiI0UM5oJvgatwYLmtNhZbDVfZumVLkLiIl5GNtH6RzxJGa7FF7rsX1PvIVThN88vqfY
-	hY7LMbrLU+yorQS6xV8EOs3HWIlbA3UFk5l8R1gBYLPydfotcQ7Va0AxrA6kwyZ11XC5ycLmezd
-	/YgynpwaSRnfex+XCAWPqr3OkMi0uEKIXYCbTWzywE7JwkPXQUBF98j467JEDPbwiKrCN6oapEC
-	72SoVgkRFH4KjWhKSJbVD8r4t9YmcQb0hHIDs8d1EChXQ+dH1UfAUALM86
-X-Received: by 2002:a05:7301:1e92:b0:2ae:5915:47b8 with SMTP id 5a478bee46e88-2b7247c4221mr541913eec.13.1769032203489;
-        Wed, 21 Jan 2026 13:50:03 -0800 (PST)
-Received: from pong.herbertland.com ([2601:646:8980:b330:30c4:fd82:1cb1:ed85])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b364579csm22774482eec.23.2026.01.21.13.50.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 13:50:03 -0800 (PST)
-From: Tom Herbert <tom@herbertland.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	justin.iurman@uliege.be
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v4 7/7] ipv6: Document enforce_ext_hdr_order sysctl
-Date: Wed, 21 Jan 2026 13:49:25 -0800
-Message-ID: <20260121214925.112604-8-tom@herbertland.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260121214925.112604-1-tom@herbertland.com>
-References: <20260121214925.112604-1-tom@herbertland.com>
+	s=arc-20240116; t=1769032401; c=relaxed/simple;
+	bh=sJciIfgI9AJ9r3GlB7MYX8yMUOqY3mV/7q5wOURip+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgkx7febEsqATZd1md368gGXPsC7HASh7UA4iKlwES0f88CLywknITl7NxO59P+fyBKGZtZOZyKkkhNcad48xvP5q3G5wFht8ZNtZ9a0jp9oyzcjygZ62lX3MTQINGN5zMK1S7KwQTGCCy9jcWSWvVu/CyngeWlL8s6WaXff98Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SSZJesAI; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769032399; x=1800568399;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sJciIfgI9AJ9r3GlB7MYX8yMUOqY3mV/7q5wOURip+0=;
+  b=SSZJesAImYtD+QzMfp/zVauyMMQZvTaralOy+GOnCp/Iuy5ri+naziL7
+   rBQROAPJaS3L8mfSQJTBaE6lHNXTRra2kK5kXo4kkx7/GSWIJH8E7ArrW
+   9KgF3rgNjAxf6SyC3fzk+akLjfJEL+OIyXJkl0LtI114EztTefjZyIgzI
+   0MWgHPu4Glns5F5QDgS7qbcip++udN5BYKWhzPcDb7+4sZGYWV0dQHLcl
+   L9kr3ev24nMSjvCLVi2fqi/tjz1w6vx5zeIaR3tfafVvvFMf2TMjyPfJc
+   HAn1CakFMaBRcF4CgFXys/9sg1sDzc4gxBYmRFcgngr6Jdp53CmWhjmli
+   A==;
+X-CSE-ConnectionGUID: zrbR8uxHSaiyaNtGOHSWpQ==
+X-CSE-MsgGUID: tnOtC4D1TG2HqN0e7Fhhyw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="87682886"
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="87682886"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 13:53:19 -0800
+X-CSE-ConnectionGUID: W8WmCJgSQKC8kyFpBsG+nA==
+X-CSE-MsgGUID: P1P94qleTmCbyi8u8PMkeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="210718602"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 21 Jan 2026 13:53:15 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vig8W-00000000S2r-1TXE;
+	Wed, 21 Jan 2026 21:53:12 +0000
+Date: Thu, 22 Jan 2026 05:52:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Felix Maurer <fmaurer@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	jkarrenpalo@gmail.com, tglx@linutronix.de, mingo@kernel.org,
+	allison.henderson@oracle.com, petrm@nvidia.com, antonio@openvpn.net,
+	bigeasy@linutronix.de, Yoann Congal <yoann.congal@smile.fr>
+Subject: Re: [PATCH net-next 6/9] hsr: Implement more robust duplicate
+ discard for HSR
+Message-ID: <202601220557.VfSPsAdo-lkp@intel.com>
+References: <a58f3b542fd8564c5d9576a10a9d6c9a7f318931.1769001553.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a58f3b542fd8564c5d9576a10a9d6c9a7f318931.1769001553.git.fmaurer@redhat.com>
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[herbertland.com,reject];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net,smile.fr];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-252067-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252066-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[herbertland.com:+];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,herbertland.com:email,herbertland.com:dkim,herbertland.com:mid]
-X-Rspamd-Queue-Id: 2D4725E5E8
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,01.org:url,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: A3E855E664
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Document the enforce_ext_hdr_order sysctl that controls whether
-Extension Header order is enforced on receive.
+Hi Felix,
 
-Signed-off-by: Tom Herbert <tom@herbertland.com>
----
- Documentation/networking/ip-sysctl.rst | 29 ++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 5051fe653c96..f8fa9f67b2ed 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2581,6 +2581,35 @@ ioam6_id_wide - LONG INTEGER
- 
-         Default: 0xFFFFFFFFFFFFFF
- 
-+enforce_ext_hdr_order - BOOLEAN
-+	Enforce recommended Extension Header ordering in RFC8200.
-+	If the sysctl is set to 1 then the ordering the ordering is
-+	enforced in received packets and each Extension Header
-+	may be present at most once per packet. If the sysctl is
-+	set to 0 then ordering is not enforced and Extension Headers
-+	may be present in any order and have any number of
-+	occurences per packet (except for Hop-by-Hop Options). Also,
-+	if the sysctl is set then Destination Options before the
-+	Routing header are disllowed.
-+
-+	The Extension Header order is:
-+
-+	    IPv6 header
-+	    Hop-by-Hop Options header
-+	    Routing header
-+	    Fragment header
-+	    Authentication header
-+	    Encapsulating Security Payload header
-+	    Destination Options header
-+	    Upper-Layer header
-+
-+	Possible values:
-+
-+	- 0 (disabled)
-+	- 1 (enabled)
-+
-+	Default: 1 (enabled)
-+
- IPv6 Fragmentation:
- 
- ip6frag_high_thresh - INTEGER
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Felix-Maurer/selftests-hsr-Add-ping-test-for-PRP/20260121-221431
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/a58f3b542fd8564c5d9576a10a9d6c9a7f318931.1769001553.git.fmaurer%40redhat.com
+patch subject: [PATCH net-next 6/9] hsr: Implement more robust duplicate discard for HSR
+config: alpha-randconfig-r073-20260122 (https://download.01.org/0day-ci/archive/20260122/202601220557.VfSPsAdo-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 12.5.0
+smatch version: v0.5.0-8985-g2614ff1a
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260122/202601220557.VfSPsAdo-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601220557.VfSPsAdo-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/hsr/hsr_framereg.c: In function 'fill_last_seq_nrs':
+>> net/hsr/hsr_framereg.c:781:22: warning: variable 'block_off' set but not used [-Wunused-but-set-variable]
+     781 |         unsigned int block_off;
+         |                      ^~~~~~~~~
+
+
+vim +/block_off +781 net/hsr/hsr_framereg.c
+
+   773	
+   774	/* Fill the last sequence number that has been received from node on if1 by
+   775	 * finding the last sequence number sent on port B; accordingly get the last
+   776	 * received sequence number for if2 using sent sequence numbers on port A.
+   777	 */
+   778	static void fill_last_seq_nrs(struct hsr_node *node, u16 *if1_seq, u16 *if2_seq)
+   779	{
+   780		struct hsr_seq_block *block;
+ > 781		unsigned int block_off;
+   782		size_t block_sz;
+   783		u16 seq_bit;
+   784	
+   785		spin_lock_bh(&node->seq_out_lock);
+   786	
+   787		// Get last inserted block
+   788		block_off = (node->next_block - 1) & (HSR_MAX_SEQ_BLOCKS - 1);
+   789		block_sz = hsr_seq_block_size(node);
+   790		block = node->block_buf + node->next_block * block_sz;
+   791	
+   792		if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_B - 1],
+   793				  HSR_SEQ_BLOCK_SIZE)) {
+   794			seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_B - 1],
+   795						HSR_SEQ_BLOCK_SIZE);
+   796			*if1_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
+   797		}
+   798		if (!bitmap_empty(block->seq_nrs[HSR_PT_SLAVE_A - 1],
+   799				  HSR_SEQ_BLOCK_SIZE)) {
+   800			seq_bit = find_last_bit(block->seq_nrs[HSR_PT_SLAVE_A - 1],
+   801						HSR_SEQ_BLOCK_SIZE);
+   802			*if2_seq = (block->block_idx << HSR_SEQ_BLOCK_SHIFT) | seq_bit;
+   803		}
+   804		spin_unlock_bh(&node->seq_out_lock);
+   805	}
+   806	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
