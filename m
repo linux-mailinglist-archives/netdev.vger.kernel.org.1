@@ -1,286 +1,195 @@
-Return-Path: <netdev+bounces-251794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gELJD6GFcGkEYQAAu9opvQ
-	(envelope-from <netdev+bounces-251794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:52:01 +0100
+	id WHhcN0eHcGlaYQAAu9opvQ
+	(envelope-from <netdev+bounces-251795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:59:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F245311D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:52:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D9F53258
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 08:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AA6E24A5317
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 07:51:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB3F04E8718
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 07:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A3044B67E;
-	Wed, 21 Jan 2026 07:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2986838B7DB;
+	Wed, 21 Jan 2026 07:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="PMVIdk8M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3DMvwDV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7P1G63L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E702438B993
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 07:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1AE44BCB7
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 07:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768981906; cv=none; b=Ryx57ciPyyzb4kNh+rqxD0Hhy5oNKtu81dnveL8Q0vt4A3vS87IaMQ5eMqCVMbwMkBspVkxKUN3g7M/UrA+2VI8sIjOn7wVdtiE/NdgEX+UADS9YQgRJomCawUoc2OaWzMjc3hzyxHwGfZyCs7J6hk3x+9NmDLYoQtGfjqUU49w=
+	t=1768982301; cv=none; b=SjusJAqeIBPSB8aSJcmbuEQOSUV48rt/ToSPhiVH3Gow6zp1kb+eLBik5KP70QWjDmMDRGD0hKQw8SbOSKWCotllyY+mAicJMWzcb32bbAta2r60bUjKQQckw+06gP4whValsX6t+8eL+NfBheA3deE2pJpAXA0rdl5psoDh1FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768981906; c=relaxed/simple;
-	bh=3Wvto2L/i7ELb+RtswT4bkc5TiCycoPC0QPWQTZpVJw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BRx2G17bH67L+ayVV3jlqEMLO/0ezBprHphi82enFcfz4HEq4Q/9Hzw86K5TVph7ixLE6YOsaWwHS3dfCVFKnBSQSATU2IBE2N8orW2wu0auOVLFDRytOMq/ACKpYjCufPZsHE6mBdJYl3uL8RaefXl9zRh7C4PONsdor6vWfMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=PMVIdk8M; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id AD063400DF
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 07:51:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1768981895;
-	bh=mwIPbOci5oaCyF1RQyLgWXCMn5I/M1luBxKEhZcFZB8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=PMVIdk8M5nP6R6TQOkf9K3W+c2O7BRLDw9uPgHWeeuQdfhqmCXm3N3B9jWHqRxTsN
-	 pyrig7sSr9nGypAGkOS1UUfZrR11+f7ypQ/jABQb3bhjclT68hKw0urWJW1sgnZEQt
-	 U1+gy/2xtc5eDtOV/lwmgLnbqcH/QRJiRqghvsoem8cA7Xb1eSCIgSxxzmF6y4K8za
-	 TH3jgbn5yiScO599fIqy/IBYUYQ8xK1PIzZoIRCywUIuh6Vnh0xLQgRgObq9nmEEP8
-	 siboIVmfb+TVH//AmVfV6tGljRJiYOoCc2LM25n3fOoJF/rsPjpH6iwJ3HLCHNY18w
-	 ndCOshDuYlzPhxr08CxmwyC5q7+CkO4Fq0+YvFngKYEnBjjQ5SKoiqgru2R8yOJWbq
-	 22eSVwBUj4H2u3zd0HE16buJaJH9GkniVK2QN2zi/A5/1nPkL9USjV9u+LYAdaCbpe
-	 sV+gHtw1cTYx1FqvuIEwUD3RvX6JbYIy31MU4f1+ztFswegTNLAMy36+1bfkbMWMbN
-	 vAdbtRy32lwKCZ9vZnmQn0it6gqaU7uI7+7ndv9zCfFRb51XkqCxIKHIx7XCeah1wD
-	 iS8HodvdF9uv2z6KtafDEziArjHqB7J71s4uOmUpoVXLMuNXsnPj8rVJsUuaVuawmz
-	 u4V7hpcUph5qMgqBginW5vPs=
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edee0b11cso35290695e9.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 23:51:35 -0800 (PST)
+	s=arc-20240116; t=1768982301; c=relaxed/simple;
+	bh=yvTAb2zyJxbyGLlRHGT89BitSAH1SZdALJsqlZ+b2z4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udPRCK8S5r4sNRa9xB0vU03tmg/7/r4BV6WTt3ZVkUUrOSOG3Iio3YMCKS5buBCLAT6jscHmZcNzjggHhzP5o2wU8dyvIEB4EFAQPMVds1Rb+C/lM4RZSfDS7Wa83ZMcgfyBUQc4i7P1BKNPNJmIbNs0YhoruQMV4uw0QtT9py0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3DMvwDV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=K7P1G63L; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768982298;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
+	b=c3DMvwDVAindHXglwcwdgszjrOV8/vecj9EMP1aLixRty6MhR32xsHHcr7hv+AELvtEG66
+	ft1y85eWuJ6VlZ5acUieIugLqeoVf9mhVD6HmgAmTk3TQkbzf63TjTKwQVM6fsqEJx0GWK
+	j4hz8tBYNyYwpqauJseKKrha4VipfdE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-676-QDr5AGcrN8eZPQxfitKaDg-1; Wed, 21 Jan 2026 02:58:16 -0500
+X-MC-Unique: QDr5AGcrN8eZPQxfitKaDg-1
+X-Mimecast-MFC-AGG-ID: QDr5AGcrN8eZPQxfitKaDg_1768982295
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47ee71f0244so54845845e9.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jan 2026 23:58:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768982295; x=1769587095; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
+        b=K7P1G63LGX6IvHLuqQdZZEm28D5707Ixxr2p9sk9M2pIdU//6UxhnbEe1kI1P9nbAf
+         2VuOUz3cPpkGv/iI3b9YeWgDGZqKQtQA7w6jjJwky9iTnUa0nWNH1PiQTswza3Vv+b/F
+         k94V8Js3H7mMO+zfxlF3Xfms5FbYvuNTsrnVU90nzEm/PY1oLDYtrb5M/IeVxkKg2h/q
+         aucKT3CiEmF8IfgjYufgmRW7Q1uAnoq/F8z28Zv/aVJrzUcExpKtzvyF0ecUsif7qhgd
+         I3pY/R5OYvtw0au+zAZ7Ti30v7cbtJyPagD2o9mKyNuhHT8xe/PUCQm/MGfLQMnd1i1f
+         CBkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768981895; x=1769586695;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1768982295; x=1769587095;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mwIPbOci5oaCyF1RQyLgWXCMn5I/M1luBxKEhZcFZB8=;
-        b=Jjr/NwsCnRfgAwR4KetdPyC0rypLtAU55Ufixvuivr6DEHhsqego89HzA2OW/ikLzT
-         gsMfNZAv3Qle0DG+adnSGlHJNSc7gMCwL6eSMm3W+Q6JDAumy3UOhGjfUH6pT1yqYtrf
-         SydKZj/1FT6/ZilgQnTEIGO53ngVKNU1tcaxZAnNrs8+2H+ozL8kNINinWEbWV3k0mUK
-         cu5KjmNLy6SInjNqL4yEpnHW09DW+8VBfQ4hrJJkDpfY+0xLsSHBb22CIEWS6qEuaR/j
-         Ew/UiL2hHX5GaOZJ5IR9iB6hdI9RDlaNZS3UnMtF1g/guc9+oVROg1vwMdmxX5jIuJz8
-         OCwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTasHpPJDXP03pqDvbpajQ7HLcGq6Rsgn2kiiDtkfHpLC2T1pO8WQUIxUEAuCg7/tubxwRe3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxeIHE4686k2cA6EKPYK5m627dTHk0SjaB+XCHEAJmyp9Om76s
-	5ObO5QwotTdgWQcR4RXqb0F22ffVTqBaTtM2QzsLxs3kpam8/lcKdY+qBQzv1y4/TIBGkjkVkZS
-	vcEEIZ7MH8SCXBDvKR7Wo+XEcQtxxCEg4LT2wqylbaR1vDYzrE1FfltqojYdk2FWOEYqg8LphEA
-	==
-X-Gm-Gg: AZuq6aJPfr2vJNEes2icGqCwW6t+xiPpMYprb+lAsTBHBz0CSkYTJGDQseKwLfRs/GC
-	IjQr3Mm+ZNnIuA4jufnYalt2FmpNHZ9pXVmLzxeeWhWbixuwz1die3UhQFhighS9OoqcgWu3ZnX
-	J7Tpg1oa6B8QQ6CsIyQYaxUUK0ro+S+wv2WErw8OjhQbJGYp4Eyhg83Bzt9hi4LWOSBGovne2Zb
-	y9qsta0Y519h6h6QT1a/MQI2rc522+HgUE/Q8lIK3O8ZmPNuimX86bOdS+pN7jGVKy6TFQXhovi
-	J/NqjKseVdOYNeuuV7TRfreDtbdMEalCeOSPQoUJWx3NSdawCYy6cMnVaQFz9jhR/JsDDY9gp+f
-	9R4jtKVjAkWbsdGmL2a8AhVxKDg==
-X-Received: by 2002:a05:600c:4e90:b0:47e:e20e:bba3 with SMTP id 5b1f17b1804b1-4801eab54ccmr222724575e9.7.1768981895243;
-        Tue, 20 Jan 2026 23:51:35 -0800 (PST)
-X-Received: by 2002:a05:600c:4e90:b0:47e:e20e:bba3 with SMTP id 5b1f17b1804b1-4801eab54ccmr222724165e9.7.1768981894784;
-        Tue, 20 Jan 2026 23:51:34 -0800 (PST)
-Received: from localhost.localdomain ([103.155.100.12])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428ac749sm356728735e9.5.2026.01.20.23.51.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 23:51:34 -0800 (PST)
-From: Aaron Ma <aaron.ma@canonical.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ice: Fix PTP NULL pointer dereference during VSI rebuild
-Date: Wed, 21 Jan 2026 15:51:06 +0800
-Message-ID: <20260121075106.401770-1-aaron.ma@canonical.com>
-X-Mailer: git-send-email 2.43.0
+        bh=xxvpO7SuR0Srs/NDxoqT0f/eYAD5mZdjyHg/RVhlFCs=;
+        b=bnNdnGNUPe/2azCcy7WAE00uS+qG5Wa3h9JIRPFfj7mAdHgg1yZVXn0ETBPzbYlFgS
+         GWDaIm0Bllr6e5Z7bzMUSGwzfne5wI8dGMdgkl67bOFYXXfmkN+u+Gn95sb2ttMzlRaa
+         s9/ZGGYq5/dxcxyD+AQfpSglr49mMVbmWXYRXXGZs9m1kDVkRSw6pbeTdT2++p+Zndix
+         ncMLBJAZW3mmHih8vphNKmIoBmlfPqtzvoT2QWb3SXGoyvDqgByzBwGYgqOQWSd7W1e6
+         EsA2U/pXVJmHBhOImC1W/TwI7enTRbcZjZW3DnuDiIIVsZdi3qEfQ8ZEkyRzc3i6Dfey
+         5vVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHlEGoSpgwjIAVWgIebfudoHxDPj3DXYWinb6tmP/1cFeTME3p8cT0uDNGhBbPJJvvVTzg15g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX6QncghAXTrAEO6zwmzG1I1WxGPU9FJoPDJqzfpIW1oqFCFLK
+	5Ylr4/92tByk61UYAStx2tITp7w7bTlbxrEcdWASSpukUoE7REqOCzDLGegjhScBfHVDGqEJmG6
+	2BPuVeOrJbfDJnbuvCS5eXAFu2gQfhb+341vz0KOLGvxOda8fHlm0WhIo9w==
+X-Gm-Gg: AZuq6aKWlDB3gADnjgCEs3yDzRZhO7d9uCBR7WztjR8fSbms08sqgjQVHomDetXfe0h
+	Wu1uKU1dyK28TtG5v1JTxC14jfOs4KNTud5JXvI0WA+u/TxqyV/rgyodBUPfxOuZBSLG7Q7x0HY
+	rlTG6vrz+MWO8/Ahzsz0rI8CckDoMDgtSX1jApS0gvoAIuRRnMUiwm8ZWpkGzpTVId2aYWWDqF+
+	0AMjrLTsrEPfXohxvx5r7+wBGZrMBe5zsZ3VV6983HiqVEjWnfzJGSPc6eaeVrWVb4Xj4yucp5n
+	GZByESN5R7O/2L748/SRB1agSw+9H8QXPwXHHamst51jiLyvsaIjXG7E/q1uah3nUShR4INCBnf
+	FSjcPOAJYf9FD
+X-Received: by 2002:a05:600c:1387:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-4801e30ba55mr255746925e9.15.1768982295372;
+        Tue, 20 Jan 2026 23:58:15 -0800 (PST)
+X-Received: by 2002:a05:600c:1387:b0:47a:935f:618e with SMTP id 5b1f17b1804b1-4801e30ba55mr255746565e9.15.1768982295020;
+        Tue, 20 Jan 2026 23:58:15 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.175])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48042c56f4asm13906205e9.15.2026.01.20.23.58.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jan 2026 23:58:14 -0800 (PST)
+Message-ID: <eaac2f5e-842e-4a18-a7a0-8a7ba2794ef9@redhat.com>
+Date: Wed, 21 Jan 2026 08:58:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net-next 2/3] bonding: restructure ad_churn_machine
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Mahesh Bandewar <maheshb@google.com>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ Liang Li <liali@redhat.com>
+References: <20260114064921.57686-1-liuhangbin@gmail.com>
+ <20260114064921.57686-3-liuhangbin@gmail.com>
+ <20260119122203.5113b16f@kernel.org>
+ <71e30492-7644-4d4f-aaab-9a505f8faae3@redhat.com>
+ <20260120151109.2d483bd8@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260120151109.2d483bd8@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aaron.ma@canonical.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-251794-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DMARC_POLICY_ALLOW(0.00)[canonical.com,reject];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,jvosburgh.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-251795-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	PRECEDENCE_BULK(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[canonical.com:email,canonical.com:dkim,canonical.com:mid,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: D5F245311D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 56D9F53258
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix race condition where PTP periodic work runs while VSI is being
-rebuilt, accessing NULL vsi->rx_rings.
+On 1/21/26 12:11 AM, Jakub Kicinski wrote:
+> On Tue, 20 Jan 2026 09:29:14 +0100 Paolo Abeni wrote:
+>> On 1/19/26 9:22 PM, Jakub Kicinski wrote:
+>>> On Wed, 14 Jan 2026 06:49:20 +0000 Hangbin Liu wrote:  
+>>>> The current ad_churn_machine implementation only transitions the
+>>>> actor/partner churn state to churned or none after the churn timer expires.
+>>>> However, IEEE 802.1AX-2014 specifies that a port should enter the none
+>>>> state immediately once the actor’s port state enters synchronization.  
+>>>
+>>> Paolo, how do you feel about his patch with 2+ weeks until final?
+>>> The first patch is definitely suitable for net. If this one is not
+>>> it should not have a Fixes tag. I'd lean towards getting them all
+>>> into -rc7 if we can.  
+>>
+>> My personal preference would be for 2/3 landing into net-next: the code
+>> looks correct to me, but refactor has IMHO still to much potential for
+>> regressions do land directly into net and the blamed commit is quite old.
+>>
+>> I suggested targeting net-next while retaining the Fixes tag as we
+>> already had complex fixes landing into net-next in the past.
+> 
+> The appropriate way to delay propagation of the fix to add:
+> 
+> Cc: <stable@vger.kernel.org> # after 4 weeks
+> 
+> not to merge things into -next.
 
-The sequence was:
-1. ice_ptp_prepare_for_reset() cancels PTP work
-2. ice_ptp_rebuild() immediately queues PTP work
-3. VSI rebuild happens AFTER ice_ptp_rebuild()
-4. PTP work runs and accesses NULL vsi->rx_rings
+I went over the code as carefully as I could and I don't see any obvious
+problem, so I don't have a so strong opinion vs net, but to hopefully
+clarify: my thinking is that this is net-next material because it's an
+invasive refactor with behavior change. My preference would be let the
+code be tested in next/net-next for a while before landing into mainline.
 
-Fix: Keep PTP work cancelled during rebuild, only queue it after
-VSI rebuild completes in ice_rebuild().
-
-Added ice_ptp_queue_work() helper function to encapsulate the logic
-for queuing PTP work, ensuring it's only queued when PTP is supported
-and the state is ICE_PTP_READY.
-
-Error log:
-[  121.392544] ice 0000:60:00.1: PTP reset successful
-[  121.392692] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  121.392712] #PF: supervisor read access in kernel mode
-[  121.392720] #PF: error_code(0x0000) - not-present page
-[  121.392727] PGD 0
-[  121.392734] Oops: Oops: 0000 [#1] SMP NOPTI
-[  121.392746] CPU: 8 UID: 0 PID: 1005 Comm: ice-ptp-0000:60 Tainted: G S                  6.19.0-rc6+ #4 PREEMPT(voluntary)
-[  121.392761] Tainted: [S]=CPU_OUT_OF_SPEC
-[  121.392773] RIP: 0010:ice_ptp_update_cached_phctime+0xbf/0x150 [ice]
-[  121.393042] Call Trace:
-[  121.393047]  <TASK>
-[  121.393055]  ice_ptp_periodic_work+0x69/0x180 [ice]
-[  121.393202]  kthread_worker_fn+0xa2/0x260
-[  121.393216]  ? __pfx_ice_ptp_periodic_work+0x10/0x10 [ice]
-[  121.393359]  ? __pfx_kthread_worker_fn+0x10/0x10
-[  121.393371]  kthread+0x10d/0x230
-[  121.393382]  ? __pfx_kthread+0x10/0x10
-[  121.393393]  ret_from_fork+0x273/0x2b0
-[  121.393407]  ? __pfx_kthread+0x10/0x10
-[  121.393417]  ret_from_fork_asm+0x1a/0x30
-[  121.393432]  </TASK>
-
-Fixes: 803bef817807d ("ice: factor out ice_ptp_rebuild_owner()")
-Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c |  3 +++
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 26 ++++++++++++++++++-----
- drivers/net/ethernet/intel/ice/ice_ptp.h  |  5 +++++
- 3 files changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 1851e9932cefe..2f5961573842d 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7814,6 +7814,9 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 
- 	/* Restore timestamp mode settings after VSI rebuild */
- 	ice_ptp_restore_timestamp_mode(pf);
-+
-+	/* Start PTP periodic work after VSI is fully rebuilt */
-+	ice_ptp_queue_work(pf);
- 	return;
- 
- err_vsi_rebuild:
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 4c8d20f2d2c0a..8e5d93acaf108 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2817,6 +2817,20 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- 				   msecs_to_jiffies(err ? 10 : 500));
- }
- 
-+/**
-+ * ice_ptp_queue_work - Queue PTP periodic work for a PF
-+ * @pf: Board private structure
-+ *
-+ * Helper function to queue PTP periodic work after VSI rebuild completes.
-+ * This ensures that PTP work only runs when VSI structures are ready.
-+ */
-+void ice_ptp_queue_work(struct ice_pf *pf)
-+{
-+	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags) &&
-+	    pf->ptp.state == ICE_PTP_READY)
-+		kthread_queue_delayed_work(pf->ptp.kworker, &pf->ptp.work, 0);
-+}
-+
- /**
-  * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
-  * @pf: Board private structure
-@@ -2835,10 +2849,15 @@ static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
- 		struct ice_pf *peer_pf = ptp_port_to_pf(port);
- 
- 		if (!ice_is_primary(&peer_pf->hw)) {
--			if (rebuild)
-+			if (rebuild) {
-+				/* TODO: When implementing rebuild=true:
-+				 * 1. Ensure secondary PFs' VSIs are rebuilt
-+				 * 2. Call ice_ptp_queue_work(peer_pf) after VSI rebuild
-+				 */
- 				ice_ptp_rebuild(peer_pf, reset_type);
--			else
-+			} else {
- 				ice_ptp_prepare_for_reset(peer_pf, reset_type);
-+			}
- 		}
- 	}
- }
-@@ -2984,9 +3003,6 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 
- 	ptp->state = ICE_PTP_READY;
- 
--	/* Start periodic work going */
--	kthread_queue_delayed_work(ptp->kworker, &ptp->work, 0);
--
- 	dev_info(ice_pf_to_dev(pf), "PTP reset successful\n");
- 	return;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 27016aac4f1e8..428f7f79343a7 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -317,6 +317,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf,
- void ice_ptp_init(struct ice_pf *pf);
- void ice_ptp_release(struct ice_pf *pf);
- void ice_ptp_link_change(struct ice_pf *pf, bool linkup);
-+void ice_ptp_queue_work(struct ice_pf *pf);
- #else /* IS_ENABLED(CONFIG_PTP_1588_CLOCK) */
- 
- static inline int ice_ptp_hwtstamp_get(struct net_device *netdev,
-@@ -383,6 +384,10 @@ static inline void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- {
- }
- 
-+static inline void ice_ptp_queue_work(struct ice_pf *pf)
-+{
-+}
-+
- static inline int ice_ptp_clock_index(struct ice_pf *pf)
- {
- 	return -1;
--- 
-2.43.0
+/P
 
 
