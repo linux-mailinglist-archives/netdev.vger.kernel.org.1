@@ -1,102 +1,102 @@
-Return-Path: <netdev+bounces-251826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251827-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJkaH6igcGlyYgAAu9opvQ
-	(envelope-from <netdev+bounces-251826-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:47:20 +0100
+	id UOw9DYCgcGlyYgAAu9opvQ
+	(envelope-from <netdev+bounces-251827-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:46:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B5254A42
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:47:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0D654A1C
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E84EC5E5C54
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:38:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F9085C7D2F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4733F47AF75;
-	Wed, 21 Jan 2026 09:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED30C44B66B;
+	Wed, 21 Jan 2026 09:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITou7ufz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jr0qjS68"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCNpCKQX";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsEW//E2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E10478848
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 09:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1273F47DFA7
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 09:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768988208; cv=none; b=kIwIWUU/FU2BtWGVebhDEtpCCW62daxPalqBEPVzeFB4YmqriJXX4zw7sPiWsBYlKEfEO5FBmsHYjwGl8pDE2DPQ97A+yw89zCZyn90UY4PkLRccqPAVM/2gyIV51ek9ijJ1RQZPX6926NkFvADsRQuaI7nj4h3nxH0syUhtKec=
+	t=1768988213; cv=none; b=j9Y+lYz71lI52BTjtVNPnwPMsBxaJzlB5IBz+DreAZtU5rz/H7Bk37EZqWLPFfbdI6mn2DIGpWc4KhjWAGKjpDy8DOjTZATWzM6NtlOmHcY9JR76kTqyYf1bI+9CKXG4OpCWHktV5hPf0NvPBBTNOjWr1ImRIMbPsyRlnvQ4Ohg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768988208; c=relaxed/simple;
-	bh=PcAOc3r6px2QPynOOTZs4aSgXDaZ3NGUJGTa4O51yqg=;
+	s=arc-20240116; t=1768988213; c=relaxed/simple;
+	bh=8FWDPO7w394Nl7XKsuUojlhzUFs0e7ivz29bXEwBdFU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SrVR+hto46K7PmzutKRqniILV5rahyxdb/g2nbE7YcfmVWCuZGoeNKs2ewK/FYXb8EqmhFI+nn8Yy1DDYBPp7EM1sSljDXUgDhNeQZw1YD5p4kLatr55xWoXkMZ1zn1w3/1mEBsag7uwlPfxxXaeTIfmCNqYFFvGSv73ZOdZtD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITou7ufz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jr0qjS68; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=BfLoS9FWwkKB4lkIoIXIAMjIPKtClJAQ+vBDLi6pa1cCgMjA0zXOmdlkpkd1JgnbHzNTu6jIXZcefulQt91Zd2FS8uxmEPviyamIOl4o+ac4t29m2+Tq7P7gJC++UoDIg9lwNKfFkzd7I8VAMjQaHVdxHqPPIJMX7ab7qEw/Fag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TCNpCKQX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FsEW//E2; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768988205;
+	s=mimecast20190719; t=1768988210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6zDKTURxMpN1giCRjW7fiv4qni6ys721eKds24IdkTk=;
-	b=ITou7ufzLDLpgwlVKRe57PAI4bzmFefP7nf27m17TkKArI68+ekv/qx6J2ORCpcJVKQ4oB
-	hnXQEHZUlKTbvVeX3EWMptWBVGw9jmFuzIEdqAurMnCP0NqJcp108EjVeDIVnBfDzJWcTc
-	BSezKEzhxjJi6885or+5/m8yrF8NJP0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=xGM0zHbdn0V12NgombpaBR+rEA6S/BsSNVQrMd4WoM4=;
+	b=TCNpCKQXLnMOks5bMqZAJ4IcqtJ38t1OYTT/zmFHOzMsLVbAgJa8CrnksFobDbD40Bq4bU
+	j77PBp5+UqWzgb7tyP6SMb/QWmQbPSAiKJ/NIc08FRyiO4PxFOhrjFWQ+RxgsqjdZSynbF
+	p60xgQ+5IFRV8FpO4tV8Hlmusm88L9c=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-0G-JZisAPPW-uDlzsKjuxw-1; Wed, 21 Jan 2026 04:36:44 -0500
-X-MC-Unique: 0G-JZisAPPW-uDlzsKjuxw-1
-X-Mimecast-MFC-AGG-ID: 0G-JZisAPPW-uDlzsKjuxw_1768988203
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4801e9e7159so29974805e9.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:36:44 -0800 (PST)
+ us-mta-503-PNhKyh2MNymVkoQAC2soMQ-1; Wed, 21 Jan 2026 04:36:49 -0500
+X-MC-Unique: PNhKyh2MNymVkoQAC2soMQ-1
+X-Mimecast-MFC-AGG-ID: PNhKyh2MNymVkoQAC2soMQ_1768988208
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430f4609e80so4307748f8f.3
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 01:36:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768988202; x=1769593002; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768988207; x=1769593007; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6zDKTURxMpN1giCRjW7fiv4qni6ys721eKds24IdkTk=;
-        b=jr0qjS68OTXX6cjhVTpCkO7OLdYWpUuRWINo10x7ukf2qK1cR/ccKfpX/RSJ4NVG0z
-         7I/683TLPuLTd1UWqbfxATGk3754DZnh8OwvEx4ch1QdNCqhRE84n5HOtkr7lWWrqiEC
-         qSyExrykmqjoMSX46zMYGpUFY3EXgGj1Y2t6NbApKnItpv/5RgrkBC7FN3HCj/BLolT6
-         8cMXnna2YXmKzp1VX4etTRfnk/4bHt9JintAMr2IB1GJvTBhWDsLB5MoFlC2Nz8PYxBf
-         nX2HwebYUxxDUit50txv8Q2FJ/23A3lB97gq0dlaRzffEqM+6364tflpL8RNraeV+WjT
-         +u6g==
+        bh=xGM0zHbdn0V12NgombpaBR+rEA6S/BsSNVQrMd4WoM4=;
+        b=FsEW//E2u1CEsxjYG47z7hsFynDqounY7IdwZW24zQaclAiWtsfM5UcxlCFS1JphxT
+         AtCTetfCd17QqNt29EWVx9OjGolE1MrPdIbp5O796bG1CSiJU7jSCjDWGnRQuBS5PesS
+         oG68+iv8SH7RViyxR5hZC4LM5T81iTB8fZA7ae/rClGahaLTtbyRNDytRt18Wg3AYUbO
+         1ytf8O77MIp5OieEl/V5A/TBRRMsVakO1zPFCFtyv2phuSICyfC4W0gA2YDcAJ4e19z+
+         SmeDwu7/Tso7TAKQX5HUSKIjR4yjFbyVBVRgi8fi35EkdSyrtIzu29cNY30/wHZr0O3k
+         SRUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768988202; x=1769593002;
+        d=1e100.net; s=20230601; t=1768988207; x=1769593007;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=6zDKTURxMpN1giCRjW7fiv4qni6ys721eKds24IdkTk=;
-        b=HULg1Ry8rwBJurDST+q7+OUY/2SICRbAlsGYU4oJQ991zeNoju8LytoTp41PadW4Nb
-         pHAMt+Nwt+sJ7kBTCSVjS8CihKHlh160Xxu9eEKWG0eBMoFm3l8QL4SAt/x2m5lb8vyc
-         H6bwh0fUewCID0WsFCe45J9NPahPPpB96OEhC++kxcC+KOapiJz7W/4cmk9Ke9pRbfTA
-         j6nndTPWOe4rOHYK5tjmKJw9c9WtpURdvMH9oFUMAvCWgB3kRxjMya9HAXytDUqK6MsP
-         UgQrgWAvQ8BX9+WWzrR/IzQ4YzXNtrW/X6QG3S8xrfT+5EP7St2dL+KybBq94yyVqrpY
-         Sz1w==
-X-Gm-Message-State: AOJu0YwTRhrXYFGg8gqruaWlKpkrKow0fQVQHiB9rse+BlZc4OIXSP3N
-	eekjCOyoFs4hhMc7fE3ofbsoSaLpzOhqI8NGeVEt4Jf9uYcbgTlzq+C8sTrPYxmD9O3lVPFnTg6
-	0mV6Nr7jHR5XSN3QBW/98b0ryram3mXzaq/v0pK4tcUV1N1ya2UaDLyCCkkz8NePIjJp6rkH0Qg
-	yweX4ZwiPMYAEFVs94wrzqjW3Py1gW2V3i5DHW5EhWBQ==
-X-Gm-Gg: AZuq6aKuXbULkcjtaACHwTAVL3qczzsrHq3nQvzmHuMdR0lp0dC/JP6C4kQvkCfyTET
-	6YwbEFV+ZU9ezLVnWttUCjcBp2jCtOklSopHscKlZb9XWOZ2r09pnu7tL4ciDPcmjPDobsP0S4C
-	ABiqUweFzg4dFxNvL1FW085o1OcFqHAM+WwA2fyeqAhEuCO4bsL64Qpk1crG1J0bEg3HWU24FT2
-	IJy0XOadPW5yVymso8aVFGxvVZ0dGm1eN9qxz1rV0M2iPrLtiti5m7Nf0dHqCrsterMHLxrgxV1
-	lcrI63iMqEc9cIKIgw62egsXoIywNtsxe8fJqFrz7+cjsqmUT86wl11evSUMUb7/W+9aChfPhIO
-	0BgEHLN5UPVimc0VS60dN5egYJ0ZS1ruuq422I8hhPxcVCqrFQn06Djt08Wnn
-X-Received: by 2002:a05:600c:3e0d:b0:479:3a86:dc1c with SMTP id 5b1f17b1804b1-4803e803c1amr77560945e9.36.1768988202262;
-        Wed, 21 Jan 2026 01:36:42 -0800 (PST)
-X-Received: by 2002:a05:600c:3e0d:b0:479:3a86:dc1c with SMTP id 5b1f17b1804b1-4803e803c1amr77560335e9.36.1768988201797;
-        Wed, 21 Jan 2026 01:36:41 -0800 (PST)
+        bh=xGM0zHbdn0V12NgombpaBR+rEA6S/BsSNVQrMd4WoM4=;
+        b=CxO5NUTC0dJ8jnLWhbgxLoZVKJbEi9ysLDANyLcRL9Kk0xMUXxUWMCvE5ayGfZZ5oS
+         M5YNtRo2gD/fQm9yxotlFH247TgearA9rAi2R+1fzOPhqIp3xppZ4V1siPqQWOSWXyvO
+         gReO4PjGrX1hNfw2At3Z/rFutkK8RI2ckEjQw5bnkrf1Y05wJ/RI8rRq2T/i9ux+roM7
+         vs5LX25R01uOFjyY3Itm/xq3fm8CAJvdoJQM3D1sPJga4AOTCUQEOUsz77dVtIlv0OZG
+         oVHNVXNVdK3TGlzxUzUpu/CNXZsVzFf2rEYHge1GDOvo2JLACYqyA3xKngDpGncAKD5F
+         Fe4g==
+X-Gm-Message-State: AOJu0Yx9NyMuoQgWB+qDywVDZbuIGQKoA6hoTJPsRvslMk2URR1lcf6S
+	wTjubqxSUxKW7lTLsR70jd03RG/orhCTEK30K+Emao/pfTVTVwK101oSIYM2XQc6+KvcTwQ1KTE
+	ovwWUHHXeKpX85A1PKquzdnsn1OinUCn/sl/jR5zgr2YnruHXenCyrHm2Z3U2pTIHhAVZ24llvY
+	oCJ2TiwPt8sELoXgVDUxssn3ap/O4/W48wn4bfe1wxNA==
+X-Gm-Gg: AZuq6aJXyE5CEbFC21/Aol80dO4iAC+hALN++wXlpW7/RoScWzMmHOdm1VfCQZMAZR8
+	kYZ0ZDRymXid4k2niiZLUedopxJN5E93CmY7/8LULxEI2RMK1ghE2N+MZ3hhcNnjTMUtYLAi7+V
+	+dJNXAqJRBbijK+OReOb9xu2OnXrhjbnyVqjg+S1AkkssDy9JqOpwCzIGdBVCClbHt4AQY9TAmc
+	KJqF0V8Lkb32gahC6k8mWbe8IVKTSbx0LRLAJfsz/9ji7uIcfJ2MTaTYY9ZV3zROFn+fb1ZrYJB
+	YzwhQzwfLscckZok+7W+yAEYw9Z5Sma6LacTlUUmYSobRZxxzyMDxW8nFhKojDGqRg6cAq1a8vK
+	vhy2cd8QafBgTj7UxyjZN9In1nqb+EZGIsSOLxb8Am7W37myQAJ49aV9gWyL6
+X-Received: by 2002:a05:6000:18b:b0:435:94c4:649c with SMTP id ffacd0b85a97d-43594c4658bmr4628428f8f.30.1768988207242;
+        Wed, 21 Jan 2026 01:36:47 -0800 (PST)
+X-Received: by 2002:a05:6000:18b:b0:435:94c4:649c with SMTP id ffacd0b85a97d-43594c4658bmr4628374f8f.30.1768988206674;
+        Wed, 21 Jan 2026 01:36:46 -0800 (PST)
 Received: from stex1.redhat.com (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f42907141sm355976705e9.9.2026.01.21.01.36.39
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569921da2sm35389534f8f.1.2026.01.21.01.36.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 01:36:40 -0800 (PST)
+        Wed, 21 Jan 2026 01:36:45 -0800 (PST)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Simon Horman <horms@kernel.org>,
@@ -115,10 +115,11 @@ Cc: Simon Horman <horms@kernel.org>,
 	Jason Wang <jasowang@redhat.com>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Asias He <asias@redhat.com>
-Subject: [PATCH net v6 2/4] vsock/test: fix seqpacket message bounds test
-Date: Wed, 21 Jan 2026 10:36:26 +0100
-Message-ID: <20260121093628.9941-3-sgarzare@redhat.com>
+	Asias He <asias@redhat.com>,
+	Melbin K Mathew <mlbnkm1@gmail.com>
+Subject: [PATCH net v6 3/4] vsock/virtio: cap TX credit to local buffer size
+Date: Wed, 21 Jan 2026 10:36:27 +0100
+Message-ID: <20260121093628.9941-4-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260121093628.9941-1-sgarzare@redhat.com>
 References: <20260121093628.9941-1-sgarzare@redhat.com>
@@ -130,82 +131,149 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-251827-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,redhat.com,sberdevices.ru,davemloft.net,lists.linux.dev,vger.kernel.org,linux.vnet.ibm.com,linux.alibaba.com,gmail.com];
+	R_SPF_SOFTFAIL(0.00)[~all];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251826-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 22B5254A42
+X-Rspamd-Queue-Id: EC0D654A1C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+From: Melbin K Mathew <mlbnkm1@gmail.com>
 
-The test requires the sender (client) to send all messages before waking
-up the receiver (server).
-Since virtio-vsock had a bug and did not respect the size of the TX
-buffer, this test worked, but now that we are going to fix the bug, the
-test hangs because the sender would fill the TX buffer before waking up
-the receiver.
+The virtio transports derives its TX credit directly from peer_buf_alloc,
+which is set from the remote endpoint's SO_VM_SOCKETS_BUFFER_SIZE value.
 
-Set the buffer size in the sender (client) as well, as we already do for
-the receiver (server).
+On the host side this means that the amount of data we are willing to
+queue for a connection is scaled by a guest-chosen buffer size, rather
+than the host's own vsock configuration. A malicious guest can advertise
+a large buffer and read slowly, causing the host to allocate a
+correspondingly large amount of sk_buff memory.
+The same thing would happen in the guest with a malicious host, since
+virtio transports share the same code base.
 
-Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
+Introduce a small helper, virtio_transport_tx_buf_size(), that
+returns min(peer_buf_alloc, buf_alloc), and use it wherever we consume
+peer_buf_alloc.
+
+This ensures the effective TX window is bounded by both the peer's
+advertised buffer and our own buf_alloc (already clamped to
+buffer_max_size via SO_VM_SOCKETS_BUFFER_MAX_SIZE), so a remote peer
+cannot force the other to queue more data than allowed by its own
+vsock settings.
+
+On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+32 guest vsock connections advertising 2 GiB each and reading slowly
+drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB; the system only
+recovered after killing the QEMU process. That said, if QEMU memory is
+limited with cgroups, the maximum memory used will be limited.
+
+With this patch applied:
+
+  Before:
+    MemFree:        ~61.6 GiB
+    Slab:           ~142 MiB
+    SUnreclaim:     ~117 MiB
+
+  After 32 high-credit connections:
+    MemFree:        ~61.5 GiB
+    Slab:           ~178 MiB
+    SUnreclaim:     ~152 MiB
+
+Only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the guest
+remains responsive.
+
+Compatibility with non-virtio transports:
+
+  - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
+    socket based on the local vsk->buffer_* values; the remote side
+    cannot enlarge those queues beyond what the local endpoint
+    configured.
+
+  - Hyper-V's vsock transport uses fixed-size VMBus ring buffers and
+    an MTU bound; there is no peer-controlled credit field comparable
+    to peer_buf_alloc, and the remote endpoint cannot drive in-flight
+    kernel memory above those ring sizes.
+
+  - The loopback path reuses virtio_transport_common.c, so it
+    naturally follows the same semantics as the virtio transport.
+
+This change is limited to virtio_transport_common.c and thus affects
+virtio-vsock, vhost-vsock, and loopback, bringing them in line with the
+"remote window intersected with local policy" behaviour that VMCI and
+Hyper-V already effectively have.
+
+Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+[Stefano: small adjustments after changing the previous patch]
+[Stefano: tweak the commit message]
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- tools/testing/vsock/vsock_test.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/vmw_vsock/virtio_transport_common.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 27e39354499a..668fbe9eb3cc 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -351,6 +351,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 6175124d63d3..d3e26025ef58 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -821,6 +821,15 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+ }
+ EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
  
- static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- {
-+	unsigned long long sock_buf_size;
- 	unsigned long curr_hash;
- 	size_t max_msg_size;
- 	int page_size;
-@@ -363,6 +364,16 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- 		exit(EXIT_FAILURE);
++static u32 virtio_transport_tx_buf_size(struct virtio_vsock_sock *vvs)
++{
++	/* The peer advertises its receive buffer via peer_buf_alloc, but we
++	 * cap it to our local buf_alloc so a remote peer cannot force us to
++	 * queue more data than our own buffer configuration allows.
++	 */
++	return min(vvs->peer_buf_alloc, vvs->buf_alloc);
++}
++
+ int
+ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+ 				   struct msghdr *msg,
+@@ -830,7 +839,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+ 
+ 	spin_lock_bh(&vvs->tx_lock);
+ 
+-	if (len > vvs->peer_buf_alloc) {
++	if (len > virtio_transport_tx_buf_size(vvs)) {
+ 		spin_unlock_bh(&vvs->tx_lock);
+ 		return -EMSGSIZE;
  	}
- 
-+	sock_buf_size = SOCK_BUF_SIZE;
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+
- 	/* Wait, until receiver sets buffer size. */
- 	control_expectln("SRVREADY");
+@@ -884,7 +893,8 @@ static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs)
+ 	 * we have bytes in flight (tx_cnt - peer_fwd_cnt), the subtraction
+ 	 * does not underflow.
+ 	 */
+-	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
++	bytes = (s64)virtio_transport_tx_buf_size(vvs) -
++		(vvs->tx_cnt - vvs->peer_fwd_cnt);
+ 	if (bytes < 0)
+ 		bytes = 0;
  
 -- 
 2.52.0
