@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-251738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPA+AZhDcGnXXAAAu9opvQ
-	(envelope-from <netdev+bounces-251738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 04:10:16 +0100
+	id GDmSIZ1DcGnXXAAAu9opvQ
+	(envelope-from <netdev+bounces-251739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 04:10:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6329B50412
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 04:10:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31FDE50419
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 04:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39E634E78E0
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:10:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 81A19506CE7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 03:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB593563FF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91FD356A11;
 	Wed, 21 Jan 2026 03:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+Z0oN32"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tqtvpj7L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9973557EE;
-	Wed, 21 Jan 2026 03:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F11356A05;
+	Wed, 21 Jan 2026 03:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768965010; cv=none; b=mPaeMRv5ewV5DTBJ4D4wi+94+0AL1ghJ7GNzbAeBvnMMzc2QAtItI88zD/oGVHrv9tZpturztTiIbnIlYwobDGwsNUuRl20IyQ0C/KqBteWjcQ/VE709nbiG7D5vxpl7E/gyoQb+8sthWhV906stRgEEbICnHuC+LuAI4/dmm/M=
+	t=1768965010; cv=none; b=YFEmaFzD8isGf6pVOCW3lLFBPWQ7QiDaAmpMVdLBs6rqKHF32WXjYV5XSQJhf8gXPrZU/0Z9BqUkHaZ1ujXrURN6XVZSWabfv1gm+weC4d2GkTFlkxmQ2Gwj6kQklx5e9CKHZ/cHYZfyHxcBuTTIPvrIIuxrnDQNE6hnq6aIcUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768965010; c=relaxed/simple;
-	bh=SJiPph6K7kfHdOadyKUmMSgjNa3vYudNdwVHfyp0Gpo=;
+	bh=aielJTOBw58FwdnxXswivgYB/zLkpUygEabseHAholY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f1msOoekPr4ngIIfeNjs8YvGirbseJc21L8Y6GrD8Xfm/UDvhT8GaGCHAeUCSRwhcnYrprHUpcVe1iAeoYf0iM2NnSFgVOPxquXl7S8B9a9k+zT2IxPIEWh7C0zcZmzR46bbNRQmB9RASQbwilZlkgrLobHTpM6N9d6A7W7Spag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+Z0oN32; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08BEC16AAE;
-	Wed, 21 Jan 2026 03:10:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qtOQypmfvII23fy+7FT6yhgtvfAYMSg7bFIVCdnOmLRxAMQl7i4XXHeRXKIRZzOipb6Zk6rayU9vAX+qMTkCjDhqS2tWqoRqo2U9FvVqbrDQqAaStb2b0dYe7rW1ToLZrFprz4hISKVjjHE5qtt4PQmijP/DPiXeoF2OXJRw9fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tqtvpj7L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E43FC16AAE;
+	Wed, 21 Jan 2026 03:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768965009;
-	bh=SJiPph6K7kfHdOadyKUmMSgjNa3vYudNdwVHfyp0Gpo=;
+	s=k20201202; t=1768965010;
+	bh=aielJTOBw58FwdnxXswivgYB/zLkpUygEabseHAholY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Q+Z0oN32VOD5W+VRlAzncYLXannKynKkiM7qB7AUN2J8MHHVhlVYGV/jWV8nrqutz
-	 dbKiPHlfgbdvDgjgWEZlz4mamnJf6HQJ4STwQdRMdedHRfwWQHpkSgdTW2o0GMAlJ8
-	 KAp3VvNFx3e5G8hPI4DEp7rkeo/mMkkQ7FlneV8LkroN3h7OAtLtNS4YyBfb9DoQjq
-	 fCYpbvp+VS59fBXxzHKjRTMKTf1YLXfnD/i4daeWhaLjexdeJ/AnLd+vy2ZW+jEJg+
-	 DTTsBJaGrRfq1PL3ntFyEVZiiAvYzS2isIx0NwbLeOYRK8Ji8Z4SlkNR5q1nDwui8N
-	 eArvaneJQUN3w==
+	b=Tqtvpj7L6nZJhK3/b7H42VznxbN/P//tWku6NVPFD2YMDCIIy2IQyn8u2vAxULYeV
+	 Tv9B9V+PmTr0wGU06cMTGDL0ZG7cw0tkEoeGU9cQHA+NtonRfqEjUIu0BeEhDFbnhO
+	 YI65DN2V/zuMMhW3vUbCIF6GRuHJQIq3E0hFVBMR1D34kQP5x9tTVJQC2doOyLgeue
+	 Mf8CtykHbIDNMFgmuK16LuQYTF7T9qpvxcv/BIAF83bW8Uny+kZXR6XSy/GilZoM7N
+	 f9rrNN7R+7lpV1zc6P56SVlgLeuqKox3oykxPNIlDa5VNRbU6pATEK2W9ETwGoIWgs
+	 p6eOJSPCsKOtA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8B9EA380820D;
-	Wed, 21 Jan 2026 03:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8BBE380820D;
+	Wed, 21 Jan 2026 03:10:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,51 +57,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net Patch] Octeontx2-pf: Update xdp features
+Subject: Re: [PATCH net v2] usbnet: limit max_mtu based on device's hard_mtu
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176896500635.707355.1206740654082331598.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Jan 2026 03:10:06 +0000
-References: <20260119100222.2267925-1-hkelam@marvell.com>
-In-Reply-To: <20260119100222.2267925-1-hkelam@marvell.com>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- bbhushan2@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, sumang@marvell.com, horms@kernel.org,
- gerhard@engleder-embedded.com, memxor@gmail.com, alardam@gmail.com
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+ <176896500760.707355.7611917521322998807.git-patchwork-notify@kernel.org>
+Date: Wed, 21 Jan 2026 03:10:07 +0000
+References: <20260119075518.2774373-1-lvivier@redhat.com>
+In-Reply-To: <20260119075518.2774373-1-lvivier@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, oneukum@suse.com,
+ kuba@kernel.org, netdev@vger.kernel.org, sbrivio@redhat.com
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,engleder-embedded.com];
-	TAGGED_FROM(0.00)[bounces-251738-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251739-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	R_SPF_SOFTFAIL(0.00)[~all];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,marvell.com:email]
-X-Rspamd-Queue-Id: 6329B50412
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 31FDE50419
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -110,19 +103,22 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 19 Jan 2026 15:32:22 +0530 you wrote:
-> In recent testing, verification of XDP_REDIRECT and zero-copy features
-> failed because the driver is not setting the corresponding feature flags.
+On Mon, 19 Jan 2026 08:55:18 +0100 you wrote:
+> The usbnet driver initializes net->max_mtu to ETH_MAX_MTU before calling
+> the device's bind() callback. When the bind() callback sets
+> dev->hard_mtu based the device's actual capability (from CDC Ethernet's
+> wMaxSegmentSize descriptor), max_mtu is never updated to reflect this
+> hardware limitation).
 > 
-> Fixes: efabce290151 ("octeontx2-pf: AF_XDP zero copy receive support")
-> Fixes: 66c0e13ad236 ("drivers: net: turn on XDP features")
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+> This allows userspace (DHCP or IPv6 RA) to configure MTU larger than the
+> device can handle, leading to silent packet drops when the backend sends
+> packet exceeding the device's buffer size.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] Octeontx2-pf: Update xdp features
-    https://git.kernel.org/netdev/net/c/cdf8de9c6bfe
+  - [net,v2] usbnet: limit max_mtu based on device's hard_mtu
+    https://git.kernel.org/netdev/net/c/c7159e960f14
 
 You are awesome, thank you!
 -- 
