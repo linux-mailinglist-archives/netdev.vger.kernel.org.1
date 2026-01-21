@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-251889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEL7MFvZcGmraQAAu9opvQ
-	(envelope-from <netdev+bounces-251889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:49:15 +0100
+	id YJKhNC/ecGnCaQAAu9opvQ
+	(envelope-from <netdev+bounces-251890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:09:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7720557E8D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 14:49:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55064582D3
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 15:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0CEFE9C79C8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:37:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C04B1A270F2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 13:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C949B427A1A;
-	Wed, 21 Jan 2026 13:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412D42C21D0;
+	Wed, 21 Jan 2026 13:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+u3H74g"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MnOZkzTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABA748125B
-	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E99E3A7F45
+	for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 13:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002506; cv=none; b=ZXrwO/u/BNkc0gbNnqjYSMV3O7JTHrSlQMyydrX0dUjxLKIYtylvt2SKp93Zudy8oE1fCZju85ZPKTKJNirAn+iHvaYIZghp+996q6Gb4xKbnnza3e6l27+TzbloJq0WYkFBMzqg6WRFW82BVuKJGhIXZnR8YkPh1a7wiO28K1U=
+	t=1769002514; cv=none; b=Y3QXrj+2hHYa0iSC8MBQKUWbZm7doB7lbQpQIsKE6tyzedN9xEkBKc//5LDenwzKaSopsuD5GM6W/+kw6fm8Rn868vAFMeBgtlLeemnYPUqh+2K9UtlvRWfeRrCgzkZfuz7c9HOfhLm52osgU5I085HFt/yEBDgITbUzcM9fBB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002506; c=relaxed/simple;
-	bh=hhQoq0gCeUxi2n9yz7sPt/ISKjP+9gkyvyv50ARrmk4=;
+	s=arc-20240116; t=1769002514; c=relaxed/simple;
+	bh=2XOpzNLTuc9GxlWyN55kHJ2wY0swkCt75808p6wk9gs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jdUbq76J8BW9vXxvEE00OL96F3pbAsJsQqDcFsOzF/CE6PR1FiCQAcsdmT2KRWiHfNMjKJyaUgim4XkodgQL7Y0JXATknB/6seN6gWPikA61DpzHOBMn3hKo5WfoYkadtRj9ucuqSs+AlQMhQXSrAF3EEGnTXYHOw8/SxPBrzt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K+u3H74g; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Wjc1YGekKnxpMCVwZZ4yho33zd/lLbRBGi5xfjGLVUV9UiFy/BLxgLD1VoC9h98dof/+dfID8lbCSMbhimOt2UYkFPgYpZHaVGujfZZFA7hDUlbiQui8gilpcCNmuqM6q/cKR4+nOcwHKbznMXIbvpAvuNNoqbObM7ybigfYrGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MnOZkzTM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769002503;
+	s=mimecast20190719; t=1769002511;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bHfyLyCxrv9Zdq5O2HBHG/L0AjXECKb27/Osx3sJCGw=;
-	b=K+u3H74gUrVVtIFPLuMIxr0/phdd4ROPt/EJhIa+3dQ4WAdFGgq9b7hplFTEQrzmOm3HKm
-	f93Immw1sekatBtEjmMKyRDnWU9/imhI3GucboH3FBLCv3Q7CAOL2f/6g20GJP0yBv6u7Q
-	Pqy/1PDTfLyc+SxTyimqyyffQuzt2Jw=
+	bh=sLu2tBWhwAr5Jc1vaGboewazfQKXap4WC90Qk/DKzio=;
+	b=MnOZkzTM9hFm4ueNKFqBbevjb4xgUhBDKmQH5SyoozEaRVRAutFqp6JvjmaEUo2B0UcC4Y
+	3rqLmQEvNGZBogaN6aYrYlSvjVQTnw3xOFM3utKFqU7qV8tvODAA+i1TB2HmlOnP3ndONo
+	X2CJiGp1B4W494hXfMyvgAXxMOVN9TY=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-YuHodBDRNrmatDkPt021XQ-1; Wed,
- 21 Jan 2026 08:35:00 -0500
-X-MC-Unique: YuHodBDRNrmatDkPt021XQ-1
-X-Mimecast-MFC-AGG-ID: YuHodBDRNrmatDkPt021XQ_1769002498
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-151-WF8bG5_1PHioso3OLeTwWQ-1; Wed,
+ 21 Jan 2026 08:35:07 -0500
+X-MC-Unique: WF8bG5_1PHioso3OLeTwWQ-1
+X-Mimecast-MFC-AGG-ID: WF8bG5_1PHioso3OLeTwWQ_1769002506
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FB641956096;
-	Wed, 21 Jan 2026 13:34:58 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F20241956094;
+	Wed, 21 Jan 2026 13:35:05 +0000 (UTC)
 Received: from thinkpad.redhat.com (unknown [10.44.33.242])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D403D19560AB;
-	Wed, 21 Jan 2026 13:34:54 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8351A19560AB;
+	Wed, 21 Jan 2026 13:35:02 +0000 (UTC)
 From: Felix Maurer <fmaurer@redhat.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -76,9 +76,9 @@ Cc: davem@davemloft.net,
 	petrm@nvidia.com,
 	antonio@openvpn.net,
 	bigeasy@linutronix.de
-Subject: [PATCH net-next 2/9] selftests: hsr: Check duplicates on HSR with VLAN
-Date: Wed, 21 Jan 2026 14:33:01 +0100
-Message-ID: <029cea9e1d28835f97d5b847164a646ce8e1594f.1769001553.git.fmaurer@redhat.com>
+Subject: [PATCH net-next 3/9] selftests: hsr: Add tests for faulty links
+Date: Wed, 21 Jan 2026 14:33:02 +0100
+Message-ID: <63db98d35c6dd792dd322382a36a47cf15ecec24.1769001553.git.fmaurer@redhat.com>
 In-Reply-To: <cover.1769001553.git.fmaurer@redhat.com>
 References: <cover.1769001553.git.fmaurer@redhat.com>
 Precedence: bulk
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-251889-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-251890-lists,netdev=lfdr.de];
 	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
@@ -112,336 +112,345 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	R_SPF_SOFTFAIL(0.00)[~all];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TO_DN_NONE(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 7720557E8D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,link_faults.sh:url]
+X-Rspamd-Queue-Id: 55064582D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Previously the hsr_ping test only checked that all nodes in a VLAN are
-reachable (using do_ping). Update the test to also check that there is no
-packet loss and no duplicate packets by running the same tests for VLANs as
-without VLANs (including using do_ping_long). This also adds tests for IPv6
-over VLAN. To unify the test code, the topology without VLANs now uses IP
-addresses from dead:beef:0::/64 to align with the 100.64.0.0/24 range for
-IPv4. Error messages are updated across the board to make it easier to find
-what actually failed.
+Add a test case that can support different types of faulty links for all
+protocol versions (HSRv0, HSRv1, PRPv1). It starts with a baseline with
+fully functional links. The first faulty case is one link being cut during
+the ping. This test uses a different function for ping that sends more
+packets in shorter intervals to stress the duplicate detection algorithms a
+bit more and allow for future tests with other link faults (packet loss,
+reordering, etc.).
 
-Also update the VLAN test to only run in VLAN 2, as there is no need to
-check if ping really works with VLAN IDs 2, 3, 4, and 5. This lowers the
-number of long ping tests on VLANs to keep the overall test runtime in
-bounds.
-
-It's still necessary to bump the test timeout a bit, though: a ping long
-tests takes 1sec, do_ping_tests performs 12 of them, do_link_problem_tests
-6, and the VLAN tests again 12. With some buffer for setup and waiting and
-for two protocol versions, 90sec timeout seems reasonable.
+As the link fault tests now cover the cut link for HSR and PRP, it can be
+removed from the hsr_ping test. Note that the removed cut link test did not
+really test the fault because do_ping_long takes about 1sec while the link
+is only cut after a 3sec sleep.
 
 Signed-off-by: Felix Maurer <fmaurer@redhat.com>
 ---
- tools/testing/selftests/net/hsr/hsr_ping.sh | 188 +++++++-------------
- tools/testing/selftests/net/hsr/settings    |   2 +-
- 2 files changed, 70 insertions(+), 120 deletions(-)
+ tools/testing/selftests/net/hsr/Makefile      |   1 +
+ tools/testing/selftests/net/hsr/hsr_ping.sh   |  11 -
+ .../testing/selftests/net/hsr/link_faults.sh  | 269 ++++++++++++++++++
+ 3 files changed, 270 insertions(+), 11 deletions(-)
+ create mode 100755 tools/testing/selftests/net/hsr/link_faults.sh
 
+diff --git a/tools/testing/selftests/net/hsr/Makefile b/tools/testing/selftests/net/hsr/Makefile
+index 1886f345897a..31fb9326cf53 100644
+--- a/tools/testing/selftests/net/hsr/Makefile
++++ b/tools/testing/selftests/net/hsr/Makefile
+@@ -5,6 +5,7 @@ top_srcdir = ../../../../..
+ TEST_PROGS := \
+ 	hsr_ping.sh \
+ 	hsr_redbox.sh \
++	link_faults.sh \
+ 	prp_ping.sh \
+ # end of TEST_PROGS
+ 
 diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh b/tools/testing/selftests/net/hsr/hsr_ping.sh
-index 5a65f4f836be..ebee4a18fc67 100755
+index ebee4a18fc67..0ec71b20ab75 100755
 --- a/tools/testing/selftests/net/hsr/hsr_ping.sh
 +++ b/tools/testing/selftests/net/hsr/hsr_ping.sh
-@@ -27,31 +27,34 @@ while getopts "$optstring" option;do
- esac
- done
- 
--do_complete_ping_test()
-+do_ping_tests()
+@@ -94,17 +94,6 @@ do_link_problem_tests()
  {
--	echo "INFO: Initial validation ping."
--	# Each node has to be able each one.
--	do_ping "$ns1" 100.64.0.2
--	do_ping "$ns2" 100.64.0.1
--	do_ping "$ns3" 100.64.0.1
--	stop_if_error "Initial validation failed."
+ 	echo "INFO: Running link problem tests."
+ 
+-	echo "INFO: Cutting one link."
+-	do_ping_long "$ns1" 100.64.0.3 &
 -
--	do_ping "$ns1" 100.64.0.3
--	do_ping "$ns2" 100.64.0.3
--	do_ping "$ns3" 100.64.0.2
-+	local netid="$1"
- 
--	do_ping "$ns1" dead:beef:1::2
--	do_ping "$ns1" dead:beef:1::3
--	do_ping "$ns2" dead:beef:1::1
--	do_ping "$ns2" dead:beef:1::2
--	do_ping "$ns3" dead:beef:1::1
--	do_ping "$ns3" dead:beef:1::2
-+	echo "INFO: Running ping tests."
- 
--	stop_if_error "Initial validation failed."
-+	echo "INFO: Initial validation ping."
-+	# Each node has to be able to reach each one.
-+	do_ping "$ns1" "100.64.$netid.2"
-+	do_ping "$ns1" "100.64.$netid.3"
-+	do_ping "$ns2" "100.64.$netid.1"
-+	do_ping "$ns2" "100.64.$netid.3"
-+	do_ping "$ns3" "100.64.$netid.1"
-+	do_ping "$ns3" "100.64.$netid.2"
-+	stop_if_error "Initial validation failed on IPv4."
-+
-+	do_ping "$ns1" "dead:beef:$netid::2"
-+	do_ping "$ns1" "dead:beef:$netid::3"
-+	do_ping "$ns2" "dead:beef:$netid::1"
-+	do_ping "$ns2" "dead:beef:$netid::2"
-+	do_ping "$ns3" "dead:beef:$netid::1"
-+	do_ping "$ns3" "dead:beef:$netid::2"
-+	stop_if_error "Initial validation failed on IPv6."
- 
- # Wait until supervisor all supervision frames have been processed and the node
- # entries have been merged. Otherwise duplicate frames will be observed which is
- # valid at this stage.
-+	echo "INFO: Wait for node table entries to be merged."
- 	WAIT=5
- 	while [ ${WAIT} -gt 0 ]
- 	do
-@@ -68,24 +71,28 @@ do_complete_ping_test()
- 	sleep 1
- 
- 	echo "INFO: Longer ping test."
--	do_ping_long "$ns1" 100.64.0.2
--	do_ping_long "$ns1" dead:beef:1::2
--	do_ping_long "$ns1" 100.64.0.3
--	do_ping_long "$ns1" dead:beef:1::3
+-	sleep 3
+-	ip -net "$ns3" link set ns3eth1 down
+-	wait
 -
--	stop_if_error "Longer ping test failed."
+-	ip -net "$ns3" link set ns3eth1 up
 -
--	do_ping_long "$ns2" 100.64.0.1
--	do_ping_long "$ns2" dead:beef:1::1
--	do_ping_long "$ns2" 100.64.0.3
--	do_ping_long "$ns2" dead:beef:1::2
--	stop_if_error "Longer ping test failed."
-+	do_ping_long "$ns1" "100.64.$netid.2"
-+	do_ping_long "$ns1" "dead:beef:$netid::2"
-+	do_ping_long "$ns1" "100.64.$netid.3"
-+	do_ping_long "$ns1" "dead:beef:$netid::3"
-+	stop_if_error "Longer ping test failed (ns1)."
+-	stop_if_error "Failed with one link down."
+-
+ 	echo "INFO: Delay the link and drop a few packages."
+ 	tc -net "$ns3" qdisc add dev ns3eth1 root netem delay 50ms
+ 	tc -net "$ns2" qdisc add dev ns2eth1 root netem delay 5ms loss 25%
+diff --git a/tools/testing/selftests/net/hsr/link_faults.sh b/tools/testing/selftests/net/hsr/link_faults.sh
+new file mode 100755
+index 000000000000..1d48f1c2fd2e
+--- /dev/null
++++ b/tools/testing/selftests/net/hsr/link_faults.sh
+@@ -0,0 +1,269 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# shellcheck disable=SC2329
 +
-+	do_ping_long "$ns2" "100.64.$netid.1"
-+	do_ping_long "$ns2" "dead:beef:$netid::1"
-+	do_ping_long "$ns2" "100.64.$netid.3"
-+	do_ping_long "$ns2" "dead:beef:$netid::3"
-+	stop_if_error "Longer ping test failed (ns2)."
++source ../lib.sh
 +
-+	do_ping_long "$ns3" "100.64.$netid.1"
-+	do_ping_long "$ns3" "dead:beef:$netid::1"
-+	do_ping_long "$ns3" "100.64.$netid.2"
-+	do_ping_long "$ns3" "dead:beef:$netid::2"
-+	stop_if_error "Longer ping test failed (ns3)."
++ALL_TESTS="
++	test_clean_hsrv0
++	test_cut_link_hsrv0
++	test_clean_hsrv1
++	test_cut_link_hsrv1
++	test_clean_prp
++	test_cut_link_prp
++"
++
++# The tests are running ping for 5sec with a relatively short interval with a
++# cut link, which should be recoverable by HSR/PRP.
++
++setup_hsr_topo()
++{
++	# Three HSR nodes in a ring, every node has a LAN A interface connected
++	# to the LAN B interface of the next node.
++	#
++	#    node1            node2
++	#
++	#     vethA -------- vethB
++	#   hsr1                 hsr2
++	#     vethB          vethA
++	#         \          /
++	#         vethA  vethB
++	#             hsr3
++	#
++	#            node3
++
++	local ver="$1"
++
++	setup_ns node1 node2 node3
++
++	# veth links
++	ip link add vethA netns "$node1" type veth peer name vethB netns "$node2"
++	ip link add vethA netns "$node2" type veth peer name vethB netns "$node3"
++	ip link add vethA netns "$node3" type veth peer name vethB netns "$node1"
++
++	# MAC addresses (not needed for HSR operation, but helps with debugging)
++	ip -net "$node1" link set address 00:11:22:00:01:01 dev vethA
++	ip -net "$node1" link set address 00:11:22:00:01:02 dev vethB
++
++	ip -net "$node2" link set address 00:11:22:00:02:01 dev vethA
++	ip -net "$node2" link set address 00:11:22:00:02:02 dev vethB
++
++	ip -net "$node3" link set address 00:11:22:00:03:01 dev vethA
++	ip -net "$node3" link set address 00:11:22:00:03:02 dev vethB
++
++	# HSR interfaces
++	ip -net "$node1" link add name hsr1 type hsr proto 0 version "$ver" \
++		slave1 vethA slave2 vethB supervision 45
++	ip -net "$node2" link add name hsr2 type hsr proto 0 version "$ver" \
++		slave1 vethA slave2 vethB supervision 45
++	ip -net "$node3" link add name hsr3 type hsr proto 0 version "$ver" \
++		slave1 vethA slave2 vethB supervision 45
++
++	# IP addresses
++	ip -net "$node1" addr add 100.64.0.1/24 dev hsr1
++	ip -net "$node2" addr add 100.64.0.2/24 dev hsr2
++	ip -net "$node3" addr add 100.64.0.3/24 dev hsr3
++
++	# Set all links up
++	ip -net "$node1" link set vethA up
++	ip -net "$node1" link set vethB up
++	ip -net "$node1" link set hsr1 up
++
++	ip -net "$node2" link set vethA up
++	ip -net "$node2" link set vethB up
++	ip -net "$node2" link set hsr2 up
++
++	ip -net "$node3" link set vethA up
++	ip -net "$node3" link set vethB up
++	ip -net "$node3" link set hsr3 up
 +}
- 
--	do_ping_long "$ns3" 100.64.0.1
--	do_ping_long "$ns3" dead:beef:1::1
--	do_ping_long "$ns3" 100.64.0.2
--	do_ping_long "$ns3" dead:beef:1::2
--	stop_if_error "Longer ping test failed."
-+do_link_problem_tests()
++
++setup_prp_topo()
 +{
-+	echo "INFO: Running link problem tests."
- 
- 	echo "INFO: Cutting one link."
- 	do_ping_long "$ns1" 100.64.0.3 &
-@@ -104,26 +111,22 @@ do_complete_ping_test()
- 
- 	do_ping_long "$ns1" 100.64.0.2
- 	do_ping_long "$ns1" 100.64.0.3
--
--	stop_if_error "Failed with delay and packetloss."
-+	stop_if_error "Failed with delay and packetloss (ns1)."
- 
- 	do_ping_long "$ns2" 100.64.0.1
- 	do_ping_long "$ns2" 100.64.0.3
--
--	stop_if_error "Failed with delay and packetloss."
-+	stop_if_error "Failed with delay and packetloss (ns2)."
- 
- 	do_ping_long "$ns3" 100.64.0.1
- 	do_ping_long "$ns3" 100.64.0.2
--	stop_if_error "Failed with delay and packetloss."
--
--	echo "INFO: All good."
-+	stop_if_error "Failed with delay and packetloss (ns3)."
- }
- 
- setup_hsr_interfaces()
- {
- 	local HSRv="$1"
- 
--	echo "INFO: preparing interfaces for HSRv${HSRv}."
-+	echo "INFO: Preparing interfaces for HSRv${HSRv}."
- # Three HSR nodes. Each node has one link to each of its neighbour, two links in total.
- #
- #    ns1eth1 ----- ns2eth1
-@@ -140,17 +143,20 @@ setup_hsr_interfaces()
- 	ip link add ns3eth2 netns "$ns3" type veth peer name ns2eth2 netns "$ns2"
- 
- 	# HSRv0/1
--	ip -net "$ns1" link add name hsr1 type hsr slave1 ns1eth1 slave2 ns1eth2 supervision 45 version $HSRv proto 0
--	ip -net "$ns2" link add name hsr2 type hsr slave1 ns2eth1 slave2 ns2eth2 supervision 45 version $HSRv proto 0
--	ip -net "$ns3" link add name hsr3 type hsr slave1 ns3eth1 slave2 ns3eth2 supervision 45 version $HSRv proto 0
-+	ip -net "$ns1" link add name hsr1 type hsr slave1 ns1eth1 \
-+		slave2 ns1eth2 supervision 45 version "$HSRv" proto 0
-+	ip -net "$ns2" link add name hsr2 type hsr slave1 ns2eth1 \
-+		slave2 ns2eth2 supervision 45 version "$HSRv" proto 0
-+	ip -net "$ns3" link add name hsr3 type hsr slave1 ns3eth1 \
-+		slave2 ns3eth2 supervision 45 version "$HSRv" proto 0
- 
- 	# IP for HSR
- 	ip -net "$ns1" addr add 100.64.0.1/24 dev hsr1
--	ip -net "$ns1" addr add dead:beef:1::1/64 dev hsr1 nodad
-+	ip -net "$ns1" addr add dead:beef:0::1/64 dev hsr1 nodad
- 	ip -net "$ns2" addr add 100.64.0.2/24 dev hsr2
--	ip -net "$ns2" addr add dead:beef:1::2/64 dev hsr2 nodad
-+	ip -net "$ns2" addr add dead:beef:0::2/64 dev hsr2 nodad
- 	ip -net "$ns3" addr add 100.64.0.3/24 dev hsr3
--	ip -net "$ns3" addr add dead:beef:1::3/64 dev hsr3 nodad
-+	ip -net "$ns3" addr add dead:beef:0::3/64 dev hsr3 nodad
- 
- 	ip -net "$ns1" link set address 00:11:22:00:01:01 dev ns1eth1
- 	ip -net "$ns1" link set address 00:11:22:00:01:02 dev ns1eth2
-@@ -177,85 +183,33 @@ setup_hsr_interfaces()
- 
- setup_vlan_interfaces() {
- 	ip -net "$ns1" link add link hsr1 name hsr1.2 type vlan id 2
--	ip -net "$ns1" link add link hsr1 name hsr1.3 type vlan id 3
--	ip -net "$ns1" link add link hsr1 name hsr1.4 type vlan id 4
--	ip -net "$ns1" link add link hsr1 name hsr1.5 type vlan id 5
--
- 	ip -net "$ns2" link add link hsr2 name hsr2.2 type vlan id 2
--	ip -net "$ns2" link add link hsr2 name hsr2.3 type vlan id 3
--	ip -net "$ns2" link add link hsr2 name hsr2.4 type vlan id 4
--	ip -net "$ns2" link add link hsr2 name hsr2.5 type vlan id 5
--
- 	ip -net "$ns3" link add link hsr3 name hsr3.2 type vlan id 2
--	ip -net "$ns3" link add link hsr3 name hsr3.3 type vlan id 3
--	ip -net "$ns3" link add link hsr3 name hsr3.4 type vlan id 4
--	ip -net "$ns3" link add link hsr3 name hsr3.5 type vlan id 5
- 
- 	ip -net "$ns1" addr add 100.64.2.1/24 dev hsr1.2
--	ip -net "$ns1" addr add 100.64.3.1/24 dev hsr1.3
--	ip -net "$ns1" addr add 100.64.4.1/24 dev hsr1.4
--	ip -net "$ns1" addr add 100.64.5.1/24 dev hsr1.5
-+	ip -net "$ns1" addr add dead:beef:2::1/64 dev hsr1.2 nodad
- 
- 	ip -net "$ns2" addr add 100.64.2.2/24 dev hsr2.2
--	ip -net "$ns2" addr add 100.64.3.2/24 dev hsr2.3
--	ip -net "$ns2" addr add 100.64.4.2/24 dev hsr2.4
--	ip -net "$ns2" addr add 100.64.5.2/24 dev hsr2.5
-+	ip -net "$ns2" addr add dead:beef:2::2/64 dev hsr2.2 nodad
- 
- 	ip -net "$ns3" addr add 100.64.2.3/24 dev hsr3.2
--	ip -net "$ns3" addr add 100.64.3.3/24 dev hsr3.3
--	ip -net "$ns3" addr add 100.64.4.3/24 dev hsr3.4
--	ip -net "$ns3" addr add 100.64.5.3/24 dev hsr3.5
-+	ip -net "$ns3" addr add dead:beef:2::3/64 dev hsr3.2 nodad
- 
- 	ip -net "$ns1" link set dev hsr1.2 up
--	ip -net "$ns1" link set dev hsr1.3 up
--	ip -net "$ns1" link set dev hsr1.4 up
--	ip -net "$ns1" link set dev hsr1.5 up
--
- 	ip -net "$ns2" link set dev hsr2.2 up
--	ip -net "$ns2" link set dev hsr2.3 up
--	ip -net "$ns2" link set dev hsr2.4 up
--	ip -net "$ns2" link set dev hsr2.5 up
--
- 	ip -net "$ns3" link set dev hsr3.2 up
--	ip -net "$ns3" link set dev hsr3.3 up
--	ip -net "$ns3" link set dev hsr3.4 up
--	ip -net "$ns3" link set dev hsr3.5 up
- 
- }
- 
--hsr_vlan_ping() {
--	do_ping "$ns1" 100.64.2.2
--	do_ping "$ns1" 100.64.3.2
--	do_ping "$ns1" 100.64.4.2
--	do_ping "$ns1" 100.64.5.2
--
--	do_ping "$ns1" 100.64.2.3
--	do_ping "$ns1" 100.64.3.3
--	do_ping "$ns1" 100.64.4.3
--	do_ping "$ns1" 100.64.5.3
--
--	do_ping "$ns2" 100.64.2.1
--	do_ping "$ns2" 100.64.3.1
--	do_ping "$ns2" 100.64.4.1
--	do_ping "$ns2" 100.64.5.1
--
--	do_ping "$ns2" 100.64.2.3
--	do_ping "$ns2" 100.64.3.3
--	do_ping "$ns2" 100.64.4.3
--	do_ping "$ns2" 100.64.5.3
--
--	do_ping "$ns3" 100.64.2.1
--	do_ping "$ns3" 100.64.3.1
--	do_ping "$ns3" 100.64.4.1
--	do_ping "$ns3" 100.64.5.1
--
--	do_ping "$ns3" 100.64.2.2
--	do_ping "$ns3" 100.64.3.2
--	do_ping "$ns3" 100.64.4.2
--	do_ping "$ns3" 100.64.5.2
-+run_complete_ping_tests()
++	# Two PRP nodes, connected by two links (treated as LAN A and LAN B).
++	#
++	#       vethA ----- vethA
++	#     prp1             prp2
++	#       vethB ----- vethB
++	#
++	#     node1           node2
++
++	setup_ns node1 node2
++
++	# veth links
++	ip link add vethA netns "$node1" type veth peer name vethA netns "$node2"
++	ip link add vethB netns "$node1" type veth peer name vethB netns "$node2"
++
++	# MAC addresses will be copied from LAN A interface
++	ip -net "$node1" link set address 00:11:22:00:00:01 dev vethA
++	ip -net "$node2" link set address 00:11:22:00:00:02 dev vethA
++
++	# PRP interfaces
++	ip -net "$node1" link add name prp1 type hsr \
++		slave1 vethA slave2 vethB supervision 45 proto 1
++	ip -net "$node2" link add name prp2 type hsr \
++		slave1 vethA slave2 vethB supervision 45 proto 1
++
++	# IP addresses
++	ip -net "$node1" addr add 100.64.0.1/24 dev prp1
++	ip -net "$node2" addr add 100.64.0.2/24 dev prp2
++
++	# All links up
++	ip -net "$node1" link set vethA up
++	ip -net "$node1" link set vethB up
++	ip -net "$node1" link set prp1 up
++
++	ip -net "$node2" link set vethA up
++	ip -net "$node2" link set vethB up
++	ip -net "$node2" link set prp2 up
++}
++
++wait_for_hsr_node_table()
 +{
-+	echo "INFO: Running complete ping tests."
-+	do_ping_tests 0
-+	do_link_problem_tests
- }
- 
--run_vlan_tests() {
-+run_vlan_tests()
++	log_info "Wait for node table entries to be merged."
++	WAIT=5
++	while [ "${WAIT}" -gt 0 ]; do
++		nts=$(cat /sys/kernel/debug/hsr/hsr*/node_table)
++
++		# We need entries in the node tables, and they need to be merged
++		if (echo "$nts" | grep -qE "^([0-9a-f]{2}:){5}") && \
++		    ! (echo "$nts" | grep -q "00:00:00:00:00:00"); then
++			return
++		fi
++
++		sleep 1
++		((WAIT--))
++	done
++	check_err 1 "Failed to wait for merged node table entries"
++}
++
++setup_topo()
 +{
- 	vlan_challenged_hsr1=$(ip net exec "$ns1" ethtool -k hsr1 | grep "vlan-challenged" | awk '{print $2}')
- 	vlan_challenged_hsr2=$(ip net exec "$ns2" ethtool -k hsr2 | grep "vlan-challenged" | awk '{print $2}')
- 	vlan_challenged_hsr3=$(ip net exec "$ns3" ethtool -k hsr3 | grep "vlan-challenged" | awk '{print $2}')
-@@ -263,27 +217,23 @@ run_vlan_tests() {
- 	if [[ "$vlan_challenged_hsr1" = "off" || "$vlan_challenged_hsr2" = "off" || "$vlan_challenged_hsr3" = "off" ]]; then
- 		echo "INFO: Running VLAN tests"
- 		setup_vlan_interfaces
--		hsr_vlan_ping
-+		do_ping_tests 2
- 	else
- 		echo "INFO: Not Running VLAN tests as the device does not support VLAN"
- 	fi
- }
- 
- check_prerequisites
--setup_ns ns1 ns2 ns3
--
- trap cleanup_all_ns EXIT
- 
-+setup_ns ns1 ns2 ns3
- setup_hsr_interfaces 0
--do_complete_ping_test
--
-+run_complete_ping_tests
- run_vlan_tests
- 
- setup_ns ns1 ns2 ns3
--
- setup_hsr_interfaces 1
--do_complete_ping_test
--
-+run_complete_ping_tests
- run_vlan_tests
- 
- exit $ret
-diff --git a/tools/testing/selftests/net/hsr/settings b/tools/testing/selftests/net/hsr/settings
-index 0fbc037f2aa8..ba4d85f74cd6 100644
---- a/tools/testing/selftests/net/hsr/settings
-+++ b/tools/testing/selftests/net/hsr/settings
-@@ -1 +1 @@
--timeout=50
-+timeout=90
++	local proto="$1"
++
++	if [ "$proto" = "HSRv0" ]; then
++		setup_hsr_topo 0
++		wait_for_hsr_node_table
++	elif [ "$proto" = "HSRv1" ]; then
++		setup_hsr_topo 1
++		wait_for_hsr_node_table
++	elif [ "$proto" = "PRP" ]; then
++		setup_prp_topo
++	else
++		check_err 1 "Unknown protocol (${proto})"
++	fi
++}
++
++check_ping()
++{
++	local node="$1"
++	local dst="$2"
++	local ping_args="-q -i 0.01 -c 400"
++
++	log_info "Running ping $node -> $dst"
++	# shellcheck disable=SC2086
++	output=$(ip netns exec "$node" ping $ping_args "$dst" | \
++		grep "packets transmitted")
++	log_info "$output"
++
++	dups=0
++	loss=0
++
++	if [[ "$output" =~ \+([0-9]+)" duplicates" ]]; then
++		dups="${BASH_REMATCH[1]}"
++	fi
++	if [[ "$output" =~ ([0-9\.]+\%)" packet loss" ]]; then
++		loss="${BASH_REMATCH[1]}"
++	fi
++
++	check_err "$dups" "Unexpected duplicate packets (${dups})"
++	if [ "$loss" != "0%" ]; then
++		check_err 1 "Unexpected packet loss (${loss})"
++	fi
++}
++
++test_clean()
++{
++	local proto="$1"
++
++	RET=0
++	tname="${FUNCNAME[0]} - ${proto}"
++
++	setup_topo "$proto"
++	if ((RET != ksft_pass)); then
++		log_test "${tname} setup"
++		return
++	fi
++
++	check_ping "$node1" "100.64.0.2"
++
++	log_test "${tname}"
++}
++
++test_clean_hsrv0()
++{
++	test_clean "HSRv0"
++}
++
++test_clean_hsrv1()
++{
++	test_clean "HSRv1"
++}
++
++test_clean_prp()
++{
++	test_clean "PRP"
++}
++
++test_cut_link()
++{
++	local proto="$1"
++
++	RET=0
++	tname="${FUNCNAME[0]} - ${proto}"
++
++	setup_topo "$proto"
++	if ((RET != ksft_pass)); then
++		log_test "${tname} setup"
++		return
++	fi
++
++	# Cutting link from subshell, so check_ping can run in the normal shell
++	# with access to global variables from the test harness.
++	(
++		sleep 2
++		log_info "Cutting link"
++		ip -net "$node1" link set vethB down
++	) &
++	check_ping "$node1" "100.64.0.2"
++
++	wait
++	log_test "${tname}"
++}
++
++
++test_cut_link_hsrv0()
++{
++	test_cut_link "HSRv0"
++}
++
++test_cut_link_hsrv1()
++{
++	test_cut_link "HSRv1"
++}
++
++test_cut_link_prp()
++{
++	test_cut_link "PRP"
++}
++
++cleanup()
++{
++	cleanup_all_ns
++}
++
++trap cleanup EXIT
++
++tests_run
++
++exit $EXIT_STATUS
 -- 
 2.52.0
 
