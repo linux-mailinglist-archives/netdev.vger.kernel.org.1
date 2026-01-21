@@ -1,365 +1,303 @@
-Return-Path: <netdev+bounces-251821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-251822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAW2DoOecGlyYgAAu9opvQ
-	(envelope-from <netdev+bounces-251821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:38:11 +0100
+	id iMP/HWChcGlyYgAAu9opvQ
+	(envelope-from <netdev+bounces-251822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:50:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA43F5486F
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:38:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD65C54B37
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 10:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C9BDE8292A4
-	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:28:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1954D84B5DB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jan 2026 09:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828DF47D92D;
-	Wed, 21 Jan 2026 09:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6763659EF;
+	Wed, 21 Jan 2026 09:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtCcDuK7"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="oLPc+O2a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4981D47B42C;
-	Wed, 21 Jan 2026 09:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B2E3ACEE8;
+	Wed, 21 Jan 2026 09:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768987423; cv=none; b=C1qvf7xPjSZPihBhX/NEyNXWQAQtFsnqHb2REtjJUKq0jAZbR+9pdVgFjp28JOv9KnFQVDOqSYlYXboDGxRe3fB+Rg1Sh9hy0ovdG2G5HR4ibfuUVDHHz4yHN9Dd41QyPSodEf+ho9JPjpqZ9IsmDN8huAVUGLKYD6PaJPsTglQ=
+	t=1768987967; cv=none; b=DhrXnnzPXB/AWjSm+Bd1Inibd3llfIP40w+adTw16L40Zvz6jiu4ZejqDTTQjralJzj/ExArnUNqYXkVJhFJNG2S2fmgkr7ABKu4FW+Bzls+BVlRKXdtum7dKtqCeqtd1xONjXGmcMnuCegJVVmzGlkuAvkKiFEXJl1kWkCA/LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768987423; c=relaxed/simple;
-	bh=xNWCmW31pGZmF7lTIVjzCHLl1hqt60gUK/dvIqhGBIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p8zzN4Prbj+yATyB0T+RSUH63qmOLdEjGVagBtjw9RBHHV9ssAnOnBsRrRgmIpfxVe6Y1bMlbU6dNJRRKDV1EHYonWtYZsf06V4tzrJLtHQAB6Xf0lZUwBZzIU7dUYz6wbbqMihJT9ere4VL7CzxyTYl3uQDCSKjor62Ywy+NsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtCcDuK7; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768987421; x=1800523421;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xNWCmW31pGZmF7lTIVjzCHLl1hqt60gUK/dvIqhGBIo=;
-  b=LtCcDuK7a7b2sva9u5w7oVRCcJxEx0fCqr3RF/8RFhgF3yguDoHqkqda
-   WzGKVnau6kXCaNIgv/viBnq8/KzRGyegCulb1NHCATQheHtxyaBDpTDlb
-   PU/6w6wuesXexZaLDTUP/4sjqMAjzzot8N5un3A1ZGvwPBU+EDl+k2F2K
-   XSiiyshzgYQxbjzlyXXYYnF5Wf7NtvRzxdfSkBJKJ1qUPcKKuT/AQqAAx
-   oqceeCm3C9LkvQgZpAGMTS2Rxz7uHjcyT9pIY3YtyhYizo/7C6S1rSeuM
-   tXQSvtZAv27Ek/k3utSuj5Y5uey6th1w2KTDUJ+C5jeBBtwJcRXiBGt28
-   Q==;
-X-CSE-ConnectionGUID: V6LQ2jrXQAyJ7yExUbJj/A==
-X-CSE-MsgGUID: U0s324AETJetjDpFoIXXqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="57773286"
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="57773286"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 01:23:40 -0800
-X-CSE-ConnectionGUID: Ydd0iDNfTzmreqfJY5KpAg==
-X-CSE-MsgGUID: MLLY5h18S8W26brRs1IpWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="210561009"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa003.jf.intel.com with ESMTP; 21 Jan 2026 01:23:39 -0800
-From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] i2c: Add SMBus ARP target mode test driver
-Date: Wed, 21 Jan 2026 10:23:28 +0100
-Message-ID: <20260121092328.2308705-5-heikki.krogerus@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
-References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
+	s=arc-20240116; t=1768987967; c=relaxed/simple;
+	bh=S6Jsr9iC1GnVhpjf+bKMgc9kqfY4K5WhFGlPiUf4D5c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=neufYmS2FbM9EJiHMukk0ypHuGSmnrCyOhDUAgIxsJeFZRmH6JQ/mY84wAbEJEQbVgC0aZ3JXDHuBI2cCpSJFAlSFcJ4t6lgxvAr4M9jN4nn32JEr5RX+sSbZAbU1pnS6ZcZg9weLmAeEXLTUH6E9rVaMDowk958ow9dLFAWelM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=oLPc+O2a; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.154] ([129.217.186.154])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60L9WTZn002712
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 21 Jan 2026 10:32:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1768987950;
+	bh=S6Jsr9iC1GnVhpjf+bKMgc9kqfY4K5WhFGlPiUf4D5c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=oLPc+O2a+imba04rEJKdoffOHEI3asOVNiGnLpMjfxgrQvT/+R5Wxp6keF24mbA26
+	 aH6sY8FA3gQ6Gq4JT5v8QeONQnluxk7jCFygUmvE4sroDo4KYMibV5g8Wb0DdGQtGW
+	 VeHETgZHaQkMGedV1/x8YlYBotJSzhkj3fMpuSQk=
+Message-ID: <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
+Date: Wed, 21 Jan 2026 10:32:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
+ <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
+ <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
+ <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-251821-lists,netdev=lfdr.de];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-251822-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[tu-dortmund.de,none];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[heikki.krogerus@linux.intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,linux.intel.com:mid]
-X-Rspamd-Queue-Id: BA43F5486F
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: DD65C54B37
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Backend that the hosts can enumerate by using the SMBus
-Address Resolution Protocol.
+On 1/9/26 07:02, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 1/8/26 04:38, Jason Wang wrote:
+>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
+>>>> and wake the corresponding netdev subqueue when consuming an entry frees
+>>>> space in the underlying ptr_ring.
+>>>>
+>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
+>>>> in an upcoming commit.
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
+>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
+>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>> index 1197f245e873..2442cf7ac385 100644
+>>>> --- a/drivers/net/tap.c
+>>>> +++ b/drivers/net/tap.c
+>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>         return ret ? ret : total;
+>>>>  }
+>>>>
+>>>> +static void *tap_ring_consume(struct tap_queue *q)
+>>>> +{
+>>>> +       struct ptr_ring *ring = &q->ring;
+>>>> +       struct net_device *dev;
+>>>> +       void *ptr;
+>>>> +
+>>>> +       spin_lock(&ring->consumer_lock);
+>>>> +
+>>>> +       ptr = __ptr_ring_consume(ring);
+>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>> +               rcu_read_lock();
+>>>> +               dev = rcu_dereference(q->tap)->dev;
+>>>> +               netif_wake_subqueue(dev, q->queue_index);
+>>>> +               rcu_read_unlock();
+>>>> +       }
+>>>> +
+>>>> +       spin_unlock(&ring->consumer_lock);
+>>>> +
+>>>> +       return ptr;
+>>>> +}
+>>>> +
+>>>>  static ssize_t tap_do_read(struct tap_queue *q,
+>>>>                            struct iov_iter *to,
+>>>>                            int noblock, struct sk_buff *skb)
+>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>>>>                                         TASK_INTERRUPTIBLE);
+>>>>
+>>>>                 /* Read frames from the queue */
+>>>> -               skb = ptr_ring_consume(&q->ring);
+>>>> +               skb = tap_ring_consume(q);
+>>>>                 if (skb)
+>>>>                         break;
+>>>>                 if (noblock) {
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index 8192740357a0..7148f9a844a4 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>         return total;
+>>>>  }
+>>>>
+>>>> +static void *tun_ring_consume(struct tun_file *tfile)
+>>>> +{
+>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
+>>>> +       struct net_device *dev;
+>>>> +       void *ptr;
+>>>> +
+>>>> +       spin_lock(&ring->consumer_lock);
+>>>> +
+>>>> +       ptr = __ptr_ring_consume(ring);
+>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>
+>>> I guess it's the "bug" I mentioned in the previous patch that leads to
+>>> the check of __ptr_ring_consume_created_space() here. If it's true,
+>>> another call to tweak the current API.
+>>>
+>>>> +               rcu_read_lock();
+>>>> +               dev = rcu_dereference(tfile->tun)->dev;
+>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
+>>>
+>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
+>>> I'm not sure is what we want.
+>>
+>> What else would you suggest calling to wake the queue?
+> 
+> I don't have a good method in my mind, just want to point out its implications.
 
-Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
----
- drivers/i2c/Kconfig          |   6 ++
- drivers/i2c/Makefile         |   1 +
- drivers/i2c/i2c-target-arp.c | 201 +++++++++++++++++++++++++++++++++++
- 3 files changed, 208 insertions(+)
- create mode 100644 drivers/i2c/i2c-target-arp.c
+I have to admit I'm a bit stuck at this point, particularly with this
+aspect.
 
-diff --git a/drivers/i2c/Kconfig b/drivers/i2c/Kconfig
-index c232054fddd6..4b97a66fc698 100644
---- a/drivers/i2c/Kconfig
-+++ b/drivers/i2c/Kconfig
-@@ -134,6 +134,12 @@ config I2C_SLAVE_TESTUNIT
- 	  multi-master, SMBus Host Notify, etc. Please read
- 	  Documentation/i2c/slave-testunit-backend.rst for further details.
- 
-+config I2C_TARGET_ARP
-+	tristate "SMBus ARP target mode test driver"
-+	help
-+	  This backend makes Linux respond to SMBus Address Resolution Protocol
-+	  commands.
-+
- endif
- 
- config I2C_DEBUG_CORE
-diff --git a/drivers/i2c/Makefile b/drivers/i2c/Makefile
-index 4fdb37b94aa4..3ea292dab065 100644
---- a/drivers/i2c/Makefile
-+++ b/drivers/i2c/Makefile
-@@ -19,5 +19,6 @@ obj-y				+= algos/ busses/ muxes/
- obj-$(CONFIG_I2C_STUB)		+= i2c-stub.o
- obj-$(CONFIG_I2C_SLAVE_EEPROM)	+= i2c-slave-eeprom.o
- obj-$(CONFIG_I2C_SLAVE_TESTUNIT)	+= i2c-slave-testunit.o
-+obj-$(CONFIG_I2C_TARGET_ARP)	+= i2c-target-arp.o
- 
- ccflags-$(CONFIG_I2C_DEBUG_CORE) := -DDEBUG
-diff --git a/drivers/i2c/i2c-target-arp.c b/drivers/i2c/i2c-target-arp.c
-new file mode 100644
-index 000000000000..458749e4681e
---- /dev/null
-+++ b/drivers/i2c/i2c-target-arp.c
-@@ -0,0 +1,201 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * SMBus Address Resolution Protocol target mode test driver
-+ *
-+ * Copyright (C) 2026 Intel Corporation
-+ */
-+#include <linux/bits.h>
-+#include <linux/device/devres.h>
-+#include <linux/i2c.h>
-+#include <linux/i2c-smbus.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+
-+#define ARP_ADDRESS_VALID	BIT(0)
-+#define ARP_ADDRESS_RESOLVED	BIT(1)
-+
-+#define I2C_SMBUS_HOST		0x08
-+#define I2C_SMBUS_DEFAULT_ADDR	0x61
-+
-+#define ARP_CMD_PREPARE_TO_ARP	0x01
-+#define ARP_CMD_RESET_DEVICE	0x02
-+#define ARP_CMD_GET_UDID	0x03
-+#define ARP_CMD_ASSIGN_ADDRESS	0x04
-+
-+struct get_udid_data {
-+	struct i2c_arp_udid	udid;
-+	u8			target_addr;
-+} __packed;
-+
-+struct arp_target {
-+	struct i2c_client target;
-+	struct i2c_client *client;
-+
-+	int read_count;
-+	int write_count;
-+	unsigned char buf[24];
-+
-+	struct get_udid_data data;
-+	unsigned char flag;
-+};
-+
-+static u8 i2c_arp_pec(struct arp_target *arp, bool read)
-+{
-+	u8 addr = I2C_SMBUS_DEFAULT_ADDR << 1;
-+	u8 len = sizeof(arp->data);
-+	u8 pec = 0;
-+
-+	pec = i2c_smbus_pec(pec, &addr, 1);
-+	pec = i2c_smbus_pec(pec, arp->buf, arp->write_count);
-+
-+	if (read) {
-+		addr |= 1;
-+		pec = i2c_smbus_pec(pec, &addr, 1);
-+		pec = i2c_smbus_pec(pec, &len, 1);
-+		pec = i2c_smbus_pec(pec, (void *)&arp->data, len);
-+	}
-+
-+	return pec;
-+}
-+
-+static int i2c_target_arp_cb(struct i2c_client *target, enum i2c_slave_event event, u8 *val)
-+{
-+	struct arp_target *arp = container_of(target, struct arp_target, target);
-+
-+	switch (event) {
-+	case I2C_SLAVE_READ_PROCESSED:
-+		if (arp->flag)
-+			break;
-+
-+		if (arp->read_count == sizeof(arp->data))
-+			*val = i2c_arp_pec(arp, 1);
-+		else
-+			*val = ((u8 *)&arp->data)[arp->read_count];
-+
-+		arp->read_count++;
-+		break;
-+	case I2C_SLAVE_READ_REQUESTED:
-+		if (arp->flag)
-+			break;
-+
-+		*val = sizeof(arp->data);
-+		break;
-+	case I2C_SLAVE_STOP:
-+		switch (arp->buf[0]) {
-+		case ARP_CMD_PREPARE_TO_ARP:
-+			arp->flag = 0;
-+			break;
-+		case ARP_CMD_ASSIGN_ADDRESS:
-+			/* If the UDID matches, this address is for us. */
-+			if (!memcmp(&arp->buf[2], &arp->data.udid, sizeof(arp->data.udid)))
-+				arp->flag = ARP_ADDRESS_VALID | ARP_ADDRESS_RESOLVED;
-+			break;
-+		default:
-+			break;
-+		}
-+
-+		arp->read_count = 0;
-+		arp->write_count = 0;
-+		break;
-+	case I2C_SLAVE_WRITE_REQUESTED:
-+		arp->read_count = 0;
-+		arp->write_count = 0;
-+		break;
-+	case I2C_SLAVE_WRITE_RECEIVED:
-+		arp->buf[arp->write_count] = *val;
-+		arp->write_count++;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static void i2c_notify_arp_controller(struct i2c_client *client)
-+{
-+	union i2c_smbus_data data = { };
-+	int ret;
-+
-+	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_WORD_DATA))
-+		return;
-+
-+	ret = i2c_smbus_xfer(client->adapter, I2C_SMBUS_HOST, client->flags,
-+			     I2C_SMBUS_WRITE, client->addr,
-+			     I2C_SMBUS_WORD_DATA, &data);
-+	if (ret)
-+		dev_warn(&client->dev, "Failed to Notify ARP Controller (%d)\n", ret);
-+}
-+
-+static int i2c_target_arp_probe(struct i2c_client *client)
-+{
-+	struct arp_target *arp;
-+	int ret;
-+
-+	arp = devm_kzalloc(&client->dev, sizeof(*arp), GFP_KERNEL);
-+	if (!arp)
-+		return -ENOMEM;
-+
-+	arp->client = client;
-+	i2c_set_clientdata(client, arp);
-+
-+	arp->target = *client;
-+	arp->target.addr = I2C_SMBUS_DEFAULT_ADDR;
-+	arp->target.flags |= I2C_CLIENT_SLAVE;
-+
-+	/*
-+	 * The vendor and device ID are left undefined. Some hosts may not
-+	 * support this. If that's the case, supply values for them.
-+	 *
-+	 * arp->data.udid.vendor = 0xXXXX;
-+	 * arp->data.udid.device = 0xXXXX;
-+	 *
-+	 * The capabilities are also 0. That makes this a fixed address device
-+	 * without support for PEC.
-+	 */
-+	arp->data.udid.version = BIT(3); /* UDID Version 1 */
-+	arp->data.udid.interface = SMBUS_INTERFACE_SMBUS_V2_0;
-+	arp->data.target_addr = client->addr;
-+
-+	/*
-+	 * NOTE: This target is only for the ARP. After the address has been
-+	 * assigned, another target should be registered for the actual device,
-+	 * but this test code does _not_ register it.
-+	 */
-+	ret = i2c_slave_register(&arp->target, i2c_target_arp_cb);
-+	if (ret)
-+		return ret;
-+
-+	i2c_notify_arp_controller(client);
-+
-+	return 0;
-+}
-+
-+static void i2c_target_arp_remove(struct i2c_client *client)
-+{
-+	struct arp_target *arp;
-+
-+	if (IS_ERR_OR_NULL(client))
-+		return;
-+
-+	arp = i2c_get_clientdata(client);
-+	i2c_slave_unregister(&arp->target);
-+}
-+
-+static const struct i2c_device_id i2c_target_arp_id[] = {
-+	{ "target-arp" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(i2c, i2c_target_arp_id);
-+
-+static struct i2c_driver i2c_target_arp_driver = {
-+	.driver = {
-+		.name = "i2c-target-arp",
-+	},
-+	.probe = i2c_target_arp_probe,
-+	.remove = i2c_target_arp_remove,
-+	.id_table = i2c_target_arp_id,
-+};
-+module_i2c_driver(i2c_target_arp_driver);
-+
-+MODULE_DESCRIPTION("SMBus ARP target mode test driver");
-+MODULE_LICENSE("GPL");
--- 
-2.50.1
+What is the correct way to pass the producer CPU ID to the consumer?
+Would it make sense to store smp_processor_id() in the tfile inside
+tun_net_xmit(), or should it instead be stored in the skb (similar to the
+XDP bit)? In the latter case, my concern is that this information may
+already be significantly outdated by the time it is used.
 
+Based on that, my idea would be for the consumer to wake the producer by
+invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
+smp_call_function_single().
+Is this a reasonable approach?
+
+More generally, would triggering TX_SOFTIRQ on the consumer CPU be
+considered a deal-breaker for the patch set?
+
+Thanks!
+
+> 
+>>
+>>>
+>>>> +               rcu_read_unlock();
+>>>> +       }
+>>>
+>>> Btw, this function duplicates a lot of logic of tap_ring_consume() we
+>>> should consider to merge the logic.
+>>
+>> Yes, it is largely the same approach, but it would require accessing the
+>> net_device each time.
+> 
+> The problem is that, at least for TUN, the socket is loosely coupled
+> with the netdev. It means the netdev can go away while the socket
+> might still exist. That's why vhost only talks to the socket, not the
+> netdev. If we really want to go this way, here, we should at least
+> check the existence of tun->dev first.
+> 
+>>
+>>>
+>>>> +
+>>>> +       spin_unlock(&ring->consumer_lock);
+>>>> +
+>>>> +       return ptr;
+>>>> +}
+>>>> +
+>>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>  {
+>>>>         DECLARE_WAITQUEUE(wait, current);
+>>>>         void *ptr = NULL;
+>>>>         int error = 0;
+>>>>
+>>>> -       ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>> +       ptr = tun_ring_consume(tfile);
+>>>
+>>> I'm not sure having a separate patch like this may help. For example,
+>>> it will introduce performance regression.
+>>
+>> I ran benchmarks for the whole patch set with noqueue (where the queue is
+>> not stopped to preserve the old behavior), as described in the cover
+>> letter, and observed no performance regression. This leads me to conclude
+>> that there is no performance impact because of this patch when the queue
+>> is not stopped.
+> 
+> Have you run a benchmark per patch? Or it might just be because the
+> regression is not obvious. But at least this patch would introduce
+> more atomic operations or it might just because the TUN doesn't
+> support burst so pktgen can't have the best PPS.
+> 
+> Thanks
+> 
+> 
+>>
+>>>
+>>>>         if (ptr)
+>>>>                 goto out;
+>>>>         if (noblock) {
+>>>> @@ -2131,7 +2152,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>
+>>>>         while (1) {
+>>>>                 set_current_state(TASK_INTERRUPTIBLE);
+>>>> -               ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>> +               ptr = tun_ring_consume(tfile);
+>>>>                 if (ptr)
+>>>>                         break;
+>>>>                 if (signal_pending(current)) {
+>>>> --
+>>>> 2.43.0
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
