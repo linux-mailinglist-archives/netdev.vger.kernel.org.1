@@ -1,614 +1,262 @@
-Return-Path: <netdev+bounces-252511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNHoE8N5cmlSlQAAu9opvQ
-	(envelope-from <netdev+bounces-252511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:25:55 +0100
+	id GM6MOI96cmmklQAAu9opvQ
+	(envelope-from <netdev+bounces-252512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:29:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBAB6CFE1
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:25:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE756D036
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3FD93300B454
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:25:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C839300A8EC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD51938B9A6;
-	Thu, 22 Jan 2026 19:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4198F38757E;
+	Thu, 22 Jan 2026 19:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKi1NJia"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IRvo8sWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B310388875
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EBF333442
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769109951; cv=none; b=hZYY7Td7wYrKdkgcdbJkfxej8YLLS4pMoiR8e8lFjqLwvE/sTj2E9AfgtHhXg/zYGBUuQ74FQJt+/xk7VSXL57xBzQd7DrKIwnp4fF7KqMri+M/8f+SaPEtskADFtvOHRD+hK6Hz0Vh3fFVIBc20z3xPSgthsA/Tfh9Ep1hMAug=
+	t=1769110155; cv=none; b=ET2a2hFlRVKXB8/XH5Opifh32JJy+Oug8sLblTB+WeJ3ITkog4LaDM2xxkhgXq259U6WT2ht8SVkPT6UsD51TeTWBBKzxkBaBG09EhU14cZvu4XmSSZld4oBnNDNthlbhgWr1wSJOoztq4qq2x1gMaRtdmBBMXAkI+eb/JBW+n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769109951; c=relaxed/simple;
-	bh=jdgMcKVdSB39G4/lNBHFNetOkjR/zR601eO0BRbqET0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CmKaITRj/7WYMZ/4Ad2VmPKIDgE2Yy3jjuN/3twqaxS7aGRXe0Y/xOZE9hpUrZ0ERrk41ijN6gh1WoEL00Pok0CdptLtln6x2anVU5fd5TcWEr8LDm7OwNMD6gFmsJXvzFnVr+g/40rqfR0FikLrApzfA+mVdpB6QN+Vy1QlDdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gKi1NJia; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-823081bb15fso655181b3a.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:25:38 -0800 (PST)
+	s=arc-20240116; t=1769110155; c=relaxed/simple;
+	bh=jUCUYHk/vIhT6Vfw1pwSSz1Dc2LLzMz4IyaKQcasnjI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VJWVpBIhdKI1qlU1YhhFCNsF93bjUI8FBbDWfa9GANu8v2oUw4hENeIANxzLxA8zzufsDxu0dy5Qho4tLFIkKPGkxlNEE67SthSv7A7j5hMyjZfqkqW71soYEDWB4C8cxg3ASmfX6SpudsRivd/bP3awxkPHRMy6LCX2jSM2ab4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IRvo8sWu; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6581af9c94aso2865069a12.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:29:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769109936; x=1769714736; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1769110148; x=1769714948; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kg5uIQs2aqLLWSbVn9bFSM/HstapWJsX7MAzjUFagsQ=;
-        b=gKi1NJiayPamZwYGHdnskX/JpQbPgb0NyuWsiiJmoQ5UNWGNiPG/+VAvBp6xNnRgy+
-         yBKTVZq4scUPCDhtG6wzZt9V+n39lfc0LOhSKwgYCHiMQlgIAQY+cXcSXwmawFA4oJRU
-         Ky3TTUqgtRF5oAKhiC5qYdZ6AKtSggJlitPY6pLljrRFcnk2unHCBP5j+uupy3ORIprz
-         OAk9bHMXQ//xXbbb7ca6Qzc/vOG9C+c+HLFtvAu+OcnXFJQINYHIWaq82TJLzWGQJ2JA
-         XNZoAOEq7MQg7+fks8UGAz7Ri2718acDSY8RNqcM/KTTeUC9TvMvMBh8kA5V8hv2nXmk
-         NtRA==
+        bh=DSEabhcfDlsXWJ1LXzQaN8xBnQ5waXUHWyGy6/gLO7w=;
+        b=IRvo8sWuBzUdzsL/Xb0O/75jVV35KppEYlrV0DrPwJeJpEsxOtghYnOBNGmhaba74L
+         xYvrCn8ajZPW/dlwSe28iI7nIkpYGGxxcMrAg1YTALBemsKzLm8xizqSGqbw5dIRlc+S
+         91gpOpQK8HjQiEtAhuBkzf08MBuB6YmPYU0BFkEuje8qkmEzlQqrMtsUvFMW4QCLdH+e
+         2yO6L5LZqrSjhxF5mX0H4NChhGI7SKpzihMAwQCxjJ8V0J2W5SgtC10+D7DlUe9W87dG
+         c+/kgS4k9cu4RNgtyJPycfbvoTgfsTJlrC4jHVoeoEhy4odADMk+KVCYJAEYydQ8bxSL
+         4+QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769109936; x=1769714736;
+        d=1e100.net; s=20230601; t=1769110148; x=1769714948;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Kg5uIQs2aqLLWSbVn9bFSM/HstapWJsX7MAzjUFagsQ=;
-        b=MYmZ73hHTJDbYXZfiYkvg20V5f2eTPWPjIgcWfLfRbHd1Yvbik3V206OoGqjX29Cpq
-         gpjCxKhn4+Ply8tfjlP3Hjc7evzLeohzZffwGRCcQcyUQi79ppTdTUnjfxs6o8QUAA5I
-         j+mRAFs3Uv21HRR0uzVIHx9xdjs05275oujk7sIdn9Px3NMyud3o6SkaIRcGgdkXjkNv
-         BEcO01wcd6R5fPFWZYxLk54BAMNj8ETzI3hQnzZVvvG3bWekhTd4CKeQMQ5uFJ7WvtRo
-         IIEjCf1rVh646M+SmSwCpEbCJzroWd3Rek4+Lf0WdqAE/5iBNs87beJn+hqZNTb8fKaH
-         SK8A==
-X-Gm-Message-State: AOJu0YzhPCxTrNH4BhrpsNF1qL8jIO4FVSSFRX3nu9VrKrygUYS7GFMF
-	uzhw5+pBTKDwlZtDevnfxR+X8cT+pTnsk5GXXCM8/VRh6B/exluVl6N0J1uOgA==
-X-Gm-Gg: AZuq6aIiFDinNXqE5yuoK6Toa2klhFan0OmlAcK8NMM+T9eVFtSDW12Cs2oHsjunj1I
-	xwtA9bSFklUlg64Qq9p3glSeXeBiCMnFj+T5YZBS6O6TrBM5xYT3TVvwfvbTc3opU9ttbt3bCjz
-	Xk3Oc/1dZ3buaQh4xGcQ7Qis/vZnaO4DOeXITZPheqwHToKuVV8oNHe6FVvfZatDC/uEf/u6L/P
-	5iQSZpLRN0yzhTExa4p3nehGT6NIoxBXB0YTZhMaxgm5nMzExbU3UimTZ3VLt8ardwun2BTyv9o
-	iKXiZf04OBpBVgVYYIfZ8qDQ82Q7WZr74Y1YqOtUHQbIuPMHPWjyCpRbg7NzsCzRQyBz3sZIc1K
-	fHXGk1ZW1BZPiG9uX/Wp8jqNutazD68s7M+WBmpD9dva2hvfgo+q2sWZrBGpULAXhOjb9cuRzNg
-	MmSbEq2+Un0MLpJiz1FjNkujSJW0nOevH+lyPAErp6uhkD9O7U16B0nA==
-X-Received: by 2002:a05:6a00:3cd6:b0:823:8a5:297f with SMTP id d2e1a72fcca58-82317da469cmr337717b3a.16.1769109936001;
-        Thu, 22 Jan 2026 11:25:36 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231873ec59sm136239b3a.53.2026.01.22.11.25.27
+        bh=DSEabhcfDlsXWJ1LXzQaN8xBnQ5waXUHWyGy6/gLO7w=;
+        b=HAsTUEA812TshhARDnQDUS2gfAz62dCqg4li8DQ/Zv8v8l8rJR0YCtr1+cR4ePbTQz
+         QEr31ZqHAqefEn/rT4Jh0sIUJGGXCVj5pfWcAtPz4LdvY5TCL/pTlgh5l2PxcncEocOk
+         VgNuldTzTrkShvYQrtsD5wJElFFZ3l7EKbt+cxebXMzHawrQlB6cl2jin57f8+gv9Tz2
+         PstwtMY+YVdLNOJ8n//v29saW5NVQVUcBfJ5/IBTwAtzO1k85WpIvgCykFC/P/lXY9SW
+         Ygh1oGyP/OPeV5eOvVaf2qK/sO/dk+el+kIOK9PwtLHo0rxtdkXM8SqrXj1uV8X7TKRj
+         gALw==
+X-Gm-Message-State: AOJu0Yxd7vYmX9956BKIA5rjGQEY2E7ehKTJo18yPFwoJX4KCyA/szcH
+	MwfMybXbN25Eqr+IGuuvPtaw9t4IjQFIB78LrjgY5Lqboe4s8iqhLKsxaCSSOpVqGBciK0p0EgM
+	vEDG3z4VLy4nvTpoXneqD4Up4ozKcC7djHITnC69doLYYXRZd/kYGl/bC9UtxlskLmGFmbga/Nk
+	3PNlsVSoozacRVIwiIU1gRfYZdpcpTN3SOYp7oaHxAu2sJRtU=
+X-Gm-Gg: AZuq6aLk6OgDo5TadgWhH3AD9myxZ3txUon3hBget0nFmcwuRKXKQcEnciFqFybXqNj
+	enkLfwQArxeNDD6KEDoYzMBC0g80DOpAIUC+swk6YXI2ZI5QKFu9TB92tMZ115VSy7h3S/uiKL8
+	nv+O96Z0wf2pvYT+UOp6k2VNmJmUrwWUFnXEXbrz6/a5encHMCo0pFcvd0pG0NMQI0j7G/t+FqC
+	KtHGF2kSN5C4oVkXpgPgxlCoAFg/31nqkSs1D59w3DU3wBt0QCNpY288/kj29dGJbW+QeftJN7r
+	UESxNn7VhzKbx33slkW2F8NdaXPVitUkqcGGbm0yIOXSPu7wllM5pDIXHpKLGUnJYXCzxxUvLbO
+	JeNWEuFJJnJAzFaR1Cd/ePiPsQBoNuvpCNAq1qqt1gtr6RZtEM3aT+pN3QkcNg13OyIfDwep2xS
+	2J+F7mgb0S506ZKhx4+C7eJOeRzwXTAXEAEpL0
+X-Received: by 2002:a17:907:3daa:b0:b88:464f:3db8 with SMTP id a640c23a62f3a-b885ae9e6e6mr21131266b.49.1769110147763;
+        Thu, 22 Jan 2026 11:29:07 -0800 (PST)
+Received: from dev-rjethwani.dev.purestorage.com ([2620:125:9007:640:ffff::71f8])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b885b8011dfsm7925266b.70.2026.01.22.11.29.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 11:25:35 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
+        Thu, 22 Jan 2026 11:29:07 -0800 (PST)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
 To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Amit Bernstein <amitbern@amazon.com>,
-	Simon Horman <horms@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Breno Leitao <leitao@debian.org>,
-	Kohei Enju <enjuk@amazon.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [RFC net-next] net: ena: Use u64_stats_t with u64_stats_sync properly
-Date: Fri, 23 Jan 2026 03:24:49 +0800
-Message-ID: <20260122192513.2771569-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	leon@kernel.org,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH v5 0/3] tls: Add TLS 1.3 hardware offload support
+Date: Thu, 22 Jan 2026 12:28:48 -0700
+Message-Id: <20260122192851.86670-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,amazon.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,debian.org,intel.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	TAGGED_FROM(0.00)[bounces-252511-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252512-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CEBAB6CFE1
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,purestorage.com:mid,purestorage.com:dkim]
+X-Rspamd-Queue-Id: 3AE756D036
 X-Rspamd-Action: no action
 
-On 64bit arches, struct u64_stats_sync is empty and provides no help
-against load/store tearing. Convert to u64_stats_t to ensure atomic
-operations.
+Hi all,
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
-RFC Comment:
+This patch series adds TLS 1.3 support to the kernel TLS hardware offload
+infrastructure, enabling hardware acceleration for TLS 1.3 connections
+including KeyUpdate (rekey) support.
 
-The write side of u64_stats should ensure mutual exclusion, however I couldn't
-find the synchronization mechanism in use (for example, ena_up / ena_io_poll /
-ena_start_xmit). Should this be considered an issue?
- .../net/ethernet/amazon/ena/ena_admin_defs.h  | 18 ++--
- drivers/net/ethernet/amazon/ena/ena_ethtool.c | 27 +++---
- drivers/net/ethernet/amazon/ena/ena_netdev.c  | 50 ++++++----
- drivers/net/ethernet/amazon/ena/ena_netdev.h  | 92 +++++++++----------
- drivers/net/ethernet/amazon/ena/ena_xdp.c     |  2 +-
- drivers/net/ethernet/amazon/ena/ena_xdp.h     |  2 +-
- 6 files changed, 101 insertions(+), 90 deletions(-)
+Background
+==========
+Currently, the kernel TLS device offload only supports TLS 1.2. With
+TLS 1.3 being the current standard and widely deployed, there is a
+growing need to extend hardware offload support to TLS 1.3 connections.
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-index 898ecd96b96a..d8a494e44f3b 100644
---- a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-@@ -440,42 +440,42 @@ struct ena_admin_eni_stats {
- 	/* The number of packets shaped due to inbound aggregate BW
- 	 * allowance being exceeded
- 	 */
--	u64 bw_in_allowance_exceeded;
-+	u64_stats_t bw_in_allowance_exceeded;
- 
- 	/* The number of packets shaped due to outbound aggregate BW
- 	 * allowance being exceeded
- 	 */
--	u64 bw_out_allowance_exceeded;
-+	u64_stats_t bw_out_allowance_exceeded;
- 
- 	/* The number of packets shaped due to PPS allowance being exceeded */
--	u64 pps_allowance_exceeded;
-+	u64_stats_t pps_allowance_exceeded;
- 
- 	/* The number of packets shaped due to connection tracking
- 	 * allowance being exceeded and leading to failure in establishment
- 	 * of new connections
- 	 */
--	u64 conntrack_allowance_exceeded;
-+	u64_stats_t conntrack_allowance_exceeded;
- 
- 	/* The number of packets shaped due to linklocal packet rate
- 	 * allowance being exceeded
- 	 */
--	u64 linklocal_allowance_exceeded;
-+	u64_stats_t linklocal_allowance_exceeded;
- };
- 
- struct ena_admin_ena_srd_stats {
- 	/* Number of packets transmitted over ENA SRD */
--	u64 ena_srd_tx_pkts;
-+	u64_stats_t ena_srd_tx_pkts;
- 
- 	/* Number of packets transmitted or could have been
- 	 * transmitted over ENA SRD
- 	 */
--	u64 ena_srd_eligible_tx_pkts;
-+	u64_stats_t ena_srd_eligible_tx_pkts;
- 
- 	/* Number of packets received over ENA SRD */
--	u64 ena_srd_rx_pkts;
-+	u64_stats_t ena_srd_rx_pkts;
- 
- 	/* Percentage of the ENA SRD resources that is in use */
--	u64 ena_srd_resource_utilization;
-+	u64_stats_t ena_srd_resource_utilization;
- };
- 
- /* ENA SRD Statistics Command */
-diff --git a/drivers/net/ethernet/amazon/ena/ena_ethtool.c b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-index 2455d6dddc26..ff26b99bfc2f 100644
---- a/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-@@ -27,12 +27,12 @@ struct ena_hw_metrics {
- 
- #define ENA_STAT_ENTRY(stat, stat_type) { \
- 	.name = #stat, \
--	.stat_offset = offsetof(struct ena_stats_##stat_type, stat) / sizeof(u64) \
-+	.stat_offset = offsetof(struct ena_stats_##stat_type, stat) / sizeof(u64_stats_t) \
- }
- 
- #define ENA_STAT_HW_ENTRY(stat, stat_type) { \
- 	.name = #stat, \
--	.stat_offset = offsetof(struct ena_admin_##stat_type, stat) / sizeof(u64) \
-+	.stat_offset = offsetof(struct ena_admin_##stat_type, stat) / sizeof(u64_stats_t) \
- }
- 
- #define ENA_STAT_RX_ENTRY(stat) \
-@@ -154,14 +154,14 @@ static const struct ena_stats ena_stats_ena_com_strings[] = {
- #define ENA_STATS_ARRAY_ENA_SRD		ARRAY_SIZE(ena_srd_info_strings)
- #define ENA_METRICS_ARRAY_ENI		ARRAY_SIZE(ena_hw_stats_strings)
- 
--static void ena_safe_update_stat(u64 *src, u64 *dst,
-+static void ena_safe_update_stat(u64_stats_t *src, u64 *dst,
- 				 struct u64_stats_sync *syncp)
- {
- 	unsigned int start;
- 
- 	do {
- 		start = u64_stats_fetch_begin(syncp);
--		*(dst) = *src;
-+		*dst = u64_stats_read(src);
- 	} while (u64_stats_fetch_retry(syncp, start));
- }
- 
-@@ -169,7 +169,7 @@ static void ena_metrics_stats(struct ena_adapter *adapter, u64 **data)
- {
- 	struct ena_com_dev *dev = adapter->ena_dev;
- 	const struct ena_stats *ena_stats;
--	u64 *ptr;
-+	u64_stats_t *ptr;
- 	int i;
- 
- 	if (ena_com_get_cap(dev, ENA_ADMIN_CUSTOMER_METRICS)) {
-@@ -191,7 +191,7 @@ static void ena_metrics_stats(struct ena_adapter *adapter, u64 **data)
- 		for (i = 0; i < ENA_STATS_ARRAY_ENI; i++) {
- 			ena_stats = &ena_stats_eni_strings[i];
- 
--			ptr = (u64 *)&adapter->eni_stats +
-+			ptr = (u64_stats_t *)&adapter->eni_stats +
- 				ena_stats->stat_offset;
- 
- 			ena_safe_update_stat(ptr, (*data)++, &adapter->syncp);
-@@ -201,14 +201,14 @@ static void ena_metrics_stats(struct ena_adapter *adapter, u64 **data)
- 	if (ena_com_get_cap(dev, ENA_ADMIN_ENA_SRD_INFO)) {
- 		ena_com_get_ena_srd_info(dev, &adapter->ena_srd_info);
- 		/* Get ENA SRD mode */
--		ptr = (u64 *)&adapter->ena_srd_info;
-+		ptr = (u64_stats_t *)&adapter->ena_srd_info;
- 		ena_safe_update_stat(ptr, (*data)++, &adapter->syncp);
- 		for (i = 1; i < ENA_STATS_ARRAY_ENA_SRD; i++) {
- 			ena_stats = &ena_srd_info_strings[i];
- 			/* Wrapped within an outer struct - need to accommodate an
- 			 * additional offset of the ENA SRD mode that was already processed
- 			 */
--			ptr = (u64 *)&adapter->ena_srd_info +
-+			ptr = (u64_stats_t *)&adapter->ena_srd_info +
- 				ena_stats->stat_offset + 1;
- 
- 			ena_safe_update_stat(ptr, (*data)++, &adapter->syncp);
-@@ -221,7 +221,7 @@ static void ena_queue_stats(struct ena_adapter *adapter, u64 **data)
- 	const struct ena_stats *ena_stats;
- 	struct ena_ring *ring;
- 
--	u64 *ptr;
-+	u64_stats_t *ptr;
- 	int i, j;
- 
- 	for (i = 0; i < adapter->num_io_queues + adapter->xdp_num_queues; i++) {
-@@ -231,7 +231,8 @@ static void ena_queue_stats(struct ena_adapter *adapter, u64 **data)
- 		for (j = 0; j < ENA_STATS_ARRAY_TX; j++) {
- 			ena_stats = &ena_stats_tx_strings[j];
- 
--			ptr = (u64 *)&ring->tx_stats + ena_stats->stat_offset;
-+			ptr = (u64_stats_t *)&ring->tx_stats +
-+				ena_stats->stat_offset;
- 
- 			ena_safe_update_stat(ptr, (*data)++, &ring->syncp);
- 		}
-@@ -243,7 +244,7 @@ static void ena_queue_stats(struct ena_adapter *adapter, u64 **data)
- 			for (j = 0; j < ENA_STATS_ARRAY_RX; j++) {
- 				ena_stats = &ena_stats_rx_strings[j];
- 
--				ptr = (u64 *)&ring->rx_stats +
-+				ptr = (u64_stats_t *)&ring->rx_stats +
- 					ena_stats->stat_offset;
- 
- 				ena_safe_update_stat(ptr, (*data)++, &ring->syncp);
-@@ -273,13 +274,13 @@ static void ena_get_stats(struct ena_adapter *adapter,
- 			  bool hw_stats_needed)
- {
- 	const struct ena_stats *ena_stats;
--	u64 *ptr;
-+	u64_stats_t *ptr;
- 	int i;
- 
- 	for (i = 0; i < ENA_STATS_ARRAY_GLOBAL; i++) {
- 		ena_stats = &ena_stats_global_strings[i];
- 
--		ptr = (u64 *)&adapter->dev_stats + ena_stats->stat_offset;
-+		ptr = (u64_stats_t *)&adapter->dev_stats + ena_stats->stat_offset;
- 
- 		ena_safe_update_stat(ptr, data++, &adapter->syncp);
- 	}
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 92d149d4f091..5f1ec7008c48 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -149,8 +149,8 @@ int ena_xmit_common(struct ena_adapter *adapter,
- 	}
- 
- 	u64_stats_update_begin(&ring->syncp);
--	ring->tx_stats.cnt++;
--	ring->tx_stats.bytes += bytes;
-+	u64_stats_inc(&ring->tx_stats.cnt);
-+	u64_stats_add(&ring->tx_stats.bytes, bytes);
- 	u64_stats_update_end(&ring->syncp);
- 
- 	tx_info->tx_descs = nb_hw_desc;
-@@ -1294,9 +1294,9 @@ static int ena_clean_rx_irq(struct ena_ring *rx_ring, struct napi_struct *napi,
- 	work_done = budget - res_budget;
- 	rx_ring->per_napi_packets += work_done;
- 	u64_stats_update_begin(&rx_ring->syncp);
--	rx_ring->rx_stats.bytes += total_len;
--	rx_ring->rx_stats.cnt += work_done;
--	rx_ring->rx_stats.rx_copybreak_pkt += rx_copybreak_pkt;
-+	u64_stats_add(&rx_ring->rx_stats.bytes, total_len);
-+	u64_stats_add(&rx_ring->rx_stats.cnt, work_done);
-+	u64_stats_add(&rx_ring->rx_stats.rx_copybreak_pkt, rx_copybreak_pkt);
- 	u64_stats_update_end(&rx_ring->syncp);
- 
- 	rx_ring->next_to_clean = next_to_clean;
-@@ -1349,15 +1349,21 @@ static void ena_adjust_adaptive_rx_intr_moderation(struct ena_napi *ena_napi)
- {
- 	struct dim_sample dim_sample;
- 	struct ena_ring *rx_ring = ena_napi->rx_ring;
-+	u64 packets, bytes;
-+	unsigned int start;
- 
- 	if (!rx_ring->per_napi_packets)
- 		return;
- 
- 	rx_ring->non_empty_napi_events++;
- 
--	dim_update_sample(rx_ring->non_empty_napi_events,
--			  rx_ring->rx_stats.cnt,
--			  rx_ring->rx_stats.bytes,
-+	do {
-+		start = u64_stats_fetch_begin(&rx_ring->syncp);
-+		packets = u64_stats_read(&rx_ring->rx_stats.cnt);
-+		bytes = u64_stats_read(&rx_ring->rx_stats.bytes);
-+	} while (u64_stats_fetch_retry(&rx_ring->syncp, start));
-+
-+	dim_update_sample(rx_ring->non_empty_napi_events, packets, bytes,
- 			  &dim_sample);
- 
- 	net_dim(&ena_napi->dim, &dim_sample);
-@@ -1496,8 +1502,8 @@ static int ena_io_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	u64_stats_update_begin(&tx_ring->syncp);
--	tx_ring->tx_stats.napi_comp += napi_comp_call;
--	tx_ring->tx_stats.tx_poll++;
-+	u64_stats_add(&tx_ring->tx_stats.napi_comp, napi_comp_call);
-+	u64_stats_inc(&tx_ring->tx_stats.tx_poll);
- 	u64_stats_update_end(&tx_ring->syncp);
- 
- 	tx_ring->tx_stats.last_napi_jiffies = jiffies;
-@@ -2824,8 +2830,8 @@ static void ena_get_stats64(struct net_device *netdev,
- 
- 		do {
- 			start = u64_stats_fetch_begin(&tx_ring->syncp);
--			packets = tx_ring->tx_stats.cnt;
--			bytes = tx_ring->tx_stats.bytes;
-+			packets = u64_stats_read(&tx_ring->tx_stats.cnt);
-+			bytes = u64_stats_read(&tx_ring->tx_stats.bytes);
- 		} while (u64_stats_fetch_retry(&tx_ring->syncp, start));
- 
- 		stats->tx_packets += packets;
-@@ -2839,9 +2845,9 @@ static void ena_get_stats64(struct net_device *netdev,
- 
- 		do {
- 			start = u64_stats_fetch_begin(&rx_ring->syncp);
--			packets = rx_ring->rx_stats.cnt;
--			bytes = rx_ring->rx_stats.bytes;
--			xdp_rx_drops = rx_ring->rx_stats.xdp_drop;
-+			packets = u64_stats_read(&rx_ring->rx_stats.cnt);
-+			bytes = u64_stats_read(&rx_ring->rx_stats.bytes);
-+			xdp_rx_drops = u64_stats_read(&rx_ring->rx_stats.xdp_drop);
- 		} while (u64_stats_fetch_retry(&rx_ring->syncp, start));
- 
- 		stats->rx_packets += packets;
-@@ -2851,8 +2857,8 @@ static void ena_get_stats64(struct net_device *netdev,
- 
- 	do {
- 		start = u64_stats_fetch_begin(&adapter->syncp);
--		rx_drops = adapter->dev_stats.rx_drops;
--		tx_drops = adapter->dev_stats.tx_drops;
-+		rx_drops = u64_stats_read(&adapter->dev_stats.rx_drops);
-+		tx_drops = u64_stats_read(&adapter->dev_stats.tx_drops);
- 	} while (u64_stats_fetch_retry(&adapter->syncp, start));
- 
- 	stats->rx_dropped = rx_drops + total_xdp_rx_drops;
-@@ -3380,7 +3386,11 @@ static void ena_fw_reset_device(struct work_struct *work)
- 	if (likely(test_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags))) {
- 		rc |= ena_destroy_device(adapter, false);
- 		rc |= ena_restore_device(adapter);
--		adapter->dev_stats.reset_fail += !!rc;
-+		if (rc) {
-+			u64_stats_update_begin(&adapter->syncp);
-+			u64_stats_inc(&adapter->dev_stats.reset_fail);
-+			u64_stats_update_end(&adapter->syncp);
-+		}
- 
- 		dev_err(&adapter->pdev->dev, "Device reset completed successfully\n");
- 	}
-@@ -4329,8 +4339,8 @@ static void ena_keep_alive_wd(void *adapter_data,
- 	/* These stats are accumulated by the device, so the counters indicate
- 	 * all drops since last reset.
- 	 */
--	adapter->dev_stats.rx_drops = rx_drops;
--	adapter->dev_stats.tx_drops = tx_drops;
-+	u64_stats_set(&adapter->dev_stats.rx_drops, rx_drops);
-+	u64_stats_set(&adapter->dev_stats.tx_drops, tx_drops);
- 	u64_stats_update_end(&adapter->syncp);
- }
- 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.h b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-index 006f9a3acea6..bf2e7c74d3eb 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-@@ -178,44 +178,44 @@ struct ena_rx_buffer {
- } ____cacheline_aligned;
- 
- struct ena_stats_tx {
--	u64 cnt;
--	u64 bytes;
--	u64 queue_stop;
--	u64 prepare_ctx_err;
--	u64 queue_wakeup;
--	u64 dma_mapping_err;
--	u64 linearize;
--	u64 linearize_failed;
--	u64 napi_comp;
--	u64 tx_poll;
--	u64 doorbells;
--	u64 bad_req_id;
--	u64 llq_buffer_copy;
--	u64 missed_tx;
--	u64 unmask_interrupt;
-+	u64_stats_t cnt;
-+	u64_stats_t bytes;
-+	u64_stats_t queue_stop;
-+	u64_stats_t prepare_ctx_err;
-+	u64_stats_t queue_wakeup;
-+	u64_stats_t dma_mapping_err;
-+	u64_stats_t linearize;
-+	u64_stats_t linearize_failed;
-+	u64_stats_t napi_comp;
-+	u64_stats_t tx_poll;
-+	u64_stats_t doorbells;
-+	u64_stats_t bad_req_id;
-+	u64_stats_t llq_buffer_copy;
-+	u64_stats_t missed_tx;
-+	u64_stats_t unmask_interrupt;
- 	u64 last_napi_jiffies;
- };
- 
- struct ena_stats_rx {
--	u64 cnt;
--	u64 bytes;
--	u64 rx_copybreak_pkt;
--	u64 csum_good;
--	u64 refil_partial;
--	u64 csum_bad;
--	u64 page_alloc_fail;
--	u64 skb_alloc_fail;
--	u64 dma_mapping_err;
--	u64 bad_desc_num;
--	u64 bad_req_id;
--	u64 empty_rx_ring;
--	u64 csum_unchecked;
--	u64 xdp_aborted;
--	u64 xdp_drop;
--	u64 xdp_pass;
--	u64 xdp_tx;
--	u64 xdp_invalid;
--	u64 xdp_redirect;
-+	u64_stats_t cnt;
-+	u64_stats_t bytes;
-+	u64_stats_t rx_copybreak_pkt;
-+	u64_stats_t csum_good;
-+	u64_stats_t refil_partial;
-+	u64_stats_t csum_bad;
-+	u64_stats_t page_alloc_fail;
-+	u64_stats_t skb_alloc_fail;
-+	u64_stats_t dma_mapping_err;
-+	u64_stats_t bad_desc_num;
-+	u64_stats_t bad_req_id;
-+	u64_stats_t empty_rx_ring;
-+	u64_stats_t csum_unchecked;
-+	u64_stats_t xdp_aborted;
-+	u64_stats_t xdp_drop;
-+	u64_stats_t xdp_pass;
-+	u64_stats_t xdp_tx;
-+	u64_stats_t xdp_invalid;
-+	u64_stats_t xdp_redirect;
- };
- 
- struct ena_ring {
-@@ -284,16 +284,16 @@ struct ena_ring {
- } ____cacheline_aligned;
- 
- struct ena_stats_dev {
--	u64 tx_timeout;
--	u64 suspend;
--	u64 resume;
--	u64 wd_expired;
--	u64 interface_up;
--	u64 interface_down;
--	u64 admin_q_pause;
--	u64 rx_drops;
--	u64 tx_drops;
--	u64 reset_fail;
-+	u64_stats_t tx_timeout;
-+	u64_stats_t suspend;
-+	u64_stats_t resume;
-+	u64_stats_t wd_expired;
-+	u64_stats_t interface_up;
-+	u64_stats_t interface_down;
-+	u64_stats_t admin_q_pause;
-+	u64_stats_t rx_drops;
-+	u64_stats_t tx_drops;
-+	u64_stats_t reset_fail;
- };
- 
- enum ena_flags_t {
-@@ -430,11 +430,11 @@ int handle_invalid_req_id(struct ena_ring *ring, u16 req_id,
- 			  struct ena_tx_buffer *tx_info, bool is_xdp);
- 
- /* Increase a stat by cnt while holding syncp seqlock on 32bit machines */
--static inline void ena_increase_stat(u64 *statp, u64 cnt,
-+static inline void ena_increase_stat(u64_stats_t *statp, u64 cnt,
- 				     struct u64_stats_sync *syncp)
- {
- 	u64_stats_update_begin(syncp);
--	(*statp) += cnt;
-+	u64_stats_add(statp, cnt);
- 	u64_stats_update_end(syncp);
- }
- 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_xdp.c b/drivers/net/ethernet/amazon/ena/ena_xdp.c
-index 5b175e7e92a1..9271d1deb96f 100644
---- a/drivers/net/ethernet/amazon/ena/ena_xdp.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_xdp.c
-@@ -461,7 +461,7 @@ int ena_xdp_io_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	u64_stats_update_begin(&tx_ring->syncp);
--	tx_ring->tx_stats.tx_poll++;
-+	u64_stats_inc(&tx_ring->tx_stats.tx_poll);
- 	u64_stats_update_end(&tx_ring->syncp);
- 	tx_ring->tx_stats.last_napi_jiffies = jiffies;
- 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_xdp.h b/drivers/net/ethernet/amazon/ena/ena_xdp.h
-index cfd82728486a..98756a065a39 100644
---- a/drivers/net/ethernet/amazon/ena/ena_xdp.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_xdp.h
-@@ -85,7 +85,7 @@ static inline int ena_xdp_execute(struct ena_ring *rx_ring, struct xdp_buff *xdp
- 	struct bpf_prog *xdp_prog;
- 	struct ena_ring *xdp_ring;
- 	struct xdp_frame *xdpf;
--	u64 *xdp_stat;
-+	u64_stats_t *xdp_stat;
- 
- 	xdp_prog = READ_ONCE(rx_ring->xdp_bpf_prog);
- 
+TLS 1.3 differs from TLS 1.2 in its record format:
+
+  TLS 1.2: [Header (5)] + [Explicit IV (8)] + [Ciphertext] + [Tag (16)]
+  TLS 1.3: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
+
+The key difference is that TLS 1.3 eliminates the explicit IV and
+instead appends the content type byte to the plaintext before
+encryption. This content type byte must be encrypted along with the
+payload for proper authentication tag computation per RFC 8446.
+
+Patch 1: TLS 1.3 hardware offload support
+=========================================
+Changes to tls_device.c, tls_device_fallback.c, and tls_main.c:
+
+- Extended version validation to accept TLS_1_3_VERSION in both
+  tls_set_device_offload() and tls_set_device_offload_rx()
+- Modified tls_device_record_close() to append the content type
+  byte before the authentication tag for TLS 1.3 records
+- Modified tls_device_reencrypt() to use prot->prepend_size and
+  prot->tag_size instead of hardcoded TLS 1.2 values
+- Pre-populated dummy_page with all 256 byte values for memory
+  allocation failure fallback path
+- Updated tls_device_fallback.c to handle TLS 1.3 IV construction
+  (XOR with sequence number) and version-specific AAD sizes
+- Rekey handling: HW offload key update (rekey) is not yet supported.
+
+Patch 2: Hardware offload key update support
+============================================
+Changes to include/net/tls.h, net/tls/tls.h, tls_device.c, tls_main.c,
+and tls_sw.c:
+
+- Extended tls_set_device_offload() and tls_set_device_offload_rx()
+  with new_crypto_info parameter for key updates
+- During rekey, the old HW context is deleted (tls_dev_del) and a new
+  one is added (tls_dev_add) with the updated key material
+- Graceful degradation: if HW key update fails, the connection
+  gracefully degrades to software:
+  * TX: TLS_TX_DEV_CLOSED is set and sk_validate_xmit_skb switches to
+    tls_validate_xmit_skb_sw for software encryption
+  * RX: TLS_RX_DEV_DEGRADED and TLS_RX_DEV_CLOSED are set for software
+    decryption
+  * In both cases, tx_conf/rx_conf remains TLS_HW
+- Record sequence management: during TX rekey, old pending records are
+  deleted and unacked_record_sn is reset to the new rec_seq
+- Split tls_set_sw_offload() into tls_sw_ctx_init() and
+  tls_sw_ctx_finalize() to allow the HW offload RX path to
+  initialize SW context first, attempt HW setup, then
+  finalize (memzero new_crypto_info, call tls_finish_key_update)
+- Added TLS_TX_DEV_CLOSED flag to track TX hardware context state,
+  to avoid double tls_dev_del call, symmetric with existing
+  TLS_RX_DEV_CLOSED.
+
+Patch 3: mlx5 driver enablement
+===============================
+- TLS 1.3 version detection and validation with proper capability checking
+- TLS 1.3 crypto context configuration using MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3
+- Correct IV handling for TLS 1.3 (12-byte IV vs TLS 1.2's 4-byte salt)
+- Hardware offload for both TLS 1.3 AES-GCM-128 and AES-GCM-256
+
+Testing
+=======
+Tested on Mellanox ConnectX-6 Dx (Crypto Enabled).
+
+Both TX and RX hardware offload verified working with:
+- TLS 1.3 AES-GCM-128
+- TLS 1.3 AES-GCM-256
+- Multiple KeyUpdate cycles (rekey)
+
+Test methodology: ktls_test : https://github.com/insanum/ktls_test/tree/master
+
+Please review and provide feedback.
+
+Thanks,
+Rishikesh
+
+v5:
+  - Fixed typo leading to compile errors
+  - Link to v4: https://lore.kernel.org/netdev/20260121215727.3994324-1-rjethwani@purestorage.com/
+
+v4:
+  - Split single TLS patch into two separate patches:
+    * Patch 1: TLS 1.3 basic HW offload support
+    * Patch 2: HW offload key update (rekey) support with graceful degradation
+  - Removed record_type check from tls_device_record_close()
+  - Removed Broadcom bnxt_en out-of-tree driver mention
+  - Link to v3: https://lore.kernel.org/netdev/20260102184708.24618-1-rjethwani@purestorage.com/
+
+v3:
+  - Added note about Broadcom bnxt_en out-of-tree driver used for testing
+  - Link to v2: https://lore.kernel.org/netdev/20251231192322.3791912-1-rjethwani@purestorage.com/
+
+v2:
+  - Fixed reverse Christmas tree ordering in variable declarations
+  - Combined 'err' and 'i' declarations (reviewer feedback)
+  - Link to v1: https://lore.kernel.org/netdev/20251230224137.3600355-1-rjethwani@purestorage.com/
+
+Rishikesh Jethwani (3):
+  tls: add TLS 1.3 hardware offload support
+  tls: add hardware offload key update support
+  mlx5: TLS 1.3 hardware offload support
+
+ .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+ include/net/tls.h                             |   4 +
+ net/tls/tls.h                                 |  14 +-
+ net/tls/tls_device.c                          | 319 +++++++++++++-----
+ net/tls/tls_device_fallback.c                 |  34 +-
+ net/tls/tls_main.c                            |  31 +-
+ net/tls/tls_sw.c                              |  77 +++--
+ 8 files changed, 379 insertions(+), 122 deletions(-)
+
 -- 
-2.51.0
+2.25.1
 
 
