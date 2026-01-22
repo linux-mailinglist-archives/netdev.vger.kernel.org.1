@@ -1,105 +1,44 @@
-Return-Path: <netdev+bounces-252269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMo9Hk4CcmmvZwAAu9opvQ
-	(envelope-from <netdev+bounces-252269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:56:14 +0100
+	id CA4XBVQAcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:47:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6728365932
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:56:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0715C6577D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:47:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 50FB4689882
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:34:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E2E08A0B07
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448233161B3;
-	Thu, 22 Jan 2026 10:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IMs9kaye";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lIMwBdqV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1956F3EDAA4;
+	Thu, 22 Jan 2026 10:39:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B3A3D3CF8
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 10:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E403E9592;
+	Thu, 22 Jan 2026 10:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769078049; cv=none; b=XpkoDusmJTcEzeWbIOVISBBlbyIneQEth96Lf94bQSmSp2rRuhdGByrCmNcZ6uYO7dc8k+k1wIEw43DUIPC0tAuP6+i4UupmY2mn0EjiQvbeiuxTkzibmE9O6lGfuDUVfhXn29W7FiNh3IlrrhdRzQ/aDzFGMVfWB0240kxYCMs=
+	t=1769078370; cv=none; b=CZUyukVO+Fiv0V17SSiZEgzbsPupapJgO/T/figMiKXKCVa90Fi9nIC4r1+FuONRGxcD1a2ZBmu+8mnq/dZNbVu1kEZAJ/egjPFZs9ntgcoj0G6tMOFfQ4opgy1Nfa+6AikhJnQYiTDQAFCkjGesZBXaBMQ8HmyVURupLS3yLno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769078049; c=relaxed/simple;
-	bh=bpqaKp9znAOnSZ5KlW3MfmlKU7CJproZYrSYtxDDX5M=;
+	s=arc-20240116; t=1769078370; c=relaxed/simple;
+	bh=L9h+VVmrw/S7QwFfMyKNXRU5RtA1qftvKbCmgN1C+Zw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eqoOUDCzIOZlak3Klmup0WtP7Ynxjy7sj9jAlUMpjepTriyOZKZDWbe8jLV+N6I7ztxuk9YZ9MJhlgOsvkQ74juIWZ1yYFkd443P9cedkbk6VomNRwRSNzmSMbeQRWpr9rs4hWzul/RfYb+lmV4dtYlB9gA1ZVsV71fkdEcUTq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IMs9kaye; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lIMwBdqV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769078046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+hE8dFei3bya+ynBeOHXmxyPXij+DCune4AiaN8nbR0=;
-	b=IMs9kayejE694W1SNL1RLELmknMvqyeiX2Kh4FQt8Vi4MuCgC+Pe6NI/sklK8RigcxTDE8
-	qDZ1O1lY5BcqPlU2JmxxmSCqEMmQbpaX6BYZnFWRLMIMM/lBnIBuNKuIyqCKvnx85lJDnZ
-	2BVLptm7DKtUapXurkQ5eVUiD5xtncQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-OILXkSzDNAa8rMpq0aCufA-1; Thu, 22 Jan 2026 05:34:05 -0500
-X-MC-Unique: OILXkSzDNAa8rMpq0aCufA-1
-X-Mimecast-MFC-AGG-ID: OILXkSzDNAa8rMpq0aCufA_1769078044
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430f5dcd4cdso520198f8f.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 02:34:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769078044; x=1769682844; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+hE8dFei3bya+ynBeOHXmxyPXij+DCune4AiaN8nbR0=;
-        b=lIMwBdqVmatToAo4yVH8zRbpOQK37+ziTftvp00JX5MmAcAY9BcwsP8gOnTE4LszGV
-         hf1YeKwnO9JqzjyN4dwGuMFob8YHXD3zrvcq7bAc3WH+yy795RAwURMFTB242ahpkW5i
-         UkCjmj/oxOnGwA5l0mCAbYp8cMoWl2RC5Tx9NYxlxZkVi2lsOdqf7RZjxcTQSYHsJybi
-         LjF+YakD6bYOyKT5SpT9Pz7lHCCKsyJGUvh5QyAMCBYqvN/aw8JvkYKzeUFLlCnpFlQG
-         eowjKWu5itFX4BXwfJYWPB4AWxsBspsJXc9FkCG8V7s7oFjISUlef09kNX0/jEgNnroQ
-         BzVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769078044; x=1769682844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+hE8dFei3bya+ynBeOHXmxyPXij+DCune4AiaN8nbR0=;
-        b=JqiIbhbYy9ajzUMQWhHFrwc8aMalo89WX2OyKXbJ8kqhA0TkUrXDjXhBKhjWYJK+Zt
-         cjzY06P8iekGJJDP8wsp8zmGaBLi9JFUmPVy6GkXruxobx0h9nXiogY80GcXt++YCbPD
-         +IM8UxBJUQ7ytHKG9MgJhcghvBTA3yKp+QJ+zejKq72+RcgGmkXikUXIt84smGfk21s1
-         1QUStDcYvX3EQoJvaiW61LetVDWkiAHhe8zajzUafiAccvLuADQ2HerbbBXoLi7361WN
-         ayjaaD4qjA0q9FdAWlt/3BBKtMvK1OUHJYQcefc3OVMjjdbufh96rjmNXsNdbOt4kBxF
-         Risg==
-X-Forwarded-Encrypted: i=1; AJvYcCWz1OUgr1pgdtjLN40TNzjB25rrhHQUBNvd5qfvqBoBnnT/uY2z/VOFZLNGYhuP5Oc+oiaw4XU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5SzjvZ6/Q0sd9VGvzhGbei0OszIfJvDRNlAIzGsr7dPdI2yja
-	uoSmsjbotOqjdCDyvm1EJ0TzqGWU8X8DlmeYUl+d82n8w5TTAKWaDFBXeFZfo+cCi3lUPdtN9Z7
-	wNE1meOeHDJizY6xlpBurYstGA4i/4TbCr4ukKpU2GDOIA7klOwippgxqsg==
-X-Gm-Gg: AZuq6aL/wBgE93IIi8uHOmFKpzyBtvDoCYNcL5yQtR20c7YnTXxU7PcN6eRuyRTJZ7I
-	u3ssPEOLMK7y0aYp7j4VMqmu2/mkzbab74bZx1YD/mMLSm0gQVvfo5ptW50xnpSgSAgRogpdovX
-	y2fd7Mt4trzaxXIfF6cw6NdlgOYupz5J2mQ/SZjxNHrnfWCORa55aNj3GnDhHBakis2Jc/Pexie
-	VvhJngE3nGFtvruzVaRH0jXZlM3Sd6NpB5rDqBQ9KBdIybMkj8lQMqvU5noYYV8gE8Nb2/FqDTY
-	WKNfWrg2bbBk1cpx5HqjmObau3+f142HMmKBhscncxkOxEUPbezhJWbpN1AnMI4EKwYOcmxXGc+
-	k/o6p/Hk47Uq9
-X-Received: by 2002:a05:6000:2406:b0:432:5ce4:6fed with SMTP id ffacd0b85a97d-4356a02639fmr28991520f8f.9.1769078043678;
-        Thu, 22 Jan 2026 02:34:03 -0800 (PST)
-X-Received: by 2002:a05:6000:2406:b0:432:5ce4:6fed with SMTP id ffacd0b85a97d-4356a02639fmr28991484f8f.9.1769078043254;
-        Thu, 22 Jan 2026 02:34:03 -0800 (PST)
-Received: from [192.168.88.32] ([216.128.11.175])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356992211dsm44139826f8f.7.2026.01.22.02.34.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jan 2026 02:34:02 -0800 (PST)
-Message-ID: <c2b42356-565f-4374-91f2-6db69a6af196@redhat.com>
-Date: Thu, 22 Jan 2026 11:34:01 +0100
+	 In-Reply-To:Content-Type; b=g+0KhjvLT3Xh0Z4pm4GxcFrYMKtT+llwejrVc5tZwucQnda7w92pdmMjBQ4bPRs004YsByZGR3W51s9pEsFkKCbP+NFsjqMDRhy4bE0beztaWHgA5Yv8lIXxOiJ9ZFXRQxxi0mzXbHZj3I4zYs4vh+6DWZlnaI12YHG6frYpbBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [10.213.20.167] (unknown [210.73.43.101])
+	by APP-03 (Coremail) with SMTP id rQCowABnhdxK_nFpSZlDBg--.20370S2;
+	Thu, 22 Jan 2026 18:39:07 +0800 (CST)
+Message-ID: <5639ff0c-dfd1-4528-a0ce-92d3c457ce64@iscas.ac.cn>
+Date: Thu, 22 Jan 2026 18:39:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,62 +46,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: dsa: yt921x: Add DCB/priority support
-To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-References: <20260119185935.2072685-1-mmyangfl@gmail.com>
- <20260119185935.2072685-3-mmyangfl@gmail.com>
+Subject: Re: [PATCH net v2] net: spacemit: Clarify stat timeout comments and
+ messages
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Yixun Lan <dlan@gentoo.org>,
+ Chukun Pan <amadeus@jmu.edu.cn>,
+ Michael Opdenacker <michael.opdenacker@rootcommit.com>,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20260121-k1-ethernet-clarify-stat-timeout-v2-1-76ff1a1168d9@iscas.ac.cn>
+ <20260121200439.64c22125@kernel.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260119185935.2072685-3-mmyangfl@gmail.com>
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20260121200439.64c22125@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:rQCowABnhdxK_nFpSZlDBg--.20370S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CryxGw48ZF47tF17KF4Durg_yoW8XF4fpa
+	1IgwsxGF1xtrWkXrsrtw10qFyYvw1vqa43ury3KryDtF15XrZa9r1FkrZ0kFZrZ393u3yj
+	qr42gFyv9FsrZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
+	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMc
+	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
+	1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUgd-PDUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [0.24 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	TAGGED_FROM(0.00)[bounces-252269-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6728365932
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252270-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0715C6577D
 X-Rspamd-Action: no action
 
-On 1/19/26 7:59 PM, David Yang wrote:
-> Set up global DSCP/PCP priority mappings and add related DSA methods.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
+On 1/22/26 12:04, Jakub Kicinski wrote:
+> On Wed, 21 Jan 2026 10:17:18 +0800 Vivian Wang wrote:
+>> This patch isn't a fix for the problem per se, since it is hardware
+>> behavior. The new message and comments, however, should direct those
+>> running into this on new hardware towards a fix.
+> Is it not possible to improve the situation?
 
-Don't apply cleanly anymore on top of the LAG changes. Please rebase and
-repost. You should keep a single series in flight touching the same
-code, or this problem will happen again.
+Maybe I should have made it clearer, but this comment and messages
+improvement was proposed by Andrew in the linked thread [1].
 
-Thanks,
+As an aside, saying that made me realize this patch should be:
 
-Paolo
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+
+> Is the refclock disappearing because of power saving?
+> Or because the link is down?
+
+I'm not really well-versed in what's allowed from the PHY here, but at
+least the Motorcomm and Realtek PHYs seem to only stop this clock while
+the link is down. So from what I can tell it's PHY stopping the clock
+because of power saving for when the link is down. I'm not sure how that
+should translate into an answer to your question here...
+
+> Because if it's the latter we should be able to skip reading the stats
+> when link is down (still racy but better than waiting in cases we can
+> detect?)
+
+If checking the link is definitely up as a condition for updating stats
+would be acceptable, then maybe the original patch from the linked
+thread [2] can also be adopted?
+
+Vivian "dramforever" Wang
+
+[1]: https://lore.kernel.org/r/48757af2-bbea-4185-8cc9-2ef51dbc8373@lunn.ch/
+[2]: https://lore.kernel.org/r/20260118100000.224793-1-amadeus@jmu.edu.cn/
 
 
