@@ -1,276 +1,136 @@
-Return-Path: <netdev+bounces-252461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJFPFUNdcmn5iwAAu9opvQ
-	(envelope-from <netdev+bounces-252461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:24:19 +0100
+	id 2L/6Esddcmn5iwAAu9opvQ
+	(envelope-from <netdev+bounces-252460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:26:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6162E6B30D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:24:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4566B3BF
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B45223018B1F
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:11:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3169C30E4427
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1705831619B;
-	Thu, 22 Jan 2026 16:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F97204C36;
+	Thu, 22 Jan 2026 16:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hXfDmN/e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiIjjTqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A6437FF72
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 16:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2DC367F2D;
+	Thu, 22 Jan 2026 16:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769100673; cv=none; b=Kds1QTeKVRJwlpvx0fpJmSeo1D47lHvfbH0zhr+xDzc7/B6w08cbNE8MVLOrokK/Z9aAKGw/MdzNtTh+I4Qs7UzP9o285qQvSL6P1epxjEGgjdDaoEOWYSXG20wbyQNUsZky+T+sqIkGSm0pZheI601c02u8WFOz/jWCBzCUYH4=
+	t=1769100665; cv=none; b=dMNrBVXhLUUsb0jrfLEoSQOzVkSwnXmB9S5RGvh3WspNF9Obusb2JWb/c5uIXxGgtywvmBVtSM+JGQYFhV7IsTjVpzarW0BAbTrtihk1AoTb3hJRW2FrvnXNGW2YVu9emd2BDSB2M9RZVirIa9UBiI6t+7+GPlB4BnQ1nIkrnlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769100673; c=relaxed/simple;
-	bh=yp//qd0PzB7Snypykjs0dXGxE2N8JW1snIV61oqC6ns=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cv/wj1MpuHCDsXke0tZd+EWbCZBmaNBd/IIqvXI0JNtnuM0f8qDFcSxbbwfLlm/ZoQsbnBc7tb33wA5MerKRWw8yeNKOlSaPv80HE2tXKJC39BcY1Lhm08z2i668Y06ohVCHoQGf8NKpO2IKPtn3yThzRfz/FnUo1l7yL6zd01A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hXfDmN/e; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8905883e793so28242406d6.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 08:50:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769100655; x=1769705455; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9pglonBNB+Nab8p8hrgiOIFMlt0ittHi/Ll8Gc4NmAQ=;
-        b=hXfDmN/e6Pf9AQXAQe5JgTnUV8ZF2PNbcY3OxeGBggL4O3JdNEiM2qrsHWR1utfqwj
-         2Ssl7KiVy9sxpdC0jTP6rxbJPXnUaEvnRvoVW7GShOQAEzCqx6P+XmB0aG25cESUQqX+
-         ZAawN4K2gZC82sq3/uQeFkkl90TaM/aDi672nLUWyMM4+U6YkiCPKB8qD7AWCGzjXcjH
-         jni/P6GYWtD7M1Evjlu/Q+R0qH7lSy9HoprMuDRJX+shesAVT+CzhmTh9pTbOnAfQhiW
-         LoMvCnL5TotgXg0nrXXbj4+yV9ys1BPD9G4Wea9+Yhtt+9r6V94Dixp6iOULZ27xmMeE
-         bXzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769100655; x=1769705455;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9pglonBNB+Nab8p8hrgiOIFMlt0ittHi/Ll8Gc4NmAQ=;
-        b=eYYmBzP+7INClhVRCU0vleiCdpfol+aq2pvX+2O7qQIXv4RJIwgSgl6vycrDS21+z9
-         z72BV6A46OTcLqWRCjrBCMiqseaI1CDr/ChopQZyaGSO8mi3psaZWtGusTMer+0EOgcr
-         m1NDNq1cnRWJ5ed4QPlSVU8M+0YKcvsR1n1V4xoLD7cBkmU8NTy57Whi23zF7bE94O/M
-         mEAOSRiOGjb8PlTrZAdQCb1T0NAJGcFCBspBkMeks4XN2YaiI6C29yYoOhpYLTjhX8th
-         91uE6Y00Ml+KMFN3cpB6BH+CFh0/FFXSPnyeSsXW9AGEijjnQYYZUlfM3gMPQgLt3aB2
-         Qh6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUxOsv7SQu/Bb2LCaxo1Mgfa9Y1ijux+UbtydOnyPnni2WbFdO3Z3OAMSjoJP1lyJTh65eptwo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjQUWawXGhfHKQX9marYP1NpJysmTe8QWmTYClNguMASNkNT8e
-	uPvkKlBYAwJFqV81MuhGuiV/ZtHu5Jb2oa4j1QddkJdbvN8M4AuKv5BTyRMTKpD8n1VbUC/mW/r
-	XfkW7UL7fgkvp2g==
-X-Received: from qvck5.prod.google.com ([2002:ad4:5be5:0:b0:890:3706:343a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5bc9:0:b0:894:74b9:6b27 with SMTP id 6a1803df08f44-89490207bf6mr1133666d6.43.1769100654668;
- Thu, 22 Jan 2026 08:50:54 -0800 (PST)
-Date: Thu, 22 Jan 2026 16:50:49 +0000
+	s=arc-20240116; t=1769100665; c=relaxed/simple;
+	bh=/mtVAN0RP8289udhD8FKKzimHR1+8kf3y0daA0yHddc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IqBJ0VVC6zOBU9DfLNLbAvTk8m3xYn3AeZptCrhV6ROefo8TxIBZJsEIJ4YS9pGX5wZSoRm2AKz3SE3ff5FLlT7FpMwgf9qOPlBK6sgCUJJ8q/vvP+Mv0BUB942XuYE21jwJoK3Zf/BXzQ/+kGRW0j3zf62cPnrlByRjc+VtBlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiIjjTqD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76FA2C116C6;
+	Thu, 22 Jan 2026 16:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769100663;
+	bh=/mtVAN0RP8289udhD8FKKzimHR1+8kf3y0daA0yHddc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QiIjjTqDgMnWLTZliMyOuLT+0NQqgDioGOcvDjmdYWKR4tPUnjHaLHOI+3+jvcQyk
+	 83Gnz57GgeUYnmYtUoUruNOKwRrijZeShiumRaXz0J4CJ9hTruy8dDXzn464aOu8F3
+	 Khb+/5PKske/lISXxpms5Z/kHqaHPxoRtK5o1Nin7CDE79IeqKUMuz7TlRbD3UHNK1
+	 f/ap7r53UcnIt3OTZn72grzu0V5zwhcDMGuUr+o/4a0dhrtRfPGR+WK1usWc8em6Iz
+	 TBF47e7k0HWU1InpeZcx22CLCsTjruJNz87y4VtgEZMzHUqnwv1MQinhHZBtjtDDcH
+	 /+1yzQ9qsN/HA==
+Date: Thu, 22 Jan 2026 10:51:02 -0600
+From: Rob Herring <robh@kernel.org>
+To: Damien Dejean <dam.dejean@gmail.com>
+Cc: andrew@lunn.ch, krzk+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, hkallweit1@gmail.com
+Subject: Re: [PATCH v2 3/4] dt-bindings: net: realtek,rtl82xx: add a property
+ to set MDI polarity
+Message-ID: <20260122165102.GA2564919-robh@kernel.org>
+References: <20260121151506.813783-1-dam.dejean@gmail.com>
+ <20260121151506.813783-3-dam.dejean@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260122165049.2366985-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] ipvlan: remove ipvlan_ht_addr_lookup()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Mahesh Bandewar <maheshb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121151506.813783-3-dam.dejean@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252460-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252461-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.963];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6162E6B30D
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DC4566B3BF
 X-Rspamd-Action: no action
 
-ipvlan_ht_addr_lookup() is called four times and not inlined.
+On Wed, Jan 21, 2026 at 04:15:05PM +0100, Damien Dejean wrote:
+> MDI pair polarity is usually configured by the bootloader.  However, on
+> some designs the configuration is left untouched during boot and needs
+> to be set by the driver.
+> 
+> Add the property 'realtek,mdi-cfg-polarity' to configure the polarity of
+> each pair. Bit 0 to 3 configure the polarity or pairs A to D, if set to
+> 1 the polarity is reversed for this pair.
+> 
+> Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> index c4ced671ecb8..17088c147358 100644
+> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> @@ -61,6 +61,13 @@ properties:
+>      description:
+>        Force normal (0) or reverse (1) order of MDI pairs.
+>  
+> +  realtek,mdi-cfg-polarity:
+> +    description:
+> +      A bitmap to describe pair polarity swap. Bit 0 to swap polarity of pair A,
+> +      bit 1 to swap polarity of pair B, bit 2 to swap polarity of pair C and bit
+> +      3 to swap polarity of pair D.
+> +    $ref: /schemas/types.yaml#/definitions/uint32
 
-Split it to ipvlan_ht_addr_lookup6() and ipvlan_ht_addr_lookup4()
-and rework ipvlan_addr_lookup() to call these helpers once,
-so that they are (auto)inlined.
+maximum: 0xf
 
-After this change, ipvlan_addr_lookup() is faster, and we save
-350 bytes of text on x86_64.
+However, are these properties something that should be common?
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/2 grow/shrink: 1/0 up/down: 123/-473 (-350)
-Function                                     old     new   delta
-ipvlan_addr_lookup                           467     590    +123
-__pfx_ipvlan_ht_addr_lookup                   16       -     -16
-ipvlan_ht_addr_lookup                        457       -    -457
-Total: Before=22571833, After=22571483, chg -0.00%
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Mahesh Bandewar <maheshb@google.com>
----
-v2: guard ipvlan_ht_addr_lookup6() with CONFIG_IPV6 (kernel test robot)
-v1: https://lore.kernel.org/netdev/20260121215728.560645-1-edumazet@google.com/
- drivers/net/ipvlan/ipvlan_core.c | 55 ++++++++++++++++++++------------
- 1 file changed, 34 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index 2efa3ba148aa7efed999dc3c06ccbb787eca92e5..f1568d50f5cc8259e6166993bda8a3425e4e5937 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -48,11 +48,9 @@ static u8 ipvlan_get_v6_hash(const void *iaddr)
- }
- #endif
- 
--static u8 ipvlan_get_v4_hash(const void *iaddr)
-+static u8 ipvlan_get_v4_hash(__be32 addr)
- {
--	const struct in_addr *ip4_addr = iaddr;
--
--	return jhash_1word((__force u32)ip4_addr->s_addr, ipvlan_jhash_secret) &
-+	return jhash_1word((__force u32)addr, ipvlan_jhash_secret) &
- 			   IPVLAN_HASH_MASK;
- }
- 
-@@ -73,16 +71,30 @@ static bool addr_equal(bool is_v6, struct ipvl_addr *addr, const void *iaddr)
- 	return false;
- }
- 
--static struct ipvl_addr *ipvlan_ht_addr_lookup(const struct ipvl_port *port,
--					       const void *iaddr, bool is_v6)
-+#if IS_ENABLED(CONFIG_IPV6)
-+static struct ipvl_addr *ipvlan_ht_addr_lookup6(const struct ipvl_port *port,
-+						const void *iaddr)
- {
- 	struct ipvl_addr *addr;
- 	u8 hash;
- 
--	hash = is_v6 ? ipvlan_get_v6_hash(iaddr) :
--	       ipvlan_get_v4_hash(iaddr);
-+	hash = ipvlan_get_v6_hash(iaddr);
- 	hlist_for_each_entry_rcu(addr, &port->hlhead[hash], hlnode)
--		if (addr_equal(is_v6, addr, iaddr))
-+		if (addr_equal(true, addr, iaddr))
-+			return addr;
-+	return NULL;
-+}
-+#endif
-+
-+static struct ipvl_addr *ipvlan_ht_addr_lookup4(const struct ipvl_port *port,
-+						__be32 addr4)
-+{
-+	struct ipvl_addr *addr;
-+	u8 hash;
-+
-+	hash = ipvlan_get_v4_hash(addr4);
-+	hlist_for_each_entry_rcu(addr, &port->hlhead[hash], hlnode)
-+		if (addr->atype == IPVL_IPV4 && addr->ip4addr.s_addr == addr4)
- 			return addr;
- 	return NULL;
- }
-@@ -94,7 +106,7 @@ void ipvlan_ht_addr_add(struct ipvl_dev *ipvlan, struct ipvl_addr *addr)
- 
- 	hash = (addr->atype == IPVL_IPV6) ?
- 	       ipvlan_get_v6_hash(&addr->ip6addr) :
--	       ipvlan_get_v4_hash(&addr->ip4addr);
-+	       ipvlan_get_v4_hash(addr->ip4addr.s_addr);
- 	if (hlist_unhashed(&addr->hlnode))
- 		hlist_add_head_rcu(&addr->hlnode, &port->hlhead[hash]);
- }
-@@ -357,21 +369,24 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
- 				     int addr_type, bool use_dest)
- {
- 	struct ipvl_addr *addr = NULL;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	struct in6_addr *i6addr;
-+#endif
-+	__be32 addr4;
- 
- 	switch (addr_type) {
- #if IS_ENABLED(CONFIG_IPV6)
- 	case IPVL_IPV6: {
- 		struct ipv6hdr *ip6h;
--		struct in6_addr *i6addr;
- 
- 		ip6h = (struct ipv6hdr *)lyr3h;
- 		i6addr = use_dest ? &ip6h->daddr : &ip6h->saddr;
--		addr = ipvlan_ht_addr_lookup(port, i6addr, true);
-+lookup6:
-+		addr = ipvlan_ht_addr_lookup6(port, i6addr);
- 		break;
- 	}
- 	case IPVL_ICMPV6: {
- 		struct nd_msg *ndmh;
--		struct in6_addr *i6addr;
- 
- 		/* Make sure that the NeighborSolicitation ICMPv6 packets
- 		 * are handled to avoid DAD issue.
-@@ -379,24 +394,23 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
- 		ndmh = (struct nd_msg *)lyr3h;
- 		if (ndmh->icmph.icmp6_type == NDISC_NEIGHBOUR_SOLICITATION) {
- 			i6addr = &ndmh->target;
--			addr = ipvlan_ht_addr_lookup(port, i6addr, true);
-+			goto lookup6;
- 		}
- 		break;
- 	}
- #endif
- 	case IPVL_IPV4: {
- 		struct iphdr *ip4h;
--		__be32 *i4addr;
- 
- 		ip4h = (struct iphdr *)lyr3h;
--		i4addr = use_dest ? &ip4h->daddr : &ip4h->saddr;
--		addr = ipvlan_ht_addr_lookup(port, i4addr, false);
-+		addr4 = use_dest ? ip4h->daddr : ip4h->saddr;
-+lookup4:
-+		addr = ipvlan_ht_addr_lookup4(port, addr4);
- 		break;
- 	}
- 	case IPVL_ARP: {
- 		struct arphdr *arph;
- 		unsigned char *arp_ptr;
--		__be32 dip;
- 
- 		arph = (struct arphdr *)lyr3h;
- 		arp_ptr = (unsigned char *)(arph + 1);
-@@ -405,9 +419,8 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
- 		else
- 			arp_ptr += port->dev->addr_len;
- 
--		memcpy(&dip, arp_ptr, 4);
--		addr = ipvlan_ht_addr_lookup(port, &dip, false);
--		break;
-+		addr4 = get_unaligned((__be32 *)arp_ptr);
-+		goto lookup4;
- 	}
- 	}
- 
--- 
-2.52.0.457.g6b5491de43-goog
-
+Rob
 
