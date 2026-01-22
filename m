@@ -1,136 +1,119 @@
-Return-Path: <netdev+bounces-252460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2L/6Esddcmn5iwAAu9opvQ
-	(envelope-from <netdev+bounces-252460-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:26:31 +0100
+	id INU/EfpdcmnbjAAAu9opvQ
+	(envelope-from <netdev+bounces-252462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:27:22 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4566B3BF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:26:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B52CE6B418
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3169C30E4427
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:11:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19FCC30EA01A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F97204C36;
-	Thu, 22 Jan 2026 16:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF944366046;
+	Thu, 22 Jan 2026 16:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiIjjTqD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czLgxvZH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2DC367F2D;
-	Thu, 22 Jan 2026 16:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA6935DCEE;
+	Thu, 22 Jan 2026 16:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769100665; cv=none; b=dMNrBVXhLUUsb0jrfLEoSQOzVkSwnXmB9S5RGvh3WspNF9Obusb2JWb/c5uIXxGgtywvmBVtSM+JGQYFhV7IsTjVpzarW0BAbTrtihk1AoTb3hJRW2FrvnXNGW2YVu9emd2BDSB2M9RZVirIa9UBiI6t+7+GPlB4BnQ1nIkrnlc=
+	t=1769100775; cv=none; b=krMovMhB+VkqUzL+fpa5D+F/I9Wk2Hur1amzSjcBVlPZd2PBiqYN6jufDBx/YQnR590tkXpihiTdKMMS+XLES32COid6QaPOvbGriUUnGrR5eWT8gLQr4vCb/jqcSAhCnDQ4vGz2RMcecx20hpxvFQatd7ARCu1dnZm7JCGWSQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769100665; c=relaxed/simple;
-	bh=/mtVAN0RP8289udhD8FKKzimHR1+8kf3y0daA0yHddc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IqBJ0VVC6zOBU9DfLNLbAvTk8m3xYn3AeZptCrhV6ROefo8TxIBZJsEIJ4YS9pGX5wZSoRm2AKz3SE3ff5FLlT7FpMwgf9qOPlBK6sgCUJJ8q/vvP+Mv0BUB942XuYE21jwJoK3Zf/BXzQ/+kGRW0j3zf62cPnrlByRjc+VtBlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiIjjTqD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76FA2C116C6;
-	Thu, 22 Jan 2026 16:51:03 +0000 (UTC)
+	s=arc-20240116; t=1769100775; c=relaxed/simple;
+	bh=psjr5AisREuV15xHE84c9dYu6GkG7NdkTjHqKjbkyuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k+ap/P1zTnZSTVLuJpJPwpo20W212YvOWHIfHSLnrcot/yoWwV+572yPQq3MwJ/Pp0uFGZglPvqRJJhkqUNT7F+WhInvIVbiLjr+iOGf1otqAlShF5l6I9TsOX53zwR4obn8Q7Hh0zDqxVFfCIbeNahsqSf5eabJ8dXYp4mQjjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czLgxvZH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B77C116C6;
+	Thu, 22 Jan 2026 16:52:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769100663;
-	bh=/mtVAN0RP8289udhD8FKKzimHR1+8kf3y0daA0yHddc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QiIjjTqDgMnWLTZliMyOuLT+0NQqgDioGOcvDjmdYWKR4tPUnjHaLHOI+3+jvcQyk
-	 83Gnz57GgeUYnmYtUoUruNOKwRrijZeShiumRaXz0J4CJ9hTruy8dDXzn464aOu8F3
-	 Khb+/5PKske/lISXxpms5Z/kHqaHPxoRtK5o1Nin7CDE79IeqKUMuz7TlRbD3UHNK1
-	 f/ap7r53UcnIt3OTZn72grzu0V5zwhcDMGuUr+o/4a0dhrtRfPGR+WK1usWc8em6Iz
-	 TBF47e7k0HWU1InpeZcx22CLCsTjruJNz87y4VtgEZMzHUqnwv1MQinhHZBtjtDDcH
-	 /+1yzQ9qsN/HA==
-Date: Thu, 22 Jan 2026 10:51:02 -0600
-From: Rob Herring <robh@kernel.org>
-To: Damien Dejean <dam.dejean@gmail.com>
-Cc: andrew@lunn.ch, krzk+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, hkallweit1@gmail.com
-Subject: Re: [PATCH v2 3/4] dt-bindings: net: realtek,rtl82xx: add a property
- to set MDI polarity
-Message-ID: <20260122165102.GA2564919-robh@kernel.org>
-References: <20260121151506.813783-1-dam.dejean@gmail.com>
- <20260121151506.813783-3-dam.dejean@gmail.com>
+	s=k20201202; t=1769100775;
+	bh=psjr5AisREuV15xHE84c9dYu6GkG7NdkTjHqKjbkyuU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=czLgxvZHkUY1gXv7zJaBck2lK8TCVng8prVA75Hhc8S8cCGPN2EQ6ncCZdbFYVnyf
+	 2HEFsymXnLb3M4FmvVMyo13YB03tPrk3X1iwR2widB44oU2kAa1UjnP9LpUU6x1D9t
+	 LwUumYqPNmNs7KBf1ndMgxnIcFctINOIqN32WjtNSuPU3MutW25vGZOvUk6+ReTIl0
+	 62ArP4qIfiVA0zFbgSztyr51W2Gh+VxA8Cksm0ReSg30pNDmR4nGZStVErsMMD8BsG
+	 BENFPcntMHoC/13dnRlAGjyIqh32MwzJRGK9YgBsGY6Kqe8RtQ5a0xwjrSMGwiaXqQ
+	 hVJ4uy23y2PBg==
+Date: Thu, 22 Jan 2026 08:52:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Srujana Challa <schalla@marvell.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org,
+ virtualization@lists.linux.dev, pabeni@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, ndabilpuram@marvell.com, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next] virtio_net: Increase RSS max key size to match
+ NETDEV_RSS_KEY_LEN
+Message-ID: <20260122085253.33b93921@kernel.org>
+In-Reply-To: <CANn89iL5s+egLhothNtnQf0jtAeftezUjNmbuXtUWgfVV3+bzg@mail.gmail.com>
+References: <20260122091527.339180-1-schalla@marvell.com>
+	<20260122075206.504ec591@kernel.org>
+	<CANn89iL5s+egLhothNtnQf0jtAeftezUjNmbuXtUWgfVV3+bzg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121151506.813783-3-dam.dejean@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-252460-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-252462-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,google.com,vger.kernel.org,lists.linux.dev,redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.963];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.974];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC4566B3BF
+X-Rspamd-Queue-Id: B52CE6B418
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 04:15:05PM +0100, Damien Dejean wrote:
-> MDI pair polarity is usually configured by the bootloader.  However, on
-> some designs the configuration is left untouched during boot and needs
-> to be set by the driver.
+On Thu, 22 Jan 2026 17:13:55 +0100 Eric Dumazet wrote:
+> > Willem, WDYT? Is there a reason to keep the core key small?
+> > Or deprecate netdev_rss_key_fill()?  
 > 
-> Add the property 'realtek,mdi-cfg-polarity' to configure the polarity of
-> each pair. Bit 0 to 3 configure the polarity or pairs A to D, if set to
-> 1 the polarity is reversed for this pair.
+> What do you mean by deprecating it ?
 > 
-> Signed-off-by: Damien Dejean <dam.dejean@gmail.com>
-> ---
->  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
+> One of the ideas was to make sure multiple NIC would share the same key,
+> for some bonding setups.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> index c4ced671ecb8..17088c147358 100644
-> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> @@ -61,6 +61,13 @@ properties:
->      description:
->        Force normal (0) or reverse (1) order of MDI pairs.
->  
-> +  realtek,mdi-cfg-polarity:
-> +    description:
-> +      A bitmap to describe pair polarity swap. Bit 0 to swap polarity of pair A,
-> +      bit 1 to swap polarity of pair B, bit 2 to swap polarity of pair C and bit
-> +      3 to swap polarity of pair D.
-> +    $ref: /schemas/types.yaml#/definitions/uint32
+> commit 960fb622f85180f36d3aff82af53e2be3db2f888    net: provide a per
+> host RSS key generic infrastructure
 
-maximum: 0xf
-
-However, are these properties something that should be common?
-
-Rob
+Just wanted to put that option on the table, it wasn't clear to me what
+the exact use case for the sysfs file was. Good to know that someone
+cares :) thanks for the reference!
 
