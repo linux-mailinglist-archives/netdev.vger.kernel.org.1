@@ -1,196 +1,178 @@
-Return-Path: <netdev+bounces-252310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252311-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JBqOPQNcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252310-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:45:56 +0100
+	id QBVlJ5MPcmksawAAu9opvQ
+	(envelope-from <netdev+bounces-252311-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:52:51 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58DD566317
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFC01663FB
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E38C90498D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:37:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A966D9050A7
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E97C3D5245;
-	Thu, 22 Jan 2026 11:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FB03587A6;
+	Thu, 22 Jan 2026 11:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDryn4r3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NvVpSFwc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="j1DyJ+BD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA003D3D11;
-	Thu, 22 Jan 2026 11:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F8C3563C4
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769081792; cv=none; b=tIOd3/N+QwjkrVBgbD080JJZxPXmpcZecXE+zK5YwmX/LCgLzvsFvrDyGxcPNQgSFONxv44Du1e4wXw2DrAR2fW+Vsa8l+mevbCmBATFPxlyagwy/LcFych6Yrr28Xp2CjVQxUQFGmCk7wX4RKNs/HOx2F6ghHy9ZQ2mY7D7mdc=
+	t=1769081846; cv=none; b=m8nRbnwGQaEQfYFFq85X2/zl9m1EKCxjljDJnE+7UIoObJrmSBZSRxoP2Sgs+BByZc/ZJn6QaYtqq0N2qEYJ7+uJnHwYjt9l2ocrL3E+IXKlqjuh8a833U6gvcy0FYCQGoaZA7YqH8KUUvWE5o26+dTdwegE+iLgZQicMRHQBIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769081792; c=relaxed/simple;
-	bh=ENaX1Ni1MjEYqWK5DUAycRHraRvMcIc+oNSelx9/l2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VD1BNqB4pCqKFZoesgG6bjN3hlgpWukjuN9DzSv/nE8qiH3pODBBxjyHgC/dm71fDU2frsfnEGkWuaAxxpV+qIDw2XDQX+XSNrfIRy8B4RraCEjD6PS9qSrHjtETICbBGicyXC+gEvDj/ygasCtrd1DhtCwnG3dYK2ttQ/HqKJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDryn4r3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A76CC116C6;
-	Thu, 22 Jan 2026 11:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769081791;
-	bh=ENaX1Ni1MjEYqWK5DUAycRHraRvMcIc+oNSelx9/l2Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZDryn4r3pVEndSSCPyKyGmEaA5BTct8VAHmY8jYwQGX6bZIuzGBK2tyiehlMSViCM
-	 Ei7gUubm2NpO0vLH1gLLEG7shYisa/qu58z1kPKCeHT7psSLc0dFIUNS20igfaqR8y
-	 H0JYR5Y3GLo2UHCzTKrQTDQA5CIsBsQX04/nfiZiuS1HDLzqsOcDFUUSDSixFNi2cA
-	 bcka/tqaxHdr2hWnQ1CWDAu9Vo3BBVN03Rl8iRMbmoAtVSYCecBSZ7PNzldFeiHaHe
-	 bmQniStX0qxItibPa8e+b/txibvQDRMzP6YVhz2gBqk8YlXoX44FzT/wg3EmzCppge
-	 Qf8lkGFsAGPRA==
-Date: Thu, 22 Jan 2026 11:36:21 +0000
-From: Will Deacon <will@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
- HK_TYPE_DOMAIN
-Message-ID: <aXILtazyRtpb3Yjy@willie-the-truck>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-30-frederic@kernel.org>
- <aW-cAlJCtI5Qtify@willie-the-truck>
- <aXEHf5nbZMI8LT4b@localhost.localdomain>
- <aXH0TZU7UNowTmwc@willie-the-truck>
- <aXIKDduX5qUXvOUX@localhost.localdomain>
+	s=arc-20240116; t=1769081846; c=relaxed/simple;
+	bh=47vdssggo+h/Zlz7kBJBl5ByRnPHVor2xs5SYsppYa8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O7hBI6UeyM4xeHbf25CZTdI7dEXtC9//8jBRhZmk/Vesw0wewr7lk1VAglUBrU0Z+TuBZB5zZhqaiSulugSvdNpIh8G2VWUKY6Iwh5NS/DylcvjyZxChn6vKdy97nfwR+4QduDuZ3BglB8CMo8GYPVgddW2fXpKFqD5jVOnkq8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NvVpSFwc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=j1DyJ+BD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769081843;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0wNs9tyPabqN3sAug4aUnrZjg9O+jb6nYLQLd09yp0k=;
+	b=NvVpSFwcVsuZzeXbByWp6S4i32vdSpFJrIB7mcxwInVMTc/a8Gt3ZHAZVfKeRWYO1FNUT9
+	yqNPzoKcax7Mmi+rvb9fwZpbZTo88JLCf5yqV0hltrNJbqNBKxVj9YVOQIezep8Hcz6i3n
+	bSrsG7T22EuxBRMqkIBahUQBLFmQDOA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-300-naDELoRDPQSwNd4Hnu3eBA-1; Thu, 22 Jan 2026 06:37:22 -0500
+X-MC-Unique: naDELoRDPQSwNd4Hnu3eBA-1
+X-Mimecast-MFC-AGG-ID: naDELoRDPQSwNd4Hnu3eBA_1769081841
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-435a0fb0c9cso854712f8f.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:37:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769081841; x=1769686641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0wNs9tyPabqN3sAug4aUnrZjg9O+jb6nYLQLd09yp0k=;
+        b=j1DyJ+BDUw7gZy4tbSPZ8a2D3XeKQ1N6bOtTW5QDH3Bg3fxLSj9uAXIgfaIjFj4QlR
+         H8MTh8fO311FeQ8OlIIZ2luhKzDou8l+nyDcfOzqAo04wurbWIYMpB24Z0NBZXDLlVmM
+         OwK8UwAjWZOTrskAyh8NXRJUwWRka6Rb5nPDKFokG0ELb2A+6cyNAlUONTjdUV9mME0j
+         Z7TsGlQx2EJ097wWpUQydk4hTTfzfZEk2UQZcbF9X8sEdCk7VDS+asIrxyIChApx7Scy
+         F9758faZBm1/xZc0GfwGTvcmmYJaFfuvT9nr4B7RsqwjL3+8Jc4mGkCN59C8kYGqQS3u
+         9jWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769081841; x=1769686641;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0wNs9tyPabqN3sAug4aUnrZjg9O+jb6nYLQLd09yp0k=;
+        b=MdHjMX/391Fj8ixjhFGb8NY8kmPMN2Vh1VeGYBwC5yYKBGMEZgKcQiR6JmHw8G10pv
+         MGHuqkeRURbwwboW6dbMFvhbUIEXjVueT/Ei/YFI+dFjNdg6/8RUdCz9JT1CuZFo82bG
+         /T8kat0W+gZr4zYX7rLz1vrEnhMOrVG/B9I0xilm317F4y9/xRbyxUVhnsHR0apc3hxv
+         u8Fa8xvxfuIV62OCMEof4+A0nDc5y/j5tDb6rrRJQrakz0oR+97nK2TEmfK14AnYp+RN
+         b6IQTeXE9+mB9IiRIvFTK+lxaI9AFx/zDkorNhxOfo6Bzo6mEj28dhsiDCq3vaUDPW9t
+         thoQ==
+X-Gm-Message-State: AOJu0YxkGiwk8hFi1lK5L1QufVdhwwuRUrKKylmwCdCxP2i9z/GobyYz
+	R9zyLGJam9lZ7g92UJLlWz0aH5Tyr5cwnmA6muL/RS3g1zbsGz+d7dPEzXyEPRu9UUZz7Z4LCez
+	zh7ZWX05tswJUrcCjR38L+rNbQhTh4K+5aT3NpSPmE2B0tB3f1JWJ8brKmg==
+X-Gm-Gg: AZuq6aLKzMi+4YWntaZ4naUr0gIwlY1hy1ODuItgK8Qm8YznSLdjoace/ljHcjLYIxT
+	7o7/6P+otpi01fpiSWfqH48kS9Xo2bsHT3poBK1ui9dAMkqwwNLJNgKc7oI8EnMOLKx83tUcTBm
+	p0o6rBmMUXcPXHSQArDU1pWhEToTDjqZJ6onojS/isyKMQkBLZ187iXTm/y2Jd2UWzpAJU2ili2
+	vuW7fI+3iPyEsS5bsNFh4bS1XAiXJk5YUpIZSDyCdRySusybemVknuuX6jLoWg1EgxXF2CqHNTZ
+	5MTBoxEkWWgO8eucwicMp/V2C83mkoeVxl8msZCjvL1F9PwVtWvOI/1OFzrxpcIDSfC7Nwnyees
+	Y3myLq6TrazYe
+X-Received: by 2002:a05:600c:34d3:b0:479:1348:c614 with SMTP id 5b1f17b1804b1-4803e7f03fdmr128686755e9.26.1769081840531;
+        Thu, 22 Jan 2026 03:37:20 -0800 (PST)
+X-Received: by 2002:a05:600c:34d3:b0:479:1348:c614 with SMTP id 5b1f17b1804b1-4803e7f03fdmr128686445e9.26.1769081840134;
+        Thu, 22 Jan 2026 03:37:20 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.175])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-480424b18cesm51351875e9.4.2026.01.22.03.37.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jan 2026 03:37:19 -0800 (PST)
+Message-ID: <86b8feca-8e82-465e-a17a-b751758306ce@redhat.com>
+Date: Thu, 22 Jan 2026 12:37:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXIKDduX5qUXvOUX@localhost.localdomain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] net: phy: add a new phy_device flag to
+ keep preamble before sfd
+To: Stefan Eichenberger <eichest@gmail.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
+ festevam@gmail.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ linux-stm32@st-md-mailman.stormreply.com, maxime.chevallier@bootlin.com,
+ francesco.dolcini@toradex.com
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ imx@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Stefan Eichenberger <stefan.eichenberger@toradex.com>
+References: <20260120203905.23805-1-eichest@gmail.com>
+ <20260120203905.23805-2-eichest@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260120203905.23805-2-eichest@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252310-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-252311-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,foss.st.com,pengutronix.de,armlinux.org.uk,st-md-mailman.stormreply.com,bootlin.com,toradex.com];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[will@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 58DD566317
+	DBL_BLOCKED_OPENRESOLVER(0.00)[toradex.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: DFC01663FB
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 12:29:17PM +0100, Frederic Weisbecker wrote:
-> Le Thu, Jan 22, 2026 at 09:56:29AM +0000, Will Deacon a écrit :
-> > On Wed, Jan 21, 2026 at 06:06:07PM +0100, Frederic Weisbecker wrote:
-> > > Le Tue, Jan 20, 2026 at 03:15:14PM +0000, Will Deacon a écrit :
-> > > > Hi Frederic,
-> > > > 
-> > > > On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
-> > > > > When none of the allowed CPUs of a task are online, it gets migrated
-> > > > > to the fallback cpumask which is all the non nohz_full CPUs.
-> > > > > 
-> > > > > However just like nohz_full CPUs, domain isolated CPUs don't want to be
-> > > > > disturbed by tasks that have lost their CPU affinities.
-> > > > > 
-> > > > > And since nohz_full rely on domain isolation to work correctly, the
-> > > > > housekeeping mask of domain isolated CPUs should always be a superset of
-> > > > > the housekeeping mask of nohz_full CPUs (there can be CPUs that are
-> > > > > domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
-> > > > > CPUs that are not domain isolated):
-> > > > > 
-> > > > > 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
-> > > > > 
-> > > > > Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
-> > > > > tasks and since this cpumask can be modified at runtime, make sure
-> > > > > that 32 bits support CPUs on ARM64 mismatched systems are not isolated
-> > > > > by cpusets.
-> > > > > 
-> > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > > > > Reviewed-by: Waiman Long <longman@redhat.com>
-> > > > > ---
-> > > > >  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
-> > > > >  include/linux/cpu.h            |  4 ++++
-> > > > >  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
-> > > > >  3 files changed, 33 insertions(+), 6 deletions(-)
-> > > > 
-> > > > tbh, I'd also be fine just saying that isolation isn't reliable on these
-> > > > systems and then you don't need to add the extra arch hook.
-> > > 
-> > > Hmm, I think I heard about nohz_full usage on arm64 but I'm not sure.
-> > > And I usually expect isolcpus or cpuset isolated partitions to be even
-> > > more broadly used, it's lighter isolation with less constraints.
-> > > 
-> > > Anyway you're probably right that we could remove isolation support here
-> > > but I don't want to break any existing user.
-> > 
-> > fwiw, I think it's only some Android markets using the mismatched 32-bit
-> > support and we're definitely not using nohz_full there.
+On 1/20/26 9:30 PM, Stefan Eichenberger wrote:
+> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > 
-> Now that removal becomes appealing. And what about isolcpus= / isolated cpuset
-> which only consist in scheduler domain isolation? Probably not used by android
-> either.
+> Add a new flag, PHY_F_KEEP_PREAMBLE_BEFORE_SFD, to indicate that the PHY
+> shall not remove the preamble before the SFD if it supports it. MACs
+> that do not support receiving frames without a preamble can set this
+> flag.
 > 
-> Ok but is there a way to detect on early boot that the system has mismatched
-> 32 bits support? Because I need to fail nohz_full= and isolcpus= boot parameters
-> early on top of this information without waiting for secondary CPUs boot.
+> Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 
-Honestly, I'm not sure I'd bother trying to be smart here. Even if the
-system has enabled support for mismatched 32-bit CPUs, things should
-still work properly with nohz_full/isolcpus if all the tasks are 64-bit,
-right?
+I understand this has been suggested by Russell, and LGTM, but still it
+would be nice explicit ack from the phy lib crew to ensure it matches
+expectations.
 
-In which case, I'd just document whatever weird behaviour you get if
-somebody throws 32-bit tasks into the mix. Adding hooks to the generic
-code for this use-case just seems like a waste, as they're not going to
-be used in practice and it increases the maintenance burden.
+Thanks,
 
-Will
+Paolo
+
 
