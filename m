@@ -1,309 +1,117 @@
-Return-Path: <netdev+bounces-252176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252174-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +O5+K1qecWmgKQAAu9opvQ
-	(envelope-from <netdev+bounces-252176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:49:46 +0100
+	id GAonB3edcWl6KQAAu9opvQ
+	(envelope-from <netdev+bounces-252174-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:45:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5798F61782
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:49:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B70616DA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C86794430D2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:43:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B21CF8A0A7B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41323469F7;
-	Thu, 22 Jan 2026 03:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C958140B6E1;
+	Thu, 22 Jan 2026 03:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZt6Tbha"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FC938B7BD;
-	Thu, 22 Jan 2026 03:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCDB34CFD6;
+	Thu, 22 Jan 2026 03:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769053306; cv=none; b=X+walaYKfOryWJ05CZLYHqWN5RlPEhhh8dUrwvfL9YyCMG2tuHRSoaSj4QMmRxank6cyO5ze9UNp0jb7mRCfMHheD41c2lxt/uNKy304Tc6htXWredouwS5Ui+rzj4C+cG6obRbxyXF2/OrnzprkHrV97uXtMt326l7KtMVzVZo=
+	t=1769053298; cv=none; b=QwQTIPo961QCVjm0vY5Uc5XUAvMw/CGOWssVDJgjKX1Bx0Ha7DfkmDuO5irGxqN8nfk8Mwed1ePyR1+AmBblyke5243cVtc8y/pZ0FtwE0ha1SGMfJ9aslb1bjxOgqv+t01Rllbv9LqGX1ORY0kG7mZ/X+ycLE6o68sKKZplZjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769053306; c=relaxed/simple;
-	bh=DKhvQ67nV21WwtrEBAmhZSLhfW28WuaLWbRRnZu8AOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfwQNbSR4GiFmjL/pwCyahfvnH6PHPyJSesiaWExGdyLWVFFOs9XzycIJvmCfXytiJRU7OsWxC72O9LMQUo6CPncSnXNVQtj09eedTZSlKaEjj0fKgjF0yKJDrpzWtq5FoYLkF38KC7TKAN7u+mNvobOMc1PbQd8aam6xRZTDZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vilZd-000000006Jt-1DXF;
-	Thu, 22 Jan 2026 03:41:33 +0000
-Date: Thu, 22 Jan 2026 03:41:29 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v8 1/4] dt-bindings: net: dsa: add MaxLinear MxL862xx
-Message-ID: <d078aa92bae134647c9f61e24b963b82c1af3c5e.1769053079.git.daniel@makrotopia.org>
-References: <cover.1769053079.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1769053298; c=relaxed/simple;
+	bh=fQn73AMtLykAtIbLfz754K7IjrqMh6xwHuQUkv3q07Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nRobrXiLTEGJH+eGN4OjtiseFBz6ExApFzX6AYcE6ad25f4XvgD9RuVA4dFSjD0/O6dNgQkRO6fE5TkknnQyrTli3q+lYOetpxt4mP1eBN7eJoXqUHOQAeodD1yQSNkhV5slDRf2cansqliFKoEeW/VAUf0Yed6DVzRmDKd6VLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZt6Tbha; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E56C116C6;
+	Thu, 22 Jan 2026 03:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769053297;
+	bh=fQn73AMtLykAtIbLfz754K7IjrqMh6xwHuQUkv3q07Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VZt6TbhaNMFnQUPH6VMQSSy4AY3T3m0yjxWcvzn/VJSjG/ekyR2N5WuJ1I77RoIeV
+	 UFxPvfj7KmKeZUvhEf2U+MSJbybnri/tGUIEKRvVLJRFjsT/5PK+T/USLsIiEI3Ubp
+	 rTV3QsEI1Z8DxpsYVh2htQANMvCMKPUwtAXmcIcguZG0Ju+IUfwGD0Rf2A6TPIq7T/
+	 GG42s5OMkxFqZ2apTXC+5L1RIJrMKr7o7I3+j7jhyFPJRANYFxkRBe9Hk4sfdYBwG/
+	 CDdIVQ9yDsg+jDNuWTQQ7qfteH+h0nw26S0Qreo6yZx3FryiiVGWkwWVML8KpayD/I
+	 7ubVMGLwPk1hg==
+Date: Wed, 21 Jan 2026 19:41:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: tariqt@nvidia.com
+Cc: cratiu@nvidia.com, saeedm@nvidia.com, cjubran@nvidia.com,
+ davem@davemloft.net, horms@kernel.org, linux-doc@vger.kernel.org,
+ mbloch@nvidia.com, moshe@nvidia.com, jiri@nvidia.com, edumazet@google.com,
+ gal@nvidia.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+ jiri@resnulli.us, krzk@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, rdunlap@infradead.org, leon@kernel.org,
+ corbet@lwn.net
+Subject: Re: [net-next,V5,10/15] net/mlx5: Add a shared devlink instance for
+ PFs on same chip
+Message-ID: <20260121194135.6737b36f@kernel.org>
+In-Reply-To: <20260122033959.2579113-1-kuba@kernel.org>
+References: <1768895878-1637182-11-git-send-email-tariqt@nvidia.com>
+	<20260122033959.2579113-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1769053079.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.24 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,kernel.org,vger.kernel.org,google.com,lunn.ch,gmail.com,resnulli.us,redhat.com,infradead.org,lwn.net];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252176-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	DMARC_NA(0.00)[makrotopia.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252174-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5798F61782
+	RCPT_COUNT_TWELVE(0.00)[23]
+X-Rspamd-Queue-Id: 92B70616DA
 X-Rspamd-Action: no action
 
-Add documentation and an example for MaxLinear MxL86282 and MxL86252
-switches.
+On Wed, 21 Jan 2026 19:39:59 -0800 Jakub Kicinski wrote:
+> > +int mlx5_shd_init(struct mlx5_core_dev *dev)
+> > +{
+> > +	u8 *vpd_data __free(kfree) = NULL;  
+> 
+> The __free(kfree) annotation here combined with the early return below
+> looks problematic.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
----
-v8: no changes
-v7: no changes
-v6: no changes
-v5: no changes
-RFC v4:
- * remove labels from example
- * remove 'bindings for' from commit title
-RFC v3: no changes
-RFC v2: better description in dt-bindings doc
----
- .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 154 ++++++++++++++++++
- MAINTAINERS                                   |   6 +
- 2 files changed, 160 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-new file mode 100644
-index 0000000000000..77e48f0c7b1e3
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-@@ -0,0 +1,154 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/maxlinear,mxl862xx.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: MaxLinear MxL862xx Ethernet Switch Family
-+
-+maintainers:
-+  - Daniel Golle <daniel@makrotopia.org>
-+
-+description:
-+  The MaxLinear MxL862xx switch family are multi-port Ethernet switches with
-+  integrated 2.5GE PHYs. The MxL86252 has five PHY ports and the MxL86282
-+  has eight PHY ports. Both models come with two 10 Gigabit/s SerDes
-+  interfaces to be used to connect external PHYs or SFP cages, or as CPU
-+  port.
-+
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+
-+properties:
-+  compatible:
-+    enum:
-+      - maxlinear,mxl86252
-+      - maxlinear,mxl86282
-+
-+  reg:
-+    maxItems: 1
-+    description: MDIO address of the switch
-+
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch@0 {
-+            compatible = "maxlinear,mxl86282";
-+            reg = <0>;
-+
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0>;
-+                    phy-handle = <&phy0>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@1 {
-+                    reg = <1>;
-+                    phy-handle = <&phy1>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@2 {
-+                    reg = <2>;
-+                    phy-handle = <&phy2>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@3 {
-+                    reg = <3>;
-+                    phy-handle = <&phy3>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@4 {
-+                    reg = <4>;
-+                    phy-handle = <&phy4>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@5 {
-+                    reg = <5>;
-+                    phy-handle = <&phy5>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@6 {
-+                    reg = <6>;
-+                    phy-handle = <&phy6>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@7 {
-+                    reg = <7>;
-+                    phy-handle = <&phy7>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@8 {
-+                    reg = <8>;
-+                    label = "cpu";
-+                    ethernet = <&gmac0>;
-+                    phy-mode = "usxgmii";
-+
-+                    fixed-link {
-+                        speed = <10000>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                phy0: ethernet-phy@0 {
-+                    reg = <0>;
-+                };
-+
-+                phy1: ethernet-phy@1 {
-+                    reg = <1>;
-+                };
-+
-+                phy2: ethernet-phy@2 {
-+                    reg = <2>;
-+                };
-+
-+                phy3: ethernet-phy@3 {
-+                    reg = <3>;
-+                };
-+
-+                phy4: ethernet-phy@4 {
-+                    reg = <4>;
-+                };
-+
-+                phy5: ethernet-phy@5 {
-+                    reg = <5>;
-+                };
-+
-+                phy6: ethernet-phy@6 {
-+                    reg = <6>;
-+                };
-+
-+                phy7: ethernet-phy@7 {
-+                    reg = <7>;
-+                };
-+            };
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 92768bceb929f..3c4990a90968c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15614,6 +15614,12 @@ S:	Supported
- F:	drivers/net/phy/mxl-86110.c
- F:	drivers/net/phy/mxl-gpy.c
- 
-+MAXLINEAR MXL862XX SWITCH DRIVER
-+M:	Daniel Golle <daniel@makrotopia.org>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-+
- MCAN DEVICE DRIVER
- M:	Markus Schneider-Pargmann <msp@baylibre.com>
- L:	linux-can@vger.kernel.org
--- 
-2.52.0
+__free() should be considered banned for netdev.
+Please.
+It clearly adds more bugs than it fixes.
 
