@@ -1,292 +1,219 @@
-Return-Path: <netdev+bounces-252138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252139-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Fnk/OmGHcWlaIwAAu9opvQ
-	(envelope-from <netdev+bounces-252138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:11:45 +0100
+	id SID/HtaIcWk1IAAAu9opvQ
+	(envelope-from <netdev+bounces-252139-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:17:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0848B60BD2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:11:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7469F60CEC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:17:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 888C5446676
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:07:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7E2094F52A0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED65355046;
-	Thu, 22 Jan 2026 02:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AB236C5BE;
+	Thu, 22 Jan 2026 02:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5jPqRxJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="cCM2dTBh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D0734AB06
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 02:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A1330149E
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 02:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769047676; cv=none; b=TrwVkGM2ftqk1JUuPgstHNU3HM9eVmM8wLDFUT0k2emwPVbew0WEmdOAZ4BEWLTuSdwyPSPFuwZVswZlXyFdVFX3U1SW1c3H23NyeJ/GgmBcex8Dt0z1oz2iMb3b7maB+TADJ560dml6aXUizLkGczTUd5+Ya287w+aKpWrDqRU=
+	t=1769048100; cv=none; b=r0eFc4mjy4+/9+8p0KMk5sTXpeCSTaUPy8w85+IpSkh8l7UM7tMbh51u8njlLSiiPJ1M0YO3QpTdPSbMYKuYY95H4LIQIGM9New9go/19QEULNNCUcD/6EZ+7GBTXonAwkfzfdM/ny61LnF3+AWxZyDFiMn32JoF8GBO4CGCNIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769047676; c=relaxed/simple;
-	bh=veJ883BXshNbMwe9b2qcWbWT2R5GwwZg36wLGBju1Ck=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oFiwvryuysn0lK4ZBA18yOIP1dHXDrH5rJ/WzHYkxsLkRNjvvyrDT3zlUbC2ym2ImMPxN7y3toHWoxGiNQ81V8ibDurA8W3frjTDyZxsEyNdunIG/Vyg1gFOpcJeupW5ddHH9+0vpqdlXreWwu1M99pcGuWAdsUg9QnUiyCxyUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5jPqRxJ; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-121a0bcd376so1303725c88.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769047673; x=1769652473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBQb1uczQpL5GIk29gYfa4oCHjDRy2kNRGngnJTqEfM=;
-        b=B5jPqRxJEkAORplOfsx11iCiZS+pN3O8ODaCCbncB4MVc1nlbP2eZw5GqAgvCpFgOA
-         +uI7yJjTSGfuUt9CU4XkYGpCTfClAPcmPwhlpNz+qw937Hwd+CbTZQuRWT1qTezYtB6U
-         bvWa38U3bt1apTW8MaRz3G0Ui92u+wSXA6DBAmlQMVOcCLeLUVodpGMtzUjnGFhBtRO9
-         Oraj1dneISZZ9c0J6uV0Y9+qU1y4Nn85ElCRM67idEo8ezLbXkzOtvph7lOor1ByiMcP
-         /murvgmIAeIjTXzxZigfcNrS5FFUO5w3kH9mdPgZJ/SJgBjD5VklF3lHLyn3J+Du2U1f
-         gc9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769047673; x=1769652473;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uBQb1uczQpL5GIk29gYfa4oCHjDRy2kNRGngnJTqEfM=;
-        b=XDKGiJ6YljvzcLiNrcAqUM79fRRypj/OLnZeyyoocdYw3XWQVVhvPZ761il2J2wa/a
-         /9Y/yFs8NwL0g8ZdZuXP6lU+/hgSi8KDVxhlfVyNxXYQ41IzPokpqIr5wsj6C+mhFW45
-         53qOKOB19SqnqK6NSHCHsy/5BuBctqzCKjJJInHn9fHGhBCGaz1DDrHS0xcPqrt5YQKx
-         vNAax7VEJ13SBPxbAHFfkNsp8+AeGXWAWaomHdFsXND986CNTVc+z51JznRsGOfQFaj5
-         RcErUtYfbON8Z3SQEfQt1jRzP0zzLngdl62RMnweJKTWarEaocBXG0fS2QSYVF96uEvw
-         2rww==
-X-Forwarded-Encrypted: i=1; AJvYcCVgMr+KOfxaF/akjdO5sQwQL+HqBIp7j1OgGhmaW984aF/FWYZK1t04Sdd5P1SbEljKrFcOna4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwSqq5GnxctYm02sXJnp+He1IIwXXDu5BhLc2Gx6CpHNS+syhY
-	MkBgaHCTyILpLmykKJ7BRo5tLUlCElkmV49iPtgz0igKvtjqLrifDAHj/deFNM2KhMM=
-X-Gm-Gg: AZuq6aKYTKD56+JjXPcXOsfdYGOyF7ARro8yabkhK+QYT/3y+HdDtvyP5NIrj1D6up2
-	39JFNJFMWFPXlKl7xovWwevWR58PEm1GBr3sWR4IZ5vA1OxdyUBYxJ9/c2MBxMrzUoPGWqs8Akv
-	PbQeGZk+ZgQXVXDKaA9l/zWAM+5dNpdmgTF8lcIBYFlq4BfJcXXI5x848x6tmBy9J+3VAKD1xtr
-	8ZeyzXGv1D+WdUpZldWi5kvpo9xx07xA5j3v0+CUkltrnRN28N5TZxfN+s27wCHddHiB+0AE5eF
-	Th/oIXN225E7bSb1PLBU0wulTpmsEo/oNrCY5Q/Q0YdZyctP5sMhJl+cGHN80AnyG4A4/uvTYaB
-	dsPPo4HRk6GNBzCc8FNheUEuEhRq2aVVQfIcHlLheORWDrWDWHzKtSer8yQ49YGBQBSztNyD9gb
-	ywKfk=
-X-Received: by 2002:a05:7022:608b:b0:11b:9386:7ed0 with SMTP id a92af1059eb24-1246aaf0f17mr4977855c88.45.1769047672743;
-        Wed, 21 Jan 2026 18:07:52 -0800 (PST)
-Received: from debian ([74.48.213.230])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6c2de1f29sm21740486eec.15.2026.01.21.18.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 18:07:52 -0800 (PST)
-From: Qiliang Yuan <realwujing@gmail.com>
-To: akpm@linux-foundation.org
-Cc: david@kernel.org,
-	mhocko@suse.com,
-	vbabka@suse.cz,
-	willy@infradead.org,
-	lance.yang@linux.dev,
-	hannes@cmpxchg.org,
-	surenb@google.com,
-	jackmanb@google.com,
-	ziy@nvidia.com,
-	weixugc@google.com,
-	rppt@kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	jis1@chinatelecom.cn,
-	wangh13@chinatelecom.cn,
-	liyi1@chinatelecom.cn,
-	sunshx@chinatelecom.cn,
-	zhangzq20@chinatelecom.cn,
-	zhangjn11@chinatelecom.cn,
-	Qiliang Yuan <realwujing@gmail.com>,
-	Qiliang Yuan <yuanql9@chinatelecom.cn>
-Subject: [PATCH v6] mm/page_alloc: boost watermarks on atomic allocation failure
-Date: Wed, 21 Jan 2026 21:07:42 -0500
-Message-ID: <20260122020742.230219-1-realwujing@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
-References: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
+	s=arc-20240116; t=1769048100; c=relaxed/simple;
+	bh=h9M9iejN2fNw9L397Nklz5vHxUPILS2WL8w6Xt8gB9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XHcwgYGWLR0MklJ+Fe+VgXjlkOcEmWyCSsV8IOCJak/j/4lwHv/O7eR3rCz+K9pIDNfATcEaXKPHNw18PYfdT/DfkVkYGm57HZ2dJgdwADEXsSQ+hU0HD9amsUvxEOs6zISV8PiIzbP9+yntDQiaEkd+WnCC5i5qnS8UoIsuiHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=cCM2dTBh; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5002b.ext.cloudfilter.net ([10.0.29.226])
+	by cmsmtp with ESMTPS
+	id ihBRvMHJjSkcfikDovH6Qs; Thu, 22 Jan 2026 02:14:56 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id ikDnvE3c3N3K1ikDovXrwI; Thu, 22 Jan 2026 02:14:56 +0000
+X-Authority-Analysis: v=2.4 cv=UdRRSLSN c=1 sm=1 tr=0 ts=69718820
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=aEbNOhhS7pL/zVeD3/sqyA==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=7T7KSl7uo7wA:10 a=_Wotqz80AAAA:8
+ a=mjzrLmHcpWlQMXoV4ikA:9 a=QEXdDO2ut3YA:10 a=buJP51TR1BpY-zbLSsyS:22
+ a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EJjitEleMxbmwXm5E0QeOux0F1n5t7iK35YezCN8Gzc=; b=cCM2dTBhIkc0LvIKmXqeooENE7
+	4eMWtUqSxl1aNPU8EqYmrX8P/Q3/6BNo8dgd3jihO8d3sfP2BKMFLCSUTu41JB9QGULcdA/S1eSEv
+	EPC77KDmnZuyYxtTSUx1Oah6NTrstVZxLkQ1LLSpK6d00fT6emmBFPFsuu+kYvWQYnhEJka/1QYGx
+	o5o6+iXFdS9KVEFbKgwhPxuPZAHjf8fohvaVYP5Ci0PJhGIDfScy2FfvobqnmJMheRAiS09NBCYCK
+	YGF8bUpyWMdAsjxYEyH2v+jX7nveltdgUM5r2G8Zqse8rtdH27/DX5Aozlm7G7ZfyUGVr1E9GFZ31
+	jMAnq8JQ==;
+Received: from m014013038128.v4.enabler.ne.jp ([14.13.38.128]:20643 helo=[10.79.109.44])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1vikDm-00000002iYL-3kYy;
+	Wed, 21 Jan 2026 20:14:55 -0600
+Message-ID: <09efbade-24ce-4e11-ab4e-782eab4f1a71@embeddedor.com>
+Date: Thu, 22 Jan 2026 11:14:41 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net] Revert "net: wwan: mhi_wwan_mbim: Avoid
+ -Wflex-array-member-not-at-end warning"
+To: Slark Xiao <slark_xiao@163.com>
+Cc: loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ gustavoars@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20260120072018.29375-1-slark_xiao@163.com>
+ <1228d107-4a60-4c33-a763-1a199c0b0961@embeddedor.com>
+ <5e012074.84f7.19bdab162e4.Coremail.slark_xiao@163.com>
+ <2fc0de60-6450-4ea3-957b-5de465a2313d@embeddedor.com>
+ <1eb019f4.1033.19be352bf0c.Coremail.slark_xiao@163.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <1eb019f4.1033.19be352bf0c.Coremail.slark_xiao@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 14.13.38.128
+X-Source-L: No
+X-Exim-ID: 1vikDm-00000002iYL-3kYy
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: m014013038128.v4.enabler.ne.jp ([10.79.109.44]) [14.13.38.128]:20643
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfMaxSnElsMc3BWWpOYWWIqqctXdyQebjntYIENPHAn0P63bgNPklvKrWc1rkA7KbBhEhopJ5dW/ZXlYGze+rmDwz++pJB0J0sMv2DnQX9SkRwVJXluzS
+ Yxic8QAdDLpr5WbdFijUZG0kdDCbXpGjcG+sImLr1Z7lvyjkxSj0pscUWtbOBlTIrr6mW/6SZK+TgjtalxoXLm17BaAy4B47U5M=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [1.24 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TAGGED_FROM(0.00)[bounces-252138-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FREEMAIL_CC(0.00)[kernel.org,suse.com,suse.cz,infradead.org,linux.dev,cmpxchg.org,google.com,nvidia.com,kvack.org,vger.kernel.org,chinatelecom.cn,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-252139-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_TO(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[embeddedor.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	HAS_X_SOURCE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0848B60BD2
+	HAS_X_ANTIABUSE(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7469F60CEC
 X-Rspamd-Action: no action
 
-Atomic allocations (GFP_ATOMIC) are prone to failure under heavy memory
-pressure as they cannot enter direct reclaim. This patch introduces a
-'Soft Boost' mechanism to mitigate this.
 
-When a GFP_ATOMIC request fails or enters the slowpath, the preferred
-zone's watermark_boost is increased. This triggers kswapd to proactively
-reclaim memory, creating a safety buffer for future atomic bursts.
 
-To prevent excessive reclaim during packet storms, a 1-second debounce
-timer (last_boost_jiffies) is added to each zone to rate-limit boosts.
+On 1/22/26 10:30, Slark Xiao wrote:
+> 
+> 
+> At 2026-01-20 17:28:42, "Gustavo A. R. Silva" <gustavo@embeddedor.com> wrote:
+>>
+>>
+>> On 1/20/26 18:16, Slark Xiao wrote:
+>>>
+>>>
+>>> At 2026-01-20 15:51:57, "Gustavo A. R. Silva" <gustavo@embeddedor.com> wrote:
+>>>> Hi Slark,
+>>>>
+>>>> On 1/20/26 16:20, Slark Xiao wrote:
+>>>>> This reverts commit eeecf5d3a3a484cedfa3f2f87e6d51a7390ed960.
+>>>>>
+>>>>> This change lead to MHI WWAN device can't connect to internet.
+>>>>> I found a netwrok issue with kernel 6.19-rc4, but network works
+>>>>> well with kernel 6.18-rc1. After checking, this commit is the
+>>>>> root cause.
+>>>>
+>>>> Thanks for the report.
+>>>>
+>>>> Could you please apply the following patch on top of this revert,
+>>>> and let us know if the problem still manifests? Thank you!
+>>>>
+>>>> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+>>>> index 1d7e3ad900c1..a271a72fed63 100644
+>>>> --- a/drivers/net/wwan/mhi_wwan_mbim.c
+>>>> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+>>>> @@ -78,9 +78,12 @@ struct mhi_mbim_context {
+>>>>
+>>>>    struct mbim_tx_hdr {
+>>>>           struct usb_cdc_ncm_nth16 nth16;
+>>>> -       struct usb_cdc_ncm_ndp16 ndp16;
+>>>> -       struct usb_cdc_ncm_dpe16 dpe16[2];
+>>>> +       __TRAILING_OVERLAP(struct usb_cdc_ncm_ndp16, ndp16, dpe16, __packed,
+>>>> +               struct usb_cdc_ncm_dpe16 dpe16[2];
+>>>> +       );
+>>>>    } __packed;
+>>>> +static_assert(offsetof(struct mbim_tx_hdr, ndp16.dpe16) ==
+>>>> +             offsetof(struct mbim_tx_hdr, dpe16));
+>>>>
+>>>>    static struct mhi_mbim_link *mhi_mbim_get_link_rcu(struct mhi_mbim_context *mbim,
+>>>>                                                      unsigned int session)
+>>> This patch won't introduce previous problem.
+>>>
+>>
+>> Thanks for confirming this.
+>>
+>> I'll turn it into a proper patch.
+>>
+>> -Gustavo
+> Hi,
+> Are you planing to add this revert commit to your coming patch?
 
-This approach reuses existing watermark_boost infrastructure, ensuring
-minimal overhead and asynchronous background reclaim via kswapd.
+No. I think the revert should be applied by the maintainers, first.
 
-Allocation failure logs:
-[38535644.718700] node 0: slabs: 1031, objs: 43328, free: 0
-[38535644.725059] node 1: slabs: 339, objs: 17616, free: 317
-[38535645.428345] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.436888] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535645.447664] node 0: slabs: 940, objs: 40864, free: 144
-[38535645.454026] node 1: slabs: 322, objs: 19168, free: 383
-[38535645.556122] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.564576] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535649.655523] warn_alloc: 59 callbacks suppressed
-[38535649.655527] swapper/100: page allocation failure: order:0, mode:0x480020(GFP_ATOMIC), nodemask=(null)
-[38535649.671692] swapper/100 cpuset=/ mems_allowed=0-1
+Thanks
+-Gustavo
 
-Signed-off-by: Qiliang Yuan <realwujing@gmail.com>
-Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
----
-v6:
-  - Replace magic number ">> 10" with ATOMIC_BOOST_SCALE_SHIFT define
-  - Add documentation explaining 0.1% zone size boost rationale
-v5:
-  - Simplify to use native boost_watermark() instead of custom logic
-v4:
-  - Add watermark_scale_boost and gradual decay via balance_pgdat
-v3:
-  - Move debounce timer to per-zone; optimize zone selection
-v2:
-  - Add debounce logic and zone-proportional boosting
-v1:
-  - Initial: boost min_free_kbytes on GFP_ATOMIC failure
----
- include/linux/mmzone.h |  1 +
- mm/page_alloc.c        | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 1 deletion(-)
----
- include/linux/mmzone.h |  1 +
- mm/page_alloc.c        | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index 75ef7c9f9307..8e37e4e6765b 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -882,6 +882,7 @@ struct zone {
- 	/* zone watermarks, access with *_wmark_pages(zone) macros */
- 	unsigned long _watermark[NR_WMARK];
- 	unsigned long watermark_boost;
-+	unsigned long last_boost_jiffies;
- 
- 	unsigned long nr_reserved_highatomic;
- 	unsigned long nr_free_highatomic;
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index c380f063e8b7..8ea2435125d5 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -218,6 +218,13 @@ unsigned int pageblock_order __read_mostly;
- static void __free_pages_ok(struct page *page, unsigned int order,
- 			    fpi_t fpi_flags);
- 
-+/*
-+ * Boost watermarks by ~0.1% of zone size on atomic allocation pressure.
-+ * This provides zone-proportional safety buffers: ~1MB per 1GB of zone size.
-+ * Larger zones under GFP_ATOMIC pressure need proportionally larger reserves.
-+ */
-+#define ATOMIC_BOOST_SCALE_SHIFT 10
-+
- /*
-  * results with 256, 32 in the lowmem_reserve sysctl:
-  *	1G machine -> (16M dma, 800M-16M normal, 1G-800M high)
-@@ -2189,12 +2196,31 @@ static inline bool boost_watermark(struct zone *zone)
- 
- 	max_boost = max(pageblock_nr_pages, max_boost);
- 
--	zone->watermark_boost = min(zone->watermark_boost + pageblock_nr_pages,
-+	zone->watermark_boost = min(zone->watermark_boost +
-+		max(pageblock_nr_pages, zone_managed_pages(zone) >> ATOMIC_BOOST_SCALE_SHIFT),
- 		max_boost);
- 
- 	return true;
- }
- 
-+static void boost_zones_for_atomic(struct alloc_context *ac, gfp_t gfp_mask)
-+{
-+	struct zoneref *z;
-+	struct zone *zone;
-+	unsigned long now = jiffies;
-+
-+	for_each_zone_zonelist(zone, z, ac->zonelist, ac->highest_zoneidx) {
-+		/* 1 second debounce to avoid spamming boosts in a burst */
-+		if (time_after(now, zone->last_boost_jiffies + HZ)) {
-+			zone->last_boost_jiffies = now;
-+			if (boost_watermark(zone))
-+				wakeup_kswapd(zone, gfp_mask, 0, ac->highest_zoneidx);
-+			/* Only boost the preferred zone to be precise */
-+			break;
-+		}
-+	}
-+}
-+
- /*
-  * When we are falling back to another migratetype during allocation, should we
-  * try to claim an entire block to satisfy further allocations, instead of
-@@ -4742,6 +4768,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
- 	if (page)
- 		goto got_pg;
- 
-+	/* Proactively boost for atomic requests entering slowpath */
-+	if ((gfp_mask & GFP_ATOMIC) && order == 0)
-+		boost_zones_for_atomic(ac, gfp_mask);
-+
- 	/*
- 	 * For costly allocations, try direct compaction first, as it's likely
- 	 * that we have enough base pages and don't need to reclaim. For non-
-@@ -4947,6 +4977,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
- 		goto retry;
- 	}
- fail:
-+	/* Boost watermarks on atomic allocation failure to trigger kswapd */
-+	if (unlikely(page == NULL && (gfp_mask & GFP_ATOMIC) && order == 0))
-+		boost_zones_for_atomic(ac, gfp_mask);
-+
- 	warn_alloc(gfp_mask, ac->nodemask,
- 			"page allocation failure: order:%u", order);
- got_pg:
--- 
-2.51.0
+> Actually it's urgent to revert this change since the release deadline of v6.19 is coming soon
+> and all my MHI WWAN device have been impacted.
+> I don't know why this commit has been tagged as "Not Applicable" and who did this.
+> 
+> I hope we can fix it regression before the official v6.19 release.
+> 
+> Thanks
 
 
