@@ -1,69 +1,105 @@
-Return-Path: <netdev+bounces-252313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OXOCMMUcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:14:59 +0100
+	id QP3aFHoZcmnrbwAAu9opvQ
+	(envelope-from <netdev+bounces-252314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:35:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4F4667CF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:14:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C6766B39
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:35:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4B5BB7223F6
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:51:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DDAD372C09E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9B3421EE7;
-	Thu, 22 Jan 2026 11:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1EF449EA8;
+	Thu, 22 Jan 2026 11:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSgNyZv6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3YJwLdg";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNiGR02K"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6333E3ACEE2
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AB743E9D3
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769082666; cv=none; b=U26Q2av8LpqS45JMqfGhd4bpIHPVAHbXYOix8DtgSQFarO8ALJxP5HjgA6+WkHfTjXWtH1HMPZi8TWIMQnA+MgskmPMMJRQLyFbpJox1EEzYBjCyXThtEsf5cHCABxpt9Fld6jQSXnCqzT+46AXTWr7jYY615tAqvGft+SjEZOk=
+	t=1769082694; cv=none; b=hTEEdiKCbf3nYzttHaoRFuoLW/dk/E6DJfVCu24clLp3NORTX/OgH4JOndTE6MAl2FziA49hP7AsJLRihsKRJn+XN0ui98/CGs9a0fCiHWTPrD4r67y6ehlAdaUpcqH+qjYpsN5aggvZxWhN62SRcyCW5662gnuT9hZc7+luJZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769082666; c=relaxed/simple;
-	bh=3Pa1VnZ+BCbmLEI4m7Qgd5wGikTxBI+GTyVTu6C7AW4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gqo5ONIygHu1YJStJm52c2DONb5nD8h68OipctYvLEqPLOIS+iPv29fXuFvMpcg0aBpVx4JwAeMXC+LJE3R3n1RSOouUNY0yulb8fNZHTxKCA7LABuDGR4Vr8FHZsHBNfqeONv4PfwuQlDaZDzV8YuhYSoyIYZIj6cedYSaIjGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dSgNyZv6; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1769082694; c=relaxed/simple;
+	bh=7KL1VMVD3OFpbZXu6ToVT7ahy8hRxRMUgANKnvOVq7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DoR3EqEMUooGESSiXAoluKrZ3WULmcA+h9fmMEosBcG7kWOvFTCjbvhbLrHq61kvPOLl/lvFRosybrFu/XyvLXth47UwSNAgmmLXb3vx04Mt9oUyLEER1DZYN8TT3jy2Xh8jkGlIKQezkK9F5Aq/jf2OKBxPSP1drX4sGvEmvOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B3YJwLdg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CNiGR02K; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769082663;
+	s=mimecast20190719; t=1769082691;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5TGblO5iXhT/s9b+tg5+0vYPJq6Re+s4kM0xTkCDf6M=;
-	b=dSgNyZv6lU5NqDKqVTsz1e504Yhjif+AgJjHBEwmLWlprBZN+cw05tSukpqULWsPHJOXik
-	foBCZcuD6/AfVRn929TJ1PfxFdxEQLcOVdiIMZFlhQLpi70XLmdXQOL3hrGSf9Fv3gAhOx
-	eIay2HCauZo3mn/Ar/8oRvivkUqnk+Y=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-508-HQ6WwfY1N9-Zj_BLG4kPbw-1; Thu,
- 22 Jan 2026 06:51:00 -0500
-X-MC-Unique: HQ6WwfY1N9-Zj_BLG4kPbw-1
-X-Mimecast-MFC-AGG-ID: HQ6WwfY1N9-Zj_BLG4kPbw_1769082658
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CC1419560AA;
-	Thu, 22 Jan 2026 11:50:57 +0000 (UTC)
-Received: from [10.44.32.135] (unknown [10.44.32.135])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 95EC51800577;
-	Thu, 22 Jan 2026 11:50:51 +0000 (UTC)
-Message-ID: <c87cecdc-8ba5-4831-889f-0d903ae7b5ca@redhat.com>
-Date: Thu, 22 Jan 2026 12:50:50 +0100
+	bh=7JTm3xpnzgFJS91sLL+soLriB/Qr5GTFc7WAwtsXhWA=;
+	b=B3YJwLdgWu0sH03BtW89nqfch15u7M8VedXgRiUuPaAvYkI4ZafaU1nNt6+V9NTAAioUNK
+	2t1Pb3AyLvKARQMIWO3p680LXbsWrL9vVP54l3o82eOZHbRzGiCMUx/95JWW2vul6GbSMa
+	641uuwQr4Ha8+ls9659P2pO/vqAABNg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-3-Y7PErNkiOGmcJz3F1I8U_w-1; Thu, 22 Jan 2026 06:51:30 -0500
+X-MC-Unique: Y7PErNkiOGmcJz3F1I8U_w-1
+X-Mimecast-MFC-AGG-ID: Y7PErNkiOGmcJz3F1I8U_w_1769082689
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4359d70faa2so593264f8f.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:51:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769082689; x=1769687489; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7JTm3xpnzgFJS91sLL+soLriB/Qr5GTFc7WAwtsXhWA=;
+        b=CNiGR02KxtXnSh+DoOi8sZI2ctNVylVd5kk1li9xKA7iSsGlfQdMlVYh47mwqeT9pl
+         FsXzkcUhBZXNOpGyktU1AI8WbApeeUJ/P3qGrPO+RIa7aisOI/5StRW2dh7tTGWXMPCJ
+         mgOyNok8d3kIAyMWP61S8jBYNvjhNr9mJD7Keei1rOE40Y7AaSQkiJHNzPL87y7fTtiI
+         oMyRn3uy3lJcnhDxSUKc9CnPPKF4bDdV7n7p9L5xo0TuNIw/DhGzcGLcgtlQ8gf3p5Uq
+         4xydtgay+CGyewTqQlgpb6kgHuSNbG4Ry1mJyYy3TdQSver0OP5cKHpH0Qirkwhpi7PL
+         bw/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769082689; x=1769687489;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7JTm3xpnzgFJS91sLL+soLriB/Qr5GTFc7WAwtsXhWA=;
+        b=jur7XscY0WxKbtHwXeHi3fL2DKpOXSCM+JyrQj8G4I6vABd4fjWdW+KRArHAspoofQ
+         0KAkQgCJ+o6Ro+0Yk/Qxuo8r/Tl1af7igdGf/31srCS4xLyyVlcRRsvdreqbwvbfmldF
+         TdhyC2VNo+zsIM9jYuxwZTkz4J5N26WxjnSiXg7oNqSmkhR53CqvO0L9EldCSmmLoorK
+         RvO1hDyEm7t/m1GpgrOzu3VCJUVCxQUtm/FKfK4uyXCmx8VyDg5vryN/v8TkgJmVE3K2
+         ibawxK4Qk5i5steXDxvjibZhZxKAY1sJhx+shTLbbgoG3n529uEGHlfhvfdqwQMr0AsD
+         ivtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkObT3Rlx6+kcNvJ2W+/j+SuPoUwdZ4N/olivNVc/UyDXa4nxCZuuz9Wl7O3ET/yc/h1QT2kg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvieUywPZZ8ev9Ul4zL7Xkzp/dzFHM9FCBYTIbj64Yh1CK9Xer
+	UDeBbjk4Jx1GYTZEyXInbs7v5L0fOsqH0guSrCg5swA+1scK//PqYv+8hG0UvDJFkn0nigIimH3
+	z/zT4dCBxd/Zn1am6ng518009erxiZUaVfS5jegb1JCG6pQUBPH0DarrucQ==
+X-Gm-Gg: AZuq6aL5I6QhKWInRfpD3cRLER69arpkh8LBwRBnk4831GGXnP9sG8oq9h+G/axTFjF
+	oixAC3mdjuT0cS+rATKrnDR8UR89mINzwq35HthswD+turKfYa7tVyT6qd1uXH4kBaSZWhU4k34
+	8rTA5l+yTFfgGFFNWImrWv+nO2w6xoDS7pSnFQHx4ozoIBscJbtwqYW+I7OJYLe3SfzRpMDltJw
+	uKJMQYS4z5uGgPePFAGdzZWcx+umhQoHV2PxKE6SVN4mvBnyMFE4mQdd6c/FMZ2BV8LnBJJzU+0
+	cvI2WFmznpzW8Ejg8+ef3l5cj4P4g3vVK3d/DGqXTt1NOys1J0abBW+pQR5+YVxWmF0z0wkLTqA
+	b/P07jW5Zvn6m
+X-Received: by 2002:a5d:5d83:0:b0:425:769e:515a with SMTP id ffacd0b85a97d-4356a05c0bcmr32153856f8f.42.1769082689340;
+        Thu, 22 Jan 2026 03:51:29 -0800 (PST)
+X-Received: by 2002:a5d:5d83:0:b0:425:769e:515a with SMTP id ffacd0b85a97d-4356a05c0bcmr32153818f8f.42.1769082688972;
+        Thu, 22 Jan 2026 03:51:28 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.175])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4358f12ee69sm21693720f8f.11.2026.01.22.03.51.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jan 2026 03:51:28 -0800 (PST)
+Message-ID: <d9170bdd-140f-4d36-954d-76223e31b209@redhat.com>
+Date: Thu, 22 Jan 2026 12:51:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,152 +107,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Ivan Vecera <ivecera@redhat.com>
-Subject: Re: [Proposal,Question - refresh] ACPI representation of
- DPLL/Ethernet dependencies (SyncE)
-To: Andrew Lunn <andrew@lunn.ch>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Linus Walleij
- <linusw@kernel.org>, Mika Westerberg <mika.westerberg@linux.intel.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Mark Brown <broonie@kernel.org>,
- Jan Aleszczyk <jaleszcz@redhat.com>, Michal Schmidt <mschmidt@redhat.com>,
- Petr Oros <poros@redhat.com>, linux-acpi@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Sakari Ailus <sakari.ailus@linux.intel.com>
-References: <6e4e40b8-b3cb-4892-8d37-d450a02e4c52@redhat.com>
- <a6e64236-d164-40d1-85d3-caf7d27fc952@lunn.ch>
+Subject: Re: [PATCH net v2] net: spacemit: Clarify stat timeout comments and
+ messages
+To: Vivian Wang <wangruikang@iscas.ac.cn>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Yixun Lan <dlan@gentoo.org>, Chukun Pan <amadeus@jmu.edu.cn>,
+ Michael Opdenacker <michael.opdenacker@rootcommit.com>,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20260121-k1-ethernet-clarify-stat-timeout-v2-1-76ff1a1168d9@iscas.ac.cn>
+ <20260121200439.64c22125@kernel.org>
+ <5639ff0c-dfd1-4528-a0ce-92d3c457ce64@iscas.ac.cn>
 Content-Language: en-US
-In-Reply-To: <a6e64236-d164-40d1-85d3-caf7d27fc952@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <5639ff0c-dfd1-4528-a0ce-92d3c457ce64@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	TAGGED_FROM(0.00)[bounces-252313-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252314-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	R_SPF_SOFTFAIL(0.00)[~all];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:url,analog.com:url,ti.com:url,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: BC4F4667CF
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,lunn.ch:email]
+X-Rspamd-Queue-Id: B8C6766B39
 X-Rspamd-Action: no action
 
-Hi Andrew,
-
-(Adding Sakari Ailus to CC, who might have insights on modeling
-  component topologies in ACPI).
-
-On 1/22/26 1:09 AM, Andrew Lunn wrote:
->> * While the physical signals on these wires are indeed clocks (10MHz,
->>    etc.), from the OS driver perspective, this is not a "Clock Resource"
->>    issue. The NIC driver does not need to gate, rate-set, or power-manage
->>    these clocks (which is what _CRS/ClockInput implies).
+On 1/22/26 11:39 AM, Vivian Wang wrote:
+> On 1/22/26 12:04, Jakub Kicinski wrote:
+>> On Wed, 21 Jan 2026 10:17:18 +0800 Vivian Wang wrote:
+>>> This patch isn't a fix for the problem per se, since it is hardware
+>>> behavior. The new message and comments, however, should direct those
+>>> running into this on new hardware towards a fix.
+>> Is it not possible to improve the situation?
 > 
-> Is this a peculiarity of the zl3073x? No gating, no rate-set, no power
-> management?
+> Maybe I should have made it clearer, but this comment and messages
+> improvement was proposed by Andrew in the linked thread [1].
 > 
-> I had a quick look at the Renesas 8V89307
+> As an aside, saying that made me realize this patch should be:
 > 
-> https://www.renesas.com/en/document/dst/8v89307-final-data-sheet?r=177681
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
 > 
-> Two of the three inputs have an optional inverter. CCF has
-> clk_set_phase(), which when passed 180 would be a good model for this.
-> The inputs then have dividers which can be configured. I would
-> probably model them using CCF clk-divider.c for that. There is then a
-> mux, which clk-mux.c could model. After the DPLL there are more muxes
-> to optionally route the output through an APLL. The output block then
-> has yet more muxes and dividers.
+>> Is the refclock disappearing because of power saving?
+>> Or because the link is down?
 > 
-> All that could be described using a number of CCF parts chained
-> together in a clock tree.
+> I'm not really well-versed in what's allowed from the PHY here, but at
+> least the Motorcomm and Realtek PHYs seem to only stop this clock while
+> the link is down. So from what I can tell it's PHY stopping the clock
+> because of power saving for when the link is down. I'm not sure how that
+> should translate into an answer to your question here...
 > 
-> And what about the TI LMK05028
+>> Because if it's the latter we should be able to skip reading the stats
+>> when link is down (still racy but better than waiting in cases we can
+>> detect?)
 > 
-> https://www.ti.com/product/LMK05028
-> 
-> It also has inverters and muxes, but no dividers.
-> 
-> Analog Devices ad9546 also has lots of internal components which could
-> be described using CCF
-> 
-> https://www.analog.com/media/en/technical-documentation/data-sheets/ad9546.pdf
+> If checking the link is definitely up as a condition for updating stats
+> would be acceptable, then maybe the original patch from the linked
+> thread [2] can also be adopted?
 
-I agree with you that the hardware itself (ZL3073x, Renesas 8V89307,
-etc.) is complex and has internal structures (dividers, muxes) that
-technically fit the CCF model.
+My understanding is that such option would fit Jakub's suggestion. Note
+that the commit message should be expanded and clarified WRT the
+original submission.
 
-However, I believe the distinction lies in how the inter-device topology
-is used versus how the device is managed internally.
-
-The kernel now uses the dedicated DPLL Subsystem (drivers/dpll) for
-SyncE and similar applications. This subsystem was created because CCF
-captures "rate and parent" well, but does not capture SyncE-specific
-aspects like lock status, holdover, priority lists, and phase-slope
-limiting.
-
-In our architecture, the complex configuration you mentioned (dividers,
-muxes) is managed via the DPLL Netlink ABI. The control logic largely
-resides in userspace daemons (e.g., synce4l), which send Netlink
-commands to the DPLL driver to configure those internal muxes/dividers
-based on network conditions.
-
-The NIC driver's role here is passive; it effectively operates in a
-"bypass" mode regarding these signals. The NIC does not need to call
-clk_set_rate() or clk_prepare_enable() on these pins to function. It
-simply needs to report the physical wiring linkage: "My input / output
-is wired to DPLL pin with index X."
-
-If we use standard Clock bindings (CCF), we imply a functional
-dependency where the NIC acts as a controller/consumer that actively
-manages the clock's state. In reality, the NIC is just a conduit mapping
-a local port to a remote pin index.
-
-We are effectively modeling a graph linkage (similar to ports / remote-
-endpoint in media graphs) rather than a functional resource (like
-clocks=<&clk0> or regulators=<&some_reg>).
-
-We are utilizing _DSD properties to model this topology edge, which is
-consistent with how other subsystems (like Media) utilize firmware node
-graphs in ACPI to describe complex non-resource connections.
-
-This provides the NIC driver with the "remote endpoint ID" (the pin
-index) it needs to populate the Netlink ABI, without forcing the driver
-to import the complexity of a full Clock Tree that it has no intention
-of managing.
-
-Does this distinction—modelling the "topology graph" rather than
-a "clock resource" make sense as a rationale for using _DSD here?
-
-Regards,
-Ivan
-
-> So i do wounder if we are being short sighted by using the clock
-> bindings but not Linux clocks.
-> 
-> 	Andrew
-> 
+/P
 
 
