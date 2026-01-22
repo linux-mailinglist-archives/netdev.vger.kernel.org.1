@@ -1,350 +1,467 @@
-Return-Path: <netdev+bounces-252257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252258-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4GUiH7PycWmvZwAAu9opvQ
-	(envelope-from <netdev+bounces-252257-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:49:39 +0100
+	id YEteFF31cWmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252258-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:01:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A3A64CA2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:49:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9568A64EF0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DF98A509676
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:44:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E726B72B369
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A853101C2;
-	Thu, 22 Jan 2026 09:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MuqdUC9b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118403A89A2;
+	Thu, 22 Jan 2026 09:49:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f100.google.com (mail-dl1-f100.google.com [74.125.82.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183C729DB88
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.100
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769075065; cv=pass; b=ufLd0w45QhrgbzT/3f3QcEoHH//WtFVX3kHDnyEQuNnBRX0bfIULhZCfQ6XugdrxC3MLWDzNJqq+8s/BkFZVPPsqFihvDAhpeevG0sUNxMaG+j07y9CIC3pYQRSMNjeyaSiPSXWEYgBK9nCpfHY4aYege0Nxxy3YP62BTPlEHUg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769075065; c=relaxed/simple;
-	bh=9oUyGmPOjHZCJLoDlJrWZ4Jt/qZNPYP6QXm1VxMBki4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GCrXDkArlkFKf9o92O24RQy0cnCuIwhxgG0tyISXEQVSu5j103vGh2qV+sUE7EJJHsmBueHKeIdsiw0u4+kLyHPFTbwdfJC29XEUytexLEE0UbTWpgmeFIb1LC1pMCP0T+WJsLifU5ihzkD3RFcunV+dwuJuBw8JA0SqipO54Rs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MuqdUC9b; arc=pass smtp.client-ip=74.125.82.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-dl1-f100.google.com with SMTP id a92af1059eb24-124566b6693so2165929c88.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 01:44:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769075063; x=1769679863;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xyklrThIIAGL1LXJOZg6CejubZvjpFddsN71DIKmab4=;
-        b=Fubkd/Xgf74k6Mi3MqcTcjti90tnWi3ACVGKzh9Attkd+O/USEFE6NwElXc+89/VA/
-         0ivX59rYV4Sn0FI0y721HmXb8CBnTgqUmcIVhdv+mNuNCwShyp2agNkMrw/5iZRaGiBE
-         B7cuhNEBWnFWBN1eNuXlHVeURNuhSt72A7FD8FSGtQuIYdan9C58An5OxOPdeR6KsPMV
-         GFjSq0xmDXNKbZPTsQ4cPXq26B4c59qUyoMSHwdu3NX3Glpzfg5dQTXaSJyK/muCU2rI
-         oJd6u3zVQdCFjVXREDmicXvSpa6PFD1tM245fcEhmj9sb8R1DqAk62ZAU1jEcx77CnPm
-         hW5Q==
-X-Forwarded-Encrypted: i=2; AJvYcCXk0juwL9z/NUTyFMhg0WnRVJggsSRbkR1hK6YnHqhSuLaQU0gIkdQtb2o4o6CB34UwHT8nTk4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMrutdnZyF+SrXo2hDf8y8sjIE2K3w4mYIy45FlurUTpWsE4ln
-	WlpJCGE3TcTWeGX3zVqhv8cX+R4gAoUdR8Nr85r5sdgMc2djDC8kdFRGZFRUSh+ughJXe4kkqdW
-	5tuixvy7gURMEkMqkZ22SYTlOwIm/ybU1M458+q6TAfnU0RnAlz7aLc4n2h7/cqaZX48jtyw7G0
-	K+Ma8PR5KSotr9AOTz0hmU3efY0FDTdhODSiPV7SkUOMx/ARzpgINL0v5ctkzwKGUN/mMZKcvfV
-	93HbBG2Jjc=
-X-Gm-Gg: AZuq6aLgoyRD7uQz2luQwDB35DsBkfYQxontxfPoc9gpQPr6MgNERJCsOpn2Uyd891J
-	0DMWemwqQ++6nsKAHJG1OSs9GahgZH+F25+nbIs+B3t8ZPjAQ2I3IrJ231jZX/4Um6nC18QSaTe
-	wQOWPsmzXt6Vo6fgJhoU0S04TNH28CNnQCPLDSeCnRzjNcEHAwsvdihfhQe47SODkzu2FhAvrmE
-	X10YrRqhF+HXMp2epozVxlK37RQxdbU3abctK1rQOEqxR7xZjG/m9G6ecWsIpwIdzEGzims7l7R
-	p0h1uABvQM0U505DjLFAmHblEomCdhMyO3g4jtmLBOLdmnJyHj1smHVCyh5iu+bfmTfX5UuYVwU
-	JoD9ZzeUu47D6dt6s/B4058esGINBf15CZqlz4FYH6ucmuiFig8iFxQ5vvrBMGjgfj2qFBj68es
-	zeIjg4Ox0LaRRFEnWa5zsx//1p6r8TA/YIzzhuJHwRNa0hJDM=
-X-Received: by 2002:a05:7022:b8f:b0:11a:4016:44a5 with SMTP id a92af1059eb24-1244b3706e1mr14511019c88.24.1769075062959;
-        Thu, 22 Jan 2026 01:44:22 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-1244aed80besm3899809c88.7.2026.01.22.01.44.22
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Jan 2026 01:44:22 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2a58c1c74a3so8534025ad.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 01:44:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769075061; cv=none;
-        d=google.com; s=arc-20240605;
-        b=N6OFAZe3f10hflh1eHZBLlDBuMQFiZcZ2l5JhxiWgG3sFwUvRcxis8XTEoM78k7I5b
-         PFoCaBZ9Ksi7106U+OLZrNd9d1QNHzx4okMtJEIT2LuUPSqCmMgRZSkvi+hIbJdEmLzQ
-         C5Cae7B/3fo02Nl12uHdQDn1no7UKuYaMs2r9VC56r1GuwkyAVY+TBi3wQx4avMFmSjt
-         1Rapn2bUSYMW9qbOFiqeEL2qvCFCnnpZi5AzgCBdqWwD/HNqDWBvS7Hn1VifaL8uLbv+
-         hieOD82uV5jpDlAgmMREYIRTGVyG8uuy6CwmaiOWftM0kCcXOf0VwfMS79HFeXhJ5nSu
-         NWEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=xyklrThIIAGL1LXJOZg6CejubZvjpFddsN71DIKmab4=;
-        fh=EEAW8QuTyILbupALRAO0FSo2K8Skko+DFbGA8bvSMI0=;
-        b=Q5VXIzoodC+EIJfG0YS9zg4jI2GS69Iir+d2+Q0GlcBl553C4xuPEKqmh/z336hbcu
-         +5xNZxrY0qt2eYkURJ9XZReRO0zZI3zZcniGUmCu+9wQuvuK3qycTnvSeM4Ajj32tYxE
-         x14/ZHSJOrLu1FacwYO5ll6GHn5c4OmaXUJRWoCBi1tYCXkt7gDT8ZM+9BFfoSFqOTrg
-         5uQEgXiP0+vVRNv5Bdv2SBFAkG5b+YbHZNyxHUz1FfWuKe6KxesnJSXInLQVjd2vBF4f
-         2uVAZB8akYHRfKB+STCNQCrBRQ3GadoTdi9xAqUnePmKZ3yYw/Mzu+k49dXyGNiNP1ou
-         yDvw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1769075061; x=1769679861; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xyklrThIIAGL1LXJOZg6CejubZvjpFddsN71DIKmab4=;
-        b=MuqdUC9bTtC3qAfbPtyARa0Qd+R4Iz5s0bawdCoEIEEGpjJlFJXojGsQYf3vLRPQMe
-         Yx0U45+F2x7NdqmoeM94NyemsHpfmdCxvvzgKkUFIuZD8bTF/SNnphYrS5X1Zb5KPvH5
-         Jqp7ZDBiH0acHKwwEhi4RXH0pydkPurZukR0I=
-X-Forwarded-Encrypted: i=1; AJvYcCVaT1oo6fenSfd6aqL6LmLWnbCP6URcUhji+H0BG7reOAgPlY+kWsMJwPgcxBKRG6paIDlMlxg=@vger.kernel.org
-X-Received: by 2002:a17:903:248:b0:295:4936:d1e9 with SMTP id d9443c01a7336-2a71892947dmr198003985ad.36.1769075060988;
-        Thu, 22 Jan 2026 01:44:20 -0800 (PST)
-X-Received: by 2002:a17:903:248:b0:295:4936:d1e9 with SMTP id
- d9443c01a7336-2a71892947dmr198003845ad.36.1769075060611; Thu, 22 Jan 2026
- 01:44:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63FE279DC9
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769075350; cv=none; b=uXwm1rSHIn6xDVBXKcwYQb0g+Efe4/gmZJM9/4ztcY/spTbFx65uA3Mfh4n9Qn6BhSGFZPFTy0ahDreTCxJWXfqPE254jmDJvEIANzpsuy5i/zRxZOpXfZniFo37c2qco4W6SOV8OZCGXEO1gi42Nt1Hi1jlpK2pWIdpCFlkBfI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769075350; c=relaxed/simple;
+	bh=/blM4cWccoRzuXNCYZY+wvi7d9hC0on7LP7cjjY7MBI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NJA7uFhFFICXXx71VC8jhHU5YlUJTd6TK1962c+PhUZxXo/x7tutKkPobaodeasXKKYv8MCaR6t4HPqtRN62kEFPG0nzrHOJ3xueabiTq6ZvtHp5oH5RozVuioJjpjZScGqj5khmo2DVSiSixdFRZ3RJiLQ4xHmBYj3snWIHS0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 422C94C1AD77C7;
+	Thu, 22 Jan 2026 10:48:26 +0100 (CET)
+Message-ID: <400faae7-94fd-4c4f-bd92-88f94d7a3a95@molgen.mpg.de>
+Date: Thu, 22 Jan 2026 10:48:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122092623.479177-1-zilin@seu.edu.cn>
-In-Reply-To: <20260122092623.479177-1-zilin@seu.edu.cn>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Thu, 22 Jan 2026 15:14:08 +0530
-X-Gm-Features: AZwV_Qjpj8byzDTG6KRCxMovGnwP32vP7Q5SUMJHLjA2FXyx4Dsakz5QYHEJQFQ
-Message-ID: <CALs4sv3STBARmMOZiBSXHtFkXd3E_hJwjWJ0x8zJ1_cYYw=ioA@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: Fix memory leak in bnxt_alloc_mem()
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: michael.chan@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009d44e00648f6e22e"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ixgbe: refactor: use
+ DECLARE_BITMAP for ring state field
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ netdev@vger.kernel.org, Marcin Szycik <marcin.szycik@linux.intel.com>
+References: <20260122085039.1117442-1-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260122085039.1117442-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.56 / 15.00];
-	SIGNED_SMIME(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+X-Spamd-Result: default: False [-1.26 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[broadcom.com,reject];
-	TO_DN_SOME(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_FROM(0.00)[bounces-252257-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pavan.chebbi@broadcom.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,mail.gmail.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: D5A3A64CA2
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[mpg.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252258-lists,netdev=lfdr.de];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mpg.de:email,molgen.mpg.de:mid,intel.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9568A64EF0
 X-Rspamd-Action: no action
 
---0000000000009d44e00648f6e22e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Dear Aleksandr,
 
-On Thu, Jan 22, 2026 at 2:56=E2=80=AFPM Zilin Guan <zilin@seu.edu.cn> wrote=
-:
->
-> In bnxt_alloc_mem(), the function allocates memory for bp->bnapi,
-> bp->rx_ring, bp->tx_ring, and bp->tx_ring_map.
->
-> However, if the allocation for rx_ring, tx_ring, or tx_ring_map fails, th=
-e
-> function currently returns -ENOMEM directly without freeing the previousl=
-y
-> allocated memory. This leads to a memory leak.
->
-> Fix this by jumping to the alloc_mem_err label when allocation fails,
-> which ensures that bnxt_free_mem() is called to properly release all
-> allocated resources.
 
-This fix is not needed. The memory is freed by the caller of bnxt_alloc_mem=
-().
+Thank you for your patch.
 
->
-> Compile tested only. Issue found using a prototype static analysis tool
-> and code review.
->
-> Fixes: a960dec98861 ("bnxt_en: Add tx ring mapping logic.")
-> Fixes: b6ab4b01f53b ("bnxt_en: Separate bnxt_{rx|tx}_ring_info structs fr=
-om bnxt_napi struct.")
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Am 22.01.26 um 09:50 schrieb Aleksandr Loktionov:
+> Convert the ring state field from 'unsigned long' to a proper bitmap
+> using DECLARE_BITMAP macro, aligning with the implementation pattern
+> already used in the i40e driver.
+> 
+> This change:
+> - Adds __IXGBE_RING_STATE_NBITS as the bitmap size sentinel to enum
+>    ixgbe_ring_state_t (consistent with i40e's __I40E_RING_STATE_NBITS)
+> - Changes 'unsigned long state' to 'DECLARE_BITMAP(state,
+>    __IXGBE_RING_STATE_NBITS)' in struct ixgbe_ring
+> - Removes the address-of operator (&) when passing ring->state to bit
+>    manipulation functions, as bitmap arrays naturally decay to pointers
+> 
+> The change maintains functional equivalence while using the
+> more appropriate kernel bitmap API, consistent with other Intel Ethernet
+> drivers.
+
+Any interesting changes in the generated assembly code?
+
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 8419d1eb4035..99dae75146b5 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -5491,8 +5491,10 @@ static int bnxt_alloc_mem(struct bnxt *bp, bool ir=
-q_re_init)
->                 bp->rx_ring =3D kcalloc(bp->rx_nr_rings,
->                                       sizeof(struct bnxt_rx_ring_info),
->                                       GFP_KERNEL);
-> -               if (!bp->rx_ring)
-> -                       return -ENOMEM;
-> +               if (!bp->rx_ring) {
-> +                       rc =3D -ENOMEM;
-> +                       goto alloc_mem_err;
-> +               }
->
->                 for (i =3D 0; i < bp->rx_nr_rings; i++) {
->                         struct bnxt_rx_ring_info *rxr =3D &bp->rx_ring[i]=
-;
-> @@ -5512,14 +5514,18 @@ static int bnxt_alloc_mem(struct bnxt *bp, bool i=
-rq_re_init)
->                 bp->tx_ring =3D kcalloc(bp->tx_nr_rings,
->                                       sizeof(struct bnxt_tx_ring_info),
->                                       GFP_KERNEL);
-> -               if (!bp->tx_ring)
-> -                       return -ENOMEM;
-> +               if (!bp->tx_ring) {
-> +                       rc =3D -ENOMEM;
-> +                       goto alloc_mem_err;
-> +               }
->
->                 bp->tx_ring_map =3D kcalloc(bp->tx_nr_rings, sizeof(u16),
->                                           GFP_KERNEL);
->
-> -               if (!bp->tx_ring_map)
-> -                       return -ENOMEM;
-> +               if (!bp->tx_ring_map) {
-> +                       rc =3D -ENOMEM;
-> +                       goto alloc_mem_err;
-> +               }
->
->                 if (bp->flags & BNXT_FLAG_SHARED_RINGS)
->                         j =3D 0;
-> --
-> 2.34.1
->
+>   drivers/net/ethernet/intel/ixgbe/ixgbe.h      | 27 ++++-----
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  4 +-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 56 +++++++++----------
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |  2 +-
+>   4 files changed, 45 insertions(+), 44 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> index dce4936..59a1cee4 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+> @@ -322,49 +322,50 @@ enum ixgbe_ring_state_t {
+>   	__IXGBE_HANG_CHECK_ARMED,
+>   	__IXGBE_TX_XDP_RING,
+>   	__IXGBE_TX_DISABLED,
+> +	__IXGBE_RING_STATE_NBITS, /* must be last */
+>   };
+>   
+>   #define ring_uses_build_skb(ring) \
+> -	test_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &(ring)->state)
+> +	test_bit(__IXGBE_RX_BUILD_SKB_ENABLED, (ring)->state)
+>   
+>   struct ixgbe_fwd_adapter {
+>   	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+>   	struct net_device *netdev;
+>   	unsigned int tx_base_queue;
+>   	unsigned int rx_base_queue;
+>   	int pool;
+>   };
+>   
+>   #define check_for_tx_hang(ring) \
+> -	test_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
+> +	test_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
+>   #define set_check_for_tx_hang(ring) \
+> -	set_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
+> +	set_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
+>   #define clear_check_for_tx_hang(ring) \
+> -	clear_bit(__IXGBE_TX_DETECT_HANG, &(ring)->state)
+> +	clear_bit(__IXGBE_TX_DETECT_HANG, (ring)->state)
+>   #define ring_is_rsc_enabled(ring) \
+> -	test_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
+> +	test_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
+>   #define set_ring_rsc_enabled(ring) \
+> -	set_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
+> +	set_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
+>   #define clear_ring_rsc_enabled(ring) \
+> -	clear_bit(__IXGBE_RX_RSC_ENABLED, &(ring)->state)
+> +	clear_bit(__IXGBE_RX_RSC_ENABLED, (ring)->state)
+>   #define ring_is_xdp(ring) \
+> -	test_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
+> +	test_bit(__IXGBE_TX_XDP_RING, (ring)->state)
+>   #define set_ring_xdp(ring) \
+> -	set_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
+> +	set_bit(__IXGBE_TX_XDP_RING, (ring)->state)
+>   #define clear_ring_xdp(ring) \
+> -	clear_bit(__IXGBE_TX_XDP_RING, &(ring)->state)
+> +	clear_bit(__IXGBE_TX_XDP_RING, (ring)->state)
+>   struct ixgbe_ring {
+>   	struct ixgbe_ring *next;	/* pointer to next ring in q_vector */
+>   	struct ixgbe_q_vector *q_vector; /* backpointer to host q_vector */
+>   	struct net_device *netdev;	/* netdev ring belongs to */
+>   	struct bpf_prog *xdp_prog;
+>   	struct device *dev;		/* device for DMA mapping */
+>   	void *desc;			/* descriptor ring memory */
+>   	union {
+>   		struct ixgbe_tx_buffer *tx_buffer_info;
+>   		struct ixgbe_rx_buffer *rx_buffer_info;
+>   	};
+> -	unsigned long state;
+> +	DECLARE_BITMAP(state, __IXGBE_RING_STATE_NBITS);
+>   	u8 __iomem *tail;
+>   	dma_addr_t dma;			/* phys. address of descriptor ring */
+>   	unsigned int size;		/* length in bytes */
+> @@ -453,19 +454,19 @@ struct ixgbe_ring_feature {
+>    */
+>   static inline unsigned int ixgbe_rx_bufsz(struct ixgbe_ring *ring)
+>   {
+> -	if (test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
+> +	if (test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
+>   		return IXGBE_RXBUFFER_3K;
+>   #if (PAGE_SIZE < 8192)
+>   	if (ring_uses_build_skb(ring))
+>   		return IXGBE_MAX_2K_FRAME_BUILD_SKB;
+>   #endif
+>   	return IXGBE_RXBUFFER_2K;
+>   }
+>   
+>   static inline unsigned int ixgbe_rx_pg_order(struct ixgbe_ring *ring)
+>   {
+>   #if (PAGE_SIZE < 8192)
+> -	if (test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
+> +	if (test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
+>   		return 1;
+>   #endif
+>   	return 0;
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+> index a1d0491..b5c85c5 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+> @@ -979,15 +979,15 @@ static int ixgbe_alloc_q_vector(struct ixgbe_adapter *adapter,
+>   		 * can be marked as checksum errors.
+>   		 */
+>   		if (adapter->hw.mac.type == ixgbe_mac_82599EB)
+> -			set_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, &ring->state);
+> +			set_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, ring->state);
+>   
+>   #ifdef IXGBE_FCOE
+>   		if (adapter->netdev->fcoe_mtu) {
+>   			struct ixgbe_ring_feature *f;
+>   			f = &adapter->ring_feature[RING_F_FCOE];
+>   			if ((rxr_idx >= f->offset) &&
+>   			    (rxr_idx < f->offset + f->indices))
+> -				set_bit(__IXGBE_RX_FCOE, &ring->state);
+> +				set_bit(__IXGBE_RX_FCOE, ring->state);
+>   		}
+>   
+>   #endif /* IXGBE_FCOE */
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 034618e..95cd8d5 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -968,7 +968,7 @@ static void ixgbe_update_xoff_rx_lfc(struct ixgbe_adapter *adapter)
+>   
+>   	for (i = 0; i < adapter->num_tx_queues; i++)
+>   		clear_bit(__IXGBE_HANG_CHECK_ARMED,
+> -			  &adapter->tx_ring[i]->state);
+> +			  adapter->tx_ring[i]->state);
+>   }
+>   
+>   static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
+> @@ -1011,15 +1011,15 @@ static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
+>   
+>   		tc = tx_ring->dcb_tc;
+>   		if (xoff[tc])
+> -			clear_bit(__IXGBE_HANG_CHECK_ARMED, &tx_ring->state);
+> +			clear_bit(__IXGBE_HANG_CHECK_ARMED, tx_ring->state);
+>   	}
+>   
+>   	for (i = 0; i < adapter->num_xdp_queues; i++) {
+>   		struct ixgbe_ring *xdp_ring = adapter->xdp_ring[i];
+>   
+>   		tc = xdp_ring->dcb_tc;
+>   		if (xoff[tc])
+> -			clear_bit(__IXGBE_HANG_CHECK_ARMED, &xdp_ring->state);
+> +			clear_bit(__IXGBE_HANG_CHECK_ARMED, xdp_ring->state);
+>   	}
+>   }
+>   
+> @@ -1103,11 +1103,11 @@ static bool ixgbe_check_tx_hang(struct ixgbe_ring *tx_ring)
+>   	if (tx_done_old == tx_done && tx_pending)
+>   		/* make sure it is true for two checks in a row */
+>   		return test_and_set_bit(__IXGBE_HANG_CHECK_ARMED,
+> -					&tx_ring->state);
+> +					tx_ring->state);
+>   	/* update completed stats and continue */
+>   	tx_ring->tx_stats.tx_done_old = tx_done;
+>   	/* reset the countdown */
+> -	clear_bit(__IXGBE_HANG_CHECK_ARMED, &tx_ring->state);
+> +	clear_bit(__IXGBE_HANG_CHECK_ARMED, tx_ring->state);
+>   
+>   	return false;
+>   }
+> @@ -1660,7 +1660,7 @@ static inline bool ixgbe_rx_is_fcoe(struct ixgbe_ring *ring,
+>   {
+>   	__le16 pkt_info = rx_desc->wb.lower.lo_dword.hs_rss.pkt_info;
+>   
+> -	return test_bit(__IXGBE_RX_FCOE, &ring->state) &&
+> +	return test_bit(__IXGBE_RX_FCOE, ring->state) &&
+>   	       ((pkt_info & cpu_to_le16(IXGBE_RXDADV_PKTTYPE_ETQF_MASK)) ==
+>   		(cpu_to_le16(IXGBE_ETQF_FILTER_FCOE <<
+>   			     IXGBE_RXDADV_PKTTYPE_ETQF_SHIFT)));
+> @@ -1708,7 +1708,7 @@ static inline void ixgbe_rx_checksum(struct ixgbe_ring *ring,
+>   		 * checksum errors.
+>   		 */
+>   		if ((pkt_info & cpu_to_le16(IXGBE_RXDADV_PKTTYPE_UDP)) &&
+> -		    test_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, &ring->state))
+> +		    test_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, ring->state))
+>   			return;
+>   
+>   		ring->rx_stats.csum_err++;
+> @@ -3526,7 +3526,7 @@ static irqreturn_t ixgbe_msix_other(int irq, void *data)
+>   			for (i = 0; i < adapter->num_tx_queues; i++) {
+>   				struct ixgbe_ring *ring = adapter->tx_ring[i];
+>   				if (test_and_clear_bit(__IXGBE_TX_FDIR_INIT_DONE,
+> -						       &ring->state))
+> +						       ring->state))
+>   					reinit_count++;
+>   			}
+>   			if (reinit_count) {
+> @@ -3952,22 +3952,22 @@ void ixgbe_configure_tx_ring(struct ixgbe_adapter *adapter,
+>   	if (adapter->flags & IXGBE_FLAG_FDIR_HASH_CAPABLE) {
+>   		ring->atr_sample_rate = adapter->atr_sample_rate;
+>   		ring->atr_count = 0;
+> -		set_bit(__IXGBE_TX_FDIR_INIT_DONE, &ring->state);
+> +		set_bit(__IXGBE_TX_FDIR_INIT_DONE, ring->state);
+>   	} else {
+>   		ring->atr_sample_rate = 0;
+>   	}
+>   
+>   	/* initialize XPS */
+> -	if (!test_and_set_bit(__IXGBE_TX_XPS_INIT_DONE, &ring->state)) {
+> +	if (!test_and_set_bit(__IXGBE_TX_XPS_INIT_DONE, ring->state)) {
+>   		struct ixgbe_q_vector *q_vector = ring->q_vector;
+>   
+>   		if (q_vector)
+>   			netif_set_xps_queue(ring->netdev,
+>   					    &q_vector->affinity_mask,
+>   					    ring->queue_index);
+>   	}
+>   
+> -	clear_bit(__IXGBE_HANG_CHECK_ARMED, &ring->state);
+> +	clear_bit(__IXGBE_HANG_CHECK_ARMED, ring->state);
+>   
+>   	/* reinitialize tx_buffer_info */
+>   	memset(ring->tx_buffer_info, 0,
+> @@ -4173,7 +4173,7 @@ static void ixgbe_configure_srrctl(struct ixgbe_adapter *adapter,
+>   			srrctl |= PAGE_SIZE >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
+>   		else
+>   			srrctl |= xsk_buf_len >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
+> -	} else if (test_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state)) {
+> +	} else if (test_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state)) {
+>   		srrctl |= IXGBE_RXBUFFER_3K >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
+>   	} else {
+>   		srrctl |= IXGBE_RXBUFFER_2K >> IXGBE_SRRCTL_BSIZEPKT_SHIFT;
+> @@ -4558,7 +4558,7 @@ void ixgbe_configure_rx_ring(struct ixgbe_adapter *adapter,
+>   		 * higher than the MTU of the PF.
+>   		 */
+>   		if (ring_uses_build_skb(ring) &&
+> -		    !test_bit(__IXGBE_RX_3K_BUFFER, &ring->state))
+> +		    !test_bit(__IXGBE_RX_3K_BUFFER, ring->state))
+>   			rxdctl |= IXGBE_MAX_2K_FRAME_BUILD_SKB |
+>   				  IXGBE_RXDCTL_RLPML_EN;
+>   #endif
+> @@ -4733,27 +4733,27 @@ static void ixgbe_set_rx_buffer_len(struct ixgbe_adapter *adapter)
+>   		rx_ring = adapter->rx_ring[i];
+>   
+>   		clear_ring_rsc_enabled(rx_ring);
+> -		clear_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
+> -		clear_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &rx_ring->state);
+> +		clear_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
+> +		clear_bit(__IXGBE_RX_BUILD_SKB_ENABLED, rx_ring->state);
+>   
+>   		if (adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)
+>   			set_ring_rsc_enabled(rx_ring);
+>   
+> -		if (test_bit(__IXGBE_RX_FCOE, &rx_ring->state))
+> -			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
+> +		if (test_bit(__IXGBE_RX_FCOE, rx_ring->state))
+> +			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
+>   
+>   		if (adapter->flags2 & IXGBE_FLAG2_RX_LEGACY)
+>   			continue;
+>   
+> -		set_bit(__IXGBE_RX_BUILD_SKB_ENABLED, &rx_ring->state);
+> +		set_bit(__IXGBE_RX_BUILD_SKB_ENABLED, rx_ring->state);
+>   
+>   #if (PAGE_SIZE < 8192)
+>   		if (adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)
+> -			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
+> +			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
+>   
+>   		if (IXGBE_2K_TOO_SMALL_WITH_PADDING ||
+>   		    (max_frame > (ETH_FRAME_LEN + ETH_FCS_LEN)))
+> -			set_bit(__IXGBE_RX_3K_BUFFER, &rx_ring->state);
+> +			set_bit(__IXGBE_RX_3K_BUFFER, rx_ring->state);
+>   #endif
+>   	}
+>   }
+> @@ -7946,10 +7946,10 @@ static void ixgbe_fdir_reinit_subtask(struct ixgbe_adapter *adapter)
+>   	if (ixgbe_reinit_fdir_tables_82599(hw) == 0) {
+>   		for (i = 0; i < adapter->num_tx_queues; i++)
+>   			set_bit(__IXGBE_TX_FDIR_INIT_DONE,
+> -				&(adapter->tx_ring[i]->state));
+> +				adapter->tx_ring[i]->state);
+>   		for (i = 0; i < adapter->num_xdp_queues; i++)
+>   			set_bit(__IXGBE_TX_FDIR_INIT_DONE,
+> -				&adapter->xdp_ring[i]->state);
+> +				adapter->xdp_ring[i]->state);
+>   		/* re-enable flow director interrupts */
+>   		IXGBE_WRITE_REG(hw, IXGBE_EIMS, IXGBE_EIMS_FLOW_DIR);
+>   	} else {
+> @@ -9490,7 +9490,7 @@ netdev_tx_t ixgbe_xmit_frame_ring(struct sk_buff *skb,
+>   		ixgbe_tx_csum(tx_ring, first, &ipsec_tx);
+>   
+>   	/* add the ATR filter if ATR is on */
+> -	if (test_bit(__IXGBE_TX_FDIR_INIT_DONE, &tx_ring->state))
+> +	if (test_bit(__IXGBE_TX_FDIR_INIT_DONE, tx_ring->state))
+>   		ixgbe_atr(tx_ring, first);
+>   
+>   #ifdef IXGBE_FCOE
+> @@ -9530,7 +9530,7 @@ static netdev_tx_t __ixgbe_xmit_frame(struct sk_buff *skb,
+>   		return NETDEV_TX_OK;
+>   
+>   	tx_ring = ring ? ring : adapter->tx_ring[skb_get_queue_mapping(skb)];
+> -	if (unlikely(test_bit(__IXGBE_TX_DISABLED, &tx_ring->state)))
+> +	if (unlikely(test_bit(__IXGBE_TX_DISABLED, tx_ring->state)))
+>   		return NETDEV_TX_BUSY;
+>   
+>   	return ixgbe_xmit_frame_ring(skb, adapter, tx_ring);
+> @@ -11015,7 +11015,7 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
+>   	if (unlikely(!ring))
+>   		return -ENXIO;
+>   
+> -	if (unlikely(test_bit(__IXGBE_TX_DISABLED, &ring->state)))
+> +	if (unlikely(test_bit(__IXGBE_TX_DISABLED, ring->state)))
+>   		return -ENXIO;
+>   
+>   	if (static_branch_unlikely(&ixgbe_xdp_locking_key))
+> @@ -11121,7 +11121,7 @@ static void ixgbe_disable_txr_hw(struct ixgbe_adapter *adapter,
+>   static void ixgbe_disable_txr(struct ixgbe_adapter *adapter,
+>   			      struct ixgbe_ring *tx_ring)
+>   {
+> -	set_bit(__IXGBE_TX_DISABLED, &tx_ring->state);
+> +	set_bit(__IXGBE_TX_DISABLED, tx_ring->state);
+>   	ixgbe_disable_txr_hw(adapter, tx_ring);
+>   }
+>   
+> @@ -11275,9 +11275,9 @@ void ixgbe_txrx_ring_enable(struct ixgbe_adapter *adapter, int ring)
+>   		ixgbe_configure_tx_ring(adapter, xdp_ring);
+>   	ixgbe_configure_rx_ring(adapter, rx_ring);
+>   
+> -	clear_bit(__IXGBE_TX_DISABLED, &tx_ring->state);
+> +	clear_bit(__IXGBE_TX_DISABLED, tx_ring->state);
+>   	if (xdp_ring)
+> -		clear_bit(__IXGBE_TX_DISABLED, &xdp_ring->state);
+> +		clear_bit(__IXGBE_TX_DISABLED, xdp_ring->state);
+>   
+>   	/* Rx/Tx/XDP Tx share the same napi context. */
+>   	napi_enable(&rx_ring->q_vector->napi);
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> index 7b94150..89f96c4 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> @@ -524,7 +524,7 @@ int ixgbe_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
+>   
+>   	ring = adapter->xdp_ring[qid];
+>   
+> -	if (test_bit(__IXGBE_TX_DISABLED, &ring->state))
+> +	if (test_bit(__IXGBE_TX_DISABLED, ring->state))
+>   		return -ENETDOWN;
+>   
+>   	if (!ring->xsk_pool)
 
---0000000000009d44e00648f6e22e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-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
-/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
-ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
-NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
-MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
-miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
-QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
-Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
-CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
-jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
-6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
-PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
-eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
-Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
-a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCAPM6ez
-c/1ivmTu3ws1n8EmOuhfjnHsaRKsbo4zN1Bt8jAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjAxMjIwOTQ0MjFaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA1jAeK1SHG4EKi7Upuw0LCeFvqj1PNz71qK2G48JUf
-M0Tv8178ni0cQKIvHHDp0hT/7+OwxKEsvSBVgyceK3aTfqELioF5kDsP1x7j5+6EKOWCrhK9Kryt
-vmYHJ+SEZthWqGFeWVFBCZdTJOywTUzRW3OdSNuNYQ/T91mkAf8RgffsyfTy1Z25bT3+TUm2Vi4w
-hjw5G77hd4kK6BEBBekIKamvKQXSOElfVK5k4AX1AAHb+SULtc0h869vXqgMYhS+RufSIKGxcGl+
-0fGDCnlPggfhNK4pXunDkV6M+TdWI1XCqIY00WtI5ft+gq7UF4PMf9s03iqLLmnwk/r5IH2w
---0000000000009d44e00648f6e22e--
+
+Kind regards,
+
+Paul
 
