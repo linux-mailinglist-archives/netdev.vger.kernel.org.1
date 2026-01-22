@@ -1,152 +1,134 @@
-Return-Path: <netdev+bounces-252159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252160-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBlfMfeZcWngJgAAu9opvQ
-	(envelope-from <netdev+bounces-252159-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:31:03 +0100
+	id 26s1OCSOcmmHmAAAu9opvQ
+	(envelope-from <netdev+bounces-252160-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:52:52 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF47761593
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:31:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 400F46D8D7
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:52:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7D7124E70C2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:27:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 966F94EF125
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291A93BBA06;
-	Thu, 22 Jan 2026 03:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125F83D3D04;
+	Thu, 22 Jan 2026 03:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6lhlPVb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc5lu1/r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51163904D2;
-	Thu, 22 Jan 2026 03:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3DE3B8D70;
+	Thu, 22 Jan 2026 03:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769052453; cv=none; b=mnL0qOIlpx2X3gyPmta/jOqwZCKpUINhWzV+IhsXWAhDDzGftcVs31YURAXdcct6lhgROJq8AW/JPu1RGnjd24jm+8uhjDW5uyu+c2jAIi969f0lIVLLwJTjQYR+/C651zwBfu9wCT0V36CGb2j/bRZzOlVos1KyEg62TKzV5Ss=
+	t=1769052612; cv=none; b=tiWZ7RLREtD0p9ejpeoYu7R3hSAXMjUhtLBuQ7HMfQxBBxq0Yw2RgzqQt2mgdygEAuV8JTIPEn8SczBCddI2NLAQBLkXw9vtR/aWas1FNDM8f/cYmQJmkjnz0lhoVKgzRVFxfIuS6gdTHHRqmunOcqSJerfTmMVVfOH+pUSb6DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769052453; c=relaxed/simple;
-	bh=Y/3pPodyEl+yDTvYSlwrBE6jK/FnjEX2M2Klb6SJ7/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kPayxFXDIwu7ngxQD+5loHRGrzwHDw+r4feC9wQt0wb3yvQ85HfvcDfo3kieou4rA/M15rSpivCBNlI/mgmVuWpgyy49sNzRqXsT/4M20KvAqB0HzWU6BdXy8hkkFdRbVHzJbF7N+MDnYg3kRB6ai0oVdEecWH6PNL119mFbaGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6lhlPVb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB3AC116C6;
-	Thu, 22 Jan 2026 03:27:30 +0000 (UTC)
+	s=arc-20240116; t=1769052612; c=relaxed/simple;
+	bh=aJNwTCZb6sShIfW52PUO8eHOwbjSWHh0BTCf90rQXrQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=isQwLbAOt5IWxqH3BZw6f0mzaXA7TOnS/So1/N/kMZo9HCmv9wSt8pbAAlMwxjn+7kAFvDALqn20Ix/MpJso0Yp6AlNm9sMA3CCwjxuP08C1edPS9LHEvnKXyHIPkf9qD9Hol77dp3i8TXSXhWLzni5wSifibbGhRsMfJx83OvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc5lu1/r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F26FC116D0;
+	Thu, 22 Jan 2026 03:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769052452;
-	bh=Y/3pPodyEl+yDTvYSlwrBE6jK/FnjEX2M2Klb6SJ7/A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k6lhlPVbyUsyNOMIwjCknuIW8kj1Pmz66UKqWq4lPQkf6n1iL5Sa1lyjONH4kYQ5x
-	 vI9f5ziiGEdMOFGZRURsyf1Gx9CkXdxO8vlru7U3mPwRcyR03gHDzQV3j/ehjqfBu0
-	 EkTeZv+BMgfjEB7fUbbB9xWwv7OugxKgmuHfdLZNBrBNLUYsbcBOpcivHfBU35oFcu
-	 yNBxNgU3syqMy8LVE7lbftDHjKGLWW+pGMO5G6yYY5NCJG23wR5a3n6Yc5TAIE51Qv
-	 uh1IgFMsOMRZiqTfyS/61wlSA5PzpTozDMPcYNTOwJdGQozn5Qmb/T03Q7cujbufJJ
-	 TEcHVgdxGdSxQ==
-Date: Wed, 21 Jan 2026 19:27:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <thomas.weissschuh@linutronix.de>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
- <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Matthieu Baerts
- <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, Geliang Tang
- <geliang@kernel.org>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?=
- <mic@digikod.net>, =?UTF-8?B?R8O8bnRoZXI=?= Noack <gnoack@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
- <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
- linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
- libc-alpha@sourceware.org, Carlos O'Donell <carlos@redhat.com>, Adhemerval
- Zanella <adhemerval.zanella@linaro.org>, Rich Felker <dalias@libc.org>,
- klibc@zytor.com, Florian Weimer <fweimer@redhat.com>
-Subject: Re: [PATCH net-next v2 0/4] net: uapi: Provide an UAPI definition
- of 'struct sockaddr'
-Message-ID: <20260121192729.2095aa25@kernel.org>
-In-Reply-To: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
-References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
+	s=k20201202; t=1769052610;
+	bh=aJNwTCZb6sShIfW52PUO8eHOwbjSWHh0BTCf90rQXrQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pc5lu1/rrM/RHWvVTMKHan3dpFgwrs4dWduPZyHC8LNpyQGy6WNzJvCzYOKaw8+/l
+	 fw9Eg6PBBce87qvU3ea1t2gTyR/TYgjNpNYn1CmSwSeTDJ8qVhNV3Wy7/qP1kuKMWT
+	 RMJxqCHA7Le93VgBW1EgAB3pAUst+7ual0TbEDjGjHv+2ZB+BbGDObjMqpQR7jF+Qt
+	 2I6W7fS+EWWxdAmDok5VEAJ/GzmZQAc3jkq6udLfwA1RSAOf+WFB9f5YA7OkdJAiwI
+	 Xw4Y0DoJ6REp+Lqf03x00ojNDHcNIj0sJ59JjL6ybUhzfFLnGJKJdhThQkUinx/4eI
+	 AD382NCdkeaLw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EB1B3808200;
+	Thu, 22 Jan 2026 03:30:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] be2net: Fix NULL pointer dereference in
+ be_cmd_get_mac_from_list
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176905260710.1542867.8147787917289306815.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jan 2026 03:30:07 +0000
+References: <20260120113734.20193-1-a.vatoropin@crpt.ru>
+In-Reply-To: <20260120113734.20193-1-a.vatoropin@crpt.ru>
+To: =?utf-8?b?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuSA8YS52YXRvcm9waW5AY3Jw?=@codeaurora.org,
+	=?utf-8?b?dC5ydT4=?=@codeaurora.org
+Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
+ somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ sathya.perla@emulex.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ stable@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [4.74 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[kernel.org : No valid SPF,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_REJECT(1.00)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev,vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,linaro.org,libc.org,zytor.com];
-	TAGGED_FROM(0.00)[bounces-252159-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCPT_COUNT_TWELVE(0.00)[40];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252160-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: DF47761593
+	NEURAL_HAM(-0.00)[-0.991];
+	TAGGED_RCPT(0.00)[netdev,0L/QuNC9INCQ0L3QtNGA0LXQuSA8YS52YXRvcm9waW5AY3Jw?=];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[crpt.ru:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 400F46D8D7
 X-Rspamd-Action: no action
 
-On Tue, 20 Jan 2026 15:10:30 +0100 Thomas Wei=C3=9Fschuh wrote:
-> Various UAPI headers reference 'struct sockaddr'. Currently the
-> definition of this struct is pulled in from the libc header
-> sys/socket.h. This is problematic as it introduces a dependency
-> on a full userspace toolchain.
->=20
-> Add a definition of 'struct sockaddr' to the UAPI headers.
-> Before that, reorder some problematic header inclusions in the selftests.
+Hello:
 
->  include/linux/socket.h                             | 10 ----------
->  include/uapi/linux/if.h                            |  4 ----
->  include/uapi/linux/libc-compat.h                   | 12 ++++++++++++
->  include/uapi/linux/socket.h                        | 14 ++++++++++++++
->  samples/bpf/xdp_adjust_tail_user.c                 |  6 ++++--
->  samples/bpf/xdp_fwd_user.c                         |  7 ++++---
->  samples/bpf/xdp_router_ipv4_user.c                 |  6 +++---
->  samples/bpf/xdp_sample_user.c                      | 15 ++++++++-------
->  samples/bpf/xdp_tx_iptunnel_user.c                 |  4 ++--
->  tools/testing/selftests/landlock/audit.h           |  7 ++++---
->  tools/testing/selftests/net/af_unix/diag_uid.c     |  9 +++++----
->  tools/testing/selftests/net/busy_poller.c          |  3 ++-
->  tools/testing/selftests/net/mptcp/mptcp_diag.c     | 11 ++++++-----
->  tools/testing/selftests/net/nettest.c              |  4 ++--
->  tools/testing/selftests/net/tcp_ao/icmps-discard.c |  6 +++---
->  tools/testing/selftests/net/tcp_ao/lib/netlink.c   |  9 +++++----
->  tools/testing/selftests/net/tun.c                  |  5 +++--
->  17 files changed, 77 insertions(+), 55 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Are all those selftests / samples getting broken by this patch set?
+On Tue, 20 Jan 2026 11:37:47 +0000 you wrote:
+> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
+> 
+> When the parameter pmac_id_valid argument of be_cmd_get_mac_from_list() is
+> set to false, the driver may request the PMAC_ID from the firmware of the
+> network card, and this function will store that PMAC_ID at the provided
+> address pmac_id. This is the contract of this function.
+> 
+> [...]
 
-I understand that we should avoid libc dependencies in uAPI but at
-least speaking for networking - building selftests without libc is..
-not a practical proposition?
+Here is the summary with links:
+  - [net,v2] be2net: Fix NULL pointer dereference in be_cmd_get_mac_from_list
+    https://git.kernel.org/netdev/net/c/8215794403d2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
