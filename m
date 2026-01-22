@@ -1,66 +1,68 @@
-Return-Path: <netdev+bounces-252242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252243-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +E/wEvHdcWk+MgAAu9opvQ
-	(envelope-from <netdev+bounces-252242-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:21:05 +0100
+	id 8FgfGmbecWl6MwAAu9opvQ
+	(envelope-from <netdev+bounces-252243-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:23:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EBA62F6A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:21:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF6162FFD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 59FD1506D99
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:14:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 724547C1710
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889E447DFB4;
-	Thu, 22 Jan 2026 08:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8073358BF;
+	Thu, 22 Jan 2026 08:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/vnElbE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="szpc9HzA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347AD407590;
-	Thu, 22 Jan 2026 08:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D470331B823;
+	Thu, 22 Jan 2026 08:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769069675; cv=none; b=uPyVCzURRL1bkdgz7WEWvC/BuAowoFF1+S7cArGc3oAJMf7Na3LBK3BBUeJuFtTCeL9veRqzE1LQIhTU/h9gq4PNI9rV8LFpSwwnSNVG1RHsch6XFCf0vqa/A1wxInY56Ko43PDd8xfMxtzQIdGLCggz/LCxkNDNkowfNi9PdUg=
+	t=1769069727; cv=none; b=DoxKwYlyi03Cux4OoehRJVU1qXQGydvCSCllpWgDPsKh2A1HSUKaHvpntVLNZAWplHuP89SLs+gc5GbvFkoEyav44Gt6G92rhyvDwzChjC3e9gKQy+5Vj9Lrl7LxWNI0rQQhJnNvhGuNEi1yp7ZA9uH0yfluKePBA78H3k50cqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769069675; c=relaxed/simple;
-	bh=+5qCEXADRX+3Rn7uzuXBcjl85v9QdvSiUb4V5YDgzjM=;
+	s=arc-20240116; t=1769069727; c=relaxed/simple;
+	bh=kbNnzPFW8j+yNLG4b7rlrzCkl90ALRJY0AIXYUJhs6Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZRKMkSUq2cSKRXKfis0rf4GHRGlf78tFhIIxrHo0P3YOfkWPeyPi2GV4xzbCtUer4GUiIil9So+eKx80xIpbi5rh1kLPVN2SXNurk/WihDElgPTk5NV/ExhSOBV+IsuIKAx4gY0PeHBrXWfvqo1DEGdsnDPZcBKH7t9/kuhQOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/vnElbE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1399BC116C6;
-	Thu, 22 Jan 2026 08:14:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=E2CiWRLzkfudod+agYDb2e9Qy5h+O56D0ia5VDhM7TmLmwtAPA/ac2IZF5ZN+j1Cg2cvf2h3BmuPnPVKiQFWbMzZpsHoeV1clg6Rp8cc1LzR8iyjsadIC5spXj13WxZM5DSpKQQwJz0Xnr23eEppQ9RCPSwMAlgAAGfBvIz2Fgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=szpc9HzA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52AFC116C6;
+	Thu, 22 Jan 2026 08:15:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769069674;
-	bh=+5qCEXADRX+3Rn7uzuXBcjl85v9QdvSiUb4V5YDgzjM=;
+	s=k20201202; t=1769069727;
+	bh=kbNnzPFW8j+yNLG4b7rlrzCkl90ALRJY0AIXYUJhs6Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f/vnElbEX7MM6IS2jPrcOMtvZrWZkYldPYc6X8wBQRkJmAkkRbXnxgCcKQU0C+L3u
-	 qbeYyRDIxM05D2RUSFGVF50vTnZK8TFn4r7CwvBSQwSFX5R4bBvVYMo8UNrv2iEsPi
-	 8p3zCzKxDXtDyK1OBbDWbQMZ3/51Bd2h67a0H2U31tkrBU/RuVPfEYzGkZ4jFzqWZv
-	 TeFwh6z+F4fNqVzhkLeWDi4LQZH/hSDmvbVehaxil7WDCtkPooTIjfVX3ud2DUjc1d
-	 RELqtjeNEiarMv0Gq+GLW2hK/+oJTj39FBcgWNX2yNU3Ub2wff/Yqn4Mfii9VrToD0
-	 LkdHNwL70Q7gA==
-Date: Thu, 22 Jan 2026 08:14:30 +0000
+	b=szpc9HzAp6GB7r+32tn2+6gDV6cqMZOkVnGKIk3i6Yv0Myj8elV8+MVVjAJOR0LWa
+	 Dre3CF7eekEMNhmEGuVg7G6ow5Z0CZPrEgfYonAnlXHuBeKfykW7HkjEA2STqLJWSj
+	 4U7u84/cdjxSjpSK1W+uQtgT2qbUBd+cc9sFK2912w9EPJG77ku/+PiVoTMsh9bJm5
+	 uBSSNGv4EgZWXlHpwet+IZytw1Oyp2AfLESl3VgcGmhFX5lnNIYzN4XhCa91HPykBG
+	 +7CUfzz2CSwn3d9K3Mp3ozEqjb0cerKGpE6fcOq3kYH06cRCdWLwyuiVDbbj0Fy/Bn
+	 vYc4lgT+hJHHg==
+Date: Thu, 22 Jan 2026 08:15:22 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Florian Westphal <fw@strlen.de>
+Cc: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>,
+	Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	"David S . Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net/tcp_sigpool: Enable compile-testing
-Message-ID: <aXHcZu0EK4THCix-@horms.kernel.org>
-References: <e4822cf4aa03fed067f5df7cd4f3496828abc638.1768487199.git.geert+renesas@glider.be>
- <20260117163304.20caae7c@kernel.org>
- <CAMuHMdX9J9QPp16aDD-_2Q-chWANWeTyS6Dw=xJdkm8r-sPyFw@mail.gmail.com>
- <aXEvOqjkMPXk28x2@horms.kernel.org>
- <20260121172828.7207108c@kernel.org>
+Subject: Re: [PATCH net-next] netfilter: arptables: use xt_entry_foreach() in
+ copy_entries_to_user()
+Message-ID: <aXHcmikPscC14t3j@horms.kernel.org>
+References: <20260119063704.12989-1-kshitiz.bartariya@zohomail.in>
+ <aXERRqh79pmVsuzk@horms.kernel.org>
+ <aXFNoRjTS71iqDDQ@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260121172828.7207108c@kernel.org>
+In-Reply-To: <aXFNoRjTS71iqDDQ@strlen.de>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -78,70 +80,72 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-252243-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252242-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: C7EBA62F6A
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,zohomail.in:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: DAF6162FFD
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 05:28:28PM -0800, Jakub Kicinski wrote:
-> On Wed, 21 Jan 2026 19:55:38 +0000 Simon Horman wrote:
-> > On Mon, Jan 19, 2026 at 05:26:37PM +0100, Geert Uytterhoeven wrote:
-> > > > this code cannot be used today. If this code regresses and someone
-> > > > wants to start using it on 32b they'll have to fix it.
-> > > >
-> > > > Please LMK if I'm misunderstanding or there's another argument (not
-> > > > mentioned in the commit message).  
+On Wed, Jan 21, 2026 at 11:05:21PM +0100, Florian Westphal wrote:
+> Simon Horman <horms@kernel.org> wrote:
+> > On Mon, Jan 19, 2026 at 12:07:04PM +0530, Kshitiz Bartariya wrote:
+> > > Replace the manual offset-based iteration with xt_entry_foreach(),
+> > > thereby removing FIXME. The byte offset semantics and user ABI
+> > > are preserved.
 > > > 
-> > > In general, we want to be able to test-compile as much code as possible
-> > > on all platforms, but not bother everyone who configures and builds a
-> > > kernel for his system.  Until commit 37a183d3b7cdb873, that included
-> > > the tcp_sigpool code, and any build regressions would be caught soon,
-> > > and fixed (presumably).  Of course that still doesn't guarantee the
-> > > code would actually work on 32-bit, but successful compilation is a
-> > > first step...
+> > > Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+> > > ---
+> > >  net/ipv4/netfilter/arp_tables.c | 8 ++++----
+> > >  1 file changed, 4 insertions(+), 4 deletions(-)
 > > > 
-> > > As the maintainer, the decision is yours, though.  
+> > > diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+> > > index 1cdd9c28ab2d..9f82ce0fcaa5 100644
+> > > --- a/net/ipv4/netfilter/arp_tables.c
+> > > +++ b/net/ipv4/netfilter/arp_tables.c
+> > > @@ -684,12 +684,11 @@ static int copy_entries_to_user(unsigned int total_size,
+> > >  
+> > >  	loc_cpu_entry = private->entries;
+> > >  
+> > > -	/* FIXME: use iterator macros --RR */
+> > > -	/* ... then go back and fix counters and names */
+> > > -	for (off = 0, num = 0; off < total_size; off += e->next_offset, num++){
+> > > +	num = 0;
+> > > +	xt_entry_foreach(e, loc_cpu_entry, total_size) {
+> > >  		const struct xt_entry_target *t;
+> > >  
+> > > -		e = loc_cpu_entry + off;
+> > > +		off = (unsigned char *)e - (unsigned char *)loc_cpu_entry;
 > > 
-> > Thanks Geert,
+> > This offset calculation makes me feel queasy.
 > > 
-> > In my understanding COMPILE_TEST is about expanding compile-test coverage,
-> > and that is what this patch does.
+> > Can the code start with off = 0 and increment it by e->next_offset
+> > as the loop iterates, as was the case before this patch?
+> > It would be similar to how num is handled.
 > 
-> Mine is that the goal of COMPILE_TEST is to make hard to reach but
-> *reachable* configurations. Canonical example a driver which can
-> only be useful on a single SOC may be hiding under that SOCs configs
-> but we don't want allconfig to miss it. Or randconfig to struggle
-> to each it.
+> I think this file should just be left alone resp. should be restricted
+> to bug fixes only.  Same for ip/ip6/ebtables.
 > 
-> If we change a core API we want to be able to build all the drivers
-> that it may break.
-> 
-> Here the situation is different, this code is already reachable by
-> allmodconfig. The patch makes it also build for what I referred to
-> as very unusual and Geert as "on't be dead for at least a decade"
-> platforms.. But crucially the code currently _never_ builds for 
-> those platforms.
-> 
-> Please don't repost this.
+> Its too early to remove this file from the tree, but I don't see
+> value in making cosmetic improvements, sorry.
 
-Let us agree to disagree on the intention of COMPILE_TEST.
-And let this thread rest.
+Thanks Florian,
+
+No objection to that approach from my side.
 
