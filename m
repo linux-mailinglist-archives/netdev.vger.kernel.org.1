@@ -1,122 +1,196 @@
-Return-Path: <netdev+bounces-252344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252345-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGgoG0IpcmmadwAAu9opvQ
-	(envelope-from <netdev+bounces-252344-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:42:26 +0100
+	id OCPAKhEncmmadwAAu9opvQ
+	(envelope-from <netdev+bounces-252345-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:33:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152DA676E1
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:42:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 180D967540
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 626CC8E890D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:53:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D7A42964AE5
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9743112D0;
-	Thu, 22 Jan 2026 12:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68BE2F3C26;
+	Thu, 22 Jan 2026 12:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="pn/AMgF+"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HCh6vqEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3E83B8D5E;
-	Thu, 22 Jan 2026 12:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53FC2E1EE5;
+	Thu, 22 Jan 2026 12:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769086300; cv=none; b=m97NnNORR6isKuZkky6LMfdSu0YzjWpIWH2lQB24rBRkzR8eBb4rk6vmCMRcX4Bi/Fmi8SMwtbwFG0NlNf8tog0JdJmglRLLCEUgQXnhOEVlY4bTbSH41BT7uac/Wyo3SJgyBqzZaI6O0WXC3kwSzUI+/Icj25fL+L2nsJ+dF2w=
+	t=1769086771; cv=none; b=IA8V5wX2/PRSs7p9zDQDClCj/kaPLrZgujjsx78+nT8coSF1Bb5haCqCbEL5ipf1mApsc9vj+ulg23Pm1+RNXN7rPYvG+pqkhxqHbRmRXo+CghADu6vJ6jGS32bgXwNmh8FNOvR0isBdGIgpXNTluEO8jacPD+8T033JUHdAk1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769086300; c=relaxed/simple;
-	bh=9IaT7yw7Auxhv5/NFAx9I3J5Tf8VyKOwe3C6pisHl7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ka9oLmg2bZZfNaHsvU++UwfEei3YMmrkha1SrPuPhJqMO6jPiPffdHRFSu3tKRV4DWExRv1EajIUMXmjW9GRGUl8mNOzC4IwWTdmKiYs10o2HGEJ25x3V4kHMA5p+bbCaDj/QmjYC1hM+4Q8LETaLdLJNyrrn0SGUpPHq9THiTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=pn/AMgF+; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6ryD9xTHOVZL3Ctrwu5BJ4DG4YQJ3Rs0CaxSMd8HeEE=; b=pn/AMgF+nUEMnYXnZBN5T4CMrp
-	f4vnquFk0sIThRxcZgmCMeCzN53ew/FkgMBLw4zfT1TZvF7dbUv89GQugpoPq7EqMlfohYWitiGVE
-	cm0HMlT3KsebfOgAoTTohIbmVqYtYGyXg4Qyi1WCCPFetHnePvtmRpm2DVm70s7Kqg9R0B6vcXOj6
-	GAnTgJ714YhLAoHyaVzN4H6jSI7zwxj1OR7tY9VlMC87gocI7EsmDn6NQTRIRvzYMP6ICgEtKNljy
-	yS79BqzytQCCib5BPq7pMB25hEpb8gWCnsdRYj3Y5Z8i3Cm9OPzPT/N6nxHgak6fUJN4WiainUlmz
-	ebU7xDpQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1viu9h-00D1t8-CQ; Thu, 22 Jan 2026 12:51:21 +0000
-Date: Thu, 22 Jan 2026 04:51:15 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Petr Mladek <pmladek@suse.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, john.ogness@linutronix.de, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
-	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next v3 4/5] netconsole: Use printk context for CPU
- and task information
-Message-ID: <aXIc43kUCBYZex2h@gmail.com>
-References: <20260122-nbcon-v3-0-a722f2f0dfa5@debian.org>
- <20260122-nbcon-v3-4-a722f2f0dfa5@debian.org>
- <aXIWUmhBnFLY6EqK@pathway.suse.cz>
+	s=arc-20240116; t=1769086771; c=relaxed/simple;
+	bh=MWDw3AAVSvk/MYFg4ztfWp+iwoesgHv3MAG6GsmRKXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gA7XK/dzDXYEwmBvnDU6Ve24DghrhAIF5qs3aIJdafWQQWEJyaQZ0qt5gYnflr0kJetmZFmo3qTF16lqZup1YdTDSNG9uJfYT5dC0B5oSV4+dPb1/7sQUwYWwAGifcoUqvR1WFAvVm5H94J0PJyl2TRxa1hD+M/77jmcwS/HvgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HCh6vqEM; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 035351A2A6F;
+	Thu, 22 Jan 2026 12:59:27 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CCD36606B6;
+	Thu, 22 Jan 2026 12:59:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 152F8119B81C8;
+	Thu, 22 Jan 2026 13:59:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769086766; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=3OR/GLNTFE1Tsft1kZ2J5pKm0XV/jBEkGEJyzuLP8NY=;
+	b=HCh6vqEMD92RMRqKguliV8WxOie4E78A3WqJsDpHKbZlL298Gzejj+Tp3fwb6pjZaYPhOh
+	HHO7s9VrNu/NQCgClHXJcI9lxrb6TvNr1Xeq4RsgxnpJ6ID6YAwcH94GApienBBD34ceXY
+	E0OftTLrgPKwAG6HMYhM+9KYSoj8LDs0bZ1RpjBjESbBCS7uHFkPenvckPACc+PY5+g0fb
+	rPg9IK7TEfhxsIvNh5QzfEZTb0m7HCVfd7XteYTiS7WIiKcpjfWj7h6p8FH+3fjNXRZYPE
+	nB1+i5gVNu6o//kTIU5MMaHbEpOXp5zpqakjDJMaG2buA+CzNLp6kdrRAz6Ztw==
+Message-ID: <4f36ca91-9749-4502-bc30-838238d24ba3@bootlin.com>
+Date: Thu, 22 Jan 2026 13:59:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXIWUmhBnFLY6EqK@pathway.suse.cz>
-X-Debian-User: leitao
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net: dsa: microchip: Add KSZ8463 tail tag
+ handling
+To: Simon Horman <horms@kernel.org>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Pascal Eberhard <pascal.eberhard@se.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com>
+ <20260115-ksz8463-ptp-v1-5-bcfe2830cf50@bootlin.com>
+ <aW-4qgp0mGNPNiau@horms.kernel.org>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aW-4qgp0mGNPNiau@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252344-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,se.com,bootlin.com,vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[bootlin.com,reject];
+	TAGGED_FROM(0.00)[bounces-252345-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	R_SPF_SOFTFAIL(0.00)[~all];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 152DA676E1
+X-Rspamd-Queue-Id: 180D967540
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 01:21:38PM +0100, Petr Mladek wrote:
-> Hi Breno,
+Hi Simon,
+
+On 1/20/26 6:17 PM, Simon Horman wrote:
+> On Thu, Jan 15, 2026 at 04:57:04PM +0100, Bastien Curutchet (Schneider Electric) wrote:
+>> KSZ8463 uses the KSZ9893 DSA TAG driver. However, the KSZ8463 doesn't
+>> use the tail tag to convey timestamps to the host as KSZ9893 does. It
+>> uses the reserved fields in the PTP header instead.
+>>
+>> Add a KSZ8463-specifig DSA_TAG driver to handle KSZ8463 timestamps.
+>> There is no information in the tail tag to distinguish PTP packets from
+>> others so use the ptp_classify_raw() helper to find the PTP packets and
+>> extract the timestamp from their PTP headers.
+>>
+>> Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 > 
-> I have got only the patches 2,3,4. I can't find the parts 0,1,5 even
-> at lore. Something went wrong when sending them?
+> ...
+> 
+>> diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
+>> index 9170a0148cc43b4213ec4bd8e81d338589671f23..635679402f8a96b29536a91988346a8825bae976 100644
+>> --- a/net/dsa/tag_ksz.c
+>> +++ b/net/dsa/tag_ksz.c
+>> @@ -16,6 +16,7 @@
+>>   #define KSZ9477_NAME "ksz9477"
+>>   #define KSZ9893_NAME "ksz9893"
+>>   #define LAN937X_NAME "lan937x"
+>> +#define KSZ8463_NAME "ksz8463"
+>>   
+>>   /* Typically only one byte is used for tail tag. */
+>>   #define KSZ_PTP_TAG_LEN			4
+>> @@ -383,6 +384,108 @@ static const struct dsa_device_ops ksz9893_netdev_ops = {
+>>   DSA_TAG_DRIVER(ksz9893_netdev_ops);
+>>   MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ9893, KSZ9893_NAME);
+>>   
+>> +#define KSZ8463_TAIL_TAG_PRIO		GENMASK(4, 3)
+>> +#define KSZ8463_TAIL_TAG_EG_PORT_M	GENMASK(2, 0)
+>> +
+>> +static void ksz8463_xmit_timestamp(struct dsa_port *dp, struct sk_buff *skb)
+>> +{
+>> +	struct ksz_tagger_private *priv;
+>> +	struct ptp_header *ptp_hdr;
+>> +	unsigned int ptp_type;
+>> +	u32 tstamp_raw = 0;
+>> +	s64 correction;
+>> +
+>> +	priv = ksz_tagger_private(dp->ds);
+>> +
+>> +	if (!test_bit(KSZ_HWTS_EN, &priv->state))
+>> +		return;
+>> +
+>> +	if (!KSZ_SKB_CB(skb)->update_correction)
+>> +		return;
+>> +
+>> +	ptp_type = KSZ_SKB_CB(skb)->ptp_type;
+>> +	ptp_hdr = ptp_parse_header(skb, ptp_type);
+>> +	if (!ptp_hdr)
+>> +		return;
+>> +
+>> +	correction = (s64)get_unaligned_be64(&ptp_hdr->correction);
+>> +
+>> +	if (correction < 0) {
+>> +		struct timespec64 ts;
+>> +
+>> +		ts = ns_to_timespec64(-correction >> 16);
+>> +		tstamp_raw = ((ts.tv_sec & 3) << 30) | ts.tv_nsec;
+>> +
+>> +		ptp_hdr->reserved2 = tstamp_raw;
+> 
+> I think that you need to assign a be32 rather than a u32 to reserved2.
+> 
 
-It seems so. I got a bunch of Delivery failed messages from different
-places, including gmail and netdev. Not sure why yet.
+Indeed. By testing this back, I realize that this is only needed by the 
+one-step mode. This series only adds support for two-step so I'll just 
+remove this part.
 
-If they don't show up soon, i will resend.
 
---breno
+Best regards,
+Bastien
+
+
 
