@@ -1,154 +1,205 @@
-Return-Path: <netdev+bounces-252484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0DE4NPlscmlpkwAAu9opvQ
-	(envelope-from <netdev+bounces-252484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:31:21 +0100
+	id qGc0DHVncmmrjwAAu9opvQ
+	(envelope-from <netdev+bounces-252485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:07:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AA7F6C75B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:31:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8272B6BFD8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9FE4F3014924
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:51:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DAB4300CC12
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A3B360756;
-	Thu, 22 Jan 2026 17:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF09332EBF;
+	Thu, 22 Jan 2026 18:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qfrrln7P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qevJb6v4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B572E2D6E44
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 17:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CEA28C2DD
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769104291; cv=none; b=b2oAJtFJ5wQMRo3h3WsZGCD1MeaeE6wMBuwHggyLoH0auI4kC0ablIErPeCQPk2EFG6BtDsfgZO0Ia1KgrT7jX0FjrMqt42HE8w7+yrGnheVqAfnMq9sunhdelQkWTKGyE37nwRzWbpIf+ZA1wvAoCE1OXEwmRM0yE4neEM0J2E=
+	t=1769105082; cv=none; b=kMTLHlJq+wSXjHvcs18pXNcoZX0MIns2Ug54VdkFQMA109/YO9TAwjBSV4m75ZDscLr9wGfz9ouhkUxZxSmtyId5vvC7ISkC4MCQ2GpRJ0MogbBT6WyT+NSR8TI2BGHRJi80hc05rgbtQa8HJk0NlUIa2oB+ysNeROvW3PzZlWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769104291; c=relaxed/simple;
-	bh=pRIQIWRrRQgnj3ezXQTQ3jrO9DmpI9kPBw6zPbHb67g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ce+zCBDWDR2VmkPlEVUUIv7bqkHKHnS8FNKw/BxsLjHHQRYqyX8uDYkRVjG6qQZUj4wsomsodphdsP+mXxH8C6w7E72FVxh3oWX0Xv8IwfW3ORzQDugazwoNN4y2idPl0PuXRTTUnVlNB6OcSj+5b11Mvm3WOQpy/Z3Za/4fv9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qfrrln7P; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4801d7c72a5so10127975e9.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:51:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769104281; x=1769709081; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AS4wzg3mx3qj2Nf8DZyjeBJuZsttBAvemF6BKgHNWis=;
-        b=Qfrrln7PGNuizmBYrmItUNneoU+j9SrxNhbg3FpmRoJVInXIVwkel16lbsF0Qt+pnT
-         w3vieA8V4U/6skgBZGvdomGnuAJbEnBFAZT4CPubR5NCsEQikcNScQ7wQfOcEm+Px2SC
-         FjnPkPAqLJlQyuxPdv6idUOsDTtb/fweZGGF51l6FbqN5OSSLD0qxA9B4SwGV+XFFxrp
-         URbQ/cLhVUXDckzAVaC1OP6hW1nOmQ6fDSAA855wy/Rn5afbll+nvNcPuPchkZL5GRfC
-         32mPUORqpo5NnRg2UvEkQMMO3264B2AscJrXvSzfoq//elRxn3As++HZwwrITX6vaNpI
-         Rlgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769104281; x=1769709081;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AS4wzg3mx3qj2Nf8DZyjeBJuZsttBAvemF6BKgHNWis=;
-        b=XwjE8xx+hmEoR11s1O2yIviXTMDUKzEdlQ034S+a2285xSxb7qUbVPJjW3lLtcI6E7
-         tOJgrGf4vXxt4R8RNR0fk71HhbSBb9+cBNHSzGUDMxGIaPvjhq8SBuesEBVnhpSmfdOt
-         78gn7WZ+OMxCipv/OuYc1LnG8RUVnGuOPjHNSWAgvt7zc3Dm4/lcAPzmP2WgrT/TRQAL
-         t43lDImAZzZbZa0W/OYA9CN15oIVocp5cg2QnyiSwWJtbqTSQqzdHHQPSSjRbTYlwJgC
-         Ridtq/VGC7MmF1mziYaoW4KflPKGKo7Fen+82dqvEzqq+iae/YYwbDm1IbbuWm8ZV8r+
-         plWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzguEwBEBGXV9PCJHBqHOq4eAA1qmtFePJ04IGAvSeDsP2zVxW3e1RiskoY6DjJwL/f2SJY9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySB8arjinKk+p9xhh2Gzyj8UhKYFEkTSIMWojoQTI3UMPaBth8
-	kl/449oxStlPNvcNk1TFkXBj1Sd2dR7ORMjUT98oYl3vUSX8gbCVrFfi
-X-Gm-Gg: AZuq6aJgy5Fcvi9XfOWstwI/xUDTWgclYN+/LtEn1uVWcIgylX35ps2c2KhVtC2CFJR
-	syZ81Ula40Y2bNeJQq5ICGyJXdba7HjNGGF8bTEnTQ/fX3AXMUpSKTdVvp9kSHijYc25T/p5L/p
-	Qa2djWThAO0XK8Ate6zA4vD8bkPzK5f7wiEwgb1X4CtnQfPSf9fgoAmHYppKHozb0WvPgxzfmf9
-	6w2O3BIQepBXDd2Rnfwkuuj79g3OMorMgkYZ8EzgRiEGxeyf3hxN5XPuR3gCv/UF7IUHxtpXhi4
-	I4vvbD0BfygpYnZyJGgl6lMKmcMXL0lmIZII9ZCl+g6mS20JS6x6bCvGDWUhzhxieTftqz1SSiZ
-	2+P2EPbWjzR/iYy9x76bzIhfjr0ZIYwilN8fMAdIFx6hXOwq3KZaZWzLQcsL15tf/03uGf8EnIL
-	n6PhexIXqDkNgNMR0d
-X-Received: by 2002:a05:600c:1552:b0:47e:dc64:f1c6 with SMTP id 5b1f17b1804b1-4804c9456e1mr7701325e9.6.1769104280996;
-        Thu, 22 Jan 2026 09:51:20 -0800 (PST)
-Received: from archlinux ([143.58.192.3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48046fb7eaasm83645505e9.0.2026.01.22.09.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 09:51:20 -0800 (PST)
-Date: Thu, 22 Jan 2026 17:51:18 +0000
-From: Andre Carvalho <asantostc@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 7/7] selftests: netconsole: validate target
- resume
-Message-ID: <aXJikx-Tt7XjHpl3@archlinux>
-References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
- <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
- <20260120172057.6600eefe@kernel.org>
- <aXFIk1L8G_dHF6od@archlinux>
- <20260121174505.5e710b0b@kernel.org>
+	s=arc-20240116; t=1769105082; c=relaxed/simple;
+	bh=50jCvLfafgTJKlBx4TNcRE0GswXckD99GJHX693Wj5c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uvojQ0WufYslmp0kK0adWIsxPp+FTnw8Z/28gYS36yXhKMjXPPGCvS5eN3QKVFtbfC1pOYXi97J0cbrkinVUgp5qflK8AhMrIDS3lYtyPuK+4KyKSC8A8UnJSCSLYkFjCXUAhDzTj2/GM+LtYQRRJ2MgID8zSOsONufHle6kNJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qevJb6v4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7CB3C2BCB2
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769105078;
+	bh=50jCvLfafgTJKlBx4TNcRE0GswXckD99GJHX693Wj5c=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qevJb6v4nzA9Q43KN0+ShIyN1tSVYdTDlpm8Ni8vkJcqlbCCviQsbsqk9TsRyJoBg
+	 axhQf9skPrpQVEFJ9NtodEaTsy1SssNyGWtdUGT9nr3blh4yy0kddbOaGVEyXD3esl
+	 DVxuRxlglN0OcPYBa1darK9+sFe2fRqvudDt4/EXLm7pr7TCv3kvVGtMR6590rXAdy
+	 3k0ZyWFujyQSkqtBCalcHpr2DWES2MGkTo1o8zl/wtvklljd9jPNfJXp0DKQLc/peu
+	 CVw8Cg98ljofLnDO4xnZvjFA5VJ2E1LmjzBbrCkfZoFlInMIu49QrQfLA1cPUghCu9
+	 CS8oCrnlAUALA==
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7cfd95f77a3so825896a34.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 10:04:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUBnxaHpV9LFk/GKSHuwq7+pdLpI6j907vuIs+FLsLwMmTo0RKIDbkE/gVnQgEYFO84XY3WzoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSC9fYSHJzTu/8GFwswuO9sfCvhMkMc8eQlw3Ibj//I00sBuTa
+	OC/ZKVtsQ/3gPsW7uhKX3vm/e78k0khdGqudzkVWxNwq+5Llf51Hl4J8p2lqgEB3XEr63A4Mqo4
+	OcQiBJLlxFNSgUe96me9ZAEhlrqqQbiY=
+X-Received: by 2002:a4a:e90c:0:b0:65f:6c0f:fb25 with SMTP id
+ 006d021491bc7-662caa50dc2mr300656eaf.0.1769105077740; Thu, 22 Jan 2026
+ 10:04:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121174505.5e710b0b@kernel.org>
+References: <6e4e40b8-b3cb-4892-8d37-d450a02e4c52@redhat.com>
+In-Reply-To: <6e4e40b8-b3cb-4892-8d37-d450a02e4c52@redhat.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Thu, 22 Jan 2026 19:04:26 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0gL3MzhyS2SOELsgztdakFU984UB+TKaMA13kd+7ssj_Q@mail.gmail.com>
+X-Gm-Features: AZwV_QigS_IDqY8zG8-OjqcAGJs0e_wILXZ8LUPsakPf3visMH18m-JhadZCIt8
+Message-ID: <CAJZ5v0gL3MzhyS2SOELsgztdakFU984UB+TKaMA13kd+7ssj_Q@mail.gmail.com>
+Subject: Re: [Proposal,Question - refresh] ACPI representation of
+ DPLL/Ethernet dependencies (SyncE)
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Linus Walleij <linusw@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Mika Westerberg <mika.westerberg@linux.intel.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Mark Brown <broonie@kernel.org>, 
+	Jan Aleszczyk <jaleszcz@redhat.com>, Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>, 
+	linux-acpi@vger.kernel.org, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252484-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asantostc@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252485-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4AA7F6C75B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8272B6BFD8
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 05:45:05PM -0800, Jakub Kicinski wrote:
-> My main point is that even if we fix the HW setups to do the right thing
-> in systemd policies - the tests are running against netdevsim, not the
-> precious HW present on those setups.
+Hi,
 
-This makes total sense. I got too carried away trying to make sense of why this
-was failing (I might still submit a follow up to make the test more resilient).
+On Wed, Jan 21, 2026 at 3:43=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
+ote:
+>
+> Hi Andy, Rafael and others,
+>
+> (based on the previous thread [1] - now involving more people from
+>   networking and DPLL)
+>
+> Thank you for the insights on _CRS and ClockInput.
+>
+> I think we have circled the issue enough to identify the core disconnect:
+> * While the physical signals on these wires are indeed clocks (10MHz,
+>    etc.), from the OS driver perspective, this is not a "Clock Resource"
+>    issue. The NIC driver does not need to gate, rate-set, or power-manage
+>    these clocks (which is what _CRS/ClockInput implies).
+> * Instead, the NIC driver simply needs a Topology Map. It needs to know:
+>    "My Port 0 (Consumer) is physically wired to DPLL Pin 3 (Provider)."
+>
+> The NIC driver needs this Pin Index (3) specifically to report it via
+> the RtNetlink. This allows the userspace daemon (e.g., synce4l or
+> linux-ptp) to see the relationship and decide to configure the DPLL via
+> the DPLL Netlink API to lock onto that specific input.
+>
+> A generic ClockInput resource in _CRS is anonymous and unordered. The OS
+> abstracts it into a handle, but it fails to convey the specific pin
+> index required for this userspace reporting.
+>
+> Since ACPI lacks a native "Graph/Topology" object for inter-device
+> dependencies of this nature, and _CRS obscures the index information
+> required by userspace, I propose we treat _DSD properties as the
+> de-facto standard [2] for modeling SyncE topology in ACPI.
 
-> I don't remember the history, it's quite possible that Breno wanted to
-> have a separate target for netcons from the start and I pushed back.
-> I think we reached the point where we want to create a target.
+If you want to call something a "standard", especially if it involves
+ACPI, it is generally not sufficient to talk to Linux kernel people
+only about it.
 
-Sounds good. I had a chat with Breno and I'll look into moving netconsole tests
-to a standalone target.
+ACPI is about agreements between multiple parties, including multiple
+OS providers (Linux being just one of them) and multiple platform
+vendors (OEMs).
 
-Thanks for the patience and reviewing this series!
+To a minimum, you'd need commitment from at least one platform vendor
+to ship the requisite _DSD data in their platform firmware.
 
--- 
-Andre Carvalho
+> To avoid the confusion Andy mentioned regarding "Clock Bindings" in
+> ACPI, I suggest we explicitly define a schema using 'dpll-' prefixed
+> properties. This effectively decouples it from the Clock subsystem
+> expectations and treats it purely as a wiring map.
+>
+> Proposed ACPI Representation with proposed documentation [3]
+>
+> If the ACPI maintainers and Netdev maintainers agree that this
+
+So long as you don't try to update the general ACPI support code in
+drivers/acpi/ or the related header files, the matter is beyond the
+role of the "ACPI maintainers".
+
+That code though is based on the ACPI specification and the related
+support documentation, modulo what is actually shipping in platform
+firmware on systems in the field, so if you want or plan to modify it,
+that needs to be based on something beyond kernel documentation.
+
+> _DSD-based topology map is the acceptable "Pragmatic Standard" for this
+> feature, I will document this schema in the kernel documentation and
+> proceed with the implementation.
+
+Kernel documentation is generally insufficient for defining new
+OS-firmware interfaces based on ACPI because there are parties
+involved in ACPI development beyond the kernel that may be interested
+in the given interface and they may be able to provide useful
+feedback.
+
+I, personally, cannot really say how useful the interface you are
+proposing would be and what it would be useful for.  Even if I liked
+it, there still would be a problem of getting at least one platform
+vendor on board.
+
+> This solves the immediate need for an upcoming Intel SyncE enabled
+> platform and provides a consistent blueprint for other vendors
+> implementing SyncE on ACPI.
+
+And what if, say, MSFT come up with their own version of an interface
+addressing the same problem space in the meantime and convince
+platform vendors to ship support for their variant instead of yours?
+
+> [1] https://lore.kernel.org/linux-acpi/3bf214b9-8691-44f7-aa13-8169276a6c=
+2b@redhat.com/
+> [2] https://docs.kernel.org/firmware-guide/acpi/dsd/data-node-references.=
+html
+> [3] https://gist.github.com/ivecera/964c25f47f688f44ec70984742cf7fbd
 
