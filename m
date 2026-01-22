@@ -1,162 +1,162 @@
-Return-Path: <netdev+bounces-252140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252142-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKVlMWuJcWk1IAAAu9opvQ
-	(envelope-from <netdev+bounces-252140-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:20:27 +0100
+	id UPgEKw2KcWk1IAAAu9opvQ
+	(envelope-from <netdev+bounces-252142-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:23:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C5060D43
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:20:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564D460D87
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:23:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E399E5CBCA8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:18:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B35E844715A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABE1389E0B;
-	Thu, 22 Jan 2026 02:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545A738A708;
+	Thu, 22 Jan 2026 02:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxWeETgf"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Q+LQcLlt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f193.google.com (mail-dy1-f193.google.com [74.125.82.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4719038A29D
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 02:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C48C2FFFA4;
+	Thu, 22 Jan 2026 02:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769048283; cv=none; b=G6RQUvmyNaUHQLH8XnwaGvhALWjgg4hueUVYfkhyMmHsrvV/XMsfv14LY2ywrhrN6I4wkQPNBZnmBs1Hyf5VRMRj78+yeQMlSaEb35xolrTlIireLyd1KHfiEmVxlG/qKul0DogdHNOEPVPcxBCuii4tv15ymj+2VknzmbGaxMw=
+	t=1769048379; cv=none; b=GXOYM82nq+R2ei6LP3OKV91ckt0jF4Ha3SCFqC6+bpgV6pcN6VjEQV2vqwD2Lq2ovx1C2vUQzP98ed62XI55xU7TFb2DY0Ezu3SS7fZ4iyF9VRKbQU148AMj0UFXUtLFHnyMpdAs2IzKQeqIIDuilnTDF2T61tced+Xq6WxptvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769048283; c=relaxed/simple;
-	bh=ZtanzfqVjtLAhTMrV/tEbA2ea3TCcc3tEkMuB+uFvC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PrMUNq6BYsVaLWG3w0wsj0pnhrMzrnms3iVBPbUXrgxXu/SyhrxKqv+q+P0lWV8uq8/beRj9NjgjqO+w7JS3WqX+473jEK1CL9Xjq5h/NTH13X6T0Cz79/U4dcma4O1pxbk+DPIuF2wH7lTFuBUB+aiNzvAn1rYoIGA//vtPasI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxWeETgf; arc=none smtp.client-ip=74.125.82.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f193.google.com with SMTP id 5a478bee46e88-2b7070acfdcso510682eec.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 18:18:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769048281; x=1769653081; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dw/DgZzvLJTE04Xi6WXYLsL13zpRb3IL+pq9d6F+PXg=;
-        b=TxWeETgfn3Pq0p2zTktP+XCQdViHJ8agK3/MAwv8E1UF71OecBlqj33Nb/YOGViuH3
-         d4ee3sYMRSSDph3dPf1H9TnTQWbkyWuwj1gDfpJK7labF/n/6gUZdCIiLq40e22N15OR
-         BTrLgJfvof1TGy//kF14OO1c50moypBmpx7V+6ojr7J31usImqkT0cX2RVWMlYt7UAn6
-         EbIInnvvPcd3G3uQlPt2mSueLY/+6/SvgCpCHnCAQfPF1m9NcGpIWBmHgIsMeqIuypiL
-         w19tBxABetNQ6yBMFitjDN5LDZimXGXIRnlPqs8+/01CpCrgRX3ufXM4oZNeGSFRgAh7
-         3Dxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769048281; x=1769653081;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Dw/DgZzvLJTE04Xi6WXYLsL13zpRb3IL+pq9d6F+PXg=;
-        b=W4EFDcpUcvCWddq7Rm3nwkYrGquGDFmQ0NNsgc7vHqINR5ufXQS0HPldJdZEhWs/A/
-         dPrKykCzXkKSaogozfQtkZVElr9PdY0HkEOQCO9CKf4lnhIbUjDjB5p7hRACI9BaalR0
-         KMkGr8mvB72/U+hSld/0Pyd2vYHNLKvUVTaEm52Rh6A7temeoOAx61LKbauIowL6z+/s
-         X8ZXF/LbrOCI49xVEgFLIBJc+CPTgI//6jaiTNlT4TjjUpg3BmEogkCdfhf0NbC6kCCr
-         YOHL52gndfwuN3X9qZ27jWn3vaYlruObNo8oys7Q6phCumNUi0LSjfpB4GOID4cKWjbp
-         uEfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQtkuquALfXnnOXkZb+HBGaclUvp84A+NDha+MXu4eklbbhYyNb0N+Mu3i2YiWkhQP09YyhIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFsQqNsc7aPHL8Vb2KTeQqozeGZSggCWxo9Pui2cfA5xOy0ug0
-	rHpdxiapeXZ1yi48n8ZatJP7EBUUipmInzYe6CrXwcwDC0OM9CQB7+sK
-X-Gm-Gg: AZuq6aKufN2wiuKTAJVQVNTZWo8KMNFv6gRcmwJqWKach9BnPXc8dHoexlyaeVE9mpl
-	UU+YywfA83fKa5OQlClHblJQmZq2WorIA3YLksPpIAoqDr3/4spB/7sQgUsI8t4k4dNJe6QS+Dg
-	2VN7Tu+WjiedvWCxi0yc9KtPmSKw6vO642DalCcHPNpODBv9f/9ZLNQO3NMWged0YKFUWr96Nk+
-	dvFNGHAzKXSsbgTkTv24926syhsIo9hRb7wlMN9PBXlGEkTB8z4ZBp2NxODXyYn5L0vZ4rsZp5S
-	o2andc/477P7KHtFov9dYPV0PulXZ7ZcXh7j6idKjrAn/ZWqjx/k+z4M1An7HkV1tez2ZMVZVfO
-	GDbp7iblbzoYW+pIU1tzT62EeTy9ZIVBbPGit5UE9DSHlgRmVn1Bnn/tKPFh7BtqP3ohdA4o8Go
-	GWflE=
-X-Received: by 2002:a05:7300:549:b0:2af:7f2:50b3 with SMTP id 5a478bee46e88-2b6b46c6835mr14542939eec.5.1769048281251;
-        Wed, 21 Jan 2026 18:18:01 -0800 (PST)
-Received: from debian ([74.48.213.230])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b6b34c11c4sm23694514eec.1.2026.01.21.18.17.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 18:18:00 -0800 (PST)
-From: Qiliang Yuan <realwujing@gmail.com>
-To: realwujing@gmail.com
-Cc: akpm@linux-foundation.org,
-	david@kernel.org,
-	edumazet@google.com,
-	hannes@cmpxchg.org,
-	jackmanb@google.com,
-	jis1@chinatelecom.cn,
-	lance.yang@linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	liyi1@chinatelecom.cn,
-	mhocko@suse.com,
-	netdev@vger.kernel.org,
-	rppt@kernel.org,
-	sunshx@chinatelecom.cn,
-	surenb@google.com,
-	vbabka@suse.cz,
-	wangh13@chinatelecom.cn,
-	weixugc@google.com,
-	willy@infradead.org,
-	yuanql9@chinatelecom.cn,
-	zhangjn11@chinatelecom.cn,
-	zhangzq20@chinatelecom.cn,
-	ziy@nvidia.com
-Subject: Re: [PATCH] mm/page_alloc: boost watermarks on atomic allocation failure
-Date: Wed, 21 Jan 2026 21:17:53 -0500
-Message-ID: <20260122021753.234007-1-realwujing@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260122020035.227449-1-realwujing@gmail.com>
-References: <20260122020035.227449-1-realwujing@gmail.com>
+	s=arc-20240116; t=1769048379; c=relaxed/simple;
+	bh=mGUXzYVzMFDbyZMW9Cy617aKBsSZtOJGIgCgcbmj9Ig=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=NlFErq+TzWsQFgYJEFPH/mXNIrDk65vmetUnOnLxjTVWLUsMLkqHUb3I8tZt2Rz0mfCwS01O2fRZXm5fZWni3CgLd+J1FLiSd9mPp7KBaolfVsJpAU90/WAQK7A/03dF6F9X5xUM1pUqpr4GysEsADaLocZU7oM6WhRplv1GK4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Q+LQcLlt; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=mGUXzYVzMFDbyZMW9Cy617aKBsSZtOJGIgCgcbmj9Ig=; b=Q
+	+LQcLltLQ77M8Ui2bTak8nBp6DMIFzZofaO6CLRxT1KfSKNgVR+eoLsnnNvH2mns
+	IRRdgMct40QXyzQ+V54elfN5fOz8O9Fq4APYw1gGdciZ7+NnoIBYgBm0swEZTHRY
+	yS+pyDVJuTFMj26f6SI9U9dXEnhM2T0wAQnpgCnxSk=
+Received: from slark_xiao$163.com (
+ [2409:895b:3874:c9a2:e8a9:6c3d:52dc:d224] ) by ajax-webmail-wmsvr-40-135
+ (Coremail) ; Thu, 22 Jan 2026 10:18:24 +0800 (CST)
+Date: Thu, 22 Jan 2026 10:18:24 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	"Loic Poulain" <loic.poulain@linaro.org>
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, gustavoars@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re:Re: [net] Revert "net: wwan: mhi_wwan_mbim: Avoid
+ -Wflex-array-member-not-at-end warning"
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 163com
+In-Reply-To: <09efbade-24ce-4e11-ab4e-782eab4f1a71@embeddedor.com>
+References: <20260120072018.29375-1-slark_xiao@163.com>
+ <1228d107-4a60-4c33-a763-1a199c0b0961@embeddedor.com>
+ <5e012074.84f7.19bdab162e4.Coremail.slark_xiao@163.com>
+ <2fc0de60-6450-4ea3-957b-5de465a2313d@embeddedor.com>
+ <1eb019f4.1033.19be352bf0c.Coremail.slark_xiao@163.com>
+ <09efbade-24ce-4e11-ab4e-782eab4f1a71@embeddedor.com>
+X-NTES-SC: AL_Qu2dC/yft0sr4iGdYOkfmk8Sg+84W8K3v/0v1YVQOpF8jB7owS0ObV9oIlruycGEACW+qQmsdD9S5M5TbZBxQYUoC01u9UNUglNFj3u1ZgDt9w==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <34e3e90e.1f22.19be37eea29.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:hygvCgBHci_wiHFpjk5cAA--.12875W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbC6BAVeWlxiPCV9wAA3W
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.64 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[163.com];
+	TAGGED_FROM(0.00)[bounces-252142-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252140-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 40C5060D43
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[slark_xiao@163.com,netdev@vger.kernel.org];
+	HAS_X_PRIO_THREE(0.00)[3];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DKIM_TRACE(0.00)[163.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[163.com,none];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[embeddedor.com:email,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 564D460D87
 X-Rspamd-Action: no action
 
-Hi,
-
-Please ignore this patch. I realized that I forgot to label the
-subject as v6, and I also forgot to rebase properly, so the changes
-from v5 were not correctly merged into this version. 
-
-I will rebase and send a proper v6 shortly. Sorry for the noise.
-
-Best regards,
-Qiliang Yuan
+CgpBdCAyMDI2LTAxLTIyIDEwOjE0OjQxLCAiR3VzdGF2byBBLiBSLiBTaWx2YSIgPGd1c3Rhdm9A
+ZW1iZWRkZWRvci5jb20+IHdyb3RlOgo+Cj4KPk9uIDEvMjIvMjYgMTA6MzAsIFNsYXJrIFhpYW8g
+d3JvdGU6Cj4+IAo+PiAKPj4gQXQgMjAyNi0wMS0yMCAxNzoyODo0MiwgIkd1c3Rhdm8gQS4gUi4g
+U2lsdmEiIDxndXN0YXZvQGVtYmVkZGVkb3IuY29tPiB3cm90ZToKPj4+Cj4+Pgo+Pj4gT24gMS8y
+MC8yNiAxODoxNiwgU2xhcmsgWGlhbyB3cm90ZToKPj4+Pgo+Pj4+Cj4+Pj4gQXQgMjAyNi0wMS0y
+MCAxNTo1MTo1NywgIkd1c3Rhdm8gQS4gUi4gU2lsdmEiIDxndXN0YXZvQGVtYmVkZGVkb3IuY29t
+PiB3cm90ZToKPj4+Pj4gSGkgU2xhcmssCj4+Pj4+Cj4+Pj4+IE9uIDEvMjAvMjYgMTY6MjAsIFNs
+YXJrIFhpYW8gd3JvdGU6Cj4+Pj4+PiBUaGlzIHJldmVydHMgY29tbWl0IGVlZWNmNWQzYTNhNDg0
+Y2VkZmEzZjJmODdlNmQ1MWE3MzkwZWQ5NjAuCj4+Pj4+Pgo+Pj4+Pj4gVGhpcyBjaGFuZ2UgbGVh
+ZCB0byBNSEkgV1dBTiBkZXZpY2UgY2FuJ3QgY29ubmVjdCB0byBpbnRlcm5ldC4KPj4+Pj4+IEkg
+Zm91bmQgYSBuZXR3cm9rIGlzc3VlIHdpdGgga2VybmVsIDYuMTktcmM0LCBidXQgbmV0d29yayB3
+b3Jrcwo+Pj4+Pj4gd2VsbCB3aXRoIGtlcm5lbCA2LjE4LXJjMS4gQWZ0ZXIgY2hlY2tpbmcsIHRo
+aXMgY29tbWl0IGlzIHRoZQo+Pj4+Pj4gcm9vdCBjYXVzZS4KPj4+Pj4KPj4+Pj4gVGhhbmtzIGZv
+ciB0aGUgcmVwb3J0Lgo+Pj4+Pgo+Pj4+PiBDb3VsZCB5b3UgcGxlYXNlIGFwcGx5IHRoZSBmb2xs
+b3dpbmcgcGF0Y2ggb24gdG9wIG9mIHRoaXMgcmV2ZXJ0LAo+Pj4+PiBhbmQgbGV0IHVzIGtub3cg
+aWYgdGhlIHByb2JsZW0gc3RpbGwgbWFuaWZlc3RzPyBUaGFuayB5b3UhCj4+Pj4+Cj4+Pj4+IGRp
+ZmYgLS1naXQgYS9kcml2ZXJzL25ldC93d2FuL21oaV93d2FuX21iaW0uYyBiL2RyaXZlcnMvbmV0
+L3d3YW4vbWhpX3d3YW5fbWJpbS5jCj4+Pj4+IGluZGV4IDFkN2UzYWQ5MDBjMS4uYTI3MWE3MmZl
+ZDYzIDEwMDY0NAo+Pj4+PiAtLS0gYS9kcml2ZXJzL25ldC93d2FuL21oaV93d2FuX21iaW0uYwo+
+Pj4+PiArKysgYi9kcml2ZXJzL25ldC93d2FuL21oaV93d2FuX21iaW0uYwo+Pj4+PiBAQCAtNzgs
+OSArNzgsMTIgQEAgc3RydWN0IG1oaV9tYmltX2NvbnRleHQgewo+Pj4+Pgo+Pj4+PiAgICBzdHJ1
+Y3QgbWJpbV90eF9oZHIgewo+Pj4+PiAgICAgICAgICAgc3RydWN0IHVzYl9jZGNfbmNtX250aDE2
+IG50aDE2Owo+Pj4+PiAtICAgICAgIHN0cnVjdCB1c2JfY2RjX25jbV9uZHAxNiBuZHAxNjsKPj4+
+Pj4gLSAgICAgICBzdHJ1Y3QgdXNiX2NkY19uY21fZHBlMTYgZHBlMTZbMl07Cj4+Pj4+ICsgICAg
+ICAgX19UUkFJTElOR19PVkVSTEFQKHN0cnVjdCB1c2JfY2RjX25jbV9uZHAxNiwgbmRwMTYsIGRw
+ZTE2LCBfX3BhY2tlZCwKPj4+Pj4gKyAgICAgICAgICAgICAgIHN0cnVjdCB1c2JfY2RjX25jbV9k
+cGUxNiBkcGUxNlsyXTsKPj4+Pj4gKyAgICAgICApOwo+Pj4+PiAgICB9IF9fcGFja2VkOwo+Pj4+
+PiArc3RhdGljX2Fzc2VydChvZmZzZXRvZihzdHJ1Y3QgbWJpbV90eF9oZHIsIG5kcDE2LmRwZTE2
+KSA9PQo+Pj4+PiArICAgICAgICAgICAgIG9mZnNldG9mKHN0cnVjdCBtYmltX3R4X2hkciwgZHBl
+MTYpKTsKPj4+Pj4KPj4+Pj4gICAgc3RhdGljIHN0cnVjdCBtaGlfbWJpbV9saW5rICptaGlfbWJp
+bV9nZXRfbGlua19yY3Uoc3RydWN0IG1oaV9tYmltX2NvbnRleHQgKm1iaW0sCj4+Pj4+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQg
+aW50IHNlc3Npb24pCj4+Pj4gVGhpcyBwYXRjaCB3b24ndCBpbnRyb2R1Y2UgcHJldmlvdXMgcHJv
+YmxlbS4KPj4+Pgo+Pj4KPj4+IFRoYW5rcyBmb3IgY29uZmlybWluZyB0aGlzLgo+Pj4KPj4+IEkn
+bGwgdHVybiBpdCBpbnRvIGEgcHJvcGVyIHBhdGNoLgo+Pj4KPj4+IC1HdXN0YXZvCj4+IEhpLAo+
+PiBBcmUgeW91IHBsYW5pbmcgdG8gYWRkIHRoaXMgcmV2ZXJ0IGNvbW1pdCB0byB5b3VyIGNvbWlu
+ZyBwYXRjaD8KPgo+Tm8uIEkgdGhpbmsgdGhlIHJldmVydCBzaG91bGQgYmUgYXBwbGllZCBieSB0
+aGUgbWFpbnRhaW5lcnMsIGZpcnN0Lgo+Cj5UaGFua3MKPi1HdXN0YXZvCj4KSGkgTG9pYywKQ291
+bGQgeW91IGhlbHAgY2hlY2sgdGhpcyBjb21taXQgc3RhdHVzPwoKVGhhbmtzCj4+IEFjdHVhbGx5
+IGl0J3MgdXJnZW50IHRvIHJldmVydCB0aGlzIGNoYW5nZSBzaW5jZSB0aGUgcmVsZWFzZSBkZWFk
+bGluZSBvZiB2Ni4xOSBpcyBjb21pbmcgc29vbgo+PiBhbmQgYWxsIG15IE1ISSBXV0FOIGRldmlj
+ZSBoYXZlIGJlZW4gaW1wYWN0ZWQuCj4+IEkgZG9uJ3Qga25vdyB3aHkgdGhpcyBjb21taXQgaGFz
+IGJlZW4gdGFnZ2VkIGFzICJOb3QgQXBwbGljYWJsZSIgYW5kIHdobyBkaWQgdGhpcy4KPj4gCj4+
+IEkgaG9wZSB3ZSBjYW4gZml4IGl0IHJlZ3Jlc3Npb24gYmVmb3JlIHRoZSBvZmZpY2lhbCB2Ni4x
+OSByZWxlYXNlLgo+PiAKPj4gVGhhbmtzCg==
 
