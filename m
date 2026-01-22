@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-252163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMiLNPaacWmdKAAAu9opvQ
-	(envelope-from <netdev+bounces-252163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:35:18 +0100
+	id aCtgAgibcWmdKAAAu9opvQ
+	(envelope-from <netdev+bounces-252164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:35:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F06615E7
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:35:18 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D62A615EE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DA561500144
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:30:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E57FE3C7B59
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5BC3ED11C;
-	Thu, 22 Jan 2026 03:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8939833C1AA;
+	Thu, 22 Jan 2026 03:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZwgaI77"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBBNUwSx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5799339280D;
-	Thu, 22 Jan 2026 03:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653103ED12D
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769052621; cv=none; b=VJ4vQ6FS/l/O28sLOFhhVCiHjZSfl1bYqq/CsOIBRedM3ZqJe2cgxE8j5KsS+AK6fohOE1/wt50T3apXQAaEOCEPDt7mC9oDY+1nNnbGYdMwdSGw06ebCXxyuOz4jgogbB1uBpbC8ktfP2ipW25aanTS9oWqMSKeRRWQiFkm1Zw=
+	t=1769052622; cv=none; b=m6uCyfPVPoeX2ngFlHaAjwSsUA2uu7akxYUqyuSf9iYfuTynrZBN7VEJJQHfRghOLi0C/Nag3XOIJG9jkGL/KGgHUQ/C0TDGL6hbwzN9sWM/0cMVNhqI+FtuB1g5wCiYOIWSfw5bbLXVUYL80zxXAP//RZyAbpROL08a9V5gfu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769052621; c=relaxed/simple;
-	bh=VE0iS3pWhp6so1Npva7qmx2mCLeL878OmKehB3Ye6Og=;
+	s=arc-20240116; t=1769052622; c=relaxed/simple;
+	bh=wVhphtw/Z6Z30S4kcU4jxxzvIQyGOud6gBZ4csv+EME=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hC+VKP8VHlQAWYJmgP6fecYHjOVzZwF3pWo+EgKqDLolM3Es+ECOpVCo0LSOCJt57LKbf9dxg8asgqC2BrYV5H5K8t4fWZ0d3msd+miRr9t4RJxH6Cf8vcBhq9Q3N47uzTePeX9taxuFwgFgYv7yMK1CcZXne5wEIdOvHB6Q420=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZwgaI77; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C648BC116C6;
-	Thu, 22 Jan 2026 03:30:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=feIbUH5XshVcfK2XoxqQTcljpiGP7YaQBqwyiF3EU0te0t/tIhtJvET6u9qmIhEfGnjyZFVf+9VAs65RACMAeIkSTD7vRYBs2SbCr5QJNjxS0hRRw/PhtGha0rDEYfZ6+SeifbBcyqEYtqDwr76hTlzANHFjnSEQMHGsOjK+DrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBBNUwSx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45326C116D0;
+	Thu, 22 Jan 2026 03:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769052620;
-	bh=VE0iS3pWhp6so1Npva7qmx2mCLeL878OmKehB3Ye6Og=;
+	s=k20201202; t=1769052622;
+	bh=wVhphtw/Z6Z30S4kcU4jxxzvIQyGOud6gBZ4csv+EME=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tZwgaI77P+JBPQJRfwCjgWjgBKL1AI5szg6OnUW3QdB5dzwq2oWIgA6ltGY6CufSV
-	 6m/USVvfKGbvMAVtFD08gU6iQnuhn520D/ApINoaXr3iYsXJ4oOTBCSqja6U9UFN2e
-	 6zjTDCZbraviVYC2j3CxpK83nDswupz+gMBTkAPLnQQwUw1JhHA3QI2ekeMJp87ToR
-	 nNGEkTDTt5ZTddlQyuGcqkM2qQudFkAVTWDuuTsftEWILjXAuk73FDdXVf90mkOEIj
-	 tsIeKWkeosMVPNHHJfEw6Lxod9h6i3xz0Bg6eN/fLgQZOMCb740VX+Iz1Y5obRkyzS
-	 JGchDmWWPdvDw==
+	b=CBBNUwSxSWVDelv3b7qDpHELyyJJsGBx2uOkZmjZsHFrAOUxpCkZ8oQSKZCc7OLn8
+	 G0XJhEDJnQXv53XRf8k015qtG7WWJVKKL1qEBhM12/SeJ3LespL7EAh283aW5VZyBa
+	 VvIREW8q6/48rtlPcDGsCYJfKSbmKFD6NgjzdTtKwxWOU6OOaqNiU7onimOHVoOVDf
+	 lyDad8RVj5Z/7dlTLtqP7By9x8dPKG3KmENRvVaWfnCGnDAQF/LQal/r1q8n5XfJm5
+	 ILAnyLD47/uKaQTrfYfcB4v5OwfF2eKHDjnTQb2dWvTGpnyLAEpPv7B+9cwyFC2J0A
+	 V7e21aeamF41g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8E8B3808200;
-	Thu, 22 Jan 2026 03:30:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EC383808200;
+	Thu, 22 Jan 2026 03:30:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,20 +57,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] airoha: Add the capability to read
- firmware binary names from dts for Airoha NPU driver
+Subject: Re: [PATCH net-next] tcp: preserve const qualifier in tcp_rsk() and
+ inet_rsk()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176905261759.1542867.17011579181219560528.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jan 2026 03:30:17 +0000
-References: <20260120-airoha-npu-firmware-name-v4-0-88999628b4c1@kernel.org>
-In-Reply-To: <20260120-airoha-npu-firmware-name-v4-0-88999628b4c1@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- andrew@lunn.ch, krzysztof.kozlowski@oss.qualcomm.com
+ <176905261885.1542867.11045113592731404342.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jan 2026 03:30:18 +0000
+References: <20260120125353.1470456-1-edumazet@google.com>
+In-Reply-To: <20260120125353.1470456-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -80,53 +78,50 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-252163-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252164-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: B1F06615E7
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 9D62A615EE
 X-Rspamd-Action: no action
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Jan 2026 11:17:16 +0100 you wrote:
-> This patch is needed because NPU firmware binaries are board specific since
-> they depend on the MediaTek WiFi chip used on the board (e.g. MT7996 or
-> MT7992). This is a preliminary patch to enable MT76 NPU offloading if
-> the Airoha SoC is equipped with MT7996 (Eagle) WiFi chipset.
+On Tue, 20 Jan 2026 12:53:53 +0000 you wrote:
+> We can change tcp_rsk() and inet_rsk() to propagate their argument
+> const qualifier thanks to container_of_const().
 > 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
-> Changes in v4:
-> - Add missing MODULE_FIRMWARE definitions for EN7581_7996_FIRMWARE
->   binaries
-> - Link to v3: https://lore.kernel.org/r/20260119-airoha-npu-firmware-name-v3-0-cba88eed96cc@kernel.org
-> 
-> [...]
+>  include/linux/tcp.h              | 5 +----
+>  include/net/inet_sock.h          | 5 +----
+>  include/trace/events/tcp.h       | 2 +-
+>  net/ipv4/inet_connection_sock.c  | 2 +-
+>  net/ipv6/inet6_connection_sock.c | 2 +-
+>  5 files changed, 5 insertions(+), 11 deletions(-)
 
 Here is the summary with links:
-  - [net-next,v4,1/2] dt-bindings: net: airoha: npu: Add firmware-name property
-    https://git.kernel.org/netdev/net-next/c/03135a5a6ed3
-  - [net-next,v4,2/2] net: airoha: npu: Add the capability to read firmware names from dts
-    https://git.kernel.org/netdev/net-next/c/3847173525e3
+  - [net-next] tcp: preserve const qualifier in tcp_rsk() and inet_rsk()
+    https://git.kernel.org/netdev/net-next/c/a4674aa58be5
 
 You are awesome, thank you!
 -- 
