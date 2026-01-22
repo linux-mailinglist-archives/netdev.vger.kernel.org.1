@@ -1,252 +1,358 @@
-Return-Path: <netdev+bounces-252336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNthLhgqcmmadwAAu9opvQ
-	(envelope-from <netdev+bounces-252336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:46:00 +0100
+	id QC6lLasbcmnrbwAAu9opvQ
+	(envelope-from <netdev+bounces-252337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:44:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2B4677AB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:46:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C65AD66C88
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87DEC729F50
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:25:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B0D2D4F18C7
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B439844A725;
-	Thu, 22 Jan 2026 12:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BFD3101C2;
+	Thu, 22 Jan 2026 12:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IVlElCxw"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k9TQhFgZ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="XPtQ1P88";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k9TQhFgZ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="XPtQ1P88"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011048.outbound.protection.outlook.com [52.101.70.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898C42DC337;
-	Thu, 22 Jan 2026 12:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769084524; cv=fail; b=GI27hzfaf/O2G8Qic0eZLDgS9bO9dvxEWgmC3aJ4gnx6ht0dZqks+sYZKfbayFc2jU5lc45Kpiz06tCH1DEh0Xi0b4DeASSixuR//h4vuX5BikMm/SaXrNOI8nqN8HLw9GNO6S2yPV2a8dYWt3F4TDl1Vyvu0aGLE563c+pOnPc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769084524; c=relaxed/simple;
-	bh=uqy9ICpalbKZreAaAMr8cryn8jV1hibOtVxxZVKumr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YrTumiHlRkhvd2PRfXydRlL24n9BKShGeasm1JTykp/ewe6QWfppHZzmXLen1hKvEg09cFjotTP7VKcHLlGIVf8KX0aTUGBXi42TV42a3K/SSFTdYccOEHQ6eo88SAmsPwlPmPPa8ivqU7RcA2YPO2Ca4Q9bw4QU3b2XywAEY40=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IVlElCxw; arc=fail smtp.client-ip=52.101.70.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xfsESMBGmt3oPLW4ERk+XccYeG12xjd2lNn40xWYr9h6k6JnA0nWKiypdFrjyZpY+WeEkingeqT7U7O6AA4vx+v/DNBjxBNFFEaq+i0+XhuoVADqOdFcBTlCTaaPoyfnc4ZeQSEBlRdBcDY9GuKh+/Gl0y2nzz3hpQNXHJOmSfUSmYMZD4vSAlpKPxh4cor2rCh6kEe5pQUNbzUUKdXpgH0AZX0Q94Ar+P5D515sA/ZiJKGK6j5Gbp7cqVH2XceMTP2XIllTZCcggi5B/VzLdJDc8jQtMlXbViuRhiS6g6npDfmfszTFb9vKm8ryWqIa0mFKWwfQLnJcsGPIsFEclA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8vXFdz+kEa1SIEJRpG1n1RCFpgyRvWH3ZCjy4ZuJs0Q=;
- b=zJ3kBQsv6KYl26mbfk8sBUDOY3JovnhnSUS+G1ZF0+Nbv+2XkKLQL1OlnBn5SHT5ugxeVbmo6rCMe6qv5r9oTwL+WcdZ3ywdHopWOxQWfH7/rKlIkN5Ze6a5NfAdtytMmHz8eNZrXYu+6hmrPfu14pjsCEqi+nc+ZZUHNyvfRkJyie+mA4S3iCREbxPQZJDhcyjtLbXP87cI+jaEbImZg9zmnqrSHMePeVDsSBoxKSCH1uNGqGtjkkQ9QHJPabpK4feb9rdKxQo4s423x1zZFtRq+2fOph2Hui56kGPKzpZvfWIAbcNqSdrQ8bNL/6ZmrjETufWpKxTF3OjhzCBopg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8vXFdz+kEa1SIEJRpG1n1RCFpgyRvWH3ZCjy4ZuJs0Q=;
- b=IVlElCxwzlHppmzk/GVSJvDc3c45/r0kOssSY/Ji+x8OU8n78kGZBKQW21o/BCqcVMgkEJFeH90fzs6FVOkOha5y1BDLR0jvCk4mZ+nYaYlqkt4+8h9jOiOfhjMkLsMjIBp4HAHr0sjvsRRnwjRzkn4eSpvJuLhsGlRZLwqJAbwsoIwrFjCrtQN40hEyPjaH74GM5km7f+2yJQ8Wn2CBZODs613LRGgPrC9MnXJa9trBf5XPdKqmjh+IinkLImwRaGhhjijVzBL6vr9ijTGhd4zEB1KCxGCQ5BPKfZnIBuq5HkjInFxPVNVju/bZLsvAOH3HPrbX3wtXq/WZD1u9jg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by PA6PR04MB11733.eurprd04.prod.outlook.com (2603:10a6:102:51f::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Thu, 22 Jan
- 2026 12:21:58 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Thu, 22 Jan 2026
- 12:21:58 +0000
-Date: Thu, 22 Jan 2026 14:21:54 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>,
-	Mark Brown <broonie@kernel.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with
- non-MMIO regmaps
-Message-ID: <20260122122154.5j62eyhny3cek2br@skbuf>
-References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
- <20260122105654.105600-2-vladimir.oltean@nxp.com>
- <aXISv3Acm1v6yS4V@smile.fi.intel.com>
- <20260122121301.cyxyevi7xvqw2axk@skbuf>
- <aXIVIw2SKsMfNVUm@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXIVIw2SKsMfNVUm@shell.armlinux.org.uk>
-X-ClientProxiedBy: VI1PR04CA0051.eurprd04.prod.outlook.com
- (2603:10a6:802:2::22) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC6A3EFD1B
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 12:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769084551; cv=none; b=elcnJ5OVYyLen+F/taFxTuPSN9oOmzVzxn0u/K8zXxyj/7pmvSmYeQwD2UnwHuYRe+JN9VRhp0EAd6dnqmTHlyjz8cXqa8xj6wW/hmA3dc87Vfy9jEBmJyq/cz54iGN8DEssAcFFaPcIiZHo6jFFqI33Qea2xdIBfOV+AbifIWw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769084551; c=relaxed/simple;
+	bh=y8hzTT455HYk+1720jHQBtvMudFAdDUuJ5NpgQT/G+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TgHAZnc2mzuEwMX8sJvdq6WZ0VB2IgPkJdaNn+TtNNs4Qy1wJYNyH27IPnl2ygky5/NchtpTgQi4XWpxWpmrfoTaMthzvu53mPIJRxJgarHdQobAl+23WgtJlZJT/MwTyvX5bZCoa0JA77PsZLAYZKMYPF58anNQLx50FE/mB3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k9TQhFgZ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=XPtQ1P88; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k9TQhFgZ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=XPtQ1P88; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6EEDC33700;
+	Thu, 22 Jan 2026 12:22:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1769084547; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R6hAPsj+NLwtF41nywMmwEDmVvrQvw3fqSAvHGFPS1U=;
+	b=k9TQhFgZ5c2BamhxOnh7Bk8q0No5vaCvYpfe4+Gbgwm0NeuoY3AHVcomUR1/FDAeYJgvGn
+	P0jy3pjRiW78oUgkPlSE+Y3vT/EdfCXX1tp1pv6pI5XmCz3+G4mQl2rEhmlHg9nbiiTUYG
+	Nrqv/xva9bZhCSxegHLq0rPA0MoOn7c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1769084547;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R6hAPsj+NLwtF41nywMmwEDmVvrQvw3fqSAvHGFPS1U=;
+	b=XPtQ1P88wnPQkQ95I0U7USA/LYirfGKp0FabMshNGhQBwyaNAe0Oq2ecIbanfU1HN4SUe9
+	jm0ReZg/fGxUy5Ag==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1769084547; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R6hAPsj+NLwtF41nywMmwEDmVvrQvw3fqSAvHGFPS1U=;
+	b=k9TQhFgZ5c2BamhxOnh7Bk8q0No5vaCvYpfe4+Gbgwm0NeuoY3AHVcomUR1/FDAeYJgvGn
+	P0jy3pjRiW78oUgkPlSE+Y3vT/EdfCXX1tp1pv6pI5XmCz3+G4mQl2rEhmlHg9nbiiTUYG
+	Nrqv/xva9bZhCSxegHLq0rPA0MoOn7c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1769084547;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R6hAPsj+NLwtF41nywMmwEDmVvrQvw3fqSAvHGFPS1U=;
+	b=XPtQ1P88wnPQkQ95I0U7USA/LYirfGKp0FabMshNGhQBwyaNAe0Oq2ecIbanfU1HN4SUe9
+	jm0ReZg/fGxUy5Ag==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2DDDB13533;
+	Thu, 22 Jan 2026 12:22:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id LfTiCoMWcmm6fwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 22 Jan 2026 12:22:27 +0000
+Message-ID: <dfdd0648-a7da-4e8e-8781-cf094da4844f@suse.cz>
+Date: Thu, 22 Jan 2026 13:22:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PA6PR04MB11733:EE_
-X-MS-Office365-Filtering-Correlation-Id: 042f5506-4764-4889-cf8b-08de59b0d6af
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|19092799006|10070799003|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8fN5OVoTKOpy1Op8mqS8bKIORieRV9+oa1IqWOlVeE/gCLG6TjkLQL6L4f1T?=
- =?us-ascii?Q?Ikb8FKoK8q95V2sLvx6okocyzL6V3M6MWPccuVbTKMpXpU08YQZA3Qxc0DDJ?=
- =?us-ascii?Q?OGkIhrTIKCGZMh3jTi0+0/vXz+GqrqjyfPqzIQ/iCqDU515/hy0U3iStq5fZ?=
- =?us-ascii?Q?JroDViy/YdIyvsitMO1WbhJw6K0qZi471hgVQoQixeW+YqlUG864BP52zp8P?=
- =?us-ascii?Q?lT8AupfuL2KTSS3dVHNPydRqdKAFFqrCqC5BQVaePECMUevUpyAT4qXrA+Ch?=
- =?us-ascii?Q?cTHjSMKkMr/w7VXXGZFmt3KJAZ1ccdq6nle586YHRB2yXxM9iWCMVrqoz9SZ?=
- =?us-ascii?Q?FQwyVNCg/8fLfn4c5nxekIrn7r9U6KfUKoGlEYUfFvcLkIHqIE5J1NRFaq9E?=
- =?us-ascii?Q?8cY66h5XuhpdGEQAQ5eDKvu3vHtegimAFHgQFj1oaV0E5OInPb95yeiZQIhu?=
- =?us-ascii?Q?oJTNlb366f5PtTS3LeMy7mDWdU/S6+eaI+G0zcYNk5qd2KSNwG4Fe1/FauST?=
- =?us-ascii?Q?lAIHL6rC9eI1pYlJ0gws50kBqim2qoTIi5RI9TbABenSPD1XSr/Ga8f5Z08B?=
- =?us-ascii?Q?2FMLSFuKC5O74dxLFBg2FS7cGJJJKtO1dQFh9cEQYhueCFeFZK5/bvWsvJ94?=
- =?us-ascii?Q?FLrhOXFKxvIWmlK4G57ZhWlu4ABoWCbBjMR+LpfNnXrZdXvCwki8vcHafgie?=
- =?us-ascii?Q?lozYRdXL03O02ArUIFgNws04f/9N7TN7v+w6d2hEFtmQoDtidPNXjUAJuLUR?=
- =?us-ascii?Q?1jg9BTJVske5+TUAO3gt+ox6gnMC6VYa5m2jPtnYPB3yKOEP0/TIgIq011I8?=
- =?us-ascii?Q?8XHgzVl4A0sw5+dS3rA/Lmi8hNITkpbW/k0fe/1uvtwkZrbhUbm10evDF1WR?=
- =?us-ascii?Q?StWr004VKMBCFFwii/XnhAovlYyO43Oq5I+acpnW03MXXkbn0rZDX02L6b3z?=
- =?us-ascii?Q?Np7uDB3iYKT6QTo5P7ZD2s/LkBeqbOdKOSY3NQ+TnXoe2JNhLybAoc0e8RJO?=
- =?us-ascii?Q?c7tsplsyNqjTYXKuePN7zUYS8iknmsV/fZtdKUawY3gTfV2mwXokMpxGLgZx?=
- =?us-ascii?Q?a+NUapQ3eqFqOc5Te5OEeuHCOaRW4LxL6W65ZWYwx9iV56O35aJe8S0Hu3dM?=
- =?us-ascii?Q?hw95r2EsqeLtjY1NIyMvf/bNbE4yF0v4IugMKfaQWbZfxnjNKwlLW3H6I2Av?=
- =?us-ascii?Q?Zfk5LuapBODwBMugm1YRh+iVHt9owMQ56zOgcQHBWfFYNGVJ7fwbaXb5jHK8?=
- =?us-ascii?Q?GyZqmCgCVqv6Ospj6+kLd0WJdCn1oxqrQjGYCPpCjaztdIj1GhSBF91p8bvi?=
- =?us-ascii?Q?ovpb9wOr8V0YsvmJJq9Pka5v4Uu53AsNKex1Zg/EcDz8J8KL4AtWPK41KKbg?=
- =?us-ascii?Q?2/7hkn54NrBT9Pj2r/mSZsNlZFM/iUAyqOv4i04pa8kRcj/7hN0jtq69beeH?=
- =?us-ascii?Q?nilr7nJd+I4NPKFYFHLbVx351jNI/lwgAYLPrBqmTSfQ6p7pR0iV0UcUEVAq?=
- =?us-ascii?Q?Cz0FUPzEcmVNkDun2YBLs2xW3jhuXxvoHdiWu1D701KjjbWrdgq1zmj70aJV?=
- =?us-ascii?Q?KJk65wyce5pZQ/kEge4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(10070799003)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?y1fejDrNbcKRjKMvNpfB5RfGMfJDwaBb8dS61oYP0UoLztVZIKz8WEZ4POrN?=
- =?us-ascii?Q?ft6vKCG3v2L2S4qyKJjyAKq7JmkArHvxCPlH7ogjGvmfYBMdsTMXQxvIBrk5?=
- =?us-ascii?Q?B0MCEDgJYroMQiAyEihOWo7tOo9Bw2GsXEAjKbZt3EwB/um++DALodlgJhX9?=
- =?us-ascii?Q?vXLEEvSuCVbA2R3Ush5xvh2DZwxul4/2wBNQWrkO8sCBDjygnuKiLI+APy/a?=
- =?us-ascii?Q?jWONmxG7/CLhkpSDh5kJbGfmaKrvG8bcacTgPtZdyCeOtU4Km6EztJbajOng?=
- =?us-ascii?Q?JVEINGup97wd8n+8jtdZ+cI5s4sfe3z1UMCSNPOfcadTnu9zngxHIiwerdFH?=
- =?us-ascii?Q?QMk/Fl8cpHZSxbYBhlOL26d7PgIRRwtPoLdk7ROOhCNQ2Ju3j+gangE1zp6K?=
- =?us-ascii?Q?bXPy7YxTbWjkZTuUdqZKcdcdShbfxyu+Ip7QYH8PzqkO5tOLiNmHjGIbjkMX?=
- =?us-ascii?Q?qoaTLO6xuqHU6yi5L52dNQg/PomRGZfBH5XTRmNldCdvuZoEqciL4d5VPdsU?=
- =?us-ascii?Q?p7jfquVjfrzfK3rpkT6sKniwefqQJR/RDNZ+jisLjinV+dU0OA4/9ix2tKfG?=
- =?us-ascii?Q?oKaG+DQWjI3orp9aPggqn4qpfEr4nlCerSlZkuC0LB9ZNBfdC4Qi1gNf7ezL?=
- =?us-ascii?Q?Yoz3FXpeuYHhHLneeQ4Tq4uxvDDdCLEqNdOoaFxuY1J8gcD+8hgaIivstoaf?=
- =?us-ascii?Q?F/YPJl1B14D5Y9fuD+Tfs0UenaSv50YEfXyi/QJDmibrhguRldBQvJf018Fw?=
- =?us-ascii?Q?kA/QblMEqa52hhVhP8pJFWS8dZe2rVlKiS1flI9Zg7RJx/IAYZ5v2pATOvEe?=
- =?us-ascii?Q?KJ/GPiTh8BXJEYcDlVQnO7nW5cmC2m2la4eFGVuxnOne6USSS9nIPMSYpf1j?=
- =?us-ascii?Q?enS76iSjzzM2Tnv6W5gftTfXO5UwadWNU7nUwmTfHGL6oa9K0BwR7r0uquZA?=
- =?us-ascii?Q?EtuG/y8bt4g0c9GBQWfD+Zt00tMQe0ehcWQcxzCT4bWkcYWUd7tCELc/wLEo?=
- =?us-ascii?Q?akk+uFOgC55ShjCl+K3EWnEWBqQMQTmX5PbqjkgKTTzYxeeVWwaIfv0uRrA1?=
- =?us-ascii?Q?q6HgfaOOXLWYhlgldNML/0CoP5NGWeaM33xVkjl6DA0lqqkDCiKxYel3iDvw?=
- =?us-ascii?Q?op2uNXDfC20ycDmECuC5A9lYbTMh6XSe7ES91u/IBt6SZh166tbw5fqtWGEP?=
- =?us-ascii?Q?mH07Ac65NUO5K51ro+NaMHaPdelDxmODrrEkPyBVBIkOM9HbYrTVXNTS4Pwz?=
- =?us-ascii?Q?kXB0wW4Lt8JxddnKrUlTdkb0i81We52+v0gQhSS+HbQQ4A9CZm96Dv3G4hxu?=
- =?us-ascii?Q?CVRT5nOl/Jqg2Qtu0VwFwrQSg3zquEJrxroXAYrhiBYE3sDFOkDZVsoXhQet?=
- =?us-ascii?Q?DAPuQ46BcREf4PPKE7ZRuOUBMFUsOD4ehYDr0+YLQtAHbVhDrX3K2DE4GTKX?=
- =?us-ascii?Q?P2v6RjHkJ9E6eofz2EngZliFmbkNXi/TrYeSahYHlpJln0cRorXyQrFN2/q5?=
- =?us-ascii?Q?f34mY4f69H3CIPXE8LfSCUVgx5lc2GkPEUisOSLN7ueFAUGdKffVZPrMG4zO?=
- =?us-ascii?Q?3uC9pPKHUzAKWjNDtp/2xlz9bGVf2g6ulnSUZXrCpMdBJ20FjzmhJoub7Ewg?=
- =?us-ascii?Q?aPgoFjdEIX6/z5yGNkuHJTXVi5nuxpgh82XBykdEeVs8oAZOQBlz2+f9J7og?=
- =?us-ascii?Q?bg1RsaHgtY8WFXjH5F3AKt1Gukc7tAhQ1woN4TM7wGc92bfYsGjVVHr6G/3p?=
- =?us-ascii?Q?kiPANsWd9/MC2hGx7ov1RBYRE/PSLrS4e/lKbSGakwdOYW5PsT+N7bkR3PEa?=
-X-MS-Exchange-AntiSpam-MessageData-1: nvO2+jYI23PgVBWofnowbrzVIQeOM4qFq0Y=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 042f5506-4764-4889-cf8b-08de59b0d6af
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 12:21:58.6358
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y4axdU3PjS4IfQioDgvJLV/RmW74UMMLVkxk7MnOX86H9MaWBjJh6KJiPfoDlq9wqjNNWK+3oz8DxFMTryr32g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR04MB11733
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] mm/page_alloc: boost watermarks on atomic allocation
+ failure
+Content-Language: en-US
+To: Qiliang Yuan <realwujing@gmail.com>, akpm@linux-foundation.org
+Cc: david@kernel.org, mhocko@suse.com, willy@infradead.org,
+ lance.yang@linux.dev, hannes@cmpxchg.org, surenb@google.com,
+ jackmanb@google.com, ziy@nvidia.com, weixugc@google.com, rppt@kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ edumazet@google.com, jis1@chinatelecom.cn, wangh13@chinatelecom.cn,
+ liyi1@chinatelecom.cn, sunshx@chinatelecom.cn, zhangzq20@chinatelecom.cn,
+ zhangjn11@chinatelecom.cn, Qiliang Yuan <yuanql9@chinatelecom.cn>
+References: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
+ <20260122020742.230219-1-realwujing@gmail.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20260122020742.230219-1-realwujing@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252336-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux.intel.com,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,trustnetic.com];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[suse.cz];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,linux-foundation.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-252337-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[nxp.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8E2B4677AB
+	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.cz,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:dkim,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,chinatelecom.cn:email]
+X-Rspamd-Queue-Id: C65AD66C88
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 12:16:35PM +0000, Russell King (Oracle) wrote:
-> On Thu, Jan 22, 2026 at 02:13:01PM +0200, Vladimir Oltean wrote:
-> > On Thu, Jan 22, 2026 at 02:06:23PM +0200, Andy Shevchenko wrote:
-> > > > Cc: Mark Brown <broonie@kernel.org>
-> > > > Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > 
-> > > FWIW, Cc list may be located after --- line. It will have the same effect on
-> > > emails (as regular tooling will parse and put them into email headers), but
-> > > will reduce unneeded noise in the commit message. List will be still available
-> > > on lore.kernel.org in the mail archives.
-> > 
-> > Thanks for the comment. I know it may be located after ---, but for me,
-> > doing that implies an extra step which I find unnecessary (moving them
-> > there after the git format-patch stage). I keep the Cc: in the commit
-> > message in git so that it's preserved across revisions.
+On 1/22/26 03:07, Qiliang Yuan wrote:
+> Atomic allocations (GFP_ATOMIC) are prone to failure under heavy memory
+> pressure as they cannot enter direct reclaim. This patch introduces a
+> 'Soft Boost' mechanism to mitigate this.
 > 
-> What I do with my individual patch versioning is in the editor, after
-> my sign-off, add the "---" and put the version changes below. This means
-> git format-patch will do what it normally does, and as the commit
-> message is reproduced verbatum, you get all that included too.
+> When a GFP_ATOMIC request fails or enters the slowpath, the preferred
+> zone's watermark_boost is increased. This triggers kswapd to proactively
+> reclaim memory, creating a safety buffer for future atomic bursts.
 > 
-> You do get an extra "---" line between the versioning changes and the
-> diffstat, but that's fine.
+> To prevent excessive reclaim during packet storms, a 1-second debounce
+> timer (last_boost_jiffies) is added to each zone to rate-limit boosts.
 > 
-> So in the commit message:
+> This approach reuses existing watermark_boost infrastructure, ensuring
+> minimal overhead and asynchronous background reclaim via kswapd.
 > 
-> Signed-off-by: ...
+> Allocation failure logs:
+> [38535644.718700] node 0: slabs: 1031, objs: 43328, free: 0
+> [38535644.725059] node 1: slabs: 339, objs: 17616, free: 317
+> [38535645.428345] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
+> [38535645.436888] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
+> [38535645.447664] node 0: slabs: 940, objs: 40864, free: 144
+> [38535645.454026] node 1: slabs: 322, objs: 19168, free: 383
+> [38535645.556122] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
+> [38535645.564576] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
+> [38535649.655523] warn_alloc: 59 callbacks suppressed
+> [38535649.655527] swapper/100: page allocation failure: order:0, mode:0x480020(GFP_ATOMIC), nodemask=(null)
+> [38535649.671692] swapper/100 cpuset=/ mems_allowed=0-1
+> 
+> Signed-off-by: Qiliang Yuan <realwujing@gmail.com>
+> Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
 > ---
-> Cc: ...
+> v6:
+>   - Replace magic number ">> 10" with ATOMIC_BOOST_SCALE_SHIFT define
+>   - Add documentation explaining 0.1% zone size boost rationale
+> v5:
+>   - Simplify to use native boost_watermark() instead of custom logic
+> v4:
+>   - Add watermark_scale_boost and gradual decay via balance_pgdat
+> v3:
+>   - Move debounce timer to per-zone; optimize zone selection
+> v2:
+>   - Add debounce logic and zone-proportional boosting
+> v1:
+>   - Initial: boost min_free_kbytes on GFP_ATOMIC failure
+> ---
+>  include/linux/mmzone.h |  1 +
+>  mm/page_alloc.c        | 36 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 36 insertions(+), 1 deletion(-)
+> ---
+>  include/linux/mmzone.h |  1 +
+>  mm/page_alloc.c        | 36 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 36 insertions(+), 1 deletion(-)
 > 
-> Changes v2:
->  ...
-> 
-> will work fine.
+> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> index 75ef7c9f9307..8e37e4e6765b 100644
+> --- a/include/linux/mmzone.h
+> +++ b/include/linux/mmzone.h
+> @@ -882,6 +882,7 @@ struct zone {
+>  	/* zone watermarks, access with *_wmark_pages(zone) macros */
+>  	unsigned long _watermark[NR_WMARK];
+>  	unsigned long watermark_boost;
+> +	unsigned long last_boost_jiffies;
+>  
+>  	unsigned long nr_reserved_highatomic;
+>  	unsigned long nr_free_highatomic;
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index c380f063e8b7..8ea2435125d5 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -218,6 +218,13 @@ unsigned int pageblock_order __read_mostly;
+>  static void __free_pages_ok(struct page *page, unsigned int order,
+>  			    fpi_t fpi_flags);
+>  
+> +/*
+> + * Boost watermarks by ~0.1% of zone size on atomic allocation pressure.
+> + * This provides zone-proportional safety buffers: ~1MB per 1GB of zone size.
+> + * Larger zones under GFP_ATOMIC pressure need proportionally larger reserves.
+> + */
+> +#define ATOMIC_BOOST_SCALE_SHIFT 10
+> +
+>  /*
+>   * results with 256, 32 in the lowmem_reserve sysctl:
+>   *	1G machine -> (16M dma, 800M-16M normal, 1G-800M high)
+> @@ -2189,12 +2196,31 @@ static inline bool boost_watermark(struct zone *zone)
+>  
+>  	max_boost = max(pageblock_nr_pages, max_boost);
+>  
+> -	zone->watermark_boost = min(zone->watermark_boost + pageblock_nr_pages,
+> +	zone->watermark_boost = min(zone->watermark_boost +
+> +		max(pageblock_nr_pages, zone_managed_pages(zone) >> ATOMIC_BOOST_SCALE_SHIFT),
 
-Oh, that's quite a clever use. I can now keep my changelog in git too...
-Thanks for the hint!
+So IIUC you are not changing (increasing) the maximum boost, but the amount
+in one step. It would be more descriptive to first set a local variable with
+this amount and then use it for the boosting.
+
+This change also affects the original boost_watermark() caller. Maybe it's
+fine, can't say without any measurements.
+
+>  		max_boost);
+>  
+>  	return true;
+>  }
+>  
+> +static void boost_zones_for_atomic(struct alloc_context *ac, gfp_t gfp_mask)
+> +{
+> +	struct zoneref *z;
+> +	struct zone *zone;
+> +	unsigned long now = jiffies;
+> +
+> +	for_each_zone_zonelist(zone, z, ac->zonelist, ac->highest_zoneidx) {
+> +		/* 1 second debounce to avoid spamming boosts in a burst */
+> +		if (time_after(now, zone->last_boost_jiffies + HZ)) {
+> +			zone->last_boost_jiffies = now;
+> +			if (boost_watermark(zone))
+> +				wakeup_kswapd(zone, gfp_mask, 0, ac->highest_zoneidx);
+
+The other caller of boost_watermark() is under zone->lock and it makes those
+zone->watermark_boost increments safe, and balance_pgdat() takes it for the
+decrements too with "/* Increments are under the zone lock */ " comment,
+otherwise I wouldn't realize this.
+
+It probably wouldn't hurt to add a lockdep assert into boost_watermark() to
+prevent mistakes.
+
+But the other caller also takes care not to call wakeup_kswapd() under the
+zone lock so I would not do it as well - see commit 73444bc4d8f92
+
+> +			/* Only boost the preferred zone to be precise */
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+>  /*
+>   * When we are falling back to another migratetype during allocation, should we
+>   * try to claim an entire block to satisfy further allocations, instead of
+> @@ -4742,6 +4768,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
+>  	if (page)
+>  		goto got_pg;
+>  
+> +	/* Proactively boost for atomic requests entering slowpath */
+> +	if ((gfp_mask & GFP_ATOMIC) && order == 0)
+> +		boost_zones_for_atomic(ac, gfp_mask);
+> +
+>  	/*
+>  	 * For costly allocations, try direct compaction first, as it's likely
+>  	 * that we have enough base pages and don't need to reclaim. For non-
+> @@ -4947,6 +4977,10 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
+>  		goto retry;
+>  	}
+>  fail:
+> +	/* Boost watermarks on atomic allocation failure to trigger kswapd */
+> +	if (unlikely(page == NULL && (gfp_mask & GFP_ATOMIC) && order == 0))
+> +		boost_zones_for_atomic(ac, gfp_mask);
+
+We already did the boosting when entering slowpath, there's 1 second
+debounce and GFP_ATOMIC can't really do anything in the slowpath to spend 1
+second, so I think this is redundant.
+
+> +
+>  	warn_alloc(gfp_mask, ac->nodemask,
+>  			"page allocation failure: order:%u", order);
+>  got_pg:
+
 
