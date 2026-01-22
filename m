@@ -1,180 +1,197 @@
-Return-Path: <netdev+bounces-252244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MON8C6bgcWk+MgAAu9opvQ
-	(envelope-from <netdev+bounces-252244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:32:38 +0100
+	id MEbfLNDjcWk+MgAAu9opvQ
+	(envelope-from <netdev+bounces-252245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:46:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86EE631E8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:32:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FE863627
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:46:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 411FF7C4238
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:26:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 141F14893FE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B1B333725;
-	Thu, 22 Jan 2026 08:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A16B3C1FFC;
+	Thu, 22 Jan 2026 08:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEN1lLMN"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A484349B15
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 08:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0173A7E17;
+	Thu, 22 Jan 2026 08:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769070314; cv=none; b=Jz+eOlEZPgAAc46RJclmn42VnckxtdGI2zI8Xjew3Oaktcmt0XyOM7R2QQCNqCBrCpRp4ViHPULketHIWzsXp9gXQOzZw9+D4KS4U/sJXEDeuxB7xDr3axd28V/GGR80PnBkNh8rZg2GcbTtyGGwLu5rq6mu8doJAXHV26qtZU0=
+	t=1769070976; cv=none; b=jEFfOxwRby4+8+bz9MtW1jtxx35CG/x++WkmwRhk/L1vSVAu5j79814Gb+3UxVAUEgJ2T82qfTLOrmzjpnoAl9KNoIwwbk3uACD6pAePo2krSG3q6+aTfQL+7q8c3cTNj4gsmBQS61BmRCxCkBHGWYIWh6mtddQ1WY5tYx9W6tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769070314; c=relaxed/simple;
-	bh=DiTutNirX4RvIWPEBcfDzYAqoKEhxeIszskS8Lw4n8c=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XB4UWdSgD7In13nXElAr4NFI73i6oxGe0/fKt84oI5OBC25q422nm+htvWxLcVxa7/DZVjRq+ErlsPolcxNOae0mEkiGgcmPt52daj2mVEYwUwd1VEmxei2zFkPiIcBoW0QH3EgVZDJ95QJFHS8tmOaIhWzyja/n91RA49tI9Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60M8ONLa081376;
-	Thu, 22 Jan 2026 17:24:23 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60M8OMNw081373
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 22 Jan 2026 17:24:22 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <287edf7f-85fb-46c3-9c70-c8ec7014a0db@I-love.SAKURA.ne.jp>
-Date: Thu, 22 Jan 2026 17:24:22 +0900
+	s=arc-20240116; t=1769070976; c=relaxed/simple;
+	bh=c5VjwEm9ex9Mg3vUtvDDSl7GAfSR5wtXihmSxg0aZtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W+hWOrWJuD1v46x424kupeLbXv7Pai4NsJ0xbQcmof2Me3EslA35iYF3YMhCHZsNqUYBfqQacIjkcZMvUdoWkmkn7nmWaipia2UDPYqARwmqCRigeSvMCZ0jezdnoq/D/QyO9kPCbmgt9vIPsrl2EZ6GYzqa2YSXN1A/l2P17Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEN1lLMN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D18AC116C6;
+	Thu, 22 Jan 2026 08:36:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769070974;
+	bh=c5VjwEm9ex9Mg3vUtvDDSl7GAfSR5wtXihmSxg0aZtQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AEN1lLMNDUYenHuV8Z8P9N41F2zTG1JFJAf0G5UF4B0pYCl3cbH0MtJlia0xFRWfE
+	 aJlvbVE+816wY2lj/ZzesL0rQzT5YhCSLZmiuE4lVZmPrKl6oIQqerJLbGB4nS++PZ
+	 3FxZY6m4xfshuKC4za6SpRiiHLXjhB60mIi8vNC6QBvUYOSxZvi92B6AcBjJ33k00h
+	 z9KK2ewaTK1Q8HfEE1cYZOx5b3M1gtg403tbIzXwLlOQvHB1sdEweN1KQcJ7nbITae
+	 t80X+9G2Kk9RQ1RbxiLWnE3Hy5eiof2u8ww9wRR59LDHUBTfjsxOf6ClCABWiue07M
+	 xJ4gYcfrqufCw==
+Date: Thu, 22 Jan 2026 08:36:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch
+Subject: Re: [PATCH net-next v4 07/13] octeontx2-af: npc: cn20k: Prepare for
+ new SoC
+Message-ID: <aXHhekHJSpTZzHXy@horms.kernel.org>
+References: <20260113101658.4144610-1-rkannoth@marvell.com>
+ <20260113101658.4144610-8-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] xfrm: force flush upon NETDEV_UNREGISTER event
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Aviad Yehezkel <aviadye@mellnaox.com>, Aviv Heller <avivh@mellanox.com>,
-        Boris Pismenny <borisp@mellanox.com>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Florian Westphal <fw@strlen.de>, Guy Shapiro <guysh@mellanox.com>,
-        Ilan Tayari <ilant@mellanox.com>,
-        Kristian Evensen <kristian.evensen@gmail.com>,
-        Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
-        Raed Salem <raeds@mellanox.com>, Raed Salem <raeds@nvidia.com>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Yossi Kuperman <yossiku@mellanox.com>
-Cc: Network Development <netdev@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>
-References: <924f9cf5-599a-48f0-b1e3-94cd971965b0@I-love.SAKURA.ne.jp>
- <537343f7-c580-43b0-9ad2-691701b9fb8e@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-In-Reply-To: <537343f7-c580-43b0-9ad2-691701b9fb8e@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260113101658.4144610-8-rkannoth@marvell.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.24 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[i-love.sakura.ne.jp];
-	TAGGED_FROM(0.00)[bounces-252244-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[mellnaox.com,mellanox.com,davemloft.net,strlen.de,gmail.com,kernel.org,nvidia.com,secunet.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-252245-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,ib_gid_table_entry:email,I-love.SAKURA.ne.jp:mid]
-X-Rspamd-Queue-Id: A86EE631E8
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 66FE863627
 X-Rspamd-Action: no action
 
-A debug patch in linux-next-20260121
-( https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit?id=fc0f090e41e652d158f946c616cdd82baed3c8f4 )
-has demonstrated that calling xfrm_dev_state_flush()/xfrm_dev_policy_flush()
-when (dev->features & NETIF_F_HW_ESP) == 0 helps releasing "struct net_device" refcount.
+On Tue, Jan 13, 2026 at 03:46:52PM +0530, Ratheesh Kannoth wrote:
 
-  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2
-  ref_tracker: netdev@ffff88805d3c0628 has 1/1 users at
-       xfrm_dev_state_add+0x6f4/0xc40 net/xfrm/xfrm_device.c:316
-       xfrm_state_construct net/xfrm/xfrm_user.c:986 [inline]
-       xfrm_add_sa+0x34ca/0x4230 net/xfrm/xfrm_user.c:1022
-       xfrm_user_rcv_msg+0x746/0xb20 net/xfrm/xfrm_user.c:3507
-       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
-       xfrm_netlink_rcv+0x79/0x90 net/xfrm/xfrm_user.c:3529
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:737
-       __sock_sendmsg net/socket.c:752 [inline]
-       ____sys_sendmsg+0x589/0x8c0 net/socket.c:2610
-       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2664
-       __sys_sendmsg net/socket.c:2696 [inline]
-       __do_sys_sendmsg net/socket.c:2701 [inline]
-       __se_sys_sendmsg net/socket.c:2699 [inline]
-       __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2699
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  
-  infiniband: balance for netdevsim0@ib_gid_table_entry is 0
-  ***** Releasing 1 refcount on 0000000000000000
-  ***** Refcount for netdevsim0 changed from 2 to 1
+...
 
-The bond_master_netdev_event(NETDEV_UNREGISTER) case is already calling
-xfrm_dev_state_flush() without checking (dev->features & NETIF_F_HW_ESP) != 0.
-Therefore, I assume that (dev->features & NETIF_F_HW_ESP) != 0 check in
-xfrm_dev_down() is wrong, and I would like to propose
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> index 508233876fc1..d73e447bedca 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> @@ -903,11 +903,12 @@ static int npc_check_unsupported_flows(struct rvu *rvu, u64 features, u8 intf)
+>   * dont care.
+>   */
+>  void npc_update_entry(struct rvu *rvu, enum key_fields type,
+> -		      struct mcam_entry *entry, u64 val_lo,
+> +		      struct mcam_entry_mdata *mdata, u64 val_lo,
+>  		      u64 val_hi, u64 mask_lo, u64 mask_hi, u8 intf)
+>  {
+>  	struct npc_mcam *mcam = &rvu->hw->mcam;
+>  	struct mcam_entry dummy = { {0} };
+> +	u64 *kw, *kw_mask, *val, *mask;
+>  	struct npc_key_field *field;
+>  	u64 kw1, kw2, kw3;
+>  	int i, max_kw;
+> @@ -920,10 +921,9 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+>  	if (!field->nr_kws)
+>  		return;
+>  
+> -	if (is_cn20k(rvu->pdev))
+> -		max_kw = NPC_MAX_KWS_IN_KEY;
+> -	else
+> -		max_kw = NPC_MAX_KWS_IN_KEY - 1;
+> +	max_kw = NPC_MAX_KWS_IN_KEY;
+> +	kw = dummy.kw;
+> +	kw_mask = dummy.kw_mask;
+>  
+>  	for (i = 0; i < max_kw; i++) {
+>  		if (!field->kw_mask[i])
+> @@ -932,10 +932,10 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+>  		shift = __ffs64(field->kw_mask[i]);
+>  		/* update entry value */
+>  		kw1 = (val_lo << shift) & field->kw_mask[i];
+> -		dummy.kw[i] = kw1;
+> +		kw[i] = kw1;
+>  		/* update entry mask */
+>  		kw1 = (mask_lo << shift) & field->kw_mask[i];
+> -		dummy.kw_mask[i] = kw1;
+> +		kw_mask[i] = kw1;
+>  
+>  		if (field->nr_kws == 1)
+>  			break;
+> @@ -945,12 +945,12 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+>  			kw2 = shift ? val_lo >> (64 - shift) : 0;
+>  			kw2 |= (val_hi << shift);
+>  			kw2 &= field->kw_mask[i + 1];
+> -			dummy.kw[i + 1] = kw2;
+> +			kw[i + 1] = kw2;
 
- static int xfrm_dev_down(struct net_device *dev)
- {
-- 	if (dev->features & NETIF_F_HW_ESP) {
--		xfrm_dev_state_flush(dev_net(dev), dev, true);
--		xfrm_dev_policy_flush(dev_net(dev), dev, true);
-- 	}
-+	xfrm_dev_state_flush(dev_net(dev), dev, true);
-+	xfrm_dev_policy_flush(dev_net(dev), dev, true);
- 
- 	return NOTIFY_DONE;
- }
+Hi Ratheesh,
 
-change as a fix for "unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 2"
-problem.
+It's not a problem introduced by this patch.
+But it seems that this could overrun kw if i is max_kw - 1.
+Likewise elsewhere in this loop.
 
+Flagged by Smatch.
 
+>  			/* update entry mask */
+>  			kw2 = shift ? mask_lo >> (64 - shift) : 0;
+>  			kw2 |= (mask_hi << shift);
+>  			kw2 &= field->kw_mask[i + 1];
+> -			dummy.kw_mask[i + 1] = kw2;
+> +			kw_mask[i + 1] = kw2;
+>  			break;
+>  		}
+>  		/* place remaining bits of key value in kw[x + 1], kw[x + 2] */
+> @@ -961,34 +961,40 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+>  			kw2 &= field->kw_mask[i + 1];
+>  			kw3 = shift ? val_hi >> (64 - shift) : 0;
+>  			kw3 &= field->kw_mask[i + 2];
+> -			dummy.kw[i + 1] = kw2;
+> -			dummy.kw[i + 2] = kw3;
+> +			kw[i + 1] = kw2;
+> +			kw[i + 2] = kw3;
+>  			/* update entry mask */
+>  			kw2 = shift ? mask_lo >> (64 - shift) : 0;
+>  			kw2 |= (mask_hi << shift);
+>  			kw2 &= field->kw_mask[i + 1];
+>  			kw3 = shift ? mask_hi >> (64 - shift) : 0;
+>  			kw3 &= field->kw_mask[i + 2];
+> -			dummy.kw_mask[i + 1] = kw2;
+> -			dummy.kw_mask[i + 2] = kw3;
+> +			kw_mask[i + 1] = kw2;
+> +			kw_mask[i + 2] = kw3;
+>  			break;
+>  		}
+>  	}
 
-But I have a question regarding security_xfrm_state_delete()/security_xfrm_policy_delete().
-
-xfrm_dev_state_flush_secctx_check() calls security_xfrm_state_delete() which can make
-xfrm_dev_state_flush() no-op by returning an error value.
-xfrm_dev_policy_flush_secctx_check() calls security_xfrm_policy_delete() which can make
-xfrm_dev_policy_flush() no-op by returning an error value.
-
-Since xfrm_dev_state_flush()/xfrm_dev_policy_flush() are called by NETDEV_UNREGISTER
-event (which is a signal for releasing all resources that prevent "struct net_device"
-references from dropping), making xfrm_dev_state_flush()/xfrm_dev_policy_flush() no-op (by
-allowing security_xfrm_state_delete()/security_xfrm_policy_delete() to return an error) is
-a denial-of-service bug.
-
-Therefore, I wonder what are security_xfrm_state_delete() and security_xfrm_policy_delete()
-for. Can I kill xfrm_dev_state_flush_secctx_check() and xfrm_dev_policy_flush_secctx_check() ?
-
+...
 
