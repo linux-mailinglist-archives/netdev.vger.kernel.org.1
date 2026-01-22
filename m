@@ -1,199 +1,158 @@
-Return-Path: <netdev+bounces-252435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252436-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6O3HAqNacmn5iwAAu9opvQ
-	(envelope-from <netdev+bounces-252435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:13:07 +0100
+	id eO0eIVRUcmnpfAAAu9opvQ
+	(envelope-from <netdev+bounces-252436-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:46:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61B886AEDD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:13:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F18B6A377
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCA3031F7E3F
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:36:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1849300BD84
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358733F22CC;
-	Thu, 22 Jan 2026 16:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5C13F22A7;
+	Thu, 22 Jan 2026 16:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vlHYNMIE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zneOet2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5A14DD6D7
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 16:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769098693; cv=pass; b=Jk1f6Nkaas7aswWZYC1fCgjvpMqT6kZoMZfKT4K8dWO+4iFA4zaY7s2mlVF0hCWX/oZAuZJ14gjco9cRaOps64GKS5g68B0yFSgbGhIWVv9Wfxn/KL16n5W/qakaUNYDkygz8ZBOGKOW49Q6xA4+DaTBTuFLZfGp9eFHZ2pQog8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769098693; c=relaxed/simple;
-	bh=4EcZlvqIrK25utzKAJDzkzB4IaMwK7OCW1fUm7993K0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=skGKuHLuwnuA+YYlmAzViw55xQ/6AKqSZIA7lPXdOU5bJKj7iR+jgK2s2yoIzzHVb/NbCECTTlNP1RtMvTil+UVm5kMLDo9ma9QBLOsm3eX8mdLx4S5ocvxgYYedVFy1D0tr6P6axuSUIhSRR80wJjyheklzrkWtMSQwJ1hdiN8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vlHYNMIE; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5013c1850bdso9213541cf.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 08:18:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769098684; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iRQKOrYalS8+lFZODR+eXzkLLi4rmumAi7Qv01CCz9qU0DaB32wgCsitiHwno+IZxE
-         hhFl9RV52Eh+omu+osRdHsUhD6SC9UYjr+e9N9oXF4bACcqkMLyXnE//YVzCav97c2Gz
-         YCyXdPPZdN1BsSN+ieJtGnyinIfZnMua4cX1nFxPfHoh0ix+8C7lLoOXRc3CbxUmbvCD
-         uhqRg6HOXNoczjjxQdCDRhP/hwdsKPwgSSCfzYR+WR15NWWajPV5Jw5cR9fk2esPTR0m
-         Xe+pGEOuAP9ClQ20wPIAG0Hjjyz3wGzsW7iI49ECdXt6/U1sC4Yh6K4xkCttr07Siy6d
-         q3GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8mGUkSnoCMX0c5y8OzCg730s87hzIp9pHV9djN0CtBk=;
-        fh=Ub7xhxnCa2NNvOtcA7qbnNDdZejV+2Y2Un60ylSI9Y4=;
-        b=jD/YR0Z/PdV8ezMw7G/iE8+I+vaaQcKeNfH4cAiHSUZokITL5vFZd8lHSSpjUZIlyE
-         ZWjq0eyTJl3y4CLE+FydgWi0JfPnufpSOVxN6K81bWk0P0rO72YagzfxqGci1EDCv3OA
-         9GdPqyQirg26vKnnT1GEtoL0M2n1opUmO5wAUPLPemJhAw5rZvNIAUdAwJlFI9R9ksQC
-         mMcgRi8bdVZKkr9YhoLmGHfGhId1YoBV2KCkhpqXeEsd4x5JxM8mjYhSVtMq5AziL/lP
-         4NNJuoYzOor7ukkh6VU94+tFGOkIRLnDAVR5qfjSmDfhcmndNM4+BuNSuaoc4QGPsf7P
-         OGWA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769098684; x=1769703484; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8mGUkSnoCMX0c5y8OzCg730s87hzIp9pHV9djN0CtBk=;
-        b=vlHYNMIExU72BI7bhNfnyVgnxqZvbDXJvXw88XHdko4fy3mtCs9irEy5vpQbdYAICb
-         MSbKgAmfebL6tEwflZb5aGAJXwyfF+1E8W7socdKON0l+3ppRz1au2GIze6eN5QSKfrr
-         wqxQLwHblqa81wCAZlBluXLRkiWexVhyZG/P7AlN2xwnzoqLVnK1RBOZec3knFpB4IZP
-         +78IG/il9qMvuJX5XNLSXbMwswdEMPtrXsdQZY2sL3/89WJrv8diqOGJx9FwNjNzAieO
-         NEDKWks5qiif2wIVlDs8rolQmdjLncWnlfFjwUcvJhPAf6Ew9M/nuRzLQfLbqx/RWmyD
-         SdYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769098684; x=1769703484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8mGUkSnoCMX0c5y8OzCg730s87hzIp9pHV9djN0CtBk=;
-        b=uzSBBNHG/G31vSOz737S6kiNkVXiASQBVuS9gEs32qS9sJ9tgY/7F6fh4FA5mOrY7y
-         qO9Xhrzygq0UekssTyVOvu9q6mhh6kBZWRM27U23qHqMSincQ4PMqa8MnoGQky997wRJ
-         VxkUt8agljLgmwZSVynxL2oLhEGJDHFH2Kfba0S0EyJVl6vcRHIXpTxu86LDf+TsEBl2
-         aXqU0h0I+8svJ6tS32l9QXxD1N4EkAUVG3k+QhmPTFRMQF9x9o8yBsvRURS9Fk/Zu6L0
-         XqsB8S5VKirDz3JJIKyaFGiXddOPksrFF74mI3tO36KA+NCVESnqd7abKd6OkOwSATcV
-         jBlw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQUA6OXTbGT6moC6NZz9ZrSo7EMD8IkHtpelxOtwk0Yr5ZO9xgHRil/4T7j0GdQxKyM6Vc1Qw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrI/DLYykTTnBlHN0cAi0LUOiONEibXl754A0ThMfhG42r7tRp
-	9gBds8AIcHiHh/B/ejV5QNqWdfMpq0Jsfmi0dg1TnX/NbvuMMx8ok1dIq0vI7Ct9wJFVOeIiBHG
-	yXMqBzl9BKGqfDqPVAGmAGN1pRxcQeljyMjX3r02K
-X-Gm-Gg: AZuq6aJp787dSY8klBwPRQXX5XnUbfTJHBBIed4mD6/gYM3VQl61nc371BHiAKGygn8
-	XVAbOyw0V3sb7ObfIs9sa4Od2HhRFkJaxMwt1s5eJYMKQc6EWFA/vdeFS/musMLtYyZ0AuqmWQs
-	7OJOYG5r64IrhMHT0Zl/Z9pmRFeCkiTpeqndYoI255eCzPkELCVSm5220EDAI+5VC+xtZoe+XV/
-	nGdM5gf8tHnd0r96knB/cjxzm6SQRAM5WPFH9gjv3nTbR9/4F14xz4EfDfXcI7Ze3DggHnm
-X-Received: by 2002:ac8:5fcd:0:b0:4ec:f697:2c00 with SMTP id
- d75a77b69052e-502f779b7acmr687831cf.42.1769098683855; Thu, 22 Jan 2026
- 08:18:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20103F22AE;
+	Thu, 22 Jan 2026 16:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769098697; cv=none; b=SaBO/L0jnNvWG+G4XWv5KfHWhoN0Sd8f2bbQCIynJ+s81X6Eg1XGauGhDbgRXS9gBJipoGs7ndp0QcfLThn8gtMTsHzwkEBurGyLK167QSKfGx7tZdywUlDXdKmjkGpsgorN58zQlPeJIIYfc6W1IzgdEy2JrNQZ9yDUcozxXug=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769098697; c=relaxed/simple;
+	bh=G7VNC55Ha486PBu02P5s/GAzjKHVUKElTcE3p8sB+P4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bcC1818Xmfr7+T2lXCs23LB/1RvJdjA8A40smMR8/8owXDo1NFSHhQrYt89F7PwIgWzssmgyFgg4q4JbOjDC1+oFAMj7zBpegJt2yNMpw1sC3J+qMgZhi9RUvivBfqdlKILn8na6+jd+1bR83zktASB5SUUhaLrtlhCFV7K0EQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zneOet2r; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ROhcxupK5+fjDAxb5ECIUsDM3Hongs6Ym9DHamBwjLI=; b=zneOet2rcigg3Y+DAN1uEIPChM
+	DQjt3UKrNi06hFU1LmLIM5PutacQhegzV3V1swgfQItUlaKa6UBclNiM/iJNlHk6V/jeXo9JEuHTd
+	dVi1huNtzLCjMJ7rSVCZYyRpKlJu19gz/+/q4mOT2+cBg2uNNPVAwe4y/6wo7E+NvqzPCg4qwOdpq
+	fFtSIj3aynEUhzz4ovpIqdcvaRo+6UAToQHQY0XjL4vEyzYDWQ7pwTfLozdGiOH6wHNXdJ4qtmqdq
+	uGkWjX34+zbOUTevDFwMqryX1n+ooqSP0SizrM3ni3yc2/6EiTXhGRkaeDiUJbmNXHOJ4JQcvfnLE
+	Ksb95ZcA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58740)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vixNk-000000000ft-2F40;
+	Thu, 22 Jan 2026 16:18:04 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vixNf-0000000018M-3Kqv;
+	Thu, 22 Jan 2026 16:17:59 +0000
+Date: Thu, 22 Jan 2026 16:17:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>,
+	Mark Brown <broonie@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: Re: [PATCH v2 net-next 04/15] net: dsa: sja1105: prepare regmap for
+ passing to child devices
+Message-ID: <aXJNtz0i--EZXQUR@shell.armlinux.org.uk>
+References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+ <20260122105654.105600-5-vladimir.oltean@nxp.com>
+ <aXIWttaIcR-yq0nx@smile.fi.intel.com>
+ <20260122134245.i5rocwklpcauk3hw@skbuf>
+ <aXI6E4-n25aYn-0y@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122091527.339180-1-schalla@marvell.com> <20260122075206.504ec591@kernel.org>
- <CANn89iL5s+egLhothNtnQf0jtAeftezUjNmbuXtUWgfVV3+bzg@mail.gmail.com>
-In-Reply-To: <CANn89iL5s+egLhothNtnQf0jtAeftezUjNmbuXtUWgfVV3+bzg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Jan 2026 17:17:52 +0100
-X-Gm-Features: AZwV_QjFSwZ3BduD3JW5Pi3e6oTuS7B3XfiVwuw9sYCVXAr7yfIwzrmnPKTOoXQ
-Message-ID: <CANn89i+e+eawQVvmVuA7jyZ=DCU+wPq3z+q6_PoVVY7ZhX2UGQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] virtio_net: Increase RSS max key size to match NETDEV_RSS_KEY_LEN
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Srujana Challa <schalla@marvell.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, pabeni@redhat.com, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, ndabilpuram@marvell.com, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXI6E4-n25aYn-0y@smile.fi.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252435-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252436-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[marvell.com,google.com,vger.kernel.org,lists.linux.dev,redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,gmail.com];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[nxp.com,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,linux.intel.com,trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 61B886AEDD
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2F18B6A377
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 5:13=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jan 22, 2026 at 4:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Thu, 22 Jan 2026 14:45:27 +0530 Srujana Challa wrote:
-> > > Increase VIRTIO_NET_RSS_MAX_KEY_SIZE from 40 to 52 bytes to align wit=
-h
-> > > the kernel's standard RSS key length defined by NETDEV_RSS_KEY_LEN.
-> >
-> > I've been meaning to bump NETDEV_RSS_KEY_LEN to 128 or some such.
-> > Most modern drivers can't use netdev_rss_key_fill() either because
-> > core generates a tiny key. And the devices support hashing over two
-> > layers of IPv6 for tunnels.
->
-> Seems fine to me. Back in 2014, RSS was limited to 52 bytes on all known =
-NIC.
->
+On Thu, Jan 22, 2026 at 04:54:11PM +0200, Andy Shevchenko wrote:
+> On Thu, Jan 22, 2026 at 03:42:45PM +0200, Vladimir Oltean wrote:
+> > I never understood the point of dev_err_probe() when you know the return
+> > code can never be -EPROBE_DEFER.
+> 
+> i) Smaller code; ii) no need to care about: a) deferred probe cases;
+> b) -ENOMEM cases.  I see only benefits here by using it.
 
-BTW make it 256 bytes. 128 is already too small.
+Isn't it also used for /sys/kernel/debug/devices_deferred to report to
+the user ?
 
-> >
-> > Willem, WDYT? Is there a reason to keep the core key small?
-> > Or deprecate netdev_rss_key_fill()?
->
-> What do you mean by deprecating it ?
->
-> One of the ideas was to make sure multiple NIC would share the same key,
-> for some bonding setups.
->
-> commit 960fb622f85180f36d3aff82af53e2be3db2f888    net: provide a per
-> host RSS key generic infrastructure
->
->
->
-> >
-> > > The virtio specification requires devices to support at least 40 byte=
-s
-> > > for the RSS key size. However, devices may support larger key sizes
-> > > up to 52 bytes (as reported by the device's rss_max_key_size config
-> > > field). This change allows such devices to work properly.
-> > > Previously, devices reporting rss_max_key_size > 40 would fail with
-> > > an error during initialization.
-> > >
-> > > The driver already handles variable key sizes dynamically through
-> > > vi->rss_key_size, so increasing the maximum limit is safe and
-> > > maintains backward compatibility with devices that support smaller
-> > > key sizes.
-> >
-> > > -#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
-> > > +#define VIRTIO_NET_RSS_MAX_KEY_SIZE     52
+E.g.
+
+supply-voltage-monitor  iio_hwmon: Failed to get channels
+
+produced by drivers/hwmon/iio_hwmon.c::iio_hwmon_probe():
+
+        channels = devm_iio_channel_get_all(dev);
+        if (IS_ERR(channels)) {
+                ret = PTR_ERR(channels);
+                if (ret == -ENODEV)
+                        ret = -EPROBE_DEFER;
+                return dev_err_probe(dev, ret,
+                                     "Failed to get channels\n");
+        }
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
