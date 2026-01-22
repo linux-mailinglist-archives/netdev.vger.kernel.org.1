@@ -1,267 +1,342 @@
-Return-Path: <netdev+bounces-252297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252298-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKC0AqsQcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252297-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:57:31 +0100
+	id oK8kO+gTcmksawAAu9opvQ
+	(envelope-from <netdev+bounces-252298-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:11:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780F7664A0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:57:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8657066726
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F02DE8AA353
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:24:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7CE238E79B6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1093A9627;
-	Thu, 22 Jan 2026 11:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="wm8JCK/x";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kO5gEcDa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC633A901E;
+	Thu, 22 Jan 2026 11:24:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B8236BCE1;
-	Thu, 22 Jan 2026 11:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6695930FC0E;
+	Thu, 22 Jan 2026 11:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080843; cv=none; b=Mxg39MitEWvQJJJdcQnBKB/OaTJkYu6zO34HcU1LZDyY/1rtRKLbECh1ikxTfYMbszDlSs5G5yKQv4MvLdYi8lqbY1H5S6Kdv6rWw5N5xqw6W0gtYEsxhILuh0mh0fldd4JhSyw9Mo0FmvROFajKh5NVy6HmO0c6pYY5ZtkdHWA=
+	t=1769081061; cv=none; b=biYxdGqrIb08OQ5adJN8b3tvRUMlsjQy2eC+CNnVlAOgMcpY6qY9sAW/4aKjpY6Sc9pTBcg92kyxFN4pcGELUAvPz7rMNMdKfLT1cn72s3UvbiDHhLEYB7KiaEBhdCHV7rmSaju0ZOjcHyIxLJVuOeb5/vpYuCX1MJ2idM9rgM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080843; c=relaxed/simple;
-	bh=bJpnp5aIwRuu1xd73cRIqk6ewXcA1D1stAsGp2g9bW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dLmZglhy/Bum0ihesNqUyMA66lQVMjYdAzg0EOiAChxALEE+FbVNRYzOlf/hEMBY0zDSpK2Ez/0hyIUkeU2wjOnBNSq4V6B0aRigFLsyFVDIe46t4COf2M5PNOw2cRHFd8oo3aeeG71LMiYMLKfL2zz4SwkM95ugtrO3cVWg7F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=wm8JCK/x; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kO5gEcDa; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 9EC3414000F8;
-	Thu, 22 Jan 2026 06:20:39 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Thu, 22 Jan 2026 06:20:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1769080839; x=1769167239; bh=O2G8GCSOLyzSBWxQZdHOWDzcNZAjYQui
-	68vaPgub5l4=; b=wm8JCK/xjEhEapeFnpflqZBA0FsTBX/7nO8YIsChO1URiaaD
-	zLt8b0nr2uFXhBv6sAvBXNL8SKJ7iRthD0ftSpVKXBmXwRzzVt6OvBXOKoe9v/rS
-	smadd/OMlHaM1ZZtZXhJrVDU3Ua2Y87Ivh74CKx1bvd7NPev1bjSbhobTA/RBW6U
-	UAOQzXlk1HHvFiap0KRhs5cRfYptKGxhcs1WVyihddAt4pLKVpI6n38AisDvcE2y
-	QuK3PHz6P/4+t5u8qX3xXMuzUmeVM1K4bdKdZWIt4fDiRAsc/RCYdEBBhHZooeKb
-	Gf8pcy5rigP7lO+eeD14KmkRZcGPKd6uumxdfQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1769080839; x=
-	1769167239; bh=O2G8GCSOLyzSBWxQZdHOWDzcNZAjYQui68vaPgub5l4=; b=k
-	O5gEcDaEQOrRxnyiK87A5nw0G0XqsynAE1T94MLVhG+K5U/7C/uTlkhkMo2iZpEW
-	1Ct6UvgoqSsxYVVCQG9QmLXVl6knAJ2GN4ww1JUaHkXPECdWoIHirGEA/+f73HXh
-	nNzUx60Sxa3tEJiHrfmYK1VJZaS2H3E/3np8y0dKpoh6ZIzDCEKWF6xI4mWjj4X2
-	cNFq+uN9YCuzwtLmpT2qdjJsMB+5yiqYcZkqsM8znyYROIOwylIToK0iOSuu4Cr2
-	gyKDJMMJmBn1CVca/v09eCM8YAMqCLAv3nJrXYR4zLyPWHLVj8GDsjhyLGVKOEZN
-	v1odn6IfUa2nq9JJnua7w==
-X-ME-Sender: <xms:BwhyabmhLYrFFfeyi12EwcZmx50jIUGqn8qGcuM0NajAYWHrhmrBcw>
-    <xme:BwhyaZHEBWaZ4MV5CYI-wnePhTQHwW5XzYjccbJt7Gqxex7TjxQEKeZqkVn2vv2N3
-    jF-0se53MtO8MEM3-80qLnadJLax4A-7Df-9Z2yyORCU-J7Mi20ZM8>
-X-ME-Received: <xmr:BwhyaXGT4y88Hbj_HAQ3mWYlH77cbNi-J53T7RT2Okqh9lcaN4JgrEPzEjcC>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddugeeitddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
-    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
-    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
-    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudekpdhm
-    ohguvgepshhmthhpohhuthdprhgtphhtthhopehmmhihrghnghhflhesghhmrghilhdrtg
-    homhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepug
-    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthes
-    ghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhgriiho
-    rhessghlrggtkhifrghllhdrohhrghdprhgtphhtthhopehiughoshgthhesnhhvihguih
-    grrdgtohhm
-X-ME-Proxy: <xmx:BwhyaZ1sKA_ChYRWgN6AA8gmUTxKXTt4DgngsNZkvon6XSIE82rZkg>
-    <xmx:BwhyaRfkoW5R3naVazTbRSnTlt1y9FLPtTg4Ha8zWtyRk2GTKgROyg>
-    <xmx:BwhyaTKHxWCqM8afIRLrH8rM0Y3_gyfGS4FG-2dFBtsQyfXlNysuZg>
-    <xmx:BwhyafEyoK2fsO0y3RUEkgv7u13G6Car9LOXMW8jnujg9xo5uAc-3g>
-    <xmx:BwhyabxdzvWz_9fVDmVWrZ1zMnI-9_u2_kLYa40mONeD6QhGCaSPXHDp>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 22 Jan 2026 06:20:38 -0500 (EST)
-Date: Thu, 22 Jan 2026 12:20:37 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
-	Mark Bloch <mbloch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Breno Leitao <leitao@debian.org>,
-	Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org,
-	bridge@lists.linux.dev
-Subject: Re: [PATCH net-next 1/4] u64_stats: Introduce u64_stats_copy()
-Message-ID: <aXIIBbCpuY_ISi-t@krikkit>
-References: <20260120092137.2161162-1-mmyangfl@gmail.com>
- <20260120092137.2161162-2-mmyangfl@gmail.com>
- <aXELnMSc4UU6DkbZ@krikkit>
- <CAAXyoMMAMAbEu=-wTf3MGMiZr2Uq7pqJXC+_zrtxKrsjyYi+AQ@mail.gmail.com>
+	s=arc-20240116; t=1769081061; c=relaxed/simple;
+	bh=1yHxMH842dxN7NIcoRgcu0xZfsoLuZ8qWSHUy7FRR2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SEBsM7g94aGqV4vA8qGqgMC+6NeIjs2bLw7ZhGTkrBXEC/x4cexIi8hj1oPj4vI49s337l1z5M3K9PCYhk4ANKseaF/Im2fYkS28r+kSkV9U0lXY3VgJhIJnMA8gccjMejkcHsCcpYgkKBEE6x7e4lN++IzWZlJS+UiO65xpaaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dxdxS1tFHzKHMZX;
+	Thu, 22 Jan 2026 19:24:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 68F6040575;
+	Thu, 22 Jan 2026 19:24:15 +0800 (CST)
+Received: from [10.67.111.176] (unknown [10.67.111.176])
+	by APP4 (Coremail) with SMTP id gCh0CgBH9fXaCHJpzfXUEg--.64027S2;
+	Thu, 22 Jan 2026 19:24:12 +0800 (CST)
+Message-ID: <fa4764db-430b-403c-a085-b71e3777ac5e@huaweicloud.com>
+Date: Thu, 22 Jan 2026 19:24:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAXyoMMAMAbEu=-wTf3MGMiZr2Uq7pqJXC+_zrtxKrsjyYi+AQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-15-frederic@kernel.org>
+Content-Language: en-US
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <20260101221359.22298-15-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBH9fXaCHJpzfXUEg--.64027S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3WrWxAw4kJF4DJr1kCF1Dtrb_yoWxtFWfpF
+	WDWrWfGF4DJr13G3s8Zw1DArWrWwn3Cw18K3sxKw4rAFy2ga4vv3409FnxXrykZr97Cr17
+	ZF1Y9w4S93WjyrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
+	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	j6a0PUUUUU=
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.26 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-252297-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 780F7664A0
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,vger.kernel.org,lists.infradead.org,kvack.org];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[huaweicloud.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chenridong@huaweicloud.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TAGGED_FROM(0.00)[bounces-252298-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,huaweicloud.com:mid]
+X-Rspamd-Queue-Id: 8657066726
 X-Rspamd-Action: no action
 
-2026-01-22, 02:22:49 +0800, Yangfl wrote:
-> On Thu, Jan 22, 2026 at 1:23 AM Sabrina Dubroca <sd@queasysnail.net> wrote:
-> >
-> > 2026-01-20, 17:21:29 +0800, David Yang wrote:
-> > > The following (anti-)pattern was observed in the code tree:
-> > >
-> > >         do {
-> > >                 start = u64_stats_fetch_begin(&pstats->syncp);
-> > >                 memcpy(&temp, &pstats->stats, sizeof(temp));
-> > >         } while (u64_stats_fetch_retry(&pstats->syncp, start));
-> > >
-> > > On 64bit arches, struct u64_stats_sync is empty and provides no help
-> > > against load/store tearing, especially for memcpy(), for which arches may
-> > > provide their highly-optimized implements.
-> > >
-> > > In theory the affected code should convert to u64_stats_t, or use
-> > > READ_ONCE()/WRITE_ONCE() properly.
-> > >
-> > > However since there are needs to copy chunks of statistics, instead of
-> > > writing loops at random places, we provide a safe memcpy() variant for
-> > > u64_stats.
-> > >
-> > > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > > ---
-> > >  include/linux/u64_stats_sync.h | 15 +++++++++++++++
-> > >  1 file changed, 15 insertions(+)
-> > >
-> > > diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
-> > > index 457879938fc1..849ff6e159c6 100644
-> > > --- a/include/linux/u64_stats_sync.h
-> > > +++ b/include/linux/u64_stats_sync.h
-> > > @@ -79,6 +79,14 @@ static inline u64 u64_stats_read(const u64_stats_t *p)
-> > >       return local64_read(&p->v);
-> > >  }
-> > >
-> > > +static inline void *u64_stats_copy(void *dst, const void *src, size_t len)
-> > > +{
-> > > +     BUILD_BUG_ON(len % sizeof(u64_stats_t));
-> > > +     for (size_t i = 0; i < len / sizeof(u64_stats_t); i++)
-> > > +             ((u64 *)dst)[i] = local64_read(&((local64_t *)src)[i]);
-> >
-> > Maybe u64_stats_read/u64_stats_t instead of local64_read/local64_t?
-> >
+
+
+On 2026/1/2 6:13, Frederic Weisbecker wrote:
+> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
+> CPUs passed through isolcpus= boot option. Users interested in also
+> knowing the runtime defined isolated CPUs through cpuset must use
+> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
 > 
-> I think casting to u64_stats_t is a bit overkill here since we accept
-> const void * and we are the actual implementation.
-
-It would be a bit more consistent. Just within this function you have
-2 lines using u64_stats_t and the 3rd uses local64_t. And reusing
-types/helpers within a similar context doesn't seem overkill.
-
-
-[...]
-> > Since this new helper is always used within a
-> > u64_stats_fetch_begin/u64_stats_fetch_retry loop, maybe it would be
-> > nicer to push the retry loop into the helper as well?  Not a strong
-> > opinion. It would be a bit "simpler" for the callers, but your current
-> > proposal has the advantage of looking like memcpy(), and of also
-> > looking (for the caller) like other retry loops fetching each counter
-> > explicitly.
-> >
+> There are many drawbacks to that approach:
 > 
-> The callers may want to copy other discontinuous data as well, albeit
-> no one did it then.
-
-I'm not sure why they would. I think the main point of using memcpy is
-"I don't want to copy each counter by name one by one", and possibly
-"I don't want to have to patch this code as well if we add a new
-counter". If you already have a batch copy for a bunch of counters,
-it's usually easier to add others in a contiguous block.
-
-
-> It would be redundant to provide two variants of the function.
-> Moreover, callers can (and already) invent their own reader/writer
-> helpers, for example
+> 1) Most interested subsystems want to know about all isolated CPUs, not
+>   just those defined on boot time.
 > 
->          #define SLIC_GET_STATS_COUNTER(newst, st, counter) \
->          { \
->                   unsigned int start; \
->                   do { \
->                           start = u64_stats_fetch_begin(&(st)->syncp); \
->                           newst = u64_stats_read(&(st)->counter); \
->                   } while (u64_stats_fetch_retry(&(st)->syncp, start)); \
->          }
-
-Probably because the retry loop is a bit cumbersome and they'd rather
-not c/p it everywhere, and see it in the middle of whatever function
-needs it.
-
-> > Either way, I think extending the "Usage" section of the big comment
-> > at the top of the file with this new helper would be nice.
-> >
+> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
+>   concurrent cpuset changes.
 > 
-> I think callers should avoid memcpy() eventually, and they almost
-> certainly copied more data than what they need. However, I took a look
-> at some instances, and it would be non trivial to modify those
-> drivers.
+> 3) Further cpuset modifications are not propagated to subsystems
+> 
+> Solve 1) and 2) and centralize all isolated CPUs within the
+> HK_TYPE_DOMAIN housekeeping cpumask.
+> 
+> Subsystems can rely on RCU to synchronize against concurrent changes.
+> 
+> The propagation mentioned in 3) will be handled in further patches.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Reviewed-by: Waiman Long <longman@redhat.com>
+> Reviewed-by: Chen Ridong <chenridong@huawei.com>
+> ---
+>  include/linux/sched/isolation.h |  7 ++++
+>  kernel/cgroup/cpuset.c          |  3 ++
+>  kernel/sched/isolation.c        | 73 ++++++++++++++++++++++++++++++---
+>  kernel/sched/sched.h            |  1 +
+>  4 files changed, 78 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index c7cf6934489c..d8d9baf44516 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -9,6 +9,11 @@
+>  enum hk_type {
+>  	/* Inverse of boot-time isolcpus= argument */
+>  	HK_TYPE_DOMAIN_BOOT,
+> +	/*
+> +	 * Same as HK_TYPE_DOMAIN_BOOT but also includes the
+> +	 * inverse of cpuset isolated partitions. As such it
+> +	 * is always a subset of HK_TYPE_DOMAIN_BOOT.
+> +	 */
+>  	HK_TYPE_DOMAIN,
+>  	/* Inverse of boot-time isolcpus=managed_irq argument */
+>  	HK_TYPE_MANAGED_IRQ,
+> @@ -35,6 +40,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
+>  extern bool housekeeping_enabled(enum hk_type type);
+>  extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
+>  extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
+> +extern int housekeeping_update(struct cpumask *isol_mask);
+>  extern void __init housekeeping_init(void);
+>  
+>  #else
+> @@ -62,6 +68,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>  	return true;
+>  }
+>  
+> +static inline int housekeeping_update(struct cpumask *isol_mask) { return 0; }
+>  static inline void housekeeping_init(void) { }
+>  #endif /* CONFIG_CPU_ISOLATION */
+>  
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index 5e2e3514c22e..1c0475e384dc 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -1490,6 +1490,9 @@ static void update_isolation_cpumasks(void)
+>  	ret = tmigr_isolated_exclude_cpumask(isolated_cpus);
+>  	WARN_ON_ONCE(ret < 0);
+>  
+> +	ret = housekeeping_update(isolated_cpus);
+> +	WARN_ON_ONCE(ret < 0);
+> +
+>  	isolated_cpus_updating = false;
+>  }
+>  
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 83be49ec2b06..c61b7ef3e98e 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
+>  
+>  bool housekeeping_enabled(enum hk_type type)
+>  {
+> -	return !!(housekeeping.flags & BIT(type));
+> +	return !!(READ_ONCE(housekeeping.flags) & BIT(type));
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>  
+> +static bool housekeeping_dereference_check(enum hk_type type)
+> +{
+> +	if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
+> +		/* Cpuset isn't even writable yet? */
+> +		if (system_state <= SYSTEM_SCHEDULING)
+> +			return true;
+> +
+> +		/* CPU hotplug write locked, so cpuset partition can't be overwritten */
+> +		if (IS_ENABLED(CONFIG_HOTPLUG_CPU) && lockdep_is_cpus_write_held())
+> +			return true;
+> +
+> +		/* Cpuset lock held, partitions not writable */
+> +		if (IS_ENABLED(CONFIG_CPUSETS) && lockdep_is_cpuset_held())
+> +			return true;
+> +
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static inline struct cpumask *housekeeping_cpumask_dereference(enum hk_type type)
+> +{
+> +	return rcu_dereference_all_check(housekeeping.cpumasks[type],
+> +					 housekeeping_dereference_check(type));
+> +}
+> +
+>  const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>  {
+> +	const struct cpumask *mask = NULL;
+> +
+>  	if (static_branch_unlikely(&housekeeping_overridden)) {
+> -		if (housekeeping.flags & BIT(type)) {
+> -			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+> -		}
+> +		if (READ_ONCE(housekeeping.flags) & BIT(type))
+> +			mask = housekeeping_cpumask_dereference(type);
+>  	}
+> -	return cpu_possible_mask;
+> +	if (!mask)
+> +		mask = cpu_possible_mask;
+> +	return mask;
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>  
+> @@ -80,12 +110,43 @@ EXPORT_SYMBOL_GPL(housekeeping_affine);
+>  
+>  bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>  {
+> -	if (static_branch_unlikely(&housekeeping_overridden) && housekeeping.flags & BIT(type))
+> +	if (static_branch_unlikely(&housekeeping_overridden) &&
+> +	    READ_ONCE(housekeeping.flags) & BIT(type))
+>  		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
+>  	return true;
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
+>  
+> +int housekeeping_update(struct cpumask *isol_mask)
+> +{
+> +	struct cpumask *trial, *old = NULL;
+> +
+> +	trial = kmalloc(cpumask_size(), GFP_KERNEL);
+> +	if (!trial)
+> +		return -ENOMEM;
+> +
+> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), isol_mask);
+> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
+> +		kfree(trial);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!housekeeping.flags)
+> +		static_branch_enable(&housekeeping_overridden);
+> +
 
-I'm not asking you to fix something else. But for example commit
-316580b69d0a ("u64_stats: provide u64_stats_t type") modified the bit
-of documentation we have at the top of the file to help developers who
-want to use this API. This patch is introducing a new function and
-should also describe how to use it, so that new users aren't tempted
-to re-introduce a memcpy.
+The cpu_read_lock is held outside, we should use static_branch_enable_cpuslocked
+here, since static_branch_enable acquires cpu_read_lock.
+
+I have sent out a patch to fix this issue.
+
+https://lore.kernel.org/cgroups/20260122080902.2312721-1-chenridong@huaweicloud.com/T/#u
+
+> +	if (housekeeping.flags & HK_FLAG_DOMAIN)
+> +		old = housekeeping_cpumask_dereference(HK_TYPE_DOMAIN);
+> +	else
+> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | HK_FLAG_DOMAIN);
+> +	rcu_assign_pointer(housekeeping.cpumasks[HK_TYPE_DOMAIN], trial);
+> +
+> +	synchronize_rcu();
+> +
+> +	kfree(old);
+> +
+> +	return 0;
+> +}
+> +
+>  void __init housekeeping_init(void)
+>  {
+>  	enum hk_type type;
+> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+> index 475bdab3b8db..653e898a996a 100644
+> --- a/kernel/sched/sched.h
+> +++ b/kernel/sched/sched.h
+> @@ -30,6 +30,7 @@
+>  #include <linux/context_tracking.h>
+>  #include <linux/cpufreq.h>
+>  #include <linux/cpumask_api.h>
+> +#include <linux/cpuset.h>
+>  #include <linux/ctype.h>
+>  #include <linux/file.h>
+>  #include <linux/fs_api.h>
 
 -- 
-Sabrina
+Best regards,
+Ridong
+
 
