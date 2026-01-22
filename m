@@ -1,205 +1,132 @@
-Return-Path: <netdev+bounces-252485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGc0DHVncmmrjwAAu9opvQ
-	(envelope-from <netdev+bounces-252485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:07:49 +0100
+	id 4KehCG9ocmnckQAAu9opvQ
+	(envelope-from <netdev+bounces-252486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:11:59 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8272B6BFD8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:07:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D7696C164
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:11:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DAB4300CC12
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:04:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA3B2300333A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF09332EBF;
-	Thu, 22 Jan 2026 18:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656A537473B;
+	Thu, 22 Jan 2026 18:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qevJb6v4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r+wgyCpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CEA28C2DD
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2731C37472A
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769105082; cv=none; b=kMTLHlJq+wSXjHvcs18pXNcoZX0MIns2Ug54VdkFQMA109/YO9TAwjBSV4m75ZDscLr9wGfz9ouhkUxZxSmtyId5vvC7ISkC4MCQ2GpRJ0MogbBT6WyT+NSR8TI2BGHRJi80hc05rgbtQa8HJk0NlUIa2oB+ysNeROvW3PzZlWg=
+	t=1769105507; cv=none; b=CAkye/SBXPFMSQhnLu1zRk1jQFm7S3r4kxPDtn1HZKZF8UXrD0SdC2CND6DySzpsq11v2QF1Go/8yK7dAzt/jR9LKBPkmAA9O8ZQUqHMpA0k7fEaJPadU9cthwJsaVpi7bruNaZKgjQYY3UOmYoqoQgHDQGYsmQ/26t/5Lo3cis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769105082; c=relaxed/simple;
-	bh=50jCvLfafgTJKlBx4TNcRE0GswXckD99GJHX693Wj5c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uvojQ0WufYslmp0kK0adWIsxPp+FTnw8Z/28gYS36yXhKMjXPPGCvS5eN3QKVFtbfC1pOYXi97J0cbrkinVUgp5qflK8AhMrIDS3lYtyPuK+4KyKSC8A8UnJSCSLYkFjCXUAhDzTj2/GM+LtYQRRJ2MgID8zSOsONufHle6kNJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qevJb6v4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7CB3C2BCB2
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769105078;
-	bh=50jCvLfafgTJKlBx4TNcRE0GswXckD99GJHX693Wj5c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qevJb6v4nzA9Q43KN0+ShIyN1tSVYdTDlpm8Ni8vkJcqlbCCviQsbsqk9TsRyJoBg
-	 axhQf9skPrpQVEFJ9NtodEaTsy1SssNyGWtdUGT9nr3blh4yy0kddbOaGVEyXD3esl
-	 DVxuRxlglN0OcPYBa1darK9+sFe2fRqvudDt4/EXLm7pr7TCv3kvVGtMR6590rXAdy
-	 3k0ZyWFujyQSkqtBCalcHpr2DWES2MGkTo1o8zl/wtvklljd9jPNfJXp0DKQLc/peu
-	 CVw8Cg98ljofLnDO4xnZvjFA5VJ2E1LmjzBbrCkfZoFlInMIu49QrQfLA1cPUghCu9
-	 CS8oCrnlAUALA==
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7cfd95f77a3so825896a34.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 10:04:38 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUBnxaHpV9LFk/GKSHuwq7+pdLpI6j907vuIs+FLsLwMmTo0RKIDbkE/gVnQgEYFO84XY3WzoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSC9fYSHJzTu/8GFwswuO9sfCvhMkMc8eQlw3Ibj//I00sBuTa
-	OC/ZKVtsQ/3gPsW7uhKX3vm/e78k0khdGqudzkVWxNwq+5Llf51Hl4J8p2lqgEB3XEr63A4Mqo4
-	OcQiBJLlxFNSgUe96me9ZAEhlrqqQbiY=
-X-Received: by 2002:a4a:e90c:0:b0:65f:6c0f:fb25 with SMTP id
- 006d021491bc7-662caa50dc2mr300656eaf.0.1769105077740; Thu, 22 Jan 2026
- 10:04:37 -0800 (PST)
+	s=arc-20240116; t=1769105507; c=relaxed/simple;
+	bh=tYM5UC9SSsqxFoxnsUD+fb34UZyp35wuUETsu4zZA1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R+vXj616VRHpRpSNU6VEux0bcbfE72+q2guZ1/F5OH1rNJT3jKYmTax7GI1xDct2rNw0H9/rpX83uTuUfv1DTzpgE7TNh3p/0D4ZMzAsoHG91svdj9mH/c5anAPgbkN8JN3/KD2ULLJU70fziXsbFoty9xUjyIQZBVFi4pVPchk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r+wgyCpi; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d13f6f33-7489-4e70-8b7b-401d2200a5a7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769105483;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y3qF3Oh1VVPLvk+yk9IepnLjR5SkTZ5MYLgq+jNxdc8=;
+	b=r+wgyCpinHDM2tEJdLICy5l6d2m4Bu1VxpdtRkYHnMbY6sKUoyK8bCnzaM4DC9FqPC2QWZ
+	kMgnsuwmsZiPno7O3rbkygCcDP3+IYauGsz7xSWA7NdtAb7bTTIPe4b98u9gJlB5kTcTSr
+	8AdahcVPsqKa0h749xQpgbFBBpLy6pU=
+Date: Thu, 22 Jan 2026 18:11:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6e4e40b8-b3cb-4892-8d37-d450a02e4c52@redhat.com>
-In-Reply-To: <6e4e40b8-b3cb-4892-8d37-d450a02e4c52@redhat.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 22 Jan 2026 19:04:26 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0gL3MzhyS2SOELsgztdakFU984UB+TKaMA13kd+7ssj_Q@mail.gmail.com>
-X-Gm-Features: AZwV_QigS_IDqY8zG8-OjqcAGJs0e_wILXZ8LUPsakPf3visMH18m-JhadZCIt8
-Message-ID: <CAJZ5v0gL3MzhyS2SOELsgztdakFU984UB+TKaMA13kd+7ssj_Q@mail.gmail.com>
-Subject: Re: [Proposal,Question - refresh] ACPI representation of
- DPLL/Ethernet dependencies (SyncE)
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Linus Walleij <linusw@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Mika Westerberg <mika.westerberg@linux.intel.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Mark Brown <broonie@kernel.org>, 
-	Jan Aleszczyk <jaleszcz@redhat.com>, Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>, 
-	linux-acpi@vger.kernel.org, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net] octeon_ep: Fix memory leak in octep_device_setup()
+To: Zilin Guan <zilin@seu.edu.cn>, vburru@marvell.com
+Cc: sedara@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+References: <20260121130551.3717090-1-zilin@seu.edu.cn>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260121130551.3717090-1-zilin@seu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252485-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252486-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8272B6BFD8
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4D7696C164
 X-Rspamd-Action: no action
 
-Hi,
+On 21/01/2026 13:05, Zilin Guan wrote:
+> In octep_device_setup(), if octep_ctrl_net_init() fails, the function
+> returns directly without unmapping the mapped resources and freeing the
+> allocated configuration memory.
+> 
+> Fix this by jumping to the unsupported_dev label, which performs the
+> necessary cleanup. This aligns with the error handling logic of other
+> paths in this function.
+> 
+> Compile tested only. Issue found using a prototype static analysis tool
+> and code review.
+> 
+> Fixes: 577f0d1b1c5f ("octeon_ep: add separate mailbox command and response queues")
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> ---
+>   drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> index bcea3fc26a8c..57db7ea2f5be 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> @@ -1338,7 +1338,7 @@ int octep_device_setup(struct octep_device *oct)
+>   
+>   	ret = octep_ctrl_net_init(oct);
+>   	if (ret)
+> -		return ret;
+> +		goto unsupported_dev;
+>   
+>   	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
+>   	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
 
-On Wed, Jan 21, 2026 at 3:43=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
->
-> Hi Andy, Rafael and others,
->
-> (based on the previous thread [1] - now involving more people from
->   networking and DPLL)
->
-> Thank you for the insights on _CRS and ClockInput.
->
-> I think we have circled the issue enough to identify the core disconnect:
-> * While the physical signals on these wires are indeed clocks (10MHz,
->    etc.), from the OS driver perspective, this is not a "Clock Resource"
->    issue. The NIC driver does not need to gate, rate-set, or power-manage
->    these clocks (which is what _CRS/ClockInput implies).
-> * Instead, the NIC driver simply needs a Topology Map. It needs to know:
->    "My Port 0 (Consumer) is physically wired to DPLL Pin 3 (Provider)."
->
-> The NIC driver needs this Pin Index (3) specifically to report it via
-> the RtNetlink. This allows the userspace daemon (e.g., synce4l or
-> linux-ptp) to see the relationship and decide to configure the DPLL via
-> the DPLL Netlink API to lock onto that specific input.
->
-> A generic ClockInput resource in _CRS is anonymous and unordered. The OS
-> abstracts it into a handle, but it fails to convey the specific pin
-> index required for this userspace reporting.
->
-> Since ACPI lacks a native "Graph/Topology" object for inter-device
-> dependencies of this nature, and _CRS obscures the index information
-> required by userspace, I propose we treat _DSD properties as the
-> de-facto standard [2] for modeling SyncE topology in ACPI.
-
-If you want to call something a "standard", especially if it involves
-ACPI, it is generally not sufficient to talk to Linux kernel people
-only about it.
-
-ACPI is about agreements between multiple parties, including multiple
-OS providers (Linux being just one of them) and multiple platform
-vendors (OEMs).
-
-To a minimum, you'd need commitment from at least one platform vendor
-to ship the requisite _DSD data in their platform firmware.
-
-> To avoid the confusion Andy mentioned regarding "Clock Bindings" in
-> ACPI, I suggest we explicitly define a schema using 'dpll-' prefixed
-> properties. This effectively decouples it from the Clock subsystem
-> expectations and treats it purely as a wiring map.
->
-> Proposed ACPI Representation with proposed documentation [3]
->
-> If the ACPI maintainers and Netdev maintainers agree that this
-
-So long as you don't try to update the general ACPI support code in
-drivers/acpi/ or the related header files, the matter is beyond the
-role of the "ACPI maintainers".
-
-That code though is based on the ACPI specification and the related
-support documentation, modulo what is actually shipping in platform
-firmware on systems in the field, so if you want or plan to modify it,
-that needs to be based on something beyond kernel documentation.
-
-> _DSD-based topology map is the acceptable "Pragmatic Standard" for this
-> feature, I will document this schema in the kernel documentation and
-> proceed with the implementation.
-
-Kernel documentation is generally insufficient for defining new
-OS-firmware interfaces based on ACPI because there are parties
-involved in ACPI development beyond the kernel that may be interested
-in the given interface and they may be able to provide useful
-feedback.
-
-I, personally, cannot really say how useful the interface you are
-proposing would be and what it would be useful for.  Even if I liked
-it, there still would be a problem of getting at least one platform
-vendor on board.
-
-> This solves the immediate need for an upcoming Intel SyncE enabled
-> platform and provides a consistent blueprint for other vendors
-> implementing SyncE on ACPI.
-
-And what if, say, MSFT come up with their own version of an interface
-addressing the same problem space in the meantime and convince
-platform vendors to ship support for their variant instead of yours?
-
-> [1] https://lore.kernel.org/linux-acpi/3bf214b9-8691-44f7-aa13-8169276a6c=
-2b@redhat.com/
-> [2] https://docs.kernel.org/firmware-guide/acpi/dsd/data-node-references.=
-html
-> [3] https://gist.github.com/ivecera/964c25f47f688f44ec70984742cf7fbd
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
