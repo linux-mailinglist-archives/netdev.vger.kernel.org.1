@@ -1,132 +1,128 @@
-Return-Path: <netdev+bounces-252486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KehCG9ocmnckQAAu9opvQ
-	(envelope-from <netdev+bounces-252486-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:11:59 +0100
+	id qLLtNFxtcmlpkwAAu9opvQ
+	(envelope-from <netdev+bounces-252487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:33:00 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7696C164
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:11:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 305BD6C7A3
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA3B2300333A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:11:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5C623007AE0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656A537473B;
-	Thu, 22 Jan 2026 18:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDF43783AC;
+	Thu, 22 Jan 2026 18:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r+wgyCpi"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="LT2aOjws"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2731C37472A
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 18:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B403559E5;
+	Thu, 22 Jan 2026 18:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769105507; cv=none; b=CAkye/SBXPFMSQhnLu1zRk1jQFm7S3r4kxPDtn1HZKZF8UXrD0SdC2CND6DySzpsq11v2QF1Go/8yK7dAzt/jR9LKBPkmAA9O8ZQUqHMpA0k7fEaJPadU9cthwJsaVpi7bruNaZKgjQYY3UOmYoqoQgHDQGYsmQ/26t/5Lo3cis=
+	t=1769106775; cv=none; b=RhSGxu7UaCfVz6lDtENaCcSqS6EN33+NHWLsVQSA8lnJGcZKBpGkAvMxQbPPvElAtU6b+OPmdb2/1igv80bVLNvBQVllQddVNXuheLf/Sd/fJHtka4ufaJVcri8k2rjiVp4DFljCrjGkMxjrPYyi4Ek1zFm4YkBP3AUhdqyyFpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769105507; c=relaxed/simple;
-	bh=tYM5UC9SSsqxFoxnsUD+fb34UZyp35wuUETsu4zZA1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R+vXj616VRHpRpSNU6VEux0bcbfE72+q2guZ1/F5OH1rNJT3jKYmTax7GI1xDct2rNw0H9/rpX83uTuUfv1DTzpgE7TNh3p/0D4ZMzAsoHG91svdj9mH/c5anAPgbkN8JN3/KD2ULLJU70fziXsbFoty9xUjyIQZBVFi4pVPchk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r+wgyCpi; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d13f6f33-7489-4e70-8b7b-401d2200a5a7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769105483;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y3qF3Oh1VVPLvk+yk9IepnLjR5SkTZ5MYLgq+jNxdc8=;
-	b=r+wgyCpinHDM2tEJdLICy5l6d2m4Bu1VxpdtRkYHnMbY6sKUoyK8bCnzaM4DC9FqPC2QWZ
-	kMgnsuwmsZiPno7O3rbkygCcDP3+IYauGsz7xSWA7NdtAb7bTTIPe4b98u9gJlB5kTcTSr
-	8AdahcVPsqKa0h749xQpgbFBBpLy6pU=
-Date: Thu, 22 Jan 2026 18:11:20 +0000
+	s=arc-20240116; t=1769106775; c=relaxed/simple;
+	bh=uAyY9gjyCOboVe//FtfBE8PFXZnUIGHTUkUD1deROxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HiGQb18wtgFqJfSF41folEfRp18g5kKcN8aDctEYypWmy/C9a+cv/OjV6IJcm2FM18PwkFo3pHUDRPBigKWxk0VrZdmWuMEY1JGpvdxS2zhE0Z+aytWcuzSs/hgDhVUNq2xiUrCxCKlaqlBQv1F+/rojNsSALSwlNCc+JtAYrKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=LT2aOjws; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=27Cg2Ss3WK7wBsdTiuUAdwt3cEVjjpMaTt34CUsHVYU=; b=LT2aOjwsHo+vA8IfzWZ91aF6zJ
+	UeUS2XmfQKmqbxkl+AzWu+bmvs26VQGrG1rSGSuGAjHjH4AkmlH4wwfeFPwJyjsQDJRADE26OdGJg
+	haNFaW8P7wIbWylMow/1/F/al+hAZpLLtqp0HCXaOdHA4j4ajTX/AYItgcZIlay3smn31iW1Ar7Z9
+	ViwyqzYHOFXYAl7FHyulgXblbQHriGTey41ff341gsTY1GVEHV0mLhx7sXlnwrdFFuuSznEPgjJMR
+	+gkcwypfC/MASiDGZqs1S/Vj1z3LHndvYO860ELgGwNXNZTz+FWQapTVZ91tZ2bptviywresgGrcd
+	yXOkRmVw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vizTv-00DDhH-F8; Thu, 22 Jan 2026 18:32:35 +0000
+Date: Thu, 22 Jan 2026 10:32:29 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Petr Mladek <pmladek@suse.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, john.ogness@linutronix.de, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, mpdesouza@suse.com, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v3 4/5] netconsole: Use printk context for CPU
+ and task information
+Message-ID: <aXJtIPk5joxRQnxV@gmail.com>
+References: <20260122-nbcon-v3-0-a722f2f0dfa5@debian.org>
+ <20260122-nbcon-v3-4-a722f2f0dfa5@debian.org>
+ <aXIWUmhBnFLY6EqK@pathway.suse.cz>
+ <aXIc43kUCBYZex2h@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] octeon_ep: Fix memory leak in octep_device_setup()
-To: Zilin Guan <zilin@seu.edu.cn>, vburru@marvell.com
-Cc: sedara@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-References: <20260121130551.3717090-1-zilin@seu.edu.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260121130551.3717090-1-zilin@seu.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXIc43kUCBYZex2h@gmail.com>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252486-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252487-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-0.982];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D7696C164
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 305BD6C7A3
 X-Rspamd-Action: no action
 
-On 21/01/2026 13:05, Zilin Guan wrote:
-> In octep_device_setup(), if octep_ctrl_net_init() fails, the function
-> returns directly without unmapping the mapped resources and freeing the
-> allocated configuration memory.
+On Thu, Jan 22, 2026 at 04:51:21AM -0800, Breno Leitao wrote:
+> On Thu, Jan 22, 2026 at 01:21:38PM +0100, Petr Mladek wrote:
+> > Hi Breno,
+> > 
+> > I have got only the patches 2,3,4. I can't find the parts 0,1,5 even
+> > at lore. Something went wrong when sending them?
 > 
-> Fix this by jumping to the unsupported_dev label, which performs the
-> necessary cleanup. This aligns with the error handling logic of other
-> paths in this function.
+> It seems so. I got a bunch of Delivery failed messages from different
+> places, including gmail and netdev. Not sure why yet.
 > 
-> Compile tested only. Issue found using a prototype static analysis tool
-> and code review.
-> 
-> Fixes: 577f0d1b1c5f ("octeon_ep: add separate mailbox command and response queues")
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> ---
->   drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> index bcea3fc26a8c..57db7ea2f5be 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> @@ -1338,7 +1338,7 @@ int octep_device_setup(struct octep_device *oct)
->   
->   	ret = octep_ctrl_net_init(oct);
->   	if (ret)
-> -		return ret;
-> +		goto unsupported_dev;
->   
->   	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
->   	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
+> If they don't show up soon, i will resend.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+The other emails arrived, but not the cover letter.
+
+I will rebase and send it again.
+--
+pw-bot: cr
 
