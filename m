@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-252273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECo4ARkJcmmOagAAu9opvQ
-	(envelope-from <netdev+bounces-252273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:25:13 +0100
+	id kIVeJ7oFcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:10:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C06B565F3E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:25:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DD965C02
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:10:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1B0D15AC0E1
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:57:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C783C886110
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83AD36826A;
-	Thu, 22 Jan 2026 10:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A093ACEF8;
+	Thu, 22 Jan 2026 10:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="R7BQSoWy"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ITbLeqfr"
 X-Original-To: netdev@vger.kernel.org
 Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013022.outbound.protection.outlook.com [40.107.159.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F4A33C197;
-	Thu, 22 Jan 2026 10:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAF83806D3;
+	Thu, 22 Jan 2026 10:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.22
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769079433; cv=fail; b=C80wfP1ocgmX7ObDwU4QReToIpJl5NYBxERNWR26cn0AztciKpXCYb3BDj31cUfbtbpnCfiIROCcMHmp98jMcge9DP8MXG3hX8fWRPPwMj1s5fPKhQNk1vFtFE2eKlGoDonlKtIQkVZyUOJMguljf+8jsgVOr9aQT9VYJF+w9fo=
+	t=1769079436; cv=fail; b=pMaWW5SJIXQ/GPLkXKHgNJgREUfSITv6HW7Ds07eUhmf+RqlPjHYrX9bRa5fAuIq0gTfqntskb8UVY0OvLYI92tSsvSOerg7xOe7g/I9UGAOJ/kE1jpqxAPXghTarQRpTPDXrE3VicjX/y6bu4IVnjXSzljx3IVkoupbcycyK70=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769079433; c=relaxed/simple;
-	bh=MwupKst/sqZDEKZQ4dPObhzHmDJPt/O3P+voCV1Gr1E=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=lsFb/dcz+YTSJJKkZenQiwBl5pWcW0GdiZq4qb0R7mpIRGKoV5rrTubUBpeuX5n0a46TC3muD/lun/B3R3o1Zx0GvFdk+gf+qpzpUM1moPpA8a9efjnM0aoLK4Q/KM/VTblifNxx/M+JS+Zz5FFIBS6HA2QuLaWPuJXIsn5IuqE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=R7BQSoWy; arc=fail smtp.client-ip=40.107.159.22
+	s=arc-20240116; t=1769079436; c=relaxed/simple;
+	bh=1qlUz3DJDZxtG8+KMQk6Z2PaJR9+8br9YMRcoshitys=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uDE7jMoSFw/nB5PQy93AW5lveVLuxoNaLI9tzEic/tEUOgBqn5/HvmWEmokDAUTcoCijxbNrSa00YHgUNu0g3FXX20KZx5/vdrfc5Ych4ZWkhSCWImcx3VlY8wtwnBema9yKrZcYJesO7zVPxR4IJYWT5kXn3ZopARsGChwPCIU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ITbLeqfr; arc=fail smtp.client-ip=40.107.159.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sx4Bjhhqv0WGux6AGjrxpjPi2qugdFz0tF9qMhSvnCFAiislOdQeMGwKZEh8QcQWzWVeRkkgsTCeK0S50+GQS4Yc3IohEeRIRRXtxEb8NGpU2JTewXDObU158c/EqXAxrcul6XVpjUT8xZYPGs8APEpR9KpY2c5jFanEaHY17Y5PhSm40jsMR6VHu9z6VMf9FwRJrgWqmgi1uaT4GT3a89eBuexESvk64DY9d0U0OYNIC34e8m+0Gi9zbwlkzSAC3/czdpARMM2OiJeu0bQSiOneP5CUpmM6hGw+0ZCiJHem5yljMQRVAtxnyFwLb0ER9VDd8LIdcG+DO37M2DP1tA==
+ b=jEVmZy4iqDiJO6J3XdgmSEQ7BglN7bT8ALADJKzKE7SwGhDhNMYWIP3SUHAPWlO7ZTpqq4xq8DDHTfT5pd0LOpuKdgzmhaNo/i+J3lpEaom1a5Fxt9U9+SwOb9EviIBCLpz80WgkaWsPncnZHyvKFMwY3CGf8D5dtkJqp9rd4ZxXqVQ/yy13aooGN2T64RtvR0eR+MxKV31tUXcsPzIXf2OES3VNMrtTsWXSxXjlpFnP2j1wBu2n1TRoXdbo2iX2fGY0MvzzuqJnSGQf5vR+aSq2+a5khnHz9LWf//oFdpMGLd4+GTSB0g8HBUqXLh51D7JI3tikAlz191QgEI6c4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yppqh+DdcCJDUQLuL5zEHZ0Fuk1lWyUfD5qrD5USkGI=;
- b=hCsBVqvHS4oiXVWDXnwdyZwQwrjcxWTNnYX/zHFIE83NGEstXKxCn48WzWmOIJPQJpKLEXrOX7lOw72D2N5ZldsI1nluUEHU+A+l1H2UWrZdfETkyT0bXdNa7oJithv/On8RpJKVZVMnhczAuUpfk3tiYiPyTmLQ704kaIyyjtbVV7plZcXVT62NENcvE5RfiT2a63knIIAUqB3c7ucilSY+g/QXfYbQXqfeEpwobJ79wq9qPyPo5cFOmg8eCQ+3ZIulafu98a29uHLQo8pBts+vDWNisOqATpHixcqUB2qFCaIKOSpmswRe0FJe0WhY36P7OEET6iw20N7xmILWug==
+ bh=1szSnQyAQrKnC//QeHrVaVSU6d0qWqEKFhwQRDQxImc=;
+ b=HSgy0BHGOMwoR2Miu/oh0rNWRu3gSm+7bh92kzET9az7yq8k0CTGR38PuWegAHDKTQZMu1kEnA6W8zABVz8DuroqgWBhtsvd6pQYz7osbT2j9AJYgXF4wPJuBviSZB/c+BYd4/jahvRm6dq86vH1KxbHJHRgI+bcjO/OhNFNUrw7wat/FwJQRKgtHmPOhMQpXkLKIAUFO1bQ2P3C3SPkK8GlX8tJ88FaJ3TVOH+vbXz7jhJVPL1Jv3ii1WF7zdRhlyK7ZB7Bf5ZqTrObg0R1FRIPQjeU3cwpV5QrxSSadBarAZfi3fOA9tfs49z5wXyiEFkVUrxVqC7kd+MYfcoK5A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yppqh+DdcCJDUQLuL5zEHZ0Fuk1lWyUfD5qrD5USkGI=;
- b=R7BQSoWyOgYTBG3qYqMRG13hp8QUammcWSzk9eHUIeUxV0rXZoNVMlWL6BTxe8cuvgkhb9hGA9ozb7qWq2u1wRKAln+RGacwkSc+xj/mXFUWMAF0j3JSVQGR4jRQJq/iWOiQSA07W8009wPeDUlMx3H2sf/psOypwAjQh1YtA+FNw8GZawmaKyaldxDLDZFdPbTsuKP/79OP7xduSgmLqJVpWxkVQDE1axKhLL5wb3XwaHcy6inwJw4pDOZLOXBw8TIWt6zPCK+q8qrY+jJgZ6Pfo0gNSAVi5oE4+Pux7y8yLclV8xIFpG0ueqWiK5FEFosSXd7dDAauD+i4H01/9g==
+ bh=1szSnQyAQrKnC//QeHrVaVSU6d0qWqEKFhwQRDQxImc=;
+ b=ITbLeqfrZY7QvUCF/cEMX/Q/5EW8Yc9nqTlh0g0AzVgrykT1m6dHREfzmUng43fZksh99yhPK4AYkvf8zPtjM0QozS8t8ThWNd2zLmJTwr9WpQ01h9q27odI24QyQKsFOWuE2j0uIGSOX8TKbReUE99jqG3t2zA7XIzfsu4iN/aCvv83ExAEZ5ST9BDG2gpvnW5HVkbg2F9jBEaPq3imfPUGJYnpDMLVhb0Y2/1zZmmX6XoVyXRXEzYMOQalRdSXVeJRzs2MtdiseuV0SN2g+ROW9mrm8784QxlPLTstHVGBIdLsTzB9lM6RC+kv5Iaex1pHodmIxMdN0LzDdGf6fg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
  by PA4PR04MB7902.eurprd04.prod.outlook.com (2603:10a6:102:c0::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Thu, 22 Jan
- 2026 10:57:07 +0000
+ 2026 10:57:09 +0000
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Thu, 22 Jan 2026
- 10:57:07 +0000
+ 10:57:09 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -82,12 +83,14 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	devicetree@vger.kernel.org,
 	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH v2 net-next 00/15] Probe SJA1105 DSA children as platform sub-devices
-Date: Thu, 22 Jan 2026 12:56:39 +0200
-Message-Id: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with non-MMIO regmaps
+Date: Thu, 22 Jan 2026 12:56:40 +0200
+Message-Id: <20260122105654.105600-2-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: AS4P192CA0029.EURP192.PROD.OUTLOOK.COM
  (2603:10a6:20b:5e1::14) To AM9PR04MB8585.eurprd04.prod.outlook.com
  (2603:10a6:20b:438::13)
@@ -99,229 +102,241 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PA4PR04MB7902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b9181a4-90dc-4b4f-0843-08de59a4fc34
+X-MS-Office365-Filtering-Correlation-Id: 3f21ffd6-4003-40df-0797-08de59a4fd1e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|19092799006|7416014|376014|52116014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bXNlZ3RZQzV0dmYxMmhaUXIvRytHVzRrTWQvUGdlQjVqZ3NRL1RDTkRIYTFm?=
- =?utf-8?B?akZlWU5yQU4yNDA4YjBuTGpJalROakU4eFdHUVVycEQ5OGtUVTdyYk1tVmo3?=
- =?utf-8?B?M0QvMnZmL3RKNlJSbVlJUTRnZkRsaE5tYVA3NnlQc0dOR0V0MjBvUitMVXdB?=
- =?utf-8?B?OGQ0TjFMbjN2Q0Evekg2TG56TlRLZTVSbFpaZkZIdjZxbWJ0NHV0SEJsbnZX?=
- =?utf-8?B?ZmxpRmdEdmhHWDBGSXRIdU9kNTBtcGRQak04YjJGaGorZy9TZWZjcFdmaTRH?=
- =?utf-8?B?MVdPYTQ2Y1NncndHdzZBRldxME1WWXBqMC9tZDFTVGlFMkFhVkFMMVpwbXJr?=
- =?utf-8?B?bEdOVWM4TmNtZXBuOW94OGU0TCt4Ui9ENkk2RW5NT2pOVFd5YlJpNUJZR0lu?=
- =?utf-8?B?YWVORVdOZllrc1NOZHhSQWtDVTVoQUo1U3JZdkIwaVh6YzRwaGxjc2hvMHZm?=
- =?utf-8?B?dWhhK1hPaHk4aFE0R29KcW5hWjBkSDJuSkk2d1FNN1l1dVBidXlHM0ZJQ0Jm?=
- =?utf-8?B?Y2ZLdXJiOWdsdkxYRWJYU3dCa2RzanQzNmhPUWR4SmtVNlFZMGUxYk0wNDZY?=
- =?utf-8?B?V0pDYjFuQThHaFgreEtUdE00cjd6YVpKOVJNV3JFSkkxcE5XTDdWdmdhSFoz?=
- =?utf-8?B?cWt5cWh5d0lkaVIwZ21FZzN6Zkd2eW02Um42alRrSjBYTTlJZnB5bUpZZGZ1?=
- =?utf-8?B?aGF4RnQvSnF2U0trSk9PR3NNZVJsUW8zQlhyNTh5R2EwQUFCR2hoTUYyUFp6?=
- =?utf-8?B?NEZaNklBdXRTV001OUp1ZUttTnQxdTVVWFBJYldZT3pETlFHbllCV21CY3M5?=
- =?utf-8?B?cjQzbFJMR0tEaXg5MGNNSnhzYVBwY012WDdnd0cwSVd4RTcxYWY2U0dEN0pk?=
- =?utf-8?B?cFhZNUMvWDc2S292WG5WU2hVMHExUTc1WjZ0QStMQTR1cEQ1NU4vdFlrWGF0?=
- =?utf-8?B?ZXZVUjRublZkMkJ1NjJ2RXR4R2dyNTN1T1FOck1WcE91clRzZEpnMVlVRVpu?=
- =?utf-8?B?MEFraUJyOWNWTThWdkp4ZHlZSnIxQkNJM1V0Wm9jM1NnMEl6Z1lOQU5mNU1J?=
- =?utf-8?B?MGRDYlR0bitxQVQzazFGSXhEdUs5bzd4aVRyMTRCNWJNUjZrZExrWFBtUjVM?=
- =?utf-8?B?M2tZbkVlcDU3c3g1YXR2TzZWM1JJQUxKajU1ZDBOQXM0YjBWS3Y3dnZsRy9X?=
- =?utf-8?B?elZkVWRLN211T2Nnd1RhdTFNZVlLcDFDc3l6STFnQkk2Yk44Wm1sajJ5c0J2?=
- =?utf-8?B?R1V4bXNDR0pHMmJlZDF3SmVnUm00T2dXMDhuTytvTlJBM1NjblVhRzFzclRR?=
- =?utf-8?B?cmFieC9CVWV5R2hBVWFMVE4zV1BVTjh3M3NxUTBFV0RHY3FlUWJlNGNwdUF4?=
- =?utf-8?B?bHEzdzZ6Wm5haEFiNHVaZzFaV0NkeHZuTDhSamdhNFhwQ2NnK1ZZZkZ2aW0w?=
- =?utf-8?B?bVg5U28rSmRJdkRJYlVySUw2VkxOeVN6ekJkSkdDT0J3MDdveG9XZ0pKbDZr?=
- =?utf-8?B?dFNqUGtNbEVOWTJzT1dpL3VnZVZkbTdGNU5PMjE1OGxOQWcrWXB0ZnUzcHBM?=
- =?utf-8?B?Qy9QeHlUM2p5T0hhTDZBVTNDUE1vWC9PUFJwQUpDNXRLVEJSOGpaaS9vMXlQ?=
- =?utf-8?B?ZzZ5c3lRVThhdmlneFlML3p4OXgvVFBCdTVkdEM1Y3JqY2pLUXdyTmsxWWha?=
- =?utf-8?B?UWZvY1phQng2RjAzMlFObEZtR3NkU1RxdGdwcXZ1eUlLRVRRbTNWSklpL3pJ?=
- =?utf-8?B?UFU3bUtBVU9TYU1LVGhhQStXYmpQVmg0SkFpbENTcXBKNnBVM2ZJWlh0MzV6?=
- =?utf-8?B?b1lBNGwxMVJlUWxsZ0w3Vmwyc1RieVlaTDUzRzEyODBDOUpaNHRNWUlDUVBp?=
- =?utf-8?B?ZzlGbC9DRGhrZWtaNGxteDNGNTNuWHlPZFFtUmFSeWRjYUd1dkloa2RGVnRJ?=
- =?utf-8?B?WEp2c3A4TnJtWHc4aEZJdy9XaDYxSFFiZzdTbVNNd3A3eGRNTGV1RUpacVdL?=
- =?utf-8?B?TzJ5bXd0bnNiclRZMjlJZUhhUzd6T1dZTjFQWjk4V3VwVnNRalliUHZLb250?=
- =?utf-8?B?Q1Z2cnJaTjlmK3B2Mm0xeTY3eTNycGl1Z2ZJaEMwcXl6NWg1ZXJVdmlqR1hN?=
- =?utf-8?B?MkZFYU1LWkZOQlNYTkdLRy81MkRnS3JsdHlCUDZCTkd6ZThxZGxNVmZXQ0J1?=
- =?utf-8?Q?Owwm0uQ/LkZcc7a4egbi5W0=3D?=
+	=?us-ascii?Q?GWQCewFP61OowOqHSTsua7H55WArcwY2J7rr+UzYWizvHpb7hat2x9L573Sa?=
+ =?us-ascii?Q?LPtwb6kIHR31W509j5qrfUFUFLrid4brmWyUdrAmJgM8T9ozrPOGrjanxsfr?=
+ =?us-ascii?Q?udUNP7WC72OKoAqHtcrKjM8z04MQNuoCYjPe5pbBW2Hua40xjpS0tBMALZ4o?=
+ =?us-ascii?Q?6nyZ6aJSsdwGOtEzio4Z6rcdsfvoVm49rvzWsqRx/+NDa0XrfVQyB9E7XY6Q?=
+ =?us-ascii?Q?4etCww9BuQpPDzzCocmcakSvFL21d6tnZjim1S42nVy3BDBM54At6Q5ukZbo?=
+ =?us-ascii?Q?uuhNmrlwy+Ss7SaTMIo7H3iacIQVl0ze3rl+s7ZJr5/KoweMKrGT+r5H3jlA?=
+ =?us-ascii?Q?zYHKk8OCIys2l9vPoYYdBjizUcPdfdqRAqD8do+PdrSUlzYHtHPxaFEx6eqe?=
+ =?us-ascii?Q?kmqqER0IWFhC/m98T9wo8a4V7RUxiota+ZJRvF9Qx367z26pe91SEywQXTq/?=
+ =?us-ascii?Q?NEoX/3lJG1a6ptU9CttlAwLStps2tzKDMUJNXzqRPH6qITElCzvG05QhZmqu?=
+ =?us-ascii?Q?p3PQod72qSPWIyMaJVCySPvvXPo2JK0wzsf7yzGDzqUkgZOzIse9E0DEAWgZ?=
+ =?us-ascii?Q?T/2yBzXRnG3ZDyRTZejJGrhRKnQdHy8/DaQPWrBIVRSevejnTubwZVM17XWg?=
+ =?us-ascii?Q?qi9btESsYQ+5xG7F6Ypi0ae/AulKRbKfeL0l7uk+5UTeq7bB8MZc90tgh4EG?=
+ =?us-ascii?Q?Q6UqwhBChbEBpJ9yfM++EnyxCKjiax6NsjpNzN9xDWGl7dvBWw7iDJsV+uv7?=
+ =?us-ascii?Q?mM213S/SdUqocHgbcllPKCotXcuCTsfx3zN1YQGOF/MEVcFlBZgE7NyxqPIP?=
+ =?us-ascii?Q?GiGyFemYYUfSwGyVf24cvVyQ1Vnsf6i3x/Lk1Y+Pgy/uZP0ZWJ6JnDg2SOak?=
+ =?us-ascii?Q?t9rV4dCzCOAOkdD7zlloIxio1fu3gshD9lYJ3Bou17DlRktg6osyWrP+T6zh?=
+ =?us-ascii?Q?D/dfR3nqf9uAYzkVOeZkirwDzHMnwBCHdwBB7mLKzWb9HPcnWLexg2XYlnkd?=
+ =?us-ascii?Q?dunoxT57ygASLYZWb1rSUWvhAbPN27e0qLnqY2QALQ+8daXawofBY18eMpUO?=
+ =?us-ascii?Q?YBIBV4tSVbFsU77ujgXVcMrYLWMT8zIOuxDIroNP7xByxwp75QvSu4OkXqn6?=
+ =?us-ascii?Q?gFO+M+owofxnIOnfNjU6+xjsHKLiHhlpbKYNCf/KO9D08T+mPOUSVykkYVfk?=
+ =?us-ascii?Q?ODq+SyTkDX9vSqVDMq9JA3RziJhhUuO619/W0mQftkudOuio1TPa4MGdzLab?=
+ =?us-ascii?Q?EVkOYYo3reNZPk6Bc03sWt/HrN7Z14kR/pSUaMXr6IUlYL9MtyQmSJl+S0SN?=
+ =?us-ascii?Q?1mUmizQORVUmlcdLqz2oQUP9gY3ypWHkHCEPRIx4QQjs2XMZED9lrVOhvs/3?=
+ =?us-ascii?Q?St+uUr94cLLMNthG7aCEZuo1xLTVdZfPPqQXTC58ap+0+G6KK7VJMbx3CgI6?=
+ =?us-ascii?Q?FYX08bqzFuEQctdmgD6/e7eMYDEjcIcJfiwHVNgiEolDhvZBUIc982jWtsH3?=
+ =?us-ascii?Q?0DuvBeugoClzoLlXrJUheu13l4aSVEwNydQJztkw7NzKdK21MbORROz9l13I?=
+ =?us-ascii?Q?gJC1O0ThdiC8uEFDTRdr6jS+QkH1VssRQ5b9brdm/I6Ib7dmLL72sLEJ27Wi?=
+ =?us-ascii?Q?Wfh80pVJqM/yV4zmsTPl5tA=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(7416014)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b2VaZkozOUx6a0JST3dWOWdrSzNHWGVSVnNGY0lIZXR2RVFRcFMvVzlMakQ4?=
- =?utf-8?B?RWF3VDAzbXMveUg1czNKU1h5K05tUlNpYjVuQTIycElrdHhuV2pXS01SVEtw?=
- =?utf-8?B?aE1DRXRuaGxIMmlFelZLTUc1V1NhV1pMNmhvTURXbkhxNnlyUDAxbFJPUGVB?=
- =?utf-8?B?UlZ6T3NsRlBVbFdqVXlYSURVT2hLcW9WOUNTaHp3S2xvNENraUlGSWlTWHZr?=
- =?utf-8?B?OUxkYWVUS1dDZWx2MitoNHFMODY2OENMV3dwWGdvYmxTYVIyTHhkNTVITEtV?=
- =?utf-8?B?TElKQTRZb0FsaVZKZmF2azhlOHA2ODF6YTg3Ykk1Uk11emR5THovZVFYOUJZ?=
- =?utf-8?B?c0hjejM3SjJOTVlMU2xNMVp3Yi9DYVgyWnNnRXFwVmVQeHJhTWo3S3BXQXI5?=
- =?utf-8?B?SkU5RStveWVpY0N6eFUyVUdUMGx6c1kzNE91dStNQ01PclJ0QTJBSnAyVFIr?=
- =?utf-8?B?VDIzWnJCTHRXeVFCUWs4YkVGOHNSbFdaQzlXVk1vVEZoQ0lzckFRSlBWVUhL?=
- =?utf-8?B?akc0WG9ONUZ5cjJsR3BzK2piZDQ1RzZKU3N2K08vbk04dDRyMXJtYk1xN0Va?=
- =?utf-8?B?RXV1bkRybUp5K0ZIVWdKVkFIKzhYOWxVN3UyYXM5RjNmcGhaMTdXSFNFUVdY?=
- =?utf-8?B?eVlObzBJenlzNTVGOUcyNENvSEh2UG5iZU56R1JHWG54d1dSRlNEZVZhUlBI?=
- =?utf-8?B?SVo1TjJRd24wYU1EbHdyWlJKYVpuQ0tTWnJoR1pOY0JFcnBKbGc2VHRKQVFC?=
- =?utf-8?B?ZlBXMm94NGhqY1NCUDh0USs0ckR4QVExQXhuTU5FQmZaWVJqMm1laGtFcE1y?=
- =?utf-8?B?dFBDV2QxczZVS0R6UkI1eDQvYWtUcnlhTkhBVVNyR0JoV0JFWGlyUGN5VHRT?=
- =?utf-8?B?d1o1b2xyaS9oNFlaMVZxai9ES0Fad2ZjNWMrbGJjWFBxN1NKcDVaS3EwNHFk?=
- =?utf-8?B?cGFjZlozL0kzTHgveWVwelpFc3ZUbVB0NjZWL3N0SjhxT254K2dXYkx3REto?=
- =?utf-8?B?V1BSNXlEZE9Ici92Z3Q1OEx4d0dDYnQwMUR0aUlyUEQ2cWpyRmtpckVEZGxG?=
- =?utf-8?B?MU5rdld5K0pUdFVlM1d0TXVJOWJ1NW9PUFBtV2hDSENWSzRJdklVNWVRbHIv?=
- =?utf-8?B?MG5yT2NpN3plcjM5L3dxcmlHUHZqNVEwRXk1OUFZcmVxZGt6NnU1S0d5ZHd3?=
- =?utf-8?B?U04zQXZlQ3d0RW5pWGV5eER1ZjhieUQrR2ZHS2FGTkI5cWducy9xNGJLYSsv?=
- =?utf-8?B?c1FmMVZCR1k3YkhHd1ZCQ2RoaGxSRTc3SjZKUkNoRXg1b2hWUlVneU1YYkZs?=
- =?utf-8?B?SnZ0dkh5bTdrOTkrWnRjSDZsQmFaUFZXbjQ5d0M2dVJqSHJXdVhBV2Yxcnhi?=
- =?utf-8?B?SzhJUXJ2Zi9yWlVOdmxRYSswTE95Tnc5eTNaeXpOdzIyNkEyem1TUG9NTm5G?=
- =?utf-8?B?SzdSNXBXbU50dFpHY0R3Uk1NNXRON0ZIVEFKb0JpbFYvaFNLNWJ0QU9SVmg3?=
- =?utf-8?B?QmcreVZLcnpKbG9FZ2dpNURvaDhhajRlR0NYdUhCK1VPbGk3VzRqRTArUDVZ?=
- =?utf-8?B?aEFaQkNaV04xbGlKOUVXVmcxcmgrRmtWQndWK3RvZnRpS3k1WVd0NnQ0M05E?=
- =?utf-8?B?NXMwMTJndlJtNkRxYmduekl5aGZZQmNPajlNWkZyV1ZkdnNEWXUyMUdPVXNI?=
- =?utf-8?B?eXRab3hoNU9SREhJRzBWS0xsWUNvak9xY2JtZ0JRRmJXNkNySzhGYm44dlAv?=
- =?utf-8?B?WkNRbXhIZ2RGY0dWNG9seU9pMmZ1aUMxdXZRd0hBdTdSVTF1VnFFK0xYWjZF?=
- =?utf-8?B?T09aVWp3WnJZTWc2NGZneXNHeWRoSzNHbXhjMjMwcEJIajNncmFvb245YWdL?=
- =?utf-8?B?NnhZakhVcVBIdWt6L0pCSTg2L01tMWlwTGZaMHdDaFRtU0I1TStQbFdKTEZv?=
- =?utf-8?B?ZGFTREFHMCt3ZXIzOHVCcWhxK0VVbnN3aDU3ZUZGRDF4MzNpNFVoOVF2MDdr?=
- =?utf-8?B?L1AzcU5TSEVuaFJpZ1JiTlVmd2Ztcmx1a3lzWDdZd1ZuRXBjYlFVU0tFKzF3?=
- =?utf-8?B?b0NxdjJxVWt5bzV0aFJFbDVqMWVqSkJBZFlBWm90aDYzQUhSYys1bXVwakJu?=
- =?utf-8?B?dlFNNnk3bE9wR0xEdnYwUWxtOFF5SUNQWEZDNnkvZXo4YUtUZDRYMnRnaStP?=
- =?utf-8?B?S2tEQUdTdzNiT0IvZmszV1FqUnNsWkR5NWVxL3lJMlhOQ1pkMzVtVzAxaGw2?=
- =?utf-8?B?ZFVGVmlScmI5bldtcG55TS9TNzVseEg2T2Y4cU0yWDFxOU9qNlI3d1pGR1N6?=
- =?utf-8?B?U3F3YW9QUFhGQVAwdC80Y3V5bS94ZExINUJWZ05HaGFIcXk4Mit1Zz09?=
+	=?us-ascii?Q?+WhfD9foNqARBM2D55O3Q0LPkRmBpn2DW3UpJTKptdggfU7RyMcrorNRJXiX?=
+ =?us-ascii?Q?Yd/xe6Emv5/dhs7RN0HSYT3SSgAXal/i9LfgtiHNjDcZvGcabW3hvxn4Iy9z?=
+ =?us-ascii?Q?tikBHJs1pnUMPJbt0qKbZk7sR1tMXwgBFiYYoRraECib7jAE7npkH2d8fbDg?=
+ =?us-ascii?Q?pw9I4FJ38abLOsjK9uu2E0JlrmSD+Gj0wf500Ata/lOSRnuh5Tg6zRPMtws/?=
+ =?us-ascii?Q?9bffqNW6H6GsmLRAiSO4xw1enQob90XpFdd9qo1FwggcXYsQMRzflDpGeLGM?=
+ =?us-ascii?Q?ByX71FDhpG6n1sR6KAdkNcAKk2JIaFEW0I+dmF+MU1neo3AVOz0knL86ZOD6?=
+ =?us-ascii?Q?VKA0uZzzWBbFfJBW+EHNGDO4OaXD6WGdEXZH3qgi/cGNJcQIoZowNne/b8RS?=
+ =?us-ascii?Q?/T9YIC7AwycC+2DeO7/OYXlviHCrqod8BINXZkzOPQDYC4C+JLGg3aYuDYf+?=
+ =?us-ascii?Q?u84h1lou7+s20x/ZX847v97JdfuMTbd55uJE++7SHkr+T08vsyEDzqq1GgY0?=
+ =?us-ascii?Q?2gCFG5SrNwcYnUKAuCiyxzMPq4ldu9xC7IlAC5lIUXqR3Ld+D8N0BnRwNrKF?=
+ =?us-ascii?Q?vokDYgYuV2fCi2NAUPMDqe4BGKt0+SO3WmgpFY6rOsvRTXzNOibhjlePGY4/?=
+ =?us-ascii?Q?d1CQFdBrjHfcROSAq2v/BKGz4taG6IS7Pl2W0Dh1TL2byQcbNPpU+aEIbo77?=
+ =?us-ascii?Q?fURqq3zqlvm2ImVA7aWiiGyRda7OeOxRgBvyL1Ft7vDurPfvflzcQr0/d845?=
+ =?us-ascii?Q?sJsWBXydOxabQnO3MPmltD6lVUI4ye1SLzMKmn0stXOq4+bChHZyiEmsh+H1?=
+ =?us-ascii?Q?CrAH5GiDUszS1IMVG7XmYPU23F/SIBsQbFVzjabbtKSjpPil94iyF8ONhhCe?=
+ =?us-ascii?Q?Y9oalou5ZbpbLM5iw9wjkaYUBeul+dlInCTj6E89XL4EMudr2Qoe8v3eb9NM?=
+ =?us-ascii?Q?rMkZue9X775BBdqjESgWCPVuh935zgRqVwxuXWZsWaFm4U7Iz/t5wUF9/cQR?=
+ =?us-ascii?Q?HVdl+l2s5/nWCxLBBGoF91fVbhj6newuRAHqzy7IVdXKf27BtpzFf4Gyvhm6?=
+ =?us-ascii?Q?sjAPyNMsA47kXJbK9oVHo2Jfjv78hjQcVGdn0/IwAesUeQWO5OkEnDAojpzx?=
+ =?us-ascii?Q?lc1eNkxhtiGn9peI3dbgHpNxPaT0A2JRZBuITLPKEoW3jMWIUCjkmbsvyA7j?=
+ =?us-ascii?Q?2a5B+QejMxleP3lO4KmEnVBgXixBn1he94QKelwfORypdj51wDsA9SCzNK0u?=
+ =?us-ascii?Q?PpPUUXJ1qtW5A0c9MR+BhQ4WbhE5z5n/XADwthL1uEuWkMVsHC5qhtZcmoYb?=
+ =?us-ascii?Q?XC1gXeSfrqwmndt8oV/hu2HqdzpEHYGR8r5h0uu5iuO/q5txBurloB/+eTRA?=
+ =?us-ascii?Q?ZuoeXlRYtRGXYgrmdEx6i49JQJi9tV8ldvSwvfVB64QZFWYXhvlcKM0l7Bgg?=
+ =?us-ascii?Q?LU7UGTEMx33lycOiPPjBOFowz/fOT019t6XEQnq3ZlntYc0dtHIff7FaQO3F?=
+ =?us-ascii?Q?l0lgzT/9a0vm0DXyXSoq+/FdBehXZLXrAMwHO7IgDTXU+Qqigjr3Csi+ocvO?=
+ =?us-ascii?Q?gf8iZu19BI4l9zuWf/hHBgsB0Ds5/tI3kd01nFAxyxCNIQV46PAFCage1JWo?=
+ =?us-ascii?Q?tXMdQJ/apWxEDJXhFmIt/7Y6ohTELBRNVs5PWuI9oXFokbollro9iIVkxdPF?=
+ =?us-ascii?Q?Bpn8u4CXMx2kpBjQHbBAXDXmH075NxO0IStvXpug96GLVOAhV4Qd5IWfcrSV?=
+ =?us-ascii?Q?JXeQXcHXag=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b9181a4-90dc-4b4f-0843-08de59a4fc34
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f21ffd6-4003-40df-0797-08de59a4fd1e
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:07.7167
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:09.5712
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0C4q+s+Pqd0U4+3ZjroswUyy/XJQtlxVivveqISVk0Lpa2HwmJtnKn2o2xam0dzfvzRriqX66hjswT4AbUhd0g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: qmWTswMNQGL/cwf7X23MNnpF84QmD4+8rCG+cLcoPTDCMxbe0SupvWstkLAeucdtrZUxOO2aC0x4UwZrjDMETQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7902
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [3.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252274-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,linux.intel.com,bootlin.com,trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252273-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,linux.intel.com,bootlin.com,trustnetic.com];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DMARC_POLICY_ALLOW(0.00)[nxp.com,none];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:mid,nxp.com:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: C06B565F3E
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,nxp.com:mid,bootlin.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 19DD965C02
 X-Rspamd-Action: no action
 
-The NXP SJA1105 and SJA1110 switches have a linear address space thanks
-to their SPI-to-AHB bridge. This address space contains not only the
-Ethernet switch, but (depending on hw generation) SGMII PCS blocks,
-MDIO controllers, interrupt controllers, GPIO controllers. Of these, the
-SGMII PCS blocks and the MDIO controllers are supported today by the DSA
-driver, through internal programming.
+The regmap world is seemingly split into two groups which attempt to
+solve different problems. Effectively, this means that not all regmap
+providers are compatible with all regmap consumers.
 
-This series proposes registering platform devices for each non-switch
-weakly coupled component, all such devices being backed by an OF node
-(and reachable through phandles to it), one or more resources and the
-switch global regmap. For backward compatibility and not only (DT author
-convenience), if these OF nodes do not exist, they are created using the
-dynamic of_changeset API.
+First, we have the group where the current mdio-regmap users fit:
+altera_tse_main.c and dwmac-socfpga.c use devm_regmap_init_mmio() to
+ioremap their pcs_base and obtain a regmap where address zero is the
+first PCS register.
 
-The motivation must be explained top-down:
+Second, we have the group where MFD parent drivers call
+mfd_add_devices(), having previously initialized a non-MMIO (SPI, I2C)
+regmap and added it to their devres list, and MFD child drivers use
+dev_get_regmap(dev->parent, NULL) in their probe function, to find the
+first (and single) regmap of the MFD parent. The address zero of this
+regmap is global to the entire parent, so the children need to be
+parent-aware and add their own offsets for the registers that they
+should manage. This is essentially because MFD is seemingly coming from
+a world where peripheral registers are all entangled with each other.
 
-  The high-level goal is to customize the XPCS (SGMII PCS block) with
-  board-specific device tree that describe the required differential
-  lane polarity.
+What I'm trying to support are potentially multiple instances of the
+same kind of device, at well separated address space regions.
 
-  But the XPCS is not presently described in the device tree in
-  SJA1105/SJA1110, hence the desire to do that.
+To provide isolated regmaps for each child device would essentially mean
+solving the problem of how would each child device needs to find the
+correct regmap. This further means that "dev_get_regmap(dev->parent,
+NULL)" transforms either in:
+- dev_get_regmap(dev, NULL): search in the child device's devres list,
+  not in the parent's. This means adding the regmap in between
+  platform_device_alloc() and platform_device_add(), but is
+  structurally impossible because &dev->devres_head is initialized way
+  too late, in device_initialize().
+- dev_get_regmap(dev->parent, "unique-regmap-name"): now the child
+  device needs to know, in case there are multiple instances of it,
+  which one is it, to ask for the right one. I've seen
+  drivers/mfd/ocelot-core.c work around this rather elegantly, providing
+  a resource to the child, and then the child uses resource->name to
+  find the regmap of the same name in the parent. But then I also
+  stumbled upon drivers/net/pcs/pcs-xpcs-plat.c which I need to support
+  as a child platform device, and that superimposes its own naming
+  scheme for the resources: "direct" or "indirect" - scheme which is
+  obviously incompatible with namespacing per instance.
 
-  However, instances of XPCS blocks described in the device tree already
-  exist for the case where it is MMIO-mapped. Those bindings dictate how
-  the XPCS in SJA1105/SJA1110 should be described.
+So a parent device needs to decide whether it is in the boat that
+provides one isolated regmap for each child, or one big regmap for all.
+The "one big regmap" is the lowest common denominator when considering
+children like pcs-xpcs-plat.c.
 
-v1 at:
-https://lore.kernel.org/netdev/20251118190530.580267-1-vladimir.oltean@nxp.com/
+This means that from mdio-regmap's perspective, it needs to deal with
+regmaps coming from both kinds of providers, as neither of them is going
+away.
 
-Major changes since v1:
-- Stop using MFD API due to pushback from Lee Jones. Create replacement
-  of_subdevs_populate() API localized to sja1105 (can be moved if need
-  be)
-- Exclude first patch "net: dsa: sja1105: let phylink help with the
-  replay of link callbacks", upstreamed separately.
-- Include XPCS lane polarity parsing.
-Minor changes listed in individual patches.
+Users who provide a big regmap but want to access only a window into it
+should provide as a struct mdio_regmap_config field a resource that
+describes the start and end of that window. Currently we only use the
+start as an offset into the regmap, and hope that MDIO reads and writes
+won't go past the end.
 
-Note that the current of_changeset API is "sufficient" for this use
-case, but if its use is acceptable for XPCS, I will need to look at
-expanding it with phandle support, for the interrupt controller
-sub-device. I was able to "wing it" here by manually keeping dynamic
-fwnode_handle references rather than reaching them through phandles,
-but that has limits.
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+v1->v2: add Maxime's review tag
 
-Vladimir Oltean (15):
-  net: mdio-regmap: permit working with non-MMIO regmaps
-  net: mdio: add driver for NXP SJA1110 100BASE-T1 embedded PHYs
-  net: mdio: add generic driver for NXP SJA1110 100BASE-TX embedded PHYs
-  net: dsa: sja1105: prepare regmap for passing to child devices
-  net: dsa: sja1105: include spi.h from sja1105.h
-  net: dsa: sja1105: transition OF-based MDIO controllers to standalone
-    sub-devices
-  net: pcs: xpcs: introduce xpcs_create_pcs_fwnode()
-  net: pcs: xpcs-plat: convert to regmap
-  dt-bindings: net: dsa: sja1105: document the PCS nodes
-  net: pcs: xpcs-plat: add NXP SJA1105/SJA1110 support
-  net: dsa: sja1105: fill device tree with ethernet-pcs sub-devices
-    under "regs" node
-  net: dsa: sja1105: replace mdiobus-pcs with xpcs-plat driver
-  net: dsa: sja1105: permit finding the XPCS via pcs-handle
-  dt-bindings: net: xpcs: allow properties from phy-common-props.yaml
-  net: pcs: xpcs: allow generic polarity inversion
+ drivers/net/mdio/mdio-regmap.c   | 7 +++++--
+ include/linux/mdio/mdio-regmap.h | 2 ++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
- .../bindings/net/dsa/nxp,sja1105.yaml         |  27 +
- .../bindings/net/pcs/snps,dw-xpcs.yaml        |  13 +-
- MAINTAINERS                                   |   2 +
- drivers/net/dsa/sja1105/Kconfig               |   1 +
- drivers/net/dsa/sja1105/Makefile              |   2 +-
- drivers/net/dsa/sja1105/sja1105.h             |  39 +-
- drivers/net/dsa/sja1105/sja1105_main.c        |  86 ++-
- drivers/net/dsa/sja1105/sja1105_mdio.c        | 507 -----------------
- drivers/net/dsa/sja1105/sja1105_spi.c         | 113 +++-
- drivers/net/dsa/sja1105/sja1105_subdev.c      | 513 ++++++++++++++++++
- drivers/net/dsa/sja1105/sja1105_subdev.h      |  10 +
- drivers/net/mdio/Kconfig                      |  22 +-
- drivers/net/mdio/Makefile                     |   2 +
- drivers/net/mdio/mdio-regmap-simple.c         |  80 +++
- drivers/net/mdio/mdio-regmap.c                |   7 +-
- drivers/net/mdio/mdio-sja1110-cbt1.c          | 179 ++++++
- drivers/net/pcs/Kconfig                       |   1 +
- drivers/net/pcs/pcs-xpcs-nxp.c                |  11 -
- drivers/net/pcs/pcs-xpcs-plat.c               | 146 +++--
- drivers/net/pcs/pcs-xpcs.c                    |  58 +-
- drivers/net/pcs/pcs-xpcs.h                    |   1 -
- include/linux/mdio/mdio-regmap.h              |   2 +
- include/linux/pcs/pcs-xpcs.h                  |   1 +
- 23 files changed, 1185 insertions(+), 638 deletions(-)
- delete mode 100644 drivers/net/dsa/sja1105/sja1105_mdio.c
- create mode 100644 drivers/net/dsa/sja1105/sja1105_subdev.c
- create mode 100644 drivers/net/dsa/sja1105/sja1105_subdev.h
- create mode 100644 drivers/net/mdio/mdio-regmap-simple.c
- create mode 100644 drivers/net/mdio/mdio-sja1110-cbt1.c
-
+diff --git a/drivers/net/mdio/mdio-regmap.c b/drivers/net/mdio/mdio-regmap.c
+index 8a742a8d6387..2a0e9c519fa3 100644
+--- a/drivers/net/mdio/mdio-regmap.c
++++ b/drivers/net/mdio/mdio-regmap.c
+@@ -19,6 +19,7 @@
+ 
+ struct mdio_regmap_priv {
+ 	struct regmap *regmap;
++	unsigned int base;
+ 	u8 valid_addr;
+ };
+ 
+@@ -31,7 +32,7 @@ static int mdio_regmap_read_c22(struct mii_bus *bus, int addr, int regnum)
+ 	if (ctx->valid_addr != addr)
+ 		return -ENODEV;
+ 
+-	ret = regmap_read(ctx->regmap, regnum, &val);
++	ret = regmap_read(ctx->regmap, ctx->base + regnum, &val);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -46,7 +47,7 @@ static int mdio_regmap_write_c22(struct mii_bus *bus, int addr, int regnum,
+ 	if (ctx->valid_addr != addr)
+ 		return -ENODEV;
+ 
+-	return regmap_write(ctx->regmap, regnum, val);
++	return regmap_write(ctx->regmap, ctx->base + regnum, val);
+ }
+ 
+ struct mii_bus *devm_mdio_regmap_register(struct device *dev,
+@@ -66,6 +67,8 @@ struct mii_bus *devm_mdio_regmap_register(struct device *dev,
+ 	mr = mii->priv;
+ 	mr->regmap = config->regmap;
+ 	mr->valid_addr = config->valid_addr;
++	if (config->resource)
++		mr->base = config->resource->start;
+ 
+ 	mii->name = DRV_NAME;
+ 	strscpy(mii->id, config->name, MII_BUS_ID_SIZE);
+diff --git a/include/linux/mdio/mdio-regmap.h b/include/linux/mdio/mdio-regmap.h
+index 679d9069846b..441cead97936 100644
+--- a/include/linux/mdio/mdio-regmap.h
++++ b/include/linux/mdio/mdio-regmap.h
+@@ -11,10 +11,12 @@
+ 
+ struct device;
+ struct regmap;
++struct resource;
+ 
+ struct mdio_regmap_config {
+ 	struct device *parent;
+ 	struct regmap *regmap;
++	const struct resource *resource;
+ 	char name[MII_BUS_ID_SIZE];
+ 	u8 valid_addr;
+ 	bool autoscan;
 -- 
 2.34.1
 
