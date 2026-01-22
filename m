@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-252564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FFGB6CtcmmAogAAu9opvQ
-	(envelope-from <netdev+bounces-252564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 00:07:12 +0100
+	id gHgUAsqucmmyogAAu9opvQ
+	(envelope-from <netdev+bounces-252565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 00:12:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CCAD6E65E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 00:07:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07E06E6B7
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 00:12:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D9048300B100
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 23:07:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 94BA1301DDB8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 23:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4AE3D9F4E;
-	Thu, 22 Jan 2026 23:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FCE3D8074;
+	Thu, 22 Jan 2026 23:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2p/uhZM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fU3KMWft"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F193E3D8074
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 23:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67BD35CB80;
+	Thu, 22 Jan 2026 23:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769123227; cv=none; b=fF5PAX0kOhvo/Witjan2yaL+/pzSk0IrgeRtozoj8GUeYHlTUrCAjfvx6SoCjekmlPXhhQj64xG8zNbw2ml7NLGOUHDStFPjQ4gHMMqZOAvG5KziNwMbZt15Ev4YqfKtsTbsQ+9GlI8OCnLh441kkitXR1afeIxiBl9+vasAVpk=
+	t=1769123525; cv=none; b=CO1FDpYQg5E0KNQ+m+hLr1CilfS+X0QPoYjL4k1Hp3AA38MMBWqQDlFBSWuPT3L7aP4DzhkgiWvM2p0unKhHxy2Sj7nnu0AN2+7c0umfnU1ZNWe4EcAjv5wBVvOWOtPhSddCZ832giyupiwiWtModYeu0ZQMFV/n0K2nG3NimuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769123227; c=relaxed/simple;
-	bh=Y9WKbaAbGay0g4onmupbqsi4v+2SSyPctEJha1HkD/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mCWeHwOZPH51C0xYS4BIQACsoumVCnwO/YL2KmWaketYuCr/NQjyKJ8AIizbwTutJnjvpQihXOWsIpNl7yNTJer8qjRSks/kniVTnDZW7tK+dO4XkPuLgH2tYjxfXiqVuIidscG+lFCa2/GVWJfrBGJEg/dorR/SGuaDwi6d7yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2p/uhZM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E59C2BCAF
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 23:07:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769123225;
-	bh=Y9WKbaAbGay0g4onmupbqsi4v+2SSyPctEJha1HkD/s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=b2p/uhZMHnwNj67Yoy5CtSPK6G4QopUeXrMebyoB6+PKS+sTalD47qalM0vgREZLU
-	 0QJCajxbWGrUlmcTMdt5AwMbiSWcq4utLz/AMgJKIk+CvtDoZMhA9WtB5LfE6ZnDRP
-	 Iqd6t5sbo6BK+IjRhwsVr8KHU107O0YgQOxiXU+tg2tXuaju6NjrbYgyvPqzz4pRRZ
-	 RMqrGhFfOBJQiIR4BeLJt5HwuK0yckC7mnIJ3uRAf06EZ8Uhvd8XTM921EmL0Q3bRG
-	 0DsbOoEORO7XpcKH4qyms9/U+wFFQAbSn6RCBn/738UZWElmRslN+l424FKtm4gfrC
-	 Xr4/g8c05Zowg==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-65813e3e215so3011546a12.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 15:07:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWW3sqQph24JucfVE1ZiXsAkUzdFkMvnjgpd7Cq1KJ37QYC5sJAF3BWh6kJicy/JjpB/G+RMck=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8KbXdHSE6o5zuCcVLekrh9w98ZzjVVZPUnxxGdjIptWl5BK/o
-	uH39mvr6gulUoUV4oVNQh+fZuCnSM/tDWTRZh5zIzNY60ZB5fWlc2uzncB46M0DoefTEPLzzRgd
-	kwXXgTSz6/QaypE/tsspVQCWMEJleVA==
-X-Received: by 2002:a05:6402:1ed5:b0:64d:46ad:da66 with SMTP id
- 4fb4d7f45d1cf-658487b7fb7mr710772a12.25.1769123224341; Thu, 22 Jan 2026
- 15:07:04 -0800 (PST)
+	s=arc-20240116; t=1769123525; c=relaxed/simple;
+	bh=5Ach7FQh0kSIfmJrAu7ACPYtsNfM+oR2FY6U6x+dxT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zb2m0DD9SwAX1aaq8qPL+FVWILvGHd+yJoD941tY7OUnVr9BNZclFB2TomZfK4CSW/x+6/zw90tXDMAzOU2dKMOgPYXzEn08A+aEcDdzGDi6ayYRt/GSPX0UK6gAGSJFfkQ2joTIEx4Q41HTrPx30T1oSWkHjHJp0ZwuSKQzApo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fU3KMWft; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FxLcaXRPfi9zcjCrv3XME+vG698ByHEWZmdDgcDOrwk=; b=fU3KMWfta0rG3ErYDO2wLNeQa5
+	gstN+V9ikpsZPqf1cucuIbBmuNDi68wcR5+SXU3lQ3cOB0HN9qgrTChsCNGAXZd4g8JriwvAJOXMT
+	sm61w0mZUo5DvskZiU9l4h8Rg87A1sWFLCXj11wmI/bZ/kHiwQqnF/vchPfhJHywkb+k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vj3q4-0042bT-Si; Fri, 23 Jan 2026 00:11:44 +0100
+Date: Fri, 23 Jan 2026 00:11:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>,
+	Mark Brown <broonie@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: Re: [PATCH v2 net-next 02/15] net: mdio: add driver for NXP SJA1110
+ 100BASE-T1 embedded PHYs
+Message-ID: <bfd1058d-5acc-4147-9609-2b257070f7a3@lunn.ch>
+References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+ <20260122105654.105600-3-vladimir.oltean@nxp.com>
+ <aXIUJbEwnAvIkeKK@smile.fi.intel.com>
+ <20260122124708.pxckp6vgi2rvagmm@skbuf>
+ <aXI339TiHFaEAWXE@smile.fi.intel.com>
+ <20260122221003.p2cbemzvi2mayety@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121151506.813783-1-dam.dejean@gmail.com> <20260121151506.813783-3-dam.dejean@gmail.com>
- <20260122165102.GA2564919-robh@kernel.org> <916AA508-4097-42DF-8087-4C82ABB87D76@gmail.com>
-In-Reply-To: <916AA508-4097-42DF-8087-4C82ABB87D76@gmail.com>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 22 Jan 2026 17:06:53 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLojaLya08L7GbocT3s3Gv2mfHrftE1yfy+Gi_VyAUqcw@mail.gmail.com>
-X-Gm-Features: AZwV_Qi840gfE0Q9gDAEExJfLTww1TWyvSgxhEpyAESJsHeuPYmLbwLXEOjQ3qc
-Message-ID: <CAL_JsqLojaLya08L7GbocT3s3Gv2mfHrftE1yfy+Gi_VyAUqcw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] dt-bindings: net: realtek,rtl82xx: add a property
- to set MDI polarity
-To: Damien Dejean <dam.dejean@gmail.com>
-Cc: andrew@lunn.ch, krzk+dt@kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, edumazet@google.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260122221003.p2cbemzvi2mayety@skbuf>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,vger.kernel.org,google.com,davemloft.net,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-252564-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252565-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.intel.com,vger.kernel.org,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5CCAD6E65E
+	NEURAL_HAM(-0.00)[-0.972];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: B07E06E6B7
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 2:47=E2=80=AFPM Damien Dejean <dam.dejean@gmail.com=
-> wrote:
->
->
-> > Le 22 janv. 2026 =C3=A0 17:51, Rob Herring <robh@kernel.org> a =C3=A9cr=
-it :
-> >
-> > However, are these properties something that should be common?
->
-> If by common you mean =C2=AB not Realtek specific =C2=BB
+> I wasn't prepared to go down this rabbit hole, but it turns out that the
+> __mdiobus_read() and __mdiobus_write() functions do support regnum >= 32.
 
-Yes.
+It could be historical, from before their were C22 and C45 operations.
 
-> I have no idea if this kind of mapping is possible on other chips. Marvel=
-l Aquantia phys have an =C2=AB order =C2=BB (marvell,mdi-cfg-order) propert=
-y like the one I introduced in the patch before this one (thanks Andrew), b=
-ut that=E2=80=99s all I know.
+Previously, both transaction types were passed through one call. The
+MSB indicated if C45 should be performed, and there were some macros
+to split the number part into MMD and register.
 
-Seems like it is.
+With the current implementation, it should be O.K. to add a range
+change.
 
-Rob
+	Andrew
 
