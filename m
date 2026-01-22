@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-252523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHINMoB/cmlElgAAu9opvQ
-	(envelope-from <netdev+bounces-252523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:50:24 +0100
+	id 6LG3MHmAcmlElgAAu9opvQ
+	(envelope-from <netdev+bounces-252524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:54:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E876D43A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:50:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7F816D491
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE58E3007A46
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09BDD3040CE4
 	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B59F38FF10;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7699E38B9B7;
 	Thu, 22 Jan 2026 19:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="astmVQV3"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="M96uOaUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8531388840
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F04392C3E
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769111414; cv=none; b=FspxuVO6IEwE7TZeIAZm6EoReTLkD4FJIvJj7++5mA+wpf40LvoHKTbTWq1WKWv2qDXJHUFrSdUIzLfADxB55I32xVR56r8HrWzaTIvXMLyFU4IslAVvYDJV47E0MLHnpTIhVpo4UxqkmLiSlHN8Ug66Js62r8hi3Kw7yx3RqdQ=
+	t=1769111414; cv=none; b=hChTquDbTTBP00gqxaSDVD8PTuLjcbMtfZjmiuqD3SioJ97lzF9Tps9Vsz2/FdVrSPZmno67biF0X8naI91O9zfnoaJnnI7F0sZ/I76+G3kB7lNkFjJjcLryEfEWzjRUaZLgKEqXiB9+4IRIAPDa7T0nUl56cAmnwGJcyks5Xx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769111414; c=relaxed/simple;
-	bh=RBVqxUaS4cO6ArtPoB/Pxrlc5BfwP6SPMNCpskYj3BQ=;
+	bh=cWEjjen3iU6Xvqp/OkWwKAmyec0fe+BlZn2zZ47/9lE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MK25baGKxluFPhdNO+55g0dD43XZdR83/A51Z1qkRqqZmU+gv6hwa3xgydLBECZEEShIUWLKLShEyRBtzAmkqzsqkrUcoLxQaU2f1v31pyKZbS0qhmN1NHrtC60VuKVdQHMIRVlXOcH7HX3yD8dR/c9ZHRR0Vq1PfUdw9lgksVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=astmVQV3; arc=none smtp.client-ip=209.85.216.99
+	 MIME-Version; b=qUp//VNA6c1KXIghtQLxXxHKEarPG9Kt5WuguV/sD47kF5uAibzcIAyab/w6SlrjhoCg4JLEcVFNCAnt+Qe8sSHm7bKXVzOzKQRNifJcoVvV/UtvZK65OFbOPEcnfrsVbiA+L/1rDG6faVZYrAqTOKrMyfko4Xuc/L3j5VqBBKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=M96uOaUq; arc=none smtp.client-ip=209.85.160.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-3530715386cso1205477a91.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:50:01 -0800 (PST)
+Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-502a407dabaso10816391cf.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:50:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769111400; x=1769716200;
+        d=1e100.net; s=20230601; t=1769111403; x=1769716203;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F3U6DORJ2wyt5p+77fI8xLML2wOZrgSxEmX6SO188PY=;
-        b=AZNgXMxoJkr7TiPrEXiPq5t5Lmc9+NAABv8SLF2PJImg+5zOfREobGWQ5OzFAaYpEf
-         Dwpt3uLphvfCTjc/agNkPqs6d4ZU25qxNRgUydgFeisKoDgCQsiQ7upsejjqBSvIeF9G
-         ImftwP1dMIz/iJou1A5nuBbXSouyY3nsc3HQLJv8BYSFTncNErwC1HZImks6n135S3XU
-         ZVJnBdq6pd7XFzHpwiUI9ARHBPNlQvHPWsZ0eC5hhzhmcqRDTWjzZlkvW8EFhtVLFL4F
-         ZpvSxLakdwgB9N2m5GgaCiEBdqyUDh/hNXixhTttoG2UmAsza9GHVXnLz53BcD+1rG2n
-         149g==
-X-Gm-Message-State: AOJu0YwXOoDOYDkFud3eGMHNop7V1iLXw0coWuONEoUOQh5e1I4tEZNA
-	aR+eBHC2Wv4levg+yDOdmA0SWe5aAU47e/gZm6hLxnpHYO1ixX4ySZcIBNkjgUK9L6GogRmJF29
-	yXq/nGDkW4fwwXYU3FFM6WNfJaVN7AHd8UB2Ospt4w4TvtI4OrhPwoSNCoBo6bZVZJIgOcU6r4t
-	lzoQWooeIxbgfDnkzTefn6GQEUIraZlbrguIasR1gC3BjNk0b53B19z5qlf5sVUEwJwFzgFhyen
-	kmMipRXgg==
-X-Gm-Gg: AZuq6aILJtjGgncvOgcn9/gsKEOySPrZ8cMXg03KV618y9CJDmaDGxaIRvgUkKOqXgG
-	AOXDhorllBVexdxRckiLccVE9oZe+nxNXLIGhD+RLbgSUpQdG3zx/F/CpURmkHvBdAA/WiOMXgj
-	OcEFrP3QzLcNLhbuVo+EgkXaS/Bp5RPJxDX23JlT3GHXPsf509bv9EOlowiTNaVmpzy3SA1SMH+
-	y4JIQLVeZyikIV7r4N3N2q+5vHqpwviJYkCTJyuQf4FUmxU7xmdvu36dMndVJBezNWaZtK+BJE8
-	dZKAZPUbjLyQO3pb5AAI/tg8+0bfBRfoIWqvDBW2iqFzrSkUuQ09cTRjCd+he+GYO0g7lF9VF+o
-	tY+bYW6se2e4YRS+fU0dpXjb7NX10MT458Y5H0/Tbe9HVt7C4Hf5OM6UBasGOomlQOJX3EN+Hx0
-	xNyJqBA+V4/0B3MWTElHpyRFCbqbZysfgcmJ0ZT2x8
-X-Received: by 2002:a17:90b:510a:b0:34a:8c77:d386 with SMTP id 98e67ed59e1d1-35367023920mr554044a91.9.1769111399900;
-        Thu, 22 Jan 2026 11:49:59 -0800 (PST)
+        bh=y1yAspWxagwwLzncLYvd60u9eD/aYkUXrGfaSULQ98Q=;
+        b=t9W1gowQfRZ8Qmc4nhh4q89eC52ShEu56GDdkltKcjrNLWSIGknt0OJNSSRCz+Xb3D
+         QaFKZRy/jPPXCYjY8XCp+5eEE2Y6Z9mVY+Vk+cFXhZ+D5yuXSWndXNZaqFWPKVd9Lj9N
+         5B0O4i0Pio4hbaKpVcrCLeo3OT456ZWcS73S3F/FBjzP878hAvegRW1GXmJf8xzoI+pj
+         CNN8SziQl9Km/vbfXiW32Bt+MyBolJS8P9xCNZp4zSAqwKmU9RrKFmScH9ekNZawNfq/
+         nvTyryrbFbHZP5CCv24TOnPsYU+A8XCCCo747mUEDC6B6S2ba5hvWPwgF/DtnQdvFz1x
+         bZ0g==
+X-Gm-Message-State: AOJu0YzfCrAd5L/SzFfi88nOG/ZlnDq7sui/jC/kkYaxDPLBmD4iAj/J
+	wUY6s9IJUpLDwkge445TDTFnzWOw62fjzbRMhHRFK6YgK7XL/qOsOB6NPtxsPtXNnHOgmXiU3xL
+	pXhsqHyD+/PVVdJUAvDgysjGqeoKllCtGs97bA++3bvURddU0T2ek5/1Ge1wEoBqoFCzbX/AuEM
+	mjyh6oRmU0gVmtwAr5RaB03KeNirSvwC+UZdbMeqbVftH/c0nZaly5jN9WdTz1RTTZkJpN6hHSD
+	qtIcg7u/A==
+X-Gm-Gg: AZuq6aK+ND2smqyEu2PY1YOlgZOIylW7/IUcJcZzX7oO7jFgk1ck0ACa4aVcO99lxzW
+	vMSStryS/FWQIXcciQ96Xano/vZ6cULgLxuD2f1J7Ak+xq4A0ZNMvWJtvNlXgu76QZnv3d7ggD3
+	U9Sa38wMYlLDN0P00NacZ9iWEyN3tqF5QjuncTPfmoNJwGYuMBQ5el75kDXikjhXkL7KA3kMK/f
+	5fNpPdVwTtv8ex6cnbz4orIbo2mvEUcJIsbtPSTYqtqmEuJODOYp9c6hnwQiDGXQ/bdXRPVXKCC
+	Y/iXHE81bbFJyxgVrWsiY9iTSWw1uGSl8a2pvxyIVuMSQXz5pIK4dT7bTk8X4VnEz9EJOavS8O0
+	buQP4vq5KNyYVy8OAsxUL+B5UIR23QB2trjNt+ZmFDgFUnYwLraEHqZbKhWPlg0E8vXDKd9Rsb/
+	+BeV/v6a0fq0ikX49uCvBL9vysMR7Pr4TdeGdJzAEZ
+X-Received: by 2002:a05:622a:11cc:b0:4f1:b93d:fb5a with SMTP id d75a77b69052e-502f7705d71mr11351221cf.7.1769111401109;
+        Thu, 22 Jan 2026 11:50:01 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3533520210esm456530a91.1.2026.01.22.11.49.59
+        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-502f7ec5f50sm128071cf.4.2026.01.22.11.50.00
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Jan 2026 11:49:59 -0800 (PST)
+        Thu, 22 Jan 2026 11:50:01 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-4040b9ea153so2098148fac.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:49:59 -0800 (PST)
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-45a8cdc7e01so3065878b6e.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:50:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1769111398; x=1769716198; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1769111400; x=1769716200; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F3U6DORJ2wyt5p+77fI8xLML2wOZrgSxEmX6SO188PY=;
-        b=astmVQV3+Brq0W6QTd5m9rrD66+R/199gSj3kPKPMIAXTNXLZZ57/sWr9a1tW3VMVk
-         2AN7804Bfd60mFHQ1zliCrsEy6U7TlA5aPx6FcEQmzpq93VAu6HBiOfMpyaXbVec69c8
-         Yrd4zKRPZsL1VBrZ0tPoxjOxINwosM/Noo1pE=
-X-Received: by 2002:a05:6870:a7a5:b0:3ec:77e8:7bcc with SMTP id 586e51a60fabf-408ab7a0da9mr424112fac.38.1769111398522;
-        Thu, 22 Jan 2026 11:49:58 -0800 (PST)
-X-Received: by 2002:a05:6870:a7a5:b0:3ec:77e8:7bcc with SMTP id 586e51a60fabf-408ab7a0da9mr424095fac.38.1769111398009;
-        Thu, 22 Jan 2026 11:49:58 -0800 (PST)
+        bh=y1yAspWxagwwLzncLYvd60u9eD/aYkUXrGfaSULQ98Q=;
+        b=M96uOaUq/c6oTxcQSNz8QTE4UtrMQ2wnMCIn2a8fy3qHgPnBPi9XXPrUjP92C8EZPj
+         I3gQPhoxidHLIYS5cuPeM1vpc2xCz/JKaECai+LiDNf3gmMw4kTAdn7WF4llTiEe7H2J
+         199Yx/hH7JwUH1bUJZIVYT0uoP+6fAx70edfQ=
+X-Received: by 2002:a05:6808:1316:b0:450:1433:f13a with SMTP id 5614622812f47-45eb1a8d8e3mr417322b6e.11.1769111399977;
+        Thu, 22 Jan 2026 11:49:59 -0800 (PST)
+X-Received: by 2002:a05:6808:1316:b0:450:1433:f13a with SMTP id 5614622812f47-45eb1a8d8e3mr417300b6e.11.1769111399472;
+        Thu, 22 Jan 2026 11:49:59 -0800 (PST)
 Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-408af88f200sm86671fac.7.2026.01.22.11.49.57
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-408af88f200sm86671fac.7.2026.01.22.11.49.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 11:49:57 -0800 (PST)
+        Thu, 22 Jan 2026 11:49:58 -0800 (PST)
 From: Justin Chen <justin.chen@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: bcm-kernel-feedback-list@broadcom.com,
@@ -98,9 +98,9 @@ Cc: bcm-kernel-feedback-list@broadcom.com,
 	andrew+netdev@lunn.ch,
 	florian.fainelli@broadcom.com,
 	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next v3 1/2] net: bcmasp: clean up some legacy logic
-Date: Thu, 22 Jan 2026 11:49:48 -0800
-Message-Id: <20260122194949.1145107-2-justin.chen@broadcom.com>
+Subject: [PATCH net-next v3 2/2] net: bcmasp: streamline early exit in probe
+Date: Thu, 22 Jan 2026 11:49:49 -0800
+Message-Id: <20260122194949.1145107-3-justin.chen@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260122194949.1145107-1-justin.chen@broadcom.com>
 References: <20260122194949.1145107-1-justin.chen@broadcom.com>
@@ -120,251 +120,102 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252523-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252524-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,broadcom.com:dkim,broadcom.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-0.999];
 	DKIM_TRACE(0.00)[broadcom.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: C1E876D43A
+X-Rspamd-Queue-Id: D7F816D491
 X-Rspamd-Action: no action
 
-Removed wol_irq check. This was needed for brcm,asp-v2.0, which was
-removed in previous commits.
-
-Removed bcmasp_intf_ops. These function pointers were added to make
-it easier to implement pseudo channels. These channels were removed
-in newer versions of the hardware and were never implemented.
+Streamline the bcmasp_probe early exit. As support for other
+functionality is added(i.e. ptp), it is easier to keep track of early
+exit cleanup when it is all in one place.
 
 Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/asp2/bcmasp.c   |  5 --
- drivers/net/ethernet/broadcom/asp2/bcmasp.h   | 36 ------------
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c  | 58 ++++---------------
- 3 files changed, 10 insertions(+), 89 deletions(-)
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c | 27 +++++++++++----------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 014340f33345..36df7d1a9be3 100644
+index 36df7d1a9be3..aa6d8606849f 100644
 --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
 +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1081,15 +1081,10 @@ static irqreturn_t bcmasp_isr_wol(int irq, void *data)
- 	struct bcmasp_priv *priv = data;
- 	u32 status;
+@@ -1317,6 +1317,8 @@ static int bcmasp_probe(struct platform_device *pdev)
  
--	/* No L3 IRQ, so we good */
--	if (priv->wol_irq <= 0)
--		goto irq_handled;
+ 	bcmasp_core_init_filters(priv);
+ 
++	bcmasp_init_wol(priv);
++
+ 	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
+ 	if (!ports_node) {
+ 		dev_warn(dev, "No ports found\n");
+@@ -1328,16 +1330,14 @@ static int bcmasp_probe(struct platform_device *pdev)
+ 		intf = bcmasp_interface_create(priv, intf_node, i);
+ 		if (!intf) {
+ 			dev_err(dev, "Cannot create eth interface %d\n", i);
+-			bcmasp_remove_intfs(priv);
+-			ret = -ENOMEM;
+-			goto of_put_exit;
++			of_node_put(ports_node);
++			ret = -EINVAL;
++			goto err_cleanup;
+ 		}
+ 		list_add_tail(&intf->list, &priv->intfs);
+ 		i++;
+ 	}
 -
- 	status = wakeup_intr2_core_rl(priv, ASP_WAKEUP_INTR2_STATUS) &
- 		~wakeup_intr2_core_rl(priv, ASP_WAKEUP_INTR2_MASK_STATUS);
- 	wakeup_intr2_core_wl(priv, status, ASP_WAKEUP_INTR2_CLEAR);
+-	/* Check and enable WoL */
+-	bcmasp_init_wol(priv);
++	of_node_put(ports_node);
  
--irq_handled:
- 	pm_wakeup_event(&priv->pdev->dev, 0);
- 	return IRQ_HANDLED;
- }
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-index e238507be40a..29cd87335ec8 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-@@ -268,13 +268,6 @@ struct bcmasp_mib_counters {
- 	u32	tx_timeout_cnt;
- };
- 
--struct bcmasp_intf_ops {
--	unsigned long (*rx_desc_read)(struct bcmasp_intf *intf);
--	void (*rx_buffer_write)(struct bcmasp_intf *intf, dma_addr_t addr);
--	void (*rx_desc_write)(struct bcmasp_intf *intf, dma_addr_t addr);
--	unsigned long (*tx_read)(struct bcmasp_intf *intf);
--	void (*tx_write)(struct bcmasp_intf *intf, dma_addr_t addr);
--};
- 
- struct bcmasp_priv;
- 
-@@ -286,7 +279,6 @@ struct bcmasp_intf {
- 	/* ASP Ch */
- 	int				channel;
- 	int				port;
--	const struct bcmasp_intf_ops	*ops;
- 
- 	/* Used for splitting shared resources */
- 	int				index;
-@@ -407,34 +399,6 @@ struct bcmasp_priv {
- 	struct mutex			net_lock;
- };
- 
--static inline unsigned long bcmasp_intf_rx_desc_read(struct bcmasp_intf *intf)
--{
--	return intf->ops->rx_desc_read(intf);
--}
--
--static inline void bcmasp_intf_rx_buffer_write(struct bcmasp_intf *intf,
--					       dma_addr_t addr)
--{
--	intf->ops->rx_buffer_write(intf, addr);
--}
--
--static inline void bcmasp_intf_rx_desc_write(struct bcmasp_intf *intf,
--					     dma_addr_t addr)
--{
--	intf->ops->rx_desc_write(intf, addr);
--}
--
--static inline unsigned long bcmasp_intf_tx_read(struct bcmasp_intf *intf)
--{
--	return intf->ops->tx_read(intf);
--}
--
--static inline void bcmasp_intf_tx_write(struct bcmasp_intf *intf,
--					dma_addr_t addr)
--{
--	intf->ops->tx_write(intf, addr);
--}
--
- #define __BCMASP_IO_MACRO(name, m)					\
- static inline u32 name##_rl(struct bcmasp_intf *intf, u32 off)		\
- {									\
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index ceb6c11431dd..d0a480430a95 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -231,39 +231,6 @@ static struct sk_buff *bcmasp_csum_offload(struct net_device *dev,
- 	return skb;
- }
- 
--static unsigned long bcmasp_rx_edpkt_dma_rq(struct bcmasp_intf *intf)
--{
--	return rx_edpkt_dma_rq(intf, RX_EDPKT_DMA_VALID);
--}
--
--static void bcmasp_rx_edpkt_cfg_wq(struct bcmasp_intf *intf, dma_addr_t addr)
--{
--	rx_edpkt_cfg_wq(intf, addr, RX_EDPKT_RING_BUFFER_READ);
--}
--
--static void bcmasp_rx_edpkt_dma_wq(struct bcmasp_intf *intf, dma_addr_t addr)
--{
--	rx_edpkt_dma_wq(intf, addr, RX_EDPKT_DMA_READ);
--}
--
--static unsigned long bcmasp_tx_spb_dma_rq(struct bcmasp_intf *intf)
--{
--	return tx_spb_dma_rq(intf, TX_SPB_DMA_READ);
--}
--
--static void bcmasp_tx_spb_dma_wq(struct bcmasp_intf *intf, dma_addr_t addr)
--{
--	tx_spb_dma_wq(intf, addr, TX_SPB_DMA_VALID);
--}
--
--static const struct bcmasp_intf_ops bcmasp_intf_ops = {
--	.rx_desc_read = bcmasp_rx_edpkt_dma_rq,
--	.rx_buffer_write = bcmasp_rx_edpkt_cfg_wq,
--	.rx_desc_write = bcmasp_rx_edpkt_dma_wq,
--	.tx_read = bcmasp_tx_spb_dma_rq,
--	.tx_write = bcmasp_tx_spb_dma_wq,
--};
--
- static netdev_tx_t bcmasp_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct bcmasp_intf *intf = netdev_priv(dev);
-@@ -368,7 +335,7 @@ static netdev_tx_t bcmasp_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	skb_tx_timestamp(skb);
- 
--	bcmasp_intf_tx_write(intf, intf->tx_spb_dma_valid);
-+	tx_spb_dma_wq(intf, intf->tx_spb_dma_valid, TX_SPB_DMA_VALID);
- 
- 	if (tx_spb_ring_full(intf, MAX_SKB_FRAGS + 1))
- 		netif_stop_queue(dev);
-@@ -449,7 +416,7 @@ static int bcmasp_tx_reclaim(struct bcmasp_intf *intf)
- 	struct bcmasp_desc *desc;
- 	dma_addr_t mapping;
- 
--	read = bcmasp_intf_tx_read(intf);
-+	read = tx_spb_dma_rq(intf, TX_SPB_DMA_READ);
- 	while (intf->tx_spb_dma_read != read) {
- 		txcb = &intf->tx_cbs[intf->tx_spb_clean_index];
- 		mapping = dma_unmap_addr(txcb, dma_addr);
-@@ -519,7 +486,7 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 	u64 flags;
- 	u32 len;
- 
--	valid = bcmasp_intf_rx_desc_read(intf) + 1;
-+	valid = rx_edpkt_dma_rq(intf, RX_EDPKT_DMA_VALID) + 1;
- 	if (valid == intf->rx_edpkt_dma_addr + DESC_RING_SIZE)
- 		valid = intf->rx_edpkt_dma_addr;
- 
-@@ -591,8 +558,8 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 		u64_stats_update_end(&stats->syncp);
- 
- next:
--		bcmasp_intf_rx_buffer_write(intf, (DESC_ADDR(desc->buf) +
--					    desc->size));
-+		rx_edpkt_cfg_wq(intf, (DESC_ADDR(desc->buf) + desc->size),
-+				RX_EDPKT_RING_BUFFER_READ);
- 
- 		processed++;
- 		intf->rx_edpkt_dma_read =
-@@ -603,7 +570,7 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 						 DESC_RING_COUNT);
+ 	/* Drop the clock reference count now and let ndo_open()/ndo_close()
+ 	 * manage it for us from now on.
+@@ -1352,19 +1352,20 @@ static int bcmasp_probe(struct platform_device *pdev)
+ 	list_for_each_entry(intf, &priv->intfs, list) {
+ 		ret = register_netdev(intf->ndev);
+ 		if (ret) {
+-			netdev_err(intf->ndev,
+-				   "failed to register net_device: %d\n", ret);
+-			bcmasp_wol_irq_destroy(priv);
+-			bcmasp_remove_intfs(priv);
+-			goto of_put_exit;
++			dev_err(dev, "failed to register net_device: %d\n", ret);
++			goto err_cleanup;
+ 		}
+ 		count++;
  	}
  
--	bcmasp_intf_rx_desc_write(intf, intf->rx_edpkt_dma_read);
-+	rx_edpkt_dma_wq(intf, intf->rx_edpkt_dma_read, RX_EDPKT_DMA_READ);
+ 	dev_info(dev, "Initialized %d port(s)\n", count);
  
- 	if (processed < budget && napi_complete_done(&intf->rx_napi, processed))
- 		bcmasp_enable_rx_irq(intf, 1);
-@@ -1271,7 +1238,6 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
- 	}
- 
- 	SET_NETDEV_DEV(ndev, dev);
--	intf->ops = &bcmasp_intf_ops;
- 	ndev->netdev_ops = &bcmasp_netdev_ops;
- 	ndev->ethtool_ops = &bcmasp_ethtool_ops;
- 	intf->msg_enable = netif_msg_init(-1, NETIF_MSG_DRV |
-@@ -1336,10 +1302,8 @@ static void bcmasp_suspend_to_wol(struct bcmasp_intf *intf)
- 
- 	umac_enable_set(intf, UMC_CMD_RX_EN, 1);
- 
--	if (intf->parent->wol_irq > 0) {
--		wakeup_intr2_core_wl(intf->parent, 0xffffffff,
--				     ASP_WAKEUP_INTR2_MASK_CLEAR);
--	}
-+	wakeup_intr2_core_wl(intf->parent, 0xffffffff,
-+			     ASP_WAKEUP_INTR2_MASK_CLEAR);
- 
- 	if (ndev->phydev && ndev->phydev->eee_cfg.eee_enabled &&
- 	    intf->parent->eee_fixup)
-@@ -1392,10 +1356,8 @@ static void bcmasp_resume_from_wol(struct bcmasp_intf *intf)
- 	reg &= ~UMC_MPD_CTRL_MPD_EN;
- 	umac_wl(intf, reg, UMC_MPD_CTRL);
- 
--	if (intf->parent->wol_irq > 0) {
--		wakeup_intr2_core_wl(intf->parent, 0xffffffff,
--				     ASP_WAKEUP_INTR2_MASK_SET);
--	}
-+	wakeup_intr2_core_wl(intf->parent, 0xffffffff,
-+			     ASP_WAKEUP_INTR2_MASK_SET);
+-of_put_exit:
+-	of_node_put(ports_node);
++	return ret;
++
++err_cleanup:
++	bcmasp_wol_irq_destroy(priv);
++	bcmasp_remove_intfs(priv);
++
+ 	return ret;
  }
  
- int bcmasp_interface_resume(struct bcmasp_intf *intf)
 -- 
 2.34.1
 
