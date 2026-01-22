@@ -1,190 +1,239 @@
-Return-Path: <netdev+bounces-252431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252432-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIA9HthQcmnpfAAAu9opvQ
-	(envelope-from <netdev+bounces-252431-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:31:20 +0100
+	id QPe3GtpScmnpfAAAu9opvQ
+	(envelope-from <netdev+bounces-252432-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:39:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D2C069FB5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:31:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1356A218
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7B0F03000FE2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:31:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 595D430D742C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472B13DE808;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606D63DE815;
 	Thu, 22 Jan 2026 16:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dm8qy4zt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+jvMFsn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907A43DE35F
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 16:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769098461; cv=pass; b=ZSmgpynKV97EC/lE3LEsatOhCsQ3dPyTU/BNn9JWrzPemvYg4PFT1NXulHCDtQftsJXtn9L64V7E2l3sg8UZMVeYj4AXJgS0pX8nLA3oTwLm+Ln8XCHYsFDqsmTOoqLA4REicYv9KUOVy/gEyRIYE+fCtoBUQnFKpX3k/Tpolrc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769098461; c=relaxed/simple;
-	bh=DMMIT4OBOGCSABOIq/HSUVkir6AqQt0iZ7vlBLj9du4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WE4qKvNUIXM+tPJLyPEAYWlXpaQUZTscez/LOSiTTzXHJSnmBnZOwTp1Q4ombXGSPAkWVQCLGCKrBXyEinvCWlPahQmBlVJHK64a9pEJp2Pr8cRt8q/QO3325OepneDG/lHBueW+d8/kutYCgW35zrep+5XLs67cBDEmb957+mE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dm8qy4zt; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-5013d163e2fso12475211cf.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 08:14:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769098447; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Iw3BOyCzgV2zl+zcyrZjDp6P652GV/CtsRvoY4vXSeHiuzY1F/ZEgSAzYEicOZrpf8
-         fo/JzIEPPM6YFDzQx9jsQGxFcXz2k2GY+UtsEjqm5BJLLKJvj7AS4Hf8Yo1zZe790WKV
-         XzIUPiLZ2Ujvs6+v1JDNJACuJtMHnyjbRyZMHZlTFb1xRCOA1lWCh4JovFRfQGa8dPLM
-         2+voB6pmW1DAsHs65Xwyiazf/Z7YnaNTO/UJEVvHiBBmb6n6CuhQM/Zmrt6VgF/ZRsC6
-         sMXBujkj5g3031yen6EfVyq+FInOOZTVJxzXAe9Y/E9FAz64sYREUQvDSxPl02y6QJoQ
-         t8Uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=K6muVKn0SpU0orx+YFCCOdy33OaYBtEbvdotyL/4ShE=;
-        fh=/C3D6bwA/9nbO+b+fbeNCxuXO+8+Mw+etWT7MXbhw8A=;
-        b=cmwd2ZuMd+y0ulEuBf3Z4r5+JpulbfbZ4mJC7zPwg4XGvV8CmCz9qb+eOHJBYJEzOB
-         ngA4wmvBuz8u4rB68pXlcUvKONhpVsV9I0cwjARFZQLsGI56/v8nd0uMhq7hvC3yUnyx
-         vO6ex9mUPo5TZ0T7c8zs51l9fHUW7SoSQEPiHkjPKOi3wnJ/Zo1CKMu/Wza7/Nz88Byv
-         up+K/5PBTj2ke3NXHd9bXac+v/pMVaU3Ay9o7jmL/8MUSJwa+ZR/aKppHyOU1RvvdgVt
-         l3xBJfETL6Y+7x0jWeU6K8K+tuUaJ4TutoLouLsw1CW7jh5wpwrJkCl8F0mu+t2BK/RH
-         uR/A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769098447; x=1769703247; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K6muVKn0SpU0orx+YFCCOdy33OaYBtEbvdotyL/4ShE=;
-        b=Dm8qy4ztv0HPu1sQquTUM0VNAHM4en6p2JJEOcwPPSbFoLrt4vgKx5DgvAbKu4F3zW
-         GeFMIigvLqfR2P/Av0/oyrPwsHvsGoWEjeQFkfRg6Xwg5IQO7RqCKGjU6sjD3GJz5pin
-         lC4b8R9YOFMLxIRYQjTsShoYxz5wdZwTj/NwEiM+kMFpF17qDDKQ/S6e9AW25UxO3vwQ
-         KowBBK0uemrZsGRNvQCPHmvPX6YT+Axn2bONIFm5BiULvRmzHiOXm6gD/S2v0ybGL4oK
-         mgtQUb6FoH8uvyDqZzuIcvdz9ZqLX+PR08WUZBqtOFCbwhbYJMwiu2tZIOKagUY/BpEz
-         rrTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769098447; x=1769703247;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=K6muVKn0SpU0orx+YFCCOdy33OaYBtEbvdotyL/4ShE=;
-        b=PvKSeqBcbVbjT8uAFJkdh6gJCjs26kcuhXG+B0farFJgmumV+4LgQXJuyi2mx4twiV
-         f4VcLPT6oybkG1dW2Dxfomnb0/ghHw4HumwpwEA/jjqJioNlFjdBPhxarEfK0OUrOqtS
-         zdr15bBaudEmn4wNt97hzdDIAgP1MjmT0WKMqtbLZXHVjEV92+AaxoKsdqSHtrQ626DC
-         icHXg3aKH6DD87lp1iyLpp2FTdhBG97RL7knL06s+M5jiUSqrGHM+BnOZgsYkawp6KBp
-         Uyb6iJjTOpi7k/0Me4i8s8sQtW3yy+2jFHKTt0gcwxXnTlBEXJUaMYRxIGEQ/uYRIda6
-         TsNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUpdTiTXbRUrf8aDKYJgyfpTxx52caUMgIvv/RJhXbfomEjD4ooEL4ZyjOGxIr00xy3GJiT/Cw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRRc9wLDNyZNh3Va5EUvtoDC7pGWFJOTbJi07XW3j8XUMNuUF7
-	2V58UsrZRu+V9SMI0xQ+4pqcoboT8Fh0QWGmWgqixTJkdUUDYymNqFNwEcuvBO4CqOsTf7Bm4f6
-	RPyHlW0vUH5nNL65+WN2wrG0NZiS5sPzV/0NVNOLd
-X-Gm-Gg: AZuq6aIp+TyCAAhj933p960bp5Uyag5HjR0Q6i2vsgrfs7GcXMbexi3k7B2rjESFqpC
-	TlkhC/dqhM4aEkxX+YpUzXPEfdKIhaqCi88RW6MHgHhJXQZhtEypHvqTUGuoQTMz5mOvG+aR24+
-	8GnkRHBsYzmH22LchJyyDHkOIM6QZjV0DO0uQK6FwTErti68r4G/RxfgHS3Wiy8+3QFMEUiZHKz
-	7xQ+wyG++lKa1eHqm1huG3YINkARtq5AAUfQ68ZVSL/rTrBKAMyPmvcQVEdLrBRHhn0WUnT
-X-Received: by 2002:ac8:7f49:0:b0:502:9a98:34cd with SMTP id
- d75a77b69052e-502f7764b86mr979651cf.22.1769098446887; Thu, 22 Jan 2026
- 08:14:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42B03DE340;
+	Thu, 22 Jan 2026 16:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769098463; cv=none; b=mB5D3nwgyHHL9U4miCi05ONpoiV6eiZyaed5xJAtHqcHsMSNTFaxVEPcyK7wj82CZn3UIzZD746A5XFOZbvyEDL6MpbCFJBODQV60+HpSxazuwhr5/QI3cTVLhNzWgpOBHcAa3SKKnXf7TvtK/HKzLzR/Iy/IQ8pbqXNcGsJbeg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769098463; c=relaxed/simple;
+	bh=A5voT2wLi+tc3Gakd2qWcqijnaOQacYQLsQbIZzWGuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=hEIWQXLdjb+vFM7PenVjPy1f98q0/qXIxH1lt4poq7GOb6m26Yn2t1MxFU4E5iuumF9CRyyLSf2B5t3KUUMunx3y3eHDRVhP/xUvnjyQ9IvweUm4fcl9Qgq8/PorbXRnoTyxsRCHNqWTp6RzOIq8XiVPB6wOe7gFk4/z9E/P9Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+jvMFsn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7278DC116C6;
+	Thu, 22 Jan 2026 16:14:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769098460;
+	bh=A5voT2wLi+tc3Gakd2qWcqijnaOQacYQLsQbIZzWGuI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=X+jvMFsnwbGFZzHk62uEp/xLYGy0TYh1BIiuZyuFCQ4UZ9wozDqF1y/yWLjDQKGsL
+	 yEnv1WPUWCjDLjL8UokP67Qh7t0Dwu0gx0fQqEVC7OA/HoPzeG089LVSShsv/cRJoy
+	 8SeSVI0sRtha8f79da2Vhu6ZmhHHjFaQ7jpDBY3PBFxm4iROWN5UY8RiYnBZCQG09j
+	 /0PFfUXflZlk6cv6CFsBKaFBN5q7svB1GokuAdYu/1v5upDzifmEVtnp7qWbstMBah
+	 a7EsJ4SDWzUCc4gUvWoG3Uvcbej3aRo8l+/FAuo8FDR6yV76kFXawp+1BOd8Y6jOVt
+	 PuCYYsJIAfXVw==
+Date: Thu, 22 Jan 2026 10:14:19 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <20260122161419.GA1250200@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122091527.339180-1-schalla@marvell.com> <20260122075206.504ec591@kernel.org>
-In-Reply-To: <20260122075206.504ec591@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Jan 2026 17:13:55 +0100
-X-Gm-Features: AZwV_Qhok7oKZjawaEjN94P0-ccBoOOH9sRA_7UQ4L2cNNkzKf_7jQWnXt6qA6Y
-Message-ID: <CANn89iL5s+egLhothNtnQf0jtAeftezUjNmbuXtUWgfVV3+bzg@mail.gmail.com>
-Subject: Re: [PATCH net-next] virtio_net: Increase RSS max key size to match NETDEV_RSS_KEY_LEN
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Srujana Challa <schalla@marvell.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, pabeni@redhat.com, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, ndabilpuram@marvell.com, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260101221359.22298-2-frederic@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252431-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252432-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[38];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[marvell.com,google.com,vger.kernel.org,lists.linux.dev,redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 1D2C069FB5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CC1356A218
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 4:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 22 Jan 2026 14:45:27 +0530 Srujana Challa wrote:
-> > Increase VIRTIO_NET_RSS_MAX_KEY_SIZE from 40 to 52 bytes to align with
-> > the kernel's standard RSS key length defined by NETDEV_RSS_KEY_LEN.
->
-> I've been meaning to bump NETDEV_RSS_KEY_LEN to 128 or some such.
-> Most modern drivers can't use netdev_rss_key_fill() either because
-> core generates a tiny key. And the devices support hashing over two
-> layers of IPv6 for tunnels.
+On Thu, Jan 01, 2026 at 11:13:26PM +0100, Frederic Weisbecker wrote:
+> HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
+> therefore be made modifiable at runtime. Synchronize against the cpumask
+> update using RCU.
+> 
+> The RCU locked section includes both the housekeeping CPU target
+> election for the PCI probe work and the work enqueue.
+> 
+> This way the housekeeping update side will simply need to flush the
+> pending related works after updating the housekeeping mask in order to
+> make sure that no PCI work ever executes on an isolated CPU. This part
+> will be handled in a subsequent patch.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 
-Seems fine to me. Back in 2014, RSS was limited to 52 bytes on all known NI=
-C.
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
->
-> Willem, WDYT? Is there a reason to keep the core key small?
-> Or deprecate netdev_rss_key_fill()?
-
-What do you mean by deprecating it ?
-
-One of the ideas was to make sure multiple NIC would share the same key,
-for some bonding setups.
-
-commit 960fb622f85180f36d3aff82af53e2be3db2f888    net: provide a per
-host RSS key generic infrastructure
-
-
-
->
-> > The virtio specification requires devices to support at least 40 bytes
-> > for the RSS key size. However, devices may support larger key sizes
-> > up to 52 bytes (as reported by the device's rss_max_key_size config
-> > field). This change allows such devices to work properly.
-> > Previously, devices reporting rss_max_key_size > 40 would fail with
-> > an error during initialization.
-> >
-> > The driver already handles variable key sizes dynamically through
-> > vi->rss_key_size, so increasing the maximum limit is safe and
-> > maintains backward compatibility with devices that support smaller
-> > key sizes.
->
-> > -#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
-> > +#define VIRTIO_NET_RSS_MAX_KEY_SIZE     52
+> ---
+>  drivers/pci/pci-driver.c | 47 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 38 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+> index 7c2d9d596258..a6111140755c 100644
+> --- a/drivers/pci/pci-driver.c
+> +++ b/drivers/pci/pci-driver.c
+> @@ -302,9 +302,8 @@ struct drv_dev_and_id {
+>  	const struct pci_device_id *id;
+>  };
+>  
+> -static long local_pci_probe(void *_ddi)
+> +static int local_pci_probe(struct drv_dev_and_id *ddi)
+>  {
+> -	struct drv_dev_and_id *ddi = _ddi;
+>  	struct pci_dev *pci_dev = ddi->dev;
+>  	struct pci_driver *pci_drv = ddi->drv;
+>  	struct device *dev = &pci_dev->dev;
+> @@ -338,6 +337,19 @@ static long local_pci_probe(void *_ddi)
+>  	return 0;
+>  }
+>  
+> +struct pci_probe_arg {
+> +	struct drv_dev_and_id *ddi;
+> +	struct work_struct work;
+> +	int ret;
+> +};
+> +
+> +static void local_pci_probe_callback(struct work_struct *work)
+> +{
+> +	struct pci_probe_arg *arg = container_of(work, struct pci_probe_arg, work);
+> +
+> +	arg->ret = local_pci_probe(arg->ddi);
+> +}
+> +
+>  static bool pci_physfn_is_probed(struct pci_dev *dev)
+>  {
+>  #ifdef CONFIG_PCI_IOV
+> @@ -362,34 +374,51 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
+>  	dev->is_probed = 1;
+>  
+>  	cpu_hotplug_disable();
+> -
+>  	/*
+>  	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
+>  	 * device is probed from work_on_cpu() of the Physical device.
+>  	 */
+>  	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
+>  	    pci_physfn_is_probed(dev)) {
+> -		cpu = nr_cpu_ids;
+> +		error = local_pci_probe(&ddi);
+>  	} else {
+>  		cpumask_var_t wq_domain_mask;
+> +		struct pci_probe_arg arg = { .ddi = &ddi };
+>  
+>  		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
+>  			error = -ENOMEM;
+>  			goto out;
+>  		}
+> +
+> +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
+> +
+> +		/*
+> +		 * The target election and the enqueue of the work must be within
+> +		 * the same RCU read side section so that when the workqueue pool
+> +		 * is flushed after a housekeeping cpumask update, further readers
+> +		 * are guaranteed to queue the probing work to the appropriate
+> +		 * targets.
+> +		 */
+> +		rcu_read_lock();
+>  		cpumask_and(wq_domain_mask,
+>  			    housekeeping_cpumask(HK_TYPE_WQ),
+>  			    housekeeping_cpumask(HK_TYPE_DOMAIN));
+>  
+>  		cpu = cpumask_any_and(cpumask_of_node(node),
+>  				      wq_domain_mask);
+> +		if (cpu < nr_cpu_ids) {
+> +			schedule_work_on(cpu, &arg.work);
+> +			rcu_read_unlock();
+> +			flush_work(&arg.work);
+> +			error = arg.ret;
+> +		} else {
+> +			rcu_read_unlock();
+> +			error = local_pci_probe(&ddi);
+> +		}
+> +
+>  		free_cpumask_var(wq_domain_mask);
+> +		destroy_work_on_stack(&arg.work);
+>  	}
+> -
+> -	if (cpu < nr_cpu_ids)
+> -		error = work_on_cpu(cpu, local_pci_probe, &ddi);
+> -	else
+> -		error = local_pci_probe(&ddi);
+>  out:
+>  	dev->is_probed = 0;
+>  	cpu_hotplug_enable();
+> -- 
+> 2.51.1
+> 
 
