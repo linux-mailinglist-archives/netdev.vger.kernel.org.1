@@ -1,261 +1,206 @@
-Return-Path: <netdev+bounces-252226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252228-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +GksKw7PcWnSMQAAu9opvQ
-	(envelope-from <netdev+bounces-252226-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:17:34 +0100
+	id YPvtGp3QcWnSMQAAu9opvQ
+	(envelope-from <netdev+bounces-252228-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:24:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E8C162702
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:17:34 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 104CE627C0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DC994F15F1
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:17:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4904A562866
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744E73D3305;
-	Thu, 22 Jan 2026 07:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6479E47A0A8;
+	Thu, 22 Jan 2026 07:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="hxb06dPG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QGKfybKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F8E34E751;
-	Thu, 22 Jan 2026 07:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95F921D59B
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 07:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769066244; cv=none; b=HWm5n5gmUjJTwKBZFadRGJRD7+gmieIyYy7hSj5/GLJoU35+GTAPCpO6sH4kCVa8oDFxMQybvAVTLpcStLXPl7N+yMhIE1WjbEn00FbXfVNsmT2CFttB+Mp0KNEKvpZRnFiqdYFLPj5dd+Cw6uBMyY5mgdouVE4qkJjXXB93Hz0=
+	t=1769066453; cv=none; b=RolXrrvOCf93KAmnQogJxPOigLb+35P968pJ5z7GGtP3QVSJv7zYmw2SByin2RZl3BZIfmB/mG+JzNdPqyLhm3i/kCCCmk9spY3zm8zvpke5h9tT0t+V2nq8cxKFxlHIqAyxzFiKAlJd9x1C31Mb3S3Jv3PlhT1W7zcG2f6cqvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769066244; c=relaxed/simple;
-	bh=2JijctQdLSpwzEBC1kAMUglg01WkfAjBYRgkoaUBqR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QNw78LwSv541fC1UT8OTG8oNgdTc97fshmZDymyjE9vpum0XLrjzqIfJxatRhjHlz6Sn23RTWOJehMS+8WN6xlIiffe06Re04xqQ5gqWQGREu+Ifm6GMzulzTnF0OY6lS886c0CNKAxFD9367KER9w+Yt65oBMHOjGI/zYYztSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=hxb06dPG; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=hxb06dPG;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60M7GRSr1239615
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 22 Jan 2026 07:16:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1769066187; bh=cWCHKxvB6XAcmgK3RJnE2JmaAN9H/6z5es3Fe4VVdTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:References:From;
-	b=hxb06dPGfaOjIdMPn3yOIovrl58hgxiw7tArXVF4EEywQ14tu72kvQ5Okvd0auryG
-	 zXr8Er9cnJrbg2u8u+Kh2R5yl1wPYpzSt1EIDe9KNDFY4pMCHLz88kgBHasi8bsxwt
-	 rC3jMsuLdmjqgsB2/bMlp2HNY5hB32T7W9V+vlZo=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60M7GRxW3217390
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 22 Jan 2026 08:16:27 +0100
-Received: (nullmailer pid 1057141 invoked by uid 1000);
-	Thu, 22 Jan 2026 07:16:27 -0000
-From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-To: netdev@vger.kernel.org
-Cc: "Lucien.Jheng" <lucienzx159@gmail.com>,
-        Daniel Golle <daniel@makrotopia.org>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-Subject: [PATCH net-next 3/3] net: phy: air_en8811h: Add clk provider for an8811hb
-Date: Thu, 22 Jan 2026 08:16:00 +0100
-Message-ID: <20260122071601.1057083-4-bjorn@mork.no>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260122071601.1057083-1-bjorn@mork.no>
-References: <20260122071601.1057083-1-bjorn@mork.no>
+	s=arc-20240116; t=1769066453; c=relaxed/simple;
+	bh=2Hl3exPjVeP4c232MZoQ+6EGCzhzQcq0Xxs4TDi0GGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fRHxYekjvwzg4nXRXpYwUI/mhn85AEKxBXqGeo5rqQ4AZVLv3y87V/Ju0ziZomzEl4WVdfFPVJx/zS3LwWf0zIT8PKzZ7sDyEzQ9K0HJc50p29vFiUVjSwrdQ/OlI1lWoOChgnhTetMLUaPnf7sSQSJ1PIrGsAk1MNOh4N+wX4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QGKfybKF; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769066450; x=1800602450;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2Hl3exPjVeP4c232MZoQ+6EGCzhzQcq0Xxs4TDi0GGg=;
+  b=QGKfybKFZDtYfgSxQERmT7fzTx14l6pKpjvao2oN2p8tzQ/MJHWqmdLc
+   668jSWS0GVDn66JW3jXPsa48k/nq3UcL/55C6yrZ2dMdxUdyWNFG18fKX
+   SCR4eQu7/cVRFZ4ZsnwvfaJz1IMAjR2yoOP+YjfuZr/h1KtToWa0CvuBZ
+   wCOCzgcUtu2SqRQkaSMeMCEyUKKPtsBkrilkfh1zsgpzu4bAOL11qbE7V
+   ul5hfwT08rAk4PQDcL6eB1GpQi4FYuPTQDMFx6AZtZTqTWw8CUkvYGkMn
+   sk/qKbKsFFLSnumhgr3C3UDwMSBkRmYXiiikSW8wJQe/c0qr2vcUGKBV3
+   g==;
+X-CSE-ConnectionGUID: 6WezpDPXQBuRb3ZHAD3W4w==
+X-CSE-MsgGUID: rPkhNvGPSl6KfbdxWFxR0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="69318732"
+X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
+   d="scan'208";a="69318732"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 23:20:38 -0800
+X-CSE-ConnectionGUID: /RkWqjGvSc6OJFZWoZDZKw==
+X-CSE-MsgGUID: MSBdt+YLQA+qFl1CNGxBcg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
+   d="scan'208";a="205910422"
+Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
+  by orviesa010.jf.intel.com with ESMTP; 21 Jan 2026 23:20:34 -0800
+Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1viozW-000000000S1-3U2W;
+	Thu, 22 Jan 2026 07:20:30 +0000
+Date: Thu, 22 Jan 2026 08:19:40 +0100
+From: kernel test robot <lkp@intel.com>
+To: Rishikesh Jethwani <rjethwani@purestorage.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
+	kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, leon@kernel.org,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: Re: [PATCH v4 2/3] tls: add hardware offload key update support
+Message-ID: <202601220850.8AbmdIiS-lkp@intel.com>
+References: <20260121215727.3994324-3-rjethwani@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121215727.3994324-3-rjethwani@purestorage.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252226-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[mork.no,reject];
-	DKIM_TRACE(0.00)[mork.no:+];
+	TAGGED_FROM(0.00)[bounces-252228-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,mork.no:email,mork.no:dkim,mork.no:mid,init.name:url]
-X-Rspamd-Queue-Id: 0E8C162702
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 104CE627C0
 X-Rspamd-Action: no action
 
-Implement clk provider driver so we can disable the clock output when it
-isn't needed. This helps to reduce EMF noise
+Hi Rishikesh,
 
-Signed-off-by: Bjørn Mork <bjorn@mork.no>
----
- drivers/net/phy/air_en8811h.c | 107 ++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index bd7bdfb4230a..286733bc8aa5 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -956,6 +956,105 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	return 0;
- };
- 
-+static unsigned long an8811hb_clk_recalc_rate(struct clk_hw *hw,
-+					      unsigned long parent)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, AN8811HB_HWTRAP2, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & AN8811HB_HWTRAP2_CKO) ? 50000000 : 25000000;
-+}
-+
-+static int an8811hb_clk_enable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	return air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
-+				       AN8811HB_CLK_DRV_CKO_MASK,
-+				       AN8811HB_CLK_DRV_CKO_MASK);
-+}
-+
-+static void an8811hb_clk_disable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
-+				AN8811HB_CLK_DRV_CKO_MASK, 0);
-+}
-+
-+static int an8811hb_clk_is_enabled(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, AN8811HB_CLK_DRV, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & AN8811HB_CLK_DRV_CKO_MASK);
-+}
-+
-+static int an8811hb_clk_save_context(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+
-+	priv->cko_is_enabled = an8811hb_clk_is_enabled(hw);
-+
-+	return 0;
-+}
-+
-+static void an8811hb_clk_restore_context(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+
-+	if (!priv->cko_is_enabled)
-+		an8811hb_clk_disable(hw);
-+}
-+
-+static const struct clk_ops an8811hb_clk_ops = {
-+	.recalc_rate		= an8811hb_clk_recalc_rate,
-+	.enable			= an8811hb_clk_enable,
-+	.disable		= an8811hb_clk_disable,
-+	.is_enabled		= an8811hb_clk_is_enabled,
-+	.save_context		= an8811hb_clk_save_context,
-+	.restore_context	= an8811hb_clk_restore_context,
-+};
-+
-+static int an8811hb_clk_provider_setup(struct device *dev, struct clk_hw *hw)
-+{
-+	struct clk_init_data init;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_COMMON_CLK))
-+		return 0;
-+
-+	init.name = devm_kasprintf(dev, GFP_KERNEL, "%s-cko",
-+				   fwnode_get_name(dev_fwnode(dev)));
-+	if (!init.name)
-+		return -ENOMEM;
-+
-+	init.ops = &an8811hb_clk_ops;
-+	init.flags = 0;
-+	init.num_parents = 0;
-+	hw->init = &init;
-+
-+	ret = devm_clk_hw_register(dev, hw);
-+	if (ret)
-+		return ret;
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
-+}
-+
- static unsigned long en8811h_clk_recalc_rate(struct clk_hw *hw,
- 					     unsigned long parent)
- {
-@@ -1097,6 +1196,12 @@ static int an8811hb_probe(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
-+	priv->phydev = phydev;
-+	/* Co-Clock Output */
-+	ret = an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-+	if (ret)
-+		return ret;
-+
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
- 				      AN8811HB_GPIO_OUTPUT_345,
-@@ -1522,6 +1627,8 @@ static struct phy_driver en8811h_driver[] = {
- 	.get_rate_matching	= en8811h_get_rate_matching,
- 	.config_aneg		= en8811h_config_aneg,
- 	.read_status		= an8811hb_read_status,
-+	.resume			= en8811h_resume,
-+	.suspend		= en8811h_suspend,
- 	.config_intr		= en8811h_clear_intr,
- 	.handle_interrupt	= en8811h_handle_interrupt,
- 	.led_hw_is_supported	= en8811h_led_hw_is_supported,
+[auto build test ERROR on linus/master]
+[also build test ERROR on v6.19-rc6 next-20260121]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Rishikesh-Jethwani/tls-add-TLS-1-3-hardware-offload-support/20260122-060724
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20260121215727.3994324-3-rjethwani%40purestorage.com
+patch subject: [PATCH v4 2/3] tls: add hardware offload key update support
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260122/202601220850.8AbmdIiS-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260122/202601220850.8AbmdIiS-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601220850.8AbmdIiS-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from ./arch/x86/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:380,
+                    from arch/x86/include/asm/atomic.h:5,
+                    from include/linux/atomic.h:7,
+                    from include/crypto/aead.h:11,
+                    from net/tls/tls_device.c:32:
+   net/tls/tls_device.c: In function 'tls_set_device_offload':
+>> include/asm-generic/rwonce.h:55:37: error: lvalue required as left operand of assignment
+      55 |         *(volatile typeof(x) *)&(x) = (val);                            \
+         |                                     ^
+   include/asm-generic/rwonce.h:61:9: note: in expansion of macro '__WRITE_ONCE'
+      61 |         __WRITE_ONCE(x, val);                                           \
+         |         ^~~~~~~~~~~~
+   arch/x86/include/asm/barrier.h:63:9: note: in expansion of macro 'WRITE_ONCE'
+      63 |         WRITE_ONCE(*p, v);                                              \
+         |         ^~~~~~~~~~
+   include/asm-generic/barrier.h:172:55: note: in expansion of macro '__smp_store_release'
+     172 | #define smp_store_release(p, v) do { kcsan_release(); __smp_store_release(p, v); } while (0)
+         |                                                       ^~~~~~~~~~~~~~~~~~~
+   net/tls/tls_device.c:1249:25: note: in expansion of macro 'smp_store_release'
+    1249 |                         smp_store_release(sk->sk_validate_xmit_skb,
+         |                         ^~~~~~~~~~~~~~~~~
+--
+   In file included from arch/x86/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:380,
+                    from arch/x86/include/asm/atomic.h:5,
+                    from include/linux/atomic.h:7,
+                    from include/crypto/aead.h:11,
+                    from tls_device.c:32:
+   tls_device.c: In function 'tls_set_device_offload':
+>> include/asm-generic/rwonce.h:55:37: error: lvalue required as left operand of assignment
+      55 |         *(volatile typeof(x) *)&(x) = (val);                            \
+         |                                     ^
+   include/asm-generic/rwonce.h:61:9: note: in expansion of macro '__WRITE_ONCE'
+      61 |         __WRITE_ONCE(x, val);                                           \
+         |         ^~~~~~~~~~~~
+   arch/x86/include/asm/barrier.h:63:9: note: in expansion of macro 'WRITE_ONCE'
+      63 |         WRITE_ONCE(*p, v);                                              \
+         |         ^~~~~~~~~~
+   include/asm-generic/barrier.h:172:55: note: in expansion of macro '__smp_store_release'
+     172 | #define smp_store_release(p, v) do { kcsan_release(); __smp_store_release(p, v); } while (0)
+         |                                                       ^~~~~~~~~~~~~~~~~~~
+   tls_device.c:1249:25: note: in expansion of macro 'smp_store_release'
+    1249 |                         smp_store_release(sk->sk_validate_xmit_skb,
+         |                         ^~~~~~~~~~~~~~~~~
+
+
+vim +55 include/asm-generic/rwonce.h
+
+e506ea451254ab Will Deacon 2019-10-15  52  
+e506ea451254ab Will Deacon 2019-10-15  53  #define __WRITE_ONCE(x, val)						\
+e506ea451254ab Will Deacon 2019-10-15  54  do {									\
+e506ea451254ab Will Deacon 2019-10-15 @55  	*(volatile typeof(x) *)&(x) = (val);				\
+e506ea451254ab Will Deacon 2019-10-15  56  } while (0)
+e506ea451254ab Will Deacon 2019-10-15  57  
+
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
