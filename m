@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-252284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GYQOKcGcmlgagAAu9opvQ
-	(envelope-from <netdev+bounces-252284-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:14:47 +0100
+	id APe0K4gGcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:14:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6C065CFE
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:14:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90AFD65CD9
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 30A608C223D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:01:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F47868B53A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6EC43D51F;
-	Thu, 22 Jan 2026 10:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B5744105A;
+	Thu, 22 Jan 2026 10:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ID9NlobN"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="RXjFUClQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013031.outbound.protection.outlook.com [52.101.83.31])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011051.outbound.protection.outlook.com [52.101.70.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF46543C059;
-	Thu, 22 Jan 2026 10:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0464A43CEF4;
+	Thu, 22 Jan 2026 10:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769079460; cv=fail; b=m/aRUgdNI938QEDSyH3A85wcGdKdq69yEBbY0erlWazKvr1mHx376+BVCuHf3ZX1GB5CoM61NvY23d0rM9oSPH/SBcUiVo86S3DbI8lmrwOwJ3HVDawhx41cte0/iNlBiYuHKOaJwmh2ibLlG5LdYW9EHToGF3cSMGi8RWXKUSg=
+	t=1769079462; cv=fail; b=hUrZ1qgIF3+EqNVKOT1esQ7XtwUcNv0owdtORDRyJtcO4WGiR7IS/HkVNk5VyOrd8guLLGgrC9Wcnr970DRTpkGqQhPILyxCIAYNmDcsNqaraeA0tyum+ELvBAxNrzFRVmy6lCA0dIl+T+G29DhAYFmqm/z7C1LFPK4OKgcbEXA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769079460; c=relaxed/simple;
-	bh=PF3MxbY2BII5HS3KV7ybjKb8Xs7fWwFU8YjQIPE/93w=;
+	s=arc-20240116; t=1769079462; c=relaxed/simple;
+	bh=sVfqghP17ZiKYE9PpPjx61rzUBSSbS9E9h5FGLS8gbo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nw56APdRaXxYVG3FE9d9EJtMprCR45fuyd1hxLAoKXxfuMjMiscwz9IYgFMdYE3dsc4Kfe/encgr7aqQjlefZp2xfYC7kqS/ilHIeBDEgzwpVVuH2sCsUdxP2U1QuegoZZsATj4/aJ9VAB5fjaNKQJOxbxNsAXSBMCft3aW7ZrA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ID9NlobN; arc=fail smtp.client-ip=52.101.83.31
+	 Content-Type:MIME-Version; b=Qjlb9hKDusLM+jD0bqq6dfnVlzRloeX7/gpJIR1T+BIex4JIoLMGHMUMBrRpYsn0nYExtqpZuKs7v+KSgQhH8moxJ8sFTiGsW5tREst0wV3Zcq9zZgh3w9KLnd1bDwBMZtvHGx+4H60g1fttvx0nd5MuUVz7fXPILboJYH4xUAI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=RXjFUClQ; arc=fail smtp.client-ip=52.101.70.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WIUoWhAzmaF/vA5Q9iqBVKJF4UYDnqE1+2teNnJrwDyWxJcoCzMd2a7CRcLVrjS8QkJS1j0a+56YnnbUCU6QMQXuCo8NHUCCxBM6clsi9gGssBQhsW4WN9lsX5iit2Y8BEGpNiigJ1aNdKgMsY/E1c2jKZzIWj08GSYl2Gvp9eVORG90BJfMX2kSGFiiKc3q3byOvqbGk4RtdwtnG98ha2oWsmkfmJ3W8268o4YMlmW9LxyHAMZVhRPhk4kKtwHmSd1r+C8ZPJB5oTAfLGzfVSF64zwd4sN5n3xXUy9gls1tzlyYB+PunJigG96ZKfWzE7hE+pGruAzW4LYvP2HG6g==
+ b=HAMJcScOvMT/qP/nQxeTgbRPteqxEL2NLxZKi4UBXnFGiS+miQBEn63RWPbqBEmSIVOyQhPeZ0iDftun8QuT0VC/u7WVMWi5Qak4kkWjbLLV/TwSAd44LzrGp7YUciJZN4HiNuacK1+ruFOEqju6Mfeedpa3jJrebuUUV9xYh3qQeqo856CJX4uC+QDq65yaWD0LOsjBnjAXPRYA3ZmniBDYVYrgbykGgUWKpSlXVX0h4LoN1iwLv4Xd3SJ8/o4iHYlGFxccCgCn5eXf+ttWAB7nezK8OrKpQfzwLC+do2kSBR4md07mykELNoizx0UrV/oJ0v3nLEfx6FkvIE34xw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6t4kI/6aRFvkhEnJNKIeFR+2yioDgPwzLEqshDLxR64=;
- b=vNaMEqcWfidSL/6BRfguFRoYKj5sorHByT41KgkGKcVaMz81Q8aL6efa+bTRXF9mDcHhrBpjU4HakFGN+PwXDlgojkP8Zm0Jl79YyM2iGmrA6ejAJjidI4mkNGR3RWESNfNRcc3J61GXg+w2549x9t+XMx1eG3jJUnket9BkQQZ5fPDtpXGSmecEOazgfYTNEGWj9nGp63Jq6GBqq0nAiQJAGln2xPwrtvtEouAmqY+IO6ITLZt6CSFA9ROw/0YQHwPTXQpx4xxgw8WYb32WrM82zxHZFCISbIh4MzeHPh8brxtdYVjCdx2TfGWJ01XpMRSNU2Z0zqlOdctDnpw0BA==
+ bh=cd4P7ZxYctpDdmM1dcVt7pvHcn5i5ElKe60umCQfiAc=;
+ b=CZg+iIByA2rQTptbf5ER2/Nt5p0S3jk/qp/fpG4er/aEiyWUwl3CdN62fp+lmimHKMTcjbpjjibY+IFTwkEExn6MaexilAbOdUqg1hSDVIvWZ5XCbP9KWvSfFY68JXburTQSUXY72iSPTMfAeYLSZLIPwiGnP9oBvjlbJu5nxGH5Bl3Te8HLumjItnMEDOePkBWGcVFVCDbVLskaCty1WG3xaxfxfB4gijjCv5/uKPRzl/q22SVRozic5Y/ZANtZLj5/x7rBX/z/TK5JHi3dK6+sh84dCwmarnG4fzLMr5/hYLRlO4uxiAVPby7Bqbkmju3LTrOxpcE3BPk1gM/kLQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6t4kI/6aRFvkhEnJNKIeFR+2yioDgPwzLEqshDLxR64=;
- b=ID9NlobNjG5AzWJdcrul9vtox8a4sZty28AQazqJ4AAq5+wWu/mmNNOh/2MlgdjxVr0h847lqQmOrv38RPOPhqtnoeRe/t7PR7cU1nX8wJruCkWV62OP/MWiYNnBME6fQjugaGwiGSUNIlJKTYtBFDV6nC+Tnn34l8rfZIkNhza7F0oRDqFuqV7UKxbgYeFjgvp+FSRhAe7TYsEwwNXrn5eEUjJtX8MuT+VpSyJiLH9dzzTYp8ydWRdzEOTo5pLwQrrtHGERA7bEn9/AlLY8cHEh7ScFrMVIIF8EgRnfsyXhg2HBOBZXgctqtcXILG13D7iwEMpLvFyHtTOHCVML7w==
+ bh=cd4P7ZxYctpDdmM1dcVt7pvHcn5i5ElKe60umCQfiAc=;
+ b=RXjFUClQBhvb43v0YYklMuGp+AniY+CafWo03VqZfsRiIaePo5RUaz4Qb3/pqtZNHEkv3jwOy13AluS4QrG0TirFmuG82tWKkJ1CaGIOu3GSyofZsZKRMJ8LlDSsMDDJ1lbZDqsTA9Gyaoh/I/LXO8svWmB3JotE7erjS8Ie6IjXQRK6pNdJq/9rwJYwFjPxf8rFbeL6+kyKfZweIww+1EZ7re07y6bWetc4EAVGDtSUTbDFbW6cwlTZ6wtYd2dsoBY1yQAEqJPnpqA2pASBIo4C1p7KGmcTc3KKo6THPwGxX/ekzlDeCFr4f65aTfWg/eBUZd2V6pQbZ1m49vNMNQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
  by AM0PR04MB11853.eurprd04.prod.outlook.com (2603:10a6:20b:6f9::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Thu, 22 Jan
- 2026 10:57:27 +0000
+ 2026 10:57:28 +0000
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Thu, 22 Jan 2026
- 10:57:26 +0000
+ 10:57:28 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -83,14 +83,14 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	devicetree@vger.kernel.org,
 	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH v2 net-next 11/15] net: dsa: sja1105: fill device tree with ethernet-pcs sub-devices under "regs" node
-Date: Thu, 22 Jan 2026 12:56:50 +0200
-Message-Id: <20260122105654.105600-12-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 12/15] net: dsa: sja1105: replace mdiobus-pcs with xpcs-plat driver
+Date: Thu, 22 Jan 2026 12:56:51 +0200
+Message-Id: <20260122105654.105600-13-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260122105654.105600-1-vladimir.oltean@nxp.com>
 References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: AS4P192CA0029.EURP192.PROD.OUTLOOK.COM
  (2603:10a6:20b:5e1::14) To AM9PR04MB8585.eurprd04.prod.outlook.com
  (2603:10a6:20b:438::13)
@@ -102,171 +102,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AM0PR04MB11853:EE_
-X-MS-Office365-Filtering-Correlation-Id: 515782fc-4447-41d0-d2b3-08de59a5072f
+X-MS-Office365-Filtering-Correlation-Id: 94505272-e544-424c-78b2-08de59a50822
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|19092799006|1800799024|52116014|376014|7416014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V0xZaGxjQXVmNjFSd0l3UlJxSWdQTXR6cDdkcGpoWUZaZTl2VktvcmV4ZWt3?=
- =?utf-8?B?NXNncWQyRzlUZTR1NHZkRG9NbEI3VTMyNkxIQmlpV2w0aGtXWEpzWWh1UDRD?=
- =?utf-8?B?b2tabnYwaXo5dGZSanEvTnhtKzFjSXhjOXp6T1hYeUZ0NWJMSzdaZTZrQ3RI?=
- =?utf-8?B?NHYrZ0l4NUdTTnNxWVMrWEVKeDlVYXFwU2ZoS0JTZHNvRFFuNVJUK2JRajJS?=
- =?utf-8?B?RExyOWcrK1p1NVVaZnNLc0dlY2pQL1JZWDcwY1ZTQ2lUOHcxQjdBaC82bm01?=
- =?utf-8?B?OVBDbWtndGNaRFdvZnFMd1VzMDl0a042RHpjRnlpdTNMU25ia09zUjVMam14?=
- =?utf-8?B?bkNoUW9IazlxaGZqMnVkc1hYemhrSG8zd053K1VVdTc1ZFZLMjR4NkIvRWhP?=
- =?utf-8?B?ZUpjTVl4cUdOenp3ai9mdGR3Y3g1TTMycWNnNXBQRlJLM2Z2cVNnKzRuYVZl?=
- =?utf-8?B?SjR3NWZVY0tWY1BzZ1RUTDJRZk1rMDk0UWlNWU1HUTMrdGhjUjllTlRUeVVr?=
- =?utf-8?B?Q1kzbG1tMFAwVVpBSVlUWDBnVVV4bExUOGlPSnJFQkY3OC9mbHJtVWNKYzBH?=
- =?utf-8?B?ZllUZlFZZ2JpLyttYUkxVHZBanBEelNZWW55N0dHeWhiY1VGWmFhMithakxs?=
- =?utf-8?B?Y3JnYXJPMlA2akFNRGNoSzdEWVNhZHVLbVNPZ0RxS0t2NFVTY3hhZ3BlNVBq?=
- =?utf-8?B?REdML20yVmdOcDNIZGtuSytYdExuUTh4RTBqOTYzc3Z6Q0JzM1FxVklKSGJK?=
- =?utf-8?B?WXhOdU1zRXZzb29LMG5WQkZuT1hxcnFoOUZDSmxSOEtFdm94MFhENGJVaUps?=
- =?utf-8?B?V3Y4akVQZ20wYWRYSkE0emhtZ0lNSVdmN1llYzRIZVpsV0JlYjlhSVpRUEtm?=
- =?utf-8?B?VWdISHhNNXdZUlkwYW5HNitjOFc3Z2xoUzlZYVRHRXpjL2k3VGhKT01YZnNM?=
- =?utf-8?B?eXBhc2ZJVlZlWlUrL2cvS1JySlNLYkZ6QTc1SjRROHA4Y0lnRENGZHE2OGoy?=
- =?utf-8?B?S2ZWOXB1eTJyRGs2aVM0YXBHUWlvVldEVDcrbEI0U0ZCMEYzVTgzWGkrMjNs?=
- =?utf-8?B?SURDY3NCWHNNYmpFRytpMkJIYWR5MWx6QktBTENDL20vWHMreHlKelRhTHh1?=
- =?utf-8?B?STJRMGhFc1BEK3lPZWt6Y2gzNFZqZjFmTEtZaWRrNUhrSisvN3NmeVlLaWVU?=
- =?utf-8?B?WC9jc0NkNjlaUGJ4NzZiYU01ZFNoWnprN29CWUZFc2hpYXNPaWVncUwrV1Q5?=
- =?utf-8?B?a0Z4NU5TUmZIb09GdlpPemxCa241bEJTOXNRUHl0WUJxVWpJSDhkcGZNK3pk?=
- =?utf-8?B?SE9rYkxmclFBb0M3cGI2WmN2ZkI1YlBJVHNkdHZUOTdEcUZUSFlPYUVwSGI3?=
- =?utf-8?B?ZGRyOXNwT0lRRzF6VHE3Y2pxZC94TGtIVjNKbVQydm83NXBsaHYwRDhGditz?=
- =?utf-8?B?S05EUGQ3K1R6NUtMdFJiUndKblNWSGJLV2J1aE9aL1pOSkllVEZvU3FoK1I4?=
- =?utf-8?B?Z3dPaFZwbHBKa0ZtSHdBb3h4bk15T1RvbWRGYmpKZWVVZGFDSVh0UElmcmhG?=
- =?utf-8?B?alVRZFRpMWpTVzFhMmY1NTE4cHMxWFNWMzZ3bDJkZGxIVXY5K2lpYTB1QzVt?=
- =?utf-8?B?S3RqNnVLZkc1YTI5UGZJUWdhdEpIUllhUE9EZHo4V1Q0bDdEUlczSXZQWTdo?=
- =?utf-8?B?blNmTnN0OE5aYS9tODk2WkpZRzhXRUxsWFFadjVMTTQ1R2VUa29kaHRxYnN2?=
- =?utf-8?B?Skx6cjRkcUJUVnNWL3k0VDZ6dHVVdG11a0YveHhJT0sva05xcHV5MzRzSURQ?=
- =?utf-8?B?bjN3VCtHdjdQTmIxWEpvRnAyNVRuZ1piOHBkWGZWVDVwaXM4QlBJVFNQLzUy?=
- =?utf-8?B?Q1F2ZWJ2Um5mWE1IVkc5VUo4cDhKREhXeXp3VGRxSjMycnRGMXZBRkRXWTF6?=
- =?utf-8?B?ZlNVdzRuaW4yZHptUnZkTVFaM25LaVdwZFdPTENxckNEZXpSLzlNUitHcTBP?=
- =?utf-8?B?Z1pQSlJCVzBIKzhsS1NvWlUxOWpIM0Nrbjc5YkI5bHBjdjhKaXo2S1hNWUpC?=
- =?utf-8?B?NUlqTkNacHhNTUhFaGxvVGV4M2RXRDRENFN6RkQzRkV5dTZzSFUrelpXcDYx?=
- =?utf-8?B?TkZJM3N0bVpGQy8vdHZrM0xLa2YvRzJuRkg5VlhRUGJkdTIzSGZ3bHBMR1Iz?=
- =?utf-8?Q?Y3ikaL+njPRN43Le8QUmUBk=3D?=
+	=?us-ascii?Q?9FoS41f4LdRB638aPCSJdSnbILFXTJ1tdQVAhNdI2RdxCmEOhTXZIO38bKGk?=
+ =?us-ascii?Q?AI8U3sCh0d13/uMBFfNtkrTxfdY8LxrRd+GdsWY/cGnZMwT0acv4qZREdC91?=
+ =?us-ascii?Q?WvzceKxouH/b+78jn1PQaYqqI+R7PFiqNoQt3R3GtVQTbJEiqD76aOP+gGa8?=
+ =?us-ascii?Q?bEZjlwBO0syA+dGWJLk0TLD9X8n7FV23FMeoKvEmzEYagExRYYlo8ul/U+ZD?=
+ =?us-ascii?Q?gcx4niXLcQppHxmsfSxa1FyNJcPRAdbN+6ZzIeK3dKnXq9DFlI3cOUMQ9PXQ?=
+ =?us-ascii?Q?riz6IZcUJif6wzYODuDGpSwWzFFP9UXv4ck0jqwQsEOA6BjSSIz/UXLogeD3?=
+ =?us-ascii?Q?W8ladnwUqdz9LnN5ShJFHcK79AYn5D2W+SstSOVqlXkA0hLsnGs1VlA/WgXu?=
+ =?us-ascii?Q?9B/SDe12T5mpMIDiFM977Y1tUee01LXWJyB4K+x6ZLDLxzgCCuofr7uNrBGQ?=
+ =?us-ascii?Q?1ejyN82vD7AZVeYHpo6L1MoATrT/YW8tkxpYh7JK57wJ0cKSQfphGK0xgyNG?=
+ =?us-ascii?Q?KqdqAZT7SWlnaIS01ehkd8WhM3cv8sWGzupE5hJPxamFzffTsyl/VLqFWRXZ?=
+ =?us-ascii?Q?b13XPHJnzaSBvmSN93mC1RBGkDlFbA+Sf78L9q1LdYg7DcPr4IppI3hmyBdJ?=
+ =?us-ascii?Q?ivSaU/0tcTXd1Rujsi7aU3/Rl+nUiYHVWxOqM628qJIp/Nj03F9vQh++hYs8?=
+ =?us-ascii?Q?UPj3vk2hxiVgAF2JHM+EozFiN6oovNz8IDXTPtGWNirdBP2UwXE17eI/H9lN?=
+ =?us-ascii?Q?caGH2oCVcqve6Vyh38gUN1I75AcKSRS02e5E4CYs+QV88m0hqt48wnqJs8hv?=
+ =?us-ascii?Q?v4owpKLKJuAjg97SL65KxYseukEGebxm+19Aw9CEG6iAO8Ge90MEtCjXjh77?=
+ =?us-ascii?Q?F/pcuuOEWYTiQCJyA9EG7sIgr4WcCndIzyQugrYLaMp1gwp93s7QYNJ+OIkO?=
+ =?us-ascii?Q?+GKiIUqkprqRdQw6EaZ9KaWTkrVWccxIMyGEfiqanH40/2RmrJHuO4WHLmRy?=
+ =?us-ascii?Q?EwhnuAIM7BS1PUvDq4BWGEHXV6cDrLq8RXy2n+Osu9qioZ9D7NZMQ7WIxh1o?=
+ =?us-ascii?Q?9HhwAZjxz2MOi+I8G9xE+2VRxt30oVUOAGqQ2/T1/Q3AGNZ8y9fLHjc7LN+z?=
+ =?us-ascii?Q?uq4rnexmKpGC+YmulJbTBR6Guot/WLXsej5uE7orcIiDgoK53Vvd9dWSZvNy?=
+ =?us-ascii?Q?77Vok1lItMLYx9TLatwe1nPnsSIgK/BFRkyBK+o0Ed+ehJRIGQCm1z/C+DS3?=
+ =?us-ascii?Q?bq2yzFbVkAGlaaJC6b4yU87/qdmFqae+dnmOVq0wFzipdYuiabZr1yuAiMh1?=
+ =?us-ascii?Q?Op8YosxLTzL4gu25Qb8WwPtFmr1Yfd+eTTypqn6kkXl6aMGEsfaNK8FAFOWw?=
+ =?us-ascii?Q?9a1bR/c22/h0KjmsVdPP4gbswtymqjO4bqI21nC8EioLl67hdSLOKA2d5lOI?=
+ =?us-ascii?Q?dvBXeCVZqRCm2i6gG7tHdRDTNHc9iPL85hdFKRXndN3zm8WkwI7cvujcumMr?=
+ =?us-ascii?Q?wskk7VYHvaWus4jjxluNiansvfXHZFF9UV3IOf2zwWIv674m2+0D5Ys3X307?=
+ =?us-ascii?Q?B29ii4ugIyJf+6+rVm0QQRpn5VpxvtSHKRHCmhl/CUJVwNzS14HeWFJGVZ+T?=
+ =?us-ascii?Q?WS23aeNigYytWuUeybY2QaQ=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(52116014)(376014)(7416014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Uys4QkxvbW5JdUEvdlpIdXlCNlFjU2hBeGhQNUwzZmZZTER6MGc2SjdqNGtB?=
- =?utf-8?B?NkI5MmgyNFhzNlFYUE1laU5DTTlIc1N5TzZZQTQ0djBQWDQxUHN1ZDQycVpj?=
- =?utf-8?B?bjZtQ09salFoS3V2VklMSkdhbi96TExrdlUzbndlNmtwQnJBeHVteHcrZWk1?=
- =?utf-8?B?WG9DaFkwaC82UmxUZWM1SEhtRUFUbFE1RlU1UWlvSXlRVlcrZ1d0ZkVRZzJv?=
- =?utf-8?B?dEVWbU5INWlnd1dPK0FJODB4YlhJNlpmRDFuMHhNUkNweFI5ZmZjMlEvOXBi?=
- =?utf-8?B?dGRCeU5pbEhONWRNZ0tCVmtxbVlWaUV1VEdlMFExUUNxTkFBWnhlektLWUZN?=
- =?utf-8?B?R0lyLzIzVzU3WnJmcGZKTW9mQ2h2OEZEa3NzMlBqRUI3eGhPTnhNSi9QaHVq?=
- =?utf-8?B?Z3hpN04vUUJRUUVidzMvK2FxMDl6Yk13U29McnhnOHpDeS9HSEU4S2syQm53?=
- =?utf-8?B?ZERtTGwxZVg3bURJSGtJNmM5amRPOUxvczAybGQ5OGtJUjNwQUpXai9FSW1R?=
- =?utf-8?B?anlTek5VdHdyK0ZxVmVINjhobDBzbzZRUUlKak9uTXZTK2lnVUJVTlpDa1ho?=
- =?utf-8?B?NU9vS0RyeDZLVHdnVnNGY0xzSllEdWNsUlIvQXR0TUNBNXkzbG1JK0t5R2E3?=
- =?utf-8?B?S1liZUw3Uy84cHdIQUxDK0RtaGZTNDN1QjlTZTc1dC9CQ09MTDVDRHhiSnVl?=
- =?utf-8?B?T2taL0lhaGY1WTIxbXhaNytvRyt6UnRVRVdDMnl3OXlJN2xzOEdkYnNHMjBR?=
- =?utf-8?B?TU9od01TeEwya2ZGV01nczYwT29aZXhrd2ZSVDRvWUM3U2hCNVBQd0kwWTA1?=
- =?utf-8?B?R2F4K3o3d0t1Nys2N2g5YVN3dGxmVWhkMHlzRnhwZURVN0lSVGplY2tvRzNx?=
- =?utf-8?B?dmQ4MEFVT1BrbEc2K25uQStHb2VNU0xJQytpZlFJOURCeGx5bk9DS2w3QnBR?=
- =?utf-8?B?NDVRL1pZUnZIZnhmZDBCeWl6bE01aHI0dFRxS04wanNrYjQxZ3czb0c4ZVcz?=
- =?utf-8?B?MFE0Q1dqUm1uNjgydjZiT21lRnpodzRLd2lxYmhuRUVLc2llWDdEVERYZGI3?=
- =?utf-8?B?aEZVM0ZjMFJwd0UxWEhZRFBLb0huT1VpQWYwemFPMGk4cCtCakxCbHVhU01C?=
- =?utf-8?B?L1JvTUd0ZGVNY0xMVWRiLzNMK3NyUHIwUlhJUG5UZ3Bma3p1Wm1XcllueFUy?=
- =?utf-8?B?QXhYd1FmWjlPMkdwQVBzS3pwYUMxTGpJM3VqZ3d6eHo5Z0RqbW9FUnhESjRK?=
- =?utf-8?B?aklOZHRRenBJQXRtU0RxSmFnaXFGc2V2Tm5mUTVqaEs2SGhwK3habmFhZnVq?=
- =?utf-8?B?SFZnN3VBS3dpMFVaYU1DVEp3U1ZZOWtUNXpkdEpRRVg1akJuQTQ5ZlZkOFVS?=
- =?utf-8?B?dHg3RXJFTUliVVJTaUN4YkZ1TUNOUGN5YUI5eXMwRU90d1BGOENSZmtYVlMr?=
- =?utf-8?B?Rk1vSnFocFgxd2NKNmpIUnFPaktVY1lMTGdram9KMVFQVUYrTE1FdkxHYmtj?=
- =?utf-8?B?dVdVY0p0Y29IM205dDk1STJ0RHlLNnBrRzlUS05tRnpjQmlRQzFvZzR2dlpO?=
- =?utf-8?B?MWFqRkd5dGx2NlV4T0diQWFVbWE2cjlqeE1SbDNwdUdHTmZvN0FpZ1dQQWJx?=
- =?utf-8?B?aE1URVRCMXF4RW9vNFpzaTdHZHRzTnVqenA0NE9UdHByaFdRQ1pERmNpTlJH?=
- =?utf-8?B?MFM4RlhsRjFBQWhhSFVmMVU3NDRMcHlFQlpOT2VKdXJWMU5RVVU4REhmWnNV?=
- =?utf-8?B?S08yeVlpVVh0OXUxTDlvbjgrajZ4M2J4UDg2Z3ZQZzlGamJsWVJmdGZQY0dW?=
- =?utf-8?B?K1FqMXBSTlJINUpIeXp3end5M2UwNVhMaS9kaG1KazFXd094T1F4WlpQRDBr?=
- =?utf-8?B?blJ5ckpZSm9SaC9FYTl4ZXY1dXBSblljY2dySTh3TTNCVDlwMUxpbVExT0Q2?=
- =?utf-8?B?dXB1SUNrM25EdllrWDlOWC9UM01GT3ZhcFU2cTFFdk80R1ZLZkhIZ014RmRW?=
- =?utf-8?B?QUtzSlVybWF4THhQOWVvSnVjbzRTREtCLzBoUWJPa3hlRUJuV3ROMVJXa2ds?=
- =?utf-8?B?ZSs3Z1duTmM3SFRMWmhlQm9UNDhUM3VhL1loY0srRFp1cyt4dlBkV0t3dGty?=
- =?utf-8?B?RVVpY3pKRkY5cEUzVmFqbnhrejcyRFZuTVZQNS9SYWhnMGxpZHZWVk5SVUVT?=
- =?utf-8?B?WFU5dWlIeTYzYnN4WTlobmQvbVFWMWd4UERjZWdLclhVd29oL2J6QXFQclpv?=
- =?utf-8?B?c0dqbVBPRWh5WDlONStETWNjSTNMejN3TlJISW5UK0d1OXgvTkJxTjNSWmpp?=
- =?utf-8?B?L1ZhWXQ2USsySDN0VTRsQzZhS01vaVNTNmdtTHVwc0lzdHVBaC9GUT09?=
+	=?us-ascii?Q?X91P1dfKqg+8Ilrjw7sRDR9MXITzheHhVMpDHiY87EW8Nzl+0hra954QwCPW?=
+ =?us-ascii?Q?jHbCVQs47zpyqPwa8NVBI+boi5+zvM0iq8UbGvj34OV72JKsy1vTgXYg67vJ?=
+ =?us-ascii?Q?4cntBQDXCQRIYwlYxS6DVFSBEGD5nH6bDnbWi+Lxef1/JBri/vGR1+Yfgpal?=
+ =?us-ascii?Q?DIfEyfGeIo8uK6V/3guhMwnNguwbv28oIAgVyHX4/iwRU8wloSZp7FG/zyz6?=
+ =?us-ascii?Q?eVdk5g5+SpzgOet0RC6FkLDMG5OYLwiq9gzexXT3wMUZ4RiXxH00M5Q7jxhn?=
+ =?us-ascii?Q?L01VmmnmM4s2KHxeUfElrNPWQbuPOG//g3kwtZc08dCN5+Dc/9lGR2leeQX9?=
+ =?us-ascii?Q?Ky+K/DRv1Jv/GezDT9bJUPCUm9i2vcDe0Shm/4I0cPhwI2xxIocwgLTQhSi/?=
+ =?us-ascii?Q?0xUOz/+4O+GoVorHQkj8/BEQYS7KsO84tYhgtlWjzc3QLR0uZZFbDJOtTD04?=
+ =?us-ascii?Q?kmeSvAyTb4GKBmg4lZK2rFAbM0wienH0QSzabQj3Xg90dGT+qy0/YBo5osO+?=
+ =?us-ascii?Q?XCNtPyER6qPfJIcxjg5EoBSy6WwgmawoMdztgPyQ7Ri1UEywffl56YDZrVAx?=
+ =?us-ascii?Q?orMhdk+919MchVKJQrROum2JnHGCDhFCi2cIJRwxdX8rjdlqxu9GQW5e6pc8?=
+ =?us-ascii?Q?QixM/qXmEWBOT1ybgQqmQqTg+nrvfeMCTHlCUAOb8i1FjRYQoPXWkTOdz/F2?=
+ =?us-ascii?Q?pJYe2PcOYlpouwvLNceD4QNRsviDCPk9j0jiauSrViqMx/NtaVSftyvSiQZN?=
+ =?us-ascii?Q?fJaHSQIRqnoXGGgZPCpsCgK23rM4Bpo93iJNXFYc+GF7OipvGhGoOrD4aW15?=
+ =?us-ascii?Q?XaTr1u4tbbT6GbFMp7+HZioc5wFJtp2OUNfq+JpjaFQHaujcdX6wp+Q3rvOa?=
+ =?us-ascii?Q?pI6JOnM2mSPnaMDmhpc13/ts/m7thg7es1DBn3vkzRaJP8i/CIoJ5T2HLOsR?=
+ =?us-ascii?Q?E2AkauWp913ebVGIZeOYgBlQcR7/sCA3qU4JS8mrDj2+O637QRZELARE2sJr?=
+ =?us-ascii?Q?FxNNaIBmTFGmqNZl+mLSg5eaqril64uN4nxxO7Di6+awPsoPFHeuHniHDUMJ?=
+ =?us-ascii?Q?7+hu4qHHZpDe+GDuH+qd4vMaZ6D9CfabqJZ6r1SgTgMbkfkl7ZhM6BHTWClQ?=
+ =?us-ascii?Q?MnOoMRRpdnD9E90BVuOO1/hwk65SbLIhmNRCdTaE/RueWcsfXT3ETbzp6//D?=
+ =?us-ascii?Q?aEfHSzy5N6ZnfuR4eH7W7Uw2czz2STv9JAMRjPStJIStoa7VRoE9G7trAJnk?=
+ =?us-ascii?Q?833dWQrXJZ1GQr0fcpt+kawnaBnVFANka5wLndLp129t/N5U8az/U8GIwA5V?=
+ =?us-ascii?Q?Agsia8B3KbsWsuMez5qx2xzlqGrCEgEjCjgik7roCcGXaR2rCA+vtK3iivq/?=
+ =?us-ascii?Q?bWUpH16GzdWtFdnUwevK/44QjMuviaq9v7hapZFeTP6CEiOdYZI6vGNwv6Ko?=
+ =?us-ascii?Q?qmgkrfC9clNvpU1HTUWGZLMlPnirxBZ+ADzJFScO9uZy+uF9QyyXPTLb61I7?=
+ =?us-ascii?Q?mVL4ukzpZxNEVcp5YOsTSqiJCK8Ux7VZY0PHJ3wjvD2JXx7Kmr8VDpYfpTT3?=
+ =?us-ascii?Q?NQxk2YUKDushlWgVUd5hpsVT5Plbc+M6XMVd2uBMB8BZhFBdsQN+TCtWmRYm?=
+ =?us-ascii?Q?Yg70lTOzDdoNsjf7pU/VcbuuIQQm01JXAGuXdYgHGHjoKdZPGNGfwVhpzwlA?=
+ =?us-ascii?Q?IR7/zcs78BGp5H/E5VmwQAI5GC4Sc3V0pScifAq6c5H7eSo8yEDbswBTVDGU?=
+ =?us-ascii?Q?CMQfibpCkg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 515782fc-4447-41d0-d2b3-08de59a5072f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94505272-e544-424c-78b2-08de59a50822
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:26.1283
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:28.5368
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 10kDha2eH5fQRZsp6hUSJsKixHNmqAW8BAfswFUvWCuMdH94Q+4J7yeEumVSuYa0VINAy6dEFJYFrHBaR9sOUw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ecNyuN8AZ3i03iO0YYxK5iS0XNiodoRLBpUO0SVJl/HWaJJljNlWE32esKV3paJHl2J9acSHFuNP8ovE0SsWww==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB11853
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [3.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252285-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,linux.intel.com,bootlin.com,trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252284-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,linux.intel.com,bootlin.com,trustnetic.com];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[nxp.com:+];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DMARC_POLICY_ALLOW(0.00)[nxp.com,none];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,nxp.com:mid,bootlin.com:email,intel.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D6C065CFE
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,bootlin.com:email,nxp.com:email,nxp.com:dkim,nxp.com:mid]
+X-Rspamd-Queue-Id: 90AFD65CD9
 X-Rspamd-Action: no action
 
-The code in sja1105_mdio.c does the same thing as the one added by Serge
-Semin in drivers/net/pcs/pcs-xpcs-plat.c (implements a virtual MDIO bus,
-backed by either a direct or an indirect register access method), except
-the latter is generic after the conversion to regmap.
+The following switches supported by the driver have at least one XPCS
+sub-device:
+- "nxp,sja1105r"
+- "nxp,sja1105s"
+- "nxp,sja1110a"
+- "nxp,sja1110b"
+- "nxp,sja1110c"
+- "nxp,sja1110d"
 
-The SJA1105 binding now has a way of specifying sub-devices in the
-switch's address space, using the 'regs' container node. However,
-specifying the XPCS in the device tree is optional, yet it is a critical
-component for the SGMII protocol (which is supported as of today). So we
-must continue to instantiate the pcs-xpcs-plat.c driver somehow.
+For these switches, it is guaranteed that the XPCS blocks is described
+in the "regs" OF subnode of the switch, either manually by the board DT
+author or by sja1105_fill_device_tree().
 
-I've tried various ways of using that driver while avoiding major DT
-bindings changes for this switch, like fwnode_create_software_node() and
-custom platform data. Platform data was ugly and software nodes didn't
-work at all, for reasons explained here:
-https://lore.kernel.org/lkml/20230223203713.hcse3mkbq3m6sogb@skbuf/
+So we can write some custom "bus" code to probe platform devices for
+each child OF node of "regs", and that completely replaces the need for
+the code in sja1105_mdio.c.
 
-I have to give huge credits to Andy Shevchenko, who after more than one
-year remembered the discussion and referenced Hervé Codina's work on PCI
-DT overlays, as well as a presentation from Lizhi Hou and Rob Herring.
+There were discussions about how to instantiate the XPCS sub-devices and
+the MFD maintainer doesn't consider mfd_add_devices() to be used
+canonically for this use case:
+https://lore.kernel.org/netdev/20260116132345.GA882947@google.com/
 
-I think I found the compromise solution that allows me to make progress,
-which is to create a dynamic OF changeset that attaches the PCS node to
-the live device tree, if it wasn't described already in the DTS, or use
-the one from the DTS if it's already there. With a proper OF node, the
-xpcs-plat driver probes just fine.
+So I am rolling my own custom code on top of devm_of_subdev_add() ->
+platform_device_register_full() that is also used for the MDIO
+sub-devices, but this time, instead of manually picking the MDIO nodes
+and registering them one by one, the PCS nodes (as well as anything
+else under "regs") will be automatically be picked up by the new
+devm_of_subdevs_populate() method. The critical difference is that the
+XPCS device tree binding is sufficiently detailed to be able to extract
+the address space resources from its "reg" properties, whereas the MDIO
+nodes were not (and had to be manually associated with resources).
 
-There also exists a use case where the XPCS is manually described
-in the device tree, and that is when the board author needs to describe
-SGMII lane polarity inversion via 'rx-polarity' or 'tx-polarity'. In
-that case, sja1105_fill_device_tree() detects which PCS nodes are
-present and fills in default descriptions only for the rest.
+This of_subdev_* "bus" code lives in the sja1105 driver for lack of a
+better home, but can easily be moved to a more generic location, and is
+written to permit that.
 
-Nobody probes these ethernet-pcs devices just yet, because the custom
-bus code is missing. SGMII continues to be supported through the
-sja1105_mdiobus_pcs_register() and sja1105_mdiobus_pcs_unregister() code
-path.
+A small implementation note: priv->pcs_fwnode[] exists because
+currently, the of_changeset API doesn't support creating phandles.
+Thus, instead of also filling in 'pcs-handle' properties from ports to
+the dynamic 'ethernet-pcs' OF nodes, the driver just saves them for
+later use in sja1105_create_pcs().
+
+This implies that when the PCS nodes do exist in DT, priv->pcs_fwnode[]
+will be NULL. This is fine - xpcs_create_fwnode() is NULL-tolerant via
+fwnode_device_is_available(), and this case currently returns -ENODEV
+and will be handled by the next change.
 
 Cc: Serge Semin <fancer.lancer@gmail.com>
 Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
@@ -278,394 +270,687 @@ Cc: devicetree@vger.kernel.org
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
 v1->v2:
-- use devres for sja1105_fill_device_tree()
-- fill correct default tx-polarity in ethernet-pcs node rather than
-  expect XPCS driver to have SJA1105-specific correct default value
-- drop cell_name from struct sja1105_pcs_resource after no longer making
-  use of MFD
-- rewrite of_child_node_exists() using of_node_full_name()
-- print phys_addr_t using unsigned long long and %llx
+- mfd_add_devices() has been replaced with a completely new approach in
+  the form of devm_of_subdevs_populate()
 
- drivers/net/dsa/sja1105/Kconfig          |   1 +
- drivers/net/dsa/sja1105/sja1105.h        |  11 ++
- drivers/net/dsa/sja1105/sja1105_main.c   |   7 +
- drivers/net/dsa/sja1105/sja1105_spi.c    |  37 ++++-
- drivers/net/dsa/sja1105/sja1105_subdev.c | 190 +++++++++++++++++++++++
- drivers/net/dsa/sja1105/sja1105_subdev.h |   1 +
- 6 files changed, 246 insertions(+), 1 deletion(-)
+ drivers/net/dsa/sja1105/Makefile         |   1 -
+ drivers/net/dsa/sja1105/sja1105.h        |  20 --
+ drivers/net/dsa/sja1105/sja1105_main.c   |  53 +++--
+ drivers/net/dsa/sja1105/sja1105_mdio.c   | 239 -----------------------
+ drivers/net/dsa/sja1105/sja1105_spi.c    |  15 --
+ drivers/net/dsa/sja1105/sja1105_subdev.c | 171 +++++++++++++++-
+ 6 files changed, 212 insertions(+), 287 deletions(-)
+ delete mode 100644 drivers/net/dsa/sja1105/sja1105_mdio.c
 
-diff --git a/drivers/net/dsa/sja1105/Kconfig b/drivers/net/dsa/sja1105/Kconfig
-index 1291bba3f3b6..55ce8f6a2758 100644
---- a/drivers/net/dsa/sja1105/Kconfig
-+++ b/drivers/net/dsa/sja1105/Kconfig
-@@ -7,6 +7,7 @@ tristate "NXP SJA1105 Ethernet switch family support"
- 	select PCS_XPCS
- 	select PACKING
- 	select CRC32
-+	select OF_DYNAMIC
- 	help
- 	  This is the driver for the NXP SJA1105 (5-port) and SJA1110 (10-port)
- 	  automotive Ethernet switch family. These are managed over an SPI
+diff --git a/drivers/net/dsa/sja1105/Makefile b/drivers/net/dsa/sja1105/Makefile
+index 7b5537d67072..049d198f681e 100644
+--- a/drivers/net/dsa/sja1105/Makefile
++++ b/drivers/net/dsa/sja1105/Makefile
+@@ -4,7 +4,6 @@ obj-$(CONFIG_NET_DSA_SJA1105) += sja1105.o
+ sja1105-objs := \
+     sja1105_spi.o \
+     sja1105_main.o \
+-    sja1105_mdio.o \
+     sja1105_subdev.o \
+     sja1105_flower.o \
+     sja1105_ethtool.o \
 diff --git a/drivers/net/dsa/sja1105/sja1105.h b/drivers/net/dsa/sja1105/sja1105.h
-index cf718e7c2b7b..1b52beba62d4 100644
+index 1b52beba62d4..7fce1507eb12 100644
 --- a/drivers/net/dsa/sja1105/sja1105.h
 +++ b/drivers/net/dsa/sja1105/sja1105.h
-@@ -113,6 +113,13 @@ enum sja1105_internal_phy_t {
- 	SJA1105_PHY_BASE_T1,
+@@ -91,11 +91,6 @@ struct sja1105_regs {
+ 	u64 rmii_ref_clk[SJA1105_MAX_NUM_PORTS];
+ 	u64 rmii_ext_tx_clk[SJA1105_MAX_NUM_PORTS];
+ 	u64 stats[__MAX_SJA1105_STATS_AREA][SJA1105_MAX_NUM_PORTS];
+-	u64 pcs_base[SJA1105_MAX_NUM_PORTS];
+-};
+-
+-struct sja1105_mdio_private {
+-	struct sja1105_private *priv;
  };
  
-+struct sja1105_pcs_resource {
-+	struct resource res;
-+	int port;
-+	u32 tx_polarity;
-+	const char *compatible;
-+};
-+
- struct sja1105_info {
- 	u64 device_id;
- 	/* Needed for distinction between P and R, and between Q and S
-@@ -165,6 +172,8 @@ struct sja1105_info {
- 	bool supports_2500basex[SJA1105_MAX_NUM_PORTS];
- 	enum sja1105_internal_phy_t internal_phy[SJA1105_MAX_NUM_PORTS];
- 	const u64 port_speed[SJA1105_SPEED_MAX];
-+	const struct sja1105_pcs_resource *pcs_resources;
-+	size_t num_pcs_resources;
- };
- 
- enum sja1105_key_type {
-@@ -278,6 +287,8 @@ struct sja1105_private {
+ enum {
+@@ -159,10 +154,6 @@ struct sja1105_info {
+ 	bool (*rxtstamp)(struct dsa_switch *ds, int port, struct sk_buff *skb);
+ 	void (*txtstamp)(struct dsa_switch *ds, int port, struct sk_buff *skb);
+ 	int (*clocking_setup)(struct sja1105_private *priv);
+-	int (*pcs_mdio_read_c45)(struct mii_bus *bus, int phy, int mmd,
+-				 int reg);
+-	int (*pcs_mdio_write_c45)(struct mii_bus *bus, int phy, int mmd,
+-				  int reg, u16 val);
+ 	int (*disable_microcontroller)(struct sja1105_private *priv);
+ 	const char *name;
+ 	bool supports_mii[SJA1105_MAX_NUM_PORTS];
+@@ -285,7 +276,6 @@ struct sja1105_private {
+ 	struct mutex dynamic_config_lock;
+ 	struct devlink_region **regions;
  	struct sja1105_cbs_entry *cbs;
- 	struct mii_bus *mdio_pcs;
+-	struct mii_bus *mdio_pcs;
  	struct phylink_pcs *pcs[SJA1105_MAX_NUM_PORTS];
-+	struct fwnode_handle *pcs_fwnode[SJA1105_MAX_NUM_PORTS];
-+	struct of_changeset of_cs;
- 	struct sja1105_ptp_data ptp_data;
- 	struct sja1105_tas_data tas_data;
- };
+ 	struct fwnode_handle *pcs_fwnode[SJA1105_MAX_NUM_PORTS];
+ 	struct of_changeset of_cs;
+@@ -316,16 +306,6 @@ int sja1105_vlan_filtering(struct dsa_switch *ds, int port, bool enabled,
+ 			   struct netlink_ext_ack *extack);
+ void sja1105_frame_memory_partitioning(struct sja1105_private *priv);
+ 
+-/* From sja1105_mdio.c */
+-int sja1105_mdiobus_register(struct dsa_switch *ds);
+-void sja1105_mdiobus_unregister(struct dsa_switch *ds);
+-int sja1105_pcs_mdio_read_c45(struct mii_bus *bus, int phy, int mmd, int reg);
+-int sja1105_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd, int reg,
+-			       u16 val);
+-int sja1110_pcs_mdio_read_c45(struct mii_bus *bus, int phy, int mmd, int reg);
+-int sja1110_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd, int reg,
+-			       u16 val);
+-
+ /* From sja1105_devlink.c */
+ int sja1105_devlink_setup(struct dsa_switch *ds);
+ void sja1105_devlink_teardown(struct dsa_switch *ds);
 diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index d3fb42772071..84c0f7c676e2 100644
+index 84c0f7c676e2..b60a890ba416 100644
 --- a/drivers/net/dsa/sja1105/sja1105_main.c
 +++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -3330,6 +3330,13 @@ static int sja1105_probe(struct spi_device *spi)
- 		return rc;
- 	}
- 
-+	rc = devm_sja1105_fill_device_tree(ds);
-+	if (rc) {
-+		dev_err(ds->dev, "Failed to fill device tree: %pe\n",
-+			ERR_PTR(rc));
-+		return rc;
-+	}
-+
- 	rc = devm_sja1105_add_subdevs(ds);
- 	if (rc) {
- 		dev_err(ds->dev, "Failed to create child devices: %pe\n",
-diff --git a/drivers/net/dsa/sja1105/sja1105_spi.c b/drivers/net/dsa/sja1105/sja1105_spi.c
-index 20757e166b08..4d4da69b3c30 100644
---- a/drivers/net/dsa/sja1105/sja1105_spi.c
-+++ b/drivers/net/dsa/sja1105/sja1105_spi.c
-@@ -1,8 +1,9 @@
- // SPDX-License-Identifier: BSD-3-Clause
--/* Copyright 2016-2018 NXP
-+/* Copyright 2016-2018, 2026 NXP
-  * Copyright (c) 2018, Sensor-Technik Wiedemann GmbH
-  * Copyright (c) 2018-2019, Vladimir Oltean <olteanv@gmail.com>
-  */
-+#include <linux/phy/phy-common-props.h>
- #include <linux/spi/spi.h>
- #include <linux/packing.h>
- #include "sja1105.h"
-@@ -619,6 +620,28 @@ static const struct sja1105_regs sja1110_regs = {
- 		     SJA1105_RSV_ADDR, SJA1105_RSV_ADDR, SJA1105_RSV_ADDR},
- };
- 
-+/* See port compatibility matrix in Documentation/networking/dsa/sja1105.rst */
-+static const struct sja1105_pcs_resource sja1105rs_pcs_resources[] = {
-+	{ DEFINE_RES_REG_NAMED(0x0, 0x800000, "direct"), 4,
-+	  PHY_POL_INVERT, "nxp,sja1105-pcs"
-+	},
-+};
-+
-+static const struct sja1105_pcs_resource sja1110_pcs_resources[] = {
-+	{ DEFINE_RES_REG_NAMED(0x705000, 0x1000, "indirect"), 1,
-+	  PHY_POL_NORMAL, "nxp,sja1110-pcs"
-+	},
-+	{ DEFINE_RES_REG_NAMED(0x706000, 0x1000, "indirect"), 2,
-+	  PHY_POL_NORMAL, "nxp,sja1110-pcs"
-+	},
-+	{ DEFINE_RES_REG_NAMED(0x707000, 0x1000, "indirect"), 3,
-+	  PHY_POL_NORMAL, "nxp,sja1110-pcs"
-+	},
-+	{ DEFINE_RES_REG_NAMED(0x708000, 0x1000, "indirect"), 4,
-+	  PHY_POL_NORMAL, "nxp,sja1110-pcs"
-+	},
-+};
-+
- const struct sja1105_info sja1105e_info = {
- 	.device_id		= SJA1105E_DEVICE_ID,
- 	.part_no		= SJA1105ET_PART_NO,
-@@ -782,6 +805,8 @@ const struct sja1105_info sja1105r_info = {
- 	.supports_rmii		= {true, true, true, true, true},
- 	.supports_rgmii		= {true, true, true, true, true},
- 	.supports_sgmii		= {false, false, false, false, true},
-+	.pcs_resources		= sja1105rs_pcs_resources,
-+	.num_pcs_resources	= ARRAY_SIZE(sja1105rs_pcs_resources),
- 	.name			= "SJA1105R",
- };
- 
-@@ -818,6 +843,8 @@ const struct sja1105_info sja1105s_info = {
- 	.supports_rmii		= {true, true, true, true, true},
- 	.supports_rgmii		= {true, true, true, true, true},
- 	.supports_sgmii		= {false, false, false, false, true},
-+	.pcs_resources		= sja1105rs_pcs_resources,
-+	.num_pcs_resources	= ARRAY_SIZE(sja1105rs_pcs_resources),
- 	.name			= "SJA1105S",
- };
- 
-@@ -869,6 +896,8 @@ const struct sja1105_info sja1110a_info = {
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_PHY_BASE_T1},
-+	.pcs_resources		= sja1110_pcs_resources,
-+	.num_pcs_resources	= ARRAY_SIZE(sja1110_pcs_resources),
- 	.name			= "SJA1110A",
- };
- 
-@@ -920,6 +949,8 @@ const struct sja1105_info sja1110b_info = {
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_NO_PHY},
-+	.pcs_resources		= &sja1110_pcs_resources[2], /* ports 3 and 4 */
-+	.num_pcs_resources	= ARRAY_SIZE(sja1110_pcs_resources) - 2,
- 	.name			= "SJA1110B",
- };
- 
-@@ -971,6 +1002,8 @@ const struct sja1105_info sja1110c_info = {
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_NO_PHY, SJA1105_NO_PHY,
- 				   SJA1105_NO_PHY},
-+	.pcs_resources		= &sja1110_pcs_resources[3], /* port 4 */
-+	.num_pcs_resources	= ARRAY_SIZE(sja1110_pcs_resources) - 3,
- 	.name			= "SJA1110C",
- };
- 
-@@ -1022,5 +1055,7 @@ const struct sja1105_info sja1110d_info = {
- 				   SJA1105_PHY_BASE_T1, SJA1105_PHY_BASE_T1,
- 				   SJA1105_NO_PHY, SJA1105_NO_PHY,
- 				   SJA1105_NO_PHY},
-+	.pcs_resources		= sja1110_pcs_resources,
-+	.num_pcs_resources	= ARRAY_SIZE(sja1110_pcs_resources),
- 	.name			= "SJA1110D",
- };
-diff --git a/drivers/net/dsa/sja1105/sja1105_subdev.c b/drivers/net/dsa/sja1105/sja1105_subdev.c
-index 06957d44f084..085d77947dc3 100644
---- a/drivers/net/dsa/sja1105/sja1105_subdev.c
-+++ b/drivers/net/dsa/sja1105/sja1105_subdev.c
-@@ -152,3 +152,193 @@ int devm_sja1105_add_subdevs(struct dsa_switch *ds)
- 
+@@ -15,6 +15,7 @@
+ #include <linux/of.h>
+ #include <linux/of_net.h>
+ #include <linux/of_mdio.h>
++#include <linux/pcs/pcs-xpcs.h>
+ #include <linux/netdev_features.h>
+ #include <linux/netdevice.h>
+ #include <linux/if_bridge.h>
+@@ -3005,6 +3006,44 @@ static int sja1105_port_bridge_flags(struct dsa_switch *ds, int port,
  	return 0;
  }
-+
-+static bool of_child_node_exists(struct device_node *np, const char *name)
+ 
++static int sja1105_create_pcs(struct dsa_switch *ds, int port)
 +{
-+	for_each_child_of_node_scoped(np, child)
-+		if (!strcmp(of_node_full_name(child), name))
-+			return true;
++	struct sja1105_private *priv = ds->priv;
++	struct phylink_pcs *pcs;
 +
-+	return false;
++	if (priv->phy_mode[port] != PHY_INTERFACE_MODE_SGMII &&
++	    priv->phy_mode[port] != PHY_INTERFACE_MODE_2500BASEX)
++		return 0;
++
++	pcs = xpcs_create_pcs_fwnode(priv->pcs_fwnode[port]);
++	if (IS_ERR(pcs))
++		return PTR_ERR(pcs);
++
++	priv->pcs[port] = pcs;
++
++	return 0;
 +}
 +
-+static int sja1105_create_pcs_nodes(struct sja1105_private *priv,
-+				    struct device_node *regs_node)
++static void sja1105_destroy_pcs(struct dsa_switch *ds, int port)
 +{
-+	struct dsa_switch *ds = priv->ds;
-+	struct device *dev = ds->dev;
-+	struct device_node *pcs_node;
-+	char node_name[32];
-+	u32 reg_props[2];
-+	int rc;
++	struct sja1105_private *priv = ds->priv;
 +
-+	for (int i = 0; i < priv->info->num_pcs_resources; i++) {
-+		const struct sja1105_pcs_resource *pcs_res;
++	if (priv->pcs[port]) {
++		xpcs_destroy_pcs(priv->pcs[port]);
++		priv->pcs[port] = NULL;
++	}
++}
 +
-+		pcs_res = &priv->info->pcs_resources[i];
++static int sja1105_port_setup(struct dsa_switch *ds, int port)
++{
++	return sja1105_create_pcs(ds, port);
++}
 +
-+		/* phys_addr_t has variable size depending on the value of
-+		 * CONFIG_PHYS_ADDR_T_64BIT, cast to the larger unsigned long
-+		 * long type for printf.
-+		 */
-+		snprintf(node_name, sizeof(node_name), "ethernet-pcs@%llx",
-+			 (unsigned long long)pcs_res->res.start);
++static void sja1105_port_teardown(struct dsa_switch *ds, int port)
++{
++	sja1105_destroy_pcs(ds, port);
++}
 +
-+		if (of_child_node_exists(regs_node, node_name))
-+			continue;
+ /* The programming model for the SJA1105 switch is "all-at-once" via static
+  * configuration tables. Some of these can be dynamically modified at runtime,
+  * but not the xMII mode parameters table.
+@@ -3059,16 +3098,9 @@ static int sja1105_setup(struct dsa_switch *ds)
+ 		goto out_flower_teardown;
+ 	}
+ 
+-	rc = sja1105_mdiobus_register(ds);
+-	if (rc < 0) {
+-		dev_err(ds->dev, "Failed to register MDIO bus: %pe\n",
+-			ERR_PTR(rc));
+-		goto out_ptp_clock_unregister;
+-	}
+-
+ 	rc = sja1105_devlink_setup(ds);
+ 	if (rc < 0)
+-		goto out_mdiobus_unregister;
++		goto out_ptp_clock_unregister;
+ 
+ 	rtnl_lock();
+ 	rc = dsa_tag_8021q_register(ds, htons(ETH_P_8021Q));
+@@ -3098,8 +3130,6 @@ static int sja1105_setup(struct dsa_switch *ds)
+ 
+ out_devlink_teardown:
+ 	sja1105_devlink_teardown(ds);
+-out_mdiobus_unregister:
+-	sja1105_mdiobus_unregister(ds);
+ out_ptp_clock_unregister:
+ 	sja1105_ptp_clock_unregister(ds);
+ out_flower_teardown:
+@@ -3120,7 +3150,6 @@ static void sja1105_teardown(struct dsa_switch *ds)
+ 	rtnl_unlock();
+ 
+ 	sja1105_devlink_teardown(ds);
+-	sja1105_mdiobus_unregister(ds);
+ 	sja1105_ptp_clock_unregister(ds);
+ 	sja1105_flower_teardown(ds);
+ 	sja1105_tas_teardown(ds);
+@@ -3139,6 +3168,8 @@ static const struct dsa_switch_ops sja1105_switch_ops = {
+ 	.connect_tag_protocol	= sja1105_connect_tag_protocol,
+ 	.setup			= sja1105_setup,
+ 	.teardown		= sja1105_teardown,
++	.port_setup		= sja1105_port_setup,
++	.port_teardown		= sja1105_port_teardown,
+ 	.set_ageing_time	= sja1105_set_ageing_time,
+ 	.port_change_mtu	= sja1105_change_mtu,
+ 	.port_max_mtu		= sja1105_get_max_mtu,
+diff --git a/drivers/net/dsa/sja1105/sja1105_mdio.c b/drivers/net/dsa/sja1105/sja1105_mdio.c
+deleted file mode 100644
+index b803ce71f5cc..000000000000
+--- a/drivers/net/dsa/sja1105/sja1105_mdio.c
++++ /dev/null
+@@ -1,239 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/* Copyright 2021 NXP
+- */
+-#include <linux/pcs/pcs-xpcs.h>
+-#include <linux/of_mdio.h>
+-#include "sja1105.h"
+-
+-#define SJA1110_PCS_BANK_REG		SJA1110_SPI_ADDR(0x3fc)
+-
+-int sja1105_pcs_mdio_read_c45(struct mii_bus *bus, int phy, int mmd, int reg)
+-{
+-	struct sja1105_mdio_private *mdio_priv = bus->priv;
+-	struct sja1105_private *priv = mdio_priv->priv;
+-	u64 addr;
+-	u32 tmp;
+-	int rc;
+-
+-	addr = (mmd << 16) | reg;
+-
+-	if (mmd != MDIO_MMD_VEND1 && mmd != MDIO_MMD_VEND2)
+-		return 0xffff;
+-
+-	if (mmd == MDIO_MMD_VEND2 && (reg & GENMASK(15, 0)) == MII_PHYSID1)
+-		return NXP_SJA1105_XPCS_ID >> 16;
+-	if (mmd == MDIO_MMD_VEND2 && (reg & GENMASK(15, 0)) == MII_PHYSID2)
+-		return NXP_SJA1105_XPCS_ID & GENMASK(15, 0);
+-
+-	rc = sja1105_xfer_u32(priv, SPI_READ, addr, &tmp, NULL);
+-	if (rc < 0)
+-		return rc;
+-
+-	return tmp & 0xffff;
+-}
+-
+-int sja1105_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd,
+-			       int reg, u16 val)
+-{
+-	struct sja1105_mdio_private *mdio_priv = bus->priv;
+-	struct sja1105_private *priv = mdio_priv->priv;
+-	u64 addr;
+-	u32 tmp;
+-
+-	addr = (mmd << 16) | reg;
+-	tmp = val;
+-
+-	if (mmd != MDIO_MMD_VEND1 && mmd != MDIO_MMD_VEND2)
+-		return -EINVAL;
+-
+-	return sja1105_xfer_u32(priv, SPI_WRITE, addr, &tmp, NULL);
+-}
+-
+-int sja1110_pcs_mdio_read_c45(struct mii_bus *bus, int phy, int mmd, int reg)
+-{
+-	struct sja1105_mdio_private *mdio_priv = bus->priv;
+-	struct sja1105_private *priv = mdio_priv->priv;
+-	const struct sja1105_regs *regs = priv->info->regs;
+-	int offset, bank;
+-	u64 addr;
+-	u32 tmp;
+-	int rc;
+-
+-	if (regs->pcs_base[phy] == SJA1105_RSV_ADDR)
+-		return -ENODEV;
+-
+-	addr = (mmd << 16) | reg;
+-
+-	if (mmd == MDIO_MMD_VEND2 && (reg & GENMASK(15, 0)) == MII_PHYSID1)
+-		return NXP_SJA1110_XPCS_ID >> 16;
+-	if (mmd == MDIO_MMD_VEND2 && (reg & GENMASK(15, 0)) == MII_PHYSID2)
+-		return NXP_SJA1110_XPCS_ID & GENMASK(15, 0);
+-
+-	bank = addr >> 8;
+-	offset = addr & GENMASK(7, 0);
+-
+-	/* This addressing scheme reserves register 0xff for the bank address
+-	 * register, so that can never be addressed.
+-	 */
+-	if (WARN_ON(offset == 0xff))
+-		return -ENODEV;
+-
+-	tmp = bank;
+-
+-	rc = sja1105_xfer_u32(priv, SPI_WRITE,
+-			      regs->pcs_base[phy] + SJA1110_PCS_BANK_REG,
+-			      &tmp, NULL);
+-	if (rc < 0)
+-		return rc;
+-
+-	rc = sja1105_xfer_u32(priv, SPI_READ, regs->pcs_base[phy] + offset,
+-			      &tmp, NULL);
+-	if (rc < 0)
+-		return rc;
+-
+-	return tmp & 0xffff;
+-}
+-
+-int sja1110_pcs_mdio_write_c45(struct mii_bus *bus, int phy, int mmd, int reg,
+-			       u16 val)
+-{
+-	struct sja1105_mdio_private *mdio_priv = bus->priv;
+-	struct sja1105_private *priv = mdio_priv->priv;
+-	const struct sja1105_regs *regs = priv->info->regs;
+-	int offset, bank;
+-	u64 addr;
+-	u32 tmp;
+-	int rc;
+-
+-	if (regs->pcs_base[phy] == SJA1105_RSV_ADDR)
+-		return -ENODEV;
+-
+-	addr = (mmd << 16) | reg;
+-
+-	bank = addr >> 8;
+-	offset = addr & GENMASK(7, 0);
+-
+-	/* This addressing scheme reserves register 0xff for the bank address
+-	 * register, so that can never be addressed.
+-	 */
+-	if (WARN_ON(offset == 0xff))
+-		return -ENODEV;
+-
+-	tmp = bank;
+-
+-	rc = sja1105_xfer_u32(priv, SPI_WRITE,
+-			      regs->pcs_base[phy] + SJA1110_PCS_BANK_REG,
+-			      &tmp, NULL);
+-	if (rc < 0)
+-		return rc;
+-
+-	tmp = val;
+-
+-	return sja1105_xfer_u32(priv, SPI_WRITE, regs->pcs_base[phy] + offset,
+-				&tmp, NULL);
+-}
+-
+-static int sja1105_mdiobus_pcs_register(struct sja1105_private *priv)
+-{
+-	struct sja1105_mdio_private *mdio_priv;
+-	struct dsa_switch *ds = priv->ds;
+-	struct mii_bus *bus;
+-	int rc = 0;
+-	int port;
+-
+-	if (!priv->info->pcs_mdio_read_c45 || !priv->info->pcs_mdio_write_c45)
+-		return 0;
+-
+-	bus = mdiobus_alloc_size(sizeof(*mdio_priv));
+-	if (!bus)
+-		return -ENOMEM;
+-
+-	bus->name = "SJA1105 PCS MDIO bus";
+-	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-pcs",
+-		 dev_name(ds->dev));
+-	bus->read_c45 = priv->info->pcs_mdio_read_c45;
+-	bus->write_c45 = priv->info->pcs_mdio_write_c45;
+-	bus->parent = ds->dev;
+-	/* There is no PHY on this MDIO bus => mask out all PHY addresses
+-	 * from auto probing.
+-	 */
+-	bus->phy_mask = ~0;
+-	mdio_priv = bus->priv;
+-	mdio_priv->priv = priv;
+-
+-	rc = mdiobus_register(bus);
+-	if (rc) {
+-		mdiobus_free(bus);
+-		return rc;
+-	}
+-
+-	for (port = 0; port < ds->num_ports; port++) {
+-		struct phylink_pcs *pcs;
+-
+-		if (dsa_is_unused_port(ds, port))
+-			continue;
+-
+-		if (priv->phy_mode[port] != PHY_INTERFACE_MODE_SGMII &&
+-		    priv->phy_mode[port] != PHY_INTERFACE_MODE_2500BASEX)
+-			continue;
+-
+-		pcs = xpcs_create_pcs_mdiodev(bus, port);
+-		if (IS_ERR(pcs)) {
+-			rc = PTR_ERR(pcs);
+-			goto out_pcs_free;
+-		}
+-
+-		priv->pcs[port] = pcs;
+-	}
+-
+-	priv->mdio_pcs = bus;
+-
+-	return 0;
+-
+-out_pcs_free:
+-	for (port = 0; port < ds->num_ports; port++) {
+-		if (priv->pcs[port]) {
+-			xpcs_destroy_pcs(priv->pcs[port]);
+-			priv->pcs[port] = NULL;
+-		}
+-	}
+-
+-	mdiobus_unregister(bus);
+-	mdiobus_free(bus);
+-
+-	return rc;
+-}
+-
+-static void sja1105_mdiobus_pcs_unregister(struct sja1105_private *priv)
+-{
+-	struct dsa_switch *ds = priv->ds;
+-	int port;
+-
+-	if (!priv->mdio_pcs)
+-		return;
+-
+-	for (port = 0; port < ds->num_ports; port++) {
+-		if (priv->pcs[port]) {
+-			xpcs_destroy_pcs(priv->pcs[port]);
+-			priv->pcs[port] = NULL;
+-		}
+-	}
+-
+-	mdiobus_unregister(priv->mdio_pcs);
+-	mdiobus_free(priv->mdio_pcs);
+-	priv->mdio_pcs = NULL;
+-}
+-
+-int sja1105_mdiobus_register(struct dsa_switch *ds)
+-{
+-	struct sja1105_private *priv = ds->priv;
+-
+-	return sja1105_mdiobus_pcs_register(priv);
+-}
+-
+-void sja1105_mdiobus_unregister(struct dsa_switch *ds)
+-{
+-	struct sja1105_private *priv = ds->priv;
+-
+-	sja1105_mdiobus_pcs_unregister(priv);
+-}
+diff --git a/drivers/net/dsa/sja1105/sja1105_spi.c b/drivers/net/dsa/sja1105/sja1105_spi.c
+index 4d4da69b3c30..27cac00eba32 100644
+--- a/drivers/net/dsa/sja1105/sja1105_spi.c
++++ b/drivers/net/dsa/sja1105/sja1105_spi.c
+@@ -615,9 +615,6 @@ static const struct sja1105_regs sja1110_regs = {
+ 	.ptpclkrate = SJA1110_SPI_ADDR(0x74),
+ 	.ptpclkcorp = SJA1110_SPI_ADDR(0x80),
+ 	.ptpsyncts = SJA1110_SPI_ADDR(0x84),
+-	.pcs_base = {SJA1105_RSV_ADDR, 0x1c1400, 0x1c1800, 0x1c1c00, 0x1c2000,
+-		     SJA1105_RSV_ADDR, SJA1105_RSV_ADDR, SJA1105_RSV_ADDR,
+-		     SJA1105_RSV_ADDR, SJA1105_RSV_ADDR, SJA1105_RSV_ADDR},
+ };
+ 
+ /* See port compatibility matrix in Documentation/networking/dsa/sja1105.rst */
+@@ -791,8 +788,6 @@ const struct sja1105_info sja1105r_info = {
+ 	.ptp_cmd_packing	= sja1105pqrs_ptp_cmd_packing,
+ 	.rxtstamp		= sja1105_rxtstamp,
+ 	.clocking_setup		= sja1105_clocking_setup,
+-	.pcs_mdio_read_c45	= sja1105_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1105_pcs_mdio_write_c45,
+ 	.regs			= &sja1105pqrs_regs,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+@@ -830,8 +825,6 @@ const struct sja1105_info sja1105s_info = {
+ 	.ptp_cmd_packing	= sja1105pqrs_ptp_cmd_packing,
+ 	.rxtstamp		= sja1105_rxtstamp,
+ 	.clocking_setup		= sja1105_clocking_setup,
+-	.pcs_mdio_read_c45	= sja1105_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1105_pcs_mdio_write_c45,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+ 		[SJA1105_SPEED_10MBPS] = 3,
+@@ -871,8 +864,6 @@ const struct sja1105_info sja1110a_info = {
+ 	.rxtstamp		= sja1110_rxtstamp,
+ 	.txtstamp		= sja1110_txtstamp,
+ 	.disable_microcontroller = sja1110_disable_microcontroller,
+-	.pcs_mdio_read_c45	= sja1110_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1110_pcs_mdio_write_c45,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+ 		[SJA1105_SPEED_10MBPS] = 4,
+@@ -924,8 +915,6 @@ const struct sja1105_info sja1110b_info = {
+ 	.rxtstamp		= sja1110_rxtstamp,
+ 	.txtstamp		= sja1110_txtstamp,
+ 	.disable_microcontroller = sja1110_disable_microcontroller,
+-	.pcs_mdio_read_c45	= sja1110_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1110_pcs_mdio_write_c45,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+ 		[SJA1105_SPEED_10MBPS] = 4,
+@@ -977,8 +966,6 @@ const struct sja1105_info sja1110c_info = {
+ 	.rxtstamp		= sja1110_rxtstamp,
+ 	.txtstamp		= sja1110_txtstamp,
+ 	.disable_microcontroller = sja1110_disable_microcontroller,
+-	.pcs_mdio_read_c45	= sja1110_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1110_pcs_mdio_write_c45,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+ 		[SJA1105_SPEED_10MBPS] = 4,
+@@ -1030,8 +1017,6 @@ const struct sja1105_info sja1110d_info = {
+ 	.rxtstamp		= sja1110_rxtstamp,
+ 	.txtstamp		= sja1110_txtstamp,
+ 	.disable_microcontroller = sja1110_disable_microcontroller,
+-	.pcs_mdio_read_c45	= sja1110_pcs_mdio_read_c45,
+-	.pcs_mdio_write_c45	= sja1110_pcs_mdio_write_c45,
+ 	.port_speed		= {
+ 		[SJA1105_SPEED_AUTO] = 0,
+ 		[SJA1105_SPEED_10MBPS] = 4,
+diff --git a/drivers/net/dsa/sja1105/sja1105_subdev.c b/drivers/net/dsa/sja1105/sja1105_subdev.c
+index 085d77947dc3..5ca613a4549d 100644
+--- a/drivers/net/dsa/sja1105/sja1105_subdev.c
++++ b/drivers/net/dsa/sja1105/sja1105_subdev.c
+@@ -78,6 +78,167 @@ static int devm_of_subdev_add(const struct platform_device_info *pdevinfo)
+ 	return devm_add_action_or_reset(parent, of_subdev_del, pdev);
+ }
+ 
++static int of_subdev_collect_resources(struct device *parent, struct device_node *np,
++				       size_t address_cells, size_t size_cells,
++				       struct resource **res, size_t *num_res)
++{
++	size_t reg_len;
++	u32 *reg;
++	int err;
 +
-+		pcs_node = of_changeset_create_node(&priv->of_cs, regs_node,
-+						    node_name);
-+		if (!pcs_node) {
-+			dev_err(dev, "Failed to create PCS node %s\n", node_name);
-+			return -ENOMEM;
++	err = of_property_count_u32_elems(np, "reg");
++	if (!err)
++		err = -EINVAL;
++	if (err < 0) {
++		dev_err(parent, "Failed to read subdev %pOF \"reg\" property: %pe\n",
++			np, ERR_PTR(err));
++		return err;
++	}
++	reg_len = err;
++
++	if (reg_len % (address_cells + size_cells)) {
++		dev_err(parent, "Invalid \"reg\" specifier for %pOF\n", np);
++		return -EINVAL;
++	}
++
++	*num_res = reg_len / (address_cells + size_cells);
++	*res = kcalloc(*num_res, sizeof(**res), GFP_KERNEL);
++	if (!*res)
++		return -ENOMEM;
++
++	reg = kcalloc(reg_len, sizeof(*reg), GFP_KERNEL);
++	if (!reg) {
++		kfree(*res);
++		return -ENOMEM;
++	}
++
++	err = of_property_read_u32_array(np, "reg", reg, reg_len);
++	if (err) {
++		kfree(reg);
++		kfree(*res);
++		return err;
++	}
++
++	for (int cur_res = 0; cur_res < *num_res; cur_res++) {
++		int idx, address_cell, size_cell;
++		phys_addr_t start = 0, size = 0;
++
++		for (address_cell = 0; address_cell < address_cells; address_cell++) {
++			idx = cur_res * (address_cells + size_cells) + address_cell;
++			start = (unsigned long long)start << 32 | reg[idx];
++		}
++		for (size_cell = 0; size_cell < size_cells; size_cell++) {
++			idx = cur_res * (address_cells + size_cells) + address_cells + size_cell;
++			size = (unsigned long long)size << 32 | reg[idx];
 +		}
 +
-+		rc = of_changeset_add_prop_string(&priv->of_cs, pcs_node,
-+						  "compatible",
-+						  pcs_res->compatible);
-+		if (rc) {
-+			dev_err(dev, "Failed to add compatible property to %s: %pe\n",
-+				node_name, ERR_PTR(rc));
-+			return rc;
-+		}
-+
-+		reg_props[0] = pcs_res->res.start;
-+		reg_props[1] = resource_size(&pcs_res->res);
-+		rc = of_changeset_add_prop_u32_array(&priv->of_cs, pcs_node,
-+						     "reg", reg_props, 2);
-+		if (rc) {
-+			dev_err(dev, "Failed to add reg property to %s: %pe\n",
-+				node_name, ERR_PTR(rc));
-+			return rc;
-+		}
-+
-+		rc = of_changeset_add_prop_string(&priv->of_cs, pcs_node,
-+						  "reg-names",
-+						  pcs_res->res.name);
-+		if (rc) {
-+			dev_err(dev, "Failed to add reg-names property to %s: %pe\n",
-+				node_name, ERR_PTR(rc));
-+			return rc;
-+		}
-+
-+		rc = of_changeset_add_prop_u32(&priv->of_cs, pcs_node,
-+					       "reg-io-width", 4);
-+		if (rc) {
-+			dev_err(dev, "Failed to add reg-io-width property to %s: %pe\n",
-+				node_name, ERR_PTR(rc));
-+			return rc;
-+		}
-+
-+		/* The SJA1105 XPCS is integrated with a TX-inverting custom
-+		 * PMA. We need to invert the polarity in the PCS to obtain a
-+		 * non-inverted signal at the pins.
-+		 */
-+		rc = of_changeset_add_prop_u32(&priv->of_cs, pcs_node, "tx-polarity",
-+					       pcs_res->tx_polarity);
-+		if (rc) {
-+			dev_err(dev, "Failed to add tx-polarity property to %s: %pe\n",
-+				node_name, ERR_PTR(rc));
-+			return rc;
-+		}
-+
-+		dev_dbg(dev, "Created OF node %pOF\n", pcs_node);
-+		priv->pcs_fwnode[pcs_res->port] = of_fwnode_handle(pcs_node);
++		(*res)[cur_res].start = start;
++		(*res)[cur_res].end = start + size - 1;
++		(*res)[cur_res].flags = IORESOURCE_REG;
++		of_property_read_string_index(np, "reg-names", cur_res, &(*res)[cur_res].name);
 +	}
 +
 +	return 0;
 +}
 +
-+static struct device_node *sja1105_create_regs_node(struct sja1105_private *priv,
-+						    struct device_node *switch_node)
++/* Custom version of of_device_make_bus_id() which derives the name from the
++ * parent device plus the subdev name and untranslatable address.
++ * We don't set the resource address in the platform ID because that would
++ * print it as decimal rather than hex.
++ */
++static void of_subdev_make_bus_id(char *name, size_t name_len,
++				  const struct device *parent,
++				  struct device_node *child,
++				  const struct resource *res)
 +{
-+	struct device *dev = priv->ds->dev;
-+	struct device_node *regs_node;
-+	int rc;
-+
-+	regs_node = of_changeset_create_node(&priv->of_cs, switch_node, "regs");
-+	if (!regs_node) {
-+		dev_err(dev, "Failed to create 'regs' device tree node\n");
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	rc = of_changeset_add_prop_u32(&priv->of_cs, regs_node, "#address-cells", 1);
-+	if (rc) {
-+		dev_err(dev, "Failed to add #address-cells property: %pe\n",
-+			ERR_PTR(rc));
-+		return ERR_PTR(rc);
-+	}
-+
-+	rc = of_changeset_add_prop_u32(&priv->of_cs, regs_node, "#size-cells", 1);
-+	if (rc) {
-+		dev_err(dev, "Failed to add #size-cells property: %pe\n",
-+			ERR_PTR(rc));
-+		return ERR_PTR(rc);
-+	}
-+
-+	return regs_node;
++	if (res)
++		snprintf(name, name_len, "%s.%llx.%pOFn", dev_name(parent),
++			 (unsigned long long)res->start, child);
++	else
++		snprintf(name, name_len, "%s.%pOFn", dev_name(parent), child);
 +}
 +
-+static void sja1105_restore_device_tree(void *data)
++/**
++ * devm_of_subdevs_populate() - Populate platform sub-devices from device tree
++ * @parent: Parent device for all created sub-devices
++ * @np: Device tree node containing child nodes to be converted to sub-devices
++ *
++ * The device tree node @np describes the (MMIO-like but untranslatable) linear
++ * address space of device @parent, as can sometimes be found when such device
++ * is accessed through a SPI-to-AHB bridge.
++ *
++ * This function parses the device tree node @np and creates platform devices
++ * for each available child node. It reads the #address-cells and #size-cells
++ * properties to properly parse the "reg" properties of child nodes.
++ *
++ * For each child node, the function:
++ * - Creates a platform device with a name based on the parent and child node
++ * - Auto-detects and attaches resources to sub-devices based on parsed device
++ *   tree "reg" and "reg-names" properties
++ * - Uses the first resource's start address as the platform device ID
++ * - Registers the device with automatic cleanup via devres
++ *
++ * This is similar to of_platform_populate() except it expects to find
++ * IORESOURCE_REG resources rather than IORESOURCE_MEM/IORESOURCE_IO.
++ * It is also similar to mfd_add_devices() except we don't have to specify the
++ * mfd_cells[], but rather, the resources are embedded into the device tree.
++ * More importantly, this allows for the parent to have a hybrid function
++ * (MFD parent + the main function of the device) and a custom device tree
++ * binding, whereas MFD does not.
++ *
++ * Return: 0 on success, negative error code on failure
++ */
++static int devm_of_subdevs_populate(struct device *parent, struct device_node *np)
 +{
-+	struct sja1105_private *priv = data;
-+	struct device *dev = priv->ds->dev;
-+	int rc;
++	u32 address_cells, size_cells;
++	int err;
 +
-+	rc = of_changeset_revert(&priv->of_cs);
-+	if (rc) {
-+		dev_err(dev, "Failed to revert device tree changeset: %pe\n",
-+			ERR_PTR(rc));
++	err = of_property_read_u32(np, "#address-cells", &address_cells);
++	if (err)
++		return err;
++
++	err = of_property_read_u32(np, "#size-cells", &size_cells);
++	if (err)
++		return err;
++
++	if (IS_ENABLED(CONFIG_PHYS_ADDR_T_64BIT) ?
++	    (address_cells > 2 || size_cells > 2) :
++	    (address_cells > 1 || size_cells > 1)) {
++		dev_err(parent, "Subdev address space exceeds phys_addr_t possibilities\n");
++		return -EINVAL;
 +	}
 +
-+	of_changeset_destroy(&priv->of_cs);
++	for_each_available_child_of_node_scoped(np, child) {
++		struct platform_device_info subdev;
++		struct resource *res;
++		size_t num_res;
++		char name[64];
++
++		err = of_subdev_collect_resources(parent, child, address_cells,
++						  size_cells, &res, &num_res);
++		if (err)
++			return err;
++
++		of_subdev_make_bus_id(name, sizeof(name), parent, child,
++				      num_res ? &res[0] : NULL);
++		subdev = (struct platform_device_info) {
++			.parent = parent,
++			.fwnode = of_fwnode_handle(child),
++			.name = name,
++			.id = PLATFORM_DEVID_NONE,
++			.res = res,
++			.num_res = num_res,
++		};
++
++		err = devm_of_subdev_add(&subdev);
++		kfree(res);
++		if (err)
++			return err;
++	}
++
++	return 0;
 +}
 +
-+int devm_sja1105_fill_device_tree(struct dsa_switch *ds)
-+{
-+	struct device_node *switch_node, *regs_node;
-+	struct sja1105_private *priv = ds->priv;
-+	bool regs_node_created = false;
-+	struct device *dev = ds->dev;
-+	int rc;
-+
-+	if (!priv->info->num_pcs_resources)
-+		return 0;
-+
-+	switch_node = dev_of_node(dev);
-+	of_changeset_init(&priv->of_cs);
-+
-+	regs_node = of_get_child_by_name(switch_node, "regs");
-+	if (!regs_node) {
-+		regs_node = sja1105_create_regs_node(priv, switch_node);
-+		if (IS_ERR(regs_node)) {
-+			rc = PTR_ERR(regs_node);
-+			goto out_destroy_changeset;
-+		}
-+
-+		regs_node_created = true;
-+		dev_dbg(dev, "Created OF node %pOF\n", regs_node);
-+	}
-+
-+	rc = sja1105_create_pcs_nodes(priv, regs_node);
-+	if (rc)
-+		goto out_destroy_changeset;
-+
-+	rc = of_changeset_apply(&priv->of_cs);
-+	if (rc) {
-+		dev_err(dev, "Failed to apply device tree changeset: %pe\n",
-+			ERR_PTR(rc));
-+		goto out_destroy_changeset;
-+	}
-+
-+	rc = devm_add_action_or_reset(dev, sja1105_restore_device_tree, priv);
-+	goto out_put_regs_node;
-+
-+out_destroy_changeset:
-+	of_changeset_destroy(&priv->of_cs);
-+out_put_regs_node:
-+	if (!regs_node_created)
+ static int devm_sja1105_add_mdio_subdev(struct device *parent,
+ 					struct device_node *np,
+ 					const struct resource *res,
+@@ -139,9 +300,17 @@ static int devm_sja1105_add_mdio_subdevs(struct dsa_switch *ds,
+ int devm_sja1105_add_subdevs(struct dsa_switch *ds)
+ {
+ 	struct device_node *switch_node = dev_of_node(ds->dev);
+-	struct device_node *mdio_node;
++	struct device_node *regs_node, *mdio_node;
+ 	int rc = 0;
+ 
++	regs_node = of_get_available_child_by_name(switch_node, "regs");
++	if (regs_node) {
++		rc = devm_of_subdevs_populate(ds->dev, regs_node);
 +		of_node_put(regs_node);
++		if (rc)
++			return rc;
++	}
 +
-+	return rc;
-+}
-diff --git a/drivers/net/dsa/sja1105/sja1105_subdev.h b/drivers/net/dsa/sja1105/sja1105_subdev.h
-index 9b5a02401399..1507ff3c44d1 100644
---- a/drivers/net/dsa/sja1105/sja1105_subdev.h
-+++ b/drivers/net/dsa/sja1105/sja1105_subdev.h
-@@ -5,5 +5,6 @@
- #define _SJA1105_SUBDEV_H
- 
- int devm_sja1105_add_subdevs(struct dsa_switch *ds);
-+int devm_sja1105_fill_device_tree(struct dsa_switch *ds);
- 
- #endif
+ 	mdio_node = of_get_available_child_by_name(switch_node, "mdios");
+ 	if (mdio_node) {
+ 		rc = devm_sja1105_add_mdio_subdevs(ds, mdio_node);
 -- 
 2.34.1
 
