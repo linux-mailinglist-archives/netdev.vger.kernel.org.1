@@ -1,239 +1,223 @@
-Return-Path: <netdev+bounces-252322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLf/J4AVcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:18:08 +0100
+	id aAkiMOMccmnrbwAAu9opvQ
+	(envelope-from <netdev+bounces-252324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:49:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6C56683E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:18:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F6566D68
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 53809722C28
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:05:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 55D5A923E00
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D4F3B52F6;
-	Thu, 22 Jan 2026 12:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DC423A81;
+	Thu, 22 Jan 2026 12:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="syT0zy3h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ScRRWpab"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E74F3E9F7F
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 12:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E051F4611;
+	Thu, 22 Jan 2026 12:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769083522; cv=none; b=MzXvhbEr/iYeqRE/MA2B/jOGleVTxlCMoH3V9AXd7u1B/RqmAnBA6CrKlU96MpM9ZCRHK6hDqxHlEDfr8KzlaEzbrumdEPW3MG0VEw7gw/DL12nU0wHFVpC9iInF73NkBQWIa0qJQxEUlHdfGLnA3JltdAp2xPmkYKAfGDUCdzo=
+	t=1769083596; cv=none; b=N3KBotrR3hFlMOZXztwO0WwpWzSZDK66YGWDDxxPJksr+TP4pR3345fAMpsVurlGmMx+8KtH2uhPvGL0ugw+E53XZpYaqAVX63ey5IBwHr8khbZAkETkoV7OgbNj+2OOgovBIaxR8aXQW1wR/yZKPC3klwIGLJgmzTF+AceaMJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769083522; c=relaxed/simple;
-	bh=OLCZ12e0QX/lX/WusDUYZSH4mUo8CD8TjV7aCnSFIxU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kvvdPJQdhmw5RU2YVrssmL4uEkiDPx2JTeljb/DuC/xOOT1twnmEGyAT1llrfFqffeAAESEeWN+lMczw98FSsaucDOZ6G94kqpf0+thnz2bGGJxlDtsxNbeZ6gTyUnKa2mY3DA/ZKOz5zRuBFwrQ/HDGciQ82vgad4nztDMTY7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=syT0zy3h; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769083514; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=li2bsbmTagTFxs5QLsxy0h7zjvI554IzOSbZpx0Tjb0=;
-	b=syT0zy3hbcEQLyhNQOIwE2RLg8PHI3SNKOvozYwXB6bdnxxhGBYw3thVPyu+8ne6gRwptyvuFjxgmi3mUSkdV+yPejG0OgqEgm3E6WOXElckYo0npTmRtbny5IGlhqkLB2+t2S28PPOzaDxtVFbdXGVf1ZO1FFG6snTe9oSjoYs=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WxcE26o_1769083512 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 22 Jan 2026 20:05:13 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1769083596; c=relaxed/simple;
+	bh=JTVz6R+VCRUISvCJ3ZucfF6TRHe+SaS+E+rhgH6fMpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=st/lt/SGmbY1NtXdft6zGz9dbdTbUTpcXTaWWcA3bjKOihxyvBe1z5J5YVmOjdHLAfK7VwNxo4ZLvIoBcPUvuuf/LmUhTIBeZSyCZdbuHlPwLyGutqRrnFmJBk3KP99a+23A3t3MQipSlIq8SUgZ9bzol7mAxdhTtihAL1P21NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ScRRWpab; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769083592; x=1800619592;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JTVz6R+VCRUISvCJ3ZucfF6TRHe+SaS+E+rhgH6fMpc=;
+  b=ScRRWpabv1mceMIxZO7kL/CW0EzVCM8z6xpLilKO5QN1/l5UezNu5uIv
+   eQWu/t2G7SN+pBbpowSZyAqN4s/JRx2WDlcaI8lQ8A8EWRPZQXU7FOl5t
+   R1MaVDcySyRHXHMjDEMK/Cxs03dCkJE+y1Z9bJEQ7G3zZwzqwlcgKjVcy
+   0KQLU6Qr4jCPCpC5vlx/7NU3Vf0kKen6wdEpWn9gy5ARnAKVZdOpM8KGs
+   L+y1OfCJnYCgJMfBWI296bFvbjrbowCch24dyjXGGPW/8wPwpYlzxvBkO
+   rT4cIVD8NiO/Jjwe4SrJRf2x4+XEay0A/T2oLeJ2MKJkQdokrB/ekR18u
+   Q==;
+X-CSE-ConnectionGUID: wUgO3qW9TuqvOINY9aBeIA==
+X-CSE-MsgGUID: JPLVVlZOQi6MV9zHq9GEOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="70231050"
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="70231050"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 04:06:31 -0800
+X-CSE-ConnectionGUID: +aJYAhtVRM6pxvea3i9K3w==
+X-CSE-MsgGUID: j/nQnV0BQx+Y/g2bpTPARA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="237977397"
+Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.225])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 04:06:25 -0800
+Date: Thu, 22 Jan 2026 14:06:23 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v22 6/6] eea: introduce callback for ndo_get_stats64
-Date: Thu, 22 Jan 2026 20:05:08 +0800
-Message-Id: <20260122120508.17452-7-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260122120508.17452-1-xuanzhuo@linux.alibaba.com>
-References: <20260122120508.17452-1-xuanzhuo@linux.alibaba.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>,
+	Mark Brown <broonie@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: Re: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with
+ non-MMIO regmaps
+Message-ID: <aXISv3Acm1v6yS4V@smile.fi.intel.com>
+References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
+ <20260122105654.105600-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: f8898de39b6a
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260122105654.105600-2-vladimir.oltean@nxp.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-5.96 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-252322-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,linux.intel.com,trustnetic.com];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	TAGGED_FROM(0.00)[bounces-252324-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	HAS_ORG_HEADER(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:mid,linux.alibaba.com:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: 4D6C56683E
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,bootlin.com:email,nxp.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,smile.fi.intel.com:mid]
+X-Rspamd-Queue-Id: 35F6566D68
 X-Rspamd-Action: no action
 
-Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
+On Thu, Jan 22, 2026 at 12:56:40PM +0200, Vladimir Oltean wrote:
+> The regmap world is seemingly split into two groups which attempt to
+> solve different problems. Effectively, this means that not all regmap
+> providers are compatible with all regmap consumers.
+> 
+> First, we have the group where the current mdio-regmap users fit:
+> altera_tse_main.c and dwmac-socfpga.c use devm_regmap_init_mmio() to
+> ioremap their pcs_base and obtain a regmap where address zero is the
+> first PCS register.
+> 
+> Second, we have the group where MFD parent drivers call
+> mfd_add_devices(), having previously initialized a non-MMIO (SPI, I2C)
+> regmap and added it to their devres list, and MFD child drivers use
+> dev_get_regmap(dev->parent, NULL) in their probe function, to find the
+> first (and single) regmap of the MFD parent. The address zero of this
+> regmap is global to the entire parent, so the children need to be
+> parent-aware and add their own offsets for the registers that they
+> should manage. This is essentially because MFD is seemingly coming from
+> a world where peripheral registers are all entangled with each other.
+> 
+> What I'm trying to support are potentially multiple instances of the
+> same kind of device, at well separated address space regions.
+> 
+> To provide isolated regmaps for each child device would essentially mean
+> solving the problem of how would each child device needs to find the
+> correct regmap. This further means that "dev_get_regmap(dev->parent,
+> NULL)" transforms either in:
+> - dev_get_regmap(dev, NULL): search in the child device's devres list,
+>   not in the parent's. This means adding the regmap in between
+>   platform_device_alloc() and platform_device_add(), but is
+>   structurally impossible because &dev->devres_head is initialized way
+>   too late, in device_initialize().
+> - dev_get_regmap(dev->parent, "unique-regmap-name"): now the child
+>   device needs to know, in case there are multiple instances of it,
+>   which one is it, to ask for the right one. I've seen
+>   drivers/mfd/ocelot-core.c work around this rather elegantly, providing
+>   a resource to the child, and then the child uses resource->name to
+>   find the regmap of the same name in the parent. But then I also
+>   stumbled upon drivers/net/pcs/pcs-xpcs-plat.c which I need to support
+>   as a child platform device, and that superimposes its own naming
+>   scheme for the resources: "direct" or "indirect" - scheme which is
+>   obviously incompatible with namespacing per instance.
+> 
+> So a parent device needs to decide whether it is in the boat that
+> provides one isolated regmap for each child, or one big regmap for all.
+> The "one big regmap" is the lowest common denominator when considering
+> children like pcs-xpcs-plat.c.
+> 
+> This means that from mdio-regmap's perspective, it needs to deal with
+> regmaps coming from both kinds of providers, as neither of them is going
+> away.
+> 
+> Users who provide a big regmap but want to access only a window into it
+> should provide as a struct mdio_regmap_config field a resource that
+> describes the start and end of that window. Currently we only use the
+> start as an offset into the regmap, and hope that MDIO reads and writes
+> won't go past the end.
 
-This commit introduces ndo_get_stats64 support.
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/ethernet/alibaba/eea/eea_net.c | 51 ++++++++++++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_net.h |  5 +++
- 2 files changed, 56 insertions(+)
+FWIW, Cc list may be located after --- line. It will have the same effect on
+emails (as regular tooling will parse and put them into email headers), but
+will reduce unneeded noise in the commit message. List will be still available
+on lore.kernel.org in the mail archives.
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index 89a1521d772f..d05c6b5acd14 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -27,8 +27,10 @@ static void enet_bind_new_q_and_cfg(struct eea_net *enet,
- 
- 	enet->cfg = ctx->cfg;
- 
-+	spin_lock(&enet->stats_lock);
- 	enet->rx = ctx->rx;
- 	enet->tx = ctx->tx;
-+	spin_unlock(&enet->stats_lock);
- 
- 	for (i = 0; i < ctx->cfg.rx_ring_num; i++) {
- 		rx = ctx->rx[i];
-@@ -54,11 +56,13 @@ static void eea_free_rxtx_q_mem(struct eea_net *enet)
- 	struct eea_net_tx *tx, *tx_array;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
- 	rx_array = enet->rx;
- 	tx_array = enet->tx;
- 
- 	enet->rx = NULL;
- 	enet->tx = NULL;
-+	spin_unlock(&enet->stats_lock);
- 
- 	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
- 		rx = rx_array[i];
-@@ -264,6 +268,50 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
- 
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	spin_lock_bh(&enet->stats_lock);
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+
-+	spin_unlock_bh(&enet->stats_lock);
-+}
-+
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- {
-@@ -455,6 +503,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- 	.ndo_tx_timeout     = eea_tx_timeout,
- };
-@@ -480,6 +529,8 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 	enet->edev = edev;
- 	edev->enet = enet;
- 
-+	spin_lock_init(&enet->stats_lock);
-+
- 	return enet;
- }
- 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index 78a621c2ce4c..f32d26e156ab 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -157,6 +157,11 @@ struct eea_net {
- 	u32 speed;
- 
- 	u64 hw_ts_offset;
-+
-+	/* Protect the tx and rx of struct eea_net, when eea_stats accesses the
-+	 * stats from rx and tx queues.
-+	 */
-+	spinlock_t stats_lock;
- };
- 
- int eea_tx_resize(struct eea_net *enet, struct eea_net_tx *tx, u32 ring_num);
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+
+  Cc: ...
+  ...
+
+...
+
+>  struct mdio_regmap_priv {
+>  	struct regmap *regmap;
+> +	unsigned int base;
+
+Hmm... resource_size_t ?
+
+>  	u8 valid_addr;
+>  };
+
 -- 
-2.32.0.3.g01195cf9f
+With Best Regards,
+Andy Shevchenko
+
 
 
