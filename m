@@ -1,188 +1,166 @@
-Return-Path: <netdev+bounces-252248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPT4ELXpcWkONAAAu9opvQ
-	(envelope-from <netdev+bounces-252248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:11:17 +0100
+	id gMmeCC/tcWk/ZwAAu9opvQ
+	(envelope-from <netdev+bounces-252250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:26:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8994364484
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:11:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D439A64802
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3EF41568CD2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:03:14 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 851205EA729
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C5D35EDBA;
-	Thu, 22 Jan 2026 09:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346923148A3;
+	Thu, 22 Jan 2026 09:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4iqzBTj+"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ciXaTA3M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E2634D3A5
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8442E223DC6
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769072553; cv=none; b=MHxOa00gysUjAfJllrU6SOI5IBrRSL2s9y3U9rlMMPLn6p02mRd2qhOEV53iNLCvSmetJmk+RtotbvSfibXcTxNmMByhzXLRgzU15rc0nLm6yhhlL8GFzWX6tJInpjI/zsUxuEGyabY74PPkeuIhpcyZnwn7/7JlbLh+CK6K5IU=
+	t=1769073404; cv=none; b=bx7DMjl+JWBjDAaV/+ijaPNNV0rjlUO2Man9sYNemZElF5UY2j17GyRyKmK0+qE3kAZHYf/YlZwGW2wrwsOmYaY0eOWaJLY61kDVqIjVat99mbFzLJ5IDQRX+YXfz+HOWeBoXS+FLlZwbrsDdtVCf8ZFbV1Y67Mhf03qzgG35TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769072553; c=relaxed/simple;
-	bh=34K+76eFg41xT/KBVhWBeQtEBZHFL83MhAy05mpJ7Cc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZKreeAD1Q5BEBNtaHMCgl9OCUPQm8mI/ZFYdvrwndiL/wZA1I89+LJUZ19vnAATsayLrYa+KPDv0xu/aAwmzIp80CnvMzUXFXm4p8LbwcSr1V2EVnsD7H+GYTksPjPJ9Sq3r5tOFpxWlWYqVTy31b8voNstjDi8YknzCSTBohPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4iqzBTj+; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c52af6855fso94965485a.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 01:02:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769072550; x=1769677350; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WxzUokCDYjO/+PBrEc2hFD8BwQnRcCSzk8Bn8EqGldQ=;
-        b=4iqzBTj+KnD8OZTDZTErzM2/XNjJ85kVw6BnrVnS8YXLrPDxObnA1ZhS0vu28KMdbU
-         V7O+ZuUfY+2cUIBGnhNN1P9eJiuxQLNeOpVkrH6IESVFau7+g3LzGmDUMdQ6Gc1qDjmZ
-         H4rVTFHdsIW+Shecatv0fyfoxXG0EsbkORZ8ivarRynrpxH610knNg5BuSlQcSV/ckWx
-         3sKTLtDu+67DrKE86gM5N0ly71FgS8mJXZjPLcaLPMNcN0cI7VSslCMaMzICXIWNA3zw
-         R858hafKPH1yp/9flzyIoipfiwX8f55CEW0QL8WJzgCutAvirKBBfLT0ShzAk9DCxPu2
-         RKkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769072550; x=1769677350;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WxzUokCDYjO/+PBrEc2hFD8BwQnRcCSzk8Bn8EqGldQ=;
-        b=lcsbViQAzS2ikwg4JruKBH0obUVEqgGfxhlR8sgoxobQ900o4LYOjpMAYZV785oUGf
-         u2T+3gs4QWEcif2QAm1+SdfvjGqER5MkpL4YIquEevRFqT86ZSmrcpk7LcLyA8CigH48
-         BOYRhr4MoylLTKwNPlZ13CvJVN+fdyj4OKGgUTahdIEypG4WwuOWyMivlgUFNaru78WR
-         BGJ4DPD6H1BmUmtFmGThKjjmv7l90nxP+sNBqD3Fsx4xfK46SjhE/L/2raT1nQLz148x
-         El3+J2gktpzApp1ypzCLznkNSCc8oFJh+ENXOghVROV//+Ra93TwdGhpGsWf+ZbC8cwJ
-         8X1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV7VedTk5pTL4VsNuBvM2BhSjqgisZ+rRTRl/vWA07GoeisJ2Rx/HwnSzCUXVZMuFGDXQGejio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKc65PAN/0RYqgT3al5IV58KQUTztOHUK1nOAQ9dvVS5d8uJus
-	mWwIHEyKJHCS/EQ9oKNtmGIkLvuyHBKgcjaAlvmD8MjqUs1QkP+KRiJdci0STY/V4y/eHYjEZHr
-	ZiE/HXlG+hjNeag==
-X-Received: from qvcu8.prod.google.com ([2002:a05:6214:1c08:b0:88f:ca76:451b])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4116:b0:8c6:a92c:5fff with SMTP id af79cd13be357-8c6cce94da9mr997522385a.25.1769072550091;
- Thu, 22 Jan 2026 01:02:30 -0800 (PST)
-Date: Thu, 22 Jan 2026 09:02:27 +0000
+	s=arc-20240116; t=1769073404; c=relaxed/simple;
+	bh=PplpYZG54yCTO5Zvm8cd60PmTtW5IMnM+N/1Ic97wbI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GspHdmLmU/JdN94KVrSd6LZAfK2QxungeNiwp1+DXD2b/IYnm4JKCqLVFO3RZHUhCQlVoqgSzKKDROsJ9rYdcl+DJdEOIAyAPGPljQUOv5Awa3S7Yhxu0LsoY87+IcaglEchiIk5VPbZQW3vQF690k7r4nkyMm6+L9bdjLs9B9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ciXaTA3M; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60M6Wf1P1834067;
+	Thu, 22 Jan 2026 01:16:25 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=RCQPDNXijAeVUWmVf6wLg88
+	flEUv6pUUQ7mfKMo2dXI=; b=ciXaTA3MG45HJsi1ie0LtUEPjvzzykCA/86QduX
+	29ZMLyvFRP7T9P2cUolN6xVI/E/ik4Pim1cTGCgvHky4Ul5s6enSxHfM+BCZO7MT
+	8wHVLPJ+S9W5Tsm8Vq1ZgBm0EQLCtnYMTFKg3dLU5OJjtmahU6KmWi7TRNOHtUwX
+	Y0ArJY9FOHu4stHu1lbPJBwy7BGHU9yhGTlhI8kWntBJS8YqCKvMYxJf+ddlzX/A
+	hoeKtCHk2tJTrLi1wSvjHNNHy6q2WCLkx81bwW5uSqganWYNpYmdbdTzIBmWBU4s
+	ZxvYlY9M1xTJ0/zQEor5laGooZNgJRdgZ+AQkvtizRsVEBA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4btm3nktr5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jan 2026 01:16:13 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 22 Jan 2026 01:15:32 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 22 Jan 2026 01:15:32 -0800
+Received: from localhost.localdomain (unknown [10.28.36.175])
+	by maili.marvell.com (Postfix) with ESMTP id 7DB483F70A7;
+	Thu, 22 Jan 2026 01:15:28 -0800 (PST)
+From: Srujana Challa <schalla@marvell.com>
+To: <netdev@vger.kernel.org>, <virtualization@lists.linux.dev>
+CC: <pabeni@redhat.com>, <mst@redhat.com>, <jasowang@redhat.com>,
+        <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>,
+        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <ndabilpuram@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH net-next] virtio_net: Increase RSS max key size to match NETDEV_RSS_KEY_LEN
+Date: Thu, 22 Jan 2026 14:45:27 +0530
+Message-ID: <20260122091527.339180-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260122090228.1678207-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: move tcp_stream_memory_free() to tcp.c
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIyMDA2MyBTYWx0ZWRfX9r2h1FS5WQcK
+ U/pruugap6TWlwP3coPhDCYguUbRDh15zKgj0LBgC5WNWzdux0TIfqpmxRg7kjZZ0HH5SdB+zk3
+ A9o91V7uuU15zfpsbAKy+39zdWeK0kd2r3RPZka/NyQMnsimhUF6ZfzQUFhaact4zZE1vxNpo8G
+ iBMhhzy/T/KCIZ5Yaf31z1hsWXlNbUS55jA1lOet84P4fc2NwSdrRh9Syuonv2BjmFjYXbGvFCq
+ K+qXc8nHUmt6Qgnc3Gt3ApyozUFrRu8yB5gshNHYMig0kOVdub/hjsTNlnuqdv0lKzmDRThz4JS
+ Cpk/CiUdngCc+/BbEQH9ih3rHJ4oKZudW3i+pKPTpmBrovvmjj6v01XONYOuPKobi0SJgJ6KQQD
+ AGNi/VOx9R/Jd5ZcIV0EVIJDTsfQZwZjp3FJPLZgy6nuPeVtUNP9ksoXg+hOmi+h2pzOwHNMFPK
+ ItN5fpvaOWT0vNDo8Rg==
+X-Authority-Analysis: v=2.4 cv=JeSxbEKV c=1 sm=1 tr=0 ts=6971eadd cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
+ a=tN_10AvwJLKXjGWysDEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: lfpShW07b5drNxv4SqoIKUJFJ1sgbB5I
+X-Proofpoint-GUID: lfpShW07b5drNxv4SqoIKUJFJ1sgbB5I
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-21_04,2026-01-20_01,2025-10-01_01
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_POLICY_ALLOW(0.00)[marvell.com,none];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252248-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252250-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schalla@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,marvell.com:email,marvell.com:dkim,marvell.com:mid];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,vmlinux.new:url]
-X-Rspamd-Queue-Id: 8994364484
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: D439A64802
 X-Rspamd-Action: no action
 
-Moving tcp_stream_memory_free() to tcp.c allows the compiler
-to (auto)inline it from tcp_poll() and tcp_sendmsg_locked()
-for better performance.
+Increase VIRTIO_NET_RSS_MAX_KEY_SIZE from 40 to 52 bytes to align with
+the kernel's standard RSS key length defined by NETDEV_RSS_KEY_LEN.
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/0 grow/shrink: 2/0 up/down: 118/0 (118)
-Function                                     old     new   delta
-tcp_poll                                     840     923     +83
-tcp_sendmsg_locked                          4217    4252     +35
-Total: Before=22573095, After=22573213, chg +0.00%
+The virtio specification requires devices to support at least 40 bytes
+for the RSS key size. However, devices may support larger key sizes
+up to 52 bytes (as reported by the device's rss_max_key_size config
+field). This change allows such devices to work properly.
+Previously, devices reporting rss_max_key_size > 40 would fail with
+an error during initialization.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+The driver already handles variable key sizes dynamically through
+vi->rss_key_size, so increasing the maximum limit is safe and
+maintains backward compatibility with devices that support smaller
+key sizes.
+
+Signed-off-by: Srujana Challa <schalla@marvell.com>
 ---
- net/ipv4/tcp.c      | 13 +++++++++++++
- net/ipv4/tcp_ipv4.c | 14 --------------
- 2 files changed, 13 insertions(+), 14 deletions(-)
+ drivers/net/virtio_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index d5319ebe24525ef9c1f0ea0297eb6c70878e0b29..e4c7cc19de3d9eb45c176ff7e2f71ac5b4f6cd5f 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -517,6 +517,19 @@ static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
- 		bpf_skops_tx_timestamping(sk, skb, BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
- }
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index db88dcaefb20..5f06cbc058d7 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -381,7 +381,7 @@ struct receive_queue {
+ 	struct xdp_buff **xsk_buffs;
+ };
  
-+/* @wake is one when sk_stream_write_space() calls us.
-+ * This sends EPOLLOUT only if notsent_bytes is half the limit.
-+ * This mimics the strategy used in sock_def_write_space().
-+ */
-+bool tcp_stream_memory_free(const struct sock *sk, int wake)
-+{
-+	const struct tcp_sock *tp = tcp_sk(sk);
-+	u32 notsent_bytes = READ_ONCE(tp->write_seq) - READ_ONCE(tp->snd_nxt);
-+
-+	return (notsent_bytes << wake) < tcp_notsent_lowat(tp);
-+}
-+EXPORT_SYMBOL(tcp_stream_memory_free);
-+
- static bool tcp_stream_is_readable(struct sock *sk, int target)
- {
- 	if (tcp_epollin_ready(sk, target))
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index f8a9596e8f4d41563896f02329d20b731fe7961f..ffdf52fbf6463b41d7c712f3710b681ecdf6e2d7 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3418,20 +3418,6 @@ void tcp4_proc_exit(void)
- }
- #endif /* CONFIG_PROC_FS */
+-#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
++#define VIRTIO_NET_RSS_MAX_KEY_SIZE     52
  
--/* @wake is one when sk_stream_write_space() calls us.
-- * This sends EPOLLOUT only if notsent_bytes is half the limit.
-- * This mimics the strategy used in sock_def_write_space().
-- */
--bool tcp_stream_memory_free(const struct sock *sk, int wake)
--{
--	const struct tcp_sock *tp = tcp_sk(sk);
--	u32 notsent_bytes = READ_ONCE(tp->write_seq) -
--			    READ_ONCE(tp->snd_nxt);
--
--	return (notsent_bytes << wake) < tcp_notsent_lowat(tp);
--}
--EXPORT_SYMBOL(tcp_stream_memory_free);
--
- struct proto tcp_prot = {
- 	.name			= "TCP",
- 	.owner			= THIS_MODULE,
+ /* Control VQ buffers: protected by the rtnl lock */
+ struct control_buf {
 -- 
-2.52.0.457.g6b5491de43-goog
+2.25.1
 
 
