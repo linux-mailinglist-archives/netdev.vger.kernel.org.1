@@ -1,98 +1,99 @@
-Return-Path: <netdev+bounces-252538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252539-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Pkd0IMiTcmksmQAAu9opvQ
-	(envelope-from <netdev+bounces-252538-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:16:56 +0100
+	id eH69FCSWcmmSmwAAu9opvQ
+	(envelope-from <netdev+bounces-252539-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:27:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAA576DA4A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:16:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39B56DBF3
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:26:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43ABF300CC34
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:16:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 57F3930010FA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF0F39BA41;
-	Thu, 22 Jan 2026 21:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6BA3C0881;
+	Thu, 22 Jan 2026 21:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lTR3CQTu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVnMwMLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CAE39CB5D
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 21:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B1533B6F4
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 21:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769116611; cv=none; b=U06ALQiECiLpfdeRnHFdSVzgn71vc/M3WMrhtgdMLhug3dL+ItqWdXEUEMYzuJHWa1iR+nXNzpTzrYes1u/ef+NNnrYfkYklZuWHFwPcpkf7SbAuCPIleH6PLZNyVMnZP4YJYWsDE0gC5a2smLH6CeIEiFy+zXtUA/qnu1AbBs8=
+	t=1769117213; cv=none; b=BIvLMvi0Zs+eQ+uVRcoydKiXRS9zqCEq+Af8OIO2RhSdyAdR9QgByuTuQKIB3ciq96rF9RWKMQ2frgmI/nkpzJDvtKGrXtOeL4uSlBIQ6UiaV4UYHU1tAwUtMiBMvprk3TbL37GbvJR0Her3YcClcMfWvU/FBFLyH8XjHx/wjrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769116611; c=relaxed/simple;
-	bh=qEC/5vZ9Ita/+Iyx/7Oe7zdmWu6d2WG8XdK2F5NCUWM=;
+	s=arc-20240116; t=1769117213; c=relaxed/simple;
+	bh=dc2WxEhMKXrurgWU1N6VFMevo2L5nPOxGcK0DhUlIOA=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fUYbISctYeTzkNrmoL1WD4nVJ0yAcVCpATEG3y2xSYoeNBMJhdptv2GcoR+5g1MKYrnuBNS8GUqfbP78djVg4u962EkCsN5kC0xpRA1yGCMt9X9qRC35lTfjSvkQzRjo+rLfmWwe8iGSQTVrBLjuNXMRoTGmQUmpponMB8yVHCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lTR3CQTu; arc=none smtp.client-ip=74.125.224.47
+	 Mime-Version:Content-Type; b=nlx+6rvaZvPxLMTXJAub57/bU1bwWghYH/5WGnaepKcWIREEzGpMNgedzKKRfja9eiV1lu95iXZANw7gCL18odki7T3tZT4ESmRKk5XTZ0gdFEIr10DP8YqC6LlaveOaR9y/fDTQb5IF0V8PKK4PG9AQmMFojfTdh2Rl/wHOwoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jVnMwMLO; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6446c1a7a1cso1258713d50.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:16:47 -0800 (PST)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-790b7b3e594so15584527b3.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:26:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769116604; x=1769721404; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769117206; x=1769722006; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gSp3jm85K5YdacDbbZd7b5J1W/2vE97DmXJkJ6AMExY=;
-        b=lTR3CQTuuhqR6yyzVL6dm/aZuK3oB6xvutrNY2ek2fX7VPZLFpg6EyjvMYDmr8+xDC
-         wRGAgvaD4AWikwW1MAbAnoZD156iJ1Wwfk0x4VCaVMbW0BQNOX644BkjZFGt40Sx0eSW
-         Aje6kh4ytf8djFfd2se1zdaE56hS+gBlQNIZQ5Clc51pKE3kcySHmImUVgyIzty5qlQx
-         AZAVnz9w+v5/vJTfIKVgYfQJhlm5OxYVdHqSUw6Y1o1GQvF5VabtQaCL97c0GY3iIyNO
-         PwxVy1QoLES7sHBGN9Bb/NgsRKaTli2xcu72e7+BCT8grli26J4qnm6wenXav2m3mHai
-         RioQ==
+        bh=TYFJzzeiiJbQS6gVd8JY6D5XsVotuGeuQ3+GqVmgfjc=;
+        b=jVnMwMLOLFiO9Ow4Y2Zf4FEUgt979uloeErVXWA/FmWHVp/atgsTewfZuVZVLPiI4w
+         XXnTiY+tcUbEAiwlKQPixhJ78bJz/VLtdxcdw8i3y2F29UGasHnAkMkBAFUec8kz56eL
+         GOx3eW8IckzGdCA6jiRBuTrEX5YkUUaoJdl8o6cponTK6LLqL3Wzt/DxUjeUxiUHPS/1
+         fXtDFd+s8jfJCMhW3xUKz+BRgj0jtT1UCV0R8+fT2JlIoFAQk6YRLWmM4AGgCAvI1no+
+         wiGLUGl/IVQLhFXb0xCDnpP2nya+N5XHRvr0w7fJ7Xi/3CbXJ4Ko5IB1ysYXF6pnJDlv
+         rm7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769116604; x=1769721404;
+        d=1e100.net; s=20230601; t=1769117206; x=1769722006;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gSp3jm85K5YdacDbbZd7b5J1W/2vE97DmXJkJ6AMExY=;
-        b=ugkfbMwjNDPY2PGT3qFihgJv+dlzb1K+Do6crVTaIe6gZDVKl3SGE0XHitKPETIxq6
-         WDnU3ClAipBeMBuDcrhYbV77wT/0WUC9TnwUdrt6p6gzxuXe3s+lPuc/EwCUunqwjvOd
-         rTdRQ3tI/kgs91fzRNMXSShpkC60EER03vc4BkbjKqR+qYu2Peg5/6yT9DYVWkHXEf+d
-         1Zo3+ynKylBNuzTSRTdZ+F2PODRWoMWhTYfZECutvfdgeVEPy8HrEWJohpZ6Ufb9aLLH
-         fAU1JbgOApjfuf6hkdu5uiksR7vV6aFUSQwIPcyLRY9s2P1+tVMJ0KWhbtmYCgH+u9RK
-         wZ/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVMUwMRYjq3QV01Ibkg5eCCvnTdADzMNX1sNYwxYL2SenW7s5PE9asaYZiOmyBurz4G3sWzQ0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgvQPTFrw4UxZf/RrJznAPLP0gzjqwrrF4NYseIVTiWXIZHHU0
-	h7oXZnD0AX0gmACTa5p0t1x/xE9fq5BZ44lr0ik3EnO8YORtMYWXwO4l
-X-Gm-Gg: AZuq6aJpuB9Z92l7SWAOA2H2MI+yffkfVNilxmMpPqNyNeqVPsTDxqBoQ5qzuDzGue6
-	O0VTAKTiSULUVjsCUE0/dPsk7YPEDOUHHwaQSEsGn8YMUB3VNN0kNfb1Ai8K285Jv4qnX+NWwcL
-	hpuLgvgxAaFd1pJmFPxVG2g9O5jpa6gpvBlu6Wikuw4QqQYelP99A+/d95SW4g2hBVwUObOT/xO
-	vbhIRmRDRhxY7ROjHcME6ZCvxiCKg2nOEX4h4RvBhUCUhAISL2+zHZiCQbiNHiicyszUE8rhyu2
-	ypP5czE+KlHJWFz79fkuhi/+m1lxUlyQKCo3K8WW2xEPZxjlk2Pgg3i6MzFc/JhE3ckLrwtOh1Y
-	Vg5RYs6/xab4TbjKjyvNeoQqhC/WcaiZAdiTqH1a6NYVGeL/ixN3cH4v968/7JwVh7AY3LyOT+E
-	AMiKMqixxdv1/i4HRXd0LZh850bQASwoZGalL9uLab7VIlGi0dcoMZfKwjNSc=
-X-Received: by 2002:a05:690e:d4c:b0:645:61fc:43c2 with SMTP id 956f58d0204a3-6495be54c66mr649987d50.8.1769116604458;
-        Thu, 22 Jan 2026 13:16:44 -0800 (PST)
+        bh=TYFJzzeiiJbQS6gVd8JY6D5XsVotuGeuQ3+GqVmgfjc=;
+        b=eWmBAQ+4DNRkDjURNgkI55mL2b0jlNAQxQMpWKHtErKbR59e/KEBVFrKhv1phQHx8k
+         6aX9lCIUZwEL7cgymQQEHMenj4/6tAUtOcZWzj22HvmkVS08KCtP/2KAjgD368MjQCjj
+         raetiLWrPOcf52fz9gxREMLKVPaAGR2wuOhSQjPTvnWDQqfeOYEgqyg+1HH/Izs1fmg8
+         uW9LlnLu4VvB4LhJERlv3diauEkTZBSTwQEUzoMgPeeg5Vx7DZBiTzZYPKITTOUlz94i
+         Tp6QCJjZSPqH5hOfqsQirWF7kqtSTSLTSXaPKv4AZk0tTGndrm5I8v8Z+foJuPqK0qoi
+         v9Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZwinuJRxGzbECxhLw+d8f/w/skATWMwf6iPNHBewttJYzGZXWw/DlUueggH0/TwjR0Ww43Ac=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy36bsYJVbnst0LvBryQozI1QfxPux30ssNBKCwsYRZTurZ/F0X
+	8lpj6nsEy3aJSwhJAOdo9rsZissKCTPVYQePOmy/Tj7ecp5hTFolRU/T
+X-Gm-Gg: AZuq6aKAbO5cvWXloYXezkBzJwxWBPb9Oo56eBFlhwm706zwSNi0jWXkOtNhzMU/0JI
+	UCk/7LK1UJYbvZmS3NlgOAoeyyog9CC0HrmeTmvlh2WQV7DbNNVtad77cpuBHvw39HH63gZ29X0
+	1roQb000Ctej80hb2IBeH6md549s2J/UoapGq+/HgtdrkGDy6Vj1AV9a8hoa8evToawJ1Mhjogp
+	tx8d/3pu3AH+tNQtn0wtLEJkk5LfCaGu3QpSJpZypex8UHiQ7PhtBCqZSeKyPS14qfshH2JtAjs
+	rIaerMAYE9Uznjsah9ReIPCR0sckMd2E+cc4kp02Fwj0IXZ5vhP8wz1pFyazMqP6UyxC9B/7uUL
+	OhZWAemhqoTeSydPccQkuMnxhweIDzje7Q2tpcUR2ZVQLG6QKGjdD4cq9Vux6c5RlnRGayGhDai
+	idVoX8MnaoBO/XnpkfRfowJ5BsOavw+z8+lQQuL3wNpV751yOOzmWrk/J9Z9M=
+X-Received: by 2002:a05:690c:6005:b0:790:afc0:4951 with SMTP id 00721157ae682-794398eefc0mr8434937b3.5.1769117206513;
+        Thu, 22 Jan 2026 13:26:46 -0800 (PST)
 Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6495cfc1be1sm196019d50.19.2026.01.22.13.16.43
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7943b2cddf3sm1849457b3.53.2026.01.22.13.26.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 13:16:43 -0800 (PST)
-Date: Thu, 22 Jan 2026 16:16:43 -0500
+        Thu, 22 Jan 2026 13:26:45 -0800 (PST)
+Date: Thu, 22 Jan 2026 16:26:45 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com
-Message-ID: <willemdebruijn.kernel.166500a9f06b7@gmail.com>
-In-Reply-To: <CANn89iKtX7Omh7qXwt7A1=Q3nQ4VgVOAzWfgNBO-t0xWP7RKpQ@mail.gmail.com>
-References: <20260122190349.2771064-1-edumazet@google.com>
- <willemdebruijn.kernel.65df45c3b4fe@gmail.com>
- <CANn89iKtX7Omh7qXwt7A1=Q3nQ4VgVOAzWfgNBO-t0xWP7RKpQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: expand NETDEV_RSS_KEY_LEN to 256 bytes
+To: Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ kshitiz.bartariya@zohomail.in, 
+ Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Message-ID: <willemdebruijn.kernel.1682586fd684e@gmail.com>
+In-Reply-To: <20260122185357.50922-1-mahdifrmx@gmail.com>
+References: <20260122185357.50922-1-mahdifrmx@gmail.com>
+Subject: Re: [PATCH net-next] udp: add drop count for packets in
+ udp_prod_queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,28 +102,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252538-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252539-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com,zohomail.in];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -130,125 +131,88 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BAA576DA4A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F39B56DBF3
 X-Rspamd-Action: no action
 
-Eric Dumazet wrote:
-> On Thu, Jan 22, 2026 at 9:22=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Eric Dumazet wrote:
-> > > NETDEV_RSS_KEY_LEN has been set to 52 bytes in 2014, until now.
-> > >
-> > > Jakub suggested we bump the size to 128 bytes or more.
-> > >
-> > > Some drivers (like idpf) were already working around the core limit=
-.
-> >
-> > Idpf still bounds to the max?
-> >
-> > Iff respinning it may be informative to explain how drivers intend to=
+Mahdi Faramarzpour wrote:
+> This commit adds SNMP drop count increment for the packets in
+> per NUMA queues which were introduced in commit b650bf0977d3
+> ("udp: remove busylock and add per NUMA queues"). note that SNMP
+> counters are incremented currently by the caller for skb. And
+> that these skbs on the intermediate queue cannot be counted
+> there so need similar logic in their error path.
+> 
+> Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+> ---
+> v5:
+>   - check if drop counts are non-zero before increasing countrers
+> v4: https://lore.kernel.org/netdev/20260108102950.49417-1-mahdifrmx@gmail.com/
+>   - move all changes to unlikely(to_drop) branch
+> v3: https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@gmail.com/
+>   - remove the unreachable UDP_MIB_RCVBUFERRORS code
+> v2: https://lore.kernel.org/netdev/20260105071218.10785-1-mahdifrmx@gmail.com/
+>   - change ENOMEM to ENOBUFS
+> v1: https://lore.kernel.org/netdev/20260104105732.427691-1-mahdifrmx@gmail.com/
+> ---
+>  net/ipv4/udp.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index ffe074cb5..41cf8f7ab 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -1793,14 +1793,31 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+>  	}
+>  
+>  	if (unlikely(to_drop)) {
+> +		int err_ipv4 = 0;
+> +		int err_ipv6 = 0;
 
-> > use limits beyond standard Toeplitz. The tunneling that Jakub
-> > mentioned. AFAIK there is no Linux control API to configure the devic=
-e
-> > RSS block in that way?
-> =
+nit: whitespace between variable definition and code block
 
-> How the NIC does header analysis and RSS computation is up to the NIC v=
-endor.
-> =
+>  		for (nb = 0; to_drop != NULL; nb++) {
+>  			skb = to_drop;
+> +			if (skb->protocol == htons(ETH_P_IP))
+> +				err_ipv4++;
+> +			else
+> +				err_ipv6++;
 
-> They provide some knobs, but not a way of using user-defined RSS
-> hashing for some particular encapsulations.
-> =
+No need for separate counters.
 
-> Some NIC use a TCAM, and they do not use the RSS keys in sequence.
-> Say if one 4byte member of the L4 4-tuple starts at offset 130, the
-> NIC will use rss_key[130-xx] :rss_key[133-xx]
+All counters will either update IPv4 or IPv6 stats. Similar to how
+the caller of _udp_enqueue_schedule_sk is either __udp_queue_rcv_skb
+or __udpv6_queue_rcv_skb and chooses the SNMP stat based on that.
 
-I see. That is no longer RSS as defined. But that's moot. The point of
-the sysfs interface is to be able to share keys across netdevices for
-consistent behavior. For whatever algorithm it uses.
- =
+Can check sk_family == PF_INET6 once.
 
-> >
-> > >
-> > > Since this change might cause some issues in admin scripts,
-> > > bump it directly to 256 in one go.
-> > >
-> > > tjbp26:~# cat /proc/sys/net/core/netdev_rss_key | wc -c
-> > > 768
-> > >
-> > > tjbp26:~# ethtool -x eth1
-> > > RX flow hash indirection table for eth1 with 32 RX ring(s):
-> > > ...
-> > > RSS hash key:
-> > > fe:16:5b:2f:93:85:c2:c9:c1:ef:bd:60:c6:e0:2b:99:4d:bf:b7:14:c8:1e:8=
-d:cb:31:17:51:da:55:eb:91:d9:9e:f9:89:9b:44:a1:dc:08:72:3a:b3:d6:31:86:9a=
-:fe:02:3a:0d:eb:a1:7c:f5:a3:51:3b:08:56:c9:3f:71:69:01:ba:70:38
-> > > RSS hash function:
-> > >     toeplitz: on
-> > >     xor: off
-> > >     crc32: off
-> > >
-> > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > > Link: https://lore.kernel.org/netdev/20260122075206.504ec591@kernel=
-.org/
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> >
-> > > diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.=
-c
-> > > index 05dd55cf8b58e6c6fce498a11c09f23fd56d8f34..0f761d4b94471a5f8bb=
-e0810922cf59e009be99d 100644
-> > > --- a/net/core/sysctl_net_core.c
-> > > +++ b/net/core/sysctl_net_core.c
-> > > @@ -325,10 +325,16 @@ static int proc_do_dev_weight(const struct ct=
-l_table *table, int write,
-> > >  static int proc_do_rss_key(const struct ctl_table *table, int writ=
-e,
-> > >                          void *buffer, size_t *lenp, loff_t *ppos)
-> > >  {
-> > > -     struct ctl_table fake_table;
-> > >       char buf[NETDEV_RSS_KEY_LEN * 3];
-> > > +     struct ctl_table fake_table;
-> > > +     char *pos =3D buf;
-> > > +
-> > > +     for (int i =3D 0; i < NETDEV_RSS_KEY_LEN; i++) {
-> > > +             pos =3D hex_byte_pack(pos, netdev_rss_key[i]);
-> > > +             *pos++ =3D ':';
-> > > +     }
-> > > +     *(--pos) =3D 0;
-> > >
-> > > -     snprintf(buf, sizeof(buf), "%*phC", NETDEV_RSS_KEY_LEN, netde=
-v_rss_key);
-> >
-> > Why change the print method?
-> >
-> =
+>  			to_drop = skb->next;
+>  			skb_mark_not_on_list(skb);
+> -			/* TODO: update SNMP values. */
+>  			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
+>  		}
+>  		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
+> +		if (err_ipv4 > 0) {
+> +			SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS,
+> +				       err_ipv4);
+> +			SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS,
+> +				       err_ipv4);
+> +		}
+> +		if (err_ipv6 > 0) {
+> +			SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS,
+> +				       err_ipv6);
+> +			SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS,
+> +				       err_ipv6);
+> +		}
+>  	}
+>  
+>  	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
+> -- 
+> 2.34.1
+> 
 
-> Because the existing one is limited to 64 bytes.
-> =
-
-> lib/vsprintf.c
-> =
-
->  * - 'h[CDN]' For a variable-length buffer, it prints it as a hex strin=
-g with
->  *            a certain separator (' ' by default):
->  *              C colon
->  *              D dash
->  *              N no separator
->  *            The maximum supported length is 64 bytes of the input. Co=
-nsider
->  *            to use print_hex_dump() for the larger input.
-
-I see. Thanks.
 
 
