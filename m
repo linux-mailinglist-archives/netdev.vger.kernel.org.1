@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-252116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOjPGrV0cWm3HAAAu9opvQ
-	(envelope-from <netdev+bounces-252116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:52:05 +0100
+	id 8MQZGMF0cWm3HAAAu9opvQ
+	(envelope-from <netdev+bounces-252117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:52:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180C560168
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:52:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288F660170
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F38A95E4053
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:51:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 388FA3C4C4F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE6E30FF20;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FE331062D;
 	Thu, 22 Jan 2026 00:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1AHe8v0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kaf+/pTM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAE730FC31
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 00:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD74230F95C
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 00:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769043092; cv=none; b=JO/QufIDr+CxvnAoQP2YSa3eUbhpl8/JLObI8+2dh0sSPwlYms53VWMTFBXYFsk1yixJLr5lfxYL5rhkteE26x+S3aJiuFD6/uABP46MaPUBESwPmvNAa/UsdVIiM063Zn1z2j/Dgru21wEde8Z5eqaEnIj8LVQLe/f8a0QstGs=
+	t=1769043092; cv=none; b=mxTlqyuQUOeYJn7tMuIkeCK699FrMBl1T+A/BOYiFJFsABRKGWsXNgomJQnI37Rlu7yS1M7WJA5HfWApIJLRATwk162pu9SSXfjjNApprk0m7GsAl2Jj8qZb9eX+KQGZHB1zXAgluAi5lcvPZSmlNkR6HpKuqDznPfzRIdsjKJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769043092; c=relaxed/simple;
-	bh=eEDHiu3G8QbRA4TDIDw3ynHovjfWsrgribiT3x6Mu7s=;
+	bh=FNDgyEhm+AU9JDVxt+AiV1JIWAuwLh7ctfHIDZGsBp0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RN1crmZHLehgjWdWz+v6QVQIQWNm5bCH4DPdkZHs5Bvo3BH36OjPpA3OCIrk5Kcl8zCrPKC2AZn244cIL6IZEmB/EmCWoiQo83C1ATyUHh9O7hcjQZN+MuaTMWOdZ17C9K0PpINv2itf2ZWwzik9UT0x+gu/vf0e3JQNqclmiWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1AHe8v0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0365CC4AF09;
-	Thu, 22 Jan 2026 00:51:30 +0000 (UTC)
+	 MIME-Version; b=Wc4BwaVTKv/oG4TumXeIQ0p3Wchtsi94BuaKDUkXutIqWCrvr/dvEErc5Cxm6If/ECdMorRjlJ+hpnq0dmnq2N3uB0v5Ubxw4VpHXMDD3nUxsnzSyYsUR6/MIGuH4Ee51dszv+TLqSwPtonqLfFB+AF50AAPwo/1lEW+U8CSL9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kaf+/pTM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3CA9C19425;
+	Thu, 22 Jan 2026 00:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769043091;
-	bh=eEDHiu3G8QbRA4TDIDw3ynHovjfWsrgribiT3x6Mu7s=;
+	s=k20201202; t=1769043092;
+	bh=FNDgyEhm+AU9JDVxt+AiV1JIWAuwLh7ctfHIDZGsBp0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p1AHe8v0Npue4AekI6LI1JV8egCEdLZEQfQrRYnk+0Q32Hev3lNp+do//joItOQpP
-	 w8QgQnAbXTfRjtxlLennQmnouKePU6grKMd41JAOiP5vDeBfUtOfkb0ASS+kkDiLDO
-	 S66XqayOec6mX79ycEeXL2W4ySzXG04oiLkD3xP9AfRxmWXx2u7kba5U9VCJ3BQ8tt
-	 /QMe/bk0nmKw65q4jnI6D1heLgpggt4ILnW8BdQcX5HH6/YNFhvqhRVtACotMsJj4f
-	 V/iLGjh3X21wLMjpFhRE/wYe1piKSZ/3EXiyM+Qg5zmJ3QUAgvZgYEzQsGV1sP0aL8
-	 E7yNax08s4J9Q==
+	b=Kaf+/pTM4tBmu1B/kylh/mJ1nZ+m64qm6jj65DYbPIhksFy00/SWmSuVJZ7ksywuF
+	 kvjWkjKPr0UPOxXHBQZyt9dU+y9f86cu+upLtekVvBnhHjwlR67iUOy6SXE9bbtyqa
+	 /QdTj/YwdrOviKZdNY3CZBJS8Z4WZKxeQlaQblwKHUAazOwW9LWZkIwaxHpUIYzjDw
+	 sOH7Qw72fnhCOF63brUr3jJGp08eAYvcjFUvnLOYc0Udm3BWX63vMudrKWbz6yxoa4
+	 AamZ13N4LK6KDHwCLz1Vg1PG1dnbT6E8n75KtDJ3UvC9Z1ue71v/Cw+D+YXvc0lITH
+	 r5cJm0NWp4Zeg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	dw@davidwei.uk,
 	daniel@iogearbox.net,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/6] eth: bnxt: always set the queue mgmt ops
-Date: Wed, 21 Jan 2026 16:51:08 -0800
-Message-ID: <20260122005113.2476634-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/6] net: introduce a trivial netdev_queue_config()
+Date: Wed, 21 Jan 2026 16:51:09 -0800
+Message-ID: <20260122005113.2476634-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260122005113.2476634-1-kuba@kernel.org>
 References: <20260122005113.2476634-1-kuba@kernel.org>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,fomichev.me,nvidia.com,gmail.com,davidwei.uk,iogearbox.net];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-252116-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252117-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
@@ -102,57 +102,118 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 180C560168
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 288F660170
 X-Rspamd-Action: no action
 
-Core provides a centralized callback for validating per-queue settings
-but the callback is part of the queue management ops. Having the ops
-conditionally set complicates the parts of the driver which could
-otherwise lean on the core to feed it the correct settings.
-
-Always set the queue ops, but provide no restart-related callbacks if
-queue ops are not supported by the device. This should maintain current
-behavior, the check in netdev_rx_queue_restart() looks both at op struct
-and individual ops.
+We may choose to extend or reimplement the logic which renders
+the per-queue config. The drivers should not poke directly into
+the queue state. Add a helper for drivers to use when they want
+to query the config for a specific queue.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-v1:
- - reflow code
- - typo fix
-rfc: https://lore.kernel.org/20250421222827.283737-15-kuba@kernel.org
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/core/Makefile                         |  1 +
+ include/net/netdev_queues.h               |  3 +++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  6 ++---
+ net/core/netdev_config.c                  | 32 +++++++++++++++++++++++
+ 4 files changed, 39 insertions(+), 3 deletions(-)
+ create mode 100644 net/core/netdev_config.c
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 0e0c88c122f8..0b95100a7c36 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16314,6 +16314,9 @@ static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
- 	.supported_params	= QCFG_RX_PAGE_SIZE,
+diff --git a/net/core/Makefile b/net/core/Makefile
+index 9ef2099c5426..d643a5a7fd18 100644
+--- a/net/core/Makefile
++++ b/net/core/Makefile
+@@ -19,6 +19,7 @@ obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
+ 
+ obj-y += net-sysfs.o
+ obj-y += hotdata.o
++obj-y += netdev_config.o
+ obj-y += netdev_rx_queue.o
+ obj-y += netdev_queues.o
+ obj-$(CONFIG_PAGE_POOL) += page_pool.o page_pool_user.o
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index 2ab3eae8e8c3..725bf69ef86c 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -170,6 +170,9 @@ struct netdev_queue_mgmt_ops {
+ 	unsigned int supported_params;
  };
  
-+static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops_unsupp = {
-+};
++void netdev_queue_config(struct net_device *dev, int rxq,
++			 struct netdev_queue_config *qcfg);
 +
- static void bnxt_remove_one(struct pci_dev *pdev)
- {
- 	struct net_device *dev = pci_get_drvdata(pdev);
-@@ -16966,9 +16969,10 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
  
- 	if (BNXT_SUPPORTS_NTUPLE_VNIC(bp))
- 		bp->rss_cap |= BNXT_RSS_CAP_MULTI_RSS_CTX;
+ /**
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 0b95100a7c36..d57e833ce690 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -4326,12 +4326,12 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		struct bnxt_napi *bnapi = bp->bnapi[i];
++		struct netdev_queue_config qcfg;
+ 		struct bnxt_ring_mem_info *rmem;
+ 		struct bnxt_cp_ring_info *cpr;
+ 		struct bnxt_rx_ring_info *rxr;
+ 		struct bnxt_tx_ring_info *txr;
+ 		struct bnxt_ring_struct *ring;
+-		struct netdev_rx_queue *rxq;
+ 
+ 		if (!bnapi)
+ 			continue;
+@@ -4349,8 +4349,8 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 		if (!rxr)
+ 			goto skip_rx;
+ 
+-		rxq = __netif_get_rx_queue(bp->dev, i);
+-		rxr->rx_page_size = rxq->qcfg.rx_page_size;
++		netdev_queue_config(bp->dev, i, &qcfg);
++		rxr->rx_page_size = qcfg.rx_page_size;
+ 
+ 		ring = &rxr->rx_ring_struct;
+ 		rmem = &ring->ring_mem;
+diff --git a/net/core/netdev_config.c b/net/core/netdev_config.c
+new file mode 100644
+index 000000000000..562087bd30c8
+--- /dev/null
++++ b/net/core/netdev_config.c
+@@ -0,0 +1,32 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +
-+	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops_unsupp;
- 	if (BNXT_SUPPORTS_QUEUE_API(bp))
- 		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
--	dev->request_ops_lock = true;
- 	dev->netmem_tx = true;
- 
- 	rc = register_netdev(dev);
++#include <linux/netdevice.h>
++#include <net/netdev_queues.h>
++#include <net/netdev_rx_queue.h>
++
++/**
++ * netdev_queue_config() - get configuration for a given queue
++ * @dev:      net_device instance
++ * @rxq_idx:  index of the queue of interest
++ * @qcfg: queue configuration struct (output)
++ *
++ * Render the configuration for a given queue. This helper should be used
++ * by drivers which support queue configuration to retrieve config for
++ * a particular queue.
++ *
++ * @qcfg is an output parameter and is always fully initialized by this
++ * function. Some values may not be set by the user, drivers may either
++ * deal with the "unset" values in @qcfg, or provide the callback
++ * to populate defaults in queue_management_ops.
++ */
++void netdev_queue_config(struct net_device *dev, int rxq_idx,
++			 struct netdev_queue_config *qcfg)
++{
++	struct netdev_queue_config *stored;
++
++	memset(qcfg, 0, sizeof(*qcfg));
++
++	stored = &__netif_get_rx_queue(dev, rxq_idx)->qcfg;
++	qcfg->rx_page_size = stored->rx_page_size;
++}
++EXPORT_SYMBOL(netdev_queue_config);
 -- 
 2.52.0
 
