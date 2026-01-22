@@ -1,168 +1,131 @@
-Return-Path: <netdev+bounces-252184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBovKtmgcWmgKQAAu9opvQ
-	(envelope-from <netdev+bounces-252184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:00:25 +0100
+	id AFn0AiqicWmgKQAAu9opvQ
+	(envelope-from <netdev+bounces-252186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:06:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF76618D8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:00:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF8086196E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 75B0A4E1DF0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:59:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CE3AB52686B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C105A413251;
-	Thu, 22 Jan 2026 03:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D50734C808;
+	Thu, 22 Jan 2026 04:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gGiwOOtS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0uORdUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078C141B37A
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6DA322B9F
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 04:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769054382; cv=none; b=rLng1KcTUrc64Vjwqso2rh2hPY0HuoMlMSqyeWzyQiqcx69G9V283kuW+xdO5Ivk3MWZlFSVfrPWw/W7k1H644aq4A9UpzRf+L2piz6C+HbyI3/PnlSLNst4KUmHbKC9wveuu4+BzjBIgGMhwCGEl7raB7c/J6rqQ3S8ssoakIM=
+	t=1769054414; cv=none; b=MuCq2hdcGOod4LZAig5H7GetjDemjcP6I4MPF5iceI3NOKL4hoBYmqMEudcStQ3h+M+P0KlBsbm8kiLUZ3hy9gso+PbzgCiZhZRo3hDD36Eu/tmxtlENbWx+pJwJ10W4dHzDtUnCSDF0grgpg+EvehHJt19Es/QJm/mDPgCBrtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769054382; c=relaxed/simple;
-	bh=ZrKaM4w+RnW6vXbe3nP8Jqgd1KOR07macYV9pIm7AlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HKGEcDOGZ37LvDMMmYfVi83RUfamy74KW4QFhptHwbDWfgEtDuAhlmDg9TMgAQvJizFLI7rZZmwfPNOJhSeARVowzTsWpkZ4ctnU0qY2cSrQuuExwo6+IIdZzm3+lvOARxYlTEApJhhzV5YCT+A5lH9ze+tBfXJ4f/KteJRSufM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gGiwOOtS; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769054379; x=1800590379;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZrKaM4w+RnW6vXbe3nP8Jqgd1KOR07macYV9pIm7AlA=;
-  b=gGiwOOtSYbrq/lsgqrPywcX0/zf34+OQ0ibzBNyyEucJnIx1IVNFy4fH
-   kPNb4+HhGPdLszwzPPEp4EfEcUlJ5miTgYvULIw3jFbnXStFZ0PXCu4Xl
-   0i12RUpFJgeWKQQy0F3jGTi/wgjbKTA5IWMPv6sNh4fUESNtG+QqPRtpN
-   cxvMEU15t1cyy4EFtwEWsUQeHreljae2LFQUVTMCj45iN0I16Kw/JnucG
-   wgThfnlh0PP9v/UZhFhAL44iGG4F2YFACXORag8QpRJORlvmyjkjseboN
-   XPwgr3OosH3fKh/n9NUvr9VdROgt9n2AayaOWALpqFjNAq/nuiMsl7xmf
-   w==;
-X-CSE-ConnectionGUID: XpTJ6NEGSn+9ZAO/h3PD4A==
-X-CSE-MsgGUID: Y8EXXfHPSGy5o+E3w6Pzew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="80914634"
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="80914634"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 19:59:36 -0800
-X-CSE-ConnectionGUID: utggy15IQAOMjNM4+petNw==
-X-CSE-MsgGUID: 8p8arBDTRvCdeTW3J+GgsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="206227433"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 21 Jan 2026 19:59:34 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vilr1-00000000SPF-23bZ;
-	Thu, 22 Jan 2026 03:59:31 +0000
-Date: Thu, 22 Jan 2026 11:58:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Eric Dumazet <edumazet@google.com>,
-	Mahesh Bandewar <maheshb@google.com>
-Subject: Re: [PATCH net-next] ipvlan: remove ipvlan_ht_addr_lookup()
-Message-ID: <202601221121.jJSK4gxB-lkp@intel.com>
-References: <20260121215728.560645-1-edumazet@google.com>
+	s=arc-20240116; t=1769054414; c=relaxed/simple;
+	bh=POsAxH2ufvLrBKhDtDwnIaXqrnLXPR4/6Xv+x98B9XQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UA8S9GCwHsf1bG1ZB5ok5kdVQrAgErwWzvENsHounxBOlAmBaKcc3XEjDn9hmD4J7a0KWXRGvpvIO2B+zkV5Ns6DrwWFp7kqbvM168uxHg82jDQgVGcAJ7y4nxL01Kn2RM84GVqUdYArxGZezdazNBkAuWBoRPfv4wRkL+yctSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0uORdUq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A8E3C116C6;
+	Thu, 22 Jan 2026 04:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769054413;
+	bh=POsAxH2ufvLrBKhDtDwnIaXqrnLXPR4/6Xv+x98B9XQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=q0uORdUqc8iGUC+bTqH3JDZgy5nCMhRLDo1JzFCwIsdpkcdd7oHA2dyZhl4mrxlAH
+	 l92EUzOvGFoafHGjNoxNvcYhiIpPlzbjgFkH5vtAV9VbEIG9PbGB6fxBs5R0v76zdM
+	 FgJTcXIj7CBTo4NyWUHqMBuJEZQLkKgJvQsX++ikdYe8tw6hOijUe62aNdY2zGbA7I
+	 AMUNE97DeNMMg3BlxBAimO9J0ntEmpxxSRO0SDBEZy8VWKpKzSF/0+CvAVqY/XxzIi
+	 3TTtprgfaezYZGoEiPC7vhYtSlJCulVTnJx6jhWFrrBORujvtJakW/NC7rdlp621JC
+	 w782iZTX4vrrA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EE833808200;
+	Thu, 22 Jan 2026 04:00:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121215728.560645-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: dsa: fix off-by-one in maximum bridge ID
+ determination
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176905440986.1550373.18140833827678654878.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jan 2026 04:00:09 +0000
+References: <20260120211039.3228999-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20260120211039.3228999-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ alsi@bang-olufsen.dk
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	FREEMAIL_CC(0.00)[lists.linux.dev,kernel.org,vger.kernel.org,gmail.com,google.com];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252184-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252186-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1DF76618D8
+X-Rspamd-Queue-Id: BF8086196E
 X-Rspamd-Action: no action
 
-Hi Eric,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test WARNING on net-next/main]
+On Tue, 20 Jan 2026 23:10:39 +0200 you wrote:
+> Prior to the blamed commit, the bridge_num range was from
+> 0 to ds->max_num_bridges - 1. After the commit, it is from
+> 1 to ds->max_num_bridges.
+> 
+> So this check:
+> 	if (bridge_num >= max)
+> 		return 0;
+> must be updated to:
+> 	if (bridge_num > max)
+> 		return 0;
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/ipvlan-remove-ipvlan_ht_addr_lookup/20260122-060038
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260121215728.560645-1-edumazet%40google.com
-patch subject: [PATCH net-next] ipvlan: remove ipvlan_ht_addr_lookup()
-config: i386-randconfig-054-20260122 (https://download.01.org/0day-ci/archive/20260122/202601221121.jJSK4gxB-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260122/202601221121.jJSK4gxB-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net] net: dsa: fix off-by-one in maximum bridge ID determination
+    https://git.kernel.org/netdev/net/c/dfca045cd4d0
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601221121.jJSK4gxB-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ipvlan/ipvlan_core.c:74:26: warning: 'ipvlan_ht_addr_lookup6' defined but not used [-Wunused-function]
-      74 | static struct ipvl_addr *ipvlan_ht_addr_lookup6(const struct ipvl_port *port,
-         |                          ^~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/ipvlan_ht_addr_lookup6 +74 drivers/net/ipvlan/ipvlan_core.c
-
-    73	
-  > 74	static struct ipvl_addr *ipvlan_ht_addr_lookup6(const struct ipvl_port *port,
-    75							const void *iaddr)
-    76	{
-    77		struct ipvl_addr *addr;
-    78		u8 hash;
-    79	
-    80		hash = ipvlan_get_v6_hash(iaddr);
-    81		hlist_for_each_entry_rcu(addr, &port->hlhead[hash], hlnode)
-    82			if (addr_equal(true, addr, iaddr))
-    83				return addr;
-    84		return NULL;
-    85	}
-    86	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
