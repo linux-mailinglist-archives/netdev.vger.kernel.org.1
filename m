@@ -1,131 +1,138 @@
-Return-Path: <netdev+bounces-252340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HLmKx8ecmmPdQAAu9opvQ
-	(envelope-from <netdev+bounces-252340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:54:55 +0100
+	id KDFmOwcicmmPdQAAu9opvQ
+	(envelope-from <netdev+bounces-252341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:11:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322D266EA4
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:54:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B71B667181
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D0C17906DE2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:30:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 982A7569CE0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E4223FC41;
-	Thu, 22 Jan 2026 12:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BC92FE579;
+	Thu, 22 Jan 2026 12:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V42jBl+5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dCzstjUZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A9023817F;
-	Thu, 22 Jan 2026 12:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56BD26FA5A
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 12:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769085009; cv=none; b=E5KORU8ERtccj7MnjCDF4oIy9U5NS9iQRXZY+qCDTRZ/ICSHSxuTTJTACmEMlwSsZAdpadKslQwC0suXUap1JTFDzwVJt+wML4fAGGVMjiSO5ZfdnGvjkBPyYPtP4CiOvDgbit4jmK3yqqpFI2sB6j2avEQPubgy4uuwnlAMxGo=
+	t=1769085130; cv=none; b=rM0Vm32xqz/eEy4Ob3tgBOwpcVQ9XIghJA2IC10Pa4As7ViMdLJkpG7YqJ+GTTX+9KEUvgFqadvtBGI2nU+KAq2NA77G//bd1EfNE+6LtMic0rYJla4SEVK4fB3V4KzdpAq720503Y9286ZpjEG6/QD66rB6yNDaNCMUyIv+mA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769085009; c=relaxed/simple;
-	bh=/hjcCNFeMj8oOox0c8QBGx9VeHubGikBZuPrKcoaGY0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j5llba2HnzTE2BtFRHkt24+v8LeSp0inXUVwddqqeKXmMSiM0huOR965yRlhQFukZJw9/P25wvvulyyCKKEqdhL7p5UBA7ZnqRNU9AprCxGWVHuMcI+OyIHL2YzMzffO/IAtD8hkny8OgNKG9hb8nX0UI4UpyvRZgrVBgAqDqyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V42jBl+5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FDDC116C6;
-	Thu, 22 Jan 2026 12:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769085008;
-	bh=/hjcCNFeMj8oOox0c8QBGx9VeHubGikBZuPrKcoaGY0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V42jBl+5C2uRu41AQq7U4l2G7smrE2+KJE/11pzMwkx7PuuDemSytCunsO8QtXN4C
-	 nI2BEvmUwCSOJWNWOtvmgjgYkb1vtN4iULjXvxFmjtOQulWVilzaIPwb9wXYmqC4og
-	 6jD4M1HAPwqsP/XB4uKXfOaAA/bmfLrhrh+5PqmNVDpdWPodxtt5qgPgWqJOeffsoU
-	 w1gVKcEaIFcl++Ng4RRPzISOdPjgw+9A28Fi6v2wM5av+Igwm+xC2RInwB18LG8vum
-	 sQLiH2xU24DD34eIOYXIkCUcbJUxuOpxswiZg0aY9IoH3rO+NrBOHh54nh+/ODAp1C
-	 yIrHHjlFRnylQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BAE33808200;
-	Thu, 22 Jan 2026 12:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1769085130; c=relaxed/simple;
+	bh=T0B4Aysngk9AYB4KDOXAjX7IYn1+hFLLAhtwfY5VegM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l3d9NHb54u8E1uyhnirL/hx6+ypQzubjYZg1e/FCljV3Ctqe3S+vVLUFDt69TylpMGqZ1TTmtkLSlgDQdnd2HZairNWPySmC3kB+oAyzDbsxgeUmz7sEx4ewXltCpC4v4tzn8Tvy4fsUSLetS3dfQjN8KZyd8Uf9RC2/CAvoCl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dCzstjUZ; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 29A011A2A54;
+	Thu, 22 Jan 2026 12:32:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D223C606B6;
+	Thu, 22 Jan 2026 12:32:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 82C1D119B818B;
+	Thu, 22 Jan 2026 13:31:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769085122; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=T0B4Aysngk9AYB4KDOXAjX7IYn1+hFLLAhtwfY5VegM=;
+	b=dCzstjUZ64RDTZX168ppsHBo2JzipVo67yFaYYdRRcqgN1F1/a8NNC3XJjtzPGiiHhxyLT
+	lLLyvrwbO4bQJpR/Y7YI0qnBp6ZTzSU+HTXtLMZnG4RHBZCzH+ohmytAKmuRlmzHKNLu8x
+	YzjeJR+yBuxgHfwwi3CMxBqGsuvnZWVA46mRjGns0SEkrsF3LUmYqQ7WjSG1JpZAffjyKy
+	itpTyWzmaleEJs81ObP6ePO2IEX+7IW3gWIL0iHPz5nfa4vuDEpv2sQr0oXjJEzLsGXgsP
+	PpsllGLLV8P/+p5oosBNdDRF4SpAtDrqq8njrQH0fTJV1qujYUGoIk4gKhYz7A==
+Message-ID: <697e05a3-9ae0-4a84-88ed-9efba98316b1@bootlin.com>
+Date: Thu, 22 Jan 2026 13:31:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: fec: account for VLAN header in frame length
- calculations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176908500535.1702959.10720487953177513534.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jan 2026 12:30:05 +0000
-References: <20260121083751.66997-1-mail@clemensgruber.at>
-In-Reply-To: <20260121083751.66997-1-mail@clemensgruber.at>
-To: Clemens Gruber <mail@clemensgruber.at>
-Cc: wei.fang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shenwei.wang@nxp.com, xiaoning.wang@nxp.com, imx@lists.linux.dev,
- netdev@vger.kernel.org, stable@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v2 1/2] net: phy: marvell: 88e1111: define
+ gigabit features
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Josua Mayer <josua@solid-run.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260101-cisco-1g-sfp-phy-features-v2-0-47781d9e7747@solid-run.com>
+ <20260101-cisco-1g-sfp-phy-features-v2-1-47781d9e7747@solid-run.com>
+ <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
+ <b8cafe50-c87b-4bd4-a47e-d11c11c16f7c@bootlin.com>
+ <aXDreiHjK06lHY9h@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aXDreiHjK06lHY9h@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-252340-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	FREEMAIL_CC(0.00)[solid-run.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[bootlin.com,reject];
+	TAGGED_FROM(0.00)[bounces-252341-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 322D266EA4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: B71B667181
 X-Rspamd-Action: no action
 
-Hello:
+On 21/01/2026 16:06, Russell King (Oracle) wrote:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> If you want to try and work out what the media side should be, then
+> I think we're basically going to end up needing our own database for
+> every transceiver out there... which leads us towards the model that
+> vendors use: only accepting transceivers we know about (which leads
+> to claims of "vendor lock-in" for this technology.)
 
-On Wed, 21 Jan 2026 09:37:51 +0100 you wrote:
-> The MAX_FL (maximum frame length) and related calculations used ETH_HLEN,
-> which does not account for the 4-byte VLAN tag in tagged frames. This
-> caused the hardware to reject valid VLAN frames as oversized, resulting
-> in RX errors and dropped packets.
-> 
-> Use VLAN_ETH_HLEN instead of ETH_HLEN in the MAX_FL register setup,
-> cut-through mode threshold, buffer allocation, and max_mtu calculation.
-> 
-> [...]
+Does the current model of applying the fixups/quirks fits that bill of
+having some internal database ?
 
-Here is the summary with links:
-  - [v2] net: fec: account for VLAN header in frame length calculations
-    https://git.kernel.org/netdev/net/c/ca1bb3fedf26
+Thing is, from my tests there are modules (e.g. Prolabs GLC-GE-100FX-C)
+where neither the eeprom nor the integrated PHY's reported capabilities
+are correct. The only reliable thing we have then is the SFP module's
+vendor_name + vendor_pn.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+From then on, we may say "We trust whatever comes out of reading the
+eeprom + applying the quirks" ?
 
+Or am I relying too much on the quirks ?
 
+Maxime
 
