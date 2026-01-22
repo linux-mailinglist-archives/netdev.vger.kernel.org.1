@@ -1,56 +1,51 @@
-Return-Path: <netdev+bounces-252534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252526-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Jt/DkONcmlJmAAAu9opvQ
-	(envelope-from <netdev+bounces-252534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:49:07 +0100
+	id sAoRLxeDcmkUlwAAu9opvQ
+	(envelope-from <netdev+bounces-252526-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:05:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C84A6D8C2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:49:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6C96D515
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DDA9300EFB6
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:48:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4EB253004DBC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87AE73A7034;
-	Thu, 22 Jan 2026 20:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E724339CED2;
+	Thu, 22 Jan 2026 20:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="TZGhD2q+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Clfw6A0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx27lb.world4you.com (mx27lb.world4you.com [81.19.149.137])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D63B21D59B
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 20:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18107346A04
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 20:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769114913; cv=none; b=p378drTRehga6QWNLttpf2U7WQphdlg2Kz6lSe95UD3bfF3n2hPEZlqxaUQt0LGqdGCDYBWYO/vYe895fkLEW1uF0NTtzOY2QLYqzYHRvvw/BeMV5GJiJMa2ytK2QKJZiRR11Jkxs5MagZdCLSSxS2D3r4cPhVqhT1vSXqATVfY=
+	t=1769112338; cv=none; b=n6/ZGeup+c43DTIg2IWDyfw4s8JA2erjhD7cphC8d8XTEjfMYu+IoHSCioWXHgiLnBDvdlY7gqkegSXgVgssYyivhBnCNPUOOWy5BwCbFzBGwjGetnOsuVwkQaWkWjumXoAhIjMkCAmFNjwpdjW894YThnK66rBSLAtYbDKgFls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769114913; c=relaxed/simple;
-	bh=ZxRzWIa2RYrCjblR8FU1QpFVaCx9tygXC9Uf0jNb22w=;
+	s=arc-20240116; t=1769112338; c=relaxed/simple;
+	bh=eWihy3VUCeEi3epkPHxvkcRSpVRAyqmLAcirtp7FW9g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FI8auZJJobNQq+oVvl6dQ3SlQH0BUgJjVDtPD7jqubXu9KpaxlarLokCbrHMXjh08ziNu9CRkP0iXLJyYrBgON0y1aJHC5ohH4vJKIfo0GiAK8fsv8BBhOtxF/nKMM9FydwlirjjgZDwV2y5CwWgoyPkrnPUWC3AprICC0ZXz2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=TZGhD2q+; arc=none smtp.client-ip=81.19.149.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sDVB9pQemhkH2KV7SHjCh7VrpYGRuz2iO0t3CU9ClFU=; b=TZGhD2q+6T+fjXSdjPP8R0wy/H
-	oobmBlntXwcND1F5rvBacjig3kiVRwsDWnRGOOjKqNHBhB76zVMRXZ1rldWfXT35xr9UIFaAkOWKd
-	e8XkGToBpEfqFDayrzX/2/OiKVCK5stsy2obNBgj6mxWReDRD/ScX3otrduJHrz+OP2g=;
-Received: from [188.23.33.245] (helo=[10.0.0.160])
-	by mx27lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1vj0ul-000000007vz-0YKZ;
-	Thu, 22 Jan 2026 21:04:24 +0100
-Message-ID: <c5ba02dd-e81f-4590-9e35-90c9b2c33bee@engleder-embedded.com>
-Date: Thu, 22 Jan 2026 21:04:23 +0100
+	 In-Reply-To:Content-Type; b=ImGxY5k28w0NePXMJa7T/woWiwh37Uwq0MWY+YT+wlX1lRe1Wt0HDLNigkyGyosWmC+RTkkoAIsJdWHX/o89hO4/HZ3MrAJAQbdVBIvTK2e/1z+H8movtY4ubYG9fM/42Tt1FSh22tHiQTF0bL7nzPmd260UoBLQ85uFGBF6uaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Clfw6A0B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5FA2C116C6;
+	Thu, 22 Jan 2026 20:05:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769112336;
+	bh=eWihy3VUCeEi3epkPHxvkcRSpVRAyqmLAcirtp7FW9g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Clfw6A0B/gvwOxK/BZB8riW6G3sZ4O1F9MevvP7LomTQ6wkPmZA2CnZO2PUTpMvOY
+	 xVVqht+VnWtw57WkJBS+Ha+ah8ncYU3eOny2RDW/XDVe0U7leFj4bdzPlmszvNKt6Y
+	 SEVEwWdz6r1ITFo5I8FWxU6XDPJCyQmYRWbxCWCBEVGW3jEBJ34AS0aEWgj8JRPslD
+	 HfA34NeWqnWTA8mta88cvgi0xHI5bXpEEA9rUyjRyA9Pw0UDcwh0htMf91jYbQ0Co6
+	 +R9InK2Ro1x9503zGqj89XoLUKXsi1svUymU2FyNOQ9NJUS3yl5FFoJ66YboUfA1qQ
+	 NEeYsZ3dbITTw==
+Message-ID: <60f5b633-d214-450c-a1ce-26df8f2d8f26@kernel.org>
+Date: Thu, 22 Jan 2026 13:05:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,103 +53,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net: extend ndo_get_tstamp for other
- timestamp types
-To: Kevin Yang <yyd@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Joshua Washington <joshwash@google.com>,
- Richard Cochran <richardcochran@gmail.com>
-References: <20260121160458.990785-1-yyd@google.com>
- <20260121160458.990785-2-yyd@google.com>
+Subject: Re: [PATCH net-next] ipv4: igmp: annotate data-races around
+ idev->mr_maxdelay
 Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20260121160458.990785-2-yyd@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260122172247.2429403-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260122172247.2429403-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[engleder-embedded.com:s=dkim11];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[engleder-embedded.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252534-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252526-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,lunn.ch,davemloft.net,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[engleder-embedded.com:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.951];
+	NEURAL_HAM(-0.00)[-0.994];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gerhard@engleder-embedded.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,engleder-embedded.com:mid]
-X-Rspamd-Queue-Id: 5C84A6D8C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CC6C96D515
 X-Rspamd-Action: no action
 
-On 21.01.26 17:04, Kevin Yang wrote:
-> Network device hardware timestamps (hwtstamps) and the system's
-> clock (ktime) often originate from different clock domains.
-> This makes it hard to directly calculate the duration between
-> a hardware-timestamped event and a system-time event by simple
-> subtraction.
+On 1/22/26 10:22 AM, Eric Dumazet wrote:
+> idev->mr_maxdelay is read and written locklessly,
+> add READ_ONCE()/WRITE_ONCE() annotations.
 > 
-> This patch extends ndo_get_tstamp to allow a netdev to provide
-> a hwtstamp into the system's CLOCK_REALTIME domain. This allows a
-> driver to either perform a conversion by estimating or, if the
-> clocks are kept synchronized, return the original timestamp directly.
-> Other clock domains, e.g. CLOCK_MONOTONIC_RAW can also be added when
-> a use surfaces.
+> While we are at it, make this field an u32.
 > 
-> This is useful for features that need to measure the delay between
-> a packet's hardware arrival/departure and a later software event.
-> For example, the TCP stack can use this to measure precise
-> packet receive delays, which is a requirement for the upcoming
-> TCP Swift [1] congestion control algorithm.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/inetdevice.h | 2 +-
+>  net/ipv4/igmp.c            | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> [1] Kumar, Gautam, et al. "Swift: Delay is simple and effective
-> for congestion control in the datacenter." Proceedings of the
-> Annual conference of the ACM Special Interest Group on Data
-> Communication on the applications, technologies, architectures,
-> and protocols for computer communication. 2020.
-> 
-> Signed-off-by: Kevin Yang <yyd@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> diff --git a/include/linux/inetdevice.h b/include/linux/inetdevice.h
+> index 5730ba6b1cfaff25f2b9d206722662e1e62b88fc..dccbeb25f70141982160c776f3cc727296def2b7 100644
+> --- a/include/linux/inetdevice.h
+> +++ b/include/linux/inetdevice.h
+> @@ -38,11 +38,11 @@ struct in_device {
+>  	struct ip_mc_list	*mc_tomb;
+>  	unsigned long		mr_v1_seen;
+>  	unsigned long		mr_v2_seen;
+> -	unsigned long		mr_maxdelay;
+>  	unsigned long		mr_qi;		/* Query Interval */
+>  	unsigned long		mr_qri;		/* Query Response Interval */
+>  	unsigned char		mr_qrv;		/* Query Robustness Variable */
+>  	unsigned char		mr_gq_running;
+> +	u32			mr_maxdelay;
+>  	u32			mr_ifc_count;
+>  	struct timer_list	mr_gq_timer;	/* general query timer */
+>  	struct timer_list	mr_ifc_timer;	/* interface change timer */
+> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> index 7182f1419c2a4d4ea1e90ef6857f6af895dd2770..0adc993c211d7a3901f9a0e9ee816e7fddc598cd 100644
+> --- a/net/ipv4/igmp.c
+> +++ b/net/ipv4/igmp.c
+> @@ -227,7 +227,7 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
+>  
+>  static void igmp_gq_start_timer(struct in_device *in_dev)
+>  {
+> -	int tv = get_random_u32_below(in_dev->mr_maxdelay);
+> +	int tv = get_random_u32_below(READ_ONCE(in_dev->mr_maxdelay));
 
-Like Jakub in his reply
-https://lore.kernel.org/netdev/20260119115710.6fdde8c0@kernel.org/
-for me also the question why this is a driver implementation came to my
-mind.
+u32 tv? fix that type while at it.
 
-With vclocks it is already possible to get timestamps for arbitrary
-clock domains in parallel. So it is already possible to synchronize
-the hwtstamp to CLOCK_REALTIME, CLOCK_MONOTONIC, ... in parallel.
-Therefore, user space synchronisation is needed, but e.g. ptp4l does
-a much better synchronisation job than your solution.
+>  	unsigned long exp = jiffies + tv + 2;
+>  
+>  	if (in_dev->mr_gq_running &&
+> @@ -1009,7 +1009,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+>  		max_delay = IGMPV3_MRC(ih3->code)*(HZ/IGMP_TIMER_SCALE);
+>  		if (!max_delay)
+>  			max_delay = 1;	/* can't mod w/ 0 */
+> -		in_dev->mr_maxdelay = max_delay;
+> +		WRITE_ONCE(in_dev->mr_maxdelay, max_delay);
 
-Maybe CLOCK_REALTIME is not supported by ptp4l, because due to daytime
-saving this clock jumps. IMO these jumps will also be problem for
-your solution, as it will lead to wrong delays two times a year.
-So usually CLOCK_TAI or CLOCK_MONOTONIC would be a better choice.
+max_delay can also be u32; only scope creep with this patch set is
+fixing up igmp_mod_timer to take u32.
 
-To sum up: IMO you suggest a driver specific in-kernel solution where
-already a driver independent user space solution with higher accuracy
-exists.
 
-Gerhard
+>  
+>  		/* RFC3376, 4.1.6. QRV and 4.1.7. QQIC, when the most recently
+>  		 * received value was zero, use the default or statically
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
