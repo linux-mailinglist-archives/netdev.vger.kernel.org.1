@@ -1,68 +1,79 @@
-Return-Path: <netdev+bounces-252180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oD5aCBqfcWmgKQAAu9opvQ
-	(envelope-from <netdev+bounces-252180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:52:58 +0100
+	id UNkHGoaecWmgKQAAu9opvQ
+	(envelope-from <netdev+bounces-252181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:50:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92F061804
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:52:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D842B617B6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9DEA55222BF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:45:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B5D96824236
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61C8425CF7;
-	Thu, 22 Jan 2026 03:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ABF41C2E8;
+	Thu, 22 Jan 2026 03:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHwfsX4y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTzK3DL5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B34393DD6;
-	Thu, 22 Jan 2026 03:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB9D2F25E4;
+	Thu, 22 Jan 2026 03:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769053349; cv=none; b=D1LQa0L1Ul5/+olXs2eghOCOjP3noX9Vhx2E2iSE5cWazOkUdMXM6fBDs2SJXmXMNCLiblXgoCuRdMixyiXJHPRLEKo0y27H9FeWwU6ib9AyIYfeLejlxZ2mvnVUsBJitjxXhw2Rdb2I5yjGzhJYRAXonQrNQANWyuzAhIUJGLs=
+	t=1769053577; cv=none; b=NqmSVItR2N+GtlhNtgybL7qE1Gh0ftM7nTRyTAZOuVJQreQYnJ6cI+PFivaXa+Svy4YZgFAGKVRwkBxiDn954cg2hWhSiFzRPG7z5mfh/f35wPyWGflY2xSkderhkEMNk6jxyS1TiDVX1DciNUjm/4voPI80Ty0cQWGLaQ2XnOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769053349; c=relaxed/simple;
-	bh=m71i5XZiMka0DYPEikMpp4G1MVwcK6evQvAL8kViuio=;
+	s=arc-20240116; t=1769053577; c=relaxed/simple;
+	bh=ynSRihxWim5+EusyB2i7EzOv0G25NDdmVPfcT0SpmjU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kVbktqPDPxsslamXsmjdndSI2t+oBrXTDw9a2p1wuYB8anX4tz2DeTAKnSC9zSKdCkDHvF32cRcn31s4Z/Nb7feD1T2DZenfzWeJEt9hI2Wb9Ts8ILeVLGktkMAj5dCxnffs6zJbdd89XFEGRMKt0GDIT5kR2zpDUY1I1PRHVaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHwfsX4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DA4C116C6;
-	Thu, 22 Jan 2026 03:42:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qYDfSFuwdpRYtfvON+w2/lOwXYf+JH9DoUgyqnh7Kl+QWh+6fxGhNJvkOz2WxSJmEy8NBzHNtKcx1Oau44EVbghpIshQJUu9JUXeZZgKDL7LG/7zCkumaK+SjWRmaYVDug2EH+Y6f8wm76iS9nPHMWMslorS7i9XECQbcVE/AZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTzK3DL5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3A6EC116C6;
+	Thu, 22 Jan 2026 03:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769053348;
-	bh=m71i5XZiMka0DYPEikMpp4G1MVwcK6evQvAL8kViuio=;
+	s=k20201202; t=1769053577;
+	bh=ynSRihxWim5+EusyB2i7EzOv0G25NDdmVPfcT0SpmjU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GHwfsX4ypWtH6/2sfXexFJCclQ1J7Gyp+uybADaY2zSQcPBu3/2ES1pd/YZ9sG6OK
-	 vMpI7mEgiKhm5FwovsXg6v+ju1JeVGsf3i5kBm+tfi4RoHSacTtYUAjwduyrVyQBVv
-	 HkoCvd3cBAxh4gR9Mp2/zfUCgZewRLhXTu87HZludp9ejcxloDB2LjmmRU99epEpRI
-	 Pu3TjTGgOWePzSr6yAl39Z+Mq0gK1B8v+T1Yz6Knn9Y75lyxABLiuboIiXjAT7nFIy
-	 0nC35HDfGR1gL46SsZIlf7ZjmPbnbTYObQTGLrdnJzHvhDnhuRWVD2eGBAnY1i4UbZ
-	 jFja43TH2T/KA==
-Date: Wed, 21 Jan 2026 19:42:26 -0800
+	b=YTzK3DL5J130YmWOp6b7es/wRK1DmQ+o7wgYSuCQfXJa7NXw65UD7/olKRv5FRrKV
+	 abDOVDa4WAmJ2ODdtvSMCixwNRCWJzzEpffJUxTToRmbi7bBnZuYiGkePf1P5fsUsC
+	 SL65nWlBRhLW4WJ/o8n+HLtai9m3yzrUqTe/7vvp9B0IjWBj6ejpqCPhTqZbb0gqj6
+	 TmKF1taxXgSwKJo2iFUncQ9W50G/6/BvGhhKONon5yCvbYrLntUER48QtpymoBA38K
+	 jFcDF9VqoadGtdXHEtHKPy5b3x7SwgwOuau1PRVY6Iq1k70rYgFc4vkCEEHvz6md1P
+	 qcGku8tnlRVvQ==
+Date: Wed, 21 Jan 2026 19:46:15 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: tariqt@nvidia.com
-Cc: cratiu@nvidia.com, saeedm@nvidia.com, cjubran@nvidia.com,
- davem@davemloft.net, horms@kernel.org, linux-doc@vger.kernel.org,
- mbloch@nvidia.com, moshe@nvidia.com, jiri@nvidia.com, edumazet@google.com,
- gal@nvidia.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
- jiri@resnulli.us, krzk@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, rdunlap@infradead.org, leon@kernel.org,
- corbet@lwn.net
-Subject: Re: [net-next,V5,11/15] net/mlx5: Expose a function to clear a
- vport's parent
-Message-ID: <20260121194226.43044b20@kernel.org>
-In-Reply-To: <20260122034001.2579161-1-kuba@kernel.org>
-References: <1768895878-1637182-12-git-send-email-tariqt@nvidia.com>
-	<20260122034001.2579161-1-kuba@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, David Ahern
+ <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>, Arnd Bergmann
+ <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, asml.silence@gmail.com,
+ matttbe@kernel.org, skhawaja@google.com, Bobby Eshleman
+ <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v10 4/5] net: devmem: document
+ NETDEV_A_DMABUF_AUTORELEASE netlink attribute
+Message-ID: <20260121194615.33dc0812@kernel.org>
+In-Reply-To: <CAKB00G2xNvfiV6J3RzKDs=GHMGZ7L16+VKUYLGjpZdOrLnSYKA@mail.gmail.com>
+References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
+	<20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-4-686d0af71978@meta.com>
+	<20260120163650.5a962648@kernel.org>
+	<aXBnqYQdomzH9bT/@devvm11784.nha0.facebook.com>
+	<20260121173512.748e2155@kernel.org>
+	<aXGNhEKOhkTHbJvw@devvm11784.nha0.facebook.com>
+	<20260121185021.446b00e8@kernel.org>
+	<CAKB00G2xNvfiV6J3RzKDs=GHMGZ7L16+VKUYLGjpZdOrLnSYKA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,67 +91,51 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,kernel.org,vger.kernel.org,google.com,lunn.ch,gmail.com,resnulli.us,redhat.com,infradead.org,lwn.net];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
+	TAGGED_FROM(0.00)[bounces-252181-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252180-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23]
-X-Rspamd-Queue-Id: D92F061804
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: D842B617B6
 X-Rspamd-Action: no action
 
-On Wed, 21 Jan 2026 19:40:01 -0800 Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
+On Wed, 21 Jan 2026 19:25:27 -0800 Bobby Eshleman wrote:
+> > > That is correct, neither is true. If the two sockets share a binding the
+> > > kernel doesn't care which socket received the token or which one
+> > > returned it. No token <> socket association. There is no
+> > > queued-but-not-read race either. If any tokens are not returned, as long
+> > > as all of the binding references are eventually released and all sockets
+> > > that used the binding are closed, then all references will be accounted
+> > > for and everything cleaned up.  
+> >
+> > Naming is hard, but I wonder whether the whole feature wouldn't be
+> > better referred to as something to do with global token accounting
+> > / management? AUTORELEASE makes sense but seems like focusing on one
+> > particular side effect.  
 > 
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> net/mlx5e: Skip ESN replay window setup for IPsec crypto offload
-> 
-> This patch fixes a WARN_ON being triggered for crypto offload by adding
-> a check to skip the replay window setup when the offload type is not
-> XFRM_DEV_OFFLOAD_PACKET.
-> 
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> > index a8fb4bec369c..63aa23f5c49e 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-> > @@ -430,7 +430,8 @@ void mlx5e_ipsec_build_accel_xfrm_attrs(struct mlx5e_ipsec_sa_entry *sa_entry,
-> >  		attrs->replay_esn.esn = sa_entry->esn_state.esn;
-> >  		attrs->replay_esn.esn_msb = sa_entry->esn_state.esn_msb;
-> >  		attrs->replay_esn.overlap = sa_entry->esn_state.overlap;
-> > -		if (attrs->dir == XFRM_DEV_OFFLOAD_OUT)
-> > +		if (attrs->dir == XFRM_DEV_OFFLOAD_OUT ||
-> > +		    attrs->type != XFRM_DEV_OFFLOAD_PACKET)
-> >  			goto skip_replay_window;  
-> 
-> At this point in mlx5e_ipsec_build_accel_xfrm_attrs(), attrs->type has not
-> been initialized yet. The function starts with memset(attrs, 0, ...) which
-> sets attrs->type to 0 (XFRM_DEV_OFFLOAD_UNSPECIFIED).
-> 
-> The assignment attrs->type = x->xso.type happens later after the
-> skip_replay_window label. This means the condition attrs->type !=
-> XFRM_DEV_OFFLOAD_PACKET evaluates as 0 != 2 which is always true.
-> 
-> As a result, the replay window setup will be skipped for all inbound
-> configurations, not just crypto offload. Should this check use x->xso.type
-> instead of attrs->type, or should attrs->type be assigned earlier in the
-> function before this check?
+> Good point. The only real use case for autorelease=on is for backwards
+> compatibility... so I thought maybe DEVMEM_A_DMABUF_COMPAT_TOKEN
+> or DEVMEM_A_DMABUF_COMPAT_DONTNEED would be clearer?
 
-Herm, something misfired here, this is a review for the series of fixes
-posted on the same day, not for the rate scheduling.
+Hm. Maybe let's return to naming once we have consensus on the uAPI.
+
+Does everyone think that pushing this via TCP socket opts still makes
+sense, even tho in practice the TCP socket is just how we find the
+binding?
 
