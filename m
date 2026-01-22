@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-252160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252161-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 26s1OCSOcmmHmAAAu9opvQ
-	(envelope-from <netdev+bounces-252160-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:52:52 +0100
+	id uPJ9BDKacWngJgAAu9opvQ
+	(envelope-from <netdev+bounces-252161-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:32:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400F46D8D7
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71EDF615AE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:32:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 966F94EF125
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:30:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D494C8885D2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125F83D3D04;
-	Thu, 22 Jan 2026 03:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30ABA3D669A;
+	Thu, 22 Jan 2026 03:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc5lu1/r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rK/HQ68t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3DE3B8D70;
-	Thu, 22 Jan 2026 03:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062023D6661;
+	Thu, 22 Jan 2026 03:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769052612; cv=none; b=tiWZ7RLREtD0p9ejpeoYu7R3hSAXMjUhtLBuQ7HMfQxBBxq0Yw2RgzqQt2mgdygEAuV8JTIPEn8SczBCddI2NLAQBLkXw9vtR/aWas1FNDM8f/cYmQJmkjnz0lhoVKgzRVFxfIuS6gdTHHRqmunOcqSJerfTmMVVfOH+pUSb6DY=
+	t=1769052613; cv=none; b=jgjNLihLQfctvq0FtZLeEEKacBrfTuktdaI+XPCkqgTxWTstcZeLgzrUKeK5KjTTf7UgxtkYZtb0uomlre86EYf6nV2YjI/oDPlz0cUfjUw3MS/ToUCzlzmt/BDENLVtS9Ka6ZB2bJjuGDR9Wj6SXTUfFfPNhovx5AcuBPeZb+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769052612; c=relaxed/simple;
-	bh=aJNwTCZb6sShIfW52PUO8eHOwbjSWHh0BTCf90rQXrQ=;
+	s=arc-20240116; t=1769052613; c=relaxed/simple;
+	bh=Rdep9s5k5V/uQGJPz9oEpnElIDdpwIOX6HjB3ghYs5M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=isQwLbAOt5IWxqH3BZw6f0mzaXA7TOnS/So1/N/kMZo9HCmv9wSt8pbAAlMwxjn+7kAFvDALqn20Ix/MpJso0Yp6AlNm9sMA3CCwjxuP08C1edPS9LHEvnKXyHIPkf9qD9Hol77dp3i8TXSXhWLzni5wSifibbGhRsMfJx83OvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc5lu1/r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F26FC116D0;
-	Thu, 22 Jan 2026 03:30:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cZT6JqwJUw52AWw+0kv9XrhbGs4GalSQPc3oTHaK5sduoPPsPe0jj36Il+2EGeGOTq3Mn2fjLziQjIZ2MLsIFquCklxrSUjuG6wHsp1AmUqFpwvGA4eP+pKmVINxZR8GuZGmLmI4ifVEgWc0mqAYQlHtY8fdnYjZwofuGfemWbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rK/HQ68t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88C7BC19422;
+	Thu, 22 Jan 2026 03:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769052610;
-	bh=aJNwTCZb6sShIfW52PUO8eHOwbjSWHh0BTCf90rQXrQ=;
+	s=k20201202; t=1769052611;
+	bh=Rdep9s5k5V/uQGJPz9oEpnElIDdpwIOX6HjB3ghYs5M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pc5lu1/rrM/RHWvVTMKHan3dpFgwrs4dWduPZyHC8LNpyQGy6WNzJvCzYOKaw8+/l
-	 fw9Eg6PBBce87qvU3ea1t2gTyR/TYgjNpNYn1CmSwSeTDJ8qVhNV3Wy7/qP1kuKMWT
-	 RMJxqCHA7Le93VgBW1EgAB3pAUst+7ual0TbEDjGjHv+2ZB+BbGDObjMqpQR7jF+Qt
-	 2I6W7fS+EWWxdAmDok5VEAJ/GzmZQAc3jkq6udLfwA1RSAOf+WFB9f5YA7OkdJAiwI
-	 Xw4Y0DoJ6REp+Lqf03x00ojNDHcNIj0sJ59JjL6ybUhzfFLnGJKJdhThQkUinx/4eI
-	 AD382NCdkeaLw==
+	b=rK/HQ68tE/3BcahXNwaMhUjmFdL2iijWJ++m8mdlmLwB/hxKIi4fV1Dtv0FD5GLU3
+	 jRw1TUC3flxKquHyuVp1KhPPIpSCBGvpR/it0qnZfh2xk9+SdXJSv+FseJ6WsTqjPo
+	 AKWnIwvG9bdRPpOdOgCwKfuhK/NHJbuROy/kjYAMYrQMnE6uYnB9oTSckXc90HCkCM
+	 D6Jb+9wOS0bfen0xGLHwI5ZkkJ03JHAIThFvOIL0mYkl6euT4wFKJprTF5VUZ4Fo2P
+	 YiuwX7uZ/EeyaddY4rsztPN8KnT78cLHTYfpXRXxuicPdQ9XwzpsLfnHeXKrlMkczd
+	 X/tA076vi0g5g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EB1B3808200;
-	Thu, 22 Jan 2026 03:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BD163808200;
+	Thu, 22 Jan 2026 03:30:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,53 +57,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] be2net: Fix NULL pointer dereference in
- be_cmd_get_mac_from_list
+Subject: Re: [PATCH net v2] selftests: net: amt: wait longer for connection
+ before
+ sending packets
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176905260710.1542867.8147787917289306815.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jan 2026 03:30:07 +0000
-References: <20260120113734.20193-1-a.vatoropin@crpt.ru>
-In-Reply-To: <20260120113734.20193-1-a.vatoropin@crpt.ru>
-To: =?utf-8?b?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuSA8YS52YXRvcm9waW5AY3Jw?=@codeaurora.org,
-	=?utf-8?b?dC5ydT4=?=@codeaurora.org
-Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
- somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- sathya.perla@emulex.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- stable@vger.kernel.org
+ <176905260835.1542867.4557783049246974526.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jan 2026 03:30:08 +0000
+References: <20260120133930.863845-1-ap420073@gmail.com>
+In-Reply-To: <20260120133930.863845-1-ap420073@gmail.com>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.74 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[kernel.org : No valid SPF,quarantine];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[kernel.org:s=k20201202];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+X-Spamd-Result: default: False [-1.96 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:-];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
+	TAGGED_FROM(0.00)[bounces-252161-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252160-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	TAGGED_RCPT(0.00)[netdev,0L/QuNC9INCQ0L3QtNGA0LXQuSA8YS52YXRvcm9waW5AY3Jw?=];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[crpt.ru:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 400F46D8D7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 71EDF615AE
 X-Rspamd-Action: no action
 
 Hello:
@@ -111,19 +107,19 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Jan 2026 11:37:47 +0000 you wrote:
-> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
+On Tue, 20 Jan 2026 13:39:30 +0000 you wrote:
+> Both send_mcast4() and send_mcast6() use sleep 2 to wait for the tunnel
+> connection between the gateway and the relay, and for the listener
+> socket to be created in the LISTENER namespace.
 > 
-> When the parameter pmac_id_valid argument of be_cmd_get_mac_from_list() is
-> set to false, the driver may request the PMAC_ID from the firmware of the
-> network card, and this function will store that PMAC_ID at the provided
-> address pmac_id. This is the contract of this function.
+> However, tests sometimes fail because packets are sent before the
+> connection is fully established.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] be2net: Fix NULL pointer dereference in be_cmd_get_mac_from_list
-    https://git.kernel.org/netdev/net/c/8215794403d2
+  - [net,v2] selftests: net: amt: wait longer for connection before sending packets
+    https://git.kernel.org/netdev/net/c/04708606fd7b
 
 You are awesome, thank you!
 -- 
