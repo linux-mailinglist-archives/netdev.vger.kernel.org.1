@@ -1,262 +1,489 @@
-Return-Path: <netdev+bounces-252149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QOhvHHqOcWkLJAAAu9opvQ
-	(envelope-from <netdev+bounces-252149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:42:02 +0100
+	id kBHcMTyPcWkLJAAAu9opvQ
+	(envelope-from <netdev+bounces-252150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:45:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1282A6106E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:42:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B0CD610D9
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 03:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E25C0468CB9
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:41:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A078F4E9CA4
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A381038FEF6;
-	Thu, 22 Jan 2026 02:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5BF38FEEA;
+	Thu, 22 Jan 2026 02:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HSkXtBgx"
+	dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b="t46NvV5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11021094.outbound.protection.outlook.com [40.107.74.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563FD38F227
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 02:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769049704; cv=none; b=WTg3BEUz1ZGMJRpecSBYKrXXZM/9nU9MWMp9BKzxlVz8dIBuzhcbXuTVli6QcSN/heBD6EIrWUfwg+JA4CdxAJ/ANwaGZWneCAkvm0iRpbzJ03NGtITtcunzmW8AHQ9EqM0blIk4JXu1fkkzCD+7YWeFuUF7CB7I0qwrKLqVNCw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769049704; c=relaxed/simple;
-	bh=PPIRfhsObAkcW33f+gZJWm44KZAjxYqIRZTHnqcd1mY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q/6OhYZxDOg8cjPQM8WUqAXP0n0SaeEvQwQjGBM+9+MWIsIK9siBz6inFs1MSN4pChobrh559SzJXNbWVn/aaXTXk/1ls9FOXD3hqEqWVkkPGsQdDOjF8wCzRMwqUeZCQYIKxMT0jDs2uhZFMCx3+f3bdwOBaUqSmsw7LKSAcis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HSkXtBgx; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769049684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PRZGbegubvTtb9X2xIuQVHiTp3mLxqiBK8qzoGNvCYg=;
-	b=HSkXtBgxBqnteiND5xUaLE6W3EMbrOuDTogxB3fkCBwpLL6ZAm4p82W3nU1LJWwS+j4WCd
-	vVRVrAsBzbPQq54I1cdmku3CTr+k30OOenm5E3CHXQQJDASVM8d8kSS07dFX34/xRllvgK
-	VBZ6eusEmoH3RNv/BzCUbWaWkNK0XkE=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>,
- Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com,
- jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH bpf-next v10 07/12] bpf,x86: add fsession support for x86_64
-Date: Thu, 22 Jan 2026 10:41:04 +0800
-Message-ID: <3026367.e9J7NaK4W3@7940hx>
-In-Reply-To:
- <CAEf4BzZm5uenrYO3ZXiGB8qXCg67Ov7crNvZtsj=Be4XEm6OpQ@mail.gmail.com>
-References:
- <20260115112246.221082-1-dongml2@chinatelecom.cn>
- <CAEf4BzYop1GT1v7qxNQi44dsEebjwnLp-sHDp-HPzVrj69WzTw@mail.gmail.com>
- <CAEf4BzZm5uenrYO3ZXiGB8qXCg67Ov7crNvZtsj=Be4XEm6OpQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF40038F959;
+	Thu, 22 Jan 2026 02:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.94
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769049909; cv=fail; b=oQJ1Xl2XiKExBOd10v7bmSeP/oVQMGf9YkTifI9sFOsHknML3FTQRN+6xv+AbIkjEa5ZCK2XD+m4vQwXS3AsIj5rE59kESSHE35pLtzByufo0R4v3rrFY1UbA0OyUnTbzk5qT5ee4aXvsciRsTnwCPU6HAOjMzc0HCdir70smzA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769049909; c=relaxed/simple;
+	bh=I7gTURczqGeW+Nim1GnAG3IvY7VInwnjK4coR6RXe6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WGuKYYY6HB4dHzwM7zKg0Z4syi2mcNiCIx/msg1Ul2No3PtibE1UEpja9GnLenOaZ10sfTv8HwlS2beB55/Xa1LxeODOvp9KIovInSsk2APCuMD6oh6K4UlUby/iqtQMI6cqFyeCfcLBKzmlIu7qX40zYOZVLF2BcZevk9xJW68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b=t46NvV5P; arc=fail smtp.client-ip=40.107.74.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valinux.co.jp
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nw+BYvUVMmVekBjLUFx5P7Nzun0YVCj/otTfQSSgUluv1AX5WDdJ5Tg3EByR91xdLzv8FUgQ+djBUYC83tHSjjvD2as+dgA+hgocMcsSDDjmFIGAL9GjVvO6HTryTpUp3FFZ+bw4hmkqTfm0dhRijEIqJQgG2gy6PQ4520CGqDXjeIo0jRIL2qYDS5sTvyFb2Q1mz1jLDKfI0CT1jLzhMaNaoBDQOitsIpPdTRuVd0sjq2D5xe7Wf/bKSzxyqDBzH2ewaxuYBd/RFbhwRYMeg2tuL3YOVKhOlErePfmQNrL51stUR6ax6imgKoq+w2iCYC0ibPs4lPGHDFeAw0PCuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VqWtMc7THSY1QrczuZxjNDiDeZH+w0H6sIYKEeueZUk=;
+ b=BnQ12pdKRTSyE7TYawkb3TDO9gPpt/H7u3AdtWPb6wKLBlLMujLgyhr/w5RFn8OHygiF8EEgVhrL52FDKXEKZFfXJ+uNYPtWcNHIYw6V+UgRP02GuYSSK1LlduDoJfrEMG4V8wmpvO6iWezKYDqEkKZPGpdhN3XSBK8thBa2FZ8db2VHiAH4jFZuZUH+JIFStPj2svu9GRjrMwJE4Np69AVKWYmY/YcuzLmhNY5g42C42DqEqqBKq0NdX5jpkRo8CcuIXQfFK2a8HgbRJtPHhw6w+vMxJBsbtqjmyZYiiQjT1Jtg40XHBVtbR1LSXRprgHQtFu1GUgk8nkPuVkxZtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=valinux.co.jp; dmarc=pass action=none
+ header.from=valinux.co.jp; dkim=pass header.d=valinux.co.jp; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=valinux.co.jp;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VqWtMc7THSY1QrczuZxjNDiDeZH+w0H6sIYKEeueZUk=;
+ b=t46NvV5PW/EeJVB5qSQFtqabet+O7XuTAoW9k8ImwhlPf7TJwgoZelVSSthxLv3mFF+i27brB0GHvvjIGsEx84wDUVk//97TCOnGks07G0W1kJNOznefC08h/ZF8pz9urDTiMZvoeCkByEVfd5SYZZxjumQ1vd5rrNi7dknHwOE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=valinux.co.jp;
+Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM (2603:1096:405:38f::10)
+ by OS7P286MB6555.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:42e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.10; Thu, 22 Jan
+ 2026 02:44:54 +0000
+Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2305:327c:28ec:9b32]) by TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2305:327c:28ec:9b32%5]) with mapi id 15.20.9542.009; Thu, 22 Jan 2026
+ 02:44:54 +0000
+Date: Thu, 22 Jan 2026 11:44:53 +0900
+From: Koichiro Den <den@valinux.co.jp>
+To: Vinod Koul <vkoul@kernel.org>, mani@kernel.org
+Cc: Frank Li <Frank.li@nxp.com>, dave.jiang@intel.com, cassel@kernel.org, 
+	kwilczynski@kernel.org, kishon@kernel.org, bhelgaas@google.com, geert+renesas@glider.be, 
+	robh@kernel.org, jdmason@kudzu.us, allenbh@gmail.com, jingoohan1@gmail.com, 
+	lpieralisi@kernel.org, linux-pci@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
+	dmaengine@vger.kernel.org, iommu@lists.linux.dev, ntb@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, arnd@arndb.de, 
+	gregkh@linuxfoundation.org, joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, 
+	magnus.damm@gmail.com, krzk+dt@kernel.org, conor+dt@kernel.org, corbet@lwn.net, 
+	skhan@linuxfoundation.org, andriy.shevchenko@linux.intel.com, jbrunet@baylibre.com, 
+	utkarsh02t@gmail.com
+Subject: Re: [RFC PATCH v4 02/38] dmaengine: dw-edma: Add per-channel
+ interrupt routing control
+Message-ID: <2bcksnyuxj33bjctjombrstfvjrcdtap6i3v6xhfxtqjmbdkwm@jcaoy2iuh5pr>
+References: <20260118135440.1958279-1-den@valinux.co.jp>
+ <20260118135440.1958279-3-den@valinux.co.jp>
+ <aW0SVx11WCxfTHoY@lizhi-Precision-Tower-5810>
+ <32egn4uhx3dll5es4nzpivg5rdv3hvvrceyznsnnnbbyze7qxu@5z6w45v3jwyf>
+ <aXD4ncvjZWljUyxe@vaman>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXD4ncvjZWljUyxe@vaman>
+X-ClientProxiedBy: TY4P286CA0055.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:405:36e::14) To TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:405:38f::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY7P286MB7722:EE_|OS7P286MB6555:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2591d0ce-ca4b-49d6-31d3-08de59603920
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|10070799003|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?sR5IKVaqKwINMMH4NfA4UeEwDoFoww+riJsfveT13p5n5WBTM+hfcbrCUPhR?=
+ =?us-ascii?Q?Dvic7xP+qdIcvqyzrRu0d348Hom+Jc7tEOBKY25uLPZPme88jBnaaxmTvWz8?=
+ =?us-ascii?Q?nP5EIoXfecFlsJJQ7V5LAdcRFg8tM+LRwp/vXmQwOjteQJe/waGTnMXd+tSb?=
+ =?us-ascii?Q?p6On2scaSKDN+Iylzj59keOi8h3GgdKCrTHsKaAxFKEStn3CQs6TK8qu8G+k?=
+ =?us-ascii?Q?HGaf7EnmJGsB30IL7GnqmauM9Mi13Md8ZM3DGN6Z3ZBctUCDkDy8+XuPu7eR?=
+ =?us-ascii?Q?Lmk1gl+AecfuyGPM08JvxCmEoJwNOYdmIbFu+baE2Y9onyZ0/l+F8cKwgVn5?=
+ =?us-ascii?Q?YhSDRLOJgTJnZOPi9TUANSFy9Uy+XgsSp1FhmzOJwVPVPGUSL/gCx5kYo8mG?=
+ =?us-ascii?Q?5R2LtwgPjIsAmwMTQsnOIq0NwBQEVphyaV4Rh7OvZCzo+2q913fp1CS/M0tG?=
+ =?us-ascii?Q?plRMSN0gWzXILePCymjPUhXfsMcHIh7aYGYhLVEAigx2nIdIoDy5t5rpQfla?=
+ =?us-ascii?Q?AMJ0M2XIWS2d9VKU5JrHMnDGeu61Bp6k+Kzne0CWEqEvvn1ZwW8RF3ydYFPE?=
+ =?us-ascii?Q?7Sv9+T1ydHgLnwL9ZLfAKIcRdYSc/dAxPtfqjmE1QIkgvWso/r66XTjk5mhU?=
+ =?us-ascii?Q?1xLfUaW+sMHAiAwhM535s7Q4dO93Xo81BnFabgbhhlkxcPnq7IXPvPT/Ackm?=
+ =?us-ascii?Q?iVB84z7GnWAN5rIoTaHWTsDdXvjqILEN0XQtO+nFl5IHk8wxLPg2U9P+wpMR?=
+ =?us-ascii?Q?4T15HkkDM4s8X2y7KcqtZaUreXGUwXLFgnYQ55Nfw1mhlX5qQQ8yBgh1b4Yf?=
+ =?us-ascii?Q?eZ735QFDzIlb5KKtCunTU8LFCtz3Qqp6LJsthMLtuOL/iVsu2Mgb1PbVihAy?=
+ =?us-ascii?Q?GJQlwOm1M01Uzzf/wPKyrsGtsh1P2Vw0tW+bsuh9ILIEb2OQNzlOPB0QnyGW?=
+ =?us-ascii?Q?6vmPHR8QinbiOTRwgAe+FrZJ/YC3HargedpJLHKHPIYpHV4pM/AivZIot8mG?=
+ =?us-ascii?Q?kSteg51e1t0mHsWlZXwgodtjRT6SQc6f29fVEUtMa9xnYTD2xOpZpPMys9Ai?=
+ =?us-ascii?Q?UuyGYpxy4H5JysuTcPEw55tC9bLaADGR1k5GouX4o+9DbESTUV4GszQJvaK7?=
+ =?us-ascii?Q?vEgjpeiYMpyFA8luSFi7zRSW1iUGbVN/A4A+gRHJb9UO/24Yapn9Bz4/bDkb?=
+ =?us-ascii?Q?OXmA6X5+9zkXejEsPJNSS/stGqDyyrNifCDCuYUpneQq5LmEwha1Dw/kF93O?=
+ =?us-ascii?Q?gyp1sst/jomDC8izUWBZF5Xj+lggzqADQSmM+qQhpa2Q+o1nsN3RAFIKJXnb?=
+ =?us-ascii?Q?y+fqRPagxVOZvnAZpqDKkd8spoPY7Lu3jwSGGjaWqE7uzpe7rrmHOQGDQH03?=
+ =?us-ascii?Q?vPEUvYg59oo0Kwvui9dEusSidHhXfHkou0KF2xL/CbtavPL2HyetFuNlUiT5?=
+ =?us-ascii?Q?lnSLWi2ScH4hvtjppO7TbE2H8JGZpbxBR4vU54TbmVrjjQqMd8ttsXxmf+hJ?=
+ =?us-ascii?Q?m/XGTI0awDSZt/ejV5d66SJ7q0E16iBOsp2/voYTZC4ZQ48Qjd4GeRHPQ/Yt?=
+ =?us-ascii?Q?lP5x8k8cAosyq+Q9S44=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(10070799003)(7416014)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?oP06ncj7cHlYa2Do1Ap5a8XcXsIwNKFO15dpH5awV9S5G210OfSWRzNpZpRN?=
+ =?us-ascii?Q?jdDkuKQRBu65sTqLYoWndhlN0ww6NCgYvb2TJZ99AoMPcYkYOfhEbSxGYKaN?=
+ =?us-ascii?Q?5UkPYhnZN1z9rwv1/WTGhrS0lAxdUqAsRe9ivj8AUYEcLMs65jUP1L/OOkj0?=
+ =?us-ascii?Q?s0lubFciocv2JTlWVz7yc7nC2lpjXQEP/iewqg3uyqPlmYi1BaNA+nTvwzWC?=
+ =?us-ascii?Q?2YBGqoVbR3ll3GzsDVPhNvbs6ms3f/z6LnZWi7rVFpIuK6/s/PpwbEydOOab?=
+ =?us-ascii?Q?5GHNmcTa3g+nnd/SM+/VLTFL6fLgoNTu0NvnF+/XPt0QUsLRnweVGsUf4fl5?=
+ =?us-ascii?Q?x7q7GNfFKfAOYtfyS9XmAyXoy0cIzFvg9mmoRqHILYxd1/PRaabaycEFRFE2?=
+ =?us-ascii?Q?kkrbdbjNqmAx8pzPerIW35TGGk4enljRwPQs+g7WH3/rU6XWlPMNk1T8WGrQ?=
+ =?us-ascii?Q?oDsdov2E42QUcjeEjort8bDKBAqh6wBpTilEWaW/A83hMrIq4JQFsL1Fquv3?=
+ =?us-ascii?Q?c2wVumxXIhcyC1/1ONfEbFRTzlmbxWSLU4No+OO8UvXPzHMLm19GIiNGKfIW?=
+ =?us-ascii?Q?6QJ1wyVHVcJ36HC619sNS9ai5tRLitAgmVv3OuJIvNceiJvZQjuY7PN8HhJc?=
+ =?us-ascii?Q?Uhm0I8gxoyBYpVuC9iF3hrt2RW4YQS9d6ZVrpqziWQsVwe2WVE5zY8rv2BD5?=
+ =?us-ascii?Q?inH0gs5as63oHcw8/eojjmEA0M4z88uPl92J05YUAp6n61P5XCJhAD5ibPYu?=
+ =?us-ascii?Q?vCSwRfRw5ef9CSqDvemP1RTZjRmlsRGhAX0y/Gr+WaYaU9eQk1TZvJyfvbS5?=
+ =?us-ascii?Q?VBtDBiHSyndvqGVB+a52ihNKG7zS6S0u7gVaKCzwqstweoMezgdpMC/sp7Uc?=
+ =?us-ascii?Q?VfKrsa33nXVWRMTTfTekM5EgKYb+ocyrUDMrCCxzarF2deliM88OA6Uwof5V?=
+ =?us-ascii?Q?W/8DXg9JDIS4ovW0lSLD8GZPaEXM0U3pNv3kcjRYB50s7F+su4VwlatPPlTk?=
+ =?us-ascii?Q?HL1aXJ3H809oHp2KHEIv6hzg5qc5rsu10BUNUmLEXnVI59o1uIJ4Q+flumbP?=
+ =?us-ascii?Q?P6lGHs95QVi2VLKeadi1rLk+IECkrjOWSuEQshbonFrShjg3riyUxuypyBM7?=
+ =?us-ascii?Q?n13JbaJpq5xcQZOJd/C8tT9RJs+f0Xo3tPcbZK7OwCU+Urd6JkyIofZiqQM6?=
+ =?us-ascii?Q?WZ6IYeLeW9yeIa+9fm5Ymn0sh3JKI9uxjRcTDGDk9PSdaJ07wOC2IKvLQTSA?=
+ =?us-ascii?Q?SERlkHh6YkcctWN8kASJ1oK+hMsIhWLbaugwm/IK8TJwugMTDaqPEiQV9B1U?=
+ =?us-ascii?Q?YGc6MpGhz1aI4jJA1HcZmAVCs7fLwaSeIsRC1v6MF8E3fYujEARSzLAXLenQ?=
+ =?us-ascii?Q?0sjXjqrEksYEN5DBL+xcHleZ5sscJ6UoVjEwOGb1fN73T3hgEbaltCtimUI0?=
+ =?us-ascii?Q?Dky0tnEMZqj9eMbPVp0Hp9cy4Ej2Zd/7NDtasKtFIeGpYH1NPFtRywGA4b12?=
+ =?us-ascii?Q?/GeJPgzOkJbjefb+DBk4dP90Jy6HWiFvRMPONbsEn8xLaBHPYKqG48fdNA3i?=
+ =?us-ascii?Q?xNjFC9vrkSmGXRAvsCH0JrGtcYjZP7XHBsCq9WmF/6dHVPeBbDWW4XC1AYvr?=
+ =?us-ascii?Q?RjmlVtKw1nD5qIFXlnsg5pPxTT1oS+pKQCwTgo/nvoK3FGXYnluq7TS5Qj6v?=
+ =?us-ascii?Q?Y0ut6ssDl8yRuQa7U9M9/6AFoEKVxlUOfihIzwhtCe4sqlpRGIcglMEwEExY?=
+ =?us-ascii?Q?Im2loV8Q7Om0hubVm1kE18jGjGXLaSuMBOHzNTwuguuNaUFiR/bR?=
+X-OriginatorOrg: valinux.co.jp
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2591d0ce-ca4b-49d6-31d3-08de59603920
+X-MS-Exchange-CrossTenant-AuthSource: TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 02:44:54.4447
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 7a57bee8-f73d-4c5f-a4f7-d72c91c8c111
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gSw7GmGOYlPcC3bUoMKXaKvCoKIitKJ9F7rj+DHoWrg20E283VCQN7U7HV1e5RlqffCs3KQdFukEnwHA3rf2rg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS7P286MB6555
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [2.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[valinux.co.jp:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252150-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252149-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[nxp.com,intel.com,kernel.org,google.com,glider.be,kudzu.us,gmail.com,vger.kernel.org,lists.linux.dev,arndb.de,linuxfoundation.org,8bytes.org,arm.com,lwn.net,linux.intel.com,baylibre.com];
+	DKIM_TRACE(0.00)[valinux.co.jp:+];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[den@valinux.co.jp,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[valinux.co.jp,none];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1282A6106E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B0CD610D9
 X-Rspamd-Action: no action
 
-On 2026/1/22 08:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> On Wed, Jan 21, 2026 at 4:06=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Thu, Jan 15, 2026 at 3:24=E2=80=AFAM Menglong Dong <menglong8.dong@g=
-mail.com> wrote:
-> > >
-> > > Add BPF_TRACE_FSESSION supporting to x86_64, including:
-> > >
-> > > 1. clear the return value in the stack before fentry to make the fent=
-ry
-> > >    of the fsession can only get 0 with bpf_get_func_ret().
-> > >
-> > > 2. clear all the session cookies' value in the stack.
-> > >
-> > > 2. store the index of the cookie to ctx[-1] before the calling to fse=
-ssion
-> > >
-> > > 3. store the "is_return" flag to ctx[-1] before the calling to fexit =
-of
-> > >    the fsession.
-> > >
-> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > Co-developed-by: Leon Hwang <leon.hwang@linux.dev>
-> > > Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
-> > > ---
-> > > v10:
-> > > - use "|" for func_meta instead of "+"
-> > > - pass the "func_meta_off" to invoke_bpf() explicitly, instead of
-> > >   computing it with "stack_size + 8"
-> > > - pass the "cookie_off" to invoke_bpf() instead of computing the curr=
-ent
-> > >   cookie index with "func_meta"
-> > >
-> > > v5:
-> > > - add the variable "func_meta"
-> > > - define cookie_off in a new line
-> > >
-> > > v4:
-> > > - some adjustment to the 1st patch, such as we get the fsession prog =
-from
-> > >   fentry and fexit hlist
-> > > - remove the supporting of skipping fexit with fentry return non-zero
-> > >
-> > > v2:
-> > > - add session cookie support
-> > > - add the session stuff after return value, instead of before nr_args
-> > > ---
-> > >  arch/x86/net/bpf_jit_comp.c | 52 ++++++++++++++++++++++++++++-------=
-=2D-
-> > >  1 file changed, 40 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> > > index 2f31331955b5..16720f2be16c 100644
-> > > --- a/arch/x86/net/bpf_jit_comp.c
-> > > +++ b/arch/x86/net/bpf_jit_comp.c
-> > > @@ -3094,13 +3094,19 @@ static int emit_cond_near_jump(u8 **pprog, vo=
-id *func, void *ip, u8 jmp_cond)
-> > >
-> > >  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
-> > >                       struct bpf_tramp_links *tl, int stack_size,
-> > > -                     int run_ctx_off, bool save_ret,
-> > > -                     void *image, void *rw_image)
-> > > +                     int run_ctx_off, int func_meta_off, bool save_r=
-et,
-> > > +                     void *image, void *rw_image, u64 func_meta,
-> > > +                     int cookie_off)
-> > >  {
-> > > -       int i;
-> > > +       int i, cur_cookie =3D (cookie_off - stack_size) / 8;
-> >
-> > not sure why you went with passing cookie_off and then calculating,
-> > effectively, cookie count out of that?... why not pass cookie count
-> > directly then? it's minor, but just seems like a weird choice here,
-> > tbh
+On Wed, Jan 21, 2026 at 09:32:37PM +0530, Vinod Koul wrote:
+> On 19-01-26, 23:26, Koichiro Den wrote:
+> > On Sun, Jan 18, 2026 at 12:03:19PM -0500, Frank Li wrote:
+> > > On Sun, Jan 18, 2026 at 10:54:04PM +0900, Koichiro Den wrote:
+> > > > DesignWare EP eDMA can generate interrupts both locally and remotely
+> > > > (LIE/RIE). Remote eDMA users need to decide, per channel, whether
+> > > > completions should be handled locally, remotely, or both. Unless
+> > > > carefully configured, the endpoint and host would race to ack the
+> > > > interrupt.
+> > > >
+> > > > Introduce a per-channel interrupt routing mode and export small APIs to
+> > > > configure and query it. Update v0 programming so that RIE and local
+> > > > done/abort interrupt masking follow the selected mode. The default mode
+> > > > keeps the original behavior, so unless the new APIs are explicitly used,
+> > > > no functional changes.
+> > > >
+> > > > Signed-off-by: Koichiro Den <den@valinux.co.jp>
+> > > > ---
+> > > >  drivers/dma/dw-edma/dw-edma-core.c    | 52 +++++++++++++++++++++++++++
+> > > >  drivers/dma/dw-edma/dw-edma-core.h    |  2 ++
+> > > >  drivers/dma/dw-edma/dw-edma-v0-core.c | 26 +++++++++-----
+> > > >  include/linux/dma/edma.h              | 44 +++++++++++++++++++++++
+> > > >  4 files changed, 116 insertions(+), 8 deletions(-)
+> > > >
+> > > > diff --git a/drivers/dma/dw-edma/dw-edma-core.c b/drivers/dma/dw-edma/dw-edma-core.c
+> > > > index b9d59c3c0cb4..059b3996d383 100644
+> > > > --- a/drivers/dma/dw-edma/dw-edma-core.c
+> > > > +++ b/drivers/dma/dw-edma/dw-edma-core.c
+> > > > @@ -768,6 +768,7 @@ static int dw_edma_channel_setup(struct dw_edma *dw, u32 wr_alloc, u32 rd_alloc)
+> > > >  		chan->configured = false;
+> > > >  		chan->request = EDMA_REQ_NONE;
+> > > >  		chan->status = EDMA_ST_IDLE;
+> > > > +		chan->irq_mode = DW_EDMA_CH_IRQ_DEFAULT;
+> > > >
+> > > >  		if (chan->dir == EDMA_DIR_WRITE)
+> > > >  			chan->ll_max = (chip->ll_region_wr[chan->id].sz / EDMA_LL_SZ);
+> > > > @@ -1062,6 +1063,57 @@ int dw_edma_remove(struct dw_edma_chip *chip)
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(dw_edma_remove);
+> > > >
+> > > > +int dw_edma_chan_irq_config(struct dma_chan *dchan,
+> > > > +			    enum dw_edma_ch_irq_mode mode)
+> > > > +{
+> > > > +	struct dw_edma_chan *chan;
+> > > > +
+> > > > +	switch (mode) {
+> > > > +	case DW_EDMA_CH_IRQ_DEFAULT:
+> > > > +	case DW_EDMA_CH_IRQ_LOCAL:
+> > > > +	case DW_EDMA_CH_IRQ_REMOTE:
+> > > > +		break;
+> > > > +	default:
+> > > > +		return -EINVAL;
+> > > > +	}
+> > > > +
+> > > > +	if (!dchan || !dchan->device)
+> > > > +		return -ENODEV;
+> > > > +
+> > > > +	chan = dchan2dw_edma_chan(dchan);
+> > > > +	if (!chan)
+> > > > +		return -ENODEV;
+> > > > +
+> > > > +	chan->irq_mode = mode;
+> > > > +
+> > > > +	dev_vdbg(chan->dw->chip->dev, "Channel: %s[%u] set irq_mode=%u\n",
+> > > > +		 str_write_read(chan->dir == EDMA_DIR_WRITE),
+> > > > +		 chan->id, mode);
+> > > > +
+> > > > +	return 0;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(dw_edma_chan_irq_config);
+> > > > +
+> > > > +bool dw_edma_chan_ignore_irq(struct dma_chan *dchan)
+> > > > +{
+> > > > +	struct dw_edma_chan *chan;
+> > > > +	struct dw_edma *dw;
+> > > > +
+> > > > +	if (!dchan || !dchan->device)
+> > > > +		return false;
+> > > > +
+> > > > +	chan = dchan2dw_edma_chan(dchan);
+> > > > +	if (!chan)
+> > > > +		return false;
+> > > > +
+> > > > +	dw = chan->dw;
+> > > > +	if (dw->chip->flags & DW_EDMA_CHIP_LOCAL)
+> > > > +		return chan->irq_mode == DW_EDMA_CH_IRQ_REMOTE;
+> > > > +	else
+> > > > +		return chan->irq_mode == DW_EDMA_CH_IRQ_LOCAL;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(dw_edma_chan_ignore_irq);
+> > > > +
+> > > >  MODULE_LICENSE("GPL v2");
+> > > >  MODULE_DESCRIPTION("Synopsys DesignWare eDMA controller core driver");
+> > > >  MODULE_AUTHOR("Gustavo Pimentel <gustavo.pimentel@synopsys.com>");
+> > > > diff --git a/drivers/dma/dw-edma/dw-edma-core.h b/drivers/dma/dw-edma/dw-edma-core.h
+> > > > index 71894b9e0b15..8458d676551a 100644
+> > > > --- a/drivers/dma/dw-edma/dw-edma-core.h
+> > > > +++ b/drivers/dma/dw-edma/dw-edma-core.h
+> > > > @@ -81,6 +81,8 @@ struct dw_edma_chan {
+> > > >
+> > > >  	struct msi_msg			msi;
+> > > >
+> > > > +	enum dw_edma_ch_irq_mode	irq_mode;
+> > > > +
+> > > >  	enum dw_edma_request		request;
+> > > >  	enum dw_edma_status		status;
+> > > >  	u8				configured;
+> > > > diff --git a/drivers/dma/dw-edma/dw-edma-v0-core.c b/drivers/dma/dw-edma/dw-edma-v0-core.c
+> > > > index 2850a9df80f5..80472148c335 100644
+> > > > --- a/drivers/dma/dw-edma/dw-edma-v0-core.c
+> > > > +++ b/drivers/dma/dw-edma/dw-edma-v0-core.c
+> > > > @@ -256,8 +256,10 @@ dw_edma_v0_core_handle_int(struct dw_edma_irq *dw_irq, enum dw_edma_dir dir,
+> > > >  	for_each_set_bit(pos, &val, total) {
+> > > >  		chan = &dw->chan[pos + off];
+> > > >
+> > > > -		dw_edma_v0_core_clear_done_int(chan);
+> > > > -		done(chan);
+> > > > +		if (!dw_edma_chan_ignore_irq(&chan->vc.chan)) {
+> > > > +			dw_edma_v0_core_clear_done_int(chan);
+> > > > +			done(chan);
+> > > > +		}
+> > > >
+> > > >  		ret = IRQ_HANDLED;
+> > > >  	}
+> > > > @@ -267,8 +269,10 @@ dw_edma_v0_core_handle_int(struct dw_edma_irq *dw_irq, enum dw_edma_dir dir,
+> > > >  	for_each_set_bit(pos, &val, total) {
+> > > >  		chan = &dw->chan[pos + off];
+> > > >
+> > > > -		dw_edma_v0_core_clear_abort_int(chan);
+> > > > -		abort(chan);
+> > > > +		if (!dw_edma_chan_ignore_irq(&chan->vc.chan)) {
+> > > > +			dw_edma_v0_core_clear_abort_int(chan);
+> > > > +			abort(chan);
+> > > > +		}
+> > > >
+> > > >  		ret = IRQ_HANDLED;
+> > > >  	}
+> > > > @@ -331,7 +335,8 @@ static void dw_edma_v0_core_write_chunk(struct dw_edma_chunk *chunk)
+> > > >  		j--;
+> > > >  		if (!j) {
+> > > >  			control |= DW_EDMA_V0_LIE;
+> > > > -			if (!(chan->dw->chip->flags & DW_EDMA_CHIP_LOCAL))
+> > > > +			if (!(chan->dw->chip->flags & DW_EDMA_CHIP_LOCAL) &&
+> > > > +			    chan->irq_mode != DW_EDMA_CH_IRQ_LOCAL)
+> > > >  				control |= DW_EDMA_V0_RIE;
+> > > >  		}
+> > > >
+> > > > @@ -408,12 +413,17 @@ static void dw_edma_v0_core_start(struct dw_edma_chunk *chunk, bool first)
+> > > >  				break;
+> > > >  			}
+> > > >  		}
+> > > > -		/* Interrupt unmask - done, abort */
+> > > > +		/* Interrupt mask/unmask - done, abort */
+> > > >  		raw_spin_lock_irqsave(&dw->lock, flags);
+> > > >
+> > > >  		tmp = GET_RW_32(dw, chan->dir, int_mask);
+> > > > -		tmp &= ~FIELD_PREP(EDMA_V0_DONE_INT_MASK, BIT(chan->id));
+> > > > -		tmp &= ~FIELD_PREP(EDMA_V0_ABORT_INT_MASK, BIT(chan->id));
+> > > > +		if (chan->irq_mode == DW_EDMA_CH_IRQ_REMOTE) {
+> > > > +			tmp |= FIELD_PREP(EDMA_V0_DONE_INT_MASK, BIT(chan->id));
+> > > > +			tmp |= FIELD_PREP(EDMA_V0_ABORT_INT_MASK, BIT(chan->id));
+> > > > +		} else {
+> > > > +			tmp &= ~FIELD_PREP(EDMA_V0_DONE_INT_MASK, BIT(chan->id));
+> > > > +			tmp &= ~FIELD_PREP(EDMA_V0_ABORT_INT_MASK, BIT(chan->id));
+> > > > +		}
+> > > >  		SET_RW_32(dw, chan->dir, int_mask, tmp);
+> > > >  		/* Linked list error */
+> > > >  		tmp = GET_RW_32(dw, chan->dir, linked_list_err_en);
+> > > > diff --git a/include/linux/dma/edma.h b/include/linux/dma/edma.h
+> > > > index ffad10ff2cd6..6f50165ac084 100644
+> > > > --- a/include/linux/dma/edma.h
+> > > > +++ b/include/linux/dma/edma.h
+> > > > @@ -60,6 +60,23 @@ enum dw_edma_chip_flags {
+> > > >  	DW_EDMA_CHIP_LOCAL	= BIT(0),
+> > > >  };
+> > > >
+> > > > +/*
+> > > > + * enum dw_edma_ch_irq_mode - per-channel interrupt routing control
+> > > > + * @DW_EDMA_CH_IRQ_DEFAULT:   LIE=1/RIE=1, local interrupt unmasked
+> > > > + * @DW_EDMA_CH_IRQ_LOCAL:     LIE=1/RIE=0
+> > > > + * @DW_EDMA_CH_IRQ_REMOTE:    LIE=1/RIE=1, local interrupt masked
+> > > > + *
+> > > > + * Some implementations require using LIE=1/RIE=1 with the local interrupt
+> > > > + * masked to generate a remote-only interrupt (rather than LIE=0/RIE=1).
+> > > > + * See the DesignWare endpoint databook 5.40, "Hint" below "Figure 8-22
+> > > > + * Write Interrupt Generation".
+> > > > + */
+> > > > +enum dw_edma_ch_irq_mode {
+> > > > +	DW_EDMA_CH_IRQ_DEFAULT	= 0,
+> > > > +	DW_EDMA_CH_IRQ_LOCAL,
+> > > > +	DW_EDMA_CH_IRQ_REMOTE,
+> > > > +};
+> > > > +
+> > > >  /**
+> > > >   * struct dw_edma_chip - representation of DesignWare eDMA controller hardware
+> > > >   * @dev:		 struct device of the eDMA controller
+> > > > @@ -105,6 +122,22 @@ struct dw_edma_chip {
+> > > >  #if IS_REACHABLE(CONFIG_DW_EDMA)
+> > > >  int dw_edma_probe(struct dw_edma_chip *chip);
+> > > >  int dw_edma_remove(struct dw_edma_chip *chip);
+> > > > +/**
+> > > > + * dw_edma_chan_irq_config - configure per-channel interrupt routing
+> > > > + * @chan: DMA channel obtained from dma_request_channel()
+> > > > + * @mode: interrupt routing mode
+> > > > + *
+> > > > + * Returns 0 on success, -EINVAL for invalid @mode, or -ENODEV if @chan does
+> > > > + * not belong to the DesignWare eDMA driver.
+> > > > + */
+> > > > +int dw_edma_chan_irq_config(struct dma_chan *chan,
+> > > > +			    enum dw_edma_ch_irq_mode mode);
+> > > > +
+> > > > +/**
+> > > > + * dw_edma_chan_ignore_irq - tell whether local IRQ handling should be ignored
+> > > > + * @chan: DMA channel obtained from dma_request_channel()
+> > > > + */
+> > > > +bool dw_edma_chan_ignore_irq(struct dma_chan *chan);
+> > > >  #else
+> > > >  static inline int dw_edma_probe(struct dw_edma_chip *chip)
+> > > >  {
+> > > > @@ -115,6 +148,17 @@ static inline int dw_edma_remove(struct dw_edma_chip *chip)
+> > > >  {
+> > > >  	return 0;
+> > > >  }
+> > > > +
+> > > > +static inline int dw_edma_chan_irq_config(struct dma_chan *chan,
+> > > > +					  enum dw_edma_ch_irq_mode mode)
+> > > > +{
+> > > > +	return -ENODEV;
+> > > > +}
+> > > > +
+> > > > +static inline bool dw_edma_chan_ignore_irq(struct dma_chan *chan)
+> > > > +{
+> > > > +	return false;
+> > > > +}
+> > > 
+> > > I think it'd better go thought
+> > > 
+> > > struct dma_slave_config {
+> > > 	...
+> > >         void *peripheral_config;
+> > > 	size_t peripheral_size;
+> > > 
+> > > };
+> > > 
+> > > So DMA consumer can use standard DMAengine API, dmaengine_slave_config().
+> > 
+> > Using .peripheral_config wasn't something I had initially considered, but I
+> > agree that this is preferable in the sense that it avoids introducing the
+> > additional exported APIs. I'm not entirely sure whether it's clean to use
+> > it for non-peripheral settings in the strict sense, but there seem to be
+> > precedents such as stm32_mdma_dma_config, so I guess it seems acceptable.
+> > If I'm missing something, please correct me.
+> 
+> Strictly speaking slave config should be used for peripheral transfers.
+> For memcpy users (this seems more like that), I would argue slave config
+> does not make much sense.
 
-Hi, Andrii. I think you misunderstand it here. The cur_cookie is not the
-same as cookie count. The layout of the stack looks like this:
+Thank you for the comment. Understood, so it seems outside the intended
+semantics of .peripheral_config.
 
-  return value  -> 8 bytes
-  argN          -> 8 bytes
-  ...
-  arg1          -> 8 bytes
-  nr_args       -> 8 bytes
-  ip (optional) -> 8 bytes
-  cookie2       -> 8 bytes
-  cookie1       -> 8 bytes
+Now I see two possible directions:
 
-So if the bpf_get_func_ip() not used, the cur_cookie is exactly the same
-as cookie count. But if it exist, they are not the same.
+1. Keep my original approach (i.e. add a dw-edma specific exported helper in
+   dw-edma-core, like dw_edma_chan_irq_config()).
 
-The location of the cookies is independent from the context, and the
-cur_cookie, which is the index of the current cookie, don't rely on cookie
-count too and can be bigger than cookie count.
+2. Introduce a more generic mechanism than .peripheral_config/size (e.g.
+   .hw_config/size), and use that instead.
 
-PS: the location of "ip" should always laid before the nr_args, as we get
-it with ctx[-2]. Maybe we can optimize it later. We store the index of
-the ip the func_meta too, therefore it is independent from the ctx too.
-Ah, it looks not make much sense ;)
+If you see a better approach, I'd be glad to hear it. Also, Mani's input on
+whether or not (1) is acceptable in the overall picture would be helpful
+(from a dw-edma-core maintainer perspective).
 
-> >
->=20
-> consider also just calculating cookie count out from bpf_tramp_links?
-> would that work? Then "func_meta" would really be just nr_args (and
-> I'd call it that) and bool for whether this is entry or exit
-> invokation (for IS_RETURN bit, and maybe we'll need this distinction
-> somewhere else in the future), and then invoke_bpf() will construct
-> func_meta from scratch.
->=20
-> It's relatively minor thing, but as I mentioned before, it's this
-> hybrid approach of partially opaque (from invoke_bpf's POV) func_meta
-> which we also adjust or fill out (for cookie index) is a bit of a sign
-> that this is not a proper interface.
+Regards,
+Koichiro
 
-Yeah, the current approach is indeed not perfect. But I think it's
-a little not flex if we construct the whole func_meta in invoke_bpf().
-=46or now, we need to pass nr_args, is_return, cookie_off to it. And
-we need to add more function arguments to invoke_bpf() if there
-are new flags occur in the feature, which is not convenient, right?
-
-So what do you think?
-
-Thanks!
-Menglong Dong
-
->=20
-> >
-> >
-> > >         u8 *prog =3D *pprog;
-> > >
-> > >         for (i =3D 0; i < tl->nr_links; i++) {
-> > > +               if (tl->links[i]->link.prog->call_session_cookie) {
-> > > +                       emit_store_stack_imm64(&prog, BPF_REG_0, -fun=
-c_meta_off,
-> > > +                                              func_meta | (cur_cooki=
-e << BPF_TRAMP_SHIFT_COOKIE));
-> > > +                       cur_cookie--;
-> > > +               }
-> > >                 if (invoke_bpf_prog(m, &prog, tl->links[i], stack_siz=
-e,
-> > >                                     run_ctx_off, save_ret, image, rw_=
-image))
-> > >                         return -EINVAL;
-> >
-> > [...]
->=20
-
-
-
-
+> 
+> -- 
+> ~Vinod
 
