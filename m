@@ -1,232 +1,230 @@
-Return-Path: <netdev+bounces-252374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFDhG902cmmadwAAu9opvQ
-	(envelope-from <netdev+bounces-252374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:40:29 +0100
+	id GDthN/w4cmmadwAAu9opvQ
+	(envelope-from <netdev+bounces-252375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:49:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841C26806D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:40:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88D868218
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:49:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 18934989D37
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:58:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F9037AC6AA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106E134A785;
-	Thu, 22 Jan 2026 13:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE6133D508;
+	Thu, 22 Jan 2026 13:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Un67D59/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKIjNfoP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mn8wNyGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467F22F28FC
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769090100; cv=pass; b=UtQ2vQ1ruDTT9IUfFuXazK2tdgHYmFxXwWap2/OF/ytgrvpF4QRncYK5QvgOUsFeyXCp928MRRy78/MJWQN+V5JWLNo4Drx1Aecgy4dQLhlkhrDbkRybgtqTJE/Znu2Nj+ZiEDjIgwSxWp3KFjF21g1rEZBjIuU3suXCOBwjw7s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769090100; c=relaxed/simple;
-	bh=gVSZxdxPBReVZyPqmvkoSTuZzdbDdoqTl4x58rjozy8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KkVUlzYzswHjPlaCKFjiNaL3qfnqsFkKriPdHrldCgs4FCgeGwY+R6+45+CW9qvy4mex5LEiy6wEr7me+GydVMXywLXuW33/T/UKgNxqy60E1eNSVq55oath3EP6WbJPPkFbTNif2pzWSh22ae/TQS4MUzNF3wwAwR1IjtAtZdU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Un67D59/; arc=pass smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8c6a001e3bfso60168085a.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 05:54:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769090098; cv=none;
-        d=google.com; s=arc-20240605;
-        b=a4+sh2kcoZEdrHcVbfoOllsokowwsFfEq+clQzged0fTjQuESu9RfCbhehK51Rb/g+
-         2CZsAGAHm2ZFOziSY7NCjHCIu+IODCPLmxGhenh8me66xAYZXP6FKWfco/BUIZKqGKMH
-         3+ZUGJchhZ8MwFOSQqA+AMNSALq1M5czgM8Z4Lw09i//3gpOTYsRtPh5qHAbarvkhQxx
-         LewT6F3yJ2UCXvtIDv3q1OlI7V7ouiJMyt5Yx23AdfNUuGaZSKwNUppZlzwjUnm6i0fr
-         1jZD8FB+gko4RpGHasZpID8+dyDlryh9106GExFzpf/i5lVfL2KGoBQL67qggurwbNcS
-         KnEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
-        fh=lQQ0/j05EvZKWId4kHMvplmCgzX8+CX6B+GDfSr58Ys=;
-        b=j0z59YOmTO/SdCE7N2BHUdrT4+r7/FTc0dPTG66ZUByE1Ndf8Kh6yP0d105ny0OUnR
-         rNrReCZSodCnbBXk8yFR9HzRccQMxhozzL1BkWYXS1e6jmJRyHJ+C+2wS+allAQj21II
-         IV9F9RU+9Y/E3wi1CBY3Xz+8egVbixzq0SqCLgzK5LTvA2xaX0sX2ZXMexCw0K/jmkYr
-         ChUuteD42YGGMMqxamgzZFbxBheY4BfrjEZTLGCoOijep0/w5hrIi9b2cKyrcH0nbh2X
-         8vvqzMvNYEnJqUAPR/dkGUu2zFXJtgn/HJQAKwpvgO9wKdU7yuPVYhDeVdiWDV3lUJIA
-         GXDQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA848224B0D
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769090148; cv=none; b=RgrKPmARhQow0kMB2U9jo9JPsumuX8lQYX8mXU2Dms42AYdpzepbP0hqxbBXTbnXTlAdo7cZPKZtjylQ9ck90EVn/Zuf7SfcnHFUTM7ow/1DQUg+FlGcevSRbvtzgxTtmJF3QwE0h+XYOA10osCTbgZhtIP4AIolWvTjLO2yTyU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769090148; c=relaxed/simple;
+	bh=2nXcGNysBiBdRcr6vy4ZStKKh5dYZxcbpIG7VnXq8as=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qb0ZUKQQQ3LfNYzVgKp6cz0HIGXT3mFUN0wXiPLfDkboMPNaqVvtoDqA90eHb9x0ZvDIeFOFBuvHPXJpo+JA5ONszFVmRCr4Vl3Xu7TFMuicM+iELkhX3qQ+lp6AERdNmHdzK3/BsiZGv3syCkHU2QomSQ/SUYe6OwuhBvTZAQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dKIjNfoP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mn8wNyGS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769090145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F3Df56peZRg7yuOoU4r9j2z63CMqum3dw8Q62JAWFUY=;
+	b=dKIjNfoPWX7POmB//l2RW700xuJRGr/FpNP99HfsXOH6cLD8kvrK9gIgtxcM7xYIzecw0X
+	kiq9eYQAsRMuE8R6vWXaNfrXn3ub6dYjjIk+fgxvZ0a4HvO/N5BoIn3f2wtg4v8Te76ouG
+	Y6Ar4VlDUQzWw9vQN0aWUV+5GNqPpu0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-171-zcOrFgmRO26u8dvLYyZr4A-1; Thu, 22 Jan 2026 08:55:44 -0500
+X-MC-Unique: zcOrFgmRO26u8dvLYyZr4A-1
+X-Mimecast-MFC-AGG-ID: zcOrFgmRO26u8dvLYyZr4A_1769090143
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4358f90fe8dso673723f8f.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 05:55:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769090098; x=1769694898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
-        b=Un67D59/piJMspO+e6ugEWg4KV9+OmXJgnEFlokPiKc7kdWJFeMkA3piokDgKHG4lq
-         eb0kDsXaNiUo3vGH6bYuVyXBqGMT08hXAdt1UTWZGS3cfI5u6/c7sKxEE0JESTLduI0N
-         4ZhMQdpiUBbhuKAb92ZVeH+43csDujNrR+4c/mXz7EC9wdhlar/Obp94HXcdVLc8rjfc
-         N3GKurNdqXDEpoDufaSMJVZUh6tmdm4isV1YSptPNnaeTaEo8FHZ/+PSx1BNSB8TRyr9
-         eyoNMOAg1AQlIt6gPz6lFB9OM17O+Gv2AoJ5c8dxEOnoG08gJz0+Tkbv1Mh3uXCaawKw
-         PV4Q==
+        d=redhat.com; s=google; t=1769090143; x=1769694943; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F3Df56peZRg7yuOoU4r9j2z63CMqum3dw8Q62JAWFUY=;
+        b=mn8wNyGShfiU8zpLqqW1CJz3jW5+8fjwrYCHmBWgOVC4SJO3MbAFX2tfxro+yd5QDm
+         0JLhe+vvs1qJcHtRo5lchGrgx2BOnItYppZYoOf1ejrjs0iqcwJKkfjVOnvok/iEi/86
+         p00hhClju5EurMCdnC9TmH/KoYzMejAKc6UDpOHrcqhLVEgKNXCgjZvesK6pkPmZv0nP
+         9HQLX/OsK0ZRDVboJL7NcCOJBhUDrGOiOPRo763osNssreWFXsqpCbvstinNRJlH5wzo
+         RWu6dp12WnWtsVWBSIq9UrDeqfpnl38BDw726f1wR+ee8TSY3Fzc4yagJg0gWUo+5IuG
+         GlHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769090098; x=1769694898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
-        b=fGbePZvBnuEKlDVwzo/EX2BkU4AWxVZ5kLDJtZyPsjh1Gkgk3Nyp5SW6jO+dOxLNfp
-         3lPn4CYucSJC9Y+4zDWVR2Qbo7dMDW8JqxKstLYrEmYSfxVgm/0UJev6rE6C3bkJawAd
-         YqWa1XyC1m932aA5IYy/z8pYkJsPNzvngQ9h5Yy/bOwN1rkqDqTY6QO/z4l2SVh0KLd1
-         MUiqFYxggb98ZkfkLFInmekndiLTX59pnsvVuQzRZuAj2K732qLKmVZWxVN3Y33Ml28f
-         ojZN9kmqtnYyAOce5RFZERHxpiU3PC3VlYs7fd5lBk5W7EzAt0Y8lhIOHzmNMrHhqOUX
-         WlGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnz8tEBGpTtnJoq30eOpipHizX85ui5nKz1VqL3SfrHBMLE6N4m4WNgUlfRrL0GJEcbxmmCsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6NDll52fUhn8A3zpSRg3U1841yYAYQmBt1NDlZ0eSC5+9PtTw
-	R37xKNCl38Aos/NOi2eDRapkWFOgYrNqeXKv31toBkrZ8NXnuMGDOQ/en/DJf0z0i/G7SHNDtKF
-	KKoTyNfPMV2HJ/rvU6EiIYeIeDJRtgPkXdVkSMpEWOZc0htCg5383364Psv8=
-X-Gm-Gg: AZuq6aJDnacy1zCvLZe/9iVB+cdJrd3qbm3LxnGrMjm+LvRRoP3H8Qt4nvleOYmRD1A
-	VofgcaJvqPMXctVcoVZwwyArYsD519z9JQ6ISuWxaCHc25SxTn6V8QJPMMWS2h+xtNsI7MstbWv
-	KrNUKmfKdcFURvnrhQSMxiIFh390ZhsTB3QOL6KramSp2gh9aCmRoVbltujwEl4ZlbFEbJHb2sC
-	zJ+gRNFXWJogGEFV/o0dSFMjkg9N3k4vYzfoIkzD0kevBojnQe4aDiIoHC9bCUfbrfci0EJ
-X-Received: by 2002:a05:620a:7013:b0:8b2:db27:425b with SMTP id
- af79cd13be357-8c6ccf226b9mr1069012985a.74.1769090097462; Thu, 22 Jan 2026
- 05:54:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769090143; x=1769694943;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F3Df56peZRg7yuOoU4r9j2z63CMqum3dw8Q62JAWFUY=;
+        b=HR1CWcnk7Czee7BfmftZbvBzumP5Cs0rQi3766t/+V9UxcJzfn0sC/Ik1/DclDB0eO
+         13INkiHDK0O47/DN/PHcUHVNEIYZKHjLknGEZJZN+4TlldXDzxnVpf2bMtkatF8RyXa4
+         DbDg3sMMNwhecR7OrSWc61ZWfcflB6d7PNHXc/h98XxslttQpl7TQLrDW/+cnKzk/c1T
+         vVGIOWJ5Y+BMACWuu65RRRPndvo7/fNzLOHkYXDYzZhuzhjqnrTsPRiVsk+5rKIiTgEO
+         xV6fd4tJwHGSrprQszedG//5nBmHVosI/nyVC5nr9wGI5fYhQiEXTMydhIK4kTItwaYP
+         OCxw==
+X-Forwarded-Encrypted: i=1; AJvYcCVDxy2tWgoMH9XdB0V/I5e2oAM3l7dkTgO6ll0TcXlHFkekBo/dgtraU3DG2ayDB5iUvNyA2dI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjrsvgDaQ0eYVdPCaQLxgGTEG8IX+2N1IBBU9rgddCvH7wL42c
+	LTq1E2jnAC+9pO/Vd8Gzf5FP33ynr9rHHi3WfP4h+2uDoCtLr5mdqkCxEUxrlcAxZnMcf7D7Rmu
+	yFcT+L53NMbxeGmANlWrxB9cqPFs16jFEzc06xN2uV9UxzvxW066W8a94zw==
+X-Gm-Gg: AZuq6aIz6zvTszJP9QshNpQ1mArKESJ72Glgq1zigTzh/Tf10PxDk6OaY6IYDwJxzN1
+	avcMo5R7eTKK0ZWW7YfJuY22D0e16Vj/DTlmmQoUx5aJn08izh0gmZ3kXnrU3VUw1xp+enF71EO
+	ATyzjD5zfuKM3DSKPi26H3wH8pKVODPGVqisAp8KNrr17g47ci1Fu43aHFbskuHKVCVmzHjiNHV
+	RvbOeX2TnBInXCFYREz2eWjcPoknE60Pih26tweNLedMZ1MbsTPn9RZezF9EhbQMFcbr43L0D3q
+	K0gQQM7e+ksMqXKUSWgoy8HEZzKG9NgpG/m+qvM43Ao/zB1Tu8NyDlUw2wVaqSd9T7j0YqDRyKa
+	tuHMQnHAJxVqc2eDdKK5kdSuIXWoXRGryVcD+YhahPqiVuhRlkGhDDHYxxUQ=
+X-Received: by 2002:adf:f812:0:b0:435:9e32:2b85 with SMTP id ffacd0b85a97d-435a5ff993cmr4488736f8f.29.1769090143512;
+        Thu, 22 Jan 2026 05:55:43 -0800 (PST)
+X-Received: by 2002:adf:f812:0:b0:435:9e32:2b85 with SMTP id ffacd0b85a97d-435a5ff993cmr4488677f8f.29.1769090143056;
+        Thu, 22 Jan 2026 05:55:43 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4359333b924sm18095487f8f.13.2026.01.22.05.55.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jan 2026 05:55:42 -0800 (PST)
+Date: Thu, 22 Jan 2026 14:55:36 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
+	linux-doc@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v16 00/12] vsock: add namespace support to
+ vhost-vsock and loopback
+Message-ID: <aXH7YCgl0qI2dF1T@sgarzare-redhat>
+References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122131306.2119853-1-edumazet@google.com>
-In-Reply-To: <20260122131306.2119853-1-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Jan 2026 14:54:46 +0100
-X-Gm-Features: AZwV_Qib9rfo18RS1wm0njXi222bvYG4DYfndteNpawtoUunkValJvPFNFQ1wsA
-Message-ID: <CANn89i+wyDiyq13nn4_NkckA0A9z7ybeKRXaC4A-VS0yFc9GQw@mail.gmail.com>
-Subject: Re: [PATCH net] mptcp: fix race in mptcp_pm_nl_flush_addrs_doit()
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com, 
-	Eulgyu Kim <eulgyukim@snu.ac.kr>, Geliang Tang <geliang@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252374-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-252375-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[kernel.org,linux.dev,strlen.de,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,snu.ac.kr];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
-	TAGGED_RCPT(0.00)[netdev,5498a510ff9de39d37da];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,appspotmail.com:email,free_list.next:url]
-X-Rspamd-Queue-Id: 841C26806D
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: C88D868218
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 2:13=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Wed, Jan 21, 2026 at 02:11:40PM -0800, Bobby Eshleman wrote:
+>This series adds namespace support to vhost-vsock and loopback. It does
+>not add namespaces to any of the other guest transports (virtio-vsock,
+>hyperv, or vmci).
 >
-> syzbot and Eulgyu Kim reported crashes in mptcp_pm_nl_get_local_id()
-> and/or mptcp_pm_nl_is_backup()
+>The current revision supports two modes: local and global. Local
+>mode is complete isolation of namespaces, while global mode is complete
+>sharing between namespaces of CIDs (the original behavior).
 >
-> Root cause is list_splice_init() in mptcp_pm_nl_flush_addrs_doit()
-> which is not RCU ready.
+>The mode is set using the parent namespace's
+>/proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
+>created. The mode of the current namespace can be queried by reading
+>/proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
+>has been created.
 >
-> list_splice_init_rcu() can not be called here while holding pernet->lock
-> spinlock.
+>Modes are per-netns. This allows a system to configure namespaces
+>independently (some may share CIDs, others are completely isolated).
+>This also supports future possible mixed use cases, where there may be
+>namespaces in global mode spinning up VMs while there are mixed mode
+>namespaces that provide services to the VMs, but are not allowed to
+>allocate from the global CID pool (this mode is not implemented in this
+>series).
 >
-> Many thanks to Eulgyu Kim for providing a repro and testing our patches.
+>Additionally, added tests for the new namespace features:
 >
-> Fixes: 141694df6573 ("mptcp: remove address when netlink flushes addrs")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/6970a46d.a00a0220.3ad28e.5cf0.GAE@goo=
-gle.com/T/
-> Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
-> Cc: Geliang Tang <geliang@kernel.org>
-> ---
->  net/mptcp/pm_kernel.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>tools/testing/selftests/vsock/vmtest.sh
+>1..25
+>ok 1 vm_server_host_client
+>ok 2 vm_client_host_server
+>ok 3 vm_loopback
+>ok 4 ns_host_vsock_ns_mode_ok
+>ok 5 ns_host_vsock_child_ns_mode_ok
+>ok 6 ns_global_same_cid_fails
+>ok 7 ns_local_same_cid_ok
+>ok 8 ns_global_local_same_cid_ok
+>ok 9 ns_local_global_same_cid_ok
+>ok 10 ns_diff_global_host_connect_to_global_vm_ok
+>ok 11 ns_diff_global_host_connect_to_local_vm_fails
+>ok 12 ns_diff_global_vm_connect_to_global_host_ok
+>ok 13 ns_diff_global_vm_connect_to_local_host_fails
+>ok 14 ns_diff_local_host_connect_to_local_vm_fails
+>ok 15 ns_diff_local_vm_connect_to_local_host_fails
+>ok 16 ns_diff_global_to_local_loopback_local_fails
+>ok 17 ns_diff_local_to_global_loopback_fails
+>ok 18 ns_diff_local_to_local_loopback_fails
+>ok 19 ns_diff_global_to_global_loopback_ok
+>ok 20 ns_same_local_loopback_ok
+>ok 21 ns_same_local_host_connect_to_local_vm_ok
+>ok 22 ns_same_local_vm_connect_to_local_host_ok
+>ok 23 ns_delete_vm_ok
+>ok 24 ns_delete_host_ok
+>ok 25 ns_delete_both_ok
+>SUMMARY: PASS=25 SKIP=0 FAIL=0
 >
-> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-> index 57570a44e4185370f531047fe97ce9f9fbd1480b..1a97d0eafa2b0c9e4275b90d4=
-a576f837dc286a9 100644
-> --- a/net/mptcp/pm_kernel.c
-> +++ b/net/mptcp/pm_kernel.c
-> @@ -1294,16 +1294,24 @@ static void __reset_counters(struct pm_nl_pernet =
-*pernet)
->  int mptcp_pm_nl_flush_addrs_doit(struct sk_buff *skb, struct genl_info *=
-info)
->  {
->         struct pm_nl_pernet *pernet =3D genl_info_pm_nl(info);
-> -       LIST_HEAD(free_list);
-> +       struct list_head free_list;
->
->         spin_lock_bh(&pernet->lock);
-> -       list_splice_init(&pernet->endp_list, &free_list);
-> +
-> +       free_list =3D pernet->endp_list;
-> +       INIT_LIST_HEAD_RCU(&pernet->endp_list);
-> +
->         __reset_counters(pernet);
->         pernet->next_id =3D 1;
->         bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
->         spin_unlock_bh(&pernet->lock);
-> -       mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
->         synchronize_rcu();
+>Thanks again for everyone's help and reviews!
 
+Thank you for your hard work and patience!
 
-> +
-> +       /* Adjust the pointers to free_list instead of pernet->endp_list =
-*/
-> +       free_list.prev->next =3D &free_list;
-> +       free_list.next->prev =3D &free_list;
+I think we've come up with an excellent solution that's also not too 
+invasive.
 
+All the patches have my R-b, I've double-checked and tested this v16.
+Everything seems to be working fine (famous last words xD).
 
-We have to test if the list was empty, and avoid the synchronize_rcu
-in this case.
+So this series is good to go IMO!
 
-I will squash in V2, unless someone complains.
+Next step should be to update the vsock(7) namespace.
 
-diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-index 1a97d0eafa2b0c9e4275b90d4a576f837dc286a9..af23be6658ded4860133bb9495c=
-7738014815d28
-100644
---- a/net/mptcp/pm_kernel.c
-+++ b/net/mptcp/pm_kernel.c
-@@ -1305,6 +1305,10 @@ int mptcp_pm_nl_flush_addrs_doit(struct sk_buff
-*skb, struct genl_info *info)
-        pernet->next_id =3D 1;
-        bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
-        spin_unlock_bh(&pernet->lock);
-+
-+       if (free_list.next =3D=3D &pernet->endp_list)
-+               return 0;
-+
-        synchronize_rcu();
+Thanks,
+Stefano
 
-        /* Adjust the pointers to free_list instead of pernet->endp_list */
 
