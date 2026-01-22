@@ -1,202 +1,232 @@
-Return-Path: <netdev+bounces-252373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uJlZCX8ycmmadwAAu9opvQ
-	(envelope-from <netdev+bounces-252373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:21:51 +0100
+	id WFDhG902cmmadwAAu9opvQ
+	(envelope-from <netdev+bounces-252374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:40:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA6067DBB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:21:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 841C26806D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EF4024CCA26
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:49:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 18934989D37
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B28B2F12AB;
-	Thu, 22 Jan 2026 13:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106E134A785;
+	Thu, 22 Jan 2026 13:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="Yoavn74e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Un67D59/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE36F2F1FE3
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769089695; cv=none; b=XBAgFtu3PU3g3m3wJo4jmuYngD6uXkDTep2a5oJHkxS8q8m3AVo0pl+wXoodRY7xmMKBQNbnSzFiwYIJQDeEWnsN2C4nKo0U4iKCOi5EfjfGO15fs7VEk6NP8a639XVwnAjQBni2uGPzZ07cEOQJoa9eopLV14IO86xVgK8E5+s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769089695; c=relaxed/simple;
-	bh=g1uheCaK+e+djJ8vvFfgrhkSkZp2jNSheeP5GdJytCU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t5MQm+9VfqWomM8kvfeg/gvjxiqcQa+ue8OBcb8OHDtZ8E86x4rY9w5NCT/okKpTAPjZ7VWv7Zup5NifuYYOaVPWm+m0x3W/aMTvuOEDYBamgAZLrtplSG6cd04W4VLJZNBHylH5UF8CiKlJIGAcEZReFXNSeAMHBRPFpHWIn9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=Yoavn74e; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (79.192.13.160.dy.iij4u.or.jp [160.13.192.79])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 60MDmAkd061527
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 22 Jan 2026 22:48:11 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=PPx7lBvZdRocqs9Ic7hyxz4MceYROtyFu1Q8VoDJ5rc=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1769089692; v=1;
-        b=Yoavn74erfL56Hc73SWC+KaIwCdQtTUPmXZdvsuA+4jlffmNcncKDT2wPpgnvwJt
-         5K7UieVXf1Bd9vnZt7t69lsAFiX6q17vsPRLYEqkjFVDVNs5m4IRnbyInGzY85K6
-         p5mq38smUAhzkyQ7vHGjb8d8jUfhP0UZNr7cmwYrbkQ0RZF7A3mBe7Cs1Kxp0wP/
-         k7wL60/KsW15YVoYL3GQAEzeUh04X6dbZ84dKrYAHE0tWDvg2PJFUzXhh9DlTRjn
-         Kre8E0gz1mICF3Hhr2f22qgoU9rtXsJ4fQ4ZVj1T2ivLJlhklYiBrkw8en7nXSOv
-         m8fwXhQuBy9Q3GuBV6vR1Q==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kohei.enju@gmail.com,
-        Kohei Enju <kohei@enjuk.jp>,
-        Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH v2 iwl-next] igb: set skb hash type from RSS_TYPE
-Date: Thu, 22 Jan 2026 13:47:46 +0000
-Message-ID: <20260122134809.7765-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467F22F28FC
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769090100; cv=pass; b=UtQ2vQ1ruDTT9IUfFuXazK2tdgHYmFxXwWap2/OF/ytgrvpF4QRncYK5QvgOUsFeyXCp928MRRy78/MJWQN+V5JWLNo4Drx1Aecgy4dQLhlkhrDbkRybgtqTJE/Znu2Nj+ZiEDjIgwSxWp3KFjF21g1rEZBjIuU3suXCOBwjw7s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769090100; c=relaxed/simple;
+	bh=gVSZxdxPBReVZyPqmvkoSTuZzdbDdoqTl4x58rjozy8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KkVUlzYzswHjPlaCKFjiNaL3qfnqsFkKriPdHrldCgs4FCgeGwY+R6+45+CW9qvy4mex5LEiy6wEr7me+GydVMXywLXuW33/T/UKgNxqy60E1eNSVq55oath3EP6WbJPPkFbTNif2pzWSh22ae/TQS4MUzNF3wwAwR1IjtAtZdU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Un67D59/; arc=pass smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8c6a001e3bfso60168085a.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 05:54:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769090098; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a4+sh2kcoZEdrHcVbfoOllsokowwsFfEq+clQzged0fTjQuESu9RfCbhehK51Rb/g+
+         2CZsAGAHm2ZFOziSY7NCjHCIu+IODCPLmxGhenh8me66xAYZXP6FKWfco/BUIZKqGKMH
+         3+ZUGJchhZ8MwFOSQqA+AMNSALq1M5czgM8Z4Lw09i//3gpOTYsRtPh5qHAbarvkhQxx
+         LewT6F3yJ2UCXvtIDv3q1OlI7V7ouiJMyt5Yx23AdfNUuGaZSKwNUppZlzwjUnm6i0fr
+         1jZD8FB+gko4RpGHasZpID8+dyDlryh9106GExFzpf/i5lVfL2KGoBQL67qggurwbNcS
+         KnEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
+        fh=lQQ0/j05EvZKWId4kHMvplmCgzX8+CX6B+GDfSr58Ys=;
+        b=j0z59YOmTO/SdCE7N2BHUdrT4+r7/FTc0dPTG66ZUByE1Ndf8Kh6yP0d105ny0OUnR
+         rNrReCZSodCnbBXk8yFR9HzRccQMxhozzL1BkWYXS1e6jmJRyHJ+C+2wS+allAQj21II
+         IV9F9RU+9Y/E3wi1CBY3Xz+8egVbixzq0SqCLgzK5LTvA2xaX0sX2ZXMexCw0K/jmkYr
+         ChUuteD42YGGMMqxamgzZFbxBheY4BfrjEZTLGCoOijep0/w5hrIi9b2cKyrcH0nbh2X
+         8vvqzMvNYEnJqUAPR/dkGUu2zFXJtgn/HJQAKwpvgO9wKdU7yuPVYhDeVdiWDV3lUJIA
+         GXDQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769090098; x=1769694898; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
+        b=Un67D59/piJMspO+e6ugEWg4KV9+OmXJgnEFlokPiKc7kdWJFeMkA3piokDgKHG4lq
+         eb0kDsXaNiUo3vGH6bYuVyXBqGMT08hXAdt1UTWZGS3cfI5u6/c7sKxEE0JESTLduI0N
+         4ZhMQdpiUBbhuKAb92ZVeH+43csDujNrR+4c/mXz7EC9wdhlar/Obp94HXcdVLc8rjfc
+         N3GKurNdqXDEpoDufaSMJVZUh6tmdm4isV1YSptPNnaeTaEo8FHZ/+PSx1BNSB8TRyr9
+         eyoNMOAg1AQlIt6gPz6lFB9OM17O+Gv2AoJ5c8dxEOnoG08gJz0+Tkbv1Mh3uXCaawKw
+         PV4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769090098; x=1769694898;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fnv+Qq8ruMpyyncSYu+WMygfb3R6Kxmj82u6o4NFWt8=;
+        b=fGbePZvBnuEKlDVwzo/EX2BkU4AWxVZ5kLDJtZyPsjh1Gkgk3Nyp5SW6jO+dOxLNfp
+         3lPn4CYucSJC9Y+4zDWVR2Qbo7dMDW8JqxKstLYrEmYSfxVgm/0UJev6rE6C3bkJawAd
+         YqWa1XyC1m932aA5IYy/z8pYkJsPNzvngQ9h5Yy/bOwN1rkqDqTY6QO/z4l2SVh0KLd1
+         MUiqFYxggb98ZkfkLFInmekndiLTX59pnsvVuQzRZuAj2K732qLKmVZWxVN3Y33Ml28f
+         ojZN9kmqtnYyAOce5RFZERHxpiU3PC3VlYs7fd5lBk5W7EzAt0Y8lhIOHzmNMrHhqOUX
+         WlGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnz8tEBGpTtnJoq30eOpipHizX85ui5nKz1VqL3SfrHBMLE6N4m4WNgUlfRrL0GJEcbxmmCsM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6NDll52fUhn8A3zpSRg3U1841yYAYQmBt1NDlZ0eSC5+9PtTw
+	R37xKNCl38Aos/NOi2eDRapkWFOgYrNqeXKv31toBkrZ8NXnuMGDOQ/en/DJf0z0i/G7SHNDtKF
+	KKoTyNfPMV2HJ/rvU6EiIYeIeDJRtgPkXdVkSMpEWOZc0htCg5383364Psv8=
+X-Gm-Gg: AZuq6aJDnacy1zCvLZe/9iVB+cdJrd3qbm3LxnGrMjm+LvRRoP3H8Qt4nvleOYmRD1A
+	VofgcaJvqPMXctVcoVZwwyArYsD519z9JQ6ISuWxaCHc25SxTn6V8QJPMMWS2h+xtNsI7MstbWv
+	KrNUKmfKdcFURvnrhQSMxiIFh390ZhsTB3QOL6KramSp2gh9aCmRoVbltujwEl4ZlbFEbJHb2sC
+	zJ+gRNFXWJogGEFV/o0dSFMjkg9N3k4vYzfoIkzD0kevBojnQe4aDiIoHC9bCUfbrfci0EJ
+X-Received: by 2002:a05:620a:7013:b0:8b2:db27:425b with SMTP id
+ af79cd13be357-8c6ccf226b9mr1069012985a.74.1769090097462; Thu, 22 Jan 2026
+ 05:54:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260122131306.2119853-1-edumazet@google.com>
+In-Reply-To: <20260122131306.2119853-1-edumazet@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 22 Jan 2026 14:54:46 +0100
+X-Gm-Features: AZwV_Qib9rfo18RS1wm0njXi222bvYG4DYfndteNpawtoUunkValJvPFNFQ1wsA
+Message-ID: <CANn89i+wyDiyq13nn4_NkckA0A9z7ybeKRXaC4A-VS0yFc9GQw@mail.gmail.com>
+Subject: Re: [PATCH net] mptcp: fix race in mptcp_pm_nl_flush_addrs_doit()
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com, 
+	Eulgyu Kim <eulgyukim@snu.ac.kr>, Geliang Tang <geliang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-252373-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252374-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,enjuk.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[kernel.org,linux.dev,strlen.de,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,snu.ac.kr];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[enjuk.jp,none];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 7DA6067DBB
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	TAGGED_RCPT(0.00)[netdev,5498a510ff9de39d37da];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,appspotmail.com:email,free_list.next:url]
+X-Rspamd-Queue-Id: 841C26806D
 X-Rspamd-Action: no action
 
-igb always marks the RX hash as L3 regardless of RSS_TYPE in the
-advanced descriptor, which may indicate L4 (TCP/UDP) hash. This can
-trigger unnecessary SW hash recalculation and breaks toeplitz selftests.
+On Thu, Jan 22, 2026 at 2:13=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> syzbot and Eulgyu Kim reported crashes in mptcp_pm_nl_get_local_id()
+> and/or mptcp_pm_nl_is_backup()
+>
+> Root cause is list_splice_init() in mptcp_pm_nl_flush_addrs_doit()
+> which is not RCU ready.
+>
+> list_splice_init_rcu() can not be called here while holding pernet->lock
+> spinlock.
+>
+> Many thanks to Eulgyu Kim for providing a repro and testing our patches.
+>
+> Fixes: 141694df6573 ("mptcp: remove address when netlink flushes addrs")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/6970a46d.a00a0220.3ad28e.5cf0.GAE@goo=
+gle.com/T/
+> Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+> Cc: Geliang Tang <geliang@kernel.org>
+> ---
+>  net/mptcp/pm_kernel.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+> index 57570a44e4185370f531047fe97ce9f9fbd1480b..1a97d0eafa2b0c9e4275b90d4=
+a576f837dc286a9 100644
+> --- a/net/mptcp/pm_kernel.c
+> +++ b/net/mptcp/pm_kernel.c
+> @@ -1294,16 +1294,24 @@ static void __reset_counters(struct pm_nl_pernet =
+*pernet)
+>  int mptcp_pm_nl_flush_addrs_doit(struct sk_buff *skb, struct genl_info *=
+info)
+>  {
+>         struct pm_nl_pernet *pernet =3D genl_info_pm_nl(info);
+> -       LIST_HEAD(free_list);
+> +       struct list_head free_list;
+>
+>         spin_lock_bh(&pernet->lock);
+> -       list_splice_init(&pernet->endp_list, &free_list);
+> +
+> +       free_list =3D pernet->endp_list;
+> +       INIT_LIST_HEAD_RCU(&pernet->endp_list);
+> +
+>         __reset_counters(pernet);
+>         pernet->next_id =3D 1;
+>         bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
+>         spin_unlock_bh(&pernet->lock);
+> -       mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
+>         synchronize_rcu();
 
-Use RSS_TYPE from pkt_info to set the correct PKT_HASH_TYPE_*
 
-Tested by toeplitz.py with the igb RSS key get/set patches applied as
-they are required for toeplitz.py (see Link below).
- # ethtool -N $DEV rx-flow-hash udp4 sdfn
- # ethtool -N $DEV rx-flow-hash udp6 sdfn
- # python toeplitz.py | grep -E "^# Totals"
+> +
+> +       /* Adjust the pointers to free_list instead of pernet->endp_list =
+*/
+> +       free_list.prev->next =3D &free_list;
+> +       free_list.next->prev =3D &free_list;
 
-Without patch:
- # Totals: pass:0 fail:12 xfail:0 xpass:0 skip:0 error:0
 
-With patch:
- # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:0 error:0
+We have to test if the list was empty, and avoid the synchronize_rcu
+in this case.
 
-Link: https://lore.kernel.org/intel-wired-lan/20260119084511.95287-5-takkozu@amazon.com/
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-Changelog:
-  v2:
-    - Fix max-line-length by removing unnecessary comment
-  v1: https://lore.kernel.org/intel-wired-lan/20260119175922.199950-1-kohei@enjuk.jp/
----
- drivers/net/ethernet/intel/igb/e1000_82575.h | 21 ++++++++++++++++++++
- drivers/net/ethernet/intel/igb/igb_main.c    | 18 +++++++++++++----
- 2 files changed, 35 insertions(+), 4 deletions(-)
+I will squash in V2, unless someone complains.
 
-diff --git a/drivers/net/ethernet/intel/igb/e1000_82575.h b/drivers/net/ethernet/intel/igb/e1000_82575.h
-index 63ec253ac788..9e696d55e512 100644
---- a/drivers/net/ethernet/intel/igb/e1000_82575.h
-+++ b/drivers/net/ethernet/intel/igb/e1000_82575.h
-@@ -87,6 +87,27 @@ union e1000_adv_rx_desc {
- 	} wb;  /* writeback */
- };
- 
-+#define E1000_RSS_TYPE_NO_HASH		 0
-+#define E1000_RSS_TYPE_HASH_TCP_IPV4	 1
-+#define E1000_RSS_TYPE_HASH_IPV4	 2
-+#define E1000_RSS_TYPE_HASH_TCP_IPV6	 3
-+#define E1000_RSS_TYPE_HASH_IPV6_EX	 4
-+#define E1000_RSS_TYPE_HASH_IPV6	 5
-+#define E1000_RSS_TYPE_HASH_TCP_IPV6_EX	 6
-+#define E1000_RSS_TYPE_HASH_UDP_IPV4	 7
-+#define E1000_RSS_TYPE_HASH_UDP_IPV6	 8
-+#define E1000_RSS_TYPE_HASH_UDP_IPV6_EX	 9
+diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+index 1a97d0eafa2b0c9e4275b90d4a576f837dc286a9..af23be6658ded4860133bb9495c=
+7738014815d28
+100644
+--- a/net/mptcp/pm_kernel.c
++++ b/net/mptcp/pm_kernel.c
+@@ -1305,6 +1305,10 @@ int mptcp_pm_nl_flush_addrs_doit(struct sk_buff
+*skb, struct genl_info *info)
+        pernet->next_id =3D 1;
+        bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
+        spin_unlock_bh(&pernet->lock);
 +
-+#define E1000_RSS_TYPE_MASK		GENMASK(3, 0)
++       if (free_list.next =3D=3D &pernet->endp_list)
++               return 0;
 +
-+#define E1000_RSS_L4_TYPES_MASK	\
-+	(BIT(E1000_RSS_TYPE_HASH_TCP_IPV4)	| \
-+	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6)	| \
-+	 BIT(E1000_RSS_TYPE_HASH_TCP_IPV6_EX)	| \
-+	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV4)	| \
-+	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6)	| \
-+	 BIT(E1000_RSS_TYPE_HASH_UDP_IPV6_EX))
-+
- #define E1000_RXDADV_HDRBUFLEN_MASK      0x7FE0
- #define E1000_RXDADV_HDRBUFLEN_SHIFT     5
- #define E1000_RXDADV_STAT_TS             0x10000 /* Pkt was time stamped */
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 8dab133296ca..ef0cbf532716 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -8824,10 +8824,20 @@ static inline void igb_rx_hash(struct igb_ring *ring,
- 			       union e1000_adv_rx_desc *rx_desc,
- 			       struct sk_buff *skb)
- {
--	if (ring->netdev->features & NETIF_F_RXHASH)
--		skb_set_hash(skb,
--			     le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
--			     PKT_HASH_TYPE_L3);
-+	u16 rss_type;
-+
-+	if (!(ring->netdev->features & NETIF_F_RXHASH))
-+		return;
-+
-+	rss_type = le16_to_cpu(rx_desc->wb.lower.lo_dword.pkt_info) &
-+		   E1000_RSS_TYPE_MASK;
-+
-+	if (!rss_type)
-+		return;
-+
-+	skb_set_hash(skb, le32_to_cpu(rx_desc->wb.lower.hi_dword.rss),
-+		     (E1000_RSS_L4_TYPES_MASK & BIT(rss_type)) ?
-+		     PKT_HASH_TYPE_L4 : PKT_HASH_TYPE_L3);
- }
- 
- /**
--- 
-2.51.0
+        synchronize_rcu();
 
+        /* Adjust the pointers to free_list instead of pernet->endp_list */
 
