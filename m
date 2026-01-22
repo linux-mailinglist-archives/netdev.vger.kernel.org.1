@@ -1,148 +1,153 @@
-Return-Path: <netdev+bounces-252270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA4XBVQAcmmvZwAAu9opvQ
-	(envelope-from <netdev+bounces-252270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:47:48 +0100
+	id MEpiHgoEcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:03:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0715C6577D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:47:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326C165ADA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E2E08A0B07
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:39:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D78038A068D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1956F3EDAA4;
-	Thu, 22 Jan 2026 10:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312BC40FD83;
+	Thu, 22 Jan 2026 10:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QgE+nUe0"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E403E9592;
-	Thu, 22 Jan 2026 10:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD373B530E;
+	Thu, 22 Jan 2026 10:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769078370; cv=none; b=CZUyukVO+Fiv0V17SSiZEgzbsPupapJgO/T/figMiKXKCVa90Fi9nIC4r1+FuONRGxcD1a2ZBmu+8mnq/dZNbVu1kEZAJ/egjPFZs9ntgcoj0G6tMOFfQ4opgy1Nfa+6AikhJnQYiTDQAFCkjGesZBXaBMQ8HmyVURupLS3yLno=
+	t=1769078626; cv=none; b=mXDDpcD6Z2dqfmQzbiJWDcqDjXRnK+BUFRazDDjZeikQD7laQx6RQiohkQXXdZJgjuMmM6wLuypKAYMwjLTuauEjKsikIM/jalcOM2QQuK9mooVPwj+2b9ZM5SaIq1qEVBlsxGrcVdPMM81IOFbeTv3O0Tv4+AGmhfJJohZc/g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769078370; c=relaxed/simple;
-	bh=L9h+VVmrw/S7QwFfMyKNXRU5RtA1qftvKbCmgN1C+Zw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g+0KhjvLT3Xh0Z4pm4GxcFrYMKtT+llwejrVc5tZwucQnda7w92pdmMjBQ4bPRs004YsByZGR3W51s9pEsFkKCbP+NFsjqMDRhy4bE0beztaWHgA5Yv8lIXxOiJ9ZFXRQxxi0mzXbHZj3I4zYs4vh+6DWZlnaI12YHG6frYpbBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [10.213.20.167] (unknown [210.73.43.101])
-	by APP-03 (Coremail) with SMTP id rQCowABnhdxK_nFpSZlDBg--.20370S2;
-	Thu, 22 Jan 2026 18:39:07 +0800 (CST)
-Message-ID: <5639ff0c-dfd1-4528-a0ce-92d3c457ce64@iscas.ac.cn>
-Date: Thu, 22 Jan 2026 18:39:06 +0800
+	s=arc-20240116; t=1769078626; c=relaxed/simple;
+	bh=alEohrBI/JLEbgcJb8e7wpbjle6K9L0/dTLOnLOjFeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qcuZHUAS/gkqurtNM0yewW1aimYz8Vc4mncNnOKdjmkhuBBwq0GzetAg4fHLRrkgboLLwAsiM3o7UpLtdIpl4tN5jf9XTRqCsGdEs/acS92XqKHFrzzaXC5zBdPVtiwhJ/WhNLbUOTkvV48BMCdE7ZQrWuuuxEgBD9NtoYh6Rec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QgE+nUe0; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=d2Ewrz6BGF+e8gQ4RD39fk9r4aqYPqkL5w/aREtx874=; b=QgE+nUe0PaFMs+CYRo+UlQO+zG
+	HhJWWAoH2wuKWMOlxqs4VcBs0r2ujAwnn7/EgyPhkINNjutaGEJThdl5Sfrmk3/OnnUlvCAs696K1
+	INZVlbVUxNuTpW/el7Yk2FkWPtfqKmEQdB+CQ4lJVq0DvownGjduoxiwXomU4N4KRz+Rm9S7JS6vd
+	F+Mvp3XggKyQivsmwdoiLA1QFgs29wTHkgWMJsfYAyUCkwtRgoH3bw6xz3lhv1Kjf6oBYwBxiTHSa
+	KI6QqU/FngK7MqlrTPtPDSsRQl1qZwCsvSCi1osXc071CrTvxyCeUPni7hJUTHIEaqgSTtgZz941L
+	9X9Uh3gA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vis9q-00CxCu-Vq; Thu, 22 Jan 2026 10:43:23 +0000
+Date: Thu, 22 Jan 2026 02:43:16 -0800
+From: Breno Leitao <leitao@debian.org>
+To: "Creeley, Brett" <bcreeley@amd.com>
+Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
+	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Igor Russkikh <irusskikh@marvell.com>, 
+	Simon Horman <horms@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Long Li <longli@microsoft.com>, Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
+	Edward Cree <ecree.xilinx@gmail.com>, Brett Creeley <brett.creeley@amd.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
+	linux-net-drivers@amd.com
+Subject: Re: [PATCH net-next 2/9] net: atlantic: convert to use
+ .get_rx_ring_count
+Message-ID: <aXH--MjkP03_aDkB@gmail.com>
+References: <20260121-grxring_big_v4-v1-0-07655be56bcf@debian.org>
+ <20260121-grxring_big_v4-v1-2-07655be56bcf@debian.org>
+ <4daf0901-20a6-4c9b-9b56-32efef24e5e5@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: spacemit: Clarify stat timeout comments and
- messages
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Yixun Lan <dlan@gentoo.org>,
- Chukun Pan <amadeus@jmu.edu.cn>,
- Michael Opdenacker <michael.opdenacker@rootcommit.com>,
- netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20260121-k1-ethernet-clarify-stat-timeout-v2-1-76ff1a1168d9@iscas.ac.cn>
- <20260121200439.64c22125@kernel.org>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20260121200439.64c22125@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:rQCowABnhdxK_nFpSZlDBg--.20370S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CryxGw48ZF47tF17KF4Durg_yoW8XF4fpa
-	1IgwsxGF1xtrWkXrsrtw10qFyYvw1vqa43ury3KryDtF15XrZa9r1FkrZ0kFZrZ393u3yj
-	qr42gFyv9FsrZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
-	1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUgd-PDUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4daf0901-20a6-4c9b-9b56-32efef24e5e5@amd.com>
+X-Debian-User: leitao
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.24 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252270-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0715C6577D
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[debian.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252271-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
+	TO_DN_SOME(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,microsoft.com,fb.com,meta.com,gmail.com,amd.com,vger.kernel.org,corigine.com];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 326C165ADA
 X-Rspamd-Action: no action
 
-On 1/22/26 12:04, Jakub Kicinski wrote:
-> On Wed, 21 Jan 2026 10:17:18 +0800 Vivian Wang wrote:
->> This patch isn't a fix for the problem per se, since it is hardware
->> behavior. The new message and comments, however, should direct those
->> running into this on new hardware towards a fix.
-> Is it not possible to improve the situation?
+Hello Brett,
 
-Maybe I should have made it clearer, but this comment and messages
-improvement was proposed by Andrew in the linked thread [1].
+On Wed, Jan 21, 2026 at 08:49:23AM -0800, Creeley, Brett wrote:
+> On 1/21/2026 7:54 AM, Breno Leitao wrote:
+> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> > 
+> > 
+> > Use the newly introduced .get_rx_ring_count ethtool ops callback instead
+> > of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >   drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c | 15 +++++++++------
+> >   1 file changed, 9 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+> > index 6fef47ba0a59b..d8b5491c9cb2b 100644
+> > --- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+> > +++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+> > @@ -500,20 +500,22 @@ static int aq_ethtool_set_rss(struct net_device *netdev,
+> >          return err;
+> >   }
+> > 
+> > +static u32 aq_ethtool_get_rx_ring_count(struct net_device *ndev)
+> > +{
+> > +       struct aq_nic_s *aq_nic = netdev_priv(ndev);
+> > +       struct aq_nic_cfg_s *cfg = aq_nic_get_cfg(aq_nic);
+> > +
+> > +       return cfg->vecs;
+> > +}
+> > +
+> 
+> Tiny nit, but RCT ordering is not maintained.
 
-As an aside, saying that made me realize this patch should be:
+Damn, I will re-spin. Thanks for catching it.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-
-> Is the refclock disappearing because of power saving?
-> Or because the link is down?
-
-I'm not really well-versed in what's allowed from the PHY here, but at
-least the Motorcomm and Realtek PHYs seem to only stop this clock while
-the link is down. So from what I can tell it's PHY stopping the clock
-because of power saving for when the link is down. I'm not sure how that
-should translate into an answer to your question here...
-
-> Because if it's the latter we should be able to skip reading the stats
-> when link is down (still racy but better than waiting in cases we can
-> detect?)
-
-If checking the link is definitely up as a condition for updating stats
-would be acceptable, then maybe the original patch from the linked
-thread [2] can also be adopted?
-
-Vivian "dramforever" Wang
-
-[1]: https://lore.kernel.org/r/48757af2-bbea-4185-8cc9-2ef51dbc8373@lunn.ch/
-[2]: https://lore.kernel.org/r/20260118100000.224793-1-amadeus@jmu.edu.cn/
-
+--breno
+--
+pw-bot: cr
 
