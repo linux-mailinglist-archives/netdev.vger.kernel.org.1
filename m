@@ -1,120 +1,106 @@
-Return-Path: <netdev+bounces-252426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252427-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEHwIx5acmkpiwAAu9opvQ
-	(envelope-from <netdev+bounces-252426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:10:54 +0100
+	id yFUZKPhWcmkpiwAAu9opvQ
+	(envelope-from <netdev+bounces-252427-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:57:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A4F6AE1B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:10:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BC36A7D8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:57:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4F0C3307B4FD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:55:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3BCFA3099BC0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849584DA534;
-	Thu, 22 Jan 2026 16:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62AD3994BF;
+	Thu, 22 Jan 2026 16:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kT5yWHwp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB68F4D2EEA;
-	Thu, 22 Jan 2026 16:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4573994AD;
+	Thu, 22 Jan 2026 16:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769098029; cv=none; b=GV42G8larMWqxGSaDJYEJIXDB/3OXobe1BRwd63UDHng+0TsPsfQjYVVcjXGou4mmgVM+F2J3xtr8W4ogyPlovuz9ApS1E7odDRPL2tPSCPcWRt2JR4ZypRoraKj7jzZ+IuhBFGw0nwHzdxRdX06KT5jdMI7n+Vqh+txE+0NywE=
+	t=1769098107; cv=none; b=DV4WrKsCFjCywZ5aDhj+taqH452/xRJ1FDpvgc+JL4KW1Occw5W/sZzsahzMx64GxjMJNO3CwzJGtzw5a3B4enQn7lKnhyrWuWk91H4cmIi1siPaif1LT4JQ1v15630Lz3Ra4/+wPrUOt53e9kHeUg1qxcE7U4qkol9qkQ477S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769098029; c=relaxed/simple;
-	bh=jL+8Oq/TlekPAgsQGzQteQHAVfM4j4PN6HEzQUiJ+BM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KI3b9hPkWeugAdaHvN7TIiOyfvOlsCZ8NpGpTS4ET5D4LJNN/380m/M4U7SgupQ6PnbMcZD/mli/gP8+/eyept6hYYiHBE7QLB5tMMfSACCg8eBGt2yLOtuZG1ugXba4psm4l4+wh1okcU6PQCzAuwRNlOXqBYLtujctjE41hYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vixCx-000000001Dx-0C9w;
-	Thu, 22 Jan 2026 16:06:55 +0000
-Date: Thu, 22 Jan 2026 16:06:51 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jonas Jelonek <jelonek.jonas@gmail.com>,
-	Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: Re: [RFC PATCH v2 2/2] net: mdio: rtl9300: setup PHY polling
- registers
-Message-ID: <aXJLG8cPKqseTbDK@makrotopia.org>
-References: <cover.1769053496.git.daniel@makrotopia.org>
- <680696024a8648535ce6dee771fe4de67802e0e8.1769053496.git.daniel@makrotopia.org>
- <aXITnCLt945xHqaP@shell.armlinux.org.uk>
- <aXIke6nASlCSJVuF@makrotopia.org>
- <8663bcdb-4c53-45f5-88fc-1f01f816e8b0@lunn.ch>
+	s=arc-20240116; t=1769098107; c=relaxed/simple;
+	bh=KhaqxuaTMA0SiOWI18UsVIS+wXCJkmLtCI0y06ff6qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bjeiQPKFCYu6mlkAkznJ5fNyLMNWjDJxH/6NdJx59lPdnthtVeLBMJsTPaF/RLqQdACLYwcpglnRdh9m0dxvTTJ/cyQATjGNvzgUTIO8zzQTcATASTGbZniFxxPc7DNMAsKgFbKlq6rebNiZKbW/3+RMWKxW3n39Lz4n8Ystir0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kT5yWHwp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D84DCC116C6;
+	Thu, 22 Jan 2026 16:08:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769098106;
+	bh=KhaqxuaTMA0SiOWI18UsVIS+wXCJkmLtCI0y06ff6qQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kT5yWHwpLgO5uOc0y4g6eTLU3F8AQINpNiH4dp71jpJgsNMokIFcqHRdBkZx8OYW4
+	 Ok0i1CfqnjQCs3jqEm2S/zbzyKsuO1w4+92mYSPq1HZi664IwZREhSF7AFcQK7MX1O
+	 13a1zjEiZ8MaCLDMb/9D/Nyhvl7FUCNge2Zma2Fmg3SmBP+rYnHJymLS+z+LUMGwV+
+	 EdU8M2NoTmLizGh+JqccfwyoIcu9zDZfK8zqFpdAd8OEiPtn1Qh9l8XYKeX7Wim3+v
+	 JvzJW60ljRypIbIZX2vRaE7BMgkGt/VZL+hgQ0JguQjBJJWiLyn6J0rMdahWduUS9b
+	 eeWFWCZ08DQbQ==
+Date: Thu, 22 Jan 2026 08:08:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH net] net: mvpp2: cls: Fix memory leak in
+ mvpp2_ethtool_cls_rule_ins()
+Message-ID: <20260122080825.39eb96b4@kernel.org>
+In-Reply-To: <20260121140600.3903164-1-zilin@seu.edu.cn>
+References: <20260121140600.3903164-1-zilin@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8663bcdb-4c53-45f5-88fc-1f01f816e8b0@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252426-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmx.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[makrotopia.org];
+	TAGGED_FROM(0.00)[bounces-252427-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,seu.edu.cn];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,makrotopia.org:mid]
-X-Rspamd-Queue-Id: 38A4F6AE1B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47BC36A7D8
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 02:46:58PM +0100, Andrew Lunn wrote:
-> > Only a small subset has been seen in the wild inside RealTek switches
-> > for now. Most, of course, come with RealTek switches. However, it is
-> > only very recently that RealTek offers 10G PHYs, so before vendors
-> > were using 10G PHYs of other vendors, in practise I've only seen
-> > Aquantia.
-> 
-> ...
-> 
-> > Yes, that does sound better, especially with your concern about
-> > ->supported mask not necessarily being correct at probe time in mind.
-> 
-> FYI: The Aquantia PHYs are particularly bad with ->supported.
+On Wed, 21 Jan 2026 14:06:00 +0000 Zilin Guan wrote:
+> Fixes: f4f1ba18195d ("net: mvpp2: cls: Report an error for unsupported flow types")
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
 
-Yes, but the PHY driver takes care of that and implements fixes via a
-custom .get_features op. That's precisely why I'd like the MDIO polling
-controller to rely on what the PHY driver has "discovered" and set in
-->supported, instead of doing all that in duplicate open-coded MDIO bus
-scanning and PHY probing in the MDIO driver, which is exactly why I
-believe we should have API for that.
+Please feed the _patch_ to the get_maintainter script.
+The author of the commit under Fixes should be cced, please repost.
+-- 
+pw-bot: cr
 
