@@ -1,147 +1,201 @@
-Return-Path: <netdev+bounces-252207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QODEFayqcWnYLAAAu9opvQ
-	(envelope-from <netdev+bounces-252207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:42:20 +0100
+	id sDmRB+eqcWnYLAAAu9opvQ
+	(envelope-from <netdev+bounces-252208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:43:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033C961C3E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:42:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8525B61C46
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:43:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A8553423330
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:40:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 268E14E0F35
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 04:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04023F23AB;
-	Thu, 22 Jan 2026 04:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286A9425CF6;
+	Thu, 22 Jan 2026 04:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sY1LWIeL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FuorqOdP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CBD28A1D5;
-	Thu, 22 Jan 2026 04:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769056820; cv=none; b=YCIKW71t0UOag+99fN375+MRsHhSUmuOtkixkDI1d2SZ4Bm46AqPoN2N/jsrt4vwFqzuwfzU7a8OmCn1vsqWUxjqISBCmiC3guXeAFKhe/PZ8VImhl5Nzno/0GVZRp0lh38jrXdRK/fyP2tp84Qw6kA+KOVvnwxaQBv6vd6JdhU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769056820; c=relaxed/simple;
-	bh=AI8dbuGL/HePhE8XRMZqTuwcBec9gvAnEVPmRRXeqCI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sMaoA54wRqg3qc2giSsJTQvxTlIzhIKldRCpndfIrgqpF5fcZRZW+CWVa0vjDYu04kkj7LYsmi1ySc+1v7P9PTitzWmak5s3ngtPKqxGQ+0B1F89rlc5oAAlOfoM/LbTaETbl4cmzuFXNU6Yzci/fyV/UDShMXGOX0HWZ7uTjaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sY1LWIeL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18C13C116C6;
-	Thu, 22 Jan 2026 04:40:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769056819;
-	bh=AI8dbuGL/HePhE8XRMZqTuwcBec9gvAnEVPmRRXeqCI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sY1LWIeLbe9PtnsZ2TXCkVlrxGKCxhUOr4JSyJeR1qit1DXQrZqISJkVQ2pnwOc3i
-	 wT3xghpz10ALVOWHtMdNnMfrqGEnGUVIVjp+mrAHM3FfZoen+JHUz8Sd0HCJBxfHJp
-	 Qji+TSQna8VPDJHHCnKnkYFkD2w++8y1XzEo+nnVGpSmVoWo2lT7GcGtrGcr2Wf7mh
-	 cMBgSCrgUxI/1LftFYqHCdsrRzVTDdvqorq/bvBYKX3oa2++3YuHdUAwp/O+Ij8c5D
-	 u2dhu/e7jxdwtWXpk5tSzLpxb4OKyvWbsswsdwHe7wgKqDvkyGTvGwFvYGdRBctpXb
-	 WcI0rRIr75xoQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 11E403808200;
-	Thu, 22 Jan 2026 04:40:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECC641325B
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 04:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769056992; cv=pass; b=I/rV6EriROXhk28d0z/vQXWiFDfLQhSOm9Btr6CpqvsJIyiwAQY2Y2v9Lf3aIiS6gSjlFMlum6ixoOZVNv62hvMdWjNIcTwlU77mJ68t1vQbc8aq5vVGZ/tYTJduWVKzydEOYKLePXVhpL7VPNM8CdzPaFSaeGDNS5V3FEiBtuc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769056992; c=relaxed/simple;
+	bh=pJM8lGgtUJ/wTZmXrm74UyMZeLkN8SeYhilCep4Jxes=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OUhckJK/UsG4rMtPMeWsgIlqiRepQd9d1n+v8azg1GiTx6gyhb/qob1GEeiU6AEVXK63dLIptZCWV9B7SOdIEBvC5je0E2pQdUJXRsjhNFI+j4nWUWJRqJ21i/PH1+Plpy4pvqtvlN9qBIikBElR1+Fc+bjDPNVflGrOBj2QYjs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FuorqOdP; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-894770e34afso9411806d6.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 20:43:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769056987; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k6bUEo7LKpJtmXay42LG0djD3YixMeZwtrXrt79MWqzM7R8g39lhmowTrtcYOsOcGZ
+         QO1qsW1lmF35Ce9/UnrDWe1boKsJt1IrFmLelkSQ1ZBGunSsagFGEB2MJPzaciOCjWvs
+         2mUzkETGjKuCwp1LVPdu1YGN8YYSa7h1EezW0FlgJzoTAInJ681UytB9niNF0xYS3hBA
+         SQJTvA6b0Y0grXS6IGSkLWeH0lDQveWanHyG3fcT3+X+nGNXS4xZhcb+IYaZxSMmQHNb
+         GnqCIwL+DSD15dxqxEnoYKdO2DgqiLOXmQhvlxzTXyNuw1KmgbVfPAIFw+HH4SgjCgXW
+         M07w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=C2WyKh72YZ/o0vuncnbjTOA7DWTRpxJUig7YSzL8W4o=;
+        fh=3Rk5QNjezc4mX5WbylVOe50dx4lNaBmVPjoqE/ClL78=;
+        b=cjJnOvfEXxEmFY2cFXMTKj3IHMwo4BRC7iwcWH6iXejDkdf8nYmh5bFPyq9mu2byZu
+         JAVmZAJ8prki+SuHgciQRnl09I40QmExx2lxCvhzpowkkevuTX6lVwuoc3DqLQrvh+dD
+         jy3+ZJH49lil6wKnEgT45F6TB6oTsf5vWzw2NeaWqN93B1dOyDSFqTAH1UNutgfFyEDY
+         5FdlhP197eIk9zTXgWvZLl2N+b3BYL/Akz4KRw+48hbLF8JeUeL9B/gLcNnYIk1KVrRz
+         GDWS4ONqMv5dnyZrG3ZrlZycgGc0bOmg7cFX6DMiacAHk97PvV8yBgsaWgsdB7n0rW7J
+         XpqQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769056987; x=1769661787; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C2WyKh72YZ/o0vuncnbjTOA7DWTRpxJUig7YSzL8W4o=;
+        b=FuorqOdPRjDAt0I+wqCaxxsKqPoEv1e/nhYJHPaQf5LZZwgKIP+h1AEMphzKApi8Ex
+         x6efMNs/ReF6rvOrCbephjEvt7iHs95QHuZ7fmJx91ur62jHEvRrS+2kCmVBIWFYKxg0
+         EONaaJdEGyrDCCAvNve0fcabkUNsTW5S4ksLSGjsvm2RoHCU2F7vVjIvt5iEQBQYjClN
+         kxR/KFb+pCBriztmbw1bZlH8/l65JyB45gkh+bve5yc9io2dS68L+ucI4RxaO54HowGj
+         SjZfxHk8ZLUu05ZUHOpqoYefvgVyZMPkwjQzmIcr9DuLFsVmVi+9a2M7YC0T4FmMh152
+         vmhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769056987; x=1769661787;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C2WyKh72YZ/o0vuncnbjTOA7DWTRpxJUig7YSzL8W4o=;
+        b=OgesqfRgUnxXCe7EbKoGkRatQPDdgypkvoxv60rByMMl6c8FLJlHj8jncFGJfW4YXl
+         zH0g8mYOgWmfnrajZvPrLOWbUJSydjHXTX/c22Tu6LTEi/sUmcxLJsDDODRREv48ZtjK
+         sZ2u5UuXdWmkJ8p4cxlRSBuvCctLYnAc/H+yTwUi88Wx4wGxr7dDK/ECRz1wh9Hj1Rve
+         xQhEfJe9FDMEBm1Xjdj8dIh/mX0qRdhDRtZJ2HnW8wkkjej1+7g4EiUaLfoF4LX72t75
+         BxaRbBCYj6fz9J/mVAQdvxoLN2RXUT0OKUQ1VjmjCE+TPfJSLfIFdLmg372x1YiP6FbW
+         6Izg==
+X-Gm-Message-State: AOJu0YxXLCKVQJq30UJnjgTK9VV3A4qJ4UbHk5us6H9pbkU/H8L8MykA
+	7PccbUVOirS28szozAL1rXZgzI6UqPg7dfh/3VjVQ4U09uQA5kZJXrM3a0f8GUrAzY74Zzjaf+o
+	qwElBQhFODyUv5GbEJ4RDArcOJKu7aAB56wf93gS2
+X-Gm-Gg: AZuq6aIUBeAIaP1GFNXvmzpNd5/XPktZuoUPim5D9d+FeYxV1nbmAnZGlunaa9My3Qp
+	OWBIrNCh6BAXqSDlMIxKmzyG05htVzhJ4RGAga5pgiL99bU0gkH3f2arGW3gQSrAj5gUEUpOOqr
+	ia7DaDidi4nMA2ykAfksLjer0wLaWIugVYM17bpXCDJWar5GaiU12BIVxVKlsTGSOovpXw1saaP
+	vpDELc7D0Y4QEu8wfkdytW8Ercn4bDbb5YsPylaX2gLh04paHuLFL64Oa4VQu98PQa/nb4=
+X-Received: by 2002:ac8:7f56:0:b0:4ed:67ea:1e5d with SMTP id
+ d75a77b69052e-502d856148dmr110247601cf.53.1769056986650; Wed, 21 Jan 2026
+ 20:43:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/10] netfilter: nf_tables: reset table
- validation
- state on abort
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176905681585.1558231.4991951813231134524.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jan 2026 04:40:15 +0000
-References: <20260120191803.22208-2-fw@strlen.de>
-In-Reply-To: <20260120191803.22208-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+References: <20260120152856.1694824-1-edumazet@google.com> <20260122022237.2529455-1-kuba@kernel.org>
+In-Reply-To: <20260122022237.2529455-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 22 Jan 2026 05:42:55 +0100
+X-Gm-Features: AZwV_QgliijMY1mRVtNh3Uk1-FZGesb2QGrcMSPgN2mJH_NoMMeNIxdI-1VmpOg
+Message-ID: <CANn89iLK1saW=7jxhtew_skR-rPPonFi71brvTApeKM5VVadiA@mail.gmail.com>
+Subject: Re: [net] bonding: annotate data-races around slave->last_rx
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, syzkaller@googlegroups.com, andy@greyhouse.net, 
+	eric.dumazet@gmail.com, pabeni@redhat.com, j.vosburgh@gmail.com, 
+	davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252207-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,googlegroups.com,greyhouse.net,gmail.com,redhat.com,davemloft.net];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	TAGGED_FROM(0.00)[bounces-252208-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
+	DKIM_TRACE(0.00)[google.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,strlen.de:email]
-X-Rspamd-Queue-Id: 033C961C3E
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 8525B61C46
 X-Rspamd-Action: no action
 
-Hello:
+On Thu, Jan 22, 2026 at 3:22=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+>
+> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
+l.html
+> ---
+> bonding: annotate data-races around slave->last_rx
+>
+> This patch adds READ_ONCE()/WRITE_ONCE() annotations to slave->last_rx
+> and slave->target_last_arp_rx[] to fix KCSAN-reported data races in the
+> bonding driver's ARP monitoring code.
+>
+> > diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/b=
+ond_options.c
+> > index 384499c869b8..74708bd2570e 100644
+> > --- a/drivers/net/bonding/bond_options.c
+> > +++ b/drivers/net/bonding/bond_options.c
+> > @@ -1152,7 +1152,7 @@ static void _bond_options_arp_ip_target_set(struc=
+t bonding *bond, int slot,
+> >
+> >       if (slot >=3D 0 && slot < BOND_MAX_ARP_TARGETS) {
+> >               bond_for_each_slave(bond, slave, iter)
+> > -                     slave->target_last_arp_rx[slot] =3D last_rx;
+> > +                     WRITE_ONCE(slave->target_last_arp_rx[slot], last_=
+rx);
+> >               targets[slot] =3D target;
+> >       }
+> >  }
+>
+> Should the IPv6 NS version of this function also get WRITE_ONCE?
+> _bond_options_ns_ip6_target_set() writes to the same target_last_arp_rx[]
+> array:
+>
+>     static void _bond_options_ns_ip6_target_set(...)
+>     {
+>         ...
+>         if (slot >=3D 0 && slot < BOND_MAX_NS_TARGETS) {
+>             bond_for_each_slave(bond, slave, iter) {
+>                 slave->target_last_arp_rx[slot] =3D last_rx;  <-- no WRIT=
+E_ONCE
+>                 ...
+>             }
+>         }
+>     }
+>
+> This seems like the same concurrent access pattern that the ARP IPv4 path
+> needed fixing for.
 
-This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
+I saw this spot, but determined this was used at setup time, not in
+packet processing.
 
-On Tue, 20 Jan 2026 20:17:54 +0100 you wrote:
-> If a transaction fails the final validation in the commit hook, the table
-> validation state is changed to NFT_VALIDATE_DO and a replay of the batch is
-> performed.  Every rule insert will then do a graph validation.
-> 
-> This is much slower, but provides better error reporting to the user
-> because we can point at the rule that introduces the validation issue.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/10] netfilter: nf_tables: reset table validation state on abort
-    https://git.kernel.org/netdev/net-next/c/6f93616a7323
-  - [net-next,02/10] netfilter: nf_conntrack: Add allow_clash to generic protocol handler
-    https://git.kernel.org/netdev/net-next/c/8a49fc8d8a3e
-  - [net-next,03/10] netfilter: nf_conncount: increase the connection clean up limit to 64
-    https://git.kernel.org/netdev/net-next/c/21d033e47273
-  - [net-next,04/10] netfilter: nf_conntrack: enable icmp clash support
-    https://git.kernel.org/netdev/net-next/c/f7becf0dad8f
-  - [net-next,05/10] netfilter: don't include xt and nftables.h in unrelated subsystems
-    https://git.kernel.org/netdev/net-next/c/910d27122775
-  - [net-next,06/10] netfilter: nf_conntrack: don't rely on implicit includes
-    https://git.kernel.org/netdev/net-next/c/d00453b6e3a3
-  - [net-next,07/10] netfilter: nfnetlink_queue: nfqnl_instance GFP_ATOMIC -> GFP_KERNEL_ACCOUNT allocation
-    https://git.kernel.org/netdev/net-next/c/a4400a5b343d
-  - [net-next,08/10] netfilter: nft_compat: add more restrictions on netlink attributes
-    https://git.kernel.org/netdev/net-next/c/cda26c645946
-  - [net-next,09/10] netfilter: nf_conncount: fix tracking of connections from localhost
-    https://git.kernel.org/netdev/net-next/c/de8a70cefcb2
-  - [net-next,10/10] netfilter: xt_tcpmss: check remaining length before reading optlen
-    https://git.kernel.org/netdev/net-next/c/735ee8582da3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I was maybe wrong.
 
