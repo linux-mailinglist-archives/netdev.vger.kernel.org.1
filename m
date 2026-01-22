@@ -1,228 +1,154 @@
-Return-Path: <netdev+bounces-252482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252484-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMfEN1VscmlpkwAAu9opvQ
-	(envelope-from <netdev+bounces-252482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:28:37 +0100
+	id 0DE4NPlscmlpkwAAu9opvQ
+	(envelope-from <netdev+bounces-252484-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:31:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E01C96C6AD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:28:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA7F6C75B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7C4B63119786
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:47:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9FE4F3014924
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E7D346FD0;
-	Thu, 22 Jan 2026 17:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A3B360756;
+	Thu, 22 Jan 2026 17:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMEzpUH0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qfrrln7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257982248BE;
-	Thu, 22 Jan 2026 17:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B572E2D6E44
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 17:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769104008; cv=none; b=ZlTzXPsfLwKlzMsLecXrPxnrVCXBd8RG3B2NkZpy6UTVEGqcL1MO4GYM0GS5liIqDqlYx5i9MHekTWsOZx3rgm93TxEgCaA3lDfLPGRYv7jLXHnEwzPFDtZLduv+FWriRSJIf5XIHh9ZoOtunPA1dOA6Nva7IYIWF03ibHQlqeE=
+	t=1769104291; cv=none; b=b2oAJtFJ5wQMRo3h3WsZGCD1MeaeE6wMBuwHggyLoH0auI4kC0ablIErPeCQPk2EFG6BtDsfgZO0Ia1KgrT7jX0FjrMqt42HE8w7+yrGnheVqAfnMq9sunhdelQkWTKGyE37nwRzWbpIf+ZA1wvAoCE1OXEwmRM0yE4neEM0J2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769104008; c=relaxed/simple;
-	bh=VjDGUTom6je4dVzwHm2KOd5tgoOEnl0QV5kY0rsBtfk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Be++bt7HikhKNV9k9KGQLX/lG+Y9I4QbLBOK8lldWPipNJ1HGSqROiYAaqCl/RQfeMWyxm328LUkC0Ljdd0Z4A/+3GARR7IT2dxob2kfB7k5V4nkoS8OVxNw799DyZeoQejtMxiJ3exkGkFZtYwRw3ejBw191MigSxiHLDgKNtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMEzpUH0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D0FDC116D0;
-	Thu, 22 Jan 2026 17:46:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769104006;
-	bh=VjDGUTom6je4dVzwHm2KOd5tgoOEnl0QV5kY0rsBtfk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DMEzpUH0sCcVRQKiLLbjFI94FDuri0ywOqM0HwIq1MjhTMeQLGyAz/NDEbf5lwnVX
-	 qUD5SrKzE4egZCIQeTvUDuPdaUb7co0gFxUpoFrNuU8NRBvnv6O3i10LOpP/Dl48rt
-	 3PnVzjzMIPJDVTlwruu91ckszTtwcQsik9VTGlODhRVJxbh4+PbWRqw9R6vokw6iAF
-	 29sfH3PQnumfVjkIci6MfIWyxZdKYoxNWwMUMrnbosY8+g83esJq124j2gQUXPtxLc
-	 J3gTEtCiLnIl0RvXqMSMmB/J3GawaLciu+oZeIh/HKa4BvfbCpBe9PUNGqH5tr9xij
-	 aRhzJctqQGbTQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 22 Jan 2026 18:46:17 +0100
-Subject: [PATCH nf-next v4 5/5] selftests: netfilter: nft_flowtable.sh: Add
- IP6IP6 flowtable selftest
+	s=arc-20240116; t=1769104291; c=relaxed/simple;
+	bh=pRIQIWRrRQgnj3ezXQTQ3jrO9DmpI9kPBw6zPbHb67g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ce+zCBDWDR2VmkPlEVUUIv7bqkHKHnS8FNKw/BxsLjHHQRYqyX8uDYkRVjG6qQZUj4wsomsodphdsP+mXxH8C6w7E72FVxh3oWX0Xv8IwfW3ORzQDugazwoNN4y2idPl0PuXRTTUnVlNB6OcSj+5b11Mvm3WOQpy/Z3Za/4fv9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qfrrln7P; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4801d7c72a5so10127975e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 09:51:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769104281; x=1769709081; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AS4wzg3mx3qj2Nf8DZyjeBJuZsttBAvemF6BKgHNWis=;
+        b=Qfrrln7PGNuizmBYrmItUNneoU+j9SrxNhbg3FpmRoJVInXIVwkel16lbsF0Qt+pnT
+         w3vieA8V4U/6skgBZGvdomGnuAJbEnBFAZT4CPubR5NCsEQikcNScQ7wQfOcEm+Px2SC
+         FjnPkPAqLJlQyuxPdv6idUOsDTtb/fweZGGF51l6FbqN5OSSLD0qxA9B4SwGV+XFFxrp
+         URbQ/cLhVUXDckzAVaC1OP6hW1nOmQ6fDSAA855wy/Rn5afbll+nvNcPuPchkZL5GRfC
+         32mPUORqpo5NnRg2UvEkQMMO3264B2AscJrXvSzfoq//elRxn3As++HZwwrITX6vaNpI
+         Rlgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769104281; x=1769709081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AS4wzg3mx3qj2Nf8DZyjeBJuZsttBAvemF6BKgHNWis=;
+        b=XwjE8xx+hmEoR11s1O2yIviXTMDUKzEdlQ034S+a2285xSxb7qUbVPJjW3lLtcI6E7
+         tOJgrGf4vXxt4R8RNR0fk71HhbSBb9+cBNHSzGUDMxGIaPvjhq8SBuesEBVnhpSmfdOt
+         78gn7WZ+OMxCipv/OuYc1LnG8RUVnGuOPjHNSWAgvt7zc3Dm4/lcAPzmP2WgrT/TRQAL
+         t43lDImAZzZbZa0W/OYA9CN15oIVocp5cg2QnyiSwWJtbqTSQqzdHHQPSSjRbTYlwJgC
+         Ridtq/VGC7MmF1mziYaoW4KflPKGKo7Fen+82dqvEzqq+iae/YYwbDm1IbbuWm8ZV8r+
+         plWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzguEwBEBGXV9PCJHBqHOq4eAA1qmtFePJ04IGAvSeDsP2zVxW3e1RiskoY6DjJwL/f2SJY9Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySB8arjinKk+p9xhh2Gzyj8UhKYFEkTSIMWojoQTI3UMPaBth8
+	kl/449oxStlPNvcNk1TFkXBj1Sd2dR7ORMjUT98oYl3vUSX8gbCVrFfi
+X-Gm-Gg: AZuq6aJgy5Fcvi9XfOWstwI/xUDTWgclYN+/LtEn1uVWcIgylX35ps2c2KhVtC2CFJR
+	syZ81Ula40Y2bNeJQq5ICGyJXdba7HjNGGF8bTEnTQ/fX3AXMUpSKTdVvp9kSHijYc25T/p5L/p
+	Qa2djWThAO0XK8Ate6zA4vD8bkPzK5f7wiEwgb1X4CtnQfPSf9fgoAmHYppKHozb0WvPgxzfmf9
+	6w2O3BIQepBXDd2Rnfwkuuj79g3OMorMgkYZ8EzgRiEGxeyf3hxN5XPuR3gCv/UF7IUHxtpXhi4
+	I4vvbD0BfygpYnZyJGgl6lMKmcMXL0lmIZII9ZCl+g6mS20JS6x6bCvGDWUhzhxieTftqz1SSiZ
+	2+P2EPbWjzR/iYy9x76bzIhfjr0ZIYwilN8fMAdIFx6hXOwq3KZaZWzLQcsL15tf/03uGf8EnIL
+	n6PhexIXqDkNgNMR0d
+X-Received: by 2002:a05:600c:1552:b0:47e:dc64:f1c6 with SMTP id 5b1f17b1804b1-4804c9456e1mr7701325e9.6.1769104280996;
+        Thu, 22 Jan 2026 09:51:20 -0800 (PST)
+Received: from archlinux ([143.58.192.3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48046fb7eaasm83645505e9.0.2026.01.22.09.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jan 2026 09:51:20 -0800 (PST)
+Date: Thu, 22 Jan 2026 17:51:18 +0000
+From: Andre Carvalho <asantostc@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 7/7] selftests: netconsole: validate target
+ resume
+Message-ID: <aXJikx-Tt7XjHpl3@archlinux>
+References: <20260118-netcons-retrigger-v11-0-4de36aebcf48@gmail.com>
+ <20260118-netcons-retrigger-v11-7-4de36aebcf48@gmail.com>
+ <20260120172057.6600eefe@kernel.org>
+ <aXFIk1L8G_dHF6od@archlinux>
+ <20260121174505.5e710b0b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260122-b4-flowtable-offload-ip6ip6-v4-5-ea3dd826c23b@kernel.org>
-References: <20260122-b4-flowtable-offload-ip6ip6-v4-0-ea3dd826c23b@kernel.org>
-In-Reply-To: <20260122-b4-flowtable-offload-ip6ip6-v4-0-ea3dd826c23b@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121174505.5e710b0b@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252482-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252484-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[asantostc@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nft_flowtable.sh:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E01C96C6AD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4AA7F6C75B
 X-Rspamd-Action: no action
 
-Similar to IPIP, introduce specific selftest for IP6IP6 flowtable SW
-acceleration in nft_flowtable.sh
+On Wed, Jan 21, 2026 at 05:45:05PM -0800, Jakub Kicinski wrote:
+> My main point is that even if we fix the HW setups to do the right thing
+> in systemd policies - the tests are running against netdevsim, not the
+> precious HW present on those setups.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- .../selftests/net/netfilter/nft_flowtable.sh       | 62 ++++++++++++++++++----
- 1 file changed, 53 insertions(+), 9 deletions(-)
+This makes total sense. I got too carried away trying to make sense of why this
+was failing (I might still submit a follow up to make the test more resilient).
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 24b4e60b91451e7ea7f6a041b0335233047c6242..bc98baba56c638cad35478109a3776d6d93c34a8 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -590,16 +590,28 @@ ip -net "$nsr1" link set tun0 up
- ip -net "$nsr1" addr add 192.168.100.1/24 dev tun0
- ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
- 
-+ip -net "$nsr1" link add name tun6 type ip6tnl local fee1:2::1 remote fee1:2::2
-+ip -net "$nsr1" link set tun6 up
-+ip -net "$nsr1" addr add fee1:3::1/64 dev tun6 nodad
-+
- ip -net "$nsr2" link add name tun0 type ipip local 192.168.10.2 remote 192.168.10.1
- ip -net "$nsr2" link set tun0 up
- ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
- ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
- 
-+ip -net "$nsr2" link add name tun6 type ip6tnl local fee1:2::2 remote fee1:2::1
-+ip -net "$nsr2" link set tun6 up
-+ip -net "$nsr2" addr add fee1:3::2/64 dev tun6 nodad
-+
- ip -net "$nsr1" route change default via 192.168.100.2
- ip -net "$nsr2" route change default via 192.168.100.1
-+ip -6 -net "$nsr1" route change default via fee1:3::2
-+ip -6 -net "$nsr2" route change default via fee1:3::1
- ip -net "$ns2" route add default via 10.0.2.1
-+ip -6 -net "$ns2" route add default via dead:2::1
- 
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6 accept'
- ip netns exec "$nsr1" nft -a insert rule inet filter forward \
- 	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
- 
-@@ -609,28 +621,51 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel"; then
- 	ret=1
- fi
- 
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Create vlan tagged devices for IPIP traffic.
- ip -net "$nsr1" link add link veth1 name veth1.10 type vlan id 10
- ip -net "$nsr1" link set veth1.10 up
- ip -net "$nsr1" addr add 192.168.20.1/24 dev veth1.10
-+ip -net "$nsr1" addr add fee1:4::1/64 dev veth1.10 nodad
- ip netns exec "$nsr1" sysctl net.ipv4.conf.veth1/10.forwarding=1 > /dev/null
- ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif veth1.10 accept'
--ip -net "$nsr1" link add name tun1 type ipip local 192.168.20.1 remote 192.168.20.2
--ip -net "$nsr1" link set tun1 up
--ip -net "$nsr1" addr add 192.168.200.1/24 dev tun1
-+
-+ip -net "$nsr1" link add name tun0.10 type ipip local 192.168.20.1 remote 192.168.20.2
-+ip -net "$nsr1" link set tun0.10 up
-+ip -net "$nsr1" addr add 192.168.200.1/24 dev tun0.10
- ip -net "$nsr1" route change default via 192.168.200.2
--ip netns exec "$nsr1" sysctl net.ipv4.conf.tun1.forwarding=1 > /dev/null
--ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun1 accept'
-+ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0/10.forwarding=1 > /dev/null
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0.10 accept'
-+
-+ip -net "$nsr1" link add name tun6.10 type ip6tnl local fee1:4::1 remote fee1:4::2
-+ip -net "$nsr1" link set tun6.10 up
-+ip -net "$nsr1" addr add fee1:5::1/64 dev tun6.10 nodad
-+ip -6 -net "$nsr1" route change default via fee1:5::2
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun6.10 accept'
- 
- ip -net "$nsr2" link add link veth0 name veth0.10 type vlan id 10
- ip -net "$nsr2" link set veth0.10 up
- ip -net "$nsr2" addr add 192.168.20.2/24 dev veth0.10
-+ip -net "$nsr2" addr add fee1:4::2/64 dev veth0.10 nodad
- ip netns exec "$nsr2" sysctl net.ipv4.conf.veth0/10.forwarding=1 > /dev/null
--ip -net "$nsr2" link add name tun1 type ipip local 192.168.20.2 remote 192.168.20.1
--ip -net "$nsr2" link set tun1 up
--ip -net "$nsr2" addr add 192.168.200.2/24 dev tun1
-+
-+ip -net "$nsr2" link add name tun0.10 type ipip local 192.168.20.2 remote 192.168.20.1
-+ip -net "$nsr2" link set tun0.10 up
-+ip -net "$nsr2" addr add 192.168.200.2/24 dev tun0.10
- ip -net "$nsr2" route change default via 192.168.200.1
--ip netns exec "$nsr2" sysctl net.ipv4.conf.tun1.forwarding=1 > /dev/null
-+ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0/10.forwarding=1 > /dev/null
-+
-+ip -net "$nsr2" link add name tun6.10 type ip6tnl local fee1:4::2 remote fee1:4::1
-+ip -net "$nsr2" link set tun6.10 up
-+ip -net "$nsr2" addr add fee1:5::2/64 dev tun6.10 nodad
-+ip -6 -net "$nsr2" route change default via fee1:5::1
- 
- if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel over vlan"; then
- 	echo "FAIL: flow offload for ns1/ns2 with IPIP tunnel over vlan" 1>&2
-@@ -638,10 +673,19 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel over vlan"; then
- 	ret=1
- fi
- 
-+if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
-+	echo "PASS: flow offload for ns1/ns2 IP6IP6 tunnel over vlan"
-+else
-+	echo "FAIL: flow offload for ns1/ns2 with IP6IP6 tunnel over vlan" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
- # Restore the previous configuration
- ip -net "$nsr1" route change default via 192.168.10.2
- ip -net "$nsr2" route change default via 192.168.10.1
- ip -net "$ns2" route del default via 10.0.2.1
-+ip -6 -net "$ns2" route del default via dead:2::1
- }
- 
- # Another test:
+> I don't remember the history, it's quite possible that Breno wanted to
+> have a separate target for netcons from the start and I pushed back.
+> I think we reached the point where we want to create a target.
+
+Sounds good. I had a chat with Breno and I'll look into moving netconsole tests
+to a standalone target.
+
+Thanks for the patience and reviewing this series!
 
 -- 
-2.52.0
-
+Andre Carvalho
 
