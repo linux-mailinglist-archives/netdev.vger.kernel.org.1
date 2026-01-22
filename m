@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-252274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIVeJ7oFcmmvZwAAu9opvQ
-	(envelope-from <netdev+bounces-252274-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:10:50 +0100
+	id wH9wHQEGcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:12:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DD965C02
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:10:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1013B65C5B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:11:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C783C886110
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:57:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70C384F51CD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A093ACEF8;
-	Thu, 22 Jan 2026 10:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F23EDAA4;
+	Thu, 22 Jan 2026 10:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ITbLeqfr"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="UiKHBziX"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013022.outbound.protection.outlook.com [40.107.159.22])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013031.outbound.protection.outlook.com [52.101.83.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAF83806D3;
-	Thu, 22 Jan 2026 10:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249413C1982;
+	Thu, 22 Jan 2026 10:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.31
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769079436; cv=fail; b=pMaWW5SJIXQ/GPLkXKHgNJgREUfSITv6HW7Ds07eUhmf+RqlPjHYrX9bRa5fAuIq0gTfqntskb8UVY0OvLYI92tSsvSOerg7xOe7g/I9UGAOJ/kE1jpqxAPXghTarQRpTPDXrE3VicjX/y6bu4IVnjXSzljx3IVkoupbcycyK70=
+	t=1769079440; cv=fail; b=OnyOjfrazhqVev9JHlVwLv9u3lo98iX4Y2MNlU00l3n85vKGzEiTqfjZAYHGrDuBPe3WGkO1/aXbG4MccJ5scLXvjWhZNoSjq6ubxi99AOTDsgyHBkEYjOiNfs/nsEn8Y36/ihFPb7iKZ822NeIQ9q9TdjF7fplyB2ZtEeHvKF4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769079436; c=relaxed/simple;
-	bh=1qlUz3DJDZxtG8+KMQk6Z2PaJR9+8br9YMRcoshitys=;
+	s=arc-20240116; t=1769079440; c=relaxed/simple;
+	bh=BGzDx7BFHsfHXR0fYbugM/K/15JLt/uHm9UcJ+XoRUY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uDE7jMoSFw/nB5PQy93AW5lveVLuxoNaLI9tzEic/tEUOgBqn5/HvmWEmokDAUTcoCijxbNrSa00YHgUNu0g3FXX20KZx5/vdrfc5Ych4ZWkhSCWImcx3VlY8wtwnBema9yKrZcYJesO7zVPxR4IJYWT5kXn3ZopARsGChwPCIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ITbLeqfr; arc=fail smtp.client-ip=40.107.159.22
+	 Content-Type:MIME-Version; b=DwX0zJ03msfQi6Ot/Mp2u69Own0HkNSkT0Mn9aUKSBBDc8xfGAOCouiyxWgxevMP55iX+LHoW9QWlkOkQ/OUumMyJ5WWkgkb1XtVEYsY0e2ei7qsB16FPpvQwfCeBzAECwS1D987e4d4PFdYZdC6+fOPFQZzw/3/CVL1tJDrQnM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=UiKHBziX; arc=fail smtp.client-ip=52.101.83.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jEVmZy4iqDiJO6J3XdgmSEQ7BglN7bT8ALADJKzKE7SwGhDhNMYWIP3SUHAPWlO7ZTpqq4xq8DDHTfT5pd0LOpuKdgzmhaNo/i+J3lpEaom1a5Fxt9U9+SwOb9EviIBCLpz80WgkaWsPncnZHyvKFMwY3CGf8D5dtkJqp9rd4ZxXqVQ/yy13aooGN2T64RtvR0eR+MxKV31tUXcsPzIXf2OES3VNMrtTsWXSxXjlpFnP2j1wBu2n1TRoXdbo2iX2fGY0MvzzuqJnSGQf5vR+aSq2+a5khnHz9LWf//oFdpMGLd4+GTSB0g8HBUqXLh51D7JI3tikAlz191QgEI6c4w==
+ b=K596FQ3lCwi6fmlP5W0ABULH4FLUsLs21TUHr1yxA2Xi7/1cqbU7B4nOrnH8xCGiHskokHzJeDoKrblJXkiyaaAJqs9gEfhSEbkNRFzzLqiWuk8YXN8XI2LQULMkDgO4YuCpxhEAuct+wXf04u1s5kVV0LXjcSvKVIdBcfFNIMCyqcrOtqbwf4azpddyb6xAcDCzs1fN5jtcU1yaPmIYZquRYMbofGrFqCLpWp+zwY8woZZQk7tlHy7W+yDioMJFaT5ZChq00DAYN3H9LhAZd0uIZsUpyvX0rK9+HeW8FOugPq/GSjI4sOoJAP6qooGO+5fCtMPQw/CO8B9zuCnucQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1szSnQyAQrKnC//QeHrVaVSU6d0qWqEKFhwQRDQxImc=;
- b=HSgy0BHGOMwoR2Miu/oh0rNWRu3gSm+7bh92kzET9az7yq8k0CTGR38PuWegAHDKTQZMu1kEnA6W8zABVz8DuroqgWBhtsvd6pQYz7osbT2j9AJYgXF4wPJuBviSZB/c+BYd4/jahvRm6dq86vH1KxbHJHRgI+bcjO/OhNFNUrw7wat/FwJQRKgtHmPOhMQpXkLKIAUFO1bQ2P3C3SPkK8GlX8tJ88FaJ3TVOH+vbXz7jhJVPL1Jv3ii1WF7zdRhlyK7ZB7Bf5ZqTrObg0R1FRIPQjeU3cwpV5QrxSSadBarAZfi3fOA9tfs49z5wXyiEFkVUrxVqC7kd+MYfcoK5A==
+ bh=HukDWN9q0nEzGTQh+dJ9zTAyRb0UhRs7F4lqES+wHGc=;
+ b=ypbGWR6lV/glwF+y3bAU6rhyqxV0wwdET4nAsbjvTldgzAhq7W0xGTssYq/+zO6ip39mxLrYuQqU7bbSheS9Lx/4Jubn/IabsJx9d8DMVisFWg/LdM1pTgsxitq01VdqNyUje35uozr0Ecvg3+mctsV0RwMRURRrvz3Kz/cxVe9AsSUBVa34N7ykoY2r4ZBgwgVF4cRDvXajTwi7X3sNzvsBCMd0bAgcEBFDTlGEMipVGo/KBb5sBsrQGdNTURb+XNWQAWNmQFejylwLp9vjv4gv8hltiprx2VYM6QtvlA+ApkTRwpDf/VmYtd5A2AGJ8+L7tFoAUzZlDFR2RuoesA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1szSnQyAQrKnC//QeHrVaVSU6d0qWqEKFhwQRDQxImc=;
- b=ITbLeqfrZY7QvUCF/cEMX/Q/5EW8Yc9nqTlh0g0AzVgrykT1m6dHREfzmUng43fZksh99yhPK4AYkvf8zPtjM0QozS8t8ThWNd2zLmJTwr9WpQ01h9q27odI24QyQKsFOWuE2j0uIGSOX8TKbReUE99jqG3t2zA7XIzfsu4iN/aCvv83ExAEZ5ST9BDG2gpvnW5HVkbg2F9jBEaPq3imfPUGJYnpDMLVhb0Y2/1zZmmX6XoVyXRXEzYMOQalRdSXVeJRzs2MtdiseuV0SN2g+ROW9mrm8784QxlPLTstHVGBIdLsTzB9lM6RC+kv5Iaex1pHodmIxMdN0LzDdGf6fg==
+ bh=HukDWN9q0nEzGTQh+dJ9zTAyRb0UhRs7F4lqES+wHGc=;
+ b=UiKHBziXUPGhVJab1A8BprKc3qUyGv3i1vVERx6l2yIH96SnsrtUn+1ukxu17Fz6ePUWzeAU1/rd9uUnCBYza7DnCzp1LXJwc2AsUJKM/xGIye00SiJUPj4M1F7raXrMr4CR6xgCP9KvnwtKWYsCGcTWwAYubFcmZgKpFBfEsD7Ezb9qaBhi2hGy21CIu5FGcEIBbF80X9qaMq29Q+VqVlnhK8wEvX2d8jN8SaF8vGsHsGVp0ByZfLoncwM67m0Q69fBCYxoaJgukTS0WxB5R+ofdL6fmFU5+t1+RRB5OR86VcMXTp98I9Z+WG4ZA9db9HcToak6aRr9ISH/MrlGWA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by PA4PR04MB7902.eurprd04.prod.outlook.com (2603:10a6:102:c0::22) with
+ by AM0PR04MB11853.eurprd04.prod.outlook.com (2603:10a6:20b:6f9::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Thu, 22 Jan
- 2026 10:57:09 +0000
+ 2026 10:57:11 +0000
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Thu, 22 Jan 2026
- 10:57:09 +0000
+ 10:57:11 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -83,9 +83,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	devicetree@vger.kernel.org,
 	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with non-MMIO regmaps
-Date: Thu, 22 Jan 2026 12:56:40 +0200
-Message-Id: <20260122105654.105600-2-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 02/15] net: mdio: add driver for NXP SJA1110 100BASE-T1 embedded PHYs
+Date: Thu, 22 Jan 2026 12:56:41 +0200
+Message-Id: <20260122105654.105600-3-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260122105654.105600-1-vladimir.oltean@nxp.com>
 References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
@@ -101,86 +101,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PA4PR04MB7902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f21ffd6-4003-40df-0797-08de59a4fd1e
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AM0PR04MB11853:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6e6bca3-9075-4128-9874-08de59a4fe63
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|19092799006|7416014|376014|52116014|38350700014;
+	BCL:0;ARA:13230040|366016|19092799006|1800799024|52116014|376014|7416014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GWQCewFP61OowOqHSTsua7H55WArcwY2J7rr+UzYWizvHpb7hat2x9L573Sa?=
- =?us-ascii?Q?LPtwb6kIHR31W509j5qrfUFUFLrid4brmWyUdrAmJgM8T9ozrPOGrjanxsfr?=
- =?us-ascii?Q?udUNP7WC72OKoAqHtcrKjM8z04MQNuoCYjPe5pbBW2Hua40xjpS0tBMALZ4o?=
- =?us-ascii?Q?6nyZ6aJSsdwGOtEzio4Z6rcdsfvoVm49rvzWsqRx/+NDa0XrfVQyB9E7XY6Q?=
- =?us-ascii?Q?4etCww9BuQpPDzzCocmcakSvFL21d6tnZjim1S42nVy3BDBM54At6Q5ukZbo?=
- =?us-ascii?Q?uuhNmrlwy+Ss7SaTMIo7H3iacIQVl0ze3rl+s7ZJr5/KoweMKrGT+r5H3jlA?=
- =?us-ascii?Q?zYHKk8OCIys2l9vPoYYdBjizUcPdfdqRAqD8do+PdrSUlzYHtHPxaFEx6eqe?=
- =?us-ascii?Q?kmqqER0IWFhC/m98T9wo8a4V7RUxiota+ZJRvF9Qx367z26pe91SEywQXTq/?=
- =?us-ascii?Q?NEoX/3lJG1a6ptU9CttlAwLStps2tzKDMUJNXzqRPH6qITElCzvG05QhZmqu?=
- =?us-ascii?Q?p3PQod72qSPWIyMaJVCySPvvXPo2JK0wzsf7yzGDzqUkgZOzIse9E0DEAWgZ?=
- =?us-ascii?Q?T/2yBzXRnG3ZDyRTZejJGrhRKnQdHy8/DaQPWrBIVRSevejnTubwZVM17XWg?=
- =?us-ascii?Q?qi9btESsYQ+5xG7F6Ypi0ae/AulKRbKfeL0l7uk+5UTeq7bB8MZc90tgh4EG?=
- =?us-ascii?Q?Q6UqwhBChbEBpJ9yfM++EnyxCKjiax6NsjpNzN9xDWGl7dvBWw7iDJsV+uv7?=
- =?us-ascii?Q?mM213S/SdUqocHgbcllPKCotXcuCTsfx3zN1YQGOF/MEVcFlBZgE7NyxqPIP?=
- =?us-ascii?Q?GiGyFemYYUfSwGyVf24cvVyQ1Vnsf6i3x/Lk1Y+Pgy/uZP0ZWJ6JnDg2SOak?=
- =?us-ascii?Q?t9rV4dCzCOAOkdD7zlloIxio1fu3gshD9lYJ3Bou17DlRktg6osyWrP+T6zh?=
- =?us-ascii?Q?D/dfR3nqf9uAYzkVOeZkirwDzHMnwBCHdwBB7mLKzWb9HPcnWLexg2XYlnkd?=
- =?us-ascii?Q?dunoxT57ygASLYZWb1rSUWvhAbPN27e0qLnqY2QALQ+8daXawofBY18eMpUO?=
- =?us-ascii?Q?YBIBV4tSVbFsU77ujgXVcMrYLWMT8zIOuxDIroNP7xByxwp75QvSu4OkXqn6?=
- =?us-ascii?Q?gFO+M+owofxnIOnfNjU6+xjsHKLiHhlpbKYNCf/KO9D08T+mPOUSVykkYVfk?=
- =?us-ascii?Q?ODq+SyTkDX9vSqVDMq9JA3RziJhhUuO619/W0mQftkudOuio1TPa4MGdzLab?=
- =?us-ascii?Q?EVkOYYo3reNZPk6Bc03sWt/HrN7Z14kR/pSUaMXr6IUlYL9MtyQmSJl+S0SN?=
- =?us-ascii?Q?1mUmizQORVUmlcdLqz2oQUP9gY3ypWHkHCEPRIx4QQjs2XMZED9lrVOhvs/3?=
- =?us-ascii?Q?St+uUr94cLLMNthG7aCEZuo1xLTVdZfPPqQXTC58ap+0+G6KK7VJMbx3CgI6?=
- =?us-ascii?Q?FYX08bqzFuEQctdmgD6/e7eMYDEjcIcJfiwHVNgiEolDhvZBUIc982jWtsH3?=
- =?us-ascii?Q?0DuvBeugoClzoLlXrJUheu13l4aSVEwNydQJztkw7NzKdK21MbORROz9l13I?=
- =?us-ascii?Q?gJC1O0ThdiC8uEFDTRdr6jS+QkH1VssRQ5b9brdm/I6Ib7dmLL72sLEJ27Wi?=
- =?us-ascii?Q?Wfh80pVJqM/yV4zmsTPl5tA=3D?=
+	=?us-ascii?Q?ULSBXqF7hNLPNxpHlUGn2ZCoMw1CVOe9yzVfZZe6vw9iwjPDrZCHLlnom85R?=
+ =?us-ascii?Q?cdeInzIP40w2y3Ma25pk6oT0BkbrKvS5/Oz+ohM82RZT/H3ZcVMUKCBc+4iC?=
+ =?us-ascii?Q?TbIX8OkFu0YtUCnNnXAFHjo+nnLGPcPuvDPfgcJ98hyJBBoNU5Rs/IkVKycM?=
+ =?us-ascii?Q?UGIpkhIN6voYK9F6O9Q1KJeYnNhU4HrPaW1bsnUguUrK7ftf229vcBQZBts2?=
+ =?us-ascii?Q?SUT41NPgOO2pKkRCMvO6B8Y9lt+y5I0CUJgBnWwmyvmZYr4JWjVYDKoC3rev?=
+ =?us-ascii?Q?E+cI6DOMz5TgsSCXbd9JrsvFmfG1K4AIXCCX7HV6vpXeuGTQfdbegUK2xitR?=
+ =?us-ascii?Q?yWf8for/Hphy2ioQFNp6Y+im9OJlFtLzd2Szt3lxUFnQvYgkHcafQYdo821c?=
+ =?us-ascii?Q?K3tEPCZKxjCYMDBJCWYV/Ds5RVd0wHmkbrBMk4fKE2rL0ecX6mXltUj4P+Wl?=
+ =?us-ascii?Q?xSqFgyGofKUjkEgC7Fq9xGJVQ/rZm0kB0mzdhmR5b3VZ8uC2eUBX+YJCdPjl?=
+ =?us-ascii?Q?tWTL3Ro+6nlG0KRhGyRUCxu6eAeO31hGG9kXdueMLe9B2XQbK8HnKW1f5o1+?=
+ =?us-ascii?Q?f1yuiE1kL2qTneEoUuWnrXTTeXTpVP5zxf8RfhIHHE0FMEk5c0Y1DC7MioI7?=
+ =?us-ascii?Q?KPUxdCM+YbZEz/qsSwH4w+LFkQ5PlVMMToK4ursH2g13uxKH6k62xmXXmHpP?=
+ =?us-ascii?Q?p6x8RosLmXQurylBeKOnUjc8LLGS4o4TB2hyMJ4kp9H1A7Wh++CThD0T26LD?=
+ =?us-ascii?Q?aL4+RKvB8XJ9UQ57pyCIdsCCC5T8RUOBtLQEo9SXxVbPbZ/L73iWOqGYBaAX?=
+ =?us-ascii?Q?eClMuD1xhVQYXwYxzA8ZUUkSItbOKDC8YhEgrrLfZFSCm2ODgZGnuAHwGEcK?=
+ =?us-ascii?Q?WYz0uVxL9KbuTH6HnD+gPyOP0Rcg6jNVxraTlh8Ume7vU868VZviPVcQEzSy?=
+ =?us-ascii?Q?ExR+17+MzX8XlBqVI/44m/XAd8OQ5VuCNZiZ5qSEImHBaLEyrQzTa7qSxrQh?=
+ =?us-ascii?Q?HFDp9szaVOVIBYgVySD1w0Ntn1cgt5wbFhZxMTdeusvT0ho9lr3afVmK8fQz?=
+ =?us-ascii?Q?P+KiiHZxIc/3HqFxvNqqJHG8bZJWaadgSL5EzD8PB09zCthE1HKucjvaGMMC?=
+ =?us-ascii?Q?wtr3SSNm3rNkaqwHMnX44d7Y+qmdx7eo5XVIRvMW3Ng/cf3fs0PfjlCtMOUV?=
+ =?us-ascii?Q?dBW6nJkBASsmecf3BeWDoTGBHT4XxAlqlN+mFVS1/2q+fjJkzYNcY6jvlrIQ?=
+ =?us-ascii?Q?tffOZbs3ACbbLO5bBlXxGudsj7SP5o+6+2bNTZnlgoRizAZdoc2I+eQw01cN?=
+ =?us-ascii?Q?kp0fRKSOyyDltpuHNa8jlJu48/SpAsclMSfD1AXugdw0bvdtHxFUjp2AhG3J?=
+ =?us-ascii?Q?x16HAJqi0niGsdAqD6O3U3MnJI21t6cmlKl2Rf7AErOAPg9nRoobTEfhk4cs?=
+ =?us-ascii?Q?GBwbRh0QDThEXTUjGCrTNF2niBqiaxC5bUzY4LShsEuDcC68CHWj5mBCZBIX?=
+ =?us-ascii?Q?cIaOnIEXVWCCGPuWHDP8VHm+oPeTKJc9rwON+0mquach5cyLNi7GaTQgaOLv?=
+ =?us-ascii?Q?o15Ien9aZqhFXgRiYKaRxCLH/ltDq7AortgDO2YREy5dGEECsGy2CHUsE6w3?=
+ =?us-ascii?Q?Bc391HUlFV+/TJcuc+XAACc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(19092799006)(7416014)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(52116014)(376014)(7416014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+WhfD9foNqARBM2D55O3Q0LPkRmBpn2DW3UpJTKptdggfU7RyMcrorNRJXiX?=
- =?us-ascii?Q?Yd/xe6Emv5/dhs7RN0HSYT3SSgAXal/i9LfgtiHNjDcZvGcabW3hvxn4Iy9z?=
- =?us-ascii?Q?tikBHJs1pnUMPJbt0qKbZk7sR1tMXwgBFiYYoRraECib7jAE7npkH2d8fbDg?=
- =?us-ascii?Q?pw9I4FJ38abLOsjK9uu2E0JlrmSD+Gj0wf500Ata/lOSRnuh5Tg6zRPMtws/?=
- =?us-ascii?Q?9bffqNW6H6GsmLRAiSO4xw1enQob90XpFdd9qo1FwggcXYsQMRzflDpGeLGM?=
- =?us-ascii?Q?ByX71FDhpG6n1sR6KAdkNcAKk2JIaFEW0I+dmF+MU1neo3AVOz0knL86ZOD6?=
- =?us-ascii?Q?VKA0uZzzWBbFfJBW+EHNGDO4OaXD6WGdEXZH3qgi/cGNJcQIoZowNne/b8RS?=
- =?us-ascii?Q?/T9YIC7AwycC+2DeO7/OYXlviHCrqod8BINXZkzOPQDYC4C+JLGg3aYuDYf+?=
- =?us-ascii?Q?u84h1lou7+s20x/ZX847v97JdfuMTbd55uJE++7SHkr+T08vsyEDzqq1GgY0?=
- =?us-ascii?Q?2gCFG5SrNwcYnUKAuCiyxzMPq4ldu9xC7IlAC5lIUXqR3Ld+D8N0BnRwNrKF?=
- =?us-ascii?Q?vokDYgYuV2fCi2NAUPMDqe4BGKt0+SO3WmgpFY6rOsvRTXzNOibhjlePGY4/?=
- =?us-ascii?Q?d1CQFdBrjHfcROSAq2v/BKGz4taG6IS7Pl2W0Dh1TL2byQcbNPpU+aEIbo77?=
- =?us-ascii?Q?fURqq3zqlvm2ImVA7aWiiGyRda7OeOxRgBvyL1Ft7vDurPfvflzcQr0/d845?=
- =?us-ascii?Q?sJsWBXydOxabQnO3MPmltD6lVUI4ye1SLzMKmn0stXOq4+bChHZyiEmsh+H1?=
- =?us-ascii?Q?CrAH5GiDUszS1IMVG7XmYPU23F/SIBsQbFVzjabbtKSjpPil94iyF8ONhhCe?=
- =?us-ascii?Q?Y9oalou5ZbpbLM5iw9wjkaYUBeul+dlInCTj6E89XL4EMudr2Qoe8v3eb9NM?=
- =?us-ascii?Q?rMkZue9X775BBdqjESgWCPVuh935zgRqVwxuXWZsWaFm4U7Iz/t5wUF9/cQR?=
- =?us-ascii?Q?HVdl+l2s5/nWCxLBBGoF91fVbhj6newuRAHqzy7IVdXKf27BtpzFf4Gyvhm6?=
- =?us-ascii?Q?sjAPyNMsA47kXJbK9oVHo2Jfjv78hjQcVGdn0/IwAesUeQWO5OkEnDAojpzx?=
- =?us-ascii?Q?lc1eNkxhtiGn9peI3dbgHpNxPaT0A2JRZBuITLPKEoW3jMWIUCjkmbsvyA7j?=
- =?us-ascii?Q?2a5B+QejMxleP3lO4KmEnVBgXixBn1he94QKelwfORypdj51wDsA9SCzNK0u?=
- =?us-ascii?Q?PpPUUXJ1qtW5A0c9MR+BhQ4WbhE5z5n/XADwthL1uEuWkMVsHC5qhtZcmoYb?=
- =?us-ascii?Q?XC1gXeSfrqwmndt8oV/hu2HqdzpEHYGR8r5h0uu5iuO/q5txBurloB/+eTRA?=
- =?us-ascii?Q?ZuoeXlRYtRGXYgrmdEx6i49JQJi9tV8ldvSwvfVB64QZFWYXhvlcKM0l7Bgg?=
- =?us-ascii?Q?LU7UGTEMx33lycOiPPjBOFowz/fOT019t6XEQnq3ZlntYc0dtHIff7FaQO3F?=
- =?us-ascii?Q?l0lgzT/9a0vm0DXyXSoq+/FdBehXZLXrAMwHO7IgDTXU+Qqigjr3Csi+ocvO?=
- =?us-ascii?Q?gf8iZu19BI4l9zuWf/hHBgsB0Ds5/tI3kd01nFAxyxCNIQV46PAFCage1JWo?=
- =?us-ascii?Q?tXMdQJ/apWxEDJXhFmIt/7Y6ohTELBRNVs5PWuI9oXFokbollro9iIVkxdPF?=
- =?us-ascii?Q?Bpn8u4CXMx2kpBjQHbBAXDXmH075NxO0IStvXpug96GLVOAhV4Qd5IWfcrSV?=
- =?us-ascii?Q?JXeQXcHXag=3D=3D?=
+	=?us-ascii?Q?PlnwOsCqtvQu8ak6A/771K2hWz7sUkqZi2Jnvhhdu06jhY6c8RnUbzDH82Dm?=
+ =?us-ascii?Q?RAD5N4bcYf1O/6WCNIgGClThBo5kUzxqSwYb9kHYFU3mYe7ikjYMkUpQgK74?=
+ =?us-ascii?Q?azRpgNsK1+50KCmfkZAmv2pd8trI/sgPxfSK8Zzz5pPrm5qbt2zCTlRXqmc5?=
+ =?us-ascii?Q?BcuVeiC8PKnZ0oZON8KykV+coBx42TcZwtB8YXqHy/XiYsdu2fhU5QhCz6Q2?=
+ =?us-ascii?Q?wWr2PQyE+pM9ZLQz4iTB119cOir3c5T2wj3wiB1gwSYJCoBlBqZzpIq7jdvF?=
+ =?us-ascii?Q?iPB3G+4K6WQRhbMqZGv8MB6LH5R6zzNXYI/e+wQSA39XOjev03qWm+0uhQsO?=
+ =?us-ascii?Q?OxAIcI9Be936owgulLFn3qFOFE+6JUebPUmVaDuLTQMV3DhIpDPx863NfW2v?=
+ =?us-ascii?Q?bu5VR0csIliBFqz02sBrZ88ePHIhKpONSYFfewAnk/it2jLCbEnSzbC8mJvv?=
+ =?us-ascii?Q?v74u6EYIQTRGE5DctevagZEeMEwxf2dr92VZe5mv8Sv1C8imQxbWxBZYpBQm?=
+ =?us-ascii?Q?oHLePoSjxxyZgd+h3UDGooeA/+XbEdNwL+6gPQF87bDxqpNT/62cpLxw3Z5u?=
+ =?us-ascii?Q?/qKjC9za98o1Mw6WbLAcTPX6sez/2xGBX+TqJ1t8NS1QGtiJR682mzqb6BFC?=
+ =?us-ascii?Q?RgyNsXX2L3HNF+PH616UDr7NyhMF+8WRJqTVUK1ggD+fTNoVSeNdlPwleiCt?=
+ =?us-ascii?Q?8lIcvL3gNF+DVmkS0+NVczqrfDgKIt+gAvykrVn/4UXaeoCdw+Sut+zUKoMd?=
+ =?us-ascii?Q?JYNGpNjwuZ4WEpN+6VJUMbFZkDXJ2GKhQMm+J+V9C05a+Vr4zdB0Vwq07CjY?=
+ =?us-ascii?Q?wCMpX+48f3VZGj4fvmVFueGWBd499TRweFMlq/oyS7F8Cas/6nLPXlgW4eZA?=
+ =?us-ascii?Q?6umGbv6pqJs+Kq45t7jIwyxrBMytr4XfiUlVvluewW4lK4uqKpaobtqBUvaF?=
+ =?us-ascii?Q?qJJUh3Z3FtZPhCAw70cbA4V1kx5rFiIoqtgVZrhfN+mByyVSvysi2yWcwEaV?=
+ =?us-ascii?Q?i5rM1JOqgfQHz2TpCoav739GkMzuXY+9wl73ykR/zjh7G/h7uegRvfoYHgAM?=
+ =?us-ascii?Q?Ya2XxL5aq24tjSt9zghcMoEefIZcoWKSoco32CmdSKlKjGun/KuKJlMTOziD?=
+ =?us-ascii?Q?lJ/fv7nrrR9Yu32sKIgSRWzFAyIOU+vcLs+qKfnf4y5mBhhloxD4Zr41zmBZ?=
+ =?us-ascii?Q?lKtUZ64OOOpKXMoABGDdqId18DleuFJXkXemYXBJJ+6WV0FKKw0zgX6g94kF?=
+ =?us-ascii?Q?yutBVSduc4rJr40r2u++GmLQp555jE4R6kUCuaR46qFHCEdbdk/f5pJrh6hi?=
+ =?us-ascii?Q?fVcV3wUyez/Zq5vd30QNCBiA3AuypBTZSFUr31ZwjQLnfb2i8nxgsT0epm/Q?=
+ =?us-ascii?Q?9Ff7FG07lx4Hm6lzMNr9udufrQoPhjDaA0Smm9czsojKbDmePnIFFM+3yNA0?=
+ =?us-ascii?Q?yftRqsyfdeRGTSLH0Nheu4xc5QsVH4FDX45qrYz3o9gKaK91fVCYNNZu7hFW?=
+ =?us-ascii?Q?g+GOmNF7yM0RuNoF6M+ZpS/O9SDNDIwo78fCjEmxhxH1XlV2CxdLJb9F7cqP?=
+ =?us-ascii?Q?JrpIyYrfY+Cg3KbzOneWjZNkfw/efxiFCKQKociMe+k6FhqCRYdIxYwbRnab?=
+ =?us-ascii?Q?qgjru2XNXXDGq6Ht6/5GV0KZuwNGZVX37vFsiqYc8NhNizIaI4IMO1B4hZSE?=
+ =?us-ascii?Q?7KliJc6RBjDej1lF/14VsPhBZvWWULrWSmojPlemvSRIi8liTmOIEvGHQ9L3?=
+ =?us-ascii?Q?WjnV6WT3eA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f21ffd6-4003-40df-0797-08de59a4fd1e
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6e6bca3-9075-4128-9874-08de59a4fe63
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:09.5712
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 10:57:11.3157
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qmWTswMNQGL/cwf7X23MNnpF84QmD4+8rCG+cLcoPTDCMxbe0SupvWstkLAeucdtrZUxOO2aC0x4UwZrjDMETQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7902
+X-MS-Exchange-CrossTenant-UserPrincipalName: UJa5Z9jPlVkflVZmkcrQc6fLDGyQbNDRytVlwubKVlldSRGAjYYX1FgVDvwCreC+UyQ+uATI95KPHX++eJiANA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB11853
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [3.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -194,7 +194,7 @@ X-Spamd-Result: default: False [3.04 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252274-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252275-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,linux.intel.com,bootlin.com,trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -208,135 +208,261 @@ X-Spamd-Result: default: False [3.04 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,nxp.com:mid,bootlin.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 19DD965C02
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,nxp.com:email,nxp.com:dkim,nxp.com:mid]
+X-Rspamd-Queue-Id: 1013B65C5B
 X-Rspamd-Action: no action
 
-The regmap world is seemingly split into two groups which attempt to
-solve different problems. Effectively, this means that not all regmap
-providers are compatible with all regmap consumers.
+This driver is the standalone variant of drivers/net/dsa/sja1105/sja1105_mdio.c.
+In terms of differences:
 
-First, we have the group where the current mdio-regmap users fit:
-altera_tse_main.c and dwmac-socfpga.c use devm_regmap_init_mmio() to
-ioremap their pcs_base and obtain a regmap where address zero is the
-first PCS register.
+- this one uses regmaps provided by the parent as a method to abstract
+  away the sja1105_xfer_u32() calls for register access
+- the driver prefix has been changed from sja1105 to sja1110 (this MDIO
+  controller is not present on the older SJA1105 family)
+- in the sja1105 driver, each memory word has 32 bits, so addresses as
+  seen by regmap need to be multiplied by 4. This affects what
+  sja1110_base_t1_encode_addr() returns, and is different compared to
+  sja1105_base_t1_encode_addr().
 
-Second, we have the group where MFD parent drivers call
-mfd_add_devices(), having previously initialized a non-MMIO (SPI, I2C)
-regmap and added it to their devres list, and MFD child drivers use
-dev_get_regmap(dev->parent, NULL) in their probe function, to find the
-first (and single) regmap of the MFD parent. The address zero of this
-regmap is global to the entire parent, so the children need to be
-parent-aware and add their own offsets for the registers that they
-should manage. This is essentially because MFD is seemingly coming from
-a world where peripheral registers are all entangled with each other.
-
-What I'm trying to support are potentially multiple instances of the
-same kind of device, at well separated address space regions.
-
-To provide isolated regmaps for each child device would essentially mean
-solving the problem of how would each child device needs to find the
-correct regmap. This further means that "dev_get_regmap(dev->parent,
-NULL)" transforms either in:
-- dev_get_regmap(dev, NULL): search in the child device's devres list,
-  not in the parent's. This means adding the regmap in between
-  platform_device_alloc() and platform_device_add(), but is
-  structurally impossible because &dev->devres_head is initialized way
-  too late, in device_initialize().
-- dev_get_regmap(dev->parent, "unique-regmap-name"): now the child
-  device needs to know, in case there are multiple instances of it,
-  which one is it, to ask for the right one. I've seen
-  drivers/mfd/ocelot-core.c work around this rather elegantly, providing
-  a resource to the child, and then the child uses resource->name to
-  find the regmap of the same name in the parent. But then I also
-  stumbled upon drivers/net/pcs/pcs-xpcs-plat.c which I need to support
-  as a child platform device, and that superimposes its own naming
-  scheme for the resources: "direct" or "indirect" - scheme which is
-  obviously incompatible with namespacing per instance.
-
-So a parent device needs to decide whether it is in the boat that
-provides one isolated regmap for each child, or one big regmap for all.
-The "one big regmap" is the lowest common denominator when considering
-children like pcs-xpcs-plat.c.
-
-This means that from mdio-regmap's perspective, it needs to deal with
-regmaps coming from both kinds of providers, as neither of them is going
-away.
-
-Users who provide a big regmap but want to access only a window into it
-should provide as a struct mdio_regmap_config field a resource that
-describes the start and end of that window. Currently we only use the
-start as an offset into the regmap, and hope that MDIO reads and writes
-won't go past the end.
-
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-v1->v2: add Maxime's review tag
+v1->v2: use FIELD_PREP()
 
- drivers/net/mdio/mdio-regmap.c   | 7 +++++--
- include/linux/mdio/mdio-regmap.h | 2 ++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ MAINTAINERS                          |   1 +
+ drivers/net/mdio/Kconfig             |   7 ++
+ drivers/net/mdio/Makefile            |   1 +
+ drivers/net/mdio/mdio-sja1110-cbt1.c | 179 +++++++++++++++++++++++++++
+ 4 files changed, 188 insertions(+)
+ create mode 100644 drivers/net/mdio/mdio-sja1110-cbt1.c
 
-diff --git a/drivers/net/mdio/mdio-regmap.c b/drivers/net/mdio/mdio-regmap.c
-index 8a742a8d6387..2a0e9c519fa3 100644
---- a/drivers/net/mdio/mdio-regmap.c
-+++ b/drivers/net/mdio/mdio-regmap.c
-@@ -19,6 +19,7 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 92768bceb929..d3fec699c577 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18948,6 +18948,7 @@ M:	Vladimir Oltean <olteanv@gmail.com>
+ L:	linux-kernel@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/dsa/sja1105
++F:	drivers/net/mdio/mdio-sja1110-cbt1.c
+ F:	drivers/net/pcs/pcs-xpcs-nxp.c
  
- struct mdio_regmap_priv {
- 	struct regmap *regmap;
+ NXP TDA998X DRM DRIVER
+diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+index 44380378911b..9819d1dc18de 100644
+--- a/drivers/net/mdio/Kconfig
++++ b/drivers/net/mdio/Kconfig
+@@ -136,6 +136,13 @@ config MDIO_MOXART
+ 	  This driver supports the MDIO interface found in the network
+ 	  interface units of the MOXA ART SoC
+ 
++config MDIO_SJA1110_CBT1
++	tristate "NXP SJA1110 100BASE-T1 MDIO bus"
++	help
++	  This driver supports the MDIO controller embedded in the NXP SJA1110
++	  automotive Ethernet switches, which is used to access the internal
++	  100BASE-T1 PHYs over SPI.
++
+ config MDIO_OCTEON
+ 	tristate "Octeon and some ThunderX SOCs MDIO buses"
+ 	depends on (64BIT && OF_MDIO) || COMPILE_TEST
+diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
+index fbec636700e7..9abf20d1b030 100644
+--- a/drivers/net/mdio/Makefile
++++ b/drivers/net/mdio/Makefile
+@@ -22,6 +22,7 @@ obj-$(CONFIG_MDIO_MVUSB)		+= mdio-mvusb.o
+ obj-$(CONFIG_MDIO_OCTEON)		+= mdio-octeon.o
+ obj-$(CONFIG_MDIO_REALTEK_RTL9300)	+= mdio-realtek-rtl9300.o
+ obj-$(CONFIG_MDIO_REGMAP)		+= mdio-regmap.o
++obj-$(CONFIG_MDIO_SJA1110_CBT1)		+= mdio-sja1110-cbt1.o
+ obj-$(CONFIG_MDIO_SUN4I)		+= mdio-sun4i.o
+ obj-$(CONFIG_MDIO_THUNDER)		+= mdio-thunder.o
+ obj-$(CONFIG_MDIO_XGENE)		+= mdio-xgene.o
+diff --git a/drivers/net/mdio/mdio-sja1110-cbt1.c b/drivers/net/mdio/mdio-sja1110-cbt1.c
+new file mode 100644
+index 000000000000..f170b63c7f69
+--- /dev/null
++++ b/drivers/net/mdio/mdio-sja1110-cbt1.c
+@@ -0,0 +1,179 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright 2022-2026 NXP
++ *
++ * NXP SJA1110 100BASE-T1 MDIO bus driver
++ */
++#include <linux/module.h>
++#include <linux/of_mdio.h>
++#include <linux/phy.h>
++#include <linux/platform_device.h>
++#include <linux/regmap.h>
++
++struct sja1110_base_t1_private {
++	struct regmap *regmap;
++	struct mii_bus *bus;
 +	unsigned int base;
- 	u8 valid_addr;
- };
- 
-@@ -31,7 +32,7 @@ static int mdio_regmap_read_c22(struct mii_bus *bus, int addr, int regnum)
- 	if (ctx->valid_addr != addr)
- 		return -ENODEV;
- 
--	ret = regmap_read(ctx->regmap, regnum, &val);
-+	ret = regmap_read(ctx->regmap, ctx->base + regnum, &val);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -46,7 +47,7 @@ static int mdio_regmap_write_c22(struct mii_bus *bus, int addr, int regnum,
- 	if (ctx->valid_addr != addr)
- 		return -ENODEV;
- 
--	return regmap_write(ctx->regmap, regnum, val);
-+	return regmap_write(ctx->regmap, ctx->base + regnum, val);
- }
- 
- struct mii_bus *devm_mdio_regmap_register(struct device *dev,
-@@ -66,6 +67,8 @@ struct mii_bus *devm_mdio_regmap_register(struct device *dev,
- 	mr = mii->priv;
- 	mr->regmap = config->regmap;
- 	mr->valid_addr = config->valid_addr;
-+	if (config->resource)
-+		mr->base = config->resource->start;
- 
- 	mii->name = DRV_NAME;
- 	strscpy(mii->id, config->name, MII_BUS_ID_SIZE);
-diff --git a/include/linux/mdio/mdio-regmap.h b/include/linux/mdio/mdio-regmap.h
-index 679d9069846b..441cead97936 100644
---- a/include/linux/mdio/mdio-regmap.h
-+++ b/include/linux/mdio/mdio-regmap.h
-@@ -11,10 +11,12 @@
- 
- struct device;
- struct regmap;
-+struct resource;
- 
- struct mdio_regmap_config {
- 	struct device *parent;
- 	struct regmap *regmap;
-+	const struct resource *resource;
- 	char name[MII_BUS_ID_SIZE];
- 	u8 valid_addr;
- 	bool autoscan;
++};
++
++enum sja1110_mdio_opcode {
++	SJA1110_C45_ADDR = 0,
++	SJA1110_C22 = 1,
++	SJA1110_C45_DATA = 2,
++	SJA1110_C45_DATA_AUTOINC = 3,
++};
++
++#define SJA1110_PHYADDR		GENMASK(11, 9)
++#define SJA1110_OPCODE		GENMASK(8, 7)
++#define SJA1110_XAD		GENMASK(6, 2)
++
++static unsigned int sja1110_base_t1_encode_addr(unsigned int phy,
++						enum sja1110_mdio_opcode op,
++						unsigned int xad)
++{
++	return FIELD_PREP(SJA1110_PHYADDR, phy) |
++	       FIELD_PREP(SJA1110_OPCODE, op) |
++	       FIELD_PREP(SJA1110_XAD, xad);
++}
++
++static int sja1110_base_t1_mdio_read_c22(struct mii_bus *bus, int phy, int reg)
++{
++	struct sja1110_base_t1_private *priv = bus->priv;
++	struct regmap *regmap = priv->regmap;
++	unsigned int addr, val;
++	int err;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C22, reg & 0x1f);
++
++	err = regmap_read(regmap, priv->base + addr, &val);
++	if (err)
++		return err;
++
++	return val & 0xffff;
++}
++
++static int sja1110_base_t1_mdio_read_c45(struct mii_bus *bus, int phy,
++					 int mmd, int reg)
++{
++	struct sja1110_base_t1_private *priv = bus->priv;
++	struct regmap *regmap = priv->regmap;
++	unsigned int addr, val;
++	int err;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C45_ADDR, mmd);
++	err = regmap_write(regmap, priv->base + addr, reg);
++	if (err)
++		return err;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C45_DATA, mmd);
++	err = regmap_read(regmap, priv->base + addr, &val);
++	if (err)
++		return err;
++
++	return val & 0xffff;
++}
++
++static int sja1110_base_t1_mdio_write_c22(struct mii_bus *bus, int phy, int reg,
++					  u16 val)
++{
++	struct sja1110_base_t1_private *priv = bus->priv;
++	struct regmap *regmap = priv->regmap;
++	unsigned int addr;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C22, reg & 0x1f);
++	return regmap_write(regmap, priv->base + addr, val & 0xffff);
++}
++
++static int sja1110_base_t1_mdio_write_c45(struct mii_bus *bus, int phy,
++					  int mmd, int reg, u16 val)
++{
++	struct sja1110_base_t1_private *priv = bus->priv;
++	struct regmap *regmap = priv->regmap;
++	unsigned int addr;
++	int err;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C45_ADDR, mmd);
++	err = regmap_write(regmap, priv->base + addr, reg);
++	if (err)
++		return err;
++
++	addr = sja1110_base_t1_encode_addr(phy, SJA1110_C45_DATA, mmd);
++	return regmap_write(regmap, priv->base + addr, val & 0xffff);
++}
++
++static int sja1110_base_t1_mdio_probe(struct platform_device *pdev)
++{
++	struct sja1110_base_t1_private *priv;
++	struct device *dev = &pdev->dev;
++	struct regmap *regmap;
++	struct resource *res;
++	struct mii_bus *bus;
++	int err;
++
++	if (!dev->of_node || !dev->parent)
++		return -ENODEV;
++
++	regmap = dev_get_regmap(dev->parent, NULL);
++	if (!regmap)
++		return -ENODEV;
++
++	bus = mdiobus_alloc_size(sizeof(*priv));
++	if (!bus)
++		return -ENOMEM;
++
++	bus->name = "SJA1110 100base-T1 MDIO bus";
++	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
++	bus->read = sja1110_base_t1_mdio_read_c22;
++	bus->write = sja1110_base_t1_mdio_write_c22;
++	bus->read_c45 = sja1110_base_t1_mdio_read_c45;
++	bus->write_c45 = sja1110_base_t1_mdio_write_c45;
++	bus->parent = dev;
++	priv = bus->priv;
++	priv->regmap = regmap;
++
++	res = platform_get_resource(pdev, IORESOURCE_REG, 0);
++	if (res)
++		priv->base = res->start;
++
++	err = of_mdiobus_register(bus, dev->of_node);
++	if (err)
++		goto err_free_bus;
++
++	priv->bus = bus;
++	platform_set_drvdata(pdev, priv);
++
++	return 0;
++
++err_free_bus:
++	mdiobus_free(bus);
++
++	return err;
++}
++
++static void sja1110_base_t1_mdio_remove(struct platform_device *pdev)
++{
++	struct sja1110_base_t1_private *priv = platform_get_drvdata(pdev);
++
++	mdiobus_unregister(priv->bus);
++	mdiobus_free(priv->bus);
++}
++
++static const struct of_device_id sja1110_base_t1_mdio_match[] = {
++	{ .compatible = "nxp,sja1110-base-t1-mdio", },
++	{},
++};
++MODULE_DEVICE_TABLE(of, sja1110_base_t1_mdio_match);
++
++static struct platform_driver sja1110_base_t1_mdio_driver = {
++	.probe = sja1110_base_t1_mdio_probe,
++	.remove = sja1110_base_t1_mdio_remove,
++	.driver = {
++		.name = "sja1110-base-t1-mdio",
++		.of_match_table = sja1110_base_t1_mdio_match,
++	},
++};
++
++module_platform_driver(sja1110_base_t1_mdio_driver);
++
++MODULE_DESCRIPTION("NXP SJA1110 100BASE-T1 MDIO bus driver");
++MODULE_AUTHOR("Vladimir Oltean <vladimir.oltean@nxp.com>");
++MODULE_LICENSE("GPL");
 -- 
 2.34.1
 
