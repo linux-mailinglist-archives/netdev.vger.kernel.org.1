@@ -1,252 +1,213 @@
-Return-Path: <netdev+bounces-252509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252510-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gP5bKvF4cmlSlQAAu9opvQ
-	(envelope-from <netdev+bounces-252509-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:22:25 +0100
+	id uE8QM/V4cmlSlQAAu9opvQ
+	(envelope-from <netdev+bounces-252510-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:22:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874756CF83
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:22:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 473BD6CF8A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 20:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 65CA330090BF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:22:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 684563011A61
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642DC3876DD;
-	Thu, 22 Jan 2026 19:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD2F3876DD;
+	Thu, 22 Jan 2026 19:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ETSSXDQm"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UkiXEZv/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEC731D750
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769109740; cv=none; b=RKVpOslYEP2t8Qp+bGHNEYJXaELMT8UcP0CydcRP7I8siL5nSawYxDlXA08MwNekWX3SOJ/OOi/mazNjAXh4zAlwRxB9wmId/d+tkyl1QiQoKHPbCrSXs3wPwle2FxTrmD6TtCsUam3eaXDu2xsI2JyN2cX7SNIylvL/ufEAFYA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769109740; c=relaxed/simple;
-	bh=wh2hfmSBVIk5bVhrCL3lt/QdK8PI9KqD5JH8sD3GlCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=udHjoYirpneVluxkWP0j9DSL0O7QvDvpZMoSieimOeLTy5eI+7GJzZZ9kAuWhM4RgIegOHB35jJid/XoYol0ZD6kocGkYP1fKPm9UPn+WbaKtXeeTbooR65SIQ6ufMQc2ua4uQbTX8hIleWZnFP0yb4rQpckeNSWNnokJodjT00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ETSSXDQm; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4801eb2c0a5so13757715e9.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:22:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5013915BD
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769109742; cv=pass; b=aInAMG/MfNT7fT4/FHaghmCog1mmCIqP8NUdAO5zCl+0LM3+JMX2DgjBF203r+KvRSgWu1sv+mzFi9iMP6On6MHrF7yQF8llJK5vy4urjVdpWR34F4zGeIjglkitz5A7h7RwZvVNKyXnzTXcndtVQwBWLpgnEAWK6UyXPBSooOk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769109742; c=relaxed/simple;
+	bh=sE0/Q6wN9FJqYyXta+W2AETgfbo9QouBmcQs0w/b0fQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nQhA6jJ7xVQq946QVX6V9W7IQhWARwyM5xWLDbaenMFiMeK1SszhTARPc1Ua6/C4Q72JjCPJmRFxdxQM0+51V2vT80YMZPrOXXXzoWnDWbPmEYhLPM/2Fui4WET7ogzLnM1zHtGH88BMzo/OAXJJ8BUVcqYA9HZQ1fZ1uYybq6w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UkiXEZv/; arc=pass smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5eeaae02888so430980137.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:22:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769109734; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RwoWOZQqrvoFTZbT/d+4OUKhYQToS71D3wqbeDIpEE+ALqdp8CkL5V+EOZSTa1dfyM
+         K939eBuNTjnIz/WNaTRg7FvS1uqAOi/BG83wFnbTKgpAugnGLzgSFvQVpsHC2F9MuE9D
+         kw9xxIjYJRvk0p7iZyCp88C5NSwSB4cr8qdL2nkNub4ienhf/dcEom4UrUj8M62kVpkL
+         MXmQrHu7xrBAqBg6JMUFOC0AqQl8xS5mhsUFagen8NIMrb2KKuqnqwcOySgbO6O5y/Je
+         ELl7+10fTwTJok+et8jkhCqoSVZQgQSaobJYvugJ8GxFZK5Fz5iGk6wkptDJCt0XR5Ro
+         5ZAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=ScKI2OIU0wzGLSpwSJLvAkI/+5TMx5BTWw4ytgpvGD0=;
+        fh=S+f6avFf+T3+/lD7i7470lZiUwELamk31lmm9MUv4nw=;
+        b=lLWDTYWZ0rBkhngM4M/FZN8JD4OYuuvexuSrZO+p3JmXNZ1VTkE+Cpr+n/s38sH2wX
+         b8OuJNsyoHORCfGtk19/9wub9pGD032Xk3dPtHmhFDe3XSX78KKmV9PJbtdnEvlOHREh
+         TidlJzvywKXSuiyqoXgE6HGjXiUagbbORK+M1F0lDhaBx94wQ/KFPSVbIQ0Tx5R9j1MT
+         LWwnqT08RMV3YuaJndCmr8XEE5FWwWlPdeLxQ+IXDwL6gBl4sB8RDq7AKP67awrh/BT7
+         +N4tOYynG4j4YRS93zGcSj4tsaxUpxcwZOaShkagT82/+RDyvT+ceaDT3PhAgtuOgC/c
+         m6Bg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769109728; x=1769714528; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PBMFeq/3WGaXDHQwYjy0vkCwllcaRFT6SwAmaIGYkOk=;
-        b=ETSSXDQm/E9ssDh7jZKIQSYdQhTN+nYANcv894DFg27wUO7d0AchEz3MyNwAUbUk0y
-         elkcx5KZfcan3omi0biNhxLNHgqUzCmHzUxU74IlpuVbCnVTGfKIttF1rEM1nSgOavd5
-         JGywZ7hy4KQR9JVtjVCr7IsOT2u+6yt7kVPv8P/tr6SyLn6ciaXjclqA0epNFz2XLRDM
-         7IyzO0iDXdJm6ktbEgAJrMnUN85hNA/eLarOMbbkrfedBbdpoRkN4qSw9n3Z55gTbhW1
-         l1vGU2BBJJ7qIxdGDSH79awFUwWp+DfUgezf83QzrWvjfPMvDGA2uOWlJYruZpcfc5hj
-         3qJg==
+        d=purestorage.com; s=google2022; t=1769109734; x=1769714534; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ScKI2OIU0wzGLSpwSJLvAkI/+5TMx5BTWw4ytgpvGD0=;
+        b=UkiXEZv/B1vLQMiHytUrJQmKm7t9Rs7owvrpfF/6d9eULpM8mBWsYjU0IFO3+gGMmU
+         gK7s2pQqHWAu0hg+xeQDs5Ch0P5UJAUrBUcyRUy4Dx+hUTXX+giePiTrN0xkIMNHAP+0
+         M3UJU2gkY5qflSjyQAJpxN2OT7yQxCFThWW0ROJ8tB0abdQTEH1Bwnrhufo6Vt+yUHOD
+         6Ac8fbERdbiWBrA+finslnwbGpnXm046XFbW127VsmfNq1NS5npvoKij+R9D55dpc/O6
+         RbBJUmLVkD6TgkWLL/BRsw95uDXLxIOcL70N8ucyc/8pQECH2UbrxWMPXy3hViaea0lP
+         ncJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769109728; x=1769714528;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PBMFeq/3WGaXDHQwYjy0vkCwllcaRFT6SwAmaIGYkOk=;
-        b=ONv6/SMVhCHQORg5H+aUQgsDVt51nqGbSAkhj+2nO4PJMeAH3m1W498Xv0LGeT1pwu
-         3kFnu7k5FwbHQKn78dcWUEuiGanmEG3A9MArD8mJW4+2FUlwM3C8I0drKE1nhLxfhdig
-         riuHSnV2uxcjj133uQiQrCm7CGZG63QdEbKSx65xwUIyNa7hFDN4XzYMnwRW4roDaxBZ
-         Uh1//40InaQG1bWQqpKPAI7u6x5VdNMU2hS9WTHOk7j5/0Fi7fZyCCB/FLJ+jmRqg9WS
-         F2hQuBKRCBh02hqiTYb3SAilXayVZuc7SoZErq8G9blNt4E9YE2wvr6jpWJAnpnfu77V
-         fswg==
-X-Gm-Message-State: AOJu0YwfFq4EB9RwUWINpiA87IFVnAy87R1UqrN1y7L+H1BK2cgPvKYY
-	w6Z7O6LNwb/Dc/1UTkKQmjB+EZGu7PARzk22+RiThNNiZSKeD1ifgyorrEMbQlHC
-X-Gm-Gg: AZuq6aKsB51FZWtMP7nvLLjpZISqCboehpe03LLPkaY+vg6hjJI6P7lti/6JIP/cYsF
-	583a51wywt9SoxrlYmwuSFmmSFOfrKwV3IWLt38pDj9uiwCfti/v1gPRPQR2ocmHcfea+Q//czZ
-	Pvp+WNzoJbCg4qJveWxlaJgvPo17eLM/x66R2dHrEN/FnPLNKuK6kSUnGm12OKEdixBMs6DmeXQ
-	TAoDxpa6q9XjwsCt5R6wkm8A5wlRRAzsARGE6pmSC3+zYQWyiOXRF6hmh+8RQSNFdRfmkkqer1L
-	7izJKYTrLI9UzFMmVa2ExlZjoJ00d3OXTOxSeh2vCsxV/tu2/OZD+3TTvdQuB4GXzPnlRk7jljK
-	X1DrHHVsGQIOQl+sEWaWCK/vhtwVKFlaAGcBsZAiEm3m63/r73Es8mLb8pGGYWxNOfQcMpyWQr6
-	0a5wc52fRL
-X-Received: by 2002:a05:600c:3b20:b0:477:63b5:7148 with SMTP id 5b1f17b1804b1-4804c94c3f3mr10782145e9.6.1769109728298;
-        Thu, 22 Jan 2026 11:22:08 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:5f::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1f745c5sm856943f8f.32.2026.01.22.11.22.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 11:22:07 -0800 (PST)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com,
-	alok.a.tiwari@oracle.com,
-	andrew+netdev@lunn.ch,
-	andrew@lunn.ch,
-	chuck.lever@oracle.com,
-	davem@davemloft.net,
-	donald.hunter@gmail.com,
-	edumazet@google.com,
-	gal@nvidia.com,
-	horms@kernel.org,
-	idosch@nvidia.com,
-	jacob.e.keller@intel.com,
-	kernel-team@meta.com,
-	kory.maincent@bootlin.com,
-	kuba@kernel.org,
-	lee@trager.us,
-	mohsin.bashr@gmail.com,
-	o.rempel@pengutronix.de,
-	pabeni@redhat.com,
-	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next 3/3] eth: fbnic: Fetch TX pause storm stats
-Date: Thu, 22 Jan 2026 11:21:58 -0800
-Message-ID: <20260122192158.428882-4-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260122192158.428882-1-mohsin.bashr@gmail.com>
-References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
+        d=1e100.net; s=20230601; t=1769109734; x=1769714534;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScKI2OIU0wzGLSpwSJLvAkI/+5TMx5BTWw4ytgpvGD0=;
+        b=jPDdSVoGLeLt8Ep8eEA42mz/hk02l7bh004voPVnCty5sdq2wBQFyvcLZdHVhyF3Jt
+         Gg2F3pnrcIVVdsuGta8w7kGjmuN+IQ0AclwZnCoic+6xIvwPGLDGnSAOufa6vRnMHPp5
+         7fALdEPvycy0qdX/v889qYxMm/aEWyXV0eAXozic7FrmDkNU24z4KzOY9StfdO2FSoT1
+         dmGpupfSgvM6rlF0cy8NzshCJeAC7gnUb3eIZONWzGV01XgpPAj14t8vEuWvpcDcESva
+         o/WFmfK/R2bMia4NKE1e3yHLDQsIRYMYjdZOh5+Tv5R11MFc+k05JGIbqX/0cxW4zP+n
+         COsQ==
+X-Gm-Message-State: AOJu0YxcC51Lz85LQww8rdH9+H+ShtgIuXx69mteZuNQvFuUmcBXbZfV
+	U2XkUw/R+oPxJvzs4e2Xx+chI3Zg4TJzs8CoPpNxvfc9qGQgLEDng/DVEZvhO0sxyi2CF45LEbM
+	JTPSbjbIOdH9o1LBPQV2mXapOHB5NgpZF5fw4aOllmA==
+X-Gm-Gg: AZuq6aJhMIfkXU/ewI2603/dxtpmj2rwoV+M7jxdTnxC3zXYOULupoDM/3KOcPjVtgR
+	Rt4Ou6Y/MENGshOX3KdbdlTV2Nroq4OxNtQKrPKNNgfKsh5dvRlIOQkRfFZWsp/4l/edZ462OKH
+	01tQOEUfvDffLxgdwB7HUzaiJY+Wxd5zqw9hpfvHuh3D3IFOiX93UF9BzXe9kMTLhpQfiPUkS0m
+	bE2OAzaUof70OA4Oa4LKb66/S/MJzvzExsn31q0WmFpues4JXPQk7mkcdzw55+BGEVdi9s=
+X-Received: by 2002:a05:6102:290a:b0:5ee:9df0:a608 with SMTP id
+ ada2fe7eead31-5f54bca55f3mr252923137.30.1769109734156; Thu, 22 Jan 2026
+ 11:22:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260121215727.3994324-1-rjethwani@purestorage.com> <58fe1908-48de-4bca-ad4e-4976d24581e6@gmail.com>
+In-Reply-To: <58fe1908-48de-4bca-ad4e-4976d24581e6@gmail.com>
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+Date: Thu, 22 Jan 2026 11:22:03 -0800
+X-Gm-Features: AZwV_Qgpa0D5t52S78n9kdekhuu1nyyGE9GtKbEz0pFrgz2mTEfUBKQVRcowgGA
+Message-ID: <CAKaoeS2Jnaekdx2dXfBV91LhbaLU6SenBRkNqmRB3-1EhSCbYg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] tls: Add TLS 1.3 hardware offload support
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, leon@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252510-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252509-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,pengutronix.de,redhat.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[purestorage.com:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 874756CF83
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 473BD6CF8A
 X-Rspamd-Action: no action
 
-With pause storm protection in place, track the occurrence of pause
-storm events. Since there is a one-to-one mapping between pause storm
-interrupts and events, use the interrupt count to track this metric.
+> Hi Rishikesh,
+>
+> This version doesn't compile for us.
+> A few comments that we wanted to share on V3, but I'll share here as
+> this is the latest:
+>
+> We tested V3 and a few issues were spotted.
+> We did not debug them though...
+>
+> We run a server/client test with nginx and wrk.
+>
+> a.
+> When requesting 128-bit key, ss output shows "cipher: aes-gcm-256" for
+> the respective connection.
+> For TLS 1.2 it works fine.
+>
+> b.
+> On the wrk side, the mlx5 rx_tls_ctx did not increase (meaning no
+> offloaded connections were opened). It works fine on the nginx side
+> however...
+> For TLS 1.2 it works fine.
+>
+> We can share more info if needed.
+>
+> Regards,
+> Tariq
+>
+Hi Tariq,
 
-./ethtool -I -a eth0
-Pause parameters for eth0:
-Autonegotiate:	off
-RX:		off
-TX:		on
-Statistics:
-  tx_pause_frames: 759657
-  rx_pause_frames: 0
-  tx_pause_storm_events: 219
+I have fixed the typo leading to compile errors in V5.
+Could you please share more info. about the setup and test, so that I
+can try to reproduce the issue?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h      |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c  |  3 +++
- drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c      | 15 +++++++++++++++
- 4 files changed, 20 insertions(+)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 39eb7b94a310..53c04293083c 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -627,6 +627,7 @@ enum {
- 	FBNIC_RXB_ENQUEUE_INDICES	= 4
- };
- 
-+#define FBNIC_RXB_INTR_PS_COUNT(n)	(0x080e9 + (n))	/* 0x203a4 + 4*n */
- #define FBNIC_RXB_DRBO_FRM_CNT_SRC(n)	(0x080f9 + (n))	/* 0x203e4 + 4*n */
- #define FBNIC_RXB_DRBO_BYTE_CNT_SRC_L(n) \
- 					(0x080fd + (n))	/* 0x203f4 + 4*n */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 61b8005a0db5..ad7bf876a044 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1707,6 +1707,7 @@ fbnic_get_pause_stats(struct net_device *netdev,
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_mac_stats *mac_stats;
- 	struct fbnic_dev *fbd = fbn->fbd;
-+	u64 tx_ps_events;
- 
- 	mac_stats = &fbd->hw_stats.mac;
- 
-@@ -1714,6 +1715,8 @@ fbnic_get_pause_stats(struct net_device *netdev,
- 
- 	pause_stats->tx_pause_frames = mac_stats->pause.tx_pause_frames.value;
- 	pause_stats->rx_pause_frames = mac_stats->pause.rx_pause_frames.value;
-+	tx_ps_events = mac_stats->pause.tx_pause_storm_events.value;
-+	pause_stats->tx_pause_storm_events = tx_ps_events;
- }
- 
- static void
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-index aa3f429a9aed..caea4be46762 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-@@ -54,6 +54,7 @@ struct fbnic_rmon_stats {
- struct fbnic_pause_stats {
- 	struct fbnic_stat_counter tx_pause_frames;
- 	struct fbnic_stat_counter rx_pause_frames;
-+	struct fbnic_stat_counter tx_pause_storm_events;
- };
- 
- struct fbnic_eth_mac_stats {
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 9cdf21192f98..97ae7086d7bd 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -418,6 +418,18 @@ static void __fbnic_mac_stat_rd64(struct fbnic_dev *fbd, bool reset, u32 reg,
- 	stat->reported = true;
- }
- 
-+static void fbnic_mac_stat_rd32(struct fbnic_dev *fbd, bool reset, u32 reg,
-+				struct fbnic_stat_counter *stat)
-+{
-+	u32 new_reg_value;
-+
-+	new_reg_value = rd32(fbd, reg);
-+	if (!reset)
-+		stat->value += new_reg_value - stat->u.old_reg_value_32;
-+	stat->u.old_reg_value_32 = new_reg_value;
-+	stat->reported = true;
-+}
-+
- #define fbnic_mac_stat_rd64(fbd, reset, __stat, __CSR) \
- 	__fbnic_mac_stat_rd64(fbd, reset, FBNIC_##__CSR##_L, &(__stat))
- 
-@@ -792,6 +804,9 @@ fbnic_mac_get_pause_stats(struct fbnic_dev *fbd, bool reset,
- 			    MAC_STAT_TX_XOFF_STB);
- 	fbnic_mac_stat_rd64(fbd, reset, pause_stats->rx_pause_frames,
- 			    MAC_STAT_RX_XOFF_STB);
-+	fbnic_mac_stat_rd32(fbd, reset,
-+			    FBNIC_RXB_INTR_PS_COUNT(FBNIC_RXB_INTF_NET),
-+			    &pause_stats->tx_pause_storm_events);
- }
- 
- static void
--- 
-2.47.3
-
+Thanks,
+Rishikesh
+> >
+> > v4:
+> >    - Split single TLS patch into two separate patches:
+> >      * Patch 1: TLS 1.3 basic HW offload support
+> >      * Patch 2: HW offload key update (rekey) support with graceful degradation
+> >    - Removed record_type check from tls_device_record_close()
+> >    - Removed Broadcom bnxt_en out-of-tree driver mention
+> >    - Link to v3: https://lore.kernel.org/netdev/20260102184708.24618-1-rjethwani@purestorage.com/
+> >
+> > v3:
+> >    - Added note about Broadcom bnxt_en out-of-tree driver used for testing
+> >    - Link to v2: https://lore.kernel.org/netdev/20251231192322.3791912-1-rjethwani@purestorage.com/
+> >
+> > v2:
+> >    - Fixed reverse Christmas tree ordering in variable declarations
+> >    - Combined 'err' and 'i' declarations (reviewer feedback)
+> >    - Link to v1: https://lore.kernel.org/netdev/20251230224137.3600355-1-rjethwani@purestorage.com/
+> >
+> > Rishikesh Jethwani (3):
+> >    tls: add TLS 1.3 hardware offload support
+> >    tls: add hardware offload key update support
+> >    mlx5: TLS 1.3 hardware offload support
+> >
+> >   .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+> >   .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+> >   include/net/tls.h                             |   4 +
+> >   net/tls/tls.h                                 |  14 +-
+> >   net/tls/tls_device.c                          | 319 +++++++++++++-----
+> >   net/tls/tls_device_fallback.c                 |  34 +-
+> >   net/tls/tls_main.c                            |  31 +-
+> >   net/tls/tls_sw.c                              |  77 +++--
+> >   8 files changed, 379 insertions(+), 122 deletions(-)
+> >
+>
 
