@@ -1,242 +1,182 @@
-Return-Path: <netdev+bounces-252132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252133-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPEtCkqAcWk1IAAAu9opvQ
-	(envelope-from <netdev+bounces-252132-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:41:30 +0100
+	id mDhTDq+AcWk1IAAAu9opvQ
+	(envelope-from <netdev+bounces-252133-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:43:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0520E60717
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:41:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44CD960760
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:43:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F30B7406A8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:41:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 74CC8500BC8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C8C354AD1;
-	Thu, 22 Jan 2026 01:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFBA318EDB;
+	Thu, 22 Jan 2026 01:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQou3zu8"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="dRHGLN65"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F165350D5D
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 01:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5A231B111;
+	Thu, 22 Jan 2026 01:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769046044; cv=none; b=V97PgzXOsUXdFLU41LRhzxRUCRHCYbPMKFvPEtW9gXGZjtwj9Sn+dLlpW30Y992RkqNuX+ESlR3yS1q060WGNvEOGwoGSyLZ3XC3ACUnauglAWGLkzIOYhHhnzv12SBaUwbFgt7uADPtJGjGaPrLkYIYWTB1rG7YP1lSNCkBZfA=
+	t=1769046184; cv=none; b=fK1F2kXEfIF64GrEfJXBFIITT6ywa1rJZliqCRQA2RD2v7YubAC3bfPSwhdzNTgdoKKxHRT/aqWY5BrwSo1zLqw8w82bpkCxDsFGHd4evlxuKUget8jlWBqXH34hVUFQdd1IUwl7pLPsqbpQqaDQ6O78VHXmrNDTwvYzy5qCbII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769046044; c=relaxed/simple;
-	bh=/ch7Q2uvZMZe33IL5LXrXfMmiaE5BvdMSTaXCfhBGA8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sWGkd46eQ8jPS8wv+06YSuGwoIIq/sEFADfAvRU9n6jTOWX/bI6JyCojcSEZ9qWnkJGcYA9bD4aKxyvwCe0A5NTRFOXLBwBVNJtbpd3MWBUao2tV6w1MhrGBV5Qr35jQM5SrWOWnENoKmGo9/Jpr4uauGrBjELNp3JmL8h2dZT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQou3zu8; arc=none smtp.client-ip=74.125.82.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-12460a7caa2so714355c88.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 17:40:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769046042; x=1769650842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bv3y2V8fADohDcIx1NVelau+w+a6LhiaxX40puOmnps=;
-        b=UQou3zu8EZVoa356eCksjDfsstLGw6aqoVn+62DTOLpv0LZCm7q61qk4y5rj37ojXI
-         q2NsPRlQjEjRTYjoKEOPFF2iZMZuvQ2BexE1xKBaml/3T5+Nz/xOSk89bk1lxdQiRP5t
-         ymampuYbxSGo3hLLcRzGCqhmKX3a25SZjYq4nIwA3v7PSS0o50CXfR30ttUdmgGTcuJZ
-         QnXxclfOMOLuNwow+gMAqVXc1+ooxnd58cU9GNNEZGJUsBJoubg5DGIjDx8Ij0Wt3m/C
-         AZrUMyKlJ9DBFCYtL9Ak8dR9Qy9VF9e1InX6NllnjrOyqKFVYDKMBLELiYjifZvu4sx7
-         LNSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769046042; x=1769650842;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bv3y2V8fADohDcIx1NVelau+w+a6LhiaxX40puOmnps=;
-        b=btuG49Jkugo4jHRC2G7WWAHTAt46AZ2Wuz1e0Hkd9cIHTS9lqHvhYNMiYfHCWuWHjh
-         sziaZ30/fzCXnLRph1K49skJC82bCMK5aWkWWvJCbnnxtJVB3hzphlV05eT9EIbNbF1X
-         LqfqBo+vzLURsOoH9VRIu1CMUcXErFFS5WZuyRS3cmo0uzeyOG/2yH4zW2bDY6KBZeWV
-         n3/U08wfMZnF0maXu3EkzGXo0OHiD4JJpFYRt/WzhvwM197I3GQ9rw7vNIiY2Yquw2e1
-         Ij7kBAQXhk22SqffCqKIUWo0AIJAl0myH2+uPhKdJi0X+BVeq4w8wmdpQrdxenKQca3Y
-         HxNg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/DVhe55w5J6WJ/qJN2+RuDvBVATo0OfntQcJKVqoAxEoClS+x9BgN8UG07kxubhufhJO4loA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLr+a6bcAYStObeR5v3Zztr7/pv54qWCaf32Rrc0PAW1TS+iHk
-	bO1M6PcAy3FfsJ9BFXGtYswTGLoRdcSiDIYYR96Ks3CwI/LeIYTTCwDv
-X-Gm-Gg: AZuq6aLnzm4jAfEeDLsqpoodq5S75WTq+0LbcCQXtp8lN7IO25vbjRltROBwqrG16s8
-	5o8v2eJyfXnwfkKOhE+Orc54pz6xyIZdqpjVoiUMkYZQVCWtUA2RvrKIdXEF1rS60YSXYa1JYYT
-	KqV6lz/S917n3PPrciVF3JyXmM+PSBNtDRbaERERTj+EvglO8f7eQt2aec8MZCVeJ2RLIqmDybL
-	SCUp7Lgn4WgRPenVhio134YQWDD39gfaulgUU+OxRdgXQ0DCM+mqXa++jhezwFv0AEhHKC30W6M
-	wI8Q5o0A1hx9nSswx21YVVo+xD4AXw8rFOqozmWPL0zAg/y/FnCuDoF7Bt58Ln7c5otC3r6kJJU
-	udJ7pt1+h3fY6/woU8u5ZzNw6spJyRlfYg/TH8gqsAeXT4Bjc0/WoW2D5dzFNGzWLOORSA/MGy2
-	2sBQY=
-X-Received: by 2002:a05:7022:6284:b0:119:e569:f611 with SMTP id a92af1059eb24-1244b30446bmr12551894c88.10.1769046041263;
-        Wed, 21 Jan 2026 17:40:41 -0800 (PST)
-Received: from debian ([74.48.213.230])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1244ad72063sm29147090c88.6.2026.01.21.17.40.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 17:40:40 -0800 (PST)
-From: Qiliang Yuan <realwujing@gmail.com>
-To: akpm@linux-foundation.org
-Cc: david@kernel.org,
-	mhocko@suse.com,
-	vbabka@suse.cz,
-	willy@infradead.org,
-	lance.yang@linux.dev,
-	hannes@cmpxchg.org,
-	surenb@google.com,
-	jackmanb@google.com,
-	ziy@nvidia.com,
-	weixugc@google.com,
-	rppt@kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	edumazet@google.com
-Subject: Re: [PATCH v5] mm/page_alloc: boost watermarks on atomic allocation failure
-Date: Wed, 21 Jan 2026 20:40:10 -0500
-Message-ID: <20260122014034.223163-1-realwujing@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
-References: <20260121125603.47b204cc8fbe9466b25cce16@linux-foundation.org>
+	s=arc-20240116; t=1769046184; c=relaxed/simple;
+	bh=yX/pgTeLEJNMLqSowQfevzCnPKyRUCyOofWNfyZXEqo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MpeuglepFQuqmkOFbHpwJCGhjX6S+wJm/OoytEhMfsBWy4dfjcGuQo+G6VWGlA9Fz1qn3CvucSDjlm21rI9vQyg2s5k14cPn1mC7pcpM8umSXQxn5bouOlfJhSmMgLhE+p+s6t3p/u5WuPvSEGFVeRR0tQ9/Hs7hcA3RsK1OCIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=dRHGLN65; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60M1gRw05076378, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1769046148;
+	bh=yX/pgTeLEJNMLqSowQfevzCnPKyRUCyOofWNfyZXEqo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=dRHGLN65oppRtuAh++8b1g/fQh9BL2AuX2VKLQZbMPtmnw/u3CPzjw5pLUQUJJX0T
+	 tG/euIbk0Xo/Nsz0Nh5j6UIbOKkf7N9MqOvAibjhN+D8/72nUIOKNq3+IL371L9tRn
+	 VHVZ0Qg6BzJS/JaYxt10ZLNyK4sds6rc1HkatfS06cNr7iQOvjjHKarAXo5Ha4n7PP
+	 tdy8z4BQ0luYOKrs9fsC3BgNuaWnUVNvGpeGgcgswm7Hznptfrv/T4HFeCnSr5oYq3
+	 lblLsGsbEfFmo19I3JNu1TgcaANhKJbHTAAl0KsVULsJ296QQFFb6+DmtQctFj/J+2
+	 RNArb0wxG5q4g==
+Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60M1gRw05076378
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 22 Jan 2026 09:42:28 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.39; Thu, 22 Jan 2026 09:42:26 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.1748.039; Thu,
+ 22 Jan 2026 09:42:26 +0800
+From: =?utf-8?B?6K645L+K5Lyf?= <javen_xu@realsil.com.cn>
+To: Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>
+Subject: RE: [PATCH net-next v1 3/3] r8169: add support for chip RTL9151AS
+Thread-Topic: [PATCH net-next v1 3/3] r8169: add support for chip RTL9151AS
+Thread-Index: AQHcg22Mgr9mW4h6dk2B/0jlDikJ7bVOlnAAgAP2R4CACuncMA==
+Date: Thu, 22 Jan 2026 01:42:26 +0000
+Message-ID: <bffa03f0eb9f405388b5436882776111@realsil.com.cn>
+References: <20260112024541.1847-1-javen_xu@realsil.com.cn>
+ <20260112024541.1847-4-javen_xu@realsil.com.cn>
+ <02c00a95-34c6-4b01-8f0a-7dbd113e26ba@gmail.com>
+ <a244b2c5-b3d6-4150-b9ab-8be20d72bf23@redhat.com>
+In-Reply-To: <a244b2c5-b3d6-4150-b9ab-8be20d72bf23@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.64 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	TAGGED_FROM(0.00)[bounces-252132-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252133-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[realsil.com.cn,none];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_NONE(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,linux-foundation.org:email]
-X-Rspamd-Queue-Id: 0520E60717
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 44CD960760
 X-Rspamd-Action: no action
 
-On Wed, 21 Jan 2026 12:56:03 -0800 Andrew Morton <akpm@linux-foundation.org> wrote:
-
-> This seems sensible to me - dynamically boost reserves in response to
-> sustained GFP_ATOMIC allocation failures.  It's very much a networking
-> thing and I expect the networking people have been looking at these
-> issues for years.  So let's start by cc'ing them!
-
-Thank you for the feedback and for cc'ing the networking folks! I appreciate
-your continued engagement throughout this patch series (v1-v5).
-
-> Obvious question, which I think was asked before: what about gradually
-> decreasing those reserves when the packet storm has subsided?
-> 
-> > v4:
-> > - Introduced watermark_scale_boost and gradual decay via balance_pgdat.
-> 
-> And there it is, but v5 removed this.  Why?  Or perhaps I'm misreading
-> the implementation.
-
-You're absolutely right - v4 did include a gradual decay mechanism. The
-evolution from v1 to v5 was driven by community feedback, and I'd like to
-explain the rationale for each major change:
-
-**v1 → v2**: Following your and Matthew Wilcox's feedback on v1, I:
-- Reduced the boost from doubling (100%) to 50% increase
-- Added a decay mechanism (5% every 5 minutes)
-- Added debounce logic
-- v1: https://lore.kernel.org/all/tencent_9DB6637676D639B4B7AEA09CC6A6F9E49D0A@qq.com/
-- v2: https://lore.kernel.org/all/tencent_6FE67BA7BE8376AB038A71ACAD4FF8A90006@qq.com/
-
-**v2 → v3**: Following Michal Hocko's suggestion to use watermark_scale_factor
-instead of min_free_kbytes, I switched to the watermark_boost infrastructure.
-This was a significant simplification that reused existing MM subsystem patterns.
-- v3: https://lore.kernel.org/all/tencent_44B556221480D8371FBC534ACCF3CE2C8707@qq.com/
-
-**v3 → v4**: Added watermark_scale_boost and gradual decay via balance_pgdat()
-to provide more fine-grained control over the reclaim aggressiveness.
-- v4: https://lore.kernel.org/all/tencent_D23BFCB69EA088C55AFAF89F926036743E0A@qq.com/
-
-**v4 → v5**: Removed watermark_scale_boost for the following reasons:
-- v5: https://lore.kernel.org/all/20260121065740.35616-1-realwujing@gmail.com/
-
-1. **Natural decay exists**: The existing watermark_boost infrastructure already
-   has a built-in decay path. When kswapd successfully reclaims memory and the
-   zone becomes balanced, kswapd_shrink_node() automatically resets
-   watermark_boost to 0. This happens organically without custom decay logic.
-
-2. **Simplicity**: The v4 approach added custom watermark_scale_boost tracking
-   and manual decay in balance_pgdat(). This added complexity that duplicated
-   functionality already present in the kswapd reclaim path.
-
-3. **Production validation**: In our production environment (high-throughput
-   networking workloads), the natural decay via kswapd proved sufficient. Once
-   memory pressure subsides and kswapd successfully reclaims to the high
-   watermark, the boost is cleared automatically within seconds.
-
-However, I recognize this is a trade-off. The v4 gradual decay provided more
-explicit control over the decay rate. If you or the networking maintainers feel
-that explicit decay control is important for packet storm scenarios, I'm happy
-to reintroduce the v4 approach or explore alternative decay strategies (e.g.,
-time-based decay independent of kswapd success).
-
-> > +	zone->watermark_boost = min(zone->watermark_boost +
-> > +		max(pageblock_nr_pages, zone_managed_pages(zone) >> 10),
-> 
-> ">> 10" is a magic number.  What is the reasoning behind choosing this
-> value?
-
-Good catch. The ">> 10" (divide by 1024) was chosen to provide a
-zone-proportional boost that scales with zone size:
-
-- For a 1GB zone: ~1MB boost per trigger
-- For a 16GB zone: ~16MB boost per trigger
-
-The rationale:
-1. **Proportionality**: Larger zones experiencing atomic allocation pressure
-   likely need proportionally larger safety buffers. A fixed pageblock_nr_pages
-   (typically 2MB) might be insufficient for large zones under heavy load.
-   
-2. **Conservative scaling**: 1/1024 (~0.1%) is aggressive enough to help during
-   sustained pressure but conservative enough to avoid over-reclaim. This was
-   empirically tuned based on our production workload.
-   
-3. **Production results**: In our high-throughput networking environment
-   (100Gbps+ traffic bursts), this value reduced GFP_ATOMIC failures by ~95%
-   without causing excessive kswapd activity or impacting normal allocations.
-
-I should document this better. I propose adding a #define:
-
-```c
-/*
- * Boost watermarks by ~0.1% of zone size on atomic allocation pressure.
- * This provides zone-proportional safety buffers: ~1MB per 1GB of zone size.
- */
-#define ATOMIC_BOOST_SCALE_SHIFT 10
-```
-
-Best regards,
-Qiliang Yuan
+Pk9uIDEvMTIvMjYgMTE6MjAgUE0sIEhlaW5lciBLYWxsd2VpdCB3cm90ZToNCj4+IE9uIDEvMTIv
+MjAyNiAzOjQ1IEFNLCBqYXZlbiB3cm90ZToNCj4+PiBGcm9tOiBKYXZlbiBYdSA8amF2ZW5feHVA
+cmVhbHNpbC5jb20uY24+DQo+Pj4NCj4+PiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCBmb3IgY2hp
+cCBSVEw5MTUxQVMuIFNpbmNlIGxhY2tpbmcgb2YgSGFyZHdhcmUNCj4+PiB2ZXJzaW9uIElEcywg
+d2UgdXNlIFRYX0NPTkZJR19WMiB0byByZWNvZ25pemUgUlRMOTE1MUFTIGFuZCBjb21pbmcNCj5j
+aGlwcy4NCj4+PiBydGxfY2hpcF9pbmZvc19leHRlbmQgaXMgdXNlZCB0byBzdG9yZSBJQyBpbmZv
+cm1hdGlvbiBmb3IgUlRMOTE1MUFTDQo+Pj4gYW5kIGNvbWluZyBjaGlwcy4gVGhlIFR4Q29uZmln
+IHZhbHVlIGJldHdlZW4gUlRMOTE1MUFTIGFuZCBSVEw5MTUxQQ0KPj4+IGlzDQo+Pj4NCj4+PiBk
+aWZmZXJlbnQuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBKYXZlbiBYdSA8amF2ZW5feHVAcmVh
+bHNpbC5jb20uY24+DQo+Pj4gLS0tDQo+Pj4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsv
+cjgxNjkuaCAgICAgIHwgIDMgKystDQo+Pj4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsv
+cjgxNjlfbWFpbi5jIHwgMjgNCj4+PiArKysrKysrKysrKysrKysrKysrKystLQ0KPj4+ICAyIGZp
+bGVzIGNoYW5nZWQsIDI4IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OS5oDQo+Pj4gYi9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5LmgNCj4+PiBpbmRleCAyYzFhMGMyMWFm
+OGQuLmY2NmMyNzljYmVlNiAxMDA2NDQNCj4+PiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9y
+ZWFsdGVrL3I4MTY5LmgNCj4+PiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4
+MTY5LmgNCj4+PiBAQCAtNzIsNyArNzIsOCBAQCBlbnVtIG1hY192ZXJzaW9uIHsNCj4+PiAgICAg
+IFJUTF9HSUdBX01BQ19WRVJfNzAsDQo+Pj4gICAgICBSVExfR0lHQV9NQUNfVkVSXzgwLA0KPj4+
+ICAgICAgUlRMX0dJR0FfTUFDX05PTkUsDQo+Pj4gLSAgICBSVExfR0lHQV9NQUNfVkVSX0xBU1Qg
+PSBSVExfR0lHQV9NQUNfTk9ORSAtIDENCj4+PiArICAgIFJUTF9HSUdBX01BQ19WRVJfTEFTVCA9
+IFJUTF9HSUdBX01BQ19OT05FIC0gMSwNCj4+PiArICAgIFJUTF9HSUdBX01BQ19WRVJfQ0hFQ0tf
+RVhURU5EDQo+Pj4gIH07DQo+Pj4NCj4+PiAgc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZTsNCj4+PiBk
+aWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMNCj4+
+PiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsvcjgxNjlfbWFpbi5jDQo+Pj4gaW5kZXgg
+OWI4OWJiZjY3MTk4Li4xNjRhZDY1NzAwNTkgMTAwNjQ0DQo+Pj4gLS0tIGEvZHJpdmVycy9uZXQv
+ZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMNCj4+PiArKysgYi9kcml2ZXJzL25ldC9ldGhl
+cm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPj4+IEBAIC05NSw4ICs5NSw4IEBADQo+Pj4gICNk
+ZWZpbmUgSlVNQk9fMTZLICAgKFNaXzE2SyAtIFZMQU5fRVRIX0hMRU4gLSBFVEhfRkNTX0xFTikN
+Cj4+Pg0KPj4+ICBzdGF0aWMgY29uc3Qgc3RydWN0IHJ0bF9jaGlwX2luZm8gew0KPj4+IC0gICAg
+dTE2IG1hc2s7DQo+Pj4gLSAgICB1MTYgdmFsOw0KPj4+ICsgICAgdTMyIG1hc2s7DQo+Pj4gKyAg
+ICB1MzIgdmFsOw0KPj4+ICAgICAgZW51bSBtYWNfdmVyc2lvbiBtYWNfdmVyc2lvbjsNCj4+PiAg
+ICAgIGNvbnN0IGNoYXIgKm5hbWU7DQo+Pj4gICAgICBjb25zdCBjaGFyICpmd19uYW1lOw0KPj4+
+IEBAIC0yMDUsMTAgKzIwNSwyMCBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IHJ0bF9jaGlwX2luZm8g
+ew0KPj4+ICAgICAgeyAweGZjOCwgMHgwNDAsIFJUTF9HSUdBX01BQ19WRVJfMDMsICJSVEw4MTEw
+cyIgfSwNCj4+PiAgICAgIHsgMHhmYzgsIDB4MDA4LCBSVExfR0lHQV9NQUNfVkVSXzAyLCAiUlRM
+ODE2OXMiIH0sDQo+Pj4NCj4+PiArICAgIC8qIGV4dGVuZCBjaGlwIHZlcnNpb24qLw0KPj4+ICsg
+ICAgeyAweDdjZiwgMHg3YzgsIFJUTF9HSUdBX01BQ19WRVJfQ0hFQ0tfRVhURU5EIH0sDQo+Pj4g
+Kw0KPj4+ICAgICAgLyogQ2F0Y2gtYWxsICovDQo+Pj4gICAgICB7IDB4MDAwLCAweDAwMCwgUlRM
+X0dJR0FfTUFDX05PTkUgfSAgfTsNCj4+Pg0KPj4+ICtzdGF0aWMgY29uc3Qgc3RydWN0IHJ0bF9j
+aGlwX2luZm8gcnRsX2NoaXBfaW5mb3NfZXh0ZW5kW10gPSB7DQo+Pj4gKyAgICB7IDB4N2ZmZmZm
+ZmYsIDB4MDAwMDAwMDAsIFJUTF9HSUdBX01BQ19WRVJfNjQsICJSVEw5MTUxQVMiLA0KPj4+ICtG
+SVJNV0FSRV85MTUxQV8xfSwNCj4+PiArDQo+Pg0KPj4gU2VlbXMgYWxsIGJpdHMgZXhjZXB0IGJp
+dCAzMSBhcmUgdXNlZCBmb3IgY2hpcCBkZXRlY3Rpb24uIEhvd2V2ZXINCj4+IHJlZ2lzdGVyIGlz
+IG5hbWVkIFRYX0NPTkZJR19WMiwgZXZlbiB0aG91Z2ggb25seSBiaXQgMzEgaXMgbGVmdCBmb3Ig
+YWN0dWFsIHR4DQo+Y29uZmlndXJhdGlvbi4NCj4+IElzIHRoZSByZWdpc3RlciBuYW1lIG1pc2xl
+YWRpbmcsIG9yIGlzIHRoZSBtYXNrIGluY29ycmVjdD8NCj4NCj5ASGVpbmVyIChkb3VibGUgY2hl
+Y2tpbmcgdG8gYXZvaWQgbW9yZSBjb25mdXNpb24gb24gbXkgc2lkZSk6IGFyZSB5b3UgZmluZQ0K
+PndpdGggdGhlIHJlZ2lzdGVyIG5hbWU/IEl0J3MgdW5jbGVhciB0byBtZSBpZiB5b3UgYXJlIGZp
+bmUgd2l0aCBqdXN0IHRoZSAyDQo+bWVyZ2VkIHBhdGNoZXMgb3IgZXZlbiB3aXRoIHRoaXMgb25l
+Lg0KPg0KPlRoYW5rcywNCj4NCj5QYW9sbw0KDQpIaSwgUGFvbG8gJiBIZWluZXINCg0KSXQgYXBw
+ZWFycyB0aGF0IHRoaXMgcGF0Y2ggaGFzIG5vdCBiZWVuIGFjY2VwdGVkIHlldC4gU2hvdWxkIEkg
+cmVzdWJtaXQgaXQgYXMgYSANCnNlcGFyYXRlICBwYXRjaD8NCg0KVGhhbmssDQpKYXZlbiBYdQ0K
 
