@@ -1,74 +1,66 @@
-Return-Path: <netdev+bounces-252130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YO95BIF/cWk1IAAAu9opvQ
-	(envelope-from <netdev+bounces-252130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:38:09 +0100
+	id yJROE+N/cWk1IAAAu9opvQ
+	(envelope-from <netdev+bounces-252131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:39:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFE960687
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:38:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6C0606CA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 02:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F2BAE3E4F08
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:38:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5E2740034F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD8234D912;
-	Thu, 22 Jan 2026 01:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A156346A0E;
+	Thu, 22 Jan 2026 01:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="da7NmC2S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rhaPcPYT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942C0210F59;
-	Thu, 22 Jan 2026 01:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E613320CA6;
+	Thu, 22 Jan 2026 01:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769045877; cv=none; b=jsqg5xXn5AZ2DmC6N2g3/a//hhdFV+PwkzdZvBP0Ef0AHJ8h59yj8gQFvHTVBsWKkZKqbSgBhajgafC8UOsGhm9qyfrixBOHFsdJDAXNIZFKwH94ltpGtR1KqnZFmH0Gz4dKFL4o8raqZcTXfaS/XMKWjz+X4CYVnmb/t3WlWG8=
+	t=1769045962; cv=none; b=Pp0ykfYD4W1gqhuKTx4OpzmQPTx1K2BGyVIyilDXo2iGK3NN1z0j+Oq8rPyaXZWOEeg3O2pPnXKtdGgKZbMAdUjrUHiRGjPPYnoOKDSBM+dNLGGJa2KSZScuXBofwYdYEpyENanvAZP3Y60ZHXELO6nd57uNsic0XhziRjwrbSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769045877; c=relaxed/simple;
-	bh=tQpBBGK/tiBo551bC20Txkb/gPAPjaLfdNVO0nqHTFk=;
+	s=arc-20240116; t=1769045962; c=relaxed/simple;
+	bh=F8jNl9MJy+FljyVswI1PqcouiQUJLJvmdgG+R8if1CI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m/5LBQW2v1z+zONeWIz/aUzDEY9ZQ5bU3LCx0T7lqbm45Fw1y1CihAku92cAnZaWmUqWgLoqpQZwQEHqx1IBExbQAPDE/scSIh3C3kYHUjaJf1Ifjz6eBRSnam/okQEzV2F3d8ifuA3x6j0qgGRLFL2T/ICtK2a50FAhMCNDYy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=da7NmC2S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11A1DC4CEF1;
-	Thu, 22 Jan 2026 01:37:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PHRpvozpm8H8AqwjU6pwNIF2zEAeosNUpMFfWngASaugMz/YEAkvF0tHHcxQFKTvy+dS2SV3sHUT3PAvPiOwN+2SqsDbCewIBwRMpN6aGyjw8XjihNLWNXXyuhyuUKZfABPWSHPRGCmjziP1kRYmN86hBBYNKiqfmOPcY/LJ8zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rhaPcPYT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3A0C4CEF1;
+	Thu, 22 Jan 2026 01:39:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769045877;
-	bh=tQpBBGK/tiBo551bC20Txkb/gPAPjaLfdNVO0nqHTFk=;
+	s=k20201202; t=1769045961;
+	bh=F8jNl9MJy+FljyVswI1PqcouiQUJLJvmdgG+R8if1CI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=da7NmC2SALcJ5sP3HO4Lf2BNs8qmqMtW1cgWNQM7j9kazH1/9r65viSUooCEpquVu
-	 YRdrEbJv9XpulFitt6vg9FaFBoney46BLTFKISo3L26sYrL7K0gm4mpI1VomDZPznd
-	 VjK7muTAk6zQ+6M9xMlIZsjfbmiROInf5jNQkKtzAg+pEEIUW/ikXrMmgNC6o8f6Ji
-	 gbpuISirGrVZUrWx+k4UChBjnNmOnt9JOvwLeutsc6nJfz7HCgmW/tM/5PT/NGxUh4
-	 GzJktYX8e5elqFIux8LQz0CINQWhLlkWWU3teWiQ24vXwk4enRZhdp6tfbGUGwyWl6
-	 G5jJGCTBgikUQ==
-Date: Wed, 21 Jan 2026 17:37:55 -0800
+	b=rhaPcPYTKW3M4NYSGNJ/AAaFD5YyqQ8kPflsPBFkxT686wzWYdhnS7lc1ATUNTSRY
+	 HPTCassKphXBWv9dxhaCZCPs+zqTmSo5d648vXA8Wur8zuBx7yTSt+5B0v1kRu9hdl
+	 GvPVJ9NN06wn/RNFgjndI/nvRyZX4EEZrWvHcN9c6E7TgHQu3va5Cnjwfsj4A+UP73
+	 yWLIH5SKaBQz9GX+sfHheTwOBtTGcbAbLJaEGhmt8SD/pJ71QBtdFFVZ3UyLwx9al+
+	 KZtYpU2giDcvoYpYLncTEevLiOjN007zs+HmECk9SR9zcxaHOc/LGmw6OvMKeJ4PNk
+	 gkNcI2mWfuqCg==
+Date: Wed, 21 Jan 2026 17:39:20 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, David Ahern
- <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>, Arnd Bergmann
- <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asml.silence@gmail.com,
- matttbe@kernel.org, skhawaja@google.com, Bobby Eshleman
- <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 0/5] net: devmem: improve cpu cost of RX
- token management
-Message-ID: <20260121173755.2ddd0b08@kernel.org>
-In-Reply-To: <aXBkQErscGzJwh2i@devvm11784.nha0.facebook.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
-	<20260120170749.101e8bcc@kernel.org>
-	<aXBkQErscGzJwh2i@devvm11784.nha0.facebook.com>
+To: Allison Henderson <allison.henderson@oracle.com>
+Cc: "achender@kernel.org" <achender@kernel.org>, "rds-devel@oss.oracle.com"
+ <rds-devel@oss.oracle.com>, "horms@kernel.org" <horms@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 0/3] net/rds: RDS-TCP bug fix collection,
+ subset 2: lock contention, state machine bugs, message drops
+Message-ID: <20260121173920.71a093e5@kernel.org>
+In-Reply-To: <83b05fbb38b2610b77d665850662a6f8c594f8cf.camel@oracle.com>
+References: <20260118024911.1203224-1-achender@kernel.org>
+	<20260120190913.20a16e15@kernel.org>
+	<83b05fbb38b2610b77d665850662a6f8c594f8cf.camel@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,54 +70,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252130-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252131-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9EFE960687
+X-Rspamd-Queue-Id: DD6C0606CA
 X-Rspamd-Action: no action
 
-On Tue, 20 Jan 2026 21:29:36 -0800 Bobby Eshleman wrote:
-> > IDK if the cmsg approach is still right for this flow TBH.
-> > IIRC when Stan talked about this a while back we were considering doing
-> > this via Netlink. Anything that proves that the user owns the binding
-> > would work. IIUC the TCP socket in this design just proves that socket
-> > has received a token from a given binding right?  
-> 
-> In both designs the owner of the binding starts of as the netlink opener,
-> and then ownership spreads out to TCP sockets as packets are steered to
-> them. Tokens are received by the user which gives them a share in the
-> form of references on the pp and binding. This design follows the same
-> approach... but I may be misinterpreting what you mean by ownership?
+On Wed, 21 Jan 2026 17:50:19 +0000 Allison Henderson wrote:
+> Sure, I will drop the "bug fixes" language and remove the Fixes tag
+> from patch 2. Also, we noticed a potential race in patch 1, so I'm
+> going to hold off on that patch for now. If that sounds good, I'll
+> send v2  with those changes.
 
-What I was getting at was the same point about socket A vs socket B as
-I made on the doc patch. IOW the kernel only tracks how many tokens it
-gave out for a net_iov, there's no socket state beyond the binding
-pointer. Right?
+SG!
 
