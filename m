@@ -1,246 +1,186 @@
-Return-Path: <netdev+bounces-252404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252405-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fvEoLbRAcmlpfwAAu9opvQ
-	(envelope-from <netdev+bounces-252404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:22:28 +0100
+	id aC2+FThCcmnpfAAAu9opvQ
+	(envelope-from <netdev+bounces-252405-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:28:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A0568A6F
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:22:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD1368CFA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:28:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 84D8F30004D4
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:22:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D25C1304E6F7
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 15:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD57336C59D;
-	Thu, 22 Jan 2026 15:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532BE37F11B;
+	Thu, 22 Jan 2026 15:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjyXwU6G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cPm1gwD6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B27A387378
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 15:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769094864; cv=pass; b=jlabA+6rhOSh31MJFhELgLAFsZKSNVYFBRMBzOfKlmFuFuTselCclvw32RodUmWg/YH5jt0uxd6/GFFdFz4ogqbVwy9xpn5yWiPrk2htq1JAZys3e88Fpc4Gx4bLL0lpUqD912upy0ApFiiguZVhP9L9LpJoy+z2ISY6yHKAckc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769094864; c=relaxed/simple;
-	bh=BzjoKlvqt1EzagDyE1uDPXUBk0JHsuSDNte2h/zwXm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IzsXsGyNWAdIEoBncPxPMz2u3/dpJQt1DzT3zjLoa/7Z9QQ43uTm8WpjGCSIkKa9x2yUbz3OXX+19PxPy2Fpr6FREDjr7sySMgwy2DCOFh6dBqk/dTycJLh2K/ycabGigZ1bvd9RVQjpQio+ewc67xT8yIfiibyPzU/DcMCJwSo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RjyXwU6G; arc=pass smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-65f6f9d84d6so653271eaf.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 07:14:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769094860; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MOi6YoI6I++CALrXOLi/i9Ht0ZojqNKENTe5jUanQaqYF4WeNrfeIDpbx6JPOKbVr4
-         xicYyAC/PNnP6K1ZKXlktWQEC7NNEoRQmYdDbDqhYy/OH5THrPnmTzMR1+TzrPmDHjLa
-         SCnDEJ/fmQkXkZgSXxkFNOj3cuzcryicJyKysycAeWfLc5T+IxYcM6ymHWTOGLPCROB2
-         xDV/8IHLfxyN2iOClHGRAqYwHC8oqaQRlVX1cuu7Zme7RqImrjxpmh+kMYtq77ktnIYO
-         FRI8xtfsw/JTz4LfRUcprkPtnI9SVval0NkyneYiSjRGXOazcAK3JpocKD657CG7DNzL
-         wfJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JBOZm8NEn1I7Enhvm7jPT5V5sGA/hVgZBX7ufyhJPsQ=;
-        fh=P/HVX2Scij3vZdTIcYjaqMyR9xJ+3MajswY47mPMVIA=;
-        b=F0qvRYKWh15vjKlHGGid+Tg6OYBS9Hg+8ZeXR9qxzPFZ28iNER6abQVTKrrUTpcpeX
-         xqKR2YPv17zMwLT+r1amcswk9Wo0QAMsuVfT+sKh6gcd9wDVNBbicUR5LvsFBRfxHUiv
-         MHRru/WgMy3/dwiq18/yemYNR73f8CzKtL0lfnAvAqkp2uPLkVnr+WBxQwCJUKviMrh3
-         ExQGHA9dbeiSFp9dRHmpByyIJ4+x/IFScmvGZIHRw5mlVNGALaorywAmiusGJkDv5bfV
-         nf7TRQfN5SnnrTUbgDyCk/XJpKmQk/yIZLEX8DwpKdJRSPVeUN/V81hJ03RBQl4oQA5k
-         40Yw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769094860; x=1769699660; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JBOZm8NEn1I7Enhvm7jPT5V5sGA/hVgZBX7ufyhJPsQ=;
-        b=RjyXwU6G4xPpty3DHY4MMLuK7bET/s4dZR1Tz5l2TGX4a7AKyQrk6AVN7WqcUDD3R+
-         2AYPfTI+UXwyDxsYEMr0/IbXa5dbcKcc7sSMMMvXcabZqKqbDJ6lXvTi8T31cW3fJQZT
-         JJKp5/2aWGK2/ESrbftV3bXjuwAZ9Ww3JarcavN7ppkkMtwt/bCV/PBp1lVxab8bhwnv
-         FLj64vIvrkvhVWX8ljnPvW5FGZtJMQ7r9lpL6uMCHg6sBw/SRqj1PAGpcw8gW9T3nYPd
-         pmBsF+Fy4mq9DfEbGnf+fOHFxDBqIZT7BrHIHIX+XZzj/b0pTAVVTb1H2fXgUDs7HKXN
-         mg6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769094860; x=1769699660;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JBOZm8NEn1I7Enhvm7jPT5V5sGA/hVgZBX7ufyhJPsQ=;
-        b=Jo6JMqaaXrixPiEdx1VQKk7ZEIlQLW7Ue3euHiod6Wr2Z+szn10klelnOuiebbDo9h
-         xxij7+6IcYVDo14Fq3BLRtJ0zPlwgOXAnihm0wyOX2bM+xAT0j7w+ANvuSm1NALaVLvQ
-         3V5UcKFYRW0S1wc87aUsLO+g3l8+9270DBSFjZuVPUzbZpuSpY0FCusdUwjrZTDi3JqI
-         LQksqdX1J0DzyZkOStjXlo3NTwlx/O0azhIGKZQ5nEwuL+55jA8J+QwLec2+ahaypV94
-         qsGZdC5MkW+wSP3BM296tP/TORP5ew1glY2vFEZQskLq6/S4md6LEXY9FI7p0mlWDg3y
-         rjPw==
-X-Gm-Message-State: AOJu0YzqQnelj5BqQiRGFqvTgySO1tqdfqx41+LdYUveB8G6owbX+Bwi
-	Oeoag/w+6vsNIBitmcWwg0nBIwRz3nEZD+QQ/kCdIfcNxP7HDUVhNzlF/x/Tbfj7dt/eEXMd0e4
-	0mkUhoZkYV0xkZdHH6BmOjRXCSdLj/L4=
-X-Gm-Gg: AZuq6aIRXaYBMqpnEupEPbQ6ET0NCojQJ1H6NUvQLhSoZBQH2+KW3KyftpI6UCi8euk
-	9q4pgk0i/egdIGa0pLk7LaUv8UX/cRtNn3FnO9XvqcxzGKdvaALTSICQJU4ChvXAkYRbspe5xiS
-	3VRAwSliq865Qn8nH3NNvEEON6W1gwh7g+zKJBWdp0qMhHOCO1m3dxZQgq53Znhy89usgTbm6LQ
-	Oe1nrTmjTwgTjbCyJdyxfn+5gucIYVk24xD4bakWN5PUjN+tg+XOT09XDn9addqi39cm+f7Fwxj
-	eGg/fQzPqWKIavG4yQIhu5AN0rGQsDr6fGm7458EB3crODQ0OP6+SaEJjFLY
-X-Received: by 2002:a4a:ddd1:0:b0:662:bffd:9e35 with SMTP id
- 006d021491bc7-662bffda1e2mr1583385eaf.77.1769094859811; Thu, 22 Jan 2026
- 07:14:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC8E37B402;
+	Thu, 22 Jan 2026 15:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769094972; cv=none; b=WFvYGPfOgRZzYx0/a51GZQZquQ47LJi3nYXnnokW+RC3Zc7yvJsPMBJTk4J6PAEZ7szaWa5vWbCEpndHVjSPFJS845P9uHF+H9CEikGo4ZJY4fp7yw9OBjiI2yuR7/NKX23mxQGVmnTg41Ji3GOsiu1vKVCLdwrfGMKjyth11zA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769094972; c=relaxed/simple;
+	bh=hEjFWHPJTwU36jyq6mh96LiBEsL2uKI2r/oLQDcmGb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4kNoeUeQ1wqcPDGcdIhUXBopzpgxY2vSz/J4o2J6ZeM6KSoAVp8/W8be5QGNGcTZAjWiWgmYrD+o41mFdU5TQc8v6sRRsR/DtT9g0l5me9XYazWWyjrJRFtEmQxiRtFbZYKOzkCCj6rGM3FU1HrRm+jQBo8ODH/P5LwLtlOCxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cPm1gwD6; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769094970; x=1800630970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hEjFWHPJTwU36jyq6mh96LiBEsL2uKI2r/oLQDcmGb4=;
+  b=cPm1gwD6FSlbypAJNUX+1jkoEMsWLMumv+KTZx3bkN1JdgHCOSjqkFWW
+   c7vwuQfnooHuV5o+mDlCUDKWB0hQGgS0iQrlClJ2GJgjLINWSmvugMzPZ
+   sweeic/uT8Z+m/YcX6DAxtHg2APt4TFg1O7NpJWRoQ5NyyJx5bg+IT+Qs
+   RKTzXlDE8/nftXgn5bzjryoAyS1Jq6H8uIyMJ8nAXxqbbmT787zCRRLbT
+   kSeWCZtiv/0lxv3iR/ItoeBggtoWwjThZZjhOumYo4ytgnp1ovnelJqXS
+   MCWBE+O2dvwa0fUtIfSzRrgGQjJHfMaEdXR0YhaMC5MhprNOVK9n2Yw5c
+   w==;
+X-CSE-ConnectionGUID: 1ZrL4UURRwS8VkheoDDUAw==
+X-CSE-MsgGUID: cRo684vYQlWxPglfGjvLsQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11679"; a="70504760"
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="70504760"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 07:16:09 -0800
+X-CSE-ConnectionGUID: gn49yJbDSki1bkexPSz8TQ==
+X-CSE-MsgGUID: YrNfleXRQ2yzpifeznZg5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="211615656"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 22 Jan 2026 07:16:06 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1viwPj-00000000Sx2-42vT;
+	Thu, 22 Jan 2026 15:16:03 +0000
+Date: Thu, 22 Jan 2026 23:15:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Damien Dejean <dam.dejean@gmail.com>, andrew@lunn.ch,
+	krzk+dt@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, hkallweit1@gmail.com,
+	Damien Dejean <dam.dejean@gmail.com>
+Subject: Re: [PATCH v2 2/4] net: phy: realtek: add RTL8224 pair order support
+Message-ID: <202601222247.z2ExZCHx-lkp@intel.com>
+References: <20260121151506.813783-2-dam.dejean@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120092137.2161162-1-mmyangfl@gmail.com> <20260120092137.2161162-2-mmyangfl@gmail.com>
- <aXELnMSc4UU6DkbZ@krikkit> <CAAXyoMMAMAbEu=-wTf3MGMiZr2Uq7pqJXC+_zrtxKrsjyYi+AQ@mail.gmail.com>
- <aXIIBbCpuY_ISi-t@krikkit>
-In-Reply-To: <aXIIBbCpuY_ISi-t@krikkit>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Thu, 22 Jan 2026 23:13:43 +0800
-X-Gm-Features: AZwV_Qht3cszjBZS3tSwI0aj4ueyYvMDm0wFiSnF3H1eB_3KslEbR7FUK3MfJh4
-Message-ID: <CAAXyoMMJsWK8F5neewwZHtEHe0-iT1rbfPekSDXm7HJvG2bOpQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/4] u64_stats: Introduce u64_stats_copy()
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Mark Bloch <mbloch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Carolina Jubran <cjubran@nvidia.com>, Breno Leitao <leitao@debian.org>, 
-	Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121151506.813783-2-dam.dejean@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252404-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-252405-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,gmail.com];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,queasysnail.net:email]
-X-Rspamd-Queue-Id: 35A0568A6F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: AFD1368CFA
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 7:20=E2=80=AFPM Sabrina Dubroca <sd@queasysnail.net=
-> wrote:
->
-> 2026-01-22, 02:22:49 +0800, Yangfl wrote:
-> > On Thu, Jan 22, 2026 at 1:23=E2=80=AFAM Sabrina Dubroca <sd@queasysnail=
-.net> wrote:
-> > >
-> > > 2026-01-20, 17:21:29 +0800, David Yang wrote:
-> > > > The following (anti-)pattern was observed in the code tree:
-> > > >
-> > > >         do {
-> > > >                 start =3D u64_stats_fetch_begin(&pstats->syncp);
-> > > >                 memcpy(&temp, &pstats->stats, sizeof(temp));
-> > > >         } while (u64_stats_fetch_retry(&pstats->syncp, start));
-> > > >
-> > > > On 64bit arches, struct u64_stats_sync is empty and provides no hel=
-p
-> > > > against load/store tearing, especially for memcpy(), for which arch=
-es may
-> > > > provide their highly-optimized implements.
-> > > >
-> > > > In theory the affected code should convert to u64_stats_t, or use
-> > > > READ_ONCE()/WRITE_ONCE() properly.
-> > > >
-> > > > However since there are needs to copy chunks of statistics, instead=
- of
-> > > > writing loops at random places, we provide a safe memcpy() variant =
-for
-> > > > u64_stats.
-> > > >
-> > > > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > > > ---
-> > > >  include/linux/u64_stats_sync.h | 15 +++++++++++++++
-> > > >  1 file changed, 15 insertions(+)
-> > > >
-> > > > diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_sta=
-ts_sync.h
-> > > > index 457879938fc1..849ff6e159c6 100644
-> > > > --- a/include/linux/u64_stats_sync.h
-> > > > +++ b/include/linux/u64_stats_sync.h
-> > > > @@ -79,6 +79,14 @@ static inline u64 u64_stats_read(const u64_stats=
-_t *p)
-> > > >       return local64_read(&p->v);
-> > > >  }
-> > > >
-> > > > +static inline void *u64_stats_copy(void *dst, const void *src, siz=
-e_t len)
-> > > > +{
-> > > > +     BUILD_BUG_ON(len % sizeof(u64_stats_t));
-> > > > +     for (size_t i =3D 0; i < len / sizeof(u64_stats_t); i++)
-> > > > +             ((u64 *)dst)[i] =3D local64_read(&((local64_t *)src)[=
-i]);
-> > >
-> > > Maybe u64_stats_read/u64_stats_t instead of local64_read/local64_t?
-> > >
-> >
-> > I think casting to u64_stats_t is a bit overkill here since we accept
-> > const void * and we are the actual implementation.
->
-> It would be a bit more consistent. Just within this function you have
-> 2 lines using u64_stats_t and the 3rd uses local64_t. And reusing
-> types/helpers within a similar context doesn't seem overkill.
->
->
-> [...]
-> > > Since this new helper is always used within a
-> > > u64_stats_fetch_begin/u64_stats_fetch_retry loop, maybe it would be
-> > > nicer to push the retry loop into the helper as well?  Not a strong
-> > > opinion. It would be a bit "simpler" for the callers, but your curren=
-t
-> > > proposal has the advantage of looking like memcpy(), and of also
-> > > looking (for the caller) like other retry loops fetching each counter
-> > > explicitly.
-> > >
-> >
-> > The callers may want to copy other discontinuous data as well, albeit
-> > no one did it then.
->
-> I'm not sure why they would. I think the main point of using memcpy is
-> "I don't want to copy each counter by name one by one", and possibly
-> "I don't want to have to patch this code as well if we add a new
-> counter". If you already have a batch copy for a bunch of counters,
-> it's usually easier to add others in a contiguous block.
->
+Hi Damien,
 
-While I agree with your statement, I don't think it's a good idea to
-push the retry loop into the helper. u64_stats_copy(syncp, dst, src,
-len) would be a strange API, while no others accept syncp argument.
-Also, it would give a false appearance to those who read the driver
-code, since it does not involve fetch_begin()/fetch_retry()
-explicitly.
+kernel test robot noticed the following build warnings:
 
-In my opinion, it would be better to introduce a for-like macro
-#define with_u64_stats_fetch(syncp), eliminating two function calls as
-well as one variable declaration altogether.
+[auto build test WARNING on 983d014aafb14ee5e4915465bf8948e8f3a723b5]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Damien-Dejean/net-phy-realtek-add-RTL8224-pair-order-support/20260122-000009
+base:   983d014aafb14ee5e4915465bf8948e8f3a723b5
+patch link:    https://lore.kernel.org/r/20260121151506.813783-2-dam.dejean%40gmail.com
+patch subject: [PATCH v2 2/4] net: phy: realtek: add RTL8224 pair order support
+config: i386-randconfig-141-20260122 (https://download.01.org/0day-ci/archive/20260122/202601222247.z2ExZCHx-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+smatch version: v0.5.0-8985-g2614ff1a
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601222247.z2ExZCHx-lkp@intel.com/
+
+New smatch warnings:
+drivers/net/phy/realtek/realtek_main.c:1710 rtl8224_mdi_config_order() warn: unsigned 'val' is never less than zero.
+
+Old smatch warnings:
+drivers/net/phy/realtek/realtek_main.c:805 rtl821x_resume() warn: 'priv->clk' from clk_prepare_enable() not released on lines: 801.
+
+vim +/val +1710 drivers/net/phy/realtek/realtek_main.c
+
+  1688	
+  1689	static int rtl8224_mdi_config_order(struct phy_device *phydev)
+  1690	{
+  1691		struct device_node *np = phydev->mdio.dev.of_node;
+  1692		u8 port_offset = phydev->mdio.addr & 3;
+  1693		u32 mdi_conf, val;
+  1694		int ret;
+  1695	
+  1696		ret = of_property_read_u32(np, "realtek,mdi-cfg-order", &mdi_conf);
+  1697	
+  1698		/* Do nothing in case the property is not present */
+  1699		if (ret == -EINVAL)
+  1700			return 0;
+  1701	
+  1702		if (ret)
+  1703			return ret;
+  1704	
+  1705		if (mdi_conf & ~1)
+  1706			return -EINVAL;
+  1707	
+  1708		val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
+  1709					     RTL8224_VND1_MDI_PAIR_SWAP);
+> 1710		if (val < 0)
+  1711			return val;
+  1712	
+  1713		if (mdi_conf)
+  1714			val |= (1 << port_offset);
+  1715		else
+  1716			val &= ~(1 << port_offset);
+  1717	
+  1718		return __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
+  1719					       RTL8224_VND1_MDI_PAIR_SWAP, val);
+  1720	}
+  1721	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
