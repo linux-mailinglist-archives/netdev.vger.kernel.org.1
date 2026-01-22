@@ -1,1208 +1,393 @@
-Return-Path: <netdev+bounces-252215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4B7HAruzcWkILgAAu9opvQ
-	(envelope-from <netdev+bounces-252215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:20:59 +0100
+	id mMz5Cna3cWmcLgAAu9opvQ
+	(envelope-from <netdev+bounces-252216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:36:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF45461F54
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:20:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8186203A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2B839467513
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:18:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 67011445B25
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19079477E4D;
-	Thu, 22 Jan 2026 05:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0353D648C;
+	Thu, 22 Jan 2026 05:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vf19SM/v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I9wo+tJw";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MI5R5ep+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57539477E3B
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 05:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769059124; cv=none; b=F+k1usVn0HlCnAVEjbNmZwtuN0SFksUx469SyrHMo9HzXJ9QzfPrXu3L09TXX6RXqR39qWRSML6wXpycToSA9rsg/XqiAuXKuzYoeLUmoUBddJJ336n8FkHcP2GwUizInGHJMNkSCG4KCXkM3IGpbuLuA75LF3vtQgotXRR+wC4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769059124; c=relaxed/simple;
-	bh=fBc3lFvG00VaN5TGXf0atLgNuzGkZzULjII+rIAbWQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EqRt6koRJsOFdwsoqrzjyw/YqN3PNFV92wYv1Awi65ZQda/X+43pdgX4It1GFwUvr2soJKoR/1ppa3v0GW9gq8fgeBmYsXmXVXdTBo2ZUUo1E8br6yfDBwMrPaw+5qNMgsEh6cga7/fgicm/qoDNFJWfGG0qW7DCbHLb949+ICs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vf19SM/v; arc=none smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-649523de91fso404844d50.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 21:18:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889E6478845
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 05:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769060181; cv=pass; b=A7YQkEB8ic6YKzL9ANgYRqfMw9RPaONd0rZFZVIr6cDgpnX3aLWtubNhkP9LTfh1LWQciMIhyAkTC/1xJVNm2w50p/3BJY9q13TYiHoJoPoMNgmLwFu8zGpkhOOBoN6ZRZzfDzOhSVycA6Yo7T3DcD7o2gV+3YZ8wAxG8hix1Fo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769060181; c=relaxed/simple;
+	bh=4u7RqhYyUxDdVXDwJ31YEx+CsrnO+8ttQ47Alq+R+iI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pM0Nz2ZwHKZQYakDaKjKKdyDIZ8G6nYcezDOwFpRFI6qh01deseq8TECMZMvhLi29DgeYYxnGWwVda9dEN0+Mx2Yoi0njGjkygw0m6b7YWy+a3XFtcNd1ob7Fru0/F7hkdaF6mMiUXylI9CQTIIvuc2X/F14N+RGkSzQlnmm0NI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I9wo+tJw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MI5R5ep+; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769060178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ED7l/hs/bCd8Y3NS4tIwlZAqaShpZQlaHK2896w0TZ8=;
+	b=I9wo+tJwcXkBUCFa3YS/b485VO6xT4ggH4Wlko8SMshMZ5LASTIJmrdLCKqAe9v0/bKYPA
+	DoyF0oo/lP/L8Bg2wIJ6j++xcIN8PHshxohJIqHkx5hhwydUS5LlUqBN2qN6XONKfzcLuY
+	KseAGL+ZilZhYU4PpgxyDsJX2MtryS8=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-duSF6p9RNbSRv5AqenR22g-1; Thu, 22 Jan 2026 00:36:15 -0500
+X-MC-Unique: duSF6p9RNbSRv5AqenR22g-1
+X-Mimecast-MFC-AGG-ID: duSF6p9RNbSRv5AqenR22g_1769060175
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34ab459c051so1372392a91.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 21:36:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769060170; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KP7tzg5HUL8wjXricCjI9wVo0SJnACUR58fW/iOv7Ita6p9Fkb1tR7+oSVJ6rSf/dJ
+         RuD0kCjABBbH5zC65wzE3M9/EHYkx98Vm48zQNvn5LXKniWBdEPJb7wdvrCuVAzI1RlA
+         yeSRhcQSdyG3npmywOg35k01bb2WqTEeU6RVNLs5CQg3b5Txo4ixnZGVANfpCmxO9J+V
+         evT0Xha4vITN+0LPXUHi3zILCim0gieZPP5knAcIA1r+rrdi5vgF6ET/5sIBhcNcw5d5
+         SrIREyHwK9rmyN+VCvjO3ZOIvevbdZpVx3Yy5a88Y5MexSSgFMEbueOdlvPDA2eflW4v
+         kYXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ED7l/hs/bCd8Y3NS4tIwlZAqaShpZQlaHK2896w0TZ8=;
+        fh=tM/VJgTt9UWLRvVElL9kAGJxluKpkp0pLvL1FxN4MFs=;
+        b=hkf8pO4ae478xz/e9WxA+7IWSle/1NkHEIiFJXzHKk0zGLUkEwoBRciDy8VUA1JqiE
+         xnOQScu+iOZs2FuX3B7lNDpweGmykXadvhraaew2awieNoOv6iR9Id2DeAsULm4JAmuz
+         JAVNkxtGScH0CFfSPn/u5AltL/KRm/UfdOjDbL6WGxJg+PXjop+HiuhtGJfhrDwziFJa
+         4nNLAm3Khd/UEWJkahFBsU+UEatG2F7Y1HlexHUZQ/ztl5CQ9loPPzmDyOdc5n3C06pi
+         Sm88WLm3VHNCNgxpUhq9YWlnal68HYAkZO6TVk06/INc1pn+k8pIxkb+/A0kxRnk8tZH
+         KvLg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769059117; x=1769663917; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AO8EA/DC8dWEgtSsLQDjFEdaL7T5CjryTDTrF4yRA3E=;
-        b=Vf19SM/vFZAVGDgrYdX59JlWHLYgnDyQOw2V0fN+r+8wtyBxFFBw/J1M+fSkMTNhNH
-         mS+9pmU3CZXmv53fMaA4ilf405U4ftqbdqzCCrW//tqtbZWGEj/rmpJs/2C9vYwY8MJ3
-         BsX2iXstnfZCL7uasC2lhMhzgxnLBhlS5pLaYYqmQQalooCKAShmUZFLe5aMrxPbZZwV
-         Km7Sm7oIg78cE1nG33FhHWwfEiZs6d36onpD//FHRXjMO2dcBKVyFcfg+s3Gxhzo14tL
-         ePHClISIGN7zhgwqTSQdNTsyo8vmdlSy+SpKxle7aE8sCLAogApCazXR98mkJng30MBe
-         8gHQ==
+        d=redhat.com; s=google; t=1769060170; x=1769664970; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ED7l/hs/bCd8Y3NS4tIwlZAqaShpZQlaHK2896w0TZ8=;
+        b=MI5R5ep+9Ete/kj9kq7iHgcTfeX2mpFQZkZrQj0HQ/JtYPBfUMPv52YXtjP6UkToio
+         WUzAC+SGrHSZJ8ygRFcutPIweTTPmyWVOn5aIWkahiWQGrY8ujgukDNBuyqkQFtaERpV
+         gk5uMIWVKQ9fmcDvlk8Rqilmr70f0lKBA6XvaXCcya/UMGe7Adc0fMRwJLe3eTaPDOFR
+         VrHcl0eB8TLYL2zUnrgs7+Q3+jj1lzHh0plL8HqnvpUMH3+OACnm2R5UMLVJMdbg24rw
+         asPSVQPl6hRUuPuR/i6fOgggyHbLAIWGyPRVAnuc/T/b8/UvuYj+UJkP8lfJjoIDEBFL
+         uBcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769059117; x=1769663917;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AO8EA/DC8dWEgtSsLQDjFEdaL7T5CjryTDTrF4yRA3E=;
-        b=lhSPsuDRt/wnDxnEGDUysCGGtkpbsSc9FctOtevAH0qskRQhirXhAJEN9ygR/HPDz3
-         8zsTQtKa2Ov3S8RwC3oI/Bdp2BUJZG4gLsDr9dSPkISucSAvFngIVh1vGX7ZQiIsih2Y
-         0msorcau7OYwoqGOvpo+Fw+3hL+UuO66RX+urTypMZgsih6KeT/UmaAflCGxUmdcmOYE
-         inrsFwXPnuJDCxZLcHdEW4YjHNHP9/SnmLQqW3C4upAakfNbhg6osXKcEyZ0VqyxXWty
-         sz5iHlLwAsNTalRnfCiP7DNeKtjLy9rEVUTTPqbCMHJQXAjwPtOP62P4xbGVbq7/wNN6
-         oQ3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUZajtxwP5l9i4crlx/QAApKTQSRui1yXwnT6VAjWkHAmd9x5RTu1zhQ/0bWDbov66A4qNKVKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8rHqeFJ1Vrjz3/3GFa/4ZMrLOzxhWaWZhwgqTxudmNj7ocIuG
-	1X/H9Pk9XJBOz+Y8kkFtj5+KU/P6jviq5MZyz7sk+58TawIwkbHxRG2I
-X-Gm-Gg: AZuq6aIH+55lXBonaYfU6Yx0Bl2JexqaWFCQlqAUVoTQ6sXjbX9au9qDU1yiw3oWmYr
-	kTWPG3CsN+6qAU59yqWt2jtiDt07UUWK3CBy58EZ02ym97/r4wZWVjpFPksHhgAcb1YlpswOjZw
-	ADxpQON0It+TBd/3Nnaxvc5BQLsepTIvMMu858ucL9vL0PgexGcO9g2tCRPbR2P7e8Tl7HiiP+k
-	4qGQQK4f5ZndvcJ+Q83VpQC9RNQzKvGFR/hHSYJLdNx+pP/HbFc3+XEcoWqxzMJ5xbquSc8A5Vb
-	qOtTQA1yZiqR4Nfbj6zbciOnghE4Z1Pb2Bz1bxKyRQhwse0m680VkszxzruUq8xWzuCCIGWWvgf
-	qAyT149cwT9lCEyKe7HoC4MG9mIFWmbxFKmR3CKYdgeIQqI5y3xna+9NBnkrbKC8LYPIt8NGAir
-	48lYWDS0xrYk1tojVkppbF+62cWXfB7UZAt1g=
-X-Received: by 2002:a05:690e:120b:b0:646:e643:d14e with SMTP id 956f58d0204a3-649164f1d0fmr14892285d50.53.1769059116833;
-        Wed, 21 Jan 2026 21:18:36 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6493dcbcce6sm3259068d50.24.2026.01.21.21.18.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 21:18:36 -0800 (PST)
-Date: Wed, 21 Jan 2026 21:18:34 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 3/5] net: devmem: implement autorelease
- token management
-Message-ID: <aXGzKo4McQ4nllum@devvm11784.nha0.facebook.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
- <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-3-686d0af71978@meta.com>
- <CAHS8izP+7bnYhtSMVZ-_KrxSXd=R5-7MUaV15vs98Rk2aimQVg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1769060170; x=1769664970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ED7l/hs/bCd8Y3NS4tIwlZAqaShpZQlaHK2896w0TZ8=;
+        b=AJoThKRDTtJaGWYLQwGAQtrkgalsWLSYzThb83ThcW1fQTNK11gwwCIwGZs7oxyPkw
+         mQct1mGfIw7eQnmDLRS/gjgjVuMSzal1KkcM2KjRPaXe9vaVHcTYD/OhXEPm0lWya0lr
+         jl7JLJ0FsT47H1MenGHGmoU1Y4isOoQfF2fY+iTK/xf9C87E9eXcuy4Ill4kJcjOnxSV
+         wqGuuT0jWvqUj4f9vlvxwxNiKB64a2/p7t9g9FR6KFLFpw3wne0DCsXAldUaovgfY3Ta
+         7RL4bbiWf6mDf0xtS5Fro1durcdZCEG/e9whpwL0QPhwxy2JuftcKL0GxO7EMa74cyEn
+         E4Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJgKGnCY44c6OATg62JsXStkX0DA9U4euyRlUupaq+XxTJ9G+cdUxhTynVG2uSJhYZme4h/4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6ISSElSvgg7+wefv0yvAVqyfNOiYMMN6pBSbbNHKA5v9JdvO6
+	M7t8clpxAHHSlFVaJWqlMt0SILS27W3rv72UqUrZFk7xOLDOhdth/bXp5SsTgs52w/PEKcHQLnP
+	emyYMKYrs4u9k+6kj1IhY2YdpcQTCTC6hy66XGO7RmAMHTvp2d8dQj5JamJi1/Tj2pZ83iWNGOa
+	qvXmXmEPElDAGasf9EEKARzc5hChXsvbRz
+X-Gm-Gg: AZuq6aIKJHKBqL0PgUw2dbh9Da0aJjSG/8sANcKJOgIQb0lHLHLUjH/EZX86T1WDtL3
+	RHCTEoVlEq1h/PKnbuorA4XTbxTcR/X7o4XdwD6ixRX4bbZ2feFpPTpmz9MlnNk7itt62T/KTta
+	gMBAlowfR5Q0wt+WHq4ZzYUX+/kfmQ9MAyEZquDZv+dHd3Dma/OKQYMqLnxXWebzAvIsQ=
+X-Received: by 2002:a17:90b:51:b0:353:41e:1f51 with SMTP id 98e67ed59e1d1-353041e787cmr3670061a91.32.1769060170505;
+        Wed, 21 Jan 2026 21:36:10 -0800 (PST)
+X-Received: by 2002:a17:90b:51:b0:353:41e:1f51 with SMTP id
+ 98e67ed59e1d1-353041e787cmr3670034a91.32.1769060170061; Wed, 21 Jan 2026
+ 21:36:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izP+7bnYhtSMVZ-_KrxSXd=R5-7MUaV15vs98Rk2aimQVg@mail.gmail.com>
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-4-simon.schippers@tu-dortmund.de> <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
+ <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de> <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+ <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
+In-Reply-To: <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 22 Jan 2026 13:35:57 +0800
+X-Gm-Features: AZwV_Qj0WIKFoTOn0eU2tLMfUdJil-HIikNxIFlK3wwyEXYRVe6obOMN0rB6aW0
+Message-ID: <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
+	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,arndb.de,lwn.net,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,meta.com];
-	TAGGED_FROM(0.00)[bounces-252215-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-252216-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm11784.nha0.facebook.com:mid,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,meta.com:email]
-X-Rspamd-Queue-Id: BF45461F54
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,mail.gmail.com:mid,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: BD8186203A
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 08:15:23PM -0800, Mina Almasry wrote:
-> On Thu, Jan 15, 2026 at 9:03 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+On Wed, Jan 21, 2026 at 5:33=E2=80=AFPM Simon Schippers
+<simon.schippers@tu-dortmund.de> wrote:
+>
+> On 1/9/26 07:02, Jason Wang wrote:
+> > On Thu, Jan 8, 2026 at 3:41=E2=80=AFPM Simon Schippers
+> > <simon.schippers@tu-dortmund.de> wrote:
+> >>
+> >> On 1/8/26 04:38, Jason Wang wrote:
+> >>> On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
+> >>> <simon.schippers@tu-dortmund.de> wrote:
+> >>>>
+> >>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_cons=
+ume()
+> >>>> and wake the corresponding netdev subqueue when consuming an entry f=
+rees
+> >>>> space in the underlying ptr_ring.
+> >>>>
+> >>>> Stopping of the netdev queue when the ptr_ring is full will be intro=
+duced
+> >>>> in an upcoming commit.
+> >>>>
+> >>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >>>> ---
+> >>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
+> >>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
+> >>>>  2 files changed, 45 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> >>>> index 1197f245e873..2442cf7ac385 100644
+> >>>> --- a/drivers/net/tap.c
+> >>>> +++ b/drivers/net/tap.c
+> >>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q=
+,
+> >>>>         return ret ? ret : total;
+> >>>>  }
+> >>>>
+> >>>> +static void *tap_ring_consume(struct tap_queue *q)
+> >>>> +{
+> >>>> +       struct ptr_ring *ring =3D &q->ring;
+> >>>> +       struct net_device *dev;
+> >>>> +       void *ptr;
+> >>>> +
+> >>>> +       spin_lock(&ring->consumer_lock);
+> >>>> +
+> >>>> +       ptr =3D __ptr_ring_consume(ring);
+> >>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1=
+))) {
+> >>>> +               rcu_read_lock();
+> >>>> +               dev =3D rcu_dereference(q->tap)->dev;
+> >>>> +               netif_wake_subqueue(dev, q->queue_index);
+> >>>> +               rcu_read_unlock();
+> >>>> +       }
+> >>>> +
+> >>>> +       spin_unlock(&ring->consumer_lock);
+> >>>> +
+> >>>> +       return ptr;
+> >>>> +}
+> >>>> +
+> >>>>  static ssize_t tap_do_read(struct tap_queue *q,
+> >>>>                            struct iov_iter *to,
+> >>>>                            int noblock, struct sk_buff *skb)
+> >>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+> >>>>                                         TASK_INTERRUPTIBLE);
+> >>>>
+> >>>>                 /* Read frames from the queue */
+> >>>> -               skb =3D ptr_ring_consume(&q->ring);
+> >>>> +               skb =3D tap_ring_consume(q);
+> >>>>                 if (skb)
+> >>>>                         break;
+> >>>>                 if (noblock) {
+> >>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >>>> index 8192740357a0..7148f9a844a4 100644
+> >>>> --- a/drivers/net/tun.c
+> >>>> +++ b/drivers/net/tun.c
+> >>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struc=
+t *tun,
+> >>>>         return total;
+> >>>>  }
+> >>>>
+> >>>> +static void *tun_ring_consume(struct tun_file *tfile)
+> >>>> +{
+> >>>> +       struct ptr_ring *ring =3D &tfile->tx_ring;
+> >>>> +       struct net_device *dev;
+> >>>> +       void *ptr;
+> >>>> +
+> >>>> +       spin_lock(&ring->consumer_lock);
+> >>>> +
+> >>>> +       ptr =3D __ptr_ring_consume(ring);
+> >>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1=
+))) {
+> >>>
+> >>> I guess it's the "bug" I mentioned in the previous patch that leads t=
+o
+> >>> the check of __ptr_ring_consume_created_space() here. If it's true,
+> >>> another call to tweak the current API.
+> >>>
+> >>>> +               rcu_read_lock();
+> >>>> +               dev =3D rcu_dereference(tfile->tun)->dev;
+> >>>> +               netif_wake_subqueue(dev, tfile->queue_index);
+> >>>
+> >>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
+> >>> I'm not sure is what we want.
+> >>
+> >> What else would you suggest calling to wake the queue?
 > >
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> >
-> > Add support for autorelease toggling of tokens using a static branch to
-> > control system-wide behavior. This allows applications to choose between
-> > two memory management modes:
-> >
-> > 1. Autorelease on: Leaked tokens are automatically released when the
-> >    socket closes.
-> >
-> > 2. Autorelease off: Leaked tokens are released during dmabuf unbind.
-> >
-> > The autorelease mode is requested via the NETDEV_A_DMABUF_AUTORELEASE
-> > attribute of the NETDEV_CMD_BIND_RX message. Having separate modes per
-> > binding is disallowed and is rejected by netlink. The system will be
-> > "locked" into the mode that the first binding is set to. It can only be
-> > changed again once there are zero bindings on the system.
-> >
-> > Disabling autorelease offers ~13% improvement in CPU utilization.
-> >
-> > Static branching is used to limit the system to one mode or the other.
-> >
-> > The xa_erase(&net_devmem_dmabuf_bindings, ...) call is moved into
-> > __net_devmem_dmabuf_binding_free(...). The result is that it becomes
-> > possible to switch static branches atomically with regards to xarray
-> > state. In the time window between unbind and free the socket layer can
-> > still find the binding in the xarray, but it will fail to acquire
-> > binding->ref (if unbind decremented to zero). This change preserves
-> > correct behavior and allows us to avoid more complicated counting
-> > schemes for bindings.
-> >
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > Changes in v10:
-> > - add binding->users to track socket and rxq users of binding, defer
-> >   release of urefs until binding->users hits zero to guard users from
-> >   incrementing urefs *after* net_devmem_dmabuf_binding_put_urefs()
-> >   is called. (Mina)
-> > - fix error failing to restore static key state when xarray alloc fails
-> >   (Jakub)
-> > - add wrappers for setting/unsetting mode that captures the static key +
-> >   rx binding count logic.
-> > - move xa_erase() into __net_devmem_dmabuf_binding_free()
-> > - remove net_devmem_rx_bindings_count, change xarray management to be
-> >   to avoid the same race as net_devmem_rx_bindings_count did
-> > - check return of net_devmem_dmabuf_binding_get() in
-> >   tcp_recvmsg_dmabuf()
-> > - move sk_devmem_info.binding fiddling into autorelease=off static path
-> >
-> > Changes in v9:
-> > - Add missing stub for net_devmem_dmabuf_binding_get() when NET_DEVMEM=n
-> > - Add wrapper around tcp_devmem_ar_key accesses so that it may be
-> >   stubbed out when NET_DEVMEM=n
-> > - only dec rx binding count for rx bindings in free (v8 did not exclude
-> >   TX bindings)
-> >
-> > Changes in v8:
-> > - Only reset static key when bindings go to zero, defaulting back to
-> >   disabled (Stan).
-> > - Fix bad usage of xarray spinlock for sleepy static branch switching,
-> >   use mutex instead.
-> > - Access pp_ref_count via niov->desc instead of niov directly.
-> > - Move reset of static key to __net_devmem_dmabuf_binding_free() so that
-> >   the static key can not be changed while there are outstanding tokens
-> >   (free is only called when reference count reaches zero).
-> > - Add net_devmem_dmabuf_rx_bindings_count because tokens may be active
-> >   even after xa_erase(), so static key changes must wait until all
-> >   RX bindings are finally freed (not just when xarray is empty). A
-> >   counter is a simple way to track this.
-> > - socket takes reference on the binding, to avoid use-after-free on
-> >   sk_devmem_info.binding in the case that user releases all tokens,
-> >   unbinds, then issues SO_DEVMEM_DONTNEED again (with bad token).
-> > - removed some comments that were unnecessary
-> >
-> > Changes in v7:
-> > - implement autorelease with static branch (Stan)
-> > - use netlink instead of sockopt (Stan)
-> > - merge uAPI and implementation patches into one patch (seemed less
-> >   confusing)
-> >
-> > Changes in v6:
-> > - remove sk_devmem_info.autorelease, using binding->autorelease instead
-> > - move binding->autorelease check to outside of
-> >   net_devmem_dmabuf_binding_put_urefs() (Mina)
-> > - remove overly defensive net_is_devmem_iov() (Mina)
-> > - add comment about multiple urefs mapping to a single netmem ref (Mina)
-> > - remove overly defense netmem NULL and netmem_is_net_iov checks (Mina)
-> > - use niov without casting back and forth with netmem (Mina)
-> > - move the autorelease flag from per-binding to per-socket (Mina)
-> > - remove the batching logic in sock_devmem_dontneed_manual_release()
-> >   (Mina)
-> > - move autorelease check inside tcp_xa_pool_commit() (Mina)
-> > - remove single-binding restriction for autorelease mode (Mina)
-> > - unbind always checks for leaked urefs
-> >
-> > Changes in v5:
-> > - remove unused variables
-> > - introduce autorelease flag, preparing for future patch toggle new
-> >   behavior
-> >
-> > Changes in v3:
-> > - make urefs per-binding instead of per-socket, reducing memory
-> >   footprint
-> > - fallback to cleaning up references in dmabuf unbind if socket leaked
-> >   tokens
-> > - drop ethtool patch
-> >
-> > Changes in v2:
-> > - always use GFP_ZERO for binding->vec (Mina)
-> > - remove WARN for changed binding (Mina)
-> > - remove extraneous binding ref get (Mina)
-> > - remove WARNs on invalid user input (Mina)
-> > - pre-assign niovs in binding->vec for RX case (Mina)
-> > - use atomic_set(, 0) to initialize sk_user_frags.urefs
-> > - fix length of alloc for urefs
-> > ---
-> >  Documentation/netlink/specs/netdev.yaml |  12 +++
-> >  include/net/netmem.h                    |   1 +
-> >  include/net/sock.h                      |   7 +-
-> >  include/uapi/linux/netdev.h             |   1 +
-> >  net/core/devmem.c                       | 136 +++++++++++++++++++++++++++-----
-> >  net/core/devmem.h                       |  64 ++++++++++++++-
-> >  net/core/netdev-genl-gen.c              |   5 +-
-> >  net/core/netdev-genl.c                  |  10 ++-
-> >  net/core/sock.c                         |  57 +++++++++++--
-> >  net/ipv4/tcp.c                          |  87 ++++++++++++++++----
-> >  net/ipv4/tcp_ipv4.c                     |  15 +++-
-> >  net/ipv4/tcp_minisocks.c                |   3 +-
-> >  tools/include/uapi/linux/netdev.h       |   1 +
-> >  13 files changed, 345 insertions(+), 54 deletions(-)
-> >
-> > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> > index 596c306ce52b..a5301b150663 100644
-> > --- a/Documentation/netlink/specs/netdev.yaml
-> > +++ b/Documentation/netlink/specs/netdev.yaml
-> > @@ -562,6 +562,17 @@ attribute-sets:
-> >          type: u32
-> >          checks:
-> >            min: 1
-> > +      -
-> > +        name: autorelease
-> > +        doc: |
-> > +          Token autorelease mode. If true (1), leaked tokens are automatically
-> > +          released when the socket closes. If false (0), leaked tokens are only
-> > +          released when the dmabuf is torn down. Once a binding is created with
-> > +          a specific mode, all subsequent bindings system-wide must use the
-> > +          same mode.
-> > +
-> > +          Optional. Defaults to false if not specified.
-> 
-> Ooof. Defaults to false if not specified.
+> > I don't have a good method in my mind, just want to point out its impli=
+cations.
+>
+> I have to admit I'm a bit stuck at this point, particularly with this
+> aspect.
+>
+> What is the correct way to pass the producer CPU ID to the consumer?
+> Would it make sense to store smp_processor_id() in the tfile inside
+> tun_net_xmit(), or should it instead be stored in the skb (similar to the
+> XDP bit)? In the latter case, my concern is that this information may
+> already be significantly outdated by the time it is used.
+>
+> Based on that, my idea would be for the consumer to wake the producer by
+> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
+> smp_call_function_single().
+> Is this a reasonable approach?
 
-I thought we wanted to default to the optimization on?
+I'm not sure but it would introduce costs like IPI.
 
-> 
-> My anxiety with this patch is that running an actual ML training job
-> involves many layers of middleware where we may not be able to enforce
-> the "must don'tneeding before closing the socket" requirement. I'm
-> curious if you have ML jobs or NCCL tests running on this and passing?
+>
+> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
+> considered a deal-breaker for the patch set?
 
-I can run NCCL on it, but haven't this rev.
+It depends on whether or not it has effects on the performance.
+Especially when vhost is pinned.
 
-> 
-> > +        type: u8
-> >
-> >  operations:
-> >    list:
-> > @@ -769,6 +780,7 @@ operations:
-> >              - ifindex
-> >              - fd
-> >              - queues
-> > +            - autorelease
-> >          reply:
-> >            attributes:
-> >              - id
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index 9e10f4ac50c3..80d2263ba4ed 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -112,6 +112,7 @@ struct net_iov {
-> >         };
-> >         struct net_iov_area *owner;
-> >         enum net_iov_type type;
-> > +       atomic_t uref;
-> >  };
-> >
-> >  struct net_iov_area {
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index aafe8bdb2c0f..9d3d5bde15e9 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -352,7 +352,7 @@ struct sk_filter;
-> >    *    @sk_scm_rights: flagged by SO_PASSRIGHTS to recv SCM_RIGHTS
-> >    *    @sk_scm_unused: unused flags for scm_recv()
-> >    *    @ns_tracker: tracker for netns reference
-> > -  *    @sk_user_frags: xarray of pages the user is holding a reference on.
-> > +  *    @sk_devmem_info: the devmem binding information for the socket
-> >    *    @sk_owner: reference to the real owner of the socket that calls
-> >    *               sock_lock_init_class_and_name().
-> >    */
-> > @@ -584,7 +584,10 @@ struct sock {
-> >         struct numa_drop_counters *sk_drop_counters;
-> >         struct rcu_head         sk_rcu;
-> >         netns_tracker           ns_tracker;
-> > -       struct xarray           sk_user_frags;
-> > +       struct {
-> > +               struct xarray                           frags;
-> > +               struct net_devmem_dmabuf_binding        *binding;
-> > +       } sk_devmem_info;
-> >
-> >  #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
-> >         struct module           *sk_owner;
-> > diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> > index e0b579a1df4f..1e5c209cb998 100644
-> > --- a/include/uapi/linux/netdev.h
-> > +++ b/include/uapi/linux/netdev.h
-> > @@ -207,6 +207,7 @@ enum {
-> >         NETDEV_A_DMABUF_QUEUES,
-> >         NETDEV_A_DMABUF_FD,
-> >         NETDEV_A_DMABUF_ID,
-> > +       NETDEV_A_DMABUF_AUTORELEASE,
-> >
-> >         __NETDEV_A_DMABUF_MAX,
-> >         NETDEV_A_DMABUF_MAX = (__NETDEV_A_DMABUF_MAX - 1)
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index 9dee697a28ee..1264d8ee40e3 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -11,6 +11,7 @@
-> >  #include <linux/genalloc.h>
-> >  #include <linux/mm.h>
-> >  #include <linux/netdevice.h>
-> > +#include <linux/skbuff_ref.h>
-> >  #include <linux/types.h>
-> >  #include <net/netdev_queues.h>
-> >  #include <net/netdev_rx_queue.h>
-> > @@ -27,6 +28,9 @@
-> >  /* Device memory support */
-> >
-> >  static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
-> > +static DEFINE_MUTEX(devmem_ar_lock);
-> > +DEFINE_STATIC_KEY_FALSE(tcp_devmem_ar_key);
-> > +EXPORT_SYMBOL(tcp_devmem_ar_key);
-> >
-> >  static const struct memory_provider_ops dmabuf_devmem_ops;
-> >
-> > @@ -63,12 +67,71 @@ static void net_devmem_dmabuf_binding_release(struct percpu_ref *ref)
-> >         schedule_work(&binding->unbind_w);
-> >  }
-> >
-> > +static bool net_devmem_has_rx_bindings(void)
-> > +{
-> > +       struct net_devmem_dmabuf_binding *binding;
-> > +       unsigned long index;
-> > +
-> > +       lockdep_assert_held(&devmem_ar_lock);
-> > +
-> > +       xa_for_each(&net_devmem_dmabuf_bindings, index, binding) {
-> > +               if (binding->direction == DMA_FROM_DEVICE)
-> > +                       return true;
-> > +       }
-> > +       return false;
-> > +}
-> > +
-> > +/* caller must hold devmem_ar_lock */
-> > +static int
-> > +__net_devmem_dmabuf_binding_set_mode(enum dma_data_direction direction,
-> > +                                    bool autorelease)
-> > +{
-> > +       lockdep_assert_held(&devmem_ar_lock);
-> > +
-> > +       if (direction != DMA_FROM_DEVICE)
-> > +               return 0;
-> > +
-> > +       if (net_devmem_has_rx_bindings() &&
-> > +           static_key_enabled(&tcp_devmem_ar_key) != autorelease)
-> > +               return -EBUSY;
-> > +
-> > +       if (autorelease)
-> > +               static_branch_enable(&tcp_devmem_ar_key);
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +/* caller must hold devmem_ar_lock */
-> > +static void
-> > +__net_devmem_dmabuf_binding_unset_mode(enum dma_data_direction direction)
-> > +{
-> > +       lockdep_assert_held(&devmem_ar_lock);
-> > +
-> > +       if (direction != DMA_FROM_DEVICE)
-> > +               return;
-> > +
-> > +       if (net_devmem_has_rx_bindings())
-> > +               return;
-> > +
-> > +       static_branch_disable(&tcp_devmem_ar_key);
-> > +}
-> > +
-> >  void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
-> >  {
-> >         struct net_devmem_dmabuf_binding *binding = container_of(wq, typeof(*binding), unbind_w);
-> >
-> >         size_t size, avail;
-> >
-> > +       mutex_lock(&devmem_ar_lock);
-> > +       xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> > +       __net_devmem_dmabuf_binding_unset_mode(binding->direction);
-> > +       mutex_unlock(&devmem_ar_lock);
-> > +
-> > +       /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after the
-> > +        * erase.
-> > +        */
-> > +       synchronize_net();
-> > +
-> 
-> I'm sorry I could not wrap my head around moving this block of code to
-> the _free(), even though you mention it in the commit message. Why is
-> removing the the binding from net_devmem_dmabuf_bindings on unbind not
-> work for you? If the binding is not active on any rx queues then there
-> cannot be new data received on it. Unless I'm missing something it
-> should be fine to leave this where it is.
+Thanks
 
-Hmmm... actually now that recvmsg gets a binding->ref, the race I was
-trying to avoid can't happen (that is, dontneed using the wrong static
-branch after unbind but before free). Thanks for catching that.
+>
+> Thanks!
+>
+> >
+> >>
+> >>>
+> >>>> +               rcu_read_unlock();
+> >>>> +       }
+> >>>
+> >>> Btw, this function duplicates a lot of logic of tap_ring_consume() we
+> >>> should consider to merge the logic.
+> >>
+> >> Yes, it is largely the same approach, but it would require accessing t=
+he
+> >> net_device each time.
+> >
+> > The problem is that, at least for TUN, the socket is loosely coupled
+> > with the netdev. It means the netdev can go away while the socket
+> > might still exist. That's why vhost only talks to the socket, not the
+> > netdev. If we really want to go this way, here, we should at least
+> > check the existence of tun->dev first.
+> >
+> >>
+> >>>
+> >>>> +
+> >>>> +       spin_unlock(&ring->consumer_lock);
+> >>>> +
+> >>>> +       return ptr;
+> >>>> +}
+> >>>> +
+> >>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int=
+ *err)
+> >>>>  {
+> >>>>         DECLARE_WAITQUEUE(wait, current);
+> >>>>         void *ptr =3D NULL;
+> >>>>         int error =3D 0;
+> >>>>
+> >>>> -       ptr =3D ptr_ring_consume(&tfile->tx_ring);
+> >>>> +       ptr =3D tun_ring_consume(tfile);
+> >>>
+> >>> I'm not sure having a separate patch like this may help. For example,
+> >>> it will introduce performance regression.
+> >>
+> >> I ran benchmarks for the whole patch set with noqueue (where the queue=
+ is
+> >> not stopped to preserve the old behavior), as described in the cover
+> >> letter, and observed no performance regression. This leads me to concl=
+ude
+> >> that there is no performance impact because of this patch when the que=
+ue
+> >> is not stopped.
+> >
+> > Have you run a benchmark per patch? Or it might just be because the
+> > regression is not obvious. But at least this patch would introduce
+> > more atomic operations or it might just because the TUN doesn't
+> > support burst so pktgen can't have the best PPS.
+> >
+> > Thanks
+> >
+> >
+> >>
+> >>>
+> >>>>         if (ptr)
+> >>>>                 goto out;
+> >>>>         if (noblock) {
+> >>>> @@ -2131,7 +2152,7 @@ static void *tun_ring_recv(struct tun_file *tf=
+ile, int noblock, int *err)
+> >>>>
+> >>>>         while (1) {
+> >>>>                 set_current_state(TASK_INTERRUPTIBLE);
+> >>>> -               ptr =3D ptr_ring_consume(&tfile->tx_ring);
+> >>>> +               ptr =3D tun_ring_consume(tfile);
+> >>>>                 if (ptr)
+> >>>>                         break;
+> >>>>                 if (signal_pending(current)) {
+> >>>> --
+> >>>> 2.43.0
+> >>>>
+> >>>
+> >>> Thanks
+> >>>
+> >>
+> >
+>
 
-> 
-> 
-> >         gen_pool_for_each_chunk(binding->chunk_pool,
-> >                                 net_devmem_dmabuf_free_chunk_owner, NULL);
-> >
-> > @@ -126,19 +189,30 @@ void net_devmem_free_dmabuf(struct net_iov *niov)
-> >         gen_pool_free(binding->chunk_pool, dma_addr, PAGE_SIZE);
-> >  }
-> >
-> > +void
-> > +net_devmem_dmabuf_binding_put_urefs(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +       int i;
-> > +
-> > +       for (i = 0; i < binding->dmabuf->size / PAGE_SIZE; i++) {
-> > +               struct net_iov *niov;
-> > +               netmem_ref netmem;
-> > +
-> > +               niov = binding->vec[i];
-> > +               netmem = net_iov_to_netmem(niov);
-> > +
-> > +               /* Multiple urefs map to only a single netmem ref. */
-> > +               if (atomic_xchg(&niov->uref, 0) > 0)
-> > +                       WARN_ON_ONCE(!napi_pp_put_page(netmem));
-> > +       }
-> > +}
-> > +
-> >  void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
-> >  {
-> >         struct netdev_rx_queue *rxq;
-> >         unsigned long xa_idx;
-> >         unsigned int rxq_idx;
-> >
-> > -       xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> > -
-> > -       /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after the
-> > -        * erase.
-> > -        */
-> > -       synchronize_net();
-> > -
-> >         if (binding->list.next)
-> >                 list_del(&binding->list);
-> >
-> > @@ -151,6 +225,8 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
-> >                 rxq_idx = get_netdev_rx_queue_index(rxq);
-> >
-> >                 __net_mp_close_rxq(binding->dev, rxq_idx, &mp_params);
-> > +
-> > +               net_devmem_dmabuf_binding_user_put(binding);
-> >         }
-> >
-> >         percpu_ref_kill(&binding->ref);
-> > @@ -178,6 +254,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
-> >         if (err)
-> >                 goto err_close_rxq;
-> >
-> > +       atomic_inc(&binding->users);
-> > +
-> 
-> nit: feels wrong that we have _binding_user_put() but open code the
-> get(). Either open code both or helper both, maybe?
-
-I had the same though, but the issue is that for the first queue
-atomic_inc_not_zero() (the helper) will fail.
-
-> 
-> >         return 0;
-> >
-> >  err_close_rxq:
-> > @@ -189,8 +267,10 @@ struct net_devmem_dmabuf_binding *
-> >  net_devmem_bind_dmabuf(struct net_device *dev,
-> >                        struct device *dma_dev,
-> >                        enum dma_data_direction direction,
-> > -                      unsigned int dmabuf_fd, struct netdev_nl_sock *priv,
-> > -                      struct netlink_ext_ack *extack)
-> > +                      unsigned int dmabuf_fd,
-> > +                      struct netdev_nl_sock *priv,
-> > +                      struct netlink_ext_ack *extack,
-> > +                      bool autorelease)
-> >  {
-> >         struct net_devmem_dmabuf_binding *binding;
-> >         static u32 id_alloc_next;
-> > @@ -225,6 +305,8 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >         if (err < 0)
-> >                 goto err_free_binding;
-> >
-> > +       atomic_set(&binding->users, 0);
-> > +
-> >         mutex_init(&binding->lock);
-> >
-> >         binding->dmabuf = dmabuf;
-> > @@ -245,14 +327,12 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >                 goto err_detach;
-> >         }
-> >
-> > -       if (direction == DMA_TO_DEVICE) {
-> > -               binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-> > -                                             sizeof(struct net_iov *),
-> > -                                             GFP_KERNEL);
-> > -               if (!binding->vec) {
-> > -                       err = -ENOMEM;
-> > -                       goto err_unmap;
-> > -               }
-> > +       binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-> > +                                     sizeof(struct net_iov *),
-> > +                                     GFP_KERNEL | __GFP_ZERO);
-> > +       if (!binding->vec) {
-> > +               err = -ENOMEM;
-> > +               goto err_unmap;
-> >         }
-> >
-> >         /* For simplicity we expect to make PAGE_SIZE allocations, but the
-> > @@ -306,25 +386,41 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >                         niov = &owner->area.niovs[i];
-> >                         niov->type = NET_IOV_DMABUF;
-> >                         niov->owner = &owner->area;
-> > +                       atomic_set(&niov->uref, 0);
-> >                         page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
-> >                                                       net_devmem_get_dma_addr(niov));
-> > -                       if (direction == DMA_TO_DEVICE)
-> > -                               binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
-> > +                       binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
-> >                 }
-> >
-> >                 virtual += len;
-> >         }
-> >
-> > +       mutex_lock(&devmem_ar_lock);
-> > +
-> > +       err = __net_devmem_dmabuf_binding_set_mode(direction, autorelease);
-> > +       if (err < 0) {
-> > +               NL_SET_ERR_MSG_FMT(extack,
-> > +                                  "System already configured with autorelease=%d",
-> > +                                  static_key_enabled(&tcp_devmem_ar_key));
-> > +               goto err_unlock_mutex;
-> > +       }
-> > +
-> 
-> Unless I've misread something, this looks very incorrect. TX bindings
-> will accidentally set the system to autorelease=false mode, no? You
-> need to make sure you only set the mode in rx-bindings only, right?
-
-Maybe the context you missed is that
-__net_devmem_dmabuf_binding_set_mode() no-ops for TX (DMA_FROM_DEVICE)?
-
-> 
-> >         err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
-> >                               binding, xa_limit_32b, &id_alloc_next,
-> >                               GFP_KERNEL);
-> >         if (err < 0)
-> > -               goto err_free_chunks;
-> > +               goto err_unset_mode;
-> > +
-> > +       mutex_unlock(&devmem_ar_lock);
-> >
-> >         list_add(&binding->list, &priv->bindings);
-> >
-> >         return binding;
-> >
-> > +err_unset_mode:
-> > +       __net_devmem_dmabuf_binding_unset_mode(direction);
-> > +err_unlock_mutex:
-> > +       mutex_unlock(&devmem_ar_lock);
-> >  err_free_chunks:
-> >         gen_pool_for_each_chunk(binding->chunk_pool,
-> >                                 net_devmem_dmabuf_free_chunk_owner, NULL);
-> > diff --git a/net/core/devmem.h b/net/core/devmem.h
-> > index 94874b323520..284f0ad5f381 100644
-> > --- a/net/core/devmem.h
-> > +++ b/net/core/devmem.h
-> > @@ -12,9 +12,13 @@
-> >
-> >  #include <net/netmem.h>
-> >  #include <net/netdev_netlink.h>
-> > +#include <linux/jump_label.h>
-> >
-> >  struct netlink_ext_ack;
-> >
-> > +/* static key for TCP devmem autorelease */
-> > +extern struct static_key_false tcp_devmem_ar_key;
-> > +
-> >  struct net_devmem_dmabuf_binding {
-> >         struct dma_buf *dmabuf;
-> >         struct dma_buf_attachment *attachment;
-> > @@ -43,6 +47,12 @@ struct net_devmem_dmabuf_binding {
-> >          */
-> >         struct percpu_ref ref;
-> >
-> > +       /* Counts sockets and rxqs that are using the binding. When this
-> > +        * reaches zero, all urefs are drained and new sockets cannot join the
-> > +        * binding.
-> > +        */
-> > +       atomic_t users;
-> > +
-> >         /* The list of bindings currently active. Used for netlink to notify us
-> >          * of the user dropping the bind.
-> >          */
-> > @@ -61,7 +71,7 @@ struct net_devmem_dmabuf_binding {
-> >
-> >         /* Array of net_iov pointers for this binding, sorted by virtual
-> >          * address. This array is convenient to map the virtual addresses to
-> > -        * net_iovs in the TX path.
-> > +        * net_iovs.
-> >          */
-> >         struct net_iov **vec;
-> >
-> > @@ -88,7 +98,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >                        struct device *dma_dev,
-> >                        enum dma_data_direction direction,
-> >                        unsigned int dmabuf_fd, struct netdev_nl_sock *priv,
-> > -                      struct netlink_ext_ack *extack);
-> > +                      struct netlink_ext_ack *extack, bool autorelease);
-> >  struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id);
-> >  void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
-> >  int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
-> > @@ -134,6 +144,26 @@ net_devmem_dmabuf_binding_put(struct net_devmem_dmabuf_binding *binding)
-> >         percpu_ref_put(&binding->ref);
-> >  }
-> >
-> > +void net_devmem_dmabuf_binding_put_urefs(struct net_devmem_dmabuf_binding *binding);
-> > +
-> > +static inline bool
-> > +net_devmem_dmabuf_binding_user_get(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +       return atomic_inc_not_zero(&binding->users);
-> > +}
-> > +
-> > +static inline void
-> > +net_devmem_dmabuf_binding_user_put(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +       if (atomic_dec_and_test(&binding->users))
-> > +               net_devmem_dmabuf_binding_put_urefs(binding);
-> > +}
-> > +
-> > +static inline bool net_devmem_autorelease_enabled(void)
-> > +{
-> > +       return static_branch_unlikely(&tcp_devmem_ar_key);
-> > +}
-> > +
-> >  void net_devmem_get_net_iov(struct net_iov *niov);
-> >  void net_devmem_put_net_iov(struct net_iov *niov);
-> >
-> > @@ -151,11 +181,38 @@ net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding, size_t addr,
-> >  #else
-> >  struct net_devmem_dmabuf_binding;
-> >
-> > +static inline bool
-> > +net_devmem_dmabuf_binding_get(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +       return false;
-> > +}
-> > +
-> >  static inline void
-> >  net_devmem_dmabuf_binding_put(struct net_devmem_dmabuf_binding *binding)
-> >  {
-> >  }
-> >
-> > +static inline void
-> > +net_devmem_dmabuf_binding_put_urefs(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +}
-> > +
-> > +static inline bool
-> > +net_devmem_dmabuf_binding_user_get(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +       return false;
-> > +}
-> > +
-> > +static inline void
-> > +net_devmem_dmabuf_binding_user_put(struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +}
-> > +
-> > +static inline bool net_devmem_autorelease_enabled(void)
-> > +{
-> > +       return false;
-> > +}
-> > +
-> >  static inline void net_devmem_get_net_iov(struct net_iov *niov)
-> >  {
-> >  }
-> > @@ -170,7 +227,8 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-> >                        enum dma_data_direction direction,
-> >                        unsigned int dmabuf_fd,
-> >                        struct netdev_nl_sock *priv,
-> > -                      struct netlink_ext_ack *extack)
-> > +                      struct netlink_ext_ack *extack,
-> > +                      bool autorelease)
-> >  {
-> >         return ERR_PTR(-EOPNOTSUPP);
-> >  }
-> > diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-> > index ba673e81716f..01b7765e11ec 100644
-> > --- a/net/core/netdev-genl-gen.c
-> > +++ b/net/core/netdev-genl-gen.c
-> > @@ -86,10 +86,11 @@ static const struct nla_policy netdev_qstats_get_nl_policy[NETDEV_A_QSTATS_SCOPE
-> >  };
-> >
-> >  /* NETDEV_CMD_BIND_RX - do */
-> > -static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_FD + 1] = {
-> > +static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_AUTORELEASE + 1] = {
-> >         [NETDEV_A_DMABUF_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-> >         [NETDEV_A_DMABUF_FD] = { .type = NLA_U32, },
-> >         [NETDEV_A_DMABUF_QUEUES] = NLA_POLICY_NESTED(netdev_queue_id_nl_policy),
-> > +       [NETDEV_A_DMABUF_AUTORELEASE] = { .type = NLA_U8, },
-> 
-> This patch in the series is proving complicated to review. Any changes
-> you can refactor out of it for ease of review would be very welcome.
-> Things like the variable renames, netlink api changes, and any
-> refactors can be pulled into their own patches would ease review of
-> the core functionality.
-> 
-> >  };
-> >
-> >  /* NETDEV_CMD_NAPI_SET - do */
-> > @@ -188,7 +189,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
-> >                 .cmd            = NETDEV_CMD_BIND_RX,
-> >                 .doit           = netdev_nl_bind_rx_doit,
-> >                 .policy         = netdev_bind_rx_nl_policy,
-> > -               .maxattr        = NETDEV_A_DMABUF_FD,
-> > +               .maxattr        = NETDEV_A_DMABUF_AUTORELEASE,
-> >                 .flags          = GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> >         },
-> >         {
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index 470fabbeacd9..c742bb34865e 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -939,6 +939,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> >         struct netdev_nl_sock *priv;
-> >         struct net_device *netdev;
-> >         unsigned long *rxq_bitmap;
-> > +       bool autorelease = false;
-> >         struct device *dma_dev;
-> >         struct sk_buff *rsp;
-> >         int err = 0;
-> > @@ -952,6 +953,10 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> >         ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
-> >         dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
-> >
-> > +       if (info->attrs[NETDEV_A_DMABUF_AUTORELEASE])
-> > +               autorelease =
-> > +                       !!nla_get_u8(info->attrs[NETDEV_A_DMABUF_AUTORELEASE]);
-> > +
-> >         priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
-> >         if (IS_ERR(priv))
-> >                 return PTR_ERR(priv);
-> > @@ -1002,7 +1007,8 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> >         }
-> >
-> >         binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_FROM_DEVICE,
-> > -                                        dmabuf_fd, priv, info->extack);
-> > +                                        dmabuf_fd, priv, info->extack,
-> > +                                        autorelease);
-> >         if (IS_ERR(binding)) {
-> >                 err = PTR_ERR(binding);
-> >                 goto err_rxq_bitmap;
-> > @@ -1097,7 +1103,7 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
-> >
-> >         dma_dev = netdev_queue_get_dma_dev(netdev, 0);
-> >         binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_TO_DEVICE,
-> > -                                        dmabuf_fd, priv, info->extack);
-> > +                                        dmabuf_fd, priv, info->extack, false);
-> >         if (IS_ERR(binding)) {
-> >                 err = PTR_ERR(binding);
-> >                 goto err_unlock_netdev;
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index f6526f43aa6e..6355c2ccfb8a 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -87,6 +87,7 @@
-> >
-> >  #include <linux/unaligned.h>
-> >  #include <linux/capability.h>
-> > +#include <linux/dma-buf.h>
-> >  #include <linux/errno.h>
-> >  #include <linux/errqueue.h>
-> >  #include <linux/types.h>
-> > @@ -151,6 +152,7 @@
-> >  #include <uapi/linux/pidfd.h>
-> >
-> >  #include "dev.h"
-> > +#include "devmem.h"
-> >
-> >  static DEFINE_MUTEX(proto_list_mutex);
-> >  static LIST_HEAD(proto_list);
-> > @@ -1081,6 +1083,44 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
-> >  #define MAX_DONTNEED_TOKENS 128
-> >  #define MAX_DONTNEED_FRAGS 1024
-> >
-> > +static noinline_for_stack int
-> > +sock_devmem_dontneed_manual_release(struct sock *sk,
-> > +                                   struct dmabuf_token *tokens,
-> > +                                   unsigned int num_tokens)
-> > +{
-> > +       struct net_iov *niov;
-> > +       unsigned int i, j;
-> > +       netmem_ref netmem;
-> > +       unsigned int token;
-> > +       int num_frags = 0;
-> > +       int ret = 0;
-> > +
-> > +       if (!sk->sk_devmem_info.binding)
-> > +               return -EINVAL;
-> > +
-> > +       for (i = 0; i < num_tokens; i++) {
-> > +               for (j = 0; j < tokens[i].token_count; j++) {
-> > +                       size_t size = sk->sk_devmem_info.binding->dmabuf->size;
-> > +
-> > +                       token = tokens[i].token_start + j;
-> > +                       if (token >= size / PAGE_SIZE)
-> > +                               break;
-> > +
-> > +                       if (++num_frags > MAX_DONTNEED_FRAGS)
-> > +                               return ret;
-> > +
-> > +                       niov = sk->sk_devmem_info.binding->vec[token];
-> > +                       if (atomic_dec_and_test(&niov->uref)) {
-> > +                               netmem = net_iov_to_netmem(niov);
-> > +                               WARN_ON_ONCE(!napi_pp_put_page(netmem));
-> > +                       }
-> > +                       ret++;
-> > +               }
-> > +       }
-> > +
-> > +       return ret;
-> > +}
-> > +
-> >  static noinline_for_stack int
-> >  sock_devmem_dontneed_autorelease(struct sock *sk, struct dmabuf_token *tokens,
-> >                                  unsigned int num_tokens)
-> > @@ -1089,32 +1129,33 @@ sock_devmem_dontneed_autorelease(struct sock *sk, struct dmabuf_token *tokens,
-> >         int ret = 0, num_frags = 0;
-> >         netmem_ref netmems[16];
-> >
-> > -       xa_lock_bh(&sk->sk_user_frags);
-> > +       xa_lock_bh(&sk->sk_devmem_info.frags);
-> >         for (i = 0; i < num_tokens; i++) {
-> >                 for (j = 0; j < tokens[i].token_count; j++) {
-> >                         if (++num_frags > MAX_DONTNEED_FRAGS)
-> >                                 goto frag_limit_reached;
-> >
-> >                         netmem_ref netmem = (__force netmem_ref)__xa_erase(
-> > -                               &sk->sk_user_frags, tokens[i].token_start + j);
-> > +                               &sk->sk_devmem_info.frags,
-> > +                               tokens[i].token_start + j);
-> >
-> >                         if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
-> >                                 continue;
-> >
-> >                         netmems[netmem_num++] = netmem;
-> >                         if (netmem_num == ARRAY_SIZE(netmems)) {
-> > -                               xa_unlock_bh(&sk->sk_user_frags);
-> > +                               xa_unlock_bh(&sk->sk_devmem_info.frags);
-> >                                 for (k = 0; k < netmem_num; k++)
-> >                                         WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-> >                                 netmem_num = 0;
-> > -                               xa_lock_bh(&sk->sk_user_frags);
-> > +                               xa_lock_bh(&sk->sk_devmem_info.frags);
-> >                         }
-> >                         ret++;
-> >                 }
-> >         }
-> >
-> >  frag_limit_reached:
-> > -       xa_unlock_bh(&sk->sk_user_frags);
-> > +       xa_unlock_bh(&sk->sk_devmem_info.frags);
-> >         for (k = 0; k < netmem_num; k++)
-> >                 WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-> >
-> > @@ -1145,7 +1186,11 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
-> >                 return -EFAULT;
-> >         }
-> >
-> > -       ret = sock_devmem_dontneed_autorelease(sk, tokens, num_tokens);
-> > +       if (net_devmem_autorelease_enabled())
-> > +               ret = sock_devmem_dontneed_autorelease(sk, tokens, num_tokens);
-> > +       else
-> > +               ret = sock_devmem_dontneed_manual_release(sk, tokens,
-> > +                                                         num_tokens);
-> >
-> >         kvfree(tokens);
-> >         return ret;
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index d5319ebe2452..73a577bd8765 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -260,6 +260,7 @@
-> >  #include <linux/memblock.h>
-> >  #include <linux/highmem.h>
-> >  #include <linux/cache.h>
-> > +#include <linux/dma-buf.h>
-> >  #include <linux/err.h>
-> >  #include <linux/time.h>
-> >  #include <linux/slab.h>
-> > @@ -492,7 +493,8 @@ void tcp_init_sock(struct sock *sk)
-> >
-> >         set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
-> >         sk_sockets_allocated_inc(sk);
-> > -       xa_init_flags(&sk->sk_user_frags, XA_FLAGS_ALLOC1);
-> > +       xa_init_flags(&sk->sk_devmem_info.frags, XA_FLAGS_ALLOC1);
-> > +       sk->sk_devmem_info.binding = NULL;
-> >  }
-> >  EXPORT_IPV6_MOD(tcp_init_sock);
-> >
-> > @@ -2424,11 +2426,12 @@ static void tcp_xa_pool_commit_locked(struct sock *sk, struct tcp_xa_pool *p)
-> >
-> >         /* Commit part that has been copied to user space. */
-> >         for (i = 0; i < p->idx; i++)
-> > -               __xa_cmpxchg(&sk->sk_user_frags, p->tokens[i], XA_ZERO_ENTRY,
-> > -                            (__force void *)p->netmems[i], GFP_KERNEL);
-> > +               __xa_cmpxchg(&sk->sk_devmem_info.frags, p->tokens[i],
-> > +                            XA_ZERO_ENTRY, (__force void *)p->netmems[i],
-> > +                            GFP_KERNEL);
-> >         /* Rollback what has been pre-allocated and is no longer needed. */
-> >         for (; i < p->max; i++)
-> > -               __xa_erase(&sk->sk_user_frags, p->tokens[i]);
-> > +               __xa_erase(&sk->sk_devmem_info.frags, p->tokens[i]);
-> >
-> >         p->max = 0;
-> >         p->idx = 0;
-> > @@ -2436,14 +2439,17 @@ static void tcp_xa_pool_commit_locked(struct sock *sk, struct tcp_xa_pool *p)
-> >
-> >  static void tcp_xa_pool_commit(struct sock *sk, struct tcp_xa_pool *p)
-> >  {
-> > +       if (!net_devmem_autorelease_enabled())
-> > +               return;
-> > +
-> >         if (!p->max)
-> >                 return;
-> >
-> > -       xa_lock_bh(&sk->sk_user_frags);
-> > +       xa_lock_bh(&sk->sk_devmem_info.frags);
-> >
-> >         tcp_xa_pool_commit_locked(sk, p);
-> >
-> > -       xa_unlock_bh(&sk->sk_user_frags);
-> > +       xa_unlock_bh(&sk->sk_devmem_info.frags);
-> >  }
-> >
-> >  static int tcp_xa_pool_refill(struct sock *sk, struct tcp_xa_pool *p,
-> > @@ -2454,24 +2460,41 @@ static int tcp_xa_pool_refill(struct sock *sk, struct tcp_xa_pool *p,
-> >         if (p->idx < p->max)
-> >                 return 0;
-> >
-> > -       xa_lock_bh(&sk->sk_user_frags);
-> > +       xa_lock_bh(&sk->sk_devmem_info.frags);
-> >
-> >         tcp_xa_pool_commit_locked(sk, p);
-> >
-> >         for (k = 0; k < max_frags; k++) {
-> > -               err = __xa_alloc(&sk->sk_user_frags, &p->tokens[k],
-> > +               err = __xa_alloc(&sk->sk_devmem_info.frags, &p->tokens[k],
-> >                                  XA_ZERO_ENTRY, xa_limit_31b, GFP_KERNEL);
-> >                 if (err)
-> >                         break;
-> >         }
-> >
-> > -       xa_unlock_bh(&sk->sk_user_frags);
-> > +       xa_unlock_bh(&sk->sk_devmem_info.frags);
-> >
-> >         p->max = k;
-> >         p->idx = 0;
-> >         return k ? 0 : err;
-> >  }
-> >
-> > +static void tcp_xa_pool_inc_pp_ref_count(struct tcp_xa_pool *tcp_xa_pool,
-> > +                                        skb_frag_t *frag)
-> > +{
-> > +       struct net_iov *niov;
-> > +
-> > +       niov = skb_frag_net_iov(frag);
-> > +
-> > +       if (net_devmem_autorelease_enabled()) {
-> > +               atomic_long_inc(&niov->desc.pp_ref_count);
-> > +               tcp_xa_pool->netmems[tcp_xa_pool->idx++] =
-> > +                       skb_frag_netmem(frag);
-> > +       } else {
-> > +               if (atomic_inc_return(&niov->uref) == 1)
-> > +                       atomic_long_inc(&niov->desc.pp_ref_count);
-> > +       }
-> > +}
-> > +
-> >  /* On error, returns the -errno. On success, returns number of bytes sent to the
-> >   * user. May not consume all of @remaining_len.
-> >   */
-> > @@ -2533,6 +2556,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
-> >                  * sequence of cmsg
-> >                  */
-> >                 for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-> > +                       struct net_devmem_dmabuf_binding *binding = NULL;
-> >                         skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-> >                         struct net_iov *niov;
-> >                         u64 frag_offset;
-> > @@ -2568,13 +2592,45 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
-> >                                               start;
-> >                                 dmabuf_cmsg.frag_offset = frag_offset;
-> >                                 dmabuf_cmsg.frag_size = copy;
-> > -                               err = tcp_xa_pool_refill(sk, &tcp_xa_pool,
-> > -                                                        skb_shinfo(skb)->nr_frags - i);
-> > -                               if (err)
-> > -                                       goto out;
-> > +
-> > +                               binding = net_devmem_iov_binding(niov);
-> > +
-> > +                               if (net_devmem_autorelease_enabled()) {
-> > +                                       err = tcp_xa_pool_refill(sk,
-> > +                                                                &tcp_xa_pool,
-> > +                                                                skb_shinfo(skb)->nr_frags - i);
-> > +                                       if (err)
-> > +                                               goto out;
-> > +
-> > +                                       dmabuf_cmsg.frag_token =
-> > +                                               tcp_xa_pool.tokens[tcp_xa_pool.idx];
-> > +                               } else {
-> > +                                       if (!sk->sk_devmem_info.binding) {
-> > +                                               if (!net_devmem_dmabuf_binding_user_get(binding)) {
-> > +                                                       err = -ENODEV;
-> > +                                                       goto out;
-> > +                                               }
-> > +
-> > +                                               if (!net_devmem_dmabuf_binding_get(binding)) {
-> > +                                                       net_devmem_dmabuf_binding_user_put(binding);
-> > +                                                       err = -ENODEV;
-> > +                                                       goto out;
-> > +                                               }
-> > +
-> > +                                               sk->sk_devmem_info.binding = binding;
-> > +                                       }
-> > +
-> > +                                       if (sk->sk_devmem_info.binding != binding) {
-> > +                                               err = -EFAULT;
-> > +                                               goto out;
-> > +                                       }
-> > +
-> > +                                       dmabuf_cmsg.frag_token =
-> > +                                               net_iov_virtual_addr(niov) >> PAGE_SHIFT;
-> > +                               }
-> > +
-> >
-> >                                 /* Will perform the exchange later */
-> > -                               dmabuf_cmsg.frag_token = tcp_xa_pool.tokens[tcp_xa_pool.idx];
-> >                                 dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
-> >
-> >                                 offset += copy;
-> > @@ -2587,8 +2643,7 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
-> >                                 if (err)
-> >                                         goto out;
-> >
-> > -                               atomic_long_inc(&niov->desc.pp_ref_count);
-> > -                               tcp_xa_pool.netmems[tcp_xa_pool.idx++] = skb_frag_netmem(frag);
-> > +                               tcp_xa_pool_inc_pp_ref_count(&tcp_xa_pool, frag);
-> >
-> >                                 sent += copy;
-> >
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index f8a9596e8f4d..420e8c8ebf6d 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -89,6 +89,9 @@
-> >
-> >  #include <crypto/md5.h>
-> >
-> > +#include <linux/dma-buf.h>
-> > +#include "../core/devmem.h"
-> > +
-> >  #include <trace/events/tcp.h>
-> >
-> >  #ifdef CONFIG_TCP_MD5SIG
-> > @@ -2492,7 +2495,7 @@ static void tcp_release_user_frags(struct sock *sk)
-> >         unsigned long index;
-> >         void *netmem;
-> >
-> > -       xa_for_each(&sk->sk_user_frags, index, netmem)
-> > +       xa_for_each(&sk->sk_devmem_info.frags, index, netmem)
-> >                 WARN_ON_ONCE(!napi_pp_put_page((__force netmem_ref)netmem));
-> >  #endif
-> >  }
-> > @@ -2503,7 +2506,15 @@ void tcp_v4_destroy_sock(struct sock *sk)
-> >
-> >         tcp_release_user_frags(sk);
-> >
-> > -       xa_destroy(&sk->sk_user_frags);
-> > +       if (!net_devmem_autorelease_enabled() && sk->sk_devmem_info.binding) {
-> > +               net_devmem_dmabuf_binding_user_put(sk->sk_devmem_info.binding);
-> > +               net_devmem_dmabuf_binding_put(sk->sk_devmem_info.binding);
-> > +               sk->sk_devmem_info.binding = NULL;
-> > +               WARN_ONCE(!xa_empty(&sk->sk_devmem_info.frags),
-> > +                         "non-empty xarray discovered in autorelease off mode");
-> > +       }
-> > +
-> > +       xa_destroy(&sk->sk_devmem_info.frags);
-> >
-> >         trace_tcp_destroy_sock(sk);
-> >
-> > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> > index bd5462154f97..2aec977f5c12 100644
-> > --- a/net/ipv4/tcp_minisocks.c
-> > +++ b/net/ipv4/tcp_minisocks.c
-> > @@ -662,7 +662,8 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
-> >
-> >         __TCP_INC_STATS(sock_net(sk), TCP_MIB_PASSIVEOPENS);
-> >
-> > -       xa_init_flags(&newsk->sk_user_frags, XA_FLAGS_ALLOC1);
-> > +       xa_init_flags(&newsk->sk_devmem_info.frags, XA_FLAGS_ALLOC1);
-> > +       newsk->sk_devmem_info.binding = NULL;
-> >
-> >         return newsk;
-> >  }
-> > diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-> > index e0b579a1df4f..1e5c209cb998 100644
-> > --- a/tools/include/uapi/linux/netdev.h
-> > +++ b/tools/include/uapi/linux/netdev.h
-> > @@ -207,6 +207,7 @@ enum {
-> >         NETDEV_A_DMABUF_QUEUES,
-> >         NETDEV_A_DMABUF_FD,
-> >         NETDEV_A_DMABUF_ID,
-> > +       NETDEV_A_DMABUF_AUTORELEASE,
-> >
-> >         __NETDEV_A_DMABUF_MAX,
-> >         NETDEV_A_DMABUF_MAX = (__NETDEV_A_DMABUF_MAX - 1)
-> >
-> > --
-> > 2.47.3
-> >
-> 
-> 
-> -- 
-> Thanks,
-> Mina
 
