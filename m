@@ -1,187 +1,287 @@
-Return-Path: <netdev+bounces-252304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNtAHhMWcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252304-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:20:35 +0100
+	id qEkmJOgScmksawAAu9opvQ
+	(envelope-from <netdev+bounces-252305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:07:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3768B668AC
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:20:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34AD66668D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B8541725B0A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:30:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34509900EDC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA350407560;
-	Thu, 22 Jan 2026 11:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142473A9636;
+	Thu, 22 Jan 2026 11:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hntVHlxv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNYHVdcw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10D338B7DB;
-	Thu, 22 Jan 2026 11:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1877331ED66
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769081360; cv=none; b=mw2El3BDgpzay2O2o+mYTcfAPhXFy9fjHfwIoP+cg9nY5eXckIFzRv9wQxzUOr3JduWxdle0s3EKFev6yUiuVctwKZ611fZ7WImQ5/HhwBUPEmyEq/3gsD1w0SXztXfWx6GgpHgZ1Awjtko8sLk353Me3Qi0A53iGmDF4hGSBJU=
+	t=1769081421; cv=none; b=ReFu0BBP2yj3AilDBagCaJfyxAbxJSb0t0C+rk9xi5Zz5QJiWVFyhC6cfkyiCsz54JFbgTi79s7Pq7yvdl4HtWMDV73JTm0q8jPJgw4dPXfo0dWHvckxen4PgKtTJ8Qw9Eq6Q6WH5ngpyBhK7l0W2c2i/cLkjL6KQXo/r82I5Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769081360; c=relaxed/simple;
-	bh=WiogiOmlVrEBDmxiYq5jKojVlIXsrZ6n9wcQdU9VhMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPgrPlq5QZpjrv9139Z3RQV2z/BUJarWMgpUK2SCK9gy7iqxbVpFGEtWqYgMcsPeYB3v7GT+K2NsRR05dbX0pbK3h7IZh3oesYdazyiY/fDVNx3Ndy2RteVJCQKruEaBBR4Hxi/5VCc/VEjdFBCe6npYN8TzIFgQJ2Phs1/fo4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hntVHlxv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEAA5C116C6;
-	Thu, 22 Jan 2026 11:29:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769081360;
-	bh=WiogiOmlVrEBDmxiYq5jKojVlIXsrZ6n9wcQdU9VhMk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hntVHlxvRLtZcEpsFecgcuy2/WeJl9lYH2mWE9f8dZGjyucvG1zCLlgF1anVNM8Mq
-	 ATZwc6IftbgZO2kJLtftNKhMvBjvPvqfUNlH6JrZwPiiiEXtxPJi1HRA+GVlhwH0Xl
-	 7jI4hCzwdhtpWuORobWzm0YF5J1jsS7gh1CwOGDB5EOeJZKzxHCuCd4SkLrzE/tlGq
-	 JVFBs8UA8NYTjNB18RHp1AShNa5zdE3qLITZrz7qt2dsO/+/eP32L9P7IpEILF4h3H
-	 3+SL3O++ddzf33ljYPKdsDd6l1rT8hde2RP+XyHB6xkPeaAyuWp9p0Q+aK9fItrNc6
-	 XJd/YpjN6/DQQ==
-Date: Thu, 22 Jan 2026 12:29:17 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
- HK_TYPE_DOMAIN
-Message-ID: <aXIKDduX5qUXvOUX@localhost.localdomain>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-30-frederic@kernel.org>
- <aW-cAlJCtI5Qtify@willie-the-truck>
- <aXEHf5nbZMI8LT4b@localhost.localdomain>
- <aXH0TZU7UNowTmwc@willie-the-truck>
+	s=arc-20240116; t=1769081421; c=relaxed/simple;
+	bh=39FPDHITu3Mcv+kLd8pXIXa7VRQv2QF7b1+o3jrmRAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dyRD7OTdJWNM80+C6Mr1e3RNHZ63IQvlKh8fT6s4+6AIPpy8/tiEVEywKjB6l2/G3Anv/j2trTp5KsJ0krnrxMmh5jjf1+mj+60XnaDKw0qZ59SeBNspkCT5QEEz/8I/vt6bKM4CH+3UJ4HjRtlI1PaxiZw3W1C2MQ8H3QSdOCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gNYHVdcw; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47ee76e8656so11587175e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:30:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769081417; x=1769686217; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dnqo+Zg9fRRtteZPakxnCOruFtX67sgTE3miBZJngDg=;
+        b=gNYHVdcwB6qugUb+NizIXFxmV5hh3HerG6j3lhD910ftP4l5wNDzjBtzVtOqjG2Dmh
+         0GKYbQjYwF5F4ulbQE/XiXHEZHPvrKqdCHzJDtYvPQnudSnC2SbBFogJfOTZi0u3HaXS
+         5O33u5arQja0qzn7hCrqaNQVX33UQivegUZma7SFS5KrDLeqTugI4S7rxhOAKUcVTKN/
+         HUUGHvaU5y7ajVbsZfaHbPfO8+jS6EeLqX1WfTAKOrqzPe0IYnHrTYzkkT6gT1Hkuhu/
+         2+EhL8tUlNaoBDsR/MGL06XdKaWtFDwG5xshaacOy9o53pRab7sj+7SA3QhEdAFEOhzl
+         Y9Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769081417; x=1769686217;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dnqo+Zg9fRRtteZPakxnCOruFtX67sgTE3miBZJngDg=;
+        b=KWunzX75E+FBP5no3+oFhkGx/a2guUntcQTyjtivbHJfAGiJlxBQaVahsVXpw1t9Mc
+         dpxju8fgzrYbN3XkIQy44i4Q8xa6o7G5vBykr+M4m4MEhFigDJvxteyMPBDCOsIxg3Cb
+         6mvBYv46K8A7LvkjP6jtc9PZBd+Tmh3E2MMvV93NXu16iyiKSXiGrxKg3lV/grByNmda
+         eBK2hMvDuSoCZA0jk+FpOUFOTuBXFbATPmk5bGggx4Lv+CQ0np48SM5BcoyWSioOVGSo
+         WHErh4pLBA3fqFbW3NGFcP9J8vgcpOr6KXlp82+1JMKiLp6wvyuuOhcqGYD/rQKhsY+z
+         ROLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXeWiXcKB0MI5QuGixHGXVkGkxELTmy6aBn3kA5v8iuj+gCq/5xplVPOv0BKz4UG+g6EgryGb8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyZDiGlFUSLzBtq50lqh0/YTQOg3DWnwXEUz5ky790OA0rXOIy
+	K6N8xogSrWXgf+caPuaTcyTu/HoKxBhOAH4xEioZ/VtoLB23tOOEewbT
+X-Gm-Gg: AZuq6aIj5Q1zBG8Ie+j7sTIXR0DQ3VQtnofEcFk8V+UpCpK5Ed5P/mWO5fhU27LnXu7
+	0KOMrxD/UclounQxhFEhAFx/WSWR+C/66DQ7u3IsUQKz8iDcsr845O6v1gSeCAWN6q0fMzdh1wE
+	sCQoVeCBrumPVmaPNTU+ltMpqkClhLuvL3YvWRZ+7l7xh+R07ovkvh/CVNIjme8IwUTfge+1Neq
+	xOFmIGaJ1tzeEVFp0alsVSwvVy2b3PxOBV1j4EU1vD4XT0q0JVhv6cp7F1FAWC6Fumh4Ni0dt+e
+	hQXA74pseD9Q/f7sGCa/LIsdxhxQJDqI79AYT95UWY4BpGUW3oN8wg3wD4tNv5xwPdUkFEaXU/F
+	ZuTbkHqeCMuvqp+GxIneRfUABtbgABNmAD4BaUI8tD/rRC4EuUDTxsNl8XOg8IVNc4Zf22W5HJL
+	/DrNRTK9FwSnRFC5aP1tM1wFsOBp3Bc/DXgw==
+X-Received: by 2002:a05:600c:a013:b0:477:79c7:8994 with SMTP id 5b1f17b1804b1-4803e7f0e39mr133251495e9.30.1769081416765;
+        Thu, 22 Jan 2026 03:30:16 -0800 (PST)
+Received: from [10.221.200.32] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4358f12ee69sm21557943f8f.11.2026.01.22.03.30.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jan 2026 03:30:16 -0800 (PST)
+Message-ID: <58fe1908-48de-4bca-ad4e-4976d24581e6@gmail.com>
+Date: Thu, 22 Jan 2026 13:30:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXH0TZU7UNowTmwc@willie-the-truck>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/3] tls: Add TLS 1.3 hardware offload support
+To: Rishikesh Jethwani <rjethwani@purestorage.com>, netdev@vger.kernel.org
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com,
+ borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+ sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, leon@kernel.org
+References: <20260121215727.3994324-1-rjethwani@purestorage.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260121215727.3994324-1-rjethwani@purestorage.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
-	TAGGED_FROM(0.00)[bounces-252304-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	TAGGED_FROM(0.00)[bounces-252305-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,localhost.localdomain:mid]
-X-Rspamd-Queue-Id: 3768B668AC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 34AD66668D
 X-Rspamd-Action: no action
 
-Le Thu, Jan 22, 2026 at 09:56:29AM +0000, Will Deacon a écrit :
-> On Wed, Jan 21, 2026 at 06:06:07PM +0100, Frederic Weisbecker wrote:
-> > Le Tue, Jan 20, 2026 at 03:15:14PM +0000, Will Deacon a écrit :
-> > > Hi Frederic,
-> > > 
-> > > On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
-> > > > When none of the allowed CPUs of a task are online, it gets migrated
-> > > > to the fallback cpumask which is all the non nohz_full CPUs.
-> > > > 
-> > > > However just like nohz_full CPUs, domain isolated CPUs don't want to be
-> > > > disturbed by tasks that have lost their CPU affinities.
-> > > > 
-> > > > And since nohz_full rely on domain isolation to work correctly, the
-> > > > housekeeping mask of domain isolated CPUs should always be a superset of
-> > > > the housekeeping mask of nohz_full CPUs (there can be CPUs that are
-> > > > domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
-> > > > CPUs that are not domain isolated):
-> > > > 
-> > > > 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
-> > > > 
-> > > > Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
-> > > > tasks and since this cpumask can be modified at runtime, make sure
-> > > > that 32 bits support CPUs on ARM64 mismatched systems are not isolated
-> > > > by cpusets.
-> > > > 
-> > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > > > Reviewed-by: Waiman Long <longman@redhat.com>
-> > > > ---
-> > > >  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
-> > > >  include/linux/cpu.h            |  4 ++++
-> > > >  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
-> > > >  3 files changed, 33 insertions(+), 6 deletions(-)
-> > > 
-> > > tbh, I'd also be fine just saying that isolation isn't reliable on these
-> > > systems and then you don't need to add the extra arch hook.
-> > 
-> > Hmm, I think I heard about nohz_full usage on arm64 but I'm not sure.
-> > And I usually expect isolcpus or cpuset isolated partitions to be even
-> > more broadly used, it's lighter isolation with less constraints.
-> > 
-> > Anyway you're probably right that we could remove isolation support here
-> > but I don't want to break any existing user.
+
+
+On 21/01/2026 23:57, Rishikesh Jethwani wrote:
+> Hi all,
 > 
-> fwiw, I think it's only some Android markets using the mismatched 32-bit
-> support and we're definitely not using nohz_full there.
+> This patch series adds TLS 1.3 support to the kernel TLS hardware offload
+> infrastructure, enabling hardware acceleration for TLS 1.3 connections
+> including KeyUpdate (rekey) support.
+> 
+> Background
+> ==========
+> Currently, the kernel TLS device offload only supports TLS 1.2. With
+> TLS 1.3 being the current standard and widely deployed, there is a
+> growing need to extend hardware offload support to TLS 1.3 connections.
+> 
+> TLS 1.3 differs from TLS 1.2 in its record format:
+> 
+>    TLS 1.2: [Header (5)] + [Explicit IV (8)] + [Ciphertext] + [Tag (16)]
+>    TLS 1.3: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
+> 
+> The key difference is that TLS 1.3 eliminates the explicit IV and
+> instead appends the content type byte to the plaintext before
+> encryption. This content type byte must be encrypted along with the
+> payload for proper authentication tag computation per RFC 8446.
+> 
+> Patch 1: TLS 1.3 hardware offload support
+> =========================================
+> Changes to tls_device.c, tls_device_fallback.c, and tls_main.c:
+> 
+> - Extended version validation to accept TLS_1_3_VERSION in both
+>    tls_set_device_offload() and tls_set_device_offload_rx()
+> - Modified tls_device_record_close() to append the content type
+>    byte before the authentication tag for TLS 1.3 records
+> - Modified tls_device_reencrypt() to use prot->prepend_size and
+>    prot->tag_size instead of hardcoded TLS 1.2 values
+> - Pre-populated dummy_page with all 256 byte values for memory
+>    allocation failure fallback path
+> - Updated tls_device_fallback.c to handle TLS 1.3 IV construction
+>    (XOR with sequence number) and version-specific AAD sizes
+> - Rekey handling: HW offload key update (rekey) is not yet supported.
+> 
+> Patch 2: Hardware offload key update support
+> ============================================
+> Changes to include/net/tls.h, net/tls/tls.h, tls_device.c, tls_main.c,
+> and tls_sw.c:
+> 
+> - Extended tls_set_device_offload() and tls_set_device_offload_rx()
+>    with new_crypto_info parameter for key updates
+> - During rekey, the old HW context is deleted (tls_dev_del) and a new
+>    one is added (tls_dev_add) with the updated key material
+> - Graceful degradation: if HW key update fails, the connection
+>    gracefully degrades to software:
+>    * TX: TLS_TX_DEV_CLOSED is set and sk_validate_xmit_skb switches to
+>      tls_validate_xmit_skb_sw for software encryption
+>    * RX: TLS_RX_DEV_DEGRADED and TLS_RX_DEV_CLOSED are set for software
+>      decryption
+>    * In both cases, tx_conf/rx_conf remains TLS_HW
+> - Record sequence management: during TX rekey, old pending records are
+>    deleted and unacked_record_sn is reset to the new rec_seq
+> - Split tls_set_sw_offload() into tls_sw_ctx_init() and
+>    tls_sw_ctx_finalize() to allow the HW offload RX path to
+>    initialize SW context first, attempt HW setup, then
+>    finalize (memzero new_crypto_info, call tls_finish_key_update)
+> - Added TLS_TX_DEV_CLOSED flag to track TX hardware context state,
+>    to avoid double tls_dev_del call, symmetric with existing
+>    TLS_RX_DEV_CLOSED.
+> 
+> Patch 3: mlx5 driver enablement
+> ===============================
+> - TLS 1.3 version detection and validation with proper capability checking
+> - TLS 1.3 crypto context configuration using MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3
+> - Correct IV handling for TLS 1.3 (12-byte IV vs TLS 1.2's 4-byte salt)
+> - Hardware offload for both TLS 1.3 AES-GCM-128 and AES-GCM-256
+> 
+> Testing
+> =======
+> Tested on Mellanox ConnectX-6 Dx (Crypto Enabled).
+> 
+> Both TX and RX hardware offload verified working with:
+> - TLS 1.3 AES-GCM-128
+> - TLS 1.3 AES-GCM-256
+> - Multiple KeyUpdate cycles (rekey)
+> 
+> Test methodology: ktls_test : https://github.com/insanum/ktls_test/tree/master
+> 
+> Please review and provide feedback.
+> 
 
-Now that removal becomes appealing. And what about isolcpus= / isolated cpuset
-which only consist in scheduler domain isolation? Probably not used by android
-either.
+Hi Rishikesh,
 
-Ok but is there a way to detect on early boot that the system has mismatched
-32 bits support? Because I need to fail nohz_full= and isolcpus= boot parameters
-early on top of this information without waiting for secondary CPUs boot.
+This version doesn't compile for us.
+A few comments that we wanted to share on V3, but I'll share here as 
+this is the latest:
 
-Thanks.
+We tested V3 and a few issues were spotted.
+We did not debug them though...
 
--- 
-Frederic Weisbecker
-SUSE Labs
+We run a server/client test with nginx and wrk.
+
+a.
+When requesting 128-bit key, ss output shows "cipher: aes-gcm-256" for 
+the respective connection.
+For TLS 1.2 it works fine.
+
+b.
+On the wrk side, the mlx5 rx_tls_ctx did not increase (meaning no 
+offloaded connections were opened). It works fine on the nginx side 
+however...
+For TLS 1.2 it works fine.
+
+We can share more info if needed.
+
+Regards,
+Tariq
+
+> Thanks,
+> Rishikesh
+> 
+> v4:
+>    - Split single TLS patch into two separate patches:
+>      * Patch 1: TLS 1.3 basic HW offload support
+>      * Patch 2: HW offload key update (rekey) support with graceful degradation
+>    - Removed record_type check from tls_device_record_close()
+>    - Removed Broadcom bnxt_en out-of-tree driver mention
+>    - Link to v3: https://lore.kernel.org/netdev/20260102184708.24618-1-rjethwani@purestorage.com/
+> 
+> v3:
+>    - Added note about Broadcom bnxt_en out-of-tree driver used for testing
+>    - Link to v2: https://lore.kernel.org/netdev/20251231192322.3791912-1-rjethwani@purestorage.com/
+> 
+> v2:
+>    - Fixed reverse Christmas tree ordering in variable declarations
+>    - Combined 'err' and 'i' declarations (reviewer feedback)
+>    - Link to v1: https://lore.kernel.org/netdev/20251230224137.3600355-1-rjethwani@purestorage.com/
+> 
+> Rishikesh Jethwani (3):
+>    tls: add TLS 1.3 hardware offload support
+>    tls: add hardware offload key update support
+>    mlx5: TLS 1.3 hardware offload support
+> 
+>   .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+>   .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+>   include/net/tls.h                             |   4 +
+>   net/tls/tls.h                                 |  14 +-
+>   net/tls/tls_device.c                          | 319 +++++++++++++-----
+>   net/tls/tls_device_fallback.c                 |  34 +-
+>   net/tls/tls_main.c                            |  31 +-
+>   net/tls/tls_sw.c                              |  77 +++--
+>   8 files changed, 379 insertions(+), 122 deletions(-)
+> 
+
 
