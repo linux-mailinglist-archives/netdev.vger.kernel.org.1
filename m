@@ -1,221 +1,187 @@
-Return-Path: <netdev+bounces-252303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGK9J64VcmksawAAu9opvQ
-	(envelope-from <netdev+bounces-252303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:18:54 +0100
+	id mNtAHhMWcmksawAAu9opvQ
+	(envelope-from <netdev+bounces-252304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:20:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103026685B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:18:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3768B668AC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 13:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E744E5E82C8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:30:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B8541725B0A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 11:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19A53D2FE6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA350407560;
 	Thu, 22 Jan 2026 11:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9Domf+z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hntVHlxv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF252DD60E
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 11:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10D338B7DB;
+	Thu, 22 Jan 2026 11:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769081360; cv=none; b=sCjJagbpjnFFOAZuII2v6cAQSX/x0ZXL6JkXepIoIjaSTsBlGyU/FB5dg8d8JPBZgDWidLq0n8lFVWrIOVOO/FhAHBpcekp/bGUhw8fK6yG46gMUCBx2lFs3cZ6wL2GFIsrmWnP7Etcz8ND4P6yI2LHjmJM0QMgHyT5U0AwBIrQ=
+	t=1769081360; cv=none; b=mw2El3BDgpzay2O2o+mYTcfAPhXFy9fjHfwIoP+cg9nY5eXckIFzRv9wQxzUOr3JduWxdle0s3EKFev6yUiuVctwKZ611fZ7WImQ5/HhwBUPEmyEq/3gsD1w0SXztXfWx6GgpHgZ1Awjtko8sLk353Me3Qi0A53iGmDF4hGSBJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769081360; c=relaxed/simple;
-	bh=Pa6NJHGR/Ca+AdnYMkYiHJqxxWBxkO2aE6kM3LFtYOc=;
+	bh=WiogiOmlVrEBDmxiYq5jKojVlIXsrZ6n9wcQdU9VhMk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o8MtA8tZDCiFsPmjhdcSNJsyLQ7MBCAbZC0g/yMfadFP89E6ZCHn4UA9u36CM2WpMpMvgIWcVjSv1llzWvQ34kZn0rMe8Z6EoZVHEV8wabjV+sQVkWZpGYRVUmh4upqNlX19fXfNSafLKy2mAEQTbWP9hzn3O0ozdpR6ek4ggrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9Domf+z; arc=none smtp.client-ip=209.85.221.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-430f38c7d4eso120498f8f.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 03:29:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769081357; x=1769686157; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w719Adxu/spsT1aehDZuiWXX85fwgBdKYmTk1wyv4mk=;
-        b=h9Domf+zVIBdcbOcrhkOtJDj1PjHEpulnUdQWUnHLNLqDybQqJu+wkEBCd7dIj88Es
-         dADLs9GTuoFBhtMcWYxajYsk+2jau6rD7oiy28jXiMVLMH1TcZlR4vnJzhnA2c4KsLjI
-         vhITAdDQ1g4jIBDdkY3Xs+Rslf57+2Ub9b6kSIIx/tqpnh6hEO5seBpFHNfVQyC2ywQO
-         M0zxgl4Cbbv+mZARPbZi93BUqQcNaoOY5u13flm//pwA5M3Z0oEg4zfDr0Dyw3N9XnR6
-         JsobfN1o9m7nlwyJ2V5iobK71TCibtNtbo1qVz0BBch9LgA+5qi0o9bJ/TnNeXDl0sI+
-         Mpfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769081357; x=1769686157;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w719Adxu/spsT1aehDZuiWXX85fwgBdKYmTk1wyv4mk=;
-        b=Ljf0puszATuwvFf8IgcHLoG1DqhCPR3HtlJ219cSw0/aETa3Q3axFDux+YCVOda2XY
-         NOwoJsRSXZXmMOMgF6pY9cBmArIAv0YXwD/kdP7xE17ucZC93Vyw0pKrf92+zm/YcwUp
-         QyeNsbD5W1s7n+809VwUwSVbo1b+Y8kwjQJ2LPIBQywBLUwuF+4H2zuqNisMINT4jyd+
-         V1JPQEsfnlsthJLtqMiP93ySjoz20EcubZvNynqgNRJcbbKPNGpAgqnCKEBW+7y4/wI7
-         lX1YbZihEp/lk1Lc33Hll/OnrhgcDtXaP4mQufKgpfVG//WbhHuRfREFlHnwlUVsfcQI
-         0RwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0KPYXke+WRa4sgbQTrKd0yXvydjpsM9seX0jT3X1wkHb2vKbaGOVTdVvi2sHcbgKKt/tbWEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy67Z36cryzpPcaY1HUJTCwb87GsSWix5thQz95MxfMhHGlck07
-	H3+Xc7eJ9RpkryQPmhACHqiPCdJnXHoa+ztyVtDTx9YySOsSXk6lOlbc
-X-Gm-Gg: AZuq6aKCUK9Gqp9EC1RniKMATuxsCyjJ1WD+kw0mVNF2SzPSLK2HBhci6EhNTOk6985
-	+GzSK0kQR6nXO6HizAAx6uc3rOkIB6lh4K02W/rF98Ywu4RLqgQ23vap+gT2QhAw5dYRFE5rmzy
-	/QiHN1evwiAyvTAyUi+6Sq2BvXxmrNRn4jna20eCSgdNg9A9Y9XZpPtiPFXLg9R3ZIl0wNxuLym
-	DpY2PM2SJlpOVI+VwAbxh8IXvgE0YCUnlovxrsXLzsG2UiolEgXvwzYVvHGLdptc8LQZ92FS/NT
-	Y7tQCuaV+FQPFqb/S9CSxrnsiWARb8F07xsmh00pE9tEx4VHtU7cfsDcsh9hhYJR9zHFR7M9Gul
-	Cwfn/wkxz+Ejdu5pM6/M188q/6zH43wK79jZrfkevs1v5rUHenisuixjl7wyhgnQo+MHCeW0ztt
-	b94jU=
-X-Received: by 2002:a5d:5f83:0:b0:429:bde0:1da8 with SMTP id ffacd0b85a97d-43569bdaa4amr18327128f8f.7.1769081356806;
-        Thu, 22 Jan 2026 03:29:16 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:7677:83bc:43db:13ae])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cf58sm44986696f8f.22.2026.01.22.03.29.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 03:29:16 -0800 (PST)
-Date: Thu, 22 Jan 2026 13:29:13 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-phy@lists.infradead.org,
-	davem@davemloft.net, maxime.chevallier@bootlin.com,
-	alexandre.torgue@foss.st.com, mohd.anwar@oss.qualcomm.com,
-	neil.armstrong@linaro.org, hkallweit1@gmail.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	edumazet@google.com, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vkoul@kernel.org,
-	andrew@lunn.ch, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next,05/14] net: stmmac: add stmmac core serdes support
-Message-ID: <20260122112913.svzaie4eywk5nc32@skbuf>
-References: <E1vhoSH-00000005H1f-2cq9@rmk-PC.armlinux.org.uk>
- <20260119192125.1245102-1-kuba@kernel.org>
- <aW8M9ZiiftGBQIRM@shell.armlinux.org.uk>
- <20260120081844.7e6aq2urhxrylywi@skbuf>
- <aW9VHt6meEJFxV0I@shell.armlinux.org.uk>
- <20260120121114.2aedgu42i2wax3yp@skbuf>
- <aXDm0jVOYOZ9l6Wu@shell.armlinux.org.uk>
- <20260121162345.4jpzvwqhfqxd7tl7@skbuf>
- <aXEN6B5_T9uFzVvu@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OPgrPlq5QZpjrv9139Z3RQV2z/BUJarWMgpUK2SCK9gy7iqxbVpFGEtWqYgMcsPeYB3v7GT+K2NsRR05dbX0pbK3h7IZh3oesYdazyiY/fDVNx3Ndy2RteVJCQKruEaBBR4Hxi/5VCc/VEjdFBCe6npYN8TzIFgQJ2Phs1/fo4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hntVHlxv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEAA5C116C6;
+	Thu, 22 Jan 2026 11:29:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769081360;
+	bh=WiogiOmlVrEBDmxiYq5jKojVlIXsrZ6n9wcQdU9VhMk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hntVHlxvRLtZcEpsFecgcuy2/WeJl9lYH2mWE9f8dZGjyucvG1zCLlgF1anVNM8Mq
+	 ATZwc6IftbgZO2kJLtftNKhMvBjvPvqfUNlH6JrZwPiiiEXtxPJi1HRA+GVlhwH0Xl
+	 7jI4hCzwdhtpWuORobWzm0YF5J1jsS7gh1CwOGDB5EOeJZKzxHCuCd4SkLrzE/tlGq
+	 JVFBs8UA8NYTjNB18RHp1AShNa5zdE3qLITZrz7qt2dsO/+/eP32L9P7IpEILF4h3H
+	 3+SL3O++ddzf33ljYPKdsDd6l1rT8hde2RP+XyHB6xkPeaAyuWp9p0Q+aK9fItrNc6
+	 XJd/YpjN6/DQQ==
+Date: Thu, 22 Jan 2026 12:29:17 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
+ HK_TYPE_DOMAIN
+Message-ID: <aXIKDduX5qUXvOUX@localhost.localdomain>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-30-frederic@kernel.org>
+ <aW-cAlJCtI5Qtify@willie-the-truck>
+ <aXEHf5nbZMI8LT4b@localhost.localdomain>
+ <aXH0TZU7UNowTmwc@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <aXEN6B5_T9uFzVvu@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXH0TZU7UNowTmwc@willie-the-truck>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252303-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-252304-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,lists.infradead.org,davemloft.net,bootlin.com,foss.st.com,oss.qualcomm.com,linaro.org,gmail.com,vger.kernel.org,google.com,lunn.ch,redhat.com,st-md-mailman.stormreply.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 103026685B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,localhost.localdomain:mid]
+X-Rspamd-Queue-Id: 3768B668AC
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 05:33:28PM +0000, Russell King (Oracle) wrote:
-> On Wed, Jan 21, 2026 at 06:23:45PM +0200, Vladimir Oltean wrote:
-> > On Wed, Jan 21, 2026 at 02:46:42PM +0000, Russell King (Oracle) wrote:
-> > > On Tue, Jan 20, 2026 at 02:11:14PM +0200, Vladimir Oltean wrote:
-> > > > On Tue, Jan 20, 2026 at 10:12:46AM +0000, Russell King (Oracle) wrote:
-> > > > > First, I'll say I'm on a very short fuse today; no dinner last night,
-> > > > > at the hospital up until 5:30am, and a fucking cold caller rang the door
-> > > > > bell at 10am this morning. Just fucking our luck.
+Le Thu, Jan 22, 2026 at 09:56:29AM +0000, Will Deacon a écrit :
+> On Wed, Jan 21, 2026 at 06:06:07PM +0100, Frederic Weisbecker wrote:
+> > Le Tue, Jan 20, 2026 at 03:15:14PM +0000, Will Deacon a écrit :
+> > > Hi Frederic,
+> > > 
+> > > On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
+> > > > When none of the allowed CPUs of a task are online, it gets migrated
+> > > > to the fallback cpumask which is all the non nohz_full CPUs.
 > > > > 
-> > > > Sorry to hear that.
+> > > > However just like nohz_full CPUs, domain isolated CPUs don't want to be
+> > > > disturbed by tasks that have lost their CPU affinities.
 > > > > 
-> > > > > On Tue, Jan 20, 2026 at 10:18:44AM +0200, Vladimir Oltean wrote:
-> > > > > > Isn't it sufficient to set pl->pcs to NULL when pcs_enable() fails and
-> > > > > > after calling pcs_disable(), though?
-> > > > >
-> > > > > No. We've already called mac_prepare(), pcs_pre_config(),
-> > > > > pcs_post_config() by this time, we're past the point of being able to
-> > > > > unwind.
+> > > > And since nohz_full rely on domain isolation to work correctly, the
+> > > > housekeeping mask of domain isolated CPUs should always be a superset of
+> > > > the housekeeping mask of nohz_full CPUs (there can be CPUs that are
+> > > > domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
+> > > > CPUs that are not domain isolated):
 > > > > 
-> > > > I'm set out to resolve a much smaller problem.
+> > > > 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
 > > > > 
-> > > > Calling it a full "unwind" is perhaps a bit much, because pcs_pre_config()
-> > > > and pcs_post_config() don't have unwinding equivalents, unlike how
-> > > > pcs_enable() has pcs_disable(). I don't see what API convention would be
-> > > > violated if phylink decided to drop a PCS whose enable() returned an error.
+> > > > Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
+> > > > tasks and since this cpumask can be modified at runtime, make sure
+> > > > that 32 bits support CPUs on ARM64 mismatched systems are not isolated
+> > > > by cpusets.
+> > > > 
+> > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > > Reviewed-by: Waiman Long <longman@redhat.com>
+> > > > ---
+> > > >  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
+> > > >  include/linux/cpu.h            |  4 ++++
+> > > >  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
+> > > >  3 files changed, 33 insertions(+), 6 deletions(-)
 > > > 
-> > > While pcs_pre_config() and pcs_post_config() do not have unwinding
-> > > equivalents (what would they be?) the issue here is that these could
-> > > have changed any state that isn't simply undone by calling
-> > > pcs_disable().
-> > > 
-> > > For example, pcs_pre_config() could have reprogrammed signal routing,
-> > > clocking, or power supplies to blocks.
-> > > 
-> > > This already applies to Marvell DSA pcs-639x.c, where the pre/post
-> > > config hooks change the power state of the PCS block (for errata
-> > > handling), and the only way that gets undone is via a call to
-> > > pcs_disable() which explicitly disables IRQs and power for the PCS. Its
-> > > pcs_disable() isn't a strict reversal of pcs_enable(), it does more.
-> > > 
-> > > We already declare the interface to be dead on pcs_post_config()
-> > > failure, but we don't do that for pcs_enable() failure.
-> > > 
-> > > Maybe I need to explicitly state that pcs_disable() does not directly
-> > > balance pcs_enable(), but that _and_ the effects of pcs_pre_config()
-> > > and pcs_post_config(). However, that itself will add to the problems.
-> > > What if pcs_pre_config() and pcs_post_config() succeed but not
-> > > pcs_enable()? pcs-639x needs pcs_disable() to be called, but if we
-> > > require pcs_disable() to be balanced with a successful call to
-> > > pcs_enable(), that messes up that driver, and pretty much makes it
-> > > impossible to work around the errata.
+> > > tbh, I'd also be fine just saying that isolation isn't reliable on these
+> > > systems and then you don't need to add the extra arch hook.
 > > 
-> > What if we reordered phylink_major_config() such that phylink_pcs_enable()
-> > comes first, followed by phylink_pcs_pre_config() -> phylink_mac_config() ->
-> > phylink_pcs_post_config()? Superficially looking at pcs-639x, I don't
-> > think it would break.
+> > Hmm, I think I heard about nohz_full usage on arm64 but I'm not sure.
+> > And I usually expect isolcpus or cpuset isolated partitions to be even
+> > more broadly used, it's lighter isolation with less constraints.
+> > 
+> > Anyway you're probably right that we could remove isolation support here
+> > but I don't want to break any existing user.
 > 
-> I'm sorry, but I don't have time to continue this discussion today. I
-> woke late, we're trying to cram in the meals (in the middle of delayed
-> lunch-time dinner right now), work wants a quick call to discuss a
-> project that I missed the meeting for yesterday (which I haven't yet
-> had time for...)
-> 
-> Sorry, but while you may wish to get this sorted, for me this is a very
-> low priority issue that can be addressed later. Don't think I will have
-> time to review anything you send - and that's not a personal attack,
-> it's because I'm barely managing to hold everything together at my
-> end, and I don't have the time.
+> fwiw, I think it's only some Android markets using the mismatched 32-bit
+> support and we're definitely not using nohz_full there.
 
-Thanks, this was a good talk, I understood a bit more about the
-challenges that need to be overcome. I'll do some testing on the
-Turris MOX with a 6390 switch. From my side this shouldn't block the
-stmmac integrated PCS from being integrated with the SerDes, but I do
-agree that leaving a comment explaining the current phylink_pcs calling
-convention, as Jakub requested, would be very useful.
+Now that removal becomes appealing. And what about isolcpus= / isolated cpuset
+which only consist in scheduler domain isolation? Probably not used by android
+either.
+
+Ok but is there a way to detect on early boot that the system has mismatched
+32 bits support? Because I need to fail nohz_full= and isolcpus= boot parameters
+early on top of this information without waiting for secondary CPUs boot.
+
+Thanks.
+
+-- 
+Frederic Weisbecker
+SUSE Labs
 
