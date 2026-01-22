@@ -1,69 +1,74 @@
-Return-Path: <netdev+bounces-252333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252334-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4M3yMa4ocmmadwAAu9opvQ
-	(envelope-from <netdev+bounces-252333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:39:58 +0100
+	id KBGoI1IicmmPdQAAu9opvQ
+	(envelope-from <netdev+bounces-252334-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:12:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C2F6768A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:39:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1501671F2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 832F17640E3
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:22:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2A824943CB4
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80563A1CE4;
-	Thu, 22 Jan 2026 12:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C87436378;
+	Thu, 22 Jan 2026 12:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vLBDx/d+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n/2nK+gA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953EF3502A4;
-	Thu, 22 Jan 2026 12:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE4837C0E9;
+	Thu, 22 Jan 2026 12:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769084207; cv=none; b=RQAp9PsoyVt7PaiuJ0eOSPidzRQ8VuzexathBkMfkCcM4TPOFcwHnl5Y1oujw2MgooOfi9j2AFSUFGjxGSyHKNa9+N9xoWNlWT0cio98I7mG/4EiDfcgjc1oRtsw4CGUfKNzqqMxyBe2fMpFhVJpX9wL5eeWSU9lYPyowC6GmOw=
+	t=1769084431; cv=none; b=KlMKR5joqgu1aSjr5Yn/UhGzQ+9/edADBKgdDyE22Os423hr07anSpl598tdQ9E3d1O4NMDICv17Js/HsbVWO9Pv09z4M5wdCnmnXIHPvuHpb4z/ziNH0oyLXl/UFK35r5TKt45hn7aoR2oGuMOea/YaTVNpxfEA7Gx8Ru4benA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769084207; c=relaxed/simple;
-	bh=WlyWSnfhnpblwx8zZtPl0q2t1AoQiYXkVgcJVu7xWf0=;
+	s=arc-20240116; t=1769084431; c=relaxed/simple;
+	bh=yz6FOb3lnDARnNOGEJctM9K6WyoQbGOoJ6ZUxNZ6L5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ay047HD83O9vzReRuXuerd/w8P/4JJjEONWOioTzsZX082r6FQQCrN/GfMwv/RbPxA1uaKy0VmrUCECxk66hhhHVvGUUE9qjewaQrvMGH8rjnar3Y29k7xwi+skrblYTPK9SiZZTi1jJLlvvnfnB8jcQ5KYlk2eI6/zBgvjua8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vLBDx/d+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uMyl9WGk6TsY212/ra2FFtO0bjOpRMAh9yfL2NWSmWg=; b=vLBDx/d+BCtqQLvGgiBsiwW+Ys
-	8zITTruozts32Bd8p6KmbY1Pc+CnvJfE2mTMQKYUlLAx8b+/XutQIcsdJRUfc57ZmjfY6CZlruuDO
-	6crdcH6Z4mUzfF6F16QHZD+eZVcuIz+5uEYkw95t2+b8UvfPC/gfHKoo+dnrH3PwsYlldvj6ID8Va
-	Fhebw5Qog7tEaWypFg0g9LIOghw/lhM+kkQfKjTjKhzZy9CTx8PcYjBbdAlAW9YJT/8Iir6juAh3Z
-	EMBpfTe4gqBBJNqWxIe3XxI/unO4lrRsp6myT4s+DMCmrv2WC2FUU5FJTcddlxVA8yxjE/yQZYbIg
-	0157pl8Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48708)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vitc9-000000000Lu-0vFv;
-	Thu, 22 Jan 2026 12:16:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vitc3-000000000zk-2nOX;
-	Thu, 22 Jan 2026 12:16:35 +0000
-Date: Thu, 22 Jan 2026 12:16:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=goZem5LgBz5r5MgevxuL5zEduSmhwezcZ4z5X9i7GT0ZcQtxRU/QD3WrPlxbOy2yBAP1poVOGWjkNnsf0BPSlI1JV4MLIyX+lEYXgaSyM6+wB/GorHvMnWiNn1K/Uhd0cW9pTkXc6Yh0InqlrGgPUKDIEQ9qAgqEBJ1d570eoho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n/2nK+gA; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769084429; x=1800620429;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yz6FOb3lnDARnNOGEJctM9K6WyoQbGOoJ6ZUxNZ6L5s=;
+  b=n/2nK+gAfyl0PZJf6xMEvyIaprO+3V5hOQXHzNS3rdU+PDn/gjUy849B
+   N6xHr67/HPLZ6eylG6JIdIyLbABAtQO8yBn5XaaxaSD/STooz177BPLs/
+   Huq7swhsFd3KZ6pkgAnKjbSop7MasYCZxAJjcIJj0hgsWg411zxLx+uUl
+   kA4kRmsGR05C+tnQvE3pRx04/2tLjnUmifbOwsG9oJfVHkUUCAaEymm8g
+   g3F+amHv5lzfUp/O0hQX9ISVp2rDugeK8+lIzV2tGtWhawRRl7tEpFCYe
+   CSPyBjAXRg3zk0UqgD96TVRG7+uTpG15/7sUQEdlMcicpZnUFjU5+xLtL
+   w==;
+X-CSE-ConnectionGUID: 4e/Y1aEIS2yLlDTXH9Xmlw==
+X-CSE-MsgGUID: W4vQ4q7nQ96gMgS0+XJUQw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="74177784"
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="74177784"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 04:20:29 -0800
+X-CSE-ConnectionGUID: WmjDF6CIQX654NEDE0gy/w==
+X-CSE-MsgGUID: 7OSp1yG4St60iyih1dlMig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="206623316"
+Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.225])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 04:20:24 -0800
+Date: Thu, 22 Jan 2026 14:20:22 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -77,13 +82,11 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
 	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with
- non-MMIO regmaps
-Message-ID: <aXIVIw2SKsMfNVUm@shell.armlinux.org.uk>
+Subject: Re: [PATCH v2 net-next 03/15] net: mdio: add generic driver for NXP
+ SJA1110 100BASE-TX embedded PHYs
+Message-ID: <aXIWBpIvp7KZYZCn@smile.fi.intel.com>
 References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
- <20260122105654.105600-2-vladimir.oltean@nxp.com>
- <aXISv3Acm1v6yS4V@smile.fi.intel.com>
- <20260122121301.cyxyevi7xvqw2axk@skbuf>
+ <20260122105654.105600-4-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,74 +95,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260122121301.cyxyevi7xvqw2axk@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20260122105654.105600-4-vladimir.oltean@nxp.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : No valid SPF,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.intel.com,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,trustnetic.com];
-	TAGGED_FROM(0.00)[bounces-252333-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,linux.intel.com,trustnetic.com];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
+	TAGGED_FROM(0.00)[bounces-252334-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[21];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 52C2F6768A
+	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[smile.fi.intel.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,intel.com:dkim,config.name:url]
+X-Rspamd-Queue-Id: F1501671F2
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 02:13:01PM +0200, Vladimir Oltean wrote:
-> On Thu, Jan 22, 2026 at 02:06:23PM +0200, Andy Shevchenko wrote:
-> > > Cc: Mark Brown <broonie@kernel.org>
-> > > Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > 
-> > FWIW, Cc list may be located after --- line. It will have the same effect on
-> > emails (as regular tooling will parse and put them into email headers), but
-> > will reduce unneeded noise in the commit message. List will be still available
-> > on lore.kernel.org in the mail archives.
+On Thu, Jan 22, 2026 at 12:56:42PM +0200, Vladimir Oltean wrote:
+> This is the standalone variant of drivers/net/dsa/sja1105/sja1105_mdio.c.
+> Same kind of differences between this driver and the embedded DSA one
+> apply: regmap is being used for register access, and addresses are
+> multiplied by 4 with regmap.
 > 
-> Thanks for the comment. I know it may be located after ---, but for me,
-> doing that implies an extra step which I find unnecessary (moving them
-> there after the git format-patch stage). I keep the Cc: in the commit
-> message in git so that it's preserved across revisions.
+> In fact this is so generic that there is nothing NXP SJA1110 specific
+> about it at all, and just instantiates mdio-regmap. I decided to name it
+> mdio-regmap-simple.c in the style of drivers/mfd/simple-mfd-i2c.c which
+> has support for various vendor compatible strings.
 
-What I do with my individual patch versioning is in the editor, after
-my sign-off, add the "---" and put the version changes below. This means
-git format-patch will do what it normally does, and as the commit
-message is reproduced verbatum, you get all that included too.
+...
 
-You do get an extra "---" line between the versioning changes and the
-diffstat, but that's fine.
+> +#include <linux/module.h>
+> +#include <linux/of_mdio.h>
+> +#include <linux/phy.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/regmap.h>
+> +#include <linux/mdio/mdio-regmap.h>
 
-So in the commit message:
+...
 
-Signed-off-by: ...
----
-Cc: ...
+> +static const struct mdio_regmap_simple_data nxp_sja1110_base_tx = {
+> +	.valid_addr = 0,
+> +	.autoscan = false,
+> +};
 
-Changes v2:
- ...
+Actually the  { } is enough to initialise that. But if you want to be super
+explicit... :-)
 
-will work fine.
+...
+
+> +static int mdio_regmap_simple_probe(struct platform_device *pdev)
+> +{
+> +	const struct mdio_regmap_simple_data *data;
+> +	struct mdio_regmap_config config = {};
+> +	struct device *dev = &pdev->dev;
+> +	struct regmap *regmap;
+> +	struct mii_bus *bus;
+> +
+> +	if (!dev->of_node || !dev->parent)
+
+dev->of_node check is not needed, see below.
+
+> +		return -ENODEV;
+> +
+> +	regmap = dev_get_regmap(dev->parent, NULL);
+> +	if (!regmap)
+> +		return -ENODEV;
+> +
+> +	data = device_get_match_data(dev);
+> +
+> +	config.regmap = regmap;
+> +	config.parent = dev;
+> +	config.name = dev_name(dev);
+> +	/* The resource is optional, provided for finding the registers
+> +	 * within a device-wide non-MMIO regmap
+> +	 */
+> +	config.resource = platform_get_resource(pdev, IORESOURCE_REG, 0);
+
+> +	if (data) {
+
+We may always require data to be present. As you use a default one anyway.
+
+> +		config.valid_addr = data->valid_addr;
+> +		config.autoscan = data->autoscan;
+> +	}
+
+And if it is not provided we will have a crash which is fine. It will just
+point that the code was not ever been run on real HW.
+
+> +	return PTR_ERR_OR_ZERO(devm_mdio_regmap_register(dev, &config));
+> +}
+
+...
+
+> +static struct platform_driver mdio_regmap_simple_driver = {
+> +	.probe = mdio_regmap_simple_probe,
+> +	.driver = {
+> +		.name = "mdio-regmap-simple",
+> +		.of_match_table = mdio_regmap_simple_match,
+> +	},
+> +};
+
+> +
+
+Unneeded blank line.
+
+> +module_platform_driver(mdio_regmap_simple_driver);
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+With Best Regards,
+Andy Shevchenko
+
+
 
