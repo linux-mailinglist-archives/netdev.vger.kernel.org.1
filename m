@@ -1,153 +1,196 @@
-Return-Path: <netdev+bounces-252271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEpiHgoEcmmvZwAAu9opvQ
-	(envelope-from <netdev+bounces-252271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:03:38 +0100
+	id sEmGOaIDcmmvZwAAu9opvQ
+	(envelope-from <netdev+bounces-252272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:01:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 326C165ADA
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:03:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8516B65A6A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 12:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D78038A068D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:46:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8C84A88A676
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 10:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312BC40FD83;
-	Thu, 22 Jan 2026 10:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD4A43E488;
+	Thu, 22 Jan 2026 10:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QgE+nUe0"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="QZp3xUXa"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD373B530E;
-	Thu, 22 Jan 2026 10:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7B443C050;
+	Thu, 22 Jan 2026 10:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769078626; cv=none; b=mXDDpcD6Z2dqfmQzbiJWDcqDjXRnK+BUFRazDDjZeikQD7laQx6RQiohkQXXdZJgjuMmM6wLuypKAYMwjLTuauEjKsikIM/jalcOM2QQuK9mooVPwj+2b9ZM5SaIq1qEVBlsxGrcVdPMM81IOFbeTv3O0Tv4+AGmhfJJohZc/g4=
+	t=1769079027; cv=none; b=DLXebC9nnnnF7q2G5zJXs0tF6lFczfmJxS1ae50s/mJzbgPA0lHh1G2pAOD7KSGLwUskVhJa/pYq+Fjdj5SyLuNwqD/zbSAqMTXqp3Y1XknZmK/ADN9SwuyDjDPXSi6bEEtlOGhxrtSC1FOASI44fgEqcr2UwZhg5vPrUgZjhng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769078626; c=relaxed/simple;
-	bh=alEohrBI/JLEbgcJb8e7wpbjle6K9L0/dTLOnLOjFeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qcuZHUAS/gkqurtNM0yewW1aimYz8Vc4mncNnOKdjmkhuBBwq0GzetAg4fHLRrkgboLLwAsiM3o7UpLtdIpl4tN5jf9XTRqCsGdEs/acS92XqKHFrzzaXC5zBdPVtiwhJ/WhNLbUOTkvV48BMCdE7ZQrWuuuxEgBD9NtoYh6Rec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QgE+nUe0; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=d2Ewrz6BGF+e8gQ4RD39fk9r4aqYPqkL5w/aREtx874=; b=QgE+nUe0PaFMs+CYRo+UlQO+zG
-	HhJWWAoH2wuKWMOlxqs4VcBs0r2ujAwnn7/EgyPhkINNjutaGEJThdl5Sfrmk3/OnnUlvCAs696K1
-	INZVlbVUxNuTpW/el7Yk2FkWPtfqKmEQdB+CQ4lJVq0DvownGjduoxiwXomU4N4KRz+Rm9S7JS6vd
-	F+Mvp3XggKyQivsmwdoiLA1QFgs29wTHkgWMJsfYAyUCkwtRgoH3bw6xz3lhv1Kjf6oBYwBxiTHSa
-	KI6QqU/FngK7MqlrTPtPDSsRQl1qZwCsvSCi1osXc071CrTvxyCeUPni7hJUTHIEaqgSTtgZz941L
-	9X9Uh3gA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vis9q-00CxCu-Vq; Thu, 22 Jan 2026 10:43:23 +0000
-Date: Thu, 22 Jan 2026 02:43:16 -0800
-From: Breno Leitao <leitao@debian.org>
-To: "Creeley, Brett" <bcreeley@amd.com>
-Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
-	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, Somnath Kotur <somnath.kotur@broadcom.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Igor Russkikh <irusskikh@marvell.com>, 
-	Simon Horman <horms@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Long Li <longli@microsoft.com>, Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
-	Edward Cree <ecree.xilinx@gmail.com>, Brett Creeley <brett.creeley@amd.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
-	linux-net-drivers@amd.com
-Subject: Re: [PATCH net-next 2/9] net: atlantic: convert to use
- .get_rx_ring_count
-Message-ID: <aXH--MjkP03_aDkB@gmail.com>
-References: <20260121-grxring_big_v4-v1-0-07655be56bcf@debian.org>
- <20260121-grxring_big_v4-v1-2-07655be56bcf@debian.org>
- <4daf0901-20a6-4c9b-9b56-32efef24e5e5@amd.com>
+	s=arc-20240116; t=1769079027; c=relaxed/simple;
+	bh=MS9OKYTyTcB4St88J3kjOMxqr6qydLzq5+rFqUKIl1U=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q3IXW/x3Yb8GWHVPcPFIz8WYhCPFbOtYQ+KB6zMPtbPA5Qjfo7WrOVCXeUWxIUY3kjB+LeeFRkCwflh0x3MEYblRwBnR42I7/UKr6s9sTn2Hz+w75joc03Xv0cV1JRqHMbYSd9esPbO3gCuMDu6deJlSSdicbGDDjj+1JDGWqCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=QZp3xUXa; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 57B3420853;
+	Thu, 22 Jan 2026 11:50:18 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IkP7Erp8dMmt; Thu, 22 Jan 2026 11:50:17 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id B07E62019D;
+	Thu, 22 Jan 2026 11:50:17 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B07E62019D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1769079017;
+	bh=c1aSZu+8LTmz5cVQKNlhVszfW/irmSsHfvWOFd1abBM=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=QZp3xUXaWK3Zb1B4CaB6W2TydunP57z9zw/t+FdWVPsbEI/2bVGLEpqy+QDkBhV9c
+	 tYxOq33JbsY6oJXz19AN38rHoZM6K7UACiU2GXUA0rMywRd+wUofh0h93bAku+EVEk
+	 3YqRb/cGyKggKWHqmaJLWTk4ti3Y80Z+EZq9Iu4XST/zmVcKzMIh1M0wUq9DmpvImt
+	 YfPW4285sn0DPEdwB9j/+l+wdrtvBOowI4hzkYsz+Ng4t4t9C1Kx+ZeTQQfP6AoTu/
+	 pzHoOmdTKLaXYQ7L2OiKAurhGOdPwS1RlcmyL6rGrwOF4Hgu/DLPO+KiqaRq76SADl
+	 AAWy4vsD/cbBw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 22 Jan
+ 2026 11:50:17 +0100
+Received: (nullmailer pid 1680181 invoked by uid 1000);
+	Thu, 22 Jan 2026 10:50:16 -0000
+Date: Thu, 22 Jan 2026 11:50:16 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Antony Antony <antony.antony@secunet.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Chiachang Wang
+	<chiachangwang@google.com>, Yan Yan <evitayan@google.com>,
+	<devel@linux-ipsec.org>, Simon Horman <horms@kernel.org>, Paul Moore
+	<paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<selinux@vger.kernel.org>
+Subject: Re: [PATCH ipsec-next v4 5/5] xfrm: add XFRM_MSG_MIGRATE_STATE for
+ single SA migration
+Message-ID: <aXIA6JdfwK1CEMeX@secunet.com>
+References: <cover.1768811736.git.antony.antony@secunet.com>
+ <b134abaf18390d1bcdd59d2192687bac0e2c2710.1768811736.git.antony.antony@secunet.com>
+ <aXH9BvGTxfaGRN4j@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <4daf0901-20a6-4c9b-9b56-32efef24e5e5@amd.com>
-X-Debian-User: leitao
+In-Reply-To: <aXH9BvGTxfaGRN4j@secunet.com>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_CC(0.00)[gondor.apana.org.au,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-252272-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252271-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[secunet.com,none];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:mid,secunet.com:dkim,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,microsoft.com,fb.com,meta.com,gmail.com,amd.com,vger.kernel.org,corigine.com];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 326C165ADA
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 8516B65A6A
 X-Rspamd-Action: no action
 
-Hello Brett,
-
-On Wed, Jan 21, 2026 at 08:49:23AM -0800, Creeley, Brett wrote:
-> On 1/21/2026 7:54 AM, Breno Leitao wrote:
-> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> > 
-> > 
-> > Use the newly introduced .get_rx_ring_count ethtool ops callback instead
-> > of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >   drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c | 15 +++++++++------
-> >   1 file changed, 9 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> > index 6fef47ba0a59b..d8b5491c9cb2b 100644
-> > --- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> > +++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-> > @@ -500,20 +500,22 @@ static int aq_ethtool_set_rss(struct net_device *netdev,
-> >          return err;
-> >   }
-> > 
-> > +static u32 aq_ethtool_get_rx_ring_count(struct net_device *ndev)
+On Thu, Jan 22, 2026 at 11:33:42AM +0100, Steffen Klassert wrote:
+> On Mon, Jan 19, 2026 at 09:54:55AM +0100, Antony Antony wrote:
+> > +
+> > +static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
+> > +				 struct nlattr **attrs, struct netlink_ext_ack *extack)
 > > +{
-> > +       struct aq_nic_s *aq_nic = netdev_priv(ndev);
-> > +       struct aq_nic_cfg_s *cfg = aq_nic_get_cfg(aq_nic);
+> > +	int err = -ESRCH;
+> > +	struct xfrm_state *x;
+> > +	struct net *net = sock_net(skb->sk);
+> > +	struct xfrm_encap_tmpl *encap = NULL;
+> > +	struct xfrm_user_offload *xuo = NULL;
+> > +	struct xfrm_migrate m = { .old_saddr.a4 = 0,};
+> > +	struct xfrm_user_migrate_state *um = nlmsg_data(nlh);
 > > +
-> > +       return cfg->vecs;
-> > +}
+> > +	if (!um->id.spi) {
+> > +		NL_SET_ERR_MSG(extack, "Invalid SPI 0x0");
+> > +		return -EINVAL;
+> > +	}
 > > +
+> > +	err = copy_from_user_migrate_state(&m, um);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	x = xfrm_user_state_lookup(net, &um->id, attrs, &err);
+> > +
+> > +	if (x) {
+> > +		struct xfrm_state *xc;
+> > +
+> > +		if (!x->dir) {
+> > +			NL_SET_ERR_MSG(extack, "State direction is invalid");
+> > +			err = -EINVAL;
+> > +			goto error;
+> > +		}
+> > +
+> > +		if (attrs[XFRMA_ENCAP]) {
+> > +			encap = kmemdup(nla_data(attrs[XFRMA_ENCAP]),
+> > +					sizeof(*encap), GFP_KERNEL);
+> > +			if (!encap) {
+> > +				err = -ENOMEM;
+> > +				goto error;
+> > +			}
+> > +		}
+> > +		if (attrs[XFRMA_OFFLOAD_DEV]) {
+> > +			xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
+> > +				      sizeof(*xuo), GFP_KERNEL);
+> > +			if (!xuo) {
+> > +				err = -ENOMEM;
+> > +				goto error;
+> > +			}
+> > +		}
+> > +		xc = xfrm_state_migrate(x, &m, encap, net, xuo, extack);
+> > +		if (xc) {
+> > +			xfrm_state_delete(x);
 > 
-> Tiny nit, but RCT ordering is not maintained.
+> This xfrm_state_delete() comes too late. You need to synchronize this
+> with xfrm_state_clone_and_setup() by holding the state lock.
+> Otherwise we might hand out the same sequence number etc. more than
+> one time. Unfortunately xfrm_migrate() has the same problem, the
+> error recovery mechanism in xfrm_migrate() looks broken.
 
-Damn, I will re-spin. Thanks for catching it.
+The xfrm_migrate() problem is nasty, looks like we can't recover
+if the state migration fails. We probably have to delete the
+states and wait for the userspace to insert new ones.
 
---breno
---
-pw-bot: cr
+Another thing, xfrm_user_state_lookup() returns a reference on x,
+you should drop it somewhere.
+
 
