@@ -1,180 +1,185 @@
-Return-Path: <netdev+bounces-252497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252499-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJ+cNqpvcmlpkwAAu9opvQ
-	(envelope-from <netdev+bounces-252497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:42:50 +0100
+	id MIXjNLZwcmlpkwAAu9opvQ
+	(envelope-from <netdev+bounces-252499-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:47:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B55B6C9C0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:42:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 153696CA70
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 19:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09148301DEC9
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:42:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 314F63011842
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 18:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD3D37D11D;
-	Thu, 22 Jan 2026 18:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213F9385ED9;
+	Thu, 22 Jan 2026 18:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="MjVJRlKC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NQZowu+7"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D81385EDB;
-	Thu, 22 Jan 2026 18:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACD737D11D;
+	Thu, 22 Jan 2026 18:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769107318; cv=none; b=hxbARCQY/INwbihn+QYDktMae/cIRKktdXOe0zWmRo2GZ8Mf6BIU9/BXJTihfu/Dvv20rIy7FYVhYrBR+iwHB8LK9YrTGO2abTZ9yPE9q7ul5pkn+F3rXgs/OU1xXUNTE/+gCvJ8uRzPRCIR5GcTWRz+p3+w+B2eW1durt0bABU=
+	t=1769107358; cv=none; b=ZoY07XCAx1J1mqqbbN8MwYm2n3H/tGpQAIfiUm4Rxr9h8W1zKRSvv8t+Hp2b2dSruIL3NP6Nms6A1k2XqBz18TcnsmACLmeF4trmwdh2v1uQOcbTEJZTve/UArywsLkgGABIPDsGc7Kn6mfjZfKjaadW8ZIhF+mbDU8CDUmw+34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769107318; c=relaxed/simple;
-	bh=kqzS/7eXjKQG4xiemTDsmFZRs2ALv2BsjFw/ViIR5ug=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Qcyv3WEWcelBCu8NcI75g0Bdf0owZcRfaoI5o32NbI9cLrAqQrNd7LUesAxLKWXCiUhAp6Wdf5Gp8kAMkp/HmLxaqv0aeFrz1PRev04hA/AcHj9SIAMlQZ0KZTi7s69wEsInaK4P4YAY5i+wmbe6eVbcILMbJLqWQoDNUWsvoXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=MjVJRlKC; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=BvlsW4lqNl+1+09mnU3bYFr4itCF0ttr+C2yEDPsR5w=; b=MjVJRlKCGyZitSaGfubXNbCTR3
-	JQWhQS/Jh0GMybhRRgIm6m1Wu0Fz7CUvg/mhRi82OWRUNIxyLNKEMmtLOxS5bMaxliitPSZJgtK7y
-	DfzYT8idPV731aAGA/Hr8umsp0k3syVU3MSWhTk8YXXoN/OtA7leMGJ05vrBFRWo+lk+Wr+QXE4T2
-	tZAnUdXWjrGlar7zyyQrNgND3JUwMjybc8zRWq1lFC73BznNynj9CsQ4qq8d/n8S7bXjmRMq2qGZX
-	ZayB+D6jKt/Z8JjuOipgN2wXMSknQbLVlP9Qm59bot7C/Lh+SGsQ+BG+HYT2ufonsXtxDw4zoHVgJ
-	bYqw5Nbw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vizcd-00DE2u-5u; Thu, 22 Jan 2026 18:41:35 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 22 Jan 2026 10:40:21 -0800
-Subject: [PATCH net-next v2 9/9] net: sfc: falcon: convert to use
- .get_rx_ring_count
+	s=arc-20240116; t=1769107358; c=relaxed/simple;
+	bh=BN/pC1Tv6LR754wFtKBSqKF3/ANhaf9GJBQL5ftXzv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3wRWvhZJDtFodfuIfKZShgVu8SEWTlbk8Vg62hFt/U74AGa5UclgN4nZg/0WuDujHzJIUouizab2PrAlbKtqrAhnsBfNAShUbFvKDnwLcW39OlDbawEidFfbVbptENdlIciGA/WJavihKx/+6RdJ/cWGrR+o8fqEItTMm0CY6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NQZowu+7; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769107345; x=1800643345;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BN/pC1Tv6LR754wFtKBSqKF3/ANhaf9GJBQL5ftXzv4=;
+  b=NQZowu+7rQp/TFWvyJdGDrV71ngc9W7vWtkNv412VktHTizmT3wOlsuy
+   RjyOkq8g+WVCIlMg0JCfOhQdCbOsoAtaYSKdfn7S4ssA1m5yTjppQxVhr
+   LgmSuF+fB/Dz0FZZyxyuhR/7xRLORxUzYa8r+0OI0doIBRqn5q1m2cCLX
+   86k6FXwPAvzUGLMubcxrnwUmeHuGTn7Q+CCXbT10PPltb3UReLaOQWxQv
+   blWODbGKXm7YJffeoNpBVNREhYgTbdE62/+dFOP3uDc9VTka1rYEMTP1s
+   sn8vNfHGmUKq3Wqr3OpVgkojYyfmzw8O6lrlp/6366kXkfOChWuTBgq8v
+   Q==;
+X-CSE-ConnectionGUID: ifVMM3QlRCGYnw+irV+Z2g==
+X-CSE-MsgGUID: rAHPtguQS/CEooe+5a6aKw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11679"; a="70450016"
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="70450016"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 10:42:20 -0800
+X-CSE-ConnectionGUID: dmHKRQjMTOWz86PkOuIFJw==
+X-CSE-MsgGUID: kmYbyz/ASxeo+V+bVuCozA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
+   d="scan'208";a="229775130"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 22 Jan 2026 10:42:17 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vizdH-00000000TBG-0Nha;
+	Thu, 22 Jan 2026 18:42:15 +0000
+Date: Fri, 23 Jan 2026 02:41:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Damien Dejean <dam.dejean@gmail.com>, andrew@lunn.ch,
+	krzk+dt@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, hkallweit1@gmail.com,
+	Damien Dejean <dam.dejean@gmail.com>
+Subject: Re: [PATCH v2 4/4] net: phy: realtek: add RTL8224 polarity support
+Message-ID: <202601230236.Ey3jrFu2-lkp@intel.com>
+References: <20260121151506.813783-4-dam.dejean@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260122-grxring_big_v4-v2-9-94dbe4dcaa10@debian.org>
-References: <20260122-grxring_big_v4-v2-0-94dbe4dcaa10@debian.org>
-In-Reply-To: <20260122-grxring_big_v4-v2-0-94dbe4dcaa10@debian.org>
-To: Ajit Khaparde <ajit.khaparde@broadcom.com>, 
- Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, 
- Somnath Kotur <somnath.kotur@broadcom.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Igor Russkikh <irusskikh@marvell.com>, Simon Horman <horms@kernel.org>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
- Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, 
- Edward Cree <ecree.xilinx@gmail.com>, Brett Creeley <brett.creeley@amd.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
- linux-net-drivers@amd.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1636; i=leitao@debian.org;
- h=from:subject:message-id; bh=kqzS/7eXjKQG4xiemTDsmFZRs2ALv2BsjFw/ViIR5ug=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpcm8lVobBKIKaWbL7Kss5QdFLbdCw83xm1pGqR
- Jhg6DdcOk2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXJvJQAKCRA1o5Of/Hh3
- bVgsEACbbq3yhlNMWTg6qovyWCNCsnQeGJQ1kp70ENZUKf6zzrXDEkDuUw87rbiYVXUFYdzRsEd
- oYipnvd5VN554x5zlGhZ0xkoy/aBtMYQLos6kNRW7Qf44a/Ugw1DAMXg3+65OIeio+NsMGlvu92
- FbzQIEj3XjSfNvZFhd+GvwRgpMxmqKzuQi2U1N7Zn3Wh2ForP8Hwcvd1t9jpq85Nb5oZCjXsxSW
- +b//phb6v0+GEInAZsQrfxM3YHrxXKVuC1e3NXd0SY8QtdKGD4dioZerHtZ4RH1yxcOAt0+6KFp
- q+2stGci5wPFkzwx39Q9nMn9v1C1GLdCxSzMO54/tQS2v/D3RSJ1Kf5Ivbp1bqYH8NVBmIV4koY
- GYMNi+C8i0jGCi/Vw59LxF4EwQV4TcDpFeOhPla/5EcgwzmnfA7NE4h8Vps20pzIMhvwX2aW1AX
- go7lj6/vaCbuuMe3ES5fUaTps6xJ+Sdm4KH4UihpC8/XKQ7RH3/HcqZoCFg9v5aHPFP3z0K3zff
- Cu0BCDRt8Ef7/gnZnvpnwdbxAhDd3rbRWAjqxf4HeRFwiXTH3x6A8dWxQw/+qQLms/zt8Pacl+5
- KW3+u6qol2KvXxlwoHsIX9wB2zCNMB0lsyJ5Ij048rRYEozpSZmqOg/awmvTaGL8WeSJsI+miIE
- ULO2KvsOGmHv0Qw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260121151506.813783-4-dam.dejean@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-252499-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,microsoft.com,fb.com,meta.com,gmail.com,amd.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252497-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9B55B6C9C0
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.977];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 153696CA70
 X-Rspamd-Action: no action
 
-Use the newly introduced .get_rx_ring_count ethtool ops callback instead
-of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
+Hi Damien,
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ethernet/sfc/falcon/ethtool.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/net/ethernet/sfc/falcon/ethtool.c b/drivers/net/ethernet/sfc/falcon/ethtool.c
-index 27d1cd6f24ca1..0493640315454 100644
---- a/drivers/net/ethernet/sfc/falcon/ethtool.c
-+++ b/drivers/net/ethernet/sfc/falcon/ethtool.c
-@@ -974,6 +974,13 @@ ef4_ethtool_get_rxfh_fields(struct net_device *net_dev,
- 	return 0;
- }
- 
-+static u32 ef4_ethtool_get_rx_ring_count(struct net_device *net_dev)
-+{
-+	struct ef4_nic *efx = netdev_priv(net_dev);
-+
-+	return efx->n_rx_channels;
-+}
-+
- static int
- ef4_ethtool_get_rxnfc(struct net_device *net_dev,
- 		      struct ethtool_rxnfc *info, u32 *rule_locs)
-@@ -981,10 +988,6 @@ ef4_ethtool_get_rxnfc(struct net_device *net_dev,
- 	struct ef4_nic *efx = netdev_priv(net_dev);
- 
- 	switch (info->cmd) {
--	case ETHTOOL_GRXRINGS:
--		info->data = efx->n_rx_channels;
--		return 0;
--
- 	case ETHTOOL_GRXCLSRLCNT:
- 		info->data = ef4_filter_get_rx_id_limit(efx);
- 		if (info->data == 0)
-@@ -1348,6 +1351,7 @@ const struct ethtool_ops ef4_ethtool_ops = {
- 	.reset			= ef4_ethtool_reset,
- 	.get_rxnfc		= ef4_ethtool_get_rxnfc,
- 	.set_rxnfc		= ef4_ethtool_set_rxnfc,
-+	.get_rx_ring_count	= ef4_ethtool_get_rx_ring_count,
- 	.get_rxfh_indir_size	= ef4_ethtool_get_rxfh_indir_size,
- 	.get_rxfh		= ef4_ethtool_get_rxfh,
- 	.set_rxfh		= ef4_ethtool_set_rxfh,
+[auto build test WARNING on 983d014aafb14ee5e4915465bf8948e8f3a723b5]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Damien-Dejean/net-phy-realtek-add-RTL8224-pair-order-support/20260122-000009
+base:   983d014aafb14ee5e4915465bf8948e8f3a723b5
+patch link:    https://lore.kernel.org/r/20260121151506.813783-4-dam.dejean%40gmail.com
+patch subject: [PATCH v2 4/4] net: phy: realtek: add RTL8224 polarity support
+config: i386-randconfig-141-20260122 (https://download.01.org/0day-ci/archive/20260123/202601230236.Ey3jrFu2-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+smatch version: v0.5.0-8994-gd50c5a4c
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601230236.Ey3jrFu2-lkp@intel.com/
+
+New smatch warnings:
+drivers/net/phy/realtek/realtek_main.c:1744 rtl8224_mdi_config_polarity() warn: unsigned 'val' is never less than zero.
+
+Old smatch warnings:
+drivers/net/phy/realtek/realtek_main.c:806 rtl821x_resume() warn: 'priv->clk' from clk_prepare_enable() not released on lines: 802.
+drivers/net/phy/realtek/realtek_main.c:1711 rtl8224_mdi_config_order() warn: unsigned 'val' is never less than zero.
+
+vim +/val +1744 drivers/net/phy/realtek/realtek_main.c
+
+  1722	
+  1723	static int rtl8224_mdi_config_polarity(struct phy_device *phydev)
+  1724	{
+  1725		struct device_node *np = phydev->mdio.dev.of_node;
+  1726		u8 port_offset = phydev->mdio.addr & 3;
+  1727		u32 polarity, val;
+  1728		int ret;
+  1729	
+  1730		ret = of_property_read_u32(np, "realtek,mdi-cfg-polarity", &polarity);
+  1731	
+  1732		/* Do nothing if the property is not present */
+  1733		if (ret == -EINVAL)
+  1734			return 0;
+  1735	
+  1736		if (!ret)
+  1737			return ret;
+  1738	
+  1739		if (polarity & ~0xf)
+  1740			return -EINVAL;
+  1741	
+  1742		val = __phy_package_read_mmd(phydev, 0, MDIO_MMD_VEND1,
+  1743					     RTL8224_VND1_MDI_POLARITY_SWAP);
+> 1744		if (val < 0)
+  1745			return val;
+  1746	
+  1747		val &= ~(0xf << port_offset);
+  1748		val |= polarity << port_offset;
+  1749		return __phy_package_write_mmd(phydev, 0, MDIO_MMD_VEND1,
+  1750					       RTL8224_VND1_MDI_POLARITY_SWAP, val);
+  1751	}
+  1752	
 
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
