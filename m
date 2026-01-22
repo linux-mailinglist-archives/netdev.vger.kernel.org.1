@@ -1,212 +1,155 @@
-Return-Path: <netdev+bounces-252223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252225-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cO5hF6jMcWl1MQAAu9opvQ
-	(envelope-from <netdev+bounces-252223-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:07:20 +0100
+	id SDoeAD7PcWnSMQAAu9opvQ
+	(envelope-from <netdev+bounces-252225-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:18:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F286266E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:07:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8796C6271F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 08:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA9E94E027A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:07:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 92E7B42A141
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588C947DFAE;
-	Thu, 22 Jan 2026 07:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740DB38BF6A;
+	Thu, 22 Jan 2026 07:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XWS3Ophr"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="fAFJ1SoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1213D6460;
-	Thu, 22 Jan 2026 07:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544353D3012;
+	Thu, 22 Jan 2026 07:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769065632; cv=none; b=Ync3Jw3fC7bHBYJ3DofRNTj4OxbIhs17r0PWL0wcb8Ld9j5KjeKDd8o3VsWlRruS7IcAUYZ1OHwxoBkSXd57xfzm7RebtCyjqXOOFbROALsnA3Cbdt1A5jIITQQ/txMaMqM+BbCBoGbJkGLuhbnxDDW/xhxZQ3KWprDGgGqKGWw=
+	t=1769066243; cv=none; b=ZsIM4T15JyBfY/jSAxTW2K8baE8XcBnl2z3P/o/hYyihz2Gg88IU7+VZsmzH4rAmr+Et4f6RWbUZEYuNt+I9Zh2DN5cMDQPD3/odmM5xZ9bg6fC58X79wROtaH5hvt9wlGiIdO0O17UI2ix6haHDSL8JWKTKyy2/uPASvMRbcwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769065632; c=relaxed/simple;
-	bh=FNwrdcWbmoEGb63NM/oRJ409z1sUphxn/NvzFK4Ha6s=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jwX4QTYjRB1o3rBtQXCKirEzEbztOwt8auF2/l5GOpWtsVsyJq8xGVVq1fYazW7VYskHcfsV3XPslQYonzE5E+zPN4DxEIk99RfWzqbx7JPHbgBdl4jcH9iC2OLSy0Xe1ou3k5LCdyfs+oKnWpQSIfbt9y0cFKFrMBomQYcdT2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XWS3Ophr; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60M4nGrX1525197;
-	Wed, 21 Jan 2026 23:06:39 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=XK6iZTmD7wkSfikXQayesYfE+
-	N7UxH40eaMy0kZ8Yrg=; b=XWS3OphrlZGjSE2Nrluw5X0YmQYcmgLn8jW3UHBqB
-	GRe2Aj1Shzr9KyVmcmg/w3bB0Z+FA6xwFlkfYr7H7P72lqUsmd/7Hostu+TtoRo8
-	Fv8ioO/BoP3ITrxtxP5pukYl62fDlJ7EVW57KAqXi2+E9zFNbQ1BwPau+IWkln0/
-	iWFd40atttRniqhOIMB3MEWmJXS7RGlcM51Wdcn+qi9re2FH2Wc35L0FAYEwMQub
-	JwT6O0QiKWOFnw6S2BGIlfFE/P+iNT6C0c+dZWk+hVJfXJr1ETnz3jNLlGEhFNlf
-	VotKkHP8yeSLVCebMMtzd3cdDvKc3Y+N3OX68xJc+q0Hw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4btm3kkkm1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jan 2026 23:06:39 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 21 Jan 2026 23:06:53 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 21 Jan 2026 23:06:53 -0800
-Received: from kernel-ep2 (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with SMTP id 0DD303F70A9;
-	Wed, 21 Jan 2026 23:06:31 -0800 (PST)
-Date: Thu, 22 Jan 2026 12:36:31 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Breno Leitao <leitao@debian.org>
-CC: Ajit Khaparde <ajit.khaparde@broadcom.com>,
-        Sriharsha Basavapatna
-	<sriharsha.basavapatna@broadcom.com>,
-        Somnath Kotur
-	<somnath.kotur@broadcom.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Igor Russkikh
-	<irusskikh@marvell.com>,
-        Simon Horman <horms@kernel.org>,
-        "K. Y. Srinivasan"
-	<kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
-	<wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>, Long Li
-	<longli@microsoft.com>,
-        Alexander Duyck <alexanderduyck@fb.com>, <kernel-team@meta.com>,
-        Edward Cree <ecree.xilinx@gmail.com>,
-        Brett Creeley
-	<brett.creeley@amd.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
-        <linux-hyperv@vger.kernel.org>, <linux-net-drivers@amd.com>
-Subject: Re: [PATCH net-next 4/9] net: mana: convert to use .get_rx_ring_count
-Message-ID: <20260122070631.GB1544290@kernel-ep2>
-References: <20260121-grxring_big_v4-v1-0-07655be56bcf@debian.org>
- <20260121-grxring_big_v4-v1-4-07655be56bcf@debian.org>
+	s=arc-20240116; t=1769066243; c=relaxed/simple;
+	bh=lXmX0fssGG7boqMteprFQ3DftHIwc8tC46Ns1HPitH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c57FaUPH/bJsnxFkz0dLs+zdHlT1BKqsVXVSjJSdh+hFeF91XToD9Vqyef9P6acpQmpqYXoZyIIomXFvSXxR12AdTsqtRR+I+8JXWoP7iucbFRXL36wRGW7DXK0CxPEvf2kn7QTxHzbby9qunh9WSOESepOJ2CBaPTpWKHAOM54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=fAFJ1SoV; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=fAFJ1SoV;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60M7GMlq1239607
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Thu, 22 Jan 2026 07:16:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1769066182; bh=dfoTS0cevGw8oOjXHOU1wkv2LAaTNCCALOMlmg1BUDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:From;
+	b=fAFJ1SoVC0cu5vySL8C5Zfn8MDhsFfNM9ZxSuVyFZheQ14hZMOJNw9vtqHRfB0NxB
+	 5Px1MH2DZDAX7rcC3iL8w606QQmorWCjdhL5mWynhHhkQJPB+f7vT085MbjQXw0n5h
+	 GUnVREJqzlNbbWA2INjC+1iohW5QNTTKQphasivo=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60M7GMtr3217356
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Thu, 22 Jan 2026 08:16:22 +0100
+Received: (nullmailer pid 1057102 invoked by uid 1000);
+	Thu, 22 Jan 2026 07:16:22 -0000
+From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+To: netdev@vger.kernel.org
+Cc: "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+Subject: [PATCH net-next 0/3] Airoha AN8811HB 2.5 Gbps phy support
+Date: Thu, 22 Jan 2026 08:15:57 +0100
+Message-ID: <20260122071601.1057083-1-bjorn@mork.no>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260121-grxring_big_v4-v1-4-07655be56bcf@debian.org>
-X-Proofpoint-ORIG-GUID: uKIwITwRmMjYlCTactKF_MrE_-fcI4GX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIyMDA0NCBTYWx0ZWRfX6rlwGfZifPyj
- kFxsRGLECkSjljY6LAUTFJp1UD3/Fpmk9fsilYePWIzmPpJVSxrXCIlMojdiK/cmeD445cistiX
- FpuaqN59Xt3MNWcM+wyVPCFXPVDFDXtIOTTy5cITouvdzYiMaD3sH7rGt6zHcoYE8y+ykzsPW8w
- QeYx05Rupp6cv2Qx0JlDo7OOtqRqD4lUPCjmPaL13VJ54vvIbJeM2Q+s+//POXkzXYGNWcXuZpn
- POJseJoD2VIGwOqvjoE5jfPPVKcrR9rRqIssHvLtJFTWkwHdMwIbwJWx3YQpCyitNv0Jb6F88Bu
- hTfkWWaJWa1fLAmqEDY9nobbekiWzj2RRpxyvfxpkdD9lodgmC2t7TUYZ6rAf+R6c5IDIo5UBon
- naQ0046odnDM2skw13GNW5cjaRP22EPyPGL1TNuoYBUseZJpR2M0C/2HGtUUqWeKCDauq+6qnVa
- aLeX9dsB6DT57cq2oWQ==
-X-Authority-Analysis: v=2.4 cv=Mu1fKmae c=1 sm=1 tr=0 ts=6971cc7f cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=xNf9USuDAAAA:8 a=M5GUcnROAAAA:8 a=Iv6O2OiJiGMJj1fiuYwA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: uKIwITwRmMjYlCTactKF_MrE_-fcI4GX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
- definitions=2026-01-21_04,2026-01-20_01,2025-10-01_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252223-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,marvell.com,microsoft.com,fb.com,meta.com,gmail.com,amd.com,vger.kernel.org,corigine.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[marvell.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252225-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[mork.no,reject];
+	DKIM_TRACE(0.00)[mork.no:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 15F286266E
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mork.no:mid,mork.no:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8796C6271F
 X-Rspamd-Action: no action
 
-On 2026-01-21 at 21:24:41, Breno Leitao (leitao@debian.org) wrote:
-> Use the newly introduced .get_rx_ring_count ethtool ops callback instead
-> of handling ETHTOOL_GRXRINGS directly in .get_rxnfc().
-> 
-> Since ETHTOOL_GRXRINGS was the only command handled by mana_get_rxnfc(),
-> remove the function entirely.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+The RFC patch posted earlier has been split into a series based on the
+feedback received:
 
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+ 1/3: preparing the EN8811H driver for maximum reuse
+ 2/3: adding support for the new AN8811HB hardware
+ 3/3: adding (optional) clock driver for AN8811HB
 
-Thanks,
-Sundeep
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_ethtool.c | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 0e2f4343ac67f..f2d220b371b5d 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -282,18 +282,11 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
->  	}
->  }
->  
-> -static int mana_get_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *cmd,
-> -			  u32 *rules)
-> +static u32 mana_get_rx_ring_count(struct net_device *ndev)
->  {
->  	struct mana_port_context *apc = netdev_priv(ndev);
->  
-> -	switch (cmd->cmd) {
-> -	case ETHTOOL_GRXRINGS:
-> -		cmd->data = apc->num_queues;
-> -		return 0;
-> -	}
-> -
-> -	return -EOPNOTSUPP;
-> +	return apc->num_queues;
->  }
->  
->  static u32 mana_get_rxfh_key_size(struct net_device *ndev)
-> @@ -520,7 +513,7 @@ const struct ethtool_ops mana_ethtool_ops = {
->  	.get_ethtool_stats	= mana_get_ethtool_stats,
->  	.get_sset_count		= mana_get_sset_count,
->  	.get_strings		= mana_get_strings,
-> -	.get_rxnfc		= mana_get_rxnfc,
-> +	.get_rx_ring_count	= mana_get_rx_ring_count,
->  	.get_rxfh_key_size	= mana_get_rxfh_key_size,
->  	.get_rxfh_indir_size	= mana_rss_indir_size,
->  	.get_rxfh		= mana_get_rxfh,
-> 
-> -- 
-> 2.47.3
-> 
+Patch 3/3 is not required for a functional device. It is included here
+for full feature parity between the EN8811H and AN8811HB drivers.
+
+The AN8811HB phy requires new firmware, which is now available with
+the 20260110 release of linux-firmware,
+
+RFC patch is at:
+https://lore.kernel.org/20251202102222.1681522-1-bjorn@mork.no/
+
+Changes since RFC:
+- refactoring of the existing EN8811H code is separated into a patch
+  of its own
+- ID conditionals are dropped, using separate functions for the two
+  hardware variants instead. Some common helpers have been added to
+  reduse code duplication
+- deprecated serdes polarity properties are not supported for AN8811HB
+- the polarity configuration code has proper error handling
+- a polarity configuration bug is fixed by using the new simplified
+  helper interface
+- the clock driver is split out in a separate patch to reduce the size
+  of the main AN8811HB driver patch
+
+Bjørn Mork (3):
+  net: phy: air_en8811h: factor out shareable code
+  net: phy: air_en8811h: add Airoha AN8811HB support
+  net: phy: air_en8811h: Add clk provider for an8811hb
+
+ drivers/net/phy/air_en8811h.c | 513 ++++++++++++++++++++++++++++++----
+ 1 file changed, 463 insertions(+), 50 deletions(-)
+
+-- 
+2.47.3
+
 
