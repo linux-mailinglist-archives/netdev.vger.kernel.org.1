@@ -1,649 +1,238 @@
-Return-Path: <netdev+bounces-252220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJIzAUO7cWkNLwAAu9opvQ
-	(envelope-from <netdev+bounces-252220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:53:07 +0100
+	id 2GXeLsO+cWkmLwAAu9opvQ
+	(envelope-from <netdev+bounces-252221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:08:03 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6B06213B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:53:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CD3622D2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3D6A34A5D16
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 05:52:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 51C2438784E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 06:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94ED8357A2F;
-	Thu, 22 Jan 2026 05:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7F0313524;
+	Thu, 22 Jan 2026 06:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2hSdPB6"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="JHaP4CDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010065.outbound.protection.outlook.com [52.101.84.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688873570CD;
-	Thu, 22 Jan 2026 05:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769061138; cv=none; b=UybupWLnte7JTm/TcuJU2gqLn9oP/Yl4qYpNCwwB5vCOtTiHbOJSlyl2V1ugTEilAW5L9tMmcw+oBrTS9nHCOxKWZmjeu0y/MSg2uK3C1NE5R0jNrbnPsnDegFd1rdEutq0HhcLXuUTt5zzeP9uQP+TIH3Kkf8+sfFEcIgJCRFw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769061138; c=relaxed/simple;
-	bh=tWahuj25sqY+SOVdxcFgi038yPSl/ffdLF8xOENLQuY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PRo6LK4VM/YHzzjCt5ZAn2Cv5gEkjgtb6BPDceE/wEXXhwFcnyoyE9+wboJw6WB03eg0gMpJS7eCvCcCo7VAMugrKQJATk8y7c4yDh7e3G/9OyT0ZHPr0aEFuS6nxtNrpUhtfDsynIj02FesEnsFAQLaAcwPxx634veeaDHAK38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2hSdPB6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C740C2BC9E;
-	Thu, 22 Jan 2026 05:52:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769061137;
-	bh=tWahuj25sqY+SOVdxcFgi038yPSl/ffdLF8xOENLQuY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O2hSdPB6KMMVBCdE2FvWak89z2vESRfSRRX4SCDE+IyRVIOIsSFSJsmgZIaVmIfKx
-	 US+s19s1RvHSpwKsme0Z1Vs4AZhCkulj+8bf9p5gITi/Fl+kuYuYwwv7JNsFFFVUuO
-	 jfdfq97RrMrAbvukJ/ni5nFiMetCUg0cG/yEj14kRz0FLsXZPxDso6baEl5Qt/wYj3
-	 o6ebMVJ1GhKaP1bT1Ybb+2sD4h1LkX0wnyzmjqb0SMm8pAT7PpdgEy54FG7d5K/TCg
-	 uLRFJV7gKg6ujEuHytSgI4f60gbZxcJQavpt3rxUtpUFOHmK3BfuzQLPKEBW95C2rB
-	 v43XCkfP2y8hA==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v2 2/2] net/rds: rds_tcp_accept_one ought to not discard messages
-Date: Wed, 21 Jan 2026 22:52:13 -0700
-Message-ID: <20260122055213.83608-3-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260122055213.83608-1-achender@kernel.org>
-References: <20260122055213.83608-1-achender@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A031147278E
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 06:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769062055; cv=fail; b=W4xYzst/mi9SMbgCOWY8EJb5uuGXf/nEwzsa+wlB+DHRqbzLEP4eOfO/YGG0px1+h9AsF+IiKR4BSba4pdQvuRGMX5kaHiNUCQbaZnsJ+IoRQeeeXO4kANi8IPtBfWBgS0p/b87IBRx4c1kZxrP4mEo8EQHS5/e9eqp6qaw9LoI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769062055; c=relaxed/simple;
+	bh=bK9FwRX8BCkUVQ+hTW81Z5khoHW/JUBu3szimLheByw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=enwRii2RSo6t1mdlVTitrkiXPeDqIWaA5lhjPWqedtwqFHQCAeCl4yEIG28gYQ+3+5vmy7NllkgOlnoIx2nCbB8nPGgPeRymvc4F6wIch7tRe621vme8CRSxii1LMzoX7S94RbM9/y6BsG2oSsckMbHwfJUs66jMg7h0BeLsLgc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=JHaP4CDS; arc=fail smtp.client-ip=52.101.84.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UCl0FKK5c2CcrWOEh2RmITU76+RhDZ8KVixKO18F637K+tqxax7rzoFaQ8kZ5t6pqqDHRU56/tc9wyy9kXxTqh5BevgfvUpm+eDMAEA7r4EA72eh6RBK8mEZOeYnjmeNrYQf9CqUIQsYHgOOL4O4m2cSS2+o1f0Mc5IpjZP/8t6J/zmezrYzkh2gKE6YyuwoMFWEmmcyVZONjdz+8gV+dUmc/Ce80Obov8e+xQnbW9tIZxwE9m842RhKqFr8cDdjsHrtWng52MxwYjAQ079KyyjAGjDTQR60gge7w8QaeIG8Gn2XUcWNDja/b+I/ls8WKxKZu2QNsi0nTa1YNZfgBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bK9FwRX8BCkUVQ+hTW81Z5khoHW/JUBu3szimLheByw=;
+ b=nZbZmMwJpz5JlteCPgmZgZGpOgvF1QKtDm+AgbC2AUsP3affXcdIUByXubQwsXFHC6fDMMEDPpA7+cP2V9oL60xXAPtib8avc9ITH1ba/d+H5/BTudwyK+cH4pYsXmWU0DwxXD0cey+le04PiYV0qwUyqs6spJR547a4C+COxVoUAcknne05ekGqGAbUkH7cybdi0Rk6nJUh8/VgZYJcdbIRCpj3s+4OtOrYuKu7dBnjrFGdZgEB8eybPIHoEuRfDcyLTETJU5fNJiH7dSAfsBprUUUNCzA3VF3bSIGRDFKF6SzrkK+m7RgDy2jt9qhnplLcL7d1uy0g79oAEOrohQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bK9FwRX8BCkUVQ+hTW81Z5khoHW/JUBu3szimLheByw=;
+ b=JHaP4CDS0NkKtzF0ASHSBwsqyrlLrqAKpK4x6cr5sf2wjljbzlcLwopM1+HwY0kiiIPSDgDGfZxNFMmVzib13vHpZ84j7kBJmta2XyonU9O9erRWZu+Z6NReBNU2CJUfLEz1jpEXEwh4JsnA7dZzBUprYJoHgtj+WcB6p96+gvniPxOQcfS+w81vh6Wj2bMioDfqKJgDg4QqqFqbCPzAJRdfIpiFAeRAa9BrDRFkDP5FcN+siqGJfv2lvHVGH5ghi5XKcuohwNv9Z1eE9+yzDbpI4U7JceV8f4a/zXSISH32CdBTc66O9elgZlKhhFk528uJL0znH6IsNlasP/oyPQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DU2PR04MB8677.eurprd04.prod.outlook.com (2603:10a6:10:2dc::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.10; Thu, 22 Jan
+ 2026 06:07:28 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9499.001; Thu, 22 Jan 2026
+ 06:07:27 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Clemens Gruber <mail@clemensgruber.at>
+CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "stable@kernel.org" <stable@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: RE: [PATCH v2] net: fec: account for VLAN header in frame length
+ calculations
+Thread-Topic: [PATCH v2] net: fec: account for VLAN header in frame length
+ calculations
+Thread-Index: AQHcirFlimMo1iYLPE26IbVnahikpbVdtRIQ
+Date: Thu, 22 Jan 2026 06:07:27 +0000
+Message-ID:
+ <PAXPR04MB851065772CADABDB29F70BD88897A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260120160407.101273-1-mail@clemensgruber.at>
+ <20260121083751.66997-1-mail@clemensgruber.at>
+In-Reply-To: <20260121083751.66997-1-mail@clemensgruber.at>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DU2PR04MB8677:EE_
+x-ms-office365-filtering-correlation-id: 244e089e-5fc9-49f0-e742-08de597c853d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|19092799006|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?OBI/tnXw+IHIhbZNx33fjkvurrqFByX+fj/C7CXXsS1yPfLS3OFe5OSr+17V?=
+ =?us-ascii?Q?i4ijfB+rbLOZdbByPx1DsNjFG717a7k54RsHI4mxb8uygNHXaBUapEnIS5gl?=
+ =?us-ascii?Q?P39BgmVwXddRJnJcgDvDrXBuP6OLmBQxtXjxtOYpWLI8Kun3MBTAAIc8bCmv?=
+ =?us-ascii?Q?HBxwA43AjWPgdzt4XRLNLe+6LcLJUj/nVeXnqlfG5fV3XH37IZCoWOilkkXE?=
+ =?us-ascii?Q?Koxk71SO92Hb+4sed+10RgVnoSzR3jF6H1o6dFhuyxUaJBQUMqtGFYOt7w4T?=
+ =?us-ascii?Q?eMomsi7HRB8VEwoLoHEUKPUGxS8mNRv2mg+Wbycv4CpWqu6HuTZqpLESj1zI?=
+ =?us-ascii?Q?K0zSzoKumhnnVJfmwfb2h1FFr2LAsLX6I27oZmBifw9e9yaLepqSfTDnU6pB?=
+ =?us-ascii?Q?5fn4zYNiVsDmLFxGoSpBLllJQ2C5m8MoTJCipyYcYq8HIPBQivgxaVhCmDaJ?=
+ =?us-ascii?Q?HyGn8l0c1z2IOd4iTm0VSOh+duFWnZse3DbmkkDsJRaUwpRwPyznKRxHTDmS?=
+ =?us-ascii?Q?LTwMUOx9XQPPEByZIw+tNqHGXptq83X5/upzDc0FH62Hc9bv9szU7gc8MkPJ?=
+ =?us-ascii?Q?m/haLi5p8Of0SxXX1qxfT4ExewgZtddVxrvTeVTV3yFV/Y9TnJ75li1tD2L6?=
+ =?us-ascii?Q?n7w5SZXCBoeEiwPUeU9v3Hxn0KV24CaJ60BuW/N9/x++HzAr0Aew+RsGq9jy?=
+ =?us-ascii?Q?/W66iUfKYadoBZsC7eteYBvPF/MkP33J3YKZ5G7awmHTqO2LTOBownnkxXak?=
+ =?us-ascii?Q?nPXY2UI4KZAMQXk50qSFsHJ9IytvDaxWScd3WQ6MM22cQ47WY3JDQnnNlFLt?=
+ =?us-ascii?Q?9eG91E6gNV+aaEohrzn6O5nGtYpd+kVehlnECQxDdevahw+CJk0L/QWjp3ih?=
+ =?us-ascii?Q?ebuaDR0DhBiD0ivTI7dp7qVeO9oOD584BxKsgxMkU0onGYLgj0gMTCdkzbel?=
+ =?us-ascii?Q?mvVuHb8fHb7hwvckz4IJSKYjE6RG/Xzy8VYCIiFHSrvXhDwJ3qf2AHVyZA0f?=
+ =?us-ascii?Q?RWX45r+60VWVdPwM7tedW1V6hVeFijxxXs0/+ZZG9xHwEs6PfUJvK3d9x4Qy?=
+ =?us-ascii?Q?P5+dZZHxen7h6RDJkG7q/JKDfm/o2KjWrghJim7le/bNdBBNfdg2adcCUkIC?=
+ =?us-ascii?Q?euxRFSNYBP5qcP22PbpXAjqti3fCQkVaqv299AUOXK4g8gZbHDdar+y5EzdU?=
+ =?us-ascii?Q?mT343vYa04Qh05RURtdecCHFt7oK9gbkPqMcAoGDIW9NjaMP4m1SRjlI0VYo?=
+ =?us-ascii?Q?oOGKLVK/r6RJAso3mTpme9cPp+LvBodQjwzMU2tvQY4OLTlUVv6+zJL57XKP?=
+ =?us-ascii?Q?fB+bFrrS0101fhTTDTUZzakklCZiqb9ZNRV7VU4VszqbxjCLGkto7ZEfXqDW?=
+ =?us-ascii?Q?g22dRkpudOFMhmODov4BJ0FvIs5aqBhWR1pFtI9sK5QmC0lHfkT4GauV50Yk?=
+ =?us-ascii?Q?d9x0dyqyueoygQDGKvGAfTeCknyBFD6448gkqx0sL4gH0IkG+pjIbOAxbPVK?=
+ =?us-ascii?Q?dKdSbFj9xqZs6U++wxaDknAWgrL/JekJJuyP12wbLa4IJBY3pk79kafaIHxE?=
+ =?us-ascii?Q?VH0pEXKj2zxMTntxr7MQJmxod1t5JhxwBs1w3sYSDdk4bYr738Tn/b4LrLDt?=
+ =?us-ascii?Q?sQnEX7Vubx7dfxVa7Kk1tUs=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(19092799006)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?wqNY0lIR+iixp83GxqYiF8AhlKI9dt8uoVadNXvTQqanVuKahoMwoXJAzV5s?=
+ =?us-ascii?Q?SDwQJ/j9RPflx9NHNpSmttR9MnkalBxW/I35f/gESOXKyd2uwOeSt7K/2s9d?=
+ =?us-ascii?Q?kWftrB5Cld3pWZVt6H4131+eM5/0Nm0PYpEnH6DeYFn8awGOIeop+UbwD/zB?=
+ =?us-ascii?Q?q8KJujy1K5jGE/yK/LyjvkprBD/IU2iZrs0qGemt7Dv2s/1+tQN//zOO4p8Z?=
+ =?us-ascii?Q?0Gqt/qnmmqnsf3lNn+Vai/nB4W3CzG3takl5Y+ofmmpKXsNQj2e997hAUa3e?=
+ =?us-ascii?Q?0hnx1ZX/3bsGQDQZY30xUnyWLMETNxldjrubuHpJFB1twZ2HtQC8K6go41/E?=
+ =?us-ascii?Q?B7ESEKykBdp9g3ASugmQ2JLEqQ8GxKUE7D6ssODYF8lFlstWoqhuuZYvHyRV?=
+ =?us-ascii?Q?33EA0Mwr09hyejr1kMFuTJMqG535NNUhc2RMdxNmElDdyXfWdAVb03d7qCbC?=
+ =?us-ascii?Q?c5ndyg8jxPw2rIqacp5wk5yfBxFjsrclKyKS8ZDGIJ2d/snN9wil6dWjLMTA?=
+ =?us-ascii?Q?WvsjVi6a1GLPPQrQtNCXkppukxlZuI4NH0YixRplifIXi2mJ3xmQmeEF68aL?=
+ =?us-ascii?Q?3AgvAubgPwuJMpNhgSFT1STEuM2a4BUqNsQIETDETHsH2PoOcK0qx3ENyOvp?=
+ =?us-ascii?Q?V7EMyWgA07MkHpBOUfmgQ4C3tLgAXsBeIco3KxBp7Ephiq3UuVX5xdz5eB6D?=
+ =?us-ascii?Q?X58sGf4dMHK+bb9D3k87Gim3ulgPYfuyDDkNTy1XAHQx4S82HhRDUj2KEBVY?=
+ =?us-ascii?Q?tHYP2ekDyazwjYBhyyQNucIsDDD6p+DinxfGOenbGBCh3E1htk30JwQCWc6B?=
+ =?us-ascii?Q?XQx3WlECpbZwAVZRJxiirzYPfF1CHoimTS0489D/zyp66Hug0vAFARqsjHz7?=
+ =?us-ascii?Q?T46RpVUSdHbcyilg0w0npMwjUS/sII31ZBndcj30RTby4ut+jZODhaQC8eRU?=
+ =?us-ascii?Q?JasbwePWYNELAQdxN/zqzbg/mCgloC9juHGFAQuacxGAlBcfPuZWtYZn/EHL?=
+ =?us-ascii?Q?GbFMfjMLqy12RD8CUwuFZHVbrxiuqJjPgAjCJIXv6ECLuiFRWuYIdI8J28Be?=
+ =?us-ascii?Q?rJ4hpaqOhTCRWGv4nVLpnWC287nDEP4Emi9U5q5ghLMk7RKE47sq6qe2O+/q?=
+ =?us-ascii?Q?LaTBXGVdMkn8UdixH5uIHJIp/CBlIAm8i12Yl7s1M8VMMM5OSfBQ+CsGZWsp?=
+ =?us-ascii?Q?pEahKEaicYwZAnZfgWUIafpY77JGftdsGWZAuPcErAeF8rvRsYHB5dss408P?=
+ =?us-ascii?Q?uoi4fov1pWsq507SEJDJXbrcGjykCDT6yGiEck8vWT9gW6AfGSQd9tVU+TYR?=
+ =?us-ascii?Q?oIBvarogR1wrSvTfBIxASUUGnvAolYUlG4OYQHpOhZA82Yucfq6qA++PAxX5?=
+ =?us-ascii?Q?pZOgWx5Q9pyp6N492D5yonLg8jq+Gebp2BjgfvTD9t3+JxtQ08ddVHjRGQys?=
+ =?us-ascii?Q?r9DwatTN6mu1KdSqfamrjMTU6TTts6/gZ3PnTJ8tAW+G/Ngnkqb3hG8iU+G4?=
+ =?us-ascii?Q?QaZKcVfTbO/wQ8tSlg5imhQ7GOfEEtI4RCN9JT6dLbbMsaIcOf/DRTIfC0PD?=
+ =?us-ascii?Q?3dfHzolnnJH7lO0+PDVeJoMRJIOlSS4JajlZD0dMFNa/k63ogjbNOfTLpT4Y?=
+ =?us-ascii?Q?htT8eIwSFy9Piz6o7kg72Hw9Wt2mg1JlvpBVg56YFAgP7sJYYDAz68rF2ave?=
+ =?us-ascii?Q?B1Cpy2Y9BfJz9/QW1qbdCio95DPV4nl5cQRcBQykZuoC/BUs?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 244e089e-5fc9-49f0-e742-08de597c853d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2026 06:07:27.9219
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: x1fJLn18Pg8a0eWds3qi3bSCiVtdDJaNNmRkZne4mrrqToQDSJjTma/1YsLhposGZH7yv/R9AOE5rMblUHU5kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8677
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252220-lists,netdev=lfdr.de];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[nxp.com,none];
+	TAGGED_FROM(0.00)[bounces-252221-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA6B06213B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,nxp.com:email,nxp.com:dkim]
+X-Rspamd-Queue-Id: 60CD3622D2
 X-Rspamd-Action: no action
 
-From: Gerd Rausch <gerd.rausch@oracle.com>
+> The MAX_FL (maximum frame length) and related calculations used
+> ETH_HLEN,
+> which does not account for the 4-byte VLAN tag in tagged frames. This
+> caused the hardware to reject valid VLAN frames as oversized, resulting
+> in RX errors and dropped packets.
+>=20
+> Use VLAN_ETH_HLEN instead of ETH_HLEN in the MAX_FL register setup,
+> cut-through mode threshold, buffer allocation, and max_mtu calculation.
+>=20
+> Cc: stable@kernel.org # v6.18+
+> Fixes: 62b5bb7be7bc ("net: fec: update MAX_FL based on the current MTU")
+> Fixes: d466c16026e9 ("net: fec: enable the Jumbo frame support for
+> i.MX8QM")
+> Fixes: 59e9bf037d75 ("net: fec: add change_mtu to support dynamic buffer
+> allocation")
+> Fixes: ec2a1681ed4f ("net: fec: use a member variable for maximum buffer
+> size")
+> Signed-off-by: Clemens Gruber <mail@clemensgruber.at>
+> ---
+> Changes in v2:
+> - Fix the other frame length calculations too
+> - Improved title and commit message
+>=20
+> One line in fec_restart (after the FEC_QUIRK_JUMBO_FRAME check) has now
+> 82 characters but I think folding it would make it less readable.
+> Let me know if this should be changed.
+> ---
 
-RDS/TCP differs from RDS/RDMA in that message acknowledgment
-is done based on TCP sequence numbers:
-As soon as the last byte of a message has been acknowledged
-by the TCP stack of a peer, "rds_tcp_write_space()" goes on
-to discard prior messages from the send queue.
+Thanks, this patch looks good to me.
 
-Which is fine, for as long as the receiver never throws any messages away.
-
-Unfortunately, that is *not* the case since the introduction of MPRDS:
-commit 1a0e100fb2c96 "RDS: TCP: Enable multipath RDS for TCP"
-
-A new function "rds_tcp_accept_one_path" was introduced,
-which is entitled to return "NULL", if no connection path is currently
-available.
-
-Unfortunately, this happens after the "->accept()" call, and the new socket
-often already contains messages, since the peer already transitioned
-to "RDS_CONN_UP" on behalf of "TCP_ESTABLISHED".
-
-That's also the case after this [1]:
-commit 1a0e100fb2c96 "RDS: TCP: Force every connection to be initiated by
-numerically smaller IP address"
-
-which tried to address the situation of pending data by only transitioning
-connections from a smaller IP address to "RDS_CONN_UP".
-
-But even in those cases, and in particular if the "RDS_EXTHDR_NPATHS"
-handshake has not occurred yet, and therefore we're working with
-"c_npaths <= 1", "c_conn[0]" may be in a state distinct from
-"RDS_CONN_DOWN", and therefore all messages on the just accepted socket
-will be tossed away.
-
-This fix changes "rds_tcp_accept_one":
-
-* If connected from a peer with a larger IP address, the new socket
-  will continue to get closed right away.
-  With commit [1] above, there should not be any messages
-  in the socket receive buffer, since the peer never transitioned
-  to "RDS_CONN_UP".
-  Therefore it should be okay to not make any efforts to dispatch
-  the socket receive buffer.
-
-* If connected from a peer with a smaller IP address,
-  we call "rds_tcp_accept_one_path" to find a free slot/"path".
-  If found, business goes on as usual.
-  If none was found, we save/stash the newly accepted socket
-  into "rds_tcp_accepted_sock", in order to not lose any
-  messages that may have arrived already.
-  We then return from "rds_tcp_accept_one" with "-ENOBUFS".
-  Later on, when a slot/"path" does become available again
-  (e.g. state transitioned to "RDS_CONN_DOWN",
-   or HS extension header was received with "c_npaths > 1")
-  we call "rds_tcp_conn_slots_available" that simply re-issues
-  a "rds_tcp_accept_one_path" worker-callback and picks
-  up the new socket from "rds_tcp_accepted_sock", and thereby
-  continuing where it left with "-ENOBUFS" last time.
-  Since a new slot has become available, those messages
-  won't be lost, since processing proceeds as if that slot
-  had been available the first time around.
-
-Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
-Signed-off-by: Jack Vogel <jack.vogel@oracle.com>
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
----
- net/rds/connection.c |   3 ++
- net/rds/rds.h        |  66 +++++++++++++----------
- net/rds/recv.c       |   4 ++
- net/rds/tcp.c        |  27 ++++------
- net/rds/tcp.h        |  22 +++++++-
- net/rds/tcp_listen.c | 123 ++++++++++++++++++++++++++++++++-----------
- 6 files changed, 169 insertions(+), 76 deletions(-)
-
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 4a9d80d56f56e..3f26a67f31804 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -449,6 +449,9 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 	} else {
- 		rcu_read_unlock();
- 	}
-+
-+	if (conn->c_trans->conn_slots_available)
-+		conn->c_trans->conn_slots_available(conn);
- }
- 
- /* destroy a single rds_conn_path. rds_conn_destroy() iterates over
-diff --git a/net/rds/rds.h b/net/rds/rds.h
-index b35afa2658cc4..8a549fe687ac9 100644
---- a/net/rds/rds.h
-+++ b/net/rds/rds.h
-@@ -506,33 +506,6 @@ struct rds_notifier {
-  */
- #define	RDS_TRANS_LOOP	3
- 
--/**
-- * struct rds_transport -  transport specific behavioural hooks
-- *
-- * @xmit: .xmit is called by rds_send_xmit() to tell the transport to send
-- *        part of a message.  The caller serializes on the send_sem so this
-- *        doesn't need to be reentrant for a given conn.  The header must be
-- *        sent before the data payload.  .xmit must be prepared to send a
-- *        message with no data payload.  .xmit should return the number of
-- *        bytes that were sent down the connection, including header bytes.
-- *        Returning 0 tells the caller that it doesn't need to perform any
-- *        additional work now.  This is usually the case when the transport has
-- *        filled the sending queue for its connection and will handle
-- *        triggering the rds thread to continue the send when space becomes
-- *        available.  Returning -EAGAIN tells the caller to retry the send
-- *        immediately.  Returning -ENOMEM tells the caller to retry the send at
-- *        some point in the future.
-- *
-- * @conn_shutdown: conn_shutdown stops traffic on the given connection.  Once
-- *                 it returns the connection can not call rds_recv_incoming().
-- *                 This will only be called once after conn_connect returns
-- *                 non-zero success and will The caller serializes this with
-- *                 the send and connecting paths (xmit_* and conn_*).  The
-- *                 transport is responsible for other serialization, including
-- *                 rds_recv_incoming().  This is called in process context but
-- *                 should try hard not to block.
-- */
--
- struct rds_transport {
- 	char			t_name[TRANSNAMSIZ];
- 	struct list_head	t_item;
-@@ -545,10 +518,49 @@ struct rds_transport {
- 			   __u32 scope_id);
- 	int (*conn_alloc)(struct rds_connection *conn, gfp_t gfp);
- 	void (*conn_free)(void *data);
-+
-+	/*
-+	 * conn_slots_available is invoked when a previously unavailable
-+	 * connection slot becomes available again. rds_tcp_accept_one_path may
-+	 * return -ENOBUFS if it cannot find an available slot, and then stashes
-+	 * the new socket in "rds_tcp_accepted_sock". This function re-issues
-+	 * `rds_tcp_accept_one_path`, which picks up the stashed socket and
-+	 * continuing where it left with "-ENOBUFS" last time.  This ensures
-+	 * messages received on the new socket are not discarded when no
-+	 * connection path was available at the time.
-+	 */
-+	void (*conn_slots_available)(struct rds_connection *conn);
- 	int (*conn_path_connect)(struct rds_conn_path *cp);
-+
-+	/*
-+	 * conn_shutdown stops traffic on the given connection.  Once
-+	 * it returns the connection can not call rds_recv_incoming().
-+	 * This will only be called once after conn_connect returns
-+	 * non-zero success and will The caller serializes this with
-+	 * the send and connecting paths (xmit_* and conn_*).  The
-+	 * transport is responsible for other serialization, including
-+	 * rds_recv_incoming().  This is called in process context but
-+	 * should try hard not to block.
-+	 */
- 	void (*conn_path_shutdown)(struct rds_conn_path *conn);
- 	void (*xmit_path_prepare)(struct rds_conn_path *cp);
- 	void (*xmit_path_complete)(struct rds_conn_path *cp);
-+
-+	/*
-+	 * .xmit is called by rds_send_xmit() to tell the transport to send
-+	 * part of a message.  The caller serializes on the send_sem so this
-+	 * doesn't need to be reentrant for a given conn.  The header must be
-+	 * sent before the data payload.  .xmit must be prepared to send a
-+	 * message with no data payload.  .xmit should return the number of
-+	 * bytes that were sent down the connection, including header bytes.
-+	 * Returning 0 tells the caller that it doesn't need to perform any
-+	 * additional work now.  This is usually the case when the transport has
-+	 * filled the sending queue for its connection and will handle
-+	 * triggering the rds thread to continue the send when space becomes
-+	 * available.  Returning -EAGAIN tells the caller to retry the send
-+	 * immediately.  Returning -ENOMEM tells the caller to retry the send at
-+	 * some point in the future.
-+	 */
- 	int (*xmit)(struct rds_connection *conn, struct rds_message *rm,
- 		    unsigned int hdr_off, unsigned int sg, unsigned int off);
- 	int (*xmit_rdma)(struct rds_connection *conn, struct rm_rdma_op *op);
-diff --git a/net/rds/recv.c b/net/rds/recv.c
-index 66205d6924bf3..66680f652e74a 100644
---- a/net/rds/recv.c
-+++ b/net/rds/recv.c
-@@ -230,6 +230,10 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 	conn->c_npaths = max_t(int, conn->c_npaths, 1);
- 	conn->c_ping_triggered = 0;
- 	rds_conn_peer_gen_update(conn, new_peer_gen_num);
-+
-+	if (conn->c_npaths > 1 &&
-+	    conn->c_trans->conn_slots_available)
-+		conn->c_trans->conn_slots_available(conn);
- }
- 
- /* rds_start_mprds() will synchronously start multiple paths when appropriate.
-diff --git a/net/rds/tcp.c b/net/rds/tcp.c
-index 3cc2f303bf786..31e7425e2da9a 100644
---- a/net/rds/tcp.c
-+++ b/net/rds/tcp.c
-@@ -213,6 +213,8 @@ void rds_tcp_set_callbacks(struct socket *sock, struct rds_conn_path *cp)
- 		sock->sk->sk_data_ready = sock->sk->sk_user_data;
- 
- 	tc->t_sock = sock;
-+	if (!tc->t_rtn)
-+		tc->t_rtn = net_generic(sock_net(sock->sk), rds_tcp_netid);
- 	tc->t_cpath = cp;
- 	tc->t_orig_data_ready = sock->sk->sk_data_ready;
- 	tc->t_orig_write_space = sock->sk->sk_write_space;
-@@ -378,6 +380,7 @@ static int rds_tcp_conn_alloc(struct rds_connection *conn, gfp_t gfp)
- 		}
- 		mutex_init(&tc->t_conn_path_lock);
- 		tc->t_sock = NULL;
-+		tc->t_rtn = NULL;
- 		tc->t_tinc = NULL;
- 		tc->t_tinc_hdr_rem = sizeof(struct rds_header);
- 		tc->t_tinc_data_rem = 0;
-@@ -458,6 +461,7 @@ struct rds_transport rds_tcp_transport = {
- 	.recv_path		= rds_tcp_recv_path,
- 	.conn_alloc		= rds_tcp_conn_alloc,
- 	.conn_free		= rds_tcp_conn_free,
-+	.conn_slots_available	= rds_tcp_conn_slots_available,
- 	.conn_path_connect	= rds_tcp_conn_path_connect,
- 	.conn_path_shutdown	= rds_tcp_conn_path_shutdown,
- 	.inc_copy_to_user	= rds_tcp_inc_copy_to_user,
-@@ -473,17 +477,7 @@ struct rds_transport rds_tcp_transport = {
- 	.t_unloading		= rds_tcp_is_unloading,
- };
- 
--static unsigned int rds_tcp_netid;
--
--/* per-network namespace private data for this module */
--struct rds_tcp_net {
--	struct socket *rds_tcp_listen_sock;
--	struct work_struct rds_tcp_accept_w;
--	struct ctl_table_header *rds_tcp_sysctl;
--	struct ctl_table *ctl_table;
--	int sndbuf_size;
--	int rcvbuf_size;
--};
-+int rds_tcp_netid;
- 
- /* All module specific customizations to the RDS-TCP socket should be done in
-  * rds_tcp_tune() and applied after socket creation.
-@@ -526,15 +520,12 @@ static void rds_tcp_accept_worker(struct work_struct *work)
- 					       struct rds_tcp_net,
- 					       rds_tcp_accept_w);
- 
--	while (rds_tcp_accept_one(rtn->rds_tcp_listen_sock) == 0)
-+	while (rds_tcp_accept_one(rtn) == 0)
- 		cond_resched();
- }
- 
--void rds_tcp_accept_work(struct sock *sk)
-+void rds_tcp_accept_work(struct rds_tcp_net *rtn)
- {
--	struct net *net = sock_net(sk);
--	struct rds_tcp_net *rtn = net_generic(net, rds_tcp_netid);
--
- 	queue_work(rds_wq, &rtn->rds_tcp_accept_w);
- }
- 
-@@ -546,6 +537,8 @@ static __net_init int rds_tcp_init_net(struct net *net)
- 
- 	memset(rtn, 0, sizeof(*rtn));
- 
-+	mutex_init(&rtn->rds_tcp_accept_lock);
-+
- 	/* {snd, rcv}buf_size default to 0, which implies we let the
- 	 * stack pick the value, and permit auto-tuning of buffer size.
- 	 */
-@@ -609,6 +602,8 @@ static void rds_tcp_kill_sock(struct net *net)
- 
- 	rtn->rds_tcp_listen_sock = NULL;
- 	rds_tcp_listen_stop(lsock, &rtn->rds_tcp_accept_w);
-+	if (rtn->rds_tcp_accepted_sock)
-+		sock_release(rtn->rds_tcp_accepted_sock);
- 	spin_lock_irq(&rds_tcp_conn_lock);
- 	list_for_each_entry_safe(tc, _tc, &rds_tcp_conn_list, t_tcp_node) {
- 		struct net *c_net = read_pnet(&tc->t_cpath->cp_conn->c_net);
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index 053aa7da87efa..7d07128593b71 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -4,6 +4,21 @@
- 
- #define RDS_TCP_PORT	16385
- 
-+/* per-network namespace private data for this module */
-+struct rds_tcp_net {
-+	/* serialize "rds_tcp_accept_one" with "rds_tcp_accept_lock"
-+	 * to protect "rds_tcp_accepted_sock"
-+	 */
-+	struct mutex		rds_tcp_accept_lock;
-+	struct socket		*rds_tcp_listen_sock;
-+	struct socket		*rds_tcp_accepted_sock;
-+	struct work_struct	rds_tcp_accept_w;
-+	struct ctl_table_header	*rds_tcp_sysctl;
-+	const struct ctl_table	*ctl_table;
-+	int			sndbuf_size;
-+	int			rcvbuf_size;
-+};
-+
- struct rds_tcp_incoming {
- 	struct rds_incoming	ti_inc;
- 	struct sk_buff_head	ti_skb_list;
-@@ -19,6 +34,7 @@ struct rds_tcp_connection {
- 	 */
- 	struct mutex		t_conn_path_lock;
- 	struct socket		*t_sock;
-+	struct rds_tcp_net	*t_rtn;
- 	void			*t_orig_write_space;
- 	void			*t_orig_data_ready;
- 	void			*t_orig_state_change;
-@@ -49,6 +65,7 @@ struct rds_tcp_statistics {
- };
- 
- /* tcp.c */
-+extern int rds_tcp_netid;
- bool rds_tcp_tune(struct socket *sock);
- void rds_tcp_set_callbacks(struct socket *sock, struct rds_conn_path *cp);
- void rds_tcp_reset_callbacks(struct socket *sock, struct rds_conn_path *cp);
-@@ -57,7 +74,7 @@ void rds_tcp_restore_callbacks(struct socket *sock,
- u32 rds_tcp_write_seq(struct rds_tcp_connection *tc);
- u32 rds_tcp_snd_una(struct rds_tcp_connection *tc);
- extern struct rds_transport rds_tcp_transport;
--void rds_tcp_accept_work(struct sock *sk);
-+void rds_tcp_accept_work(struct rds_tcp_net *rtn);
- int rds_tcp_laddr_check(struct net *net, const struct in6_addr *addr,
- 			__u32 scope_id);
- /* tcp_connect.c */
-@@ -69,7 +86,8 @@ void rds_tcp_state_change(struct sock *sk);
- struct socket *rds_tcp_listen_init(struct net *net, bool isv6);
- void rds_tcp_listen_stop(struct socket *sock, struct work_struct *acceptor);
- void rds_tcp_listen_data_ready(struct sock *sk);
--int rds_tcp_accept_one(struct socket *sock);
-+void rds_tcp_conn_slots_available(struct rds_connection *conn);
-+int rds_tcp_accept_one(struct rds_tcp_net *rtn);
- void rds_tcp_keepalive(struct socket *sock);
- void *rds_tcp_listen_sock_def_readable(struct net *net);
- 
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 27b6107ddc28d..551c847f2890a 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -35,6 +35,8 @@
- #include <linux/in.h>
- #include <net/tcp.h>
- #include <trace/events/sock.h>
-+#include <net/net_namespace.h>
-+#include <net/netns/generic.h>
- 
- #include "rds.h"
- #include "tcp.h"
-@@ -66,32 +68,46 @@ struct rds_tcp_connection *rds_tcp_accept_one_path(struct rds_connection *conn)
- 	int i;
- 	int npaths = max_t(int, 1, conn->c_npaths);
- 
--	/* for mprds, all paths MUST be initiated by the peer
--	 * with the smaller address.
--	 */
--	if (rds_addr_cmp(&conn->c_faddr, &conn->c_laddr) >= 0) {
--		/* Make sure we initiate at least one path if this
--		 * has not already been done; rds_start_mprds() will
--		 * take care of additional paths, if necessary.
--		 */
--		if (npaths == 1)
--			rds_conn_path_connect_if_down(&conn->c_path[0]);
--		return NULL;
--	}
--
- 	for (i = 0; i < npaths; i++) {
- 		struct rds_conn_path *cp = &conn->c_path[i];
- 
- 		if (rds_conn_path_transition(cp, RDS_CONN_DOWN,
--					     RDS_CONN_CONNECTING)) {
-+					     RDS_CONN_CONNECTING))
- 			return cp->cp_transport_data;
--		}
- 	}
- 	return NULL;
- }
- 
--int rds_tcp_accept_one(struct socket *sock)
-+void rds_tcp_conn_slots_available(struct rds_connection *conn)
- {
-+	struct rds_tcp_connection *tc;
-+	struct rds_tcp_net *rtn;
-+
-+	if (rds_destroy_pending(conn))
-+		return;
-+
-+	tc = conn->c_path->cp_transport_data;
-+	rtn = tc->t_rtn;
-+	if (!rtn)
-+		return;
-+
-+	/* As soon as a connection went down,
-+	 * it is safe to schedule a "rds_tcp_accept_one"
-+	 * attempt even if there are no connections pending:
-+	 * Function "rds_tcp_accept_one" won't block
-+	 * but simply return -EAGAIN in that case.
-+	 *
-+	 * Doing so is necessary to address the case where an
-+	 * incoming connection on "rds_tcp_listen_sock" is ready
-+	 * to be acccepted prior to a free slot being available:
-+	 * the -ENOBUFS case in "rds_tcp_accept_one".
-+	 */
-+	rds_tcp_accept_work(rtn);
-+}
-+
-+int rds_tcp_accept_one(struct rds_tcp_net *rtn)
-+{
-+	struct socket *listen_sock = rtn->rds_tcp_listen_sock;
- 	struct socket *new_sock = NULL;
- 	struct rds_connection *conn;
- 	int ret;
-@@ -105,17 +121,23 @@ int rds_tcp_accept_one(struct socket *sock)
- #endif
- 	int dev_if = 0;
- 
--	if (!sock) /* module unload or netns delete in progress */
-+	if (!listen_sock) /* module unload or netns delete in progress */
- 		return -ENETUNREACH;
- 
--	ret = kernel_accept(sock, &new_sock, O_NONBLOCK);
--	if (ret)
--		return ret;
-+	mutex_lock(&rtn->rds_tcp_accept_lock);
-+	new_sock = rtn->rds_tcp_accepted_sock;
-+	rtn->rds_tcp_accepted_sock = NULL;
- 
--	rds_tcp_keepalive(new_sock);
--	if (!rds_tcp_tune(new_sock)) {
--		ret = -EINVAL;
--		goto out;
-+	if (!new_sock) {
-+		ret = kernel_accept(listen_sock, &new_sock, O_NONBLOCK);
-+		if (ret)
-+			goto out;
-+
-+		rds_tcp_keepalive(new_sock);
-+		if (!rds_tcp_tune(new_sock)) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
- 	}
- 
- 	inet = inet_sk(new_sock->sk);
-@@ -130,7 +152,7 @@ int rds_tcp_accept_one(struct socket *sock)
- 	peer_addr = &daddr;
- #endif
- 	rdsdebug("accepted family %d tcp %pI6c:%u -> %pI6c:%u\n",
--		 sock->sk->sk_family,
-+		 listen_sock->sk->sk_family,
- 		 my_addr, ntohs(inet->inet_sport),
- 		 peer_addr, ntohs(inet->inet_dport));
- 
-@@ -150,13 +172,13 @@ int rds_tcp_accept_one(struct socket *sock)
- 	}
- #endif
- 
--	if (!rds_tcp_laddr_check(sock_net(sock->sk), peer_addr, dev_if)) {
-+	if (!rds_tcp_laddr_check(sock_net(listen_sock->sk), peer_addr, dev_if)) {
- 		/* local address connection is only allowed via loopback */
- 		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
- 
--	conn = rds_conn_create(sock_net(sock->sk),
-+	conn = rds_conn_create(sock_net(listen_sock->sk),
- 			       my_addr, peer_addr,
- 			       &rds_tcp_transport, 0, GFP_KERNEL, dev_if);
- 
-@@ -169,15 +191,51 @@ int rds_tcp_accept_one(struct socket *sock)
- 	 * If the client reboots, this conn will need to be cleaned up.
- 	 * rds_tcp_state_change() will do that cleanup
- 	 */
--	rs_tcp = rds_tcp_accept_one_path(conn);
--	if (!rs_tcp)
-+	if (rds_addr_cmp(&conn->c_faddr, &conn->c_laddr) < 0) {
-+		/* Try to obtain a free connection slot.
-+		 * If unsuccessful, we need to preserve "new_sock"
-+		 * that we just accepted, since its "sk_receive_queue"
-+		 * may contain messages already that have been acknowledged
-+		 * to and discarded by the sender.
-+		 * We must not throw those away!
-+		 */
-+		rs_tcp = rds_tcp_accept_one_path(conn);
-+		if (!rs_tcp) {
-+			/* It's okay to stash "new_sock", since
-+			 * "rds_tcp_conn_slots_available" triggers
-+			 * "rds_tcp_accept_one" again as soon as one of the
-+			 * connection slots becomes available again
-+			 */
-+			rtn->rds_tcp_accepted_sock = new_sock;
-+			new_sock = NULL;
-+			ret = -ENOBUFS;
-+			goto out;
-+		}
-+	} else {
-+		/* This connection request came from a peer with
-+		 * a larger address.
-+		 * Function "rds_tcp_state_change" makes sure
-+		 * that the connection doesn't transition
-+		 * to state "RDS_CONN_UP", and therefore
-+		 * we should not have received any messages
-+		 * on this socket yet.
-+		 * This is the only case where it's okay to
-+		 * not dequeue messages from "sk_receive_queue".
-+		 */
-+		if (conn->c_npaths <= 1)
-+			rds_conn_path_connect_if_down(&conn->c_path[0]);
-+		rs_tcp = NULL;
- 		goto rst_nsk;
-+	}
-+
- 	mutex_lock(&rs_tcp->t_conn_path_lock);
- 	cp = rs_tcp->t_cpath;
- 	conn_state = rds_conn_path_state(cp);
- 	WARN_ON(conn_state == RDS_CONN_UP);
--	if (conn_state != RDS_CONN_CONNECTING && conn_state != RDS_CONN_ERROR)
-+	if (conn_state != RDS_CONN_CONNECTING && conn_state != RDS_CONN_ERROR) {
-+		rds_conn_path_drop(cp, 0);
- 		goto rst_nsk;
-+	}
- 	if (rs_tcp->t_sock) {
- 		/* Duelling SYN has been handled in rds_tcp_accept_one() */
- 		rds_tcp_reset_callbacks(new_sock, cp);
-@@ -207,6 +265,9 @@ int rds_tcp_accept_one(struct socket *sock)
- 		mutex_unlock(&rs_tcp->t_conn_path_lock);
- 	if (new_sock)
- 		sock_release(new_sock);
-+
-+	mutex_unlock(&rtn->rds_tcp_accept_lock);
-+
- 	return ret;
- }
- 
-@@ -234,7 +295,7 @@ void rds_tcp_listen_data_ready(struct sock *sk)
- 	 * the listen socket is being torn down.
- 	 */
- 	if (sk->sk_state == TCP_LISTEN)
--		rds_tcp_accept_work(sk);
-+		rds_tcp_accept_work(net_generic(sock_net(sk), rds_tcp_netid));
- 	else
- 		ready = rds_tcp_listen_sock_def_readable(sock_net(sk));
- 
--- 
-2.43.0
+Reviewed-by: Wei Fang <wei.fang@nxp.com>
 
 
