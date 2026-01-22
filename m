@@ -1,113 +1,114 @@
-Return-Path: <netdev+bounces-252107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252108-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHTbEkhqcWmaGgAAu9opvQ
-	(envelope-from <netdev+bounces-252107-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:07:36 +0100
+	id 4AQMFHJqcWmaGgAAu9opvQ
+	(envelope-from <netdev+bounces-252108-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:08:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50AAF5FCFA
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:07:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAFFF5FD18
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 01:08:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 010FE36591C
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:07:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D4AE4E129E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 00:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4931E5B64;
-	Thu, 22 Jan 2026 00:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6255A1B394F;
+	Thu, 22 Jan 2026 00:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwPZTS1t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHml28c1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EEE19C553
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 00:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABAE3A1B5
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 00:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769040433; cv=pass; b=RUUsmfgwNfcRzFFKGJU68drLGOKQasZh5tBm43taXRfJkQ6d5iMyE1D6O+Qb0h5KfN7Uz6s+jfELDHoqxw0iYo5myBQdKLWXht9CT6tB8pVZgMU3Kr/B2zclYjYsZPdAOKknMV4LrB0Dd40ZV3OHiXnsWvya0EuljwL1LINrEEg=
+	t=1769040492; cv=pass; b=hrne3AnOd00ZLe3YzEnJPhHlc7lWdsTOcOOCzZI7DhdR5XuhuY7Y748l/qhHq96Ri8HS1XjJu6IsPJynjqmUmoYZqHKJdrb23wV29sIs4RXUa8DVzVpbvkhOV1TKVoVP/eW0+tdyziJIBJg1QiSlL2AH/qGBNKOZCPlnJA+oizY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769040433; c=relaxed/simple;
-	bh=YDS2dEo5JUXKvqLS3U1b6s+W+s7l5ZragsnMIxIcL7A=;
+	s=arc-20240116; t=1769040492; c=relaxed/simple;
+	bh=rcDFV/jb5AFZGAv5ko2hhsutnZLwDbzbWS7PyUYRzm0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tKstyeJHJPdfMgT4QcZkbvsCJTZmAwR8so5Iba3DVk6s6ZQqBxNGLJ0ipeMkku1lqReo2P2GSgX8FrXYpRORdgdfX94IaAJa1x0FonWHHIqKgiRkTYYoTrYovNjxEoUDefQfr1TYzGj8XqXzE9QtOJUkpK+qJQxAfpYCHRPmd8E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwPZTS1t; arc=pass smtp.client-ip=209.85.215.173
+	 To:Cc:Content-Type; b=ja3O5oJJykrCYwCAapCMA4GSkWLaPSq1tu3F98HMMduEenLsYCji0DrUwpXkh9K5uouns3LpE6EaMh9nRXTHWazPzVkYrThwsMiN7Pb7EP9i6yXHKWOtzPQUcabAg0dzyJDzUvbjhTHtt3otDO618fd+K+vSAy7EChex3BGe1kg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nHml28c1; arc=pass smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c613a0ca52dso169165a12.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:07:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769040427; cv=none;
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-34c24f4dfb7so258467a91.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jan 2026 16:08:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769040490; cv=none;
         d=google.com; s=arc-20240605;
-        b=fprYbzs/AzOeT+HYuzZK9i/azRbE3gvLw0pNbcJ9wpqizFRag8OwWm/kXFA9OcRqQb
-         hWl1lTXmnJzJUvCSuNvbMxl7T8sBsiApfsR35txrAQKqbhMBTSqG/n+mLkYBWAT8ticY
-         l7JT6j+u8zeY78H2pD3pnehWP5tXniJZrx5zTLBSC+WXvmrp1tup/ecQAL1uDgryE4/i
-         zTTEX5ETLaUkZMUsrGBkoXquzMYyNyOJvaIsWr79Jv6jomVy6M5jLGqW3SQFlt4AM51+
-         gvkYdqLztowg8BQT4Tj11pt7PmcIN1xqntkMArTaykSe6OAhfGs0WMWnt+6fifpRFYML
-         RGaA==
+        b=YZEOtTSl+BXb3lGI3zAASUn7UmjbKvX76iohr52uVQxP82d8eL40c+gj0PJzaYFPfN
+         5lr0j4uR472iE3AjSjkOHEJig46mIiJx40r6FhvQdv/QKRIroTyTUNVYQrEyTsVQRj5D
+         GONfI4UtcwiHAJKVO8n19pYM2ExecEaBDNIUkE2V1trHtq+akR+DR5KreK/KL8yxjmpD
+         mM5p+FeUYtSPCvfc5vNBIL9Knx6WiQD43jhe0lXSdwvpmc8mZse35vGoGReL9UoeNH28
+         FZOkWFQMxs6ti7M1sAe1xUxdb8whdXUMIakERoU6IVsv/Rz6OxtiH5JWuCUctCl38jiM
+         jmNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=kpehpzYUeYxQtOW064pL5zljYpeDlxfX3uOqdqYW3MQ=;
-        fh=8mU0dQ+8lWBA984azMwKaJK12AufEfFYVasXgKaB9PI=;
-        b=F35LBwdmPYuHZRwAap3qfVeZN8rHZ/qKK5IqF8/afgbuY6/lJ83LKppBFWlX6COa1M
-         jIz9y9Ik9nC9N6B6xIso10hLEDmiynyRijK48xIrpgH4epuZLHfCkGobFv1bofjarnBr
-         w+rxajD9MSgacC9Fpbh+Di6PKtW9aBv6PTtVEvgkUh1/PbQrdJWyBX3KF1xUTlynyLQh
-         Zt3oOa7hOnJCGDtG8EZ2VGN3AorqDJOf8Lv3l0gj9g9SDd8WU5htM2FzvZnANBFd/O8T
-         sozOerXv1GvhiAlNcj5DkJkwmehxNECP8pQimt27BndVKDlJr6J1aWLOHv43oHqNv1aQ
-         dZdg==;
+        bh=CEq2XLfImnI9UEC9IsU1TUIK3ENSgE7y7e+S18vk1RM=;
+        fh=GezImQrP+Vp4pjh17oHk4smk8wSzpaChsprlebvWddo=;
+        b=ITlj4+Qyd+AumyV4HcK4Tc3S1vrko9O3oEGESA4/CvOwSmi3sCey8I4PEv2plsgsqQ
+         o7y+twLyZpZmMa4rRVnIPqw4rtHnoS/DluJ/w9H/7/nVXboUzrjPwGJimNsLU8HNDXyf
+         JCOTUKNYXYub1dcyeNcmCqpJUaTYBRq6vPyCmloPKgjWPVtDe7ouOqRhLmPnGKWsHu2g
+         ViTtA2SB8nmgOxYdvTcHVGGa8qDTuqGRGND+uZBi371D5L6YVVEQjUaR9SWwDCCLy4gE
+         RPgJS2G2y4yJ6RL+KenKIywWgANi9ctAVt9fCAiRgwWaXuDF+XBad8oypjjZTrQQ33yK
+         /Jww==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769040427; x=1769645227; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769040490; x=1769645290; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kpehpzYUeYxQtOW064pL5zljYpeDlxfX3uOqdqYW3MQ=;
-        b=fwPZTS1tybOQkAiB0vhUDeanxbxIMfuZGdqzW1tTunfabB9nq9Lo5YbDv0eahhSla6
-         2Hfir8ql8n95v6qKqKq/HrKwqkrwBtKnFcYQIu9OVMKsx0o9QGdykkv+OM69SyNnd+J/
-         +nnOw4gdyP0gOTYQ9hBMOvqTKYPKdJRFoEXsIX2d28HkeyHJg/CmeoqaijcCTjKg4HWv
-         DuBqGNu5bj3t5YZ+kFaJPUToR3e6kP/VTyvmkSorUnhzXcROsLZQgTrO8669WmAgYWcq
-         aH2swOvyUUiweODSDxVrJ8EH2jqPr1jvjEMS4xffoIUyXeO7epf4ca8zli/lbctyU1Sx
-         hMnQ==
+        bh=CEq2XLfImnI9UEC9IsU1TUIK3ENSgE7y7e+S18vk1RM=;
+        b=nHml28c1FdgbO3YOkCGuXVzQn72JQPBQKTQqY20Nx7bcjSWdzfAu2lYzleEwkSGj27
+         jSRE4lqwk+n14Gv13vC6FI5rbqempf/GMebUz0X1Am3fHg/4AXlcyuyj50Rf000fzjwc
+         ZPzENOaj6u0NeAG9eEBK8HfdNyvV591x7G6Sik6nuJkvOkCHrw+CpXiQvsFbrroowXLr
+         zd8Ymwa+i6ua/+hb8WRAn1ohcStC6SDysXRQCD04ln6/3i65mmT7rWVE2fjLPxzRYf1g
+         MrTTFIYIcq1cRiIuodLjjZFjp+i9e9dXfxL5zGUrUuS5KTnaBAC3FPkQgphBDmsKrGZg
+         YMKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769040427; x=1769645227;
+        d=1e100.net; s=20230601; t=1769040490; x=1769645290;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=kpehpzYUeYxQtOW064pL5zljYpeDlxfX3uOqdqYW3MQ=;
-        b=fuYrUUTtHaafgnqr9rIege4Yhy0czXkJy0h/RXj5zFY0VEW0+A2yQaKP9zHOjbxbWK
-         og3qMbpPm+Z3a5JRF3xu5Hw8gYpulKpjMYiKtTne6BcCTPUfF7fIBlp2KEnveFsaeUnO
-         NqDpTUwDdlmtaz0c1zKaLgA7wxVE7l4hwsqE6FlecRD8+c687hN6PvO8Y21WAHXeJx8j
-         cZk9UkhTOgQvlBXJHSYtTCHg3gAl2C2EDeT6cg8NMrdkH2AhMk9VbmSjJH6JSEi5l3jM
-         tp3GqnxneEG5WZXkrPU0z10mRMIrEFGBwjDS8iPcly3PG3sAeg86Ay3D11T/CUhUG9ff
-         pBhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVyXvTOd+kOrTRxKIzPWcoK99gjb/CYviWLt3bd+cz+64KJ7pqVlh+fWy/PjV5FTIzCoybuaoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGVO8/84nE4vUhUYYDXJ5Vn6mkTTH9zqv+W2f+9PQsxb575JOH
-	dlH3MaJPxb55P84M4Arqyq6tsm8P1sbYBCtNvbdWXj841xdhpHwhew9nxQWCTLq+nD3Lz7CIvS1
-	YeUCnHF51BmDUGHMY8o9/gJ2pb7Qplxw=
-X-Gm-Gg: AZuq6aIkKEDinsJmHvclybjW9CO57JoI2oE5yfxfFeKjXpuWHgcVD4Vpqd4Hw7maij9
-	JsWvBxPSuewifSBrV0S54Ik+P6EtAL4LdAHQThi1+raRBrNf/Wq7w8dLFHSR9nYt2Kmbyh0Ne5e
-	uub1jjbUGOV5u+wQIYLtHioHfnDbH40JoouoDPvkXFBS8lVKKF1krWKtXncYjywA59n4A4L6Sv1
-	skawuTLNX6i19pf47qAU9ffW9uTDE8IlS2XWTLzbeAfLKJLL4ZOIeUfmGvLRun9V9QY1piSjAjB
-	b3EM2a2n5FrskvPs0eQ=
-X-Received: by 2002:a17:90b:1f91:b0:341:b5a2:3e7b with SMTP id
- 98e67ed59e1d1-35272edae77mr15190946a91.4.1769040427195; Wed, 21 Jan 2026
- 16:07:07 -0800 (PST)
+        bh=CEq2XLfImnI9UEC9IsU1TUIK3ENSgE7y7e+S18vk1RM=;
+        b=QDoKv8EnVlOfBgspi72+sy38S3Lgsm6W9et3hVZfuYIMGP9Zh3yFu+b/myEe/aewEW
+         H6zSiWy7AwK0/6FnAhQdpIWYX7BHxbkgmgGzRX+3GHOozepBYWj5gFWUARx+Sti/nRcl
+         1SN94yNCbFpx2ySrGK2094vJPeVz02FoOoKigdymZLrt02KBI9zlBjSze/GLl1Oo6bBD
+         s443VhNd659FAnPyqCDtAIH7vKMRe9WGyzs/7ILVxluEzToqLKs/6LIejg1xgROoctzI
+         JScLOOcEYBJrQ2HTBeBknF2QV3Rxsqs0orZ+gY+adKExGcnnHjNmEtCU+q7Beirj0vJ4
+         RJNA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8VteJJiE5BP2SkgpUNDB0Dk4mx+oxiD6/ViLcwmYjYvJOmfJ56f3Uz0EsJYLqokxmqlxResU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvbf0FUZhLtb4i+I0qgX0zX6EHC8CkL6NN45UyK1kBB9wMnFSy
+	h0UcnkMMzPoAIGxYTf+O7zF9NRkBznecr6u4RWsC+UNq7wapBZig3/ZlmvaqBcnuT77/tRUECwA
+	uZuagJO0kwQc/cI9lcGeyZKJwpxfsQCBOSw==
+X-Gm-Gg: AZuq6aJz9qj29Vg3WDZ1mKixVzvpVHn0p5fYgLFASX4PdBqPtLYG2Mu+Q74azLVhZll
+	VJVMDY50lFIdszCM8zrRXdDx2tU1KQZYFjan4oJwYXIqWNu8+pqRXcJJQGyaqeyGiM1595H3u71
+	D8QVTKKV6kMfckJ+waUCKfvKOvE0JvkN2JlJTZOGQqDT19ppGLZJ7Ilnc+Lmpfa6KCsy3PKBhcV
+	zkkMGRMmnZtqv8uF8mXGHRrGyCrGl9ASKrAnfOf1sM+KXQ7HrpOp8jY8Vr9hRA8ZVrgb4rSXJ96
+	4KMH90w/Hf5HkdhDYBI=
+X-Received: by 2002:a17:90b:5344:b0:34c:cb3c:f544 with SMTP id
+ 98e67ed59e1d1-35273179d01mr16388848a91.14.1769040490112; Wed, 21 Jan 2026
+ 16:08:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260115112246.221082-1-dongml2@chinatelecom.cn> <20260115112246.221082-8-dongml2@chinatelecom.cn>
-In-Reply-To: <20260115112246.221082-8-dongml2@chinatelecom.cn>
+References: <20260115112246.221082-1-dongml2@chinatelecom.cn> <20260115112246.221082-12-dongml2@chinatelecom.cn>
+In-Reply-To: <20260115112246.221082-12-dongml2@chinatelecom.cn>
 From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 21 Jan 2026 16:06:55 -0800
-X-Gm-Features: AZwV_QhSGxLIIP5f5im61MFlVXddfZPY1u3-4m3Mb5vdt2iGWTCVRB0Cnsxp4Lo
-Message-ID: <CAEf4BzYop1GT1v7qxNQi44dsEebjwnLp-sHDp-HPzVrj69WzTw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v10 07/12] bpf,x86: add fsession support for x86_64
+Date: Wed, 21 Jan 2026 16:07:58 -0800
+X-Gm-Features: AZwV_QhgBqz09ws2ewKfqsUbDO_vJyCn2syHCxdPXgnk8kXxYqJ1jNQI5JIHhoY
+Message-ID: <CAEf4BzYbzSf_jXwFxni0viHRHhYQ=k=Ggq79S=FRNmxQGdcS1w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v10 11/12] selftests/bpf: add testcases for
+ fsession cookie
 To: Menglong Dong <menglong8.dong@gmail.com>
 Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net, 
 	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
@@ -128,7 +129,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252107-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252108-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
@@ -144,96 +145,101 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
 	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 50AAF5FCFA
+X-Rspamd-Queue-Id: BAFFF5FD18
 X-Rspamd-Action: no action
 
 On Thu, Jan 15, 2026 at 3:24=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
 .com> wrote:
 >
-> Add BPF_TRACE_FSESSION supporting to x86_64, including:
->
-> 1. clear the return value in the stack before fentry to make the fentry
->    of the fsession can only get 0 with bpf_get_func_ret().
->
-> 2. clear all the session cookies' value in the stack.
->
-> 2. store the index of the cookie to ctx[-1] before the calling to fsessio=
-n
->
-> 3. store the "is_return" flag to ctx[-1] before the calling to fexit of
->    the fsession.
+> Test session cookie for fsession. Multiple fsession BPF progs is attached
+> to bpf_fentry_test1() and session cookie is read and write in the
+> testcase.
 >
 > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> Co-developed-by: Leon Hwang <leon.hwang@linux.dev>
-> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 > ---
-> v10:
-> - use "|" for func_meta instead of "+"
-> - pass the "func_meta_off" to invoke_bpf() explicitly, instead of
->   computing it with "stack_size + 8"
-> - pass the "cookie_off" to invoke_bpf() instead of computing the current
->   cookie index with "func_meta"
->
-> v5:
-> - add the variable "func_meta"
-> - define cookie_off in a new line
->
-> v4:
-> - some adjustment to the 1st patch, such as we get the fsession prog from
->   fentry and fexit hlist
-> - remove the supporting of skipping fexit with fentry return non-zero
->
-> v2:
-> - add session cookie support
-> - add the session stuff after return value, instead of before nr_args
+> v3:
+> - restructure the testcase by combine the testcases for session cookie an=
+d
+>   get_func_ip into one patch
 > ---
->  arch/x86/net/bpf_jit_comp.c | 52 ++++++++++++++++++++++++++++---------
->  1 file changed, 40 insertions(+), 12 deletions(-)
+>  .../selftests/bpf/progs/fsession_test.c       | 53 +++++++++++++++++++
+>  1 file changed, 53 insertions(+)
 >
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index 2f31331955b5..16720f2be16c 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -3094,13 +3094,19 @@ static int emit_cond_near_jump(u8 **pprog, void *=
-func, void *ip, u8 jmp_cond)
+> diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/te=
+sting/selftests/bpf/progs/fsession_test.c
+> index f504984d42f2..4e55ca67db46 100644
+> --- a/tools/testing/selftests/bpf/progs/fsession_test.c
+> +++ b/tools/testing/selftests/bpf/progs/fsession_test.c
+> @@ -108,3 +108,56 @@ int BPF_PROG(test6, int a)
+>                 test6_entry_result =3D (const void *) addr =3D=3D &bpf_fe=
+ntry_test1;
+>         return 0;
+>  }
+> +
+> +__u64 test7_entry_ok =3D 0;
+> +__u64 test7_exit_ok =3D 0;
+> +SEC("fsession/bpf_fentry_test1")
+> +int BPF_PROG(test7, int a)
+> +{
+> +       __u64 *cookie =3D bpf_session_cookie(ctx);
+> +
+> +       if (!bpf_session_is_return(ctx)) {
+> +               *cookie =3D 0xAAAABBBBCCCCDDDDull;
+> +               test7_entry_ok =3D *cookie =3D=3D 0xAAAABBBBCCCCDDDDull;
+
+you are trying to double-check that writing into *cookie preserves the
+written value, is that right? Do we need volatile read here to ensure
+that compiler doesn't optimize this?
+
+> +               return 0;
+> +       }
+> +
+> +       test7_exit_ok =3D *cookie =3D=3D 0xAAAABBBBCCCCDDDDull;
+> +       return 0;
+> +}
+> +
+> +__u64 test8_entry_ok =3D 0;
+> +__u64 test8_exit_ok =3D 0;
+> +
+> +SEC("fsession/bpf_fentry_test1")
+> +int BPF_PROG(test8, int a)
+> +{
+> +       __u64 *cookie =3D bpf_session_cookie(ctx);
+> +
+> +       if (!bpf_session_is_return(ctx)) {
+> +               *cookie =3D 0x1111222233334444ull;
+> +               test8_entry_ok =3D *cookie =3D=3D 0x1111222233334444ull;
+> +               return 0;
+> +       }
+> +
+> +       test8_exit_ok =3D *cookie =3D=3D 0x1111222233334444ull;
+> +       return 0;
+> +}
+> +
+> +__u64 test9_entry_result =3D 0;
+> +__u64 test9_exit_result =3D 0;
+> +
+> +SEC("fsession/bpf_fentry_test1")
+> +int BPF_PROG(test9, int a, int ret)
+> +{
+> +       __u64 *cookie =3D bpf_session_cookie(ctx);
+> +
+> +       if (!bpf_session_is_return(ctx)) {
+> +               test9_entry_result =3D a =3D=3D 1 && ret =3D=3D 0;
+> +               *cookie =3D 0x123456ULL;
+> +               return 0;
+> +       }
+> +
+> +       test9_exit_result =3D a =3D=3D 1 && ret =3D=3D 2 && *cookie =3D=
+=3D 0x123456ULL;
+> +       return 0;
+> +}
+> --
+> 2.52.0
 >
->  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
->                       struct bpf_tramp_links *tl, int stack_size,
-> -                     int run_ctx_off, bool save_ret,
-> -                     void *image, void *rw_image)
-> +                     int run_ctx_off, int func_meta_off, bool save_ret,
-> +                     void *image, void *rw_image, u64 func_meta,
-> +                     int cookie_off)
->  {
-> -       int i;
-> +       int i, cur_cookie =3D (cookie_off - stack_size) / 8;
-
-not sure why you went with passing cookie_off and then calculating,
-effectively, cookie count out of that?... why not pass cookie count
-directly then? it's minor, but just seems like a weird choice here,
-tbh
-
-
-
->         u8 *prog =3D *pprog;
->
->         for (i =3D 0; i < tl->nr_links; i++) {
-> +               if (tl->links[i]->link.prog->call_session_cookie) {
-> +                       emit_store_stack_imm64(&prog, BPF_REG_0, -func_me=
-ta_off,
-> +                                              func_meta | (cur_cookie <<=
- BPF_TRAMP_SHIFT_COOKIE));
-> +                       cur_cookie--;
-> +               }
->                 if (invoke_bpf_prog(m, &prog, tl->links[i], stack_size,
->                                     run_ctx_off, save_ret, image, rw_imag=
-e))
->                         return -EINVAL;
-
-[...]
 
