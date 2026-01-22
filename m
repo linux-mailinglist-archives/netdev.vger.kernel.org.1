@@ -1,176 +1,224 @@
-Return-Path: <netdev+bounces-252421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0N8jCcdTcmnpfAAAu9opvQ
-	(envelope-from <netdev+bounces-252421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:43:51 +0100
+	id CHkZGhdWcmkpiwAAu9opvQ
+	(envelope-from <netdev+bounces-252422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:53:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B8806A316
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:43:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00CB86A640
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 17:53:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CCFB0314FFDD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:34:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92FC4300A4DD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9E3366064;
-	Thu, 22 Jan 2026 15:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED7844D011;
+	Thu, 22 Jan 2026 16:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vOG9jW/2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2Rj+KiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C23366041
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 15:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769097439; cv=pass; b=vA1p9aX0Zk56NpLR24LD/5JPbel9+xtRyC1pO4zhR0rh3YQ5+IROWXNYmu8F3Uj3RhLoQQJ61MUG3gfehLynYq/YApa8vO8C3kNCvlshOUmkyWoufnXVrYpPS8p5zwnDtN7Im6jCR0vMmQH8E18av8y5dVarD27do2Rlz911tp0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769097439; c=relaxed/simple;
-	bh=Yj4BIWXcszVHy3RbHw3mIijcq3FuH0VHZcWejptXT2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dxPEZpUi8dddgXQPc8Rywoql+ysfH3hX8P02+aPjGtYNmM50Znnzldb9l6N5jr84f28jwjz7HqcZwOKB2tHcl9o8YkUCDJnshWeZpp5o75JomdpvQXU4XqMAkQY5ERbIiVzCuz3vkgJYhgPC3nZVezrgorX7RRtEMurtBrGgjWs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vOG9jW/2; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-501506f448bso8315001cf.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 07:57:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769097435; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aM2D4yk7Epj33wk0LoYZ6gOVnjAHAIX4Og4mEBpPBSKMh/HNzmbdnsDbBBEWI5x7zo
-         Q1CZWZ6biirv/rArqVY/rhXaiW2db86jS5wsowsTL54bwZT1vBWylOq7m0kiO4jSjpEs
-         pahmAen7vUD/apt3rtyWOICWeyHy6Ry0kDpJSvF0kVnC6mcBFFE2GzIzsJIW5+Gd64L1
-         CPsRgGVJK8FSRF1Ri/NLU7NCAeiwzhUD59FmZSQ2s8iR0WrG5PIGLW2l5VogfhtCWpAk
-         knS4HhWQlffu/xsaKRq2G+6QwPxsRQFjoBG4qeeVP77tXij+OdjKS2MBA2PtxnF96jD6
-         eVMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Yj4BIWXcszVHy3RbHw3mIijcq3FuH0VHZcWejptXT2c=;
-        fh=3Rk5QNjezc4mX5WbylVOe50dx4lNaBmVPjoqE/ClL78=;
-        b=NzHsYTZWa/kh+rKigUQIMfcrjFJ2poPnW7xcqTfhYfaLFPLNXm0s4Xqoz8Z7QJ6Ucd
-         jZ4IfVS/L0HQqnZCjR8lT59iNQ5Ebiga74CKWp7syKhG3ExacSautDlHrIWyWELDGMqH
-         UIOhO7PeYm71JOv2JZ6UGWpzaLc8QeDUnXRDUjT/YIoiqLQWqgjQ/wmzMiNM1fFH32u9
-         7muHLEzWvLpYeuIlO5NFCQJSOUTXIX4ExleTjG/zTCRZNUCTPmo8H654ypCIbVz9Yrep
-         OIGxEx9wv/LlYu6AyRVN6EIHgWP8E+sTxa4kQoBPbSmuI55w0SsbxtJ4zkEsA7Y/Kdpn
-         k8NA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F304360758
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 16:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769097694; cv=none; b=G3YLCcdpVrOyRIBhGH7cnSZLFfta76U5F7Aj774btfflDDd7QyOym2buvbvqxwxhCpvDQRHlXVZkJIyrI4wq5JJpzKWVbd2z3+vSAgF/FN/+eUs2AnML6Cp8UoaCT3/IZaZ5nX/Fp5VNGAFjR5R2SH94dCVYIDLIfA5B0kFJYNM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769097694; c=relaxed/simple;
+	bh=9JzOfqiTFO39kgxFQWVLYY5umNJRQRPCw/NtCy7HzoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HV/DQNf9yBgDVnRh3Iek12xicCSrYAcW2YiNKrBHMnN6CRAUPI3IYCHSkX9kjVf8Z+ZECUbsdMCS8R2B1EKhUccqblE9MdsqIQnU2mie3CN4DiYtqZTza3U0kRuaxXvDoGgj/sh97ZzeFj5KtiMMgA/QNok0gtpUcq7NNnhGFXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2Rj+KiD; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-649389b1cc5so1157542d50.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 08:01:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769097435; x=1769702235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yj4BIWXcszVHy3RbHw3mIijcq3FuH0VHZcWejptXT2c=;
-        b=vOG9jW/2ymkVmDowptiaV4KZWiO0JMtNgpPsS124nS+tVr7zw4Z5p5J1mnMyGwz94a
-         4/BXvcylZpc6HHWjmjo4cwjthmFvcGW/xMgX/34HmVtmiCcw4oR1xpiW+0b80bhp/R8/
-         ilK2R49cvSTKRBY+u12HGB4xuATi1ZVFJSnWIqpZ9HCdfONd16B8PDY/ezzy1oMKzw4O
-         8XSa+voc5YmY39vnkMq1ebryANiX3rCooV5Jn9SUwqmGO94JYALEGA7BmzhgUgx8r3/7
-         R/i18qkdS9/99T3ij6RFk5QOcIplDUQnTm6yagdz7AcYXrlZIZEGySUwA8prQ92hVO3A
-         2C9w==
+        d=gmail.com; s=20230601; t=1769097688; x=1769702488; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4nNXaOW8SsH8VsbBiV479RmC0+eq7tMcFo5rcunlQoQ=;
+        b=l2Rj+KiDdtD2q2NtiGMA5033btXx9v484iJj7k8xvoYFUvON0uWN//Nj0B5cEZyYul
+         k8z+xwAcG4QnP/VahCqMOrvr3kNZJu14BB2o8opiF+eHpFAxpgElXJ6ycHbEVZkbIRD7
+         rpdBZZfPcAObZ4iovLDSomfuB/s4pjTq2lFUqlmgqWdE6oJy5RUYj5cZe9uGJHN0M494
+         llfIRIqnvzfZwBz14cODqAs3+Sa9Ytcpw6atLylFbOKCh0RbvLu7V39tzPsAij/QIppG
+         Kn19Zf7i/MnoUjTB2+4IWB1BZUNurieL8640i6M9ASZR7pjIn3vnLTbALhflJdeG896f
+         VXFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769097435; x=1769702235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Yj4BIWXcszVHy3RbHw3mIijcq3FuH0VHZcWejptXT2c=;
-        b=LAkBR2seHO4h+2aFWIZOmcZeCqXHTmzZZCepzKBgNLMWO+AQCYYwQqGwIxSgrgI1w3
-         X0GtGCRxZ+isiIJtXV0aNJd4wtqUL43Qvj2zyhVX2bnGoB2rm52oCK5IVpogGLra0z1V
-         jxtxGWhuXHu17M5kX2KK02At/a2lIHF7A69li98j3T9fMQkj5yZm01bdu+n22Lebh+aC
-         dK0lTlKgZ4OE3TSEMdyhtNLkImCQSkv+tJu7bGDHY06FIwbiX3YolRE8uF3IMxvpthCq
-         wi8Xc0D0J/MaCeMGexjPloPtlYdyqQg+zTCsh+Uk2sN2fWT+8gTF+j9iGsxuO/UDtpEk
-         HnDw==
-X-Gm-Message-State: AOJu0YwI+rLLdHjfm2PliCQIDlYXdxto5QpCS9b6XAnI6ieiI04XXlY+
-	ZKTMNRFaaKho7BOQDtVVzJ2siyRbV4n+KFNm1mR32Lw+ecxF2pAFv97AF1Le7uQgQNtSOQuyrZw
-	0Bt74EXCtyRueZ72Af0nzNKMCY8AjfsYMveohFGig
-X-Gm-Gg: AZuq6aJIV39a/PivJGoWuBEmJuwuLGac7Fmn2bC66WzvatIqy1SrFZuYrmoYNk5mOba
-	BhYnLE5LtDBQR82+C8/Sliy5rVn1zqi6SDD9M/U9EhbkdP/IidoNWTXVJrH7Tu14kIvfQevlF/r
-	w5Sz4+m8WiteVlGLA255zl9039tYddFvHJbMip8JrLlHvV81o5dqItCqJuRWk7+cjMiJ7pJAXN8
-	42sdGz2PhYPYWGmXyh1pqCmAdcDG66+wY3VH329AVd9nGSzMU5LtWY2v62Qdo1tsZt7+qoL
-X-Received: by 2002:a05:622a:1195:b0:502:6ed5:7b04 with SMTP id
- d75a77b69052e-502d853be68mr131098091cf.74.1769097434554; Thu, 22 Jan 2026
- 07:57:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769097688; x=1769702488;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4nNXaOW8SsH8VsbBiV479RmC0+eq7tMcFo5rcunlQoQ=;
+        b=id4Jeh1H3VBrCaUyg6/6sM1z85wqFlbfWZcxpnWUnqEVYevw4DI4vwxFTNjKWy1Qfy
+         Ix48WfLHFSCkVCQ4GbOoAytGOAhBGNi9b5qHu0ULyBzKCEx0ogUDbGkPqm8XtUTIQgf3
+         jTzyN8kX2rMQj1JuT166fXBp4CHfcniYHje33hLSBMEvjT8S8OatpWNA0gdkDy5AU3ZF
+         y35rBiTI5OsOsgs+vXzl+anP21ZFLWKdAIIbWtrXxy6UVSwAY8tv+8KQyVWjUuJ5s6tq
+         rkeAGOBT7KDLg1zUrN3WzkYpJfvgW8s5c077oAdPDAEfa+Q/VuOOnvM2QW71JFVzorWR
+         cjXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwoNsjq4O6JRD6FdqB7G1RsEG1HeMIx0zZLSKYXBW+PpDaSV8ohUrj/D9WYlll6kKj8FclvQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQQCWyAzmn8j6lJeAsDuakC29VLAKu38WIUxCf3mzr5KjB9eBG
+	mNc03ExAzDwJ9Z6ezmd+MylKOqNWuG1SxinAcj35UjucIu1/muyZCkCO
+X-Gm-Gg: AZuq6aIWGLqkFfmdnGwLmxR7op6mvk9yi70LCRVOHETZ0tj2Hnh2RBRQAr8xVYWIlLX
+	Eg5oRqAsCnojMtmrwFVosUZe673LzXqA3EW/XkBUpe4Uz2x0HERL1EFop0aoVJ7kt6jNbJNcFTQ
+	2mYGQr6iv768JvPY+FjKUq1DLPrjg4QmflhudJ0la+fbTAk+m4Y5WCBWbn+g+juKyBSVt7j1MFD
+	W38Qbj/g34L18H2cz3quamvtTnxkGJ4zLdDlKo7TIlawtC7hxBrbUWzpXcTNDO0zbPiRJwJEf8Q
+	dHWpjWckEJRF51qScbfiUAtHelG+uOrWHG0+EAXzQeisU0jgJ34ydBZ93uktABXKxu7MwnSYRu1
+	5DzO8oDUVCvP4FEY24WgGaTU3Rcqeya0+FSxbYSeyFw/BIf0Rl8OqYxwt4R6+Rih9irTL2eoURq
+	CdMUJBOyzVZXATbn3Q2YD0mJKjk0Us4gG4ng==
+X-Received: by 2002:a05:690e:d8b:b0:649:4689:c4a9 with SMTP id 956f58d0204a3-6494689c534mr4815658d50.89.1769097685513;
+        Thu, 22 Jan 2026 08:01:25 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:7::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-649170acbdbsm9523979d50.13.2026.01.22.08.01.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jan 2026 08:01:24 -0800 (PST)
+Date: Thu, 22 Jan 2026 08:01:23 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>, linux-doc@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v16 00/12] vsock: add namespace support to
+ vhost-vsock and loopback
+Message-ID: <aXJJ0yjZB5mT162B@devvm11784.nha0.facebook.com>
+References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
+ <aXH7YCgl0qI2dF1T@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260120152856.1694824-1-edumazet@google.com> <20260122022237.2529455-1-kuba@kernel.org>
- <CANn89iLK1saW=7jxhtew_skR-rPPonFi71brvTApeKM5VVadiA@mail.gmail.com>
- <20260122072858.2b652eb7@kernel.org> <CANn89i+0kJ5M1_6NPxbe4k5eY4sPwNeKN0yKyaHzFhZDT9-=kQ@mail.gmail.com>
- <CANn89i+7H32ODq3=nEfoORTR+6FiO2mOWRcLFf-K=+4UQcOmig@mail.gmail.com>
-In-Reply-To: <CANn89i+7H32ODq3=nEfoORTR+6FiO2mOWRcLFf-K=+4UQcOmig@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Jan 2026 16:57:03 +0100
-X-Gm-Features: AZwV_QgdaPaEBuvZtdaLr8nBTuHIJSiHHMzzSG-NQO1IG2LBCMmqKn-eORHodA4
-Message-ID: <CANn89i+eEGOkU0gS8CEh1WepoSBczt8Rq4r0nMA41Q=y5EADxQ@mail.gmail.com>
-Subject: Re: [net] bonding: annotate data-races around slave->last_rx
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, syzkaller@googlegroups.com, andy@greyhouse.net, 
-	eric.dumazet@gmail.com, pabeni@redhat.com, j.vosburgh@gmail.com, 
-	davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXH7YCgl0qI2dF1T@sgarzare-redhat>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252421-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252422-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,googlegroups.com,greyhouse.net,gmail.com,redhat.com,davemloft.net];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7B8806A316
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 00CB86A640
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 4:56=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jan 22, 2026 at 4:50=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Thu, Jan 22, 2026 at 4:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Thu, 22 Jan 2026 05:42:55 +0100 Eric Dumazet wrote:
-> > > > > This seems like the same concurrent access pattern that the ARP I=
-Pv4 path
-> > > > > needed fixing for.
-> > > >
-> > > > I saw this spot, but determined this was used at setup time, not in
-> > > > packet processing.
-> > > >
-> > > > I was maybe wrong.
-> > >
-> > > I guess if nothing else we should do it for consistency?
-> >
-> > To be clear, I will cook a V2 with this part.
-> >
->
-> _bond_options_ns_ip6_target_set() probably needs a fix as well.
+On Thu, Jan 22, 2026 at 02:55:36PM +0100, Stefano Garzarella wrote:
+> On Wed, Jan 21, 2026 at 02:11:40PM -0800, Bobby Eshleman wrote:
+> > This series adds namespace support to vhost-vsock and loopback. It does
+> > not add namespaces to any of the other guest transports (virtio-vsock,
+> > hyperv, or vmci).
+> > 
+> > The current revision supports two modes: local and global. Local
+> > mode is complete isolation of namespaces, while global mode is complete
+> > sharing between namespaces of CIDs (the original behavior).
+> > 
+> > The mode is set using the parent namespace's
+> > /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
+> > created. The mode of the current namespace can be queried by reading
+> > /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
+> > has been created.
+> > 
+> > Modes are per-netns. This allows a system to configure namespaces
+> > independently (some may share CIDs, others are completely isolated).
+> > This also supports future possible mixed use cases, where there may be
+> > namespaces in global mode spinning up VMs while there are mixed mode
+> > namespaces that provide services to the VMs, but are not allowed to
+> > allocate from the global CID pool (this mode is not implemented in this
+> > series).
+> > 
+> > Additionally, added tests for the new namespace features:
+> > 
+> > tools/testing/selftests/vsock/vmtest.sh
+> > 1..25
+> > ok 1 vm_server_host_client
+> > ok 2 vm_client_host_server
+> > ok 3 vm_loopback
+> > ok 4 ns_host_vsock_ns_mode_ok
+> > ok 5 ns_host_vsock_child_ns_mode_ok
+> > ok 6 ns_global_same_cid_fails
+> > ok 7 ns_local_same_cid_ok
+> > ok 8 ns_global_local_same_cid_ok
+> > ok 9 ns_local_global_same_cid_ok
+> > ok 10 ns_diff_global_host_connect_to_global_vm_ok
+> > ok 11 ns_diff_global_host_connect_to_local_vm_fails
+> > ok 12 ns_diff_global_vm_connect_to_global_host_ok
+> > ok 13 ns_diff_global_vm_connect_to_local_host_fails
+> > ok 14 ns_diff_local_host_connect_to_local_vm_fails
+> > ok 15 ns_diff_local_vm_connect_to_local_host_fails
+> > ok 16 ns_diff_global_to_local_loopback_local_fails
+> > ok 17 ns_diff_local_to_global_loopback_fails
+> > ok 18 ns_diff_local_to_local_loopback_fails
+> > ok 19 ns_diff_global_to_global_loopback_ok
+> > ok 20 ns_same_local_loopback_ok
+> > ok 21 ns_same_local_host_connect_to_local_vm_ok
+> > ok 22 ns_same_local_vm_connect_to_local_host_ok
+> > ok 23 ns_delete_vm_ok
+> > ok 24 ns_delete_host_ok
+> > ok 25 ns_delete_both_ok
+> > SUMMARY: PASS=25 SKIP=0 FAIL=0
+> > 
+> > Thanks again for everyone's help and reviews!
+> 
+> Thank you for your hard work and patience!
+> 
+> I think we've come up with an excellent solution that's also not too
+> invasive.
 
-Sorry, copy paste error : I meant : bond_option_arp_ip_target_rem()
+Thanks, and I appreciate all of the work you and other maintainers put
+into this as well! I think we honed in on a great solution too.
+> 
+> All the patches have my R-b, I've double-checked and tested this v16.
+> Everything seems to be working fine (famous last words xD).
+> 
+> So this series is good to go IMO!
+> 
+> Next step should be to update the vsock(7) namespace.
 
->
-> Is AI review stopping at the first error ?
+Sounds good, I'll follow up with that and CC you + other reviewers that
+participated here.
+
+Thanks again,
+Bobby
 
