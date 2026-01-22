@@ -1,179 +1,181 @@
-Return-Path: <netdev+bounces-252378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGejKo9CcmnpfAAAu9opvQ
-	(envelope-from <netdev+bounces-252378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:30:23 +0100
+	id 0O3pNA9EcmnpfAAAu9opvQ
+	(envelope-from <netdev+bounces-252379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:36:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2840468DAE
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:30:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CA569008
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 16:36:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B25B784C7F3
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:28:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AFAE098479C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 14:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A4E34D4FB;
-	Thu, 22 Jan 2026 14:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0090D34F262;
+	Thu, 22 Jan 2026 14:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WibVxrQi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+k9Kf2R";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qz4xW+pK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F41629CB3A;
-	Thu, 22 Jan 2026 14:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BFC34B40F
+	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 14:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769092127; cv=none; b=fsxj6u3OvwMImnxd1isZd3YG3CQegQwVmpbq3XFXHBmEgMXMax1EsI8ZzMihhTj2L5f/4EUj7Kqy1prFCIbf85dqXhoXGe/kS4fw3tBbCoMpJTGUY6lk98a8So3MN+Dggvvr1TCA2t2dJu8Qot3FnTd6Gc2msxe+pbbD1NYowzg=
+	t=1769092575; cv=none; b=LxVwaPxF17pJWmNbmQpJ0KWNNCol1Apbxf1nVZCr4IhN8hgDVe5DyzPGJsLpmsTbxCfvn/vqOnPhK2QeIp7BGB15wAuBDzj56CV4YZ8V0+PMG7Ec6q6jGWqpX85PW0Wkj10ysU9ImQ5Y//bo9sZp5b+dcdSEJpPXTVHvrecfYGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769092127; c=relaxed/simple;
-	bh=q+1sYBA9PQtb89RfW6pjRHDbl1q/Q0h/ZePbba5ii7U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BtEJbch6LV7t5Gjc42Itfi2LxbCemxetUnQrypAovoiZ6RHddbW+52cLwhKi3NlY/mtIbMj64bCIYupZ4vFas9ZMNm+VXAXB8tWUge4vUtAOI0rLLyOdqRCf2YHkL9Am75eZjtk+XOVlE4l5l5tMeDeDtIsbtVtGjcnGn807tss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WibVxrQi; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769092125; x=1800628125;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=q+1sYBA9PQtb89RfW6pjRHDbl1q/Q0h/ZePbba5ii7U=;
-  b=WibVxrQiDMSgws6vqRl9nqs2CZLTPvWbUkDht/cW7xFuS3zNFivJfW23
-   omaQyojJrONog65fmJ2PIUFqAuPPw4rD5IDFYO5M5tggcx9ltulQgDXfk
-   jDH4BuLnRv/3IPuN0to/190Ucu5Z+1gKZIWoWfk30i/UXJF/3xR4hR0Cp
-   e8I90OWW6jg9J5v5BS/J6de1OyTnSftP6vprx3nv8VK6Hhb7rBh6gQaXY
-   IZhUhqLMWfitWdq0KHzmAF836p/OsvENlUZL95JGvIPh4d4PobTVdn363
-   nwDCuxwR7YG4GPaelt0CfJY4d2llvxCRyPXSME9ih7RKYkdbho3kqxOxE
-   w==;
-X-CSE-ConnectionGUID: zgrHAWwpRnaeWVi6SFpaxQ==
-X-CSE-MsgGUID: vbXOMJK7QzK0O2DVQ+1rEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11679"; a="70389188"
-X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
-   d="scan'208";a="70389188"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 06:28:44 -0800
-X-CSE-ConnectionGUID: MtVen+tNTfmkXZF5GblPbA==
-X-CSE-MsgGUID: WloQCkRlSz69zIISyvigYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,246,1763452800"; 
-   d="scan'208";a="206648487"
-Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.225])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 06:28:39 -0800
-Date: Thu, 22 Jan 2026 16:28:37 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>,
-	Mark Brown <broonie@kernel.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH v2 net-next 01/15] net: mdio-regmap: permit working with
- non-MMIO regmaps
-Message-ID: <aXI0FdE66sejdvng@smile.fi.intel.com>
-References: <20260122105654.105600-1-vladimir.oltean@nxp.com>
- <20260122105654.105600-2-vladimir.oltean@nxp.com>
- <aXISv3Acm1v6yS4V@smile.fi.intel.com>
- <20260122121301.cyxyevi7xvqw2axk@skbuf>
+	s=arc-20240116; t=1769092575; c=relaxed/simple;
+	bh=oUSkpNJmY0xJU72nm4mAJJRfKSHFJiXY6nI3DcQbCbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T/5dUQS5F/wHFzJeCflItdoYg9MJ9azyWdMaeaHt3/ObJ3o/Ow5JkVbAd7/iW+lFcKJ/cAWuZgmbgn72ZHXILXVsznLmuqzxnZ50kiuxkH+RTzFquw5jHI7gamP+KReww5UYGJNSkT7tiYZf9aQX7pJbI/En2B33xsR3O4w+WBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B+k9Kf2R; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qz4xW+pK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769092571;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HsvOuFjLTr+YqXVe6RGyDhXEKiYKtBULZ5xPe6pwFaU=;
+	b=B+k9Kf2RJ1Ozfz5yc8B3Hrp2bG4kyMq6SfXj1T9GzfJH/ZMd1ewJvMe1qz/5IsK/XOu6Hl
+	px/Mo22wZ4SSIhroa+emqS2maKvOSpxw1IlIaiQkL/NGTCL8cbdAhOlRmz3Tp8LKl8noIt
+	IcCMNRnBZzDHDPKEEfs9gd53JmitOEQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-182-4AVoGP0dOVKZjfFp4YuqTg-1; Thu, 22 Jan 2026 09:36:09 -0500
+X-MC-Unique: 4AVoGP0dOVKZjfFp4YuqTg-1
+X-Mimecast-MFC-AGG-ID: 4AVoGP0dOVKZjfFp4YuqTg_1769092568
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6581d41ab79so1209464a12.2
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 06:36:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769092568; x=1769697368; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HsvOuFjLTr+YqXVe6RGyDhXEKiYKtBULZ5xPe6pwFaU=;
+        b=qz4xW+pKTncxtM0SOGwG/aMPiDe/HhEW1KFd9rUOAzX0uWbAKTTDP4DEHnZeHJYPVT
+         610KfFJjhxEOBgx9rtBZCUvjhonAjgtHIRCB5gasfIPmC3QEauZX4R1ozjTeQq+n371j
+         WnRTmr+vfV8zgBZ0XTzKKWpBPkhn7TYiqneNNyxuo4dxZmqrG4tpnUCfG/9onO4Ehfob
+         nWmdD+TCgi4AEWYCATRKofbD3lvP0I3UoCY4q/ij6kDXWkjN9i8J1StLu33Qmgxhq4tR
+         z07LDbSomZL2694u7Zdfyl1fm9vZvv/dl4NxKpQXby5J2DjIDgzPMwZohbOePtUHEO4C
+         pABQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769092568; x=1769697368;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HsvOuFjLTr+YqXVe6RGyDhXEKiYKtBULZ5xPe6pwFaU=;
+        b=WKVyvSc8lSFmKYEcow2FIsP84NdWwdiVIetDeGFODtXZkGIB7CIfKjweAXW8AtJolf
+         +61G5cUp/EbHears3natQ/Zo+VYng3ZzlaQ20UzblVDnI/on4R8hgfMvWIDoRYokM/XM
+         JoBDkyeYoeiXBg96WhIKwCYXJU7zW4aTrcrob3PuTPNOC3jB09E8oHuRJDX0EU/QZw9F
+         ZXc4tEMybr8t1+Q4ItrWN0JewcY+dk1mp9F3sywgolO7fT9GdG5Ytfbh67djt7GAV9II
+         u96Hd58+kvqQOj9rcDJKQiot679DUZl0bIYVS7iKIiUVou280k7fVAKjFcUFED1XBdPu
+         oYVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWemjIbFqQACn9WHM4E06I8+GPRMtv+42fFG/y3rD1ivgNs4dIu0pjC89WmJlSdq6ylOJB1kgk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzup2YH561fJm6kPSP3P+5Fy0PRClGBaHsjcf7CkXuxQdp5h8CJ
+	wCzX6gvvSpSOy7sH/cab05hu23N3kFcKGxVF3EVdsyYU7NFdquyx+ccT5N6yHBqwxEh7Our7Dw/
+	iv0ZMVAz7d+vzxakaeNK+fRKAEPuAEBARYo/QHCwCEQFrTe0EkbShkLAfPg==
+X-Gm-Gg: AZuq6aKXWnIjZhQXi3+BwZCLSXBMnYJsjEKEWUav+BJDRrjLOH+3my+Z1FM27z5rZis
+	yrTYPQJL5Tyd/7MmOJ9FrpgLFcHwy7uq6u9naD6GqxF5zMFbq5qc8rsG+4hi9PcsvMYSV9J1Yrd
+	QgBdrhoIBrD/g+YcuAKdA/06ApBdd8qQ73bln7Syg3MpzzGuSQlgp7e30c2FO8wdqTbQGXR++cR
+	me3SKoaFrbm82eHbFyWjRBcumUWhZXKX/sUDoHsMGf8nLiPHlQL8xC3SomQ2sAmHW0crsSFYcO+
+	O0dyfFK7M2xcn8b0Mk+ryfEH0sDgK1UZFj+STE7CMBYDoeHKjY+CBLCu9ohOUBHuGHhogtDkaWs
+	twT6cDgwoaz9X
+X-Received: by 2002:a50:cb87:0:b0:658:dbf:d1a0 with SMTP id 4fb4d7f45d1cf-6580dbfd2e4mr4103600a12.30.1769092567809;
+        Thu, 22 Jan 2026 06:36:07 -0800 (PST)
+X-Received: by 2002:a50:cb87:0:b0:658:dbf:d1a0 with SMTP id 4fb4d7f45d1cf-6580dbfd2e4mr4103583a12.30.1769092567343;
+        Thu, 22 Jan 2026 06:36:07 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.175])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65452cdb0e4sm15970133a12.13.2026.01.22.06.36.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jan 2026 06:36:06 -0800 (PST)
+Message-ID: <d681a9d5-ff37-45a0-8398-3e770052177e@redhat.com>
+Date: Thu, 22 Jan 2026 15:36:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260122121301.cyxyevi7xvqw2axk@skbuf>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] mctp i2c: Enable SMBus ARP discovery
+To: Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>, linux-i2c@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
+ <20260121092328.2308705-4-heikki.krogerus@linux.intel.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260121092328.2308705-4-heikki.krogerus@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,linux.intel.com,trustnetic.com];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	TAGGED_FROM(0.00)[bounces-252378-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
 	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,bootlin.com:email,intel.com:dkim,smile.fi.intel.com:mid,nxp.com:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2840468DAE
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2605:f480:58:1:0:1994:3:14:from];
+	TAGGED_FROM(0.00)[bounces-252379-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_PBL(0.00)[216.128.11.175:received];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[52.25.139.140:received,170.10.133.124:received];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 49CA569008
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 02:13:01PM +0200, Vladimir Oltean wrote:
-> On Thu, Jan 22, 2026 at 02:06:23PM +0200, Andy Shevchenko wrote:
-> > > Cc: Mark Brown <broonie@kernel.org>
-> > > Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > 
-> > FWIW, Cc list may be located after --- line. It will have the same effect on
-> > emails (as regular tooling will parse and put them into email headers), but
-> > will reduce unneeded noise in the commit message. List will be still available
-> > on lore.kernel.org in the mail archives.
+On 1/21/26 10:23 AM, Heikki Krogerus wrote:
+> Since the SMBus Address Resolution Protocol (ARP) is now
+> supported with all I2C host adapters, every ARP-capable MCTP
+> device will get automatically enumerated. Those devices just
+> need to be bind to this driver.
 > 
-> Thanks for the comment. I know it may be located after ---, but for me,
-> doing that implies an extra step which I find unnecessary (moving them
-> there after the git format-patch stage). I keep the Cc: in the commit
-> message in git so that it's preserved across revisions.
-
-You can keep them in your commit message. Many --- lines are also allowed!
-
-> > > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > ---
-> > 
-> >   Cc: ...
-> >   ...
-
-...
-
-> > > +	unsigned int base;
-> > 
-> > Hmm... resource_size_t ?
+> The SMBus ARP-capable MCTP devices are identified by
+> checking the interface (MCTP SMBus/I2C Transport Binding
+> Specification section 6.5). The interface must match the ASF
+> protocol, so all devices that use the ASF protocol as their
+> interface will be probed by this driver.
 > 
-> Well, regmap_read() takes "unsigned int reg".
-> https://elixir.bootlin.com/linux/v6.18.6/source/include/linux/regmap.h#L1297
-> So in practice, a truncation will be done somewhere if the register base
-> exceeds unsigned int storage capacity. But I didn't feel that it's worth
-> handling that.
+> Link: https://www.dmtf.org/sites/default/files/standards/documents/DSP0237_1.2.0.pdf
+> Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
 
-Maybe a comment near to the assignment?
+This patch depends on 1/4 but it looks like it could be a follow-up to
+the main series. If so, I think it would be better to re-submit it after
+the relevant code landed in net-next to avoid cross sub-tree problems.
 
--- 
-With Best Regards,
-Andy Shevchenko
+Otherwise I think it should go via I2C tree - and we will solve
+conflicts as needed later on.
 
+Thanks,
+
+Paolo
 
 
