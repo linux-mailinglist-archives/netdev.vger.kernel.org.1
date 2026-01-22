@@ -1,392 +1,180 @@
-Return-Path: <netdev+bounces-252235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gESjOGjacWk+MgAAu9opvQ
-	(envelope-from <netdev+bounces-252235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:06:00 +0100
+	id wB3TK2LacWk+MgAAu9opvQ
+	(envelope-from <netdev+bounces-252236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:05:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED4262D68
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:06:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2246762D61
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 09:05:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B74DD7A22A5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:56:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A97F85011D6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 07:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65134350291;
-	Thu, 22 Jan 2026 07:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GgNnH/HN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BE8324B2A;
+	Thu, 22 Jan 2026 07:57:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AEE30596D
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 07:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+Received: from hrbeu.edu.cn (mx1.hrbeu.edu.cn [202.118.176.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAF53469E3;
+	Thu, 22 Jan 2026 07:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.118.176.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769068491; cv=none; b=g2yMTdJH5J67yWsc+4ct+JL3WRZTsLaraF3bIqHs6I0ye84C+FZelYGk9vcbRuUWuDRe5LYbV6ZW51IV9+WqK0VkYsTU544hyUN+HnYRlJzCSt7Zd22QtNLac7hizxeQnXbzRVhm2SESeN67vE0L5iXXjBoKc/5bspSsMG6Wxgk=
+	t=1769068659; cv=none; b=UAhJ9ybcfQd4s/NXamITHX0OB+hLUh1AuOp3yAUmus/LSH0IEouJ3twiSm4/SgHlrDmN9ZZEzN2C6VrRX477YlSZgB3UDkqUCg3ll9AUZK5DGnxKsRwSo52Jk9vVZSayivI4V3IgNfZOuSyANLyAmxj+KKBi9pxu3FOYcktksiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769068491; c=relaxed/simple;
-	bh=nyMGeoOkL0QdzBs/NrnaOdhm6/U4oVNKyz0gPRixEf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PxmlorAP+CAbSiC89poCfeD6VddngsmC7PMnyA58QPFIX90yrF3+5G+wFX3kb8CgXvJLsQi84VA0dJmJ6eHEwHbQLzrM0E/8FSAnNDVKMYmL2av2fRm9BgacVpVVtDMLO4QCCVD+/ccT0741nfm4UUISyUBazn0bfaOkGoVVa8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GgNnH/HN; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769068489; x=1800604489;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nyMGeoOkL0QdzBs/NrnaOdhm6/U4oVNKyz0gPRixEf0=;
-  b=GgNnH/HNMZOm6w0hq9o9/HEQwC7FPMgmlwYjqicX20PpLFGWPIba6VIS
-   KaNVOf8tCatHsLL8oyR84rOAVBoWL/2fignl9IoacAk5bD5eVyFkPhFiZ
-   pGEX1bQm1zCOaWQjFwiyMW0lqHX37bOyUa1gGgWtZqRgoloN1+VQFCrCd
-   MiPkRs4t2wVCrmlrDi0BtJuj0/z0DsJMOuDX+jUlFzE1uVvb540lZuXyJ
-   XxqQC/Kfm1xKJoaPs0LzekueAWRFGj1/Ei8OwUaI1usikN5HdOJO3L1Wv
-   npGdO6x8jisRAZ6QcIcjrI2AY2p6XOWOzE8XPGt76wi/ydiqWaR+iDjVo
-   g==;
-X-CSE-ConnectionGUID: j3Z5bUdeRaGJYxAcPLk4SA==
-X-CSE-MsgGUID: /53CJO2UTpK8IdxPzYTsdQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="80929094"
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="80929094"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 23:54:49 -0800
-X-CSE-ConnectionGUID: l7j7o6K/SImEFTiDyTJELw==
-X-CSE-MsgGUID: 3NNZIlqUQO6sRj11CBolGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,245,1763452800"; 
-   d="scan'208";a="205793400"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 21 Jan 2026 23:54:44 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vipWb-00000000SZd-1kBe;
-	Thu, 22 Jan 2026 07:54:41 +0000
-Date: Thu, 22 Jan 2026 15:54:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, saeedm@nvidia.com,
-	tariqt@nvidia.com, mbloch@nvidia.com, borisp@nvidia.com,
-	john.fastabend@gmail.com, kuba@kernel.org, sd@queasysnail.net,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	leon@kernel.org, Rishikesh Jethwani <rjethwani@purestorage.com>
-Subject: Re: [PATCH v4 2/3] tls: add hardware offload key update support
-Message-ID: <202601221546.bR6QG2oX-lkp@intel.com>
-References: <20260121215727.3994324-3-rjethwani@purestorage.com>
+	s=arc-20240116; t=1769068659; c=relaxed/simple;
+	bh=QiW6ianH0X+a0Xgzua8SAD0qO4W3OumN2xnk8zkR1Fg=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=uBD9NahFxn3hEpzBmeXQ7xPev47SKTWiHBFHUu+xRjeFLRyLxfrbfitNW8/WlRTxqtHkDlUEGJqf6luHd0A73I4gUNMKx1XiX3Lz4GsFIO54aH7Mer6oKaucOmvwTgZebfzmF7eVs8AaeYxGuQuQvchRksZntndo9VEStiDYTjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hrbeu.edu.cn; spf=pass smtp.mailfrom=hrbeu.edu.cn; arc=none smtp.client-ip=202.118.176.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hrbeu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hrbeu.edu.cn
+Received: from baishuoran$hrbeu.edu.cn ( [118.74.28.54] ) by
+ ajax-webmail-Front (Coremail) ; Thu, 22 Jan 2026 15:56:43 +0800 (GMT+08:00)
+Date: Thu, 22 Jan 2026 15:56:43 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?55m954OB5YaJ?= <baishuoran@hrbeu.edu.cn>
+To: "David S. Miller" <davem@davemloft.net>,
+	"Jakub Kicinski" <kuba@kernel.org>
+Cc: "Kun Hu" <huk23@m.fudan.edu.cn>, "Jiaji Qin" <jjtan24@m.fudan.edu.cn>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+	syzkaller@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: hung task in rtnl_newlink
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT5 build
+ 20250609(354f7833) Copyright (c) 2002-2026 www.mailtech.cn hrbeu.edu.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121215727.3994324-3-rjethwani@purestorage.com>
+Message-ID: <39db9ec8.c5b0.19be4b4a8d5.Coremail.baishuoran@hrbeu.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:CbB2ygCnMso72HFpFRcNAQ--.28728W
+X-CM-SenderInfo: pedl2xpxrut0w6kuuvvxohv3gofq/1tbiAQIPCmlxgDsC-gAAsZ
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252235-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-252236-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[hrbeu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_X_PRIO_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[baishuoran@hrbeu.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:email,intel.com:dkim,intel.com:mid,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,git-scm.com:url]
-X-Rspamd-Queue-Id: 6ED4262D68
+	DBL_BLOCKED_OPENRESOLVER(0.00)[hrbeu.edu.cn:mid,hrbeu.edu.cn:email,fudan.edu.cn:email,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2246762D61
 X-Rspamd-Action: no action
 
-Hi Rishikesh,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.19-rc6 next-20260121]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Rishikesh-Jethwani/tls-add-TLS-1-3-hardware-offload-support/20260122-060724
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20260121215727.3994324-3-rjethwani%40purestorage.com
-patch subject: [PATCH v4 2/3] tls: add hardware offload key update support
-config: x86_64-randconfig-071-20260122 (https://download.01.org/0day-ci/archive/20260122/202601221546.bR6QG2oX-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260122/202601221546.bR6QG2oX-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601221546.bR6QG2oX-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/tls/tls_device.c:1249:4: warning: 'volatile' qualifier on function type 'typeof (*sk->sk_validate_xmit_skb)' (aka 'struct sk_buff *(struct sock *, struct net_device *, struct sk_buff *)') has no effect and is a Clang extension [-Wignored-qualifiers]
-    1249 |                         smp_store_release(sk->sk_validate_xmit_skb,
-         |                         ^
-   include/asm-generic/barrier.h:172:55: note: expanded from macro 'smp_store_release'
-     172 | #define smp_store_release(p, v) do { kcsan_release(); __smp_store_release(p, v); } while (0)
-         |                                                       ^
-   arch/x86/include/asm/barrier.h:63:2: note: expanded from macro '__smp_store_release'
-      63 |         WRITE_ONCE(*p, v);                                              \
-         |         ^
-   include/asm-generic/rwonce.h:61:2: note: expanded from macro 'WRITE_ONCE'
-      61 |         __WRITE_ONCE(x, val);                                           \
-         |         ^
-   include/asm-generic/rwonce.h:55:4: note: expanded from macro '__WRITE_ONCE'
-      55 |         *(volatile typeof(x) *)&(x) = (val);                            \
-         |           ^
->> net/tls/tls_device.c:1249:4: error: non-object type 'typeof (*sk->sk_validate_xmit_skb)' (aka 'struct sk_buff *(struct sock *, struct net_device *, struct sk_buff *)') is not assignable
-    1249 |                         smp_store_release(sk->sk_validate_xmit_skb,
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1250 |                                    tls_validate_xmit_skb_sw);
-         |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/asm-generic/barrier.h:172:55: note: expanded from macro 'smp_store_release'
-     172 | #define smp_store_release(p, v) do { kcsan_release(); __smp_store_release(p, v); } while (0)
-         |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/x86/include/asm/barrier.h:63:2: note: expanded from macro '__smp_store_release'
-      63 |         WRITE_ONCE(*p, v);                                              \
-         |         ^~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:61:2: note: expanded from macro 'WRITE_ONCE'
-      61 |         __WRITE_ONCE(x, val);                                           \
-         |         ^~~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:55:30: note: expanded from macro '__WRITE_ONCE'
-      55 |         *(volatile typeof(x) *)&(x) = (val);                            \
-         |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
-   1 warning and 1 error generated.
-
-
-vim +1249 net/tls/tls_device.c
-
-  1086	
-  1087	int tls_set_device_offload(struct sock *sk,
-  1088				   struct tls_crypto_info *new_crypto_info)
-  1089	{
-  1090		struct tls_crypto_info *crypto_info, *src_crypto_info;
-  1091		struct tls_record_info *start_marker_record;
-  1092		struct tls_offload_context_tx *offload_ctx;
-  1093		const struct tls_cipher_desc *cipher_desc;
-  1094		struct tls_prot_info *prot;
-  1095		struct net_device *netdev;
-  1096		struct tls_context *ctx;
-  1097		char *iv, *rec_seq;
-  1098		int rc;
-  1099	
-  1100		ctx = tls_get_ctx(sk);
-  1101		prot = &ctx->prot_info;
-  1102	
-  1103		/* Rekey is only supported for connections that are already
-  1104		 * using HW offload. For SW offload connections, the caller
-  1105		 * should fall back to tls_set_sw_offload() for rekey.
-  1106		 */
-  1107		if (new_crypto_info && ctx->tx_conf != TLS_HW)
-  1108			return -EINVAL;
-  1109	
-  1110		netdev = get_netdev_for_sock(sk);
-  1111		if (!netdev) {
-  1112			pr_err_ratelimited("%s: netdev not found\n", __func__);
-  1113			return -EINVAL;
-  1114		}
-  1115	
-  1116		if (!(netdev->features & NETIF_F_HW_TLS_TX)) {
-  1117			rc = -EOPNOTSUPP;
-  1118			goto release_netdev;
-  1119		}
-  1120	
-  1121		crypto_info = &ctx->crypto_send.info;
-  1122		src_crypto_info = new_crypto_info ?: crypto_info;
-  1123		if (src_crypto_info->version != TLS_1_2_VERSION &&
-  1124		    src_crypto_info->version != TLS_1_3_VERSION) {
-  1125			rc = -EOPNOTSUPP;
-  1126			goto release_netdev;
-  1127		}
-  1128	
-  1129		cipher_desc = get_cipher_desc(src_crypto_info->cipher_type);
-  1130		if (!cipher_desc || !cipher_desc->offloadable) {
-  1131			rc = -EINVAL;
-  1132			goto release_netdev;
-  1133		}
-  1134	
-  1135		iv = crypto_info_iv(src_crypto_info, cipher_desc);
-  1136		rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
-  1137	
-  1138		if (!new_crypto_info) {
-  1139			rc = init_prot_info(prot, src_crypto_info, cipher_desc);
-  1140			if (rc)
-  1141				goto release_netdev;
-  1142	
-  1143			memcpy(ctx->tx.iv + cipher_desc->salt, iv, cipher_desc->iv);
-  1144			memcpy(ctx->tx.rec_seq, rec_seq, cipher_desc->rec_seq);
-  1145	
-  1146			start_marker_record = kmalloc(sizeof(*start_marker_record),
-  1147						      GFP_KERNEL);
-  1148			if (!start_marker_record) {
-  1149				rc = -ENOMEM;
-  1150				goto release_netdev;
-  1151			}
-  1152	
-  1153			offload_ctx = alloc_offload_ctx_tx(ctx);
-  1154			if (!offload_ctx) {
-  1155				rc = -ENOMEM;
-  1156				goto free_marker_record;
-  1157			}
-  1158	
-  1159			rc = tls_sw_fallback_init(sk, offload_ctx, src_crypto_info);
-  1160			if (rc)
-  1161				goto free_offload_ctx;
-  1162	
-  1163			start_marker_record->end_seq = tcp_sk(sk)->write_seq;
-  1164			start_marker_record->len = 0;
-  1165			start_marker_record->num_frags = 0;
-  1166			list_add_tail(&start_marker_record->list,
-  1167				      &offload_ctx->records_list);
-  1168	
-  1169			clean_acked_data_enable(tcp_sk(sk), &tls_tcp_clean_acked);
-  1170			ctx->push_pending_record = tls_device_push_pending_record;
-  1171	
-  1172			/* TLS offload is greatly simplified if we don't send
-  1173			 * SKBs where only part of the payload needs to be encrypted.
-  1174			 * So mark the last skb in the write queue as end of record.
-  1175			 */
-  1176			tcp_write_collapse_fence(sk);
-  1177		}
-  1178	
-  1179		/* Avoid offloading if the device is down
-  1180		 * We don't want to offload new flows after
-  1181		 * the NETDEV_DOWN event
-  1182		 *
-  1183		 * device_offload_lock is taken in tls_devices's NETDEV_DOWN
-  1184		 * handler thus protecting from the device going down before
-  1185		 * ctx was added to tls_device_list.
-  1186		 */
-  1187		down_read(&device_offload_lock);
-  1188		if (!(netdev->flags & IFF_UP)) {
-  1189			rc = -EINVAL;
-  1190			goto release_lock;
-  1191		}
-  1192	
-  1193		if (!new_crypto_info) {
-  1194			ctx->priv_ctx_tx = offload_ctx;
-  1195		} else {
-  1196			char *key = crypto_info_key(src_crypto_info, cipher_desc);
-  1197	
-  1198			offload_ctx = tls_offload_ctx_tx(ctx);
-  1199	
-  1200			rc = crypto_aead_setkey(offload_ctx->aead_send, key,
-  1201						cipher_desc->key);
-  1202			if (rc)
-  1203				goto release_lock;
-  1204	
-  1205			/* For rekey, delete old HW context before adding new one. */
-  1206			if (!test_bit(TLS_TX_DEV_CLOSED, &ctx->flags))
-  1207				netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
-  1208								TLS_OFFLOAD_CTX_DIR_TX);
-  1209		}
-  1210	
-  1211		rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
-  1212						     src_crypto_info,
-  1213						     tcp_sk(sk)->write_seq);
-  1214		trace_tls_device_offload_set(sk, TLS_OFFLOAD_CTX_DIR_TX,
-  1215					     tcp_sk(sk)->write_seq, rec_seq, rc);
-  1216	
-  1217		if (new_crypto_info) {
-  1218			unsigned long flags;
-  1219			__be64 rcd_sn;
-  1220	
-  1221			memcpy(ctx->tx.iv + cipher_desc->salt, iv, cipher_desc->iv);
-  1222			memcpy(ctx->tx.rec_seq, rec_seq, cipher_desc->rec_seq);
-  1223	
-  1224			spin_lock_irqsave(&offload_ctx->lock, flags);
-  1225			/* Delete old records, can't be retransmitted with new key */
-  1226			delete_all_records(offload_ctx);
-  1227	
-  1228			/* Update unacked_record_sn for the new key's rec_seq.
-  1229			 * This is critical for SW fallback encryption to use
-  1230			 * the correct record sequence number after rekey.
-  1231			 */
-  1232			memcpy(&rcd_sn, rec_seq, sizeof(rcd_sn));
-  1233			offload_ctx->unacked_record_sn = be64_to_cpu(rcd_sn);
-  1234			spin_unlock_irqrestore(&offload_ctx->lock, flags);
-  1235	
-  1236			unsafe_memcpy(crypto_info, new_crypto_info,
-  1237				      cipher_desc->crypto_info,
-  1238				      /* size was checked in do_tls_setsockopt_conf */);
-  1239			memzero_explicit(new_crypto_info, cipher_desc->crypto_info);
-  1240		}
-  1241	
-  1242		if (rc) {
-  1243			if (new_crypto_info) {
-  1244				/* HW rekey failed, gracefully degrade to SW encryption.
-  1245				 * SW fallback already has new key, IV, and rec_seq.
-  1246				 * Old HW ctx was deleted, continue with SW encryption.
-  1247				 */
-  1248				set_bit(TLS_TX_DEV_CLOSED, &ctx->flags);
-> 1249				smp_store_release(sk->sk_validate_xmit_skb,
-  1250					   tls_validate_xmit_skb_sw);
-  1251			} else {
-  1252				goto release_lock;
-  1253			}
-  1254		} else {
-  1255			if (new_crypto_info)
-  1256				clear_bit(TLS_TX_DEV_CLOSED, &ctx->flags);
-  1257	
-  1258			tls_device_attach(ctx, sk, netdev);
-  1259	
-  1260			/* following this assignment tls_is_skb_tx_device_offloaded
-  1261			 * will return true and the context might be accessed
-  1262			 * by the netdev's xmit function.
-  1263			*/
-  1264			smp_store_release(&sk->sk_validate_xmit_skb,
-  1265					  tls_validate_xmit_skb);
-  1266		}
-  1267	
-  1268		up_read(&device_offload_lock);
-  1269	
-  1270		dev_put(netdev);
-  1271	
-  1272		return 0;
-  1273	
-  1274	release_lock:
-  1275		up_read(&device_offload_lock);
-  1276		if (new_crypto_info)
-  1277			goto release_netdev;
-  1278		clean_acked_data_disable(tcp_sk(sk));
-  1279		crypto_free_aead(offload_ctx->aead_send);
-  1280	free_offload_ctx:
-  1281		kfree(offload_ctx);
-  1282		ctx->priv_ctx_tx = NULL;
-  1283	free_marker_record:
-  1284		kfree(start_marker_record);
-  1285	release_netdev:
-  1286		dev_put(netdev);
-  1287		return rc;
-  1288	}
-  1289	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+RGVhciBNYWludGFpbmVycywKCgpXaGVuIHVzaW5nIG91ciBjdXN0b21pemVkIFN5emthbGxlciB0
+byBmdXp6IHRoZSBsYXRlc3QgTGludXgga2VybmVsLCB0aGUgZm9sbG93aW5nIGNyYXNoIHdhcyB0
+cmlnZ2VyZWQuCgoKSEVBRCBjb21taXQ6IDY1MzdjZmIzOTVmMzUyNzgyOTE4ZDhlZTdiN2YxMGJh
+MmNjM2NiZjIKZ2l0IHRyZWU6IHVwc3RyZWFtCk91dHB1dDpodHRwczpodHRwczovL2dpdGh1Yi5j
+b20vcGdoazEzL0tlcm5lbC1CdWcvYmxvYi9tYWluLzA3MDJfNi4xNC85JTIwaHVuZyUyMHRhc2sl
+MjBpbiUyMHJ0bmxfbmV3bGluay9yZXBvcnQ5LnR4dApLZXJuZWwgY29uZmlnOiBodHRwczovL2dp
+dGh1Yi5jb20vcGdoazEzL0tlcm5lbC1CdWcvYmxvYi9tYWluLzAyMTlfNi4xM3JjN190b2RvL2Nv
+bmZpZy50eHQgCkMgcmVwcm9kdWNlcjpodHRwczovL2dpdGh1Yi5jb20vcGdoazEzL0tlcm5lbC1C
+dWcvYmxvYi9tYWluLzA3MDJfNi4xNC85JTIwaHVuZyUyMHRhc2slMjBpbiUyMHJ0bmxfbmV3bGlu
+ay85cmVwcm8udHh0ClN5emxhbmcgcmVwcm9kdWNlcjogaHR0cHM6Ly9naXRodWIuY29tL3BnaGsx
+My9LZXJuZWwtQnVnL2Jsb2IvbWFpbi8wNzAyXzYuMTQvOSUyMGh1bmclMjB0YXNrJTIwaW4lMjBy
+dG5sX25ld2xpbmsvOXJlcHJvLmMKClRoZSBodW5nLXRhc2sgaXMgcHJpbWFyaWx5IGFzc29jaWF0
+ZWQgd2l0aCB0aGUgbGlua3dhdGNoIHdvcmtxdWV1ZSBjYWxsYmFjay4gU3BlY2lmaWNhbGx5LCBs
+aW5rd2F0Y2hfZXZlbnQoKSBwcm9jZXNzZXMgYmF0Y2hlcyBvZiBkZXZpY2VzIHdoaWxlIGhvbGRp
+bmcgUlROTCAocnRubF9sb2NrKCkpLCBkdXJpbmcgd2hpY2ggaXQgcmVwZWF0ZWRseSBpbnZva2Vz
+IGxpbmt3YXRjaF9kb19kZXYoKSBhbmQgZnVydGhlciBjYWxscyBwYXRocyBzdWNoIGFzIGRldl9h
+Y3RpdmF0ZSgpLCBkZXZfZGVhY3RpdmF0ZSgpLCBhbmQgbmV0ZGV2X3N0YXRlX2NoYW5nZSgpLCB3
+aGljaCBtYXkgaW52b2x2ZSByZWxhdGl2ZWx5IHRpbWUtY29uc3VtaW5nIG9yIGJsb2NraW5nIG9w
+ZXJhdGlvbnMgKGxpbmtfd2F0Y2guYzoyODXigJMyODcsIDE5NOKAkzI1NCwgMTY24oCTMTg3KS4g
+QXQgdGhlIHNhbWUgdGltZSwgbWVzc2FnZXMgc2VudCBmcm9tIHVzZXJzcGFjZSB2aWEgc2VuZG1z
+ZyBlbnRlciB0aGUga2VybmVsIHN5bmNocm9ub3VzbHkgdGhyb3VnaCBuZXRsaW5rX3VuaWNhc3Rf
+a2VybmVsKCkgaW4gYWZfbmV0bGluay5jIChhZl9uZXRsaW5rLmM6MTMxMikgYW5kIGFyZSBoYW5k
+bGVkIGluIHRoZSBwcm90b2NvbCBjYWxsYmFjayBpbnZva2VkIGZyb20gbmV0bGlua19yY3Zfc2ti
+KCkgKGFmX25ldGxpbmsuYzoyNTMzKS4gQXMgYSByZXN1bHQsIHdoZW4gUlROTCBpcyBoZWxkIGJ5
+IGxpbmt3YXRjaCBmb3IgYW4gZXh0ZW5kZWQgcGVyaW9kLCBhIGxhcmdlIG51bWJlciBvZiBydG5l
+dGxpbmsgcmVxdWVzdHMgbWF5IGJsb2NrIHdoaWxlIGF0dGVtcHRpbmcgdG8gYWNxdWlyZSBSVE5M
+LCBlbnRlciB0aGUgRCBzdGF0ZSwgYW5kIGV2ZW50dWFsbHkgdHJpZ2dlciBodW5nLXRhc2sgcmVw
+b3J0cy4KV2UgaGF2ZSByZXByb2R1Y2VkIHRoaXMgaXNzdWUgc2V2ZXJhbCB0aW1lcyBvbiA2LjE5
+LXJjNCBhZ2Fpbi4KCgpJZiB5b3UgZml4IHRoaXMgaXNzdWUsIHBsZWFzZSBhZGQgdGhlIGZvbGxv
+d2luZyB0YWcgdG8gdGhlIGNvbW1pdDoKUmVwb3J0ZWQtYnk6IEt1biBIdSA8aHVrMjNAbS5mdWRh
+bi5lZHUuY24+LCBKaWFqaSBRaW4gPGpqdGFuMjRAbS5mdWRhbi5lZHUuY24+LCBTaHVvcmFuIEJh
+aSA8YmFpc2h1b3JhbkBocmJldS5lZHUuY24+CgoKClsgIDU3OS4yNDAxNTldWyAgIFQ0Nl0gIDwv
+VEFTSz4KWyAgNTc5LjI0MTEzM11bICAgVDQ2XSBJTkZPOiB0YXNrIHN5ei1leGVjdXRvcjoxMDY5
+MCBibG9ja2VkIGZvciBtb3JlIHRoYW4gMTgzIHNlY29uZHMuClsgIDU3OS4yNDM0ODZdWyAgIFQ0
+Nl0gICAgICAgTm90IHRhaW50ZWQgNi4xOS4wLXJjNCAjMQpbICA1NzkuMjQ1MDQ1XVsgICBUNDZd
+ICJlY2hvIDAgPiAvcHJvYy9zeXMva2VybmVsL2h1bmdfdGFza190aW1lb3V0X3NlY3MiIGRpc2Fi
+bGVzIHRoaXMgbWVzc2FnZS4KWyAgNTc5LjI0Nzc3Nl1bICAgVDQ2XSB0YXNrOnN5ei1leGVjdXRv
+ciAgICBzdGF0ZTpEIHN0YWNrOjExMjk2IHBpZDoxMDY5MCB0Z2lkOjEwNjkwIHBwaWQ6MSAgICAg
+IHRhc2tfZmxhZ3M6MHg0MDAxNDAgZmxhZ3M6MHgwMDA4MDAwMgpbICA1NzkuMjUxMzk0XVsgICBU
+NDZdIENhbGwgVHJhY2U6ClsgIDU3OS4yNTI0NDNdWyAgIFQ0Nl0gIDxUQVNLPgpbICA1NzkuMjUz
+MzcxXVsgICBUNDZdICBfX3NjaGVkdWxlKzB4ZTYyLzB4MWZhMApbICA1NzkuMjU0NzkxXVsgICBU
+NDZdICA/IHNyc29fYWxpYXNfcmV0dXJuX3RodW5rKzB4NS8weGZiZWY1ClsgIDU3OS4yNTY2NjZd
+WyAgIFQ0Nl0gID8gc2NoZWR1bGUrMHhiNi8weGUwClsgIDU3OS4yNTgwNjNdWyAgIFQ0Nl0gIHNj
+aGVkdWxlKzB4MzQvMHhlMApbICA1NzkuMjU5MzY4XVsgICBUNDZdICBzY2hlZHVsZV9wcmVlbXB0
+X2Rpc2FibGVkKzB4Zi8weDIwClsgIDU3OS4yNjExMDFdWyAgIFQ0Nl0gIF9fbXV0ZXhfbG9jaysw
+eDgxMC8weDEyNDAKWyAgNTc5LjI2MjYwM11bICAgVDQ2XSAgPyBfX3Nhbml0aXplcl9jb3ZfdHJh
+Y2VfcGMrMHgxYy8weDUwClsgIDU3OS4yNjQzNDFdWyAgIFQ0Nl0gID8gc3Jzb19hbGlhc19yZXR1
+cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI2NjE1M11bICAgVDQ2XSAgPyBydG5sX25ld2xp
+bmsrMHg0Y2IvMHg3NjAKWyAgNTc5LjI2NzYzOV1bICAgVDQ2XSAgPyBzcnNvX2FsaWFzX3JldHVy
+bl90aHVuaysweDUvMHhmYmVmNQpbICA1NzkuMjY5NTkwXVsgICBUNDZdICA/IHJ0bmxfbmV3bGlu
+aysweDRjYi8weDc2MApbICA1NzkuMjcxMDcwXVsgICBUNDZdICBydG5sX25ld2xpbmsrMHg0Y2Iv
+MHg3NjAKWyAgNTc5LjI3MjUxNl1bICAgVDQ2XSAgPyBzcnNvX2FsaWFzX3JldHVybl90aHVuaysw
+eDUvMHhmYmVmNQpbICA1NzkuMjc0MjgwXVsgICBUNDZdICA/IHNyc29fYWxpYXNfcmV0dXJuX3Ro
+dW5rKzB4NS8weGZiZWY1ClsgIDU3OS4yNzYxNzhdWyAgIFQ0Nl0gID8gc3Jzb19hbGlhc19yZXR1
+cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI3NzkxOV1bICAgVDQ2XSAgPyBfX3BmeF9ydG5s
+X25ld2xpbmsrMHgxMC8weDEwClsgIDU3OS4yNzk0ODhdWyAgIFQ0Nl0gIHJ0bmV0bGlua19yY3Zf
+bXNnKzB4NmFmLzB4YWUwClsgIDU3OS4yODEwMjNdWyAgIFQ0Nl0gID8gc3Jzb19hbGlhc19yZXR1
+cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI4Mjc1NF1bICAgVDQ2XSAgPyBfX3Nhbml0aXpl
+cl9jb3ZfdHJhY2VfcGMrMHgxYy8weDUwClsgIDU3OS4yODQ1MDZdWyAgIFQ0Nl0gID8gc3Jzb19h
+bGlhc19yZXR1cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI4NjM0Nl1bICAgVDQ2XSAgPyBy
+ZWZfdHJhY2tlcl9mcmVlKzB4MTU3LzB4MmUwClsgIDU3OS4yODc5NThdWyAgIFQ0Nl0gID8gc3Jz
+b19hbGlhc19yZXR1cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI4OTc3N11bICAgVDQ2XSAg
+bmV0bGlua19yY3Zfc2tiKzB4N2QvMHgxYzAKWyAgNTc5LjI5MTI3MF1bICAgVDQ2XSAgPyBfX3Bm
+eF9ydG5ldGxpbmtfcmN2X21zZysweDEwLzB4MTAKWyAgNTc5LjI5MzAwM11bICAgVDQ2XSAgbmV0
+bGlua191bmljYXN0KzB4MmJjLzB4M2QwClsgIDU3OS4yOTQ1NTVdWyAgIFQ0Nl0gID8gc3Jzb19h
+bGlhc19yZXR1cm5fdGh1bmsrMHg1LzB4ZmJlZjUKWyAgNTc5LjI5NjQyNV1bICAgVDQ2XSAgbmV0
+bGlua19zZW5kbXNnKzB4MzQwLzB4NjkwClsgIDU3OS4yOTgwMTBdWyAgIFQ0Nl0gIF9fc29ja19z
+ZW5kbXNnKzB4MTFiLzB4MTMwClsgIDU3OS4yOTk1MDVdWyAgIFQ0Nl0gIF9fc3lzX3NlbmR0bysw
+eDE4ZC8weDIxMApbICA1NzkuMzAxMDQ1XVsgICBUNDZdICA/IHNyc29fYWxpYXNfcmV0dXJuX3Ro
+dW5rKzB4NS8weGZiZWY1ClsgIDU3OS4zMDI3NzddWyAgIFQ0Nl0gID8geGZkX3ZhbGlkYXRlX3N0
+YXRlKzB4M2IvMHhlMApbICA1NzkuMzA0MzkyXVsgICBUNDZdICA/IHNyc29fYWxpYXNfcmV0dXJu
+X3RodW5rKzB4NS8weGZiZWY1ClsgIDU3OS4zMDYyMjVdWyAgIFQ0Nl0gID8gX19zYW5pdGl6ZXJf
+Y292X3RyYWNlX3BjKzB4MWMvMHg1MApbICA1NzkuMzA3OTc5XVsgICBUNDZdICA/IHNyc29fYWxp
+YXNfcmV0dXJuX3RodW5rKzB4NS8weGZiZWY1ClsgIDU3OS4zMDk3MjBdWyAgIFQ0Nl0gID8gd3Jp
+dGVfY29tcF9kYXRhKzB4MjkvMHg4MApbICA1NzkuMzExMjI4XVsgICBUNDZdICBfX3g2NF9zeXNf
+c2VuZHRvKzB4MjYvMHgzMApbICA1NzkuMzEyNzI2XVsgICBUNDZdICBkb19zeXNjYWxsXzY0KzB4
+YzMvMHgxMWUwClsgIDU3OS4zMTQyMzNdWyAgIFQ0Nl0gIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJf
+aHdmcmFtZSsweDc3LzB4N2YKWyAgNTc5LjMxNjE3Nl1bICAgVDQ2XSBSSVA6IDAwMzM6MHg3Zjk0
+N2JkMWVlMDQKWyAgNTc5LjMxNzU2MV1bICAgVDQ2XSBSU1A6IDAwMmI6MDAwMDdmZmNhMjgzZDA2
+MCBFRkxBR1M6IDAwMDAwMjkzIE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDJjClsgIDU3OS4zMjAx
+MjddWyAgIFQ0Nl0gUkFYOiBmZmZmZmZmZmZmZmZmZmRhIFJCWDogMDAwMDdmOTQ3Y2FkNDYyMCBS
+Q1g6IDAwMDA3Zjk0N2JkMWVlMDQKWyAgNTc5LjMyMjUwM11bICAgVDQ2XSBSRFg6IDAwMDAwMDAw
+MDAwMDAwMmMgUlNJOiAwMDAwN2Y5NDdjYWQ0NjcwIFJESTogMDAwMDAwMDAwMDAwMDAwMwpbICA1
+NzkuMzI0OTI1XVsgICBUNDZdIFJCUDogMDAwMDAwMDAwMDAwMDAwMCBSMDg6IDAwMDA3ZmZjYTI4
+M2QwYmMgUjA5OiAwMDAwMDAwMDAwMDAwMDBjClsgIDU3OS4zMjc0MTBdWyAgIFQ0Nl0gUjEwOiAw
+MDAwMDAwMDAwMDAwMDAwIFIxMTogMDAwMDAwMDAwMDAwMDI5MyBSMTI6IDAwMDAwMDAwMDAwMDAw
+Cgp0aGFua3MsCkt1biBIdQo=
 
