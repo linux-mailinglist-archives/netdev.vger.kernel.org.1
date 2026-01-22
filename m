@@ -1,279 +1,446 @@
-Return-Path: <netdev+bounces-252544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHJpAhuccmkFnAAAu9opvQ
-	(envelope-from <netdev+bounces-252544-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:52:27 +0100
+	id UCLzF5+dcmkFnAAAu9opvQ
+	(envelope-from <netdev+bounces-252545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:58:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E0F6DF54
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:52:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1406DFED
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 22:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6C8F3025939
-	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:52:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E767300CC05
+	for <lists+netdev@lfdr.de>; Thu, 22 Jan 2026 21:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546543C23B2;
-	Thu, 22 Jan 2026 21:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF803921E7;
+	Thu, 22 Jan 2026 21:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b7XHfinr";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="q56jVRtl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MlSTMKvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C014E3C1970
-	for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 21:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12EA3C1FC5;
+	Thu, 22 Jan 2026 21:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769118733; cv=none; b=AMccOvoOICUdOstkCpzv73hCKlDV8bQtajFnXnxF4/B7PBrN1USvr7/SaNXU2Six2XU0CDWUXjJ6UVRF3l72D+P7vJ+JNWmHpbrYJVzsIPulukC6rT6ANg5AVSWogZJ1HDvh+6LWMJJEVmRsUaiuz6eg/JwqDOx0xQxCKjD5sG8=
+	t=1769119130; cv=none; b=iucFhPSpa4jgIzVQC9/uTMaUG4mJ1AGlJ+fzdATMhRKT0jCsIzRlbztCgRXPqQvLqXG7vcq0J6AUBRku2QUWxd5dkiR2kCpZERxzcUU5gm6TgtUDzHXtAPzGWa7Ei6vClVRz/OIbhObXT87uQmCbM5parMlyCM2n/vURTx1xeh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769118733; c=relaxed/simple;
-	bh=vBKOE2qVFcm4p0Uyp9ThApwnQdHm19ApCeX565t096c=;
+	s=arc-20240116; t=1769119130; c=relaxed/simple;
+	bh=Mfr7mIDtrzBzLCBXMkoZgIUe7cfiZ3c8E1WWNlDsMMU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDr5b1a7kQzMRUX7U9Hk+QE70o+pFB8C0JgzDuDsIK/DC6sQ6ZOoNPPt3loYe1jnl8pnaZ8vtUPTcAe7usGPcQt/ZBQUdpGIPX1C9ppBdJECFC1QMcA0pD7d3fFZ9wCjry/+LdZwl8zZQxzVyz6fw5E8zecd+3bucRRyo5WHYic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b7XHfinr; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=q56jVRtl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769118724;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZW5gSdhItogFEcRflAqU8aOpgxsdIYIRekkLZQNMM3c=;
-	b=b7XHfinrsLtiZINAkKh5Rt6SE1gBMHJiG1pyOE1lqS7awYyu1x/R/Ex8aF0fj1TZnfEBVV
-	q2KLav2W0LyoFw7zCBkz8xW7aCWAEnutcYzJ0aQl2MSvnGuAWGSZcDgBY0zIEavX4uQeF8
-	j8OaQo7kNRWOdtFJrnxnvLyVQD/S88w=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-ZZPSaNx0MVeuPg5CeBL0-w-1; Thu, 22 Jan 2026 16:52:02 -0500
-X-MC-Unique: ZZPSaNx0MVeuPg5CeBL0-w-1
-X-Mimecast-MFC-AGG-ID: ZZPSaNx0MVeuPg5CeBL0-w_1769118721
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47ee7346f8bso10114765e9.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 13:52:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769118721; x=1769723521; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZW5gSdhItogFEcRflAqU8aOpgxsdIYIRekkLZQNMM3c=;
-        b=q56jVRtlBKjT8dYeZseyIRCVfsn0WXpevhaXR1OtnuwLMIOXIQc3CDbsqFtPMicyXN
-         LY+ypQNuyHBv8nZ62BkbTw1rG2uo6gHc2A9VAAtA/p5zpzGU1iGppi0IANOGUf6F3PK0
-         qF+UvSUp+A0/J/Ie9/8CYJKdbD9ij4YQSgVCZtSQxj7VYzItzIzTq/kQcX6luC3v0xcW
-         XL5yb6J+1NiZ+SIZzQW8jc2bNT08qXIFT2b2Liy1jwf7FTQiYwFvJwjdBKjNoosspGHK
-         YOHsQtB+mN8YwEsg6lsX6I7qDwTSIl3nd+Y/T1HOM88vBYaI731wAZ66sr3ALH8lAU0g
-         mPSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769118721; x=1769723521;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZW5gSdhItogFEcRflAqU8aOpgxsdIYIRekkLZQNMM3c=;
-        b=Pwhxa3JidFtRwRZdKI55iGNfoVf4HCmK6be8ZADlhIbiVA4V7UDKgmPYBdaQqCZA4q
-         +NS5XN4urVz9I9X8dtNnU/ZrwJLEebZBdQ0QoYDcQE3XYRTzuKIJ7ZpbgiKcjUmaZFuV
-         LP2z0dSXi4MomneSyKPZopNr/4Ed/NWxqRdyrS3mlC5aohGgV2JQLCYU03B2MGO0xTp5
-         FzRPeYCm76n2AUNknjTHG1/Zmv6k75DBY2J7eKGtmOcagAx+Qc/T2W39m12tcpUSeBzz
-         UC/Ye65wkp4ta6gkOLb29idlIWH5wnplr8W3hev3ZtmIqnWRkUIWiSUZRbsnuboA0Ol7
-         iUBw==
-X-Gm-Message-State: AOJu0Yy2rE5K8DwGTWmqEvpw1B8kGj/0tL464zTIwEm4hk7ug1WMUZvF
-	sbphOWXG53vFb8JhxeMo8/47k34znmOloJiB0L70/YExzNgoUkI1nRyeGRHt8LOy/Or+rarhjAo
-	7r8+CZttSEHT641XMj9SLYM8Sh4QRr2sWbVpMKZfW/frcnnWi+OzbV4VsaYMNFQ5k7w==
-X-Gm-Gg: AZuq6aIhWjAHY7Jj67uFSWLB0UVucx1VZa/biGBwldF5oMjMu36kx5MsROgSBtPUV4b
-	nSPu7bSToSaTmmMdJk/RV5hik1I+2liICchGkJmjq2fsufW9h/UdIt29aw9l4tPJ3DeotbLlE+s
-	HdFtelgvLJu9MbI2/OpjJQHhFQAcgmlM3juQos/fz2+OcH/vYFshg2GWtzl9yavWek4gjUTDqIj
-	hAzcQh6aHixxLTIKKBBTZ3jkTbvxMygjCeUG4vtkRDG0DPiA+mqG7fS3k6mFrtBPCUBA5x+kuR6
-	6i5U6ac+h8qLSEiIAHCGA20cCG6h+rc9Rt17p9wEvUmu2GfIbz1pwyPF8B7GR//s1pnm6qcYiwX
-	lO/UiL4ergwk/ulECkE+PH/W+uVIW5Qg4PA==
-X-Received: by 2002:a05:600c:1f84:b0:477:97c7:9be7 with SMTP id 5b1f17b1804b1-4804c947d4dmr17354475e9.1.1769118720922;
-        Thu, 22 Jan 2026 13:52:00 -0800 (PST)
-X-Received: by 2002:a05:600c:1f84:b0:477:97c7:9be7 with SMTP id 5b1f17b1804b1-4804c947d4dmr17354035e9.1.1769118720351;
-        Thu, 22 Jan 2026 13:52:00 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e717cbsm1597488f8f.24.2026.01.22.13.51.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 13:51:59 -0800 (PST)
-Date: Thu, 22 Jan 2026 16:51:56 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, jgg@ziepe.ca, kevin.tian@intel.com,
-	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v16 06/12] virtio_net: Create a FF group for
- ethtool steering
-Message-ID: <20260122165014-mutt-send-email-mst@kernel.org>
-References: <20260121220652.894364-1-danielj@nvidia.com>
- <20260121220652.894364-7-danielj@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cyQcaK3d8YmlzpZ5jAP8CdEZ7IGTETzbvZVb1PSj34OhmKC0c/beUCAUFIWs0Won1gTUHbeaqJjfA0jBTVxM3LMP8EiFjyk/7qRyUwLnx8p8+if3SGAUhrPasbjE8UX7thmvRhc0ApvNZI9w3RRl38MkL0Ukoo5AlZmQjhrpSAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MlSTMKvg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91A2C116C6;
+	Thu, 22 Jan 2026 21:58:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769119130;
+	bh=Mfr7mIDtrzBzLCBXMkoZgIUe7cfiZ3c8E1WWNlDsMMU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MlSTMKvgK4NcWm0tAwyXT1wlKt6TiF9g91K8yfQhJbI3P/YJaKzWRRYXG0IicIB2w
+	 r92M8GtL9dH1tEXH5MANaXQ2e0f27q/0LzBNcAeOcZZXE0YOG+L5maCDRSryLB7c74
+	 e9CijWX3zDp6kC/54V2X+LPqLNodeaKIt5W8WyM9PnzyuxkX95Y/rAcas5+P5Ktp2n
+	 S/ccB0imNTp4BL8bBNLj4vWxS3N+Bui+YiYmEAwiV62eqF8p+1qK7cgD2VrWRMpCwU
+	 bzP6fhzxnslfzu67hx1fGMO/UOv9MhaeuWq2OCsKyySTWSk6ysAHEtMZgUSIf318Gi
+	 AEISUhwRi4Hvw==
+Date: Thu, 22 Jan 2026 22:58:47 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Use u64_stats_t with
+ u64_stats_sync properly
+Message-ID: <aXKdl8N7YPTbEtFZ@lore-desk>
+References: <20260122185255.2761568-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ONLtqPOzoLLC9PQz"
 Content-Disposition: inline
-In-Reply-To: <20260121220652.894364-7-danielj@nvidia.com>
+In-Reply-To: <20260122185255.2761568-1-mmyangfl@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252544-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-252545-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: 82E0F6DF54
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF1406DFED
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 04:06:46PM -0600, Daniel Jurgens wrote:
-> All ethtool steering rules will go in one group, create it during
-> initialization.
-> 
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> Reviewed-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> 
+
+--ONLtqPOzoLLC9PQz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> On 64bit arches, struct u64_stats_sync is empty and provides no help
+> against load/store tearing. Convert to u64_stats_t to ensure atomic
+> operations.
+
+I guess we need a Fixes tag here.
+
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+
+>=20
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
 > ---
-> v4: Documented UAPI
-> ---
-> ---
->  drivers/net/virtio_net.c           | 29 +++++++++++++++++++++++++++++
->  include/uapi/linux/virtio_net_ff.h | 15 +++++++++++++++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 03bd3d2c2b0e..b406f5f1c75e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -286,6 +286,9 @@ static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc_qstat[] = {
->  	VIRTNET_STATS_DESC_TX_QSTAT(speed, ratelimit_packets, hw_drop_ratelimits),
+>  drivers/net/ethernet/airoha/airoha_eth.c | 136 +++++++++++------------
+>  drivers/net/ethernet/airoha/airoha_eth.h |  34 +++---
+>  2 files changed, 85 insertions(+), 85 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 62bcbbbe2a95..6ed220e5a094 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -1472,131 +1472,131 @@ static void airoha_update_hw_stats(struct airoh=
+a_gdm_port *port)
+> =20
+>  	/* TX */
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_H(port->id));
+> -	port->stats.tx_ok_pkts +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_ok_pkts, (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_PKT_CNT_L(port->id));
+> -	port->stats.tx_ok_pkts +=3D val;
+> +	u64_stats_add(&port->stats.tx_ok_pkts, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_BYTE_CNT_H(port->id));
+> -	port->stats.tx_ok_bytes +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_ok_bytes, (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_OK_BYTE_CNT_L(port->id));
+> -	port->stats.tx_ok_bytes +=3D val;
+> +	u64_stats_add(&port->stats.tx_ok_bytes, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_DROP_CNT(port->id));
+> -	port->stats.tx_drops +=3D val;
+> +	u64_stats_add(&port->stats.tx_drops, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_BC_CNT(port->id));
+> -	port->stats.tx_broadcast +=3D val;
+> +	u64_stats_add(&port->stats.tx_broadcast, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_MC_CNT(port->id));
+> -	port->stats.tx_multicast +=3D val;
+> +	u64_stats_add(&port->stats.tx_multicast, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_RUNT_CNT(port->id));
+> -	port->stats.tx_len[i] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_E64_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L64_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L64_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L127_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L127_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L255_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L255_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L511_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L511_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L1023_CNT_H(port->id));
+> -	port->stats.tx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.tx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_L1023_CNT_L(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_TX_ETH_LONG_CNT(port->id));
+> -	port->stats.tx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.tx_len[i++], val);
+> =20
+>  	/* RX */
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_PKT_CNT_H(port->id));
+> -	port->stats.rx_ok_pkts +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_ok_pkts, (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_PKT_CNT_L(port->id));
+> -	port->stats.rx_ok_pkts +=3D val;
+> +	u64_stats_add(&port->stats.rx_ok_pkts, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_BYTE_CNT_H(port->id));
+> -	port->stats.rx_ok_bytes +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_ok_bytes, (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OK_BYTE_CNT_L(port->id));
+> -	port->stats.rx_ok_bytes +=3D val;
+> +	u64_stats_add(&port->stats.rx_ok_bytes, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_DROP_CNT(port->id));
+> -	port->stats.rx_drops +=3D val;
+> +	u64_stats_add(&port->stats.rx_drops, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_BC_CNT(port->id));
+> -	port->stats.rx_broadcast +=3D val;
+> +	u64_stats_add(&port->stats.rx_broadcast, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_MC_CNT(port->id));
+> -	port->stats.rx_multicast +=3D val;
+> +	u64_stats_add(&port->stats.rx_multicast, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ERROR_DROP_CNT(port->id));
+> -	port->stats.rx_errors +=3D val;
+> +	u64_stats_add(&port->stats.rx_errors, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_CRC_ERR_CNT(port->id));
+> -	port->stats.rx_crc_error +=3D val;
+> +	u64_stats_add(&port->stats.rx_crc_error, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_OVERFLOW_DROP_CNT(port->id));
+> -	port->stats.rx_over_errors +=3D val;
+> +	u64_stats_add(&port->stats.rx_over_errors, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_FRAG_CNT(port->id));
+> -	port->stats.rx_fragment +=3D val;
+> +	u64_stats_add(&port->stats.rx_fragment, val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_JABBER_CNT(port->id));
+> -	port->stats.rx_jabber +=3D val;
+> +	u64_stats_add(&port->stats.rx_jabber, val);
+> =20
+>  	i =3D 0;
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_RUNT_CNT(port->id));
+> -	port->stats.rx_len[i] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_E64_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L64_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L64_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L127_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L127_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L255_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L255_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L511_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L511_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L1023_CNT_H(port->id));
+> -	port->stats.rx_len[i] +=3D ((u64)val << 32);
+> +	u64_stats_add(&port->stats.rx_len[i], (u64)val << 32);
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_L1023_CNT_L(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	val =3D airoha_fe_rr(eth, REG_FE_GDM_RX_ETH_LONG_CNT(port->id));
+> -	port->stats.rx_len[i++] +=3D val;
+> +	u64_stats_add(&port->stats.rx_len[i++], val);
+> =20
+>  	/* reset mib counters */
+>  	airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(port->id),
+> @@ -1795,16 +1795,16 @@ static void airoha_dev_get_stats64(struct net_dev=
+ice *dev,
+>  	airoha_update_hw_stats(port);
+>  	do {
+>  		start =3D u64_stats_fetch_begin(&port->stats.syncp);
+> -		storage->rx_packets =3D port->stats.rx_ok_pkts;
+> -		storage->tx_packets =3D port->stats.tx_ok_pkts;
+> -		storage->rx_bytes =3D port->stats.rx_ok_bytes;
+> -		storage->tx_bytes =3D port->stats.tx_ok_bytes;
+> -		storage->multicast =3D port->stats.rx_multicast;
+> -		storage->rx_errors =3D port->stats.rx_errors;
+> -		storage->rx_dropped =3D port->stats.rx_drops;
+> -		storage->tx_dropped =3D port->stats.tx_drops;
+> -		storage->rx_crc_errors =3D port->stats.rx_crc_error;
+> -		storage->rx_over_errors =3D port->stats.rx_over_errors;
+> +		storage->rx_packets =3D u64_stats_read(&port->stats.rx_ok_pkts);
+> +		storage->tx_packets =3D u64_stats_read(&port->stats.tx_ok_pkts);
+> +		storage->rx_bytes =3D u64_stats_read(&port->stats.rx_ok_bytes);
+> +		storage->tx_bytes =3D u64_stats_read(&port->stats.tx_ok_bytes);
+> +		storage->multicast =3D u64_stats_read(&port->stats.rx_multicast);
+> +		storage->rx_errors =3D u64_stats_read(&port->stats.rx_errors);
+> +		storage->rx_dropped =3D u64_stats_read(&port->stats.rx_drops);
+> +		storage->tx_dropped =3D u64_stats_read(&port->stats.tx_drops);
+> +		storage->rx_crc_errors =3D u64_stats_read(&port->stats.rx_crc_error);
+> +		storage->rx_over_errors =3D u64_stats_read(&port->stats.rx_over_errors=
+);
+>  	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
+>  }
+> =20
+> @@ -2057,13 +2057,13 @@ static void airoha_ethtool_get_mac_stats(struct n=
+et_device *dev,
+>  	airoha_update_hw_stats(port);
+>  	do {
+>  		start =3D u64_stats_fetch_begin(&port->stats.syncp);
+> -		stats->FramesTransmittedOK =3D port->stats.tx_ok_pkts;
+> -		stats->OctetsTransmittedOK =3D port->stats.tx_ok_bytes;
+> -		stats->MulticastFramesXmittedOK =3D port->stats.tx_multicast;
+> -		stats->BroadcastFramesXmittedOK =3D port->stats.tx_broadcast;
+> -		stats->FramesReceivedOK =3D port->stats.rx_ok_pkts;
+> -		stats->OctetsReceivedOK =3D port->stats.rx_ok_bytes;
+> -		stats->BroadcastFramesReceivedOK =3D port->stats.rx_broadcast;
+> +		stats->FramesTransmittedOK =3D u64_stats_read(&port->stats.tx_ok_pkts);
+> +		stats->OctetsTransmittedOK =3D u64_stats_read(&port->stats.tx_ok_bytes=
+);
+> +		stats->MulticastFramesXmittedOK =3D u64_stats_read(&port->stats.tx_mul=
+ticast);
+> +		stats->BroadcastFramesXmittedOK =3D u64_stats_read(&port->stats.tx_bro=
+adcast);
+> +		stats->FramesReceivedOK =3D u64_stats_read(&port->stats.rx_ok_pkts);
+> +		stats->OctetsReceivedOK =3D u64_stats_read(&port->stats.rx_ok_bytes);
+> +		stats->BroadcastFramesReceivedOK =3D u64_stats_read(&port->stats.rx_br=
+oadcast);
+>  	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
+>  }
+> =20
+> @@ -2098,12 +2098,12 @@ airoha_ethtool_get_rmon_stats(struct net_device *=
+dev,
+>  		int i;
+> =20
+>  		start =3D u64_stats_fetch_begin(&port->stats.syncp);
+> -		stats->fragments =3D hw_stats->rx_fragment;
+> -		stats->jabbers =3D hw_stats->rx_jabber;
+> +		stats->fragments =3D u64_stats_read(&hw_stats->rx_fragment);
+> +		stats->jabbers =3D u64_stats_read(&hw_stats->rx_jabber);
+>  		for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_rmon_ranges) - 1;
+>  		     i++) {
+> -			stats->hist[i] =3D hw_stats->rx_len[i];
+> -			stats->hist_tx[i] =3D hw_stats->tx_len[i];
+> +			stats->hist[i] =3D u64_stats_read(&hw_stats->rx_len[i]);
+> +			stats->hist_tx[i] =3D u64_stats_read(&hw_stats->tx_len[i]);
+>  		}
+>  	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
+>  }
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index 20e602d61e61..b2e9bd849f8b 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -215,24 +215,24 @@ struct airoha_hw_stats {
+>  	struct u64_stats_sync syncp;
+> =20
+>  	/* get_stats64 */
+> -	u64 rx_ok_pkts;
+> -	u64 tx_ok_pkts;
+> -	u64 rx_ok_bytes;
+> -	u64 tx_ok_bytes;
+> -	u64 rx_multicast;
+> -	u64 rx_errors;
+> -	u64 rx_drops;
+> -	u64 tx_drops;
+> -	u64 rx_crc_error;
+> -	u64 rx_over_errors;
+> +	u64_stats_t rx_ok_pkts;
+> +	u64_stats_t tx_ok_pkts;
+> +	u64_stats_t rx_ok_bytes;
+> +	u64_stats_t tx_ok_bytes;
+> +	u64_stats_t rx_multicast;
+> +	u64_stats_t rx_errors;
+> +	u64_stats_t rx_drops;
+> +	u64_stats_t tx_drops;
+> +	u64_stats_t rx_crc_error;
+> +	u64_stats_t rx_over_errors;
+>  	/* ethtool stats */
+> -	u64 tx_broadcast;
+> -	u64 tx_multicast;
+> -	u64 tx_len[7];
+> -	u64 rx_broadcast;
+> -	u64 rx_fragment;
+> -	u64 rx_jabber;
+> -	u64 rx_len[7];
+> +	u64_stats_t tx_broadcast;
+> +	u64_stats_t tx_multicast;
+> +	u64_stats_t tx_len[7];
+> +	u64_stats_t rx_broadcast;
+> +	u64_stats_t rx_fragment;
+> +	u64_stats_t rx_jabber;
+> +	u64_stats_t rx_len[7];
 >  };
->  
-> +#define VIRTNET_FF_ETHTOOL_GROUP_PRIORITY 1
-> +#define VIRTNET_FF_MAX_GROUPS 1
-> +
->  struct virtnet_ff {
->  	struct virtio_device *vdev;
->  	bool ff_supported;
-> @@ -5724,6 +5727,7 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
->  	size_t ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data) +
->  			      sizeof(struct virtio_net_ff_selector) *
->  			      VIRTIO_NET_FF_MASK_TYPE_MAX;
-> +	struct virtio_net_resource_obj_ff_group ethtool_group = {};
->  	struct virtio_admin_cmd_query_cap_id_result *cap_id_list;
->  	struct virtio_net_ff_selector *sel;
->  	unsigned long sel_types = 0;
-> @@ -5808,6 +5812,12 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
->  	if (err)
->  		goto err_ff_action;
->  
-> +	if (le32_to_cpu(ff->ff_caps->groups_limit) < VIRTNET_FF_MAX_GROUPS) {
-> +		err = -ENOSPC;
-> +		goto err_ff_action;
-> +	}
-> +	ff->ff_caps->groups_limit = cpu_to_le32(VIRTNET_FF_MAX_GROUPS);
-> +
->  	err = virtio_admin_cap_set(vdev,
->  				   VIRTIO_NET_FF_RESOURCE_CAP,
->  				   ff->ff_caps,
-> @@ -5854,6 +5864,19 @@ static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
->  	if (err)
->  		goto err_ff_action;
->  
-> +	ethtool_group.group_priority = cpu_to_le16(VIRTNET_FF_ETHTOOL_GROUP_PRIORITY);
-> +
-> +	/* Use priority for the object ID. */
-> +	err = virtio_admin_obj_create(vdev,
-> +				      VIRTIO_NET_RESOURCE_OBJ_FF_GROUP,
-> +				      VIRTNET_FF_ETHTOOL_GROUP_PRIORITY,
+> =20
+>  enum {
+> --=20
+> 2.51.0
+>=20
 
-This (3rd param to virtio_admin_obj_create)
-is the object ID actually. Setting this to 1 means it is outside
-of range for group limit which should be 0...limit - 1 and limit is 1.
+--ONLtqPOzoLLC9PQz
+Content-Type: application/pgp-signature; name=signature.asc
 
-don't you mean 0?
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaXKdlwAKCRA6cBh0uS2t
+rB8qAP4i+/X9hpN9af9mEBX687u+dKpPq5MD8M5X4FtRR0VKXQEAnJujR6H52o/e
+jpplETvS44lswKpFqQalJXJ1RTisqQY=
+=slEj
+-----END PGP SIGNATURE-----
 
-> +				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
-> +				      0,
-> +				      &ethtool_group,
-> +				      sizeof(ethtool_group));
-> +	if (err)
-> +		goto err_ff_action;
-> +
->  	ff->vdev = vdev;
->  	ff->ff_supported = true;
->  
-> @@ -5881,6 +5904,12 @@ static void virtnet_ff_cleanup(struct virtnet_ff *ff)
->  	if (!ff->ff_supported)
->  		return;
->  
-> +	virtio_admin_obj_destroy(ff->vdev,
-> +				 VIRTIO_NET_RESOURCE_OBJ_FF_GROUP,
-> +				 VIRTNET_FF_ETHTOOL_GROUP_PRIORITY,
-> +				 VIRTIO_ADMIN_GROUP_TYPE_SELF,
-
-
-same
-
-> +				 0);
-> +
->  	kfree(ff->ff_actions);
->  	kfree(ff->ff_mask);
->  	kfree(ff->ff_caps);
-> diff --git a/include/uapi/linux/virtio_net_ff.h b/include/uapi/linux/virtio_net_ff.h
-> index d025e252ee26..66af9ecdb674 100644
-> --- a/include/uapi/linux/virtio_net_ff.h
-> +++ b/include/uapi/linux/virtio_net_ff.h
-> @@ -11,6 +11,8 @@
->  #define VIRTIO_NET_FF_SELECTOR_CAP 0x801
->  #define VIRTIO_NET_FF_ACTION_CAP 0x802
->  
-> +#define VIRTIO_NET_RESOURCE_OBJ_FF_GROUP 0x0200
-> +
->  /**
->   * struct virtio_net_ff_cap_data - Flow filter resource capability limits
->   * @groups_limit: maximum number of flow filter groups supported by the device
-> @@ -87,4 +89,17 @@ struct virtio_net_ff_actions {
->  	__u8 reserved[7];
->  	__u8 actions[];
->  };
-> +
-> +/**
-> + * struct virtio_net_resource_obj_ff_group - Flow filter group object
-> + * @group_priority: priority of the group used to order evaluation
-> + *
-> + * This structure is the payload for the VIRTIO_NET_RESOURCE_OBJ_FF_GROUP
-> + * administrative object. Devices use @group_priority to order flow filter
-> + * groups. Multi-byte fields are little-endian.
-> + */
-> +struct virtio_net_resource_obj_ff_group {
-> +	__le16 group_priority;
-> +};
-> +
->  #endif
-> -- 
-> 2.50.1
-
+--ONLtqPOzoLLC9PQz--
 
