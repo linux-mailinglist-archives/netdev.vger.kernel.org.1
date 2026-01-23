@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-252970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +AoDMVHlc2nEzQAAu9opvQ
-	(envelope-from <netdev+bounces-252970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:17:05 +0100
+	id oKdEKBDmc2nRzQAAu9opvQ
+	(envelope-from <netdev+bounces-252971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:20:16 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273097AD9D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29DE97ADB6
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E6F73037E43
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:16:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A57F3053739
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24BE1F8AC8;
-	Fri, 23 Jan 2026 21:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F592868A9;
+	Fri, 23 Jan 2026 21:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZoZlHcc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pv801Wmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DC21C5F1B
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624B0268C42
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769202994; cv=none; b=W9kmqtjJ86fBNt845jQfKf4CbboQikQg8+i/xHPbWRxQXE3q1SgJrD6qSmPfUTwpV6C/n89tiarw8BugjarLvpgkYby06VIsJOCRe5Jhr4qbWRnX82C0YdpeMyWLp10+GyxWw1IeKgvLCALDxMJFfekffsU3LaDaVAUDUjN6Gfo=
+	t=1769203169; cv=none; b=HaKLV1UZ4yYR6tTljsIhVSYfQb3p6K4f0nvof6FD/La1wc4tVXmTVk71E1y1YRn1n1l/f2y9PYJxPDV7ekfrXN7FoTHM1PRjIJ6XXdPBKjFqdl8PhTnv+O6wRhkxcghTbrkZfXwN139Q7d/kQuq4tAdhcKk9n6aogUw7Jqvvfts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769202994; c=relaxed/simple;
-	bh=jZ65mtrIh61iI72OrbJcAu/9pucAtrcTzfDMF9B7m2I=;
+	s=arc-20240116; t=1769203169; c=relaxed/simple;
+	bh=7MPsl8wJltGQvgAYO099SuWW8yqt1rLeMM2l5uhMsfs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PkeG9/VzxQcjUpYwexy08KPmYkZ2OVtK2Z206Mh8TjSyIjBs8O5/bfDFj0Sl1zxwHS5Qc/d1IUQCr1n7KF4BRthMnrcdpRo80H64FTmR6GMaMBZClIc/iiqi+qqwUiDfg13maX3lDxX2q4z0r+ytDP18yPP8FxthJhBL86iqGLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZoZlHcc; arc=none smtp.client-ip=209.85.221.48
+	 In-Reply-To:Content-Type; b=XPPXsahMVxAg4w685AxDrqCT+LUuKXeZwuIzzs1nrc2+Z08n+ICwLGFYuuA8tMmYK1OwpiXGSn2BHxdoaHT9RMXc7/VSw7nSIMV0DSHIpH/7RwvClcEPu0mx8+7w19GLmjAd5HwxmV81GqX2d8bEuBkTbU5x9OvTAt5l0jne1Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pv801Wmh; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4358fb60802so1542338f8f.1
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 13:16:33 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso1711131f8f.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 13:19:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769202992; x=1769807792; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769203167; x=1769807967; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=yCtU053PUoWUs1BXXRkhAIg7hyO65zq/+nHwYKqxXUI=;
-        b=NZoZlHcckZC/iEvHI76ybYT42TOqVstma28lSD+8z1vWdxNINT2yjgY5klBuFDtH7w
-         Ztz2oXJgpq7M6NtHq2a93Ed3p0dRXHXcgbNxOo05b4GCC3T3PpX7ef/nke5Wjrp7Xqd1
-         Q7iffGD+3D8JFPS3Ni85d9VoUW6U3tZYfYLyq93EP5JL9fK2EGgp7w6MkX7VbnB8dmnF
-         NnX3dDyXnVfRDI9iMqxLJ1W6N36O17/uRkzrkyV9OtQ8LECoT4G+5BzjOT02j7Z2pyA7
-         6O83pUdC4kMIlz7U95znrMcKyk/Gs458hl6wZxxrHOMFOmkQue6K1pQ/mxPbmy4JqbYe
-         0xEg==
+        bh=ii1aXpqD8k68Rtpy11c4RJPhE04I2RKFrJZZoC2MaAI=;
+        b=Pv801Wmh6unPCe49bbW0xCMzsHerJKQG5X+A5fKJFM/GlHgYdhrjQoqz3pQQJ2IPF/
+         Dsuc5iUsOo1pcILUf5/tj4d4X4ADWHhef0kbU5imljUEej7Gnt66Ot3Kqe2/LuCXoUoh
+         cnhU+0tTjexemSXRAMDvcm3bkB7hQnlkKw/k6aaZoXEQePg5UC7lq4M5QgRWR2QHt8Dc
+         MM/mzAlItPTy/HUA99Pp6GaOn5X/L+jGczGVWUyEyGw6GmxBD5rf2DZXhprY8ef8mrSn
+         osmnBMxwbd1iwgPd5sbTQ9MzRj0foDfe2k59lpFAnzyipEdOu8OTjdfL7RtvcPbgR311
+         Tmcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769202992; x=1769807792;
+        d=1e100.net; s=20230601; t=1769203167; x=1769807967;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yCtU053PUoWUs1BXXRkhAIg7hyO65zq/+nHwYKqxXUI=;
-        b=oyeVBYXFe04FjLWRCYfEBPCsiqrxUtwwhngc9GpTc7VebIkP0PDgAeZve2LOqAuXLJ
-         rUfJpqHpy3VPnHJUgPfl2Emg94LJQDUEkru2tlZ8UvBxpShB8wtc4QTIBr7wUvHO3WwQ
-         OJ76JZ4uTHbWZ+BIT3UHce7AEiLEHPDU4Q6/qbzRS/4JBGlwHmaGGq70qgAvieitorH/
-         puL6IsKu7V5zOfEiSPTZaJl4ibRWxzD2gZxRSCEkcpkN+7+LqgNXmje+4Qp2efvIX3Ox
-         iCsJwZSgDYM9M3PbZPHtQ29KeOpWND8RmwaMGHLpvReueETB6dohY+QtquSQFRlSWyNq
-         9+Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCV97Xr8l8BpI/TQWkl0m85oOrv1VvS7k8kK8+0jD06U/IrBIEasC2ab0RzH8OXy1c7iS+Vu6Zk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVtzZ0IVOglULnDO2A7VovAOVrKcureJraHlDvJmzxn0wRT5Yk
-	nOHeI896JDL9ZxCzQwcIh1Rdqqj6tO4oJ28/WEY90TqWixC6FDPb4IIHZGNPhh4h
-X-Gm-Gg: AZuq6aIMDbj8KXHyDqiAoJrJlCaXVn/R/gzMXxlexwQaW0Y7bRbjNZDFAJg8ZHlCCth
-	wf9sihwT7qGBO0M4IZ6rpSTXIl8bVLncJTTwf4ifufygC2XbEjWYBNSbWPeITqKgTqBfT0ZielX
-	YgypsyTj3eX3hlKp6Ih6XmfTNJpigj9HLEbniOLKxoM/1NNZsd+fnDDkWq/g4tMGDzVCxqrtFMa
-	wFC+BAftJHYVciCb0m3oqgtsr/qo7+qx12Nd4pE6O/9Zn4xDO5nbjo0UVhly7CgsbEvyZqMJFxD
-	KR5ombfIFDL5ZsO6vPtOzmPMLc7HfFWbky45BoIXOsrmNZ+/3pjPsVoT6xGkfjnnKA7vHFJPCRu
-	rzHzGdOM9hQePZ0DDKYZn/TpUv20ulh3sPaLluDJibBKq9qrCftddYVei5G/x5w9HimfBV7mrNp
-	JYw7iJt/FdkIL2PAcxsOqqVaIkXss/1HODFzXlfCi2RMiaxJy/5cNC52OrlQh8vFouDQ==
-X-Received: by 2002:adf:f812:0:b0:435:9e32:2b85 with SMTP id ffacd0b85a97d-435a5ff993cmr11073350f8f.29.1769202991455;
-        Fri, 23 Jan 2026 13:16:31 -0800 (PST)
+        bh=ii1aXpqD8k68Rtpy11c4RJPhE04I2RKFrJZZoC2MaAI=;
+        b=nM31F1Z2Oew9KHEKy9zlSeXKu4Av7icvoKaucJwxuvn//RElyV4PoLTPqHP5VxuPyH
+         b+RXdgwIFJEX2VpRnmJJPUjEc8qiPNz3cmJSExOv9gwFUqyI74nUFvoAd1qqRzgD/dV3
+         NZjsLj+/PkxAopCKou7uQLavnfQSgL1vPOzkCHZll1a/p9tdUuchT01HyMa5z8jWAwt4
+         j/XRl5WSgLj/lpYtqzu24kAIPxrmSKI9J6GBYa/l4nebOiTLX7WjVq3KoyZVI+0344RK
+         IBSl1N3C5hfEWkltG4J74LOjjSeu/8NQyfdRAg6x6060qYsZP8OGw2e52F5c+9N3BGvL
+         +4IA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBK1gfARR08K8AXURzFB5gplx9Oyd4xMC1qqeqHAG2A+itqEsF4qRL1KcvElvQaxXCO68ERSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyycMy+djFQ3KkSAkQT18OtWeZkQJZJP0aZw0AJkRbEBIe6UV2D
+	9S3QTPnjy+bkedwUNTWbd10OEpSXH7h9gYFPKB6qYgpGygx4qqpaDRWF
+X-Gm-Gg: AZuq6aLAYRq58X6FmcP3tFKqj0Amo6XYHgNG4Iv3K6w0lyAQSFOyIqwCqxBRsLljHds
+	orwRJL5DBiGlZC8m+Dfy1LORLv5znPAEaUVRWIVnsk0fZzNJ2bxCYDROeF6a6AN5tCoHE/ay+e+
+	CWRxbb1jQnsuf1W02wy+tjMIIYyRaTYycebjxPlxffXMW4QSsYbo5KNt+KJO0fWVrHOtMtM9+KW
+	4DJcikuVxO6zhFfRIEPeG1I48MbFEw6Yp7214aaaa05XTh+OXmJCmyK9q2R3PTaHOnYcSU+mJ6s
+	Err8cMiTgREx7w+3CtCYRtZPQMm1bMmyphdkzIZBnD8k4pabeAyOgxhh/dMbsBtVrpt0d43AIbo
+	rKkLXL9oS1AoNXegqd/b1GWNw9IKs6Orpm3YvLNKh1nQA/+ujji5JGSF2C+uC9rJn1dOdmpoSSn
+	R6Pq9AyHX5WztX76wjGlhn3WQNDmQa5HZbisGglVH1nIeScH43pEDAFY48h8HzSrOm4A==
+X-Received: by 2002:a5d:5d0e:0:b0:432:c39d:102d with SMTP id ffacd0b85a97d-435b130e1b4mr6347821f8f.0.1769203166462;
+        Fri, 23 Jan 2026 13:19:26 -0800 (PST)
 Received: from ?IPV6:2a02:a03f:a75e:9a00:b377:103e:67ba:8048? ([2a02:a03f:a75e:9a00:b377:103e:67ba:8048])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e717cbsm9157914f8f.24.2026.01.23.13.16.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e717cbsm9174427f8f.24.2026.01.23.13.19.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jan 2026 13:16:31 -0800 (PST)
-Message-ID: <30e7ea41-ed0f-4049-b844-b0d0507deedb@gmail.com>
-Date: Fri, 23 Jan 2026 22:16:30 +0100
+        Fri, 23 Jan 2026 13:19:26 -0800 (PST)
+Message-ID: <3080d88c-1726-42dc-ae98-09451fb08b99@gmail.com>
+Date: Fri, 23 Jan 2026 22:19:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,15 +86,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/7] ipv6: Check of max HBH or DestOp sysctl
- is zero and drop if it is
+Subject: Re: [PATCH net-next v4 2/7] ipv6: Cleanup IPv6 TLV definitions
 To: Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
  netdev@vger.kernel.org
 References: <20260121214925.112604-1-tom@herbertland.com>
- <20260121214925.112604-2-tom@herbertland.com>
+ <20260121214925.112604-3-tom@herbertland.com>
 Content-Language: en-US
 From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260121214925.112604-2-tom@herbertland.com>
+In-Reply-To: <20260121214925.112604-3-tom@herbertland.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
@@ -110,7 +109,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252970-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252971-lists,netdev=lfdr.de];
 	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -124,60 +123,68 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 273097AD9D
+X-Rspamd-Queue-Id: 29DE97ADB6
 X-Rspamd-Action: no action
 
 On 1/21/26 22:49, Tom Herbert wrote:
-> In IPv6 Destination options processing function check if
-> net->ipv6.sysctl.max_dst_opts_cnt is zero up front. If it is zero then
-> drop the packet since Destination Options processing is disabled.
-> 
-> Similarly, in IPv6 hop-by-hop options processing function check if
-> net->ipv6.sysctl.max_hbh_opts_cnt is zero up front. If it is zero then
-> drop the packet since Hop-by-Hop Options processing is disabled.
+> Move IPV6_TLV_TNL_ENCAP_LIMIT to uapi/linux/in6.h to be with the rest
+> of the TLV definitions. Label each of the TLV definitions as to whether
+> they are a Hop-by-Hop option, Destination option, or both.
 > 
 > Signed-off-by: Tom Herbert <tom@herbertland.com>
 > ---
->   net/ipv6/exthdrs.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
+>   include/uapi/linux/in6.h        | 21 ++++++++++++++-------
+>   include/uapi/linux/ip6_tunnel.h |  1 -
+>   2 files changed, 14 insertions(+), 8 deletions(-)
 > 
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 54088fa0c09d..45bbad76f5de 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -303,7 +303,8 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
->   	struct net *net = dev_net(skb->dev);
->   	int extlen;
+> diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
+> index 5a47339ef7d7..c2f873c98d20 100644
+> --- a/include/uapi/linux/in6.h
+> +++ b/include/uapi/linux/in6.h
+> @@ -140,14 +140,21 @@ struct in6_flowlabel_req {
 >   
-> -	if (!pskb_may_pull(skb, skb_transport_offset(skb) + 8) ||
-> +	if (!net->ipv6.sysctl.max_dst_opts_cnt ||
-> +	    !pskb_may_pull(skb, skb_transport_offset(skb) + 8) ||
->   	    !pskb_may_pull(skb, (skb_transport_offset(skb) +
->   				 ((skb_transport_header(skb)[1] + 1) << 3)))) {
->   		__IP6_INC_STATS(dev_net(dst_dev(dst)), idev,
+>   /*
+>    *	IPv6 TLV options.
+> + *
+> + *	Hop-by-Hop and Destination options share the same number space.
+> + *	For each option below whether it is a Hop-by-Hop option or
+> + *	a Destination option is indicated by HBH or DestOpt.
+>    */
+> -#define IPV6_TLV_PAD1		0
+> -#define IPV6_TLV_PADN		1
+> -#define IPV6_TLV_ROUTERALERT	5
+> -#define IPV6_TLV_CALIPSO	7	/* RFC 5570 */
+> -#define IPV6_TLV_IOAM		49	/* RFC 9486 */
+> -#define IPV6_TLV_JUMBO		194
+> -#define IPV6_TLV_HAO		201	/* home address option */
+> +#define IPV6_TLV_PAD1		0	/* HBH or DestOpt */
+> +#define IPV6_TLV_PADN		1	/* HBH or DestOpt */
+> +#define IPV6_TLV_ROUTERALERT	5	/* HBH */
+> +#define IPV6_TLV_TNL_ENCAP_LIMIT 4	/* RFC 2473, DestOpt */
 
-Hi Tom,
+Would make sense to have IPV6_TLV_TNL_ENCAP_LIMIT (4) before 
+IPV6_TLV_ROUTERALERT (5).
 
-You should use READ_ONCE() and store it:
+> +#define IPV6_TLV_CALIPSO	7	/* RFC 5570, HBH */
+> +#define IPV6_TLV_IOAM		49	/* RFC 9486, HBH or Destopt
+> +					 * IOAM sent and rcvd as HBH
+> +					 */
+> +#define IPV6_TLV_JUMBO		194	/* HBH */
+> +#define IPV6_TLV_HAO		201	/* home address option, DestOpt */
+>   
+>   /*
+>    *	IPV6 socket options
+> diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_tunnel.h
+> index 85182a839d42..35af4d9c35fb 100644
+> --- a/include/uapi/linux/ip6_tunnel.h
+> +++ b/include/uapi/linux/ip6_tunnel.h
+> @@ -6,7 +6,6 @@
+>   #include <linux/if.h>		/* For IFNAMSIZ. */
+>   #include <linux/in6.h>		/* For struct in6_addr. */
+>   
+> -#define IPV6_TLV_TNL_ENCAP_LIMIT 4
+>   #define IPV6_DEFAULT_TNL_ENCAP_LIMIT 4
+>   
+>   /* don't add encapsulation limit if one isn't present in inner packet */
 
-int max_dst_opts_cnt = READ_ONCE(net->ipv6.sysctl.max_dst_opts_cnt);
-
-if (!max_dst_opts_cnt || ...)
-
-[...]
-
-if (ip6_parse_tlv(false, skb, max_dst_opts_cnt)) {
-
-> @@ -1041,7 +1042,8 @@ int ipv6_parse_hopopts(struct sk_buff *skb)
->   	 * sizeof(struct ipv6hdr) by definition of
->   	 * hop-by-hop options.
->   	 */
-> -	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr) + 8) ||
-> +	if (!net->ipv6.sysctl.max_hbh_opts_cnt ||
-> +	    !pskb_may_pull(skb, sizeof(struct ipv6hdr) + 8) ||
->   	    !pskb_may_pull(skb, (sizeof(struct ipv6hdr) +
->   				 ((skb_transport_header(skb)[1] + 1) << 3)))) {
->   fail_and_free:
-
-Same remark for max_hbh_opts_cnt.
 
