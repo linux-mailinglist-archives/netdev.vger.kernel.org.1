@@ -1,33 +1,34 @@
-Return-Path: <netdev+bounces-252904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252906-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFnLJtSwc2nOxwAAu9opvQ
-	(envelope-from <netdev+bounces-252904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:33:08 +0100
+	id gA/yFAOxc2nOxwAAu9opvQ
+	(envelope-from <netdev+bounces-252906-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:33:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C6D790DE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:33:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68B179103
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:33:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5242E303E2C6
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:32:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32053306B7AB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4CF21CC55;
-	Fri, 23 Jan 2026 17:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D9C2638BC;
+	Fri, 23 Jan 2026 17:32:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051883EBF00
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747E521CA02
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769189573; cv=none; b=jUPyfQtshyO48OVSIApKnfUN69LQOSQgVGzm3KZyPeQ8XDGMYk8CMPehxKK6HPzbavh0GLscSWKHClMwVGiabUQR6B4D6frmOkj7+o7GThE7F7XqlGuTP+E66DQ9x7QhQnqpAuq/S30xdDjvAzoTZfx+73tmdlsut0qh3fE4dXs=
+	t=1769189577; cv=none; b=arriB5p06CcZHDnkF50ndQod2DOlsbXpNQ267ilnNDbDOpWAaQvt1X8H80b/ehLZ0WVlNgo6thbiPrDfOTgQTtDNNfLK12yS3Z/6y69Aqi84dKYQVixv3DqVGuNohF/5+tXwepl37RfwsxCngfRzN7CqHI8ah2G1+Uo94PCHocQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769189573; c=relaxed/simple;
-	bh=djbyUr2y8KkEBqL8lc3n1igmZv83fb14ai3mmjxWBoA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l2rE3t27eEnLPCjxqfOOWyZLnpfQsok/2Aiy8hXuhLIs7juaU8EHjgTl/uBrqwYltRQUX/VP2IVMb/MUqcW3z5nIoTuWdrS1UdPzCD+A1I3zH/udobzZB+EF8CBtjbrXcOvSgql5aqb+GYjbPkVddBC12SB7XN7YXvBNZ8VGjeE=
+	s=arc-20240116; t=1769189577; c=relaxed/simple;
+	bh=+7YBH0inH1MriyTcpWAIFSrOFK6o9X1jYpo6aklY2uc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qCOXOxRGpKAsM7bQL911szAqAdbbG/n730Ob94QigsQMYkblci5ZPUOaDFLE1mI/hMDpEnB4fFxBNiorUgTtjEgcejZgIus2x6L7E+rdiQ4MitKx+90sCXOO+tiSMKtXpT94RbeiOTjgzez00tSOOnIL0CC1rmJfy05hUURoO8A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -35,30 +36,34 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vjL1a-0008Rr-Hq; Fri, 23 Jan 2026 18:32:46 +0100
+	id 1vjL1c-0008Rs-7L; Fri, 23 Jan 2026 18:32:48 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vjL1Z-0028Ag-3B;
+	id 1vjL1a-0028Aj-1q;
 	Fri, 23 Jan 2026 18:32:45 +0100
 Received: from blackshift.org (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 9DF044D713C;
-	Fri, 23 Jan 2026 17:32:44 +0000 (UTC)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3A0874D713D;
+	Fri, 23 Jan 2026 17:32:45 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net 0/2] pull-request: can 2026-01-23
-Date: Fri, 23 Jan 2026 18:30:05 +0100
-Message-ID: <20260123173241.1026226-1-mkl@pengutronix.de>
+	kernel@pengutronix.de,
+	Zilin Guan <zilin@seu.edu.cn>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 1/2] can: at91_can: Fix memory leak in at91_can_probe()
+Date: Fri, 23 Jan 2026 18:30:06 +0100
+Message-ID: <20260123173241.1026226-2-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260123173241.1026226-1-mkl@pengutronix.de>
+References: <20260123173241.1026226-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,69 +80,68 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252904-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-252906-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[pengutronix.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:mid]
-X-Rspamd-Queue-Id: 21C6D790DE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,pengutronix.de:mid,pengutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,seu.edu.cn:email]
+X-Rspamd-Queue-Id: A68B179103
 X-Rspamd-Action: no action
 
-Hello netdev-team,
+From: Zilin Guan <zilin@seu.edu.cn>
 
-this is a pull request of 2 patches for net/main.
+In at91_can_probe(), the dev structure is allocated via alloc_candev().
+However, if the subsequent call to devm_phy_optional_get() fails, the
+code jumps directly to exit_iounmap, missing the call to free_candev().
+This results in a memory leak of the allocated net_device structure.
 
-The first patch is by Zilin Guan and fixes a memory leak in the error
-path of the at91_can driver's probe function.
+Fix this by jumping to the exit_free label instead, which ensures that
+free_candev() is called to properly release the memory.
 
-The last patch is by me and fixes yet another error in the gs_usb's
-gs_usb_receive_bulk_callback() function.
+Compile tested only. Issue found using a prototype static analysis tool
+and code review.
 
-regards,
-Marc
-
+Fixes: 3ecc09856afb ("can: at91_can: add CAN transceiver support")
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Link: https://patch.msgid.link/20260122114128.643752-1-zilin@seu.edu.cn
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
+ drivers/net/can/at91_can.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit 5778d65d4b85d4929d30998863e08e20af4b6113:
+diff --git a/drivers/net/can/at91_can.c b/drivers/net/can/at91_can.c
+index c2a3a4eef5b2..58da323f14d7 100644
+--- a/drivers/net/can/at91_can.c
++++ b/drivers/net/can/at91_can.c
+@@ -1099,7 +1099,7 @@ static int at91_can_probe(struct platform_device *pdev)
+ 	if (IS_ERR(transceiver)) {
+ 		err = PTR_ERR(transceiver);
+ 		dev_err_probe(&pdev->dev, err, "failed to get phy\n");
+-		goto exit_iounmap;
++		goto exit_free;
+ 	}
+ 
+ 	dev->netdev_ops	= &at91_netdev_ops;
 
-  Merge branch 'vsock-virtio-fix-tx-credit-handling' (2026-01-22 15:41:36 +0100)
+base-commit: 5778d65d4b85d4929d30998863e08e20af4b6113
+-- 
+2.51.0
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.19-20260123
-
-for you to fetch changes up to 494fc029f662c331e06b7c2031deff3c64200eed:
-
-  can: gs_usb: gs_usb_receive_bulk_callback(): fix error message (2026-01-23 18:16:37 +0100)
-
-----------------------------------------------------------------
-linux-can-fixes-for-6.19-20260123
-
-----------------------------------------------------------------
-Marc Kleine-Budde (1):
-      can: gs_usb: gs_usb_receive_bulk_callback(): fix error message
-
-Zilin Guan (1):
-      can: at91_can: Fix memory leak in at91_can_probe()
-
- drivers/net/can/at91_can.c   | 2 +-
- drivers/net/can/usb/gs_usb.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
 
