@@ -1,120 +1,177 @@
-Return-Path: <netdev+bounces-252988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Am4G0L+c2nu0wAAu9opvQ
-	(envelope-from <netdev+bounces-252988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:03:30 +0100
+	id oMfhBucCdGlA1QAAu9opvQ
+	(envelope-from <netdev+bounces-252989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:23:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B777B5C4
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:03:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8478D7B77D
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:23:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCB4A302DA3C
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 23:01:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7523A3014430
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 23:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61ADF288522;
-	Fri, 23 Jan 2026 23:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5861EB5E1;
+	Fri, 23 Jan 2026 23:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ru9ETQoC"
+	dkim=pass (1024-bit key) header.d=lambdal.com header.i=@lambdal.com header.b="Z2Vk+9bf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C243EBF3B;
-	Fri, 23 Jan 2026 23:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9131990C7
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 23:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769209303; cv=none; b=uyO2nh3mbqph2Npqc0GKBz+NCKcDoH2PHKkcIRhQPkOuvcY4RjMRvzy2yUWPSWK3lDo264icTb5byEApY57DGxVtamOkCLGr3bEeVi3PzcoqusDc7M/dRaF1GAAXqTGfF9JTYGvEf3oS/ULTHDrvSpccSywYldx8OPpBTHVBrW0=
+	t=1769210595; cv=none; b=ud4gJ9+ZMT+0vToMF8bJPb7T+eWtxVEFlATjsubpuMrE0FgLfbeOiiMvLUolqJtYRUCM4qTkErRtmtxNTU/GrzOTthf8sEn3C0tUIakpVjrab3K6Vp8xu+E4NY55tA+y/veSSR9YtOwX8J+7IjklAXHobvYKTMV4AL86Ia4RL2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769209303; c=relaxed/simple;
-	bh=5w4ORdFCYlw0uGHn4m4rcttlMWZ0imyq7RefzwLMA6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KiSHUe/JYOJp+QWVrQZ+3HQMNDow8Rn23wIpiRsdx8Ey6/IboxmLUIssrsW7A9hQilOYXPSMDB3xVlNs6lqxXZR8iTBgI8swUuvRCH7Q0KFi5xOu5HPlX2er4Ecf+Gu9COgVAfLXWb6jvdTZOXooYFMHOrPNk4QYpPRx7GF0Dr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ru9ETQoC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MzgvAs/RGwn0okuLp07Is/WXK2iHShLRRWk8QzbODeM=; b=Ru9ETQoC6w9F0TW+QnFcJPRY1e
-	gsaFY/S3EcSWXcgiIBmRFXapjmHfLp6wNBEk8vvpitTlw6jA2eoXa4u+0CampXOsmzVah0K5/8nPs
-	nG3aatAC/PInJC159imxWj0d98LAyh/cH2E4v64hXf7fgma0aDVxgaWYNcN6PCtbjDxA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vjQ9h-004MGA-Ke; Sat, 24 Jan 2026 00:01:29 +0100
-Date: Sat, 24 Jan 2026 00:01:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/3] net: phy: air_en8811h: add Airoha
- AN8811HB support
-Message-ID: <4a3430cc-5a9a-414e-9dbf-cbc34c8fd019@lunn.ch>
-References: <20260123075817.1162068-1-bjorn@mork.no>
- <20260123075817.1162068-3-bjorn@mork.no>
+	s=arc-20240116; t=1769210595; c=relaxed/simple;
+	bh=BkQqil8bjfDxZVp+2HM9b80FetkOvjmgnQ+03vEe5IU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=P8gnRRF7VF/8IK3Uk5pv+UEFiVwE6zA7MkRzIhIIstBvQi8/Q+drvDZo++G6RMk9sL6ALylRxT4ofu1Ys8zMjtEQ2NXhdkA7s2LgOakLyWJuk9Q+7KyCZeDJa/J3hB8zSKNlfthasUyGToA6HdKm4JiGRNFBWsDqt0f2bjuPWFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=lambdal.com; spf=pass smtp.mailfrom=lambdal.com; dkim=pass (1024-bit key) header.d=lambdal.com header.i=@lambdal.com header.b=Z2Vk+9bf; arc=none smtp.client-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=lambdal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lambdal.com
+Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-12336f33098so2778117c88.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 15:23:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lambdal.com; s=google; t=1769210593; x=1769815393; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BkQqil8bjfDxZVp+2HM9b80FetkOvjmgnQ+03vEe5IU=;
+        b=Z2Vk+9bfU6r0s4XJGzCVqBXjinKssEgYFLLFiKsQj5YkDvcA7Ahj61GC794jwjd7J2
+         BiI6Kyl59PaXIjZ7l89P4i3wq3WBDKfQLQa3qBROrJk0v0D/2WGY+0jmrvuTj8xau4a0
+         hktseEyX/eD87/3zf1IEaRvSjHqOXXOv2di3Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769210593; x=1769815393;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BkQqil8bjfDxZVp+2HM9b80FetkOvjmgnQ+03vEe5IU=;
+        b=GuHZJI3Ayni+OuggzKE00+bBtKZpA25zEt7hoDLdOe9XjEiNBjO2GiQsnvkvR/wHzH
+         miESRogWpHEVfec0RKpMJ0+uG26/JTZUNQSOG7LM2/ufN10anwf552MUhG/B1ec9nu3+
+         EakF0N2lEjKPt8fU7E7paXa0XlQ0D3h+qNy+mY1OpiKOy6qaaOgZP53Juh3qWHHiaiDn
+         cGN1YPBJu9yuL2Cf6gEBvIL6rVrR/tjpqA0pxx4qgI1JBz+mGx7ovc8508eNJZrGPzxi
+         SRscU2Jk1sl6wah7S8B08NpI4m04cWxEFJceexfl12L+cM2VmfuAtR6w2OXUTKbt9cgF
+         6kxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ7SDZhKdHCJcWH25R4xjfvuOIXaJooRzJ8M0fng3y+BFDDYmfmTXxvD2fC/onU6lAsl2ubQ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF7ZSZUElWYG490Ow1kEmT/YgjzYQvzQe9cbsnT98K5z3Q5+7T
+	VqJB2VJrAN4itzGDojsfg5RdYn5/yH8ubCh3DLHKHssFjalGaXYb6YDFwb+buhhFrgc=
+X-Gm-Gg: AZuq6aJqqrtmCGykDuqm8lLMrSgyiERs0bSQjsw3+vArhD0FAjV8J00NT8UNxM2QgRn
+	vBB3eMueV+2UeNPulz75eDQcuiSwfXmOj31sY6JAuQNa/QK/xaRYArzFnGny7c+sxhOvR6/pNuG
+	QFGZzgxfuECcn7LkTjuiTvadua2MTWQj5XK8WLfb0B1KUSc+lr7edTLJk+oLpUKg4wCOVMG98t2
+	YABGSKgLCQJVwrXKtZ93NZ2lz8kLfU4Ad7BRa99b7lwG1fr1xTz9DARHK41Y6Y1UN/AukA+OgCC
+	NilL8SOyP68RVPHkaQpik5kYUvSU7FcNzRO324RI30/BsxEfY5Ri7YmQyjSYi93N5PgZBWI9Tr/
+	ukUAJfR5EdAlk7GAEUt/0IaKdSR7bQcFCCuRDyFY1QcZzM+ut3P9foVJHgxkuzljdC/agM6PFcH
+	Iu7iS++9pxtid1s4llhQuerofmYtSWbdGt/2DM2mwYh2PuKqtQ5K41coRQouUnKuTh+SRB4KSi
+X-Received: by 2002:a05:7022:68aa:b0:11a:2e9c:1130 with SMTP id a92af1059eb24-1247dba9487mr2375660c88.7.1769210592700;
+        Fri, 23 Jan 2026 15:23:12 -0800 (PST)
+Received: from [10.100.9.95] (LAMBDA-INC.bar2.SanFrancisco1.Level3.net. [4.15.73.186])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1247d91c541sm6261819c88.7.2026.01.23.15.23.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jan 2026 15:23:12 -0800 (PST)
+Message-ID: <ecb0ffd9-4a1f-4579-bff8-264aedb5bab1@lambdal.com>
+Date: Fri, 23 Jan 2026 15:23:10 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260123075817.1162068-3-bjorn@mork.no>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: davem@davemloft.net, kuba@kernel.org, jmaxwell37@gmail.com,
+ dsahern@kernel.org, linux-decnet-user@lists.sourceforge.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bilbao@vt.edu
+From: Carlos Bilbao <carlos.bilbao@lambdal.com>
+Subject: [PATCH] net: decnet: fix build error due to incompatible pointer
+ type, in dn_dst_gc
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[lambdal.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[lambdal.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252988-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,makrotopia.org,nxp.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[lambdal.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252989-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,gmail.com,lists.sourceforge.net];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[carlos.bilbao@lambdal.com,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: B8B777B5C4
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lambdal.com:mid,lambdal.com:dkim]
+X-Rspamd-Queue-Id: 8478D7B77D
 X-Rspamd-Action: no action
 
-> +#define AN8811HB_GPIO_OUTPUT		0x5cf8b8
-> +#define   AN8811HB_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
+Update the signature of dn_dst_gc() to return void instead of int.
 
-> +	/* Configure led gpio pins as output */
-> +	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
-> +				      AN8811HB_GPIO_OUTPUT_345,
-> +				      AN8811HB_GPIO_OUTPUT_345);
+This change is required because the .gc member of struct dst_ops was
+updated to a void return type in a previous commit [1]. This leads to the
+following build error:
 
-The code/comment probably does not describe what is actually happening
-here. My _guess_ is you are setting a pinmux, disconnecting the pins
-from the GPIO controller and connecting them to the LED controller.
+net/decnet/dn_route.c:132:10: error: initialization of 'void (*)(struct dst_ops *)' from incompatible pointer type 'int (*)(struct dst_ops *)' [-Werror=incompatible-pointer-types]
 
-I assume there is no open data sheet for this device?
+Note that dst_alloc() inside net/core/dst.c was already updated to
+ignore the return value of this callback.
 
-	Andrew
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=af6d10345ca76670c1b7c37799f0d5576ccef277
+
+Fixes: af6d10345ca7 ("ipv6: remove max_size check inline with ipv4")
+Signed-off-by: Carlos Bilbao (Lambda) <carlos.bilbao@kernel.org>
+---
+ net/decnet/dn_route.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/decnet/dn_route.c b/net/decnet/dn_route.c
+index 729d3de6020d..840a0e3852de 100644
+--- a/net/decnet/dn_route.c
++++ b/net/decnet/dn_route.c
+@@ -100,7 +100,7 @@ static const int dn_rt_mtu_expires = 10 * 60 * HZ;
+
+ static unsigned long dn_rt_deadline;
+
+-static int dn_dst_gc(struct dst_ops *ops);
++static void dn_dst_gc(struct dst_ops *ops);
+ static struct dst_entry *dn_dst_check(struct dst_entry *, __u32);
+ static unsigned int dn_dst_default_advmss(const struct dst_entry *dst);
+ static unsigned int dn_dst_mtu(const struct dst_entry *dst);
+@@ -208,7 +208,7 @@ static void dn_dst_check_expire(struct timer_list *unused)
+     mod_timer(&dn_route_timer, now + decnet_dst_gc_interval * HZ);
+ }
+
+-static int dn_dst_gc(struct dst_ops *ops)
++static void dn_dst_gc(struct dst_ops *ops)
+ {
+     struct dn_route *rt;
+     struct dn_route __rcu **rtp;
+@@ -236,8 +236,6 @@ static int dn_dst_gc(struct dst_ops *ops)
+         }
+         spin_unlock_bh(&dn_rt_hash_table[i].lock);
+     }
+-
+-    return 0;
+ }
+
+ /*
+--
+2.50.1 (Apple Git-155)
+
 
