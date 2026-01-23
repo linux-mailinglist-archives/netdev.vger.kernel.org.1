@@ -1,199 +1,182 @@
-Return-Path: <netdev+bounces-252679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252680-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FXWBoorc2mTswAAu9opvQ
-	(envelope-from <netdev+bounces-252679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:04:26 +0100
+	id SCa6LM4sc2mTswAAu9opvQ
+	(envelope-from <netdev+bounces-252680-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:09:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D52F72261
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:04:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAA3723CE
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5AB1B30048C7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:04:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 613AA304AAD3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB364339714;
-	Fri, 23 Jan 2026 08:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CF333F8B3;
+	Fri, 23 Jan 2026 08:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VjqxZ/Up"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jXcqbV9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F08331204
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D508F33EB09
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769155463; cv=none; b=bqbnphnVq13tQ+hzGRGb7vT+R9Pl2pDf9d0hARNCY+V3xjQhRTvRh0xfL1Cb3jawXHSUUwiPrU0O1u7fOJhNPJGLwP1DelaSHJfpng5GQ6Lf0vLfOnvbx9odb7Ihnc5veHOhZGbEWvL459S2++pRBwlORTEWesaavyBb9hd/8yc=
+	t=1769155573; cv=none; b=ErJnu12ed9mzWRMQSSRgtlNspRRKflalm+0jJC1cEXTVoqBuSyzZQSpq8H325JlrzmQM+F2q5XwVLfzIjw3AmvkwTssLZgJnBVaMgPJ8dZiAjnbiuTY8QDrm0Z5Me379aaNrZYe4eX8dtoNSafc34CaVpCQq3o1NxzkWZrxHtdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769155463; c=relaxed/simple;
-	bh=dZaT9cSBNeM285PphXlT0/xB70LYV4cXn5X4Ku0z8wY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=raTNGzuxAsHoIfOXtYh6GT/YVn7uI/xtBswoBtxgJ7SOKpCW0jQeAINNJmWysL6SEIZHnY6caRSv+726rgjk4YoNLWAOvAYFCTHu3NRt0/X2k2Z1Y8WmPyDxuXQTBdcF9yUuS9dZ+skZw1Es58dupZ7JxWXKXvDyQmML0M8mo0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VjqxZ/Up; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-1233c155a42so2712809c88.1
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 00:04:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769155461; x=1769760261; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9iUFL56beVY/iIEgFqGvI5oxeFHwKFv4+mDAz58zBhU=;
-        b=VjqxZ/UpcakcriUiUkAdwZwlBsLwNLZTpHHvSQXevcgctZA3obknNAGHu+geIKEENi
-         ugtxTOA2XzFyKUERGjoDA1QIbSTa9XCbRQjkIKuM8bY1pCMkzhOdXyq91bMnEn7lwQA1
-         aCBKTawUbWl7bADYmNxCT/pyP47+KE0fmPyJjxDyng+uJPKY9lXn7gQnorSQd09hk/Yl
-         Mz4HAOytYjxILh2GuflFinRd730wN5BLI221u6hlGO3HAGpbk43kYxtLUHwuYqpxoWZb
-         V/j1pDRqgiRQGTDop3jXf47gRgXZOjLSlt8idfxNiAsyhYwPiquqZKooYA9c9xv+CML3
-         I3Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769155461; x=1769760261;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9iUFL56beVY/iIEgFqGvI5oxeFHwKFv4+mDAz58zBhU=;
-        b=iHwSTB5XITC2LTARt0h9rMpzCG6N7VDT8JaeB/K3XBwc96Y6PaZPOcXsJvYBrO9F/x
-         6xkZKGOGiwr8buANKFnP1gfRHAFO01FnNtFjZ0k+hALV5mPl93+ojtaFhr91GHI3+EtD
-         er1SsYt8OQQSpyMl7M9ZmS/emjOkC74/M40RYidN9uvhHrsLkFCOrnTuc30HnLMhyqNy
-         NEz3vh6j78vkTxdUwiMeIHgAyeJYYtGYAD3M20U2JwF87brsZunlISQALPx+hjmYjKnI
-         9W7+WvnPbcv6MZIsuifme9UsK9A3SlmG/WAcg4F7USi6WFwrVnauEdQO2vAfGCTYj3+7
-         PpuA==
-X-Gm-Message-State: AOJu0YzN8/8u/FvjjwoCykUE2Pv0kCoCe96jQw7Oti2Cj2VYZTwfplOl
-	jG9pWFqn6NEZ+aYAI9h90H1l1b2cswco6UYeh8wgW/u4TslUR1neOi/tjSFyIFfY
-X-Gm-Gg: AZuq6aKHJKl0+LfBTwg+di/cCgd77vVdNxSQKo7LgpmqbysUAGysbY00v8SjIyApo+g
-	o24rd12mXv/TOwbbDbfe1T8i4zdRRBw4WvK9Oh9eqoa+2F0GQFhqofqtYpHLQK39WTBsszndjAv
-	HKyj2eXEC5mEDgoOE9B1by8ZBX+zogTxjDKeAm5Xi/6Ry+yib1YgajPcpVWuhMgnjc3xZ+Q3mPG
-	nDWihLyWPF14x0ckQo4svOnxnPJl/nf5rJKigWy904B2J3YsRCCYPr6YL9/17209FXsIr5S1FWz
-	mJMgtdVqzmQe2Gz/bt3+8np9FPKDSVQTc6PVmoZEIDYtYeZJxxBNZEq4YuVXgDAd/BrrCYuz7y+
-	xnbGQc93fn+Ln0fZom82tcX9qoRkiwmLSvJrqBFczTqFRnZrDxyf7rOSNbEZhEX7rvYI3hEUC+m
-	LhKgxHPLRZWP5gGXhG3Sj4vxwbDfqJrQmRg8fXWL3vD7DkO+SL/oa0datJXsi4x7Ft9Oce49KXH
-	mXg6bmy9/1kncNQCsLp0kcQLBLtUZnfJSNAglXboHX8YEDjnSh1Ip2HZkNq/18qXfpyZQrXeBx1
-	L/rx
-X-Received: by 2002:a05:7022:fa8:b0:11a:335d:80d2 with SMTP id a92af1059eb24-1247dc08c24mr1070234c88.35.1769155461161;
-        Fri, 23 Jan 2026 00:04:21 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1247d997f7bsm3395840c88.11.2026.01.23.00.04.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 00:04:20 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] net: usb: sr9700: rename register write commands for clarity
-Date: Fri, 23 Jan 2026 00:03:58 -0800
-Message-ID: <20260123080409.64165-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1769155573; c=relaxed/simple;
+	bh=NoNHTmDRI4VDQCjM6SBpQBy5k+KRzJXkF8/1Rwg9VeU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AAMAjup8ugImlwWewRkrGR7k6jBNMeQLGn9rcbz9tjhWJmRNG2JVmZogQFKPi+W5pOwkDQiyvAKYaYbQUZmExrY+3M3oVtfkyhcX6+fgCDffUfg9YSWPLKdhaAp3qp802yE/dmYt8kAjrJO3oCMiXdyItloxQ4mX2ibj/1ugR5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jXcqbV9i; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769155559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZpLS1xvNWvaqlDj8byf7/WXIXjI0jG8CHvPr3U0nJuQ=;
+	b=jXcqbV9i4Yacw4nRzEs5u9F48ku5UcoUdZg+ffNtjbPmh7xReTG9ZMDRMWxfquG1fGDSR2
+	C7jzPYzYxOaw3YHVvJKEYzIo5fYXB5uGEYxLZ1iT7ihDFF7Xh6i/0oWcfAnkvmNi8xBDgf
+	044joIq2RqsaGuGc44FjeT0S7JzNM+E=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
+Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
+ clm@meta.com, ihor.solodrai@linux.dev
+Subject:
+ Re: [PATCH bpf-next v11 10/12] selftests/bpf: add testcases for fsession
+Date: Fri, 23 Jan 2026 16:05:43 +0800
+Message-ID: <12822324.O9o76ZdvQC@7940hx>
+In-Reply-To:
+ <28d092553ad40300324a21ccbc1dfd89f06283ca4801a5196e993f11e1522e71@mail.kernel.org>
+References:
+ <20260123073532.238985-11-dongml2@chinatelecom.cn>
+ <28d092553ad40300324a21ccbc1dfd89f06283ca4801a5196e993f11e1522e71@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	CTE_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252679-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252680-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D52F72261
+	RCPT_COUNT_TWELVE(0.00)[33];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.990];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim]
+X-Rspamd-Queue-Id: 5CAA3723CE
 X-Rspamd-Action: no action
 
-SR_WR_REG and SR_WR_REGS may be confused at a cursory glance. Rename
-them to be more easily differentiated to prevent this.
+On 2026/1/23 15:57 bot+bpf-ci@kernel.org write:
+> > diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
+> > new file mode 100644
+> > index 000000000000..f504984d42f2
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/fsession_test.c
+> > @@ -0,0 +1,110 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/* Copyright (c) 2025 ChinaTelecom */
+> > +#include <vmlinux.h>
+> > +#include <bpf/bpf_helpers.h>
+> > +#include <bpf/bpf_tracing.h>
+> > +
+> > +char _license[] SEC("license") = "GPL";
+> 
+> [ ... ]
+> 
+> > +__u64 test6_entry_result = 0;
+> > +__u64 test6_exit_result = 0;
+> > +SEC("fsession/bpf_fentry_test1")
+> > +int BPF_PROG(test6, int a)
+> > +{
+> > +	__u64 addr = bpf_get_func_ip(ctx);
+> > +
+> > +	if (bpf_session_is_return(ctx))
+> > +		test6_exit_result = (const void *) addr == &bpf_fentry_test1;
+> > +	else
+> > +		test6_entry_result = (const void *) addr == &bpf_fentry_test1;
+>                                                           ^^^^^^^^^^^^^^^^^^
+> 
+> Is the bpf_fentry_test1 symbol declared somewhere? The code references
+> &bpf_fentry_test1 but there is no extern declaration with __ksym in this
+> file.
 
-Suggested-by: Andrew Lunn <andrew+netdev@lunn.ch>
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/usb/sr9700.c | 8 ++++----
- drivers/net/usb/sr9700.h | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+The symbol "bpf_fentry_test1" will be declared in vmlinux.h, which is
+generated automatically.
 
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 9c7cd0db1768..e518e1710b18 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -37,7 +37,7 @@ static int sr_write(struct usbnet *dev, u8 reg, u16 length, void *data)
- {
- 	int err;
- 
--	err = usbnet_write_cmd(dev, SR_WR_REGS, SR_REQ_WR_REG, 0, reg, data,
-+	err = usbnet_write_cmd(dev, SR_WR_MULTIPLE_REGS, SR_REQ_WR_REG, 0, reg, data,
- 			       length);
- 	if ((err >= 0) && (err < length))
- 		err = -EINVAL;
-@@ -51,20 +51,20 @@ static int sr_read_reg(struct usbnet *dev, u8 reg, u8 *value)
- 
- static int sr_write_reg(struct usbnet *dev, u8 reg, u8 value)
- {
--	return usbnet_write_cmd(dev, SR_WR_REG, SR_REQ_WR_REG,
-+	return usbnet_write_cmd(dev, SR_WR_SINGLE_REG, SR_REQ_WR_REG,
- 				value, reg, NULL, 0);
- }
- 
- static void sr_write_async(struct usbnet *dev, u8 reg, u16 length,
- 			   const void *data)
- {
--	usbnet_write_cmd_async(dev, SR_WR_REGS, SR_REQ_WR_REG,
-+	usbnet_write_cmd_async(dev, SR_WR_MULTIPLE_REGS, SR_REQ_WR_REG,
- 			       0, reg, data, length);
- }
- 
- static void sr_write_reg_async(struct usbnet *dev, u8 reg, u8 value)
- {
--	usbnet_write_cmd_async(dev, SR_WR_REG, SR_REQ_WR_REG,
-+	usbnet_write_cmd_async(dev, SR_WR_SINGLE_REG, SR_REQ_WR_REG,
- 			       value, reg, NULL, 0);
- }
- 
-diff --git a/drivers/net/usb/sr9700.h b/drivers/net/usb/sr9700.h
-index 3212859830dc..5c04ea0306c7 100644
---- a/drivers/net/usb/sr9700.h
-+++ b/drivers/net/usb/sr9700.h
-@@ -150,8 +150,8 @@
- 
- /* Register access commands and flags */
- #define	SR_RD_REGS		0x00
--#define	SR_WR_REGS		0x01
--#define	SR_WR_REG		0x03
-+#define	SR_WR_MULTIPLE_REGS	0x01
-+#define	SR_WR_SINGLE_REG	0x03
- #define	SR_REQ_RD_REG	(USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE)
- #define	SR_REQ_WR_REG	(USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE)
- 
--- 
-2.43.0
+> 
+> Other BPF selftests that take addresses of kernel symbols declare them
+> explicitly, for example get_func_ip_test.c has:
+> 
+>     extern int bpf_fentry_test1(int a) __ksym;
+> 
+> And kprobe_multi_session.c has:
+> 
+>     extern const void bpf_fentry_test1 __ksym;
+> 
+> Without a similar declaration, will this BPF program compile and load
+> correctly?
+
+As I said above, it won't cause compile problem.
+
+Thanks!
+Menglong Dong
+
+> 
+> > +	return 0;
+> > +}
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
+> 
+
+
+
 
 
