@@ -1,131 +1,168 @@
-Return-Path: <netdev+bounces-252973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252974-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NbSJ0vmc2nRzQAAu9opvQ
-	(envelope-from <netdev+bounces-252973-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:21:15 +0100
+	id gHZnEMHnc2nhzQAAu9opvQ
+	(envelope-from <netdev+bounces-252974-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:27:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBAB7ADD9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:21:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3057AE5D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B464302EEA3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:20:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 398D63006101
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658B72DA74C;
-	Fri, 23 Jan 2026 21:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fu2uuTJR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7F1246778;
+	Fri, 23 Jan 2026 21:27:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE4E2D0C9D;
-	Fri, 23 Jan 2026 21:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D9C1E487
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769203220; cv=none; b=NO2uvk8qJF2fcGsoV2lCkJIJc06csX+3wtDU8C8FQtYNxyV7gS+dFi+JdEYE2u6U0euujAJmwF3Sn7xVKEtxj3qwtditeUxMP1NlEOcYvgvIgOGvPbuGy6swi/7wOAsfW3H2XWNT3K5Ct6h0Ji76JPnzMgIt79KWmFTofmM+xjA=
+	t=1769203645; cv=none; b=ePcuf6lkPT1GqWp8+81AO86VCYn3koHMwzgIZLKF7i4rVB80OiZEEQyeh7NQrGuztbmWBDON4Nxxi0tdrnHCGDpZOAWWRGwbhpktjukw0Q2QNmnjvnMXd2N8sEfooFXJyMuACNH5q9OfcnYjj30jZDHy0yAR9zybYrBR5ugxvRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769203220; c=relaxed/simple;
-	bh=isTighoWKow4JJBrOzp/J3FQ7at5VDfiyw5ADB+Qiww=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ldBthHEOJLMNeYXp/0UkzAzAdzGCpA98skSteHYe5vTTKuqK/OOpiBe80O1F/apBHNFl8lCYOZKr1t5VxuF79I4HO96cLRrthMMkJjIplAubm4oRfVkDLlBqf+ZyQCJjjbTMpSy7TJOw5cZjq1iEngc03xCTOH8DolHG/J8VYlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fu2uuTJR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0316CC4CEF1;
-	Fri, 23 Jan 2026 21:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769203220;
-	bh=isTighoWKow4JJBrOzp/J3FQ7at5VDfiyw5ADB+Qiww=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fu2uuTJRCKJlfbxNA9+ro5oaSc5tyVsw1gkcuo9sMo1LXmih4aUzSI8kjuDBlY/US
-	 xHEzfhbdaZincxyFKomWMXn/SAWmAF4zAm7Y+q7S4eeOxAf9lm4bk+9YAaWx6jaAzE
-	 89Rp0iW2hj0DNj1m5R/ID/eDN7vFlCFRvs01SiwmM/UvOJSy0ON27XD1eMwmtGMctR
-	 Pj6SZsNdx0pcDgaLNE/Wxo+gLRk453+t/l5713reVL+p8eOV7dIqArDr2LozxkLoKV
-	 YXwCrXbb0IhSsdm31G6pHt02meyqd871YIOZV7WN1WIx7pNsPTI12VaqC1ypOrJ+pD
-	 Z06dujWBbHH8g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 118A53808200;
-	Fri, 23 Jan 2026 21:20:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1769203645; c=relaxed/simple;
+	bh=6EfQPL4EHcqyjtbufDjUzm0oqyoxP1Ski6ZimmGZhng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCC42SyGUlVatiRVu9WXYfrMKitevCWZyi05r8BKXEpT6XQLzCSMxXtpKR5PpKJylMF+UCTuAJkD0srayC77GABGO7j5gVy7upMGVXlh+LHEopVjMm0otGV7+HqSwhuen4paExs2lpCeCZgq3rfUkpSCiHzsYJGKQlbG4f/5mZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjOgb-0007Wc-Vo; Fri, 23 Jan 2026 22:27:21 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjOgZ-0029ml-2w;
+	Fri, 23 Jan 2026 22:27:19 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjOgZ-00B7J1-0G;
+	Fri, 23 Jan 2026 22:27:19 +0100
+Date: Fri, 23 Jan 2026 22:27:19 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, alok.a.tiwari@oracle.com,
+	andrew+netdev@lunn.ch, andrew@lunn.ch, chuck.lever@oracle.com,
+	davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
+	gal@nvidia.com, horms@kernel.org, idosch@nvidia.com,
+	jacob.e.keller@intel.com, kernel-team@meta.com,
+	kory.maincent@bootlin.com, kuba@kernel.org, lee@trager.us,
+	pabeni@redhat.com, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next 1/3] net: ethtool: Track pause storm events
+Message-ID: <aXPntx9wiUqbKGRN@pengutronix.de>
+References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
+ <20260122192158.428882-2-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net/rds: RDS-TCP state machine and
- message
- loss improvements
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176920321584.2718299.3881561780744022977.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Jan 2026 21:20:15 +0000
-References: <20260122055213.83608-1-achender@kernel.org>
-In-Reply-To: <20260122055213.83608-1-achender@kernel.org>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pabeni@redhat.com, edumazet@google.com, rds-devel@oss.oracle.com,
- kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
- allison.henderson@oracle.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260122192158.428882-2-mohsin.bashr@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,redhat.com,linux.dev];
+	TAGGED_FROM(0.00)[bounces-252974-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252973-lists,netdev=lfdr.de,netdevbpf];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[pengutronix.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.994];
 	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3BBAB7ADD9
+X-Rspamd-Queue-Id: CF3057AE5D
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 21 Jan 2026 22:52:11 -0700 you wrote:
-> From: Allison Henderson <allison.henderson@oracle.com>
+On Thu, Jan 22, 2026 at 11:21:56AM -0800, Mohsin Bashir wrote:
+> With TX pause enabled, if a device is unable to pass packets up to the
+> stack (e.g., CPU is hanged), the device can cause pause storm. Given
+> that devices can have native support to protect the neighbor from such
+> flooding, such events need some tracking. This support is to track TX
+> pause storm events for better observability.
 > 
-> Hi all,
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> ---
+>  Documentation/netlink/specs/ethtool.yaml       | 13 +++++++++++++
+>  include/linux/ethtool.h                        |  2 ++
+>  include/uapi/linux/ethtool_netlink_generated.h |  1 +
+>  net/ethtool/pause.c                            |  4 +++-
+>  4 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> This is subset 2 of the larger RDS-TCP patch series I posted last
-> Oct.  The greater series aims to correct multiple rds-tcp issues that
-> can cause dropped or out of sequence messages.  I've broken it down into
-> smaller sets to make reviews more manageable.
-> 
-> [...]
+> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> index 0a2d2343f79a..4707063af3b4 100644
+> --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -879,6 +879,19 @@ attribute-sets:
+>        -
+>          name: rx-frames
+>          type: u64
+> +      -
+> +        name: tx-pause-storm-events
+> +        type: u64
+> +        doc: >-
+> +            TX pause storm event count. Increments each time device
+> +            detects that its pause assertion condition has been true
+> +            for too long for normal operation. As a result, the device
+> +            has temporarily disabled its own Pause TX function to
+> +            protect the network from itself.
+> +            This counter should never increment under normal overload
+> +            conditions; it indicates catastrophic failure like an OS
+> +            crash. The rate of incrementing is implementation specific.
 
-Here is the summary with links:
-  - [net-next,v2,1/2] net/rds: No shortcut out of RDS_CONN_ERROR
-    https://git.kernel.org/netdev/net-next/c/ad22d24be635
-  - [net-next,v2,2/2] net/rds: rds_tcp_accept_one ought to not discard messages
-    https://git.kernel.org/netdev/net-next/c/db69e9b838c3
+Hm, we already have the tx pause frame counters. So, the anomaly is
+visible to the user anyway (even if it isn't explicitly labeled as an
+anomaly).
 
-You are awesome, thank you!
+What is not visible to the user is when HW or SW disables flow control.
+Maybe that is what the counter should represent and be named? Would
+tx-pause-auto-disabled-events make sense?
+
+The reason I do not like tx-pause-storm-events is that the meaning is
+device specific; the user has to read the device manual to know what it
+actually means.
+
+tx-pause-auto-disabled-events can be reused in more cases - every time
+we try to pause flow control for some reason.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
