@@ -1,154 +1,174 @@
-Return-Path: <netdev+bounces-252967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHvbAXfic2l7zQAAu9opvQ
-	(envelope-from <netdev+bounces-252967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:04:55 +0100
+	id 0OXsEevjc2mjzQAAu9opvQ
+	(envelope-from <netdev+bounces-252968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:11:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0228E7AD12
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:04:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1107AD40
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:11:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE8B33003BC3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:04:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A22F03023A5E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09FF2ED858;
-	Fri, 23 Jan 2026 21:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533AE2F6907;
+	Fri, 23 Jan 2026 21:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMaj5Fc4"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEE919992C
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65B2F3C22
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769202287; cv=none; b=oniMZskxBW21B921yI5lk2Rk2kerhO/WIGmM6XhFIj3Eznda1i26Qn9zfCY7kr+rTWlQebtcoc3OklZH+6FRLyeAcwfdYc3h3VCKy0oCb5tj2uUPhzbDGh6WBplIfZOHhyL55tNcUGwYSVpnybPnTibaJQE0d4G62Ytn9jOsqtU=
+	t=1769202652; cv=none; b=Bt5sdDmcF+du20DLPkeSP/sMA3ZORm3E1UOBScwIKt7PwOLHpNx7AgWlWwyAIiYmUpXIg3NmJcU8FqJ9gwtiiZY84tHviKAROe4pIeVLDTT/KdsgH/p3LU/Z7mNtbqcUmcjnjF2piTLeK1DO6NH0kzpGo2jYQLcvfXjpNBrDxuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769202287; c=relaxed/simple;
-	bh=uOw/tGhA18La+/CoA/KQTT87PQaemnKL4J5kioOYfjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6hJIj7U3LGlU1uYU5Kb46Ua8VL5Sq42JtVwY2Cr4HPl8ReyUKT8IjVOOj2DnWTwxRXHs7jWf0pkgxOqhAvJ/7CfpYmvIU9oCf/3cQhOgKlXy6+60Qz03MbBfeHRx2c9PrU16w9s+0I95ThwUaWchANWK99NuTpZ1Qz330+3Kpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOKh-0005To-2t; Fri, 23 Jan 2026 22:04:43 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOKe-0029YU-0e;
-	Fri, 23 Jan 2026 22:04:39 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOKd-00B7BO-1B;
-	Fri, 23 Jan 2026 22:04:39 +0100
-Date: Fri, 23 Jan 2026 22:04:39 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
-	alexanderduyck@fb.com, alok.a.tiwari@oracle.com,
-	andrew+netdev@lunn.ch, andrew@lunn.ch, chuck.lever@oracle.com,
-	davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
-	gal@nvidia.com, horms@kernel.org, idosch@nvidia.com,
-	jacob.e.keller@intel.com, kernel-team@meta.com,
-	kory.maincent@bootlin.com, lee@trager.us, pabeni@redhat.com,
-	vadim.fedorenko@linux.dev, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 0/3] net: ethtool: Track TX pause storm
-Message-ID: <aXPiZ8H-usRn1pcD@pengutronix.de>
-References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
- <aXNAjOjkCqOESf5y@pengutronix.de>
- <aXNbTVF5KNz1yV-1@pengutronix.de>
- <20260123104031.16d914e4@kernel.org>
+	s=arc-20240116; t=1769202652; c=relaxed/simple;
+	bh=Be53D6pKmPcYdTpNJVEfk1jJ3RT4jCyrusGvCtJrluc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kyobV61LxmavyfuiE/OSsvWs1XwvOXcdvV/+4O+GnecMCoyzhNW5n38l18gSc+a+3O/vtHV+wizJd5fgjufuVh3d1WPNQN+cc48hOkz8/sywItjzIXVE1BaYoxDru1eF+G5YjDgAYnV4vaFixN065yPzddszZ9OfP8iGRJFfC/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMaj5Fc4; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so29919495ad.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 13:10:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769202650; x=1769807450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XaIB4jAIwQJAbyKIhxwkktHEa0cxLoXn5gAW3Xs2KS4=;
+        b=QMaj5Fc4sVJ2T15Gw1v5TM8gWSuEnypf7OmCUx9joBkgaqCCzZV7jgGlOp/bz6AaSM
+         dks/hDqAIu+0hKBJOKRb5pn6SCescAYfbdPfgiA+B1wMOxkOxylkdku/prfFfrw/QFyf
+         qRpSZTyO6d6+VIcpXy2yjpD62dhREivFYwYTAq3DbqTfVs8MoukEr6BJxiyJR/Bssu9p
+         6QoLV3IUXDEa0hmOw9k+nODKsB3ue9nFNPLftomklW/r8oFxt9ORFMSYiJWTP++ID252
+         pDUfBDJTyLbdpaNlEratYc9lOq7J1vfg3mZ18IotiNI58vsUFlR+rng5GXxanX5G02Ky
+         dcAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769202650; x=1769807450;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XaIB4jAIwQJAbyKIhxwkktHEa0cxLoXn5gAW3Xs2KS4=;
+        b=WSaOA6Y8Y4xAkzsMOPDLQ9LR4DpkabIjgN5AvQe6UV3zvBLRe0i/MDW69lC8hv/gKj
+         GEFK2bsu0mHlRCOpNPkvF8yYV0eGoLaODQ3JDTiIaIpHn4z5si9xZ1+xN+HaTwnKZayj
+         l6jyOGGZjaPxeQvgzwGi0QCZXQVizUslJamnsDQ0bdpdi3iBPRTVavZtJcQw24JVKGyE
+         1RPATlq1PXPNl0aUmfeWBEwEiisJvH7RmMgnSvY7TeQrUg+quCrYZOUOh1gaOfII02/t
+         4sj3HLSIkh7gpY854RlL9atOILvctBaC1zVbmA2dw41zMtyiAg4IrBHEAnY2cyr1zJem
+         s9kg==
+X-Gm-Message-State: AOJu0YylWDwfNfM50jnS76lfju3ilxw0JrcRH6T4dRDsMfGpC81rdfln
+	z6SDageUD+I+XQJjEYeoOOYSGsc9b+u5D8YQ3h+XJIvprJspNtsdx8U=
+X-Gm-Gg: AZuq6aKgdhPDm6u2eoKiBwt8ba8j9X+u3u7HGUnfyTqOgKZVq3L+NbxAr82H91QeMrp
+	a48EW2R2o0YCZU9LVUUiqVLrsi+2Ufo7lUcdxs2IOHSLa6BmVq8u2e1nHwk9WA3Pmf3xzxMCvLS
+	o4WF+uEwWFsJBjt0sIo9JQNPdcxO5je9HoZxpIYQjT2zzIardi610lE7B2UssckyWqrnWwO4+w5
+	EZNrCYe5bOqcnzoQzIYSC+CnX6d40QM0wBKhoYizEqlmTBPJb5MgzLunVxmRNMdzEyhZzQYf8PK
+	QzqqjlL9FCad3G+e5D2yYY5zjIoJM9giUgTq0Ikl6B9w1E1J1Crm5Lz3XS5H1LVTXdsIVTdX5VO
+	fCcCvj2fiQcuK2DIN7f+tP9xQpfn2Q7sapaxpz/6Lr4E3O7V5d44HDDglnXSL2Wsb1HIYeEV51R
+	NN7Tg3LkDUIj3pRlA=
+X-Received: by 2002:a17:902:e5cf:b0:2a0:8be7:e3d7 with SMTP id d9443c01a7336-2a7fe75c6d4mr40090285ad.57.1769202650382;
+        Fri, 23 Jan 2026 13:10:50 -0800 (PST)
+Received: from DESKTOP-BKIPFGN ([38.76.140.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802f978b8sm27313745ad.46.2026.01.23.13.10.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 13:10:49 -0800 (PST)
+From: Kery Qi <qikeyu2017@gmail.com>
+To: jiri@resnulli.us,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kery Qi <qikeyu2017@gmail.com>
+Subject: [PATCH] rocker: fix memory leak in rocker_world_port_post_fini()
+Date: Sat, 24 Jan 2026 05:10:31 +0800
+Message-ID: <20260123211030.2109-2-qikeyu2017@gmail.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260123104031.16d914e4@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,fb.com,oracle.com,lunn.ch,davemloft.net,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,redhat.com,linux.dev,pengutronix.de];
-	TAGGED_FROM(0.00)[bounces-252967-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252968-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.993];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qikeyu2017@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,pengutronix.de:url,pengutronix.de:mid]
-X-Rspamd-Queue-Id: 0228E7AD12
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DB1107AD40
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 10:40:31AM -0800, Jakub Kicinski wrote:
-> On Fri, 23 Jan 2026 12:28:13 +0100 Oleksij Rempel wrote:
-> > Here is a TL;DR summary of my questions regarding the pause storm logic
-> > :)
-> 
-> Eh, did you get AI to help write the full version? :) So much text :)
+In rocker_world_port_pre_init(), rocker_port->wpriv is allocated with
+kzalloc(wops->port_priv_size, GFP_KERNEL). However, in
+rocker_world_port_post_fini(), the memory is only freed when
+wops->port_post_fini callback is set:
 
-Yes, to reduce the text! Sorry, sometimes I have word diarrhea :D
+    if (!wops->port_post_fini)
+        return;
+    wops->port_post_fini(rocker_port);
+    kfree(rocker_port->wpriv);
 
-> > - Should we standardize an "RX Watchdog" mechanism in the core instead of
-> >   or in addition to driver-specific stats?
-> 
-> Our primary use case is machine is hard-wedged. Either Linux crash, or
-> kexec died, or UEFI issue. So it must be the device that implements the
-> logic.
-> 
-> Florian was proposing a hook to auto-disable pause from the crash
-> notifier. It sounds like your use case is closer to that?
+Since rocker_ofdpa_ops does not implement port_post_fini callback
+(it is NULL), the wpriv memory allocated for each port is never freed
+when ports are removed. This leads to a memory leak of
+sizeof(struct ofdpa_port) bytes per port on every device removal.
 
-It is valid use case - it will be nice to have it too.
+Fix this by always calling kfree(rocker_port->wpriv) regardless of
+whether the port_post_fini callback exists.
 
-In my tests, I was able to trigger an Rx stall and a pause storm (if
-flow control is enabled), for example by partially disrupting the USB
-connection. Since this controller is used in medical devices, it will
-be good to detect these anomalies and attempt recovery.
+Fixes: e420114eef4a ("rocker: introduce worlds infrastructure")
+Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
+---
+ drivers/net/ethernet/rocker/rocker_main.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Sorry, here I want to hijack this discussion for my purpose :)
-
-Since a pause storm is only a symptom of an Rx stall, should we have a
-common method to detect it? Is it even reasonably possible? In my cases,
-I tried to detect it by monitoring the level of the Rx queue, Rx HW
-counters, and Rx SW counters. But maybe I just have a blind spot and
-this is a naive way to detect things.
-
+diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
+index 36af94a2e062..2794f75df8fc 100644
+--- a/drivers/net/ethernet/rocker/rocker_main.c
++++ b/drivers/net/ethernet/rocker/rocker_main.c
+@@ -1524,9 +1524,8 @@ static void rocker_world_port_post_fini(struct rocker_port *rocker_port)
+ {
+ 	struct rocker_world_ops *wops = rocker_port->rocker->wops;
+ 
+-	if (!wops->port_post_fini)
+-		return;
+-	wops->port_post_fini(rocker_port);
++	if (wops->port_post_fini)
++		wops->port_post_fini(rocker_port);
+ 	kfree(rocker_port->wpriv);
+ }
+ 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
