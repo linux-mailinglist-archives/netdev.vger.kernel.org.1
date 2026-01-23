@@ -1,94 +1,81 @@
-Return-Path: <netdev+bounces-252842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252843-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hM9oH/lyc2mWvwAAu9opvQ
-	(envelope-from <netdev+bounces-252842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 14:09:13 +0100
+	id GB74MDt2c2kEwAAAu9opvQ
+	(envelope-from <netdev+bounces-252843-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 14:23:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E9D76230
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 14:09:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39308762E8
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 14:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A746B302F38E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:09:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2C938301A535
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFEA2F3C10;
-	Fri, 23 Jan 2026 13:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057E42E6CAB;
+	Fri, 23 Jan 2026 13:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iR38wHq2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LpM1733F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4792417E0
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 13:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389CD29AB02;
+	Fri, 23 Jan 2026 13:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769173749; cv=none; b=MOE0YjCUf5+PUm9xcniodjjMowye6FKygu6jRLenJ15hvsxCZAcbCrVG2Ul2/4kWpLYSFW5xWk87cRn+hnjr94qfzsnLW2U/kL7OtMAQFat/8tBpbADKIMYXTFWiXbZiuCReJU56ktQjbKt2/xYPKGcGpq24F6WwQdh8xxh/L6E=
+	t=1769174583; cv=none; b=boilbJ4bmrfPD0SX4twcEN7e6K+xkjxdvyueT88FtPHTykRNSPvls62myUlNG/QECKEayRC3ZzS3a6XvHGLpsAdOJEmvLfbSDZcDT91tFrjZELboExWDgodz6eeF7V6ty4h+sglyq40E2B3ZCv+8vERinEbJN80sE+DvUSUlcB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769173749; c=relaxed/simple;
-	bh=cFpC7v3e2f1s5QcKqpbbp+MFq/K0luTpU66taNYWdOU=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OFAgF4e8zsYpbUdze8DwndKpbIz9rDQ8XOkuV/SOGRjCPt9XgIOcqZoHZldwg9M+h0abPuRIq9pFXm6Enq/B6L+LzlJPk03kmm9OqiUdNmmeN8ZrLwPVhbIp2mow2A4J//XnBtQwT06GpF5o9vgK4I7fbAqz3v+dcd+XyNa7XWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iR38wHq2; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47ee4539adfso23628385e9.3
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 05:09:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769173746; x=1769778546; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0mZ7cxT9Oc18zXyi3CSpw+MXg+25jVdopAgJLZF8Ols=;
-        b=iR38wHq2FEItCU6W71zVW44xzhAYS6eRUF31IsomzvlHGKv8nwPsoB9b93LRLE15Ye
-         u/r4QyI/4HvD51VifPawjsUecXF4QSfmOPtos6sRivPtSSPQQRNJCmyNJv/eNqwVtUvD
-         1BzeKjSIzo6MoXrO8SebpfPk1wN7FpXFxtIGX/OjrnnAkrOEZAFYMiEZL74/WbMeXU+H
-         Zst/8X2l/DEGwPFLyPYdzN3YnE917cOl0a3VaFipiiS/FLc76Po7zJwNvtqLu4KeFXEt
-         mvi9e28BR8irowMxc0z4Wlb9jBOeZeQIsUdfQM6tYL/VPaXmTgk9sncOaDRKLXEtG6Dw
-         DTMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769173746; x=1769778546;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0mZ7cxT9Oc18zXyi3CSpw+MXg+25jVdopAgJLZF8Ols=;
-        b=YkNo+THK+Ph3A2RIOkHus4BCPPlU1bKjsQuLXYrztekdbQbbh98E0bo/PEFuj0Vdqr
-         3FVzzcdGIKqfp09YSKmPA+Krgyo2MzVkEufFSttk2Ue8/NMMydh49AsZcpvz09GebLzt
-         2JtXFPusWl2uMpYpKld6FUd1emOFXx1JOdUNAluAWbVa2uza/Nm1gAtbIsI7K4Vi1m3o
-         GVlDcvza7P1toZMu8uso6r/5fK0CMmeT5kODmc5Igmp5LiRXFO3ZtepADD0RBTHbpjUQ
-         Jh5tg6TkjI5ZfapP8c495XysrVC8Z81+wkVM+fxgzIa/HnT6bv+W2IXTg6MfcRwXsRF2
-         jYcA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8vNiD4YxZ6jntvma39S+j+u2UWDJfEyrXvXuzIENKisP6ThM0TvTOH9m9UgUbhORU9JeUnRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpVvHRsu/tyWYgNBE1c+rSndZIGgjg0gpPEknAclUAHMuEe+AA
-	+Up/0rZ3TJQal/29KTF7FVrd/JdjotE02CF2G2iZRfGoMiuzz1HL/ul1
-X-Gm-Gg: AZuq6aJnZq2vbavlhXZVt2fyG9/+xNTsAudUaHVpxRSXNLjIr5eaG8s7NLtJOzzc/ur
-	dgyGAYSuq8Ukd/HyTcEmTzYxteyt/JhoQGgcnR90O96M4eAm2kMYRcoDWSwxEGw4EjKi7Med8rz
-	FMwheM/bGOJZ3XoamO1oF/BdKRhlxZiNqX1t0NHz6ogZDLCJVoKlmvxrp3ZH622wutUY6ztN6i9
-	PAtQPekJ30KKkpT4MD14D2OKuTQ42EasHw+or2uHyJCSRMz7E57Pb6Rs5b4DXiy7Dl7VFVdtv2u
-	ojFszBjUg0qRY+K2KhXCp1t6U81vaZNuiMENVFbcmGoURR7RrvGsZ48G9Kt+B/nU90ZKSBu6rzQ
-	OzfFkE704yklw3D7E/YcIkYLmvd40eMoCXVGpWOpPwqlSW/1uRg6bLTSib9p8n2oKgL5FFxRwT1
-	p5lvgvH8djnboZcMUYdgqfoGSVP7Ye1iyJsq3EfOI=
-X-Received: by 2002:a05:600c:46c5:b0:477:6374:6347 with SMTP id 5b1f17b1804b1-4804f8235f5mr33189985e9.22.1769173746248;
-        Fri, 23 Jan 2026 05:09:06 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-88-81.ip49.fastwebnet.it. [93.34.88.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e71730sm7008672f8f.26.2026.01.23.05.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 05:09:05 -0800 (PST)
-Message-ID: <697372f1.df0a0220.291d22.85ee@mx.google.com>
-X-Google-Original-Message-ID: <aXNy7at2k-Am3Kj6@Ansuel-XPS.>
-Date: Fri, 23 Jan 2026 14:09:01 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 0/3] net: phy: as21xxx: toggle In Band
- feature support
-References: <20260123120117.10883-1-ansuelsmth@gmail.com>
- <aXNmrVgpzvPwoyL1@shell.armlinux.org.uk>
+	s=arc-20240116; t=1769174583; c=relaxed/simple;
+	bh=R30KX4+8mtSuQxUCOYXGRi/E2OHWVlkbi4zsYYYbcLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cx1BS9ZCZpPjtZOy88zc894qVew3qmsQobf3V3hQ0is4LGHhTdM5xU+JfF0gwmxkgai2uXaERebK+qaFOxDYp8H3iOJqMpLauL+EmVuTP/2p1zmqqc7ue/z9SEKr5CCzid5WqXUuLUIUXZw6ZDPxd4shjOYktBKflP3oNtwwh8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LpM1733F; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769174580; x=1800710580;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=R30KX4+8mtSuQxUCOYXGRi/E2OHWVlkbi4zsYYYbcLY=;
+  b=LpM1733FsRYg0xXVSb2Md7sEP0yWTVAHeiZ+3cv6Ww+8rlQX0918vG2C
+   U1lhR+ya9MEuLzulfHA81b+W4ipGYb3nVbQvuzT+1FavZtekqeS12rIYO
+   hUyR/0bYxoZeQ8mjDmJWHuqlkIfZc1+jjQG8FbQIG51F3INpWpsqgd2b5
+   KblLLGFUAzmb3GHOFHhERCZs497XCLr6WVbZX1v6e28HxKstH5CrVrHho
+   oqN2UoGRo0y158QoC/qIb4bNIru0uSyLbEaj76JeggQCpaHrjV8Rdgo7C
+   kXBl86Q1F2M5Lg1QuS14D3ZHVl63McgKwAap8Kl2dVOmKrByYq0ZNgg36
+   w==;
+X-CSE-ConnectionGUID: jq5Pyxj/QLuxYb1Tah5+qA==
+X-CSE-MsgGUID: qRdR1fYBRpK5GYZwGdInQw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11680"; a="70146799"
+X-IronPort-AV: E=Sophos;i="6.21,248,1763452800"; 
+   d="scan'208";a="70146799"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2026 05:22:59 -0800
+X-CSE-ConnectionGUID: yBgXnFLASAKzAaMJ4vgRhQ==
+X-CSE-MsgGUID: v4rCm2mbRpKWnuOe/rZsNg==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 23 Jan 2026 05:22:56 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vjH7m-00000000Tyg-0ip6;
+	Fri, 23 Jan 2026 13:22:54 +0000
+Date: Fri, 23 Jan 2026 21:22:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, sgoutham@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: Re: [PATCH net-next] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <202601232124.fqzsosEi-lkp@intel.com>
+References: <20260123065257.2993735-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,131 +84,177 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXNmrVgpzvPwoyL1@shell.armlinux.org.uk>
+In-Reply-To: <20260123065257.2993735-1-rkannoth@marvell.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-252842-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252843-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: C4E9D76230
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 39308762E8
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 12:16:45PM +0000, Russell King (Oracle) wrote:
-> [Please note: gmail.com has become unreliable for email delivery,
-> google has too much power to decide what is spam and what isn't, with
-> no route for appeal. please consider switching to a different email
-> provider.]
->
+Hi Ratheesh,
 
-Thanks for reporting this. I'm also noticing for a while some legit
-email from mailing list going to spam. I have a new mail from a long
-time but never took the time to actually made the switch for kernel
-submission. Also it's mostly new so I guess it needs to earn some cretis
-as it will get directly rejected by some service. Chicken Egg problem...
+kernel test robot noticed the following build warnings:
 
-> On Fri, Jan 23, 2026 at 01:00:28PM +0100, Christian Marangi wrote:
-> > This is a new variant of the previous submitted patch adding a similar
-> > feature.
-> > 
-> > Old Aeonsemi Firmware permitted only to enable or disable In Band
-> > support and it couldn't be disabled after (or there wasn't a
-> > way to detect the current state of it)
-> > 
-> > As suggested by Russell this was bad Implementation. Some talk
-> > with Aeonsemi permitted to release a new firmware with correct
-> > implementation.
-> > 
-> > This series adds support for this if new firmware (1.9.1+) is
-> > used. On the new firmware, 2 new IPC command are introduced
-> > to GET the current state of DPC RA (Rate Adaption) or SET it.
-> > (DPC RA is effectively In Band mode)
-> > 
-> > It was verified on the same scenario and can confirm it works
-> > as expected. (Airoha AN7581/AN7583 with and without In Band
-> > mode) (If PCS is set to In Band and PHY isn't then no
-> > connection, so it's easy to verify correct functionality of
-> > this)
-> > 
-> > The new firmware is currently submitted to linux-firmware
-> > awaiting it to be merged.
-> > 
-> > For old firmware to save on compatibility we still enable
-> > In Band by default (this is what the current driver do)
-> > 
-> > This was discovered to be needed in some scenario as is effectively
-> > the most compatible featureset.
-> > 
-> > On a BananaPi R4 Pro, one of the 2 AS21xxx PHY is connected to
-> > one of the Switch port and such switch supports only In Band when
-> > set to USXGMII (assuming the Switch expect an SFP module to be
-> > attached where in absence of i2c or MDIO line In Band is always
-> > required)
-> 
-> Coupling the PHY's rate adaption with inband support, but not setting
-> phydev->rate_matching anywhere in this driver seems wrong, and highly
-> suspicious. I'm not sure what to think given what you've said above,
-> it just seems completely wrong what has happened here.
-> 
+[auto build test WARNING on net-next/main]
 
-Honestly speaking the Rate Adaption thing is what I found in some
-strange API c code on the downstream driver where they say that in
-DPC_RA RA is Rate Adaption.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ratheesh-Kannoth/devlink-Implement-devlink-param-multi-attribute-nested-data-values/20260123-145646
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260123065257.2993735-1-rkannoth%40marvell.com
+patch subject: [PATCH net-next] devlink: Implement devlink param multi attribute nested data values
+config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20260123/202601232124.fqzsosEi-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260123/202601232124.fqzsosEi-lkp@intel.com/reproduce)
 
-My personal idea is that, that thing toggle also other stuff and not only
-Rate Adaption.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601232124.fqzsosEi-lkp@intel.com/
 
-On the Airoha PCS In Band is controlled by enabling and disabling AN
-register (and this also apply to Mediatek PCS)
+All warnings (new ones prefixed by >>):
 
-With AN enabled, DPC RA needs to be enabled or no traffic.
-With AN disabled, DPC RA needs to be disabled or not traffic.
+   net/devlink/param.c: In function 'devlink_nl_param_fill.constprop':
+>> net/devlink/param.c:410:1: warning: the frame size of 1300 bytes is larger than 1280 bytes [-Wframe-larger-than=]
+     410 | }
+         | ^
 
-This both apply to Airoha and Mediatek PCS.
 
-For the Switch, it's a different story. Everything is controlled by a
-Firmware blob and it's only possible to send command to setup the
-Serdes mode (USXGMII in this case)
-I made lots of test with forcing speed or trying to find a way to make
-it work but the only combo I found working was USXGMII + DPC_RA enabled.
+vim +410 net/devlink/param.c
 
-For the lack of .get_rate_matching should be set to RATE_MATCH_NONE
-AFAIK for this PHY.
-
-To give more info comments in the downstream driver at dpc_ra_enable
-have "Set USXGMII mode.".
-But I verified that PCS at USXGMII (but no In Band) and DPC_RA off
-I have correct link up and traffic. So it's not dropping to 10g base-r
-somehow with DPC_RA disabled and if it was the case the PCS should be
-configured for that mode (there are specific register for that).
-
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+830c41e1e987d9 Jiri Pirko   2023-08-28  304  
+830c41e1e987d9 Jiri Pirko   2023-08-28  305  static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+830c41e1e987d9 Jiri Pirko   2023-08-28  306  				 unsigned int port_index,
+830c41e1e987d9 Jiri Pirko   2023-08-28  307  				 struct devlink_param_item *param_item,
+830c41e1e987d9 Jiri Pirko   2023-08-28  308  				 enum devlink_command cmd,
+011d133bb988f8 Daniel Zahka 2025-11-18  309  				 u32 portid, u32 seq, int flags,
+011d133bb988f8 Daniel Zahka 2025-11-18  310  				 struct netlink_ext_ack *extack)
+830c41e1e987d9 Jiri Pirko   2023-08-28  311  {
+2a367002ed321e Daniel Zahka 2025-11-18  312  	union devlink_param_value default_value[DEVLINK_PARAM_CMODE_MAX + 1];
+830c41e1e987d9 Jiri Pirko   2023-08-28  313  	union devlink_param_value param_value[DEVLINK_PARAM_CMODE_MAX + 1];
+2a367002ed321e Daniel Zahka 2025-11-18  314  	bool default_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+830c41e1e987d9 Jiri Pirko   2023-08-28  315  	bool param_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+830c41e1e987d9 Jiri Pirko   2023-08-28  316  	const struct devlink_param *param = param_item->param;
+830c41e1e987d9 Jiri Pirko   2023-08-28  317  	struct devlink_param_gset_ctx ctx;
+830c41e1e987d9 Jiri Pirko   2023-08-28  318  	struct nlattr *param_values_list;
+830c41e1e987d9 Jiri Pirko   2023-08-28  319  	struct nlattr *param_attr;
+830c41e1e987d9 Jiri Pirko   2023-08-28  320  	void *hdr;
+830c41e1e987d9 Jiri Pirko   2023-08-28  321  	int err;
+830c41e1e987d9 Jiri Pirko   2023-08-28  322  	int i;
+830c41e1e987d9 Jiri Pirko   2023-08-28  323  
+830c41e1e987d9 Jiri Pirko   2023-08-28  324  	/* Get value from driver part to driverinit configuration mode */
+830c41e1e987d9 Jiri Pirko   2023-08-28  325  	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  326  		if (!devlink_param_cmode_is_supported(param, i))
+830c41e1e987d9 Jiri Pirko   2023-08-28  327  			continue;
+830c41e1e987d9 Jiri Pirko   2023-08-28  328  		if (i == DEVLINK_PARAM_CMODE_DRIVERINIT) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  329  			if (param_item->driverinit_value_new_valid)
+830c41e1e987d9 Jiri Pirko   2023-08-28  330  				param_value[i] = param_item->driverinit_value_new;
+830c41e1e987d9 Jiri Pirko   2023-08-28  331  			else if (param_item->driverinit_value_valid)
+830c41e1e987d9 Jiri Pirko   2023-08-28  332  				param_value[i] = param_item->driverinit_value;
+830c41e1e987d9 Jiri Pirko   2023-08-28  333  			else
+830c41e1e987d9 Jiri Pirko   2023-08-28  334  				return -EOPNOTSUPP;
+2a367002ed321e Daniel Zahka 2025-11-18  335  
+2a367002ed321e Daniel Zahka 2025-11-18  336  			if (param_item->driverinit_value_valid) {
+2a367002ed321e Daniel Zahka 2025-11-18  337  				default_value[i] = param_item->driverinit_default;
+2a367002ed321e Daniel Zahka 2025-11-18  338  				default_value_set[i] = true;
+2a367002ed321e Daniel Zahka 2025-11-18  339  			}
+830c41e1e987d9 Jiri Pirko   2023-08-28  340  		} else {
+830c41e1e987d9 Jiri Pirko   2023-08-28  341  			ctx.cmode = i;
+011d133bb988f8 Daniel Zahka 2025-11-18  342  			err = devlink_param_get(devlink, param, &ctx, extack);
+830c41e1e987d9 Jiri Pirko   2023-08-28  343  			if (err)
+830c41e1e987d9 Jiri Pirko   2023-08-28  344  				return err;
+830c41e1e987d9 Jiri Pirko   2023-08-28  345  			param_value[i] = ctx.val;
+2a367002ed321e Daniel Zahka 2025-11-18  346  
+2a367002ed321e Daniel Zahka 2025-11-18  347  			err = devlink_param_get_default(devlink, param, &ctx,
+2a367002ed321e Daniel Zahka 2025-11-18  348  							extack);
+2a367002ed321e Daniel Zahka 2025-11-18  349  			if (!err) {
+2a367002ed321e Daniel Zahka 2025-11-18  350  				default_value[i] = ctx.val;
+2a367002ed321e Daniel Zahka 2025-11-18  351  				default_value_set[i] = true;
+2a367002ed321e Daniel Zahka 2025-11-18  352  			} else if (err != -EOPNOTSUPP) {
+2a367002ed321e Daniel Zahka 2025-11-18  353  				return err;
+2a367002ed321e Daniel Zahka 2025-11-18  354  			}
+830c41e1e987d9 Jiri Pirko   2023-08-28  355  		}
+830c41e1e987d9 Jiri Pirko   2023-08-28  356  		param_value_set[i] = true;
+830c41e1e987d9 Jiri Pirko   2023-08-28  357  	}
+830c41e1e987d9 Jiri Pirko   2023-08-28  358  
+830c41e1e987d9 Jiri Pirko   2023-08-28  359  	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+830c41e1e987d9 Jiri Pirko   2023-08-28  360  	if (!hdr)
+830c41e1e987d9 Jiri Pirko   2023-08-28  361  		return -EMSGSIZE;
+830c41e1e987d9 Jiri Pirko   2023-08-28  362  
+830c41e1e987d9 Jiri Pirko   2023-08-28  363  	if (devlink_nl_put_handle(msg, devlink))
+830c41e1e987d9 Jiri Pirko   2023-08-28  364  		goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  365  
+830c41e1e987d9 Jiri Pirko   2023-08-28  366  	if (cmd == DEVLINK_CMD_PORT_PARAM_GET ||
+830c41e1e987d9 Jiri Pirko   2023-08-28  367  	    cmd == DEVLINK_CMD_PORT_PARAM_NEW ||
+830c41e1e987d9 Jiri Pirko   2023-08-28  368  	    cmd == DEVLINK_CMD_PORT_PARAM_DEL)
+830c41e1e987d9 Jiri Pirko   2023-08-28  369  		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, port_index))
+830c41e1e987d9 Jiri Pirko   2023-08-28  370  			goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  371  
+830c41e1e987d9 Jiri Pirko   2023-08-28  372  	param_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PARAM);
+830c41e1e987d9 Jiri Pirko   2023-08-28  373  	if (!param_attr)
+830c41e1e987d9 Jiri Pirko   2023-08-28  374  		goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  375  	if (nla_put_string(msg, DEVLINK_ATTR_PARAM_NAME, param->name))
+830c41e1e987d9 Jiri Pirko   2023-08-28  376  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  377  	if (param->generic && nla_put_flag(msg, DEVLINK_ATTR_PARAM_GENERIC))
+830c41e1e987d9 Jiri Pirko   2023-08-28  378  		goto param_nest_cancel;
+f9e78932eac650 Jiri Pirko   2025-05-05  379  	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_TYPE, param->type))
+830c41e1e987d9 Jiri Pirko   2023-08-28  380  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  381  
+830c41e1e987d9 Jiri Pirko   2023-08-28  382  	param_values_list = nla_nest_start_noflag(msg,
+830c41e1e987d9 Jiri Pirko   2023-08-28  383  						  DEVLINK_ATTR_PARAM_VALUES_LIST);
+830c41e1e987d9 Jiri Pirko   2023-08-28  384  	if (!param_values_list)
+830c41e1e987d9 Jiri Pirko   2023-08-28  385  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  386  
+830c41e1e987d9 Jiri Pirko   2023-08-28  387  	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  388  		if (!param_value_set[i])
+830c41e1e987d9 Jiri Pirko   2023-08-28  389  			continue;
+830c41e1e987d9 Jiri Pirko   2023-08-28  390  		err = devlink_nl_param_value_fill_one(msg, param->type,
+2a367002ed321e Daniel Zahka 2025-11-18  391  						      i, param_value[i],
+2a367002ed321e Daniel Zahka 2025-11-18  392  						      default_value[i],
+2a367002ed321e Daniel Zahka 2025-11-18  393  						      default_value_set[i]);
+830c41e1e987d9 Jiri Pirko   2023-08-28  394  		if (err)
+830c41e1e987d9 Jiri Pirko   2023-08-28  395  			goto values_list_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  396  	}
+830c41e1e987d9 Jiri Pirko   2023-08-28  397  
+830c41e1e987d9 Jiri Pirko   2023-08-28  398  	nla_nest_end(msg, param_values_list);
+830c41e1e987d9 Jiri Pirko   2023-08-28  399  	nla_nest_end(msg, param_attr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  400  	genlmsg_end(msg, hdr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  401  	return 0;
+830c41e1e987d9 Jiri Pirko   2023-08-28  402  
+830c41e1e987d9 Jiri Pirko   2023-08-28  403  values_list_nest_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  404  	nla_nest_end(msg, param_values_list);
+830c41e1e987d9 Jiri Pirko   2023-08-28  405  param_nest_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  406  	nla_nest_cancel(msg, param_attr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  407  genlmsg_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  408  	genlmsg_cancel(msg, hdr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  409  	return -EMSGSIZE;
+830c41e1e987d9 Jiri Pirko   2023-08-28 @410  }
+830c41e1e987d9 Jiri Pirko   2023-08-28  411  
 
 -- 
-	Ansuel
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
