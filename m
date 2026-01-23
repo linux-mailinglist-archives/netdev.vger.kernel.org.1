@@ -1,69 +1,105 @@
-Return-Path: <netdev+bounces-252702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252700-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UG/QM744c2l/tQAAu9opvQ
-	(envelope-from <netdev+bounces-252702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:00:46 +0100
+	id SMmcKVs4c2lItAAAu9opvQ
+	(envelope-from <netdev+bounces-252700-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:59:07 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2510472E1A
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:00:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFB172D92
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E29A3049276
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:59:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBBFE301017C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7513542D4;
-	Fri, 23 Jan 2026 08:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED362341AC0;
+	Fri, 23 Jan 2026 08:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UH0AJJLf"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s1F4hAcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752543370FE;
-	Fri, 23 Jan 2026 08:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4804D318BBF
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769158734; cv=none; b=XRRky47t7CKdUPfI7r/WiuGfuIeIs1XKUZSRcwASt819pJlRarha4PUgvmfc5HRn2B44A/YvmhJT8qHuJSQffUeuu+lcJOIPhhIz72A+rA58f4vHLJITIeQ/HGv/wXhkAJjTk76qYVJtIfE2foOKf6VbgHSFKoCw8Z46CeVZX0I=
+	t=1769158725; cv=none; b=fky0ewZquei/rme6Wrqh+urUG2/uDJpZ/0CozP3h9fWy+GIFRwPe9JXCB5CGx3RsU1ehJKD+byNd6WuU8oD9x+lOQpvFT/10cFtnw8yr6q/7GamBAGZlfgncu23Su20wPnTiDg+D1UWmZ+oOThsWPW6QLC7FOtutRzCQ+2rIfqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769158734; c=relaxed/simple;
-	bh=FQk32BMzHESc1g+auuhE1AY09RGLD+GUzhW85HGfTDs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GQepOXbA7O+U9j+wF7zvxk6nyPSkv04H2D4Sop1w+G1jeQO17S9QtS4HTdqAtfJRZXZEEqsM9O4xkYYFSMnhNS65deI0tQ9aR2G5D39kRto64zKj6tFHenrjsuv+mF/uYqeQD0YTk/v+2c56IOHrNueKcc+scMI0r4ubk4EyDZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UH0AJJLf; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=3Q
-	9PIHHsmNzz5nXOAMH+AINGqxXgNMHvUZUnjZZ5X0U=; b=UH0AJJLfVGfqLO9OXM
-	kIZL8rLVIE7y3AHZ1vq1F//w3rHvdY7xsGmOyBfUpHa7dk8GGIF8Pfi1f3/zs4hv
-	z7XK3DcoVQDML3Bap2i41z4Qq7H6xU0QSO+5qKroQBnMlQ++EEZ/bzc84QB3mUeA
-	W+dBHDxm7teiOqOZtrHLmhuqI=
-Received: from zengchi (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wBHsLcOOHNpG8j6HQ--.35229S2;
-	Fri, 23 Jan 2026 16:57:51 +0800 (CST)
-From: Zeng Chi <zeng_chi911@163.com>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
+	s=arc-20240116; t=1769158725; c=relaxed/simple;
+	bh=2k9LiI+M//qM4q+K2IyZ0CNDJt0ZnwZ2pxw6XNWmxxQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BFjRVUiWSEKgi/YbKPjpMUYd0tPmnnNdwxm+gYlTQw9GKqim1PeZP90d/pRflJdwWEyGGE7nXtLLfKHUY1SJ1X/X5xWlxBOf/mtLQxvXvh4LtSuT88rwz/AhDNioufY5GeunS6fQrY9S7hIRAASeWndioD8zdZpXNyZBdsDoHk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s1F4hAcN; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769158710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MZDHd5qG1jM6uT5/JnPwA06VDLOpkfHtWx6qC88p08g=;
+	b=s1F4hAcNIr7FO7zIIhXOc52f/ar923r2DlaIfnkq9t9LXEKwLC/zJvy/Jwl45AvVrjQ7V1
+	oM0I6+NJkSSr0xpaHsAfkzNd+jZZOEZBJTWEjJ9HsKumn8IOWsUJTw6yBQ9aPRHuFekepj
+	Sqw7JE/M2z8LvOE2rpvDvCmlnRkH+nQ=
+From: Hui Zhu <hui.zhu@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Jeff Xu <jeffxu@chromium.org>,
+	mkoutny@suse.com,
+	Jan Hendrik Farr <kernel@jfarr.cc>,
+	Christian Brauner <brauner@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
 	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	feliu@nvidia.com,
-	parav@nvidia.com,
-	witu@nvidia.com,
-	ajayachandra@nvidia.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Paul Chaignon <paul.chaignon@gmail.com>,
+	Anton Protopopov <a.s.protopopov@gmail.com>,
+	Amery Hung <ameryhung@gmail.com>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Lance Yang <lance.yang@linux.dev>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
 	linux-kernel@vger.kernel.org,
-	Zeng Chi <zengchi@kylinos.cn>
-Subject: [PATCH v3 net] net/mlx5: Fix return type mismatch in mlx5_esw_vport_vhca_id()
-Date: Fri, 23 Jan 2026 16:57:49 +0800
-Message-Id: <20260123085749.1401969-1-zeng_chi911@163.com>
-X-Mailer: git-send-email 2.25.1
+	linux-mm@kvack.org,
+	cgroups@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH bpf-next v3 04/12] mm: define mem_cgroup_get_from_ino() outside of CONFIG_SHRINKER_DEBUG
+Date: Fri, 23 Jan 2026 16:57:58 +0800
+Message-ID: <f627edee18f43dbfcd4c2eb06a8188e88dc6bda9.1769157382.git.zhuhui@kylinos.cn>
+In-Reply-To: <cover.1769157382.git.zhuhui@kylinos.cn>
+References: <cover.1769157382.git.zhuhui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,81 +107,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBHsLcOOHNpG8j6HQ--.35229S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tr43JrWDCrW5uFWfury5twb_yoW8XF4xp3
-	yUGryxZFyktFWUXw4UWayrX3yrCayUK3y29F4Sk3WSqr1ktFWUtrn5KFZruF1DCrWUGr98
-	trs7Z3s5Zas8Aa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jaHq7UUUUU=
-X-CM-SenderInfo: 52hqws5fklmiqr6rljoofrz/xtbC6A9IBGlzOA-wWwAA3t
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252702-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252700-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[163.com:+];
+	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zeng_chi911@163.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 2510472E1A
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,kylinos.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4AFB172D92
 X-Rspamd-Action: no action
 
-From: Zeng Chi <zengchi@kylinos.cn>
+From: Roman Gushchin <roman.gushchin@linux.dev>
 
-The function mlx5_esw_vport_vhca_id() is declared to return bool,
-but returns -EOPNOTSUPP (-45), which is an int error code. This
-causes a signedness bug as reported by smatch.
+mem_cgroup_get_from_ino() can be reused by the BPF OOM implementation,
+but currently depends on CONFIG_SHRINKER_DEBUG. Remove this dependency.
 
-This patch fixes this smatch report:
-drivers/net/ethernet/mellanox/mlx5/core/eswitch.h:981 mlx5_esw_vport_vhca_id()
-warn: signedness bug returning '(-45)'
-
-Fixes: 1baf30426553 ("net/mlx5: E-Switch, Set/Query hca cap via vhca id")
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Signed-off-by: Zeng Chi <zengchi@kylinos.cn>
+Signed-off-by: Roman Gushchin <roman.gushchin@linux.dev>
 ---
-v2 -> v3:
-- Shortened the commit ID in the `Fixes:` tag to 12 characters as suggested.
-- Added a `Reviewed-by:` tag from Parav Pandit <parav@nvidia.com>.
+ include/linux/memcontrol.h | 4 ++--
+ mm/memcontrol.c            | 2 --
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-v2:Added the required Fixes tag and specified target branch net in subject prefix
----
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index ad1073f7b79f..e7fe43799b23 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -1009,7 +1009,7 @@ mlx5_esw_host_functions_enabled(const struct mlx5_core_dev *dev)
- static inline bool
- mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index 229ac9835adb..f3b8c71870d8 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -833,9 +833,9 @@ static inline unsigned long mem_cgroup_ino(struct mem_cgroup *memcg)
  {
--	return -EOPNOTSUPP;
-+	return false;
+ 	return memcg ? cgroup_ino(memcg->css.cgroup) : 0;
+ }
++#endif
+ 
+ struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino);
+-#endif
+ 
+ static inline struct mem_cgroup *mem_cgroup_from_seq(struct seq_file *m)
+ {
+@@ -1298,12 +1298,12 @@ static inline unsigned long mem_cgroup_ino(struct mem_cgroup *memcg)
+ {
+ 	return 0;
+ }
++#endif
+ 
+ static inline struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
+ {
+ 	return NULL;
+ }
+-#endif
+ 
+ static inline struct mem_cgroup *mem_cgroup_from_seq(struct seq_file *m)
+ {
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 3808845bc8cc..1f74fce27677 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -3658,7 +3658,6 @@ struct mem_cgroup *mem_cgroup_from_id(unsigned short id)
+ 	return xa_load(&mem_cgroup_ids, id);
  }
  
- #endif /* CONFIG_MLX5_ESWITCH */
+-#ifdef CONFIG_SHRINKER_DEBUG
+ struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
+ {
+ 	struct cgroup *cgrp;
+@@ -3679,7 +3678,6 @@ struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
+ 
+ 	return memcg;
+ }
+-#endif
+ 
+ static void free_mem_cgroup_per_node_info(struct mem_cgroup_per_node *pn)
+ {
 -- 
-2.25.1
+2.43.0
 
 
