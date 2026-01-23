@@ -1,158 +1,159 @@
-Return-Path: <netdev+bounces-252672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJWPKgMqc2kAswAAu9opvQ
-	(envelope-from <netdev+bounces-252672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:57:55 +0100
+	id QIDOFmUqc2l7swAAu9opvQ
+	(envelope-from <netdev+bounces-252675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:59:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27571720F5
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:57:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEEDC72197
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:59:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DFB03301303E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:57:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E6053018BCD
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0217C33A9EF;
-	Fri, 23 Jan 2026 07:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C722344DA3;
+	Fri, 23 Jan 2026 07:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="usbQ8lft"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="jDPtIjzf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C441EA84;
-	Fri, 23 Jan 2026 07:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142151B81CA;
+	Fri, 23 Jan 2026 07:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769155072; cv=none; b=Dtgfe9Q7Q65gQcuwmLu2WP8xtGdfz2+6xRN3MraYbK/h2tbvOqHvmJPkT2MX5UFrPbjnAaODvpZCnPWbiMCJRDAtRMDOxqBPlmwERcW9jLobUtuHSmhF9PhyKFKxbF45bJ3cCi32V9ccmNJlp6CdDh0C3yrZqLa2Uuj+tMeMxiU=
+	t=1769155164; cv=none; b=V/nL3JgDih/EuVHi4JEEqXr3vNQc7uqoz++MyvgdXnYD4zpDDzgTF/C4veF0Gq3Ere8Lv6hZs5IRwSRuXLEp0Y2uFqjyDCwfyNtaO1WkcfS+V7EnpYgecnj2klf1cHR1NOCExKybgow2hwtfWNCOeuNiJycI7ssVYqFp36NzLwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769155072; c=relaxed/simple;
-	bh=YG46esQt9Jg/6w27OTE+7JkxGKvOrFrFMxKupSuzJ/Y=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=t1ssQAMgYOCkr+3yi96t5of2VN6FXr/BSwF5HexDKuPDw7d96TD9JTEsdPd2KdFFGYfF7tSzgQ464xGQ9liYMh2w6N/RpxpnWcXcIg35KaMfnEIH/8p0FTkbvLaa/lVTAcAnX0MpVYriCKA4Ajm5CEatp/BVATpPyMpDugpR1KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=usbQ8lft; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF6ABC4CEF1;
-	Fri, 23 Jan 2026 07:57:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769155072;
-	bh=YG46esQt9Jg/6w27OTE+7JkxGKvOrFrFMxKupSuzJ/Y=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=usbQ8lftuF8+2Rf8hQj8NuRnCiqzAoJYgm3QwK8+EfSrR7awdGqd4hxJ0NSegeyI7
-	 hn8BEnqhEu3LRFAd4Ysd0SIRjQO6YRvXSUAfkW1JvqPlz1FdJqMEB1kXpsSGEE0m/I
-	 OkB+2Ic6wR6FcghivPgFePboWHmy1DzJCOoVaEnNprqriqOAp73coXB920/iEQygQh
-	 UzN46dDYgIpjUtJneIVWZwsvAg2UXqZLgmDhRHo48qp9XlvD6TKSWIdxIYMAf63Xmz
-	 yJrFk90iBjE858GRFRU0bHFJCV+bgSgoUJywD6nLcP/uPLq2fe+owAf7IsJ4uDJ6dU
-	 BvgrOrE2n85nw==
-Content-Type: multipart/mixed; boundary="===============8460079455577535595=="
+	s=arc-20240116; t=1769155164; c=relaxed/simple;
+	bh=SsQgRVrALIEbimguf13cUqs0gI1w1LmHdJZ04aIQ3CQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=odRKPmKLJB4O5AvSAncqwCMW1aF0nET8vZ5V0RRzEXG5ZT+BRI2fmdkIr/C8prARrSdgW0hy25mrBfNksbdrtA5fIlETr5MM0y3o3TxPPgXEo2hqzpqrOGb44iWxPccJaOYypSqIyBh7zcY8ayka03qMC8Ua4yufQSCal3+bapo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=jDPtIjzf; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=jDPtIjzf;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60N7wTJe1303105
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Fri, 23 Jan 2026 07:58:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1769155109; bh=IyTEWleDrSZIoXhyMc9DAYmo3+9uVHcoYrCCzjQ0PUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:From;
+	b=jDPtIjzfVF8GnE1ObzPsTfoDgz5oaxjqNGMMnPFJamuSLrK8RWfY85XME0SPKHFDt
+	 PhmltuZgUOsKbLfwNbnCBeAX1s/Rq2lFa36LgJXt/xIs+TtTd0sGwo1416WZnAa5to
+	 +RKi9TbBYLWIvq7k994OdlXu1QYw1fK2GFHT+t7k=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60N7wTG33568526
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Fri, 23 Jan 2026 08:58:29 +0100
+Received: (nullmailer pid 1162087 invoked by uid 1000);
+	Fri, 23 Jan 2026 07:58:28 -0000
+From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+To: netdev@vger.kernel.org
+Cc: "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+Subject: [PATCH net-next v2 0/3] Airoha AN8811HB 2.5 Gbps phy support
+Date: Fri, 23 Jan 2026 08:58:14 +0100
+Message-ID: <20260123075817.1162068-1-bjorn@mork.no>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <28d092553ad40300324a21ccbc1dfd89f06283ca4801a5196e993f11e1522e71@mail.kernel.org>
-In-Reply-To: <20260123073532.238985-11-dongml2@chinatelecom.cn>
-References: <20260123073532.238985-11-dongml2@chinatelecom.cn>
-Subject: Re: [PATCH bpf-next v11 10/12] selftests/bpf: add testcases for fsession
-From: bot+bpf-ci@kernel.org
-To: menglong8.dong@gmail.com,andrii@kernel.org
-Cc: daniel@iogearbox.net,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,davem@davemloft.net,dsahern@kernel.org,tglx@linutronix.de,mingo@redhat.com,jiang.biao@linux.dev,bp@alien8.de,dave.hansen@linux.intel.com,x86@kernel.org,hpa@zytor.com,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 23 Jan 2026 07:57:51 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252672-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	TAGGED_FROM(0.00)[bounces-252675-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	NEURAL_HAM(-0.00)[-0.997];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mork.no:+];
+	NEURAL_HAM(-0.00)[-0.991];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 27571720F5
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mork.no:mid,mork.no:dkim]
+X-Rspamd-Queue-Id: EEEDC72197
 X-Rspamd-Action: no action
 
---===============8460079455577535595==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The RFC patch posted earlier has been split into a series based on the
+feedback received:
 
-> diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
-> new file mode 100644
-> index 000000000000..f504984d42f2
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/fsession_test.c
-> @@ -0,0 +1,110 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2025 ChinaTelecom */
-> +#include <vmlinux.h>
-> +#include <bpf/bpf_helpers.h>
-> +#include <bpf/bpf_tracing.h>
-> +
-> +char _license[] SEC("license") = "GPL";
+ 1/3: preparing the EN8811H driver for maximum reuse
+ 2/3: adding support for the new AN8811HB hardware
+ 3/3: adding (optional) clock driver for AN8811HB
 
-[ ... ]
+Patch 3/3 is not required for a functional device. It is included here
+for full feature parity between the EN8811H and AN8811HB drivers.
 
-> +__u64 test6_entry_result = 0;
-> +__u64 test6_exit_result = 0;
-> +SEC("fsession/bpf_fentry_test1")
-> +int BPF_PROG(test6, int a)
-> +{
-> +	__u64 addr = bpf_get_func_ip(ctx);
-> +
-> +	if (bpf_session_is_return(ctx))
-> +		test6_exit_result = (const void *) addr == &bpf_fentry_test1;
-> +	else
-> +		test6_entry_result = (const void *) addr == &bpf_fentry_test1;
-                                                          ^^^^^^^^^^^^^^^^^^
+The AN8811HB phy requires new firmware, which is now available with
+the 20260110 release of linux-firmware,
 
-Is the bpf_fentry_test1 symbol declared somewhere? The code references
-&bpf_fentry_test1 but there is no extern declaration with __ksym in this
-file.
+RFC: https://lore.kernel.org/20251202102222.1681522-1-bjorn@mork.no/
+v1:  https://lore.kernel.org/20260122071601.1057083-1-bjorn@mork.no/
 
-Other BPF selftests that take addresses of kernel symbols declare them
-explicitly, for example get_func_ip_test.c has:
+Changes since v1:
+- moved AIR_AUX_CTRL_STATUS_SPEED_10 reference from patch 1 to 2, where
+  it is defined, fixing intermediate build error
+- rearranged an8811hb_check_crc loop to improve readability for AI and
+  other intelligent beings
 
-    extern int bpf_fentry_test1(int a) __ksym;
+Changes since RFC:
+- refactoring of the existing EN8811H code is separated into a patch
+  of its own
+- ID conditionals are dropped, using separate functions for the two
+  hardware variants instead. Some common helpers have been added to
+  reduse code duplication
+- deprecated serdes polarity properties are not supported for AN8811HB
+- the polarity configuration code has proper error handling
+- a polarity configuration bug is fixed by using the new simplified
+  helper interface
+- the clock driver is split out in a separate patch to reduce the size
+  of the main AN8811HB driver patch
 
-And kprobe_multi_session.c has:
+Bjørn Mork (3):
+  net: phy: air_en8811h: factor out shareable code
+  net: phy: air_en8811h: add Airoha AN8811HB support
+  net: phy: air_en8811h: Add clk provider for an8811hb
 
-    extern const void bpf_fentry_test1 __ksym;
+ drivers/net/phy/air_en8811h.c | 511 ++++++++++++++++++++++++++++++----
+ 1 file changed, 461 insertions(+), 50 deletions(-)
 
-Without a similar declaration, will this BPF program compile and load
-correctly?
+-- 
+2.47.3
 
-> +	return 0;
-> +}
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
-
---===============8460079455577535595==--
 
