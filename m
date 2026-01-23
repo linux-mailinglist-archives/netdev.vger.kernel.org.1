@@ -1,231 +1,216 @@
-Return-Path: <netdev+bounces-252817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252818-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJywKANZc2nruwAAu9opvQ
-	(envelope-from <netdev+bounces-252817-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:18:27 +0100
+	id 8Dn9I4tYc2nruwAAu9opvQ
+	(envelope-from <netdev+bounces-252818-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:16:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7F374EBD
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:18:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C25474E80
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 690A9302350B
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:13:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DA618301C11B
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29B13385AE;
-	Fri, 23 Jan 2026 11:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93595287256;
+	Fri, 23 Jan 2026 11:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zlxp6bbS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U/AMaCQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9B431AABF;
-	Fri, 23 Jan 2026 11:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B73B2E414
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769166818; cv=none; b=iYMIG+85xCaw1ILeEj3DFNfXo7hcsnJUsAnWQGEYcqiM8b3A6OitLn5GYnUbvr+2czpVzh7C0yRCelGrvP7DtqW5HMwxX8nYnhYw2Wa0VLd0UhAPVwkxIxFe6H1IPGDWqunNNTFPJ5PxK+ZRvlf8I13JkechRXG+e+CccBDckPg=
+	t=1769166968; cv=none; b=ALR59VuyD+SyzTZ4V/wc2T7X14kb7ic6zzlaun8QPydvqEbrq4wQufsaViNPM/NiW5qXHrw9BkDFXvDYccN0TUkHjAfI/07X1G6LaIpRzzsa5sTHeWFtGrhor015h2Zvnzb2lsU5wdGsin7Y1UwDBFuP63xkbXz2Av1KWjK+q4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769166818; c=relaxed/simple;
-	bh=MJLO83jCA4MxM79trawupE0Yr9I28Svi19yQn9PK8no=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ioep1CfWaoGx77078qXSOazlNF63oH6V5yFOWoh/x8O95sQfvCspErlmCxap9C2ZESRGyOcdqIfxh5Yo0prc5tf70Ap5uYr/La/C3SWLIoPA9Ywke17yvAfIZEUyQP5VrlvzHas+aQLJ9MyunVAg5iXY6ydUGqidaD93QhRfWvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zlxp6bbS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rW6hIs7kbRE6sqC+VHhb8yfuCQxkSIbxM4EYUPiSqtQ=; b=zlxp6bbSAdrUvEEckC6IDgQkwS
-	smUH7veqqcf/A7ifQVrNarkgkN6fyrAyh3Wv9wXroHnUW1bGNyYswwd5gBGipBhCXXr/rouJDvOMn
-	e8L4drbydog/ojOmYaOIufuu3h8sPcPxTRcvhK9TtkuzOJ381J8hnTW+JNGn1KuSw3e98I4p+y/2q
-	tRG88KVUkDCOeiLMp26CFEdZDCOEUx303vTo87F9X9yacUkoK5+gEuN6C0dMaUzZtvaKhvvHxAwoT
-	zh/oFMfJltVh8yijjuPpiNLrclGxwHjLL1AqiNQzC0u9QkaGSpJN7zV7MFB8hLR1LsaU++zvruHgs
-	urysKlsA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39500)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vjF6X-000000001uQ-3Rne;
-	Fri, 23 Jan 2026 11:13:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vjF6V-0000000022q-0aE9;
-	Fri, 23 Jan 2026 11:13:27 +0000
-Date: Fri, 23 Jan 2026 11:13:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
- inband goodies
-Message-ID: <aXNX1oi7nWLcPK28@shell.armlinux.org.uk>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+	s=arc-20240116; t=1769166968; c=relaxed/simple;
+	bh=N/CY6pJq1G36Er6zYIOpAVeB0TOP9GZ5Gx3dfPRc3t4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rOjG4vCN1uHoKWmlHov/JYAUUWcSzjdF6n3u29cGJT7UZNi7XL/q8eKqRiw2Iuya7qgt2u93mMrCR4nGiM25zvLdfVCENeKeaDLxnGBjYnvKj0QiV/9al1bGf7yvwZ0dl0wNZDnKk3Qta4CKsftq45N0oiMbYsSrGAXb5mjlVqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U/AMaCQj; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88a344b86f7so68336346d6.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 03:16:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769166966; x=1769771766; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ixxU3s7qaKIpU1ooiYPj/OAlbfzL9VIdLbuXGZLihXs=;
+        b=U/AMaCQjBFSDYF2X2wcDE+r8Jfl9nHnXpQlagd13veenXQcXL/7TDfG3k18m6rDem8
+         yF624zUXETnAlbpekn+PQGWlEg9r0Z66IQdTC8g6idzPximaHsD0JaZ6brQ5CjagwvGS
+         SQ0Kb6fWnHVYdSdicXOYGHxYVBCJyY8obtkdJZUmpyJD4P4G4pz8ekDsjwXrYe/Pki8b
+         3WFY/R0Qm2Hjo1IDHGIepwqA2HGleWnCfjaKYWMvANduD3bvW5vIeuDVfw5JXoX8Qne8
+         wYp3hYtmxnTsdG1MvwYGnE5Msd7M/auIKKtBIci+LC8dmEYyCG90gDHmjxsP+Ahv3fLx
+         qKBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769166966; x=1769771766;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ixxU3s7qaKIpU1ooiYPj/OAlbfzL9VIdLbuXGZLihXs=;
+        b=Fu7S/6/fsG+HzuDJilA9wzR8/Jqtl5NCy9dodqB5u84K9xVYeqIf7se+U9A09hfGxM
+         oBQA6wzQyvLm9FYrADhnkTpV031XUuW3Pnz3Zv1duGMgB+uCOyf0i3zIcr0Iqgfl6k7x
+         Lvrp36wYE0AzcVOX3EgefqcrLOhtTzHsUhfnBTvANXYMVzRMukRg3Ey+B2vh3qcgzV9t
+         V9p9P7VBi8nwAkvBumGpeKQdCd+Js8p7KB91lIayRvapHx2K9CZqNKV404Cf+/m7BRuJ
+         4oKUWEKj4F5Y/tchMxnLZUOQ7Fej+gI/4CTA1JR5AbC/kbm+iRIR5o5z+xQP4W+H/bI0
+         +uGw==
+X-Forwarded-Encrypted: i=1; AJvYcCVl89mtuZJfl3iTFKag4nPiEYGPbdydgbnP89qQrvY2aYBZX83BUim9hQJDhV1GjfDeIDwRY7w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg16whvehwCRuZYyn6lwQywJn+60FEW2cZaxPLGQDtBhBO5RR7
+	yoL1A/bnWbuxVb36lL+mMlK2UdHfqFuFTwYz82scSGU0+tzdqlqllD4ceWliMj1KMn3+Qw8agt5
+	VXB8/BeuaU1A5lA==
+X-Received: from qvbma18.prod.google.com ([2002:a05:6214:5b12:b0:894:9755:2a7f])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2685:b0:88f:ccba:8f20 with SMTP id 6a1803df08f44-894982db3d2mr6710416d6.48.1769166966058;
+ Fri, 23 Jan 2026 03:16:06 -0800 (PST)
+Date: Fri, 23 Jan 2026 11:16:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260123111605.4089200-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: move sk_forced_mem_schedule() to tcp.c
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252817-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252818-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0C7F374EBD
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0C25474E80
 X-Rspamd-Action: no action
 
-According to patchwork, this doesn't apply to net-next. That's odd,
-it was generated on last night's net next, and although there has been
-further work, it rebases cleanly on top of this morning's. How can
-these changes:
+TCP fast path can (auto)inline this helper, instead
+of (auto)inling it from tcp_send_fin().
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c   |  6 +++++-
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 20 ++++++++++++++++----
- 2 files changed, 21 insertions(+), 5 deletions(-)
+No change of overall code size, but tcp_sendmsg() is faster.
 
-which happened in net-next overnight result in this change in patch 1:
+$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
+add/remove: 0/0 grow/shrink: 1/1 up/down: 141/-140 (1)
+Function                                     old     new   delta
+tcp_stream_alloc_skb                         216     357    +141
+tcp_send_fin                                 688     548    -140
+Total: Before=22236729, After=22236730, chg +0.00%
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 ---
- 1 file changed, 3 deletions(-)
+BTW, we might change tcp_send_fin() to use tcp_stream_alloc_skb().
 
-failing to apply?
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp.c        | 27 +++++++++++++++++++++++++++
+ net/ipv4/tcp_output.c | 27 ---------------------------
+ 2 files changed, 27 insertions(+), 27 deletions(-)
 
-No, patchwork is clearly wrong.
-
-On Fri, Jan 23, 2026 at 09:52:00AM +0000, Russell King (Oracle) wrote:
-> This is the v1 submission: if it doesn't get tested but review goes
-> well, it'll end up in net-next and mainline without testing on the
-> affected hardware!
-> 
-> Mentioned previously, I've been trying to sort out the PCS support in
-> stmmac, and this series represents the current state of play.
-> 
-> Previous posted patches centred around merely getting autonegotiation
-> to be configured correctly, to a point where the manual configuration
-> can be removed from the qcom-ethqos driver. The qcom-ethqos driver
-> uses both SGMII and 2500BASE-X, manually configuring the dwmac's
-> integrated PCS appropriately.
-> 
-> This *untested* series attempts to take this further. The patches:
-> 
-> - clean up qcom-ethqos only-written mac_base member.
-> - convert qcom-ethqos to use the set_clk_tx_rate() method for setting
->   the link clock rate.
-> - add support for phy_set_mode_ext() to the qcom "SGMII" ethernet
->   SerDes driver (which is really only what it needs. Note that
->   phy_set_mode_ext() is an expected call to be made, where as
->   phy_set_speed() is optional and not. See PHY documentation.)
-> - add platform-glue independent SerDes support to the stmmac core
->   driver. Currently, only qcom-ethqos will make use of this, and
->   I suspect as we haven't had this, it's going to be difficult to
->   convert other platform glue to use this - but had this existed
->   earlier, we could've pushed people to use PHY to abstract some
->   of the platform glue differences. Adding it now makes it available
->   for future platform glue.
-> - convert qcom-ethqos to use this core SerDes support.
-> - arrange for stmmac_pcs.c to supply the phy_intf_sel field value
->   if the integrated PCS will be used. (PHY_INTF_SEL_SGMII requires
->   the integrated PCS rather than an external PCS.)
-> - add BASE-X support to the integrated PCS driver, and use it for
->   BASE-X modes. This fully supports in-band mode, including reading
->   the link partner advertisement.
-> - add in-band support for SGMII, reading the state from the RGSMII
->   status field.
-> 
-> As we leave qcom-ethqos' manual configuration of the PCS in place at
-> the moment, the last patch adds reporting of any changes in its
-> configuration that the qcom-ethqos driver does beyond what phylink
-> requested, thus providing a path to debug and eventually remove
-> qcom-ethqos' manual configuration.
-> 
-> One patch is not included in this set - which adds a phy_intf_sel
-> value for external PCS (using PHY_INTF_SEL_GMII_MII). I believe all
-> external PCS use this mode when connected to a MAC capable of up to
-> 2.5G. However, no platform glue that provides the mac_select_pcs()
-> method also provide the set_phy_intf_sel() method, so we can safely
-> ignore this for now.
-> 
-> I would like to get this into net-next before the next merge window,
-> so testing would be appreciated. If there are issues with these patches
-> applied, please check whether the issue exists without these patches
-> and only report regressions caused by this patch set. For example,
-> I'm aware that qcom-ethqos has issues with 10Mbps mode due to an AQR
-> PHY being insanely provisioned to use SGMII in 1000M mode but with
-> rate matching with 10M media. This is not an issue that is relevant
-> to this patch series, but a problem with the PHY provisioning.
-> 
-> rfc->v1:
->  - fix SGMII link status
->  - avoid calling phy_get_mode() if PHY is null
-> v2:
->  - fix further AI review bot dribble that could've been raised on
->    the rfc version but wasn't.
->  
->  drivers/net/ethernet/stmicro/stmmac/Makefile       |   2 +-
->  drivers/net/ethernet/stmicro/stmmac/common.h       |   1 -
->  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  74 ++-----
->  drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  12 +-
->  .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   |  11 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  10 +-
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  10 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  69 +++++--
->  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 222 +++++++++++++++++++--
->  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   |  53 ++---
->  .../net/ethernet/stmicro/stmmac/stmmac_serdes.c    | 111 +++++++++++
->  .../net/ethernet/stmicro/stmmac/stmmac_serdes.h    |  16 ++
->  drivers/phy/qualcomm/phy-qcom-sgmii-eth.c          |  43 ++++
->  include/linux/stmmac.h                             |   2 +
->  14 files changed, 491 insertions(+), 145 deletions(-)
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
-
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 148cdf3cd6233add37ea52e273cb4fb3e75fcbcb..87acd01274601eca799e42b8f895fff4c35cf25a 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -902,6 +902,33 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
+ }
+ EXPORT_IPV6_MOD(tcp_splice_read);
+ 
++/* We allow to exceed memory limits for FIN packets to expedite
++ * connection tear down and (memory) recovery.
++ * Otherwise tcp_send_fin() could be tempted to either delay FIN
++ * or even be forced to close flow without any FIN.
++ * In general, we want to allow one skb per socket to avoid hangs
++ * with edge trigger epoll()
++ */
++void sk_forced_mem_schedule(struct sock *sk, int size)
++{
++	int delta, amt;
++
++	delta = size - sk->sk_forward_alloc;
++	if (delta <= 0)
++		return;
++
++	amt = sk_mem_pages(delta);
++	sk_forward_alloc_add(sk, amt << PAGE_SHIFT);
++
++	if (mem_cgroup_sk_enabled(sk))
++		mem_cgroup_sk_charge(sk, amt, gfp_memcg_charge() | __GFP_NOFAIL);
++
++	if (sk->sk_bypass_prot_mem)
++		return;
++
++	sk_memory_allocated_add(sk, amt);
++}
++
+ struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
+ 				     bool force_schedule)
+ {
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 256b669e8d3b4a4d191e61e79784e412aaef8965..597e888af36d8697cd696964077b423e79fdb83e 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3767,33 +3767,6 @@ void tcp_xmit_retransmit_queue(struct sock *sk)
+ 				     inet_csk(sk)->icsk_rto, true);
+ }
+ 
+-/* We allow to exceed memory limits for FIN packets to expedite
+- * connection tear down and (memory) recovery.
+- * Otherwise tcp_send_fin() could be tempted to either delay FIN
+- * or even be forced to close flow without any FIN.
+- * In general, we want to allow one skb per socket to avoid hangs
+- * with edge trigger epoll()
+- */
+-void sk_forced_mem_schedule(struct sock *sk, int size)
+-{
+-	int delta, amt;
+-
+-	delta = size - sk->sk_forward_alloc;
+-	if (delta <= 0)
+-		return;
+-
+-	amt = sk_mem_pages(delta);
+-	sk_forward_alloc_add(sk, amt << PAGE_SHIFT);
+-
+-	if (mem_cgroup_sk_enabled(sk))
+-		mem_cgroup_sk_charge(sk, amt, gfp_memcg_charge() | __GFP_NOFAIL);
+-
+-	if (sk->sk_bypass_prot_mem)
+-		return;
+-
+-	sk_memory_allocated_add(sk, amt);
+-}
+-
+ /* Send a FIN. The caller locks the socket for us.
+  * We should try to send a FIN packet really hard, but eventually give up.
+  */
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.52.0.457.g6b5491de43-goog
+
 
