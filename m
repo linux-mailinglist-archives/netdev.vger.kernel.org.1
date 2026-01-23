@@ -1,204 +1,213 @@
-Return-Path: <netdev+bounces-252691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNslDm0xc2mTswAAu9opvQ
-	(envelope-from <netdev+bounces-252691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:29:33 +0100
+	id sOJmBkUyc2kxtAAAu9opvQ
+	(envelope-from <netdev+bounces-252692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:33:09 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26DAA727B3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:29:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20677289D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CF46430060B9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:29:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 284913021D1A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA043338905;
-	Fri, 23 Jan 2026 08:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590092FCBF0;
+	Fri, 23 Jan 2026 08:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JWon6RE7"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="S0JW/Se4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9EA341077
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1FB253B58;
+	Fri, 23 Jan 2026 08:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769156964; cv=none; b=DfgLsj8urfqXA4x9V0sXjX7Y2hR7Xh34Lb29CRldnE6TLvcUnvFWcuiGEclTLWB9kZnGGK5UBN6DYYUKweumsV8HtyXzc5lF8iOLkFYW3SmInhitNkr0YevFlVLSU90MTUHEXDEzHehZt2EqMpLOnRAkpWF3jTgURNIhBKgwGRQ=
+	t=1769157142; cv=none; b=M78JNxLxlDUDLtlreuYJtb1gEhzxEZVV91E4GaEkZYmAwmMiNf8kk7NLvUatuBGULapNRVmm2RQlB9QBp6I2tPhR+DxiI9+I8s+u2EaubNGn2+9qxemu6m2LyQ40ypsI6awFQtN6e+MEQ9YArNZPdeYxwT2Q0vV1+NWk+8QxiS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769156964; c=relaxed/simple;
-	bh=ZAO1eH5Ob+wbUe6Tbrm6BL05d172n5IRN7+saAQo6UU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=frYP7t/R7TR3R64KsuKUwei9ApxUyXYovfkwZeuPIXaiLM8pnR3An94B1gcAvojjmOEO4YxmDJnnI+dyIaqtrjlH1tP+1WFZ65XUjrJCvnG0FrkBoqykixfWk5SGIC/9r043QdZ8iMStl31Ls3uATc/qZCOan9F/Yq1Ur07/HvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JWon6RE7; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769156960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5N0F8qUmQJwh+vKEiMdvVxVXqwMYLaba+2w+ktMYCz0=;
-	b=JWon6RE7VfOc2DVA7gYGKeWwiuhs5va9qXmOS/+PI98LB7yAWxfk1YWg8rFHMOHMKrVmYt
-	pUA+I5SS5LyOVG97Zi0SXySkKCHeiMgXc/llzj73SBsCJNUl47wcd773geaaPPjF984dVU
-	LkfaCf48blrzZSV3JX0+sfBawJrRg1A=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
-Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
- clm@meta.com, ihor.solodrai@linux.dev
-Subject:
- Re: [PATCH bpf-next v11 02/12] bpf: use the least significant byte for the
- nr_args in trampoline
-Date: Fri, 23 Jan 2026 16:29:01 +0800
-Message-ID: <2250332.irdbgypaU6@7940hx>
-In-Reply-To:
- <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
-References:
- <20260123073532.238985-3-dongml2@chinatelecom.cn>
- <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
+	s=arc-20240116; t=1769157142; c=relaxed/simple;
+	bh=pe/U8R1GHGgSVphOhGhvbyXMon4vZEqHjodKszec0Ow=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dkHWRSxfd2KhYC2szWwv32O7KqwfhbR+dJdD/ye8y4GYrNVogP9BdwXrJU3b8L4ihWodIRzYABWYVutF9ZSyvk5B9Ui5zsyAIdNLueRtSzlpI9ILt+Kn/G6opY76OKw4db8p8AVPcKgeMa79q6MFbTduDzE2A8Jy3WnI39Cz6eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=S0JW/Se4; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 4295F2087C;
+	Fri, 23 Jan 2026 09:32:17 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3NzD6L_K90UO; Fri, 23 Jan 2026 09:32:16 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 968B1201E4;
+	Fri, 23 Jan 2026 09:32:16 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 968B1201E4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1769157136;
+	bh=JPf6CgXjsnmZXM26M5Jo8AsLktests7HCe2DYHQMJk8=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=S0JW/Se4RoCYu4h3aegzIuTPjHv46y79aCxGMF3F+hrR0DECz+QVPxvCMWBLpDYwm
+	 qrFeNSzVG+tbdoaZjFhXibf55f+YGOBXCD7zxwJe7+aCM5UNFiNrkubrboK+5CH/x8
+	 He1zkZPjx/PKHIEyXVfZTTD3/asEOz1ZAWbkTfchDCK1246dF/JHRh5MW/ad5kKMg1
+	 nO9sQJ2a/X6h+BKvYnPHyIFBWprs3H2rN+4fzQBPnr0mF5PdwfR/ofZ3Bt2sAgZFOd
+	 Tar9jbSvoiMNZ6kpxicwCKrGUrykRQlAQ+UnCCW4eAMUAyDHcmvBfP1f0PqGEtVrBZ
+	 ebyMRWFqKkhXw==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 23 Jan
+ 2026 09:32:15 +0100
+Received: (nullmailer pid 2692962 invoked by uid 1000);
+	Fri, 23 Jan 2026 08:32:15 -0000
+Date: Fri, 23 Jan 2026 09:32:15 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Antony Antony <antony@phenome.org>
+CC: Antony Antony <antony.antony@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Chiachang Wang
+	<chiachangwang@google.com>, Yan Yan <evitayan@google.com>,
+	<devel@linux-ipsec.org>, Simon Horman <horms@kernel.org>, Paul Moore
+	<paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<selinux@vger.kernel.org>
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v4 5/5] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <aXMyD4zss0wnXf7h@secunet.com>
+References: <cover.1768811736.git.antony.antony@secunet.com>
+ <b134abaf18390d1bcdd59d2192687bac0e2c2710.1768811736.git.antony.antony@secunet.com>
+ <aXH9BvGTxfaGRN4j@secunet.com>
+ <aXIA6JdfwK1CEMeX@secunet.com>
+ <aXMN_m7_PFxr_AO8@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aXMN_m7_PFxr_AO8@Antony2201.local>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	CTE_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252691-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-252692-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.984];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:dkim]
-X-Rspamd-Queue-Id: 26DAA727B3
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: B20677289D
 X-Rspamd-Action: no action
 
-On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
-> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > index 41bbed6418b5..b3f912ad18ba 100644
-> > --- a/kernel/bpf/verifier.c
-> > +++ b/kernel/bpf/verifier.c
+On Fri, Jan 23, 2026 at 06:58:22AM +0100, Antony Antony wrote:
+> On Thu, Jan 22, 2026 at 11:50:16AM +0100, Steffen Klassert via Devel wrote:
+> > On Thu, Jan 22, 2026 at 11:33:42AM +0100, Steffen Klassert wrote:
+> > > On Mon, Jan 19, 2026 at 09:54:55AM +0100, Antony Antony wrote:
+> > > > +
+> > > > +static int xfrm_do_migrate_state(struct sk_buff *skb, struct nlmsghdr *nlh,
+> > > > +				 struct nlattr **attrs, struct netlink_ext_ack *extack)
+> > > > +{
+> > > > +	int err = -ESRCH;
+> > > > +	struct xfrm_state *x;
+> > > > +	struct net *net = sock_net(skb->sk);
+> > > > +	struct xfrm_encap_tmpl *encap = NULL;
+> > > > +	struct xfrm_user_offload *xuo = NULL;
+> > > > +	struct xfrm_migrate m = { .old_saddr.a4 = 0,};
+> > > > +	struct xfrm_user_migrate_state *um = nlmsg_data(nlh);
+> > > > +
+> > > > +	if (!um->id.spi) {
+> > > > +		NL_SET_ERR_MSG(extack, "Invalid SPI 0x0");
+> > > > +		return -EINVAL;
+> > > > +	}
+> > > > +
+> > > > +	err = copy_from_user_migrate_state(&m, um);
+> > > > +	if (err)
+> > > > +		return err;
+> > > > +
+> > > > +	x = xfrm_user_state_lookup(net, &um->id, attrs, &err);
+> > > > +
+> > > > +	if (x) {
+> > > > +		struct xfrm_state *xc;
+> > > > +
+> > > > +		if (!x->dir) {
+> > > > +			NL_SET_ERR_MSG(extack, "State direction is invalid");
+> > > > +			err = -EINVAL;
+> > > > +			goto error;
+> > > > +		}
+> > > > +
+> > > > +		if (attrs[XFRMA_ENCAP]) {
+> > > > +			encap = kmemdup(nla_data(attrs[XFRMA_ENCAP]),
+> > > > +					sizeof(*encap), GFP_KERNEL);
+> > > > +			if (!encap) {
+> > > > +				err = -ENOMEM;
+> > > > +				goto error;
+> > > > +			}
+> > > > +		}
+> > > > +		if (attrs[XFRMA_OFFLOAD_DEV]) {
+> > > > +			xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
+> > > > +				      sizeof(*xuo), GFP_KERNEL);
+> > > > +			if (!xuo) {
+> > > > +				err = -ENOMEM;
+> > > > +				goto error;
+> > > > +			}
+> > > > +		}
+> > > > +		xc = xfrm_state_migrate(x, &m, encap, net, xuo, extack);
+> > > > +		if (xc) {
+> > > > +			xfrm_state_delete(x);
+> > > 
+> > > This xfrm_state_delete() comes too late. You need to synchronize this
+> > > with xfrm_state_clone_and_setup() by holding the state lock.
+> > > Otherwise we might hand out the same sequence number etc. more than
+> > > one time. Unfortunately xfrm_migrate() has the same problem, the
+> > > error recovery mechanism in xfrm_migrate() looks broken.
+> > 
+> > The xfrm_migrate() problem is nasty, looks like we can't recover
+> > if the state migration fails. We probably have to delete the
+> > states and wait for the userspace to insert new ones.
 > 
-> [ ... ]
+> userspace should notice the inconsistany. Most of them are ENOMEM or EMSGSIZE
 > 
-> > @@ -23779,12 +23781,13 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
-> >  			    eatype == BPF_MODIFY_RETURN) {
-> >  				/* Load nr_args from ctx - 8 */
-> >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-> > -				insn_buf[1] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
-> > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-> > +				insn_buf[2] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
+> > 
+> > Another thing, xfrm_user_state_lookup() returns a reference on x,
+> > you should drop it somewhere.
 > 
-> [ ... ]
+> There is a call a few lines bellow, the label was "error:"  I renamed it to  
+> "out:" for clariy.
 > 
-> > -				cnt = 6;
-> > +				cnt = 7;
-> >  			} else {
-> >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, -EOPNOTSUPP);
-> >  				cnt = 1;
-> >  			}
-> >
-> >  			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
-> 
-> [ ... ]
-> 
-> > 			delta    += cnt - 1;
-> 
-> Note that the bpf_get_func_ret block above correctly updates delta after
-> patching.
-> 
-> > @@ -23808,12 +23811,15 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
-> >
-> >  				/* skip 'void *__data' in btf_trace_##name() and save to reg0 */
-> >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, nr_args - 1);
-> > +				cnt = 1;
-> >  			} else {
-> >  				/* Load nr_args from ctx - 8 */
-> >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-> > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-> > +				cnt = 2;
-> >  			}
-> >
-> > -			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, 1);
-> > +			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
-> >  			if (!new_prog)
-> >  				return -ENOMEM;
-> >
-> >  			env->prog = prog = new_prog;
-> >  			insn      = new_prog->insnsi + i + delta;
-> >  			goto next_insn;
-> >  		}
-> 
-> Should there be a "delta += cnt - 1;" before assigning env->prog in this
-> bpf_get_func_arg_cnt block? When cnt is 2 (non-RAW_TP path), the program
-> grows by one instruction, but delta is not updated. This could cause
-> subsequent bpf_patch_insn_data() calls to use incorrect offsets.
-> 
-> The bpf_get_func_arg block at the beginning of this patch has:
-> 
->     delta    += cnt - 1;
->     env->prog = prog = new_prog;
-> 
-> And the bpf_get_func_ret block similarly has delta updated. But this
-> bpf_get_func_arg_cnt block goes directly to env->prog assignment without
-> updating delta.
+> +out:
+> +       xfrm_state_put(x);
 
-Ah, good point, I think this is a valid problem. The selftests didn't cover
-this case, and I think I'd better to use bpf_get_func_arg() and bpf_get_func_ret()
-in the exit path of fsession to cover it.
+Yes, this makes it more clear that we hit this even without error.
 
-Will fix it in the next version.
-
-Thanks!
-Menglong Dong
-
-> 
-> 
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> 
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
-> 
-
-
-
-
+Maybe you should do a 'if (!X)' check on the retuen value of
+xfrm_user_state_lookup(). This woulds make the structure of
+the function even clearer.
 
