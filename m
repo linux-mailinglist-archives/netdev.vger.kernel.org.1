@@ -1,58 +1,82 @@
-Return-Path: <netdev+bounces-252902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKHRCBKuc2nOxwAAu9opvQ
-	(envelope-from <netdev+bounces-252902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:21:22 +0100
+	id kMj3HWyvc2nOxwAAu9opvQ
+	(envelope-from <netdev+bounces-252903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:27:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D93A78F53
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:21:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F088C78FE2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:27:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4F923013AAE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:21:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E5B28301CD95
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298162857F4;
-	Fri, 23 Jan 2026 17:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C662DECDE;
+	Fri, 23 Jan 2026 17:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aFmBW25T"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WbE7SAtu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ECD248886;
-	Fri, 23 Jan 2026 17:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9407C296BA7;
+	Fri, 23 Jan 2026 17:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769188876; cv=none; b=Tg6u1tWjwx+Nt2x/8SJx4wv/N6mX0xxfFgm0kZntpo0LUV3RyZWUAWJhlZgvju1+2YHhRKAPj/Vf115wMJ/diil1ryW6C7cy9aJM4Ti5kIdOfq48iGwWh3wxAyG6oO4E751ldYol6O4rL1JExPXWdlGmFrwvkGmz5jWWcJJKks4=
+	t=1769189225; cv=none; b=fgaXQlkvohzcGUgdOEUP16EwFFJCuOIOZ0ii6yaxNSfXlU58kty9tGAM2DveBKaQgNk6+GyNkuMYjSGar3XYkgxnYXzTxNewAq5W4i8cN35ikyip+j+FAZSos9xYe+1sOxldPN7rB9BixEL7yheRMtujF7ZXYpIMVrC3SFkNsck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769188876; c=relaxed/simple;
-	bh=oDYlsT8ao4IVUn/v2GEIWN5chgYkGCfLTxu2tBB/5Js=;
+	s=arc-20240116; t=1769189225; c=relaxed/simple;
+	bh=G/8OCQ/8COWTW4EpiiDpBWGvKl0QjVJqCfmQ1t0wbGk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e6pXkYDcEEu6d1C8zCDFW1zYDs1Yd6WHis020flKmA9woUjTPS3kdP9WgaLtj9v8zq4LYQWkAEuAR/6WCVhz83lJrT9luaoPgsQyP1DKZLT3y9wwtDiTkpIWscvLpWYrKDfRyxAVIqQHED8YlBKMsGyQG4CJTK3y688re39OQO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aFmBW25T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3BD5C4CEF1;
-	Fri, 23 Jan 2026 17:21:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769188875;
-	bh=oDYlsT8ao4IVUn/v2GEIWN5chgYkGCfLTxu2tBB/5Js=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aFmBW25TZDiYDj3uLSa8f7KCO8yKS4dhtf1jYKDt8DWbWk9y8tvZHAIpD2Vb+W0m2
-	 SLYvw9lJpuGYGYT0Nx3HSPqYX/8Yc4e51lOSZROLoe/UbDyQ10arao/N6ZIebDCCID
-	 LTB5kAkUr1B4/hyoEAvPI5re4zjeQF7vL/AyhR4ohr4B3t1aownyKN0QqJb6qYOpyA
-	 vS+xnoE/c6bG5lSXjws/fWrc91GwZNupgGOZM0vjM70RU521NTQN4gW2FkRQUiWfSE
-	 URow+soqN4Dl6EmhG/kddp42vccphaX00iCfKS0MykmpW+YnKQnWLIbhFmeuhkC9rP
-	 xkJk1ojfjXJZQ==
-Date: Fri, 23 Jan 2026 17:21:11 +0000
-From: Simon Horman <horms@kernel.org>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-Subject: Re: [PATCH net] net: liquidio: Fix memory leak in setup_nic_devices()
-Message-ID: <aXOuByqgZ0iY81ak@horms.kernel.org>
-References: <20260122072933.328997-1-zilin@seu.edu.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oFww1EDg0ydWh5VxptX/8opl+3PpUl3qMul8mYN+5YdO9Oveq8t11NsLaQ+B8r570rxXvdhE36eS+BxUcuT6b6ODMN3rGDF4pS84xpRN6eWGKSqMutO8sIEFAIW5CsGiYbuPlpcretd57/VhXBco4GSyB9pRiCsp/mKmogNYqK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WbE7SAtu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ATqUy5/Sp0hLV7kTQCotJYn2id+kgnBDhi2Bfu1dxMw=; b=WbE7SAtucfXWKA5HnfaYgijWAA
+	7L0Et33+VW7YE0lTPtIg91YcJfGT/yqR4XWo1hOw3m7+aVG65JgF7eEHkVJ2uucFrEz9d3yS0RouW
+	pT+Tki0zV5+Z5Jy3b1t3Syzoa/LXYZcZEwiBOglSDeN7qf+1Dhgk0Mv06lfV2fsphs/ho1GU7SiPk
+	7Lup2A1+JyjmwnTix8YwXKrcGF4aBOn7KZ/kjR695XoY5LJlDU4d/Hqm0YJmltDvCL7s3/OAaJ++m
+	ZpZK6f8PfdvQq5KpcTqsfmSNWwQZtHE4V5fTLx3oUaU2CZ+leNEvhXGF4mPe+8IT6GbIMaS6sLY5/
+	Fp2PCgHA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42282)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vjKvr-000000002Mn-2kBY;
+	Fri, 23 Jan 2026 17:26:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vjKvn-000000002GB-2S0Y;
+	Fri, 23 Jan 2026 17:26:47 +0000
+Date: Fri, 23 Jan 2026 17:26:47 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
+ inband goodies
+Message-ID: <aXOvV-XRmn_Pe-ca@shell.armlinux.org.uk>
+References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+ <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,88 +85,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260122072933.328997-1-zilin@seu.edu.cn>
+In-Reply-To: <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252902-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252903-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.912];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D93A78F53
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F088C78FE2
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 07:29:33AM +0000, Zilin Guan wrote:
-> In setup_nic_devices(), the netdev is allocated using alloc_etherdev_mq().
-> However, the pointer to this structure is stored in oct->props[i].netdev
-> only after the calls to netif_set_real_num_rx_queues() and
-> netif_set_real_num_tx_queues().
+On Fri, Jan 23, 2026 at 07:05:00PM +0530, Mohd Ayaan Anwar wrote:
+> Hello Russell,
+> On Fri, Jan 23, 2026 at 09:52:00AM +0000, Russell King (Oracle) wrote:
+> > This is the v1 submission: if it doesn't get tested but review goes
+> > well, it'll end up in net-next and mainline without testing on the
+> > affected hardware!
+> > 
+> > Mentioned previously, I've been trying to sort out the PCS support in
+> > stmmac, and this series represents the current state of play.
+> > 
+> > Previous posted patches centred around merely getting autonegotiation
+> > to be configured correctly, to a point where the manual configuration
+> > can be removed from the qcom-ethqos driver. The qcom-ethqos driver
+> > uses both SGMII and 2500BASE-X, manually configuring the dwmac's
+> > integrated PCS appropriately.
+> > 
 > 
-> If either of these functions fails, setup_nic_devices() returns an error
-> without freeing the allocated netdev. Since oct->props[i].netdev is still
-> NULL at this point, the cleanup function liquidio_destroy_nic_device()
-> will fail to find and free the netdev, resulting in a memory leak.
+> Thank you for CC'ing me on this series. Sorry, but I have been M.I.A.
+> for the past couple of months due to some health issues, which caused a
+> backlog at work that I had to power through. I haven't been able to
+> monitor the mailing list for stmmac patches.
+
+Sorry to hear that, but if it's any consolation, you're not alone. On
+new year's eve, I had three teeth extracted, including one that was
+laying horizontally in the palate of the mouth buried in bone, and
+needed in bone graft (modern bone grafts are quite different from what
+you'd expect btw.) It's been quite sore/painful as it heals.
+
+> I tested v1 last night and just picked up v2. Here are my observations
+> and logs (phylink logs are enabled). I haven't had time to debug the
+> issues, but they are not seen on the net-next tree. One thing that I
+> remember from our last discussion is the need to test with comma
+> detection enabled; I will test that next.
 > 
-> Fix this by initializing oct->props[i].netdev before calling the queue
-> setup functions. This ensures that the netdev is properly accessible for
-> cleanup in case of errors.
-> 
-> Compile tested only. Issue found using a prototype static analysis tool
-> and code review.
-> 
-> Fixes: c33c997346c3 ("liquidio: enhanced ethtool --set-channels feature")
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> Tested on the QCS9100 Ride R3 board with 2X AQR115C PHYs. I have one
+> more board that I can test next week (IQ8275, which has a single
+> QCA8081 PHY, but that is limited to 2.5G because the PHY switches its
+> mode according to the speed).
 
-Thanks Zilin,
+Thanks for testing!
 
-I agree with your analysis, and proposed fix.
-And that the problem appears to have been introduced in the cited commit.
+Given the results you've given, my suggestion would be that the
+following patches are probably the most risky:
 
-But I am wondering if we also need the following, probably as a separate
-commit, to ensure that liquidio_destroy_nic_device is called for the
-element of props[i] whose assingment your patch addresses.
+Patch 2 "net: stmmac: qcom-ethqos: convert to set_clk_tx_rate() method"
 
-Also compile tested only.
+This changes the way the clock is configured. It would be worth
+testing that and giving a tested-by for the first two patches if
+that's successful.
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-index 0732440eeacd..3ba2806f5d1e 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-@@ -3765,11 +3765,11 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
- 
- setup_nic_dev_free:
- 
--	while (i--) {
-+	do {
- 		dev_err(&octeon_dev->pci_dev->dev,
- 			"NIC ifidx:%d Setup failed\n", i);
- 		liquidio_destroy_nic_device(octeon_dev, i);
--	}
-+	} while (i--);
- 
- setup_nic_dev_done:
+Patch 6 "net: stmmac: qcom-ethqos: convert to dwmac generic SerDes
+support"
 
-...
+This changes how the SerDes is handled, which is a significant change.
+It's possible that the PHY calibration needs some other state to be
+appropriately configured, and that's not happening in the same order.
+
+Either of these two would account for what appears to be an unstable
+SerDes link.
+
+As for the NULL pointer deref, I'll look at that in a bit (waiting
+for a build to complete so I can hopefully pinpoint where the oops
+is happening.)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
