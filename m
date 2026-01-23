@@ -1,143 +1,147 @@
-Return-Path: <netdev+bounces-252649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBiBI3odc2ngsQAAu9opvQ
-	(envelope-from <netdev+bounces-252649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:04:26 +0100
+	id aIjgMx8cc2mwsAAAu9opvQ
+	(envelope-from <netdev+bounces-252650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:58:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0598715EE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:04:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 539FD7147E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:58:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CCEF130160E6
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 06:57:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C82AC3018754
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 06:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5D433C192;
-	Fri, 23 Jan 2026 06:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B099233E347;
+	Fri, 23 Jan 2026 06:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="S7kLzLRR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QoDBF9u8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f74.google.com (mail-dl1-f74.google.com [74.125.82.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9141130F812;
-	Fri, 23 Jan 2026 06:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DA333EAEB
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 06:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769151448; cv=none; b=UVpFrdX007s+d5WqYG+rBInjpg81+QCA//go/p36VIAE9pSD2askj+Fs4dPwhpw5hyhLcyzG73og3wwo4epRjsajX3fkNTVvkRjEXO3hOCPpm0YW6r73ptgWGRNVgYofXTma5N5W0AnQWb2a8D9ZjneMkUtPLOzWgwtcFAVAT6w=
+	t=1769151504; cv=none; b=O0RthI/XK04VuWrniUg9yPRRHmuA7ONhMTONVIml42kitUZLBmTbDzAO8oe9/LO8Vv9h+sPk1n32D/p5LdOPo54WrmeaOhi3c5ONWWXcAsysaZRbPpVEMIDc0n89XiNuMS2M4sN6dIu8xbLGmFEJckqyDI4eHcbc43CAzgXF00U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769151448; c=relaxed/simple;
-	bh=d6tVuQB9kxWWABGsFkTqtufONnZXyqU6rQB2WgIfPf0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WLvyiyPBSqflom7MuLKx4ne8C2YulSACaPoCuDzuRlvzomiUvjuqszAxhNz7kTntD0ZcSv066bRDINxtd9HqUHjjd+X+XffqBcJHYQUqS6+1uAkByt7bkSnLaAMMXCDcAIZr+KK/NO0XVAwz3F7+56t78NDUwmqPnQmgCpd9CDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=S7kLzLRR; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 31b470a2f;
-	Fri, 23 Jan 2026 14:57:20 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: marcin.s.wojtas@gmail.com
-Cc: linux@armlinux.org.uk,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH net v2] net: mvpp2: cls: Fix memory leak in mvpp2_ethtool_cls_rule_ins()
-Date: Fri, 23 Jan 2026 06:57:16 +0000
-Message-Id: <20260123065716.2248324-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1769151504; c=relaxed/simple;
+	bh=6+3nZjgoHWSP4ea8zSCT148SAOESmqsnhw6/Ni1AyDs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MMg27ydlV+LQuiBIJ1Qv/9QhqZ34QDne83BdvnVWRS7X1Nx2vqJkFhlRQmWl7EJ6ZVj8rpE6b7h3yC5APUOC9aFR542PX+NuII8W0BAzxkXY/qD29J6tTBVDGZilQLBmnZkjDnRvwXx7QZrGQAXsJYIU5XViQ0MU2ZOwmP/aWMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QoDBF9u8; arc=none smtp.client-ip=74.125.82.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
+Received: by mail-dl1-f74.google.com with SMTP id a92af1059eb24-11b94abc09dso2797254c88.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 22:58:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769151502; x=1769756302; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wNuK2/dOALJQhNEGtJ2LlGL6rosoPqMbD+3I0jKBgfc=;
+        b=QoDBF9u80vu0mQmzoIz4rihEci5tnb/dSisJw6uUCJOO9UAvRbH8bzPdcTSdjyfBkq
+         l6rLfbelYxG0YvWhY9gXu1m8oSb0+kZYoIbTjs0wLosnqjFKXQXXqhC40LNbhnhxPZP2
+         1HsySEibF0mhZcp+R6QMzRqWa0ga/pahzhX7TKWU4lHTTkV0Z+LfzzRy2MwhChoCmW3C
+         WN+nC5Mp2ETCAJEVfn/e7Hdxu/GSuf/YdnUMJHEnFB42PJYyFq65aNXD3qjU8BQPLYdw
+         uyfEf89iIBy02fG2OjrCZ4OotYKzEhmUAL33loWPCfAzfRDp35fTzxAoCGJbwJPBxdl3
+         CS/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769151502; x=1769756302;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wNuK2/dOALJQhNEGtJ2LlGL6rosoPqMbD+3I0jKBgfc=;
+        b=eTM7d2zdaq7N8bXflQ4iE9NQ37sdD6DNAG8sXXs+CoaEWrYHFp+XM1Afa9G1CkLWzJ
+         gKuFEopXaFoZaGwKruFWOWuTwWE8bCF+mKqdmZyBUbf2bdfg3MYQJh9fVVQdARDXwjk1
+         HNOtmJUsiMcXOo0M/xp5tXJUPTE7/M7m3wRBSfy/FiQI2NoMOf4n8LFd68sHegw9S3qF
+         SLMRRkaetH5HzTnVVr8MDy3b7MbbFigoiP4+EuuxzzjGtiaQqrVGW0xzTpDS4fw0CSi3
+         Tv40/thxKGFUnUucMp5PvJEPuWBIZ/4ZJPA9XvJxKG+C1/V0OwIaLh9cOXVpPvJt/1XA
+         Xdlg==
+X-Gm-Message-State: AOJu0YyoXD59RPmkhdYxqCZWDWvkGRmAI0ZwE8lqwaRnZlu98VLnJIMO
+	vit8HwpN7H1GVn+BWY5ehu5RIROTqrQzFzQ+YNbkkb8oAxseawZ7l8q98dHLNbfCLaxUW9kt8Jq
+	lSNfKKw==
+X-Received: from dlbuy11.prod.google.com ([2002:a05:7022:1e0b:b0:11f:3ccd:73d7])
+ (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:112:b0:11a:273c:dd98
+ with SMTP id a92af1059eb24-1247dbb0d6amr858556c88.20.1769151501761; Thu, 22
+ Jan 2026 22:58:21 -0800 (PST)
+Date: Fri, 23 Jan 2026 06:58:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9be9a4a35903a1kunmd3d2fb92681de
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZH0tIVk4YSxoaHhpMQhhNGlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
-	tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=S7kLzLRR5KlPhJVnmGiOHAb6agq/65IlHxLqqKIrc8NXecX8NFf6BNkHvKWGumokqUwCktuaZqLblbBHKYApoNv3ymYaWQGHtTf7jwaAqfvrC5i7m/+0kvJxVpXuJBB9XozO6se69DaOxTtbVU++bVyUYzPeMs8M3sr+oJawWKE=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=lQ2Fr8sNf6vuSAhrEgQCKZgVL2bhPTFJxxQvht9W+2Q=;
-	h=date:mime-version:subject:message-id:from;
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260123065806.3858623-1-boolli@google.com>
+Subject: [PATCH v2] idpf: nullify pointers after they are freed
+From: Li Li <boolli@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252649-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-252650-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zilin@seu.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,seu.edu.cn:dkim,seu.edu.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E0598715EE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 539FD7147E
 X-Rspamd-Action: no action
 
-In mvpp2_ethtool_cls_rule_ins(), the ethtool_rule is allocated by
-ethtool_rx_flow_rule_create(). If the subsequent conversion to flow
-type fails, the function jumps to the clean_rule label.
+rss_data->rss_key needs to be nullified after it is freed.
+Checks like "if (!rss_data->rss_key)" in the code could fail
+if it is not nullified.
 
-However, the clean_rule label only frees efs, skipping the cleanup
-of ethtool_rule, which leads to a memory leak.
+Tested: built and booted the kernel.
 
-Fix this by jumping to the clean_eth_rule label, which properly calls
-ethtool_rx_flow_rule_destroy() before freeing efs.
-
-Compile tested only. Issue found using a prototype static analysis tool
-and code review.
-
-Fixes: f4f1ba18195d ("net: mvpp2: cls: Report an error for unsupported flow types")
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Fixes: 83f38f210b85 ("idpf: Fix RSS LUT NULL pointer crash on early ethtool operations")
+Signed-off-by: Li Li <boolli@google.com>
 ---
 Changes in v2:
-- Cc the author of the commit under Fixes.
+ - Remove the line to nullify vport->q_vector_idxs as it is not
+   necessary.
 
- drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/idpf_lib.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-index 44b201817d94..c116da7d7f18 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_cls.c
-@@ -1389,7 +1389,7 @@ int mvpp2_ethtool_cls_rule_ins(struct mvpp2_port *port,
- 	efs->rule.flow_type = mvpp2_cls_ethtool_flow_to_type(info->fs.flow_type);
- 	if (efs->rule.flow_type < 0) {
- 		ret = efs->rule.flow_type;
--		goto clean_rule;
-+		goto clean_eth_rule;
- 	}
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 131a8121839bd..f63ab58428d2e 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -1308,6 +1308,7 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
  
- 	ret = mvpp2_cls_rfs_parse_rule(&efs->rule);
+ free_rss_key:
+ 	kfree(rss_data->rss_key);
++	rss_data->rss_key = NULL;
+ free_vector_idxs:
+ 	kfree(vport->q_vector_idxs);
+ free_vport:
 -- 
-2.34.1
+2.52.0.457.g6b5491de43-goog
 
 
