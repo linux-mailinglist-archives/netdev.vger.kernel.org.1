@@ -1,135 +1,183 @@
-Return-Path: <netdev+bounces-252621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252622-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMhpJ37kcmlYrAAAu9opvQ
-	(envelope-from <netdev+bounces-252621-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 04:01:18 +0100
+	id vYn4NRPlcmlzrAAAu9opvQ
+	(envelope-from <netdev+bounces-252622-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 04:03:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E346FE21
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 04:01:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 390096FE3A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 04:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5634B3001CC0
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 03:01:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D3BF63005E84
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 03:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F3E37D113;
-	Fri, 23 Jan 2026 03:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B5723AE9B;
+	Fri, 23 Jan 2026 03:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IuT0oK9A"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7707280A56;
-	Fri, 23 Jan 2026 03:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A091A2DAFB4
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 03:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769137270; cv=none; b=R/cP/x8qeentzZfmbJD8AAYhAxe2ARcSYpk3+4UPZoLffyynhCvq88QffjdgSFhyivtQ+gQpw4rwGlHYplmwUBzKuu3sNu4m3/SY/tlmjgh25hyy3NaeWi642otAQ8Pzl6MWYyijf2ns09uqhIKTENPpM5FyKwk9yqu8B5OWBFc=
+	t=1769137423; cv=none; b=szqUPLoEV8UKqnE6gHoMw0DXD+VUMtArgfUBwcp/KKqKyNs0Z7qXYD3OShN2F5DDeJnepAKQ1xzv+k19tgqBNgtWbHOI/ZekmktX9vqPocNlb2lV/nuaZdfRbejzW0hquGjgHjiZ+FwtxFV58idJ0ratGt38FPFDdVTVUpyrkNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769137270; c=relaxed/simple;
-	bh=9tWzlg4noYB1SecXcRQgDvZBvbUbx3Ptw7Th/eHLv3M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=EG3mxNaOiCRDrQgZ1BnT4sMh55P8tz9ulmnTDM35krCUoPpciz+d3s3nEizVhDBXFjpuZJSKG3LBWKhZfx80v8ZgGUbWaZzWW8EosKYj6Yrn3Uso3SmMhKk/caRkcNB+6kQgzaR0xObUMPZzRvbVeaRTSt+MYq4gYz3h8o5JOUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
- ajax-webmail-app1 (Coremail) ; Fri, 23 Jan 2026 11:00:16 +0800 (GMT+08:00)
-Date: Fri, 23 Jan 2026 11:00:16 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-Subject: Re: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock
- sampling control
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2026 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
- <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
- <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1769137423; c=relaxed/simple;
+	bh=U/FNq5rdpbdcZGN7Huo5dHrKnrH2MlVUn0VSIsLzWvg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uK6ahJjaPp2sqsKaJHBbfUQwBPzPW7qs0LJn0aOug/CQNKSs8/SIqf8Go/pohq3/1N5pbaVczdHt6qkbUgMAFce+vEzFcpWQmzy1hwpuK3sbK38aKLe0Uu6xjbKPkDKbvNNmSL0jMJuRIRybDOhOg2la6bgp1hpBovIAk7s1iOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IuT0oK9A; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8c6a291e7faso574195785a.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 19:03:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769137409; x=1769742209; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fA6qxRoEFh+rpwIl41Oht/rMATH6zAaeudQmjuunb0g=;
+        b=IuT0oK9Au0MrqobZlkgNsCr4vPhBjmJMjGemovvJlKz06n4ZIVf8jMBJ4xVddSIXNb
+         gWGMB/EburXlupJnCd17EGx5yxbs0+9+2pa/70gdO2wApFHE3Gjv3Lqs+ylRKRRElgqu
+         AlZe8PlQtsHBsefd08JBdDM0LqTIZ+7WMGZtFtZme49IdqkJKsCRVDP9+AJpbRnJOQZl
+         4gOTTAgBDuE184BcInXGOI/HinadyvIE2v03s/OgYQ2dpG0+2tDwK7/0OvQJYjAqOR3e
+         oojywr2kq2UOGJNT8ouSPShpIzxW2EijRobEJcqQuZK+5RlL/ybFkeYleP5EBS+gWN0f
+         r/Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769137409; x=1769742209;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fA6qxRoEFh+rpwIl41Oht/rMATH6zAaeudQmjuunb0g=;
+        b=nPEijlNE+X7b3BOJ99GhYZL4BdLQpt9kMll1DRyiBoVRq9bfDnkbOavR7Vd/9VuNyz
+         YcRtc65hBYgWBsLhnDWFTpxoebovSNztg3iIl1diznd2T+2a0d8ezsrmBh0eaTnaV9Zn
+         pW57/FXx8iSqfjDpYSfB0VX1T7u8lncxUdgXXWAk8T1sDmox2HuzBmfPCOeBmHXOxE9g
+         ZP03bb7XdNfTKXgD+mq+73Jzz2jZ5tK/3svXjZ+WPohhpa5vbjD9t21ko6FyOGxlIYYe
+         Ee5lbUhZ/VtYp9/2cXXoHBGiyHQJSzGvfB1ubMSFFxdSCftoPa9eDco36u1HgI8LMfW5
+         KIbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHPQ80V2CDxFG2nj7xOlu0Hmzdpsf1w+EKkeNkw+Cqnevsupt8tPpGAzFb9Go38VaEXPMTcrQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOnTvZAfqyR7a27xxpdxssV/zKYqq2a4xffTv1BndABTPm56pY
+	bk4KFsTk9KVeill9bdxjkID3MNTb0eVbd/083cZOCm6tSrew6xlQ1aMwlxaZOxyCmDocw3YyGpz
+	Ngg5aptg+KrZmuQ==
+X-Received: from qkbdv10.prod.google.com ([2002:a05:620a:1b8a:b0:8c5:335a:95f3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:44d6:b0:8c6:af59:5e2c with SMTP id af79cd13be357-8c6e2d8d992mr218217985a.18.1769137409254;
+ Thu, 22 Jan 2026 19:03:29 -0800 (PST)
+Date: Fri, 23 Jan 2026 03:03:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TAJkCgD3SmxA5HJpFPMEAA--.1437W
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAgEQDGlyUYERQgABsG
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260123030327.3041148-1-edumazet@google.com>
+Subject: [PATCH v2 net] mptcp: fix race in mptcp_pm_nl_flush_addrs_doit()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@linux.dev>, 
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com, 
+	Eulgyu Kim <eulgyukim@snu.ac.kr>, Geliang Tang <geliang@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252622-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252621-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[eswincomputing.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_PRIO_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lizhi2@eswincomputing.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,linux.dev,strlen.de,vger.kernel.org,lists.linux.dev,gmail.com,google.com,syzkaller.appspotmail.com,snu.ac.kr];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,5498a510ff9de39d37da];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[eswincomputing.com:mid,eswincomputing.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,einfochips.com:email,davemloft.net:email,st.com:email,lunn.ch:email,infradead.org:email,stormreply.com:email]
-X-Rspamd-Queue-Id: 90E346FE21
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,snu.ac.kr:email]
+X-Rspamd-Queue-Id: 390096FE3A
 X-Rspamd-Action: no action
 
-CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiQW5kcmV3IEx1bm4iIDxh
-bmRyZXdAbHVubi5jaD4KPiDlj5HpgIHml7bpl7Q6MjAyNi0wMS0yMiAyMTozMjozNCAo5pif5pyf
-5ZubKQo+IOaUtuS7tuS6ujog5p2O5b+XIDxsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29tPgo+IOaK
-hOmAgTogZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmcsIGFuZHJldytuZXRkZXZAbHVubi5jaCwg
-ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldCwgZWR1bWF6ZXRAZ29vZ2xlLmNvbSwga3ViYUBrZXJuZWwub3Jn
-LCByb2JoQGtlcm5lbC5vcmcsIGtyemsrZHRAa2VybmVsLm9yZywgY29ub3IrZHRAa2VybmVsLm9y
-ZywgbmV0ZGV2QHZnZXIua2VybmVsLm9yZywgcGFiZW5pQHJlZGhhdC5jb20sIG1jb3F1ZWxpbi5z
-dG0zMkBnbWFpbC5jb20sIGFsZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb20sIHJtaytrZXJuZWxA
-YXJtbGludXgub3JnLnVrLCBsaW51eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHkuY29t
-LCBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcsIGxpbnV4LWtlcm5lbEB2Z2Vy
-Lmtlcm5lbC5vcmcsIG5pbmd5dUBlc3dpbmNvbXB1dGluZy5jb20sIGxpbm1pbkBlc3dpbmNvbXB1
-dGluZy5jb20sIHBpbmtlc2gudmFnaGVsYUBlaW5mb2NoaXBzLmNvbSwgd2Vpc2hhbmdqdWFuQGVz
-d2luY29tcHV0aW5nLmNvbQo+IOS4u+mimDogUmU6IFJlOiBbUEFUQ0ggdjEgMS8yXSBkdC1iaW5k
-aW5nczogZXRoZXJuZXQ6IGVzd2luOiBhZGQgY2xvY2sgc2FtcGxpbmcgY29udHJvbAo+IAo+ID4g
-T24gRUlDNzcwMCwgUlhDIGFuZCBSWEQgZXhwZXJpZW5jZSBhbiBpbnRlcm5hbCBza2V3IGJlZm9y
-ZSByZWFjaGluZyB0aGUKPiA+IE1BQy4gQXQgaGlnaCBzcGVlZCwgdGhpcyBjYW4gc2hpZnQgdGhl
-IGVmZmVjdGl2ZSBzYW1wbGluZyBwb2ludCBieQo+ID4gYXBwcm94aW1hdGVseSBoYWxmIGEgY3lj
-bGUsIGNhdXNpbmcgdGhlIE1BQyB0byBzYW1wbGUgdGhlIHdyb25nIG5pYmJsZQo+ID4gb24gZWFj
-aCBlZGdlLgo+IAo+IFlvdSBzYXkgaW50ZXJuYWwuIFNvIHRoZSBza2V3IGlzIGZpeGVkLCBpdCBp
-cyBhIHByb3BlcnR5IG9mIHRoZQo+IHNpbGljb24/IElmIHNvLCB3aHkgYSBEVCBwcm9wZXJ0eT8g
-V2h5IG5vdCBqdXN0IGhhcmQgY29kZSBpdCBpbiB0aGUKPiBkcml2ZXI/IFNpbmNlIGl0IGlzIGlu
-dGVybmFsLCBkaWZmZXJlbnQgYm9hcmRzIHNob3VsZCBub3QgbmVlZCBpdCBzZXQKPiBkaWZmZXJl
-bnRseT8KPiAKVGhhbmtzIGZvciB0aGUgcXVlc3Rpb24uCgpFSUM3NzAwIGhhcyB0d28gRXRoZXJu
-ZXQgTUFDcy4gT25seSBldGgxIGhhcyB0aGlzIGludGVybmFsIFJYQy9SWEQgc2tldywKZXRoMCBk
-b2VzIG5vdC4KClNvIHRoaXMgaXMgbm90IGEgY2hpcC13aWRlIGNvbnN0YW50IHRoYXQgY2FuIGJl
-IGhhcmRjb2RlZCBpbiB0aGUgZHJpdmVyLgpXZSBuZWVkIGEgd2F5IHRvIGRpc3Rpbmd1aXNoIHRo
-ZSB0d28gTUFDIGluc3RhbmNlcywgd2hpY2ggaXMgd2h5IHRoaXMgaXMKZGVzY3JpYmVkIHBlci1w
-b3J0IGluIERUUy4KCi0tCkxpIFpoaQo=
+syzbot and Eulgyu Kim reported crashes in mptcp_pm_nl_get_local_id()
+and/or mptcp_pm_nl_is_backup()
+
+Root cause is list_splice_init() in mptcp_pm_nl_flush_addrs_doit()
+which is not RCU ready.
+
+list_splice_init_rcu() can not be called here while holding pernet->lock
+spinlock.
+
+Many thanks to Eulgyu Kim for providing a repro and testing our patches.
+
+Fixes: 141694df6573 ("mptcp: remove address when netlink flushes addrs")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6970a46d.a00a0220.3ad28e.5cf0.GAE@google.com/T/
+Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+Cc: Geliang Tang <geliang@kernel.org>
+---
+v2: Make sure the list was not empty, return early otherwise.
+v1: https://lore.kernel.org/netdev/20260122131306.2119853-1-edumazet@google.com/
+
+ net/mptcp/pm_kernel.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+index 57570a44e4185370f531047fe97ce9f9fbd1480b..af23be6658ded4860133bb9495c7738014815d28 100644
+--- a/net/mptcp/pm_kernel.c
++++ b/net/mptcp/pm_kernel.c
+@@ -1294,16 +1294,28 @@ static void __reset_counters(struct pm_nl_pernet *pernet)
+ int mptcp_pm_nl_flush_addrs_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
+-	LIST_HEAD(free_list);
++	struct list_head free_list;
+
+	spin_lock_bh(&pernet->lock);
+-	list_splice_init(&pernet->endp_list, &free_list);
++
++	free_list = pernet->endp_list;
++	INIT_LIST_HEAD_RCU(&pernet->endp_list);
++
+	__reset_counters(pernet);
+	pernet->next_id = 1;
+	bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
+	spin_unlock_bh(&pernet->lock);
+-	mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
++
++	if (free_list.next == &pernet->endp_list)
++		return 0;
++
+	synchronize_rcu();
++
++	/* Adjust the pointers to free_list instead of pernet->endp_list */
++	free_list.prev->next = &free_list;
++	free_list.next->prev = &free_list;
++
++	mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
+	__flush_addrs(&free_list);
+	return 0;
+ }
+--
+2.52.0.457.g6b5491de43-goog
+
 
