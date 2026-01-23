@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-252921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252878-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IKgYOGu7c2kmyQAAu9opvQ
-	(envelope-from <netdev+bounces-252921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:18:19 +0100
+	id GFZnFkWgc2lqxgAAu9opvQ
+	(envelope-from <netdev+bounces-252878-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:22:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9777978F
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:18:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22F2786B7
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABCF4300EFB4
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:17:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD4D23021599
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA17218AAD;
-	Fri, 23 Jan 2026 18:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7002D3A89;
+	Fri, 23 Jan 2026 16:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXrcjsbL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYAsjmwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1541E1DC9B3
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 18:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097E5212550
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 16:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769192260; cv=none; b=AbI9tyLXq4ocsNyFrVHJAqwczoG8oXeC7kNIGU5oWRWW1Bv1nUTo5KNXfgaoM3Sv2JveYiXf1CWEhmFkkAT8TeutADhT52FcyYrdeVoxLbR8aWvsZALOjiRrYOt+TeyfKVYZ1+NXa/w97tO2tCzkQv5zoXeVQ/98ajUPrGbBtzY=
+	t=1769185345; cv=none; b=tOuGHjg61lXAgRzCqiiuehKzynUO+Vt+2X7gDgO9YtEF8PmlNBsdnxYffIagQXjVvD7RwlBzhcqKLaucA0Eahr93v+OvwFA4HZ+P+s7c7/kNjDE1SJssdWpejcFlMbO68vuR1qzmSi1mgqLjVOApW8htV1hxq7NqxqJr8g78fBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769192260; c=relaxed/simple;
-	bh=HL9Z8exH0p8ghijOUjxjCoBmCDjBhhDKtkS3KASOoh0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lQ342E7DeKGQrGr/Wj4pOENo6jx5+u8PHAPqKq2ofaybUQyeZcczyEkTQ+WPix17AKgSQwXslD1wIZN3iDd/Lbe3cHYmV9KBp6Ly08I5BgBYXW/J4luw7EmzlKDKScOk+3+wS9ZlsD1v41mYXZpbhV7b80fN6VewoFF61OjIaC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FXrcjsbL; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1769185345; c=relaxed/simple;
+	bh=w5MIfnlIHaBZE9Sx+nDab+c35nSGwa8xj0TFBnbl3RQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KrAcNgkyaluss/Nz6a8dGQxY2x5xy7lewCm8I6mHNAg1QvhACwz06xI9cSGJQ9ANMaYZZAMO87JqNCqJNAHOFDbgPPFoOtudPg6wo8Y+AzLefTtuWjFb19CAe0i89FkR66wozFU14A3RgLpfTHgj5wuCHBe2dAbfXJP4ZTf5HEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DYAsjmwx; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8946f12b1cfso33939196d6.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 10:17:38 -0800 (PST)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8230d228372so1028251b3a.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:22:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769192258; x=1769797058; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zF0a10J5mLJVO6RkpWuar6FLLd6MMCZJu1XiB3Hvb/Q=;
-        b=FXrcjsbL3lQYWuDMkpdApVo0X3645CYccv6zcaSnCoXp6BBd/yDyTO+duKymbcsrZO
-         GJPdfdjjk8m5aHmkQKLd3JYG6ILSG65D0tkhM1OFQAwUQ2GOrLsMOlnHjAIrjU/NiDF5
-         BCaHic6gTuhN9d+3TU5Uw9WOVBv9xcwhaXTh/lxVe1IT5YAPak2zMkVIljb5oaXrYE6o
-         M3NEx7dKbdvR7YXl6EESGJzSgGid7CWahtKBZdrVeIArLCbiExGQgAhicWhNjM+QGlbR
-         A1OtcUxOpqHrNAdL6+pH8nXO0MBpiUAndXULne4UlDy1srTLhyS6Ru4KH8gg2/+c7NFV
-         wksg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769192258; x=1769797058;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769185343; x=1769790143; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zF0a10J5mLJVO6RkpWuar6FLLd6MMCZJu1XiB3Hvb/Q=;
-        b=dX3W7fXmweDcVXgVBSIIvOMOVT9yx21n8lh5wcVwvfpyFz/MCf7m2aVlFeg/dg1vwk
-         pcfSRnu1lqmdU2Zj0CtcSiyp3KaY9IN2fYYcfKsRsNv4FvPv/5PRwrdel9lTiMfwtLsI
-         vumvKyHyTkdNA+2g89zgW2wN9PE7Jhbk8oYFrdnRDHVHQCeOmwZQMjK22JVKpyIOgzqB
-         hOZtknyotDcRFn1MEMKC+kk143W2oLN65YrrFpi20KH/ElBnSICzIeEpvlEjLy19RANo
-         JtswpHZa/UjPVmObeE7opGwxErm5ym8lhJFcfaANa7h8/WXNVQaEjsWcIUkfzTK0hGOY
-         nTAQ==
-X-Gm-Message-State: AOJu0Yx+lS0yJQDI/P9uaWgCEOslTZe58e5FQ6uxLhUCe7EW6FRApS8Y
-	Q/nWcxhbdidfLaaLSvWMv7pOAzmrGfyB0GpLEqpH65w79VZ7P35yi2rSD9P4Pg==
-X-Gm-Gg: AZuq6aJ3ovK5Usm5tD3cQvGL6AG1EM2wxaxiSmd5Ljk8OPtmJIbiYiJx9RicJfF0ChF
-	u30WBmD8HNZSZBC4TWRBpMRqniC84rh9rxtfeUm1zcGPXTJHAuqa2N5+mfG4ajANNkTy35pq58Q
-	UntoFDRqcGFDRnrw7GcYeNIpox7ITc4uSz6B0ZZrdWigOGFPkWuBXbuSypzyxFpeFu9BhaEO5iN
-	hiI9WS0ArCeh6X0iEa8tFtzz1WDHjRCqSqPfqZtwPu/c3C3JD/qkv+dtp5lqziKu4aRxa9o1V5w
-	Di0WPjwbrcX4RUtF92kMlRCpbFOQd1Hn3eS0kjJoGrlBTvoC58P1oumZrv6y+FD+CkQ8DC5HXqD
-	bUw+kUs5neyheO7x0J123vT2CPxP/QDaw8zuOQSlzica2ThM4usKGaz0Rj8G4sigc/zg2Ty/PIK
-	vM6EtCP2xpe1uaWlb7byf6F9Le3FVPkgA69wDdqfleeo3aMUK7dVxxYw==
-X-Received: by 2002:a17:90b:17ca:b0:33b:cfac:d5c6 with SMTP id 98e67ed59e1d1-3537af9505emr1485005a91.29.1769185336053;
-        Fri, 23 Jan 2026 08:22:16 -0800 (PST)
+        bh=j1hAVBooT6RSatSb0JkTTI9JelC7CFfOn3FnTuarbB4=;
+        b=DYAsjmwxu3adShH3XSnF59IQqoBbiazlOzRhwU8sDXDpIni6snHqasTsswFd6vGHdb
+         oP88BvSbTABYhYtrHTxCoTwD6ls9O2ygMjTFXnSeElpsx9gsnplq2qLl01hQvqQpRH9q
+         Fqe3e2p/uwarWt8kEzt00Ls8wBCtFfrj07PqrdlrSgtUvmCDVMeQCUzo1/fxP38JhIwl
+         w8BJTms5Tgs5rAoGP5GIvo0Lg38sUZeYnPb0jh825q1IkgXUGsAtlHKNPMUB+BC4d/mu
+         J/wCjC09I36X/r5gr1ABpx/qRT8Od3D4guo7SMw5BQgr9uMrGYlxVAIBxwLuRy3Veihe
+         gtfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769185343; x=1769790143;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=j1hAVBooT6RSatSb0JkTTI9JelC7CFfOn3FnTuarbB4=;
+        b=FVG8Fp8aYBhXkC+sanoymqhng7H2HIlkeoZI3ud6kmveqbGPAP/YfQZzwnQT4qTM1s
+         YXHcqTsSdiQOPIOd4i2E3PHUUdrU4Y+p53GCIB1ICvrH4NTNkSW3Wjm2Ph0monbhUpox
+         serTFXgAjQLiHvtoWwWzlMhlq4lbXfgD8u6/CNpjRxPuOs3o8mPtLk5Nrp7z5UtZWF9l
+         2tHql4264fQhcVP56ad6DphSwki7UDZb/vIMwRbjCtmAygqC8VHZTIgLdand+ZnjEs8V
+         6XjecB4ug4wyb3hKFppGysIvSrGpncuz9RP+1bLENI4PAK8XI8MoxE15kqdHcG/OXHm0
+         U7iw==
+X-Gm-Message-State: AOJu0Yx1y52OujIut+teThduS2QzKbCHYDCUsF48h1o8KP3AlYx52x/y
+	9VkJGHkwPdBIRhb8hzDwvQW8K0dOSrwatlzKNL/YpTeZDj4xoVi955SNZVtD4g==
+X-Gm-Gg: AZuq6aLRrLOnWzfIqeh50iWVbA6A8Dot0askv9mzrHLf0ElxUN66ZARZbJpJwRmpXkv
+	yq5c5dxupg8YbNe25HFMHvXSxOf4BDvuUlJ0g1+dblS896TdYHsRDygOKmj5EONN9dcmz88q3Dx
+	2qLV3JBcH1FMGvnsW6q1H00siDhzwIN/1VrYYfKDcpN9gGNBuWFva94hvKOLnbeZfekc+sniM+X
+	fxjR3kLaYE6as3myWy3WB1csOh4Tl7ouZ9OL/2WTJlhN3rvzGj9zGNAReJ/1eFoQNJ6mKa4pKFD
+	CpCRJnLasu161wNHHGVJVzbYrMZsOyXKFzrqlJ+ilNKoM3yGAxaZS0kw+rv0S3gxg+bItdeV4n8
+	VSn2Ty1WdIuG6EzfVOadHPiUKoFeVmgzLdq9MmFicxroPjWsabtopOY8hKY40kXM/3qEbNvoHeN
+	Qp5tEWObt2w3Y3qGHvL+4pSQh7LEtYu6pcA7KVchcY7pIeCY96DrE6EA==
+X-Received: by 2002:a17:90b:2244:b0:349:3fe8:170d with SMTP id 98e67ed59e1d1-35378ba82b6mr1242634a91.3.1769185342968;
+        Fri, 23 Jan 2026 08:22:22 -0800 (PST)
 Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3536dc50882sm2496967a91.16.2026.01.23.08.22.09
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3536dc50882sm2496967a91.16.2026.01.23.08.22.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 08:22:15 -0800 (PST)
+        Fri, 23 Jan 2026 08:22:22 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -97,10 +99,12 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	bridge@lists.linux.dev,
 	dev@openvswitch.org
-Subject: [PATCH net-next v2 0/7] u64_stats: Introduce u64_stats_reads()
-Date: Sat, 24 Jan 2026 00:21:32 +0800
-Message-ID: <20260123162159.2877941-1-mmyangfl@gmail.com>
+Subject: [PATCH net-next v2 1/7] u64_stats: Introduce u64_stats_reads()
+Date: Sat, 24 Jan 2026 00:21:33 +0800
+Message-ID: <20260123162159.2877941-2-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260123162159.2877941-1-mmyangfl@gmail.com>
+References: <20260123162159.2877941-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -126,7 +130,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-252921-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252878-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -136,39 +140,76 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5B9777978F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C22F2786B7
 X-Rspamd-Action: no action
 
+The following pattern was observed in the code tree:
+
+        do {
+                start = u64_stats_fetch_begin(&pstats->syncp);
+                memcpy(&temp, &pstats->stats, sizeof(temp));
+        } while (u64_stats_fetch_retry(&pstats->syncp, start));
+
 On 64bit arches, struct u64_stats_sync is empty and provides no help
-against load/store tearing. memcpy() and struct copying should not be
-considered tear-free. Use u64_stats_reads() instead.
+against load/store tearing. memcpy() or struct copying does not
+guarantee tear free, although compilers never generate such instructions
+in practice.
 
-v1: https://lore.kernel.org/r/20260120092137.2161162-1-mmyangfl@gmail.com
-  - rename to u64_stats_reads() to clarify data flow direction
-  - refine the implementation
-  - add docs
-  - fix struct copying too
+Theoretically the affected code should convert to u64_stats_t, or use
+atomic operations properly.
 
-David Yang (7):
-  u64_stats: Introduce u64_stats_reads()
-  u64_stats: Doc incorrect usage with plain variables
-  net: bridge: mcast: fix memcpy with u64_stats
-  net: openvswitch: fix load tearing with u64_stats
-  macsec: fix memcpy with u64_stats
-  mpls: Fix load tearing with u64_stats
-  vxlan: vnifilter: fix memcpy with u64_stats
+However since there are needs to copy chunks of statistics, instead of
+writing loops everywhere, we provide a safe memcpy() variant for that
+purpose.
 
- drivers/net/macsec.c                |  6 ++--
- drivers/net/vxlan/vxlan_vnifilter.c |  2 +-
- include/linux/u64_stats_sync.h      | 56 ++++++++++++++++++++++++-----
- net/bridge/br_multicast.c           |  2 +-
- net/mpls/af_mpls.c                  |  2 +-
- net/openvswitch/datapath.c          |  3 +-
- 6 files changed, 55 insertions(+), 16 deletions(-)
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ include/linux/u64_stats_sync.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
+diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
+index 457879938fc1..15ea4db2a77b 100644
+--- a/include/linux/u64_stats_sync.h
++++ b/include/linux/u64_stats_sync.h
+@@ -79,6 +79,14 @@ static inline u64 u64_stats_read(const u64_stats_t *p)
+ 	return local64_read(&p->v);
+ }
+ 
++static inline void *u64_stats_reads(void *dst, const void *src, size_t len)
++{
++	BUILD_BUG_ON(len % sizeof(u64_stats_t));
++	for (size_t i = 0; i < len; i += sizeof(u64_stats_t))
++		*(u64 *)(dst + i) = u64_stats_read((const u64_stats_t *)(src + i));
++	return dst;
++}
++
+ static inline void u64_stats_set(u64_stats_t *p, u64 val)
+ {
+ 	local64_set(&p->v, val);
+@@ -110,6 +118,7 @@ static inline bool __u64_stats_fetch_retry(const struct u64_stats_sync *syncp,
+ }
+ 
+ #else /* 64 bit */
++#include <linux/string.h>
+ 
+ typedef struct {
+ 	u64		v;
+@@ -120,6 +129,12 @@ static inline u64 u64_stats_read(const u64_stats_t *p)
+ 	return p->v;
+ }
+ 
++static inline void *u64_stats_reads(void *dst, const void *src, size_t len)
++{
++	BUILD_BUG_ON(len % sizeof(u64_stats_t));
++	return memcpy(dst, src, len);
++}
++
+ static inline void u64_stats_set(u64_stats_t *p, u64 val)
+ {
+ 	p->v = val;
 -- 
 2.51.0
 
