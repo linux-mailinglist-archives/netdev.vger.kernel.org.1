@@ -1,179 +1,161 @@
-Return-Path: <netdev+bounces-252782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QI1LKPlRc2kDuwAAu9opvQ
-	(envelope-from <netdev+bounces-252782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:48:25 +0100
+	id GHCNCOZRc2kDuwAAu9opvQ
+	(envelope-from <netdev+bounces-252783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:48:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5207491F
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:48:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEA1748FD
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D51E331F46B0
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:42:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 67A623008627
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AA53793CD;
-	Fri, 23 Jan 2026 10:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E43309DCB;
+	Fri, 23 Jan 2026 10:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqzHGOu8"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BqEUIBfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8138037AA6A
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 10:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D53C2DE711;
+	Fri, 23 Jan 2026 10:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769164974; cv=none; b=MxaOuXwQ1GcMk0H7e95II4v282QiwvKo3Cq0EEHeOgUvvS9RIEYdronxCByO+mTCh+2XvfQf7EMsqU1kzZVPX/hRsKeHcsfS6QzfYNlvvBKxpBJdD2JPEqsladx+oIMehXSiMerHH2P0eE1G6Zxn61wftf5fgt/IN6G+rulmpOc=
+	t=1769165281; cv=none; b=GJPIwIlLONJNxYNPahtBYOaTP6/UL3Dk+Cs+nSMGL2nTbhZCnp3YAiwCY4lGR7vxYhKUb/6D94LdGMTAh6S7irgiAGFW0hrtUfmaJhAuKcn1LMMO8m034Huxd44Trol3s8b/RHvXtAWEaF+1HP9czKcdsqL+DNll4unhsicZpDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769164974; c=relaxed/simple;
-	bh=qVVLNJ7YXu9WNPO4RkV73hHgmEFOPSz6GfdeQZ4051U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fBV6RdRlSEdpaw+RD1FV0abCftf4iSo9WNIkTxho67x96+tnB5Dg0QxNdUqDuS01cPqRI+bA/7r4IjUDwvubiH7sHdZCnQWFIdcy6YX/EDAuMgyO0nFmPuiTMwslIfdsGZLPTqBXCu0aZDKU28FgbKmyql4C6WJnhTCOqX785V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqzHGOu8; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7f89d0b37f0so1575247b3a.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 02:42:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769164971; x=1769769771; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/cJzMSeJBm/TCcIoSkUUB8qr/tXilSOEhL8O9TYXtqM=;
-        b=UqzHGOu88FL4chPQ9P3cfZjx4p3OvTq7W0+YeMkIoAE1iNZACa+s5DLtaKtgVzde4K
-         JgM+tSJxS0nYxGwJAyzlKxGdb78ZW2IjTFZPKU/ccQFj8129GelgiUSNhlDxTbg7z7/e
-         zvdl5zPqVRxWD7RrxLZ555T7LR+/LilWe8VniOjR8XFFS5dx0crq9TYPB3Vqjjr/FKt6
-         m5yoHqsjaiL0P88rr2S+trr9kSPF27aU3WLkV3KO7ZaqMtA9+KCYemzFNkcq5asXLpxR
-         u8NyXBry4GaCN17EKzslng2qM5wjDCijclUGEt/ls+hypNt3IKQbLdzFOX1RYGEAUdzA
-         JdpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769164971; x=1769769771;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/cJzMSeJBm/TCcIoSkUUB8qr/tXilSOEhL8O9TYXtqM=;
-        b=ok6Cy2bKn5g8pv3v7kcSgRIUE+I90rT1bqawrQM+jodLzyNfUaVJZcrICTBpn4RvpA
-         Tq4HzkF7gqmltZklvqrSz9zxg10H61+QAXuYDiWG9g6z/lwm5zj3kXRWp0DUh9Jhpz8R
-         U7Lp9ZFH761lzAB6DGwG7T/pTO+2aVl2EcXBl6tJvUdHDmP/QPlZKKp81ctPp3MyqoZJ
-         /E2lqsyWKscCIOJe262fhg4tNdemucZ+EFBvcIcnwZ1f0FAKvnBMb3LxwNP/65AwEL/a
-         R/7fXUIdyBC9/hiDtOdgCUqq4lWXKohFen3oVS8i6m4FFzNK9WlYdPlJzkkHMnBqHIKp
-         eMzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWxUcdKv2rBuNr6rlenuGzrRe43mh+Y1a8anrGtVRXjoJUNPhKYqYDgdIFHAuLPd4/HooVR9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz2TyBSI0HrTPfERTz37uOc7ji9JPfkyK7eXNa/wRJ0kAvZADC
-	8Nbsea2gGDZgTynkbNkwicpbOgNg6XxHKQuMIqwJolsisVWFj7prc7jV
-X-Gm-Gg: AZuq6aLVxLMK28oan6hqjsyplsBiCtcLkFfm74CAut+jB+enn37EL0cpzZozHhTj+mC
-	U404MkUIwnGYtcGRvDtyloZvWtp5+CgEvAekmhp2FQcP2cE4VlA1haIlCBAaczkLLpS74ZSkQ92
-	6TIS3m+jGf5wg9MtOuHl8Unjd5l7W5l96OrU5EQxNTdU61J1FNRYXsqNhb39277wzZVo6tNL5Bt
-	FTz3u/OojKRNGUC5KrJvQUjyeOmG4ef0OGjdJ3S4Wiq6sSghnLEGDBXrHQDNd/dKjp3u+mYoPv9
-	PntbtzNSISFl3g6waMdd+W8gWm7B10h+v3jmffs6zmgjrOUiRfs+fDsg/0H6CHHHJZ7hrIJYW+i
-	CQnvsKWx/iCQBXQeDmkXmYyjjB51V23NdcB9I7d7dO3TZt4ZAR/VnGoiMPy19ZQ7PNJg4c7FxJK
-	iP/Hy3UGdppXwXbg==
-X-Received: by 2002:a05:6a21:1507:b0:354:dcc0:8c0f with SMTP id adf61e73a8af0-38e6266c26bmr5654764637.12.1769164971008;
-        Fri, 23 Jan 2026 02:42:51 -0800 (PST)
-Received: from [192.168.1.131] ([172.92.174.155])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c635a141fc4sm1743148a12.8.2026.01.23.02.42.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jan 2026 02:42:50 -0800 (PST)
-Message-ID: <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
-Date: Fri, 23 Jan 2026 02:47:18 -0800
+	s=arc-20240116; t=1769165281; c=relaxed/simple;
+	bh=VuCbbT2xk7dTc5ffPUZcubuxjoKkLoMCLsgt9W8rbTE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CvBKO75e7EqdCHCcDVfIb70UNT37+3htSP5sEG9hFjd/AYjFcyrbS9+/soygj0nOZexIboQV8B7mlh03bFyUDtaokOMDTGCkfLKBMk+S/2l//CzpkDRxuvywhRVQlEFH6SUKl6drMZnfSaNhuuejuEiBZ0oHwUzaKwSgzqCnvJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BqEUIBfQ; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60N9Chsd633099;
+	Fri, 23 Jan 2026 02:47:37 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=uBhbbYKkl8R7lD7U35Naqhj
+	zf+zsqgR836urkk92zOg=; b=BqEUIBfQY3TLSBCcFro3t+7bDitgUB0UPhTV45b
+	mZRZz+LsAvJoveD5+oacO0aVUBxIxVk0zV6oGOJXybMk2vh4Mquh6GR59EkM2t9w
+	P10r+Fg48wEpEFrnYT7zR0i7CjFPG95FFpiQlAfLyaCLieLBkm2vS9cxCtWorPaw
+	1SKIqFB6vQ+MPmr/5+97a1qMNNWhwBdIcLx+i5cjKCOhha2rjVsRjtH3nNt2KLan
+	b/MGIqXN2tZ5rEQ1Gqjjz/ArToTYALmS6ZZKPsR66VBvcmI9DjRRNH3s4oseFlA8
+	cM6QDWzuIdH/VqIk76iQBFPWEctfW1+ZxI4igS1QM6/grTg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bv65504e0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Jan 2026 02:47:37 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 23 Jan 2026 02:47:36 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 23 Jan 2026 02:47:36 -0800
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id 987AD5B6964;
+	Fri, 23 Jan 2026 02:47:32 -0800 (PST)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>
+Subject: [net-next PatchV4 0/2] Octeontx2-pf: Add support for DMAC_FILTER trap
+Date: Fri, 23 Jan 2026 16:17:29 +0530
+Message-ID: <20260123104731.2710019-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
- control
-To: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- rmk+kernel@armlinux.org.uk, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ningyu@eswincomputing.com, linmin@eswincomputing.com,
- pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
- <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
- <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
- <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
- <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
- <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
- <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
-Content-Language: en-US
-From: Bo Gan <ganboing@gmail.com>
-In-Reply-To: <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIzMDA4NyBTYWx0ZWRfX/jToeZbs9/jM
+ N15zwWQPszheO+4hz8UqiLcG9XMEwXcxZAm/A1C8Ke8Ypk6CE2O27NuW8lQHjAgaFFta984nwjk
+ fMHxAwxz5bb3DUQXzNM6gBLpHTjQLyuL9JXLdcRg8W3YAeV5bP8QUC3+7/bjd+C3V0G5/7d7olA
+ CqWv5ul+jBWzaqmOxnJXzgSVUBzY1u0KbulTAFGeSyUbmR7Ta68YGqVgas/z/g4xlEpYD+kp7F9
+ A0OUtj2htYtOTWS/VN6/+2gMww7qvB9IGMdzG8EnTMawiR5iOIObkt8U8vwKDsfAkS60HLKYQdi
+ 5jQpWOAXJeEzbcVDfLaCtN5ziOnVyMYeG9p24dSqwK7ZBLUz+pvZbXw7VgoCtUhqVW3daw/CiPb
+ 7qbIiBm8199xxkl6/zkp+3UEWW9vC8azFq2PkPdV9AHsKPYb5buCHByOnX1LJtIRVlZhEvYw0T3
+ pQcWut5s6CFbD5FmHwA==
+X-Authority-Analysis: v=2.4 cv=EJILElZC c=1 sm=1 tr=0 ts=697351c9 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yfvZBKtj2kfplXi_T7QA:9
+X-Proofpoint-GUID: og_fLU_UeB2EZTuOmJOHsTj0FUwIvrsx
+X-Proofpoint-ORIG-GUID: og_fLU_UeB2EZTuOmJOHsTj0FUwIvrsx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-23_01,2026-01-22_02,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252782-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	FROM_NEQ_ENVFROM(0.00)[hkelam@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252783-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ganboing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C5207491F
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:mid,marvell.com:dkim];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 2BEA1748FD
 X-Rspamd-Action: no action
 
-Hi Krzysztof,
+Octeontx2/CN10K silicon MAC blocks CGX/RPM supports DMAC filters.
+These patches add devlink trap support for this functionality.
 
-On 1/23/26 02:07, Krzysztof Kozlowski wrote:
-> On 23/01/2026 08:39, Bo Gan wrote:
->>> I assume the address of the interface is fixed. So you can just key
->>> off that to distinguish the two instances.
->>>
->>> Since this is an internal property, not a board property, it is not
->>> clear it actually belongs on DT.
->>>
->>>       Andrew
->>
->> IMO, they should be in DT to provide maximum flexibility. The SoC .dtsi
-> 
-> This is not the purpose of DT. Please rather use arguments in terms of
-> DT rules (see docs, presentations).
-> 
-Any examples? links? Thank you for your patience.
+Patch 1: Introduces mailbox handlers to retrieve the DMAC filter 
+         drop counter.
+ 
+Patch 2: Adds driver callbacks to support devlink traps.
 
-I'd say if the board .dts never overrides the eswin,rx-clk-invert, (E.g.,
-the SoC .dtsi has rx-clk-invert, later the board /delete-property/'s it)
-then yes, it can be treated as something inherent to the mac, and then
-"use arguments in terms of DT rules". I was thinking about use cases like:
-https://lore.kernel.org/all/20230714104521.18751-3-samin.guo@starfivetech.com/
+Hariprasad Kelam (2):
+  octeontx2-af: Mailbox handlers to fetch DMAC filter drop counter
+  Octeontx2-pf: Add support for DMAC_FILTER trap
+----
+V4 * Address AI review comments 
 
-> We really do not care about maximum flexibility.
-> 
-> Best regards,
-> Krzysztof
+V3 * Address review comments suggested by Claude Code
 
-Bo
+V2 * fix warnings reported by kernel test robot
+
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   |  11 ++
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |   2 +
+ .../marvell/octeontx2/af/lmac_common.h        |   1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   7 +
+ .../net/ethernet/marvell/octeontx2/af/rpm.c   |  18 +-
+ .../net/ethernet/marvell/octeontx2/af/rpm.h   |   2 +
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   |  23 +++
+ .../marvell/octeontx2/nic/otx2_devlink.c      | 167 ++++++++++++++++++
+ .../marvell/octeontx2/nic/otx2_devlink.h      |  23 ++-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   7 +
+ 10 files changed, 259 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
 
