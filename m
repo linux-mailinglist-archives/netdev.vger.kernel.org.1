@@ -1,426 +1,277 @@
-Return-Path: <netdev+bounces-252646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBGuBjYac2mwsAAAu9opvQ
-	(envelope-from <netdev+bounces-252646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:50:30 +0100
+	id QCdLFiwbc2mwsAAAu9opvQ
+	(envelope-from <netdev+bounces-252648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:54:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618A871262
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:50:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A401B713B3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:54:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08EA33009517
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 06:50:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6984F302DA33
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 06:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297B2306B0A;
-	Fri, 23 Jan 2026 06:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AADD33290B;
+	Fri, 23 Jan 2026 06:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2u1kd+Q"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jbPqBNTX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE2F27874F
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 06:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC6333890A;
+	Fri, 23 Jan 2026 06:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769151027; cv=none; b=Nsw1M6+RkLVkyWDaZyaVsg3lMnd9bQMciwwRhIxv37uEcPXJyWq4H1rJbjK/O5TW3VXuO4r2TWH4j1ZXK6618UpCXfOkvE8L6d0hYc46cxoocV8ThiS9X1ihSSZwUzPv26MnWqAU58/Bp9ft1A/1zo7ECtVDNaYDqrFRNrCKonI=
+	t=1769151199; cv=none; b=J9hfe5DVUeU0VpZNLde0VaP1XJG5E/gG3GkzlE0/gST0YUUiv6grRlXSaFJfIsbQW8B2C8nN9jQgrSPTN4C0lHG8plG0ivsQtPGKwBiDmnHsdTIIC6tN2DEpLQm3FptQzUTwyH++smb9aCRgDv3KeeHzwi/4Qu7DT0afl+6YaIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769151027; c=relaxed/simple;
-	bh=Cjq501TqzlpFBUsSmvLVd6/SvO21X7q3Hg3RhKecv6Y=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=e57GRAYKbFuC8bvsla5sNtCuvuLsqYKWfF8Cka0gc2FGpvLaNYBy1orjW6BNopUn1v3y9g/Fi2pJg3HFRxvIiyKn4toaIwCXV96nIZ8ck1IHO6sGN1oDHxmrvVsZsIEP+QdIbFzC6xQNCATRtWl3VO9RcV17D1JLYzqetQqfNoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C2u1kd+Q; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso18083555e9.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 22:50:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769151023; x=1769755823; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6spVyNehIjk6wRL49yQ2CMhgFp4/M9ZJ4dRKB7aua58=;
-        b=C2u1kd+Qs/5mkFSeEZpwIGV8MH1YjdIIZcYYhw8r80fqwqLt29OILRaP81M7N/JmZi
-         tr1DfqdfRS6oc2PxhukGyLinwBpg8qLXoZne/7gp0RO4/po6mFXf2eSI7H6WjLoUXlCo
-         P1wOL43Z/qP0dKf6yZaFkgO5lyT+jTRq2qjMpEwO/2/vhATXaZdnVFrfFCzsQoXOdo9s
-         pOlI17hsI5ld2wMqGylnK1ILfyBYsDhqLU7g4hSyOJc8D3YQBETWoDlcIAa6w/R1fDLE
-         4sbtWlnIaT4+Qj2WJ0irgfU30u2nKixcVNsWOjn0VTcP98cLgZ35LVNxJlYWQu5jJvSq
-         JREg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769151023; x=1769755823;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6spVyNehIjk6wRL49yQ2CMhgFp4/M9ZJ4dRKB7aua58=;
-        b=YmysPtKSz15k3Vqc6I2Yhi0N5/+5lNHXFYxb/glsrQBVryQzhlY0ggrObPYOrPIgux
-         T+/sLpjUvPZFmP3I1Z4/P7cX9a9Gk7pKhRKDGccGX8vrrjth1m70fsBrIkh3YYBNKuHf
-         NTeMjYywe0Z33U1S0n5r8dazjOuN3VzW5E499xy5VbpjtMdQxiVnx008agZQwHIQ20Dj
-         xgwwwENX3+QL2HTRZ222Sjl3C7xKYawxIrf4WDJfXJ5wpqA5StO9ohuKUpvhOLK28Lzx
-         A86UxUe+uBXX9HyGrHsn3rphqINOAytfegE+MM8zLkNkSVOedX+hRN9UMZ/S40xgeV5j
-         L0pQ==
-X-Gm-Message-State: AOJu0YymspeqM/cFmGo+wNw49Kf393e7ZcFIS7QOVXEWCeLWVkuNIWrU
-	SpMrC3lTJO3z7+1SvN5qUNIdnTok8L8fNaQbPNG3pobUlgdxSdof0fr9
-X-Gm-Gg: AZuq6aIAvH4Hih0r98bAUA1c5EfHA9r9vaTxTn7phcRW7NQrUm+YFCOVwmFOd9ZhKXl
-	9ucFrQ0ZPYDh0wDIGiYq4L1QotfdTM6z4Fe2Hl71ih7To46cyDf7V8/J9L69kaBx38FBL6UMF96
-	m6lDDnSynRVxhRE3t061BzPzQm67PFYYkJFXEofibyBubu1dltE1okQb/OsOZIJgI1Cpt1sWhMS
-	HiXBH90/M96EJ5CntsFz1+dZMK1KGkfcVQ6Oq7W+2czUDxtD2hbXlaVokXVFv2wzWxNAfqocvx0
-	GZ93OragsOPGFYookBLDLnNmWKW9Mo0UJx2Gwg7eGgMlc8HMMcMzEmmHAsVCIde+88L8IlWgiqb
-	5+47O+HnZpcOsZIdGLYBIQkN9aXpc9Iz+xmVFqj0TJKzGMbSOo95v3DyDmkxE4mdNcx1Rp/U/YU
-	Fmu9BL8mujqmxgw3auCGvtdNuWatIHv22cxO5CI1VoGnnu8DfUVuPmAm1tbkKvdZoB8UsDefEcf
-	ydE+h6f0L1rgMIgJYyPmvJ4qkDb6bZwpmqEtXXdz3INOoNvibSxRA==
-X-Received: by 2002:a05:600c:3f0f:b0:477:73e9:dbe7 with SMTP id 5b1f17b1804b1-480512676fcmr5302075e9.35.1769151023314;
-        Thu, 22 Jan 2026 22:50:23 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f45:2d00:e509:e5ce:fa2e:3b01? (p200300ea8f452d00e509e5cefa2e3b01.dip0.t-ipconnect.de. [2003:ea:8f45:2d00:e509:e5ce:fa2e:3b01])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-480470bfe88sm110331655e9.11.2026.01.22.22.50.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jan 2026 22:50:22 -0800 (PST)
-Message-ID: <800595c6-496a-443e-92e3-37251195e610@gmail.com>
-Date: Fri, 23 Jan 2026 07:50:20 +0100
+	s=arc-20240116; t=1769151199; c=relaxed/simple;
+	bh=ZFzmWzjoLThr4+DzN7YmOV0Iu/cb4VMHplNefYT/PQo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BwsMp4m9VmWscg7eABvAJVqJF0nD3C6IEI4XwYRBC9AtRq68iBiF96lCP/NW9M1vAKcKMz3RuvekG6WTUvdiy8EzSdTTa5Bd40hnMM0RTJFJRunre2pBxpMO1HZUtdSEkQXth0ogT07LUtXAjClwUiZ5BDXM1VmLZ10pqC7WaKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jbPqBNTX; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60MNSVQV3718392;
+	Thu, 22 Jan 2026 22:53:06 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=7EzWX+JfsswAs6Xk/XQa2dq
+	cvDBLl72m3sadmR3GyPw=; b=jbPqBNTXFJgZvhsi5ZAFVCuU0AAaVb6yotOBYlC
+	NSe+fuqS16HIJY8l1VSjzUQiZR3hS/3Po79hD8GN7x/EWRPsOSTkmr7Ux4eAdgH2
+	TjmVdDixTv17Ki6zoAyKblzJWMZEqYiw/Vu0JrbXSsUh/pB+tOv7HNICmgyQIkfu
+	cGD6MSaJjjQF9EoSAfm80+NllYDLIKovycVKXpMfYhWeh5f+cr0vbNHkaty6rPk0
+	m03PQG0vvMMvu8mkKE5D4Oom4dGiCv5D06JqC7Kxvc7vNdXS1m9+JFyNgTp7JTSq
+	/3JiYiNm57uZNL9AJiXWvOt0qIChye59NE5j1S918KBiHPA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4buwkh8pn4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jan 2026 22:53:06 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 22 Jan 2026 22:53:21 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 22 Jan 2026 22:53:21 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 11CE85B695F;
+	Thu, 22 Jan 2026 22:53:01 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        "Saeed
+ Mahameed" <saeedm@nvidia.com>,
+        Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH net-next] devlink: Implement devlink param multi attribute nested data values
+Date: Fri, 23 Jan 2026 12:22:57 +0530
+Message-ID: <20260123065257.2993735-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: make PHY fixup support always built-in
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=F7dat6hN c=1 sm=1 tr=0 ts=69731ad2 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Ikd4Dj_1AAAA:8 a=M5GUcnROAAAA:8
+ a=cytzpGnjpnkeWZElj0gA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: DvObko-hmIbQOroWns7dMnfwMfuGc1Eh
+X-Proofpoint-ORIG-GUID: DvObko-hmIbQOroWns7dMnfwMfuGc1Eh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIzMDA1MSBTYWx0ZWRfX3n9yHmQSrFim
+ sHX4kecmCAsi85BaoqB53aPePNTl+sDa8xjP6yKwMUQ+vcROeJwI2qJ7K0/oUwfb909lykgr5Vv
+ doc6AZTnz9aRYfZkwdGs7Co6ITB9pjQOjySQCKC30ZzQu55XkXAMTyOYw7Ni+bBNrsh7Gh3UKsu
+ 0WMI7UZyZDiXrX5UoKmnA4G3RQdv1BKu/O2t8MByPI7CDNBcKGmcU4d6qzquoxMELCDNavinNav
+ BuCjU3nq+xIOmQB+Pr+UQXzCaHYpQA4yxHPb0rrFFhHW8oAG+8dgk/iNdbY0DoV6VJ2DOthwNno
+ ZoKetbAzqI8pw+8dSjR/5pWpQCHV5ZA4G/LOyURcSB0vVzZYoOGTcn78UeaC0W5tnoBvyxpucCj
+ xXqsf9CY4PkJVRQxzULeooMSNlbclQ77n2PBiucMFbtQIicuLSrmyBp6qvyYOKGBVxtbC/c3hkh
+ hVu0+dGSOTniSsz0Stw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-22_06,2026-01-22_02,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252646-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-252648-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 618A871262
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: A401B713B3
 X-Rspamd-Action: no action
 
-PHY fixup registration is used from platform code in init phase only.
-Let's move the PHY fixup code from the modular part of phylib to the
-always built-in part of phylib. This allows to annotate the fixup
-registration as __init.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-phy_needs_fixup() and phy_scan_fixups() wouldn't have to be moved to
-the built-in part of phylib. But doing so allows to fully factor out
-fixup support into its own source code file, and make struct
-phy_fixup and phy_fixup_list strictly private to phy_fixup.c.
+Devlink param value attribute is not defined since devlink is handling
+the value validating and parsing internally, this allows us to implement
+multi attribute values without breaking any policies.
 
-phy_scan_fixups() is used after init phase only, then phy_fixup_list
-is read-only. So we don't need the mutex when accessing the list.
-Also when registering PHY fixups the mutex isn't needed, because
-fixup registration is done sequentially from platform init code.
-Actually there is only one platform with more than one fixup.
+Devlink param multi-attribute values are considered to be dynamically
+sized arrays of u32 values, by introducing a new devlink param type
+DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
+count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Implement get/set parsing and add to the internal value structure passed
+to drivers.
+
+This is useful for devices that need to configure a list of values for
+a specific configuration.
+
+example:
+$ devlink dev param show pci/... name multi-value-param
+name multi-value-param type driver-specific
+values:
+cmode permanent value: 0,1,2,3,4,5,6,7
+
+$ devlink dev param set pci/... name multi-value-param \
+		value 4,5,6,7,0,1,2,3 cmode permanent
+
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- drivers/net/phy/Makefile          |   2 +-
- drivers/net/phy/phy_device.c      |  90 --------------------------
- drivers/net/phy/phy_fixup.c       | 101 ++++++++++++++++++++++++++++++
- drivers/net/phy/phylib-internal.h |   1 +
- include/linux/phy.h               |   8 +--
- 5 files changed, 107 insertions(+), 95 deletions(-)
- create mode 100644 drivers/net/phy/phy_fixup.c
+ Documentation/netlink/specs/devlink.yaml |  4 ++++
+ include/net/devlink.h                    |  8 ++++++++
+ include/uapi/linux/devlink.h             |  1 +
+ net/devlink/netlink_gen.c                |  2 ++
+ net/devlink/param.c                      | 18 +++++++++++++++++-
+ 5 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 3a34917adea..52bbb441e87 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -8,7 +8,7 @@ mdio-bus-y			+= mdio_bus.o mdio_device.o
- 
- ifdef CONFIG_PHYLIB
- # built-in whenever PHYLIB is built-in or module
--obj-y				+= stubs.o
-+obj-y				+= stubs.o phy_fixup.o
- endif
- 
- libphy-$(CONFIG_SWPHY)		+= swphy.o
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index f624218bf36..7dd73a11f86 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -49,14 +49,6 @@ MODULE_DESCRIPTION("PHY library");
- MODULE_AUTHOR("Andy Fleming");
- MODULE_LICENSE("GPL");
- 
--struct phy_fixup {
--	struct list_head list;
--	char bus_id[MII_BUS_ID_SIZE + 3];
--	u32 phy_uid;
--	u32 phy_uid_mask;
--	int (*run)(struct phy_device *phydev);
--};
--
- static struct phy_driver genphy_c45_driver = {
- 	.phy_id         = 0xffffffff,
- 	.phy_id_mask    = 0xffffffff,
-@@ -237,9 +229,6 @@ static void phy_mdio_device_remove(struct mdio_device *mdiodev)
- 
- static struct phy_driver genphy_driver;
- 
--static LIST_HEAD(phy_fixup_list);
--static DEFINE_MUTEX(phy_fixup_lock);
--
- static bool phy_drv_wol_enabled(struct phy_device *phydev)
- {
- 	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
-@@ -427,85 +416,6 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
- static SIMPLE_DEV_PM_OPS(mdio_bus_phy_pm_ops, mdio_bus_phy_suspend,
- 			 mdio_bus_phy_resume);
- 
--/**
-- * phy_register_fixup - creates a new phy_fixup and adds it to the list
-- * @bus_id: A string which matches phydev->mdio.dev.bus_id (or NULL)
-- * @phy_uid: Used to match against phydev->phy_id (the UID of the PHY)
-- * @phy_uid_mask: Applied to phydev->phy_id and fixup->phy_uid before
-- *	comparison (or 0 to disable id-based matching)
-- * @run: The actual code to be run when a matching PHY is found
-- */
--static int phy_register_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask,
--			      int (*run)(struct phy_device *))
--{
--	struct phy_fixup *fixup = kzalloc(sizeof(*fixup), GFP_KERNEL);
--
--	if (!fixup)
--		return -ENOMEM;
--
--	if (bus_id)
--		strscpy(fixup->bus_id, bus_id, sizeof(fixup->bus_id));
--	fixup->phy_uid = phy_uid;
--	fixup->phy_uid_mask = phy_uid_mask;
--	fixup->run = run;
--
--	mutex_lock(&phy_fixup_lock);
--	list_add_tail(&fixup->list, &phy_fixup_list);
--	mutex_unlock(&phy_fixup_lock);
--
--	return 0;
--}
--
--/* Registers a fixup to be run on any PHY with the UID in phy_uid */
--int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
--			       int (*run)(struct phy_device *))
--{
--	return phy_register_fixup(NULL, phy_uid, phy_uid_mask, run);
--}
--EXPORT_SYMBOL(phy_register_fixup_for_uid);
--
--/* Registers a fixup to be run on the PHY with id string bus_id */
--int phy_register_fixup_for_id(const char *bus_id,
--			      int (*run)(struct phy_device *))
--{
--	return phy_register_fixup(bus_id, 0, 0, run);
--}
--EXPORT_SYMBOL(phy_register_fixup_for_id);
--
--static bool phy_needs_fixup(struct phy_device *phydev, struct phy_fixup *fixup)
--{
--	if (!strcmp(fixup->bus_id, phydev_name(phydev)))
--		return true;
--
--	if (fixup->phy_uid_mask &&
--	    phy_id_compare(phydev->phy_id, fixup->phy_uid, fixup->phy_uid_mask))
--		return true;
--
--	return false;
--}
--
--/* Runs any matching fixups for this phydev */
--static int phy_scan_fixups(struct phy_device *phydev)
--{
--	struct phy_fixup *fixup;
--
--	mutex_lock(&phy_fixup_lock);
--	list_for_each_entry(fixup, &phy_fixup_list, list) {
--		if (phy_needs_fixup(phydev, fixup)) {
--			int err = fixup->run(phydev);
--
--			if (err < 0) {
--				mutex_unlock(&phy_fixup_lock);
--				return err;
--			}
--			phydev->has_fixups = true;
--		}
--	}
--	mutex_unlock(&phy_fixup_lock);
--
--	return 0;
--}
--
- /**
-  * genphy_match_phy_device - match a PHY device with a PHY driver
-  * @phydev: target phy_device struct
-diff --git a/drivers/net/phy/phy_fixup.c b/drivers/net/phy/phy_fixup.c
-new file mode 100644
-index 00000000000..ace78512686
---- /dev/null
-+++ b/drivers/net/phy/phy_fixup.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * PHY fixup support
-+ */
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 837112da6738..e8a8287c4f19 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -226,6 +226,10 @@ definitions:
+         value: 10
+       -
+         name: binary
++      -
++        name: u32-array
++        value: 129
 +
-+#include <linux/list.h>
-+#include <linux/phy.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+
-+#include "phylib-internal.h"
-+
-+static struct list_head phy_fixup_list __ro_after_init =
-+	LIST_HEAD_INIT(phy_fixup_list);
-+
-+struct phy_fixup {
-+	struct list_head list;
-+	char bus_id[MII_BUS_ID_SIZE + 3];
-+	u32 phy_uid;
-+	u32 phy_uid_mask;
-+	int (*run)(struct phy_device *phydev);
+   -
+     name: rate-tc-index-max
+     type: const
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index cb839e0435a1..0a496715da99 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -432,6 +432,13 @@ enum devlink_param_type {
+ 	DEVLINK_PARAM_TYPE_U64 = DEVLINK_VAR_ATTR_TYPE_U64,
+ 	DEVLINK_PARAM_TYPE_STRING = DEVLINK_VAR_ATTR_TYPE_STRING,
+ 	DEVLINK_PARAM_TYPE_BOOL = DEVLINK_VAR_ATTR_TYPE_FLAG,
++	DEVLINK_PARAM_TYPE_U32_ARRAY = DEVLINK_VAR_ATTR_TYPE_U32_ARRAY,
 +};
 +
-+/**
-+ * phy_register_fixup - creates a new phy_fixup and adds it to the list
-+ * @bus_id: A string which matches phydev->mdio.dev.bus_id (or PHY_ANY_ID)
-+ * @phy_uid: Used to match against phydev->phy_id (the UID of the PHY)
-+ *	It can also be PHY_ANY_UID
-+ * @phy_uid_mask: Applied to phydev->phy_id and fixup->phy_uid before
-+ *	comparison
-+ * @run: The actual code to be run when a matching PHY is found
-+ */
-+static int __init phy_register_fixup(const char *bus_id, u32 phy_uid,
-+				     u32 phy_uid_mask,
-+				     int (*run)(struct phy_device *))
-+{
-+	struct phy_fixup *fixup = kzalloc(sizeof(*fixup), GFP_KERNEL);
-+
-+	if (!fixup)
-+		return -ENOMEM;
-+
-+	if (bus_id)
-+		strscpy(fixup->bus_id, bus_id, sizeof(fixup->bus_id));
-+	fixup->phy_uid = phy_uid;
-+	fixup->phy_uid_mask = phy_uid_mask;
-+	fixup->run = run;
-+
-+	list_add_tail(&fixup->list, &phy_fixup_list);
-+
-+	return 0;
-+}
-+
-+/* Registers a fixup to be run on any PHY with the UID in phy_uid */
-+int __init phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
-+				      int (*run)(struct phy_device *))
-+{
-+	return phy_register_fixup(NULL, phy_uid, phy_uid_mask, run);
-+}
-+
-+/* Registers a fixup to be run on the PHY with id string bus_id */
-+int __init phy_register_fixup_for_id(const char *bus_id,
-+				     int (*run)(struct phy_device *))
-+{
-+	return phy_register_fixup(bus_id, 0, 0, run);
-+}
-+
-+static bool phy_needs_fixup(struct phy_device *phydev, struct phy_fixup *fixup)
-+{
-+	if (!strcmp(fixup->bus_id, phydev_name(phydev)))
-+		return true;
-+
-+	if (fixup->phy_uid_mask &&
-+	    phy_id_compare(phydev->phy_id, fixup->phy_uid, fixup->phy_uid_mask))
-+		return true;
-+
-+	return false;
-+}
-+
-+/**
-+ * phy_scan_fixups - runs any matching fixups for this phydev
-+ * @phydev: the phydev to search and run fixups for
-+ * Returns: 0 or an errno
-+ */
-+int phy_scan_fixups(struct phy_device *phydev)
-+{
-+	struct phy_fixup *fixup;
-+
-+	list_for_each_entry(fixup, &phy_fixup_list, list) {
-+		if (phy_needs_fixup(phydev, fixup)) {
-+			int err = fixup->run(phydev);
-+
-+			if (err < 0)
-+				return err;
-+
-+			phydev->has_fixups = true;
-+		}
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(phy_scan_fixups);
-diff --git a/drivers/net/phy/phylib-internal.h b/drivers/net/phy/phylib-internal.h
-index dc9592c6bb8..ca3794ffe04 100644
---- a/drivers/net/phy/phylib-internal.h
-+++ b/drivers/net/phy/phylib-internal.h
-@@ -19,6 +19,7 @@ void of_set_phy_eee_broken(struct phy_device *phydev);
- void of_set_phy_timing_role(struct phy_device *phydev);
- int phy_speed_down_core(struct phy_device *phydev);
- void phy_check_downshift(struct phy_device *phydev);
-+int phy_scan_fixups(struct phy_device *phydev);
++#define __DEVLINK_PARAM_MAX_ARRAY_SIZE 32
++struct devlink_param_u32_array {
++	u32 size;
++	u32 val[__DEVLINK_PARAM_MAX_ARRAY_SIZE];
+ };
  
- int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv);
+ union devlink_param_value {
+@@ -441,6 +448,7 @@ union devlink_param_value {
+ 	u64 vu64;
+ 	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
+ 	bool vbool;
++	struct devlink_param_u32_array u32arr;
+ };
  
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 5972f19af16..ec09159e546 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2400,10 +2400,10 @@ int phy_get_mac_termination(struct phy_device *phydev, struct device *dev,
- void phy_resolve_pause(unsigned long *local_adv, unsigned long *partner_adv,
- 		       bool *tx_pause, bool *rx_pause);
+ struct devlink_param_gset_ctx {
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index e7d6b6d13470..768d0d88710f 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -404,6 +404,7 @@ enum devlink_var_attr_type {
+ 	DEVLINK_VAR_ATTR_TYPE_BINARY,
+ 	__DEVLINK_VAR_ATTR_TYPE_CUSTOM_BASE = 0x80,
+ 	/* Any possible custom types, unrelated to NLA_* values go below */
++	DEVLINK_VAR_ATTR_TYPE_U32_ARRAY,
+ };
  
--int phy_register_fixup_for_id(const char *bus_id,
--			      int (*run)(struct phy_device *));
--int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
--			       int (*run)(struct phy_device *));
-+int __init phy_register_fixup_for_id(const char *bus_id,
-+				     int (*run)(struct phy_device *));
-+int __init phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
-+				      int (*run)(struct phy_device *));
+ enum devlink_attr {
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index f4c61c2b4f22..e5a80eb467b8 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -32,6 +32,8 @@ devlink_attr_param_type_validate(const struct nlattr *attr,
+ 	case DEVLINK_VAR_ATTR_TYPE_NUL_STRING:
+ 		fallthrough;
+ 	case DEVLINK_VAR_ATTR_TYPE_BINARY:
++		fallthrough;
++	case DEVLINK_VAR_ATTR_TYPE_U32_ARRAY:
+ 		return 0;
+ 	}
+ 	NL_SET_ERR_MSG_ATTR(extack, attr, "invalid enum value");
+diff --git a/net/devlink/param.c b/net/devlink/param.c
+index e0ea93eded43..2d0ef13b562f 100644
+--- a/net/devlink/param.c
++++ b/net/devlink/param.c
+@@ -252,6 +252,11 @@ devlink_nl_param_value_put(struct sk_buff *msg, enum devlink_param_type type,
+ 				return -EMSGSIZE;
+ 		}
+ 		break;
++	case DEVLINK_PARAM_TYPE_U32_ARRAY:
++		for (int i = 0; i < val.u32arr.size; i++)
++			if (nla_put_u32(msg, nla_type, val.u32arr.val[i]))
++				return -EMSGSIZE;
++		break;
+ 	}
+ 	return 0;
+ }
+@@ -507,7 +512,7 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
+ 				  union devlink_param_value *value)
+ {
+ 	struct nlattr *param_data;
+-	int len;
++	int len, cnt, rem;
  
- int phy_eee_tx_clock_stop_capable(struct phy_device *phydev);
- int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
+ 	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
+ 
+@@ -547,6 +552,17 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
+ 			return -EINVAL;
+ 		value->vbool = nla_get_flag(param_data);
+ 		break;
++
++	case DEVLINK_PARAM_TYPE_U32_ARRAY:
++		cnt = 0;
++		nla_for_each_attr_type(param_data,
++				       DEVLINK_ATTR_PARAM_VALUE_DATA,
++				       genlmsg_data(info->genlhdr),
++				       genlmsg_len(info->genlhdr), rem)
++			value->u32arr.val[cnt++] = nla_get_u32(param_data);
++
++		value->u32arr.size = cnt;
++		break;
+ 	}
+ 	return 0;
+ }
 -- 
-2.52.0
+2.43.0
 
 
