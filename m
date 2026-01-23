@@ -1,235 +1,220 @@
-Return-Path: <netdev+bounces-252721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252724-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHIIAvc9c2kztgAAu9opvQ
-	(envelope-from <netdev+bounces-252721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:23:03 +0100
+	id sD3LGZo9c2kztgAAu9opvQ
+	(envelope-from <netdev+bounces-252724-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:21:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901597333D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:23:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B374732B4
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46933301495B
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:19:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D6D8830080AB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66775330657;
-	Fri, 23 Jan 2026 09:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2786D32B9A6;
+	Fri, 23 Jan 2026 09:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CobmJcP0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jlm/mnyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE9E23D28C;
-	Fri, 23 Jan 2026 09:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F6E3164D3
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769159949; cv=none; b=HS9SzE6r+ywlAk4xnvIhcWYosUw+1MfB0UQ5JYq/tnNnNthODfOu914zguMXwMlLBMwZZAeP0C7wFHqTDrNcIT9i5C6gxB/yBIQ0JoeLe5aamYXgQqCw3tylPBc0NjaijfaoI72lbkeGqV9aBRZ0hsoyj/pj6wSD9nB3t/DVX3U=
+	t=1769160084; cv=none; b=WtHyYVuh8vDrUD7s8KmwRNWOi2A3Ygsy/jFbYFZDtRtKENvyt2vym49qMUcK2MNgOt7SkQS465JBm4kR6c/ILxg3c45RV40TNXSG/oJKC1M6eSyQWXkQ2ffw8mD2QabmoXD3ZFoG75xcRN3FLoiX6TwCFnkEIFWaOTHFmJaEKa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769159949; c=relaxed/simple;
-	bh=H12UDh2LI6aLgmcHOsAxDY/SKGsGeNOCjHscsd4qfzU=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=D2qvkM7n4IPfuDNHSHSY7MZCCesAuSielA1toU3i4OAdt8iRS7vyl+N2fmGzXpFIgWR8cDjXDmjkrpLbiiKRzdU5Sg1DqN7FrNnoEPYv7D4eEbptas0kXUHjzLBd06Rydzrr4dcZHju+Btcwc84XFHnory67Bdx5aQa9EvSGEyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CobmJcP0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B6A4C4CEF1;
-	Fri, 23 Jan 2026 09:19:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769159948;
-	bh=H12UDh2LI6aLgmcHOsAxDY/SKGsGeNOCjHscsd4qfzU=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=CobmJcP0dYaI8MHKuRjINgU6o4ybjdtD/skBYy1WVINmCZGH/jgqb8ez7lXxcnnfL
-	 7b8wmFduH+OQHTuBY4MhX5RGK2quSii5I6twltTi2BT6pdkhtMzjTqHTjnSU3i5hoM
-	 Sbu5josCT9Tu7c7hqqpqLAUlwxNoOsvaDKGS2iW2EBUXLh+KbDok7zhwMhrKjQ/y4w
-	 YfnCEZji+S6hyOBYcFmCEdW9YwU0xujNVeeKEa7W90jUDNPf/p8otTwdTaBHZMlaV4
-	 986B1olKGrlwA6B94ODvJGxHRL1WDbV1VQJh5Kr6Vq92MbNIc0xuy28O4vXwAM5xK1
-	 DKG8ru1UP/gkA==
-Content-Type: multipart/mixed; boundary="===============3584986258708126564=="
+	s=arc-20240116; t=1769160084; c=relaxed/simple;
+	bh=/qBBaxWhukWs4qJg+J65MwAsyajsVQ45yyS5jCwBNIo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LzkWWHzG9xErgAstfgpK3rFf2ba6vKIlYtYs33C3ItBEzS5KMYl0I6Z5xD7pwjEvI7DgdjqckvF1JQmxogONDYCncT6PIsECIjIddjoEkAvMn9yQAi7bKluuiiqdwxVuuy2VFCcFoWYDfqDofSxpNHQ2ixyn3uR4Bl9uXZx7PNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jlm/mnyR; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769160079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ie5xJzmkxgG8lABACs468KKiagQngHba9qY5Hp3s314=;
+	b=jlm/mnyRCmcsgiGagpUpgQ4MBZmziSqt6uQfpWP8SmNqjWD3De58XH7O8A/zaaOci5pEQE
+	25DRGUR5DWUqw/xMMK+bynuy92kLBQ5l9cIXRrqHVS6X2B0+wRBMUgVIV0CSUekzYcDAx9
+	635MTGLq1jYF/120nlROHPmByeg7C2c=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
+Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
+ clm@meta.com, ihor.solodrai@linux.dev
+Subject:
+ Re: [PATCH bpf-next v11 02/12] bpf: use the least significant byte for the
+ nr_args in trampoline
+Date: Fri, 23 Jan 2026 17:21:06 +0800
+Message-ID: <8632406.T7Z3S40VBb@7940hx>
+In-Reply-To: <2250332.irdbgypaU6@7940hx>
+References:
+ <20260123073532.238985-3-dongml2@chinatelecom.cn>
+ <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
+ <2250332.irdbgypaU6@7940hx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <9ab6aaa78c0dcba8b563eab2807eccb0c24bd14fa02d7417cff4284204de7d2d@mail.kernel.org>
-In-Reply-To: <c44accaaaebfc32be13234f82b501a3852ba3f0f.1769157382.git.zhuhui@kylinos.cn>
-References: <c44accaaaebfc32be13234f82b501a3852ba3f0f.1769157382.git.zhuhui@kylinos.cn>
-Subject: Re: [RFC PATCH bpf-next v3 09/12] selftests/bpf: Add tests for memcg_bpf_ops
-From: bot+bpf-ci@kernel.org
-To: hui.zhu@linux.dev,akpm@linux-foundation.org,hannes@cmpxchg.org,mhocko@kernel.org,roman.gushchin@linux.dev,shakeel.butt@linux.dev,muchun.song@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,peterz@infradead.org,ojeda@kernel.org,nathan@kernel.org,kees@kernel.org,tj@kernel.org,jeffxu@chromium.org,mkoutny@suse.com,kernel@jfarr.cc,brauner@kernel.org,rdunlap@infradead.org,brgerst@gmail.com,masahiroy@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org,inwardvessel@gmail.com,willemb@google.com,kerneljasonxing@gmail.com,paul.chaignon@gmail.com,a.s.protopopov@gmail.com,ameryhung@gmail.com,chenridong@huaweicloud.com,lance.yang@linux.dev,jiayuan.chen@linux.dev,linux-kernel@vger.kernel.org,linux-mm@kvack.org,cgroups@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linu
- x-kselftest@vger.kernel.org
-Cc: zhuhui@kylinos.cn,geliang@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 23 Jan 2026 09:19:07 +0000 (UTC)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	CTE_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
-	TAGGED_FROM(0.00)[bounces-252721-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-252724-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kylinos.cn,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
-	FREEMAIL_TO(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	NEURAL_SPAM(0.00)[0.859];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCPT_COUNT_GT_50(0.00)[60];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.985];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
 	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 901597333D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B374732B4
 X-Rspamd-Action: no action
 
---===============3584986258708126564==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2026/1/23 16:29 Menglong Dong <menglong.dong@linux.dev> write:
+> On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
+> > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > > index 41bbed6418b5..b3f912ad18ba 100644
+> > > --- a/kernel/bpf/verifier.c
+> > > +++ b/kernel/bpf/verifier.c
+> > 
+> > [ ... ]
+> > 
+> > > @@ -23779,12 +23781,13 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+> > >  			    eatype == BPF_MODIFY_RETURN) {
+> > >  				/* Load nr_args from ctx - 8 */
+> > >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> > > -				insn_buf[1] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
+> > > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
+> > > +				insn_buf[2] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
+> > 
+> > [ ... ]
+> > 
+> > > -				cnt = 6;
+> > > +				cnt = 7;
+> > >  			} else {
+> > >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, -EOPNOTSUPP);
+> > >  				cnt = 1;
+> > >  			}
+> > >
+> > >  			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
+> > 
+> > [ ... ]
+> > 
+> > > 			delta    += cnt - 1;
+> > 
+> > Note that the bpf_get_func_ret block above correctly updates delta after
+> > patching.
+> > 
+> > > @@ -23808,12 +23811,15 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+> > >
+> > >  				/* skip 'void *__data' in btf_trace_##name() and save to reg0 */
+> > >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, nr_args - 1);
+> > > +				cnt = 1;
+> > >  			} else {
+> > >  				/* Load nr_args from ctx - 8 */
+> > >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> > > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
+> > > +				cnt = 2;
+> > >  			}
+> > >
+> > > -			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, 1);
+> > > +			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
+> > >  			if (!new_prog)
+> > >  				return -ENOMEM;
+> > >
+> > >  			env->prog = prog = new_prog;
+> > >  			insn      = new_prog->insnsi + i + delta;
+> > >  			goto next_insn;
+> > >  		}
+> > 
+> > Should there be a "delta += cnt - 1;" before assigning env->prog in this
+> > bpf_get_func_arg_cnt block? When cnt is 2 (non-RAW_TP path), the program
+> > grows by one instruction, but delta is not updated. This could cause
+> > subsequent bpf_patch_insn_data() calls to use incorrect offsets.
+> > 
+> > The bpf_get_func_arg block at the beginning of this patch has:
+> > 
+> >     delta    += cnt - 1;
+> >     env->prog = prog = new_prog;
+> > 
+> > And the bpf_get_func_ret block similarly has delta updated. But this
+> > bpf_get_func_arg_cnt block goes directly to env->prog assignment without
+> > updating delta.
+> 
+> Ah, good point, I think this is a valid problem. The selftests didn't cover
+> this case, and I think I'd better to use bpf_get_func_arg() and bpf_get_func_ret()
+> in the exit path of fsession to cover it.
 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
-> new file mode 100644
-> index 000000000000..9a8d16296f2d
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+Oh, the problem doesn't have much impact. The only impact
+is that the verifier will check the "r0 &= 0xFF" instruction redundantly.
 
-[ ... ]
+I'll see if there is more comment before I send next version.
 
-> +static void real_test_memcg_ops(int read_times)
-> +{
-> +	int ret;
-> +	char data_file1[] = "/tmp/test_data_XXXXXX";
-> +	char data_file2[] = "/tmp/test_data_XXXXXX";
-> +	char time_file1[] = "/tmp/test_time_XXXXXX";
-> +	char time_file2[] = "/tmp/test_time_XXXXXX";
-> +	pid_t pid1, pid2;
-> +	double time1, time2;
+Thanks!
+Menglong Dong
 
-[ ... ]
-
-> +	pid1 = fork();
-> +	if (!ASSERT_GE(pid1, 0, "fork"))
-> +		goto cleanup;
-> +	if (pid1 == 0)
-> +		real_test_memcg_ops_child_work(CG_LOW_DIR,
-> +					       data_file1,
-> +					       time_file1,
-> +					       read_times);
-> +
-> +	pid2 = fork();
-> +	if (!ASSERT_GE(pid1, 0, "fork"))
-                       ^^^^
-
-Should this check pid2 instead of pid1?  After assigning pid2 = fork(),
-checking pid1 means a failed second fork() would go undetected if the
-first fork() succeeded.
-
-> +		goto cleanup;
-> +	if (pid2 == 0)
-> +		real_test_memcg_ops_child_work(CG_HIGH_DIR,
-> +					       data_file2,
-> +					       time_file2,
-> +					       read_times);
-
-[ ... ]
-
-> +void test_memcg_ops_over_high(void)
-> +{
-> +	int err, map_fd;
-> +	struct memcg_ops *skel;
-              ^^^^^^^^^^^^^^^
-
-The skel variable is not initialized to NULL here.  If setup_cgroup()
-fails early and jumps to the out label, memcg_ops__detach(skel) would
-be called with an uninitialized pointer.
-
-Also, the cleanup path calls memcg_ops__detach() but never calls
-memcg_ops__destroy().  Would this leak the skeleton object and its
-associated BPF resources?
-
-> +	struct bpf_map *map;
-> +	size_t bss_sz;
-> +	struct memcg_ops__bss *bss_data;
-> +	__u32 key = 0;
-> +	struct bpf_program *prog = NULL;
-> +	struct bpf_link *link = NULL, *link2 = NULL;
-> +	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-> +	int high_cgroup_id, low_cgroup_fd = -1;
-> +
-> +	err = setup_cgroup(&high_cgroup_id, &low_cgroup_fd, NULL);
-> +	if (!ASSERT_OK(err, "setup_cgroup"))
-> +		goto out;
-> +
-> +	skel = memcg_ops__open_and_load();
-
-[ ... ]
-
-> +out:
-> +	bpf_link__destroy(link);
-> +	bpf_link__destroy(link2);
-> +	memcg_ops__detach(skel);
-> +	close(low_cgroup_fd);
-> +	cleanup_cgroup_environment();
-> +}
-
-[ ... ]
-
-> +void test_memcg_ops_below_low_over_high(void)
-> +{
-> +	int err, map_fd;
-> +	struct memcg_ops *skel;
-
-Same issue here - skel is not initialized to NULL.
-
-[ ... ]
-
-> +out:
-> +	bpf_link__destroy(link);
-> +	bpf_link__destroy(link_high);
-> +	bpf_link__destroy(link_low);
-> +	memcg_ops__detach(skel);
-
-[ ... ]
-
-> +void test_memcg_ops_below_min_over_high(void)
-> +{
-> +	int err, map_fd;
-> +	struct memcg_ops *skel;
-
-Same issue here as well - skel is not initialized to NULL.
-
-[ ... ]
-
-> +out:
-> +	bpf_link__destroy(link);
-> +	bpf_link__destroy(link_high);
-> +	bpf_link__destroy(link_low);
-> +	memcg_ops__detach(skel);
-> +	close(high_cgroup_fd);
-> +	close(low_cgroup_fd);
-> +	cleanup_cgroup_environment();
-> +}
+> 
+> Will fix it in the next version.
+> 
+> Thanks!
+> Menglong Dong
+> 
+> > 
+> > 
+> > ---
+> > AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> > See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> > 
+> > CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
+> > 
+> 
+> 
+> 
+> 
+> 
+> 
 
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21280790825
 
---===============3584986258708126564==--
 
