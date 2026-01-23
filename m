@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-252828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wCSgG31jc2mivQAAu9opvQ
-	(envelope-from <netdev+bounces-252828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:03:09 +0100
+	id YDV+MqBjc2mivQAAu9opvQ
+	(envelope-from <netdev+bounces-252829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:03:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60F375846
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:03:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E13C7586D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D99B53033209
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:01:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C06EC30747A8
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113E933A712;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC9A33D6EE;
 	Fri, 23 Jan 2026 12:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xxq4dokT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfhG+Py1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF02314B91
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 12:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668B8340290
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 12:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769169694; cv=none; b=fh46eZ+GpIPxcXKUzRd9HV76iCU+b+YLmhVcri1DS08rkgpRpre7LGU664eTbXZQM/vTnIUJhENZiVVu6mdCkVHxRfVylnn/M7MKNyJyqpilemhyRelGXgncBEHIlYujUITh58VJ+ohR8xmQFeXoIOGXWYGo+6vPHpmFZ2wGRTk=
+	t=1769169695; cv=none; b=QqJ2XZ5AMM+o9wwvaP1uSOI1UrEbTZomMHBcUpGLy/l20sjhbuv12+I4G/gIEAgivUrsT3xBYRb31/2SKWSjLs3zGhDeUap/wKsTi101wNa3oK2hqjgvSMsZQWf50e3CpFl5Dk3i8lNK3QMJPzKeZXvIKQ1DTNygnwfKU5Ifl4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769169694; c=relaxed/simple;
-	bh=lfX/aQXgXu8N99a9UbOqMgD2maNs9TaUPsD2bCWDZ58=;
+	s=arc-20240116; t=1769169695; c=relaxed/simple;
+	bh=argX+ekhVkmNswgZoOntqGB4oLHzgeu85h5GOyhgHik=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OfgmxHANtI1+vHVMsfQXcveFDh9dTm2VgCSDmYEUqlwT6eH3XM3pEpX5Otb4WwLl1pbmTTk0jRrlqS7/JvF5dgJDeKMleMV/oRqM4m2xAuG/bwMXuXcWCexJ+wbZEhbKNN8e649RclCAG0sOKCBvlRQ/VYiJCIxQvSNpY3jGVgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xxq4dokT; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version; b=X9adwW/DgeDRpk3bNnS4sDDZgRjz+LQvTEmVA2gZpsfoSlrne8B9+rUPf/1TO/1/1NCBRdQoU5zFBxCAP+DIDlLupRMQ49DDUdaOeze6uqm/Up6hIUkAMzNOAqTJ7gaPEy2MBuLRM9TjJcGLog/efxw4zBtp2c1KNwPJV2XzcmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfhG+Py1; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47ee3a63300so24431335e9.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 04:01:32 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47ee2715254so11654515e9.3
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 04:01:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769169691; x=1769774491; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769169692; x=1769774492; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QCpcCt671zec/WYYqXDWL85shhNDDHyWCrlnv8/D0oo=;
-        b=Xxq4dokTUMTkkOJrrbo2gdebJv2Bew8zzzSwkczajjjoVG5MxytlBBYLwxX0aNN/4o
-         USD5BF4qy1bvnwK+nsgvHe4mfbpQZQCkyNW2pKPx0UuMCiFjaSnQzyu/d0JV8+CrlKwa
-         ttweS9pFUwXdg0UerAh+E2QD1jvQRARQuZ+Es9o+p8w5W42g4w1iJqStxbWLG7GP8f9Z
-         D5p7XBREa01a1IvL/sfbogOMyAq5JS0eUnpAAvTQBwSl9SfiI0o8gt7HsHnif5PxS4EU
-         NQ3ca2PdJ28WTHjXPfRmXyqYhv1kMDdi42KAzmG1up01FGZiyD0Y1N90hh/YzQ/hMtvY
-         jkkg==
+        bh=JSvgyOqp8b8U8Jk0c4U57aOF95Ym7PtbxT8UnBm+Rrs=;
+        b=kfhG+Py1p10h8wyA0M6YHYWuzIiTcGVJNG2pu8nHJnwaNm0ID7pahvEFuBrlyEVpZl
+         W6CPYIu0nxkpR1fqK/oPft0yY/e1LBW8IsSVD5F4JVulWW50wsivESHD+c4t657/qsgM
+         +W5T9F2JBNOYfje4IP5xG3xhIQj2UlD77Vh0R802P096QOwLlvqaQFNoflyYNhxgNU7T
+         C7yW459e1oSJr/6FpOH7tq13Sq0Dihoh6v32g1uhIAGsB6zf8U7ml4OoQlUrpBunvbAq
+         4iWF8aiy4nojQdmDslM6IuG67JppiljkcdKrxqxyfxR3zHJsWU/MVEpTxgGbVvkdF7Ut
+         vaVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769169691; x=1769774491;
+        d=1e100.net; s=20230601; t=1769169692; x=1769774492;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=QCpcCt671zec/WYYqXDWL85shhNDDHyWCrlnv8/D0oo=;
-        b=o6Y+ZsEtkdVA4AdlnmtxCrRrKU5RnVFkFAoFQ85vq//8UvNV2eF746KWR2c/zoXT+T
-         0cdM10BYaFcF30tiIzbECC2+1WJMFQeopid9pPdZP/NjAA3HyCawHxElteo6/BGXPTTd
-         efO7P1f9h18kD4V323oy3evtp9Lg9DmyvfpAFIjsmvBSxbiIMFZe1i2mFejmcB3K17+H
-         u5xPjVhNohGziCgew/9fa3/NhThs/sbhefaZ7nw8SCBrxtZEUfpbyaietDLdD0cfg9LP
-         Sze5TVP69kcpZQSA+ASddy1nlTzHoReABERudxUZCqhd2V/K/XHxddP0EikVFkkGmFPp
-         k4qA==
-X-Forwarded-Encrypted: i=1; AJvYcCVXx602YA6CcpbBLo/K/1KrkC9PHxc5r1gvQCvWJUKlN9N8g1cgZ/tmxkDYLJfbHuzGUFs5vPk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygZPx44Y7r74gmbjokZTYx88i5Hb3wESI1qRj3w77sRDSeTKU+
-	HOHW+zPGs34G9m/4ka/HwWCtAyg2bdIjMSRejCD9jbIFyEMIbQZlwxd1
-X-Gm-Gg: AZuq6aKe4cuke6Ip8yIKSfU7kuW9JHeBANxHoKPPqglBc2JQkz4ezIPS3NS+nD062s8
-	R62OeBsUq+E8KX/32Th22oexuSHcZg62g/qYIW+zHtpE1TxSGHlYxchuoT4H8StY20ABi2dLrWg
-	RvbTAiUNcK2aHcW2NBE6h//hHGFGKUwH0Ni3knXpab4SMSMyDHv8nZD/9lt89PQHcj1+qa7e839
-	UDQ/Bu/VTnccUk784If4TlIGMJIDidsxD27lWwuDDeGyEoyqd2LjpXUsxPXWWQmy10YflKF/mKy
-	VoONlE2bRKRdJMiCdHT43lVRPprBn6FNQ5uttWos0+s9r0fnFj97QB/dXgieTgte6mlXHWPZChv
-	gtmM3i0jZmJZqtJu3S6aH4jy2jWXUXFCAcEPRcxdOUwjBD9LxD5gd7U9NSfLWhtpNPDDomNHgdF
-	VfdKT02Vy+SZsn/eF9RofVHk1UmPYkjYh7Rv00B0nd
-X-Received: by 2002:a05:600c:a08e:b0:477:b642:9dc1 with SMTP id 5b1f17b1804b1-4804c9b4afcmr43459265e9.20.1769169688437;
-        Fri, 23 Jan 2026 04:01:28 -0800 (PST)
+        bh=JSvgyOqp8b8U8Jk0c4U57aOF95Ym7PtbxT8UnBm+Rrs=;
+        b=w5U9chXB2mhhb4g3LMw98YfOMFcq/0uc5ctVggnLdoirP8qeTkqQ34LtJOod2+bGLM
+         uh52vKMdwdUybFP/qRzCouSDb9jYH7p4h61dAcBnufumIVzxYNj/rOwum4Yhx4bD8TxN
+         jNlpnl4p/rzw4wgsECxltLfLYh6O+IWolQz8GN4YOOi4nAAc/XtkbK2tX0NaazYnCEus
+         LY22A+GcU9lcvT7p/pK9CQ6OmZTyCFjPfOLpN5Fun4uH/fwoFrI5QRod0Rvx7ilwbgo0
+         W/TlzOEM3M6GlbdC5JCaNNxd5hSq6YmsJY898fAcA2+jeyyYwZq8fJbp12g5x8QxnaHs
+         yW6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUye75INK2lh76Il24NPRICFl5Oso5zdgu3/EvFzFsn3vgGH+k6eW3Ytsx8ia30A5rta8i6/4Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9gNAF/h1ThGVcDv2bHZYPQogLV57pQhUidgdrfHqyW2iu0lAD
+	sFV1thx8Jr7Zqn+XiY+GqT02EhreswOLPJmjUiGT1SVQT8pHdEBWHOTg
+X-Gm-Gg: AZuq6aJQtF3UGxqigVgOwotg9rxeTVnCIlHpeWeI/NFLErdk1GnNZ/yHy2dNIOrqfIc
+	hDFrrQ2CqLMcb//p3LaKiwJhINIMLmnXtXY2FHaUw7Lhyx7uzAGgAkh0x9swIYIDC6g8O6o+FJN
+	9DG0ZPTuHS+FqVFnsxJS+ur9A+lvKy/D8K6Qb++uIbmU3VfhBjakiHddtRbo8tAmwFD7BpSSN6k
+	UHrw0MbNLrqP5UpusSh4HkqdgIWnU5rJX/HTfCCv5M6q7908EQedBgmKVxP1zLNZ/kBAi1HmZvg
+	k3X8UMlDdcNCkzcyWSFAdaz2tjw3984TW8TwYgg1ED6kGkQb5UyxURZvaw04bef8X1FPLjHbI6S
+	41rCuTFeOYMGpW5++MonBrOM55C2aAxOKSy7iIUpuJfKh9XJkQh8YPKYs3OH6d1+NjAk2iVUA24
+	0ORkKIql3/R5EJSlpySt0iUz3oDugsfHijKdPe/0bO
+X-Received: by 2002:a05:600c:a00d:b0:477:a246:8398 with SMTP id 5b1f17b1804b1-4804c947d28mr48477335e9.2.1769169690230;
+        Fri, 23 Jan 2026 04:01:30 -0800 (PST)
 Received: from Ansuel-XPS24 (93-34-88-81.ip49.fastwebnet.it. [93.34.88.81])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4804d603ac9sm21575135e9.4.2026.01.23.04.01.27
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4804d603ac9sm21575135e9.4.2026.01.23.04.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 04:01:28 -0800 (PST)
+        Fri, 23 Jan 2026 04:01:29 -0800 (PST)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -87,9 +87,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v2 2/3] net: phy: as21xxx: add support for DBG command
-Date: Fri, 23 Jan 2026 13:00:30 +0100
-Message-ID: <20260123120117.10883-3-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 3/3] net: phy: as21xxx: fill in inband caps and better handle inband
+Date: Fri, 23 Jan 2026 13:00:31 +0100
+Message-ID: <20260123120117.10883-4-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260123120117.10883-1-ansuelsmth@gmail.com>
 References: <20260123120117.10883-1-ansuelsmth@gmail.com>
@@ -107,18 +107,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252828-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252829-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -129,266 +129,249 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D60F375846
+X-Rspamd-Queue-Id: 6E13C7586D
 X-Rspamd-Action: no action
 
-Rework the msg send logic to support sending DBG command.
+The as21xxx control In-Band support with the DPC RateAdapation
+configuration.
 
-These DBG command use a special way to send and receive data and use
-data in u8 size and are used to tweak advanced (and later introduced)
-feature of the PHY.
+Tested on a Banana Pi R4 PRO (MT7988a) and on Airoha AN7581/AN7583 where
+In Band is controlled by disabling Autoneg on the PCS, where the PHY
+correctly transfer packet with In Band disabled on the PCS and DPC RA
+disabled on the PHY. It was also confirmed that with In Band enabled on
+the PCS and DPC RA enabled on the PHY also packets gets transmitted
+correctly.
+
+With this new information, fill in the .inband_caps() OP and set the
+.config_inband() to enable DPC RA when inband is enabled.
+
+Support for this feature is enabled only on PHY firmware >= 1.9 as on
+previous version the DPC RA could only be enabled and a PHY reset (and
+Firmware reloaded) was needed to change this at runtime.
+
+To keep compatibility with some HW configuration, we enable DPC RA by
+default for older firmware. This is needed as on Banana Pi R4 PRO, one
+of the 2 as21xxx PHY is attached to a Switch that requires the PHY in In
+Band mode with Rate Adaption.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/phy/as21xxx.c | 190 +++++++++++++++++++++++++++++++-------
- 1 file changed, 155 insertions(+), 35 deletions(-)
+ drivers/net/phy/as21xxx.c | 111 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 110 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
-index a5344abde91a..2098fa6a2f63 100644
+index 2098fa6a2f63..60ec7af6e386 100644
 --- a/drivers/net/phy/as21xxx.c
 +++ b/drivers/net/phy/as21xxx.c
-@@ -59,6 +59,10 @@
- #define IPC_CMD_SYS_CPU			0x2  /* SYS_CPU */
- #define IPC_CMD_BULK_DATA		0xa  /* Pass bulk data in ipc registers. */
- #define IPC_CMD_BULK_WRITE		0xc  /* Write bulk data to memory */
-+#define IPC_CMD_DBG			0x16
-+#define IPC_CMD_POLL			0x17
-+#define IPC_CMD_WRITE_BUF		0x18
-+#define IPC_CMD_READ_BUF		0x19
- #define IPC_CMD_CFG_PARAM		0x1a /* Write config parameters to memory */
- #define IPC_CMD_NG_TESTMODE		0x1b /* Set NG test mode and tone */
- #define IPC_CMD_TEMP_MON		0x15 /* Temperature monitoring function */
-@@ -115,6 +119,12 @@
- /* Sub command of CMD_TEMP_MON */
- #define IPC_CMD_TEMP_MON_GET		0x4
+@@ -125,6 +125,10 @@
+ #define IPC_DATA_DBG_SEC		GENMASK(15, 8)
+ #define IPC_DATA_DBG_CMD		GENMASK(7, 0)
  
-+/* Sub command of CMD_DBG */
-+#define IPC_DBG_DPC			0x8b
-+
-+#define IPC_DATA_DBG_SEC		GENMASK(15, 8)
-+#define IPC_DATA_DBG_CMD		GENMASK(7, 0)
++/* DBG_DPC sub command */
++#define IPC_DPC_RA_SET_CFG		0x2
++#define IPC_DPC_RA_GET_CFG		0x7
 +
  #define AS21XXX_MDIO_AN_C22		0xffe0
  
  #define PHY_ID_AS21XXX			0x75009410
-@@ -451,18 +461,9 @@ static int aeon_ipc_send_cmd(struct phy_device *phydev,
- 	return 0;
+@@ -724,6 +728,52 @@ static int aeon_ipc_dbg_write_buf(struct phy_device *phydev, u8 *data,
+ 	return ret;
  }
  
--/* If data is NULL, return 0 or negative error.
-- * If data not NULL, return number of Bytes received from IPC or
-- * a negative error.
-- */
--static int aeon_ipc_send_msg(struct phy_device *phydev,
--			     u16 opcode, u16 *data, unsigned int data_len,
--			     u16 *ret_data)
-+static int aeon_ipc_set_msg_data(struct phy_device *phydev, u16 *data,
-+				 unsigned int data_len)
- {
--	struct as21xxx_priv *priv = phydev->priv;
--	unsigned int ret_size;
--	u16 cmd, ret_sts;
--	int ret;
- 	int i;
- 
- 	/* IPC have a max of 8 register to transfer data,
-@@ -475,46 +476,69 @@ static int aeon_ipc_send_msg(struct phy_device *phydev,
- 		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i),
- 			      data[i]);
- 
--	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, data_len) |
--	      FIELD_PREP(AEON_IPC_CMD_OPCODE, opcode);
--
--	mutex_lock(&priv->ipc_lock);
--
--	ret = aeon_ipc_send_cmd(phydev, priv, cmd, &ret_sts);
--	if (ret) {
--		phydev_err(phydev, "failed to send ipc msg for %x: %d\n",
--			   opcode, ret);
--		goto out;
--	}
--
--	if (!data)
--		goto out;
++static int aeon_ipc_dpc_ra_set(struct phy_device *phydev, bool enable)
++{
++	u8 data[1];
++	int ret;
++
++	ret = aeon_ipc_dbg_cmd(phydev, IPC_DBG_DPC,
++			       IPC_DPC_RA_SET_CFG,
++			       sizeof(data));
++	if (ret)
++		return ret;
++
++	data[0] = enable;
++
++	ret = aeon_ipc_dbg_write_buf(phydev, data, sizeof(data));
++	if (ret)
++		return ret;
++
++	ret = aeon_ipc_poll(phydev);
++	if (ret)
++		return ret;
++
 +	return 0;
 +}
- 
--	if ((ret_sts & AEON_IPC_STS_STATUS) == AEON_IPC_STS_STATUS_ERROR) {
--		ret = -EINVAL;
--		goto out;
--	}
-+static int
-+aeon_ipc_get_msg_ret_data(struct phy_device *phydev, u16 ret_sts,
-+			  u16 *ret_data) __must_hold(&priv->ipc_lock)
-+{
-+	unsigned int ret_size;
-+	int ret;
-+	int i;
- 
- 	/* Prevent IPC from stack smashing the kernel.
- 	 * We can't trust IPC to return a good value and we always
- 	 * preallocate space for 16 Bytes.
- 	 */
- 	ret_size = FIELD_GET(AEON_IPC_STS_SIZE, ret_sts);
--	if (ret_size > AEON_IPC_DATA_MAX) {
--		ret = -EINVAL;
--		goto out;
--	}
-+	if (ret_size > AEON_IPC_DATA_MAX)
-+		return -EINVAL;
- 
- 	/* Read data from IPC data register for ret_size value from IPC */
- 	for (i = 0; i < DIV_ROUND_UP(ret_size, sizeof(u16)); i++) {
- 		ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i));
- 		if (ret < 0)
--			goto out;
-+			return ret;
- 
- 		ret_data[i] = ret;
- 	}
- 
--	ret = ret_size;
-+	return ret_size;
-+}
 +
-+/* If data is NULL, return 0 or negative error.
-+ * If data not NULL, return number of Bytes received from IPC or
-+ * a negative error.
-+ */
-+static int aeon_ipc_send_msg(struct phy_device *phydev,
-+			     u16 opcode, u16 *data, unsigned int data_len,
-+			     u16 *ret_data)
++static int aeon_ipc_dpc_ra_get(struct phy_device *phydev, bool *enabled)
 +{
-+	struct as21xxx_priv *priv = phydev->priv;
-+	u16 cmd, ret_sts;
++	u16 ret_data[AEON_IPC_DATA_NUM_REGISTERS];
 +	int ret;
 +
-+	ret = aeon_ipc_set_msg_data(phydev, data, data_len);
++	ret = aeon_ipc_dbg_cmd(phydev, IPC_DBG_DPC,
++			       IPC_DPC_RA_GET_CFG, 0);
 +	if (ret)
 +		return ret;
 +
-+	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, data_len) |
-+	      FIELD_PREP(AEON_IPC_CMD_OPCODE, opcode);
-+
-+	mutex_lock(&priv->ipc_lock);
-+
-+	ret = aeon_ipc_send_cmd(phydev, priv, cmd, &ret_sts);
-+	if (ret) {
-+		phydev_err(phydev, "failed to send ipc msg for %x: %d\n",
-+			   opcode, ret);
-+		goto out;
-+	}
-+
-+	if (!data)
-+		goto out;
-+
-+	ret = aeon_ipc_get_msg_ret_data(phydev, ret_sts, ret_data);
- 
- out:
- 	mutex_unlock(&priv->ipc_lock);
-@@ -604,6 +628,102 @@ static int aeon_ipc_get_fw_version(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int aeon_ipc_poll(struct phy_device *phydev)
-+{
-+	struct as21xxx_priv *priv = phydev->priv;
-+	u16 ret_sts;
-+	u16 cmd;
-+	int ret;
-+
-+	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, 0) |
-+	      FIELD_PREP(AEON_IPC_CMD_OPCODE, IPC_CMD_POLL);
-+
-+	mutex_lock(&priv->ipc_lock);
-+
-+	ret = aeon_ipc_send_cmd(phydev, phydev->priv, cmd, &ret_sts);
-+	if (ret)
-+		phydev_err(phydev, "Invalid IPC status on IPC poll: %x\n",
-+			   ret_sts);
-+
-+	mutex_unlock(&priv->ipc_lock);
-+
-+	return ret;
-+}
-+
-+static int aeon_ipc_dbg_cmd(struct phy_device *phydev, u16 dbg_sec,
-+			    u16 dbg_cmd, u16 msg_size)
-+{
-+	u16 data[3];
-+
-+	data[0] = FIELD_PREP(IPC_DATA_DBG_SEC, dbg_sec) |
-+		  FIELD_PREP(IPC_DATA_DBG_CMD, dbg_cmd);
-+	data[1] = msg_size;
-+
-+	return aeon_ipc_send_msg(phydev, IPC_CMD_DBG, data,
-+				 sizeof(data), NULL);
-+}
-+
-+static int aeon_ipc_dbg_read_buf(struct phy_device *phydev, u16 *buf)
-+{
-+	struct as21xxx_priv *priv = phydev->priv;
-+	u16 cmd, ret_sts;
-+	int ret;
-+
-+	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, 0) |
-+	      FIELD_PREP(AEON_IPC_CMD_OPCODE, IPC_CMD_READ_BUF);
-+
-+	mutex_lock(&priv->ipc_lock);
-+
-+	ret = aeon_ipc_send_cmd(phydev, phydev->priv, cmd, &ret_sts);
-+	if (ret)
-+		goto out;
-+
-+	ret = aeon_ipc_get_msg_ret_data(phydev, ret_sts, buf);
-+
-+out:
-+	mutex_unlock(&priv->ipc_lock);
-+
-+	return ret;
-+}
-+
-+static int aeon_ipc_dbg_write_buf(struct phy_device *phydev, u8 *data,
-+				  u8 data_len)
-+{
-+	u16 msg_data[AEON_IPC_DATA_NUM_REGISTERS];
-+	struct as21xxx_priv *priv = phydev->priv;
-+	u16 cmd, ret_sts;
-+	int ret;
-+	int i;
-+
-+	/* Make sure we don't try to write more data than supported */
-+	if (data_len * 2 > AEON_IPC_DATA_MAX)
-+		return -EINVAL;
-+
-+	/* Pack u8 DBG data in u16 buffer */
-+	for (i = 0; i < data_len; i += 2) {
-+		msg_data[i] = data[i];
-+		msg_data[i] |= data[i + 1] << 8;
-+	}
-+
-+	ret = aeon_ipc_set_msg_data(phydev, msg_data, data_len * 2);
++	ret = aeon_ipc_poll(phydev);
 +	if (ret)
 +		return ret;
 +
-+	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, data_len) |
-+	      FIELD_PREP(AEON_IPC_CMD_OPCODE, IPC_CMD_WRITE_BUF);
++	ret = aeon_ipc_dbg_read_buf(phydev, ret_data);
++	if (ret < 0)
++		return ret;
 +
-+	mutex_lock(&priv->ipc_lock);
-+
-+	ret = aeon_ipc_send_cmd(phydev, priv, cmd, &ret_sts);
-+	if (ret)
-+		phydev_err(phydev, "failed to send IPC msg for %x: %d\n",
-+			   IPC_CMD_WRITE_BUF, ret);
-+
-+	mutex_unlock(&priv->ipc_lock);
-+
-+	return ret;
++	*enabled = !!ret_data[0];
++	return 0;
 +}
 +
  static int aeon_dpc_ra_enable(struct phy_device *phydev)
  {
  	u16 data[2];
+@@ -765,7 +815,11 @@ static int as21xxx_probe(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
+-	return aeon_dpc_ra_enable(phydev);
++	/* Enable DPC Rate Adaption by default on older firmware */
++	if (priv->fw_major_ver == 1 && priv->fw_minor_ver < 9)
++		return aeon_dpc_ra_enable(phydev);
++
++	return 0;
+ }
+ 
+ static int as21xxx_read_link(struct phy_device *phydev, int *bmcr)
+@@ -1078,6 +1132,41 @@ static int as21xxx_match_phy_device(struct phy_device *phydev,
+ 	return ret;
+ }
+ 
++static unsigned int as21xxx_inband_caps(struct phy_device *phydev,
++					phy_interface_t interface)
++{
++	struct as21xxx_priv *priv = phydev->priv;
++
++	/* Configuring DPC Rate Adaption (to permit In Band support)
++	 * is supported only from firmware version 1.9+
++	 */
++	if (priv->fw_major_ver > 1 || priv->fw_minor_ver >= 9)
++		return LINK_INBAND_ENABLE | LINK_INBAND_DISABLE;
++
++	/* On older firmware we enforce In Band by default
++	 * for compatibility reason.
++	 */
++	return LINK_INBAND_ENABLE;
++}
++
++static int as21xxx_config_inband(struct phy_device *phydev,
++				 unsigned int modes)
++{
++	bool enabled;
++	int ret;
++
++	ret = aeon_ipc_dpc_ra_get(phydev, &enabled);
++	if (ret)
++		return ret;
++
++	/* Ignore if already in the desired mode */
++	if ((modes == LINK_INBAND_ENABLE && enabled) ||
++	    (modes == LINK_INBAND_DISABLE && !enabled))
++		return 0;
++
++	return aeon_ipc_dpc_ra_set(phydev, modes == LINK_INBAND_ENABLE);
++}
++
+ static struct phy_driver as21xxx_drivers[] = {
+ 	{
+ 		/* PHY expose in C45 as 0x7500 0x9410
+@@ -1093,6 +1182,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21011JB1),
+ 		.name		= "Aeonsemi AS21011JB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1105,6 +1196,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21011PB1),
+ 		.name		= "Aeonsemi AS21011PB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1117,6 +1210,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21010PB1),
+ 		.name		= "Aeonsemi AS21010PB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1129,6 +1224,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21010JB1),
+ 		.name		= "Aeonsemi AS21010JB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1141,6 +1238,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21210PB1),
+ 		.name		= "Aeonsemi AS21210PB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1153,6 +1252,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21510JB1),
+ 		.name		= "Aeonsemi AS21510JB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1165,6 +1266,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21510PB1),
+ 		.name		= "Aeonsemi AS21510PB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1177,6 +1280,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21511JB1),
+ 		.name		= "Aeonsemi AS21511JB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1189,6 +1294,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21210JB1),
+ 		.name		= "Aeonsemi AS21210JB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
+@@ -1201,6 +1308,8 @@ static struct phy_driver as21xxx_drivers[] = {
+ 		PHY_ID_MATCH_EXACT(PHY_ID_AS21511PB1),
+ 		.name		= "Aeonsemi AS21511PB1",
+ 		.probe		= as21xxx_probe,
++		.inband_caps	= as21xxx_inband_caps,
++		.config_inband	= as21xxx_config_inband,
+ 		.match_phy_device = as21xxx_match_phy_device,
+ 		.read_status	= as21xxx_read_status,
+ 		.led_brightness_set = as21xxx_led_brightness_set,
 -- 
 2.51.0
 
