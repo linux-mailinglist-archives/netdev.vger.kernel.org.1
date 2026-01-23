@@ -1,199 +1,439 @@
-Return-Path: <netdev+bounces-252911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNsZAk+2c2liyAAAu9opvQ
-	(envelope-from <netdev+bounces-252911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:56:31 +0100
+	id wIa/IWq3c2ncyAAAu9opvQ
+	(envelope-from <netdev+bounces-252912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:01:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA797941C
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:56:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CCBB794FF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8404030432C7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:56:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F3923300C8E7
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F55274B3A;
-	Fri, 23 Jan 2026 17:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581BA1DD525;
+	Fri, 23 Jan 2026 18:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rUCxl/6B"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zMmfrX+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013007.outbound.protection.outlook.com [40.93.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF9A26B971
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84011A55;
+	Fri, 23 Jan 2026 18:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769190973; cv=pass; b=OjIDtuUvkyzrLjMf9vOA/02l2519WPyhq4P9Md2S0A01574txm4P9B0EKTK8RQIOWeB9bKllQHYMXeKb99Re3t6gqg0drTILCqKpm6nOjNSl8vw4+QxNpJS9A3K5ZChabkXq6rJvul5iUJYkl82vBbjCgZu6gjFErsc/Ek+gXrA=
+	t=1769191267; cv=fail; b=Bk06dcNqSR0kI9B/Mr91zYTEj9XZnG8PsWUnW/oQhC7YsmW3mcuXFLiizUeVfp35PCiHSgpIvJQp8nQmYNpHn69SL1OERxkCgHx9O3nVgQapQCpLK6TMSe90F877m1W7KVf1S+G/vXXjgMmxvXMPc1AMYeUCJFjy5vZuvNNaE2Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769190973; c=relaxed/simple;
-	bh=47KVK4oV1KNaKpRFmFXPiFnrlHZSAOfNpFbyVM/rxyM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sNL1SoHgb0/G/WS5tDgEJXfmvoV/Axh8aPx9l2DWe32eKlpv5ag2hCXjkbGJLCIrnt/pl9WtCkn3gy5GPGzONbWOkndvSJujCCvfDK5BxDvafybHcrBRn9ZFY1J1i8G10mAHh+p5jpD7asJdmq3lHDRCVFPV4GR5KiSTV6f+v8E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rUCxl/6B; arc=pass smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7942b9663f8so22660447b3.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:56:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769190971; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PM5MRI1VEowD/CZA8V2O8PelUgDmAGlen6UBA1R7AecpOLCS/EzMLR5AbEYbwqO957
-         amGMrMqy6Fm9Q56sZKNxb0lkCI/tOa/bThfrYhDc9LOLKpPX+P0bwUh09/MBfKYozHGT
-         usYJq4ifG4unf47P0UyAy78u/DG1CjR9UrwGUXpOMXcqPbXIE7RH9HF6eet5r+wAVCdU
-         CuQLFIMvcY6KDg6VcK99CfnkOjhkEzX0tpb1iEDev8f7+F9jpSJaZ47UG/VLQOpomj5/
-         ugTCs6fTK6GYv99vYQDtYb/TUZte14B7u3CkCLwbNgSUlOJ5+HFdvFEkwz9QfOdPSNqn
-         z27g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=hPEm2oRsWZ5WyQi5AvSh+MQur1z7+e5R6KmqSEmzJEk=;
-        fh=1/lvlMLkDBb4Y6Ig9nzUYouUC8CzPStEVJKj5xHCTkA=;
-        b=LRQ/27LStf3NmSkEzW0oOQSGFWAZVyYinz3HOxvARpVw2v3+r9pRVSAbK3rtlnk7LE
-         zUx9/v/Ok2CO1suZemhih+8YtS6hiuiYPxWUO/53V4MCC69/8Lp2Tjw8pFcDTqaardnA
-         fyBm6V4TUXTnEYNyCINmwLwS5/ukF7HziZ1fkXFRhHp1h9KZLouCzjU/TzJYA8m5yUgo
-         dquypq3eQ+3UxvSZCZwV01MmX9jaUQ6+PA7q9iH5XykYiOU44jGqewrBB2/USkDM4N1v
-         dYwdLQSi3Y++PUbbUoKUl5AhdlnIVefllY51jTIrScnYVmIEeGOvJmmBrZR1VBedmF0J
-         TSuA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769190971; x=1769795771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hPEm2oRsWZ5WyQi5AvSh+MQur1z7+e5R6KmqSEmzJEk=;
-        b=rUCxl/6B9CX1G6YSeqEAmlU9gKuzpwP4m4J/ytJWlSTahB76UL43dX23ZrrkDces2n
-         RJD1UFStnWX8D/i1d3/FjwOAtQZ72hobj1LC4XmCZHB2dQCn0dOq+mDomCSNjn5o5BwM
-         2WKjZR4QtfZsuB4RlRJwTcCmrzIB8Md6SScu17gsD4FKI/HlBfRHv667RCpwohfvWLqY
-         EUFj6AUUiWQ2MVvYaQDz5MwQBacGIPUB+2333sQ8qtN9NJtA/t5KHO/HnAv9YCCWr1Xk
-         zh7qfNOFhMQqXqfjB5tzoOZOHna1Pvyes8KPuWXiiFKzEsehmLqzCp4Z+2nnRs6OhAVT
-         JRLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769190971; x=1769795771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hPEm2oRsWZ5WyQi5AvSh+MQur1z7+e5R6KmqSEmzJEk=;
-        b=ZISL4dSwaACefzA0LmfyHYc0QQuOWAJ7HwJf9VA3iCCNccorxTAAn++xxQ6CDaO6bU
-         1zWhwagtYtiv3Ogt8k2WpfEDsQBno/aeOzimofLg//0cF4RyLeRPRIIN2VwE3Ybs05/O
-         L/ihbcuvCNVVbS0eo92qvkey0IyVNJNGUHfJbRX7VgFTKhck59o8iWPOGoxRmE8fGhPH
-         WI9AgF+igCqEFSRIeIYuwbrZQHOCYLYmkCP0y8Tx1OiAT7Z/IHqtoi9CUpl8yqHqw12o
-         UFdJJHXYj5vBFo+0hVEGo4JdKpXAnYDG+5FjsvuzhJXiMZnSGPaUswJdOyOXgA8Eqdh+
-         sIkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeizqqid5N+q5fAefZ61kVIYXBOMLLF707Bk2/BQylZw0rNNQ+MUYpk4+kYl6sLknhqDcd1F8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOO20mrhNHhyeSEG0n4+D/onF/9jEFlKQe/2LXU+NsgfRQv6GE
-	8YWM1xTHUX9MFseg8C/AZxr95UNOwgKo3nuwz6AtU5A1ujHPswlhe1oTcvDrmTl+I2GWHsqPoFU
-	Aei1dK0vHpLfOLdHXBhixtg2RTPhFs+jfOs8OndPW
-X-Gm-Gg: AZuq6aKOySYnIGAtq4iBi0l/1TzkcFg0v9AT0TkJXiBCE0wnSf16MUWCtqXRH0P+Pso
-	Jpdmh3Vb9EOw546WOUG5qiIJa5YWz/Hv38GcXvTBGhNLioz9FBE27n5kDguYtHHrVdd6n7X0YGL
-	34OuHK33mhZy30xsSkGW7NIqSDsxBjLwhxZYsr3NwhTtW1h6vGt0aQM0xeX0eIdf0B91gXMeK1B
-	bBH/lkxLsb53/C4vRfXQZtrGXaVzss7bWKy/HD1/aGOgVzjeq8ADjnrqMdetyy8UJhcjdwv
-X-Received: by 2002:a05:690c:c4cc:b0:794:146c:8bc4 with SMTP id
- 00721157ae682-79439a0e8d1mr29143857b3.50.1769190971110; Fri, 23 Jan 2026
- 09:56:11 -0800 (PST)
+	s=arc-20240116; t=1769191267; c=relaxed/simple;
+	bh=H+iYjhyJyvz0fSLSArbS4nbklTEbJKVywtAJePWa128=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oKJWnTOeHHZrLiU3njHGDToybBYujF/PQ/08D2/tJ6+ZWtbBizPNzciKeKAUP+Bcic8O4xPjFNmXJEj8d+bCjaBVCdaoO+PPDVsoo2CxNL2pyyO2CtPccfV7RvVFZDUfyu5Vjd2PqiYwNak7OX2LBbg9ics4LaotP6rtaxa9bi0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zMmfrX+l; arc=fail smtp.client-ip=40.93.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZHShlVqufP0EyEGzFvtCjsHsifxQLesLK3nRpFBUW3mi2HeGgC7vIIn9n52tliU/AnmXN31ZVDF4vnNYLZCyT4jwayKlun3GTHHy3M2sWcDGMtWSyQDLrFexOfQ4mS4+2sA+hzsZX8pkL/bcc54s7zvpNU/nmFRs8NZGk5BYRxCDsCWIwycOzLcYIzX4t+YQD1cFHMq5bVzSCKaFIDrLUvSkIweKIY21YEV5p7Q0IsYvpQ73Kszg4kJHef2bA5L3sBHhpCAQv34VGbdggqvNHMZmigdF8qgUkgnv+4L0XkXAdLUjHThZZ13t926R28IHreeZ6WLjxccd5CK1MASBRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pHZQu94wwBqQXz53UineyDsRSVIay85jB/0uNC9nlT8=;
+ b=dkfb/j0g18tV89lWKB6uPv+M5FOmRicr0qTltVBLppoxNy14wnziBla+rVM4pPao7sby2pSLLv6Hlf0ojskJ9i/syUR6XAe5uuR/1NGwGoH2GOWtkYTeKA9R0Df/dNgPQOrYRXmzycsvgZ4t1vhfgJKdPTp0pYhiuK9xIgFc15CiwkUOFf5LTD6t2StTKX6vTP2y7WWgSaNkZCiE5XhsYHwePbuYUQ5ffD7diwnQB9oXomDpQzBAOVa6k5kXha3yfgSo91cnZ2yTYrPSUkV2vNCiz3x+wGUWZtF5wBbtclRnBIQxeTeeQ7IcaG9CDLfbIOx8MD0RVJJJp7QcmRiJaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pHZQu94wwBqQXz53UineyDsRSVIay85jB/0uNC9nlT8=;
+ b=zMmfrX+lGpMidNCdsPURuIj248pHOSWQp504bW56Ht038xHEWNg6GVogXF4X6NBoXON1yO1feC5M6FZ4vOllJqLer/uQi5mioadB/Shz4MhNK7Mb+XmsbNy/qkziSBJyDo3qpUFi6V/XZvfYZQtq/vsVeIcjQzBFOYdl/YJYOnk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by SN7PR12MB6790.namprd12.prod.outlook.com (2603:10b6:806:269::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.10; Fri, 23 Jan
+ 2026 18:00:59 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::4eda:ca5:8634:5b27]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::4eda:ca5:8634:5b27%4]) with mapi id 15.20.9542.008; Fri, 23 Jan 2026
+ 18:00:59 +0000
+Message-ID: <53f4dc0f-4d1d-47d4-80c6-84c3562a0310@amd.com>
+Date: Fri, 23 Jan 2026 10:00:55 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] PCI/MSI: Conservatively generalize no_64bit_msi
+ into msi_addr_mask
+To: Vivian Wang <wangruikang@iscas.ac.cn>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, Thomas Gleixner <tglx@kernel.org>,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-riscv@lists.infradead.org,
+ sophgo@lists.linux.dev, Takashi Iwai <tiwai@suse.de>
+References: <20260123-pci-msi-addr-mask-v3-0-9f9baa048524@iscas.ac.cn>
+ <20260123-pci-msi-addr-mask-v3-1-9f9baa048524@iscas.ac.cn>
+Content-Language: en-US
+From: "Creeley, Brett" <bcreeley@amd.com>
+In-Reply-To: <20260123-pci-msi-addr-mask-v3-1-9f9baa048524@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR04CA0013.namprd04.prod.outlook.com
+ (2603:10b6:a03:217::18) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260123052721.3765743-1-boolli@google.com> <CANn89i+ocUUpwzf-0t6_H9eZo3cikwrKd4ymtDkRL8W7g7uz0A@mail.gmail.com>
-In-Reply-To: <CANn89i+ocUUpwzf-0t6_H9eZo3cikwrKd4ymtDkRL8W7g7uz0A@mail.gmail.com>
-From: Li Li <boolli@google.com>
-Date: Fri, 23 Jan 2026 09:55:59 -0800
-X-Gm-Features: AZwV_QhidTXbFyW0hdKyy7IVS5RYP3NzTkHkHl0LvpKQD21odQoCxfOhDcfs-j8
-Message-ID: <CAODvEq6NXpwYZbXiQeisYEE-sJaaG-tN1u-rq+RTSi=gPY+EAQ@mail.gmail.com>
-Subject: Re: [PATCH] idpf: nullify pointers after they are freed
-To: Eric Dumazet <edumazet@google.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Decotigny <decot@google.com>, 
-	Anjali Singhai <anjali.singhai@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
-	Brian Vazquez <brianvv@google.com>, emil.s.tantilov@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SN7PR12MB6790:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7ef3e18f-7f92-4bcc-9b01-08de5aa95d14
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QXJ2aGtBZ0dOT3kzSDU2RTJ6aVVCelNyWm9scnZxZE8yWkQvZWRSK0tPVU5v?=
+ =?utf-8?B?MkgwOGRhb0dhSVFaeXlHZ3orUjl1YkZHL0xTL1lzYVVoQ0QyUStrVXliZkQ3?=
+ =?utf-8?B?d29lVldpTUd5a3hTZDZORHc1UVRSbVh3ODNWY05teW9McjlQaittWEZkN1Zm?=
+ =?utf-8?B?ODBsK05zR2hxbUR3ZDcvSlQ3ODkwc1BFWEMwZlJBdFdyWThYQ0ViMnlkeDFY?=
+ =?utf-8?B?MTVxMG5VMUNjdm9mREFySnpyN1FDVGI3Mm5ML3Fkd2dqbkVFWkdNNEhRYjBt?=
+ =?utf-8?B?bWdGd1YrbmpCUVFlSDF0ODZIMjJEZWxrZ2FBbTc2UUs0YWpTZmJ0Z3lDelBL?=
+ =?utf-8?B?ZWxiK2U2VFhZdnkvUFBtbDgvQ3V0aWpvU25wbngyaVlBRmlydVZFdGozSW5X?=
+ =?utf-8?B?Nkk0dDZSTVVRRVRzRjhiSmdqSDZFc0x5TVhldk9CZCs1eEdhVGxpcGRYMm9R?=
+ =?utf-8?B?NndGUkJ6K095a2dKdDlVU2MrMTFJNU5Zd0ZTcHFEWUhMYlRlL0JMemwwZXRk?=
+ =?utf-8?B?WGxjcjQzV0Z0cjR1b1lPOGxkdnVzWjJMcFBoRHYwY3BJeFhnQXkrMk52RE5O?=
+ =?utf-8?B?VExicjFBRzdzODNDWkpOUmp6amtYb0JXMUxjRWN5NHV1bzNzYWpZa1Y0QW1E?=
+ =?utf-8?B?cW5zOVNvQ1lWemgzdVZDeDJ2bUlBM2Z5ZnNkSEJXWWtubjhXTXFDOVFuWVM2?=
+ =?utf-8?B?TnZrTnFSVW9UdnJjT0dBRWxDT3ZBUDFsMzd1NGZvKzBCaW5oemYvZ2x1KzRX?=
+ =?utf-8?B?UXdaWXg3c1VYK0lraWw4RzBoUXJmSFkvSUpma0hWSk5rOTNrMHQ1VkVsN3ph?=
+ =?utf-8?B?N3pNVGQ1ZllySE1XRWJuVGFZdUw1TDUyV2pmQnptMWtXaE5LeFBHZUtOZmJ1?=
+ =?utf-8?B?WWx0cjR4dzhYSlFDUktOMjI3MSswTVBWdFVFbFQ5N013ZkUxQmxaNlBnaDVI?=
+ =?utf-8?B?WnBBcTVVU0wxOE9aWTdXcTJiazk1RVNkSlBPUDhBNUVEam9PK3BobkQzODFx?=
+ =?utf-8?B?cUx1Q1VzNWIzUlRnV3NmTXp1UWRrOUVFWm44Y2JWcTk3bVgwV1JTVGtmV2tW?=
+ =?utf-8?B?U1Q3YzVsZDROSlluRy9BYmo4Vk1lRjMySzh3WG9FTHNRNkgvQ0JvVnNqc2Rk?=
+ =?utf-8?B?Zkorbjk2ZFA0QzNYVW1vQjBTeHpSOC9LM25NZE04WndieWxIV25EQ3UycWd2?=
+ =?utf-8?B?YzhOaXVmeHJmUE9KWGJsZ3RjNklCNjZNakxNQyt3cXR1Q2pqbUtmaUR5VEtv?=
+ =?utf-8?B?MDFrbDVTeE1IV3FzbVE1dWlPdmJVeTFFQ0Y5RHFpdUtQQXhlYjBRSlhGODRn?=
+ =?utf-8?B?R0lPRW5tQm1kakYvUm5TNmhGeG1ZNVlnd3FkRkVkTmtES2greWRSNlRBZEFV?=
+ =?utf-8?B?dUJwd3AwSm1EUjZFdk1peTZ2K1ZkaDExMlhmOWpNWVZ0Zld0czJKTGpGOXhQ?=
+ =?utf-8?B?NWZHRE1DaVRsc21WbnBxMkpHak1ocTBUSXBTanFsZkpkQVI2c1Bya0ExVWFZ?=
+ =?utf-8?B?d1h6eFhNUFF3L0JGcUxhdGJKNmUyTlVEL3djSmF3d043R2p0OG1aZWtSaHJC?=
+ =?utf-8?B?OFF5ZkR3UFBwYURQV0VKQXVUd2JTMTNOekgrTlhIWFBnaGxGQ1ErYTJka3kw?=
+ =?utf-8?B?blZ6d0NnS2JvaGNqaWdhNkkydSsyQXMxcFBYUGZRYlBud1lETTJFOHFPazY4?=
+ =?utf-8?B?b3lUanFYY0FHYnNEZUkrM0MrK0V1MUg4clY0eUlmSXhHNHdEV2grbDZ3bERJ?=
+ =?utf-8?B?QnpxbnVMTWZNMFpselRtL3lvL3lGVWxMYnB2SHZRNmhqVFJVNUVoQi9ZK2xW?=
+ =?utf-8?B?MFlxdnM3Mk9oWlM0Ry9mR3BRalNSdG9wVFI1eTVaNU9KdnIrNkxrQUtnYUll?=
+ =?utf-8?B?bTU2OFlya3dnN0tSMDZhKzB1RXJ1b2ZYSVJkMlRnaDNmblRGQVZxOWZJOUhW?=
+ =?utf-8?B?czhtQWVwK3N0OGVPaWhOVlRNZFRLTTV1cWlqaWo2RmJmc0ZIMi9pTFB1ejBr?=
+ =?utf-8?B?d2lxbWdpUk5lNmVuUVluekNxbUl4TStaT1B6L3VmcFlkZjJhVkIzVGFHTW1Z?=
+ =?utf-8?B?aVZ5VXVQUlpTZmFyT1dxSVpIT2Q3SnYyR2NWQStjZWhscDlCWURaOWs5V1lR?=
+ =?utf-8?B?S3IzdlBPQlExM1hxTDJxMkJsbGN4Q2ZNTFU2QzdVUEtySDFDYlR0SElja0hu?=
+ =?utf-8?B?L2c9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dWxwQ01xaGdCRnZ5QVlpbDkwM0pEVjAvamZXR0gzSnNQVDFsUVBSOUdaVzRt?=
+ =?utf-8?B?ZWlBdEwwYjI3TGxuOGlYMGIzNXFmY2NlNXVXTENtSy8rNFVRVGt3RUFnKzNG?=
+ =?utf-8?B?WEhMcGtGQkZ0QTV3MElMMzRGRDljZXdTcFBkTkZuMzl5OTllTTNURGMwaG9p?=
+ =?utf-8?B?c1FsYXloSGMrYXI3blFVNWc2M00vKzM2b2kyN01xdkY0RHJ5WjNYU1hqVStI?=
+ =?utf-8?B?MG1sVXVQTU1yeE9qZG9WRUp5c0lUSlUrTVYyVGlSMGxZMG1UODFaVURtWlY2?=
+ =?utf-8?B?SkJpZnljczR3eVdabEV1M0Q1dysyL2ZGQlhMc3dCVGZ4NUdkeEQrYWpPKzNy?=
+ =?utf-8?B?M3JjT2IrQjlLbWNUbCtURFdHbUN6ZzVodTBVaXBuTnRiRzhBb1BzaUp6dEFJ?=
+ =?utf-8?B?S0hwd3JCNmIxeWZhODFoY3o0bVErWUh4TjA3L2xDL0xJWlNyRGMrRnFERHVi?=
+ =?utf-8?B?TGF3SkJPOEdkaFZjNVk5aVFpaUdYaEtLZzM1MFZVOE1qNHVRNUx2WEtIOWdR?=
+ =?utf-8?B?ZVJzYmEwd1J2eHdTR1A5dDBza09Sd0tHRWIzK05nOE9saytaVXBzMjY3RU55?=
+ =?utf-8?B?djVBSHZqNHYwOHZaTmYzYjNwaXdSTnd1WW10b1Qwcm9hbkRESGRoaVloWFVT?=
+ =?utf-8?B?UmtBZGd1NGZzenpqWHZSejlOVDBnR21BemNGb3F3Q1h3Q0kybW9XbUFlczVv?=
+ =?utf-8?B?dDg1NC82d25zZW9jakt0Smt6Qmx2R2hJeXVRNVd5dExNMVg3VEtkTk9OeTVO?=
+ =?utf-8?B?bXQ0cmhvZHZlbUFOMzhDbXgwUVU5clNQU09IOUpheEV0b0pEVk8zZVNqbGhx?=
+ =?utf-8?B?SHhLOFpJakJQYzkyS0JHNGtaTGYzYXdkL1ZZYUlGZGg2OUh5b0xNeFJMOHFJ?=
+ =?utf-8?B?MGJweTRPR2x5Z3Q1MDNidGZWQTEvd1VMRmdTZXg0UlZ6RnpVL3hNVTMrclBz?=
+ =?utf-8?B?U3B5cElqekFTYkthUTF0MFV2OGt0cHppRUpqWkJjMi9GRjVRcXhzeHR1cXcr?=
+ =?utf-8?B?cFpRVzRtbDQ1QXBsMU83YmY1MkJjTGdBVHVUbEJHa1FSYjZ2UDM0ODd4aVNq?=
+ =?utf-8?B?eElJcjB2L3lkUGRSYldFWkVSSDZTOHIzMlJTRUQ4UzBNclR5VXgxNWhnYzk1?=
+ =?utf-8?B?bUQ3ekxHTEo1dERMTEt6SWFXNmVPMFVqdi9DUDZKeDFCdWtkNW13Tlp0M1Br?=
+ =?utf-8?B?b2xsVTZnaXU2TDkzaDB4S2NlTm84R3JaSno3cnZNalZleS9GbTlvMEdGWlYz?=
+ =?utf-8?B?RVNQdWVlbXdUKzBzaGRpNzBxY3RiZTdpclRyOG5UMFA3YTRFeXV0dEhEOEpG?=
+ =?utf-8?B?UFhpWUZSdzlqbG51aUhXb25jM0Q2eDc4SnJPNE1yRWRyVnA1dldvOG1lL1B2?=
+ =?utf-8?B?WXp6OExUanAraTBsaTRjczEvYi9rMkczeUxEc25weTc3MzZVTllxZGtpWFRl?=
+ =?utf-8?B?U1hsOVRaaUEwc29CejZOTEoySkh0VzV0RDIvL0FXVUxkajA3cEU1azNJTDFp?=
+ =?utf-8?B?L0pLNjJ3MmpMdU5CcmJyay82Qkd0SHFoRWlFdlF6UTVyNW4ybVgvS0tKQ2JU?=
+ =?utf-8?B?bEZ3Z01zUHdHZVM1a1lCd09NWHlyR1dScmhaZm1Xdm1UTEFDY0ZFeU01elFr?=
+ =?utf-8?B?SEY0VnM1NklLSHEvakFrcVUrdGRHelI1VTJxNkJJOTBvdkVrMEc0bStaT3py?=
+ =?utf-8?B?dUFhdjAwSTVuTm02K2tPTCszZHA5OWRab1hhUHhnMFpSU3BvSkN3ZTIxSEsv?=
+ =?utf-8?B?ckNBdDA3ekhUVWVlUDdjZnF1ZzBpdzlKMkRhU2FrZStEWmhNTzduT3I5bnFR?=
+ =?utf-8?B?ZXZtR0l0Zk5DZjdzdkhlTE5WQWNSSG50RUpZQXRITUZlQVRaV2s0djRUU0xj?=
+ =?utf-8?B?UWRGa1FXL1k4czFmN2ZEUG5WMHJKV1lNVUtSZ25WNk9pNVA2ZlpsYlVrRk1l?=
+ =?utf-8?B?cWQrZGNnZmRvUlZBMWNMQ2JvdFdVRloxbVI2NGNrUDhWYitsMy9GVHJqUXg2?=
+ =?utf-8?B?enJLSk1IYUNCR0l0MlhwdElNTzhRSlgzWG5seEJIMjE5K29lcE5Ndm4zRE8z?=
+ =?utf-8?B?ZkFwakpOWFlDVXFOeUN1QWtuMld5djYrSE5CUXNXMldHSEJXRGRkMDRxZ3J6?=
+ =?utf-8?B?a3Y1clY0emFLVzhsOWZZSnFLbk9kdk5jY0RXRVNpSWhRNnRjdTAzakwrTlJi?=
+ =?utf-8?B?L0F4dTVQeENPSlprNUpoUjVtOGRVZ2U1dDZMb0ZWR2o2Nm5XUEsyNVhqVjVU?=
+ =?utf-8?B?QUd6eUtMeVJMSmw5L0JuMDVlZzJXRmlMS1hmRTF2K3FnYWlTMStnTlYrZ2g5?=
+ =?utf-8?B?OG0rOXo4eDJkZW0vRWhoNm5haG4wNnRRUVdibTk0cG5uem5EdkFUZz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ef3e18f-7f92-4bcc-9b01-08de5aa95d14
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 18:00:59.2372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EmvzPqL3uA1asqBnF15qFhTPIv7yTq6iM+8vBqxaWD3EpIAsFs6y97Rf+TQVcFwNq2NRBkKzDIwJxckqKYPuoQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6790
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252912-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252911-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_TO(0.00)[iscas.ac.cn,linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8AA797941C
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bcreeley@amd.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4CCBB794FF
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 1:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Jan 23, 2026 at 6:27=E2=80=AFAM Li Li <boolli@google.com> wrote:
-> >
-> > rss_data->rss_key and vport->q_vector_idxs need to be nullified after
-> > they are freed. Checks like "if (!rss_data->rss_key)" and
-> > "if (!vport->q_vector_idxs)" in the code could fail if they are not
-> > nullified.
-> >
-> > Tested: built and booted the kernel.
-> >
-> > Fixes: 83f38f210b85 ("idpf: Fix RSS LUT NULL pointer crash on early eth=
-tool operations")
-> > Fixes: 8a558cbda51b ("idpf: fix potential memory leak on kcalloc() fail=
-ure")
-> > Signed-off-by: Li Li <boolli@google.com>
-> > ---
-> >  drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/e=
-thernet/intel/idpf/idpf_lib.c
-> > index 131a8121839bd..7af4214ec44de 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> > @@ -1308,8 +1308,10 @@ static struct idpf_vport *idpf_vport_alloc(struc=
-t idpf_adapter *adapter,
-> >
-> >  free_rss_key:
-> >         kfree(rss_data->rss_key);
-> > +       rss_data->rss_key =3D NULL;
-> >  free_vector_idxs:
-> >         kfree(vport->q_vector_idxs);
-> > +       vport->q_vector_idxs =3D NULL;
->
-> vport is freed right after this line.
->
-> vport->q_vector_idxs content is not relevant.
->
-> If anything tries to deref vport->any_field ater at this point, there
-> is another bug. KASAN might help.
 
-Thank you Eric! I realized this after this patch and have sent out a
-v2 patch with this line removed as well.
 
+On 1/22/2026 10:07 PM, Vivian Wang wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 >
-> >  free_vport:
-> >         kfree(vport);
-> >
-> > --
-> > 2.52.0.457.g6b5491de43-goog
-> >
+>
+> Some PCI devices have PCI_MSI_FLAGS_64BIT in the MSI capability, but
+> implement less than 64 address bits. This breaks on platforms where such
+> a device is assigned an MSI address higher than what's reachable.
+>
+> Currently, we deal with this with a single no_64bit_msi flag, and
+> (notably on powerpc) forces 32-bit MSI address for these devices.
+> However, on some platforms the MSI doorbell address is above 32-bit but
+> within device ability.
+>
+> As a first step to enabling MSI on those combinations of devices and
+> platforms, conservatively generalize the single-bit flag no_64bit_msi
+> into msi_addr_mask. (The name msi_addr_mask is chosen to avoid confusion
+> with msi_mask.)
+>
+> The translation is essentially:
+>
+> - no_64bit_msi = 1    ->    msi_addr_mask = DMA_BIT_MASK(32)
+> - no_64bit_msi = 0    ->    msi_addr_mask = DMA_BIT_MASK(64)
+> - if (no_64bit_msi)   ->    if (msi_addr_mask < DMA_BIT_MASK(64))
+>
+> Since no values other than DMA_BIT_MASK(32) and DMA_BIT_MASK(64) is
+> used, no functional change is intended. Future patches that make use of
+> intermediate values of msi_addr_mask will follow, allowing devices that
+> cannot use full 64-bit addresses for MSI to work on platforms with MSI
+> doorbell above 32-bit address space.
+>
+> Acked-by: Takashi Iwai <tiwai@suse.de>
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> ---
+> v3: Add Acked-by, no code changes
+>
+> checkpatch complains about the comment include/linux/pci.h, which I have
+> formatted similarly with other comments in the vicinity.
+> ---
+>   arch/powerpc/platforms/powernv/pci-ioda.c           | 2 +-
+>   arch/powerpc/platforms/pseries/msi.c                | 4 ++--
+>   drivers/gpu/drm/radeon/radeon_irq_kms.c             | 2 +-
+>   drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 2 +-
+>   drivers/pci/msi/msi.c                               | 2 +-
+>   drivers/pci/msi/pcidev_msi.c                        | 2 +-
+>   drivers/pci/probe.c                                 | 7 +++++++
+>   include/linux/pci.h                                 | 8 +++++++-
+>   sound/hda/controllers/intel.c                       | 2 +-
+>   9 files changed, 22 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
+> index b0c1d9d16fb5..1c78fdfb7b03 100644
+> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
+> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
+> @@ -1666,7 +1666,7 @@ static int __pnv_pci_ioda_msi_setup(struct pnv_phb *phb, struct pci_dev *dev,
+>                  return -ENXIO;
+>
+>          /* Force 32-bit MSI on some broken devices */
+> -       if (dev->no_64bit_msi)
+> +       if (dev->msi_addr_mask < DMA_BIT_MASK(64))
+>                  is_64 = 0;
+>
+>          /* Assign XIVE to PE */
+> diff --git a/arch/powerpc/platforms/pseries/msi.c b/arch/powerpc/platforms/pseries/msi.c
+> index a82aaa786e9e..7473c7ca1db0 100644
+> --- a/arch/powerpc/platforms/pseries/msi.c
+> +++ b/arch/powerpc/platforms/pseries/msi.c
+> @@ -383,7 +383,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
+>           */
+>   again:
+>          if (type == PCI_CAP_ID_MSI) {
+> -               if (pdev->no_64bit_msi) {
+> +               if (pdev->msi_addr_mask < DMA_BIT_MASK(64)) {
+>                          rc = rtas_change_msi(pdn, RTAS_CHANGE_32MSI_FN, nvec);
+>                          if (rc < 0) {
+>                                  /*
+> @@ -409,7 +409,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
+>                  if (use_32bit_msi_hack && rc > 0)
+>                          rtas_hack_32bit_msi_gen2(pdev);
+>          } else {
+> -               if (pdev->no_64bit_msi)
+> +               if (pdev->msi_addr_mask < DMA_BIT_MASK(64))
+>                          rc = rtas_change_msi(pdn, RTAS_CHANGE_32MSIX_FN, nvec);
+>                  else
+>                          rc = rtas_change_msi(pdn, RTAS_CHANGE_MSIX_FN, nvec);
+> diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> index 9961251b44ba..d550554a6f3f 100644
+> --- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> +++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+> @@ -252,7 +252,7 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
+>           */
+>          if (rdev->family < CHIP_BONAIRE) {
+>                  dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
+> -               rdev->pdev->no_64bit_msi = 1;
+> +               rdev->pdev->msi_addr_mask = DMA_BIT_MASK(32);
+>          }
+>
+>          /* force MSI on */
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> index 70d86c5f52fb..0671deae9a28 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+> @@ -331,7 +331,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>
+>   #ifdef CONFIG_PPC64
+>          /* Ensure MSI/MSI-X interrupts lie within addressable physical memory */
+> -       pdev->no_64bit_msi = 1;
+> +       pdev->msi_addr_mask = DMA_BIT_MASK(32);
+>   #endif
+
+This seems like identical behavior compared to pre-patch, so LGTM.
+
+For the ionic part: Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+
+Thanks,
+
+Brett
+>
+>          err = ionic_setup_one(ionic);
+> diff --git a/drivers/pci/msi/msi.c b/drivers/pci/msi/msi.c
+> index 34d664139f48..48f5f03d1479 100644
+> --- a/drivers/pci/msi/msi.c
+> +++ b/drivers/pci/msi/msi.c
+> @@ -322,7 +322,7 @@ static int msi_verify_entries(struct pci_dev *dev)
+>   {
+>          struct msi_desc *entry;
+>
+> -       if (!dev->no_64bit_msi)
+> +       if (dev->msi_addr_mask == DMA_BIT_MASK(64))
+>                  return 0;
+>
+>          msi_for_each_desc(entry, &dev->dev, MSI_DESC_ALL) {
+> diff --git a/drivers/pci/msi/pcidev_msi.c b/drivers/pci/msi/pcidev_msi.c
+> index 5520aff53b56..0b0346813092 100644
+> --- a/drivers/pci/msi/pcidev_msi.c
+> +++ b/drivers/pci/msi/pcidev_msi.c
+> @@ -24,7 +24,7 @@ void pci_msi_init(struct pci_dev *dev)
+>          }
+>
+>          if (!(ctrl & PCI_MSI_FLAGS_64BIT))
+> -               dev->no_64bit_msi = 1;
+> +               dev->msi_addr_mask = DMA_BIT_MASK(32);
+>   }
+>
+>   void pci_msix_init(struct pci_dev *dev)
+> diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
+> index 41183aed8f5d..a2bff57176a3 100644
+> --- a/drivers/pci/probe.c
+> +++ b/drivers/pci/probe.c
+> @@ -2047,6 +2047,13 @@ int pci_setup_device(struct pci_dev *dev)
+>           */
+>          dev->dma_mask = 0xffffffff;
+>
+> +       /*
+> +        * Assume 64-bit addresses for MSI initially. Will be changed to 32-bit
+> +        * if MSI (rather than MSI-X) capability does not have
+> +        * PCI_MSI_FLAGS_64BIT. Can also be overridden by driver.
+> +        */
+> +       dev->msi_addr_mask = DMA_BIT_MASK(64);
+> +
+>          dev_set_name(&dev->dev, "%04x:%02x:%02x.%d", pci_domain_nr(dev->bus),
+>                       dev->bus->number, PCI_SLOT(dev->devfn),
+>                       PCI_FUNC(dev->devfn));
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 864775651c6f..0fe32fef0331 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -377,6 +377,13 @@ struct pci_dev {
+>                                             0xffffffff.  You only need to change
+>                                             this if your device has broken DMA
+>                                             or supports 64-bit transfers.  */
+> +       u64             msi_addr_mask;  /* Mask of the bits of bus address for
+> +                                          MSI that this device implements.
+> +                                          Normally set based on device
+> +                                          capabilities. You only need to
+> +                                          change this if your device claims
+> +                                          to support 64-bit MSI but implements
+> +                                          fewer than 64 address bits. */
+>
+>          struct device_dma_parameters dma_parms;
+>
+> @@ -441,7 +448,6 @@ struct pci_dev {
+>
+>          unsigned int    is_busmaster:1;         /* Is busmaster */
+>          unsigned int    no_msi:1;               /* May not use MSI */
+> -       unsigned int    no_64bit_msi:1;         /* May only use 32-bit MSIs */
+>          unsigned int    block_cfg_access:1;     /* Config space access blocked */
+>          unsigned int    broken_parity_status:1; /* Generates false positive parity */
+>          unsigned int    irq_reroute_variant:2;  /* Needs IRQ rerouting variant */
+> diff --git a/sound/hda/controllers/intel.c b/sound/hda/controllers/intel.c
+> index 1e8e3d61291a..c9542ebdf7e2 100644
+> --- a/sound/hda/controllers/intel.c
+> +++ b/sound/hda/controllers/intel.c
+> @@ -1905,7 +1905,7 @@ static int azx_first_init(struct azx *chip)
+>
+>          if (chip->msi && chip->driver_caps & AZX_DCAPS_NO_MSI64) {
+>                  dev_dbg(card->dev, "Disabling 64bit MSI\n");
+> -               pci->no_64bit_msi = true;
+> +               pci->msi_addr_mask = DMA_BIT_MASK(32);
+>          }
+>
+>          pci_set_master(pci);
+>
+> --
+> 2.52.0
+>
+
 
