@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-252942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLecHsLNc2kCywAAu9opvQ
-	(envelope-from <netdev+bounces-252942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 20:36:34 +0100
+	id yOKnAibOc2kCywAAu9opvQ
+	(envelope-from <netdev+bounces-252943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 20:38:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D522E7A330
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 20:36:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A97C7A381
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 20:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 72BAD3010DDB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:36:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A04430135E0
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5B02C0281;
-	Fri, 23 Jan 2026 19:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EBC2C11CD;
+	Fri, 23 Jan 2026 19:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WQacgNma"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dfwI2u9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f100.google.com (mail-ot1-f100.google.com [209.85.210.100])
+Received: from mail-vs1-f100.google.com (mail-vs1-f100.google.com [209.85.217.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266F52D7D3A
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 19:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E1B2D6E63
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 19:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769196948; cv=none; b=Wd1M1+GcBICk57gx+l8IUTvQH8JA9vSTo4Zg5BD5dUt6+e4WsmWSR25W4xVHS5OSWLNiN2tn/gRI/SrdLGNjeLkWf1/fu3pq0wBUfsJA1XKXQtsvr68NNeVRb0ycnb/p8Cz4rLRMNjHcCOKawcQhdsOqSCznSL7jVyqZcVW5Pzo=
+	t=1769196952; cv=none; b=b5cAJzPLZH3a8vc9Cgf9LdUuV78O0P1gu+Cu4rDkUqNrOo+gml4gCX3Es/zOb9s4S4SKfNm9/369LLzBl+SXK9LfKeJib1Td2OG6+mLxDVDIeCo6Sivu5YNztIOB2fEFinkGbTu+6Ej+UEp+Xz99F3eLbs8kybcxb3IOA0zJheY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769196948; c=relaxed/simple;
-	bh=+426l+HxRyq3a7RSISVqDALXB+wvYRf//cVq+Ymj6vg=;
+	s=arc-20240116; t=1769196952; c=relaxed/simple;
+	bh=IDtYlfyHd9puO8uzddW7kcDwMbhw00sKaMmn1ogyjtE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oeHDtuG5ftXveXKymi6k0cS4RdtRrpJYmNQSKqnC7HgGgKvVHCQBMpfAPqipE5MAdAXjzb9qjY+e7QYBwQrvxs+13HXDpoecAziFXLEtCFRxV3mDeG22TXLn5j908qemY12RO8V9LNXwmPACTviWt/S5z71EO8VQP4CUVo/ZKBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WQacgNma; arc=none smtp.client-ip=209.85.210.100
+	 MIME-Version; b=kBVxmgy6Vik3gWZ+0pNHYIQ8ogHL91Ip0qW9CgdqjL6wb38Gjgk085zEUTkrhK4zn5+4JEp5kB6upvx+yvitQkBnetEmjXRYQ2RZv+3C06V2ZVwbJP4GoPk+jnNFm6ltFyPGnRNWA5Kar9CODemUyEh0f20aXAkGjo3l7za94GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dfwI2u9C; arc=none smtp.client-ip=209.85.217.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f100.google.com with SMTP id 46e09a7af769-7cfd8ca8191so914281a34.3
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:35:45 -0800 (PST)
+Received: by mail-vs1-f100.google.com with SMTP id ada2fe7eead31-5f52b0728ccso1022350137.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:35:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769196944; x=1769801744;
+        d=1e100.net; s=20230601; t=1769196949; x=1769801749;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k2PNNrzYfwF6RJOlif8UuJP8LkFjNKReEQi+5VZis0Q=;
-        b=de6nj3zWv29OqiCJjL2kdk2yxn5lIrUwBLQ1a9gOQo1Wfl7pDQoJkwZI3Nd4FAeVY1
-         b8bbK3ZrGrVMpe+dGVhYg0V1mrUM8CLB/XSp8w+k23VsQOQbhpD4gTKBwzi53ycJo7Bx
-         nFsbDDgUvjQZAPAE5ohm2J8l41l0xMp6APeOSMDGLwNA7jdSRMSB8+JjYJneE8QNa+bH
-         x/8qNcsDkIKNwUD9LRIznQLz5y8fC/hmqyMg+P7wgQu+/tkvUElblmvKLTbFvhvso/vc
-         sf/ymmCt4Mh5CUuRILIgOLb68XGMgxmYQHowR7wH8SvXIrweze5zEyZBACjpfKXTMMt5
-         D8tw==
-X-Gm-Message-State: AOJu0YzBIxgVCXv83M3AGH9z5SegVbfJANOgGPyJE7Vb55Ppug3jvBNM
-	4nrg+ofJ2NOAtTtmCXk82sYbMHDNygTLK0eobyvLJkAzHcvU+17xCxq7L3HdZCzPVDwgaszgYif
-	EQyBIzqv7MCEyHpWGWwBh+vJniknjfTRgY1DjO79md7G5xdN+TmNPS1cTyo8HO8P6YJhxnc17qE
-	eQ9z3Pxou+BPepPe7VXof8YGMrhB8xL1ZZX1p2B2xTHCiV//XhWnbqtXLXLr7ZZXi84vVCGmdeB
-	E+I6FvpuU/3JrZ33g==
-X-Gm-Gg: AZuq6aJYRv/CCgSixCLaJ8yWSoParSLE/MTn3HAgWlF3Zd5reol1c5oo2PoKJk33zlD
-	5/7hrIE7+yXS0cJgnO7TEZgnVGZP6Gb2TfC2sPI/jdszfjT3nxY/mY4GOipY8s/WS1MUjEs2hJP
-	EF8KWLL193PJC2MSV3OXZZ5OyyJDl2126z4xfOTIAs7X/1VrVTGDGv6Pj0m/27s2jxYlNUApQA/
-	VHLXX3EL7PcDgo0hJUWeazcB8YpMtrN5hbs/7qLKMyHmvblJiAAQQ/dpVGVpyRgoH25QH3dn/iy
-	6R/no93p6EuNY4UNr+5co+Vln9LaI7uDrPd1A9ZK47xf3t+JgSVjtwZaeJ6MJ00mWkkFrNPzWf+
-	XBAJFdS9I/cR8MGIl2ac/2aJTRNqjy//GfxBy5Vp44csAMIK5q3M+QyTFWoCzeGPRZ38/2frLQN
-	UzBduMTLZg4faEBtX+d0LODwIwUNurKw4Jy93TBSQS+6BiiSz6tQaNfA==
-X-Received: by 2002:a05:6830:661b:b0:7c7:e3b:488a with SMTP id 46e09a7af769-7d15a634711mr1970874a34.30.1769196944541;
-        Fri, 23 Jan 2026 11:35:44 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-100.dlp.protect.broadcom.com. [144.49.247.100])
-        by smtp-relay.gmail.com with ESMTPS id 46e09a7af769-7d15b3a10dbsm526366a34.3.2026.01.23.11.35.44
+        bh=l5OU/RLBNz5QlYQHo4MnTuUpoycaD8XZR+hOfHOhW5Q=;
+        b=KScoSJVF4vSJ7hfSwENuGyHDC0FOVJIu3e4iupVZFiGaEnwCox/IpjR65/1FwngtbA
+         6gD2mmXzDxmB87cOcosqJQY/GRR3BVZ7AvzLB8K4L+NiZfybWIPGRSrVxk3U64mBnsnS
+         1dKn1ctsN1iqKs19oMPf9qNLS0kLa7oibq2felinN9j2teR2/xlk2XWimcEd+QFhec5u
+         ZWlDKGMK03Qv4tW1Q4pdgIFjunI83Db+SXY6CNsORQQBZTT0S3q/QbRG2/FpOr7Poy1m
+         k/x6yHuM+78rc43+MFRUIjkJ6CHwh+zEuDVy1WVPBW/tr4n8bJoC4VqieP72rFf3ZxC3
+         tsfg==
+X-Gm-Message-State: AOJu0Yw9jdW5e9hbFzJX4uk954DoYVKIhApXo62VnBPV9HYgu8WEJyMZ
+	aZDWe9qvFS2zDUBJ+4ldiyg0PIol1W3zJAXh8eMiLA+yxnlPgefsj8w45ey3RFv6Q3YzXKj4J2X
+	LxnJ+G3uZpYPhBG8FWSYms+HHRdQUvSXzkMnFyatRpsCGQdUdkWvM7yC1uH5MZEBiiPFha4DuUn
+	2FC/zXsZddBMVZDSkXeNsDQNsthDtytjqbqPGNL9cItPstPdV0hDVoYGBWdvu3fVb2X056AGmGf
+	e5JlCPguPSCEoBsVQ==
+X-Gm-Gg: AZuq6aIqJnhGEQeXg09F+8l/lPF9M7amt05fkoVJ4Od0j5Bi0b+LUDByGsSS4aUVzWn
+	+UyeO0LtvIDiWUmkyfoEUDXeCc9xnBfMRaoBbV6sWX6kPaV9GawjsaoZ+HaMcbi3uZDvSULWM6e
+	ZNcPfG073pJDvjgPpURjWgwpgkAbvTkYQfZojW8KKT6oOeox6aXPniXaRsXSGw0DUXEEUjPBsVr
+	PPfm4CTuRXaHhoCWWPSsV92wyagAFLG0j2o1YP+6O9CpHVj86B7jImEwfVmv7b4XC6J6XC6BirW
+	ZC11/GyvwWsrOp//DlESHMU6w3Le8Dby97+EnN+mOk2YZjx7pbduHOk568TRbK1FaNJsb0ZdCva
+	3hjO+c+BXJ5OHNapDcjAXgJLEaKsaAB7OiN/E9bT/WWtm8HeGS2k81Of6aTsaT3uo3lCDnu6/Xc
+	37h8GOexVViVPKmEo7nhmwQNzmujpDtPE2U9ytRTVKrXz5LsGZeBE=
+X-Received: by 2002:a05:6102:a49:b0:5de:93bb:c53f with SMTP id ada2fe7eead31-5f54bc5d794mr1094922137.25.1769196948487;
+        Fri, 23 Jan 2026 11:35:48 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-77.dlp.protect.broadcom.com. [144.49.247.77])
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-5f54d650df5sm389891137.5.2026.01.23.11.35.48
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Jan 2026 11:35:44 -0800 (PST)
+        Fri, 23 Jan 2026 11:35:48 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-81c68fef4d4so4759773b3a.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:35:43 -0800 (PST)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b630753cc38so4270206a12.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1769196943; x=1769801743; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1769196947; x=1769801747; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k2PNNrzYfwF6RJOlif8UuJP8LkFjNKReEQi+5VZis0Q=;
-        b=WQacgNmadqk7Q45/fKxDfaSfOsURMR5eq/MLEqKwKbfSOht/Cd9xaeCFGu6u2tjHti
-         CwbKW1E3SOojr+Qiz39m9wQOU6NXa/EHAw5R8S6veW5vVPyXaIFY5YySHzkExGp/9SHC
-         b6FpG238P7M2HRL98Ej2QyfV4W/J7t27y9zoc=
-X-Received: by 2002:a05:6a00:3d51:b0:823:1252:9428 with SMTP id d2e1a72fcca58-82317d937femr3300350b3a.9.1769196942804;
-        Fri, 23 Jan 2026 11:35:42 -0800 (PST)
-X-Received: by 2002:a05:6a00:3d51:b0:823:1252:9428 with SMTP id d2e1a72fcca58-82317d937femr3300319b3a.9.1769196942157;
-        Fri, 23 Jan 2026 11:35:42 -0800 (PST)
+        bh=l5OU/RLBNz5QlYQHo4MnTuUpoycaD8XZR+hOfHOhW5Q=;
+        b=dfwI2u9CKUNh138627fU31lBII/o4kdUSlsLxgDtim7SIYiVXrdBLwOVHHowId8yDw
+         MHsQEPttzPoKBOnZg2k5l+CvesXvfmtjdeQ5UeFtAH9B5u0n6NA6JIk9zZ5J2RbpevvP
+         F3M7zuOcrGcrZiIyfqE5aXhs2gfpxoUPT5SUo=
+X-Received: by 2002:a05:6a00:4ac9:b0:81d:e9b1:b6e3 with SMTP id d2e1a72fcca58-82317d95c45mr3591367b3a.14.1769196947120;
+        Fri, 23 Jan 2026 11:35:47 -0800 (PST)
+X-Received: by 2002:a05:6a00:4ac9:b0:81d:e9b1:b6e3 with SMTP id d2e1a72fcca58-82317d95c45mr3591343b3a.14.1769196946503;
+        Fri, 23 Jan 2026 11:35:46 -0800 (PST)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231873e519sm2843206b3a.49.2026.01.23.11.35.38
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231873e519sm2843206b3a.49.2026.01.23.11.35.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 11:35:41 -0800 (PST)
+        Fri, 23 Jan 2026 11:35:46 -0800 (PST)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -104,9 +104,9 @@ Cc: netdev@vger.kernel.org,
 	ajit.khaparde@broadcom.com,
 	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [v6, net-next 6/8] bng_en: Add support to handle AGG events
-Date: Sat, 24 Jan 2026 01:05:02 +0530
-Message-ID: <20260123193504.285573-7-bhargava.marreddy@broadcom.com>
+Subject: [v6, net-next 7/8] bng_en: Add TPA related functions
+Date: Sat, 24 Jan 2026 01:05:03 +0530
+Message-ID: <20260123193504.285573-8-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260123193504.285573-1-bhargava.marreddy@broadcom.com>
 References: <20260123193504.285573-1-bhargava.marreddy@broadcom.com>
@@ -125,7 +125,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -134,432 +134,535 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252942-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252943-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,broadcom.com:dkim,broadcom.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: D522E7A330
+X-Rspamd-Queue-Id: 0A97C7A381
 X-Rspamd-Action: no action
 
-Add AGG event handling in the RX path to receive packet data
-on AGG rings. This enables Jumbo and HDS functionality.
+Add the functions to handle TPA events in RX path.
+This helps the next patch enable TPA functionality.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
 Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnge/bnge_hw_def.h  |  14 ++
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  |  17 +-
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |   5 +
- .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 223 +++++++++++++++++-
- .../net/ethernet/broadcom/bnge/bnge_txrx.h    |   1 +
- 5 files changed, 250 insertions(+), 10 deletions(-)
+ .../net/ethernet/broadcom/bnge/bnge_hw_def.h  | 239 +++++++++++++++++-
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 124 +++++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  46 ++++
+ 3 files changed, 408 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h b/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
-index 0e28352f41f2..d2c2acf44e82 100644
+index d2c2acf44e82..49828dc05514 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
-@@ -139,6 +139,20 @@ struct rx_cmp_ext {
- 	__le32 rx_cmp_timestamp;
- };
+@@ -143,7 +143,7 @@ struct rx_cmp_ext {
+ #define RX_AGG_CMP_LEN			GENMASK(31, 16)
+ #define RX_AGG_CMP_LEN_SHIFT		16
+ #define RX_AGG_CMP_V			BIT(0)
+-#define RX_AGG_CMP_AGG_ID		GENMASK(31, 16)
++#define RX_AGG_CMP_AGG_ID		GENMASK(25, 16)
+ #define RX_AGG_CMP_AGG_ID_SHIFT		16
  
-+#define RX_AGG_CMP_TYPE			GENMASK(5, 0)
-+#define RX_AGG_CMP_LEN			GENMASK(31, 16)
-+#define RX_AGG_CMP_LEN_SHIFT		16
-+#define RX_AGG_CMP_V			BIT(0)
-+#define RX_AGG_CMP_AGG_ID		GENMASK(31, 16)
-+#define RX_AGG_CMP_AGG_ID_SHIFT		16
+ struct rx_agg_cmp {
+@@ -206,4 +206,241 @@ struct rx_agg_cmp {
+ 
+ #define RX_CMP_HASH_VALID(rxcmp)				\
+ 	((rxcmp)->rx_cmp_len_flags_type & cpu_to_le32(RX_CMP_FLAGS_RSS_VALID))
 +
-+struct rx_agg_cmp {
-+	__le32 rx_agg_cmp_len_flags_type;
-+	u32 rx_agg_cmp_opaque;
-+	__le32 rx_agg_cmp_v;
-+	__le32 rx_agg_cmp_unused;
++#define TPA_AGG_AGG_ID(rx_agg)				\
++	((le32_to_cpu((rx_agg)->rx_agg_cmp_v) &		\
++	 RX_AGG_CMP_AGG_ID) >> RX_AGG_CMP_AGG_ID_SHIFT)
++
++#define RX_TPA_START_CMP_TYPE				GENMASK(5, 0)
++#define RX_TPA_START_CMP_FLAGS				GENMASK(15, 6)
++#define RX_TPA_START_CMP_FLAGS_SHIFT			6
++#define RX_TPA_START_CMP_FLAGS_ERROR			BIT(6)
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT		GENMASK(9, 7)
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT_SHIFT		7
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT_JUMBO		BIT(7)
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT_HDS		(0x2 << 7)
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT_GRO_JUMBO	(0x5 << 7)
++#define RX_TPA_START_CMP_FLAGS_PLACEMENT_GRO_HDS	(0x6 << 7)
++#define RX_TPA_START_CMP_FLAGS_RSS_VALID		BIT(10)
++#define RX_TPA_START_CMP_FLAGS_TIMESTAMP		BIT(11)
++#define RX_TPA_START_CMP_FLAGS_ITYPES			GENMASK(15, 12)
++#define RX_TPA_START_CMP_FLAGS_ITYPES_SHIFT		12
++#define RX_TPA_START_CMP_FLAGS_ITYPE_TCP		(0x2 << 12)
++#define RX_TPA_START_CMP_LEN				GENMASK(31, 16)
++#define RX_TPA_START_CMP_LEN_SHIFT			16
++#define RX_TPA_START_CMP_V1				BIT(0)
++#define RX_TPA_START_CMP_RSS_HASH_TYPE			GENMASK(15, 9)
++#define RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT		9
++#define RX_TPA_START_CMP_V3_RSS_HASH_TYPE		GENMASK(15, 7)
++#define RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT		7
++#define RX_TPA_START_CMP_AGG_ID				GENMASK(25, 16)
++#define RX_TPA_START_CMP_AGG_ID_SHIFT			16
++#define RX_TPA_START_CMP_METADATA1			GENMASK(31, 28)
++#define RX_TPA_START_CMP_METADATA1_SHIFT		28
++#define RX_TPA_START_METADATA1_TPID_SEL			GENMASK(30, 28)
++#define RX_TPA_START_METADATA1_TPID_8021Q		BIT(28)
++#define RX_TPA_START_METADATA1_TPID_8021AD		(0x0 << 28)
++#define RX_TPA_START_METADATA1_VALID			BIT(31)
++
++struct rx_tpa_start_cmp {
++	__le32 rx_tpa_start_cmp_len_flags_type;
++	u32 rx_tpa_start_cmp_opaque;
++	__le32 rx_tpa_start_cmp_misc_v1;
++	__le32 rx_tpa_start_cmp_rss_hash;
 +};
 +
- #define RX_CMP_L2_ERRORS						\
- 	cpu_to_le32(RX_CMPL_ERRORS_BUFFER_ERROR_MASK | RX_CMPL_ERRORS_CRC_ERROR)
- 
++#define TPA_START_HASH_VALID(rx_tpa_start)				\
++	((rx_tpa_start)->rx_tpa_start_cmp_len_flags_type &		\
++	 cpu_to_le32(RX_TPA_START_CMP_FLAGS_RSS_VALID))
++
++#define TPA_START_HASH_TYPE(rx_tpa_start)				\
++	(((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	   RX_TPA_START_CMP_RSS_HASH_TYPE) >>				\
++	  RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
++
++#define TPA_START_V3_HASH_TYPE(rx_tpa_start)				\
++	(((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	   RX_TPA_START_CMP_V3_RSS_HASH_TYPE) >>			\
++	  RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
++
++#define TPA_START_AGG_ID(rx_tpa_start)				\
++	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	 RX_TPA_START_CMP_AGG_ID) >> RX_TPA_START_CMP_AGG_ID_SHIFT)
++
++#define TPA_START_ERROR(rx_tpa_start)					\
++	((rx_tpa_start)->rx_tpa_start_cmp_len_flags_type &		\
++	 cpu_to_le32(RX_TPA_START_CMP_FLAGS_ERROR))
++
++#define TPA_START_VLAN_VALID(rx_tpa_start)				\
++	((rx_tpa_start)->rx_tpa_start_cmp_misc_v1 &			\
++	 cpu_to_le32(RX_TPA_START_METADATA1_VALID))
++
++#define TPA_START_VLAN_TPID_SEL(rx_tpa_start)				\
++	(le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	 RX_TPA_START_METADATA1_TPID_SEL)
++
++#define RX_TPA_START_CMP_FLAGS2_IP_CS_CALC		BIT(0)
++#define RX_TPA_START_CMP_FLAGS2_L4_CS_CALC		BIT(1)
++#define RX_TPA_START_CMP_FLAGS2_T_IP_CS_CALC		BIT(2)
++#define RX_TPA_START_CMP_FLAGS2_T_L4_CS_CALC		BIT(3)
++#define RX_TPA_START_CMP_FLAGS2_IP_TYPE			BIT(8)
++#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_VALID		BIT(9)
++#define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT		GENMASK(11, 10)
++#define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT_SHIFT	10
++#define RX_TPA_START_CMP_V3_FLAGS2_T_IP_TYPE		BIT(10)
++#define RX_TPA_START_CMP_V3_FLAGS2_AGG_GRO		BIT(11)
++#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL		GENMASK(31, 16)
++#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_SHIFT		16
++#define RX_TPA_START_CMP_V2				BIT(0)
++#define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_MASK	GENMASK(3, 1)
++#define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_SHIFT	1
++#define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_NO_BUFFER	(0x0 << 1)
++#define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_BAD_FORMAT	(0x3 << 1)
++#define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_FLUSH	(0x5 << 1)
++#define RX_TPA_START_CMP_CFA_CODE			GENMASK(31, 16)
++#define RX_TPA_START_CMPL_CFA_CODE_SHIFT		16
++#define RX_TPA_START_CMP_METADATA0_TCI_MASK		GENMASK(31, 16)
++#define RX_TPA_START_CMP_METADATA0_VID_MASK		GENMASK(27, 16)
++#define RX_TPA_START_CMP_METADATA0_SFT			16
++
++struct rx_tpa_start_cmp_ext {
++	__le32 rx_tpa_start_cmp_flags2;
++	__le32 rx_tpa_start_cmp_metadata;
++	__le32 rx_tpa_start_cmp_cfa_code_v2;
++	__le32 rx_tpa_start_cmp_hdr_info;
++};
++
++#define TPA_START_CFA_CODE(rx_tpa_start)				\
++	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_cfa_code_v2) &	\
++	 RX_TPA_START_CMP_CFA_CODE) >> RX_TPA_START_CMPL_CFA_CODE_SHIFT)
++
++#define TPA_START_IS_IPV6(rx_tpa_start)				\
++	(!!((rx_tpa_start)->rx_tpa_start_cmp_flags2 &		\
++	    cpu_to_le32(RX_TPA_START_CMP_FLAGS2_IP_TYPE)))
++
++#define TPA_START_ERROR_CODE(rx_tpa_start)				\
++	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_cfa_code_v2) &	\
++	  RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_MASK) >>			\
++	 RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_SHIFT)
++
++#define TPA_START_METADATA0_TCI(rx_tpa_start)				\
++	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_cfa_code_v2) &	\
++	  RX_TPA_START_CMP_METADATA0_TCI_MASK) >>			\
++	 RX_TPA_START_CMP_METADATA0_SFT)
++
++#define RX_TPA_END_CMP_TYPE				GENMASK(5, 0)
++#define RX_TPA_END_CMP_FLAGS				GENMASK(15, 6)
++#define RX_TPA_END_CMP_FLAGS_SHIFT			6
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT			GENMASK(9, 7)
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_SHIFT		7
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_JUMBO		BIT(7)
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_HDS		(0x2 << 7)
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_GRO_JUMBO	(0x5 << 7)
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_GRO_HDS		(0x6 << 7)
++#define RX_TPA_END_CMP_FLAGS_RSS_VALID			BIT(10)
++#define RX_TPA_END_CMP_FLAGS_ITYPES			GENMASK(15, 12)
++#define RX_TPA_END_CMP_FLAGS_ITYPES_SHIFT		12
++#define RX_TPA_END_CMP_FLAGS_ITYPE_TCP			(0x2 << 12)
++#define RX_TPA_END_CMP_LEN				GENMASK(31, 16)
++#define RX_TPA_END_CMP_LEN_SHIFT			16
++#define RX_TPA_END_CMP_V1				BIT(0)
++#define RX_TPA_END_CMP_TPA_SEGS				GENMASK(15, 8)
++#define RX_TPA_END_CMP_TPA_SEGS_SHIFT			8
++#define RX_TPA_END_CMP_AGG_ID				GENMASK(25, 16)
++#define RX_TPA_END_CMP_AGG_ID_SHIFT			16
++#define RX_TPA_END_GRO_TS				BIT(31)
++
++struct rx_tpa_end_cmp {
++	__le32 rx_tpa_end_cmp_len_flags_type;
++	u32 rx_tpa_end_cmp_opaque;
++	__le32 rx_tpa_end_cmp_misc_v1;
++	__le32 rx_tpa_end_cmp_tsdelta;
++};
++
++#define TPA_END_AGG_ID(rx_tpa_end)					\
++	((le32_to_cpu((rx_tpa_end)->rx_tpa_end_cmp_misc_v1) &		\
++	 RX_TPA_END_CMP_AGG_ID) >> RX_TPA_END_CMP_AGG_ID_SHIFT)
++
++#define TPA_END_TPA_SEGS(rx_tpa_end)					\
++	((le32_to_cpu((rx_tpa_end)->rx_tpa_end_cmp_misc_v1) &		\
++	 RX_TPA_END_CMP_TPA_SEGS) >> RX_TPA_END_CMP_TPA_SEGS_SHIFT)
++
++#define RX_TPA_END_CMP_FLAGS_PLACEMENT_ANY_GRO				\
++	cpu_to_le32(RX_TPA_END_CMP_FLAGS_PLACEMENT_GRO_JUMBO &		\
++		    RX_TPA_END_CMP_FLAGS_PLACEMENT_GRO_HDS)
++
++#define TPA_END_GRO(rx_tpa_end)						\
++	((rx_tpa_end)->rx_tpa_end_cmp_len_flags_type &			\
++	 RX_TPA_END_CMP_FLAGS_PLACEMENT_ANY_GRO)
++
++#define TPA_END_GRO_TS(rx_tpa_end)					\
++	(!!((rx_tpa_end)->rx_tpa_end_cmp_tsdelta &			\
++	    cpu_to_le32(RX_TPA_END_GRO_TS)))
++
++#define RX_TPA_END_CMP_TPA_DUP_ACKS			GENMASK(3, 0)
++#define RX_TPA_END_CMP_PAYLOAD_OFFSET			GENMASK(23, 16)
++#define RX_TPA_END_CMP_PAYLOAD_OFFSET_SHIFT		16
++#define RX_TPA_END_CMP_AGG_BUFS				GENMASK(31, 24)
++#define RX_TPA_END_CMP_AGG_BUFS_SHIFT			24
++#define RX_TPA_END_CMP_TPA_SEG_LEN			GENMASK(15, 0)
++#define RX_TPA_END_CMP_V2				BIT(0)
++#define RX_TPA_END_CMP_ERRORS				GENMASK(2, 1)
++#define RX_TPA_END_CMPL_ERRORS_SHIFT			1
++#define RX_TPA_END_CMP_ERRORS_BUFFER_ERROR_NO_BUFFER	(0x0 << 1)
++#define RX_TPA_END_CMP_ERRORS_BUFFER_ERROR_NOT_ON_CHIP	(0x2 << 1)
++#define RX_TPA_END_CMP_ERRORS_BUFFER_ERROR_BAD_FORMAT	(0x3 << 1)
++#define RX_TPA_END_CMP_ERRORS_BUFFER_ERROR_RSV_ERROR	(0x4 << 1)
++#define RX_TPA_END_CMP_ERRORS_BUFFER_ERROR_FLUSH	(0x5 << 1)
++
++struct rx_tpa_end_cmp_ext {
++	__le32 rx_tpa_end_cmp_dup_acks;
++	__le32 rx_tpa_end_cmp_seg_len;
++	__le32 rx_tpa_end_cmp_errors_v2;
++	u32 rx_tpa_end_cmp_start_opaque;
++};
++
++#define TPA_END_ERRORS(rx_tpa_end_ext)					\
++	((rx_tpa_end_ext)->rx_tpa_end_cmp_errors_v2 &			\
++	 cpu_to_le32(RX_TPA_END_CMP_ERRORS))
++
++#define TPA_END_PAYLOAD_OFF(rx_tpa_end_ext)				\
++	((le32_to_cpu((rx_tpa_end_ext)->rx_tpa_end_cmp_dup_acks) &	\
++	 RX_TPA_END_CMP_PAYLOAD_OFFSET) >>				\
++	RX_TPA_END_CMP_PAYLOAD_OFFSET_SHIFT)
++
++#define TPA_END_AGG_BUFS(rx_tpa_end_ext)				\
++	((le32_to_cpu((rx_tpa_end_ext)->rx_tpa_end_cmp_dup_acks) &	\
++	 RX_TPA_END_CMP_AGG_BUFS) >> RX_TPA_END_CMP_AGG_BUFS_SHIFT)
++
++#define EVENT_DATA1_RESET_NOTIFY_FATAL(data1)				\
++	(((data1) &							\
++	  ASYNC_EVENT_CMPL_RESET_NOTIFY_EVENT_DATA1_REASON_CODE_MASK) ==\
++	 ASYNC_EVENT_CMPL_RESET_NOTIFY_EVENT_DATA1_REASON_CODE_FW_EXCEPTION_FATAL)
++
++#define EVENT_DATA1_RESET_NOTIFY_FW_ACTIVATION(data1)			\
++	(((data1) &							\
++	  ASYNC_EVENT_CMPL_RESET_NOTIFY_EVENT_DATA1_REASON_CODE_MASK) ==\
++	ASYNC_EVENT_CMPL_RESET_NOTIFY_EVENT_DATA1_REASON_CODE_FW_ACTIVATION)
++
++#define EVENT_DATA2_RESET_NOTIFY_FW_STATUS_CODE(data2)			\
++	((data2) &							\
++	ASYNC_EVENT_CMPL_RESET_NOTIFY_EVENT_DATA2_FW_STATUS_CODE_MASK)
++
++#define EVENT_DATA1_RECOVERY_MASTER_FUNC(data1)				\
++	(!!((data1) &							\
++	   ASYNC_EVENT_CMPL_ERROR_RECOVERY_EVENT_DATA1_FLAGS_MASTER_FUNC))
++
++#define EVENT_DATA1_RECOVERY_ENABLED(data1)				\
++	(!!((data1) &							\
++	   ASYNC_EVENT_CMPL_ERROR_RECOVERY_EVENT_DATA1_FLAGS_RECOVERY_ENABLED))
++
++#define BNGE_EVENT_ERROR_REPORT_TYPE(data1)				\
++	(((data1) &							\
++	  ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_MASK) >>\
++	 ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_SFT)
++
++#define BNGE_EVENT_INVALID_SIGNAL_DATA(data2)				\
++	(((data2) &							\
++	  ASYNC_EVENT_CMPL_ERROR_REPORT_INVALID_SIGNAL_EVENT_DATA2_PIN_ID_MASK) >>\
++	 ASYNC_EVENT_CMPL_ERROR_REPORT_INVALID_SIGNAL_EVENT_DATA2_PIN_ID_SFT)
+ #endif /* _BNGE_HW_DEF_H_ */
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 2c8f8949d500..5b0e326c5056 100644
+index 5b0e326c5056..6e240f48d89b 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -10,6 +10,9 @@
- #include <linux/list.h>
- #include <linux/pci.h>
- #include <linux/netdevice.h>
-+#include <net/netdev_lock.h>
-+#include <net/netdev_queues.h>
-+#include <net/netdev_rx_queue.h>
- #include <linux/etherdevice.h>
- #include <linux/if.h>
- #include <net/ip.h>
-@@ -979,9 +982,9 @@ static netmem_ref __bnge_alloc_rx_netmem(struct bnge_net *bn,
- 	return netmem;
+@@ -377,11 +377,37 @@ static void bnge_free_one_agg_ring_bufs(struct bnge_net *bn,
+ 	}
  }
  
--static u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
--				struct bnge_rx_ring_info *rxr,
--				gfp_t gfp)
-+u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
-+			 struct bnge_rx_ring_info *rxr,
-+			 gfp_t gfp)
++static void bnge_free_one_tpa_info_data(struct bnge_net *bn,
++					struct bnge_rx_ring_info *rxr)
++{
++	int i;
++
++	for (i = 0; i < bn->max_tpa; i++) {
++		struct bnge_tpa_info *tpa_info = &rxr->rx_tpa[i];
++		u8 *data = tpa_info->data;
++
++		if (!data)
++			continue;
++
++		tpa_info->data = NULL;
++		page_pool_free_va(rxr->head_pool, data, false);
++	}
++}
++
+ static void bnge_free_one_rx_ring_pair_bufs(struct bnge_net *bn,
+ 					    struct bnge_rx_ring_info *rxr)
  {
- 	unsigned int offset;
- 	struct page *page;
-@@ -1048,7 +1051,7 @@ static int bnge_alloc_one_rx_ring_bufs(struct bnge_net *bn,
++	struct bnge_tpa_idx_map *map;
++
++	if (rxr->rx_tpa)
++		bnge_free_one_tpa_info_data(bn, rxr);
++
+ 	bnge_free_one_rx_ring_bufs(bn, rxr);
+ 	bnge_free_one_agg_ring_bufs(bn, rxr);
++
++	map = rxr->rx_tpa_idx_map;
++	if (map)
++		memset(map->agg_idx_bmap, 0, sizeof(map->agg_idx_bmap));
+ }
+ 
+ static void bnge_free_rx_ring_pair_bufs(struct bnge_net *bn)
+@@ -452,11 +478,70 @@ static void bnge_free_all_rings_bufs(struct bnge_net *bn)
+ 	bnge_free_tx_skbs(bn);
+ }
+ 
++static void bnge_free_tpa_info(struct bnge_net *bn)
++{
++	struct bnge_dev *bd = bn->bd;
++	int i, j;
++
++	for (i = 0; i < bd->rx_nr_rings; i++) {
++		struct bnge_rx_ring_info *rxr = &bn->rx_ring[i];
++
++		kfree(rxr->rx_tpa_idx_map);
++		rxr->rx_tpa_idx_map = NULL;
++		if (rxr->rx_tpa) {
++			for (j = 0; j < bn->max_tpa; j++) {
++				kfree(rxr->rx_tpa[j].agg_arr);
++				rxr->rx_tpa[j].agg_arr = NULL;
++			}
++		}
++		kfree(rxr->rx_tpa);
++		rxr->rx_tpa = NULL;
++	}
++}
++
++static int bnge_alloc_tpa_info(struct bnge_net *bn)
++{
++	struct bnge_dev *bd = bn->bd;
++	int i, j;
++
++	if (!bd->max_tpa_v2)
++		return 0;
++
++	bn->max_tpa = max_t(u16, bd->max_tpa_v2, MAX_TPA);
++	for (i = 0; i < bd->rx_nr_rings; i++) {
++		struct bnge_rx_ring_info *rxr = &bn->rx_ring[i];
++
++		rxr->rx_tpa = kcalloc(bn->max_tpa, sizeof(struct bnge_tpa_info),
++				      GFP_KERNEL);
++		if (!rxr->rx_tpa)
++			goto err_free_tpa_info;
++
++		for (j = 0; j < bn->max_tpa; j++) {
++			struct rx_agg_cmp *agg;
++
++			agg = kcalloc(MAX_SKB_FRAGS, sizeof(*agg), GFP_KERNEL);
++			if (!agg)
++				goto err_free_tpa_info;
++			rxr->rx_tpa[j].agg_arr = agg;
++		}
++		rxr->rx_tpa_idx_map = kzalloc(sizeof(*rxr->rx_tpa_idx_map),
++					      GFP_KERNEL);
++		if (!rxr->rx_tpa_idx_map)
++			goto err_free_tpa_info;
++	}
++	return 0;
++
++err_free_tpa_info:
++	bnge_free_tpa_info(bn);
++	return -ENOMEM;
++}
++
+ static void bnge_free_rx_rings(struct bnge_net *bn)
+ {
+ 	struct bnge_dev *bd = bn->bd;
+ 	int i;
+ 
++	bnge_free_tpa_info(bn);
+ 	for (i = 0; i < bd->rx_nr_rings; i++) {
+ 		struct bnge_rx_ring_info *rxr = &bn->rx_ring[i];
+ 		struct bnge_ring_struct *ring;
+@@ -581,6 +666,12 @@ static int bnge_alloc_rx_rings(struct bnge_net *bn)
+ 				goto err_free_rx_rings;
+ 		}
+ 	}
++
++	if (bn->priv_flags & BNGE_NET_EN_TPA) {
++		rc = bnge_alloc_tpa_info(bn);
++		if (rc)
++			goto err_free_rx_rings;
++	}
+ 	return rc;
+ 
+ err_free_rx_rings:
+@@ -1126,6 +1217,30 @@ static int bnge_alloc_one_agg_ring_bufs(struct bnge_net *bn,
+ 	return -ENOMEM;
+ }
+ 
++static int bnge_alloc_one_tpa_info_data(struct bnge_net *bn,
++					struct bnge_rx_ring_info *rxr)
++{
++	dma_addr_t mapping;
++	u8 *data;
++	int i;
++
++	for (i = 0; i < bn->max_tpa; i++) {
++		data = __bnge_alloc_rx_frag(bn, &mapping, rxr,
++					    GFP_KERNEL);
++		if (!data)
++			goto err_free_tpa_info_data;
++
++		rxr->rx_tpa[i].data = data;
++		rxr->rx_tpa[i].data_ptr = data + bn->rx_offset;
++		rxr->rx_tpa[i].mapping = mapping;
++	}
++	return 0;
++
++err_free_tpa_info_data:
++	bnge_free_one_tpa_info_data(bn, rxr);
++	return -ENOMEM;
++}
++
+ static int bnge_alloc_one_rx_ring_pair_bufs(struct bnge_net *bn, int ring_nr)
+ {
+ 	struct bnge_rx_ring_info *rxr = &bn->rx_ring[ring_nr];
+@@ -1140,8 +1255,17 @@ static int bnge_alloc_one_rx_ring_pair_bufs(struct bnge_net *bn, int ring_nr)
+ 		if (rc)
+ 			goto err_free_one_rx_ring_bufs;
+ 	}
++
++	if (rxr->rx_tpa) {
++		rc = bnge_alloc_one_tpa_info_data(bn, rxr);
++		if (rc)
++			goto err_free_one_agg_ring_bufs;
++	}
++
  	return 0;
- }
  
--static u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
-+u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
- {
- 	u16 next, max = rxr->rx_agg_bmap_size;
- 
-@@ -1058,9 +1061,9 @@ static u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
- 	return next;
- }
- 
--static int bnge_alloc_rx_netmem(struct bnge_net *bn,
--				struct bnge_rx_ring_info *rxr,
--				u16 prod, gfp_t gfp)
-+int bnge_alloc_rx_netmem(struct bnge_net *bn,
-+			 struct bnge_rx_ring_info *rxr,
-+			 u16 prod, gfp_t gfp)
- {
- 	struct bnge_sw_rx_agg_bd *rx_agg_buf;
- 	u16 sw_prod = rxr->rx_sw_agg_prod;
++err_free_one_agg_ring_bufs:
++	bnge_free_one_agg_ring_bufs(bn, rxr);
+ err_free_one_rx_ring_bufs:
+ 	bnge_free_one_rx_ring_bufs(bn, rxr);
+ 	return rc;
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index d7cef5c5ba68..ee036ce63655 100644
+index ee036ce63655..89c9775f610e 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -514,4 +514,9 @@ u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr);
- void bnge_fill_hw_rss_tbl(struct bnge_net *bn, struct bnge_vnic_info *vnic);
- int bnge_alloc_rx_data(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
- 		       u16 prod, gfp_t gfp);
-+u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx);
-+u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
-+			 struct bnge_rx_ring_info *rxr, gfp_t gfp);
-+int bnge_alloc_rx_netmem(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
-+			 u16 prod, gfp_t gfp);
- #endif /* _BNGE_NETDEV_H_ */
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-index 33f39a57f12d..363f835438f4 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-@@ -13,6 +13,7 @@
- #include <linux/etherdevice.h>
- #include <linux/if.h>
- #include <net/ip.h>
-+#include <net/tcp.h>
- #include <linux/skbuff.h>
- #include <net/page_pool/helpers.h>
- #include <linux/if_vlan.h>
-@@ -43,6 +44,191 @@ irqreturn_t bnge_msix(int irq, void *dev_instance)
- 	return IRQ_HANDLED;
- }
+@@ -153,6 +153,45 @@ enum {
  
-+static struct rx_agg_cmp *bnge_get_agg(struct bnge_net *bn,
-+				       struct bnge_cp_ring_info *cpr,
-+				       u16 cp_cons, u16 curr)
-+{
-+	struct rx_agg_cmp *agg;
-+
-+	cp_cons = RING_CMP(bn, ADV_RAW_CMP(cp_cons, curr));
-+	agg = (struct rx_agg_cmp *)
-+		&cpr->desc_ring[CP_RING(cp_cons)][CP_IDX(cp_cons)];
-+	return agg;
-+}
-+
-+static void bnge_reuse_rx_agg_bufs(struct bnge_cp_ring_info *cpr, u16 idx,
-+				   u16 start, u32 agg_bufs)
-+{
-+	struct bnge_napi *bnapi = cpr->bnapi;
-+	struct bnge_net *bn = bnapi->bn;
-+	struct bnge_rx_ring_info *rxr;
-+	u16 prod, sw_prod;
-+	u32 i;
-+
-+	rxr = bnapi->rx_ring;
-+	sw_prod = rxr->rx_sw_agg_prod;
-+	prod = rxr->rx_agg_prod;
-+
-+	for (i = 0; i < agg_bufs; i++) {
-+		struct bnge_sw_rx_agg_bd *cons_rx_buf, *prod_rx_buf;
-+		struct rx_agg_cmp *agg;
-+		struct rx_bd *prod_bd;
-+		netmem_ref netmem;
-+		u16 cons;
-+
-+		agg = bnge_get_agg(bn, cpr, idx, start + i);
-+		cons = agg->rx_agg_cmp_opaque;
-+		__clear_bit(cons, rxr->rx_agg_bmap);
-+
-+		if (unlikely(test_bit(sw_prod, rxr->rx_agg_bmap)))
-+			sw_prod = bnge_find_next_agg_idx(rxr, sw_prod);
-+
-+		__set_bit(sw_prod, rxr->rx_agg_bmap);
-+		prod_rx_buf = &rxr->rx_agg_buf_ring[sw_prod];
-+		cons_rx_buf = &rxr->rx_agg_buf_ring[cons];
-+
-+		/* It is possible for sw_prod to be equal to cons, so
-+		 * set cons_rx_buf->netmem to 0 first.
-+		 */
-+		netmem = cons_rx_buf->netmem;
-+		cons_rx_buf->netmem = 0;
-+		prod_rx_buf->netmem = netmem;
-+		prod_rx_buf->offset = cons_rx_buf->offset;
-+
-+		prod_rx_buf->mapping = cons_rx_buf->mapping;
-+
-+		prod_bd = &rxr->rx_agg_desc_ring[RX_AGG_RING(bn, prod)]
-+					[RX_IDX(prod)];
-+
-+		prod_bd->rx_bd_haddr = cpu_to_le64(cons_rx_buf->mapping);
-+		prod_bd->rx_bd_opaque = sw_prod;
-+
-+		prod = NEXT_RX_AGG(prod);
-+		sw_prod = RING_RX_AGG(bn, NEXT_RX_AGG(sw_prod));
-+	}
-+	rxr->rx_agg_prod = prod;
-+	rxr->rx_sw_agg_prod = sw_prod;
-+}
-+
-+static int bnge_agg_bufs_valid(struct bnge_net *bn,
-+			       struct bnge_cp_ring_info *cpr,
-+			       u8 agg_bufs, u32 *raw_cons)
-+{
-+	struct rx_agg_cmp *agg;
-+	u16 last;
-+
-+	*raw_cons = ADV_RAW_CMP(*raw_cons, agg_bufs);
-+	last = RING_CMP(bn, *raw_cons);
-+	agg = (struct rx_agg_cmp *)
-+		&cpr->desc_ring[CP_RING(last)][CP_IDX(last)];
-+	return RX_AGG_CMP_VALID(bn, agg, *raw_cons);
-+}
-+
-+static int bnge_discard_rx(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
-+			   u32 *raw_cons, void *cmp)
-+{
-+	u32 tmp_raw_cons = *raw_cons;
-+	struct rx_cmp *rxcmp = cmp;
-+	u8 cmp_type, agg_bufs = 0;
-+
-+	cmp_type = RX_CMP_TYPE(rxcmp);
-+
-+	if (cmp_type == CMP_TYPE_RX_L2_CMP) {
-+		agg_bufs = (le32_to_cpu(rxcmp->rx_cmp_misc_v1) &
-+			    RX_CMP_AGG_BUFS) >>
-+			   RX_CMP_AGG_BUFS_SHIFT;
-+	}
-+
-+	if (agg_bufs) {
-+		if (!bnge_agg_bufs_valid(bn, cpr, agg_bufs, &tmp_raw_cons))
-+			return -EBUSY;
-+	}
-+	*raw_cons = tmp_raw_cons;
-+	return 0;
-+}
-+
-+static u32 __bnge_rx_agg_netmems(struct bnge_net *bn,
-+				 struct bnge_cp_ring_info *cpr,
-+				 u16 idx, u32 agg_bufs,
-+				 struct sk_buff *skb)
-+{
-+	struct bnge_napi *bnapi = cpr->bnapi;
-+	struct skb_shared_info *shinfo;
-+	struct bnge_rx_ring_info *rxr;
-+	u32 i, total_frag_len = 0;
-+	u16 prod;
-+
-+	rxr = bnapi->rx_ring;
-+	prod = rxr->rx_agg_prod;
-+	shinfo = skb_shinfo(skb);
-+
-+	for (i = 0; i < agg_bufs; i++) {
-+		struct bnge_sw_rx_agg_bd *cons_rx_buf;
-+		struct rx_agg_cmp *agg;
-+		u16 cons, frag_len;
-+		netmem_ref netmem;
-+
-+		agg = bnge_get_agg(bn, cpr, idx, i);
-+		cons = agg->rx_agg_cmp_opaque;
-+		frag_len = (le32_to_cpu(agg->rx_agg_cmp_len_flags_type) &
-+			    RX_AGG_CMP_LEN) >> RX_AGG_CMP_LEN_SHIFT;
-+
-+		cons_rx_buf = &rxr->rx_agg_buf_ring[cons];
-+		skb_add_rx_frag_netmem(skb, i, cons_rx_buf->netmem,
-+				       cons_rx_buf->offset,
-+				       frag_len, BNGE_RX_PAGE_SIZE);
-+		__clear_bit(cons, rxr->rx_agg_bmap);
-+
-+		/* It is possible for bnge_alloc_rx_netmem() to allocate
-+		 * a sw_prod index that equals the cons index, so we
-+		 * need to clear the cons entry now.
-+		 */
-+		netmem = cons_rx_buf->netmem;
-+		cons_rx_buf->netmem = 0;
-+
-+		if (bnge_alloc_rx_netmem(bn, rxr, prod, GFP_ATOMIC) != 0) {
-+			skb->len -= frag_len;
-+			skb->data_len -= frag_len;
-+			skb->truesize -= BNGE_RX_PAGE_SIZE;
-+
-+			--shinfo->nr_frags;
-+			cons_rx_buf->netmem = netmem;
-+
-+			/* Update prod since possibly some netmems have been
-+			 * allocated already.
-+			 */
-+			rxr->rx_agg_prod = prod;
-+			bnge_reuse_rx_agg_bufs(cpr, idx, i, agg_bufs - i);
-+			return 0;
-+		}
-+
-+		page_pool_dma_sync_netmem_for_cpu(rxr->page_pool, netmem, 0,
-+						  BNGE_RX_PAGE_SIZE);
-+
-+		total_frag_len += frag_len;
-+		prod = NEXT_RX_AGG(prod);
-+	}
-+	rxr->rx_agg_prod = prod;
-+	return total_frag_len;
-+}
-+
-+static struct sk_buff *bnge_rx_agg_netmems_skb(struct bnge_net *bn,
-+					       struct bnge_cp_ring_info *cpr,
-+					       struct sk_buff *skb, u16 idx,
-+					       u32 agg_bufs)
-+{
-+	u32 total_frag_len;
-+
-+	total_frag_len = __bnge_rx_agg_netmems(bn, cpr, idx, agg_bufs, skb);
-+	if (!total_frag_len) {
-+		skb_mark_for_recycle(skb);
-+		dev_kfree_skb(skb);
-+		return NULL;
-+	}
-+
-+	return skb;
-+}
-+
- static void bnge_sched_reset_rxr(struct bnge_net *bn,
- 				 struct bnge_rx_ring_info *rxr)
- {
-@@ -221,15 +407,16 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
- 	struct bnge_napi *bnapi = cpr->bnapi;
- 	struct net_device *dev = bn->netdev;
- 	struct bnge_rx_ring_info *rxr;
-+	u32 tmp_raw_cons, flags, misc;
- 	struct bnge_sw_rx_bd *rx_buf;
- 	struct rx_cmp_ext *rxcmp1;
- 	u16 cons, prod, cp_cons;
--	u32 tmp_raw_cons, flags;
- 	u8 *data_ptr, cmp_type;
- 	struct rx_cmp *rxcmp;
- 	dma_addr_t dma_addr;
- 	struct sk_buff *skb;
- 	unsigned int len;
-+	u8 agg_bufs;
- 	void *data;
- 	int rc = 0;
+ #define BNGE_NET_EN_TPA		(BNGE_NET_EN_GRO | BNGE_NET_EN_LRO)
  
-@@ -258,11 +445,15 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
++#define BNGE_NO_FW_ACCESS(bd)	(pci_channel_offline((bd)->pdev))
++
++#define MAX_TPA		256
++#define MAX_TPA_MASK	(MAX_TPA - 1)
++#define MAX_TPA_SEGS	0x3f
++
++#define BNGE_TPA_INNER_L3_OFF(hdr_info)	\
++	(((hdr_info) >> 18) & 0x1ff)
++
++#define BNGE_TPA_INNER_L2_OFF(hdr_info)	\
++	(((hdr_info) >> 9) & 0x1ff)
++
++#define BNGE_TPA_OUTER_L3_OFF(hdr_info)	\
++	((hdr_info) & 0x1ff)
++
++struct bnge_tpa_idx_map {
++	u16		agg_id_tbl[1024];
++	DECLARE_BITMAP(agg_idx_bmap, MAX_TPA);
++};
++
++struct bnge_tpa_info {
++	void			*data;
++	u8			*data_ptr;
++	dma_addr_t		mapping;
++	u16			len;
++	unsigned short		gso_type;
++	u32			flags2;
++	u32			metadata;
++	enum pkt_hash_types	hash_type;
++	u32			rss_hash;
++	u32			hdr_info;
++
++	u16			cfa_code; /* cfa_code in TPA start compl */
++	u8			agg_count;
++	u8			vlan_valid:1;
++	u8			cfa_code_valid:1;
++	struct rx_agg_cmp	*agg_arr;
++};
++
+ /* Minimum TX BDs for a TX packet with MAX_SKB_FRAGS + 1. We need one extra
+  * BD because the first TX BD is always a long BD.
+  */
+@@ -245,6 +284,10 @@ struct bnge_net {
+ #define BNGE_STATE_NAPI_DISABLED	0
  
- 	cons = rxcmp->rx_cmp_opaque;
- 	if (unlikely(cons != rxr->rx_next_cons)) {
-+		int rc1 = bnge_discard_rx(bn, cpr, &tmp_raw_cons, rxcmp);
-+
- 		/* 0xffff is forced error, don't print it */
- 		if (rxr->rx_next_cons != 0xffff)
- 			netdev_warn(bn->netdev, "RX cons %x != expected cons %x\n",
- 				    cons, rxr->rx_next_cons);
- 		bnge_sched_reset_rxr(bn, rxr);
-+		if (rc1)
-+			return rc1;
- 		goto next_rx_no_prod_no_len;
- 	}
- 	rx_buf = &rxr->rx_buf_ring[cons];
-@@ -270,11 +461,23 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
- 	data_ptr = rx_buf->data_ptr;
- 	prefetch(data_ptr);
+ 	u32			msg_enable;
++	u16			max_tpa;
++	__be16			vxlan_port;
++	__be16			nge_port;
++	__be16			vxlan_gpe_port;
+ };
  
-+	misc = le32_to_cpu(rxcmp->rx_cmp_misc_v1);
-+	agg_bufs = (misc & RX_CMP_AGG_BUFS) >> RX_CMP_AGG_BUFS_SHIFT;
-+
-+	if (agg_bufs) {
-+		if (!bnge_agg_bufs_valid(bn, cpr, agg_bufs, &tmp_raw_cons))
-+			return -EBUSY;
-+
-+		cp_cons = NEXT_CMP(bn, cp_cons);
-+		*event |= BNGE_AGG_EVENT;
-+	}
- 	*event |= BNGE_RX_EVENT;
+ #define BNGE_DEFAULT_RX_RING_SIZE	511
+@@ -390,6 +433,9 @@ struct bnge_rx_ring_info {
+ 	dma_addr_t		rx_desc_mapping[MAX_RX_PAGES];
+ 	dma_addr_t		rx_agg_desc_mapping[MAX_RX_AGG_PAGES];
  
- 	rx_buf->data = NULL;
- 	if (rxcmp1->rx_cmp_cfa_code_errors_v2 & RX_CMP_L2_ERRORS) {
- 		bnge_reuse_rx_data(rxr, cons, data);
-+		if (agg_bufs)
-+			bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0, agg_bufs);
- 		rc = -EIO;
- 		goto next_rx_no_len;
- 	}
-@@ -286,10 +489,19 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
- 	if (len <= bn->rx_copybreak) {
- 		skb = bnge_copy_skb(bnapi, data_ptr, len, dma_addr);
- 		bnge_reuse_rx_data(rxr, cons, data);
--		if (!skb)
--			goto oom_next_rx;
- 	} else {
- 		skb = bnge_rx_skb(bn, rxr, cons, data, data_ptr, dma_addr, len);
-+	}
++	struct bnge_tpa_info	*rx_tpa;
++	struct bnge_tpa_idx_map *rx_tpa_idx_map;
 +
-+	if (!skb) {
-+		if (agg_bufs)
-+			bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0, agg_bufs);
-+		goto oom_next_rx;
-+	}
-+
-+	if (agg_bufs) {
-+		skb = bnge_rx_agg_netmems_skb(bn, cpr, skb, cp_cons,
-+					      agg_bufs);
- 		if (!skb)
- 			goto oom_next_rx;
- 	}
-@@ -469,6 +681,11 @@ static void __bnge_poll_work_done(struct bnge_net *bn, struct bnge_napi *bnapi,
- 		bnge_db_write(bn->bd, &rxr->rx_db, rxr->rx_prod);
- 		bnapi->events &= ~BNGE_RX_EVENT;
- 	}
-+
-+	if (bnapi->events & BNGE_AGG_EVENT) {
-+		bnge_db_write(bn->bd, &rxr->rx_agg_db, rxr->rx_agg_prod);
-+		bnapi->events &= ~BNGE_AGG_EVENT;
-+	}
- }
- 
- static void
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
-index 32be5eb46870..2a17ff639100 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
-@@ -107,6 +107,7 @@ static inline void bnge_db_write_relaxed(struct bnge_net *bn,
- #define ADV_RAW_CMP(idx, n)	((idx) + (n))
- #define NEXT_RAW_CMP(idx)	ADV_RAW_CMP(idx, 1)
- #define RING_CMP(bn, idx)	((idx) & (bn)->cp_ring_mask)
-+#define NEXT_CMP(bn, idx)	RING_CMP(bn, ADV_RAW_CMP(idx, 1))
- 
- #define RX_CMP_ITYPES(rxcmp)					\
- 	(le32_to_cpu((rxcmp)->rx_cmp_len_flags_type) & RX_CMP_FLAGS_ITYPES_MASK)
+ 	struct bnge_ring_struct	rx_ring_struct;
+ 	struct bnge_ring_struct	rx_agg_ring_struct;
+ 	struct page_pool	*page_pool;
 -- 
 2.47.3
 
