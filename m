@@ -1,364 +1,188 @@
-Return-Path: <netdev+bounces-252685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252686-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Kn0CMUuc2mTswAAu9opvQ
-	(envelope-from <netdev+bounces-252685-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:18:13 +0100
+	id KKI7BFguc2mTswAAu9opvQ
+	(envelope-from <netdev+bounces-252686-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:16:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A2872537
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:18:12 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9306724F5
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CCDB302A6D5
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:14:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B8BE300752E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A73434405F;
-	Fri, 23 Jan 2026 08:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25B3330B28;
+	Fri, 23 Jan 2026 08:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HkBN1Yh9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mr/xdLY0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vEr63Vax"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A053D308F2E
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4E4314A95
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769156054; cv=none; b=fi8m3mY5oE4DJiu1viOg2APR2AnR40dRnEvSKjZJITdNJo5zM1Ukf9gwLHJ4o74E1O2qrJrGgffctnY5cISXvnLpV3eC6XciQNJwKvDi6joawN+CKbWDusCKo6Iu6I5TdT3+/xCzYrwJTxk5ZX/cuKde4e4kANnUuBkf4xMLawo=
+	t=1769156180; cv=none; b=iQMFD/KjR1PXVOKixXBzsIu5GKXtIg5P1MzctgaNW5Q/H6VSG7mrc+W7+nOQcVyvsreXDY0PFwYtI57UB9nAbUdA4Q6+M2LxlY1b+w8PtACU4x2YPRMksWLgawDgya3BQlTn+9VYKqwrdMPYmThMX0i/yRq+T3JNF6dCSUI4jOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769156054; c=relaxed/simple;
-	bh=DmQW5z8oZn1rOIHFFsFCMso8GAYkWZwW086RWgaAgoA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jyHTJ2eviUkBNr2i6eDeKIq9gPB6BoeyzxqwCJMrTsg9UV5FXsUgATJPLKLw6Aw/cgDfc8nUTU5588+3or8XcfUQEX7zAhvmZZiM5Xn5V2cfyz3eB1EBkhngTy5yY8hsWqUZTEiQrVQXLrSyY61/v/AtrwUkam7wtH1vTZV8Rkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HkBN1Yh9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mr/xdLY0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769156051;
+	s=arc-20240116; t=1769156180; c=relaxed/simple;
+	bh=BsTbk9PK/Dho8o57iGK8Ji2OTakuElTTQ+Nej8bohjM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qFcg55+psPZ547ULkv4TpppOrbQzhXhv/QRDNFWi92ZSXKwDIx7ptM/UL2xw0CXQxVUGRdLnZdxH4M7vFwpoBXjfQF9Wl3w4SIyIIpIQNtkNdzobj8wkwH9GTHnkEK/nlp14QBWYU4OYR4MU6GdCt1J/I37BB5SwdB2hfU5HN/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vEr63Vax; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769156166;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NzEfV1jz0zhOiOT9COdmIzS6u1ujWo47exY0xdd1fnE=;
-	b=HkBN1Yh9oMRXXkCYjr+P75U7CCrBKSCvPCvc+rFl/zY6kqh6uhlj3K6VLTjrjWb45XNmcJ
-	dTXzBLMarDRCOffQoCnKjlpU3bK7bU8tPkJh5M67Jgf7eQFbw1RbdLMDrlH/2/ySuXv2cV
-	6jPYKPDIM+w3H6Do1LPq/cb2zjQB2Pg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-339gvTpRNF2pSMcdlz-Gig-1; Fri, 23 Jan 2026 03:14:09 -0500
-X-MC-Unique: 339gvTpRNF2pSMcdlz-Gig-1
-X-Mimecast-MFC-AGG-ID: 339gvTpRNF2pSMcdlz-Gig_1769156049
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779ecc3cc8so14729215e9.3
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 00:14:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769156048; x=1769760848; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NzEfV1jz0zhOiOT9COdmIzS6u1ujWo47exY0xdd1fnE=;
-        b=mr/xdLY0L1TfP2xzXvQ4REi+8Qm2G6DDqvCZZIPYFwIsIGh50FNhP48vRs97qDJUxp
-         dwN287rr+UXTDfC0++FSBkC3YuGjntrpO3hmZbK0xBbpTc/rbHBWdfyFRwAtiHYbT/pH
-         b7MZbh3+zzQ5CUxZ298sDpVo6BKOPLYyCU3yHnh8CGejzswyWBbfGmv2V4cXX4JpkcQv
-         eUu/Aq5/+fvG55wAgoWTBYsckFfkalxrBoLCvQnLuHc8Da2FiJw+TmuyqjsQpszod63B
-         FeNvIW5etKU03AegYYHZ3cqr0/j5zo5v5s+UQRkTsziC0Vikxy610Q5xHcX7ZoKbg8H3
-         MQ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769156048; x=1769760848;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NzEfV1jz0zhOiOT9COdmIzS6u1ujWo47exY0xdd1fnE=;
-        b=lJjIUZP3pFzlv2SVavwCpQu9ScZ50nx6OEHcS2YFH0KF2ggOailUAqeN+nRv1yssTj
-         deO+HXcKlTnZCHbl3NMF1EsRSfs2EB+OGQrHHV5SLt5i6vzD7sttyzmMvEpwUiOWuNS5
-         n84AC28GseqkMG74Fid3Yw6iU2W8FQ3xzoVPt1y6QUSWNTMSFMgDh4IsmeaLvxeptit5
-         1DR/ujT9WCapARWhJOt8KtSbxJ2UEWqGdY+7luNq7vuM35u1cxAyL2DKAqp+m71OwtaH
-         Jxqlj69emQFcVif0DUFWgLtAkAaoPHfuWtBpgk+AGEXhFtftkLLQgI31PX07dYfh27Od
-         cFew==
-X-Forwarded-Encrypted: i=1; AJvYcCUBbF18cfQQCrRe4I8VwQ/EHLqXLMkyjhlToWwhWEsB57HRtKzv0GvSmlOJ/KdeeNEAf2Hr8yk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwznTJTV8v31PD+BzVxAeJ0/yKaN5D4qLF9twiR1qgD/OPfBF/3
-	CfaMqgv+SC0oSr/ruUXMb3dMUYtgaAW+nklS3FW8hRETWZIEzc+rk9HxNB0dxPRHJzkGGtaMvBc
-	AwApm0bZL+ve4kq2OKWcMaG2YONNk2UN2shfzKxxmS/C6v8enFLCajVhrcA==
-X-Gm-Gg: AZuq6aJ5kZWXwFCmXJk79mHamUmvHIfan6Pu7oViyrc/ZFPh/RO6AYpRpmDiB8lfigb
-	o/Rh7YFQVpaNT9yRUjzQw/sNomYCzZ16KS58d1XnqrIfbFMkjW3uEUgeYolPlY7awDa797gHvqB
-	gkvaETV+Hx3vF1iq+qDlsKYi69OrkyiUBNjVGMPH6nPofvaOSJ1lTRnJ7nuh1XD9c871HPG55G2
-	jSRZ/GB6chEwsViP/Qd2dl6iXy0TX1pYpm9tu1JVIiF99mOJ97viOuXYVK0w5Z40vbNomjYOmmE
-	FTXwKCsmMOjeSVN/evum64Mcq0JjgXjeivsvtb3qi1C0+38FKeS9i3FLbBuaSaHCeCLHvRzZi7k
-	hxPfDqI6CgrIQ
-X-Received: by 2002:a05:600c:c174:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-4804c95872emr36919635e9.10.1769156048515;
-        Fri, 23 Jan 2026 00:14:08 -0800 (PST)
-X-Received: by 2002:a05:600c:c174:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-4804c95872emr36919265e9.10.1769156048050;
-        Fri, 23 Jan 2026 00:14:08 -0800 (PST)
-Received: from [192.168.88.32] ([216.128.11.175])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85206fsm38711895e9.6.2026.01.23.00.14.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jan 2026 00:14:07 -0800 (PST)
-Message-ID: <60ed19a1-97e1-4342-8dfc-a5db684afa6f@redhat.com>
-Date: Fri, 23 Jan 2026 09:14:06 +0100
+	bh=s5/gOBon1dhydrWDZXwZcbC1y+hCYJIaCL2aKChxtag=;
+	b=vEr63VaxWe8PUFcQkZqOMUJb88ZZobeFvXZ5re+ha18e8e9XToG54pm+B9mgR7TndTRpnJ
+	Z7CVTe8VJw3ADiCjhwMTFmn0grkAqkpjTbh0cwXrBd9nJSv49ToBnt+4fI2m0lDhU4G1WJ
+	RifQIWCxdui44PHAXUK/JzfCSAiJUHE=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
+Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
+ clm@meta.com, ihor.solodrai@linux.dev
+Subject:
+ Re: [PATCH bpf-next v11 04/12] bpf: support fsession for
+ bpf_session_is_return
+Date: Fri, 23 Jan 2026 16:15:50 +0800
+Message-ID: <5071572.31r3eYUQgx@7940hx>
+In-Reply-To:
+ <ccb153dc349dfbbced71546e26de91c4e8094a0c515c3e2a9336dfa1a2f0a607@mail.kernel.org>
+References:
+ <20260123073532.238985-5-dongml2@chinatelecom.cn>
+ <ccb153dc349dfbbced71546e26de91c4e8094a0c515c3e2a9336dfa1a2f0a607@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] udp: add drop count for packets in
- udp_prod_queue
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Mahdi Faramarzpour <mahdifrmx@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, kshitiz.bartariya@zohomail.in
-References: <20260122185357.50922-1-mahdifrmx@gmail.com>
- <willemdebruijn.kernel.1682586fd684e@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <willemdebruijn.kernel.1682586fd684e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	CTE_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-252685-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252686-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0A2872537
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.984];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A9306724F5
 X-Rspamd-Action: no action
 
-On 1/22/26 10:26 PM, Willem de Bruijn wrote:
-> Mahdi Faramarzpour wrote:
->> This commit adds SNMP drop count increment for the packets in
->> per NUMA queues which were introduced in commit b650bf0977d3
->> ("udp: remove busylock and add per NUMA queues"). note that SNMP
->> counters are incremented currently by the caller for skb. And
->> that these skbs on the intermediate queue cannot be counted
->> there so need similar logic in their error path.
->>
->> Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
->> ---
->> v5:
->>   - check if drop counts are non-zero before increasing countrers
->> v4: https://lore.kernel.org/netdev/20260108102950.49417-1-mahdifrmx@gmail.com/
->>   - move all changes to unlikely(to_drop) branch
->> v3: https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@gmail.com/
->>   - remove the unreachable UDP_MIB_RCVBUFERRORS code
->> v2: https://lore.kernel.org/netdev/20260105071218.10785-1-mahdifrmx@gmail.com/
->>   - change ENOMEM to ENOBUFS
->> v1: https://lore.kernel.org/netdev/20260104105732.427691-1-mahdifrmx@gmail.com/
->> ---
->>  net/ipv4/udp.c | 19 ++++++++++++++++++-
->>  1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
->> index ffe074cb5..41cf8f7ab 100644
->> --- a/net/ipv4/udp.c
->> +++ b/net/ipv4/udp.c
->> @@ -1793,14 +1793,31 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->>  	}
->>  
->>  	if (unlikely(to_drop)) {
->> +		int err_ipv4 = 0;
->> +		int err_ipv6 = 0;
+On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index 41228b0add52..29eecd79352e 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -1229,6 +1229,8 @@ enum {
+> >  #endif
+> >  };
+> >
+> > +#define BPF_TRAMP_IS_RETURN_SHIFT	63
+> > +
+> >  struct bpf_tramp_links {
 > 
-> nit: whitespace between variable definition and code block
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 19fd16697262..2ae8f29b854f 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> > @@ -23011,6 +23011,19 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+> >  		   desc->func_id == special_kfunc_list[KF_bpf_rdonly_cast]) {
+> >  		insn_buf[0] = BPF_MOV64_REG(BPF_REG_0, BPF_REG_1);
+> >  		*cnt = 1;
+> > +	} else if (desc->func_id == special_kfunc_list[KF_bpf_session_is_return] &&
+> > +		   env->prog->expected_attach_type == BPF_TRACE_FSESSION) {
+> > +		/*
+> > +		 * inline the bpf_session_is_return() for fsession:
+> > +		 *   bool bpf_session_is_return(void *ctx)
+> > +		 *   {
+> > +		 *       return (((u64 *)ctx)[-1] >> BPF_TRAMP_IS_RETURN_SHIFT) & 1;
+> > +		 *   }
+> > +		 */
+> > +		insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> > +		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_IS_RETURN_SHIFT);
+> > +		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 1);
+> > +		*cnt = 3;
+> > +	}
 > 
->>  		for (nb = 0; to_drop != NULL; nb++) {
->>  			skb = to_drop;
->> +			if (skb->protocol == htons(ETH_P_IP))
->> +				err_ipv4++;
->> +			else
->> +				err_ipv6++;
+> The inline implementation reads bit 63 of ctx[-1] to check the is_return
+> flag. However, looking at the x86 trampoline code in
+> arch/x86/net/bpf_jit_comp.c, the trampoline only stores nr_regs in ctx[-1]:
 > 
-> No need for separate counters.
+>     emit_mov_imm64(&prog, BPF_REG_0, 0, (u32) nr_regs);
+>     emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -nregs_off);
 > 
-> All counters will either update IPv4 or IPv6 stats. Similar to how
-> the caller of _udp_enqueue_schedule_sk is either __udp_queue_rcv_skb
-> or __udpv6_queue_rcv_skb and chooses the SNMP stat based on that.
+> The is_return flag (bit 63) is never set by the current trampoline code.
+> This means bpf_session_is_return() will always return 0 for fsession
+> programs, even when executing at the return point.
 > 
-> Can check sk_family == PF_INET6 once.
+> I see this is fixed later in the series by commit ba766b26e776 ("bpf,x86:
+> add fsession support for x86_64") which adds:
+> 
+>     func_meta |= (1ULL << BPF_TRAMP_IS_RETURN_SHIFT);
+>     if (bpf_fsession_cnt(tlinks))
+>         emit_store_stack_imm64(&prog, BPF_REG_0, -func_meta_off, func_meta);
+> 
+> Should this commit be squashed with the x86 trampoline changes to ensure
+> the feature works correctly at each point in the series?
 
-I think that doing the SNMP accounting in __udp_enqueue_schedule_skb()
-(for `to_drop`), __udp_queue_rcv_skb() and __udpv6_queue_rcv_skb() (for
-`skb`) is a little confusing and possible error prone in the long run.
+As I said before, this patch implement the common part of the fsession.
+and we implement the architecture specific code for x86_64 in the later
+patch.
 
-I'm wondering if something alike the following (completely untested, not
-even built! just to give the idea) would be better?
+> 
+> [ ... ]
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
+> 
 
-Note that the additional argument in __udp_enqueue_schedule_skb() could
-be avoided piggybacking the `to_drop` return argument into the
-__udp_enqueue_schedule_skb() return value.
 
----
-diff --git a/include/net/udp.h b/include/net/udp.h
-index a061d1b22ddc..673497eb79b7 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -399,7 +399,8 @@ static inline bool udp_sk_bound_dev_eq(const struct
-net *net, int bound_dev_if,
- /* net/ipv4/udp.c */
- void udp_destruct_common(struct sock *sk);
- void skb_consume_udp(struct sock *sk, struct sk_buff *skb, int len);
--int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb);
-+int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb,
-+			       struct sk_buff *to_drop);
- void udp_skb_destructor(struct sock *sk, struct sk_buff *skb);
- struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags, int
-*off,
- 			       int *err);
-@@ -411,6 +412,21 @@ static inline struct sk_buff *skb_recv_udp(struct
-sock *sk, unsigned int flags,
- 	return __skb_recv_udp(sk, flags, &off, err);
- }
 
-+static inline int udp_drop_skbs(struct sock *sk, struct sk_buff *to_drop)
-+{
-+	struct sk_buff *skb;
-+	int nb;
-+
-+	for (nb = 0; to_drop != NULL; nb++) {
-+		skb = to_drop;
-+		to_drop = skb->next;
-+		skb_mark_not_on_list(skb);
-+		sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
-+	}
-+	numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-+	return nb;
-+}
-+
- enum skb_drop_reason udp_v4_early_demux(struct sk_buff *skb);
- bool udp_sk_rx_dst_set(struct sock *sk, struct dst_entry *dst);
- int udp_err(struct sk_buff *, u32);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ee63af0ef42c..0869e115c0d3 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1696,14 +1696,15 @@ static int udp_rmem_schedule(struct sock *sk,
-int size)
- 	return 0;
- }
-
--int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
-+int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb,
-+			       struct sk_buff **to_drop)
- {
- 	struct sk_buff_head *list = &sk->sk_receive_queue;
- 	struct udp_prod_queue *udp_prod_queue;
--	struct sk_buff *next, *to_drop = NULL;
- 	struct llist_node *ll_list;
- 	unsigned int rmem, rcvbuf;
- 	int size, err = -ENOMEM;
-+	struct sk_buff *next;
- 	int total_size = 0;
- 	int q_size = 0;
- 	int dropcount;
-@@ -1761,8 +1762,8 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
-struct sk_buff *skb)
- 		err = udp_rmem_schedule(sk, size);
- 		if (unlikely(err)) {
- 			/*  Free the skbs outside of locked section. */
--			skb->next = to_drop;
--			to_drop = skb;
-+			skb->next = *to_drop;
-+			*to_drop = skb;
- 			continue;
- 		}
-
-@@ -1792,17 +1793,6 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
-struct sk_buff *skb)
- 		}
- 	}
-
--	if (unlikely(to_drop)) {
--		for (nb = 0; to_drop != NULL; nb++) {
--			skb = to_drop;
--			to_drop = skb->next;
--			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
--			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
--		}
--		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
--	}
--
- 	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
-
- 	return 0;
-@@ -2333,6 +2323,7 @@ void udp_v4_rehash(struct sock *sk)
-
- static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- {
-+	struct sk_buff *to_drop = NULL;
- 	int rc;
-
- 	if (inet_sk(sk)->inet_daddr) {
-@@ -2343,7 +2334,13 @@ static int __udp_queue_rcv_skb(struct sock *sk,
-struct sk_buff *skb)
- 		sk_mark_napi_id_once(sk, skb);
- 	}
-
--	rc = __udp_enqueue_schedule_skb(sk, skb);
-+	rc = __udp_enqueue_schedule_skb(sk, skb, &to_drop);
-+	if (unlikely(to_drop)) {
-+		int cnt = udp_drop_skb_list(sk, to_drop);
-+
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS, cnt);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS, cnt);
-+	}
- 	if (rc < 0) {
- 		int is_udplite = IS_UDPLITE(sk);
- 		int drop_reason;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 794c13674e8a..5950ec699deb 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -782,6 +782,7 @@ int __udp6_lib_err(struct sk_buff *skb, struct
-inet6_skb_parm *opt,
-
- static int __udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- {
-+	struct sk_buff *to_drop = NULL;
- 	int rc;
-
- 	if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
-@@ -792,7 +793,13 @@ static int __udpv6_queue_rcv_skb(struct sock *sk,
-struct sk_buff *skb)
- 		sk_mark_napi_id_once(sk, skb);
- 	}
-
--	rc = __udp_enqueue_schedule_skb(sk, skb);
-+	rc = __udp_enqueue_schedule_skb(sk, skb, &to_drop);
-+	if (unlikely(to_drop)) {
-+		int cnt = udp_drop_skb_list(sk, to_drop);
-+
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS, cnt);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS, cnt);
-+	}
- 	if (rc < 0) {
- 		int is_udplite = IS_UDPLITE(sk);
- 		enum skb_drop_reason drop_reason;
 
 
