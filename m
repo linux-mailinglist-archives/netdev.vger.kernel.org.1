@@ -1,339 +1,176 @@
-Return-Path: <netdev+bounces-252976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252977-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJuWCL7pc2k6zgAAu9opvQ
-	(envelope-from <netdev+bounces-252976-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:35:58 +0100
+	id +L8ZEG7rc2llzgAAu9opvQ
+	(envelope-from <netdev+bounces-252977-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:43:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A58F7AF0E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:35:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B0A7AF62
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2CD63301BC2D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:35:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E983301BF44
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E1E2F39DD;
-	Fri, 23 Jan 2026 21:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47032F6197;
+	Fri, 23 Jan 2026 21:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmVtRtT8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rssnGl86"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E382E62D1
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B45256C70;
+	Fri, 23 Jan 2026 21:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769204154; cv=none; b=Er26Zb4ATwYC6H3YMNB1w7n70lEHvQlRuMvuuOW4Ona3WxLyQ+tNEbdpSu7NL0OAio1X36YzZih29Pex4csqvwsnenHh4JKwbJQFdT8OZrAKjIMfkB9x4nrEQgCvAolXmDPOZs7tV3uvVfQdWjBNmD6OTgnzj2RKgIFc/I1S1CU=
+	t=1769204586; cv=none; b=fm3fm9wvdQiBdLj+INyDvbuWJOzgTyH34ippxwISBJu/hkQ+7Pjlzw+uosOZgtV2mwJ3X9D2/J34Jhb9TcGYGpb7/n9tJoEbFbkiwOmqD4UPpZd+p2JBwVfe3Cgv/sbnCsCJhoAbv5wOSAn/Mjv82U1OzAwTgjoPMM02y1tsUtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769204154; c=relaxed/simple;
-	bh=uMy3HxjA5hDCgIJblyt6KfZmdEgbS4b57+GnOjEOLvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=unquwsVWB+IYH4jyhpnxorBRls2lb/PporD4O4E0LosZUmsYualKOaAW3sj6ncTXKlkNrik8759vt7OOUte3yewnvGjqQ5pJSbYzmJg/6BTkXJD0ApJi/W4p6ZP6+J3f+VHw9akZV3eG4zaC15avZddmlQ5sc1kdwpOeQpPctW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RmVtRtT8; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-480142406b3so18535505e9.1
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 13:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769204151; x=1769808951; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bMClnrU1ojs/oRDsTOTz3+XVnxCCRuf482L0kuY835M=;
-        b=RmVtRtT8gTp1AVCjodCLLGAzTJSwDdOn3pdyhVcFT4gjFyFslZWHSLYupwuXw4CGwr
-         qlgbe3GsHeGs4b7387bwq+u+eNk6BesAUsrfTHavG/JCnHMt94yAQ4XNz6SVfYtQTYwe
-         MieoLeC/lAUwPnyUxvg/oQicZnXrr+MERdYEtJ2q6MjaivkuL0Al7mmlNyqv6WB9v1g5
-         u+t+h28RLwojA0RsdXqugI6aoYZDa0VAAOkCw2ARhbfNIlSMyqly/iB2sTSmw7yKun+a
-         P4dJjBB9nnrjw+woGEyGX3ehFvt01QCpGGR2lyzAtPlnSndzhpWTsvBagK6PyB3232n5
-         H7Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769204151; x=1769808951;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bMClnrU1ojs/oRDsTOTz3+XVnxCCRuf482L0kuY835M=;
-        b=usJEVUOW7DlmQePT6MJkATPvhsi3JAOlZ71ZQhlH07bHLsR+SAY90iyhTN2Spk/HDA
-         jBJrgs42ycWx7K0NIGaU0/uDsDiN61G+9fIjW+y+m4cNuJfl7+8ijg0tYz3T7w6KMwwJ
-         8eI6NSuLCqajSak4lAslf/DgTvSGEqVt1JUq8SkxApReKLbhrQzUlhjMxIIWfXEHb16+
-         gkaIhwaN1ogAc1heuNMbu7AwweXVh4O1H3fWDMIPCTtg2YHxM+f4Cmd03IebwLctu7C7
-         7Al7I/wBQWBDeIvy/Di9ZfWXy8TlhGLIfxqhnJObrKqY0CNWYjHDheDbWl0mldTJaVMH
-         ikZA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9fTVYcMBtqc/6c90TOPjY6v4jJAPnIY25+iQUCHG9BZDllQ80zaM2oJd+RUrK2y70Aznbt0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6tgDG1djCa+xntQhygBZWO8WEKp5atugblrmiRLQlcmG10aQk
-	oEtgnbnwc/Pye/kQRdkBQJzT8N4Uuf1dI5vR0dDb4rknmrtlylapMGTi
-X-Gm-Gg: AZuq6aJGbaV8539fryBN1mNKGTWIUAJiTmjmrWk+fl3rPhFc8wWy3KyAQ2PaMhb8lij
-	PdhqIhJHsmBziDFRHFZAMmUnCrq/+qnUEg/VSWgktOxofEAEeuXf7eZd/MyiQY6xrVFalMS5U0P
-	LCH8J2cuTYm3hzPOAlHeRhEuh9SUwPeQlnK0KYn0Rl/1ML9scPhHoXhJHMDqP3jRImeQH426jhB
-	XbKAPvod9Zqc1h7AaxPiK2xD1oyJ6dXNKGZV6HPkgR1gfWe/5rTI3HSyIWAbn8mIzQus29vswbt
-	e0YRQERzudSAeRbRJWOj7ZnpV4QUqlk6C/zRJy6C9rSgzZ4oh7jWS2FxHyfq/HCWr0U/5cfpUqD
-	TgYNOaF9EbwJTBJddmgWCumqZerOKVNgMBMg9anBIdYuSjUaWCumFfj1MvczShxMh2j2VyGFtbq
-	Q6DmaDGsLbc7ekSKN6txsLT7KaaJZdaD22YYaA4yoj1d1TkVlEJei/NHYVYqle7e+ZnA==
-X-Received: by 2002:a05:600c:c113:b0:480:3ad0:64fb with SMTP id 5b1f17b1804b1-48050679699mr47943935e9.12.1769204150954;
-        Fri, 23 Jan 2026 13:35:50 -0800 (PST)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:b377:103e:67ba:8048? ([2a02:a03f:a75e:9a00:b377:103e:67ba:8048])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d4faecbsm33622255e9.1.2026.01.23.13.35.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jan 2026 13:35:50 -0800 (PST)
-Message-ID: <5dca897a-700f-41da-afa4-37a497346f97@gmail.com>
-Date: Fri, 23 Jan 2026 22:35:50 +0100
+	s=arc-20240116; t=1769204586; c=relaxed/simple;
+	bh=KheEDbybRqccT4YssL9LzHDPm7tF5WT0v2sGWl6zBxc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=J5fdSTSz0v7X933xsHgDTar9b1A6Tff6+woIdYhsIUMaX81vs7xeaT95Ye2/MzBWRMBQebBAsMRk6VALzA6vtB93/8FJh7n9hbK828cUXwu1CenKif42pTgPubv1llT94v+/Ysyd2J1dTpEtpSpfDGsVjhlbcdhtPwEyRjaMjDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rssnGl86; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40B97C4CEF1;
+	Fri, 23 Jan 2026 21:43:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769204586;
+	bh=KheEDbybRqccT4YssL9LzHDPm7tF5WT0v2sGWl6zBxc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=rssnGl86RvKZD83WgWSS3e0Qm1GV6iygavQHn/9Lo5jH+ybnZLtqajqv+yL/r/znc
+	 iBaMgd5BRYnPqObJld6zlIzf1UtmSJm9mJhlIYivwBCQEAujrskPSLJvoAHgU00EZL
+	 NH+y/P3/xP8DkfEPgCL2AxfvM/NKc/+tLI4DaLdWIapISGPduyckL64TWL1wGgRg48
+	 AI6BVZkuMxH3cosb24CVfbQHBo26UN7KVsMCR7LAIh1IH1uWsAHCxPIRn9Q0txy9Vn
+	 rM4bvbySyTKOuJBgsbTrE5NtVaVJk4F5p5n2WL89vxAMTTQMmzrmwak1UsaQPDC0Oc
+	 sNcxOOYcJResg==
+Date: Fri, 23 Jan 2026 13:43:05 -0800 (PST)
+From: Mat Martineau <martineau@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+    Matthieu Baerts <matttbe@kernel.org>, 
+    Geliang Tang <geliang.tang@linux.dev>, Florian Westphal <fw@strlen.de>, 
+    netdev@vger.kernel.org, mptcp@lists.linux.dev, eric.dumazet@gmail.com, 
+    syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com, 
+    Eulgyu Kim <eulgyukim@snu.ac.kr>, Geliang Tang <geliang@kernel.org>
+Subject: Re: [PATCH v2 net] mptcp: fix race in
+ mptcp_pm_nl_flush_addrs_doit()
+In-Reply-To: <20260123030327.3041148-1-edumazet@google.com>
+Message-ID: <36367d05-e05f-c86b-7125-e98b529f9d0c@kernel.org>
+References: <20260123030327.3041148-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 6/7] ipv6: Enforce Extension Header ordering
-To: Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
-References: <20260121214925.112604-1-tom@herbertland.com>
- <20260121214925.112604-7-tom@herbertland.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260121214925.112604-7-tom@herbertland.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252976-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252977-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,linux.dev,strlen.de,vger.kernel.org,lists.linux.dev,gmail.com,syzkaller.appspotmail.com,snu.ac.kr];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	NEURAL_HAM(-0.00)[-0.994];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[martineau@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 5A58F7AF0E
+	TAGGED_RCPT(0.00)[netdev,5498a510ff9de39d37da];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 63B0A7AF62
 X-Rspamd-Action: no action
 
-On 1/21/26 22:49, Tom Herbert wrote:
-> RFC8200 highly recommends that different Extension Headers be send in
-> a prescibed order and all Extension Header types occur at most once
-> in a packet with the expection of Destination Options that may
-> occur twice. This patch enforces the ordering be folowed in received
-> packets. It also disregrards Destination Options before the Routing
-> Header as those are unused in deployment asnd there is a proposal
-> to deprecate them in draft-herbert-deprecate-destops-before-rh.
+On Fri, 23 Jan 2026, Eric Dumazet wrote:
 
-I'll have to pushback on this specifically, at least as long as 
-draft-herbert-deprecate-destops-before-rh is not adopted and published 
-(to be clear, I'm not against it, just that it's still an individual 
-draft right now and there is no consensus). We're already at the edge of 
-remaining compliant with RFC8200 with this series (which is fine 
-considering its security gaps), so let's not rush by removing the 
-DestOps before the Routing header. It can be done later, this series 
-already mitigates DoS attacks quite well.
-
-FWIW, the rest of this patch makes sense.
-
-> The allowed order of Extension Headers is:
-> 
->      IPv6 header
->      Hop-by-Hop Options header
->      Routing header
->      Fragment header
->      Authentication header
->      Encapsulating Security Payload header
->      Destination Options header
->      Upper-Layer header
-> 
-> Each Extension Header may be present only once in a packet.
-> 
-> net.ipv6.enforce_ext_hdr_order is a sysctl to enable or disable
-> enforcement of xtension Header order. If it is set to zero then
-> Extension Header order and number of occurences is not checked
-> in receive processeing (except for Hop-by-Hop Options that
-> must be the first Extension Header and can only occur once in
-> a packet.
-> 
-> Signed-off-by: Tom Herbert <tom@herbertland.com>
+> syzbot and Eulgyu Kim reported crashes in mptcp_pm_nl_get_local_id()
+> and/or mptcp_pm_nl_is_backup()
+>
+> Root cause is list_splice_init() in mptcp_pm_nl_flush_addrs_doit()
+> which is not RCU ready.
+>
+> list_splice_init_rcu() can not be called here while holding pernet->lock
+> spinlock.
+>
+> Many thanks to Eulgyu Kim for providing a repro and testing our patches.
+>
+> Fixes: 141694df6573 ("mptcp: remove address when netlink flushes addrs")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: syzbot+5498a510ff9de39d37da@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/6970a46d.a00a0220.3ad28e.5cf0.GAE@google.com/T/
+> Reported-by: Eulgyu Kim <eulgyukim@snu.ac.kr>
+> Cc: Geliang Tang <geliang@kernel.org>
 > ---
->   include/net/netns/ipv6.h   |  1 +
->   include/net/protocol.h     | 16 ++++++++++++++++
->   net/ipv6/af_inet6.c        |  1 +
->   net/ipv6/exthdrs.c         |  2 ++
->   net/ipv6/ip6_input.c       | 14 ++++++++++++++
->   net/ipv6/reassembly.c      |  1 +
->   net/ipv6/sysctl_net_ipv6.c |  7 +++++++
->   net/ipv6/xfrm6_protocol.c  |  2 ++
->   8 files changed, 44 insertions(+)
-> 
-> diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-> index 34bdb1308e8f..2db56718ea60 100644
-> --- a/include/net/netns/ipv6.h
-> +++ b/include/net/netns/ipv6.h
-> @@ -61,6 +61,7 @@ struct netns_sysctl_ipv6 {
->   	u8 fib_notify_on_flag_change;
->   	u8 icmpv6_error_anycast_as_unicast;
->   	u8 icmpv6_errors_extension_mask;
-> +	u8 enforce_ext_hdr_order;
->   };
->   
->   struct netns_ipv6 {
-> diff --git a/include/net/protocol.h b/include/net/protocol.h
-> index b2499f88f8f8..70cc2d0fdc0c 100644
-> --- a/include/net/protocol.h
-> +++ b/include/net/protocol.h
-> @@ -50,6 +50,21 @@ struct net_protocol {
->   };
->   
->   #if IS_ENABLED(CONFIG_IPV6)
-> +
-> +/* Order of extension headers as prescribed in RFC8200. The ordering and
-> + * number of extension headers in a packet can be enforced in IPv6 receive
-> + * processing. Destination Options before the Routing Header is not included
-> + * in the list as they are unused in deployment and it has been proposed that
-> + * they be deprecated. See:
-> + * www.ietf.org/archive/id/draft-herbert-deprecate-destops-before-rh-01.txt
-> + */
-> +#define IPV6_EXT_HDR_ORDER_HOP		BIT(0)
-> +#define IPV6_EXT_HDR_ORDER_ROUTING	BIT(1)
-> +#define IPV6_EXT_HDR_ORDER_FRAGMENT	BIT(2)
-> +#define IPV6_EXT_HDR_ORDER_AUTH		BIT(3)
-> +#define IPV6_EXT_HDR_ORDER_ESP		BIT(4)
-> +#define IPV6_EXT_HDR_ORDER_DEST		BIT(5)
-> +
->   struct inet6_protocol {
->   	int	(*handler)(struct sk_buff *skb);
->   
-> @@ -61,6 +76,7 @@ struct inet6_protocol {
->   
->   	unsigned int	flags;	/* INET6_PROTO_xxx */
->   	u32		secret;
-> +	u32		ext_hdr_order;
->   };
->   
->   #define INET6_PROTO_NOPOLICY	0x1
-> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-> index bd29840659f3..43097360ce64 100644
-> --- a/net/ipv6/af_inet6.c
-> +++ b/net/ipv6/af_inet6.c
-> @@ -980,6 +980,7 @@ static int __net_init inet6_net_init(struct net *net)
->   	net->ipv6.sysctl.max_dst_opts_len = IP6_DEFAULT_MAX_DST_OPTS_LEN;
->   	net->ipv6.sysctl.max_hbh_opts_len = IP6_DEFAULT_MAX_HBH_OPTS_LEN;
->   	net->ipv6.sysctl.fib_notify_on_flag_change = 0;
-> +	net->ipv6.sysctl.enforce_ext_hdr_order = 1;
->   	atomic_set(&net->ipv6.fib6_sernum, 1);
->   
->   	net->ipv6.sysctl.ioam6_id = IOAM6_DEFAULT_ID;
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 394e3397e4d4..2af16694db46 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -845,11 +845,13 @@ static int ipv6_rthdr_rcv(struct sk_buff *skb)
->   static const struct inet6_protocol rthdr_protocol = {
->   	.handler	=	ipv6_rthdr_rcv,
->   	.flags		=	INET6_PROTO_NOPOLICY,
-> +	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_ROUTING,
->   };
->   
->   static const struct inet6_protocol destopt_protocol = {
->   	.handler	=	ipv6_destopt_rcv,
->   	.flags		=	INET6_PROTO_NOPOLICY,
-> +	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_DEST,
->   };
->   
->   static const struct inet6_protocol nodata_protocol = {
-> diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-> index 168ec07e31cc..5254ead5c226 100644
-> --- a/net/ipv6/ip6_input.c
-> +++ b/net/ipv6/ip6_input.c
-> @@ -366,6 +366,7 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
->   	const struct inet6_protocol *ipprot;
->   	struct inet6_dev *idev;
->   	unsigned int nhoff;
-> +	u32 ext_hdrs = 0;
->   	SKB_DR(reason);
->   	bool raw;
->   
-> @@ -427,6 +428,19 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
->   				goto discard;
->   			}
->   		}
-> +
-> +		if (ipprot->ext_hdr_order &&
-> +		    READ_ONCE(net->ipv6.sysctl.enforce_ext_hdr_order)) {
-> +			/* The protocol is an extension header and EH ordering
-> +			 * is being enforced. Discard packet if we've already
-> +			 * seen this EH or one that is lower in the order list
-> +			 */
-> +			if (ipprot->ext_hdr_order <= ext_hdrs)
-> +				goto discard;
-> +
-> +			ext_hdrs |= ipprot->ext_hdr_order;
-> +		}
-> +
->   		if (!(ipprot->flags & INET6_PROTO_NOPOLICY)) {
->   			if (!xfrm6_policy_check(NULL, XFRM_POLICY_IN, skb)) {
->   				SKB_DR_SET(reason, XFRM_POLICY);
-> diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-> index 25ec8001898d..91dba72c5a3c 100644
-> --- a/net/ipv6/reassembly.c
-> +++ b/net/ipv6/reassembly.c
-> @@ -414,6 +414,7 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
->   static const struct inet6_protocol frag_protocol = {
->   	.handler	=	ipv6_frag_rcv,
->   	.flags		=	INET6_PROTO_NOPOLICY,
-> +	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_FRAGMENT,
->   };
->   
->   #ifdef CONFIG_SYSCTL
-> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
-> index d2cd33e2698d..543b6acdb11d 100644
-> --- a/net/ipv6/sysctl_net_ipv6.c
-> +++ b/net/ipv6/sysctl_net_ipv6.c
-> @@ -213,6 +213,13 @@ static struct ctl_table ipv6_table_template[] = {
->   		.proc_handler	= proc_doulongvec_minmax,
->   		.extra2		= &ioam6_id_wide_max,
->   	},
-> +	{
-> +		.procname	= "enforce_ext_hdr_order",
-> +		.data		= &init_net.ipv6.sysctl.enforce_ext_hdr_order,
-> +		.maxlen		= sizeof(u8),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dou8vec_minmax,
-> +	},
->   };
->   
->   static struct ctl_table ipv6_rotable[] = {
-> diff --git a/net/ipv6/xfrm6_protocol.c b/net/ipv6/xfrm6_protocol.c
-> index ea2f805d3b01..5826edf67f64 100644
-> --- a/net/ipv6/xfrm6_protocol.c
-> +++ b/net/ipv6/xfrm6_protocol.c
-> @@ -197,12 +197,14 @@ static const struct inet6_protocol esp6_protocol = {
->   	.handler	=	xfrm6_esp_rcv,
->   	.err_handler	=	xfrm6_esp_err,
->   	.flags		=	INET6_PROTO_NOPOLICY,
-> +	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_ESP,
->   };
->   
->   static const struct inet6_protocol ah6_protocol = {
->   	.handler	=	xfrm6_ah_rcv,
->   	.err_handler	=	xfrm6_ah_err,
->   	.flags		=	INET6_PROTO_NOPOLICY,
-> +	.ext_hdr_order	=	IPV6_EXT_HDR_ORDER_AUTH
->   };
->   
->   static const struct inet6_protocol ipcomp6_protocol = {
+> v2: Make sure the list was not empty, return early otherwise.
 
+Thanks Eric, the v2 code changes LGTM. The netdev tooling wasn't able to 
+apply the patch 
+(https://patchwork.kernel.org/project/netdevbpf/patch/20260123030327.3041148-1-edumazet@google.com/), 
+so Matthieu is planning to send a basically-identical v3 that 'git am' and 
+the netdev CI will be happy with.
+
+Reviewed-by: Mat Martineau <martineau@kernel.org>
+
+> v1: https://lore.kernel.org/netdev/20260122131306.2119853-1-edumazet@google.com/
+>
+> net/mptcp/pm_kernel.c | 18 +++++++++++++++---
+> 1 file changed, 15 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+> index 57570a44e4185370f531047fe97ce9f9fbd1480b..af23be6658ded4860133bb9495c7738014815d28 100644
+> --- a/net/mptcp/pm_kernel.c
+> +++ b/net/mptcp/pm_kernel.c
+> @@ -1294,16 +1294,28 @@ static void __reset_counters(struct pm_nl_pernet *pernet)
+> int mptcp_pm_nl_flush_addrs_doit(struct sk_buff *skb, struct genl_info *info)
+> {
+> 	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
+> -	LIST_HEAD(free_list);
+> +	struct list_head free_list;
+>
+> 	spin_lock_bh(&pernet->lock);
+> -	list_splice_init(&pernet->endp_list, &free_list);
+> +
+> +	free_list = pernet->endp_list;
+> +	INIT_LIST_HEAD_RCU(&pernet->endp_list);
+> +
+> 	__reset_counters(pernet);
+> 	pernet->next_id = 1;
+> 	bitmap_zero(pernet->id_bitmap, MPTCP_PM_MAX_ADDR_ID + 1);
+> 	spin_unlock_bh(&pernet->lock);
+> -	mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
+> +
+> +	if (free_list.next == &pernet->endp_list)
+> +		return 0;
+> +
+> 	synchronize_rcu();
+> +
+> +	/* Adjust the pointers to free_list instead of pernet->endp_list */
+> +	free_list.prev->next = &free_list;
+> +	free_list.next->prev = &free_list;
+> +
+> +	mptcp_nl_flush_addrs_list(sock_net(skb->sk), &free_list);
+> 	__flush_addrs(&free_list);
+> 	return 0;
+> }
+> --
+> 2.52.0.457.g6b5491de43-goog
+>
+>
 
