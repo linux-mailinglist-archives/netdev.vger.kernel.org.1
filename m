@@ -1,95 +1,106 @@
-Return-Path: <netdev+bounces-252877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252921-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MG25Euygc2lqxgAAu9opvQ
-	(envelope-from <netdev+bounces-252877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:25:16 +0100
+	id IKgYOGu7c2kmyQAAu9opvQ
+	(envelope-from <netdev+bounces-252921-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:18:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C33A78776
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:25:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9777978F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:18:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 85F043024168
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:18:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABCF4300EFB4
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E2F21FF38;
-	Fri, 23 Jan 2026 16:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA17218AAD;
+	Fri, 23 Jan 2026 18:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HAZfGOBw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXrcjsbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010061.outbound.protection.outlook.com [52.101.201.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49BD2836B5
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 16:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769185083; cv=fail; b=PisEhVPcrpmYOO/WDlVc3Xk1VzMVsQKTwEtLzPV9IV7M1BIKOceIGyuBR79XzZ2E40KxDpvdZ/WQFulmX6xNjBUQcfvF+Ak5HCS3zcWEKraRbM43zjE1bC2GD2BQb5uhDV/FaES472KIftQDGafctqRixxlsez1ejIts06NF6mY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769185083; c=relaxed/simple;
-	bh=PI0c8AaiA4mZre9vYEl8sliDjSVBc4J9dOHrF8MieEI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IoJ+1IaWkVYia91Zs+2PZOwvhek7ZFgDzxcnWOfK4JM4xrAtlJEhy9YuD+88ahl4k8N9vJeAQmGYLr6KE69OjPBFmeUdvv3pwClG0y04PIG2Msa2Y6Zll4useLYJX32AbqTwcbQPBcuUvXHMS0EhhDuQRbwMewYTYTPSWc5EcqA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HAZfGOBw; arc=fail smtp.client-ip=52.101.201.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=neyyfoiVe4nRqN7N7zkCLopobTov3XfldrOwMBUz45eUShyM68kW0t3nPCfATCEQwRESMPS/ztCKuIVZ/oquSzG/ToZIZLW7QZM6uTq/axMPd0t7me5Ynf9dW0wt1B6OkwdblaAQDZoGzh9DYElzY7+cfUrsXAFshsgxTm7QE1zCYwK3U/Br93SMN/bbbf7fQ+8DI7OcavTZKglQzqayJmHGu/qtO0GD8uMGKQ86+w77lMLelBvbx4nwu8wQHS76bbzbT4uM/LO91UkXdSw+UhpmRUTB/G0EHHNflnMGzKuG7XDqrGoMaSI2N5wkusDDRfyOWJh9gwHeh+kS6eDHDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TlkeNYwDIp/x7G2tmAkTUkbuoNUoJuoqYESioUFuUfY=;
- b=kaP7SIAskymuVaQrFwe7t9gU5TQQT1CzdKFCWiIwO5CMqjz9dGLAuTezmYX1dj+j0w4LptTn/6bTDh1fC4gXD6TLCwIvrS9I86E51a7XetGPRwatfDQ+Ycgd7FfWSj4LUOQZGvV/f5mMIeQjw5AEyat+PsrzOHgGvHEUX+lYMgWraIMhtEBZ/Mq/3eg8rrPsnxbQYbsQa/zfPt5GVYv2u4aTUgIu5oYSsUNt+pJpsZXyJtwOcr3Ia94RRReq7u6OBPk6daFgY2s/LprjzJoxjEzeOwdyTGyKhGip22jDWn5/14URu6jBrffKXHEGiPxnh+09k40OINp+83gFJ6nUMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TlkeNYwDIp/x7G2tmAkTUkbuoNUoJuoqYESioUFuUfY=;
- b=HAZfGOBw9Lye5hUW9PI3aS+vhN1zxZHWvRwnYGXwvrhtzwDq7BLwYQQWj9gO/JPMjq+eOe0gt/31vg1wpCry1o2MnNCaL+YfsZbG4Jw5AjKPkRpcJC5nX2XKkNcDbxLzQu0FXQ3GCSpgO77hbYPBGEDyBPxxJR9U1XMLvmeeh88=
-Received: from PH0PR07CA0024.namprd07.prod.outlook.com (2603:10b6:510:5::29)
- by DM4PR12MB6375.namprd12.prod.outlook.com (2603:10b6:8:a2::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Fri, 23 Jan
- 2026 16:17:52 +0000
-Received: from CY4PEPF0000EE3C.namprd03.prod.outlook.com
- (2603:10b6:510:5:cafe::88) by PH0PR07CA0024.outlook.office365.com
- (2603:10b6:510:5::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.11 via Frontend Transport; Fri,
- 23 Jan 2026 16:17:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- CY4PEPF0000EE3C.mail.protection.outlook.com (10.167.242.13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Fri, 23 Jan 2026 16:17:52 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 23 Jan
- 2026 10:17:51 -0600
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 23 Jan
- 2026 08:17:51 -0800
-Received: from xcbecree50x.xilinx.com (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17 via Frontend
- Transport; Fri, 23 Jan 2026 10:17:50 -0600
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>, "Damir
- Mansurov" <damir.mansurov@oktetlabs.ru>, Ben Hutchings <ben@decadent.org.uk>
-Subject: [PATCH net] sfc: fix deadlock in RSS config read
-Date: Fri, 23 Jan 2026 16:16:34 +0000
-Message-ID: <20260123161634.1215006-1-edward.cree@amd.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1541E1DC9B3
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 18:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769192260; cv=none; b=AbI9tyLXq4ocsNyFrVHJAqwczoG8oXeC7kNIGU5oWRWW1Bv1nUTo5KNXfgaoM3Sv2JveYiXf1CWEhmFkkAT8TeutADhT52FcyYrdeVoxLbR8aWvsZALOjiRrYOt+TeyfKVYZ1+NXa/w97tO2tCzkQv5zoXeVQ/98ajUPrGbBtzY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769192260; c=relaxed/simple;
+	bh=HL9Z8exH0p8ghijOUjxjCoBmCDjBhhDKtkS3KASOoh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lQ342E7DeKGQrGr/Wj4pOENo6jx5+u8PHAPqKq2ofaybUQyeZcczyEkTQ+WPix17AKgSQwXslD1wIZN3iDd/Lbe3cHYmV9KBp6Ly08I5BgBYXW/J4luw7EmzlKDKScOk+3+wS9ZlsD1v41mYXZpbhV7b80fN6VewoFF61OjIaC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FXrcjsbL; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8946f12b1cfso33939196d6.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 10:17:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769192258; x=1769797058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zF0a10J5mLJVO6RkpWuar6FLLd6MMCZJu1XiB3Hvb/Q=;
+        b=FXrcjsbL3lQYWuDMkpdApVo0X3645CYccv6zcaSnCoXp6BBd/yDyTO+duKymbcsrZO
+         GJPdfdjjk8m5aHmkQKLd3JYG6ILSG65D0tkhM1OFQAwUQ2GOrLsMOlnHjAIrjU/NiDF5
+         BCaHic6gTuhN9d+3TU5Uw9WOVBv9xcwhaXTh/lxVe1IT5YAPak2zMkVIljb5oaXrYE6o
+         M3NEx7dKbdvR7YXl6EESGJzSgGid7CWahtKBZdrVeIArLCbiExGQgAhicWhNjM+QGlbR
+         A1OtcUxOpqHrNAdL6+pH8nXO0MBpiUAndXULne4UlDy1srTLhyS6Ru4KH8gg2/+c7NFV
+         wksg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769192258; x=1769797058;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zF0a10J5mLJVO6RkpWuar6FLLd6MMCZJu1XiB3Hvb/Q=;
+        b=dX3W7fXmweDcVXgVBSIIvOMOVT9yx21n8lh5wcVwvfpyFz/MCf7m2aVlFeg/dg1vwk
+         pcfSRnu1lqmdU2Zj0CtcSiyp3KaY9IN2fYYcfKsRsNv4FvPv/5PRwrdel9lTiMfwtLsI
+         vumvKyHyTkdNA+2g89zgW2wN9PE7Jhbk8oYFrdnRDHVHQCeOmwZQMjK22JVKpyIOgzqB
+         hOZtknyotDcRFn1MEMKC+kk143W2oLN65YrrFpi20KH/ElBnSICzIeEpvlEjLy19RANo
+         JtswpHZa/UjPVmObeE7opGwxErm5ym8lhJFcfaANa7h8/WXNVQaEjsWcIUkfzTK0hGOY
+         nTAQ==
+X-Gm-Message-State: AOJu0Yx+lS0yJQDI/P9uaWgCEOslTZe58e5FQ6uxLhUCe7EW6FRApS8Y
+	Q/nWcxhbdidfLaaLSvWMv7pOAzmrGfyB0GpLEqpH65w79VZ7P35yi2rSD9P4Pg==
+X-Gm-Gg: AZuq6aJ3ovK5Usm5tD3cQvGL6AG1EM2wxaxiSmd5Ljk8OPtmJIbiYiJx9RicJfF0ChF
+	u30WBmD8HNZSZBC4TWRBpMRqniC84rh9rxtfeUm1zcGPXTJHAuqa2N5+mfG4ajANNkTy35pq58Q
+	UntoFDRqcGFDRnrw7GcYeNIpox7ITc4uSz6B0ZZrdWigOGFPkWuBXbuSypzyxFpeFu9BhaEO5iN
+	hiI9WS0ArCeh6X0iEa8tFtzz1WDHjRCqSqPfqZtwPu/c3C3JD/qkv+dtp5lqziKu4aRxa9o1V5w
+	Di0WPjwbrcX4RUtF92kMlRCpbFOQd1Hn3eS0kjJoGrlBTvoC58P1oumZrv6y+FD+CkQ8DC5HXqD
+	bUw+kUs5neyheO7x0J123vT2CPxP/QDaw8zuOQSlzica2ThM4usKGaz0Rj8G4sigc/zg2Ty/PIK
+	vM6EtCP2xpe1uaWlb7byf6F9Le3FVPkgA69wDdqfleeo3aMUK7dVxxYw==
+X-Received: by 2002:a17:90b:17ca:b0:33b:cfac:d5c6 with SMTP id 98e67ed59e1d1-3537af9505emr1485005a91.29.1769185336053;
+        Fri, 23 Jan 2026 08:22:16 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3536dc50882sm2496967a91.16.2026.01.23.08.22.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 08:22:15 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Simon Horman <horms@kernel.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Breno Leitao <leitao@debian.org>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	bridge@lists.linux.dev,
+	dev@openvswitch.org
+Subject: [PATCH net-next v2 0/7] u64_stats: Introduce u64_stats_reads()
+Date: Sat, 24 Jan 2026 00:21:32 +0800
+Message-ID: <20260123162159.2877941-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,121 +108,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3C:EE_|DM4PR12MB6375:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46e4a5a1-3808-4213-c405-08de5a9af56c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?s0QKyKTo+MHSRnrOBEo1MX/C4FJ3sSdnLm6Dl7NtC/EdIaEkPHo6NpcrnnZb?=
- =?us-ascii?Q?601ev2sCYIrH6bxVGte7XI8QqZ2AS+rJYrsCGHVVwQ0lxBGjhY8FohbwlCVJ?=
- =?us-ascii?Q?wSygNfjkstHwfWuoH4294QjXaQzIyPcwcVHC4naMdZDFYBffg4/o5/k/Aq/d?=
- =?us-ascii?Q?8u7i3bNvzzl75KDpTJj0arJfHlZpBUpcO+xjhOPVwoqy5lZ3VxwyxKiqUXNp?=
- =?us-ascii?Q?PgDw1C8NBw27RrrMWdROjoHlGuMGQC4v5CwO7mxj4nz6I7kF2hV2STJFFfDf?=
- =?us-ascii?Q?kmoXziCFX70AZUSg5XSBkGIaX4QalGGo/c5ttJKee7dQYR4O35tZG801YRkp?=
- =?us-ascii?Q?nzNIf8S60A4Zc80yQv7uFcZRSnf7qqtxU0UOzRTSdcDoxByejAcZupa5AdEw?=
- =?us-ascii?Q?QKAKErKGOe+xX726yMAYrbTVBqzMDnt/xsXSxGd1sDZcYGFZZzsBj7hZyn7J?=
- =?us-ascii?Q?cTj2buCSzhCKONplb6rXuR/7XlXobYTzEFG6qVW+K83Xt4akPqeOx6W2Fo8+?=
- =?us-ascii?Q?LZr66CxUzsXbViXWxN4wH3X+Ftl+QveeH0c05rM+Sk4bGDTFlK4ql4KZSkIg?=
- =?us-ascii?Q?b6Li7QHNCDczpYxMl0u1HPOX9yfNGiMK7HIP6ck7cGq/KGyBJgtLc8K7QPfV?=
- =?us-ascii?Q?WrwJaJ7Z7FsAuSmPnC2Sx7nrAN+KYwRwG0WQoExx6qaLYL6aCAIeWh2TYx1f?=
- =?us-ascii?Q?VIuiNGDcLpNRLNub/CUzg0F2ouazhq8383cKklgv/Zm0ByxsLyKHLcxAioV3?=
- =?us-ascii?Q?8SlJKxzyK9jOKawwN+JQlNhyZf6sRjnz6lZ1Izn4Nj6QkfrvA22k2TuN5mcg?=
- =?us-ascii?Q?wtlgLisAu5h+SSHlJfrCfgfe9gLVqd4Zk+NPuaLk/o3WaZNxTiIP03UgTdIA?=
- =?us-ascii?Q?npzIQNKAbtBfVm1DSpsBz4fy4uRN+hRhOafRe/SYNRiXzj308Nf2FmpuKjXo?=
- =?us-ascii?Q?zQ/2GR46vmirah52DrXQJ76mI4hChjqRJPMEC0PMp1WhgPBbLp/5LR/ZaC8X?=
- =?us-ascii?Q?nmoPbPYw7NAWJOptwQjWobJkCmT952lZwHa9rR0ucyZR6yeqJM5VIV9QSByh?=
- =?us-ascii?Q?YrnWmTV14FOerwe9lIQ3UPpTHqjcM4eilMzOzaNmZILzrMvNriz8ZQFQx48X?=
- =?us-ascii?Q?iAzuIDyuOPxF/UXUQnRserfs/fSIZvfUQUyBm+Mtcqjax2GCYLJ3wcL3Eh9B?=
- =?us-ascii?Q?eXgY1GAqj9ubgZlwlnHkBtiu9yDUWi8yBQBuU3FSPTtbOmznIKX4PPawRyQN?=
- =?us-ascii?Q?RwVLlaZ0AUPmSe2utrISTUtZ/LeehEUTikqew+iji6v8oxnMBF/tBTOrNkAf?=
- =?us-ascii?Q?bYewLiPFUJPbUcwXv7tvPNc++IKjDmcnJBjDAIaX5SwTripY2ezGvyPNyDuY?=
- =?us-ascii?Q?1NYb4xZHNPTUDJGyJBm2T8a11y3bzkle+JFa45ZQHLG1t1IFA+4BGm1+/k9j?=
- =?us-ascii?Q?FnLAWg8jlLVdnezVkO+e4C/edo5sCLeBylESpdzAs3JndvO3iVfJlptZF1Wm?=
- =?us-ascii?Q?FwPuXSq9m/iV393EDG5X+3BePTQF7dttfB0H/2oRxSCCmpfsTDq3K63gGDe0?=
- =?us-ascii?Q?FLVEK498yJl54XK10ndiOyVylC+fBU1kQSRdC1gINT8Vr7IidWPSjgK0RVpB?=
- =?us-ascii?Q?d0DtcZAZJu/GLzsYFzDGLllrw0QLepPyxg0FI9woaR1la/xBhOJIyBmXvX0N?=
- =?us-ascii?Q?bqPLcg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 16:17:52.1314
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46e4a5a1-3808-4213-c405-08de5a9af56c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3C.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6375
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,oktetlabs.ru,decadent.org.uk];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252877-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,blackwall.org,nvidia.com,ovn.org,fomichev.me,debian.org,vger.kernel.org,lists.linux.dev,openvswitch.org];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-252921-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim,oktetlabs.ru:email];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edward.cree@amd.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+];
-	NEURAL_HAM(-0.00)[-0.989];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 9C33A78776
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B9777978F
 X-Rspamd-Action: no action
 
-From: Edward Cree <ecree.xilinx@gmail.com>
+On 64bit arches, struct u64_stats_sync is empty and provides no help
+against load/store tearing. memcpy() and struct copying should not be
+considered tear-free. Use u64_stats_reads() instead.
 
-Since cited commit, core locks the net_device's rss_lock when handling
- ethtool -x command, so driver's implementation should not lock it
- again.  Remove the latter.
+v1: https://lore.kernel.org/r/20260120092137.2161162-1-mmyangfl@gmail.com
+  - rename to u64_stats_reads() to clarify data flow direction
+  - refine the implementation
+  - add docs
+  - fix struct copying too
 
-Fixes: 040cef30b5e6 ("net: ethtool: move get_rxfh callback under the rss_lock")
-Reported-by: Damir Mansurov <damir.mansurov@oktetlabs.ru>
-Closes: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1126015
-Suggested-by: Ben Hutchings <ben@decadent.org.uk>
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
----
- drivers/net/ethernet/sfc/mcdi_filters.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+David Yang (7):
+  u64_stats: Introduce u64_stats_reads()
+  u64_stats: Doc incorrect usage with plain variables
+  net: bridge: mcast: fix memcpy with u64_stats
+  net: openvswitch: fix load tearing with u64_stats
+  macsec: fix memcpy with u64_stats
+  mpls: Fix load tearing with u64_stats
+  vxlan: vnifilter: fix memcpy with u64_stats
 
-diff --git a/drivers/net/ethernet/sfc/mcdi_filters.c b/drivers/net/ethernet/sfc/mcdi_filters.c
-index 6ef96292909a..3db589b90b68 100644
---- a/drivers/net/ethernet/sfc/mcdi_filters.c
-+++ b/drivers/net/ethernet/sfc/mcdi_filters.c
-@@ -2182,12 +2182,7 @@ int efx_mcdi_rx_pull_rss_context_config(struct efx_nic *efx,
- 
- int efx_mcdi_rx_pull_rss_config(struct efx_nic *efx)
- {
--	int rc;
--
--	mutex_lock(&efx->net_dev->ethtool->rss_lock);
--	rc = efx_mcdi_rx_pull_rss_context_config(efx, &efx->rss_context);
--	mutex_unlock(&efx->net_dev->ethtool->rss_lock);
--	return rc;
-+	return efx_mcdi_rx_pull_rss_context_config(efx, &efx->rss_context);
- }
- 
- void efx_mcdi_rx_restore_rss_contexts(struct efx_nic *efx)
+ drivers/net/macsec.c                |  6 ++--
+ drivers/net/vxlan/vxlan_vnifilter.c |  2 +-
+ include/linux/u64_stats_sync.h      | 56 ++++++++++++++++++++++++-----
+ net/bridge/br_multicast.c           |  2 +-
+ net/mpls/af_mpls.c                  |  2 +-
+ net/openvswitch/datapath.c          |  3 +-
+ 6 files changed, 55 insertions(+), 16 deletions(-)
+
+-- 
+2.51.0
+
 
