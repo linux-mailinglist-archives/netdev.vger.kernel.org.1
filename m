@@ -1,85 +1,51 @@
-Return-Path: <netdev+bounces-252788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELy4NIJTc2kDuwAAu9opvQ
-	(envelope-from <netdev+bounces-252788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:54:58 +0100
+	id 4BVkMoVUc2kDuwAAu9opvQ
+	(envelope-from <netdev+bounces-252789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:59:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8DB74A19
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:54:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B12574AAA
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 75F0830164BB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:54:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B0D2F300615F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7380C26F2A6;
-	Fri, 23 Jan 2026 10:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28AD353EFF;
+	Fri, 23 Jan 2026 10:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mUBcwFDA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EK3RUFZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0766C32D0E6;
-	Fri, 23 Jan 2026 10:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684C7346E4C;
+	Fri, 23 Jan 2026 10:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769165695; cv=none; b=VWsZ0xLAnsmybKJQtGqwW9d8ueFgVQM9cBpIHzOh8EajohhZ1jyu80VTscVKwUKDyTuPSxbLCHws+7SxPbRhIn3XoUbuz8qyFCQVwFeOgf49I9/bEoFu37jVNf/A2/QqwjKXh9s/+iSPA8RmqnVqLwu1ENr4+nGROOR7qRecvGM=
+	t=1769165953; cv=none; b=jGTFPFBBhjJANMiR/7zD5Y6nF3DAFi1gsl6MJ2szYxQt0VE2AoDqk1UaEuDXqDDkvStF1BtcKz/Q7gUoBJ5BXLyLHNgzCMGDUKZZzJLPAvs2R1J6sdktW0K8azgokWd0asJbDQN4HSybR4ar6LFDCXIuImN0g4RMPWGLr+xQgPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769165695; c=relaxed/simple;
-	bh=2ukMXpaeejxDwQKrCJNtxodFmM/Dwkk2QHyFD2Cf3c0=;
+	s=arc-20240116; t=1769165953; c=relaxed/simple;
+	bh=jb65O2/Bio1rZLzUlCPrtU9qyJ2dyfIAeGMPxF6fupM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X0fTtiKeziyN6Q5sCnhE4d6LU1ftcbbkXg2mzDz7wVsmCJKs9EUToYCZrSU5wjFQMr1Mpg7VH1mgV6yU7s3bqE3JR7+EZI4F8iMOp0l4ckjU/mfHaslWVGYUUhZikl2DeOJeBdiHitHJDA4ACRV6szWqv8n4JuCnmfWwzFXd17Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mUBcwFDA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60N0KvIF019648;
-	Fri, 23 Jan 2026 10:54:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=csXEFZ
-	8Rtqlj0OhRse/YTXINvL5yKhREspaRqgErWlw=; b=mUBcwFDAjlOKo4HvNcQjFD
-	Lw+hDpFqSKossTzU/13dUEv/HPtAGVAk9aPvb1xYee3ZMS3VOE8JUnZJCKCZTh2d
-	uKCgqqQNay1pidqH1NTNV0HUSLA23tS7ncJ6yGPi24uCUcxCz+dFpf+YzVCnDve9
-	iixyNcRG/ODkCQymsXWNCkKrbG7tfQLlNnjs1955i4bh5qp5EAbpuUQ56JvZ2sfd
-	o7S3vPud28eVBbSV+bdHwNoU7fsil4Mufs5mBPKK6aaa57xffvwQ3ZjMMTMhdvJF
-	TgWt2QFPA0ICJGtfh1QpcGw011Fteb7usYZE3C7X5SXgJVNx79Gt7ZXOh6RYczgw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br256fef5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Jan 2026 10:54:44 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 60NAshMC006452;
-	Fri, 23 Jan 2026 10:54:44 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4br256fef2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Jan 2026 10:54:43 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60NA5KfH016600;
-	Fri, 23 Jan 2026 10:54:42 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4brn4ygqnv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Jan 2026 10:54:42 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60NAscIS59441584
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 Jan 2026 10:54:38 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 352C920043;
-	Fri, 23 Jan 2026 10:54:38 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BDFE720040;
-	Fri, 23 Jan 2026 10:54:37 +0000 (GMT)
-Received: from [9.111.132.48] (unknown [9.111.132.48])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 Jan 2026 10:54:37 +0000 (GMT)
-Message-ID: <6f8de95e-b034-4ea8-a246-605047d142db@linux.ibm.com>
-Date: Fri, 23 Jan 2026 11:54:37 +0100
+	 In-Reply-To:Content-Type; b=gIXEx/moAj2+clTtI/25vCDnHVe/pkBWJuXJKWyPBT9GpFMUkvnoFrzOZk9HDn03Y0rmLt8h+d9Qnalgw3kQ+u5I2mC/gtZE4Y5iBsI9/giieb5v2k7h7i4S1agPsoXc5AFL2Yo1pRuTwDmUFjfP1lagyz7sMJWK6YM4X2X/5MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EK3RUFZH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70B38C4CEF1;
+	Fri, 23 Jan 2026 10:59:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769165952;
+	bh=jb65O2/Bio1rZLzUlCPrtU9qyJ2dyfIAeGMPxF6fupM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EK3RUFZHlbcY4fzQJ27jyz0Ukr94SmdfUkSFrrYQCfCOL8XxIUBtLq5rqrZLgYYNN
+	 shd3nl5Q+JZRs5MCuddlvhXZoN/+voIqp3mqn3NVZg2sVQgYDidE9WAMClrGavFpw+
+	 o6oQ4ysGHXGtzj9RxxWceznd9x8Yre0g1oLi18Dd2qp2cZaGDR+p7MP0b3HnEdGUmp
+	 He0xmXhy8UU15M1kQFh7Lmx9H/oKAgDqDSrElsCI4vAUNJLwjgfirxGzaiTnWteyL+
+	 zwkba0Q00mJPyF0P3i+7p6Yf9k5hVmiCWrVPVoZ0z4Y92Sdw8nnIAwKwn3ZNRzJdPy
+	 rD8EJItIVt1zg==
+Message-ID: <eece25d7-1196-46f6-b3c8-2f88cbff960d@kernel.org>
+Date: Fri, 23 Jan 2026 11:59:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,119 +53,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net/smc: cap allocation order for SMC-R
- physically contiguous buffers
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Uladzislau Rezki
- <urezki@gmail.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>, Simon Horman
- <horms@kernel.org>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, oliver.yang@linux.alibaba.com
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
- <20260123082349.42663-2-alibuda@linux.alibaba.com>
+Subject: Re: [PATCH net-next v1] net: sched: sfq: add detailed drop reasons
+ for monitoring
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ carges@cloudflare.com, kernel-team@cloudflare.com,
+ Yan Zhai <yan@cloudflare.com>
+References: <176847978787.939583.16722243649193888625.stgit@firesoul>
+ <1bbbb306-d497-4143-a714-b126ecc41a06@kernel.org>
+ <20260120162616.463c8af1@kernel.org>
+ <412b91a2-15f3-4a5f-8f1a-249c9d79cb41@kernel.org>
+ <20260121172155.6ec96ef8@kernel.org>
+ <28911dac-6aec-42ce-9101-9071e18e1522@kernel.org>
+ <20260122175919.590601b6@kernel.org>
 Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20260123082349.42663-2-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20260122175919.590601b6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTIzMDA4NyBTYWx0ZWRfX283tG++MGNtC
- 0z7k81OTUFvAWo+ixbiBlazIsDbhz7VdUPceTVZwVjGq51U4brUVXJQD7lyUtmt/eiYJLWJQutg
- jeJIbYtWU9MnxUU7spFhaIo/W3LmFSDbMPelFh7DWBW15bt1DG47RcQJV2v/z0lh7HStIgEZUZQ
- vLMUlb3cPycJR2CccAuzNUdKQVSSBTGl1f9vqB6wh7u2eACS2S4KI1UySoxwKUy905PLtkBy3Cf
- tz1txSC8iF/aDbjcbIiA+ihAoW+BQipjEegTc/NA3TDSHqxkpHx8fnbw7+0UsHNMzVeOX/tWVT1
- I8fBrzR+rebVdOwMUuxckpfh7M2jupKcSCNiXg8bns2EVhUAgSQFzKrWgiOBvn6+sWgbfKTiZHI
- Gs/cRM53KC3fdZfuROKWbAJs/pV579LJUL/5alri9+Uy64T7YxVvHqxxdVBiBWtwanW34RiGf9H
- By9XgjQY1rgtJ2DF04Q==
-X-Authority-Analysis: v=2.4 cv=BpSQAIX5 c=1 sm=1 tr=0 ts=69735374 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=dTheS_w4H7qbiWTV3QcA:9
- a=QEXdDO2ut3YA:10 a=-_B0kFfA75AA:10
-X-Proofpoint-GUID: 4DB0nUwNBqPXJw6bK7wTkhoyrtboA-7l
-X-Proofpoint-ORIG-GUID: OPcdjeIHknd5ucfLknkVuotX6sIIBtrs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
- definitions=2026-01-23_01,2026-01-22_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 clxscore=1011 adultscore=0 phishscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2601230087
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com,toke.dk,cloudflare.com];
+	TAGGED_FROM(0.00)[bounces-252789-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252788-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linux.alibaba.com,davemloft.net,linux-foundation.org,google.com,kernel.org,redhat.com,linux.ibm.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_TWELVE(0.00)[13];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: 7C8DB74A19
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6B12574AAA
 X-Rspamd-Action: no action
 
 
 
-On 23.01.26 09:23, D. Wythe wrote:
-Describe your changes in imperative mood.
-https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-
-
-> For SMCR_PHYS_CONT_BUFS, the allocation order is now capped to
-> MAX_PAGE_ORDER, ensures the attempts to allocate the largest possible
-> physically contiguous chunk instead of failing with an invalid order,
-> which also avoid redundant "try-fail-degrade" cycles in __smc_buf_create().
+On 23/01/2026 02.59, Jakub Kicinski wrote:
+> On Thu, 22 Jan 2026 16:33:00 +0100 Jesper Dangaard Brouer wrote:
+>>> The kfree_skb tracepoint does not have netdev,
+>>
+>> Correct, the kfree_skb tracepoint does not have netdev avail.
+>> I'm also saying that I don't want the netdev, because that would
+>> explode/increase the Prometheus metric data.
 > 
-> For SMCR_MIXED_BUFS, If it's order exceeds MAX_PAGE_ORDER, skips the
-> doomed physical allocation attempt and fallback to virtual memory
-> immediately.
+> Perhaps cutting someones reply mid-sentence is not the most effective
+> way to communicate.
 > 
+>>> so if you're saying you have the ability to see the netdev then
+>>> presumably there's some BPF in the mix BTF'ing the netdev info out.
+>>> And if you can read the netdev info, you can as well read
+>>> netdev->qdisc->ops->id and/or netdev->_tx[0]->qdisc->ops->id
+>>>
+>>> It kinda reads to me like you're trying to encode otherwise-reachable
+>>> metadata into the drop reason.
+>>
+>> This feels like a misunderstanding. We don't want to (somehow) decode
+>> extra metadata like netdev or qdisc.  First of all we don't want to
+>> spend extra BPF prog cycles doing this (if it's even possible), and
+>> secondly we want to keep metric simple (see cardinality explosion).
+>>
+>> I'm simply saying let us keep Eric's current approach of having qdisc
+>> specific drop-reason *when* those relates to qdisc specific tunables.
+>> And I'm arguing that FQ flow_limit and SFQ depth are two different
+>> things, and should have their own enums.
+>>     I have a specific production use-case, where I want configure SFQ to
+>> have small flow "depth" to penalize elefant flows, so I'm okay with
+>> SKB_DROP_REASON_SFQ_MAXDEPTH events.  So, I want to be able to tell this
+>> apart from FQ drops (SKB_DROP_REASON_FQ_FLOW_LIMIT). I hope that this
+>> makes it clear why I want this to be separate enums(?)
+> 
+> It really sounds to me like _in your setup_ there's some special
+> meaning associated with some traffic being in SFQ and other
+> traffic in FQ. And you can get the relevant information with BPF,
+> you're just saying that you don't want to spend cycles (with no
+> data to back that up).
+> 
+> I'm not gonna lose sleep over this, if you convince another maintainer
+> to merge it it's fine. To me having per qdisc drop reasons. When qdiscs
+> are *pluggable modules* and drop reasons are a core thing makes
+> no sense. You're encoding arbitrary metadata into the drop reason for
+> the convenience of your narrow use case.
 
-Proposal for a version in imperative mood (iiuc):
-"
-For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER. This
-ensures the attempts to allocate the largest possible physically contiguous
-chunk succeed, instead of failing with an invalid order. This also avoids
-redundant "try-fail-degrade" cycles in __smc_buf_create().
+Fair enough. I understand your concern about encoding qdisc identity
+into drop reasons. My view is that qdisc-specific drop reasons help
+pinpoint exact code paths and tunables, which is valuable for production
+debugging. Eric's FQ commit (5765c7f6e317) already established this
+pattern with FQ_BAND_LIMIT, FQ_HORIZON_LIMIT, and FQ_FLOW_LIMIT.
 
-For SMCR_MIXED_BUFS, if its order exceeds MAX_PAGE_ORDER, skip the doomed
-physical allocation attempt and fallback to virtual memory immediately.
-"
+I'll send a v3 and expect other maintainers to review this.
 
-
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
-Other than that: LGTM
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
+--Jesper
 
