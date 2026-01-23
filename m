@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-252665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCIDNh4mc2kAswAAu9opvQ
-	(envelope-from <netdev+bounces-252665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:41:18 +0100
+	id EKA7Gbclc2nCsgAAu9opvQ
+	(envelope-from <netdev+bounces-252666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:39:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7989F71E54
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:41:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CC371D73
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:39:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 25B903015872
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:36:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0527A301925D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 07:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68093382E4;
-	Fri, 23 Jan 2026 07:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629F6329386;
+	Fri, 23 Jan 2026 07:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQhrHOIK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vm0+fqpH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BEE6318B95
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 07:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13394314A95
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 07:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769153813; cv=none; b=FpYaq8BlV7T407j4QvUsoFv6DsVrt+4qpi1huamnLG+B81NepGM4UZ67I8nwx4rnGvO+8nOOnppUY+HcQI/rbBG9qcATlEXuGRUQ+ddNG+o5SVhA9YH+40Z8p3J8mTR0gFQEYNgGERkbTZm4hnLeiebYfdvGP4b8i1LGSsfXsaQ=
+	t=1769153822; cv=none; b=LYFhs/E81Qo89Ti/zpODwjcxr7NB2ib7foVmqHFt7fFNbEVe42RYFUHR0Sibh90JnuNanLS6rdq5MOPjr8TKOqOZTWdlITwInWNF85lwtxmm6YO2xZ1G4G8wFv9JLScQKPVfNgFAtStsA5pN1F7EAgJzsCdeFom6uCD1OX86i8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769153813; c=relaxed/simple;
-	bh=7cC1ms5ub9SS0bly7QzzdjNJghADRqDQHVSuwXZiOkM=;
+	s=arc-20240116; t=1769153822; c=relaxed/simple;
+	bh=pPH6IGYSvT73W3XnsSk5F+V+bv692q4Zq0EDWpqk/mQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IfucARCHR3BiTmYUuyrGew/ffbHD+j99TwC4oCQTp+57M05XVAePL5rBL8/XqvLbaYtbWi9KCmXTh/J81X0QwhG636bnaRUBP55qSJ/jJZPJlVa8H8qWW44i8j1AT0MW1EOg1YNFfXYfXzIh9qcSkS9/zdVxM2pTsM4YyFFtd2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQhrHOIK; arc=none smtp.client-ip=209.85.210.195
+	 MIME-Version; b=svHpPHkeeJImjhTpP2Dh+dg3yGN3YIGU5TtdmPVytPCsBex1q7Jjd5WO9zGHq0HiAi6yNzdkue6ULVbYoBNj8yivY1POT0Iiv0g//fvAm9ey+fHUaFpE6PpmWb8cM+vQ3OzYtu4bxWF04R0xUBScPBY9ZZ2NgJ3Vc1w9dYVU5no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vm0+fqpH; arc=none smtp.client-ip=209.85.210.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-823210d1d8eso73577b3a.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 23:36:51 -0800 (PST)
+Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-8217f2ad01eso1960280b3a.2
+        for <netdev@vger.kernel.org>; Thu, 22 Jan 2026 23:37:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769153811; x=1769758611; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769153820; x=1769758620; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TG3OIJ4OsXGkuiYroAWEp+caX5ZqVGcvi7JJxvZjj6c=;
-        b=HQhrHOIKI1HpgGhW1C4/hYqk+pyPGbib312/colf0oNZeKvi2aQrTu4AkNjQIGya5T
-         L2pQKJAwNp/ZGzSiKgNUlC0WxQsvUdug/WpuIVLPeOM4rHxUo6WcHGA5x09wTy7/sYCb
-         wfA283H6WygQN0YXvlZWrSarIC3XXdnABrlozPgvzzzyJwvHNhhxnzqzLJ6amIoQirza
-         yyiTcWRg/5v12paT9ZR4o70CItBrh5qKe8urBxBIf/QeCFGSD4g9ksp1ae2epKMG7wmT
-         3K6Mw62EMRq1S3huYMw8turGLvf72GienPWTgplc9pvMiEGdJHBLPsAeNY3/G+ECPCM4
-         8wFA==
+        bh=BGHQu6mG6lMqPEadRM+ZfBOS3CsIq7QGGssQ90tpvv4=;
+        b=Vm0+fqpHWlEa2M1hAWoc9wyZcQl+HMEfYOUmXMKu/0JcRr/8K92M2mH9/A+O3FfeHm
+         moFr8zJZgMZLQOP3uH0OppnTFpsVWGMV3qCgDUb7otpHQJ6gy4JDMPlp3ucLeVbVk2lg
+         J8nZnxX5a/+7+QNkXtJKNX7HORm2gkiygY1LfofMVgFsSxRZAv9UGHKTscqCGclkHu9H
+         atp+gRwiHrtbtArlApz7oxhleB4h9HE53LORlO5syHT9wx2XsQUZOPhaCBavdRzLME5a
+         1hybaCeuKmtcZnIlOpmbN1gFJxtARI5UPYMWNgN3sOXwPMsxMyIsGO382ggec3+6yXnH
+         dnaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769153811; x=1769758611;
+        d=1e100.net; s=20230601; t=1769153820; x=1769758620;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TG3OIJ4OsXGkuiYroAWEp+caX5ZqVGcvi7JJxvZjj6c=;
-        b=SGMCLAZ9/I/aAnyNRbbWlJmLZR0Lr/LMXVfsdUHqSFMhKURaVQdq3lbSToFsmVg/b3
-         stv1/5iAg+cjGf9QXMw17AbaTbBRgqCzniSZKHZxyAbo6PnGEwWiKDBh23Ay2mGtXzeh
-         H2XtFUJYUQ/HSdsjhnIriuYsVoxlSky8XJAKFEabyIkgX9gCQlusld2Pu6gRSmd2XzH3
-         7E8VIRDHHoxgFHVQ2eA3U3Fl9PALEeWFNMM6doyu2IcEwtK/JNDqfqF7M1w4wKZRMTMT
-         wQI7DSg0Z+yQ26I0t+q2yvImDanjEIRflXpN48W5O9pCZwFi/cPK+6myN90KcUmhk3wR
-         FQqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXDwhTSu6rV/cZfKwPLIfSG5MaH9UsB6AvAymBy0txqyR19SbLW+LrE/KnqOCDc1/Tm5BdkN4Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHs8NjcQtjY0lSSgy6NMFyClixXD+tUsrZhYM2kfGcGp2dLyMp
-	GNyVjHzHC1iph674bhrWNx9R0jT+CVYF8GKOuFRSxtw0UD28HQFxZ+1d
-X-Gm-Gg: AZuq6aKwzXiK3L+ZHNROuzwpaBgpLRLvkCaE0Lr23dePSIAYryR2zmy6kbTEnbZFtp3
-	UMWmV9Zof2kGD6s6Gaf1PIGz6ZgjwdzYG9koxyni/bHbJXepBI7099O5a2P2iAnjr/JrR6/t2p2
-	XKHjbg4GON1Em27ItMkYBEw9IMNUjaYqrzdD9V85+4zbwiV4fXsvEvhOVB80APEgWA/D7FchIQM
-	HS/xpUF7T7UOcmPAgZag4xdfgsgndTOcOmXoN+kfJczZfZbpe1WIa0D1vHZIfIO8t3VR+YAeWJa
-	lNXsjlSA7Q/tuvxKpSSWSchGrI40pBnMUUvyUlFFu71QpHPZ6DeiIhq3FtXFSZBXIxN5Uu5Nk07
-	Kwj1vzN1HJU07XFbxiqlYiqahDMWjDnQjbUQUvmjNYBEKesu0COdtIUPlxizxpGR7UsL1Pn3tIr
-	4q3J2rClcD
-X-Received: by 2002:a05:6a00:3cd6:b0:823:8a5:297f with SMTP id d2e1a72fcca58-82317da469cmr1995656b3a.16.1769153811409;
-        Thu, 22 Jan 2026 23:36:51 -0800 (PST)
+        bh=BGHQu6mG6lMqPEadRM+ZfBOS3CsIq7QGGssQ90tpvv4=;
+        b=g/RoGLx/6+Xxpnh0lcEkTvdTSb+oTBIL7P77BkhiWiht/sb/FzTm4gX9H5apHrTTal
+         AAkC+HC/OsZjXhg7FtPUIi3jvWXjFjWDP+ah5g+k0Z1uLkPZQX4SEwVy9mrTyIzyuphv
+         0zUrgySNNoTV5ywSHu9q5M+voT0gdDZHTcIup2jq81b+E+5O2rMI7KjqPwMH0iv7CvZb
+         JtLE7J2aqoG/azr/SS/tvbZ0tQXL8U6tmKTVXxJAQtRjN7YIrGgrTgcvEq+WQaxJG+Pt
+         z6ehAmN4vPnSKQ1jyZiBWb+tuHB1p6MoheILoZmzqmSy5bYNrO8SWiL8d0qtv1ugRNsn
+         m5tA==
+X-Forwarded-Encrypted: i=1; AJvYcCXzdQRnEFbpqOHrsl6skzbYBEoVdegqBoZHJ6cT3jW8apbHRVlyurcqgFO695n8ou7Zs4S2/TE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgrvQUrpPC2Hxs/e5nVTt13lScx1os4zSpvjvb0ZR4N1JRToRj
+	bFzwEwLTP0akFRLRKmwg5D5SMzVO44U59DvEhB6va96nsfQ6QzCqvIQ/
+X-Gm-Gg: AZuq6aKM5lhHsWQxVOjGpNYa/tU0pG3+KQ21Urp4qFG2GElf/KBHJnk1N1FCZ9hUIch
+	jU/3kHzLh2PoM27CbDArEH1ZvE7s9gZp1YTSAZEXSvZ4Kp+RHUOhcbtSz28Wjg6wP/2Sr5aSeCz
+	4YVIr4k7bE0HDrPBB+VKo+/tfD+S3Hl9lvf0zS5t/POLClUxPkCVR1LsPjILS17/yMlUYJ9UOOO
+	ej14ANjT5Q2NFFFNK6uGfWxOEhNsSj0OPWSfodk14g5iwX1/Lma+gZWn50OH7k/YYgEE0QwYAp7
+	l9tAl4WO1S3+gPRHqK+K4ujE981COipRUj5y+VcJ31kmWlrAw3huI5E7/9swA4Nv3k9bnUT18Uk
+	oh2J080z4k6k0r2MOnKYlCoGEX+D0eueGPFMUqVRptOmbqHL2kxaHWktV03TYDInl0+zQgjRxGR
+	MTxGsycS7k
+X-Received: by 2002:a05:6a00:3c87:b0:823:bbb:76fb with SMTP id d2e1a72fcca58-82317ecf202mr1711766b3a.46.1769153820320;
+        Thu, 22 Jan 2026 23:37:00 -0800 (PST)
 Received: from 7940hx ([103.173.155.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231876fd1fsm1334205b3a.69.2026.01.22.23.36.42
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231876fd1fsm1334205b3a.69.2026.01.22.23.36.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 23:36:50 -0800 (PST)
+        Thu, 22 Jan 2026 23:36:59 -0800 (PST)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: andrii@kernel.org
@@ -101,9 +101,9 @@ Cc: daniel@iogearbox.net,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v11 08/12] libbpf: add fsession support
-Date: Fri, 23 Jan 2026 15:35:28 +0800
-Message-ID: <20260123073532.238985-9-dongml2@chinatelecom.cn>
+Subject: [PATCH bpf-next v11 09/12] bpftool: add fsession support
+Date: Fri, 23 Jan 2026 15:35:29 +0800
+Message-ID: <20260123073532.238985-10-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260123073532.238985-1-dongml2@chinatelecom.cn>
 References: <20260123073532.238985-1-dongml2@chinatelecom.cn>
@@ -121,12 +121,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252665-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252666-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -142,60 +142,30 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:mid,chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7989F71E54
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:mid,chinatelecom.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 63CC371D73
 X-Rspamd-Action: no action
 
-Add BPF_TRACE_FSESSION to libbpf.
+Add BPF_TRACE_FSESSION to bpftool.
 
 Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 ---
-v10:
-- split the modification to bpftool to a separate patch
+ tools/bpf/bpftool/common.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-v5:
-- remove the handling of BPF_TRACE_SESSION in legacy fallback path for
-  BPF_RAW_TRACEPOINT_OPEN
-- use fsession terminology consistently
----
- tools/lib/bpf/bpf.c    | 1 +
- tools/lib/bpf/libbpf.c | 3 +++
- 2 files changed, 4 insertions(+)
-
-diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
-index 21b57a629916..5846de364209 100644
---- a/tools/lib/bpf/bpf.c
-+++ b/tools/lib/bpf/bpf.c
-@@ -794,6 +794,7 @@ int bpf_link_create(int prog_fd, int target_fd,
- 	case BPF_TRACE_FENTRY:
- 	case BPF_TRACE_FEXIT:
- 	case BPF_MODIFY_RETURN:
-+	case BPF_TRACE_FSESSION:
- 	case BPF_LSM_MAC:
- 		attr.link_create.tracing.cookie = OPTS_GET(opts, tracing.cookie, 0);
- 		if (!OPTS_ZEROED(opts, tracing))
-diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-index bbcfd72b07d5..0c8bf0b5cce4 100644
---- a/tools/lib/bpf/libbpf.c
-+++ b/tools/lib/bpf/libbpf.c
-@@ -115,6 +115,7 @@ static const char * const attach_type_name[] = {
- 	[BPF_TRACE_FENTRY]		= "trace_fentry",
- 	[BPF_TRACE_FEXIT]		= "trace_fexit",
- 	[BPF_MODIFY_RETURN]		= "modify_return",
-+	[BPF_TRACE_FSESSION]		= "trace_fsession",
- 	[BPF_LSM_MAC]			= "lsm_mac",
- 	[BPF_LSM_CGROUP]		= "lsm_cgroup",
- 	[BPF_SK_LOOKUP]			= "sk_lookup",
-@@ -9859,6 +9860,8 @@ static const struct bpf_sec_def section_defs[] = {
- 	SEC_DEF("fentry.s+",		TRACING, BPF_TRACE_FENTRY, SEC_ATTACH_BTF | SEC_SLEEPABLE, attach_trace),
- 	SEC_DEF("fmod_ret.s+",		TRACING, BPF_MODIFY_RETURN, SEC_ATTACH_BTF | SEC_SLEEPABLE, attach_trace),
- 	SEC_DEF("fexit.s+",		TRACING, BPF_TRACE_FEXIT, SEC_ATTACH_BTF | SEC_SLEEPABLE, attach_trace),
-+	SEC_DEF("fsession+",		TRACING, BPF_TRACE_FSESSION, SEC_ATTACH_BTF, attach_trace),
-+	SEC_DEF("fsession.s+",		TRACING, BPF_TRACE_FSESSION, SEC_ATTACH_BTF | SEC_SLEEPABLE, attach_trace),
- 	SEC_DEF("freplace+",		EXT, 0, SEC_ATTACH_BTF, attach_trace),
- 	SEC_DEF("lsm+",			LSM, BPF_LSM_MAC, SEC_ATTACH_BTF, attach_lsm),
- 	SEC_DEF("lsm.s+",		LSM, BPF_LSM_MAC, SEC_ATTACH_BTF | SEC_SLEEPABLE, attach_lsm),
+diff --git a/tools/bpf/bpftool/common.c b/tools/bpf/bpftool/common.c
+index e8daf963ecef..8bfcff9e2f63 100644
+--- a/tools/bpf/bpftool/common.c
++++ b/tools/bpf/bpftool/common.c
+@@ -1191,6 +1191,7 @@ const char *bpf_attach_type_input_str(enum bpf_attach_type t)
+ 	case BPF_TRACE_FENTRY:			return "fentry";
+ 	case BPF_TRACE_FEXIT:			return "fexit";
+ 	case BPF_MODIFY_RETURN:			return "mod_ret";
++	case BPF_TRACE_FSESSION:		return "fsession";
+ 	case BPF_SK_REUSEPORT_SELECT:		return "sk_skb_reuseport_select";
+ 	case BPF_SK_REUSEPORT_SELECT_OR_MIGRATE:	return "sk_skb_reuseport_select_or_migrate";
+ 	default:	return libbpf_bpf_attach_type_str(t);
 -- 
 2.52.0
 
