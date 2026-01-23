@@ -1,237 +1,262 @@
-Return-Path: <netdev+bounces-252839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CaZDqZoc2mivQAAu9opvQ
-	(envelope-from <netdev+bounces-252839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:25:10 +0100
+	id WCYSFWBuc2mnvgAAu9opvQ
+	(envelope-from <netdev+bounces-252840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:49:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8667F75BBB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:25:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BC575FC6
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 13:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4167031A0AF4
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:18:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D45FC3038149
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF78627CCF0;
-	Fri, 23 Jan 2026 12:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53943281356;
+	Fri, 23 Jan 2026 12:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfIeo99t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JtNqjFXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD09C222575;
-	Fri, 23 Jan 2026 12:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4792522A1;
+	Fri, 23 Jan 2026 12:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769170731; cv=none; b=pA82xaKM3qKA0ziHtbhB27LG6taeUeRIFcQni2hzOXTjaF6Fi2qB3LcxnzjUV6yrYLB6xIjIpDCXhnbJ9f6FOCUPbqHkqS0LyousCTWbrnHSnQuqwFvPAYGqfzckmCRS641FXeGh5WQIrmotrP4IUqclIdT7D7eErGlsGgL1vA8=
+	t=1769172542; cv=none; b=cYfa20svLZwdAIQCeW1v/3/Dxa15er9uBoV7YG2lS53l/5o54XsjWts8s25lpTxZegeYl3/lWj4100FthLClv2w8f3epcrlHr56Ga2gv0qNrZ4Bg+YX5TRDgYaU2EPDN0pACmm49uIfcUmonxTaYEmEFXFZVwlngo6fIli+zpXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769170731; c=relaxed/simple;
-	bh=RI7LGH0pvlSUbNfW4+4aeCZh8WWmVQu6y5LjvxFd9HM=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=mz5Fk2DKhy2E7CqwKDqnbXtG/5HJqvt88ZjKGpc52jSNSJnR6hW9Lxgt8raLQGnpYm65ABiGsf8hgnXRNXMv0/QXKn18l/530tm4LgpsAIhIMih+hnWoLL41+2HbdxLUfyAmry/TBHeXyXjFKVog9qBPcvc+RjjDJKn0thpP584=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfIeo99t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55043C4CEF1;
-	Fri, 23 Jan 2026 12:18:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769170731;
-	bh=RI7LGH0pvlSUbNfW4+4aeCZh8WWmVQu6y5LjvxFd9HM=;
-	h=Subject:From:To:Cc:Date:From;
-	b=VfIeo99tMICRoLwFLK76V+fpUxMsLyoV0pnVvzfaT8FcxwUvgBrwTojA3Rg3DSPOP
-	 vu/2//Y0TvinVOHMU5zyjBh2i0y9cH8hLhBaDqBATWix+36aR57/4oEWA/yMH9HPqt
-	 OccGU+b+9N0Eai2keSHt49O/OY7gplXwa3NZ8qpw1GbXbfvu8GQ0CPFtHP1Cldo4Yv
-	 9xN/6hBlW4GXXoC7kLpRY26A2Rm9Bk1kV8/FjnLTN+YxRe5bm2gf85LPGgNsvT9cgX
-	 SZfqRL4u/WoV78ndqR9cZCRSlBbd0djncMLxcehrsSfVZeJYb9mdzC0mB3AQs4jwgF
-	 k8n5OrQhec55Q==
-Subject: [PATCH net-next v3] net: sched: sfq: add detailed drop reasons for
- monitoring
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org, Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- horms@kernel.org, jiri@resnulli.us, edumazet@google.com,
- xiyou.wangcong@gmail.com, jhs@mojatatu.com, carges@cloudflare.com,
- kernel-team@cloudflare.com
-Date: Fri, 23 Jan 2026 13:18:46 +0100
-Message-ID: <176917072608.1186611.11185920960590396939.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1769172542; c=relaxed/simple;
+	bh=c/Tyh7KTdNA0+IEkETwGY3ZSXSp+5HE4oKexBxdgdkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D1uVDyAoLy8ABkULL+Du5Nw2+MiCdxeZezbIkOzRhpsGyHSySOoiGDMOuHB5ets/zuH3OOUHnt1sivFRWHY4H4EbLx7mAWKpyS6o4ZZk9Mn4rGTX27dG4C5+AeV5KMV8MZ6etMSFgM8Wje3fsNNS8KV9vzREH9T9mGu1j1lWATs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JtNqjFXN; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769172541; x=1800708541;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=c/Tyh7KTdNA0+IEkETwGY3ZSXSp+5HE4oKexBxdgdkc=;
+  b=JtNqjFXNrFLRZ5KNIWXDJQnLMnoUtHLZYTzcB7aHOilm7Tq7uqyyxNYq
+   QwNqtxF+GrsdFaWfb4gNlk8Cl7GaOtQBXKRzQ8pLq8JEQekqD/QIfCdaF
+   zvkGFiwUBW1FFj9pQ2RAhhTxU364huZzylr1I6z20LegZaGoA3zgyGZl8
+   eqpkQCDfamgv2KqfJUMuiMEY98ShixnIXuTwTgqQASxnV8rp4qJAcuDGG
+   ulm6PdMbR0hjqMTDjyrG2FAD06I1Voqd/P7wwBYjS0LHch7jd/KYlqhvX
+   enIIqVOeQ43WYHOX55/7CBHvQbQwUIKdqqkY+MsS+0FpmElrKzvICgCbY
+   Q==;
+X-CSE-ConnectionGUID: pj6PSzFzRk+nH91zjBhxSg==
+X-CSE-MsgGUID: Coi9zs82Sn6oj1EEqLj92g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11679"; a="70338796"
+X-IronPort-AV: E=Sophos;i="6.21,248,1763452800"; 
+   d="scan'208";a="70338796"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2026 04:49:00 -0800
+X-CSE-ConnectionGUID: FA01p0Q9Sku6t9JO7atQSA==
+X-CSE-MsgGUID: tP44//wPRNS0Zw1DkgKJoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,248,1763452800"; 
+   d="scan'208";a="212021230"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 23 Jan 2026 04:48:56 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vjGar-00000000TxS-1WhJ;
+	Fri, 23 Jan 2026 12:48:53 +0000
+Date: Fri, 23 Jan 2026 20:48:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: Re: [PATCH net-next] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <202601232029.nwwE5gfM-lkp@intel.com>
+References: <20260123065257.2993735-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123065257.2993735-1-rkannoth@marvell.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252839-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com,davemloft.net,redhat.com];
+	TAGGED_FROM(0.00)[bounces-252840-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	NEURAL_HAM(-0.00)[-0.995];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,toke.dk,resnulli.us,google.com,gmail.com,mojatatu.com,cloudflare.com];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8667F75BBB
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: C8BC575FC6
 X-Rspamd-Action: no action
 
-Add specific drop reasons to SFQ qdisc to improve packet drop
-observability and monitoring capabilities. This change replaces
-generic qdisc_drop() calls with qdisc_drop_reason() to provide
-granular metrics about different drop scenarios in production
-environments.
+Hi Ratheesh,
 
-Two new drop reasons are introduced:
+kernel test robot noticed the following build warnings:
 
-- SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS: Used when a new flow cannot
-  be created because the maximum number of flows (flows parameter)
-  has been reached and no free flow slots are available.
+[auto build test WARNING on net-next/main]
 
-- SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH: Used when a flow's queue
-  length exceeds the per-flow depth limit (depth parameter),
-  triggering either tail drop or head drop depending on headdrop
-  configuration.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ratheesh-Kannoth/devlink-Implement-devlink-param-multi-attribute-nested-data-values/20260123-145646
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260123065257.2993735-1-rkannoth%40marvell.com
+patch subject: [PATCH net-next] devlink: Implement devlink param multi attribute nested data values
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260123/202601232029.nwwE5gfM-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260123/202601232029.nwwE5gfM-lkp@intel.com/reproduce)
 
-The existing SKB_DROP_REASON_QDISC_OVERLIMIT is used in sfq_drop()
-when the overall qdisc limit is exceeded and packets are dropped
-from the longest queue.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601232029.nwwE5gfM-lkp@intel.com/
 
-The naming uses qdisc-specific drop reasons tied to SFQ tunables,
-following the pattern established by Eric's FQ commit 5765c7f6e317
-("net_sched: sch_fq: add three drop_reason") which introduced
-FQ_BAND_LIMIT, FQ_HORIZON_LIMIT, and FQ_FLOW_LIMIT.
+All warnings (new ones prefixed by >>):
 
-The new drop reasons are inserted in the middle of the enum after
-SKB_DROP_REASON_QDISC_CONGESTED to group all qdisc-related reasons
-together. While drop reason enum values are not UAPI, the enum
-names implicitly become UAPI as userspace tools rely on BTF to
-resolve names to values. This makes middle-insertion safe as long
-as names remain stable.
-
-These detailed drop reasons enable production monitoring systems
-to distinguish between different SFQ drop scenarios and generate
-specific metrics for:
-- Flow table exhaustion (flows exceeded)
-- Per-flow congestion (depth limit exceeded)
-- Global qdisc congestion (overall limit exceeded)
-
-This granular visibility allows operators to identify capacity
-planning needs, detect traffic patterns, and optimize SFQ
-configuration based on real-world drop patterns.
-
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
-v3:
-- Removed SFQ_DR() macro per upstream feedback
-- Use full drop reason names (SKB_DROP_REASON_QDISC_SFQ_*) for easier grepping
-- Split long lines to stay under 80 characters
-
-v2:
-- Changed to hierarchical naming: QDISC_SFQ_MAXFLOWS and QDISC_SFQ_MAXDEPTH
-- Added QDISC_ prefix for pattern matching across qdisc subsystems
-- Added rationale paragraph explaining userspace monitoring benefits
-
-v1:
-- Initial submission with QDISC_MAXFLOWS and QDISC_MAXDEPTH
----
- include/net/dropreason-core.h |   12 ++++++++++++
- net/sched/sch_sfq.c           |   11 +++++++----
- 2 files changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index a7b7abd66e21..92c99169bb97 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -70,6 +70,8 @@
- 	FN(QDISC_BURST_DROP)		\
- 	FN(QDISC_OVERLIMIT)		\
- 	FN(QDISC_CONGESTED)		\
-+	FN(QDISC_SFQ_MAXFLOWS)		\
-+	FN(QDISC_SFQ_MAXDEPTH)		\
- 	FN(CAKE_FLOOD)			\
- 	FN(FQ_BAND_LIMIT)		\
- 	FN(FQ_HORIZON_LIMIT)		\
-@@ -390,6 +392,16 @@ enum skb_drop_reason {
- 	 * due to congestion.
- 	 */
- 	SKB_DROP_REASON_QDISC_CONGESTED,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS: dropped by SFQ qdisc when the
-+	 * maximum number of flows is exceeded.
-+	 */
-+	SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS,
-+	/**
-+	 * @SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH: dropped by SFQ qdisc when a flow
-+	 * exceeds its maximum queue depth limit.
-+	 */
-+	SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH,
- 	/**
- 	 * @SKB_DROP_REASON_CAKE_FLOOD: dropped by the flood protection part of
- 	 * CAKE qdisc AQM algorithm (BLUE).
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 96eb2f122973..ecc1028bdac8 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -302,7 +302,7 @@ static unsigned int sfq_drop(struct Qdisc *sch, struct sk_buff **to_free)
- 		sfq_dec(q, x);
- 		sch->q.qlen--;
- 		qdisc_qstats_backlog_dec(sch, skb);
--		qdisc_drop(skb, sch, to_free);
-+		qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
- 		return len;
- 	}
- 
-@@ -363,7 +363,8 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (x == SFQ_EMPTY_SLOT) {
- 		x = q->dep[0].next; /* get a free slot */
- 		if (x >= SFQ_MAX_FLOWS)
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free,
-+						 SKB_DROP_REASON_QDISC_SFQ_MAXFLOWS);
- 		q->ht[hash] = x;
- 		slot = &q->slots[x];
- 		slot->hash = hash;
-@@ -420,14 +421,16 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	if (slot->qlen >= q->maxdepth) {
- congestion_drop:
- 		if (!sfq_headdrop(q))
--			return qdisc_drop(skb, sch, to_free);
-+			return qdisc_drop_reason(skb, sch, to_free,
-+					 SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH);
- 
- 		/* We know we have at least one packet in queue */
- 		head = slot_dequeue_head(slot);
- 		delta = qdisc_pkt_len(head) - qdisc_pkt_len(skb);
- 		sch->qstats.backlog -= delta;
- 		slot->backlog -= delta;
--		qdisc_drop(head, sch, to_free);
-+		qdisc_drop_reason(head, sch, to_free,
-+				  SKB_DROP_REASON_QDISC_SFQ_MAXDEPTH);
- 
- 		slot_queue_add(slot, skb);
- 		qdisc_tree_reduce_backlog(sch, 0, delta);
+>> net/devlink/param.c:305:12: warning: stack frame size (1464) exceeds limit (1280) in 'devlink_nl_param_fill' [-Wframe-larger-than]
+     305 | static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+         |            ^
+   1 warning generated.
 
 
+vim +/devlink_nl_param_fill +305 net/devlink/param.c
+
+830c41e1e987d9 Jiri Pirko   2023-08-28  304  
+830c41e1e987d9 Jiri Pirko   2023-08-28 @305  static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+830c41e1e987d9 Jiri Pirko   2023-08-28  306  				 unsigned int port_index,
+830c41e1e987d9 Jiri Pirko   2023-08-28  307  				 struct devlink_param_item *param_item,
+830c41e1e987d9 Jiri Pirko   2023-08-28  308  				 enum devlink_command cmd,
+011d133bb988f8 Daniel Zahka 2025-11-18  309  				 u32 portid, u32 seq, int flags,
+011d133bb988f8 Daniel Zahka 2025-11-18  310  				 struct netlink_ext_ack *extack)
+830c41e1e987d9 Jiri Pirko   2023-08-28  311  {
+2a367002ed321e Daniel Zahka 2025-11-18  312  	union devlink_param_value default_value[DEVLINK_PARAM_CMODE_MAX + 1];
+830c41e1e987d9 Jiri Pirko   2023-08-28  313  	union devlink_param_value param_value[DEVLINK_PARAM_CMODE_MAX + 1];
+2a367002ed321e Daniel Zahka 2025-11-18  314  	bool default_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+830c41e1e987d9 Jiri Pirko   2023-08-28  315  	bool param_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+830c41e1e987d9 Jiri Pirko   2023-08-28  316  	const struct devlink_param *param = param_item->param;
+830c41e1e987d9 Jiri Pirko   2023-08-28  317  	struct devlink_param_gset_ctx ctx;
+830c41e1e987d9 Jiri Pirko   2023-08-28  318  	struct nlattr *param_values_list;
+830c41e1e987d9 Jiri Pirko   2023-08-28  319  	struct nlattr *param_attr;
+830c41e1e987d9 Jiri Pirko   2023-08-28  320  	void *hdr;
+830c41e1e987d9 Jiri Pirko   2023-08-28  321  	int err;
+830c41e1e987d9 Jiri Pirko   2023-08-28  322  	int i;
+830c41e1e987d9 Jiri Pirko   2023-08-28  323  
+830c41e1e987d9 Jiri Pirko   2023-08-28  324  	/* Get value from driver part to driverinit configuration mode */
+830c41e1e987d9 Jiri Pirko   2023-08-28  325  	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  326  		if (!devlink_param_cmode_is_supported(param, i))
+830c41e1e987d9 Jiri Pirko   2023-08-28  327  			continue;
+830c41e1e987d9 Jiri Pirko   2023-08-28  328  		if (i == DEVLINK_PARAM_CMODE_DRIVERINIT) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  329  			if (param_item->driverinit_value_new_valid)
+830c41e1e987d9 Jiri Pirko   2023-08-28  330  				param_value[i] = param_item->driverinit_value_new;
+830c41e1e987d9 Jiri Pirko   2023-08-28  331  			else if (param_item->driverinit_value_valid)
+830c41e1e987d9 Jiri Pirko   2023-08-28  332  				param_value[i] = param_item->driverinit_value;
+830c41e1e987d9 Jiri Pirko   2023-08-28  333  			else
+830c41e1e987d9 Jiri Pirko   2023-08-28  334  				return -EOPNOTSUPP;
+2a367002ed321e Daniel Zahka 2025-11-18  335  
+2a367002ed321e Daniel Zahka 2025-11-18  336  			if (param_item->driverinit_value_valid) {
+2a367002ed321e Daniel Zahka 2025-11-18  337  				default_value[i] = param_item->driverinit_default;
+2a367002ed321e Daniel Zahka 2025-11-18  338  				default_value_set[i] = true;
+2a367002ed321e Daniel Zahka 2025-11-18  339  			}
+830c41e1e987d9 Jiri Pirko   2023-08-28  340  		} else {
+830c41e1e987d9 Jiri Pirko   2023-08-28  341  			ctx.cmode = i;
+011d133bb988f8 Daniel Zahka 2025-11-18  342  			err = devlink_param_get(devlink, param, &ctx, extack);
+830c41e1e987d9 Jiri Pirko   2023-08-28  343  			if (err)
+830c41e1e987d9 Jiri Pirko   2023-08-28  344  				return err;
+830c41e1e987d9 Jiri Pirko   2023-08-28  345  			param_value[i] = ctx.val;
+2a367002ed321e Daniel Zahka 2025-11-18  346  
+2a367002ed321e Daniel Zahka 2025-11-18  347  			err = devlink_param_get_default(devlink, param, &ctx,
+2a367002ed321e Daniel Zahka 2025-11-18  348  							extack);
+2a367002ed321e Daniel Zahka 2025-11-18  349  			if (!err) {
+2a367002ed321e Daniel Zahka 2025-11-18  350  				default_value[i] = ctx.val;
+2a367002ed321e Daniel Zahka 2025-11-18  351  				default_value_set[i] = true;
+2a367002ed321e Daniel Zahka 2025-11-18  352  			} else if (err != -EOPNOTSUPP) {
+2a367002ed321e Daniel Zahka 2025-11-18  353  				return err;
+2a367002ed321e Daniel Zahka 2025-11-18  354  			}
+830c41e1e987d9 Jiri Pirko   2023-08-28  355  		}
+830c41e1e987d9 Jiri Pirko   2023-08-28  356  		param_value_set[i] = true;
+830c41e1e987d9 Jiri Pirko   2023-08-28  357  	}
+830c41e1e987d9 Jiri Pirko   2023-08-28  358  
+830c41e1e987d9 Jiri Pirko   2023-08-28  359  	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+830c41e1e987d9 Jiri Pirko   2023-08-28  360  	if (!hdr)
+830c41e1e987d9 Jiri Pirko   2023-08-28  361  		return -EMSGSIZE;
+830c41e1e987d9 Jiri Pirko   2023-08-28  362  
+830c41e1e987d9 Jiri Pirko   2023-08-28  363  	if (devlink_nl_put_handle(msg, devlink))
+830c41e1e987d9 Jiri Pirko   2023-08-28  364  		goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  365  
+830c41e1e987d9 Jiri Pirko   2023-08-28  366  	if (cmd == DEVLINK_CMD_PORT_PARAM_GET ||
+830c41e1e987d9 Jiri Pirko   2023-08-28  367  	    cmd == DEVLINK_CMD_PORT_PARAM_NEW ||
+830c41e1e987d9 Jiri Pirko   2023-08-28  368  	    cmd == DEVLINK_CMD_PORT_PARAM_DEL)
+830c41e1e987d9 Jiri Pirko   2023-08-28  369  		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, port_index))
+830c41e1e987d9 Jiri Pirko   2023-08-28  370  			goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  371  
+830c41e1e987d9 Jiri Pirko   2023-08-28  372  	param_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PARAM);
+830c41e1e987d9 Jiri Pirko   2023-08-28  373  	if (!param_attr)
+830c41e1e987d9 Jiri Pirko   2023-08-28  374  		goto genlmsg_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  375  	if (nla_put_string(msg, DEVLINK_ATTR_PARAM_NAME, param->name))
+830c41e1e987d9 Jiri Pirko   2023-08-28  376  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  377  	if (param->generic && nla_put_flag(msg, DEVLINK_ATTR_PARAM_GENERIC))
+830c41e1e987d9 Jiri Pirko   2023-08-28  378  		goto param_nest_cancel;
+f9e78932eac650 Jiri Pirko   2025-05-05  379  	if (nla_put_u8(msg, DEVLINK_ATTR_PARAM_TYPE, param->type))
+830c41e1e987d9 Jiri Pirko   2023-08-28  380  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  381  
+830c41e1e987d9 Jiri Pirko   2023-08-28  382  	param_values_list = nla_nest_start_noflag(msg,
+830c41e1e987d9 Jiri Pirko   2023-08-28  383  						  DEVLINK_ATTR_PARAM_VALUES_LIST);
+830c41e1e987d9 Jiri Pirko   2023-08-28  384  	if (!param_values_list)
+830c41e1e987d9 Jiri Pirko   2023-08-28  385  		goto param_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  386  
+830c41e1e987d9 Jiri Pirko   2023-08-28  387  	for (i = 0; i <= DEVLINK_PARAM_CMODE_MAX; i++) {
+830c41e1e987d9 Jiri Pirko   2023-08-28  388  		if (!param_value_set[i])
+830c41e1e987d9 Jiri Pirko   2023-08-28  389  			continue;
+830c41e1e987d9 Jiri Pirko   2023-08-28  390  		err = devlink_nl_param_value_fill_one(msg, param->type,
+2a367002ed321e Daniel Zahka 2025-11-18  391  						      i, param_value[i],
+2a367002ed321e Daniel Zahka 2025-11-18  392  						      default_value[i],
+2a367002ed321e Daniel Zahka 2025-11-18  393  						      default_value_set[i]);
+830c41e1e987d9 Jiri Pirko   2023-08-28  394  		if (err)
+830c41e1e987d9 Jiri Pirko   2023-08-28  395  			goto values_list_nest_cancel;
+830c41e1e987d9 Jiri Pirko   2023-08-28  396  	}
+830c41e1e987d9 Jiri Pirko   2023-08-28  397  
+830c41e1e987d9 Jiri Pirko   2023-08-28  398  	nla_nest_end(msg, param_values_list);
+830c41e1e987d9 Jiri Pirko   2023-08-28  399  	nla_nest_end(msg, param_attr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  400  	genlmsg_end(msg, hdr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  401  	return 0;
+830c41e1e987d9 Jiri Pirko   2023-08-28  402  
+830c41e1e987d9 Jiri Pirko   2023-08-28  403  values_list_nest_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  404  	nla_nest_end(msg, param_values_list);
+830c41e1e987d9 Jiri Pirko   2023-08-28  405  param_nest_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  406  	nla_nest_cancel(msg, param_attr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  407  genlmsg_cancel:
+830c41e1e987d9 Jiri Pirko   2023-08-28  408  	genlmsg_cancel(msg, hdr);
+830c41e1e987d9 Jiri Pirko   2023-08-28  409  	return -EMSGSIZE;
+830c41e1e987d9 Jiri Pirko   2023-08-28  410  }
+830c41e1e987d9 Jiri Pirko   2023-08-28  411  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
