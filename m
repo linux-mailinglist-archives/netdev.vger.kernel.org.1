@@ -1,286 +1,247 @@
-Return-Path: <netdev+bounces-252864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252865-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ON7mG3GQc2l0xAAAu9opvQ
-	(envelope-from <netdev+bounces-252864-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:14:57 +0100
+	id UGVLBPCSc2ntxAAAu9opvQ
+	(envelope-from <netdev+bounces-252865-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:25:36 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9449779C2
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:14:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51A0377C36
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:25:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 179283029AC6
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 15:12:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68A2F3029AC3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 15:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C8921D5B0;
-	Fri, 23 Jan 2026 15:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B83B266B67;
+	Fri, 23 Jan 2026 15:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="o6hBUBkY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eNCmhFTJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="A95VLlEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0C01ADC83;
-	Fri, 23 Jan 2026 15:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9376F224234
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 15:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769181153; cv=none; b=PntqiySpkBxz2XbwXi/PaZnQ8z4i6ukM164SfeaUZ+H7ozbXv/ZaCCGXYXeQbZCyt21BaAoMCkvoCXNjxNkEXWgp1CM95IUce5S7NJZkFxEogDBTdYcOPO5c3RlptMDo9mD931rzITEK5Tm+yZ77jl+81eY1cE2ftT3chNgkO2s=
+	t=1769181928; cv=none; b=OUycaiGw5Tn4nJmkrnRfmVzmkWKHabl+tI4xosWpewxCEGfctTy+1a6vzM+BpqkrC9PIzKGM3CYMIGs94KYlGBekdknxC9+fQ5FoNq1oZJK27TthQMjiqNSpq2dkNg1aB1EfJAmbmf5umMkDIXYUsaec751DOPLsaEwfDM2y/nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769181153; c=relaxed/simple;
-	bh=LlGjFkbpz393Zh2cp8e492GV822pG88X7RMG/tq/iv8=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EIVCpTOIhYmzDAj/iH3Mq7Keumd9HX/zio/oJBoTV/yGKEGOfU40IOk0EyMUjB8b/x7NRqbx0hRVMW/A4GkFkABpUgDpncpsJHnNtgL8MRE4fz+hehIcLDQhLdnmAmA23HEMQctllzv+SnQl4foReFxxPouGyRyyt4cVNR6OJfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=o6hBUBkY; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1769181152; x=1800717152;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=LlGjFkbpz393Zh2cp8e492GV822pG88X7RMG/tq/iv8=;
-  b=o6hBUBkYPyOSAu32aQ47MHT1fYDZGHTsOTGQ88X6C8bzBZVyDx0lzGqg
-   lEM3Qn9n5YTfeVHtzg0j7uBlDJMRLvkOqBiPuHJec8mQHqNYmhaHLmDpV
-   Dw3JMLWPRu2u8tDdfjOMXGz6MOiUoVqWf9Jn+/d/TO3NykJANCxcQAWZX
-   leHUqNNAAEKpeNpbxHDqHWBXnzqJ32lYDaL2YhHHwnKpG39DOuW4iijTa
-   SK/jC9O6aoBDU/wOhMzWBd0Do+QF+5tD7t1nDeGPcWYXH8y7rCQX2oupX
-   3ORneo1T9LKGjeZbAqzDlhgHktrQPeob7xIptDac/MJj1cV4zyZ8xUpio
-   g==;
-X-CSE-ConnectionGUID: HoJcv0SgTYebdqU3KinZPg==
-X-CSE-MsgGUID: LHE7fFyeSc+PamifPSO3fQ==
-X-IronPort-AV: E=Sophos;i="6.21,248,1763449200"; 
-   d="scan'208";a="52351502"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2026 08:12:31 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Fri, 23 Jan 2026 08:12:21 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Fri, 23 Jan 2026 08:12:19 -0700
-Message-ID: <15accbfe16853a468890944dbf75de46ef560f83.camel@microchip.com>
-Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan9645x
- internal phy
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@pengutronix.de>, <rsc@pengutronix.de>
-Date: Fri, 23 Jan 2026 16:12:18 +0100
-In-Reply-To: <aXNFrDOdPanZ_cjk@pengutronix.de>
-References: <20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com>
-	 <aXNFrDOdPanZ_cjk@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1769181928; c=relaxed/simple;
+	bh=TPilFpdJp1Go0cVxzJ2Y8EYCjgED8qeptbTOPq2pfCA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nWYpKLYWGGoVgQDyVUqWA7y6uqDY2xA7d+zvGY6NumuylPQemRuE/hRymbElvN1suxGfGVvOPNylLkf0a3tY8kIXQlPWAEqXS3zf4tZi7AqiqTZmahRruFcltQBAjYNcpB8aUKrThUOK2/9X/mLe8mvA1tyOj1HNmQqLcy7whAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eNCmhFTJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=A95VLlEc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769181926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Now7tdOfyzhUbO7RxdUCeN8d0nGZ8UI+KA1797d1YFY=;
+	b=eNCmhFTJDobslk7iZUo8+u0DkN4XwEIcJctVf88HTYLLY4F3LRMCZmaxoW1T1thUEMz/gt
+	ipb3Thl/thjwY7MS5t0mCoCZsj8CmXHZVOVZUtnEiiKnCAkFPGPi+EkOxGPx096uYfTbxi
+	kWBUQXgSV5Smx3FMvoSjZ6nn3PcdPfU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-iCbu55MnMsizRX4l2FZbJQ-1; Fri, 23 Jan 2026 10:25:25 -0500
+X-MC-Unique: iCbu55MnMsizRX4l2FZbJQ-1
+X-Mimecast-MFC-AGG-ID: iCbu55MnMsizRX4l2FZbJQ_1769181924
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-435991d4a3aso1290620f8f.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 07:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769181924; x=1769786724; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Now7tdOfyzhUbO7RxdUCeN8d0nGZ8UI+KA1797d1YFY=;
+        b=A95VLlEcFZN721A2rIGS8UeiLtnrnhI5VbKxn0Bgd00irond9vaejEou45u9741tyH
+         ThtMIONpEzlyFqNCQiNJIXuO7cQholHTm4dTWPJiE+gH+nAMatvW2H1JdNqypF8G9Qzg
+         /Wc9jE356RG3LQg3XmpFP0P0wtK9XxTSJ5FzRLcnULlcs58kkYewskWS9YGnOcsIqJm/
+         Vdh3N73pjKcvoV50yN4/iMONO8DqLVNrHa4lzrjHZO6AM793J4RIAs806Q3qcKzcvFOk
+         DcReTTJqSaWvEY6BzGd1Zq0/2al8ZfRKSoaO92EBLexVOPslrJzEz1l5bK4WzVGEbIuu
+         TQfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769181924; x=1769786724;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Now7tdOfyzhUbO7RxdUCeN8d0nGZ8UI+KA1797d1YFY=;
+        b=NNQdvmrNOLGGcku34dcXxkuUvgcXYeRz2hAG9B/4+MFASbx+hlFHgcjIBHEfz1AamL
+         wdjfrTl7pqrmy4LrIJteerqP3z7xcfB8/QT3EW0OvErRA5KRNf8TqgKIa8vig7NIMo3e
+         hxAkaaf6vQkjatZ2tIiGgw/fJij6D/+B3LTLMgwOoViwVDOqntbASji3EoppEqd1fucO
+         6FCP5xZ9uFAsoaU35zy818y/j0ZML9Y0pPZ5nc62CRHsZJIfXUWBJUQSHR25cDL/Ha0T
+         ZKrRB6SNCn5UJdIaUqWAVgHF2zruokoa2RatFGu0/EsGDoo+t+OR94SoIZfcE7V5zxMC
+         Ja+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVRM/mRb3xMWu7N1IE+Ud2LWGc2PtZFJKAGPF3qYWLIYrEnp5Vw/YlXXgF1IQb6tQsPxfRBQes=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/sE2y56nAvU76ZKnWhpSKGztoCa2j0ARSkcTDi2vcHfO7jS5h
+	SJYIZa2hUCe1sHo84aaKbbokdIPuFa6Dd1EnH5r/m1TND9e8/8vPNCzvFwEzdXBXbEQfL5jrCAk
+	sHq+toJ9z37FjvaPBaS/MEAYlxGOJVIPyXiH4QtpdcCd/YFVwAJEscdzzHSWrA9k25g==
+X-Gm-Gg: AZuq6aL47j1B+yEx3KwJbZX3NcAXjwS/+QraD3lSzGanIFyM7e7LCjOPBFw7lrxKKxQ
+	R8WVamfBXKtnH96RZWnYwsMBFQFGr3RoYOsuIEs3lKGTdKF9TvPuWK7NMFROGE4czqIveBUAQyB
+	h+XDobFKQBdP//SvZN8WE1g/LiaIHWZMG4hI+YeUXqR1JdXOhm5dkomtD6O1LbUi5DVgKD71zyO
+	XjL9R3yKMuGqSBOzvVD5YXm5WEjiavOEgP9007jYsPKxbdj3eoPSbW02wfsjDkUstnBtR2ektJv
+	w2wcA6Zzflt3lTSxaqLmy74IB631fwK9IHUwXEiIMNoDau4n5MNbBegrPVUZMOq504kEITauZer
+	WIhIhvLF+ijzN
+X-Received: by 2002:a05:6000:40cb:b0:430:f790:99d7 with SMTP id ffacd0b85a97d-435b94f5e8cmr3073287f8f.27.1769181923681;
+        Fri, 23 Jan 2026 07:25:23 -0800 (PST)
+X-Received: by 2002:a05:6000:40cb:b0:430:f790:99d7 with SMTP id ffacd0b85a97d-435b94f5e8cmr3073230f8f.27.1769181923223;
+        Fri, 23 Jan 2026 07:25:23 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.175])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c02ba3sm7442499f8f.2.2026.01.23.07.25.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jan 2026 07:25:22 -0800 (PST)
+Message-ID: <05b086b3-c82d-4aba-b185-2d39ba968a72@redhat.com>
+Date: Fri, 23 Jan 2026 16:25:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] udp: add drop count for packets in
+ udp_prod_queue
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Mahdi Faramarzpour <mahdifrmx@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, kshitiz.bartariya@zohomail.in
+References: <20260122185357.50922-1-mahdifrmx@gmail.com>
+ <willemdebruijn.kernel.1682586fd684e@gmail.com>
+ <60ed19a1-97e1-4342-8dfc-a5db684afa6f@redhat.com>
+ <willemdebruijn.kernel.2b69585efeb5a@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <willemdebruijn.kernel.2b69585efeb5a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,vger.kernel.org,pengutronix.de];
-	TAGGED_FROM(0.00)[bounces-252864-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252865-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim,microchip.com:email,microchip.com:url,microchip.com:mid]
-X-Rspamd-Queue-Id: A9449779C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 51A0377C36
 X-Rspamd-Action: no action
 
-Hi Oleksij,
+On 1/23/26 3:41 PM, Willem de Bruijn wrote:
+> Paolo Abeni wrote:
+>> I think that doing the SNMP accounting in __udp_enqueue_schedule_skb()
+>> (for `to_drop`), __udp_queue_rcv_skb() and __udpv6_queue_rcv_skb() (for
+>> `skb`) is a little confusing and possible error prone in the long run.
+>>
+>> I'm wondering if something alike the following (completely untested, not
+>> even built! just to give the idea) would be better?
+> 
+> I don't see the error prone issue with the simpler patch.
+> But SGTM if you prefer this.
+It's not a big deal but if we need to update the UDP MIB someday having
+to look in different places could cause missing something.
 
-On Fri, 2026-01-23 at 10:55 +0100, Oleksij Rempel wrote:
->=20
-> Hi Jens,
->=20
-> On Fri, Jan 23, 2026 at 08:50:55AM +0100, Jens Emil Schulz =C3=98stergaar=
-d wrote:
-> > LAN9645X is a family of switch chips with 5 internal copper phys. The
-> > internal PHY is based on parts of LAN8832. This is a low-power, single
-> > port triple-speed (10BASE-T/100BASE-TX/1000BASE-T) ethernet physical
-> > layer transceiver (PHY) that supports transmission and reception of dat=
-a
-> > on standard CAT-5, as well as CAT-5e and CAT-6 Unshielded Twisted
-> > Pair (UTP) cables.
-> >=20
-> > Add support for the internal PHY of the lan9645x chip family.
->=20
-> Looks like interesting switch for our use cases :)
->=20
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
-> > Signed-off-by: Jens Emil Schulz =C3=98stergaard <jensemil.schulzosterga=
-ard@microchip.com>
-> > ---
-> > =C2=A0drivers/net/phy/micrel.c=C2=A0=C2=A0 | 142 ++++++++++++++++++++++=
-+++++++++++++++++++++++
-> > =C2=A0include/linux/micrel_phy.h |=C2=A0=C2=A0 1 +
-> > =C2=A02 files changed, 143 insertions(+)
-> >=20
-> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> > index 225d4adf28be..7f47f7987067 100644
-> > --- a/drivers/net/phy/micrel.c
-> > +++ b/drivers/net/phy/micrel.c
-> > @@ -6502,6 +6502,132 @@ static void lan8842_get_phy_stats(struct phy_de=
-vice *phydev,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stats->tx_errors =3D priv->phy_stats.tx_=
-errors;
-> > =C2=A0}
-> >=20
-> > +#define LAN9645X_DAC_ICAS_AMP_POWER_DOWN=C2=A0=C2=A0=C2=A0=C2=A0 0x47
-> > +#define LAN9645X_BTRX_QBIAS_POWER_DOWN=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x46
-> > +#define LAN9645X_TX_LOW_I_CH_CD_POWER_MGMT=C2=A0=C2=A0 0x45
-> > +#define LAN9645X_TX_LOW_I_CH_B_POWER_MGMT=C2=A0=C2=A0=C2=A0 0x44
-> > +#define LAN9645X_TX_LOW_I_CH_A_POWER_MGMT=C2=A0=C2=A0=C2=A0 0x43
->=20
-> > +static const struct lanphy_reg_data force_dac_tx_errata[] =3D {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* Force channel A/B/C/D TX on */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 { LAN8814_PAGE_POWER_REGS,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LAN9645X_DAC_ICAS_AMP_POWER_DOWN,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0 },
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* Force channel A/B/C/D QBias on */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 { LAN8814_PAGE_POWER_REGS,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LAN9645X_BTRX_QBIAS_POWER_DOWN,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0xaa },
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* tx low I on channel C/D overwrite */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 { LAN8814_PAGE_POWER_REGS,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LAN9645X_TX_LOW_I_CH_CD_POWER_MGM=
-T,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0xbfff },
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* channel B low I overwrite */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 { LAN8814_PAGE_POWER_REGS,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LAN9645X_TX_LOW_I_CH_B_POWER_MGMT=
-,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0xabbf },
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* channel A low I overwrite */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 { LAN8814_PAGE_POWER_REGS,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LAN9645X_TX_LOW_I_CH_A_POWER_MGMT=
-,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0xbd3f },
-> > +};
->=20
-> It looks like this erratum not publicly documented. At least not here:
-> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
-uments/Errata/LAN9645xS-
-> LAN9645xF-Errata-DS80001187.pdf
->=20
-> re there more information about it? Can it be described in the comment?
->=20
+The code I proposed could be made smaller with something alike the
+following (still completely untested), which in turn looks quite alike
+what this patch is heading, I guess. So really it's not a big deal.
+---
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 1db63db7e5d4..431de8dda0d3 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1793,6 +1795,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
+struct sk_buff *skb)
+ 		}
+ 	}
 
-You are right, I think they ought to be documented in the official erratas
-list with a more thorough description. I will get a hold of the right
-people and ask them to add it.
++	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
+ 	if (unlikely(to_drop)) {
+ 		for (nb = 0; to_drop != NULL; nb++) {
+ 			skb = to_drop;
+@@ -1802,10 +1805,9 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
+struct sk_buff *skb)
+ 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
+ 		}
+ 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
++		return nb;
+ 	}
 
-> > +
-> > +static int lan9645x_config_init(struct phy_device *phydev)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* Apply erratas. */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D lan8842_erratas(phydev);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 return ret;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 return lanphy_write_reg_data(phydev, force_da=
-c_tx_errata,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ARRAY_SIZE(force_dac=
-_tx_errata));
-> > +}
-> > +
-> > +static int lan9645x_suspend(struct phy_device *phydev)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 int aneg_en_state, ret;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* Software workaround from design to handle =
-SPD. SPD will stop AFE
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * clock from AFE port, which makes the =
-system MAC fifo unable to flush.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The workaround is to restart ANEG and=
- wait for flush, before issuing
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * software power down.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 aneg_en_state =3D phy_read(phydev, MII_BMCR) =
-& BMCR_ANENABLE;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D phy_restart_aneg(phydev);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 if (ret)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 return ret;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 /* Allow time for system FIFO flush data */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0 usleep_range(8 * USEC_PER_MSEC, 12 * USEC_PER=
-_MSEC);
->=20
-> MAC and PHY power management are not always fully coupled (implementation
-> specific), are there other ways to sync them with each other, except of
-> unconditional sleep in the PHY driver. I expect that someone making
-> changes on the MAC driver may miss this nuance.
->=20
+-	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
+-
+ 	return 0;
 
-The MAC side will be handled in a yet-to-be-sent DSA driver, which is also
-authored by my team.
+ drop:
+@@ -2345,6 +2347,9 @@ static int __udp_queue_rcv_skb(struct sock *sk,
+struct sk_buff *skb)
+ 	}
 
-During development I was seeing issues where SPD sometimes causing
-interference on neighbouring PHYs. The PHY team came up with the tx dac
-errata and the aneg restart workaround as a solution.
+ 	rc = __udp_enqueue_schedule_skb(sk, skb);
++	if (likely(!rc))
++		return 0;
++
+ 	if (rc < 0) {
+ 		int is_udplite = IS_UDPLITE(sk);
+ 		int drop_reason;
+@@ -2365,6 +2370,9 @@ static int __udp_queue_rcv_skb(struct sock *sk,
+struct sk_buff *skb)
+ 		return -1;
+ 	}
 
-To my knowledge there was no alternative workaround, but I have reached out
-to the PHY team to make sure. If there is a better way to fix these issues,
-I will add it in the next version.
++	/* rc > 0, packets dropped after dequeueing from prod_queue */
++	SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS, rc);
++	SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS, rc);
+ 	return 0;
+ }
 
-> Best Regards,
-> Oleksij
-> --
-> Pengutronix e.K.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> Steuerwalder Str. 21=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | http://www.pengutronix.de/=C2=A0 |
-> 31137 Hildesheim, Germany=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | Phone: +49-5121-20=
-6917-0=C2=A0=C2=A0=C2=A0 |
-> Amtsgericht Hildesheim, HRA 2686=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 | Fax:=C2=A0=C2=A0 +49-5121-206917-5555 |
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 010b909275dd..df895096669e 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -793,6 +793,9 @@ static int __udpv6_queue_rcv_skb(struct sock *sk,
+struct sk_buff *skb)
+ 	}
 
-Thank you for the comments,
+ 	rc = __udp_enqueue_schedule_skb(sk, skb);
++	if (likely(!rc))
++		return 0;
++
+ 	if (rc < 0) {
+ 		int is_udplite = IS_UDPLITE(sk);
+ 		enum skb_drop_reason drop_reason;
+@@ -813,6 +816,9 @@ static int __udpv6_queue_rcv_skb(struct sock *sk,
+struct sk_buff *skb)
+ 		return -1;
+ 	}
 
-Emil
++	/* rc > 0, packets dropped after dequeueing from prod_queue */
++	SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS, rc);
++	SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS, rc);
+ 	return 0;
+ }
 
 
