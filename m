@@ -1,298 +1,120 @@
-Return-Path: <netdev+bounces-252987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEYMFej8c2mf0gAAu9opvQ
-	(envelope-from <netdev+bounces-252987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 23:57:44 +0100
+	id 8Am4G0L+c2nu0wAAu9opvQ
+	(envelope-from <netdev+bounces-252988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:03:30 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7365C7B4F4
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 23:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B777B5C4
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC9E8300B9FF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:57:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DCB4A302DA3C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 23:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490792857F6;
-	Fri, 23 Jan 2026 22:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61ADF288522;
+	Fri, 23 Jan 2026 23:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XW7fHD/w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ru9ETQoC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66041643B
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 22:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769209056; cv=pass; b=LSrdNqBelrNUKfem2/uvqmkrwOHzV/BM4bGq2dtkBvaAVT0KfXiNMQfqTLuvLYxsx6h3MM4nokzM6o2XWLfQFQYx1DkH+ERXId//gfriDgnmk+QRZC6esOhAiNf0n0QxWA8S7nfxk9uNEVUAYMB1xq5JMl3A04ukP7vZLLYl9e4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769209056; c=relaxed/simple;
-	bh=6v4rZ9oJpz8LUKiLodEbEuxsY/ZrUiOquPogvNms0iM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ww5yHxF7j57DmegEPJ5YehSFGAP0cm2C8VhTybkRa/9om6MSlYPM9VkXsM0uCA97vtJJaMbj3NoZv0fd3BDAiFqIpUGs67EtZNFCuMhl45s77lHe2VZYJfyvC1UpmFVaKThzLeuZrNaLuZpW3XUWVkv0Rv3Tg+r97qnfGPOhgYI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XW7fHD/w; arc=pass smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34ab8e0df53so2499360a91.3
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 14:57:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769209054; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MdoFEuGhZsJwWr/6NcTMph3VAqyMXdiEgBYtvlmKmYuxumCEomDSl8B+LCNMFsREU4
-         lwipE3CMFDUVLBftd/gmEz2zU0xSkglL5LFgb8kqR14wavC42M9Ha6hITEGh3u0gkFGU
-         yXu+1Vr6Ljopl+PSDsnY77ArH6VmW0lapyFz9jh3QjL3kgQQJS8kZt+0yKlxfG/iy7P9
-         jwk8dscTpa0PEyxzXOZxU0nQuPxZJLAjeF8uuAbfVxeyUAJvHwjm3Us6CV4Z2tN3gMLh
-         vkj2GjvE62hpbBiARPh8PfzAJOD1fc+D8pX9xETB8IwQfO4dZoJ44Dm0ncMSOQlcrISR
-         ssAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4j31uslQqJ9kDCp8Ht1kV/SN1veEZSVwfHGiVKs76y8=;
-        fh=2m6iovLyWvbvtOxV6AxKWdYmHJ9DdaRHH1d1tf/yiLk=;
-        b=jU+3p0NoPiQR7sozBGiLt6wsXMzC4sB9hf1rCmgU6uHgNFQ7DxzBoHuFxeLoFSCuDb
-         a7xoUhiGqOlXWeArIrotff5TMLr554VmzVyCaKp7XhItmQ1Dy2EHOrHHFzxW/m/luyr6
-         VJ1a9aS01czBCsXuBDcNb45zki+twtow/R+9pB0NbrIsadChrRhGMOt5NQ0OSqJahScJ
-         tX8NJaMTojY8szks23u5IvfVwFtwbdm4CWMA5OjqyecKum0ZDHaGINRQbdoRJtrN8tX9
-         RekJxIbJKFz2YzV8fbYfke/kY267WRqvRZznfIeGaQtB2gqPErcMpKUj2+hZfgbkgyME
-         aujA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769209054; x=1769813854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4j31uslQqJ9kDCp8Ht1kV/SN1veEZSVwfHGiVKs76y8=;
-        b=XW7fHD/wk8H98YWft98bmxnvQdkfV3uYiQVlHQaL+kL9Kn+SAlKGgLMCZY+vOqncT2
-         c7sEQ/ZFPXH8G3eyIRTkxWjXQdxQNgfpXVaqXvj56B3hoTl9i9WMjJD0CL+Eocmx7Wl0
-         SYWQXhLSj7WwsuBwbGGEWeJZcXJgMJVCVeaEBPl9A22KoDX+ynkHX2vE/0WqDEV8HN69
-         7wJvt4SwMxcJa0ZOjnLfWIaLDCSaK5kzVlv4WzXmY2vsT34ezyNQsXu6spI0K5MO9YnZ
-         u9JklG2P9TTavpHWaPUHA4Licl63Kf6QKi0igUo22fIEmoyCSn2NKZWGyoX2QuaCGow2
-         zVbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769209054; x=1769813854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4j31uslQqJ9kDCp8Ht1kV/SN1veEZSVwfHGiVKs76y8=;
-        b=vVi0lExm8Ilut1nyhWJxfZ+7XtvCP8fCeZakN5+Rwe4al0KNoKIwRANZPt4M7uhcdZ
-         QrQTSiuAYdzL3PZS4a+TkEw66dS7sajRo+MHXAWwMtb4odiL6L1S8GalB7DhivSU6dQW
-         DWPVssQhjJ73I6zG/phxbkNLmkwHC/KA/lUM0H7OXdZdhicAGRQXCqeQHeXJ8omOfeLZ
-         ebOFYs/IaDRoj/jbA+Jr+IhBh9USJE6yO5ant/Q0dLlm4xcUz0Q/ub5rTAf9pNQjF38r
-         jHPB7XAc80+dqDTCjecyTWUWzOPcn0Zwj5DNN+fUvpTdlaZS91dZc002c3JNnBBZh0V3
-         QK5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWOaqVquD29MqJ66tPOHAxfCbiul6/vpIgBE1Ghv41MVqsPyEcnwllzDUCw8BUOfTiF2DBX9OA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiF9gDuPsORz5U6g6pYACRHCAKYclgqX9ewNxn5e42r7OqF35a
-	51UmiyBga9vD8nF3qwAkgaTbIB7qWt3kffkfaXoMtuRfW9AOOjYu2pw1t57NHbGfvqQRN6XsTq6
-	JZSuHbsdHTpDYS7z45dc2ChcyOvrMpV4=
-X-Gm-Gg: AZuq6aIW65+Q5yPsXB0AwUwHrndVh9EoCrS2xMiSfIJAgStfVXeBiMz92gStjE8SJaB
-	9BQ0vX5X1xXfWLUGrAWhGiDiqkQ3p8X6jqRQ2m3+dRGXaLO+4l4UEOPcqqbU7jvw08dsycdNtOn
-	QgDilkypwvdzjbz70RHWTcGmMWmdyJlzYitsBz9NtGhcEAObvJOXV33Ou+kzVNNwwo/34rBobXZ
-	jFrWXEbktgJglVddxBZJWzGZWlDJOlgJlSMqp29FufeleRfgcRLXCMjX8NevMDMwKEHNI9eddLa
-	K6tiggwGYs8=
-X-Received: by 2002:a17:90b:57e6:b0:349:9d63:8511 with SMTP id
- 98e67ed59e1d1-35368c42f49mr3571701a91.25.1769209054201; Fri, 23 Jan 2026
- 14:57:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C243EBF3B;
+	Fri, 23 Jan 2026 23:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769209303; cv=none; b=uyO2nh3mbqph2Npqc0GKBz+NCKcDoH2PHKkcIRhQPkOuvcY4RjMRvzy2yUWPSWK3lDo264icTb5byEApY57DGxVtamOkCLGr3bEeVi3PzcoqusDc7M/dRaF1GAAXqTGfF9JTYGvEf3oS/ULTHDrvSpccSywYldx8OPpBTHVBrW0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769209303; c=relaxed/simple;
+	bh=5w4ORdFCYlw0uGHn4m4rcttlMWZ0imyq7RefzwLMA6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KiSHUe/JYOJp+QWVrQZ+3HQMNDow8Rn23wIpiRsdx8Ey6/IboxmLUIssrsW7A9hQilOYXPSMDB3xVlNs6lqxXZR8iTBgI8swUuvRCH7Q0KFi5xOu5HPlX2er4Ecf+Gu9COgVAfLXWb6jvdTZOXooYFMHOrPNk4QYpPRx7GF0Dr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ru9ETQoC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MzgvAs/RGwn0okuLp07Is/WXK2iHShLRRWk8QzbODeM=; b=Ru9ETQoC6w9F0TW+QnFcJPRY1e
+	gsaFY/S3EcSWXcgiIBmRFXapjmHfLp6wNBEk8vvpitTlw6jA2eoXa4u+0CampXOsmzVah0K5/8nPs
+	nG3aatAC/PInJC159imxWj0d98LAyh/cH2E4v64hXf7fgma0aDVxgaWYNcN6PCtbjDxA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vjQ9h-004MGA-Ke; Sat, 24 Jan 2026 00:01:29 +0100
+Date: Sat, 24 Jan 2026 00:01:29 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/3] net: phy: air_en8811h: add Airoha
+ AN8811HB support
+Message-ID: <4a3430cc-5a9a-414e-9dbf-cbc34c8fd019@lunn.ch>
+References: <20260123075817.1162068-1-bjorn@mork.no>
+ <20260123075817.1162068-3-bjorn@mork.no>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260123073532.238985-3-dongml2@chinatelecom.cn>
- <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
- <2250332.irdbgypaU6@7940hx> <8632406.T7Z3S40VBb@7940hx>
-In-Reply-To: <8632406.T7Z3S40VBb@7940hx>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 23 Jan 2026 14:57:21 -0800
-X-Gm-Features: AZwV_QgjtKbg3xcVVs0fXgYTWRVrke_V4VqsUfD77JrusnPTgbwxconkivavg84
-Message-ID: <CAEf4BzabUj0APqROb7ibkEovoXVmxbiHq0kNAPWExpEfRmQwiw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v11 02/12] bpf: use the least significant byte
- for the nr_args in trampoline
-To: Menglong Dong <menglong.dong@linux.dev>
-Cc: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org, 
-	daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com, 
-	x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ast@kernel.org, martin.lau@kernel.org, 
-	clm@meta.com, ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123075817.1162068-3-bjorn@mork.no>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252987-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,makrotopia.org,nxp.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriinakryiko@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 7365C7B4F4
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: B8B777B5C4
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 1:21=E2=80=AFAM Menglong Dong <menglong.dong@linux.=
-dev> wrote:
->
-> On 2026/1/23 16:29 Menglong Dong <menglong.dong@linux.dev> write:
-> > On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
-> > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > > index 41bbed6418b5..b3f912ad18ba 100644
-> > > > --- a/kernel/bpf/verifier.c
-> > > > +++ b/kernel/bpf/verifier.c
-> > >
-> > > [ ... ]
-> > >
-> > > > @@ -23779,12 +23781,13 @@ static int do_misc_fixups(struct bpf_veri=
-fier_env *env)
-> > > >                       eatype =3D=3D BPF_MODIFY_RETURN) {
-> > > >                           /* Load nr_args from ctx - 8 */
-> > > >                           insn_buf[0] =3D BPF_LDX_MEM(BPF_DW, BPF_R=
-EG_0, BPF_REG_1, -8);
-> > > > -                         insn_buf[1] =3D BPF_ALU64_IMM(BPF_LSH, BP=
-F_REG_0, 3);
-> > > > +                         insn_buf[1] =3D BPF_ALU64_IMM(BPF_AND, BP=
-F_REG_0, 0xFF);
-> > > > +                         insn_buf[2] =3D BPF_ALU64_IMM(BPF_LSH, BP=
-F_REG_0, 3);
-> > >
-> > > [ ... ]
-> > >
-> > > > -                         cnt =3D 6;
-> > > > +                         cnt =3D 7;
-> > > >                   } else {
-> > > >                           insn_buf[0] =3D BPF_MOV64_IMM(BPF_REG_0, =
--EOPNOTSUPP);
-> > > >                           cnt =3D 1;
-> > > >                   }
-> > > >
-> > > >                   new_prog =3D bpf_patch_insn_data(env, i + delta, =
-insn_buf, cnt);
-> > >
-> > > [ ... ]
-> > >
-> > > >                   delta    +=3D cnt - 1;
-> > >
-> > > Note that the bpf_get_func_ret block above correctly updates delta af=
-ter
-> > > patching.
-> > >
-> > > > @@ -23808,12 +23811,15 @@ static int do_misc_fixups(struct bpf_veri=
-fier_env *env)
-> > > >
-> > > >                           /* skip 'void *__data' in btf_trace_##nam=
-e() and save to reg0 */
-> > > >                           insn_buf[0] =3D BPF_MOV64_IMM(BPF_REG_0, =
-nr_args - 1);
-> > > > +                         cnt =3D 1;
-> > > >                   } else {
-> > > >                           /* Load nr_args from ctx - 8 */
-> > > >                           insn_buf[0] =3D BPF_LDX_MEM(BPF_DW, BPF_R=
-EG_0, BPF_REG_1, -8);
-> > > > +                         insn_buf[1] =3D BPF_ALU64_IMM(BPF_AND, BP=
-F_REG_0, 0xFF);
-> > > > +                         cnt =3D 2;
-> > > >                   }
-> > > >
-> > > > -                 new_prog =3D bpf_patch_insn_data(env, i + delta, =
-insn_buf, 1);
-> > > > +                 new_prog =3D bpf_patch_insn_data(env, i + delta, =
-insn_buf, cnt);
-> > > >                   if (!new_prog)
-> > > >                           return -ENOMEM;
-> > > >
-> > > >                   env->prog =3D prog =3D new_prog;
-> > > >                   insn      =3D new_prog->insnsi + i + delta;
-> > > >                   goto next_insn;
-> > > >           }
-> > >
-> > > Should there be a "delta +=3D cnt - 1;" before assigning env->prog in=
- this
-> > > bpf_get_func_arg_cnt block? When cnt is 2 (non-RAW_TP path), the prog=
-ram
-> > > grows by one instruction, but delta is not updated. This could cause
-> > > subsequent bpf_patch_insn_data() calls to use incorrect offsets.
-> > >
-> > > The bpf_get_func_arg block at the beginning of this patch has:
-> > >
-> > >     delta    +=3D cnt - 1;
-> > >     env->prog =3D prog =3D new_prog;
-> > >
-> > > And the bpf_get_func_ret block similarly has delta updated. But this
-> > > bpf_get_func_arg_cnt block goes directly to env->prog assignment with=
-out
-> > > updating delta.
-> >
-> > Ah, good point, I think this is a valid problem. The selftests didn't c=
-over
-> > this case, and I think I'd better to use bpf_get_func_arg() and bpf_get=
-_func_ret()
-> > in the exit path of fsession to cover it.
->
-> Oh, the problem doesn't have much impact. The only impact
-> is that the verifier will check the "r0 &=3D 0xFF" instruction redundantl=
-y.
->
-> I'll see if there is more comment before I send next version.
->
+> +#define AN8811HB_GPIO_OUTPUT		0x5cf8b8
+> +#define   AN8811HB_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
 
-Let's still fix the problem. Just go ahead and resubmit (with the fix
-and improved test).
+> +	/* Configure led gpio pins as output */
+> +	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
+> +				      AN8811HB_GPIO_OUTPUT_345,
+> +				      AN8811HB_GPIO_OUTPUT_345);
 
-pw-bot: cr
+The code/comment probably does not describe what is actually happening
+here. My _guess_ is you are setting a pinmux, disconnecting the pins
+from the GPIO controller and connecting them to the LED controller.
 
+I assume there is no open data sheet for this device?
 
-> Thanks!
-> Menglong Dong
->
-> >
-> > Will fix it in the next version.
-> >
-> > Thanks!
-> > Menglong Dong
-> >
-> > >
-> > >
-> > > ---
-> > > AI reviewed your patch. Please fix the bug or email reply why it's no=
-t a bug.
-> > > See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/R=
-EADME.md
-> > >
-> > > CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21=
-278745581
-> > >
-> >
-> >
-> >
-> >
-> >
-> >
->
->
->
->
+	Andrew
 
