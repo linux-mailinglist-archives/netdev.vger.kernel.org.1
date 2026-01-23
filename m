@@ -1,317 +1,246 @@
-Return-Path: <netdev+bounces-252809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gBiUGZ1Wc2kDuwAAu9opvQ
-	(envelope-from <netdev+bounces-252809-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:08:13 +0100
+	id kOD/GxBXc2kDuwAAu9opvQ
+	(envelope-from <netdev+bounces-252813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:10:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9798974CB9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:08:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFBE674D21
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:10:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67461305AE68
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:03:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F57B302C5C3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B656258CD7;
-	Fri, 23 Jan 2026 11:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48140330657;
+	Fri, 23 Jan 2026 11:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mctqiiGG"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CdG7TnVH"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010061.outbound.protection.outlook.com [52.101.69.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7021025BEF8
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769166206; cv=none; b=Q+QhZNW1aqQOKaSg/iRZOeFasPLU9ESo2hC0s1RspN7bKCavdKEi1uteVn9t/OjFGFJll01pT01+Lm68lZzazbCa+hOrX06LJrNJaDiHg46SV0FqA+Ki/yyxawTUK2KMnjG6gCFEWo1DBNchp+DuDrQOF28QSr0mu5dmElrz4g8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769166206; c=relaxed/simple;
-	bh=N00DUDoX8Fc+1JHBuN5IixHTSPQSSbc1trxeX5jWFgE=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=H06ugFzQhvEwbqD58KaXQbUiObvt8iFQ6KWcAJpSDRjfmAYBSTYtn8UX0DFivmFUb1WuIvQFTaRFZEiXK1waHmd0np6GPX5zvLJuBZ05ykN1Rzfud0RawijmoPVZPZXzTWhyjsQMDGV2WDnbUNCKX3I1yGGahDjRsYXw+aFtj2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mctqiiGG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3vbOcszqA5Hufjdy8TMCsw0OsErRSBDMsgH/AbrRhjY=; b=mctqiiGGN8WR5x1MAnPYxzVOrB
-	hW/YNnc4+XsqzbSjcux3yWUSkWbrcV89QTkMfoUzcGw4uKE3c9ZyEE+zcwU8CJI6HNLipjvR+MZME
-	NwFANr6Ocw1GWk+idpJmjFUBg0MHJa7kVbZ1L6DS67liOjlrsJCLOh0ETHSyHBnVQHCwoN+9pqm9v
-	U9+hgr0TByN7XR8nS+ip30jhH2e4hAf4rJUF+gGhYRsmRPYlOqJqZhGjgnePGibL9j2SXs20J2Uip
-	emZT6Lmwjj3r+yM2pcs7XZ5+kMKiJ2RhZ//syit5ACxyFD6tunNJU8r/5JfiVs/3J0BaDlP1XP0Ws
-	7ZtzbRJw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55782 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vjEvV-000000001sJ-42NE;
-	Fri, 23 Jan 2026 11:02:06 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vjEvV-00000005ghc-0ZkO;
-	Fri, 23 Jan 2026 11:02:05 +0000
-In-Reply-To: <aXNUlVZilT-CTgph@shell.armlinux.org.uk>
-References: <aXNUlVZilT-CTgph@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 21/21] net: stmmac: rk: rk3506, rk3528 and kk3588
- have rmii_mode in clock register
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB1A21ADCB;
+	Fri, 23 Jan 2026 11:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769166386; cv=fail; b=EyaDlML0FU7LmZiBsA4E5Igue6qJiEEGHg/0rRBq79+76LbL2xmZWNdo2k9hwZaNJWXE9f4Zq1mFDDA3b7/dkWRf9RlI4SCmiuZ9jpqhiCuKH9WKg2ORMROQAvqf0/yBbR70M7qy2ot9sp351TnN7w3lGKzDSvo6BHgIxI0jE9c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769166386; c=relaxed/simple;
+	bh=CwnxDPQH+SHQyLjjJ1sKBnjDShhHVltRoHl8AxsKUiQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PNVNKqVgxkZ6G8FDH7DkR8unl5HVdPl7DtJ9p0/psojoTI5pN+zSS8HUU2OLsszZDV69rzxzqcdLA8zVjTqTfdOxXDXOPWAwYakx7Z/YhOitYt2oHVzcf8J7di8sJPN9NdjK40movw/fsRoIa9inFbtjIIPJqDw4KV0lBZ3sfEE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CdG7TnVH; arc=fail smtp.client-ip=52.101.69.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iQsKFI5YsUueAPzV3c2wQSyEc3WgYwjthq4AkiGoO0p+4q6uDPGTeIPHZVi72ahkyBM+o4PS8z7E9yfrcQEZHZ/Ul1HF17WLhnepHkD++FOcAKAZnCQi68GwNND/6goPr5d5lxcwWzlWpeWJNW7KAQVTL5u4S60hA7qgPbD3Nq6wt5Qdn3KiEnIQgCd1ky8o4MJ5r0bNwdieDHCIJwSZtmrfEsnBzSfwU/IjAldIQVA42SSRhvPzAdrG5VO5fgBFu6frXaW6I0S4s46rghUzR19Tnx3FKWLdrZzTLxSf9DGGNJ68oB8V9txEnmhhMuT6WFOFdIf6l/sMZHiI/VeluQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P7tM0Djk+NbuQUSZH3NvHPMhohN5vkzh1fE5hjbG46w=;
+ b=d6JpYJbfVy+bDdoHtTQ9HhBYc/rs/cMuB65Sxg1jkymdjcUGMl33KNcpPNe4a9B/W4YZMQr7XjKfI58PniUgd9YEOPLUDIIuLytVYHNv1rwpR7OiBCi5rSmaNccJgDdW51s/+O+9frSuX8DqoD0uDXwwOhAIn0VBKtCFhLBS3ewI8g5eIAEucobBcp8iHQEgC+C2eDDuz2yckD9gqaGhxvr4e89fdDLmsxTpGvzFsiJB55OyWePWPcQBlpXOP4YJOArmJIrZBlav47jJFNK5pNcEyAvsjMkS48D+UKdFZS06f2zs1UExr0ZvSFodVRY0O1+b0QPgutZaYwUI3LN9kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P7tM0Djk+NbuQUSZH3NvHPMhohN5vkzh1fE5hjbG46w=;
+ b=CdG7TnVH6D+6UFr6bzoMuyS9SUc+LZz11z9+lmM0Mo2/G2uJurK9mCzO8fbB3IwXW4ztg8tVRzV0vcH1OUpFZYF63+ZLDyWtbqnGENna/whihTsf7IIXnsdQi7CcocNJswovp8ZXDc+fZznEJDkAfhjSsIDUAgxp1gS4otc7FTMwH7i6jAwthu7oXYiE9d0nKyzC9wlxA8U+ugX3Gtu1OEA4wgIhzYBPiUl3fCoRbMNmvwUuPic5Xgz0CNrDFSoZYwpfjz9jvTv1unB+XYwI484UUooT1ImL1Hs4XtJSDY2GchOCiDC2alVbr+crCENZeCBK96khjYoih325f3J6Zg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by DU2PR04MB9212.eurprd04.prod.outlook.com (2603:10a6:10:2fb::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Fri, 23 Jan
+ 2026 11:06:21 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Fri, 23 Jan 2026
+ 11:06:21 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: linux-phy@lists.infradead.org,
+	Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>
+Cc: netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	linux-kernel@vger.kernel.org,
+	Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+Subject: [PATCH phy] phy: enter drivers/phy/Makefile even without CONFIG_GENERIC_PHY
+Date: Fri, 23 Jan 2026 13:06:00 +0200
+Message-ID: <20260123110600.3118561-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR07CA0136.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::23) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vjEvV-00000005ghc-0ZkO@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 23 Jan 2026 11:02:05 +0000
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DU2PR04MB9212:EE_
+X-MS-Office365-Filtering-Correlation-Id: d25e13fa-858b-47c1-a511-08de5a6f7093
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|52116014|376014|19092799006|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xIG6seNrez/yksSRaTvuKVJUmmHu0jTTMYtLBsx4BrvGNhKMdl2gRIXFRJc2?=
+ =?us-ascii?Q?uwvzx24QvhBVA1inlHieE5YredXiZe6U/yRBkt2Z+XS86mRphKNu1P6iiX47?=
+ =?us-ascii?Q?I3pjgRQj3lau1KT2flK1akK5pqmq1TkrRQLy+Zkzhf/54RO0EsoI9n+AQlHP?=
+ =?us-ascii?Q?qM8V04l0JiDPsKKK5SxcVdV82wAEYEEz3+AYAW55ZWtf9d2zhOKZ0m7DzrKQ?=
+ =?us-ascii?Q?B/IK0WH7yL5pV7rPuFIsrE4ZOEAJ1WJWNy4x3kh7ToK30rFO7sjnurXEvPNN?=
+ =?us-ascii?Q?wcboSeuPgToYET2QdwVbmlzzHo4fhX3iOTzw8WXY/y5MnqJZdlgbCUk8r6SX?=
+ =?us-ascii?Q?NyHxtMHcja2dYvGX5V+JE6It2Bjh+TtQDfodbpaDZEWWLju6jdGpuBesnQRN?=
+ =?us-ascii?Q?MPiE2Zei8vnUKhuYPTDEiKF9DipYNzy6VfbgDTkkBSnGQCh5ReE1uyTyUs52?=
+ =?us-ascii?Q?3sTEJF8pEtJVMemd5Unrf1Fihd4UmLsUn5HF4yRPXpgf1AwzWje5GOzCB2Ya?=
+ =?us-ascii?Q?gqt0cynoOZ9D6yam0xAcm60+jzoo/qE4/Lr80Ny3Jy4BIB8qv/IqwQ+9P6je?=
+ =?us-ascii?Q?xAXsKufxppxeFI+ij2dFvpwVhDfggH9xdPp6LlJHb53nCWB5GDKXg2WqnRUZ?=
+ =?us-ascii?Q?DTPRb/fHpO8PctSeVQ8tVGgVWdqANcbbBmmUl2Ch88OwunOlZtyheknvbJrl?=
+ =?us-ascii?Q?zX/lIHnPuvIQcH5MOyZzMgRJfJU5lySjdS7y6hbuHs94oCxNzyZOFgvCS8hh?=
+ =?us-ascii?Q?wxkxFFYVTFqSCQgbUAkhH0opAmbfCQN0OwltTYZmCNrqjhm7AWRkPmx0PzCp?=
+ =?us-ascii?Q?eCpq0XKTNZZhVEt2hyHD1npve/7IOZv9LFdO1WD2knhkoJ1BsuYjF3z2UYcf?=
+ =?us-ascii?Q?+lqpVSxIGWzfc03vPTMagqEjjQfawednnygfzBlKfakDrbHWv0ezSTLG6gnJ?=
+ =?us-ascii?Q?ZaSfzJmPqWUevF32ZOJHG3t4xQm+YBwAz6yTUqL9A9bzbK2vJYN8SEj9DcVI?=
+ =?us-ascii?Q?z6rZZpPTw1x7sJCJixwfe+6t3aertE3FG27HK/E+5S3IKECzY+f5CEXuuOuC?=
+ =?us-ascii?Q?+MiEMJyFrbjM2++rR6ex1KSQKFqyT4JwYnJqiwvU12FrA2yx9dZxBE3dEQbx?=
+ =?us-ascii?Q?hzZ5E9LLkf4MMm/tRndX8lN7zo412hqnYHlg/zT07y3xRFpFGOXvhJGsw3zf?=
+ =?us-ascii?Q?dGatfKZZsBGc+HLx5R5C2Rgad5E18Jx1fOuHM03pmBv1Nh4ZdhUxjbr0d96u?=
+ =?us-ascii?Q?HrcnPEwHzX32XdZJDTbC4c0dV2CRkJiInrPGsI0M2aGSJW8ucLJhTU6BfAjd?=
+ =?us-ascii?Q?cI51uJY98ppVCmmtm98AY70IErx2nPdJw1pbcEoXPRo5lJwxqdKTB24T3+mn?=
+ =?us-ascii?Q?uM/gwZYrAbYvMyu8eJnyOEi0QvkI3olO0e8ZsaxGxk3IDqsaOG1TmhWDVlX7?=
+ =?us-ascii?Q?+a0CCVEdjg8r9j/ju7SJpg++02X9adGb8/tIeGdpIsKiDtpPK4hX+awGc1GN?=
+ =?us-ascii?Q?Vzmqs5RT6ThGnRzND88xUsSwWNJet4UN0vPJ8r6mlPrQJzUEzVzWK5UepELX?=
+ =?us-ascii?Q?+b5hB3tSfdLJBaQgzyM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(52116014)(376014)(19092799006)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ljs6lHwUxUImhsqLJcWBGWRPCXKwI2ssBLTm9bEOl2HXQi3hhOKo5+g1VQxG?=
+ =?us-ascii?Q?foJI/Xc5jTYQBernRRfs6qMqHNWrrVgRLKhfCEWfKVL15JRUwh0c5vhnFoai?=
+ =?us-ascii?Q?Dot1vyCpt0Ozq4onJt+Hp2+LOzawP3pVQB4TGkVupMaO49wL+yYSwfdmo+2E?=
+ =?us-ascii?Q?ZYvvvwTMcWhYQNIZWUc6bmUtn7I9osI8Bqoq9YnfH9Dy1uLdiT6B6hdNzgYV?=
+ =?us-ascii?Q?Jp2HVJlerUGzvoAyjRbhFhcfiW2krdW4YDg/I4GcykjNF5GRWpvAlT5H9gYH?=
+ =?us-ascii?Q?A3vIlx4NCq7FimwQYw/dj+hDb29QETi9MSTxpzGfl07fyA2R2nWowcPc3g+Q?=
+ =?us-ascii?Q?Juyrt7Gl2UN5vdTsuTiOU91XzcBioeTDFMfAQ+NaQUOpPRA9WGky/U60Alqr?=
+ =?us-ascii?Q?2UPL7FROh69IA27wy0g5LyG6VcieX6BXPQtxpOMneHeddwS/DhZMa9IUL1no?=
+ =?us-ascii?Q?8rgJefkTInWAP5uLLuwrUwGaWL06NIJdGsH5WPVvvD6T+FBE0L3DJn04aO3n?=
+ =?us-ascii?Q?xbkKMs5d0oMD5gTp5Ecup1CAsdd4EkE9mkckhBGa+5/XweZfHRx8mtbSM8d+?=
+ =?us-ascii?Q?GcAQEQ9MLLkDpmeCPTyBiiNUCUHY/rZOY0YHNY1EhsdhjRe7h6h/Y0wnF8oA?=
+ =?us-ascii?Q?9iH+umESDenJQLqzpFyJilgoF1H1MDRre+XBcqOKi12mKiE8qJL8KARsPyEi?=
+ =?us-ascii?Q?U0MXBb/8F+QI0rZQi2yt42cBQAfnj2WhX9AUV4dcTGddXKtlT8sx0AD9I+b9?=
+ =?us-ascii?Q?Kq2radn6Su6wRuH37IuInAgOmpVnXeZt6/9ocw0oj0/Uhc9/DH2+nQ65TbA+?=
+ =?us-ascii?Q?6q4osA1jJM0Og+JXSXpMHwjEJCDiINNsMJdTAxuWqzQkxMf6daMuAEVNciVh?=
+ =?us-ascii?Q?0qaOoxj5SYxkV6IO1bsLs8rjkT/XXiMPo4Mtz9xuzaix2nrcz8dScpwhcce6?=
+ =?us-ascii?Q?tcmocTbk9VoTyYAqL0uaErsBixnfHz/0Ej2I63QVqFcyQamRoO1AJEVRYDx4?=
+ =?us-ascii?Q?Y06hVaT3XieRNFEHhOgJ/8GVUtojpHx9HN0SmIrPRsnqS9bp5Km/mPlTL2Ve?=
+ =?us-ascii?Q?Nd5WmwVDUGcZFZKQkR2Nt1DQLkHe7CcacVlNjNTgdLHZaREnT3Cn58wmHfWE?=
+ =?us-ascii?Q?n3uaVs8qyPOw+5BunmGFG1j7iFuFDkdXY0F9p+N9SCrPsR9oGW1gCZ5E0CdN?=
+ =?us-ascii?Q?VXUW1c6gc+NP5dPeIg/5o2Gb8bDBxEoxR/HkUxLapgjEbFRvcdhZAfXWLYHq?=
+ =?us-ascii?Q?1Vg/vviZAnhFFSOdww/9wEnD2Fn97OTMlehmeqTAhxxRhNjCL2enVGVMgPfU?=
+ =?us-ascii?Q?D1nvGC/83C+HfAYMOujCy1KVvK+7X+2bWUIcBiY/HZV4CLuzbgsYTbOzIvgk?=
+ =?us-ascii?Q?vSTHCsG53MaqzBCTgvzDqHoLYnVA93RfdR7e+/UZyCEGi4QUlyG2HsTjuGwW?=
+ =?us-ascii?Q?t/0UrhJZOh/OEdTU/VnTgrzyT5L3yerVPpZNQIh51fBdsn3OJsDp0qubcCO9?=
+ =?us-ascii?Q?ZpiuAzAAlDtsGuzeZhxVMhx8mwsVtMqbzMJ86ZIfULGBdx37xv3tzq2d3fqb?=
+ =?us-ascii?Q?fXXBM1ykbmP/k4SCDNicdVM/hl6crrxhEAosySSeESyRqaiad/PNEMBjHrEb?=
+ =?us-ascii?Q?cJ7QAg9XyUQYvcggfw3CkbG4jXaGk1azw/br4F/ymEko2a2qxIdZNWKjyV5l?=
+ =?us-ascii?Q?0to3eGS7ZEmGUnNklcfmNha8saFPHmwXeXsTgwbCfRQ8wi9hb5ZEd630OO/s?=
+ =?us-ascii?Q?CZBWbFLaH43uteYE4R52R8CXFl34b5mQ5o1rcxnkxpZoRsJw8QF6vZbfO12h?=
+X-MS-Exchange-AntiSpam-MessageData-1: L6FkmxJP6ulnTWTuGpp8GK7SiLudXKBHDRw=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d25e13fa-858b-47c1-a511-08de5a6f7093
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 11:06:21.6751
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QnQJCe4hVAc7DhN2gvEMfHXa0BWmgOJWet108rzvv1jIRL1OqOwD0jz4n4BAi6JRwQN0ag1vAa8NesKDN7fPew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9212
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252809-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-252813-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.982];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 9798974CB9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,nxp.com:dkim,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DFBE674D21
 X-Rspamd-Action: no action
 
-rk3506, rk3528 and rk3588 have the rmii_mode bit in the clock GRF
-register rather than the gmac GRF register. Provide a mask for this
-field in the clock register, and convert these SoCs to use this.
-Add the necessary code in rk_gmac_powerup() to write this field.
+Kconfig option CONFIG_PHY_COMMON_PROPS, which builds
+drivers/phy/phy-common-props.c, was intended to be selectable
+independently of CONFIG_GENERIC_PHY. Yet it lives in drivers/phy/, which
+is entered by the Makefile only if CONFIG_GENERIC_PHY is set.
 
-This allows us to get rid of these SoCs set_to_rmii() function. As
-such, we need to mark these SoCs as supporting RMII mode.
+Allow the Makefile to enter one level deeper, but stop at drivers/phy/
+if CONFIG_GENERIC_PHY is unselected (i.e. do not enter vendor folders).
+The other stuff from drivers/phy/Makefile except for CONFIG_PHY_COMMON_PROPS,
+like CONFIG_PHY_NXP_PTN3222, all depends on CONFIG_GENERIC_PHY.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Fixes: e7556b59ba65 ("phy: add phy_get_rx_polarity() and phy_get_tx_polarity()")
+Closes: https://lore.kernel.org/lkml/43ea0202-891d-4582-980b-5cb557b41114@linux.ibm.com/
+Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Debugged-by: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 62 +++++++------------
- 1 file changed, 22 insertions(+), 40 deletions(-)
+ drivers/Makefile     | 2 +-
+ drivers/phy/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index ebbc09ea572a..759deb66ef2a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -38,6 +38,7 @@ struct rk_clock_fields {
- 	u16 gmii_clk_sel_mask;
- 	u16 rmii_clk_sel_mask;
- 	u16 rmii_gate_en_mask;
-+	u16 rmii_mode_mask;
- 	u16 mac_speed_mask;
- };
+diff --git a/drivers/Makefile b/drivers/Makefile
+index ccc05f1eae3e..53fbd2e0acdd 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -10,7 +10,7 @@ obj-y				+= cache/
+ obj-y				+= irqchip/
+ obj-y				+= bus/
  
-@@ -695,21 +696,15 @@ static int rk3506_init(struct rk_priv_data *bsp_priv)
- 	}
- }
+-obj-$(CONFIG_GENERIC_PHY)	+= phy/
++obj-y				+= phy/
  
--static void rk3506_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	unsigned int id = bsp_priv->id, offset;
--
--	offset = (id == 1) ? RK3506_GRF_SOC_CON11 : RK3506_GRF_SOC_CON8;
--	regmap_write(bsp_priv->grf, offset, RK3506_GMAC_RMII_MODE);
--}
--
- static const struct rk_gmac_ops rk3506_ops = {
- 	.init = rk3506_init,
--	.set_to_rmii = rk3506_set_to_rmii,
- 
- 	.clock.io_clksel_io_mask = BIT_U16(5),
- 	.clock.rmii_clk_sel_mask = BIT_U16(3),
- 	.clock.rmii_gate_en_mask = BIT_U16(2),
-+	.clock.rmii_mode_mask = BIT_U16(1),
-+
-+	.supports_rmii = true,
- 
- 	.regs_valid = true,
- 	.regs = {
-@@ -733,10 +728,6 @@ static const struct rk_gmac_ops rk3506_ops = {
- #define RK3528_GMAC_CLK_RX_DL_CFG(val)	GRF_FIELD(15, 8, val)
- #define RK3528_GMAC_CLK_TX_DL_CFG(val)	GRF_FIELD(7, 0, val)
- 
--#define RK3528_GMAC0_PHY_INTF_SEL_RMII	GRF_BIT(1)
--#define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
--#define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
--
- static int rk3528_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -744,6 +735,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock_grf_reg = RK3528_VO_GRF_GMAC_CON;
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(3);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(2);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(1);
- 		bsp_priv->supports_rgmii = false;
- 		return 0;
- 
-@@ -753,6 +745,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(11, 10);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(10);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(9);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(8);
- 		return 0;
- 
- 	default:
-@@ -763,9 +756,6 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
--		     RK3528_GMAC1_PHY_INTF_SEL_RGMII);
--
- 	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
- 		     DELAY_ENABLE(RK3528, tx_delay, rx_delay));
- 
-@@ -774,16 +764,6 @@ static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 		     RK3528_GMAC_CLK_TX_DL_CFG(tx_delay));
- }
- 
--static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	if (bsp_priv->id == 1)
--		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
--			     RK3528_GMAC1_PHY_INTF_SEL_RMII);
--	else
--		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON,
--			     RK3528_GMAC0_PHY_INTF_SEL_RMII);
--}
--
- static void rk3528_integrated_phy_powerup(struct rk_priv_data *bsp_priv)
- {
- 	rk_gmac_integrated_fephy_powerup(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-@@ -797,9 +777,11 @@ static void rk3528_integrated_phy_powerdown(struct rk_priv_data *bsp_priv)
- static const struct rk_gmac_ops rk3528_ops = {
- 	.init = rk3528_init,
- 	.set_to_rgmii = rk3528_set_to_rgmii,
--	.set_to_rmii = rk3528_set_to_rmii,
- 	.integrated_phy_powerup = rk3528_integrated_phy_powerup,
- 	.integrated_phy_powerdown = rk3528_integrated_phy_powerdown,
-+
-+	.supports_rmii = true,
-+
- 	.regs_valid = true,
- 	.regs = {
- 		0xffbd0000, /* gmac0 */
-@@ -975,9 +957,6 @@ static const struct rk_gmac_ops rk3576_ops = {
- #define RK3588_GRF_GMAC_CON0			0X0008
- #define RK3588_GRF_CLK_CON1			0X0070
- 
--#define RK3588_GMAC_CLK_RMII_MODE(id)		GRF_BIT(5 * (id))
--#define RK3588_GMAC_CLK_RGMII_MODE(id)		GRF_CLR_BIT(5 * (id))
--
- static int rk3588_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -987,6 +966,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(3, 2);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(2);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(1);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(0);
- 		return 0;
- 
- 	case 1:
-@@ -995,6 +975,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(8, 7);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(7);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(6);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(5);
- 		return 0;
- 
- 	default:
-@@ -1010,9 +991,6 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 	offset_con = bsp_priv->id == 1 ? RK3588_GRF_GMAC_CON9 :
- 					 RK3588_GRF_GMAC_CON8;
- 
--	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
--		     RK3588_GMAC_CLK_RGMII_MODE(id));
--
- 	regmap_write(bsp_priv->grf, RK3588_GRF_GMAC_CON7,
- 		     RK3588_GMAC_RXCLK_DLY_ENABLE(id) |
- 		     RK3588_GMAC_TXCLK_DLY_ENABLE(id));
-@@ -1022,22 +1000,17 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 		     RK3588_GMAC_CLK_TX_DL_CFG(tx_delay));
- }
- 
--static void rk3588_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
--		     RK3588_GMAC_CLK_RMII_MODE(bsp_priv->id));
--}
--
- static const struct rk_gmac_ops rk3588_ops = {
- 	.init = rk3588_init,
- 	.set_to_rgmii = rk3588_set_to_rgmii,
--	.set_to_rmii = rk3588_set_to_rmii,
- 
- 	.gmac_grf_reg = RK3588_GRF_GMAC_CON0,
- 
- 	.clock_grf_reg_in_php = true,
- 	.clock_grf_reg = RK3588_GRF_CLK_CON1,
- 
-+	.supports_rmii = true,
-+
- 	.php_grf_required = true,
- 	.regs_valid = true,
- 	.regs = {
-@@ -1412,6 +1385,15 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
- 			return ret;
- 	}
- 
-+	if (bsp_priv->clock.rmii_mode_mask) {
-+		val = rk_encode_wm16(ret == PHY_INTF_SEL_RMII,
-+				     bsp_priv->clock.rmii_mode_mask);
-+
-+		ret = rk_write_clock_grf_reg(bsp_priv, val);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	/*rmii or rgmii*/
- 	switch (bsp_priv->phy_iface) {
- 	case PHY_INTERFACE_MODE_RGMII:
+ # GPIO must come after pinctrl as gpios may need to mux pins etc
+ obj-$(CONFIG_PINCTRL)		+= pinctrl/
+diff --git a/drivers/phy/Makefile b/drivers/phy/Makefile
+index 30b150d68de7..93715ea0d010 100644
+--- a/drivers/phy/Makefile
++++ b/drivers/phy/Makefile
+@@ -15,7 +15,7 @@ obj-$(CONFIG_PHY_SNPS_EUSB2)		+= phy-snps-eusb2.o
+ obj-$(CONFIG_USB_LGM_PHY)		+= phy-lgm-usb.o
+ obj-$(CONFIG_PHY_AIROHA_PCIE)		+= phy-airoha-pcie.o
+ obj-$(CONFIG_PHY_NXP_PTN3222)		+= phy-nxp-ptn3222.o
+-obj-y					+= allwinner/	\
++obj-$(CONFIG_GENERIC_PHY)		+= allwinner/	\
+ 					   amlogic/	\
+ 					   broadcom/	\
+ 					   cadence/	\
 -- 
-2.47.3
+2.43.0
 
 
