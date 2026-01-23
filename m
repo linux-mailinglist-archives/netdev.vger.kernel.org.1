@@ -1,208 +1,209 @@
-Return-Path: <netdev+bounces-252729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4DyYCT9Ac2mWtwAAu9opvQ
-	(envelope-from <netdev+bounces-252729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:32:47 +0100
+	id uGYFDgZCc2mWtwAAu9opvQ
+	(envelope-from <netdev+bounces-252730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:40:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC5073698
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:32:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A147387C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA0CA30705BA
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:29:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3CEE332CE383
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5306836BCED;
-	Fri, 23 Jan 2026 09:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+Da/JIQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06FC366836;
+	Fri, 23 Jan 2026 09:34:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6CF34DCFD;
-	Fri, 23 Jan 2026 09:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CB536E498
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769160587; cv=none; b=Tgn+/pHPpsdUfASbZGDPr/S43re+vUOvY70iAVkkLnAzW6JL4HfrKTXnivMjlkNdsPV3R/+741aVNrsC1uY1IycByg4NDQxUk6dpNGxCL8g8IlsrjcvbmkAlFUH83RkKzB4SXXRqvq9UeYzEpIsSRtLxhq4xAyIBdn2s9x3sax0=
+	t=1769160860; cv=none; b=oOFXyAMTEe91pHVacCB59H7C17yhgw2VOzOA07PZh5YxZDqR/zOLQgxtb6KSe3ZVcIelttozT27p7dfClwMrhqZWFfkfENY7BD2n8f3h4Ce8UOZ51aYgyrL6UygeyIyKtFy3oAbeoXRKdmFcJnwnDTQDgpdAZT7gfJp0rg3/m9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769160587; c=relaxed/simple;
-	bh=66bJXTJk22/mLio1RAI3vsCprk6nUWyXhsTyMDG/6mE=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=MiAFttJFAawC/GSuHY5aDyTWZn2Nwx/aOVH65tVPoA3o1pOElVzXh/OZgWecHuEhWuvwj/YWLvLNn2MCDXQnWssvRxocafgM8ovyFkD4Rekq+9NlEvgptgz7h+M55LsJbjAifaqNENVEdj0AIybfV7CgKH1iriaeMXNPgY/KtHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+Da/JIQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FCBC116D0;
-	Fri, 23 Jan 2026 09:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769160586;
-	bh=66bJXTJk22/mLio1RAI3vsCprk6nUWyXhsTyMDG/6mE=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=P+Da/JIQVUBFdjvtmkdMKF6CSdvIICA7ZvyHGDVa0wEg3lX968hjg0HzrYc1dY9cA
-	 82tsjt/LJncXYHEM2ytyit/TamThZnQoqQWOkSPiXqwMwEOd95l9wxc7pAMiFHADfW
-	 IRvr+kW47fQvxH1kFQYIjm014r0sqN7WBVhN4uZkELWsf/oHqk20Y/N2OvivUjNqFW
-	 qLXomYcSYWhPgCanwfxrYY8n+ltGd22kDDkB+GOg3v5314j4lfZ078NboWEMtZi0Z4
-	 JIHHi+hqh0o0zsdkduLL6j+/y9vYhEchxkVHpomNftsBShx6bQ+Q4Fp+DHNRriZ28d
-	 ruoT8dTtoWs2A==
-Content-Type: multipart/mixed; boundary="===============7258097213843698012=="
+	s=arc-20240116; t=1769160860; c=relaxed/simple;
+	bh=wksl7ixP/bS/PYXdddI8qlI5+uMJ2pVUKvzcj5RdSOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kbwn2W30/fspcW9FXGTw+n/TzzBERkymnA8Fh8WNQkT2qhYQmyGM2U73xrhGxQ9AnzjHnh4MMJ774PwFyYk6lGXwlFBdBO2UbhMHqUczKYuTHIWZ+WUu9PJGbRmOdrnNkmvx+8ZfNZX+sVcBEuJZ96SglFIrA1ZxtJ/wjODaHdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjDYM-0006eC-Uv; Fri, 23 Jan 2026 10:34:06 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjDYL-0024Jn-15;
+	Fri, 23 Jan 2026 10:34:04 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjDYK-00AtXa-1j;
+	Fri, 23 Jan 2026 10:34:04 +0100
+Date: Fri, 23 Jan 2026 10:34:04 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, alok.a.tiwari@oracle.com,
+	andrew+netdev@lunn.ch, andrew@lunn.ch, chuck.lever@oracle.com,
+	davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
+	gal@nvidia.com, horms@kernel.org, idosch@nvidia.com,
+	jacob.e.keller@intel.com, kernel-team@meta.com,
+	kory.maincent@bootlin.com, kuba@kernel.org, lee@trager.us,
+	pabeni@redhat.com, vadim.fedorenko@linux.dev, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 0/3] net: ethtool: Track TX pause storm
+Message-ID: <aXNAjOjkCqOESf5y@pengutronix.de>
+References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <f02212613904023c5e4f900ee1efdb15e8266c3c4f7d0572db4f515da3a700e5@mail.kernel.org>
-In-Reply-To: <863b91cb85097f137bc741e7cb686ff78d9bb95e.1769157382.git.zhuhui@kylinos.cn>
-References: <863b91cb85097f137bc741e7cb686ff78d9bb95e.1769157382.git.zhuhui@kylinos.cn>
-Subject: Re: [RFC PATCH bpf-next v3 08/12] mm: memcontrol: Add BPF struct_ops for memory controller
-From: bot+bpf-ci@kernel.org
-To: hui.zhu@linux.dev,akpm@linux-foundation.org,hannes@cmpxchg.org,mhocko@kernel.org,roman.gushchin@linux.dev,shakeel.butt@linux.dev,muchun.song@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,peterz@infradead.org,ojeda@kernel.org,nathan@kernel.org,kees@kernel.org,tj@kernel.org,jeffxu@chromium.org,mkoutny@suse.com,kernel@jfarr.cc,brauner@kernel.org,rdunlap@infradead.org,brgerst@gmail.com,masahiroy@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org,inwardvessel@gmail.com,willemb@google.com,kerneljasonxing@gmail.com,paul.chaignon@gmail.com,a.s.protopopov@gmail.com,ameryhung@gmail.com,chenridong@huaweicloud.com,lance.yang@linux.dev,jiayuan.chen@linux.dev,linux-kernel@vger.kernel.org,linux-mm@kvack.org,cgroups@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linu
- x-kselftest@vger.kernel.org
-Cc: zhuhui@kylinos.cn,geliang@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 23 Jan 2026 09:29:45 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260122192158.428882-1-mohsin.bashr@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.54 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
-	TAGGED_FROM(0.00)[bounces-252729-lists,netdev=lfdr.de,bpf-ci];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252730-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,redhat.com,linux.dev,pengutronix.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DMARC_NA(0.00)[pengutronix.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kylinos.cn,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
-	FREEMAIL_TO(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	NEURAL_SPAM(0.00)[0.867];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	RCPT_COUNT_GT_50(0.00)[60];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:-];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 9AC5073698
+	NEURAL_HAM(-0.00)[-0.981];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:url,pengutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 83A147387C
 X-Rspamd-Action: no action
 
---===============7258097213843698012==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Mohsin, hi Jakub!
 
-> diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-> index f3b8c71870d8..d71e86b85ba7 100644
-> --- a/include/linux/memcontrol.h
-> +++ b/include/linux/memcontrol.h
+On Thu, Jan 22, 2026 at 11:21:55AM -0800, Mohsin Bashir wrote:
+> With TX pause enabled, if a device cannot deliver received frames to
+> the stack (e.g., during a system hang), it may generate excessive pause
+> frames causing a pause storm. This series updates the uAPI to track TX
+> pause storm events as part of the pause stats (p1), adds pause storm
+> protection support for fbnic (p2), and leverages p1 to provide
+> observability into these events for fbnic (p3).
+> 
+> Mohsin Bashir (3):
+>   net: ethtool: Track pause storm events
+>   eth: fbnic: Add protection against pause storm
+>   eth: fbnic: Fetch TX pause storm stats
+> 
+ 
+Very interesting series! Before the Christmas break, I started looking into a
+similar issue on different hardware (LAN78xx USB Ethernet), which has counters
+but no automatic pause storm mitigation in silicon. For reference, here is the
+RFC patch set I'm working on:
+https://lore.kernel.org/all/20260123090741.1566469-1-o.rempel@pengutronix.de/
 
-[ ... ]
+In my implementation, I added the detection logic to the driver but exposed it
+via the devlink health interface.
 
-> +#else /* CONFIG_BPF_SYSCALL */
-> +
-> +static inline unsigned long
-> +bpf_memcg_get_high_delay(struct mem_cgroup *memcg) { return 0 }
-> +static inline bpf_memcg_below_low(struct mem_cgroup *memcg) { return false }
-> +static inline bpf_memcg_below_min(struct mem_cgroup *memcg) { return false }
-                 ^^^^^^^^^^^^^^^^^^^^
+I have a few questions regarding the definitions and the architectural approach
+here.
 
-These stub functions appear to have syntax issues that would prevent
-compilation when CONFIG_BPF_SYSCALL is disabled:
+-  Definition of "Pause Storm"
 
-1. bpf_memcg_get_high_delay() is missing a semicolon after "return 0"
-2. bpf_memcg_below_low() is missing the "bool" return type
-3. bpf_memcg_below_min() is missing the "bool" return type
+It seems fbnic defines a storm as a continuous assertion of the pause signal
+(duration-based). The code defines FBNIC_RXB_PAUSE_STORM_UNIT_WR with a 10us
+granularity and a 500ms threshold.
 
-Should these be:
+Does this hardware detector handle "flapping" (high rate of distinct pause
+frames) or is it strictly for a stuck-high condition (deadlock/hang)? If the RX
+queue drains slightly and fills up again every 100ms, does the internal timer
+reset? If so, a "stuttering" storm might bypass this protection. Except the
+primary goal of this feature is to prevent the link partner's TX watchdog from
+firing (saving the neighbor from a reset).
 
-  static inline unsigned long
-  bpf_memcg_get_high_delay(struct mem_cgroup *memcg) { return 0; }
-  static inline bool bpf_memcg_below_low(struct mem_cgroup *memcg) { return false; }
-  static inline bool bpf_memcg_below_min(struct mem_cgroup *memcg) { return false; }
+- Policy and Tunability
 
-> +static inline void memcontrol_bpf_online(struct mem_cgroup *memcg) { }
-> +static inline void memcontrol_bpf_offline(struct mem_cgroup *memcg) { }
-> +
-> +#endif /* CONFIG_BPF_SYSCALL */
+The current implementation enforces an auto-recovery policy that is invisible
+to userspace. By resetting the storm protection in fbnic_service_task (runs
+every 1s), you effectively enforce a ~50% duty cycle on a hung system.
 
-[ ... ]
+Since this logic decides when to stop flow control and start dropping packets,
+shouldn't these thresholds be configurable?
 
-> diff --git a/mm/bpf_memcontrol.c b/mm/bpf_memcontrol.c
-> index 716df49d7647..415e3c59b6a6 100644
-> --- a/mm/bpf_memcontrol.c
-> +++ b/mm/bpf_memcontrol.c
+I understand that in a complete OS crash, software cannot intervene, and we
+rely entirely on the hardware's 500ms safety breaker. However, for partial
+stalls (livelocks, soft lockups) where the service task might still run, the
+hardcoded "force normal" policy might not be ideal.
 
-[ ... ]
+Furthermore, having the ability to disable auto-recovery is critical for
+testing. If we want to develop/validate a driver for the link partner that
+detects incoming pause storms, we need a way to generate a sustained storm from
+this device without the safety breaker constantly resetting it. A "controllable
+reference" is very valuable here.
 
-> +static void clean_memcg_bpf_ops(struct mem_cgroup *memcg,
-> +				struct memcg_bpf_ops *ops)
-> +{
-> +	struct mem_cgroup *iter = NULL;
-> +
-> +	while ((iter = mem_cgroup_iter(memcg, iter, NULL))) {
-> +		if (ops) {
-> +			if (!WARN_ON(READ_ONCE(memcg->bpf_ops) != ops))
-> +				WRITE_ONCE(memcg->bpf_ops, NULL);
-                                         ^^^^^
+In my LAN78xx work, I used the devlink reporter's .recover callback. This lets
+userspace control the policy (devlink health set ... recover
+true/false) - determining whether the driver should auto-reset the MAC/PHY or
+wait for manual intervention. Baking the "force normal" logic into the service
+task removes this control.
 
-When ops is non-NULL, this code checks and writes to memcg->bpf_ops, but
-should it be using iter->bpf_ops instead? The else branch at the bottom
-correctly uses iter. As written, when called from bpf_memcg_ops_unreg()
-with a non-NULL ops argument, this only clears the root cgroup's bpf_ops
-pointer while leaving all descendant cgroups with stale pointers to the
-ops structure that will be freed after synchronize_srcu().
+Architecture:
 
-> +		} else
-> +			WRITE_ONCE(iter->bpf_ops, NULL);
-> +	}
-> +}
+This feels very similar to the existing ndo_tx_timeout watchdog, but for the RX
+side. We are essentially trying to handle an "RX Timeout" or "RX Stall" where
+the device cannot push packets to the host.
 
-[ ... ]
+I assume the 500ms hardware threshold is specifically chosen to be well below
+the standard 5-second ndo_tx_timeout of link partners, preventing a hung node
+from causing watchdog resets on its neighbors. I've observed cases where
+triggering a full ndo_tx_timeout reset on a stalled device leaves the hardware
+in a partially reconfigured "zombie" state, unable to receive anything
+thereafter. 
 
-> +static int __init bpf_memcontrol_init(void)
-> +{
-> +	int err, err2;
-> +
-> +	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
-> +					&bpf_memcontrol_kfunc_set);
-> +	if (err)
-> +		pr_warn("error while registering bpf memcontrol kfuncs: %d", err);
-> +
-> +	err2 = register_bpf_struct_ops(&bpf_memcg_bpf_ops, memcg_bpf_ops);
-> +	if (err)
-            ^^^
+Did you consider if we should approach this as a central networking mechanism
+(an "RX Watchdog")?  I am debating this for my own driver:
 
-The condition here checks err but prints err2. Should this be "if (err2)"
-to log when the struct_ops registration fails?
+- Option A: Export needed metrics/events to userspace (Devlink/Ethtool) and let
+  a userspace agent decide when to reset.
 
-> +		pr_warn("error while registering memcontrol bpf ops: %d", err2);
-> +
-> +	return err ? err : err2;
-> +}
-> +late_initcall(bpf_memcontrol_init);
+- Option B: Handle it entirely in the kernel (like this patch), but potentially
+  standardize the "RX Stall" behavior so we don't end up with different
+  heuristics in every driver.
 
-Note: The clean_memcg_bpf_ops() issue appears to be addressed in a later
-commit in this series (90eaa9cd0346 "mm/bpf: Add BPF_F_ALLOW_OVERRIDE
-support for memcg_bpf_ops") which removes and rewrites the function
-entirely. However, the syntax errors in the stubs and the error check
-typo in bpf_memcontrol_init() do not appear to be fixed in the series.
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21280790825
-
---===============7258097213843698012==--
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
