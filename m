@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-252712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252710-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uP4DGGs7c2kztgAAu9opvQ
-	(envelope-from <netdev+bounces-252712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:12:11 +0100
+	id gGlTLJM6c2l/tQAAu9opvQ
+	(envelope-from <netdev+bounces-252710-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:08:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4DD1730C1
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:12:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D7A7300F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:08:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2610307E598
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:08:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60B043028C2F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2E334FF49;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8298034D383;
 	Fri, 23 Jan 2026 09:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6D133A712
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DCD30DEB5
 	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769159274; cv=none; b=VXRMJTA9Nirs9N8JetmpmgRJloOV4eSoRD8TWYS8vrHXfq3cHnmKzZF7Ti7RwpdkQTD2hzb7cgzRH+nMNtsW4FJiACUGn7qIxqa5MhyznyMXhh0V9ogxiU4CcZKrE3VLI3AonYU/NcOEdMvr9sVGEg7W/hUfS83JuZa4t84yLMc=
+	t=1769159274; cv=none; b=b1eXrK57muNEExz0gNqT+qfKFlKH4TgbaXy/NCQHwjNuwHmj/TRyR4W0ICLGdeKt4cBRRLajwdEIH4KaqQ76091sv1mTI3KPQZFAXnMs3EdvFmuHI0/qVarwuxKwBZY+AX+9pmD0rKYSfyDOAQA9sUt1RhDxCzXcEDKr8NpvhjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769159274; c=relaxed/simple;
-	bh=r5XEHOJhn1h9gr3DcBd/TQpuCeRA/qz6bGYE0Gsm3I0=;
+	bh=/0cL2fuHdGpIi6bdL6UK4t+rDuKh3T0YQNJtD/9d/c0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X01B/zu+Dnjz/aEhB0bBVp9U1JvCuwCjvtBMgeHgET5YaNFu3bxGGyNLxY7YUUU8GVtOftVbMq8ESpHcwcuBtgS6owCaoatlFByijvPPPCY9n1oyRXx+HDilGiO5jSy20VrrGdCimjHc2D94+3P9ho5HHMyIHlM3p1DpJy0iWj0=
+	 MIME-Version; b=iB+Yg8pdE7oFixNHhTrVMOOrWSxmQk3BuRLp3W/Rgj3SM5W5FdFE/vFsutiRLwixet2D75uE8KPS7u/yk5Qeebz/7Uu0kRBkRWMAMwBVeZHU/NYPGD9kGe2nAS+D9Xic+3HzBsQjvgbRGgBmW2y2PYsl0S6F0nXzxGJm7ZJ3+1o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -36,16 +36,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1vjD8q-00027J-59; Fri, 23 Jan 2026 10:07:44 +0100
+	id 1vjD8q-00027I-58; Fri, 23 Jan 2026 10:07:44 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac] helo=dude04)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1vjD8p-00244z-0l;
+	id 1vjD8p-002451-0k;
 	Fri, 23 Jan 2026 10:07:42 +0100
 Received: from ore by dude04 with local (Exim 4.98.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1vjD8o-00000006ZX2-1uae;
+	id 1vjD8o-00000006ZXC-20KC;
 	Fri, 23 Jan 2026 10:07:42 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com
-Subject: [RFC PATCH 3/4] net: lan78xx: Enhance health reporting with workqueue and detailed flow control stats
-Date: Fri, 23 Jan 2026 10:07:39 +0100
-Message-ID: <20260123090741.1566469-4-o.rempel@pengutronix.de>
+Subject: [RFC PATCH 4/4] net: lan78xx: Add debugfs file for error injection testing
+Date: Fri, 23 Jan 2026 10:07:40 +0100
+Message-ID: <20260123090741.1566469-5-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260123090741.1566469-1-o.rempel@pengutronix.de>
 References: <20260123090741.1566469-1-o.rempel@pengutronix.de>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	DMARC_NA(0.00)[pengutronix.de];
 	RCVD_COUNT_FIVE(0.00)[6];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-252712-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252710-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
@@ -101,286 +101,153 @@ X-Spamd-Result: default: False [1.54 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,pengutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D4DD1730C1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:mid,pengutronix.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 39D7A7300F
 X-Rspamd-Action: no action
 
-Refactor the health reporting to:
-
-1. Introduce a dedicated workqueue for TX timeouts. This prevents
-   calling devlink_health_report (which may sleep) from an atomic
-   context (netdev tx_timeout).
-
-2. Update statistics tracking and reporting context to separate TX Pause
-   and RX Pause frames, allowing finer-grained stall analysis (local vs.
-   link partner induced flow control storm).
-
-3. Change the devlink recovery function to call
-   phylink_mac_change(false). This leverages the newly robust link_down
-   path which performs the necessary locking and conditional Lite Reset.
+Add a debugfs file (inject\_error) to allow users to trigger specific
+hardware errors (e.g., Burst Cap Violation, RX FIFO Overflow, USB PHY
+destabilization) for testing the newly introduced health and recovery
+mechanisms.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/usb/lan78xx.c | 133 +++++++++++++++++++++++++-------------
- 1 file changed, 87 insertions(+), 46 deletions(-)
+ drivers/net/usb/lan78xx.c | 71 +++++++++++++++++++++++++++++++++++++++
+ drivers/net/usb/lan78xx.h |  4 +++
+ 2 files changed, 75 insertions(+)
 
 diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 9dadca4101bc..316a3a8d0534 100644
+index 316a3a8d0534..ae721025cf3d 100644
 --- a/drivers/net/usb/lan78xx.c
 +++ b/drivers/net/usb/lan78xx.c
-@@ -425,15 +425,36 @@ struct lan78xx_stat_snapshot {
- 	ktime_t time;
+@@ -3,6 +3,7 @@
+  * Copyright (C) 2015 Microchip Technology
+  */
+ #include <linux/crc32.h>
++#include <linux/debugfs.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
+ #include <linux/if_vlan.h>
+@@ -519,6 +520,8 @@ struct lan78xx_net {
  
- 	u64 tx_pause_total;
-+	u64 rx_pause_total;
- 	u64 tx_unicast_total;
- 	u64 rx_total_frames;
- 	u64 rx_hw_drop_total;
- 	u64 rx_sw_packets_total;
+ 	struct irq_domain_data	domain_data;
  
--	u32 last_delta_pause;
-+	u32 last_delta_rx_pause;
-+	u32 last_delta_tx_pause;
- 	u32 last_delta_drops;
++	struct dentry		*debugfs_pdev;
++
+ 	struct phylink		*phylink;
+ 	struct phylink_config	phylink_config;
+ 
+@@ -5088,6 +5091,68 @@ static const struct devlink_ops lan78xx_devlink_ops = {
+ 	.info_get = lan78xx_devlink_info_get,
  };
  
-+struct lan78xx_dump_ctx {
-+	const char *msg;
-+	ktime_t ts; /* Timestamp of detection */
++static ssize_t lan78xx_inject_write(struct file *file, const char __user *user_buf,
++				    size_t count, loff_t *ppos)
++{
++	struct lan78xx_net *dev = file->private_data;
++	char buf[32];
++	int val, ret;
++	u32 reg_val;
 +
-+	union {
-+		struct {
-+			u64 delta_tx_pause;
-+			u64 delta_rx_pause;
-+			u64 delta_rx;
-+			u64 delta_hw_drop;
-+			u64 delta_sw_rx;
-+		} fifo;
-+		struct {
-+			u32 int_sts; /* The ISR's view of INT_STS */
-+			u32 int_enp; /* The ISR's view of INT_ENP_CTL */
-+		} err;
-+	};
++	if (count >= sizeof(buf))
++		return -EINVAL;
++
++	if (copy_from_user(buf, user_buf, count))
++		return -EFAULT;
++	buf[count] = 0;
++
++	if (kstrtoint(buf, 0, &val))
++		return -EINVAL;
++
++	switch (val) {
++	case 1: /* Trigger Burst Cap Violation (Hang UTX) */
++		/* Enable Burst Cap Enforcement */
++		ret = lan78xx_read_reg(dev, USB_CFG0, &reg_val);
++		if (ret < 0)
++			return ret;
++		reg_val |= USB_CFG_BCE_;
++		lan78xx_write_reg(dev, USB_CFG0, reg_val);
++
++		/* Set illegal Burst Cap size (512 bytes < Max Frame) */
++		lan78xx_write_reg(dev, BURST_CAP, 0x01);
++		break;
++
++	case 2: /* Trigger RX FIFO Overflow (Hold UTX in Reset) */
++		ret = lan78xx_read_reg(dev, USB_CFG0, &reg_val);
++		if (ret < 0)
++			return ret;
++		reg_val |= USB_CFG0_UTX_RESET_;
++		lan78xx_write_reg(dev, USB_CFG0, reg_val);
++		break;
++
++	case 3: /* Destabilize USB PHY (Invalid HS State) */
++		ret = lan78xx_read_reg(dev, LAN78XX_USB2_TEST_REG, &reg_val);
++		if (ret < 0)
++			return ret;
++		/* Set bits 15:14 to '10' (Binary) - Defined as "Invalid combination" */
++		reg_val &= ~(0x3 << 14);
++		reg_val |= (0x2 << 14);
++		lan78xx_write_reg(dev, LAN78XX_USB2_TEST_REG, reg_val);
++		break;
++
++	default:
++		return -EINVAL;
++	}
++
++	return count;
++}
++
++static const struct file_operations lan78xx_inject_fops = {
++	.open = simple_open,
++	.write = lan78xx_inject_write,
++	.llseek = default_llseek,
 +};
 +
- struct irq_domain_data {
- 	struct irq_domain	*irqdomain;
- 	unsigned int		phyirq;
-@@ -505,27 +526,10 @@ struct lan78xx_net {
- 	struct devlink_health_reporter	*fifo_reporter;
- 	struct devlink_health_reporter	*internal_err_reporter;
- 	struct lan78xx_stat_snapshot	snapshot;
-+	struct work_struct		tx_timeout_work;
-+	struct lan78xx_dump_ctx		timeout_ctx;
- };
- 
--struct lan78xx_dump_ctx {
--	const char *msg;
--	ktime_t ts; /* Timestamp of detection */
--
--	union {
--		struct {
--			u64 delta_pause;
--			u64 delta_rx;
--			u64 delta_hw_drop;
--			u64 delta_sw_rx;
--		} fifo;
--		struct {
--			u32 int_sts; /* The ISR's view of INT_STS */
--			u32 int_enp; /* The ISR's view of INT_ENP_CTL */
--		} err;
--	};
--};
--
--/* Register Dump Map Structure */
- struct lan78xx_reg_map {
- 	u32 reg;
- 	const char *name;
-@@ -966,7 +970,7 @@ static void lan78xx_check_stat_rollover(struct lan78xx_net *dev,
- 
- static void lan78xx_check_stat_anomalies(struct lan78xx_net *dev)
+ static void lan78xx_disconnect(struct usb_interface *intf)
  {
--	u64 delta_pause, delta_rx, delta_hw_drop, delta_sw_rx;
-+	u64 delta_tx_pause, delta_rx_pause, delta_rx, delta_hw_drop, delta_sw_rx;
- 	struct lan78xx_dump_ctx ctx = {0};
- 	struct lan78xx_stat_snapshot now;
- 	const char *anomaly_msg = NULL;
-@@ -976,6 +980,7 @@ static void lan78xx_check_stat_anomalies(struct lan78xx_net *dev)
+ 	struct lan78xx_net *dev;
+@@ -5102,6 +5167,8 @@ static void lan78xx_disconnect(struct usb_interface *intf)
+ 	udev = interface_to_usbdev(intf);
+ 	net = dev->net;
  
- 	mutex_lock(&dev->stats.access_lock);
- 	now.tx_pause_total = dev->stats.curr_stat.tx_pause_frames;
-+	now.rx_pause_total = dev->stats.curr_stat.rx_pause_frames;
- 	now.rx_total_frames = dev->stats.curr_stat.rx_unicast_frames +
- 			      dev->stats.curr_stat.rx_broadcast_frames +
- 			      dev->stats.curr_stat.rx_multicast_frames;
-@@ -985,17 +990,19 @@ static void lan78xx_check_stat_anomalies(struct lan78xx_net *dev)
- 
- 	now.rx_sw_packets_total = dev->net->stats.rx_packets;
- 
--	delta_pause = now.tx_pause_total - dev->snapshot.tx_pause_total;
-+	delta_tx_pause = now.tx_pause_total - dev->snapshot.tx_pause_total;
-+	delta_rx_pause = now.rx_pause_total - dev->snapshot.rx_pause_total;
- 	delta_rx = now.rx_total_frames - dev->snapshot.rx_total_frames;
- 	delta_hw_drop = now.rx_hw_drop_total - dev->snapshot.rx_hw_drop_total;
- 	delta_sw_rx = now.rx_sw_packets_total - dev->snapshot.rx_sw_packets_total;
- 
--	now.last_delta_pause = (u32)delta_pause;
-+	now.last_delta_tx_pause = (u32)delta_tx_pause;
-+	now.last_delta_rx_pause = (u32)delta_rx_pause;
- 	now.last_delta_drops = (u32)delta_hw_drop;
- 
- 	dev->snapshot = now;
- 
--	if (delta_pause > LAN78XX_STALL_PAUSE_THRESH && delta_rx == 0) {
-+	if (delta_tx_pause > LAN78XX_STALL_PAUSE_THRESH && delta_rx == 0) {
- 		anomaly_msg = "Stall: Pause Storm & No RX";
- 	} else if (delta_hw_drop > LAN78XX_LIVELOCK_DROP_THRESH &&
- 		   delta_hw_drop > (delta_sw_rx * LAN78XX_LIVELOCK_DROP_RATIO)) {
-@@ -1008,10 +1015,11 @@ static void lan78xx_check_stat_anomalies(struct lan78xx_net *dev)
- 	/* 5. Reporting */
- 	ctx.msg = anomaly_msg;
- 	ctx.ts = now.time;
--	ctx.fifo.delta_pause   = delta_pause;
--	ctx.fifo.delta_rx      = delta_rx;
-+	ctx.fifo.delta_tx_pause = delta_tx_pause;
-+	ctx.fifo.delta_rx_pause = delta_rx_pause;
-+	ctx.fifo.delta_rx = delta_rx;
- 	ctx.fifo.delta_hw_drop = delta_hw_drop;
--	ctx.fifo.delta_sw_rx   = delta_sw_rx;
-+	ctx.fifo.delta_sw_rx = delta_sw_rx;
- 
- 	netdev_warn(dev->net, "%s (HW Drops: +%llu, SW RX: +%llu)\n",
- 		    ctx.msg, delta_hw_drop, delta_sw_rx);
-@@ -2495,6 +2503,24 @@ static void lan78xx_mac_config(struct phylink_config *config, unsigned int mode,
- 			   ERR_PTR(ret));
- }
- 
-+static int lan78xx_configure_flowcontrol(struct lan78xx_net *dev,
-+					 bool tx_pause, bool rx_pause);
-+static int lan78xx_reset(struct lan78xx_net *dev);
++	debugfs_remove_recursive(dev->debugfs_pdev);
 +
-+static void lan78xx_dump_status(struct lan78xx_net *dev, const char *msg)
-+{
-+	u32 int_sts, mac_tx, fct_tx_ctl, mac_rx, fct_rx_ctl;
-+
-+	lan78xx_read_reg(dev, INT_STS, &int_sts);
-+	lan78xx_read_reg(dev, MAC_TX, &mac_tx);
-+	lan78xx_read_reg(dev, FCT_TX_CTL, &fct_tx_ctl);
-+	lan78xx_read_reg(dev, MAC_RX, &mac_rx);
-+	lan78xx_read_reg(dev, FCT_RX_CTL, &fct_rx_ctl);
-+
-+	netdev_info(dev->net, "[%s] INT_STS: 0x%08x, MAC_TX: 0x%08x, FCT_TX: 0x%08x, MAC_RX: 0x%08x, FCT_RX: 0x%08x\n",
-+		    msg, int_sts, mac_tx, fct_tx_ctl, mac_rx, fct_rx_ctl);
-+}
-+
- static void lan78xx_mac_link_down(struct phylink_config *config,
- 				  unsigned int mode, phy_interface_t interface)
- {
-@@ -4939,8 +4965,10 @@ static int lan78xx_fifo_dump(struct devlink_health_reporter *reporter,
- 					  ktime_to_ns(ctx->ts));
- 
- 		devlink_fmsg_obj_nest_start(fmsg);
--		devlink_fmsg_u64_pair_put(fmsg, "trigger_delta_pause",
--					  ctx->fifo.delta_pause);
-+		devlink_fmsg_u64_pair_put(fmsg, "trigger_delta_tx_pause",
-+					  ctx->fifo.delta_tx_pause);
-+		devlink_fmsg_u64_pair_put(fmsg, "trigger_delta_rx_pause",
-+					  ctx->fifo.delta_rx_pause);
- 		devlink_fmsg_u64_pair_put(fmsg, "trigger_delta_rx",
- 					  ctx->fifo.delta_rx);
- 		devlink_fmsg_u64_pair_put(fmsg, "trigger_delta_hw_drop",
-@@ -4989,8 +5017,9 @@ static int lan78xx_fifo_recover(struct devlink_health_reporter *reporter,
- {
- 	struct lan78xx_net *dev = devlink_health_reporter_priv(reporter);
- 
--	netdev_warn(dev->net, "Recovering from FIFO stall via Lite Reset\n");
--	return lan78xx_reset(dev);
-+	netdev_warn(dev->net, "Recovering via Lite Reset\n");
-+	phylink_mac_change(dev->phylink, false);
-+	return 0;
- }
- 
- static const struct devlink_health_reporter_ops lan78xx_fifo_ops = {
-@@ -5075,6 +5104,7 @@ static void lan78xx_disconnect(struct usb_interface *intf)
- 
  	lan78xx_health_cleanup(dev);
  	if (dev->devlink) {
-+		cancel_work_sync(&dev->tx_timeout_work);
- 		devlink_unregister(dev->devlink);
- 		devlink_free(dev->devlink);
- 		dev->devlink = NULL;
-@@ -5107,36 +5137,45 @@ static void lan78xx_disconnect(struct usb_interface *intf)
- 	usb_put_dev(udev);
- }
+ 		cancel_work_sync(&dev->tx_timeout_work);
+@@ -5594,6 +5661,10 @@ static int lan78xx_probe(struct usb_interface *intf,
+ 		lan78xx_health_init(dev);
+ 	}
  
-+static void lan78xx_tx_timeout_work(struct work_struct *work)
-+{
-+	struct lan78xx_net *dev = container_of(work, struct lan78xx_net,
-+					       tx_timeout_work);
++	dev->debugfs_pdev = debugfs_create_dir(netdev_name(netdev), NULL);
++	debugfs_create_file("inject_error", 0200, dev->debugfs_pdev, dev,
++			    &lan78xx_inject_fops);
 +
-+	devlink_health_report(dev->fifo_reporter, dev->timeout_ctx.msg,
-+			      &dev->timeout_ctx);
-+}
+ 	return 0;
+ 
+ phy_uninit:
+diff --git a/drivers/net/usb/lan78xx.h b/drivers/net/usb/lan78xx.h
+index 968e5e5faee0..16666a998441 100644
+--- a/drivers/net/usb/lan78xx.h
++++ b/drivers/net/usb/lan78xx.h
+@@ -366,6 +366,7 @@
+ #define USB_CFG_MAX_DEV_SPEED_SS_	(0x00008000)
+ #define USB_CFG_MAX_DEV_SPEED_HS_	(0x00000000)
+ #define USB_CFG_MAX_DEV_SPEED_FS_	(0x00002000)
++#define USB_CFG0_UTX_RESET_		(0x00000400)
+ #define USB_CFG_PHY_BOOST_MASK_		(0x00000180)
+ #define USB_CFG_PHY_BOOST_PLUS_12_	(0x00000180)
+ #define USB_CFG_PHY_BOOST_PLUS_8_	(0x00000100)
+@@ -876,4 +877,7 @@
+ #define OTP_TPVSR_VAL			(OTP_BASE_ADDR + 4 * 0x3A)
+ #define OTP_TPVHR_VAL			(OTP_BASE_ADDR + 4 * 0x3B)
+ #define OTP_TPVSA_VAL			(OTP_BASE_ADDR + 4 * 0x3C)
 +
- static void lan78xx_tx_timeout(struct net_device *net, unsigned int txqueue)
- {
- 	struct lan78xx_net *dev = netdev_priv(net);
--	struct lan78xx_dump_ctx ctx = {0};
--	s64 diff_ms;
-+	s64 diff_ms = 0;
- 
- 	/* Calculate time since last health check */
--	ctx.ts = ktime_get_real();
--	diff_ms = ktime_ms_delta(ctx.ts, dev->snapshot.time);
-+	dev->timeout_ctx.ts = ktime_get_real();
-+	diff_ms = ktime_ms_delta(dev->timeout_ctx.ts, dev->snapshot.time);
- 
- 	/* We rely on the trend data captured during the last valid stat update
- 	 * to infer the system state before the crash.
- 	 */
--	if (dev->snapshot.last_delta_pause > LAN78XX_STALL_PAUSE_THRESH)
--		ctx.msg = "TX Timeout (Flow Control Storm?)";
-+	if (dev->snapshot.last_delta_rx_pause > LAN78XX_STALL_PAUSE_THRESH)
-+		dev->timeout_ctx.msg = "TX Timeout (Link Partner Pause Storm?)";
-+	else if (dev->snapshot.last_delta_tx_pause > LAN78XX_STALL_PAUSE_THRESH)
-+		dev->timeout_ctx.msg = "TX Timeout (Local Flow Control Storm?)";
- 	else if (dev->snapshot.last_delta_drops > LAN78XX_TX_TIMEOUT_DROP_THRESH)
--		ctx.msg = "TX Timeout (FIFO Drop Storm?)";
-+		dev->timeout_ctx.msg = "TX Timeout (FIFO Drop Storm?)";
- 	else
--		ctx.msg = "TX Timeout";
-+		dev->timeout_ctx.msg = "TX Timeout";
- 
--	ctx.fifo.delta_pause = dev->snapshot.last_delta_pause;
--	ctx.fifo.delta_hw_drop = dev->snapshot.last_delta_drops;
-+	dev->timeout_ctx.fifo.delta_rx_pause = dev->snapshot.last_delta_rx_pause;
-+	dev->timeout_ctx.fifo.delta_tx_pause = dev->snapshot.last_delta_tx_pause;
-+	dev->timeout_ctx.fifo.delta_hw_drop = dev->snapshot.last_delta_drops;
- 
- 	netdev_warn(dev->net, "%s (Last stat update: %lld ms ago)\n",
--		    ctx.msg, diff_ms);
-+		    dev->timeout_ctx.msg, diff_ms);
- 
--	devlink_health_report(dev->fifo_reporter, ctx.msg, &ctx);
--
--	unlink_urbs(dev, &dev->txq);
--	napi_schedule(&dev->napi);
-+	/* Defer report to worker to avoid sleeping in atomic context */
-+	schedule_work(&dev->tx_timeout_work);
- }
- 
- static netdev_features_t lan78xx_features_check(struct sk_buff *skb,
-@@ -5542,6 +5581,8 @@ static int lan78xx_probe(struct usb_interface *intf,
- 	pm_runtime_set_autosuspend_delay(&udev->dev,
- 					 DEFAULT_AUTOSUSPEND_DELAY);
- 
-+	INIT_WORK(&dev->tx_timeout_work, lan78xx_tx_timeout_work);
++#define LAN78XX_USB2_TEST_REG		(0x12C4)
 +
- 	dev->devlink = devlink_alloc(&lan78xx_devlink_ops,
- 				     sizeof(struct lan78xx_devlink_priv),
- 				     &udev->dev);
+ #endif /* _LAN78XX_H */
 -- 
 2.47.3
 
