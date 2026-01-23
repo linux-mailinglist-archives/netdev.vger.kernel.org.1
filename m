@@ -1,168 +1,218 @@
-Return-Path: <netdev+bounces-252974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252975-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHZnEMHnc2nhzQAAu9opvQ
-	(envelope-from <netdev+bounces-252974-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:27:29 +0100
+	id oJ55Ffroc2nhzQAAu9opvQ
+	(envelope-from <netdev+bounces-252975-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:32:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF3057AE5D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:27:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F277C7AEDF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 22:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 398D63006101
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:27:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5D8933004D33
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 21:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7F1246778;
-	Fri, 23 Jan 2026 21:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF7C2D94AC;
+	Fri, 23 Jan 2026 21:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UUVNlVPj"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D9C1E487
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BA727470;
+	Fri, 23 Jan 2026 21:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769203645; cv=none; b=ePcuf6lkPT1GqWp8+81AO86VCYn3koHMwzgIZLKF7i4rVB80OiZEEQyeh7NQrGuztbmWBDON4Nxxi0tdrnHCGDpZOAWWRGwbhpktjukw0Q2QNmnjvnMXd2N8sEfooFXJyMuACNH5q9OfcnYjj30jZDHy0yAR9zybYrBR5ugxvRU=
+	t=1769203958; cv=none; b=Qd/yOOrCZpvVZDFFFGYGjwnZA2gVvXV4shyb7fyS+EXKc9az1sxeczYhGz7YSokjNByYPTVCBrh98ZCQ9+PPOQZm1AtvMObDpQ2b2vMUynxK0UzlTeRK5Dqr6od4/qJDMPBXP/u1TJPA/wnCHziLRAnC58I47YINLbP/BJg/VQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769203645; c=relaxed/simple;
-	bh=6EfQPL4EHcqyjtbufDjUzm0oqyoxP1Ski6ZimmGZhng=;
+	s=arc-20240116; t=1769203958; c=relaxed/simple;
+	bh=32WWXeXvRXXXnj/kZlQKkKu4K9vlUwiDPTb+2euqXV0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RCC42SyGUlVatiRVu9WXYfrMKitevCWZyi05r8BKXEpT6XQLzCSMxXtpKR5PpKJylMF+UCTuAJkD0srayC77GABGO7j5gVy7upMGVXlh+LHEopVjMm0otGV7+HqSwhuen4paExs2lpCeCZgq3rfUkpSCiHzsYJGKQlbG4f/5mZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOgb-0007Wc-Vo; Fri, 23 Jan 2026 22:27:21 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOgZ-0029ml-2w;
-	Fri, 23 Jan 2026 22:27:19 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjOgZ-00B7J1-0G;
-	Fri, 23 Jan 2026 22:27:19 +0100
-Date: Fri, 23 Jan 2026 22:27:19 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, alok.a.tiwari@oracle.com,
-	andrew+netdev@lunn.ch, andrew@lunn.ch, chuck.lever@oracle.com,
-	davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
-	gal@nvidia.com, horms@kernel.org, idosch@nvidia.com,
-	jacob.e.keller@intel.com, kernel-team@meta.com,
-	kory.maincent@bootlin.com, kuba@kernel.org, lee@trager.us,
-	pabeni@redhat.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next 1/3] net: ethtool: Track pause storm events
-Message-ID: <aXPntx9wiUqbKGRN@pengutronix.de>
-References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
- <20260122192158.428882-2-mohsin.bashr@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=piyHC64LsUdUJUOOPj7WOCkaK8kTs9SWBtFxNHqAd/cga2Wj0pkiBEQXUqY1gzVZr7ftEtgVGsaxDqb6Gii0GmHcChcuwE3IGrJhECHxCeG+l/z0w2CoaoQ/PHH0YOM5KGOC4jUuQfcLpix+uUG7QuLW+KCdfdgDkMsr61XWYoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UUVNlVPj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UId/Vzt9Vm2GMBalR/x7lGAofZBiET9NUSj2/ZXMbKw=; b=UUVNlVPj9g+71IhAhxMULD9ivp
+	frh5NGpDhavuR+455fTIxq4AsTEpiUZgXVk0HasxdIi98K7k3RRP7N+iWhDyCxEh9lh11T4f9Ad/6
+	PkHZeihli1kFmfs5qwHKvpHOI07TrNEtvK+ZiVmZWYLgSWU/ozx5M72kIR/jNtfHAXwDslutBShFe
+	pDtmZQhMAitq6rtrK1c/pSRmDQKWohJzJiPduRvw6pp65OnOtiwP0qXgUQI70/XxvYTr+/9xdihQz
+	SCxnjkqNlqsasxYT6+YN5G8i7Ydi2h2cdI7ifWwETuuMrq1coSffTwsc3dXpsHr9SK8DcpDFrtq8J
+	hiXRr/4g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43970)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vjOlV-000000002YU-2dTD;
+	Fri, 23 Jan 2026 21:32:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vjOlR-000000002QA-2jQL;
+	Fri, 23 Jan 2026 21:32:21 +0000
+Date: Fri, 23 Jan 2026 21:32:21 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
+ inband goodies
+Message-ID: <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
+References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+ <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260122192158.428882-2-mohsin.bashr@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,redhat.com,linux.dev];
-	TAGGED_FROM(0.00)[bounces-252974-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-252975-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.994];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.947];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: CF3057AE5D
+X-Rspamd-Queue-Id: F277C7AEDF
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 11:21:56AM -0800, Mohsin Bashir wrote:
-> With TX pause enabled, if a device is unable to pass packets up to the
-> stack (e.g., CPU is hanged), the device can cause pause storm. Given
-> that devices can have native support to protect the neighbor from such
-> flooding, such events need some tracking. This support is to track TX
-> pause storm events for better observability.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-> ---
->  Documentation/netlink/specs/ethtool.yaml       | 13 +++++++++++++
->  include/linux/ethtool.h                        |  2 ++
->  include/uapi/linux/ethtool_netlink_generated.h |  1 +
->  net/ethtool/pause.c                            |  4 +++-
->  4 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 0a2d2343f79a..4707063af3b4 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -879,6 +879,19 @@ attribute-sets:
->        -
->          name: rx-frames
->          type: u64
-> +      -
-> +        name: tx-pause-storm-events
-> +        type: u64
-> +        doc: >-
-> +            TX pause storm event count. Increments each time device
-> +            detects that its pause assertion condition has been true
-> +            for too long for normal operation. As a result, the device
-> +            has temporarily disabled its own Pause TX function to
-> +            protect the network from itself.
-> +            This counter should never increment under normal overload
-> +            conditions; it indicates catastrophic failure like an OS
-> +            crash. The rate of incrementing is implementation specific.
+On Fri, Jan 23, 2026 at 07:05:00PM +0530, Mohd Ayaan Anwar wrote:
+> 4. Switching from 1G to 2.5G - similar issues + a NULL pointer
+> dereference. I am checking on the reason for it.
 
-Hm, we already have the tx pause frame counters. So, the anomaly is
-visible to the user anyway (even if it isn't explicitly labeled as an
-anomaly).
+For the NULL pointer dereference, this is a bit weird, and may help to
+point towards the issue.
 
-What is not visible to the user is when HW or SW disables flow control.
-Maybe that is what the counter should represent and be named? Would
-tx-pause-auto-disabled-events make sense?
+> 	[ 1235.996004] qcom-ethqos 23040000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
+> 	[ 1240.517716] qcom-ethqos 23040000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/off/nolpi
+> 	[ 1240.529470] qcom-ethqos 23040000.ethernet eth1: major config, requested phy/2500base-x
+> 	[ 1240.537642] qcom-ethqos 23040000.ethernet eth1: interface 2500base-x inband modes: pcs=00 phy=00
+> 	[ 1240.546702] qcom-ethqos 23040000.ethernet eth1: major config, active phy/outband/2500base-x
+> 	[ 1240.555441] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
 
-The reason I do not like tx-pause-storm-events is that the meaning is
-device specific; the user has to read the device manual to know what it
-actually means.
+> 	[ 1240.880168] Code: d63f0020 f9400e60 b4000040 f900081f (f9000ad3)
 
-tx-pause-auto-disabled-events can be reused in more cases - every time
-we try to pause flow control for some reason.
+This code line disassembles to:
+
+   0:   d63f0020        blr     x1
+   4:   f9400e60        ldr     x0, [x19, #24]
+   8:   b4000040        cbz     x0, 10 <.text+0x10>
+   c:   f900081f        str     xzr, [x0, #16]
+  10:   f9000ad3        str     x19, [x22, #16]
+
+which, after comparing with my disassembly, the blr x1 is the call to
+pcs_disable() inside phylink_pcs_disable() in this code:
+
+        if (pcs_changed) {
+                phylink_pcs_disable(pl->pcs);
+
+                if (pl->pcs)
+                        pl->pcs->phylink = NULL;
+
+                pcs->phylink = pl;
+
+and the failing store is the one for that last line of C code - in
+other words, pcs = NULL.
+
+This means that mac_select_pcs() returned NULL when being asked
+"which PCS should be used for 2500base-X" ?
+
+This suggests that the SerDes detection of support for 2500BASE-X
+isn't working, meaning that stmmac_mac_select_pcs() ends up returning
+NULL, rather than &priv->integrated_pcs->pcs.
+
+That would only happen if:
+
+                /* Only allow 2500Base-X if the SerDes has support. */
+                ret = dwmac_serdes_validate(priv, PHY_INTERFACE_MODE_2500BASEX);
+                if (ret == 0)
+                        __set_bit(PHY_INTERFACE_MODE_2500BASEX,
+                                  spcs->pcs.supported_interfaces);
+
+fails, meaning we don't set that interface mode for the PCS.
+dwmac_serdes_validate() calls phy_validate() for PHY_MODE_ETHERNET
+with the PHY interface mode as the sub mode.
+
+Patch 3 adds the required methods to phy-qcom-sgmii-eth.c to allow
+phy_validate() to indicate whether this is supported or not:
+
+        .validate       = qcom_dwmac_sgmii_phy_validate,
+
+and its implementation is:
+
+        int ret = qcom_dwmac_sgmii_phy_speed(mode, submode);
+
+        return ret < 0 ? ret : 0;
+
+where qcom_dwmac_sgmii_phy_speed() is:
+
+        if (mode != PHY_MODE_ETHERNET)
+                return -EINVAL;
+
+        if (submode == PHY_INTERFACE_MODE_SGMII ||
+            submode == PHY_INTERFACE_MODE_1000BASEX)
+                return SPEED_1000;
+
+        if (submode == PHY_INTERFACE_MODE_2500BASEX)
+                return SPEED_2500;
+
+        return -EINVAL;
+
+So, this should be returning a positive integer (SPEED_2500), which
+should cause phy_validate(serdes, PHY_MODE_ETHERNET,
+PHY_INTERFACE_MODE_2500BASEX, NULL) to return success (zero). That
+should result in PHY_INTERFACE_MODE_2500BASEX being set in
+spcs->pcs.supported_interfaces, and thus &priv->integrated_pcs->pcs
+being returned for PHY_INTERFACE_MODE_2500BASEX.
+
+Is the particular hardware you're running this oopsing test on not
+using a SerDes PHY? If that's the case, how does it switch between
+2.5Gbps and 1Gbps data rate on the SerDes?
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
