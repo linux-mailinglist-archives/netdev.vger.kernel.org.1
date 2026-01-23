@@ -1,186 +1,162 @@
-Return-Path: <netdev+bounces-252698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kHJ7O0Y4c2lItAAAu9opvQ
-	(envelope-from <netdev+bounces-252698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:46 +0100
+	id qEatGDM4c2lItAAAu9opvQ
+	(envelope-from <netdev+bounces-252699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E443E72D76
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5CD72D3A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E889030175DD
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:56:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFBB93011BEF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE373330645;
-	Fri, 23 Jan 2026 08:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF29318BBF;
+	Fri, 23 Jan 2026 08:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G/KkPluM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FQ3UQ6I5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261FC318152
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4600262FC1;
+	Fri, 23 Jan 2026 08:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769158604; cv=none; b=u/CQD/FC1LFfkgXDoKEUkzsVmZqSXwJw8HnoeJxnh12mDhtgg5JDdG9XCTq6QSCuRO2q0kt/fcXyTkPD/PYONYtqkDVvHH8JCuEYBVJv99nkyk9CRTZcnPhyvtw3WtxC2v59F0fU72NMM8VHiCEdnegNzfRD5nl3GShbqe5+f4M=
+	t=1769158662; cv=none; b=CkBwjFAIrmhr7KnjysFZDKeQboDi2L73ruPVSbjkd1yp4hi3F9oukZ1cuKIS1QkEKeNWkRn41rYEnbUHeV6CjQaLQ7fOecVEJcYMBhN9Kb87OifeRU+YcsNP9br2uYEENLnkf47AUtcrQ2K09Ei59amjQJWQqsLfajXYa9QjwkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769158604; c=relaxed/simple;
-	bh=1UvSBdgGuBgiQRwX3e7nYHkdgZ7JTX6rdeF6qDJwPQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ginzYY+b+kj7zWYmAIr3VeFVyRoFj/Fyb3MH5XLlMIfZBulW0xxLW/0RznBGF0ABYQVRA6qSTyrw4jpzf+7mUWcbikOfgiIOCnuWnhzwJ6RMnU8JkShDrJZAK/I3xZoK+AWNzjnJb1QBhI7hxObM2+nIzqNnNe/JuQUsxUqdqnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G/KkPluM; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769158600;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ev1nwp2jqQHVpe3TXk2x9AVEGB6Nj6mx2yP0IpcUZW4=;
-	b=G/KkPluM8KiVv/KlXXvon+NjDg2D+OVXWkHzALnwohFtZK4prPRR6w8tcl7XhnGO9L1O5L
-	yoLCuV9BE9e/bPYYrRXc1CFx1c+BQkJAnwkDsEou9XN8/GXO2/DN8T+qUPqi4V4YqtegaR
-	vdecvuwC7H3OEHkwZGZukpN6hW5pqn8=
-From: Hui Zhu <hui.zhu@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Jeff Xu <jeffxu@chromium.org>,
-	mkoutny@suse.com,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Christian Brauner <brauner@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paul Chaignon <paul.chaignon@gmail.com>,
-	Anton Protopopov <a.s.protopopov@gmail.com>,
-	Amery Hung <ameryhung@gmail.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Lance Yang <lance.yang@linux.dev>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Subject: [RFC PATCH bpf-next v3 03/12] bpf: mark struct oom_control's memcg field as TRUSTED_OR_NULL
-Date: Fri, 23 Jan 2026 16:55:21 +0800
-Message-ID: <27af33f679846a2783cc8d82111ebeac170b004c.1769157382.git.zhuhui@kylinos.cn>
-In-Reply-To: <cover.1769157382.git.zhuhui@kylinos.cn>
-References: <cover.1769157382.git.zhuhui@kylinos.cn>
+	s=arc-20240116; t=1769158662; c=relaxed/simple;
+	bh=aYJnsW24NcHiZLmUtSbBYZsqBH63QQK/EUkpG2QP3C4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FPTGeZ6GjuwWqg9MmwOX1CPQrbb5yzxpxD5AltMh8R6nNx7Km0QcXOSsFJzJHzpsFqHM90WnZ9UhyDKgvPfAHcJWnfgiKBcUp7+CzdpKwwEuMvmssuqyy9H3vqh+IjCPZ+FySqoqY7ht5h3TYciC8KAzQQ9IKRih+ehUDmvUGbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FQ3UQ6I5; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 571B71A2AEA;
+	Fri, 23 Jan 2026 08:57:38 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2AB256070A;
+	Fri, 23 Jan 2026 08:57:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 112EB119A8790;
+	Fri, 23 Jan 2026 09:57:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769158657; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=z+JHSGN23hsX+cVo1mrcC79xpDEwkF6f8jxXDpevJ5w=;
+	b=FQ3UQ6I58yofLejpjcad3q+pSTycJZ1ejA5OlKxkkS7QMDvry45L5TI1ObmuGQUawpB3P7
+	RH2RljkXv4R+MhCdy9UrA7Vz8/NX4igduLPrPXsnThEHtHdXln+AP1JGC0HI42aWWxtLHJ
+	7yMIrxQ4Ja2H11S5Iiqb7d/WDxIs/YRd+Un4rGKj3oqeZHzRK9UiikPeXMiDOTpgJLtLpl
+	ivPl/uuIX2y8fgZ1V8B9/k59E41nMeKgDoqkMXx2Z8HtMzqRSEUMCVfsa7CgcRL5AQE3MH
+	8hfnBtQYpP1eQivE05ebinw1paPZ3/PgWmnu2iyd1NOtvqclaAqD2Jj47ifyRQ==
+Message-ID: <d5177d67-7b61-4459-befe-999dc052ca2b@bootlin.com>
+Date: Fri, 23 Jan 2026 09:57:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan9645x
+ internal phy
+To: =?UTF-8?Q?Jens_Emil_Schulz_=C3=98stergaard?=
+ <jensemil.schulzostergaard@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, o.rempel@pengutronix.de,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-252698-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252699-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCPT_COUNT_GT_50(0.00)[50];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.982];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,pengutronix.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,kylinos.cn:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E443E72D76
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: AE5CD72D3A
 X-Rspamd-Action: no action
 
-From: Roman Gushchin <roman.gushchin@linux.dev>
+Hi Jens,
 
-Struct oom_control is used to describe the OOM context.
-It's memcg field defines the scope of OOM: it's NULL for global
-OOMs and a valid memcg pointer for memcg-scoped OOMs.
-Teach bpf verifier to recognize it as trusted or NULL pointer.
-It will provide the bpf OOM handler a trusted memcg pointer,
-which for example is required for iterating the memcg's subtree.
+On 23/01/2026 08:50, Jens Emil Schulz Østergaard wrote:
+> LAN9645X is a family of switch chips with 5 internal copper phys. The
+> internal PHY is based on parts of LAN8832. This is a low-power, single
+> port triple-speed (10BASE-T/100BASE-TX/1000BASE-T) ethernet physical
+> layer transceiver (PHY) that supports transmission and reception of data
+> on standard CAT-5, as well as CAT-5e and CAT-6 Unshielded Twisted
+> Pair (UTP) cables.
+> 
+> Add support for the internal PHY of the lan9645x chip family.
+> 
+> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+> Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+> ---
 
-Signed-off-by: Roman Gushchin <roman.gushchin@linux.dev>
-Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
----
- kernel/bpf/verifier.c | 5 +++++
- 1 file changed, 5 insertions(+)
+[...]
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 7a375f608263..e59acdbb5062 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -7152,6 +7152,10 @@ BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct vm_area_struct) {
- 	struct file *vm_file;
- };
- 
-+BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct oom_control) {
-+	struct mem_cgroup *memcg;
-+};
-+
- static bool type_is_rcu(struct bpf_verifier_env *env,
- 			struct bpf_reg_state *reg,
- 			const char *field_name, u32 btf_id)
-@@ -7194,6 +7198,7 @@ static bool type_is_trusted_or_null(struct bpf_verifier_env *env,
- 	BTF_TYPE_EMIT(BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct socket));
- 	BTF_TYPE_EMIT(BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct dentry));
- 	BTF_TYPE_EMIT(BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct vm_area_struct));
-+	BTF_TYPE_EMIT(BTF_TYPE_SAFE_TRUSTED_OR_NULL(struct oom_control));
- 
- 	return btf_nested_type_is_trusted(&env->log, reg, field_name, btf_id,
- 					  "__safe_trusted_or_null");
--- 
-2.43.0
+> +static int lan9645x_config_intr(struct phy_device *phydev)
+> +{
+> +	int err;
+> +
+> +	/* enable / disable interrupts */
+> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+> +		/* This is an internal PHY of lan9645x and is not possible to
+> +		 * change the polarity of irq sources in the OIC (CPU_INTR)
+> +		 * found in lan9645x. Therefore change the polarity of the
+> +		 * interrupt in the PHY from being active low instead of active
+> +		 * high.
+> +		 */
+> +		phy_write(phydev, LAN8804_CONTROL,
+> +			  LAN8804_CONTROL_INTR_POLARITY);
+> +
+> +		/* By default interrupt buffer is open-drain in which case the
+> +		 * interrupt can be active only low. Therefore change the
+> +		 * interrupt buffer to be push-pull to be able to change
+> +		 * interrupt polarity.
+> +		 */
+> +		phy_write(phydev, LAN8804_OUTPUT_CONTROL,
+> +			  LAN8804_OUTPUT_CONTROL_INTR_BUFFER);
+
+Small nit from me, you're missing error checks on the 2 above reads.
+
+Thanks,
+
+Maxime
 
 
