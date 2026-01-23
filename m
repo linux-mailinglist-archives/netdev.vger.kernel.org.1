@@ -1,223 +1,223 @@
-Return-Path: <netdev+bounces-252750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEzpMbhHc2mHuQAAu9opvQ
-	(envelope-from <netdev+bounces-252750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:04:40 +0100
+	id KAX9KulHc2mHuQAAu9opvQ
+	(envelope-from <netdev+bounces-252751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:05:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DBB973E15
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:04:40 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5763A73E48
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:05:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9A0563015D20
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3063C307E76A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A06237B415;
-	Fri, 23 Jan 2026 09:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A5A37F72F;
+	Fri, 23 Jan 2026 09:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="REh8jgmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE1737D111
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7CD2F3C0E;
+	Fri, 23 Jan 2026 09:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769162191; cv=none; b=nvOFPDF/1JkN6qNqG4nTPgqJs7CfpjzFZgVDdvsBAZHxnDj4rRSpcbUOpfBxuIPgyA1eu0uspDun0d9qerte+Ucovcn1V9enMNYrmJU3+Y2m/5NVrbqU0R/5YJJlnzOj+Sk/l4ucJs03GnLyRy6XLWp2WrIrWOcaxQEaeE3MRWc=
+	t=1769162237; cv=none; b=kU1zjyjz3zlXgT/fze226VYUaOteZ6Q/xU+gN7rAgsapHfWApselB4u3zvYbebbsuWTL95RUWvq7xDdKaVf6SbF8DRs+x1p2Cqm05ihf5yahSlerdLHXm/E7Snm/X4plaVJJT5OqBlfpj0qqD2TL5b9N7SWo5lUG96BE5aFli0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769162191; c=relaxed/simple;
-	bh=tx5Wz+a5TLaMtHBcpvkdAn6w2K8YSei6fIc572qMG5o=;
+	s=arc-20240116; t=1769162237; c=relaxed/simple;
+	bh=EN6X9LoKjYWwNqE6QKgNM9oNlBmr2E32Ou52785WPGE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2ntAWuzDb7RMdCrHMkIOump4BCyvp8yp0/oOjkEoZbxxqPvUmPW3UZQzMzRYJ7QZhCSOndXI7lwf3gUi9NmPqsb6kUr5HdGlH9kasTnfQq5pg6Bc8EvCkQ95+Pg0SssMC6gC2BdlN7ZH9B5mOfOo8G3qKmoMpLo6M6zFsCrgHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjDtV-00027t-MN; Fri, 23 Jan 2026 10:55:57 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjDtV-0024QO-2S;
-	Fri, 23 Jan 2026 10:55:57 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vjDtU-00AteV-3B;
-	Fri, 23 Jan 2026 10:55:56 +0100
-Date: Fri, 23 Jan 2026 10:55:56 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jens Emil Schulz =?utf-8?Q?=C3=98stergaard?= <jensemil.schulzostergaard@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYmypBeRJ0jsF0X8DyBBMqWrlnrifUbm+QLvOMuFaom7dcpJm/x+PbRQJDTeq8zFKALfkWPLmXFQSOpQE2e98wWCaAkOu65ALubMeGdETWFYddrVPLjSd50jPci9FQ+u4V8LOz+RQi/xBCaCD4HgwXpKw0mwMOl5i94JSlXMcZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=REh8jgmK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+AC/7ch07dBjpTRIT9l75rK+n+kJUZ9IIAXe4YZ5E90=; b=REh8jgmKGQyduBMK5s5o9CAA2F
+	ZiqkpdCcUWj3hKY9eh7gmLi50Qozyas94d0+KYiGp2aqp/hOsmpPX57BgttXSZ6ACv1slzIA18Pbc
+	UPLkWvOQc5KKUg6VevMZVvCjwM/zDzVYK7mvVn2qdKXui20GiZ1kkT07BHtJckVPCS0o/ZXMmdt7Y
+	xj5SL3WMHwAO1xuZ/QqX4GSF1mun42tWtJpbiZFfOUhu8FS518Ek83bWyMWajL34StkMu/vIIm+3W
+	1gOklBZq5ZlJWupv24/G0m6vDl7XNdvMIb6ANAFIB/rp7Cm7iX/cEHdx0kNXIYNlxJfs2Zqv31rZC
+	7QoSiA0A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46288)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vjDuR-000000001eh-0hS5;
+	Fri, 23 Jan 2026 09:56:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vjDuO-000000001zY-39SO;
+	Fri, 23 Jan 2026 09:56:52 +0000
+Date: Fri, 23 Jan 2026 09:56:52 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-	rsc@pengutronix.de
-Subject: Re: [PATCH net-next] net: phy: micrel: Add support for lan9645x
- internal phy
-Message-ID: <aXNFrDOdPanZ_cjk@pengutronix.de>
-References: <20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
+ inband goodies
+Message-ID: <aXNF5A2cUg5kslF9@shell.armlinux.org.uk>
+References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260123-phy_micrel_add_support_for_lan9645x_internal_phy-v1-1-8484b1a5a7fd@microchip.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,vger.kernel.org,pengutronix.de];
-	TAGGED_FROM(0.00)[bounces-252750-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252751-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,gmail.com,linaro.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.978];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.883];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pengutronix.de:url,pengutronix.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:url,microchip.com:email]
-X-Rspamd-Queue-Id: 3DBB973E15
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 5763A73E48
 X-Rspamd-Action: no action
 
-Hi Jens,
+Please note that gmail is now rejecting this patch series because it's
+spam. From now on, I will be dropping all gmail.com email addresses from
+patch series that are sent out.
 
-On Fri, Jan 23, 2026 at 08:50:55AM +0100, Jens Emil Schulz Østergaard wrote:
-> LAN9645X is a family of switch chips with 5 internal copper phys. The
-> internal PHY is based on parts of LAN8832. This is a low-power, single
-> port triple-speed (10BASE-T/100BASE-TX/1000BASE-T) ethernet physical
-> layer transceiver (PHY) that supports transmission and reception of data
-> on standard CAT-5, as well as CAT-5e and CAT-6 Unshielded Twisted
-> Pair (UTP) cables.
+If you care about Linux, stop using gmail and giving Google an excessive
+amount of power over email.
+
+On Fri, Jan 23, 2026 at 09:52:00AM +0000, Russell King (Oracle) wrote:
+> This is the v1 submission: if it doesn't get tested but review goes
+> well, it'll end up in net-next and mainline without testing on the
+> affected hardware!
 > 
-> Add support for the internal PHY of the lan9645x chip family.
-
-Looks like interesting switch for our use cases :)
-
-> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
-> Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
-> ---
->  drivers/net/phy/micrel.c   | 142 +++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/micrel_phy.h |   1 +
->  2 files changed, 143 insertions(+)
+> Mentioned previously, I've been trying to sort out the PCS support in
+> stmmac, and this series represents the current state of play.
 > 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 225d4adf28be..7f47f7987067 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -6502,6 +6502,132 @@ static void lan8842_get_phy_stats(struct phy_device *phydev,
->  	stats->tx_errors = priv->phy_stats.tx_errors;
->  }
+> Previous posted patches centred around merely getting autonegotiation
+> to be configured correctly, to a point where the manual configuration
+> can be removed from the qcom-ethqos driver. The qcom-ethqos driver
+> uses both SGMII and 2500BASE-X, manually configuring the dwmac's
+> integrated PCS appropriately.
+> 
+> This *untested* series attempts to take this further. The patches:
+> 
+> - clean up qcom-ethqos only-written mac_base member.
+> - convert qcom-ethqos to use the set_clk_tx_rate() method for setting
+>   the link clock rate.
+> - add support for phy_set_mode_ext() to the qcom "SGMII" ethernet
+>   SerDes driver (which is really only what it needs. Note that
+>   phy_set_mode_ext() is an expected call to be made, where as
+>   phy_set_speed() is optional and not. See PHY documentation.)
+> - add platform-glue independent SerDes support to the stmmac core
+>   driver. Currently, only qcom-ethqos will make use of this, and
+>   I suspect as we haven't had this, it's going to be difficult to
+>   convert other platform glue to use this - but had this existed
+>   earlier, we could've pushed people to use PHY to abstract some
+>   of the platform glue differences. Adding it now makes it available
+>   for future platform glue.
+> - convert qcom-ethqos to use this core SerDes support.
+> - arrange for stmmac_pcs.c to supply the phy_intf_sel field value
+>   if the integrated PCS will be used. (PHY_INTF_SEL_SGMII requires
+>   the integrated PCS rather than an external PCS.)
+> - add BASE-X support to the integrated PCS driver, and use it for
+>   BASE-X modes. This fully supports in-band mode, including reading
+>   the link partner advertisement.
+> - add in-band support for SGMII, reading the state from the RGSMII
+>   status field.
+> 
+> As we leave qcom-ethqos' manual configuration of the PCS in place at
+> the moment, the last patch adds reporting of any changes in its
+> configuration that the qcom-ethqos driver does beyond what phylink
+> requested, thus providing a path to debug and eventually remove
+> qcom-ethqos' manual configuration.
+> 
+> One patch is not included in this set - which adds a phy_intf_sel
+> value for external PCS (using PHY_INTF_SEL_GMII_MII). I believe all
+> external PCS use this mode when connected to a MAC capable of up to
+> 2.5G. However, no platform glue that provides the mac_select_pcs()
+> method also provide the set_phy_intf_sel() method, so we can safely
+> ignore this for now.
+> 
+> I would like to get this into net-next before the next merge window,
+> so testing would be appreciated. If there are issues with these patches
+> applied, please check whether the issue exists without these patches
+> and only report regressions caused by this patch set. For example,
+> I'm aware that qcom-ethqos has issues with 10Mbps mode due to an AQR
+> PHY being insanely provisioned to use SGMII in 1000M mode but with
+> rate matching with 10M media. This is not an issue that is relevant
+> to this patch series, but a problem with the PHY provisioning.
+> 
+> rfc->v1:
+>  - fix SGMII link status
+>  - avoid calling phy_get_mode() if PHY is null
+> v2:
+>  - fix further AI review bot dribble that could've been raised on
+>    the rfc version but wasn't.
 >  
-> +#define LAN9645X_DAC_ICAS_AMP_POWER_DOWN	0x47
-> +#define LAN9645X_BTRX_QBIAS_POWER_DOWN		0x46
-> +#define LAN9645X_TX_LOW_I_CH_CD_POWER_MGMT	0x45
-> +#define LAN9645X_TX_LOW_I_CH_B_POWER_MGMT	0x44
-> +#define LAN9645X_TX_LOW_I_CH_A_POWER_MGMT	0x43
+>  drivers/net/ethernet/stmicro/stmmac/Makefile       |   2 +-
+>  drivers/net/ethernet/stmicro/stmmac/common.h       |   1 -
+>  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  74 ++-----
+>  drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  12 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   |  11 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  10 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  10 +-
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  69 +++++--
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   | 222 +++++++++++++++++++--
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   |  53 ++---
+>  .../net/ethernet/stmicro/stmmac/stmmac_serdes.c    | 111 +++++++++++
+>  .../net/ethernet/stmicro/stmmac/stmmac_serdes.h    |  16 ++
+>  drivers/phy/qualcomm/phy-qcom-sgmii-eth.c          |  43 ++++
+>  include/linux/stmmac.h                             |   2 +
+>  14 files changed, 491 insertions(+), 145 deletions(-)
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
 
-> +static const struct lanphy_reg_data force_dac_tx_errata[] = {
-> +	/* Force channel A/B/C/D TX on */
-> +	{ LAN8814_PAGE_POWER_REGS,
-> +	  LAN9645X_DAC_ICAS_AMP_POWER_DOWN,
-> +	  0 },
-> +	/* Force channel A/B/C/D QBias on */
-> +	{ LAN8814_PAGE_POWER_REGS,
-> +	  LAN9645X_BTRX_QBIAS_POWER_DOWN,
-> +	  0xaa },
-> +	/* tx low I on channel C/D overwrite */
-> +	{ LAN8814_PAGE_POWER_REGS,
-> +	  LAN9645X_TX_LOW_I_CH_CD_POWER_MGMT,
-> +	  0xbfff },
-> +	/* channel B low I overwrite */
-> +	{ LAN8814_PAGE_POWER_REGS,
-> +	  LAN9645X_TX_LOW_I_CH_B_POWER_MGMT,
-> +	  0xabbf },
-> +	/* channel A low I overwrite */
-> +	{ LAN8814_PAGE_POWER_REGS,
-> +	  LAN9645X_TX_LOW_I_CH_A_POWER_MGMT,
-> +	  0xbd3f },
-> +};
-
-It looks like this erratum not publicly documented. At least not here:
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/LAN9645xS-LAN9645xF-Errata-DS80001187.pdf
-
-re there more information about it? Can it be described in the comment?
-
-> +
-> +static int lan9645x_config_init(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	/* Apply erratas. */
-> +	ret = lan8842_erratas(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return lanphy_write_reg_data(phydev, force_dac_tx_errata,
-> +				     ARRAY_SIZE(force_dac_tx_errata));
-> +}
-> +
-> +static int lan9645x_suspend(struct phy_device *phydev)
-> +{
-> +	int aneg_en_state, ret;
-> +
-> +	/* Software workaround from design to handle SPD. SPD will stop AFE
-> +	 * clock from AFE port, which makes the system MAC fifo unable to flush.
-> +	 * The workaround is to restart ANEG and wait for flush, before issuing
-> +	 * software power down.
-> +	 */
-> +	aneg_en_state = phy_read(phydev, MII_BMCR) & BMCR_ANENABLE;
-> +
-> +	ret = phy_restart_aneg(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Allow time for system FIFO flush data */
-> +	usleep_range(8 * USEC_PER_MSEC, 12 * USEC_PER_MSEC);
-
-MAC and PHY power management are not always fully coupled (implementation
-specific), are there other ways to sync them with each other, except of
-unconditional sleep in the PHY driver. I expect that someone making
-changes on the MAC driver may miss this nuance.
-
-Best Regards,
-Oleksij
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
