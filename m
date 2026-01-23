@@ -1,71 +1,73 @@
-Return-Path: <netdev+bounces-252913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOHKM5O4c2n/yAAAu9opvQ
-	(envelope-from <netdev+bounces-252913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:06:11 +0100
+	id EA5UC9m4c2n/yAAAu9opvQ
+	(envelope-from <netdev+bounces-252914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:07:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590E879597
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:06:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E729795C6
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 19:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96D243056151
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:04:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBFEC30A437D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC69218AAD;
-	Fri, 23 Jan 2026 18:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05C526E173;
+	Fri, 23 Jan 2026 18:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfysU7OV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dw3YL1b4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6419992C;
-	Fri, 23 Jan 2026 18:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B26C156C6A;
+	Fri, 23 Jan 2026 18:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769191459; cv=none; b=CmZAYUGPkNLF02dUdH6mMz9gwdzB8yMCQpNTooch9BU97vF50eGzoz1o2u0m2I86OZqvSxUVesenDlOmKrcx3JyR4LL0RdoyySu5rB3nede3NGK643XnB5YGDLnROHTfb45hJkLLgsL8s93d3p3Hm6fLjpoV2rDF3gxAzIla1Nk=
+	t=1769191495; cv=none; b=oZQydL6dMprk2sbu7N4MWRBmToTSi3G8xsgEWwkWGty5nhQPdizRq8gh3GvMT2Tcj0VfTD1b90aG5z+kLg+fuiKjxmcFwdt9k+LfyXzQKZcji0oNHU7ku3tqP820lj0Gud1o0/27qA1mxibtoNz2yF4ZUrpfVS3BFMNKPrf6lZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769191459; c=relaxed/simple;
-	bh=DwUaUSIkk8Rk3K76xtfMFmWSJFuLEL3bEOAlwXfFTvU=;
+	s=arc-20240116; t=1769191495; c=relaxed/simple;
+	bh=0DvNaXsBMKsLBkqZft0cqd9Fzf0jP09zTVPIXy7A82Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fXg8OTJRaH1nXfRtzLVKQyf1l+ju/M7rTGUalhigHmkk8Zt9XL6RKTN++imJz0tnAJHjkJBoTwSCf98l1sXfxmrjs+XlJv/ORuqSUcm7Z2+5Wd5dhPerYZcuGjoWZRkAOXrjgqG/HkBk8/VsyEcml1DpHe5lVeoikp5m9suqPTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfysU7OV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC561C4CEF1;
-	Fri, 23 Jan 2026 18:04:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=L13qBUZxwvhRi4uPwo/cUTezGHPhC8HZ1mA32UU7jh/5SmxzGa4rG9YQoNngehZ3Ncd548+QyxTG1X7pKY34/UqmOslBwvytX/FeLci7dC0q0tm0hUuj7fWZnKT0f3Lutf/cnc/gPRS90jKWGgUva5qcrlSMim6/uNDyVU3WWTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dw3YL1b4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72716C4CEF1;
+	Fri, 23 Jan 2026 18:04:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769191458;
-	bh=DwUaUSIkk8Rk3K76xtfMFmWSJFuLEL3bEOAlwXfFTvU=;
+	s=k20201202; t=1769191495;
+	bh=0DvNaXsBMKsLBkqZft0cqd9Fzf0jP09zTVPIXy7A82Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kfysU7OVtpu7IiMpjoPtw17RAUrmRcCOvnRVGqvXuBCT+rmbqiSuKMV8GbGVeyoMw
-	 FFz1WP6DHANklyged8BFGWvSuqlai24fd28saB4CyP47d4kWhjdDiv/pYyQjwi/jJ1
-	 hBIvmhnUwwyxUHIsLjSVmmMgD0xdev+N0EXsVV7xpZw09upScww/utR/dNdUcg8uhr
-	 DrPEx70BZMfYRQq8xPLMYxovFsDV8SVrl3Q+pr//qezhpJsHAfS0MY0AGnEwqPVfQ5
-	 ILwIEhltWeME9hvtec6SffWW2wdP0UBK+sUfeFBFM5FWfqqx+c3MExlPFJrBGSHzy2
-	 Ppp5XvJYvsOPg==
-Date: Fri, 23 Jan 2026 18:04:12 +0000
+	b=dw3YL1b4wRL0gdmgXTHfy275iYbUQUxqlxtSSSygZ+j2gf0OINHEbN351xA3Ob0mJ
+	 XW/2t3eZNrkwIEAWj96KY6Cw9L+EqDtPezRJPJjacGPT69rkq7oO/DzRp7hGf9YFA9
+	 JyDnqzyZeTVFa9Q0c/dOfKJC7b/ymlhz7pUZIiNaIdaFCThb3TfCdbEyCJsoIH0lFe
+	 dmqO/vRYoqce7mCECBwS/q4p4p1YuaXi/lO8TLtnCe/kW3yorCoTaRqXqejwPWVo1m
+	 XJWi1LGt9yI4yVBAULOtYqRoXjcVHoALzN6j+O0KKxsTfDt6RfMsaZfmgtM4bxFddW
+	 YaWjnc5CpBkcw==
+Date: Fri, 23 Jan 2026 18:04:47 +0000
 From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	pmladek@suse.com, john.ogness@linutronix.de,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
-	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
-	mpdesouza@suse.com, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 3/5] netconsole: convert to NBCON console
- infrastructure
-Message-ID: <aXO4HBMEGwekTtlQ@horms.kernel.org>
-References: <20260120-nbcon-v2-0-b61f960587a8@debian.org>
- <20260120-nbcon-v2-3-b61f960587a8@debian.org>
- <aXKSDoi8Yue_Ghxj@horms.kernel.org>
- <aXNRR7dQHZ7bN2mS@gmail.com>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, conor+dt@kernel.org, poros@redhat.com,
+	anthony.l.nguyen@intel.com, linux-rdma@vger.kernel.org,
+	tariqt@nvidia.com, robh@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, aleksander.lobakin@intel.com,
+	mbloch@nvidia.com, jiri@resnulli.us, Prathosh.Satish@microchip.com,
+	krzk+dt@kernel.org, saeedm@nvidia.com, devicetree@vger.kernel.org,
+	davem@davemloft.net, pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com, arkadiusz.kubalewski@intel.com,
+	jonathan.lemon@gmail.com, saravanak@kernel.org,
+	aleksandr.loktionov@intel.com, mschmidt@redhat.com,
+	edumazet@google.com, leon@kernel.org, vadim.fedorenko@linux.dev,
+	grzegorz.nitka@intel.com, intel-wired-lan@lists.osuosl.org,
+	richardcochran@gmail.com, andrew+netdev@lunn.ch
+Subject: Re: [net-next,v2,08/12] dpll: Enhance and consolidate reference
+ counting logic
+Message-ID: <aXO4PzKrud1h3uYL@horms.kernel.org>
+References: <20260116184610.147591-9-ivecera@redhat.com>
+ <20260121001650.1904392-2-kuba@kernel.org>
+ <f676c151-e871-4b2e-83f6-6d62bc146337@redhat.com>
+ <aXOMiAhf-NdQTonz@horms.kernel.org>
+ <6da98781-9cf2-4756-a6b1-89cc650c9bce@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,107 +76,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXNRR7dQHZ7bN2mS@gmail.com>
+In-Reply-To: <6da98781-9cf2-4756-a6b1-89cc650c9bce@redhat.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252913-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252914-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,intel.com,vger.kernel.org,nvidia.com,resnulli.us,microchip.com,davemloft.net,gmail.com,google.com,linux.dev,lists.osuosl.org,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[32];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	NEURAL_HAM(-0.00)[-0.991];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 590E879597
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8E729795C6
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 02:48:47AM -0800, Breno Leitao wrote:
-> Hello Simon!
-> 
-> On Thu, Jan 22, 2026 at 09:09:34PM +0000, Simon Horman wrote:
-> > On Tue, Jan 20, 2026 at 08:23:49AM -0800, Breno Leitao wrote:
-> > > Convert netconsole from the legacy console API to the NBCON framework.
-> > > NBCON provides threaded printing which unblocks printk()s and flushes in
-> > > a thread, decoupling network TX from printk() when netconsole is
-> > > in use.
-> > > 
-> > > Since netconsole relies on the network stack which cannot safely operate
-> > > from all atomic contexts, mark both consoles with
-> > > CON_NBCON_ATOMIC_UNSAFE. (See discussion in [1])
-> > > 
-> > > CON_NBCON_ATOMIC_UNSAFE restricts write_atomic() usage to emergency
-> > > scenarios (panic) where regular messages are sent in threaded mode.
-> > > 
-> > > Implementation changes:
-> > > - Unify write_ext_msg() and write_msg() into netconsole_write()
-> > > - Add device_lock/device_unlock callbacks to manage target_list_lock
-> > > - Use nbcon_enter_unsafe()/nbcon_exit_unsafe() around network
-> > >   operations.
-> > >   - If nbcon_enter_unsafe() fails, just return given netconsole lost
-> > >     the ownership of the console.
-> > > - Set write_thread and write_atomic callbacks (both use same function)
-> > > 
-> > > Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > ---
-> > >  drivers/net/netconsole.c | 97 ++++++++++++++++++++++++++++++------------------
-> > >  1 file changed, 60 insertions(+), 37 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+On Fri, Jan 23, 2026 at 04:27:21PM +0100, Ivan Vecera wrote:
+> On 1/23/26 3:58 PM, Simon Horman wrote:
+> > On Wed, Jan 21, 2026 at 09:18:02AM +0100, Ivan Vecera wrote:
+> > > On 1/21/26 1:16 AM, Jakub Kicinski wrote:
+> > > > This is an AI-generated review of your patch.
+> > > > 
+> > > > Dunno if there's a reason for having this fixed by a later patch,
+> > > > if not let's fix. I'm sending the review mostly because of the
+> > > > comments on patch 12.
+> > > Will reorder these patches... Maybe it would be better to send patch 9
+> > > separately to net as this is the fix for the bug we found during
+> > > development of this series.
 > > 
-> > ...
+> > Hi Ivan,
 > > 
-> > > +static void netconsole_device_lock(struct console *con __always_unused,
-> > > +				   unsigned long *flags)
-> > > +{
-> > > +	spin_lock_irqsave(&target_list_lock, *flags);
-> > > +}
-> > > +
-> > > +static void netconsole_device_unlock(struct console *con __always_unused,
-> > > +				     unsigned long flags)
-> > > +{
-> > >  	spin_unlock_irqrestore(&target_list_lock, flags);
-> > >  }
-> > >  
+> > If it is a but in net, then yes, that sounds like a good idea to me.
 > > 
-> > Hi Breno,
+> > Please include a Fixes tag if you take that route.
 > > 
-> > I'm wondering if we could consider the following annotations,
-> > as "suggested" by Sparse[1].
+> Yes, it was submitted to net with Fixes and recently merged as
 > 
-> This is great. I hadn't realized that Al Viro's sparse tree includes this
-> additional check, which is really useful.
-> 
-> Are you using Al Viro's branch rather than the sparse mainline?
-> 
-> (I'm asking to see if I should also follow master and do the same, in
-> true padawan fashion)
+> https://git.kernel.org/netdev/net/c/f3ddbaaaaf4d
 
-Well, I think it would be best if mainline was fixed.
-(Although I am yet to do anything towards making that happen.)
-
-But to answer your question, yes, I am using Al's tree.
-Since a few days ago when I tracked down that it allows
-Sparse to once work significantly more robustly on the
-current Kernel tree.
+Thanks, sorry for missing that earlier.
 
