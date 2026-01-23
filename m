@@ -1,216 +1,235 @@
-Return-Path: <netdev+bounces-252818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Dn9I4tYc2nruwAAu9opvQ
-	(envelope-from <netdev+bounces-252818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:16:27 +0100
+	id IHJfBGdbc2l3vAAAu9opvQ
+	(envelope-from <netdev+bounces-252819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:28:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C25474E80
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:16:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F60274FCB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA618301C11B
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:16:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16C1E301A70E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93595287256;
-	Fri, 23 Jan 2026 11:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U/AMaCQj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5967D30F959;
+	Fri, 23 Jan 2026 11:28:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B73B2E414
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A53630E0F8
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769166968; cv=none; b=ALR59VuyD+SyzTZ4V/wc2T7X14kb7ic6zzlaun8QPydvqEbrq4wQufsaViNPM/NiW5qXHrw9BkDFXvDYccN0TUkHjAfI/07X1G6LaIpRzzsa5sTHeWFtGrhor015h2Zvnzb2lsU5wdGsin7Y1UwDBFuP63xkbXz2Av1KWjK+q4c=
+	t=1769167708; cv=none; b=VqZtoR1G3VH7SF7XGJ8yvOEWOXMnWLVnZpR22TKgb9EF0wC6Xt/JRSTqj7Unusoz9Bm28EVKQBJngICJX1JASRk6ATTDkGs6e8XVTNzVct3GMYYRIxPgM7vWbEb/NZM+o/g7DRjnKO8lj4mAIR78Fr8vy1R0AweULxI4jX2RriI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769166968; c=relaxed/simple;
-	bh=N/CY6pJq1G36Er6zYIOpAVeB0TOP9GZ5Gx3dfPRc3t4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rOjG4vCN1uHoKWmlHov/JYAUUWcSzjdF6n3u29cGJT7UZNi7XL/q8eKqRiw2Iuya7qgt2u93mMrCR4nGiM25zvLdfVCENeKeaDLxnGBjYnvKj0QiV/9al1bGf7yvwZ0dl0wNZDnKk3Qta4CKsftq45N0oiMbYsSrGAXb5mjlVqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U/AMaCQj; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88a344b86f7so68336346d6.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 03:16:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769166966; x=1769771766; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ixxU3s7qaKIpU1ooiYPj/OAlbfzL9VIdLbuXGZLihXs=;
-        b=U/AMaCQjBFSDYF2X2wcDE+r8Jfl9nHnXpQlagd13veenXQcXL/7TDfG3k18m6rDem8
-         yF624zUXETnAlbpekn+PQGWlEg9r0Z66IQdTC8g6idzPximaHsD0JaZ6brQ5CjagwvGS
-         SQ0Kb6fWnHVYdSdicXOYGHxYVBCJyY8obtkdJZUmpyJD4P4G4pz8ekDsjwXrYe/Pki8b
-         3WFY/R0Qm2Hjo1IDHGIepwqA2HGleWnCfjaKYWMvANduD3bvW5vIeuDVfw5JXoX8Qne8
-         wYp3hYtmxnTsdG1MvwYGnE5Msd7M/auIKKtBIci+LC8dmEYyCG90gDHmjxsP+Ahv3fLx
-         qKBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769166966; x=1769771766;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ixxU3s7qaKIpU1ooiYPj/OAlbfzL9VIdLbuXGZLihXs=;
-        b=Fu7S/6/fsG+HzuDJilA9wzR8/Jqtl5NCy9dodqB5u84K9xVYeqIf7se+U9A09hfGxM
-         oBQA6wzQyvLm9FYrADhnkTpV031XUuW3Pnz3Zv1duGMgB+uCOyf0i3zIcr0Iqgfl6k7x
-         Lvrp36wYE0AzcVOX3EgefqcrLOhtTzHsUhfnBTvANXYMVzRMukRg3Ey+B2vh3qcgzV9t
-         V9p9P7VBi8nwAkvBumGpeKQdCd+Js8p7KB91lIayRvapHx2K9CZqNKV404Cf+/m7BRuJ
-         4oKUWEKj4F5Y/tchMxnLZUOQ7Fej+gI/4CTA1JR5AbC/kbm+iRIR5o5z+xQP4W+H/bI0
-         +uGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVl89mtuZJfl3iTFKag4nPiEYGPbdydgbnP89qQrvY2aYBZX83BUim9hQJDhV1GjfDeIDwRY7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg16whvehwCRuZYyn6lwQywJn+60FEW2cZaxPLGQDtBhBO5RR7
-	yoL1A/bnWbuxVb36lL+mMlK2UdHfqFuFTwYz82scSGU0+tzdqlqllD4ceWliMj1KMn3+Qw8agt5
-	VXB8/BeuaU1A5lA==
-X-Received: from qvbma18.prod.google.com ([2002:a05:6214:5b12:b0:894:9755:2a7f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:2685:b0:88f:ccba:8f20 with SMTP id 6a1803df08f44-894982db3d2mr6710416d6.48.1769166966058;
- Fri, 23 Jan 2026 03:16:06 -0800 (PST)
-Date: Fri, 23 Jan 2026 11:16:05 +0000
+	s=arc-20240116; t=1769167708; c=relaxed/simple;
+	bh=FTfzdvpE37StflINhMfOPnWam4Xp+bqcOqussm0o85E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sza0kDMwxqRf7UXLnFQ+Y7CsM+N+QbcNo2YdZzAN14jvbU6vzMW2Kp3hz1FNunlsF0oS78ZtSnYxftOSKT82cf4hqXMI7Kzc3R1qlreBF0l00EHXialJYO3GIAEmcKv8zhBHqqjIXcC3nNLDvWzuOZ/kiA3b0dUzgYnGroL65lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjFKr-0007fq-Es; Fri, 23 Jan 2026 12:28:17 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjFKo-0025BR-2X;
+	Fri, 23 Jan 2026 12:28:14 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vjFKn-00Auhu-3A;
+	Fri, 23 Jan 2026 12:28:13 +0100
+Date: Fri, 23 Jan 2026 12:28:13 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, alok.a.tiwari@oracle.com,
+	andrew+netdev@lunn.ch, andrew@lunn.ch, chuck.lever@oracle.com,
+	davem@davemloft.net, donald.hunter@gmail.com, edumazet@google.com,
+	gal@nvidia.com, horms@kernel.org, idosch@nvidia.com,
+	jacob.e.keller@intel.com, kernel-team@meta.com,
+	kory.maincent@bootlin.com, kuba@kernel.org, lee@trager.us,
+	pabeni@redhat.com, vadim.fedorenko@linux.dev, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 0/3] net: ethtool: Track TX pause storm
+Message-ID: <aXNbTVF5KNz1yV-1@pengutronix.de>
+References: <20260122192158.428882-1-mohsin.bashr@gmail.com>
+ <aXNAjOjkCqOESf5y@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260123111605.4089200-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: move sk_forced_mem_schedule() to tcp.c
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aXNAjOjkCqOESf5y@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252819-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,nvidia.com,kernel.org,intel.com,meta.com,bootlin.com,trager.us,redhat.com,linux.dev,pengutronix.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DMARC_NA(0.00)[pengutronix.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252818-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.987];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0C25474E80
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8F60274FCB
 X-Rspamd-Action: no action
 
-TCP fast path can (auto)inline this helper, instead
-of (auto)inling it from tcp_send_fin().
+Here is a TL;DR summary of my questions regarding the pause storm logic
+:)
 
-No change of overall code size, but tcp_sendmsg() is faster.
+- Does the 500ms hardware timer reset on "flapping" pause signals? If so,
+  a stuttering storm might still crash the link partner (tx watchdog
+  timeout).
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/0 grow/shrink: 1/1 up/down: 141/-140 (1)
-Function                                     old     new   delta
-tcp_stream_alloc_skb                         216     357    +141
-tcp_send_fin                                 688     548    -140
-Total: Before=22236729, After=22236730, chg +0.00%
+- The auto-recovery (service task) enforces a fixed policy. Can we make
+  this configurable? I used devlink health (.recover) to let userspace
+  decide between auto-reset or manual intervention.
 
-BTW, we might change tcp_send_fin() to use tcp_stream_alloc_skb().
+- Should we standardize an "RX Watchdog" mechanism in the core instead of
+  or in addition to driver-specific stats?
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp.c        | 27 +++++++++++++++++++++++++++
- net/ipv4/tcp_output.c | 27 ---------------------------
- 2 files changed, 27 insertions(+), 27 deletions(-)
+- If main case where we will run in to tx pause storm is OS crash, what
+  instance will be able to read this stats? Are they preserved on reboot
+  or kexec?
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 148cdf3cd6233add37ea52e273cb4fb3e75fcbcb..87acd01274601eca799e42b8f895fff4c35cf25a 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -902,6 +902,33 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
- }
- EXPORT_IPV6_MOD(tcp_splice_read);
- 
-+/* We allow to exceed memory limits for FIN packets to expedite
-+ * connection tear down and (memory) recovery.
-+ * Otherwise tcp_send_fin() could be tempted to either delay FIN
-+ * or even be forced to close flow without any FIN.
-+ * In general, we want to allow one skb per socket to avoid hangs
-+ * with edge trigger epoll()
-+ */
-+void sk_forced_mem_schedule(struct sock *sk, int size)
-+{
-+	int delta, amt;
-+
-+	delta = size - sk->sk_forward_alloc;
-+	if (delta <= 0)
-+		return;
-+
-+	amt = sk_mem_pages(delta);
-+	sk_forward_alloc_add(sk, amt << PAGE_SHIFT);
-+
-+	if (mem_cgroup_sk_enabled(sk))
-+		mem_cgroup_sk_charge(sk, amt, gfp_memcg_charge() | __GFP_NOFAIL);
-+
-+	if (sk->sk_bypass_prot_mem)
-+		return;
-+
-+	sk_memory_allocated_add(sk, amt);
-+}
-+
- struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
- 				     bool force_schedule)
- {
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 256b669e8d3b4a4d191e61e79784e412aaef8965..597e888af36d8697cd696964077b423e79fdb83e 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3767,33 +3767,6 @@ void tcp_xmit_retransmit_queue(struct sock *sk)
- 				     inet_csk(sk)->icsk_rto, true);
- }
- 
--/* We allow to exceed memory limits for FIN packets to expedite
-- * connection tear down and (memory) recovery.
-- * Otherwise tcp_send_fin() could be tempted to either delay FIN
-- * or even be forced to close flow without any FIN.
-- * In general, we want to allow one skb per socket to avoid hangs
-- * with edge trigger epoll()
-- */
--void sk_forced_mem_schedule(struct sock *sk, int size)
--{
--	int delta, amt;
--
--	delta = size - sk->sk_forward_alloc;
--	if (delta <= 0)
--		return;
--
--	amt = sk_mem_pages(delta);
--	sk_forward_alloc_add(sk, amt << PAGE_SHIFT);
--
--	if (mem_cgroup_sk_enabled(sk))
--		mem_cgroup_sk_charge(sk, amt, gfp_memcg_charge() | __GFP_NOFAIL);
--
--	if (sk->sk_bypass_prot_mem)
--		return;
--
--	sk_memory_allocated_add(sk, amt);
--}
--
- /* Send a FIN. The caller locks the socket for us.
-  * We should try to send a FIN packet really hard, but eventually give up.
-  */
+On Fri, Jan 23, 2026 at 10:34:04AM +0100, Oleksij Rempel wrote:
+> Hi Mohsin, hi Jakub!
+> 
+> On Thu, Jan 22, 2026 at 11:21:55AM -0800, Mohsin Bashir wrote:
+> > With TX pause enabled, if a device cannot deliver received frames to
+> > the stack (e.g., during a system hang), it may generate excessive pause
+> > frames causing a pause storm. This series updates the uAPI to track TX
+> > pause storm events as part of the pause stats (p1), adds pause storm
+> > protection support for fbnic (p2), and leverages p1 to provide
+> > observability into these events for fbnic (p3).
+> > 
+> > Mohsin Bashir (3):
+> >   net: ethtool: Track pause storm events
+> >   eth: fbnic: Add protection against pause storm
+> >   eth: fbnic: Fetch TX pause storm stats
+> > 
+>  
+> Very interesting series! Before the Christmas break, I started looking into a
+> similar issue on different hardware (LAN78xx USB Ethernet), which has counters
+> but no automatic pause storm mitigation in silicon. For reference, here is the
+> RFC patch set I'm working on:
+> https://lore.kernel.org/all/20260123090741.1566469-1-o.rempel@pengutronix.de/
+> 
+> In my implementation, I added the detection logic to the driver but exposed it
+> via the devlink health interface.
+> 
+> I have a few questions regarding the definitions and the architectural approach
+> here.
+> 
+> -  Definition of "Pause Storm"
+> 
+> It seems fbnic defines a storm as a continuous assertion of the pause signal
+> (duration-based). The code defines FBNIC_RXB_PAUSE_STORM_UNIT_WR with a 10us
+> granularity and a 500ms threshold.
+> 
+> Does this hardware detector handle "flapping" (high rate of distinct pause
+> frames) or is it strictly for a stuck-high condition (deadlock/hang)? If the RX
+> queue drains slightly and fills up again every 100ms, does the internal timer
+> reset? If so, a "stuttering" storm might bypass this protection. Except the
+> primary goal of this feature is to prevent the link partner's TX watchdog from
+> firing (saving the neighbor from a reset).
+> 
+> - Policy and Tunability
+> 
+> The current implementation enforces an auto-recovery policy that is invisible
+> to userspace. By resetting the storm protection in fbnic_service_task (runs
+> every 1s), you effectively enforce a ~50% duty cycle on a hung system.
+> 
+> Since this logic decides when to stop flow control and start dropping packets,
+> shouldn't these thresholds be configurable?
+> 
+> I understand that in a complete OS crash, software cannot intervene, and we
+> rely entirely on the hardware's 500ms safety breaker. However, for partial
+> stalls (livelocks, soft lockups) where the service task might still run, the
+> hardcoded "force normal" policy might not be ideal.
+> 
+> Furthermore, having the ability to disable auto-recovery is critical for
+> testing. If we want to develop/validate a driver for the link partner that
+> detects incoming pause storms, we need a way to generate a sustained storm from
+> this device without the safety breaker constantly resetting it. A "controllable
+> reference" is very valuable here.
+> 
+> In my LAN78xx work, I used the devlink reporter's .recover callback. This lets
+> userspace control the policy (devlink health set ... recover
+> true/false) - determining whether the driver should auto-reset the MAC/PHY or
+> wait for manual intervention. Baking the "force normal" logic into the service
+> task removes this control.
+> 
+> Architecture:
+> 
+> This feels very similar to the existing ndo_tx_timeout watchdog, but for the RX
+> side. We are essentially trying to handle an "RX Timeout" or "RX Stall" where
+> the device cannot push packets to the host.
+> 
+> I assume the 500ms hardware threshold is specifically chosen to be well below
+> the standard 5-second ndo_tx_timeout of link partners, preventing a hung node
+> from causing watchdog resets on its neighbors. I've observed cases where
+> triggering a full ndo_tx_timeout reset on a stalled device leaves the hardware
+> in a partially reconfigured "zombie" state, unable to receive anything
+> thereafter. 
+> 
+> Did you consider if we should approach this as a central networking mechanism
+> (an "RX Watchdog")?  I am debating this for my own driver:
+> 
+> - Option A: Export needed metrics/events to userspace (Devlink/Ethtool) and let
+>   a userspace agent decide when to reset.
+> 
+> - Option B: Handle it entirely in the kernel (like this patch), but potentially
+>   standardize the "RX Stall" behavior so we don't end up with different
+>   heuristics in every driver.
+> 
+> Best Regards,
+> Oleksij
+> -- 
+> Pengutronix e.K.                           |                             |
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
 -- 
-2.52.0.457.g6b5491de43-goog
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
