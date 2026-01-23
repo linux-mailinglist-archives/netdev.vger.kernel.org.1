@@ -1,220 +1,140 @@
-Return-Path: <netdev+bounces-252724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252725-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sD3LGZo9c2kztgAAu9opvQ
-	(envelope-from <netdev+bounces-252724-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:21:30 +0100
+	id oHjZDTY+c2kztgAAu9opvQ
+	(envelope-from <netdev+bounces-252725-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:24:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B374732B4
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:21:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59AA9733A6
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:24:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D6D8830080AB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:21:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7416F3002D2A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2786D32B9A6;
-	Fri, 23 Jan 2026 09:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDAC3385AB;
+	Fri, 23 Jan 2026 09:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jlm/mnyR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XPSvDxTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F6E3164D3
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249FC23BD02
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769160084; cv=none; b=WtHyYVuh8vDrUD7s8KmwRNWOi2A3Ygsy/jFbYFZDtRtKENvyt2vym49qMUcK2MNgOt7SkQS465JBm4kR6c/ILxg3c45RV40TNXSG/oJKC1M6eSyQWXkQ2ffw8mD2QabmoXD3ZFoG75xcRN3FLoiX6TwCFnkEIFWaOTHFmJaEKa8=
+	t=1769160184; cv=none; b=AzawUul+pmFdjkozF2Z6B0MYAneDvKcoGDL5ZEXdiIcGE1iY/2JaVYs+ZxLuAdMqoeNUApAJQ5lVo+v4rH4F362cWv6Zcmzkov+RweUuTCf/KnuuLn0BvbsStPfTVSHwS7q/qaMwDcUN63JeMYX/k/S+3rlQEj/b65j4IRpv1yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769160084; c=relaxed/simple;
-	bh=/qBBaxWhukWs4qJg+J65MwAsyajsVQ45yyS5jCwBNIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LzkWWHzG9xErgAstfgpK3rFf2ba6vKIlYtYs33C3ItBEzS5KMYl0I6Z5xD7pwjEvI7DgdjqckvF1JQmxogONDYCncT6PIsECIjIddjoEkAvMn9yQAi7bKluuiiqdwxVuuy2VFCcFoWYDfqDofSxpNHQ2ixyn3uR4Bl9uXZx7PNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jlm/mnyR; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769160079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ie5xJzmkxgG8lABACs468KKiagQngHba9qY5Hp3s314=;
-	b=jlm/mnyRCmcsgiGagpUpgQ4MBZmziSqt6uQfpWP8SmNqjWD3De58XH7O8A/zaaOci5pEQE
-	25DRGUR5DWUqw/xMMK+bynuy92kLBQ5l9cIXRrqHVS6X2B0+wRBMUgVIV0CSUekzYcDAx9
-	635MTGLq1jYF/120nlROHPmByeg7C2c=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
-Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
- clm@meta.com, ihor.solodrai@linux.dev
-Subject:
- Re: [PATCH bpf-next v11 02/12] bpf: use the least significant byte for the
- nr_args in trampoline
-Date: Fri, 23 Jan 2026 17:21:06 +0800
-Message-ID: <8632406.T7Z3S40VBb@7940hx>
-In-Reply-To: <2250332.irdbgypaU6@7940hx>
-References:
- <20260123073532.238985-3-dongml2@chinatelecom.cn>
- <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
- <2250332.irdbgypaU6@7940hx>
+	s=arc-20240116; t=1769160184; c=relaxed/simple;
+	bh=SFuj7UPcIBvbQbc0W8dyiHCo45ikyzlOEDjAkKhZt58=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMlO37VLrTtqlMJeL0DRNTd6+k8JoR3jFmMv9yPrXlXbzY2odA9kZQDsbaVKIOmlDgkQ4dbxFeL/T0haoRTQJvbNvIZ1dPi4ccAqoN5BstltbCzNn+4HWFq719FO9OOoMeJlvAaAsIMuanGDgsEIXTVxmbpqiHsE8Jr4eKmaLKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XPSvDxTu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iylHYQC7bypzUMsUMKe8ERFGYjxfve+NR6YW7zkm7W4=; b=XPSvDxTuNyXc1gSKQwWzz4qNIa
+	NAvfOLOxY1DGQgwHOwLLh5b78qlm/Aufd7/PvX52FUVf2LmBMUla32Ztvf9Xr5LynyAPt0f8AIaBl
+	rwn46EL6+yHp0+RAyXpYcGnjKuNTA7ryJK198GAX6BaGykyE8omeSPPX3vwBC+HAahjtbuNwEALUE
+	NWcBOulen0dW5Xx7fBDxcablmqMEYz8/A2jkHUa8f7LUiuC7wJ6BKDL+lSQarfdBX1H4YtUAkGIP8
+	+MRh8bAI+kSPO1MFO481KMPYpBJJy9h9klMGZPLydrB+SnDMHmJGhu0/2Tj2clmQbBnov4mQTODMn
+	oZUW2sQw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38210)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vjDNV-000000001X1-1xng;
+	Fri, 23 Jan 2026 09:22:53 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vjDNQ-000000001yI-1Qye;
+	Fri, 23 Jan 2026 09:22:48 +0000
+Date: Fri, 23 Jan 2026 09:22:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: make PHY fixup support always built-in
+Message-ID: <aXM96CNzkiSIPukf@shell.armlinux.org.uk>
+References: <800595c6-496a-443e-92e3-37251195e610@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <800595c6-496a-443e-92e3-37251195e610@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	CTE_CASE(0.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-252725-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252724-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.985];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5B374732B4
+	NEURAL_HAM(-0.00)[-0.983];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 59AA9733A6
 X-Rspamd-Action: no action
 
-On 2026/1/23 16:29 Menglong Dong <menglong.dong@linux.dev> write:
-> On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
-> > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > index 41bbed6418b5..b3f912ad18ba 100644
-> > > --- a/kernel/bpf/verifier.c
-> > > +++ b/kernel/bpf/verifier.c
-> > 
-> > [ ... ]
-> > 
-> > > @@ -23779,12 +23781,13 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
-> > >  			    eatype == BPF_MODIFY_RETURN) {
-> > >  				/* Load nr_args from ctx - 8 */
-> > >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-> > > -				insn_buf[1] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
-> > > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-> > > +				insn_buf[2] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
-> > 
-> > [ ... ]
-> > 
-> > > -				cnt = 6;
-> > > +				cnt = 7;
-> > >  			} else {
-> > >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, -EOPNOTSUPP);
-> > >  				cnt = 1;
-> > >  			}
-> > >
-> > >  			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
-> > 
-> > [ ... ]
-> > 
-> > > 			delta    += cnt - 1;
-> > 
-> > Note that the bpf_get_func_ret block above correctly updates delta after
-> > patching.
-> > 
-> > > @@ -23808,12 +23811,15 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
-> > >
-> > >  				/* skip 'void *__data' in btf_trace_##name() and save to reg0 */
-> > >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, nr_args - 1);
-> > > +				cnt = 1;
-> > >  			} else {
-> > >  				/* Load nr_args from ctx - 8 */
-> > >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-> > > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-> > > +				cnt = 2;
-> > >  			}
-> > >
-> > > -			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, 1);
-> > > +			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
-> > >  			if (!new_prog)
-> > >  				return -ENOMEM;
-> > >
-> > >  			env->prog = prog = new_prog;
-> > >  			insn      = new_prog->insnsi + i + delta;
-> > >  			goto next_insn;
-> > >  		}
-> > 
-> > Should there be a "delta += cnt - 1;" before assigning env->prog in this
-> > bpf_get_func_arg_cnt block? When cnt is 2 (non-RAW_TP path), the program
-> > grows by one instruction, but delta is not updated. This could cause
-> > subsequent bpf_patch_insn_data() calls to use incorrect offsets.
-> > 
-> > The bpf_get_func_arg block at the beginning of this patch has:
-> > 
-> >     delta    += cnt - 1;
-> >     env->prog = prog = new_prog;
-> > 
-> > And the bpf_get_func_ret block similarly has delta updated. But this
-> > bpf_get_func_arg_cnt block goes directly to env->prog assignment without
-> > updating delta.
+On Fri, Jan 23, 2026 at 07:50:20AM +0100, Heiner Kallweit wrote:
+> PHY fixup registration is used from platform code in init phase only.
+> Let's move the PHY fixup code from the modular part of phylib to the
+> always built-in part of phylib. This allows to annotate the fixup
+> registration as __init.
 > 
-> Ah, good point, I think this is a valid problem. The selftests didn't cover
-> this case, and I think I'd better to use bpf_get_func_arg() and bpf_get_func_ret()
-> in the exit path of fsession to cover it.
+> phy_needs_fixup() and phy_scan_fixups() wouldn't have to be moved to
+> the built-in part of phylib. But doing so allows to fully factor out
+> fixup support into its own source code file, and make struct
+> phy_fixup and phy_fixup_list strictly private to phy_fixup.c.
+> 
+> phy_scan_fixups() is used after init phase only, then phy_fixup_list
+> is read-only. So we don't need the mutex when accessing the list.
+> Also when registering PHY fixups the mutex isn't needed, because
+> fixup registration is done sequentially from platform init code.
+> Actually there is only one platform with more than one fixup.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Oh, the problem doesn't have much impact. The only impact
-is that the verifier will check the "r0 &= 0xFF" instruction redundantly.
+What is broken today that needs this change, and why haven't we had
+reports of breakage?
 
-I'll see if there is more comment before I send next version.
-
-Thanks!
-Menglong Dong
-
-> 
-> Will fix it in the next version.
-> 
-> Thanks!
-> Menglong Dong
-> 
-> > 
-> > 
-> > ---
-> > AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> > See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> > 
-> > CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
-> > 
-> 
-> 
-> 
-> 
-> 
-> 
-
-
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
