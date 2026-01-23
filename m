@@ -1,120 +1,218 @@
-Return-Path: <netdev+bounces-252885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4+82L7ulc2lnxwAAu9opvQ
-	(envelope-from <netdev+bounces-252885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:45:47 +0100
+	id yDYuFPmpc2nOxwAAu9opvQ
+	(envelope-from <netdev+bounces-252889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:03:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18223789C9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:45:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C2E78C20
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 18:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 780D13011C46
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 16:45:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA02930398AC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 17:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF78E21B905;
-	Fri, 23 Jan 2026 16:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3079C28B7DB;
+	Fri, 23 Jan 2026 17:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBBQIoRz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eubQEOwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD00B201278
-	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 16:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5DD285CBA
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769186744; cv=none; b=LxKSrA9dhj86v7SsSmdlE2rkBgMPdC7mC3mzhuTI8dvbdAWxdK9plYh4Qtyl+R8UuK6+MsXrf4dsohdB6fQerteMHR3wkSoLvN97Q8XDeJJZxsOUaUYBRejBq7X88kkxubjnKIpaUzT8wL5Vs2Tdl5IK6dfHQjPERwqEq3HSIXk=
+	t=1769187806; cv=none; b=iSfA6q5I2zhQf3BWmKHvYEd16jN0a7YaV1BhaXfdaacyWz2k5SUOZqBvORZ3fPp6XGX8djGCpEgR+k7+xmozL0Ad6vYzd2XWA5P2i8XElzl787yY76r7AQG9OKkyXh/ybicPqaedFG/0njon17QNCt5zxIhnRZyS6wjENYgbTII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769186744; c=relaxed/simple;
-	bh=VGbNVNahKWwLXw/qQCNp/J4Iq8B/K42acEfB6yri4DM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CCXcIQCg0BtwmMDpMV14PVom6UD08u/GrVz/0vZ/WVLeqUUKavei83iGZJeD2xHe3UrZ+AZ2F1N0l18QelYBG1O4reO2gBfg0P/3zO5umxqH5NndnicwEtipUuIKKtiX/hZpU4X5yDYln6atnJmx/kc40wiMOHbBV6HWArQXEXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBBQIoRz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292A9C19423;
-	Fri, 23 Jan 2026 16:45:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769186744;
-	bh=VGbNVNahKWwLXw/qQCNp/J4Iq8B/K42acEfB6yri4DM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fBBQIoRz3wwA4swVYscxFnC8Iwj9IVtAtzWeZ/uSqnmYorxr+v5xz6Ya/Kn17FhGu
-	 Hjpp/otTObs82HK7Qih/ceQFz4RBp22sDJpkMcgBAb3KfAg+DnvJJEHrxkn4ZrCLl1
-	 gUuNl1zLTyEZIyYlwqVuuiy0mMHo0VD9cNpZsFj3g9jzGWj6FVp6ak4r1AWtwsMzcS
-	 aj/H2LUb8nE07inSzzE4MQ6Gr6rgjHtiVmSlHwAgb9BAozJEC159i4D6Ox0YqkjxEv
-	 QrHdOPoTErLb86Oil0M+g53onVwmVCYtsMvInajXOBgYc8o7y8OYRb2x0CokuY+edh
-	 5uB+nBOM3VBAQ==
-Date: Fri, 23 Jan 2026 16:45:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 2/4] gro: change the BUG_ON() in
- gro_pull_from_frag0()
-Message-ID: <aXOltKyRoWvUTfKf@horms.kernel.org>
-References: <20260122045720.1221017-1-edumazet@google.com>
- <20260122045720.1221017-3-edumazet@google.com>
+	s=arc-20240116; t=1769187806; c=relaxed/simple;
+	bh=NhgzJvxSjijv1UBl5vqceNfEmtassV+8Z+WDXiFYaYw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NV2aDxruYvNpT0ISrZ1YgGCSgKFuW17g2ES1BuvoUnG0tCnWLDtNyT0vL0QbvoudxZ02/KjFZ/15/oIr5VWMAUFvC5BOBaLACc7KwaSNBMLXei0arzQWGDSMHAugraz8NOKR1hL3N8a/qJXRt+8aRLmtUaywXp2iHzvHjD0d4EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eubQEOwP; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-823075fed75so1312107b3a.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 09:03:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769187804; x=1769792604; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q+PPh+f/fZGEIExOliWL4xsOsnlsuK0W3FPm/lFc3wM=;
+        b=eubQEOwPsp3xypqxIa/A+lIZxuDIrCA52fXOpw31nhSqNYUAl1EphDf+BNZsKA75s/
+         7Yx6eaBdVCF0Da8/vs4b7K0+pldRWlF/T6dCrgSTsv/CUT+34O6LDjJ2msGWoCuPf0h8
+         1DFFLlG41NShpt6ejkf0JOlgRTg5EaJk5pBKLFPA7UsH+MbEzsIyW8FHpwexJwKL6gNi
+         ijh8IRpjxVnCDJlS9/qzQ10t8uYXuM4QZQtAkouCcxZ/Dv9Br2NeK0cUtea/1PAS64Ql
+         DoxTsD9g8ZBfKi8Uj0n37R23W8LbiyJ6YOcicZv/mAROvpeX5OLm7dTn7wErICItozRr
+         kklw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769187804; x=1769792604;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q+PPh+f/fZGEIExOliWL4xsOsnlsuK0W3FPm/lFc3wM=;
+        b=LB90FjHBY9UAVNTq1hFZj4S7MjqiJw6QWK4LXDui7Rie96AeRWSX/5ntyB69lzWO+H
+         VVbzc85apEuNVTwVL8KIpt7MkY31NPNhoq8aQF6+TeM90jcVbsVgVq+5drRfh+gjuYXD
+         DTJxeCX0j8uFEvL+FGazeQ0AwEMHCoLiYai+MJvMuDI/MbipeUgFY7tJMdMAp2AsrROt
+         E5FRzVMv00wWZpifh14rulaa3T3RAXoxLqBrln9dGFdTcvL3PvVXB3UzlxU/510fJUah
+         3Tg+38PvLbE2+IPaKxP4jxoVJP7DB755piJnPJ1eutR3UGrQiqX/p7Vvpibt6vm2kMne
+         X8+Q==
+X-Gm-Message-State: AOJu0Yw6wfymZLHtL95q7KvsBjXOF3K2OpOICS3wkqdsAHbC6rgpx9qk
+	5JGOxuqBHinK49Q9bZQhSn3Xhu32OPXq3u8rA0YcDOzZ1gy22C1nUnlGYuKevQ==
+X-Gm-Gg: AZuq6aKPiULnDKlabzbpuZro6jKnmdKAHJus2q1/OmnE2Wr624u2zvsnZtiaQYBApyG
+	GYPFimBIIP/KOSN8gm8usXTa2/OTa2ePxn/jgWvqfCbCtu/M5RzBMAcvM1GZtyB0X8tjS+vmhUh
+	77pHUn3AVLte4DKM15eRvVXVTH2kPkhUf3uzp0sc6ktSfksDOQC6JH+sBfJoO7FcCNb+AshHa79
+	C8b+/RAOnJUvwFLOBMPgH0yFLr4Fi6OFOuA8w5j9UC4/fipxEiXEJ0f5ddXbd0Y6mW38neFuEpn
+	cIgh8aMYQ1TNr7eo6wkzFy7KTFUzeX2ksSWvINgKnzUzUB53OJ1gAfaB1LyforVLDrozujmdiV3
+	yZys2Bh6raDKImc9nBe7FoiT9HjsoluJTozZKCg+HQUE87sKwcTHXBkoCy2yuiSeTdVrUp7IT+y
+	dZW1XbxBlI4PXcNKwk5007WQjb/xuZDhZutU+0IJulIO7UKU2ac/KtSQ==
+X-Received: by 2002:a05:6a00:1954:b0:81f:c6d1:5608 with SMTP id d2e1a72fcca58-82317a17c4cmr3170141b3a.1.1769187803903;
+        Fri, 23 Jan 2026 09:03:23 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82318644989sm2638201b3a.13.2026.01.23.09.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 09:03:23 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Nishanth Menon <nm@ti.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: ethernet: ti: netcp: Use u64_stats_t with u64_stats_sync properly
+Date: Sat, 24 Jan 2026 00:48:36 +0800
+Message-ID: <20260123164841.2890054-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260122045720.1221017-3-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252885-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,bootlin.com,intel.com,ti.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-252889-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 18223789C9
+X-Rspamd-Queue-Id: B5C2E78C20
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 04:57:17AM +0000, Eric Dumazet wrote:
-> Replace the BUG_ON() which never fired with a DEBUG_NET_WARN_ON_ONCE()
-> 
-> $ scripts/bloat-o-meter -t vmlinux.1 vmlinux.2
-> add/remove: 2/2 grow/shrink: 1/1 up/down: 370/-254 (116)
-> Function                                     old     new   delta
-> gro_try_pull_from_frag0                        -     196    +196
-> napi_gro_frags                               771     929    +158
-> __pfx_gro_try_pull_from_frag0                  -      16     +16
-> __pfx_gro_pull_from_frag0                     16       -     -16
-> dev_gro_receive                             1514    1464     -50
-> gro_pull_from_frag0                          188       -    -188
-> Total: Before=22565899, After=22566015, chg +0.00%
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On 64bit arches, struct u64_stats_sync is empty and provides no help
+against load/store tearing. Convert to u64_stats_t to ensure atomic
+operations.
 
-Hi Eric,
+Note that does not mean the code is now tear-free: there're u32 counters
+unprotected by u64_stats or anything else.
 
-Am I right in thinking that the motivation is to reduce this
-check to zero-code in the case of !CONFIG_DEBUG_NET?
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ drivers/net/ethernet/ti/netcp.h      |  8 ++++----
+ drivers/net/ethernet/ti/netcp_core.c | 16 ++++++++--------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/netcp.h b/drivers/net/ethernet/ti/netcp.h
+index b9cbd3b4a8a2..9cfddaa807e2 100644
+--- a/drivers/net/ethernet/ti/netcp.h
++++ b/drivers/net/ethernet/ti/netcp.h
+@@ -65,14 +65,14 @@ struct netcp_addr {
+ 
+ struct netcp_stats {
+ 	struct u64_stats_sync   syncp_rx ____cacheline_aligned_in_smp;
+-	u64                     rx_packets;
+-	u64                     rx_bytes;
++	u64_stats_t             rx_packets;
++	u64_stats_t             rx_bytes;
+ 	u32                     rx_errors;
+ 	u32                     rx_dropped;
+ 
+ 	struct u64_stats_sync   syncp_tx ____cacheline_aligned_in_smp;
+-	u64                     tx_packets;
+-	u64                     tx_bytes;
++	u64_stats_t             tx_packets;
++	u64_stats_t             tx_bytes;
+ 	u32                     tx_errors;
+ 	u32                     tx_dropped;
+ };
+diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
+index 5ed1c46bbcb1..eb8fc2ed05f4 100644
+--- a/drivers/net/ethernet/ti/netcp_core.c
++++ b/drivers/net/ethernet/ti/netcp_core.c
+@@ -759,8 +759,8 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
+ 	knav_pool_desc_put(netcp->rx_pool, desc);
+ 
+ 	u64_stats_update_begin(&rx_stats->syncp_rx);
+-	rx_stats->rx_packets++;
+-	rx_stats->rx_bytes += skb->len;
++	u64_stats_inc(&rx_stats->rx_packets);
++	u64_stats_add(&rx_stats->rx_bytes, skb->len);
+ 	u64_stats_update_end(&rx_stats->syncp_rx);
+ 
+ 	/* push skb up the stack */
+@@ -1045,8 +1045,8 @@ static int netcp_process_tx_compl_packets(struct netcp_intf *netcp,
+ 		}
+ 
+ 		u64_stats_update_begin(&tx_stats->syncp_tx);
+-		tx_stats->tx_packets++;
+-		tx_stats->tx_bytes += skb->len;
++		u64_stats_inc(&tx_stats->tx_packets);
++		u64_stats_add(&tx_stats->tx_bytes, skb->len);
+ 		u64_stats_update_end(&tx_stats->syncp_tx);
+ 		dev_kfree_skb(skb);
+ 		pkts++;
+@@ -1973,14 +1973,14 @@ netcp_get_stats(struct net_device *ndev, struct rtnl_link_stats64 *stats)
+ 
+ 	do {
+ 		start = u64_stats_fetch_begin(&p->syncp_rx);
+-		rxpackets       = p->rx_packets;
+-		rxbytes         = p->rx_bytes;
++		rxpackets       = u64_stats_read(&p->rx_packets);
++		rxbytes         = u64_stats_read(&p->rx_bytes);
+ 	} while (u64_stats_fetch_retry(&p->syncp_rx, start));
+ 
+ 	do {
+ 		start = u64_stats_fetch_begin(&p->syncp_tx);
+-		txpackets       = p->tx_packets;
+-		txbytes         = p->tx_bytes;
++		txpackets       = u64_stats_read(&p->tx_packets);
++		txbytes         = u64_stats_read(&p->tx_bytes);
+ 	} while (u64_stats_fetch_retry(&p->syncp_tx, start));
+ 
+ 	stats->rx_packets = rxpackets;
+-- 
+2.51.0
+
 
