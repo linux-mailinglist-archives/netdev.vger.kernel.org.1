@@ -1,259 +1,303 @@
-Return-Path: <netdev+bounces-252814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJSbDnhWc2kDuwAAu9opvQ
-	(envelope-from <netdev+bounces-252814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:07:36 +0100
+	id MAAbHvNWc2kDuwAAu9opvQ
+	(envelope-from <netdev+bounces-252816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:09:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBB974C96
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:07:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA5C74D0B
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 12:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CEE6E30071ED
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:07:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 842CA3003718
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5190A31AF1F;
-	Fri, 23 Jan 2026 11:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40794330B2D;
+	Fri, 23 Jan 2026 11:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TgDkxiin"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHKKuGrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011037.outbound.protection.outlook.com [52.101.70.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D316D21ADCB;
-	Fri, 23 Jan 2026 11:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769166453; cv=fail; b=VAtdhVNjupUBP+qdfAvSFOnDNnxD0DNsUrFEIObJbp26btcUU9/bKEKYay2P9h4Df9n6b2NkgoOuDtkMS7jRzA/iHU/HhcdgWIJfDtYYKjD0H9XiWflYAF4uO1AtxMkUFgvWiItdNdwo1n905mkQe8VYhXxYRfSjvt/cAdmKFR8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769166453; c=relaxed/simple;
-	bh=1PtJGx/RIwZblItg229jfzBvCWoytLZwcs/xU6D7qR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=rr8SE43ZoRAU2KGltXZm+6WWJZhGa4vVXHa48L3hhekgKs1AjIozESoG3UnCdXAwFn3paVBH7furPg+hamw9diNqZ1CxUdatcacwn0B+ns1jvnZS11dtW+pRlPkpoCH470IQOHyI77w7nS5q06PQWDWJgCWUBsJaDFhF+q9Q+6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=fail (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TgDkxiin reason="signature verification failed"; arc=fail smtp.client-ip=52.101.70.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G/bBZFhdUaXVU27zGIk5JKzFV65zeqhAwUmFgtvQNHDg1LOGHuUxPdx4FyrD8vW5yXnnTpD3lJvvaZfR8b4Z9ALLqsCsCNMUVr/ZGiI3Ih8H7EzwZl3VuEk0U+vxYYHTtQTWidnwepOIcsq6uEF+KWoGI1wtsfzSleV09ltqLqs8IwDUoBUDdlXzf/+BW6bLiCSNaJCzIFiGnkaZY5rYPJ+BqZREkev+cKXm1pdZnSB0XAR0AgbxZ0tg6Xv+TtKfzUd2XWNiG83wYYCaJPQsFchhlBKQBgVN1DcC72bW8maWvSWHERLNEiQkv5wwoKxfWOO0sTqvjrz5xyqmBlTb+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EOMm6cl6PZkl/SqI9y9XWv5bINrfjekA2JlEHjyOD98=;
- b=owhmcCKK3oYlln3Gs0sMTH1maM7csn3ZNq7RhJoiFzddoBGhsClheIs6BqnMoDx2m5Ro7LSX9/aB/ZXgUiB/m35zJI2BrrlsRtihupeJvzsQnkg6cgp6FByIB9iaQWFflWLgKtJndLK/pQ3WwUr3bGb29Kk81iGQc77uOEhvKYB8YOskSDs0+uFIgELLvbuL57zW2c3xRRsLbsuzdQ2YsTfpdBBXDFgr4wqUXi7N51RzYoCuvfIhRyiygfKxOEzRk1B/SytERg9UB9r9njhseOwiCeF8W9QS+CMfH2w6qGXz4kAD0J7bLpk/EEHQNfambQgNk9rcc/BvSSE51D/Uxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EOMm6cl6PZkl/SqI9y9XWv5bINrfjekA2JlEHjyOD98=;
- b=TgDkxiin0KBDNU1ooDQFO6pY7X+/gSX8lvWPtk5FgbmKb2xlf0ypAurRij6wlfnQmp0MZKcCBHswYurnC6Xc7P9JHzTOLgP6Y4cDuh0JsYzhUBjqU2tTbDF0+ejuF9iu7reMW+h/qItin45z42JqUnvar5/E8Bg9f3l2JV1D2kdGapzJcqqLIMJLq6RwvQvx06zvGqZ9XgGfbAoGuGlCt2s7rCEG8dWu3uPSXfeqqgztWw7ouiv7h7xr21029fZY3LEGEg86JNBaUnB/MTgGQmSsBLtZncvkNi78CadI6m/Spt5y2SirjQ8NfJzI1zJsvptNjNsIgqigfxrndqjHgA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by DU2PR04MB9212.eurprd04.prod.outlook.com (2603:10a6:10:2fb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Fri, 23 Jan
- 2026 11:07:25 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.011; Fri, 23 Jan 2026
- 11:07:25 +0000
-Date: Fri, 23 Jan 2026 13:07:22 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>, broonie@kernel.org,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Vinod Koul <vkoul@kernel.org>, linux-phy@lists.infradead.org
-Subject: Re: [next-20260122] Build failure on IBM Power Server
-Message-ID: <20260123110722.l52ei5bfmx3u7wvl@skbuf>
-References: <43ea0202-891d-4582-980b-5cb557b41114@linux.ibm.com>
- <f07d721f-ac80-4421-86a3-1f7f76ea8e6c@infradead.org>
- <136ae3bf-b1a3-4ee8-a7ea-dfc90e7b4baf@linux.ibm.com>
- <fa330d98-653c-4643-aee9-9697068e734a@kernel.org>
- <20260123103922.sr7m7py7d4afvc2f@skbuf>
- <2b41debd-9a05-4707-b270-a8fa3dd7768c@kernel.org>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2b41debd-9a05-4707-b270-a8fa3dd7768c@kernel.org>
-X-ClientProxiedBy: VI1P194CA0025.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:803:3c::14) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801D32FD1B1
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 11:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769166574; cv=none; b=VxTesiY994rejs4CceD7hcQAniJtok13HDbLZQLOO67PuLK8ywDlj+3tQEI3WTmCiAdrrEj7/nGdRm8OUPxMFjsOl4qw3sUIJUX1UY/E17zhGS1ZLsdD3IzeAjbAhD17Z3147eNWSA0Z5rwjepv72ytpLo/HOjKS44GApEA4KyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769166574; c=relaxed/simple;
+	bh=4iDgbCPDX6zetLw0sIoTMixX1OU29nvoRAcbnlpMyp8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uOPIzQdvIFRMsmg1ND2qLTOF8jB2YFLh7rdjvg2Jjg2kiUc/QzXlzPHPaxp0xcN8LVANHSpfzNsQx6huArxWK+lP/YVyFvi664cit8pr/2l2aqB+ZBejA9PAP+GooZiVtWWyxE9Ym097T/gxgDhf/rmO8gBeywyp9D7bpyjmQCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHKKuGrR; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-894774491deso37043496d6.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 03:09:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769166571; x=1769771371; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0/pAK6MrrOiwwDQc0GBrsxIdwLQE0979ZY3mHhzgGcY=;
+        b=UHKKuGrRBDJYfX0sG/9bxETcd5SZb8WQwP+7HWlx1nIw2UoE23VKeMOvwdQBhRBINE
+         q3YKvVduVJeoHK7pjMmHofRUmMxheAwfCnvyhDkW8qixjat0eO+2EF9EvawjQhoHwpQA
+         uMJeLJismzXFR5MdJLaLGUAi/POQzt1rMNvV9UeJe94BWQDUF5JFeltvobw4DRRMVA8q
+         BvNqu2HZe9CqzmIukR61UfP90vAo0sRHnEh62nBUPhtSAn8n4yey2WpbwbcjIYe3buRx
+         SaHG2BX6vn3n1Ifw26p2gMly7GBRlk6UTn1vL2bfj3Dy2atpYFB9nLb/6RraBHRT3znP
+         mLpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769166571; x=1769771371;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0/pAK6MrrOiwwDQc0GBrsxIdwLQE0979ZY3mHhzgGcY=;
+        b=ZQZovpp8Cip/vF1mOfRFrILRaxKKvbJPMuXUjqiw+b8+r0qtL3XUmgJC+ygoSuWhr0
+         cWw0z/ZJZRKiDWOGeGXYSMo1lCUpJ6NDehdmSvMa72QNxEkcPiQ0nJzRvksFM24MuJdR
+         kIr/ukDT5PojUxyrNtrljx/tYUGi7Rw3hrcI1k2YUMKt4HeeZ0mV/R5l4RZ2er2XD4Nk
+         h3ZGXpZBV+fsI+r5PDEvVgvZShELiuRVq5eum5DMDUCGQqXw8LG1i0o14fgDbGJZEWSp
+         0bvfgZPLdXCD0iY9GhBt1RTN0HCZyJ7xLOlqEivTj3uc/yo3zzWciOaQZnJ/lBSUd7cS
+         mcBw==
+X-Gm-Message-State: AOJu0YwDDTeMX9axuvhtsVH428BrES5Ps+da0FSnpjfO6Z3nzo337/1M
+	BNeLRYlhQVSoKVtVaK9fg5CNVnQVFZHjRzvAdsPOxiZoljjTSSpBIjpD
+X-Gm-Gg: AZuq6aJm6SttesUV2wRKIZly2fQg6Kw8lUevu+FrenkmNr+dkOKNSSF+iGAYW7VhD26
+	vF5JTmrG0EgJmilz5tBE15yu/qgCop8hx5YetHTrzre3MYDqPC0+wtaDwxeqf6XaGgcT6s6ETiS
+	UV5lcZ4sh+dRUUuguuojXRzcL4aug3077TAalQKaK4zw4TbxClbh14CiIO18bMvNZtpwFrR5Wbt
+	fyu15gPatAu4L1X+3EiAIkO9cbEGcJmVqbuMmEs2yDLyHVaYaYiB0+nKNhBmYnJl/fV/VipM3ao
+	gach/5lHL2yENbdx6K4/d41pSYhdHQwUpyMVioXtOj82jZSG93IbdjLj6IPb3scmWsnM9MDs1/R
+	1RDFerKGIbC7xwcOMulHRRosucKYmYY2riL5qr/1p+H4UU+pAG/p7x8CiqGHssjFjSgktoM7KQO
+	js2AOUNJUK9riidBJy2YZz
+X-Received: by 2002:a05:6214:2628:b0:894:610c:3a22 with SMTP id 6a1803df08f44-89490177e74mr36606866d6.20.1769166571210;
+        Fri, 23 Jan 2026 03:09:31 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-502f7f72d8bsm14348801cf.22.2026.01.23.03.09.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 03:09:30 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Fri, 23 Jan 2026 19:09:07 +0800
+Subject: [PATCH net] net: cpsw_new: Execute ndo_set_rx_mode callback in a
+ work queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DU2PR04MB9212:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f5862e9-3f68-4d6b-0c3b-08de5a6f96d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|7416014|376014|19092799006|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?bOLF+or4oKulFFFOarKnlm+PRM7ybZjzhl0sJrkbRPXKMRoMPBoJNBmEYn?=
- =?iso-8859-1?Q?2KpcEEQL+XRfJU3j21s9suy3WY5AJG0pDEO16d5/jZvbVvty4+40wLbmpV?=
- =?iso-8859-1?Q?LDS0MD1B8FSfJfrhb5lfM8kcDDI/ZKFpF1yO2aSpohJMs2HlAtbs+6cHds?=
- =?iso-8859-1?Q?AP30h4Ba0uE6Ro8pRCdguy/yBFIKww7TX2dzz5tFuJEU24JoOy0mW8jMy0?=
- =?iso-8859-1?Q?mbyp+7eXygYzuw1MvccQQ0fJWi6S5BvCe+sqXq2d4zZ2R2A9+P9fqwmfIk?=
- =?iso-8859-1?Q?2YCeWHFPnpq6Ld4YYvJKbOaYoAIfMn48jw0eikkhFMry6/ZpvmpQjhZJfG?=
- =?iso-8859-1?Q?HRvBJj9+xTLYTZG35BHU/9zjb9z81E3awdo7CPWqkeVJzgv5FHuZ/KJ4tF?=
- =?iso-8859-1?Q?GmjWMiNKgWb40Ywq3fqI8I3rhqOaKOqtk20AB1maVXLjoi6eydDjKktgZ2?=
- =?iso-8859-1?Q?Tz9GDiw9ApYgT2iGetFa/olAfVCtMeuUlXpiL9fpCDGjRuuegHYtRjRAwH?=
- =?iso-8859-1?Q?Uvu03p8n0AYgCWcq1PrlHo6eU9ifdGHJAkeuVdF1KKiAOZCSVTbwGzgSX1?=
- =?iso-8859-1?Q?9FxW7rBFWJTldTicP9smIWMK6FwvrrnM6IHydgzjtP49iUX6UKnDLp1/o5?=
- =?iso-8859-1?Q?xRh7KQa1H0OqbEO8PvFl27CQ1P4Pjg7RfI5VnTgs6dHHMJ57pcMZhF6nBy?=
- =?iso-8859-1?Q?9meUWomKO4fMbAnSNOhpm/zmSkj6SU4NVqDMqbpY6FA0aVotTOhRsTFhuq?=
- =?iso-8859-1?Q?y6BC8xvXGipiUi1aRCXl5o/zRu3diHsi5wgwXTbRG/PaDoYdQlSIgKUXGk?=
- =?iso-8859-1?Q?CBcN1ij30yI7Mc0RBwy0tCbFWWyHEWn5dw87Lc8dOdNNUvDBtyXQnGvYTS?=
- =?iso-8859-1?Q?omZZ5AKgz8RpL7L+BAyCegzJzvIOMMCbz7UwXRKITXIa6Dkt/DKPs1IbD+?=
- =?iso-8859-1?Q?NXJ/U7ZL7/tRGg4binzFk2kJJLoowDq/RGlH7f8PeXjn6DkKhnqi5qrCtq?=
- =?iso-8859-1?Q?hSBqVWfql2QFT+j6pnboLfvrTxbz5Bj8ug4cWnyiTLx7qMk2EkmGW17kJW?=
- =?iso-8859-1?Q?jHogI98PcGk+J2YD4AqN6Q2t5viLOI6DLa4CYj29xj/mEF6QWcjdwYYWZx?=
- =?iso-8859-1?Q?FnwPSQ7bAjwY4uPlJHu8lzGVNsNaZ0aP6wnMm6t5mFdUvHnNsMqxBCFesu?=
- =?iso-8859-1?Q?PODe1tc50bEDzWF0oIxB11DQCpQDvUWHyBe0Jv4DiVG/3mWaIQx0bbXiww?=
- =?iso-8859-1?Q?SUk7Jyp28Y3v+R+2ubcIBnFjc4A6UPAclXoT0cHMZF+mDGIusxbMKtk3/N?=
- =?iso-8859-1?Q?T8Y0eOO0eWw9dytxbxeAniSvedtbSgjTRDaAeFUuNjf4Uu+LMjV/LMJuvI?=
- =?iso-8859-1?Q?XHqp9L1koGaIQ3/J8yvSzxkeFL6aOgvXKKbrQ9miN18dJgJIYxPAHN/7W7?=
- =?iso-8859-1?Q?X/tbLCB52vzNNuxiD5Nk7v2oy85SOCuQDKcfcOtdB7FORUFXZj9r1ipJzH?=
- =?iso-8859-1?Q?0JRld+Zk166iVyVueLOq2QDAbNPqnsbFbByZ3wq5k8LnqntLYbyyYvjoTu?=
- =?iso-8859-1?Q?XYoRoU2XxUTIDZmDbusdVD9SXDVb/+rZjwYnq9bME8TqT38xXHfRwG7wXL?=
- =?iso-8859-1?Q?HR7DgMT4pRyDw3qQDqCcjrcyWtRFp0fKU3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(7416014)(376014)(19092799006)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?ln/4r2Bsyi9OkL/4aB+Z1ttUtr3Nu1AjKD0axtI5ub3KC7LFLQut1LnulM?=
- =?iso-8859-1?Q?yZ+TgiKtcatYZPDztl4P/aZHNGJz/jaZOIuKzBVKPlHhg6pdKUxofvpMMl?=
- =?iso-8859-1?Q?FVj8cHqZ6yXCY2XQ2u6vdlz9f4Jq4zZcEI6yVwiiKii/HChH5+mPtVy5oC?=
- =?iso-8859-1?Q?q/k5tjEOkwNTgLtLblExjsV05UZGadSovHS4lTNSH999rcSnFHtqq3EkBc?=
- =?iso-8859-1?Q?AT7zeDMJF5xlpziNfsEGr3NG0udFqteGkCx0viRrYig7xaqpVQKkwmLrPw?=
- =?iso-8859-1?Q?YDXfUqlQlx8g17e1JBqxQFFx6CmAjnFgSNjf27Gk8ujWvi3s6kfqIX5um3?=
- =?iso-8859-1?Q?WjbpopehaXR3k5gv9SPwFZnOwMshhsXofHFqHzNR9mX6Y5oL9QYl4ObDYG?=
- =?iso-8859-1?Q?2ZdqHDdmim5mGqZzmplDQ7P7Yo8thbcAO3KAgWoNkHY3PeeHn7QBf1eYkc?=
- =?iso-8859-1?Q?xtSprJTOMNBS5r7miCj6pvLK7+e8abkuyRwGVGBMjLrq0g1vBAYy5TwtBK?=
- =?iso-8859-1?Q?/PKsGLMJIagdbWrpxlEPlPZYb45GnigetdJF+a9qbjs+fSQT7eooS4S/rF?=
- =?iso-8859-1?Q?n8qoL12wGeGGoVVXgfHeYIu98pTUAI6ANxfkyEH0Mf40hLAWBlkP209dMG?=
- =?iso-8859-1?Q?uGfOZl7a9YUMwfuz5RoW+S5i6sQu/AgZVo2rrY/QeTtgfe20RuPsvOCo5V?=
- =?iso-8859-1?Q?eVPIxQlh4dOqvlLuN9twgpywsLdSSiqIBDiuPu+KJ2VkI1QFGo/4FHtPDf?=
- =?iso-8859-1?Q?gEk9wCa/8ogoFDLibFXZGN40rKtVOd1H5jRUObWnnKSoy5Ra6SH1V4SYhI?=
- =?iso-8859-1?Q?A155gTmJNEiFuUtVZ2ykJJrMTYXqsMxOmkxWJdI2fRA4UhfcKQvaJBC6gH?=
- =?iso-8859-1?Q?iGSNmuz4B+2LNMPKbrDFXGCQJTG11M/aLfAAQwoLnJdX4J5KnTaNx9wwpm?=
- =?iso-8859-1?Q?NwzKoEBWmlNyCyHH5Qcxf525aQJtSVXseLX2J6Ff05uI2a3ZVOpKdj5jmC?=
- =?iso-8859-1?Q?iueyrtREXSr/uDzGyhkviHk7kY5PgQEl8SnBdkNgZsmXL/mkSKn7aMEOYU?=
- =?iso-8859-1?Q?5c8xrLFQR615RsErnGFeoeugYPjTLAnqeJzvXLeuz0I3WlNvTjlc7l/Jx/?=
- =?iso-8859-1?Q?YueoPmGDqRQZMwfMRvAiPHbr2Zx2hXid+Qq93nJMjEu2HBdwRWFDEQBcFP?=
- =?iso-8859-1?Q?IsZAjAD9ErPnJ2ENiDoJbZeZEF8J4DdRLekC2I37X9pE6WMipxdphcbfoc?=
- =?iso-8859-1?Q?2n+QcZY/ZucxRAYDgm9AVL9tSqqrUPZs8wMkn6AXAKSByT6E9B3mgpbfZk?=
- =?iso-8859-1?Q?VDU0jpZIpcSDBeccJlyOi5hDsBO+/vrKL47n8RXpWKlNq4MHUeI3LNhUjJ?=
- =?iso-8859-1?Q?Ey/ieD5IH0W8Ek3T2pCeHHx+kImLug/LrrxL/vycpYVnaFdxeB+aD1xwYU?=
- =?iso-8859-1?Q?CqO8v/l4qw27z5anCLvllhoK/UFULeLS5vf3FOxbNw2PDG3t9gfe3tYVna?=
- =?iso-8859-1?Q?xb22CWOjPPB+78BoTj4UP7ezKwNnCTumGSO/vF0OV2Bmc5vwZ7dTrmX8o5?=
- =?iso-8859-1?Q?YJTnL57lqS12T6UMwTIRdzyy6LpOdXxDegQVHMUxj4XIfbfkIXiJVDF0zj?=
- =?iso-8859-1?Q?MPmEzooYylc23Fc4GuO/yomz6SLY1Q800gv8jq1vqze/K+tS0nEaCBfHQi?=
- =?iso-8859-1?Q?+txU7UBH2pz+T5+z8uU+Zt5OxUf0/qYuqr0M4xJpZsQsTA5bBSzMxAS0Ob?=
- =?iso-8859-1?Q?HzOAv1BeZYT650gCEdaUyqykH/8YTy5Sp8zFpdRFURsWG+TQf0cmi8mBbf?=
- =?iso-8859-1?Q?cP5oNF8bzTeyPqY0nBJLI5KLf8ZUCKYAp0W9nGS/9tGAKbRGh67/AKuCcT?=
- =?iso-8859-1?Q?AY?=
-X-MS-Exchange-AntiSpam-MessageData-1: yhwnBB/4ZC2Sj59tozCKNaQcs78rk41InzE=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f5862e9-3f68-4d6b-0c3b-08de5a6f96d1
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 11:07:25.2964
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tkKF3jCHrfXnycPN96HKdOKobGIq7le8QwYZEkB4NOGiNMj4jGCaan1Uzuu2D5oBqqtGduTzB61BQvOPzxGYQw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9212
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260123-bbb-v1-1-176b0b71834d@gmail.com>
+X-B4-Tracking: v=1; b=H4sIANJWc2kC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDQyNj3aSkJN2UZGMzc9M0M3PDFAMloMqCotS0zAqwKdFKeaklSrG1tQB
+ t+L7sWgAAAA==
+X-Change-ID: 20260123-bbb-dc3675f671d0
+To: netdev@vger.kernel.org
+Cc: Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org, 
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, linux-omap@vger.kernel.org
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.14 / 15.00];
-	R_DKIM_REJECT(1.00)[nxp.com:s=selector1];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252814-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-252816-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[nxp.com:-];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.991];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CEBB974C96
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,davemloft.net:email]
+X-Rspamd-Queue-Id: 6DA5C74D0B
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 11:52:45AM +0100, Christophe Leroy (CS GROUP) wrote:
-> Le 23/01/2026 à 11:39, Vladimir Oltean a écrit :
-> > On Fri, Jan 23, 2026 at 10:52:49AM +0100, Christophe Leroy (CS GROUP) wrote:
-> > > +Vladimir, Maxime, Jakub and netdev
-> > > 
-> > > Le 23/01/2026 à 10:11, Venkat Rao Bagalkote a écrit :
-> > > > 
-> > > > On 23/01/26 1:17 pm, Randy Dunlap wrote:
-> > > > > 
-> > > > > On 1/22/26 8:15 PM, Venkat Rao Bagalkote wrote:
-> > > > > > Greetings!!
-> > > > > > 
-> > > > > > IBM CI has reported build failure of 20260122 on IBM Power server.
-> > > > > > 
-> > > > > > 
-> > > > > > Error:
-> > > > > > 
-> > > > > > 
-> > > > > > ERROR: modpost: "phy_get_rx_polarity" [drivers/net/phy/
-> > > > > > air_en8811h.ko] undefined!
-> > > > > > ERROR: modpost: "phy_get_tx_polarity" [drivers/net/phy/
-> > > > > > air_en8811h.ko] undefined!
-> > > > > > make[2]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
-> > > > > > make[1]: *** [/home/upstreamci/linux/Makefile:2040: modpost] Error 2
-> > > > > > make: *** [Makefile:248: __sub-make] Error 2
-> > > 
-> > > Thanks for the config file.
-> > > 
-> > > The probleme is because allthough CONFIG_PHY_COMMON_PROPS is selected,
-> > > drivers/phy/phy-common-props.o is not built because CONFIG_GENERIC_PHY
-> > > is not selected.
-> > > 
-> > > Likely comes from commit 66d8a334b57e ("net: phy: air_en8811h: deprecate
-> > > "airoha,pnswap-rx" and "airoha,pnswap-tx"")
-> > > 
-> > > Christophe
-> > 
-> > The intention was for drivers/phy/phy-common-props.o to be
-> > buildable/usable without CONFIG_GENERIC_PHY.
-> > 
-> > Does this help?
-> 
-> Yes it fixes the build for me.
-> 
-> Christophe
+Commit 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for
+IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP") removed the RTNL lock for
+IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP operations. However, this
+change triggered the following call trace on my BeagleBone Black board:
+  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/496
+  RTNL: assertion failed at net/8021q/vlan_core.c (236)
+  Modules linked in:
+  CPU: 0 UID: 997 PID: 496 Comm: rpcbind Not tainted 6.19.0-rc6-next-20260122-yocto-standard+ #8 PREEMPT
+  Hardware name: Generic AM33XX (Flattened Device Tree)
+  Call trace:
+   unwind_backtrace from show_stack+0x28/0x2c
+   show_stack from dump_stack_lvl+0x30/0x38
+   dump_stack_lvl from __warn+0xb8/0x11c
+   __warn from warn_slowpath_fmt+0x130/0x194
+   warn_slowpath_fmt from vlan_for_each+0x120/0x124
+   vlan_for_each from cpsw_add_mc_addr+0x54/0xd8
+   cpsw_add_mc_addr from __hw_addr_ref_sync_dev+0xc4/0xec
+   __hw_addr_ref_sync_dev from __dev_mc_add+0x78/0x88
+   __dev_mc_add from igmp6_group_added+0x84/0xec
+   igmp6_group_added from __ipv6_dev_mc_inc+0x1fc/0x2f0
+   __ipv6_dev_mc_inc from __ipv6_sock_mc_join+0x124/0x1b4
+   __ipv6_sock_mc_join from do_ipv6_setsockopt+0x84c/0x1168
+   do_ipv6_setsockopt from ipv6_setsockopt+0x88/0xc8
+   ipv6_setsockopt from do_sock_setsockopt+0xe8/0x19c
+   do_sock_setsockopt from __sys_setsockopt+0x84/0xac
+   __sys_setsockopt from ret_fast_syscall+0x0/0x5
 
-Patch sent:
-https://lore.kernel.org/linux-phy/20260123110600.3118561-1-vladimir.oltean@nxp.com/
+This trace occurs because vlan_for_each() is called within
+cpsw_ndo_set_rx_mode(), which expects the RTNL lock to be held.
+Since modifying vlan_for_each() to operate without the RTNL lock is not
+straightforward, and because ndo_set_rx_mode() is invoked both with and
+without the RTNL lock across different code paths, simply adding
+rtnl_lock() in cpsw_ndo_set_rx_mode() is not a viable solution.
+
+To resolve this issue, we opt to execute the actual processing within
+a work queue, following the approach used by the icssg-prueth driver.
+
+Fixes: 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.")
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Cc: stable@vger.kernel.org
+---
+Please note that the cpsw driver also has the same issue. If this resolution
+is acceptable, I will create another patch to fix the issue in cpsw.
+
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: linux-omap@vger.kernel.org
+---
+ drivers/net/ethernet/ti/cpsw_new.c  | 29 +++++++++++++++++++++++++++--
+ drivers/net/ethernet/ti/cpsw_priv.h |  2 ++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+index ab88d4c02cbde76207f89cf433e2b383dcde6a83..786d64a952643927ad80d2effbb171dd87f91160 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -248,15 +248,20 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
+ 	return 0;
+ }
+ 
+-static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
++static void cpsw_ndo_set_rx_mode_work(struct work_struct *work)
+ {
+-	struct cpsw_priv *priv = netdev_priv(ndev);
++	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
+ 	struct cpsw_common *cpsw = priv->cpsw;
++	struct net_device *ndev = priv->ndev;
+ 
++	rtnl_lock();
++	netif_addr_lock_bh(ndev);
+ 	if (ndev->flags & IFF_PROMISC) {
+ 		/* Enable promiscuous mode */
+ 		cpsw_set_promiscious(ndev, true);
+ 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
++		netif_addr_unlock_bh(ndev);
++		rtnl_unlock();
+ 		return;
+ 	}
+ 
+@@ -270,6 +275,16 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
+ 	/* add/remove mcast address either for real netdev or for vlan */
+ 	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
+ 			       cpsw_del_mc_addr);
++	netif_addr_unlock_bh(ndev);
++	rtnl_unlock();
++}
++
++static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
++{
++	struct cpsw_priv *priv = netdev_priv(ndev);
++	struct cpsw_common *cpsw = priv->cpsw;
++
++	queue_work(cpsw->cmd_wq, &priv->rx_mode_work);
+ }
+ 
+ static unsigned int cpsw_rxbuf_total_len(unsigned int len)
+@@ -1398,6 +1413,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
+ 		priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
+ 		priv->emac_port = i + 1;
+ 		priv->tx_packet_min = CPSW_MIN_PACKET_SIZE;
++		INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
+ 
+ 		if (is_valid_ether_addr(slave_data->mac_addr)) {
+ 			ether_addr_copy(priv->mac_addr, slave_data->mac_addr);
+@@ -1976,6 +1992,13 @@ static int cpsw_probe(struct platform_device *pdev)
+ 	}
+ 	cpsw_split_res(cpsw);
+ 
++	cpsw->cmd_wq = create_singlethread_workqueue("cpsw_cmd_wq");
++	if (!cpsw->cmd_wq) {
++		dev_err(dev, "error initializing workqueue\n");
++		ret = -ENOMEM;
++		goto clean_cpts;
++	}
++
+ 	/* setup netdevs */
+ 	ret = cpsw_create_ports(cpsw);
+ 	if (ret)
+@@ -2042,6 +2065,7 @@ static int cpsw_probe(struct platform_device *pdev)
+ clean_unregister_notifiers:
+ 	cpsw_unregister_notifiers(cpsw);
+ clean_unregister_netdev:
++	destroy_workqueue(cpsw->cmd_wq);
+ 	cpsw_unregister_ports(cpsw);
+ clean_cpts:
+ 	cpts_release(cpsw->cpts);
+@@ -2068,6 +2092,7 @@ static void cpsw_remove(struct platform_device *pdev)
+ 		return;
+ 	}
+ 
++	destroy_workqueue(cpsw->cmd_wq);
+ 	cpsw_unregister_notifiers(cpsw);
+ 	cpsw_unregister_devlink(cpsw);
+ 	cpsw_unregister_ports(cpsw);
+diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
+index 91add8925e235c6cf5542fde11f3383b9234c872..8cdf4bff198fcc05436ff381a7e4326b3e3c27b1 100644
+--- a/drivers/net/ethernet/ti/cpsw_priv.h
++++ b/drivers/net/ethernet/ti/cpsw_priv.h
+@@ -362,6 +362,7 @@ struct cpsw_common {
+ 	struct net_device *hw_bridge_dev;
+ 	bool ale_bypass;
+ 	u8 base_mac[ETH_ALEN];
++	struct workqueue_struct *cmd_wq;
+ };
+ 
+ struct cpsw_ale_ratelimit {
+@@ -391,6 +392,7 @@ struct cpsw_priv {
+ 	u32 tx_packet_min;
+ 	struct cpsw_ale_ratelimit ale_bc_ratelimit;
+ 	struct cpsw_ale_ratelimit ale_mc_ratelimit;
++	struct work_struct rx_mode_work;
+ };
+ 
+ #define ndev_to_cpsw(ndev) (((struct cpsw_priv *)netdev_priv(ndev))->cpsw)
+
+---
+base-commit: a0c666c25aeefd16f4b088c6549a6fb6b65a8a1d
+change-id: 20260123-bbb-dc3675f671d0
+
+Best regards,
+-- 
+Kevin Hao <haokexin@gmail.com>
+
 
