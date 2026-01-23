@@ -1,171 +1,259 @@
-Return-Path: <netdev+bounces-252786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBgNN+pSc2kDuwAAu9opvQ
-	(envelope-from <netdev+bounces-252786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:52:26 +0100
+	id +IFlDAhTc2kDuwAAu9opvQ
+	(envelope-from <netdev+bounces-252787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:52:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E65D74989
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:52:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AEC174997
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 11:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EBFCF30382A9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:49:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7BF003016834
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 10:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D867629BDAE;
-	Fri, 23 Jan 2026 10:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6E72DF6E6;
+	Fri, 23 Jan 2026 10:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="MHnVZk8l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s2f2wPSB"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB66301702;
-	Fri, 23 Jan 2026 10:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F255333438;
+	Fri, 23 Jan 2026 10:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769165354; cv=none; b=MyCLncEyBL7ZOA95Kbq1E0zX9E5zWOkBOSTMQzvJIwthYeE9/kc0kDS7kam1XiBLhLwqb1ZLJ+ANFTug+fAjSseKEZxpsVjQNpqy8eFt2378zjrPqFMWNKo+RRzX+YC72OU59ytKNuFF6fPDjaOF/cglyjfI2nzl2nBEWYWolg0=
+	t=1769165571; cv=none; b=OUnH41HHeGu/1Q3G9qeYHEOjH3NGAfb9PLvmk9HzdyFQ86gU4TkTKLGkcRL8fG1zf9OhQ1fmrle1FpGb1B0PaiYFFcJJ/j4zer8Vqh13gSPgxEImUJlMQbELRZjr5w+yWlYghJx9yp74waC2AZv1AuU8/btSK0ntICWnXU0PnpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769165354; c=relaxed/simple;
-	bh=GMrqokOjh3k3YsjHV1IcTV/TZ9eSopUtljN4V26GQPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fHtQkHeorhZn67vR7c74tqEvLEAqOudCzxRQwwcjxX8X14jg1FGSsNahcpMe825FrkmqwKztBBKsMNm939mQGPLPFqQKC51o1/Eax0oHjt1dO/aJqnx+eKHstRfrwez/vRCHG5/7Hf8TxGlT1Z32BcHQJnDiL9O52nC9aPuffuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=MHnVZk8l; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=S/r8KF8KuCYJGeBfJA6eGHiYYYS8fyuSrkH1t69XORk=; b=MHnVZk8lTWcw4NC3USZpD3t1Ah
-	jTnJYr3y8zalQgea1l1dX/FdZMHo2UnFpIVTzlbEVz26PTu1HaWchPICGeiJhLbg716KN/FppgSjp
-	xqBzXM8+EVziAUcVLFe49APmXEcVo01y+FpUxe0fXpw90cnb/NB1sPexBh01z4oFtlmL0wa+V4Oui
-	qQRU3lOKxNX8MOryH2hinciWvdldBzmtYI55E2TpNAAmpJ3YsKofXNvJdpVl08Y95npwRHz6/gaxa
-	ON26scFzVC4ip2Ml1WJJecgnhpGcwo6XkeI7blD4LEwFSxoFtnbGpXbWm8mW/1CFQOz6hinZDP7It
-	oDXleOPw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vjEij-00DmjE-3Z; Fri, 23 Jan 2026 10:48:53 +0000
-Date: Fri, 23 Jan 2026 02:48:47 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com, 
-	john.ogness@linutronix.de, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, calvin@wbinvd.org, 
-	jv@jvosburgh.net, mpdesouza@suse.com, kernel-team@meta.com
-Subject: Re: [PATCH net-next v2 3/5] netconsole: convert to NBCON console
- infrastructure
-Message-ID: <aXNRR7dQHZ7bN2mS@gmail.com>
-References: <20260120-nbcon-v2-0-b61f960587a8@debian.org>
- <20260120-nbcon-v2-3-b61f960587a8@debian.org>
- <aXKSDoi8Yue_Ghxj@horms.kernel.org>
+	s=arc-20240116; t=1769165571; c=relaxed/simple;
+	bh=ojbfcl6dIvtY+adr7dmxP1SqcnShBLlbESAfM2YXYq0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pHz/H//A/VSGAp61VXhd+L8S2bSnYUg/GsOQOP+jsT3rw0yUAU8fg0y57jQtc85OKSM34FzNRhkU7XrYSh9++eWo4rmvcs40VSanHLUN8f3qPWKa6NTUDxgnBGXqOLgZ6s3WIbmTqMoQAYSImQebsoF7bUh0FAPWzwH2jCJXPd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s2f2wPSB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ADCEC4CEF1;
+	Fri, 23 Jan 2026 10:52:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769165571;
+	bh=ojbfcl6dIvtY+adr7dmxP1SqcnShBLlbESAfM2YXYq0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s2f2wPSB1By77YZx78G4NYjIc1Edaa8r0GoGZCJpeFJEJOlz2sZP7AuN4jkl7Xic3
+	 qzgHcL9a8Kk7TnPbjdNRkGWjb17KQLah8KGDRttLmr4QOcMphSqa3wW9mkZSakxsLC
+	 1zBUFXPrgGhlFq5RACJOOn3IMf+ZnxPL36kJ2Y/EtX474wyXYeUhXBa5tXuzFa9OlR
+	 ZJc7ZZ56dFOidTDw5mWU+ja41m4km8GQGRxsveK00M3ay8XTyFr2A7RHYHmCU7KpSs
+	 Evn9ImxYCjfFCff2GCXxSQ6UX5uVwGuvlIvU1u9P+OmRg04bdfSrkZZxgFtm3F30dG
+	 uCjff4WMVBJeQ==
+Message-ID: <2b41debd-9a05-4707-b270-a8fa3dd7768c@kernel.org>
+Date: Fri, 23 Jan 2026 11:52:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXKSDoi8Yue_Ghxj@horms.kernel.org>
-X-Debian-User: leitao
+User-Agent: Mozilla Thunderbird
+Subject: Re: [next-20260122] Build failure on IBM Power Server
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>, broonie@kernel.org,
+ Linux Next Mailing List <linux-next@vger.kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Jakub Kicinski <kuba@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Vinod Koul <vkoul@kernel.org>, linux-phy@lists.infradead.org
+References: <43ea0202-891d-4582-980b-5cb557b41114@linux.ibm.com>
+ <f07d721f-ac80-4421-86a3-1f7f76ea8e6c@infradead.org>
+ <136ae3bf-b1a3-4ee8-a7ea-dfc90e7b4baf@linux.ibm.com>
+ <fa330d98-653c-4643-aee9-9697068e734a@kernel.org>
+ <20260123103922.sr7m7py7d4afvc2f@skbuf>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260123103922.sr7m7py7d4afvc2f@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-252787-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-252786-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-0.981];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,suse.com,linutronix.de,linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,meta.com];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7E65D74989
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9AEC174997
 X-Rspamd-Action: no action
 
-Hello Simon!
 
-On Thu, Jan 22, 2026 at 09:09:34PM +0000, Simon Horman wrote:
-> On Tue, Jan 20, 2026 at 08:23:49AM -0800, Breno Leitao wrote:
-> > Convert netconsole from the legacy console API to the NBCON framework.
-> > NBCON provides threaded printing which unblocks printk()s and flushes in
-> > a thread, decoupling network TX from printk() when netconsole is
-> > in use.
-> > 
-> > Since netconsole relies on the network stack which cannot safely operate
-> > from all atomic contexts, mark both consoles with
-> > CON_NBCON_ATOMIC_UNSAFE. (See discussion in [1])
-> > 
-> > CON_NBCON_ATOMIC_UNSAFE restricts write_atomic() usage to emergency
-> > scenarios (panic) where regular messages are sent in threaded mode.
-> > 
-> > Implementation changes:
-> > - Unify write_ext_msg() and write_msg() into netconsole_write()
-> > - Add device_lock/device_unlock callbacks to manage target_list_lock
-> > - Use nbcon_enter_unsafe()/nbcon_exit_unsafe() around network
-> >   operations.
-> >   - If nbcon_enter_unsafe() fails, just return given netconsole lost
-> >     the ownership of the console.
-> > - Set write_thread and write_atomic callbacks (both use same function)
-> > 
-> > Link: https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/ [1]
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  drivers/net/netconsole.c | 97 ++++++++++++++++++++++++++++++------------------
-> >  1 file changed, 60 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> 
-> ...
-> 
-> > +static void netconsole_device_lock(struct console *con __always_unused,
-> > +				   unsigned long *flags)
-> > +{
-> > +	spin_lock_irqsave(&target_list_lock, *flags);
-> > +}
-> > +
-> > +static void netconsole_device_unlock(struct console *con __always_unused,
-> > +				     unsigned long flags)
-> > +{
-> >  	spin_unlock_irqrestore(&target_list_lock, flags);
-> >  }
-> >  
-> 
-> Hi Breno,
-> 
-> I'm wondering if we could consider the following annotations,
-> as "suggested" by Sparse[1].
 
-This is great. I hadn't realized that Al Viro's sparse tree includes this
-additional check, which is really useful.
+Le 23/01/2026 à 11:39, Vladimir Oltean a écrit :
+> On Fri, Jan 23, 2026 at 10:52:49AM +0100, Christophe Leroy (CS GROUP) wrote:
+>> +Vladimir, Maxime, Jakub and netdev
+>>
+>> Le 23/01/2026 à 10:11, Venkat Rao Bagalkote a écrit :
+>>>
+>>> On 23/01/26 1:17 pm, Randy Dunlap wrote:
+>>>>
+>>>> On 1/22/26 8:15 PM, Venkat Rao Bagalkote wrote:
+>>>>> Greetings!!
+>>>>>
+>>>>> IBM CI has reported build failure of 20260122 on IBM Power server.
+>>>>>
+>>>>>
+>>>>> Error:
+>>>>>
+>>>>>
+>>>>> ERROR: modpost: "phy_get_rx_polarity" [drivers/net/phy/
+>>>>> air_en8811h.ko] undefined!
+>>>>> ERROR: modpost: "phy_get_tx_polarity" [drivers/net/phy/
+>>>>> air_en8811h.ko] undefined!
+>>>>> make[2]: *** [scripts/Makefile.modpost:147: Module.symvers] Error 1
+>>>>> make[1]: *** [/home/upstreamci/linux/Makefile:2040: modpost] Error 2
+>>>>> make: *** [Makefile:248: __sub-make] Error 2
+>>
+>> Thanks for the config file.
+>>
+>> The probleme is because allthough CONFIG_PHY_COMMON_PROPS is selected,
+>> drivers/phy/phy-common-props.o is not built because CONFIG_GENERIC_PHY
+>> is not selected.
+>>
+>> Likely comes from commit 66d8a334b57e ("net: phy: air_en8811h: deprecate
+>> "airoha,pnswap-rx" and "airoha,pnswap-tx"")
+>>
+>> Christophe
+> 
+> The intention was for drivers/phy/phy-common-props.o to be
+> buildable/usable without CONFIG_GENERIC_PHY.
+> 
+> Does this help?
 
-Are you using Al Viro's branch rather than the sparse mainline?
+Yes it fixes the build for me.
 
-(I'm asking to see if I should also follow master and do the same, in
-true padawan fashion)
+Christophe
+
+> 
+> diff --git a/drivers/Makefile b/drivers/Makefile
+> index ccc05f1eae3e..53fbd2e0acdd 100644
+> --- a/drivers/Makefile
+> +++ b/drivers/Makefile
+> @@ -10,7 +10,7 @@ obj-y				+= cache/
+>   obj-y				+= irqchip/
+>   obj-y				+= bus/
+>   
+> -obj-$(CONFIG_GENERIC_PHY)	+= phy/
+> +obj-y				+= phy/
+>   
+>   # GPIO must come after pinctrl as gpios may need to mux pins etc
+>   obj-$(CONFIG_PINCTRL)		+= pinctrl/
+> 
+>>
+>>
+>>>>>
+>>>>>
+>>>>> IBM CI has bisected this issue and below is the bisection log.
+>>>>>
+>>>>>
+>>>>> git bisect log
+>>>>> git bisect log
+>>>>> git bisect start
+>>>>> # status: waiting for both good and bad commits
+>>>>> # good: [24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7] Linux 6.19-rc6
+>>>>> git bisect good 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
+>>>>> # status: waiting for bad commit, 1 good commit known
+>>>>> # bad: [a0c666c25aeefd16f4b088c6549a6fb6b65a8a1d] Add linux-next
+>>>>> specific files for 20260122
+>>>>> git bisect bad a0c666c25aeefd16f4b088c6549a6fb6b65a8a1d
+>>>>> # good: [2574bcf1765ec13bf3ef469aa5b15cce293aebb6] Merge branch
+>>>>> 'master' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Fbluetooth%2Fbluetooth-next.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441808471%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=FlVDfg3VVHplFxnQpG4oQNlr5Mm3ZzaCve19hnomYNo%3D&reserved=0
+>>>>> git bisect good 2574bcf1765ec13bf3ef469aa5b15cce293aebb6
+>>>>> # good: [2ad38467d20c16f38d0cffad711ef4f4acdb8b29] Merge branch 'for-
+>>>>> next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Faxboe%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441834557%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=ez4lgXXDn95PjgZNSAjwp%2BWbvJvQYLeHApGrODqs%2Fmc%3D&reserved=0
+>>>>> git bisect good 2ad38467d20c16f38d0cffad711ef4f4acdb8b29
+>>>>> # good: [a954370fea56ee1bf995524255a34da7a1ddb524] Merge branch 'for-
+>>>>> next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Fpdx86%2Fplatform-drivers-x86.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441853661%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=c4Fim5nuBV9O%2BfFTUltpoLTV19%2Fdy394PvzzGBxh8I4%3D&reserved=0
+>>>>> git bisect good a954370fea56ee1bf995524255a34da7a1ddb524
+>>>>> # good: [c7ec480f05dd0185a26f190471905ddf1215bc52] Merge branch
+>>>>> 'staging-next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Fgregkh%2Fstaging.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441870081%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=xgtRCeDKj7BL1EXx%2BSEtCzR5gaN6wKfihyiwh0AFsRM%3D&reserved=0
+>>>>> git bisect good c7ec480f05dd0185a26f190471905ddf1215bc52
+>>>>> # good: [4427398fed2b8e07a62fd4f3f6fcf9ffcf56829a] Merge branch 'for-
+>>>>> next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Flinusw%2Flinux-pinctrl.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441887814%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=AzoGH2fuDhFyYqK9JxlVZEsx3V7P5x8Yc8%2BuVE%2BBHJ4%3D&reserved=0
+>>>>> git bisect good 4427398fed2b8e07a62fd4f3f6fcf9ffcf56829a
+>>>>> # good: [852ccea1ca3144beb7003976d4fa04dbf81b307b] Merge branch
+>>>>> 'next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Fmic%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441903764%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2BTtdFgkDy9QevJOIHlzjk7Jjd1390L6g0Nr5RpSTYp8%3D&reserved=0
+>>>>> git bisect good 852ccea1ca3144beb7003976d4fa04dbf81b307b
+>>>>> # good: [f174dabd307dfd92edacb34e8bee0384daa1bd2e] Merge branch
+>>>>> 'next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Flenb%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441919983%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2BaVHILI%2FJcj%2BedPEPrJ1zFeSRGwuXUKb0VHFpZ%2Bp95s%3D&reserved=0
+>>>>> git bisect good f174dabd307dfd92edacb34e8bee0384daa1bd2e
+>>>>> # good: [e31f3c967c66cf03eecdf50fe138d05f635e3698] doc: Add
+>>>>> housekeeping documentation
+>>>>> git bisect good e31f3c967c66cf03eecdf50fe138d05f635e3698
+>>>>> # good: [0cc83fc23debf3e2df19c4510a77fe2d60ab2693] gpu: nova-core:
+>>>>> don't print raw PMU table entries
+>>>>> git bisect good 0cc83fc23debf3e2df19c4510a77fe2d60ab2693
+>>>>> # good: [75df6953fed6b7274f9c5080925ae4c8d3e424e6] Merge branch 'for-
+>>>>> next' of  Warning: Removed corrupted safelink.
+>>>>> url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ffrederic%2Flinux-dynticks.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C441b227c282845cf2a3308de5a5f8110%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639047563441936107%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=beNKxNQCA6SYkfbETF9eJYQ7mBFWwCKUFce6cwNbHUA%3D&reserved=0
+>>>>> git bisect good 75df6953fed6b7274f9c5080925ae4c8d3e424e6
+>>>>> # good: [086714bbb96f63785da251e1f8d1ce3e716a6e42] Merge tag 'v6.19-
+>>>>> rc5' into drm-rust-next
+>>>>> git bisect good 086714bbb96f63785da251e1f8d1ce3e716a6e42
+>>>>> # good: [6ea52b6d8f33ae627f4dcf43b12b6e713a8b9331] drm/tyr: use
+>>>>> read_poll_timeout
+>>>>> git bisect good 6ea52b6d8f33ae627f4dcf43b12b6e713a8b9331
+>>>>> # good: [b956937ce78fae5fa785f6a95f291e2137502c5e] drm: tyr: Mark BROKEN
+>>>>> git bisect good b956937ce78fae5fa785f6a95f291e2137502c5e
+>>>>> # first bad commit: [a0c666c25aeefd16f4b088c6549a6fb6b65a8a1d] Add
+>>>>> linux-next specific files for 20260122
+>>>>>
+>>>>>
+>>>>> If you happen to fix, this please add below tag.
+>>>>>
+>>>>>
+>>>>> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+>>>> I don't think that bisection helps very much.
+>>>>
+>>>> Can you post the kernel config file?
+>>>>
+>>>
+>>> Attached is the .config file.
+>>>
+>>>
+>>> GCC: gcc version 11.5.0 20240719 (Red Hat 11.5.0-2) (GCC)
+>>>
+>>> ld: GNU ld version 2.35.2-54.el9
+>>>
+>>>
+>>> Regards,
+>>>
+>>> Venkat.
+>>
 
 
