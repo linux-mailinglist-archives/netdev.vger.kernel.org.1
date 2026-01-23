@@ -1,200 +1,204 @@
-Return-Path: <netdev+bounces-252688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFi/CRsxc2mTswAAu9opvQ
-	(envelope-from <netdev+bounces-252688-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:28:11 +0100
+	id UNslDm0xc2mTswAAu9opvQ
+	(envelope-from <netdev+bounces-252691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:29:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D697277D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:28:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26DAA727B3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 09:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0243B309EF7D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:24:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CF46430060B9
+	for <lists+netdev@lfdr.de>; Fri, 23 Jan 2026 08:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454C7350D76;
-	Fri, 23 Jan 2026 08:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA043338905;
+	Fri, 23 Jan 2026 08:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dDKh9u0C"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JWon6RE7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15A63195FD;
-	Fri, 23 Jan 2026 08:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9EA341077
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 08:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769156641; cv=none; b=lwhvBZRzFVTXzx52ttfzUF+O6RcgPY69xTTmkzq2Q2Y9R6bhr7k3QtY8yggeiqVlHJ9LGxfu2kibeGEpHzoVv6E9xBvf6+Kgcc+Qk6W6dz7UypK0K6zlUST324pPImFfBa92ZjVPuLz86CnEjW+kNRKQVhJ9FSlcfoNVOQWOc8A=
+	t=1769156964; cv=none; b=DfgLsj8urfqXA4x9V0sXjX7Y2hR7Xh34Lb29CRldnE6TLvcUnvFWcuiGEclTLWB9kZnGGK5UBN6DYYUKweumsV8HtyXzc5lF8iOLkFYW3SmInhitNkr0YevFlVLSU90MTUHEXDEzHehZt2EqMpLOnRAkpWF3jTgURNIhBKgwGRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769156641; c=relaxed/simple;
-	bh=59DKB/VaktxKecnGsajFsV8KKJSNeWl2YpkeV1l9kvs=;
+	s=arc-20240116; t=1769156964; c=relaxed/simple;
+	bh=ZAO1eH5Ob+wbUe6Tbrm6BL05d172n5IRN7+saAQo6UU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g3EOrZjsRbsS0vpNTcqYaswWCB1KKG6Rzl8gmPTwes9aftDh54U6tdI6W9ViLW+8cXuob3/z+orlI11bGkGugWG3IbnHA2AxmsiVT/SSg+W+lpqYI8v8XqI6fCB8bTp+mzA0bJz4E6CoQFKDZz2E4nksDnzyGnf45dyGp6lZmo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dDKh9u0C; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769156636; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=S1bjNuHUrGPdJip9CidbGVSG4Xe7mlDtcxJDAR5+R0s=;
-	b=dDKh9u0C2/6CwA61LrupXXv7Iy8pKePZelbPzySVA39rNQJRFjJE7V4BrYqqPubDuGQxVqyM0Wsirsj1KSDB8Y3DZRG0jWfjuJWAUZdOigZ8kKxiaITif+c6vOzEbcks7QykzA/M6Fcnh0ElS9r08rcO5c5HaswE+gOqtuhpHCY=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wxf8owG_1769156635 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Jan 2026 16:23:55 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: [PATCH net-next 3/3] net/smc: optimize MTTE consumption for SMC-R buffers
-Date: Fri, 23 Jan 2026 16:23:49 +0800
-Message-ID: <20260123082349.42663-4-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20260123082349.42663-1-alibuda@linux.alibaba.com>
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
+	 MIME-Version:Content-Type; b=frYP7t/R7TR3R64KsuKUwei9ApxUyXYovfkwZeuPIXaiLM8pnR3An94B1gcAvojjmOEO4YxmDJnnI+dyIaqtrjlH1tP+1WFZ65XUjrJCvnG0FrkBoqykixfWk5SGIC/9r043QdZ8iMStl31Ls3uATc/qZCOan9F/Yq1Ur07/HvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JWon6RE7; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769156960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5N0F8qUmQJwh+vKEiMdvVxVXqwMYLaba+2w+ktMYCz0=;
+	b=JWon6RE7VfOc2DVA7gYGKeWwiuhs5va9qXmOS/+PI98LB7yAWxfk1YWg8rFHMOHMKrVmYt
+	pUA+I5SS5LyOVG97Zi0SXySkKCHeiMgXc/llzj73SBsCJNUl47wcd773geaaPPjF984dVU
+	LkfaCf48blrzZSV3JX0+sfBawJrRg1A=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, andrii@kernel.org, bot+bpf-ci@kernel.org
+Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
+ clm@meta.com, ihor.solodrai@linux.dev
+Subject:
+ Re: [PATCH bpf-next v11 02/12] bpf: use the least significant byte for the
+ nr_args in trampoline
+Date: Fri, 23 Jan 2026 16:29:01 +0800
+Message-ID: <2250332.irdbgypaU6@7940hx>
+In-Reply-To:
+ <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
+References:
+ <20260123073532.238985-3-dongml2@chinatelecom.cn>
+ <d91544bd4b513290bf468386c0261f913b59b761c34405839c424f8eaf8b1d04@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	CTE_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252688-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,kernel.org,redhat.com,linux.ibm.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-252691-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[iogearbox.net,linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,meta.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim]
-X-Rspamd-Queue-Id: B7D697277D
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.984];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:dkim]
+X-Rspamd-Queue-Id: 26DAA727B3
 X-Rspamd-Action: no action
 
-SMC-R buffers currently use 4KB page mapping for IB registration.
-Each page consumes one MTTE, which is inefficient and quickly depletes
-limited IB hardware resources for large buffers.
+On 2026/1/23 16:07 bot+bpf-ci@kernel.org write:
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index 41bbed6418b5..b3f912ad18ba 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+> 
+> [ ... ]
+> 
+> > @@ -23779,12 +23781,13 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+> >  			    eatype == BPF_MODIFY_RETURN) {
+> >  				/* Load nr_args from ctx - 8 */
+> >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> > -				insn_buf[1] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
+> > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
+> > +				insn_buf[2] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
+> 
+> [ ... ]
+> 
+> > -				cnt = 6;
+> > +				cnt = 7;
+> >  			} else {
+> >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, -EOPNOTSUPP);
+> >  				cnt = 1;
+> >  			}
+> >
+> >  			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
+> 
+> [ ... ]
+> 
+> > 			delta    += cnt - 1;
+> 
+> Note that the bpf_get_func_ret block above correctly updates delta after
+> patching.
+> 
+> > @@ -23808,12 +23811,15 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+> >
+> >  				/* skip 'void *__data' in btf_trace_##name() and save to reg0 */
+> >  				insn_buf[0] = BPF_MOV64_IMM(BPF_REG_0, nr_args - 1);
+> > +				cnt = 1;
+> >  			} else {
+> >  				/* Load nr_args from ctx - 8 */
+> >  				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> > +				insn_buf[1] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
+> > +				cnt = 2;
+> >  			}
+> >
+> > -			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, 1);
+> > +			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
+> >  			if (!new_prog)
+> >  				return -ENOMEM;
+> >
+> >  			env->prog = prog = new_prog;
+> >  			insn      = new_prog->insnsi + i + delta;
+> >  			goto next_insn;
+> >  		}
+> 
+> Should there be a "delta += cnt - 1;" before assigning env->prog in this
+> bpf_get_func_arg_cnt block? When cnt is 2 (non-RAW_TP path), the program
+> grows by one instruction, but delta is not updated. This could cause
+> subsequent bpf_patch_insn_data() calls to use incorrect offsets.
+> 
+> The bpf_get_func_arg block at the beginning of this patch has:
+> 
+>     delta    += cnt - 1;
+>     env->prog = prog = new_prog;
+> 
+> And the bpf_get_func_ret block similarly has delta updated. But this
+> bpf_get_func_arg_cnt block goes directly to env->prog assignment without
+> updating delta.
 
-For virtual contiguous buffer, switch to vmalloc_huge() to leverage
-huge page support. By using larger page sizes during IB MR registration,
-we can drastically reduce MTTE consumption.
+Ah, good point, I think this is a valid problem. The selftests didn't cover
+this case, and I think I'd better to use bpf_get_func_arg() and bpf_get_func_ret()
+in the exit path of fsession to cover it.
 
-For physically contiguous buffer, the entire buffer now requires only
-one single MTTE.
+Will fix it in the next version.
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
----
- net/smc/smc_core.c |  3 ++-
- net/smc/smc_ib.c   | 23 ++++++++++++++++++++---
- 2 files changed, 22 insertions(+), 4 deletions(-)
+Thanks!
+Menglong Dong
 
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 6219db498976..8aca5dc54be7 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -2348,7 +2348,8 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
- 			goto out;
- 		fallthrough;	// try virtually contiguous buf
- 	case SMCR_VIRT_CONT_BUFS:
--		buf_desc->cpu_addr = vzalloc(PAGE_SIZE << buf_desc->order);
-+		buf_desc->cpu_addr = vmalloc_huge(PAGE_SIZE << buf_desc->order,
-+						  GFP_KERNEL | __GFP_ZERO);
- 		if (!buf_desc->cpu_addr)
- 			goto out;
- 		buf_desc->pages = NULL;
-diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-index 1154907c5c05..67211d44a1db 100644
---- a/net/smc/smc_ib.c
-+++ b/net/smc/smc_ib.c
-@@ -20,6 +20,7 @@
- #include <linux/wait.h>
- #include <linux/mutex.h>
- #include <linux/inetdevice.h>
-+#include <linux/vmalloc.h>
- #include <rdma/ib_verbs.h>
- #include <rdma/ib_cache.h>
- 
-@@ -697,6 +698,18 @@ void smc_ib_put_memory_region(struct ib_mr *mr)
- 	ib_dereg_mr(mr);
- }
- 
-+static inline int smc_buf_get_vm_page_order(struct smc_buf_desc *buf_slot)
-+{
-+#ifdef CONFIG_HAVE_ARCH_HUGE_VMALLOC
-+	struct vm_struct *vm;
-+
-+	vm = find_vm_area(buf_slot->cpu_addr);
-+	return vm ? vm->page_order : 0;
-+#else
-+	return 0;
-+#endif
-+}
-+
- static int smc_ib_map_mr_sg(struct smc_buf_desc *buf_slot, u8 link_idx)
- {
- 	unsigned int offset = 0;
-@@ -706,8 +719,9 @@ static int smc_ib_map_mr_sg(struct smc_buf_desc *buf_slot, u8 link_idx)
- 	sg_num = ib_map_mr_sg(buf_slot->mr[link_idx],
- 			      buf_slot->sgt[link_idx].sgl,
- 			      buf_slot->sgt[link_idx].orig_nents,
--			      &offset, PAGE_SIZE);
--
-+			      &offset,
-+			      buf_slot->is_vm ? PAGE_SIZE << smc_buf_get_vm_page_order(buf_slot) :
-+			      PAGE_SIZE << buf_slot->order);
- 	return sg_num;
- }
- 
-@@ -719,7 +733,10 @@ int smc_ib_get_memory_region(struct ib_pd *pd, int access_flags,
- 		return 0; /* already done */
- 
- 	buf_slot->mr[link_idx] =
--		ib_alloc_mr(pd, IB_MR_TYPE_MEM_REG, 1 << buf_slot->order);
-+		ib_alloc_mr(pd, IB_MR_TYPE_MEM_REG,
-+			    buf_slot->is_vm ?
-+			    1 << (buf_slot->order - smc_buf_get_vm_page_order(buf_slot)) : 1);
-+
- 	if (IS_ERR(buf_slot->mr[link_idx])) {
- 		int rc;
- 
--- 
-2.45.0
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21278745581
+> 
+
+
+
 
 
