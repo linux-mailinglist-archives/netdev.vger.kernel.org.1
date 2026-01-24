@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-253030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHdSHptjdGnb5AAAu9opvQ
-	(envelope-from <netdev+bounces-253030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:15:55 +0100
+	id 4PZ5Ce1jdGnb5AAAu9opvQ
+	(envelope-from <netdev+bounces-253031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:17:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FDFC7C9E0
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:15:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D59B7CA0D
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0E1FB30156F3
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:15:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25C64300953B
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642AB27A107;
-	Sat, 24 Jan 2026 06:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FDA214A64;
+	Sat, 24 Jan 2026 06:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mlFPo/zE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jy2Ydcc8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7A7263899
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F361F30A9
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769235346; cv=none; b=T8OaDdXRrbjV2f5Clh5f1VWy/cMyoyuu4Vwu74+/Y0Ppkh+K8fSJUU9pPVcUzggICwpSSlggyZKUzQ/HrmTnSBftN+QPUMF4awXilFpWvbhvPzt0gqQnPxkpTCn1dLwgTj/HSHGf2GZ2Y1aYbnUgQSe42yCF2bpm4buhdNnQvJ8=
+	t=1769235357; cv=none; b=IOIGKyFGtlbVUk8TUms6sD9QePtZueQ/dffsE8fIb1E2kCCQEH/ZgH/r/l2Kv4umLzjlA0ThVn8XLVjWP2HxENLpxg5tNAlLCyaJqqI2Jcro0r7+whjCnnvTlCfyTo76vwtT/I9qcv4KX+MjGHYUt3ax9yPIq2XT4gWLAb/oNMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769235346; c=relaxed/simple;
-	bh=6xSypfncfNY1Nss0vh0kNoq/wXkNJz2RD8yfrY1UXfA=;
+	s=arc-20240116; t=1769235357; c=relaxed/simple;
+	bh=Dc1p3iDaf801teNw/cxJac53B/FzanFufUDmnroKQCs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CQKY7U0jssUPGsUZFrrRr9idcogz9lqVwB3t0nYHOyXYXsVwEY0Vp44GQ0pbx+r7SXJ4OlZeXl4PJZUjGl7Z/rhf1bMlrfct36C7qHSRj6VSezad97+yQQvPkJ4GTn+9oO313v4AXAj6/Ys/XwBf41C2mug0N7dfBDVTTfQ/kvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mlFPo/zE; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=kSTMdaU61iAKZ2Drp81yZ5KM0ijzk5oLu7Z0gfLgPrKrqvwv2kmdqA+sGlsclhMj0C33b6oxscKbGMSuBarn9PXdf1DOToX2LPPcED4ekr42hbedU0dbCn+QboFQrCh5A0zhGJaNSDxNsOQXf6IBbE7gqFCfkL/IJ1AHZAmTe2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jy2Ydcc8; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769235342;
+	t=1769235353;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zqd0TGwTIL3tZ38ebnmi7rts9nq4t1a/C8VA2l7wkV0=;
-	b=mlFPo/zEeQMG6k4djdzGSGj/7JC6nJZ00w3HcvHMwiFqm8/AT0z99zdu7Ba5bjWy0hKIGc
-	i1FBdivAm/8S3s/3xiUm9OYpqcEqLvXL4tyzFO2zhIqoUL81C1hKDgWODQsF+x0smARacs
-	oz3iRBhTEdU/MFXjahB5MuM/u1AlqGs=
+	bh=ARfWb+0AzpGKu3iI7iT5/X6JyKiOG9JFwcLDWao6NGM=;
+	b=Jy2Ydcc8m+cNCgC8ZxOe5HvdEg03sSkacqe4LEyU3TfCkwmgWa/zu8WQTob4ivz04HT7od
+	u/P/GCGDMqrKV+rLFvbVwjeWpbAy/yQrX1VEp3hGYoMFY/ggDu3702cFHtwKv5P/TZ6BED
+	aGolHqW7kLgyjq8u8nGOqnq+mSW1Pbc=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
 	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -70,15 +70,14 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Hao Luo <haoluo@google.com>,
 	Jiri Olsa <jolsa@kernel.org>,
 	Shuah Khan <shuah@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
 	Michal Luczaj <mhal@rbox.co>,
 	Cong Wang <cong.wang@bytedance.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v8 1/3] bpf, sockmap: Fix incorrect copied_seq calculation
-Date: Sat, 24 Jan 2026 14:14:31 +0800
-Message-ID: <20260124061502.24350-2-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf-next v8 2/3] bpf, sockmap: Fix FIONREAD for sockmap
+Date: Sat, 24 Jan 2026 14:14:32 +0800
+Message-ID: <20260124061502.24350-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260124061502.24350-1-jiayuan.chen@linux.dev>
 References: <20260124061502.24350-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -97,14 +96,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,cloudflare.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,rbox.co,bytedance.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,rbox.co,bytedance.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	TAGGED_FROM(0.00)[bounces-253030-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-253031-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -114,35 +113,44 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,syzkaller.appspot.com:url,cloudflare.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2FDFC7C9E0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7D59B7CA0D
 X-Rspamd-Action: no action
 
 A socket using sockmap has its own independent receive queue: ingress_msg.
 This queue may contain data from its own protocol stack or from other
 sockets.
 
-The issue is that when reading from ingress_msg, we update tp->copied_seq
-by default. However, if the data is not from its own protocol stack,
-tcp->rcv_nxt is not increased. Later, if we convert this socket to a
-native socket, reading from this socket may fail because copied_seq might
-be significantly larger than rcv_nxt.
+Therefore, for sockmap, relying solely on copied_seq and rcv_nxt to
+calculate FIONREAD is not enough.
 
-This fix also addresses the syzkaller-reported bug referenced in the
-Closes tag.
+This patch adds a new msg_tot_len field in the psock structure to record
+the data length in ingress_msg. Additionally, we implement new ioctl
+interfaces for TCP and UDP to intercept FIONREAD operations.
 
-This patch marks the skmsg objects in ingress_msg. When reading, we update
-copied_seq only if the data is from its own protocol stack.
+Note that we intentionally do not include sk_receive_queue data in the
+FIONREAD result. Data in sk_receive_queue has not yet been processed by
+the BPF verdict program, and may be redirected to other sockets or
+dropped. Including it would create semantic ambiguity since this data
+may never be readable by the user.
 
-                                                     FD1:read()
-                                                     --  FD1->copied_seq++
-                                                         |  [read data]
-                                                         |
-                                [enqueue data]           v
+Unix and VSOCK sockets have similar issues, but fixing them is outside
+the scope of this patch as it would require more intrusive changes.
+
+Previous work by John Fastabend made some efforts towards FIONREAD support:
+commit e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+Although the current patch is based on the previous work by John Fastabend,
+it is acceptable for our Fixes tag to point to the same commit.
+
+                                                      FD1:read()
+                                                      --  FD1->copied_seq++
+                                                          |  [read data]
+                                                          |
+                                   [enqueue data]         v
                   [sockmap]     -> ingress to self ->  ingress_msg queue
 FD1 native stack  ------>                                 ^
 -- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
@@ -152,139 +160,244 @@ FD1 native stack  ------>                                 ^
                                       ...                 |  [sockmap]
                                                      FD2 native stack
 
-Closes: https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
 Fixes: 04919bed948dc ("tcp: Introduce tcp_read_skb()")
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- include/linux/skmsg.h |  2 ++
- net/core/skmsg.c      | 27 ++++++++++++++++++++++++---
- net/ipv4/tcp_bpf.c    |  5 +++--
- 3 files changed, 29 insertions(+), 5 deletions(-)
+ include/linux/skmsg.h | 68 +++++++++++++++++++++++++++++++++++++++++--
+ net/core/skmsg.c      |  3 ++
+ net/ipv4/tcp_bpf.c    | 20 +++++++++++++
+ net/ipv4/udp_bpf.c    | 23 ++++++++++++---
+ 4 files changed, 108 insertions(+), 6 deletions(-)
 
 diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 49847888c287..dfdc158ab88c 100644
+index dfdc158ab88c..829b281d6c9c 100644
 --- a/include/linux/skmsg.h
 +++ b/include/linux/skmsg.h
-@@ -141,6 +141,8 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
- 			     struct sk_msg *msg, u32 bytes);
- int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 		   int len, int flags);
-+int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
-+		     int len, int flags, int *copied_from_self);
- bool sk_msg_is_readable(struct sock *sk);
+@@ -97,6 +97,8 @@ struct sk_psock {
+ 	struct sk_buff_head		ingress_skb;
+ 	struct list_head		ingress_msg;
+ 	spinlock_t			ingress_lock;
++	/** @msg_tot_len: Total bytes queued in ingress_msg list. */
++	u32				msg_tot_len;
+ 	unsigned long			state;
+ 	struct list_head		link;
+ 	spinlock_t			link_lock;
+@@ -321,6 +323,27 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+ 	kfree_skb(skb);
+ }
  
- static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
++static inline u32 sk_psock_get_msg_len_nolock(struct sk_psock *psock)
++{
++	/* Used by ioctl to read msg_tot_len only; lock-free for performance */
++	return READ_ONCE(psock->msg_tot_len);
++}
++
++static inline void sk_psock_msg_len_add_locked(struct sk_psock *psock, int diff)
++{
++	/* Use WRITE_ONCE to ensure correct read in sk_psock_get_msg_len_nolock().
++	 * ingress_lock should be held to prevent concurrent updates to msg_tot_len
++	 */
++	WRITE_ONCE(psock->msg_tot_len, psock->msg_tot_len + diff);
++}
++
++static inline void sk_psock_msg_len_add(struct sk_psock *psock, int diff)
++{
++	spin_lock_bh(&psock->ingress_lock);
++	sk_psock_msg_len_add_locked(psock, diff);
++	spin_unlock_bh(&psock->ingress_lock);
++}
++
+ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+ 				      struct sk_msg *msg)
+ {
+@@ -329,6 +352,7 @@ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+ 	spin_lock_bh(&psock->ingress_lock);
+ 	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
+ 		list_add_tail(&msg->list, &psock->ingress_msg);
++		sk_psock_msg_len_add_locked(psock, msg->sg.size);
+ 		ret = true;
+ 	} else {
+ 		sk_msg_free(psock->sk, msg);
+@@ -345,18 +369,25 @@ static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
+ 
+ 	spin_lock_bh(&psock->ingress_lock);
+ 	msg = list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
+-	if (msg)
++	if (msg) {
+ 		list_del(&msg->list);
++		sk_psock_msg_len_add_locked(psock, -msg->sg.size);
++	}
+ 	spin_unlock_bh(&psock->ingress_lock);
+ 	return msg;
+ }
+ 
++static inline struct sk_msg *sk_psock_peek_msg_locked(struct sk_psock *psock)
++{
++	return list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
++}
++
+ static inline struct sk_msg *sk_psock_peek_msg(struct sk_psock *psock)
+ {
+ 	struct sk_msg *msg;
+ 
+ 	spin_lock_bh(&psock->ingress_lock);
+-	msg = list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
++	msg = sk_psock_peek_msg_locked(psock);
+ 	spin_unlock_bh(&psock->ingress_lock);
+ 	return msg;
+ }
+@@ -523,6 +554,39 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
+ 	return !!psock->saved_data_ready;
+ }
+ 
++/* for tcp only, sk is locked */
++static inline ssize_t sk_psock_msg_inq(struct sock *sk)
++{
++	struct sk_psock *psock;
++	ssize_t inq = 0;
++
++	psock = sk_psock_get(sk);
++	if (likely(psock)) {
++		inq = sk_psock_get_msg_len_nolock(psock);
++		sk_psock_put(sk, psock);
++	}
++	return inq;
++}
++
++/* for udp only, sk is not locked */
++static inline ssize_t sk_msg_first_len(struct sock *sk)
++{
++	struct sk_psock *psock;
++	struct sk_msg *msg;
++	ssize_t inq = 0;
++
++	psock = sk_psock_get(sk);
++	if (likely(psock)) {
++		spin_lock_bh(&psock->ingress_lock);
++		msg = sk_psock_peek_msg_locked(psock);
++		if (msg)
++			inq = msg->sg.size;
++		spin_unlock_bh(&psock->ingress_lock);
++		sk_psock_put(sk, psock);
++	}
++	return inq;
++}
++
+ #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
+ 
+ #define BPF_F_STRPARSER	(1UL << 1)
 diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 2ac7731e1e0a..d402da5caadd 100644
+index d402da5caadd..ddde93dd8bc6 100644
 --- a/net/core/skmsg.c
 +++ b/net/core/skmsg.c
-@@ -409,22 +409,26 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
- }
- EXPORT_SYMBOL_GPL(sk_msg_memcopy_from_iter);
+@@ -458,6 +458,7 @@ int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg
+ 					atomic_sub(copy, &sk->sk_rmem_alloc);
+ 				}
+ 				msg_rx->sg.size -= copy;
++				sk_psock_msg_len_add(psock, -copy);
  
--/* Receive sk_msg from psock->ingress_msg to @msg. */
--int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
--		   int len, int flags)
-+int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
-+		     int len, int flags, int *copied_from_self)
- {
- 	struct iov_iter *iter = &msg->msg_iter;
- 	int peek = flags & MSG_PEEK;
- 	struct sk_msg *msg_rx;
- 	int i, copied = 0;
-+	bool from_self;
- 
- 	msg_rx = sk_psock_peek_msg(psock);
-+	if (copied_from_self)
-+		*copied_from_self = 0;
-+
- 	while (copied != len) {
- 		struct scatterlist *sge;
- 
- 		if (unlikely(!msg_rx))
- 			break;
- 
-+		from_self = msg_rx->sk == sk;
- 		i = msg_rx->sg.start;
- 		do {
- 			struct page *page;
-@@ -443,6 +447,9 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 			}
- 
- 			copied += copy;
-+			if (from_self && copied_from_self)
-+				*copied_from_self += copy;
-+
- 			if (likely(!peek)) {
- 				sge->offset += copy;
- 				sge->length -= copy;
-@@ -487,6 +494,13 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- out:
- 	return copied;
- }
-+
-+/* Receive sk_msg from psock->ingress_msg to @msg. */
-+int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
-+		   int len, int flags)
-+{
-+	return __sk_msg_recvmsg(sk, psock, msg, len, flags, NULL);
-+}
- EXPORT_SYMBOL_GPL(sk_msg_recvmsg);
- 
- bool sk_msg_is_readable(struct sock *sk)
-@@ -616,6 +630,12 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
- 	if (unlikely(!msg))
- 		return -EAGAIN;
- 	skb_set_owner_r(skb, sk);
-+
-+	/* This is used in tcp_bpf_recvmsg_parser() to determine whether the
-+	 * data originates from the socket's own protocol stack. No need to
-+	 * refcount sk because msg's lifetime is bound to sk via the ingress_msg.
-+	 */
-+	msg->sk = sk;
- 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, take_ref);
- 	if (err < 0)
+ 				if (!sge->length) {
+ 					sk_msg_iter_var_next(i);
+@@ -821,9 +822,11 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
+ 		list_del(&msg->list);
+ 		if (!msg->skb)
+ 			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
++		sk_psock_msg_len_add(psock, -msg->sg.size);
+ 		sk_msg_free(psock->sk, msg);
  		kfree(msg);
-@@ -909,6 +929,7 @@ int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
- 	sk_msg_compute_data_pointers(msg);
- 	msg->sk = sk;
- 	ret = bpf_prog_run_pin_on_cpu(prog, msg);
-+	msg->sk = NULL;
- 	ret = sk_psock_map_verd(ret, msg->sk_redir);
- 	psock->apply_bytes = msg->apply_bytes;
- 	if (ret == __SK_REDIRECT) {
+ 	}
++	WARN_ON_ONCE(psock->msg_tot_len);
+ }
+ 
+ static void __sk_psock_zap_ingress(struct sk_psock *psock)
 diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index a268e1595b22..5c698fd7fbf8 100644
+index 5c698fd7fbf8..ca8a5cb8e569 100644
 --- a/net/ipv4/tcp_bpf.c
 +++ b/net/ipv4/tcp_bpf.c
-@@ -226,6 +226,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 	int peek = flags & MSG_PEEK;
- 	struct sk_psock *psock;
- 	struct tcp_sock *tcp;
-+	int copied_from_self = 0;
- 	int copied = 0;
- 	u32 seq;
+@@ -10,6 +10,7 @@
  
-@@ -262,7 +263,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 	}
+ #include <net/inet_common.h>
+ #include <net/tls.h>
++#include <asm/ioctls.h>
  
- msg_bytes_ready:
--	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
-+	copied = __sk_msg_recvmsg(sk, psock, msg, len, flags, &copied_from_self);
- 	/* The typical case for EFAULT is the socket was gracefully
- 	 * shutdown with a FIN pkt. So check here the other case is
- 	 * some error on copy_page_to_iter which would be unexpected.
-@@ -277,7 +278,7 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 			goto out;
- 		}
- 	}
--	seq += copied;
-+	seq += copied_from_self;
- 	if (!copied) {
- 		long timeo;
- 		int data;
+ void tcp_eat_skb(struct sock *sk, struct sk_buff *skb)
+ {
+@@ -332,6 +333,24 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 	return copied;
+ }
+ 
++static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
++{
++	bool slow;
++
++	if (cmd != SIOCINQ)
++		return tcp_ioctl(sk, cmd, karg);
++
++	/* works similar as tcp_ioctl */
++	if (sk->sk_state == TCP_LISTEN)
++		return -EINVAL;
++
++	slow = lock_sock_fast(sk);
++	*karg = sk_psock_msg_inq(sk);
++	unlock_sock_fast(sk, slow);
++
++	return 0;
++}
++
+ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 			   int flags, int *addr_len)
+ {
+@@ -610,6 +629,7 @@ static void tcp_bpf_rebuild_protos(struct proto prot[TCP_BPF_NUM_CFGS],
+ 	prot[TCP_BPF_BASE].close		= sock_map_close;
+ 	prot[TCP_BPF_BASE].recvmsg		= tcp_bpf_recvmsg;
+ 	prot[TCP_BPF_BASE].sock_is_readable	= sk_msg_is_readable;
++	prot[TCP_BPF_BASE].ioctl		= tcp_bpf_ioctl;
+ 
+ 	prot[TCP_BPF_TX]			= prot[TCP_BPF_BASE];
+ 	prot[TCP_BPF_TX].sendmsg		= tcp_bpf_sendmsg;
+diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+index 0735d820e413..91233e37cd97 100644
+--- a/net/ipv4/udp_bpf.c
++++ b/net/ipv4/udp_bpf.c
+@@ -5,6 +5,7 @@
+ #include <net/sock.h>
+ #include <net/udp.h>
+ #include <net/inet_common.h>
++#include <asm/ioctls.h>
+ 
+ #include "udp_impl.h"
+ 
+@@ -111,12 +112,26 @@ enum {
+ static DEFINE_SPINLOCK(udpv6_prot_lock);
+ static struct proto udp_bpf_prots[UDP_BPF_NUM_PROTS];
+ 
++static int udp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
++{
++	if (cmd != SIOCINQ)
++		return udp_ioctl(sk, cmd, karg);
++
++	/* Since we don't hold a lock, sk_receive_queue may contain data.
++	 * BPF might only be processing this data at the moment. We only
++	 * care about the data in the ingress_msg here.
++	 */
++	*karg = sk_msg_first_len(sk);
++	return 0;
++}
++
+ static void udp_bpf_rebuild_protos(struct proto *prot, const struct proto *base)
+ {
+-	*prot        = *base;
+-	prot->close  = sock_map_close;
+-	prot->recvmsg = udp_bpf_recvmsg;
+-	prot->sock_is_readable = sk_msg_is_readable;
++	*prot			= *base;
++	prot->close		= sock_map_close;
++	prot->recvmsg		= udp_bpf_recvmsg;
++	prot->sock_is_readable	= sk_msg_is_readable;
++	prot->ioctl		= udp_bpf_ioctl;
+ }
+ 
+ static void udp_bpf_check_v6_needs_rebuild(struct proto *ops)
 -- 
 2.43.0
 
