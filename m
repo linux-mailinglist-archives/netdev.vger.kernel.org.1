@@ -1,250 +1,168 @@
-Return-Path: <netdev+bounces-253000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENXWFpIZdGnS2AAAu9opvQ
-	(envelope-from <netdev+bounces-253000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 02:00:02 +0100
+	id KBWRBC0ddGkW2QAAu9opvQ
+	(envelope-from <netdev+bounces-253002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 02:15:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C507BD53
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 02:00:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D677BE77
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 02:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3D23A301468C
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:00:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91C7B304808A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EF515746E;
-	Sat, 24 Jan 2026 00:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F4D1E834B;
+	Sat, 24 Jan 2026 01:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1rz8hFw"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="gb0uiZMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637A07E110
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 00:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9851D6DA9
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 01:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769216399; cv=none; b=lmZ55AGDJK0YWuW9FPMVANEOq3cV9xRdmywX8F3Lufxvi+rESnzmmH/aZFWqdPehWVdzVwr5lnhA1ZCko+UPIq969UjzmegQHxyUv0LeAgedYY6LNkkkugNaeqxSpqsbQEfdZ6T40e9XnfLq89nku2V9WIeiV9nvm7fsa3rqyfM=
+	t=1769217284; cv=none; b=MI7rZbpmArOdzTcRQh032sS1nhpKv8yJs6udF58I00qV930Z1Ka5G1wHWC3k22KIEt+h3qyKe6wxRRdMYJsJ08+JXFvycRabvA7f0PmFuzP/uJwxrgAPDuBLaIM99E/96VeMHk9bTsSeRd1Vkf/pB0NMiPjhuFa1b+mKm23aq+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769216399; c=relaxed/simple;
-	bh=P0moAP4QUOcnHbcix0kXlraPc2P4nJVJoTdv0t/Our8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PeOCgZjs5nWw7JmIe0UWDQITjuXPyt8IQFMLv56K3JuJG1DtW7zPk46Tg+r4XTOQPZ2VLjOQOVmGNf3rik0LnnAY/yxNoO5t39IjUyJBMZLNsbOtMeYG3k9WWaLX6r2ELrhHjf9xgs9oWohTVTKMoW4kML1oTZfkcoDtkcAuUy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S1rz8hFw; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42fbb061a08so446675f8f.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 16:59:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769216396; x=1769821196; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxQBocjBKjEC4mv4CNajitmiXw7FC5x1mC5Q0V2nZ7g=;
-        b=S1rz8hFwq47sda9lP5h0/LBnurRB743RFDymD9Xrrhk8d6Z45R7sm3/Hmx6kOy/qZw
-         2EpVH4Yww0Fi2/6wLRko1lQGyNPYzlLxFaGAG7HGQprGs3rlrn1KeFjm+ZeyXuCh+2/1
-         bmSEJDQZ34rijPHvZ0gdD987rQFdyavERvFsJKrPhWPFUi+mL4aoCa7iUQ0ynH9L7i6X
-         lrGGOPM/U1QsTVJaSazdjBRwILFazmNCfz3EFjZ1y9LYuANWy7aGLf62sul8NineAdng
-         1OT+Rd3KfnPPMsh/Wv0DvUDg0r3xd4D9SJQ7dz1jvyul6EhhYsvk4hXGSNRHOwtjEyGt
-         VLeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769216396; x=1769821196;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PxQBocjBKjEC4mv4CNajitmiXw7FC5x1mC5Q0V2nZ7g=;
-        b=irn0/DSdCeWyKW5Es9O68M3/i6S59mqDdE0wnflyAfAkHgXt/yXyimZdTeBijw09Nj
-         32ErqV5GafEUP3FRjryqDuO67FsM1ZqQ6diaMY2uoyZ5XzCCYYEy8+2krzUz6wHam6Hd
-         Xbdj/DYHPQ8TVIBZYRN6hpPUsimTw8MmeJJbSQumRcxcWyMRNIHFCrTTHGaGEO0T7WIM
-         EIefSpZR8e9rF+jzgmledJum1nQmpy7TfWkEirIPv7l5TXvkvaGB2QxLdr1hQTbB/Wbq
-         KwhNjFpcd59+DRhPKvyLHgARkaHihyTbjCMCZXzbLP6zCapsxOir2DLJIIjc+hd+88HB
-         ls2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXN2poy2U4Yss3lCBjygcX8ZfkaPdwyI/e/6FkmEpZbNqLJ2rUyNKChp9PJWmWKfI1Fj2R+1uQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1IegtcSym8v1CNhE5z8r9saQFSQvoEtBhQrB7UWKQWhQKCmom
-	B6QGHbaS55NJ+Z9yI2TlksLPmDTm7tPtKFNlpCPRt6bIxqWoYIOYMn5n
-X-Gm-Gg: AZuq6aJllUEYO3zlMd/u1C2rJ9S3C0djatC7SXcsgiNp/R00r66V1lM1g4f3AOSXiss
-	zxDe3/gHwtcSB33HL0vHGmShW6Ego/Z24qrZeAcIS7KCZ7oldcDYICIghflmW7TYY6aouc/qjJf
-	ufxOpAa98RhqoSs5KQNN7DuR0ALLW+qD5PdOtVKUJ8Aylebc3OOTCfmDnnrr4yOe0lqSggCHD20
-	rF3QbOEV948C+0KtbyjipohgzkEeY1kwdkQKjxwHAM6M4eY0UZxPYbMiwNsSHdT3D9upm90aeDU
-	sLCv1GjJz6rUfIFsI3QhFgai6iO8VhulF9D5Zh9lb7aBRd7jwRA8Rq2QE2JQglPConahTXFC8Hx
-	a14MuFcYKbuljukMOc0+BbP5KiH46Bzu/wufQkjL6kiw/UzLRff1qQriS+9K0XFx59JNxUWBHve
-	hH4Q==
-X-Received: by 2002:a05:6000:420c:b0:435:b068:d3d9 with SMTP id ffacd0b85a97d-435bdff681emr1187921f8f.5.1769216395508;
-        Fri, 23 Jan 2026 16:59:55 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d501:d900:1430:8b48:2d45:6c1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e716b6sm10616033f8f.27.2026.01.23.16.59.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 16:59:54 -0800 (PST)
-Date: Sat, 24 Jan 2026 02:59:51 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 05/14] net: stmmac: add stmmac core serdes
- support
-Message-ID: <20260124005951.fbkvd2girdqtfxe7@skbuf>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
- <E1vjDrM-00000005fQR-0rmB@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1769217284; c=relaxed/simple;
+	bh=LWbEQ6Qb58mba99fQT7Bo/qzaqprFSHHlGLGlnboiA8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LlZFYAe0+zNS2/CVcVChZ5HUCwRk/H9DPLI9xnQOasIQRB2WUyolHK2qts6FYonfXg3ro4ZYcoACd9v81jX3rF8s8br55fZhUZSDSsPpVE8UGx36Oma0Fwzrrs9f17/EMEBWuPq1FreTv+5l6kFdNFPK14juUcgm+5sQA7YU9D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=gb0uiZMy; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 60NN8D0L2798914
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:14:41 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=YdlSP3kPdploWJS5aUMnMwLO0/mqjo3Jlr7WAS5cl7E=; b=gb0uiZMy98B8
+	CFSsITssaKCwAC6SVh6xqW/32q1ZrO0ZgEI+xA3QOSDqHzvIl8zovPc0C81FAyw4
+	Z0lIdKYOvxXvfSo/E52n+wBO3lktItLxqZNJxeTFkagXBk3Gq0LnumMeb3iOh6Q1
+	oXBGvvi5YwJZFXQfNcYnBMQ/RMjyEOqTzTkHu0xZ/vXegWeJobOd0R211do/+i0h
+	2f7Ua4zWqN74xmkjvhM1FJUVgQFUvbUig/sFK6S65KE3kH/4BO2U/0TupBOEk73s
+	7/YWyICV79oCSncBBrt6Cdg1CrxqrNATF7Cs5qA0nhtabB384HB5sLoYQbuzWE0P
+	Tolyr6sfGA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4bvdcg3va8-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 17:14:41 -0800 (PST)
+Received: from twshared26141.04.snb1.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Sat, 24 Jan 2026 01:14:40 +0000
+Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
+	id D15DAF2FB2F3; Fri, 23 Jan 2026 17:14:36 -0800 (PST)
+From: Zhiping Zhang <zhipingz@meta.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
+        Yochai Cohen
+	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+        Zhiping Zhang
+	<zhipingz@meta.com>
+Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+Date: Fri, 23 Jan 2026 17:13:19 -0800
+Message-ID: <20260124011436.172058-1-zhipingz@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260113164923.GQ745888@ziepe.ca>
+References: <20260113164923.GQ745888@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vjDrM-00000005fQR-0rmB@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: bg3HlO6JKCdn7FpwL_zBCZWhL_U1ckFa
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI0MDAwNyBTYWx0ZWRfX2egofQQhpIF8
+ iQWuQj9XnRvp12wE8Kb0QyCEWg/tnLSoIta9YDtUOUR4zaigCieHYqfJPbM5+adHgorg2b5YcSN
+ aD8il+K3KA94VHUm4hrTTRZgWWlW2RwIjK4+loBuh1bVuWrb9wfX/0Lilkz78o8ISn88hJPKPRq
+ CRNk+NC/BC6Nhazqv95ZTyF1iX7lDmn6AZHPZ8crleIVA8fKxvSxpvlnS89EtFrm0WnocGcCz7N
+ 0pMZyxNKrtzfrlwZorWEQfrHK1Z+3WWoKUdG9qdZt2pgBZFWfhOWI4FADpWL+eKMwYfcdmSx+Vr
+ 0IXxN38juP4c47ez8a3WLAx1kyzsoXp7q1+1HiCndVtGpLpCCqMQrkKmkVHG3ztzJE2c1oPUT8s
+ muZhov0tBS+XY2KNBj7lk69hTSpGn+24al07fa9yy+V/5JNR0vKkz3gQI2WE8nPa3D6TrpN4dVK
+ RS4rmDfsKuSTAzbHvDQ==
+X-Authority-Analysis: v=2.4 cv=K88v3iWI c=1 sm=1 tr=0 ts=69741d01 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=NEAV23lmAAAA:8 a=VwQbUJbxAAAA:8 a=zHM-U5WPLxhMletD85EA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: bg3HlO6JKCdn7FpwL_zBCZWhL_U1ckFa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-23_04,2026-01-22_02,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253000-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,bootlin.com,oss.qualcomm.com,linaro.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[meta.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253002-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:mid,meta.com:dkim];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olteanv@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C5C507BD53
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 91D677BE77
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 09:53:44AM +0000, Russell King (Oracle) wrote:
-> Rather than having platform glue implement SerDes PHY support, add it
-> to the core driver, specifically to the stmmac integrated PCS driver
-> as the SerDes is connected to the integrated PCS.
-> 
-> Platforms using external PCS can also populate plat->serdes, and the
-> core driver will call phy_init() and phy_exit() when the administrative
-> state of the interface changes, but the other phy methods will not be
-> called.
-> 
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> --
-> rfc->v1: avoid calling phy_get_mode() with NULL serdes PHY
-> v2: add cleanup when dwmac_serdes_set_mode() fails, because AI allegedly
->   knows better than the author and phylink maintainer, even though this
->   will result in dwmac_serdes_power_off() being called multiple times
->   and producing a kernel warning. But if it makes AI happy, then it must
->   be a good thing. It'll also make Vladimir happy.
+On Tue, 13 Jan 2026 12:49:23 -0400, Jason Gunthorpe wrote:
 
-These gratuitous passive-aggressive comments about what makes me happy,
-based on twisted interpretations of conversations, are best kept to yourself.
+> On Mon, Jan 12, 2026 at 11:43:13PM -0800, Zhiping Zhang wrote:
+> > Got it, thanks for pointing out the security concern! To address this=
+, I
+> > propose that we still pass the TPH value when allocating the dmah, bu=
+t we add
+> > a verification callback in the reg_mr_dmabuf flow to the dmabuf expor=
+ter. This
+> > callback will ensure that the TPH value is correctly linked to the ex=
+porting
+> > device=E2=80=99s MMIO, and only the exporter can authorize the TPH/ta=
+g association.
 
-I remember Jakub's request was only to add a note in the commit message
-about the reason behind the lack of cleanup, not to add cleanup which
-will be executed twice:
-https://lore.kernel.org/netdev/20260120153248.0636f1e9@kernel.org/
+> That still sounds messy because we have to protect CPU memory.
 
-I only expressed dissatisfaction with the phylink_pcs calling convention
-as it is today, and searched for ways to make the calls balanced. I also
-didn't make any suggestion to make the code worse by performing the
-SerDes power down twice, just subscribed to Jakub's request to leave a
-comment why your v1 is the way that it is:
-https://lore.kernel.org/netdev/20260122112913.svzaie4eywk5nc32@skbuf/
+> I think you should not use dmah possibly and make it so the dmabuf
+entirely supplies the TPH value.
 
-Getting over that dissatisfaction and working within the framework of
-the existing calling convention, but also inserting the comment that I
-was looking to see, I believe that functionally correct code would look
-like this (applies on top of your entire v2 patch set):
+> Jason
 
--- >8 --
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-index d46a071bc383..c4465dca6b93 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_serdes.c
-@@ -59,12 +59,27 @@ int dwmac_serdes_power_on(struct stmmac_priv *priv)
- {
- 	int ret;
- 
-+	/* Because the dwmac_integrated_pcs_disable() call path is eventually
-+	 * invoked irrespective of the dwmac_integrated_pcs_enable() return
-+	 * code, we risk either underflowing the SerDes phy->power_count or
-+	 * leaving the lane powered on, depending on the cleanup choice and the
-+	 * point of failure. Keeping separate track of the lane power on state
-+	 * is a band aid until phylink offers balanced pcs_enable() and
-+	 * pcs_disable() calls.
-+	 */
-+	if (priv->plat->serdes_powered_on)
-+		return 0;
-+
- 	ret = phy_power_on(priv->plat->serdes);
--	if (ret)
-+	if (ret) {
- 		dev_err(priv->device, "failed to power on SerDes: %pe\n",
- 			ERR_PTR(ret));
-+		return ret;
-+	}
- 
--	return ret;
-+	priv->plat->serdes_powered_on = true;
-+
-+	return 0;
- }
- 
- int dwmac_serdes_init_mode(struct stmmac_priv *priv, phy_interface_t interface)
-@@ -95,10 +110,17 @@ void dwmac_serdes_power_off(struct stmmac_priv *priv)
- {
- 	int ret;
- 
-+	if (!priv->plat->serdes_powered_on)
-+		return;
-+
- 	ret = phy_power_off(priv->plat->serdes);
--	if (ret)
-+	if (ret) {
- 		dev_err(priv->device, "failed to power off SerDes: %pe\n",
- 			ERR_PTR(ret));
-+		return;
-+	}
-+
-+	priv->plat->serdes_powered_on = false;
- }
- 
- void dwmac_serdes_exit(struct stmmac_priv *priv)
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 6097f4b6dd12..e62bba38ab60 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -225,6 +225,7 @@ struct plat_stmmacenet_data {
- 	 */
- 	phy_interface_t phy_interface;
- 	struct phy *serdes;
-+	bool serdes_powered_on;
- 	struct stmmac_mdio_bus_data *mdio_bus_data;
- 	struct device_node *phy_node;
- 	struct fwnode_handle *port_node;
--- >8 --
+Thanks Jason.
+
+We already have an end-to-end workflow around dmah (perftest =E2=86=92 rd=
+ma-core =E2=86=92 kernel)
+to carry the TPH hint, across multiple patch sets. References:
+  https://github.com/linux-rdma/perftest/commit/98bfb3679a1e71ec96df6a6d6=
+c8124ac66ebce25
+  https://github.com/linux-rdma/rdma-core/pull/1623/commits
+  https://lore.kernel.org/all/cover.1752752567.git.leon@kernel.org/
+
+Given that, I=E2=80=99d like to minimize churn and use the existing dmah-=
+based flow, while
+addressing the CPU-memory protection concern you raised. Would you be ope=
+n to
+reconsidering this approach?
+
+Zhiping
 
