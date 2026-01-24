@@ -1,191 +1,146 @@
-Return-Path: <netdev+bounces-252998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-252999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Qbe8JiYXdGmQ2AAAu9opvQ
-	(envelope-from <netdev+bounces-252998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:49:42 +0100
+	id uiCTANMYdGnD2AAAu9opvQ
+	(envelope-from <netdev+bounces-252999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:56:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A664B7BCB0
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:49:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1227BD2B
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 01:56:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5B883019BB8
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:49:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D9DD30115BD
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 00:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A1B533D6;
-	Sat, 24 Jan 2026 00:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311CF4AEE2;
+	Sat, 24 Jan 2026 00:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MMIbepD6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GibuF+cw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D0133985;
-	Sat, 24 Jan 2026 00:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC281A945;
+	Sat, 24 Jan 2026 00:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769215778; cv=none; b=oJJeGeFyRz17y+hn/ECIZ+yW2bScHYLVVAN0kSNnaKvdSZUvRWLlwjfHlq51vnJP8ninaAlQP24uE2QwVoYKtZpHyfi1fP336zdKx/y/uM+x7Edi7sxNXwLjwLdprYAjWgvUDwrJ5wsen1qOtaedqp2Kbq5Eir5F6PosOg88hxo=
+	t=1769216207; cv=none; b=rYdnXX+ziUNaSlRP7R0E8XYXuED6qnQH3Ri1Hig6+TuTUy81Yd6MFfHl5ViQ4kOIdamkrqmAt6xRYePFXeOSe/TZRvlQ4ceL64qWAAFPOLWC7yLznw0EPrK5eBjDWaPMvaYDj1rZkBbQH1ukbSkwtjULwWhxMcq1oCvetshpDyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769215778; c=relaxed/simple;
-	bh=fvpElUu6XDGBp0awRg+CEKX3ynOmniADUu3Ped643sg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NGj+XjvGCvGvr0qz0qfZW+IUoWAK5JYD0XwZgYH1UaJdq9/gGKPt/ZmsLuUwE56ZnTV+HLvtpo9lMb1yevGJ/1PF/K8LRRINwCyzyehjn6r1gzsWUYT0AbDO4qcb6ulEImjywSc/sWuKls1Kejf7ChjoJM7Xo4McJxVGVXXeQ+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MMIbepD6; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1769216207; c=relaxed/simple;
+	bh=tjwDfVUOCv7OweMTrTAC/NmQxTm0fJ23jK+CFiLTyI4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fz5wA3ATCFUtCguj0kIB/yC+q9roda2y/uj4n89fP3c8ty5baSe+hJm4mqOYSwGJwoRCn64ibP2OYXkCtjQPqieB/46lwh7WnzvBYe+ucm4pmOR/SJ26jGFXs+62ZXtGKSF6EhSlDijis+mpZwnGc25JZlofmloYaPLUtBf4kyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GibuF+cw; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769215778; x=1800751778;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fvpElUu6XDGBp0awRg+CEKX3ynOmniADUu3Ped643sg=;
-  b=MMIbepD6buOA7HO0BvZAEtFMjMjLJXhz+/rG6ewjXNJSZMyAHH2egzCN
-   KBLgbKQ7dJqqeEfOpTEppREm+YL5VoU14TtmDJk+W+3h/H6z+c+B5O5/V
-   3ott2y4e0RZ0+z9f9N1h3TmNabV96C5xWm5YaJdRlFqS+/HyDjoRrXQ1Y
-   HILU8xnsyGupWGXyXWclt5nzu2SDmayUZ08iC/35fWKtxyy9QWKuxIbOm
-   jYPKsKY6A1jTyxIMHZLRklUTrHthI7lf6ZWZpgC4ePMtMluelc7WQc/lR
-   VF9ZiWzonBAJYGuQNVDeWCs4M/yO6Zjf2u1KpA8qEqo+xNpkDqbm7Bug6
-   Q==;
-X-CSE-ConnectionGUID: nOTrLTy2TAKypuAnEEkYOw==
-X-CSE-MsgGUID: wSVasP/ES7e1rVYpTHoHig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11680"; a="81911537"
+  t=1769216206; x=1800752206;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tjwDfVUOCv7OweMTrTAC/NmQxTm0fJ23jK+CFiLTyI4=;
+  b=GibuF+cwbOIUMFvfZv9MCVxy8ql7w5Gw8IXAYYU5JQJPRHbIkzQx+tMZ
+   sLAGPcYea+VyVNlWTulHgVS6YJDzeF7HauykUyT0G3GQAME3gKpdw9cgl
+   5xcCbI5sqSRNlu1yzpXH3stqMpeWxMiselcdFFOyyD41Qr6cSiCeJQamT
+   XbyXLYpRMqf46PeQd0Ymft0VMUksGhRO4KGKiMj50TLVy1QBIzFIGinXC
+   zTraCCf5iE1OyG6fA4nisBgHGrb6ocFYzP139kWzrzxPGEnji20Wu43E8
+   +GYw8hsoeQBkDKwNiGHVMRdw7bO5qlVYK/jZ9ekeajjoCkUhpy997B/9B
+   g==;
+X-CSE-ConnectionGUID: xoO76KYKQXuEJ/WEUZ1Mfg==
+X-CSE-MsgGUID: +/pMsyM6TYacmK+0fbCoDw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11680"; a="81584997"
 X-IronPort-AV: E=Sophos;i="6.21,249,1763452800"; 
-   d="scan'208";a="81911537"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2026 16:49:37 -0800
-X-CSE-ConnectionGUID: 4hSdrnMGTwirlIT2T20HRA==
-X-CSE-MsgGUID: DKon93DATsmsaV9YLPTl9w==
+   d="scan'208";a="81584997"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2026 16:56:46 -0800
+X-CSE-ConnectionGUID: twLP+ktBTQCGufqTGUO+jw==
+X-CSE-MsgGUID: gzGievpnQ2ejZLrJO/1Erw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,249,1763452800"; 
-   d="scan'208";a="244775633"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 23 Jan 2026 16:49:33 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vjRqF-00000000Ud4-0Lb3;
-	Sat, 24 Jan 2026 00:49:31 +0000
-Date: Sat, 24 Jan 2026 08:49:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, dev@openvswitch.org,
+   d="scan'208";a="237815430"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa002.jf.intel.com with ESMTP; 23 Jan 2026 16:56:43 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 0955195; Sat, 24 Jan 2026 01:56:42 +0100 (CET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/7] net: openvswitch: fix load tearing with
- u64_stats
-Message-ID: <202601240814.75efeFdo-lkp@intel.com>
-References: <20260123162159.2877941-5-mmyangfl@gmail.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v1 1/1] i40e: Add missing header
+Date: Sat, 24 Jan 2026 01:56:39 +0100
+Message-ID: <20260124005639.3175766-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260123162159.2877941-5-mmyangfl@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-252998-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,gmail.com,redhat.com,ovn.org,google.com,kernel.org,openvswitch.org,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-252999-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: A664B7BCB0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B1227BD2B
 X-Rspamd-Action: no action
 
-Hi David,
+When cleaning up another header I have met this build error:
 
-kernel test robot noticed the following build errors:
+drivers/net/ethernet/intel/i40e/i40e_hmc.h:105:22: error: implicit declaration of function 'upper_32_bits' [-Wimplicit-function-declaration]
+  105 |         val1 = (u32)(upper_32_bits(pa));                                \
 
-[auto build test ERROR on net-next/main]
+This is due to missing header, add it to fix the possible issue.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/u64_stats-Doc-incorrect-usage-with-plain-variables/20260124-012240
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260123162159.2877941-5-mmyangfl%40gmail.com
-patch subject: [PATCH net-next v2 4/7] net: openvswitch: fix load tearing with u64_stats
-config: m68k-randconfig-r073-20260124 (https://download.01.org/0day-ci/archive/20260124/202601240814.75efeFdo-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 8.5.0
-smatch version: v0.5.0-8994-gd50c5a4c
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260124/202601240814.75efeFdo-lkp@intel.com/reproduce)
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_hmc.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601240814.75efeFdo-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
-   In function 'u64_stats_reads.constprop',
-       inlined from 'get_dp_stats' at net/openvswitch/datapath.c:773:4:
->> include/linux/compiler_types.h:631:38: error: call to '__compiletime_assert_333' declared with attribute error: BUILD_BUG_ON failed: len % sizeof(u64_stats_t)
-     _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-                                         ^
-   include/linux/compiler_types.h:612:4: note: in definition of macro '__compiletime_assert'
-       prefix ## suffix();    \
-       ^~~~~~
-   include/linux/compiler_types.h:631:2: note: in expansion of macro '_compiletime_assert'
-     _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-     ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-    #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-                                        ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-     BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-     ^~~~~~~~~~~~~~~~
-   include/linux/u64_stats_sync.h:157:2: note: in expansion of macro 'BUILD_BUG_ON'
-     BUILD_BUG_ON(len % sizeof(u64_stats_t));
-     ^~~~~~~~~~~~
-
-
-vim +/__compiletime_assert_333 +631 include/linux/compiler_types.h
-
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  617  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  618  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  619  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  620  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  621  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  622   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  623   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  624   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  625   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  626   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  627   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  628   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  629   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  630  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @631  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  632  
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_hmc.h b/drivers/net/ethernet/intel/i40e/i40e_hmc.h
+index 480e3a883cc7..967711405919 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_hmc.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_hmc.h
+@@ -4,6 +4,8 @@
+ #ifndef _I40E_HMC_H_
+ #define _I40E_HMC_H_
+ 
++#include <linux/wordpart.h>
++
+ #include "i40e_alloc.h"
+ #include "i40e_io.h"
+ #include "i40e_register.h"
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.50.1
+
 
