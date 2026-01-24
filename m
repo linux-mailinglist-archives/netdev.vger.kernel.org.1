@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-253039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253040-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIx8I59ldGnb5AAAu9opvQ
-	(envelope-from <netdev+bounces-253039-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:24:31 +0100
+	id MC07Dc9ldGnb5AAAu9opvQ
+	(envelope-from <netdev+bounces-253040-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:25:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3DD7CB0A
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:24:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 878A07CB28
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19DAC3013D76
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:21:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C4633017265
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D9C27BF6C;
-	Sat, 24 Jan 2026 06:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442D1280CC9;
+	Sat, 24 Jan 2026 06:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUIsKtpn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GAnOG9jN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0567114EC73
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9572580DE
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769235668; cv=none; b=u73HR9pNr/ykoeM2NJFB94vbe+JZnYksntiBq5iNbgiRLRXfy+2i+JOuhKh+m9tDtKlemJnr4pZDXnrLkGnRe2hCAtd7ln6xHh6MMHY+v+nPw6cf4egpSXsoC7LN+0ZX0BugszWXWUdt7VMtpnYx9saas4url9z0PvNDqqvRGok=
+	t=1769235677; cv=none; b=kIcYD2C3xMj2MIEGX/2IdhsuySoNOUX9VG7Qx1WBICo1qWN905OwwXYMNGeqbH73YOd83/gJY3IgzBEdmGv+jgT6GNoY05yyAdze4okZ/pD06aLN+ZM2TQqpX2TIOdrgu4nQkUGZYlyLOouBBRR9HsrrQjvKIhhr5DlSKczWJr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769235668; c=relaxed/simple;
-	bh=kjcr3U+Eej2jkvLdErMnd6YR7FAn98KttpJB/4PZM7c=;
+	s=arc-20240116; t=1769235677; c=relaxed/simple;
+	bh=6fOLPr5pZFj/RQ+K6yXNXzxNF1aapP52tKW6Swnvtbk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SOfhOFXXknJOj3F6SVazy3+qpVR7atQIC3u8WATlZL/vHTXZRC4L9qm4sa6Mxf84zufNk0E/w7MbAFlFFcTjzS3tpjSWHfjjrOSa7vorwieuLnRtQXqcgiXuSa2/w9Zjr2EzEMi9I1XtNVXNJYEwoPlH7g9zr4heAeGXBUbeFRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUIsKtpn; arc=none smtp.client-ip=209.85.214.195
+	 MIME-Version; b=Y6MhsX1KGUjkrSnI0GnczR2zH9WqocPMHCD9q4uT+9AAtiEtAZB6BZsdNnedbPmRGAlXTXb9KYhOAxoEjzibJ3z2PKZRGx4qtxoG7I/eGcUUFOwB2+p1TnRlttGJfFuR9KJKtqbQMaS7WcvUIMdcDfxC4WuJF6xpLy+GyugpPXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GAnOG9jN; arc=none smtp.client-ip=209.85.214.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so32665135ad.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 22:21:06 -0800 (PST)
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2a743050256so19985315ad.3
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 22:21:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769235666; x=1769840466; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769235675; x=1769840475; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LRFPc/7UJMwRjQVl87T1d/8z+6sYjAGIhOZdpUb7X2k=;
-        b=YUIsKtpnltVxgATzRFvFwDTjGamy3m4CrBUo03J/TfZ5HtM1RVIAJuvOtK4JOtldyF
-         i2J5erBEAnJmrBqftfteGjqM2lu0Kyu/V/r2wD0cRPn9qPC3s1bvioivDd0NKYq7o5oS
-         jAB1mzh+w783RDSIzgQydnFBQ9GmbkkcbSk6H3K8zpV7q9F5TFHRqjHoCLSKenG/hg+9
-         k2h27c91rSjx5tOXVjTj19ChIaqclBTKWcGycH56ouLZtiXMqkpHONsdFKkQEV7dbUx4
-         O4HZMhmepH8Eodvl39m6qOh40OV+NlmOX6oAnv6mmvlbDw/JFlIJ9AE/PiZA/B5OaM6p
-         qUXA==
+        bh=L3QmrLYBEBYXBAfPFlkqBudM2njHTQyGi8eiKfdRBPI=;
+        b=GAnOG9jNJ2TOgwjjI475jP2tsUk1AIN1smo/Qyx34s+JXA9DgjvdBcYZZzZlssUDrx
+         mvE5RIwQkVQhRXtkKdOZ/wR0s+8/TDJ/u8odXMpIuJX15/9gb+g7xu1cCUbgzgmQhaT7
+         jF+9mLVLsyoHDe88oIdhOW01CsG5Kev8REsm5ZZyJVeGWsvQ8vp3AhLe6x2zX5jjpgPi
+         2kg7RfNdPxxOVa2XsAMcRoO9LzgPmkUG3r3niNphoRSHHtqypgKT4aljQRxm2N7WqOaG
+         6/xDkQ1VFR+D7PO40wHhmFC3SPI7Npd81Rlk4nnM1fD7N9HCbdag8hAbbftldrNm9YwD
+         RAYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769235666; x=1769840466;
+        d=1e100.net; s=20230601; t=1769235675; x=1769840475;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LRFPc/7UJMwRjQVl87T1d/8z+6sYjAGIhOZdpUb7X2k=;
-        b=scbAyTpHD4URcL+xJtcuJU2mH5/gIIMnT41QtPmAOOf54A4EqE5WAcashuQZxLcnKE
-         G+byGcbowpZt3RC77VOGRZ2zS9GagylA1GQZKWLRjJ9cqMdSqV5MFEziQnAIaogLXNNu
-         JpYemX8xEp20kTsLsG1Ii28b78l5RoxKRfK/tnYABTGL0FZHgXDgpiuEI1k6woCGYoRO
-         Owhq2KKgpNAniUKLJPjgnI+OJXHyo7qGsC/0acBrHYev11omj7El0INk0ihGBSjltdW+
-         t4lDbO9ZdiS7MdAWO6p7pQUSCiV6W/rhjlcx3rGQriY/BJ8WjVesR5CSF3WRdA6is+aQ
-         8nKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVtbKlPDLGlZVifFfWGsHT4nbCUzhNbX69neMk386q61P1GQdos65MxD9eewrTs3DNuTAVdmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtC853k2Ecy3uLKL3ulN7kZSQCocg2LLVGqCt3U++4ASYxDhzE
-	Q1hWX5MjdYoF3MEQyLWSADDSA4OWfZ+KSqQDlNU2v0QAWNJlapQilpjx
-X-Gm-Gg: AZuq6aLl8B8ehid2J8GTVJXg7XSNABTLydg2B6Ol4itjvAhxFa5PV8tQtFeeZ7H5E3A
-	leJCrMzRk6le/LM0+P8PgKTiFitY5A5aNNFkB6MR4+IuVR3ARbnAUiynGqvFMzhmqSd+veq2DNk
-	5EWe6HUHkoi75Ei//Mc8DshCmeeM+3EG45NeDI81VSeFqfYGQ9Ye4itx/Nl+1O3XC8BjfBYSYhS
-	athx4ze3b5S6QsPqQRw+JCh8Kt1zEgJn6GRLIoqfrsfD+mA8YoLE7YCXxCR1un4TuQAqtoxL15e
-	OgyrucOgP5uOXKzlN/XKmaxrpmyahQgGFrQ+gIyxbprU2+KnHH8xUbOYQ+No9rtu/bhQtBtFoaB
-	vYtFFikptat8JCsBSY8pJvRB0ShqtvTx0vaZDwITmeQkXY036gz3FR7Drrg96YLY51igLn80fPA
-	23f6WWchXW
-X-Received: by 2002:a17:902:f54f:b0:2a7:3daa:5822 with SMTP id d9443c01a7336-2a7fe77dd97mr45112005ad.60.1769235666125;
-        Fri, 23 Jan 2026 22:21:06 -0800 (PST)
+        bh=L3QmrLYBEBYXBAfPFlkqBudM2njHTQyGi8eiKfdRBPI=;
+        b=iuAazlauj7zQ2utU6dV2p9dLejznKKVlTVXjFJKi4fm20Eev1tK+cUSQRR8WIIRWa9
+         rFQq0FkZ9e+pNrhuTxmi4RVUWwsFKUl+lV32/B8dhP5C5J2vPRnIR8XrUcW3XSo2pFSV
+         q+p6u80HgalL0CtDRNElXmAwYMsYN4Ps9IYRr79E26VkdiX+DvarMPvVwvMciowP8aWH
+         gtRtuIzhCkYyg67JsS0JogxmAUna7QVbNycIJQ5WbaBQd6BgjwTO7KXjAGPo+P8l8Dfm
+         /d+YRwvmIN19u5B1mhXxuEwDAYWGWrVNG9pv5VqokxItadlkhZ8+H0dNRu/gwwgq/Fq2
+         rKUw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJHp3ZKWY2QLNiP2gMtK6YvIPirmWbV+X26uvea3mrToX5lbtyguqb8QfZk0Ys2Tjo37DiQYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnuixbhDt1Cs8CL/1hk0qodNkzyOP8VuUUszheCK4RJtGCHuXe
+	QhVDQOc5/nWnDdl3ISDDkRhBj6TvakTsCuk58aYqkyUXfINS62N800kA
+X-Gm-Gg: AZuq6aKmJMfNLo0u/COevIq543pOWwnIKSTmIdzWA4K1zUDH6gnSygsLS6QoytOxfvP
+	ED21ldAd178cVgbTVxXvfIDpPrzo36q0PJQgthePfMw6Ny6u9e5swBpEDmKhU+cc4fE6TUTx3ya
+	Owvn5uKoxSmIWXihw7J6EmDIFhPofBScc2iZ+wFEjH21nJZEFBN7lw0VJJ8rJYppqWeP+0ltDnu
+	USq3JK3ozkG4JlaMJqoNqXij5PHbAPymuWvlrh/vLHlYFwdRgkQg5u13Ohx4BclKRK1aNgP+TN1
+	UdBD1aGrRzK5iqgNhrCQTLo/RIi1u83Jv6OVj52zYWs8OuFXx7Cdolao9pgoLbavOWQfo6X6KVY
+	xTTU06DAW7qsuyKWAX1K76xnYMvdT9m8aJE+r9JiXx9+6F7Xxz3RF5pySHGgQv4/bLDXnLqjw4b
+	NaBHUUl1hT
+X-Received: by 2002:a17:90b:4c4b:b0:34e:5aa2:cf61 with SMTP id 98e67ed59e1d1-35368c436e7mr4201938a91.28.1769235675250;
+        Fri, 23 Jan 2026 22:21:15 -0800 (PST)
 Received: from 7950hx ([103.173.155.241])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353354a6b5asm6496537a91.9.2026.01.23.22.20.57
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353354a6b5asm6496537a91.9.2026.01.23.22.21.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jan 2026 22:21:05 -0800 (PST)
+        Fri, 23 Jan 2026 22:21:14 -0800 (PST)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: andrii@kernel.org
@@ -102,9 +102,9 @@ Cc: ast@kernel.org,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v13 05/13] bpf: support fsession for bpf_session_cookie
-Date: Sat, 24 Jan 2026 14:20:00 +0800
-Message-ID: <20260124062008.8657-6-dongml2@chinatelecom.cn>
+Subject: [PATCH bpf-next v13 06/13] bpf,x86: introduce emit_store_stack_imm64() for trampoline
+Date: Sat, 24 Jan 2026 14:20:01 +0800
+Message-ID: <20260124062008.8657-7-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260124062008.8657-1-dongml2@chinatelecom.cn>
 References: <20260124062008.8657-1-dongml2@chinatelecom.cn>
@@ -131,7 +131,7 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253039-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253040-lists,netdev=lfdr.de];
 	R_DKIM_ALLOW(0.00)[gmail.com:s=20230601];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
@@ -145,137 +145,76 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	NEURAL_HAM(-0.00)[-0.889];
+	NEURAL_HAM(-0.00)[-0.872];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:mid,chinatelecom.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2D3DD7CB0A
+X-Rspamd-Queue-Id: 878A07CB28
 X-Rspamd-Action: no action
 
-Implement session cookie for fsession. The session cookies will be stored
-in the stack, and the layout of the stack will look like this:
-  return value	-> 8 bytes
-  argN		-> 8 bytes
-  ...
-  arg1		-> 8 bytes
-  nr_args	-> 8 bytes
-  ip (optional)	-> 8 bytes
-  cookie2	-> 8 bytes
-  cookie1	-> 8 bytes
-
-The offset of the cookie for the current bpf program, which is in 8-byte
-units, is stored in the
-"(((u64 *)ctx)[-1] >> BPF_TRAMP_COOKIE_INDEX_SHIFT) & 0xFF". Therefore, we
-can get the session cookie with ((u64 *)ctx)[-offset].
-
-Implement and inline the bpf_session_cookie() for the fsession in the
-verifier.
+Introduce the helper emit_store_stack_imm64(), which is used to store a
+imm64 to the stack with the help of a register.
 
 Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 ---
-v11:
-- rename BPF_TRAMP_SHIFT_COOKIE to BPF_TRAMP_COOKIE_INDEX_SHIFT
-
 v10:
-- describe the offset of the session cookie more explicit
-- make 8 as the bit shift of session cookie
-- remove the session cookie count limitation
+- add the "reg" to the function arguments of emit_store_stack_imm64()
+- use the positive offset in emit_store_stack_imm64()
+- remove some unnecessary comment, as we already have proper comment in
+  emit_store_stack_imm64()
 
 v9:
-- remove the definition of bpf_fsession_cookie()
-
-v7:
-- reuse bpf_session_cookie() instead of introduce new kfunc
-
-v5:
-- remove "cookie_cnt" in struct bpf_trampoline
-
-v4:
-- limit the maximum of the cookie count to 4
-- store the session cookies before nr_regs in stack
+- rename emit_st_r0_imm64() to emit_store_stack_imm64()
 ---
- include/linux/bpf.h   | 15 +++++++++++++++
- kernel/bpf/verifier.c | 20 ++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ arch/x86/net/bpf_jit_comp.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 29eecd79352e..4427c6e98331 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1229,6 +1229,7 @@ enum {
- #endif
- };
- 
-+#define BPF_TRAMP_COOKIE_INDEX_SHIFT	8
- #define BPF_TRAMP_IS_RETURN_SHIFT	63
- 
- struct bpf_tramp_links {
-@@ -1782,6 +1783,7 @@ struct bpf_prog {
- 				enforce_expected_attach_type:1, /* Enforce expected_attach_type checking at attach time */
- 				call_get_stack:1, /* Do we call bpf_get_stack() or bpf_get_stackid() */
- 				call_get_func_ip:1, /* Do we call get_func_ip() */
-+				call_session_cookie:1, /* Do we call bpf_session_cookie() */
- 				tstamp_type_access:1, /* Accessed __sk_buff->tstamp_type */
- 				sleepable:1;	/* BPF program is sleepable */
- 	enum bpf_prog_type	type;		/* Type of BPF program */
-@@ -2190,6 +2192,19 @@ static inline int bpf_fsession_cnt(struct bpf_tramp_links *links)
- 	return cnt;
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index e3b1c4b1d550..2f31331955b5 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -1300,6 +1300,16 @@ static void emit_st_r12(u8 **pprog, u32 size, u32 dst_reg, int off, int imm)
+ 	emit_st_index(pprog, size, dst_reg, X86_REG_R12, off, imm);
  }
  
-+static inline int bpf_fsession_cookie_cnt(struct bpf_tramp_links *links)
++static void emit_store_stack_imm64(u8 **pprog, int reg, int stack_off, u64 imm64)
 +{
-+	struct bpf_tramp_links fentries = links[BPF_TRAMP_FENTRY];
-+	int cnt = 0;
-+
-+	for (int i = 0; i < links[BPF_TRAMP_FENTRY].nr_links; i++) {
-+		if (fentries.links[i]->link.prog->call_session_cookie)
-+			cnt++;
-+	}
-+
-+	return cnt;
++	/*
++	 * mov reg, imm64
++	 * mov QWORD PTR [rbp + stack_off], reg
++	 */
++	emit_mov_imm64(pprog, reg, imm64 >> 32, (u32) imm64);
++	emit_stx(pprog, BPF_DW, BPF_REG_FP, reg, stack_off);
 +}
 +
- int bpf_prog_ctx_arg_info_init(struct bpf_prog *prog,
- 			       const struct bpf_ctx_arg_aux *info, u32 cnt);
+ static int emit_atomic_rmw(u8 **pprog, u32 atomic_op,
+ 			   u32 dst_reg, u32 src_reg, s16 off, u8 bpf_size)
+ {
+@@ -3348,20 +3358,12 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
+ 	/* mov QWORD PTR [rbp - rbx_off], rbx */
+ 	emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_6, -rbx_off);
  
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index d04aea235a12..c2f2650db9fd 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -14406,6 +14406,9 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
- 			return err;
+-	/* Store number of argument registers of the traced function:
+-	 *   mov rax, nr_regs
+-	 *   mov QWORD PTR [rbp - nregs_off], rax
+-	 */
+-	emit_mov_imm64(&prog, BPF_REG_0, 0, (u32) nr_regs);
+-	emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -nregs_off);
++	/* Store number of argument registers of the traced function */
++	emit_store_stack_imm64(&prog, BPF_REG_0, -nregs_off, nr_regs);
+ 
+ 	if (flags & BPF_TRAMP_F_IP_ARG) {
+-		/* Store IP address of the traced function:
+-		 * movabsq rax, func_addr
+-		 * mov QWORD PTR [rbp - ip_off], rax
+-		 */
+-		emit_mov_imm64(&prog, BPF_REG_0, (long) func_addr >> 32, (u32) (long) func_addr);
+-		emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -ip_off);
++		/* Store IP address of the traced function */
++		emit_store_stack_imm64(&prog, BPF_REG_0, -ip_off, (long)func_addr);
  	}
  
-+	if (meta.func_id == special_kfunc_list[KF_bpf_session_cookie])
-+		env->prog->call_session_cookie = true;
-+
- 	return 0;
- }
- 
-@@ -23024,6 +23027,23 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
- 		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_IS_RETURN_SHIFT);
- 		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 1);
- 		*cnt = 3;
-+	} else if (desc->func_id == special_kfunc_list[KF_bpf_session_cookie] &&
-+		   env->prog->expected_attach_type == BPF_TRACE_FSESSION) {
-+		/*
-+		 * inline bpf_session_cookie() for fsession:
-+		 *   __u64 *bpf_session_cookie(void *ctx)
-+		 *   {
-+		 *       u64 off = (((u64 *)ctx)[-1] >> BPF_TRAMP_COOKIE_INDEX_SHIFT) & 0xFF;
-+		 *       return &((u64 *)ctx)[-off];
-+		 *   }
-+		 */
-+		insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-+		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_COOKIE_INDEX_SHIFT);
-+		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-+		insn_buf[3] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
-+		insn_buf[4] = BPF_ALU64_REG(BPF_SUB, BPF_REG_0, BPF_REG_1);
-+		insn_buf[5] = BPF_ALU64_IMM(BPF_NEG, BPF_REG_0, 0);
-+		*cnt = 6;
- 	}
- 
- 	if (env->insn_aux_data[insn_idx].arg_prog) {
+ 	save_args(m, &prog, regs_off, false, flags);
 -- 
 2.52.0
 
