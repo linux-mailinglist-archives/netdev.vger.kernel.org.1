@@ -1,172 +1,155 @@
-Return-Path: <netdev+bounces-253078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253079-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PWSDZW+dGlk9QAAu9opvQ
-	(envelope-from <netdev+bounces-253078-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 13:44:05 +0100
+	id 631rMJXHdGnu9gAAu9opvQ
+	(envelope-from <netdev+bounces-253079-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 14:22:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88DA77DA16
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 13:44:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACF57DB31
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 14:22:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A53D3029E69
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 12:42:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B38A03002D0B
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 13:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D95314D2C;
-	Sat, 24 Jan 2026 12:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A90318B9F;
+	Sat, 24 Jan 2026 13:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="MiXrUKhu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HUywvX5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F473148AF;
-	Sat, 24 Jan 2026 12:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE00263899;
+	Sat, 24 Jan 2026 13:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769258543; cv=none; b=gPhefYudrnGd3Fo4oVfJvT80xFRqm4MInAMfJIm+7XvQ0sjhoBlhM+dDlVEyAxdHogz5voPj7ugarKPSk5N8v/nUWY0ncyoi/I9rC/K25fDWCSBRlzI1GcVXZUii0a+0/kItsrWNhhE7b0i9TqJ2QmYCa9ddBrjdkzcxTvYnnn8=
+	t=1769260942; cv=none; b=XIJ56WabTXgV0s7uGmcBaHO546hjhDS4ml+GjzcfIIAsLdph6JuCJxhXRZUykga3DW2dzIhZiNdtpCaGnVQXT7M5igTPTckVMmLSVMyNsgNQPDgdskHNZEQ01jibb5+PtKUKmdv4fTJRCAMfrQjebGBlUvVzX+COYjG+qfgBJuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769258543; c=relaxed/simple;
-	bh=UH2BPisERv2xmsWEtC30XX0eOi/BxkTvlwwuBRUGXCQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q5VjjkK7+46Ek08CEx1ciIm4NQ1H8Xj2W9Ut8ZL28Ja3ss4oV6541QCau+aryKwPt6ukV7BVgmnCHsAOiVtsXfRCh3P8rFTZsh48g36nvgpKtrsIDv6hPMIseFmbHBa60mnAp5+abry2yxUtMcL4+pMKxnc9sCBPSBb3euMLTZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=MiXrUKhu; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 31d4a5558;
-	Sat, 24 Jan 2026 20:42:12 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	marco.crivellari@suse.com,
-	vadim.fedorenko@linux.dev,
-	kory.maincent@bootlin.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH net v2 2/2] net: liquidio: Initialize netdev pointer before queue setup
-Date: Sat, 24 Jan 2026 12:42:05 +0000
-Message-Id: <20260124124205.102499-3-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260124124205.102499-1-zilin@seu.edu.cn>
-References: <20260124124205.102499-1-zilin@seu.edu.cn>
+	s=arc-20240116; t=1769260942; c=relaxed/simple;
+	bh=ToIaOZgqAD9RJ+1Uhj8Ob1zhp9ZLsHIZHDqohWQufXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hJLvd/e90L3D3j0RHZf4VUR9ChhO20IyvgxOq+x8r3i7D9SNnnPHPZXag83+BE+wY+aCgKutyBMHcSum71MRQ1icW6R2U/Ce+H5BABzq/aQNIbfmxLnm5aEPZUrACVf6p0ZsSoB6KdryupDdpaWEsFnqsx5cxOhki4QYg1ZxCXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HUywvX5x; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769260940; x=1800796940;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ToIaOZgqAD9RJ+1Uhj8Ob1zhp9ZLsHIZHDqohWQufXk=;
+  b=HUywvX5xDBeV2Gn0J9W2lzp3oTY28Ub5qKGTnoVyyhdSGuSR6B9ql7o4
+   rt4XG1qvgg4yXvadb9EzlUPzeVgHzu1pFqx35xtkb4aEYF0XeulqAx/PH
+   di35/VtFtgpd3ySPeqheOYREIE/zaDlymDL532pFVTAKq32qtKIGmIfH8
+   uuntB/c5bj67GYoarlYyfvNlwuV0fkhA+iahBgfn/rOCpx9lU3gpOCOG4
+   Yi/6S3Hj/1nf+JY2KIiSdoO1odgHe8WV2CMLW6oMdaOgGb5piCF1aNnf4
+   I89jv5MwI/85r2QGMxwxTNpIKsZw/gA6WPpp/vrGtQt7OdGYhw4RZWhWN
+   w==;
+X-CSE-ConnectionGUID: NX6pJ8czSrymIt4PrCYlGg==
+X-CSE-MsgGUID: Ot3lphe5Sea5QGux5nL3dw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="74122886"
+X-IronPort-AV: E=Sophos;i="6.21,250,1763452800"; 
+   d="scan'208";a="74122886"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 05:22:19 -0800
+X-CSE-ConnectionGUID: PcdYSi6FQLmV/XWr5T9vpw==
+X-CSE-MsgGUID: sCj+0JBFSj6T+skUwozrVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,250,1763452800"; 
+   d="scan'208";a="211723635"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.244.207])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 05:22:14 -0800
+Date: Sat, 24 Jan 2026 15:22:12 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Korsgaard <peter@korsgaard.com>,
+	Petko Manolov <petkan@nucleusys.com>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	UNGLinuxDriver@microchip.com,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Oliver Neukum <oneukum@suse.com>,
+	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Max Schulze <max.schulze@online.de>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Kees Cook <kees@kernel.org>, Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v2 net-next] net: usb: remove unnecessary get_drvinfo
+ code and driver versions
+Message-ID: <aXTHhI710LK1EsTG@smile.fi.intel.com>
+References: <20260124102042.112101-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9bf006bdf603a1kunm29d30d5ebf2f6
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZT0sZVklKQkgZHk4ZGh9JGlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
-	tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=MiXrUKhuevyihXqQvGxaQ5ehjc5fUQhzWZ5YXIr4tb3IwZ8Kezq9xuG+nAdTves3FJTWGbE8NvOmJRhQ3vDJIiWk78hvgjGEDpD+16XIl6u/OEJQXx7F16QcKJoPZXhAw4M5LTO6B2YPFbbYyBHKjxKG4ukFqYRvSE+sknNsJaY=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=Wx1rJPks4lZTfMd7LBXpxcQY36ZNVIHULAiFfh/XgkU=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260124102042.112101-1-enelsonmoore@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-253078-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com,nucleusys.com,shawell.net,microchip.com,fintech.ru,suse.com,piap.pl,gmail.com,pengutronix.de,online.de];
+	TAGGED_FROM(0.00)[bounces-253079-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zilin@seu.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,seu.edu.cn:dkim,seu.edu.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 88DA77DA16
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,smile.fi.intel.com:mid]
+X-Rspamd-Queue-Id: DACF57DB31
 X-Rspamd-Action: no action
 
-In setup_nic_devices(), the netdev is allocated using alloc_etherdev_mq().
-However, the pointer to this structure is stored in oct->props[i].netdev
-only after the calls to netif_set_real_num_rx_queues() and
-netif_set_real_num_tx_queues().
+On Sat, Jan 24, 2026 at 02:19:45AM -0800, Ethan Nelson-Moore wrote:
+> Many USB network drivers define get_drvinfo functions which add no
+> value over usbnet_get_drvinfo, only setting the driver name and
+> version. usbnet_get_drvinfo automatically sets the driver name, and
+> separate driver versions are now frowned upon in the kernel. Remove all
+> driver versions and replace these get_drvinfo functions with references
+> to usbnet_get_drvinfo where possible. Where that is not possible,
+> remove unnecessary code to set the driver name. Also remove two
+> unnecessary initializations from aqc111_get_drvinfo, an inaccurate
+> comment in pegasus.c, and an unused macro in catc.c.
 
-If either of these functions fails, setup_nic_devices() returns an error
-without freeing the allocated netdev. Since oct->props[i].netdev is still
-NULL at this point, the cleanup function liquidio_destroy_nic_device()
-will fail to find and free the netdev, resulting in a memory leak.
+There are three problems with this version:
+1) you haven't taken my tag, why?
+2) there is no changelog to understand what's going on;
+3) the v2 was sent too quickly (usually should be 24h+ between the versions).
 
-Fix this by initializing oct->props[i].netdev before calling the queue
-setup functions. This ensures that the netdev is properly accessible for
-cleanup in case of errors.
-
-Compile tested only. Issue found using a prototype static analysis tool
-and code review.
-
-Fixes: c33c997346c3 ("liquidio: enhanced ethtool --set-channels feature")
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
----
- .../net/ethernet/cavium/liquidio/lio_main.c   | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-index 3ba2806f5d1e..2383f0173a54 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-@@ -3505,6 +3505,16 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
- 		 */
- 		netdev->netdev_ops = &lionetdevops;
- 
-+		lio = GET_LIO(netdev);
-+
-+		memset(lio, 0, sizeof(struct lio));
-+
-+		lio->ifidx = ifidx_or_pfnum;
-+
-+		props = &octeon_dev->props[i];
-+		props->gmxport = resp->cfg_info.linfo.gmxport;
-+		props->netdev = netdev;
-+
- 		retval = netif_set_real_num_rx_queues(netdev, num_oqueues);
- 		if (retval) {
- 			dev_err(&octeon_dev->pci_dev->dev,
-@@ -3521,16 +3531,6 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
- 			goto setup_nic_dev_free;
- 		}
- 
--		lio = GET_LIO(netdev);
--
--		memset(lio, 0, sizeof(struct lio));
--
--		lio->ifidx = ifidx_or_pfnum;
--
--		props = &octeon_dev->props[i];
--		props->gmxport = resp->cfg_info.linfo.gmxport;
--		props->netdev = netdev;
--
- 		lio->linfo.num_rxpciq = num_oqueues;
- 		lio->linfo.num_txpciq = num_iqueues;
- 		for (j = 0; j < num_oqueues; j++) {
 -- 
-2.34.1
+With Best Regards,
+Andy Shevchenko
+
 
 
