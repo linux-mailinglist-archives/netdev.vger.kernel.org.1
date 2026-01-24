@@ -1,231 +1,301 @@
-Return-Path: <netdev+bounces-253027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCotF19idGmv5AAAu9opvQ
-	(envelope-from <netdev+bounces-253027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:10:39 +0100
+	id MrL/C/dVdGnj4gAAu9opvQ
+	(envelope-from <netdev+bounces-253023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:17:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A5D7C9A5
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:10:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 733FB7C89C
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:17:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0BC5D3013B4D
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:10:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1872E30063A7
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 05:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C792823A99E;
-	Sat, 24 Jan 2026 06:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E181DF248;
+	Sat, 24 Jan 2026 05:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="caspnkqA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJzw0A0/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FAC21256C
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAC43EBF0F
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 05:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769235031; cv=none; b=Hlk4B4TDC5yGONCv0nPf6IWRFJ4u5yefz5xKK12Xxf0EsuZ07DSedAqo+U0rXW4PKe3me+kNX/5EYip/Hww4Ji2A94eZEhu0L+4O3f9V12cjp4iApfgzrI4KHVFlo4Tz/05BOC9sinb+4Nt0RAn/xG4TquRWxh53lP90PjWj/9M=
+	t=1769231860; cv=none; b=MGOeCT88fA5O85hAZz8Uzegk3YowvVwjulGKIQCj2gB61FoV5YDhphbvz2W2GmubVOaLEnrx08p91Wp8228Ev5TrbPzlL8enV6+y09mdnTb1/qwj1XVsdhHk/w12HNEwQEHQSowUk3LPMbkS+cTdi8pw4vqVgoAKx8w9r6PJ3MY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769235031; c=relaxed/simple;
-	bh=3DshowPd5UH8QdtymmXbXqHLZNSLQexFMhz/sxvHnbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j8vZKtQVsNKFTmYGfSfae2CNEO8qPDucl1Wz933MfKUhDP7kLuXIRTio9MLIUlCkgd17kZsi/EXE8kjm3nMmzePiNcKF7/2faiZRJkX9Z2mAkH2jtugc59iAZWa/Akf2yTGHR1vbhmZl1SiO11HzP/40x9zZm9o1VmbCMPhFNn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=caspnkqA; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769235017;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qLL+DSALaiaCyHkccN04ZlpoBn+BdgA+NrFlgliZ5k4=;
-	b=caspnkqAJ50SJc8nbFa/JkdpIe/38FO1OkKTaLWqSf0RhEa6aowplV8D9JthGmVAYzxrHY
-	QgTYulyJQnW56EH7bZMQDLwHjntqgFsZO8Qaoqx44sr3Tm9sYh63aFGH71BGoPPL8H9AkK
-	+RACdOkhT0r7JqMUWdqnGMg44xO/9TY=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com,
- jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH bpf-next v12 11/13] selftests/bpf: test bpf_get_func_* for
- fsession
-Date: Sat, 24 Jan 2026 13:09:12 +0800
-Message-ID: <5962490.DvuYhMxLoT@7950hx>
-In-Reply-To: <20260124033119.28682-12-dongml2@chinatelecom.cn>
-References:
- <20260124033119.28682-1-dongml2@chinatelecom.cn>
- <20260124033119.28682-12-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1769231860; c=relaxed/simple;
+	bh=iAnprdhO3uDJcSm3zWKRSisBMN6wtlRXW/1FQidOFbo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SDmmiqy3fOmwYk2lttodeRogmin2GGgsYxcpk8yYCIqs6P5ZHHC1Sdr+VzwA+ffwUnGUDUhhcppXJOdL9dpOAW2W2R9blf4lLkJuQk7Rrzt0i0IVscd1CSCAojnq/lU783Py12nMe63qh8ePrJRjLmNinXUFR0SN2AybHjqc694=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UJzw0A0/; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-34f634dbfd6so2428607a91.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:17:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769231858; x=1769836658; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KqASAUm/GFCdALxLtn9qqyibLFPtenKBFroaARUvxic=;
+        b=UJzw0A0/QF3qnOZrM83IGh/GcTuu2slFA7+TJhTEQ5azYWYtayo8+evcZkbHgV6+oJ
+         aa5ou+q/XcTKOYEcswaU4R9IIixAghfk7+5yjzdo+ruiNxeJXIFUHzguZ4nG0vufb00t
+         g5z0shEXl5fObCSo1lbMOtw6Jk+mQX82wkq/gzWeukvDnylEzW0C5uAP89XH0LcNzpCW
+         hmS+SNemPkoD8hRRAPNRlf4ZgFhFcL88vq41YBliD6/7caiRTa8a0loDKDfo7GFBtRty
+         kK0luu1nLvgM1XLfRASV/iwadvw0SCeGFAgViNW/6+pU3XM3++WEsm59CD2nWT4nOYFf
+         m4Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769231858; x=1769836658;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqASAUm/GFCdALxLtn9qqyibLFPtenKBFroaARUvxic=;
+        b=EgQvaSiXS7I9FSINTfkKEwbCc+8pb+fvAfYiJQOasAIUw2CygEHFn5RZ4XCMk8xi4O
+         vUf8aJTW34qlkT7I4HHx3wBLt8I42ElCW2w9oN2lVfj7QU39p/9RY34XPpHp2Ehiet+s
+         N2eEk1g+FujsJrbkWjTqGz+7ccWQX6OjRYDsL0m2vdS70vM3vRaK7U1ZFqDkSy7Pjp43
+         fpzAjN6VTbXIs68OOcu10SsSZahFcIdd9YV0C8kr6NSj+PBBNqWan8uGM5yOdeSp2nJr
+         nnpwpHtPB8vSwzN0LDq08FKkn+tuC4oZMed2i6QoRm33nuo7CgxaAQtoWrGcM3Hsa36d
+         C5tA==
+X-Forwarded-Encrypted: i=1; AJvYcCV74b3wMSZuVOxd/CbMg2mzOV/v4GeD7nNVYlqL+eIsO1m/6JuPtQbo02dbF+/JkvDlKkFWntE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8tQ5gBwpetAmoc4kbNb8Z53yuYsFgAtVLTwrX9YVFKKmvJxkV
+	5T0cDv8zuqWICdxR2o/5jVbPHBeWRxfFgYSNlb8cZ89E8pw1Td/SMiXg
+X-Gm-Gg: AZuq6aIlMFkZjk+H2o8flAbJXq8m9xnOSh5byuSKVB0kF78lh9Zu2JB90vwK0HpOtiO
+	xd5IHK/8yeWqX1yZoxSVxZqzxaTGTLFCy59ibOHekjnpDXRwOEwBbYYVQ3jY/KQF4f8R0a+IO1i
+	lh/8bcnjiajDcSJqG/OV88rBXGaJ0h5DBZSS7B+b4Z6ru8W6BYxUEVdoZHo+y6wicdxvIRQxboU
+	8jA1R4I+0nXMSU7R5cwNqC7bZNcDMrXQaN1PIIxMT7V/O2kKUHaVZCe8IymcFF/WtOs5RYN8LHQ
+	AjdPZsY8biJK4QKdiu0rtEyTCEPYTZlN+wZUCqpd1k5Lk3LgBhJ+0qfx34YqM7I05fs2w+K24Jt
+	+UGKzapoJYMvfqNF0vJNY0octU1QgLYq+oXSFxy1Nq0MVcslHzYep/H3O7ReWt/vIfRcVnGjUYY
+	bKXQDJ+lZIlf4PysXzEeE=
+X-Received: by 2002:a17:90b:35c9:b0:339:ec9c:b275 with SMTP id 98e67ed59e1d1-3536700c87bmr4676569a91.6.1769231858082;
+        Fri, 23 Jan 2026 21:17:38 -0800 (PST)
+Received: from [172.16.80.107] ([210.228.119.9])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353354cdd03sm6464750a91.15.2026.01.23.21.17.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 21:17:37 -0800 (PST)
+From: Ryota Sakamoto <sakamo.ryota@gmail.com>
+Date: Sat, 24 Jan 2026 14:17:19 +0900
+Subject: [PATCH] SUNRPC: Replace KUnit tests for memcmp() with
+ KUNIT_EXPECT_MEMEQ_MSG()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260124-fix-gcc_krb5-memcmp-v1-1-4648cbbdc78b@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MWwqAIBAArxL73YJK2eMqEVG21RKaKEQg3T3pc
+ 2BmEkQKTBH6IkGgmyNfLoMsCzDH7HZCXjODEkoLqSrc+MHdmOkMS42WrLEelax12zWkF5KQSx8
+ oa/91GN/3A6+sajtlAAAA
+X-Change-ID: 20260124-fix-gcc_krb5-memcmp-2156897e6be1
+To: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+ NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Ryota Sakamoto <sakamo.ryota@gmail.com>
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [3.94 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	SUSPICIOUS_URL_IN_SUSPICIOUS_MESSAGE(1.00)[];
-	CTE_CASE(0.50)[];
-	URIBL_RED(0.50)[chinatelecom.cn:email];
-	MID_RHS_NOT_FQDN(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	HAS_ANON_DOMAIN(0.10)[];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-253023-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253027-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	MIME_TRACE(0.00)[0:+];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim]
-X-Rspamd-Queue-Id: 04A5D7C9A5
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sakamoryota@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 733FB7C89C
 X-Rspamd-Action: no action
 
-On 2026/1/24 11:31, Menglong Dong wrote:
-> Test following bpf helper for fsession:
->   bpf_get_func_arg()
->   bpf_get_func_arg_cnt()
->   bpf_get_func_ret()
->   bpf_get_func_ip()
-> 
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
->  .../bpf/prog_tests/get_func_args_test.c       |  1 +
->  .../bpf/prog_tests/get_func_ip_test.c         |  2 ++
->  .../selftests/bpf/progs/get_func_args_test.c  | 31 ++++++++++++++++++-
->  .../selftests/bpf/progs/get_func_ip_test.c    | 14 +++++++++
->  4 files changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c b/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
-> index fadee95d3ae8..96b27de05524 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
-> @@ -41,6 +41,7 @@ void test_get_func_args_test(void)
->  	ASSERT_EQ(skel->bss->test4_result, 1, "test4_result");
->  	ASSERT_EQ(skel->bss->test5_result, 1, "test5_result");
->  	ASSERT_EQ(skel->bss->test6_result, 1, "test6_result");
-> +	ASSERT_EQ(skel->bss->test7_result, 1, "test7_result");
->  
->  cleanup:
->  	get_func_args_test__destroy(skel);
-> diff --git a/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c b/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
-> index c40242dfa8fb..7772a0f288d3 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
-> @@ -46,6 +46,8 @@ static void test_function_entry(void)
->  	ASSERT_EQ(skel->bss->test5_result, 1, "test5_result");
->  	ASSERT_EQ(skel->bss->test7_result, 1, "test7_result");
->  	ASSERT_EQ(skel->bss->test8_result, 1, "test8_result");
-> +	ASSERT_EQ(skel->bss->test9_entry_result, 1, "test9_entry_result");
-> +	ASSERT_EQ(skel->bss->test9_exit_result, 1, "test9_exit_result");
->  
->  cleanup:
->  	get_func_ip_test__destroy(skel);
-> diff --git a/tools/testing/selftests/bpf/progs/get_func_args_test.c b/tools/testing/selftests/bpf/progs/get_func_args_test.c
-> index 5b7233afef05..8ecc5f339552 100644
-> --- a/tools/testing/selftests/bpf/progs/get_func_args_test.c
-> +++ b/tools/testing/selftests/bpf/progs/get_func_args_test.c
-> @@ -1,5 +1,5 @@
->  // SPDX-License-Identifier: GPL-2.0
-> -#include <linux/bpf.h>
-> +#include <vmlinux.h>
->  #include <bpf/bpf_helpers.h>
->  #include <bpf/bpf_tracing.h>
->  #include <errno.h>
-> @@ -165,3 +165,32 @@ int BPF_PROG(tp_test2)
->  
->  	return 0;
->  }
-> +
-> +__u64 test7_result = 0;
-> +SEC("fsession/bpf_fentry_test1")
-> +int BPF_PROG(test7)
-> +{
-> +	__u64 cnt = bpf_get_func_arg_cnt(ctx);
-> +	__u64 a = 0, z = 0, ret = 0;
-> +	__s64 err;
-> +
-> +	test7_result = cnt == 1;
-> +
-> +	/* valid arguments */
-> +	err = bpf_get_func_arg(ctx, 0, &a);
-> +	test7_result &= err == 0 && ((int) a == 1);
-> +
-> +	/* not valid argument */
-> +	err = bpf_get_func_arg(ctx, 1, &z);
-> +	test7_result &= err == -EINVAL;
-> +
-> +	if (bpf_session_is_return(ctx)) {
-> +		err = bpf_get_func_ret(ctx, &ret);
-> +		test7_result &= err == 0 && ret == 2;
-> +	} else {
-> +		err = bpf_get_func_ret(ctx, &ret);
-> +		test7_result &= err == 0 && ret == 0;
-> +	}
-> +
-> +	return 0;
-> +}
+Replace KUnit tests for memcmp() with KUNIT_EXPECT_MEMEQ_MSG() to improve
+debugging that prints the hex dump of the buffers when the assertion fails,
+whereas memcmp() only returns an integer difference.
 
-CI failed, as this testcase can't run on !CONFIG_X86_64, and
-"#ifdef __TARGET_ARCH_x86" should be used here.
+Signed-off-by: Ryota Sakamoto <sakamo.ryota@gmail.com>
+---
+ net/sunrpc/auth_gss/gss_krb5_test.c | 93 ++++++++++++++++++++-----------------
+ 1 file changed, 51 insertions(+), 42 deletions(-)
 
-Will send a V13 later :)
+diff --git a/net/sunrpc/auth_gss/gss_krb5_test.c b/net/sunrpc/auth_gss/gss_krb5_test.c
+index a5bff02cd7ba48c75a6d270b6584c0f23cb71380..dde1ee934d0d448fe558a633e3d729c490ea26ae 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_test.c
++++ b/net/sunrpc/auth_gss/gss_krb5_test.c
+@@ -63,10 +63,11 @@ static void kdf_case(struct kunit *test)
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	/* Assert */
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   derivedkey.data, derivedkey.len), 0,
+-			    "key mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       derivedkey.data,
++			       derivedkey.len,
++			       "key mismatch");
+ }
+ 
+ static void checksum_case(struct kunit *test)
+@@ -111,10 +112,11 @@ static void checksum_case(struct kunit *test)
+ 	KUNIT_ASSERT_EQ(test, err, 0);
+ 
+ 	/* Assert */
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   checksum.data, checksum.len), 0,
+-			    "checksum mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       checksum.data,
++			       checksum.len,
++			       "checksum mismatch");
+ 
+ 	crypto_free_ahash(tfm);
+ }
+@@ -314,10 +316,11 @@ static void rfc3961_nfold_case(struct kunit *test)
+ 		   param->expected_result->len * 8, result);
+ 
+ 	/* Assert */
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   result, param->expected_result->len), 0,
+-			    "result mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       result,
++			       param->expected_result->len,
++			       "result mismatch");
+ }
+ 
+ static struct kunit_case rfc3961_test_cases[] = {
+@@ -569,14 +572,16 @@ static void rfc3962_encrypt_case(struct kunit *test)
+ 	KUNIT_EXPECT_EQ_MSG(test,
+ 			    param->expected_result->len, buf.len,
+ 			    "ciphertext length mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   text, param->expected_result->len), 0,
+-			    "ciphertext mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->next_iv->data, iv,
+-				   param->next_iv->len), 0,
+-			    "IV mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       text,
++			       param->expected_result->len,
++			       "ciphertext mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->next_iv->data,
++			       iv,
++			       param->next_iv->len,
++			       "IV mismatch");
+ 
+ 	crypto_free_sync_skcipher(cts_tfm);
+ 	crypto_free_sync_skcipher(cbc_tfm);
+@@ -1194,15 +1199,17 @@ static void rfc6803_encrypt_case(struct kunit *test)
+ 	KUNIT_EXPECT_EQ_MSG(test, param->expected_result->len,
+ 			    buf.len + checksum.len,
+ 			    "ciphertext length mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   buf.head[0].iov_base, buf.len), 0,
+-			    "encrypted result mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data +
+-				   (param->expected_result->len - checksum.len),
+-				   checksum.data, checksum.len), 0,
+-			    "HMAC mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       buf.head[0].iov_base,
++			       buf.len,
++			       "encrypted result mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data +
++					(param->expected_result->len - checksum.len),
++			       checksum.data,
++			       checksum.len,
++			       "HMAC mismatch");
+ 
+ 	crypto_free_ahash(ahash_tfm);
+ 	crypto_free_sync_skcipher(cts_tfm);
+@@ -1687,15 +1694,16 @@ static void rfc8009_encrypt_case(struct kunit *test)
+ 	KUNIT_EXPECT_EQ_MSG(test,
+ 			    param->expected_result->len, buf.len,
+ 			    "ciphertext length mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->expected_result->data,
+-				   buf.head[0].iov_base,
+-				   param->expected_result->len), 0,
+-			    "ciphertext mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test, memcmp(param->expected_hmac->data,
+-					 checksum.data,
+-					 checksum.len), 0,
+-			    "HMAC mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_result->data,
++			       buf.head[0].iov_base,
++			       param->expected_result->len,
++			       "ciphertext mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->expected_hmac->data,
++			       checksum.data,
++			       checksum.len,
++			       "HMAC mismatch");
+ 
+ 	crypto_free_ahash(ahash_tfm);
+ 	crypto_free_sync_skcipher(cts_tfm);
+@@ -1826,10 +1834,11 @@ static void encrypt_selftest_case(struct kunit *test)
+ 	KUNIT_EXPECT_EQ_MSG(test,
+ 			    param->plaintext->len, buf.len,
+ 			    "length mismatch");
+-	KUNIT_EXPECT_EQ_MSG(test,
+-			    memcmp(param->plaintext->data,
+-				   buf.head[0].iov_base, buf.len), 0,
+-			    "plaintext mismatch");
++	KUNIT_EXPECT_MEMEQ_MSG(test,
++			       param->plaintext->data,
++			       buf.head[0].iov_base,
++			       buf.len,
++			       "plaintext mismatch");
+ 
+ 	crypto_free_sync_skcipher(cts_tfm);
+ 	crypto_free_sync_skcipher(cbc_tfm);
 
-> diff --git a/tools/testing/selftests/bpf/progs/get_func_ip_test.c b/tools/testing/selftests/bpf/progs/get_func_ip_test.c
-> index 2011cacdeb18..bd7598a037cd 100644
-> --- a/tools/testing/selftests/bpf/progs/get_func_ip_test.c
-> +++ b/tools/testing/selftests/bpf/progs/get_func_ip_test.c
-> @@ -103,3 +103,17 @@ int BPF_URETPROBE(test8, int ret)
->  	test8_result = (const void *) addr == (const void *) uprobe_trigger;
->  	return 0;
->  }
-> +
-> +__u64 test9_exit_result = 0;
-> +__u64 test9_entry_result = 0;
-> +SEC("fsession/bpf_fentry_test1")
-> +int BPF_PROG(test9, int a)
-> +{
-> +	__u64 addr = bpf_get_func_ip(ctx);
-> +
-> +	if (bpf_session_is_return(ctx))
-> +		test9_exit_result = (const void *) addr == &bpf_fentry_test1;
-> +	else
-> +		test9_entry_result = (const void *) addr == &bpf_fentry_test1;
-> +	return 0;
-> +}
-> 
+---
+base-commit: 62085877ae6592be830c2267e35dc469cb706308
+change-id: 20260124-fix-gcc_krb5-memcmp-2156897e6be1
 
-
-
+Best regards,
+-- 
+Ryota Sakamoto <sakamo.ryota@gmail.com>
 
 
