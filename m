@@ -1,106 +1,82 @@
-Return-Path: <netdev+bounces-253026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id NNU4NaxbdGnU4wAAu9opvQ
-	(envelope-from <netdev+bounces-253026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:42:04 +0100
+	id WJiaEJJjdGnb5AAAu9opvQ
+	(envelope-from <netdev+bounces-253029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:15:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E57D7C926
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:42:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3887C9D1
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:15:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 437803007F46
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 05:42:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A9A25301107E
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30704246BA7;
-	Sat, 24 Jan 2026 05:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7551DF748;
+	Sat, 24 Jan 2026 06:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bf6YIIUa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j3O2M7Fm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7111721773F
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 05:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04933A1D2
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769233321; cv=none; b=ouyb4CZ8bzkiuDCL5MNagBY7u1k7L1cfVkDyZN1BvEjWD16x/nfJM03PmLV7OuBNS8y4Tus7rJlo3zvaHJhN9lVDe239wV5KfmGzaYRKmtEzDWyDjAQuIEHZuZTbzLiS/Ya8piXknZdnjWU7MATz+qBaZfzdUWcMcf2HrEB3vsY=
+	t=1769235343; cv=none; b=oO0nE6iKyBBlPIGCOn3abRXBcMzpghmL/TmBaiVwESDFNoOadq9AK5NecjzqjnPXG+ubrM2Jb6Dsdqr2dtIANYVaSsLwGZXp4Tum7iRLwOPlorxA5hoTof1dQfsmtrPTqySrb+DFpnXutk5U224AWHIH7RPioGLS7tqsg06sjys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769233321; c=relaxed/simple;
-	bh=Trz4KH7SRRsjp59mbGLum+zU8PGBK7l1ETvVZeOaQ7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uyjeA5Bijx5/EhX6Fao5fpLam9IaIGmJ8WcbtWfmZiNCGzmV4xmUOYz4118zRShg05BboW1wGhdfKUf/QS5ODVAMht17U1CkZgLq48hBSlYRS7bWLgizp/2dWXwSHtesrV8LFUjCs5jbu4720ocMrKIWniEQZ/e+ia6CEJ+aqYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bf6YIIUa; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c61342a69b9so1064032a12.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:41:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769233319; x=1769838119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=V3JkJCi/BPVR8+u1DbgLowMn18CQEBQmlg70z/avGY0=;
-        b=Bf6YIIUaau5WazQ7DDFPUF+2MNbinN++jKk6Scz0hdnPbhm5+B1tS5SxdzlWU3toeM
-         XWYvLOW6RcQxDZlvEzCgEx3FIbVirLmsEg1tmM2BUPyZnavuNcwmSjfB96EdovpLB+FK
-         NwOfzktDrnzam92VlUTtgRR8KyfNk21TMYJX+UFod3ky16l2OXwHZzWCSSCqR7vWQNn0
-         dBTSw7lxEQntWgUUgYO33RgMKQK2zjCI1MKhs6JnGzSpdYxE8tRyemR4mchi1qpMM5Vr
-         fWLq4V4bD3Cm8Nky/IZC2BAJmcCygygVOjprPb4tLIa7ebfRGKCFhOc1CPCuUMDKn23s
-         9YIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769233319; x=1769838119;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V3JkJCi/BPVR8+u1DbgLowMn18CQEBQmlg70z/avGY0=;
-        b=FBOebq4CITkFsMDAOFUSYzqeGpp7F8p5mWk9jSwTbKJ6trslhON1RwPmVVOspWrA8f
-         EiZGxh7eOSlLv26qfsO3BP7M+ZhFnafHJqoPWSx81Z+43uDX7E2lmauQTcTk6wUyASMI
-         oziviy/Dqi8TGhI19S8zx7dVp9k0jANaPto7W3t/NE3FqK7+ObZh9B8J6jGb11vTkoSb
-         01eJGCvfMDPKdTS/Ts9iExxwfzDGa6d4sB6pXAI02XDj0CAOJjQhpnKH/1Jm9p0QWe2w
-         9QQOWzJuJH5bhryeBNrDR6cD/TSCBkUWOWKMQ/L6S4SIRYGpwZt7Nr6tK5X0Ki9yDs8F
-         WMSw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrvl1V8J6Kd2HXQ4l522x0uaoP6bIzQee6xoGePAoh+tWdlQ1s0TusY1SmdZv2/B1K/hg3KC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2GglWUjPkgzL75jHM9dwnzrLt3lwvMHUF6qyhS0wxShx6ymd0
-	YW5pGAMd4M2N8cOwVcAnP/aKxzuZ5oqQ4HeliRFJqN9q3r6J5HAsrE4K
-X-Gm-Gg: AZuq6aLtWxf1XhDocQjJI085QsW754l8IQ+iCHRI/RtaAkvRKUa/bO2DNbSrzfIbash
-	swS2bM5ElTt93XAmNrV3qeqqVk75QIgPSUJQjaZqX9VLg6ynBiPfRQPX/Saq4oYum5rMGYiyq8v
-	K9iq15XeOZtdELPHSkuWCyOSpgKZEBqxb2+XKOyqNY/bhl8b80VuxIJ+7ICHTe31Dyyr66oPwkE
-	nmhfIlACkRN9cH+fp7lci9TaW3eoXBejgs9jkFzbh+VkMmksX0LaTOY12F6SqY6XcSjAjJD03TK
-	ttaAc954RGidrTvb7N8s1Sx6Kl9mvqoLLb4mhkEAFuWpAVRX0n+LV2yY2mO2NByzehr3Kj1tfMJ
-	gczNf0ZVW4rm+cQldTS+9eEDXbysY8nAWs9V41esg92cATQLO4uXu/nOgqp58Vo973iD2gpBHnF
-	OTbdyM5/7J9fSlza2NpfRlAPuQKgfCBoV+LvW6G1DA3azE1CTqulWpV30pSPqIw3wacChuvg6Y
-X-Received: by 2002:a17:902:da8d:b0:2a7:bd4e:db92 with SMTP id d9443c01a7336-2a7fe75599dmr47829875ad.53.1769233318702;
-        Fri, 23 Jan 2026 21:41:58 -0800 (PST)
-Received: from kirchou-macbookpro2.roam.corp.google.com ([2001:268:99e8:2043:d1af:8ab1:2bc:1f3b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802fb134csm34085495ad.87.2026.01.23.21.41.51
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 23 Jan 2026 21:41:57 -0800 (PST)
-Sender: kir <610548@gmail.com>
-From: Kir Chou <note351@hotmail.com>
-To: akpm@linux-foundation.org
-Cc: davidgow@google.com,
-	geert@linux-m68k.org,
-	visitorckw@gmail.com,
-	brendan.higgins@linux.dev,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	Kir Chou <note351@hotmail.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
+	s=arc-20240116; t=1769235343; c=relaxed/simple;
+	bh=wgYELbTzeRKx53lNu3PGbO9UHZIelrY/ulnN/pnRapI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rmhWhuflqbypN5+jkx/OCSXM2o1YEhdU6SfSgn2F/ZXt8Zl0f6YnTXUbTz75PTZKUqfFEx3+/EPzkiI/1wFASqy9ew13DaticTu4lT8gl81Vn0JdtmIsGa197jqbCBwFpoMA640445EyTBliAAXr+AX8IIdluzvbcRmrrsCSy20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j3O2M7Fm; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769235329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KvJCH4XXdbWBtSibWgDG2N47XCPK7n8tQQHZT5gdhDc=;
+	b=j3O2M7Fmq7bzXme8+GFH0leHRc8FvKjY8ezR8inSZDOrqPRjX/Llvvjpbg/CP1Ij3RV9yp
+	U1dZSlIvRaP1m2JF8CliUsC9J3ZWWm5zRFYXocRzz+ZD/cGjTh8LSGH29TRVpy31AaSvfE
+	PLiDjg8z89xaZ+05vM1SUCkMz4g1iLw=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	linux-s390@vger.kernel.org (open list:S390 ARCHITECTURE),
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-Subject: [PATCH] lib/random32: convert selftest to KUnit
-Date: Sat, 24 Jan 2026 14:41:33 +0900
-Message-ID: <20260124054134.71369-1-note351@hotmail.com>
-X-Mailer: git-send-email 2.52.0
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Michal Luczaj <mhal@rbox.co>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v8 0/3] bpf: Fix FIONREAD and copied_seq issues
+Date: Sat, 24 Jan 2026 14:14:30 +0800
+Message-ID: <20260124061502.24350-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,469 +84,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[hotmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253026-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[hotmail.com];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,rbox.co,bytedance.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-253029-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,linux-m68k.org,gmail.com,linux.dev,vger.kernel.org,googlegroups.com,hotmail.com,linux.ibm.com,davemloft.net,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[note351@hotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E57D7C926
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF3887C9D1
 X-Rspamd-Action: no action
 
-This patch converts the existing prandom selftest (lib/random32.c) to use
-the KUnit framework (lib/tests/random32_kunit.c). Unlike typical KUnit
-tests, this file is directly #included into lib/random32.c.
+syzkaller reported a bug [1] where a socket using sockmap, after being
+unloaded, exposed incorrect copied_seq calculation. The selftest I
+provided can be used to reproduce the issue reported by syzkaller.
 
-Only the file name "random32_kunit.c" keeps random32, "prandom" is used
-for all other places for aligning with the API semantics and avoiding
-confusion with the cryptographically secure random.c,
+TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
+WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
+Call Trace:
+ <TASK>
+ receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
+ tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
+ do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
+ tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
+ do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
+ __sys_getsockopt+0x12f/0x260 net/socket.c:2450
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-The new test:
-- Removes the legacy CONFIG_RANDOM32_SELFTEST.
-- Adds CONFIG_PRANDOM_KUNIT_TEST (defaulting to KUNIT_ALL_TESTS).
-- Moves the test logic to lib/tests/random32_kunit.c.
-- Updates arch/s390/configs/debug_defconfig to use the new KUnit symbol.
+A sockmap socket maintains its own receive queue (ingress_msg) which may
+contain data from either its own protocol stack or forwarded from other
+sockets.
 
-This commit is verified by `./tools/testing/kunit/kunit.py run`
-with the .kunit/.kunitconfig:
+                                                     FD1:read()
+                                                     --  FD1->copied_seq++
+                                                         |  [read data]
+                                                         |
+                                [enqueue data]           v
+                  [sockmap]     -> ingress to self ->  ingress_msg queue
+FD1 native stack  ------>                                 ^
+-- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+                                       |                  |
+                                       |             ingress to FD1
+                                       v                  ^
+                                      ...                 |  [sockmap]
+                                                     FD2 native stack
 
-```
-CONFIG_KUNIT=y
-CONFIG_PRANDOM_KUNIT_TEST=y
-```
+The issue occurs when reading from ingress_msg: we update tp->copied_seq
+by default, but if the data comes from other sockets (not the socket's
+own protocol stack), tcp->rcv_nxt remains unchanged. Later, when
+converting back to a native socket, reads may fail as copied_seq could
+be significantly larger than rcv_nxt.
 
-Signed-off-by: Kir Chou <note351@hotmail.com>
+Additionally, FIONREAD calculation based on copied_seq and rcv_nxt is
+insufficient for sockmap sockets, requiring separate field tracking.
+
+[1] https://syzkaller.appspot.com/bug?extid=06dbd397158ec0ea4983
+
 ---
- arch/s390/configs/debug_defconfig |   2 +-
- lib/Kconfig.debug                 |  12 +++
- lib/random32.c                    | 173 +----------------------------
- lib/tests/random32_kunit.c        | 174 ++++++++++++++++++++++++++++++
- 4 files changed, 189 insertions(+), 172 deletions(-)
- create mode 100644 lib/tests/random32_kunit.c
+v7 -> v8: Address Jakub Sitnicki's feedback:
+          - Remove sk_receive_queue check in tcp_bpf_ioctl, only report
+            ingress_msg data length for FIONREAD
+          - Minor nits fixes
+          - Add Reviewed-by tag from John Fastabend
+          https://lore.kernel.org/bpf/20260113025121.197535-1-jiayuan.chen@linux.dev/
 
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 0713914b2..6e8e3772c 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -827,7 +827,7 @@ CONFIG_CRYPTO_KRB5=m
- CONFIG_CRYPTO_KRB5_SELFTESTS=y
- CONFIG_CORDIC=m
- CONFIG_TRACE_MMIO_ACCESS=y
--CONFIG_RANDOM32_SELFTEST=y
-+CONFIG_PRANDOM_KUNIT_TEST=y
- CONFIG_XZ_DEC_MICROLZMA=y
- CONFIG_DMA_CMA=y
- CONFIG_CMA_SIZE_MBYTES=0
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index ba36939fd..b4df466c2 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -3354,6 +3354,18 @@ config PRIME_NUMBERS_KUNIT_TEST
- 
- 	  If unsure, say N
- 
-+config PRANDOM_KUNIT_TEST
-+	tristate "KUnit test for prandom" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Enable this option to test the prandom functions at runtime.
-+
-+	  This test suite verifies the correctness of the pseudo-random number
-+	  generator across various scenarios, including edge cases.
-+
-+	  If unsure, say N
-+
- endif # RUNTIME_TESTING_MENU
- 
- config ARCH_USE_MEMTEST
-diff --git a/lib/random32.c b/lib/random32.c
-index 24e7acd93..0aab36792 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -126,175 +126,6 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state)
- }
- EXPORT_SYMBOL(prandom_seed_full_state);
- 
--#ifdef CONFIG_RANDOM32_SELFTEST
--static struct prandom_test1 {
--	u32 seed;
--	u32 result;
--} test1[] = {
--	{ 1U, 3484351685U },
--	{ 2U, 2623130059U },
--	{ 3U, 3125133893U },
--	{ 4U,  984847254U },
--};
--
--static struct prandom_test2 {
--	u32 seed;
--	u32 iteration;
--	u32 result;
--} test2[] = {
--	/* Test cases against taus113 from GSL library. */
--	{  931557656U, 959U, 2975593782U },
--	{ 1339693295U, 876U, 3887776532U },
--	{ 1545556285U, 961U, 1615538833U },
--	{  601730776U, 723U, 1776162651U },
--	{ 1027516047U, 687U,  511983079U },
--	{  416526298U, 700U,  916156552U },
--	{ 1395522032U, 652U, 2222063676U },
--	{  366221443U, 617U, 2992857763U },
--	{ 1539836965U, 714U, 3783265725U },
--	{  556206671U, 994U,  799626459U },
--	{  684907218U, 799U,  367789491U },
--	{ 2121230701U, 931U, 2115467001U },
--	{ 1668516451U, 644U, 3620590685U },
--	{  768046066U, 883U, 2034077390U },
--	{ 1989159136U, 833U, 1195767305U },
--	{  536585145U, 996U, 3577259204U },
--	{ 1008129373U, 642U, 1478080776U },
--	{ 1740775604U, 939U, 1264980372U },
--	{ 1967883163U, 508U,   10734624U },
--	{ 1923019697U, 730U, 3821419629U },
--	{  442079932U, 560U, 3440032343U },
--	{ 1961302714U, 845U,  841962572U },
--	{ 2030205964U, 962U, 1325144227U },
--	{ 1160407529U, 507U,  240940858U },
--	{  635482502U, 779U, 4200489746U },
--	{ 1252788931U, 699U,  867195434U },
--	{ 1961817131U, 719U,  668237657U },
--	{ 1071468216U, 983U,  917876630U },
--	{ 1281848367U, 932U, 1003100039U },
--	{  582537119U, 780U, 1127273778U },
--	{ 1973672777U, 853U, 1071368872U },
--	{ 1896756996U, 762U, 1127851055U },
--	{  847917054U, 500U, 1717499075U },
--	{ 1240520510U, 951U, 2849576657U },
--	{ 1685071682U, 567U, 1961810396U },
--	{ 1516232129U, 557U,    3173877U },
--	{ 1208118903U, 612U, 1613145022U },
--	{ 1817269927U, 693U, 4279122573U },
--	{ 1510091701U, 717U,  638191229U },
--	{  365916850U, 807U,  600424314U },
--	{  399324359U, 702U, 1803598116U },
--	{ 1318480274U, 779U, 2074237022U },
--	{  697758115U, 840U, 1483639402U },
--	{ 1696507773U, 840U,  577415447U },
--	{ 2081979121U, 981U, 3041486449U },
--	{  955646687U, 742U, 3846494357U },
--	{ 1250683506U, 749U,  836419859U },
--	{  595003102U, 534U,  366794109U },
--	{   47485338U, 558U, 3521120834U },
--	{  619433479U, 610U, 3991783875U },
--	{  704096520U, 518U, 4139493852U },
--	{ 1712224984U, 606U, 2393312003U },
--	{ 1318233152U, 922U, 3880361134U },
--	{  855572992U, 761U, 1472974787U },
--	{   64721421U, 703U,  683860550U },
--	{  678931758U, 840U,  380616043U },
--	{  692711973U, 778U, 1382361947U },
--	{  677703619U, 530U, 2826914161U },
--	{   92393223U, 586U, 1522128471U },
--	{ 1222592920U, 743U, 3466726667U },
--	{  358288986U, 695U, 1091956998U },
--	{ 1935056945U, 958U,  514864477U },
--	{  735675993U, 990U, 1294239989U },
--	{ 1560089402U, 897U, 2238551287U },
--	{   70616361U, 829U,   22483098U },
--	{  368234700U, 731U, 2913875084U },
--	{   20221190U, 879U, 1564152970U },
--	{  539444654U, 682U, 1835141259U },
--	{ 1314987297U, 840U, 1801114136U },
--	{ 2019295544U, 645U, 3286438930U },
--	{  469023838U, 716U, 1637918202U },
--	{ 1843754496U, 653U, 2562092152U },
--	{  400672036U, 809U, 4264212785U },
--	{  404722249U, 965U, 2704116999U },
--	{  600702209U, 758U,  584979986U },
--	{  519953954U, 667U, 2574436237U },
--	{ 1658071126U, 694U, 2214569490U },
--	{  420480037U, 749U, 3430010866U },
--	{  690103647U, 969U, 3700758083U },
--	{ 1029424799U, 937U, 3787746841U },
--	{ 2012608669U, 506U, 3362628973U },
--	{ 1535432887U, 998U,   42610943U },
--	{ 1330635533U, 857U, 3040806504U },
--	{ 1223800550U, 539U, 3954229517U },
--	{ 1322411537U, 680U, 3223250324U },
--	{ 1877847898U, 945U, 2915147143U },
--	{ 1646356099U, 874U,  965988280U },
--	{  805687536U, 744U, 4032277920U },
--	{ 1948093210U, 633U, 1346597684U },
--	{  392609744U, 783U, 1636083295U },
--	{  690241304U, 770U, 1201031298U },
--	{ 1360302965U, 696U, 1665394461U },
--	{ 1220090946U, 780U, 1316922812U },
--	{  447092251U, 500U, 3438743375U },
--	{ 1613868791U, 592U,  828546883U },
--	{  523430951U, 548U, 2552392304U },
--	{  726692899U, 810U, 1656872867U },
--	{ 1364340021U, 836U, 3710513486U },
--	{ 1986257729U, 931U,  935013962U },
--	{  407983964U, 921U,  728767059U },
--};
--
--static void prandom_state_selftest_seed(struct rnd_state *state, u32 seed)
--{
--#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
--	state->s1 = __seed(LCG(seed),        2U);
--	state->s2 = __seed(LCG(state->s1),   8U);
--	state->s3 = __seed(LCG(state->s2),  16U);
--	state->s4 = __seed(LCG(state->s3), 128U);
--}
--
--static int __init prandom_state_selftest(void)
--{
--	int i, j, errors = 0, runs = 0;
--	bool error = false;
--
--	for (i = 0; i < ARRAY_SIZE(test1); i++) {
--		struct rnd_state state;
--
--		prandom_state_selftest_seed(&state, test1[i].seed);
--		prandom_warmup(&state);
--
--		if (test1[i].result != prandom_u32_state(&state))
--			error = true;
--	}
--
--	if (error)
--		pr_warn("prandom: seed boundary self test failed\n");
--	else
--		pr_info("prandom: seed boundary self test passed\n");
--
--	for (i = 0; i < ARRAY_SIZE(test2); i++) {
--		struct rnd_state state;
--
--		prandom_state_selftest_seed(&state, test2[i].seed);
--		prandom_warmup(&state);
--
--		for (j = 0; j < test2[i].iteration - 1; j++)
--			prandom_u32_state(&state);
--
--		if (test2[i].result != prandom_u32_state(&state))
--			errors++;
--
--		runs++;
--		cond_resched();
--	}
--
--	if (errors)
--		pr_warn("prandom: %d/%d self tests failed\n", errors, runs);
--	else
--		pr_info("prandom: %d self tests passed\n", runs);
--	return 0;
--}
--core_initcall(prandom_state_selftest);
-+#ifdef CONFIG_PRANDOM_KUNIT_TEST
-+#include "tests/random32_kunit.c"
- #endif
-diff --git a/lib/tests/random32_kunit.c b/lib/tests/random32_kunit.c
-new file mode 100644
-index 000000000..ee50205b8
---- /dev/null
-+++ b/lib/tests/random32_kunit.c
-@@ -0,0 +1,174 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test cases for random32 functions.
-+ */
-+
-+#include <kunit/test.h>
-+
-+static struct prandom_test1 {
-+	u32 seed;
-+	u32 result;
-+} test1[] = {
-+	{ 1U, 3484351685U },
-+	{ 2U, 2623130059U },
-+	{ 3U, 3125133893U },
-+	{ 4U,  984847254U },
-+};
-+
-+static struct prandom_test2 {
-+	u32 seed;
-+	u32 iteration;
-+	u32 result;
-+} test2[] = {
-+	/* Test cases against taus113 from GSL library. */
-+	{  931557656U, 959U, 2975593782U },
-+	{ 1339693295U, 876U, 3887776532U },
-+	{ 1545556285U, 961U, 1615538833U },
-+	{  601730776U, 723U, 1776162651U },
-+	{ 1027516047U, 687U,  511983079U },
-+	{  416526298U, 700U,  916156552U },
-+	{ 1395522032U, 652U, 2222063676U },
-+	{  366221443U, 617U, 2992857763U },
-+	{ 1539836965U, 714U, 3783265725U },
-+	{  556206671U, 994U,  799626459U },
-+	{  684907218U, 799U,  367789491U },
-+	{ 2121230701U, 931U, 2115467001U },
-+	{ 1668516451U, 644U, 3620590685U },
-+	{  768046066U, 883U, 2034077390U },
-+	{ 1989159136U, 833U, 1195767305U },
-+	{  536585145U, 996U, 3577259204U },
-+	{ 1008129373U, 642U, 1478080776U },
-+	{ 1740775604U, 939U, 1264980372U },
-+	{ 1967883163U, 508U,   10734624U },
-+	{ 1923019697U, 730U, 3821419629U },
-+	{  442079932U, 560U, 3440032343U },
-+	{ 1961302714U, 845U,  841962572U },
-+	{ 2030205964U, 962U, 1325144227U },
-+	{ 1160407529U, 507U,  240940858U },
-+	{  635482502U, 779U, 4200489746U },
-+	{ 1252788931U, 699U,  867195434U },
-+	{ 1961817131U, 719U,  668237657U },
-+	{ 1071468216U, 983U,  917876630U },
-+	{ 1281848367U, 932U, 1003100039U },
-+	{  582537119U, 780U, 1127273778U },
-+	{ 1973672777U, 853U, 1071368872U },
-+	{ 1896756996U, 762U, 1127851055U },
-+	{  847917054U, 500U, 1717499075U },
-+	{ 1240520510U, 951U, 2849576657U },
-+	{ 1685071682U, 567U, 1961810396U },
-+	{ 1516232129U, 557U,    3173877U },
-+	{ 1208118903U, 612U, 1613145022U },
-+	{ 1817269927U, 693U, 4279122573U },
-+	{ 1510091701U, 717U,  638191229U },
-+	{  365916850U, 807U,  600424314U },
-+	{  399324359U, 702U, 1803598116U },
-+	{ 1318480274U, 779U, 2074237022U },
-+	{  697758115U, 840U, 1483639402U },
-+	{ 1696507773U, 840U,  577415447U },
-+	{ 2081979121U, 981U, 3041486449U },
-+	{  955646687U, 742U, 3846494357U },
-+	{ 1250683506U, 749U,  836419859U },
-+	{  595003102U, 534U,  366794109U },
-+	{   47485338U, 558U, 3521120834U },
-+	{  619433479U, 610U, 3991783875U },
-+	{  704096520U, 518U, 4139493852U },
-+	{ 1712224984U, 606U, 2393312003U },
-+	{ 1318233152U, 922U, 3880361134U },
-+	{  855572992U, 761U, 1472974787U },
-+	{   64721421U, 703U,  683860550U },
-+	{  678931758U, 840U,  380616043U },
-+	{  692711973U, 778U, 1382361947U },
-+	{  677703619U, 530U, 2826914161U },
-+	{   92393223U, 586U, 1522128471U },
-+	{ 1222592920U, 743U, 3466726667U },
-+	{  358288986U, 695U, 1091956998U },
-+	{ 1935056945U, 958U,  514864477U },
-+	{  735675993U, 990U, 1294239989U },
-+	{ 1560089402U, 897U, 2238551287U },
-+	{   70616361U, 829U,   22483098U },
-+	{  368234700U, 731U, 2913875084U },
-+	{   20221190U, 879U, 1564152970U },
-+	{  539444654U, 682U, 1835141259U },
-+	{ 1314987297U, 840U, 1801114136U },
-+	{ 2019295544U, 645U, 3286438930U },
-+	{  469023838U, 716U, 1637918202U },
-+	{ 1843754496U, 653U, 2562092152U },
-+	{  400672036U, 809U, 4264212785U },
-+	{  404722249U, 965U, 2704116999U },
-+	{  600702209U, 758U,  584979986U },
-+	{  519953954U, 667U, 2574436237U },
-+	{ 1658071126U, 694U, 2214569490U },
-+	{  420480037U, 749U, 3430010866U },
-+	{  690103647U, 969U, 3700758083U },
-+	{ 1029424799U, 937U, 3787746841U },
-+	{ 2012608669U, 506U, 3362628973U },
-+	{ 1535432887U, 998U,   42610943U },
-+	{ 1330635533U, 857U, 3040806504U },
-+	{ 1223800550U, 539U, 3954229517U },
-+	{ 1322411537U, 680U, 3223250324U },
-+	{ 1877847898U, 945U, 2915147143U },
-+	{ 1646356099U, 874U,  965988280U },
-+	{  805687536U, 744U, 4032277920U },
-+	{ 1948093210U, 633U, 1346597684U },
-+	{  392609744U, 783U, 1636083295U },
-+	{  690241304U, 770U, 1201031298U },
-+	{ 1360302965U, 696U, 1665394461U },
-+	{ 1220090946U, 780U, 1316922812U },
-+	{  447092251U, 500U, 3438743375U },
-+	{ 1613868791U, 592U,  828546883U },
-+	{  523430951U, 548U, 2552392304U },
-+	{  726692899U, 810U, 1656872867U },
-+	{ 1364340021U, 836U, 3710513486U },
-+	{ 1986257729U, 931U,  935013962U },
-+	{  407983964U, 921U,  728767059U },
-+};
-+
-+static void prandom_state_test_seed(struct rnd_state *state, u32 seed)
-+{
-+#define LCG(x)	 ((x) * 69069U)	/* super-duper LCG */
-+	state->s1 = __seed(LCG(seed),        2U);
-+	state->s2 = __seed(LCG(state->s1),   8U);
-+	state->s3 = __seed(LCG(state->s2),  16U);
-+	state->s4 = __seed(LCG(state->s3), 128U);
-+}
-+
-+static void test_prandom_seed_boundary(struct kunit *test)
-+{
-+	int i;
-+	struct rnd_state state;
-+
-+	for (i = 0; i < ARRAY_SIZE(test1); i++) {
-+		prandom_state_test_seed(&state, test1[i].seed);
-+		prandom_warmup(&state);
-+		KUNIT_EXPECT_EQ(test, test1[i].result, prandom_u32_state(&state));
-+	}
-+}
-+
-+static void test_prandom_taus113(struct kunit *test)
-+{
-+	int i, j;
-+	struct rnd_state state;
-+
-+	for (i = 0; i < ARRAY_SIZE(test2); i++) {
-+		prandom_state_test_seed(&state, test2[i].seed);
-+		prandom_warmup(&state);
-+
-+		for (j = 0; j < test2[i].iteration - 1; j++)
-+			prandom_u32_state(&state);
-+
-+		KUNIT_EXPECT_EQ(test, test2[i].result, prandom_u32_state(&state));
-+	}
-+}
-+
-+static struct kunit_case prandom_test_cases[] = {
-+	KUNIT_CASE(test_prandom_seed_boundary),
-+	KUNIT_CASE(test_prandom_taus113),
-+	{}
-+};
-+
-+static struct kunit_suite prandom_test_suite = {
-+	.name = "prandom",
-+	.test_cases = prandom_test_cases,
-+};
-+
-+kunit_test_suite(prandom_test_suite);
+v5 -> v7: Some modifications suggested by Jakub Sitnicki, and added Reviewed-by tag.
+https://lore.kernel.org/bpf/20260106051458.279151-1-jiayuan.chen@linux.dev/
+
+v1 -> v5: Use skmsg.sk instead of extending BPF_F_XXX macro and fix CI
+          failure reported by CI
+v1: https://lore.kernel.org/bpf/20251117110736.293040-1-jiayuan.chen@linux.dev/
+
+Jiayuan Chen (3):
+  bpf, sockmap: Fix incorrect copied_seq calculation
+  bpf, sockmap: Fix FIONREAD for sockmap
+  bpf, selftest: Add tests for FIONREAD and copied_seq
+
+ include/linux/skmsg.h                         |  70 ++++-
+ net/core/skmsg.c                              |  30 +-
+ net/ipv4/tcp_bpf.c                            |  25 +-
+ net/ipv4/udp_bpf.c                            |  23 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 277 +++++++++++++++++-
+ .../bpf/progs/test_sockmap_pass_prog.c        |  14 +
+ 6 files changed, 422 insertions(+), 17 deletions(-)
+
 -- 
-2.52.0
+2.43.0
 
 
