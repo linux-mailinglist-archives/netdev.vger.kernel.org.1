@@ -1,239 +1,152 @@
-Return-Path: <netdev+bounces-253086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKkZAQDndGkQ+wAAu9opvQ
-	(envelope-from <netdev+bounces-253086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 16:36:32 +0100
+	id AO+3COvzdGlH/QAAu9opvQ
+	(envelope-from <netdev+bounces-253087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 17:31:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B768F7E0BE
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 16:36:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E077E209
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 17:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 136943003805
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 15:36:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A64230087BA
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 16:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F1E22A4D6;
-	Sat, 24 Jan 2026 15:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3622222C0;
+	Sat, 24 Jan 2026 16:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lz1WmLTO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJlX1JsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0431F03D2
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 15:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B09D21B191
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 16:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769268985; cv=none; b=daXkWZGP7TnYoqiEPfZiZKFNbJ73oNUJxVGHVUf7hD6E31kUO3uuWzFywOb7OdUh0zq9FQ1JSaS5098jolMdWl1u/nn/xVaTVmkSvA8qZjZyjUnufpz+o//EzDJdixVZGx9THHLyPu2IdshdTVl27QXsIKkJqNxNnuoqPEG5eCA=
+	t=1769272296; cv=none; b=a1r0lw4+o+TG+XCxpUKKs7jefhO56Y+nIZnpo1gFo9Uv3iiLUDeuWh6FPZDZb/E/dyO2ndHZLcQenoEH6ezj1byCNtQfAShWdfwHAhJr1r/X4VKbigqGtaeum1SjzCUuvR6mqTd1YTaDU23OHm2bVjYTKCfXZ0tSJy1KbWWu9PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769268985; c=relaxed/simple;
-	bh=tt3ICgihB3ll2W95De8w+7bU3+Au6XTjFxYRLdmZUQ8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DILMt7ztOXTNClcq//DaM7ynEDQk48rUP6YK4fLeNp3aI5oMCQd3Q+Tmamz+kAIKAHwbr3STpTCflDTMZFiBiPUF1YxSPFU+IjbZLYc4cjHFlSzNnJ7sQLCBQVmQGsXD1FDgckQgUtIJefOR1PPi9KaY+w1czOzheYXnoHjb+kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lz1WmLTO; arc=none smtp.client-ip=209.85.128.177
+	s=arc-20240116; t=1769272296; c=relaxed/simple;
+	bh=1eqMQIkORPHz+LKdyHWjs2l5QZ5Wq4LYksvp1ptRUNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kXgT1pV7GTK4JVHJYC25in7xkzAcxKLmuOCCaxLyrWwbxbzS6vcod1ra/R5pvuUysVYsGzYoWB30f2Ge4vlY4PsrYOoWC4IPHpJYdDCMgjHk4nh9J0vEKz1LhxKcLDh8SX4QV4uvpRbESmMJ9P5Jx73e5jAH4jChfVIHuOHvJ7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJlX1JsI; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-790ac42fd00so32379777b3.3
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 07:36:24 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4801bc328easo36654365e9.3
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 08:31:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769268983; x=1769873783; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CZffbMRjY10Ecny24h62HzMsaRiu2djFlqj+rY4gDlM=;
-        b=Lz1WmLTO/PVKudqfSumD5IznC583tqbXO7BwXpz6yJsjImGjGmgnL0oWM8ziAJAWaw
-         t1HHngxHgDdfDJ/X/4/cd8VCXDnC2r2KJOQ5hfSAiz/BHXt0fkmlGHwlikF79PRMhPTI
-         9WUWHk7pNsX2Mmqmgn5Otre2osvGsK9PPisWAfkgh2t7ZW17mbu04AQQueZb0zehQ5ji
-         sIAu7Mz2ADZjJsR7NoYz2Rurl3I7JHDREDFXJRsRhUDeHR86Rd8RlastEkey2BOKK1NN
-         lAkSyk+MMAcT1vof8C3hhxHBY/gNH71AINXkPLe9TW/RZkPdYulcBmciNkLuhu/CLc06
-         kl8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769268983; x=1769873783;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=gmail.com; s=20230601; t=1769272293; x=1769877093; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=CZffbMRjY10Ecny24h62HzMsaRiu2djFlqj+rY4gDlM=;
-        b=A1v2QvnQ6OfRL/qnTcONQThoHr3TfEd4CHMeNHsdvthNQKpEH4e7absh+QLo47IU9u
-         qIMuro0fZUMuvJLUDDTVD4rUxqMc4hgK+8weqIk7rCk4hm49XKKG8BJwNRUILk06BWBx
-         0JrInBd1pSulX5l62EQgzLvHT89wX81spQs+TxlmFdQzCE/kxXJISZCL1K+pnxsqIglx
-         QzPGSNJfOTdPOb0oZZFiHSSkXPOJY7IORTihTTbHsokeMOZGCSsShHthn3oUwf2Fjr8M
-         qclf5avY0bRC8Lema930n5llCzy2nqp9Q4MLOlzCmh8hxH8o9QjkykqHCsXfs64Qblkb
-         +cXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVYNaxiV9KQ0sJJQZK2OqWg2rsIU2pRParV3ecNnU0f6VGYzvi9CpfPoGAahSGVKgL08+5FPyc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYTGzdvP2G9oOOrE3tMa5zievjv68D9PituMZAzFsqcx31hfQ/
-	seqJsyMfWhdmTaOiSa9/5ZWfj6z7HXD11R1Mb0duSowbllDHtmJYfI5M
-X-Gm-Gg: AZuq6aL+FrKcRFZEQ1QoiqDMAdZYBLUrrHvZVacydrZAp9PK2nmRFUrRBnGFB+m70BW
-	7fIUaYH5m0B3bbbSStKgthcawzDMoMzTUHsplS9AewStbUSx11gP8AnZQSkmQMsqWFmuyP+KACq
-	RSMCs1jLGfOV0x5IOQNrGaMwQsjBRPA/CIcFMOIPZ1w0vS7Op399JcAAyhQljZxLkPoK7n16gUm
-	lb4qgrW94vexaz1mK0/koRLue/HNc9rHR/jV0aGbRFbDX0Oo+9YQFq+8+P9vFvOnWTJfzfilA8k
-	eMouU05HRiYqprgK5vMryOVwtCMkDEimUwV3Gb2HY4AoH2NPWm0tp8TmIoF7SFOCjmW/WcxhMEI
-	Sc9xMqpcndHWeXMHMWRP2vxstTtdZjFhL075h+PnC7qOZjoby6FKDTK125/O6KVoEDrhoXN2Ha9
-	U2w4+4D4YNyJosWODPGFtUPDMKISpjPWn/Ax7uXutYCLHst5c5z3yvzPXKvsY=
-X-Received: by 2002:a05:690c:e3eb:b0:793:c9d4:3c8c with SMTP id 00721157ae682-79439795ecamr128848537b3.0.1769268983284;
-        Sat, 24 Jan 2026 07:36:23 -0800 (PST)
-Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7943b2ba803sm25613717b3.39.2026.01.24.07.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jan 2026 07:36:22 -0800 (PST)
-Date: Sat, 24 Jan 2026 10:36:22 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org, 
- horms@kernel.org, 
- kshitiz.bartariya@zohomail.in
-Message-ID: <willemdebruijn.kernel.1575664f1b7c9@gmail.com>
-In-Reply-To: <05b086b3-c82d-4aba-b185-2d39ba968a72@redhat.com>
-References: <20260122185357.50922-1-mahdifrmx@gmail.com>
- <willemdebruijn.kernel.1682586fd684e@gmail.com>
- <60ed19a1-97e1-4342-8dfc-a5db684afa6f@redhat.com>
- <willemdebruijn.kernel.2b69585efeb5a@gmail.com>
- <05b086b3-c82d-4aba-b185-2d39ba968a72@redhat.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in
- udp_prod_queue
+        bh=SikO7ZOzq4nMwwsrNbdMlMZbqUgdAVK7GEFvFEDT/V0=;
+        b=lJlX1JsIre7Sf/jogqmJkgqBXVSR9D7PcQR6BDL9RbtqZQshEmiWVMczHnjRA6Jqfk
+         /p/lWYclxhFe3nVALCCryB9Cue+KIkPN3GlZna0s18SnoODcAUBB/Y7kga6r6yotnSdP
+         iTmy5HAm7A0wXVejRUJoxtphW5I1uJLa9+698WLJv21WgCEVsW23kR/2O/9qNOx3LFlu
+         pHRPX+/bNrsx66xcE5xxonBcm3KK3BIqKBjBvtm/hxgAi4mMyhr2s2PkbPmSTS2mtOgd
+         WcBy8NEJNEZAylFKUneiov+bvm4e6k2bQqqmrXbJ++p6i1rtBeM2TgWt0OjJp99aLOsG
+         WnHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769272293; x=1769877093;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SikO7ZOzq4nMwwsrNbdMlMZbqUgdAVK7GEFvFEDT/V0=;
+        b=E6AR/5vR9p9aq+wx5k1b+xVDEtr/UizAL5DsBkt/Jg4vDu7x5D4z5d2m7eJj23+ASa
+         DrcuHFmLUVVTrpLhhvTSLSHpnzahpdikN1J4ww3+2g4wsruHrSC+sGjAlovS51BjupF6
+         NGzUX+RF6ULpmQTjdD7rBYXupOt+zE4xsLehe3HT2FyvbABsNgJxKaDwmv/O4fDDJ4a9
+         yCalony6IVd0duirCjGb5mNR8qKHx2NU9L7dVlOWwin044F/S9FnZVkocUHA+s/zQfHW
+         TszpZVF8o1QvcYjYpi49wCgyNGKANInOkNdEZ6ByP7d+6Xb5PV0C2va57RiMGK16OqO4
+         DL0g==
+X-Gm-Message-State: AOJu0YyfWAkPwkfyCcQs4rWHT3ttdeRr5XHEtRR2eicCPxlrbTYKx1gj
+	9GyzFFN9N+C1ZnqswKuDf4ZCBvROMDE3qULgwYmw2uAXoN2B4jNB2eVB
+X-Gm-Gg: AZuq6aL8U3Vz9nyVdBXGzwDd31qobhoAjESE4eyJG838Bi2FKo6tvaigGU1t+x18aB4
+	PH2Sl9AdPHhoIx5sVtqNxslmXhCemfNFztjz/CeZ/bQzaT1GfNZsfyG5muuQIbZqjRgbWIgpI3v
+	xibJ+zuI42HtPHYo6UGMgMyMm9O+SshkUiSUze+fIDogJLIlStqKdFbiYGB6x8mkngpJ/YPoeF2
+	R/wsDtAHCu7Q+HnvZ4Uq0LVJLzDVCIcp2m7p9hN32yaUC1rDV54tsjXOIt77Blo6hbGsjpn1Dhb
+	X7RcmR6PjM5UTdcgM+I86wprJvwPnQQRjksUiqoJ1140M/6D8luhahQis2SlaInnimWZy04/6ok
+	VNg1FMkQtEu/DF5afX1IKK9jPh2DbZdJO/HNjJocaPt4flZmReUixd6WKas7oDA2yD/bHhN0Nn0
+	3XA/n4YYJ2IinDUlFYcYYaDJ2LH2FMXGpO64o5Ot1fofdtgA882+DFR2Q129XnG3eNFLizKMnYe
+	1ZgUmqZVKnRdld+yQ8lPTr70WEqZw6Kr8jP0GM0YHAGR4zEjpNzP5AcoZddLKzdzg==
+X-Received: by 2002:a05:600c:5494:b0:480:1e9e:f9d with SMTP id 5b1f17b1804b1-4804c94810fmr106845805e9.8.1769272293250;
+        Sat, 24 Jan 2026 08:31:33 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48047028928sm305258775e9.2.2026.01.24.08.31.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jan 2026 08:31:32 -0800 (PST)
+Message-ID: <edc2351c-f8cc-4bfe-8cf0-691f13619c1d@gmail.com>
+Date: Sat, 24 Jan 2026 16:31:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] io_uring/zcrx: implement large rx buffer support
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org
+References: <cover.1769249792.git.asml.silence@gmail.com>
+ <a840a38936ddcaa4c03b81e66e571a38ca68694f.1769249792.git.asml.silence@gmail.com>
+ <8ce09f91-0706-4883-9b7e-1855c8dd5c2a@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <8ce09f91-0706-4883-9b7e-1855c8dd5c2a@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-253086-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253087-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: B768F7E0BE
+X-Rspamd-Queue-Id: 70E077E209
 X-Rspamd-Action: no action
 
-Paolo Abeni wrote:
-> On 1/23/26 3:41 PM, Willem de Bruijn wrote:
-> > Paolo Abeni wrote:
-> >> I think that doing the SNMP accounting in __udp_enqueue_schedule_skb()
-> >> (for `to_drop`), __udp_queue_rcv_skb() and __udpv6_queue_rcv_skb() (for
-> >> `skb`) is a little confusing and possible error prone in the long run.
-> >>
-> >> I'm wondering if something alike the following (completely untested, not
-> >> even built! just to give the idea) would be better?
-> > 
-> > I don't see the error prone issue with the simpler patch.
-> > But SGTM if you prefer this.
-> It's not a big deal but if we need to update the UDP MIB someday having
-> to look in different places could cause missing something.
+On 1/24/26 15:32, Jens Axboe wrote:
+> On 1/24/26 3:36 AM, Pavel Begunkov wrote:
+>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+>> index b99cf2c6670a..b5166c9118e5 100644
+>> --- a/io_uring/zcrx.c
+>> +++ b/io_uring/zcrx.c
+>> @@ -15,6 +15,7 @@
+>>   #include <net/netlink.h>
+>>   #include <net/netdev_queues.h>
+>>   #include <net/netdev_rx_queue.h>
+>> +#include <net/netdev_queues.h>
+>>   #include <net/tcp.h>
+>>   #include <net/rps.h>
 > 
-> The code I proposed could be made smaller with something alike the
-> following (still completely untested), which in turn looks quite alike
-> what this patch is heading, I guess. So really it's not a big deal.
-> ---
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 1db63db7e5d4..431de8dda0d3 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1793,6 +1795,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
-> struct sk_buff *skb)
->  		}
->  	}
-> 
-> +	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
->  	if (unlikely(to_drop)) {
->  		for (nb = 0; to_drop != NULL; nb++) {
->  			skb = to_drop;
-> @@ -1802,10 +1805,9 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
-> struct sk_buff *skb)
->  			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
->  		}
->  		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-> +		return nb;
->  	}
-> 
-> -	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
-> -
->  	return 0;
-> 
->  drop:
-> @@ -2345,6 +2347,9 @@ static int __udp_queue_rcv_skb(struct sock *sk,
-> struct sk_buff *skb)
->  	}
-> 
->  	rc = __udp_enqueue_schedule_skb(sk, skb);
-> +	if (likely(!rc))
-> +		return 0;
-> +
->  	if (rc < 0) {
->  		int is_udplite = IS_UDPLITE(sk);
->  		int drop_reason;
-> @@ -2365,6 +2370,9 @@ static int __udp_queue_rcv_skb(struct sock *sk,
-> struct sk_buff *skb)
->  		return -1;
->  	}
-> 
-> +	/* rc > 0, packets dropped after dequeueing from prod_queue */
-> +	SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS, rc);
-> +	SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS, rc);
->  	return 0;
->  }
-> 
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 010b909275dd..df895096669e 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -793,6 +793,9 @@ static int __udpv6_queue_rcv_skb(struct sock *sk,
-> struct sk_buff *skb)
->  	}
-> 
->  	rc = __udp_enqueue_schedule_skb(sk, skb);
-> +	if (likely(!rc))
-> +		return 0;
-> +
->  	if (rc < 0) {
->  		int is_udplite = IS_UDPLITE(sk);
->  		enum skb_drop_reason drop_reason;
-> @@ -813,6 +816,9 @@ static int __udpv6_queue_rcv_skb(struct sock *sk,
-> struct sk_buff *skb)
->  		return -1;
->  	}
-> 
-> +	/* rc > 0, packets dropped after dequeueing from prod_queue */
-> +	SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS, rc);
-> +	SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS, rc);
->  	return 0;
->  }
-> 
+> Duplicate header? Rest of the patch looks fine to me, I'll just kill it
+> while applying.
 
-Honestly, I don't see this plumbing of nb as simpler than incrementing
-the counters right where nb is known. All it takes there is to make
-the second arg to UDPX_MIB conditional on sk_family. But again I don't
-care strongly, so SGTM if you do.
+Looks like it, probably slipped through during rebases
+
+-- 
+Pavel Begunkov
+
 
