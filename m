@@ -1,197 +1,175 @@
-Return-Path: <netdev+bounces-253081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MPS8LQbedGkV+gAAu9opvQ
-	(envelope-from <netdev+bounces-253081-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 15:58:14 +0100
+	id eEbVE4HkdGnu+gAAu9opvQ
+	(envelope-from <netdev+bounces-253082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 16:25:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC0F37DFCC
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 15:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93FF37E060
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 16:25:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EB6F300CC04
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 14:58:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A7AA300D156
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 15:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDF33191C8;
-	Sat, 24 Jan 2026 14:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BC621D3D6;
+	Sat, 24 Jan 2026 15:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qLMQh7xd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JT64rcv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32101D8E10;
-	Sat, 24 Jan 2026 14:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769266687; cv=none; b=ElC6PsO3aPTmOaZD9jrpekYFt6ld6p/tG5hBub483CRf62uZDXPMqVbpbiqS8+RNRqlvMUwCnX62jr5UdvktRimzd6XiGDz31dglPnmqQOMzFpDkD6cjJD5e74V42QLfdQFSfV6mhqZm9tRuZ4Mx/O3OQdOp5mGnZyD2PUmNbBo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769266687; c=relaxed/simple;
-	bh=dm8Ct+dHvdTsQ8RTyKSos3OmynlqH5EjrJzZcnN2LuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GR4pmqcOBXYBzYRQ2Y0br4UARTj9RoPhiKUlJzo4gI0gbdr0sLWX7MjGlWEvIiZQAZZ8WGxXakmxErlTjaOfwUyZGRzFukeZX4LFxWWwyiHXEVDTAvzYeWH1fGGcpSdPulXnjm/aObjXS+UZ9h2/L/IRVDwMOzhrd6GiSxIOx2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qLMQh7xd; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769266676; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=CPWuCV8/90YbisajP7XufYM2YYkYUVDqVYcpinvbKXw=;
-	b=qLMQh7xdIcdmuC4QVLXEsAR6u2W28NZEIu574FJuOTY6WkmSudQvNhw3iIGSyQ5pKjdjE3WFtPZqCszuv1Xd9cPMZc+2tKtlEJlR059mRXx1XzQt/z6vcy1nZoPbLa3jTAeuDKQCKAK09UxvwkYXHvboVDaYDpIKYuhqg+0T4Cs=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WxjCWVN_1769266674 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 24 Jan 2026 22:57:55 +0800
-Date: Sat, 24 Jan 2026 22:57:54 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <20260124145754.GA57116@j66a10360.sqa.eu95>
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
- <20260123082349.42663-3-alibuda@linux.alibaba.com>
- <aXPEFdEdtSmd6AzF@milan>
- <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BC720DD75
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 15:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769268348; cv=pass; b=BOTK1m7rcHOTdAKE9PvcE26/LKYpSR2qZCbUr6k6Ne1bRJE1EuyopgUMXwoBJfwuYL8iYWIA/3oi8RQZ+iNNLv/9N+28FEpoqIxvorxS13xK4f5F1zgCgOkeAoVz7LxJzdRy1iv/9CUcqvRIzxeT7tL9GV/FGqYD+4z+ZlKD3o8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769268348; c=relaxed/simple;
+	bh=pcfU+4mnDH676iCM6nVMR4sNi6d040S7tQhpJL1WDW4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XsVlyirn/46OuB2HTJKP+rmZ+9+C/zP4rLaVA7s0IbwOEqgQyLMaum1BI5lAvbg1Mj0uShkpJxZM+65QNZhO2gLtqWktmsSXPWsSrUV+02JbN4XU4qgdZ7Okvyg71tCXHgWRNOvsvcXb2vnDaJGBPX0x3VWzNcI7oOtRfLEc2u8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JT64rcv7; arc=pass smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7cfe2a6bf81so1022827a34.0
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 07:25:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769268346; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UM0h7OALRiEodwpdZ7QAHKpzgbSE/zl0kCp/BERVmTTWzPr6Ybedt/c92efc3zuTty
+         bXbyrMxYxMhP0oQkLYrBtxNcATQongWngmttpjC8y/CQhemrBlLO92q86qFw7qyb43va
+         cbYkswZewZB6ZUuDoRR2dBpmZfg50+/GFiuTFCsOT+Xmip9UaWdsAOiwVb2r1tQEdGDY
+         ZUOqrM4lo2Hr+tHd4cmG4z/bbG7SXrfjt1U+VZRhKh6rjWAJ+9DB6E0H8bEa6tlQ0Wxo
+         XweE5jvtZG/n0zvLOSi0Eu0y/FtwuZXHkL1Q0rmbqvlInC8Mnc9iTC6JF4ZxEJUEeWVo
+         NWvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=pcfU+4mnDH676iCM6nVMR4sNi6d040S7tQhpJL1WDW4=;
+        fh=CH0Tucwx7uCn7iLWRUxHa0Elo9sMmn1az94uhhghKYs=;
+        b=SgxNlLzNvNspMsMLp4/Kr28cDMib9vKamLHnVrKub6xhUyGD4rx8WBMkm3ZW2Prbnx
+         IVXnqqW2NzaxJjEzBd7d3cA2B1eB98GLOQXIAmUrzsJGrAUFnuRbz8YUQGIO0cQ8lst4
+         fm9EU4lxR2STZ1Ejvw9xB0gLYpQOwHv3r9WxEXu0sKPrivlSIA+aSRY9+J6j5nkWE71e
+         /wJssQCQ/dOPuOzxWh3tHXT1Ue8RYRFUfODJtk3iAiNr38ueVZtrSBUZw7rEHDpiBOL0
+         m/rSuZQnoJRMA1CKwjiOlcV2My9Arvw1q6d67HoHsulxS7IvkT/vRg1IM91tbXT04ki4
+         qbiQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769268346; x=1769873146; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pcfU+4mnDH676iCM6nVMR4sNi6d040S7tQhpJL1WDW4=;
+        b=JT64rcv7sNeplUh/tnpU8KT1FksRB58d5I0R25SLHcYn5m4NRcqL6o03KL+jYfMqbB
+         4c7ufXu/YPtpyYjMp6d9yYTFIsUvhA5SnWkxdv5e+39pffZdD2Nql5jYZ06jJmZlvcKE
+         Oh1t/SRA2j1wk++g+VzLdxg91rFUGIfe5tQIH684ay3K91mgYfFoHh+hF23ZIr8GVIB/
+         vrylV3i7snmmweTbjQpDx4gDaB4Y9xY7sVbbIGiWb7nzxBvt6GdFQVhlcQXrZ72kNcK4
+         9/kyye0r+7I2fqXC1YTASsymqfOd28YZi4KFjhW8vKcOp7rx5CsIk79jUujnYJ1W9lSy
+         xXew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769268346; x=1769873146;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pcfU+4mnDH676iCM6nVMR4sNi6d040S7tQhpJL1WDW4=;
+        b=Nx5OCT5W4OoqS+k5J1KCkjSbPg4x05wHPUm/P/ze8zjummIkffPEBuganaHfvoyouV
+         AGOtUmmdeMuOOU7lKienkHpF6QMtJp8eQNMRvRvSYl8bQFEmklEseN6lXbIEpqSz5OFG
+         aH/BZIMhRmlbd9HB8MOllW99ceqMj3KSINcPxZT1fITzxM87NPPbsqBgQ2K1GI7+FJkL
+         dDY7pza/U7o0U+Gm4dkEMjrkaIPcPk9tqOte9YLcTXZWSE9sYgiyegPOIwRiDtZYzWSp
+         wmT24C0D0zKz3UJAoU9oKA2FYC49vC1inksVsVkv9PKrFFXy6rZZ3Lw5Lj9RpXyB8+7E
+         iIJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNXcafimKpby4L1TqQLcnPonGw5t4uG23fIE/CGvlLe2rgKcIepNYX7K4I7mu6znQ6YypBuU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwitVxzpU5ZTbqD5YloOZ4hN7Nca/19QG+u84ve49n4V/ZkW+FA
+	QUQqfrzyzzaDljmrNNY96lbhxldsyD7pqaWOKXomfn+QejNo/fVMWqzHxrOzWHk+8jnX5QD7cTs
+	eCFzCkyQ0zpJw4MOfuwxGwDXLqhCCXeU=
+X-Gm-Gg: AZuq6aJNBfoaqPi706TtRhbHxDtG3uU2w2ZiZ7rMMV+QPrZmoEstnWhWzlpT89CwYbl
+	kVHFusu0mbFiKfvxMxkYyE58VamVqRN/ghDFJOvTG5LuFG1h18elZlVzafaAWZD8aViUCmQH6eC
+	OzlvidSma/nD0bVE9oPsYiS/jNLlXOII77piVWYhu2rmkPbvY4BfQVBpNfsUeho+LICFTLVIu4U
+	hwri8qXGRJ36GW6VHf+YTTIcI4ZOlXRCG77/52wg2gyLTDNYcKUQkNoHwLCUIWZRyJF3Ts=
+X-Received: by 2002:a05:6830:3695:b0:7cf:d822:37fb with SMTP id
+ 46e09a7af769-7d15a6772c6mr3176213a34.34.1769268346171; Sat, 24 Jan 2026
+ 07:25:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXSjm1DXm6yP62tD@pc636>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20260123071635.16976-1-suchitkarunakaran@gmail.com> <CANn89iL5jS8BP+eXe1HeOBNpzfmVgTAHROGBK0qCAKJxvxUnuw@mail.gmail.com>
+In-Reply-To: <CANn89iL5jS8BP+eXe1HeOBNpzfmVgTAHROGBK0qCAKJxvxUnuw@mail.gmail.com>
+From: Suchit Karunakaran <suchitkarunakaran@gmail.com>
+Date: Sat, 24 Jan 2026 20:55:35 +0530
+X-Gm-Features: AZwV_QgO86ZqF-7AWmtIDBCAYwPvZv8yTFk5or4fxY8OOXTLlHlFA9ru4rr3Szg
+Message-ID: <CAO9wTFhNijfEbmASx8rdStWSjvQicCvA5nSHqF4B4XpNxu0nGg@mail.gmail.com>
+Subject: Re: [PATCH] ipv4: ipmr: add socket type checks to ipmr_ioctl()
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-253082-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-253081-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[suchitkarunakaran@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:dkim,j66a10360.sqa.eu95:mid]
-X-Rspamd-Queue-Id: EC0F37DFCC
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 93FF37E060
 X-Rspamd-Action: no action
 
-On Sat, Jan 24, 2026 at 11:48:59AM +0100, Uladzislau Rezki wrote:
-> Hello, D. Wythe!
-> 
-> > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
-> > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
-> > > > find_vm_area() provides a way to find the vm_struct associated with a
-> > > > virtual address. Export this symbol to modules so that modularized
-> > > > subsystems can perform lookups on vmalloc addresses.
-> > > > 
-> > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> > > > ---
-> > > >  mm/vmalloc.c | 1 +
-> > > >  1 file changed, 1 insertion(+)
-> > > > 
-> > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> > > > index ecbac900c35f..3eb9fe761c34 100644
-> > > > --- a/mm/vmalloc.c
-> > > > +++ b/mm/vmalloc.c
-> > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
-> > > >  
-> > > >  	return va->vm;
-> > > >  }
-> > > > +EXPORT_SYMBOL_GPL(find_vm_area);
-> > > >  
-> > > This is internal. We can not just export it.
-> > > 
-> > > --
-> > > Uladzislau Rezki
-> > 
-> > Hi Uladzislau,
-> > 
-> > Thank you for the feedback. I agree that we should avoid exposing
-> > internal implementation details like struct vm_struct to external
-> > subsystems.
-> > 
-> > Following Christoph's suggestion, I'm planning to encapsulate the page
-> > order lookup into a minimal helper instead:
-> > 
-> > unsigned int vmalloc_page_order(const void *addr){
-> > 	struct vm_struct *vm;
-> >  	vm = find_vm_area(addr);
-> > 	return vm ? vm->page_order : 0;
-> > }
-> > EXPORT_SYMBOL_GPL(vmalloc_page_order);
-> > 
-> > Does this approach look reasonable to you? It would keep the vm_struct
-> > layout private while satisfying the optimization needs of SMC.
-> > 
-> Could you please clarify why you need info about page_order? I have not
-> looked at your second patch.
-> 
-> Thanks!
-> 
-> --
-> Uladzislau Rezki
+On Fri, 23 Jan 2026 at 14:57, Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Fri, Jan 23, 2026 at 10:04=E2=80=AFAM Suchit Karunakaran
+> <suchitkarunakaran@gmail.com> wrote:
+> >
+> > This is the IPv4 counterpart to commit ("ipv6: ip6mr: add socket type
+> > checks to ip6mr_ioctl()") [1].
+> >
+> > Similar to the IPv6 issue, ipmr_ioctl() and ipmr_compat_ioctl() access
+> > raw_sk(sk)->ipmr_table without first verifying that the socket is a raw
+> > socket with IPPROTO_IGMP protocol.
+> >
+> > This allows a permission bypass where a user with CAP_NET_RAW can creat=
+e
+> > a non-IGMP raw socket (e.g., IPPROTO_UDP, IPPROTO_TCP, or any other
+> > protocol) and use SIOCGETVIFCNT or SIOCGETSGCNT ioctls to query IPv4
+> > multicast routing statistics. This bypasses the access control that
+> > restricts mroute operations to IGMP sockets only.
+>
+> Where has this been documented? An RFC perhaps ?
+>
+> This change could break applications if they were unaware of such rules.
+>
+> I fail to see how querying statistics could be a risk.
+>
+> What about the RTNL_FAMILY_IPMR rtnetlink interface ? I am sure it is
+> available to any user.
 
-Hi Uladzislau,
-
-This stems from optimizing memory registration in SMC-R. To provide the
-RDMA hardware with direct access to memory buffers, we must register
-them with the NIC. During this process, the hardware generates one MTT
-entry for each physically contiguous block. Since these hardware entries
-are a finite and scarce resource, and SMC currently defaults to a 4KB
-registration granularity, a single 2MB buffer consumes 512 entries. In
-high-concurrency scenarios, this inefficiency quickly exhausts NIC
-resources and becomes a major bottleneck for system scalability.
-
-To address this, we intend to use vmalloc_huge(). When it successfully
-allocates high-order pages, the vmalloc area is backed by a sequence of
-physically contiguous chunks (e.g., 2MB each). If we know this
-page_order, we can register these larger physical blocks instead of
-individual 4KB pages, reducing MTT consumption from 512 entries down to
-1 for every 2MB of memory (with page_order == 9).
-
-However, the result of vmalloc_huge() is currently opaque to the caller.
-We cannot determine whether it successfully allocated huge pages or fell
-back to 4KB pages based solely on the returned pointer. Therefore, we
-need a helper function to query the actual page order, enabling SMC-R to
-adapt its registration logic to the underlying physical layout.
-
-I hope this clarifies our design motivation!
-
-Best regards,
-D. Wythe
-
-
-
-
+Hi Eric. The primary motivations for this patch are the IPv6
+counterpart mentioned in the commit message and the commit 5e1859f.
 
