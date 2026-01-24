@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-253102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gAXoD5YkdWnZBAEAu9opvQ
-	(envelope-from <netdev+bounces-253102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:18 +0100
+	id QCTKNackdWnZBAEAu9opvQ
+	(envelope-from <netdev+bounces-253103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA5E7EC9E
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 493867ECA6
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C288301F984
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6BBA33029274
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C0A274B40;
-	Sat, 24 Jan 2026 19:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EC0241114;
+	Sat, 24 Jan 2026 19:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XeG5GiR7"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="1yJxobAY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AA8263899
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC8D259C92
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769284716; cv=none; b=nzE2iAHNGa5RxFvq5jeDKlR+NkKiWQORRBAMVnzumbUSX0FF2WXoBEEHudwgZ427XWeNIxP4T2+fksWIxGN9KrFvPDHlpDmmeztg4Rc7qIqRw0P+XTYDkFGHlmKrhbVB+t2OxLnRreIi75tZaNOkrWO6hSsNJueXvCIHbHnSigw=
+	t=1769284718; cv=none; b=Z+aycjTEHZGoVmmPDKsiOb0JbgCSpzNZZ+70Bbj7aKRlyp2caC0CUjzCAb5srIJAXmJP476fFLuRq7CNi1R06/QCo7fqM94Mj+o6NVjuZLv2ijvkBZyXrXgx5kmkZKJkfnpN26cI4k2IW8vyAnIvhFG3KmDl3E49Xai++yw0T0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769284716; c=relaxed/simple;
-	bh=SiAmVbxXslaomHbo/y78+2pVq+aHdb6yqAmkDrphu4Q=;
+	s=arc-20240116; t=1769284718; c=relaxed/simple;
+	bh=UEUyixXsksaes461qeojX8CH8Hm/xLERO1wV8L3TOzc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h56IyrPX3MYpXb4Y0SEqpv2wA5PjE+1WaOQ68Cbn3WvqB6Cj6mWps5/slpcXoaweKTICKrrPWA9YS4RPfU/Ovlf8vNZB4NaE1PugXqk+FhFxs6tiFybmM8AoCalOJikEYfR7mfAU1AhlWaso8I0gr9SCDsc1L8Fiy4sxEsgFXuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XeG5GiR7; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=LaaxtwCgHlndms7Z9T6/VuFwp7CB+/lC9m5naIVcQ9rbebOvw0fz5uGKJ89wEC+L93lNf0UffvNK59OkT5QE6i6upVdEaT2nNb0LqrkP06O358a3Pq8+iWfry9cklNTM2qpgoTFJFFNUiBzGREMnT9CnUDGbcFo2BPxvOw5ISZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=1yJxobAY; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47edffe5540so37423435e9.0
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:34 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4801d98cf39so24208645e9.1
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284713; x=1769889513; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284715; x=1769889515; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XGgkNSgPv+4DWg1/0xpqIlGMpixZAm1LMI7hGDSXCiE=;
-        b=XeG5GiR7sH9PO45fI5PLs3P3svB02UTL08NiXFcz5lK5Q5Dasdh9ewz0G+2iS0KcDj
-         8CtA8nXqt91VyyiSL1/cylFlEm/SbinKjgP65hU1v25QotIKxpR4kK04na0rvCSqmX9d
-         3XdXSPusziZZqiZhtCfPSFXzqVXKZT0ypNbDgP/y2Mqe6P+eivqbI9KqTqXRSGqleM4q
-         0GMSWQaU4G6AE5WZJk/EOckfFetyB/FHQDXcjkLR/wjL44V+eo2n0H+48Mff8gQcPs8Y
-         x2e/ctwPoKeEH5wJRvrSID1bgmxzDfnpCVjX6Eo+8RYdccELtKEZhDa89BbDyWaoLrz6
-         sBdw==
+        bh=eVk3/h+ZYVTXc92sAdNZ2O1XJ1rq2CAFCQHcjy7oFJc=;
+        b=1yJxobAYmhGzmpNJBR51ZK3YgIDsj9NIy8xWsi8+23fS9PyZEEl5ZYJ2yD4VT7gec2
+         a4A1qBXTaCUAofB17jMz7/uQIK5UivQL/kdHtNIXW8/JxqXJZemHuBtCl6pODYpVOXRY
+         DTJiLvh+vP/LafzgcRo4Oh1kNn3lorz/7xLerf85AeLhiIxuxaeh68byrm+LnNTrydGf
+         5ZZrngdR/mmywesLJnl2hNdVCx5yY1dNRxiTm1jID701qIXU6tLG8I0xRp6kid6DjJu+
+         8SDE9kiDys9omBya20wqCz6JZCgKiFjg/mhlobLKPLllDYNsoMmsDPtqkMzvgciqJ8G7
+         NjUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769284713; x=1769889513;
+        d=1e100.net; s=20230601; t=1769284715; x=1769889515;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=XGgkNSgPv+4DWg1/0xpqIlGMpixZAm1LMI7hGDSXCiE=;
-        b=lP7MkdMg5bBz8G1pOrGv5uFwpX3tt8ZHcC30rn3T5pDgoQxEjb+e3RExIhY1Mrt6cr
-         QsN/HO9wVxOMmxXfOz5TOlQp3skkfOV2I6xtKgqGqG45FEmh4T9oXByekUNEYizMPIEs
-         sj3Qyina0DfhGTi2qhxiUFOzUXpc0RoehI/dqAHHsLg+STNVnykTL1Chxacg2/bpRU9k
-         orx8GmKnS0jSzexSBRwc1pPNHlea4wqQRf8up5UmE0hXLC9F/Vt+AoIaOZg0ZVhe8EWD
-         kVEB+a6wR3hHmOfwG92O/nwlEqVGUDIDS9n95ZVQxyn0bujGZlGvx9l2VmhGFGInJTO4
-         mtag==
-X-Gm-Message-State: AOJu0YxUJxS1kSGuzND1KAIeOwoHsiNFhQBhT7LRVJ0bVoNFk0Zxv6rr
-	g/mI30gAgN8PobXtwJGdQK6QRBX+gzqnLESD/IeTCrBADx6kFNHZqJffMj3G7TD0DhD53njfW/G
-	eeMIW
-X-Gm-Gg: AZuq6aIIYq2swgejIvm913zyaXNgARMZIOrJiU8FCACnxuyrYAMA7mzUOwsfZr3YEYt
-	4PPu2RRIuJXYZRphDybyrr1kkd6JK7W/9CEIq2VqJf0lo8+2CB/7cJmVVn6uIABbvrjunRuboQ3
-	RDJ424RWZ6b9lnRWW9Iu/zi52DjvqTRPi8qdEzJwt6pkH5JwHIXJ/H1NFsO4oyjn4a0nEcpK3zr
-	CMjti5BAOQcnFuzUt9818RNvh+NzLJTITYq+29Kf3xBBdHLr6mKe1JcA7BjY10CelBMYv2zidD2
-	FahfZzqchU+Lb9DdHq0sDQrrFZIn+t6WJMfFPQPxoXTjDFQN3OZoWu3QCtW5N+P2jjXwajtvdW1
-	A4UcSekKMjayC9sUZOVYUwKWfDHretEx19S4c4xAHQoJYYvEERq3aI6abuxx5+JEhnEN3u7TYQg
-	BtYWZzilC60aG44X78Cjf71J2M8AvCtiXA7JhyGgP2CdAnkNnwjw==
-X-Received: by 2002:a05:600c:c170:b0:477:98f7:2aec with SMTP id 5b1f17b1804b1-4804c947110mr115775475e9.3.1769284713589;
-        Sat, 24 Jan 2026 11:58:33 -0800 (PST)
+        bh=eVk3/h+ZYVTXc92sAdNZ2O1XJ1rq2CAFCQHcjy7oFJc=;
+        b=LPe8X/vVz9M/YRNU/yOt6TzJULHLI+pLUkbP/I05nSKdvtvVcZntZxPY4jQ5vK87Bx
+         fRTUKBziT5lazEUpArPSREwmUt/UnbkSreNWp1HZZ6dywDZlSHhsfaQ4eq1Xa5PAjbG5
+         JyF+UuABSmPIoVQDenwMOBidNv3o+6J+Bxg2ZDBzt0M6yYO6xsG11MCebOuT6+HQglqn
+         uhLS8nhdM/jVNRWb5hxL+doLyJ1RA5a0kwx7F66cCsYLzV2DFZDWgJ9IaffXC7GvfDnu
+         gmXszqDq8ywEXOBsbfOilRV6jyLkIIoFMJmu45PuVq/hiV0SM+1qjXaxprD3KMAGSex0
+         zBMA==
+X-Gm-Message-State: AOJu0Yy+WoTLGPUTnHJMicNi4Jzfa9yQtQRAQQRJvLRi86kVkHA+h1g8
+	YvyFbS1WJVKHdwYICbqQ80pRY8H37uk0tXLR9NlVkOzEdtqWl+rsUxJqZvG9BEqxjsoEX+lWRaF
+	ZYezI
+X-Gm-Gg: AZuq6aJvPpjFlUEdJXurC01Qqus747R9ELOibIlY5jERtjjyZPo3y1f3dvMCVPQzvLa
+	+u6b2NI2tC4EO0d6I9Xp5pzC95yddJQkFUNKh1UIaK03F3DP19LaqXAd04JqwXk3HwPkPQ0mQyF
+	vagPrcXnodwA1XghgEqsPAsxMFt5ZlqQGUcVIb7aqbmmfg+hyhYLG78n+FxGklXZXuEBWc70yxl
+	cJcbJgil3QrzkIfnrviCBv6W4/VMrHxY+ts1UTeVQGyBfkeH8Pcy5XDwFBeVa8S2N2BqYrapCzm
+	ivr7tEtwlIZp0q8yVK9KS6lGzWoJhGeNXZmF4xK6I7ZZspvOsQgtASZYV+zBeU5rYzGv1gIsPoP
+	n56r94MQfXOiKZtimm8Pnaf/jSq3YyRXKACL0hXj5M9z0+zc+ok6Le44wBv6RF4G6GIf4Z7qEEQ
+	ft5joZOXu4CTmdlwBfgg5aLxH/55TIWTsIHIRbbrAJ2Qw4bx26dU3AKlhDZV+U
+X-Received: by 2002:a05:600c:1490:b0:475:dd9a:f791 with SMTP id 5b1f17b1804b1-4804db89fd2mr72501135e9.28.1769284715005;
+        Sat, 24 Jan 2026 11:58:35 -0800 (PST)
 Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.32
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jan 2026 11:58:33 -0800 (PST)
+        Sat, 24 Jan 2026 11:58:34 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2-next 3/7] fix grammar and style issues in man pages for stat related pages
-Date: Sat, 24 Jan 2026 11:49:27 -0800
-Message-ID: <20260124195824.221305-4-stephen@networkplumber.org>
+Subject: [PATCH iproute2-next 4/7] netshaper: fix grammar and style issues in man page
+Date: Sat, 24 Jan 2026 11:49:28 -0800
+Message-ID: <20260124195824.221305-5-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260124195824.221305-1-stephen@networkplumber.org>
 References: <20260124195824.221305-1-stephen@networkplumber.org>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253102-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253103-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -120,160 +120,96 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:mid,networkplumber.org:email,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 9DA5E7EC9E
+X-Rspamd-Queue-Id: 493867ECA6
 X-Rspamd-Action: no action
 
 This patch addresses grammatical errors and style inconsistencies in
-the ifstat, lnstat, and rtacct man pages documentation.
+the netshaper man page documentation.
 
-lnstat Changes:
-  - Capitalize "Linux" as proper noun in NAME and DESCRIPTION sections
-  - Add missing period to -j/--json option description
-  - Fix passive voice: "is being used" -> "is used"
-  - Fix word form: "can not" -> "cannot"
-
-rtacct Changes:
-  - Fix date format: remove comma in "27 June, 2007" -> "27 June 2007"
-  - Remove period from NAME section per man page convention
-  - Capitalize SNMP acronym (2 instances)
-  - Add missing periods to -h and -V option descriptions
-  - Improve clarity of -s/--noupdate description
-  - Add missing article in -d/--scan description
+Changes:
+  - Improve clarity of set command description by restructuring
+    awkward parenthetical about id parameter
+  - Fix punctuation consistency in scope list formatting
+  - Capitalize "ID" in example heading for proper title case
+  - Add missing article "the" in color option description (3 instances)
+  - Make example descriptions consistent by using present tense
+    third person ("Displays", "Removes") to match Example 1
 
 No functional changes. All technical content remains accurate.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- man/man8/ifstat.8 |  4 ++--
- man/man8/lnstat.8 | 10 +++++-----
- man/man8/rtacct.8 | 16 ++++++++--------
- 3 files changed, 15 insertions(+), 15 deletions(-)
+ man/man8/netshaper.8 | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/man/man8/ifstat.8 b/man/man8/ifstat.8
-index 8cd164dd..35389d57 100644
---- a/man/man8/ifstat.8
-+++ b/man/man8/ifstat.8
-@@ -28,7 +28,7 @@ Show version of program.
- Ignore the history file.
- .TP
- .B \-d, \-\-scan=SECS
--Sample statistics every SECS second.
-+Sample statistics every SECS seconds.
- .TP
- .B \-e, \-\-errors
- Show errors.
-@@ -67,7 +67,7 @@ Show extended stats of TYPE. Supported types are:
- .SH ENVIRONMENT
- .TP
- .B IFSTAT_HISTORY
--If set, it's value is interpreted as alternate history file path.
-+If set, its value is interpreted as alternate history file path.
- .SH SEE ALSO
- .BR ip (8)
- .br
-diff --git a/man/man8/lnstat.8 b/man/man8/lnstat.8
-index b98241bf..9b548f19 100644
---- a/man/man8/lnstat.8
-+++ b/man/man8/lnstat.8
-@@ -1,6 +1,6 @@
- .TH LNSTAT 8
- .SH NAME
--lnstat \- unified linux network statistics
-+lnstat \- unified Linux network statistics
- .SH SYNOPSIS
- .B lnstat
- .RI [ options ]
-@@ -13,7 +13,7 @@ command.
- rtstat program. It is commonly used to periodically print a selection of
- statistical values exported by the kernel.
- In addition to routing cache statistics, it supports any kind of statistics the
--linux kernel exports via a file in /proc/net/stat/.
-+Linux kernel exports via a file in /proc/net/stat/.
- .PP
- Each file in /proc/net/stat/ contains a header line listing the column names.
- These names are used by \fBlnstat\fP as keys for selecting which statistics to
-@@ -46,12 +46,12 @@ Statistics file to use, may be specified multiple times. By default all files in
- Set interval to 'intv' seconds.
- .TP
- .B \-j, \-\-json
--Display results in JSON format
-+Display results in JSON format.
- .TP
- .B \-k, \-\-keys k,k,k,...
- Display only keys specified. Each key \fBk\fP is of the form \fB[file:]key\fP. If \fB<file>\fP
- is given, the search for the given key is limited to that file. Otherwise the first file containing
--the searched key is being used.
-+the searched key is used.
- .TP
- .B \-s, \-\-subject [0-2]
- Specify display of subject/header. '0' means no header at all, '1' prints a header only at start of the program and '2' prints a header every 20 lines.
-@@ -145,7 +145,7 @@ Number of \fBsearched\fP entries which were successful.
- Number of conntrack entries added which were not expected before.
- .sp
- .B invalid
--Number of packets seen which can not be tracked.
-+Number of packets seen which cannot be tracked.
- .sp
- .B ignore
- Number of packets seen which are already connected to a conntrack entry.
-diff --git a/man/man8/rtacct.8 b/man/man8/rtacct.8
-index 988a6d1b..e3d9a1b7 100644
---- a/man/man8/rtacct.8
-+++ b/man/man8/rtacct.8
-@@ -1,7 +1,7 @@
--.TH RTACCT 8 "27 June, 2007"
-+.TH RTACCT 8 "27 June 2007"
+diff --git a/man/man8/netshaper.8 b/man/man8/netshaper.8
+index b9fdc0d3..f5fe36cc 100644
+--- a/man/man8/netshaper.8
++++ b/man/man8/netshaper.8
+@@ -77,9 +77,9 @@ parameter is required.
+ .B netshaper set
+ - Create or update a shaper configuration
  
- .SH NAME
--nstat, rtacct - network statistics tools.
-+nstat, rtacct - network statistics tools
+-Creates or updates a shaper with the specified parameters. All parameters except
++Creates or updates a shaper with the specified parameters. The
+ .I id
+-(for netdev scope) are required.
++parameter is optional for netdev scope but required for all other scopes.
  
- .SH SYNOPSIS
- Usage: nstat [ -h?vVzrnasd:t:jp ] [ PATTERN [ PATTERN ] ]
-@@ -12,10 +12,10 @@ Usage: rtacct [ -h?vVzrnasd:t: ] [ ListOfRealms ]
- .B nstat
- and
- .B rtacct
--are simple tools to monitor kernel snmp counters and network interface statistics.
-+are simple tools to monitor kernel SNMP counters and network interface statistics.
+ .SS
+ .B netshaper show
+@@ -109,7 +109,8 @@ Defines the shaper handle consisting of:
+ .BI scope " HANDLE_SCOPE"
+ The shaper scope, which can be:
+ .BR netdev " (device-level shaper), "
+-.BR queue " (queue-level shaper), or "
++.BR queue " (queue-level shaper), "
++or
+ .BR node " (scheduling node shaper)."
  
- .B nstat
--can filter kernel snmp counters by name with one or several specified wildcards. Wildcards are case-insensitive and can include special symbols
-+can filter kernel SNMP counters by name with one or several specified wildcards. Wildcards are case-insensitive and can include special symbols
- .B ?
- and
- .B *
-@@ -23,10 +23,10 @@ and
+ .TP
+@@ -139,11 +140,11 @@ utility and exit.
  
- .SH OPTIONS
- .B \-h, \-\-help
--Print help
-+Print help.
  .TP
- .B \-V, \-\-version
--Print version
-+Print version.
+ .BR \-c [ color "] = {" always " | " auto " | " never }
+-Configure color output. If parameter is omitted or
++Configure color output. If the parameter is omitted or
+ .BR always ,
+-color output is enabled regardless of stdout state. If parameter is
++color output is enabled regardless of stdout state. If the parameter is
+ .BR auto ,
+-stdout is checked to be a terminal before enabling color output. If parameter is
++stdout is checked to be a terminal before enabling color output. If the parameter is
+ .BR never ,
+ color output is disabled. If specified multiple times, the last one takes
+ precedence.
+@@ -155,7 +156,7 @@ Display usage information and exit.
+ .SH EXAMPLES
+ 
  .TP
- .B \-z, \-\-zeros
- Dump zero counters too. By default they are not shown.
-@@ -41,7 +41,7 @@ Do not display anything, only update history.
- Dump absolute values of counters. The default is to calculate increments since the previous use.
+-.B Example 1: Create a device-level shaper (id optional)
++.B Example 1: Create a device-level shaper (ID optional)
+ .nf
+ # netshaper set dev foo handle scope netdev bw-max 10gbit
+ .fi
+@@ -170,7 +171,7 @@ bandwidth to 10 gigabits per second.
+ # netshaper show dev foo handle scope netdev
+ .fi
+ .RS
+-Display the current shaper configuration for the specified device and handle.
++Displays the current shaper configuration for the specified device and handle.
+ .RE
+ 
  .TP
- .B \-s, \-\-noupdate
--Do not update history, so that the next time you will see counters including values accumulated to the moment of this measurement too.
-+Do not update history, so that the next time you will see counters including values accumulated up to this measurement.
- .TP
- .B \-j, \-\-json
- Display results in JSON format.
-@@ -52,7 +52,7 @@ When combined with
- pretty print the output.
- .TP
- .B \-d, \-\-scan <INTERVAL>
--Run in daemon mode collecting statistics. <INTERVAL> is interval between measurements in seconds.
-+Run in daemon mode collecting statistics. <INTERVAL> is the interval between measurements in seconds.
- .TP
- .B \-t, \-\-interval <INTERVAL>
- Time interval to average rates. Default value is 60 seconds.
+@@ -179,7 +180,7 @@ Display the current shaper configuration for the specified device and handle.
+ # netshaper delete dev eth0 handle scope netdev
+ .fi
+ .RS
+-Remove the specified shaper configuration.
++Removes the specified shaper configuration.
+ .RE
+ 
+ .SH NOTES
 -- 
 2.51.0
 
