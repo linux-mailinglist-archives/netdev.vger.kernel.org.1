@@ -1,214 +1,231 @@
-Return-Path: <netdev+bounces-253024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHOBBhtWdGnj4gAAu9opvQ
-	(envelope-from <netdev+bounces-253024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:18:19 +0100
+	id oCotF19idGmv5AAAu9opvQ
+	(envelope-from <netdev+bounces-253027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:10:39 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE6F7C8B4
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:18:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A5D7C9A5
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 07:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 126B2300360E
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 05:18:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BC5D3013B4D
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 06:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541421DF248;
-	Sat, 24 Jan 2026 05:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C792823A99E;
+	Sat, 24 Jan 2026 06:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGqRwl96"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="caspnkqA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC5D1A9FBD
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 05:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FAC21256C
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 06:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769231895; cv=none; b=IdL/XalbuRX8YRncHn+7YlveJ36Bmww/QqvJNvtbNMG3seFTS6bgKmnFPFhDXl9wxFHtrKkBahH8JMF1JEDRLjZiJdlLxmF2lQZDZkfzuqPuIrkV78aumVpSW3Myjmp3Yzk3WmwaRSsxir5c2FQi6IK5MAhcSTSR2RIlslAnw3g=
+	t=1769235031; cv=none; b=Hlk4B4TDC5yGONCv0nPf6IWRFJ4u5yefz5xKK12Xxf0EsuZ07DSedAqo+U0rXW4PKe3me+kNX/5EYip/Hww4Ji2A94eZEhu0L+4O3f9V12cjp4iApfgzrI4KHVFlo4Tz/05BOC9sinb+4Nt0RAn/xG4TquRWxh53lP90PjWj/9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769231895; c=relaxed/simple;
-	bh=rPtHryY0q9AVLq9N0aEIaze3I2zH4NeZeRcE+2JStw4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P5tIB1tdhrYMNYVukw5VBkz1hpvLqA0WdvYzfLfapSrIhsNvR39R6ClNG7JDPAimH35bUEmDJ36z5DEhC2IrCrYUmclH8y4B5nf+cbdAXIUhFcxgxnmRr/yN9xWJGcAJktYmnw6JRgwzAaWBT1wjbG54NvEj1+M0QNSzzLONork=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VGqRwl96; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8c6c922850cso303796585a.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jan 2026 21:18:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769231893; x=1769836693; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uAVsETK21+kGnCxqlDEtp4ioX9WXTvhY2/OchwRYyU8=;
-        b=VGqRwl960RKleyqmpe21M8Z+RY3wDdC2KOl03FvsZFeZXqFZ0Ip8Ns4wm03QWZEcTE
-         t+537x8UodNnxc67n18oe9WdWFuKLBIX/FvXIdzgGa7g2GFQg6w20xPrMOFtkLY+UEPh
-         8FiA/cG0ddqf5PGPOzHjb1OEn4dM3B6CtGWnBo7v3TBH+o/0ktTMmWwcbvI0sRlmJe1o
-         STXDcryi11SXVckNeffD5sZCLFOS/JJU5Lly/rj1T71Z2L33k8PS+k4vo4eSgM62nZUe
-         5nrAPi93rDwx1AqMhm8XuJYRD6EBLOc08KlxfEL+uL6QJkNNVCdeTMEs8IWOplWIwWO9
-         8hDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769231893; x=1769836693;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uAVsETK21+kGnCxqlDEtp4ioX9WXTvhY2/OchwRYyU8=;
-        b=sAJntlWsX2cSkeW+yCK65jxJaXmDM8wgSEGp0SDwC+97HQ9dPmwVF6M/rCabuNttGI
-         fYFHTYPgfJMt9bI5zvoEXqdQStVhenm2GLMpPuS2k15Yux2+LTvxEyfEoLu9X24CI+2d
-         2aBe0bSY95CnDzuRMpgcBSEejRer2934E8w1Jv0kjblMzhrf+zmaqN8h6vnkDyrHorQ7
-         waklEArjAgoEjRrfMBLM1dHdQzmthwkLD/h2Oa2CjfMeeALpe/diatDT7t2EobWcewzS
-         MA1BTtlmFmQaiTBmgRZvmKWIC1iGvONKuQGHFR5s0WnJ0/3eUB3ygNBEAzMBtaOhwADG
-         cwkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLy+Akz5AgNhr9Hcs9AIgvwM4EwmmWWrOApb8eNyNdtRkAU+K6OtcRrtl8e8xLIGR0tadohiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkBZBIN9LY/ytFvdZTkPsfyEdFVn6mNamijFS27Bl/JxgfZ27K
-	VIjNfGJcP/al/eZhR/oZ/gcnVNYauhSJVE8G5I5+8SgNTfDpMBbX1l80uMkkbw==
-X-Gm-Gg: AZuq6aKXVJwC5Rk5VM/7THN630BVgm2/lHzkzX/TiUInfaEVjGBJFPT79aTOrtXhZ8l
-	64v3LWw6LqTEXMN6Xd6fF4JRxu8tpg8qF2sQo+yr+L9Z5Fsec/CgAOBEkgE+07SVzmfD1lTBs1v
-	V/Zj1m0w0PJPfZSP1BDibsFVt/S9ez2jvqnAs2hoW3z4eIZEKy2U3WxXcNeFfu8TMtA01g4w3JQ
-	dV2H7QP0QRjQ6Re2O8Oq6u8Y0GNte9POMUCiffFxAGFagi16xbYj12Za40iPtf+5EnaGbdl1DwU
-	NXRcMmv0ZkICBYrkuokLk0TUOT59L1cCnTYfmbw6LPxLJz4g1QYcWv6WiJ3zWREYHj74SLLU6IF
-	hDuWJZmY5Ov37O+83LXIshR1/PuUsFJselkUQKmzpPbC9JPeea2w2v0U9su04b35L6ZdkoQeE4g
-	hXvSYrDywvbjfGkLU+dWxugJ+wi0om2ayzJr0=
-X-Received: by 2002:a05:7301:1015:b0:2ae:5db9:f32c with SMTP id 5a478bee46e88-2b739b6d1bdmr2095282eec.26.1769230365229;
-        Fri, 23 Jan 2026 20:52:45 -0800 (PST)
-Received: from [172.16.0.242] ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b73aa22707sm5548789eec.29.2026.01.23.20.52.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jan 2026 20:52:44 -0800 (PST)
-Message-ID: <009aefc4-fbc9-4f91-9230-23d18c281bf3@gmail.com>
-Date: Fri, 23 Jan 2026 20:57:23 -0800
+	s=arc-20240116; t=1769235031; c=relaxed/simple;
+	bh=3DshowPd5UH8QdtymmXbXqHLZNSLQexFMhz/sxvHnbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j8vZKtQVsNKFTmYGfSfae2CNEO8qPDucl1Wz933MfKUhDP7kLuXIRTio9MLIUlCkgd17kZsi/EXE8kjm3nMmzePiNcKF7/2faiZRJkX9Z2mAkH2jtugc59iAZWa/Akf2yTGHR1vbhmZl1SiO11HzP/40x9zZm9o1VmbCMPhFNn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=caspnkqA; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769235017;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qLL+DSALaiaCyHkccN04ZlpoBn+BdgA+NrFlgliZ5k4=;
+	b=caspnkqAJ50SJc8nbFa/JkdpIe/38FO1OkKTaLWqSf0RhEa6aowplV8D9JthGmVAYzxrHY
+	QgTYulyJQnW56EH7bZMQDLwHjntqgFsZO8Qaoqx44sr3Tm9sYh63aFGH71BGoPPL8H9AkK
+	+RACdOkhT0r7JqMUWdqnGMg44xO/9TY=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com,
+ x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH bpf-next v12 11/13] selftests/bpf: test bpf_get_func_* for
+ fsession
+Date: Sat, 24 Jan 2026 13:09:12 +0800
+Message-ID: <5962490.DvuYhMxLoT@7950hx>
+In-Reply-To: <20260124033119.28682-12-dongml2@chinatelecom.cn>
+References:
+ <20260124033119.28682-1-dongml2@chinatelecom.cn>
+ <20260124033119.28682-12-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
- control
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, =?UTF-8?B?5p2O5b+X?=
- <lizhi2@eswincomputing.com>, devicetree@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ningyu@eswincomputing.com, linmin@eswincomputing.com,
- pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
- <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
- <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
- <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
- <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
- <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
- <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
- <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
- <bd202cfa-d6eb-4d0e-982d-b49795dd25f7@lunn.ch>
-Content-Language: en-US
-From: Bo Gan <ganboing@gmail.com>
-In-Reply-To: <bd202cfa-d6eb-4d0e-982d-b49795dd25f7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.94 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	SUSPICIOUS_URL_IN_SUSPICIOUS_MESSAGE(1.00)[];
+	CTE_CASE(0.50)[];
+	URIBL_RED(0.50)[chinatelecom.cn:email];
+	MID_RHS_NOT_FQDN(0.50)[];
 	MAILLIST(-0.15)[generic];
+	HAS_ANON_DOMAIN(0.10)[];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253024-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253027-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,eswincomputing.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
+	NEURAL_HAM(-0.00)[-0.996];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ganboing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9EE6F7C8B4
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim]
+X-Rspamd-Queue-Id: 04A5D7C9A5
 X-Rspamd-Action: no action
 
-Hi Andrew,
+On 2026/1/24 11:31, Menglong Dong wrote:
+> Test following bpf helper for fsession:
+>   bpf_get_func_arg()
+>   bpf_get_func_arg_cnt()
+>   bpf_get_func_ret()
+>   bpf_get_func_ip()
+> 
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
+>  .../bpf/prog_tests/get_func_args_test.c       |  1 +
+>  .../bpf/prog_tests/get_func_ip_test.c         |  2 ++
+>  .../selftests/bpf/progs/get_func_args_test.c  | 31 ++++++++++++++++++-
+>  .../selftests/bpf/progs/get_func_ip_test.c    | 14 +++++++++
+>  4 files changed, 47 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c b/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
+> index fadee95d3ae8..96b27de05524 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/get_func_args_test.c
+> @@ -41,6 +41,7 @@ void test_get_func_args_test(void)
+>  	ASSERT_EQ(skel->bss->test4_result, 1, "test4_result");
+>  	ASSERT_EQ(skel->bss->test5_result, 1, "test5_result");
+>  	ASSERT_EQ(skel->bss->test6_result, 1, "test6_result");
+> +	ASSERT_EQ(skel->bss->test7_result, 1, "test7_result");
+>  
+>  cleanup:
+>  	get_func_args_test__destroy(skel);
+> diff --git a/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c b/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
+> index c40242dfa8fb..7772a0f288d3 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/get_func_ip_test.c
+> @@ -46,6 +46,8 @@ static void test_function_entry(void)
+>  	ASSERT_EQ(skel->bss->test5_result, 1, "test5_result");
+>  	ASSERT_EQ(skel->bss->test7_result, 1, "test7_result");
+>  	ASSERT_EQ(skel->bss->test8_result, 1, "test8_result");
+> +	ASSERT_EQ(skel->bss->test9_entry_result, 1, "test9_entry_result");
+> +	ASSERT_EQ(skel->bss->test9_exit_result, 1, "test9_exit_result");
+>  
+>  cleanup:
+>  	get_func_ip_test__destroy(skel);
+> diff --git a/tools/testing/selftests/bpf/progs/get_func_args_test.c b/tools/testing/selftests/bpf/progs/get_func_args_test.c
+> index 5b7233afef05..8ecc5f339552 100644
+> --- a/tools/testing/selftests/bpf/progs/get_func_args_test.c
+> +++ b/tools/testing/selftests/bpf/progs/get_func_args_test.c
+> @@ -1,5 +1,5 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -#include <linux/bpf.h>
+> +#include <vmlinux.h>
+>  #include <bpf/bpf_helpers.h>
+>  #include <bpf/bpf_tracing.h>
+>  #include <errno.h>
+> @@ -165,3 +165,32 @@ int BPF_PROG(tp_test2)
+>  
+>  	return 0;
+>  }
+> +
+> +__u64 test7_result = 0;
+> +SEC("fsession/bpf_fentry_test1")
+> +int BPF_PROG(test7)
+> +{
+> +	__u64 cnt = bpf_get_func_arg_cnt(ctx);
+> +	__u64 a = 0, z = 0, ret = 0;
+> +	__s64 err;
+> +
+> +	test7_result = cnt == 1;
+> +
+> +	/* valid arguments */
+> +	err = bpf_get_func_arg(ctx, 0, &a);
+> +	test7_result &= err == 0 && ((int) a == 1);
+> +
+> +	/* not valid argument */
+> +	err = bpf_get_func_arg(ctx, 1, &z);
+> +	test7_result &= err == -EINVAL;
+> +
+> +	if (bpf_session_is_return(ctx)) {
+> +		err = bpf_get_func_ret(ctx, &ret);
+> +		test7_result &= err == 0 && ret == 2;
+> +	} else {
+> +		err = bpf_get_func_ret(ctx, &ret);
+> +		test7_result &= err == 0 && ret == 0;
+> +	}
+> +
+> +	return 0;
+> +}
 
-On 1/23/26 11:43, Andrew Lunn wrote:
-> On Fri, Jan 23, 2026 at 02:47:18AM -0800, Bo Gan wrote:
->> Hi Krzysztof,
->>
->> On 1/23/26 02:07, Krzysztof Kozlowski wrote:
->>> On 23/01/2026 08:39, Bo Gan wrote:
->>>>> I assume the address of the interface is fixed. So you can just key
->>>>> off that to distinguish the two instances.
->>>>>
->>>>> Since this is an internal property, not a board property, it is not
->>>>> clear it actually belongs on DT.
->>>>>
->>>>>        Andrew
->>>>
->>>> IMO, they should be in DT to provide maximum flexibility. The SoC .dtsi
->>>
->>> This is not the purpose of DT. Please rather use arguments in terms of
->>> DT rules (see docs, presentations).
->>>
->> Any examples? links? Thank you for your patience.
->>
->> I'd say if the board .dts never overrides the eswin,rx-clk-invert, (E.g.,
->> the SoC .dtsi has rx-clk-invert, later the board /delete-property/'s it)
->> then yes, it can be treated as something inherent to the mac, and then
->> "use arguments in terms of DT rules". I was thinking about use cases like:
->> https://lore.kernel.org/all/20230714104521.18751-3-samin.guo@starfivetech.com/
-> 
-> Your device should be compliant with the RGMII standard by
-> default. There should not be a DT property to ask it nicely to follow
-> the standard.
-> 
-> Properties like
-> 
-> motorcomm,tx-clk-adj-enabled;
-> motorcomm,tx-clk-100-inverted;
-> motorcomm,tx-clk-1000-inverted;
-> 
-> are for broken boards which break the standard and require the MAC do
-> also break the standard so that everything works. We should not start
-> out with the assumption you need to support broken boards which ignore
-> the standard.
+CI failed, as this testcase can't run on !CONFIG_X86_64, and
+"#ifdef __TARGET_ARCH_x86" should be used here.
 
-My reading of
-https://lore.kernel.org/all/308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com/
-is that the eth1 MAC is already breaking the standard at SoC level, and
-the boards can un-break it or break it even more. Hence, even for proper
-designed board, SoC .dtsi still needs eswin,rx-clk-invert (for *eth1*).
-For broken boards, they may require eswin,rx-clk-invert for *eth0*, even
-though SoC doesn't mandate. For *eth1* broken boards might have to
-/delete-property/ it and use eswin,tx-clk-invert or something else.
-It's clearer to have all these parameters visible and explicit in DT.
+Will send a V13 later :)
 
-ESWIN, please correct me if I'm wrong.
-
-P.S. I'm not affiliated to ESWIN, but I do own eic7700/hifive-premier
-board, and I can talk to someone who owns eic7700/megrez. I can help
-validating ESWIN's patches independently.
-
+> diff --git a/tools/testing/selftests/bpf/progs/get_func_ip_test.c b/tools/testing/selftests/bpf/progs/get_func_ip_test.c
+> index 2011cacdeb18..bd7598a037cd 100644
+> --- a/tools/testing/selftests/bpf/progs/get_func_ip_test.c
+> +++ b/tools/testing/selftests/bpf/progs/get_func_ip_test.c
+> @@ -103,3 +103,17 @@ int BPF_URETPROBE(test8, int ret)
+>  	test8_result = (const void *) addr == (const void *) uprobe_trigger;
+>  	return 0;
+>  }
+> +
+> +__u64 test9_exit_result = 0;
+> +__u64 test9_entry_result = 0;
+> +SEC("fsession/bpf_fentry_test1")
+> +int BPF_PROG(test9, int a)
+> +{
+> +	__u64 addr = bpf_get_func_ip(ctx);
+> +
+> +	if (bpf_session_is_return(ctx))
+> +		test9_exit_result = (const void *) addr == &bpf_fentry_test1;
+> +	else
+> +		test9_entry_result = (const void *) addr == &bpf_fentry_test1;
+> +	return 0;
+> +}
 > 
->         Andrew
-> 
-Bo
+
+
+
+
 
