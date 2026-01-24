@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-253105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNaQKcEkdWnZBAEAu9opvQ
-	(envelope-from <netdev+bounces-253105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 21:00:01 +0100
+	id OL7kONIkdWnZBAEAu9opvQ
+	(envelope-from <netdev+bounces-253106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 21:00:18 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3DB77ECB4
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 21:00:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 603937ECBD
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 21:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 549213034E2F
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 662603039806
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9D3279908;
-	Sat, 24 Jan 2026 19:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D37824DD1F;
+	Sat, 24 Jan 2026 19:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="aibV65B1"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="1DScyITH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E07272E6D
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACFD2750ED
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769284721; cv=none; b=HBcHY3RUyYp+qXlT86/HgCYHMjZ8GfoHPUhvyZgBWqVN21cxHIhL5jnAYwcbbYJF0+xYKfLDVg8ucPYXgAI379GQPWVdJS0Y7taUKJpxnh1BLb463O5/Hxtyb9FpognaZEh31CSDwSL5UoDybkB3JblTvQSwXhhZmq+Xn9WVW/E=
+	t=1769284722; cv=none; b=F8JcdJUqBA1XslASFhBVBIqzj/ciNlV4cmFvt92Q/C+KkmaYt45gxupf6vvJWXxzR8IVRV5LQ7wU5+o4FAVuZvPnu/C7SN4z1ON334Mr9dwbw+VTssAToMKXC8PaX2U1pyA6HWLjWY1ulKxNh4LMZR4w2tunx+XW2fCw8WaH58I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769284721; c=relaxed/simple;
-	bh=L6Wd2BhERuSKnYfF//DEgQAZKxfuFznfnyuKYLzpGxg=;
+	s=arc-20240116; t=1769284722; c=relaxed/simple;
+	bh=SC4Zjr/fMbgYATZ+gMI2EOcPGQk3iamY9bXmcGWpbTA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oVcI4tb2xzpjrqY9ykDLqspGYDJHJl7uAPM1RdQofQmD8j3c65CDITnSt+vNHuylTrtoUuuwfinornK9suWNZarqzybiQ1WLeD4dw85wZhJOyiBLbda9w4AMrByU8QZo7s9Y1UH7h0r6UeHQvSWxJyMUr//cYhkv8vUi8aTy2gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=aibV65B1; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version; b=Hy9fbPlKwnGIY3WR1HKiCDyJpGQXCLPLegmTmEFvU2ei1U+j8QkYaVjz+VxKEYGuAzRX0wucQONggtaMW1W0eNEYNegls66SWAiO9ckzqcPXi44i3fEV9RrNZ0hoBisy0Lgu7NIQx2yZbUICFErBWFokbEm6aW0Is8u2U7ryG1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=1DScyITH; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-480142406b3so22333585e9.1
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:39 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47ee4539adfso35867085e9.3
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284718; x=1769889518; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284719; x=1769889519; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jGXDTtcUfov4xDNOXudgc+xFFCq1pXc8ESe99K20ts8=;
-        b=aibV65B16WSIGF/8vIcJ7BWAVUIw3GRdZDDCI4jApzudrt6d9ZUD96JeuWzaAVtRSs
-         tCjWpRqf6XC6ywbg+qSDUcy1c7lNmrCuR1A7TmQgiqWDZYvDeOhgER7qqrJPbuj+u9hr
-         GvYjtPUPnXBpBRpqu6hBQuOShEisPHMNR1hwlpQ5/jAZranekcPwVc9GhsOr0/kJafSS
-         Wgml2aevMQdFZWg3plq60tQjc5gcw3r5N9IYtKdkY6ntkl4MBWM3ck+ndwt4TlyEE++r
-         1aGp43+Ezt40dXQbaMKFqr66+xffeGXQt0LwSlF/Aoq4GvxIHzgDTQIdvC3M+/TL0cDs
-         FmCg==
+        bh=GQuFR2we3LLcn2PNsJGG4pg3o3HQ6wXCKg2Xjm4Qldw=;
+        b=1DScyITHWU9WxVsFACVYjPCv95s8Oej+cD7232CgsM9VmVxeWTOrvt6zhO2sxSLh5I
+         BlZvEXGjBvVHxXBw6CokZy6IrvlqlBY3c7Mg8JAi+z9KA+0EERG/RvMQstGUuXmAdRWP
+         Eo6HbJr/iQMK9XDjOtFkVp6JDxI68Q950vdWh/DIYRy8lwSJjypI/Wuq29xY/Q58nqy4
+         KotJvZBPMGpOkFok8zyB2gDu4BZlGnYmzI0LEIbYU9ylHpORlkUP00PsomqtvbbUnbvm
+         H5AbrlPlXijypWLf+jTuQ0V/kMR2X7npqoXX1V+WzUJlgDZG2cLD275m8+97tO/nvw4c
+         HjNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769284718; x=1769889518;
+        d=1e100.net; s=20230601; t=1769284719; x=1769889519;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jGXDTtcUfov4xDNOXudgc+xFFCq1pXc8ESe99K20ts8=;
-        b=i+QpEG0egSi473R7d5mnTJUSzghYph1tI035rGF1SH0e237JW2nXXKhUn3tWzzNw8J
-         cz52n2lFHGx/5+H4c+C6QvqH4R033aUS/uUhQ2dfYm9aXZU14qq9quw6XHZ0gB1LpsKK
-         L4N6rGt2Jn0GL7cr3kIZzcV057fo6h1Jy3AuEku5Pv0qU3L5ciqDPhJdtRQjNiWxW9+t
-         62++qOSv1+k1dKarHdRUT6LifjnjGckPYemY2osXeMnKtPTs1HOOsn8OuPVz+3Nu4RYk
-         WAJpEzCb2H6oCvNkbFz4WUN4PDh3mLWE2JtTQdJf5tAo6914f1IGuXDC5vWkQVWsrqjH
-         C+kA==
-X-Gm-Message-State: AOJu0YxJNGN+p7SzYiM2VECiXOId391h8jBKZXsG0vRyjOiZjW9iPw2m
-	Uxy8KtgJhnMwQ5FtbrEq2Ioi0OUYUbIKC1JnvW1mhhv7NSVkgRSQY22LM7qYn4Zcoxhb/FCidIi
-	BAh4m
-X-Gm-Gg: AZuq6aKXv33zW5uNRjTc3OFIy9IrrslWCAe5FtG1mCZltO2c+4SYpQ5XtOW7ptSzdIW
-	esxFpbbk/FHd1fBHaAgTlT9C3CQngp8oc/t2lSe1wbuAXLBmaReIHpTjItFSt0dh9N9nZwrkjgL
-	qCr9W0zytbpr7ACWvilBmVvJuZCnA18HJQqx427jzUwObNjGXUw6oaOsbieKX6BZxRD2CRIWso/
-	rFxrWq36VVo7gd4QFkAmgWzJYOYoAxAMEemddUoqEr5UH7wH7yzxKk2L2G0MaUK+S6AM+CLtCtO
-	hS3WNfJF5819Q6wRbo68oPFQ1KHMasHw/dFa5iZ+J89yRrC64vaVAeWMwXg28h5epyXnuA56sMa
-	aXhXN3iEb+i9D9A49uVy2Pfpx2mRI2cyEkqMCSzARjWnCH+slrAP7cVl8CAe8XeEPaNh3lYCtme
-	JeWdHMqtZD5d2SWc4n38aCA1R2+ROwaWj+kLhRMh2CU+Gb+CeiAw==
-X-Received: by 2002:a05:600c:4693:b0:480:1f6b:d495 with SMTP id 5b1f17b1804b1-4804c9bf396mr105605955e9.32.1769284717918;
-        Sat, 24 Jan 2026 11:58:37 -0800 (PST)
+        bh=GQuFR2we3LLcn2PNsJGG4pg3o3HQ6wXCKg2Xjm4Qldw=;
+        b=ph3TgobxSZv0ivgRWT4ziFZ742uz8ZLSsn+qEn+6fTVOkaXw81XAC5/3mkyA/0q2f1
+         uGttSmt/SoRfnXCg5WGVfdalOFmVMVdxzwcVSVv0eFQ+w6obpJv8FKPMWUZxPv1tqMiu
+         NBGRUSu8H6qDuXs/P3TAukitKZMMlHhWsUYJfFjV9cMN9pm0LTlDbF5QSs65CsSgTiB8
+         sIDrS2EvdWNnikXNjflhNpNTw3hLDpxHqLS7m9d7bHQk6qjFg2Nua60dlip+bbQAYwYh
+         kJspUSqbKVevB/Ho9kYPz6C8wcb7tEekc5GYvHWM2YRBsVmVbvya6BZF/72CUo+H+PKD
+         3inQ==
+X-Gm-Message-State: AOJu0Yw+mboWZSNuCaLP8MwvytPPvTv26d7LlmKGCi2L2CW8MnZ/9uNs
+	QQtwUHrdrlU0Be4MA2kZZlQtMpLrcG4oz59/ZSNmxffHxoNEz9KR93GkSfzpQrYz/EQwq4M0/xA
+	+S1wm
+X-Gm-Gg: AZuq6aJzUcVUHo7CNi4DaFfS7c76+1b43wCz1fyuu9RVbqKpE2eFGIcwVLYnziy3Gw3
+	y4ZS1oMjv6B65c8TGj6h53jZFAml8f0h4OjrkVVWPVV9vuTLrBnyaYlKXkaBA8V2SjO1zThOFyB
+	oEC6gAdC17pWeX/IPEAtkyRiFDuTtApnwef76AkBjhnfhHj7Tt4NIHuwtWVgUeSyJwYQfehkRqK
+	uIG1sf4BsQ/PQRNNnK7Zh6oKVf9DwOaH9Uej0i+ODCD7/uVPFabrATlMlvSchdiGcY5Se4XCR7E
+	UUMKXexO1QXl3tryvXNYkzbERgDdluWDeVfXmqYqSw0qGf+zZ8bB+COB9B1Be6iFxITa/lNlq+i
+	U/L2YPCbA/zIvMjXMI880QVapeYTgwAwPcI49gmqGXNxaWnWLEOVxWYZ8VQC0Bot68oCNQvNrUf
+	yba822o5cSeRTBd4XHcE03MW5TMCHUp0PG3VoKoEP7VJFLdEyMqQ==
+X-Received: by 2002:a05:600c:8b10:b0:477:7bca:8b34 with SMTP id 5b1f17b1804b1-4804c948210mr110838655e9.6.1769284719358;
+        Sat, 24 Jan 2026 11:58:39 -0800 (PST)
 Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.36
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jan 2026 11:58:37 -0800 (PST)
+        Sat, 24 Jan 2026 11:58:39 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2-next 6/7] vdpa: fix grammar, titles, and formatting in man pages
-Date: Sat, 24 Jan 2026 11:49:30 -0800
-Message-ID: <20260124195824.221305-7-stephen@networkplumber.org>
+Subject: [PATCH iproute2-next 7/7] rdma: fix grammar, formatting, and style in man pages
+Date: Sat, 24 Jan 2026 11:49:31 -0800
+Message-ID: <20260124195824.221305-8-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260124195824.221305-1-stephen@networkplumber.org>
 References: <20260124195824.221305-1-stephen@networkplumber.org>
@@ -93,165 +93,404 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253105-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-253106-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:mid,networkplumber.org:email,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: F3DB77ECB4
+X-Rspamd-Queue-Id: 603937ECBD
 X-Rspamd-Action: no action
 
-This patch addresses grammatical errors, copy-paste errors from devlink
-documentation, and formatting issues across the vdpa man page documentation.
+This patch addresses grammatical errors, overly long section headers,
+missing punctuation, and style inconsistencies across all RDMA man
+page documentation.
 
 Changes by file:
 
-vdpa.8:
-  - Remove unnecessary article: "a pretty JSON output" -> "pretty JSON output"
+rdma.8:
+  - Fix hyphenation: "non zero" -> "non-zero"
+  - Remove article: "a pretty JSON" -> "pretty JSON"
+  - Capitalize option description: "output" -> "Output"
+  - Add missing period after "monitor"
 
-vdpa-dev.8:
-  - Fix incorrect title: "DEVLINK\-DEV" -> "VDPA\-DEV"
-  - Fix file path: "virtio*h" -> "virtio*.h" (add missing period)
-  - Fix capitalization and punctuation in macro description
-  - Split overly long vstats section header into title + body
-  - Fix spacing: "-Name" -> "- Name"
-  - Fix article error: "the all vdpa devices" -> "all vdpa devices"
-  - Add missing periods to example descriptions (2 instances)
+rdma-dev.8:
+  - Split overly long section headers into concise titles + body text
+  - Fix semicolon to period and add missing articles
+  - Fix possessive: "it's parent" -> "its parent"
+  - Add missing article: "specified" -> "the specified"
+  - Fix tense: "is previously created" -> "was previously created"
+  - Add article: "iproute2 ip command" -> "the iproute2 ip command"
+  - Fix verb tense in examples: "Add" -> "Adds", "Delete" -> "Deletes"
 
-vdpa-mgmtdev.8:
-  - Fix incorrect title: "DEVLINK\-DEV" -> "VDPA\-MGMTDEV"
-  - Fix NAME section: "vdpa-dev" -> "vdpa-mgmtdev"
+rdma-link.8:
+  - Split overly long section header
+  - Add missing article: "specified" -> "the specified"
+  - Add missing periods (2 instances)
 
-The title corrections in vdpa-dev.8 and vdpa-mgmtdev.8 fix critical
-copy-paste errors that would cause man page indexing problems and
-confusion about which command is being documented.
+rdma-monitor.8:
+  - Split awkward section header and reword
+  - Add missing period
+
+rdma-resource.8:
+  - Add missing article: "specified" -> "the specified"
+  - Add missing periods (4 instances)
+
+rdma-statistic.8:
+  - Split overly long section header
+  - Fix verb form: "are bind" -> "are bound"
+  - Add missing periods (7 instances)
+  - Fix grammar: "does not exists" -> "it does not exist"
+  - Fix plural verb: "that was enabled" -> "that were enabled"
+
+rdma-system.8:
+  - Fix plural: "network namespace" -> "network namespaces"
+  - Remove duplicate .PP line
+
+The most significant improvements are splitting overly long section
+headers across multiple files, fixing missing punctuation in examples,
+and correcting various grammatical errors.
 
 No functional changes. All technical content remains accurate.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- man/man8/vdpa-dev.8     | 18 ++++++++++--------
- man/man8/vdpa-mgmtdev.8 |  4 ++--
- man/man8/vdpa.8         |  2 +-
- 3 files changed, 13 insertions(+), 11 deletions(-)
+ man/man8/rdma-dev.8       | 23 ++++++++++++++---------
+ man/man8/rdma-link.8      | 10 ++++++----
+ man/man8/rdma-monitor.8   |  7 +++++--
+ man/man8/rdma-resource.8  |  6 +++---
+ man/man8/rdma-statistic.8 | 24 +++++++++++++-----------
+ man/man8/rdma-system.8    |  3 +--
+ man/man8/rdma.8           |  8 ++++----
+ 7 files changed, 46 insertions(+), 35 deletions(-)
 
-diff --git a/man/man8/vdpa-dev.8 b/man/man8/vdpa-dev.8
-index 718f40b2..4e2522f0 100644
---- a/man/man8/vdpa-dev.8
-+++ b/man/man8/vdpa-dev.8
-@@ -1,4 +1,4 @@
--.TH DEVLINK\-DEV 8 "5 Jan 2021" "iproute2" "Linux"
-+.TH VDPA\-DEV 8 "5 Jan 2021" "iproute2" "Linux"
- .SH NAME
- vdpa-dev \- vdpa device configuration
- .SH SYNOPSIS
-@@ -84,9 +84,9 @@ Name of the management device to use for device addition.
- .BI device_features " DEVICE_FEATURES"
- Specifies the virtio device features bit-mask that is provisioned for the new vdpa device.
+diff --git a/man/man8/rdma-dev.8 b/man/man8/rdma-dev.8
+index e26f738c..abc9f405 100644
+--- a/man/man8/rdma-dev.8
++++ b/man/man8/rdma-dev.8
+@@ -65,17 +65,22 @@ rdma-dev \- RDMA device configuration
+ - specifies the RDMA device to show.
+ If this argument is omitted all devices are listed.
  
--The bits can be found under include/uapi/linux/virtio*h.
-+The bits can be found under include/uapi/linux/virtio*.h.
- 
--see macros such as VIRTIO_F_ and VIRTIO_XXX(e.g NET)_F_ for specific bit values.
-+See macros such as VIRTIO_F_ and VIRTIO_XXX (e.g., NET)_F_ for specific bit values.
- 
- This is optional.
- 
-@@ -116,7 +116,9 @@ Format is:
- .in +2
- VDPA_DEVICE_NAME
- 
--.SS vdpa dev vstats show - shows vendor specific statistics for the given device and virtqueue index. The information is presented as name-value pairs where name is the name of the field and value is a numeric value for it.
-+.SS vdpa dev vstats show - show vendor specific statistics
+-.SS rdma dev add - Add a RDMA device with a specific type and parent IB device; This new device provides subset of functionalities defined in IBTA spec.
+-.SS rdma dev delete - Delete a RDMA device which is created with the "add" command.
++.SS rdma dev add - add a RDMA device
 +
-+Shows vendor specific statistics for the given device and virtqueue index. The information is presented as name-value pairs where name is the name of the field and value is a numeric value for it.
++Add a RDMA device with a specific type and parent IB device. This new device provides a subset of functionalities defined in the IBTA spec.
++
++.SS rdma dev delete - delete a RDMA device
++
++Delete a RDMA device which was created with the "add" command.
+ .I NAME
+ - The name of the device being added/deleted.
+ 
+ .I TYPE
+-- The type of the device being added; It specifies which functionalities it provides. Supported device type:
++- The type of the device being added. It specifies which functionalities it provides. Supported device type:
+ .sp
+ .in +8
+ .B SMI
+-- A device with this type provides SMI (QP0) interface. This device and it's parent associates with the same HCA port and shares the physical link, so when the parent doesn't support SMI, then this type of device can be created to allow the subnet manager to configure the link.
++- A device with this type provides SMI (QP0) interface. This device and its parent associates with the same HCA port and shares the physical link, so when the parent doesn't support SMI, then this type of device can be created to allow the subnet manager to configure the link.
+ .in -8
+ 
+ .I PARENT_DEV
+@@ -90,7 +95,7 @@ Shows the state of all RDMA devices on the system.
+ .PP
+ rdma dev show mlx5_3
+ .RS 4
+-Shows the state of specified RDMA device.
++Shows the state of the specified RDMA device.
+ .RE
+ .PP
+ rdma dev set mlx5_3 name rdma_0
+@@ -100,8 +105,8 @@ Renames the mlx5_3 device to rdma_0.
+ .PP
+ rdma dev set mlx5_3 netns foo
+ .RS 4
+-Changes the network namespace of RDMA device to foo where foo is
+-previously created using iproute2 ip command.
++Changes the network namespace of RDMA device to foo where foo was
++previously created using the iproute2 ip command.
+ .RE
+ .PP
+ rdma dev set mlx5_3 adaptive-moderation [on/off]
+@@ -114,12 +119,12 @@ This is a global setting for the RDMA device but the value is printed for each C
+ .PP
+ rdma dev add smi1 type SMI parent ibp8s0f1
+ .RS 4
+-Add a new IB device with name "smi1", type "SMI", and "ibp8s0f1" as its parent device.
++Adds a new IB device with name "smi1", type "SMI", and "ibp8s0f1" as its parent device.
+ .RE
+ .PP
+ rdma dev delete smi1
+ .RS 4
+-Delete the IB device "smi1".
++Deletes the IB device "smi1".
+ .RE
+ .PP
+ 
+diff --git a/man/man8/rdma-link.8 b/man/man8/rdma-link.8
+index 5e4a5307..7a4be457 100644
+--- a/man/man8/rdma-link.8
++++ b/man/man8/rdma-link.8
+@@ -45,7 +45,9 @@ rdma-link \- rdma link configuration
+ - specifies the RDMA link to show.
+ If this argument is omitted all links are listed.
+ 
+-.SS rdma link add NAME type TYPE netdev NETDEV - add an rdma link for the specified type to the network device
++.SS rdma link add - add an rdma link
++
++Add an rdma link for the specified type to the network device.
+ .sp
+ .BR NAME
+ - specifies the new name of the rdma link to add
+@@ -79,17 +81,17 @@ Shows the state of all rdma links on the system.
+ .PP
+ rdma link show mlx5_2/1
+ .RS 4
+-Shows the state of specified rdma link.
++Shows the state of the specified rdma link.
+ .RE
+ .PP
+ rdma link add rxe_eth0 type rxe netdev eth0
+ .RS 4
+-Adds a RXE link named rxe_eth0 to network device eth0
++Adds a RXE link named rxe_eth0 to network device eth0.
+ .RE
+ .PP
+ rdma link del rxe_eth0
+ .RS 4
+-Removes RXE link rxe_eth0
++Removes RXE link rxe_eth0.
+ .RE
+ .PP
+ 
+diff --git a/man/man8/rdma-monitor.8 b/man/man8/rdma-monitor.8
+index d445cba0..5e82e092 100644
+--- a/man/man8/rdma-monitor.8
++++ b/man/man8/rdma-monitor.8
+@@ -23,7 +23,10 @@ rdma-monitor \- RDMA events monitoring
+ .B rdma monitor help
+ 
+ .SH "DESCRIPTION"
+-.SS rdma monitor - utility can monitor RDMA device events on all RDMA devices.
++.SS rdma monitor - monitor RDMA device events
++
++This utility can monitor RDMA device events on all RDMA devices.
++
+ .PP
+ .B rdma
+ opens an RDMA Netlink socket, listens on it and dumps the event info.
+@@ -35,7 +38,7 @@ and net device attachment/detachment.
+ .PP
+ rdma monitor
+ .RS 4
+-Listen for events of all RDMA devices
++Listen for events of all RDMA devices.
+ .RE
+ .PP
+ 
+diff --git a/man/man8/rdma-resource.8 b/man/man8/rdma-resource.8
+index 1035478d..61bec471 100644
+--- a/man/man8/rdma-resource.8
++++ b/man/man8/rdma-resource.8
+@@ -45,7 +45,7 @@ Shows summary for all devices on the system.
+ .PP
+ rdma resource show mlx5_2
+ .RS 4
+-Shows the state of specified rdma device.
++Shows the state of the specified rdma device.
+ .RE
+ .PP
+ rdma res show qp link mlx5_4
+@@ -95,12 +95,12 @@ Show CM_IDs with destination ip port of 7174.
+ .PP
+ rdma resource show cm_id src-addr 172.16.0.100
+ .RS 4
+-Show CM_IDs bound to local ip address 172.16.0.100
++Show CM_IDs bound to local ip address 172.16.0.100.
+ .RE
+ .PP
+ rdma resource show cq pid 30489
+ .RS 4
+-Show CQs belonging to pid 30489
++Show CQs belonging to pid 30489.
+ .RE
+ .PP
+ rdma resource show ctx ctxn 1
+diff --git a/man/man8/rdma-statistic.8 b/man/man8/rdma-statistic.8
+index 337e31ef..c81e3b75 100644
+--- a/man/man8/rdma-statistic.8
++++ b/man/man8/rdma-statistic.8
+@@ -98,7 +98,9 @@ rdma-statistic \- RDMA statistic counter configuration
+ .RB "{ " cntn " | " lqpn " | " pid " | " qp-type " }"
+ 
+ .SH "DESCRIPTION"
+-.SS rdma statistic [object] show - Queries the specified RDMA device for RDMA and driver-specific statistics. Show the default hw counters if object is not specified
++.SS rdma statistic [object] show - display RDMA statistics
++
++Queries the specified RDMA device for RDMA and driver-specific statistics. Shows the default hw counters if object is not specified.
+ 
+ .PP
+ .I "DEV"
+@@ -111,7 +113,7 @@ rdma-statistic \- RDMA statistic counter configuration
+ - specifies a filter to show only the results matching it.
+ 
+ .SS rdma statistic <object> set - configure counter statistic auto-mode for a specific device/port
+-In auto mode all objects belong to one category are bind automatically to a single counter set. The "off" is global for all auto modes together. Not applicable for MR's.
++In auto mode all objects belong to one category are bound automatically to a single counter set. The "off" is global for all auto modes together. Not applicable for MR's.
+ 
+ .SS rdma statistic <object> bind - manually bind an object (e.g., a qp) with a counter
+ When bound the statistics of this object are available in this counter. Not applicable for MR's.
+@@ -143,7 +145,7 @@ Shows the state of the default counter of all RDMA devices on the system.
+ .PP
+ rdma statistic show link mlx5_2/1
+ .RS 4
+-Shows the state of the default counter of specified RDMA port
++Shows the state of the default counter of specified RDMA port.
+ .RE
+ .PP
+ rdma statistic qp show
+@@ -158,22 +160,22 @@ Shows the state of all qp counters of specified RDMA port.
+ .PP
+ rdma statistic qp show link mlx5_2 pid 30489
+ .RS 4
+-Shows the state of all qp counters of specified RDMA port and belonging to pid 30489
++Shows the state of all qp counters of specified RDMA port and belonging to pid 30489.
+ .RE
+ .PP
+ rdma statistic qp show link mlx5_2 qp-type UD
+ .RS 4
+-Shows the state of all qp counters of specified RDMA port and with QP type UD
++Shows the state of all qp counters of specified RDMA port and with QP type UD.
+ .RE
+ .PP
+ rdma statistic qp mode
+ .RS 4
+-List current counter mode on all devices
++List current counter mode on all devices.
+ .RE
+ .PP
+ rdma statistic qp mode link mlx5_2/1
+ .RS 4
+-List current counter mode of device mlx5_2 port 1
++List current counter mode of device mlx5_2 port 1.
+ .RE
+ .PP
+ rdma statistic qp set link mlx5_2/1 auto type on
+@@ -203,12 +205,12 @@ Turn-off auto mode on device mlx5_2 port 1. The allocated counters can be manual
+ .PP
+ rdma statistic qp bind link mlx5_2/1 lqpn 178
+ .RS 4
+-On device mlx5_2 port 1, allocate a counter and bind the specified qp on it
++On device mlx5_2 port 1, allocate a counter and bind the specified qp on it.
+ .RE
+ .PP
+ rdma statistic qp unbind link mlx5_2/1 cntn 4 lqpn 178
+ .RS 4
+-On device mlx5_2 port 1, bind the specified qp on the specified counter
++On device mlx5_2 port 1, bind the specified qp on the specified counter.
+ .RE
+ .PP
+ rdma statistic qp unbind link mlx5_2/1 cntn 4
+@@ -223,12 +225,12 @@ List all currently allocated MR's and their counters.
+ .PP
+ rdma statistic show mr mrn 6
+ .RS 4
+-Dump a specific MR statistics with mrn 6. Dumps nothing if does not exists.
++Dump a specific MR statistics with mrn 6. Dumps nothing if it does not exist.
+ .RE
+ .PP
+ rdma statistic mode link mlx5_2/1
+ .RS 4
+-Display the optional counters that was enabled on mlx5_2/1.
++Display the optional counters that were enabled on mlx5_2/1.
+ .RE
+ .PP
+ rdma statistic mode supported link mlx5_2/1
+diff --git a/man/man8/rdma-system.8 b/man/man8/rdma-system.8
+index 5373027a..8aff9d38 100644
+--- a/man/man8/rdma-system.8
++++ b/man/man8/rdma-system.8
+@@ -51,7 +51,7 @@ one or more RDMA devices exist, changing mode from shared to
+ exclusive returns error code EBUSY.
+ 
+ When RDMA subsystem is in shared mode, RDMA device is accessible in
+-all network namespace. When RDMA device isolation among multiple
++all network namespaces. When RDMA device isolation among multiple
+ network namespaces is not needed, shared mode can be used.
+ 
+ It is preferred to not change the subsystem mode when there is active
+@@ -82,7 +82,6 @@ Sets the RDMA subsystem in network namespace shared mode. In this mode RDMA devi
+ are shared among network namespaces.
+ .RE
+ .PP
+-.PP
+ rdma system set privileged-qkey on
+ .RS 4
+ Sets the privileged-qkey parameter to on. In this state non-privileged user
+diff --git a/man/man8/rdma.8 b/man/man8/rdma.8
+index df86284d..4061b9ae 100644
+--- a/man/man8/rdma.8
++++ b/man/man8/rdma.8
+@@ -46,7 +46,7 @@ First failure will cause termination of rdma.
+ .TP
+ .BR "\-force"
+ Don't terminate rdma on errors in batch mode.
+-If there were any errors during execution of the commands, the application return code will be non zero.
++If there were any errors during execution of the commands, the application return code will be non-zero.
  
  .TP
- .BI "DEV"
-@@ -129,7 +131,7 @@ VDPA_DEVICE_NAME
- .SS vdpa dev set - set the configuration to the vdpa device.
- 
- .BI name " NAME"
---Name of the vdpa device to configure.
-+- Name of the vdpa device to configure.
- 
- .BI mac " MACADDR"
- - specifies the mac address for the vdpa device.
-@@ -139,7 +141,7 @@ This is applicable only for the network type of vdpa device.
- .PP
- vdpa dev show
- .RS 4
--Shows the all vdpa devices on the system.
-+Shows all vdpa devices on the system.
- .RE
- .PP
- vdpa dev show foo
-@@ -154,7 +156,7 @@ Add the vdpa device named foo on the management device vdpa_sim_net.
- .PP
- vdpa dev add name foo mgmtdev vdpa_sim_net device_features 0x300020000
- .RS 4
--Add the vdpa device named foo on the management device vdpa_sim_net with device_features of 0x300020000
-+Add the vdpa device named foo on the management device vdpa_sim_net with device_features of 0x300020000.
- .RE
- .PP
- vdpa dev add name foo mgmtdev vdpa_sim_net mac 00:11:22:33:44:55
-@@ -169,7 +171,7 @@ Add the vdpa device named foo on the management device vdpa_sim_net with mac add
- .PP
- vdpa dev add name foo mgmtdev auxiliary/mlx5_core.sf.1 mac 00:11:22:33:44:55 max_vqp 8
- .RS 4
--Add the vdpa device named foo on the management device auxiliary/mlx5_core.sf.1 with mac address of 00:11:22:33:44:55 and max 8 virtqueue pairs
-+Add the vdpa device named foo on the management device auxiliary/mlx5_core.sf.1 with mac address of 00:11:22:33:44:55 and max 8 virtqueue pairs.
- .RE
- .PP
- vdpa dev del foo
-diff --git a/man/man8/vdpa-mgmtdev.8 b/man/man8/vdpa-mgmtdev.8
-index cae2cbd0..9a7529fc 100644
---- a/man/man8/vdpa-mgmtdev.8
-+++ b/man/man8/vdpa-mgmtdev.8
-@@ -1,6 +1,6 @@
--.TH DEVLINK\-DEV 8 "5 Jan 2021" "iproute2" "Linux"
-+.TH VDPA\-MGMTDEV 8 "5 Jan 2021" "iproute2" "Linux"
- .SH NAME
--vdpa-dev \- vdpa management device view
-+vdpa-mgmtdev \- vdpa management device view
- .SH SYNOPSIS
- .sp
- .ad l
-diff --git a/man/man8/vdpa.8 b/man/man8/vdpa.8
-index d1aaecec..81725312 100644
---- a/man/man8/vdpa.8
-+++ b/man/man8/vdpa.8
-@@ -25,7 +25,7 @@ Generate JSON output.
+ .BR "\-d" , " --details"
+@@ -58,7 +58,7 @@ Output includes driver-specific details in raw format.
  
  .TP
  .BR "\-p" , " --pretty"
 -When combined with -j generate a pretty JSON output.
 +When combined with -j generate pretty JSON output.
  
- .SS
- .I OBJECT
+ .TP
+ .BR "\-j" , " --json"
+@@ -66,7 +66,7 @@ Generate JSON output.
+ 
+ .TP
+ .BR "\-o" , " \-oneline"
+-output each record on a single line, replacing line feeds
++Output each record on a single line, replacing line feeds
+ with the
+ .B '\e'
+ character.
+@@ -96,7 +96,7 @@ character.
+ 
+ .TP
+ .B monitor
+-- RDMA events monitor
++- RDMA events monitor.
+ 
+ .PP
+ The names of all objects may be written in full or
 -- 
 2.51.0
 
