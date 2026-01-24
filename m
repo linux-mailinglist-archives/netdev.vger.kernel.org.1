@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-253103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QCTKNackdWnZBAEAu9opvQ
-	(envelope-from <netdev+bounces-253103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:35 +0100
+	id QDG1C7YkdWnZBAEAu9opvQ
+	(envelope-from <netdev+bounces-253104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493867ECA6
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D2E7ECAD
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 20:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BBA33029274
-	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F516302F72B
+	for <lists+netdev@lfdr.de>; Sat, 24 Jan 2026 19:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EC0241114;
-	Sat, 24 Jan 2026 19:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C670244186;
+	Sat, 24 Jan 2026 19:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="1yJxobAY"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="iRLODas1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC8D259C92
-	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31363238C3A
+	for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 19:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769284718; cv=none; b=Z+aycjTEHZGoVmmPDKsiOb0JbgCSpzNZZ+70Bbj7aKRlyp2caC0CUjzCAb5srIJAXmJP476fFLuRq7CNi1R06/QCo7fqM94Mj+o6NVjuZLv2ijvkBZyXrXgx5kmkZKJkfnpN26cI4k2IW8vyAnIvhFG3KmDl3E49Xai++yw0T0c=
+	t=1769284719; cv=none; b=leYSPwka+aW/iM/0fGBTvgnxPQekoHY68nqQTb49sJR3ZIm0OQU7cxP8UifTMP+PU+n62Cbb8yqZaSXtj/oKhJ/WI9EBqI8Xzv6A4ZdK9euMq01KH9Tib42rAmlGURCPp+8z0sGonv2RTN560zOdq2NafSIO3ex9IHVpnRmPQ/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769284718; c=relaxed/simple;
-	bh=UEUyixXsksaes461qeojX8CH8Hm/xLERO1wV8L3TOzc=;
+	s=arc-20240116; t=1769284719; c=relaxed/simple;
+	bh=5NRB4XCWelTmpWdc9RXR7au56YzDFxTG8/CTwKf2QUY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LaaxtwCgHlndms7Z9T6/VuFwp7CB+/lC9m5naIVcQ9rbebOvw0fz5uGKJ89wEC+L93lNf0UffvNK59OkT5QE6i6upVdEaT2nNb0LqrkP06O358a3Pq8+iWfry9cklNTM2qpgoTFJFFNUiBzGREMnT9CnUDGbcFo2BPxvOw5ISZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=1yJxobAY; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=tk3OXDr9EUh1k9DRpJTWCLBdMhluZcLprj1Kx1zXfuZiVYyzLB2BQ5hldRWY0k6nYzRVksGqY3A0qMMxQfUTXe9nyFLuHtCtmyCcj2fNbUcsubf7NgIJrVx9FlNFgVnknidxvy5TROMv85OIED1leW9Lp67gNFapOow0sPc8tj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=iRLODas1; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4801d98cf39so24208645e9.1
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:36 -0800 (PST)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47ff94b46afso27509985e9.1
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 11:58:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284715; x=1769889515; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1769284716; x=1769889516; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eVk3/h+ZYVTXc92sAdNZ2O1XJ1rq2CAFCQHcjy7oFJc=;
-        b=1yJxobAYmhGzmpNJBR51ZK3YgIDsj9NIy8xWsi8+23fS9PyZEEl5ZYJ2yD4VT7gec2
-         a4A1qBXTaCUAofB17jMz7/uQIK5UivQL/kdHtNIXW8/JxqXJZemHuBtCl6pODYpVOXRY
-         DTJiLvh+vP/LafzgcRo4Oh1kNn3lorz/7xLerf85AeLhiIxuxaeh68byrm+LnNTrydGf
-         5ZZrngdR/mmywesLJnl2hNdVCx5yY1dNRxiTm1jID701qIXU6tLG8I0xRp6kid6DjJu+
-         8SDE9kiDys9omBya20wqCz6JZCgKiFjg/mhlobLKPLllDYNsoMmsDPtqkMzvgciqJ8G7
-         NjUg==
+        bh=SkxLfvFuPA+eZczt+TKGIyxqXPDImJrJbK7sfWrPoAQ=;
+        b=iRLODas1JhnqzIYSE6F/9fIjl8/sOXmjxeVIIqtpnaKkmnyVqVj1tLfafaGig4G6li
+         Ae/iAk8QwuWrE1ZfWxhhFimfUrdU2v8nhYSO1ceF54AUvhwzc5Mc6hlq1npHpBiHiJSc
+         2atPyvG2s4HhfMEgglRdfhpcd3wE55KdMGoIhGsplhkiVqWZm9zOsPqfGjmhAU2LVcE6
+         8uq0UpkVEel1Fg8u5crZgUHy59YrVBLRPgQrL+ej750qM5FJ4vc+egU/hUIOHFvwZusn
+         7CL6n/8RQx5kLEOLMYjtjhNNzPQszxygQTQizWvsO91pyOzegCHKfpE7nqDuYz/9TRAp
+         gp1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769284715; x=1769889515;
+        d=1e100.net; s=20230601; t=1769284716; x=1769889516;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=eVk3/h+ZYVTXc92sAdNZ2O1XJ1rq2CAFCQHcjy7oFJc=;
-        b=LPe8X/vVz9M/YRNU/yOt6TzJULHLI+pLUkbP/I05nSKdvtvVcZntZxPY4jQ5vK87Bx
-         fRTUKBziT5lazEUpArPSREwmUt/UnbkSreNWp1HZZ6dywDZlSHhsfaQ4eq1Xa5PAjbG5
-         JyF+UuABSmPIoVQDenwMOBidNv3o+6J+Bxg2ZDBzt0M6yYO6xsG11MCebOuT6+HQglqn
-         uhLS8nhdM/jVNRWb5hxL+doLyJ1RA5a0kwx7F66cCsYLzV2DFZDWgJ9IaffXC7GvfDnu
-         gmXszqDq8ywEXOBsbfOilRV6jyLkIIoFMJmu45PuVq/hiV0SM+1qjXaxprD3KMAGSex0
-         zBMA==
-X-Gm-Message-State: AOJu0Yy+WoTLGPUTnHJMicNi4Jzfa9yQtQRAQQRJvLRi86kVkHA+h1g8
-	YvyFbS1WJVKHdwYICbqQ80pRY8H37uk0tXLR9NlVkOzEdtqWl+rsUxJqZvG9BEqxjsoEX+lWRaF
-	ZYezI
-X-Gm-Gg: AZuq6aJvPpjFlUEdJXurC01Qqus747R9ELOibIlY5jERtjjyZPo3y1f3dvMCVPQzvLa
-	+u6b2NI2tC4EO0d6I9Xp5pzC95yddJQkFUNKh1UIaK03F3DP19LaqXAd04JqwXk3HwPkPQ0mQyF
-	vagPrcXnodwA1XghgEqsPAsxMFt5ZlqQGUcVIb7aqbmmfg+hyhYLG78n+FxGklXZXuEBWc70yxl
-	cJcbJgil3QrzkIfnrviCBv6W4/VMrHxY+ts1UTeVQGyBfkeH8Pcy5XDwFBeVa8S2N2BqYrapCzm
-	ivr7tEtwlIZp0q8yVK9KS6lGzWoJhGeNXZmF4xK6I7ZZspvOsQgtASZYV+zBeU5rYzGv1gIsPoP
-	n56r94MQfXOiKZtimm8Pnaf/jSq3YyRXKACL0hXj5M9z0+zc+ok6Le44wBv6RF4G6GIf4Z7qEEQ
-	ft5joZOXu4CTmdlwBfgg5aLxH/55TIWTsIHIRbbrAJ2Qw4bx26dU3AKlhDZV+U
-X-Received: by 2002:a05:600c:1490:b0:475:dd9a:f791 with SMTP id 5b1f17b1804b1-4804db89fd2mr72501135e9.28.1769284715005;
-        Sat, 24 Jan 2026 11:58:35 -0800 (PST)
+        bh=SkxLfvFuPA+eZczt+TKGIyxqXPDImJrJbK7sfWrPoAQ=;
+        b=xSr3xyBLJ1WnCSqQUb2qOsQH+WnjnVmdbrKweS2f/eUX3PJjROrGgB7S1kx5F+RmlX
+         1edFsOBa1lxtX9ZsSOsJOHUsnRDTNglYJ80gkU9H3kMaTABPeKQWZ0VS7R9WmLW/0TID
+         mS9ZCAPP7vOrVX/hJjQNjz4zKuPPNA8QdnuZqhhQg1vaXoc/6mQ83ddhLlAvT36GWYh0
+         TefqP3HG3EAPRZaKc6juCwyt+Ae1kGIFG9LaKPY1a7NCMRYkC7SaGL5f/ywDkcwOtc5H
+         On/xN93OPapC8XZA9mjKR1RItMGjIb7/MWEiSCf7cpWAPlHX6sTR0Oihuv6HQ/HpRfWP
+         l2dw==
+X-Gm-Message-State: AOJu0YzPONAABiAf72cWjkfEKBPaPzpL0m8rkRjGyw0u5KRxCbxcvw1x
+	P6819vH0BkJoleG8PstrjLSNnhbtDROYvaBlYgmQmShXw4Ktvwr8c78a/Z9YLadjxz2C2ap7fKG
+	80EI4
+X-Gm-Gg: AZuq6aLfl6WK0kQ9BX1FHdoGjLNOb5l1QAtVFMb6cRparvIFIsj/bYyUmIjvPrfTRn3
+	PmYivVMKks9q8nGoctsiRocr71qTetqpLdU6KgOSLuCHl2cTD19l7gC5Niz6qfc6EBkBtLCHM40
+	5b6ynFCbJmEZ0TOjo90HXCMWk+J1nRKNnKI1nY0D/0GMqIs15lXt9jT3ZVIWxVFEni4AQIbLFuw
+	5iSvlaH9gLLYCxBmqtYj/aQ3rtchIcW80SiigBRNehkjSZb+BL3PHhqGkxmdXA880R59A8CCQTL
+	byfdHajfKKZsw738W/AeangngmiCv3lBXy6eLNHJd+nEPSCFyKPXI624MPK9enCgKYUQDrstgmg
+	NtHFMQ+PyHvg49OmAUYHY0abd/fqHctBrbSEfxiK0d4pW76mFou3UCst3B2t+TQIWoxX8ko0QlP
+	harMjhTWoJ40FgaZTr0Hem7lgo/egY2fyAHWs9Sr/RqhQMSp+bQA==
+X-Received: by 2002:a05:600c:8708:b0:47b:deb9:163d with SMTP id 5b1f17b1804b1-4804d2be33emr111999695e9.7.1769284716499;
+        Sat, 24 Jan 2026 11:58:36 -0800 (PST)
 Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d85cff5sm144573525e9.7.2026.01.24.11.58.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jan 2026 11:58:34 -0800 (PST)
+        Sat, 24 Jan 2026 11:58:36 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2-next 4/7] netshaper: fix grammar and style issues in man page
-Date: Sat, 24 Jan 2026 11:49:28 -0800
-Message-ID: <20260124195824.221305-5-stephen@networkplumber.org>
+Subject: [PATCH iproute2-next 5/7] tipc: fix grammar and style issues in man pages
+Date: Sat, 24 Jan 2026 11:49:29 -0800
+Message-ID: <20260124195824.221305-6-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260124195824.221305-1-stephen@networkplumber.org>
 References: <20260124195824.221305-1-stephen@networkplumber.org>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253103-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253104-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -120,96 +120,206 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:mid,networkplumber.org:email,networkplumber-org.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 493867ECA6
+X-Rspamd-Queue-Id: 78D2E7ECAD
 X-Rspamd-Action: no action
 
-This patch addresses grammatical errors and style inconsistencies in
-the netshaper man page documentation.
+This patch addresses grammatical errors, typos, and formatting issues
+across the TIPC man page documentation.
 
-Changes:
-  - Improve clarity of set command description by restructuring
-    awkward parenthetical about id parameter
-  - Fix punctuation consistency in scope list formatting
-  - Capitalize "ID" in example heading for proper title case
-  - Add missing article "the" in color option description (3 instances)
-  - Make example descriptions consistent by using present tense
-    third person ("Displays", "Removes") to match Example 1
+Changes by file:
+
+tipc.8:
+  - Fix subject-verb agreement: "consists" -> "consist"
+
+tipc-bearer.8:
+  - Fix verb agreement: "udp identify" -> "udp identifies"
+  - Fix article and hyphenation: "an multi bearer" -> "a multi-bearer"
+  - Fix IP notation: "IP v4/v6" -> "IPv4/IPv6"
+
+tipc-link.8:
+  - Fix plural verb: "messages has been" -> "messages have been"
+  - Fix preposition: "If set of 0" -> "If set to 0"
+  - Fix plural noun: "Possible status are" -> "Possible statuses are"
+    (3 instances)
+
+tipc-nametable.8:
+  - Fix misplaced help text: move from after -p option to -h option
+    where it belongs
+
+tipc-node.8:
+  - Fix preposition: "On the form" -> "In the form"
+  - Fix typo: "Can by used" -> "Can be used"
+
+tipc-socket.8:
+  - Add missing comma in SEE ALSO section after tipc-bearer(8)
 
 No functional changes. All technical content remains accurate.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- man/man8/netshaper.8 | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ man/man8/tipc-bearer.8    |  6 +++---
+ man/man8/tipc-link.8      | 10 +++++-----
+ man/man8/tipc-nametable.8 | 11 +++++------
+ man/man8/tipc-node.8      |  4 ++--
+ man/man8/tipc-socket.8    |  2 +-
+ man/man8/tipc.8           |  2 +-
+ 6 files changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/man/man8/netshaper.8 b/man/man8/netshaper.8
-index b9fdc0d3..f5fe36cc 100644
---- a/man/man8/netshaper.8
-+++ b/man/man8/netshaper.8
-@@ -77,9 +77,9 @@ parameter is required.
- .B netshaper set
- - Create or update a shaper configuration
+diff --git a/man/man8/tipc-bearer.8 b/man/man8/tipc-bearer.8
+index d95b1e1c..4011d6d1 100644
+--- a/man/man8/tipc-bearer.8
++++ b/man/man8/tipc-bearer.8
+@@ -112,7 +112,7 @@ identify a bearer with a
+ .I DEVICE
+ while
+ .B udp
+-identify a bearer with a
++identifies a bearer with a
+ .IR "LOCALIP " "and a " NAME
  
--Creates or updates a shaper with the specified parameters. All parameters except
-+Creates or updates a shaper with the specified parameters. The
- .I id
--(for netdev scope) are required.
-+parameter is optional for netdev scope but required for all other scopes.
+ .B ib
+@@ -155,7 +155,7 @@ link establish requests.
+ Default link priority inherited by all links subsequently established over a
+ bearer. A single bearer can only host one link to a particular node. This means
+ the default link priority for a bearer typically affects which bearer to use
+-when communicating with a particular node in an multi bearer setup. For more
++when communicating with a particular node in a multi-bearer setup. For more
+ info about link priority see
+ .BR tipc-link (8)
  
- .SS
- .B netshaper show
-@@ -109,7 +109,8 @@ Defines the shaper handle consisting of:
- .BI scope " HANDLE_SCOPE"
- The shaper scope, which can be:
- .BR netdev " (device-level shaper), "
--.BR queue " (queue-level shaper), or "
-+.BR queue " (queue-level shaper), "
-+or
- .BR node " (scheduling node shaper)."
+@@ -178,7 +178,7 @@ bearer. For more info about the link window size see
+ .TP
+ .BI "localip " LOCALIP
+ .br
+-Specify a local IP v4/v6 address for a
++Specify a local IPv4/IPv6 address for a
+ .B udp
+ bearer.
+ 
+diff --git a/man/man8/tipc-link.8 b/man/man8/tipc-link.8
+index 47dae25d..ac6c7a2b 100644
+--- a/man/man8/tipc-link.8
++++ b/man/man8/tipc-link.8
+@@ -158,7 +158,7 @@ Subsequently the
+ .B fragments
+ are the total amount of packets that the
+ .B fragmented
+-messages has been broken into.
++messages have been broken into.
  
  .TP
-@@ -139,11 +140,11 @@ utility and exit.
+ .B Bundles
+@@ -262,7 +262,7 @@ activated.
+ .br
+ The threshold specifies the cluster size exceeding which the link monitoring
+ algorithm will switch from "full-mesh" to "overlapping-ring".
+-If set of 0 the overlapping-ring monitoring is always on and if set to a
++If set to 0 the overlapping-ring monitoring is always on and if set to a
+ value larger than anticipated cluster size the overlapping-ring is disabled.
+ The default value is 32.
+ 
+@@ -290,7 +290,7 @@ Possible values are full-mesh or overlapping-ring.
+ .B status
+ .br
+ The node status derived by the local node.
+-Possible status are up or down.
++Possible statuses are up or down.
  
  .TP
- .BR \-c [ color "] = {" always " | " auto " | " never }
--Configure color output. If parameter is omitted or
-+Configure color output. If the parameter is omitted or
- .BR always ,
--color output is enabled regardless of stdout state. If parameter is
-+color output is enabled regardless of stdout state. If the parameter is
- .BR auto ,
--stdout is checked to be a terminal before enabling color output. If parameter is
-+stdout is checked to be a terminal before enabling color output. If the parameter is
- .BR never ,
- color output is disabled. If specified multiple times, the last one takes
- precedence.
-@@ -155,7 +156,7 @@ Display usage information and exit.
- .SH EXAMPLES
+ .B monitored
+@@ -313,7 +313,7 @@ of a domain record to know if it should ignore or process the record.
+ The node status reported by the peer node for the succeeding peers in
+ the node list. The Node list is a circular list of ascending addresses
+ starting with the local node.
+-Possible status are: U or D. The status U implies up and D down.
++Possible statuses are: U or D. The status U implies up and D down.
  
  .TP
--.B Example 1: Create a device-level shaper (id optional)
-+.B Example 1: Create a device-level shaper (ID optional)
- .nf
- # netshaper set dev foo handle scope netdev bw-max 10gbit
- .fi
-@@ -170,7 +171,7 @@ bandwidth to 10 gigabits per second.
- # netshaper show dev foo handle scope netdev
- .fi
- .RS
--Display the current shaper configuration for the specified device and handle.
-+Displays the current shaper configuration for the specified device and handle.
- .RE
+ .B [non_applied_node:status]
+@@ -322,7 +322,7 @@ Represents the nodes and their status as reported by the peer node.
+ These nodes were not applied to the monitoring list for this peer node.
+ They are usually transient and occur during the cluster startup phase
+ or network reconfiguration.
+-Possible status are: U or D. The status U implies up and D down.
++Possible statuses are: U or D. The status U implies up and D down.
+ 
+ .SS Broadcast properties
+ .TP
+diff --git a/man/man8/tipc-nametable.8 b/man/man8/tipc-nametable.8
+index f7c51f19..a8d357ab 100644
+--- a/man/man8/tipc-nametable.8
++++ b/man/man8/tipc-nametable.8
+@@ -18,6 +18,11 @@ tipc-nametable \- show TIPC nametable
+ Options (flags) that can be passed anywhere in the command chain.
+ .TP
+ .BR "\-h" , " --help"
++Show help about last valid command. For example
++.B tipc nametable --help
++will show nametable help and
++.B tipc --help
++will show general help. The position of the option in the string is irrelevant.
  
  .TP
-@@ -179,7 +180,7 @@ Display the current shaper configuration for the specified device and handle.
- # netshaper delete dev eth0 handle scope netdev
- .fi
- .RS
--Remove the specified shaper configuration.
-+Removes the specified shaper configuration.
- .RE
+ .BR "\-j", " \-json"
+@@ -28,12 +33,6 @@ Output results in JavaScript Object Notation (JSON).
+ The default JSON format is compact and more efficient to parse but hard for most users to read.
+ This flag adds indentation for readability.
  
- .SH NOTES
+-Show help about last valid command. For example
+-.B tipc nametable --help
+-will show nametable help and
+-.B tipc --help
+-will show general help. The position of the option in the string is irrelevant.
+-
+ .SH DESCRIPTION
+ The nametable shows TIPC publication information.
+ 
+diff --git a/man/man8/tipc-node.8 b/man/man8/tipc-node.8
+index a72a4099..4a199c47 100644
+--- a/man/man8/tipc-node.8
++++ b/man/man8/tipc-node.8
+@@ -41,13 +41,13 @@ will show general help. The position of the option in the string is irrelevant.
+ .TP
+ .BI address
+ .br
+-The TIPC logical address. On the form x.y.z where x, y and z are unsigned
++The TIPC logical address. In the form x.y.z where x, y and z are unsigned
+ integers.
+ 
+ .TP
+ .BI netid
+ .br
+-Network identity. Can by used to create individual TIPC clusters on the same
++Network identity. Can be used to create individual TIPC clusters on the same
+ media.
+ 
+ .SH EXIT STATUS
+diff --git a/man/man8/tipc-socket.8 b/man/man8/tipc-socket.8
+index 23ec1e51..5b04d866 100644
+--- a/man/man8/tipc-socket.8
++++ b/man/man8/tipc-socket.8
+@@ -43,7 +43,7 @@ Exit status is 0 if command was successful or a positive integer upon failure.
+ 
+ .SH SEE ALSO
+ .BR tipc (8),
+-.BR tipc-bearer (8)
++.BR tipc-bearer (8),
+ .BR tipc-link (8),
+ .BR tipc-media (8),
+ .BR tipc-nametable (8),
+diff --git a/man/man8/tipc.8 b/man/man8/tipc.8
+index 6706cca1..95904989 100644
+--- a/man/man8/tipc.8
++++ b/man/man8/tipc.8
+@@ -78,7 +78,7 @@ This flag adds indentation for readability.
+ .SH ARGUMENTS
+ 
+ Command arguments are described in a command specific man page and typically
+-consists of nested commands along with key value pairs.
++consist of nested commands along with key value pairs.
+ If no arguments are given a command typically shows its help text. The explicit
+ help option
+ .B -h
 -- 
 2.51.0
 
