@@ -1,154 +1,224 @@
-Return-Path: <netdev+bounces-253175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eElAEgEjdmlFMQEAu9opvQ
-	(envelope-from <netdev+bounces-253175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 15:04:49 +0100
+	id iNDYMTcqdmnjMgEAu9opvQ
+	(envelope-from <netdev+bounces-253176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 15:35:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFC480EC7
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 15:04:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97DA88102C
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 15:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9DE5E3001385
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:04:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D0A7300461C
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1232B20FAAB;
-	Sun, 25 Jan 2026 14:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB781F3BAC;
+	Sun, 25 Jan 2026 14:35:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DA24594A
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 14:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5661EEAB
+	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 14:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769349883; cv=none; b=u3OU3+vUIMBumoTq6HbjETbNRduXGFWQLdy6T6Cu1nmFscVZgib4m2ql7tOo6d0V3jSsqI/jm1dvRKzkhCvRaTCLn/fpl6PTLU3ksIc8JzzEVIjhkr2H65C3UJU6/i1jRMubWW5a8LIofChMTlBxEyLVQLbPBZ3I9YuD7Qst/iI=
+	t=1769351732; cv=none; b=NAXGHrHRDQsYlcgjqrD/x9hNKWw0tqpsPsw8VlvRjNxq7i7vdHHvK0A5VX0o6Fma6u0PIXf35BfS9zzCVlHFpQHorSfUk6nhOMwI97HwI4hEJzQ8npBTLF3s6MCqg4nr5Oj8LwciKtQDszICR8qSktMxoDHLc2SFYVQJhDa26NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769349883; c=relaxed/simple;
-	bh=NvAypIdXZLBVarKKKQsfN4Lcg+y9cvUvQLIQYlF3VVQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BD0h8X7c8QjXtnGJFD6jKPu6vFZgCjBAqAEZ9fGiL2dg5I4RqpM6l15fHlTJrrreROzBUorfoWhRKK7ttpfl4W/8Q+Zi2yBcg0jnBcT+SM6o9TB04tei92oVe4j2r5v46PIR3cXREjdRASwDiyb2kPiTEkGfjrjelcEFtey75QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [36.112.3.223])
-	by APP-03 (Coremail) with SMTP id rQCowADH5t3oInZpYdesBg--.41622S2;
-	Sun, 25 Jan 2026 22:04:24 +0800 (CST)
-From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-Subject: [PATCH] i40e: add an error handling path in i40e_xsk_pool_enable()
-Date: Sun, 25 Jan 2026 22:04:23 +0800
-Message-Id: <20260125140423.2077845-1-lihaoxiang@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1769351732; c=relaxed/simple;
+	bh=eofHMbx37Qy+jH9e1IIxuSMExyjULMFWzPDvesK+EOY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MYV93LP4kwuhXGYImadPcCjVuMqBP/7fNKPTHKNjaSc1fePwj+3FAmFPgVL7lwGr20q3c2Mn7xzCxW8l6Wmv9Pqj0kwx/OesuPl37jhk6m9ll8JEPvMvAa/krutEx5G8FvgzQ6vSPYGb9AlCDSUb5js2FYip8lTjaP0UEbcMZzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60PEZSf1059785;
+	Sun, 25 Jan 2026 23:35:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60PEZSuL059782
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 25 Jan 2026 23:35:28 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ece4365f-906c-44e2-80c9-ab73f91f7fb5@I-love.SAKURA.ne.jp>
+Date: Sun, 25 Jan 2026 23:35:28 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADH5t3oInZpYdesBg--.41622S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Wr1fKF1ftrWUGryUWF1DGFg_yoW8Jr43pr
-	4Y9398Cr18XrW5Ww4kXF4jgF13Ja1ftry8KFW3G3Z5uwn0qa17JF4xtFWYgry8ZrWxJanx
-	JF4DAanxCF15J3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCQ8SE2l1qZiRMAACsJ
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] team: avoid NETDEV_CHANGEMTU event when unregistering slave
+To: Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <7fe2645c-680d-4fbe-981b-67a041f0d9c9@I-love.SAKURA.ne.jp>
+ <20260125085835.GA54633@shredder>
+ <29ffd5ac-07b1-4424-ad3f-8304a28d2946@I-love.SAKURA.ne.jp>
+ <20260125121551.GA83275@shredder>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260125121551.GA83275@shredder>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav404.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253175-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-253176-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,isrc.iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 3EFC480EC7
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url,I-love.SAKURA.ne.jp:mid,i-love.sakura.ne.jp:email]
+X-Rspamd-Queue-Id: 97DA88102C
 X-Rspamd-Action: no action
 
-In i40e_xsk_pool_enable(), the memory allocated by
-xsk_pool_dma_map() should be released if some error
-occurs. Add an error handling path to do so.
+syzbot is reporting
 
-Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 3
+  ref_tracker: netdev@ffff88807dcf8618 has 1/2 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_hold include/linux/netdevice.h:4429 [inline]
+       inetdev_init+0x201/0x4e0 net/ipv4/devinet.c:286
+       inetdev_event+0x251/0x1610 net/ipv4/devinet.c:1600
+       notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+       call_netdevice_notifiers_mtu net/core/dev.c:2318 [inline]
+       netif_set_mtu_ext+0x5aa/0x800 net/core/dev.c:9886
+       netif_set_mtu+0xd7/0x1b0 net/core/dev.c:9907
+       dev_set_mtu+0x126/0x260 net/core/dev_api.c:248
+       team_port_del+0xb07/0xcb0 drivers/net/team/team_core.c:1333
+       team_del_slave drivers/net/team/team_core.c:1936 [inline]
+       team_device_event+0x207/0x5b0 drivers/net/team/team_core.c:2929
+       notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+       call_netdevice_notifiers_extack net/core/dev.c:2281 [inline]
+       call_netdevice_notifiers net/core/dev.c:2295 [inline]
+       __dev_change_net_namespace+0xcb7/0x2050 net/core/dev.c:12592
+       do_setlink+0x2ce/0x4590 net/core/rtnetlink.c:3060
+       rtnl_changelink net/core/rtnetlink.c:3776 [inline]
+       __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
+       rtnl_newlink+0x15a9/0x1be0 net/core/rtnetlink.c:4072
+       rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
+       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
+
+problem. Ido Schimmel found steps to reproduce
+
+  ip link add name team1 type team
+  ip link add name dummy1 mtu 1499 master team1 type dummy
+  ip netns add ns1
+  ip link set dev dummy1 netns ns1
+  ip -n ns1 link del dev dummy1
+
+and also found that the same issue was fixed in the bond driver in
+commit f51048c3e07b ("bonding: avoid NETDEV_CHANGEMTU event when
+unregistering slave").
+
+Let's do similar thing for the team driver, with commit ad7c7b2172c3 ("net:
+hold netdev instance lock during sysfs operations") and commit 303a8487a657
+("net: s/__dev_set_mtu/__netif_set_mtu/") also applied.
+
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Suggested-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
- drivers/net/ethernet/intel/i40e/i40e_xsk.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ drivers/net/team/team_core.c | 25 ++++++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 9f47388eaba5..92b853a75b28 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -108,23 +108,27 @@ static int i40e_xsk_pool_enable(struct i40e_vsi *vsi,
- 	if (if_running) {
- 		err = i40e_queue_pair_disable(vsi, qid);
- 		if (err)
--			return err;
-+			goto unmap;
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index c08a5c1bd6e4..0af2e5aa84fb 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -1292,7 +1292,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
  
- 		err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true);
- 		if (err)
--			return err;
-+			goto unmap;
+ static void __team_port_change_port_removed(struct team_port *port);
  
- 		err = i40e_queue_pair_enable(vsi, qid);
- 		if (err)
--			return err;
-+			goto unmap;
+-static int team_port_del(struct team *team, struct net_device *port_dev)
++static int team_port_del(struct team *team, struct net_device *port_dev, bool unregister)
+ {
+ 	struct net_device *dev = team->dev;
+ 	struct team_port *port;
+@@ -1330,7 +1330,13 @@ static int team_port_del(struct team *team, struct net_device *port_dev)
+ 	__team_port_change_port_removed(port);
  
- 		/* Kick start the NAPI context so that receiving will start */
- 		err = i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX);
- 		if (err)
--			return err;
-+			goto unmap;
- 	}
+ 	team_port_set_orig_dev_addr(port);
+-	dev_set_mtu(port_dev, port->orig.mtu);
++	if (unregister) {
++		netdev_lock_ops(port_dev);
++		__netif_set_mtu(port_dev, port->orig.mtu);
++		netdev_unlock_ops(port_dev);
++	} else {
++		dev_set_mtu(port_dev, port->orig.mtu);
++	}
+ 	kfree_rcu(port, rcu);
+ 	netdev_info(dev, "Port device %s removed\n", portname);
+ 	netdev_compute_master_upper_features(team->dev, true);
+@@ -1634,7 +1640,7 @@ static void team_uninit(struct net_device *dev)
+ 	ASSERT_RTNL();
  
- 	return 0;
+ 	list_for_each_entry_safe(port, tmp, &team->port_list, list)
+-		team_port_del(team, port->dev);
++		team_port_del(team, port->dev, false);
+ 
+ 	__team_change_mode(team, NULL); /* cleanup */
+ 	__team_options_unregister(team, team_options, ARRAY_SIZE(team_options));
+@@ -1933,7 +1939,16 @@ static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
+ 
+ 	ASSERT_RTNL();
+ 
+-	return team_port_del(team, port_dev);
++	return team_port_del(team, port_dev, false);
++}
 +
-+unmap:
-+	xsk_pool_dma_unmap(pool, I40E_RX_DMA_ATTR);
-+	return err;
++static int team_del_slave_on_unregister(struct net_device *dev, struct net_device *port_dev)
++{
++	struct team *team = netdev_priv(dev);
++
++	ASSERT_RTNL();
++
++	return team_port_del(team, port_dev, true);
  }
  
- /**
+ static netdev_features_t team_fix_features(struct net_device *dev,
+@@ -2926,7 +2941,7 @@ static int team_device_event(struct notifier_block *unused,
+ 					       !!netif_oper_up(port->dev));
+ 		break;
+ 	case NETDEV_UNREGISTER:
+-		team_del_slave(port->team->dev, dev);
++		team_del_slave_on_unregister(port->team->dev, dev);
+ 		break;
+ 	case NETDEV_FEAT_CHANGE:
+ 		if (!port->team->notifier_ctx) {
 -- 
-2.25.1
+2.47.3
+
 
 
