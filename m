@@ -1,108 +1,133 @@
-Return-Path: <netdev+bounces-253294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id p6ltHfSldmlYTwEAu9opvQ
-	(envelope-from <netdev+bounces-253294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 00:23:32 +0100
+	id s2KiKYmndmnLTwEAu9opvQ
+	(envelope-from <netdev+bounces-253295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 00:30:17 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBFD083223
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 00:23:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B7B83237
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 00:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 36DE03001381
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 23:23:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 56856300107A
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 23:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4792530F53E;
-	Sun, 25 Jan 2026 23:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5467830FF2A;
+	Sun, 25 Jan 2026 23:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AcBQzA4U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htCrqEsP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AC1230D0F;
-	Sun, 25 Jan 2026 23:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3070030E0CC;
+	Sun, 25 Jan 2026 23:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769383406; cv=none; b=KTkjzPf0GKhme7o4BtCix950R+iU0Jsb3HQTC4H4jzRwajZCK3hcnt98squya9X1+Zd5F3whqcUb/UIPDVUrU7uaL8D6WY3VDFoFb9rfglVuzS+39YoNLrhDiZ1G2wH3F2W4i+BOjU6UKu12tSlAHXg+n1uLMEVjlaa/em/oJvw=
+	t=1769383811; cv=none; b=oFp9gG0QrFWsDzoYuQv3CEdgSCBo/s0g8CwjzL4YOHOELF/zhKAV/tZzdXg7Bm7rKRkOhiuiTvOydrPKVB1IizsftNcDSAcpUIZ5NifYl1gaJIZi7pfp32b6iLcug7AEBJ8xRSvaCfjliMucRq9d4XuxaSks7TxcKyxwbskU+xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769383406; c=relaxed/simple;
-	bh=bGLaHBn1IjojJVZhvgMqVVXp64JzJ5tiA32E6pxU0Sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hylo62ObYHSfmlZZgyMMsc0YXVotRuEN2+Sb9sHZROl5Af0DiMTfBSTz9crzARSm540LSSTGTNyNB61Yr76jKBYc83igJkgKu1ASiWoEWMQMuNFHRm6fHEliOGKCSFkmlIIBmrNiwsDMD/+3G8DnEcprPLL2sA7i3pT/jZFlt3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AcBQzA4U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473D4C4CEF1;
-	Sun, 25 Jan 2026 23:23:25 +0000 (UTC)
+	s=arc-20240116; t=1769383811; c=relaxed/simple;
+	bh=Rj5sC8bf8dIRUDluKMP7VcYwIjcC6Qi5QvUU9BIKa3M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gb4UE+JTU1JxZUXBSiDY23friMs+0FCzjdU8msW1dKN/Rwe4lcYixVl3IifghOKOqDATtnUcZnNVP1CITySgYYMt4uOVHkCp+cWJ+KAZ0pRSuuXDJct/0ocoBlMEv36Z75/97itkifK3pQnqR9jfbq9YPpXFoBMYcwZybsEUOco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=htCrqEsP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB648C4CEF1;
+	Sun, 25 Jan 2026 23:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769383405;
-	bh=bGLaHBn1IjojJVZhvgMqVVXp64JzJ5tiA32E6pxU0Sc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AcBQzA4U3e35VHsdAP53ZMNjfiFL+x884yReqpvJKrDRZ9f413R6fuW8e/Gc+KePm
-	 RZrZCIamMNGjx82XZ9GGXy+mJdGEoYXqgmpPzxcWAacFf/HRwtRjNf84o7ooI2rJle
-	 FRE/VeyugItQbHObI24Yh1o7D4cu/dvDqophnhOgbSNauZrNj0adYA/YtgtylqnDDg
-	 wVeqN0r62eDTv8BCF6APUHyIXYFNagYwuNW3toCUrGN3x8boxBh8KX41cmolwoL6BY
-	 iAYzSsaX2xroPJDCZ6b7gg2BFNKjXqeP/5P/CtLb7lK3MxztlOueWjjMT6NUNXTNqf
-	 yTC1Ho1osuuzQ==
-Date: Sun, 25 Jan 2026 15:23:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Yang <mmyangfl@gmail.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Lino Sanfilippo <LinoSanfilippo@gmx.de>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: alacritech: Use u64_stats_t with
- u64_stats_sync properly
-Message-ID: <20260125152324.1b7e5a9f@kernel.org>
-In-Reply-To: <20260122185113.2760355-1-mmyangfl@gmail.com>
-References: <20260122185113.2760355-1-mmyangfl@gmail.com>
+	s=k20201202; t=1769383810;
+	bh=Rj5sC8bf8dIRUDluKMP7VcYwIjcC6Qi5QvUU9BIKa3M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=htCrqEsPPdpZ/m7/irgOPomhdmzo3BRh0KR0zePnD+eTh93Z/M7G1qxvkkjDTn8zb
+	 /5d3mJCKpzvXoluejGFoV2qgi0/0fILnrTZpeT9DLKMKdYtwaipz8XUMtecWpPPwvL
+	 BMexrd792SvIlOg2jTm5riSOC1G/UrH7gjwWwmkzv+tZQZcKl7U9FMh54OtuXLzGpi
+	 79BHFgzhX3DgUHdy6oFKD5ku7w5XHESSt6m4fO0EK2CZnWOyXHwkKIybA9KwdFvlYN
+	 knTWIc7OCD7tHaINVEPJ7skH0lohiqY4Pk5grepDidUhk4DDLCH0VfclYOpFdW9miO
+	 uXtKrO6AEq7DA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8B223809A15;
+	Sun, 25 Jan 2026 23:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v6] net: dsa: yt921x: Fix MIB overflow wraparound
+ routine
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176938380561.4011909.7698131395251407118.git-patchwork-notify@kernel.org>
+Date: Sun, 25 Jan 2026 23:30:05 +0000
+References: <20260122170512.2713738-1-mmyangfl@gmail.com>
+In-Reply-To: <20260122170512.2713738-1-mmyangfl@gmail.com>
+To: Yangfl <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, dan.carpenter@linaro.org,
+ david.laight.linux@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253294-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linaro.org,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-253295-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,google.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmx.de,lunn.ch,davemloft.net,redhat.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BBFD083223
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:email]
+X-Rspamd-Queue-Id: B0B7B83237
 X-Rspamd-Action: no action
 
-On Fri, 23 Jan 2026 02:51:07 +0800 David Yang wrote:
-> On 64bit arches, struct u64_stats_sync is empty and provides no help
-> against load/store tearing. Convert to u64_stats_t to ensure atomic
-> operations.
+Hello:
 
-Eric, could you comment if this matters? I expect David may send a
-non-trivial number of these, I want to make sure we're making good
-use of everyone's time here. 64b accesses are not torn on 64b arches,
-and never used for control flow.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 23 Jan 2026 01:05:09 +0800 you wrote:
+> Reported by the following Smatch static checker warning:
+> 
+>   drivers/net/dsa/yt921x.c:702 yt921x_read_mib()
+>   warn: was expecting a 64 bit value instead of '(~0)'
+> 
+> Fixes: 186623f4aa72 ("net: dsa: yt921x: Add support for Motorcomm YT921x")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/netdev/aPsjYKQMzpY0nSXm@stanley.mountain/
+> Suggested-by: David Laight <david.laight.linux@gmail.com>
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v6] net: dsa: yt921x: Fix MIB overflow wraparound routine
+    https://git.kernel.org/netdev/net/c/709bbb015538
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
