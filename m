@@ -1,147 +1,172 @@
-Return-Path: <netdev+bounces-253201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253203-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDsVOrx3dmnqQwEAu9opvQ
-	(envelope-from <netdev+bounces-253201-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:06:20 +0100
+	id iOxIKXl6dmlLRAEAu9opvQ
+	(envelope-from <netdev+bounces-253203-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:18:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F39C8250F
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:06:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6258B8256A
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41B5D30038DB
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 20:05:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BB8C23000B35
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 20:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DEC2F0C74;
-	Sun, 25 Jan 2026 20:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1663009C3;
+	Sun, 25 Jan 2026 20:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TevhOiBd"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="dAEGDbiE";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="6C2MVFmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55EE26738C
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 20:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769371547; cv=none; b=S/WRVKFShyrtbhNHNL0jMIvD27Y9ILi2du0c1e1W1sPZwjcmz+Ep8qi/1v8vNsU1ctY2TFVdfvBKJnigh72fPF4z73+X5QZEui8BW+N7fX3fHqINTboc+49kkfMxBQBT+1I368srOGZ5U/5PgXBD4z2eciAMZH2mTcPDBCeMAxw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769371547; c=relaxed/simple;
-	bh=ycGk0CtMeW7gP/6ErJi71CoEIMFACqdsXe2eK58bneY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AAuyAmQpt6Ml+pdXmBzJQDHmapDej4SyKiI0S/7/bA3n1obkF5GqE1OcHKndRWJthkycQvUowmZxwxDH6ax7653yEdu9lR5NMbzsWywVmZ9TpwC26V9M5TONd1nRnzADDEQT2JUbi+DT0x2Zc7aUQPqFKgP7gZwlMur5tZMZMEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TevhOiBd; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4801c731d0aso30078775e9.1
-        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 12:05:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769371544; x=1769976344; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n49mtwqBKQFWj3g1whYCmVJ/2ZLD1Hd3JqwhErWWRKw=;
-        b=TevhOiBdN+bELy7jGPsvP1EFTlwzBGCIbvFDx/h5bT+OrF8bP9t3WVNcu2dJmiTC5T
-         FwnvuabW/ePxex3Aal1tVhPGJgCW5zpoYJReprW0aNMcFT4PfkAr5GDwMs0eucTP9Xr1
-         FCpskYdJ1DbOCjxEG5l3MAXp7ww/WNv4mg5S2vYSC8zQDLVrzrjM1iHvOjA1SZ/XZTjU
-         fDmkKbczyE0FT+KFojSQTTtMLphlpuCAcZdgozzNlyQDHxf32jXPdBJhIChRONvVhTrn
-         mQLGUFyRgFi+GUuHd622veR06+Phfn+6r6HW9B7Mh1JGT2BwT2b3gc/Kc7ra0T35BvL6
-         jtOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769371544; x=1769976344;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n49mtwqBKQFWj3g1whYCmVJ/2ZLD1Hd3JqwhErWWRKw=;
-        b=hKlGfqASUvfp2VYfLhrc4uIFsOLMMHwhvV8v70z0p8hGGPQkTNDKLLgqCP1aEKbSSG
-         UDPkgrtQ6ABkt9N08HcLZGG3+aAf3fNmDf8+dyRvYkqWcophNm9ziIqBE9I4SQFWrskE
-         PqBPp9DyiEahmYcefDJz5vbGGjcTAhiUEQmtg1ws9ArHTK2f8r1gBDpQ+RByb/jOmm+Q
-         oYU40ma07KJ3MiQS0SKGmLTpTedsPpHPhPsZ56kVhtOScT6t1D2XaN1ujQoKWXmQr32h
-         20fWk0UlOlLSEYYgUgMMdSNx0rzN5kr+Bm0jteaJm9VeS5Lol7X6VCLbwxoraOwVcuX0
-         ZAiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNEpcGaRJgdl4y2KyDT57ikxfhjzoZ5vDJr/1ajbgy0gcLxE33NPUfynedtOjL5IIeSL70Ykk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk0Qvp8WzypvxZ1+2TLj/9MKQ39H2bP6PX5mCqYUXqxJO6MLpf
-	JrDxDAe8Aqc/CbfIGAxrJTetzQWZfJQo0bo8m7x0+vsFmlCpPlArTwFour/HzA==
-X-Gm-Gg: AZuq6aKF298Stbb/VlvUwsm//8e5f0jzveBKr3FG3DAVfkmRjDPi63BdJj1zCul6v+X
-	3EN/YlkmQkQ3ZU3VW5DAD88utoeWu4Kxq/MsEnXXUu+AbCr3RRkBlBj1D9rA+AHfKc7HsOuuL/u
-	IN2YRQMukDhMjE7sTrgbAGkQHGB7tdapWQFXaVnDP3/VCKBHzWjUlTZ9IF975gA+nhatjvzgs+e
-	dbmdVEJEESE225OO6qA+SHp4/58q8DfCbtzvHKZTrEq2sI2mZdUy8iM7OXOF8uAOA5wriV6gxeS
-	ko9J5d2yBCII2j3NonVCMaz5zI/O682UUo4Upg0MyHsEzTWnnMb+LJDZ85GWGMagaFu9XO20FXH
-	EB4Pzwa6I+IVgcpSiKJEkXJ7fpAwYDMG18XgL+FGQT4mcaGeUxe0/214BoQlotHwiPieWdv/N5+
-	ZrSBtlxoUtgAHGOBD1NZ41aH72bqtD9Z+Pf5Lr3151bkTFW8WfvO/PJwQvl2qv32Hf7sCaKJLBe
-	JsYJqvIvZQBFkVfeOWeIixBTMUyw9jeRAUA8nEkQrccrknnDih0TQ==
-X-Received: by 2002:a05:600c:64cf:b0:47e:e7e5:ff32 with SMTP id 5b1f17b1804b1-4805d0646cdmr38080635e9.34.1769371543887;
-        Sun, 25 Jan 2026 12:05:43 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f0f:cf00:d971:93b2:48cc:4e22? (p200300ea8f0fcf00d97193b248cc4e22.dip0.t-ipconnect.de. [2003:ea:8f0f:cf00:d971:93b2:48cc:4e22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-480470cf1acsm306058025e9.14.2026.01.25.12.05.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Jan 2026 12:05:42 -0800 (PST)
-Message-ID: <6b52acda-026d-4506-8864-8445fb8c432b@gmail.com>
-Date: Sun, 25 Jan 2026 21:05:40 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CAC2749ED;
+	Sun, 25 Jan 2026 20:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769372277; cv=pass; b=Bbmy6mXWnagoVkepwghPMA87UjlAmUJde8SNz2usC4XHpT/xGCA/7DmhcRD0CifLFqRkfjZKDyDMzXXxKSX0UyuQuhw+r0UctOhaAUwKw002XuL7wi7dQ0Uvir64k4Kdk1F82r385DVwnYJb8R7FAKIi640+2bQJsbMF98lShCg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769372277; c=relaxed/simple;
+	bh=I8MixfrxLNziBKBmQDlPf9/AUezQATlV80rHFfy8Y3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VimVSoprIa3Ed8pzCieyosyw1/V7ks3qlD+kcdAHjXQy68L4Aqpw71KpslfLuOL6nevq3bfs7NTsJj0NrX+sx/DeFZHGZvLz0QDaUWRuJLSg2VOdWV29+ViTHWZI6wQutnjY1dW7poNZBb8q3fyi/LIsb53x8kcBuU5smSFXYE8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=dAEGDbiE; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=6C2MVFmp; arc=pass smtp.client-ip=85.215.255.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1769372267; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=c/ZH8EIfDYD7Hu/0W9qKydBR79aAUlsTSWq2b855s3C5liflY992s+Y3YeKD2IAlkV
+    x+gFDPVTf6ekQryV7W7E2kChYzF0IUrm3wLdWLQfMGasL3KLH4JrmWJdxbnDAnipixaH
+    WASH95JwncQ6imylC2PndMsHF0j0DrLcodQrTnwXoaMdKycWXIT5gpXAC+6NXaikYB0E
+    O/w9wf0IdNlxxRyncdBTuEN3Zi8Dgy7DscHSiuV58RvvDGFg5giMbtcvLcjhDMQCd1W9
+    ZOygQgOKzB19BVbMYOP2rIu70Qx+Lm1XqpndmzCWriIfPHI/VR2FYTjAfjyxtK9ZMlMW
+    47KQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1769372267;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=nHKqd5cJMudFFZuvLJl24nOnCqoSBuTF0s6DvV4s9jE=;
+    b=CS6rEu4Rvz4I9tgJQ8z+Jo6nn7fIZFGc6aVjyKpNFewwT9s82OQO6o2dv7WGXwIsCo
+    bcKjKG00z+mq6VAYYUdiNa2HD0sBCTw7ESuLaOKFgAp/FRskBf6f7e5MFUHgCmK3MGxq
+    hw7d0n0TEZDLp1bEtSyCzNbQouGJW7u5+fWlJ+ERFCFecPt4U+NIFDCz8ir1OI9NDaZJ
+    N4cSEq7NHmex5Ecaqe/mMj1n9HAfU9HVwCREwqumbqAckTYoyTReyQHa6lBAhVOPw1Ul
+    Xk68/afOAbzmKmh+JXx/yaabHi4UPexWOqiPgjApAfb1MLonitUkoJ0OTLziNiFKPOJV
+    y/rQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1769372267;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=nHKqd5cJMudFFZuvLJl24nOnCqoSBuTF0s6DvV4s9jE=;
+    b=dAEGDbiEel9SffKpptY8DvoCwG1gK+oaAcsJqPoCVKej/n//eZeYq9udWrZHlZZTts
+    ZafMBONYNAvvTYdpUzL4iF40W3n3RXmCAa9R5LMRalXlXUUsy1rybIBVdXsMcrQ5li2S
+    QbtNvZ6BLrYufxlw6CgT0++/fouqVL3xm8sumlIUv1d2vkxcQfa39Ev3ok/QuLMobb+s
+    +x2z2e98tF1iZLan63H+U8PimebHzQ4kQq8/h2rDZq0pjr08LC1HDnirnlMRXb58RPvc
+    aO3afS+wqUsRU1UhfrN/nXmfQcVS8MJ8GHt8OUfGQ++3yCPn4wyo2KRteCcsWKVfgagr
+    7P4A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1769372267;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=nHKqd5cJMudFFZuvLJl24nOnCqoSBuTF0s6DvV4s9jE=;
+    b=6C2MVFmpCKICjrz9Ivh5AwqtU4Wou2EPGt+EwN9YSOvW/Y3IJgC1W3PQBpgvs15/PB
+    tlgkAtvdL2hhB/l8FfAg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s1YTqptmo87qzm6sElmZEI+VN6rw=="
+Received: from lenov17.lan
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b20PKHlYsR
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 25 Jan 2026 21:17:47 +0100 (CET)
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+To: netdev@vger.kernel.org,
+	linux-can@vger.kernel.org
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>
+Subject: [net-next 0/6] move CAN skb headroom content to skb extensions
+Date: Sun, 25 Jan 2026 21:15:55 +0100
+Message-ID: <20260125201601.5018-1-socketcan@hartkopp.net>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: make PHY fixup support always built-in
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <800595c6-496a-443e-92e3-37251195e610@gmail.com>
- <aXM96CNzkiSIPukf@shell.armlinux.org.uk>
- <66f110ca-3a49-46fe-a996-c5ad477b8f4d@gmail.com>
- <20260125115701.27a3db0c@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260125115701.27a3db0c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253201-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[hartkopp.net:+];
+	TAGGED_FROM(0.00)[bounces-253203-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 3F39C8250F
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 6258B8256A
 X-Rspamd-Action: no action
 
-On 1/25/2026 8:57 PM, Jakub Kicinski wrote:
-> On Fri, 23 Jan 2026 12:39:22 +0100 Heiner Kallweit wrote:
->> Recent removal of the dnet driver removed last fixup user not being
->> platform init code.
-> 
-> Oh, driver removals may need to be reverted if someone speaks up.
-> Could you wait at least 2 releases with the dependent cleanups?
-> We had to revert back at least 2 drivers we removed in the past.
+CAN bus related skbuffs (ETH_P_CAN/ETH_P_CANFD/ETH_P_CANXL) simply contain
+CAN frame structs for CAN CC/FD/XL of skb->len length at skb->data.
+Those CAN skbs do not have network/mac/transport headers nor other such
+references for encapsulated protocols like ethernet/IP protocols.
 
-OK. I'll keep the change in my local tree until then.
+To store data for CAN specific use-cases all CAN bus related skbuffs are
+created with a 16 byte private skb headroom (struct can_skb_priv).
+Using the skb headroom and accessing skb->head for this private data
+led to several problems in the past likely due to "The struct can_skb_priv
+business is highly unconventional for the networking stack." [1]
+
+This patch set aims to remove the unconventional skb headroom usage for
+CAN bus related skbuffs and use the common skb extensions instead.
+
+[1] https://lore.kernel.org/linux-can/20260104074222.29e660ac@kernel.org/
+
+Oliver Hartkopp (6):
+  can: use skb hash instead of private variable in headroom
+  can: add CAN skb extension infrastructure
+  can: move ifindex to CAN skb extensions
+  can: move frame_len to CAN skb extensions
+  can: remove private CAN skb headroom infrastructure
+  can: gw: use can_gw_hops instead of sk_buff::csum_start
+
+ MAINTAINERS               |   1 +
+ drivers/net/can/dev/skb.c | 123 ++++++++++++++++++++++++--------------
+ include/linux/can/core.h  |   1 +
+ include/linux/can/skb.h   |  32 ++--------
+ include/linux/skbuff.h    |   3 +
+ include/net/can.h         |  28 +++++++++
+ net/can/Kconfig           |   1 +
+ net/can/af_can.c          |  23 +++++--
+ net/can/bcm.c             |  26 +++++---
+ net/can/gw.c              |  38 ++++++------
+ net/can/isotp.c           |  45 +++++++++-----
+ net/can/j1939/socket.c    |  15 +++--
+ net/can/j1939/transport.c |  28 ++++++---
+ net/can/raw.c             |  21 ++++---
+ net/core/skbuff.c         |   4 ++
+ 15 files changed, 248 insertions(+), 141 deletions(-)
+ create mode 100644 include/net/can.h
+
+-- 
+2.47.3
+
 
