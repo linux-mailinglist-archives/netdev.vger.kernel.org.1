@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-253220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253221-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hubnLvGOdmksSAEAu9opvQ
-	(envelope-from <netdev+bounces-253220-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:45:21 +0100
+	id YPGgNSiPdmksSAEAu9opvQ
+	(envelope-from <netdev+bounces-253221-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:46:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1126A82895
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:45:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA18828B4
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAE84300422F
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:45:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA3253014960
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F65274FEF;
-	Sun, 25 Jan 2026 21:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE09230E0D9;
+	Sun, 25 Jan 2026 21:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJJ2I41Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WqUwSyip"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15ACA946C;
-	Sun, 25 Jan 2026 21:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD5930DED7;
+	Sun, 25 Jan 2026 21:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769377517; cv=none; b=nOa3pR6nLZJzO7b5NQ4jQDph1G7BmMpyushXdaBMG6sJfRCNiQyL3hjXc3ZX5Ugb1ff2tBMv4273w3yCuNchnSjdoSHn0my2NEETNGmANWHvna+BijnnXma9p+TiH6cN5IaIWqKJO2bO2WOS2eMe5j2IsRTuW1oPu3oZRqF+uBE=
+	t=1769377519; cv=none; b=MKnghVSleVmncCuDZahhHeY2e1nz8uabqFmnH7pmKwskZ+jiH+Apx9xmfyTUKMTzomDEJZd7uChjLS/n4JBR4L4MXSRJUqtfzhm3IAS0uDzeD9bFk8MNY4OC3lrWlDp45kgTvUz2vZhhoqVmdpmdAFI7aTDhOY44foCPSjbyWWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769377517; c=relaxed/simple;
-	bh=4Hs7D0jZtzJiVBb2yTBmS1/1dpXXOED2Kmh7/H708XY=;
+	s=arc-20240116; t=1769377519; c=relaxed/simple;
+	bh=PGoOLqNio3LD9cjsjNmgVUgdmPGeq0f57mM85yor9Ug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bhCj1BOUOL1AfB6rZaSZVU9e3GFK/XtnUdnWwDlL00byka8cIk0LCBSkRtja3uXjzHTtElpdCwUIJUxOz00+7P6MlQEVITwUmcqL3k91RddzCowp0G87vRwJrIPwPWTMmvTotaJQTKAXhdrP6VY1DDTXz9gUxURk6RGGS+HW2VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJJ2I41Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF658C4CEF1;
-	Sun, 25 Jan 2026 21:45:15 +0000 (UTC)
+	 MIME-Version; b=IZI+xBP9ZnJJsLEtfyM8nzfKL21DzzZEHB2WdxRKUiY5hJPLD5aLRKwJgg25wAhpVx+lPgrG26D96kdE8zyheLIDPWcf9cAzRr9dDvrLmAt4FXkxBcVQKbqQbhQj7+OUeBcaIR6JoCQM0QvejT9BRH/R863vL43qUkxy2X163kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WqUwSyip; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB27C4CEF1;
+	Sun, 25 Jan 2026 21:45:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769377516;
-	bh=4Hs7D0jZtzJiVBb2yTBmS1/1dpXXOED2Kmh7/H708XY=;
+	s=k20201202; t=1769377519;
+	bh=PGoOLqNio3LD9cjsjNmgVUgdmPGeq0f57mM85yor9Ug=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NJJ2I41Y4BI5+qnS++v44VnEqj0Ah43Yehhnp2aZGhb/q7yC3Gjmn+ui80/Y1jvkO
-	 PZvjFr2tsv5lH8bCKrhfUQUb/I/JrxnufSO/Utx2Sj/+PxEDw03lPQ+Y4QY9pnHrb8
-	 0IN5SZB17WrcHmFZeEgoqmmh9gS1g3GSVtn5Vy1P2giwHbfuRL7xFYXEUK4zPFh2YP
-	 crbTSxVUP/4X9tWBv/F+m1TaocZtIHTRUaieVftR/FU0tGcRd87NFrwsUycFTS55Lf
-	 GOhpNWXXzP+eO9suspQQosDfo86R3H4XBaxLtpVTVCdczJ2VTXKlV5zotVDswo5dLD
-	 auamaCz6PoCuQ==
+	b=WqUwSyip5gbyjMXOeMooltp2IroSyqdAIA501lQ7r6pMAJoqJi0NfqPpgRKiRY6TQ
+	 xTbXg2feAZ1L54viofnHILrTGHsbXWbzSHfnBDG4FbRvOFBWD0Pr4GmhDo6xEi67IQ
+	 9Uv0QVrz+mNpzhyoWnMg5Yr5qYOO/JG2U2bp3NrDMMsmuXHao8kO+Ecc2ZseUKkc1s
+	 vD87Bm9GVxzxk9WXIu83+4jK/AVNkCURcQuY69LzwyvZu2KBC6xENQ50uWy/N0QO5h
+	 G9C9SkturSSnUZoDQpyGNDNX5D3sFVYTb4I5CmpYFMNxe/yRuTfbHwlR6tp7BuSJZ2
+	 SiH0+EXL8z6lw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: wei.fang@nxp.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -63,12 +63,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	bpf@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch
-Subject: Re: [v4,net-next,06/15] net: fec: add fec_enet_rx_queue_xdp() for XDP path
-Date: Sun, 25 Jan 2026 13:44:46 -0800
-Message-ID: <20260125214446.3383999-1-kuba@kernel.org>
+Subject: Re: [v4,net-next,12/15] net: fec: move xdp_rxq_info* APIs out of fec_enet_create_page_pool()
+Date: Sun, 25 Jan 2026 13:45:16 -0800
+Message-ID: <20260125214516.3384252-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260123022143.4121797-7-wei.fang@nxp.com>
-References: <20260123022143.4121797-7-wei.fang@nxp.com>
+In-Reply-To: <20260123022143.4121797-13-wei.fang@nxp.com>
+References: <20260123022143.4121797-13-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,29 +83,28 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-253221-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253220-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,nxp.com,iogearbox.net,fomichev.me,lists.linux.dev,davemloft.net,google.com,redhat.com,lunn.ch];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,nxp.com,iogearbox.net,fomichev.me,lists.linux.dev,davemloft.net,google.com,redhat.com,lunn.ch];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 1126A82895
+X-Rspamd-Queue-Id: 1DA18828B4
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -113,59 +112,61 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: fec: add fec_enet_rx_queue_xdp() for XDP path
+net: fec: add fec_alloc_rxq_buffers_pp() to allocate buffers from page pool
 
-This commit separates XDP path packet processing from protocol stack
-packet processing by adding a new fec_enet_rx_queue_xdp() function.
-The goal is to optimize XDP path logic and improve XDP performance.
+This commit extracts fec_alloc_rxq_buffers_pp() from fec_enet_alloc_rxq_buffers()
+to prepare for XDP zero copy mode support. It also adds fec_free_rxq_buffers()
+helper for cleanup.
 
 > diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index 0529dc91c981..86447a7cb963 100644
+> index c5ba532e00a8..867694d6d54d 100644
 > --- a/drivers/net/ethernet/freescale/fec_main.c
 > +++ b/drivers/net/ethernet/freescale/fec_main.c
 
 [ ... ]
 
-> +static int fec_enet_rx_queue_xdp(struct fec_enet_private *fep, int queue,
-> +				 int budget, struct bpf_prog *prog)
+> +static int
+> +fec_enet_alloc_rxq_buffers(struct net_device *ndev, unsigned int queue)
 > +{
+> +	struct fec_enet_private *fep = netdev_priv(ndev);
+> +	struct fec_enet_priv_rx_q *rxq;
+> +	int err;
+> +
+> +	rxq = fep->rx_queue[queue];
+> +	err = fec_alloc_rxq_buffers_pp(fep, rxq);
+> +	if (err)
+> +		return err;
+> +
+> +	err = fec_xdp_rxq_info_reg(fep, rxq);
+> +	if (err) {
+> +		fec_free_rxq_buffers(rxq);
+> +
+> +		return err;
+> +	}
+> +
+> +	return 0;
+> +}
 
-[ ... ]
+Could there be a memory leak here on systems with multiple RX queues? The
+old code had:
 
-> +		switch (act) {
-> +		case XDP_PASS:
-> +			rxq->stats[RX_XDP_PASS]++;
-> +			/* The packet length includes FCS, but we don't want to
-> +			 * include that when passing upstream as it messes up
-> +			 * bridging applications.
-> +			 */
-> +			skb = fec_build_skb(fep, rxq, bdp, page, pkt_len);
-> +			if (!skb) {
-> +				fec_xdp_drop(rxq, &xdp, sync);
-> +				trace_xdp_exception(ndev, prog, XDP_PASS);
-> +			} else {
-> +				napi_gro_receive(&fep->napi, skb);
-> +			}
-> +			break;
+     err_alloc:
+         fec_enet_free_buffers(ndev);
+         return -ENOMEM;
 
-On platforms with FEC_QUIRK_SWAP_FRAME (like i.MX28), the old code path
-would call swap_buffer() after XDP_PASS before building the skb. In the
-old fec_enet_rx_queue(), the flow was:
+which freed all queues (both RX and TX). The new code calls
+fec_free_rxq_buffers(rxq), which only frees the current queue.
 
-    fec_enet_run_xdp() returns FEC_ENET_XDP_PASS
-    -> if (ret != FEC_ENET_XDP_PASS) goto done; // continues
-    -> if (need_swap) swap_buffer(data, pkt_len);
-    -> fec_build_skb()
+If fec_enet_alloc_buffers() calls this function in a loop for multiple
+queues and queue N fails after queues 0 through N-1 succeeded, only queue
+N gets cleaned up. The caller fec_enet_alloc_buffers() just returns
+-ENOMEM without freeing the previously allocated queues:
 
-With this change, XDP_PASS goes directly to fec_build_skb() without
-calling swap_buffer(). Does this break XDP_PASS on i.MX28 where the DMA
-delivers data in wrong byte order? On such platforms, packets passed to
-the network stack would have incorrect byte order, causing protocol
-parsing failures.
+    for (i = 0; i < fep->num_rx_queues; i++)
+        if (fec_enet_alloc_rxq_buffers(ndev, i))
+            return -ENOMEM;
 
-The commit message says "XDP path does not support swap_buffer()" but the
-previous code did support it for XDP_PASS - the swap happened after the
-XDP program returned PASS but before the packet was handed to the stack.
--- 
-pw-bot: cr
+And fec_enet_open() jumps to err_enet_alloc which does not call
+fec_enet_free_buffers(), leaving the page pools and pages from the
+successfully allocated queues leaked.
 
