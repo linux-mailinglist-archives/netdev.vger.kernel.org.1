@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-253212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNMbAiqJdmncRgEAu9opvQ
-	(envelope-from <netdev+bounces-253212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:20:42 +0100
+	id QA+1BUKJdmncRgEAu9opvQ
+	(envelope-from <netdev+bounces-253213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:21:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80C32827BF
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:20:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD9B827D5
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5F6F93002D4B
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:20:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C99C7301475C
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A10330DD3B;
-	Sun, 25 Jan 2026 21:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD0E30E0C0;
+	Sun, 25 Jan 2026 21:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1l52BRj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4ki0f0q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E9130C631;
-	Sun, 25 Jan 2026 21:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3AC30DEDC;
+	Sun, 25 Jan 2026 21:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769376018; cv=none; b=jbC/fKw1e2HH2l/iaX3Pi8HL5wmrgBUnaE+V/hjEFUnKNl5Ni3ugbdePZkSEy4ZYkU2sO6Dd7sZhK1hHPj/2uze1nvbh9blp9hrlU8R6KWB+uIuO8nD5q9E5aVOKFJ5ASrJ/p+apG8vZ7t8rwPZ+ccLgq0Vfjv/rsa59mDydg+c=
+	t=1769376019; cv=none; b=p41SVdsMmlDzFxkUE98IxN1wEcRNBVW9/RFlwL7A5BbkvuA2V0EN+qnXCUv9foyfPVekC6z2grw4hP+KAUO56RwODHw9OIgvmGswcUkxGACksJkKCHW1aFDdPD96tkX6102gzLKInWZ8HRvOD7tuWEE4dNZ5Y7+6wtO6+yWhndA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769376018; c=relaxed/simple;
-	bh=6j60dgi8/9GlBHmAivaRLBu71UcV/WyFp1Jyq82JIQM=;
+	s=arc-20240116; t=1769376019; c=relaxed/simple;
+	bh=fFc5GWOjATI8wU50Ou3gyc63w8hj5PkBp259xRZdrL4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tVwTl8Lli+R5e9FBTnySv3IM7cC4k/ky2jjRhj1L/id9+i2GJj+cf/fopsXjzcqQvwz/DTvIqY9YyLMrDhFi71W0f6hBXKYup6aZk8fpBVPH/3TxPDS384WIZYIMGgHGP9n0zF4kPPwiDPAI4nWd7NhHXNqVdOQ/Eto0VxdusMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1l52BRj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA57CC4CEF1;
-	Sun, 25 Jan 2026 21:20:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FxBXWTbVzCG1o9u+6XKymwcEjJeZ5WYhZvf5vBQDYH+iEVT1jqLTWECxqkTKh1hQxwwhxs/B/ktFbC5W/k7U08W7JtE6HSIBIcyQNeFvjadTUEGwq20gF5Vfp9eeEh20EVnQ26EYwYXdKpvEz7IAwz2zZZAiAEdNPSfTSTJScKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4ki0f0q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E5EFC19425;
+	Sun, 25 Jan 2026 21:20:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769376018;
-	bh=6j60dgi8/9GlBHmAivaRLBu71UcV/WyFp1Jyq82JIQM=;
+	s=k20201202; t=1769376019;
+	bh=fFc5GWOjATI8wU50Ou3gyc63w8hj5PkBp259xRZdrL4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T1l52BRj1BYMknDW8GXYTQ+lZ3zk7MwzdZoJwn7HOjM0nFfq0cKMvwFCtq+PQmnXb
-	 btAKkCqFNTMjFDd7aJfp1Fsj9t1wMv364ZqR8qDGBpRypzG8w5mntOtlscbZ8K4j21
-	 bJI91z20Dgf68qZCOk88wUJl1dADCf1oo7YUN2slhofBq72RQflYfhQhFOFwGAnLbb
-	 oK5AT8WC+5u5IajCynKqVr5gK8Af16A+LdzWp2wcox4frzyPWBF+sCzGYHvWFLB6AM
-	 x+C1pR9Kgb7bWJqJa9ACPtXvXrrYdgAZ9hohT9+G1Mn3gitmwPDCzYJeKz7Wvm3Cuu
-	 UXcpB7o/9BycQ==
+	b=q4ki0f0qTeGm7qwpj2VD3V04u4Vho8hCYaNIK7GIyIOugtCINtEymNuGb2EwIyILu
+	 /gw7JcZTxwB9zq5saF3ilM7qg6OBIi1w1jJP4DDhHkPUMlgNaebN0u4jMMxAjliQRA
+	 nScvraNIr4gjkxT6Nj5caiRZqZyPHUWYI+xj39Zl9S/hzesoztvCX/Kkklds63FxdI
+	 PaJdBQrJR2ri+kpFEKBRnPkEMjAgd731b0uKo1QEpyvN+8V0VmMUI3WgAKZlgyWrFF
+	 hI7P5ZTAZvXyYaWlD/5Xz3cE4DA8n3e7zshbD1/du3YyU9i5kRGI674AaLdKb27G/V
+	 EEeRiu9wSUssQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 11B2D3809A15;
-	Sun, 25 Jan 2026 21:20:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8BBAD3809A15;
+	Sun, 25 Jan 2026 21:20:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,69 +55,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: mvpp2: cls: Fix memory leak in
- mvpp2_ethtool_cls_rule_ins()
+Subject: Re: [PATCH net 1/2] can: at91_can: Fix memory leak in
+ at91_can_probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176937601260.3588307.18092388045138415195.git-patchwork-notify@kernel.org>
-Date: Sun, 25 Jan 2026 21:20:12 +0000
-References: <20260123065716.2248324-1-zilin@seu.edu.cn>
-In-Reply-To: <20260123065716.2248324-1-zilin@seu.edu.cn>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+ <176937601410.3588307.10395345975668569922.git-patchwork-notify@kernel.org>
+Date: Sun, 25 Jan 2026 21:20:14 +0000
+References: <20260123173241.1026226-2-mkl@pengutronix.de>
+In-Reply-To: <20260123173241.1026226-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, zilin@seu.edu.cn
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253212-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,vger.kernel.org,seu.edu.cn];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253213-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 80C32827BF
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,seu.edu.cn:email]
+X-Rspamd-Queue-Id: 6AD9B827D5
 X-Rspamd-Action: no action
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Fri, 23 Jan 2026 06:57:16 +0000 you wrote:
-> In mvpp2_ethtool_cls_rule_ins(), the ethtool_rule is allocated by
-> ethtool_rx_flow_rule_create(). If the subsequent conversion to flow
-> type fails, the function jumps to the clean_rule label.
+On Fri, 23 Jan 2026 18:30:06 +0100 you wrote:
+> From: Zilin Guan <zilin@seu.edu.cn>
 > 
-> However, the clean_rule label only frees efs, skipping the cleanup
-> of ethtool_rule, which leads to a memory leak.
+> In at91_can_probe(), the dev structure is allocated via alloc_candev().
+> However, if the subsequent call to devm_phy_optional_get() fails, the
+> code jumps directly to exit_iounmap, missing the call to free_candev().
+> This results in a memory leak of the allocated net_device structure.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: mvpp2: cls: Fix memory leak in mvpp2_ethtool_cls_rule_ins()
-    https://git.kernel.org/netdev/net/c/09f979d1f312
+  - [net,1/2] can: at91_can: Fix memory leak in at91_can_probe()
+    https://git.kernel.org/netdev/net/c/0baa4d3170d7
+  - [net,2/2] can: gs_usb: gs_usb_receive_bulk_callback(): fix error message
+    https://git.kernel.org/netdev/net/c/494fc029f662
 
 You are awesome, thank you!
 -- 
