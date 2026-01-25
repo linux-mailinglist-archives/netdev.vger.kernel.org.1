@@ -1,68 +1,64 @@
-Return-Path: <netdev+bounces-253173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253174-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sEQxLwYXdml1LgEAu9opvQ
-	(envelope-from <netdev+bounces-253173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:13:42 +0100
+	id 5xCNAacgdmm1MAEAu9opvQ
+	(envelope-from <netdev+bounces-253174-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:54:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C408097D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:13:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B7280D7B
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 14:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 13AA83002B7C
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 13:13:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A3135300101F
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 13:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44062517AC;
-	Sun, 25 Jan 2026 13:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="uB8lTu7o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68533191B2;
+	Sun, 25 Jan 2026 13:54:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA77672631
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 13:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992F12741A0;
+	Sun, 25 Jan 2026 13:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769346818; cv=none; b=BDg/gbam1dhUfg5tlzgMb8SUHYmiVpaotaT/PY4c90DhtklSwpLEzXEdWNtbWDuo5K+s1Pnp6a+lzEAqehvh4lHQm0uyCKXhHWUmXd4MomiYZcbdpIw0kWyFFaUOE8b4KfcZjuY/axgM6C0ng7hrE4wUlmX2dn0bJFKt4XPHr6M=
+	t=1769349283; cv=none; b=Y/A7bbJJDl8Pg5vhf2CoR9vj571rg/fssj1t3L+BCHNuuqMIkYcsy/YvODrV78AA0D7fVsa0oUhg9NafhqSrYPgmX16yMtPupBOClNt2vAwp5WCQlOzl2I1UYTiPBQWcXdcAoWPhR9Krn6EvR57UlRogXREpe53ATSjOVisjwdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769346818; c=relaxed/simple;
-	bh=XjLkVbT3y5QTJl5oD/LP2VjXmxLt6IhVtOpk0x4yZMo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sVjza5LBcR9F1g0wcp6CbkfbgbDN26QVVdLBFMV3GeorD56VIgQULrT7/KcPSHms136CA00zaRqjQQ9uhXESWJh98PbpqorgVjJHuoamhD+tpIdimraV5MUd/Lx23gDc/ggLhwV2Hw/+4cCljuoJJ4zNYZyRSLJW4qTqK90UngY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=uB8lTu7o; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (188.53.30.125.dy.iij4u.or.jp [125.30.53.188])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 60PDDRms093033
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 25 Jan 2026 22:13:28 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=lTKJGbCrPaEbSFAuvPIh6CkaeFRE7NCkoh+SsrCk7jc=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:To:Subject:Date:Message-ID;
-        s=rs20251215; t=1769346809; v=1;
-        b=uB8lTu7ocXcmDtNk/A60xi+YGO/4iaX865u5/sa2MRHW8FHIYlmuDPxli9aaYiNj
-         noFuNXbU2hhqfdGIlieuANVIltFmI4TAi7C/Xr5380DJbnzp+qkwHwMJ0UpUcsfN
-         xLZG+CQnc+QR+HyDEgaJrs1RGaUncr5cwVzmCxOv0m959J/Kqqp0B0C8t+5NuodI
-         ecHtHrD8gacWbNZx+O0my8pi2NagMPYyk0zxiBqo8Xj0AsCacx5gaHJlY4DDtXKm
-         MvbtQPNy1wC1OekSZJaB+oiJQPIe6TFnU4J9o7QrPMzZq2uqblwgal/pFskEls9J
-         FjKnAp5FPUjnnBnHsMtdHw==
-From: Kohei Enju <kohei@enjuk.jp>
-To: takkozu@amazon.com
-Cc: aleksandr.loktionov@intel.com, andrew+netdev@lunn.ch,
-        anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
-        enjuk@amazon.com, intel-wired-lan@lists.osuosl.org, kuba@kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com, piotr.kwapulinski@intel.com,
-        pmenzel@molgen.mpg.de, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH iwl-next v4 3/3] igb: allow configuring RSS key via ethtool set_rxfh
-Date: Sun, 25 Jan 2026 13:12:37 +0000
-Message-ID: <20260125131327.4469-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260120093441.70075-8-takkozu@amazon.com>
-References: <20260120093441.70075-8-takkozu@amazon.com>
+	s=arc-20240116; t=1769349283; c=relaxed/simple;
+	bh=zcROzgu/7aDchbNG5QLNl5UGJBX13jos71p+rtTOFOU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jp0nnqeJj39hLNJl0fr+jJgW06vXQRu/Z8MzUHTtnKoCYrM5FoYBWq9WRKvvQpMRaj9OCa58LkH5F/ZmnP/y1A550e3wTK+uOdSqlhoHh+DqVqLlkKVfMFlyzh+sGJrp+lPtyg9qlZ8SKGG1mRQc04g0oNSs16QV8hZmGcX70ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from localhost.localdomain (unknown [36.112.3.223])
+	by APP-03 (Coremail) with SMTP id rQCowAAnDOOFIHZp7ZOsBg--.946S2;
+	Sun, 25 Jan 2026 21:54:13 +0800 (CST)
+From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	boon.leong.ong@intel.com
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] fix a potential memory leak in stmmac_xdp_enable_pool()
+Date: Sun, 25 Jan 2026 21:54:12 +0800
+Message-Id: <20260125135412.2070798-1-lihaoxiang@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,164 +66,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAAnDOOFIHZp7ZOsBg--.946S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF43Xw4kWFWUJrWkAr4ruFg_yoWDZFX_Ka
+	12vrnxXa15JF4jkw45Gr43ZryI9F1kur1v9F42va9xCFZYgFZxXFZ8ur95AF13W34rZFyD
+	Gws7A34xA347tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3xFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+	1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+	C2KfnxnUUI43ZEXa7sRRKZX5UUUUU==
+X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiCRASE2l1qZiRLwAAsL
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,lunn.ch,google.com,redhat.com,foss.st.com,intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-253173-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253174-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[lihaoxiang@isrc.iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 15C408097D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,isrc.iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: 80B7280D7B
 X-Rspamd-Action: no action
 
-On Tue, 20 Jan 2026 18:34:40 +0900, Takashi Kozu wrote:
+In stmmac_xdp_enable_pool(), if stmmac_xsk_wakeup() fails,
+the memory allocated by xsk_pool_dma_map() should be released.
+Add xsk_pool_dma_unmap() to do so.
 
-> Change igc_set_rxfh() to accept and save a userspace-provided
-> RSS key. When a key is provided, store it in the adapter and write the
-> E1000 registers accordingly.
-> 
-> This can be tested using `ethtool -X <dev> hkey <key>`.
-> 
-> Signed-off-by: Takashi Kozu <takkozu@amazon.com>
-> ---
->  drivers/net/ethernet/intel/igb/igb.h         |  1 +
->  drivers/net/ethernet/intel/igb/igb_ethtool.c | 49 +++++++++++---------
->  drivers/net/ethernet/intel/igb/igb_main.c    |  3 +-
->  3 files changed, 30 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-> index 8c9b02058cec..2509ec30acf3 100644
-> --- a/drivers/net/ethernet/intel/igb/igb.h
-> +++ b/drivers/net/ethernet/intel/igb/igb.h
-> @@ -657,6 +657,7 @@ struct igb_adapter {
->  	u32 rss_indir_tbl_init;
->  	u8 rss_indir_tbl[IGB_RETA_SIZE];
->  	u8 rss_key[IGB_RSS_KEY_SIZE];
-> +	bool has_user_rss_key;
+Fixes: bba2556efad6 ("net: stmmac: Enable RX via AF_XDP zero-copy")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Hi Kozu-san.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.c
+index d7e4db7224b0..7d89d6066ea3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.c
+@@ -48,8 +48,10 @@ static int stmmac_xdp_enable_pool(struct stmmac_priv *priv,
+ 		napi_enable(&ch->rxtx_napi);
+ 
+ 		err = stmmac_xsk_wakeup(priv->dev, queue, XDP_WAKEUP_RX);
+-		if (err)
++		if (err) {
++			xsk_pool_dma_unmap(pool, STMMAC_RX_DMA_ATTR);
+ 			return err;
++		}
+ 	}
+ 
+ 	return 0;
+-- 
+2.25.1
 
-While preparing for testing, I noticed that now 'has_user_rss_key' is
-not necessary.
-
-Since netdev_rss_key_fill() is called in igb_sw_init() and igb_sw_init()
-is called only once for the adapter's lifetime, adapter->rss_key
-wouldn't be changed except for user-intended change.
-
-I'd drop that flag and related code (see below)
-
->  
->  	unsigned long link_check_timeout;
->  	int copper_tries;
-> diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> index b387121f0ea7..1db9c2447c91 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> @@ -3357,35 +3357,40 @@ static int igb_set_rxfh(struct net_device *netdev,
->  	u32 num_queues;
->  
->  	/* We do not allow change in unsupported parameters */
-> -	if (rxfh->key ||
-> -	    (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-> -	     rxfh->hfunc != ETH_RSS_HASH_TOP))
-> +	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-> +	    rxfh->hfunc != ETH_RSS_HASH_TOP)
->  		return -EOPNOTSUPP;
-> -	if (!rxfh->indir)
-> -		return 0;
->  
-> -	num_queues = adapter->rss_queues;
-> +	if (rxfh->indir) {
-> +		num_queues = adapter->rss_queues;
->  
-> -	switch (hw->mac.type) {
-> -	case e1000_82576:
-> -		/* 82576 supports 2 RSS queues for SR-IOV */
-> -		if (adapter->vfs_allocated_count)
-> -			num_queues = 2;
-> -		break;
-> -	default:
-> -		break;
-> -	}
-> +		switch (hw->mac.type) {
-> +		case e1000_82576:
-> +			/* 82576 supports 2 RSS queues for SR-IOV */
-> +			if (adapter->vfs_allocated_count)
-> +				num_queues = 2;
-> +			break;
-> +		default:
-> +			break;
-> +		}
->  
-> -	/* Verify user input. */
-> -	for (i = 0; i < IGB_RETA_SIZE; i++)
-> -		if (rxfh->indir[i] >= num_queues)
-> -			return -EINVAL;
-> +		/* Verify user input. */
-> +		for (i = 0; i < IGB_RETA_SIZE; i++)
-> +			if (rxfh->indir[i] >= num_queues)
-> +				return -EINVAL;
->  
->  
-> -	for (i = 0; i < IGB_RETA_SIZE; i++)
-> -		adapter->rss_indir_tbl[i] = rxfh->indir[i];
-> +		for (i = 0; i < IGB_RETA_SIZE; i++)
-> +			adapter->rss_indir_tbl[i] = rxfh->indir[i];
-> +
-> +		igb_write_rss_indir_tbl(adapter);
-> +	}
->  
-> -	igb_write_rss_indir_tbl(adapter);
-> +	if (rxfh->key) {
-> +		adapter->has_user_rss_key = true;
-
-here
-
-> +		memcpy(adapter->rss_key, rxfh->key, sizeof(adapter->rss_key));
-> +		igb_write_rss_key(adapter);
-> +	}
->  
->  	return 0;
->  }
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index c703011b19ec..8dab133296ca 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -4051,7 +4051,8 @@ static int igb_sw_init(struct igb_adapter *adapter)
->  	pci_read_config_word(pdev, PCI_COMMAND, &hw->bus.pci_cmd_word);
->  
->  	/* init RSS key */
-> -	netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
-> +	if (!adapter->has_user_rss_key)
-> +		netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
-
-and this diff.
-
->  
->  	/* set default ring sizes */
->  	adapter->tx_ring_count = IGB_DEFAULT_TXD;
-> -- 
-> 2.52.0
 
