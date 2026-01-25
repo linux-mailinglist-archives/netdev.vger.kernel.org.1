@@ -1,229 +1,199 @@
-Return-Path: <netdev+bounces-253150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MhaIqr2dWlBKAEAu9opvQ
-	(envelope-from <netdev+bounces-253150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 11:55:38 +0100
+	id YFH2OZD5dWmwKAEAu9opvQ
+	(envelope-from <netdev+bounces-253151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 12:08:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC34F8021D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 11:55:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B728026F
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 12:08:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCB423007C8F
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 10:55:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3F96A3005E87
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 11:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AEB3191B1;
-	Sun, 25 Jan 2026 10:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E759B318135;
+	Sun, 25 Jan 2026 11:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GuJYlEOP"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="Y0ZMhF/s"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011001.outbound.protection.outlook.com [40.93.194.1])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEC4217723;
-	Sun, 25 Jan 2026 10:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769338533; cv=fail; b=KG+jjoiJFifXBz2f9BZjKrHwwDSWFQZhBD9k74EndoQBwcaM8zvqVQdzd8st5lOYTntEa0reGs20peBIPkl38hEnXpPhl3YhYRYes8BzowBOzC90e2t0sK8tfVfzOtJqowq/I6rPZWciXtSggCGuhWmRdPDjKBnP49IxzeEPmgQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769338533; c=relaxed/simple;
-	bh=RJGzMkFIFR2zPUPIWjviKtQV6q/Lf5BnLInal9DceRY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QI4Yva6pisF4LQxMzyLvUfRvdc6zstZrAYo1UFwWpII4DGZ4o+BVyRXyexEj9WTfjOOK23tFMEpu6odkTMfOL6idLEGYowflpglhl6LN91760sEOt9Npiqc6nfmjalCoIrxGlfdQ17ZHV0ZFZFANvfU+6Kado8Bsopiv/yYY//4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GuJYlEOP; arc=fail smtp.client-ip=40.93.194.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ybXIKWyl4LpOelCG/SnVu48GxB64KpCslRlpqXIS1QWjetzvJFZ+6SBwl4yuLNoQYdWcNhO/L2teBAhPQLGn0jT0ce3d930zmdF4vRUpvywUL6gFXI61+kZQ+wK67u9aEPO43P7+w+lAtp2llShIV79AsmxwrnXUbrZ3Nzukz8ZzT351j9q9wmD/XKsO+AvONGXjYM3N1iqzRP2cnihmhdAOhzX91awyS8q4XUEBOdUAZH8NDVDqLIh1wIFhMYzfITb4Tq5nWWizUrdAkY6rtdX5s+Q2D+eNWQavJ9Hhc7tOBmxSPrwJ65pwYi/HDgxH4hlbvVbAYr/qQRr6AWuunQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dyhUnDulX+2Ky/e0R+IqVrRfEYC5LxKQr/l/Q/UkzIQ=;
- b=PHnPoDE9ydeVov/DxGkorz1XXuU4SPhFwi09NK3DBCIpdYDe8EcuRo1quO5iUSUJhQ0Wu7KhYdg+R96c6zFcP1oQgKImJDfEqJ0WYzRE8iVTDdcmjOORloPzTQsH2siq+elt92tuWUvblU6wLYI27ncvkqD7aX+lWBxlcYQ+LrHOqUsyg5Uxx9oUII3QfuoB3p0Fo8mwFzAUF6ieUpoeclTlrHp4FmZc/Sd/IS7tAzdTYmvyE4MoMkhz7Y9wIHqWu36RTq/eihjGz7e8lffs+FZ/qCQNtzIJpe3eaJLzl2uFqDFZ2j6TwPHciZ3uC17MsHBbt6G8NUmKueGyFXUZhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dyhUnDulX+2Ky/e0R+IqVrRfEYC5LxKQr/l/Q/UkzIQ=;
- b=GuJYlEOP8VtsSLkJOt9gmpkt5wsdVZhEts1Jqs67ZDF6UzJtV/1RhN33GYuulxS9iGDqrhga9+KKHq6f9uiSWD11F0gG8ltl36wB979/mCYAy5Th+jQSDTKiT+yNYM+p/RRAuR4O8AWLxaD1r7C8kiJjcxVrJ2OqLLaYkhGfiX0UVFVDJFkoM9k/FZzHaGuBEGO/2d08sv/Ys64sb8n5ehz5HeKF0GEUz5HKEDqBPcaW5zLFDblJ6WLtMo6N8if0c+PxbL4hplFWTXveqWixcWcSiXjy1bhUB53YQA2Txwl7vaDm4hoa2pD3Db35zu+wwaz+5/whnRNTjvmohxq/uQ==
-Received: from SJ0PR03CA0152.namprd03.prod.outlook.com (2603:10b6:a03:338::7)
- by PH0PR12MB999113.namprd12.prod.outlook.com (2603:10b6:510:38f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.14; Sun, 25 Jan
- 2026 10:55:28 +0000
-Received: from SJ5PEPF000001CE.namprd05.prod.outlook.com
- (2603:10b6:a03:338:cafe::89) by SJ0PR03CA0152.outlook.office365.com
- (2603:10b6:a03:338::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.14 via Frontend Transport; Sun,
- 25 Jan 2026 10:54:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SJ5PEPF000001CE.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Sun, 25 Jan 2026 10:55:27 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 25 Jan
- 2026 02:55:25 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Sun, 25 Jan 2026 02:55:24 -0800
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Sun, 25 Jan 2026 02:55:21 -0800
-From: Gal Pressman <gal@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Joe Damato
-	<joe@dama.to>, Stanislav Fomichev <sdf@fomichev.me>,
-	<linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Nimrod Oren
-	<noren@nvidia.com>
-Subject: [PATCH net-next v2] selftests: net: fix wrong boolean evaluation in __exit__
-Date: Sun, 25 Jan 2026 12:55:24 +0200
-Message-ID: <20260125105524.773993-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D597130CDBD;
+	Sun, 25 Jan 2026 11:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769339276; cv=none; b=M1k9f2v8lLyeZF6WyOD9tC4yQ7hR8yk5kMsmcEXJC+zCnmWaSqHpKavBEZYEy1IA2sqT/Y9MNd0TcpikyXdq2MJFyzc8NZ1yDJd+AluyMvGKnH7jswwtvFu4VC+xncjolbTBHCFELdmEVwzdIGbDEAu4s2+9zNYcee/JlQPVYPU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769339276; c=relaxed/simple;
+	bh=E461urgd8LlcikGl8eKj3Xspa2K6GJCUSjp/yZOrZeo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=I1Zqgt00KUudRSILzFra3W8TRNY/+C7nCRlFsGuE3hNSU8jbqbU8PbxN5n6qF2sj2ApS6QOlcxNmK1m6Y7kwb1DuI2QdKpdSsOwU1+fBUbF5TZVH5O+3ptbtMipN3msO+rkTRbCJ+e0Ol51c94lXZSNVQJQJpcG70VVIg35/t8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=Y0ZMhF/s; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=Y0ZMhF/s;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60PB7Jtr1581266
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Sun, 25 Jan 2026 11:07:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1769339239; bh=ZbYWvdv5K7Sk5v0eLu0u+WMvL3Pp0afi40nSL4j2EOY=;
+	h=From:To:Cc:Subject:References:Date:Message-ID:From;
+	b=Y0ZMhF/sxHsKgSIKmMfvN11dHrexrylwr+GwntN+Hq5mngtcsCM/C2Q9yDkZ4Fl9d
+	 fD4nvbmG7d3HuPylmJuoceZi81B0Br1Hg8f0RlVoyGPi9k4y/WvFK2A8BxLehacBqr
+	 3ncCqDTKfvpNe079rIjwp6p+Mt2xskvJbimDhQlQ=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60PB7J583885267
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Sun, 25 Jan 2026 12:07:19 +0100
+Received: (nullmailer pid 1277942 invoked by uid 1000);
+	Sun, 25 Jan 2026 11:07:19 -0000
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/3] net: phy: air_en8811h: add Airoha
+ AN8811HB support
+In-Reply-To: <aff7a69c-e72f-4cb9-8fc5-6d8d1626ab4e@lunn.ch> (Andrew Lunn's
+	message of "Sat, 24 Jan 2026 19:33:31 +0100")
+Organization: m
+References: <20260123075817.1162068-1-bjorn@mork.no>
+	<20260123075817.1162068-3-bjorn@mork.no>
+	<4a3430cc-5a9a-414e-9dbf-cbc34c8fd019@lunn.ch>
+	<87ecnfj6kw.fsf@miraculix.mork.no>
+	<aff7a69c-e72f-4cb9-8fc5-6d8d1626ab4e@lunn.ch>
+Date: Sun, 25 Jan 2026 12:07:19 +0100
+Message-ID: <87a4y2hrx4.fsf@miraculix.mork.no>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CE:EE_|PH0PR12MB999113:EE_
-X-MS-Office365-Filtering-Correlation-Id: de69dfe1-00af-42a6-8cb6-08de5c004021
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700013|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xy1B9CXQKrTLIwWg/xxOT1Wa8pkINMTVxWccBv03rJ/0KEXRfre76xIXyFzo?=
- =?us-ascii?Q?9mSDyAaTdLfqxda9JqgA96am8ziZZ960awlEwk2vZl1WG7IPSZeVPJuP4Eim?=
- =?us-ascii?Q?0H8neCF50RaecosJbNyQMJElHcUGinr0dpOljodmRieVZR8eTn6wTk1+gYbX?=
- =?us-ascii?Q?Y+XAD7rumKLoEY2cwfE1fVUT762xj4vqaRAZ8IndS986/6ASXZ+a4S1RIzrY?=
- =?us-ascii?Q?hkszx+vXQtiViZs2pvNrL0+vS54AnA8UnmYEomZxRgjxDQ+2i4ltUQy/DDNK?=
- =?us-ascii?Q?wrhA6Jm3W44aeuLBke2syWpzGJSiZ/L1ob1GpaNyPCbfzxrbP3eLUHIFmr6I?=
- =?us-ascii?Q?16ke36JE13vYPWUllsGBMtQkA2n8qxGVWLOUDlzABpkGK8pZYoBLc2XvVIRw?=
- =?us-ascii?Q?U0I9cuiM+lMW/7lFP3++B+6C5SI5tkDtEQeQ2GNT6F3QK3GxGhhb2HJhPs87?=
- =?us-ascii?Q?WfHWguFX5KsNNobIF8x3B41n2T7wGdzjTf0cTvyzrZKQKodeeyOPIFlc3Lcm?=
- =?us-ascii?Q?mH8F2Fgez4Ap86isthZhsjSQItryR6rDnT9bh0tVe3LBYoX2699aBjZmAbgd?=
- =?us-ascii?Q?KBe37I8adWxDrZHCekwgo67VM+Jipd0mLAPeGm2j4apXUG0QYq78oJ9Alqb1?=
- =?us-ascii?Q?awYzyqfVXetahF2zy5KzXwMpEjslk5drIUceD78S6NtoKdXJ3aytIqhVS2Ez?=
- =?us-ascii?Q?Vh8r+PnClJOKzDzf4jzf+sq/NXrPXKKWe7GALXMKl2lRu/70ZxYMsZ37P4Mf?=
- =?us-ascii?Q?Uck1udhLCKGjatX1xxrAhHxKRZfwaK5deQg+ykZIXaZQ8yRwIHf2V6zVC07W?=
- =?us-ascii?Q?XeHkNMJWBXa0pAtvoTE5yWvgE8GfewPpsYP/oj8Z5acjXaQ5ROhvniGhw1TL?=
- =?us-ascii?Q?BkudNmbvmWfUrl+T717BcEtc+SJ5zrCRBLJLKkfip4RUl+ZAkave8uXL75M/?=
- =?us-ascii?Q?0WJp53n+26papoYUk+uX0KrnDLckTPpPtlK1N+uPAuGbQUU6p+FUNId1TutY?=
- =?us-ascii?Q?hLsRtrd1PAaLpL8VbZ9mGwkgKGfL394mzPmA0Yidez7z82Zrou+jE45SNNvJ?=
- =?us-ascii?Q?Z8D9xQuFGw1ZaVa/2qeHUA4XO/ylfPdsGMn+hY0K95TK3VK2o5Sa6UWqWEJc?=
- =?us-ascii?Q?1+xjb3Y2S/i5uYqWtOuEVbawWkYaPIwJgkf8Uu3Jq7fWYxXVj2lG0D6ZpjU1?=
- =?us-ascii?Q?1/YqM7CnLOQYR/CyPFrHva5sAq1fc3IjqIhARpC+Dj2WtwYeAXeJ/iRSqWO2?=
- =?us-ascii?Q?j2cdsJNFyutQ3aeQM/otMBJLG9f5skQx0bhv2YBoR2VI+ZOe5gDeM5tARkBX?=
- =?us-ascii?Q?SjolJI1IF4xaB7XlFx8NQsyBo6fk6PV46FouKNMWC21Hxn0QEkEkehLmhdMn?=
- =?us-ascii?Q?mi+XU6QNIbSRKA8bRJ3M5Rb9H58YzU7DdhmXfgeUgV23m4sJ83Om9ClcSXh4?=
- =?us-ascii?Q?+3G5RInLiuTnOI484u2twCjkVVwGkxDGCPxOV8aUtXmRjxRtoXI4c5bJmonl?=
- =?us-ascii?Q?BmnJgwmqWqAIQSMbCgU9FvUNPbj+eoOcAPQb94cvq94iG5cbB3aFSNTxVfZT?=
- =?us-ascii?Q?kPiSGkwYiQ+tCVe/uX9fbZHx6Q7sR+1sPEzPq2rG9Az77RnZARHyqfisO5fh?=
- =?us-ascii?Q?sobJywOhHmgVP3ITTOyyBt3B3i3NRvBzHZfkfg7P6zWMHyYCRPZp2clAFxus?=
- =?us-ascii?Q?Y+Q5Qg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2026 10:55:27.8298
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de69dfe1-00af-42a6-8cb6-08de5c004021
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CE.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB999113
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-253150-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,makrotopia.org,nxp.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-253151-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[mork.no:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: DC34F8021D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mork.no:dkim]
+X-Rspamd-Queue-Id: 52B728026F
 X-Rspamd-Action: no action
 
-The __exit__ method receives ex_type as the exception class when an
-exception occurs. The previous code used implicit boolean evaluation:
+Andrew Lunn <andrew@lunn.ch> writes:
+> On Sat, Jan 24, 2026 at 05:53:03PM +0100, Bj=C3=B8rn Mork wrote:
+>> Andrew Lunn <andrew@lunn.ch> writes:
+>>=20
+>> >> +#define AN8811HB_GPIO_OUTPUT		0x5cf8b8
+>> >> +#define   AN8811HB_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
+>> >
+>> >> +	/* Configure led gpio pins as output */
+>> >> +	ret =3D air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
+>> >> +				      AN8811HB_GPIO_OUTPUT_345,
+>> >> +				      AN8811HB_GPIO_OUTPUT_345);
+>> >
+>> > The code/comment probably does not describe what is actually happening
+>> > here. My _guess_ is you are setting a pinmux, disconnecting the pins
+>> > from the GPIO controller and connecting them to the LED controller.
+>>=20
+>> Possibly.  This code is copied from the out-of-tree vendor driver.  We
+>> already have similar code and comment in the en8811h probe:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/driv=
+ers/net/phy/air_en8811h.c#n959
+>>=20
+>> The register addresses and layouts are suspiciously similar:
+>>=20
+>> #define EN8811H_GPIO_OUTPUT		0xcf8b8
+>> #define   EN8811H_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
+>>=20
+>> Without any docs, or a way to test this particular feature, I
+>> believe the safest option is to assume that the vendor driver is
+>> correct.  Can't start guessing no matter how tempting it is :-)
+>
+> The writing of the value to the register is likely correct. I just
+> think all the names and comments are wrong.
+>
+> Maybe using magic numbers in this case is actually better?
 
-    terminate = self.terminate or (self._exit_wait and ex_type)
-                                                   ^^^^^^^^^^^
+I agree that it would probably be just as good here.  But I really don't
+want to make unnecessary changes to the existing EN8811H code.  Trying
+hard to modify as little as possible of that in this series.  And I
+believe it's always best to keep the style of similar code blocks inside
+as single file/driver.
 
-In Python, the and operator can be used with non-boolean values, but it
-does not always return a boolean result.
+So unless this is important, I'd prefer to keep the macros and comment.
+It is what we have had so far for EN8811H.
 
-This is probably not what we want, because 'self._exit_wait and ex_type'
-could return the actual ex_type value (the exception class) rather than
-a boolean True when an exception occurs.
+> And describe the intent of the code in more general terms, allow the
+> pins to be used to driver LEDs.
+>
+>> I have no other docs either.  The code is based solely on the vendor
+>> driver.  But trying to reuse as much as possible of the existing en8811h
+>> driver instead of duplicating it like the vendor did.
+>
+> That is typical of vendors, and i agree with your strategy,.
+>
+>> I have two almost identical boards with this phy connected to a Mediatek
+>> MT7988D SoC.  I can test, and have tested, the features exposed by those
+>> boards.  But this is obviously a limited test environment.  There are
+>> for example no port LEDs on any of the boards.
+>
+> So you have no idea if the LEDs actualy blink with traffic, show link
+> state etc?
 
-Use explicit `ex_type is not None` check to properly evaluate whether
-an exception occurred, returning a boolean result.
+Correct.  I can only test that this code doesn't cause any obvious harm
+to other functions.
 
-Reviewed-by: Nimrod Oren <noren@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
----
-Changelog -
-v1->v2: https://lore.kernel.org/all/20260120124733.604590-1-gal@nvidia.com/
-* Target net-next and remove Fixes (Jakub).
----
- tools/testing/selftests/net/lib/py/utils.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The options, as I see them, are either
+a) dropping this functionality from the driver until someone is able to
+   test and adds it back, or
+b) keep it in the hope that it works, until someone is able to test and
+   either verifies or fixes the code.  Including fixups of the macros
+   and comment if/when we get docs
 
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index 106ee1f2df86..dc1db78b5304 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -137,7 +137,7 @@ class bkg(cmd):
- 
-     def __exit__(self, ex_type, ex_value, ex_tb):
-         # Force termination on exception
--        terminate = self.terminate or (self._exit_wait and ex_type)
-+        terminate = self.terminate or (self._exit_wait and ex_type is not None)
-         return self.process(terminate=terminate, fail=self.check_fail)
- 
- 
--- 
-2.40.1
+I believe that b) is more likely to succeed, which is why I chose to
+include it.
 
+
+Bj=C3=B8rn
 
