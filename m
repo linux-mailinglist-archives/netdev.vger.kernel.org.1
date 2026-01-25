@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-253178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 14bINZo/dmm6OAEAu9opvQ
-	(envelope-from <netdev+bounces-253178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:06:50 +0100
+	id iF4TGsM/dmm6OAEAu9opvQ
+	(envelope-from <netdev+bounces-253179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:07:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585188155D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:06:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CEE81582
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B3CDE3000FCB
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:06:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 78BB63004F79
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F35731A045;
-	Sun, 25 Jan 2026 16:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96C2324B38;
+	Sun, 25 Jan 2026 16:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zzxs8gHF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gULGtUVE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4894A07
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 16:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784A131A7E1
+	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 16:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769357208; cv=none; b=tfE78m0B+LQCdf633C9Veb5NPlzi+WG5Ucz0vaKrzXxF+6fEoqk1i9dzErMr2wN37PuHFOk7aqKY5Vn1aNJpiCYib93Kbv1Txcfir9Bw5fzlyo0+Hh/2KQp2QG4+xkrG9vqMQUYlMNprSx7cNQz+Un/QV4x992JWoAU4av77z3Y=
+	t=1769357247; cv=none; b=RnTNz2HYZPWh8c+UnUCS/G9MjXiGFj6fNAM4Px3klrr18frUUqk8ZY1v3uG/A2ivr1AXA333NIgBCBxwA2itPldeUnHtewDc9YIkLPevFU7KGjwnActhlGcLqhtoF/MbNN0kP2eZXQx50k1IL6JQSfPU0ogyHlrJJi3bDc4ucKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769357208; c=relaxed/simple;
-	bh=GSlQIT/+IJfCKmiinYtstHpEZeTo2NJEAuuwOFkTEzo=;
+	s=arc-20240116; t=1769357247; c=relaxed/simple;
+	bh=1JQUHjZYL59DmrAabDgnZXBTuRE0Rrr0TT0qVpO3zE4=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZnYGpqnP/mTDHtIO1kVQv/90nnBjMWRDaWjUBOUTv3vqKG5bozs6kUL+v267ypc0ObU5uasrJQ/uzyv8oU+J9lj3DMx7zYIw6by6bkSkG1b45bRAag/LuH8lBsD/u1AfoH2bz9Vbuvh6t0Sq5UIMogeC7QdxfLGD2xRE+0wRPf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zzxs8gHF; arc=none smtp.client-ip=170.10.133.124
+	 Content-Disposition:In-Reply-To; b=cLPV1PMlMkzpFoY38KsbxQZi+UN3LQBITPhimrEcM+k0niAACs7/ZYgQRiM0aVN3VQP17pQK6KbzTB0gXrsN/r8ud0lwv3Mp5mjgYgZPiLRjw5F8rNmUwMuyUIE4/TOoV5i4mS7auz2AHYh1SkTlrfYY1QLKg2b6lM4c4HdCn+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gULGtUVE; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769357205;
+	s=mimecast20190719; t=1769357245;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=6XHVeVhJgsFiFSaz4pxwz0WF8NA7U9e0c68zypE8Q6g=;
-	b=Zzxs8gHFoJgFTimprGxlocrDzFlW2yf8dc9dwzHn0Ql4AirrE/R0mJN4ry7z5NclGRzCye
-	65TqcmO8XfVDZSYtDXBqVAVBU0ek/iiFz2a43KBrGIEEuepu30W7Mz/M6QnxZ3udLaMttw
-	7iCJpxh05U6xbfs9Q9lu2mA0A3wxG1w=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=xB97zLe11SZtUlvoaULtcDCkHx3T3uK2AQMcqJMNJHc=;
+	b=gULGtUVEVg4D5DI5SEr38nTWHb3GhfRW7OyeemiWmx7r+2PyWeYsoKPq8Nw3D5pmxeFubl
+	DJ7KVxb3wknyVgE9l2od+p0ZdztJw+sxxSUl1fAQyRzHo1IoK1DNJ1fCSCrtKvbW6vJpds
+	dbHCYhI/dH03qhvMQZmauEkjiVcuxB4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-82-IolnCAo-OX6IbJfKHl6ZvQ-1; Sun,
- 25 Jan 2026 11:06:41 -0500
-X-MC-Unique: IolnCAo-OX6IbJfKHl6ZvQ-1
-X-Mimecast-MFC-AGG-ID: IolnCAo-OX6IbJfKHl6ZvQ_1769357199
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-MV5s2csbO0WMU3OsplZ8Kg-1; Sun,
+ 25 Jan 2026 11:07:22 -0500
+X-MC-Unique: MV5s2csbO0WMU3OsplZ8Kg-1
+X-Mimecast-MFC-AGG-ID: MV5s2csbO0WMU3OsplZ8Kg_1769357240
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 05828195608D;
-	Sun, 25 Jan 2026 16:06:39 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF0C119560B5;
+	Sun, 25 Jan 2026 16:07:19 +0000 (UTC)
 Received: from fedora (unknown [10.45.224.8])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 1F3C330001A7;
-	Sun, 25 Jan 2026 16:06:32 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 69D1B30001A7;
+	Sun, 25 Jan 2026 16:07:13 +0000 (UTC)
 Received: by fedora (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Sun, 25 Jan 2026 17:06:38 +0100 (CET)
-Date: Sun, 25 Jan 2026 17:06:31 +0100
+	oleg@redhat.com; Sun, 25 Jan 2026 17:07:19 +0100 (CET)
+Date: Sun, 25 Jan 2026 17:07:11 +0100
 From: Oleg Nesterov <oleg@redhat.com>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Alice Ryhl <aliceryhl@google.com>,
@@ -75,8 +75,8 @@ Cc: Alice Ryhl <aliceryhl@google.com>,
 	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
 	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
 	linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v2 0/7] don't abuse task_struct.group_leader
-Message-ID: <aXY_h8i78n6yD9JY@redhat.com>
+Subject: [PATCH v2 1/7] android/binder: don't abuse current->group_leader
+Message-ID: <aXY_ryGDwdygl1Tv@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,63 +85,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <aXY_h8i78n6yD9JY@redhat.com>
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253178-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oleg@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 585188155D
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oleg@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253179-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+]
+X-Rspamd-Queue-Id: B4CEE81582
 X-Rspamd-Action: no action
 
-Andrew, can you take these simple cleanups?
+Cleanup and preparation to simplify the next changes.
 
-The patches do not depend on each other, this series just removes
-the usage of ->group_leader when it is "obviously unnecessary".
+- Use current->tgid instead of current->group_leader->pid
 
-I am going to move ->group_leader from task_struct to signal_struct
-or at least add the new task_group_leader() helper. So I will send
-more tree-wide changes on top of this series.
+- Use the value returned by get_task_struct() to initialize proc->tsk
 
-Link to V1: https://lore.kernel.org/all/aTV1KYdcDGvjXHos@redhat.com/
-
-V2 doesn't differ, I only added the acks I got (thanks!).
-
-7/7 was not reviewed, but looks really trivial.
-
-Oleg.
+Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 ---
+ drivers/android/binder.c       | 7 +++----
+ drivers/android/binder_alloc.c | 2 +-
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
- drivers/android/binder.c                         |  9 ++++-----
- drivers/android/binder_alloc.c                   |  2 +-
- drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c |  2 +-
- drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c           |  5 +----
- drivers/gpu/drm/amd/amdkfd/kfd_process.c         | 10 ----------
- drivers/gpu/drm/panfrost/panfrost_gem.c          |  2 +-
- drivers/gpu/drm/panthor/panthor_gem.c            |  2 +-
- drivers/infiniband/core/umem_odp.c               |  4 ++--
- net/core/netclassid_cgroup.c                     |  2 +-
- 9 files changed, 12 insertions(+), 26 deletions(-)
+diff --git a/drivers/android/binder.c b/drivers/android/binder.c
+index 535fc881c8da..dea701daabb0 100644
+--- a/drivers/android/binder.c
++++ b/drivers/android/binder.c
+@@ -6046,7 +6046,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
+ 	bool existing_pid = false;
+ 
+ 	binder_debug(BINDER_DEBUG_OPEN_CLOSE, "%s: %d:%d\n", __func__,
+-		     current->group_leader->pid, current->pid);
++		     current->tgid, current->pid);
+ 
+ 	proc = kzalloc(sizeof(*proc), GFP_KERNEL);
+ 	if (proc == NULL)
+@@ -6055,8 +6055,8 @@ static int binder_open(struct inode *nodp, struct file *filp)
+ 	dbitmap_init(&proc->dmap);
+ 	spin_lock_init(&proc->inner_lock);
+ 	spin_lock_init(&proc->outer_lock);
+-	get_task_struct(current->group_leader);
+-	proc->tsk = current->group_leader;
++	proc->tsk = get_task_struct(current->group_leader);
++	proc->pid = current->tgid;
+ 	proc->cred = get_cred(filp->f_cred);
+ 	INIT_LIST_HEAD(&proc->todo);
+ 	init_waitqueue_head(&proc->freeze_wait);
+@@ -6075,7 +6075,6 @@ static int binder_open(struct inode *nodp, struct file *filp)
+ 	binder_alloc_init(&proc->alloc);
+ 
+ 	binder_stats_created(BINDER_STAT_PROC);
+-	proc->pid = current->group_leader->pid;
+ 	INIT_LIST_HEAD(&proc->delivered_death);
+ 	INIT_LIST_HEAD(&proc->delivered_freeze);
+ 	INIT_LIST_HEAD(&proc->waiting_threads);
+diff --git a/drivers/android/binder_alloc.c b/drivers/android/binder_alloc.c
+index 979c96b74cad..145ed5f14cdb 100644
+--- a/drivers/android/binder_alloc.c
++++ b/drivers/android/binder_alloc.c
+@@ -1233,7 +1233,7 @@ static struct shrinker *binder_shrinker;
+ VISIBLE_IF_KUNIT void __binder_alloc_init(struct binder_alloc *alloc,
+ 					  struct list_lru *freelist)
+ {
+-	alloc->pid = current->group_leader->pid;
++	alloc->pid = current->tgid;
+ 	alloc->mm = current->mm;
+ 	mmgrab(alloc->mm);
+ 	mutex_init(&alloc->mutex);
+-- 
+2.52.0
 
 
