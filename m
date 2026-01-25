@@ -1,163 +1,159 @@
-Return-Path: <netdev+bounces-253127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253128-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iok6A9eFdWm4FwEAu9opvQ
-	(envelope-from <netdev+bounces-253127-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 03:54:15 +0100
+	id GHO4IHGHdWn0FwEAu9opvQ
+	(envelope-from <netdev+bounces-253128-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 04:01:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7F97F895
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 03:54:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E387F8D1
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 04:01:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D23D300A61B
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 02:54:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74325300CC99
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 03:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508D31FBC8E;
-	Sun, 25 Jan 2026 02:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719FE21018A;
+	Sun, 25 Jan 2026 03:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MvMahlos"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMYtBfjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB90019B5B1
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 02:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.193
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769309650; cv=pass; b=Ty5s0k8pTM1K0HrcXVzNiZ9j9J00caOZFxOXJcyqcvadHn0iOZlR5ETFmmH7XCxpQ1zzSXGM4jXdjtM4F62eWKcMKwDnLVHNksXTdF3HD1BkUVOVk9L52OBy0yvu7QWpsEmos5svKGMxkcvjN1r5m6+no/blOm4YputX3kOMCiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769309650; c=relaxed/simple;
-	bh=IYHtsqgFcIUIvfYQbQe6IeYMlZr60r15jL45TpHiEIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k6AADAHQcXOMRV5GL5rSOJ37088dW9RSq3/sWR0TfnBcORijKd0Chrq+bL3e8YGs2Nv31SgZipceoiptMEb8JuNfkzJuEX3wgEv50mIfieuZsA0XJCMg2KvYm/fIGvttsAsmKboHEAu/k84sz/lzZkqA5EOtkM6BS6f5Ospp8Gk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MvMahlos; arc=pass smtp.client-ip=209.85.222.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8c6a50c17fdso403458385a.2
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 18:54:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769309648; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LiVQ64QXmU31Izrst8MVOyxJK1sWRO0rEU0oMmYRiBVSffA8P29GrJ4XRCJ+039Doh
-         cMtOY394j/Q7xV4YSfXGsHl0Vg+0kK4n7tc8Za0FFzrORjsuTT8acG7CNpcnJT6TOYYF
-         //QHWKAiM48krR12ShC+57fDUdNvaqB2FqgwOWE82zvOWJGyGJSVyIwF0Favc1PY0Yp7
-         xr+N1Ah5LILsOB7crGMtHyXDYZAs6k2dKcSK1fCUpSELLuotXd4VyyS3m/9IKDiCt9Uv
-         HBO4KDFFz6HG5i0t4WbiwF6AaKclGqmY19+UtksKUGQXvhgwT5zwK3/+wtQsirUnkSfS
-         kvBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=IYHtsqgFcIUIvfYQbQe6IeYMlZr60r15jL45TpHiEIQ=;
-        fh=LgeYnhBTpuS5moPSr1VlCSbe9iw7ciqYtrZ6UNByRR4=;
-        b=gMUGD5wBOZ7VHu0d/o/QqiSNzPqyLMICJyRGs/YmqaaNaMOf1XvQySv5wqcXfOAvLO
-         LaX6FXoXba2yfuIIvcTg7CtnBYzAvlM8+0E4v9xZhM0UPnhEZfKkqdBOt/dQx8TVwavk
-         VT+LmQgkcJzR1M3c4cNDJ6NA4YzG2yZR9M99yyeYi473+y9DqLO16XkqrdfIEIl/c5yx
-         6VwT/ruFE+Xk3tJ/Xsl77vemLp9E3JUid+saBuIc/5JjID0b28tIcAfRfxlkxwmxfBHw
-         1BFv9Ks59G/F/mPXRZHNvGIY2+7sFaE/36oDhLqynZUregZMoZSPrYGFnFLcXA+68tQn
-         83zg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769309648; x=1769914448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IYHtsqgFcIUIvfYQbQe6IeYMlZr60r15jL45TpHiEIQ=;
-        b=MvMahlosfmiu9qXX45IgvGREP0NfgTiEhyhG+av4sfaiIpgRXC7776EGKoKQsGtZpR
-         iSqHcisuY5TiLDSVFrZBYV50LwO0kU3mXEmIeTw0FRLlpUkVvCFD6S8M7eSk1oXC/iFo
-         IhLCWC9uax9v1QUjx5hDM683NIhifMuA3QyDAFiraEYwEqBemaMHg+TyEc3t4J4UtxaY
-         I5iAzvbhHBU2Xa2MnTlWOGMP7FxmD84A4DT0gE0QjbqqO64j4XyfDk7uSWS96zCETmIb
-         3cTOlrQa7/V8Sdf1Uo7wkQJasR11T/rYcV/5oOKkuvnXzZHJqpnGgLp9cb2KhRZmWP9N
-         HBTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769309648; x=1769914448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IYHtsqgFcIUIvfYQbQe6IeYMlZr60r15jL45TpHiEIQ=;
-        b=ouxysJ3zBo2CFutw8EUNY5pcdCLoSffclI3hlh0j0aQE2TZOaJnfty6Hcm+FD6DsEw
-         hyXTk/Z0nwL4LB8uGXe7jttLz+Tkhe2M9PzsoHd4RGFwUHbXn8KvVge+QJg2/WgmJdnA
-         lOzjN4pgeEAbIyNPd4MvIClbHZu3W+QALtf/ayjNFbxTKvweF1tGJk3vt1F5YJ+ohOxD
-         4zaGEV/LB0+eAoA4e8ZgkgR6j6F3dURMNHlJecTHbGpr/cWsOZRK6y64XokMBkVpfFQV
-         OqGj+4+G0lLnJTXBwA332n9AvisznJdClo6KlyhoJREBKSHZDSstqXOmh3UOu5nSx8Vp
-         9qdg==
-X-Gm-Message-State: AOJu0YyAR1gx9wrr1PRyDDg5umr3pd152wgXPWJmJfAWwwWJMXqCK7bA
-	agi8ZQs3aTPwXH9hiPhe/04NjCzzdEsqlYwJVMN76f8F3HLazz/f18heKK97rOIWFuJ5WrYwTJ/
-	DpaEBp2uGOEkeuIM23+bzpWm8xU8tlN8=
-X-Gm-Gg: AZuq6aJiqA9ghmOj8KKO97gMnqQwGaqcN3X+37WcoBdGvc2xdF6Jyh898MnTkQXI1Uz
-	K0jrudJycXTpeJJFpB5dTfegcOzrQ9XwxzfbMGMQCcGbrgque+GdT1w+tfL4d9u2jCMwE5gY4TP
-	EV6Sjy8Q2V8DLGWL29cEmBpQJK4uuFZYwmSowciBofwwhRRS1mK2jgDD1MaRiU5+PgEzyvroHz3
-	ckr909G3nsllcqrwgrlpmfkB+TOH+f+aiNbYRA/JycBq5mYVoiUeaLDDTv8DgyKygFOzB+pbrOp
-	3Ye3m6RriuTfc3jWq1WW7tFR/UgAW5N6n2Zuf6Kk5PqaAPoBPJXedUt1
-X-Received: by 2002:a05:622a:2c3:b0:501:4f3d:1469 with SMTP id
- d75a77b69052e-50314c55495mr7134931cf.52.1769309647832; Sat, 24 Jan 2026
- 18:54:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE9E26ACC;
+	Sun, 25 Jan 2026 03:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769310027; cv=none; b=WAzgjWsgFNxx+ZEScgflsB6xP7P7dvoYjDfXyKzGGXCtePTtg8wSAuB0HQbsKA7tDCsLAPpArebV4H+Gm3i2K6g0PwCbqZ0uWVv6bvsKO8lMAS+X0eyse0TBPIQJDxbxdXD+4ZbgV0N639Knb2EHnKBZQ4GXYmY1yGd/53ao2P8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769310027; c=relaxed/simple;
+	bh=YqaW9tz+7OsYDKVkNU3i0UCHGE6HGW7BFSYdk6LW+A8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WZvieczGCT4VF7hz0ueR99H1uZZJ2n57n//aEXSaTa+SWNn3H0RhDhM9rLMxBlFzZz3+CjV3J/U7z623zmYGKgMtXcSFKiTa7VFnGJXdcmZqR3xVANyGlCIPOZ/MMrMGhhxh4hE1zq8nZXRrl4DbgXDsAhmuktoz6gdsGfMQh1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMYtBfjf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9EE1C116D0;
+	Sun, 25 Jan 2026 03:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769310026;
+	bh=YqaW9tz+7OsYDKVkNU3i0UCHGE6HGW7BFSYdk6LW+A8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JMYtBfjfiyMgoj02Rkh8MCbwJzDsoMenbmosZc856oAqtb7nNGEtBwqeRY5jJ2bY7
+	 t44IWlPLfm8QE1QVfdX8/QyK+zNhn3mrFWsJMTNIg+4QSKgmmIthjKlqPtTpAboyfS
+	 Hp3CujO+vrFBJQDhif0rwxDFrN09ZTBu2gD7pn0OGC1mrc/aFkUtdYxZhp8uz9NU5y
+	 2nmnfDTOcbKPsjiyDiQcHG2vam7UzFdHgTX2+B4RzRZD06IvbJmXh+H2+zwCWO1/Nz
+	 LnI2GlozZYuERSG86K0ElBhjkyxEA5gbBDrSsbTRs8li2AUanq8XBNkF7NrivgGjFw
+	 hbfgP+ttBEYlg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EC0F3809A00;
+	Sun, 25 Jan 2026 03:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260124080136.75619-1-enelsonmoore@gmail.com> <8d17a810-9e74-4ef1-8fa7-3267a8678b40@lunn.ch>
-In-Reply-To: <8d17a810-9e74-4ef1-8fa7-3267a8678b40@lunn.ch>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Sat, 24 Jan 2026 18:53:57 -0800
-X-Gm-Features: AZwV_Qh5Nj-aIJJF_8HJO-NJrZ-96KaDX6vGZ_IV7_FiqKa5dzyv_xJzN9TZ2Uw
-Message-ID: <CADkSEUig7Pp66nDx5ch+txDfNcbLj1wRUbC3n4a4pBuc9mBb4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: usb: introduce usbnet_mii_ioctl helper function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Peter Korsgaard <peter@korsgaard.com>, Steve Glendinning <steve.glendinning@shawell.net>, 
-	Oliver Neukum <oneukum@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, Max Schulze <max.schulze@online.de>, 
-	=?UTF-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v13 00/13] bpf: fsession support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176931002209.3419928.12789468285524749357.git-patchwork-notify@kernel.org>
+Date: Sun, 25 Jan 2026 03:00:22 +0000
+References: <20260124062008.8657-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20260124062008.8657-1-dongml2@chinatelecom.cn>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com,
+ x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253128-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253127-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,linutronix.de,redhat.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 6A7F97F895
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 10E387F8D1
 X-Rspamd-Action: no action
 
-On Sat, Jan 24, 2026 at 10:48=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
-> You are doing the same as phy_do_ioctl(), but for the old mii
-> code. However, we also have phy_do_ioctl_running(). It might make
-> sense to add usbnet_mii_ioctl_running()?
+Hello:
 
-Hi, Andrew,
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-It makes sense in principle, but after applying my patch to smsc95xx
-to use phy_do_ioctl_running, smsc75xx is the only driver that would
-use such a function, so it would add complexity rather than removing
-it.
+On Sat, 24 Jan 2026 14:19:55 +0800 you wrote:
+> overall
+> -------
+> Sometimes, we need to hook both the entry and exit of a function with
+> TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
+> function, which is not convenient.
+> 
+> Therefore, we add a tracing session support for TRACING. Generally
+> speaking, it's similar to kprobe session, which can hook both the entry
+> and exit of a function with a single BPF program.
+> 
+> [...]
 
-Ethan
+Here is the summary with links:
+  - [bpf-next,v13,01/13] bpf: add fsession support
+    https://git.kernel.org/bpf/bpf-next/c/2d419c44658f
+  - [bpf-next,v13,02/13] bpf: use the least significant byte for the nr_args in trampoline
+    https://git.kernel.org/bpf/bpf-next/c/f1b56b3cbdb2
+  - [bpf-next,v13,03/13] bpf: change prototype of bpf_session_{cookie,is_return}
+    https://git.kernel.org/bpf/bpf-next/c/8fe4dc4f6456
+  - [bpf-next,v13,04/13] bpf: support fsession for bpf_session_is_return
+    https://git.kernel.org/bpf/bpf-next/c/27d89baa6da8
+  - [bpf-next,v13,05/13] bpf: support fsession for bpf_session_cookie
+    https://git.kernel.org/bpf/bpf-next/c/eeee4239dbb1
+  - [bpf-next,v13,06/13] bpf,x86: introduce emit_store_stack_imm64() for trampoline
+    https://git.kernel.org/bpf/bpf-next/c/37c7ba1b39c4
+  - [bpf-next,v13,07/13] bpf,x86: add fsession support for x86_64
+    https://git.kernel.org/bpf/bpf-next/c/98770bd4e6df
+  - [bpf-next,v13,08/13] libbpf: add fsession support
+    https://git.kernel.org/bpf/bpf-next/c/257c43688b14
+  - [bpf-next,v13,09/13] bpftool: add fsession support
+    https://git.kernel.org/bpf/bpf-next/c/85fc4be6d811
+  - [bpf-next,v13,10/13] selftests/bpf: add testcases for fsession
+    https://git.kernel.org/bpf/bpf-next/c/f7afef5617b6
+  - [bpf-next,v13,11/13] selftests/bpf: test bpf_get_func_* for fsession
+    https://git.kernel.org/bpf/bpf-next/c/a5533a6eaa5b
+  - [bpf-next,v13,12/13] selftests/bpf: add testcases for fsession cookie
+    https://git.kernel.org/bpf/bpf-next/c/8909b3fb23e2
+  - [bpf-next,v13,13/13] selftests/bpf: test fsession mixed with fentry and fexit
+    https://git.kernel.org/bpf/bpf-next/c/cb4bfacfb011
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
