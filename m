@@ -1,270 +1,325 @@
-Return-Path: <netdev+bounces-253123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id p8JOO59rdWmRFAEAu9opvQ
-	(envelope-from <netdev+bounces-253123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 02:02:23 +0100
+	id YA96ETh4dWnDFQEAu9opvQ
+	(envelope-from <netdev+bounces-253124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 02:56:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C637F69A
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 02:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3227F79E
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 02:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E83E300A8EB
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 01:02:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5F60300A616
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 01:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2210686329;
-	Sun, 25 Jan 2026 01:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246BF1ACEDE;
+	Sun, 25 Jan 2026 01:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YrudJ2l8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cl3EsP2s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05D93EBF20
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 01:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821E01A0712
+	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 01:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769302940; cv=none; b=fCBBDjuOZeu6sTWEk+MoI6r9MBRsssgVrWtnhCK4jRAcYNs2+bU/xnHpKilGRgGE1T08H+2CtCYXFSjjalrH8dLEvG+qkiWTJhi+8iTUp6eUmwMq+CMLirvItvMb/Bk1ymRlndEESVSvLD2V1BSomPuNZlQiBbQpe4h0nKAjI3g=
+	t=1769306162; cv=none; b=rO7P/IE98DDKi0ZlZEHexrc9E9eUmJRuhsXeEw9u9nTVnWdzhLCFffB/L/opOHd7deujDtadFCpNK4bdd0i5zma/NbMO26AAsE4DmK9drvSL95OZpWkb4i1YNmQDs9TYtX/CHl6OEqEkS7eyFsGgJXE4qU2r04Opw4x3CMvfOJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769302940; c=relaxed/simple;
-	bh=9ZTjT68rvCZ1yq/eCvHh2oIZ03Jta9I1WQRDjBvHH5Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=djTlodHBobyrAJMma++22ggKfFc/9AfIqsTW37kbKzSeVY4CQkeprnGWvQ8NKmYOx/WJMu1k981+/d2comjDnvrdn1RTbi50nldowif599Dlvf6KnFVUsF+5ESwjuWsdinZ4DFFvNXqpDweSeLHHBW087ILz2vfGX/n2h3mcTWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YrudJ2l8; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29f25e494c2so37061885ad.0
-        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 17:02:18 -0800 (PST)
+	s=arc-20240116; t=1769306162; c=relaxed/simple;
+	bh=czHtok8kdM+NFjQous0qO1iQS3e10Dwr/nFSfUrsxbs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uNjz24mbtBINIq8f+l0Bh2DUiZeo14tHx0+SQ1AGfOLOc8XtBeu1vgJyYjSeLgXPQdotFhXRQDgkzpB0lytRXf9FRQqyJBd0Ts5iD4tinU0iWEj0A9aDyGUJYn2o+viuYa7rKc1lcC4mRWyFyn3AR/i+u9SV2UpVpWdvldVjcFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cl3EsP2s; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-5028fb9d03bso32446991cf.3
+        for <netdev@vger.kernel.org>; Sat, 24 Jan 2026 17:56:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769302938; x=1769907738; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RX8RX2jk8ljzZ1deKCet546PZdgQS3CqCJ2Kl6Se5Vg=;
-        b=YrudJ2l8JO7QBTd00+FzZ4Wqv+N4KIg3r2gpC5HvXikOSGl1bgL52PUMH2lFdl0ZNY
-         XWMBfM1RcSD5KmRLpMl07zMp8eFDDFzBNZZ1jLQH61vJb0DV1ym42qvw0sP9cUDfgRzh
-         AwQlPgN+8FRrR0eCBU/kxShW7+yf65kR2KrjRwZDtj3xHsV2v6vWum1116EdyhjywyJ9
-         HXJR5v838kDpCRtokemH9SdDAvVMkPUst+qKofraGGLCRXQMIc6i19RwNWMNQc39E/yG
-         82JiMcaFpu/TB/r4qwJmM0wKiZtTveUouQG1PfLc4wnwRVVgzpEY/xc5Xna5Rd+5hHmQ
-         WfAA==
+        d=gmail.com; s=20230601; t=1769306159; x=1769910959; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8JTWJ4sRGrlm2gY6MCzSC7MNQIM/QuydTD6Wv2h6Os=;
+        b=Cl3EsP2s1wXyPSSP/G+QUsKMs2NoPzM8R1hqDzGDqX+LcP6feXEdPrN4W76UZWRAP0
+         sxeHhIZx+hHd192F8jAj1Jky4S7OjYX4kNLtxZhuazulHzUv1qtBXqwvxB3yIut63FkV
+         lswMAi5nBPq0fDpxA6Tq7cte1I2g3Yjj/1GVexcaD4bDswrXWES4uWgWZ1/vwdWMJFut
+         bkO6gUlsaihRSHG1vR0A70OyJMuwdpkk1sgcclKHNW1Jt4SgT8CFiQ4e1VNjTwDjx+vB
+         Z46oL+ASi2EEa9sYexg8QrLocc638worFkPTwtlt0n6BaiSLy8nMT6i/7yNm3Qg18eNP
+         rsLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769302938; x=1769907738;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RX8RX2jk8ljzZ1deKCet546PZdgQS3CqCJ2Kl6Se5Vg=;
-        b=dx4Dz/vGY+pIqtjzs0rRDBmtrommTwWyI0PCdXVpqyaEgrowAgpBwGgHeB6zRGM+1P
-         Ke+pVrGxayxEJwQJGMqXb2klP6By5A/BozkQwKIWYCj2YwcUGF7HrBiG3iEABxWH7bMM
-         kdKo8EI+RPERK87lne3V6j5WA5AwS7fw80zSR8Gw6MHd5dd17MgXmeMvaH86kfXN7GVK
-         mmSL+mHlHGbTUfbQlWsFwrPDtrqdwKhcu4N38iXaOZkVSL/hNrcujHb7E84NTNf7Sy2y
-         0OideWC2RBPg+o4s1Hhfaq1gNYTR3qcJldZzzPVMzdrQ1l1qyp0jZMicryl6hkLSMclJ
-         PsUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeg+uI0S7eah1CBd3hTLZUb4dx8xI3DMq6YGOWyixrx8TofTsjAJEWWqO650wXdS/zfgDJQmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOMlyKhxtmV4rT+Hu9kxaWI8h0I2zpwl463AW+3EHXiy0aehOI
-	GbkjrbwMqlMRlobYg4r/HCd62FX+A584JATLV4cgyQ3qe0yHsJiGuFyQ9cdwkVFLqJAbv7O8M8Y
-	/C0gATw==
-X-Received: from pleu4.prod.google.com ([2002:a17:903:41c4:b0:2a7:885b:ea39])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b50:b0:2a7:5171:9220
- with SMTP id d9443c01a7336-2a84558a9f4mr3265785ad.14.1769302937838; Sat, 24
- Jan 2026 17:02:17 -0800 (PST)
-Date: Sun, 25 Jan 2026 00:59:28 +0000
+        d=1e100.net; s=20230601; t=1769306159; x=1769910959;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B8JTWJ4sRGrlm2gY6MCzSC7MNQIM/QuydTD6Wv2h6Os=;
+        b=Ob70hB/LqPY/ESHlKYgswXWlvxzJMpaI3WrHXJvndyD02iiBRZRHiymkjMgy8mSKAY
+         npqQLTkNSSE6PN50+3S5bZ5vv1iEecz6C1PqmNPEf8cqK2Z2zfJxjqySIlXBomPWDMlt
+         3YMG+EDQR4Ne8obTqGaSlaDnJwZTni/YyuGoFIW+LNB3HuCDhUsJKJoItghN3OqJOdP/
+         6HnwQIJ5QIyGexDqfzLoR8T26CBqddTW5vP3KqtEn89+U4xt3I/MaOjxixiYoA1gBWWz
+         Tbe4eBict2bcFq00zvsjnJWNz4hR4b5O0ejw85N/OkpLxp0cSivUV4neKhJuNGWyxCvS
+         KTDQ==
+X-Gm-Message-State: AOJu0YwPcpLD6BLA+EXxxGXpQSyVj9P2Cs1myibgpL4+ygP+gRtbhTAr
+	pAOJyzxRBYTe3X/mDgdWmLNhXSlBN7istJ/iZwndJ4kTOcffPZb+11Dp
+X-Gm-Gg: AZuq6aKaronjuCRCPo7qI3JQ2MB/XlZ5Ri73MGTnqK0n6ZYK04SpIcTh+ZgUEAjGj2N
+	RHA8V+uW7VHGBtJKfH59z4BprU/xMShNuifN07gbmoeUFMD1xRvj89Jycvq93IsqXYw/0gtmJEi
+	K01IMkSm8Mmg+VaK9Lk/mZIC6r648LHngkruUkHsJTMe0mLW6oUUdpDZsWRO4v9hal6/h3gXLWn
+	3ps6T9CoQXEqEcSI4hAaSTP8RMyoqcFGUYevTZkUxOi7GgTobWqhdVQSWLoDrbSsgMwt/BXhtaV
+	FMmBuu1K8/JurXlNVyag+QEzKi03c4Cjc0b4pjUrBHbGEhLKZHyBXTkEiFcylMHJoO1iyHhQnb3
+	16C4D2myVAoc6TQnawVx1LI6Oh8ieAnO9Bx2qJuKxq/n09g39PIXvoP3OASS2ojJcf1fNhQ52Pk
+	4xQAwcqs2MS/2DEP/p+u05
+X-Received: by 2002:a05:622a:315:b0:501:3d11:18cb with SMTP id d75a77b69052e-50314ceaa37mr5122341cf.73.1769306159399;
+        Sat, 24 Jan 2026 17:55:59 -0800 (PST)
+Received: from localhost.localdomain ([128.224.253.2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8949193cdc1sm49035636d6.47.2026.01.24.17.55.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Jan 2026 17:55:59 -0800 (PST)
+From: Kevin Hao <haokexin@gmail.com>
+Date: Sun, 25 Jan 2026 09:55:33 +0800
+Subject: [PATCH net v2] net: cpsw_new: Execute ndo_set_rx_mode callback in
+ a work queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260125010214.1572439-1-kuniyu@google.com>
-Subject: [PATCH v1 net] nfc: llcp: Fix memleak in nfc_llcp_send_ui_frame().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Samuel Ortiz <sameo@linux.intel.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+f2d245f1d76bbfa50e4c@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260125-bbb-v2-1-1547ffabc9d3@gmail.com>
+X-B4-Tracking: v=1; b=H4sIABR4dWkC/1WMyw7CIBREf6W5azE8FIwr/8N0UeC2vYkFAw3RN
+ Py7hJ2Z1ZmZnAMyJsIM9+GAhIUyxdBAngZw6xQWZOQbg+RScyEVs9Yy75Q211kb4Tm05zvhTJ9
+ ueULAHcZWrpT3mL7dXESf/iRFsBajLbdG3NTFP5ZtotfZxQ3GWusPN60RDJsAAAA=
+X-Change-ID: 20260123-bbb-dc3675f671d0
+To: netdev@vger.kernel.org
+Cc: Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org, 
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, linux-omap@vger.kernel.org
+X-Mailer: b4 0.14.2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253123-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-253124-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linux.intel.com,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nxp.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,f2d245f1d76bbfa50e4c];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: 03C637F69A
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email,nxp.com:email]
+X-Rspamd-Queue-Id: 5E3227F79E
 X-Rspamd-Action: no action
 
-syzbot reported various memory leaks related to NFC, struct
-nfc_llcp_sock, sk_buff, nfc_dev, etc. [0]
+Commit 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for
+IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.") removed the RTNL lock for
+IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP operations. However, this
+change triggered the following call trace on my BeagleBone Black board:
+  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/496
+  RTNL: assertion failed at net/8021q/vlan_core.c (236)
+  Modules linked in:
+  CPU: 0 UID: 997 PID: 496 Comm: rpcbind Not tainted 6.19.0-rc6-next-20260122-yocto-standard+ #8 PREEMPT
+  Hardware name: Generic AM33XX (Flattened Device Tree)
+  Call trace:
+   unwind_backtrace from show_stack+0x28/0x2c
+   show_stack from dump_stack_lvl+0x30/0x38
+   dump_stack_lvl from __warn+0xb8/0x11c
+   __warn from warn_slowpath_fmt+0x130/0x194
+   warn_slowpath_fmt from vlan_for_each+0x120/0x124
+   vlan_for_each from cpsw_add_mc_addr+0x54/0xd8
+   cpsw_add_mc_addr from __hw_addr_ref_sync_dev+0xc4/0xec
+   __hw_addr_ref_sync_dev from __dev_mc_add+0x78/0x88
+   __dev_mc_add from igmp6_group_added+0x84/0xec
+   igmp6_group_added from __ipv6_dev_mc_inc+0x1fc/0x2f0
+   __ipv6_dev_mc_inc from __ipv6_sock_mc_join+0x124/0x1b4
+   __ipv6_sock_mc_join from do_ipv6_setsockopt+0x84c/0x1168
+   do_ipv6_setsockopt from ipv6_setsockopt+0x88/0xc8
+   ipv6_setsockopt from do_sock_setsockopt+0xe8/0x19c
+   do_sock_setsockopt from __sys_setsockopt+0x84/0xac
+   __sys_setsockopt from ret_fast_syscall+0x0/0x5
 
-The leading log hinted that nfc_llcp_send_ui_frame() failed
-to allocate skb due to sock_error(sk) being -ENXIO.
+This trace occurs because vlan_for_each() is called within
+cpsw_ndo_set_rx_mode(), which expects the RTNL lock to be held.
+Since modifying vlan_for_each() to operate without the RTNL lock is not
+straightforward, and because ndo_set_rx_mode() is invoked both with and
+without the RTNL lock across different code paths, simply adding
+rtnl_lock() in cpsw_ndo_set_rx_mode() is not a viable solution.
 
-ENXIO is set by nfc_llcp_socket_release() when struct
-nfc_llcp_local is destroyed by local_cleanup().
+To resolve this issue, we opt to execute the actual processing within
+a work queue, following the approach used by the icssg-prueth driver.
 
-The problem is that there is no synchronisation between
-nfc_llcp_send_ui_frame() and local_cleanup(), and skb
-could be put into local->tx_queue after it was purged in
-local_cleanup():
-
-  CPU1                          CPU2
-  ----                          ----
-  nfc_llcp_send_ui_frame()      local_cleanup()
-  |- do {                       '
-     |- pdu = nfc_alloc_send_skb(..., &err)
-     |                          .
-     |                          |- nfc_llcp_socket_release(local, false, ENXIO);
-     |                          |- skb_queue_purge(&local->tx_queue);      |
-     |                          '                                          |
-     |- skb_queue_tail(&local->tx_queue, pdu);                             |
-    ...                                                                    |
-     |- pdu = nfc_alloc_send_skb(..., &err)                                |
-                                       ^._________________________________.'
-
-local_cleanup() is called for struct nfc_llcp_local only
-after nfc_llcp_remove_local() unlinks it from llcp_devices.
-
-If we hold local->tx_queue.lock then, we can synchronise
-the thread and nfc_llcp_send_ui_frame().
-
-Let's do that and check list_empty(&local->list) before
-queuing skb to local->tx_queue in nfc_llcp_send_ui_frame().
-
-[0]:
-[   56.074943][ T6096] llcp: nfc_llcp_send_ui_frame: Could not allocate PDU (error=-6)
-[   64.318868][ T5813] kmemleak: 6 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
-BUG: memory leak
-unreferenced object 0xffff8881272f6800 (size 1024):
-  comm "syz.0.17", pid 6096, jiffies 4294942766
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    27 00 03 40 00 00 00 00 00 00 00 00 00 00 00 00  '..@............
-  backtrace (crc da58d84d):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    __do_kmalloc_node mm/slub.c:5645 [inline]
-    __kmalloc_noprof+0x3e3/0x6b0 mm/slub.c:5658
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    sk_prot_alloc+0x11a/0x1b0 net/core/sock.c:2239
-    sk_alloc+0x36/0x360 net/core/sock.c:2295
-    nfc_llcp_sock_alloc+0x37/0x130 net/nfc/llcp_sock.c:979
-    llcp_sock_create+0x71/0xd0 net/nfc/llcp_sock.c:1044
-    nfc_sock_create+0xc9/0xf0 net/nfc/af_nfc.c:31
-    __sock_create+0x1a9/0x340 net/socket.c:1605
-    sock_create net/socket.c:1663 [inline]
-    __sys_socket_create net/socket.c:1700 [inline]
-    __sys_socket+0xb9/0x1a0 net/socket.c:1747
-    __do_sys_socket net/socket.c:1761 [inline]
-    __se_sys_socket net/socket.c:1759 [inline]
-    __x64_sys_socket+0x1b/0x30 net/socket.c:1759
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-BUG: memory leak
-unreferenced object 0xffff88810fbd9800 (size 240):
-  comm "syz.0.17", pid 6096, jiffies 4294942850
-  hex dump (first 32 bytes):
-    68 f0 ff 08 81 88 ff ff 68 f0 ff 08 81 88 ff ff  h.......h.......
-    00 00 00 00 00 00 00 00 00 68 2f 27 81 88 ff ff  .........h/'....
-  backtrace (crc 6cc652b1):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4979 [inline]
-    slab_alloc_node mm/slub.c:5284 [inline]
-    kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5336
-    __alloc_skb+0x203/0x240 net/core/skbuff.c:660
-    alloc_skb include/linux/skbuff.h:1383 [inline]
-    alloc_skb_with_frags+0x69/0x3f0 net/core/skbuff.c:6671
-    sock_alloc_send_pskb+0x379/0x3e0 net/core/sock.c:2965
-    sock_alloc_send_skb include/net/sock.h:1859 [inline]
-    nfc_alloc_send_skb+0x45/0x80 net/nfc/core.c:724
-    nfc_llcp_send_ui_frame+0x162/0x360 net/nfc/llcp_commands.c:766
-    llcp_sock_sendmsg+0x14c/0x1d0 net/nfc/llcp_sock.c:814
-    sock_sendmsg_nosec net/socket.c:727 [inline]
-    __sock_sendmsg net/socket.c:742 [inline]
-    __sys_sendto+0x2d8/0x2f0 net/socket.c:2244
-    __do_sys_sendto net/socket.c:2251 [inline]
-    __se_sys_sendto net/socket.c:2247 [inline]
-    __x64_sys_sendto+0x28/0x30 net/socket.c:2247
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 94f418a20664 ("NFC: UI frame sending routine implementation")
-Reported-by: syzbot+f2d245f1d76bbfa50e4c@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/697569c7.a00a0220.33ccc7.0014.GAE@google.com/T/#u
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.")
+Signed-off-by: Kevin Hao <haokexin@gmail.com>
+Cc: stable@vger.kernel.org
 ---
- net/nfc/llcp_commands.c | 17 ++++++++++++++++-
- net/nfc/llcp_core.c     |  4 +++-
- 2 files changed, 19 insertions(+), 2 deletions(-)
+Changes in v2:
+- Addresses the issue identified in the AI review [1]:
+  - Adds a netif_running() check in cpsw_ndo_set_rx_mode_work()
+  - Cancels the rx_mode_work in cpsw_ndo_stop()
 
-diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
-index e2680a3bef79..b652323bc2c1 100644
---- a/net/nfc/llcp_commands.c
-+++ b/net/nfc/llcp_commands.c
-@@ -778,8 +778,23 @@ int nfc_llcp_send_ui_frame(struct nfc_llcp_sock *sock, u8 ssap, u8 dsap,
- 		if (likely(frag_len > 0))
- 			skb_put_data(pdu, msg_ptr, frag_len);
+- Link to v1: https://lore.kernel.org/r/20260123-bbb-v1-1-176b0b71834d@gmail.com
+
+[1] https://netdev-ai.bots.linux.dev/ai-review.html?id=bd885e1e-1aed-4755-ad60-7150737ad0f5
+---
+Please note that the cpsw driver also has the same issue. If this resolution
+is acceptable, I will create another patch to fix the issue in cpsw.
+
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: linux-omap@vger.kernel.org
+---
+ drivers/net/ethernet/ti/cpsw_new.c  | 34 ++++++++++++++++++++++++++++++++--
+ drivers/net/ethernet/ti/cpsw_priv.h |  2 ++
+ 2 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+index ab88d4c02cbde76207f89cf433e2b383dcde6a83..a631df9691e06fef563da6276f8ee9358c4cf911 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -248,15 +248,23 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
+ 	return 0;
+ }
  
-+		spin_lock(&local->tx_queue.lock);
-+
-+		if (list_empty(&local->list)) {
-+			spin_unlock(&local->tx_queue.lock);
-+
-+			kfree_skb(pdu);
-+
-+			len -= remaining_len;
-+			if (len == 0)
-+				len = -ENXIO;
-+			break;
-+		}
-+
- 		/* No need to check for the peer RW for UI frames */
--		skb_queue_tail(&local->tx_queue, pdu);
-+		__skb_queue_tail(&local->tx_queue, pdu);
-+
-+		spin_unlock(&local->tx_queue.lock);
+-static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
++static void cpsw_ndo_set_rx_mode_work(struct work_struct *work)
+ {
+-	struct cpsw_priv *priv = netdev_priv(ndev);
++	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
+ 	struct cpsw_common *cpsw = priv->cpsw;
++	struct net_device *ndev = priv->ndev;
  
- 		remaining_len -= frag_len;
- 		msg_ptr += frag_len;
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index beeb3b4d28ca..444a3774c8e8 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -316,7 +316,9 @@ static struct nfc_llcp_local *nfc_llcp_remove_local(struct nfc_dev *dev)
- 	spin_lock(&llcp_devices_lock);
- 	list_for_each_entry_safe(local, tmp, &llcp_devices, list)
- 		if (local->dev == dev) {
--			list_del(&local->list);
-+			spin_lock(&local->tx_queue.lock);
-+			list_del_init(&local->list);
-+			spin_unlock(&local->tx_queue.lock);
- 			spin_unlock(&llcp_devices_lock);
- 			return local;
- 		}
++	if (!netif_running(ndev))
++		return;
++
++	rtnl_lock();
++	netif_addr_lock_bh(ndev);
+ 	if (ndev->flags & IFF_PROMISC) {
+ 		/* Enable promiscuous mode */
+ 		cpsw_set_promiscious(ndev, true);
+ 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
++		netif_addr_unlock_bh(ndev);
++		rtnl_unlock();
+ 		return;
+ 	}
+ 
+@@ -270,6 +278,16 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
+ 	/* add/remove mcast address either for real netdev or for vlan */
+ 	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
+ 			       cpsw_del_mc_addr);
++	netif_addr_unlock_bh(ndev);
++	rtnl_unlock();
++}
++
++static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
++{
++	struct cpsw_priv *priv = netdev_priv(ndev);
++	struct cpsw_common *cpsw = priv->cpsw;
++
++	queue_work(cpsw->cmd_wq, &priv->rx_mode_work);
+ }
+ 
+ static unsigned int cpsw_rxbuf_total_len(unsigned int len)
+@@ -813,6 +831,8 @@ static int cpsw_ndo_stop(struct net_device *ndev)
+ 
+ 	__hw_addr_ref_unsync_dev(&ndev->mc, ndev, cpsw_purge_all_mc);
+ 
++	cancel_work_sync(&priv->rx_mode_work);
++
+ 	if (cpsw->usage_count <= 1) {
+ 		napi_disable(&cpsw->napi_rx);
+ 		napi_disable(&cpsw->napi_tx);
+@@ -1398,6 +1418,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
+ 		priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
+ 		priv->emac_port = i + 1;
+ 		priv->tx_packet_min = CPSW_MIN_PACKET_SIZE;
++		INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
+ 
+ 		if (is_valid_ether_addr(slave_data->mac_addr)) {
+ 			ether_addr_copy(priv->mac_addr, slave_data->mac_addr);
+@@ -1976,6 +1997,13 @@ static int cpsw_probe(struct platform_device *pdev)
+ 	}
+ 	cpsw_split_res(cpsw);
+ 
++	cpsw->cmd_wq = create_singlethread_workqueue("cpsw_cmd_wq");
++	if (!cpsw->cmd_wq) {
++		dev_err(dev, "error initializing workqueue\n");
++		ret = -ENOMEM;
++		goto clean_cpts;
++	}
++
+ 	/* setup netdevs */
+ 	ret = cpsw_create_ports(cpsw);
+ 	if (ret)
+@@ -2042,6 +2070,7 @@ static int cpsw_probe(struct platform_device *pdev)
+ clean_unregister_notifiers:
+ 	cpsw_unregister_notifiers(cpsw);
+ clean_unregister_netdev:
++	destroy_workqueue(cpsw->cmd_wq);
+ 	cpsw_unregister_ports(cpsw);
+ clean_cpts:
+ 	cpts_release(cpsw->cpts);
+@@ -2068,6 +2097,7 @@ static void cpsw_remove(struct platform_device *pdev)
+ 		return;
+ 	}
+ 
++	destroy_workqueue(cpsw->cmd_wq);
+ 	cpsw_unregister_notifiers(cpsw);
+ 	cpsw_unregister_devlink(cpsw);
+ 	cpsw_unregister_ports(cpsw);
+diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
+index 91add8925e235c6cf5542fde11f3383b9234c872..8cdf4bff198fcc05436ff381a7e4326b3e3c27b1 100644
+--- a/drivers/net/ethernet/ti/cpsw_priv.h
++++ b/drivers/net/ethernet/ti/cpsw_priv.h
+@@ -362,6 +362,7 @@ struct cpsw_common {
+ 	struct net_device *hw_bridge_dev;
+ 	bool ale_bypass;
+ 	u8 base_mac[ETH_ALEN];
++	struct workqueue_struct *cmd_wq;
+ };
+ 
+ struct cpsw_ale_ratelimit {
+@@ -391,6 +392,7 @@ struct cpsw_priv {
+ 	u32 tx_packet_min;
+ 	struct cpsw_ale_ratelimit ale_bc_ratelimit;
+ 	struct cpsw_ale_ratelimit ale_mc_ratelimit;
++	struct work_struct rx_mode_work;
+ };
+ 
+ #define ndev_to_cpsw(ndev) (((struct cpsw_priv *)netdev_priv(ndev))->cpsw)
+
+---
+base-commit: ca3a02fda4da8e2c1cb6baee5d72352e9e2cfaea
+change-id: 20260123-bbb-dc3675f671d0
+
+Best regards,
 -- 
-2.52.0.457.g6b5491de43-goog
+Kevin Hao <haokexin@gmail.com>
 
 
