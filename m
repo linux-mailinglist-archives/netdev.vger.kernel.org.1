@@ -1,142 +1,138 @@
-Return-Path: <netdev+bounces-253185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253186-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yB6iKxNAdmm6OAEAu9opvQ
-	(envelope-from <netdev+bounces-253185-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:08:51 +0100
+	id QCtJMgdBdmm6OAEAu9opvQ
+	(envelope-from <netdev+bounces-253186-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:12:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B359815F2
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:08:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27DD981663
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:12:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DB30C3011A6D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:08:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2A2D30000B0
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DD1326942;
-	Sun, 25 Jan 2026 16:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377AE326924;
+	Sun, 25 Jan 2026 16:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7Fgla07"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LXbTQONU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49A21B4244
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 16:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E84318135;
+	Sun, 25 Jan 2026 16:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769357295; cv=none; b=gS89Kfw0RYGlQ1LJWt+GZVaw1NXeSBTnZ8gxf8MFyQPHpINOriEEvUxjxpuullmbMG8sXeKdTLhzN4788HW3d1paWKKVfCk4u1qvR0Dp+G1wzmIw1aCqsG7g7yW/er9585HDfklEK+f0mRZ4mWEiSXRhRPB8URZ/OUREDcfbL9Y=
+	t=1769357572; cv=none; b=QK2GDVS7JRCvVcNSH1xK9+lsUp77TDzSG3YNrGRL54GAFEAa581kz6H+0RH+JmntbS8ffUU5CMUHTmlFx3DIkisYNJji5GAPFpYmhI54sCMkbKG4Ru2j1Nj2UKUZWccEMKbv+Fqs03rnKsUI4mVUz7TEcvyG0K3so+FSGmc/6YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769357295; c=relaxed/simple;
-	bh=K2R9b0barWC68k/7xbhNUGCfm1zFHkjY7UaNg/NdOEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=lS6Cv0m+QDFnRmyGHsbKJgFNp1K0/afLBkde1Uz/8bxLsFVDLrcw8EMbZQFxiN/yz+WKkuCqNlYqrDqtb01IlRWMUcUtTfbwwVFxna4G0oTrnzvo4KrEHtEAukCIEjlqrxX4qQxbgtRdMTMc0UQQ3/pm9ZcDKaWYqJwVBofKrso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D7Fgla07; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769357292;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=vBKRDP8bqkordujGp7qy48QcPV4IJTrct7fsioyRbjk=;
-	b=D7Fgla07Olwx7OgrDKxpmUMUsSAYlpvMJiB0SxRmfNg99AsWbv5FJ1Ao+gz4CFJsVQY3s3
-	TPkgRaoRUBv72pkr4/D6wjyj8aVhn5pbhIVC61E+OoA3kFSKD7MolKQWCtn4LeEMxdUkuB
-	LeRfgHJwmGanMOhkInIS2NhVacMYkTQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-272-flqaROaMMQSqWeM4JnXa7g-1; Sun,
- 25 Jan 2026 11:08:09 -0500
-X-MC-Unique: flqaROaMMQSqWeM4JnXa7g-1
-X-Mimecast-MFC-AGG-ID: flqaROaMMQSqWeM4JnXa7g_1769357287
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 452B71956089;
-	Sun, 25 Jan 2026 16:08:07 +0000 (UTC)
-Received: from fedora (unknown [10.45.224.8])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 89E9F180049F;
-	Sun, 25 Jan 2026 16:08:01 +0000 (UTC)
-Received: by fedora (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Sun, 25 Jan 2026 17:08:06 +0100 (CET)
-Date: Sun, 25 Jan 2026 17:08:00 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Alice Ryhl <aliceryhl@google.com>,
-	Boris Brezillon <boris.brezillon@collabora.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Felix Kuehling <felix.kuehling@amd.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Steven Price <steven.price@arm.com>,
+	s=arc-20240116; t=1769357572; c=relaxed/simple;
+	bh=/MRFa+ksUtXOLYbtnhs8ngTi9AE+YCeO2EQ6syig3dI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R870UXPnadtYHx94FqZ5WiUekNhnorXhGlANuONLJ1XOxm5cA+7jzATsMs6holAHtnp7ABgJGo7L3X0rwVfVd5nwF08yOnVQV+jvWjPUTAqWSRfEXvrnoTYI6mOWD4V0o6C2uAiPEjHRXNnN+Uu2vfmJ6RCQtAHTcZ6VGgtMvmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LXbTQONU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=yFYTbKXLQNYZ18jNwg6Ic/NTRPunDNzNmi8acNRMIX8=; b=LX
+	bTQONUnK2y9RrfXtg+AHPtPV9W9L8l5BNZ45hRFWv3Yz1T+9qLlI+urJ7+3BiwjiG05KjIMtga5ZI
+	x460cvxc761DrfMVJ8LwzbTDjBW8mwxFG39881ZQvCcdpUuqTwkyx0xjfml46GPUg8HwMW7127pLH
+	yzu/RM3sCtbWtOM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vk2jG-004ceV-DT; Sun, 25 Jan 2026 17:12:46 +0100
+Date: Sun, 25 Jan 2026 17:12:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v2 7/7] netclassid: use thread_group_leader(p) in
- update_classid_task()
-Message-ID: <aXY_4NSP094-Cf-2@redhat.com>
+	Peter Korsgaard <peter@korsgaard.com>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	Oliver Neukum <oneukum@suse.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Max Schulze <max.schulze@online.de>,
+	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>
+Subject: Re: [PATCH net-next] net: usb: introduce usbnet_mii_ioctl helper
+ function
+Message-ID: <0a082885-5506-40d6-8871-056ef6cf3502@lunn.ch>
+References: <20260124080136.75619-1-enelsonmoore@gmail.com>
+ <8d17a810-9e74-4ef1-8fa7-3267a8678b40@lunn.ch>
+ <CADkSEUig7Pp66nDx5ch+txDfNcbLj1wRUbC3n4a4pBuc9mBb4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aXY_h8i78n6yD9JY@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADkSEUig7Pp66nDx5ch+txDfNcbLj1wRUbC3n4a4pBuc9mBb4Q@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253186-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oleg@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253185-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+]
-X-Rspamd-Queue-Id: 0B359815F2
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 27DD981663
 X-Rspamd-Action: no action
 
-Cleanup and preparation to simplify the next changes.
+On Sat, Jan 24, 2026 at 06:53:57PM -0800, Ethan Nelson-Moore wrote:
+> On Sat, Jan 24, 2026 at 10:48 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> > You are doing the same as phy_do_ioctl(), but for the old mii
+> > code. However, we also have phy_do_ioctl_running(). It might make
+> > sense to add usbnet_mii_ioctl_running()?
+> 
+> Hi, Andrew,
+> 
+> It makes sense in principle, but after applying my patch to smsc95xx
+> to use phy_do_ioctl_running, smsc75xx is the only driver that would
+> use such a function, so it would add complexity rather than removing
+> it.
 
-Signed-off-by: Oleg Nesterov <oleg@redhat.com>
----
- net/core/netclassid_cgroup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is not always about complexity. The mii subsystem is in Maintenance
+mode only. Has been for a decade or more. All development work is done
+in phylink and phylib. Ideally, drivers using mii should move over to
+phylib.
 
-diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
-index dff66d8fb325..db9a5354f9de 100644
---- a/net/core/netclassid_cgroup.c
-+++ b/net/core/netclassid_cgroup.c
-@@ -93,7 +93,7 @@ static void update_classid_task(struct task_struct *p, u32 classid)
- 	/* Only update the leader task, when many threads in this task,
- 	 * so it can avoid the useless traversal.
- 	 */
--	if (p != p->group_leader)
-+	if (!thread_group_leader(p))
- 		return;
- 
- 	do {
--- 
-2.52.0
+I don't actually expect many will, it requires a driver Maintainer who
+cares to do the work. It might however be an good "intro to kernel
+hacking" for newbies, since such USB dongles are cheap. And anybody
+doing such a conversion would likely learn a lot more than mindlessly
+fixing checkpatch and other tools warnings.
 
+usbnet_mii_ioctl_running() would be a hint to use
+phy_do_ioctl_running() with such a conversion.
+
+   Andrew
 
