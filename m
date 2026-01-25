@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-253143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0P9AJtnVdWn0IwEAu9opvQ
-	(envelope-from <netdev+bounces-253143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 09:35:37 +0100
+	id EHUDJxrWdWn0IwEAu9opvQ
+	(envelope-from <netdev+bounces-253144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 09:36:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7618005A
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 09:35:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06AD580073
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 09:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 889883002908
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 08:35:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2778E300CC26
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 08:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F79631815D;
-	Sun, 25 Jan 2026 08:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CCAA205E3B;
+	Sun, 25 Jan 2026 08:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUMxDSo0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNc69PHU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D5521A459
-	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 08:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3470246778
+	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 08:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769330130; cv=none; b=Yrv9I0e27c/P/Kzfj7BsG4ftwL0TaYLDgHtGlbL+sdZY/4TDpNCmKMAgbz+cL1eyX5i4LQRKq+PQqQPHpadQiL4eRD/qxptB84IPXFdTfZLXeAQ64gGAvyof0AHgMJUkCfDpvcW1RHfzUYA+I94/l0AK7jyjWzUsqHQwYcGZ8Jc=
+	t=1769330139; cv=none; b=vDpIJKsSEoZMoGaCUfmM2OY1ULXectBZJeDadVuSCK6knDRKVx0MJ1jbPRA4bPwqLskmZ7GZDqCHEJQRouWeUybGGZFYF++7c7EILU0a+x1X/znZ/srLFpVzM4cS4M9fCITiFqzz2cC6D0EQa8BmheLwHLF7Y/OSN9g5NsPK9Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769330130; c=relaxed/simple;
-	bh=GzBDLGBocitxdoam6aBT/6PlZGW+8mF1hp9l3EqP07U=;
+	s=arc-20240116; t=1769330139; c=relaxed/simple;
+	bh=a8/Jz4t+QSejf3DaIFPp2hGHMr0wpqyl7dtL1FKK188=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YF2Mn5rB5aW4L8ekVTW834RGwQMSguxYEaUC5FwWOZCkdIOLsvPdefL6Jpr3nKJJCFDjfO5FqHQPBXke06mrHGx2IFRT4ZEDAnmWxCVTogYNMQZ6dHbLjpKDZkM1d1wi6Zvv7BXafhGvU0ci6ab9xHUUI6w7V1+c1JcVRew+tZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUMxDSo0; arc=none smtp.client-ip=74.125.82.196
+	 MIME-Version; b=gjEBPHm2KGYGg39V/rPAJ9zHx6L1E2ftnQTufFVFy4K/AHJVRDNBq7LXWplrsM5jcpiiBEVslXOnxTGGLT4hmD+lOJIZI2UiLv1DQCohe0a+JgE/bhWpyDMpF0P4+EsWPDLkOm3VPPxZVF4jTE2M+0jlVZQMSDqjysd3mRVEOWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QNc69PHU; arc=none smtp.client-ip=74.125.82.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b720bb90d0so3181905eec.0
-        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 00:35:28 -0800 (PST)
+Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b7070acfdcso4010247eec.0
+        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 00:35:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769330128; x=1769934928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769330137; x=1769934937; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oNy2hBem/8NYXTwi6a7AXV3n4+qEbntRa2UCgw80QcU=;
-        b=DUMxDSo0Rj/9p5BKH1LkYjsfXNbe55QIP09v2MNOAtWgmiEgm0Ie3YVrKfJur3gzAS
-         LwvlpbRZ824j3snXTYPbT7J/uxyIUzr8ED2q3xvf64JR36ZydAp0enTgbHhbHDi6rqvV
-         1G0KuITLBu/NeQIkM+7CwB37TqqHsAZkhAUBefhmBf7uDiXTvfoyLbFT1hZwbiKOiKWm
-         6vB+ZipeZx9aJi7d7hJPHp7eoYkvAoLr5CoH8cb5PSQJBS2oxp/PjQw0VJhSZRcY8Mq2
-         Tj8r2eJg/lKXPBhl9XJoS64xCw7WAzTTu0iNLtL83vKLnIfdO6WpPREi0vP3Oo+Capqz
-         gDsQ==
+        bh=PRV2tc7UKGydtDugCyIQZoyJpOk914+23c8gH2LlXIA=;
+        b=QNc69PHUTEcizgpth7Dx6AnPRTDKiFu0+Eikhp5CFAKsZl79+ZnVauNFIM3lPgwFMJ
+         P3+QWobyPRPFB3oA0l/4sqFsN0DNOmtY4VD6yyBgrSNyNdnQ9Cg9b3dZn4xxkYboljMH
+         U+kd4zI8JjgE4B+0P/YNJz9eY68Uz514KxdfQjtcuFLfpTTgZ0GwIXyzxQH4tyEqSuCA
+         OBLc8OoRuYbE5jax3lvNHlT67Ox8+Dr9f1OWRPkY5R1FzFqATTTxDHOcJX+RMyu3W4Jt
+         tFOvQGstb5lZBeLUaFH1vejNGvDfPz1Yz/42EPzCDoBT475iwJEFsVnCyorGH/naiJng
+         65vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769330128; x=1769934928;
+        d=1e100.net; s=20230601; t=1769330137; x=1769934937;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=oNy2hBem/8NYXTwi6a7AXV3n4+qEbntRa2UCgw80QcU=;
-        b=M/NliJThcMEFHj9ECxZCHVOci+g76UqVPGS38M4krGxyocRTJ/qOH293VS8k1yf0ts
-         cLXF2wjPAhLm91+Ylda3FWrBUwuTRx8hCz+vDERny5WpLWFEa+RP3SkMhrlddQhO2LjQ
-         FPO9MIUPgo9bYfONAV7g870GIc3RuvdPPvSfldWQUJdIOC3TdaDZYuR5nM/Qewd7w1Wn
-         r2OAucfYdNG94Qw3c40Qo3/ynNbRmVR5g36vgoQfPcoUH4eE9Ipd/yNFb8EtAfrVatg5
-         joO91vshQRvMNGO4P7sog3opLewix68oEOT9mzppkQJQYpiUivE0qbTWJQhvVEvcrrx4
-         iX2g==
-X-Gm-Message-State: AOJu0Yxi8xnrc4wXV7O4YrK2WojQi1H7ym2g6WqagnoEN6ie8t+0Q6jX
-	p/lZi66l5TxzNnKmSLTO9DpmdJeMRzMiikUFXzVEGMpV39E/3pdndtATl3lea4Dg
-X-Gm-Gg: AZuq6aLytdnHfzfAtpGyO81Z3RJqv4hhb8+CiPXPOFEpe1/9SJ0dOACKzXFT/BOZf5P
-	GSnsdnCoLB2Is6dA9bEtIfA0ahGkl+V6YLaeVr6ckWukqzMscsQw9DLwlbDNjWODyug/ckaxURF
-	hudtUR0KJZTmfmuKDLxgh6caw1gTd0AgRKIBfPtQrL7BPTL9pvH4/9js9GmZKYcFn1Oi04JumWE
-	0/C4uVWcVwELUt7Wxhdx397YMArDZS5wyTacibx0CANGsHgElQPCyRfy97rnC1e5088LQrcZe6B
-	9oIE0nfhT6RJOXcvhHJe6fBWa0TEXHkFTb0VT/2QoXgS/kWqDUruW6iJu7VF4M1a6kiKTh5vXSi
-	wD9hzPb5g8o5VVjmrqXhUPq6dNFn3GFcjvgh/8vnWCoQDOux3oCsbFWRlt17+Zd0QvEcg2UwN/A
-	NZPA+msh4+kecTYWto2pE7tPi6UAmdStEpQEaH/aiXrLCqNuzXdvdZT3jbTj7FZ96yT9aQGghD2
-	OpZE+7T/mYaSk/GrWEIzUcQIcPof6WnaV3va0dAIF8dVr4YBIl4pwNYJctWhY3czmBrxBSNRFon
-	OHXx
-X-Received: by 2002:a05:7300:cc1b:b0:2b7:1abc:a6eb with SMTP id 5a478bee46e88-2b764218a16mr498757eec.7.1769330127811;
-        Sun, 25 Jan 2026 00:35:27 -0800 (PST)
+        bh=PRV2tc7UKGydtDugCyIQZoyJpOk914+23c8gH2LlXIA=;
+        b=DrKX+SusyDv/y2D0o6o41I17ShI+puDPsOtNFkpolbVX+Hr1p/5bqeZ6JvSr+kDLsB
+         0b055qLr065vVV4BGl6wqfkUcA6WB9fNBobCKqwE/LsVUGb2rTnONlH/olCe7OTdQPbt
+         QQvz64/2nEjMkHku82GjgDk6DFg450sI5XPfo56Zl/6ISWAefmEBdnG3kI0hSzqx3E5f
+         vQuTdrTK25iCrBk01KJ3MICeMUbZSrjoxUJuObAKxCYTNJrc8TrYXQrdFyfBVJ4lP1cA
+         obgc8maf9DNryylt1Z3Exw7/HNWcwuffXYjpEYhkFsOGubC35cWoLTg8eNN27Mi+Y1si
+         9ZvQ==
+X-Gm-Message-State: AOJu0Yxo5qrE71BuimmQjlRIg9lHNOq9ZE8ff7PmjVRYXLk95FsocUUe
+	zxEeKyt1tZwXRbVYABLBMtBwtpTBr2N1pRBEGiVd+idaoBplzjhFLdoMK4RpT5HA
+X-Gm-Gg: AZuq6aLufaZRuPstiJixc82N7PoEoIF851FMjseSMXRNL4PXWS7fnwSndIAsvyBWfDE
+	govmiqfZDR4rn3iltLJYGvlaUfU9fmoIbxfkKj323COA76v/89QhCSDbVT+ByRr+u26ciNZ6gRX
+	eegf0M3r75W/GzKBW7PSxfuuE5G2SnUiTDEIhM0B/sjBryB2javOJQqvsTRUdk7gvoNAXNIwAb0
+	ZOEqihstbHeUStK2140l0B3qh+kuSXz9tn6006tIE+d8T46RBiT051bs0O4di6q41UZyPdF6bS1
+	3xSdgu+7B1NsWt3ZE3YZ9Medstws2khAxi60JgfpNfY2HDMS+whtkJHh4lRn3Qm/GdMadgzE+Ts
+	YH4A7bCic3Mu1BfU61RprjbH6ody8nXCSbgCxG7WTWn9z44w6G942qwRF/g131lVZ2H93kWt+p8
+	9DyVcoEozxC7bCUgYbJPnKlgRQ+PnK7TEkgQt7qJHZ/Cxmu2N2C8EY51qhfhB7plUvnuIzN6C54
+	eMyySZ038HmgF5nUp93Vvqjr7L62+zuHombcwdxr/Us8b+YEGdD6o99XwJaxJEY8hK0Dod95Wzp
+	XDxS+eeSRwDsT5Y=
+X-Received: by 2002:a05:7300:dc97:b0:2b7:3538:ce5c with SMTP id 5a478bee46e88-2b76421b0b2mr428650eec.2.1769330136745;
+        Sun, 25 Jan 2026 00:35:36 -0800 (PST)
 Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7410615c0sm7994977eec.0.2026.01.25.00.35.27
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7410615c0sm7994977eec.0.2026.01.25.00.35.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jan 2026 00:35:27 -0800 (PST)
+        Sun, 25 Jan 2026 00:35:36 -0800 (PST)
 From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 To: netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org
@@ -87,9 +87,9 @@ Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 1/3] net: usb: rtl8150: remove rtl8150_t typedef for struct rtl8150
-Date: Sun, 25 Jan 2026 00:34:55 -0800
-Message-ID: <20260125083501.34513-2-enelsonmoore@gmail.com>
+Subject: [PATCH net-next 2/3] net: usb: pegasus: remove pegasus_t typedef for struct pegasus
+Date: Sun, 25 Jan 2026 00:34:56 -0800
+Message-ID: <20260125083501.34513-3-enelsonmoore@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260125083501.34513-1-enelsonmoore@gmail.com>
 References: <20260125083501.34513-1-enelsonmoore@gmail.com>
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253143-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253144-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -129,327 +129,444 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B7618005A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[carrier_check.work:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 06AD580073
 X-Rspamd-Action: no action
 
 It violates kernel code style guidelines to define typedefs for
-non-opaque types. Update rtl8150 to conform to these guidelines by
-expanding the rtl8150_t typedef. Also remove a few extra spaces after
-the * in pointer declarations to adhere to kernel code style.
+non-opaque types. Update pegasus to conform to these guidelines by
+expanding the pegasus_t typedef. Also replace a few tabs before * in
+struct pegasus variable declarations with spaces.
 
 Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/net/usb/rtl8150.c | 68 +++++++++++++++++++--------------------
- 1 file changed, 33 insertions(+), 35 deletions(-)
+ drivers/net/usb/pegasus.c | 92 +++++++++++++++++++--------------------
+ drivers/net/usb/pegasus.h |  4 +-
+ 2 files changed, 48 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index e40b0669d9f4..142bd468b2a3 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -144,8 +144,6 @@ struct rtl8150 {
- 	u8 phy;
- };
- 
--typedef struct rtl8150 rtl8150_t;
--
- struct async_req {
- 	struct usb_ctrlrequest dr;
- 	u16 rx_creg;
-@@ -158,14 +156,14 @@ static const char driver_name [] = "rtl8150";
- **	device related part of the code
- **
- */
--static int get_registers(rtl8150_t * dev, u16 indx, u16 size, void *data)
-+static int get_registers(struct rtl8150 *dev, u16 indx, u16 size, void *data)
- {
- 	return usb_control_msg_recv(dev->udev, 0, RTL8150_REQ_GET_REGS,
- 				    RTL8150_REQT_READ, indx, 0, data, size,
- 				    1000, GFP_NOIO);
- }
- 
--static int set_registers(rtl8150_t * dev, u16 indx, u16 size, const void *data)
-+static int set_registers(struct rtl8150 *dev, u16 indx, u16 size, const void *data)
- {
- 	return usb_control_msg_send(dev->udev, 0, RTL8150_REQ_SET_REGS,
- 				    RTL8150_REQT_WRITE, indx, 0, data, size,
-@@ -183,7 +181,7 @@ static void async_set_reg_cb(struct urb *urb)
+diff --git a/drivers/net/usb/pegasus.c b/drivers/net/usb/pegasus.c
+index c514483134f0..a85ffb04fc2b 100644
+--- a/drivers/net/usb/pegasus.c
++++ b/drivers/net/usb/pegasus.c
+@@ -97,14 +97,14 @@ static void async_ctrl_callback(struct urb *urb)
  	usb_free_urb(urb);
  }
  
--static int async_set_registers(rtl8150_t *dev, u16 indx, u16 size, u16 reg)
-+static int async_set_registers(struct rtl8150 *dev, u16 indx, u16 size, u16 reg)
+-static int get_registers(pegasus_t *pegasus, __u16 indx, __u16 size, void *data)
++static int get_registers(struct pegasus *pegasus, __u16 indx, __u16 size, void *data)
  {
- 	int res = -ENOMEM;
- 	struct urb *async_urb;
-@@ -217,7 +215,7 @@ static int async_set_registers(rtl8150_t *dev, u16 indx, u16 size, u16 reg)
- 	return res;
+ 	return usb_control_msg_recv(pegasus->usb, 0, PEGASUS_REQ_GET_REGS,
+ 				   PEGASUS_REQT_READ, 0, indx, data, size,
+ 				   1000, GFP_NOIO);
  }
  
--static int read_mii_word(rtl8150_t * dev, u8 phy, __u8 indx, u16 * reg)
-+static int read_mii_word(struct rtl8150 *dev, u8 phy, __u8 indx, u16 *reg)
+-static int set_registers(pegasus_t *pegasus, __u16 indx, __u16 size,
++static int set_registers(struct pegasus *pegasus, __u16 indx, __u16 size,
+ 			 const void *data)
  {
- 	int i;
- 	u8 data[3], tmp;
-@@ -241,7 +239,7 @@ static int read_mii_word(rtl8150_t * dev, u8 phy, __u8 indx, u16 * reg)
- 		return 1;
- }
- 
--static int write_mii_word(rtl8150_t * dev, u8 phy, __u8 indx, u16 reg)
-+static int write_mii_word(struct rtl8150 *dev, u8 phy, __u8 indx, u16 reg)
- {
- 	int i;
- 	u8 data[3], tmp;
-@@ -264,7 +262,7 @@ static int write_mii_word(rtl8150_t * dev, u8 phy, __u8 indx, u16 reg)
- 		return 1;
- }
- 
--static void set_ethernet_addr(rtl8150_t *dev)
-+static void set_ethernet_addr(struct rtl8150 *dev)
- {
- 	u8 node_id[ETH_ALEN];
  	int ret;
-@@ -283,7 +281,7 @@ static void set_ethernet_addr(rtl8150_t *dev)
- static int rtl8150_set_mac_address(struct net_device *netdev, void *p)
+@@ -123,7 +123,7 @@ static int set_registers(pegasus_t *pegasus, __u16 indx, __u16 size,
+  * specific control request.  'data' is ignored by the device, but it is here to
+  * not break the API.
+  */
+-static int set_register(pegasus_t *pegasus, __u16 indx, __u8 data)
++static int set_register(struct pegasus *pegasus, __u16 indx, __u8 data)
  {
- 	struct sockaddr *addr = p;
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
+ 	void *buf = &data;
+ 	int ret;
+@@ -137,7 +137,7 @@ static int set_register(pegasus_t *pegasus, __u16 indx, __u8 data)
+ 	return ret;
+ }
  
- 	if (netif_running(netdev))
- 		return -EBUSY;
-@@ -315,7 +313,7 @@ static int rtl8150_set_mac_address(struct net_device *netdev, void *p)
+-static int update_eth_regs_async(pegasus_t *pegasus)
++static int update_eth_regs_async(struct pegasus *pegasus)
+ {
+ 	int ret = -ENOMEM;
+ 	struct urb *async_urb;
+@@ -174,7 +174,7 @@ static int update_eth_regs_async(pegasus_t *pegasus)
+ 	return ret;
+ }
+ 
+-static int __mii_op(pegasus_t *p, __u8 phy, __u8 indx, __u16 *regd, __u8 cmd)
++static int __mii_op(struct pegasus *p, __u8 phy, __u8 indx, __u16 *regd, __u8 cmd)
+ {
+ 	int i, ret;
+ 	__le16 regdi;
+@@ -211,20 +211,20 @@ static int __mii_op(pegasus_t *p, __u8 phy, __u8 indx, __u16 *regd, __u8 cmd)
+ }
+ 
+ /* Returns non-negative int on success, error on failure */
+-static int read_mii_word(pegasus_t *pegasus, __u8 phy, __u8 indx, __u16 *regd)
++static int read_mii_word(struct pegasus *pegasus, __u8 phy, __u8 indx, __u16 *regd)
+ {
+ 	return __mii_op(pegasus, phy, indx, regd, PHY_READ);
+ }
+ 
+ /* Returns zero on success, error on failure */
+-static int write_mii_word(pegasus_t *pegasus, __u8 phy, __u8 indx, __u16 *regd)
++static int write_mii_word(struct pegasus *pegasus, __u8 phy, __u8 indx, __u16 *regd)
+ {
+ 	return __mii_op(pegasus, phy, indx, regd, PHY_WRITE);
+ }
+ 
+ static int mdio_read(struct net_device *dev, int phy_id, int loc)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	int ret;
+ 	u16 res;
+ 
+@@ -237,13 +237,13 @@ static int mdio_read(struct net_device *dev, int phy_id, int loc)
+ 
+ static void mdio_write(struct net_device *dev, int phy_id, int loc, int val)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	u16 data = val;
+ 
+ 	write_mii_word(pegasus, phy_id, loc, &data);
+ }
+ 
+-static int read_eprom_word(pegasus_t *pegasus, __u8 index, __u16 *retdata)
++static int read_eprom_word(struct pegasus *pegasus, __u8 index, __u16 *retdata)
+ {
+ 	int ret, i;
+ 	__le16 retdatai;
+@@ -277,7 +277,7 @@ static int read_eprom_word(pegasus_t *pegasus, __u8 index, __u16 *retdata)
+ }
+ 
+ #ifdef	PEGASUS_WRITE_EEPROM
+-static inline void enable_eprom_write(pegasus_t *pegasus)
++static inline void enable_eprom_write(struct pegasus *pegasus)
+ {
+ 	__u8 tmp;
+ 
+@@ -285,7 +285,7 @@ static inline void enable_eprom_write(pegasus_t *pegasus)
+ 	set_register(pegasus, EthCtrl2, tmp | EPROM_WR_ENABLE);
+ }
+ 
+-static inline void disable_eprom_write(pegasus_t *pegasus)
++static inline void disable_eprom_write(struct pegasus *pegasus)
+ {
+ 	__u8 tmp;
+ 
+@@ -294,7 +294,7 @@ static inline void disable_eprom_write(pegasus_t *pegasus)
+ 	set_register(pegasus, EthCtrl2, tmp & ~EPROM_WR_ENABLE);
+ }
+ 
+-static int write_eprom_word(pegasus_t *pegasus, __u8 index, __u16 data)
++static int write_eprom_word(struct pegasus *pegasus, __u8 index, __u16 data)
+ {
+ 	int i;
+ 	__u8 tmp, d[4] = { 0x3f, 0, 0, EPROM_WRITE };
+@@ -326,7 +326,7 @@ static int write_eprom_word(pegasus_t *pegasus, __u8 index, __u16 data)
+ }
+ #endif	/* PEGASUS_WRITE_EEPROM */
+ 
+-static inline int get_node_id(pegasus_t *pegasus, u8 *id)
++static inline int get_node_id(struct pegasus *pegasus, u8 *id)
+ {
+ 	int i, ret;
+ 	u16 w16;
+@@ -341,7 +341,7 @@ static inline int get_node_id(pegasus_t *pegasus, u8 *id)
  	return 0;
  }
  
--static int rtl8150_reset(rtl8150_t * dev)
-+static int rtl8150_reset(struct rtl8150 *dev)
+-static void set_ethernet_addr(pegasus_t *pegasus)
++static void set_ethernet_addr(struct pegasus *pegasus)
  {
- 	u8 data = 0x10;
- 	int i = HZ;
-@@ -328,7 +326,7 @@ static int rtl8150_reset(rtl8150_t * dev)
- 	return (i > 0) ? 1 : 0;
+ 	int ret;
+ 	u8 node_id[6];
+@@ -369,7 +369,7 @@ static void set_ethernet_addr(pegasus_t *pegasus)
+ 	return;
  }
  
--static int alloc_all_urbs(rtl8150_t * dev)
-+static int alloc_all_urbs(struct rtl8150 *dev)
+-static inline int reset_mac(pegasus_t *pegasus)
++static inline int reset_mac(struct pegasus *pegasus)
  {
- 	dev->rx_urb = usb_alloc_urb(0, GFP_KERNEL);
- 	if (!dev->rx_urb)
-@@ -348,21 +346,21 @@ static int alloc_all_urbs(rtl8150_t * dev)
- 	return 1;
- }
+ 	int ret, i;
+ 	__u8 data = 0x8;
+@@ -416,7 +416,7 @@ static inline int reset_mac(pegasus_t *pegasus)
  
--static void free_all_urbs(rtl8150_t * dev)
-+static void free_all_urbs(struct rtl8150 *dev)
+ static int enable_net_traffic(struct net_device *dev, struct usb_device *usb)
  {
- 	usb_free_urb(dev->rx_urb);
- 	usb_free_urb(dev->tx_urb);
- 	usb_free_urb(dev->intr_urb);
- }
- 
--static void unlink_all_urbs(rtl8150_t * dev)
-+static void unlink_all_urbs(struct rtl8150 *dev)
- {
- 	usb_kill_urb(dev->rx_urb);
- 	usb_kill_urb(dev->tx_urb);
- 	usb_kill_urb(dev->intr_urb);
- }
- 
--static inline struct sk_buff *pull_skb(rtl8150_t *dev)
-+static inline struct sk_buff *pull_skb(struct rtl8150 *dev)
- {
- 	struct sk_buff *skb;
- 	int i;
-@@ -379,7 +377,7 @@ static inline struct sk_buff *pull_skb(rtl8150_t *dev)
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	int ret;
+ 	__u16 linkpart;
+ 	__u8 data[4];
+@@ -456,7 +456,7 @@ static int enable_net_traffic(struct net_device *dev, struct usb_device *usb)
  
  static void read_bulk_callback(struct urb *urb)
  {
--	rtl8150_t *dev;
-+	struct rtl8150 *dev;
- 	unsigned pkt_len, res;
- 	struct sk_buff *skb;
- 	struct net_device *netdev;
-@@ -453,7 +451,7 @@ static void read_bulk_callback(struct urb *urb)
+-	pegasus_t *pegasus = urb->context;
++	struct pegasus *pegasus = urb->context;
+ 	struct net_device *net;
+ 	u8 *buf = urb->transfer_buffer;
+ 	int rx_status, count = urb->actual_length;
+@@ -566,7 +566,7 @@ static void read_bulk_callback(struct urb *urb)
+ 
+ static void rx_fixup(struct tasklet_struct *t)
+ {
+-	pegasus_t *pegasus = from_tasklet(pegasus, t, rx_tl);
++	struct pegasus *pegasus = from_tasklet(pegasus, t, rx_tl);
+ 	int status;
+ 
+ 	if (pegasus->flags & PEGASUS_UNPLUG)
+@@ -602,7 +602,7 @@ static void rx_fixup(struct tasklet_struct *t)
  
  static void write_bulk_callback(struct urb *urb)
  {
--	rtl8150_t *dev;
-+	struct rtl8150 *dev;
+-	pegasus_t *pegasus = urb->context;
++	struct pegasus *pegasus = urb->context;
+ 	struct net_device *net;
  	int status = urb->status;
  
- 	dev = urb->context;
-@@ -471,7 +469,7 @@ static void write_bulk_callback(struct urb *urb)
+@@ -638,7 +638,7 @@ static void write_bulk_callback(struct urb *urb)
  
  static void intr_callback(struct urb *urb)
  {
--	rtl8150_t *dev;
-+	struct rtl8150 *dev;
- 	__u8 *d;
- 	int status = urb->status;
+-	pegasus_t *pegasus = urb->context;
++	struct pegasus *pegasus = urb->context;
+ 	struct net_device *net;
+ 	int res, status = urb->status;
+ 
+@@ -694,7 +694,7 @@ static void intr_callback(struct urb *urb)
+ 
+ static void pegasus_tx_timeout(struct net_device *net, unsigned int txqueue)
+ {
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
+ 	netif_warn(pegasus, timer, net, "tx timeout\n");
+ 	usb_unlink_urb(pegasus->tx_urb);
+ 	net->stats.tx_errors++;
+@@ -703,7 +703,7 @@ static void pegasus_tx_timeout(struct net_device *net, unsigned int txqueue)
+ static netdev_tx_t pegasus_start_xmit(struct sk_buff *skb,
+ 					    struct net_device *net)
+ {
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
+ 	int count = ((skb->len + 2) & 0x3f) ? skb->len + 2 : skb->len + 3;
  	int res;
-@@ -528,7 +526,7 @@ static void intr_callback(struct urb *urb)
- 
- static int rtl8150_suspend(struct usb_interface *intf, pm_message_t message)
- {
--	rtl8150_t *dev = usb_get_intfdata(intf);
-+	struct rtl8150 *dev = usb_get_intfdata(intf);
- 
- 	netif_device_detach(dev->netdev);
- 
-@@ -541,7 +539,7 @@ static int rtl8150_suspend(struct usb_interface *intf, pm_message_t message)
- 
- static int rtl8150_resume(struct usb_interface *intf)
- {
--	rtl8150_t *dev = usb_get_intfdata(intf);
-+	struct rtl8150 *dev = usb_get_intfdata(intf);
- 
- 	netif_device_attach(dev->netdev);
- 	if (netif_running(dev->netdev)) {
-@@ -562,7 +560,7 @@ static int rtl8150_resume(struct usb_interface *intf)
- **
- */
- 
--static void fill_skb_pool(rtl8150_t *dev)
-+static void fill_skb_pool(struct rtl8150 *dev)
- {
- 	struct sk_buff *skb;
- 	int i;
-@@ -579,7 +577,7 @@ static void fill_skb_pool(rtl8150_t *dev)
- 	}
+ 	__u16 l16 = skb->len;
+@@ -739,14 +739,14 @@ static netdev_tx_t pegasus_start_xmit(struct sk_buff *skb,
+ 	return NETDEV_TX_OK;
  }
  
--static void free_skb_pool(rtl8150_t *dev)
-+static void free_skb_pool(struct rtl8150 *dev)
+-static inline void disable_net_traffic(pegasus_t *pegasus)
++static inline void disable_net_traffic(struct pegasus *pegasus)
  {
- 	int i;
+ 	__le16 tmp = cpu_to_le16(0);
  
-@@ -623,7 +621,7 @@ static void rx_fixup(struct tasklet_struct *t)
- 	tasklet_schedule(&dev->tl);
+ 	set_registers(pegasus, EthCtrl0, sizeof(tmp), &tmp);
  }
  
--static int enable_net_traffic(rtl8150_t * dev)
-+static int enable_net_traffic(struct rtl8150 *dev)
+-static inline int get_interrupt_interval(pegasus_t *pegasus)
++static inline int get_interrupt_interval(struct pegasus *pegasus)
  {
- 	u8 cr, tcr, rcr, msr;
+ 	u16 data;
+ 	u8 interval;
+@@ -776,7 +776,7 @@ static inline int get_interrupt_interval(pegasus_t *pegasus)
  
-@@ -644,7 +642,7 @@ static int enable_net_traffic(rtl8150_t * dev)
- 	return 0;
+ static void set_carrier(struct net_device *net)
+ {
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
+ 	u16 tmp;
+ 
+ 	if (read_mii_word(pegasus, pegasus->phy, MII_BMSR, &tmp))
+@@ -788,21 +788,21 @@ static void set_carrier(struct net_device *net)
+ 		netif_carrier_off(net);
  }
  
--static void disable_net_traffic(rtl8150_t * dev)
-+static void disable_net_traffic(struct rtl8150 *dev)
+-static void free_all_urbs(pegasus_t *pegasus)
++static void free_all_urbs(struct pegasus *pegasus)
  {
- 	u8 cr;
+ 	usb_free_urb(pegasus->intr_urb);
+ 	usb_free_urb(pegasus->tx_urb);
+ 	usb_free_urb(pegasus->rx_urb);
+ }
  
-@@ -655,7 +653,7 @@ static void disable_net_traffic(rtl8150_t * dev)
- 
- static void rtl8150_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+-static void unlink_all_urbs(pegasus_t *pegasus)
++static void unlink_all_urbs(struct pegasus *pegasus)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	dev_warn(&netdev->dev, "Tx timeout.\n");
- 	usb_unlink_urb(dev->tx_urb);
- 	netdev->stats.tx_errors++;
-@@ -663,7 +661,7 @@ static void rtl8150_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 	usb_kill_urb(pegasus->intr_urb);
+ 	usb_kill_urb(pegasus->tx_urb);
+ 	usb_kill_urb(pegasus->rx_urb);
+ }
  
- static void rtl8150_set_multicast(struct net_device *netdev)
+-static int alloc_urbs(pegasus_t *pegasus)
++static int alloc_urbs(struct pegasus *pegasus)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	u16 rx_creg = 0x9e;
+ 	int res = -ENOMEM;
  
- 	if (netdev->flags & IFF_PROMISC) {
-@@ -684,7 +682,7 @@ static void rtl8150_set_multicast(struct net_device *netdev)
- static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
- 					    struct net_device *netdev)
+@@ -827,7 +827,7 @@ static int alloc_urbs(pegasus_t *pegasus)
+ 
+ static int pegasus_open(struct net_device *net)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	int count, res;
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
+ 	int res=-ENOMEM;
  
- 	/* pad the frame and ensure terminating USB packet, datasheet 9.2.3 */
-@@ -721,7 +719,7 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+ 	if (pegasus->rx_skb == NULL)
+@@ -880,7 +880,7 @@ static int pegasus_open(struct net_device *net)
  
- static void set_carrier(struct net_device *netdev)
+ static int pegasus_close(struct net_device *net)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	short tmp;
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
  
- 	get_registers(dev, CSCR, 2, &tmp);
-@@ -733,7 +731,7 @@ static void set_carrier(struct net_device *netdev)
- 
- static int rtl8150_open(struct net_device *netdev)
+ 	netif_stop_queue(net);
+ 	if (!(pegasus->flags & PEGASUS_UNPLUG))
+@@ -894,7 +894,7 @@ static int pegasus_close(struct net_device *net)
+ static void pegasus_get_drvinfo(struct net_device *dev,
+ 				struct ethtool_drvinfo *info)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	int res;
- 
- 	if (dev->rx_skb == NULL)
-@@ -770,7 +768,7 @@ static int rtl8150_open(struct net_device *netdev)
- 
- static int rtl8150_close(struct net_device *netdev)
- {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 
- 	netif_stop_queue(netdev);
- 	if (!test_bit(RTL8150_UNPLUG, &dev->flags))
-@@ -782,7 +780,7 @@ static int rtl8150_close(struct net_device *netdev)
- 
- static void rtl8150_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
  
  	strscpy(info->driver, driver_name, sizeof(info->driver));
- 	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
-@@ -792,7 +790,7 @@ static void rtl8150_get_drvinfo(struct net_device *netdev, struct ethtool_drvinf
- static int rtl8150_get_link_ksettings(struct net_device *netdev,
- 				      struct ethtool_link_ksettings *ecmd)
+ 	usb_make_path(pegasus->usb, info->bus_info, sizeof(info->bus_info));
+@@ -906,7 +906,7 @@ static void pegasus_get_drvinfo(struct net_device *dev,
+ static void
+ pegasus_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	short lpa = 0;
- 	short bmcr = 0;
- 	u32 supported;
-@@ -841,7 +839,7 @@ static const struct ethtool_ops ops = {
- static int rtl8150_siocdevprivate(struct net_device *netdev, struct ifreq *rq,
+-	pegasus_t	*pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 
+ 	wol->supported = WAKE_MAGIC | WAKE_PHY;
+ 	wol->wolopts = pegasus->wolopts;
+@@ -915,7 +915,7 @@ pegasus_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ static int
+ pegasus_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ {
+-	pegasus_t	*pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	u8		reg78 = 0x04;
+ 	int		ret;
+ 
+@@ -952,7 +952,7 @@ static int
+ pegasus_get_link_ksettings(struct net_device *dev,
+ 			   struct ethtool_link_ksettings *ecmd)
+ {
+-	pegasus_t *pegasus;
++	struct pegasus *pegasus;
+ 
+ 	pegasus = netdev_priv(dev);
+ 	mii_ethtool_get_link_ksettings(&pegasus->mii, ecmd);
+@@ -963,31 +963,31 @@ static int
+ pegasus_set_link_ksettings(struct net_device *dev,
+ 			   const struct ethtool_link_ksettings *ecmd)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	return mii_ethtool_set_link_ksettings(&pegasus->mii, ecmd);
+ }
+ 
+ static int pegasus_nway_reset(struct net_device *dev)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	return mii_nway_restart(&pegasus->mii);
+ }
+ 
+ static u32 pegasus_get_link(struct net_device *dev)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	return mii_link_ok(&pegasus->mii);
+ }
+ 
+ static u32 pegasus_get_msglevel(struct net_device *dev)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	return pegasus->msg_enable;
+ }
+ 
+ static void pegasus_set_msglevel(struct net_device *dev, u32 v)
+ {
+-	pegasus_t *pegasus = netdev_priv(dev);
++	struct pegasus *pegasus = netdev_priv(dev);
+ 	pegasus->msg_enable = v;
+ }
+ 
+@@ -1007,7 +1007,7 @@ static int pegasus_siocdevprivate(struct net_device *net, struct ifreq *rq,
  				  void __user *udata, int cmd)
  {
--	rtl8150_t *dev = netdev_priv(netdev);
-+	struct rtl8150 *dev = netdev_priv(netdev);
- 	u16 *data = (u16 *) & rq->ifr_ifru;
- 	int res = 0;
+ 	__u16 *data = (__u16 *) &rq->ifr_ifru;
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
+ 	int res;
  
-@@ -880,7 +878,7 @@ static int rtl8150_probe(struct usb_interface *intf,
- 			 const struct usb_device_id *id)
+ 	switch (cmd) {
+@@ -1031,7 +1031,7 @@ static int pegasus_siocdevprivate(struct net_device *net, struct ifreq *rq,
+ 
+ static void pegasus_set_multicast(struct net_device *net)
  {
- 	struct usb_device *udev = interface_to_usbdev(intf);
--	rtl8150_t *dev;
-+	struct rtl8150 *dev;
- 	struct net_device *netdev;
- 	static const u8 bulk_ep_addr[] = {
- 		RTL8150_USB_EP_BULK_IN | USB_DIR_IN,
-@@ -890,7 +888,7 @@ static int rtl8150_probe(struct usb_interface *intf,
- 		RTL8150_USB_EP_INT_IN | USB_DIR_IN,
- 		0};
+-	pegasus_t *pegasus = netdev_priv(net);
++	struct pegasus *pegasus = netdev_priv(net);
  
--	netdev = alloc_etherdev(sizeof(rtl8150_t));
-+	netdev = alloc_etherdev(sizeof(struct rtl8150));
- 	if (!netdev)
- 		return -ENOMEM;
+ 	if (net->flags & IFF_PROMISC) {
+ 		pegasus->eth_regs[EthCtrl2] |= RX_PROMISCUOUS;
+@@ -1047,7 +1047,7 @@ static void pegasus_set_multicast(struct net_device *net)
+ 	update_eth_regs_async(pegasus);
+ }
  
-@@ -954,7 +952,7 @@ static int rtl8150_probe(struct usb_interface *intf,
- 
- static void rtl8150_disconnect(struct usb_interface *intf)
+-static __u8 mii_phy_probe(pegasus_t *pegasus)
++static __u8 mii_phy_probe(struct pegasus *pegasus)
  {
--	rtl8150_t *dev = usb_get_intfdata(intf);
-+	struct rtl8150 *dev = usb_get_intfdata(intf);
+ 	int i, ret;
+ 	__u16 tmp;
+@@ -1065,7 +1065,7 @@ static __u8 mii_phy_probe(pegasus_t *pegasus)
+ 	return 0xff;
+ }
  
- 	usb_set_intfdata(intf, NULL);
- 	if (dev) {
+-static inline void setup_pegasus_II(pegasus_t *pegasus)
++static inline void setup_pegasus_II(struct pegasus *pegasus)
+ {
+ 	int ret;
+ 	__u8 data = 0xa5;
+@@ -1104,7 +1104,7 @@ static inline void setup_pegasus_II(pegasus_t *pegasus)
+ 
+ static void check_carrier(struct work_struct *work)
+ {
+-	pegasus_t *pegasus = container_of(work, pegasus_t, carrier_check.work);
++	struct pegasus *pegasus = container_of(work, struct pegasus, carrier_check.work);
+ 	set_carrier(pegasus->net);
+ 	if (!(pegasus->flags & PEGASUS_UNPLUG)) {
+ 		queue_delayed_work(system_long_wq, &pegasus->carrier_check,
+@@ -1133,7 +1133,7 @@ static int pegasus_probe(struct usb_interface *intf,
+ {
+ 	struct usb_device *dev = interface_to_usbdev(intf);
+ 	struct net_device *net;
+-	pegasus_t *pegasus;
++	struct pegasus *pegasus;
+ 	int dev_index = id - pegasus_ids;
+ 	int res = -ENOMEM;
+ 
+diff --git a/drivers/net/usb/pegasus.h b/drivers/net/usb/pegasus.h
+index a05b143155ba..6810adf43f78 100644
+--- a/drivers/net/usb/pegasus.h
++++ b/drivers/net/usb/pegasus.h
+@@ -76,7 +76,7 @@ enum pegasus_registers {
+ };
+ 
+ 
+-typedef struct pegasus {
++struct pegasus {
+ 	struct usb_device	*usb;
+ 	struct usb_interface	*intf;
+ 	struct net_device	*net;
+@@ -97,7 +97,7 @@ typedef struct pegasus {
+ 	__u8			eth_regs[4];
+ 	__u8			phy;
+ 	__u8			gpio_res;
+-} pegasus_t;
++};
+ 
+ 
+ struct usb_eth_dev {
 -- 
 2.43.0
 
