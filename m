@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-253177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8wfZAT88dmngNwEAu9opvQ
-	(envelope-from <netdev+bounces-253177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:52:31 +0100
+	id 14bINZo/dmm6OAEAu9opvQ
+	(envelope-from <netdev+bounces-253178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:06:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D414981514
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:52:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585188155D
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 17:06:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8CC630048E3
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 15:52:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B3CDE3000FCB
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 16:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7959E3164D9;
-	Sun, 25 Jan 2026 15:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F35731A045;
+	Sun, 25 Jan 2026 16:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PRW8ylLj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zzxs8gHF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2623D994;
-	Sun, 25 Jan 2026 15:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4894A07
+	for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 16:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769356347; cv=none; b=TljIDSqEkVa+LldFHC694cTSaFLXoK0hsZkTb2ieMa/1YQTS7nbDUP/hrPUYAdomD93UuqP3G4hNOzantuZBMy17yr3lJ7DlFpBeRbnpgVIKeq4ZZ2zNEIxtk52Q5RybdPHGvkNZJ5tWOmPxgRvR9RiqeUzuyg6kk4qeVsCSDig=
+	t=1769357208; cv=none; b=tfE78m0B+LQCdf633C9Veb5NPlzi+WG5Ucz0vaKrzXxF+6fEoqk1i9dzErMr2wN37PuHFOk7aqKY5Vn1aNJpiCYib93Kbv1Txcfir9Bw5fzlyo0+Hh/2KQp2QG4+xkrG9vqMQUYlMNprSx7cNQz+Un/QV4x992JWoAU4av77z3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769356347; c=relaxed/simple;
-	bh=D33rqpyLTFodzdQ1dhJ+xXv0QwjFVoFFH+qj+aLzPV0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P0LyR3YBIF8OMNBrg+9n0so4jxPdv8UVFp5hHAqnoeNtVpQUjxcL3sAU2dRUFEMALxPxvJsWnItMeMLVptr+mB6vAwh11Pnh0vgYE2mKdSeSSHO+ygF7IyrgG0E09IpQrl4+TjW/rcZs778Nx3CyeoAKzUwB2CN4JJVlemUJLoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PRW8ylLj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PjVVGGDzGJQg82HdwI3cCgNHZMB2P+MQX3RCeVSgvs8=; b=PRW8ylLjfCMycHvlq2GxlY0E4q
-	agdG9qdhoxJZLUUXXb7wwomAtyOXE2U+4KV6vzwsAF0kQOWhliAe2lvPiDviO9/CbyEKJmDYObsoV
-	zelwWS+vwrPNyplXNJJMUH3Pbbe1/ZOBtMkUDGSRZZ3t6dbOROFL81tuls0f8algsm+o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vk2PP-004cSM-EV; Sun, 25 Jan 2026 16:52:15 +0100
-Date: Sun, 25 Jan 2026 16:52:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1769357208; c=relaxed/simple;
+	bh=GSlQIT/+IJfCKmiinYtstHpEZeTo2NJEAuuwOFkTEzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZnYGpqnP/mTDHtIO1kVQv/90nnBjMWRDaWjUBOUTv3vqKG5bozs6kUL+v267ypc0ObU5uasrJQ/uzyv8oU+J9lj3DMx7zYIw6by6bkSkG1b45bRAag/LuH8lBsD/u1AfoH2bz9Vbuvh6t0Sq5UIMogeC7QdxfLGD2xRE+0wRPf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zzxs8gHF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769357205;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=6XHVeVhJgsFiFSaz4pxwz0WF8NA7U9e0c68zypE8Q6g=;
+	b=Zzxs8gHFoJgFTimprGxlocrDzFlW2yf8dc9dwzHn0Ql4AirrE/R0mJN4ry7z5NclGRzCye
+	65TqcmO8XfVDZSYtDXBqVAVBU0ek/iiFz2a43KBrGIEEuepu30W7Mz/M6QnxZ3udLaMttw
+	7iCJpxh05U6xbfs9Q9lu2mA0A3wxG1w=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-82-IolnCAo-OX6IbJfKHl6ZvQ-1; Sun,
+ 25 Jan 2026 11:06:41 -0500
+X-MC-Unique: IolnCAo-OX6IbJfKHl6ZvQ-1
+X-Mimecast-MFC-AGG-ID: IolnCAo-OX6IbJfKHl6ZvQ_1769357199
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 05828195608D;
+	Sun, 25 Jan 2026 16:06:39 +0000 (UTC)
+Received: from fedora (unknown [10.45.224.8])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 1F3C330001A7;
+	Sun, 25 Jan 2026 16:06:32 +0000 (UTC)
+Received: by fedora (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Sun, 25 Jan 2026 17:06:38 +0100 (CET)
+Date: Sun, 25 Jan 2026 17:06:31 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alice Ryhl <aliceryhl@google.com>,
+	Boris Brezillon <boris.brezillon@collabora.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Felix Kuehling <felix.kuehling@amd.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steven Price <steven.price@arm.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Petko Manolov <petkan@nucleusys.com>,
-	Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Oliver Neukum <oneukum@suse.com>,
-	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Max Schulze <max.schulze@online.de>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Kees Cook <kees@kernel.org>, Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 net-next] net: usb: remove unnecessary get_drvinfo
- code and driver versions
-Message-ID: <9d03bd34-1c35-4cde-b29c-08e5387139ba@lunn.ch>
-References: <20260124102042.112101-1-enelsonmoore@gmail.com>
- <aXTHhI710LK1EsTG@smile.fi.intel.com>
- <CADkSEUjwCmowmo_AwZ7TNS2gDt0CLz6buvfjjXz7BrLfuokM4Q@mail.gmail.com>
- <e91dfc01-373d-4d3e-9dd4-9fb3be92f756@lunn.ch>
- <CADkSEUhf5Dpy=yFNQBksEhKjwj-+n07ujADmVHFUv0go5pYbhQ@mail.gmail.com>
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 0/7] don't abuse task_struct.group_leader
+Message-ID: <aXY_h8i78n6yD9JY@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,57 +85,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADkSEUhf5Dpy=yFNQBksEhKjwj-+n07ujADmVHFUv0go5pYbhQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253177-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253178-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.intel.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com,nucleusys.com,shawell.net,microchip.com,fintech.ru,suse.com,piap.pl,gmail.com,pengutronix.de,online.de];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oleg@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: D414981514
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 585188155D
 X-Rspamd-Action: no action
 
-> > We prefer lots of small patches, they are easier to find time to
-> > review. Combing patches is generally the wrong things to do.
-> This is also helpful to know; thanks. I had assumed the opposite was
-> preferred (if the combined patch was fairly small) to reduce the
-> amount of mailing list traffic.
+Andrew, can you take these simple cleanups?
 
-mutt(1) can show and delete emails faster than i can scan the subject
-lines for keywords to see if they are interesting. So the absolute
-number of emails does not matter.
+The patches do not depend on each other, this series just removes
+the usage of ->group_leader when it is "obviously unnecessary".
 
-For most reviewers, it is not an 9 to 5 job. Reviews get fitted in
-between other tasks, maybe while waiting for a build to complete,
-drinking coffee, etc. Small patches which can be quickly reviewed are
-more likely to get looked at. Big patches will get deferred, and maybe
-deferred again and again.
+I am going to move ->group_leader from task_struct to signal_struct
+or at least add the new task_group_leader() helper. So I will send
+more tree-wide changes on top of this series.
 
-So if you want your patches reviewed and merged quickly, make then
-small, good commit messages, obviously correct, and quick to review.
+Link to V1: https://lore.kernel.org/all/aTV1KYdcDGvjXHos@redhat.com/
 
-       Andrew
+V2 doesn't differ, I only added the acks I got (thanks!).
+
+7/7 was not reviewed, but looks really trivial.
+
+Oleg.
+---
+
+ drivers/android/binder.c                         |  9 ++++-----
+ drivers/android/binder_alloc.c                   |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c           |  5 +----
+ drivers/gpu/drm/amd/amdkfd/kfd_process.c         | 10 ----------
+ drivers/gpu/drm/panfrost/panfrost_gem.c          |  2 +-
+ drivers/gpu/drm/panthor/panthor_gem.c            |  2 +-
+ drivers/infiniband/core/umem_odp.c               |  4 ++--
+ net/core/netclassid_cgroup.c                     |  2 +-
+ 9 files changed, 12 insertions(+), 26 deletions(-)
+
 
