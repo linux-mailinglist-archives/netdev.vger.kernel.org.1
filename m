@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-253222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CC76AViPdmksSAEAu9opvQ
-	(envelope-from <netdev+bounces-253222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:47:04 +0100
+	id 8BsyHImPdmksSAEAu9opvQ
+	(envelope-from <netdev+bounces-253223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:47:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A4E828CA
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD083828E0
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 22:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC0E7301FFBC
-	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:45:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACB23302D965
+	for <lists+netdev@lfdr.de>; Sun, 25 Jan 2026 21:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E732F30DEBE;
-	Sun, 25 Jan 2026 21:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7BB30EF65;
+	Sun, 25 Jan 2026 21:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7BXWbJV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0StyOsM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C432130DEB8;
-	Sun, 25 Jan 2026 21:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EE430E0D3;
+	Sun, 25 Jan 2026 21:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769377521; cv=none; b=gZ7iPy2Dyciz/HaFeiQVpU9ga7FnXdlyIG1DVdXhztOULnYGw8AacCiPXIr56K+qJgqPSW7sK+it3YCgN5S2g0VaopWcIYwwLJr98OSZyJ/9LMgS5ayAVer6r2u6vAEnPxDJ/rtH95u4CyxuiAUbiR39kxkjYQ53TbPnVereYWA=
+	t=1769377523; cv=none; b=gV4bGjpax+uDLU33kHRtms2W+9C4/+Uj85e+DD1X4MrOKMzzVYnMm4Zv8Kl0zah3hUp6vs24YIdlOO9e+s1IId/aWROXXpEVCXI/oAMAg4ba0hqYfAUhCCaE8Y3oV1Eu5ITZ6BFGVsjBUSdJfSN+pphWfuhqEFGRiFh0agaS+IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769377521; c=relaxed/simple;
-	bh=+XMaW9KHF5jK8JykWaSX8el6KsQSrR6xUKWXs8AAIkQ=;
+	s=arc-20240116; t=1769377523; c=relaxed/simple;
+	bh=2xoo2eyP1Ra2vHGy7A0s6glBdg87bpoHN64gXy3qjvk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MidlqClqDMIkn7+uSiUBMBpwb/u2iIn9nc8z4FjmRI6yNOMahTuPPgKWWpb/eoGG0ils+dnHUhJmMzsE2lpkSuqa1tJZWJ5uyTY2MaJsEBjWu7BXJTDBa1t2RCmwXE7bnmsxKfwFR0bZsGRk0mR2mouzHklM6cTGPDmTMQU246M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7BXWbJV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60AEC4CEF1;
-	Sun, 25 Jan 2026 21:45:20 +0000 (UTC)
+	 MIME-Version; b=n4Z5di+pniboft07OiGeLtR8yYSs98ovErNZWwgmLESKkLaG9vKpWxo4sU15TeSZnx9LU5bB/VyFdc15C2DWc4M+AtZPcHh1cl5Ezjo21t6MFQj7otw+v3moWMNj9zIV/PZO4f+fhYjRqpNX2i0IOWVFiWy/Qcdv1rzdGsYJSNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0StyOsM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 695A8C4CEF1;
+	Sun, 25 Jan 2026 21:45:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769377521;
-	bh=+XMaW9KHF5jK8JykWaSX8el6KsQSrR6xUKWXs8AAIkQ=;
+	s=k20201202; t=1769377523;
+	bh=2xoo2eyP1Ra2vHGy7A0s6glBdg87bpoHN64gXy3qjvk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H7BXWbJV/dV6xwKtkCcUcVcOT4iiglrG3CONMsP6lYnsm/DhuRyfMOX1RBBz63HB+
-	 Hhkn11jzoXryWdMLHppgoYNbTCTu5H1IFfaQ5/avc8Bobfz0v17M6lW5px1WM2Ua1i
-	 Kj4bberT5Ly9di/oYjCX/fxxS61dL8qNOCS2vQj5BCAzobHn8oRETHKM/lwdc7KVBx
-	 rFuZUxZPJqdpeXHMrZ3oD4v/c5anrN5jh+k1Cg0YAmC2jhzLc1/mu65rJsIHASll9T
-	 TG3IgbsumALDnG2w0Gc4mwoe0XQlC3atmrqN1mlIqg5VjwHxTBaQ546i3Oy5oqpeEf
-	 nNfH68r+UH7tA==
+	b=H0StyOsME6oZ5n4CnIzAsuWUk+/sUC80ElOZUfYcELAzUgc+tl1vArUhntV72WNDL
+	 guijiV/TOcvQ0Zpr+mmnPyHfuJsaO7lPlX2tFhJzRtLq3n17Zky+bMulOrdKl0mUUW
+	 JNuAwGtYKWLb0NYb8nf0/hdQD4WDw3WJNyLbBfXAHxRYbpBwajiq/4C8+gzDVhkL5o
+	 I0s4tTh4OZxz6tA9bfZ0ccBiJl7M9nLwlTj4MqWV944oRKTdjufeVlATetZ2pie9VA
+	 St8LGJFY1Fi8wruPiPO3Js6F0RpvJLpmpXWQCtNIWlzn51Yqfyf13g2NcX9H58EUkh
+	 LLmh8Vvvp9u9g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: wei.fang@nxp.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -63,12 +63,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	bpf@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch
-Subject: Re: [v4,net-next,13/15] net: fec: add fec_alloc_rxq_buffers_pp() to allocate buffers from page pool
-Date: Sun, 25 Jan 2026 13:45:19 -0800
-Message-ID: <20260125214519.3384279-1-kuba@kernel.org>
+Subject: Re: [v4,net-next,15/15] net: fec: add AF_XDP zero-copy support
+Date: Sun, 25 Jan 2026 13:45:21 -0800
+Message-ID: <20260125214521.3384305-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260123022143.4121797-14-wei.fang@nxp.com>
-References: <20260123022143.4121797-14-wei.fang@nxp.com>
+In-Reply-To: <20260123022143.4121797-16-wei.fang@nxp.com>
+References: <20260123022143.4121797-16-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,nxp.com,iogearbox.net,fomichev.me,lists.linux.dev,davemloft.net,google.com,redhat.com,lunn.ch];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-253222-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253223-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 51A4E828CA
+X-Rspamd-Queue-Id: BD083828E0
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -117,12 +117,12 @@ For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 net: fec: add AF_XDP zero-copy support
 
 This patch adds AF_XDP zero-copy support for both TX and RX on the FEC
-ethernet driver. RX buffers are allocated from the XSK pool instead of
-the page pool, and TX supports both frames from AF_XDP sockets and
-XDP_TX action.
+driver, enabling higher performance packet processing through XSK pools.
 
 > diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
 > index c19ae60b04d7..d3e54dcf6a4c 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
 
 [ ... ]
 
@@ -155,17 +155,20 @@ XDP_TX action.
 > +		if (err) {
 > +			netdev_err(ndev, "Failed to map xsk pool\n");
 > +			return err;
+                        ^^^^^^^^^^
+
+If xsk_pool_dma_map() fails here when the device was running (is_run ==
+true), the function returns without restoring the device state. At this
+point NAPI is disabled, TX queues are disabled, and all buffers have been
+freed. Should the error path restore the device to a working state similar
+to the err_alloc_buffers path below?
+
+The err_alloc_buffers label handles the cleanup for xsk_pool state but it
+looks like that error path would also need to call fec_enet_alloc_buffers(),
+fec_restart(), napi_enable(), and netif_tx_start_all_queues() to restore
+the device when is_run was true.
+
 > +		}
-
-If xsk_pool_dma_map() fails here when is_run was true, NAPI has already
-been disabled, TX has been disabled, and buffers have been freed. The
-early return leaves the device in a non-functional state with no way to
-recover except manually bringing the interface down and up.
-
-Should this error path restore the device state by calling fec_restart(),
-napi_enable(), and netif_tx_start_all_queues() before returning, similar
-to what is done after fec_enet_alloc_buffers() succeeds?
-
 > +
 > +		rxq->xsk_pool = pool;
 > +		txq->xsk_pool = pool;
@@ -197,12 +200,5 @@ to what is done after fec_enet_alloc_buffers() succeeds?
 > +	}
 > +
 > +	return err;
-
-Similarly, the err_alloc_buffers path cleans up the XSK pool state but
-does not restore NAPI/TX or restart the device when is_run was true.
-Does this leave the device in the same non-functional state?
-
 > +}
-
-[ ... ]
 
