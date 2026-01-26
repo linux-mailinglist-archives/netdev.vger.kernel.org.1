@@ -1,222 +1,218 @@
-Return-Path: <netdev+bounces-253499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253500-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMMTO1J3d2n7ggEAu9opvQ
-	(envelope-from <netdev+bounces-253499-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:16:50 +0100
+	id SE+fHpx3d2n7ggEAu9opvQ
+	(envelope-from <netdev+bounces-253500-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:18:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B75A895F7
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:16:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DF189607
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 248F7300373E
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:16:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CC9C430156D2
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25DF33D6D5;
-	Mon, 26 Jan 2026 14:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D5B33D516;
+	Mon, 26 Jan 2026 14:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="jeOXF2mb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YYzZr1jq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="can6yX0p"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286F7336EC0;
-	Mon, 26 Jan 2026 14:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252EA33C514;
+	Mon, 26 Jan 2026 14:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769437003; cv=none; b=tKtzULmVPKqqN4RZjwLm5G59zBzgGeLDc30S2+T6BPZ3cY8DszY86Px1lpwqohcEz7J4PlWK4Vk3j400rlHOc9KdGu9PNDEL9oar5G90bO5QT4W9CRciQYC2WmHOKCVFFCuRFCr4X3TERP5kCd4oB9FRWFJ8OgPxIpcpi2WtFAE=
+	t=1769437080; cv=none; b=tUq2z0yu0MSdMMH5z1msPEOpblA04fa7MGJv0jyK43HxxZIeWEt42htbE3J6TMdQ+KgOhyH++su2+vNt8EDAdLu42NHvMwa6nU9rRT5FR1toOot5tUEbL9GqLSTOWwQ0coxmDxARH4Y6EDMp+Ttj/w2hZeypuKezHFV+qJ1BF3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769437003; c=relaxed/simple;
-	bh=OFVfkZfQSq/IC6N/ILZo/vJ8Z4F8NfJuOsvVtPmxDEA=;
+	s=arc-20240116; t=1769437080; c=relaxed/simple;
+	bh=xeDWngqya0qhU4z6lV5Uzc9Xyw1MTwc5ZzZeotSP5pI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=liapdcmdppfd5BLTQCoEPD4UWWIyUvPsbn1lQufnMGrpWHWkSFX0FmVziqWPLvcSFrm6Iu7YfCXsJyurvbp/MEuMIxvehYqWvskqq+vHzYlDxcFKtgJMuTSFzDdIpyLFwOOxqZ/M/XV5OGSEYR2PGFTzZTb0k0r301SqXLf0N18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=jeOXF2mb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YYzZr1jq; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id AC3E17A012E;
-	Mon, 26 Jan 2026 09:16:38 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 26 Jan 2026 09:16:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1769436998; x=
-	1769523398; bh=2v0nuC3kBXBD79NKKqugi1PyZ8oI4cF8xd3QLkXTs7Y=; b=j
-	eOXF2mbiNVmXNnBoOaSwuDcB3bxOafWx2Q1Envc5vhUMEoe6mDvR8fBwRZDPrQHF
-	d997vGyMkpf7GlSG3kJdyvEekrcNy3mF86I4blIVyQOQOb8nZ8ljOC2mvFDrdqqh
-	oIqg6wj/Wiwe3chmJFSoMvQJ89FNeeXs9Y1vU5uBT3MfkCkc0qk1t6uDPE6yr9qG
-	6DoJL1xvdHhM3b6UpaIghV0FIWknlBn9dc/ItQJ+vCEi4kjiDM2jn6EexGPM9j4q
-	scVHo7Hd1NWA9yy8oKXjFMaZiTX+10dCppK2UVmoVuKo88I8jfVznzMnghf5rlU3
-	oLiSNjpUJK0CBj9H9nQ3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1769436998; x=1769523398; bh=2v0nuC3kBXBD79NKKqugi1PyZ8oI4cF8xd3
-	QLkXTs7Y=; b=YYzZr1jqsmbn67SKIjhWuErgElZ0ymnluhPWZoaBwwagumB/Ucq
-	iQvj86xe5OpwwGkvbFObkdbFnEyjypu9lQ4eHJOZLCWDbg9YJiamLz0NVwhDko6g
-	QO6CRiFgBnbbdaroHOB8jq/PKZ6uOTCyeMNLMf+pbJojE5tcUbcki/OHf7IQXtpx
-	5ieBq9ZIU2rGbvf7J9H1DMC69cPG5TyBOe4xzQp3hR8MM2o88PBMrZ1tX5zVSySB
-	d+8cPDKE5TB6ghqREI/a1YaZjLASBnV49U6nynP0ekf1Ntj504ITXo0sybtngUDB
-	apDBVzh2V/pcpcLu+iP+VYdrXZCBRuvWboA==
-X-ME-Sender: <xms:RHd3aamPhUZZAfHSVpwEe2iOfPUjKqONTpc_omdr-CaB9oJQvUQpUA>
-    <xme:RHd3aSx_9D_F1FCuPhQC40k7VzG2KqP7C3oNbmAwBQCA-_1Zox4HZEd46EV8KtCd8
-    l4QHRHW89MmJ7_cUKoYTpXuwNNlNnURE0aGj7g1OUEPfLvDNxUPXJMG>
-X-ME-Received: <xmr:RHd3aY-zmCiUrGtwK1bKUG2gTMciK4ddOtbWFW2iAAsTMLiIH6rUm4Vf1yl9>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduheejkeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepkeejvdehgeekveduudeufedugfdtlefgiedugfeggfevuedvtddujedt
-    jefgleevnecuffhomhgrihhnpegsvghlohifrdhnvghtnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhn
-    vghtpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epphgvnhhguhhinhdqkhgvrhhnvghlsehiqdhlohhvvgdrshgrkhhurhgrrdhnvgdrjhhp
-    pdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrdgtoh
-    hmpdhrtghpthhtoheplhhinhhugidqshgvtghurhhithihqdhmohguuhhlvgesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegsohhrihhsphesmhgvlhhlrghnohigrd
-    gtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphht
-    thhopehffiesshhtrhhlvghnrdguvgdprhgtphhtthhopehkrhhishhtihgrnhdrvghvvg
-    hnshgvnhesghhmrghilhdrtghomhdprhgtphhtthhopehlvghonheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtoheplhgvohhnrhhosehnvhhiughirgdrtghomh
-X-ME-Proxy: <xmx:RHd3adC3rLGq2o0WR1tZMzBHx9AQFgrMiC3jm0E-2LDYSY2hUkUYig>
-    <xmx:RHd3afrFZGHgiSj6iNr8Q0Lk5OpJydio3J5knn0YlvWtL2d4s2HY3A>
-    <xmx:RHd3aVmmg5nb19tvwEhHU5ckwCXXAlURyAT8c3FoJW6B6wrRQBuibQ>
-    <xmx:RHd3aSVmb-81gBbWP0ry_LQyecV3fCqMfjtK0278EisexaxwLehcGA>
-    <xmx:Rnd3aZNVkDYrOdDRpa9fVDIR31jZZKuG-SfMCVfqr1XT-jdVhqnEpFbi>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 26 Jan 2026 09:16:36 -0500 (EST)
-Date: Mon, 26 Jan 2026 15:16:34 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-security-module <linux-security-module@vger.kernel.org>,
-	Boris Pismenny <borisp@mellanox.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=O+EZEgIRX4OCMfDyLOwVubPjhpt6K7RHCr8DuqAvRbhXhyFIankmNHCC+Sastpz+wLoSoi9uavnB20323U4YYSPS1o+krpEpJ8ClFXpCckCaqytZ3vCTesE1k32bBuAadV1Gqk8Aoxr99wASA9aCj73r5iPlWiaLKSs+jcDcXys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=can6yX0p; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769437079; x=1800973079;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xeDWngqya0qhU4z6lV5Uzc9Xyw1MTwc5ZzZeotSP5pI=;
+  b=can6yX0p4UzEsO88ULloCX9oHxJE36+/npuW+zkTDZIs3n9gRK+NNGbw
+   CAzXumqxhIzjdNYtvop+lXWOhra/Kzy4Rfzb90351e+ASwrOf2suQI9qx
+   IMwJFr5Rsgli34dIHv455ysAIwGTX78xm249Wms97KCdooexLm70vuXdF
+   txG1JnjLKRVLSbRjK1oHq3M0poUMQd8NQtiSSmV+/YM5qhv4D5pXkUrgu
+   OdmPguBXniE4dpd4MAUpoX7oSn3nZV/K1Y93eH0UvX+P9rwIgZxSxxfoi
+   W+IODpFstqyMGs+OpwLg+WsiW+PYtaGCe/8epsbWpXzRsUVhm7Jg7DlaF
+   g==;
+X-CSE-ConnectionGUID: JWZYjU8xSdi5XquwIVMWfA==
+X-CSE-MsgGUID: xZMGou7eSSK0lK1Hp0pzzw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="88026603"
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="88026603"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 06:17:59 -0800
+X-CSE-ConnectionGUID: bMMd/1CpSf2kDNFYCKZeGw==
+X-CSE-MsgGUID: xWHtBDO8RCaVp4uh22hrsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="206811273"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 26 Jan 2026 06:17:54 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vkNPb-00000000XO2-3LKq;
+	Mon, 26 Jan 2026 14:17:51 +0000
+Date: Mon, 26 Jan 2026 22:17:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>,
-	Kristian Evensen <kristian.evensen@gmail.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Raed Salem <raeds@mellanox.com>, Raed Salem <raeds@nvidia.com>,
-	Saeed Mahameed <saeedm@mellanox.com>,
-	Yossi Kuperman <yossiku@mellanox.com>,
-	Network Development <netdev@vger.kernel.org>,
-	Aviad Yehezkel <aviadye@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] xfrm: force flush upon NETDEV_UNREGISTER event
-Message-ID: <aXd3QjzwOVm0Q9LF@krikkit>
-References: <924f9cf5-599a-48f0-b1e3-94cd971965b0@I-love.SAKURA.ne.jp>
- <537343f7-c580-43b0-9ad2-691701b9fb8e@I-love.SAKURA.ne.jp>
- <287edf7f-85fb-46c3-9c70-c8ec7014a0db@I-love.SAKURA.ne.jp>
- <aXIGxmCB2QU86-iA@secunet.com>
- <447378de-3cc9-44f5-872e-a1fc477f591e@I-love.SAKURA.ne.jp>
- <aXIKwNJv59KnsnLw@secunet.com>
- <5811ec38-907e-4788-8a0e-7758f12dc9d0@I-love.SAKURA.ne.jp>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Pascal Eberhard <pascal.eberhard@se.com>,
+	=?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org,
+	"Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Subject: Re: [PATCH net-next v3 4/8] net: dsa: microchip: Add support for
+ KSZ8463's PTP interrupts
+Message-ID: <202601262210.Ncec5HWm-lkp@intel.com>
+References: <20260126-ksz8463-ptp-v3-4-9f092aeb8492@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5811ec38-907e-4788-8a0e-7758f12dc9d0@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260126-ksz8463-ptp-v3-4-9f092aeb8492@bootlin.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253499-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	TAGGED_FROM(0.00)[bounces-253500-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[bootlin.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[secunet.com,vger.kernel.org,mellanox.com,davemloft.net,strlen.de,gmail.com,kernel.org,nvidia.com,gondor.apana.org.au];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,queasysnail.net:dkim]
-X-Rspamd-Queue-Id: 0B75A895F7
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: D4DF189607
 X-Rspamd-Action: no action
 
-2026-01-22, 22:07:46 +0900, Tetsuo Handa wrote:
-> On 2026/01/22 20:32, Steffen Klassert wrote:
-> > On Thu, Jan 22, 2026 at 08:28:31PM +0900, Tetsuo Handa wrote:
-> >> On 2026/01/22 20:15, Steffen Klassert wrote:
-> >>> Hm, I'd say we should not try to offload to a device that does
-> >>> not support NETIF_F_HW_ESP.
-> >>
-> >> I was about to post the patch below, but you are suggesting that "do not allow calling
-> >> xfrm_dev_state_add()/xfrm_dev_policy_add() if (dev->features & NETIF_F_HW_ESP) == 0" ?
-> > 
-> > As said, I think this is the correct way to do it. But let's wait
-> > on opinions from the hardware people.
+Hi Bastien,
 
-But the current behavior ("ignore NETIF_F_HW_ESP and call
-xdo_dev_state_add for new states anyway") has been established for
-multiple years. Changing that now seems a bit risky.
+kernel test robot noticed the following build warnings:
 
-> OK. I guess something like below.
-> 
->  net/xfrm/xfrm_device.c |   10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 52ae0e034d29..19aa61609d24 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -292,6 +292,13 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
->  		dst_release(dst);
->  	}
->  
-> +	if (!(dev->features & NETIF_F_HW_ESP)) {
-> +		NL_SET_ERR_MSG(extack, "Device doesn't support offload");
-> +		xso->dev = NULL;
-> +		dev_put(dev);
-> +		return -EINVAL;
-> +	}
+[auto build test WARNING on 3adff276e751051e77be4df8d29eab1cf0856fbf]
 
-I'm not sure we want to make state creation fail in this case...
+url:    https://github.com/intel-lab-lkp/linux/commits/Bastien-Curutchet-Schneider-Electric/net-dsa-microchip-Add-support-for-KSZ8463-global-irq/20260126-163430
+base:   3adff276e751051e77be4df8d29eab1cf0856fbf
+patch link:    https://lore.kernel.org/r/20260126-ksz8463-ptp-v3-4-9f092aeb8492%40bootlin.com
+patch subject: [PATCH net-next v3 4/8] net: dsa: microchip: Add support for KSZ8463's PTP interrupts
+config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20260126/202601262210.Ncec5HWm-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260126/202601262210.Ncec5HWm-lkp@intel.com/reproduce)
 
-> +
->  	if (!dev->xfrmdev_ops || !dev->xfrmdev_ops->xdo_dev_state_add) {
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601262210.Ncec5HWm-lkp@intel.com/
 
-while it will succeed (just without offload) in that case.
+All warnings (new ones prefixed by >>):
 
->  		xso->dev = NULL;
->  		dev_put(dev);
-> @@ -367,7 +374,8 @@ int xfrm_dev_policy_add(struct net *net, struct xfrm_policy *xp,
->  	if (!dev)
->  		return -EINVAL;
->  
-> -	if (!dev->xfrmdev_ops || !dev->xfrmdev_ops->xdo_dev_policy_add) {
-> +	if (!dev->xfrmdev_ops || !dev->xfrmdev_ops->xdo_dev_policy_add ||
-> +	    !(dev->features & NETIF_F_HW_ESP)) {
->  		xdo->dev = NULL;
->  		dev_put(dev);
->  		NL_SET_ERR_MSG(extack, "Policy offload is not supported");
+   drivers/net/dsa/microchip/ksz_ptp.c: In function 'ksz8463_ptp_irq_setup':
+>> drivers/net/dsa/microchip/ksz_ptp.c:1171:35: warning: unused variable 'ops' [-Wunused-variable]
+    1171 |         const struct ksz_dev_ops *ops = dev->dev_ops;
+         |                                   ^~~
+
+
+vim +/ops +1171 drivers/net/dsa/microchip/ksz_ptp.c
+
+  1167	
+  1168	int ksz8463_ptp_irq_setup(struct dsa_switch *ds)
+  1169	{
+  1170		struct ksz_device *dev = ds->priv;
+> 1171		const struct ksz_dev_ops *ops = dev->dev_ops;
+  1172		struct ksz_port *port1, *port2;
+  1173		struct ksz_irq *ptpirq;
+  1174		int ret;
+  1175	
+  1176		port1 = &dev->ports[0];
+  1177		port2 = &dev->ports[1];
+  1178		ptpirq = &port1->ptpirq;
+  1179	
+  1180		ptpirq->irq_num = irq_find_mapping(dev->girq.domain, KSZ8463_SRC_PTP_INT);
+  1181		if (!ptpirq->irq_num)
+  1182			return -EINVAL;
+  1183	
+  1184		ptpirq->dev = dev;
+  1185		ptpirq->nirqs = 4;
+  1186		ptpirq->reg_mask = KSZ8463_PTP_TS_IER;
+  1187		ptpirq->reg_status = KSZ8463_PTP_TS_ISR;
+  1188		ptpirq->irq0_offset = KSZ8463_PTP_INT_START;
+  1189		snprintf(ptpirq->name, sizeof(ptpirq->name), "ptp-irq");
+  1190	
+  1191		ptpirq->domain = irq_domain_create_linear(dev_fwnode(dev->dev), ptpirq->nirqs,
+  1192							  &ksz_ptp_irq_domain_ops, ptpirq);
+  1193		if (!ptpirq->domain)
+  1194			return -ENOMEM;
+  1195	
+  1196		ret = request_threaded_irq(ptpirq->irq_num, NULL, ksz_ptp_irq_thread_fn,
+  1197					   IRQF_ONESHOT, ptpirq->name, ptpirq);
+  1198		if (ret)
+  1199			goto release_domain;
+  1200	
+  1201		ret = ksz8463_ptp_port_irq_setup(ptpirq, port1,
+  1202						 KSZ8463_PTP_PORT1_INT_START - KSZ8463_PTP_INT_START);
+  1203		if (ret)
+  1204			goto release_irq;
+  1205	
+  1206		ret = ksz8463_ptp_port_irq_setup(ptpirq, port2,
+  1207						 KSZ8463_PTP_PORT2_INT_START - KSZ8463_PTP_INT_START);
+  1208		if (ret)
+  1209			goto free_port1;
+  1210	
+  1211		return 0;
+  1212	
+  1213	free_port1:
+  1214		ksz8463_ptp_port_irq_teardown(port1);
+  1215	release_irq:
+  1216		free_irq(ptpirq->irq_num, ptpirq);
+  1217	release_domain:
+  1218		irq_domain_remove(ptpirq->domain);
+  1219	
+  1220		return ret;
+  1221	}
+  1222	
 
 -- 
-Sabrina
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
