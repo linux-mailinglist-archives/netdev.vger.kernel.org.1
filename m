@@ -1,174 +1,150 @@
-Return-Path: <netdev+bounces-253407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPkCM7Q7d2mMdQEAu9opvQ
-	(envelope-from <netdev+bounces-253407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:02:28 +0100
+	id UH1YFsg9d2mMdQEAu9opvQ
+	(envelope-from <netdev+bounces-253408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:11:20 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D30865E5
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:02:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF86586787
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:11:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCD3F3021719
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:00:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D3133007AF2
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282A032E692;
-	Mon, 26 Jan 2026 10:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FB632E73D;
+	Mon, 26 Jan 2026 10:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="dgpwF2po"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrkgaYtH"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E11432AAD0;
-	Mon, 26 Jan 2026 10:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA56313547;
+	Mon, 26 Jan 2026 10:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769421640; cv=none; b=RKqG7Hda1kj2vrhtnZNYpgU6EOIscb0V/UQ9z7kAo6M/mdOxWEorztPZl4smjPlKXQ6Tgu+gQeCXNaEq0Ivo1HP+jREhtWtevYGDotmt3KAzC/x/Cdx2MrDWe603s8gjRLZKniuJE/gyVbhTmxkAjLOWsGblnITJ8hr8G8m4ju8=
+	t=1769422079; cv=none; b=MeabeXBGPVTVSLm0RlvL4zZnrHUHj9QKC9Pw7uP6sEt3NRcKcB7e6ytoB5y8fbPQ3CGHMW0BYtU9q8QXQkAvkMaNpwfRkVsH++NZaXI6+REPu5vsJg3dhfrwIqSsNRBtKBDygp3SFc5h0GLeRltucvb0lEtuhmkoFEdnOOf0Ryg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769421640; c=relaxed/simple;
-	bh=Wt1rwo/nec9IpGLwGdaQ+T7BDTQMUQSo633PVUPIh1w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f+jNXRcRGocypPGjeeaxVdXw1Gyqn7wvG7hM+oYuVHk81zuZHidutLKM43vlbS4ZnQ7RTrItlZBSH0EdN6XIHi/Brv6wQ8gRjYwc2U6U5E+Lz3uz63PCdg08Zh/y2OYdjU+S34H0bK9W9WdBvfzua9wZrM+n5sNJYYb26QkzL9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=dgpwF2po; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=FfRxM4H11A6s0iRMiMwGmk8muiPnvWkFmoTAesES2BU=; b=dgpwF2poLLIicVlsvLlGXPfITg
-	Eg7hvxjBWQvQD4zZmmh8mCWkkoGmdp2FIcQhroXv2qKCTtkCsTtDNxdfpfWYF35F1trbiVgnUA7hn
-	97aSIFDwAOmXqMkMOxV2A0Mo8Ghe5dRGEmeuQWiqwNjPgh6zR+bpmj59yYAuT/+L26r9wH+8Slg97
-	JxA1CVAd6Hw7gOnPyz9qMIAL0jNb5LRRaie/E+12/QxMzA6Z/oFi2uEz7KI1ggVVYorsScZWpOJXL
-	UzOtb2/fypGwsSGsGhVdWrL/K8GPGyjOZ8FbJjcLM4pPkYH+dbjurgs8livvbWSC5R78SNiDWR5uB
-	4YPSkU7Q==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vkJOU-00G5vB-I1; Mon, 26 Jan 2026 10:00:26 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 26 Jan 2026 02:00:15 -0800
-Subject: [PATCH net-next] ethtool: remove ETHTOOL_GRXRINGS fallback through
- get_rxnfc
+	s=arc-20240116; t=1769422079; c=relaxed/simple;
+	bh=i53QC34mmVK2ZaeyBA2qjvIBa8TfbY7lumbUxES+2GY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8hGkcED5Na61z7MVtD4X6jIL4r1RN12RE4opK1FvVwSgU1JFJFLTwx4EtFDxiKlRqkJfCR40k8xqojn1LEA7sWr3idQC5pA5naYqLwzuKD/qitUxKWnKutvXa6jktLvvv8gcG7EHx2pVfpWvBIXyKuFw366zV9oTSeWFVixnBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrkgaYtH; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769422078; x=1800958078;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=i53QC34mmVK2ZaeyBA2qjvIBa8TfbY7lumbUxES+2GY=;
+  b=PrkgaYtH6PQGDzpIO2enA6MjrU6fOl2ZY36ttdjopARAxOJuR31mR19N
+   tBSm0R4TrXMnxPzkJ9NT14FtZnvutoiwQEfAE9Wcbhb3O2LoQF3F4vK3e
+   nGsOKFONUj7iAu2ft3+x88vCHEsL3Drq8cCxORiqpeBLDwddjQzP162BN
+   1micg6C/BDxBNLdn9qOugeGQ9spqpHMT8P2zyOo26gs+MOMRMwnQzhhxr
+   J9DSTqc+l6LMvvkwSDCqCQulY5xRlHsJlcIkLBCAfLVsSuH0Ac2D/m7az
+   6xqCHpyD7jOVFVV373krp+rbaFeVlQQ/OxbPCiJAeP8TCdhi/a+VG94er
+   w==;
+X-CSE-ConnectionGUID: TZu679eeQ7+XGXWI3eMppw==
+X-CSE-MsgGUID: GvXtyQoKSGKTTnfPD/65IA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="70755953"
+X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
+   d="scan'208";a="70755953"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:07:57 -0800
+X-CSE-ConnectionGUID: 0APbs0HMRe24HbNouuz9Lw==
+X-CSE-MsgGUID: Yk+1LMP8Ruagh5YFaJaDpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
+   d="scan'208";a="207529230"
+Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.122])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:07:53 -0800
+Date: Mon, 26 Jan 2026 12:07:50 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	UNGLinuxDriver@microchip.com, Petko Manolov <petkan@nucleusys.com>,
+	Oliver Neukum <oneukum@suse.com>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+	Foster Snowhill <forst@pen.gy>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Kees Cook <kees@kernel.org>, Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH net-next] net: usb: switch to two-argument strscpy
+Message-ID: <aXc89lDpfHQFVX-7@smile.fi.intel.com>
+References: <20260126035052.31216-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260126-grxring_final-v1-1-0981cb24512e@debian.org>
-X-B4-Tracking: v=1; b=H4sIAC87d2kC/yXM0QqCMBQG4FcZ/7WDOclirxIhOo/rRJzibMVAf
- PfQrj/4VmRSpoxgVih9OfNLEEzbGMT7KIkszwgG3vnetb63SauypGFhGZ+WvOumyzmeZtehMXg
- rLVyP7wqhYoVqwe0v+TM9KJa9w7b9ALfh8sZ7AAAA
-X-Change-ID: 20260126-grxring_final-e203b87c5d03
-To: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1660; i=leitao@debian.org;
- h=from:subject:message-id; bh=Wt1rwo/nec9IpGLwGdaQ+T7BDTQMUQSo633PVUPIh1w=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpdzs2HcyWZqYREQZNdJ2gniMveBQ4pbtbwDhh/
- h858GnFrz6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaXc7NgAKCRA1o5Of/Hh3
- bdaJEACTbf0zbV5+IalAOX025wwpoVvr4QvjPK7mc1o3y6DMNmQHo70acMli4grK/B1XF5lM8P7
- l4cQu/ATjq0rn3ggKhPSyE09b8R//5qxc6Knj/FNyt2lOROz70uniTPqHhOPRqO+HYSgcxM3a0V
- rnDM7bOXPxc9hLoFXjTBAQwhBngn/RnRu1iX4Iwrn16ByP6dVWfmvL+XqFXPyHUXf/V6tXWWTk/
- XYIsaTDA+31egEUxzbqpRmpyQJ8T9fvm2ZNINkzK3k4Nm8qYMz32GcILehYftBGn7bHRBB/DKLU
- otiVPTj6BmxSgrIaCC79wYtIYOw8sYIfuACW+BT9P2UR8HzRTv2dlJ/QRsPk7YWN3TDzHEdlnx5
- 4szWCoC98+b6EYO+vr3rmHdZHB1wjt5NLYujKiGihzPT1/jFyr4933W9QzuyCfQbiAHX+w3yHA/
- kC0c9OfKwsawsfWtVOUUq54u5warFFFmGYgK8Q0dE1iJY6YemyQKbTbrO5V3JmwSxeJUqeeWLOZ
- i0TPA39/2Zbv8p2O/SwTv+SrRZPQyNZqxK0RGmhbxVxdQgGS4DQcDw9XZ53AOalMWfJC54RkE2v
- z1F+Kuzd++EoDmwKKm6lacJbpHJCjY3j9wJkifOc2Vj0LPqP8PBcmokqi7IgR2H8IHhMaLkK/FT
- AiB6tsf3Eg9ygVQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126035052.31216-1-enelsonmoore@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253407-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,nucleusys.com,suse.com,fintech.ru,piap.pl,gmail.com,pen.gy];
+	TAGGED_FROM(0.00)[bounces-253408-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 37D30865E5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,smile.fi.intel.com:mid]
+X-Rspamd-Queue-Id: BF86586787
 X-Rspamd-Action: no action
 
-All drivers that need to report the RX ring count now implement the
-get_rx_ring_count callback directly. Remove the legacy fallback path
-that obtained this information by calling get_rxnfc with ETHTOOL_GRXRINGS.
+On Sun, Jan 25, 2026 at 07:50:15PM -0800, Ethan Nelson-Moore wrote:
+> All instances of strscpy in the USB network drivers use the size of the
+> destination. If given only two arguments, strscpy will automatically
+> use the size of the destination. Make the code more concise by
+> switching to the two-argument form of strscpy.
+> 
+> Also add a blank line after a variable declaration in catc.c to adhere
+> to kernel code style, since the surrounding code is being touched.
 
-This simplifies the code and makes get_rx_ring_count the only way
-to retrieve the RX ring count.
+It should go after your patch that drops some of the strscpy():s.
+Hence make a v3 as a series of two patches.
 
-Note: ethtool_get_rx_ring_count() returns int to allow returning
--EOPNOTSUPP, while the callback returns u32. The implicit conversion
-is safe since RX ring counts will not exceed INT_MAX while we are still
-alive.
+Code wise this LGTM, thanks for doing this.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/ethtool/common.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+-- 
+With Best Regards,
+Andy Shevchenko
 
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 4036561b078b5..c5ed88bccbb41 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -637,21 +637,11 @@ int __ethtool_get_link(struct net_device *dev)
- int ethtool_get_rx_ring_count(struct net_device *dev)
- {
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
--	struct ethtool_rxnfc rx_rings = {};
--	int ret;
--
--	if (ops->get_rx_ring_count)
--		return ops->get_rx_ring_count(dev);
- 
--	if (!ops->get_rxnfc)
-+	if (!ops->get_rx_ring_count)
- 		return -EOPNOTSUPP;
- 
--	rx_rings.cmd = ETHTOOL_GRXRINGS;
--	ret = ops->get_rxnfc(dev, &rx_rings, NULL);
--	if (ret < 0)
--		return ret;
--
--	return rx_rings.data;
-+	return ops->get_rx_ring_count(dev);
- }
- 
- static int ethtool_get_rxnfc_rule_count(struct net_device *dev)
-
----
-base-commit: bf2e36c9dab95e41516fbcf7b1cc804539b2d021
-change-id: 20260126-grxring_final-e203b87c5d03
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
 
 
