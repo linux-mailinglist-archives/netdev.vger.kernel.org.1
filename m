@@ -1,206 +1,254 @@
-Return-Path: <netdev+bounces-253466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253467-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iItJL3Vdd2n8eQEAu9opvQ
-	(envelope-from <netdev+bounces-253466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:26:29 +0100
+	id 8MC0Icxfd2n8eQEAu9opvQ
+	(envelope-from <netdev+bounces-253467-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:36:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A29882AA
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:26:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F678858D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62DDC301484F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:26:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 829933026AA7
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C973358D3;
-	Mon, 26 Jan 2026 12:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FEE3016FC;
+	Mon, 26 Jan 2026 12:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOr04dty"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hRiZFrh4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644903358A6
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 12:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769430386; cv=pass; b=stre4Q7ir+8UbGVmFjW7RAEfG8JO/2rxpGloLY4T4DFbMYzDZy+V2Y7dCSjqY/l9l35v7SzxtnbxPPX/CUS8gy8Kny8PKDmKu7Ca5BLqZB7hearJ7pxunBhSh3mZoWpFDrR9YWOJJWo6w+FwndXnAv/M4Xa2vLobeJzJQZvIgRw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769430386; c=relaxed/simple;
-	bh=vPCZu31gxLfRaeY7YQxgNiP/GuzXwU0aaq6khzdHMjw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sZJ6UHXSrGZrNY50a69BRcUdyQ7lWdlJruPH/+uOfoybbbMMkdEt3KxGAXF9cC7BXkvW4e4pSYEOT11HJDDPqVW6R3slmtn/0ujoCoeUdDdky5YcWwipzSZZa9fNaTiO36rLkKnbSPSb7OQPTkz0WPtH0ffpdZyl/22PJP1W+VI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOr04dty; arc=pass smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-894723da7dfso71890936d6.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 04:26:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769430383; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UEzbHabw3QGnf+iMjgaoZ0tIMXZ7+AFW72G/oTp6Q82+3AJyX3Szz11bvNmMdK/mVc
-         bKzyWSxueK2LYwglsWMyFGdysLJraCBHAjbPP9OsRo+F7K/mvrByxWdTcfRuMkQ+02lB
-         +QQMimhLH0cMkIh9hXGlsy4uRXh1z7vA2J4pSVSucw0XAvxn3TNhLY8Tfko6hc+0z3kG
-         Oyjg5z6jEZijFe8qNKXVejtD9dTLVZbF8K+wPnnIdYDSYj55MGH9T8Cx2+j6Pab1vGfH
-         k0KSQ/N2t4o8mFWryxvqQ0FcN5OoROZGOxLBYoGpz+UKk36ihrMbqth3B1EZR/W4EguT
-         GKkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BQR5xxlaPiBFDty3dHak2wCiTHJHX4MEnx5OyreGB1k=;
-        fh=vo3Il5wHTuJZwrMqyd25qqpESAoJmfKVgBrDbXThYSI=;
-        b=M6nMMjJPET3zB2tBW5bnkmUplmxVvz1hAQYHTIGMa6xgpT55f24+W+l9uSJEjgTYGR
-         IvEaH5ZU43rxKCENVNujfp1o1PnI2GESqm/cdzqM7guEkHvUTn56RumAxhbPf+C4woWn
-         ZMMbaBty+E3D2KnX5OeBunzq6wk1xGzZ2lgt1ycp+s48V+Xd/+7G6SplV/UUmNV4a0PU
-         lsxoyOqGSB8z5SxyDVPXATBSQDcpgopnXRi15jMrpKl/4DFBNyK5VU+RRXezx/SPQj7U
-         im+dM8MpefLoHR6LNk5ewctxBCdhZYNl2niCZNJFEyH6SKgI1PwNAMh0P3ilZSxUfd4U
-         LHNg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769430383; x=1770035183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BQR5xxlaPiBFDty3dHak2wCiTHJHX4MEnx5OyreGB1k=;
-        b=MOr04dtyfv1Zp3nhw24YzWG7ABxDremBoErKo6ZplFU2zPggccQO4PzvoJGxOhI/Jl
-         HQLACN5xSdo/ImjxkTvzkF1d7NWVZj6ObWpsYT0uR6fEybxxGtUSS08pupCshWlGuzA/
-         i0eIrFivcY/Z1bc/mYb07OkxA8sKyjqYcfDQp2oCFk+2v6XAtHafO+csYwYBIe5n57ty
-         HUSmF+w3SZ6tzRopt+huY6NnyK+Xm/cFCb2uRgfHECHeK0OmbqMBQ34DOUT/bCjjKY5j
-         +kNALa9pzH0zlDlNZy5pMlaJjTgW3wmJtfInPrq4Ms5ay02OZO66rNkwaqPYmt8cbVdd
-         BywA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769430383; x=1770035183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=BQR5xxlaPiBFDty3dHak2wCiTHJHX4MEnx5OyreGB1k=;
-        b=VuCbspxosvKvMsD5a0g96bXhLvFeheB19qRy8nnUM3K14nulM68oG4Z3mqFcvXRotz
-         xbOC0Q+QUTDovkb037aM9p2DhVi9W3m9q1cZZn9JdBTsfHkzs4f5s5wuOO+z+iBgJhT5
-         Zp66T8FGe4bA9QypX8KrKdf3CtM4fA1xZEcBZvbSGE2kVsOuMal354buxnnBqZDRfCPg
-         JNKKxw18uJNTn381sIcLMtfjG1OqEkoBd8zVCPw7KUeYy/HxS3fO0owv/cElZORjf5Jz
-         H3fKReudVxJ3L1n6jFYL2pwm2XxOtpdplbBvgQgk+tz1Ds3MtUGldhKbTqGdGDs4QoXt
-         J1TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLihPRV4f2HYeKJe+layjBFd3YjR0cyT/PSez+kaDxrpt7A3Zp4fw/438+ltB3U8ynxduUI8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj1BbTEMYNYgITNn9emlollv/tpIg/YDAxWw44plr5/sjEXwWR
-	WlwJ3cRGnC0yqUBQwtaJrfaesc1o8zknoud7IAozycDPl8txEGI5xyKgqm6Yn0C8x17pP5U2jdp
-	reB3/ahSI43sC16SChVLFs05muXF8xNdLcqL3wWja
-X-Gm-Gg: AZuq6aIA9wfRGNqP2HbAPPX/kifdrsalppFoNCU6SHYjNFXNn+C3PcxfIp2UlOMMkLV
-	gi/8fBXND2b1K5vBISpVO5AIVSgj+0Cw/IZJGS0QRLjLfWX3SzWWsbBw9/MBkXpnnmhYX9lcih7
-	VQQhY5CFaGv4dKH1TroyDOjxxrsR6qLPICoilOd88haUksoQ5kJ+a7EhQQZUIHt/BvVeyisUsAK
-	Dy9bppzF2DxGmhKSOjxd/2o6zMx9tHlWVas6jD6DC36WE6hL1tf3pBvEswv7joEKwqEgA==
-X-Received: by 2002:a05:6214:20ca:b0:880:3ce2:65ad with SMTP id
- 6a1803df08f44-894b075ebb8mr53564136d6.41.1769430382887; Mon, 26 Jan 2026
- 04:26:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D34025DD1E;
+	Mon, 26 Jan 2026 12:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769430804; cv=none; b=C3l0cuxHEE9pU97+qpRk2Uj/PhjVduZ7bJueKvY1uwqyw2lHlx2YcxZWrNq7lZBKlLv7YN1husil0bXM7OVSDTgF7ERPVtQXeeCu9LEd1Sx9OAiIgswoTkwXx2EKZnKT2h4ZPmDG062QrT4Rzfamta8YOjEYCTZo9izv/CnVR74=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769430804; c=relaxed/simple;
+	bh=ZREDIf6krv7feMki999FgAwEP76fHYD8y3XIdOwuu6g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PggNeqj/RUG2xREd5xlSmmTbfn+3VAUfKHJN+5Mmj4H9oEWexlwnu2vRJ1T9Psf+a/F4KAXvYUgh05k6Z3JRsKCDsjO2U/t5KzEAbwlnCU2gwcEHZ9muOdmthJpUPOWtH0XW0lO8l6rJbupkNmw6azC7OaMkBaG5phPkNhPIxo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hRiZFrh4; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60Q9dhtg4175220;
+	Mon, 26 Jan 2026 04:33:14 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=vRyKl4mOPGPHX0rmBrOfwRm
+	MIucbzDb0IO+yMjyJBN8=; b=hRiZFrh4Y0FND65f7d7hhDUESXecZgSGGz6LqrY
+	PnCSCECmbEQDuUKAtFXEFPc0PaJm47fGIpB7VeWdEjzoWm/+CSG6UbIXW1JFlwLW
+	HxZgiCRft8IzXSL9ye2ATKJLJlG5go9ui21t5XESX4/QjSdea24E6O5UoXASN+So
+	p1mJnLLfl7y1az0jVTUP613SXYKt0ImKx8bKAUbqfjp6mYdi7viInGqSSiswB7m1
+	SdvwkKZaovMJn17oGaaFhOMZplZzCmMr+zseIuuEKeNsc94P2ZvahNorLcOLiABb
+	Yk7rDgX76BZC3HaknEeuOQjhFjQFsOZRGlA/YncHD8kwdaA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjjqk8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Jan 2026 04:33:13 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 26 Jan 2026 04:33:12 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 26 Jan 2026 04:33:12 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 1CA143F70B4;
+	Mon, 26 Jan 2026 04:33:09 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net-next v5 00/13] NPC HW block support for cn20k
+Date: Mon, 26 Jan 2026 18:02:40 +0530
+Message-ID: <20260126123254.1000480-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGfirfeHMgBUq-Q8tCn8dr2tHVJdQtZbS0JMutqF+b04T3EoWw@mail.gmail.com>
- <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
- <CANn89iJrXSHouF4ZnnoVYz4Q47J5jkwU4OuXMpJi3Orox4uT_Q@mail.gmail.com>
- <CANn89iJvj8YXtuMNTh1cQOjVctBsMs88FHx-xLn+rCzyBGn-og@mail.gmail.com> <CAGfirfebdHJi13epyM5RWYfQ2TGSWExP5nmnoKra83awetAbLQ@mail.gmail.com>
-In-Reply-To: <CAGfirfebdHJi13epyM5RWYfQ2TGSWExP5nmnoKra83awetAbLQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Jan 2026 13:26:11 +0100
-X-Gm-Features: AZwV_QgiWGm59mk0ei6HnIkVkYgAcOxBiqQElEceFpCpuVrl3oQIO1cRxuadLxE
-Message-ID: <CANn89iLhXQ0W7+rOQCqxLpGyoHBAJ_xeUhjL+7MtQmN2saaYog@mail.gmail.com>
-Subject: Re: [BUG] KASAN: slab-use-after-free Read in u32_classify
-To: =?UTF-8?B?6rmA6rCV66+8?= <km.kim1503@gmail.com>
-Cc: davem@davemloft.net, Jamal Hadi Salim <jhs@mojatatu.com>, jiri@resnulli.us, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	xiyou.wangcong@gmail.com, horms@kernel.org, syzkaller@googlegroups.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: qn0-nzvO54DHXBXERd-Y2WR5fDLmI_r8
+X-Proofpoint-ORIG-GUID: qn0-nzvO54DHXBXERd-Y2WR5fDLmI_r8
+X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=69775f09 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=A1wDlwXRn1NGPBHeO_kA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI2MDEwNiBTYWx0ZWRfX7OKoYr6JfkoQ
+ Y3WoB1UqNpRAw/Nds5CO/U/T8Sqf6OzMCowyVoAgpUPj52w9H8xlH6QIIUZSLA7u2qVMzAplvqd
+ 6KdkwahVHtoFZOUdmoI5hXNZ4e3ioNhD8jah4ObM3MqW3NAOswuIx6nl4HXt8VLeq6DE0YTINeM
+ Rd2J88OT3tMWHyt6TTA9Dw/XhAhZwpLP0gfYi6S7NaG2CSteBVElFtjHmQPPlNBj30ZO/Ql6ZoE
+ y81sMZ4FrLDmc8sHZSlXveWNXG3cOastbtYhQMZJL20DJkcLjr98hgdHmnIaqktq+S9+1fIz2bf
+ n9NwZVp1FPnyMFMLNFukmYtwGYGO3Xydoyf7LWgtEUHWkK5f8g2WAjhRUakGr4WdW5VykKYH27X
+ K9GfWzRYWRHPEiE8m2jzrjuc3Mh6LHxnlQ54Ih1IPFrVVWKRfWhXAbDptFlU+RSW65VvxfuvmzJ
+ aVIngliDkNHiEvCtXww==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-26_02,2026-01-22_02,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253466-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,mojatatu.com,resnulli.us,kernel.org,vger.kernel.org,redhat.com,gmail.com,googlegroups.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253467-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:mid,marvell.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 38A29882AA
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: E8F678858D
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 1:11=E2=80=AFPM =EA=B9=80=EA=B0=95=EB=AF=BC <km.kim=
-1503@gmail.com> wrote:
->
-> I propose the following patch and would appreciate your review.
->
-> hoff is used as an offset argument to skb_header_pointer() in
-> u32_classify(), and negative values can cause out-of-bounds read. As
-> shown in the code below, offoff follows the same pattern and requires
-> the same validation.
-> ```
-> TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
->    const struct tcf_proto *tp,
->    struct tcf_result *res)
-> {
-> ...
-> if (n) {
-> ...
-> if (n->sel.flags & (TC_U32_OFFSET | TC_U32_VAROFFSET)) {
-> off2 =3D n->sel.off + 3;
-> if (n->sel.flags & TC_U32_VAROFFSET) {
-> __be16 *data, hdata;
->
-> data =3D skb_header_pointer(skb,
->   off + n->sel.offoff,
->   2, &hdata);
-> if (!data)
-> goto out;
-> off2 +=3D ntohs(n->sel.offmask & *data) >>
-> n->sel.offshift;
-> }
-> off2 &=3D ~3;
-> }
-> ...
-> }
-> ...
-> }
-> ```
-> Therefore, I propose a patch that rejects negative hoff and offoff
-> values during u32 classifier configuration.
->
-> --- a/net/sched/cls_u32.c
-> +++ b/net/sched/cls_u32.c
-> @@ -1104,6 +1104,11 @@ static int u32_change(struct net *net, struct
-> sk_buff *in_skb,
->   err =3D -EINVAL;
->   goto erridr;
->   }
-> +
-> + if (s->hoff < 0 || s->offoff < 0) {
-> + err =3D -EINVAL;
-> + goto erridr;
-> + }
->
+This patchset adds comprehensive support for the CN20K NPC
+architecture. CN20K introduces significant changes in MCAM layout,
+parser design, KPM/KPU mapping, index management, virtual index handling,
+and dynamic rule installation. The patches update the AF, PF/VF, and
+common layers to correctly support these new capabilities while
+preserving compatibility with previous silicon variants.
 
-Negative values are valid, it is ok to access data between skb->head
-and skb->data.
+MCAM on CN20K differs from older designs: the hardware now contains
+two vertical banks of depth 8192, and thirty-two horizontal subbanks of
+depth 256. Each subbank can be configured as x2 or x4, enabling
+256-bit or 512-bit key storage. Several allocation models are added to
+support this layout, including contiguous and non-contiguous allocation
+with or without reference ranges and priorities.
+
+Parser and extraction logic are also enhanced. CN20K introduces a new
+profile model where up to twenty-four extractors may be configured for
+each parsing profile. A new KPM profile scheme is added, grouping
+sixteen KPUs into eight KPM profiles, each formed by two KPUs.
+
+Support is added for default index allocation for CN20K-specific
+MCAM entry structures, virtual index allocation, improved defragmentation,
+and TC rule installation by allowing the AF driver to determine
+required x2/x4 rule width during flow install.
+
+Ratheesh Kannoth (7):
+  octeontx2-af: npc: cn20k: Index management
+  Add CN20K MCAM allocation support. Implements contiguous and
+  non-contiguous allocation models with ref, limit, contig,
+  priority, and count support.
+
+  octeontx2-af: npc: cn20k: Allocate default MCAM indexes
+  Allocate default MCAM entries dynamically in descending index
+  order during NIX LF attach, reducing MCAM wastage
+
+  octeontx2-af: npc: cn20k: Prepare for new SoC
+  Introduce MCAM metadata structure so low-level functions no
+  longer receive SoC-specific structures directly.
+
+  octeontx2-af: npc: cn20k: virtual index support
+  Add virtual MCAM index allocation and improve CN20K MCAM
+  defragmentation handling. Track virtual indexes and restore
+  statistics correctly.
+
+  octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
+  Extend install_flow mailbox so AF can determine rule width and
+  complete allocation and installation in a single exchange.
+
+  octeontx2-af: npc: cn20k: add debugfs support
+  Debugfs entries to show mcam layout and default mcam entry allocations
+  Legacy debugfs entries are modified to show hardware priority on cn20k
+  SoC.
+
+  octeontx-af: npc: Use common structures
+  Low level functions should use maximum mcam size array and modify cam0
+  and cam1. This is a cleanup patch.
+
+Subbaraya Sundeep (1):
+  octeontx2-pf: cn20k: Add TC rules support
+  Add full TC dynamic rule support for CN20K. Handle x2/x4 rule
+  widths, dynamic allocation, and shifting restrictions when
+  mixed rule sizes exist.
+
+Suman Ghosh (5):
+  octeontx2-af: npc: cn20k: KPM profile changes
+  Add support for CN20K KPM profiles. Sixteen KPUs are grouped
+  into eight KPM configurations to improve resource usage
+
+  octeontx2-af: npc: cn20k: Add default profile
+  Update mkex profile for CN20K and mark unused objects with
+  may_be_unused to silence compiler warnings.
+
+  ocetontx2-af: npc: cn20k: MKEX profile support
+  Add support for the new CN20K parser profile. Introduces the
+  extractor-based model with up to twenty-four extractors per
+  profile.
+
+  octeontx2-af: npc: cn20k: Use common APIs
+  Update common MCAM APIs for CN20K. Add new register handling,
+  new access algorithms, and CN20K-specific index management.
+
+  octeontx2-af: npc: cn20k: Add new mailboxes for CN20K silicon
+  Add CN20K-specific MCAM mailbox messages for updated mcam_entry
+  layout and avoid breaking backward compatibility.
+
+ MAINTAINERS                                   |    2 +-
+ .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+ .../marvell/octeontx2/af/cn20k/debugfs.c      |  437 ++
+ .../marvell/octeontx2/af/cn20k/debugfs.h      |    3 +
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 4368 +++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  262 +
+ .../ethernet/marvell/octeontx2/af/cn20k/reg.h |   58 +
+ .../ethernet/marvell/octeontx2/af/common.h    |    4 -
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  173 +-
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |    2 +
+ .../marvell/octeontx2/af/npc_profile.h        |   84 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |   17 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   18 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |   68 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |   81 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |    1 -
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  513 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.h   |   21 +
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  664 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.h         |   14 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.c       |   21 +-
+ .../marvell/octeontx2/af/rvu_npc_hash.h       |    2 +-
+ .../ethernet/marvell/octeontx2/nic/cn20k.c    |  265 +
+ .../ethernet/marvell/octeontx2/nic/cn20k.h    |   13 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   35 +
+ .../marvell/octeontx2/nic/otx2_flows.c        |  263 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  |   77 +-
+ 27 files changed, 7086 insertions(+), 382 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.h
+
+--
+ChangeLog:
+v1 -> v2: Addressed comments
+v2 -> v3: Resolved build errors, addressed comments
+v3 -> v4: Address comments from Jakub
+	 https://lore.kernel.org/netdev/20260109054828.1822307-12-rkannoth@marvell.com/T/#t
+v4 -> v5: Addressed comments from Jakub
+	https://lore.kernel.org/netdev/20260113101658.4144610-6-rkannoth@marvell.com/
+	Removed "write to debugfs" code. Will come back to it after devlink array support is added.
+2.43.0
 
