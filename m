@@ -1,110 +1,138 @@
-Return-Path: <netdev+bounces-253298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDbMOMS2dmksVAEAu9opvQ
-	(envelope-from <netdev+bounces-253298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 01:35:16 +0100
+	id kMZzOlC+dmkYVgEAu9opvQ
+	(envelope-from <netdev+bounces-253302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 02:07:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D9A83358
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 01:35:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D9A83446
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 02:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D17C83005E9B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 00:35:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39BFC3011F1F
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 01:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC617260D;
-	Mon, 26 Jan 2026 00:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E841DF271;
+	Mon, 26 Jan 2026 01:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StN5kJ9Z"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="5/H4LYxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCBA625;
-	Mon, 26 Jan 2026 00:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BCA548EE;
+	Mon, 26 Jan 2026 01:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769387712; cv=none; b=puEiRW2aiGHImQhnansa1YQWeYUOKLEL/YVSaUPtndf9UrDK6N8Oa6v17FQyRggcELz7pwinRJDappm0vatIMwXzVN4PYxqwkLEz2TmGV5LQPjDItD0mrwpKu/jxbsM2W0eR73ssIP5laZtgegz7exLmPlEKFIBxhjBx9ZXEoX4=
+	t=1769389599; cv=none; b=MkcuvbjEVfXsYj5ds9STxJkFqNb8JgUb6LrO6vh39mbnpfW2Hvcvkn/LBDKshOIwa6GhUxNRSgAVFVxPwwf4vtrnM3SZdyQbpZYF5XfNID2ql7CDUkN3bmZPDBjb1wa0roFgoBHPRhFfGplIlNX5gmOD10AyyBYqfIFPQ/LojRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769387712; c=relaxed/simple;
-	bh=UPQoK1ge3az5sWfMSPCewv5xcDr179Pzfg1pOZpPjrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ji55uSwBHEmtN60mY7VxBu+V6d/JJsRKHA4DBJ6rg3ogUSx+V6CXEIa7nMZO9DLqFZIx1nyUhODO9tAJgq3tH5APIUrMkmT8p54hE05+oVaVGhbQD4QcskjFthDGTsXXy2+DQshTWJhSr3Pw0jF7D7kExtzzqFkOgdkHn/fF/OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StN5kJ9Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8106CC4CEF1;
-	Mon, 26 Jan 2026 00:35:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769387712;
-	bh=UPQoK1ge3az5sWfMSPCewv5xcDr179Pzfg1pOZpPjrk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=StN5kJ9Zffbb7bohQyX5TgM0rQPH5yf0P0HPrka2oW8956lqitlziLCBsLVljcF/1
-	 HIH2xlx94WbJRnekZaJiLbC+MbkCS7JSFKg2NXKiyIjZDRqJHNEmnXCIFX91gTqSgj
-	 //j7N5aMGBYqgr9aXx9U9b2rKA/85bN6swIZNv4VXIBgDxL9LLI8d3f3OHK+cip7QK
-	 YW0z6/9Y+yPRAoOCQ2R0d7OP3LQUP79ZtZPAWAivg5Nc71q5IGJYn91BEoaUmopJGv
-	 MCppXfRv4RBZTJBp4wBtsxTsWhYZ+eHfj41f+QsTzbmhvG5wnxxC7YK18GjXT4suvy
-	 t+yQFG6W2Lh/g==
-Date: Sun, 25 Jan 2026 16:35:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: airoha: Use u64_stats_t with
- u64_stats_sync properly
-Message-ID: <20260125163510.4c5ea4df@kernel.org>
-In-Reply-To: <20260125220753.3984326-3-mmyangfl@gmail.com>
-References: <20260125220753.3984326-1-mmyangfl@gmail.com>
-	<20260125220753.3984326-3-mmyangfl@gmail.com>
+	s=arc-20240116; t=1769389599; c=relaxed/simple;
+	bh=FyrJO934c2Q08VFZw98/QGu7W1xJURNsMAM6qBnp2aE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=svVOgB2x+knTRIy+6S6lkz3E0e0aFVwjO0trVXtXJjF/u5EwCJTmeMTM3cpC+CFQrrnsSZO+4Cgt4P+ib9CD1qrBmTCykqLa4BGyVg5FIgZIawkYHyoiG8P9Sf23UgeW7ldTNWgxfae78gmuHSWUwwwqLttZxQwi3ClNldhqnSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=5/H4LYxe; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=6kk/V2kSb+hk1d/bnoCL/WTzwRbODiqZx5XFRSsUATs=;
+	b=5/H4LYxeBe2fLH5C07zuYFwZE3RTeVY7U9kcy9Yi9ja6DRwmf/SJr2ZEWHpaEbpZZZR+gMGhp
+	IKCNyTvBBiDC7L54vknutFrYOZT7eMJW30MTKyV8IdGq1zek5EvCyUWgnY6WsM+uH7v7kYZAeff
+	y4T2xM56x34I5g0NDf6xP2o=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4dzqys2YH8z1K9Xq;
+	Mon, 26 Jan 2026 09:03:01 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id D80FD40568;
+	Mon, 26 Jan 2026 09:06:25 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Mon, 26 Jan 2026 09:06:24 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
+	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>
+Subject: [PATCH net-next v02 0/4] net: hinic3: Fix code styles
+Date: Mon, 26 Jan 2026 09:03:30 +0800
+Message-ID: <cover.1769142701.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253298-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253302-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 73D9A83358
+	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[h-partners.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:dkim]
+X-Rspamd-Queue-Id: 97D9A83446
 X-Rspamd-Action: no action
 
-On Mon, 26 Jan 2026 06:07:50 +0800 David Yang wrote:
-> On 64bit arches, struct u64_stats_sync is empty and provides no help
-> against load/store tearing. Convert to u64_stats_t to ensure atomic
-> operations.
+This patchset provides 4 code styles fixes:
 
-The driver takes a spin lock over the very expensive series
-of register reads and then drops out to copy the just read
-values? Just move the readers under the spinlock?
+Remove empty lines between error handling.
+Remove redundant defensive code.
+Use array_size instead of multiplying.
+SQ use SQ_CTXT_PREF_CI_HI to improve readability.
+
+Thanks,
+Fan gong
+
+Fan Gong (4):
+  hinic3: Fix code Style(remove empty lines between error handling)
+  hinic3: Remove redundant defensive code
+  hinic3: Use array_size instead of multiplying
+  hinic3: RQ use RQ_CTXT_PREF_CI_HI instead of SQ_CTXT_PREF_CI_HI
+
+ drivers/net/ethernet/huawei/hinic3/hinic3_cmdq.c    | 3 ---
+ drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c     | 1 -
+ drivers/net/ethernet/huawei/hinic3/hinic3_lld.c     | 5 -----
+ drivers/net/ethernet/huawei/hinic3/hinic3_main.c    | 4 ----
+ drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c    | 2 --
+ drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c | 6 ++++--
+ drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c  | 6 +++++-
+ drivers/net/ethernet/huawei/hinic3/hinic3_tx.c      | 7 -------
+ 8 files changed, 9 insertions(+), 25 deletions(-)
+
+
+base-commit: 4515ec4ad58a37e70a9e1256c0b993958c9b7497
+-- 
+2.43.0
+
 
