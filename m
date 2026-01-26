@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-253381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +I5+BPYud2lVdAEAu9opvQ
-	(envelope-from <netdev+bounces-253381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:06 +0100
+	id aLbOEiMvd2lVdAEAu9opvQ
+	(envelope-from <netdev+bounces-253382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626FB85CD7
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62D085D2C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 546573021EBE
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:05:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 507CC30420A8
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8B030497C;
-	Mon, 26 Jan 2026 09:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3D83043DB;
+	Mon, 26 Jan 2026 09:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aDOq1xmX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uy/RXibV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4B63033EF
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35AD3043DC
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769418335; cv=none; b=d+iczwXXKDom8hMWhUOZ/RD7C19qKEpJt2DCUQeMbRSkgrSiXftjuJrGnXT8SlxhdpYIFZz/w9DtH22ZNBtDrn9ElKdXSGa2ik1JYtaEhOF0wx6lExmTwgw8/z/Xqv+5x6DVW4bD+P9R4SrpfwVnM6OXcxbu0WUSJnfNAjmrV5o=
+	t=1769418337; cv=none; b=KRJQh0Qvg8Jb6Fh/elYssN0lRipnCJRfSg3O5eukI5QzCbKqqYDjkhruerjEboSXCtSVAjWoUCNHYCzxsNpHe93JUsxvsoQLLOJAqMfGCtlZJW1pVQohUXDbrdkod6u4m/WJSBjv7lSUNQGC3T9yipquF00MVyd430jaDSYQrZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769418335; c=relaxed/simple;
-	bh=2k9LiI+M//qM4q+K2IyZ0CNDJt0ZnwZ2pxw6XNWmxxQ=;
+	s=arc-20240116; t=1769418337; c=relaxed/simple;
+	bh=OGLI1S2l0PmNr2S4bsYnKqfqSXB+2A+DsfQrV5CIDWU=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CqMFkjLU0A6KFFydNV1CSruTJT7vSU1aOCDnDpjYQSuMAZjXkgn5xogdc5cUTtPA7dZa4fSJI2fMNRqb86SQaBtbyKdYWzIbTPOA/RH+DoixKLXo4BiBtYalAPsUSvHJK47EohZ5TtnO9xe6K8Vnos3ueJFDHgMCz8ISGYR0fX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aDOq1xmX; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=Ykt7KVUP6FJSqflQI+yZQ452rvHgNR7rUF6q+VLUk3X0AsvgFj4xWzlPSmBHsSFhl47tcKGPe5evAssDVnT4OksscwW/AcC5HKpyYTwxMi4LiAmm6REgN3Kfpk/F1vPBchDnBi8gMgZmbwQBHoGyzj6uIa3BMkQZBu8dkTk69R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uy/RXibV; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769418321;
+	t=1769418333;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MZDHd5qG1jM6uT5/JnPwA06VDLOpkfHtWx6qC88p08g=;
-	b=aDOq1xmX1htN3hO0feRYUDc3w9DQ2r1pila9TAuDHs2gzwvwuhQKew3H7l1iGkAqae1m+d
-	14ScCeAjq4WbJGmEoYbx8fpu+fFe+XBjV+Zcdr6Mu2ENKnJjCRbVoh9SQf4eVSjSQCwg4f
-	MA7hyAoYo1P2OFkMvRn/S3+kwsgAky8=
+	bh=FOthmRQx1S9k8S+lynuRz8PEGmhPgopf4vkxZNGup6E=;
+	b=uy/RXibVJ3oVqmHcuUREIO42g9J6ZAIDsRa75aGhZMOzYi44E9zdwYLQ+penjI2tSnOZ+w
+	LYhshtEuxxm3yPmlrUhEurCZH+tgHpic1Git0dNeJokwkgNF4kbjIyW7g7HRcL6RogvQ/w
+	Xf01C8a/HuO2jBXWYYLKTeQ+JOUbD78=
 From: Hui Zhu <hui.zhu@linux.dev>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Johannes Weiner <hannes@cmpxchg.org>,
@@ -95,9 +95,9 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [RFC PATCH bpf-next v4 04/12] mm: define mem_cgroup_get_from_ino() outside of CONFIG_SHRINKER_DEBUG
-Date: Mon, 26 Jan 2026 17:04:47 +0800
-Message-ID: <c7dd362ee9a607fd74416b85d69a4f8fd246da13.1769417588.git.zhuhui@kylinos.cn>
+Subject: [RFC PATCH bpf-next v4 05/12] libbpf: introduce bpf_map__attach_struct_ops_opts()
+Date: Mon, 26 Jan 2026 17:04:48 +0800
+Message-ID: <635923ceadf1899672e4f7727ddc52554c11a3ac.1769417588.git.zhuhui@kylinos.cn>
 In-Reply-To: <cover.1769417588.git.zhuhui@kylinos.cn>
 References: <cover.1769417588.git.zhuhui@kylinos.cn>
 Precedence: bulk
@@ -115,11 +115,11 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253381-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253382-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
@@ -132,73 +132,133 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 626FB85CD7
+X-Rspamd-Queue-Id: E62D085D2C
 X-Rspamd-Action: no action
 
 From: Roman Gushchin <roman.gushchin@linux.dev>
 
-mem_cgroup_get_from_ino() can be reused by the BPF OOM implementation,
-but currently depends on CONFIG_SHRINKER_DEBUG. Remove this dependency.
+Introduce bpf_map__attach_struct_ops_opts(), an extended version of
+bpf_map__attach_struct_ops(), which takes additional struct
+bpf_struct_ops_opts argument.
+
+struct bpf_struct_ops_opts has the relative_fd member, which allows
+to pass an additional file descriptor argument. It can be used to
+attach struct ops maps to cgroups.
 
 Signed-off-by: Roman Gushchin <roman.gushchin@linux.dev>
 ---
- include/linux/memcontrol.h | 4 ++--
- mm/memcontrol.c            | 2 --
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ tools/lib/bpf/bpf.c      |  8 ++++++++
+ tools/lib/bpf/libbpf.c   | 18 ++++++++++++++++--
+ tools/lib/bpf/libbpf.h   | 14 ++++++++++++++
+ tools/lib/bpf/libbpf.map |  1 +
+ 4 files changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 229ac9835adb..f3b8c71870d8 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -833,9 +833,9 @@ static inline unsigned long mem_cgroup_ino(struct mem_cgroup *memcg)
- {
- 	return memcg ? cgroup_ino(memcg->css.cgroup) : 0;
- }
-+#endif
- 
- struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino);
--#endif
- 
- static inline struct mem_cgroup *mem_cgroup_from_seq(struct seq_file *m)
- {
-@@ -1298,12 +1298,12 @@ static inline unsigned long mem_cgroup_ino(struct mem_cgroup *memcg)
- {
- 	return 0;
- }
-+#endif
- 
- static inline struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
- {
- 	return NULL;
- }
--#endif
- 
- static inline struct mem_cgroup *mem_cgroup_from_seq(struct seq_file *m)
- {
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 3808845bc8cc..1f74fce27677 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -3658,7 +3658,6 @@ struct mem_cgroup *mem_cgroup_from_id(unsigned short id)
- 	return xa_load(&mem_cgroup_ids, id);
+diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+index 5846de364209..84a53c594f48 100644
+--- a/tools/lib/bpf/bpf.c
++++ b/tools/lib/bpf/bpf.c
+@@ -884,6 +884,14 @@ int bpf_link_create(int prog_fd, int target_fd,
+ 		if (!OPTS_ZEROED(opts, cgroup))
+ 			return libbpf_err(-EINVAL);
+ 		break;
++	case BPF_STRUCT_OPS:
++		relative_fd = OPTS_GET(opts, cgroup.relative_fd, 0);
++		attr.link_create.cgroup.relative_fd = relative_fd;
++		attr.link_create.cgroup.expected_revision =
++			OPTS_GET(opts, cgroup.expected_revision, 0);
++		if (!OPTS_ZEROED(opts, cgroup))
++			return libbpf_err(-EINVAL);
++		break;
+ 	default:
+ 		if (!OPTS_ZEROED(opts, flags))
+ 			return libbpf_err(-EINVAL);
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index 0c8bf0b5cce4..70a00da54ff5 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -13462,12 +13462,19 @@ static int bpf_link__detach_struct_ops(struct bpf_link *link)
+ 	return close(link->fd);
  }
  
--#ifdef CONFIG_SHRINKER_DEBUG
- struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
+-struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
++struct bpf_link *bpf_map__attach_struct_ops_opts(const struct bpf_map *map,
++						 const struct bpf_struct_ops_opts *opts)
  {
- 	struct cgroup *cgrp;
-@@ -3679,7 +3678,6 @@ struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
++	DECLARE_LIBBPF_OPTS(bpf_link_create_opts, link_opts);
+ 	struct bpf_link_struct_ops *link;
+ 	__u32 zero = 0;
+ 	int err, fd;
  
- 	return memcg;
++	if (!OPTS_VALID(opts, bpf_struct_ops_opts)) {
++		pr_warn("map '%s': invalid opts\n", map->name);
++		return libbpf_err_ptr(-EINVAL);
++	}
++
+ 	if (!bpf_map__is_struct_ops(map)) {
+ 		pr_warn("map '%s': can't attach non-struct_ops map\n", map->name);
+ 		return libbpf_err_ptr(-EINVAL);
+@@ -13503,7 +13510,9 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
+ 		return &link->link;
+ 	}
+ 
+-	fd = bpf_link_create(map->fd, 0, BPF_STRUCT_OPS, NULL);
++	link_opts.cgroup.relative_fd = OPTS_GET(opts, relative_fd, 0);
++
++	fd = bpf_link_create(map->fd, 0, BPF_STRUCT_OPS, &link_opts);
+ 	if (fd < 0) {
+ 		free(link);
+ 		return libbpf_err_ptr(fd);
+@@ -13515,6 +13524,11 @@ struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
+ 	return &link->link;
  }
--#endif
  
- static void free_mem_cgroup_per_node_info(struct mem_cgroup_per_node *pn)
- {
++struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map)
++{
++	return bpf_map__attach_struct_ops_opts(map, NULL);
++}
++
+ /*
+  * Swap the back struct_ops of a link with a new struct_ops map.
+  */
+diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
+index dfc37a615578..5aef44bcfcc2 100644
+--- a/tools/lib/bpf/libbpf.h
++++ b/tools/lib/bpf/libbpf.h
+@@ -920,6 +920,20 @@ bpf_program__attach_cgroup_opts(const struct bpf_program *prog, int cgroup_fd,
+ struct bpf_map;
+ 
+ LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_map *map);
++
++struct bpf_struct_ops_opts {
++	/* size of this struct, for forward/backward compatibility */
++	size_t sz;
++	__u32 flags;
++	__u32 relative_fd;
++	__u64 expected_revision;
++	size_t :0;
++};
++#define bpf_struct_ops_opts__last_field expected_revision
++
++LIBBPF_API struct bpf_link *
++bpf_map__attach_struct_ops_opts(const struct bpf_map *map,
++				const struct bpf_struct_ops_opts *opts);
+ LIBBPF_API int bpf_link__update_map(struct bpf_link *link, const struct bpf_map *map);
+ 
+ struct bpf_iter_attach_opts {
+diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
+index d18fbcea7578..4779190c97b6 100644
+--- a/tools/lib/bpf/libbpf.map
++++ b/tools/lib/bpf/libbpf.map
+@@ -454,4 +454,5 @@ LIBBPF_1.7.0 {
+ 		bpf_prog_assoc_struct_ops;
+ 		bpf_program__assoc_struct_ops;
+ 		btf__permute;
++		bpf_map__attach_struct_ops_opts;
+ } LIBBPF_1.6.0;
 -- 
 2.43.0
 
