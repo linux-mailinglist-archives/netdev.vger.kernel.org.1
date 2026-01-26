@@ -1,198 +1,153 @@
-Return-Path: <netdev+bounces-253488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0G0iNn1yd2n7ggEAu9opvQ
-	(envelope-from <netdev+bounces-253488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:56:13 +0100
+	id sMykH59Td2mdeAEAu9opvQ
+	(envelope-from <netdev+bounces-253434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:44:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A444892C0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:56:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D42EA87BCD
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:44:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E48E305E317
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:50:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EAB73010D95
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D4C334C03;
-	Mon, 26 Jan 2026 13:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2834331A70;
+	Mon, 26 Jan 2026 11:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z896Cdtp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Y8lwjlEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A831F2380
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 13:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D779329C6A
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 11:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769435458; cv=none; b=b2LO8EqqLy0npMDOTpgRGNdQnmWg0T9ZGYW5w5B925VI8gPo3g1lNJMlngGBTuvifp4m36UHEOoFZwjEvHRxavasuBM48oBcDeoI60dYxD8y5uwYwS9XUBUkVfFJolZcxwjGg0wv5bVHF0tg+CuNLqbgW+ygEOBtjY/rfWoKbmE=
+	t=1769427868; cv=none; b=pROzCgLp8B8NLrV51ve1KFIeZsKTadAQqtOu55CKfwxxbKrkhcorAFQOe5nnFg1nVpQQ0W9inuIwIl/DmNVCgDXbPuwkOHMp8X+NsJvP+x4Y3rbhxBvupgC90eNTpJuoNYeHsWzoBbM9E9HzlYU3NPNFTrVqMbPPH7sZjyh1638=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769435458; c=relaxed/simple;
-	bh=f53timH0np4bz+gztyV/dfAq6Ha3g4qBItMHfYuFoN4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JpIe70nm+RHwiS+VbJI0Noph+o1FBB9awygeBiS6/MWJLuqVojR8x8g2FDtW+6yzTSbr/fHBNPUTORbVgZjYqCddAT+wJG+AORsSE4z01nZJ1AAhzZY/Gm3HnFsxFIhalZVD7cJnTf9FWx1WTogQnLIkb0hHvX3MYNTFDdaFNgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z896Cdtp; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8c6aaf3cd62so580103385a.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 05:50:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769435456; x=1770040256; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iQxwi2pFUZR+UAlToTQBrAAHIAjqCBSvDHQE8e6QSYI=;
-        b=Z896CdtpOPVagWYpaW3ZkjtlZsDBCg2opIPR+XJms3UMQNd3qOb7KXjj61LSp110Sx
-         9V/rHLr+O61Ofv51xDoPDDd940XnAkc20xlJpVk8oTjGlYqZuEdSwA28pjkLBzN5YfAp
-         zcGPPFGkanNVnBoSIbFVHcVXejUySsHfG4728ow6+dgE5VDB//LuFzDmGpfqbYDCT2Km
-         Qnr/1XJyJXp9ePkujuiWX2kDEhejrhcCsBZgyTjlk78MpuXKrLw8SWH3sizps4oUQQpX
-         YELNukHAWlMy9XvMIPdDtLHDJclQujtXGCkMladbAFli7aZBxfKXWYxYhBu67d24OpcP
-         2l3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769435456; x=1770040256;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iQxwi2pFUZR+UAlToTQBrAAHIAjqCBSvDHQE8e6QSYI=;
-        b=wHHjmtYOg0yeoiRAQN58kDTwzcIvoqoTtGbmy3HsA0Kd/tUf0WSpQLo9auhSUNDnXg
-         jagZzMcWFGcJ9HZOlqlJpDmNjO2J+6+XBOWVDjWJ6ccVYsgNcnwmPq5unKjrvQU+sM0G
-         DlLYktKduhYP3K2bY3bU7rrna3zg64OjXaSQXrz4Mu9Z2V1ep0N+lxpKJFFogdj53vEp
-         v79YxxmGvEZhOE5gzG8HoeJF2cor+Veo38/GwxSvljfkn5m8/qQvdQdsiBmPjR1A7QJc
-         fEwz4E+3nJ+DQsBoZoLL2KWiWrGPnRBwQswaZpcgKG+4nqZ06TcT5pC0yjBhBpN6OIrK
-         e13w==
-X-Forwarded-Encrypted: i=1; AJvYcCUYeWwmoNJoSj/vLFO0SivGJF1lTaxLKPFh6Y0kw1c+VGsH9s2MepR7s7D7qnwaHxZvTirCWfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ0kEYau6A3RzPht6WViNM9ELre0HEAVLTUQzamwptnirfWQ5+
-	dhtFRR10gAZorPFbrXmvDbzCtHQQ1Oa/6CgRXcKMM01D5xtrqJOoJIdA
-X-Gm-Gg: AZuq6aIGRt7BUu1hU1plvoWCRwcwmgXYG5BgZVlYn339avIuK+8U4tlM7Eobrzh1OUV
-	joc2rHal1tKgwAQTmfoI5ZzBjYaZLN3IRo6I9VtQf5xdM5xpdaKVYcTQHtj12WDx9FhLcZPsi0M
-	BUg8uqw+9ms9LjhJ8QToh7pO3jZ9kPIoZWcPMpY/GmCWjR6C3I40oMsQ+Eo9lMyq+VCTIzWfBuZ
-	jRSn9COM8mHNu6ufFmFLCo99C6dG+zDmxaUqSSPLlKb1FdSh5obBKLTy+OP9fE0GlMxZx8T1C/Q
-	7ZggjQywoWp0pSBnAYzz2fCq0nzbHUEfi7YXGpS6V8euWKTlBbdtvYzc+AxRXZAQ7fAmEJGuBfs
-	aErhg3pF49t9DMe2qczlVKvwQA2pNswwyvNTUK58P2rgLhu5y8Gvw3cMJviyNRY6bgvpZsmWzkG
-	86jvNzrNaN48yyGMUhDyQ=
-X-Received: by 2002:a05:6a00:22d3:b0:81f:4c37:7647 with SMTP id d2e1a72fcca58-823412dbea7mr4104835b3a.68.1769427926560;
-        Mon, 26 Jan 2026 03:45:26 -0800 (PST)
-Received: from soham-laptop.. ([103.182.158.109])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82318648dd7sm9086663b3a.3.2026.01.26.03.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 03:45:26 -0800 (PST)
-From: Soham Metha <sohammetha01@gmail.com>
-To: linux-kernel-mentees@lists.linuxfoundation.org
-Cc: shuah@kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	haoluo@google.com,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	martin.lau@linux.dev,
-	sdf@fomichev.me,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	Soham Metha <sohammetha01@gmail.com>,
+	s=arc-20240116; t=1769427868; c=relaxed/simple;
+	bh=sOmQHT/KB8XTMWgnQ5jz7GSXRwvF+dxEnN6zZ0y9Q4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=OlWZ5l1f4aJAmZOH9DzSmxarWL9PIE6ANw4pukUDrzl9mDlP5cIbKVcOarS9nuewiAKB1GWKCgKCTwRADgEhvnVV1/e45O+rbBVOCxPGV3RpRMXQD4Rmz2IcKvsElGMb3UYEw8C2/k86SPgmwfAh0fnksWqGdfAin0StNZZBlzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Y8lwjlEd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yBZgVQPE5pyIHc9AqGzEXNSbNLwIwnbp7Ek3gt6UiS0=; b=Y8lwjlEdMnBjJgPevGq9soTwBU
+	BO0PRHynTRQjso22RDyJLEtu8GL4on7kPvOqYgrb1FcLsxveUyHwIABeCBrvb1K95kQlbHJiWy/Zz
+	VNT7U1GToRrpnBcczM+N0v9ZrS5D8zwnfSUARTyfTgWkGv3+Ni0aGuEd7d9k6l4iXyFfREqGv3VEP
+	sBPs7f7SxUmM+6ptdeonH/owGEzhrhwpw2fEmXutCg9xUq1SsQGgJHk4N5AGLt0LQlEcwkkd1xvkR
+	7TQ/SrdcRybIfBYpRCzVAJdUW9Oa/p6Jc/YAGOkNOo2rkzoDgAEgzwZ0OZzs7u7QR6gqreJp3WJ/a
+	E8DvvxHA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35628)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vkL0x-000000004dB-0NVz;
+	Mon, 26 Jan 2026 11:44:15 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vkL0t-000000004vB-2rTY;
+	Mon, 26 Jan 2026 11:44:11 +0000
+Date: Mon, 26 Jan 2026 11:44:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jason Xing <kernelxing@tencent.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Michal Luczaj <mhal@rbox.co>,
-	Mina Almasry <almasrymina@google.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2] net: skbuff: fix uninitialized memory use in pskb_expand_head()
-Date: Mon, 26 Jan 2026 17:13:30 +0530
-Message-Id: <20260126114332.23955-1-sohammetha01@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <6954bc70.050a0220.a1b6.0310.GAE@google.com>
-References: <6954bc70.050a0220.a1b6.0310.GAE@google.com>
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 00/22] net: stmmac: rk: simplify per-SoC
+ configuration
+Message-ID: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linuxfoundation.org,vger.kernel.org,syzkaller.appspotmail.com,googlegroups.com,iogearbox.net,gmail.com,google.com,linux.dev,fomichev.me,davemloft.net,redhat.com,tencent.com,rbox.co,intel.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	TAGGED_FROM(0.00)[bounces-253488-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sohammetha01@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253434-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,619b9ef527f510a57cfc];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 4A444892C0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D42EA87BCD
 X-Rspamd-Action: no action
 
-pskb_expand_head() allocates a new skb data buffer using
-kmalloc_reserve(), which does not initialize memory. skb helpers may
-later copy or move padding bytes from the buffer.
+[Please note: due to google's spam filtering, I can no longer send
+patch series to @gmail.com addresses, and thus, to save being spammed
+with failed deliveries, I'm dropping such addresses from my patch
+series. Stop giving google so much power, use other email services.]
 
-Initialize the newly allocated skb buffer to avoid propagating
-uninitialized memory.
+dwmac-rk has an excessive variability between each individual SoCs
+which makes this file extremely large.
 
-Reported-by: syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=619b9ef527f510a57cfc
-Tested-by: syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
-Signed-off-by: Soham Metha <sohammetha01@gmail.com>
----
+This series reworks the per-SoC handling, moving the majority of it
+out of code and into data in a way that greatly reduces the lines of
+code necessary for each SoC, moving the code into the higher level
+functions in this file.
 
-v2:
-- No code changes
-- Resent to netdev list
-- Added Closes tag
-- Added Tested-by tag
+In order to do this, we need a version of FIELD_PREP_WM16() that works
+with non-constant masks, so we introduce rk_encode_wm16().
 
- net/core/skbuff.c | 3 +++
- 1 file changed, 3 insertions(+)
+We change the definitions to reveal the fact that in all of this
+variability, there is a lot of commonality in terms of the values of
+the bitfields, even though these bitfields appear to be randomly
+placed within registers.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a56133902c0d..b0f0d3a0310b 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -2282,6 +2282,9 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
- 	data = kmalloc_reserve(&size, gfp_mask, NUMA_NO_NODE, NULL);
- 	if (!data)
- 		goto nodata;
-+
-+	memset(data, 0, size);
-+
- 	size = SKB_WITH_OVERHEAD(size);
- 
- 	/* Copy only real data... and, alas, header. This should be
+Both of these allow us to progressively move to a situation where
+the SoC independent code can, in the mojority of cases, program these
+RGMII clocks, RMII clocks and RMII speed without calling any SoC
+specific code.
+
+Further cleanup may be possible with the (actually incorrect) handling
+of RGMII delays, but this is not addressed in this already large
+series.
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 1237 ++++++++++--------------
+ 1 file changed, 508 insertions(+), 729 deletions(-)
+
+v2: fix AI review comments
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
