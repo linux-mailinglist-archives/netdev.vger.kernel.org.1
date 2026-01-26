@@ -1,720 +1,276 @@
-Return-Path: <netdev+bounces-253389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253390-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uOPaKaQvd2lVdAEAu9opvQ
-	(envelope-from <netdev+bounces-253389-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:11:00 +0100
+	id cAfFLP4wd2lVdAEAu9opvQ
+	(envelope-from <netdev+bounces-253390-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:16:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6556C85DB2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:11:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16EB585E9C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BE34A3019C88
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:07:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E39E30067BA
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A9030499A;
-	Mon, 26 Jan 2026 09:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965AE304BDE;
+	Mon, 26 Jan 2026 09:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="copk9EMd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y8vpRSAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013067.outbound.protection.outlook.com [40.93.201.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9F83033F7
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769418476; cv=none; b=uZDSKPm91fF17jz3w/+qhZkscjSnKhvkyBAs5WlzN2dXk904j+1Lm9dyZ5s8/PMp83Z5NKYj+hYp9ueENunSMGcXgE3QebQLw+jPMCy0nXt6kJsVa5RRn2kG7xhuktJW5OeoFXvn7GNgXm1S/PTfTWicLYjsPwXaQaw4Qu8NOMw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769418476; c=relaxed/simple;
-	bh=AyXJSg3lOrShVN9HheV2o8D32FAZa7ZdE4mnDpX45S0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qZbcmV2INiwZve1kW6fYdMbAfWdoktUs8RUj8WoZt1QAg+LQE/GQ8H7dMz8cmFAnoCI6KvkADeFJ5OKZb2EbeFYIr0Ol4mymkYPqsyXqnEdHBbeMa4yyjrk3LJVtdTyzfTOrjOdvpp9fXJr57qJwJGdNaVVDNbBBD++RuCEQVls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=copk9EMd; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769418472;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7g40Scui5AeSn6g7k+CN7+mSNdz8zvlZncZCV88NKxg=;
-	b=copk9EMdoTHKQbMB3bhBYhXGwamypqLcWjDrVVdI7OAt1kcaier/EpCwd0reXZhKMzXwHb
-	TSNpkaVgC5tWZb0CqfTNel02gPK7eyNnRHy9W7mtzwfEGXNExd589AiIzCd+M8oLblM5lA
-	8lyEvs3htVy/+iHnCqIN2c3ElghCnBI=
-From: Hui Zhu <hui.zhu@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Jeff Xu <jeffxu@chromium.org>,
-	mkoutny@suse.com,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Christian Brauner <brauner@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paul Chaignon <paul.chaignon@gmail.com>,
-	Anton Protopopov <a.s.protopopov@gmail.com>,
-	Amery Hung <ameryhung@gmail.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Lance Yang <lance.yang@linux.dev>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Hui Zhu <zhuhui@kylinos.cn>,
-	Geliang Tang <geliang@kernel.org>
-Subject: [RFC PATCH bpf-next v4 12/12] samples/bpf: Add memcg priority control example
-Date: Mon, 26 Jan 2026 17:06:31 +0800
-Message-ID: <a78337e8e3eac1f279cab52db5573e6fbbaad4ef.1769417588.git.zhuhui@kylinos.cn>
-In-Reply-To: <cover.1769417588.git.zhuhui@kylinos.cn>
-References: <cover.1769417588.git.zhuhui@kylinos.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EEE2236E3;
+	Mon, 26 Jan 2026 09:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769418939; cv=fail; b=ukdIF7KSyH5nkV04NWVVwviIxueU+VpbCI0nbvwds3/4XmktDm9KJi4pUz5qLOpiU87vR1bXed52n/ZeeVv+/RxkrvDISEk0tXveZweRyGXKr1bJWhWf/2E6OUYICHTfe04xkMbTlL9COk7pnWb0hVxn6oiYzv8RBLp4Y9winoM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769418939; c=relaxed/simple;
+	bh=YSdNYGJgor/yE/OdPiup0DSIO1v7NFtZLQ9IRm0uSJo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pe2hiC7HhYJdGbiu+LTNO7YLulU/JMR/XY6yBwxug8f9fg05E4d85eIVE5HshaO4gN2aowojM6U+pcA2q/RGPrhyNtjoFVBOa68PHgmD/n8xhs/10IEu7qerDOVNDUae6BHYGMGUlCdoFODLIS4kHqrrtKKzb4HnC1YnTq+TZ+A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y8vpRSAL; arc=fail smtp.client-ip=40.93.201.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=j1CQXR7t17xJj8CeM5W8aRmuptkruXRZ2iN/PTOiJ5uTDzbNt5n6/v3pj1Q+DnhDMd5XMo8kSJVySC+yGZhkIXCkNhg0eJ+3d4QyM7YVovB75hM3suMP0BA3SgnMpe2NP0Rf/NRwUkpmMT3GzUD5vFhpvbszl8GOuQU3NF9GTjmno0EG7lBKk+P5nZpvqgYmChyO58A0RXkP1mGZMFq3/N50BYsf3gJ3096C5i4qfy8XMPM7huzrvJrfEGTXoIsZNbrtAGN6tgAeEsmPDYiuPO68bdsIWqy72/e3CsufIcU/r7KgxnUuu78s4fD89zIhLGzlBJBw5PoTCw7QtA5p/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YSdNYGJgor/yE/OdPiup0DSIO1v7NFtZLQ9IRm0uSJo=;
+ b=i0M7cqSwk+JtITvqMo0kv4HVOM2+3alkmMIZuLGrVz0XyY4ycdFwPK5oFQj4QtL9aAfN8Baku0Hlx5zMSEEnf92A0hV7sW5u/a9tceeixsyCbe20WHnvkEYgOKLSPLzveQRxezsIpmPIcf2dHiaomG+Lv7phR/THcPaV8mVCtcIf05UuYrgtFtiAECYfk6ouGx9AqTs+tfvdbIt4Eg7A65AnHWZD+dE5+gVqSJkyPA3VM80iPB+BOox0gfOU6DhZmpgf+kQXu/9UzrUwX9njy141t+6N+XRKI2K8gTG/18KQ+S/RyIgRLbYZORfizS007qifdjf9ptsdC8vZShHy8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YSdNYGJgor/yE/OdPiup0DSIO1v7NFtZLQ9IRm0uSJo=;
+ b=Y8vpRSALPNPAw/p7c5aJYV/4dSWPR/HqgAYCuFs36z6CZMQVQWN/+ggol+FF5OPim9oPAHHwXUSW9h+xyCF96MjhH1ElQtuJGX696gIPYzRvQZph+GwyIXS8uwfyEn4L1b40Lv4q3qAsgqf9L7nl1msAdeoOwrZmeOnuRPazgngOGzV2ACCnKhDAV5uYv/CjtZRgOS7wIgAJ8uOWXFz3qfBgXp0eRVM+XxRLy2DWt2mzX+k61Jk4mybgojVX8o517c0/Z5kBzIcrVZBpqstuM0InWi8z1hJrgM/IKnkK30a9lUikbukcc5RMX7icMeD49ZcveyRDsh4yBnkNKo0YHg==
+Received: from DS5PPF266051432.namprd12.prod.outlook.com
+ (2603:10b6:f:fc00::648) by BL3PR12MB6545.namprd12.prod.outlook.com
+ (2603:10b6:208:38c::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.4; Mon, 26 Jan
+ 2026 09:15:34 +0000
+Received: from DS5PPF266051432.namprd12.prod.outlook.com
+ ([fe80::3753:5cf7:1798:aa83]) by DS5PPF266051432.namprd12.prod.outlook.com
+ ([fe80::3753:5cf7:1798:aa83%6]) with mapi id 15.20.9542.010; Mon, 26 Jan 2026
+ 09:15:33 +0000
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "edumazet@google.com"
+	<edumazet@google.com>, "davem@davemloft.net" <davem@davemloft.net>, Tariq
+ Toukan <tariqt@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, Raed
+ Salem <raeds@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org"
+	<leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Boris Pismenny
+	<borisp@nvidia.com>, "daniel.zahka@gmail.com" <daniel.zahka@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net/mlx5e: don't assume psp tx skbs are ipv6 csum
+ handling
+Thread-Topic: [PATCH] net/mlx5e: don't assume psp tx skbs are ipv6 csum
+ handling
+Thread-Index: AQHcjJOtoxLadyLgAUKFCUzREF4QS7VkL3uA
+Date: Mon, 26 Jan 2026 09:15:33 +0000
+Message-ID: <dddaf1c5923576042112c2edad2f285306b839cb.camel@nvidia.com>
+References: <20260123-dzahka-fix-tx-csum-partial-v1-1-7b0107693883@gmail.com>
+In-Reply-To: <20260123-dzahka-fix-tx-csum-partial-v1-1-7b0107693883@gmail.com>
+Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS5PPF266051432:EE_|BL3PR12MB6545:EE_
+x-ms-office365-filtering-correlation-id: c565860a-26f0-48ab-8955-08de5cbb75b2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|921020;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?cC9TMjVudEFVUXZjcVFKV2hBVlR0M2UzTEJ5dkxFVnNKOE8wdElFOUdHTHF3?=
+ =?utf-8?B?Q2puM29JeTNiU3hVVG9WYkh4UVp6R3dOcmxUK0R6c2dHVVNZc0MvcFY5UjRR?=
+ =?utf-8?B?QVlVb216SWY5Z05rZGZad2xCMlQ0WWVmRE03eUcwaXgwdjNBT2IxTmI2RjFv?=
+ =?utf-8?B?L045UWdJNzdweFV4MVlqcEJ2cm9obit5dzZjUWMwYnUvcFIxM0ZBdHNXcjlr?=
+ =?utf-8?B?UEsvWlo2cEZndjBaTWlqV2xmYWZyQzFWMHdaSGt6emtqNEFqeS8yNVBsUmp0?=
+ =?utf-8?B?Ly9CMDBpUTJ5VzIvM1d1clRPY3U3ZkdwOWVaelVzemRqd3VlNHBhSFh1UjRR?=
+ =?utf-8?B?UHJBWGFFMDVyQzlENVY0VjNFbzE5d1Iya2ExcnJhNzBWT01pZkZ6ek84Z0dN?=
+ =?utf-8?B?V0RkckNISDRNUnVqWlNiL2tIbFF6VytEa0M4QTlBbFVkUnlJejZwUzB2c09a?=
+ =?utf-8?B?bEJBa1JucnRSV0FWd1pkT0JhL2RqelEwN2c2dWxkbHZVcTJURHJNT2tCMWVj?=
+ =?utf-8?B?WGtYSlNmWHNpMm1vKzlUcmZTVUFqWVE4SGk2amxJYld5MTlEZnViYllXOEMw?=
+ =?utf-8?B?Sm1RNnNNd1BoZ2s4cVlTS0laWWZsVmYyZlZ0YUh3ZjdjUjViYXRZdFR2UmRy?=
+ =?utf-8?B?Y0lWWkR6b0puUUNtMy9jZ285OXQ5Njk0OUoyY1ZRRjZEVVdINFA2Y016d2Nt?=
+ =?utf-8?B?ZStmY3hjWlRoOHRteFR6bCtXRXk2dEdEYjV3R2JoVUYyMG9KQVBYa1NDMGlT?=
+ =?utf-8?B?ZW9uNWZsakZ0SU9lbFF5WVg5STQ0ejZLS3FSSU9CYTFESEdEbWx1Mmo3WkJo?=
+ =?utf-8?B?cThocytMb3RVZkkvQWpJVFdKY3JPVDQ5Ri9uVHpxZVhOZEZPWkgrM3hhRUhh?=
+ =?utf-8?B?dWVGZlArWGlsWng0ZWNpc0tuV2xnQ2tETFR6QjJKYzNWUEhIR1JjZW1BVUlh?=
+ =?utf-8?B?Ly9TTGlkZ05PdWVZbWxBVzhkUnFhSmxWYUQ2bmNoTW9GV2xkQVZKOE9BcEw2?=
+ =?utf-8?B?eXM1NXZxeGtrTHF2b1laM1lIYVZvTnpIZ2I0aWdZdUdXMytIMlYwN1QzTzBr?=
+ =?utf-8?B?QUpJRE4vZFB3WWhyR1NMd2FnR1RPb2Z0VytHeHFiUnlrOUJUTWtLQjI3TVd2?=
+ =?utf-8?B?NG91TmtFUndZTmVoSVJZcFYwWmpDS2ZlZ09ZUWszUWRVeTh0YVdIL3RhdDYw?=
+ =?utf-8?B?VjZXR1JzYXoxZ1hYZ0RBQnVWT0JIUUhxM1BjN2RpV2lPUEYrZm1MOFZIWFdE?=
+ =?utf-8?B?VnY3NjRsaisrY2FGbzl4YzhKTnl5MkNEcHQ2N2dCMjg1MEZJNzdvd0lNbjho?=
+ =?utf-8?B?a0ZKdEdvT0gvVnhveDF1M0RETmlvaEFYb3JaaVM4VmZJZUxUQUpUSGp1Umt6?=
+ =?utf-8?B?STNKV0txUjk1RlF2b3lpbG5WRCs3OE11b0QySm1xTVdIMWFneURzUmk4a1pu?=
+ =?utf-8?B?c3Zab29ISmdxV20xWGRnQ3FZUTFJVnY5SGs5L0pUdGd2TGVrQ05BYWVNSGdX?=
+ =?utf-8?B?aXpiUmsrV0RHcnMxeXNSSlNDVW9UY0p0ZTlXdkczTUlqYjMyMGY1VkJtRzNY?=
+ =?utf-8?B?RElWL1RENWxpbWtNd3VDSGZzOGlkOFFrSmVkWU43eEI3ekpUSmE3bDVkM3Mz?=
+ =?utf-8?B?TTNkMU9wU0kxcDlPbjdKRGIvcUpIL0tRaTBlQkhrV1U5VFQwS2tSaXFiNk83?=
+ =?utf-8?B?aGhYdk8rTFYyMkxKaTM5QnBpb0tPUFJ0Wkd6emxuSnFKRmdsd1EwN2NFWGJ0?=
+ =?utf-8?B?ZXNvaXU0a2lzQmV0elhXS1U3bXNSV1RZcW83QmtzRXdzeE50VzEvT1F1NXUx?=
+ =?utf-8?B?TnBLMFA5ZzBuQW94WHFTSHNEazZ6VGVjT1Z1TkFZUkFZeUZzNHIwZGdvZldz?=
+ =?utf-8?B?am1waUkyd3F6K0dEcnlwY3hDZnM2aEJNUTE2UjlYZm42QXhENFhpeEMwUTNq?=
+ =?utf-8?B?NzFHZXhnMnlMZ0RQc1RkQzJ3Q0hGNy9yV2pIT0hLRTVuQlc0dUtJaVdHWXRS?=
+ =?utf-8?B?TnVFcWpmS1pYSjNTVlE1cUhFVEswbUtwWmRiUGJUNGxCK1RWMEVjYkJxUmhu?=
+ =?utf-8?B?MGg5SkNldktGS1l0SmdjMWMxb25rM3F1d2p4alorOVFaUER1WTVOd2loaFFC?=
+ =?utf-8?B?VzhTOGQzOHlXV1pLSFNNNVhoY2hlYnI0dFJQUEtENDFWYzRrZVQ2RWpQTEo5?=
+ =?utf-8?Q?djc6pqK6E4/W6RJPPj/Ro0qDBA1POd4teWKr7DHEdgh9?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS5PPF266051432.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Mm5BVXdUeDVOK1JIc0kzbm9zWThiVDFVRHVEVDVhcXNUdktMR1BZNnB1Rmo4?=
+ =?utf-8?B?VXZybU5XSzJDa0tyQ0ZkN0MzTk9EZTdjL0N5SUs0cW9nWWp5RnFWZDlpdDBw?=
+ =?utf-8?B?RGZhbmNsL09BQjQwYmtRSjRDNHgzR3JIZlJDMXhVYUNBMzdHeGYwMXhscWF3?=
+ =?utf-8?B?bFVtUk1oc2JOS2JoZTREZjNLL3RpaTJkNTZTMTVtRnJ0TkpwSTUvTXRlbHIr?=
+ =?utf-8?B?WFV4a3UwRVJsVU5ZN2lmMTZ4MHZ6RGYvb3JpWlltM2FmZFBXQXlhcGYxOTZu?=
+ =?utf-8?B?VWZEb1grbXphWXRRSUxqODk4RWY0OFlNMEJFbmtmY1ArWmtDMktBMDdoRVBC?=
+ =?utf-8?B?OXk0VTlONDlCYkI1Nm1VWUJSNUVKajhOUzNjZlJTMmFqTTNTb0c0biszQURV?=
+ =?utf-8?B?a291T1hUVzlwTHpLRjBINDVLSld1ZTlXcjFwZmpDbEU2RHVBYi9jc3dCRnRl?=
+ =?utf-8?B?TzNZR3hsUnBLc1ZyZ084NGIzV0t2MlR3WEg4NG9XVTdTemhVQTlRV0g3Zytk?=
+ =?utf-8?B?bXNJUEZyeExmM29saUtqcWV2R2ExSHo4SndITnJhYk5JaHBzaU1nMjVWeFVS?=
+ =?utf-8?B?Zkh3SWRqenYwOUYvbU5XMFRIcEUzaXgzQ1FQWWV5d3dvenpGY3EwTEhDN3Ez?=
+ =?utf-8?B?WlV2WEc0MXVsczJXYktqL2hSZHBRQWNJRk9oQWpxVzN5UVVvWUVwdnR0V2E0?=
+ =?utf-8?B?NzFEU2tibVhBQWhKSDZzRlIyUFpmRTUzdStudjUvalBFSlpCOUFUR0RUeVlh?=
+ =?utf-8?B?UC8xVHY2VjJCbUliZ0NsaU5tWk90WGhGbnRLa2x3ckNibjdsa2tqVGpxbXp1?=
+ =?utf-8?B?NTJRd2oxWFFTZ2dlZEFDME96N1BidGxhQlJFdnNpZU1oZE9zQ2MySnpHSUQ0?=
+ =?utf-8?B?dzJqbktaaW1TbXpsVlpvYWFKbENzamJIRThRaDlOMmVmUnhpMHpZbkVxWGN3?=
+ =?utf-8?B?bEpveUZyQWJ6dVd0SUxnQ2wrcWFZS3hBQVNHRmhYdGQvcCtNZjUxanR5R1ds?=
+ =?utf-8?B?OHdWYS9HMzZURzlGeFhrN3RnMlB6Y1kyRkppVGVnemc3L25VeGFveWZLelF3?=
+ =?utf-8?B?V3FwY29sNEMxcGpJTmFlc0xkZFg1YnJGMXZEcWhod0Rpa2o5SFNYcEhIeTU5?=
+ =?utf-8?B?dlhvcmhoeFBWZ2paaE03M0F0eW1HbkYxSmNnM3IvaWZXQW1kSi9jNUFCRnhz?=
+ =?utf-8?B?czZ6MGU0SEM1QmhONlBEY2hEQlA5eFh5RnNUSytoa2xzVThzTDJwWlNFL1ZR?=
+ =?utf-8?B?amVnNUhhR0swaWsrQThiUHhibnI3YnpBdEh3VHJQRkYxV2Y4a0xMYk1BNHQ3?=
+ =?utf-8?B?a0Y0ZDRxNlJyYzZYSGFvcnRQRnRhb0tvaUg3QU01MDU0Z1dwbEF3WWZyMGcv?=
+ =?utf-8?B?WVRpWDc1bmYzcVM3eEJFUGhyazV2ME5sZmpIajJnV2ZWVjQyTzhXblJqTWRr?=
+ =?utf-8?B?K1ZMSGVDNWZSTkR3UzU1Z1hPSFVkVUVJbS8rMVB4dklpbFhQS2VrQUhCbVBz?=
+ =?utf-8?B?cUROU2g0YlA4WjFJR2dXSlRlVmI5RXZnS0hWaWQrc0pHV3lVang4cUJja20r?=
+ =?utf-8?B?TEpvOGxrYmhSYjZoN0Fqb1NGa0VEck5YYnk2Ulp3dE44MVUzMnRMelAwVS91?=
+ =?utf-8?B?aU1hUmZqTEpHZURkMWVXSC9zdmFZdFNvK1l0THZhcENOYXlQU3BTRDY5eTdz?=
+ =?utf-8?B?YkYvMHFxT1R2VTRnRkR3bkpCd3o3VlE4bUFMb0xyWFFGUHFBd2pWUWs3ZXh5?=
+ =?utf-8?B?S3BEbmxWQklpTnFRQXVzTkRxTVhaaHRydys2U25obm9aTkcwTVBVOXRTTVVl?=
+ =?utf-8?B?VzB2RTlVOHhQTUd0NmwwOHpibW92dEo1M3Q5MzRnV0RPems3Wlc1cGlUMnpL?=
+ =?utf-8?B?ZFVOR0RoZk92MWt1amx2TnZXSzBITnB5U25TYTdENEltUklmSjJJOS9LeE92?=
+ =?utf-8?B?bzdYY3o5TVZJR3F4c0dzai9Wa3pkQ1ZSR1d4N25VMmtuSy8wNW1KQWlJZy9L?=
+ =?utf-8?B?em10MXd5Q0RCSlZXMWJDSmhKU2I3OEFOaFJlcnVEcVVyYzhubkdNZEtLN0dL?=
+ =?utf-8?B?VCtrKyt3WTY2N2tlUnNyOThVT0lXUUdKV2NaUDkrdHIwcnlxbHhRWXlSNmpY?=
+ =?utf-8?B?SUMxaEg1WGVsWGk2bnQzdFpCZWVSaXMxWUNQUkwxdC9NUUpNd3hQQXNrM0VV?=
+ =?utf-8?B?b3R5aEZwYmFvYmFRTlJDUnY4d295Wk1vaXJuWEdFcXk0aS9wbmJZVVozOUt3?=
+ =?utf-8?B?Vlp3WGxYUHU1cHB1MDV4SDNJOWR3dndUc2FYRHZTZW84RE9KNyt0dEpoUXo5?=
+ =?utf-8?B?VE01YjAyNGxxSGxub2IvcHpWZktDSzczWUhXNyt6Wkx2Q2JtWmcwdz09?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D1AE1B81E3E07847A65EF40D1E037D90@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS5PPF266051432.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c565860a-26f0-48ab-8955-08de5cbb75b2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2026 09:15:33.6082
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jXly719lJUZGN4S3idJM1qHEoINAd0ds09u8MhuvXKVdZfaip2Zbb1oml1ggm2yrJmV/y/LVsyj+qhra2Tyr2Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6545
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253389-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253390-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,google.com,davemloft.net,nvidia.com,kernel.org,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 6556C85DB2
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	HAS_REPLYTO(0.00)[cratiu@nvidia.com];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 16EB585E9C
 X-Rspamd-Action: no action
 
-From: Hui Zhu <zhuhui@kylinos.cn>
-
-Add a sample program to demonstrate a practical use case for the
-`memcg_bpf_ops` feature: priority-based memory throttling.
-
-The sample consists of a BPF program and a userspace loader:
-
-1. memcg.bpf.c: A BPF program that monitors PGFAULT events on a
-   high-priority cgroup. When activity exceeds a threshold, it uses
-   the `get_high_delay_ms`, `below_low`, or `below_min` hooks to
-   apply pressure on a low-priority cgroup.
-
-2. memcg.c: A userspace loader that configures and attaches the BPF
-   program. It takes command-line arguments for the high and low
-   priority cgroup paths, a pressure threshold, and the desired
-   throttling delay (`over_high_ms`).
-
-This provides a clear, working example of how to implement a dynamic,
-priority-aware memory management policy. A user can create two
-cgroups, run workloads of different priorities, and observe the
-low-priority workload being throttled to protect the high-priority one.
-
-Example usage:
-  # ./memcg --low_path /sys/fs/cgroup/low \
-  #         --high_path /sys/fs/cgroup/high \
-  #         --threshold 100 --over_high_ms 1024
-
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
----
- MAINTAINERS             |   2 +
- samples/bpf/.gitignore  |   1 +
- samples/bpf/Makefile    |   8 +-
- samples/bpf/memcg.bpf.c | 129 ++++++++++++++++
- samples/bpf/memcg.c     | 327 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 466 insertions(+), 1 deletion(-)
- create mode 100644 samples/bpf/memcg.bpf.c
- create mode 100644 samples/bpf/memcg.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7e07bb330eae..819ef271e011 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6470,6 +6470,8 @@ F:	mm/memcontrol-v1.c
- F:	mm/memcontrol-v1.h
- F:	mm/page_counter.c
- F:	mm/swap_cgroup.c
-+F:	samples/bpf/memcg.bpf.c
-+F:	samples/bpf/memcg.c
- F:	samples/cgroup/*
- F:	tools/testing/selftests/bpf/prog_tests/memcg_ops.c
- F:	tools/testing/selftests/bpf/progs/memcg_ops.c
-diff --git a/samples/bpf/.gitignore b/samples/bpf/.gitignore
-index 0002cd359fb1..0de6569cdefd 100644
---- a/samples/bpf/.gitignore
-+++ b/samples/bpf/.gitignore
-@@ -49,3 +49,4 @@ iperf.*
- /vmlinux.h
- /bpftool/
- /libbpf/
-+memcg
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 95a4fa1f1e44..b00698bdc53b 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -37,6 +37,7 @@ tprogs-y += xdp_fwd
- tprogs-y += task_fd_query
- tprogs-y += ibumad
- tprogs-y += hbm
-+tprogs-y += memcg
- 
- # Libbpf dependencies
- LIBBPF_SRC = $(TOOLS_PATH)/lib/bpf
-@@ -122,6 +123,7 @@ always-y += task_fd_query_kern.o
- always-y += ibumad_kern.o
- always-y += hbm_out_kern.o
- always-y += hbm_edt_kern.o
-+always-y += memcg.bpf.o
- 
- COMMON_CFLAGS = $(TPROGS_USER_CFLAGS)
- TPROGS_LDFLAGS = $(TPROGS_USER_LDFLAGS)
-@@ -289,6 +291,8 @@ $(obj)/hbm_out_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- $(obj)/hbm.o: $(src)/hbm.h
- $(obj)/hbm_edt_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- 
-+memcg: $(obj)/memcg.skel.h
-+
- # Override includes for xdp_sample_user.o because $(srctree)/usr/include in
- # TPROGS_CFLAGS causes conflicts
- XDP_SAMPLE_CFLAGS += -Wall -O2 \
-@@ -347,11 +351,13 @@ $(obj)/%.bpf.o: $(src)/%.bpf.c $(obj)/vmlinux.h $(src)/xdp_sample.bpf.h $(src)/x
- 		-I$(LIBBPF_INCLUDE) $(CLANG_SYS_INCLUDES) \
- 		-c $(filter %.bpf.c,$^) -o $@
- 
--LINKED_SKELS := xdp_router_ipv4.skel.h
-+LINKED_SKELS := xdp_router_ipv4.skel.h memcg.skel.h
- clean-files += $(LINKED_SKELS)
- 
- xdp_router_ipv4.skel.h-deps := xdp_router_ipv4.bpf.o xdp_sample.bpf.o
- 
-+memcg.skel.h-deps := memcg.bpf.o
-+
- LINKED_BPF_SRCS := $(patsubst %.bpf.o,%.bpf.c,$(foreach skel,$(LINKED_SKELS),$($(skel)-deps)))
- 
- BPF_SRCS_LINKED := $(notdir $(wildcard $(src)/*.bpf.c))
-diff --git a/samples/bpf/memcg.bpf.c b/samples/bpf/memcg.bpf.c
-new file mode 100644
-index 000000000000..44087a206a61
---- /dev/null
-+++ b/samples/bpf/memcg.bpf.c
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#define ONE_SECOND_NS	1000000000
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+struct AggregationData {
-+	u64 sum;
-+	u64 window_start_ts;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, struct AggregationData);
-+} aggregation_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, u64);
-+} trigger_ts_map SEC(".maps");
-+
-+SEC("tp/memcg/count_memcg_events")
-+int
-+handle_count_memcg_events(struct trace_event_raw_memcg_rstat_events *ctx)
-+{
-+	u32 key = 0;
-+	struct AggregationData *data;
-+	u64 current_ts;
-+
-+	if (ctx->id != local_config.high_cgroup_id ||
-+	    (ctx->item != PGFAULT))
-+		goto out;
-+
-+	data = bpf_map_lookup_elem(&aggregation_map, &key);
-+	if (!data)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - data->window_start_ts < ONE_SECOND_NS) {
-+		data->sum += ctx->val;
-+	} else {
-+		data->window_start_ts = current_ts;
-+		data->sum = ctx->val;
-+	}
-+
-+	if (data->sum > local_config.threshold) {
-+		bpf_map_update_elem(&trigger_ts_map, &key, &current_ts,
-+				    BPF_ANY);
-+		data->sum = 0;
-+		data->window_start_ts = current_ts;
-+	}
-+
-+out:
-+	return 0;
-+}
-+
-+static bool need_threshold(void)
-+{
-+	u32 key = 0;
-+	u64 *trigger_ts;
-+	bool ret = false;
-+
-+	trigger_ts = bpf_map_lookup_elem(&trigger_ts_map, &key);
-+	if (!trigger_ts || *trigger_ts == 0)
-+		goto out;
-+
-+	u64 current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - *trigger_ts < ONE_SECOND_NS)
-+		ret = true;
-+
-+out:
-+	return ret;
-+}
-+
-+SEC("struct_ops/below_low")
-+unsigned int below_low_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_low)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/below_min")
-+unsigned int below_min_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_min)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/get_high_delay_ms")
-+unsigned int get_high_delay_ms_impl(struct mem_cgroup *memcg)
-+{
-+	if (local_config.over_high_ms && need_threshold())
-+		return local_config.over_high_ms;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops high_mcg_ops = {
-+	.below_low = (void *)below_low_impl,
-+	.below_min = (void *)below_min_impl,
-+};
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops low_mcg_ops = {
-+	.get_high_delay_ms = (void *)get_high_delay_ms_impl,
-+};
-+
-+char LICENSE[] SEC("license") = "GPL";
-diff --git a/samples/bpf/memcg.c b/samples/bpf/memcg.c
-new file mode 100644
-index 000000000000..6d59a722f581
---- /dev/null
-+++ b/samples/bpf/memcg.c
-@@ -0,0 +1,327 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <signal.h>
-+#include <stdbool.h>
-+#include <getopt.h>
-+#include <bpf/bpf.h>
-+#include <bpf/libbpf.h>
-+
-+#ifndef __MEMCG_RSTAT_SIMPLE_BPF_SKEL_H__
-+#define u64 uint64_t
-+#endif
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+#include "memcg.skel.h"
-+
-+static bool exiting;
-+
-+static void sig_handler(int sig)
-+{
-+	exiting = true;
-+}
-+
-+static void usage(char *name)
-+{
-+	fprintf(stderr,
-+		"Usage: %s --low_path=<path> --high_path=<path> \\\n"
-+		"          --threshold=<value> [OPTIONS]\n\n",
-+		name);
-+	fprintf(stderr, "Required arguments:\n");
-+	fprintf(stderr,
-+		"  -l, --low_path=PATH    Low priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -g, --high_path=PATH   High priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -t, --threshold=VALUE  The sum of 'val' PGSCAN of\n");
-+	fprintf(stderr,
-+		"                         high priority memcgroup in\n");
-+	fprintf(stderr,
-+		"                         1 sec to trigger low priority\n");
-+	fprintf(stderr,
-+		"                         cgroup over_high\n\n");
-+	fprintf(stderr, "Optional arguments:\n");
-+	fprintf(stderr, "  -o, --over_high_ms=VALUE\n");
-+	fprintf(stderr,
-+		"                         Low_path over_high_ms value\n");
-+	fprintf(stderr,
-+		"                         (default: 0)\n");
-+	fprintf(stderr, "  -L, --use_below_low    Enable use_below_low flag\n");
-+	fprintf(stderr, "  -M, --use_below_min    Enable use_below_min flag\n");
-+	fprintf(stderr,
-+		"  -O, --allow_override   Enable BPF_F_ALLOW_OVERRIDE\n");
-+	fprintf(stderr,
-+		"                         flag\n");
-+	fprintf(stderr, "  -h, --help             Show this help message\n\n");
-+	fprintf(stderr, "Examples:\n");
-+	fprintf(stderr, "  # Using long options:\n");
-+	fprintf(stderr, "  %s --low_path=/sys/fs/cgroup/low \\\n", name);
-+	fprintf(stderr, "     --high_path=/sys/fs/cgroup/high \\\n");
-+	fprintf(stderr, "     --threshold=1000 --over_high_ms=500 \\\n"
-+			"     --use_below_low\n\n");
-+	fprintf(stderr, "  # Using short options:\n");
-+	fprintf(stderr, "  %s -l /sys/fs/cgroup/low \\\n"
-+			"     -g /sys/fs/cgroup/high \\\n",
-+		name);
-+	fprintf(stderr, "     -t 1000 -o 500 -L -M\n");
-+}
-+
-+static uint64_t get_cgroup_id(const char *cgroup_path)
-+{
-+	struct stat st;
-+
-+	if (cgroup_path == NULL) {
-+		fprintf(stderr, "Error: cgroup_path is NULL\n");
-+		return 0;
-+	}
-+
-+	if (stat(cgroup_path, &st) < 0) {
-+		fprintf(stderr, "Error: stat(%s) failed: %d\n",
-+			cgroup_path, errno);
-+		return 0;
-+	}
-+
-+	return (uint64_t)st.st_ino;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int low_cgroup_fd = -1, high_cgroup_fd = -1;
-+	uint64_t threshold = 0, high_cgroup_id;
-+	unsigned int over_high_ms = 0;
-+	bool use_below_low = false, use_below_min = false;
-+	__u32 opts_flags = 0;
-+	const char *low_path = NULL;
-+	const char *high_path = NULL;
-+	const char *bpf_obj_file = "memcg.bpf.o";
-+	struct bpf_object *obj = NULL;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link_low = NULL, *link_high = NULL;
-+	struct bpf_map *map;
-+	struct memcg__bss *bss_data;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	int err = -EINVAL;
-+	int map_fd;
-+	int opt;
-+	int option_index = 0;
-+
-+	static struct option long_options[] = {
-+		{"low_path",       required_argument, 0, 'l'},
-+		{"high_path",      required_argument, 0, 'g'},
-+		{"threshold",      required_argument, 0, 't'},
-+		{"over_high_ms",   required_argument, 0, 'o'},
-+		{"use_below_low",  no_argument,       0, 'L'},
-+		{"use_below_min",  no_argument,       0, 'M'},
-+		{"allow_override", no_argument,       0, 'O'},
-+		{"help",           no_argument,       0, 'h'},
-+		{0,                0,                 0,  0 }
-+	};
-+
-+	while ((opt = getopt_long(argc, argv, "l:g:t:o:LMOh",
-+				  long_options, &option_index)) != -1) {
-+		switch (opt) {
-+		case 'l':
-+			low_path = optarg;
-+			break;
-+		case 'g':
-+			high_path = optarg;
-+			break;
-+		case 't':
-+			threshold = strtoull(optarg, NULL, 10);
-+			break;
-+		case 'o':
-+			over_high_ms = strtoull(optarg, NULL, 10);
-+			break;
-+		case 'L':
-+			use_below_low = true;
-+			break;
-+		case 'M':
-+			use_below_min = true;
-+			break;
-+		case 'O':
-+			opts_flags = BPF_F_ALLOW_OVERRIDE;
-+			break;
-+		case 'h':
-+			usage(argv[0]);
-+			return 0;
-+		default:
-+			usage(argv[0]);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (!low_path || !high_path || !threshold) {
-+		fprintf(stderr,
-+			"ERROR: Missing required arguments\n\n");
-+		usage(argv[0]);
-+		goto out;
-+	}
-+
-+	low_cgroup_fd = open(low_path, O_RDONLY);
-+	if (low_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open low cgroup '%s' failed: %d\n",
-+			low_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	high_cgroup_id = get_cgroup_id(high_path);
-+	if (!high_cgroup_id)
-+		goto out;
-+	high_cgroup_fd = open(high_path, O_RDONLY);
-+	if (high_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open high cgroup '%s' failed: %d\n",
-+			high_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	obj = bpf_object__open_file(bpf_obj_file, NULL);
-+	err = libbpf_get_error(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: opening BPF object file '%s' failed: %d\n",
-+			bpf_obj_file, err);
-+		goto out;
-+	}
-+
-+	map = bpf_object__find_map_by_name(obj, ".bss");
-+	if (!map) {
-+		fprintf(stderr, "ERROR: Failed to find .data map\n");
-+		err = -ESRCH;
-+		goto out;
-+	}
-+
-+	err = bpf_object__load(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: loading BPF object file failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = malloc(bpf_map__value_size(map));
-+	if (bss_data) {
-+		__u32 key = 0;
-+
-+		memset(bss_data, 0, sizeof(struct local_config));
-+		bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+		bss_data->local_config.threshold = threshold;
-+		bss_data->local_config.over_high_ms = over_high_ms;
-+		bss_data->local_config.use_below_low = use_below_low;
-+		bss_data->local_config.use_below_min = use_below_min;
-+
-+		err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+		free(bss_data);
-+		if (err) {
-+			fprintf(stderr,
-+				"ERROR: update config failed: %d\n",
-+				err);
-+			goto out;
-+		}
-+	} else {
-+		fprintf(stderr,
-+			"ERROR: allocate memory failed\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	prog = bpf_object__find_program_by_name(obj,
-+						"handle_count_memcg_events");
-+	if (!prog) {
-+		fprintf(stderr,
-+			"ERROR: finding a prog in BPF object file failed\n");
-+		goto out;
-+	}
-+
-+	link = bpf_program__attach(prog);
-+	err = libbpf_get_error(link);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: bpf_program__attach failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	if (over_high_ms) {
-+		map = bpf_object__find_map_by_name(obj, "low_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find low_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = low_cgroup_fd,
-+		);
-+		link_low = bpf_map__attach_struct_ops_opts(map, &opts);
-+		if (!link_low) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops low_mcg_ops: %d\n",
-+				errno);
-+			err = -errno;
-+			goto out;
-+		}
-+	}
-+
-+	if (use_below_low || use_below_min) {
-+		map = bpf_object__find_map_by_name(obj, "high_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find high_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = high_cgroup_fd,
-+		);
-+		link_high = bpf_map__attach_struct_ops_opts(map, &opts);
-+		if (!link_high) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops high_mcg_ops: %d\n",
-+				errno);
-+			err = -errno;
-+			goto out;
-+		}
-+	}
-+
-+	printf("Successfully attached!\n");
-+
-+	signal(SIGINT, sig_handler);
-+	signal(SIGTERM, sig_handler);
-+
-+	while (!exiting)
-+		pause();
-+
-+	printf("Exiting...\n");
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link_low);
-+	bpf_link__destroy(link_high);
-+	bpf_object__close(obj);
-+	close(low_cgroup_fd);
-+	close(high_cgroup_fd);
-+	return err;
-+}
--- 
-2.43.0
-
+T24gRnJpLCAyMDI2LTAxLTIzIGF0IDEwOjExIC0wODAwLCBEYW5pZWwgWmFoa2Egd3JvdGU6DQo+
+IG1seDVlX3BzcF9oYW5kbGVfdHhfc2tiKCkgYXNzdW1lcyBza2JzIGFyZSBpcHY2IHdoZW4gZG9p
+bmcgYSBwYXJ0aWFsDQo+IFRDUCBjaGVja3N1bSB3aXRoIHRzby4gTWFrZSBjb3JyZWN0bHkgbWx4
+NWVfcHNwX2hhbmRsZV90eF9za2IoKQ0KPiBoYW5kbGUNCj4gaXB2NCBwYWNrZXRzLg0KPiANCj4g
+Rml4ZXM6IGU1YTE4NjFhMjk4ZSAoIm5ldC9tbHg1ZTogSW1wbGVtZW50IFBTUCBUeCBkYXRhIHBh
+dGgiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgWmFoa2EgPGRhbmllbC56YWhrYUBnbWFpbC5j
+b20+DQo+IC0tLQ0KPiBUaGlzIGlzIGEgYnVnIHdoZW4gYW4gaXB2NCB0eCBza2IgcGFzc2VzIHRo
+cm91Z2gNCj4gbWx4NWVfcHNwX2hhbmRsZV90eF9za2IoKSBhbmQgdHNvIGlzIHJlcXVlc3RlZC4g
+SXQgd2FzIHByZXZpb3VzbHkNCj4gdW5kZXRlY3RlZCBpbiBteSB0ZXN0aW5nIGJlY2F1c2UgbXkg
+c2V0dXAgaW52b2x2ZXMgY3g3J3Mgb24gYm90aA0KPiBlbmRzLA0KPiBhbmQgbWx4NWVfaGFuZGxl
+X2NzdW0oKSBtYXJrcyBQU1Agcnggc2tiJ3Mgd2l0aCBjc3VtX3VubmVjZXNzYXJ5Lg0KPiANCj4g
+VG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtIGp1c3QgdHVybiBvZmYgTkVUSUZfRl9SWENTVU0gYW5k
+IG9ic2VydmU6DQo+IG5zdGF0IC1hIHwgZ3JlcCBUY3BJbkNzdW1FcnJvcnMNCj4gLS0tDQo+IMKg
+Li4uL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZW5fYWNjZWwvcHNwX3J4dHguY8Kg
+wqAgfCAxNQ0KPiArKysrKysrKysrKy0tLS0NCj4gwqAxIGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0
+aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQNCj4gYS9kcml2ZXJzL25l
+dC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZW5fYWNjZWwvcHNwX3J4dHguYw0KPiBiL2Ry
+aXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9lbl9hY2NlbC9wc3Bfcnh0eC5j
+DQo+IGluZGV4IGMxN2VhMGZjZDhlZi4uMTVhMzQ0YWQ0NzFkIDEwMDY0NA0KPiAtLS0gYS9kcml2
+ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZW5fYWNjZWwvcHNwX3J4dHguYw0K
+PiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZW5fYWNjZWwv
+cHNwX3J4dHguYw0KPiBAQCAtMTc4LDcgKzE3OCw5IEBAIGJvb2wgbWx4NWVfcHNwX2hhbmRsZV90
+eF9za2Ioc3RydWN0IG5ldF9kZXZpY2UNCj4gKm5ldGRldiwNCj4gwqAJc3RydWN0IG1seDVlX3By
+aXYgKnByaXYgPSBuZXRkZXZfcHJpdihuZXRkZXYpOw0KPiDCoAlzdHJ1Y3QgbmV0ICpuZXQgPSBz
+b2NrX25ldChza2ItPnNrKTsNCj4gwqAJY29uc3Qgc3RydWN0IGlwdjZoZHIgKmlwNjsNCj4gKwlj
+b25zdCBzdHJ1Y3QgaXBoZHIgKmlwOw0KPiDCoAlzdHJ1Y3QgdGNwaGRyICp0aDsNCj4gKwlpbnQg
+bGVuOw0KDQpBbGwgZm91ciBvZiB0aGVzZSBzaG91bGQgYmUgZGVjbGFyZWQgbG93ZXIgZG93biBp
+biB0aGVpciByZXNwZWN0aXZlIGlmDQpicmFuY2hlcy4NCg0KPiDCoA0KPiDCoAlpZiAoIW1seDVl
+X3BzcF9zZXRfc3RhdGUocHJpdiwgc2tiLCBwc3Bfc3QpKQ0KPiDCoAkJcmV0dXJuIHRydWU7DQo+
+IEBAIC0xOTAsMTEgKzE5MiwxNiBAQCBib29sIG1seDVlX3BzcF9oYW5kbGVfdHhfc2tiKHN0cnVj
+dCBuZXRfZGV2aWNlDQo+ICpuZXRkZXYsDQo+IMKgCQlyZXR1cm4gZmFsc2U7DQo+IMKgCX0NCj4g
+wqAJaWYgKHNrYl9pc19nc28oc2tiKSkgew0KPiAtCQlpcDYgPSBpcHY2X2hkcihza2IpOw0KPiDC
+oAkJdGggPSBpbm5lcl90Y3BfaGRyKHNrYik7DQo+IC0NCj4gLQkJdGgtPmNoZWNrID0gfnRjcF92
+Nl9jaGVjayhza2Jfc2hpbmZvKHNrYiktPmdzb19zaXplDQo+ICsgaW5uZXJfdGNwX2hkcmxlbihz
+a2IpLCAmaXA2LT5zYWRkciwNCj4gLQkJCQkJwqAgJmlwNi0+ZGFkZHIsIDApOw0KPiArCQlsZW4g
+PSBza2Jfc2hpbmZvKHNrYiktPmdzb19zaXplICsNCj4gaW5uZXJfdGNwX2hkcmxlbihza2IpOw0K
+PiArDQo+ICsJCWlmIChza2ItPnByb3RvY29sID09IGh0b25zKEVUSF9QX0lQKSkgew0KPiArCQkJ
+aXAgPSBpcF9oZHIoc2tiKTsNCj4gKwkJCXRoLT5jaGVjayA9IH50Y3BfdjRfY2hlY2sobGVuLCBp
+cC0+c2FkZHIsDQo+IGlwLT5kYWRkciwgMCk7DQo+ICsJCX0gZWxzZSB7DQo+ICsJCQlpcDYgPSBp
+cHY2X2hkcihza2IpOw0KPiArCQkJdGgtPmNoZWNrID0gfnRjcF92Nl9jaGVjayhsZW4sICZpcDYt
+PnNhZGRyLA0KPiAmaXA2LT5kYWRkciwgMCk7DQo+ICsJCX0NCj4gwqAJfQ0KPiDCoA0KPiDCoAly
+ZXR1cm4gdHJ1ZTsNCj4gDQo+IC0tLQ0KPiBiYXNlLWNvbW1pdDogNGEzZGJhNDgxODgyMDhlNGY2
+NjgyMjgwMGUwNDI2ODY3ODRkMjlkMQ0KPiBjaGFuZ2UtaWQ6IDIwMjYwMTIyLWR6YWhrYS1maXgt
+dHgtY3N1bS1wYXJ0aWFsLTk1MmU4ZGMyODM3NQ0KPiANCj4gQmVzdCByZWdhcmRzLA0KDQpPdGhl
+cndpc2UgTEdUTSENCg0KQ29zbWluLg0KDQo=
 
