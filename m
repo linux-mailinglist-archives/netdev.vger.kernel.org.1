@@ -1,249 +1,166 @@
-Return-Path: <netdev+bounces-253519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yPpOJVSHd2m9hgEAu9opvQ
-	(envelope-from <netdev+bounces-253519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:25:08 +0100
+	id YA6/CaeHd2m9hgEAu9opvQ
+	(envelope-from <netdev+bounces-253520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:26:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CBCF8A1B0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:25:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 295428A205
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E83A6300D17A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:24:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F28A03004439
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442D533C1BD;
-	Mon, 26 Jan 2026 15:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616CA33F378;
+	Mon, 26 Jan 2026 15:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="emoSN7AB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFnm4LGp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4915C26E6F4
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769441077; cv=pass; b=M3mRXBdhQtGZ3Gtx76m3vR2nq999eMTgsN3UztJge8a0NHFSuiFjE2mQSJA7yURjbT75PrkW1Sn0sJPVP7/VulULajntliZpDyFpNGKpYaMbHlFEHXez2BukdWmDCcjUCz3N5tKk7JlXjzgPVdQHmTmGgXxOINo0mieclNyjlp4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769441077; c=relaxed/simple;
-	bh=AtkjgheHFRz232YeezgplcyAWxSNqThTBPDtNmqMFfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CzAr3EFUOqNPGXWJVrpkALGMzZrX58dTjFL2l6oL/FKbzPMhslAMRwDsB/ALoatbqU4USK8M0OopxSXQs8gGDBNDdn7BXBvRKaf3GE+zXxDSlNnjpRsFvCJTUMjKNksSLaLC2BENf6aVmdbOGKR9z252tCIENI00gpIjOpk260o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=emoSN7AB; arc=pass smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a09d981507so31171895ad.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 07:24:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769441074; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jWAuZe3XacaOHuHaOORP5WoZQeBOywsK2f+atDqDaEodMqEiGSczHkayj6AshfwVX2
-         BSBjrWKvG9Kc5eV/DQX8q7+6CUC2o39UzIDRao/ri83TJgQHHIXbtNI40GyPMsX4VyYO
-         p4ZBgdXEF+I+QSeJ4oEnYh64XnlgW0lwrdsQroGLK2gpfr71TAl8iv/tqHl61iSY7wVI
-         45sqdR5ta3Z2dIaqZ7CMShoOd4lFAjTV05HjfceB+agYUerA0xGB8B1VJNoATvAAgS2T
-         /defVlPjxlHPCXwleLL2qryvu7cK8+zDYp4aNFcRT0aeOvEcgP4JEC130/TxDbLgC2zJ
-         zjEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
-        fh=RMfgJZiZvXLhl24vC/GWoywQDZ2kyZf9xkGPQMvyiAI=;
-        b=AEvahUOgeXegVsJ8xyOzogAAf5BV+PljtOQExHSxEwF7ywo6JgoNs37/slulwyApJ8
-         1Yta4oaFANgRzKuz0X1HYZ4jfw4oX/JNqxpJZTItuW4TmUTnlj7tIKih7+NNfBp0dbAZ
-         hBvzphcPCruzApA4Y26ybYZDRndQXC+39D91odFkkmZnBsaEH5zKtIMhWENIp8rW5CbO
-         Ig5vfKpv26aXLogfdLgn5l792HVZlrQwraHCTUhhLER6WON1pCF0orQ5Wn4z371yA5nO
-         U50rL1FG4cB1eTkDzLFlOdc0TnfXA5J7eZALy6hUlQNZK1587EefHtpOlxYkJ53vpKhH
-         20PQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769441074; x=1770045874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
-        b=emoSN7ABW40UJr4DvX7ql5B+wFbyO1zHU1ZW8eRTCVww5j8xm7Adjct0/KL2oKz5+M
-         +rrLn+ZcVbsYeyZljO0nHObLxXAoAHcR3eLvlghukkllMcAgmS7LdlOPSp180NhdzJ9q
-         fRFtQEQUFlmKRm1mq5NUYEIVvO077rBBy1bYTd2D7Z6aWRjSK/gMHGe6KbPCp2gehxBY
-         3eAqQVkMvRISh3zC8EVpyZr1SNnAsYEYTMnC4PKbArWE44h37Zh8tAbIk683nffzTPyQ
-         DYc4IgKbSC022NLz8DnfPLeK8cWQdIfoycztwLGsD/GU3o25RqiXDd8n3kKFLiyH4uWD
-         CVQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769441074; x=1770045874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
-        b=W9oTAIQfyTjZPepnV3Ce2jZndwZq+jwQ/khfImfz9Qq6Q3Wk/vzzFs4wHYlVpK6r9q
-         x3wm4s8OeH7bDn3os5NWgbkVKqQqTupgaxYd9o2rFJWUHXeBYtvokb2tI08XG7RcPscM
-         y6JH22kBtLtc/+gOQSU27Vntk8WFC9v3zCb3zk1Ly+o6X87uKVpty0RVedCYLbabtBk/
-         rV3KfE8UCuNU53RiwlpSbWp7xen8/UCZcfms3d9gt+qnl/BadE/RMid242aWpOia0s3u
-         uGVAFxPrKyu1GuWvKWnJ8U4P6t+rVMjhODpEGHMT1ChfVjysEJv5PdHnmiIMrEhL5wLR
-         I/CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhPJHV7YCLqvyHMZLp6YeVy6eTm00v7+YILOzUTfh04MFmVFIFkVok43vnyVDSfaowyXeiWnc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0UeZiVVVJRF46gk9OC/RvsvQPcId8v950U48/7PSv2Q2pRQMu
-	fqFSluXujgujpB3abaB5xaFmEJCsvGlEXAVuj+MCj5kz0wgKIHuGgNgviXrUI5UlgHQVRaR+MkS
-	IwQ0uT4yyiLJnWCGXg6LxicVc5De6GEbVFKRQueIA
-X-Gm-Gg: AZuq6aIkzNOaQ1ZTbepdVvm6wd3Kq9Ss3gm8lVMBNvB7TDC1xlNwZR7hnMI8MBv4uvg
-	dC4YKf+LLj/TnqhaGc+IeVZzi/DWiMTOa8c9PF/8aNVckS15a8fVf56AsuaucXihi3J5BqmOs5v
-	5oaqjSFxFSHpjaeUO/ZdfVyrOF9VZzH5O3AitEj2ZHU9o5sKx6MtEgL9QBT9sQAADVguDm58VH7
-	9/vkr9LUQ2l+oQQuc6uq9cTsYy2erGBCpuMyYaLQAe6TVQZGahWlPFiAJ/FzT7ZHrWh1OpdP/SA
-	PYU=
-X-Received: by 2002:a17:902:c94d:b0:294:f6e5:b91a with SMTP id
- d9443c01a7336-2a845502f26mr47537115ad.13.1769441074384; Mon, 26 Jan 2026
- 07:24:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B61933E352;
+	Mon, 26 Jan 2026 15:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769441183; cv=none; b=YaITRDi1smBgbLP5rhIcQRirM2XTR7ZTcXvisRgS1KHwNXlimDvLtpljE8zOqAUvWiAjpJlEKOt4kwNbkpRROJUJAmeqAl9UR/Q4Igv5Tl/W8hEAnBVoiMh5Bmhjs44dg1MLyTF7h8RMggnvHNIqKK3wopIUi678wEKME7wXwcs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769441183; c=relaxed/simple;
+	bh=SRqS+y38YIXOhs6ehnUotQdiVYwta8kYRuUNmf2OMmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RNyU5008rNg3P/ce1JjCgXd95NJFGZ/AG5AgBAw2JJ806oDXTRjsXkND/8tfbIm7dSOz8S9MffB2wTKLqUCuaoKVTvQAoQlk8RAFXfi+3kCD9/OGOXZC/KblU3byfob4RdIwq5TjeXrZ0oBMerZKpob3PkOghfjjBAyIT9uX0b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFnm4LGp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B41F6C116C6;
+	Mon, 26 Jan 2026 15:26:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769441182;
+	bh=SRqS+y38YIXOhs6ehnUotQdiVYwta8kYRuUNmf2OMmU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uFnm4LGpkWz+9rGWqbjbTkYhQlIVZdBW/EwyRtekVDrdQ1caR9uQeZXFYebihiuw4
+	 vuDoe8RjTmdTy83+0hhR7SGWq2uhBFceEsM3x6LmeusdsI1lV/opnKHQt2OZ0iGZIz
+	 DkEbKRbdj07Bno5AJp5maVzQenSlEkStldiC1lP9cN/t5AW4i8xNTxf75aFGzTDG7Q
+	 hkpyFTm2JsgOYbRctdhgBdHNZi6VO1hYJyIINWKIFJoqRNFORhn7/M6voK4B/0Cwnh
+	 +wcllBCvVA3LuTz9Qcm+huRUXFUoc1zTvuYWPHFg+m7J0+ABAAxcmE5ajVaqH9Xrv3
+	 4VxmMxAekA34Q==
+From: Simon Horman <horms@kernel.org>
+To: dan.carpenter@linaro.org
+Cc: Simon Horman <horms@kernel.org>,
+	robh@kernel.org,
+	kuba@kernel.org,
+	festevam@gmail.com,
+	ghennadi.procopciuc@oss.nxp.com,
+	alexandre.torgue@foss.st.com,
+	linux-kernel@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	shawnguo@kernel.org,
+	mbrugger@suse.com,
+	mcoquelin.stm32@gmail.com,
+	linaro-s32@linaro.org,
+	davem@davemloft.net,
+	s.hauer@pengutronix.de,
+	edumazet@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev,
+	conor+dt@kernel.org,
+	krzk+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	Frank.li@nxp.com,
+	chester62515@gmail.com,
+	netdev@vger.kernel.org,
+	kernel@pengutronix.de,
+	pabeni@redhat.com,
+	jan.petrous@oss.nxp.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	s32@nxp.com
+Subject: Re: [v4,1/3] net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
+Date: Mon, 26 Jan 2026 15:24:30 +0000
+Message-ID: <20260126152430.1390514-1-horms@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <8f2139e8adf02b485a4c84d558fc23f78cf04add.1769195864.git.dan.carpenter@linaro.org>
+References: <8f2139e8adf02b485a4c84d558fc23f78cf04add.1769195864.git.dan.carpenter@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGfirfeHMgBUq-Q8tCn8dr2tHVJdQtZbS0JMutqF+b04T3EoWw@mail.gmail.com>
- <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
- <CANn89iJrXSHouF4ZnnoVYz4Q47J5jkwU4OuXMpJi3Orox4uT_Q@mail.gmail.com>
- <CANn89iJvj8YXtuMNTh1cQOjVctBsMs88FHx-xLn+rCzyBGn-og@mail.gmail.com>
- <CAGfirfebdHJi13epyM5RWYfQ2TGSWExP5nmnoKra83awetAbLQ@mail.gmail.com>
- <CANn89iLhXQ0W7+rOQCqxLpGyoHBAJ_xeUhjL+7MtQmN2saaYog@mail.gmail.com>
- <CAM0EoMm49+9j77Xpb46Q7qVT7JBU2cXKZB-Oeurzsuoe-=3eJw@mail.gmail.com> <CANn89iL1oB2J6whubYof+2AVWpWRm+gBsp3P8-xRP8Y22Jy6_w@mail.gmail.com>
-In-Reply-To: <CANn89iL1oB2J6whubYof+2AVWpWRm+gBsp3P8-xRP8Y22Jy6_w@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 26 Jan 2026 10:24:22 -0500
-X-Gm-Features: AZwV_QhrUNfMJfwZN64jDviP85j-RotZAo_DAlEWkNx6IccB0YCddDfKfX1-dgs
-Message-ID: <CAM0EoMnwGW05yc50ZyoKE28F-jZHeEtX+X4H2Xx6+KBQn-v6DQ@mail.gmail.com>
-Subject: Re: [BUG] KASAN: slab-use-after-free Read in u32_classify
-To: Eric Dumazet <edumazet@google.com>
-Cc: =?UTF-8?B?6rmA6rCV66+8?= <km.kim1503@gmail.com>, davem@davemloft.net, 
-	jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	xiyou.wangcong@gmail.com, horms@kernel.org, syzkaller@googlegroups.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253519-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,oss.nxp.com,foss.st.com,vger.kernel.org,lunn.ch,suse.com,linaro.org,davemloft.net,pengutronix.de,google.com,lists.infradead.org,lists.linux.dev,nxp.com,redhat.com,st-md-mailman.stormreply.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	TAGGED_FROM(0.00)[bounces-253520-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,resnulli.us,kernel.org,vger.kernel.org,redhat.com,googlegroups.com];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:email,vadai.me:email]
-X-Rspamd-Queue-Id: 0CBCF8A1B0
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 295428A205
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 9:11=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, Jan 26, 2026 at 2:51=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-> >
-> > On Mon, Jan 26, 2026 at 7:26=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Mon, Jan 26, 2026 at 1:11=E2=80=AFPM =EA=B9=80=EA=B0=95=EB=AF=BC <=
-km.kim1503@gmail.com> wrote:
-> > > >
-> > > > I propose the following patch and would appreciate your review.
-> > > >
-> > > > hoff is used as an offset argument to skb_header_pointer() in
-> > > > u32_classify(), and negative values can cause out-of-bounds read. A=
-s
-> > > > shown in the code below, offoff follows the same pattern and requir=
-es
-> > > > the same validation.
-> > > > ```
-> > > > TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
-> > > >    const struct tcf_proto *tp,
-> > > >    struct tcf_result *res)
-> > > > {
-> > > > ...
-> > > > if (n) {
-> > > > ...
-> > > > if (n->sel.flags & (TC_U32_OFFSET | TC_U32_VAROFFSET)) {
-> > > > off2 =3D n->sel.off + 3;
-> > > > if (n->sel.flags & TC_U32_VAROFFSET) {
-> > > > __be16 *data, hdata;
-> > > >
-> > > > data =3D skb_header_pointer(skb,
-> > > >   off + n->sel.offoff,
-> > > >   2, &hdata);
-> > > > if (!data)
-> > > > goto out;
-> > > > off2 +=3D ntohs(n->sel.offmask & *data) >>
-> > > > n->sel.offshift;
-> > > > }
-> > > > off2 &=3D ~3;
-> > > > }
-> > > > ...
-> > > > }
-> > > > ...
-> > > > }
-> > > > ```
-> > > > Therefore, I propose a patch that rejects negative hoff and offoff
-> > > > values during u32 classifier configuration.
-> > > >
-> > > > --- a/net/sched/cls_u32.c
-> > > > +++ b/net/sched/cls_u32.c
-> > > > @@ -1104,6 +1104,11 @@ static int u32_change(struct net *net, struc=
-t
-> > > > sk_buff *in_skb,
-> > > >   err =3D -EINVAL;
-> > > >   goto erridr;
-> > > >   }
-> > > > +
-> > > > + if (s->hoff < 0 || s->offoff < 0) {
-> > > > + err =3D -EINVAL;
-> > > > + goto erridr;
-> > > > + }
-> > > >
-> > >
-> > > Negative values are valid, it is ok to access data between skb->head
-> > > and skb->data.
-> >
-> > Right. We have to do this at runtime in classify().
-> > Can you test with your POC with Eric's suggested fix?
-> >
-> > Eric, can we do something like pedit? See: offset_valid() usage
->
->
-> Yes, it seems net/sched/act_pedit.c had a similar issue in the past :)
->  Amir fixed it with
->
-> commit 95c2027bfeda21a28eb245121e6a249f38d0788e
-> Author: Amir Vadai <amir@vadai.me>
-> Date:   Mon Nov 28 12:56:40 2016 +0200
->
->     net/sched: pedit: make sure that offset is valid
->
->     Add a validation function to make sure offset is valid:
->     1. Not below skb head (could happen when offset is negative).
->     2. Validate both 'offset' and 'at'.
->
->     Signed-off-by: Amir Vadai <amir@vadai.me>
->     Signed-off-by: David S. Miller <davem@davemloft.net>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-=EA=B9=80=EA=B0=95=EB=AF=BC,
-Are you able to send a similar patch? Otherwise one of us will.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+    net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
 
-cheers,
-jamal
+This commit adds syscon/regmap support for accessing the GMAC_0_CTRL_STS
+register on s32 chipsets, while maintaining backwards compatibility with
+the existing direct MMIO approach for older device trees.
+
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> index 5a485ee98fa7..2e6bb41f49e1 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+
+[ ... ]
+
+> @@ -40,7 +44,10 @@ struct s32_priv_data {
+>
+>  static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
+>  {
+> -	writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
+> +	if (gmac->ctrl_sts)
+> +		writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
+> +	else
+> +		regmap_write(gmac->sts_regmap, gmac->sts_offset, S32_PHY_INTF_SEL_RGMII);
+
+Should the regmap_write() return value be checked here? The function
+returns int and the caller s32_gmac_init() checks the return value
+expecting errors to be propagated. For comparison, dwmac-sun55i.c in
+sun55i_gmac200_set_syscon() does check regmap_write() return value:
+
+    ret = regmap_write(regmap, SYSCON_REG, reg);
+    if (ret < 0)
+        return dev_err_probe(dev, ret, "Failed to write to syscon\n");
+
+>
+>  	dev_dbg(gmac->dev, "PHY mode set to %s\n", phy_modes(*gmac->intf_mode));
+>
+>  	return 0;
+
+[ ... ]
 
