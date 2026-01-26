@@ -1,259 +1,161 @@
-Return-Path: <netdev+bounces-253344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253346-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGB8JMUQd2nJbgEAu9opvQ
-	(envelope-from <netdev+bounces-253344-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:59:17 +0100
+	id xqEaE3gSd2k5bwEAu9opvQ
+	(envelope-from <netdev+bounces-253346-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:06:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1906C84A63
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 995AA84ADB
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FD4E300EA9D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 06:58:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52F793003EB3
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14B2287253;
-	Mon, 26 Jan 2026 06:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F0F288C08;
+	Mon, 26 Jan 2026 07:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="T7OrylMU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ObDE7EkE"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44224283FDC;
-	Mon, 26 Jan 2026 06:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A922882D6
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 07:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769410731; cv=none; b=f6PtgbGk6s9dVf9g7WSexnN2V6SemHYaqUkICojLg47+CAuYdSQ7yDhXzSJZJyhMmbBsILZL4xmgetV+Q+yXi0WBAT81b2e7tFw2+56WVzhgkQRrv3lNT3DGDQBHTZH+D6ltygNk8Dr0oHeAbLhS67lRdUiFg3hcwNRKC0lVqkI=
+	t=1769411189; cv=none; b=QmFX9x+zloL0WitSoeFXmJmpYQW+bMvlXP/fBGqtwqM+Ig2GiVWfKlBBESCZAsTVi7C5uwtpy4Y6eMCy5+cymw8ijuJiqe0pNGoOEkCTdOLqkP6+2FukJQC91uOKvGNwMbNON2jAdKpRd48+cUylCLqD5XmFl62dPfG0ud0363M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769410731; c=relaxed/simple;
-	bh=YcIKEao+Ezb8G4VFoOe91+FnV1R+WsiMFrBsTwUFMCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AGRiwsWebHtTCbtbvmN5T5pRGF0bab9yzjB3eB3Y24kOa2Q/7M7JxONBBGzeRSEYGx7THYBzAYQqUB3+7me8IRbAE1L0KNWzNpHDRTr4HmQ9B570IC5VNCN5I8z/qTpanxD8KxHdvicG1YXgzrLOWFnjnAab5jwDyhA1KsPmUD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=T7OrylMU; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=T7OrylMU;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60Q6vthx1701723
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Mon, 26 Jan 2026 06:57:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1769410675; bh=05W2nvMYeBXKM5cojk1EbU2v8AtpCi3BGN/39UiOxC8=;
-	h=From:To:Cc:Subject:Date:Message-ID:References:From;
-	b=T7OrylMU66d0dzLFvXtgoSSbPdWY+DHW5zwTcDGPM++bnoaavnV55iWDoKuq+no28
-	 3Jm3OrhBydwt6geCwC0cn+wMhy3oMC1r4VZB9BPOco6SJxVC7fki/djHJChGKZYche
-	 sVy8+16yfWqzI3xp9btRTHQGV59QAAHfw5ANEpEs=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60Q6vtN5285644
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Mon, 26 Jan 2026 07:57:55 +0100
-Received: (nullmailer pid 1334893 invoked by uid 1000);
-	Mon, 26 Jan 2026 06:57:54 -0000
-From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-To: netdev@vger.kernel.org
-Cc: "Lucien.Jheng" <lucienzx159@gmail.com>,
-        Daniel Golle <daniel@makrotopia.org>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-Subject: [PATCH net-next v3 3/3] net: phy: air_en8811h: Add clk provider for an8811hb
-Date: Mon, 26 Jan 2026 07:57:49 +0100
-Message-ID: <20260126065749.1334867-4-bjorn@mork.no>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260126065749.1334867-1-bjorn@mork.no>
-References: <20260126065749.1334867-1-bjorn@mork.no>
+	s=arc-20240116; t=1769411189; c=relaxed/simple;
+	bh=BrGYfbKjFcWVBNtR1VCrwZ1sP+nBA2htFvw/QqIZpRI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZA8K0yWQATEmZ5+wGCFEg0PziLvRahNdI+r6/QlRIsa5v8xBA60n16AinSUVgV5CALUSEvtMDx/lM2lALcpjhGay/5qPWM63zgrzeXdcX0/HaBUCPHKsZ/bYrd8vGA6jZASB/QFko6FJ8SRhZw/CuVLpBjsHdJdpRoNzXPMH5z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ObDE7EkE; arc=none smtp.client-ip=74.125.82.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2b74f839bdfso970147eec.1
+        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 23:06:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769411187; x=1770015987; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZnNSYAsSgZZKBbd6EX4AMUvPpqA2jWI9KkqGPjFXPC0=;
+        b=ObDE7EkEzZCzM4l2WEmjfE/rIA9vOK9qUHkbpah/DiS7vwQ2W5ngVeG8SeLhGUwJBK
+         C4xPHzWCNmgo9mU6KT9Ulkrsri/k2vqZq2SXI6BReyZba43OvSuSU5PHZmJ6g4z4b3+d
+         zY+/JJfWYw+SrRnyDXiCkjswXIZDD+IR0clEjddTHWGqynUX1TEB81abhhQJuSdwFxBg
+         /Zlr5H9MQa9ehv8hlMLP2rUHYWupuMnepV8KSF4G2YNpEoWOCz1M7a8ysZvYW0hs/u7w
+         U8LXv6gpKHyM2FEUFwBNOOkvwpftyfb+5GxhJFXcL4yWqc7NHyaU0quhW71fyD9Es+nk
+         hD3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769411187; x=1770015987;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZnNSYAsSgZZKBbd6EX4AMUvPpqA2jWI9KkqGPjFXPC0=;
+        b=EwSMIqH64H7scANXBoJN8l95NoBWXiFKFl6lHRumDTyYIZN3qY85hmIIQX34nDk7ER
+         iB6Ka6U8iCE+CS4gJVGIGoAejYVy+K6jGc9+tudEEsYtAIT4Tpl0Epf7Ck1YML2uLANK
+         vV7Yuh2tYzToiMAnL4iYm0GY0WkTesIiZQQGqLXLkSOZnr3RccQgbycTzg1hAVtb4wHe
+         zU17hOf2eKakRAfp/MUSUAWozxYnuftfKzbjmAq1sPasFwGDjm6XfnUx9LCKUsaKISOv
+         KhGQFx06rcqgDePW6onM4ThWpLqkFmA6CmrgASaP9nPJsM6l/6ZTi2jNLolOdFHNXJUm
+         Z0fQ==
+X-Gm-Message-State: AOJu0YzOgiqwAWlfBxF0ZwnvYXsKWXtSfNtA+f7stQ5UtusRqEPZrDTX
+	knmeVWyTmn3CuXMZJ1b6JHO0qcHYmYp+JrOcnA1Z735VD+C3Ty0pL349QAmoM0wy
+X-Gm-Gg: AZuq6aKW1fmlADFb5TNQWeOPvPxkBx1q+0JrCk4AYWL9Sf7B+RD0QXi7mfuBtLoB7F6
+	k+r9rVrvQC1lk0A5iHaSgrcsHlFZF1cMTzLdPTpX7W8obGHl9877pWDU8FWYRoQBPYyEHTXhdEc
+	vxuPm+L+ayc0EXwa3hMj8Rk1HkYN1X+8HdMC4JF/0qz1lA869AUebSYy9exvIAcaTDQcaMEDoAq
+	YO9YZepdVvBXOosZvTI+peyJyuCW9YKIgGVpa7z+ThkJ1B888JJaPgcno/1a207BjltCK0Ew+Vg
+	22beTa0PGgPcinCY3tvphA6xDA37ymXQ54OuxZbiE8fgCTaBWp8ypKm/7QXJGrimvT9mI810T2b
+	5QNxCYQDsV5HnI7uTo82PAh65TfCySgmx0uGWPQ8yGki4qN72EGRFj5IhzNyTFuGAgO+X/zMAoi
+	r86eniZDZNhT/c8yjC+Uw2WgDbpQG85755epEk0+SmUpPFWaROSEQU1NvSYCarWsc8NyrJ4oy1Z
+	XgE0iAkO3FpaSt3lWcuh62NXA9AtZfnkK2grr2RwKiFJK6shcvU56lcIFjUAMErSS/fuZ/F4eko
+	CAjkbGpX
+X-Received: by 2002:a05:7300:d511:b0:2ae:556b:76f2 with SMTP id 5a478bee46e88-2b7638a7f04mr1772945eec.6.1769411186616;
+        Sun, 25 Jan 2026 23:06:26 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1247d91c52bsm18021503c88.6.2026.01.25.23.06.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jan 2026 23:06:26 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: usb: int51x1: remove unused includes
+Date: Sun, 25 Jan 2026 23:06:13 -0800
+Message-ID: <20260126070618.53758-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
-	TAGGED_FROM(0.00)[bounces-253344-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253346-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mork.no:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mork.no:email,mork.no:dkim,mork.no:mid]
-X-Rspamd-Queue-Id: 1906C84A63
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 995AA84ADB
 X-Rspamd-Action: no action
 
-Implement clk provider driver so we can disable the clock output when it
-isn't needed. This helps to reduce EMF noise
+Most of the headers the int51x1 driver includes are not actually used.
+Remove these unused includes.
 
-Signed-off-by: Bjørn Mork <bjorn@mork.no>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/net/phy/air_en8811h.c | 107 ++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
+ drivers/net/usb/int51x1.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index 05a7023b98a9..bfd91b4aa3a7 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -954,6 +954,105 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	return 0;
- };
+diff --git a/drivers/net/usb/int51x1.c b/drivers/net/usb/int51x1.c
+index 6fde41550de1..317ae365277f 100644
+--- a/drivers/net/usb/int51x1.c
++++ b/drivers/net/usb/int51x1.c
+@@ -13,13 +13,8 @@
+  */
  
-+static unsigned long an8811hb_clk_recalc_rate(struct clk_hw *hw,
-+					      unsigned long parent)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, AN8811HB_HWTRAP2, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & AN8811HB_HWTRAP2_CKO) ? 50000000 : 25000000;
-+}
-+
-+static int an8811hb_clk_enable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	return air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
-+				       AN8811HB_CLK_DRV_CKO_MASK,
-+				       AN8811HB_CLK_DRV_CKO_MASK);
-+}
-+
-+static void an8811hb_clk_disable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
-+				AN8811HB_CLK_DRV_CKO_MASK, 0);
-+}
-+
-+static int an8811hb_clk_is_enabled(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, AN8811HB_CLK_DRV, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & AN8811HB_CLK_DRV_CKO_MASK);
-+}
-+
-+static int an8811hb_clk_save_context(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+
-+	priv->cko_is_enabled = an8811hb_clk_is_enabled(hw);
-+
-+	return 0;
-+}
-+
-+static void an8811hb_clk_restore_context(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+
-+	if (!priv->cko_is_enabled)
-+		an8811hb_clk_disable(hw);
-+}
-+
-+static const struct clk_ops an8811hb_clk_ops = {
-+	.recalc_rate		= an8811hb_clk_recalc_rate,
-+	.enable			= an8811hb_clk_enable,
-+	.disable		= an8811hb_clk_disable,
-+	.is_enabled		= an8811hb_clk_is_enabled,
-+	.save_context		= an8811hb_clk_save_context,
-+	.restore_context	= an8811hb_clk_restore_context,
-+};
-+
-+static int an8811hb_clk_provider_setup(struct device *dev, struct clk_hw *hw)
-+{
-+	struct clk_init_data init;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_COMMON_CLK))
-+		return 0;
-+
-+	init.name = devm_kasprintf(dev, GFP_KERNEL, "%s-cko",
-+				   fwnode_get_name(dev_fwnode(dev)));
-+	if (!init.name)
-+		return -ENOMEM;
-+
-+	init.ops = &an8811hb_clk_ops;
-+	init.flags = 0;
-+	init.num_parents = 0;
-+	hw->init = &init;
-+
-+	ret = devm_clk_hw_register(dev, hw);
-+	if (ret)
-+		return ret;
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
-+}
-+
- static unsigned long en8811h_clk_recalc_rate(struct clk_hw *hw,
- 					     unsigned long parent)
- {
-@@ -1095,6 +1194,12 @@ static int an8811hb_probe(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
+ #include <linux/module.h>
+-#include <linux/ctype.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+-#include <linux/ethtool.h>
+-#include <linux/slab.h>
+-#include <linux/mii.h>
+-#include <linux/usb.h>
+ #include <linux/usb/usbnet.h>
  
-+	priv->phydev = phydev;
-+	/* Co-Clock Output */
-+	ret = an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-+	if (ret)
-+		return ret;
-+
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
- 				      AN8811HB_GPIO_OUTPUT_345,
-@@ -1488,6 +1593,8 @@ static struct phy_driver en8811h_driver[] = {
- 	.get_rate_matching	= en8811h_get_rate_matching,
- 	.config_aneg		= en8811h_config_aneg,
- 	.read_status		= en8811h_read_status,
-+	.resume			= en8811h_resume,
-+	.suspend		= en8811h_suspend,
- 	.config_intr		= en8811h_clear_intr,
- 	.handle_interrupt	= en8811h_handle_interrupt,
- 	.led_hw_is_supported	= en8811h_led_hw_is_supported,
+ #define INT51X1_VENDOR_ID	0x09e1
 -- 
-2.47.3
+2.43.0
 
 
