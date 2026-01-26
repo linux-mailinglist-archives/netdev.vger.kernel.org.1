@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-253593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wORKJEXOd2mxlQEAu9opvQ
-	(envelope-from <netdev+bounces-253593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 21:27:49 +0100
+	id MGfLJBnQd2mxlQEAu9opvQ
+	(envelope-from <netdev+bounces-253594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 21:35:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE31F8D0FA
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 21:27:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AACE8D1D9
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 21:35:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B3D903009B3A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:26:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE2833014974
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FD62D5926;
-	Mon, 26 Jan 2026 20:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0A22D6E6C;
+	Mon, 26 Jan 2026 20:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBAM8N2F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvcht4Ht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD984285C8C
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 20:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E629A2D541B
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 20:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769459199; cv=none; b=qGFNTWqFlaJi6fYEIhQnoc8z8M23yd7qrzdQ2B6o7n2GUFABBgCcm6zgNq/08PWsPzc0rbuxou/ZAkLxcEKQwa1b8abFERdwbnDsrhNJweBHJ+PaKAVgbVZEUKoqS1drifWt150u6X5GimQXcP3RpROZppoiH5DywGtBcnhmeOM=
+	t=1769459735; cv=none; b=KtUXvlkmnwgqC7JSd+JlPbynSjkeYMjM+N8jTAhc4V/HAXZHfLM/rd4VySmqsrQ+6CXImIe4way1v6s2EbC+UTsKnkUJD1DbfZp0ngASMDGYYemNbom1y9TeYvq+ISDtyISaB83aDV7NeM1BOWMNYclBGsb4RNgrhsdZFpqZqLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769459199; c=relaxed/simple;
-	bh=QojildKJVNfOzJ2FA2VbQreb53+szZ8jOJA25sDd4MI=;
+	s=arc-20240116; t=1769459735; c=relaxed/simple;
+	bh=Hv73xovg7rs+ED9F7z8l/VwWVkfiGm/GSqfIJQSKT6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gxBpLE6+U06QleYyMPlv8n8gzXopnljs0VNBcA3KWVCN4fBHUV6WXtfrP3Kn8ussJab5ZVTkEJo/doNYKVv1jwi7LtFjCh24hg5MLH2y7SqMeWT6yfCR6ukOJWBXbXgQMbF908mpFS5KtsLsWJ/Kh1YDjCpxqqL9x+dzDS8nlac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBAM8N2F; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-78fba1a1b1eso73980557b3.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 12:26:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769459197; x=1770063997; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+77MEX92w21ydV8W8Ch081Vt4q/87vkSywxoRlWdug=;
-        b=IBAM8N2FMck07wgKXakVwZT0f40Cce7D7L9f/h/u5LM/L0LsE+Wqfex2tyqyiu2Pcj
-         nmjZfNFFqK6WxCtgEe2lLlEgjLI4zTUfKZFgcmkh1GBNy/uiddPDwD3tsW1BEZw4Ol0H
-         tk798vxp+Yc6WaE/Al8WJRUNT+0l0Xyw1WHVTObjP48s1vBvLDs9eZ9Q9Q9sJ3263Hem
-         o6DNw4FPGZys+SkrDPwMZKQY0j3Nfed9QBFg2KHqjO9XwZX5rOl6+d9O2gSKUt9ohdX5
-         Lp4bcPX+TYojc7EQdYjau5+AxydmOERtLrk6hnmJE/A5rEu8D+zaYaYYLLyR3Wnamuuk
-         rbkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769459197; x=1770063997;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K+77MEX92w21ydV8W8Ch081Vt4q/87vkSywxoRlWdug=;
-        b=u2EQBpP+yenZczphjkPs3YMGX/Ftt8llzCl66GpwHpYrZ7/1zMYUdWiHyzJ8O5wPeN
-         aNpIXFR6GF62ZSXTau/erK4ouhJLg8lfvaKRswIz2kkVZZarLVTE9YgHUxc1TsxdsZzs
-         aAoWGsUGMfetC95ZMtzEbHTRl1+P81K8N1/oV1brozHm+C25anTLjszsO18/6vpDGsoi
-         GxcAjeqOjGT+pJI9RtdfL7/jlIx7xvu7gXrTZhz+SXx8tOymVYNvrcskIXzG9M6+HxlU
-         CT2fglGsKIUDsgbWvPbNl/fngEIseloHmK9awuCcQBV5Ze1A1Ss07I2EiHwPktx11eWV
-         fZjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYmnZ9HEo/+blNI7JEn31IOrD0R+ft+WXpoot5sV8bo15YihfWyxcYnHAnk5yyj3U28yoHcy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJOD5DIQLWo1i5arByCQ3MgR+3LZbaDngDcK62O1JID4/1dzwr
-	UcxkiSqf8rFM2b7FOLMGIU0jYCror/yMoEM6jaPC8mvpItWwYOvp6Tfk
-X-Gm-Gg: AZuq6aKhtnV7FBZHomMKa8N1I2kHz6lUiBh5mz4c6ZdhEuzjLP4Bh+t+Z4xR2IhQQFu
-	KiyMSgoBo5riltmUt/zQSgbkLpR/XGDaI5frUiuDeHiFSUnhxdgbGKfOHy8IJL5IgpSV9ATowG/
-	2WnEFpgXzqI3PL/5Co96hOpfe4dl3W+RyeC0NF7qse93PwfJX9Td5WJSnZWIIf8xVaxdDfdOEyK
-	OQqwjcUPsYvVvdKjMEi4EdeuladY1V5Ff0D6STYTCZL7el/JK9bt71+G4hdvBqbMmQhlvRTpnzT
-	XoksoEK/5+zXwgreTXmlR1hZ9isMNTyfy74gdsSUI+tQLJBFdL3qJYTy6nKeuYLdR4iRHSWpoE4
-	ztjK0Y92XU4tUOMKHiS1Zm93Q4DZl4O3UoOCJVhikv1TbyORtjehrcK+Kn7OTDLt0Tg8DV5sAUb
-	hZ+bJ1LDtApYh0amxEMsqeiuwWxQvIRYGL1oY=
-X-Received: by 2002:a05:690c:c52e:b0:792:7745:72fc with SMTP id 00721157ae682-7945ad3dda6mr40762637b3.21.1769459196761;
-        Mon, 26 Jan 2026 12:26:36 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:55::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7944aa7b302sm39785637b3.48.2026.01.26.12.26.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 12:26:36 -0800 (PST)
-Date: Mon, 26 Jan 2026 12:26:35 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 4/4] net: inline get_netmem() and put_netmem()
-Message-ID: <aXfN+/v8JAh9GcQU@devvm11784.nha0.facebook.com>
-References: <20260122045720.1221017-1-edumazet@google.com>
- <20260122045720.1221017-5-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WmGPV2dTucJ2rBrX1qM7azPr5nY718yxtuw8qNc9uiW/K2uAwEGfIt4hByrJS2+Hs6Hi+30XRthdkWFIL/HR9yiEKSoDShnGJi2dnutnzboii8xy8VVeGY4e+P5MUI/Gucbd/GK6oB/kt09L17J24OiXZOJG0M4vHP1ljVXAobc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvcht4Ht; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769459734; x=1800995734;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hv73xovg7rs+ED9F7z8l/VwWVkfiGm/GSqfIJQSKT6M=;
+  b=hvcht4Ht9cb2SvSp3r/zPn2cOxXSiFezycdz2VcQewmz1lCwbLVxhFZZ
+   4Vb3KcsyPkxaemAa9VPtbI6KX3MCNBiFeR+7KfbWXJ07gizIA0L+YA9PQ
+   7pqoDZm8xk3Ad2zbHsRnnz5xj+ocPmLQQtY0+/m7L1zKriTD/VxK7iFgh
+   pTCx58LhV6xz+zKoS6eRXI+SmoJcZ29N3kL1sRXfTFWXStehwqpmBfhSN
+   IFtXNf0X4IW/QGk62gPKV0DLHFjsjKdpfZGMhfnQilmPeBsRWwBLdTlta
+   0+RUJJ3OzJllS0PpgttfzLKN5fY5wTyU1Ej5fs46AvjX29a6gX7+hTN++
+   g==;
+X-CSE-ConnectionGUID: aYUnXCCGS8u823I0YGhToQ==
+X-CSE-MsgGUID: 7EpVI3LWTbOY7li1rQWtJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="70548995"
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="70548995"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 12:35:33 -0800
+X-CSE-ConnectionGUID: sagnajPzQ5CRUn3YbCDE2w==
+X-CSE-MsgGUID: nd9RHMb/SPikWc1P17fuuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="208125486"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 26 Jan 2026 12:35:30 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vkTJ2-00000000XfO-2ljl;
+	Mon, 26 Jan 2026 20:35:28 +0000
+Date: Tue, 27 Jan 2026 04:34:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: report active PHY interface
+Message-ID: <202601270450.IAoLETfq-lkp@intel.com>
+References: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,154 +87,102 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260122045720.1221017-5-edumazet@google.com>
+In-Reply-To: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253593-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253594-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,209.85.128.172:received];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm11784.nha0.facebook.com:mid]
-X-Rspamd-Queue-Id: CE31F8D0FA
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1AACE8D1D9
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 04:57:19AM +0000, Eric Dumazet wrote:
-> These helpers are used in network fast paths.
-> 
-> Only call out-of-line helpers for netmem case.
-> 
-> We might consider inlining __get_netmem() and __put_netmem()
-> in the future.
-> 
-> $ scripts/bloat-o-meter -t vmlinux.3 vmlinux.4
-> add/remove: 6/6 grow/shrink: 22/1 up/down: 2614/-646 (1968)
-> Function                                     old     new   delta
-> pskb_carve                                  1669    1894    +225
-> gro_pull_from_frag0                            -     206    +206
-> get_page                                     190     380    +190
-> skb_segment                                 3561    3747    +186
-> put_page                                     595     765    +170
-> skb_copy_ubufs                              1683    1822    +139
-> __pskb_trim_head                             276     401    +125
-> __pskb_copy_fclone                           734     858    +124
-> skb_zerocopy                                1092    1215    +123
-> pskb_expand_head                             892    1008    +116
-> skb_split                                    828     940    +112
-> skb_release_data                             297     409    +112
-> ___pskb_trim                                 829     941    +112
-> __skb_zcopy_downgrade_managed                120     226    +106
-> tcp_clone_payload                            530     634    +104
-> esp_ssg_unref                                191     294    +103
-> dev_gro_receive                             1464    1514     +50
-> __put_netmem                                   -      41     +41
-> __get_netmem                                   -      41     +41
-> skb_shift                                   1139    1175     +36
-> skb_try_coalesce                             681     714     +33
-> __pfx_put_page                               112     144     +32
-> __pfx_get_page                                32      64     +32
-> __pskb_pull_tail                            1137    1168     +31
-> veth_xdp_get                                 250     267     +17
-> __pfx_gro_pull_from_frag0                      -      16     +16
-> __pfx___put_netmem                             -      16     +16
-> __pfx___get_netmem                             -      16     +16
-> __pfx_put_netmem                              16       -     -16
-> __pfx_gro_try_pull_from_frag0                 16       -     -16
-> __pfx_get_netmem                              16       -     -16
-> put_netmem                                   114       -    -114
-> get_netmem                                   130       -    -130
-> napi_gro_frags                               929     771    -158
-> gro_try_pull_from_frag0                      196       -    -196
-> Total: Before=22565857, After=22567825, chg +0.01%
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  include/net/netmem.h | 20 ++++++++++++++++++--
->  net/core/skbuff.c    | 31 ++++++++++---------------------
->  2 files changed, 28 insertions(+), 23 deletions(-)
-> 
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index 2113a197abb315f608ee3d6d3e8a60811b3781f8..a96b3e5e5574c1800ae7949c39366968707ab5d5 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -401,8 +401,24 @@ static inline bool net_is_devmem_iov(const struct net_iov *niov)
->  }
->  #endif
->  
-> -void get_netmem(netmem_ref netmem);
-> -void put_netmem(netmem_ref netmem);
-> +void __get_netmem(netmem_ref netmem);
-> +void __put_netmem(netmem_ref netmem);
-> +
-> +static __always_inline void get_netmem(netmem_ref netmem)
-> +{
-> +	if (netmem_is_net_iov(netmem))
-> +		__get_netmem(netmem);
-> +	else
-> +		get_page(netmem_to_page(netmem));
-> +}
-> +
-> +static __always_inline void put_netmem(netmem_ref netmem)
-> +{
-> +	if (netmem_is_net_iov(netmem))
-> +		__put_netmem(netmem);
-> +	else
-> +		put_page(netmem_to_page(netmem));
-> +}
->  
->  #define netmem_dma_unmap_addr_set(NETMEM, PTR, ADDR_NAME, VAL)   \
->  	do {                                                     \
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index c57c806edba8524d3d498800e61ae6901fbfe5fb..2a8235c3d6f7fcee8b0b28607c10db985965b8d4 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -7422,31 +7422,20 @@ bool csum_and_copy_from_iter_full(void *addr, size_t bytes,
->  }
->  EXPORT_SYMBOL(csum_and_copy_from_iter_full);
->  
-> -void get_netmem(netmem_ref netmem)
-> +void __get_netmem(netmem_ref netmem)
->  {
-> -	struct net_iov *niov;
-> +	struct net_iov *niov = netmem_to_net_iov(netmem);
->  
-> -	if (netmem_is_net_iov(netmem)) {
-> -		niov = netmem_to_net_iov(netmem);
-> -		if (net_is_devmem_iov(niov))
-> -			net_devmem_get_net_iov(netmem_to_net_iov(netmem));
-> -		return;
-> -	}
-> -	get_page(netmem_to_page(netmem));
-> +	if (net_is_devmem_iov(niov))
-> +		net_devmem_get_net_iov(netmem_to_net_iov(netmem));
+Hi Russell,
 
-I wonder if this is a good time to move to just re-use niov from above
-here instead of re-convert with netmem_to_net_iov()? I do acknowledge
-the original code did not do this.
+kernel test robot noticed the following build warnings:
 
-Best,
-Bobby
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-report-active-PHY-interface/20260126-201908
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1vkLXO-00000005uxQ-31ZV%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next] net: stmmac: report active PHY interface
+config: riscv-defconfig (https://download.01.org/0day-ci/archive/20260127/202601270450.IAoLETfq-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260127/202601270450.IAoLETfq-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601270450.IAoLETfq-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:41:10: warning: 'PHY_INTF_RGMII' macro redefined [-Wmacro-redefined]
+      41 | #define  PHY_INTF_RGMII                 FIELD_PREP(PHY_INTF_MASK, 1)
+         |          ^
+   drivers/net/ethernet/stmicro/stmmac/common.h:328:9: note: previous definition is here
+     328 | #define PHY_INTF_RGMII          1
+         |         ^
+   1 warning generated.
+
+
+vim +/PHY_INTF_RGMII +41 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  18  
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  19  #define GMAC_CLK_EN			0x00
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  20  #define  GMAC_TX_CLK_EN			BIT(1)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  21  #define  GMAC_TX_CLK_N_EN		BIT(2)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  22  #define  GMAC_TX_CLK_OUT_EN		BIT(3)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  23  #define  GMAC_RX_CLK_EN			BIT(4)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  24  #define  GMAC_RX_CLK_N_EN		BIT(5)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  25  #define  GMAC_EPHY_REF_CLK_EN		BIT(6)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  26  #define GMAC_RXCLK_DELAY_CTRL		0x04
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  27  #define  GMAC_RXCLK_BYPASS		BIT(15)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  28  #define  GMAC_RXCLK_INVERT		BIT(14)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  29  #define  GMAC_RXCLK_DELAY		GENMASK(4, 0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  30  #define GMAC_TXCLK_DELAY_CTRL		0x08
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  31  #define  GMAC_TXCLK_BYPASS		BIT(15)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  32  #define  GMAC_TXCLK_INVERT		BIT(14)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  33  #define  GMAC_TXCLK_DELAY		GENMASK(4, 0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  34  #define GMAC_PLLCLK_DIV			0x0c
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  35  #define  GMAC_PLLCLK_DIV_EN		BIT(31)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  36  #define  GMAC_PLLCLK_DIV_NUM		GENMASK(7, 0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  37  #define GMAC_GTXCLK_SEL			0x18
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  38  #define  GMAC_GTXCLK_SEL_PLL		BIT(0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  39  #define GMAC_INTF_CTRL			0x1c
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  40  #define  PHY_INTF_MASK			BIT(0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03 @41  #define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  42  #define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  43  #define GMAC_TXCLK_OEN			0x20
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  44  #define  TXCLK_DIR_MASK			BIT(0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  45  #define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  46  #define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
+33a1a01e3afa724 Jisheng Zhang 2024-11-03  47  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
