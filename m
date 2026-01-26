@@ -1,168 +1,384 @@
-Return-Path: <netdev+bounces-253375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253377-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLiiBIwrd2nacwEAu9opvQ
-	(envelope-from <netdev+bounces-253375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:53:32 +0100
+	id uMxeJtEtd2kvdAEAu9opvQ
+	(envelope-from <netdev+bounces-253377-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:03:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301EE85A50
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:53:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D3C85B79
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:03:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BDC733001581
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:53:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA98A30036CC
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58742FF646;
-	Mon, 26 Jan 2026 08:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BC7277C81;
+	Mon, 26 Jan 2026 09:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="mvwkY5OJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xa6EFDgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EA61E5B73;
-	Mon, 26 Jan 2026 08:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB799244694;
+	Mon, 26 Jan 2026 09:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769417605; cv=none; b=W34tMzrt8riDDSp74uzB8wOKmDAXtDOkQveSrjlyWv/wApgeuogyDOTWfurLEp62L4pAU6A27hFCzdrVWU+UaqFRdSn6LvydeTW+q8bsNOgG3zPq9+BSsAPAqfDfMBWiQ+fZeQRozyWICVyE/Iww109rDFBnT/1vXf4zuafm0MM=
+	t=1769418189; cv=none; b=ss98OCur6ePwls8FcCW9e5xwU/1qu2jVse51ucBV6Z9K953PwGnFNYlyRSTSgNGZbDAfOBbArHDQQPNCuc6iLAECzev2tFM+G/vHINx6B93G3GuiS2hG9AqUpqqtX/7FCIJAJoSaDFgf8c1irwBB+zIMYTCirOcIxFt4jDeQ908=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769417605; c=relaxed/simple;
-	bh=BJZV3Cw0Vi7MkeA/1O9xXI98G1YadhiApczo4SXoCWY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DeXjHVJ+D8ByTk8RXAsJGflyOyiZbDXhcp0PQ1hv3p7n+gwKi1VsfBTiW1ku7CA7yzBPdvZKmsBwRQPyol5prPqdMZ+9pyDp4xU53aQn5tspnNOsmqtEyBkdH4y2kMQdMmgvDeFoANHSsMcfPojjjatD6RpOouAPjJgVa05inPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=mvwkY5OJ; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1769417594; x=1769676794;
-	bh=BJZV3Cw0Vi7MkeA/1O9xXI98G1YadhiApczo4SXoCWY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=mvwkY5OJxXeFNzNr7ahxsOnntKz6G7CbV0YYAj4hQHpemmWFSwXQV9f6yfiDmexZN
-	 eycbtoZBeGj6BF+kHbqD4ELjBhyQij2RK0su6nP5jlOledkd1ON/qq9ClQFQQ9A16O
-	 2xbhyPrj5LKIrhjW/Ph3od2Fi4r7LfKObknDG7soGsyMlX7Oc11iySco7fWXPKeCgT
-	 EIfv5LiuDNKgKBERdXE7AE1yVJJc84NIqHIIRI0mMZYedgvbcYIvSXX2ruRTnh+Pgs
-	 GhHkoxPF/edOnFsU+8DEwOb2YJjrpk7lbLH0riglIQYyTgQXQ3CyGg3yY/Z/put1SE
-	 k6BCsuvUrpdAw==
-Date: Mon, 26 Jan 2026 08:53:10 +0000
-To: Victor Nogueira <victor@mojatatu.com>
-From: Paul Moses <p@1g4.org>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 6/7] net/sched: act_gate: reject empty schedule list
-Message-ID: <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
-In-Reply-To: <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
-References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-7-p@1g4.org> <c8a8ae22-c5c4-4112-8084-0faa256a1d84@mojatatu.com> <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: c1fd98711753fdf12f01526c362f688a5aa969b6
+	s=arc-20240116; t=1769418189; c=relaxed/simple;
+	bh=WoMSaaEa6cPJ7PS3AIOXxw/NrGUzfUkLfBRwpe+8VaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LSlIR0XN3m2oss31fCrFLfxQm2bGJK+MWYqn2RwTwc/65a1eCZiZEMDi6sHY8G4iGfNplAD07mF8fzo3tlP6r10c9BB6lWQstHWOoRGWwdFGhwbGRhcjUnkWnLohChFxxQep64WRAwClDSgjjiRnbMtUMnfnMAcscklZVNlW0q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xa6EFDgh; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769418184;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gFr3YlD/FrQ5KpFJY2fbuprM3uE6y+2ho/7y/E4qt6c=;
+	b=Xa6EFDghdPtPPeaPmdck+ruV9B57Bb32pkkRJ/zJSbAsevQ6855WdTp5jvcB75IVRlEZXZ
+	J6UfsoznsXT4WH5lKLXkgc3wB8zzSliTyO4WclOeEucWwvwtUhvKwSE3PVZA1OXCAhdd71
+	aEjqyD9Xdmxvk8R78HFXfUgbVAq1/wY=
+From: Hui Zhu <hui.zhu@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Jeff Xu <jeffxu@chromium.org>,
+	mkoutny@suse.com,
+	Jan Hendrik Farr <kernel@jfarr.cc>,
+	Christian Brauner <brauner@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	davem@davemloft.net,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	JP Kobryn <inwardvessel@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Paul Chaignon <paul.chaignon@gmail.com>,
+	Anton Protopopov <a.s.protopopov@gmail.com>,
+	Amery Hung <ameryhung@gmail.com>,
+	Chen Ridong <chenridong@huaweicloud.com>,
+	Lance Yang <lance.yang@linux.dev>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	cgroups@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: Hui Zhu <zhuhui@kylinos.cn>
+Subject: [RFC PATCH bpf-next v4 00/12] mm: memcontrol: Add BPF hooks for memory controller
+Date: Mon, 26 Jan 2026 17:02:24 +0800
+Message-ID: <cover.1769417588.git.zhuhui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-253375-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253377-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 301EE85A50
+X-Rspamd-Queue-Id: 39D3C85B79
 X-Rspamd-Action: no action
 
-Should REPLACE with an explicit entry list that yields 0 entries return -EI=
-NVAL or should it be treated the same as omitting TCA_GATE_ENTRY_LIST and k=
-eeping the old schedule?
+From: Hui Zhu <zhuhui@kylinos.cn>
 
-thanks,
-Paul
+eBPF infrastructure provides rich visibility into system performance
+metrics through various tracepoints and statistics.
+This patch series introduces BPF struct_ops for the memory controller.
+Then the eBPF program can help the system control the memory controller
+based on system performance metrics, thereby improving the utilization
+of system memory resources while ensuring memory limits are respected.
+
+The following example illustrates how memcg eBPF can improve memory
+utilization in some scenarios.
+The example running on x86_64 QEMU (10 CPUs, 4GB RAM), using a
+file in tmpfs on the host as a swap device to reduce I/O impact.
+root@ubuntu:~# cat /proc/sys/vm/swappiness
+60
+This the high priority memcg.
+root@ubuntu:~# mkdir /sys/fs/cgroup/high
+This the low priority memcg.
+root@ubuntu:~# mkdir /sys/fs/cgroup/low
+root@ubuntu:~# free
+               total        used        free      shared  buff/cache   available
+Mem:         4007276      392320     3684940         908      101476     3614956
+Swap:       10485756           0    10485756
+
+First, The following test uses memory.low to reduce the likelihood of tasks in
+high-priority memory cgroups being reclaimed.
+root@ubuntu:~# echo $((3 * 1024 * 1024 * 1024)) > /sys/fs/cgroup/high/memory.low
+root@ubuntu:~# cgexec -g memory:low stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60 \
+& cgexec -g memory:high stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60
+[1] 1176
+stress-ng: info:  [1177] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1176] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1177] dispatching hogs: 4 vm
+stress-ng: info:  [1176] dispatching hogs: 4 vm
+stress-ng: metrc: [1177] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1177]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1177] vm             27047770     60.07    217.79      8.87    450289.91      119330.63        94.34        886936
+stress-ng: info:  [1177] skipped: 0
+stress-ng: info:  [1177] passed: 4: vm (4)
+stress-ng: info:  [1177] failed: 0
+stress-ng: info:  [1177] metrics untrustworthy: 0
+stress-ng: info:  [1177] successful run completed in 1 min, 0.07 secs
+stress-ng: metrc: [1176] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1176]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1176] vm               679754     60.12     11.82     72.78     11307.18        8034.42        35.18        469884
+stress-ng: info:  [1176] skipped: 0
+stress-ng: info:  [1176] passed: 4: vm (4)
+stress-ng: info:  [1176] failed: 0
+stress-ng: info:  [1176] metrics untrustworthy: 0
+stress-ng: info:  [1176] successful run completed in 1 min, 0.13 secs
+[1]+  Done                    cgexec -g memory:low stress-ng --vm 4 --vm-keep --vm-bytes $((3 * 1024 * 1024 * 1024)) --vm-method all --seed 2025 --metrics -t 60
 
 
+The following test continues to use memory.low to reduce the likelihood
+of tasks in high-priority memory cgroups (memcg) being reclaimed.
+In this scenario, a Python script within the high-priority memcg simulates
+a low-load task.
+As a result, the Python script's performance is not affected by memory
+reclamation (as it sleeps after allocating memory).
+However, the performance of stress-ng is still impacted due to
+the memory.low setting.
 
+root@ubuntu:~# cgexec -g memory:low stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60 \
+& cgexec -g memory:high python3 -c \
+"import time; a = bytearray(3*1024*1024*1024); time.sleep(62)"
+[1] 1196
+stress-ng: info:  [1196] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1196] dispatching hogs: 4 vm
+stress-ng: metrc: [1196] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1196]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1196] vm               886893     60.10     17.76     56.61     14756.92       11925.69        30.94        788676
+stress-ng: info:  [1196] skipped: 0
+stress-ng: info:  [1196] passed: 4: vm (4)
+stress-ng: info:  [1196] failed: 0
+stress-ng: info:  [1196] metrics untrustworthy: 0
+stress-ng: info:  [1196] successful run completed in 1 min, 0.10 secs
+[1]+  Done                    cgexec -g memory:low stress-ng --vm 4 --vm-keep --vm-bytes $((3 * 1024 * 1024 * 1024)) --vm-method all --seed 2025 --metrics -t 60
+root@ubuntu:~# echo 0 > /sys/fs/cgroup/high/memory.low
 
+Now, we switch to using the memcg eBPF program for memory priority control.
+memcg is a test program added to samples/bpf in this patch series.
+It loads memcg.bpf.c into the kernel.
+memcg.bpf.c monitors PGFAULT events in the high-priority memory cgroup.
+When the number of events triggered within one second exceeds a predefined
+threshold, the eBPF hook for the memory cgroup activates its control for
+one second.
 
-On Wednesday, January 21st, 2026 at 3:49 PM, Victor Nogueira <victor@mojata=
-tu.com> wrote:
+The following command configures the high-priority memory cgroup to
+return below_min during memory reclamation if the number of PGFAULT
+events per second exceeds one.
+root@ubuntu:~# ./memcg --low_path=/sys/fs/cgroup/low \
+     --high_path=/sys/fs/cgroup/high \
+     --threshold=1 --use_below_min
+Successfully attached!
 
->=20
->=20
-> On 21/01/2026 16:44, Victor Nogueira wrote:
->=20
-> > On 21/01/2026 10:20, Paul Moses wrote:
-> >=20
-> > > Reject empty schedules (num_entries =3D=3D 0) so next_entry is always
-> > > valid and
-> > > RCU readers/timer logic never walk an empty list. taprio enforces the
-> > > same
-> > > constraint on schedules (sch_taprio.c, commit 09dbdf28f9f9fa).
-> > >=20
-> > > Fixes: a51c328df310 ("net: qos: introduce a gate control flow action"=
-)
-> > > Signed-off-by: Paul Moses p@1g4.org
-> > > Cc: stable@vger.kernel.org
-> > > ---
-> > > net/sched/act_gate.c | 6 ++++++
-> > > 1 file changed, 6 insertions(+)
-> > >=20
-> > > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-> > > index 48ff378bb051a..e4134b9a4a314 100644
-> > > --- a/net/sched/act_gate.c
-> > > +++ b/net/sched/act_gate.c
-> > > @@ -509,6 +509,12 @@ static int tcf_gate_init(struct net *net, struct
-> > > nlattr *nla,
-> > > cycletime_ext =3D nla_get_u64(tb[TCA_GATE_CYCLE_TIME_EXT]);
-> > > p->tcfg_cycletime_ext =3D cycletime_ext;
-> > > + if (p->num_entries =3D=3D 0) {
-> > > + NL_SET_ERR_MSG(extack, "The entry list is empty");
-> > > + err =3D -EINVAL;
-> > > + goto release_mem;
-> > > + }
-> >=20
-> > It would be simpler to check this in parse_gate_list.
-> > That way you could return -EINVAL there directly
-> > in case 0 entries were passed.
->=20
->=20
-> On second thought, I believe it would be better
-> to check whether parse_gate_list's return is 0
-> and the op is a create. Something like:
->=20
-> err =3D parse_gate_list(tb[TCA_GATE_ENTRY_LIST], p, extack);
-> ...
-> if (!err && ret =3D=3D ACT_P_CREATED) {
-> NL_SET_ERR_MSG(extack, "The entry list is empty");
-> err =3D -EINVAL;
-> goto release_mem;
-> }
->=20
-> so that you don't need to add new arguments to
-> parse_gate_list.
->=20
-> cheers,
-> Victor
+root@ubuntu:~# cgexec -g memory:low stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60 \
+& cgexec -g memory:high stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60
+[1] 1220
+stress-ng: info:  [1220] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1221] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1220] dispatching hogs: 4 vm
+stress-ng: info:  [1221] dispatching hogs: 4 vm
+stress-ng: metrc: [1221] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1221]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1221] vm             24295240     60.08    221.36      7.64    404392.49      106095.60        95.29        886684
+stress-ng: info:  [1221] skipped: 0
+stress-ng: info:  [1221] passed: 4: vm (4)
+stress-ng: info:  [1221] failed: 0
+stress-ng: info:  [1221] metrics untrustworthy: 0
+stress-ng: info:  [1221] successful run completed in 1 min, 0.11 secs
+stress-ng: metrc: [1220] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1220]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1220] vm               685732     60.13     11.69     75.98     11403.88        7822.30        36.45        496496
+stress-ng: info:  [1220] skipped: 0
+stress-ng: info:  [1220] passed: 4: vm (4)
+stress-ng: info:  [1220] failed: 0
+stress-ng: info:  [1220] metrics untrustworthy: 0
+stress-ng: info:  [1220] successful run completed in 1 min, 0.14 secs
+[1]+  Done                    cgexec -g memory:low stress-ng --vm 4 --vm-keep --vm-bytes $((3 * 1024 * 1024 * 1024)) --vm-method all --seed 2025 --metrics -t 60
+
+This test demonstrates that because the Python process within the
+high-priority memory cgroup is sleeping after memory allocation, 
+no page fault events occur.
+As a result, the stress-ng process in the low-priority memory cgroup
+achieves normal memory performance.
+root@ubuntu:~# cgexec -g memory:low stress-ng --vm 4 --vm-keep \
+--vm-bytes $((3 * 1024 * 1024 * 1024)) \
+--vm-method all --seed 2025 --metrics -t 60 \
+& cgexec -g memory:high python3 -c \
+"import time; a = bytearray(3*1024*1024*1024); time.sleep(62)"
+[1] 1238
+stress-ng: info:  [1238] setting to a 1 min, 0 secs run per stressor
+stress-ng: info:  [1238] dispatching hogs: 4 vm
+stress-ng: metrc: [1238] stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s CPU used per       RSS Max
+stress-ng: metrc: [1238]                           (secs)    (secs)    (secs)   (real time) (usr+sys time) instance (%)          (KB)
+stress-ng: metrc: [1238] vm             33107485     60.08    205.41     13.19    551082.91      151448.44        90.97        886064
+stress-ng: info:  [1238] skipped: 0
+stress-ng: info:  [1238] passed: 4: vm (4)
+stress-ng: info:  [1238] failed: 0
+stress-ng: info:  [1238] metrics untrustworthy: 0
+stress-ng: info:  [1238] successful run completed in 1 min, 0.09 secs
+
+In this patch series, I've incorporated a portion of Roman's patch in
+[1] to ensure the entire series can be compiled cleanly with bpf-next.
+I made some modifications to bpf_struct_ops_link_create
+in "bpf: Pass flags in bpf_link_create for struct_ops" and
+"libbpf: Support passing user-defined flags for struct_ops" to allow
+the flags parameter to be passed into the kernel.
+With this change, patch "mm/bpf: Add BPF_F_ALLOW_OVERRIDE support for
+memcg_bpf_ops" enables BPF_F_ALLOW_OVERRIDE support for memcg_bpf_ops.
+
+Patch "mm: memcontrol: Add BPF struct_ops for memory controller"
+introduces BPF struct_ops support to the memory controller, enabling
+custom and dynamic control over memory pressure. This is achieved
+through a new struct_ops type, `memcg_bpf_ops`.
+The `memcg_bpf_ops` struct provides the following hooks:
+- `get_high_delay_ms`: Returns a custom throttling delay in
+  milliseconds for a cgroup that has breached its `memory.high`
+  limit. This is the primary mechanism for BPF-driven throttling.
+- `below_low`: Overrides the `memory.low` protection check. If this
+  hook returns true, the cgroup is considered to be protected by its
+  `memory.low` setting, regardless of its actual usage.
+- `below_min`: Similar to `below_low`, this overrides the `memory.min`
+  protection check.
+- `handle_cgroup_online`/`offline`: Callbacks invoked when a cgroup
+  with an attached program comes online or goes offline, allowing for
+  state management.
+
+Patch "samples/bpf: Add memcg priority control example" introduces
+the programs memcg.c and memcg.bpf.c that were used in the previous
+examples.
+
+Changelog:
+v4:
+Fix the issues acccording to the comments of bot+bof-ci.
+According to the comments of JP Kobryn, move exit(0) from
+real_test_memcg_ops_child_work to real_test_memcg_ops.
+Fix the issues in the function bpf_memcg_ops_reg.
+v3:
+According to the comments of Michal Koutný and Chen Ridong, update hooks
+to get_high_delay_ms, below_low, below_min, handle_cgroup_online and
+handle_cgroup_offline.
+According to the comments of Michal Koutný, add BPF_F_ALLOW_OVERRIDE
+support to memcg_bpf_ops.
+v2:
+According to the comments of Tejun Heo, rebased on Roman Gushchin's BPF
+OOM patch series [1] and added hierarchical delegation support.
+According to the comments of Roman Gushchin and Michal Hocko, Designed
+concrete use case scenarios and provided test results.
+
+[1] https://lore.kernel.org/lkml/20251027231727.472628-1-roman.gushchin@linux.dev/
+
+Hui Zhu (7):
+  bpf: Pass flags in bpf_link_create for struct_ops
+  libbpf: Support passing user-defined flags for struct_ops
+  mm: memcontrol: Add BPF struct_ops for memory controller
+  selftests/bpf: Add tests for memcg_bpf_ops
+  mm/bpf: Add BPF_F_ALLOW_OVERRIDE support for memcg_bpf_ops
+  selftests/bpf: Add test for memcg_bpf_ops hierarchies
+  samples/bpf: Add memcg priority control example
+
+Roman Gushchin (5):
+  bpf: move bpf_struct_ops_link into bpf.h
+  bpf: initial support for attaching struct ops to cgroups
+  bpf: mark struct oom_control's memcg field as TRUSTED_OR_NULL
+  mm: define mem_cgroup_get_from_ino() outside of CONFIG_SHRINKER_DEBUG
+  libbpf: introduce bpf_map__attach_struct_ops_opts()
+
+ MAINTAINERS                                   |   4 +
+ include/linux/bpf.h                           |   8 +
+ include/linux/memcontrol.h                    | 111 +++-
+ kernel/bpf/bpf_struct_ops.c                   |  22 +-
+ kernel/bpf/verifier.c                         |   5 +
+ mm/bpf_memcontrol.c                           | 276 +++++++-
+ mm/memcontrol.c                               |  34 +-
+ samples/bpf/.gitignore                        |   1 +
+ samples/bpf/Makefile                          |   8 +-
+ samples/bpf/memcg.bpf.c                       | 129 ++++
+ samples/bpf/memcg.c                           | 327 ++++++++++
+ tools/include/uapi/linux/bpf.h                |   2 +-
+ tools/lib/bpf/bpf.c                           |   8 +
+ tools/lib/bpf/libbpf.c                        |  19 +-
+ tools/lib/bpf/libbpf.h                        |  14 +
+ tools/lib/bpf/libbpf.map                      |   1 +
+ .../selftests/bpf/prog_tests/memcg_ops.c      | 611 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/memcg_ops.c | 129 ++++
+ 18 files changed, 1682 insertions(+), 27 deletions(-)
+ create mode 100644 samples/bpf/memcg.bpf.c
+ create mode 100644 samples/bpf/memcg.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/memcg_ops.c
+
+-- 
+2.43.0
+
 
