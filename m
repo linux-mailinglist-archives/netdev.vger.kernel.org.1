@@ -1,354 +1,241 @@
-Return-Path: <netdev+bounces-253563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253564-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sCk5JPyrd2kZkAEAu9opvQ
-	(envelope-from <netdev+bounces-253563-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:01:32 +0100
+	id OOmrKF6ud2ngkAEAu9opvQ
+	(envelope-from <netdev+bounces-253564-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:11:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B10248BDCA
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:01:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F6098BEC6
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:11:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4D77A300514B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:01:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1549A301ABAF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CDF239E7F;
-	Mon, 26 Jan 2026 18:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793BE34D4D2;
+	Mon, 26 Jan 2026 18:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1wda3iRy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NrPEk1J1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2008A1E2858
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 18:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769450486; cv=pass; b=m4vB1lOuGBauvY9OVsFt8bznAFOnywkXckuWZ3UNhayFyf06UOaeOvW1LWcdrogz9owx0ihvNduwR7RdQIGqW+2wFgYdc6kIkK+nqSiQeeAbj6ha3aIuLc2CZU/YywIkQNgHlv19XB7w8p1ueWnmp8BMug6WLlnJhfkIFWy+pUE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769450486; c=relaxed/simple;
-	bh=zfiGbFYY4CM6UTlE5l+3XzYXBTEOALqGHPkhXHGGgWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C8Zdw6UjoUff7TWRyW21AveywwMqWkaQFatRJhvf1VxYyPmpuxftIPgc4Ip01ztgNKTYnjnDtLU/b7+gl4XqCGQ+6to+U2rmW5TA8EevrjMUX2lpbs3fih5EHi1sF6hbekMW+JVYZHzJ+ZX7wFiWw3rWr8lmCmqmFVr2Q8wsYys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1wda3iRy; arc=pass smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-124899ee9d3so1210342c88.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 10:01:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769450484; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bnJg/EcZcDkobAydhvZ+uIDHHdyZB6sldeE3G1sPSWivbjyIL3tq6iK0Tsx0pHK1SD
-         EtpLBqQOkJUL+e6OIuHUEFhIVOHgXDnHUxOmhm8kzF4vEOTp8T1X35hysZkjty3IcuRD
-         MphmYffGdxxlKloBJALKBR0FnaHADVpVEiX5deKcuLOxMdOdAvMw0wiNragevm7inkKB
-         agGCHWy+Y+j9869YcQpQ506pps557EdppgAK4AZfzgLeCiZbg09TV2dOUXzO53g3ye8v
-         h0YEZyfsI6GCwXWjB6K5KBWJgKP03GRU7SuDEdeTgqixcQ00qP9Z318j83NZL4GVtM/1
-         BAzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MxgLpSEGg0aaQhp5m9hUFvbZY893f1cTyzABqo6reB0=;
-        fh=Wcg8O9TLw7XlngOTtsLJTKreYK45mza9LnP18ci4VXM=;
-        b=YckENgvOiySDLe8OvqU7lGbnSMAIYO3DwrApu3aZxOb5s+c0eb52NhDPW1fsjQvgF2
-         xLK073odTJ7yKOFDOwR6SUCiR3iShPSGCG/6KePaRokWJdsMexne75k3p3p9ohrZbs93
-         JQpxSjPJZ4lTNOneVLZerBI8HrH0q7RGGFhjWxhjkGTz87RcsfY16Q2StjhSeJCs1Fzt
-         iNXnag03QMyJhZHRYBqtSNZmqmAw8aRZ+zmUbFC3KvJFJ7e38W60Ttqt/LC3jpny/s9Q
-         +cIo8S7gBljkBcW+RtcC3jBxS0ioqoM/BrCuZPuzCumw5lBTxjca7WFLubYuE7kcno1v
-         MG7A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769450484; x=1770055284; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MxgLpSEGg0aaQhp5m9hUFvbZY893f1cTyzABqo6reB0=;
-        b=1wda3iRyzZudxP3DG7M5yM3qMAilHB6OW1uyzmk2yAaI6/KcpBAi3+WbgGBOrLbAmA
-         N8elgw/idx97NrhCmvRCD3zoEVSGM1O1OqS7yuRICMZ1o9bb7R7dVI4j01IwpVjMNnif
-         Njt2rYOYmXzeg4K8cKLxrLtDU3PqvdPJBU7eFaHilWb15W16al8qMmKGcUSMT24hz0Vm
-         Jcck8V5+BVfhv7A7zDSkjvLiCz4QVo6wRZIwgpxs3nNIZ1msQ/X3rAFMtimcTClwycMl
-         vGvSEUHLCf6+YU73VYP7fprLbDJtDZPd7ps0qh+SklZiyFTtP8CvSF0ngVoYLaAiBoKn
-         gmLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769450484; x=1770055284;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MxgLpSEGg0aaQhp5m9hUFvbZY893f1cTyzABqo6reB0=;
-        b=QPh4GUjP2G6pVfCkj7DraCg3TdQzo0Z60Q7XwszuT0UJn+dZPt4KhyQW00xM4IdN8M
-         Jt8M4yCheCK+c1nylIfenxP4FylLwRkSiy9lhEftLTc2TT5vYMx3ukFQEEnaSs9r2tk/
-         TzHMBL/Rq9IQbaLo/16CzUypX20oD7yB1J3v8AZGS1yszM24OGyiQfFj4cHEP2YveNsq
-         uLmCh5yXWE8yl3iwDTAFhLiRYxoWVPGfAcwkMeMJprRXSH/bxeyTcGTdx7ilckacO1JT
-         7NUq4qDPtScQUYWq6TTso3E3CExZqcgjssKf2ykBQ0WnUiQ1+nxWdc8qLrcn0M2aVSBq
-         p9Eg==
-X-Gm-Message-State: AOJu0YxaWidFoqPJ7Yd1LsTOYL/M3ZwgAc8hCwhaxtGprb2n/nGq/NTZ
-	Rg0xpRaV4UdXBZNOSWDHAR0oKcQaEknBHNHqDYbNukPsJAzrqrcwl0rocutg9TEWhZSMAkWeS1O
-	ZoVlBKfJ8NCmYT0R9oOe2HHkH5uvE+3D1gnY6mWHh
-X-Gm-Gg: AZuq6aKXN8ZLLpiUIz7F9EF9AcLXR3M4iFRS9DLpJYidY3jDkBEG1UGo/UmEJ74SRrm
-	mzMxpN5+FZp8DjEiQdGSYno+pXZBiijC1rHpnJu9UrPJ1+6/Y6JD1ZNSC+PzdC7B1LGweDBEq/A
-	UcJu0zl/UoN1LS84rCFHn1qPOgzSQAy/ILxQs91uLupB1eWv9SHf1sOCwzA76rmsDQn44FHQ0af
-	Mv8NWPtXRB7aqwaedD8YU9K8erWKqZMIYOR4osdpoQjw4SaDL9Zwo6iyYKAHIDOnKR7GEpVq3jr
-	fYp2DUJN6NtHn4wYssoNCmdHGLwhOHDsPPa0KAET74kxu4GwP7IueTtkcsix
-X-Received: by 2002:a05:7022:e23:b0:11b:ca88:c4f1 with SMTP id
- a92af1059eb24-1248ede8598mr2501419c88.20.1769450483681; Mon, 26 Jan 2026
- 10:01:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E6F2E54D3;
+	Mon, 26 Jan 2026 18:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769451096; cv=none; b=qH3heGtf2OzxhXPVQIgODp5aGJ055DtP87vyFVAboI9R69nhMo9Fc45e68gfode1TqX3Tf2/QUKga+IjJfZokz6ZfJl/65+Aqa3HRlhxk0NGNMjC/HzXbBpQxo2DI9jFbeFoeO4D2kNfCsxb5Nu481uX5KARdgtox7GfCtM2RGk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769451096; c=relaxed/simple;
+	bh=3V0RDusxbh6pnXCeXi+v91jcVPHVAE66LeVm2jo3hH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i0oWxhK+0f7AqVbkCEU5zxt6d4KW8eQLaaK6xU7DPLW38n5rkzdqumhdiZj40L2xZAJciXxylOsnPgJ+9Q47mo20/C3a+2IrMuTW9+d5ip94aSqhDAcqBuVHafYoDCjIChzGjYbO8dHdpkLtxNpj+bz660DKAMEQblReobmgCWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NrPEk1J1; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vicu6lpUE90FAgN2xtfuOumDUR1Qg4VnW5GWRXk4y9o=; b=NrPEk1J1La77hJglDtJdiD8za9
+	IGx3mDMOahM9R9I2Epz3BcUKZV0mEwhrhJowvHeWenHhHLJRQmcsbU5jlB66JkVEvQS2Co5khEXlF
+	asdrMDH6hVzJxOHU2z65VzC4+izMIh1i573mzJbt9dxmqTpS+HtuGU2tgNpoX+XId54JueRF3XNIF
+	LpV/dq8Ej88/zNas8S35JPhVSeA8skdIZWOdx3nPPsnkHPXiP97M1UY8xNnAHJVZi6ipsJJ1MHpZF
+	PAlyizJyryjDuVP54qj98ob9nRsfq+XB3t4GOkzjGe85CZRYRnTbfos0P7CnvrtLmXfVuSo8b1zma
+	Zh7SYR1Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36042)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vkR3c-000000005Co-0yVO;
+	Mon, 26 Jan 2026 18:11:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vkR3X-00000000595-3RUR;
+	Mon, 26 Jan 2026 18:11:19 +0000
+Date: Mon, 26 Jan 2026 18:11:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [RFC PATCH net-next] net: stmmac: Preserve bootloader MAC
+ address across unconditional reset
+Message-ID: <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk>
+References: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260123170412.906280-1-skorodumov.dmitry@huawei.com> <20260123170412.906280-3-skorodumov.dmitry@huawei.com>
-In-Reply-To: <20260123170412.906280-3-skorodumov.dmitry@huawei.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 26 Jan 2026 10:01:12 -0800
-X-Gm-Features: AZwV_QgO57DjPqmP4SIvdAUAiFsOptMHTxQAJL_z4S1IS5TIHkRtnhpVQgvb32s
-Message-ID: <CAAVpQUBGAitiYbXjGoU7ByaXuU9oYF3nfywu43susMHi8mSy8g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/3] ipvlan: Common code from v6/v4 validator_event
-To: Dmitry Skorodumov <dskr99@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Xiao Liang <shaw.leon@gmail.com>, linux-kernel@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253564-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253563-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,huawei.com,fomichev.me,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,bp.renesas.com,renesas.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B10248BDCA
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email]
+X-Rspamd-Queue-Id: 4F6098BEC6
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 9:04=E2=80=AFAM Dmitry Skorodumov <dskr99@gmail.com=
-> wrote:
->
-> Extract commond code for ipvlan_addr4_validator_event()/
-> ipvlan_addr6_validator_event() to own function.
->
-> Get rid of separate functions for xxx_validator_event()
-> and check whether we are called for ipv4 or ipv6 by
-> looking at "notifier_block *nblock" argument
->
-> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-> ---
-> v2:
->   - Fixed warning about unused by specifying __maybe_unused
->     for ipvlan_addr6_vtor_notifier_block (used only with CONFIG_IPV6)
->
->  drivers/net/ipvlan/ipvlan_main.c | 110 +++++++++++++++----------------
->  1 file changed, 55 insertions(+), 55 deletions(-)
->
-> diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan=
-_main.c
-> index cf8c1ea78f4b..d5b55876d340 100644
-> --- a/drivers/net/ipvlan/ipvlan_main.c
-> +++ b/drivers/net/ipvlan/ipvlan_main.c
-> @@ -878,6 +878,33 @@ static bool ipvlan_is_valid_dev(const struct net_dev=
-ice *dev)
->         return true;
->  }
->
-> +static int ipvlan_addr_validator_event(struct net_device *dev,
-> +                                      unsigned long event,
-> +                                      struct netlink_ext_ack *extack,
-> +                                      const void *iaddr,
-> +                                      bool is_v6)
-> +{
-> +       struct ipvl_dev *ipvlan =3D netdev_priv(dev);
-> +       int ret =3D NOTIFY_OK;
-> +
-> +       if (!ipvlan_is_valid_dev(dev))
-> +               return NOTIFY_DONE;
-> +
-> +       switch (event) {
-> +       case NETDEV_UP:
-> +               spin_lock_bh(&ipvlan->port->addrs_lock);
-> +               if (ipvlan_addr_busy(ipvlan->port, iaddr, is_v6)) {
-> +                       NL_SET_ERR_MSG(extack,
-> +                                      "Address already assigned to an ip=
-vlan device");
-> +                       ret =3D notifier_from_errno(-EADDRINUSE);
-> +               }
-> +               spin_unlock_bh(&ipvlan->port->addrs_lock);
-> +               break;
-> +       }
-> +
-> +       return ret;
-> +}
-> +
->  #if IS_ENABLED(CONFIG_IPV6)
->  static int ipvlan_add_addr6(struct ipvl_dev *ipvlan, struct in6_addr *ip=
-6_addr)
->  {
-> @@ -922,32 +949,6 @@ static int ipvlan_addr6_event(struct notifier_block =
-*unused,
->
->         return NOTIFY_OK;
->  }
-> -
-> -static int ipvlan_addr6_validator_event(struct notifier_block *unused,
-> -                                       unsigned long event, void *ptr)
-> -{
-> -       struct in6_validator_info *i6vi =3D (struct in6_validator_info *)=
-ptr;
-> -       struct net_device *dev =3D (struct net_device *)i6vi->i6vi_dev->d=
-ev;
-> -       struct ipvl_dev *ipvlan =3D netdev_priv(dev);
-> -       int ret =3D NOTIFY_OK;
-> -
-> -       if (!ipvlan_is_valid_dev(dev))
-> -               return NOTIFY_DONE;
-> -
-> -       switch (event) {
-> -       case NETDEV_UP:
-> -               spin_lock_bh(&ipvlan->port->addrs_lock);
-> -               if (ipvlan_addr_busy(ipvlan->port, &i6vi->i6vi_addr, true=
-)) {
-> -                       NL_SET_ERR_MSG(i6vi->extack,
-> -                                      "Address already assigned to an ip=
-vlan device");
-> -                       ret =3D notifier_from_errno(-EADDRINUSE);
-> -               }
-> -               spin_unlock_bh(&ipvlan->port->addrs_lock);
-> -               break;
-> -       }
-> -
-> -       return ret;
-> -}
->  #endif
->
->  static int ipvlan_add_addr4(struct ipvl_dev *ipvlan, struct in_addr *ip4=
-_addr)
-> @@ -997,38 +998,15 @@ static int ipvlan_addr4_event(struct notifier_block=
- *unused,
->         return NOTIFY_OK;
->  }
->
-> -static int ipvlan_addr4_validator_event(struct notifier_block *unused,
-> -                                       unsigned long event, void *ptr)
-> -{
-> -       struct in_validator_info *ivi =3D (struct in_validator_info *)ptr=
-;
-> -       struct net_device *dev =3D (struct net_device *)ivi->ivi_dev->dev=
-;
-> -       struct ipvl_dev *ipvlan =3D netdev_priv(dev);
-> -       int ret =3D NOTIFY_OK;
-> -
-> -       if (!ipvlan_is_valid_dev(dev))
-> -               return NOTIFY_DONE;
-> -
-> -       switch (event) {
-> -       case NETDEV_UP:
-> -               spin_lock_bh(&ipvlan->port->addrs_lock);
-> -               if (ipvlan_addr_busy(ipvlan->port, &ivi->ivi_addr, false)=
-) {
-> -                       NL_SET_ERR_MSG(ivi->extack,
-> -                                      "Address already assigned to an ip=
-vlan device");
-> -                       ret =3D notifier_from_errno(-EADDRINUSE);
-> -               }
-> -               spin_unlock_bh(&ipvlan->port->addrs_lock);
-> -               break;
-> -       }
-> -
-> -       return ret;
-> -}
-> +static int ipvlan_addr_validator_event_cb(struct notifier_block *nblock,
-> +                                         unsigned long event, void *ptr)=
-;
->
->  static struct notifier_block ipvlan_addr4_notifier_block __read_mostly =
-=3D {
->         .notifier_call =3D ipvlan_addr4_event,
->  };
->
->  static struct notifier_block ipvlan_addr4_vtor_notifier_block __read_mos=
-tly =3D {
-> -       .notifier_call =3D ipvlan_addr4_validator_event,
-> +       .notifier_call =3D ipvlan_addr_validator_event_cb,
->  };
->
->  static struct notifier_block ipvlan_notifier_block __read_mostly =3D {
-> @@ -1039,11 +1017,33 @@ static struct notifier_block ipvlan_notifier_bloc=
-k __read_mostly =3D {
->  static struct notifier_block ipvlan_addr6_notifier_block __read_mostly =
-=3D {
->         .notifier_call =3D ipvlan_addr6_event,
->  };
-> +#endif
->
-> -static struct notifier_block ipvlan_addr6_vtor_notifier_block __read_mos=
-tly =3D {
-> -       .notifier_call =3D ipvlan_addr6_validator_event,
-> +static struct notifier_block
-> +ipvlan_addr6_vtor_notifier_block __read_mostly __maybe_unused =3D {
+On Mon, Jan 26, 2026 at 05:25:03PM +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> 
+> Commit 90f522a20e3d1 ("NET: dwmac: Make dwmac reset unconditional")
+> asserts a reset in probe when a reset controller is present. This reset
+> clears the MAC address registers, so a valid address programmed by the
+> bootloader gets lost and the driver falls back to a random address.
+> 
+> Read the MAC address from the hardware registers before resetting the
+> hardware. Keep the existing address selection logic when no valid
+> address is found, and program the selected address back into the MAC
+> after probe so it remains consistent in hardware.
+> 
+> Export stmmac_bus_clks_config() so the early read path can enable the
+> bus clocks before accessing the MAC registers.
 
-I think #if IS_ENABLED(CONFIG_IPV6) is preferable to
-__mabe_unused.
+I don't think this is a good idea. stmmac_bus_clks_config() is specific
+to using platform devices, but the core stmmac driver also supports
+PCI that doesn't use stmmac_bus_clks_config().
+
+stmmac_bus_clks_config() handles:
+
+ - plat_dat->stmmac_clk
+ - plat_dat->pclk
+ - any clock handled by the plat_dat->clks_config() method
+
+For platform devices, stmmac_probe_config_dt() gets these two clocks
+from DT, and prepares and enables them both. So, by the time the
+probe function is called, these clocks are already running.
+
+For those handled by the platform glue, the glues that populate
+this function:
+
+eic7700: eic7700_clks_config() - this is called from the init/exit
+handlers. Will be invoked to enable the clocks by stmmac_dvr_probe().
+
+imx: imx_dwmac_clks_config() - called by imx_dwmac_probe() to enable
+clocks prior to stmmac_dvr_probe() being invoked.
+
+mediaktek: mediatek_dwmac_clks_config() - called by
+mediatek_dwmac_probe() to enable clocks prior to stmmac_dvr_probe()
+being invoked.
+
+qcom-ethqos: ethqos_clks_config() - called by qcom_ethqos_probe() to
+enable clocks prior to stmmac_dvr_probe() being invoked.
+
+So, I can confidently say that all clocks should be running by the
+time __stmmac_dvr_probe() is called, and thus there should be no
+requirement to call stmmac_bus_clks_config() in this code.
 
 
-> +       .notifier_call =3D ipvlan_addr_validator_event_cb,
->  };
-> -#endif
-> +
-> +static int ipvlan_addr_validator_event_cb(struct notifier_block *nblock,
-> +                                         unsigned long event, void *ptr)
-> +{
-> +       struct in6_validator_info *i6vi;
-> +       struct net_device *dev;
-> +
-> +       if (nblock =3D=3D &ipvlan_addr4_vtor_notifier_block) {
+The next problem: you place this code to read registers from stmmac
+before:
 
-If you check this against the v6 one instead, the if block
-and the i6vi definition can be guarded with
-#if IS_ENABLED(CONFIG_IPV6)
+	ret = reset_control_deassert(priv->plat->stmmac_ahb_rst);
+
+Sadly, the binding documentation is too vague to pin down what this
+is, as dwmac can have AHB master (which generates bus cycles for
+accessing memory) and AHB slave (which would be the target for
+register accesses) interfaces.
+
+The problem here is that if some platform glue has wired this reset
+such that it resets the AHB slave side, that will prevent register
+access, and thus your attempt to read the MAC across all devices
+will fail.
 
 
-> +               struct in_validator_info *ivi;
-> +
-> +               ivi =3D (struct in_validator_info *)ptr;
-> +               dev =3D ivi->ivi_dev->dev;
-> +               return ipvlan_addr_validator_event(dev, event, ivi->extac=
-k,
-> +                                                  &ivi->ivi_addr, false)=
-;
-> +       }
-> +
-> +       i6vi =3D (struct in6_validator_info *)ptr;
-> +       dev =3D i6vi->i6vi_dev->dev;
-> +       return ipvlan_addr_validator_event(dev, event, i6vi->extack,
-> +                                          &i6vi->i6vi_addr, true);
-> +}
->
->  static int __init ipvlan_init_module(void)
->  {
-> --
-> 2.43.0
->
+The next question that comes up is that we have a perfectly good way
+that's been around for years to pass a MAC address from the boot
+loader into the kernel for any network interface. I notice that it
+isn't mentioned in the DT bindings, presumably to prevent people
+from adding it to their in-kernel DT files.
+
+	mac-address =
+	local-mac-address =
+
+The old documentation in ethernet.txt was:
+
+- mac-address: array of 6 bytes, specifies the MAC address that was last used by
+  the boot program; should be used in cases where the MAC address assigned to
+  the device by the boot program is different from the "local-mac-address"
+  property;
+- local-mac-address: array of 6 bytes, specifies the MAC address that was
+  assigned to the network device;
+
+Given that these are interfaces between the boot loader and the kernel,
+they can't be deprecated, as platforms will rely upon these properties
+to pass the MAC address from the boot loader to the kernel. For example
+on one of my systems:
+
+$ vdir /sys/class/net/eth0/of_node/
+total 0
+-r--r--r-- 1 root root  4 Jan 26 18:08 gop-port-id
+-r--r--r-- 1 root root 50 Jan 26 18:08 interrupt-names
+-r--r--r-- 1 root root 80 Jan 26 18:08 interrupts
+-r--r--r-- 1 root root  6 Jan 26 18:08 local-mac-address
+-r--r--r-- 1 root root 14 Jan 26 18:08 name
+-r--r--r-- 1 root root  4 Jan 26 18:08 phy
+-r--r--r-- 1 root root 10 Jan 26 18:08 phy-mode
+-r--r--r-- 1 root root  8 Jan 26 18:08 phys
+-r--r--r-- 1 root root  4 Jan 26 18:08 port-id
+-r--r--r-- 1 root root  4 Jan 26 18:08 reg
+-r--r--r-- 1 root root  5 Jan 26 18:08 status
+
+where "local-mac-address" states the MAC address to be used for eth0,
+as specified by the boot loader.
+
+I don't think stmmac needs this extra complication provided platforms
+make use of mechanisms that already exist... and I feel it's time to
+start saying no to platform specific quirks that can be handled by
+those mechanisms.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
