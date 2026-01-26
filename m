@@ -1,67 +1,100 @@
-Return-Path: <netdev+bounces-253551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +MJ7Ci+hd2kCjQEAu9opvQ
-	(envelope-from <netdev+bounces-253551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:15:27 +0100
+	id GCr2MBihd2kCjQEAu9opvQ
+	(envelope-from <netdev+bounces-253552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:15:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C4628B5B9
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:15:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0CDC8B5B1
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17A74302E7A2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:13:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7DDE23004414
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F7F34AAF2;
-	Mon, 26 Jan 2026 17:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7242134B1A4;
+	Mon, 26 Jan 2026 17:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABE2lW/Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zk0ZESLa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0E9330679;
-	Mon, 26 Jan 2026 17:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6A933C51B
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 17:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769447624; cv=none; b=pBzdIx/3pKRY7iZ/oq7trFlc47kMM+KxKX+3MuJFlUd51W0dWs1U0dDXS/L09Zr+yt/SQN0gND69iQTA6u6+E/Siq7MeCqDPnevDcuOS9qebUJFYiUEm5ysVhifr9WWPjDlqSpVLz38KtRFOKYnZV9+5u0AIeOOSmXvT5kz+Wcc=
+	t=1769447699; cv=none; b=kV2dG4sMiwQdsdcEgoMyvTrHN1nIKIyjsjXDJiWTMYtSsaiiEVHsBIQzbNqjb70Z4KM6iZzTb3eGGC6+1wzv7mqaf9MIpbqnTvTrebWaYX6LBY/ZkLOjLhgmB6pekMyFidaeXmHw5ecn95xe9Qcwx5nGWrq1HqhDdlF0zirgUXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769447624; c=relaxed/simple;
-	bh=NBz7ZaIkqSaPXtHRkfG/f3m6UU+9n6nZ52q+gmm16do=;
+	s=arc-20240116; t=1769447699; c=relaxed/simple;
+	bh=m7gtpX6JlLNBi33iHKaUJijwhNaqEtEM+3TbX6tlFCQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k/f52c7JEPmqhywC/DySzXFl22kcfdl0HlFA0Dn6VsgrqXfK9x8d0OMKAz3d+u1Ob2/+mdxVutioSekiINFSyC1XH8L2qlGDrjAol4gwHuHUYUEKb35JVZVNmf6OthWGXqNk1EzWqdeVjc9k3hxHXDtIo4FRK06/7K49bl7boqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABE2lW/Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A7EC116C6;
-	Mon, 26 Jan 2026 17:13:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769447623;
-	bh=NBz7ZaIkqSaPXtHRkfG/f3m6UU+9n6nZ52q+gmm16do=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ABE2lW/Y+5QJwdaq1KwjbZrGoUb7Xr5uiAgpY0MFWpiwuAOBnXoDQ145dq2v97Dt9
-	 6MzEq7k76NfEHcZLmwbtIMHFGFcxiZSZ4FOEKCs8NN/JQR+NJveHamQOJ0KoQYqf/R
-	 LkeyHDuBgWZb3clzHL7rbfjv1AVkaX2Z/wQjcYOUgAjxLy4dEyelzTPLQswF45Bl1T
-	 yg6Q+QIqY+ykCE6HKOw/gel/xZqPHYqnmNudLvQWdd1gkBm6UJKR4R0rrKPLE6jhjR
-	 HgrHlA9HN5TLwXGNrK60NYgHS1w0pkfN6eDmhvzx+mCpy0yYOe5tQxYUNIZ4LXcrLT
-	 f6G86SMlz6nOA==
-From: Simon Horman <horms@kernel.org>
-To: mmyangfl@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	edumazet@google.com,
-	olteanv@gmail.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
+	 MIME-Version; b=bDC8A/yDjwT6xZ3/R8b0v2OdWVQNe+oPlFNeLcjc7r8VIloU3R6C9sTg6wVuYH3IFKdTakzZXMXeSO4cyckRisc/xspczQ/WmlWo/Zdm47+SNhLvMMGBF1TF5adVge2UKuOoKY19WsLQmwBBYaRWjGdk4x+wKFXakq0aOk3D5Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zk0ZESLa; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4801ea9bafdso19277645e9.3
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:14:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769447696; x=1770052496; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SHXVzDDBmvnIJ3lzKbW0IxNth1KaCaSoyXj6yfLdil0=;
+        b=Zk0ZESLaWO2nm1K9H7nQYEE7hCZCu0CSw0aqdObwypvMmsOkIy5xxvEiY0LgIGxFnk
+         cgpe5ayLD97dLwvsaVsqIl8Ye3U/S9WYXFPbd259yjVtLAz3nGta7e/kRRDmv370SUVf
+         uBz3yw6I1Z+2QkN1HoFYz4AMCR0SK1QuvDV6Ck1o/62D5k+O8TLbNPBL/VFJlwUAowvo
+         72YURjduAMfBCH1ghNAgELLItizw3BTcPHA3SR5JwBuhZB8pUJL/9C0TrqA5pViIMVuG
+         pZJnBg+wupLmdOXphyI4scH04DNFatLOmFsogGqWE/PKLRz3dmRhMKG68BbXmKjeMNCE
+         YfaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769447696; x=1770052496;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SHXVzDDBmvnIJ3lzKbW0IxNth1KaCaSoyXj6yfLdil0=;
+        b=sI0th54d+qUYx2sjatQEENe8xoh3xdHrsRX3aWB4I6x7aO55vzVigcHe7fy0nemDUu
+         POrOaioGUrIZe7lxYPaYvOT8HkubJBlA+OTgPrUk4znRagXOBljm0Tn3HhH1jR8h5+Aj
+         mMy6owibfxdQwZjbVTZp6JyRDlXW+TtfWcQ9cpdn4q5YZb0DNACl22/GEndVc5lP0h1n
+         v6O2YlPxqJp+g1GiGzYbw8wSGrZIlBeA/HgwnZFjOLuwXbyphmoIj99lZbLX9ezH2tU2
+         C1TPPJ1nnQPXwqkOpGaK3uAUI3O1KVhEYSe65bgZDkNuoqsf0Sk2zOVVioEtDGhAMyj8
+         tOlw==
+X-Gm-Message-State: AOJu0YzsKrPwgaJIzm2Rauariq9ITntQJruGRbDEO/zPCuIJyXxd/Wbu
+	PE0fgGNWgpjxMlkNqsf2ECT3EAC1YH4VoBhuVWqhN8FA75yeh/KSpTwO0BTkNWcInQ==
+X-Gm-Gg: AZuq6aIvhT9SACw/NOJMAVOdU/9LKJ5sk3rrG+HnD0AQ94cR2SmMHbzpWg+m70KSjAO
+	mSVPlS46O0tI6F/3w9NbetVn6om5jgmnJNBgk4AZdPZx06PAT+Xo+cIhe3132hFCF7YHm2WnK7C
+	jWYO8Ebl5zOPHswtqyI90XwhRluE0Z88S9VrSGwbVoNprYodb0puFskjn8vCCkDsep1+aymIdtd
+	36HvQ8noCj3ImmiyIPy+qGQT7LYik/0+jHTqNFmPOhZkNgkNoBxZ3c2krCjByfn934UG4lns3tU
+	AfmCZ6s7AMUsMKR4tLrJG5Yekj7P6Gr/yXWzAaY4JPeFW8rbCeYAcShl6nrBqsK3N0fxiMD/UCc
+	1QaouAPbGzVQvD+LetVw4c5l7TRpNQ77tQ4FgUqq343dH8YElS+lTYcqaV4okzTCmaRb7eQhVNp
+	/MLNHC
+X-Received: by 2002:a05:600c:5395:b0:46e:32dd:1b1a with SMTP id 5b1f17b1804b1-4805cd40961mr78662845e9.7.1769447695886;
+        Mon, 26 Jan 2026 09:14:55 -0800 (PST)
+Received: from localhost ([2a02:169:c21a:1:5aa8:4ea4:a58b:fc48])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066aaf30esm3136815e9.0.2026.01.26.09.14.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 09:14:55 -0800 (PST)
+From: Tomas Hlavacek <tmshlvck@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch
-Subject: Re: [net-next,v3,1/3] net: dsa: tag_yt921x: fix priority support
-Date: Mon, 26 Jan 2026 17:13:24 +0000
-Message-ID: <20260126171324.1392638-1-horms@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260125001328.3784006-2-mmyangfl@gmail.com>
-References: <20260125001328.3784006-2-mmyangfl@gmail.com>
+	stable@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Yixun Lan <dlan@kernel.org>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	Tomas Hlavacek <tmshlvck@gmail.com>
+Subject: [PATCH net v2] net: spacemit: k1-emac: program frame size registers for jumbo frames
+Date: Mon, 26 Jan 2026 18:14:49 +0100
+Message-ID: <20260126171449.83288-1-tmshlvck@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260126135919.77168-1-tmshlvck@gmail.com>
+References: <20260126135919.77168-1-tmshlvck@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,106 +103,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,redhat.com,vger.kernel.org,davemloft.net,armlinux.org.uk,lunn.ch];
-	TAGGED_FROM(0.00)[bounces-253551-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.infradead.org,lists.linux.dev,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,iscas.ac.cn,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-253552-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tmshlvck@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7C4628B5B9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0CDC8B5B1
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+The driver allows changing MTU up to 4K via emac_change_mtu() and
+allocates appropriately sized DMA buffers, but it never programs the
+MAC_MAXIMUM_FRAME_SIZE and MAC_RECEIVE_JABBER_SIZE registers.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+This causes the MAC hardware to reject frames larger than the default
+1518 bytes, even when larger buffers are allocated. Frames exceeding
+the default size trigger jabber errors and are discarded.
+
+Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tomas Hlavacek <tmshlvck@gmail.com>
 ---
-net: dsa: yt921x: Add DCB/QoS support
+v2: Added Fixes tag and Cc stable.
 
-This commit adds DCB/QoS support to the yt921x DSA switch driver,
-setting up global DSCP/PCP priority mappings and adding related DCB
-methods.
+ drivers/net/ethernet/spacemit/k1_emac.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-> index af8464c42b51..87e33d0df4ac 100644
-> --- a/drivers/net/dsa/yt921x.c
-> +++ b/drivers/net/dsa/yt921x.c
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 220eb5ce7583..31b1bdb2827e 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -228,6 +228,12 @@ static void emac_init_hw(struct emac_priv *priv)
+ 		DEFAULT_TX_THRESHOLD);
+ 	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
+ 
++	/* Set maximum frame size and jabber size based on configured buffer
++	 * size.
++	 */
++	emac_wr(priv, MAC_MAXIMUM_FRAME_SIZE, priv->dma_buf_sz);
++	emac_wr(priv, MAC_RECEIVE_JABBER_SIZE, priv->dma_buf_sz);
++
+ 	/* Configure flow control (enabled in emac_adjust_link() later) */
+ 	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+ 	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
+-- 
+2.52.0
 
-[ ... ]
-
-> +/* Not "port" - DSCP mapping is global */
-> +static int __maybe_unused
-> +yt921x_dsa_port_get_dscp_prio(struct dsa_switch *ds, int port, u8 dscp)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +	u32 val;
-> +	int res;
-> +
-> +	mutex_lock(&priv->reg_lock);
-> +	res = yt921x_reg_read(priv, YT921X_IPM_DSCPn(dscp), &val);
-> +	mutex_unlock(&priv->reg_lock);
-> +
-> +	if (res)
-> +		return res;
-> +
-> +	return FIELD_GET(YT921X_IPM_PRIO_M, val);
-> +}
-> +
-> +static int __maybe_unused
-> +yt921x_dsa_port_del_dscp_prio(struct dsa_switch *ds, int port, u8 dscp, u8 prio)
-> +{
-> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
-> +	int res;
-> +
-> +	mutex_lock(&priv->reg_lock);
-> +	res = yt921x_reg_write(priv, YT921X_IPM_DSCPn(dscp),
-> +			       YT921X_IPM_PRIO(IEEE8021Q_TT_BK));
-> +	mutex_unlock(&priv->reg_lock);
-> +
-> +	return res;
-> +}
-
-Should yt921x_dsa_port_del_dscp_prio() check the prio parameter before
-resetting the DSCP mapping? The ocelot driver (ocelot_port_del_dscp_prio
-in drivers/net/ethernet/mscc/ocelot.c) has a comment explaining that
-during a "dcb app replace" command, the new entry is added first, then
-the old entry is deleted. If the delete operation ignores the prio
-parameter, it will incorrectly reset the newly-added mapping instead
-of only deleting when the current priority matches the old one.
-
-The ksz driver also checks this condition in ksz_port_del_dscp_prio().
-
-Without this check, the sequence for "dcb app replace ... dscp X prio N"
-followed by "dcb app replace ... dscp X prio M" would be:
-  1. add dscp X -> prio M (correct)
-  2. del dscp X, prio N (but code ignores prio N and resets to BK)
-  3. result: dscp X -> BK instead of prio M
-
-Perhaps something like this is needed:
-
-  if (yt921x_dsa_port_get_dscp_prio(ds, port, dscp) != prio)
-      return 0;
 
