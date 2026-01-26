@@ -1,150 +1,120 @@
-Return-Path: <netdev+bounces-253408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253409-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UH1YFsg9d2mMdQEAu9opvQ
-	(envelope-from <netdev+bounces-253408-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:11:20 +0100
+	id QPK2AnU9d2mMdQEAu9opvQ
+	(envelope-from <netdev+bounces-253409-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:09:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF86586787
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:11:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCF886742
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:09:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D3133007AF2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:08:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B653130015B3
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FB632E73D;
-	Mon, 26 Jan 2026 10:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7218A23645D;
+	Mon, 26 Jan 2026 10:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrkgaYtH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYtvyX57"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA56313547;
-	Mon, 26 Jan 2026 10:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5DB31354C;
+	Mon, 26 Jan 2026 10:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769422079; cv=none; b=MeabeXBGPVTVSLm0RlvL4zZnrHUHj9QKC9Pw7uP6sEt3NRcKcB7e6ytoB5y8fbPQ3CGHMW0BYtU9q8QXQkAvkMaNpwfRkVsH++NZaXI6+REPu5vsJg3dhfrwIqSsNRBtKBDygp3SFc5h0GLeRltucvb0lEtuhmkoFEdnOOf0Ryg=
+	t=1769422191; cv=none; b=Q6v+wapmCfoEJsTe2q8HtPWQ4kvhM9Ys1qXfxf+OnCkd2a6DBzJXeIBo7DYO+t1zJTgcIRyvKJEv4RUHY2KsndJD0/YlHaTCb3ZzDRjY/k7f4vxggoWpv+mjRTjjC/XexuT0sckWNooIAAgD+LDR+D969zPWCcadnC9BTVutESk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769422079; c=relaxed/simple;
-	bh=i53QC34mmVK2ZaeyBA2qjvIBa8TfbY7lumbUxES+2GY=;
+	s=arc-20240116; t=1769422191; c=relaxed/simple;
+	bh=EqxYhk3eOK2oVjIDJzcbmtWjJuaTxw29jJAJZKAfBF8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X8hGkcED5Na61z7MVtD4X6jIL4r1RN12RE4opK1FvVwSgU1JFJFLTwx4EtFDxiKlRqkJfCR40k8xqojn1LEA7sWr3idQC5pA5naYqLwzuKD/qitUxKWnKutvXa6jktLvvv8gcG7EHx2pVfpWvBIXyKuFw366zV9oTSeWFVixnBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrkgaYtH; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769422078; x=1800958078;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=i53QC34mmVK2ZaeyBA2qjvIBa8TfbY7lumbUxES+2GY=;
-  b=PrkgaYtH6PQGDzpIO2enA6MjrU6fOl2ZY36ttdjopARAxOJuR31mR19N
-   tBSm0R4TrXMnxPzkJ9NT14FtZnvutoiwQEfAE9Wcbhb3O2LoQF3F4vK3e
-   nGsOKFONUj7iAu2ft3+x88vCHEsL3Drq8cCxORiqpeBLDwddjQzP162BN
-   1micg6C/BDxBNLdn9qOugeGQ9spqpHMT8P2zyOo26gs+MOMRMwnQzhhxr
-   J9DSTqc+l6LMvvkwSDCqCQulY5xRlHsJlcIkLBCAfLVsSuH0Ac2D/m7az
-   6xqCHpyD7jOVFVV373krp+rbaFeVlQQ/OxbPCiJAeP8TCdhi/a+VG94er
-   w==;
-X-CSE-ConnectionGUID: TZu679eeQ7+XGXWI3eMppw==
-X-CSE-MsgGUID: GvXtyQoKSGKTTnfPD/65IA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="70755953"
-X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
-   d="scan'208";a="70755953"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:07:57 -0800
-X-CSE-ConnectionGUID: 0APbs0HMRe24HbNouuz9Lw==
-X-CSE-MsgGUID: Yk+1LMP8Ruagh5YFaJaDpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
-   d="scan'208";a="207529230"
-Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.122])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:07:53 -0800
-Date: Mon, 26 Jan 2026 12:07:50 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com, Petko Manolov <petkan@nucleusys.com>,
-	Oliver Neukum <oneukum@suse.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	Foster Snowhill <forst@pen.gy>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Kees Cook <kees@kernel.org>, Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH net-next] net: usb: switch to two-argument strscpy
-Message-ID: <aXc89lDpfHQFVX-7@smile.fi.intel.com>
-References: <20260126035052.31216-1-enelsonmoore@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m6fQbvSgfGMcokPejwFrXrbvChDBbakXptjSvW1PWsmhkwR/zFvv+mDo85zhBSrZ6OVjWz1uk6pgF2eNCmsMD3MfC2h2ltlw1mhFUfgPu08cIvqR44xJd0vvxWmV0ABOhp1B4Cdop0g0Ozxr7Z0pqfjqPxYK8f+uKGmUf29vZ4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYtvyX57; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C13C3C116C6;
+	Mon, 26 Jan 2026 10:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769422189;
+	bh=EqxYhk3eOK2oVjIDJzcbmtWjJuaTxw29jJAJZKAfBF8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OYtvyX57BzmaZzbtQtSPIK2oUdpnl3bHRmMp6JO45v1s1iSTKyIZ1+TzzUJEtwJnt
+	 vMT+05piGhM8hTRybMDo6uIHOmYpG/daMhJpHWw7dNGNOwA0eo69kFs9wJs8ipiVIw
+	 eB0D7qqPjlUNtXAn57IBcoiyhp0YSukmPKFOlbv/uWB7n1hBplNVKzzwFAHRINa3zC
+	 7okw/87c2RwpNxQ+t8uDU3tDDPUvbpG8UeB/0zEb/X64SSGAJehSg2kM4UyBncV9s0
+	 v2HPazGYR5eZCBwoy3T4/cWh86+jO3C6zH4l5QS2SvU2pWwe4z9mI+GUjEopgh/5Lp
+	 anjUAN4AU8imA==
+Date: Mon, 26 Jan 2026 12:09:42 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Zilin Guan <zilin@seu.edu.cn>, michael.chan@broadcom.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH net] bnxt_en: Fix memory leak in bnxt_alloc_mem()
+Message-ID: <20260126100942.GI13967@unreal>
+References: <20260122092623.479177-1-zilin@seu.edu.cn>
+ <CALs4sv3STBARmMOZiBSXHtFkXd3E_hJwjWJ0x8zJ1_cYYw=ioA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260126035052.31216-1-enelsonmoore@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALs4sv3STBARmMOZiBSXHtFkXd3E_hJwjWJ0x8zJ1_cYYw=ioA@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,nucleusys.com,suse.com,fintech.ru,piap.pl,gmail.com,pen.gy];
-	TAGGED_FROM(0.00)[bounces-253408-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-253409-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,smile.fi.intel.com:mid]
-X-Rspamd-Queue-Id: BF86586787
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1DCF886742
 X-Rspamd-Action: no action
 
-On Sun, Jan 25, 2026 at 07:50:15PM -0800, Ethan Nelson-Moore wrote:
-> All instances of strscpy in the USB network drivers use the size of the
-> destination. If given only two arguments, strscpy will automatically
-> use the size of the destination. Make the code more concise by
-> switching to the two-argument form of strscpy.
+On Thu, Jan 22, 2026 at 03:14:08PM +0530, Pavan Chebbi wrote:
+> On Thu, Jan 22, 2026 at 2:56 PM Zilin Guan <zilin@seu.edu.cn> wrote:
+> >
+> > In bnxt_alloc_mem(), the function allocates memory for bp->bnapi,
+> > bp->rx_ring, bp->tx_ring, and bp->tx_ring_map.
+> >
+> > However, if the allocation for rx_ring, tx_ring, or tx_ring_map fails, the
+> > function currently returns -ENOMEM directly without freeing the previously
+> > allocated memory. This leads to a memory leak.
+> >
+> > Fix this by jumping to the alloc_mem_err label when allocation fails,
+> > which ensures that bnxt_free_mem() is called to properly release all
+> > allocated resources.
 > 
-> Also add a blank line after a variable declaration in catc.c to adhere
-> to kernel code style, since the surrounding code is being touched.
+> This fix is not needed. The memory is freed by the caller of bnxt_alloc_mem().
 
-It should go after your patch that drops some of the strscpy():s.
-Hence make a v3 as a series of two patches.
+That is an anti-pattern as well. On error, the function should clean up
+all resources it allocated.
 
-Code wise this LGTM, thanks for doing this.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Thanks
 
