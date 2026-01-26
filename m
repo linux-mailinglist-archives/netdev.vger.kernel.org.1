@@ -1,179 +1,159 @@
-Return-Path: <netdev+bounces-253586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GgbETTFd2nckgEAu9opvQ
-	(envelope-from <netdev+bounces-253586-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:49:08 +0100
+	id WEBbFoTHd2lOkwEAu9opvQ
+	(envelope-from <netdev+bounces-253588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:59:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68188CC21
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:49:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E778F8CD53
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:58:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EF64D3008C39
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:49:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B7913013A82
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA63D287518;
-	Mon, 26 Jan 2026 19:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CA028C037;
+	Mon, 26 Jan 2026 19:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="OUJi0Jg/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bA516Go6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CA62882AA
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2228122A4E1;
+	Mon, 26 Jan 2026 19:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769456943; cv=none; b=KRfnbOrKjp0x64CVAcsFefmYdIA7By74wvOzBTkN/Ur90N+wY1Sh0Y4LbyE+dbryGDnzo2wHvEkXNpXLJFbUZL8PZsxU5pWNtPJAFui5l7K1jhPamrKgA9lWhj6S20lUZAuziEZozW7ptxiRdhW7PiG83MMd8UWsga3vy+j6wXM=
+	t=1769457535; cv=none; b=sWHRVpu12sPzgABpmebuR2J5mzhJo7CBdYOvFuQJQ9oIxdfTaZfVVU5Xkl13UyIquNiWKjSxlysxz5sSAjTgyZlXsWUEEHpw3Pm7ejDgdLpghVcqUzt7oR+9Q8kB1tV8/htz8M3yrJiYjfxSzINpnXa/T1g5njEyvvxpLwmyBNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769456943; c=relaxed/simple;
-	bh=r8Lc7H83l4M5PnLfAJGlX+xbp8bcWHDwmhpjwfGra1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lmK89rE766fWFcftwMTtA3iKYC3dAzehRJ5X1jndpllYPswUEZ+uylRcdcElGr0u2+SyYKEq3vQcYZXK+qBOpT3Q/T7feOJX27VC1KxEEQZDAjZ+/nr+PlVZJRSKaieZaRpjhI/qOXpBvgzwFJHOot59GImPgR1QErtG7FJt9qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=OUJi0Jg/; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-12460a7caa2so6944216c88.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 11:49:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1769456942; x=1770061742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hp4xT2211A2z3PT0Rk2oMz47A04bz4M6b3S5qxzHThA=;
-        b=OUJi0Jg/m0Q/WVHGxUJE7m3o5wtsUI2aKOD7P6lgKgCRt2Wktkcv+2jsss5wT3DbOF
-         +aRtqHMVGjdMdIa4xO0/flxcHeWP5lRnIbopT1ZNWEO3LWmAVTcjX/QSje+jZ6CU849H
-         jEL7YeTqizEbLO/HyUSZYCqBwhQDuSGGiJJZ23b8KKbbuPd0V8zXQKT0ujhxnnKO0/mS
-         VuCmGh2aF3Yt9aE2kTt64nK2HFxL8ioIrKePhKcC72Ilk6/VFEy4GgvPYBlvNk9HbeC6
-         07sQBgaP0OD7FEg8kkHcG5fpEa7Fb8jNoNilMgT3087Zae8Kowh9CLEISHKQ0X+kTVAv
-         B73g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769456942; x=1770061742;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hp4xT2211A2z3PT0Rk2oMz47A04bz4M6b3S5qxzHThA=;
-        b=PDFioIBdcq1kmjBG70QsanDCNbh0YZ4XU2B+yepZ1nycRht4MrCVlTqRlGknmPxBEh
-         nmsffchI1pbtKG5NCXUqxlmE0FvsYUsf1aUppFNTRtZWmISNYa0tz+tUds9LQiDy8hta
-         a+WeSbTt8hWU9IOgbTYUKx9cO5jHTguPozkjjUdoRCJjtUrnQIwRwU6pPiNhfhxBGsW7
-         z7kH7nRjTf+zuaHyMxsqtqCGgGGbsomSMpPB9RefU4eTG8sim8HqKN3X40GGhaNnQWGl
-         Wtpo/Li7st1+X5P5tb0PuIYeKdj0Ncq/v14SQJYNFsTRzdUelaH0An5GDEATFXCaUbHB
-         HR2w==
-X-Forwarded-Encrypted: i=1; AJvYcCW17U0869b87vT/jGgt3gLEYjDBg8FdnmpmTmZ12ekhsY/KUbgX1UXlwfYWLzv+Qjd6Be77uXk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzu3mZ0xTmnLM4Q++9QvcQ25goAwpalZYxad3UdYKb5FgOPFS6S
-	6SmXvc1G5MRPhQrosouljjbA7fxgnvzyPviqWoX17fuug3eQypa5W049PrmsSL17gw==
-X-Gm-Gg: AZuq6aJtgpwzoVn6wADjVXCKtY6bLdKJrWZUm7jJNl8qgf2BS++mqUSSWrj1Z1a9bvZ
-	VLpwEKtekSpLNSfcubZnp/VrDjE9saeJxAKJ7KVAgD1AG1rYBSpo3T0OSTdVch9fhEaRy8DmHqW
-	CWKwsd1boZa6oPCSTz1NJT/d6a+EwYgFgXVTmB/VsaqhSQXdpRpIz/ocLEgyiKqvjEd+Y8D7Td+
-	FgMlnRh9DvqVmsi/fCdknsrqXP76MxwzeRLG+qQfHg4hIeQEAcLysQiWwgWjkfSJNRh3aDm/8x+
-	QxpUqPFCNrgJB92mgoQfu9XOT96qLyGhrLeML8mydz7fTBpxpc3tDy13m14e/L3P+RfSTUge7AW
-	O2vdzFRdVmKhb1PCNFv4hMUI7mFmfx31aZW1vfPjB2QAFbUyX+sLraQPQmlTr4zLAg2jpKkvOSx
-	pSwMlISQxQgDDRv3Pcq+9FgWdJbpKgk4jteb8BDSi9D14UaTAU/wpI5UTWJGfmI0Huvw==
-X-Received: by 2002:a05:7022:791:b0:11a:2f10:fa46 with SMTP id a92af1059eb24-1248eb4069dmr3007589c88.0.1769456941442;
-        Mon, 26 Jan 2026 11:49:01 -0800 (PST)
-Received: from pong.herbertland.com ([2601:646:8980:b330:1485:5851:22a:4c2d])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1247d99804asm21121295c88.12.2026.01.26.11.49.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 11:49:01 -0800 (PST)
-From: Tom Herbert <tom@herbertland.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	justin.iurman@uliege.be
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v5 7/7] ipv6: Document enforce_ext_hdr_order sysctl
-Date: Mon, 26 Jan 2026 11:48:26 -0800
-Message-ID: <20260126194826.236075-8-tom@herbertland.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260126194826.236075-1-tom@herbertland.com>
-References: <20260126194826.236075-1-tom@herbertland.com>
+	s=arc-20240116; t=1769457535; c=relaxed/simple;
+	bh=gpEGhhknN7TzCJjkZ66nConf3Yk3nMin5RZ3GnJaav4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WfWrR+Heg7giKOtnFI1TydR0kM7bVCjVtpvDIPulBAdNLDrsm/QPffHT5sMTbKnRr3FWp9dqZYKtA7oyLwGq7rQiHFUJUq5NDjgBEPDZm55UiP/yPf/Eya9anhxXxM0vViOvZQOSEBZsFseHMSaONiPBa8gzolXl4i0ypGKS5Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bA516Go6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB65C116C6;
+	Mon, 26 Jan 2026 19:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769457535;
+	bh=gpEGhhknN7TzCJjkZ66nConf3Yk3nMin5RZ3GnJaav4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bA516Go6hiQe3HJiBvib21exVP/J/+RZoB6ZOQQrbwm4XLglnt4Qe0y2o3PSC5GcZ
+	 k+/51GyDGLn35lbVHLG4mf26jLNunFyZqxQ6GaJCGrHG4JFywDFjZNKH66auOAtzTF
+	 L+19jgiFDe/lbC2rmJi1wbg/cUn4bfihd60c+ZGRljmutdxa3ZDDocf8O99ON1utfF
+	 F8Gro+4lJ0vKTKS5Uf96+A3UTkT2byjypi5gz96DYa7sPANEjGufxlZmDlhIQoSgWl
+	 74Q9ec8ZeIMKiBaKU8Wsxn8KDLnS25xNTF85kamks8WLqHeqbX7Y9qe9OaQsh5/ihV
+	 C9kmhyKN6hORg==
+Date: Mon, 26 Jan 2026 21:58:50 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	longli@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, yury.norov@gmail.com,
+	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+	ssengar@linux.microsoft.com, gargaditya@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: mana: Improve diagnostic logging for
+ better debuggability
+Message-ID: <20260126195850.GO13967@unreal>
+References: <20260121065655.18249-1-ernis@linux.microsoft.com>
+ <20260121201412.179f9b37@kernel.org>
+ <aXJhzi58GqLKtui4@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260122180745.3b5607cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260122180745.3b5607cf@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253588-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253586-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[herbertland.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.microsoft.com,microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,herbertland.com:email,herbertland.com:dkim,herbertland.com:mid]
-X-Rspamd-Queue-Id: E68188CC21
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E778F8CD53
 X-Rspamd-Action: no action
 
-Document the enforce_ext_hdr_order sysctl that controls whether
-Extension Header order is enforced on receive.
+On Thu, Jan 22, 2026 at 06:07:45PM -0800, Jakub Kicinski wrote:
+> On Thu, 22 Jan 2026 09:43:42 -0800 Erni Sri Satya Vennela wrote:
+> > On Wed, Jan 21, 2026 at 08:14:12PM -0800, Jakub Kicinski wrote:
+> > > On Tue, 20 Jan 2026 22:56:55 -0800 Erni Sri Satya Vennela wrote:  
+> > > > Enhance MANA driver logging to provide better visibility into
+> > > > hardware configuration and error states during driver initialization
+> > > > and runtime operations.  
+> > >   
+> > > > +	dev_info(gc->dev, "Max Resources: msix_usable=%u max_queues=%u\n",
+> > > > +		 gc->num_msix_usable, gc->max_num_queues);  
+> > >   
+> > > > +	dev_info(dev, "Device Config: max_vports=%u adapter_mtu=%u bm_hostmode=%u\n",
+> > > > +		 *max_num_vports, gc->adapter_mtu, *bm_hostmode);  
+> > > 
+> > > IIUC in networking we try to follow the mantra that if the system is
+> > > functioning correctly there should be no logs. You can expose the debug
+> > > info via ethtool, devlink, debugfs etc. Take your pick.  
+> > 
+> > We discussed this internally and noted that customers often cannot
+> > reliably reproduce the VM issue. In such cases, the only evidence
+> > available is the dmesg logs captured during the incident. Asking them to
+> > re-enable debug options later is not practical, since the problem may
+> > not occur again. Similarly, exposing the information via ethtool,
+> > devlink, or debugfs is less effective because the data is transient and
+> > lost after a reboot. As these messages are printed only once during
+> > initialization, and not repeated during runtime or driver load/unload,
+> > we decided to keep them at info level to aid troubleshooting without
+> > adding noise.
+> 
+> You will have to build proper support tooling like every single vendor
+> before you. Presumably you can also log from the hypervisor side which
+> makes your life so much easier than supporting real HW. Yet, real
+> NIC don't spew random trash to the logs all the time. SMH. Respectfully,
+> next time y'all "discuss things internally" start with the question of
+> what makes your case special :|
 
-Signed-off-by: Tom Herbert <tom@herbertland.com>
----
- Documentation/networking/ip-sysctl.rst | 28 ++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
++100
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 4f568b0e39d2..1b12b955fa34 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2581,6 +2581,34 @@ ioam6_id_wide - LONG INTEGER
- 
-         Default: 0xFFFFFFFFFFFFFF
- 
-+enforce_ext_hdr_order - BOOLEAN
-+	Enforce recommended Extension Header ordering in RFC8200.
-+	If the sysctl is set to 1 then the ordering the ordering is
-+	enforced in received packets and each Extension Header
-+	may be present at most once per packet. If the sysctl is
-+	set to 0 then ordering is not enforced and Extension Headers
-+	may be present in any order and have any number of
-+	occurences per packet (except for Hop-by-Hop Options).
-+
-+	The Extension Header order is:
-+
-+	    IPv6 header
-+	    Hop-by-Hop Options header
-+	    Destination Options before the Routing header
-+	    Routing header
-+	    Fragment header
-+	    Authentication header
-+	    Encapsulating Security Payload header
-+	    Destination Options header
-+	    Upper-Layer header
-+
-+	Possible values:
-+
-+	- 0 (disabled)
-+	- 1 (enabled)
-+
-+	Default: 1 (enabled)
-+
- IPv6 Fragmentation:
- 
- ip6frag_high_thresh - INTEGER
--- 
-2.43.0
+Interesting. Completely independent of your comment, I provided the same
+feedback on their mana_ib driver. They added debug logs to nearly every
+command, even though those commands already had existing debug logging.
 
+https://lore.kernel.org/linux-rdma/20260122131442.GL13201@unreal/T/#m51e8a12f4bca4a6c1377c5531c8a6d94a43af1e5
+
+"In order to simplify things for you: unless you can clearly justify why this
+print is required and why you cannot proceed without it, I must ask you to stop
+adding any new debug or error messages to the mana_ib driver. There is a wide
+range of existing tools and well‑established practices for debugging the kernel,
+and none of them require spamming dmesg."
+
+Thanks
 
