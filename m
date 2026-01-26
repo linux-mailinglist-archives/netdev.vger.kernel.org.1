@@ -1,167 +1,117 @@
-Return-Path: <netdev+bounces-253516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253517-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8MH4JyWBd2m9hgEAu9opvQ
-	(envelope-from <netdev+bounces-253516-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:58:45 +0100
+	id 4OPwDvOCd2m9hgEAu9opvQ
+	(envelope-from <netdev+bounces-253517-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:06:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4666189D84
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:58:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA6B89E93
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:06:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4E6430309AD
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:55:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 828F43004041
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6EE3346B5;
-	Mon, 26 Jan 2026 14:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDAA271471;
+	Mon, 26 Jan 2026 15:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VPONkrhe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSzEVxWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177B12BE7C6
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 14:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF4E23EA80
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769439359; cv=none; b=q5dnwXCxhUkd5yK9KsDp3VxVdYfh6q0GRecZjpolZWAV9eqdtM2WSVbt+UmegmtSYYP3xqm8mv1UsOcdNhPnBvFqcgRa4t0KaMNkFusar4lSh8eSgY1q0GeC8EE0+kbiz9koCaI0EY9RCp36AMHj/Wl23SNG/6hj3txjnaAZTY8=
+	t=1769439982; cv=none; b=ZQPhvjxoLWCQqywGRfYnukmpAxDKpNK/NwguK5brjjzsZmXDzGJ4FDWtys+kuqx6gDWv7QabU3Brs3KMr7JbEOXCkK8baZQqC+5UWlyIMZopZFhpn0Egz6+UhWPJIM+Gc6DlzfTMlZIukFd97xIkL3tQUu41iTkOr+0S4l7Aiys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769439359; c=relaxed/simple;
-	bh=MDmBBGGuPsR8+N/8tM8Hw6z+AHRj6CTwlvcV3NwZhVQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=kb+aDJux4FAwMqQu1JBEi6V5eJPHgyWoENg1cMc4yaBQ5D1fQYwOEq/CM2twjzDGJQi2ezKgkD3ZecLT7bpT7QoOWpWhZV3epXXLD6Cg9aZh03+ORnsaTxBIt2B5Fki+QFfq7r42IDsftAVtoZ0BgSGKjA/LwjkrYw47xe3n/bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VPONkrhe; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 76B291A2A53;
-	Mon, 26 Jan 2026 14:55:55 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4B1F260717;
-	Mon, 26 Jan 2026 14:55:55 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 17F1C119A860F;
-	Mon, 26 Jan 2026 15:55:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769439353; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=4o0SETIqk3lQBmYw6tEO8k7aX0EALyrPx6wDM4E+Fk8=;
-	b=VPONkrheDRNRn9V2KaC61AyMtfNCPIXg0+3bWkSyAljOFv/ypEIzSKRGw/d5BP1WmPKy5p
-	6E+6KrZ7G/jlyqHV+4njs3zoZNJ0Kb7Tr1/ztdw9RQnSIxt+CkwTzYL9kGOj7lDFJPX5Mk
-	CmzUsefqE8KNtO+fdFPE0uEiZ2o/+9ojoaCXwIxDrOI2sPId9OdOa3G2pYg5T99icV/XE6
-	KKEuqV/sAVLN7YEnllM0nLoR90fbadvttrk5eCHOgQM4D5FkpB3hRsajL86xip8M+zuq2q
-	YFIr5Jhk9wu/Eme3UnIooxrerWzuMc5iKjA0c/5URBkD7e0sEFjuG3sGf5QsAg==
+	s=arc-20240116; t=1769439982; c=relaxed/simple;
+	bh=2JFEPf30m7LKmwSZWiMJp7j9YWw9mkuejrrzYRdJNuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GJ57oYhtNySeDQtm/SAsRu0UdyJHzwcwWlMFKpoZO+FL4b+KKLcBpy+TIKXw0K2Ib7ODLSflvx0RkYRy49teFh3NlcB23q+3z3SCznlFh60r378XW5S8h59N2vynayqZnbm5+QgoJDvg7Q249RYkXWfDEVbUY0RRyf3Ns1QnOW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSzEVxWI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01952C16AAE;
+	Mon, 26 Jan 2026 15:06:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769439981;
+	bh=2JFEPf30m7LKmwSZWiMJp7j9YWw9mkuejrrzYRdJNuo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TSzEVxWIk0EwkBCDGaRKPfuTakNt0uPZ/t3sKStQJOHV89uk1s8fMXqY7AUl7TDcx
+	 OD8cBV6jamJ+JzOJGZurjWL2BAuUjBFACzSi2uqPsRzJ9OPnzFpqmV1BeqiUlP6olu
+	 jJcyUAgiAASuziyzJUi9/HBuO+mxkOToPzIaqMtp+AQlQI2VPJ6U8adKGvgc5m/qmI
+	 H1Giqkq/22x9zrkjhrM5SQbH2LY1RNBEgZuOr4I3tMf13b4UcOO4Os4TwWC+UqDpRE
+	 dw8OJ3Xndlju07fWYlXEcb2j2A/dVUQWuwtgzGeRtfvdku3sraX8WMuvDeJJF55sXu
+	 kgpXD6hnR4DCw==
+Date: Mon, 26 Jan 2026 15:06:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Dmitry Skorodumov <dskr99@gmail.com>
+Cc: netdev@vger.kernel.org,
+	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Subject: Re: [PATCH v2 net-next 0/3] ipvlan: Deduplicate ipv4/ipv6
+ addr_validator_event code
+Message-ID: <aXeC6hmPiaviXcIx@horms.kernel.org>
+References: <20260123170412.906280-1-skorodumov.dmitry@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 26 Jan 2026 15:55:49 +0100
-Message-Id: <DFYLWF9IATJE.H6R8RUZQI1FG@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 3/8] cadence: macb: Add page pool support
- handle multi-descriptor frame rx
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260115222531.313002-1-pvalerio@redhat.com>
- <20260115222531.313002-4-pvalerio@redhat.com>
-In-Reply-To: <20260115222531.313002-4-pvalerio@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123170412.906280-1-skorodumov.dmitry@huawei.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253516-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-253517-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:url,bootlin.com:mid]
-X-Rspamd-Queue-Id: 4666189D84
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4EA6B89E93
 X-Rspamd-Action: no action
 
-Hi Paolo,
+On Fri, Jan 23, 2026 at 08:03:53PM +0300, Dmitry Skorodumov wrote:
+> This is a bit stylish patches: The code to handle ipv4 and ipv6
+> address change are exactly the same. We don't need separate
+> functions for them. Just look whether we are called
+> with ipvlan_addr4_notifier_block or with ipvlan_addr6_notifier_block
+> 
+> The changed functionality is already covered
+> with existing selftests/net/ipvtap_test.sh
 
-On Thu Jan 15, 2026 at 11:25 PM CET, Paolo Valerio wrote:
-> Use the page pool allocator for the data buffers and enable skb recycling
-> support, instead of relying on netdev_alloc_skb allocating the entire skb
-> during the refill.
->
-> The patch also add support for receiving network frames that span multipl=
-e
-> DMA descriptors in the Cadence MACB/GEM Ethernet driver.
->
-> The patch removes the requirement that limited frame reception to
-> a single descriptor (RX_SOF && RX_EOF), also avoiding potential
-> contiguous multi-page allocation for large frames.
+Hi Dmitry,
 
-[...]
+I'm somewhat ambivalent towards the trade-off between
+reducing code duplication, and requiring run-time demuxing
+between ipv4 and ipv4 code paths and the moderate increase in
+code complexity that entails.
 
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -14,6 +14,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/phy/phy.h>
->  #include <linux/workqueue.h>
-> +#include <net/page_pool/helpers.h>
-> =20
->  #define MACB_GREGS_NBR 16
->  #define MACB_GREGS_VERSION 2
-> @@ -1266,6 +1267,8 @@ struct macb_queue {
->  	void			*rx_buffers;
->  	struct napi_struct	napi_rx;
->  	struct queue_stats stats;
-> +	struct page_pool	*page_pool;
-> +	struct sk_buff		*skb;
+But assuming these paths are not performance sensitive I guess
+that reducing duplication has the upper hand.
 
-There might be a cleanup issue with the GRO queue->skb field.
-It gets cleaned up by gem_rx() in
- - various error codepaths with the free_frags label, or,
- - the happy path where we hand off the skb with napi_gro_receive().
-
-If we get closed in the middle of a transfer we have queue->skb that is
-valid. It sounds like an issue if we shutdown (and leak the SKB) or if
-we reopen (and have the old SKB laying around). I have not encountered
-this on HW, but I haven't tried.
-
-Do you agree? A job for gem_free_rx_buffers()?
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
