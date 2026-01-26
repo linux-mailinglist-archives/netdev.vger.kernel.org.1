@@ -1,257 +1,190 @@
-Return-Path: <netdev+bounces-253543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253545-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uH9tN3abd2n0iwEAu9opvQ
-	(envelope-from <netdev+bounces-253543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:51:02 +0100
+	id 2L+9Maicd2n0iwEAu9opvQ
+	(envelope-from <netdev+bounces-253545-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:56:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803068AF12
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:51:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305578B102
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:56:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23319307221A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:45:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C61993051865
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D932E345757;
-	Mon, 26 Jan 2026 16:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8E33491C9;
+	Mon, 26 Jan 2026 16:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtC4TyBb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3VpYOpB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310F43242B1
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D391034888A
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769445910; cv=none; b=JiaEqdyDGca+psI0e0Q/XiEaaNPELzPS4RHUNOOV0H8Q6n/r0sbswOQ5/7VREnBXsuFJ2U1O0/i4jRvCn+szBqpuMoLSX1GOTO8cnwcyfcLVIlgqLurMuDToIhIVLw5dtHFE+vc7s8be7HTR9N4cOtwTe3Co9MM1D87eE30U9k8=
+	t=1769446172; cv=none; b=Y66416kKY+VxQwIxXgoH12xo15s1rG4uT0TQYF9K4ESk39tGMVoPq850u2EdIKalniw4t8B7i/NU5ED5i+kHt5XRQGDBc0SlpexHAUo/fDDlSQyLGKTvW9uFY0ebwM3KNOp9nsSfjyCtlMxI6CGdaxZaSNIo1yxslJGKqEzMEWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769445910; c=relaxed/simple;
-	bh=tE3Uxmr9IsUS6mJokT1N6n0qqojE4/K3/OnOvYAIYeY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dlvt3YwMyVqeNME2NDWuLE/+/YCCh/+sWfDLH7W0TZM2tjvQGVIbusRtMBUPQq37JYb63PRCIqgeHqcH2TDpOYU8cFrsgs8/CjQhrU7F1/IUhrb5l6uywxHGBBYpBDsxJu5voZ+5JdvFChUiIkKfnQb+VPP8QySa/UpchiqgNo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WtC4TyBb; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1769446172; c=relaxed/simple;
+	bh=uHcXECLSgsppVhP+AhoOZulbAbBN77UIUBU86+28NXw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PfEUsLy315PYZyzQ4qX94M4ylJEjxFex2hTVUD2SZLF8hlsYje9LxbHhxk3POBiRrSG8FcJVGM+oykRw4Fnpa88Pi7H25pABACDgu5T0k7QQVBJlG2sSH2z7ut1GosQo9besrIdP2kdrnJ6z+xenQE2ZQrHmkz2YqISsmAqYt7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3VpYOpB; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59b710d46ceso4530688e87.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 08:45:05 -0800 (PST)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7927b1620ddso69028237b3.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 08:49:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769445904; x=1770050704; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=67gINf8nv70IfGM4en9MXo18NWyvtv/UqgQR1tCJ+fU=;
-        b=WtC4TyBbh8yct5Y9IFzhxu13T+HfvneZprkfZ0mAaiIw3wzxldQspYusobja5GsuP4
-         X5kOWhqhF39lZCG16fxs/fKUIE5THQRzlVq0W4vNDmcl48JAaEHKD8EQbCswT9K7Om0M
-         +9jnqNGKD5Jc2BTFPAdgcLWw8d77Zwvbj6uPV75RsXJvj8oTtWJOqVeruQUhcBuRSwTb
-         z7/PqGTIdy6K9vh0VBxxpA0zyNBnqmk6UH0YXkBF8MMw0CDVbt5K7arQBIXmU7Y/9Dhi
-         xkW9VCVt8gU3LAlm3Ymxey5lhrSOs9uyZ8Pyl5YRI9s+puriPhqfgADmu6rXkB/9illR
-         NDhw==
+        d=gmail.com; s=20230601; t=1769446167; x=1770050967; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CzIM5S1aosasnRgv4fpJy7hXx99GJuvBk4X/AumVJ6E=;
+        b=C3VpYOpBYH6j/6Ogy6nYwz33PkgKdn7zoo8DV+MsAPUKDOmRisXtm82KK7zpBFotFd
+         KG3HZbVdskGhXmgESjGv3ZEUogwzPyjOLe09etNtZJ5I8ENxG4Ec0XpevpkO8s6eIY23
+         Fq6bTrTjdxopBy4riRctLA/JUZn/LDLgm6ZFBGlSFzBLyjwAMr1fropAWpbywCnFobiX
+         iYZDQxhrGKe8lXj9io+A/YUJTF2bXqxIlBtuPKe5oOzv7txsBTp4sXpGtj/phpq2Rc2H
+         evXJsR49xTGdyULmbJqghynRdYxVPEfMLhE0EwS8/l05HSzQ5WHjvdXNqUsz25vXCCmL
+         bhIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769445904; x=1770050704;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=67gINf8nv70IfGM4en9MXo18NWyvtv/UqgQR1tCJ+fU=;
-        b=sJwwo3osO9oL//JHr10OjDFQJ/0zMCRJMjc7Mzn4VsOukTg0hrNxSlIh+tUDOacSRi
-         i7ZQXa/fLgBPHpofOaJHC6CBcV3Qx+bcLHNCokFcXoSqgsnIfV54+dMbNZ/1N1PhoDRq
-         fYNau6YuJg72sBR5fhVw2Z5vNVQAe523qwh8eQzA/Hz/AlKhW3lOZgfp/DrCkpCI9qg5
-         E6ybr6A6FKHXXZUbDC4qBDeZ8Dlog+jGWhbT+pUMB7yQLiHufN4WXku3YaSKF2RcQ8wr
-         wfIcZXOxXjvHdzBZU3dyjhkQq30NzTqQZvQKTVXV0QA/p9ofWaMUPfAv7NAzH/yfM5jN
-         KZPA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5clSnj7nBqebCRuFaPNf27E2mQTDZM9PJKiCzWl8JysSYgl5e67+eCsNGkhsQZ97KhGeHOQ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU+PI1Qop15bnhPoiafvUxu48pGa2WAZpOsW/Qe+fAWTAKedQr
-	reGMnexUZVBJQSZJv5UthXoJ8cvs9gHFGSEh9lUiHudHVhtPHK2OVbXp
-X-Gm-Gg: AZuq6aKu4XvhEcTUi7phZJ/jZ/dhZsNiKialtVRTeqmGf//QQTZdVy7rDZuHWPlMMvJ
-	ScaMLiHXfx1PXuHYlaG5OwQh04kxJVpzAEDDzWBapU7Jw7lCVfYCE9r1nEq+/TCfvX083YvUlKZ
-	b8Tb7MJn6hCBe1/M79VsASSnIKBc8n+i8cQ4x2s30Z66/LOrSk2pJ6jZXCW7dk8AtxPpzXBr2Sw
-	3j3VFxcvsLhX2izVp8nB87pUKCz9K1mnugyZI8VqDwvOOddPLZEGnKhxI97ve8bBcQ6quCfVKxL
-	30v+IEEDxjpYqes6enj297P8cEgLc8ZaeYvbPMqA5kbqGH1HnX7P3tEPX2pY+3pfcQ7aDErdWNx
-	ETavsF2rsz/d4TAiD2FmIGPTodCK/7u0+6bqeAdgIPPKUtKyJodW9
-X-Received: by 2002:a05:6512:3f06:b0:59d:f2a4:3e98 with SMTP id 2adb3069b0e04-59df360afd1mr1753347e87.4.1769445903361;
-        Mon, 26 Jan 2026 08:45:03 -0800 (PST)
-Received: from milan ([2001:9b1:d5a0:a500::24b])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59de492cd32sm2794304e87.100.2026.01.26.08.45.02
+        d=1e100.net; s=20230601; t=1769446167; x=1770050967;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CzIM5S1aosasnRgv4fpJy7hXx99GJuvBk4X/AumVJ6E=;
+        b=GZvJXx7Y9ChP6vduX8vpVS/J+U1oHC9NpTQKoUE+DMYEniu9W7Ddja+nXdYg+5lSYy
+         So6uZZp7xu4EZ2qVLO+wO07D/Sbc3x3tXkhPsQbdedHa1UdcvNOpB3NRyhEe/7s+7bsp
+         69OJcviQhUm9PCUESz1x2bWqdk8aIxIVsd88Y8rYCV7VSp7a4JIsb5RsamhZZpEp7IXD
+         VqTuTU3F+Y/ko5o1XPqMEJaVxOq/v5WpqRZ9Emqop8XEWPE3UpPodpl9c4dRRX3EL/S4
+         6XrwXdwR2pHPFmosrCK1/knC21B5Gx7YyPuQr4w6OSCA2fOcaUgGyDifH8KfA221R+V6
+         Y1Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCUm1vU0BubZMVUoROu0pZJXaFkp98ymE6SAoSgYa0SfOCyIweiKcWTrKkkE+g11DwHsQKcJCNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW4ZXQ0i5w3wN4NAA9rP+lYBH+lutWOcsCtP2rOU9a34GadJcP
+	gmejbwMBtAeSZEWbpVp4Ad/eR+3JDSehViLpUdy5g9wzEeeLBjnYbBOn
+X-Gm-Gg: AZuq6aKzWvYNchRi0SCjwAONjl2z5Y843xFJbQaIcIFTIR/8w/j4wLYlcH7MVa6KO0C
+	LN8deOsAc5iGcsyZ0yHGfYzjAvwd7MXBcuE+TNCYFgQGUbqOd9qfjhaeosoaP8jZKGzd7Pg5Df+
+	3C0yLOSH0dRXIHwhyjlVnuR942wWBijiVapK+2aYIMWjDEWnVJOPF0g1e/8Dkdpv+clvCm0Rpvm
+	V2OhUfHMWPnFAxxVKYyAlRDK06pCCT0CPZ/xn+iuLAz2wqUTuLcl1CG5qEBWIkA3FVIsHkoO1uf
+	b3Qc9+nLi2CYjo+eE3A6u+kAbDryFxCEUQjhBG9lNzH+j8+0VKa3oLT7G0Dml73arYCB3TB9quG
+	oIEgwIbo0IzAigLoGMEHYWGZVpY2/fQgvpaZBw5DQ0pPd6VwLBypWZVENZqM1Vyf/4hmTeere7E
+	AEGk1nTNzJyXfsNTD5/Uym1n3h+WB7FXvXdsFptNv3xniYUExcps9NbOVfQB8=
+X-Received: by 2002:a05:690c:6809:b0:794:107f:12b8 with SMTP id 00721157ae682-7945abe5d41mr35771317b3.10.1769446167253;
+        Mon, 26 Jan 2026 08:49:27 -0800 (PST)
+Received: from gmail.com (21.33.48.34.bc.googleusercontent.com. [34.48.33.21])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7943b2b9bfcsm49990507b3.38.2026.01.26.08.49.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 08:45:02 -0800 (PST)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@milan>
-Date: Mon, 26 Jan 2026 17:45:00 +0100
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <aXeaDMczmQl6wn9v@milan>
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
- <20260123082349.42663-3-alibuda@linux.alibaba.com>
- <aXPEFdEdtSmd6AzF@milan>
- <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
- <20260124145754.GA57116@j66a10360.sqa.eu95>
- <aXdB3lsm3w0fJT3Q@milan>
- <20260126120226.GA6424@j66a10360.sqa.eu95>
+        Mon, 26 Jan 2026 08:49:26 -0800 (PST)
+Date: Mon, 26 Jan 2026 11:49:26 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jibin Zhang <jibin.zhang@mediatek.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ steffen.klassert@secunet.com
+Cc: wsd_upstream@mediatek.com, 
+ Jibin Zhang <jibin.zhang@mediatek.com>
+Message-ID: <willemdebruijn.kernel.11a4b80935127@gmail.com>
+In-Reply-To: <20260126152114.1211-1-jibin.zhang@mediatek.com>
+References: <20260126152114.1211-1-jibin.zhang@mediatek.com>
+Subject: Re: [PATCH v4] net: fix segmentation of forwarding fraglist GRO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126120226.GA6424@j66a10360.sqa.eu95>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253543-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253545-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
+	FREEMAIL_TO(0.00)[mediatek.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,collabora.com,vger.kernel.org,lists.infradead.org,secunet.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[urezki@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 803068AF12
+X-Rspamd-Queue-Id: 305578B102
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 08:02:26PM +0800, D. Wythe wrote:
-> On Mon, Jan 26, 2026 at 11:28:46AM +0100, Uladzislau Rezki wrote:
-> > Hello, D. Wythe!
-> > 
-> > > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
-> > > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
-> > > > > > > find_vm_area() provides a way to find the vm_struct associated with a
-> > > > > > > virtual address. Export this symbol to modules so that modularized
-> > > > > > > subsystems can perform lookups on vmalloc addresses.
-> > > > > > > 
-> > > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> > > > > > > ---
-> > > > > > >  mm/vmalloc.c | 1 +
-> > > > > > >  1 file changed, 1 insertion(+)
-> > > > > > > 
-> > > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> > > > > > > index ecbac900c35f..3eb9fe761c34 100644
-> > > > > > > --- a/mm/vmalloc.c
-> > > > > > > +++ b/mm/vmalloc.c
-> > > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
-> > > > > > >  
-> > > > > > >  	return va->vm;
-> > > > > > >  }
-> > > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
-> > > > > > >  
-> > > > > > This is internal. We can not just export it.
-> > > > > > 
-> > > > > > --
-> > > > > > Uladzislau Rezki
-> > > > > 
-> > > > > Hi Uladzislau,
-> > > > > 
-> > > > > Thank you for the feedback. I agree that we should avoid exposing
-> > > > > internal implementation details like struct vm_struct to external
-> > > > > subsystems.
-> > > > > 
-> > > > > Following Christoph's suggestion, I'm planning to encapsulate the page
-> > > > > order lookup into a minimal helper instead:
-> > > > > 
-> > > > > unsigned int vmalloc_page_order(const void *addr){
-> > > > > 	struct vm_struct *vm;
-> > > > >  	vm = find_vm_area(addr);
-> > > > > 	return vm ? vm->page_order : 0;
-> > > > > }
-> > > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
-> > > > > 
-> > > > > Does this approach look reasonable to you? It would keep the vm_struct
-> > > > > layout private while satisfying the optimization needs of SMC.
-> > > > > 
-> > > > Could you please clarify why you need info about page_order? I have not
-> > > > looked at your second patch.
-> > > > 
-> > > > Thanks!
-> > > > 
-> > > > --
-> > > > Uladzislau Rezki
-> > > 
-> > > Hi Uladzislau,
-> > > 
-> > > This stems from optimizing memory registration in SMC-R. To provide the
-> > > RDMA hardware with direct access to memory buffers, we must register
-> > > them with the NIC. During this process, the hardware generates one MTT
-> > > entry for each physically contiguous block. Since these hardware entries
-> > > are a finite and scarce resource, and SMC currently defaults to a 4KB
-> > > registration granularity, a single 2MB buffer consumes 512 entries. In
-> > > high-concurrency scenarios, this inefficiency quickly exhausts NIC
-> > > resources and becomes a major bottleneck for system scalability.
-> > > 
-> > > To address this, we intend to use vmalloc_huge(). When it successfully
-> > > allocates high-order pages, the vmalloc area is backed by a sequence of
-> > > physically contiguous chunks (e.g., 2MB each). If we know this
-> > > page_order, we can register these larger physical blocks instead of
-> > > individual 4KB pages, reducing MTT consumption from 512 entries down to
-> > > 1 for every 2MB of memory (with page_order == 9).
-> > > 
-> > > However, the result of vmalloc_huge() is currently opaque to the caller.
-> > > We cannot determine whether it successfully allocated huge pages or fell
-> > > back to 4KB pages based solely on the returned pointer. Therefore, we
-> > > need a helper function to query the actual page order, enabling SMC-R to
-> > > adapt its registration logic to the underlying physical layout.
-> > > 
-> > > I hope this clarifies our design motivation!
-> > > 
-> > Appreciate for the explanation. Yes it clarifies an intention.
-> > 
-> > As for proposed patch above:
-> > 
-> > - A page_order is available if CONFIG_HAVE_ARCH_HUGE_VMALLOC is defined;
-> > - It makes sense to get a node, grab a spin-lock and find VM, save
-> >   page_order and release the lock.
-> > 
-> > You can have a look at the vmalloc_dump_obj(void *object) function.
-> > We try-spinlock there whereas you need just spin-lock. But the idea
-> > is the same.
-> > 
-> > --
-> > Uladzislau Rezki
-> 
-> Hi Uladzislau,
-> 
-> Thanks very much for the detailed guidance, especially on the correct
-> locking pattern. This is extremely helpful.I will follow it and send
-> a v2 patch series with the new helper implemented in mm/vmalloc.c.
-> 
-> Thanks again for your support.
-> 
-Welcome!
+[PATCH net v4]
 
---
-Uladzislau Rezki
+Jibin Zhang wrote:
+> This patch enhances GSO segment handling by properly checking
+> the SKB_GSO_DODGY flag for frag_list GSO packets, addressing
+> low throughput issues observed when a station accesses IPv4
+> servers via hotspots with an IPv6-only upstream interface.
+> 
+> Specifically, it fixes a bug in GSO segmentation when forwarding
+> GRO packets containing a frag_list. The function skb_segment_list
+> cannot correctly process GRO skbs that have been converted by XLAT,
+> since XLAT only translates the header of the head skb. Consequently,
+> skbs in the frag_list may remain untranslated, resulting in protocol
+> inconsistencies and reduced throughput.
+> 
+> To address this, the patch explicitly sets the SKB_GSO_DODGY flag
+> for GSO packets in XLAT's IPv4/IPv6 protocol translation helpers
+> (bpf_skb_proto_4_to_6 and bpf_skb_proto_6_to_4). This marks GSO
+> packets as potentially modified after protocol translation. As a
+> result, GSO segmentation will avoid using skb_segment_list and
+> instead falls back to skb_segment for packets with the SKB_GSO_DODGY
+> flag. This ensures that only safe and fully translated frag_list
+> packets are processed by skb_segment_list, resolving protocol
+> inconsistencies and improving throughput when forwarding GRO packets
+> converted by XLAT.
+
+Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+Cc: stable@vger.kernel.org
+
+
+
 
