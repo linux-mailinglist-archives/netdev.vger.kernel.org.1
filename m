@@ -1,245 +1,190 @@
-Return-Path: <netdev+bounces-253571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +H0MFBu6d2lGkgEAu9opvQ
-	(envelope-from <netdev+bounces-253571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:01:47 +0100
+	id KHhNFym8d2l8kgEAu9opvQ
+	(envelope-from <netdev+bounces-253572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:10:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8BF48C4B4
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:01:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE3F8C605
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27ADF301BC2B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:01:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7789E301A7CE
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AE724DFF3;
-	Mon, 26 Jan 2026 19:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C4D2773DA;
+	Mon, 26 Jan 2026 19:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXHtuceF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bi7FTri6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529921F30AD;
-	Mon, 26 Jan 2026 19:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6902749DF
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769454101; cv=none; b=ItOlXb7x6cK30ClUWH5vYh1Pgb20Ctl6fHMKdueISD+oJaKZBUT3AQaPQEOg1XodWmJISvMYn+5YrkNO7Dw2s7hBgQU9PW2FcRFZluSYIGjseOjifuO8GqhtY+dWiG3XdAHTg/HzS+aedJdhV0MV/Mg5vSMt2KxWUpBD8frPbEM=
+	t=1769454630; cv=none; b=NAjbN5I4sI3hSdnqT7OfxwPmEpzcBHFhalF9PnA4muGZoHpy1tY6vgTfuXS0SDbngrKSp8O+BZ6MTUxkUyazWL2lpbvVvq7j9iQtYKAkg8RuUzNc13Yyu45ELh+tGbmB+r15JHWMxNb9B9ZMXNeTROJm7HyFkUeNVddPFPzInvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769454101; c=relaxed/simple;
-	bh=l93hlbEyLc+w9+V7vcsTvvUPIRFqS0itMLiaYqMaNFY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hPxbekMyfz8JCgIVXWqdALSBTNEiSNCDEwIshFZYtHFWmvxO+9H4QidWr6+/TlBzB6FDb7eiEz7jQgHh8UHmI/yquL6uorurRu8Nxkofy3BODxj3bv0eyHUNk5Uqel3bijSADlSZhULoNJ6HHlI411a/+G610USkSqzRgthXhpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXHtuceF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 999A0C116C6;
-	Mon, 26 Jan 2026 19:01:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769454101;
-	bh=l93hlbEyLc+w9+V7vcsTvvUPIRFqS0itMLiaYqMaNFY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=pXHtuceF8rrbD3JUjmXCAzZzpCxqmPanXzVO9Hx1/ElROCQrkESEeXrtCy57JHMk4
-	 KVbYGsVBx3RUQ3VYfCn2B2cdf9Uevw42IDK4DrBpy+JdddIBefLBFhTSjnk/08qbSc
-	 HHQ3MRPHXBDniRi8pzmaFdABzJc+MQZ16i9hALh6DJ95F9Y43mrgT07J71LqaSWYKa
-	 pA+L3UNHtBEvu25PQgCM+u82WUO1rPwwnZ3bb8ATssGoMTXh7dxHRphBBySzGlEHS0
-	 F040kLmb3iEU/mtAET3KK/qjziUwPNGJM5TXHXQ1+wT4fJ2a9kBjjHD4nG1Ozzs+b9
-	 GWR/1xMSU+oxw==
-Message-ID: <19540d70aaa8d92a65625f1a4530824d92f6ba44.camel@kernel.org>
-Subject: Re: [PATCH] sunrpc/xs_read_stream: fix dead loop when
- xs_read_discard
-From: Trond Myklebust <trondmy@kernel.org>
-To: "jack.zhou" <jack.wemmick@foxmail.com>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, "jack.zhou"
-	 <jacketzc@outlook.com>
-Date: Mon, 26 Jan 2026 14:01:39 -0500
-In-Reply-To: <tencent_DBA407008574A1E4BF7F27AD38AD4D13730A@qq.com>
-References: <tencent_DBA407008574A1E4BF7F27AD38AD4D13730A@qq.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	s=arc-20240116; t=1769454630; c=relaxed/simple;
+	bh=y8WZa5lTxZhinaJ1vI22gqo62u2Mkl4bP9hj4eR0CVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tT2r0hobbwmmI+5WPYFY6xTAt2NxuQuasm9jd0xSPmFPLoJZhIQJL/RnpYYext+G69stWJbRw9NUYMxluPV9kCpRPtES+OOavqZUZIY1eDr+SE+oWv5pKPVuJhFhv6/2s5ReMZ3W8Zp34LDmk1e1xIQM27Q0SVbVayol4HBQqJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bi7FTri6; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769454629; x=1800990629;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=y8WZa5lTxZhinaJ1vI22gqo62u2Mkl4bP9hj4eR0CVE=;
+  b=bi7FTri6sg2ihWZWt0iv85T1Wm+og34za6DXH0ogMmoqpNrLeR8w+m31
+   lHuDblvib9R8Rw+CWU/WsUy4oBbd/F6iLRtY7iPQbXhxVZzLj3qiRCjm/
+   Lu1yfqna8SkVMJelLvlV+l36BavbUs+BYDfZ3aS+aA4ejlP1kLZYd2HbQ
+   SvA9ngp+o7n5OQqVjwApbzeBHiBmrye5MK2oaeMzqZ2hu4n1RT6J0inyf
+   SoDS1es7rmsmXxqN16bebTFZpPXDrv7KnrbZIhZDQ8HSybBpkGv8RpvVx
+   seeip9AmCeYE8DmWCWpNc1m7OY/nHrSeLIlk1WAP6QKbgc3IW7Joa+eoP
+   Q==;
+X-CSE-ConnectionGUID: ZuOoI92aR/a5/GfcZYQrBw==
+X-CSE-MsgGUID: mJMzzaD6ROO8AYayDSRWqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="58212093"
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="58212093"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 11:10:29 -0800
+X-CSE-ConnectionGUID: JQZN/nleR1mKrX8NgdsnHw==
+X-CSE-MsgGUID: 9Fr2sKWUTraXYXXumoWrtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="212217771"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 26 Jan 2026 11:10:26 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vkRyh-00000000Xbu-3oiy;
+	Mon, 26 Jan 2026 19:10:23 +0000
+Date: Tue, 27 Jan 2026 03:09:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: report active PHY interface
+Message-ID: <202601270336.BzkH3lDa-lkp@intel.com>
+References: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253571-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[foxmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253572-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[trondmy@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hammerspace.com:email,outlook.com:email]
-X-Rspamd-Queue-Id: C8BF48C4B4
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7FE3F8C605
 X-Rspamd-Action: no action
 
-On Mon, 2026-01-26 at 14:25 +0800, jack.zhou wrote:
-> From: "jack.zhou" <jacketzc@outlook.com>
->=20
-> Hi maintainers,
->=20
-> This bug was discovered during following scenario:
->=20
-> 1. Using NFS client with TCP mode
-> 2. RPC_REPLY process
->=20
->=20
-> Let's first review the normal process:
->=20
-> 1. The `xs_read_stream` function is located within the for loop of
-> the `xs_stream_data_receive` function. The condition for exiting is
-> that the return value ret of the `xs_read_stream` method is < 0.
-> 2. When entering the function `xs_read_stream`, since `transport-
-> >recv.len` =3D=3D 0, `xs_read_stream_header` will be called first. Based
-> on `transport->recv.calldir`, it decides whether to execute
-> `RPC_CALL` or `RPC_REPLY`;(and also sets the value of `transport-
-> >recv.len`)
-> 3. Since it is executing `RPC_REPLY`, the return value of the
-> function `xs_read_stream_reply` is provided by tcp.c's `tcp_recvmsg`,
-> indicating the size of the copied skb, and this value is > 0.
-> 4. Since it is a normal process, it will reach the end of the
-> function and return, which is:=20
-> ```
-> transport->recv.offset =3D 0;
-> transport->recv.len =3D 0;
-> return read;
-> ```
-> 5. The returned 'read' is the return value of the function
-> 'xs_read_stream_reply' in the RPC_REPLY process. Since this value is
-> > 0, the `xs_stream_data_receive` function's for loop cannot be
-> exited.
-> 6. After re-entering the xs_read_stream function, since transport-
-> >recv.len =3D=3D 0, xs_read_stream_header will still be called.
-> 7. Since the skb is empty, tcp.c's `tcp_recvmsg` will return a value
-> < 0, usually -EAGAIN (-11).
-> 8. Since the return value of xs_read_stream_header is < 0, the goto
-> out_err statement will be executed.
-> 9. The for loop of the xs_stream_data_receive function will be
-> exited.
-> 10. The next time xs_stream_data_receive is entered, the above steps
-> will be repeated.
->=20
->=20
-> Now we are encountering an abnormal process:
->=20
->=20
-> 1. For some reason, skb is contaminated, and `transport-
-> >recv.calldir` parses out an incorrect value, so `msg.msg_flags |=3D
-> MSG_TRUNC`;(and also sets the value of transport->recv.len)
-> 2. The `if (transport->recv.offset < transport->recv.len) {}`
-> condition will be executed
-> 3. The return value of function `xs_read_discard` is > 0, so when
-> returning to the upstream `xs_stream_data_receive` function, the for
-> loop cannot be exited
-> 4. When entering xs_read_stream again, since transport->recv.len !=3D
-> 0, `xs_read_stream_header` will no longer be executed, which means
-> `transport->recv.calldir` cannot be correctly set anymore
-> 5. This is fatal for all subsequent RPC Replies because `transport-
-> >recv.calldir` cannot be correctly set anymore, so they will all go
-> to `xs_read_discard`
-> 6. At the same time, since transport->recv.len has not been reset to
-> 0, this loop will become an infinite loop
->=20
-> Therefore, my approach is:
->=20
-> After reaching the point of `xs_read_discard` due to an abnormal
-> situation, the value of `transport->recv.len` will be reset in the
-> same way as a normal return, in order to prevent a deadlock from
-> occurring.
->=20
-> The modification has been tested and passed in version 5.10.160.
->=20
->=20
->=20
-> ---
-> =C2=A0net/sunrpc/xprtsock.c | 14 +++++++++++---
-> =C2=A01 file changed, 11 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-> index 2e1fe6013361..91d1b992eb7f 100644
-> --- a/net/sunrpc/xprtsock.c
-> +++ b/net/sunrpc/xprtsock.c
-> @@ -695,6 +695,13 @@ xs_read_stream_reply(struct sock_xprt
-> *transport, struct msghdr *msg, int flags)
-> =C2=A0	return ret;
-> =C2=A0}
-> =C2=A0
-> +static void
-> +xs_stream_reset_recv(struct sock_xprt *transport)
-> +{
-> +	transport->recv.offset =3D 0;
-> +	transport->recv.len =3D 0;
-> +}
-> +
-> =C2=A0static ssize_t
-> =C2=A0xs_read_stream(struct sock_xprt *transport, int flags)
-> =C2=A0{
-> @@ -740,8 +747,10 @@ xs_read_stream(struct sock_xprt *transport, int
-> flags)
-> =C2=A0		msg.msg_flags =3D 0;
-> =C2=A0		ret =3D xs_read_discard(transport->sock, &msg, flags,
-> =C2=A0				transport->recv.len - transport-
-> >recv.offset);
-> -		if (ret <=3D 0)
-> +		if (ret <=3D 0) {
-> +			xs_stream_reset_recv(transport);
-> =C2=A0			goto out_err;
-> +		}
-> =C2=A0		transport->recv.offset +=3D ret;
-> =C2=A0		read +=3D ret;
-> =C2=A0		if (transport->recv.offset !=3D transport->recv.len)
-> @@ -751,8 +760,7 @@ xs_read_stream(struct sock_xprt *transport, int
-> flags)
-> =C2=A0		trace_xs_stream_read_request(transport);
-> =C2=A0		transport->recv.copied =3D 0;
-> =C2=A0	}
-> -	transport->recv.offset =3D 0;
-> -	transport->recv.len =3D 0;
-> +	xs_stream_reset_recv(transport);
-> =C2=A0	return read;
-> =C2=A0out_err:
-> =C2=A0	return ret !=3D 0 ? ret : -ESHUTDOWN;
+Hi Russell,
 
-NACK.
+kernel test robot noticed the following build warnings:
 
-If we're in the xs_read_discard() case, then that's because we're out
-of receive buffer space, and so we've given up reading the remainder of
-the message into that receive buffer. However we still have to read to
-the end of that message before we get to the next message in the TCP
-stream. The only thing that can prevent that is if someone breaks the
-connection, and in that case the client already takes care of resetting
-the message state as part of reconnecting.
+[auto build test WARNING on net-next/main]
 
-With this change, then as soon as there is no more buffered data to
-read from the socket and it returns EAGAIN, you will reset the message
-parameters. The result is that the next call to xs_read_stream() will
-just leave us reading random data from the middle of the message as if
-it were a new message header.
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-report-active-PHY-interface/20260126-201908
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1vkLXO-00000005uxQ-31ZV%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next] net: stmmac: report active PHY interface
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20260127/202601270336.BzkH3lDa-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260127/202601270336.BzkH3lDa-lkp@intel.com/reproduce)
 
---=20
-Trond Myklebust
-Linux NFS client maintainer, Hammerspace
-trondmy@kernel.org, trond.myklebust@hammerspace.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601270336.BzkH3lDa-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:41:10: warning: 'PHY_INTF_RGMII' redefined
+      41 | #define  PHY_INTF_RGMII                 FIELD_PREP(PHY_INTF_MASK, 1)
+         |          ^~~~~~~~~~~~~~
+   In file included from drivers/net/ethernet/stmicro/stmmac/stmmac.h:20,
+                    from drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h:12,
+                    from drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:17:
+   drivers/net/ethernet/stmicro/stmmac/common.h:328:9: note: this is the location of the previous definition
+     328 | #define PHY_INTF_RGMII          1
+         |         ^~~~~~~~~~~~~~
+
+
+vim +/PHY_INTF_RGMII +41 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  18  
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  19  #define GMAC_CLK_EN			0x00
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  20  #define  GMAC_TX_CLK_EN			BIT(1)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  21  #define  GMAC_TX_CLK_N_EN		BIT(2)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  22  #define  GMAC_TX_CLK_OUT_EN		BIT(3)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  23  #define  GMAC_RX_CLK_EN			BIT(4)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  24  #define  GMAC_RX_CLK_N_EN		BIT(5)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  25  #define  GMAC_EPHY_REF_CLK_EN		BIT(6)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  26  #define GMAC_RXCLK_DELAY_CTRL		0x04
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  27  #define  GMAC_RXCLK_BYPASS		BIT(15)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  28  #define  GMAC_RXCLK_INVERT		BIT(14)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  29  #define  GMAC_RXCLK_DELAY		GENMASK(4, 0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  30  #define GMAC_TXCLK_DELAY_CTRL		0x08
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  31  #define  GMAC_TXCLK_BYPASS		BIT(15)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  32  #define  GMAC_TXCLK_INVERT		BIT(14)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  33  #define  GMAC_TXCLK_DELAY		GENMASK(4, 0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  34  #define GMAC_PLLCLK_DIV			0x0c
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  35  #define  GMAC_PLLCLK_DIV_EN		BIT(31)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  36  #define  GMAC_PLLCLK_DIV_NUM		GENMASK(7, 0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  37  #define GMAC_GTXCLK_SEL			0x18
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  38  #define  GMAC_GTXCLK_SEL_PLL		BIT(0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  39  #define GMAC_INTF_CTRL			0x1c
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  40  #define  PHY_INTF_MASK			BIT(0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03 @41  #define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  42  #define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  43  #define GMAC_TXCLK_OEN			0x20
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  44  #define  TXCLK_DIR_MASK			BIT(0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  45  #define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  46  #define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
+33a1a01e3afa72 Jisheng Zhang 2024-11-03  47  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
