@@ -1,190 +1,275 @@
-Return-Path: <netdev+bounces-253572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253573-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHhNFym8d2l8kgEAu9opvQ
-	(envelope-from <netdev+bounces-253572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:10:33 +0100
+	id wGU6BFq+d2l8kgEAu9opvQ
+	(envelope-from <netdev+bounces-253573-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:19:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE3F8C605
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:10:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB138C7EA
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:19:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7789E301A7CE
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:10:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B31230238D1
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C4D2773DA;
-	Mon, 26 Jan 2026 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F34B27AC5C;
+	Mon, 26 Jan 2026 19:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bi7FTri6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tRgO1tz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6902749DF
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42CC279DB3
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769454630; cv=none; b=NAjbN5I4sI3hSdnqT7OfxwPmEpzcBHFhalF9PnA4muGZoHpy1tY6vgTfuXS0SDbngrKSp8O+BZ6MTUxkUyazWL2lpbvVvq7j9iQtYKAkg8RuUzNc13Yyu45ELh+tGbmB+r15JHWMxNb9B9ZMXNeTROJm7HyFkUeNVddPFPzInvo=
+	t=1769455072; cv=none; b=p8k4P0iKfK5Ehg5TdKI4rR0mjae9Yh/bDCw8QOOdCi7gsz/7D9jgmUhwI2yIQd10eID3I/5iZJBSdsRaO6wJQUGvj48hysA02vAIQBSyWtuLltBiZI6GrX5+YoSXJ/N1LT3f36hBeBviDiPLu5Zz1YMvBcDHXaAK4hR6sIcqCOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769454630; c=relaxed/simple;
-	bh=y8WZa5lTxZhinaJ1vI22gqo62u2Mkl4bP9hj4eR0CVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tT2r0hobbwmmI+5WPYFY6xTAt2NxuQuasm9jd0xSPmFPLoJZhIQJL/RnpYYext+G69stWJbRw9NUYMxluPV9kCpRPtES+OOavqZUZIY1eDr+SE+oWv5pKPVuJhFhv6/2s5ReMZ3W8Zp34LDmk1e1xIQM27Q0SVbVayol4HBQqJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bi7FTri6; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769454629; x=1800990629;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y8WZa5lTxZhinaJ1vI22gqo62u2Mkl4bP9hj4eR0CVE=;
-  b=bi7FTri6sg2ihWZWt0iv85T1Wm+og34za6DXH0ogMmoqpNrLeR8w+m31
-   lHuDblvib9R8Rw+CWU/WsUy4oBbd/F6iLRtY7iPQbXhxVZzLj3qiRCjm/
-   Lu1yfqna8SkVMJelLvlV+l36BavbUs+BYDfZ3aS+aA4ejlP1kLZYd2HbQ
-   SvA9ngp+o7n5OQqVjwApbzeBHiBmrye5MK2oaeMzqZ2hu4n1RT6J0inyf
-   SoDS1es7rmsmXxqN16bebTFZpPXDrv7KnrbZIhZDQ8HSybBpkGv8RpvVx
-   seeip9AmCeYE8DmWCWpNc1m7OY/nHrSeLIlk1WAP6QKbgc3IW7Joa+eoP
-   Q==;
-X-CSE-ConnectionGUID: ZuOoI92aR/a5/GfcZYQrBw==
-X-CSE-MsgGUID: mJMzzaD6ROO8AYayDSRWqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="58212093"
-X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="58212093"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 11:10:29 -0800
-X-CSE-ConnectionGUID: JQZN/nleR1mKrX8NgdsnHw==
-X-CSE-MsgGUID: 9Fr2sKWUTraXYXXumoWrtA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="212217771"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 26 Jan 2026 11:10:26 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vkRyh-00000000Xbu-3oiy;
-	Mon, 26 Jan 2026 19:10:23 +0000
-Date: Tue, 27 Jan 2026 03:09:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: report active PHY interface
-Message-ID: <202601270336.BzkH3lDa-lkp@intel.com>
-References: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1769455072; c=relaxed/simple;
+	bh=LbjZePeNTvTkkMh5FiU3nnSxLkqi2vYMrRy0ZrGHjXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fcNYntWFZuEijb24jF8K6Dx5iSucwPE03K8aiq4re5oqWxyBJtdJWXuvj8gqgVU9n5cdJTqoAi2DSMwYL89EXyvy2iGd1TJMgglbUVfyxHcvvFmWLvG7HZxVJ2UObI83kZZOcJMkH2btPPgzlXVVFNLdQ0LkaZJvMuxtcV0iDRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tRgO1tz+; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <77e06763-76a8-46ab-9a51-efc708720a98@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769455067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tpzz2UljQE3YZ9pOoTuAUnr4osF8V6q48LrSRhifpHs=;
+	b=tRgO1tz+fphioTCkeEXld67Mf3fvL/ltdmMKnA3VwBlgXj6mSkDEd21S8MCkKzF0l79rst
+	ZmpmriDg9gGMo773dWMBKPPRh8bFaf+LMVQ73ruR3HgkV9LmfX+k9ESfaCQo0osv2kLbn4
+	GCMMg8l6QKKsmUTJp7eR885LirKi9CY=
+Date: Mon, 26 Jan 2026 19:17:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vkLXO-00000005uxQ-31ZV@rmk-PC.armlinux.org.uk>
+Subject: Re: [RFC net-next] net: systemport: Use u64_stats_t with
+ u64_stats_sync properly
+To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+References: <20260122201545.2792428-1-mmyangfl@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260122201545.2792428-1-mmyangfl@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253573-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253572-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,01.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FE3F8C605
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 5EB138C7EA
 X-Rspamd-Action: no action
 
-Hi Russell,
+On 22/01/2026 20:15, David Yang wrote:
+> On 64bit arches, struct u64_stats_sync is empty and provides no help
+> against load/store tearing. Convert to u64_stats_t to ensure atomic
+> operations.
+> 
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> ---
+> RFC Comment:
+> 
+> I couldn't find the lock associated with u64_stats_sync. Should this be
+> considered an issue?
 
-kernel test robot noticed the following build warnings:
+Didn't get the question. u64_stats_sync structure has it's own lock for 
+cases where atomic operations are not possible.
 
-[auto build test WARNING on net-next/main]
+>   drivers/net/ethernet/broadcom/bcmsysport.c | 56 ++++++++++++----------
+>   drivers/net/ethernet/broadcom/bcmsysport.h | 12 ++---
+>   2 files changed, 37 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
+> index bc4e1f3b3752..7017b2d2a1b5 100644
+> --- a/drivers/net/ethernet/broadcom/bcmsysport.c
+> +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+> @@ -435,8 +435,8 @@ static void bcm_sysport_update_tx_stats(struct bcm_sysport_priv *priv,
+>   		ring = &priv->tx_rings[q];
+>   		do {
+>   			start = u64_stats_fetch_begin(&priv->syncp);
+> -			bytes = ring->bytes;
+> -			packets = ring->packets;
+> +			bytes = u64_stats_read(&ring->bytes);
+> +			packets = u64_stats_read(&ring->packets);
+>   		} while (u64_stats_fetch_retry(&priv->syncp, start));
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-report-active-PHY-interface/20260126-201908
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/E1vkLXO-00000005uxQ-31ZV%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net-next] net: stmmac: report active PHY interface
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20260127/202601270336.BzkH3lDa-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260127/202601270336.BzkH3lDa-lkp@intel.com/reproduce)
+please, look the comment below which includes reference to this block...
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601270336.BzkH3lDa-lkp@intel.com/
+>   
+>   		*tx_bytes += bytes;
+> @@ -458,8 +458,10 @@ static void bcm_sysport_get_stats(struct net_device *dev,
+>   	if (netif_running(dev)) {
+>   		bcm_sysport_update_mib_counters(priv);
+>   		bcm_sysport_update_tx_stats(priv, &tx_bytes, &tx_packets);
+> -		stats64->tx_bytes = tx_bytes;
+> -		stats64->tx_packets = tx_packets;
+> +		u64_stats_update_begin(&priv->syncp);
+> +		u64_stats_set(&stats64->tx_bytes, tx_bytes);
+> +		u64_stats_set(&stats64->tx_packets, tx_packets);
+> +		u64_stats_update_end(&priv->syncp);
+>   	}
+>   
+>   	for (i =  0, j = 0; i < BCM_SYSPORT_STATS_LEN; i++) {
+> @@ -482,28 +484,32 @@ static void bcm_sysport_get_stats(struct net_device *dev,
+>   		    s->type == BCM_SYSPORT_STAT_NETDEV64) {
+>   			do {
+>   				start = u64_stats_fetch_begin(syncp);
+> -				data[i] = *(u64 *)p;
+> +				data[i] = u64_stats_read((u64_stats_t *)p);
+>   			} while (u64_stats_fetch_retry(syncp, start));
+>   		} else
+>   			data[i] = *(u32 *)p;
+>   		j++;
+>   	}
+>   
+> -	/* For SYSTEMPORT Lite since we have holes in our statistics, j would
+> -	 * be equal to BCM_SYSPORT_STATS_LEN at the end of the loop, but it
+> -	 * needs to point to how many total statistics we have minus the
+> -	 * number of per TX queue statistics
+> -	 */
+> -	j = bcm_sysport_get_sset_count(dev, ETH_SS_STATS) -
+> -	    dev->num_tx_queues * NUM_SYSPORT_TXQ_STAT;
+> +	do {
+> +		/* For SYSTEMPORT Lite since we have holes in our statistics, j
+> +		 * would be equal to BCM_SYSPORT_STATS_LEN at the end of the
+> +		 * loop, but it needs to point to how many total statistics we
+> +		 * have minus the number of per TX queue statistics
+> +		 */
+> +		j = bcm_sysport_get_sset_count(dev, ETH_SS_STATS) -
+> +		    dev->num_tx_queues * NUM_SYSPORT_TXQ_STAT;
+>   
+> -	for (i = 0; i < dev->num_tx_queues; i++) {
+> -		ring = &priv->tx_rings[i];
+> -		data[j] = ring->packets;
+> -		j++;
+> -		data[j] = ring->bytes;
+> -		j++;
+> -	}
+> +		start = u64_stats_fetch_begin(syncp);
+> +
+> +		for (i = 0; i < dev->num_tx_queues; i++) {
+> +			ring = &priv->tx_rings[i];
+> +			data[j] = u64_stats_read(&ring->packets);
+> +			j++;
+> +			data[j] = u64_stats_read(&ring->bytes);
+> +			j++;
+> +		}
+> +	} while (u64_stats_fetch_retry(syncp, start));
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:41:10: warning: 'PHY_INTF_RGMII' redefined
-      41 | #define  PHY_INTF_RGMII                 FIELD_PREP(PHY_INTF_MASK, 1)
-         |          ^~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/stmicro/stmmac/stmmac.h:20,
-                    from drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h:12,
-                    from drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c:17:
-   drivers/net/ethernet/stmicro/stmmac/common.h:328:9: note: this is the location of the previous definition
-     328 | #define PHY_INTF_RGMII          1
-         |         ^~~~~~~~~~~~~~
+ring is protected by ring::lock, there is no need to introduce another
+per-device lock. ring statistics can be protected by the same lock, and
+to improve the code, ring::lock can be converted into seqlock_t.
 
 
-vim +/PHY_INTF_RGMII +41 drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+>   }
+>   
+>   static void bcm_sysport_get_wol(struct net_device *dev,
+> @@ -829,8 +835,8 @@ static unsigned int bcm_sysport_desc_rx(struct bcm_sysport_priv *priv,
+>   		ndev->stats.rx_packets++;
+>   		ndev->stats.rx_bytes += len;
+>   		u64_stats_update_begin(&priv->syncp);
+> -		stats64->rx_packets++;
+> -		stats64->rx_bytes += len;
+> +		u64_stats_inc(&stats64->rx_packets);
+> +		u64_stats_add(&stats64->rx_bytes, len);
+>   		u64_stats_update_end(&priv->syncp);
+>   
+>   		napi_gro_receive(&priv->napi, skb);
+> @@ -914,8 +920,8 @@ static unsigned int __bcm_sysport_tx_reclaim(struct bcm_sysport_priv *priv,
+>   	}
+>   
+>   	u64_stats_update_begin(&priv->syncp);
+> -	ring->packets += pkts_compl;
+> -	ring->bytes += bytes_compl;
+> +	u64_stats_add(&ring->packets, pkts_compl);
+> +	u64_stats_add(&ring->bytes, bytes_compl);
+>   	u64_stats_update_end(&priv->syncp);
 
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  18  
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  19  #define GMAC_CLK_EN			0x00
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  20  #define  GMAC_TX_CLK_EN			BIT(1)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  21  #define  GMAC_TX_CLK_N_EN		BIT(2)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  22  #define  GMAC_TX_CLK_OUT_EN		BIT(3)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  23  #define  GMAC_RX_CLK_EN			BIT(4)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  24  #define  GMAC_RX_CLK_N_EN		BIT(5)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  25  #define  GMAC_EPHY_REF_CLK_EN		BIT(6)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  26  #define GMAC_RXCLK_DELAY_CTRL		0x04
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  27  #define  GMAC_RXCLK_BYPASS		BIT(15)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  28  #define  GMAC_RXCLK_INVERT		BIT(14)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  29  #define  GMAC_RXCLK_DELAY		GENMASK(4, 0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  30  #define GMAC_TXCLK_DELAY_CTRL		0x08
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  31  #define  GMAC_TXCLK_BYPASS		BIT(15)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  32  #define  GMAC_TXCLK_INVERT		BIT(14)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  33  #define  GMAC_TXCLK_DELAY		GENMASK(4, 0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  34  #define GMAC_PLLCLK_DIV			0x0c
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  35  #define  GMAC_PLLCLK_DIV_EN		BIT(31)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  36  #define  GMAC_PLLCLK_DIV_NUM		GENMASK(7, 0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  37  #define GMAC_GTXCLK_SEL			0x18
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  38  #define  GMAC_GTXCLK_SEL_PLL		BIT(0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  39  #define GMAC_INTF_CTRL			0x1c
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  40  #define  PHY_INTF_MASK			BIT(0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03 @41  #define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  42  #define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  43  #define GMAC_TXCLK_OEN			0x20
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  44  #define  TXCLK_DIR_MASK			BIT(0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  45  #define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  46  #define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
-33a1a01e3afa72 Jisheng Zhang 2024-11-03  47  
+here again, no need for device-wide lock in hot path.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>   
+>   	ring->c_index = c_index;
+> @@ -1857,8 +1863,8 @@ static void bcm_sysport_get_stats64(struct net_device *dev,
+>   
+>   	do {
+>   		start = u64_stats_fetch_begin(&priv->syncp);
+> -		stats->rx_packets = stats64->rx_packets;
+> -		stats->rx_bytes = stats64->rx_bytes;
+> +		stats->rx_packets = u64_stats_read(&stats64->rx_packets);
+> +		stats->rx_bytes = u64_stats_read(&stats64->rx_bytes);
+>   	} while (u64_stats_fetch_retry(&priv->syncp, start));
+>   }
+>   
+> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.h b/drivers/net/ethernet/broadcom/bcmsysport.h
+> index a34296f989f1..91b1c8293a23 100644
+> --- a/drivers/net/ethernet/broadcom/bcmsysport.h
+> +++ b/drivers/net/ethernet/broadcom/bcmsysport.h
+> @@ -652,10 +652,10 @@ struct bcm_sysport_stats {
+>   
+>   struct bcm_sysport_stats64 {
+>   	/* 64bit stats on 32bit/64bit Machine */
+> -	u64	rx_packets;
+> -	u64	rx_bytes;
+> -	u64	tx_packets;
+> -	u64	tx_bytes;
+> +	u64_stats_t	rx_packets;
+> +	u64_stats_t	rx_bytes;
+> +	u64_stats_t	tx_packets;
+> +	u64_stats_t	tx_bytes;
+>   };
+>   
+>   /* Software house keeping helper structure */
+> @@ -698,8 +698,8 @@ struct bcm_sysport_tx_ring {
+>   	unsigned int	clean_index;	/* Current clean index */
+>   	struct bcm_sysport_cb *cbs;	/* Transmit control blocks */
+>   	struct bcm_sysport_priv *priv;	/* private context backpointer */
+> -	unsigned long	packets;	/* packets statistics */
+> -	unsigned long	bytes;		/* bytes statistics */
+> +	u64_stats_t	packets;	/* packets statistics */
+> +	u64_stats_t	bytes;		/* bytes statistics */
+>   	unsigned int	switch_queue;	/* switch port queue number */
+>   	unsigned int	switch_port;	/* switch port queue number */
+>   	bool		inspect;	/* inspect switch port and queue */
+
 
