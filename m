@@ -1,127 +1,122 @@
-Return-Path: <netdev+bounces-253485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDI4Kntsd2nCfQEAu9opvQ
-	(envelope-from <netdev+bounces-253485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:30:35 +0100
+	id wNSCKXlxd2m8gAEAu9opvQ
+	(envelope-from <netdev+bounces-253486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:51:53 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A915588D86
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:30:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E11891AB
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8E64630091F1
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:29:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 62D94300A257
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8477F339867;
-	Mon, 26 Jan 2026 13:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B35632825B;
+	Mon, 26 Jan 2026 13:42:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BCrSE+mw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVY7QuR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA80033985F
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 13:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EF933A9D6;
+	Mon, 26 Jan 2026 13:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769434172; cv=none; b=RpfdyqZ0HnO9jEv3PIx31c9fTYryaXAOHZkpS5yFTasn859KyJDwMeGSS+ergElLq6Xgg8WFgM1Z1VeFgmhl5WiZFHSy5QrbtyRpIZYnfHLl8swQuDAIKtsYg5vUjyNkXaeNL/Cecq5rQErSyZebqcyfLzKbu4SHKVFeQLboElU=
+	t=1769434954; cv=none; b=Yl9K5HwXZIeLFCFotzNuJCswX16o4UpOpr9up+Pjx9iQ9MK3RX9ejn4Az4CZ+IYO6TbujWjcmA47bMQrncPCr7l7m15qdh+knPRJalPUpE98qrqtKepBVG+3G11Ca7d477DZikCZir2dWfI/B+8DL1dQEEEg0oXQY1jyvppQmd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769434172; c=relaxed/simple;
-	bh=e5/cfbgmcZ8VtWGWKmm/w6akYaG//Yt8RiRfZ6FFiHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qn9CKQj9jxkMRQHTZBvINCr7nJwy80TKFR0KVfLdQs8KJq2WhEUlf8k0HDG00e/ilFZeTClYkaPrydY16GlPuMkzDe7PwTlHElKiOxTRd+W2iFG7H7JAgb/9RIYKxigg60R2q6XaH9FAALw4eP+nRWBOIhZF4oO/cY4qVaLrFJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BCrSE+mw; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 4AD571A2A49;
-	Mon, 26 Jan 2026 13:29:27 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 150F460717;
-	Mon, 26 Jan 2026 13:29:27 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 99E0E119A8633;
-	Mon, 26 Jan 2026 14:29:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769434166; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=4VpehwRlJ7i5t1l2Yl9R834m3oPT3yev9rVS4TQ1wVY=;
-	b=BCrSE+mwhylQ4tQixlFfLMNCHR1HqfQYOItuKPvQ6/aoZHerpdcVoSB7In1NJ5PwEqF5kM
-	irzRf74H31TNzv3Dyj3h7OlEmNZJUVjQUUhru8R1ff2RPeqJGgi8gnt9PkNMTXXUKq/k+Y
-	DlzUB+84WjuXD4FN6wGA7IwcLNav2zCTomQZNN75hCIiWBBzZc/dtSls6bNK+hDxUGcDkp
-	5rLG/zkVRryOwJ9NSRIri6OQ8llqfnNXCmbfz3K+MiooPSWiRR+e9iZZIhRt93ZDxZlDXA
-	T62L6mnYQ4tO7Amw1WOFEWb04bfT1scWymEKbqOvFPiaHJGhS6TPLuFUFV15Nw==
-Message-ID: <2ce008fd-cb9b-4f5d-bdb0-cccb1f09eae8@bootlin.com>
-Date: Mon, 26 Jan 2026 14:29:18 +0100
+	s=arc-20240116; t=1769434954; c=relaxed/simple;
+	bh=jYwExo7rfIbCoeFjaHZI7UEh+OE6XcOeAoCk3DyxBUU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n+CYImKs09TV0pPdbrgeaZV7zyzmy45gkMg3la4jKnHmKWlKLcP6XaLo4ATNkY4OJqQJVg2xEr8/lOHWB1KNGC66EyOfk7nVBgi7YhFFOMe9Tbuig4PWBAor/mj0pzKwezAy/2EoDFU5SgFmEOZp/VVkrxr9Z5tO4ql+0DMRego=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVY7QuR9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9104AC116C6;
+	Mon, 26 Jan 2026 13:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769434954;
+	bh=jYwExo7rfIbCoeFjaHZI7UEh+OE6XcOeAoCk3DyxBUU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MVY7QuR9EDtIUAYBGw60Z6l+yRWSFK3bjwwtXX9NqsrKPjgGRZwqHuCnOIXWfmgA7
+	 WPNJ6drel+xni2qyhRRrMisWnNc2TUQiYP36aPugZow4gCzfee+DOEf52rGH/V55N6
+	 Ay9dvBJtweYlTwISHmZa6R11SdLyQWtOnBbPh8+1aTiOBYzhZhtSdT9SMzqV3jOGLG
+	 5ZrB3HMnVkh4A2Jos2JvrmPh4QWomHxg28bH7m0FSop9sv5d7hrBYxY7iqwimmMfkS
+	 YgihTsL0iCvppFBmjvr6igWcogOUgzG8ZaMMbJd7KteaZmIS5AoV1EjteGNlM5ALwk
+	 RhMpXmXXUsVHg==
+Date: Mon, 26 Jan 2026 13:42:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Korsgaard <peter@korsgaard.com>
+Subject: Re: [PATCH net-next] net: usb: sr9700: remove code to drive
+ nonexistent multicast filter
+Message-ID: <aXdvRs1hAC5E4Dex@horms.kernel.org>
+References: <20260123065842.53669-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: don't pass ioaddr to
- fix_soc_reset() method
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>
-References: <E1vkLmM-00000005vE1-0nop@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vkLmM-00000005vE1-0nop@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123065842.53669-1-enelsonmoore@gmail.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253485-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253486-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A915588D86
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D1E11891AB
 X-Rspamd-Action: no action
 
-Hi,
-
-On 26/01/2026 13:33, Russell King (Oracle) wrote:
-> As the stmmac_priv struct is passed to the fix_soc_reset() method which
-> has the ioaddr, there is no need to pass ioaddr separately. Pass just
-> the stmmac_priv struct. Fix up the glues that use it.
+On Thu, Jan 22, 2026 at 10:58:32PM -0800, Ethan Nelson-Moore wrote:
+> Several registers referenced in this driver's source code do not
+> actually exist (they are not writable and read as zero in my testing).
+> They exist in this driver because it originated as a copy of the dm9601
+> driver. Notably, these include the multicast filter registers - this
+> causes the driver to not support multicast packets correctly. Remove
+> the multicast filter code and instead set the chip to receive all
+> multicast filter packets when any multicast addresses are in the list.
+> Also take the opportunity to remove definitions for a few other
+> nonexistent registers, and a couple pointless comments.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+I would slightly lean towards splitting this patch up,
+say one for the multicast changes and removal of related #defines,
+and another for the remainder of the #define clean-up.
 
-Maxime
+But that notwithstanding this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
