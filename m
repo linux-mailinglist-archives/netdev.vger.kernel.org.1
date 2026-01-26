@@ -1,318 +1,190 @@
-Return-Path: <netdev+bounces-253456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253457-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULU2KGlUd2nMeAEAu9opvQ
-	(envelope-from <netdev+bounces-253456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:47:53 +0100
+	id yPrkDAZWd2nMeAEAu9opvQ
+	(envelope-from <netdev+bounces-253457-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:54:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C583087CE1
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:47:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D023687DF9
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 404673006D49
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:47:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1EE59305D868
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186F7332ECC;
-	Mon, 26 Jan 2026 11:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF14833372D;
+	Mon, 26 Jan 2026 11:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Hz1wQJGU"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="g8OvjCRp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECB3332EC4
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 11:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECEC328616
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 11:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769428023; cv=none; b=AXb5lC1dK9gDd8xcjRuxFPO0XE6giP/48gtepUDD2SgG/BSQfLMn2PQBEHh9U7UYxMSQgE7ySs7Cee9X8vG6bSBrGuk0gSzqH7juU6pyOUiN9GnU4YsP6ptg76Y7S1+WBvGNgfvHNo8W6eCqcc+lGPNBlatAK2wN2lt8U9lALBA=
+	t=1769428180; cv=none; b=hXLCyzzGYA70r2xaCjx42RXFtflSqFxjBDwAJ744Ip3FMlQr89zwZ9TX2PC8SA97zKOwzVRvlJg47RUZrBHCAKLrvagG2k3mD+prpR4+jdKgIm2qJ8kvwsp9pNcA/c1PfZbMK9057p4PLDPkQMOoqJRQk+Zn4Pv9hBfRDKntuq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769428023; c=relaxed/simple;
-	bh=t0BLNVlGuXflc390mXSVI+ecsXIuP1C6sicvS9JwRes=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=hsZscq8mX87aFl2ypc6uyQMyH+pyfXF5zuNVWcqTnSVJiLzVpj5sDaQXDX1uLPphA9xt8P4EqZ+/+FomllC2gfNuDoeeydoUUgMPrxX3F2LshSHsDMucPE8RPg+b9IaLyAKGMml1sNqtXcWSL9RU0tCdZxMKFdHav1g2li84fp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Hz1wQJGU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Fk0OFdSv4z1lOiwA5ccWO4V+Shu5Ym4b7St2WuN3K3Q=; b=Hz1wQJGUWp2XQJS6YDkqg35Ay7
-	jJN/6+aKcGSW6E5Uw4npDTZhHbcHDO4ALQ6p+xiPpR8ZHQdYEph3ct3hLodZZKUH06iZ6/SKRgMGs
-	XHmFC3GK2LroOIMkKrkdyTK4dmsauRhv7nF2AqSqoDGPS3HX9/IIiJDYFYLGhk3CqVHw6rwvHjaoh
-	w3KFLMllsZwlyGNRlVmv1tzljA0YjoWmMeF8X+mBsHCBMVdNiNpxFR9m46x+BTlHFhPWK+k+ke0wj
-	T5dyFC17mb1deLOXl8RR1U/L6CMCwTnGp3cjB09p53DBXcZKT8twkqKPYM57AMFj1st5rKrT1tgLC
-	O5k8S+ug==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33560 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vkL3U-000000004k8-0OwF;
-	Mon, 26 Jan 2026 11:46:52 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vkL3S-00000005uuG-2qFN;
-	Mon, 26 Jan 2026 11:46:50 +0000
-In-Reply-To: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
-References: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 22/22] net: stmmac: rk: rk3506, rk3528 and kk3588
- have rmii_mode in clock register
+	s=arc-20240116; t=1769428180; c=relaxed/simple;
+	bh=9yn2gy4stahnnhoif2MbmULokXbFyhugTFcvVCHDtZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XoV1penxoZXBWY4UpZToKgGVB73okP9BgXjDYvaHg+h0XdosAfsqLtxR1m5Ay7MI/tnqFSwGGE4XbFVE1GxbAKI5LXdD9DqIi/Bz8aIRsESDXgtWgigxy+EoqowLxahPw/nkQeN8hmCQDkTsDRzEV98vv2nawzLh3PCoxEG9G4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=g8OvjCRp; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47ee4338e01so24998385e9.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 03:49:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1769428177; x=1770032977; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NOhLAj2giVSLA0OsJBFJXkMMrU18g2uT51Qc0Cqc3Y8=;
+        b=g8OvjCRpuDAdCP1praM4sVBUmhqpw5qU5Zsf1mQNurHrTNHm33j6SeoO9IE/wEGbqr
+         Bnsox7ue47l6/PK1Vbhjwi0KCZUyGqxsLyi4ea+93NKwydwOuq6yb4/k9G2ho/EyVTqe
+         obBR7NPTVMqIHdfvNnqhcE6/EOKlH6F9JtDuiA2NYRb+n/ryWm4qbzMqy3c1EYOe4DPP
+         NIsurtCqHdv7VYMMbf+zgC+79ZC98R6VuRtypnKKAaa2EBtl/kQUcEzlsJfNNyJDABPM
+         RNQ0W3R0KQf8eLOf1aPIWsneQpwjyDXxgCSI7iPXUyFUNd8vsW9x+Iqkzzfz81T0Bxu3
+         HtxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769428177; x=1770032977;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NOhLAj2giVSLA0OsJBFJXkMMrU18g2uT51Qc0Cqc3Y8=;
+        b=Ug/PvXRRqVe0qHRi5vhqpbeDl61DD5/KYRuX6GRTVfmIurWOMXgK35bnarbfyShzFM
+         lszByJVXhIAUqmdyNuMJBMTQpwwon4xiX4c0DGMV4BzkeQv37gMIG0nD0lDMbQwBrSX6
+         72ypHCCDW3QiTvOSh7nnAciHuaJZhYyvYjB8Icube3xN+9mJmh5WoNtCeD0e8wmYFBDr
+         P9AupvWtA9ctVwcnbFwyDE2TD+m3qub0PuO74uP+KV2Z3w4eV4Ydyko/cpwksR/UYMgh
+         1uoPzTkJ+JzKEEmPC9lwxm67JpN9uRibzh2hGa0LkCbXJ+P4BRcVGixzwFckYDbMvXOL
+         WhdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKG/Lk2sQFYA9sMXTWXiCNof7vC2ciJVMVyOQXWdxyHRLW+wf4Jpk2T21Xzb7TT6Oxq0seIj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3TSFxidh+V3jw0ntevA1j+LTHII5LcbiKreg9zMUTWb5hK913
+	f5Fp6+ZW+fN/pFUO9JE3dln5BTesu9R9ms90S6vVlFJjZWgL4cbx+GqSYQke8c52jB8=
+X-Gm-Gg: AZuq6aIGWUS3II+6AMGyZA1wcpZy/ErEx2ivSm7qSlZrRNxO5ART2MUyZEZ/ZAKiy4W
+	msPPmxs+ujDvMEKGCXFrYIwBx5rkM1B1WafHiOnJDMXYaIe450nSwtBgsuTKC7ZLxxAGa6AW0Cs
+	Mzl2Qedv9JrFDQAdMEm6vlCtOJdbhpSirgEVvX8667rXbHM0JU82Anz0dkRl+p5ndNOZtGjR1Pb
+	Ih+VVTYoZEfQmFKOOU+wu5gyp3r2eqjS3+B/Tvsn5PQjVGTGhVO3P5p+TR+apriW9i5RmawMmE1
+	OZljeTL6oeZpOt8tr6Ke+a5+AApDyQAILg4Y3QYI+Vvx3NmJyOAQldrBXvoydVRHWM3p1FjkH+3
+	/vQHF/PtA15wmxDE/Iy+IscFbojSiXmltUUgmcjubrpsxgRm2DrIGcE4WrTVjV/EEDIPFY/xluT
+	OcC+bfZX0Zm+1NGM+vX3Ool0rJC1yJJ/pLUDIXwGFegyo4NhY/Z+0FMqG6I0IGLlQ=
+X-Received: by 2002:a05:600c:34c7:b0:47d:25ac:3a94 with SMTP id 5b1f17b1804b1-4805cf5eb16mr69099575e9.17.1769428176854;
+        Mon, 26 Jan 2026 03:49:36 -0800 (PST)
+Received: from ?IPV6:2001:a61:1306:1a01:7fb:321b:3b69:f667? ([2001:a61:1306:1a01:7fb:321b:3b69:f667])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-480470c1dc6sm318920465e9.10.2026.01.26.03.49.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jan 2026 03:49:36 -0800 (PST)
+Message-ID: <9239ddef-c197-4fbd-8e88-691766bda3e2@suse.com>
+Date: Mon, 26 Jan 2026 12:49:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vkL3S-00000005uuG-2qFN@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 26 Jan 2026 11:46:50 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: usb: kaweth: remove eth_addr_t typedef
+ and bcast_addr definition
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20260125083501.34513-1-enelsonmoore@gmail.com>
+ <20260125083501.34513-4-enelsonmoore@gmail.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20260125083501.34513-4-enelsonmoore@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253456-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253457-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: C583087CE1
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email,suse.com:dkim,suse.com:mid]
+X-Rspamd-Queue-Id: D023687DF9
 X-Rspamd-Action: no action
 
-rk3506, rk3528 and rk3588 have the rmii_mode bit in the clock GRF
-register rather than the gmac GRF register. Provide a mask for this
-field in the clock register, and convert these SoCs to use this.
-Add the necessary code in rk_gmac_powerup() to write this field.
+Hi,
 
-This allows us to get rid of these SoCs set_to_rmii() function. As
-such, we need to mark these SoCs as supporting RMII mode.
+unfortunately I must NACK this patch. Let me explain:
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 62 +++++++------------
- 1 file changed, 22 insertions(+), 40 deletions(-)
+On 25.01.26 09:34, Ethan Nelson-Moore wrote:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 443d3bd62cae..3a03b2d57140 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -38,6 +38,7 @@ struct rk_clock_fields {
- 	u16 gmii_clk_sel_mask;
- 	u16 rmii_clk_sel_mask;
- 	u16 rmii_gate_en_mask;
-+	u16 rmii_mode_mask;
- 	u16 mac_speed_mask;
- };
- 
-@@ -708,21 +709,15 @@ static int rk3506_init(struct rk_priv_data *bsp_priv)
- 	}
- }
- 
--static void rk3506_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	unsigned int id = bsp_priv->id, offset;
--
--	offset = (id == 1) ? RK3506_GRF_SOC_CON11 : RK3506_GRF_SOC_CON8;
--	regmap_write(bsp_priv->grf, offset, RK3506_GMAC_RMII_MODE);
--}
--
- static const struct rk_gmac_ops rk3506_ops = {
- 	.init = rk3506_init,
--	.set_to_rmii = rk3506_set_to_rmii,
- 
- 	.clock.io_clksel_io_mask = BIT_U16(5),
- 	.clock.rmii_clk_sel_mask = BIT_U16(3),
- 	.clock.rmii_gate_en_mask = BIT_U16(2),
-+	.clock.rmii_mode_mask = BIT_U16(1),
-+
-+	.supports_rmii = true,
- 
- 	.regs_valid = true,
- 	.regs = {
-@@ -746,10 +741,6 @@ static const struct rk_gmac_ops rk3506_ops = {
- #define RK3528_GMAC_CLK_RX_DL_CFG(val)	GRF_FIELD(15, 8, val)
- #define RK3528_GMAC_CLK_TX_DL_CFG(val)	GRF_FIELD(7, 0, val)
- 
--#define RK3528_GMAC0_PHY_INTF_SEL_RMII	GRF_BIT(1)
--#define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
--#define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
--
- static int rk3528_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -757,6 +748,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock_grf_reg = RK3528_VO_GRF_GMAC_CON;
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(3);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(2);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(1);
- 		bsp_priv->supports_rgmii = false;
- 		return 0;
- 
-@@ -766,6 +758,7 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(11, 10);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(10);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(9);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(8);
- 		return 0;
- 
- 	default:
-@@ -776,9 +769,6 @@ static int rk3528_init(struct rk_priv_data *bsp_priv)
- static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
--		     RK3528_GMAC1_PHY_INTF_SEL_RGMII);
--
- 	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
- 		     DELAY_ENABLE(RK3528, tx_delay, rx_delay));
- 
-@@ -787,16 +777,6 @@ static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 		     RK3528_GMAC_CLK_TX_DL_CFG(tx_delay));
- }
- 
--static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	if (bsp_priv->id == 1)
--		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
--			     RK3528_GMAC1_PHY_INTF_SEL_RMII);
--	else
--		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON,
--			     RK3528_GMAC0_PHY_INTF_SEL_RMII);
--}
--
- static void rk3528_integrated_phy_powerup(struct rk_priv_data *bsp_priv)
- {
- 	rk_gmac_integrated_fephy_powerup(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-@@ -810,9 +790,11 @@ static void rk3528_integrated_phy_powerdown(struct rk_priv_data *bsp_priv)
- static const struct rk_gmac_ops rk3528_ops = {
- 	.init = rk3528_init,
- 	.set_to_rgmii = rk3528_set_to_rgmii,
--	.set_to_rmii = rk3528_set_to_rmii,
- 	.integrated_phy_powerup = rk3528_integrated_phy_powerup,
- 	.integrated_phy_powerdown = rk3528_integrated_phy_powerdown,
-+
-+	.supports_rmii = true,
-+
- 	.regs_valid = true,
- 	.regs = {
- 		0xffbd0000, /* gmac0 */
-@@ -988,9 +970,6 @@ static const struct rk_gmac_ops rk3576_ops = {
- #define RK3588_GRF_GMAC_CON0			0X0008
- #define RK3588_GRF_CLK_CON1			0X0070
- 
--#define RK3588_GMAC_CLK_RMII_MODE(id)		GRF_BIT(5 * (id))
--#define RK3588_GMAC_CLK_RGMII_MODE(id)		GRF_CLR_BIT(5 * (id))
--
- static int rk3588_init(struct rk_priv_data *bsp_priv)
- {
- 	switch (bsp_priv->id) {
-@@ -1000,6 +979,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(3, 2);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(2);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(1);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(0);
- 		return 0;
- 
- 	case 1:
-@@ -1008,6 +988,7 @@ static int rk3588_init(struct rk_priv_data *bsp_priv)
- 		bsp_priv->clock.gmii_clk_sel_mask = GENMASK_U16(8, 7);
- 		bsp_priv->clock.rmii_clk_sel_mask = BIT_U16(7);
- 		bsp_priv->clock.rmii_gate_en_mask = BIT_U16(6);
-+		bsp_priv->clock.rmii_mode_mask = BIT_U16(5);
- 		return 0;
- 
- 	default:
-@@ -1023,9 +1004,6 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 	offset_con = bsp_priv->id == 1 ? RK3588_GRF_GMAC_CON9 :
- 					 RK3588_GRF_GMAC_CON8;
- 
--	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
--		     RK3588_GMAC_CLK_RGMII_MODE(id));
--
- 	regmap_write(bsp_priv->grf, RK3588_GRF_GMAC_CON7,
- 		     RK3588_GMAC_RXCLK_DLY_ENABLE(id) |
- 		     RK3588_GMAC_TXCLK_DLY_ENABLE(id));
-@@ -1035,16 +1013,9 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 		     RK3588_GMAC_CLK_TX_DL_CFG(tx_delay));
- }
- 
--static void rk3588_set_to_rmii(struct rk_priv_data *bsp_priv)
--{
--	regmap_write(bsp_priv->php_grf, RK3588_GRF_CLK_CON1,
--		     RK3588_GMAC_CLK_RMII_MODE(bsp_priv->id));
--}
--
- static const struct rk_gmac_ops rk3588_ops = {
- 	.init = rk3588_init,
- 	.set_to_rgmii = rk3588_set_to_rgmii,
--	.set_to_rmii = rk3588_set_to_rmii,
- 
- 	.gmac_grf_reg_in_php = true,
- 	.gmac_grf_reg = RK3588_GRF_GMAC_CON0,
-@@ -1052,6 +1023,8 @@ static const struct rk_gmac_ops rk3588_ops = {
- 	.clock_grf_reg_in_php = true,
- 	.clock_grf_reg = RK3588_GRF_CLK_CON1,
- 
-+	.supports_rmii = true,
-+
- 	.php_grf_required = true,
- 	.regs_valid = true,
- 	.regs = {
-@@ -1429,6 +1402,15 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
- 			return ret;
- 	}
- 
-+	if (bsp_priv->clock.rmii_mode_mask) {
-+		val = rk_encode_wm16(intf == PHY_INTF_SEL_RMII,
-+				     bsp_priv->clock.rmii_mode_mask);
-+
-+		ret = rk_write_clock_grf_reg(bsp_priv, val);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	/*rmii or rgmii*/
- 	switch (bsp_priv->phy_iface) {
- 	case PHY_INTERFACE_MODE_RGMII:
--- 
-2.47.3
+>   /****************************************************************
+>    *     usb_eth_dev
+>    ****************************************************************/
+> @@ -185,7 +183,7 @@ struct kaweth_ethernet_configuration
+>   	__u8 size;
+>   	__u8 reserved1;
+>   	__u8 reserved2;
+> -	eth_addr_t hw_addr;
+> +	u8 hw_addr[ETH_ALEN];
+
+You may note that this data structure is declared __packed
+and the member hw_addr is preceded by three members of type __u8.
+That means that it is located on a _three_ byte alignment.
+
+>   	__u32 statistics_mask;
+>   	__le16 segment_size;
+>   	__u16 max_multicast_filters;
+> @@ -882,7 +880,6 @@ static int kaweth_probe(
+
+[..]
+   
+> @@ -991,9 +988,7 @@ static int kaweth_probe(
+>   	dev_info(dev, "MTU: %d\n", le16_to_cpu(kaweth->configuration.segment_size));
+>   	dev_info(dev, "Read MAC address %pM\n", kaweth->configuration.hw_addr);
+>   
+> -	if(!memcmp(&kaweth->configuration.hw_addr,
+> -                   &bcast_addr,
+> -		   sizeof(bcast_addr))) {
+> +	if (is_broadcast_ether_addr((const u8 *)&kaweth->configuration.hw_addr)) {
+
+Here you are using is_broadcast_ether_addr(). Let me quote
+from the documentation on this helper:
+
+/**
+  * is_broadcast_ether_addr - Determine if the Ethernet address is broadcast
+  * @addr: Pointer to a six-byte array containing the Ethernet address
+  *
+  * Return: true if the address is the broadcast address.
+  *
+  * Please note: addr must be aligned to u16.
+  */
+
+That requirement is not met. This code will bomb on ARM for example.
+
+	HTH
+		Oliver
+
+NACKED-BY: Oliver Neukum <oneukum@suse.com>
 
 
