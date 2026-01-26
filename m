@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-253323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMNFM3QGd2lGawEAu9opvQ
-	(envelope-from <netdev+bounces-253323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:15:16 +0100
+	id 4LV0HaYGd2lGawEAu9opvQ
+	(envelope-from <netdev+bounces-253324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:16:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5DA84652
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:15:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D749B8467D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:16:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2CABD300103B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 06:15:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69EC4300822A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 06:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA0826A08F;
-	Mon, 26 Jan 2026 06:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FC826D4DF;
+	Mon, 26 Jan 2026 06:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYiS41Hl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqZdU/DI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EBD225397
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 06:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087C0264614
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 06:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769408114; cv=none; b=Yk86XYRGz62kqr7PL+M+On3mLfeunHmRgalLWzpzRYCDFSdUZKM45+20Q6a+KnAAhbeB8UGytoxYu4HA8jAxYn/Jla0ZRUjXUCY9++VUobZ/UEiUSjZNVNb8xjrW96Pghsvlf74tu+L44MS6SmVqPFXhkPtOsO0p8pfAkqo4LbE=
+	t=1769408119; cv=none; b=MmzFuCctfnjvgYS/sphtG2AFMU9GpeU/+KfpsSHVkdoHt4SMnkGZlW8fZ4dDhUJHk5FkoGz4X2nFJmSpdTeEpBu3bQGojyLUup73DXmiRIu4Irs8bQi5BkH9l2tI1HplEKnBQ2yLUgXgnNFuunAguF1IKfhD/gvmMwiLRGNsLAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769408114; c=relaxed/simple;
-	bh=Gr4+bhITkx9F49J6vCV5YDDpTEU83G+mJCTwFLDDtl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bInCZTQCulVY+tc4KWZmobdcQSGYwwSiZcfsc4/kd0EBb1U5/WeaIFwYE9YsUROA4gQe0Ugv5VJwd7v4LchWu3N8XxNQSmhxXQ5C3xC5qvgTolhbUJQc83WX6gTg1nZcEfVQfnYtNOa0YeeuZymYkEGIGa/Tr95nvw8r5drhIzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NYiS41Hl; arc=none smtp.client-ip=209.85.210.176
+	s=arc-20240116; t=1769408119; c=relaxed/simple;
+	bh=eK9IEQxX6bPuQTZmqf3fBzqSi3lRKs7tjHBkjQMOx5I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=b+hXuXZEd4cWXRjdFQgss3mYJMzJUGu4AZS6SIfgHgU4xfcSkguXKDf6shFInwh1QIq+U3iyWiZPC6h3o6O9gToLyIN1fU8rlR0+H0GpW6gLj/q3H68afZeGDA10Rsqv7vSsOqMSjgQgsHza10YsmS2xn6Q3VfM0jwkvfRZOlto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqZdU/DI; arc=none smtp.client-ip=209.85.214.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81dab89f286so2039458b3a.2
-        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 22:15:12 -0800 (PST)
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2a0ac29fca1so31097215ad.2
+        for <netdev@vger.kernel.org>; Sun, 25 Jan 2026 22:15:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769408112; x=1770012912; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFiEoE4nGi5AEu3XaJSow5Ow49M6nU87RQ3hnz+11yU=;
-        b=NYiS41HlzXQaZ7aCKT5sG17Ja2vaerxgtfqI3MwSF/rEJTEBQN/2eR1wm+H3rY1kp/
-         ZVeBolSvqrxx0kMN5JYn1ENE/TxVOgAjJpG+1pvICChaygp3t1sDW2C/RkbLqWa01yT0
-         KNu9tgm7e3azoS+4LDL5oj0sr9xPvdu0hpwWc1cRuu+h9jTB7T0Sn84byPoFwejADxM7
-         hdiXYhS2FBJ540mWNj/sBO7aPiJTb9MeC7m9HIVCuN5d5VFuaHlD2OhDerM+MdrLhtQZ
-         WTdue9mzWP4NHdZwATskHhGQ0VBHSrUC5ElBP9xJfmbEHTB8cmvurAgcVnOjuGGaKBTl
-         IR4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769408112; x=1770012912;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769408117; x=1770012917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bFiEoE4nGi5AEu3XaJSow5Ow49M6nU87RQ3hnz+11yU=;
-        b=EfDXiF71xzICupY/MCNFiWgD0p7qP2tMw83lAnqwrzg++58JpraElaKI2b0E85f0cm
-         Ix6YHUKwZed4H63oVQViGsKSM9pw0rt7vmMYxfdptrhKKwUmC0GdLF1Re/2yuYc9w0F1
-         /NXia+soX+cs6gYQQnExuUwV3nqadjAFvZr9GDLanLH8L5Tw+pjZ7fHRxMv1xFPui42I
-         mRSqXlFve8WdJ2yMsZk0lhf0gBSiTlshj6dp82Fw4C9DCkOPlHdmI+DWUXQyavVLS/xg
-         /RRtgNBU7P+J7zW9l5FhmUCK5D8tQYU+sryhL4ak5w1dZ/r1Pug6gF8kIQVJPF2g0J78
-         O+yw==
-X-Gm-Message-State: AOJu0YzBHlOWPpMvmBe4NIuC2bmDgaDBPXhJZmil4lue+bDxYyL+rbcv
-	DdFWvAD+iK3sRtpzYWDbt/rp8WpY88WT9IH/vNrYmPNRdaS4BHdVdpiLEiyVlQ==
-X-Gm-Gg: AZuq6aKjYlGhL1tQO8BXGCBMWo+0onC6j2Bd3U5B9xnW4HKLFv3CRuzSD9xEK6cdv0+
-	hTuBUDvlrO1gfzTVznd52TTOpQpihNU+KhPw7Vsi2sdXaW1VMjP/eLyPW2YHt1Sw1w7NxOnkPxR
-	Fp8A1OUHG/oNnfKUw1f+qUSrzi+PGqXNR5q7XtNtL0FQVFsoO41O3UinVzUgRJvXslPQJLXGuIq
-	h+Z4IfAU2SYJu63cNCSfNtl3EK7TfjPXeeB/gUbTzAxMdYN2FlpUDIUB1ClqRYJE65WdE+I3rjV
-	59YKleX876K4s5ctRySiGbGWPZdv0Zad9lL2+qZJo8XnmxCFXFfJt+NOHmuYcHksEOgR0LyCsVW
-	gxP+d45XQR+kuUzN/RCMNTYXXYkfz255H6x77sACmizlxSa2sr1xdAJuFZ2ojuPudCpLJ7qdf3Y
-	2y1oj1Ln2xawYdYyRUN7fG4gY827qPzJfiR0oukJZ2ZcD3mZYQpq7IsA==
-X-Received: by 2002:a05:6a20:1604:b0:38d:e716:c1d4 with SMTP id adf61e73a8af0-38e9f0f3ecemr2689078637.3.1769408112024;
-        Sun, 25 Jan 2026 22:15:12 -0800 (PST)
+        bh=p1BtHozxghZJqgMzo9JEMTRARSx5nNU/9Ls9XrihPew=;
+        b=QqZdU/DIoAP32fY2NRBhsdfz0TayJ1RcDDiy4CmVKklVPK9M78lCRZcp82GNyzym2M
+         2zwCuwr5PSst3QfKHcjXGNZ+YjGSwnmEww5Ha+snvGV3j4tO0noncCrS1HtrkHh6S/Gu
+         tNwWb5t57VU2O0cEzW8uxUVR8MbbbUbxJBH8IhIGYcu4vWf+VnaOg2H6BaAkxLcDchP+
+         Puc2KWBZmz1uLU3KC7QQODZ/4CEfnHP0wgiW34bwofI/ktVoqAaVzauLBdlwcD97eNoz
+         UG4hSQoCnFDaMY8cp6CV4MuWMA0oliqOExme/Qv7WUvAawHl6kTlvrLnJqFX2P/mapN8
+         Cb1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769408117; x=1770012917;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=p1BtHozxghZJqgMzo9JEMTRARSx5nNU/9Ls9XrihPew=;
+        b=I4SSbJ25wVvzMbLyQ/neSXd8L0qt8yNXN72QWHN51wal0O4U0UrdRY0AZ15zdHpWL6
+         pOq8vJwMXUDpuF2E2+y3YG96mc0YyUbO/3hYF9oXivfEBnqRJhIsJzLm7UjwqKq9i7gS
+         8py1O5E2jmvqZm8Np4xHT7jKOAlKO895/L6embmIzAe752j6PT+SqU/Li+TcNm01R610
+         pHT+Ls55I/J0KxpV4BZr7cfuJLE2308aiRDlXhS6kPM1EjA2W5qYK6fFYer9o+OSYC7N
+         T6Hulixnqe60i4MJu2QW1teQyMZawFs9baregKwRa7wcaV6G5P0Kz9igM0hx/HD/vDHe
+         ObdQ==
+X-Gm-Message-State: AOJu0Yx0g4lJ3bKuZWIUr8kVncTPihGzoXXx8XCQxi7eGB+Q2dkhN9y5
+	1xx7XBhmDFpM4Nh7Tv2LcgE1KO6ghHX/7IXlHphFAILBI15IuWEUPBkaF9XzxbO2
+X-Gm-Gg: AZuq6aLaC5bQMQW2oLEdAfZtO1xpBUYuhDqDzNiHIY0rn3k9D31tdwpy8FP6OMK/iDv
+	dNVaTe9cbjUoWmJZFOLtZ66+nO9j3eN+0pj0RkB9u8u9YgZRKYAzXMGtPwumH3Euyer/+xrHxq2
+	fD/IGOM3okjQ0Siem8jtRt5Qkwu0C2AnJUD74HXyzvzIJVoXj2AeK9nJyAtrfFMcgPbijhk9Zff
+	zidVDs+UUIoLYJXlbxw/TDgmz+8Y+9Cw+G5vD0P5DbPJP5+jOdfwv7uBkdxbTFTQ66ZP5VlxKi2
+	gwS0CD+TbMy9VBmbQHaUyJ5udExppPPCbkstczw6LQw6toTXwnVb/krhm+vYfclOfsIATNszYp/
+	QDLFzBKyDi5cnrRLe1vsTWZmEfS2PRixmlbudS2bVANteql0ON/k4xmO7EVsTEfIyovXaX9D3c2
+	c/YWV64hf8bpuHj7QC+Jg3A64dngUGK8JiG1W4BK4NkkGxikvOWb51EuTAZg7l+wJn
+X-Received: by 2002:a17:902:d58b:b0:2a1:e19:ff0 with SMTP id d9443c01a7336-2a8452b2031mr32575335ad.39.1769408117209;
+        Sun, 25 Jan 2026 22:15:17 -0800 (PST)
 Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802ede745sm79477325ad.44.2026.01.25.22.15.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802ede745sm79477325ad.44.2026.01.25.22.15.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jan 2026 22:15:11 -0800 (PST)
+        Sun, 25 Jan 2026 22:15:16 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -88,10 +90,12 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/3] net: dsa: sync dsa_mall_policer_tc_entry with FLOW_ACTION_POLICE
-Date: Mon, 26 Jan 2026 14:13:28 +0800
-Message-ID: <20260126061340.757543-1-mmyangfl@gmail.com>
+Subject: [PATCH net-next 1/3] net: dsa: sync dsa_mall_policer_tc_entry with FLOW_ACTION_POLICE
+Date: Mon, 26 Jan 2026 14:13:29 +0800
+Message-ID: <20260126061340.757543-2-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260126061340.757543-1-mmyangfl@gmail.com>
+References: <20260126061340.757543-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,48 +109,103 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,nxp.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-253323-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,nxp.com,bootlin.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253324-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 6D5DA84652
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D749B8467D
 X-Rspamd-Action: no action
 
-Fix tc command which should not succeed:
+New options were introduced to FLOW_ACTION_POLICE
+after struct dsa_mall_policer_tc_entry was added. The following commands
+will succeed on DSA ports:
 
+  tc qdisc add dev lan1 handle ffff: ingress
   tc filter add dev lan1 ingress matchall skip_sw action police \
     pkts_rate 80000 pkts_burst 100 mtu 1000 conform-exceed ok
 
-David Yang (3):
-  net: dsa: sync dsa_mall_policer_tc_entry with FLOW_ACTION_POLICE
-  net: dsa: add dsa_mall_policer_tc_entry_type() helper
-  net: dsa: ocelot: check policer entry
+resulting 1. burst_pkt, rate_pkt_ps, etc. being ignored; 2. burst and
+rate_bytes_per_sec set to 0 without any error.
 
- drivers/net/dsa/ocelot/felix.c |  4 ++++
- include/net/dsa.h              | 25 +++++++++++++++++++++++++
- net/dsa/dsa.c                  | 33 +++++++++++++++++++++++++++++++++
- net/dsa/user.c                 |  7 +++++--
- 4 files changed, 67 insertions(+), 2 deletions(-)
+Instead of making decisions for drivers, extend struct
+dsa_mall_policer_tc_entry to all options for FLOW_ACTION_POLICE in favor
+of full functionalities, such as packet rate mode.
 
+Drivers must reject unsupported combinations.
+
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ include/net/dsa.h | 11 +++++++++++
+ net/dsa/user.c    |  7 +++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 6b2b5ed64ea4..4c177b168ec8 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -21,6 +21,7 @@
+ #include <linux/phylink.h>
+ #include <net/devlink.h>
+ #include <net/switchdev.h>
++#include <net/flow_offload.h>
+ 
+ struct dsa_8021q_context;
+ struct tc_action;
+@@ -220,6 +221,16 @@ struct dsa_mall_mirror_tc_entry {
+ struct dsa_mall_policer_tc_entry {
+ 	u32 burst;
+ 	u64 rate_bytes_per_sec;
++	u64 peakrate_bytes_ps;
++	u32 avrate;
++	u16 overhead;
++	u64 burst_pkt;
++	u64 rate_pkt_ps;
++	u32 mtu;
++	struct {
++		enum flow_action_id act_id;
++		u32 extval;
++	} exceed, notexceed;
+ };
+ 
+ /* TC matchall entry */
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index f59d66f0975d..4c9cff629d5c 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -1497,8 +1497,11 @@ dsa_user_add_cls_matchall_police(struct net_device *dev,
+ 	mall_tc_entry->cookie = cls->cookie;
+ 	mall_tc_entry->type = DSA_PORT_MALL_POLICER;
+ 	policer = &mall_tc_entry->policer;
+-	policer->rate_bytes_per_sec = act->police.rate_bytes_ps;
+-	policer->burst = act->police.burst;
++	/* so sad, flow_offload.h did not export the type of act->police, and
++	 * it's a nightmare to copy it field by field
++	 */
++	static_assert(sizeof(act->police) == sizeof(*policer));
++	memcpy(policer, &act->police, sizeof(*policer));
+ 
+ 	err = ds->ops->port_policer_add(ds, dp->index, policer);
+ 	if (err) {
 -- 
 2.51.0
 
