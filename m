@@ -1,177 +1,257 @@
-Return-Path: <netdev+bounces-253542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNLZJNCZd2n0iwEAu9opvQ
-	(envelope-from <netdev+bounces-253542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:44:00 +0100
+	id uH9tN3abd2n0iwEAu9opvQ
+	(envelope-from <netdev+bounces-253543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:51:02 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CE58AD6C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:43:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803068AF12
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B5A883007203
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:43:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23319307221A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED01344DA0;
-	Mon, 26 Jan 2026 16:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D932E345757;
+	Mon, 26 Jan 2026 16:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKtDcd4D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtC4TyBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90E9344D96;
-	Mon, 26 Jan 2026 16:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310F43242B1
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769445829; cv=none; b=aENtBFr+zT6mzY7u8wd3mTgmnAAqNxIwjZp5JrgwthcsRrNkSbouszbp0BWRqCkvgBQe51o/XWG4Xqc1X0VaSaigF2rGy5PIxJ2fRwibpI/acFJ2eZNesCXCARv1F1EnoPFY/QGkmktZt7YjB4Pf8QeEhiIC451hoFRI6AKQzJs=
+	t=1769445910; cv=none; b=JiaEqdyDGca+psI0e0Q/XiEaaNPELzPS4RHUNOOV0H8Q6n/r0sbswOQ5/7VREnBXsuFJ2U1O0/i4jRvCn+szBqpuMoLSX1GOTO8cnwcyfcLVIlgqLurMuDToIhIVLw5dtHFE+vc7s8be7HTR9N4cOtwTe3Co9MM1D87eE30U9k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769445829; c=relaxed/simple;
-	bh=3UWo939L6qAo1geRf3z+Q3XrV55NBiqDxtsdzDzUB6k=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=irDPpDj7wPFWmMBWKaaZX8SHbKV9SmNP+R0w9NPrGtrItM1YcVVqZSRatQ/pgwc8pn/cauUWCckG74uf7da8+YsqRZJsFAVQY5s59XSGW+d0vXvDmuyK075TYAYt96sPM/XFUXKe8GQrO9PRAhJlzl59T7T3QqlBq0iaII3UHoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKtDcd4D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 124F9C16AAE;
-	Mon, 26 Jan 2026 16:43:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769445829;
-	bh=3UWo939L6qAo1geRf3z+Q3XrV55NBiqDxtsdzDzUB6k=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=qKtDcd4DkHQQDVYgjbB3yh+iEJckhc4+eFnIZABjylnmieShF4BU7PWM6GBa2YSIB
-	 PER9KA6GLxWXwfAu2Sm40KZk18ub0YK/m4h/BH3yFJNfaqUtMBIQmZ7srJSxhCpxah
-	 SFIXeAYUdnShTBBSWC6IjycupLW7HsZZdBuKz0qvMKPJH5v0mpvtg13PWRJ2ueJV2E
-	 nbOVxD3lfJBRHICe/PrTZ1s71ZTkCsg4WVe/TK7SnHRqXTumbg5FAPHKn0qDyDU/P/
-	 VQ3jCFvlmyIGj11qA+BGjuZmaaIKebzhaH3xAGZXzEOZY9g4oETw0qlsC1FGw+F8oG
-	 SnaWmBusf/5zw==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 1D3E4F40068;
-	Mon, 26 Jan 2026 11:43:48 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Mon, 26 Jan 2026 11:43:48 -0500
-X-ME-Sender: <xms:xJl3aacQ0WAVnPG1svfKIfYFhSM4VDe9T--lNfvOeOdFYWWEHS2wKA>
-    <xme:xJl3afD0fBUbVs5ZoNje6daQN3CgVQRMJK1qtf-qWvL3gk5OqTT3_Le7E2OYY1X6K
-    kqC0l3viLRQWTbpXLK4Jvn4oPYIo9axtPBuBY93upnydAKC6H-Epy3z>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduheekudekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
-    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
-    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
-    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
-    hilhdrtghomhdpnhgspghrtghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprhgt
-    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepsghfih
-    gvlhgushesfhhivghlughsvghsrdhorhhgpdhrtghpthhtoheplhhlfhgrmhhsvggtsehg
-    mhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehlihhhrghogihirghnghesihhsrhgtrdhishgtrghsrdgrtgdrtghn
-    pdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmh
-    hssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtohepthhrohhnughmhieskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:xJl3aeKkEI4SocJDGBRW4txsUaNP6moLnLr9BKe2seSDAIW3UQMbGw>
-    <xmx:xJl3aUp-F01NdIKcuDvs61M-BQEt1QOLbQrhgihchcFGWSkeFcJhJw>
-    <xmx:xJl3aVhdq_zubHyDkCCurqhW3bwbxuWGI-F7l9V3RH_eBOunsa4tXA>
-    <xmx:xJl3aTYaWrne4dpudBq2-Ho_HaiIrWPicM96W3FfYKImyUL__uD4eg>
-    <xmx:xJl3adnqsKxEyO6csg7-ZPbYI5m17qQn0BZ_MChYHYgJxlEtZ_0GX7MX>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id ED751780070; Mon, 26 Jan 2026 11:43:47 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1769445910; c=relaxed/simple;
+	bh=tE3Uxmr9IsUS6mJokT1N6n0qqojE4/K3/OnOvYAIYeY=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dlvt3YwMyVqeNME2NDWuLE/+/YCCh/+sWfDLH7W0TZM2tjvQGVIbusRtMBUPQq37JYb63PRCIqgeHqcH2TDpOYU8cFrsgs8/CjQhrU7F1/IUhrb5l6uywxHGBBYpBDsxJu5voZ+5JdvFChUiIkKfnQb+VPP8QySa/UpchiqgNo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WtC4TyBb; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59b710d46ceso4530688e87.3
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 08:45:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769445904; x=1770050704; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=67gINf8nv70IfGM4en9MXo18NWyvtv/UqgQR1tCJ+fU=;
+        b=WtC4TyBbh8yct5Y9IFzhxu13T+HfvneZprkfZ0mAaiIw3wzxldQspYusobja5GsuP4
+         X5kOWhqhF39lZCG16fxs/fKUIE5THQRzlVq0W4vNDmcl48JAaEHKD8EQbCswT9K7Om0M
+         +9jnqNGKD5Jc2BTFPAdgcLWw8d77Zwvbj6uPV75RsXJvj8oTtWJOqVeruQUhcBuRSwTb
+         z7/PqGTIdy6K9vh0VBxxpA0zyNBnqmk6UH0YXkBF8MMw0CDVbt5K7arQBIXmU7Y/9Dhi
+         xkW9VCVt8gU3LAlm3Ymxey5lhrSOs9uyZ8Pyl5YRI9s+puriPhqfgADmu6rXkB/9illR
+         NDhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769445904; x=1770050704;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=67gINf8nv70IfGM4en9MXo18NWyvtv/UqgQR1tCJ+fU=;
+        b=sJwwo3osO9oL//JHr10OjDFQJ/0zMCRJMjc7Mzn4VsOukTg0hrNxSlIh+tUDOacSRi
+         i7ZQXa/fLgBPHpofOaJHC6CBcV3Qx+bcLHNCokFcXoSqgsnIfV54+dMbNZ/1N1PhoDRq
+         fYNau6YuJg72sBR5fhVw2Z5vNVQAe523qwh8eQzA/Hz/AlKhW3lOZgfp/DrCkpCI9qg5
+         E6ybr6A6FKHXXZUbDC4qBDeZ8Dlog+jGWhbT+pUMB7yQLiHufN4WXku3YaSKF2RcQ8wr
+         wfIcZXOxXjvHdzBZU3dyjhkQq30NzTqQZvQKTVXV0QA/p9ofWaMUPfAv7NAzH/yfM5jN
+         KZPA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5clSnj7nBqebCRuFaPNf27E2mQTDZM9PJKiCzWl8JysSYgl5e67+eCsNGkhsQZ97KhGeHOQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwU+PI1Qop15bnhPoiafvUxu48pGa2WAZpOsW/Qe+fAWTAKedQr
+	reGMnexUZVBJQSZJv5UthXoJ8cvs9gHFGSEh9lUiHudHVhtPHK2OVbXp
+X-Gm-Gg: AZuq6aKu4XvhEcTUi7phZJ/jZ/dhZsNiKialtVRTeqmGf//QQTZdVy7rDZuHWPlMMvJ
+	ScaMLiHXfx1PXuHYlaG5OwQh04kxJVpzAEDDzWBapU7Jw7lCVfYCE9r1nEq+/TCfvX083YvUlKZ
+	b8Tb7MJn6hCBe1/M79VsASSnIKBc8n+i8cQ4x2s30Z66/LOrSk2pJ6jZXCW7dk8AtxPpzXBr2Sw
+	3j3VFxcvsLhX2izVp8nB87pUKCz9K1mnugyZI8VqDwvOOddPLZEGnKhxI97ve8bBcQ6quCfVKxL
+	30v+IEEDxjpYqes6enj297P8cEgLc8ZaeYvbPMqA5kbqGH1HnX7P3tEPX2pY+3pfcQ7aDErdWNx
+	ETavsF2rsz/d4TAiD2FmIGPTodCK/7u0+6bqeAdgIPPKUtKyJodW9
+X-Received: by 2002:a05:6512:3f06:b0:59d:f2a4:3e98 with SMTP id 2adb3069b0e04-59df360afd1mr1753347e87.4.1769445903361;
+        Mon, 26 Jan 2026 08:45:03 -0800 (PST)
+Received: from milan ([2001:9b1:d5a0:a500::24b])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59de492cd32sm2794304e87.100.2026.01.26.08.45.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 08:45:02 -0800 (PST)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@milan>
+Date: Mon, 26 Jan 2026 17:45:00 +0100
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <aXeaDMczmQl6wn9v@milan>
+References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
+ <20260123082349.42663-3-alibuda@linux.alibaba.com>
+ <aXPEFdEdtSmd6AzF@milan>
+ <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <aXdB3lsm3w0fJT3Q@milan>
+ <20260126120226.GA6424@j66a10360.sqa.eu95>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AhhugJyzaYCV
-Date: Mon, 26 Jan 2026 11:43:18 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Haoxiang Li" <lihaoxiang@isrc.iscas.ac.cn>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- davem@davemloft.net, edumazet@google.com, "Jakub Kicinski" <kuba@kernel.org>,
- pabeni@redhat.com, "Simon Horman" <horms@kernel.org>, llfamsec@gmail.com,
- simo@redhat.com, bfields@fieldses.org
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Message-Id: <9b028652-eb5b-4faf-bf9c-6d64f0ed7a9f@app.fastmail.com>
-In-Reply-To: <20260126021047.2478741-1-lihaoxiang@isrc.iscas.ac.cn>
-References: <20260126021047.2478741-1-lihaoxiang@isrc.iscas.ac.cn>
-Subject: Re: [PATCH] sunrpc: fix a resource leak in gss_proxy_save_rsc()
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126120226.GA6424@j66a10360.sqa.eu95>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[isrc.iscas.ac.cn,kernel.org,davemloft.net,google.com,redhat.com,gmail.com,fieldses.org];
+	TAGGED_FROM(0.00)[bounces-253543-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253542-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,app.fastmail.com:mid];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[urezki@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: A7CE58AD6C
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 803068AF12
 X-Rspamd-Action: no action
 
-
-
-On Sun, Jan 25, 2026, at 9:10 PM, Haoxiang Li wrote:
-> In gss_proxy_save_rsc(), if gss_import_sec_context() fails,
-> call gss_mech_put() to release the reources acquired by
-> gss_mech_get_by_OID().
->
-> Fixes: 030d794bf498 ("SUNRPC: Use gssproxy upcall for server RPCGSS 
-> authentication.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-> ---
->  net/sunrpc/auth_gss/svcauth_gss.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/sunrpc/auth_gss/svcauth_gss.c 
-> b/net/sunrpc/auth_gss/svcauth_gss.c
-> index a8ec30759a18..cdae1f23adfc 100644
-> --- a/net/sunrpc/auth_gss/svcauth_gss.c
-> +++ b/net/sunrpc/auth_gss/svcauth_gss.c
-> @@ -1268,8 +1268,10 @@ static int gss_proxy_save_rsc(struct 
-> cache_detail *cd,
->  						ud->out_handle.len,
->  						gm, &rsci.mechctx,
->  						&expiry, GFP_KERNEL);
-> -		if (status)
-> +		if (status) {
-> +			gss_mech_put(gm);
->  			goto out;
-> +		}
-
-Is the reference already released via free_svc_cred() ? This
-change might introduce a double-free bug.
-
-
+On Mon, Jan 26, 2026 at 08:02:26PM +0800, D. Wythe wrote:
+> On Mon, Jan 26, 2026 at 11:28:46AM +0100, Uladzislau Rezki wrote:
+> > Hello, D. Wythe!
+> > 
+> > > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
+> > > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
+> > > > > > > find_vm_area() provides a way to find the vm_struct associated with a
+> > > > > > > virtual address. Export this symbol to modules so that modularized
+> > > > > > > subsystems can perform lookups on vmalloc addresses.
+> > > > > > > 
+> > > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> > > > > > > ---
+> > > > > > >  mm/vmalloc.c | 1 +
+> > > > > > >  1 file changed, 1 insertion(+)
+> > > > > > > 
+> > > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> > > > > > > index ecbac900c35f..3eb9fe761c34 100644
+> > > > > > > --- a/mm/vmalloc.c
+> > > > > > > +++ b/mm/vmalloc.c
+> > > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
+> > > > > > >  
+> > > > > > >  	return va->vm;
+> > > > > > >  }
+> > > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
+> > > > > > >  
+> > > > > > This is internal. We can not just export it.
+> > > > > > 
+> > > > > > --
+> > > > > > Uladzislau Rezki
+> > > > > 
+> > > > > Hi Uladzislau,
+> > > > > 
+> > > > > Thank you for the feedback. I agree that we should avoid exposing
+> > > > > internal implementation details like struct vm_struct to external
+> > > > > subsystems.
+> > > > > 
+> > > > > Following Christoph's suggestion, I'm planning to encapsulate the page
+> > > > > order lookup into a minimal helper instead:
+> > > > > 
+> > > > > unsigned int vmalloc_page_order(const void *addr){
+> > > > > 	struct vm_struct *vm;
+> > > > >  	vm = find_vm_area(addr);
+> > > > > 	return vm ? vm->page_order : 0;
+> > > > > }
+> > > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
+> > > > > 
+> > > > > Does this approach look reasonable to you? It would keep the vm_struct
+> > > > > layout private while satisfying the optimization needs of SMC.
+> > > > > 
+> > > > Could you please clarify why you need info about page_order? I have not
+> > > > looked at your second patch.
+> > > > 
+> > > > Thanks!
+> > > > 
+> > > > --
+> > > > Uladzislau Rezki
+> > > 
+> > > Hi Uladzislau,
+> > > 
+> > > This stems from optimizing memory registration in SMC-R. To provide the
+> > > RDMA hardware with direct access to memory buffers, we must register
+> > > them with the NIC. During this process, the hardware generates one MTT
+> > > entry for each physically contiguous block. Since these hardware entries
+> > > are a finite and scarce resource, and SMC currently defaults to a 4KB
+> > > registration granularity, a single 2MB buffer consumes 512 entries. In
+> > > high-concurrency scenarios, this inefficiency quickly exhausts NIC
+> > > resources and becomes a major bottleneck for system scalability.
+> > > 
+> > > To address this, we intend to use vmalloc_huge(). When it successfully
+> > > allocates high-order pages, the vmalloc area is backed by a sequence of
+> > > physically contiguous chunks (e.g., 2MB each). If we know this
+> > > page_order, we can register these larger physical blocks instead of
+> > > individual 4KB pages, reducing MTT consumption from 512 entries down to
+> > > 1 for every 2MB of memory (with page_order == 9).
+> > > 
+> > > However, the result of vmalloc_huge() is currently opaque to the caller.
+> > > We cannot determine whether it successfully allocated huge pages or fell
+> > > back to 4KB pages based solely on the returned pointer. Therefore, we
+> > > need a helper function to query the actual page order, enabling SMC-R to
+> > > adapt its registration logic to the underlying physical layout.
+> > > 
+> > > I hope this clarifies our design motivation!
+> > > 
+> > Appreciate for the explanation. Yes it clarifies an intention.
+> > 
+> > As for proposed patch above:
+> > 
+> > - A page_order is available if CONFIG_HAVE_ARCH_HUGE_VMALLOC is defined;
+> > - It makes sense to get a node, grab a spin-lock and find VM, save
+> >   page_order and release the lock.
+> > 
+> > You can have a look at the vmalloc_dump_obj(void *object) function.
+> > We try-spinlock there whereas you need just spin-lock. But the idea
+> > is the same.
+> > 
+> > --
+> > Uladzislau Rezki
 > 
->  		getboottime64(&boot);
->  		expiry -= boot.tv_sec;
-> -- 
-> 2.25.1
+> Hi Uladzislau,
+> 
+> Thanks very much for the detailed guidance, especially on the correct
+> locking pattern. This is extremely helpful.I will follow it and send
+> a v2 patch series with the new helper implemented in mm/vmalloc.c.
+> 
+> Thanks again for your support.
+> 
+Welcome!
 
--- 
-Chuck Lever
+--
+Uladzislau Rezki
 
