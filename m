@@ -1,252 +1,159 @@
-Return-Path: <netdev+bounces-253401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIhQDzk4d2nhdAEAu9opvQ
-	(envelope-from <netdev+bounces-253401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:47:37 +0100
+	id yE/9F0Q5d2nhdAEAu9opvQ
+	(envelope-from <netdev+bounces-253406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:52:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97ED7862DF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:47:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D880B863A3
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 86D1F300AEFB
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:47:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 071D43019FEC
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2526C32D0CE;
-	Mon, 26 Jan 2026 09:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D741B32D7FA;
+	Mon, 26 Jan 2026 09:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vnz/Yy/D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DDh9TbMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A9810E3
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769420854; cv=none; b=JQaQus20qHgSn8QtVQE0BYV2AVh/lclrFTdNzhufiYIaMu79+TTj+TLG8s0t6kot9yeqRKiZhGShvvnUXDnjB0BqkDTyCNAMYJaWRP3SrkSBDgywaM6xrdxzTSD+ucAIgLkRVYStqvi4mVRjdNMJ34gUYqGDGtsZCZa3HPbRFvU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769420854; c=relaxed/simple;
-	bh=NCfiALUxUfvAlwDgUNB51OMAugK2pgymVaa514mSZyc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fpZgM6HowyyAWKukfxZXsrpVabHgFaGSSuT3Menqt4k3dwSeZnMOLLRn154xWPpAOgRpERhubbESjMY0xJexyOsN8uCHuwWU2mg+B6a6NoqNPf2N6TR/esnt4GMcAyaTpoUpUmujMTCbIHZ50bDy5J/yw3Qg2GZbQ0efU4Ra9SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vnz/Yy/D; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-12339e2e2c1so2693223c88.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 01:47:32 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5127932BF22
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769421092; cv=pass; b=B5gYi8DTXjrxOzOBfL55RwsdM6ECO9nVSWF/rKYwSDLRt8BM5BjWdQU/P2QRKMlP2r/Q3+b8iKMLm0awK9lPhWvH7G3PGBPE/hAuTLI0od8hUCrOWS02JxInyF600nb8nFEJjYrSL+UcycGNKWVhP4tamzKA5ByCZJDtvpeBvQw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769421092; c=relaxed/simple;
+	bh=R4m3xAHpZRktXg6t2RbX0pRcPJIu5idPDcFCjkEwSGA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lkE3glcxiBHyH8HXT6ya+Xg4YJHFA8M52+bqeBAFkkBMkP/wW9rxeQtcDYQ73sFnB43e7z6h48jiwbqQteurJptkwmJc1aOJbmm7E3YqcoQsMsHibhqJqbmzfYDWfLeedx2XPyL6TGjQX1Wcx3wKjBzvzh7OkEj+YNMvoYc98sI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DDh9TbMf; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-502a789834fso37484901cf.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 01:51:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769421090; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Vc6QtuWixglvgLk0aHL3tjB17hzMyT8xaqi1AoQv/BtQNRowIQxXfwaMoWbh4fQVdL
+         y0CCi/LuYWDIznxA+559EYlBhgy/6CUK2JB7up+K1Vo1r45yvXz5UrnlOVmVLJGfZGs6
+         m7ELLTwhgwC53Op6pfFkBDEC0/HTvK2KQ0Cg3LW+PhnA4DbG0eygSS0IxaAEHwACYYEa
+         9sUMPeeCouEtu00sBEBO7HyH0pR8vf5Y0NxoMkIZF3iMampepmAmAngiGOOovrUX4iuq
+         Iz4DYdxQWbgeEG8W13p4nIEvMsjSeuMfiMT6GRkJ3X7EgD3+cZVBc8t4ZuBcxBrAfcYi
+         kFVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=R4m3xAHpZRktXg6t2RbX0pRcPJIu5idPDcFCjkEwSGA=;
+        fh=coVQQnhgWwBCGiLnd9QPTYWxb/gSoNg7CzXNYAJxWyM=;
+        b=F80i+RJFo2zGW9pUh2V5816JyWCWESZ/ZbXV4p5vX/QGOysHataiPlc1LyLcivtVYW
+         KisEYpMzIN/dvlatAvvIb9VXgGDgUmywvhcNkW5bUHooo1A/GAWSYTI3JiYidy1u0kEC
+         BePaMLdgdAhA3f4+Npn3Cdykh+7M3yDHFh/sdhFYnXJzoy3erSaPTXkyYEM0pk4pI58y
+         KcBMfOmmFIo9rBLC3at5tVSfSzlg15ym5jHf0Fq5EyBc6E7VeLEwyhP3SPB15JUZ3F5g
+         FSzNy/JFBDJ9tjTxB9vp4Tf1tLQRoh7Tf/nx7G0n86iMjY6DiXrUlwWAYlOo9pWMMFPL
+         wX7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769420852; x=1770025652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gdtQRDCU8hM43eKPfMFM0Zqsb+dtZgi7zi3Ez1tCjVE=;
-        b=Vnz/Yy/DISD8CaoidAYofclNrB5OpkrdKL+b2wZPD8ACsP17oiPUt5DGb+blY/yhbA
-         G/QjCu5emtN6Ex63jFRF5FSw+L/ie4v0IqAKDF/U2ActfzuzK/RRf4K2nFm52G5cncpA
-         sKkEAz2Fsj7yyQM8xkD1A4fR4WiMucGnxEpE8e0G/IX+w78yLrX3NeNdCNpBGwJfpCR9
-         eze+Po6mhf0hy568ycUGuXszgqJTq9cqD3HQmK7ZfwpApT/rHP7WTfOAD+wNSLwUjAK7
-         ypg08SCpT1uzdO0uE0mkcW0w6WDFn9WlATTzp1c7HYjZdMTgSxiQSskMGN9ng1nzfibB
-         QazA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769420852; x=1770025652;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1769421090; x=1770025890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gdtQRDCU8hM43eKPfMFM0Zqsb+dtZgi7zi3Ez1tCjVE=;
-        b=b99nsFSpM2UsvakcH1PvypKr5CzRKbrxmAf3LizE71HEDQhInoc520joMWcs6VUGe/
-         mxBnebCyrXaPWFh+pUhaTzcljmuqVgio7aMwUO2m26OkLvaEakSUv010bmxwTTH7tVPN
-         j6A+YeCiq1V9cRROiTChZXeR0rvkieWIgENdZ2IJwjVfSX28ELva5xjS/Gkjy0/3EB1Y
-         AnwJ4CyvkS9TKoN2y2UFZ3XbZ8e2B1TLMCIJExlorhaufLlx1LL19bxgbmVEt9hS/WL8
-         yMoZkOVqCaa6WnP63+MYeUAVfKZ5dJTDWI7d/yC3vhfo2hDTmdLqb0725oY1KGR+i9LH
-         44zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXID/6849YZeau6EDxU2B1uy+weP/ne7Eeq2SGF6p2JnkIU99nXxTzHINOXfFx9q9kt44AUXRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4lEeaP8DWCQpjDZ7eCtEYPprIAe29/5Bwe6xrTuPZEVsMxp26
-	a/wC3GZ0k6l6O/EKUPGt1D1vAOSPQWiklFiyVc+gMRzosy5pwIvxLVRmzIxzoQ==
-X-Gm-Gg: AZuq6aJ3ZwnyXg9aEsUpt1ucRopIOymWFWU8beNL3FXK+H7HzGNfPSlwljTeSLkViMu
-	VO2GcH6jEI30bX4VGZoEqenFgzvDLqW32yGMZ3KtMSXIJ/qpdaUuPOx8uz00DgC29AXotanZ8UI
-	C4vZENuLsYkAJlTc+NT9tS7JxEa4ES2R2ZnyVp4mDyQykTwH686rBNEGa5hPSFyJ6dJEHDvGqPX
-	8qRItLoHOX5aJ5xe2LWIp3zbJw5itAxHo85Q5edJig51vyAIsYY0H3s60mJbzi6j5rUXjDyo0cc
-	wWdzw7IFhtObmI+HmX2AnDPywflicNCd95DU0Xypzdx4c9NKbFFYlrgQijy2CUXHuYLZR7JB6qW
-	QGQsmycsiLcklN07wz3x7eLXIWdsbYMz8ZJtxu+0m+U9hhVf9wVJQzRya5rvU85rNcpGGZOeu7I
-	ehjRM=
-X-Received: by 2002:a05:7022:2389:b0:11e:3e9:3e91 with SMTP id a92af1059eb24-1248ee063efmr1791962c88.26.1769420851763;
-        Mon, 26 Jan 2026 01:47:31 -0800 (PST)
-Received: from debian ([74.48.213.230])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1247d91b9e1sm18428029c88.5.2026.01.26.01.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 01:47:31 -0800 (PST)
-From: Qiliang Yuan <realwujing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: brauner@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Qiliang Yuan <realwujing@gmail.com>,
-	Qiliang Yuan <yuanql9@chinatelecom.cn>
-Subject: [PATCH] netns: optimize netns cleaning by batching unhash_nsid calls
-Date: Mon, 26 Jan 2026 04:47:18 -0500
-Message-ID: <20260126094718.1031407-1-realwujing@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        bh=R4m3xAHpZRktXg6t2RbX0pRcPJIu5idPDcFCjkEwSGA=;
+        b=DDh9TbMfpRNLI/Q3D6u7Gju6ygO74XJAmBllry3yRF61b2dE3YLHhuigiC5iGffR/p
+         ei1vDk56P8Xkma/pWZYjfFK0I1TCg15+MbBwZR51WXDgTOlC+vPq8haG6uZDMVzKjHwh
+         ytPC22Cy8ICKSFp7nBOkW/4KsKJFMSEkEKZ3eUGpUTun/fb5YBp5EUenu5qt5cdCWpzH
+         L5cVJEwxmy5ntE2Xl5Vo7kiNiKkio51KbtAXcYquI5NhFmZ0+LbvBCPUHDlMOkbmfPk9
+         jqkwVbck+19sQxUJOZh6cHlw88mEt8XmnkbuM9NPX0sq5sm7bBKTT13MpLj+zGKq2TOO
+         GzDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769421090; x=1770025890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=R4m3xAHpZRktXg6t2RbX0pRcPJIu5idPDcFCjkEwSGA=;
+        b=rm00b/7E9vdQY62jpe7NGOoX+hX6HFpmpp+ii/2NuyRXeiRKOGZ5JJpRgGzt9AkxhM
+         p99yyki4ZNZ8mpuXozUfon5JCvRVNZzt6qolZiDrBscxqWKU0Z4Gq7hl8sZ8yp8ZY1CT
+         8ECv4is8YdMYZD4PE8fIIKmfczcw2bCey8eAW7qD3f4EM2sOGzq52siuISpEoJ1ew7jT
+         FYwFiq/ROro1fmYq74KvFomUqJHvOSzVxL3qldTtp3Tluz+PWVCNgqMedoYNBTd3LtA5
+         4JWXNTtYposs3eYElxPJDk+20GmWqpBl/CQAfC5XdMZQWJtbqZ3IihZALYSxA44ItIID
+         JjRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXw4nJLOLPLLIDyElkUEFcBmvtOALCs9EpwlXchp1ZURKYCxYdpk+LkdYxTSIuFuFDf7nDv1R0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzclwFmySeTQ1eRAwAhcOCTSxBvCLuZOXDfsVi50X5LHTEjs9mE
+	BhhB21cf9aXvRTqbxfchB9BFcrdUJKEuJYIu1wgavVRUCjO3mXpfMcbosJXpUTbUVMRpZsLHO7o
+	aQOA++NAdq7oU4b+SAsvDrb0DF9E/ZFDJuilNVhvg
+X-Gm-Gg: AZuq6aJBuluCtigXkRBEGDZq9S1bGDk+gG8wEzruguvknKuJXQZL+wMBqBbQPeKu/po
+	vV+EZfX8VIdHsTrG2gPn+EEYPYkzpmZ56PBYFwwVcjGOl1ae0bmUjKjuzFQhbtbq2o5dUuXA3E1
+	ZKwkyK6m1v5/veRaVY2L8w7xpNHRxWrVkXnZIoTV6xBPWVzuoZ6TahNzaEC9mSs/sK8p1uz77TC
+	EilQAyykx2qi1BxxH0qCMu/Y7fRcfNsWYmDtcmb6BQNE8d82K/Rcb0cNGls45/jIAJcihtH
+X-Received: by 2002:ac8:5f0a:0:b0:502:a299:3937 with SMTP id
+ d75a77b69052e-50314b7a488mr46484011cf.6.1769421089873; Mon, 26 Jan 2026
+ 01:51:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAGfirfeHMgBUq-Q8tCn8dr2tHVJdQtZbS0JMutqF+b04T3EoWw@mail.gmail.com>
+ <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
+In-Reply-To: <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Jan 2026 10:51:16 +0100
+X-Gm-Features: AZwV_QhoW6y9dJF92KThKWLM-xeyeWqQdHuRiD05sQswIeaD5u2k60dYy6cQhZY
+Message-ID: <CANn89iJrXSHouF4ZnnoVYz4Q47J5jkwU4OuXMpJi3Orox4uT_Q@mail.gmail.com>
+Subject: Re: [BUG] KASAN: slab-use-after-free Read in u32_classify
+To: =?UTF-8?B?6rmA6rCV66+8?= <km.kim1503@gmail.com>
+Cc: davem@davemloft.net, Jamal Hadi Salim <jhs@mojatatu.com>, jiri@resnulli.us, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	xiyou.wangcong@gmail.com, horms@kernel.org, syzkaller@googlegroups.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,chinatelecom.cn];
-	TAGGED_FROM(0.00)[bounces-253401-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253406-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,mojatatu.com,resnulli.us,kernel.org,vger.kernel.org,redhat.com,gmail.com,googlegroups.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 97ED7862DF
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D880B863A3
 X-Rspamd-Action: no action
 
-Currently, unhash_nsid() scans the entire net_namespace_list for each
-netns in a destruction batch during cleanup_net(). This leads to
-an O(M * N) complexity, where M is the batch size and N is the total
-number of namespaces in the system.
+On Mon, Jan 26, 2026 at 5:30=E2=80=AFAM =EA=B9=80=EA=B0=95=EB=AF=BC <km.kim=
+1503@gmail.com> wrote:
+>
+> Apologies, I set the wrong title and KASAN report. The root cause is
+> out-of-bounds, not use-after-free. Please find the correct KASAN
+> report below.
 
-Reduce the complexity to O(N) by introducing an 'is_dying' flag to mark
-the entire batch of namespaces being destroyed. This allows unhash_nsid()
-to perform a single-pass traversal over the system's namespaces. In
-this pass, for each survivor namespace, iterate through its netns_ids
-and remove any mappings that point to a marked namespace.
+This is great, do you have a patch to fix the issue and get full
+credit on the resolution ?
 
-Signed-off-by: Qiliang Yuan <realwujing@gmail.com>
-Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
----
- include/net/net_namespace.h |  1 +
- net/core/net_namespace.c    | 50 +++++++++++++++++++++++++++----------
- 2 files changed, 38 insertions(+), 13 deletions(-)
-
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index cb664f6e3558..bd1acc6056ac 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -69,6 +69,7 @@ struct net {
- 
- 	unsigned int		dev_base_seq;	/* protected by rtnl_mutex */
- 	u32			ifindex;
-+	bool			is_dying;
- 
- 	spinlock_t		nsid_lock;
- 	atomic_t		fnhe_genid;
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index a6e6a964a287..d24e46c034f2 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -413,6 +413,8 @@ static __net_init int preinit_net(struct net *net, struct user_namespace *user_n
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
-+	net->ifindex = 0;
-+	net->is_dying = false;
- 	net->user_ns = user_ns;
- 
- 	idr_init(&net->netns_ids);
-@@ -624,9 +626,10 @@ void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
- }
- EXPORT_SYMBOL_GPL(net_ns_get_ownership);
- 
--static void unhash_nsid(struct net *net, struct net *last)
-+static void unhash_nsid(struct net *last)
- {
- 	struct net *tmp;
-+
- 	/* This function is only called from cleanup_net() work,
- 	 * and this work is the only process, that may delete
- 	 * a net from net_namespace_list. So, when the below
-@@ -636,20 +639,34 @@ static void unhash_nsid(struct net *net, struct net *last)
- 	for_each_net(tmp) {
- 		int id;
- 
--		spin_lock(&tmp->nsid_lock);
--		id = __peernet2id(tmp, net);
--		if (id >= 0)
--			idr_remove(&tmp->netns_ids, id);
--		spin_unlock(&tmp->nsid_lock);
--		if (id >= 0)
--			rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
--					  GFP_KERNEL);
-+		for (id = 0; ; id++) {
-+			struct net *peer;
-+			bool dying;
-+
-+			rcu_read_lock();
-+			peer = idr_get_next(&tmp->netns_ids, &id);
-+			dying = peer && peer->is_dying;
-+			rcu_read_unlock();
-+
-+			if (!peer)
-+				break;
-+			if (!dying)
-+				continue;
-+
-+			spin_lock(&tmp->nsid_lock);
-+			if (idr_find(&tmp->netns_ids, id) == peer)
-+				idr_remove(&tmp->netns_ids, id);
-+			else
-+				peer = NULL;
-+			spin_unlock(&tmp->nsid_lock);
-+
-+			if (peer)
-+				rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0,
-+						  NULL, GFP_KERNEL);
-+		}
- 		if (tmp == last)
- 			break;
- 	}
--	spin_lock(&net->nsid_lock);
--	idr_destroy(&net->netns_ids);
--	spin_unlock(&net->nsid_lock);
- }
- 
- static LLIST_HEAD(cleanup_list);
-@@ -688,8 +705,15 @@ static void cleanup_net(struct work_struct *work)
- 	last = list_last_entry(&net_namespace_list, struct net, list);
- 	up_write(&net_rwsem);
- 
-+	llist_for_each_entry(net, net_kill_list, cleanup_list)
-+		net->is_dying = true;
-+
-+	unhash_nsid(last);
-+
- 	llist_for_each_entry(net, net_kill_list, cleanup_list) {
--		unhash_nsid(net, last);
-+		spin_lock(&net->nsid_lock);
-+		idr_destroy(&net->netns_ids);
-+		spin_unlock(&net->nsid_lock);
- 		list_add_tail(&net->exit_list, &net_exit_list);
- 	}
- 
--- 
-2.51.0
-
+Thank you
 
