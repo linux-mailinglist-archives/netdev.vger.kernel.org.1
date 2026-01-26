@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-253616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253617-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCUXChrud2kVmgEAu9opvQ
-	(envelope-from <netdev+bounces-253616-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:43:38 +0100
+	id CM3yMh7ud2kVmgEAu9opvQ
+	(envelope-from <netdev+bounces-253617-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:43:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464678E01F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:43:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0537C8E026
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:43:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CDB433007214
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 22:43:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B32A300846C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 22:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288CC30AABC;
-	Mon, 26 Jan 2026 22:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95323093CB;
+	Mon, 26 Jan 2026 22:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IX9O3dAu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g23y7XMj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5B630AAD7
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 22:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA43630AD02;
+	Mon, 26 Jan 2026 22:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769467408; cv=none; b=dDIakCJkyXiRqssMvPnaJ84qaFJuMbbTELXqeED2uAHfg078lxi8qr2K7Yp64n246NBsmsXkBkoeAaSnE5US1LoDWnX+DFsMKeM+J3g72rOotfV7QQp0pID+uhtsPii8BfGEE1oCJSuxvJghSM9Tui3uyKlqq2QZRhruWuwTGk0=
+	t=1769467410; cv=none; b=NmzkMR4UVGyrQQThZxRGs9bPM9RWdIewzMcvJ40Ole8yZk3dNCJhhGrPMKc7YjJO2oDML6tZwYcCINgecw2y8htxMJIYmUEeLdpE0WvEooIrmE8Lnr0lK2e7nnrFCZNk+JcOd1/y3Je0nkajgrHcqenS3XdY1HDsGFnG7Jy3mhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769467408; c=relaxed/simple;
-	bh=q910RMZJmcFFwz/3GvXa/Rf0uIeafQ6yr3VNqIN4hUI=;
+	s=arc-20240116; t=1769467410; c=relaxed/simple;
+	bh=5q1Wf9vuZXDeyI1+7XA5Y6Y1giwsGPq1AGESntabpvI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K6Jz2Z7R0qxLgm4bScNbSW4DK7Yde02of1PsbPD+ub0K0E8s846W/d8xc8Pe12YM1SY00heSfaMTFYzvIo5TtLgm3Lzj83yeWIQ9wn2JyE4786f3/xw9RJ92Lm8ZAal0AteSedAxv93K1l7B2ZH1BOAoCrA/0OuqNPmuzNc9pK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IX9O3dAu; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=Zu69EIS9EUm8uD3o46GslfwlNOxh54IrKue68gaPVRUpvoT3YudDEe8BmFT3RB+sxWFjwqrY7F9I3qlaR+/K6A2LaBRwQj//NLZ49hl2F7nw8ID69opJdfsELsTnwM49FPxKcvTD+bS4XCQaknRW7AgsyrwsUTzI+SRauWarl0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g23y7XMj; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769467404; x=1801003404;
+  t=1769467405; x=1801003405;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=q910RMZJmcFFwz/3GvXa/Rf0uIeafQ6yr3VNqIN4hUI=;
-  b=IX9O3dAust/EBrJTIZazSm3WAsCKUsGPMAj3hc4DY1AB9Sl8+pNaYJYe
-   2wRXR6jTjHyPax09Oxi1WkSA6PpoSBdP9F+39Gycm8ytIpajWuxtnlqcm
-   xltyt5GkFm56csW5IROe0OhoYwhxnGR/o7e1v/MSSTSyAbYS/l7w4U+Di
-   BYHdc07xP2jIFU7Rx93+7bZGLZC59pYO3gg2dCxgvJEfwb0/RI5V2/nNm
-   urmsn6pvxgJdsqdOZDWxe5Zgb0GjxB+EszmhT4scnGQ0RNHw+wLldA+Kq
-   31maZB4n8vAjKwyy9R5iQCvYMqA5dJyH4OhKY1xUwhtktz6SipDm/rDbs
-   A==;
-X-CSE-ConnectionGUID: 3xjmzQ7ZQVu9LFW80l5k9g==
-X-CSE-MsgGUID: HaO1LH4NTiqEaXPmeJjEzA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="70369409"
+  bh=5q1Wf9vuZXDeyI1+7XA5Y6Y1giwsGPq1AGESntabpvI=;
+  b=g23y7XMj3iif20IbNbxlSzEhf2P6vtd07q7rsVGPhRsm1UxKQ4l78RYk
+   awMFIpGpZvFnapm48iceQoRlYS6MByI9J7qQ/S84VFLoc19WMr8OTOEZ3
+   s3Pm9nPc3CNGfjd3pDD1xaVmRzJzmJBcIh6z9rdg+MA3vCBavjNfDunQQ
+   BHSPKG8pCid9c9BDUVHjLuUGoZxQAYZn4hwySJFneegFEgnBN3u86Hafr
+   xCUVKesH+T061jhcEDETOY+TxiMLya/piHNspzVMtWqNqOZAsB1QN4OdG
+   oo2VQuQX4tUrewD0X0cezKzDQIj/G1iaWOsfgV5bh5mZ/KCeYn6OxIHMO
+   w==;
+X-CSE-ConnectionGUID: e6Fw5nLSQhKxe/VE+9Ytxg==
+X-CSE-MsgGUID: tjQ556e8R3GMMHl1sSgHRg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="70369420"
 X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
-   d="scan'208";a="70369409"
+   d="scan'208";a="70369420"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 14:43:24 -0800
-X-CSE-ConnectionGUID: T+HdY8C/ThWJ9KiJvFR6tg==
-X-CSE-MsgGUID: SWr30mmoTfqggdUGiHso4g==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 14:43:25 -0800
+X-CSE-ConnectionGUID: yJQW2NxWSWmpmYmTerAmHA==
+X-CSE-MsgGUID: McfdtltMTA2mjLRQG4wiqA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
-   d="scan'208";a="230754298"
+   d="scan'208";a="230754311"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa002.fm.intel.com with ESMTP; 26 Jan 2026 14:43:23 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,14 +68,24 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
+Cc: YiFei Zhu <zhuyifei@google.com>,
+	anthony.l.nguyen@intel.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	bpf@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Mina Almasry <almasrymina@google.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net-next 6/7] ice: reshuffle and group Rx and Tx queue fields by cachelines
-Date: Mon, 26 Jan 2026 14:43:10 -0800
-Message-ID: <20260126224313.3847849-7-anthony.l.nguyen@intel.com>
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 7/7] idpf: export RX hardware timestamping information to XDP
+Date: Mon, 26 Jan 2026 14:43:11 -0800
+Message-ID: <20260126224313.3847849-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260126224313.3847849-1-anthony.l.nguyen@intel.com>
 References: <20260126224313.3847849-1-anthony.l.nguyen@intel.com>
@@ -89,278 +99,167 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[google.com,intel.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253617-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253616-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mpg.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 464678E01F
+	NEURAL_HAM(-0.00)[-0.994];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,osuosl.org:email]
+X-Rspamd-Queue-Id: 0537C8E026
 X-Rspamd-Action: no action
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+From: YiFei Zhu <zhuyifei@google.com>
 
-Place the fields in ice_{rx,tx}_ring used in the same pieces of
-hotpath code closer to each other and use
-__cacheline_group_{begin,end}_aligned() to isolate the read mostly,
-read-write, and cold groups into separate cachelines similarly
-to idpf.
+The logic is similar to idpf_rx_hwtstamp, but the data is exported
+as a BPF kfunc instead of appended to an skb to support grabbing
+timestamps in xsk packets.
 
-Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+A idpf_queue_has(PTP, rxq) condition is added to check the queue
+supports PTP similar to idpf_rx_process_skb_fields.
+
+Tested using an xsk connection and checking xdp timestamps are
+retrievable in received packets.
+
+Cc: intel-wired-lan@lists.osuosl.org
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |   1 -
- drivers/net/ethernet/intel/ice/ice_txrx.c     |   1 -
- drivers/net/ethernet/intel/ice/ice_txrx.h     | 122 ++++++++++--------
- drivers/net/ethernet/intel/ice/ice_txrx_lib.c |   3 -
- 4 files changed, 70 insertions(+), 57 deletions(-)
+ drivers/net/ethernet/intel/idpf/xdp.c | 31 +++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/xdp.h | 20 +++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 2c007669c197..c6bc29cfb8e6 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3388,7 +3388,6 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 				 */
- 				rx_rings[i].next_to_use = 0;
- 				rx_rings[i].next_to_clean = 0;
--				rx_rings[i].next_to_alloc = 0;
- 				*vsi->rx_rings[i] = rx_rings[i];
- 			}
- 			kfree(rx_rings);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index eea83b26b094..396326a6d5be 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -574,7 +574,6 @@ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
- 		     PAGE_SIZE);
- 	memset(rx_ring->desc, 0, size);
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index 0fe435fdbb6c..2b60f2a78684 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -2,6 +2,7 @@
+ /* Copyright (C) 2025 Intel Corporation */
  
--	rx_ring->next_to_alloc = 0;
- 	rx_ring->next_to_clean = 0;
- 	rx_ring->next_to_use = 0;
+ #include "idpf.h"
++#include "idpf_ptp.h"
+ #include "idpf_virtchnl.h"
+ #include "xdp.h"
+ #include "xsk.h"
+@@ -398,8 +399,38 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
+ 				    pt);
  }
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-index c51b1e60f717..b6547e1b7c42 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-@@ -267,34 +267,49 @@ struct ice_tstamp_ring {
- } ____cacheline_internodealigned_in_smp;
  
- struct ice_rx_ring {
--	/* CL1 - 1st cacheline starts here */
-+	__cacheline_group_begin_aligned(read_mostly);
- 	void *desc;			/* Descriptor ring memory */
- 	struct page_pool *pp;
- 	struct net_device *netdev;	/* netdev ring maps to */
--	struct ice_vsi *vsi;		/* Backreference to associated VSI */
- 	struct ice_q_vector *q_vector;	/* Backreference to associated vector */
- 	u8 __iomem *tail;
--	u16 q_index;			/* Queue number of ring */
--
--	u16 count;			/* Number of descriptors */
--	u16 reg_idx;			/* HW register index of the ring */
--	u16 next_to_alloc;
++static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
++{
++	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
++	struct idpf_xdp_rx_desc desc __uninitialized;
++	const struct idpf_rx_queue *rxq;
++	u64 cached_time, ts_ns;
++	u32 ts_high;
++
++	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
++
++	if (!idpf_queue_has(PTP, rxq))
++		return -ENODATA;
++
++	idpf_xdp_get_qw1(&desc, xdp->desc);
++
++	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
++		return -ENODATA;
++
++	cached_time = READ_ONCE(rxq->cached_phc_time);
++
++	idpf_xdp_get_qw3(&desc, xdp->desc);
++
++	ts_high = idpf_xdp_rx_ts_high(&desc);
++	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
++
++	*timestamp = ts_ns;
++	return 0;
++}
++
+ static const struct xdp_metadata_ops idpf_xdpmo = {
+ 	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
++	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
+ };
  
- 	union {
- 		struct libeth_fqe *rx_fqes;
- 		struct xdp_buff **xdp_buf;
- 	};
+ void idpf_xdp_set_features(const struct idpf_vport *vport)
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
+index 7ffc6955dfae..63e56f7d43e0 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.h
++++ b/drivers/net/ethernet/intel/idpf/xdp.h
+@@ -112,11 +112,13 @@ struct idpf_xdp_rx_desc {
+ 	aligned_u64		qw1;
+ #define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
+ #define IDPF_XDP_RX_EOP		BIT_ULL(1)
++#define IDPF_XDP_RX_TS_LOW	GENMASK_ULL(31, 24)
  
--	/* CL2 - 2nd cacheline starts here */
--	struct libeth_fqe *hdr_fqes;
-+	u16 count;			/* Number of descriptors */
-+	u8 ptp_rx;
-+
-+	u8 flags;
-+#define ICE_RX_FLAGS_CRC_STRIP_DIS	BIT(2)
-+#define ICE_RX_FLAGS_MULTIDEV		BIT(3)
-+#define ICE_RX_FLAGS_RING_GCS		BIT(4)
-+
-+	u32 truesize;
-+
- 	struct page_pool *hdr_pp;
-+	struct libeth_fqe *hdr_fqes;
-+
-+	struct bpf_prog *xdp_prog;
-+	struct ice_tx_ring *xdp_ring;
-+	struct xsk_buff_pool *xsk_pool;
-+
-+	/* stats structs */
-+	struct ice_ring_stats *ring_stats;
-+	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
+ 	aligned_u64		qw2;
+ #define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
  
-+	u32 hdr_truesize;
-+
-+	struct xdp_rxq_info xdp_rxq;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
- 	union {
- 		struct libeth_xdp_buff_stash xdp;
- 		struct libeth_xdp_buff *xsk;
- 	};
--
--	/* CL3 - 3rd cacheline starts here */
- 	union {
- 		struct ice_pkt_ctx pkt_ctx;
- 		struct {
-@@ -302,75 +317,78 @@ struct ice_rx_ring {
- 			__be16 vlan_proto;
- 		};
- 	};
--	struct bpf_prog *xdp_prog;
+ 	aligned_u64		qw3;
++#define IDPF_XDP_RX_TS_HIGH	GENMASK_ULL(63, 32)
+ } __aligned(4 * sizeof(u64));
+ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
+ 	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
+@@ -128,6 +130,8 @@ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
+ #define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
+ #define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
+ #define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
++#define idpf_xdp_rx_ts_low(desc)	FIELD_GET(IDPF_XDP_RX_TS_LOW, (desc)->qw1)
++#define idpf_xdp_rx_ts_high(desc)	FIELD_GET(IDPF_XDP_RX_TS_HIGH, (desc)->qw3)
  
- 	/* used in interrupt processing */
- 	u16 next_to_use;
- 	u16 next_to_clean;
-+	__cacheline_group_end_aligned(read_write);
+ static inline void
+ idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
+@@ -149,6 +153,9 @@ idpf_xdp_get_qw1(struct idpf_xdp_rx_desc *desc,
+ 	desc->qw1 = ((const typeof(desc))rxd)->qw1;
+ #else
+ 	desc->qw1 = ((u64)le16_to_cpu(rxd->buf_id) << 32) |
++		    ((u64)rxd->ts_low << 24) |
++		    ((u64)rxd->fflags1 << 16) |
++		    ((u64)rxd->status_err1 << 8) |
+ 		    rxd->status_err0_qw1;
+ #endif
+ }
+@@ -166,6 +173,19 @@ idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
+ #endif
+ }
  
--	u32 hdr_truesize;
--	u32 truesize;
--
--	/* stats structs */
--	struct ice_ring_stats *ring_stats;
--
-+	__cacheline_group_begin_aligned(cold);
- 	struct rcu_head rcu;		/* to avoid race on free */
--	/* CL4 - 4th cacheline starts here */
-+	struct ice_vsi *vsi;		/* Backreference to associated VSI */
- 	struct ice_channel *ch;
--	struct ice_tx_ring *xdp_ring;
--	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
--	struct xsk_buff_pool *xsk_pool;
--	u16 rx_hdr_len;
--	u16 rx_buf_len;
++static inline void
++idpf_xdp_get_qw3(struct idpf_xdp_rx_desc *desc,
++		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
++{
++#ifdef __LIBETH_WORD_ACCESS
++	desc->qw3 = ((const typeof(desc))rxd)->qw3;
++#else
++	desc->qw3 = ((u64)le32_to_cpu(rxd->ts_high) << 32) |
++		    ((u64)le16_to_cpu(rxd->fmd6) << 16) |
++		    le16_to_cpu(rxd->l2tag1);
++#endif
++}
 +
- 	dma_addr_t dma;			/* physical address of ring */
-+	u16 q_index;			/* Queue number of ring */
-+	u16 reg_idx;			/* HW register index of the ring */
- 	u8 dcb_tc;			/* Traffic class of ring */
--	u8 ptp_rx;
--#define ICE_RX_FLAGS_CRC_STRIP_DIS	BIT(2)
--#define ICE_RX_FLAGS_MULTIDEV		BIT(3)
--#define ICE_RX_FLAGS_RING_GCS		BIT(4)
--	u8 flags;
--	/* CL5 - 5th cacheline starts here */
--	struct xdp_rxq_info xdp_rxq;
-+
-+	u16 rx_hdr_len;
-+	u16 rx_buf_len;
-+	__cacheline_group_end_aligned(cold);
- } ____cacheline_internodealigned_in_smp;
+ void idpf_xdp_set_features(const struct idpf_vport *vport);
  
- struct ice_tx_ring {
--	/* CL1 - 1st cacheline starts here */
--	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
-+	__cacheline_group_begin_aligned(read_mostly);
- 	void *desc;			/* Descriptor ring memory */
- 	struct device *dev;		/* Used for DMA mapping */
- 	u8 __iomem *tail;
- 	struct ice_tx_buf *tx_buf;
-+
- 	struct ice_q_vector *q_vector;	/* Backreference to associated vector */
- 	struct net_device *netdev;	/* netdev ring maps to */
- 	struct ice_vsi *vsi;		/* Backreference to associated VSI */
--	/* CL2 - 2nd cacheline starts here */
--	dma_addr_t dma;			/* physical address of ring */
--	struct xsk_buff_pool *xsk_pool;
--	u16 next_to_use;
--	u16 next_to_clean;
--	u16 q_handle;			/* Queue handle per TC */
--	u16 reg_idx;			/* HW register index of the ring */
-+
- 	u16 count;			/* Number of descriptors */
- 	u16 q_index;			/* Queue number of ring */
--	u16 xdp_tx_active;
-+
-+	u8 flags;
-+#define ICE_TX_FLAGS_RING_XDP		BIT(0)
-+#define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
-+#define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
-+#define ICE_TX_FLAGS_TXTIME		BIT(3)
-+
-+	struct xsk_buff_pool *xsk_pool;
-+
- 	/* stats structs */
- 	struct ice_ring_stats *ring_stats;
--	/* CL3 - 3rd cacheline starts here */
-+	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
-+
-+	struct ice_tstamp_ring *tstamp_ring;
-+	struct ice_ptp_tx *tx_tstamps;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
-+	u16 next_to_use;
-+	u16 next_to_clean;
-+
-+	u16 xdp_tx_active;
-+	spinlock_t tx_lock;
-+	__cacheline_group_end_aligned(read_write);
-+
-+	__cacheline_group_begin_aligned(cold);
- 	struct rcu_head rcu;		/* to avoid race on free */
- 	DECLARE_BITMAP(xps_state, ICE_TX_NBITS);	/* XPS Config State */
- 	struct ice_channel *ch;
--	struct ice_ptp_tx *tx_tstamps;
--	spinlock_t tx_lock;
--	u32 txq_teid;			/* Added Tx queue TEID */
--	/* CL4 - 4th cacheline starts here */
--	struct ice_tstamp_ring *tstamp_ring;
--#define ICE_TX_FLAGS_RING_XDP		BIT(0)
--#define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
--#define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
--#define ICE_TX_FLAGS_TXTIME		BIT(3)
--	u8 flags;
-+
-+	dma_addr_t dma;			/* physical address of ring */
-+	u16 q_handle;			/* Queue handle per TC */
-+	u16 reg_idx;			/* HW register index of the ring */
- 	u8 dcb_tc;			/* Traffic class of ring */
-+
- 	u16 quanta_prof_id;
-+	u32 txq_teid;			/* Added Tx queue TEID */
-+	__cacheline_group_end_aligned(cold);
- } ____cacheline_internodealigned_in_smp;
- 
- static inline bool ice_ring_ch_enabled(struct ice_tx_ring *ring)
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-index e68f3e5d35b4..e695a664e53d 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-@@ -20,9 +20,6 @@ void ice_release_rx_desc(struct ice_rx_ring *rx_ring, u16 val)
- 
- 	rx_ring->next_to_use = val;
- 
--	/* update next to alloc since we have filled the ring */
--	rx_ring->next_to_alloc = val;
--
- 	/* QRX_TAIL will be updated with any tail value, but hardware ignores
- 	 * the lower 3 bits. This makes it so we only bump tail on meaningful
- 	 * boundaries. Also, this allows us to bump tail on intervals of 8 up to
+ int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
 -- 
 2.47.1
 
