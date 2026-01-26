@@ -1,220 +1,160 @@
-Return-Path: <netdev+bounces-253459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJZ8CeNXd2lneQEAu9opvQ
-	(envelope-from <netdev+bounces-253459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:02:43 +0100
+	id aMIHHq5Yd2lneQEAu9opvQ
+	(envelope-from <netdev+bounces-253460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:06:06 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81ADC87F36
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C4B87FD2
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 13:06:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABA82301384C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:02:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3E4ED3002E46
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 12:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1A732E724;
-	Mon, 26 Jan 2026 12:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F5433064F;
+	Mon, 26 Jan 2026 12:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wKDDG/mK"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1Zij63wo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B95329DB65;
-	Mon, 26 Jan 2026 12:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769428959; cv=none; b=E8tpB+JHXXGH9ROE2AsBbBeFHzYALLAOH7ni6vkW8lLBZCsTXymmoaG05KMb9wpuuY1VjP8Oz0qP+WDOQ0bsjyvJbplkm3DIudtv8v0/dIGUTCGU2wi9LFZm+OwF5plDzvTeNpSRnAuK/P8PbJHrXRAAYWKa3cqDH16qjdOCQhc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769428959; c=relaxed/simple;
-	bh=1ejtWTPxC7QhHvmJf8Z6FrtDXKg5bPC5ZA2RhQSYSfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XltjkHzefBz8NZ78nn7/+/xVk2yG2OWb7F0sBvdoErHaNchDuRLnGVBiWTEhYxFi6hZfT7kQGXQIlNqPmOCiPaSzteMtDBCa5ridxMx8b6dQaeYuKsdOW6HXvxWfmaGABfvrocf9cqk+7kEN4Vw/TSS0Y80G7dFYXSHgAQOvaoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wKDDG/mK; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769428947; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=Hc/TS0tY4HUOfWDij4WQGV+0xonDLwbrony8b89dCv8=;
-	b=wKDDG/mKMb9rg1cLvtpdeRV6Ej+XS4VU9btC3v9XsSKFdLVhqEG+t93h7q1K7L1/Wg7whOH5s81CgVK5ykmsa2qmEorvV09GLh9AwykleuNC66DIgUwHYrIFTaWqOPdfNe2X+Vx6/sHQEK+eYSzBRhG/g+pRF1dHlE2VzZPhOtU=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wxu-mhe_1769428946 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Jan 2026 20:02:26 +0800
-Date: Mon, 26 Jan 2026 20:02:26 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <20260126120226.GA6424@j66a10360.sqa.eu95>
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
- <20260123082349.42663-3-alibuda@linux.alibaba.com>
- <aXPEFdEdtSmd6AzF@milan>
- <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
- <20260124145754.GA57116@j66a10360.sqa.eu95>
- <aXdB3lsm3w0fJT3Q@milan>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB993346B0
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 12:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769429163; cv=pass; b=fvf3PkABUfDq+CR9ZaXQQ8C02+vD7xJPnwHrhIKSbvM6dgkeiVREjVWE4+1UGdvSxoEhDe6M9cxlhV5LptpCjNsAz6rzLdSM8m1D/aFgnHHprm7NfzgWotBuFpId94zdEsAQeBK8wDkvKGm1UvJJVk+VbnssJGWcum8IXiu+9W4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769429163; c=relaxed/simple;
+	bh=oP1w0AKAafvaItQXb6mntKKiwKfxi+SXpE5jsecUakU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fUj5BtdIZFU3QrkDqGn0YpY60icW1JntWq3xfg3dhc0MxEq38sGZ7Aho/Afs3ypJvSoMDjGqueqNLrpQ5Uwg0rVEcdJRHOLB3dDhnuFMZhkzteOlm5hoae82d1m5KBxyNwvtnpdbFw/j63PumxLCYmeC65e63/MgBH0K473IQlQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=1Zij63wo; arc=pass smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-649605d3664so2620304d50.3
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 04:06:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769429160; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kcSwVgUNy2BsNypGT/093XpK5Z2793A1ywvACyhfPL64kmTC6zCbZylTgDfsge/3cg
+         JesYwhm9YicJywQODIZ+er5LqyBak0Z2dg4kt5WlTPV+yavjfbl+ZZYd8uGQPMFLAaxS
+         9dqGmMpuPwHqOlSfWRKLZjy4A2OjyHO6iC6roH/baMr9EnuWCkmT7vn0xyCqW6hG9Okl
+         RQZHPOJOfv09lo1hfcH2kXHE2D2o5FyEeJmzxex7xvNCO7GJvdkX21jP3X0II4VTBaek
+         mW7UJxq7UXNOgqgf/FoERM0+39CalBlrSRDF7WEBjP/vLUFqtWl1Cik4vUAJRXJUyyaP
+         DNOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oP1w0AKAafvaItQXb6mntKKiwKfxi+SXpE5jsecUakU=;
+        fh=NCv5ASnofJ4t0U0jBAj24Y0mSuwq7rQ0dhhDhzgmYnQ=;
+        b=JE2su73sV9dbfmVaUV6WLpbqOG8AOM/wmA4B53x8jaEI21WQiyJCOiOXYqqR4D80Wj
+         g9Hn2p+Q0ov9vQfV8hXMmRA8p+RlwB6jWAm4joTNqoKyyACpkvDDnriMbzk8T3FQLSAb
+         5GHKehQ3pXQhJ8/Brja+V91eq/ZFsw/eC+1UABDXicABd943J+NXSMJ5m8/mtIfKQgih
+         gbU3XIH78C0EedcPJAWo0rN6NqSk1hwwT+4k6+Oa39CkpU0GP07ng+DQ+ZR0//JDHpB3
+         +cFSSDC9Bvs9bqxVeBPC4IFbe6GYEroCzWqFOdciKU9XEV2kZ55Rjnizf10Cwmt+5U4e
+         jvYQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769429160; x=1770033960; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oP1w0AKAafvaItQXb6mntKKiwKfxi+SXpE5jsecUakU=;
+        b=1Zij63woQHziAQzHVfjY0y4htMadKSomdD1Gk1NuT2QFGYHzCpFCItWy+Zts0MuCO1
+         BYO4/fqsT6nVR88qnIA8EzaNmSWKsQ4GRa3GG4D5IqO2Ac9RbS3MpIAeY7ADB/MEu0Sf
+         zaTI7S+ja2WG81rq+NBhRVDbXB1UnEvLU87RqS4V76kvGI+LglESS4qK0MtLlYeLlkhO
+         ope200MpviqKshoz2d9RbsV+GWdTFDvW9vDc2qDsEfjbEfGZWycEuZyXzAfjW0NFCI92
+         V6n9j9osKa8lG+ivw4hgEe6WQ+iZzShBCFBRGUMN7ETUZEAWSaBuhIYCrZMiSwZa2iBY
+         22SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769429160; x=1770033960;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oP1w0AKAafvaItQXb6mntKKiwKfxi+SXpE5jsecUakU=;
+        b=RuR2fnUSUjdrad4ouh7R9UqlZayyEn4D9YBOYdEiICiafnvIDnkWk4tw4yEOpsvUQh
+         knJXfUj+gFCaJrA27FM/nqRRzhD8JqkY/sw/cLDYGsRaR2SJsTzJb9xiv1AY9iKnRVFC
+         JLoWZb2r/qE585ko0ovlBi2s476CCAicppCm+xx1ra7yGrIb1J0P2k1xH3RnHIXrgWEZ
+         ZY7NQ8Uuz1xVi/M2dJ9Hzv7WCiHXTmikTB7thIBE6uaBxxKDc3twwo8mxv5Jz9kA94K9
+         KslM3lXxCNAvxS3rt1mB/Bml0x/TPOMEY9phre6oMo3EBa9j51QUNdnH3c0VNy5QkiT3
+         Lxhg==
+X-Gm-Message-State: AOJu0YxWKXdEyLOLYZ+NhIbkrBIpx3GR42oELBxyEGR8M9PWy7cbhxk1
+	kR/Is3nMTLTroatmWhblX0NZ/z9KnK/c9NVVlP3FCOe5yN7zb1DHozeHHWlHq+dwizsLPV+x6nE
+	1W1HZYb4tPQZPLu4ogcozu2K1EF1j3tOviz6ROran
+X-Gm-Gg: AZuq6aLMmv+BmZ9ux2XoGUzAgD2kNw0vaq/1c1HE22cmxx3pdxoKShsZpeOAw+uu/O3
+	6Yr73VX8A6VqgRhQX7WSmxFdhNZZqUSjMPND2fj5UtFZzocPS7uKkF1ibCnBH5onTlukDaJMFAl
+	ENYKpVbzma+8O6cbnz7qUkaocGlGyJK2dGaOnGxdPyOMDttTAa0leuBpFgeZdQ243NH7oSpHMSo
+	chLQsAZZvJX6e10ddcYVn+/PVmi6ZL09IfFdYeSaT6+rKlXkxZz2LAQlEvYnIK75mvx0D/DdTTR
+	bdYRG3SbmA==
+X-Received: by 2002:a05:690e:bcd:b0:649:44ac:cc01 with SMTP id
+ 956f58d0204a3-64970ca0981mr2713750d50.55.1769429160609; Mon, 26 Jan 2026
+ 04:06:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXdB3lsm3w0fJT3Q@milan>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-7-p@1g4.org>
+ <c8a8ae22-c5c4-4112-8084-0faa256a1d84@mojatatu.com> <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
+ <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
+In-Reply-To: <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Mon, 26 Jan 2026 09:05:49 -0300
+X-Gm-Features: AZwV_Qg1l52weut7CP9r6jdojpkdt_YToCFRM5o8ot5rEl30mGGPNQW9ipnfrBs
+Message-ID: <CA+NMeC-65UfJyq=34_K9tzf9J=-XFPJqDe1BxLNZv0mnjkxZEA@mail.gmail.com>
+Subject: Re: [PATCH net v3 6/7] net/sched: act_gate: reject empty schedule list
+To: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-253459-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253460-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email,j66a10360.sqa.eu95:mid]
-X-Rspamd-Queue-Id: 81ADC87F36
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 50C4B87FD2
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 11:28:46AM +0100, Uladzislau Rezki wrote:
-> Hello, D. Wythe!
-> 
-> > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
-> > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
-> > > > > > find_vm_area() provides a way to find the vm_struct associated with a
-> > > > > > virtual address. Export this symbol to modules so that modularized
-> > > > > > subsystems can perform lookups on vmalloc addresses.
-> > > > > > 
-> > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> > > > > > ---
-> > > > > >  mm/vmalloc.c | 1 +
-> > > > > >  1 file changed, 1 insertion(+)
-> > > > > > 
-> > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> > > > > > index ecbac900c35f..3eb9fe761c34 100644
-> > > > > > --- a/mm/vmalloc.c
-> > > > > > +++ b/mm/vmalloc.c
-> > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
-> > > > > >  
-> > > > > >  	return va->vm;
-> > > > > >  }
-> > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
-> > > > > >  
-> > > > > This is internal. We can not just export it.
-> > > > > 
-> > > > > --
-> > > > > Uladzislau Rezki
-> > > > 
-> > > > Hi Uladzislau,
-> > > > 
-> > > > Thank you for the feedback. I agree that we should avoid exposing
-> > > > internal implementation details like struct vm_struct to external
-> > > > subsystems.
-> > > > 
-> > > > Following Christoph's suggestion, I'm planning to encapsulate the page
-> > > > order lookup into a minimal helper instead:
-> > > > 
-> > > > unsigned int vmalloc_page_order(const void *addr){
-> > > > 	struct vm_struct *vm;
-> > > >  	vm = find_vm_area(addr);
-> > > > 	return vm ? vm->page_order : 0;
-> > > > }
-> > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
-> > > > 
-> > > > Does this approach look reasonable to you? It would keep the vm_struct
-> > > > layout private while satisfying the optimization needs of SMC.
-> > > > 
-> > > Could you please clarify why you need info about page_order? I have not
-> > > looked at your second patch.
-> > > 
-> > > Thanks!
-> > > 
-> > > --
-> > > Uladzislau Rezki
-> > 
-> > Hi Uladzislau,
-> > 
-> > This stems from optimizing memory registration in SMC-R. To provide the
-> > RDMA hardware with direct access to memory buffers, we must register
-> > them with the NIC. During this process, the hardware generates one MTT
-> > entry for each physically contiguous block. Since these hardware entries
-> > are a finite and scarce resource, and SMC currently defaults to a 4KB
-> > registration granularity, a single 2MB buffer consumes 512 entries. In
-> > high-concurrency scenarios, this inefficiency quickly exhausts NIC
-> > resources and becomes a major bottleneck for system scalability.
-> > 
-> > To address this, we intend to use vmalloc_huge(). When it successfully
-> > allocates high-order pages, the vmalloc area is backed by a sequence of
-> > physically contiguous chunks (e.g., 2MB each). If we know this
-> > page_order, we can register these larger physical blocks instead of
-> > individual 4KB pages, reducing MTT consumption from 512 entries down to
-> > 1 for every 2MB of memory (with page_order == 9).
-> > 
-> > However, the result of vmalloc_huge() is currently opaque to the caller.
-> > We cannot determine whether it successfully allocated huge pages or fell
-> > back to 4KB pages based solely on the returned pointer. Therefore, we
-> > need a helper function to query the actual page order, enabling SMC-R to
-> > adapt its registration logic to the underlying physical layout.
-> > 
-> > I hope this clarifies our design motivation!
-> > 
-> Appreciate for the explanation. Yes it clarifies an intention.
-> 
-> As for proposed patch above:
-> 
-> - A page_order is available if CONFIG_HAVE_ARCH_HUGE_VMALLOC is defined;
-> - It makes sense to get a node, grab a spin-lock and find VM, save
->   page_order and release the lock.
-> 
-> You can have a look at the vmalloc_dump_obj(void *object) function.
-> We try-spinlock there whereas you need just spin-lock. But the idea
-> is the same.
-> 
-> --
-> Uladzislau Rezki
+On Mon, Jan 26, 2026 at 5:53=E2=80=AFAM Paul Moses <p@1g4.org> wrote:
+>
+> Should REPLACE with an explicit entry list that yields 0 entries return -=
+EINVAL or should it be treated the same as omitting TCA_GATE_ENTRY_LIST and=
+ keeping the old schedule?
 
-Hi Uladzislau,
+It should be treated the same as omitting TCA_GATE_ENTRY_LIST and keeping
+the old schedule.
 
-Thanks very much for the detailed guidance, especially on the correct
-locking pattern. This is extremely helpful.I will follow it and send
-a v2 patch series with the new helper implemented in mm/vmalloc.c.
-
-Thanks again for your support.
-
-Best regards,
-D. Wythe
-
-
+cheers,
+Victor
 
