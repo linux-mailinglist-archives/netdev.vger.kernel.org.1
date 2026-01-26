@@ -1,168 +1,160 @@
-Return-Path: <netdev+bounces-253357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NGkIhsYd2k1cAEAu9opvQ
-	(envelope-from <netdev+bounces-253357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:30:35 +0100
+	id 6JSQH74fd2ntcQEAu9opvQ
+	(envelope-from <netdev+bounces-253358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:03:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B480B84DA3
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:30:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B952853CD
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4ED7C3002F86
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:30:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB4ED30038EB
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFE52C0278;
-	Mon, 26 Jan 2026 07:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BC4255F5E;
+	Mon, 26 Jan 2026 08:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YEKQ2oHF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="C+k7IL2G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34F2212566;
-	Mon, 26 Jan 2026 07:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F0C226863
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 08:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769412632; cv=none; b=RDPvcWaG9U9mg3Q6Mc5IyJav/Z3nn08XFFGNOtjdCMvD6FVvqYrcUvKcM2e/lbyhG/ORphC67AjB4jVrAniWWaSCxrOOcYh4MaiYgCxfWn6u5bMXPraC/VCmlv0DdU2BAPIMQR1bli4W/dn4WErVKrItmeOeNa+P7hnEnrU3fKw=
+	t=1769414586; cv=none; b=eFzl0Jm0sYi8p7d+m9rjOZmhOSDnyao41v+LLyx7iQZ5+HferQCaZ2WoCXnweBSWl0hHI0SpZVi4eRt7OF8zE9np9y4NHqmLLauIHi+2AbrtbQNj3p3g+dTOrwrNoN9mj/dmQ2rXAGqf+Dw31k0Xpt5EBg6JDVnEUPcP20wN9wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769412632; c=relaxed/simple;
-	bh=7M1Qp3E4IgSeuMjenTyLTiLhYneDC0ACbTvLHKeBhK0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F4kZdN7gzQ7mOoJk3UgKYzWtDTL/xR6A6Onp8JT6h0w8p45IGsHhX04VVNSxOR/3vOfRfenQeruTAlojkNpMPexn6k857TGLUD9ZGMQtRGvPaAv0i76ufou6MiW0ioDl93CWzVtGtJX9friacZbOP6bKda1fzKkmLeVxR6+mQ7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YEKQ2oHF; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60PNGOiP3054212;
-	Sun, 25 Jan 2026 23:30:20 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=AucSPbb3bnmFr22F++NhPthsl8GBA1u0JwQ/99BcSi8=; b=YEK
-	Q2oHFzTf+/Mjwu+jBv27gkH6mk6w6C9lIcDvtpZFpUh/PMKoeQ5UKxe60+P1Q/u2
-	HbJedmTsjjXg1IcmGHBfopx67Gcd50Afi/wRGIw+pnI9EirWyyOkwpAI0Ry6VMpT
-	ATx65OGMX677z2ts7PUe9DT0/9sAd+C457XkUdmbe7izg++Pyg0cNF8uXdT/jfi1
-	4+QhGRknh68/zIeVCjDxLzK3F+jk0pxatzFNHgWFQbUhHDHhArEB+MvxM3dvUw0q
-	I08JXZySt495I4EAQ/cC7S4mGnjr3oJkuQcaVX/lGdjn9nMHgVQo/SzVojpuvznb
-	K6VM8bFxquXyUePCS1g==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjj9y9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 25 Jan 2026 23:30:20 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 25 Jan 2026 23:30:34 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 25 Jan 2026 23:30:34 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 2F7683F70FB;
-	Sun, 25 Jan 2026 23:30:15 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH] octeontx2-pf: cn10k/cn20k: Update count_eot in NPA_LF_AURA_BATCH_FREE0
-Date: Mon, 26 Jan 2026 13:00:15 +0530
-Message-ID: <20260126073015.29333-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1769414586; c=relaxed/simple;
+	bh=gvpacmcv3iaE3q5n99vE8YQiJO50/wdTysWKG3860JA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h4Srpw52h2aff+kmoM39gMFP7rWbmFZ8cfDkG9efK55pPu8MpWEs+vBZqx1yl4P6MyeGxVjxC6pSsrox4CBbPFFMc+5MAsr9uCAEL00qMWamjkfoai19Kf4lTXfMTu7jxBNKCDW/kbHitLVCXVFQ1jhVzygpR8QO455UL6WStwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=C+k7IL2G; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 8AA0FC225BA;
+	Mon, 26 Jan 2026 08:02:57 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 04A1560717;
+	Mon, 26 Jan 2026 08:02:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C7FC9119A83F1;
+	Mon, 26 Jan 2026 09:02:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769414575; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=mkvjlrFf1NHBrgWnTVPrjXycV0Uof3KMIgKwfPUxqQU=;
+	b=C+k7IL2GrMhq0MoJ/zu5Pqbbj/EdVJPWbvpA+yaDHIbWD1dHQU1mhv44wkgllV7jhoLnAm
+	3xnPCbfgdwQq8Qg/ZzHfF0FmVw+VXJGPAgAiy6ISUFDF3OphGGfMYXXiq7fhI5rR4/vHX5
+	n31XclVnpqRN14WWStMLe0HxuZf91HJvuxToESomXIU1vqOaerStWODCB1sctZnUfBQf0u
+	yYSTRld2nQPBiKeiavHL451aLkjRoBjlpnqlw6gPgsBo5/Gl+JAR1b/JnHvmFgMhzYJ9Ux
+	2BcxNwVDRHiIK0feie+M9MwZxUcTTKt/RP2QF2XkVnlQsiNdqM4u1H6X6SVW4g==
+Message-ID: <3f1bea58-46fb-42fe-bd5b-b6341ca66aeb@bootlin.com>
+Date: Mon, 26 Jan 2026 09:02:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: 1KWETdC_QTilqt4z9kXJdYJ6Ijk-ttbS
-X-Proofpoint-ORIG-GUID: 1KWETdC_QTilqt4z9kXJdYJ6Ijk-ttbS
-X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=6977180c cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=BegAR1CbhO-4hU-ZqGQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI2MDA2NCBTYWx0ZWRfX/R/sCFLwsvlO
- mtwjjNP7oV9SOb8his/N/SiwfahGBhB6j4UQfa+Lzl/sxiQiwy+Gvv60XVyAe/qDbhTmJsOBXo2
- TsG0QdwOr0T4arfoXyW+NHUxq41RDDzwSaFz8TAY95p96DcQv9oRgw3yp15jywVFoCU1aWb77HM
- 7bQ9Co9u6eLAznW/ZJrrkRb3/aq6fXB6aQERE1do20mf2CB4qQ0lQgsExk5xXpWqrtvIXIfigq1
- VpBo+Afnj5OXLsXwVOJ1TxiSuAeJG0FQzarrS15OH+YVt2ONB7BfDPAiKfMtTd7Na4jT0BfCby2
- Tao/ZvarnxUd1sPUbYemRy+39uBB2K2okECsJ1IzKPIk2KRigZhyLYefGfhWUz1A+eLM7nsF6qX
- zEZb5a7Zs+hf0C/uDSzLSis344wpGTxtvT6cY3Pdx8Y9G1KRkhQ6Y5uvnZDPvQ7tH/MqL1L6sOh
- zyfjVGgJBEQMhzPXZ9Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
- definitions=2026-01-26_02,2026-01-22_02,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/8] net: dsa: microchip: Add support for
+ KSZ8463's PTP interrupts
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Simon Horman <horms@kernel.org>, Pascal Eberhard <pascal.eberhard@se.com>,
+ =?UTF-8?Q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260122-ksz8463-ptp-v2-0-b6683f5ce50b@bootlin.com>
+ <20260122-ksz8463-ptp-v2-4-b6683f5ce50b@bootlin.com>
+ <20260125133858.5fdb7532@kernel.org>
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260125133858.5fdb7532@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[gakula@marvell.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-253357-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,se.com,bootlin.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253358-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: B480B84DA3
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0B952853CD
 X-Rspamd-Action: no action
 
-The count_eot field determines how many valid pointers are present in
-the last 128-bit word during buffer free operations. The current driver
-only handled CN10K devices where count_eot feild is 1 bit wide.
-And possible values, count_eot = 0 for an even number of
-pointers and 1 for an odd number.
+Hi Jakub,
 
-For CN20K devices,the count_eot feild extended to 2 bits.
-The hardware expects count_eot to represent the least
-significant two bits of the number of valid pointers to free. This patch
-updates the calculation accordingly to ensure correct behavior on both
-CN10K and CN20K platforms.
+On 1/25/26 10:38 PM, Jakub Kicinski wrote:
+> On Thu, 22 Jan 2026 14:27:38 +0100 Bastien Curutchet (Schneider
+> Electric) wrote:
+>> +int ksz8463_ptp_irq_setup(struct dsa_switch *ds)
+>> +{
+>> +	struct ksz_device *dev = ds->priv;
+>> +	const struct ksz_dev_ops *ops = dev->dev_ops;
+>> +	struct ksz_port *port1, *port2;
+>> +	struct ksz_irq *ptpirq;
+>> +	int ret;
+>> +	int p;
+>> +
+>> +	port1 = &dev->ports[0];
+>> +	port2 = &dev->ports[1];
+>> +	ptpirq = &port1->ptpirq;
+>> +
+>> +	ptpirq->irq_num = irq_find_mapping(dev->girq.domain, KSZ8463_SRC_PTP_INT);
+>> +	if (!ptpirq->irq_num)
+>> +		return -EINVAL;
+>> +
+>> +	ptpirq->dev = dev;
+>> +	ptpirq->nirqs = 4;
+>> +	ptpirq->reg_mask = ops->get_port_addr(p, KSZ8463_PTP_TS_IER);
+>> +	ptpirq->reg_status = ops->get_port_addr(p, KSZ8463_PTP_TS_ISR);
+> 
+> clang says:
+> 
+> drivers/net/dsa/microchip/ksz_ptp.c:1187:40: warning: variable 'p' is uninitialized when used here [-Wuninitialized]
+>   1187 |         ptpirq->reg_mask = ops->get_port_addr(p, KSZ8463_PTP_TS_IER);
+>        |                                               ^
+> drivers/net/dsa/microchip/ksz_ptp.c:1175:7: note: initialize the variable 'p' to silence this warning
+>   1175 |         int p;
+>        |              ^
+>        |               = 0
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/nic/otx2_common.h  | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+I thought gcc also reported this kind of warning, but I see here that it 
+only reports it with W=2.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 8cdfc36d79d2..c6023e1ce92b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -789,8 +789,15 @@ static inline void __cn10k_aura_freeptr(struct otx2_nic *pfvf, u64 aura,
- 	tar_addr = (__force u64)otx2_get_regaddr(pfvf, NPA_LF_AURA_BATCH_FREE0);
- 	/* LMTID is same as AURA Id */
- 	val = (lmt_info->lmt_id & 0x7FF) | BIT_ULL(63);
--	/* Set if [127:64] of last 128bit word has a valid pointer */
--	count_eot = (num_ptrs % 2) ? 0ULL : 1ULL;
-+	/* Meaning of count_eot
-+	 * CN10K: count_eot = 0 if the number of pointers to free is even,
-+	 *	  count_eot = 1 if the number of pointers to free is odd.
-+	 *
-+	 * CN20K: count_eot represents the least significant 2 bits of the
-+	 *	  total number of valid pointers to free.
-+	 *        Example: if 7 pointers are freed (0b111), count_eot = 0b11.
-+	 */
-+	count_eot = (num_ptrs - 1) & 0x3ULL;
- 	/* Set AURA ID to free pointer */
- 	ptrs[0] = (count_eot << 32) | (aura & 0xFFFFF);
- 	/* Target address for LMTST flush tells HW how many 128bit
--- 
-2.25.1
+Anyway, I'll respin with this fixed.
 
+
+Best regards,
+Bastien
 
