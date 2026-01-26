@@ -1,128 +1,160 @@
-Return-Path: <netdev+bounces-253397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253398-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uA0FDZs0d2nhdAEAu9opvQ
-	(envelope-from <netdev+bounces-253397-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:32:11 +0100
+	id ENwmBsY0d2nhdAEAu9opvQ
+	(envelope-from <netdev+bounces-253398-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:32:54 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8ED860B5
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:32:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B172D860CB
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FDEC304018D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:29:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E9363013A40
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F1B3164BA;
-	Mon, 26 Jan 2026 09:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A541325495;
+	Mon, 26 Jan 2026 09:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LywcPcKP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MjPNuEKr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10777314A6C
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF7C324B30;
+	Mon, 26 Jan 2026 09:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769419721; cv=none; b=goufD+SwFuNCZfs+AmyIRO9evnP2+0aXuloYRBmhRPB3RGZ4iMARZCnfsOXuPEJC0VWjO/oVlYRAolWKwNFRyANHcZRDT9YWmmuyzSnacLmKMIGqVSZsFUs/SD6iu8w/RIbJpLymDNC3mb46t7n1pRbaekHbikOOO0QV4KXcE4o=
+	t=1769419824; cv=none; b=eFdM47Qc0lLeBhphW3vK/OZ6yq4SMmJd6XySRdxLH9sO+GNawAgsH9gJwKdlBlVsSxkXmqsfcmeZFq/Cdz0rUIc2UHO4sFUkDtf4V+/hNEDTCCX3f4zx2OYBwbqWypR+AUHVhaPR+Hz+GUsmF8TdM6b5MvL7v34ggFFncEqG2VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769419721; c=relaxed/simple;
-	bh=lIZ/axGtJY1GJmgq+Bq/FOTvSbmIpkliuvpjSjqfq6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=uPOE26Bs4XUnNXd/OTlzdFEKOXtGQelbiQ0Nsp5vs8kdWgF5RV7suahVgsbOjogRojnhs/QuCyknJOqp09PkhG3d0JG0wd+baRZz5Ok5VLuTtU7FL99yRdBRNe42uBWaGWhHudLFy51aEFZePA8vyLywrcIMjcSNVcsrRS9+qLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LywcPcKP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769419713;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=W+4vYzNAjTdVAA623ZrO8amSnfgaSmiNwyODoYrAlvY=;
-	b=LywcPcKPtFaLW/cCVU5sHKo8Z1xmhkcOJW3ZgeRfJXMdQiyHPKv9bFQ7ccSWXrMsNaLKn9
-	j56WwxidYpYv1ZaKR0wNawRtwhsAY/pO6LZtEQ8aQL/ICQhlcAllMWT+Bzh9ZImH70Q6xf
-	moSt+039wBOC4wvsYiT9PiVROkXpURo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-P6GaWfdnP6qxEPQ8HJLT2A-1; Mon,
- 26 Jan 2026 04:28:27 -0500
-X-MC-Unique: P6GaWfdnP6qxEPQ8HJLT2A-1
-X-Mimecast-MFC-AGG-ID: P6GaWfdnP6qxEPQ8HJLT2A_1769419706
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDE011955D92;
-	Mon, 26 Jan 2026 09:28:25 +0000 (UTC)
-Received: from thinkpad (unknown [10.45.225.199])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38A3A30001A7;
-	Mon, 26 Jan 2026 09:28:21 +0000 (UTC)
-Date: Mon, 26 Jan 2026 10:28:18 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, bigeasy@linutronix.de
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, jkarrenpalo@gmail.com,
-	tglx@linutronix.de, mingo@kernel.org, allison.henderson@oracle.com,
-	petrm@nvidia.com, antonio@openvpn.net
-Subject: Re: [PATCH net-next v2 0/9] hsr: Implement more robust duplicate
- discard algorithm
-Message-ID: <aXczshu7nvWWFMy4@thinkpad>
+	s=arc-20240116; t=1769419824; c=relaxed/simple;
+	bh=tPDTH/y75T67JFjuIWvMnrDHNL7T+b3GWP+6DE5AMmk=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=bzNcOq3R7snUxN7RVLO/b5yDBBjgzuVaHotOngcTqRAKiVaUqv4ptrilwzBehw74ICI6lg7+Svq8ebZ60yAxj9VgeUZMYXpMOQyinP/qjE+nYcDvBD0EsE3uOcnIAEp2cHfMw/Epa3B+3/B8IXTQDnYS5vhdFi1eF0xR7ikqudo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MjPNuEKr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D5A2C116C6;
+	Mon, 26 Jan 2026 09:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769419824;
+	bh=tPDTH/y75T67JFjuIWvMnrDHNL7T+b3GWP+6DE5AMmk=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=MjPNuEKr3A4Hh5VIPhoiaA7JHMRRadBXQM5MCSbzj5KhL5Vt2D5vZdk26P+N8Uq5a
+	 3xapmE78VcENeQdCYAkAZ5W+g5Sj3Q7qdluC60S200Q1/pQi4ajLIib1H39qJzi1SM
+	 zZBF+dqICgUOLo4FM26KOVV63lbDQAX3Dgjnhr7Y+IvroK71HIX12dS1RQon4g/yF1
+	 SB9exwUM2HJEYGjF4KGSv/o7AfIzeayiuXJalezv8cAvfzu9gEaRbO8zkEM3q5mN0c
+	 ACsqtNyYmwTuNGSS3rD4AUkU9n5fojcajCTxxHalLmHT/lZ5LnBUR1m4O5ETw+3gvF
+	 Dte7tqpHGVf3A==
+Content-Type: multipart/mixed; boundary="===============4570348085458857697=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260122173556.44d8b77f@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Message-Id: <522167db42c30a5a277f7f3cf0042aae0835cf95606d04b9a251ddd2b3a66f93@mail.kernel.org>
+In-Reply-To: <d7dfd68ed07fa445d616c3e21217bccafc951ae1.1769417588.git.zhuhui@kylinos.cn>
+References: <d7dfd68ed07fa445d616c3e21217bccafc951ae1.1769417588.git.zhuhui@kylinos.cn>
+Subject: Re: [RFC PATCH bpf-next v4 11/12] selftests/bpf: Add test for memcg_bpf_ops hierarchies
+From: bot+bpf-ci@kernel.org
+To: hui.zhu@linux.dev,akpm@linux-foundation.org,hannes@cmpxchg.org,mhocko@kernel.org,roman.gushchin@linux.dev,shakeel.butt@linux.dev,muchun.song@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,peterz@infradead.org,ojeda@kernel.org,nathan@kernel.org,kees@kernel.org,tj@kernel.org,jeffxu@chromium.org,mkoutny@suse.com,kernel@jfarr.cc,brauner@kernel.org,rdunlap@infradead.org,brgerst@gmail.com,masahiroy@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org,inwardvessel@gmail.com,willemb@google.com,kerneljasonxing@gmail.com,paul.chaignon@gmail.com,a.s.protopopov@gmail.com,ameryhung@gmail.com,chenridong@huaweicloud.com,lance.yang@linux.dev,jiayuan.chen@linux.dev,linux-kernel@vger.kernel.org,linux-mm@kvack.org,cgroups@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linu
+ x-kselftest@vger.kernel.org
+Cc: zhuhui@kylinos.cn,geliang@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon, 26 Jan 2026 09:30:23 +0000 (UTC)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+X-Spamd-Result: default: False [2.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253397-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,linutronix.de,oracle.com,nvidia.com,openvpn.net];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
+	FREEMAIL_CC(0.00)[kylinos.cn,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-253398-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_TO(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:-];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[60];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: AC8ED860B5
+	MIME_TRACE(0.00)[0:+,1:+]
+X-Rspamd-Queue-Id: B172D860CB
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 05:35:56PM -0800, Jakub Kicinski wrote:
-> Transient build breakage here - patches 4-7 don't build and will break
-> bisection. Perhaps wait a few days to give a chance for Sebastian to
-> TAL before reposting tho?
+--===============4570348085458857697==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The build breaks because I didn't update the KUnit test for the PRP
-duplicate discard algorithm in patch 4 and 6 to keep the patches a bit
-smaller. But the build succeeds without
-CONFIG_PRP_DUP_DISCARD_KUNIT_TEST, which is probably not active in most
-bisection runs.
+> diff --git a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+> index a019ba2387bc..08ac97752ac9 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/memcg_ops.c
+> @@ -539,3 +539,73 @@ void test_memcg_ops_below_min_over_high(void)
 
-I'll wait for feedback from Sebastian, but I'm also fine with merging
-the fixes for the KUnit test into the other patches and reposting.
+[ ... ]
 
-Thanks,
-   Felix
+> +void test_memcg_ops_hierarchies(void)
+> +{
+> +	int ret, first = -1, second = -1, third = -1;
+> +	struct memcg_ops *skel;
+                          ^^^^
 
+Should skel be initialized to NULL here? The other tests in this file
+(test_memcg_ops_over_high, test_memcg_ops_below_low_over_high, and
+test_memcg_ops_below_min_over_high) all initialize their skeleton pointers
+to NULL.
+
+If any of the early checks fail (e.g. setup_cgroup_environment() or
+create_and_get_cgroup()), the code jumps to cleanup where memcg_ops__detach()
+is called. The skeleton __detach() function dereferences its argument without
+checking for NULL, which would cause a crash with an uninitialized pointer.
+
+> +	struct bpf_map *map;
+> +	struct bpf_link *link1 = NULL, *link2 = NULL, *link3 = NULL;
+> +	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
+> +
+> +	ret = setup_cgroup_environment();
+> +	if (!ASSERT_OK(ret, "setup_cgroup_environment"))
+> +		goto cleanup;
+
+[ ... ]
+
+> +cleanup:
+> +	bpf_link__destroy(link1);
+> +	bpf_link__destroy(link2);
+> +	bpf_link__destroy(link3);
+> +	memcg_ops__detach(skel);
+                         ^^^^
+
+This dereferences skel without checking if it was ever assigned.
+
+> +	close(first);
+> +	close(second);
+> +	close(third);
+> +	cleanup_cgroup_environment();
+> +}
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21352241149
+
+--===============4570348085458857697==--
 
