@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-253365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOw4Htkld2kUcwEAu9opvQ
-	(envelope-from <netdev+bounces-253365-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:29:13 +0100
+	id ruOTHoMld2kUcwEAu9opvQ
+	(envelope-from <netdev+bounces-253362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:27:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12EC8573E
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:29:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A66A856BC
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:27:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05AD2301FF83
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:27:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6D1FA300C271
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B825431329D;
-	Mon, 26 Jan 2026 08:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FC72FFDE3;
+	Mon, 26 Jan 2026 08:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uepyBXEr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kSvgwcvW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D394031282E;
-	Mon, 26 Jan 2026 08:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FAA20DD52;
+	Mon, 26 Jan 2026 08:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769416067; cv=none; b=AAdKU9jW+mYEPhFuaJ8oizZIGJkNW9ogLYw7MKND+HkTPRfNT+c5T+q1vf66n2vomnIFZzD9k9E7dMgLbapw89aGuhQVXf9vvSLear2rzF9yo2Aq31s/UtPC60zljS2tHGxwJ+G5gSbE2OMHK5L36IJ+dcI9uVCsOvW3dPmauts=
+	t=1769416064; cv=none; b=ajHuWqP0KBxSJeWtZqNmKLyGxAFeJItz5oYFZo+mSo6WS3v2NTWBNDSZrTc6099905YdCBaex6g5N/nyx3+ADpUQc695GGKlCs+skAXV32n8Y8BXwUsO47HCPO8v0SxSVc/H76BJndPDvkdzW1Gg4A8EhY4RsV5NvBBOB4BcVSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769416067; c=relaxed/simple;
-	bh=0NmEGGyH7g7H5B/eZVztpNdNx8l4A7JBT5m3MHC5pgE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qs6HtJHbYZAIEySukKksevgeyfkCERG9CrGXrDXachCWer6RQa+Smq6nY3aL6bzpQ+Upu1NLdquzE3dVZSdlR0+9lws/ZiZzUpVZLEo/Gd2VE4e1z2M7JclmThy6L5R2HJbNVcWv5fm5EKedfOs3/9RKeyqKPu9QQaD4nON3Ztk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uepyBXEr; arc=none smtp.client-ip=185.246.85.4
+	s=arc-20240116; t=1769416064; c=relaxed/simple;
+	bh=N3ryQbGEWD3cPHtfikuGqfoTM8sOAlPC0aYgdbP0Wxw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=fzEIVE3n09cpqr+Ph9KW4cgl20HZg8IEgND0J3nru/bhfJy+gBGgEM1+GAriFJj/aSOTvOdTE0lw21JurONhUdyLLWEYNOdBdxD+V+AMLfhPQRt33Q7ME1nBMAxyzIEDDTa/6Ikw8oybRJcrPH8UzCvVESLVtwaMp5bnx1PEeZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kSvgwcvW; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 3ABE94E42295;
-	Mon, 26 Jan 2026 08:27:38 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id F1C6B1A2A4F;
+	Mon, 26 Jan 2026 08:27:39 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0D65260717;
-	Mon, 26 Jan 2026 08:27:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E332E119A80E2;
-	Mon, 26 Jan 2026 09:27:31 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B3A2960717;
+	Mon, 26 Jan 2026 08:27:39 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5844F119A83F1;
+	Mon, 26 Jan 2026 09:27:37 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769416056; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=qfSzuZ/oXqR/bU2qrtyPcgTd6j4GILTJZ/5fTdNadD4=;
-	b=uepyBXEr5rS3MrYmP/47310GWkkiYafsrp+gy3uoVgY6HYLn4A7/QtqPlBkdGkvuj3j6gY
-	rJ9RiJSkdEWY6AKJRHcMy42QAvVYtjxdED/MNOIhQJiS0oMq0fwV2vS5xdBXvXrxJs62Oz
-	o8qi/y4D0K4ACOM62kf/pkbk9ZxYpo8+vqQTElkpB03Cmd/x3x1RUrqloCtOtphJ5mnsK0
-	JwVN6NeX2PjPq6srvrKrG133wAMqkq3K2Zg9l0DogMFNsgblaYxqcDsVe18jQOeocCeGYz
-	yiAYomIR6qx3eANXksZ8yBQA+I/LjBbQl+qsxo4cnWhxEQxKPH5qCk/hIelawA==
+	t=1769416058; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=gkMPdwGfu8X4F3+hrF5ewptOuduz1YxWL/Ffa1MnO38=;
+	b=kSvgwcvWc6p/ARlrrGo5K5/bRTKHM8DsoCok5MLxzmF2aiP+uDu6UjZobtAFWMd2BkYVon
+	gOzcChQzXLhZmoYVp5dFK8d1ydkrLe3pboWV5iQ134CbpG3apHD5vCWXhbv8zMQDXa/pnF
+	DsROBE4OoVsPo4sGuzmPdP6mObaOql0cZCZBphKYFPA8dl+w3umQxVY7HyLgdUj63vP/Rl
+	skWGm/E5tlfzm8xm3F1F+zMC+ZxfFb9GOCrc0IAu4t+onGOD6p4TFVKtNw8RFlmQSRlx37
+	rbZeu4akIvjstA5VL+P4UmnOGxaRbPcpUHT+E+FRU0xIFmmW5Gv7Vyfs6J4BFw==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Subject: [PATCH net-next v3 0/8] net: dsa: microchip: Add PTP support for
- the KSZ8463
-Date: Mon, 26 Jan 2026 09:27:28 +0100
-Message-Id: <20260126-ksz8463-ptp-v3-0-9f092aeb8492@bootlin.com>
+Date: Mon, 26 Jan 2026 09:27:29 +0100
+Subject: [PATCH net-next v3 1/8] net: dsa: microchip: Add support for
+ KSZ8463 global irq
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,12 +63,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHAld2kC/1WOy04EIRREf2XCWgyP5jGz8j+MC6DvdYgOtICd0
- Un/u8i4sJeVyjlVN1KhRKjkdLiRAmusMace5MOBhLNLr0Dj3DMRTGjG2ZG+1W87aUmXtlAfjJD
- BGXRhIp1YCmC8DtszSdBogmsjL/emwMdn17e/2rsKNOTLJbY+52ZEYTQYxZniYIyHaUY7iyM4z
- wMyqzR6HK5zrC2Xr3F55UN2f8fV7t3KKesXEYSVLKBiTz7n9h7TY58dplX8o4XY0+KX1tpKVAE
- U83t627YfJU5whDwBAAA=
-X-Change-ID: 20260109-ksz8463-ptp-bc723ca7fac4
+Message-Id: <20260126-ksz8463-ptp-v3-1-9f092aeb8492@bootlin.com>
+References: <20260126-ksz8463-ptp-v3-0-9f092aeb8492@bootlin.com>
+In-Reply-To: <20260126-ksz8463-ptp-v3-0-9f092aeb8492@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -84,12 +82,12 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253365-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253362-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
@@ -98,7 +96,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -108,65 +106,134 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D12EC8573E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9A66A856BC
 X-Rspamd-Action: no action
 
-Hi all,
+KSZ8463's interrupt scheme differs from the others KSZ swicthes. Its
+global interrupt handling is done through an 'enable irq' register
+instead of a 'mask irq' one, so the bit logic to enable/disable
+interrupt is reversed. Also its interrupts registers are 16-bits
+registers and don't have the same address.
 
-This series aims to add two-step PTP support for the KSZ8463 driver. It
-depends on a previous series that was recently applied to net-next:
-https://lore.kernel.org/all/20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com/
-
-I've encountered weird behavior with IPv4 and IPv6 layers -- maybe that's
-related to the incompatibility with the Linux stack mentionned by commit
-620e2392db235 ("net: dsa: microchip: Disable PTP function of KSZ8463") ? --
-So the support is only added for the L2 layer.
-
-Patches 1 to 4 add IRQ support for the KSZ8463
-Patch 5 adds specific dsa_device_ops for the KSZ8463
-Patches 6 to 8 add PTP support for the KSZ8463
+Add ksz8463-specific global interrupt setup function that still relies
+on the ksz_irq_common_setup().
+Add a check on the device type in the irq_chip operations to adjust the
+bit logic for KSZ8463
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
-Changes in v3:
-- PATCH 4: Fix the unitialized value reported by clang
-- Link to v2: https://lore.kernel.org/r/20260122-ksz8463-ptp-v2-0-b6683f5ce50b@bootlin.com
+ drivers/net/dsa/microchip/ksz_common.c | 40 +++++++++++++++++++++++++++++-----
+ drivers/net/dsa/microchip/ksz_common.h |  3 +++
+ 2 files changed, 37 insertions(+), 6 deletions(-)
 
-Changes in v2:
-- PATCH 8: Disable PTP by default.
-- PATCH 5: TX path: remove timestamp handling
-- PATCH 5: RX path: zero the PTP header's reserved area before
-  forwarding packets to userspace
-- Link to v1: https://lore.kernel.org/r/20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index e5fa1f5fc09b37c1a9d907175f8cd2cd60aee180..82ec7142a02c432f162e472c831faa010c035123 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2817,14 +2817,20 @@ static void ksz_irq_mask(struct irq_data *d)
+ {
+ 	struct ksz_irq *kirq = irq_data_get_irq_chip_data(d);
+ 
+-	kirq->masked |= BIT(d->hwirq);
++	if (ksz_is_ksz8463(kirq->dev))
++		kirq->masked &= ~BIT(d->hwirq);
++	else
++		kirq->masked |= BIT(d->hwirq);
+ }
+ 
+ static void ksz_irq_unmask(struct irq_data *d)
+ {
+ 	struct ksz_irq *kirq = irq_data_get_irq_chip_data(d);
+ 
+-	kirq->masked &= ~BIT(d->hwirq);
++	if (ksz_is_ksz8463(kirq->dev))
++		kirq->masked |= BIT(d->hwirq);
++	else
++		kirq->masked &= ~BIT(d->hwirq);
+ }
+ 
+ static void ksz_irq_bus_lock(struct irq_data *d)
+@@ -2840,7 +2846,10 @@ static void ksz_irq_bus_sync_unlock(struct irq_data *d)
+ 	struct ksz_device *dev = kirq->dev;
+ 	int ret;
+ 
+-	ret = ksz_write8(dev, kirq->reg_mask, kirq->masked);
++	if (ksz_is_ksz8463(dev))
++		ret = ksz_write16(dev, kirq->reg_mask, kirq->masked);
++	else
++		ret = ksz_write8(dev, kirq->reg_mask, kirq->masked);
+ 	if (ret)
+ 		dev_err(dev->dev, "failed to change IRQ mask\n");
+ 
+@@ -2890,14 +2899,14 @@ static irqreturn_t ksz_irq_thread_fn(int irq, void *dev_id)
+ 	unsigned int nhandled = 0;
+ 	struct ksz_device *dev;
+ 	unsigned int sub_irq;
+-	u8 data;
++	u16 data;
+ 	int ret;
+ 	u8 n;
+ 
+ 	dev = kirq->dev;
+ 
+ 	/* Read interrupt status register */
+-	ret = ksz_read8(dev, kirq->reg_status, &data);
++	ret = ksz_read16(dev, kirq->reg_status, &data);
+ 	if (ret)
+ 		goto out;
+ 
+@@ -2939,6 +2948,22 @@ static int ksz_irq_common_setup(struct ksz_device *dev, struct ksz_irq *kirq)
+ 	return ret;
+ }
+ 
++static int ksz8463_girq_setup(struct dsa_switch *ds)
++{
++	struct ksz_device *dev = ds->priv;
++	struct ksz_irq *girq = &dev->girq;
++
++	girq->nirqs = 15;
++	girq->reg_mask = KSZ8463_REG_IER;
++	girq->reg_status = KSZ8463_REG_ISR;
++	girq->masked = 0;
++	snprintf(girq->name, sizeof(girq->name), "global_irq");
++
++	girq->irq_num = dev->irq;
++
++	return ksz_irq_common_setup(dev, girq);
++}
++
+ static int ksz_girq_setup(struct ksz_device *dev)
+ {
+ 	struct ksz_irq *girq = &dev->girq;
+@@ -3044,7 +3069,10 @@ static int ksz_setup(struct dsa_switch *ds)
+ 	p->learning = true;
+ 
+ 	if (dev->irq > 0) {
+-		ret = ksz_girq_setup(dev);
++		if (ksz_is_ksz8463(dev))
++			ret = ksz8463_girq_setup(ds);
++		else
++			ret = ksz_girq_setup(dev);
+ 		if (ret)
+ 			return ret;
+ 
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 929aff4c55de5254defdc1afb52b224b3898233b..67a488a3b5787f93f9e2a9266ce04f6611b56bf8 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -839,6 +839,9 @@ static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
+ #define KSZ87XX_INT_PME_MASK		BIT(4)
+ 
+ /* Interrupt */
++#define KSZ8463_REG_ISR			0x190
++#define KSZ8463_REG_IER			0x192
++
+ #define REG_SW_PORT_INT_STATUS__1	0x001B
+ #define REG_SW_PORT_INT_MASK__1		0x001F
+ 
 
----
-Bastien Curutchet (Schneider Electric) (8):
-      net: dsa: microchip: Add support for KSZ8463 global irq
-      net: dsa: microchip: Decorrelate IRQ domain from port
-      net: dsa: microchip: Decorrelate msg_irq index from IRQ bit offset
-      net: dsa: microchip: Add support for KSZ8463's PTP interrupts
-      net: dsa: microchip: Add KSZ8463 tail tag handling
-      net: dsa: microchip: Enable Ethernet PTP detection
-      net: dsa: microchip: Adapt port offset for KSZ8463's PTP register
-      net: dsa: microchip: Add two-step PTP support for KSZ8463
-
- drivers/net/dsa/microchip/ksz8.c        |  12 +--
- drivers/net/dsa/microchip/ksz8_reg.h    |   1 +
- drivers/net/dsa/microchip/ksz_common.c  |  95 ++++++++++++-----
- drivers/net/dsa/microchip/ksz_common.h  |   6 ++
- drivers/net/dsa/microchip/ksz_ptp.c     | 179 ++++++++++++++++++++++++++++----
- drivers/net/dsa/microchip/ksz_ptp.h     |   9 ++
- drivers/net/dsa/microchip/ksz_ptp_reg.h |  11 ++
- include/net/dsa.h                       |   2 +
- net/dsa/tag_ksz.c                       |  70 +++++++++++++
- 9 files changed, 335 insertions(+), 50 deletions(-)
----
-base-commit: 3adff276e751051e77be4df8d29eab1cf0856fbf
-change-id: 20260109-ksz8463-ptp-bc723ca7fac4
-
-Best regards,
 -- 
-Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+2.52.0
 
 
