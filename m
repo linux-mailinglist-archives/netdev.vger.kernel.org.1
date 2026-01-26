@@ -1,152 +1,168 @@
-Return-Path: <netdev+bounces-253376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EwcFLQtd2kvdAEAu9opvQ
-	(envelope-from <netdev+bounces-253376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:02:44 +0100
+	id yLiiBIwrd2nacwEAu9opvQ
+	(envelope-from <netdev+bounces-253375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:53:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D508085B71
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:02:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301EE85A50
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 45C1430022F9
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:02:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BDC733001581
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D41D224B15;
-	Mon, 26 Jan 2026 09:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58742FF646;
+	Mon, 26 Jan 2026 08:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="mvwkY5OJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A014D219A8A
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 09:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EA61E5B73;
+	Mon, 26 Jan 2026 08:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769418161; cv=none; b=sjtzSoMoxZVnf/UMpQW0La3wmC6l1HZjLfMqUo4qL7TZnLvWThPaHE6kKUbsZFJLp4unxHnwke5urPatDtWURrnanqNLulmDRqWrDQT9LpuXB79bKlvJM/CXwkw1VyXT3q1oIFgccymB3cvSsv1YnqjglJkKO67Z1f2dVlFUlEQ=
+	t=1769417605; cv=none; b=W34tMzrt8riDDSp74uzB8wOKmDAXtDOkQveSrjlyWv/wApgeuogyDOTWfurLEp62L4pAU6A27hFCzdrVWU+UaqFRdSn6LvydeTW+q8bsNOgG3zPq9+BSsAPAqfDfMBWiQ+fZeQRozyWICVyE/Iww109rDFBnT/1vXf4zuafm0MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769418161; c=relaxed/simple;
-	bh=7q5IxcdZrOaXLWprKCBq3VzXK/GPmVp4HGjmJuHXKq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IpiMzY/8w1l57KDhsznVdfXXvMEE5Z7yqeQbiN38I7Dee2lk38l19XrCPvgzuhmPiyXIeBgcNsQHKUAb4TsbO0miHvccp5Lk6c84aQCBQzT4s2gnjR5DEmGFVuZhDd0wOdiogZrGiG8svQPW86844noItYz75ClH2ioBZpb73Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.221] (p57bd931f.dip0.t-ipconnect.de [87.189.147.31])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4BE374C1A25A03;
-	Mon, 26 Jan 2026 09:53:03 +0100 (CET)
-Message-ID: <450d5022-48c4-4b7b-9406-5df9833bd26d@molgen.mpg.de>
-Date: Mon, 26 Jan 2026 09:53:02 +0100
+	s=arc-20240116; t=1769417605; c=relaxed/simple;
+	bh=BJZV3Cw0Vi7MkeA/1O9xXI98G1YadhiApczo4SXoCWY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DeXjHVJ+D8ByTk8RXAsJGflyOyiZbDXhcp0PQ1hv3p7n+gwKi1VsfBTiW1ku7CA7yzBPdvZKmsBwRQPyol5prPqdMZ+9pyDp4xU53aQn5tspnNOsmqtEyBkdH4y2kMQdMmgvDeFoANHSsMcfPojjjatD6RpOouAPjJgVa05inPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=mvwkY5OJ; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
+	s=protonmail2; t=1769417594; x=1769676794;
+	bh=BJZV3Cw0Vi7MkeA/1O9xXI98G1YadhiApczo4SXoCWY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=mvwkY5OJxXeFNzNr7ahxsOnntKz6G7CbV0YYAj4hQHpemmWFSwXQV9f6yfiDmexZN
+	 eycbtoZBeGj6BF+kHbqD4ELjBhyQij2RK0su6nP5jlOledkd1ON/qq9ClQFQQ9A16O
+	 2xbhyPrj5LKIrhjW/Ph3od2Fi4r7LfKObknDG7soGsyMlX7Oc11iySco7fWXPKeCgT
+	 EIfv5LiuDNKgKBERdXE7AE1yVJJc84NIqHIIRI0mMZYedgvbcYIvSXX2ruRTnh+Pgs
+	 GhHkoxPF/edOnFsU+8DEwOb2YJjrpk7lbLH0riglIQYyTgQXQ3CyGg3yY/Z/put1SE
+	 k6BCsuvUrpdAw==
+Date: Mon, 26 Jan 2026 08:53:10 +0000
+To: Victor Nogueira <victor@mojatatu.com>
+From: Paul Moses <p@1g4.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 6/7] net/sched: act_gate: reject empty schedule list
+Message-ID: <77q-JcImMG2fuQxj_GMUtYmaFAIuPrYMasj4I3aqIVID-Op24JIShBIPgt9kozLZgN4HvsGCS8Ez16mKq4Wq9juL1IOKydWUJwMwCYgHRMg=@1g4.org>
+In-Reply-To: <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
+References: <20260121131954.2710459-1-p@1g4.org> <20260121131954.2710459-7-p@1g4.org> <c8a8ae22-c5c4-4112-8084-0faa256a1d84@mojatatu.com> <412136f7-1d46-42ac-96f9-b6cc462204b2@mojatatu.com>
+Feedback-ID: 8253658:user:proton
+X-Pm-Message-ID: c1fd98711753fdf12f01526c362f688a5aa969b6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: fix unaligned u32
- access in
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-References: <20260126084442.413230-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260126084442.413230-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[mpg.de];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253376-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: D508085B71
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-253375-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[1g4.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 301EE85A50
 X-Rspamd-Action: no action
 
-Dear Aleksandr,
+Should REPLACE with an explicit entry list that yields 0 entries return -EI=
+NVAL or should it be treated the same as omitting TCA_GATE_ENTRY_LIST and k=
+eeping the old schedule?
 
-
-Thank you for your patch. The subject/title seems incomplete (stray 
-trailing *in*).
-
-Am 26.01.26 um 09:44 schrieb Aleksandr Loktionov:
-> ixgbe_host_interface_command() treats its buffer as a u32 array. The
-> local buffer we pass in was a union of byte-sized fields, which gives
-> it 1-byte alignment on the stack. On strict-align architectures this
-> can cause unaligned 32-bit accesses.
-> 
-> Add a u32 member to union ixgbe_hic_hdr2 so the object is 4-byte
-> aligned, and pass the u32 member when calling ixgbe_host_interface_command().
-
-The line could be wrapped to adhere to the 75 characters per line.
-
-> No functional change on x86; prevents unaligned accesses on
-> architectures that enforce natural alignment.
->   
-> Fixes: 49425dfc7451 ("ixgbe: Add support for x550em_a 10G MAC type")
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
-> v1 -> v2 change title and concentrate on alignement issue
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 +
->   drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 2 +-
->   2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> index 61f2ef6..eb5bf3b 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> @@ -2798,6 +2798,7 @@ struct ixgbe_hic_hdr2_rsp {
->   };
->   
->   union ixgbe_hic_hdr2 {
-> +	u32 buf[1];
->   	struct ixgbe_hic_hdr2_req req;
->   	struct ixgbe_hic_hdr2_rsp rsp;
->   };
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> index 76d2fa3..4a0ccbf 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-> @@ -1228,7 +1228,7 @@ static int ixgbe_update_flash_X550(struct ixgbe_hw *hw)
->   	buffer.req.buf_lenl = FW_SHADOW_RAM_DUMP_LEN;
->   	buffer.req.checksum = FW_DEFAULT_CHECKSUM;
->   
-> -	status = ixgbe_host_interface_command(hw, &buffer, sizeof(buffer),
-> +	status = ixgbe_host_interface_command(hw, buffer.buf, sizeof(buffer),
->   					      IXGBE_HI_COMMAND_TIMEOUT, false);
->   	return status;
->   }
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
+thanks,
 Paul
+
+
+
+
+
+On Wednesday, January 21st, 2026 at 3:49 PM, Victor Nogueira <victor@mojata=
+tu.com> wrote:
+
+>=20
+>=20
+> On 21/01/2026 16:44, Victor Nogueira wrote:
+>=20
+> > On 21/01/2026 10:20, Paul Moses wrote:
+> >=20
+> > > Reject empty schedules (num_entries =3D=3D 0) so next_entry is always
+> > > valid and
+> > > RCU readers/timer logic never walk an empty list. taprio enforces the
+> > > same
+> > > constraint on schedules (sch_taprio.c, commit 09dbdf28f9f9fa).
+> > >=20
+> > > Fixes: a51c328df310 ("net: qos: introduce a gate control flow action"=
+)
+> > > Signed-off-by: Paul Moses p@1g4.org
+> > > Cc: stable@vger.kernel.org
+> > > ---
+> > > net/sched/act_gate.c | 6 ++++++
+> > > 1 file changed, 6 insertions(+)
+> > >=20
+> > > diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
+> > > index 48ff378bb051a..e4134b9a4a314 100644
+> > > --- a/net/sched/act_gate.c
+> > > +++ b/net/sched/act_gate.c
+> > > @@ -509,6 +509,12 @@ static int tcf_gate_init(struct net *net, struct
+> > > nlattr *nla,
+> > > cycletime_ext =3D nla_get_u64(tb[TCA_GATE_CYCLE_TIME_EXT]);
+> > > p->tcfg_cycletime_ext =3D cycletime_ext;
+> > > + if (p->num_entries =3D=3D 0) {
+> > > + NL_SET_ERR_MSG(extack, "The entry list is empty");
+> > > + err =3D -EINVAL;
+> > > + goto release_mem;
+> > > + }
+> >=20
+> > It would be simpler to check this in parse_gate_list.
+> > That way you could return -EINVAL there directly
+> > in case 0 entries were passed.
+>=20
+>=20
+> On second thought, I believe it would be better
+> to check whether parse_gate_list's return is 0
+> and the op is a create. Something like:
+>=20
+> err =3D parse_gate_list(tb[TCA_GATE_ENTRY_LIST], p, extack);
+> ...
+> if (!err && ret =3D=3D ACT_P_CREATED) {
+> NL_SET_ERR_MSG(extack, "The entry list is empty");
+> err =3D -EINVAL;
+> goto release_mem;
+> }
+>=20
+> so that you don't need to add new arguments to
+> parse_gate_list.
+>=20
+> cheers,
+> Victor
 
