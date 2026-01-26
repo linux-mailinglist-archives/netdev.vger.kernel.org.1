@@ -1,180 +1,172 @@
-Return-Path: <netdev+bounces-253361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCSqB2sjd2mZcgEAu9opvQ
-	(envelope-from <netdev+bounces-253361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:18:51 +0100
+	id WOw4Htkld2kUcwEAu9opvQ
+	(envelope-from <netdev+bounces-253365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:29:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DF785670
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:18:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12EC8573E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 09:29:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92D0F300DA78
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:18:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 05AD2301FF83
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 08:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9BB29E0F8;
-	Mon, 26 Jan 2026 08:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B825431329D;
+	Mon, 26 Jan 2026 08:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0ofuWgv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RuI0pI7Y"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="uepyBXEr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0852765F8
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 08:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D394031282E;
+	Mon, 26 Jan 2026 08:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769415509; cv=none; b=fJEIoJMdYxp1d/qw5bm13/Yvl5OajVnwtP6YM/KwqF0OMjsdC/yHP4U9Qfv6azEZnaQ5AcZnpNtwPsuQaZuMwhJ2ns4uwfv1oe2/0CLrNIE67IR2ZWkB9/V+K+IeXTfBcw8OJc5ZGF7GNpTZ0QApRT0paGrz7w4247XoGGlSYAk=
+	t=1769416067; cv=none; b=AAdKU9jW+mYEPhFuaJ8oizZIGJkNW9ogLYw7MKND+HkTPRfNT+c5T+q1vf66n2vomnIFZzD9k9E7dMgLbapw89aGuhQVXf9vvSLear2rzF9yo2Aq31s/UtPC60zljS2tHGxwJ+G5gSbE2OMHK5L36IJ+dcI9uVCsOvW3dPmauts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769415509; c=relaxed/simple;
-	bh=DKafQET6VHvgKdQ2xS5R2djl5aeMeZJYXkq+Ux/fFSA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I/Pi3qFxjlRHWqWAhBRlVke56IjwgfjCuyq3bg/M/IkJjjRXmWxjtUn/R4KCF1gb52pDYSLAwXVCDIA2c9CIh6qpnTx5kP5fLpIKCeZ7XKbUApBgAGZAYxE81slNi0H08tBoL+izxqVcEHy/kCt6qvmg4QfPesMIa571gGTJxO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q0ofuWgv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RuI0pI7Y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769415507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=65n+X3UOPS9Pw2GVgi+j91Mtiyejj+FB56DpILdmAjA=;
-	b=Q0ofuWgv6bHKlFh5puTFYp2upd0KXvREtWcZQfyKS7zy6vuqR26sEb0sGDTT/05iKeK84s
-	ehiqUnUDVaOTT/VW1YsbH6McpSRzhX1vlFVh2lh0u90itQwpXB/pbrnLCz+EfKwZwuPtpF
-	abpERBpQWJWr/Xei72VASBF+7E0rIDU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-9vXdFnwAMmCVLyh5wZLX5Q-1; Mon, 26 Jan 2026 03:18:25 -0500
-X-MC-Unique: 9vXdFnwAMmCVLyh5wZLX5Q-1
-X-Mimecast-MFC-AGG-ID: 9vXdFnwAMmCVLyh5wZLX5Q_1769415504
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42fdbba545fso3916426f8f.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 00:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769415504; x=1770020304; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=65n+X3UOPS9Pw2GVgi+j91Mtiyejj+FB56DpILdmAjA=;
-        b=RuI0pI7YoSDlQgnWVIztY8i7xHUQEhd6G53WpQWB+ZK3txlqnTGRHjIanDqGW4wYbQ
-         rbsyTJN6UwrdvHGEryfLrS0+KjIzXj6PGtZeju/h+6q3tOLs5FOHLDyxtA6TIVZU9T9j
-         jf6j+k993CVwrjjHm7uxViekAf56mlcCQM6+qdVUzvzAwuqgu1CS/2CxPgxZPjrQ1wkf
-         gxqDYLddyqfflTgkoj2+8sRDR7/43XXOIU1ZGvmBosDlmVO6rhl13oeBHf12PWoq2NWb
-         qQ+A29+NMJFTIi96NHR83b2T7117Ne1SEVT/OOsjfinYOzOVyEHpu9O/M5XWYbEkjF8U
-         I+0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769415504; x=1770020304;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=65n+X3UOPS9Pw2GVgi+j91Mtiyejj+FB56DpILdmAjA=;
-        b=nIy/L48JuWUsPNVL3DAypf3ViVIzE7qn8qY5p5QNRzrDs6braElAsH6nK2XSkVYUY1
-         jBpHA9Csxdk+bOkKkdGXT6l8OzO+5l2x9DquM05//0n9m+FI0ZkppCbPk8xdsEVmXVom
-         wwcAZu1HDHhHjlwREPEXDLALdebOeMT6k3d0xqsNJyENIiBk1QkVRGH1TmUxaVbMj0AM
-         O7G2TXQmpUV4cm6SbJQd2UlFAFn7UqWRzn2Kwfc9seEKG1HYOwJ7hCkMlRfjfgH5yui7
-         cJyzb/u6Gmmt8ZWgEmGcz6pTfxhIA0mOqhpJiUqpYgXlsVWmtHh6cn+ViGYZZA8Ap+pd
-         hfOw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5E/sbitmF0cfPtP6CjjkSeYUtnYBx7YoB4YUwg63FBg3tRFyy8PPI9Usj0EStohIeyvhNUbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1xqWLhyBNWg8mNqAE9H+w0sCPyGddqAWsdqdrgVcSeB4d5hzv
-	eJU2yhnTWLkQ85ZgZhHJ6KUtPjxfPxcLLK+Y8J0UfoPcXEDEFJpbMFombinjITpoUsqK6zDW0+W
-	/NH78iHeLYwGFOGUBGMhRYDWYymwvGAEYoww19gNr2m8tE8a8XNReDEZ6/A==
-X-Gm-Gg: AZuq6aKzaswCrbUZbErarzGBtISTKSa9oWkSCdI/grGs70uKEB5mQarI1F2p+ul8553
-	AOV/+uFdKJ/+QWaYBtCRtKpIhARqEozwYiJZf/yv/cLmLGOlCMOo7lGAGvcT5WJW9VdCF5+EylE
-	67Wqu9O2Jxto+Im4J0SUzXzobY8njOwFsUq49ZLRhV31O9NglUEKLu6li++eUjnDLP4oVXj/NSh
-	p8Uz2w34/c5NQj2JRtJCXIgsvx2lo1H0ZGG79hmAQ5eIt7LAMbjp1WUWy2R/tSGD9lJqGHNZPHT
-	ve8brN01X4YmMeqG9pZRwkY0T5lA5Pavmj0/dMMRme5op/L5jvmnvrAraR8fEgMOKOsO26Q3cXo
-	cumMaKKEcHZo=
-X-Received: by 2002:a05:600c:8012:b0:480:4a90:1afd with SMTP id 5b1f17b1804b1-4805cc9fe07mr61971075e9.0.1769415503856;
-        Mon, 26 Jan 2026 00:18:23 -0800 (PST)
-X-Received: by 2002:a05:600c:8012:b0:480:4a90:1afd with SMTP id 5b1f17b1804b1-4805cc9fe07mr61970735e9.0.1769415503372;
-        Mon, 26 Jan 2026 00:18:23 -0800 (PST)
-Received: from [192.168.88.32] ([150.228.25.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c02f71sm28665069f8f.6.2026.01.26.00.18.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jan 2026 00:18:22 -0800 (PST)
-Message-ID: <ebb3a731-a3ec-444e-8efe-aa13cb76adad@redhat.com>
-Date: Mon, 26 Jan 2026 09:18:18 +0100
+	s=arc-20240116; t=1769416067; c=relaxed/simple;
+	bh=0NmEGGyH7g7H5B/eZVztpNdNx8l4A7JBT5m3MHC5pgE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qs6HtJHbYZAIEySukKksevgeyfkCERG9CrGXrDXachCWer6RQa+Smq6nY3aL6bzpQ+Upu1NLdquzE3dVZSdlR0+9lws/ZiZzUpVZLEo/Gd2VE4e1z2M7JclmThy6L5R2HJbNVcWv5fm5EKedfOs3/9RKeyqKPu9QQaD4nON3Ztk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uepyBXEr; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 3ABE94E42295;
+	Mon, 26 Jan 2026 08:27:38 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0D65260717;
+	Mon, 26 Jan 2026 08:27:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E332E119A80E2;
+	Mon, 26 Jan 2026 09:27:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769416056; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=qfSzuZ/oXqR/bU2qrtyPcgTd6j4GILTJZ/5fTdNadD4=;
+	b=uepyBXEr5rS3MrYmP/47310GWkkiYafsrp+gy3uoVgY6HYLn4A7/QtqPlBkdGkvuj3j6gY
+	rJ9RiJSkdEWY6AKJRHcMy42QAvVYtjxdED/MNOIhQJiS0oMq0fwV2vS5xdBXvXrxJs62Oz
+	o8qi/y4D0K4ACOM62kf/pkbk9ZxYpo8+vqQTElkpB03Cmd/x3x1RUrqloCtOtphJ5mnsK0
+	JwVN6NeX2PjPq6srvrKrG133wAMqkq3K2Zg9l0DogMFNsgblaYxqcDsVe18jQOeocCeGYz
+	yiAYomIR6qx3eANXksZ8yBQA+I/LjBbQl+qsxo4cnWhxEQxKPH5qCk/hIelawA==
+From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Subject: [PATCH net-next v3 0/8] net: dsa: microchip: Add PTP support for
+ the KSZ8463
+Date: Mon, 26 Jan 2026 09:27:28 +0100
+Message-Id: <20260126-ksz8463-ptp-v3-0-9f092aeb8492@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tcp: move sk_forced_mem_schedule() to tcp.c
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, Neal Cardwell <ncardwell@google.com>
-References: <20260123111605.4089200-1-edumazet@google.com>
- <CADVnQyktV_z9=SoT7yhkT6mBQKRjaJgpwLhR2SdWGQS3iKD3Tw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CADVnQyktV_z9=SoT7yhkT6mBQKRjaJgpwLhR2SdWGQS3iKD3Tw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHAld2kC/1WOy04EIRREf2XCWgyP5jGz8j+MC6DvdYgOtICd0
+ Un/u8i4sJeVyjlVN1KhRKjkdLiRAmusMace5MOBhLNLr0Dj3DMRTGjG2ZG+1W87aUmXtlAfjJD
+ BGXRhIp1YCmC8DtszSdBogmsjL/emwMdn17e/2rsKNOTLJbY+52ZEYTQYxZniYIyHaUY7iyM4z
+ wMyqzR6HK5zrC2Xr3F55UN2f8fV7t3KKesXEYSVLKBiTz7n9h7TY58dplX8o4XY0+KX1tpKVAE
+ U83t627YfJU5whDwBAAA=
+X-Change-ID: 20260109-ksz8463-ptp-bc723ca7fac4
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>
+Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
+ =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-253365-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-253361-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[bastien.curutchet@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 74DF785670
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D12EC8573E
 X-Rspamd-Action: no action
 
-Hi Eric,
+Hi all,
 
-On Fri, Jan 23, 2026 at 6:16 AM Eric Dumazet <edumazet@google.com> wrote:
-> TCP fast path can (auto)inline this helper, instead
- of (auto)inling it from tcp_send_fin().
->
->> No change of overall code size, but tcp_sendmsg() is faster.
->
-> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-> add/remove: 0/0 grow/shrink: 1/1 up/down: 141/-140 (1)
-> Function                                     old     new   delta
-> tcp_stream_alloc_skb                         216     357    +141
-> tcp_send_fin                                 688     548    -140
-> Total: Before=22236729, After=22236730, chg +0.00%
->
-> BTW, we might change tcp_send_fin() to use tcp_stream_alloc_skb().
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+This series aims to add two-step PTP support for the KSZ8463 driver. It
+depends on a previous series that was recently applied to net-next:
+https://lore.kernel.org/all/20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com/
 
-I've a question out of sheer curiosity: are you using some specific tool
-to look for inline opportunity, or "just" careful code and/or objdump
-analysis?
+I've encountered weird behavior with IPv4 and IPv6 layers -- maybe that's
+related to the incompatibility with the Linux stack mentionned by commit
+620e2392db235 ("net: dsa: microchip: Disable PTP function of KSZ8463") ? --
+So the support is only added for the L2 layer.
 
-Thanks,
+Patches 1 to 4 add IRQ support for the KSZ8463
+Patch 5 adds specific dsa_device_ops for the KSZ8463
+Patches 6 to 8 add PTP support for the KSZ8463
 
-Paolo
+Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+---
+Changes in v3:
+- PATCH 4: Fix the unitialized value reported by clang
+- Link to v2: https://lore.kernel.org/r/20260122-ksz8463-ptp-v2-0-b6683f5ce50b@bootlin.com
+
+Changes in v2:
+- PATCH 8: Disable PTP by default.
+- PATCH 5: TX path: remove timestamp handling
+- PATCH 5: RX path: zero the PTP header's reserved area before
+  forwarding packets to userspace
+- Link to v1: https://lore.kernel.org/r/20260115-ksz8463-ptp-v1-0-bcfe2830cf50@bootlin.com
+
+---
+Bastien Curutchet (Schneider Electric) (8):
+      net: dsa: microchip: Add support for KSZ8463 global irq
+      net: dsa: microchip: Decorrelate IRQ domain from port
+      net: dsa: microchip: Decorrelate msg_irq index from IRQ bit offset
+      net: dsa: microchip: Add support for KSZ8463's PTP interrupts
+      net: dsa: microchip: Add KSZ8463 tail tag handling
+      net: dsa: microchip: Enable Ethernet PTP detection
+      net: dsa: microchip: Adapt port offset for KSZ8463's PTP register
+      net: dsa: microchip: Add two-step PTP support for KSZ8463
+
+ drivers/net/dsa/microchip/ksz8.c        |  12 +--
+ drivers/net/dsa/microchip/ksz8_reg.h    |   1 +
+ drivers/net/dsa/microchip/ksz_common.c  |  95 ++++++++++++-----
+ drivers/net/dsa/microchip/ksz_common.h  |   6 ++
+ drivers/net/dsa/microchip/ksz_ptp.c     | 179 ++++++++++++++++++++++++++++----
+ drivers/net/dsa/microchip/ksz_ptp.h     |   9 ++
+ drivers/net/dsa/microchip/ksz_ptp_reg.h |  11 ++
+ include/net/dsa.h                       |   2 +
+ net/dsa/tag_ksz.c                       |  70 +++++++++++++
+ 9 files changed, 335 insertions(+), 50 deletions(-)
+---
+base-commit: 3adff276e751051e77be4df8d29eab1cf0856fbf
+change-id: 20260109-ksz8463-ptp-bc723ca7fac4
+
+Best regards,
+-- 
+Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 
 
