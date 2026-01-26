@@ -1,115 +1,248 @@
-Return-Path: <netdev+bounces-253532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OXEBaSUd2n0iwEAu9opvQ
-	(envelope-from <netdev+bounces-253532-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:21:56 +0100
+	id iERTF+6Ud2n0iwEAu9opvQ
+	(envelope-from <netdev+bounces-253534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:23:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620E28A9C8
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:21:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A78908A9E6
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:23:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3FF130115BF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:20:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 010943005593
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44460330668;
-	Mon, 26 Jan 2026 16:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C537632AAA1;
+	Mon, 26 Jan 2026 16:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TaNlONzJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1tEIlZ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D0331B10D;
-	Mon, 26 Jan 2026 16:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED3D28DB54
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769444436; cv=none; b=LCZixUG6Hj8dYayA0ax7Cm4JAqtyvH3zpKbpqT314W3V6aWJYxryDToKEIL1hpmLpeboIzhBQHcUzScmn/hgKhPMO8j5ubRL+AJCeNHldQ/zG2wtkFf1Eo3XGwEYKjHq/mAwHynTvBP2xPeomD2d1MtAzW4VdQx/j1YylY+/5pg=
+	t=1769444587; cv=none; b=pRkAqcEYowzyBYfRudcYv7OA63B4blnZutTXBDRHRy/oPgi3eZ+C5MHZ3XInO0hBAfcxlIqJT9kqPPyAFRtMG6ca2F59cVRNxbWM4nlk5qFJXUmxncSa/6ReDcdlDGs662143YIrBk85kesVBQp1SnZ69q01CuWnTE1K5JGXlKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769444436; c=relaxed/simple;
-	bh=3FdQHs3mDvUGT5rX7OJK2axo760hLmnlPgwxBo8NnfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HeemaNDXpkCtDhEES44Jexfb/G81DiCiXWqX5UisXUMzladxSbLflC/C4HI+6Rnc3yFQFL6MBiCeTo5WyZ1IGsmaQldRgEjwSSpusThVaxjAevNthwOZm3qLeCw1vvFqD2S006m1JcsU8Pwm6xx2aE6C6dM/7A9vymOCtJuz27w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TaNlONzJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lLZfSnd8l0vmNwskGFJdLuWhZQyos3yCTgoijKc5g4c=; b=TaNlONzJnRURaR7peCf7d9C0PO
-	vhbIdQ38V6tMdEAwpdPoc+Chh2qQwp25USrbsd7hNkW9v5H27hhkyWwR4lE9BXsTFG2gc6deSYMqv
-	YzPcMLxsfe8cQhs9PArtzg8Aq2NzuJvFhDNk31/sEAehfceJlZw71sYoDIAtClYNtDDs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vkPKJ-004oT1-E5; Mon, 26 Jan 2026 17:20:31 +0100
-Date: Mon, 26 Jan 2026 17:20:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tomas Hlavacek <tmshlvck@gmail.com>
-Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
-	spacemit@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Yixun Lan <dlan@kernel.org>,
-	Vivian Wang <wangruikang@iscas.ac.cn>
-Subject: Re: [PATCH] net: spacemit: k1-emac: program frame size registers for
- jumbo frames
-Message-ID: <169bffe4-5292-48b5-b8e7-448fa4288598@lunn.ch>
-References: <20260126135919.77168-1-tmshlvck@gmail.com>
+	s=arc-20240116; t=1769444587; c=relaxed/simple;
+	bh=WJ7NFZ18n9I/IRO2Qd1eUYKElHlcJcBM+w65YsSWMsk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hVyaudTt0SiXumsK9eZxXrrgRp0AvyxnKwH/TfxoZ/8bYutrDrIyWmdnLWSdnmParSsCaReAlrYjo0y3bOEDYJ01I4sGS/tosKSKuOZFNjPV4oieVnwoDSr2s5SyZUlAHigH5qYB0v1w9MIDw7RpPG0+EbOXaFRQYP41f1n0Rro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1tEIlZ9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769444585;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nsIQrgfp5jLTggR6149XJxSxNh6TrKVXLrfEpKoLZdw=;
+	b=I1tEIlZ98aLU6F6R87D75qx5RS9yW4gue3MQf0PfeLrABfGvLExF38iDknjLww6BgIAV3P
+	0OgGkIv6NAQh0jqRrMSUTw9eukSqwLfoPH0tDFAkz+zHu0a1YJvOy81URosndfhAFoBYvA
+	YLUIHOtDw1Pmtu10YNe79cLR9qQ1u6E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-544-AR7DDxPWOnmR01VolRz0iQ-1; Mon,
+ 26 Jan 2026 11:23:03 -0500
+X-MC-Unique: AR7DDxPWOnmR01VolRz0iQ-1
+X-Mimecast-MFC-AGG-ID: AR7DDxPWOnmR01VolRz0iQ_1769444581
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 898B919775E6;
+	Mon, 26 Jan 2026 16:23:00 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.226.107])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E734F19560B2;
+	Mon, 26 Jan 2026 16:22:54 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Petr Oros <poros@redhat.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver)
+Subject: [PATCH net-next] dpll: expose fractional frequency offset in ppt
+Date: Mon, 26 Jan 2026 17:22:51 +0100
+Message-ID: <20260126162253.27890-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126135919.77168-1-tmshlvck@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253532-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,linux.dev,intel.com,resnulli.us,microchip.com,nvidia.com,lunn.ch,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-253534-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 620E28A9C8
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A78908A9E6
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 02:59:19PM +0100, Tomas Hlavacek wrote:
-> The driver allows changing MTU up to 4K via emac_change_mtu() and
-> allocates appropriately sized DMA buffers, but it never programs the
-> MAC_MAXIMUM_FRAME_SIZE and MAC_RECEIVE_JABBER_SIZE registers.
-> 
-> This causes the MAC hardware to reject frames larger than the default
-> 1518 bytes, even when larger buffers are allocated. Frames exceeding
-> the default size trigger jabber errors and are discarded.
+Currently, the dpll subsystem exports the fractional frequency offset
+(FFO) in parts per million (ppm). This granularity is insufficient for
+high-precision synchronization scenarios which often require parts per
+trillion (ppt) resolution.
 
-This sounds like a fix? Should it have a Fixes: tag? Should it be
-added to stable?
+Add a new netlink attribute DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET_PPT
+to expose the FFO in ppt.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+Update the dpll netlink core to expect the driver-provided FFO value
+to be in ppt. To maintain backward compatibility with existing userspace
+tools, populate the legacy DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET
+attribute by dividing the new ppt value by 1,000,000.
 
-	Andrew
+Update the zl3073x and mlx5 drivers to provide the FFO value in ppt:
+- zl3073x: adjust the fixed-point calculation to produce ppt (10^12)
+  instead of ppm (10^6).
+- mlx5: scale the existing ppm value by 1,000,000.
+
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ Documentation/netlink/specs/dpll.yaml          | 11 +++++++++++
+ drivers/dpll/dpll_netlink.c                    | 10 +++++++++-
+ drivers/dpll/zl3073x/core.c                    |  7 +++++--
+ drivers/net/ethernet/mellanox/mlx5/core/dpll.c |  2 +-
+ include/uapi/linux/dpll.h                      |  1 +
+ 5 files changed, 27 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+index b55afa77eac4b..3dd48a32f7837 100644
+--- a/Documentation/netlink/specs/dpll.yaml
++++ b/Documentation/netlink/specs/dpll.yaml
+@@ -446,6 +446,16 @@ attribute-sets:
+         doc: |
+           Granularity of phase adjustment, in picoseconds. The value of
+           phase adjustment must be a multiple of this granularity.
++      -
++        name: fractional-frequency-offset-ppt
++        type: sint
++        doc: |
++          The FFO (Fractional Frequency Offset) of the pin with respect to
++          the nominal frequency.
++          Value = (frequency_measured - frequency_nominal) / frequency_nominal
++          Value is in PPT (parts per trillion, 10^-12).
++          Note: This attribute provides higher resolution than the standard
++          fractional-frequency-offset (which is in PPM).
+ 
+   -
+     name: pin-parent-device
+@@ -628,6 +638,7 @@ operations:
+             - phase-adjust-max
+             - phase-adjust
+             - fractional-frequency-offset
++            - fractional-frequency-offset-ppt
+             - esync-frequency
+             - esync-frequency-supported
+             - esync-pulse
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 499bca460b1e1..904199ddd1781 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -389,7 +389,15 @@ static int dpll_msg_add_ffo(struct sk_buff *msg, struct dpll_pin *pin,
+ 			return 0;
+ 		return ret;
+ 	}
+-	return nla_put_sint(msg, DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET, ffo);
++	/* Put the FFO value in PPM to preserve compatibility with older
++	 * programs.
++	 */
++	ret = nla_put_sint(msg, DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET,
++			   div_s64(ffo, 1000000));
++	if (ret)
++		return -EMSGSIZE;
++	return nla_put_sint(msg, DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET_PPT,
++			    ffo);
+ }
+ 
+ static int
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+index 383e2397dd033..63bd97181b9ee 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -710,8 +710,11 @@ zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
+ 		if (rc)
+ 			return rc;
+ 
+-		/* Convert to ppm -> ffo = (10^6 * value) / 2^32 */
+-		zldev->ref[i].ffo = mul_s64_u64_shr(value, 1000000, 32);
++		/* Convert to ppt
++		 * ffo = (10^12 * value) / 2^32
++		 * ffo = ( 5^12 * value) / 2^20
++		 */
++		zldev->ref[i].ffo = mul_s64_u64_shr(value, 244140625, 20);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
+index 1e5522a194839..3ea8a1766ae28 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
+@@ -136,7 +136,7 @@ mlx5_dpll_pin_ffo_get(struct mlx5_dpll_synce_status *synce_status,
+ {
+ 	if (!synce_status->oper_freq_measure)
+ 		return -ENODATA;
+-	*ffo = synce_status->frequency_diff;
++	*ffo = 1000000LL * synce_status->frequency_diff;
+ 	return 0;
+ }
+ 
+diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
+index b7ff9c44f9aa0..de0005f28e5c5 100644
+--- a/include/uapi/linux/dpll.h
++++ b/include/uapi/linux/dpll.h
+@@ -253,6 +253,7 @@ enum dpll_a_pin {
+ 	DPLL_A_PIN_ESYNC_PULSE,
+ 	DPLL_A_PIN_REFERENCE_SYNC,
+ 	DPLL_A_PIN_PHASE_ADJUST_GRAN,
++	DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET_PPT,
+ 
+ 	__DPLL_A_PIN_MAX,
+ 	DPLL_A_PIN_MAX = (__DPLL_A_PIN_MAX - 1)
+-- 
+2.52.0
+
 
