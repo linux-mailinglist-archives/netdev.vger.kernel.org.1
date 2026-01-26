@@ -1,240 +1,262 @@
-Return-Path: <netdev+bounces-253414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLiKCPVBd2mMdQEAu9opvQ
-	(envelope-from <netdev+bounces-253414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:29:09 +0100
+	id MJmxIJFDd2mMdQEAu9opvQ
+	(envelope-from <netdev+bounces-253415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:36:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E94586EC0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:29:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1CE87135
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92E77300D63F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:28:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7CABE3017052
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FA133064C;
-	Mon, 26 Jan 2026 10:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B20330B33;
+	Mon, 26 Jan 2026 10:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZxR15TY3"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="hEauLtti";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="t4OfXgO5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254C633033C
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 10:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0E0238C15;
+	Mon, 26 Jan 2026 10:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769423332; cv=none; b=Vg7gmqUu+loK0YPe5ybLBxob1fS/UYyraMOkTTk1Z5XnQaMhyJPKkoTuxnUiNSiOzi11BoaOWQY9DvNxxb5gt5W6jwFekrTC056u4q2Vce2zGNf9xpd1FNkuFuhQNwfDtJGKfu5EBKM0ti0BNbJ610SSShuhi4sR4PY6RpsD3KQ=
+	t=1769423695; cv=none; b=tx4lnQaEHOXw3U5o71slqDqcxEW1kJ/f5gpKU5LkI4c8HzTXhDtxSG7VrKejAVhQ+W5MFWpGlizWk/mL4s4K1FhgbH/IJCKSKkexaR1aW9gK5gYvI5G6pFM3RoHNNVgAlXowf8PzeZC7tmDE9T1AVr+oMIVqYAEuGDaiD0fQ91A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769423332; c=relaxed/simple;
-	bh=Mq4jhoQwiChk2fbSJkOenkl/50i+ECFFT+yZETA5cbY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HG9g0KUj02SnYIiRjRCnZxGiCHGMAC+x+AfAlX4RBAm55afZWByf+l+qnImkGsjhc2VQrTq/kokeuQ0XaKld52Q3JUmXvDyPvRb3L/7Z4gkuufH4ucRfUMH4LyuhkbOOtTDmaneG6x7TsplZhSrA4yr7ZiUd/dWU5D2bfCqXnWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZxR15TY3; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59dcd9b89ecso5208054e87.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 02:28:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769423329; x=1770028129; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=auhtqvKNqSuy3B8gISIK2h86XPLcfd95W6hmGc7ctWo=;
-        b=ZxR15TY381sdQAr7ox85tqd7OVr7m8CmarXwuhqN1oDLdoTqFXENoWv9cnF7LHJ+Nc
-         lfh2Rek/CbjStFrNBqGB69iT+ngjbV2qZxJER9DNM2m12lRh6L5f/uDeoeT6ok7iovZU
-         q6eYr06ipygPk62Nac/szrd5PsS9OkXI92Jn6hUvKTtbqu6goNK4Qlb54F80s0jXCVSG
-         IONXBaQe55ANxUezmhTY8h88oMXNGZVo2J3KLexpgM6RUX3UZmiqvQXLLDFn0kkXLspz
-         42SK8/OoUt6VKvNoCLjrtr3tGWsBbSfUflAKz2wGu0PcPijRw9r5xTBJmCmq8QIUHVRL
-         c7KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769423329; x=1770028129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=auhtqvKNqSuy3B8gISIK2h86XPLcfd95W6hmGc7ctWo=;
-        b=ZoFAKjr7AzGfDP3KPsif0H6CIpJBF4/GQyUaIKPNGJWy+RRkT/9CRmGL+ZiQagvPyJ
-         67dxm9EWeqrr5mxDxhn0g2d/rsiMNIPEgLDC/ETal3N6/o+xmny1IlgSktBtlBe6XFVf
-         EBRCRkllJdXxuGJVrHmdwULQm6YwQL8o8gR1n2ftiSLU0gqojOEq8fG5l01vq+krmQ+G
-         SSZYmMGkTG/43bnxzqeHbwJv3BvrUGlpuZnLq5EKPFAX/SR54gPR0Ekofbgh8uhM7skl
-         ZQ2IXGX3EjlldkXsXDk3Ib4tczsRbFUIhTyaOUyn4rXIVSKf+S3xL2u11JI4178awQNg
-         Hjlg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlAyvUwTLZQ5Adhn7yR2ARbYvKwbWtLodNs+Jq5PrpMORsuSPzxlhfvE9LE81bLADe9XtJYIY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKyFIQC2RzebXX3sZMaDs2wdymubRj/AxjvpfhFnDG5oRShPcM
-	8D1QNilHw83s9lJT03eEoM/t+XzISTNT7IjzuPl5x6kAYWB60QF6du/N
-X-Gm-Gg: AZuq6aIwXtGt4XGncHe4QE3QPtIFlaDCJvobcnfZYKny/hYoIx2CFuQyK4LBAj5fP5F
-	E2T3yadpkkxXfGTxNdrHf5WrUm/84kOyy+lJkMxkV07dEOs6lErmAv9JETqdrMr/Wj/V8xtMNH1
-	LkzWAR3SXXA9Zx3F8fu19mxCPZ/dq/rh8HoNdXlpA2tioDjgjcSm9t2/eYhEkFnC9U62mW3G/GY
-	cMrhwBUFa8sPYneB5PwCIHPEYGNt7ANLJiRUeHVzXz3Oysq4UTu0ODXj8+5T9pa0KtSqzpsbt+B
-	7YlG8BRfCG3aa90eb6jgFOSXI+LDuhnl5rq4007kPkRcbJWYc2AgXGqbR0W7A47wu7VpS/YleaF
-	uvSzRP7zLtyM5/PTG5OTGg5SA4owNT9ajACY3bUU6+ivrnAXncBIe33r1tC0Y51o=
-X-Received: by 2002:ac2:4bd6:0:b0:59d:f5ad:1267 with SMTP id 2adb3069b0e04-59df5ad12a3mr1093590e87.9.1769423328970;
-        Mon, 26 Jan 2026 02:28:48 -0800 (PST)
-Received: from milan ([2001:9b1:d5a0:a500::24b])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59de491f8b9sm2596674e87.68.2026.01.26.02.28.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 02:28:48 -0800 (PST)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@milan>
-Date: Mon, 26 Jan 2026 11:28:46 +0100
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
+	s=arc-20240116; t=1769423695; c=relaxed/simple;
+	bh=H9irN+j1Njtx+ubpk0ycXzN6sXa5DRuElxvxMSHwPOA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XPoMF+r9wfbCgYmfT91EUi4IpGHOwJU3r0r84WSOn1v8b3LVpYpR4YDBGMlZ5IQHKsjrlvfpdrojn9ofYULzvOyaxu+t3iWgOEYV9B2GYLh8Mrt1OjSHohZKmD1lXEGMJWJ7qTQmvI79eT+I1yZ6Z1ZtattwbvQeuAR5+E1HE5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=hEauLtti; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=t4OfXgO5; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4f04fW53cWz9sk9;
+	Mon, 26 Jan 2026 11:34:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1769423683;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XQgy/gqXOYj94r+JKw2+t1DDizO2slSW2W9L6xQSj1E=;
+	b=hEauLtti+Ly3CEdg3PB7c9YQ62isImXVd/Vaura3ZvX8kfQvgjEwL9OUQTH443ZH0xSs2C
+	yv7IP3forGyA8LMQ1GBFH+Dmv29uXPsP68OIXNM1tDRUdsrOVgYNpZo6ESQcLcZi9F6eVA
+	3mUeU5DtsK2T7L5/1PhGUFgE1Fv4Ghh+agqJmqF8A7pNt8DWoEEBaaIIfEK2iEcNXIEaQU
+	mXxYI3dCMGZX2Xc8od4MzsIfKrLkJ+rzERTnDs80HhMbDqVDLWuKR6Joa3iXy2Ns7giTQQ
+	ENrjaCN3syNmGJzCaR7/Bw0kaOnJuCSJ+Ab0ZTvvdVGLtIfI1dDGyveSWGjWAg==
+From: Lukasz Majewski <lukasz.majewski@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1769423677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XQgy/gqXOYj94r+JKw2+t1DDizO2slSW2W9L6xQSj1E=;
+	b=t4OfXgO5oz4DrbkGNt4wwmw7F9AWzsCKdrMTKGsMowIFrmcPmxqlCVn9Zk6gk6698Hfp9K
+	6wdQJWmJvgLkjbZMW3umWWgQqmkv8wS04pLZpltL8XIlfRY49nyYeUw2tP+XDuw6IHwUaP
+	4WSnYN+rqODAzbSDuqDWBRnxmqN0DK5xjaXXpusOXQ9fDAay9Lgp9uw0Dphue+mtXZziZV
+	89dEhoxIWKblIZ4qD2n9i8wikGueiaBf/hCQtl1YwIapoddgYhR4n2RuXe+pBSBUSZPiZK
+	iArSCuHZemhNzz2Yj+e2W/b2W6cFz+kmNRC6ed9PjULmUYwv3b7CHz2yv0r+Fg==
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	oliver.yang@linux.alibaba.com
-Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
-Message-ID: <aXdB3lsm3w0fJT3Q@milan>
-References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
- <20260123082349.42663-3-alibuda@linux.alibaba.com>
- <aXPEFdEdtSmd6AzF@milan>
- <20260124093505.GA98529@j66a10360.sqa.eu95>
- <aXSjm1DXm6yP62tD@pc636>
- <20260124145754.GA57116@j66a10360.sqa.eu95>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Stefan Wahren <wahrenst@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Lukasz Majewski <lukasz.majewski@mailbox.org>
+Subject: [net-next v20 0/7] net: mtip: Add support for MTIP imx287 L2 switch driver
+Date: Mon, 26 Jan 2026 11:33:53 +0100
+Message-Id: <20260126103400.1683125-1-lukasz.majewski@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260124145754.GA57116@j66a10360.sqa.eu95>
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: x865gi14jsshirwxxo1hicjtm4nkecf7
+X-MBO-RS-ID: a2654ea3b3aa8cc6253
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[pengutronix.de,gmail.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,gmx.net,kernel.org,mailbox.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-253415-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253414-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,linux-foundation.org,linux.alibaba.com,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[urezki@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alibaba.com:email]
-X-Rspamd-Queue-Id: 8E94586EC0
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:mid,mailbox.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,denx.de:url]
+X-Rspamd-Queue-Id: EA1CE87135
 X-Rspamd-Action: no action
 
-Hello, D. Wythe!
+This patch series adds support for More Than IP's L2 switch driver embedded
+in some NXP's SoCs. This one has been tested on imx287, but is also available
+in the vf610.
 
-> > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
-> > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
-> > > > > find_vm_area() provides a way to find the vm_struct associated with a
-> > > > > virtual address. Export this symbol to modules so that modularized
-> > > > > subsystems can perform lookups on vmalloc addresses.
-> > > > > 
-> > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> > > > > ---
-> > > > >  mm/vmalloc.c | 1 +
-> > > > >  1 file changed, 1 insertion(+)
-> > > > > 
-> > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-> > > > > index ecbac900c35f..3eb9fe761c34 100644
-> > > > > --- a/mm/vmalloc.c
-> > > > > +++ b/mm/vmalloc.c
-> > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
-> > > > >  
-> > > > >  	return va->vm;
-> > > > >  }
-> > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
-> > > > >  
-> > > > This is internal. We can not just export it.
-> > > > 
-> > > > --
-> > > > Uladzislau Rezki
-> > > 
-> > > Hi Uladzislau,
-> > > 
-> > > Thank you for the feedback. I agree that we should avoid exposing
-> > > internal implementation details like struct vm_struct to external
-> > > subsystems.
-> > > 
-> > > Following Christoph's suggestion, I'm planning to encapsulate the page
-> > > order lookup into a minimal helper instead:
-> > > 
-> > > unsigned int vmalloc_page_order(const void *addr){
-> > > 	struct vm_struct *vm;
-> > >  	vm = find_vm_area(addr);
-> > > 	return vm ? vm->page_order : 0;
-> > > }
-> > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
-> > > 
-> > > Does this approach look reasonable to you? It would keep the vm_struct
-> > > layout private while satisfying the optimization needs of SMC.
-> > > 
-> > Could you please clarify why you need info about page_order? I have not
-> > looked at your second patch.
-> > 
-> > Thanks!
-> > 
-> > --
-> > Uladzislau Rezki
-> 
-> Hi Uladzislau,
-> 
-> This stems from optimizing memory registration in SMC-R. To provide the
-> RDMA hardware with direct access to memory buffers, we must register
-> them with the NIC. During this process, the hardware generates one MTT
-> entry for each physically contiguous block. Since these hardware entries
-> are a finite and scarce resource, and SMC currently defaults to a 4KB
-> registration granularity, a single 2MB buffer consumes 512 entries. In
-> high-concurrency scenarios, this inefficiency quickly exhausts NIC
-> resources and becomes a major bottleneck for system scalability.
-> 
-> To address this, we intend to use vmalloc_huge(). When it successfully
-> allocates high-order pages, the vmalloc area is backed by a sequence of
-> physically contiguous chunks (e.g., 2MB each). If we know this
-> page_order, we can register these larger physical blocks instead of
-> individual 4KB pages, reducing MTT consumption from 512 entries down to
-> 1 for every 2MB of memory (with page_order == 9).
-> 
-> However, the result of vmalloc_huge() is currently opaque to the caller.
-> We cannot determine whether it successfully allocated huge pages or fell
-> back to 4KB pages based solely on the returned pointer. Therefore, we
-> need a helper function to query the actual page order, enabling SMC-R to
-> adapt its registration logic to the underlying physical layout.
-> 
-> I hope this clarifies our design motivation!
-> 
-Appreciate for the explanation. Yes it clarifies an intention.
+In the past there has been performed some attempts to upstream this driver:
 
-As for proposed patch above:
+1. The 4.19-cip based one [1]
+2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
+   with NO tag appended.
+3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
+   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
+   the driver uses already configured MAC and PHY to also configure PHY.
 
-- A page_order is available if CONFIG_HAVE_ARCH_HUGE_VMALLOC is defined;
-- It makes sense to get a node, grab a spin-lock and find VM, save
-  page_order and release the lock.
+All three approaches were not accepted as eligible for upstreaming.
 
-You can have a look at the vmalloc_dump_obj(void *object) function.
-We try-spinlock there whereas you need just spin-lock. But the idea
-is the same.
+The driver from this series has following features:
 
---
-Uladzislau Rezki
+1. It is fully separated from fec_main - i.e. can be used interchangeable
+   with it. To be more specific - one can build them as modules and
+   if required switch between them when e.g. bridge offloading is required.
+
+   To be more specific:
+        - Use FEC_MAIN: When one needs support for two ETH ports with separate
+          uDMAs used for both and bridging can be realized in SW.
+
+        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
+          attached to switch and bridging shall be offloaded to HW. 
+
+2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
+   separation at boot time. Port separation is disabled when bridging is
+   required.
+
+3. Example usage:
+        Configuration:
+        ip link set lan0 up; sleep 1;
+        ip link set lan1 up; sleep 1;
+        ip link add name br0 type bridge;
+        ip link set br0 up; sleep 1;
+        ip link set lan0 master br0;
+        ip link set lan1 master br0;
+        bridge link;
+        ip addr add 192.168.2.17/24 dev br0;
+        ping -c 5 192.168.2.222
+
+        Removal:
+        ip link set br0 down;
+        ip link delete br0 type bridge;
+        ip link set dev lan1 down
+        ip link set dev lan0 down
+
+4. Limitations:
+        - Driver enables and disables switch operation with learning and ageing.
+        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
+          on purpose, as up till now we didn't had consensus about how the driver
+          shall be added to Linux.
+          However, on top of this patch set the code with SWITCHDEV support (v6.6.
+          PREEMPT_RT enabled) has been implemented in [4].
+
+5. Clang build:
+	make LLVM_SUFFIX=-19 LLVM=1 mrproper
+	cp ./arch/arm/configs/mxs_defconfig .config
+	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 menuconfig
+	make ARCH=arm LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 LOADADDR=0x40008000 uImage dtbs
+
+        make LLVM_SUFFIX=-19 LLVM=1 mrproper
+        make LLVM_SUFFIX=-19 LLVM=1 allmodconfig
+        make LLVM_SUFFIX=-19 LLVM=1 W=1 drivers/net/ethernet/freescale/mtipsw/ | tee llvm_build.log
+        make LLVM_SUFFIX=-19 LLVM=1 W=1 -j8 | tee llvm_build.log
+
+6. Kernel compliance checks:
+	make coccicheck MODE=report J=4 M=drivers/net/ethernet/freescale/mtipsw/
+        make allmodconfig; ~/work/src/smatch/smatch_scripts/kchecker drivers/net/ethernet/freescale/mtipsw/
+
+7. GCC:
+        make mrproper
+        make allmodconfig
+        make W=1 drivers/net/ethernet/freescale/mtipsw/
+
+        
+        [source OE/Yocto SDK build environment]
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make mrproper
+        cp ./arch/arm/configs/mxs_defconfig .config
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make menuconfig
+        CROSS_COMPILE=arm-poky-linux-gnueabi- ARCH=arm make -j8 LOADADDR=0x40008000 uImage dtbs
+
+8. DT_SCHEMA checks:
+        source ~/.venv/bin/activate
+        source /opt/poky/3.1.31/environment-setup-armv5e-poky-linux-gnueabi
+        make dt_binding_check DT_SCHEMA_FILES=nxp,imx28-mtip-switch.yaml
+        make CHECK_DTBS=y DT_SCHEMA_FILES=nxp,imx28-mtip-switch.yaml nxp/mxs/imx28-xea.dtb
+
+
+Links:
+[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
+[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
+[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
+[4] - https://github.com/lmajewski/linux-imx28-l2switch/commits/vf610-linux-6.6.y-mtipl2sw
+
+Lukasz Majewski (7):
+  dt-bindings: net: Add MTIP L2 switch description
+  net: mtip: The L2 switch driver for imx287
+  net: mtip: Add buffers management functions to the L2 switch driver
+  net: mtip: Add net_device_ops functions to the L2 switch driver
+  net: mtip: Add mtip_switch_{rx|tx} functions to the L2 switch driver
+  net: mtip: Extend the L2 switch driver with management operations
+  net: mtip: Extend the L2 switch driver for imx287 with bridge
+    operations
+
+ .../bindings/net/nxp,imx28-mtip-switch.yaml   |  150 ++
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/freescale/Kconfig        |    1 +
+ drivers/net/ethernet/freescale/Makefile       |    1 +
+ drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
+ .../net/ethernet/freescale/mtipsw/Makefile    |    4 +
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 1997 +++++++++++++++++
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  648 ++++++
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  132 ++
+ .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  443 ++++
+ 10 files changed, 3396 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+
+-- 
+2.39.5
+
 
