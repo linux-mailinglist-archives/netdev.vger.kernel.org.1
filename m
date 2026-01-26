@@ -1,225 +1,298 @@
-Return-Path: <netdev+bounces-253621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253622-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCIDNsP6d2nlmwEAu9opvQ
-	(envelope-from <netdev+bounces-253621-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:37:39 +0100
+	id WABqODr9d2kvnAEAu9opvQ
+	(envelope-from <netdev+bounces-253622-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:48:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10EED8E37A
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:37:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6EC8E50A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:48:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4CA130160C8
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:37:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEC663024440
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B85130FC12;
-	Mon, 26 Jan 2026 23:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967643101AD;
+	Mon, 26 Jan 2026 23:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FnDNDkjp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjQry7wM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1248326299
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8B628850C
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.176
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769470656; cv=pass; b=lpmZlwJcpgLXa6NMun6W24pZe+HkzJkRbACZovbhgjzC32Kgn17gL9dAK0zniA1X0hGHEjAsIyrLh0OVwFvYW9VxOsOm53UMMDhRKwp7Hnlnahl8AhZUgPFeP9tMRgMl5lL3GO3BVIQj12nHi8HpXwB3kPSNMtOfST8/3SD7u7Q=
+	t=1769471287; cv=pass; b=ZbocpYJhC12mgPQUSqbc75tm8IR6S6DXGzj8UQWG0opekCWyz4b1O/04/JwRELQnNwrQsaodtW4hYthmT9h61mP9nKnf0tPiCC1b/pQOEnzB/RNz+qb5tdxE9XwAFqZi6LFDZE/hFUEvvts0YJvLy/bclrhb3ANRKA+tLRzvjjA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769470656; c=relaxed/simple;
-	bh=MpH5HfQqqOP4vgM6v8cVHc8HKf+ehzZ58Vny6IWtl9I=;
+	s=arc-20240116; t=1769471287; c=relaxed/simple;
+	bh=6P7K47Ygy+L97CBlUR3oUNT4NXx+pgENUXHRpAc7cOI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EPdiiRCAXLGY40sd/7h3hLUHzL5S3R4HNpjEOhHs/9JwyuSKMntoIQK56s+Ge6Qcl7HZw8kQKCwN2ENtjWgS+CLN2AiHkTBPdg1RsXLY6GcTl/CU2wqf3XVOH92DjP5qCcBPXE9EL/tCsNjo3cs2KFv/19lw/KBrjAVEgu4m3dM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FnDNDkjp; arc=pass smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5f54d6b4047so3034726137.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:37:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769470654; cv=none;
+	 To:Cc:Content-Type; b=s8CWzdlTXeca+Q/x6ufzknfo0YfaCSr6a4HB+XvcGLMQ/rEkIs9iCrYbGkml4bLq6JLM/ORAtmSduiKg9SGMqXWbQ4s7eqvw3QZLybmsHE/WFturX3SHCVpZzHhcxBsMmEq6eOf2Fi5mFmGONam6xb2fJ6gjotOwrdpngsVTBUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fjQry7wM; arc=pass smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a097cc08d5so12522405ad.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:48:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769471285; cv=none;
         d=google.com; s=arc-20240605;
-        b=a/m/7KnF9ZZNwgNSZ2spVjZUX6UmzyM9HPvRLRMuBWGQGGdJxZ9s+Pogd1Kx0D0a3g
-         PMwjU8ZXyY4cm7wSSwwmqnIcDCE400hM7FAR54GW07b8VRyAyZbmnVVh3M+OW8QvQb3s
-         3sy15Pr4q0RpMkZboGB3Lo/ed3sE2j+W7vJ1c+dCJBzuwhTvE8KqTIbK42Zq/GZZQhcF
-         AvdWy/pg7zDGynuPfA3lkMGjnyzapGoS8HUma6R7pvCzf1OA62uMtP+YmEQ/MfFUDTIc
-         jtzJK59hU7eYTgW9XoUJHnqvSrtwgXlg947ACzjXbCuuE9SZDERjEcbXVlap3ZZtt1uL
-         bgHg==
+        b=bmikljsgCncewc1+FqK8xXP/KdD4jSHSY9leRxfNXrcOE3aGWSN0/WKxR+rlfbgUO0
+         BKgIYlye+WSs3nksLobozJ3Zwr8VmtjqgjVg5mwfG59BTm3QoZ6sUnjVqfkJn/musGJN
+         iWN1cnfczTLGRn0YTJQrb2sxIEN36nqcmVSUEkyPrP1GKdn89u5pDHXq/kqAWcUagXgq
+         szEk2Zx78zlv+kFPl7espkLPSqnztfPZW00xnMRuvW7E+sWqGEXqvLRmPggtpS6vBxmj
+         Y8YtvQ1UiEVsoWRGOhB4ALgOqYaVTplP0B5m6dCApLYdL0R4NiPeykKCjf8EkivhPKI/
+         q90A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=wV6g5Kunqs0fqAq5CF6kHS+zlhoiN8KJDdska3kpk28=;
-        fh=S+f6avFf+T3+/lD7i7470lZiUwELamk31lmm9MUv4nw=;
-        b=kbjff6nsHcqGDISh9k72lzCfyrkNaV5UYd94tKAJzF1omyNleyum36bnBwAZTWDb2M
-         Hz19HnuvcrsnBDyUWCNz+F6y+uHYtB7lkWTz9kc8vuvVMq0ZNJiRQ7kA4pBXujvN7D6f
-         ZW1+akAUoMjtDvgTNy5eqWutCH1+1UanPzS0d5VxUcDjia2QANNObRCoAJBspTaP/U51
-         AnvkqVmMsy4keFCDMl3q6gKa0EARV4LJL2lrGckWjBZQhJF/I/4fUabL1EC2xo1zR/iJ
-         2EmgZSa7MvMI6ZeNScOOXbgbbe+oGkE8EunMnEUG0OaO6Z+K6juZ3OIFeun7vJ2Nr95B
-         1Bxg==;
+        bh=GO5kGcOId02q+94y1nKynoWWSsh0iwJBp3duKSsqaD0=;
+        fh=CZdKTfxlXuIKIjnRXlG9t/9xZg9yLT/HMzAvp04myPM=;
+        b=KvaVg3xQZ3h7sPHG7MKAxS4xrxyP7uietfM5xPoWSB6k63b5ptK4PLfTWTkio+X7Wo
+         9tvbVQJiXVZhYTmf7E9lmB1i/Mpo+KKA0smYWdz67R10AH3lWlxB/xv1D+gJ9+qBhgtk
+         aWeeu70xTu1vBvFHAx6MXGmaNRLrMBgdBsLpY013XEgVucjH+v6xrp3SPCyq91AKNJmc
+         B/ktRvCfHGOisN8VlHohswy32w0QGygv+VdU+mkq7hz92q1JZmPyw0JimAST2TL8yAvh
+         QNskmighFLTRkUywxhsNmKAyq7SUqDWpzt8dQiPa0KkpYPfcPF7rAArOQ26ATCxoZIPQ
+         CfQw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1769470654; x=1770075454; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769471285; x=1770076085; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wV6g5Kunqs0fqAq5CF6kHS+zlhoiN8KJDdska3kpk28=;
-        b=FnDNDkjp4G2izkd3SCPOGLvOa8oHonaY+qcs+TDDLuEqnB4SHwczV1tFxTn6lgiGGE
-         2TNC9p8SZLOdNx5f1fK4zXO5hUkbqrw6Td+l/VUJ52Y4rip2KwKir4Z/hOmfUgBz/PEv
-         ZFXoMU2jmepEpaAp/vT+dPN0Q7oQJPy2PihaUYMXZSVPRwnDgs4OH10XfrZ9Qu92tZCN
-         7qyh1ug7bXfEfNGoTf+5+4CP44Altlxzel+c+QX0+oRlypX3wmceh65RaV3jAiLAk5fN
-         4BJ/UgHemxHFzvgot2UtZAzqaPDgywMswCE4y8QY6fIUT0lb23bTr/zpqadFycZ0DSsd
-         7Pdw==
+        bh=GO5kGcOId02q+94y1nKynoWWSsh0iwJBp3duKSsqaD0=;
+        b=fjQry7wMBp0lVxmMqHtQok+9B54ox6DceDyg65HcZ8fVEnNt9NK47dJLFhK/534s2o
+         iO/+GvU39qWFKFGK6WL7OQSnJ9YQG6A4t3rY02ShIBJ87sGlY2AsmcjgWyPSRvsddFRm
+         RHOipNh/HX9aSI0NF/XbYLX9umNxjqENg9B+QgvJY7m7IwsYi6CkkPKqNvF4sF5cCs8v
+         IHlW/rGfDns9Wps/EadG/AIUUB+ahRqldoCWw61b6BhB8F2Hmi80g72osr2MjiNdrPdH
+         N1GO8VlHaXsqVBhyBD4S7LIDV3xosOzfy6QhcMupZ8GxruES0HBWp27EX5z6/pdOgI3a
+         jOEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769470654; x=1770075454;
+        d=1e100.net; s=20230601; t=1769471285; x=1770076085;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wV6g5Kunqs0fqAq5CF6kHS+zlhoiN8KJDdska3kpk28=;
-        b=G2kGASiTOzprezznssIMMJglLnRGa990DoTRvPnnrdmQ2iUX1G0lPABuTWiRTozhTi
-         7gDVxmsUKDqk06CT4qfS7ztzWpQCd3Zab2v6f9Q8pvQ5R9ZZLt3y+tZwR01H8JZnJZ47
-         Xv8SxO83yx2BU0MLJAuGWchx+s72V67RapO68oSLRqtGvUsFSF0e28DcuJZCq/IIl8O7
-         wu0iud013cdwIXbf4i4fzyjSPaQuHQ20m5H09N55VOIAgJtb5zdxrGW4pyF1pgJ/wA3x
-         jHLytMPuCR/Y061gRymAO0jecfgfMciGkt7Yyyy8QEP8e9IbLe9qFHp1X7WhpJMuqBgh
-         GXhQ==
-X-Gm-Message-State: AOJu0Yxw+KstJU35VR9KZJvAh/PDoRlxc3KE2SPNqqePzLJnmPeBRlpD
-	998X9j25/u4J/BsEgAvrgb6aQ3gwAtiLB4HRZHgOD2GJYn3JvQCP2B6OhJyCq5yzhkk6AhbSgp4
-	uoxIYmPlvEXyXHbBXWJsZUNSp2auIURnq3/rqjFBDcg==
-X-Gm-Gg: AZuq6aLlQ3r2PnuJcGEpWWvr0bREl0Cnh2Pw1CH6Y25g9RBizZPijbb45EOTQx7fI/A
-	k4fasBc/MfxNLiABmytZkSrAXZe4YuX/K0ZmJKwK0DbywCcZlNI8fq1tDUFgWEHA8EiryoC05aS
-	4KJ59yrHbyzsSCreUJZP3g4u+9xtNA3T+7oDcvosvRQQhKAmhuXhHaAxr8zD2Yagfgp2nSgWZlM
-	OH3WoSVdzXKiBs+wPbWsndolg/Lcj4/efMKWbT89Tb+Veo9J1EM/5Put8F0M+seid4gP4U=
-X-Received: by 2002:a05:6102:1614:b0:5db:cec7:810b with SMTP id
- ada2fe7eead31-5f7237aaf4bmr279443137.29.1769470653975; Mon, 26 Jan 2026
- 15:37:33 -0800 (PST)
+        bh=GO5kGcOId02q+94y1nKynoWWSsh0iwJBp3duKSsqaD0=;
+        b=pb647OFPlBzUvQzwpYW0UGwUHzPANkEzizeng2+/q5HpF/zkwjkFx6tTS4g1dSOZyS
+         oe3VXgYNFf4QNe0XEwfwVtrgNE2SnMhWGeRHUs8/EkRIHkSYynrk94hoPaC7uQ8BUdsm
+         0NS+lPL0oGeL23dE8VYYa5ErqcQWaMMZdcvF1BdF8Th1fbLa+BCHQzyrQ6oy4dOkD1kT
+         XBgWCfUqwnuGBYKprivP/CrobEwezACbFRah236pJvclstS+BWL6swQ0W0CgHIOkoP2q
+         27yfL2b1vy+wW7xGBTKGZMKELesgJFI0IFWSZjEOZhX5bDNOWgQD1AnFE41MEhTKfiua
+         bT2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVy0nLie7iYmiRe+QEVJePUcBlJ0117Sl0Cu9m0lsllWMz8sv+7epdByctHTPbLCLUUamiLvcY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdQDRHCWi0/denA1se6MLlKkRJ2huKWFlodpcpR2Ox5DDNZXSA
+	tlIXxGwF1gtPeaZA7Mc7Jfqz943GnG+pQhpDD+6HKXhmZNOS+3SgJkOjSa/xPVhJMEVnKO1KEsk
+	NFsD9xn+NJp67VkbW9Mt03a26lJkq6dCZ6vBLQaog5g==
+X-Gm-Gg: AZuq6aK3uiV8dSOSM12W3mo4+sZ3KjaR4P6y+PDCZ6RUtxLDU9ldFKlmn7MlkwNflGV
+	1AYARMi1kfRTbftd2FGWRDPmi2BmsJYsDcS7RJ27XIiPVwcrtOSnfrHxBeWEV91hyeTjtHTNIko
+	s9cBJ819qLGxMox5c3V9MvP1wErFLfw9vblM/mOWh3MsrULfXdHeffUH6QlrawEPQnzlQZN683D
+	WvVL8wmqNkWtIm/ozaUpROI3knnrp59oWQ5OmjfrImQ28kgRue0u33J5TNucT8ZRaRL8G4sObgt
+	q+NNF43fa1firxgjsf4kQWHUT/k=
+X-Received: by 2002:a17:90b:588d:b0:352:ebe9:2828 with SMTP id
+ 98e67ed59e1d1-353c41bb19emr4042574a91.7.1769471285492; Mon, 26 Jan 2026
+ 15:48:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121215727.3994324-1-rjethwani@purestorage.com>
- <58fe1908-48de-4bca-ad4e-4976d24581e6@gmail.com> <CAKaoeS2Jnaekdx2dXfBV91LhbaLU6SenBRkNqmRB3-1EhSCbYg@mail.gmail.com>
- <CAKaoeS1Ykr9E0URiasMy9j0Jw6R7AbXLbSgMV=KHyfrCakp48w@mail.gmail.com>
-In-Reply-To: <CAKaoeS1Ykr9E0URiasMy9j0Jw6R7AbXLbSgMV=KHyfrCakp48w@mail.gmail.com>
-From: Rishikesh Jethwani <rjethwani@purestorage.com>
-Date: Mon, 26 Jan 2026 15:37:23 -0800
-X-Gm-Features: AZwV_QjYVkpXTDSM_c6DOMx7V_svIs4qvK_f_ZJTtiJfphGGjmK0h3bidbpZzrw
-Message-ID: <CAKaoeS0ngukLaNKT8q6zsykRbFARTDw-QZgbrk7gjnE_Bf9Xcg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] tls: Add TLS 1.3 hardware offload support
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, leon@kernel.org
+References: <CAGfirfeHMgBUq-Q8tCn8dr2tHVJdQtZbS0JMutqF+b04T3EoWw@mail.gmail.com>
+ <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
+ <CANn89iJrXSHouF4ZnnoVYz4Q47J5jkwU4OuXMpJi3Orox4uT_Q@mail.gmail.com>
+ <CANn89iJvj8YXtuMNTh1cQOjVctBsMs88FHx-xLn+rCzyBGn-og@mail.gmail.com>
+ <CAGfirfebdHJi13epyM5RWYfQ2TGSWExP5nmnoKra83awetAbLQ@mail.gmail.com>
+ <CANn89iLhXQ0W7+rOQCqxLpGyoHBAJ_xeUhjL+7MtQmN2saaYog@mail.gmail.com>
+ <CAM0EoMm49+9j77Xpb46Q7qVT7JBU2cXKZB-Oeurzsuoe-=3eJw@mail.gmail.com>
+ <CANn89iL1oB2J6whubYof+2AVWpWRm+gBsp3P8-xRP8Y22Jy6_w@mail.gmail.com> <CAM0EoMnwGW05yc50ZyoKE28F-jZHeEtX+X4H2Xx6+KBQn-v6DQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMnwGW05yc50ZyoKE28F-jZHeEtX+X4H2Xx6+KBQn-v6DQ@mail.gmail.com>
+From: GangMin Kim <km.kim1503@gmail.com>
+Date: Tue, 27 Jan 2026 08:47:54 +0900
+X-Gm-Features: AZwV_Qi7wby4giSxNv4BVIuFsKTpj3OPOLRfFGZItfSUC2EsIWXbQWcjbIzvvuo
+Message-ID: <CAGfirfcWbnW0wMYSZNs4M5Hj-qPn1edJsDq9Y-4yxuBvOMzdWQ@mail.gmail.com>
+Subject: Re: [BUG] KASAN: slab-use-after-free Read in u32_classify
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, jiri@resnulli.us, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
+	horms@kernel.org, syzkaller@googlegroups.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253621-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253622-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[purestorage.com:+];
+	FREEMAIL_CC(0.00)[davemloft.net,resnulli.us,kernel.org,vger.kernel.org,redhat.com,gmail.com,googlegroups.com];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com];
+	FROM_NEQ_ENVFROM(0.00)[kmkim1503@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,purestorage.com:email,purestorage.com:dkim]
-X-Rspamd-Queue-Id: 10EED8E37A
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 2A6EC8E50A
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 11:05=E2=80=AFAM Rishikesh Jethwani
-<rjethwani@purestorage.com> wrote:
+Structured the patch following similar commits to prevent out-of-bounds acc=
+ess.
+
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -111,6 +111,17 @@ static inline unsigned int u32_hash_fold(__be32 key,
+  return h;
+ }
+
++static bool offset_valid(struct sk_buff *skb, int offset)
++{
++ if (offset > 0 && offset > skb->len)
++ return false;
++
++ if (offset < 0 && -offset > skb_headroom(skb))
++ return false;
++
++ return true;
++}
++
+ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+     const struct tcf_proto *tp,
+     struct tcf_result *res)
+@@ -214,6 +225,8 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+  if (ht->divisor) {
+  __be32 *data, hdata;
+
++ if (!offset_valid(skb, off + n->sel.hoff))
++ goto out;
+  data =3D skb_header_pointer(skb, off + n->sel.hoff, 4,
+    &hdata);
+  if (!data)
+@@ -229,6 +242,8 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+  if (n->sel.flags & TC_U32_VAROFFSET) {
+  __be16 *data, hdata;
+
++ if (!offset_valid(skb, off + n->sel.offoff))
++ goto out;
+  data =3D skb_header_pointer(skb,
+    off + n->sel.offoff,
+    2, &hdata);
+
+2026=EB=85=84 1=EC=9B=94 27=EC=9D=BC (=ED=99=94) AM 12:24, Jamal Hadi Salim=
+ <jhs@mojatatu.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 >
-> On Thu, Jan 22, 2026 at 11:22=E2=80=AFAM Rishikesh Jethwani
-> <rjethwani@purestorage.com> wrote:
+> On Mon, Jan 26, 2026 at 9:11=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
 > >
-> > > Hi Rishikesh,
+> > On Mon, Jan 26, 2026 at 2:51=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.=
+com> wrote:
 > > >
-> > > This version doesn't compile for us.
-> > > A few comments that we wanted to share on V3, but I'll share here as
-> > > this is the latest:
+> > > On Mon, Jan 26, 2026 at 7:26=E2=80=AFAM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Mon, Jan 26, 2026 at 1:11=E2=80=AFPM =EA=B9=80=EA=B0=95=EB=AF=BC=
+ <km.kim1503@gmail.com> wrote:
+> > > > >
+> > > > > I propose the following patch and would appreciate your review.
+> > > > >
+> > > > > hoff is used as an offset argument to skb_header_pointer() in
+> > > > > u32_classify(), and negative values can cause out-of-bounds read.=
+ As
+> > > > > shown in the code below, offoff follows the same pattern and requ=
+ires
+> > > > > the same validation.
+> > > > > ```
+> > > > > TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+> > > > >    const struct tcf_proto *tp,
+> > > > >    struct tcf_result *res)
+> > > > > {
+> > > > > ...
+> > > > > if (n) {
+> > > > > ...
+> > > > > if (n->sel.flags & (TC_U32_OFFSET | TC_U32_VAROFFSET)) {
+> > > > > off2 =3D n->sel.off + 3;
+> > > > > if (n->sel.flags & TC_U32_VAROFFSET) {
+> > > > > __be16 *data, hdata;
+> > > > >
+> > > > > data =3D skb_header_pointer(skb,
+> > > > >   off + n->sel.offoff,
+> > > > >   2, &hdata);
+> > > > > if (!data)
+> > > > > goto out;
+> > > > > off2 +=3D ntohs(n->sel.offmask & *data) >>
+> > > > > n->sel.offshift;
+> > > > > }
+> > > > > off2 &=3D ~3;
+> > > > > }
+> > > > > ...
+> > > > > }
+> > > > > ...
+> > > > > }
+> > > > > ```
+> > > > > Therefore, I propose a patch that rejects negative hoff and offof=
+f
+> > > > > values during u32 classifier configuration.
+> > > > >
+> > > > > --- a/net/sched/cls_u32.c
+> > > > > +++ b/net/sched/cls_u32.c
+> > > > > @@ -1104,6 +1104,11 @@ static int u32_change(struct net *net, str=
+uct
+> > > > > sk_buff *in_skb,
+> > > > >   err =3D -EINVAL;
+> > > > >   goto erridr;
+> > > > >   }
+> > > > > +
+> > > > > + if (s->hoff < 0 || s->offoff < 0) {
+> > > > > + err =3D -EINVAL;
+> > > > > + goto erridr;
+> > > > > + }
+> > > > >
+> > > >
+> > > > Negative values are valid, it is ok to access data between skb->hea=
+d
+> > > > and skb->data.
 > > >
-> > > We tested V3 and a few issues were spotted.
-> > > We did not debug them though...
+> > > Right. We have to do this at runtime in classify().
+> > > Can you test with your POC with Eric's suggested fix?
 > > >
-> > > We run a server/client test with nginx and wrk.
-> > >
-> > > a.
-> > > When requesting 128-bit key, ss output shows "cipher: aes-gcm-256" fo=
-r
-> > > the respective connection.
-> > > For TLS 1.2 it works fine.
-> > >
-> > > b.
-> > > On the wrk side, the mlx5 rx_tls_ctx did not increase (meaning no
-> > > offloaded connections were opened). It works fine on the nginx side
-> > > however...
-> > > For TLS 1.2 it works fine.
-> > >
-> > > We can share more info if needed.
-> > >
-> > > Regards,
-> > > Tariq
-> > >
-> > Hi Tariq,
+> > > Eric, can we do something like pedit? See: offset_valid() usage
 > >
-> > I have fixed the typo leading to compile errors in V5.
-> > Could you please share more info. about the setup and test, so that I
-> > can try to reproduce the issue?
 > >
-> > Thanks,
-> > Rishikesh
+> > Yes, it seems net/sched/act_pedit.c had a similar issue in the past :)
+> >  Amir fixed it with
+> >
+> > commit 95c2027bfeda21a28eb245121e6a249f38d0788e
+> > Author: Amir Vadai <amir@vadai.me>
+> > Date:   Mon Nov 28 12:56:40 2016 +0200
+> >
+> >     net/sched: pedit: make sure that offset is valid
+> >
+> >     Add a validation function to make sure offset is valid:
+> >     1. Not below skb head (could happen when offset is negative).
+> >     2. Validate both 'offset' and 'at'.
+> >
+> >     Signed-off-by: Amir Vadai <amir@vadai.me>
+> >     Signed-off-by: David S. Miller <davem@davemloft.net>
 >
-> HI Tariq,
+> =EA=B9=80=EA=B0=95=EB=AF=BC,
+> Are you able to send a similar patch? Otherwise one of us will.
 >
-> Did you run SW TLS 1.3 in your environment?
-
-Hi Tariq,
-
-I tested TLS 1.3 hardware offload with nginx and wrk. The ss output
-shows the correct cipher, and hardware counters confirm TX/RX offload
-is working as expected.
-
-AES-256-GCM:
-nginx.conf:
-    ssl_protocols TLSv1.3;
-    ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384;
-    ssl_conf_command Options KTLS;
-
-# ss -tnei 'sport =3D :16443 or dport =3D :16443' | grep -i cipher
-version: 1.3 cipher: aes-gcm-256
-
-
-AES-128-GCM:
-nginx.conf:
-    ssl_protocols TLSv1.3;
-    ssl_conf_command Ciphersuites TLS_AES_128_GCM_SHA256;
-    ssl_conf_command Options KTLS;
-
-# ss -tnei 'sport =3D :16443 or dport =3D :16443' | grep -i cipher
-version: 1.3 cipher: aes-gcm-128
-
-Both ciphers report correctly. I suspect there may be a configuration
-issue on your setup. Let me know if you need help debugging.
-
-Regards,
-Rishikesh
+> cheers,
+> jamal
 
