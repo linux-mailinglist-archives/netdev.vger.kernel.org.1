@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-253624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id xZh7OZX+d2lqnAEAu9opvQ
-	(envelope-from <netdev+bounces-253624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:53:57 +0100
+	id UIQrBaT+d2lqnAEAu9opvQ
+	(envelope-from <netdev+bounces-253625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:54:12 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3459F8E554
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:53:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1908E564
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 320473018D79
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:53:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1C5F3022951
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D4F3101D8;
-	Mon, 26 Jan 2026 23:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1B231196F;
+	Mon, 26 Jan 2026 23:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UR+1j1qP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmXlgaur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92442D94B4
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0112E309EF5
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769471634; cv=none; b=HR2aansqUDdBFVS4KqP5wHTypDXzwVUkFhZWjHg88GO1AQ+bcvvji/o7SY3RRlS0ZpyTfobG+9pCjdPwhS0Zzn38apb5v8WKCbho6SYRibc0IjVqp3E/7IU4DtYS/L3u0EHgoKdwdoCuwTbkD/4h8V65p0GN1v0nVe34AY+ns2I=
+	t=1769471635; cv=none; b=UzY53qFsXIpA73wg4Jz0+vqp5XWYxgpxrqmq8ixIUI7zEH5WkyXQaPCuq0rciokydeodqB3Qm4rjAx3rNGTi3dtv5P4Gi/CcST62izuGY8zg7aWQH8MhpQvhWqdzkWJ6aFkUao5M2hPABPse6nFh3zZVE+91mM3C4/xgZ8iIO48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769471634; c=relaxed/simple;
-	bh=FXrt+gvFE7I7a/y+qW6eteDMg2gQf4kuOSO/dloC+nU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kk/zGeQx8eNoTxCTSKBpmZJjOjVCCTZYJT7NW8cNXMgLuSH1tABssuW5UShFujUiYH9hG7CwBd4jRtAAwygv0FiPQ1uVTDt4Y8ujf9ITqbPDYeYAKXvG8TXFLvlLinA0WlIkUKvzn+E27WhShnSpOy4AugpVo0vSpmxGNDB+XX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UR+1j1qP; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1769471635; c=relaxed/simple;
+	bh=Qik1ozjqSZ/s/skBi6PKBAxE22b0dCz+aDh6JJNlO0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J/QEwjEzC4Usdc/9bv/bUaytAC5uR2K8yisf0y+Djn56Z3pfWCJSApavBniUNbbhufT/TXVpwkUae6R/T7aWrLhh9EOC55ReUKLbUXobBsowzngT9jAYrk93ec0boSQbVwOqsC32et6lA8kFKJ4Uu1iHcTjROZ3ywURIh903iy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmXlgaur; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4801eb2c0a5so50322655e9.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:53:52 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47ee4338e01so28859185e9.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:53:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769471631; x=1770076431; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NwOokDGd1yHaZSqePwW74hCKjWo3HyDY9570nB5Oua8=;
-        b=UR+1j1qPRd44+1ecbI0HM7SUfAnSiFDX1EhclyzK1Ha7CHcNchUbfokSc5k1MlDhXf
-         UO47WZP60XKxhpoTXnDbJTGg76vEVDVtzGWgHcCBab1gB7xfAXNkP06XQQyZJ6SNHDSE
-         BuCbUSVYaEh9HqA5FFUnfjQCxj9OvAMBKHzupoKs2pcyXUs9vp4WYMiH+kHT8/VmOIPP
-         ZCLdgk+HFCt8k61O6ySVQ8tx+V/ONUtgxHx5ln73b2JQnLGQgxojlcjouHx+9VCUBQQz
-         KoX/Kq24BSU36x2na1Is2MA51yvGNC5nQoU40WHA5pKSy56lbaxuq8CHqvMO8Gl/boQy
-         RlMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769471631; x=1770076431;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769471632; x=1770076432; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NwOokDGd1yHaZSqePwW74hCKjWo3HyDY9570nB5Oua8=;
-        b=h1oiZjDcMUS96nFZ/4ZrN1kuHMGI1VlFbLIW7UZTlOccilNAsB2Zf3roqbAR1qERgn
-         wn4KaLDUKB8WZb+DNWzcsaOmRN7o+wVj2leetM0v8L1r25An1+BMxree+6lRONu34fys
-         TdmU4OsT0+Fs/Y9l+1sYykvaOXnWfD7vTg//YmXEY3yfydfOOBn0XCOQEaD+jXpKernZ
-         Zzx9dJvZYBy7CIyO3+1BOjOzRHXVvh4EMqNIX1NZ3PYx0rBx4UthPguELOxfo5WqZXeg
-         zeQL5TU8GqFIB+TtThb2G3rvNgx5nFBikYMprnCCwjo2TS9GKrPY6PftRMSZuIEqbpGN
-         jIiQ==
-X-Gm-Message-State: AOJu0YywyWhw9dvIkC2U2Gp5P6jjU0ZLPjVwzgWDkAxrO2IiY9ytFPL4
-	3ArnGgeaBYILH/8XG6QPLexdGzEG4fd93R5v8wQm3GbwO/nzexBs4QgFrr6IsQ==
-X-Gm-Gg: AZuq6aIc78yqlkxosCMQ8A8T1Sm9dJPr0/itRlwpptXLKLFkc020V+SA+Tvw20foAfU
-	gC+vA2/fD2cjoCZYd4Fp0akdI5W0wCCxQMFflvsEdZP4+3/yvYvjJb4hGuK/cXWXOeOud51aph/
-	+XDv9LPld4oy1rlp6fvu/+EM62rwldvLnhGqVFBDzeRwtc7l18yuo2qgp1r4X+zIJHPrPpkvpfv
-	+/8Te2gB6J8PA+gG4WtC162b3sVrLW2o4JrnBOKWCzEL1MHoFasT3V6Ue/dl23AFusrXZ54ui1K
-	VfMKE6lTBMVdI+jxkZ+dioN3AdmtF7fuDf1e1tHA2S5+SXgU39pugWBSlLm0MjK7rDGjRmntwLn
-	3gTf0WGt4NpHEwi33sKvrlkQ/j3TxqzatqfjAXOyIKgT5QnGp5HwdYTi202UA/F/aMJBc3WwoOR
-	oKZ2sa2OtPeQ/nY6oZVURFR6lfWLauZKBKPXsEMZoIEuEip/8wTUspnpAlVjNXJ1BrptbjeVMvk
-	KRcow4TEJchgsSAZj7zUT6dRBqAxB6BidU57YqHWk/AIW18faGgEpvylE4TaYIiACS8j3A=
-X-Received: by 2002:a05:600c:a106:b0:477:c71:1fc1 with SMTP id 5b1f17b1804b1-4805e6fd919mr76939315e9.19.1769471630910;
-        Mon, 26 Jan 2026 15:53:50 -0800 (PST)
+        bh=Pk9Fb92hOdGZyZJu9bD0s2WE9JX2jwnrDPcvrJsJU0E=;
+        b=jmXlgaurfI9Tc6j6217Y4PtYItGsOkYd2fzGy9ndTbZ1LiQdo+MMpC+NMDz6zwOb0R
+         CgvArj0zyshPaQOtARJJl8ATHQFw5MuQEE0eYxyAwZJHCsrsSuBQy/oBSzZO+eBcL01s
+         UrFht3H35ZMv97KvDRCpdAaANCJtkNmj8AdHU39PCxjtnpYoR0z2lVW9UmAN8c2BqVDp
+         d/cgOMVg27PLizoTL24vZ0qmlP5KTOptKza8oqn21+RQdj7XHL4Odcbt79SDSPbh/AQb
+         HrAnf2CxDNX2SkDqs5QLrpWtQ+TWcRbrtZWu/Nx+p4CLqgs/wbDPVSYLzOA8TtV0pVsR
+         E9SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769471632; x=1770076432;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Pk9Fb92hOdGZyZJu9bD0s2WE9JX2jwnrDPcvrJsJU0E=;
+        b=EDHvPB7W3JrUMNII1IuWti1oxprFnXPxUB6A+kC9PQ4/TQl1H9s+3ttWroxGi+gMSh
+         Tls/5DJQt9UuLn4F1KtG6jtkke1E4dhHBk4bggmPkgbfXM/hAHKGU047zKJ3YswScjfs
+         ajBvWG2d18ak6H0oBlo5qeSqJqpWH4qohQjdsBzYDD5dMNI2gWBbMk7PxLSzj+iIoI+c
+         eWi2G8DreAIbfCAUVC/NkBRUFUpLBrvgVRx8ix8aNm/nwIxgYgHeCJZ6hh8Mf0BwSKUx
+         olydszle6VJVLTHn61ujgQQ9uYzfmZeDnFDknQf0o+Z4qoMFcK2r/jKNXdm+OwAFM3qH
+         9/qA==
+X-Gm-Message-State: AOJu0Yx4K+vQGRJXGbSFe8ojoUFa9RLo4cTPM1BbPhU3ioOorUz4yNo1
+	VsoEdCvkzlB0ei4fLKqToJ1TXyxIWtokSzCPDBmLMt/KshQYWg4DJU5F
+X-Gm-Gg: AZuq6aL/O7V71zHcfDDR4pKx1CBjQhF54MkWQFTSnJT+PdT7dnR2fIADb6Wk4KONK8R
+	yhIu1yQxAqxdNmgXZ/ue0JKnLmq1B5wMpdP2mDK4mXYNi7GI1e1T0q+j0jjB0AJSaCOmCJ0STM+
+	c0WIoRhYhofBdkN1K2MqAR3sKxN40YsYb+fKKX4J/wL3q9SHV8VHLOeOiedS7fvr83UORZf2oFS
+	ejd8oODHgYDKcqxpYg4FMwbIs6QVC7N9yuTLZUEYGHR3fc2qeLOX8LlYCzswRYtiBtwaW3zfCj1
+	ilcf5Vhyr26XSRGNjBcf3lU9iIWDT43XmgrkBACcu3WZctMKYsTprSUNeFhjD7Ex0MXVtflwT4H
+	bC3Fibt/eI+AqqjmawELHt//B2dHXgOou/4BS8oxxlcRAJ2cOvYmjzKQ5+NUg7w3WtmQtgkrRCu
+	vdqv5r+Fo3Ku1cn4ZtWiI5rY3mVxGQX7FHnJf5GYeSlrE1MkOcdMHZjbbTRHMcs6E4LHSEk7SCG
+	JNER2SCxj1sLNdEIZqBaYCXXsbkI5E2ryFtOfLREEDc7wKg/FYT6d3whUUv
+X-Received: by 2002:a05:600c:468f:b0:477:9b35:3e49 with SMTP id 5b1f17b1804b1-4805cd407d7mr92703915e9.3.1769471632060;
+        Mon, 26 Jan 2026 15:53:52 -0800 (PST)
 Received: from localhost.localdomain (105.red-79-153-133.dynamicip.rima-tde.net. [79.153.133.105])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066be7404sm22658615e9.1.2026.01.26.15.53.49
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066be7404sm22658615e9.1.2026.01.26.15.53.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 15:53:50 -0800 (PST)
+        Mon, 26 Jan 2026 15:53:51 -0800 (PST)
 From: =?UTF-8?q?Marc=20Su=C3=B1=C3=A9?= <marcdevel@gmail.com>
 To: kuba@kernel.org,
 	willemdebruijn.kernel@gmail.com,
@@ -82,10 +84,12 @@ Cc: netdev@vger.kernel.org,
 	dborkman@kernel.org,
 	vadim.fedorenko@linux.dev,
 	=?UTF-8?q?Marc=20Su=C3=B1=C3=A9?= <marcdevel@gmail.com>
-Subject: [PATCH net v2 0/4] discard ARP/NDP b/mcast/null announce (poison)
-Date: Tue, 27 Jan 2026 00:53:01 +0100
-Message-ID: <cover.1769464405.git.marcdevel@gmail.com>
+Subject: [PATCH net v2 1/4] arp: discard invalid sha addr (b/mcast ARP poison)
+Date: Tue, 27 Jan 2026 00:53:02 +0100
+Message-ID: <64dc9e3a6a815929bfdf3ccf591a1418a0a5959d.1769464405.git.marcdevel@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <cover.1769464405.git.marcdevel@gmail.com>
+References: <cover.1769464405.git.marcdevel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,26 +99,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.96 / 15.00];
+X-Spamd-Result: default: False [0.93 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.63)[subject];
+	R_MIXED_CHARSET(0.59)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,linux.dev,gmail.com];
-	TAGGED_FROM(0.00)[bounces-253624-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253625-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,gmail.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -125,84 +129,121 @@ X-Spamd-Result: default: False [0.96 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3459F8E554
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8C1908E564
 X-Rspamd-Action: no action
 
-The current ARP and NDP implementations accept announcements with
-multicast (broadcast incl.) and null MAC addresses as Sender HW Address
-(SHA) in ARP or src/target lladdr in NDP, and updates the cache
-for that neighbour.
+Prior to this commit, the ARP implementation accepted ARP req/replies
+with multicast (including broadcast) and null MAC addresses as Sender
+HW Address (SHA), and updated the ARP cache for that neighbour.
+Broadcast, multicast and null MAC addresses shall never be associated
+with a unicast or a multicast IPv4 address (see RFC1812, section 3.3.2).
 
-Multicast (incl. broadcast) and null MAC addresses shall never be
-associated with a unicast or a multicast IPv4/6 address (see RFC1812,
-section 3.3.2).
+ARP poisioning with a broadcast MAC address and certain multicast
+addresses, especially when poisoning a Gateway IP, have some undesired
+implications compared to an ARP poisioning with a regular MAC (see
+Note1).
 
-ARP/NDP poisioning with a broadcast and certain multicast MAC addresses,
-especially when poisoning a Gateway IP, have some undesired implications
-compared to an ARP/NDP poisioning with a regular MAC (see commit message
-in patch 1 for more information).
-
-Worth mentioning that if an attacker is able to ARP/NDP poison in
+Worth mentioning that if an attacker is able to ARP poison in
 a L2 segment, that in itself is probably a bigger security threat
-(Man-in-middle etc., see Note2 in patch 1)
+(Man-in-middle etc., see Note2).
 
-Since these MACs should never be announced, this patch series discards/drops
-these packets, which prevents broadcast and multicast ARP/NDP poisoning
-vectors.
+However, since these MACs should never be announced as SHA,
+discard/drop ARPs with SHA={b/mcast, null}, which prevents the
+broadcast/multicast ARP poisoning vector.
 
-This patchset only modifies the behaviour of the neighbouring subsystem
-when processing network packets. Static entries can still be added with
-mcast/bcast/null MACs.
+Note1:
 
-v1: https://lore.kernel.org/netdev/cover.1766349632.git.marcdevel@gmail.com/
+After a successful broadcast/multicast ARP poisioning attack:
 
-Changes since RFC v1
-====================
-  - Discard announcements with multicast MAC addresses
-  - Check for dev->type == ARPHRD_ETHER instead of HW addrlen in ARP
-  - Use !is_valid_ether_addr()
-  - Added multicast test coverage and renamed tests accordingly
-  - Dropped patch 5 (scapy utils)
+1. Unicast packets and refresh ("targeted") ARPs sent to or via
+   the poisioned IP (e.g. the default GW) are flooded by
+   bridges/switches. That is in absence of other security controls.
 
-Comments
-========
+   Hardware swiches generally have rate-limits to prevent/mitigate
+   broadcast storms, since ARPs are usually answered by the CPU.
+   Legit unicast packets could be dropped (perf. degradation).
 
-As discussed in v1, certain Load Balancers make use of Multicast MAC addresses
-for their VIPs:
+   Most modern NICs implement some form of L2 MAC filtering to early
+   discard irrelevant packets. In contrast to an ARP poisoning
+   attack with any other MAC, both unicast and ARP ("targeted")
+   refresh packets are passed up to the Kernel networking stack
+   (for all hosts in the L2 segment).
 
-https://support.huawei.com/enterprise/en/doc/EDOC1100213154/d8621162/dynamic-learning-of-arp-entries-with-multicast-mac-addresses
-https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/configure-network-to-support-nlb-operation-mode
+2. A single forged ARP packet (e.g. for the Gateway IP) can produce
+   up to N "targeted" (to broadcast) ARPs, where N is the number of
+   hosts in the L2 segment that have an ARP entry for that IP
+   (e.g. GW), and some more traffic, since the real host will answer
+   to targeted refresh ARPs with their (real) reply.
 
-But as stated in the Microsoft NLB documentation, it is expected that
-static entries are created for it to work:
+   This is a relatively low amount of traffic compared to 1).
 
-  To support this configuration, you must configure the network
-  infrastructure to use static ARP entries and MAC address table
-  entries. Network switches cannot learn the NLB multicast MAC address
-  in the course of their usual operations. If you skip the manual
-  configuration step, the network switches may flood NLB traffic to
-  all ports or drop packets. The network may seem to function
-  correctly at first, but problems increase over time.
+3. An attacker could use this form of ARP poisoning to discover
+   all hosts in a L2 segment in a very short period of time with
+   one or few packets.
 
-Marc Suñé (4):
-  arp: discard invalid sha addr (b/mcast ARP poison)
-  selftests/net: add no ARP b/mcast,null poison test
-  neigh: discard invalid lladdr (b/mcast poison)
-  selftests/net: add no NDP b/mcast,null poison test
+   By poisoning e.g. the default GW (likely multiple times, to
+   avoid races with real gARPs from the GW), all hosts will eventually
+   issue refresh "targeted" ARPs for the GW IP with the broadcast MAC
+   address as destination. These packets will be flooded in the L2
+   segment, revealing the presence of hosts to the attacker.
 
- net/ipv4/arp.c                                |   8 +
- net/ipv6/ndisc.c                              |  16 +
- tools/testing/selftests/net/.gitignore        |   2 +
- tools/testing/selftests/net/Makefile          |   3 +
- .../net/arp_ndisc_no_invalid_sha_poison.sh    | 368 ++++++++++++++++++
- tools/testing/selftests/net/arp_send.c        | 138 +++++++
- tools/testing/selftests/net/ndisc_send.c      | 198 ++++++++++
- 7 files changed, 733 insertions(+)
- create mode 100755 tools/testing/selftests/net/arp_ndisc_no_invalid_sha_poison.sh
- create mode 100644 tools/testing/selftests/net/arp_send.c
- create mode 100644 tools/testing/selftests/net/ndisc_send.c
+   For comparison:
+     * Passive ARP monitoring: also stealthy, but can take a long
+       time or not be possible at all in switches, as most refresh
+       ARPs are targeted.
+     * ARP req flooding: requires swiping the entire subnet. Noisy
+       and easy to detect.
+     * ICMP/L4 port scans: similar to the above.
 
+4. In the unlikely case that hosts were to run with
+   `/proc/sys/net/ipv4/conf/*/arp_accept=1` (unsafe, and disabled
+   by default), poisoning with the broadcast MAC could be used to
+   create significantly more broadcast traffic (low-volume
+   amplification attack).
+
+   An attacker could send M fake gARP with a number of IP addresses,
+   where M is `/proc/sys/net/ipv4/neigh/*/gc_thresh3` (1024 by
+   default). This would result in M x R ARPs, where R is the number
+   of hosts in L2 segment with `arp_accept=1`, and likely other
+   (real) ARP replies coming from the attacked host. This starts to
+   get really relevant when R > 512, which is possible in large LANs
+   but not very common.
+
+Note2:
+
+However, broadcast ARP poisoning might be subtle and difficult to
+spot. These ARP packets appear on the surface as regular broadcast
+ARP requests (unless ARP hdr is inspected), traffic continues to
+flow uninterrupted (unless broadcast rate-limit in switches kick-in)
+and, the next refresh ARP reply (from the GW) or any (valid) gARP
+from the GW, will restore the original MAC in the ARP table, making
+the traffic flow normally again.
+
+Signed-off-by: Marc Suñé <marcdevel@gmail.com>
+---
+ net/ipv4/arp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
+index c8c3e1713c0e..7dbb3fd5cc8a 100644
+--- a/net/ipv4/arp.c
++++ b/net/ipv4/arp.c
+@@ -800,6 +800,14 @@ static int arp_process(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		goto out_free_skb;
+ 
+ /*
++ *	For Ethernet devices, Multicast/Broadcast and zero MAC addresses should
++ *	never be announced and accepted as sender HW address (RFC1812, 3.3.2).
++ *	Prevents Broadcast/Mcast ARP poisoning attack.
++ */
++	if (dev->type == ARPHRD_ETHER && !is_valid_ether_addr(sha))
++		goto out_free_skb;
++
++ /*
+  *     Special case: We must set Frame Relay source Q.922 address
+  */
+ 	if (dev_type == ARPHRD_DLCI)
 -- 
 2.47.3
 
