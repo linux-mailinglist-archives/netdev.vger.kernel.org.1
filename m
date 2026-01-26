@@ -1,253 +1,249 @@
-Return-Path: <netdev+bounces-253518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KKKeMoyGd2m9hgEAu9opvQ
-	(envelope-from <netdev+bounces-253518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:21:48 +0100
+	id yPpOJVSHd2m9hgEAu9opvQ
+	(envelope-from <netdev+bounces-253519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:25:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2AA98A0F6
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:21:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CBCF8A1B0
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:25:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1F5AB300B9D0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:21:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E83A6300D17A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1B833E36B;
-	Mon, 26 Jan 2026 15:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442D533C1BD;
+	Mon, 26 Jan 2026 15:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="iN87vqpQ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="emoSN7AB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BBE33DEE0;
-	Mon, 26 Jan 2026 15:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769440897; cv=none; b=SkhLVjg6G3BPbuNCKgh1ML2nYoffr69qCJQPBlGgwtJq/QRgxs65XyDx69RECz8y5GMuMuVYAFRKcOuvlOEeIBYUiHbVdjGXqc5LTbL5wtGWIVmJ8mjveOjFGNCqFwZV/42ElCUyzS774B6ea91eQ0h/O1jHH30sIGa+b/5zEmY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769440897; c=relaxed/simple;
-	bh=l9alNzLtbKf/N5wbrT78rj1ZCgxuxNdCfWh18n8WqEA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UnVWTEJMbyhXKbT8F/29AkbLRIZzTPkk/ubkYnXFDf93xqDayk1jiw/c52lzFTDSZIP7p9EQUQJdNNXtf7ZDwdWStqyshh1+vCZ5sY02gyBdIGF/9IZ0pZ6sWIEEKHgV66lGFxDM7SR5AsaxTNhR42w7TdWFHzl7GydXIo/OJF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=iN87vqpQ; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: ac239e02faca11f0b7fc4fdb8733b2bc-20260126
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=/KO48sLcc1Pw1/EXPTPJ/6Em+9GtVtY6da5KGjQjsQs=;
-	b=iN87vqpQPRNVbGVSX8BHLXFSkWeRvW4JqTOMTjLLL+ZwQ84kYdzOERhSROifFOI8ryRRfOFULk8XJHBhCZ8WajkevyjC2BGWCoweXvj812lgilj4QSrzuSTvnimQrBcHRGYM9hj1fahjgMsClmc1t5x1eIafhtVfy2Z0WuNmY+w=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.11,REQID:8c5965e4-d5d2-4bef-babf-7080bd9be116,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:89c9d04,CLOUDID:27903c7a-8c8a-4fc4-88c0-3556e7711556,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:1,File:130,RT:0,Bulk:nil,QS:nil,BEC:-1,COL:0,OSI:0,OSA
-	:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: ac239e02faca11f0b7fc4fdb8733b2bc-20260126
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
-	(envelope-from <jibin.zhang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 354293242; Mon, 26 Jan 2026 23:21:22 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 26 Jan 2026 23:21:17 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Mon, 26 Jan 2026 23:21:16 +0800
-From: Jibin Zhang <jibin.zhang@mediatek.com>
-To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
-	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, Kuniyuki
- Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: <wsd_upstream@mediatek.com>, Jibin Zhang <jibin.zhang@mediatek.com>
-Subject: [PATCH v4] net: fix segmentation of forwarding fraglist GRO
-Date: Mon, 26 Jan 2026 23:21:11 +0800
-Message-ID: <20260126152114.1211-1-jibin.zhang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4915C26E6F4
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 15:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769441077; cv=pass; b=M3mRXBdhQtGZ3Gtx76m3vR2nq999eMTgsN3UztJge8a0NHFSuiFjE2mQSJA7yURjbT75PrkW1Sn0sJPVP7/VulULajntliZpDyFpNGKpYaMbHlFEHXez2BukdWmDCcjUCz3N5tKk7JlXjzgPVdQHmTmGgXxOINo0mieclNyjlp4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769441077; c=relaxed/simple;
+	bh=AtkjgheHFRz232YeezgplcyAWxSNqThTBPDtNmqMFfQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CzAr3EFUOqNPGXWJVrpkALGMzZrX58dTjFL2l6oL/FKbzPMhslAMRwDsB/ALoatbqU4USK8M0OopxSXQs8gGDBNDdn7BXBvRKaf3GE+zXxDSlNnjpRsFvCJTUMjKNksSLaLC2BENf6aVmdbOGKR9z252tCIENI00gpIjOpk260o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=emoSN7AB; arc=pass smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a09d981507so31171895ad.1
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 07:24:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769441074; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jWAuZe3XacaOHuHaOORP5WoZQeBOywsK2f+atDqDaEodMqEiGSczHkayj6AshfwVX2
+         BSBjrWKvG9Kc5eV/DQX8q7+6CUC2o39UzIDRao/ri83TJgQHHIXbtNI40GyPMsX4VyYO
+         p4ZBgdXEF+I+QSeJ4oEnYh64XnlgW0lwrdsQroGLK2gpfr71TAl8iv/tqHl61iSY7wVI
+         45sqdR5ta3Z2dIaqZ7CMShoOd4lFAjTV05HjfceB+agYUerA0xGB8B1VJNoATvAAgS2T
+         /defVlPjxlHPCXwleLL2qryvu7cK8+zDYp4aNFcRT0aeOvEcgP4JEC130/TxDbLgC2zJ
+         zjEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
+        fh=RMfgJZiZvXLhl24vC/GWoywQDZ2kyZf9xkGPQMvyiAI=;
+        b=AEvahUOgeXegVsJ8xyOzogAAf5BV+PljtOQExHSxEwF7ywo6JgoNs37/slulwyApJ8
+         1Yta4oaFANgRzKuz0X1HYZ4jfw4oX/JNqxpJZTItuW4TmUTnlj7tIKih7+NNfBp0dbAZ
+         hBvzphcPCruzApA4Y26ybYZDRndQXC+39D91odFkkmZnBsaEH5zKtIMhWENIp8rW5CbO
+         Ig5vfKpv26aXLogfdLgn5l792HVZlrQwraHCTUhhLER6WON1pCF0orQ5Wn4z371yA5nO
+         U50rL1FG4cB1eTkDzLFlOdc0TnfXA5J7eZALy6hUlQNZK1587EefHtpOlxYkJ53vpKhH
+         20PQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1769441074; x=1770045874; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
+        b=emoSN7ABW40UJr4DvX7ql5B+wFbyO1zHU1ZW8eRTCVww5j8xm7Adjct0/KL2oKz5+M
+         +rrLn+ZcVbsYeyZljO0nHObLxXAoAHcR3eLvlghukkllMcAgmS7LdlOPSp180NhdzJ9q
+         fRFtQEQUFlmKRm1mq5NUYEIVvO077rBBy1bYTd2D7Z6aWRjSK/gMHGe6KbPCp2gehxBY
+         3eAqQVkMvRISh3zC8EVpyZr1SNnAsYEYTMnC4PKbArWE44h37Zh8tAbIk683nffzTPyQ
+         DYc4IgKbSC022NLz8DnfPLeK8cWQdIfoycztwLGsD/GU3o25RqiXDd8n3kKFLiyH4uWD
+         CVQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769441074; x=1770045874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EiVjxQGRao7xnd2E/gIJBKtFb7ROOiCEX8h6EN5f6qI=;
+        b=W9oTAIQfyTjZPepnV3Ce2jZndwZq+jwQ/khfImfz9Qq6Q3Wk/vzzFs4wHYlVpK6r9q
+         x3wm4s8OeH7bDn3os5NWgbkVKqQqTupgaxYd9o2rFJWUHXeBYtvokb2tI08XG7RcPscM
+         y6JH22kBtLtc/+gOQSU27Vntk8WFC9v3zCb3zk1Ly+o6X87uKVpty0RVedCYLbabtBk/
+         rV3KfE8UCuNU53RiwlpSbWp7xen8/UCZcfms3d9gt+qnl/BadE/RMid242aWpOia0s3u
+         uGVAFxPrKyu1GuWvKWnJ8U4P6t+rVMjhODpEGHMT1ChfVjysEJv5PdHnmiIMrEhL5wLR
+         I/CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhPJHV7YCLqvyHMZLp6YeVy6eTm00v7+YILOzUTfh04MFmVFIFkVok43vnyVDSfaowyXeiWnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0UeZiVVVJRF46gk9OC/RvsvQPcId8v950U48/7PSv2Q2pRQMu
+	fqFSluXujgujpB3abaB5xaFmEJCsvGlEXAVuj+MCj5kz0wgKIHuGgNgviXrUI5UlgHQVRaR+MkS
+	IwQ0uT4yyiLJnWCGXg6LxicVc5De6GEbVFKRQueIA
+X-Gm-Gg: AZuq6aIkzNOaQ1ZTbepdVvm6wd3Kq9Ss3gm8lVMBNvB7TDC1xlNwZR7hnMI8MBv4uvg
+	dC4YKf+LLj/TnqhaGc+IeVZzi/DWiMTOa8c9PF/8aNVckS15a8fVf56AsuaucXihi3J5BqmOs5v
+	5oaqjSFxFSHpjaeUO/ZdfVyrOF9VZzH5O3AitEj2ZHU9o5sKx6MtEgL9QBT9sQAADVguDm58VH7
+	9/vkr9LUQ2l+oQQuc6uq9cTsYy2erGBCpuMyYaLQAe6TVQZGahWlPFiAJ/FzT7ZHrWh1OpdP/SA
+	PYU=
+X-Received: by 2002:a17:902:c94d:b0:294:f6e5:b91a with SMTP id
+ d9443c01a7336-2a845502f26mr47537115ad.13.1769441074384; Mon, 26 Jan 2026
+ 07:24:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <CAGfirfeHMgBUq-Q8tCn8dr2tHVJdQtZbS0JMutqF+b04T3EoWw@mail.gmail.com>
+ <CAGfirfc70aJ7YUa02ObbxPfkH1u6B=BPZpUXDAg2FU16aKvL1Q@mail.gmail.com>
+ <CANn89iJrXSHouF4ZnnoVYz4Q47J5jkwU4OuXMpJi3Orox4uT_Q@mail.gmail.com>
+ <CANn89iJvj8YXtuMNTh1cQOjVctBsMs88FHx-xLn+rCzyBGn-og@mail.gmail.com>
+ <CAGfirfebdHJi13epyM5RWYfQ2TGSWExP5nmnoKra83awetAbLQ@mail.gmail.com>
+ <CANn89iLhXQ0W7+rOQCqxLpGyoHBAJ_xeUhjL+7MtQmN2saaYog@mail.gmail.com>
+ <CAM0EoMm49+9j77Xpb46Q7qVT7JBU2cXKZB-Oeurzsuoe-=3eJw@mail.gmail.com> <CANn89iL1oB2J6whubYof+2AVWpWRm+gBsp3P8-xRP8Y22Jy6_w@mail.gmail.com>
+In-Reply-To: <CANn89iL1oB2J6whubYof+2AVWpWRm+gBsp3P8-xRP8Y22Jy6_w@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 26 Jan 2026 10:24:22 -0500
+X-Gm-Features: AZwV_QhrUNfMJfwZN64jDviP85j-RotZAo_DAlEWkNx6IccB0YCddDfKfX1-dgs
+Message-ID: <CAM0EoMnwGW05yc50ZyoKE28F-jZHeEtX+X4H2Xx6+KBQn-v6DQ@mail.gmail.com>
+Subject: Re: [BUG] KASAN: slab-use-after-free Read in u32_classify
+To: Eric Dumazet <edumazet@google.com>
+Cc: =?UTF-8?B?6rmA6rCV66+8?= <km.kim1503@gmail.com>, davem@davemloft.net, 
+	jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	xiyou.wangcong@gmail.com, horms@kernel.org, syzkaller@googlegroups.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[mediatek.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[mediatek.com:s=dk];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,collabora.com,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[29];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253518-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jibin.zhang@mediatek.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253519-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mediatek.com:+];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,resnulli.us,kernel.org,vger.kernel.org,redhat.com,googlegroups.com];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mediatek.com:email,mediatek.com:dkim,mediatek.com:mid]
-X-Rspamd-Queue-Id: D2AA98A0F6
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:email,vadai.me:email]
+X-Rspamd-Queue-Id: 0CBCF8A1B0
 X-Rspamd-Action: no action
 
-This patch enhances GSO segment handling by properly checking
-the SKB_GSO_DODGY flag for frag_list GSO packets, addressing
-low throughput issues observed when a station accesses IPv4
-servers via hotspots with an IPv6-only upstream interface.
+On Mon, Jan 26, 2026 at 9:11=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Jan 26, 2026 at 2:51=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Mon, Jan 26, 2026 at 7:26=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Mon, Jan 26, 2026 at 1:11=E2=80=AFPM =EA=B9=80=EA=B0=95=EB=AF=BC <=
+km.kim1503@gmail.com> wrote:
+> > > >
+> > > > I propose the following patch and would appreciate your review.
+> > > >
+> > > > hoff is used as an offset argument to skb_header_pointer() in
+> > > > u32_classify(), and negative values can cause out-of-bounds read. A=
+s
+> > > > shown in the code below, offoff follows the same pattern and requir=
+es
+> > > > the same validation.
+> > > > ```
+> > > > TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+> > > >    const struct tcf_proto *tp,
+> > > >    struct tcf_result *res)
+> > > > {
+> > > > ...
+> > > > if (n) {
+> > > > ...
+> > > > if (n->sel.flags & (TC_U32_OFFSET | TC_U32_VAROFFSET)) {
+> > > > off2 =3D n->sel.off + 3;
+> > > > if (n->sel.flags & TC_U32_VAROFFSET) {
+> > > > __be16 *data, hdata;
+> > > >
+> > > > data =3D skb_header_pointer(skb,
+> > > >   off + n->sel.offoff,
+> > > >   2, &hdata);
+> > > > if (!data)
+> > > > goto out;
+> > > > off2 +=3D ntohs(n->sel.offmask & *data) >>
+> > > > n->sel.offshift;
+> > > > }
+> > > > off2 &=3D ~3;
+> > > > }
+> > > > ...
+> > > > }
+> > > > ...
+> > > > }
+> > > > ```
+> > > > Therefore, I propose a patch that rejects negative hoff and offoff
+> > > > values during u32 classifier configuration.
+> > > >
+> > > > --- a/net/sched/cls_u32.c
+> > > > +++ b/net/sched/cls_u32.c
+> > > > @@ -1104,6 +1104,11 @@ static int u32_change(struct net *net, struc=
+t
+> > > > sk_buff *in_skb,
+> > > >   err =3D -EINVAL;
+> > > >   goto erridr;
+> > > >   }
+> > > > +
+> > > > + if (s->hoff < 0 || s->offoff < 0) {
+> > > > + err =3D -EINVAL;
+> > > > + goto erridr;
+> > > > + }
+> > > >
+> > >
+> > > Negative values are valid, it is ok to access data between skb->head
+> > > and skb->data.
+> >
+> > Right. We have to do this at runtime in classify().
+> > Can you test with your POC with Eric's suggested fix?
+> >
+> > Eric, can we do something like pedit? See: offset_valid() usage
+>
+>
+> Yes, it seems net/sched/act_pedit.c had a similar issue in the past :)
+>  Amir fixed it with
+>
+> commit 95c2027bfeda21a28eb245121e6a249f38d0788e
+> Author: Amir Vadai <amir@vadai.me>
+> Date:   Mon Nov 28 12:56:40 2016 +0200
+>
+>     net/sched: pedit: make sure that offset is valid
+>
+>     Add a validation function to make sure offset is valid:
+>     1. Not below skb head (could happen when offset is negative).
+>     2. Validate both 'offset' and 'at'.
+>
+>     Signed-off-by: Amir Vadai <amir@vadai.me>
+>     Signed-off-by: David S. Miller <davem@davemloft.net>
 
-Specifically, it fixes a bug in GSO segmentation when forwarding
-GRO packets containing a frag_list. The function skb_segment_list
-cannot correctly process GRO skbs that have been converted by XLAT,
-since XLAT only translates the header of the head skb. Consequently,
-skbs in the frag_list may remain untranslated, resulting in protocol
-inconsistencies and reduced throughput.
+=EA=B9=80=EA=B0=95=EB=AF=BC,
+Are you able to send a similar patch? Otherwise one of us will.
 
-To address this, the patch explicitly sets the SKB_GSO_DODGY flag
-for GSO packets in XLAT's IPv4/IPv6 protocol translation helpers
-(bpf_skb_proto_4_to_6 and bpf_skb_proto_6_to_4). This marks GSO
-packets as potentially modified after protocol translation. As a
-result, GSO segmentation will avoid using skb_segment_list and
-instead falls back to skb_segment for packets with the SKB_GSO_DODGY
-flag. This ensures that only safe and fully translated frag_list
-packets are processed by skb_segment_list, resolving protocol
-inconsistencies and improving throughput when forwarding GRO packets
-converted by XLAT.
-
-Signed-off-by: Jibin Zhang <jibin.zhang@mediatek.com>
----
-v4: Change according to Willem de Bruijn's suggestions
-    1. Set SKB_GSO_DODGY when XLAT modifies headers for GSO packets.
-    2. GSO segmentation is downgraded to use skb_segment instead of
-       skb_segment_list to ensure robust handling of potentially
-       modified packets when the SKB_GSO_DODGY flag is set on a
-       GSO packet.
-
-v3: Apply the same fix to tcp6_gso_segment(), as suggested.
-
-v2: To apply the added condition to a narrower scop
-
-  In this version, the condition (skb_has_frag_list(gso_skb) &&
-(gso_skb->protocol == skb_shinfo(gso_skb)->frag_list->protocol))
-is moved into inner 'if' statement to a narrower scope.
-
-  Send out the patch again for further discussion because:
-
-1. This issue has a significant impact and has occurred in many
-countries and regions.
-2. Currently, modifying BPF is not a good option, because BPF code
-cannot access the header of skb on the fraglist, and the required
-changes would affect a wide range of code.
-3. Directly disabling GRO aggregation for XLAT flows is also not a
-good solution, as this change would disable GRO even when forwarding
-is not needed, and it would also require cooperation from all device
-drivers.
-
-[3]: https://patchwork.kernel.org/patch/14397344
-
-[2]: https://patchwork.kernel.org/patch/14375646
-
-[1]: https://patchwork.kernel.org/patch/14350844
-
----
- net/core/filter.c        | 2 ++
- net/ipv4/tcp_offload.c   | 3 ++-
- net/ipv4/udp_offload.c   | 3 ++-
- net/ipv6/tcpv6_offload.c | 3 ++-
- 4 files changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 616e0520a0bb..bcd73d9bd764 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3353,6 +3353,7 @@ static int bpf_skb_proto_4_to_6(struct sk_buff *skb)
- 			shinfo->gso_type &= ~SKB_GSO_TCPV4;
- 			shinfo->gso_type |=  SKB_GSO_TCPV6;
- 		}
-+		shinfo->gso_type |=  SKB_GSO_DODGY;
- 	}
- 
- 	bpf_skb_change_protocol(skb, ETH_P_IPV6);
-@@ -3383,6 +3384,7 @@ static int bpf_skb_proto_6_to_4(struct sk_buff *skb)
- 			shinfo->gso_type &= ~SKB_GSO_TCPV6;
- 			shinfo->gso_type |=  SKB_GSO_TCPV4;
- 		}
-+		shinfo->gso_type |=  SKB_GSO_DODGY;
- 	}
- 
- 	bpf_skb_change_protocol(skb, ETH_P_IP);
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index fdda18b1abda..942a948f1a31 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -107,7 +107,8 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
- 	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		struct tcphdr *th = tcp_hdr(skb);
- 
--		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+		if ((skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size) &&
-+		    !(skb_shinfo(skb)->gso_type & SKB_GSO_DODGY))
- 			return __tcp4_gso_segment_list(skb, features);
- 
- 		skb->ip_summed = CHECKSUM_NONE;
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 19d0b5b09ffa..589456bd8b5f 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -514,7 +514,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 
- 	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		 /* Detect modified geometry and pass those to skb_segment. */
--		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
-+		if ((skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size) &&
-+		    !(skb_shinfo(gso_skb)->gso_type & SKB_GSO_DODGY))
- 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
- 
- 		ret = __skb_linearize(gso_skb);
-diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
-index effeba58630b..5670d32c27f8 100644
---- a/net/ipv6/tcpv6_offload.c
-+++ b/net/ipv6/tcpv6_offload.c
-@@ -170,7 +170,8 @@ static struct sk_buff *tcp6_gso_segment(struct sk_buff *skb,
- 	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
- 		struct tcphdr *th = tcp_hdr(skb);
- 
--		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+		if ((skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size) &&
-+		    !(skb_shinfo(skb)->gso_type & SKB_GSO_DODGY))
- 			return __tcp6_gso_segment_list(skb, features);
- 
- 		skb->ip_summed = CHECKSUM_NONE;
--- 
-2.45.2
-
+cheers,
+jamal
 
