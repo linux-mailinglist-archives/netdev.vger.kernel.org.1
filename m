@@ -1,241 +1,231 @@
-Return-Path: <netdev+bounces-253564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOmrKF6ud2ngkAEAu9opvQ
-	(envelope-from <netdev+bounces-253564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:11:42 +0100
+	id nojtHk+vd2kbkQEAu9opvQ
+	(envelope-from <netdev+bounces-253565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:15:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6098BEC6
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:11:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8FFC8C018
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1549A301ABAF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:11:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 085C9300E449
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793BE34D4D2;
-	Mon, 26 Jan 2026 18:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5374C34D93B;
+	Mon, 26 Jan 2026 18:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NrPEk1J1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nVgoIJgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E6F2E54D3;
-	Mon, 26 Jan 2026 18:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FB234D910;
+	Mon, 26 Jan 2026 18:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769451096; cv=none; b=qH3heGtf2OzxhXPVQIgODp5aGJ055DtP87vyFVAboI9R69nhMo9Fc45e68gfode1TqX3Tf2/QUKga+IjJfZokz6ZfJl/65+Aqa3HRlhxk0NGNMjC/HzXbBpQxo2DI9jFbeFoeO4D2kNfCsxb5Nu481uX5KARdgtox7GfCtM2RGk=
+	t=1769451246; cv=none; b=ED8BaevKStI7OGKlrrw8+ovt7RT9DaiESycXWFqZry9stBFpD8ePuVLD1g4RFO+otFIikkfiQKjKt+isgbQgwUh7bTJFvoeIOg09a0M/mw8vAttk6NdHM1dxFwtfhh/ZmiAPRRIDLQ3SAvQgzQC9WFZ6OjAMYZejH3MABIxjafU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769451096; c=relaxed/simple;
-	bh=3V0RDusxbh6pnXCeXi+v91jcVPHVAE66LeVm2jo3hH4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i0oWxhK+0f7AqVbkCEU5zxt6d4KW8eQLaaK6xU7DPLW38n5rkzdqumhdiZj40L2xZAJciXxylOsnPgJ+9Q47mo20/C3a+2IrMuTW9+d5ip94aSqhDAcqBuVHafYoDCjIChzGjYbO8dHdpkLtxNpj+bz660DKAMEQblReobmgCWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NrPEk1J1; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vicu6lpUE90FAgN2xtfuOumDUR1Qg4VnW5GWRXk4y9o=; b=NrPEk1J1La77hJglDtJdiD8za9
-	IGx3mDMOahM9R9I2Epz3BcUKZV0mEwhrhJowvHeWenHhHLJRQmcsbU5jlB66JkVEvQS2Co5khEXlF
-	asdrMDH6hVzJxOHU2z65VzC4+izMIh1i573mzJbt9dxmqTpS+HtuGU2tgNpoX+XId54JueRF3XNIF
-	LpV/dq8Ej88/zNas8S35JPhVSeA8skdIZWOdx3nPPsnkHPXiP97M1UY8xNnAHJVZi6ipsJJ1MHpZF
-	PAlyizJyryjDuVP54qj98ob9nRsfq+XB3t4GOkzjGe85CZRYRnTbfos0P7CnvrtLmXfVuSo8b1zma
-	Zh7SYR1Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36042)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vkR3c-000000005Co-0yVO;
-	Mon, 26 Jan 2026 18:11:24 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vkR3X-00000000595-3RUR;
-	Mon, 26 Jan 2026 18:11:19 +0000
-Date: Mon, 26 Jan 2026 18:11:19 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [RFC PATCH net-next] net: stmmac: Preserve bootloader MAC
- address across unconditional reset
-Message-ID: <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk>
-References: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1769451246; c=relaxed/simple;
+	bh=jhr9a6cgDBi4L/Y/fqNnkSWD4mZrTD0Td1Kjc0FE7d4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bXin7mABzqZwt6gsvO80zr9Wdd0f2kJoPUUE2h6N8CtsnVVQ3JW+7rQcOPbdMriM4SgwuBUhEXn2Z0+o02liFkFTwnVpKMV6nhUtRkDmHIhut488uVLGo0Y4xlxqDLo/AYlBcK0lGChXCNDqldiUgHXvV1Z4e5PTFXeMODGTNao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nVgoIJgT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E27C116C6;
+	Mon, 26 Jan 2026 18:13:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769451245;
+	bh=jhr9a6cgDBi4L/Y/fqNnkSWD4mZrTD0Td1Kjc0FE7d4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nVgoIJgTaMtZXe7vJx91AIult5bczODnhPAwNvlhgpWv9/zxDR9iqiytQ/4FLN947
+	 pwwrkH5t65DpbcC2Ndjsc3y8aLEOhS0YcPTP/zE9t8jPah+veeX4QBoyt1kmvAWrY+
+	 zRwMXcdzKZtNmnovqWUmBKzDbk9OAYTgK+9DolDd9fVf3ecNbeyx+YBmZX/4TxAWSB
+	 wqRZlkumamMI/9hdPN88aJwNDn2vHU20e79cjnY/MZArxLERLAkk/9E4ucbO4XBing
+	 XS9aPsA9kPCFc1v/sOkFQgZ7s+hN5AxNLT2q9/XSNFJhI7WnNpPfb4LEcMYEAXUTHV
+	 2++X9k5uMy7nA==
+Message-ID: <4e673f7f-c49c-46b0-85b4-bae6e4efcb3a@kernel.org>
+Date: Mon, 26 Jan 2026 19:13:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/4] selftests: net: Move some UAPI header
+ inclusions after libc ones
+Content-Language: en-GB, fr-BE
+To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
+ libc-alpha@sourceware.org, Carlos O'Donell <carlos@redhat.com>,
+ Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+ Rich Felker <dalias@libc.org>, klibc@zytor.com,
+ Florian Weimer <fweimer@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
+References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
+ <20260120-uapi-sockaddr-v2-1-63c319111cf6@linutronix.de>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260120-uapi-sockaddr-v2-1-63c319111cf6@linutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253564-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,bp.renesas.com,renesas.com];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,redhat.com,linaro.org,libc.org,zytor.com,google.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev];
+	TAGGED_FROM(0.00)[bounces-253565-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[40];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email]
-X-Rspamd-Queue-Id: 4F6098BEC6
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: C8FFC8C018
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 05:25:03PM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Hi Thomas,
+
+On 20/01/2026 15:10, Thomas Weißschuh wrote:
+> Interleaving inclusions of UAPI headers and libc headers is problematic.
+> Both sets of headers define conflicting symbols. To enable their
+> coexistence a compatibility-mechanism is in place.
 > 
-> Commit 90f522a20e3d1 ("NET: dwmac: Make dwmac reset unconditional")
-> asserts a reset in probe when a reset controller is present. This reset
-> clears the MAC address registers, so a valid address programmed by the
-> bootloader gets lost and the driver falls back to a random address.
+> An upcoming change will define 'struct sockaddr' from linux/socket.h.
+> However sys/socket.h from libc does not yet handle this case and a
+> symbol conflict will arise.
 > 
-> Read the MAC address from the hardware registers before resetting the
-> hardware. Keep the existing address selection logic when no valid
-> address is found, and program the selected address back into the MAC
-> after probe so it remains consistent in hardware.
+> Furthermore libc-compat.h evaluates the state of the libc
+> inclusions only once, at the point it is included first. If another
+> problematic header from libc is included later, symbol conflicts arise.
+> This will trigger other duplicate definitions when linux/libc-compat.h
+> is added to linux/socket.h
 > 
-> Export stmmac_bus_clks_config() so the early read path can enable the
-> bus clocks before accessing the MAC registers.
+> Move the inclusion of UAPI headers after the inclusion of the glibc
+> ones, so the libc-compat.h continues to work correctly.
 
-I don't think this is a good idea. stmmac_bus_clks_config() is specific
-to using platform devices, but the core stmmac driver also supports
-PCI that doesn't use stmmac_bus_clks_config().
+Thank you for looking at this!
 
-stmmac_bus_clks_config() handles:
+Here is my (late, sorry) review for the modifications related to MPTCP:
+> diff --git a/tools/testing/selftests/net/mptcp/mptcp_diag.c b/tools/testing/selftests/net/mptcp/mptcp_diag.c
+> index 8e0b1b8d84b6..af25ebfd2915 100644
+> --- a/tools/testing/selftests/net/mptcp/mptcp_diag.c
+> +++ b/tools/testing/selftests/net/mptcp/mptcp_diag.c
+> @@ -1,11 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (c) 2025, Kylin Software */
+>  
+> -#include <linux/sock_diag.h>
+> -#include <linux/rtnetlink.h>
+> -#include <linux/inet_diag.h>
+> -#include <linux/netlink.h>
+> -#include <linux/compiler.h>
+>  #include <sys/socket.h>
+>  #include <netinet/in.h>
+>  #include <linux/tcp.h>
 
- - plat_dat->stmmac_clk
- - plat_dat->pclk
- - any clock handled by the plat_dat->clks_config() method
+There is a remaining one (linux/tcp.h) here that you might want to move
+below too.
 
-For platform devices, stmmac_probe_config_dt() gets these two clocks
-from DT, and prepares and enables them both. So, by the time the
-probe function is called, these clocks are already running.
+> @@ -17,6 +12,12 @@
+>  #include <errno.h>
+>  #include <stdio.h>
+>  
+> +#include <linux/sock_diag.h>
+> +#include <linux/rtnetlink.h>
+> +#include <linux/inet_diag.h>
+> +#include <linux/netlink.h>
+> +#include <linux/compiler.h>
 
-For those handled by the platform glue, the glues that populate
-this function:
+Note that I just noticed this is the only file from this directory where
+the "includes" are not sorted by type and alphabetical order, see
+pm_nl_ctl.c as an example. A bit of a detail, but if you plan to send a
+v2, do you mind doing that too here while at it, please?
 
-eic7700: eic7700_clks_config() - this is called from the init/exit
-handlers. Will be invoked to enable the clocks by stmmac_dvr_probe().
+If not, I can look at that later, but better to avoid doing that in
+parallel.
 
-imx: imx_dwmac_clks_config() - called by imx_dwmac_probe() to enable
-clocks prior to stmmac_dvr_probe() being invoked.
-
-mediaktek: mediatek_dwmac_clks_config() - called by
-mediatek_dwmac_probe() to enable clocks prior to stmmac_dvr_probe()
-being invoked.
-
-qcom-ethqos: ethqos_clks_config() - called by qcom_ethqos_probe() to
-enable clocks prior to stmmac_dvr_probe() being invoked.
-
-So, I can confidently say that all clocks should be running by the
-time __stmmac_dvr_probe() is called, and thus there should be no
-requirement to call stmmac_bus_clks_config() in this code.
-
-
-The next problem: you place this code to read registers from stmmac
-before:
-
-	ret = reset_control_deassert(priv->plat->stmmac_ahb_rst);
-
-Sadly, the binding documentation is too vague to pin down what this
-is, as dwmac can have AHB master (which generates bus cycles for
-accessing memory) and AHB slave (which would be the target for
-register accesses) interfaces.
-
-The problem here is that if some platform glue has wired this reset
-such that it resets the AHB slave side, that will prevent register
-access, and thus your attempt to read the MAC across all devices
-will fail.
-
-
-The next question that comes up is that we have a perfectly good way
-that's been around for years to pass a MAC address from the boot
-loader into the kernel for any network interface. I notice that it
-isn't mentioned in the DT bindings, presumably to prevent people
-from adding it to their in-kernel DT files.
-
-	mac-address =
-	local-mac-address =
-
-The old documentation in ethernet.txt was:
-
-- mac-address: array of 6 bytes, specifies the MAC address that was last used by
-  the boot program; should be used in cases where the MAC address assigned to
-  the device by the boot program is different from the "local-mac-address"
-  property;
-- local-mac-address: array of 6 bytes, specifies the MAC address that was
-  assigned to the network device;
-
-Given that these are interfaces between the boot loader and the kernel,
-they can't be deprecated, as platforms will rely upon these properties
-to pass the MAC address from the boot loader to the kernel. For example
-on one of my systems:
-
-$ vdir /sys/class/net/eth0/of_node/
-total 0
--r--r--r-- 1 root root  4 Jan 26 18:08 gop-port-id
--r--r--r-- 1 root root 50 Jan 26 18:08 interrupt-names
--r--r--r-- 1 root root 80 Jan 26 18:08 interrupts
--r--r--r-- 1 root root  6 Jan 26 18:08 local-mac-address
--r--r--r-- 1 root root 14 Jan 26 18:08 name
--r--r--r-- 1 root root  4 Jan 26 18:08 phy
--r--r--r-- 1 root root 10 Jan 26 18:08 phy-mode
--r--r--r-- 1 root root  8 Jan 26 18:08 phys
--r--r--r-- 1 root root  4 Jan 26 18:08 port-id
--r--r--r-- 1 root root  4 Jan 26 18:08 reg
--r--r--r-- 1 root root  5 Jan 26 18:08 status
-
-where "local-mac-address" states the MAC address to be used for eth0,
-as specified by the boot loader.
-
-I don't think stmmac needs this extra complication provided platforms
-make use of mechanisms that already exist... and I feel it's time to
-start saying no to platform specific quirks that can be handled by
-those mechanisms.
-
-Thanks.
-
+Cheers,
+Matt
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sponsored by the NGI0 Core fund.
+
 
