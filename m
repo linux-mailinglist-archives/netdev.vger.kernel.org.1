@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-253338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253340-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ID8cMdIJd2lebAEAu9opvQ
-	(envelope-from <netdev+bounces-253338-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:29:38 +0100
+	id IA5FGaAKd2lebAEAu9opvQ
+	(envelope-from <netdev+bounces-253340-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:33:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C02D484894
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:29:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7B7848EF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 07:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 79C27300363E
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 06:29:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 729BC3006168
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 06:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F34A23AE87;
-	Mon, 26 Jan 2026 06:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B252B245031;
+	Mon, 26 Jan 2026 06:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="faQD8Kdy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g469qg2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28D01624C0;
-	Mon, 26 Jan 2026 06:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9045153BE9;
+	Mon, 26 Jan 2026 06:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769408975; cv=none; b=CtoPE4sXJXVfYqxa6OXzxMdkqnXriesBh9taaKleboAhmamXwK28npkbR0dg0gc4uZXin/XzBlXeTidGWxA7tHgkTuqNp6a8vZd+/HyYLtzpFeNjWK711DNR+NM21jIZxZrqOqLeeSYCL4XHC8llmP5l+jae4nONa8vzr6POXcc=
+	t=1769409169; cv=none; b=NViMne1C/UyUZpnEqjRBLl1Ouiu3Q3bFpXBL7aCB8TAzxYt4w6JH2a+0OI6L5vDZQ0oqnWlHBhcDXg4oC+lxcAdatmqQIdsUAw7b0OdRJvqybsUO0H3Uf77HLi8VqUR3WHgJtQbIklJmwC3YZ0zyboA852nCaJx0Mbu/I2XW0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769408975; c=relaxed/simple;
-	bh=74F+QdvEEPyCkFQAZ9k7xfLSsdZRZRCgm+EBSZyKB+I=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=KdMwmGtRfPqUNsdgx7XT+WVdVfVnKVb3w5Bnt7zwKNRNGUld2kPUi0C/pH7R9umm53S6gMWLdUq0M/WbCoQhbDTWsfy7/tt9zu9X/hKVKcf7YzT1hRqx55WFJk/+uHsJoVQA1jyKAZ5KBYVWn3jXfxux4bObi7dCxjEDdnCoiCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=faQD8Kdy; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1769408960;
-	bh=YrOJ9nnZ1uMX7vySKsJwrRb67e2niePqvCeLLz2LtBM=;
-	h=From:To:Cc:Subject:Date;
-	b=faQD8KdycPq+93nfF6kh/Q3Nl6D+o3F0fqeUtI7VhROVJ1THbltMagh4pm/776+MY
-	 Ezqt9/dtfhUCuPsHuExbJ34Lu7kT9pW8JnQNbb6b0rGichtmK0WCOAtzeAWrvpjS4j
-	 HLFg9h2bGGDU24CiaMkFnVtYnMAHWrFck4Aqoy0s=
-Received: from jack-mini ([58.212.11.129])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id 673944A9; Mon, 26 Jan 2026 14:25:51 +0800
-X-QQ-mid: xmsmtpt1769408751tmo9wa8bj
-Message-ID: <tencent_DBA407008574A1E4BF7F27AD38AD4D13730A@qq.com>
-X-QQ-XMAILINFO: MqswyhUqVe0CsHE4UAtaAPNOrVrVCeA8XoFx1yJMupYoIBLm34WVL95ZXkh2Sm
-	 pmW04F9Z9YHOs2V13ddwEz/rqxN+4Xp6+F/pw4siFRf95ls+hDdXJd8WKk8xdZRiX+gDRYLfL3Ij
-	 oiM/YwvP1mVT/6E3sMQEcdBd0LLsTGDn5bjDHxkHvP/mGaF2SUUvssCrglhCtqC2nNjtCdxpd09m
-	 93z5Ixs7oLVtKDmxt4rp3NjBA/zw/giZO/xNOye2CjEF8NTw8h5EKRoaPHHxhusiYIvZKGZYuQL7
-	 cBkcQPHD9fS3iKRXb5oov7dkjNyXphgX/I1NCI3j+7kPXZs+rxM0bW67jIFK0eCH6ySg/jIAqORU
-	 SUgTtWO0fCKARgNebAx0jfp2vdkyNxClHPX9F2tQLwONCj4iO1aJc1Dia0akDiaPpQs/z2AuHUl8
-	 c04RCcBTHhtGGyiWOmRgGBHYXf3fkNT+wI1d0ws8utyLCEo9YW1q1sW1MlrmfgCQlO7+FNM1jS2a
-	 BwkzdmdiiI33Bs1G8Dq7OVMKzaR8vw+UXWxQSPWUw86co1yC6yrIEyTUouvFtsx8mFBgfO8DXXcR
-	 0o3obenJP8xzMu6Kd7unYCTPEi+KAL4mYFsMAIiDvjMZDMBCDbZgqrFykz8lo1RDuDPYf2CQuBVm
-	 RpGFOeIGuRQmCHwgHskiaLM/glCdrrUA78EGeLK9Jz5e4FRvnd8RqABvydwLdp/HE3+IT0alUNSB
-	 QkOHh1fARpdiGKRMGIhCMQvWiSKgqz+TDntwirgnX3J34DiRaGrTKs4U6gtyrd7vc5d/2h3V1564
-	 BuuDp0Toa8+PkCm97oxPRwr1UxGfqzFhz9a39xnpgGasJ6szw19FuKL/XEs2yD21D8F3natNAzW/
-	 A8tHVMIQnUcKR4HQI3eboi61mYRu2po24ndXVXSa3SxQYVdofaRfsHkjvP5yZ/2IGsTpghXZ8CLP
-	 iiiRbPjyQppp+0ywFJjuJxiUcvspfJqQCCZYp7nffnyEjswvVStsg6yxr3qr2aJP+AwB1sh3Lrx2
-	 cIp4gW7UPAUKcZCU8jNxd3Q9KOeqDMkFgZypgGBg==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-From: "jack.zhou" <jack.wemmick@foxmail.com>
-To: Trond Myklebust <trondmy@kernel.org>
-Cc: linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"jack.zhou" <jacketzc@outlook.com>
-Subject: [PATCH] sunrpc/xs_read_stream: fix dead loop when xs_read_discard
-Date: Mon, 26 Jan 2026 14:25:24 +0800
-X-OQ-MSGID: <20260126062548.3417933-1-jack.wemmick@foxmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1769409169; c=relaxed/simple;
+	bh=ca3CvIEq2pCmha0u3/zyo2pS3/FM1U0+Ak6O9gy0/+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TASZsxFv2488Hk1+cdYVoqXhz3eowZapqQ6TXNlzYJDD4ajbn1uIsSgbgCj1JXBgqbx5R8+PNnhjnzHnv2QYLHZPmg72xm4yptFWOfBSYWdKUC40J9YwmD1SeXz8UDmobE+VFcnfUdU/hTsue1HAsrhcEt2LOB/qCwGkj6JTTB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g469qg2C; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769409167; x=1800945167;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ca3CvIEq2pCmha0u3/zyo2pS3/FM1U0+Ak6O9gy0/+8=;
+  b=g469qg2CfIN6R3YJDOJf5qrcCHGL7xIJbVb0hBXG6LuyFyOmL8IKWWNa
+   fVCAFTHYws9NYpXEaWyBR5cM01ryz3h8xJYf7in5wuZndzlDnD7IYe1pN
+   E8Etf519yYrH0p/tG5y8ZtyQZORZLN7zJY3cNGDvXCDRMquJOW86sw+cD
+   MD7j9YZHdensapfbLIwn7v64FNCPKmztYuG5IMcZuOQPEH4xuXC8CC9vN
+   JopvXrIsMlMnQ8FyVyJBgNEfc9pBU2w3KDsBRNInrLhZ1VDRHrzoYa22g
+   AsDK6nf++3cyh5NCw+JKngVpKhO91t0gi7bekoRkc/VThr5125ui94JcD
+   g==;
+X-CSE-ConnectionGUID: TDbJTqjHSgOazqIaaQDD8Q==
+X-CSE-MsgGUID: ozbbFh1vT+KcAtB7+INiHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="70641981"
+X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
+   d="scan'208";a="70641981"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2026 22:32:45 -0800
+X-CSE-ConnectionGUID: vQ1jSQGOQF609MuJhIP1sA==
+X-CSE-MsgGUID: uIdHXltVSl+z8gqGt1JoEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
+   d="scan'208";a="245214201"
+Received: from junjie-nuc14rvs.bj.intel.com ([10.238.152.25])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2026 22:32:44 -0800
+From: Junjie Cao <junjie.cao@intel.com>
+To: Shuah Khan <shuah@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] selftests: ptp: use KSFT_SKIP exit code for skip scenarios
+Date: Mon, 26 Jan 2026 14:32:36 +0800
+Message-ID: <20260126063236.16267-1-junjie.cao@intel.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260126061532.12532-1-junjie.cao@intel.com>
+References: <20260126061532.12532-1-junjie.cao@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,128 +81,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253338-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253340-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
-	RCPT_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[foxmail.com];
-	FROM_NEQ_ENVFROM(0.00)[jack.wemmick@foxmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[foxmail.com:+];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[junjie.cao@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,foxmail.com:dkim]
-X-Rspamd-Queue-Id: C02D484894
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A7B7848EF
 X-Rspamd-Action: no action
 
-From: "jack.zhou" <jacketzc@outlook.com>
-
-Hi maintainers,
-
-This bug was discovered during following scenario:
-
-1. Using NFS client with TCP mode
-2. RPC_REPLY process
-
-
-Let's first review the normal process:
-
-1. The `xs_read_stream` function is located within the for loop of the `xs_stream_data_receive` function. The condition for exiting is that the return value ret of the `xs_read_stream` method is < 0.
-2. When entering the function `xs_read_stream`, since `transport->recv.len` == 0, `xs_read_stream_header` will be called first. Based on `transport->recv.calldir`, it decides whether to execute `RPC_CALL` or `RPC_REPLY`;(and also sets the value of `transport->recv.len`)
-3. Since it is executing `RPC_REPLY`, the return value of the function `xs_read_stream_reply` is provided by tcp.c's `tcp_recvmsg`, indicating the size of the copied skb, and this value is > 0.
-4. Since it is a normal process, it will reach the end of the function and return, which is: 
-```
-transport->recv.offset = 0;
-transport->recv.len = 0;
-return read;
-```
-5. The returned 'read' is the return value of the function 'xs_read_stream_reply' in the RPC_REPLY process. Since this value is > 0, the `xs_stream_data_receive` function's for loop cannot be exited.
-6. After re-entering the xs_read_stream function, since transport->recv.len == 0, xs_read_stream_header will still be called.
-7. Since the skb is empty, tcp.c's `tcp_recvmsg` will return a value < 0, usually -EAGAIN (-11).
-8. Since the return value of xs_read_stream_header is < 0, the goto out_err statement will be executed.
-9. The for loop of the xs_stream_data_receive function will be exited.
-10. The next time xs_stream_data_receive is entered, the above steps will be repeated.
-
-
-Now we are encountering an abnormal process:
-
-
-1. For some reason, skb is contaminated, and `transport->recv.calldir` parses out an incorrect value, so `msg.msg_flags |= MSG_TRUNC`;(and also sets the value of transport->recv.len)
-2. The `if (transport->recv.offset < transport->recv.len) {}` condition will be executed
-3. The return value of function `xs_read_discard` is > 0, so when returning to the upstream `xs_stream_data_receive` function, the for loop cannot be exited
-4. When entering xs_read_stream again, since transport->recv.len != 0, `xs_read_stream_header` will no longer be executed, which means `transport->recv.calldir` cannot be correctly set anymore
-5. This is fatal for all subsequent RPC Replies because `transport->recv.calldir` cannot be correctly set anymore, so they will all go to `xs_read_discard`
-6. At the same time, since transport->recv.len has not been reset to 0, this loop will become an infinite loop
-
-Therefore, my approach is:
-
-After reaching the point of `xs_read_discard` due to an abnormal situation, the value of `transport->recv.len` will be reset in the same way as a normal return, in order to prevent a deadlock from occurring.
-
-The modification has been tested and passed in version 5.10.160.
-
-
-
----
- net/sunrpc/xprtsock.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 2e1fe6013361..91d1b992eb7f 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -695,6 +695,13 @@ xs_read_stream_reply(struct sock_xprt *transport, struct msghdr *msg, int flags)
- 	return ret;
- }
- 
-+static void
-+xs_stream_reset_recv(struct sock_xprt *transport)
-+{
-+	transport->recv.offset = 0;
-+	transport->recv.len = 0;
-+}
-+
- static ssize_t
- xs_read_stream(struct sock_xprt *transport, int flags)
- {
-@@ -740,8 +747,10 @@ xs_read_stream(struct sock_xprt *transport, int flags)
- 		msg.msg_flags = 0;
- 		ret = xs_read_discard(transport->sock, &msg, flags,
- 				transport->recv.len - transport->recv.offset);
--		if (ret <= 0)
-+		if (ret <= 0) {
-+			xs_stream_reset_recv(transport);
- 			goto out_err;
-+		}
- 		transport->recv.offset += ret;
- 		read += ret;
- 		if (transport->recv.offset != transport->recv.len)
-@@ -751,8 +760,7 @@ xs_read_stream(struct sock_xprt *transport, int flags)
- 		trace_xs_stream_read_request(transport);
- 		transport->recv.copied = 0;
- 	}
--	transport->recv.offset = 0;
--	transport->recv.len = 0;
-+	xs_stream_reset_recv(transport);
- 	return read;
- out_err:
- 	return ret != 0 ? ret : -ESHUTDOWN;
--- 
-2.51.0
-
+Apologies - this is actually v1, not v2. The version was set incorrectly during local work. Let me know if you'd prefer a resend.
 
