@@ -1,184 +1,170 @@
-Return-Path: <netdev+bounces-253605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253606-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MY6AM3ld2k9mQEAu9opvQ
-	(envelope-from <netdev+bounces-253605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:08:13 +0100
+	id aKqZMIPod2mwmQEAu9opvQ
+	(envelope-from <netdev+bounces-253606-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:19:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37CC8DD77
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:08:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEEA8DE6B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 23:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 762773004689
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 22:08:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 428CE3004683
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 22:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63582DF716;
-	Mon, 26 Jan 2026 22:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDD11C862F;
+	Mon, 26 Jan 2026 22:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IsMk+QCc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iXDN6svr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B472D876B
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 22:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769465286; cv=pass; b=UJd6VaZ0VbOV0l12hTE7Ctr3S7e4v1UWHdY7An8lweylglcqPZmHXawHmsIPyF+FF5WqyGZ6L/sNC2EueTynqTNdhyyzi8XZEsPgmC3Lf2WQFr6khGmSX7GnSSrFcwUCIWq5xizHfyKc34UNIN1R/0/jBe8AswSjIyJ2Ojefa9E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769465286; c=relaxed/simple;
-	bh=1WpWTEYnQFU24311RN7E2Bm1qH3Q3fjhO2tNvVjnXQ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nh2jZ7gtaIR+RVL27TfHiPOnW6LnN/gCPvTDLXiu7m4Rb4YdxNB25MX+WiwPsIwzank4STvihypMX7K15sT08OjUVQi2mxp5gIxrEWjMb3SrZoLev9NKW95Fl7YbM/cS8OHKWfiAEXDUWnr7cYfYtaH37qwrJQoVgsAo/YAiF/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IsMk+QCc; arc=pass smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-563610de035so4625326e0c.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 14:08:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769465284; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QfE8YuHLXRxWyhcVsEtoiD8HwfqjyGuE7XAdP9Ggvnbia/iOD9I+0V8Cv2IoKoVRgn
-         HEYf5GHcgueg6tc9ACb9ub+0zy6Uz5cibuH07b2fbSGC2ugNo7kv+3EFyUzQG4fyzvg1
-         YvreWXBC1alhPVUptig1g2M/2xPt1xOZ8hXIl9DRAf+jSGGBFrc2e9JWXejw+8aUg7Rf
-         YwTewztae8S7PCh41cRPhGlGTGJRTrFn12cX9Kw72m8hVUtblkNJOmKI5Nxrinb2yjev
-         KIjaq4PCBsBRG60CmqBYid2CFD12XLgj0Qb9rBqWZu/6LFGB1/mfKAZZ0AqURdjyGx6I
-         IoDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1WpWTEYnQFU24311RN7E2Bm1qH3Q3fjhO2tNvVjnXQ4=;
-        fh=6NL+27sIBxvB5wwZ0ZBQmTcL/aD2DfokudLcOu/BOqg=;
-        b=ZZw3SBw59nmigcbvvyTgX4Ze76bu1xpT3w2lFdRQf5t6VlngPUgZpqLOpI819hbOY/
-         iH4kp+ziW/eZ4wvEOs9gjVmv/T3UJvNigwXo1N4RHCC+PxgR+K5AizzrdS+D/5YOQ636
-         RvvBVgIK04IAK85rc0fl7GrXJa/i8gRSOj1JBySLreXhl98JoHhRvjngNr8hklANu4+9
-         iQZIJP5u9GoMePhQSwu8UFKGpWU1wZ7fR4mtcvozmWUi5jQI5GK/aj1GJ94eiFaJyGay
-         xrH0o+YpmnNEdlYuxb9c1SVi6OAmnIGGm8VBcPhLj1ER4OXVpmxIjwrGaWALYp/VaAW+
-         bPlA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1769465284; x=1770070084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1WpWTEYnQFU24311RN7E2Bm1qH3Q3fjhO2tNvVjnXQ4=;
-        b=IsMk+QCcT+VXgePEWywEujBF4THTNiswk+1ppFJ9I0Z1sl4HarSvB8ZsMwi3MvFQWQ
-         /tyReAKunNJKALcaW0i19VhtEj8yq2uK9vuNQ6F3+ki8w/+46izOgSDfG+8g9RW28BRH
-         Z7Ow4VluL+pn8qjAoEH0WOU2Rsie9ymjNCWcVv4YLCAt54cBoAMsujHD6w4UItJt7Q2+
-         izFN39RBiLLt2YEJzPOD3t3hzDR6/+GDwGtxWdYey17R2kBEhwswyBEM937CGsZz0bQU
-         Vm3z4Eh5q2QJRQ22Ry1qHuOmwftBYmSGzIbe7HKP6qvfmyeGTmD/Vti0pY0UnhjB9BVS
-         Hl1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769465284; x=1770070084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1WpWTEYnQFU24311RN7E2Bm1qH3Q3fjhO2tNvVjnXQ4=;
-        b=Du+Eb+A0WfOjwRlFw8QtP1IaSgmV553/ocaUThrUkety0FnbPk4kM8Y/FZcwIycEpv
-         iI4QqJj7PEtHglp2Zq6VshuFAsYieOnBZaqeds94mGbQ+zoHUVBL0X1zZOCxa3MQOJR8
-         cV9Ah6QIgGQ39sKeRt+U7zJq3i/SGkdKMn5UcAzGs+iSNPksZ7NqT/rnmb2nStdNnYdM
-         2fiL4z2z2TyivUttkZCIdjs/ZifUSeyrAL+alNKiIoUiY2NHnAknHapy4psG51wR0SSp
-         npHSSe9xai2ayz2GmNTE38eisXYyWYopfkTseFsrpf8CsfLpdOOQXXF/SCGUMTkKAgrz
-         g4NQ==
-X-Gm-Message-State: AOJu0YzjD/B/xnhfdLkqaBjyYmb2q2dsjt4qSm5J6nc34qodHYZvzRt8
-	E6k3Eb/uDpT/f8OlNvPuxaxXOti0Ly8Z8KGL6oTbHPY60LAYACM6xGKltuJj3VYBxgqKYom6Uqf
-	8JqiF1/SK9E0D/vgLklQQ+HdvqV2z4qmgiV3sAtyy5g==
-X-Gm-Gg: AZuq6aK0+x3AQLyOw4EYOVw8N8JeGjBBxl8mFqY8TqVjeGyE5YQgUpDIr5tilWHiW9S
-	TmpcPYXa88GpmwtISeDbWZOTM0n5np6A15RP7/1wYzXf9jPFnZ1owGH36w8ag/Ve/ESgIIrZMun
-	+YNIbmqib4Tthamq3U+Kknb+kv/g0fzhph1SHmA4k+BO0d5NjeDSiySxdfgjcjHm1sIkoK36VSV
-	JrwVEaNH8jBZPnjeHDcX1fdmwMNGfeeoxklT8RZO66btr1uUnSZWOX6V2c91eXhRaDll7M=
-X-Received: by 2002:a05:6102:a47:b0:5f1:4fb8:6b9a with SMTP id
- ada2fe7eead31-5f723933e1cmr210798137.42.1769465284222; Mon, 26 Jan 2026
- 14:08:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579B32F99BD
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 22:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769465982; cv=none; b=jGjNcBhVKwWHLEOOBSSNI4P/JqXe9Fg3m68nKyUpRkqb+ODKnkx4kw/+nbe6nVDO6g1MexJhBxD5Zt/LB2LbJAMJ2cPWWSyokZT9+Y4OorCo+fD0FVpntwx2racpbYPHAmByr2UpdZG4rSHiAAkXtXqeaXnq8EQiuWWcEZfjoQo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769465982; c=relaxed/simple;
+	bh=MfG5mNjjM2G02N3+AWG0P0JkfwOAvfM7VEWe3256V5c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cYEHva1SdIihKXKCdFm7EyJS9x9YGytPMxJYguyDoJh1HztQlbZp3B0UlacLNiQzQGsrfJq5EJbgbKd2AHH3n/jj7k3uamiCXiVaS+LuQYMIXmxf2Ki5k0Y7Y7hIDVQC9JJ93dGC1MKYihPugkOBBmmjqmdFpLlDr/JHwzEoVnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iXDN6svr; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769465980; x=1801001980;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MfG5mNjjM2G02N3+AWG0P0JkfwOAvfM7VEWe3256V5c=;
+  b=iXDN6svrT9SE18gIoKHKbdQjiAqMdHdLvJn7/2woqeWfXtyiwq8GZ/q/
+   imcv0jihDY4/rDYChdBSBL2c05TpbC08Qxs2nJgrZfLQOr31aCCsB9AN3
+   ESVsXnOYRcxGmUaJXhAQb6n1GOcqVOeN1fU7QTKgWjQelLOmpMJFjMfi/
+   lKPlokgJ6zQ0oMqAfdPxrwDoPVeS/47iWgL02DohQP+VHbQSGYIUagRpG
+   rulaFHuY+/txTpIpDM+X0oiVZ38vOFM8Twsr41jFaqjW3RWCzdP6xTwSN
+   KuYyLbMecjHMZrFrMkP25j7q8CfuZ9u4YghksJnYCZShXIuFLQpyhZCUf
+   Q==;
+X-CSE-ConnectionGUID: qNnXQ2CrSWyhb//g+0cS4g==
+X-CSE-MsgGUID: J+3FiU+6RkaDvbzuYy3Z1A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="82020728"
+X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
+   d="scan'208";a="82020728"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 14:19:40 -0800
+X-CSE-ConnectionGUID: g4hHWet8R1qn9oh1nF18gQ==
+X-CSE-MsgGUID: tuyl5+JHQhyy8v27GXZOhg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
+   d="scan'208";a="245405233"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 26 Jan 2026 14:19:36 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vkUvl-00000000Xjy-2AbJ;
+	Mon, 26 Jan 2026 22:19:33 +0000
+Date: Tue, 27 Jan 2026 06:19:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 08/22] net: stmmac: rk: convert rk3588 to
+ mask-based interface mode config
+Message-ID: <202601270652.AmCxSo3f-lkp@intel.com>
+References: <E1vkL2I-00000005usu-42Hy@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260122192851.86670-1-rjethwani@purestorage.com>
- <20260122174821.70553ffc@kernel.org> <CAKaoeS0f7z_pjJhij8dFpgPPJfiWGsn25k6rgBUMUM4wiFHurA@mail.gmail.com>
-In-Reply-To: <CAKaoeS0f7z_pjJhij8dFpgPPJfiWGsn25k6rgBUMUM4wiFHurA@mail.gmail.com>
-From: Rishikesh Jethwani <rjethwani@purestorage.com>
-Date: Mon, 26 Jan 2026 14:07:52 -0800
-X-Gm-Features: AZwV_QjLget_D5AcRoAHST9cnXs18MozWBEr5b6vlH_I8F7eqThXVZ8Vr39T6Oc
-Message-ID: <CAKaoeS3ZLtiXNLNoJXGyTRp_-4yywdmDdCbNtjA-Q_w6mT_oaQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/3] tls: Add TLS 1.3 hardware offload support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
-	sd@queasysnail.net, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, leon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1vkL2I-00000005usu-42Hy@rmk-PC.armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253605-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253606-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,queasysnail.net,davemloft.net,redhat.com,google.com,kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[purestorage.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F37CC8DD77
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: EBEEA8DE6B
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 11:03=E2=80=AFAM Rishikesh Jethwani
-<rjethwani@purestorage.com> wrote:
->
-> On Thu, Jan 22, 2026 at 5:48=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Thu, 22 Jan 2026 12:28:48 -0700 Rishikesh Jethwani wrote:
-> > > - Rekey handling: HW offload key update (rekey) is not yet supported.
-> >
-> > Not sure this series will be merged without rekeying.
-> > We'll need to discuss pros and cons.
->
-> Rekey support is in [PATCH v5 2/3]. Split into a separate patch to
-> make review easier.
->
-> > > Testing
-> > > =3D=3D=3D=3D=3D=3D=3D
-> > > Tested on Mellanox ConnectX-6 Dx (Crypto Enabled).
-> > >
-> > > Both TX and RX hardware offload verified working with:
-> > > - TLS 1.3 AES-GCM-128
-> > > - TLS 1.3 AES-GCM-256
-> > > - Multiple KeyUpdate cycles (rekey)
-> > >
-> > > Test methodology: ktls_test : https://github.com/insanum/ktls_test/tr=
-ee/master
-> > >
-> > > Please review and provide feedback.
-> >
-> > Selftests are a hard requirement, I already shared a link with more
-> > info with you.
->
-> I will run the existing TLS selftests to verify no regressions.
+Hi Russell,
 
-I ran the TLS selftests - all 898 tests pass:
-linux-kselftest/tools/testing/selftests/net# ./tls 2>&1 | tee tls_test.log
-# PASSED: 898 / 898 tests passed.
-# Totals: pass:898 fail:0 xfail:0 xpass:0 skip:0 error:0
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-rk-avoid-phy_power_on/20260126-234820
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1vkL2I-00000005usu-42Hy%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next v2 08/22] net: stmmac: rk: convert rk3588 to mask-based interface mode config
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20260127/202601270652.AmCxSo3f-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260127/202601270652.AmCxSo3f-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601270652.AmCxSo3f-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c: In function 'rk_write_gmac_grf_reg':
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c:132:24: warning: variable 'regmap' set but not used [-Wunused-but-set-variable]
+     132 |         struct regmap *regmap;
+         |                        ^~~~~~
+
+
+vim +/regmap +132 drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+
+   129	
+   130	static int rk_write_gmac_grf_reg(struct rk_priv_data *bsp_priv, u32 val)
+   131	{
+ > 132		struct regmap *regmap;
+   133	
+   134		if (bsp_priv->ops->gmac_grf_reg_in_php)
+   135			regmap = bsp_priv->php_grf;
+   136		else
+   137			regmap = bsp_priv->grf;
+   138	
+   139		return regmap_write(bsp_priv->grf, bsp_priv->gmac_grf_reg, val);
+   140	}
+   141	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
