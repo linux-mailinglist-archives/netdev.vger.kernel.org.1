@@ -1,144 +1,102 @@
-Return-Path: <netdev+bounces-253546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMh2LNSbd2nOjAEAu9opvQ
-	(envelope-from <netdev+bounces-253546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:52:36 +0100
+	id kLNkApmcd2n0iwEAu9opvQ
+	(envelope-from <netdev+bounces-253547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:55:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2125B8AF86
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:52:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C930A8B0EB
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 17:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3275300AEE9
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:52:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CC60304A54A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 16:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3553164A5;
-	Mon, 26 Jan 2026 16:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF50B3491F1;
+	Mon, 26 Jan 2026 16:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nvH/ojhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9632FE595
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C57E347FEA
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 16:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769446352; cv=none; b=KuTSlKrSth3HR07E+c1KuVW/PnqkEW7wlYxsDol2zJT69qHkMuqwsBWkSvwmL73nlg3otMtGTJNTHGH4ArBvjL5mReyNBC47Z3sLXQahpWnLrigEbecN6Wthj4vS8OOTBWV/kmitKFde9bBO9DiuT2+aVGBLpqESZuOd2AHeVko=
+	t=1769446420; cv=none; b=kMIpzBsOCvoDxi2Y08ULJTRWDIFEqG2d92DqIIy1giWNeTWR9Ln8ir7vViiB9dRX6KZovjEijSEh4w9D5I2aukxRiaIu+Z1ZnajGYQkjiIm3O9ZGslRVGTyidzzLIX/csK0c4bhMURBS5mEDn+57H6jSLGU1WaCugel3xjEnQiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769446352; c=relaxed/simple;
-	bh=NiHBSZZhoC4mVg0AtlJMN8hAj8NU53x4UkFW2EF0jdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g2k5jvGPHcEgVU8pe4RLfi/ZTa5DQGQCp/6fZghCjxkzhdgEzKUMw7awBFGatA/cEZLKecBSVo+fdY+rve834yo9hvnFpHorBWvhIdbICLSMQr95Z8OqeUgnrcZzxe+ngiq1SHA7D1G3ylDVULmTTPAI42erqAGCfW89VXAFlS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.221] (p57bd931f.dip0.t-ipconnect.de [87.189.147.31])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BFB144C4430092;
-	Mon, 26 Jan 2026 17:51:37 +0100 (CET)
-Message-ID: <4eae4d1a-8043-4186-bd38-87f47dd35eda@molgen.mpg.de>
-Date: Mon, 26 Jan 2026 17:51:35 +0100
+	s=arc-20240116; t=1769446420; c=relaxed/simple;
+	bh=nJk6+hl07VRbjSmWfIoluy2CoiiL2JE+kR7eqf27Uqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mAogJ/41ELTk1+XVDWDFen3Vq+MqU9NxAV/aVH2lHg+OFdEdC36SE0yNZbWza/Pq5Xg3RUf2hLWPupwriqgwSAoFd5ClEmUb5N/oj1RqpKfl0I+glRXflUs1VUcQ+0fUkjjT3WssQyLxLiuxi7fBM8c6KzJ3l0oMH4Dea8s5TPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nvH/ojhV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F34C116C6;
+	Mon, 26 Jan 2026 16:53:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769446420;
+	bh=nJk6+hl07VRbjSmWfIoluy2CoiiL2JE+kR7eqf27Uqk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nvH/ojhVILRdym2IDtjxZb9rtATkVLzte+ig395AtxgYHId2nRPKlkMNwq+7Ovwp9
+	 Kf809aPqe0KFh1SCTVeInzVQlede7++K90h8s/Srn0AmuR1HAXXN1OkHjyf1Tif45m
+	 deLq2p+VxHu2fxwHP7I+3sJF3JBG2DiM92cgBgzpxpu5u3DrzwcognOuHuq0M5Z3Z2
+	 5GqobmfI2+YLDf2y2AK5dxG74io13Py/5XyyC1ByuiBLmzO/h1V3ENwTz8Bhhi1TmW
+	 53EFkHMoKZoUjXPY9IkdhjY5QIXOfpEQHxSRrN7PXLzU3885SFZ/tyXJzRIS35oiWj
+	 ITZqX6ec8hH4Q==
+Date: Mon, 26 Jan 2026 16:53:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] ss: fix grammar, articles, and phrasing in
+ man page
+Message-ID: <aXecEWx08vg4MQiT@horms.kernel.org>
+References: <20260124200107.222116-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] i40e: add an error handling path in
- i40e_xsk_pool_enable()
-To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-References: <20260125140423.2077845-1-lihaoxiang@isrc.iscas.ac.cn>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260125140423.2077845-1-lihaoxiang@isrc.iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260124200107.222116-1-stephen@networkplumber.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[mpg.de:server fail,tor.lore.kernel.org:server fail,molgen.mpg.de:server fail,iscas.ac.cn:server fail];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253546-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[mpg.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253547-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_TWO(0.00)[2];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[molgen.mpg.de:mid,iscas.ac.cn:email,mpg.de:email]
-X-Rspamd-Queue-Id: 2125B8AF86
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C930A8B0EB
 X-Rspamd-Action: no action
 
-Dear Haoxiang,
+On Sat, Jan 24, 2026 at 12:00:41PM -0800, Stephen Hemminger wrote:
+> This patch addresses grammatical errors, awkward phrasing, missing
+> articles, and singular/plural agreement issues throughout the ss
+> man page documentation.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thank you for your patch.
-
-Am 25.01.26 um 15:04 schrieb Haoxiang Li:
-> In i40e_xsk_pool_enable(), the memory allocated by 
-> xsk_pool_dma_map() should be released if some error occurs. Add an
-> error handling path to do so.
-
-(Please be aware to use the fully allowed text width of 75 characters
-per line. (It wouldn’t save a line here though.))
-
-Please add a Fixes: tag.
-
-> Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn> --- drivers/
-> net/ethernet/intel/i40e/i40e_xsk.c | 12 ++++++++---- 1 file changed,
-> 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/
-> net/ethernet/intel/i40e/i40e_xsk.c index 9f47388eaba5..92b853a75b28
-> 100644 --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c +++ b/
-> drivers/net/ethernet/intel/i40e/i40e_xsk.c @@ -108,23 +108,27 @@
-> static int i40e_xsk_pool_enable(struct i40e_vsi *vsi, if
-> (if_running) { err = i40e_queue_pair_disable(vsi, qid); if (err) -
-> return err; +			goto unmap;
-> 
-> err = i40e_realloc_rx_xdp_bi(vsi->rx_rings[qid], true); if (err) -
-> return err; +			goto unmap;
-> 
-> err = i40e_queue_pair_enable(vsi, qid); if (err) -			return err; +
-> goto unmap;
-> 
-> /* Kick start the NAPI context so that receiving will start */ err =
-> i40e_xsk_wakeup(vsi->netdev, qid, XDP_WAKEUP_RX); if (err) -
-> return err; +			goto unmap; }
-> 
-> return 0; + +unmap: +	xsk_pool_dma_unmap(pool, I40E_RX_DMA_ATTR); +
-> return err; }
-> 
-> /**
-
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
 
