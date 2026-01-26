@@ -1,283 +1,190 @@
-Return-Path: <netdev+bounces-253424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKMlMBxHd2lbdwEAu9opvQ
-	(envelope-from <netdev+bounces-253424-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:51:08 +0100
+	id ACJYIZNId2ledwEAu9opvQ
+	(envelope-from <netdev+bounces-253425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:57:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE0987495
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:51:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E9587615
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 11:57:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F1972302E790
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:48:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5BD17302A57A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 10:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D52F331A71;
-	Mon, 26 Jan 2026 10:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E168F32F747;
+	Mon, 26 Jan 2026 10:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w8bwAuk1"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LMLl0CdU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5DE3321DE
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 10:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769424382; cv=pass; b=qpVqH6HjOhfbK4pHfN7V5ue02HV6r4pDFHy0FGyTS7H2if5v3lWR4HIjEdNma0+1aILMuy103l5lqRLFG8pUWV/miYHTkKEpjAayH2AY+jsOVWvlyWeK+96kCyBtJhAy1sc58fXEagvNwUY2x44qOQx5VpkxCzETDN8RXUiTiUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769424382; c=relaxed/simple;
-	bh=94GmzbRktVK1GlPBz5Sz7m7iOIEia5jWBvlAE13dppc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WZrif7w2V6NsLER2lvGwLQjSwgUFpeUnXxnUcg1zu1Z/p8PbsFGmC0ZXlm3nJlExlLQfj1c1yHG89S4ygmWQE/xrGKRVRUyp9OYCS3BmoRBlw79/ye2CvqP0bpaclESkwi5aJEweZ1AZmc6dPFtfqBAh/Q8gNlWt8oYHe10HF/M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w8bwAuk1; arc=pass smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-50146fcf927so59814161cf.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 02:46:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769424379; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Gb0f0h/JFp3AbPO0BDxfvAO7THF4hpAsvpHhqbj8MYMIGtsEj/xZQqiqcgSaVpgoTg
-         fs9NIa4cFV+NC7yiMoKYvILfOWy0/xrEG0GsbLNiToT0flPEu4DhKQQaWPdGpK3UDbnV
-         tM+PjPLNsWLysQACMUAGPi9fCs0rwH4A+YtWiAQcgVUd+7EpWWUirGstgUwg+RTDZQ79
-         gbz65sXDyBaDE1DqbHEQBXQhDNLKLrvL0XIdwtxnHSf58lued6KSi8ENiG9BHpWQOjTg
-         6UZF9oSydFG54eLPTU06im7lztl/1QPUlIuqMnkcgns7yU2vUwM4JDYt1FLUbrqXEZ8N
-         CuMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7Od1EKCwd9dTKL6f28R/c7jV4EqRADZNnYvDknVlC7Y=;
-        fh=lK+C8pB1og3nAhELHFG5l1zMCOgKxmzcnYaHIfxZJVc=;
-        b=c3ECpTDZz8POfFybapU4ek3Kdv7naUK7mWPq+bYwqhqM3GUePGizaVyzqwhZ30umdd
-         DRVXicWWQ83zjVVOGKKYdZQkSaJD5dte395CDFkRTPsLnnFekx5VSTgT6BWWZYD2y6wt
-         5F43TLrO6+Pfbk/5zPJ06iAn9QIxlCrqDgTPrIatEtxd8rKBV1A8Vi5RsksEInHEoRmo
-         8gahvf3GH2pOaPTtyHtG23m/VOKvU3zTfMsWDZPI0hQviJh+C/VzDaaCveXsvs823SgQ
-         96GDGfdko4m/aAQ+QvgPnSBwR08bgSpv99nMIcz8BT8/JiYPGi6FxVAy9vy+fOyXmCbM
-         35PQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01413314CB
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 10:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769424786; cv=none; b=OU0xdVqNJfAnsLMGjC/2UGIM5fmtqcNxYFAoB0slXwmdrK2sgk0DFG5O7wZiWZA9Hey7g34w+5saDC8W5z8moZWYJDw7vR/YEBIoXud1FUpJ0Gmygv8oi7Vw000D97MQ05WcpdSIZLtpqazWUvrFtJpt39CWoYronFwBPmX5GCk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769424786; c=relaxed/simple;
+	bh=wi91apMevgorcUoNdYgJdCJWvTz1n03aU7FKUWmZnAI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Hms4YFFeGyZ5m79AOQdj/pS8vLwaLlJBJq95O2oYi+/QjLULrnXHXmYHU3+7CB4eQMLNSzrU0DbfV8rbfE8kwp3ekNS89yVDdenXuEZeftrWb7l14aiKhUIFa+eAfmlekM75s8fn7KMBE8WAoP22fRV/FmUIX1n+ENyJrcsCJkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LMLl0CdU; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b8871718b05so414433566b.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 02:53:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769424379; x=1770029179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Od1EKCwd9dTKL6f28R/c7jV4EqRADZNnYvDknVlC7Y=;
-        b=w8bwAuk1bpd4gYsowpKo/4b3Cq/IXjDkcnbpPBbUNSeysHjF8tyV4TB1Da637LFq9k
-         X/5etSwAJxBTa3lxbxPF8e50SRLR5lYJxosMemvennxyCxA0phswxCwdZqBmBTleCVMS
-         sP//wV2KHQlRQYGJJHS4PXMg07iZA2xek6XGAUyoZxt5Q+Ag/Ij+pwBBakemeIhvYctP
-         GM/70OncZpywVYPzNrrnbvZNsnDINXYXv8KrTaEqvbW3PtRwbi5F7ykfh42C8qNgpaxi
-         KsywR5o8kVH5uwY4ayuvlJwSljW4ba1YYCs0UMQNQMD/jHBSQFACPzNYpVeSGqGEr9Wm
-         om9Q==
+        d=cloudflare.com; s=google09082023; t=1769424783; x=1770029583; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7HQyMiysYGwMm5ScyZuRYthPeCj1mNuauMhUi+x7J5g=;
+        b=LMLl0CdUhJ43KTJp9v0VbiAarCY6oEIqZZ7jGGOZTBcXw1st3dVaauwSKXKrr2EdBn
+         9SdDC3EkaSzdIi7/Y+mfMU2R9jxZmt03ate7/fn+rzq8L1RQvXDyzgSYFQb6UTQ6n3ZV
+         LUsWxBW6OUNaWfKDqUs5h3JIXbNM7ppsb23vDL9snkCsnYZdknYPcvOzUtWKp2DQM7lL
+         gpdwUN/cku23XlvwSiUZVCL/0mzYzKEBwgLQQUKeCg2fqPUa7gbJFwAm1pWrdbRmS47I
+         jQDNbiX/DxZa4b2DlysJl6cpVdDnRLWEXiDFf3Y2DUjQc830fM7w8AnFxGOHK0jxsHlU
+         Cm4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769424379; x=1770029179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7Od1EKCwd9dTKL6f28R/c7jV4EqRADZNnYvDknVlC7Y=;
-        b=BQCBUt9za5adkWkrwKeqmbbCFV+AJ4l8aMivV7vMzpQEFMW1OD7DNmI8yLZ4pQSzHo
-         oG3LTUJUm7IoHBUsqjsW8j9ori4VCA0q+IQnfro0mpXo8o5/z7GL+zGlVmTeeNMfjz6t
-         yjuuYO4VOHBMH2eYyMVFkYThJL0/52IhpeIfnJRxJxQnghj400wnytEtb2Rnl6AcXDYv
-         C3lCAaL71qH90D6nShpKjmrwe4CAyb7fnThs3vMCuJC7qonAbBybVRqjySEL1ELuYIlO
-         9n1DnLosf77KKLsYpete5BcnFSvw7tfYWNG8YpETGXwlSZsXaWvA62v5VUl+jqy5JiIg
-         s0wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUU1Ihjl6aSwBQOD8Irqy68Xb3urPucnfDmO8qH6ZqzpzOPT7BUEyT1KTIrskMOHHLDVSAXgRM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWHKgI4QjGXlPdYb+tz1EeX14oDtu7JbwuUHlzQoEeXnP0tLUw
-	US+px254Hiv9VjMe0vK8MPfvK7BagG5wU+b21Z5edmUIfhvWinictJiIsde2CPX4r1TMleb/5sQ
-	SJjAWBNtzXQ2k7NiG3+hzW47mN7KjVuV3CQ5Mda1V
-X-Gm-Gg: AZuq6aJkwDJEcWewuftrDV8o4gCl8u3zkjHCkEk/6lTC7Jg2Ti9QHIClSzoH5GQV3rW
-	j0qBDe4peNnJY2C51RMmtHLoqfjgOG1iT69eoMPzpq7MTAxzVRsFjJmhuniYtH0OC5LOg+Bi2MD
-	uRibcOftLsqdcsJZYBCLi8ALMy+oZBwk5q2G2tygjJ0zp61vBBPmGZk5OWFoIGwsVxP+8tKj3jf
-	TLvXpJQMoRcx03IUhGKLpL8P+PVFns2/vwcS/HRpR657V9QY/J/BmPszx1hPSBsMv9KVXpe
-X-Received: by 2002:ac8:5a0e:0:b0:4e7:4a3:ae88 with SMTP id
- d75a77b69052e-50314b91caamr38279801cf.7.1769424378935; Mon, 26 Jan 2026
- 02:46:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769424783; x=1770029583;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7HQyMiysYGwMm5ScyZuRYthPeCj1mNuauMhUi+x7J5g=;
+        b=EL4vPg7tDqqWshtwzM5ncG4w7rMV54uIJEZ4z7et6z50q58mKbEDc9euPSGZleXXgx
+         51aUT2UkbHhkuPg8CP2hwEfB+un5sRB4AH+3z9AucjcIu191E11uvNlCHhf5aBQWDqTC
+         4ZPENvOjL39NlzuIxFMe6sPphnG4Vob4sPRN6nFqEDuo74IAxLSOYQ2x/WtOmIFW0MHR
+         vhOYvU+Cu9tC4ykPprYnIKl803aFCMxBeGgEKg9UKKDJPJiufWzTevwyRgEYn96wYXTH
+         xVX3E+R/FYVuuu/Z805P0+cTup3IVXsxF0mmPFEeJjgZOpESaRW0qNgaR4wEWC2lEf05
+         69yA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcfQzpDdR5RxV+zQBpPJOPQR3zdkQSmSL+hjeHESg7hlQhg2KfOmQBA5kC04tHu67gX4bgLxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQgvdUoDyBI8oA5I2JegVeTjjS1b8YL23lyWpQHIkGcbZXROv4
+	i296+sKJesbRnsjxDYDhcm2a34YBUbDGayW4wPecC1/xykbHUgxE5cBWle7fIBJTQig=
+X-Gm-Gg: AZuq6aKyn2ivYkAVbZASzBAvWoRkBYzewBq/tsxiIwHN+RySgJnUOCUZ0l8otkrSVmc
+	gdB7dCY0VbtE2jNgPWJRXutFyVQfNnGGZsXbG46yb7ZDkf4Fz8XqA54e6cyUozw3LjG6ugfmL4p
+	ga/4KRyCC+HHpT8S8oxIXDjhX9b4WOine41LqE/sxYKIrOWgSBHgWxJhkCPuTzK3FJ0Y5YjAsqu
+	ckRBCjUNUxEW3/eypTa6Qzk8r7xcquqFwU8su16gq0AlsHacHehn3pGLBUnbQ3hMW+G/JJI0MLu
+	jCnKbCoV0EAYjF4Z3M7VPeBlBdvEDtKpb31va+cPPnZXdy3JfySTmWpKD9YfHS/Lo6h6Q9eshNL
+	2verpGoUCivYywKVnYogNxUKMz59dfjlADF77xwejr8trxJoeUmatFEsxHV1sXOEreFBEsdiO8c
+	OZvTo=
+X-Received: by 2002:a17:907:3cc2:b0:b86:f194:9eec with SMTP id a640c23a62f3a-b8d20b4f26emr305487166b.18.1769424782815;
+        Mon, 26 Jan 2026 02:53:02 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:b1])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b885b6ff080sm587357766b.38.2026.01.26.02.53.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 02:53:02 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org,  John Fastabend <john.fastabend@gmail.com>,  "David
+ S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  Simon Horman <horms@kernel.org>,  Neal Cardwell <ncardwell@google.com>,
+  Kuniyuki Iwashima <kuniyu@google.com>,  David Ahern <dsahern@kernel.org>,
+  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
+ Borkmann <daniel@iogearbox.net>,  Martin KaFai Lau <martin.lau@linux.dev>,
+  Song Liu <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  KP
+ Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
+ Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  Michal Luczaj <mhal@rbox.co>,  Cong Wang
+ <cong.wang@bytedance.com>,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v9 2/3] bpf, sockmap: Fix FIONREAD for sockmap
+In-Reply-To: <20260124113314.113584-3-jiayuan.chen@linux.dev> (Jiayuan Chen's
+	message of "Sat, 24 Jan 2026 19:32:44 +0800")
+References: <20260124113314.113584-1-jiayuan.chen@linux.dev>
+	<20260124113314.113584-3-jiayuan.chen@linux.dev>
+Date: Mon, 26 Jan 2026 11:53:01 +0100
+Message-ID: <87zf60sl0y.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126094718.1031407-1-realwujing@gmail.com>
-In-Reply-To: <20260126094718.1031407-1-realwujing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Jan 2026 11:46:07 +0100
-X-Gm-Features: AZwV_Qi1KY1G0mjBZLtwiSOjkFV3kRtQlR1FBt43IF9zwWOkk-bunVH4i9lbafs
-Message-ID: <CANn89i+pyHq-jfqoaXpk_07LVCn+REmW1wPTbKmxV7ykZCEHfg@mail.gmail.com>
-Subject: Re: [PATCH] netns: optimize netns cleaning by batching unhash_nsid calls
-To: Qiliang Yuan <realwujing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	brauner@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Qiliang Yuan <yuanql9@chinatelecom.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-7.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253424-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,fomichev.me,rbox.co,bytedance.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253425-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,chinatelecom.cn:email]
-X-Rspamd-Queue-Id: 4FE0987495
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cloudflare.com:email,cloudflare.com:dkim,cloudflare.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: F2E9587615
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 10:47=E2=80=AFAM Qiliang Yuan <realwujing@gmail.com=
-> wrote:
+On Sat, Jan 24, 2026 at 07:32 PM +08, Jiayuan Chen wrote:
+> A socket using sockmap has its own independent receive queue: ingress_msg.
+> This queue may contain data from its own protocol stack or from other
+> sockets.
 >
-> Currently, unhash_nsid() scans the entire net_namespace_list for each
-> netns in a destruction batch during cleanup_net(). This leads to
-> an O(M * N) complexity, where M is the batch size and N is the total
-> number of namespaces in the system.
+> Therefore, for sockmap, relying solely on copied_seq and rcv_nxt to
+> calculate FIONREAD is not enough.
 >
-> Reduce the complexity to O(N) by introducing an 'is_dying' flag to mark
-> the entire batch of namespaces being destroyed. This allows unhash_nsid()
-> to perform a single-pass traversal over the system's namespaces. In
-> this pass, for each survivor namespace, iterate through its netns_ids
-> and remove any mappings that point to a marked namespace.
+> This patch adds a new msg_tot_len field in the psock structure to record
+> the data length in ingress_msg. Additionally, we implement new ioctl
+> interfaces for TCP and UDP to intercept FIONREAD operations.
 >
-> Signed-off-by: Qiliang Yuan <realwujing@gmail.com>
-> Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+> Note that we intentionally do not include sk_receive_queue data in the
+> FIONREAD result. Data in sk_receive_queue has not yet been processed by
+> the BPF verdict program, and may be redirected to other sockets or
+> dropped. Including it would create semantic ambiguity since this data
+> may never be readable by the user.
+>
+> Unix and VSOCK sockets have similar issues, but fixing them is outside
+> the scope of this patch as it would require more intrusive changes.
+>
+> Previous work by John Fastabend made some efforts towards FIONREAD support:
+> commit e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+> Although the current patch is based on the previous work by John Fastabend,
+> it is acceptable for our Fixes tag to point to the same commit.
+>
+>                                                       FD1:read()
+>                                                       --  FD1->copied_seq++
+>                                                           |  [read data]
+>                                                           |
+>                                    [enqueue data]         v
+>                   [sockmap]     -> ingress to self ->  ingress_msg queue
+> FD1 native stack  ------>                                 ^
+> -- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+>                                        |                  |
+>                                        |             ingress to FD1
+>                                        v                  ^
+>                                       ...                 |  [sockmap]
+>                                                      FD2 native stack
+>
+> Fixes: 04919bed948dc ("tcp: Introduce tcp_read_skb()")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 > ---
->  include/net/net_namespace.h |  1 +
->  net/core/net_namespace.c    | 50 +++++++++++++++++++++++++++----------
->  2 files changed, 38 insertions(+), 13 deletions(-)
->
-> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-> index cb664f6e3558..bd1acc6056ac 100644
-> --- a/include/net/net_namespace.h
-> +++ b/include/net/net_namespace.h
-> @@ -69,6 +69,7 @@ struct net {
->
->         unsigned int            dev_base_seq;   /* protected by rtnl_mute=
-x */
->         u32                     ifindex;
-> +       bool                    is_dying;
->
->         spinlock_t              nsid_lock;
->         atomic_t                fnhe_genid;
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index a6e6a964a287..d24e46c034f2 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -413,6 +413,8 @@ static __net_init int preinit_net(struct net *net, st=
-ruct user_namespace *user_n
->
->         get_random_bytes(&net->hash_mix, sizeof(u32));
->         net->dev_base_seq =3D 1;
-> +       net->ifindex =3D 0;
-Unrelated change (and not needed)
 
-> +       net->is_dying =3D false;
-No need to clear fields, whole net is cleared at alloc time (zalloc)
+Thanks, Jiayuan!
 
->         net->user_ns =3D user_ns;
->
->         idr_init(&net->netns_ids);
-> @@ -624,9 +626,10 @@ void net_ns_get_ownership(const struct net *net, kui=
-d_t *uid, kgid_t *gid)
->  }
->  EXPORT_SYMBOL_GPL(net_ns_get_ownership);
->
-> -static void unhash_nsid(struct net *net, struct net *last)
-> +static void unhash_nsid(struct net *last)
->  {
->         struct net *tmp;
-> +
->         /* This function is only called from cleanup_net() work,
->          * and this work is the only process, that may delete
->          * a net from net_namespace_list. So, when the below
-> @@ -636,20 +639,34 @@ static void unhash_nsid(struct net *net, struct net=
- *last)
->         for_each_net(tmp) {
->                 int id;
->
-> -               spin_lock(&tmp->nsid_lock);
-> -               id =3D __peernet2id(tmp, net);
-> -               if (id >=3D 0)
-> -                       idr_remove(&tmp->netns_ids, id);
-> -               spin_unlock(&tmp->nsid_lock);
-> -               if (id >=3D 0)
-> -                       rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
-> -                                         GFP_KERNEL);
-> +               for (id =3D 0; ; id++) {
-> +                       struct net *peer;
-> +                       bool dying;
-> +
-> +                       rcu_read_lock();
-> +                       peer =3D idr_get_next(&tmp->netns_ids, &id);
-> +                       dying =3D peer && peer->is_dying;
-> +                       rcu_read_unlock();
-
-Hopefully the number of entries in netns_ids is small, otherwise this
-could have O(N*M) complexity.
-
-> +
-> +                       if (!peer)
-> +                               break;
-> +                       if (!dying)
-> +                               continue;
-> +
-> +                       spin_lock(&tmp->nsid_lock);
-> +                       if (idr_find(&tmp->netns_ids, id) =3D=3D peer)
-> +                               idr_remove(&tmp->netns_ids, id);
-> +                       else
-> +                               peer =3D NULL;
-> +                       spin_unlock(&tmp->nsid_lock);
-> +
-> +                       if (peer)
-> +                               rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0=
-,
-> +                                                 NULL, GFP_KERNEL);
-> +               }
->                 if (tmp =3D=3D last)
->                         break;
->         }
-> -       spin_lock(&net->nsid_lock);
-> -       idr_destroy(&net->netns_ids);
-> -       spin_unlock(&net->nsid_lock);
->  }
->
->  static LLIST_HEAD(cleanup_list);
-> @@ -688,8 +705,15 @@ static void cleanup_net(struct work_struct *work)
->         last =3D list_last_entry(&net_namespace_list, struct net, list);
->         up_write(&net_rwsem);
->
-> +       llist_for_each_entry(net, net_kill_list, cleanup_list)
-> +               net->is_dying =3D true;
-Move this to __put_net(), no need for yet another loop.
-
-> +
-> +       unhash_nsid(last);
-> +
->         llist_for_each_entry(net, net_kill_list, cleanup_list) {
-> -               unhash_nsid(net, last);
-> +               spin_lock(&net->nsid_lock);
-> +               idr_destroy(&net->netns_ids);
-> +               spin_unlock(&net->nsid_lock);
->                 list_add_tail(&net->exit_list, &net_exit_list);
->         }
->
-> --
-> 2.51.0
->
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
