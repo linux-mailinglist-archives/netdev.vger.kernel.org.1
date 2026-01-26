@@ -1,127 +1,170 @@
-Return-Path: <netdev+bounces-253497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDWuIZ92d2n7ggEAu9opvQ
-	(envelope-from <netdev+bounces-253497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:13:51 +0100
+	id QKhKHRJ3d2n7ggEAu9opvQ
+	(envelope-from <netdev+bounces-253498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:15:46 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034C1895B2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:13:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14575895D9
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 15:15:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E534E3017502
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:13:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 794F2300680C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 14:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D009B33CE84;
-	Mon, 26 Jan 2026 14:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988283385BE;
+	Mon, 26 Jan 2026 14:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qy/ZK3AK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHvCZB5a";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AO20Ue4n"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AD633B979;
-	Mon, 26 Jan 2026 14:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AB722E3F0
+	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 14:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769436826; cv=none; b=E4MLb5JfgKlWqUOoHlCSw/zQd4j7r+zafO5mvAO8AJ7rYuIsMvYw1VdX/NFITo1BavbaZoQzt8ZGqBFOxLOEU3Dhc0SmFEdvM1O/UQ9/AFTp87PTHmyldEHnKVXJbZo5vo/aTTyn0NKvuetIkYP6D+qFeR54x2KUKJufLpnZKxM=
+	t=1769436942; cv=none; b=o+R4yDn3apSDknZ1wzVecDBv6mYEfCyqpK0R07Eb+uHmmFuUTLTn5K9SxxdHBEjZLxOTEgS0gKo8Fks/g4nYYir4bSHr4BTqqyjICU6KVyjbAW8yrzhr2wliWUknyKJO/CJaJQtcnd9ln3prsaPtSlbjrwk/XvxU08tS6R+WDqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769436826; c=relaxed/simple;
-	bh=c8wHS1GSDT/p7+BB9QJ+uPyVPlyARHIFJQOIjLEpzsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wqd+uhzBskQbPHb1t6kLqJ7NR16VP8WaRg8LBgwZFCWA8vsVXGxcIe//WVihQpzgha3gjhqC1tkYCxIBxrkZLKvfyGk35/rM/A4ctNEw9kg8WHFssjFSoEpvepCK+aID7oq3qoYZTtYZqm9xcZTn6qml4Tq6JZI5uBPhowtVRwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qy/ZK3AK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Si7F027L4MHkHl6W8g2C1ydhbQv99XYtueMfjkYDZqk=; b=qy/ZK3AKQMpij9zi3RjCOr/C4F
-	ALnwB/uPmNV13sdSWjpXYuEuOjkJUKcoLtkGqVsyQIj674vpmj/Qg+WMGqh3QBruCfD3BWcu7ioSy
-	eHQ4rEpC/+cHxLMpSSyknH8fCuSFUqBzimbvOvADBdqDB4tTOeKTDQ1k6zcLflyMPdtI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vkNLK-004nBB-B5; Mon, 26 Jan 2026 15:13:26 +0100
-Date: Mon, 26 Jan 2026 15:13:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	florian.fainelli@broadcom.com, xiaolei.wang@windriver.com,
-	maxime.chevallier@bootlin.com, quic_abchauha@quicinc.com,
-	quic_sarohasa@quicinc.com, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: add device link between MAC device and
- MDIO device
-Message-ID: <2344001a-08c4-42f9-b4e6-116e39fbf1a3@lunn.ch>
-References: <20260126104409.1070403-1-wei.fang@nxp.com>
+	s=arc-20240116; t=1769436942; c=relaxed/simple;
+	bh=zUktEHGKHLE9TJGXL5YM3vc2cOgc6sc1SgttBbIkLpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D3qBnCJduBXH0XDINAMB6TqfgBmw8fUDpLYH23JILcZM5gXyQmyxYXuwkQBLmYtKMU6QIEKNMAL31+jebrT9tQxCuNTUKIFWFGRI5tlDtTedhwfjo1PhpzpcCsIc8zl5CYMYMsQTYGbU+u46yLEwyuzluh2rm5t0oR+SPzvdoCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZHvCZB5a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AO20Ue4n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769436940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ba6scG27hyC+OOv6pXy5I21jJl9wm99+WT3gp+Bu9c=;
+	b=ZHvCZB5aHSoxz9KcOLnT3s0VASj1t2FzH2mMZitUH4Xyb6avp93Q5rk6u6pTgAWVAR4V/J
+	/9mW6vu/eytSTg2goQD/ZPfCmTPcIrCRd8Ryl6VlcldfhnT3TtgDthM/0btxKeZiQNEUs7
+	H3MOVl3gKdqLpNPEMGHQd8np8vR+3RA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-m2hNu9TxMq6O_Q2rtG7qnw-1; Mon, 26 Jan 2026 09:15:38 -0500
+X-MC-Unique: m2hNu9TxMq6O_Q2rtG7qnw-1
+X-Mimecast-MFC-AGG-ID: m2hNu9TxMq6O_Q2rtG7qnw_1769436938
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4325b81081aso4428160f8f.3
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 06:15:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769436937; x=1770041737; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/ba6scG27hyC+OOv6pXy5I21jJl9wm99+WT3gp+Bu9c=;
+        b=AO20Ue4njo3SRsO4304QsS1vR7SdoNCpHEARyWaOsdE7MFW/ki+SvWHz0fbKwIkxtv
+         GjJdbhYIBCzb59+CW+JqqiR6QJfgykUxlgYnHkqohA7SWm5jztm7Dx2OtVEFcQhKDD8l
+         H7Mm3T8vDENCEdypA949HvCJ6X72bUdGy8vDP5oeQ0J+FPs1WvGzWKtZyt0B/MtDG94d
+         IFVW+JMeV8GcgAyGY93e8JCJrxcfMWKeqLKn2GtmtazyNGx5qMh/hI5xflUNUH75eykc
+         pxn1J5uoCVy9waQBZ58/EuskWDdesvvZ3vT5GQChhtbDpTGqUEQ0yqDbrWfM1nKUA5Q6
+         /wzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769436937; x=1770041737;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/ba6scG27hyC+OOv6pXy5I21jJl9wm99+WT3gp+Bu9c=;
+        b=w0iWBFEvz5/gemz0BBCnlGyJTKZHRm8bjOGlqM4nRa0NAxva2VDjFuIfWOr2OO3rcW
+         vyY3H2fgFUt44J7YcXjJyna/Asq3Wxj4YKv5bvUy9YUPC4oLplJSuQX6fs6nD65wElI8
+         AeVrtuFG9MA4ayC4JTLtziD/3RjZXYE41b9LAplo5uQ7gyPwjgjM09HlPD1C4WX/S2mw
+         xIvmThBNFiG8lFAc4Xe7Huyof6vNnb6ncQhRZ+JrrwPrKGyDckX4CA5++SezXZNXHMjw
+         o8LB0J+NMv/1XQ3JDrBR5MezQr3o1iQX24SXfhAwhIaatw6HoxMLGbejbkXljjVCMhR8
+         OGdg==
+X-Gm-Message-State: AOJu0Yze7Dr9M3tP34NtEltT7eY4uhZaZPPMtksejH0aRsYm0rLdgXg9
+	IrP1aojHStzzCqv0K25TnEMnBA83MOuJsVEBihGGIW+oEcWOVaM4rJsW3qqEBZkAKPWjVwynLGZ
+	okyQWTj35R5BKIR+O8ijIdy0sDPblg3czuQ/ouM5Zykz+iodcDvWrfzixJA==
+X-Gm-Gg: AZuq6aIT0gk78UYqeZfnL2HjJ6vxmh8l5sONv0aJryVsjCjJcpDqdXvZZTeAYnW6F9H
+	cdSgox0wnEjMtbF/JjPcePXry+3GEwBh2TV2WBKv4ZAa3kDhfoqK6pMNePXUxy2vXHhVxNABt77
+	FQXHYi5rq03LdKDTrXzEP914zK5rPoeQTeR+sf18+zAT0g0eSaXz8HNHhEOrvBF9f0Cak4Gc8GR
+	PIbU2qAlvqfqWO/4ll+980Nasuuyx/e/jncQ7FOIvrNqQCkmhsq5r0phNhX1yhCwG09E/6iCV1W
+	1hLhBjxwaeRMQF350qU9CoQZB/wH6ahWFcqs/k2nmFksOw57znLBwoZ1/ucYkFbn1/bis98PIN3
+	W8rpU/A57wZQ=
+X-Received: by 2002:a05:6000:3109:b0:435:a464:f468 with SMTP id ffacd0b85a97d-435ca1b0a8amr7518695f8f.47.1769436937432;
+        Mon, 26 Jan 2026 06:15:37 -0800 (PST)
+X-Received: by 2002:a05:6000:3109:b0:435:a464:f468 with SMTP id ffacd0b85a97d-435ca1b0a8amr7518659f8f.47.1769436936993;
+        Mon, 26 Jan 2026 06:15:36 -0800 (PST)
+Received: from [192.168.88.32] ([150.228.25.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c24a6fsm30748182f8f.16.2026.01.26.06.15.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jan 2026 06:15:36 -0800 (PST)
+Message-ID: <18ed7727-b68e-4611-b9cb-6884408835ef@redhat.com>
+Date: Mon, 26 Jan 2026 15:15:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126104409.1070403-1-wei.fang@nxp.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 00/10] geneve: introduce double tunnel GSO/GRO
+ support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, sdf@fomichev.me,
+ petrm@nvidia.com, razor@blackwall.org, idosch@nvidia.com
+References: <cover.1769011015.git.pabeni@redhat.com>
+ <20260123113334.1dea13d3@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260123113334.1dea13d3@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253497-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,windriver.com,bootlin.com,quicinc.com,lists.linux.dev,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,gmail.com,lunn.ch,fomichev.me,nvidia.com,blackwall.org];
+	TAGGED_FROM(0.00)[bounces-253498-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 034C1895B2
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 14575895D9
 X-Rspamd-Action: no action
 
-> The commit bc66fa87d4fd ("net: phy: Add link between phy dev and mac
-> dev") has created a device link between the MAC and the PHY if the MAC
-> uses a shared MDIO bus (The MDIO and the MAC are two separate devices).
-
-> Sarosh Hasan tried to change the DL_FLAG_STATELESS flag to
-> DL_FLAG_AUTOREMOVE_SUPPLIER to fix the issue [1]. However, the solution
-> does not take into account the hot-swappable PHY devices (such as SFP).
-> so when the PHY device is unplugged, the MAC driver will automatically
-> be removed, which is not the expected behavior.
+On 1/23/26 8:33 PM, Jakub Kicinski wrote:
+> On Wed, 21 Jan 2026 17:11:26 +0100 Paolo Abeni wrote:
+>> This is the [belated] incarnation of topic discussed in the last Neconf
+>> [1].
 > 
-> Therefore, to solve this issue of the shared MDIO bus, we create the
-> device link between the MAC device and the MDIO device, rather than
-> between the MAC device and the PHY device. And when the shared MDIO bus
-> is removed, all MAC drivers that depend on it will also be removed.
+> In case you find yourself with spare cycles or an intern -- adding a
+> test case to tools/testing/selftests/drivers/net/hw/tso.py could save
+> us some driver surprises?
 
-Shouldn't there be a full chain here? MAC->MDIO->PHY?
+I'll try to have a look and/or offload it so someone else. I have a
+vague suspect that the additional setup will require some rework - hence
+the offload one would be the preferred option.
 
-For the case of the SFP, maybe it should be
+/P
 
-MAC->SFP Cage and I2C MDIO->PHY
-
-So if the PHY inside an SFP disappears, the I2C MDIO bus is
-removed. But there is no link upwards from that, so the SFP cage and
-the MAC are left alone?
-
-    Andrew
 
