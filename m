@@ -1,231 +1,173 @@
-Return-Path: <netdev+bounces-253565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id nojtHk+vd2kbkQEAu9opvQ
-	(envelope-from <netdev+bounces-253565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:15:43 +0100
+	id iEnYGYmyd2l2kQEAu9opvQ
+	(envelope-from <netdev+bounces-253566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:29:29 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FFC8C018
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:15:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64068C172
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 085C9300E449
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:14:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CB1B2301DEFF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5374C34D93B;
-	Mon, 26 Jan 2026 18:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032833081D2;
+	Mon, 26 Jan 2026 18:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nVgoIJgT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1oXHcVOE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FB234D910;
-	Mon, 26 Jan 2026 18:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C232A4F881;
+	Mon, 26 Jan 2026 18:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769451246; cv=none; b=ED8BaevKStI7OGKlrrw8+ovt7RT9DaiESycXWFqZry9stBFpD8ePuVLD1g4RFO+otFIikkfiQKjKt+isgbQgwUh7bTJFvoeIOg09a0M/mw8vAttk6NdHM1dxFwtfhh/ZmiAPRRIDLQ3SAvQgzQC9WFZ6OjAMYZejH3MABIxjafU=
+	t=1769452164; cv=none; b=buLef1AkdMhEwTcTfp+PDDakQVuZ+78becE7jn/Hm/p5R4anNtub/SIkT5KS4u1jXHJ3hzSy1AyHPDJ/Umed83A1yeRlSB6t7Wf59YbeguoWit4AP3MDf66faHBiF8T4JcXIm2fcWdiSL3D3B98iQ8+AHK+vFoHkI7lZU0ghnMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769451246; c=relaxed/simple;
-	bh=jhr9a6cgDBi4L/Y/fqNnkSWD4mZrTD0Td1Kjc0FE7d4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bXin7mABzqZwt6gsvO80zr9Wdd0f2kJoPUUE2h6N8CtsnVVQ3JW+7rQcOPbdMriM4SgwuBUhEXn2Z0+o02liFkFTwnVpKMV6nhUtRkDmHIhut488uVLGo0Y4xlxqDLo/AYlBcK0lGChXCNDqldiUgHXvV1Z4e5PTFXeMODGTNao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nVgoIJgT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E27C116C6;
-	Mon, 26 Jan 2026 18:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769451245;
-	bh=jhr9a6cgDBi4L/Y/fqNnkSWD4mZrTD0Td1Kjc0FE7d4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nVgoIJgTaMtZXe7vJx91AIult5bczODnhPAwNvlhgpWv9/zxDR9iqiytQ/4FLN947
-	 pwwrkH5t65DpbcC2Ndjsc3y8aLEOhS0YcPTP/zE9t8jPah+veeX4QBoyt1kmvAWrY+
-	 zRwMXcdzKZtNmnovqWUmBKzDbk9OAYTgK+9DolDd9fVf3ecNbeyx+YBmZX/4TxAWSB
-	 wqRZlkumamMI/9hdPN88aJwNDn2vHU20e79cjnY/MZArxLERLAkk/9E4ucbO4XBing
-	 XS9aPsA9kPCFc1v/sOkFQgZ7s+hN5AxNLT2q9/XSNFJhI7WnNpPfb4LEcMYEAXUTHV
-	 2++X9k5uMy7nA==
-Message-ID: <4e673f7f-c49c-46b0-85b4-bae6e4efcb3a@kernel.org>
-Date: Mon, 26 Jan 2026 19:13:50 +0100
+	s=arc-20240116; t=1769452164; c=relaxed/simple;
+	bh=RpY/a3YOkPpZowN8J50+3W3QyIgU7NGF+rNzgR3E4L4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A70Cb/yafgVVeYOd/jzicZChr/y55Fj8SLyYAsKq+/szdzpLwA9mevuitLWb/u/g3Epsn39a36IEK4Q7yTI0TOuIWWxBvcAT6QdeSLWGb3CfX3qvYLN9Ze9768cIprpNyQ6w5aKkeVmpYnzkcr6BkgQTRgdwbxuEOHPQAR/iDWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1oXHcVOE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Qh2+4EAwmLQeQZACP33br3DlT9jNVGAtBcqIW3K6GBY=; b=1oXHcVOEbBsPeKtD7teuUoyUKA
+	rEBoh0VAB/JUFwdTHamwVXxwBqSyg+KkaZ322sjhe0tRa2s7gqMStIkRCsySN7cZA88CYuQcsSHcC
+	j+TqI2EKxYDKw1sNcGyXmSgoTZXLfKB32XKFjCtebURP5xz4/EEQyoTsQwric7NIr0IyMg97NRH5Y
+	v+FcwuOtnXLHiujV4gsTpe3Hmt/e8M9mUR5dZFRTH42BRUeA/DlcylNQGh2GVhWuy+m+QMtUSl6ik
+	w4uHLniv9u0Vqhat1i6uZLKRlsN0UazPmmom41ZzD8iCUNRvSJFj15FQw+6nX2T4rG7lZK0J1cKuP
+	n20j5Y7A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58892)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vkRKr-000000005Ew-2moS;
+	Mon, 26 Jan 2026 18:29:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vkRKn-0000000059Q-1LXH;
+	Mon, 26 Jan 2026 18:29:09 +0000
+Date: Mon, 26 Jan 2026 18:29:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Min Lin <linmin@eswincomputing.com>
+Cc: Bo Gan <ganboing@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	=?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
+	devicetree@vger.kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	weishangjuan@eswincomputing.com
+Subject: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock
+ sampling control
+Message-ID: <aXeydXuWEMDz-yVM@shell.armlinux.org.uk>
+References: <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
+ <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
+ <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
+ <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
+ <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
+ <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
+ <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
+ <bd202cfa-d6eb-4d0e-982d-b49795dd25f7@lunn.ch>
+ <009aefc4-fbc9-4f91-9230-23d18c281bf3@gmail.com>
+ <73ea5619.2b71.19bf847c80d.Coremail.linmin@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] selftests: net: Move some UAPI header
- inclusions after libc ones
-Content-Language: en-GB, fr-BE
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
- linux-security-module@vger.kernel.org, bpf@vger.kernel.org,
- libc-alpha@sourceware.org, Carlos O'Donell <carlos@redhat.com>,
- Adhemerval Zanella <adhemerval.zanella@linaro.org>,
- Rich Felker <dalias@libc.org>, klibc@zytor.com,
- Florian Weimer <fweimer@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
-References: <20260120-uapi-sockaddr-v2-0-63c319111cf6@linutronix.de>
- <20260120-uapi-sockaddr-v2-1-63c319111cf6@linutronix.de>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260120-uapi-sockaddr-v2-1-63c319111cf6@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <73ea5619.2b71.19bf847c80d.Coremail.linmin@eswincomputing.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,lists.linux.dev,sourceware.org,redhat.com,linaro.org,libc.org,zytor.com,google.com,davemloft.net,kernel.org,digikod.net,iogearbox.net,gmail.com,fomichev.me,linux.dev];
-	TAGGED_FROM(0.00)[bounces-253565-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-253566-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,kernel.org,eswincomputing.com,vger.kernel.org,davemloft.net,google.com,redhat.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[40];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C8FFC8C018
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: D64068C172
 X-Rspamd-Action: no action
 
-Hi Thomas,
+On Mon, Jan 26, 2026 at 11:10:12AM +0800, Min Lin wrote:
+> Due to chip backend reasons, there is already a ~4-5ns skew between the RX
+> clock and data of the eth1 MAC controller inside the silicon.
 
-On 20/01/2026 15:10, Thomas Weißschuh wrote:
-> Interleaving inclusions of UAPI headers and libc headers is problematic.
-> Both sets of headers define conflicting symbols. To enable their
-> coexistence a compatibility-mechanism is in place.
-> 
-> An upcoming change will define 'struct sockaddr' from linux/socket.h.
-> However sys/socket.h from libc does not yet handle this case and a
-> symbol conflict will arise.
-> 
-> Furthermore libc-compat.h evaluates the state of the libc
-> inclusions only once, at the point it is included first. If another
-> problematic header from libc is included later, symbol conflicts arise.
-> This will trigger other duplicate definitions when linux/libc-compat.h
-> is added to linux/socket.h
-> 
-> Move the inclusion of UAPI headers after the inclusion of the glibc
-> ones, so the libc-compat.h continues to work correctly.
+Let's analyse this.
 
-Thank you for looking at this!
+	TXC / RXC	TXC / RXC
+Speed	Clock rate	Clock period
+1G	125MHz		8ns
+100M	25MHz		40ns
+10M	2.5MHz		400ns
 
-Here is my (late, sorry) review for the modifications related to MPTCP:
-> diff --git a/tools/testing/selftests/net/mptcp/mptcp_diag.c b/tools/testing/selftests/net/mptcp/mptcp_diag.c
-> index 8e0b1b8d84b6..af25ebfd2915 100644
-> --- a/tools/testing/selftests/net/mptcp/mptcp_diag.c
-> +++ b/tools/testing/selftests/net/mptcp/mptcp_diag.c
-> @@ -1,11 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright (c) 2025, Kylin Software */
->  
-> -#include <linux/sock_diag.h>
-> -#include <linux/rtnetlink.h>
-> -#include <linux/inet_diag.h>
-> -#include <linux/netlink.h>
-> -#include <linux/compiler.h>
->  #include <sys/socket.h>
->  #include <netinet/in.h>
->  #include <linux/tcp.h>
+The required skew for TXC and RXC at the receiver is specified to be
+between 1 and 2.6ns irrespective of the speed. The edge of the clock
+is also important: the rising edge indicates the lower 4 bits, and
+the falling edge indicates the upper 4 bits.
 
-There is a remaining one (linux/tcp.h) here that you might want to move
-below too.
+At 1G speed, with a "4 to 5ns" skew in the chip. If this is accurate,
+then inverting the clock and adding 1ns of additional skew by some
+means (PCB trace, or at the MAC or PHY) will give the required clock
+at the receiver.
 
-> @@ -17,6 +12,12 @@
->  #include <errno.h>
->  #include <stdio.h>
->  
-> +#include <linux/sock_diag.h>
-> +#include <linux/rtnetlink.h>
-> +#include <linux/inet_diag.h>
-> +#include <linux/netlink.h>
-> +#include <linux/compiler.h>
+The timing table in the RGMII standard (3.3) allows for Tcyc (the
+clock rate) to be scaled, but there is no allowance for scaling
+TskewR (the required 1 to 2.6ns skew.) This skew parameter is
+fixed.
 
-Note that I just noticed this is the only file from this directory where
-the "includes" are not sorted by type and alphabetical order, see
-pm_nl_ctl.c as an example. A bit of a detail, but if you plan to send a
-v2, do you mind doing that too here while at it, please?
+So, at the other speeds, you are completely unable to meet the timing
+specification, whether irrespective of the clock inversion. In effect,
+the only speed that you can meet the specification is 1G.
 
-If not, I can look at that later, but better to avoid doing that in
-parallel.
+Thus, I think this is something that needs a lot more than just "do
+we need to invert the clock". You also need to prevent 10M and 100M
+being supported IMHO.
 
-Cheers,
-Matt
+I can't get my head around why someone would come up with this crazy,
+crippled design, but maybe they didn't bother reading the RGMII
+specification and ensuring that their design met the requirements
+before implementing the hardware.
+
 -- 
-Sponsored by the NGI0 Core fund.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
