@@ -1,169 +1,245 @@
-Return-Path: <netdev+bounces-253570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPYNIFu2d2n3kQEAu9opvQ
-	(envelope-from <netdev+bounces-253570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:45:47 +0100
+	id +H0MFBu6d2lGkgEAu9opvQ
+	(envelope-from <netdev+bounces-253571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:01:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202138C300
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:45:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BF48C4B4
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 20:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 75A24302158C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 18:45:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27ADF301BC2B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jan 2026 19:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A80925BF13;
-	Mon, 26 Jan 2026 18:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AE724DFF3;
+	Mon, 26 Jan 2026 19:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PafYqorl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXHtuceF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63EF8F5B
-	for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 18:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529921F30AD;
+	Mon, 26 Jan 2026 19:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769453139; cv=none; b=OkD5hDbb5IsxOCE1dFpLhX4yqIS3LDXVt4lRa/LdoJdtdURDr/VmIT0rYp7O30u/s2lEQeSxs9Nr/+Sysve5rJ22QvoJ1qMHnIRLlvQBBjxUtSre1AmnA+bIEerS6onp4SPvYAgV+gJX+Ln+2jonazCx2I3LG+UmdBxpSBXaALA=
+	t=1769454101; cv=none; b=ItOlXb7x6cK30ClUWH5vYh1Pgb20Ctl6fHMKdueISD+oJaKZBUT3AQaPQEOg1XodWmJISvMYn+5YrkNO7Dw2s7hBgQU9PW2FcRFZluSYIGjseOjifuO8GqhtY+dWiG3XdAHTg/HzS+aedJdhV0MV/Mg5vSMt2KxWUpBD8frPbEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769453139; c=relaxed/simple;
-	bh=WhQXw4JHbLWsW64Jp69XFlwCDuuVv0njTZH8hBYA18M=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=YgDKuOS40QMPnAwgnw8sxFxfhCUQfEOe/0QDqeIRIjvFTjzOSpIHiVKB+cVWsOnDw2nktyRlc/yNTK8zk7Hgw9w0zKoPbI2Efg0r1wWS92FErD8i2DAWS7ao1udQjtgl/IomWfzIeaT1zgXvjWWNpk3qNqXSS0xw1/+Llmoj3bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PafYqorl; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 2CFA94E422AD;
-	Mon, 26 Jan 2026 18:45:35 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E13F060717;
-	Mon, 26 Jan 2026 18:45:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9B3D119A8652;
-	Mon, 26 Jan 2026 19:45:29 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769453134; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=BuSTLIZdsIKbxDUOqNbeY1fRUhRsulVmHEBjfsq+WaU=;
-	b=PafYqorlWc3k/f2ENpMLkvRQl+pOrnDTkX9L9BMwGBb/QtWBqKglcXntT8vzMCtz2D6uvv
-	/K3U32Yy+WT2bRDwc8/GmBMinPCuXGvwdTiwhD8NvQbY2pgJkrjHzUR2hDVYq6QnGWPIZh
-	wIz4wT1cy1GTFu8INfO9TP/WKYmGd5iDWcSBRPp4vbpT6GSyv52ZvKlgkCO3HllOprdssc
-	rkqWRVrTAZlgMwFw23AEEdoAreeKllCRGpbK/VmmPNIczgU/sZPtHu6K1PY3XDNBpQvsM0
-	a+nSO0MQcpHB14+0gNL2gK1lTFtAEM+Qm1R07fmtpPmjPT1/gas+wqRtpPohrQ==
+	s=arc-20240116; t=1769454101; c=relaxed/simple;
+	bh=l93hlbEyLc+w9+V7vcsTvvUPIRFqS0itMLiaYqMaNFY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hPxbekMyfz8JCgIVXWqdALSBTNEiSNCDEwIshFZYtHFWmvxO+9H4QidWr6+/TlBzB6FDb7eiEz7jQgHh8UHmI/yquL6uorurRu8Nxkofy3BODxj3bv0eyHUNk5Uqel3bijSADlSZhULoNJ6HHlI411a/+G610USkSqzRgthXhpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXHtuceF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 999A0C116C6;
+	Mon, 26 Jan 2026 19:01:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769454101;
+	bh=l93hlbEyLc+w9+V7vcsTvvUPIRFqS0itMLiaYqMaNFY=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=pXHtuceF8rrbD3JUjmXCAzZzpCxqmPanXzVO9Hx1/ElROCQrkESEeXrtCy57JHMk4
+	 KVbYGsVBx3RUQ3VYfCn2B2cdf9Uevw42IDK4DrBpy+JdddIBefLBFhTSjnk/08qbSc
+	 HHQ3MRPHXBDniRi8pzmaFdABzJc+MQZ16i9hALh6DJ95F9Y43mrgT07J71LqaSWYKa
+	 pA+L3UNHtBEvu25PQgCM+u82WUO1rPwwnZ3bb8ATssGoMTXh7dxHRphBBySzGlEHS0
+	 F040kLmb3iEU/mtAET3KK/qjziUwPNGJM5TXHXQ1+wT4fJ2a9kBjjHD4nG1Ozzs+b9
+	 GWR/1xMSU+oxw==
+Message-ID: <19540d70aaa8d92a65625f1a4530824d92f6ba44.camel@kernel.org>
+Subject: Re: [PATCH] sunrpc/xs_read_stream: fix dead loop when
+ xs_read_discard
+From: Trond Myklebust <trondmy@kernel.org>
+To: "jack.zhou" <jack.wemmick@foxmail.com>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, "jack.zhou"
+	 <jacketzc@outlook.com>
+Date: Mon, 26 Jan 2026 14:01:39 -0500
+In-Reply-To: <tencent_DBA407008574A1E4BF7F27AD38AD4D13730A@qq.com>
+References: <tencent_DBA407008574A1E4BF7F27AD38AD4D13730A@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 26 Jan 2026 19:45:29 +0100
-Message-Id: <DFYQS9RIPCSY.25SHGGC3VM2M3@bootlin.com>
-Cc: <netdev@vger.kernel.org>, "Nicolas Ferre" <nicolas.ferre@microchip.com>,
- "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Lorenzo Bianconi" <lorenzo@kernel.org>,
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, "Thomas
- Petazzoni" <thomas.petazzoni@bootlin.com>
-To: "Andrew Lunn" <andrew@lunn.ch>, "Paolo Valerio" <pvalerio@redhat.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 3/8] cadence: macb: Add page pool support
- handle multi-descriptor frame rx
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260115222531.313002-1-pvalerio@redhat.com>
- <20260115222531.313002-4-pvalerio@redhat.com>
- <4c74c2c4-7a47-45ff-be17-485e0702cc37@lunn.ch> <87cy315lru.fsf@redhat.com>
- <840fd286-779e-4130-b544-913116c97a29@lunn.ch> <87qzrdecs1.fsf@redhat.com>
- <b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch>
-In-Reply-To: <b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253570-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-253571-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[foxmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,outlook.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[trondmy@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,bootlin.com:mid]
-X-Rspamd-Queue-Id: 202138C300
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hammerspace.com:email,outlook.com:email]
+X-Rspamd-Queue-Id: C8BF48C4B4
 X-Rspamd-Action: no action
 
-On Mon Jan 26, 2026 at 3:29 PM CET, Andrew Lunn wrote:
->> > I was more interested in plain networking, not XDP. Does it perform
->> > better with page pool? You at least need to show it is not worse, you
->> > need to avoid performance regressions.
->>=20
->> I retested with iperf3. The target has a single rx queue with iperf3
->> running with no cpu affinity set.
->>=20
->> |              |  64 | 128 |
->> | baseline     | 273 | 545 |
->> | pp (page)    | 273 | 544 |
->> | pp (2 frags) | 272 | 544 |
->
-> So no real difference. That is unusual, it is typically faster, or if
-> it is always doing line rate, it uses less CPU time. That might
-> suggest the page pool integration is not optimal?
+On Mon, 2026-01-26 at 14:25 +0800, jack.zhou wrote:
+> From: "jack.zhou" <jacketzc@outlook.com>
+>=20
+> Hi maintainers,
+>=20
+> This bug was discovered during following scenario:
+>=20
+> 1. Using NFS client with TCP mode
+> 2. RPC_REPLY process
+>=20
+>=20
+> Let's first review the normal process:
+>=20
+> 1. The `xs_read_stream` function is located within the for loop of
+> the `xs_stream_data_receive` function. The condition for exiting is
+> that the return value ret of the `xs_read_stream` method is < 0.
+> 2. When entering the function `xs_read_stream`, since `transport-
+> >recv.len` =3D=3D 0, `xs_read_stream_header` will be called first. Based
+> on `transport->recv.calldir`, it decides whether to execute
+> `RPC_CALL` or `RPC_REPLY`;(and also sets the value of `transport-
+> >recv.len`)
+> 3. Since it is executing `RPC_REPLY`, the return value of the
+> function `xs_read_stream_reply` is provided by tcp.c's `tcp_recvmsg`,
+> indicating the size of the copied skb, and this value is > 0.
+> 4. Since it is a normal process, it will reach the end of the
+> function and return, which is:=20
+> ```
+> transport->recv.offset =3D 0;
+> transport->recv.len =3D 0;
+> return read;
+> ```
+> 5. The returned 'read' is the return value of the function
+> 'xs_read_stream_reply' in the RPC_REPLY process. Since this value is
+> > 0, the `xs_stream_data_receive` function's for loop cannot be
+> exited.
+> 6. After re-entering the xs_read_stream function, since transport-
+> >recv.len =3D=3D 0, xs_read_stream_header will still be called.
+> 7. Since the skb is empty, tcp.c's `tcp_recvmsg` will return a value
+> < 0, usually -EAGAIN (-11).
+> 8. Since the return value of xs_read_stream_header is < 0, the goto
+> out_err statement will be executed.
+> 9. The for loop of the xs_stream_data_receive function will be
+> exited.
+> 10. The next time xs_stream_data_receive is entered, the above steps
+> will be repeated.
+>=20
+>=20
+> Now we are encountering an abnormal process:
+>=20
+>=20
+> 1. For some reason, skb is contaminated, and `transport-
+> >recv.calldir` parses out an incorrect value, so `msg.msg_flags |=3D
+> MSG_TRUNC`;(and also sets the value of transport->recv.len)
+> 2. The `if (transport->recv.offset < transport->recv.len) {}`
+> condition will be executed
+> 3. The return value of function `xs_read_discard` is > 0, so when
+> returning to the upstream `xs_stream_data_receive` function, the for
+> loop cannot be exited
+> 4. When entering xs_read_stream again, since transport->recv.len !=3D
+> 0, `xs_read_stream_header` will no longer be executed, which means
+> `transport->recv.calldir` cannot be correctly set anymore
+> 5. This is fatal for all subsequent RPC Replies because `transport-
+> >recv.calldir` cannot be correctly set anymore, so they will all go
+> to `xs_read_discard`
+> 6. At the same time, since transport->recv.len has not been reset to
+> 0, this loop will become an infinite loop
+>=20
+> Therefore, my approach is:
+>=20
+> After reaching the point of `xs_read_discard` due to an abnormal
+> situation, the value of `transport->recv.len` will be reset in the
+> same way as a normal return, in order to prevent a deadlock from
+> occurring.
+>=20
+> The modification has been tested and passed in version 5.10.160.
+>=20
+>=20
+>=20
+> ---
+> =C2=A0net/sunrpc/xprtsock.c | 14 +++++++++++---
+> =C2=A01 file changed, 11 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index 2e1fe6013361..91d1b992eb7f 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -695,6 +695,13 @@ xs_read_stream_reply(struct sock_xprt
+> *transport, struct msghdr *msg, int flags)
+> =C2=A0	return ret;
+> =C2=A0}
+> =C2=A0
+> +static void
+> +xs_stream_reset_recv(struct sock_xprt *transport)
+> +{
+> +	transport->recv.offset =3D 0;
+> +	transport->recv.len =3D 0;
+> +}
+> +
+> =C2=A0static ssize_t
+> =C2=A0xs_read_stream(struct sock_xprt *transport, int flags)
+> =C2=A0{
+> @@ -740,8 +747,10 @@ xs_read_stream(struct sock_xprt *transport, int
+> flags)
+> =C2=A0		msg.msg_flags =3D 0;
+> =C2=A0		ret =3D xs_read_discard(transport->sock, &msg, flags,
+> =C2=A0				transport->recv.len - transport-
+> >recv.offset);
+> -		if (ret <=3D 0)
+> +		if (ret <=3D 0) {
+> +			xs_stream_reset_recv(transport);
+> =C2=A0			goto out_err;
+> +		}
+> =C2=A0		transport->recv.offset +=3D ret;
+> =C2=A0		read +=3D ret;
+> =C2=A0		if (transport->recv.offset !=3D transport->recv.len)
+> @@ -751,8 +760,7 @@ xs_read_stream(struct sock_xprt *transport, int
+> flags)
+> =C2=A0		trace_xs_stream_read_request(transport);
+> =C2=A0		transport->recv.copied =3D 0;
+> =C2=A0	}
+> -	transport->recv.offset =3D 0;
+> -	transport->recv.len =3D 0;
+> +	xs_stream_reset_recv(transport);
+> =C2=A0	return read;
+> =C2=A0out_err:
+> =C2=A0	return ret !=3D 0 ? ret : -ESHUTDOWN;
 
-One more data point. I get line rate with & without page_pool so below
-are CPU times from /proc/stat:
+NACK.
 
-         upstream    pp
-user            1     1
-system        179    91 (!!!)
-idle         7874  7303
-softirq        35    37
+If we're in the xs_read_discard() case, then that's because we're out
+of receive buffer space, and so we've given up reading the remainder of
+the message into that receive buffer. However we still have to read to
+the end of that message before we get to the next message in the TCP
+stream. The only thing that can prevent that is if someone breaks the
+connection, and in that case the client already takes care of resetting
+the message state as part of reconnecting.
 
-16K pages on Mobileye EyeQ5 (MIPS), 7 fragments per page.
+With this change, then as soon as there is no more buffered data to
+read from the socket and it returns EAGAIN, you will reset the message
+parameters. The result is that the next call to xs_read_stream() will
+just leave us reading random data from the middle of the message as if
+it were a new message header.
 
-Paolo shared 64 versus 128 measurements but I am unsure what those stand
-for; I doubt it can be packet size as xdp-bench does not have it as a
-parameter. https://man.archlinux.org/man/extra/xdp-tools/xdp-bench.8.en
-
-Measurement incantation:
-
-   cat /proc/stat > /tmp/a && \
-   iperf3 -c $IP && \
-   cat /proc/stat > /tmp/b && \
-   awk 'NR=3D=3DFNR && $1=3D=3D"cpu" {user=3D$2;sys=3D$4;idle=3D$5;softirq=
-=3D$8;next}
-        $1=3D=3D"cpu" {printf "user\t%5d\n", $2-user}
-        $1=3D=3D"cpu" {printf "system\t%5d\n", $4-sys}
-        $1=3D=3D"cpu" {printf "idle\t%5d\n", $5-idle}
-        $1=3D=3D"cpu" {printf "softirq\t%5d\n", $8-softirq}
-   ' /tmp/a /tmp/b
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+--=20
+Trond Myklebust
+Linux NFS client maintainer, Hammerspace
+trondmy@kernel.org, trond.myklebust@hammerspace.com
 
