@@ -1,137 +1,172 @@
-Return-Path: <netdev+bounces-253651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253652-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKSjLOgZeGmwoAEAu9opvQ
-	(envelope-from <netdev+bounces-253651-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:50:32 +0100
+	id 4IGCKiQbeGnooAEAu9opvQ
+	(envelope-from <netdev+bounces-253652-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:55:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3DA8ECE9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:50:31 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 727658ED30
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:55:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 23A86302A7E3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:50:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B2D35300669D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD0D284669;
-	Tue, 27 Jan 2026 01:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03769296BC9;
+	Tue, 27 Jan 2026 01:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DswVc6OF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="K73u5pQr"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4751320311;
-	Tue, 27 Jan 2026 01:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12C4298CAB
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769478629; cv=none; b=V61UPrcUanNzvqd+nmC3q0g33Dt6DPZ8Ky/ilYOriCHtifeS6RDN8vc/t7hLOg/aZCSW3+PI6ehN5WTP2Y11g226D04+vRo2IKZX8YA3lynAYRY4VBD9+5JmnDq+BPCPrbZ9DExVpyiWB5NwEpaqfC8Io3QkBDNl+vb2wywgt/4=
+	t=1769478944; cv=none; b=DN2gMreZfOBw8eumZB+H0HTtL/i+EODIyIpIsf5WCnyKNeLo0gV8zNQ3Z+BczcThl/vrKSUPppEvnqvY8LmNHzepzl9lGX3jumwXz8Nd1WwmbDBnfIxzUqYIf0gZXjLqQhiJv7YigF6qxRwXlDu394utWTXrvjZHqfgv3QIyUeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769478629; c=relaxed/simple;
-	bh=PoPkVPJ+AoSJsQsIpYU0/3qsSaVTpwRSPJYcLPqWts8=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=F3J7Um91Rmbat0e03SpsRdwgn/jIbHpCeXRCRfq1WEmJKstuJWraupnn/+MzQGqw5d7cID/sm8lc0V2dU7IC5RpKUUVZBUPGYj4oGVq0Y9P0AlO48m3NN/dhDXlXaPe3T1ieq0UPEJE2xjNfZxolnu+EenbasqqcBGpMiXwVamo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DswVc6OF; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=PoPkVPJ+AoSJsQsIpYU0/3qsSaVTpwRSPJYcLPqWts8=;
-	b=DswVc6OFEA3Iv0l50KMEtE9/qi1c6e3a2t+mHU0jjQStlmjbBGUuDNnsbMYhEw/VkrWMu4WjA
-	zLtb5qt/0gor2GmA+WJDyQW+cLUol2CSQKfQxKUNbxFqJpVscJL/kmQ9jXxdRp/zZqx9eIRAE6b
-	su/5lJa92fur/6lU0ttJETU=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4f0StW5sk7z12LGK;
-	Tue, 27 Jan 2026 09:46:27 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id CD38C404AD;
-	Tue, 27 Jan 2026 09:50:22 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 27 Jan 2026 09:50:21 +0800
-Message-ID: <acbfdba6-1590-417f-8bf5-f5ad44e1c294@huawei.com>
-Date: Tue, 27 Jan 2026 09:50:21 +0800
+	s=arc-20240116; t=1769478944; c=relaxed/simple;
+	bh=9oRyMB4v9knl25OEKbfUpH7lggk4I2Mck4BStnbftSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YH/bsQwi8WLCuYn4PWbTqIKV8wqRQny6UvgW6/8bqpYlrdGkkhZ9e6EDg3cpj0McMsG76pZq/cOnws9EmtRo6Kw9qz/PnrYxPDr5JDZPZbwpK9OMVGwDBb1Sg79L90cvGAbVbEkDJH5iGXcabQ8BnoAdVu7abRriyc7eK60QHMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=K73u5pQr; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=LvO5XQ+hJ+bO6yYuL4I5nYEstcN+CoP2zxmc7kZjaHA=; b=K73u5pQrlQ8ZLV9RxyHv2J/jwb
+	9aR25JTtJYKT8McR4etdr9G5J1IwvVSnsqBfzSAWRF2Xs04MHMmaaIk2HKIuZzucV8DfZgDCogub5
+	sHQO6jFzMTR4S8yPAo1aWvXX6FbTXBTINf3sp2BO6tar7XkhFZZAIi/4SLGV0tjm4dauvCLoN9c1w
+	nR5f7Uh3cpcqPMnH07wE6MBFCchZp2babQSwibPJZIyJcrF7GdNy0WcLqJs1uorvMUraFtiNQa0AX
+	TPqZ8MGFz/TW7126NU2Tamj3H6qp7zK4GYfC4gx7Myi/MzdpajEEK4CKcbbwdzjffkq3W1dTlg2sa
+	Gq//ZoRg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44380)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vkYIo-000000005WJ-0PkD;
+	Tue, 27 Jan 2026 01:55:34 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vkYIj-000000005Ta-3Dv2;
+	Tue, 27 Jan 2026 01:55:29 +0000
+Date: Tue, 27 Jan 2026 01:55:29 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 06/22] net: stmmac: rk: add SoC specific
+ ->init() method
+Message-ID: <aXgbEYvjcXqQKRIx@shell.armlinux.org.uk>
+References: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
+ <E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
+ <aXd7aSk7KIxlQd5z@shell.armlinux.org.uk>
+ <20260126165144.25055591@kernel.org>
+ <aXgN2UjiI_OxWHH-@shell.armlinux.org.uk>
+ <20260126171606.6153aa1a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<lantao5@huawei.com>, <huangdonghua3@h-partners.com>,
-	<yangshuaisong@h-partners.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/2] extend bit width in the flow director of
- HNS3 driver
-To: Simon Horman <horms@kernel.org>
-References: <20260123094756.3718516-1-shaojijie@huawei.com>
- <aXd0QSip2AcefqT2@horms.kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <aXd0QSip2AcefqT2@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126171606.6153aa1a@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253651-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253652-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C3DA8ECE9
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 727658ED30
 X-Rspamd-Action: no action
 
+On Mon, Jan 26, 2026 at 05:16:06PM -0800, Jakub Kicinski wrote:
+> On Tue, 27 Jan 2026 00:59:05 +0000 Russell King (Oracle) wrote:
+> > > > and there's no way to find out for about 9 hours (more like 19 hours
+> > > > for me because of the timezone) as the AI reviews are not accessible
+> > > > until then.  
+> > > 
+> > > The patchwork checks are for maintainers. If someone wants to build
+> > > a public CI for contributors that'd be great. We can even provide
+> > > funds from the netdev foundation. But let us be clear that the current
+> > > setup is until now maintained primarily by me for me on the weekends.
+> > > Unless you make an effort to actually help I don't think it is in good
+> > > taste to complain.  
+> > 
+> > This sounds like my contributions to netdev aren't valued, and if that's
+> > the case, I will stop.
+> 
+> Quite the opposite, what I'm saying is that your complaints make me
+> feel like the weekends spent on trying to make this project come out 
+> of stone age testing-wise are not appreciated. Of course your
+> contributions are appreciated.
+> 
+> The AI code reviews on existing buggy code are indeed very painful.
+> Not sure what we can do here to make the contributing easier.
+> It costs us around $2 now to review a single patch so we can't afford
+> public access. I think Google is working on making Gemini code reviews
+> public and free, hopefully that materializes.
 
-on 2026/1/26 22:03, Simon Horman wrote:
-> On Fri, Jan 23, 2026 at 05:47:54PM +0800, Jijie Shao wrote:
->> The bit widths of HCLGE_FD_AD_QID and HCLGE_FD_AD_COUNTER_NUM are
->> increased to support higher specifications.
->>
->> Note: The hardware already supports the specifications.
-> Hi Jijie,
->
-> Are there any compatibility issues here?
-> E.g. new driver with old hardware or firmware?
+For a series of this size and complexity, the AI reviews are valued
+because it's finding real issues that I can't test for.
 
-Thank you, There are no compatibility issues.
+The big problem is that the AI only finds one issue with a patch, not
+all the issues. So, it's going to take multiple submissions to get to
+a point where the AI review of this series is clean.
 
-The chip and firmware are supported in V2.
-However, the software does not support the extension due to
-consistency with older versions(and the customer has not used the extended bits either).
+I suspect the problem with "AI only finds one issue" is that the AI
+systems aren't advanced enough to do anything else yet.
 
-The queue_cnt and counter_cnt specifications of the software are directly or indirectly
-queried from the firmware, and the extended bits are not used in the V1 version.
+So, do I continue fixing the AI issues each day and resubmitting a new
+version of this series each day this week, costing $44 each time? Do
+we reach a point where it gets merged even though the AI review still
+has issues?
 
-Thanks,
-Jijie Shao
+These are honest questions... and if they haven't been considered, I
+think they need to be, because I can see this series becoming very
+expensive.
 
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
