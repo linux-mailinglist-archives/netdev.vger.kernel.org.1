@@ -1,740 +1,314 @@
-Return-Path: <netdev+bounces-253788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253789-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIdfHpmKeGmqqwEAu9opvQ
-	(envelope-from <netdev+bounces-253788-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:51:21 +0100
+	id IJBIB/CKeGmqqwEAu9opvQ
+	(envelope-from <netdev+bounces-253789-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:52:48 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1641392171
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:51:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86CA3921C4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B48D93017397
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:49:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 648713025C71
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB54D33506F;
-	Tue, 27 Jan 2026 09:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0A33321DE;
+	Tue, 27 Jan 2026 09:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AJiyh1rH"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="hAXiDgcT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFFB3346BF
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769507360; cv=none; b=iew1vuo7N4V5qEzL5+gwX/C5vpoalzjamVvFeOGbXWdJU87a+CZ9hDlWEm14jlrC7cynTNBdRKqNyBjLdtNNZw/Tbt4tpdolDhH0M/FDWZ7DZRIdQB/i0Aj20ISoxdWOfwTswGgkyIfXs+oainBx7GVqWCnOfAnY65B80F77RmU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769507360; c=relaxed/simple;
-	bh=S7Ug2ka6mO/w/YVzx9oNA2JjUvWPG/sbKL1Icf/GMUM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ht7xlvJe2cqRXHfIKtnKnK7E38zXCTpKHT8GtUvu6ZIFaBJGr2hlOHj/fdW78l2MPvyqUeUytht2Rgc2GUatqOGqWE29dkbjhxxDh2BsMbZlS//tz2phRpdl9TCoWKyB+TNJ25cWv+7lufQG4cMReQz378088JMjJ7o2p2jcO7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AJiyh1rH; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769507355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LNlKokYgxgtWwpk4PxEDaqPinFDBpx6E9i1VtbSdG98=;
-	b=AJiyh1rHunCQlyZlUOqMxiENPEkvpYgXw/LOtImSreONfHFhLDLbSC4yfSWbB/rBc7wyIa
-	zijHvy9PDzD6HHx+pBZwCDV7HrG/SUlK0hMkG/+SeVzgpgp7pSfOvFkLp2gE5p740/W/H0
-	D90oadXR/BrIjHGqeCD/EqdQf/KlCq0=
-From: Hui Zhu <hui.zhu@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Jeff Xu <jeffxu@chromium.org>,
-	mkoutny@suse.com,
-	Jan Hendrik Farr <kernel@jfarr.cc>,
-	Christian Brauner <brauner@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	JP Kobryn <inwardvessel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Paul Chaignon <paul.chaignon@gmail.com>,
-	Anton Protopopov <a.s.protopopov@gmail.com>,
-	Amery Hung <ameryhung@gmail.com>,
-	Chen Ridong <chenridong@huaweicloud.com>,
-	Lance Yang <lance.yang@linux.dev>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Hui Zhu <zhuhui@kylinos.cn>,
-	Geliang Tang <geliang@kernel.org>
-Subject: [RFC PATCH bpf-next v5 12/12] samples/bpf: Add memcg priority control example
-Date: Tue, 27 Jan 2026 17:48:55 +0800
-Message-ID: <ef784786a2e38c2effca5f331f11658eeafd5f3e.1769506741.git.zhuhui@kylinos.cn>
-In-Reply-To: <cover.1769506741.git.zhuhui@kylinos.cn>
-References: <cover.1769506741.git.zhuhui@kylinos.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0EC278E63;
+	Tue, 27 Jan 2026 09:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769507405; cv=fail; b=stHfI7W89Y19TQHqxTNidricswwiSI/gUx2+5u9arBEQGfk0Uqq8W8dMZ5N6asJp154sPi/HA/l2jlGH5ytyYeAt3/W7wedsd7h8gEFvcBzUKSYttT7cj6lCjTYYU0Jiz6xULx6xhaeigMvLcKqGYcqF59ZiwCV6glXSaH7LwAo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769507405; c=relaxed/simple;
+	bh=b+YzuC45Phv1duRAr9n0dYFXksiA5lGixifDqr/VxJo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DDHjvcM/WTa2JP9ehz4ZUsWcTbFrBgn95uRYnLZ4J3yEPq2xrNgWs6w9mLFg4ONgvgQ3bUWPXpd/WatOBxfZEya6hvpm4g0ef739yDh2OZJCcPWo3rKMQ3A2yLR4OeLnSSCnChP6h/PPZQEdH3XDq4591cJXyewP/RLHlkSqTcg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=hAXiDgcT; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R5ZoxT204308;
+	Tue, 27 Jan 2026 01:50:00 -0800
+Received: from bl0pr03cu003.outbound.protection.outlook.com (mail-eastusazon11022133.outbound.protection.outlook.com [52.101.53.133])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjn4ee-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 27 Jan 2026 01:49:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LJJ1uWNmZQLm+5QamTfFKhbRgxzvWRckJmGP3vvV9pQFYuPm6ac7DS94E0t2y89YG9/LKMTjFQkpFpWb3ssJBw8/aj+E2Y1lpBE0qOzcJk/l2G/XcNad7xAaavxfcEFY6I2+ERC6ON7EPW71HNrnwWby+dOLTJdOWhmQQ710CD4LJsAG0vKVElwcGMirx4duQC6Gfjn8rjvOIiRNJJO0LkAYy2rmjsGc6bBmLSIhIoY8lLQLix/7xhY7g8gJIe0dfL6qlMHL1ByExx1ppBZJ2NDgVmY9e/KiJQDh24NB8OjpplKfIQhSCH70CcYm4YYW3Bn1A7CSXOz8e0j9sa6TWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b+YzuC45Phv1duRAr9n0dYFXksiA5lGixifDqr/VxJo=;
+ b=u2RLQFryg7B2DwH98Sq3iM5yEjo4hrGNGkVz9G984zrVASO6scjhxLwetlX+VxgjbfO/zHWBT5CqxUH33Wyxp2Ei/ICP+CCHe2dkP/6E6nKU8YBlyT5GNn2GF+oT2UnJ8kvQ9tCXQNzfVcJ7qR9PY5MGdYocq16m46AsCSTHvWdtks9VXXXTFaY4Q5gTVhWqW0w463R6pc6Dt6VrfyPPI79rcemPaii4f600dzGb+okD5Y0Jh082mg+1lFRVW0jSMbVDwVbaiFLb9d2FBZgNPisNDou2/LhrpD9CNPyI5j1izbywc0jkWgyV8oFBto5Wv6dRx5rH6Tv2w7C1gFFieA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b+YzuC45Phv1duRAr9n0dYFXksiA5lGixifDqr/VxJo=;
+ b=hAXiDgcTbQ/56oSusDfPXhTXCdL3zGhxgmpzXzIIkNBkxa0Emwad63LMWi1U67aQxnKduZ2pp7OChQbjI1kpLMZFPo7ba8A68xqIUdJEEMCLsd7Wtdc/yJ+52QlTM5R+KEY8WLZaWrC9d1n3WEB3ITu4Gfq6bqARqmbtyUaA7z8=
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com (2603:10b6:610:d2::17)
+ by LV0PR18MB927529.namprd18.prod.outlook.com (2603:10b6:408:33b::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.6; Tue, 27 Jan
+ 2026 09:49:58 +0000
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::210a:9dad:297f:3540]) by CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::210a:9dad:297f:3540%6]) with mapi id 15.20.9564.001; Tue, 27 Jan 2026
+ 09:49:58 +0000
+From: Geethasowjanya Akula <gakula@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [net-next] octeontx2-pf: cn10k/cn20k: Update
+ count_eot in NPA_LF_AURA_BATCH_FREE0
+Thread-Topic: [EXTERNAL] Re: [net-next] octeontx2-pf: cn10k/cn20k: Update
+ count_eot in NPA_LF_AURA_BATCH_FREE0
+Thread-Index: AQHcjzt1cvQv8UWfDESJOD5MYNwki7Vlwmmg
+Date: Tue, 27 Jan 2026 09:49:57 +0000
+Message-ID:
+ <CH0PR18MB43395511F6E52A77CEF31F9ACD90A@CH0PR18MB4339.namprd18.prod.outlook.com>
+References: <20260126073015.29333-1-gakula@marvell.com>
+ <20260127031600.3841572-1-kuba@kernel.org>
+In-Reply-To: <20260127031600.3841572-1-kuba@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH0PR18MB4339:EE_|LV0PR18MB927529:EE_
+x-ms-office365-filtering-correlation-id: 879a0483-b467-4f0c-833d-08de5d896e94
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|1800799024|10070799003|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?WFEvUE1BZjhjak1NQ3pqbnNDZ0ZLa1Z4UENiRlNpb1FWNVlscGpKeU92eU82?=
+ =?utf-8?B?Smw2OGZTb3dxKzJzNmw3ajN1OUswR1JxVDZUaTlvaEoveFcrM0JGdk85QzRC?=
+ =?utf-8?B?eGpaZVBoTUhIaWMxVUhMVjFHVjhjNHJwNVNsazM2Rk00SEs3Tk1VVG1TWlY3?=
+ =?utf-8?B?VzZ4cGF2VDVnVEhYa1hHWDF6RWRYOWd2YVJTbHcrd1BNenI5VnBONjVrL0FE?=
+ =?utf-8?B?bWNocGt4dFVJanRYUUhqdHN5UE1pNjM1dmQxdUtnMmNVY1FuVUlLVkR1QjNi?=
+ =?utf-8?B?R3hQWkkrUTlSd1FINm5EK0RRb3VWUnVEY3NtZlh1WGNXZXNheCtGRjlpMkdK?=
+ =?utf-8?B?SkpiVFVOdUVMNzZuNEFybEtXTmxtckZ6VWozWStVbmNBaldoTTZJN0pBa0N6?=
+ =?utf-8?B?VzI2OHFYZUI3ZWFHOUErcXFhNjRKQWVEd2dxR0xDSmJ6T1RvUzdrZ2tyc0FQ?=
+ =?utf-8?B?cmRLcTRLVnB0SHh1dWFaWjFSdWRpNHJnUTh2ZUJGUDNFUndPNWdwamwwVi9z?=
+ =?utf-8?B?L2xuMU9rdTFBSEYyM1BjTkFyb0RlM3FZZkloeXlUdkMvNzFYS3o1Vjh6SGo1?=
+ =?utf-8?B?clVFcDN5a0dZMFkxdVV4NzlxSGsyQ2FzRW5EcWRmWE9PYk9KMVNBZFNBdWZI?=
+ =?utf-8?B?K2dSd0JDelltRDRDRXdNZ3g3QWhKOHUzZnNzNVlSdjNONDhSc2NHV0FvNElx?=
+ =?utf-8?B?TjhONkprQnJZSXVwQlU5TFJHN2FLczFxeTFweGM1UEZJZjZhRmJFejJTY2ZQ?=
+ =?utf-8?B?N0w5K2t1dnY2Nlo4VDRFbXRPbWNZT2JrVnZOUk5EYkpFY3ZvYSs3OTloU0Zq?=
+ =?utf-8?B?NGI2THhsUmc4cUcxUWxIUjFvQ0RURE0yTEdnNTh2VHBxYVdBUmNRU2lDL2xv?=
+ =?utf-8?B?STVES1lPVW1wU2lNQnB6MmpnT1I3VVRrSUJrMTd2bWI1Z05xdjVOaTRIMDMr?=
+ =?utf-8?B?VVdwWnJ3bnNGaUM1Y2pFa21wV3poMTVWNGdJT080MW1QOWNlMC9kQnhzbFNv?=
+ =?utf-8?B?WU5IZ2pqYnRyaGF3WXNsbkVvTm5uam5lRUV4ckxieGlFeDZjellkUldmY0ps?=
+ =?utf-8?B?TVR2eUFKTXZ5MUdRNnJRMkpKRWkwN0pjb09vRkR6WFI2SldpMm15TFIxRFhJ?=
+ =?utf-8?B?QTRzUFF5SXF4S1NXcUEyclpTUVB4RnpCRWJQM0gyRDh1eTFHOGVDWFFYWnFk?=
+ =?utf-8?B?cWV5SmQ0eHhSZFdXZlNoS0FlaTdXazJNY0NPblhDbjVTNmtsKzNXU1RYY3FG?=
+ =?utf-8?B?bmt5V0tqS096SnpyeUZEcGc1dlpQWW5oc20rZk96TWxnbDIzcm1NdkR3Z2U0?=
+ =?utf-8?B?TWZ5azhabUpiKzIvazM1T1BHSlpmSFZ6aTRiNXpQVmJabU4zRjJKVUxka1BC?=
+ =?utf-8?B?ZUVTR0tjVmlyUW1TN2N4YjllMkhRdFdNUmNWWjY3d2ZZbWttZVJ3L2c3R0JP?=
+ =?utf-8?B?WlhQUHE3YWhQN0xpODF1OEF0SXIvRXNsL1ZHb29FTHA1M1VtdXR6MVN3bmk3?=
+ =?utf-8?B?Z0VUaEpUQi82L3hYN2o3WHdYUDUwRnRaRzRFcWp6Sm9hY2dkS3RQU1VLRVlE?=
+ =?utf-8?B?dVlLQkRYa1FrRmV0TDhUWFpaY1VReUlEVXVlSW43eDdsSWJlZ2JGWVFtd3Br?=
+ =?utf-8?B?QjZwRXljOWFSY3A0RjNXOGtmcWpLYVhEYkUzV0E4U3RWNEhhMGV5d241N2VF?=
+ =?utf-8?B?dUZ3UUNZSkJGbVJWRUFNd1FjOXZhSE1pQlBZOTNRVkJnZU1DTWdLbjN0ZmFk?=
+ =?utf-8?B?N1R6NUxTRGd4RlcwR3BhbmN4c2pUM0xIamdLZFJ2UkxFRVp1MVB6TGE4OG8z?=
+ =?utf-8?B?UUhkZnlsTE9QZzNMZVBpREpsek41NWFNWGRTTnlsc2h1cEJTMUJHa2xVdTNI?=
+ =?utf-8?B?MTZVZ2tWZERjcXJ3Nk14K0hVam9Dc2lSRUpvbzZuNHNoZEhmbllISVE2QTlt?=
+ =?utf-8?B?Z2YwNHd0cnp4YVd6MGlQQWJNREVjQUVoTndLTFBWYkVHN0hHalVRTzFaMExW?=
+ =?utf-8?B?WVBkQjdZekVjcmE3Q3RtQldqQU1udzBTTGJjY2NZNVFyWWkrcjQ4UFMwSHR6?=
+ =?utf-8?B?OXQ2Y1drT29WSGlmY1YzblhzcjJBVDlyMGZVM0JEUGIzdXlKTHAramt1UDRu?=
+ =?utf-8?Q?MAluTNbb+K8KMX2jw4Z3NUzik?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR18MB4339.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(10070799003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?clJjWnBua0lURnlyRTBESHQ5L1MvOUNuMFhpcGI0a3BtL2lwNkdvWkJ0Y25r?=
+ =?utf-8?B?WmFnMWhib1hNVThWRmFQRktTcUwxT2dqRkR3L2FZcGN4YzhmbGNzQUFjajZF?=
+ =?utf-8?B?Znd5VExtRmtzZllBOUc2V3R6elVTQnRYUWRWVFlQZ0QzVEtIenJEa3BHMm1B?=
+ =?utf-8?B?WjAyeUM0TXBQTFdjQTRRVitNNUJwQ3ZBaVkvWU5RbndWL21MS0R0TXFqNGN3?=
+ =?utf-8?B?N1g5YzZ4QnhLbDN1THJDV0lSckovMTJURCtqelNXbHAvY1JOOC9TZVJBQVZ1?=
+ =?utf-8?B?eWtXS2tmaVhKSC9mUmhodS8rWTFuckUyVFk2ditqN3BrREs5L2g3a09UVDhN?=
+ =?utf-8?B?MDB2bzdWYlJ0N1JsTkJBNWVYd0orMWhDdWxNNytDajlIN0tINEpBU0lkSTFQ?=
+ =?utf-8?B?S05tdEQ3UGN2Mi9SUXdLNDl6a2pVNWZ3SXVaemNScnExeHFnR2xMVGNoaytL?=
+ =?utf-8?B?YXpVRnZDZjFzdDB2eW02Y2c4R0xPbGMrRFFha3RFOW5aZkVnWDNEMXJwUGRM?=
+ =?utf-8?B?bUNHdUZCYWNWbkZyZXdQaWppRCtOK3FlQWQxN3RqMml5Y1Ixa3UxbGp6eGhL?=
+ =?utf-8?B?SlFTRTZEYjl4ZTlObHJGNzJkVHNOMlh0Qk5JZ1A2ZTFiWmZGZXpBdWQ5b3BK?=
+ =?utf-8?B?cmJ4cThhVWg1VWxia1RJMVpmMmFVTHc0bWVJdXRoV3k1MFNKM09vVjhlWHNq?=
+ =?utf-8?B?QnlrVVpZNkxuQnRXTXlIWGlZOWdqUnU5L3lkenNIUjVzQ1VPL2VhUzhxaWRz?=
+ =?utf-8?B?U2NqNFMyL1p2S0tOdWowRWNydzZMOFNnbnpnaTB2UlJGN2pFTnhDdDNtaE9l?=
+ =?utf-8?B?RnViRVUrQi9MU2xzR2tPbmhHYncxT3RiV0J2WWFjelExZUlQeklOVU5CU1Er?=
+ =?utf-8?B?NGV3Z3MxV2dPYVdwUysycityblFlYTV0ZW5VUHFiK1ZFL01MTzhOallKTEpG?=
+ =?utf-8?B?anlZWlNPZXkrMVBWcm4vNzRDU1FjaFFkQlRldjh0ZDRETFc3VDNTaGNZMlZw?=
+ =?utf-8?B?NEo3Wk9mdmU5WGRVOFZvd0Y0ZXdBQXZKVFFudDMzMURsN0NGY3Avc1dyc3NX?=
+ =?utf-8?B?ZlB5bVFBNldKZjk2WDVzMWcrUjFtNUp2bmVQdkhwNVprSmp4R1d4UWpINTcz?=
+ =?utf-8?B?aStwMlZiVlU5ZTU2NTFrdk5RK2ZHdk5mNExUeFI3SVdURVdTYlNjL3FoTkpC?=
+ =?utf-8?B?MGtIbHFiaHpoNWJnN2RYNldJWFZqTFZRZEkya2FYa3E3UXpaTzJvamhTZ3V1?=
+ =?utf-8?B?RnJreFc0S0Frd1RMV0tHU20wdzRGZ0ZacWgzNE9IK2lPZUdnbHovcllIbU9G?=
+ =?utf-8?B?aktYSHltbzQxdjExVnR0cmxLUU4wR1d6TE0wREE3Tm5PdS9WaG5ocUFUN29r?=
+ =?utf-8?B?SytaZGQxRVlDTjEwLzhkSmoweTh4MDhERFVuRWVyRTlIZndKOXk1REhKZERh?=
+ =?utf-8?B?cEtab1AzQjJIS2NIYjlpRFhmS1hmRUhYQVBMcFN5RStUNDVlcmo2SjJZQVhL?=
+ =?utf-8?B?TmhsTitWSTVMdW4yZno1WDVWWGtmbEhUZkVOYTIzQVJjamxuaDlKSCtaU3Vn?=
+ =?utf-8?B?d0R3YlplMTdBMHJ2eWVWMHlBSmtYVW5oaWxaU1l6MmVnbTF5YXJINFNDYlR3?=
+ =?utf-8?B?aEdrZ3FWR3BLcmE5a2h3VHdkSkJJV28wOU1GTG9teStYNlIyZDBsSG9BeTQv?=
+ =?utf-8?B?bFE2clZFS0Jpd1lLSUFWazZxeXM2QTl6YXJVNUpwUEw5Q21Ub0tCSFQrdmVH?=
+ =?utf-8?B?NE1lTVF6aGFJR2dyOEdwc2hCWGZaV2VaZzVSc09OQ1VCRXFuUEVRVWVZOFJV?=
+ =?utf-8?B?em8reWRzRXhoVno1ZGRHdEIvcDdoNjAxcGFZZ3Z3YlpGZm8rZGxwNk1BOUU3?=
+ =?utf-8?B?VlRXS0dmUlQrR1RDQUVRYldpYzNFTE80ODlpbWZCeUhWT3RoaUQrMzlZZXJk?=
+ =?utf-8?B?bzUzTyt6MFRIVk5ERDlseWZ2SEVqNVdKaVZvTWRub3ZMUVBqYUR1RERSQlVz?=
+ =?utf-8?B?SDFWSTRhRzlkR2hYWGxBeEdvM1ZRd1FpRkxQV0FLdVJWM25oODJhVDdQQ3Bm?=
+ =?utf-8?B?SFhma20rcG5XbEhyaStuZk5FUnlTZnptV0dPZE1pK2ZRR2Q5b0VOV1l5OTlT?=
+ =?utf-8?B?djNkdlVEV2pMYllIVWl2a1FvcEE4bk9GQXJqUWFmaVFzSzluekEzWGtnSUEx?=
+ =?utf-8?B?L0huMFBaWHNBb1BxRGpYcVRpaCtYdkVBOUFtcFhWTlcwK0w5QjBicEJUcUFh?=
+ =?utf-8?B?cE5lY0dHL3ZXbmE4SVNzY1RveVdxeVlmNU85WUFpelZCaGhXbkdpOXN6WUdI?=
+ =?utf-8?B?L0M0anMrUzUvUFFGYjZOZ2RpamRQSTZuKzBWdURweVFRQk9MclVkcU5HU2RB?=
+ =?utf-8?Q?P+h4IiBc/newsfU84MatG1SsdkEo1qd+Ad6/n?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR18MB4339.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 879a0483-b467-4f0c-833d-08de5d896e94
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2026 09:49:58.0257
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bsEbBUaBHykiZ2y6USAW2pzfq3KwLTpBhQGDZ/2JIO57ub8Zzq6ksoEeaAWFaU+uUV3r/DDjt2mQu1BpqxWRWw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV0PR18MB927529
+X-Proofpoint-GUID: EfFAdHeKDOPE5IuibTOSyVo2zI0cNnUu
+X-Proofpoint-ORIG-GUID: EfFAdHeKDOPE5IuibTOSyVo2zI0cNnUu
+X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=69788a47 cx=c_pps
+ a=nXg1BFrUXdgPQNEnN+3bHQ==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=vUbySO9Y5rIA:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RpNjiQI2AAAA:8 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=B8YKcIu03EdaewKlx7gA:9
+ a=PRpDppDLrCsA:10 a=QEXdDO2ut3YA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA3OSBTYWx0ZWRfX4emMvGWD7of0
+ QOzl059mEhP73VIvDZEsh0MnZKbBsgMcrDdsxEU2nGYkCCkwUDa3i3bZsm2gr3mlirHhn9Et284
+ oG4tqzvfyhd+Jwh8SoS10VRj9jPc4tPB1GIcLoNUvJz+15dPl+Z2siC/zwWKNgumWfOxR5jD/oq
+ 9wUFhmos0GSkQMmpHWrDOK8zh4wW4GT4DfvyoeVkxxPtGubkRWAKnH9cBm8tG1k/vThZKMe+QLJ
+ f258tPoSGxha91AkWbWcXNBmOIVercyqGKtSqYLWo43xzy6Sy1Q40bLVaCyikK4z9xAXLKFdyso
+ 3W+hiI9a6q0LMRPH+FV1GG6G7h565kTTUJZ7vIqObcRAUGLzoK7UaX/YhnFjycvFOTOujlQ/rN1
+ RG6+1jtKsl0J6m1S2apx7cLq4RIhzcC7gufye+EK4MkdQctyLqeadI1th7rZ8Z7QOBnwPpYPt0L
+ 1fMe8Bc9llkTJNO3O4A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-27_01,2026-01-26_01,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253788-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253789-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hui.zhu@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[51];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[CH0PR18MB4339.namprd18.prod.outlook.com:mid,proofpoint.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gakula@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	REDIRECTOR_URL(0.00)[proofpoint.com];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kylinos.cn:mid,kylinos.cn:email]
-X-Rspamd-Queue-Id: 1641392171
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 86CA3921C4
 X-Rspamd-Action: no action
 
-From: Hui Zhu <zhuhui@kylinos.cn>
-
-Add a sample program to demonstrate a practical use case for the
-`memcg_bpf_ops` feature: priority-based memory throttling.
-
-The sample consists of a BPF program and a userspace loader:
-
-1. memcg.bpf.c: A BPF program that monitors PGFAULT events on a
-   high-priority cgroup. When activity exceeds a threshold, it uses
-   the `get_high_delay_ms`, `below_low`, or `below_min` hooks to
-   apply pressure on a low-priority cgroup.
-
-2. memcg.c: A userspace loader that configures and attaches the BPF
-   program. It takes command-line arguments for the high and low
-   priority cgroup paths, a pressure threshold, and the desired
-   throttling delay (`over_high_ms`).
-
-This provides a clear, working example of how to implement a dynamic,
-priority-aware memory management policy. A user can create two
-cgroups, run workloads of different priorities, and observe the
-low-priority workload being throttled to protect the high-priority one.
-
-Example usage:
-  # ./memcg --low_path /sys/fs/cgroup/low \
-  #         --high_path /sys/fs/cgroup/high \
-  #         --threshold 100 --over_high_ms 1024
-
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Hui Zhu <zhuhui@kylinos.cn>
----
- MAINTAINERS             |   2 +
- samples/bpf/.gitignore  |   1 +
- samples/bpf/Makefile    |   8 +-
- samples/bpf/memcg.bpf.c | 130 +++++++++++++++
- samples/bpf/memcg.c     | 345 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 485 insertions(+), 1 deletion(-)
- create mode 100644 samples/bpf/memcg.bpf.c
- create mode 100644 samples/bpf/memcg.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7e07bb330eae..819ef271e011 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6470,6 +6470,8 @@ F:	mm/memcontrol-v1.c
- F:	mm/memcontrol-v1.h
- F:	mm/page_counter.c
- F:	mm/swap_cgroup.c
-+F:	samples/bpf/memcg.bpf.c
-+F:	samples/bpf/memcg.c
- F:	samples/cgroup/*
- F:	tools/testing/selftests/bpf/prog_tests/memcg_ops.c
- F:	tools/testing/selftests/bpf/progs/memcg_ops.c
-diff --git a/samples/bpf/.gitignore b/samples/bpf/.gitignore
-index 0002cd359fb1..0de6569cdefd 100644
---- a/samples/bpf/.gitignore
-+++ b/samples/bpf/.gitignore
-@@ -49,3 +49,4 @@ iperf.*
- /vmlinux.h
- /bpftool/
- /libbpf/
-+memcg
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 95a4fa1f1e44..b00698bdc53b 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -37,6 +37,7 @@ tprogs-y += xdp_fwd
- tprogs-y += task_fd_query
- tprogs-y += ibumad
- tprogs-y += hbm
-+tprogs-y += memcg
- 
- # Libbpf dependencies
- LIBBPF_SRC = $(TOOLS_PATH)/lib/bpf
-@@ -122,6 +123,7 @@ always-y += task_fd_query_kern.o
- always-y += ibumad_kern.o
- always-y += hbm_out_kern.o
- always-y += hbm_edt_kern.o
-+always-y += memcg.bpf.o
- 
- COMMON_CFLAGS = $(TPROGS_USER_CFLAGS)
- TPROGS_LDFLAGS = $(TPROGS_USER_LDFLAGS)
-@@ -289,6 +291,8 @@ $(obj)/hbm_out_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- $(obj)/hbm.o: $(src)/hbm.h
- $(obj)/hbm_edt_kern.o: $(src)/hbm.h $(src)/hbm_kern.h
- 
-+memcg: $(obj)/memcg.skel.h
-+
- # Override includes for xdp_sample_user.o because $(srctree)/usr/include in
- # TPROGS_CFLAGS causes conflicts
- XDP_SAMPLE_CFLAGS += -Wall -O2 \
-@@ -347,11 +351,13 @@ $(obj)/%.bpf.o: $(src)/%.bpf.c $(obj)/vmlinux.h $(src)/xdp_sample.bpf.h $(src)/x
- 		-I$(LIBBPF_INCLUDE) $(CLANG_SYS_INCLUDES) \
- 		-c $(filter %.bpf.c,$^) -o $@
- 
--LINKED_SKELS := xdp_router_ipv4.skel.h
-+LINKED_SKELS := xdp_router_ipv4.skel.h memcg.skel.h
- clean-files += $(LINKED_SKELS)
- 
- xdp_router_ipv4.skel.h-deps := xdp_router_ipv4.bpf.o xdp_sample.bpf.o
- 
-+memcg.skel.h-deps := memcg.bpf.o
-+
- LINKED_BPF_SRCS := $(patsubst %.bpf.o,%.bpf.c,$(foreach skel,$(LINKED_SKELS),$($(skel)-deps)))
- 
- BPF_SRCS_LINKED := $(notdir $(wildcard $(src)/*.bpf.c))
-diff --git a/samples/bpf/memcg.bpf.c b/samples/bpf/memcg.bpf.c
-new file mode 100644
-index 000000000000..e611ac0e641a
---- /dev/null
-+++ b/samples/bpf/memcg.bpf.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#define ONE_SECOND_NS	1000000000
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+struct AggregationData {
-+	u64 sum;
-+	u64 window_start_ts;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, struct AggregationData);
-+} aggregation_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, u32);
-+	__type(value, u64);
-+} trigger_ts_map SEC(".maps");
-+
-+SEC("tp/memcg/count_memcg_events")
-+int
-+handle_count_memcg_events(struct trace_event_raw_memcg_rstat_events *ctx)
-+{
-+	u32 key = 0;
-+	struct AggregationData *data;
-+	u64 current_ts;
-+
-+	if (ctx->id != local_config.high_cgroup_id ||
-+	    (ctx->item != PGFAULT))
-+		goto out;
-+
-+	data = bpf_map_lookup_elem(&aggregation_map, &key);
-+	if (!data)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - data->window_start_ts < ONE_SECOND_NS) {
-+		data->sum += ctx->val;
-+	} else {
-+		data->window_start_ts = current_ts;
-+		data->sum = ctx->val;
-+	}
-+
-+	if (data->sum > local_config.threshold) {
-+		bpf_map_update_elem(&trigger_ts_map, &key, &current_ts,
-+				    BPF_ANY);
-+		data->sum = 0;
-+		data->window_start_ts = current_ts;
-+	}
-+
-+out:
-+	return 0;
-+}
-+
-+static bool need_threshold(void)
-+{
-+	u32 key = 0;
-+	u64 *trigger_ts;
-+	bool ret = false;
-+	u64 current_ts;
-+
-+	trigger_ts = bpf_map_lookup_elem(&trigger_ts_map, &key);
-+	if (!trigger_ts || *trigger_ts == 0)
-+		goto out;
-+
-+	current_ts = bpf_ktime_get_ns();
-+
-+	if (current_ts - *trigger_ts < ONE_SECOND_NS)
-+		ret = true;
-+
-+out:
-+	return ret;
-+}
-+
-+SEC("struct_ops/below_low")
-+unsigned int below_low_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_low)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/below_min")
-+unsigned int below_min_impl(struct mem_cgroup *memcg)
-+{
-+	if (!local_config.use_below_min)
-+		return false;
-+
-+	return need_threshold();
-+}
-+
-+SEC("struct_ops/get_high_delay_ms")
-+unsigned int get_high_delay_ms_impl(struct mem_cgroup *memcg)
-+{
-+	if (local_config.over_high_ms && need_threshold())
-+		return local_config.over_high_ms;
-+
-+	return 0;
-+}
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops high_mcg_ops = {
-+	.below_low = (void *)below_low_impl,
-+	.below_min = (void *)below_min_impl,
-+};
-+
-+SEC(".struct_ops.link")
-+struct memcg_bpf_ops low_mcg_ops = {
-+	.get_high_delay_ms = (void *)get_high_delay_ms_impl,
-+};
-+
-+char LICENSE[] SEC("license") = "GPL";
-diff --git a/samples/bpf/memcg.c b/samples/bpf/memcg.c
-new file mode 100644
-index 000000000000..0c47ed53f6ae
---- /dev/null
-+++ b/samples/bpf/memcg.c
-@@ -0,0 +1,345 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <signal.h>
-+#include <stdbool.h>
-+#include <getopt.h>
-+#include <bpf/bpf.h>
-+#include <bpf/libbpf.h>
-+
-+#ifndef __MEMCG_RSTAT_SIMPLE_BPF_SKEL_H__
-+#define u64 uint64_t
-+#endif
-+
-+struct local_config {
-+	u64 threshold;
-+	u64 high_cgroup_id;
-+	bool use_below_low;
-+	bool use_below_min;
-+	unsigned int over_high_ms;
-+} local_config;
-+
-+#include "memcg.skel.h"
-+
-+static bool exiting;
-+
-+static void sig_handler(int sig)
-+{
-+	exiting = true;
-+}
-+
-+static void usage(char *name)
-+{
-+	fprintf(stderr,
-+		"Usage: %s --low_path=<path> --high_path=<path> \\\n"
-+		"          --threshold=<value> [OPTIONS]\n\n",
-+		name);
-+	fprintf(stderr, "Required arguments:\n");
-+	fprintf(stderr,
-+		"  -l, --low_path=PATH    Low priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -g, --high_path=PATH   High priority memcgroup path\n");
-+	fprintf(stderr,
-+		"  -t, --threshold=VALUE  The sum of 'val' PGSCAN of\n");
-+	fprintf(stderr,
-+		"                         high priority memcgroup in\n");
-+	fprintf(stderr,
-+		"                         1 sec to trigger low priority\n");
-+	fprintf(stderr,
-+		"                         cgroup over_high\n\n");
-+	fprintf(stderr, "Optional arguments:\n");
-+	fprintf(stderr, "  -o, --over_high_ms=VALUE\n");
-+	fprintf(stderr,
-+		"                         Low_path over_high_ms value\n");
-+	fprintf(stderr,
-+		"                         (default: 0)\n");
-+	fprintf(stderr, "  -L, --use_below_low    Enable use_below_low flag\n");
-+	fprintf(stderr, "  -M, --use_below_min    Enable use_below_min flag\n");
-+	fprintf(stderr,
-+		"  -O, --allow_override   Enable BPF_F_ALLOW_OVERRIDE\n");
-+	fprintf(stderr,
-+		"                         flag\n");
-+	fprintf(stderr, "  -h, --help             Show this help message\n\n");
-+	fprintf(stderr, "Examples:\n");
-+	fprintf(stderr, "  # Using long options:\n");
-+	fprintf(stderr, "  %s --low_path=/sys/fs/cgroup/low \\\n", name);
-+	fprintf(stderr, "     --high_path=/sys/fs/cgroup/high \\\n");
-+	fprintf(stderr, "     --threshold=1000 --over_high_ms=500 \\\n"
-+			"     --use_below_low\n\n");
-+	fprintf(stderr, "  # Using short options:\n");
-+	fprintf(stderr, "  %s -l /sys/fs/cgroup/low \\\n"
-+			"     -g /sys/fs/cgroup/high \\\n",
-+		name);
-+	fprintf(stderr, "     -t 1000 -o 500 -L -M\n");
-+}
-+
-+static uint64_t get_cgroup_id(const char *cgroup_path)
-+{
-+	struct stat st;
-+
-+	if (cgroup_path == NULL) {
-+		fprintf(stderr, "Error: cgroup_path is NULL\n");
-+		return 0;
-+	}
-+
-+	if (stat(cgroup_path, &st) < 0) {
-+		fprintf(stderr, "Error: stat(%s) failed: %d\n",
-+			cgroup_path, errno);
-+		return 0;
-+	}
-+
-+	return (uint64_t)st.st_ino;
-+}
-+
-+static uint64_t parse_u64(const char *str, const char *name)
-+{
-+	uint64_t value;
-+
-+	errno = 0;
-+	value = strtoull(str, NULL, 10);
-+
-+	if (errno != 0) {
-+		fprintf(stderr,
-+			"ERROR: strtoull '%s' failed: %d\n",
-+			str, errno);
-+		usage(name);
-+		exit(-errno);
-+	}
-+
-+	return value;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int low_cgroup_fd = -1, high_cgroup_fd = -1;
-+	uint64_t threshold = 0, high_cgroup_id;
-+	unsigned int over_high_ms = 0;
-+	bool use_below_low = false, use_below_min = false;
-+	__u32 opts_flags = 0;
-+	const char *low_path = NULL;
-+	const char *high_path = NULL;
-+	const char *bpf_obj_file = "memcg.bpf.o";
-+	struct bpf_object *obj = NULL;
-+	struct bpf_program *prog = NULL;
-+	struct bpf_link *link = NULL, *link_low = NULL, *link_high = NULL;
-+	struct bpf_map *map;
-+	struct memcg__bss *bss_data;
-+	DECLARE_LIBBPF_OPTS(bpf_struct_ops_opts, opts);
-+	int err = -EINVAL;
-+	int map_fd;
-+	int opt;
-+	int option_index = 0;
-+
-+	static struct option long_options[] = {
-+		{"low_path",       required_argument, 0, 'l'},
-+		{"high_path",      required_argument, 0, 'g'},
-+		{"threshold",      required_argument, 0, 't'},
-+		{"over_high_ms",   required_argument, 0, 'o'},
-+		{"use_below_low",  no_argument,       0, 'L'},
-+		{"use_below_min",  no_argument,       0, 'M'},
-+		{"allow_override", no_argument,       0, 'O'},
-+		{"help",           no_argument,       0, 'h'},
-+		{0,                0,                 0,  0 }
-+	};
-+
-+	while ((opt = getopt_long(argc, argv, "l:g:t:o:LMOh",
-+				  long_options, &option_index)) != -1) {
-+		switch (opt) {
-+		case 'l':
-+			low_path = optarg;
-+			break;
-+		case 'g':
-+			high_path = optarg;
-+			break;
-+		case 't':
-+			threshold = parse_u64(optarg, argv[0]);
-+			break;
-+		case 'o':
-+			over_high_ms = (unsigned int)parse_u64(optarg, argv[0]);
-+			break;
-+		case 'L':
-+			use_below_low = true;
-+			break;
-+		case 'M':
-+			use_below_min = true;
-+			break;
-+		case 'O':
-+			opts_flags = BPF_F_ALLOW_OVERRIDE;
-+			break;
-+		case 'h':
-+			usage(argv[0]);
-+			return 0;
-+		default:
-+			usage(argv[0]);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (!low_path || !high_path || !threshold) {
-+		fprintf(stderr,
-+			"ERROR: Missing required arguments\n\n");
-+		usage(argv[0]);
-+		goto out;
-+	}
-+
-+	low_cgroup_fd = open(low_path, O_RDONLY);
-+	if (low_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open low cgroup '%s' failed: %d\n",
-+			low_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	high_cgroup_id = get_cgroup_id(high_path);
-+	if (!high_cgroup_id)
-+		goto out;
-+	high_cgroup_fd = open(high_path, O_RDONLY);
-+	if (high_cgroup_fd < 0) {
-+		fprintf(stderr,
-+			"ERROR: open high cgroup '%s' failed: %d\n",
-+			high_path, errno);
-+		err = -errno;
-+		goto out;
-+	}
-+
-+	obj = bpf_object__open_file(bpf_obj_file, NULL);
-+	err = libbpf_get_error(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: opening BPF object file '%s' failed: %d\n",
-+			bpf_obj_file, err);
-+		goto out;
-+	}
-+
-+	map = bpf_object__find_map_by_name(obj, ".bss");
-+	if (!map) {
-+		fprintf(stderr, "ERROR: Failed to find .bss map\n");
-+		err = -ESRCH;
-+		goto out;
-+	}
-+
-+	err = bpf_object__load(obj);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: loading BPF object file failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	map_fd = bpf_map__fd(map);
-+	bss_data = malloc(bpf_map__value_size(map));
-+	if (bss_data) {
-+		__u32 key = 0;
-+
-+		memset(bss_data, 0, sizeof(struct local_config));
-+		bss_data->local_config.high_cgroup_id = high_cgroup_id;
-+		bss_data->local_config.threshold = threshold;
-+		bss_data->local_config.over_high_ms = over_high_ms;
-+		bss_data->local_config.use_below_low = use_below_low;
-+		bss_data->local_config.use_below_min = use_below_min;
-+
-+		err = bpf_map_update_elem(map_fd, &key, bss_data, BPF_EXIST);
-+		free(bss_data);
-+		if (err) {
-+			fprintf(stderr,
-+				"ERROR: update config failed: %d\n",
-+				err);
-+			goto out;
-+		}
-+	} else {
-+		fprintf(stderr,
-+			"ERROR: allocate memory failed\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	prog = bpf_object__find_program_by_name(obj,
-+						"handle_count_memcg_events");
-+	if (!prog) {
-+		fprintf(stderr,
-+			"ERROR: finding a prog in BPF object file failed\n");
-+		goto out;
-+	}
-+
-+	link = bpf_program__attach(prog);
-+	err = libbpf_get_error(link);
-+	if (err) {
-+		fprintf(stderr,
-+			"ERROR: bpf_program__attach failed: %d\n",
-+			err);
-+		goto out;
-+	}
-+
-+	if (over_high_ms) {
-+		map = bpf_object__find_map_by_name(obj, "low_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find low_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = low_cgroup_fd,
-+		);
-+		link_low = bpf_map__attach_struct_ops_opts(map, &opts);
-+		if (!link_low) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops low_mcg_ops: %d\n",
-+				errno);
-+			err = -errno;
-+			goto out;
-+		}
-+	}
-+
-+	if (use_below_low || use_below_min) {
-+		map = bpf_object__find_map_by_name(obj, "high_mcg_ops");
-+		if (!map) {
-+			fprintf(stderr,
-+				"ERROR: Failed to find high_mcg_ops map\n");
-+			err = -ESRCH;
-+			goto out;
-+		}
-+		LIBBPF_OPTS_RESET(opts,
-+			.flags = opts_flags,
-+			.relative_fd = high_cgroup_fd,
-+		);
-+		link_high = bpf_map__attach_struct_ops_opts(map, &opts);
-+		if (!link_high) {
-+			fprintf(stderr,
-+				"Failed to attach struct ops high_mcg_ops: %d\n",
-+				errno);
-+			err = -errno;
-+			goto out;
-+		}
-+	}
-+
-+	printf("Successfully attached!\n");
-+
-+	signal(SIGINT, sig_handler);
-+	signal(SIGTERM, sig_handler);
-+
-+	while (!exiting)
-+		pause();
-+
-+	printf("Exiting...\n");
-+
-+out:
-+	bpf_link__destroy(link);
-+	bpf_link__destroy(link_low);
-+	bpf_link__destroy(link_high);
-+	bpf_object__close(obj);
-+	close(low_cgroup_fd);
-+	close(high_cgroup_fd);
-+	return err;
-+}
--- 
-2.43.0
-
+DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IEpha3ViIEtpY2luc2tpIDxr
+dWJhQGtlcm5lbC5vcmc+DQo+U2VudDogVHVlc2RheSwgSmFudWFyeSAyNywgMjAyNiA4OjQ2IEFN
+DQo+VG86IEdlZXRoYXNvd2phbnlhIEFrdWxhIDxnYWt1bGFAbWFydmVsbC5jb20+DQo+Q2M6IEph
+a3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwu
+b3JnOw0KPm5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj5TdWJqZWN0OiBbRVhURVJOQUxdIFJlOiBb
+bmV0LW5leHRdIG9jdGVvbnR4Mi1wZjogY24xMGsvY24yMGs6IFVwZGF0ZQ0KPmNvdW50X2VvdCBp
+biBOUEFfTEZfQVVSQV9CQVRDSF9GUkVFMA0KPg0KPlRoaXMgaXMgYW4gQUktZ2VuZXJhdGVkIHJl
+dmlldyBvZiB5b3VyIHBhdGNoLiBUaGUgaHVtYW4gc2VuZGluZyB0aGlzIGVtYWlsDQo+aGFzIGNv
+bnNpZGVyZWQgdGhlIEFJIHJldmlldyB2YWxpZCwgb3IgYXQgbGVhc3QgcGxhdXNpYmxlLiBGb3Ig
+bG9jYWwgcmVwcm9kdWN0aW9uDQo+c3RlcHMgc2VlIGh0dHBzOuKAii8vdXJsZGVmZW5zZS7igIpw
+cm9vZnBvaW50LuKAimNvbS92Mi91cmw/dT1odHRwcy0zQV9fbmV0ZGV2LQ0KPjJEYWku4oCKYm90
+cy7igIpsaW51eC7igIpkZXZfYWktDQo+MkRsb2NhbC7igIpodG1sJmQ9RHdJREFnJmM9bktqV2Vj
+MmI2UjBtT3lQYXo3eHRmUSZyPVVpRXRfblVlWUZjdHU3SlZMDQo+WFZsWERoVG1xX0VBZm9vYVpF
+WUluZkd1RVEmbT1EOVoyMTRpQUhKMUZaU2c2MU5YcllrUUsyQ0xkdTJXM1dsDQo+eG1LeElmS19B
+Q2ptUkREd0JxSHRibDRnX3BpcXE5JnM9QjlDeDEyQTF5MWViX25BRW05REJMNUJUVzBydWMNCj5j
+bW9sbmJUUTk5TnZrSSZlPQ0KPlRoaXMgaXMgYW4gQUktZ2VuZXJhdGVkIHJldmlldyBvZiB5b3Vy
+IHBhdGNoLiBUaGUgaHVtYW4gc2VuZGluZyB0aGlzIGVtYWlsDQo+aGFzIGNvbnNpZGVyZWQgdGhl
+IEFJIHJldmlldyB2YWxpZCwgb3IgYXQgbGVhc3QgcGxhdXNpYmxlLg0KPg0KPkZvciBsb2NhbCBy
+ZXByb2R1Y3Rpb24gc3RlcHMgc2VlDQo+aHR0cHM6Ly91cmxkZWZlbnNlLnByb29mcG9pbnQuY29t
+L3YyL3VybD91PWh0dHBzLTNBX19uZXRkZXYtDQo+MkRhaS5ib3RzLmxpbnV4LmRldl9haS0NCj4y
+RGxvY2FsLmh0bWwmZD1Ed0lEQWcmYz1uS2pXZWMyYjZSMG1PeVBhejd4dGZRJnI9VWlFdF9uVWVZ
+RmN0dTdKVkwNCj5YVmxYRGhUbXFfRUFmb29hWkVZSW5mR3VFUSZtPUQ5WjIxNGlBSEoxRlpTZzYx
+TlhyWWtRSzJDTGR1MlczV2wNCj54bUt4SWZLX0FDam1SRER3QnFIdGJsNGdfcGlxcTkmcz1COUN4
+MTJBMXkxZWJfbkFFbTlEQkw1QlRXMHJ1Yw0KPmNtb2xuYlRROTlOdmtJJmU9DQo+LS0tDQo+b2N0
+ZW9udHgyLXBmOiBjbjEway9jbjIwazogVXBkYXRlIGNvdW50X2VvdCBpbiBOUEFfTEZfQVVSQV9C
+QVRDSF9GUkVFMA0KPg0KPlRoaXMgY29tbWl0IGV4dGVuZHMgdGhlIGNvdW50X2VvdCBjYWxjdWxh
+dGlvbiBmb3IgQ04yMEsgZGV2aWNlcyB3aGVyZSB0aGUNCj5maWVsZCBpcyAyIGJpdHMgd2lkZSwg
+d2hpbGUgbWFpbnRhaW5pbmcgQ04xMEsgY29tcGF0aWJpbGl0eSB3aGVyZSBvbmx5IGJpdCAwIGlz
+DQo+dXNlZC4NCj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tYXJ2ZWxs
+L29jdGVvbnR4Mi9uaWMvb3R4Ml9jb21tb24uaA0KPj4gYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9t
+YXJ2ZWxsL29jdGVvbnR4Mi9uaWMvb3R4Ml9jb21tb24uaA0KPj4gaW5kZXggOGNkZmMzNmQ3OWQy
+Li5jNjAyM2UxY2U5MmIgMTAwNjQ0DQo+PiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tYXJ2
+ZWxsL29jdGVvbnR4Mi9uaWMvb3R4Ml9jb21tb24uaA0KPj4gKysrIGIvZHJpdmVycy9uZXQvZXRo
+ZXJuZXQvbWFydmVsbC9vY3Rlb250eDIvbmljL290eDJfY29tbW9uLmgNCj4+IEBAIC03ODksOCAr
+Nzg5LDE1IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBfX2NuMTBrX2F1cmFfZnJlZXB0cihzdHJ1Y3QN
+Cj5vdHgyX25pYyAqcGZ2ZiwgdTY0IGF1cmEsDQo+PiAgCXRhcl9hZGRyID0gKF9fZm9yY2UgdTY0
+KW90eDJfZ2V0X3JlZ2FkZHIocGZ2ZiwNCj5OUEFfTEZfQVVSQV9CQVRDSF9GUkVFMCk7DQo+PiAg
+CS8qIExNVElEIGlzIHNhbWUgYXMgQVVSQSBJZCAqLw0KPj4gIAl2YWwgPSAobG10X2luZm8tPmxt
+dF9pZCAmIDB4N0ZGKSB8IEJJVF9VTEwoNjMpOw0KPj4gLQkvKiBTZXQgaWYgWzEyNzo2NF0gb2Yg
+bGFzdCAxMjhiaXQgd29yZCBoYXMgYSB2YWxpZCBwb2ludGVyICovDQo+PiAtCWNvdW50X2VvdCA9
+IChudW1fcHRycyAlIDIpID8gMFVMTCA6IDFVTEw7DQo+PiArCS8qIE1lYW5pbmcgb2YgY291bnRf
+ZW90DQo+PiArCSAqIENOMTBLOiBjb3VudF9lb3QgPSAwIGlmIHRoZSBudW1iZXIgb2YgcG9pbnRl
+cnMgdG8gZnJlZSBpcyBldmVuLA0KPj4gKwkgKgkgIGNvdW50X2VvdCA9IDEgaWYgdGhlIG51bWJl
+ciBvZiBwb2ludGVycyB0byBmcmVlIGlzIG9kZC4NCj4+ICsJICoNCj4+ICsJICogQ04yMEs6IGNv
+dW50X2VvdCByZXByZXNlbnRzIHRoZSBsZWFzdCBzaWduaWZpY2FudCAyIGJpdHMgb2YgdGhlDQo+
+PiArCSAqCSAgdG90YWwgbnVtYmVyIG9mIHZhbGlkIHBvaW50ZXJzIHRvIGZyZWUuDQo+PiArCSAq
+ICAgICAgICBFeGFtcGxlOiBpZiA3IHBvaW50ZXJzIGFyZSBmcmVlZCAoMGIxMTEpLCBjb3VudF9l
+b3QgPSAwYjExLg0KPj4gKwkgKi8NCj4+ICsJY291bnRfZW90ID0gKG51bV9wdHJzIC0gMSkgJiAw
+eDNVTEw7DQo+DQo+VGhlIG5ldyBjb3VudF9lb3QgZm9ybXVsYSBsb29rcyBjb3JyZWN0IGZvciBw
+YXNzaW5nIHRvIGhhcmR3YXJlLCBidXQgZG9lcyBpdA0KPmJyZWFrIHRoZSBzaXplIGNhbGN1bGF0
+aW9uIGZ1cnRoZXIgZG93biBpbiB0aGlzIGZ1bmN0aW9uPyBUaGUgb2xkIGNvZGUNCj5wcm9kdWNl
+ZCBjb3VudF9lb3QgdmFsdWVzIG9mIG9ubHkgMCBvciAxLCB3aGlsZSB0aGUgbmV3IGZvcm11bGEg
+Y2FuIHByb2R1Y2UNCj4wLCAxLCAyLCBvciAzLg0KPg0KPkxhdGVyIGluIHRoaXMgc2FtZSBmdW5j
+dGlvbiB0aGVyZSBpczoNCj4NCj4gICAgaWYgKCFjb3VudF9lb3QpDQo+ICAgICAgICBzaXplKys7
+DQo+DQo+V2l0aCB0aGUgb2xkIGZvcm11bGEsIGZvciBudW1fcHRycz0zICgyIGJ1ZmZlcnMpLCBj
+b3VudF9lb3Qgd2FzIDAsIHNvIHNpemUgZ290DQo+aW5jcmVtZW50ZWQgZnJvbSAxIHRvIDIsIHdo
+aWNoIGlzIGNvcnJlY3QgZm9yIDI0IGJ5dGVzIG5lZWRpbmcgMiAxMjgtYml0IHdvcmRzLg0KPg0K
+PldpdGggdGhlIG5ldyBmb3JtdWxhLCBmb3IgbnVtX3B0cnM9MywgY291bnRfZW90IGJlY29tZXMg
+Miwgd2hpY2ggaXMgdHJ1dGh5LA0KPnNvIHNpemUgc3RheXMgYXQgMS4gQnV0IDMgdTY0IHZhbHVl
+cyBzdGlsbCByZXF1aXJlIDIgMTI4LWJpdCB3b3Jkcy4NCj4NCj5UaGlzIGFwcGVhcnMgdG8gY2F1
+c2UgaW5jb3JyZWN0IExNVFNUIHNpemUgZm9yIG51bV9wdHJzIHZhbHVlcyBvZiAzLCA3LCAxMSwg
+YW5kDQo+MTUsIHdoZXJlIHRoZSBkcml2ZXIgd291bGQgdGVsbCBoYXJkd2FyZSBhYm91dCBmZXdl
+ciAxMjgtYml0IHdvcmRzIHRoYW4gYXJlDQo+YWN0dWFsbHkgcHJlc2VudC4NCj4NCj5TaG91bGQg
+dGhlIHNpemUgYWRqdXN0bWVudCBjaGVjayBiZSB1cGRhdGVkIHRvIHNvbWV0aGluZyBsaWtlOg0K
+Pg0KPiAgICBpZiAoIShjb3VudF9lb3QgJiAxKSkNCj4gICAgICAgIHNpemUrKzsNCj4NCiAgVGhh
+bmtzIGZvciB0aGUgZmVlZGJhY2suIFdpbGwgZml4IHRoZSBzaXplIHZhbHVlIGluIHYyLg0KPnRv
+IHByZXNlcnZlIHRoZSBvcmlnaW5hbCBiZWhhdmlvciBvZiBpbmNyZW1lbnRpbmcgc2l6ZSB3aGVu
+IHRoZSBidWZmZXIgY291bnQNCj4obnVtX3B0cnMgLSAxKSBpcyBldmVuPw0KPi0tDQo+cHctYm90
+OiBjcg0K
 
