@@ -1,190 +1,145 @@
-Return-Path: <netdev+bounces-253992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOt4LH0UeWl3vAEAu9opvQ
-	(envelope-from <netdev+bounces-253992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:41 +0100
+	id ULOQIJsUeWl3vAEAu9opvQ
+	(envelope-from <netdev+bounces-253993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:40:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597DB9A085
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47AE9A09B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5CA03061457
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:33:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F03930649E4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5626B36CDE3;
-	Tue, 27 Jan 2026 19:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406F136CDE3;
+	Tue, 27 Jan 2026 19:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MvrHHE4A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iSFeXMHE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5582BCF7F
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 19:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD345323416
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 19:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769542438; cv=none; b=R+o/rmMBu3xbp7hx1A+X5+J9FfOkgqbHSaFWdvhEODz5148Eakv3JZWBvozztNEFbZKVBRuSFlkwqJVmmw2Ozmk/u665uA0GgkBm4yBPZ+H+kmMifZW/rTMkqpz4biIhXZ2h+lGlZDTXXEU7IHBo8HSPmx5/lkgsM9DJLsvkBrY=
+	t=1769542490; cv=none; b=bCffp4KOLlIzGFYuCK0KZ1mReBvnSNQa6b6kwV5N0boir5+dBu98Z7q2/sdaJGSsFVA0mlhCTQjOvVjXVvrM5plvprVD7dY01CwyheeugMy5iwZxTyeBnnYUwhKGA3oK3kLzEdmyxdjRP8H/AVQ3CaOmNUOPN6PA6S49PJgCp3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769542438; c=relaxed/simple;
-	bh=iYAxyduA0s22PkYnL2nakuErPqp1U9iyFl2fdqR+s7w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ea6mC6cbFDGkXIu5ny01+NeFjk7vjG80aGkSAiRsUYiB9pjMSo8Gmz6FdM7+FFR1GbcTDtrZGNu//zLpP2qT/XuY00n2Asc+TnIfD7xm6dtOQWpdkjChtaRs5tzHUy1zU3/6YDSAdqYKtItR1vnAHGGa285k8DHkRktK+08CXLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MvrHHE4A; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <243ea894-3bf3-4c10-b012-d4451e7ec17e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769542424;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DrtAfvaeBV+P4A9wsocJoQ3hSxFzimNThzq0s5w4qU=;
-	b=MvrHHE4ASs7vyavoa/VJYmmAgD8AXEib483PbIUj8Wfu4x3AbgWNmAhBaTECcOEBPlkqyQ
-	hX2Qrh0Ed5+eio9mr+Lvqn1CEkaYDkn8zsTP3NMUkU63UGwNXtVcLaCWelx3QVmeV4DJS3
-	DdRZaR6KpstVb5JsZSQ9U3iu1iaRCRM=
-Date: Tue, 27 Jan 2026 11:33:30 -0800
+	s=arc-20240116; t=1769542490; c=relaxed/simple;
+	bh=05TbWWxv3tntbUxViB7tGA8U0cvXI8ITITBDahJ1Ac0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WXL33XsZ0mNbUGrrgZt1iliVYXw+HvWQ3zL83dwqDj9tBCdzkZayGp27hiNYoHG+Juj+Ih2i/cueFKe/I6+xMVARec/c33Qk3qox5aElhGfKpiuxlZk7L9042C6hIqU/DXCxc1O07I3jCj1oQ4E8HA8OHdBcTH6e7qYyQFu6tjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iSFeXMHE; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4801d98cf39so46285365e9.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 11:34:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769542487; x=1770147287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lK5TGsJWU7nuB/Efm0pXlDktNbx5xUrIMoFBpRFKJCM=;
+        b=iSFeXMHEhGdvaET7bjhMQPIYrA2Gz9AS+OcV7YK/L0wPBPEATr8UzPbzukxz+hLiUk
+         xGn9LAegguUa29M+kOksXNIAc/6yHagr4SEFAcJqbJWNFXLttPKwrrSXbMbiCih6ZWBf
+         TASsFs5cjvzb+GqHndjnE2wU+/3C7q8YWapHSM6nhhmBpN55Fm2ZeVG+zz3ZT10TAF5d
+         amKuPWMJScIGZcsUN39WOTsQhgYls8gwWHxVzP9C+zfXmooDYkH6Lw1P2F79HRdmcVPj
+         sXJ/HiWxeIshGvo0U8GcKgDzFprU95EFTFv3NURkWcKVZh8HOLy+xmpJUx7bTPuzbkB6
+         wksw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769542487; x=1770147287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lK5TGsJWU7nuB/Efm0pXlDktNbx5xUrIMoFBpRFKJCM=;
+        b=q7SUQelALSIP3U5Fv108z/yLkNaoXm10pQY3tX+DND3kxXBKapT0h4TEOjnk11m2Ih
+         gZw7q/RBaFQ+7OwGVy3lZc5D/S4Z8J1GIHYIXynuTHuRD3U6NZPfIJZQejJ7BwShkN9l
+         rJg53BsWVUYdb3SHVFRiOPcVy5m/5PEYO+mQfLp/u5ECgIDxDDEzO1LquPewO9ToiAa2
+         hZ9bkFYo05JTycj1h3+AYAbI4sl+Gf9GXY1comRulCnAf/UHFifETrpdPNbl1ubdRddF
+         Jkq28eflfzaSWMtcOz5Q+zR/oAweTAIEQD7SD0jKRCsy+yLGnzV2hOlU/1JftEDIj5Ys
+         gwKw==
+X-Forwarded-Encrypted: i=1; AJvYcCV76018ODzlDmypP3mWCpks3BEg+nNlOglLbyIvZh4pBeCUEZjURcr0ICM+FKxCLueH6fxD5Ew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDz0Me+y98hzJokA5q9VCEJaZaGHwutiBK1kliby+e/C1IQ0eM
+	gv+xAS+qEvSgLhxTfBH2Uiu2yNXDPxrEU8P7s2nV3w7X8yyf4o6mWrT+
+X-Gm-Gg: AZuq6aL2C/fqi2WzhOTgizJBSDwLigAH7xfWYXyzOO52GbtlLVqEdg9mhrYV5lVwSYL
+	ly+yPjKGTi34v6GXPXz13YJSMsUPNoUIk3cz+ZAXQL059a0rc+xgGjmnj79FCUD4PMoEJa6WX66
+	iIoYtnZ41quocU1P+5YrUvsNSXOR1VLz0XJE/E/HNgjPGx2ktGeBpRo5MUfzKJWyjC7pPFC7iZE
+	mkH1RsGuSV666d+vTLqQ9FKdlabfrppJOVfT//LV1ncAV1SjebijxZRtB1AqVpS/CkxM83Cwb69
+	4mULhaMGGRJFX7doDXryKFdVSNigNg3IKJbQDeBJ6K9c00F4IO7Vft4J/GUz1+enxi4y21mZsYZ
+	B9tLTayUDRrHeYQwLCyvn+MMROdBB+DZcxZEmm5q4DYrtL5rexv7i696WuMD60DYgR7F1gZd+2C
+	xvQ+yZ1g==
+X-Received: by 2002:a05:6000:184a:b0:435:975a:131c with SMTP id ffacd0b85a97d-435dd0b6b23mr3917733f8f.36.1769542486975;
+        Tue, 27 Jan 2026 11:34:46 -0800 (PST)
+Received: from archlinux ([143.58.192.3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10edfe7sm990496f8f.14.2026.01.27.11.34.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jan 2026 11:34:46 -0800 (PST)
+Date: Tue, 27 Jan 2026 19:34:44 +0000
+From: Andre Carvalho <asantostc@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] netconsole: selftests: Move netconsole
+ selftests to separate target
+Message-ID: <aXkS8b4vimfz9MvV@archlinux>
+References: <20260124-netcons-selftest-target-v1-1-d3937f44c4c2@gmail.com>
+ <aXdYwphLx2O-Hxis@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 00/10] Call skb_metadata_set when skb->data
- points past metadata
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
- bpf@vger.kernel.org, kernel-team@cloudflare.com,
- Jakub Kicinski <kuba@kernel.org>, Amery Hung <ameryhung@gmail.com>
-References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
- <20260112190856.3ff91f8d@kernel.org> <87bjixwv41.fsf@cloudflare.com>
- <ad835a9b-e544-48d3-b6e2-ffe172fcfa6d@linux.dev>
- <878qdltsg0.fsf@cloudflare.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <878qdltsg0.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXdYwphLx2O-Hxis@gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253993-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,broadcom.com,lunn.ch,intel.com,nvidia.com,iogearbox.net,gmail.com,fomichev.me,lists.osuosl.org,cloudflare.com];
-	TAGGED_FROM(0.00)[bounces-253992-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[asantostc@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 597DB9A085
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: E47AE9A09B
 X-Rspamd-Action: no action
 
-
-
-On 1/25/26 11:15 AM, Jakub Sitnicki wrote:
-> On Thu, Jan 22, 2026 at 12:21 PM -08, Martin KaFai Lau wrote:
->> On 1/13/26 4:33 AM, Jakub Sitnicki wrote:
->>> Good point. I'm hoping we don't have to allocate from
->>> skb_metadata_set(), which does sound prohibitively expensive. Instead
->>> we'd allocate the extension together with the skb if we know upfront
->>> that metadata will be used.
->>
->> [ Sorry for being late. Have been catching up after holidays. ]
->>
->> For the sk local storage (which was mentioned in other replies as making skb
->> metadata to look more like sk local storage), there is a plan (Amery has been
->> looking into it) to allocate the storage together with sk for performance
->> reason. This means allocating a larger 'struct sock'. The extra space will be at
->> the front of sk instead of the end of sk because of how the 'struct sock' is
->> embedded in tcp_sock/udp_sock/... If skb is going in the same direction, it
->> should be useful to have a similar scheme on: upfront allocation and then shared
->> by multiple BPF progs.
->>
->> The current thinking is to built upon the existing bpf_sk_local_storage usage. A
->> boot param decides how much BPF space should be allocated for 'struct
->> sock'. When a bpf_sk_storage_map is created (with a new use_reserve flag), the
->> space will be allocated permanently from the head space of every sk for this
->> map. The read (from a BPF prog) will be at one stable offset before a sk. If
->> there is no more head space left, the map creation will fail. User can decide if
->> it wants to retry without the 'use_reserve' flag.
+On Mon, Jan 26, 2026 at 04:10:18AM -0800, Breno Leitao wrote:
 > 
-> Thanks for sharing the plans.
+> I don't think you need * here. The following might be enough.
 > 
-> We will definitely be looking into ways of eliminating allocations in
-> the long run. With one allocation for skb_ext, one for
-> bpf_local_storage, and one for the actual map, it seems unlikely we will
-> be able to attach metadata this way to every packet. Which is something
-> we wanted for our "label packet once, use label everywhere" use case.
+> 	F:   tools/testing/selftests/drivers/net/netconsole/
 > 
-> I'm not sure how much we can squeeze in together with the sk_buff.
-> Hopefully at least skb_ext plus a pointer to bpf_local_storage.
 
-yeah, only a bpf_local_storage pointer is needed in skb (or in skb_ext). 
-It is the same for the bpf sk/task/... storage.
+Ack. I wasn't sure which form was preferable as I saw both being used. Will
+send a v2 addressing this.
 
-To be clear, for allocation in skb, I was thinking more about Paolo's 
-comment on "...increasing struct sk_buff size as an alternative to the 
-mptcp skb extension...".
+Thanks for the review!
 
-> 
-> I'm also hoping we can allocate memory for bpf_local_storage together
-> with the backing space for the map, which update triggers the skb
-> extension activation.
-
-Allocate the actual storage at the end of bpf_local_storage? Hmm... off 
-the top of my head, I don't have a good idea how to do it without 
-trading off flexibility. If trading off flexibility, may as well 
-allocate fixed extra space at the sk (/skb) and get a performance 
-benefit (which would need to be measured).
-
-> 
-> Finally, bpf_local_storage itself has a pretty generous cache which
-> blows it up. Maybe the cache could be a flexible array, which could be
-> smaller for skb local storage.
-
-For our usage, the cache has been slowly filling up, so we actually have 
-another side of the issue. Improvements on bpf_local_storage is always 
-welcomed.
-
-I am currently more interested in getting the extra memory/headroom 
-allocated for an sk. Eventually, the storage(s) that will be needed for 
-all (or most) sk will use the extra headroom of sk. The current 
-bpf_local_storage (pointer) in sk will be more for testing/ad-hoc 
-purpose or for performance-insensitive usage.
-
-It is probably off topic now. It seems having extra tail space in a skb 
-is not in your current plan for the next respin.
-
+-- 
+Andre Carvalho
 
