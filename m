@@ -1,124 +1,134 @@
-Return-Path: <netdev+bounces-253638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJEIEK4JeGk2ngEAu9opvQ
-	(envelope-from <netdev+bounces-253638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:18 +0100
+	id KE0nIiYMeGl3ngEAu9opvQ
+	(envelope-from <netdev+bounces-253639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:51:50 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1FF48E85B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB8A8E8C6
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ADECB300D378
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:41:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E86E301DDBD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EC51DF963;
-	Tue, 27 Jan 2026 00:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE8A19AD5C;
+	Tue, 27 Jan 2026 00:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCLiRYhX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsrKNcrY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E830C1DF72C
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081503B2BA
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769474465; cv=none; b=tsdEI+D5tUlEbRiYziKbrMuQuKuXslqnKj7rVbda9NCYQGIH7cDeVLaWG92iWW7lCgspiQk9ue54hKXsAJk6gdKttuvMNxHnjQjkELrlEHIOuV2sndO+HoaP/cfromjFc8/l8fFEwD9rFpq1dNKJF6dVzAOmQoxotxYjrWglr6A=
+	t=1769475106; cv=none; b=RTa7YU1JZnUvkOzDc+iBMDaV1ii3To4kdMDy6eZnEnZwVye14/kevxA2JlhBgA3PU3jqLj+ExPWAusx/HFlUTlvxCCjpY53mLY3d1UcWpQaP1UlH3LQo8i5JQmO2CecVYDiqAGVh554gDn5G0NqEV8tuWJOg2ad8q25Lfbi74Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769474465; c=relaxed/simple;
-	bh=nB6yjbNXx42GKTBaXT02ZrBwPDOQ+Wsz8KL8vGzVQaU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zz8InAcrDvcqNhg+6m9H2gfAVI4env3i/zGLdFSQIFELpPJK8lVYdaaHRDNWOLVA+2AVVnaYarbG8FBQF17GYgUVFNcvllAmtwRZzeGwuYPJ10VQNFnbw1KQvYlPweoXuI8dmKr1cWeW7c6h3UYgdKRgN02mBb03tVYiRk8kBDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCLiRYhX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AEAAC116C6;
-	Tue, 27 Jan 2026 00:41:04 +0000 (UTC)
+	s=arc-20240116; t=1769475106; c=relaxed/simple;
+	bh=/NtOgl//jXPuJSMTE/EaAvxKGxzbcDqlXUmd33t1b6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tlHOBJAJoEkutnXjQFjzYVeAo+9dcXWTvM4l+ucZIf+fl051hMO21l3Szxws6c4c1I7RSvHb0VlqcaKGHA18KnW/pbQqYXxNg4/FHAHqZOVCYHMxYTGkahENA1jzR1tHrMDnyE42Bkaxqcb90Ajx1TNeoP64SZUqYscAC9MOx0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsrKNcrY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06CEDC116C6;
+	Tue, 27 Jan 2026 00:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769474464;
-	bh=nB6yjbNXx42GKTBaXT02ZrBwPDOQ+Wsz8KL8vGzVQaU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nCLiRYhXSjC0cyWgFzfpBfJz3GNGLNuwr8vZmbLNiPP0025V4EsEpQZ2mNpPf5yLV
-	 S+N/f4ZgDlNfz6MiEJahyApVGOTfnTp3e/Dhyj39TDiQfKpKYyw6UsxbPCG4wiwQog
-	 PDXoIrevY3UX/IqyOqJQpVLeSRwWcON7gX1EthcZZV9NqkeUMMpfICM7AnomZSpJKA
-	 IS8yLo13jC5CYTQk39EdkZpsbmvdOyUgwkppwIHx3E/0anYLWw2rOIXPsJIobLh213
-	 5CqFqOGb5/euCk663qw+qv+iYaPHWqs+DIEFRzsbCVhxJFHwSFBJnzsU8q+5kvtUxF
-	 ArgQDm22sXoKQ==
+	s=k20201202; t=1769475105;
+	bh=/NtOgl//jXPuJSMTE/EaAvxKGxzbcDqlXUmd33t1b6c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qsrKNcrYztJ49G384fvcqcuUjsyoizPuJYIIv8nnqs0+tAyZTI82WG+jPhamGvMFD
+	 DCClxEduYLpvjxsSkukoFdnjjSYF+JfvvcGKVzPPMVYOe6ED/vEI8EWDDZNgqS3lCc
+	 JevaEQedSZNfAumwFasF1EJ3Cj2jMn5Ca6DHK0ZX1uLxje0wdXBtRv/VadplsmzohI
+	 A3RyZAkFqYh9xQONrcQlzUqtrtWj3Qvm++lhrep9lNGuqa/FubpvPsQr0EDAVMfIVC
+	 0XP0thotcb/9vc7XTXqFWC5BMsn4+NGrMMTqzG/ifvfPL3A7ybiafHeMhMQ2eH2NYL
+	 17EbLfIjvaRtg==
+Date: Mon, 26 Jan 2026 16:51:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: rmk+kernel@armlinux.org.uk
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	andrew+netdev@lunn.ch,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	linux-rockchip@lists.infradead.org,
-	heiko@sntech.de,
-	alexandre.torgue@foss.st.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com
-Subject: Re: [net-next,v2,22/22] net: stmmac: rk: rk3506, rk3528 and kk3588 have rmii_mode in clock register
-Date: Mon, 26 Jan 2026 16:41:03 -0800
-Message-ID: <20260127004103.3785897-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <E1vkL3S-00000005uuG-2qFN@rmk-PC.armlinux.org.uk>
-References: <E1vkL3S-00000005uuG-2qFN@rmk-PC.armlinux.org.uk>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Heiko
+ Stuebner <heiko@sntech.de>, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, Paolo
+ Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 06/22] net: stmmac: rk: add SoC specific
+ ->init() method
+Message-ID: <20260126165144.25055591@kernel.org>
+In-Reply-To: <aXd7aSk7KIxlQd5z@shell.armlinux.org.uk>
+References: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
+	<E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
+	<aXd7aSk7KIxlQd5z@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-253638-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253639-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D1FF48E85B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DEB8A8E8C6
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Mon, 26 Jan 2026 14:34:17 +0000 Russell King (Oracle) wrote:
+> On Mon, Jan 26, 2026 at 11:45:28AM +0000, Russell King (Oracle) wrote:
+> > Add a SoC specific init method.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>  
+> 
+> I see the AI review has identified that this patch has an issue, whereas
+> in the previous review, it was fine with this patch. I can't imagine what
+> it's problem with this patch is
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: stmmac: rk: rk3506, rk3528 and kk3588 have rmii_mode in clock register
+I released the reviews for you, the first one looks legit, I haven't
+scanned the rest so YMMV.
 
-This patch moves the rmii_mode bit configuration for rk3506, rk3528 and
-rk3588 from the SoC-specific set_to_rmii() functions to the common
-rk_gmac_powerup() path, using the new rmii_mode_mask field in the clock
-register configuration.
+> and there's no way to find out for about 9 hours (more like 19 hours
+> for me because of the timezone) as the AI reviews are not accessible
+> until then.
 
->     net: stmmac: rk: rk3506, rk3528 and kk3588 have rmii_mode in clock register
-                                          ^^^^^^
+The patchwork checks are for maintainers. If someone wants to build
+a public CI for contributors that'd be great. We can even provide
+funds from the netdev foundation. But let us be clear that the current
+setup is until now maintained primarily by me for me on the weekends.
+Unless you make an effort to actually help I don't think it is in good
+taste to complain.
 
-This isn't a bug, but the subject line has a typo: "kk3588" should be
-"rk3588". The commit body correctly refers to "rk3588" and the code
-changes reference rk3588_ops, rk3588_init, and RK3588_* macros.
+> Makes me wonder whether it's worth continuing to submit patches to
+> netdev anymore.
+
+If you choose to continue I'd appreciate if you could follow the common
+guidance:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
