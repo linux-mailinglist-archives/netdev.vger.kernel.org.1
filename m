@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-253634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6M15Ap4JeGk2ngEAu9opvQ
-	(envelope-from <netdev+bounces-253634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:02 +0100
+	id oPTVJqcJeGk2ngEAu9opvQ
+	(envelope-from <netdev+bounces-253635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960948E830
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8378E854
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C79DC30067A5
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:41:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9B9B530300E8
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969931D63E4;
-	Tue, 27 Jan 2026 00:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7528A1DE887;
+	Tue, 27 Jan 2026 00:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0wLd03M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFVT0ozS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CB642AA6
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5363542AA6
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769474457; cv=none; b=JRWPyWRwRAnfI0uh/nHoCLsIpKdIO62TsftKsPLfUKj/nRcNQa1WeVU9rf3CRczZkRx7526/3sBTZm551wUQJF+Hfe3/Hfpc8gR9BrRLxsw9ONbGA9RMRwCNudEWrXRNRQj8S8H7j6t0HSec/L/uW+0K+Xio7rZ7MpyCPhmJaGk=
+	t=1769474460; cv=none; b=oQIkH7H3dvICioPvE0VmHFsGYqGy6TvRIPo32JzUA0eR4k26fQWh+kbVBOxCaVdpaWIiX0vSncLe78KCVZ5MsphEfhgCcC4gJ0yw0xYGBTQd3egNyT5p0zl1YW9SMIivgjJDEUwUEpVUSWN18iF1kG1qLdx3yXA1vAsTkobpNHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769474457; c=relaxed/simple;
-	bh=FDSZmApZTKLD7bqxE5fcK4gRn51ugRSvMR/vvQBFnWc=;
+	s=arc-20240116; t=1769474460; c=relaxed/simple;
+	bh=gyfB6CxCcjmjjILeS0ZovfjbSMTZXSuR0XjS5SBThoA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vAKnH3Ew+MKEmrov4agXyFU4vQGlaCrzNqXOdRSQloszrksb6XeBcmkQ8jdJnPXVF/4+sYBD3ZxA+LKeKCllf77prXRzXukNGDYYf97ahSkWuZwBNiXUwYaNqPDQJtP/UxHO+/ofVHx1cTIWx+wHefFdGDka0zff2bnXdL2zQRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0wLd03M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DAAC116C6;
-	Tue, 27 Jan 2026 00:40:56 +0000 (UTC)
+	 MIME-Version; b=feahHh9MGAALlT5e5YERpv+ifpCxCLkERW2zzJfjKa5evIml1q7lB7eRfyXV8+Xa9R36bIuLzSDiK64RGp7LKiZlxCVt6wkYJcEua+qlFORHnyw4JdwlyxgUSPu0CDhBbT9ybFRRvT3RMrI1nlWO6P+9mHk17HaX3kVBwUo4tSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFVT0ozS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A547C116C6;
+	Tue, 27 Jan 2026 00:40:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769474457;
-	bh=FDSZmApZTKLD7bqxE5fcK4gRn51ugRSvMR/vvQBFnWc=;
+	s=k20201202; t=1769474459;
+	bh=gyfB6CxCcjmjjILeS0ZovfjbSMTZXSuR0XjS5SBThoA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=q0wLd03Mgtol6WxGBhARowmEdA89LnFc0PHMRjf8qlNgKYXb3eMpsPBlZ6e8XwYFO
-	 IvqM5UDxe219kUeXSOmepN2HI5MdrL8eCwcI39U5MVHLAkzG/i7anAzgFwa1B700vL
-	 3/6zDrsLrTcefDf+bVuFrLUMHiZDSmeJD7f8a7hPMiMiTsPoUqHJ+ObOAFYCJr3pB9
-	 vEwEG5akak2+X/ZL91NSPlvDlJ0vWLfNu3EEGO60iu0ML26kuBTQGADJzuanY7iMLK
-	 ULRUV/f1CU8SwwzhAI0a24zyuKKJvlFxjx9nFVHQ7HwDvC/ycIyfTqfhvBXgjnz8xT
-	 YMfhBE8PvdVHg==
+	b=UFVT0ozS7FgYPwaFDGZ2cfWG/YY0qi0V4LPQU40c0jX9fImWwrtpWlxdnt49l6rRY
+	 IfaHAQPPFc2RZ3JGvCuM6tTpBHcmYxktxedE/mHEKiddEqF+eze1T163nqc3edvZr9
+	 tLFBLabXkQx/jpHgkNRSyWj5bNQCdae0z82Fe82+jD/f2IAHUA316GeuWuXskcT1Ka
+	 Uog7VArapPEvIuXcXCR2XDRq+qr9Jeo30IMKCFiMSveEG4V5hM3ORrzG3GYjYOomrC
+	 tq7dKlnF8YodLJXlXUGc0LR18mW/bZZqglo4aEp9xO68iBwamtVrN1jdqfTM92wHjT
+	 L5XbbISIqMQbw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: rmk+kernel@armlinux.org.uk
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -58,12 +58,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	andrew@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com
-Subject: Re: [net-next,v2,06/22] net: stmmac: rk: add SoC specific ->init() method
-Date: Mon, 26 Jan 2026 16:40:20 -0800
-Message-ID: <20260127004020.3785641-1-kuba@kernel.org>
+Subject: Re: [net-next,v2,07/22] net: stmmac: rk: convert to mask-based interface mode configuration
+Date: Mon, 26 Jan 2026 16:40:57 -0800
+Message-ID: <20260127004057.3785761-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
-References: <E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vkL2D-00000005uso-3W6y@rmk-PC.armlinux.org.uk>
+References: <E1vkL2D-00000005uso-3W6y@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,12 +79,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-253634-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253635-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -98,9 +98,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,kernel];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 960948E830
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0D8378E854
 X-Rspamd-Action: no action
 
 This is an AI-generated review of your patch. The human sending this
@@ -108,49 +108,64 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: stmmac: rk: add SoC specific ->init() method
+net: stmmac: rk: convert to mask-based interface mode configuration
 
-This commit adds infrastructure for SoC-specific initialization by adding
-an init callback to rk_gmac_ops and calling it from rk_gmac_setup().
+This commit consolidates PHY interface mode configuration into common
+infrastructure by introducing mask fields for phy_intf_sel and rmii_mode,
+moving the register writes from SoC-specific functions into the common
+rk_gmac_powerup() function.
 
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 7f8ffd1549bc..4117f6863ff0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 4117f6863ff0..35836ffdfc1d 100644
 
 [ ... ]
 
-> @@ -1618,6 +1619,14 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
+> @@ -1654,7 +1685,9 @@ static int rk_gmac_check_ops(struct rk_priv_data *bsp_priv)
+>  static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
+>  {
+>  	struct device *dev = bsp_priv->dev;
+> +	u32 val;
+>  	int ret;
+> +	u8 intf;
 >
->  	bsp_priv->dev = dev;
+>  	ret = rk_gmac_check_ops(bsp_priv);
+>  	if (ret)
+> @@ -1664,6 +1697,26 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
+>  	if (ret)
+>  		return ret;
 >
-> +	if (ops->init) {
-> +		ret = ops->init(bsp_priv);
-> +		if (ret) {
-> +			dev_err_probe(dev, ret, "failed to init BSP\n");
-> +			return ERR_PTR(ret);
-                        ^^^^^^^^^^^^^^^
+> +	ret = rk_get_phy_intf_sel(bsp_priv->phy_iface);
+> +	if (ret < 0)
+> +		return ret;
 
-If ops->init() fails here, does bsp_priv->phy_reset need to be released?
+Should this error path call gmac_clk_enable(bsp_priv, false) before
+returning? The clocks were enabled just above, and the existing error
+handling for rk_phy_powerup() later in this function disables the
+clocks on failure:
 
-Earlier in rk_gmac_setup(), at line 1610, the code calls:
+    ret = rk_phy_powerup(bsp_priv);
+    if (ret) {
+        gmac_clk_enable(bsp_priv, false);
+        return ret;
+    }
 
-    bsp_priv->phy_reset = of_reset_control_get(plat->phy_node, NULL);
-
-of_reset_control_get() is not a devm-managed function, so the reset control
-would need to be explicitly released with reset_control_put() on error paths.
-
-This new error return happens after phy_reset could have been acquired (when
-the device has an integrated PHY), but before the function successfully
-returns. If this path is taken, it appears the reset control would be leaked.
-
-Currently no SoC sets ops->init so this path cannot trigger, but when a
-future SoC implements this callback, the leak would occur on init failure
-for devices with integrated PHYs.
-
-> +		}
-> +	}
 > +
->  	return bsp_priv;
->  }
+> +	intf = ret;
+> +
+> +	if (bsp_priv->gmac_phy_intf_sel_mask ||
+> +	    bsp_priv->gmac_rmii_mode_mask) {
+> +		/* If defined, encode the phy_intf_sel value */
+> +		val = rk_encode_wm16(intf, bsp_priv->gmac_phy_intf_sel_mask);
+> +
+> +		/* If defined, encode the RMII mode mask setting. */
+> +		val |= rk_encode_wm16(intf == PHY_INTF_SEL_RMII,
+> +				      bsp_priv->gmac_rmii_mode_mask);
+> +
+> +		ret = regmap_write(bsp_priv->grf, bsp_priv->gmac_grf_reg, val);
+> +		if (ret < 0)
+> +			return ret;
+
+Same question here - should this also disable clocks before returning?
+
+> +	}
 
