@@ -1,88 +1,79 @@
-Return-Path: <netdev+bounces-253647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EtrAbUSeGkYnwEAu9opvQ
-	(envelope-from <netdev+bounces-253647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:49 +0100
+	id +KOBN4oUeGkynwEAu9opvQ
+	(envelope-from <netdev+bounces-253648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:27:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6678F8EA6E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C258EB5F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:27:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 384B530215BD
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:19:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CBC903028374
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190CE23AB90;
-	Tue, 27 Jan 2026 01:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BC3246BC7;
+	Tue, 27 Jan 2026 01:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+QW8vpm"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F0A1FF1B5;
-	Tue, 27 Jan 2026 01:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D310523D7F7;
+	Tue, 27 Jan 2026 01:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769476786; cv=none; b=Cu4z22h5TArDV7YOWUjeh2l1SZgIZk6hzBDfxDJQDCMeYu/vbovw8J5awEV1iGX0CP3uN7uet1y0mQHAiJ+ld95trSaxK17Fmj7ySAUdd8PajHp1tEQTMnf53/ck66tAJKCuI7hArro3R0gQy4DLWFoKz+ytShQ5fwbj/3wrFWw=
+	t=1769477208; cv=none; b=N1ENvMCG0OB+i37br0Lg/haxLd/EAugwmIXesC+jdowgIJSAx1WCLzN/Ppx0q554vdQcyXOhOwxnF5w8XwgjBm79SWZYUu6qwmcmk4KpqHte80+Nvgx0XMaMSsD9oIW/TDnGXqW7EDwqQGu5BuQBwzi8Bga4qDu3COYfpeK5NRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769476786; c=relaxed/simple;
-	bh=ssCiDavxKEbwZwVsjiEsnnR//r40IO9WyiCR/IKIQwg=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tPXS0nAM2gcDjy7eD6b101Cg4JZHQOE6bvJyV5ExyGyqyW8q6tzixlhrnNr5ynylbbl306I/MriDn+/cdt1FQVyY+6JAl3Ryl1FNEoiJVUhT/RWSkUrit/X+L5pENJSt47JY8GBsuWpw08UGKFqNTJ+RK9pcj80u0UkEwznfMwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 5922092009C; Tue, 27 Jan 2026 02:19:34 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 5181F92009B;
-	Tue, 27 Jan 2026 01:19:34 +0000 (GMT)
-Date: Tue, 27 Jan 2026 01:19:34 +0000 (GMT)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-    linux-pci@vger.kernel.org, linux-mips@vger.kernel.org, 
-    linux-s390@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-    Linas Vepstas <linasvepstas@gmail.com>, 
-    Mahesh J Salgaonkar <mahesh@linux.ibm.com>, 
-    Oliver O'Halloran <oohall@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-    Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-    Madhavan Srinivasan <maddy@linux.ibm.com>, 
-    Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-    "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
-    Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-    Alexander Gordeev <agordeev@linux.ibm.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Sven Schnelle <svens@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    Andrew Morton <akpm@linux-foundation.org>, 
-    =?UTF-8?Q?Martin_Kepplinger-Novakovi=C4=87?= <martink@posteo.de>, 
-    Pavel Machek <pavel@ucw.cz>, MD Danish Anwar <danishanwar@ti.com>, 
-    Mengyuan Lou <mengyuanlou@net-swift.com>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, Takashi Iwai <tiwai@suse.de>, 
-    Huacai Chen <chenhuacai@kernel.org>, Theodore Ts'o <tytso@mit.edu>, 
-    Eric Biggers <ebiggers@google.com>, 
-    Madadi Vineeth Reddy <vineethr@linux.ibm.com>, 
-    Shrikanth Hegde <sshegde@linux.ibm.com>, 
-    Geert Uytterhoeven <geert@linux-m68k.org>, 
-    Ard Biesheuvel <ardb@kernel.org>, 
-    "Martin K. Petersen" <martin.petersen@oracle.com>, 
-    Frederic Barrat <fbarrat@linux.ibm.com>, 
-    Andrew Donnellan <ajd@linux.ibm.com>, 
-    Herbert Xu <herbert@gondor.apana.org.au>, 
-    Konstantin Shkolnyy <kshk@linux.ibm.com>, 
-    Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-    Lorenzo Bianconi <lorenzo@kernel.org>, 
-    Lukas Bulwahn <lukas.bulwahn@redhat.com>, Dong Yibo <dong100@mucse.com>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, Thomas Gleixner <tglx@kernel.org>, 
-    Ingo Molnar <mingo@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-    Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH net-next v2] net: ethernet: neterion: s2io: remove unused
- driver
-In-Reply-To: <20260126031352.22997-1-enelsonmoore@gmail.com>
-Message-ID: <alpine.DEB.2.21.2601270110590.40317@angie.orcam.me.uk>
-References: <20260126031352.22997-1-enelsonmoore@gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1769477208; c=relaxed/simple;
+	bh=gmdrVwD9eObEFR00n36pXc50L4GnXjwmmLnzgMT1NlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uBZnHn/R/W7X7ktpFauMycnsPXgYWu9FqMHvK2TqiFmkasYvwF3TxINP51IZvrLO5NnxHHk0rT+wXdyZtk2WuQ4fdyydgKLPuAMu1fiYcVeQUKyj+0IAtoNGh3XQBnO5zXTz/c5w795L5Vy5E/gQ9ZHtjnEbiWMGPp9QI0Af3U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+QW8vpm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E874C116C6;
+	Tue, 27 Jan 2026 01:26:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769477208;
+	bh=gmdrVwD9eObEFR00n36pXc50L4GnXjwmmLnzgMT1NlU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e+QW8vpmETOY6ejHARAz2/oNFnfVyXlahzJt93h2H9CUXabli1qsjSy7WoR5FiWJh
+	 KvUI037G+x1u4pYJswRTYgbJAiphQy9pGJ/aiE6+qG/Ybp1anuDGIpFhpTwP17iK0R
+	 4FVcTTiu2qes330GNIzqi9MiqezgkYYGbu6OPU9o4nbDYogrDjBwfdvHjcAWX28CqZ
+	 X13xR5bCq4o1Cwqbp6IIoYAM2J0oPcs8mHjdPiWIuup5e70lZlyLJHEf+jJ8XFwNWe
+	 xh4kYAXh5LJ5bV8V32KWLVFUCn3vlfNgTKu5Th7/JWhIespwAW94KW81HVbCNCRubH
+	 Ck2AFH/769BYg==
+Date: Mon, 26 Jan 2026 17:26:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Bobby Eshleman <bobbyeshleman@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, Neal Cardwell
+ <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, Mina Almasry
+ <almasrymina@google.com>, Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet
+ <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
+ <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com, Bobby
+ Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v10 4/5] net: devmem: document
+ NETDEV_A_DMABUF_AUTORELEASE netlink attribute
+Message-ID: <20260126172646.2e5af2d4@kernel.org>
+In-Reply-To: <aXGib0OcNdHTLyZN@mini-arch>
+References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-0-686d0af71978@meta.com>
+	<20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-4-686d0af71978@meta.com>
+	<20260120163650.5a962648@kernel.org>
+	<aXBnqYQdomzH9bT/@devvm11784.nha0.facebook.com>
+	<20260121173512.748e2155@kernel.org>
+	<aXGNhEKOhkTHbJvw@devvm11784.nha0.facebook.com>
+	<20260121185021.446b00e8@kernel.org>
+	<CAKB00G2xNvfiV6J3RzKDs=GHMGZ7L16+VKUYLGjpZdOrLnSYKA@mail.gmail.com>
+	<20260121194615.33dc0812@kernel.org>
+	<aXGib0OcNdHTLyZN@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,62 +81,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253647-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253648-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,fomichev.me,vger.kernel.org,meta.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,gmail.com,linux.ibm.com,google.com,davemloft.net,kernel.org,redhat.com,alpha.franken.de,ellerman.id.au,lunn.ch,linux-foundation.org,posteo.de,ucw.cz,ti.com,net-swift.com,netfilter.org,suse.de,mit.edu,linux-m68k.org,oracle.com,gondor.apana.org.au,linux.dev,mucse.com,wunner.de,intel.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[orcam.me.uk];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[55];
-	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6678F8EA6E
+X-Rspamd-Queue-Id: 59C258EB5F
 X-Rspamd-Action: no action
 
-On Sun, 25 Jan 2026, Ethan Nelson-Moore wrote:
+On Wed, 21 Jan 2026 20:07:11 -0800 Stanislav Fomichev wrote:
+> On 01/21, Jakub Kicinski wrote:
+> > On Wed, 21 Jan 2026 19:25:27 -0800 Bobby Eshleman wrote:  
+> > > Good point. The only real use case for autorelease=on is for backwards
+> > > compatibility... so I thought maybe DEVMEM_A_DMABUF_COMPAT_TOKEN
+> > > or DEVMEM_A_DMABUF_COMPAT_DONTNEED would be clearer?  
+> > 
+> > Hm. Maybe let's return to naming once we have consensus on the uAPI.
+> > 
+> > Does everyone think that pushing this via TCP socket opts still makes
+> > sense, even tho in practice the TCP socket is just how we find the
+> > binding?  
+> 
+> I'm not a fan of the existing cmsg scheme, but we already have userspace
+> using it, so getting more performance out of it seems like an easy win?
 
-> The s2io driver supports Exar (formerly Neterion and S2io) PCI-X 10
-> Gigabit Ethernet cards. Hardware supporting PCI-X has not been
-> manufactured in years. On x86, it was quickly replaced by PCIe. While
-> it stuck around longer on POWER hardware, the last POWER hardware to
-> support it was POWER7, which is not supported by ppc64le Linux
-> distributions. The last supported mainstream ppc64 Linux distribution
-> was RHEL 7; while it is still supported under ELS, ELS is only
-> available for x86 and IBM Z. It is possible to use many PCI-X cards in
-> standard PCI slots (which are still available on new motherboards), but
-> it does not make sense to do so for 10 Gigabit Ethernet because the
-> maximum bandwidth of standard PCI is only 1067 Mbps. It is therefore
+I don't like:
+ - the fact that we have to add the binding to a socket (extra field)
+   - single socket can only serve single binding, there's no technical
+     reason for this really, AFAICT, just the fact that we have a single
+     pointer in the sock struct
+ - the 7 levels of indentation in tcp_recvmsg_dmabuf()
 
- However 64-bit PCI at 66MHz will let you reach 4 times as much.  Also 
-PCI-X can be bridged from PCIe or HT.
-
-> highly unlikely that this driver is still being used. Remove the
-> driver, and move the former maintainer to the CREDITS file (restoring
-> credit for the vxge driver, which was removed in commit f05643a0f60b
-> ("eth: remove neterion/vxge").
-
- How do you know it's not used?  What's the gain from removing a driver 
-unless say it's broken and does not build?
-
-  Maciej
+I understand your argument, but as is this series feels closer to a PoC
+than an easy win (the easy part should imply minor changes and no
+detrimental effect on code quality IMHO).
 
