@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-253922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHl8OqXYeGmftgEAu9opvQ
-	(envelope-from <netdev+bounces-253922-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:24:21 +0100
+	id uP/nLXzYeGmftgEAu9opvQ
+	(envelope-from <netdev+bounces-253920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:23:40 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FF65969F2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:24:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5550B969BD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:23:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 26C9A3079612
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:17:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A8A75305DB43
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E4F36607E;
-	Tue, 27 Jan 2026 15:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5F43644DE;
+	Tue, 27 Jan 2026 15:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="cBTbtAk0"
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="HEQ1Qa3D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75656366051;
-	Tue, 27 Jan 2026 15:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C135F8B1;
+	Tue, 27 Jan 2026 15:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769526783; cv=none; b=DEi46EPImIdSZkWLN6GPvVVB4YZ5iMlZWKiSCUFdb4D2KGDfmmlducHsa9BjxeaMq8zEByJUG8jqpXq++s/pTRFQhTQ7YJ6bUfNOlTsPbnHGdAKz3joCicZm/fS04G7oYnZkVo8ue/LgaFNBJ3g38AvEuqEb0WO+bkwQEHie43w=
+	t=1769526779; cv=none; b=loF8JQ5XUzoyqDLN3nc9Ib+CaT+Yg1rhJhuL8NsegYcZT++PxfQif7IcLlOM8QnJGYj03togNO11nGHKHwr+ljza53qBsqCS3g6+acKp/zgtCrhIPE9UQkI4UEMfJUbrhHqy+S4LE9IbDdxetZLgdtUkK3+dqYunQrAfNNsfGSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769526783; c=relaxed/simple;
-	bh=cIXqT5FnicbiGpytwx5r3gF/Cd0q8kd1fuH3bp8cggg=;
+	s=arc-20240116; t=1769526779; c=relaxed/simple;
+	bh=dMB145a7yMhOOQBd500anVWAgo8E3r+vL2gn4Qbd7ao=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FdSFEcJbtgUyv1X0+q7iaCbZuJBmMakFeXsjZMDXZGrvNVEniB0vKeLrkM/f3EfX3uPkJNW7evgkmaM+IPTArTOPKsSIlz/UBqixlvLjGzn8RD7J9WEYOj+EowbCD2u7nX4YWhyIUDD0YVBO2+FViH/yaSInUu8VevYF6SCMNmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=cBTbtAk0; arc=none smtp.client-ip=45.254.49.197
+	 MIME-Version; b=Kg8Qnk0s5Gs1nIxI7QbG3tOulh7mWD838AW/rTfE9Wz4d0jyGTbKMvm9uz92ZWbNkXUvt8TcuvMqe47CCtnPBsRh0GTW8yNvUztfUM05sBVGDhWYGL9apLnNnfc1XuWxT7wDoyeP+7xw73jIn0npkI7rNQWJ2MoBveDxyBLVN5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=HEQ1Qa3D; arc=none smtp.client-ip=45.254.49.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Received: from LAPTOP-N070L597.localdomain (unknown [58.241.16.34])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 32272e8ee;
-	Tue, 27 Jan 2026 23:12:52 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 32272e8f0;
+	Tue, 27 Jan 2026 23:12:53 +0800 (GMT+08:00)
 From: Zilin Guan <zilin@seu.edu.cn>
 To: horms@kernel.org
 Cc: andrew+netdev@lunn.ch,
@@ -51,9 +51,9 @@ Cc: andrew+netdev@lunn.ch,
 	pabeni@redhat.com,
 	vadim.fedorenko@linux.dev,
 	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH net v3 1/3] net: liquidio: Fix off-by-one error in PF setup_nic_devices() cleanup
-Date: Tue, 27 Jan 2026 15:12:39 +0000
-Message-Id: <20260127151241.1144039-2-zilin@seu.edu.cn>
+Subject: [PATCH net v3 2/3] net: liquidio: Fix off-by-one error in VF setup_nic_devices() cleanup
+Date: Tue, 27 Jan 2026 15:12:40 +0000
+Message-Id: <20260127151241.1144039-3-zilin@seu.edu.cn>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260127151241.1144039-1-zilin@seu.edu.cn>
 References: <20260127151241.1144039-1-zilin@seu.edu.cn>
@@ -64,15 +64,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9c0003c22203a1kunmaea0ca6058ce6
+X-HM-Tid: 0a9c0003c87803a1kunmaea0ca6058ce9
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDHR4eVh0dH0hCHUNLHxkaHVYeHw5VEwETFhoSFy
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZQ0oZVkpOTUNLQ0oYShpPQlYeHw5VEwETFhoSFy
 	QUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVUtZBg
 	++
 DKIM-Signature: a=rsa-sha256;
-	b=cBTbtAk0xhLj12HmCc3DtgaA7hCTolYl+2ZHbuavgHEYXHF6o1r3fo6W+tETmU4ecnhAbVcAMebjkXnwiRH9K9N2uHDwqP4qu1sds10pp8MUm9/nazJ5muohN6uJoJDSNy7yBbSDmsUlwJU/Ar1f+bYQ/OsEFtGSQl3WAuLa4jc=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=0sd9aewjv4fvCJ9HVyUnkC7myYx922OsGGV1uHmx4Ww=;
+	b=HEQ1Qa3DA+mhBv/ToqIpSeJ1qwbAuFXgYzEFwzJAHOU6Bw3Xs9jnKmERtV0l7L7BLBeD+Kjv4yChF9Dy2ol7l3ZdWvWqPOnyKBwRr7SHfQaEnahzDQiObLB31IOnfbGeIDsERWKNUJmfxsBhnk4AK1m2HDAk8yKVYVhHGpcXHGM=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=p4sgQiaqSyqHzCtFus3lKv0CQYdeiD7QQJX5j8ux/Rw=;
 	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-253922-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253920-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -101,8 +101,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,seu.edu.cn:email,seu.edu.cn:dkim,seu.edu.cn:mid]
-X-Rspamd-Queue-Id: 7FF65969F2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,seu.edu.cn:dkim,seu.edu.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5550B969BD
 X-Rspamd-Action: no action
 
 In setup_nic_devices(), the initialization loop jumps to the label
@@ -112,31 +112,20 @@ skip the failing index i, causing a memory leak.
 Fix this by changing the loop to iterate from the current index i
 down to 0.
 
-Also, decrement i in the devlink_alloc failure path to point to the
-last successfully allocated index.
-
 Compile tested only. Issue found using code review.
 
-Fixes: f21fb3ed364b ("Add support of Cavium Liquidio ethernet adapters")
+Fixes: 846b46873eeb ("liquidio CN23XX: VF offload features")
 Suggested-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
 ---
- drivers/net/ethernet/cavium/liquidio/lio_main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/cavium/liquidio/lio_vf_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-index 0732440eeacd..e9a728997689 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-@@ -3750,6 +3750,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
- 	if (!devlink) {
- 		device_unlock(&octeon_dev->pci_dev->dev);
- 		dev_err(&octeon_dev->pci_dev->dev, "devlink alloc failed\n");
-+		i--;
- 		goto setup_nic_dev_free;
- 	}
- 
-@@ -3765,10 +3766,11 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
+index e02942dbbcce..050f9feb0b4a 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
+@@ -2212,10 +2212,11 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
  
  setup_nic_dev_free:
  
