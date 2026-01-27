@@ -1,178 +1,190 @@
-Return-Path: <netdev+bounces-253906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIIBIXTMeGmNtQEAu9opvQ
-	(envelope-from <netdev+bounces-253906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:32:20 +0100
+	id 4MFlNPPNeGmNtQEAu9opvQ
+	(envelope-from <netdev+bounces-253907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:38:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22FBE95C06
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:32:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5840B95D6F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D0575301707B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:31:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 749C33036617
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8911635B642;
-	Tue, 27 Jan 2026 14:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC438356A23;
+	Tue, 27 Jan 2026 14:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1cLHZnT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jM5bYw+J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B6974BE1
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769524287; cv=pass; b=KGxPj4HzL04UBeX4wRcEkqJ4r3/cOnAgUmbjdsHUEZ2TRZboz2c/Wzv5AP7pviGCqU8tAdrtS84M/kIhOdhfVVDkQ0sUNH/tVQ87kWHXqXKDMWAV9uqMXnPGQwz2ye51+NgLyypE75l3ZYR7lw3hjPsm+MJKfdCBeY3U2Nl1X5s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769524287; c=relaxed/simple;
-	bh=JGwR91Qfe8nXomjgqf2NH1PG05H8e7VTRWQVuRRQaJQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qQw92YPeqEawzeHupMvus02mwMuPDNnpfotA1y07r7vQ3sQNfs1m2F6USID1y5bcAfdRJCcZw3lJmoLDTVsk/4F04IZVW/ZDdtSwOnXuZnNf+VVgpkf82h0yKfCQcwpAIERtLT9kcIodvGgSNxMQYWoTKwzoctgYBLdbBKmL1Jc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1cLHZnT; arc=pass smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-79274e0e56bso56461457b3.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 06:31:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769524285; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jGYQl4lHyltReti1YD6mpTIYtjlVQnMM8eSvR/EupSdLyECD/KgV21Peh4zhZc/PYC
-         RtJwYiGeGcQe0HkhCWZZGhitmws8FbR2AMlv/HqY4WKKe8/l0Gv4lUFdSI2bPhxiSJKe
-         O1KDqOSMOz83tlVyN9Emk7nMB/4MhmFcKjipLsYwLRX5O5jhUsze66By8+hL3YeHbPqb
-         Pqqq71hlsV+PYECoca3SKS6p4TBFw3dJ9wHfNDpVQwLgr7eEwYbjbdf3qYZXoENEaN1W
-         ptU/q7WBfUf7chOeHFDGXJWFRttGmClSgakwIGd1eMU3hPr6MKWX4j52GK+I9IQo1P7H
-         Ub8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=JGwR91Qfe8nXomjgqf2NH1PG05H8e7VTRWQVuRRQaJQ=;
-        fh=d+1xU1rjaE2Vqu7besGTQTUoXpa7XyyaBZAzZgZLUPc=;
-        b=SpGo8Dv8Sy85wpF6ovJn76Yj7Imynaqrv0hKrqXvBdINm3cLV4lYO1/WKkggpIlk2w
-         D9r+c+IbiiLBwuU3SftonjT94i5hMELPhWfl4sONLpLD8VO/f//pz8sL/XLTMwHl4Grt
-         zTS/KBhhRYNVmW8aaasJjiejsSF33P4Hl+HGtjN6DRwLV330HsCRSjaQASQeRluVw1+8
-         xkL2+95QPoQ0C5X2hYc1LOinCeqZaEDLlk+oOtxJ6j8JysB4uKdtSMygtM1flzoSgbke
-         X80xI5B/BWJEah6x5YFytmLyhPVqY5GEZHb66qyWUd+8R7lDxbeeobW+J9z5xw74X7M9
-         LAuw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769524285; x=1770129085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JGwR91Qfe8nXomjgqf2NH1PG05H8e7VTRWQVuRRQaJQ=;
-        b=Z1cLHZnTt4WyW1oNE7msTzaCmYM/VoVY4sYfebP1jqVTke6b0UPACX4T5a1HlFP27A
-         Vnm4gSn19/0+Q2FuboMNXVTt5fPFOwREpGTjboM4F3L8jwqqNALFx4SBR3jIvBnb9Xy3
-         NGXY36ZAr7ef22r1OV7/y0r/v47vpX0twQx6tixn0f0TftSvQK+BjQ4vcCQc7FpFDXvq
-         OOt2H9cRIltLPad1UnLfq5ezYZ57WCzCqKWJNmt9lRsUJcfjop3nsv2Qd+rAWaIbA+KR
-         DynSaL/f8LhwNx6py736Ajqu4w68O3YryaI85hk62A+hefF03XpjS/xs0ytUf93NfSjZ
-         pyfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769524285; x=1770129085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JGwR91Qfe8nXomjgqf2NH1PG05H8e7VTRWQVuRRQaJQ=;
-        b=V5EJFEnQ0X8cm/U9dK3M98QAII5arRiByzq/qAzFAnjZLVbpMDbwGf3kJEgyndA+hY
-         gM2LE1+jPZ/d70K2noNTtX7bRGXansHBAUyNqmj2qI1slPsc5st7G6rV3g7ilLcGgV/g
-         GKLyIuBhH5MM+vOCnbjPnqVf59VL5MB5k6/yUMvTQpG09LkD8O07omxYbkyK1Be99QlR
-         XV/akHmtvBpmn4eaUEeBVmuKmBfm2Pb8rjw0JyxUlW2Y1WVZ7Vg3pG0VdVe9TmXaiYi1
-         bSsPpM6spJgnUPYIN5ic0IPo4pmvYT5AU4mcHH/czKLFmOjhfgC9sCaEJPPwnVHLYlqS
-         m4iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb/h11hTP7+3WvkHh1qODgSOyiMpURyH5Z6LTARitR3g8J+bArAMUMKz1Wqgj3rW/lFsr4hHA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh1RbEtqkKI7btXy8IhFqoIUG5x+E75cImadIEpIvMh2e/W+I4
-	Rs8nXqFkKc0Carvtj8+pKrWKvHRWLPlGPxUGlDMCRsbExYg9Yo9YDWddPY0vLz3Atmvn01falT3
-	p2T7BYuics6JmmNFfHtSKA0N9aRESuD0=
-X-Gm-Gg: AZuq6aJaJt8y2K3Ftp0OqTw7c+cU4wuoeTf80r8lLPSmcr4xwCoEpiiwpgiNN4ZbO4A
-	JXavwA2MOo00PA5O2om2w9RbrnfLvNr0rI+oBfMWfdgeDfeaiTZFutdrIvaeJZPVhNLA9ITKogM
-	pWQpIqK8bhEKMlJZfqkHc4vXGNrhbBleefrgMHhI09BrInT1Bzl9p35g+4S25SgPoHx5rsrsuA0
-	HEBUdzaOcjdbjp1P+Wv0vCudctSSafRIJxHzXAn4QzT2txKpCJxnJeIErL+xAIaC6miKUFER3C5
-	YZ8RhlkGPE5W1gJYAR9j/jLjuP8xRKkhfS4=
-X-Received: by 2002:a05:690c:6813:b0:786:a0fb:fa8e with SMTP id
- 00721157ae682-7947ab157c5mr13544667b3.15.1769524285131; Tue, 27 Jan 2026
- 06:31:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E890235B65C
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769524344; cv=none; b=mJVH3z7ickFV/FYaHim3nGug5g2X6JTdBmvlRg2JEWL68gm/FmJZ4g8PQNBk3MiLRXW4tWV2Xl9eYj30DDbRwr7bxlukmreNeMU1kxAu3OqsLr5c8z1W96tTbWAwIL3qdV0/0LSvfTHuTdzzWblip7O/7jHhLCyHec7mEekPZXo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769524344; c=relaxed/simple;
+	bh=VcRUL4NbT8twQveEXMVj/8F9mmyPFmm+GhP5+Xw6znc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z7lDeLE/Of7mFW+sFoZrZdw713ABxdWWrFpkkcx7vryDqt01E+WRMYs5GJYYTl8J1/NlsiEZc2MEN51e90TWki9X6AnHVtIqfTUSKyQaTZY93X5Ilx1f+AI76fHPh2MCLLFFLFLgSsxqjHN/g23PeAUGN6VqJvALZh/F+147weM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jM5bYw+J; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 6A4FF4E422D4;
+	Tue, 27 Jan 2026 14:32:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 327F5606F5;
+	Tue, 27 Jan 2026 14:32:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CB6EC119A8647;
+	Tue, 27 Jan 2026 15:32:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769524339; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=YG+evten0yorTj1PVwCqXLsem+E2MfmXhxz9xxSUXDU=;
+	b=jM5bYw+JTlgYd8epvFGkND9QFXuOeyU81PbiOfBqIid6cm1V9ZCCs7kCfXqDfLANLh6hGn
+	n/hSWOrZ8jzNMCksZtKWOQVAssw9aR6vdbzWDssDzwsXw4hP/CxKbqEtT0sJ/c2PhSnGOC
+	AGm6vnIn/D6eaFvo4USRHXmzIvTjw0Uausb+IeI1ItHiEdIVl4fYNlBadetUn51/ITubOv
+	I6VXQnALMLRzR2yu30N2DnkpRx1RwT6r8QRqVPmnwVlgY9DOTFWIilq6nECs4p/PZXUSYz
+	FxU0B6EikTyUHr0DgR9ea0ypWdtOWiSp1qbKeXVwrE+i1fhnRML9iwf3Hvuh7w==
+Message-ID: <13f1599a-afd7-4350-a395-83c57ab91f18@bootlin.com>
+Date: Tue, 27 Jan 2026 15:32:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260123014214.225278-1-dqfext@gmail.com> <a957214d-62dc-40cd-a422-73b317bc1827@redhat.com>
-In-Reply-To: <a957214d-62dc-40cd-a422-73b317bc1827@redhat.com>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Tue, 27 Jan 2026 22:31:13 +0800
-X-Gm-Features: AZwV_Qgys8PIBruD6IDJu3dMJHS65bdijFA95T9f5ZDhzgombFrwpXGG4qqUgfg
-Message-ID: <CALW65jYb0prfB-KpxdcNVHB1tBjN3tW286BsvQkCFoXwTu2QKw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] ppp: enable TX scatter-gather
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: micrel: fix clk warning when removing the
+ driver
+To: Wei Fang <wei.fang@nxp.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, florian.fainelli@broadcom.com
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260126081544.983517-1-wei.fang@nxp.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260126081544.983517-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253906-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253907-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 22FBE95C06
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 5840B95D6F
 X-Rspamd-Action: no action
 
-Hi Paolo,
+Hi,
 
-On Tue, Jan 27, 2026 at 8:34=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
-> I spent a little time trying to understanding the logic here and I think
-> that enabling features depending on IFF_NO_QUEUE is fragile at best.
->
-> It looks like that the IFF_NO_QUEUE bit is an inconsistent state for
-> multilink devices using different type of channels.
-> Moreover the user-space could attaching a qdisc to the ppp device after
-> channel initialization.
->
-> Instead you could always expose the features and linearize as needed
-> when transmitting on !direct_xmit channel; no need to touch the
-> individual channel implementation, you could do such check before
-> calling the ops->start_xmit() calls (possibly creating a new
-> wrapper/helper for that).
+On 26/01/2026 09:15, Wei Fang wrote:
+> Since the commit 25c6a5ab151f ("net: phy: micrel: Dynamically control
+> external clock of KSZ PHY"), the clock of Micrel PHY has been enabled
+> by phy_driver::resume() and disabled by phy_driver::suspend(). However,
+> devm_clk_get_optional_enabled() is used in kszphy_probe(), so the clock
+> will automatically be disabled when the device is unbound from the bus.
+> Therefore, this could cause the clock to be disabled twice, resulting
+> in clk driver warnings.
+> 
+> For example, this issue can be reproduced on i.MX6ULL platform, and we
+> can see the following logs when removing the FEC MAC drivers.
+> 
+> $ echo 2188000.ethernet > /sys/bus/platform/drivers/fec/unbind
+> $ echo 20b4000.ethernet > /sys/bus/platform/drivers/fec/unbind
+> [  109.758207] ------------[ cut here ]------------
+> [  109.758240] WARNING: drivers/clk/clk.c:1188 at clk_core_disable+0xb4/0xd0, CPU#0: sh/639
+> [  109.771011] enet2_ref already disabled
+> [  109.793359] Call trace:
+> [  109.822006]  clk_core_disable from clk_disable+0x28/0x34
+> [  109.827340]  clk_disable from clk_disable_unprepare+0xc/0x18
+> [  109.833029]  clk_disable_unprepare from devm_clk_release+0x1c/0x28
+> [  109.839241]  devm_clk_release from devres_release_all+0x98/0x100
+> [  109.845278]  devres_release_all from device_unbind_cleanup+0xc/0x70
+> [  109.851571]  device_unbind_cleanup from device_release_driver_internal+0x1a4/0x1f4
+> [  109.859170]  device_release_driver_internal from bus_remove_device+0xbc/0xe4
+> [  109.866243]  bus_remove_device from device_del+0x140/0x458
+> [  109.871757]  device_del from phy_mdio_device_remove+0xc/0x24
+> [  109.877452]  phy_mdio_device_remove from mdiobus_unregister+0x40/0xac
+> [  109.883918]  mdiobus_unregister from fec_enet_mii_remove+0x40/0x78
+> [  109.890125]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
+> [  109.896076]  fec_drv_remove from device_release_driver_internal+0x17c/0x1f4
+> [  109.962748] WARNING: drivers/clk/clk.c:1047 at clk_core_unprepare+0xfc/0x13c, CPU#0: sh/639
+> [  109.975805] enet2_ref already unprepared
+> [  110.002866] Call trace:
+> [  110.031758]  clk_core_unprepare from clk_unprepare+0x24/0x2c
+> [  110.037440]  clk_unprepare from devm_clk_release+0x1c/0x28
+> [  110.042957]  devm_clk_release from devres_release_all+0x98/0x100
+> [  110.048989]  devres_release_all from device_unbind_cleanup+0xc/0x70
+> [  110.055280]  device_unbind_cleanup from device_release_driver_internal+0x1a4/0x1f4
+> [  110.062877]  device_release_driver_internal from bus_remove_device+0xbc/0xe4
+> [  110.069950]  bus_remove_device from device_del+0x140/0x458
+> [  110.075469]  device_del from phy_mdio_device_remove+0xc/0x24
+> [  110.081165]  phy_mdio_device_remove from mdiobus_unregister+0x40/0xac
+> [  110.087632]  mdiobus_unregister from fec_enet_mii_remove+0x40/0x78
+> [  110.093836]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
+> [  110.099782]  fec_drv_remove from device_release_driver_internal+0x17c/0x1f4
+> 
+> After analyzing the process of removing the FEC driver, as shown below,
+> it can be seen that the clock was disabled twice by the PHY driver.
+> 
+> fec_drv_remove()
+>   --> fec_enet_close()
+>     --> phy_stop()
+>       --> phy_suspend()
+>         --> kszphy_suspend() #1 The clock is disabled
+>   --> fec_enet_mii_remove()
+>     --> mdiobus_unregister()
+>       --> phy_mdio_device_remove()
+>         --> device_del()
+>           --> devm_clk_release() #2 The clock is disabled again
+> 
+> Therefore, devm_clk_get_optional() is used to fix the above issue. And
+> to avoid the issue mentioned by the commit 985329462723 ("net: phy:
+> micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
+> clock is enabled by clk_prepare_enable() to get the correct clock rate.
+> 
+> Fixes: 25c6a5ab151f ("net: phy: micrel: Dynamically control external clock of KSZ PHY")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-Attaching a new qdisc won't clear the IFF_NO_QUEUE bit. (The flag
-means the interface _can_ run without a qdisc).
-As for multilink devices, one is not supposed to bundle channels with
-inconsistent direct_xmit (for example, mix ppp_synctty with pptp) and
-expect better results. But as the driver does not reject that, I may
-add a skb_linearize() to ppp_mp_explode(), or add a check for
-SC_MULTILINK flag in ppp_fix_features().
+This should fix the issue indeed. The dance of enabling/disabling then
+re-enabling at resume() again feels odd, but at least it's balanced.
 
-What do you think?
+We may be able to avoid that entirely by dealing with the ref_mii_clk
+selection only in the .resume() path, as it's also called no long after
+config_init(). That would mean reading the clock rate in
+kszphy_config_reset(), then performing the kszphy_rmii_clk_sel()
+accordingly.
 
-Regards,
-Qingfang
+Maxime
+
 
