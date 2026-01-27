@@ -1,134 +1,164 @@
-Return-Path: <netdev+bounces-253774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMjxFQiHeGk/qwEAu9opvQ
-	(envelope-from <netdev+bounces-253774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:36:08 +0100
+	id EHNXIBWJeGmqqwEAu9opvQ
+	(envelope-from <netdev+bounces-253775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:44:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE01991CEA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:36:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D871091F20
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D05783037451
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:32:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CC09302A50B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A952E090B;
-	Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFEA2E0923;
+	Tue, 27 Jan 2026 09:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqg/p5fw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IawBPD25";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrqF3LPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632EB217723
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13C233D9E
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769506377; cv=none; b=tJT1NsrcZfoiZS2B1sB7iYRhxCQaRmhZv/oSaKrdaIDL0nkoE17bLxypIIZXdcKkx7hl//+3RMwZgp6k/ovBv8Doa3L5EfFXDfC8fySzoxsOrFTwxvmbTQ9md9gACrzwSaRbkK2QxSTaojIBXJACjiKVRAI0pfOUHbbyZpXDSrE=
+	t=1769506855; cv=none; b=p7qLaUcoi7S9IJbjsNWMAvETAB5S6HPivu6T2rR2ex3z1UlGiKx8e9cUQP9cfTzkKkawxbHADXYjsaVR8AZ2QsARsJvPShY7ccBk5vLQrBtqjcajUobx8BJdTZKVp4hgnp7lwdJIwcmfiV8dY6wsAHCCbiyTYknuPmc0Kz3EivY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769506377; c=relaxed/simple;
-	bh=nd4756Hy+92ohyhREHEr2ehaES7a+HF9kecPSnYoKRI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i6kWIG3Hau8uZvp+yQLqWA5EANVX9Uv6f1EMzawq8jRzbz7Yub7KLzXFFvL5bIHidOqUcqC7uLGF0OMX+dYb+nftt1BR4gXv7kZoFLIEDpihCJ4vO65s3Lh8qmJ4A5hgAM0Nh5k++EeMh/KkX21wXijXGnRhAzhdMCyX8D7Ccts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqg/p5fw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39BCFC2BCB4
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769506377;
-	bh=nd4756Hy+92ohyhREHEr2ehaES7a+HF9kecPSnYoKRI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hqg/p5fwd0Wtm1K4HPBR20a0ZALUIPwJbR+HTRa2SE9d84XqA97XGZ0n5H7mZ/pdY
-	 LrjP7i6moJ/1DKMh3Ytl3YLATfXpP09QgOljgvsJQY/IYIEHYWaCJWONYB5b1bsQdM
-	 JVDDcg/mmFlM3swvNUuEodb70UKzeHAXzR3f3GWxzLI+QLDjCYFcH0etlakY+OErJj
-	 UtNpdTSkGiffuXXOp+rivvZLqk7ewNp1ny7Vd5fcL9tYwhlehqrW4wLewQ5h4JslZ7
-	 P2hD4a0YTZxIISfyde3jLLAOXwD7M0PnMd/pnnluIIr1/1vvlxzzehe1wM3o8X4nrE
-	 rDvlKs0ndj1Zg==
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-790ac42fd00so55436987b3.3
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:32:57 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUtnAqLkQO1WIiX9O/TTL7IzwVg3LxtNyP88t9o/g1WmOmTGLbLSAXJZBlf8mqJYV+95ARS5qE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoQztz1ysolNyW9/ElmSbDbOQSja9lzOiXsKxZ5RguQuAJ7XyE
-	hbSXEO9M0mLK5Sm7d6qgl/en91Ercr7o6EHJ0sO4UJJCbBiL19BsOe3+dWxXTxLpkaYSSfOZ2CG
-	PC+WYgi3M4ftxSqY31glVw2ieXVPrQaI=
-X-Received: by 2002:a05:690c:fd1:b0:794:78ad:470d with SMTP id
- 00721157ae682-7947ab40c1fmr16169877b3.27.1769506376440; Tue, 27 Jan 2026
- 01:32:56 -0800 (PST)
+	s=arc-20240116; t=1769506855; c=relaxed/simple;
+	bh=TaCylpJ3oBWXtsgydAsq+xnzjouw/VNwJPzJMQjLhvw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I47oot6QYMze7uk8IoRJIARRYTLFDye8V4kP+G8xPZ+Xr9qgKDsdLQiUWWaGvr2s7/zHlcR/uDBOd1+LOfTvTRvSbqWwAUZ1uvJzqAaNRFWG9wnh1jLxGGits7a2zafZHjZLMrlB0sQENhk44x3bOfarOYoQeZiEvY6lDM61+Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IawBPD25; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FrqF3LPp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769506853;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TaCylpJ3oBWXtsgydAsq+xnzjouw/VNwJPzJMQjLhvw=;
+	b=IawBPD25HogvllBbfPz99Crh6l0THwq9DQR3lSowYELdWhx6VRjYePxP0jj7jcMtwg+tp+
+	+fwPrhkutcmfmRnyzn9pDjOq42mx+AJi2s7Hbzab0v0boSBiERrQ1dJ5tRfp8wbP4vVZeT
+	JVihEJ0sArgQ+UYQJy1uEmHdbS39XgQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-327-pZgzvdw8NhOb52xfT2EyKw-1; Tue, 27 Jan 2026 04:40:49 -0500
+X-MC-Unique: pZgzvdw8NhOb52xfT2EyKw-1
+X-Mimecast-MFC-AGG-ID: pZgzvdw8NhOb52xfT2EyKw_1769506849
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48066dbd873so4207065e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769506848; x=1770111648; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TaCylpJ3oBWXtsgydAsq+xnzjouw/VNwJPzJMQjLhvw=;
+        b=FrqF3LPpcdy1gCE3UdRyAbioJMVggmdXCSTWmSbOUMFya2p1MRHsCTGKPMaFGGG9DW
+         VkNy90BaXKKLYQGfwVTF+lHad4Zzt2bRwOGKYYFZjdFzJyLY5VAtoa3yv9p6ftHlL9Z4
+         VIqOJ7c/LyJ1xXgdVVg4DppxVdujph2evebKJTugm0n3hlGHKUaNxJst48EKTWoG1HYq
+         l9aN93bszOtE2ujw7J6D44xR7iQ8D3yUFGisLLKhJc3aQZVcs/R5Awnx/QeXIfLRlg/a
+         7LD4x4eWGdC1TffcwE4nJnAy5MepX0bxEEOlh46LIVpl9gQtEVbpCtjAv103Gy4rm8nc
+         WvLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769506848; x=1770111648;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TaCylpJ3oBWXtsgydAsq+xnzjouw/VNwJPzJMQjLhvw=;
+        b=GBcZVIxIR0lszblhvO5p0sAXyhfAVdc8KOpDJg7sifUQGZdAHFmRWJXrKK0PVepDYE
+         Gm41h9Z1R9hGoGwPT5MOrisMzyMeG4UhFOEfFU1ek0lh5HHHok8B2Vbr+N3ZCfpqEMQx
+         4spOlT8QWCMhmnjpU30r4ZXhxhtSiuHhbgW3l04AC1GYq/MwqeJWGnoV4/Um6XzxYoHB
+         ssTclgq90a5KGtnr44ER4BDutHp/N2cHatKf0XzSAPL3fav2pnZPyUuMLU+2uKYadBV7
+         X5/Yf7mQzdtrAffsa+w+3All/rwZiaDcouWuABS4U3qEEzpIz8pt4oeeD0BUwrQtHMrX
+         /Ayg==
+X-Forwarded-Encrypted: i=1; AJvYcCWE45gETwnlJ6aJ1Bm+YGOmxwokpa4EVoprpeH1pb7ADKV7jh6ff5lhEyUjLuALC+bG8r9t6+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT42o3LkWYEoSNUQw7URjVoxGorcVeosMp46LRQ0gxyQfCD2TB
+	HVMF6NejKP83bNCSdvGfQn0vzLEXRMpd8gSvnSrRg7m/kMe3rfdBHGpw26JNZFW+8Lk4UIONEen
+	1TB7CWYOzWaQizx6ruEKwFXYuLPXGQIEoPcEcMmEPEq/KIooSch3+i5BH1A==
+X-Gm-Gg: AZuq6aLTYcuV3Kw8VdkbwuaYvgYNLq0gnogtlOtuIANXvQyjGVojI3MdfC8j2LTr9Ge
+	GbEpH5s0tp5x8ZwsQJ9krD8uDJHbM8aT5yQd28L71cEeZp4fDwAZ/AnEaSNXujl0mnxgyPWP8nD
+	zxMFRl/HMPnKDGXxZlVxKVoC6BXz1W68YzldD+J6KP0EY8P1CcCBiEEf7VgrFgyIQavhhANruNS
+	1ohToy76apnZ1KT626brKyRw7BMcOdaBXHDu0XcUVnlpJezsKW9s9TbvOLbug+WblsRYwittXYb
+	nsmWuXKkGEfcCqRWHucvs4LG48Z28HikxogX8oN5WhpX1CBM35j+Yp9Xn/UV8FNK6xgxlCQp6c9
+	AeHeF305dDXDR
+X-Received: by 2002:a05:600c:450b:b0:471:114e:5894 with SMTP id 5b1f17b1804b1-48069c9620emr13219575e9.25.1769506848578;
+        Tue, 27 Jan 2026 01:40:48 -0800 (PST)
+X-Received: by 2002:a05:600c:450b:b0:471:114e:5894 with SMTP id 5b1f17b1804b1-48069c9620emr13219155e9.25.1769506848117;
+        Tue, 27 Jan 2026 01:40:48 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.22])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804d3ae17esm130747395e9.0.2026.01.27.01.40.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jan 2026 01:40:47 -0800 (PST)
+Message-ID: <bbe37fa4-aa44-4200-bd97-075772498485@redhat.com>
+Date: Tue, 27 Jan 2026 10:40:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260115114021.111324-1-robert.marko@sartura.hr> <20260115114021.111324-7-robert.marko@sartura.hr>
-In-Reply-To: <20260115114021.111324-7-robert.marko@sartura.hr>
-From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 27 Jan 2026 10:32:45 +0100
-X-Gmail-Original-Message-ID: <CAD++jLn3pP4cdB3h5KN04Pn_v+XuvK6ROuxpNfJVhSRJpo2FUQ@mail.gmail.com>
-X-Gm-Features: AZwV_QjPaAf4YpNWpzKIxLTu_1dAPvSU-dSWNUWnEkSR0mawzeMGDcKYjAjufcE
-Message-ID: <CAD++jLn3pP4cdB3h5KN04Pn_v+XuvK6ROuxpNfJVhSRJpo2FUQ@mail.gmail.com>
-Subject: Re: [PATCH v5 06/11] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
- add LAN969x
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	lee@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
-	UNGLinuxDriver@microchip.com, olivia@selenic.com, richard.genoud@bootlin.com, 
-	radu_nicolae.pirea@upb.ro, gregkh@linuxfoundation.org, 
-	richardcochran@gmail.com, horatiu.vultur@microchip.com, 
-	Ryan.Wanner@microchip.com, tudor.ambarus@linaro.org, 
-	kavyasree.kotagiri@microchip.com, lars.povlsen@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, luka.perkov@sartura.hr, 
-	Conor Dooley <conor.dooley@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 5/6] doc/netlink: nftables: Add getcompat operation
+To: "Remy D. Farley" <one-d-wide@protonmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org
+References: <20260121184621.198537-1-one-d-wide@protonmail.com>
+ <20260121184621.198537-6-one-d-wide@protonmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260121184621.198537-6-one-d-wide@protonmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253774-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,microchip.com,bootlin.com,tuxon.dev,gondor.apana.org.au,davemloft.net,lunn.ch,google.com,redhat.com,selenic.com,upb.ro,linuxfoundation.org,gmail.com,linaro.org,vger.kernel.org,lists.infradead.org,sartura.hr];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[protonmail.com,gmail.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253775-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tuxon.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email]
-X-Rspamd-Queue-Id: AE01991CEA
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D871091F20
 X-Rspamd-Action: no action
 
-On Thu, Jan 15, 2026 at 12:41=E2=80=AFPM Robert Marko <robert.marko@sartura=
-.hr> wrote:
+On 1/21/26 7:47 PM, Remy D. Farley wrote:
+> Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
 
-> Document LAN969x compatibles for SGPIO.
->
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Some (even minimal) description is needed in every change.
 
-This patch 6/11 applied to the pinctrl tree!
+Thanks,
 
-Yours,
-Linus Walleij
+Paolo
+
 
