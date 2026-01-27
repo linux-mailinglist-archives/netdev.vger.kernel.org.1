@@ -1,226 +1,198 @@
-Return-Path: <netdev+bounces-253700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253701-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCXWDZ1AeGlXpAEAu9opvQ
-	(envelope-from <netdev+bounces-253700-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:35:41 +0100
+	id wa+KLl1BeGlspAEAu9opvQ
+	(envelope-from <netdev+bounces-253701-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:38:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877E78FDD1
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:35:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE8E88FDDB
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BB03F3029A47
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:35:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8661301AD2D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E796A1DE8BB;
-	Tue, 27 Jan 2026 04:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gTpN3G6E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD27298CBE;
+	Tue, 27 Jan 2026 04:38:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCCC14A91
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 04:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8253F3C2F;
+	Tue, 27 Jan 2026 04:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769488535; cv=none; b=Bo/RQGOQOMCBOSBZLLJdyM7G/B/Mpr0TUxYXJDiquB8WFhXJABXXeq4yZje1hwQZafUFrWWJ/5x0wWiQLMcGKpr2pGY2PBb7PaptkSS7LPaFxB3fXwXB8sTgTfOmArre/L5hMyprcI8z94vDZzi2jZ5jKSOhsiVCEeqYzFJ2kag=
+	t=1769488728; cv=none; b=h0yyplQzRdb2Hi8YFLBx0Du59BxPOtwpYcmSa1FCnTaGqG0n5QbnBnvCdZ14b4CHvkxaADZdE1hhbutg4pFBiXnmqvqwHNzuubk8xrrM6/6/Koc1CAUF5dSpmd1g90ARTQRtdgaNtVtb6BRl9znu5E7UG/P9KJXyqhX6VQeS274=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769488535; c=relaxed/simple;
-	bh=LpT4UqmQSHxaEBmEOk+HPdu0WT3mQPh+bx9mVn+nTTE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Nufh+SBz2Rayi6aX9VZMVh8b0f3yaCVwgFj5NQD8ZB28CTd74XfXHpwZKGpJZn/KWCSgr3Q8TVNtOg80juXKWCB2hiBbbKnoAbxbv2Z0Rd3L8zfDdAGSCVj9lr4QGUegpQA+EhSKA6ILNNd8uVVJWMPFjaEal2xC7yaSJXkSAF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gTpN3G6E; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c43f8ef9bso5607916a91.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 20:35:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769488534; x=1770093334; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ziEifKkiuPs337en0hAfF5pGfm0tXpcONkUMyhpEC04=;
-        b=gTpN3G6ERA5cGC9AiwUv/EsRRJXrwpwkOsOI1/H71VpUQ77Gqrhnlk08GX5xR6fMhl
-         Wqoq61bHL0rBGbZ7BYR2/DkOYkTT34bASJFEScoxlPmiLgCY18xlhT40nwYfZeP2aH7X
-         V+3IBY8wbEXQ130MILDQBNxg3zouiKeLXHTBsysvMDUqZHENdDgDY8tRpbU4KO+62fYt
-         0JnkxZ6m231pfYQ7kS1IDVz0Wkd2PEQQR1encLRW0mBWDTW1AMqNn9E+E1o/Q/ogihCA
-         eieWP4cFlbhdHg6aQM9RTLvus/cldWjGN981Tj638FTDJrq3gj6iyRemdGdxzVMTkz0a
-         NUpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769488534; x=1770093334;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ziEifKkiuPs337en0hAfF5pGfm0tXpcONkUMyhpEC04=;
-        b=t6dW/u9b8T8geJ4gM2vHHhFR+J0bjy0w4Uo2HmG7fbzAyj1K6SI9UAW1FtnZIvN6X8
-         qs2QfeLZy/zEzHYRJM4Ut4y8KM/ywJMnq+4XXhvj3Q6xPaGPCo7U68YwucDssFXLuGi/
-         LCgckStvPqeGSuWtZlbELOKM0qJMeeB5SxYedUKyvl0ZoG5Ub4595R8bZOd769uLSWcE
-         GXEItik7we6FYk49ORg2U5A0Sj5FPZtALrB5X8PhygTsIkyysEZ5JAt1L8rHTdYzOZ/x
-         KixwtiSnC7+zxb/41W9r5XOVQuijdBy6MP8KnEmF2Q541TwrOE/1tiRTrI0BdGfkTKBl
-         9E2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW32mGUVRQVdLO+zV9toEYbCCaKc/XO0dJ+YgucNkuIWPpxTIwfWyy8IfawOb1bQnKQMXfqPVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLaqw5DCgNL2S4vTsNKQm1tMYs17SRK8zPYBVl3bmgTUc88WtT
-	I3cQzv6rZW9iCNbGyPiOKKhlyyUPCYYsDXVRInr8DLT4h8dL3hAAGRao++XQymZUO6CO+ozBu1/
-	B5aYilA==
-X-Received: from pghi9.prod.google.com ([2002:a63:e909:0:b0:c1d:67e2:834])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3948:b0:38b:d93f:b409
- with SMTP id adf61e73a8af0-38ec5e7b317mr418419637.25.1769488533721; Mon, 26
- Jan 2026 20:35:33 -0800 (PST)
-Date: Tue, 27 Jan 2026 04:35:24 +0000
+	s=arc-20240116; t=1769488728; c=relaxed/simple;
+	bh=2pxIiiqvyVltJcyDScY3y+LrRMiWAYkh+pHfqfGsi9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CrWhwgQ/VhHw9kG7GJayEjbQUUqJ00+WcF7ysoEPNjZxZ2ZrGCew2RvoU8hJ+KwU0z01jBQ4V/QxC+2muftc8ehXapm1lCBJYNWm4KbW7hMnmKYqxxGHER6V/tnyBNpU7BJXAkesVRa8sfw44k1gVPibTauS159jKgbnKXsV+R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [10.213.22.4] (unknown [210.73.43.101])
+	by APP-03 (Coremail) with SMTP id rQCowAC31dxGQXhpI1vqBg--.61005S2;
+	Tue, 27 Jan 2026 12:38:31 +0800 (CST)
+Message-ID: <42765b5f-2d94-4fd6-8cd9-977729220696@iscas.ac.cn>
+Date: Tue, 27 Jan 2026 12:38:30 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260127043528.514160-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] ipv4: fib: Annotate access to struct fib_alias.fa_state.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+d24f940f770afda885cf@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: spacemit: k1-emac: program frame size
+ registers for jumbo frames
+To: Tomas Hlavacek <tmshlvck@gmail.com>, netdev@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Yixun Lan <dlan@kernel.org>
+References: <20260126135919.77168-1-tmshlvck@gmail.com>
+ <20260126171449.83288-1-tmshlvck@gmail.com>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20260126171449.83288-1-tmshlvck@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:rQCowAC31dxGQXhpI1vqBg--.61005S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZw17Jw1xCFW7XF4kuF4UArb_yoW5ArWkpa
+	y5XasI9r4jyF1xKa1kAa18X34rJa1IqFyUCFyYvrWrZ3WDJr17WryrKFW3Cr98urWrWw1S
+	va4UZw43CF1DZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9ab7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
+	8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l
+	c7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r45MxAIw28IcxkI7VAKI48JMxC20s026x
+	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
+	JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
+	1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_
+	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
+	UvcSsGvfC2KfnxnUUI43ZEXa7IU5MwZ3UUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253700-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,d24f940f770afda885cf];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253701-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 877E78FDD1
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BE8E88FDDB
 X-Rspamd-Action: no action
 
-syzbot reported that struct fib_alias.fa_state can be
-modified locklessly by RCU readers. [0]
+Hi Tomas,
 
-Let's use READ_ONCE()/WRITE_ONCE() properly.
+Thanks for the fix. Just a few more things...
 
-[0]:
-BUG: KCSAN: data-race in fib_table_lookup / fib_table_lookup
+Firstly, I believe it is preferred to send a new patch version in its
+own thread with a link to the previous version. See
+Documentation/process/maintainer-netdev.rst:
 
-write to 0xffff88811b06a7fa of 1 bytes by task 4167 on cpu 0:
- fib_alias_accessed net/ipv4/fib_lookup.h:32 [inline]
- fib_table_lookup+0x361/0xd60 net/ipv4/fib_trie.c:1565
- fib_lookup include/net/ip_fib.h:390 [inline]
- ip_route_output_key_hash_rcu+0x378/0x1380 net/ipv4/route.c:2814
- ip_route_output_key_hash net/ipv4/route.c:2705 [inline]
- __ip_route_output_key include/net/route.h:169 [inline]
- ip_route_output_flow+0x65/0x110 net/ipv4/route.c:2932
- udp_sendmsg+0x13c3/0x15d0 net/ipv4/udp.c:1450
- inet_sendmsg+0xac/0xd0 net/ipv4/af_inet.c:859
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0x53a/0x600 net/socket.c:2592
- ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
- __sys_sendmmsg+0x185/0x320 net/socket.c:2735
- __do_sys_sendmmsg net/socket.c:2762 [inline]
- __se_sys_sendmmsg net/socket.c:2759 [inline]
- __x64_sys_sendmmsg+0x57/0x70 net/socket.c:2759
- x64_sys_call+0x1e28/0x3000 arch/x86/include/generated/asm/syscalls_64.h:308
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  The new version of patches should be posted as a separate thread,
+  not as a reply to the previous posting. Change log should include a lin=
+k
+  to the previous posting (see :ref:`Changes requested`).
 
-read to 0xffff88811b06a7fa of 1 bytes by task 4168 on cpu 1:
- fib_alias_accessed net/ipv4/fib_lookup.h:31 [inline]
- fib_table_lookup+0x338/0xd60 net/ipv4/fib_trie.c:1565
- fib_lookup include/net/ip_fib.h:390 [inline]
- ip_route_output_key_hash_rcu+0x378/0x1380 net/ipv4/route.c:2814
- ip_route_output_key_hash net/ipv4/route.c:2705 [inline]
- __ip_route_output_key include/net/route.h:169 [inline]
- ip_route_output_flow+0x65/0x110 net/ipv4/route.c:2932
- udp_sendmsg+0x13c3/0x15d0 net/ipv4/udp.c:1450
- inet_sendmsg+0xac/0xd0 net/ipv4/af_inet.c:859
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0x53a/0x600 net/socket.c:2592
- ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
- __sys_sendmmsg+0x185/0x320 net/socket.c:2735
- __do_sys_sendmmsg net/socket.c:2762 [inline]
- __se_sys_sendmmsg net/socket.c:2759 [inline]
- __x64_sys_sendmmsg+0x57/0x70 net/socket.c:2759
- x64_sys_call+0x1e28/0x3000 arch/x86/include/generated/asm/syscalls_64.h:308
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+You can do that for v3.
 
-value changed: 0x00 -> 0x01
+Secondly...
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 UID: 0 PID: 4168 Comm: syz.4.206 Not tainted syzkaller #0 PREEMPT(voluntary)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+On 1/27/26 01:14, Tomas Hlavacek wrote:
+> [...]
+>
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethe=
+rnet/spacemit/k1_emac.c
+> index 220eb5ce7583..31b1bdb2827e 100644
+> --- a/drivers/net/ethernet/spacemit/k1_emac.c
+> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
+> @@ -228,6 +228,12 @@ static void emac_init_hw(struct emac_priv *priv)
+>  		DEFAULT_TX_THRESHOLD);
+>  	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOL=
+D);
+> =20
+> +	/* Set maximum frame size and jabber size based on configured buffer
+> +	 * size.
+> +	 */
+> +	emac_wr(priv, MAC_MAXIMUM_FRAME_SIZE, priv->dma_buf_sz);
+> +	emac_wr(priv, MAC_RECEIVE_JABBER_SIZE, priv->dma_buf_sz);
+> +
 
-Reported-by: syzbot+d24f940f770afda885cf@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/69783ead.050a0220.c9109.0013.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- net/ipv4/fib_lookup.h | 6 ++++--
- net/ipv4/fib_trie.c   | 4 ++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+I tested this (also setting MAC_TRANSMIT_JABBER_SIZE, as Yixun
+described)=C2=A0and it appears that this has surfaced a latent bug in the=
+ code.
 
-diff --git a/net/ipv4/fib_lookup.h b/net/ipv4/fib_lookup.h
-index f9b9e26c32c1..0b72796dd1ad 100644
---- a/net/ipv4/fib_lookup.h
-+++ b/net/ipv4/fib_lookup.h
-@@ -28,8 +28,10 @@ struct fib_alias {
- /* Don't write on fa_state unless needed, to keep it shared on all cpus */
- static inline void fib_alias_accessed(struct fib_alias *fa)
- {
--	if (!(fa->fa_state & FA_S_ACCESSED))
--		fa->fa_state |= FA_S_ACCESSED;
-+	u8 fa_state = READ_ONCE(fa->fa_state);
-+
-+	if (!(fa_state & FA_S_ACCESSED))
-+		WRITE_ONCE(fa->fa_state, fa_state | FA_S_ACCESSED);
- }
- 
- /* Exported by fib_semantics.c */
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 7e2c17fec3fc..1308213791f1 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1280,7 +1280,7 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
- 			new_fa->fa_dscp = fa->fa_dscp;
- 			new_fa->fa_info = fi;
- 			new_fa->fa_type = cfg->fc_type;
--			state = fa->fa_state;
-+			state = READ_ONCE(fa->fa_state);
- 			new_fa->fa_state = state & ~FA_S_ACCESSED;
- 			new_fa->fa_slen = fa->fa_slen;
- 			new_fa->tb_id = tb->tb_id;
-@@ -1745,7 +1745,7 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
- 
- 	fib_remove_alias(t, tp, l, fa_to_delete);
- 
--	if (fa_to_delete->fa_state & FA_S_ACCESSED)
-+	if (READ_ONCE(fa_to_delete->fa_state) & FA_S_ACCESSED)
- 		rt_cache_flush(cfg->fc_nlinfo.nl_net);
- 
- 	fib_release_info(fa_to_delete->fa_info);
--- 
-2.52.0.457.g6b5491de43-goog
+I found that the hardware can't actually handle 4096-byte buffers, since
+the size field is only 12-bit. (It was my fault to assume that existing
+code was right in this regard...) So MTU larger than ~2000 breaks the
+hardware, and also triggers the WARN_ON_ONCE() in emac_rx_frame_good().
+4095 works just fine.
+
+Can you include this in v3 as well? Maybe also reword the commit
+messages a bit. Thanks.
+
+(Here's hoping Thunderbird hasn't destroyed the whitespace...)
+
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethern=
+et/spacemit/k1_emac.c
+index 31b1bdb2827e..78306a06a329 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -38,7 +38,7 @@
+=20
+ #define EMAC_DEFAULT_BUFSIZE		1536
+ #define EMAC_RX_BUF_2K			2048
+-#define EMAC_RX_BUF_4K			4096
++#define EMAC_RX_BUF_MAX			FIELD_MAX(RX_DESC_1_BUFFER_SIZE_1_MASK)
+=20
+ /* Tuning parameters from SpacemiT */
+ #define EMAC_TX_FRAMES			64
+@@ -937,7 +937,7 @@ static int emac_change_mtu(struct net_device *ndev, i=
+nt mtu)
+ 	else if (frame_len <=3D EMAC_RX_BUF_2K)
+ 		priv->dma_buf_sz =3D EMAC_RX_BUF_2K;
+ 	else
+-		priv->dma_buf_sz =3D EMAC_RX_BUF_4K;
++		priv->dma_buf_sz =3D EMAC_RX_BUF_MAX;
+=20
+ 	ndev->mtu =3D mtu;
+=20
+@@ -2011,7 +2011,7 @@ static int emac_probe(struct platform_device *pdev)=
+
+ 	ndev->hw_features =3D NETIF_F_SG;
+ 	ndev->features |=3D ndev->hw_features;
+=20
+-	ndev->max_mtu =3D EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
++	ndev->max_mtu =3D EMAC_RX_BUF_MAX - (ETH_HLEN + ETH_FCS_LEN);
+ 	ndev->pcpu_stat_type =3D NETDEV_PCPU_STAT_DSTATS;
+=20
+ 	priv =3D netdev_priv(ndev);
 
 
