@@ -1,147 +1,161 @@
-Return-Path: <netdev+bounces-253923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253924-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOEbN2TaeGmwtgEAu9opvQ
-	(envelope-from <netdev+bounces-253923-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:31:48 +0100
+	id YMfrALbdeGnytgEAu9opvQ
+	(envelope-from <netdev+bounces-253924-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:45:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F7696C30
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:31:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73D397021
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3AC90300829F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:19:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 09A87306B8DC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965FD35EDA9;
-	Tue, 27 Jan 2026 15:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625F135E53E;
+	Tue, 27 Jan 2026 15:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pI9qkzvu"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QSYDW22E"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FDC35CBB8;
-	Tue, 27 Jan 2026 15:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01422FFDE1;
+	Tue, 27 Jan 2026 15:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769527061; cv=none; b=JFOVj3VkZY65hD4av9H8SRLZY8b2dHdbscMJ1imMmQ+4rCk5P5IpYHPFL1qz7k19cWrzGn2b7zmwO5m9vKJrFpxUuds51ojbWfAQ0bJLPnfHNccwjq3DxOYx0ca5531Gmne/sO/bbQJO31yTU1NTi8yqHOXM/n59qxkbW6Epies=
+	t=1769527281; cv=none; b=jxfDGNrupNvkPDf18bSa/J1mlibuyoKoLaMgvdSnTiHIyugEULo9gDSm1EDXy9VWQVFcm5V75KnP1q81b1Vk+1OL+j9HU/J0CUXtiACQvZTfHUn0baDrc9uYXoX34kEEOeA7e9lk6/UNqAruBXf738CXvpC/u8thYWUS+YJNbds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769527061; c=relaxed/simple;
-	bh=gmhD44L1K9tLudyPg622CFQJdiQBqosgYt3gwdurMkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tjyy17BTVGnzlp+5Tga5R9k47r4zprQSb+HyNfNssn4obihfedHU2f5vxUcB1WM47J2E+mWqWMR4V74L5qXuVMhQsWacUFu2xbEsyXyw0pIew0wuWLE0asgWcajL19ikTO3gbbKyp/BPFVmpFNl/9PlvpSeDF6tu39Dl0WQqe50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pI9qkzvu; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZVh052NF40220AWAqRlV3TkXB/pLRow1eBVBsLhpPPk=; b=pI9qkzvuh9ZDIMnTPnQKFVkG/p
-	wdEN50YVxEZV47ubYV+IF8h7+5JuCrLjnr4XITbJn0KsVpV6p4P3iJUF6EGdJxWIhtJsLvlTaPZmd
-	FxOQS6mq8hG+jNsCevTeiywb1IEYaXeqJOWuk6n0kTUXFS6jaNz4Mx8px8l8wyL0vfVw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vkkoq-004yQu-1s; Tue, 27 Jan 2026 16:17:28 +0100
-Date: Tue, 27 Jan 2026 16:17:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
- inband goodies
-Message-ID: <34469896-9ea8-4f82-891f-0b57253f6cc5@lunn.ch>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
- <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
- <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
- <aXjSbu6L6ICYOPiJ@oss.qualcomm.com>
+	s=arc-20240116; t=1769527281; c=relaxed/simple;
+	bh=RRUg811pJ+cBdX9jlMunpOkfkjGJUh4eB4dsjIBSMRY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c+nLVR8LhNz7CxrLuBJK0uSnyBTcmbfm6Z4rm+hpczrXXdPiRHmc/cNjVFNhsDNZzQs4kSgZHvHcImXx9HX0/rhn2GbsBpjceqd85JdOVxxlq3ThcSEzZZBO2jXL7fsQ2GtycAOj6OtCXVBusCUok3fChNGb2feiUtiS73f/a9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QSYDW22E; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 176AA1A2A7B;
+	Tue, 27 Jan 2026 15:21:18 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CF933606F5;
+	Tue, 27 Jan 2026 15:21:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0A874119A8687;
+	Tue, 27 Jan 2026 16:21:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769527276; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=WMipDv9MuM92RjWoMNI3U7Qxd5CzrA27eVlnKn0dWe8=;
+	b=QSYDW22ExISK7Q8SZmdjSQJwM0GDH4aDLo1xhOhw6iahcLOYX/1LhxAZSROIihs6uZ//uu
+	ru6gCMqLo00PzOY5zODRGu2vxciahLy75tVSBzWxpSEmy2LYbQ9HvtZYeK4aaVbv1OrWym
+	p0imOALuuvQYvV6xM0nGYy2C5k43VMf5xdNjlPj5AnPui3cuBbQPCPeS7hMZBQ4SWVJDOq
+	dsvlRroiBkXMg9dJgcek7xRO8eojznHw3vdKxhRhrP/H7p0uzuX93OGOkwpBp1J1SF2Ter
+	/eTYQBogOX7C1YLf6Ei6Xw0cAghX5H7D1nivcGWBGkkutkGzdo3unYN34ttxrw==
+Message-ID: <d86d05ac-6c1f-418e-80fe-ef354053caf6@bootlin.com>
+Date: Tue, 27 Jan 2026 16:21:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXjSbu6L6ICYOPiJ@oss.qualcomm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/13] net: phy: phy_port: Correctly recompute
+ the port's linkmodes
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
+ <20260127134202.8208-2-maxime.chevallier@bootlin.com>
+ <20260127150021.110a0ddc@kmaincent-XPS-13-7390>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260127150021.110a0ddc@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253924-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253923-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,gmail.com,foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:mid,lunn.ch:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 56F7696C30
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A73D397021
 X-Rspamd-Action: no action
 
-> I added additional debug prints, and I think the crash is due to
-> BMSR_ESTATEN not being set in GMAC_AN_STATUS.
+
+
+On 27/01/2026 15:00, Kory Maincent wrote:
+> On Tue, 27 Jan 2026 14:41:49 +0100
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 > 
-> During pcs_init, BIT(8) of GMAC_AN_STATUS is 0:
-> [    7.985913] [DBG] GMAC_AN_STATUS = 8
+>> a PHY-driven phy_port contains a 'supported' field containing the
+>> linkmodes available on this port. This is populated based on :
+>>  - The PHY's reported features
+>>  - The DT representation of the connector
+>>  - The PHY's attach_mdi() callback
+>>
+>> As these different attrbutin methods work in conjunction, the helper
 > 
-> Therefore, this check:
-> 	if (readl(spcs->base + GMAC_AN_STATUS) & BMSR_ESTATEN) {
-> 		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-> 			  spcs->pcs.supported_interfaces);
+> Typo here:           ^^^^^^^^^
+
+Erf, thanks :)
+
 > 
-> 		/* Only allow 2500Base-X if the SerDes has support. */
-> 		ret = dwmac_serdes_validate(priv, PHY_INTERFACE_MODE_2500BASEX);
-> 		if (ret == 0)
-> 			__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-> 				  spcs->pcs.supported_interfaces);
-> 	}
-> fails, and PHY_INTERFACE_MODE_2500BASEX never gets set in
-> pcs.supported_interfaces. Pardon my naivete, but does the
-> BMSR_ESTATEN bit not being set break some standard?
+>> phy_port_update_supported() recomputes the final 'supported' value based
+>> on the populated mediums, linkmodes and pairs.
+>>
+>> However this recompute wasn't correctly implemented, and added more
+>> modes than necessary by or'ing the medium-specific modes to the existing
+>> support. Let's fix this and properly filter the modes.
+>>
+>> Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
+>> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 
+> It is the only fix of the series, maybe you should send it standalone?
+> Else this seems ok to me.
+> 
 
-You might want to check the IEEE 802.3 standard. It is free to
-download from IEEE.
+I considered that yeah, however without the rest of this series, this
+bug has no impact. I'll probably split it out anyways, depending on how
+review goes for the whole series.
 
-The original C22 register definitions only supported 10 and
-100Mbps. In order to support 1G, more registers are needed. The
-BMSR_ESTATEN bit indicate the PHY supports having more status bits in
-register 15. Register 15 then indicates if 1000BaseX, 1000Base-T is
-supported.
-
-If the SERDES supports 1000BaseX, it should have BMSR_ESTATEN set, and
-register 15 should indicate 1000BASE-X.
-
-	 Andrew
+Maxime
 
