@@ -1,102 +1,71 @@
-Return-Path: <netdev+bounces-253894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253895-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJHrKZPDeGmltAEAu9opvQ
-	(envelope-from <netdev+bounces-253894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:54:27 +0100
+	id 4GcQGwvEeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253895-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 162C2952BF
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:54:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1648895361
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A3B730581A9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:46:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62C8D306EB6D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A103359F90;
-	Tue, 27 Jan 2026 13:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C9435B626;
+	Tue, 27 Jan 2026 13:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goHiphA2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1ngN13m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0371126ED54
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC2D2D979F;
+	Tue, 27 Jan 2026 13:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521572; cv=none; b=qHonRYZBhcIY6n34c4IENvToP8QCvwlY0OLE9kUejkXhNhzfioKs6NHVDI4e8AYCFwTINY6+4oIxowRo8Wl7GTvNFqwdRoiQzbz5tRl/pC2NWBdahsxhIb3ZjC3IQLxDWzuIFixphBEvW/cosUFGNEBWbU6Tov4xQ1tSj71hBas=
+	t=1769521798; cv=none; b=eupEqadJaX/YttSmsMXOdWVZrRWVmccThcavkNycjUqyWVFCdrbJx0cbJdfOhpLNori46pqhhuLv6xIo1QXNSTw8l+XWSF6tCXoTxiBLb6Q6WksGfWnoCo9pMgc0iLy5o5xlMKBbpMhgy0bfJxtylyChllU6VWzvaTjQB4q4CPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521572; c=relaxed/simple;
-	bh=re6NSiZizBDEm3EpB+1e8HbLc2V1raKduoGD2wp8Pe4=;
+	s=arc-20240116; t=1769521798; c=relaxed/simple;
+	bh=xJU6Yuhq5fJsCgB2olMgIDeTq7BGYRCyFgfx+0nnVog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IyYsIIpXwYGKecVrHYgBrWa5tf4DHCUhrzro3IoUHIJcGDevF9IzJSMPF57YgotpU9Yehqux3JSrZXFBb718LWVlB6Y4cHEog+78FG5C9YsxW5Lh1ETzrp8ltt+31i7G87Bvmz6gnRoWPYDLlSNA5wnoENZToYV5RamTGidBWAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=goHiphA2; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4327790c4e9so3701193f8f.2
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:46:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769521569; x=1770126369; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x6OQwLQVXz7cUVwRGuGUS5QtspAXdqTx91X6RLYCCic=;
-        b=goHiphA2BY86LhXWzMT9cZDXAFvdKVS5K0wRNu/VOX/YDeliq7P1qru4TNUkrV+mW5
-         2EpgC/05F8dCeMh/kn3W9x2pM1TlCHtiulznaekt1k2heI1ilxwDFFVhDPvrkOojAJXx
-         iXsLxklr5PTjLnYW59zBtkY7cIRpF/mxoqp1ofZkiWl6eaY063h9zl5u1Kv/N95QvTxU
-         hfFLR2RAKKd1aKr3PQAFyokEexebiLs/4Qrd8zx4pSC9ezL+K/APnmw5mzYCXMpkKvs9
-         oqcpkRrjmpfsAoQmMgjR+AHMK6gbQSw8Uu8pPExDS/tuj3NN8pqDLoPYoHuaF2qOwz9X
-         WgXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769521569; x=1770126369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x6OQwLQVXz7cUVwRGuGUS5QtspAXdqTx91X6RLYCCic=;
-        b=IMv6ZoPrTJQ7HebDzDoWxVuQOCYa6BHU38Olv8biPIilDQnFnpzyfzjPRbWG1+p8rN
-         UhEKXh5NJLbmrLAaZ2lJhFYmWzK/fijUMkarCdhJMgr6rQE1Bp2NWU3JZaDezAaO3Vor
-         2Hm6jjEBshRlOqe2ISX06cn6ySSbdNzhJe0POUCDByDGFpzWP0HssjS76ewk4a4rGP8t
-         d1krtmYCBLOGAx3O83Ascoytnp6oWFqX0n4REfTIi6Q6+2421BrXfq42aeA0v+gAzzPY
-         2vP0Y26AVsd4CItOVQ77t8mOWy3+X7OAdqmPCI8U3DCjydzjo4F2mo5ZAc5PHR25KAxr
-         YW2g==
-X-Forwarded-Encrypted: i=1; AJvYcCU7EyffHQoW4KmIOJE80TFe4SMlkPoOCpIZCU3j9yLzZLMPiN1DvHfaMDir8kbtPkACSVRo8zE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw88L9brJrDnF6ra5/IBKEnD2m8aliAUI4IB9AmzOyZgqeqjwkL
-	5IEzQWo9Dusvf/T+hPhNOuyyR9GX+bc1LHc9T+EXnX+V/nRIpBBEbT0f
-X-Gm-Gg: AZuq6aJrlnp0ycoRAmziS8Gsjr8i2FlvczIMt9oxbHcr5k0fgPWJN+2vqxWl8CsM/zI
-	g1rZWwmFOEEveYDMbXHJ2C0gBIPw3IBU08Ox63rahGtGn9T6UF8PTZsBMrg7Cl4oz69aR/yJfSD
-	xexi4QgLpV/NUrKiTooUNYXIJFfBWHjgfvan0giWWmvqZc+2AOeHuiM8eXa8XPvXifK7g8Jmm0p
-	1s5B8IHFDZ4NughCcmOMg/JHCo59DmUwMtatIOLi59mm0u4YTMajkoe/9Z9b0ahaSjC+VBf9T8Y
-	Y5FtP/OopZ717tIIuUlIWw5O6hO7F31JpDpkKFVZWTjiWgoKWyzG3h7OxuQuSkqovrrGNakwMEz
-	AjxLmFtRGzUoTGer/9VBhwfrZLYRPywLVm6gNZW8XlRgpvhjIHNvkxKNB8wR4t6jGofeG89gLtd
-	OhHzSGmUWWdnRqo7Sk9M9L91g=
-X-Received: by 2002:a05:6000:2c0c:b0:42b:3806:2ba0 with SMTP id ffacd0b85a97d-435dd02dc43mr2250887f8f.2.1769521569105;
-        Tue, 27 Jan 2026 05:46:09 -0800 (PST)
-Received: from debian.local ([2a0a:ef40:e94:5d01:a218:5589:9f9c:4f52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c24a8asm37902764f8f.12.2026.01.27.05.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 05:46:08 -0800 (PST)
-Date: Tue, 27 Jan 2026 13:46:06 +0000
-From: Chris Bainbridge <chris.bainbridge@gmail.com>
-To: "Korenblit, Miriam Rachel" <miriam.rachel.korenblit@intel.com>
-Cc: "kvalo@kernel.org" <kvalo@kernel.org>,
-	"Berg, Johannes" <johannes.berg@intel.com>,
-	"benjamin@sipsolutions.net" <benjamin@sipsolutions.net>,
-	"gustavoars@kernel.org" <gustavoars@kernel.org>,
-	"linux-intel-wifi@intel.com" <linux-intel-wifi@intel.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] Revert "wifi: iwlwifi: trans: remove STATUS_SUSPENDED"
-Message-ID: <aXjBnu8MAg5ly76z@debian.local>
-References: <20260125233335.6875-1-chris.bainbridge@gmail.com>
- <DM3PPF63A6024A93B1437A144E82CC38B7AA393A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
- <aXcovK8uhsiaHumT@debian.local>
- <DM3PPF63A6024A907097A88AEB32669C1E5A393A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
- <CAP-bSRZ60CSEtR-_9OL6k_Lzg=w8MtD2i79KpwF+nYYzgak=-Q@mail.gmail.com>
- <DM3PPF63A6024A9FCE1CF29C0492A406E7AA390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
- <aXit5795WQLL290t@debian.local>
- <DM3PPF63A6024A91EFB76D52F9590E82C30A390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n/zu9L6VDpqS73QaxTIFbFECmI9lHobZgok4wegqZGHRgRub+8mGh4woLHYUCLrBZtvHzSzhLYTmgVf8HTWO7kSdFULgQ199tVEX/JWWKgSqSDVOBvkjX0K6h3t1wwPzuy1BNVRTpIv91UMS6G3wNwFz04YZZs49TYTDF8s3YXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1ngN13m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85131C116C6;
+	Tue, 27 Jan 2026 13:49:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769521797;
+	bh=xJU6Yuhq5fJsCgB2olMgIDeTq7BGYRCyFgfx+0nnVog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d1ngN13m7IgYqLmjsuowA02OOYZy8cHLn1RTksWhhAMFWrvDA+LGB+6ow9o9sl4MK
+	 LCkjI2qoQOX04TJ7DpYdAE+Fd+E3qbFgj8/I2PD9TgdbcAZjDTbZ7EJNIFQwrOVzsE
+	 53IAUNkNQxaLkdTq5n5PCji4nDUen0ewG/JMZqaq1dBnR3Js4jib3Il5AS09xiS8Uz
+	 XKRsqEf8Vd1B7KDdeF4oe//mZ3D56UePRhJkFXwk61n/S2IXfi4AVpBu9HW+tigH5i
+	 N5KrzCKJIXUc2WJRkTGmOcnA4njPJDdYJExYjr7pBxjtJs6MMaQ1iYUTlIHHYT67X8
+	 6JwI2v/f7oA2w==
+Date: Tue, 27 Jan 2026 13:49:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next V6 07/14] devlink: Add parent dev to devlink API
+Message-ID: <aXjCf2iRC5VsRC5A@horms.kernel.org>
+References: <1769340723-14199-1-git-send-email-tariqt@nvidia.com>
+ <1769340723-14199-8-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,77 +74,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM3PPF63A6024A91EFB76D52F9590E82C30A390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+In-Reply-To: <1769340723-14199-8-git-send-email-tariqt@nvidia.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253894-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253895-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chrisbainbridge@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,nvidia.com,vger.kernel.org,infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:email,debian.local:mid]
-X-Rspamd-Queue-Id: 162C2952BF
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1648895361
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 01:22:06PM +0000, Korenblit, Miriam Rachel wrote:
+On Sun, Jan 25, 2026 at 01:31:56PM +0200, Tariq Toukan wrote:
+> From: Cosmin Ratiu <cratiu@nvidia.com>
 > 
+> Upcoming changes to the rate commands need the parent devlink specified.
+> This change adds a nested 'parent-dev' attribute to the API and helpers
+> to obtain and put a reference to the parent devlink instance in
+> info->user_ptr[1].
 > 
-> > -----Original Message-----
-> > From: Chris Bainbridge <chris.bainbridge@gmail.com>
-> > Sent: Tuesday, January 27, 2026 2:22 PM
-> > To: Korenblit, Miriam Rachel <miriam.rachel.korenblit@intel.com>
-> > Cc: kvalo@kernel.org; Berg, Johannes <johannes.berg@intel.com>;
-> > benjamin@sipsolutions.net; gustavoars@kernel.org; linux-intel-wifi@intel.com;
-> > linux-wireless@vger.kernel.org; netdev@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; stable@vger.kernel.org
-> > Subject: Re: [PATCH] Revert "wifi: iwlwifi: trans: remove STATUS_SUSPENDED"
-> > 
-> > On Tue, Jan 27, 2026 at 05:05:31AM +0000, Korenblit, Miriam Rachel wrote:
-> > >
-> > > Just making sure: have you been able to reproduce the assert
-> > (ADVANCED_SYSASSERT in the log), and then the panic didn't happen?
-> > 
-> > Yes, the ADVANCED_SYSASSERT was logged but there was no subsequent null
-> > pointer dereference.
-> > 
-> > > If yes, please test the attached patch, which is supposed to fix the assert itself.
-> > With this, you are not even supposed to see an assert.
-> > 
-> > I ran this through 15 suspend/resume cycles with network traffic. The
-> > ADVANCED_SYSASSERT did not occur, so it looks like the patch does fix the
-> > SYSASSERT. There was a warning logged once out of the 15 cycles:
-> > 
-> > I think that this is probably a different bug though - checking previous logs with
-> > journalctl, I see the same warning occurred once with 6.17.0-06871-
-> > gf79e772258df which predates the "remove STATUS_SUSPENDED"
-> > commit.
+> To avoid deadlocks, the parent devlink is unlocked before obtaining the
+> main devlink instance that is the target of the request.
+> A reference to the parent is kept until the end of the request to avoid
+> it suddenly disappearing.
 > 
-> Thanks for the help!
+> This means that this reference is of limited use without additional
+> protection.
 > 
-> Regarding the warning, please open Bugzilla ticket for that
-> 
-> Miri
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Sure, ticket is https://bugzilla.kernel.org/show_bug.cgi?id=221017
+...
+
+Hi Cosmin, all,
+
+The netlink_gen.[ch] and spec changes in this patch do not seem consistent.
+
+$ tools/net/ynl/ynl-regen.sh -f
+$ git diff
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index 6b691bdbf037..f4c61c2b4f22 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -39,11 +39,6 @@ devlink_attr_param_type_validate(const struct nlattr *attr,
+ }
+
+ /* Common nested types */
+-const struct nla_policy devlink_dl_parent_dev_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
+-       [DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+-       [DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+-};
+-
+ const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1] = {
+        [DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .type = NLA_BINARY, },
+        [DEVLINK_PORT_FN_ATTR_STATE] = NLA_POLICY_MAX(NLA_U8, 1),
+diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+index d4db82a00522..2817d53a0eba 100644
+--- a/net/devlink/netlink_gen.h
++++ b/net/devlink/netlink_gen.h
+@@ -13,7 +13,6 @@
+ #include <uapi/linux/devlink.h>
+
+ /* Common nested types */
+-extern const struct nla_policy devlink_dl_parent_dev_nl_policy[DEVLINK_ATTR_DEV_NAME + 1];
+ extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1];
+ extern const struct nla_policy devlink_dl_rate_tc_bws_nl_policy[DEVLINK_RATE_TC_ATTR_BW + 1];
+ extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
+@@ -30,19 +29,12 @@ int devlink_nl_pre_doit_dev_lock(const struct genl_split_ops *ops,
+ int devlink_nl_pre_doit_port_optional(const struct genl_split_ops *ops,
+                                      struct sk_buff *skb,
+                                      struct genl_info *info);
+-int devlink_nl_pre_doit_parent_dev_optional(const struct genl_split_ops *ops,
+-                                           struct sk_buff *skb,
+-                                           struct genl_info *info);
+ void
+ devlink_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+                     struct genl_info *info);
+ void
+ devlink_nl_post_doit_dev_lock(const struct genl_split_ops *ops,
+                              struct sk_buff *skb, struct genl_info *info);
+-void
+-devlink_nl_post_doit_parent_dev_optional(const struct genl_split_ops *ops,
+-                                        struct sk_buff *skb,
+-                                        struct genl_info *info);
+
+ int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+;
 
