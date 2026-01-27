@@ -1,84 +1,49 @@
-Return-Path: <netdev+bounces-253743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KAhIFDtueGl2pwEAu9opvQ
-	(envelope-from <netdev+bounces-253743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:50:19 +0100
+	id UOjpKGVveGmjpwEAu9opvQ
+	(envelope-from <netdev+bounces-253744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:55:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A684590D75
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:50:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29DAB90DD4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:55:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 189E63006179
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:50:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 82E53303F45C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD07283FDB;
-	Tue, 27 Jan 2026 07:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W0l9RlVJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB2E285CBC;
+	Tue, 27 Jan 2026 07:54:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BDD23AB81
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 07:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BB31E520A;
+	Tue, 27 Jan 2026 07:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769500216; cv=none; b=P7vFS52t/CkIc2ygqrPaCvLEpcWCZ9qjj39E5OwKng4SXoumbMRL13J0FgDJE14MmkKShQD8VM32QrXRLd/5rvjgURXF/XdI7E3uQYdivZ5Ebx95DbuLkhRtFhNgOBUeS06FHTA74kHLW2wtXW3C02Y8/VyXasHvmqgYbOdAeb8=
+	t=1769500471; cv=none; b=NdWOFjiyw4T1kUuzNKmLMz1kOIvRJQlE8OnpOXGL6DgU8QyjJaWUirKmJWUhsZCivcMgLf68kI0HFfPIdg4M6uYUW210EnqjyhLXQwM5yryoEsvK+bVsB1HR50DbFg7AeRG60RRaRzkJEvTH80NVpyZ+q7QONR4vuTSesz0K9b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769500216; c=relaxed/simple;
-	bh=jhKN+FIotpia4REEgeIZnDqef/WVtVZ0T34Ox+kFDUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NeRgYPi/4AdfKF3QfqWNHUKvU7Zrkf7tjLDuOX3NqakFvEQKPwe9EebsdCK0Anb6HXepQ2j98lXwLtVNCGOpSRqlyqUXX2b7gUxQmeSBnz2aoemydfdDOp182VrabH4yjRoKHVcMGSzkKUSFlgvklt0tqx98Ek9UuOGEvXCI5CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W0l9RlVJ; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48069a48629so2648965e9.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:50:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769500213; x=1770105013; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1F+pwf4TDg/OxTQCcbJAJWg75eTnF2WjrBMDZZbHuLY=;
-        b=W0l9RlVJdLmlLLyoidvWqwuiwrembZwluVDEpncVqR5V1AqgNWJw5YRBT2oNnPG0bc
-         njJY3GWyDYt143xTIx2ukz0OS2CTyfhym+97RJFwb3AxLMZ6byhudNrgCEZA3q03RsYT
-         5OtGZG5DHBczXKlDxXIe/OK8DNlyoEpsZd4kZtL80wVAgFjEeahzBOhWN6jUoA/RJCbl
-         Kd5zlvvd2wF6jVlnDlfmFvpVJBL5tEkAXvbkS5aNgv25lNPCOJwPlg/BOY7c/yBKa3i7
-         qQ9vTe6Qc2lUu6tJ71nPaZsnm+7m+vFmMCZYCMGdlmeiC1IaHREWvhul9Noj7MDKsPv2
-         9mUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769500213; x=1770105013;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1F+pwf4TDg/OxTQCcbJAJWg75eTnF2WjrBMDZZbHuLY=;
-        b=JTEpn2fDz93lCNPQ8Q4+Tsy2eu7Sp1JnSvJZLMD0UkVvXQPj62Q0fCqpQj+ZytYZec
-         ukpChzSXEDrliGWsiiUtHZ6L/qo49lyTw2TLkn9ocTnumzeVmjMHH7XBejKFnupglySV
-         Ryv0Iwuw1tKvKUUxa3ogl7IRculMasik9SmusgKbk+ObCBYY946CbT7I28BKvOUNVVjy
-         0D9hmyq0DpZ5UiGwwRrTL8xGa5sZi38kmzOrzWN/fGjqO/Ot4tt0z1en4gNoj9ruW0/M
-         0iTbBYYITjkFA80PbR/O8t8UUyXx7SZWq9gfua/7u2rY53vzoGGV/hpvgI4cdJOUfxSu
-         aTfw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuDZRXzGKJ57plI3/U9WSOkj4fh1jZZLFLSuGhxvu4mttujNO06VqNAX2LLufxfsLKnsF53v4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBtYTv+0FWvrgPaGV1GzH6tVaNMelpDlinJTJuA3L3i9PAFTjS
-	dJHpy0Bpj17rFJm27XnbeMqan5LerY8ZSckhT2Goh/JryGhI6ufbm9LJ
-X-Gm-Gg: AZuq6aLjATjBtXt/GzAU65KG4yrWVJxZFFZL5VFlp2EjU6aB4sWCyekHPfY+6ysN5gr
-	TPYmZnUBn53mez0FJgvuxRfcepuESNGaB6UjZquvnsDiNXth+z1HE9FNYCoR48NmQGaKNwCsp/y
-	SLk0/roG61EOemko+I8rsePCJFSoIGiwNhjIKYitRR+5tUOMeaR1s1S4m/G0SB0wg5j5YLgRR4l
-	GeAWPFSNbGyL6qSptOCkEkHAnV1qbTBSZuuSwSNR6nGmsPC/EkVOjqTK+BLscX996P1RWH0OiIi
-	q0qDtDByPSirIfq6brt6d99tt0joOTUI6tsCzoKAwvGYv0BmjiBTXcENFMcbeu6OLsnUYeIFxSm
-	IdGEzz986KlnsNVyOT+IiMmxtpGHmMTVBB4+Ad4oq7nQUt4s1OuVkPja3frHuqXsY4rzME+ZiuX
-	e6y62GQsU1Ip25j1k8g72KjhXHkp+dEocgSRE=
-X-Received: by 2002:a05:6000:1865:b0:435:b020:30ab with SMTP id ffacd0b85a97d-435dd030439mr1215295f8f.15.1769500212866;
-        Mon, 26 Jan 2026 23:50:12 -0800 (PST)
-Received: from [10.221.205.245] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e717cbsm36432550f8f.24.2026.01.26.23.50.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jan 2026 23:50:12 -0800 (PST)
-Message-ID: <3b58208d-c2a3-4623-8fc8-e1ad2b71d2f7@gmail.com>
-Date: Tue, 27 Jan 2026 09:50:11 +0200
+	s=arc-20240116; t=1769500471; c=relaxed/simple;
+	bh=qMTSBm+EL1++ek6f18p5cG5XR7YashfVLGasolSURxs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=fyU187nMDxEoe/PREBhQlyLCq8lEjDHgXHEQ5tmWIVALIo5C4hZWNpnjXzSC+qNYRNfIF0UAfsawJ7kjZIhN1Kptxm5nlrw9DOJrZXg8wXFWsr8LMS+SqiW2GImR70ls4sr4k1BCvg2rTEso63KE2nkOsmkJL1SSy2SqR6P4CLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4f0d2P48TxzJ467W;
+	Tue, 27 Jan 2026 15:53:49 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 28B074056B;
+	Tue, 27 Jan 2026 15:54:25 +0800 (CST)
+Received: from [10.123.122.198] (10.123.122.198) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 27 Jan 2026 10:54:24 +0300
+Message-ID: <acb923ce-82f0-4a0a-bcfc-aadf00b746b6@huawei.com>
+Date: Tue, 27 Jan 2026 10:54:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,69 +51,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net/mlx5e: Remove redundant UDP length
- adjustment with GSO_PARTIAL
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Cc: Igor Russkikh <irusskikh@marvell.com>, Boris Pismenny
- <borisp@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, David Ahern <dsahern@kernel.org>,
- Simon Horman <horms@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
- linux-rdma@vger.kernel.org, Dragos Tatulea <dtatulea@nvidia.com>
-References: <20260125121649.778086-1-gal@nvidia.com>
- <20260125121649.778086-3-gal@nvidia.com>
+Subject: Re: [PATCH v2 net-next 2/3] ipvlan: Common code from v6/v4
+ validator_event
+To: Eric Dumazet <edumazet@google.com>
+CC: Kuniyuki Iwashima <kuniyu@google.com>, Dmitry Skorodumov
+	<dskr99@gmail.com>, <netdev@vger.kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang
+	<shaw.leon@gmail.com>, <linux-kernel@vger.kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+	<pabeni@redhat.com>
+References: <20260123170412.906280-1-skorodumov.dmitry@huawei.com>
+ <20260123170412.906280-3-skorodumov.dmitry@huawei.com>
+ <CAAVpQUBGAitiYbXjGoU7ByaXuU9oYF3nfywu43susMHi8mSy8g@mail.gmail.com>
+ <a4a16ead-a534-47e6-8468-58898350415c@huawei.com>
+ <CANn89iLQ2tDcWq-aLe-FhQU2cX8txF5L9SewiB1ssJh+7ds46Q@mail.gmail.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260125121649.778086-3-gal@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+In-Reply-To: <CANn89iLQ2tDcWq-aLe-FhQU2cX8txF5L9SewiB1ssJh+7ds46Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	DMARC_POLICY_QUARANTINE(1.50)[huawei.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253743-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253744-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,vger.kernel.org,kernel.org,fomichev.me,lunn.ch,davemloft.net,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[skorodumov.dmitry@huawei.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.928];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A684590D75
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:mid,huawei.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 29DAB90DD4
 X-Rspamd-Action: no action
 
-
-
-On 25/01/2026 14:16, Gal Pressman wrote:
-> GSO_PARTIAL now takes care of updating the UDP header length,
-> mlx5e_udp_gso_handle_tx_skb() is redundant, remove it.
+On 1/27/2026 10:37 AM, Eric Dumazet wrote:
+> On Tue, Jan 27, 2026 at 6:56 AM Dmitry Skorodumov
+> <skorodumov.dmitry@huawei.com> wrote:
+>> It even might be a good idea to replace wherever possible preprocessor
+>> checks with runtime checks. Use
+>> if (IS_ENABLED(CONFIG_IPV6)) { ... }
+>>
+>> instead of #if IS_ENABLED(CONFIG_IPV6) ... #endif
+>>
+>> --
+>>
+>> I'm ok with both approaches (though i tend to like runtime checks) - but
+>> unsure what is a common practice in bpf-net
 > 
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->   .../mellanox/mlx5/core/en_accel/en_accel.h      | 17 -----------------
->   1 file changed, 17 deletions(-)
-> 
+> What you call runtime checks is in reality the same : C compiler is
+> able to optimize constant boolean expressions
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Should I fix patches to be something like
+
+if (nblock == &ipvlan_addr4_vtor_notifier_block) {
+} else if (IS_ENABLED(CONFIG_IPV6)) {
+   ...
+}
+
+but still with __maybe_unused for ipvlan_addr6_vtor_notifier_block ?
+
+I see that this __maybe_unused is used quite often in linux-kernel in 
+similar way
+
+Dmitry
+
 
