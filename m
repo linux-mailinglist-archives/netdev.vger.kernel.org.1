@@ -1,220 +1,158 @@
-Return-Path: <netdev+bounces-254001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2ExiMnkjeWndvgEAu9opvQ
-	(envelope-from <netdev+bounces-254001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:43:37 +0100
+	id kIxDExsneWkIvwEAu9opvQ
+	(envelope-from <netdev+bounces-254002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:59:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CCD9A6CC
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:43:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1779A813
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B80C1301C17E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:43:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 30E3130074A2
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A1C32E733;
-	Tue, 27 Jan 2026 20:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3318428B40E;
+	Tue, 27 Jan 2026 20:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4LbDx3g+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="C7huW96G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJxTSIHh"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FC123C503;
-	Tue, 27 Jan 2026 20:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21602877DE
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 20:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769546610; cv=none; b=p5rQD7UkWm5ahP/v0Iw0UoVI3/A6DaVEf57XQxVGs9eQpm84yO8yJ5pBmS87FGeR0b75sPbKCuQJQtNJdyyvkOT6qCYu7CZvRlxTrBih8/I36nwv7GaXdhv7w5tdNi0dTogZutwNjGcheDiw4YGiJ33tuiQXUxDgV40k4rimiyg=
+	t=1769547544; cv=none; b=qEmez+i2BeyZDtLlczfQf6RgyVtMu4oaJh/apDBP/8ZSs670CeBwaK/vhqOR1/M3PX5oxg1qAyPLhlDOiUCaCY+PkNWzQ4VUYmOXJEH9iQ5+BnNZAMgrhiu+VWo7/cuwEWIh3I+QNWfWaBfryDbdP0iSkrlULOvCpK7A6DTnJb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769546610; c=relaxed/simple;
-	bh=zfolhV9Ze02+UuPt5wWghVk9sRVd8mMoFTahMiBUxic=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Lzxgeb4u8ZUkB+5mzFS3qzvP6y9VGnwHp4OVHb+2O65sgaTM8YMWciwYz/3jkj++aOlT2SMvGM1SJpYoeTMi7wRYFJZ+i3068pUnL4f0VY+YvEThVWBKFBzeN7pybLi/m15J2oeEG8g0wg5SEi9KUqcAnamwmINuotxIGNeNnc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4LbDx3g+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=C7huW96G; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769546606;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZMqM0U1ZHpg6/6FCY9/v7F7AqZW0Y4S7oYJKqS3Z8UY=;
-	b=4LbDx3g+8h+jX9AJt6MMvJmeP76qCaXhN3d9gZJnVb3YXH1BJxfe9/87rbTpntiPt6i+Yj
-	uNheZP9S6MzLe5jWzDmV3voDcOYMj5eWMUYb7YQ36a69ts+xqLCTKa02A37j+D6jjgv/HB
-	gSQ6a0cEvjWgE8NrXzBCOGgimCfYSgs5tgmR/KrCrBGK/qPJ24XRIWUwHxoM8G6R/Xip2T
-	Qhy/6LfIQR4UjQ1EEZIb1hWV63MWHRdkAYj2CtEw2Rx73dqbHuFR/a01rtu1A8Xu+GNFQF
-	1URl2NsXAnUBOrjz21dAT6R4PDTaFGHKisLK8HuqrDMB0whc93K5LQmVR7iH5w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769546606;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZMqM0U1ZHpg6/6FCY9/v7F7AqZW0Y4S7oYJKqS3Z8UY=;
-	b=C7huW96Gin8geMejn6PtonNf1Fyc6G1X7ZsjsQIB3BaG3vHdHzFBGw6jGnHOL4zlGZKonS
-	bq8Z4/rz2nDr4kBA==
-To: Breno Leitao <leitao@debian.org>, Breno Leitao <leitao@debian.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt
- <rostedt@goodmis.org>, Sergey Senozhatsky <senozhatsky@chromium.org>,
- Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
- mpdesouza@suse.com, kernel-team@meta.com
-Subject: Re: [PATCH net-next v4 1/5] printk: Add execution context (task
- name/CPU) to printk_info
-In-Reply-To: <20260123-nbcon-v4-1-46a5cf567926@debian.org>
-References: <20260123-nbcon-v4-0-46a5cf567926@debian.org>
- <20260123-nbcon-v4-1-46a5cf567926@debian.org>
-Date: Tue, 27 Jan 2026 21:49:25 +0106
-Message-ID: <87ldhi7pn6.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1769547544; c=relaxed/simple;
+	bh=uIcwkzbqJN3pSWq6K5fH1Eh0+OwAbnFMRoChim/GMjM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bC/rMmrsSm4YTw2S35icQXhi37DAxaAhfCJpEgEHqE5aW9ZrrM9cfUZQHVNKEEOYBIiGxqC38oGvDIUKVenVVQ+TPV1ht9up6L5Yry/YK3hhzWkRqS2vlbrSFM9926e/fUiNVzHXkyVZ5lVDRiGKwF1aUT90fQ8ISV1/8PzL3Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LJxTSIHh; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4358fb60802so130932f8f.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:59:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769547541; x=1770152341; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RPH9cRQ5hnz0qiQoHF0rnEXTRqbPpbIaCVqfz2DhLdM=;
+        b=LJxTSIHh5GLS7w51XsmQYq3XzfDOXmsT/j3TTIYlL+sn/HnypYx19KQPifRLHaELEn
+         QarodfjnfDcKdLld+UdfRDb5zcLzrdyRvMAYXHFpmpKc3yc5WvjYIWzxGfNzu2lneZdE
+         E9kL++js7O7+M4RAMCjnUHPHAe8pLjU0Rtj5mwzZVq05jddZH9papMkOXCrKekxXjGNM
+         ChdbxZ03sFQ1FPGlOFTBd4xOVnZUGxHHE+aAf7Fn3jrLTsgvzu+lSmx5XfLoGh6L+seV
+         SLTnFs5pUqc8xnu32lnxX8I9TUnuu6oCvPmVoN/T6mYFncY7Y33JqBsokK4QVH8lkmaA
+         dp8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769547541; x=1770152341;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RPH9cRQ5hnz0qiQoHF0rnEXTRqbPpbIaCVqfz2DhLdM=;
+        b=OtOQ755LjccKK6q4d0KLFKdeSGfGyiisrjKHiEZUUEeHsB7vCQ+9RKCbOZaG+XVYyg
+         wYea6B3oyJYWmfN20sfbRDUFhRidWpCpjcfs2EbM9KVNvm0BXHi02jfwg20O9ZNIWTOK
+         9Ek6qVN/asxTKSCDUaov/8R0SJctCup72lLq0E9LbVbWhKKHEQ/zqcg3Z98C49IPpF62
+         bCBRlIhwZv2cP20EZ3g/7RYWSCxYQ9hEwm96rNvujIhCsSlDPoqCVNxMpngFKzrNLOB/
+         UCg1DZ3qHaIVCXoRpicaDxfkkB2QHZ6y7dyXrJmifogF99LOt73DJ3UKUCfJ3ZBLMzD1
+         GxYg==
+X-Gm-Message-State: AOJu0YzGGYSG5c2QqqNGBTdtHkfyMhIBaygYR22eChvJVwUoIZ8/ebMi
+	1lzi0aihyedjfo0qC2kpnteayeuMlDFTLD9vUCsyuwzOlDkNeBJVAZig
+X-Gm-Gg: AZuq6aIvm7cV7va94Y7Fbqh4slPUBkBuT+P1Th+raywzf8ZFcmcHsYbV74B/O+1ke/8
+	+fsl6X/ug5XxTA3n95CVQO8neDl3MG6/tbUnqIyhaSvgK4E03SuswjU8q1cZDkU3ysmGQor0aba
+	oZwnTmAmYa8AVNL0fT6Q0hO7T1Ike7x2w+/u/SUGTj19BTstlXJFqzlOXJqZAFBLxV7+iL08ynS
+	9ldrGOIVeE58FP63YtnlZf3ax1ubfkw2GjyF/4QK6p8QGk5WfjlXLiodyBRjvY56ricNPUYjGpZ
+	YmRJr/8i9KRIw7f7Dky4TED9ng1qcvRqWvXNtKhCdOAHHEYF07PKb5nvR9Pq9uX56lp1mzeIzql
+	DQz60Vf2dcx+8Ny+IX+IcBwBvLuqar7QYrJ7kCfijf/QGyUypiD7zETxopUJf7LiZKbJlWDatFQ
+	dDqtmziN4Q8dfiB/w0jw085hkJBidXdHe1LBUUkA721lt9Idg+lxaB4aFY5Gfv1Yg7X4l2tCsd3
+	ExwbybEIKynRZCDeEV684adf+lG2IVgttYjW1Y/aAAteGT3Kbc=
+X-Received: by 2002:a5d:5d8a:0:b0:435:953e:5897 with SMTP id ffacd0b85a97d-435dd211e38mr4800123f8f.25.1769547540821;
+        Tue, 27 Jan 2026 12:59:00 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f19:d300:97a:bf24:fa2c:e12e? (p200300ea8f19d300097abf24fa2ce12e.dip0.t-ipconnect.de. [2003:ea:8f19:d300:97a:bf24:fa2c:e12e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c4f3edsm81539245e9.15.2026.01.27.12.58.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jan 2026 12:59:00 -0800 (PST)
+Message-ID: <640c373b-09d9-4b54-9113-782df41aa152@gmail.com>
+Date: Tue, 27 Jan 2026 21:58:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/3] r816e: Add r816e driver in Realtek
+To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260127113425.1989-1-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260127113425.1989-1-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254001-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[jogness.linutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 68CCD9A6CC
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254002-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email]
+X-Rspamd-Queue-Id: CB1779A813
 X-Rspamd-Action: no action
 
-On 2026-01-23, Breno Leitao <leitao@debian.org> wrote:
-> diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
-> index 32fc12e536752..391a58be0c5b3 100644
-> --- a/kernel/printk/nbcon.c
-> +++ b/kernel/printk/nbcon.c
-> @@ -946,6 +946,19 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
->  }
->  EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
->  
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +static void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
-> +				     struct printk_message *pmsg)
-> +{
-> +	wctxt->cpu = pmsg->cpu;
-> +	wctxt->pid = pmsg->pid;
-> +	memcpy(wctxt->comm, pmsg->comm, TASK_COMM_LEN);
+On 1/27/2026 12:34 PM, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This series patch add a fake driver r816e to ensure the kernel could set the
+> correct power state for #fun through r816e driver when suspending.
+> 
 
-Perhaps using sizeof() instead?
+I think a better approach would be to contribute to adding phylink/sfp
+support to r8169, so that the SFP NIC versions (incl. RTL8116AF) can be
+properly supported. This would have to include making the SFP I2C bus
+accessible by the kernel (instead of firmware only).
 
-	memcpy(wctxt->comm, pmsg->comm, sizeof(wctxt->comm));
+> Javen Xu (3):
+>   r816e: add a fake driver r816e for RTL8116af
+>   r816e: Add a Makefile in the r816e folder
+>   realtek: Update Makefile and Kconfig
+> 
+>  drivers/net/ethernet/realtek/Kconfig        |  7 ++
+>  drivers/net/ethernet/realtek/Makefile       |  1 +
+>  drivers/net/ethernet/realtek/r816e/Makefile |  8 +++
+>  drivers/net/ethernet/realtek/r816e/r816e.c  | 75 +++++++++++++++++++++
+>  4 files changed, 91 insertions(+)
+>  create mode 100644 drivers/net/ethernet/realtek/r816e/Makefile
+>  create mode 100644 drivers/net/ethernet/realtek/r816e/r816e.c
+> 
 
-And adding a static assert that the sizes match?
-
-	static_assert(sizeof(wctxt->comm) == sizeof(pmsg->comm));
-
-> +}
-
-[...]
-
-> diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-> index 1d765ad242b82..7daaa27705339 100644
-> --- a/kernel/printk/printk.c
-> +++ b/kernel/printk/printk.c
-> @@ -2131,12 +2131,37 @@ static inline void printk_delay(int level)
->  	}
->  }
->  
-> +#define CALLER_ID_MASK 0x80000000
-> +
->  static inline u32 printk_caller_id(void)
->  {
->  	return in_task() ? task_pid_nr(current) :
-> -		0x80000000 + smp_processor_id();
-> +		CALLER_ID_MASK + smp_processor_id();
-> +}
-> +
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +/* Store the opposite info than caller_id. */
-> +static u32 printk_caller_id2(void)
-> +{
-> +	return !in_task() ? task_pid_nr(current) :
-> +		CALLER_ID_MASK + smp_processor_id();
->  }
->  
-> +static pid_t printk_info_get_pid(const struct printk_info *info)
-> +{
-> +	u32 caller_id = info->caller_id;
-> +	u32 caller_id2 = info->caller_id2;
-> +
-> +	return caller_id & CALLER_ID_MASK ? caller_id2 : caller_id;
-> +}
-> +
-> +static int printk_info_get_cpu(const struct printk_info *info)
-> +{
-> +	return ((info->caller_id & CALLER_ID_MASK ?
-> +		 info->caller_id : info->caller_id2) & ~CALLER_ID_MASK);
-> +}
-
-It is a bit odd that printk_info_get_pid() uses local variables and
-printk_info_get_cpu() does not. I could understand if things evolve that
-way over time, but it is odd to use the two different styles from the
-beginning.
-
-I would prefer the local variable variant. But mostly I would prefer
-that they are the same style.
-
-> +#endif
-> +
->  /**
->   * printk_parse_prefix - Parse level and control flags.
->   *
-> @@ -2213,6 +2238,27 @@ static u16 printk_sprint(char *text, u16 size, int facility,
->  	return text_len;
->  }
->  
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +static void printk_store_execution_ctx(struct printk_info *info)
-> +{
-> +	info->caller_id2 = printk_caller_id2();
-> +	get_task_comm(info->comm, current);
-> +}
-> +
-> +static void pmsg_load_execution_ctx(struct printk_message *pmsg,
-> +				    const struct printk_info *info)
-> +{
-> +	pmsg->cpu = printk_info_get_cpu(info);
-> +	pmsg->pid = printk_info_get_pid(info);
-> +	memcpy(pmsg->comm, info->comm, TASK_COMM_LEN);
-
-Here I also suggest using sizeof() and static_assert():
-
-	memcpy(pmsg->comm, info->comm, sizeof(pmsg->comm));
-	static_assert(sizeof(pmsg->comm) == sizeof(info->comm));
-
-John Ogness
 
