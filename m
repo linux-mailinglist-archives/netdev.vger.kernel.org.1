@@ -1,139 +1,154 @@
-Return-Path: <netdev+bounces-253742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253743-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEBSKAlteGlSpwEAu9opvQ
-	(envelope-from <netdev+bounces-253742-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:45:13 +0100
+	id KAhIFDtueGl2pwEAu9opvQ
+	(envelope-from <netdev+bounces-253743-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:50:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A9D90D02
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:45:12 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A684590D75
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADA5730180A3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:45:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 189E63006179
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1B6285050;
-	Tue, 27 Jan 2026 07:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD07283FDB;
+	Tue, 27 Jan 2026 07:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="pBhjh4uu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W0l9RlVJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CFA27F73A
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 07:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BDD23AB81
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 07:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769499909; cv=none; b=s2uG2QtuV7IJ/lWtZhsvF3S757u5wNI5yLbCiXVL4yPMvKmveFjbinJeZIhbh9bnIzsbSE3S9NeYID2VKHyS9WM5XP55KdcF7nGYfLT9e8mMIjSNEQlUJySrbeVMu7OwX1iMerbuzAwtzZqYrU8GSPexlTsbaYXWes2AWaoW6rg=
+	t=1769500216; cv=none; b=P7vFS52t/CkIc2ygqrPaCvLEpcWCZ9qjj39E5OwKng4SXoumbMRL13J0FgDJE14MmkKShQD8VM32QrXRLd/5rvjgURXF/XdI7E3uQYdivZ5Ebx95DbuLkhRtFhNgOBUeS06FHTA74kHLW2wtXW3C02Y8/VyXasHvmqgYbOdAeb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769499909; c=relaxed/simple;
-	bh=jRFlianfvhERyS4SQ8HXJV4xHZ0IAZbBHxBU2K0iu/Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YJXNTRmQ571ol6PStAUuFEfcBAyYi5Qb+lHmERrboGseWv9lQNfBSjVhlVmWRx0utGQwH4PvqtkI22NhN4PDIwMfo8RZa0oNZYdqExxRqEH2/cmr2sjPwm17KrRQundEDqiQKe2pOMj9rh5fqURFfqE3sUJp0ix07IcJFS5cHmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=korsgaard.com; spf=pass smtp.mailfrom=korsgaard.com; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=pBhjh4uu; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=korsgaard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=korsgaard.com
-DKIM-Signature: a=rsa-sha256; b=pBhjh4uu/IaXMFyJOFZ4J7tDIPlA58kgYhG6qtaXr6zyMeUf9NRrWfrMIsb4TPiTXtfZesYG0Yj2eqiE/VseBEQ/7LmlMpy+oYjslJAMCGeuB8fMfK/LF24WnN+krVUGdeJZ5o0HbBBoGLugWDhlk2EzGa2IdXw0K717SQfXAJFYnmxLeSA7AQpAg7Bxc3P44x1e4uzr+opYW0U5f9h5sWxqSMFvMGPRccIWfToejNOi75DXpNxLLV2FNZZzI5kRTxr5bUJSJTEBUIjs1K5uIXURPNL+grfp0qog+uxuiXNZB62zYVQd6BIozML5evkGuhILP9SS9SpwQydY1GgHgQ==; s=purelymail1; d=purelymail.com; v=1; bh=jRFlianfvhERyS4SQ8HXJV4xHZ0IAZbBHxBU2K0iu/Y=; h=Feedback-ID:Received:Received:From:To:Subject:Date;
-Feedback-ID: 21632:4007:null:purelymail
-X-Pm-Original-To: netdev@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 1981953599;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Tue, 27 Jan 2026 07:43:16 +0000 (UTC)
-Received: from peko by dell.be.48ers.dk with local (Exim 4.98.2)
-	(envelope-from <peter@korsgaard.com>)
-	id 1vkdjH-00000000FYe-0Vcz;
-	Tue, 27 Jan 2026 08:43:15 +0100
-From: Peter Korsgaard <peter@korsgaard.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org,  linux-usb@vger.kernel.org,  Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
-  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Petko Manolov <petkan@nucleusys.com>,  Steve
- Glendinning <steve.glendinning@shawell.net>,
-  UNGLinuxDriver@microchip.com,  Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>,  Oliver Neukum <oneukum@suse.com>,  Krzysztof
- =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>,  Deepanshu Kartikey
- <kartikey406@gmail.com>,
-  Oleksij Rempel <o.rempel@pengutronix.de>,  Max Schulze
- <max.schulze@online.de>,  Thomas Gleixner <tglx@kernel.org>,  Ingo Molnar
- <mingo@kernel.org>,  "Gustavo A. R. Silva" <gustavoars@kernel.org>,  Kees
- Cook <kees@kernel.org>,  Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH net-next v3] net: usb: remove unnecessary get_drvinfo
- code and driver versions
-In-Reply-To: <20260127060534.51206-1-enelsonmoore@gmail.com> (Ethan
-	Nelson-Moore's message of "Mon, 26 Jan 2026 22:04:38 -0800")
-References: <20260127060534.51206-1-enelsonmoore@gmail.com>
-Date: Tue, 27 Jan 2026 08:43:14 +0100
-Message-ID: <87ecnb1ox9.fsf@dell.be.48ers.dk>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1769500216; c=relaxed/simple;
+	bh=jhKN+FIotpia4REEgeIZnDqef/WVtVZ0T34Ox+kFDUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NeRgYPi/4AdfKF3QfqWNHUKvU7Zrkf7tjLDuOX3NqakFvEQKPwe9EebsdCK0Anb6HXepQ2j98lXwLtVNCGOpSRqlyqUXX2b7gUxQmeSBnz2aoemydfdDOp182VrabH4yjRoKHVcMGSzkKUSFlgvklt0tqx98Ek9UuOGEvXCI5CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W0l9RlVJ; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-48069a48629so2648965e9.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 23:50:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769500213; x=1770105013; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1F+pwf4TDg/OxTQCcbJAJWg75eTnF2WjrBMDZZbHuLY=;
+        b=W0l9RlVJdLmlLLyoidvWqwuiwrembZwluVDEpncVqR5V1AqgNWJw5YRBT2oNnPG0bc
+         njJY3GWyDYt143xTIx2ukz0OS2CTyfhym+97RJFwb3AxLMZ6byhudNrgCEZA3q03RsYT
+         5OtGZG5DHBczXKlDxXIe/OK8DNlyoEpsZd4kZtL80wVAgFjEeahzBOhWN6jUoA/RJCbl
+         Kd5zlvvd2wF6jVlnDlfmFvpVJBL5tEkAXvbkS5aNgv25lNPCOJwPlg/BOY7c/yBKa3i7
+         qQ9vTe6Qc2lUu6tJ71nPaZsnm+7m+vFmMCZYCMGdlmeiC1IaHREWvhul9Noj7MDKsPv2
+         9mUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769500213; x=1770105013;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1F+pwf4TDg/OxTQCcbJAJWg75eTnF2WjrBMDZZbHuLY=;
+        b=JTEpn2fDz93lCNPQ8Q4+Tsy2eu7Sp1JnSvJZLMD0UkVvXQPj62Q0fCqpQj+ZytYZec
+         ukpChzSXEDrliGWsiiUtHZ6L/qo49lyTw2TLkn9ocTnumzeVmjMHH7XBejKFnupglySV
+         Ryv0Iwuw1tKvKUUxa3ogl7IRculMasik9SmusgKbk+ObCBYY946CbT7I28BKvOUNVVjy
+         0D9hmyq0DpZ5UiGwwRrTL8xGa5sZi38kmzOrzWN/fGjqO/Ot4tt0z1en4gNoj9ruW0/M
+         0iTbBYYITjkFA80PbR/O8t8UUyXx7SZWq9gfua/7u2rY53vzoGGV/hpvgI4cdJOUfxSu
+         aTfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuDZRXzGKJ57plI3/U9WSOkj4fh1jZZLFLSuGhxvu4mttujNO06VqNAX2LLufxfsLKnsF53v4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBtYTv+0FWvrgPaGV1GzH6tVaNMelpDlinJTJuA3L3i9PAFTjS
+	dJHpy0Bpj17rFJm27XnbeMqan5LerY8ZSckhT2Goh/JryGhI6ufbm9LJ
+X-Gm-Gg: AZuq6aLjATjBtXt/GzAU65KG4yrWVJxZFFZL5VFlp2EjU6aB4sWCyekHPfY+6ysN5gr
+	TPYmZnUBn53mez0FJgvuxRfcepuESNGaB6UjZquvnsDiNXth+z1HE9FNYCoR48NmQGaKNwCsp/y
+	SLk0/roG61EOemko+I8rsePCJFSoIGiwNhjIKYitRR+5tUOMeaR1s1S4m/G0SB0wg5j5YLgRR4l
+	GeAWPFSNbGyL6qSptOCkEkHAnV1qbTBSZuuSwSNR6nGmsPC/EkVOjqTK+BLscX996P1RWH0OiIi
+	q0qDtDByPSirIfq6brt6d99tt0joOTUI6tsCzoKAwvGYv0BmjiBTXcENFMcbeu6OLsnUYeIFxSm
+	IdGEzz986KlnsNVyOT+IiMmxtpGHmMTVBB4+Ad4oq7nQUt4s1OuVkPja3frHuqXsY4rzME+ZiuX
+	e6y62GQsU1Ip25j1k8g72KjhXHkp+dEocgSRE=
+X-Received: by 2002:a05:6000:1865:b0:435:b020:30ab with SMTP id ffacd0b85a97d-435dd030439mr1215295f8f.15.1769500212866;
+        Mon, 26 Jan 2026 23:50:12 -0800 (PST)
+Received: from [10.221.205.245] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1e717cbsm36432550f8f.24.2026.01.26.23.50.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jan 2026 23:50:12 -0800 (PST)
+Message-ID: <3b58208d-c2a3-4623-8fc8-e1ad2b71d2f7@gmail.com>
+Date: Tue, 27 Jan 2026 09:50:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net/mlx5e: Remove redundant UDP length
+ adjustment with GSO_PARTIAL
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org
+Cc: Igor Russkikh <irusskikh@marvell.com>, Boris Pismenny
+ <borisp@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, David Ahern <dsahern@kernel.org>,
+ Simon Horman <horms@kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
+ linux-rdma@vger.kernel.org, Dragos Tatulea <dtatulea@nvidia.com>
+References: <20260125121649.778086-1-gal@nvidia.com>
+ <20260125121649.778086-3-gal@nvidia.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260125121649.778086-3-gal@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[purelymail.com:s=purelymail1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253742-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[korsgaard.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux.intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nucleusys.com,shawell.net,microchip.com,fintech.ru,suse.com,piap.pl,gmail.com,pengutronix.de,online.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peter@korsgaard.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253743-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[purelymail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,korsgaard.com:email]
-X-Rspamd-Queue-Id: 05A9D90D02
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A684590D75
 X-Rspamd-Action: no action
 
->>>>> "Ethan" == Ethan Nelson-Moore <enelsonmoore@gmail.com> writes:
 
- > Many USB network drivers define get_drvinfo functions which add no
- > value over usbnet_get_drvinfo, only setting the driver name and
- > version. usbnet_get_drvinfo automatically sets the driver name, and
- > separate driver versions are now frowned upon in the kernel. Remove all
- > driver versions and replace these get_drvinfo functions with references
- > to usbnet_get_drvinfo where possible. Where that is not possible,
- > remove unnecessary code to set the driver name. Also remove two
- > unnecessary initializations from aqc111_get_drvinfo, an inaccurate
- > comment in pegasus.c, and an unused macro in catc.c.
 
- > Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
- > Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
- > ---
- > Changes in v3:
- > Add changelog
- > Add received Reviewed-by tag
+On 25/01/2026 14:16, Gal Pressman wrote:
+> GSO_PARTIAL now takes care of updating the UDP header length,
+> mlx5e_udp_gso_handle_tx_skb() is redundant, remove it.
+> 
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
+>   .../mellanox/mlx5/core/en_accel/en_accel.h      | 17 -----------------
+>   1 file changed, 17 deletions(-)
+> 
 
- > Changes in v2:
- > Also remove driver versions from smsc[79]5xx (missed in the original
- > patch because they had a version definition but didn't use it in
- > get_drvinfo)
-
-Reviewed-by: Peter Korsgaard <peter@korsgaard.com> (for dm9601.c)
-
--- 
-Bye, Peter Korsgaard
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
