@@ -1,151 +1,127 @@
-Return-Path: <netdev+bounces-253954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uM2CF9TzeGnKuAEAu9opvQ
-	(envelope-from <netdev+bounces-253954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:20:20 +0100
+	id SL43DRb4eGnYuAEAu9opvQ
+	(envelope-from <netdev+bounces-253955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:38:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A596E985F1
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:20:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A07919887A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01D4A3009B0D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:20:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9A7CF300CFD4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E5028C874;
-	Tue, 27 Jan 2026 17:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C3630CDAF;
+	Tue, 27 Jan 2026 17:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCuuFT7E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgXLaWun"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB8972612;
-	Tue, 27 Jan 2026 17:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81FE30BF69;
+	Tue, 27 Jan 2026 17:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769534415; cv=none; b=QQZj5T8QJrNP4vkjMXwkDzW7zxsz8qgbtY2YpAnSJhiqqlRpqg9Oyg5NpOeKJ4nOD1Qzz4vtCS63BFZUZAGJRRmAcRBqfBa5Bssy6h/MnSBUYBxarD7m9MIF2wVeiRXgSVzkNh/E4eKgheekqkTm6SubFPewAQ4IgMeLVyxUdTU=
+	t=1769535505; cv=none; b=gO7xRTXK/Y1INi5gG+KieDySf2mEjw+q7y/u2A+C9487IZyTNQLEjVXj/OQzolCxzoNEbgo1kFAHJstwex1H3uGGSA0eWcPju+cPqSlSaTK7wdkW8hSA4HsgujfGit8I7sppcpF1ans4X5awG38aaPlENCZ+Fui4J7cTnL6KUdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769534415; c=relaxed/simple;
-	bh=xEWpUH0GpFu3Wi9qJlzazmweNqVVJJNm17C9pi8TVfQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=l/uFiG6lUZLzRqqGUxLVGUvxnOd9y4UtE+PicdrTRDNUbLHCYav+LOT+ZgYmzO5G5OnO40YoXxt/6BSCNiiVvb9UR2FLUF2h3z5Alca6gR1Rb8P5jgsm/1730X6D2pqbUp3mRoTlsoVWU0tGJGtfduKbfUlYwf5CVaealJHVy+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCuuFT7E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FE4AC116C6;
-	Tue, 27 Jan 2026 17:20:15 +0000 (UTC)
+	s=arc-20240116; t=1769535505; c=relaxed/simple;
+	bh=1sORWrip5h6GNkhsP9WIl4kdoR8RvObly6DZBUxgvTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iCxXYc5/1Dn5B9uXDfverQ4S6dIQ0kOm1dL+lc0x3BL2vU+T/BEGxgdgD3YEA/p7FrnrCLRcJ4MIWdRQ7vEio8fEPneu6TJBQ8Y3QaA1L/zX55IK64Tb8CUHzGzuxhILUCtE9MkEVoRQg60e99PYIvHPfC6WCfGuJpz2d8URQEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgXLaWun; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933A8C116C6;
+	Tue, 27 Jan 2026 17:38:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769534415;
-	bh=xEWpUH0GpFu3Wi9qJlzazmweNqVVJJNm17C9pi8TVfQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YCuuFT7EgCzIVS+i2WYktxKB2uZWZHPMT1q1wJ3HB32Ojc/wBLH1iHzSWKsDx1ehS
-	 gw1Mu0P6lbJXIWL9Q9hBQ68MBY/XjPKYgtclMgsiIvVnso9tvF5DmlfvgDB7NdGyFK
-	 j6AWW23g64GQR7GZsloBUDgXBPM5zzecWllA6+3cVy04kD0VG1w+ie91aXPoz4Gtpa
-	 moMzSs0APuPQZco90Xgp9J5cB9nxzxAT1AvSwbXZLa7qAeeUV/9fkjO5eS74FQLwxK
-	 Kw7K4XifJ/srjSCD8Kf54F7sTHYAAh7XKTyHK2VD29kNCz3zPGVza198x8tIdkYZ0C
-	 5YG28mAdm6mtA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4EC8C380AA58;
-	Tue, 27 Jan 2026 17:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1769535505;
+	bh=1sORWrip5h6GNkhsP9WIl4kdoR8RvObly6DZBUxgvTk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZgXLaWun9sMrq5KJ0SaGzj5XTqZK0BSObFq1hUCfnmNHC/cXT/wsoueX43VMXECMt
+	 ODvvxFIGdS3TcYix6deKoFmT1jJgAFWjHRG1MRss0+HeUvhtYFtHXMqYBbZS+Jy3ZM
+	 lf7KIFTn0WvKF7gr5uUvjICUyS9nVfW3mr0cX6rOGj3eCdnhBIQYtjHO2iao7jRNVp
+	 Ln30/m6R/6lpLJJe/aGx36zklndO9Ss4RwXiXLS/WvoWvvDCopHaC1ho/3el4oIqyK
+	 WAxoAX7VCNHNfsCzAgBKfhmlZT++JPWgo8bGXs0HTRk8nIkJpOq/K83U57VZT6fqjg
+	 y5OBGa4YSd/kg==
+Date: Tue, 27 Jan 2026 17:38:20 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: Re: [PATCH net 0/3] mlx5 misc fixes 2026-01-26
+Message-ID: <aXj4DJFkgUpL6ad8@horms.kernel.org>
+References: <1769411695-18820-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v9 0/3] bpf: Fix FIONREAD and copied_seq issues
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176953440910.945615.5240442156824844283.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Jan 2026 17:20:09 +0000
-References: <20260124113314.113584-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260124113314.113584-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, ncardwell@google.com, kuniyu@google.com,
- dsahern@kernel.org, andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org,
- daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
- cong.wang@bytedance.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1769411695-18820-1-git-send-email-tariqt@nvidia.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253954-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,fomichev.me,rbox.co,bytedance.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253955-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A596E985F1
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: A07919887A
 X-Rspamd-Action: no action
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
-
-On Sat, 24 Jan 2026 19:32:42 +0800 you wrote:
-> syzkaller reported a bug [1] where a socket using sockmap, after being
-> unloaded, exposed incorrect copied_seq calculation. The selftest I
-> provided can be used to reproduce the issue reported by syzkaller.
+On Mon, Jan 26, 2026 at 09:14:52AM +0200, Tariq Toukan wrote:
+> Hi,
 > 
-> TCP recvmsg seq # bug 2: copied E92C873, seq E68D125, rcvnxt E7CEB7C, fl 40
-> WARNING: CPU: 1 PID: 5997 at net/ipv4/tcp.c:2724 tcp_recvmsg_locked+0xb2f/0x2910 net/ipv4/tcp.c:2724
-> Call Trace:
->  <TASK>
->  receive_fallback_to_copy net/ipv4/tcp.c:1968 [inline]
->  tcp_zerocopy_receive+0x131a/0x2120 net/ipv4/tcp.c:2200
->  do_tcp_getsockopt+0xe28/0x26c0 net/ipv4/tcp.c:4713
->  tcp_getsockopt+0xdf/0x100 net/ipv4/tcp.c:4812
->  do_sock_getsockopt+0x34d/0x440 net/socket.c:2421
->  __sys_getsockopt+0x12f/0x260 net/socket.c:2450
->  __do_sys_getsockopt net/socket.c:2457 [inline]
->  __se_sys_getsockopt net/socket.c:2454 [inline]
->  __x64_sys_getsockopt+0xbd/0x160 net/socket.c:2454
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> This patchset provides misc bug fixes from the team to the mlx5 core and
+> Eth drivers.
 > 
-> [...]
+> Thanks,
+> Tariq.
+> 
+> 
+> Gal Pressman (1):
+>   net/mlx5e: Account for netdev stats in ndo_get_stats64
+> 
+> Mark Bloch (1):
+>   net/mlx5e: TC, delete flows only for existing peers
+> 
+> Shay Drory (1):
+>   net/mlx5: Fix Unbinding uplink-netdev in switchdev mode
 
-Here is the summary with links:
-  - [bpf-next,v9,1/3] bpf, sockmap: Fix incorrect copied_seq calculation
-    https://git.kernel.org/bpf/bpf-next/c/b40cc5adaa80
-  - [bpf-next,v9,2/3] bpf, sockmap: Fix FIONREAD for sockmap
-    https://git.kernel.org/bpf/bpf-next/c/929e30f93125
-  - [bpf-next,v9,3/3] bpf, selftest: Add tests for FIONREAD and copied_seq
-    https://git.kernel.org/bpf/bpf-next/c/17e2ce02bf56
+Thanks,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+For the series:
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
