@@ -1,68 +1,63 @@
-Return-Path: <netdev+bounces-253645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDh4GNsReGn7ngEAu9opvQ
-	(envelope-from <netdev+bounces-253645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:16:11 +0100
+	id D0HWCooSeGkYnwEAu9opvQ
+	(envelope-from <netdev+bounces-253646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE24D8EA49
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:16:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB458EA5C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 714643013A91
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:16:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3B9D3301FC89
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0313619D07E;
-	Tue, 27 Jan 2026 01:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FB1238D22;
+	Tue, 27 Jan 2026 01:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dmxrjDsL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYs67asI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FD718E1F
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEB8199E94;
+	Tue, 27 Jan 2026 01:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769476568; cv=none; b=ouwDU7BHRm1HK10h8CCZQ+RXP/66AwNIVVn4K1yTX1pvPusu9IgBxdoARMUTXOVRMrH06u080Z1Hw28H+uP9qnkuG16AIJHjBKzAImXgxejsU1GXRwBLq8l+FBtRDdwpFcJf20S+f055YtqjTXQj8ho3Alj9Hr2rtLWtkekIXJs=
+	t=1769476741; cv=none; b=O59XD/OFDsN8lEIxKgko7aAsfNTnU8y94NfZLm1mbHEy5ieU0YRb1X90oyM5uGux99ApbLx80Vzl50cVld5689SR5z5HZNzUr8xOs3NlmbwEgHJMbvNnFmZPTomT8MpmY6/FHmyWFiurtpO7FQr+pH78h72dRCOZiWPGxi8GN7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769476568; c=relaxed/simple;
-	bh=PWUrFDaZymwHGwAF/jInaMszPNXRgniP+HW2yijeOLU=;
+	s=arc-20240116; t=1769476741; c=relaxed/simple;
+	bh=I7zlTeswa8SHh4ArIiC4MzQa3xWyYpORcMwR8zCd7/s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VpW0AU6I9i/JNeMhMgJkeX3B8pSGUfdAcxwDMiPwAsIIhEnyVtj/OlGm+IYY15JTRnhPgWMdHYUe1rulavwcQo4dzkO/2lNmtxVis2sNFsAAQeQUFys2CHfRt40NAJ8Xeuj4x2Z4fQA8n06n/VGZ6VAZxa3LaCL67Rxk+D4uKbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dmxrjDsL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8FBBC116C6;
-	Tue, 27 Jan 2026 01:16:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TBsdoFJAVJWa4549k4+X0EIEc2TaRrZ4ZtgHosBcN87WrvvgYvVtk5MAwFFmYjhqBC7oyYNYrqUZsgh+ZujyzN0hh21HI4LhTxpyNn/Z3nL0t+CEhZKCsDyHTJW3u7flIlG82mtBExl1hbtikH8sE+hy8FF1EJWEXyufHDuBW3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYs67asI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 684B9C116C6;
+	Tue, 27 Jan 2026 01:19:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769476568;
-	bh=PWUrFDaZymwHGwAF/jInaMszPNXRgniP+HW2yijeOLU=;
+	s=k20201202; t=1769476741;
+	bh=I7zlTeswa8SHh4ArIiC4MzQa3xWyYpORcMwR8zCd7/s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dmxrjDsL4BXwTxbaXPruNdQTZilZ/Es6cUwSrTDI19LNLLlOVul/Eg/QnBdhGLH0V
-	 1Y/GOeFtRavJcbwq3NjPxWKjX/zIteq4DJdVmSwFyw16zeyoGGO3WchvvWOWVHJTIt
-	 clBGn5qiuEfaQzlx0itO79PSMDK0dHYIHcKUb99YwyQ6kKIKZ+t+E10aDKxoPVBUiF
-	 WCGimFuhpZyqOdeiEEJurPrVRvuycnoiaw3KCN2VI0CMFFUSgGTCQjOObWQq5GZ5sn
-	 MFYSdTzI6xhw5iR34dRNtCiAKypxeHHLd5tpbgRHvVj3diZJOlj+QpTTlk1/fD1VgI
-	 Kvwol6/iDxGoQ==
-Date: Mon, 26 Jan 2026 17:16:06 -0800
+	b=pYs67asI5GUDMhYypY4QZlVkelpALPLOGilgr+6yX4s+uvYCxvJYZvetMRla+Q4mc
+	 eFSCUUBUr9gL0G6K/5h06NrxGcPFekctSke3y3SdDlAq7nAjP2WDlPOZVdr3OME47s
+	 /PE1rXKHtAxmP/8NC/G50T7kvRJazL39jR+zvWoXtfMzGWbVmxgWA2bZNuny6HDJh4
+	 Vtj+7R9CsP4h488uYwyAl9wKnMQLtzqF12i8n56voZ+/Q3MuMjGV5lCiZN1imPbpOb
+	 hTT8eHf0q7q3MC1QhV1Lcn6lA5C/BzsdCHV+Aq//TSVv82MPJZwiJjWeXpuGc7lTCK
+	 +3aWCy0PgXUsw==
+Date: Mon, 26 Jan 2026 17:18:59 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Heiko
- Stuebner <heiko@sntech.de>, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, Paolo
- Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 06/22] net: stmmac: rk: add SoC specific
- ->init() method
-Message-ID: <20260126171606.6153aa1a@kernel.org>
-In-Reply-To: <aXgN2UjiI_OxWHH-@shell.armlinux.org.uk>
-References: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
-	<E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
-	<aXd7aSk7KIxlQd5z@shell.armlinux.org.uk>
-	<20260126165144.25055591@kernel.org>
-	<aXgN2UjiI_OxWHH-@shell.armlinux.org.uk>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, Chuck Lever <chuck.lever@oracle.com>, "Matthieu Baerts
+ (NGI0)" <matttbe@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next v2] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <20260126171859.5097dfb5@kernel.org>
+In-Reply-To: <20260126023946.906893-1-rkannoth@marvell.com>
+References: <20260126023946.906893-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,55 +72,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253645-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,resnulli.us,oracle.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BE24D8EA49
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7DB458EA5C
 X-Rspamd-Action: no action
 
-On Tue, 27 Jan 2026 00:59:05 +0000 Russell King (Oracle) wrote:
-> > > and there's no way to find out for about 9 hours (more like 19 hours
-> > > for me because of the timezone) as the AI reviews are not accessible
-> > > until then.  
-> > 
-> > The patchwork checks are for maintainers. If someone wants to build
-> > a public CI for contributors that'd be great. We can even provide
-> > funds from the netdev foundation. But let us be clear that the current
-> > setup is until now maintained primarily by me for me on the weekends.
-> > Unless you make an effort to actually help I don't think it is in good
-> > taste to complain.  
+On Mon, 26 Jan 2026 08:09:44 +0530 Ratheesh Kannoth wrote:
+> Devlink param value attribute is not defined since devlink is handling
+> the value validating and parsing internally, this allows us to implement
+> multi attribute values without breaking any policies.
 > 
-> This sounds like my contributions to netdev aren't valued, and if that's
-> the case, I will stop.
+> Devlink param multi-attribute values are considered to be dynamically
+> sized arrays of u32 values, by introducing a new devlink param type
+> DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
+> count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
+> 
+> Implement get/set parsing and add to the internal value structure passed
+> to drivers.
+> 
+> This is useful for devices that need to configure a list of values for
+> a specific configuration.
 
-Quite the opposite, what I'm saying is that your complaints make me
-feel like the weekends spent on trying to make this project come out 
-of stone age testing-wise are not appreciated. Of course your
-contributions are appreciated.
-
-The AI code reviews on existing buggy code are indeed very painful.
-Not sure what we can do here to make the contributing easier.
-It costs us around $2 now to review a single patch so we can't afford
-public access. I think Google is working on making Gemini code reviews
-public and free, hopefully that materializes.
+Could you respin this as a series with the first driver implementing
+a param of this type?  We can't merge an API without a user.
+-- 
+pw-bot: cr
 
