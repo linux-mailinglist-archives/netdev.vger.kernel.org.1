@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-253827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253830-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4L7aK/iieGmGrgEAu9opvQ
-	(envelope-from <netdev+bounces-253827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:35:20 +0100
+	id KPKXKi+jeGmGrgEAu9opvQ
+	(envelope-from <netdev+bounces-253830-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:36:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FC493A76
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:35:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5B693ABC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60EFA3014408
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:35:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75C9F3046B80
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95985347BDC;
-	Tue, 27 Jan 2026 11:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0016D34AAEB;
+	Tue, 27 Jan 2026 11:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="PQ2bAgZq"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="eXEeqGAQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5152EE5FC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC58F346E5F;
 	Tue, 27 Jan 2026 11:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769513709; cv=none; b=i+RJLSbdyBQLYPBXr4c+dZejGb55AvYSSq7i0vJ+2f18mbYGqeoUBbJFNZK7HttZHwmsitqYUikpQUMw0mw/QmncGWt8ZJP4B/YEGaTM6ZNff3NtcZ/8xEgCejSnu8r3WJ4atQm8h9Lc1yr8GHyrsd8AD9NKBCWjVYqLnTyy5G0=
+	t=1769513710; cv=none; b=gGQSbE3UVvk6RVvd5vYImKg/B+Wc/v9rNAjo9S9IPtRcs0UFoD7K586nTroGJ0rtQkWAHX1MkrAj1gW1Y4DX7HvrEPaKBHQbBRaVZ38/GelpXxo2un2cABEC10XXNp5DbsEmytLKLCu7dtS9SIYKnvInCDIFGBRECzQUbMKgVxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769513709; c=relaxed/simple;
-	bh=TcxQG3Uk1qVoNLXSi42PKRy+0aSvGUu1h4ix3ulP84g=;
+	s=arc-20240116; t=1769513710; c=relaxed/simple;
+	bh=GVspYd10DxPhbhP46uvJwpu59C//6wmJDjpQq5xM1xo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TXnsEB35R+/QvZsEndAycXWxtMlzxGnYamxJjI4100Uhoa9EH/ZLsKCtNKfRfwHrToaaPSQ8VAUIYFoXzpfF9UrzxzjGPjSEddOZ2PjBYq6Cg+es7LRMsv2Z0uKPm9hNHnF99sz8Mvh5u5At6MgDDcpv/OKb/UpPP33LaoBO39o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=PQ2bAgZq; arc=none smtp.client-ip=211.75.126.72
+	 MIME-Version:Content-Type; b=JtmIiTQfPOMxnQqICM0l6YW2vxnroj+prAjrYJsuNg0ghyfoH5zvfFIMQZVtZAoKmV+KncGveOb0uw7z3waA9qPxEKp18JtFveVrSKG9a2zmcj4ZIP9rxk8vsj1rzjH9Jrueeb+kVThNwv169UG4ctq0TrzjKNCXMpgRPCPGIp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=eXEeqGAQ; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60RBYRVE02868626, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60RBYSS602868731, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1769513668;
-	bh=HPkFL8AOlRYLXUCPkupQ62Marl/S2MmVMmJBQIb0WxU=;
+	s=dkim; t=1769513669;
+	bh=Vo0aMRzYf1jl6v9fuoTunTjRKBFOkKzeqCas/adOSu4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=PQ2bAgZqJIjjm96by8M72FMuQENLb6iY5i5Upj8ISZZrDo1Yu0Xol6/esRgj6kW18
-	 x2dbx7O3pB9upphp5ZKbdCwmP+SipRmuZ4R/U0r17z2dsq9C0e6V/P8h7fiX3PkGWU
-	 wlpU0ilARvNNxQMDpL5Pvd52VMVQ6uJ9MbEPPvs6kj4f4Q0TCY8ecYWKquhKpUPSNT
-	 VC6O1VwXWoNiWtZVpK/9MboMuV023PLwBlXyYt1IAPriZD4JF6kAFV5WuIoQRQQYLm
-	 shSM+Hr+SyGhOv2tfpprHJ2NWVwnGAnsLc0JjiTWYl4KkdOt8K5VPxr4SIht+o8L3I
-	 MvuJfAEKGtZnw==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60RBYRVE02868626
+	b=eXEeqGAQCEzDe0UwSKkL4ygsLYryyEr+yR6Ajd4Nnk74nWexCvAltMCQXCdz5cAOx
+	 QM+Ge1F+4P7r7yhD0G5GIwM9N37HPQ2zZeGQxRefqftKIPjbE4udi2nHWSBlgu84Gk
+	 PqW3S7+ABIkPS/70OmQKG2+K0K2N0SLHJf8T+hHOK0OV6lMF96a59dXJ6zRkJeKoQM
+	 GJs3oae8HjPOI5F8VAmtbeoswVgfumxSIO8FPHtCuHkgI8qxEFuT7tcxsM+NdM0Uhd
+	 /3y4CEX3RT7LEccRAKFeyLS15vhHStWe6Um9ADvPXMyJDl4uPaac+hPcjAPQX2OzBH
+	 ASu0A75mySUKg==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60RBYSS602868731
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 27 Jan 2026 19:34:28 +0800
+	Tue, 27 Jan 2026 19:34:29 +0800
 Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Tue, 27 Jan 2026 19:34:27 +0800
+ 15.2.1748.39; Tue, 27 Jan 2026 19:34:28 +0800
 Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
  (172.29.17.101) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Tue, 27 Jan 2026 19:34:27 +0800
+ Transport; Tue, 27 Jan 2026 19:34:28 +0800
 From: javen <javen_xu@realsil.com.cn>
 To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
         <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -64,9 +64,9 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v1 2/3] r816e: Add a Makefile in the r816e folder
-Date: Tue, 27 Jan 2026 19:34:24 +0800
-Message-ID: <20260127113425.1989-3-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v1 3/3] realtek: Update Makefile and Kconfig
+Date: Tue, 27 Jan 2026 19:34:25 +0800
+Message-ID: <20260127113425.1989-4-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260127113425.1989-1-javen_xu@realsil.com.cn>
 References: <20260127113425.1989-1-javen_xu@realsil.com.cn>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -94,9 +94,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-253827-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253830-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
@@ -106,34 +106,46 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 43FC493A76
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4C5B693ABC
 X-Rspamd-Action: no action
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-Add a Makefile in the r816e folder to build r816e driver.
+This patch adds the R816E entry in the Kconfig and adds the CONFIG_R816E
+entry in the Makefile.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
- drivers/net/ethernet/realtek/r816e/Makefile | 8 ++++++++
- 1 file changed, 8 insertions(+)
- create mode 100644 drivers/net/ethernet/realtek/r816e/Makefile
+ drivers/net/ethernet/realtek/Kconfig  | 7 +++++++
+ drivers/net/ethernet/realtek/Makefile | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r816e/Makefile b/drivers/net/ethernet/realtek/r816e/Makefile
-new file mode 100644
-index 000000000000..0f028c7ce7bf
---- /dev/null
-+++ b/drivers/net/ethernet/realtek/r816e/Makefile
-@@ -0,0 +1,8 @@
-+# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+# Copyright(c) 2026 Realtek Semiconductor Corp. All rights reserved.
+diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
+index 9b0f4f9631db..f2d7edaf299d 100644
+--- a/drivers/net/ethernet/realtek/Kconfig
++++ b/drivers/net/ethernet/realtek/Kconfig
+@@ -126,4 +126,11 @@ config RTASE
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called rtase. This is recommended.
+ 
++config R816E
++	tristate "Realtek RTL8116AF power management support"
++	depends on PCI
++	help
++	  Say Y here and it will be complied to ensure the device enters correct
++	  power state if you have Realtek PCIe nic RTL8116AF.
 +
-+#
-+# Makefile for the Realtek R816E power management driver
-+#
-+
-+obj-$(CONFIG_R816E) += r816e.o
+ endif # NET_VENDOR_REALTEK
+diff --git a/drivers/net/ethernet/realtek/Makefile b/drivers/net/ethernet/realtek/Makefile
+index 12a9c399f40c..c027667df74f 100644
+--- a/drivers/net/ethernet/realtek/Makefile
++++ b/drivers/net/ethernet/realtek/Makefile
+@@ -9,3 +9,4 @@ r8169-y += r8169_main.o r8169_firmware.o r8169_phy_config.o
+ r8169-$(CONFIG_R8169_LEDS) += r8169_leds.o
+ obj-$(CONFIG_R8169) += r8169.o
+ obj-$(CONFIG_RTASE) += rtase/
++obj-$(CONFIG_R816E) += r816e/
 -- 
 2.43.0
 
