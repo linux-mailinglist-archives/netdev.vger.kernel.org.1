@@ -1,211 +1,222 @@
-Return-Path: <netdev+bounces-253833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253834-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAVUOs6oeGl9rwEAu9opvQ
-	(envelope-from <netdev+bounces-253833-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:00:14 +0100
+	id ICvTBFCqeGl9rwEAu9opvQ
+	(envelope-from <netdev+bounces-253834-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:06:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA5093F26
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:00:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9329F9402C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7C79F3004D24
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:00:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF4CA301AA85
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDE430EF90;
-	Tue, 27 Jan 2026 12:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121A731062C;
+	Tue, 27 Jan 2026 12:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kB8SrFBV"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SFCOd1M4";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="EiRfrtl5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585642D6E5A;
-	Tue, 27 Jan 2026 12:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1152BDC0C
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769515211; cv=none; b=s++F8N5ebYvi0J1cfWeRPxEO1oYK+3SHIw4Kd86zfvWDNJKiCwl0Pk2S8zps8hE2B48VvPWK/cxDhJ70/IJs+jrzgTNMkw6i5b/cj1MqRXjt/KPw1Nfji90r+SQ6fNEWQFpKfr7if2UzdDdyipj1SbTms1brtR2QoITUZ1sMffI=
+	t=1769515583; cv=none; b=gU8aFE1d5wB37+ty5uDZxKexidoB6l7GLEwe9A9amjProNnDwm8WhurB7CqqORjcq+BxFBI/8K22mW6WvBzSo7EsaYfp+YB53UJNYQ8F/UbPkEJZq7TLFu0YIjR/+b7d6x3ekzHOO/btqSGscmaTF2WXp5hM4cJvCd1vWo6SvfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769515211; c=relaxed/simple;
-	bh=SeLALWDOP83Jw3okDSyIifVylWpRx8J9njxbkkPruig=;
+	s=arc-20240116; t=1769515583; c=relaxed/simple;
+	bh=HcPqe8fhDNEKoQCDbQZQovvUA+6ZWNZxYiaDEP1JdGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZpeHNhW6RWvudHoBGxxJv2U2G6gFupBeFy3PPOXg+XT6+uDWdVAvhTQrQsQAON5un0kmYjHiK4SlYQ2awqVTTJIY2T4V4MtUn4rNpaLFRt60kSBjgLfNl0pn1D/E4PLE+mEHcXixq7hkaZnl33N3gtoEJyvy88ccoviUui98YAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kB8SrFBV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B45DC116C6;
-	Tue, 27 Jan 2026 12:00:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769515210;
-	bh=SeLALWDOP83Jw3okDSyIifVylWpRx8J9njxbkkPruig=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kB8SrFBVdLcDp1yO21dPiiLLQ4Jr5Ybfy6tLGM2XI/gK2CYW8fjNWg9Du6y4EWrjE
-	 3NIgAi2RQ6740vmp1QbiFheUnoRLQGoFNgH52Lg6XSHChxpK8T7FqMepfIUO4WsCym
-	 Xvjaq10fo61gyKaupdnylv2TwW/DKprmwbQbf3U3ghAFss4pj+jFTW8U4E/VF50nHi
-	 5PLaWITS4KnXj324Q22UeEUdk1gSpbbX79StZrHPYLa3IwTrN4wPGo4IQad7iCra3C
-	 sOUIXlEgIx0dE4oHDzLwm8fI1j/qbjFBhkNfXWvlYzCB5/3iCGFzJ36oQy4KqWTndo
-	 XcLRFyHCiWGyQ==
-Date: Tue, 27 Jan 2026 14:00:04 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Liu Jian <liujian56@huawei.com>, dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
- smc_ib_is_sg_need_sync()
-Message-ID: <20260127120004.GT13967@unreal>
-References: <20250828124117.2622624-1-liujian56@huawei.com>
- <20250909094532.GD341237@unreal>
- <20260126044501.GA18724@j66a10360.sqa.eu95>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oul1wIwKM/wNVw3sP0W1k9Cq/WfbsdjpbGbgXP3qHtDdgu1z6ejYIIxAcTeaug+Sw1eUWg1jNhz4AQt6rGhd7vsqtFkbBfNP0zQr4Pqvfn5ML0BDjVi3Pu40QhpaM64UfL/Rn0YcZftavyH9I9I7+D6cEVorLv0i21uIJrmXdWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SFCOd1M4; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EiRfrtl5; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60R87A06621762
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:06:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=oJmDDECkW3iXsL3g4I3qEOxh
+	a59jVBDs+hiTdIwu23k=; b=SFCOd1M44pt3IzqJIWZy8H8I/QoiF7NXN0rgT0ia
+	B19mlTG+dl4OUrVUz+NXmZkqvKzSH2Fy3/oQD+kZqHrZnwT/VkWrDinTkbzmE9N4
+	YN/6CH3qZXc7sLY6wDnxZMMpwUbpoQOXpE0OJJ0mQIgoYkVavb9Ro6QrJhqTa8/f
+	BtArQZVv9m3PyvBX9f7eu7HNoyjTIkDkjvxpexz8b61aHAmo2eufC1MIrq9/1mDB
+	+fR1BvhXvb/Q2Q6Sa1IKodpPpKIjNik88CcAuBXTSBkKa+zINxdheG7EgkxMWIGo
+	Yvlttka2K2gQdZXxgdXi/wn6Lf75pJ+xV3BjyoVHuJNj4Q==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxsjegr2h-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:06:19 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-352e1a8603bso5769936a91.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 04:06:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1769515579; x=1770120379; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oJmDDECkW3iXsL3g4I3qEOxha59jVBDs+hiTdIwu23k=;
+        b=EiRfrtl5Ml6gcLACJdshtgLW1MLG8jQ1apBosL3LgX6RF/aP2dbqh1khyxktz8Gmfa
+         M0qXTUYl5JPoO4iOrQ+owa++e+YLm9OVmBgqMWXmxI8CouH7bE1PYgExcek0WCGWNNJ2
+         VWUULeyB9eRQKJ8kD70yNIVen6XFdB/h1fssjshAOfGp1vjne4bkQc2he+//hl2oRJsm
+         xOKHaQi2AMkdEpcMiZTSzZDpBYuMH6xoNlJGYN2nIi0vmtxibeyDAvY0EgYc/mmeIPOT
+         ea43QmXFLpFcC4BhSp1W4j0RNgOPP1SJoZmmesK1E1psJaJJHDES/bjzlVX+T1UeG509
+         IZAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769515579; x=1770120379;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oJmDDECkW3iXsL3g4I3qEOxha59jVBDs+hiTdIwu23k=;
+        b=BCUDDTlXp6jVdOHqDfU5pRE8qocL/77E95oxVZAY7nc5gJBNSI1N1h9z9TKoaeUPjo
+         hNdEvDLCSewNi+grJPuKO25J2l8+BuSmj7L0yWZwSFPsUiR7+LlpKpXYaG9B6xIyhSnO
+         DCY6G0q9mz+udWN/v0Dd7LvTNuA9+wlXBnLbRbgFCGXrhmJnB8dBORLCeTmb13PR3j2Z
+         QtQRhDIdyDP0lK1m8H6N3IOFnCmVAlZ1CVpxLZc9vRYS2c8UuNwN0ALGHYvTMSi5ky8u
+         B6RvXvaXlh6/drI/7GO5dWazjGZ444ygl7PKJOSV/R9PG/OfokTJXZoVmu/HaO05Zjgh
+         PKfA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1jZAZKc9Jx/Cf2Xdwnlfmm12g3i74Zn7zGoyikE3n9gTB0IrFNHWVkiqpzeyMGItx2TLQV/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE27/tJf00jCxZLS+uUfsEJ5448K1Mr0UQhU5xWdvixmcjZo1m
+	jRUZlWbIt8PLbFJgMse5wd8inK6y3DZSmPxs23npLv/9pt4g9DIvSXTCMYflnP3hkuTExxUq8tf
+	aQsktkMBl2cRdFeWkjq2osAEqvc/0gH270IHdYw7AvZdZNn6jsWapruxZSGY=
+X-Gm-Gg: AZuq6aK0uVaqPvYFk1Jm9aXCdl/i5smo78asUJHprf/h3hs/MVRrFXHuKv8GEQD1CIO
+	nverF5DlwarHIXXlZdufs3eLZxBswEsHikjAyyVtpoLs+qabZRSJ8DHhXYtkJiB9v/HatDRqu+N
+	O4w8GMH7yswC3o19abJ5oP7BBBJtzQSgENhKGWKMLHmmo+A7M0lKcONB8dH1GtqBO5yBDLtXrRg
+	Z7i2VjaZtZMSN+loRdb2U4bbn5VG98ga3cDbeANkWTwphoqEqbwPHUYxxZ8r+n3xx8jSrpfFr0l
+	/mwLk7hY+7b9vgAoXG7h3Om5oWU+2eHhYpUKBz3PX2ncrNbXGho6K8MXavWlvTkMPHqrZu4rGHa
+	fYaY4INEexjMTdoLnrjm4LK4=
+X-Received: by 2002:a17:90b:2dc9:b0:341:6164:c27d with SMTP id 98e67ed59e1d1-353fecc66admr1463650a91.3.1769515578703;
+        Tue, 27 Jan 2026 04:06:18 -0800 (PST)
+X-Received: by 2002:a17:90b:2dc9:b0:341:6164:c27d with SMTP id 98e67ed59e1d1-353fecc66admr1463627a91.3.1769515578192;
+        Tue, 27 Jan 2026 04:06:18 -0800 (PST)
+Received: from oss.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353f61292bdsm2411832a91.6.2026.01.27.04.06.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jan 2026 04:06:17 -0800 (PST)
+Date: Tue, 27 Jan 2026 17:36:11 +0530
+From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-phy@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next v2 01/14] net: stmmac: qcom-ethqos: remove
+ mac_base
+Message-ID: <aXiqM+rYK/QCy6DW@oss.qualcomm.com>
+References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
+ <E1vjDr1-00000005fQ3-2rcn@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260126044501.GA18724@j66a10360.sqa.eu95>
+In-Reply-To: <E1vjDr1-00000005fQ3-2rcn@rmk-PC.armlinux.org.uk>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA5OCBTYWx0ZWRfX+Wu6ZekypTCm
+ KqdU2Pob5DIe/G17iIUOmbSFzoI9lV44isna5d9uvrVntRUBqGvcqjN9QOCp+Rh70BRKlQxq98R
+ XGqGmM8YnHaTRbDdDzTKtvd6f1Bw7q5kz3l2ZI7v+LrXM8FMQAwu/1WHZRCMqvvr4jt5ZXjspzr
+ I3McTFvKDxwHfSdoFgh6AW5cyAaBlfcIkX9/xXcEmJSqDCFHnJzYj/he6+P5qZfNNfCi/mIY6mr
+ zMn/LwfF1L/WI3OZCzBLlNxizwmhNxNVqxcTuAccL+PaRFAi2T5xVwqtHA3VIYE900hIA0BdfTB
+ J3IzELjb7wXgA1irrnPy1X36lqmbeQoZptCCxOip18CTqE0mMOjqg2BVlrG52wXbdt6XBpIbe2Z
+ F/BDkln1A4GM9AoSa8FdqDIAQEk2yR3zkulDUSBwoVDyAiKtLmBOV31ClRLF2GAdN+N5/hkL05U
+ kwKyNu5xK7z6x+mtG1Q==
+X-Authority-Analysis: v=2.4 cv=Qelrf8bv c=1 sm=1 tr=0 ts=6978aa3b cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=PHq6YzTAAAAA:8 a=EUspDBNiAAAA:8
+ a=2f8CEio2oMm2juszzV8A:9 a=CjuIK1q_8ugA:10 a=mQ_c8vxmzFEMiUWkPHU9:22
+ a=ZKzU8r6zoKMcqsNulkmm:22
+X-Proofpoint-ORIG-GUID: GiaMp2nUR5cUqV4r_eG7R2Xd9xadGghf
+X-Proofpoint-GUID: GiaMp2nUR5cUqV4r_eG7R2Xd9xadGghf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-27_02,2026-01-27_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 malwarescore=0 adultscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601270098
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,bootlin.com,linaro.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-253834-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253833-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3AA5093F26
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 9329F9402C
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 12:45:01PM +0800, D. Wythe wrote:
-> On Tue, Sep 09, 2025 at 12:45:32PM +0300, Leon Romanovsky wrote:
-> > On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
-> > > BUG: kernel NULL pointer dereference, address: 00000000000002ec
-> > > PGD 0 P4D 0
-> > > Oops: Oops: 0000 [#1] SMP PTI
-> > > CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
-> > > Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-> > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> > > Workqueue: smc_hs_wq smc_listen_work [smc]
-> > > RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
-> > > ...
-> > > Call Trace:
-> > >  <TASK>
-> > >  smcr_buf_map_link+0x211/0x2a0 [smc]
-> > >  __smc_buf_create+0x522/0x970 [smc]
-> > >  smc_buf_create+0x3a/0x110 [smc]
-> > >  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
-> > >  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
-> > >  smc_listen_find_device+0x1dd/0x2b0 [smc]
-> > >  smc_listen_work+0x30f/0x580 [smc]
-> > >  process_one_work+0x18c/0x340
-> > >  worker_thread+0x242/0x360
-> > >  kthread+0xe7/0x220
-> > >  ret_from_fork+0x13a/0x160
-> > >  ret_from_fork_asm+0x1a/0x30
-> > >  </TASK>
-> > > 
-> > > If the software RoCE device is used, ibdev->dma_device is a null pointer.
-> > > As a result, the problem occurs. Null pointer detection is added to
-> > > prevent problems.
-> > > 
-> > > Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
-> > > Signed-off-by: Liu Jian <liujian56@huawei.com>
-> > > ---
-> > > v1->v2:
-> > > move the check outside of loop.
-> > >  net/smc/smc_ib.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> > > index 53828833a3f7..a42ef3f77b96 100644
-> > > --- a/net/smc/smc_ib.c
-> > > +++ b/net/smc/smc_ib.c
-> > > @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
-> > >  	unsigned int i;
-> > >  	bool ret = false;
-> > >  
-> > > +	if (!lnk->smcibdev->ibdev->dma_device)
-> > > +		return ret;
-> > 
-> > Please use ib_uses_virt_dma() function for that.
-> > 
-> > It is clearly stated in the code:
-> >   2784 struct ib_device {
-> >   2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
-> >   2786         struct device                *dma_device;     
-> > 
-> > Thanks
-> > 
-> >
+On Fri, Jan 23, 2026 at 09:53:23AM +0000, Russell King (Oracle) wrote:
+> In commit 9b443e58a896 ("net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
+> modification"), ethqos->mac_base is only written, never read. Let's
+> remove it.
 > 
-> Hi Leon,
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 ---
+>  1 file changed, 3 deletions(-)
 > 
-> Sorry for the late reply, I just noticed this and thank you for your review.
-> I agree completely with your feedback: we should not be accessing ibdev->dma_device
-> directly. Following your advice, replacing the
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> index 0826a7bd32ff..869f924f3cde 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> @@ -100,7 +100,6 @@ struct ethqos_emac_driver_data {
+>  struct qcom_ethqos {
+>  	struct platform_device *pdev;
+>  	void __iomem *rgmii_base;
+> -	void __iomem *mac_base;
+>  	int (*configure_func)(struct qcom_ethqos *ethqos, int speed);
+>  
+>  	unsigned int link_clk_rate;
+> @@ -772,8 +771,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>  		return dev_err_probe(dev, PTR_ERR(ethqos->rgmii_base),
+>  				     "Failed to map rgmii resource\n");
+>  
+> -	ethqos->mac_base = stmmac_res.addr;
+> -
+>  	data = of_device_get_match_data(dev);
+>  	ethqos->por = data->por;
+>  	ethqos->num_por = data->num_por;
+> -- 
+> 2.47.3
 > 
-> 	if (!lnk->smcibdev->ibdev->dma_device)
-> 
-> check with ib_uses_virt_dma() is straightforward and absolutely the correct
-> thing to do for that part of the logic.
-> 
-> However, this has led me to a further challenge. The main purpose of the
-> smc_ib_is_sg_need_sync() function is to get the result of dma_need_sync().
-> This means that even after correctly using ib_uses_virt_dma(), the function
-> still needs to call dma_need_sync(ibdev->dma_device, ...), which forces us
-> right back into the direct access pattern we are trying to eliminate.
 
-I would like to challenge the use of dma_need_sync() in smc_ib.c. From
-what I see, it is used to avoid calls to dma_sync_single_*_device()
-which will be NOP anyway in that case.
+Validated this patch on the QCS9100 Ride R3 board, so:
 
-Why did you copy that logic from XSK?
-
-> 
-> Since the RDMA doesn't currently offer a helper for this "check" functionality,
-> I'd like to propose adding one. What are your thoughts on a new helper like
-> the one below, which would allow us to solve this cleanly?
-> 
-> /* ib_verbs.h */
-> static inline bool ib_dma_need_sync(struct ib_device *dev, dma_addr_t dma_addr) {
-> 	return !ib_uses_virt_dma(dev) && dma_need_sync(dev->dma_device, dma_addr);
-> }
-
-If we're discussing wrappers, it's likely better to provide a wrapper around
-dma_sync_sg_for_cpu() for use in ib_dma_sync_sg_for_cpu(), rather than
-open‑coding the logic.
-
-Thanks
-
-> 
-> Best wishes,
-> D. Wythe
-> 
-> 
+Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
 
