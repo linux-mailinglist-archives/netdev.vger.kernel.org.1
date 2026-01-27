@@ -1,189 +1,167 @@
-Return-Path: <netdev+bounces-254026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBKzBvQ/eWmAwAEAu9opvQ
-	(envelope-from <netdev+bounces-254026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:45:08 +0100
+	id kM+9I8BBeWmAwAEAu9opvQ
+	(envelope-from <netdev+bounces-254029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:52:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EAD9B32D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:45:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049459B401
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9FDAA300C0E2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 22:45:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F34430432EE
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 22:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26762980A8;
-	Tue, 27 Jan 2026 22:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B162EBDC0;
+	Tue, 27 Jan 2026 22:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MLSWQbC5"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UxiOGLfz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028A82E9EB9;
-	Tue, 27 Jan 2026 22:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325061D9346;
+	Tue, 27 Jan 2026 22:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769553904; cv=none; b=kvOaNLKfFRiMbBA2HffZp+mruntqYyC9uTcRzz57GogHMeQ5D8y7Ndi5j+aR/E7DVkk+jHmjkTGxlVnioMEACG2ba1Pl0dqmNQuud1Eig1LmnF3Ck/IKfdJA5LBs7cC9vKsLe6HI5N63rCDhC/oXC3wE5WWHWl9mWQsumpoJToc=
+	t=1769554326; cv=none; b=m89bOmXXDB5Uw1h7i/7MEDko4ZeRV0FmWbrUMMZcNp/FEVXFzvRMUhhaCMfk0vC8niDus6Vs3/VR5RRjFsejAQoi3vmixiXJjZZbBxQOHvuzMtdwMOCezwKTv193yqERvnZWnG2tuXG+C1uFYgINraDvxvIzf0mE5II+egTNHPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769553904; c=relaxed/simple;
-	bh=Fyfig1hlmqksh+KcRGovg5cENmEy6664DDkuXWFmK48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tshk0SD2/iEFrgRx6DMJZOti3LCbQIZg5ZEKzMJjA4HLYUmNK8zrcqnU7TcemhOcBu2lo9R4hacNRabubf/bpuZmoujA+a4H727tE8XXRqYaNLzGMF69DBb/0uMMkK7Ju3zPn3+MvrpOqBrZd6jyOjSZ5XLuhIOOd3j5dKxub9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MLSWQbC5; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769553903; x=1801089903;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Fyfig1hlmqksh+KcRGovg5cENmEy6664DDkuXWFmK48=;
-  b=MLSWQbC5U/xa0B+UwqzVvHrUiGzDTpURlRrXNxjxT+Savp4N1pXCH/4C
-   KWoc7aNXUit89d9zZJT9ErjD011C6JYOo2lIpjG+tjs9DKH3SwzwdQYua
-   0WvO+1kOKXXxnXU5tvgf+qq4EicaFghMy5O7429QDzKCZDuPKvPpiXjto
-   lLPbeILDkIvjAbxJTxJ4bOxdjW/vInmcWg2ucuGRS52OzEc5Jy8aGiV1i
-   oW6xaT3azezC5JabkYvtftHSGhSabRI89oVbZ6Zjf2jeV3wsJP2Ti2OgK
-   7hTdGIekwcGX/DqzsczqBB27fAknDQBSLBxixacAuFFOIQIhexZJtMh7H
-   w==;
-X-CSE-ConnectionGUID: xCQVy6RHQU+a/fPaJ5MdOA==
-X-CSE-MsgGUID: AuUPboCiRM6cZoIgQ92eFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="88339594"
-X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
-   d="scan'208";a="88339594"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 14:45:02 -0800
-X-CSE-ConnectionGUID: Y/YszoS9TKm0VeoYoRYcVQ==
-X-CSE-MsgGUID: Qirxfc7BS7mjeRGGm3t8Lg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
-   d="scan'208";a="208333165"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 27 Jan 2026 14:44:56 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vkrnp-00000000YzA-3ywp;
-	Tue, 27 Jan 2026 22:44:53 +0000
-Date: Wed, 28 Jan 2026 06:44:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next 10/13] net: phy: phy_link_topology: Add a helper
- to retrieve ports
-Message-ID: <202601280624.F1IZ2yHm-lkp@intel.com>
-References: <20260127134202.8208-11-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1769554326; c=relaxed/simple;
+	bh=vtxknKF/ZXq5o33bB0vF38r/1onhLX3epf6M5aavci4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JiT5PTU0sSgV7f5FQF04kN02kbu6x8QGdItBKDzw2+Y3SylrNc39Tmn1MaEjpqlXeGwCi/ypO9lHG0Yrfnz+enKl6veWmgXxn4mx98Mi+sJyhHjLUogqLo6XvydwEm4PU9uPz/bWt7XpAroaHq3feduq+I/ab2633sbdc3Kp6Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=UxiOGLfz; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
+	Content-Type; bh=Ld3ED09LEVDRnegWuYHO03LTqeQQlpZJYm4QJKr3ODk=; b=UxiOGLfzoYwL
+	3so4yELsm6G9AH6+EJ2jGg6go5knzCzX+LyLMEkISPYWL4cX14DOxBiyVpw6aGhgbkslBGq6480uh
+	YLXjUSMWmzimFk+d1L7/Vhx/m1E7G482jySzyuGAhzGOjBFKulOO+hym4aaouegusuRdX4GW8Aamk
+	yQZVaEdS2J+BilxA+zwZN9rLg38yB2HUyFoWng40XObfqFgT0DF/zRaZdRmtLTpZxUTj2jnq/ujZd
+	9MIOGQ4Con033KILQj41zVjWOJeQkzLRZltw+JFzhb5RnXqCsJq5CGVC2FV5kx0hWPkr60lOwU6mj
+	F6rnBU5e5fyVkPJCZonzLg==;
+Received: from [130.117.225.5] (helo=dev004.aci.vzint.dev)
+	by relay.virtuozzo.com with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aleksey.oladko@virtuozzo.com>)
+	id 1vkrtt-0080Sz-1z;
+	Tue, 27 Jan 2026 23:51:39 +0100
+Received: from dev004.aci.vzint.dev (localhost [127.0.0.1])
+	by dev004.aci.vzint.dev (8.16.1/8.16.1) with ESMTPS id 60RMpmDM304383
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 27 Jan 2026 22:51:48 GMT
+Received: (from root@localhost)
+	by dev004.aci.vzint.dev (8.16.1/8.16.1/Submit) id 60RMpk5N304382;
+	Tue, 27 Jan 2026 22:51:46 GMT
+From: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan <shuah@kernel.org>, Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Subject: [PATCH v2 0/5] selftests: net: fix false failures due to missing features and host interference
+Date: Tue, 27 Jan 2026 22:51:29 +0000
+Message-ID: <20260127225134.304362-1-aleksey.oladko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260127134202.8208-11-maxime.chevallier@bootlin.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	TAGGED_FROM(0.00)[bounces-254026-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254029-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[bootlin.com,davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksey.oladko@virtuozzo.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,01.org:url]
-X-Rspamd-Queue-Id: A8EAD9B32D
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:email,virtuozzo.com:dkim,virtuozzo.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ovs-dpctl.py:url]
+X-Rspamd-Queue-Id: 049459B401
 X-Rspamd-Action: no action
 
-Hi Maxime,
+Hi,
 
-kernel test robot noticed the following build warnings:
+This series addresses several issues in the networking kselftests
+that cause false-positive failures depending on the host environment,
+kernel configuration, or library versions.
 
-[auto build test WARNING on net-next/main]
+The main focus of these changes is to isolate tests from the host
+environment (using namespaces) and to ensure proper fallback or
+skipping when dependencies are missing.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-phy-phy_port-Correctly-recompute-the-port-s-linkmodes/20260127-215318
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260127134202.8208-11-maxime.chevallier%40bootlin.com
-patch subject: [PATCH net-next 10/13] net: phy: phy_link_topology: Add a helper to retrieve ports
-config: s390-randconfig-002-20260128 (https://download.01.org/0day-ci/archive/20260128/202601280624.F1IZ2yHm-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260128/202601280624.F1IZ2yHm-lkp@intel.com/reproduce)
+Summary of changes:
+1. Adds a check for cls_basic module in fib_tests. Without this
+   module, the test fails when attempting to add tc rules instead
+   of skipping.
+2. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
+   is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
+   instead of assuming the configuration was successful.
+3,4. Move reuseport and pmtu.sh tests info dedicated network namespaces.
+   This prevents failures caused by port conflicts with host processes
+   or interference from host firewall rules.
+5. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
+   test, preventing failures on systems where kernel.io_uring_disabled
+   is set.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601280624.F1IZ2yHm-lkp@intel.com/
+Signed-off-by: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
 
-All warnings (new ones prefixed by >>):
+Changes in v2:
+- Fixed a typo by adding the missing backslash in Makefile
+- Added a Fixes: tag to the appropriate commit as requested
+- Link to v1: https://lore.kernel.org/linux-kselftest/20260120230558.328423-1-aleksey.oladko@virtuozzo.com
+---
+Aleksei Oladko (3):
+  selftests: net: fib_tests: skip rp_filter test if cls_basic is
+    unavailable
+  selftests: net: make ovs-dpctl.py fail when pyroute2 is unsupported
+  selftests: net: io_uring_zerocopy: enable io_uring for the test
 
-   In file included from net/ethtool/tsinfo.c:5:
-   include/linux/phy_link_topology.h:110:1: error: return type defaults to 'int' [-Werror=implicit-int]
-    phy_link_topo_get_port(struct net_device *dev, u32 port_id)
-    ^~~~~~~~~~~~~~~~~~~~~~
-   include/linux/phy_link_topology.h:110:1: warning: no previous prototype for 'phy_link_topo_get_port' [-Wmissing-prototypes]
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from include/uapi/linux/net_tstamp.h:13,
-                    from include/linux/net_tstamp.h:6,
-                    from net/ethtool/tsinfo.c:3:
-   include/linux/phy_link_topology.h: In function 'phy_link_topo_get_port':
->> include/linux/stddef.h:8:14: warning: returning 'void *' from a function with return type 'int' makes integer from pointer without a cast [-Wint-conversion]
-    #define NULL ((void *)0)
-                 ^
-   include/linux/phy_link_topology.h:112:9: note: in expansion of macro 'NULL'
-     return NULL;
-            ^~~~
-   cc1: some warnings being treated as errors
+Konstantin Khorenko (2):
+  selftests: net: run reuseport tests in netns to avoid port conflicts
+  selftests: net: run pmtu.sh in netns to avoid host firewall
+    interference
 
-
-vim +8 include/linux/stddef.h
-
-^1da177e4c3f41 Linus Torvalds   2005-04-16  6  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  7  #undef NULL
-^1da177e4c3f41 Linus Torvalds   2005-04-16 @8  #define NULL ((void *)0)
-6e218287432472 Richard Knutsson 2006-09-30  9  
+ tools/testing/selftests/net/Makefile               | 14 +++++++++-----
+ tools/testing/selftests/net/fib_tests.sh           |  2 ++
+ .../testing/selftests/net/io_uring_zerocopy_tx.sh  |  9 +++++++++
+ .../testing/selftests/net/openvswitch/ovs-dpctl.py |  2 +-
+ tools/testing/selftests/net/pmtu_wrapper.sh        |  4 ++++
+ tools/testing/selftests/net/reuseport_bpf.sh       |  4 ++++
+ tools/testing/selftests/net/reuseport_bpf_cpu.sh   |  4 ++++
+ tools/testing/selftests/net/reuseport_bpf_numa.sh  |  4 ++++
+ tools/testing/selftests/net/reuseport_dualstack.sh |  4 ++++
+ 9 files changed, 41 insertions(+), 6 deletions(-)
+ create mode 100755 tools/testing/selftests/net/pmtu_wrapper.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_cpu.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_bpf_numa.sh
+ create mode 100755 tools/testing/selftests/net/reuseport_dualstack.sh
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
