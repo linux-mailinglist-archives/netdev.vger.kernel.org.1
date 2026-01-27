@@ -1,157 +1,135 @@
-Return-Path: <netdev+bounces-253671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253672-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFF2F70ueGl7oQEAu9opvQ
-	(envelope-from <netdev+bounces-253671-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:19:25 +0100
+	id uAegHWEveGn5ogEAu9opvQ
+	(envelope-from <netdev+bounces-253672-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:22:09 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E048F7E9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:19:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0EDB8F80E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3067C30136BD
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:17:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4060300B466
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3036D2D5C95;
-	Tue, 27 Jan 2026 03:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1572C2FE582;
+	Tue, 27 Jan 2026 03:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dFQYRZH3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0YflV8Mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C65E1D8DFB;
-	Tue, 27 Jan 2026 03:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE67029E0F6
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 03:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769483838; cv=none; b=VuGkEer9BChdzGI2TfvoYLWxs6YcpkXvo8LiBfXHnYayx6TmzIuO3ggaCWBfKZTQdqKJ599xHI3kgVktu+NLgaXJx5I9NVgnBh1pPbObfUYxbFa18L4VUpOPSNR/lVgsPYwW+C9cjG6ISj5P2P79aFDO7h5cxbvzczFX5fcFg+8=
+	t=1769484111; cv=none; b=no15Pz+Eh4Z2Bx43INLkqaBzT9pTZaVxgE9dGxqZ4RS0tqTcQgKyUWPeVi+hFvQxSL8QLuJ+6hpiS6aeTEO2LV6F0KDHq3tsz2jmJNEd7janZQ16dMfRYUxcMxlSvv3hyIZ5mRIaNfw6RbV7LpInMPqMJu5UeSVtVWHyBnXIY4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769483838; c=relaxed/simple;
-	bh=dnJcFhSRUQLJ1ApFWP2PZZv4CeRhdXayeV0WZw3iT70=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SgThKrr3x3cYRyfN4OFiNvBnkXxeBoWYse8SZ8EjNM9/32EgMg89iLlePStu6diHP4utSyIviqcc+ztVQ0XrThjuiErdJwIsnzamiQp+c5TVXqoVXKoVvS1nkCTZERZfDNoSPwyPnXMCz/6jX0Y6CI/x60UOmCREGaXGys5AUlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dFQYRZH3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49848C116C6;
-	Tue, 27 Jan 2026 03:17:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769483837;
-	bh=dnJcFhSRUQLJ1ApFWP2PZZv4CeRhdXayeV0WZw3iT70=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dFQYRZH3KpdkqeQGFxLgHD78VoOv2zl7OKVLpQn1ANHrxxo+Ab9bVxcP/vFP9cTES
-	 kbkOkI3GBCdrkTJe/9zwS5G4Dufii99CQ0ZX2osZm2OxyVZEyl5quhYjvGRXMxbOAN
-	 Jl7IzV8mciBalcV5kJNU9MHKV72Miyvu4NR8fHru2f376Tivjso1SKIHYNJCZnN26o
-	 FLNnoXqn1QAqAz3+hMlMkBudE5YkbZVTRzzqoMYbLmK+GGYvEOdwZuFrwp9CHeuk72
-	 qadio22g7FH+fqprV83nbqz7ACeJZjEWKoauZNfHR+lyV36uM8WMz7LfPgXqSoK7hL
-	 lj28jv0W1S1Wg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: gakula@marvell.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [net-next] octeontx2-pf: cn10k/cn20k: Update count_eot in NPA_LF_AURA_BATCH_FREE0
-Date: Mon, 26 Jan 2026 19:16:00 -0800
-Message-ID: <20260127031600.3841572-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260126073015.29333-1-gakula@marvell.com>
-References: <20260126073015.29333-1-gakula@marvell.com>
+	s=arc-20240116; t=1769484111; c=relaxed/simple;
+	bh=1cyN3eefRpHJG1K4/2RVq/+UE7rr/AeIvJ7yPxDcfcU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DGkQo2g6l8lJV8V+VD4ZU/5GwaIM/ezMiSf9jGuE2BH6ggHCdDzyYgsevYSjVvJvDIpPVCfgfj0LXWXaCBUxEIjKqIBUynObT4e4M17HhutVNTXya8yD5Zsiu27oXcUlKetZKnsELx/vtDpaR4zSKOnF7ZsnNeodXXzBHcnFE9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0YflV8Mz; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-89470bda22aso141497626d6.1
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:21:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769484108; x=1770088908; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HyCDOyua4bEMVA8ezAo7O1nNlJqJqpNZUZun+K8DHDQ=;
+        b=0YflV8Mzkulr9uVSczvzwTErHEsNAxl0w+tgDNu35eEl935QtZpYxWx8ZUUH7Ry6NY
+         eZTxJXyrEIEzxMsBzfiqXP56rdH9LRGIxOAuJ6BXEo+zmnbiwCBPJ3R5i7RJkJ/7AwKh
+         SyR/DLc3n+r02iRuEuW5OwVP6uvkAnzlw2nkUl2ITfNq4LYMFYyFbd4okgozMJBn5yen
+         LrJN1R4y/AdiN158/n5V4eW2a6TlS4QmZA8qiJDrO327nBmrZFTqeiYQrbK2Xa0O5a82
+         xkCafxeoveOvtfPoKOe4fy6QQQ/Tu5NCKpsM8AV1SSoayVpPW9IobshkQUnHDTzFfpQ0
+         uevw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769484108; x=1770088908;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HyCDOyua4bEMVA8ezAo7O1nNlJqJqpNZUZun+K8DHDQ=;
+        b=bmJGAYejAdg4k/ZevLo06UzuLF3nG8uJIaKbB6Sn5Ifq2m2badI0y7mAN5BbN0I61X
+         OSf+71HTZ2VeynmMKe+uM8HXAh660UJq0MFbB0Rn60QM2SS2zGzuJOXB/B4ocmOZblXg
+         2MIVlvG/xQsO/u6r78S1W3PiT0HVy97ply/vp3fFkz8Gj31q9f7jaNaY30goa+vhghmd
+         Isz6N6/ox5HdlzMWYExO9TQAEGIyftZjPK0Ox846jQhDMBOKuAGhcWyKc3685MXCTmu2
+         rBk3rR3ApvP9uvi3PpmGpkae0JUxVhXfxXJQYwiDzvIj44tZp1Lhwz6L0msGV5VLCb/O
+         T/Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3gnUJ+1pUmaCV/FjYCVg5jX+pRpLy6K+u2zy7M1a9LPWIINUhLuoWHpH1KM34XH6L7jnXRQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywk7zcQO8cSKof0Yd0RO+kxdY7ft9oRmDTMDpEtHVH2CrQAe1rL
+	utqCqfkbgjgKp7axDHu1/Scm5G0gPJjWviqZgNLbJ4X3OPFUnuFpJ16WY4lZ6hOgnB90HMOamVY
+	FSmbcsd5pg+Bjbg==
+X-Received: from qvhc11.prod.google.com ([2002:ad4:5aeb:0:b0:892:72f2:d23c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:f05:b0:894:8004:b104 with SMTP id 6a1803df08f44-894cc8fdaaamr4849656d6.44.1769484108682;
+ Mon, 26 Jan 2026 19:21:48 -0800 (PST)
+Date: Tue, 27 Jan 2026 03:21:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
+Message-ID: <20260127032147.3498272-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] tcp: make tcp_ack() faster
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253671-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253672-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url]
-X-Rspamd-Queue-Id: B7E048F7E9
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D0EDB8F80E
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+Move tcp_rack_update_reo_wnd() and tcp_rack_advance() to tcp_input.c
+to allow their (auto)inlining.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-octeontx2-pf: cn10k/cn20k: Update count_eot in NPA_LF_AURA_BATCH_FREE0
+No functional change in this series.
 
-This commit extends the count_eot calculation for CN20K devices where
-the field is 2 bits wide, while maintaining CN10K compatibility where
-only bit 0 is used.
+Eric Dumazet (3):
+  tcp: mark tcp_process_tlp_ack() as unlikely
+  tcp: move tcp_rack_update_reo_wnd() to tcp_input.c
+  tcp: move tcp_rack_advance() to tcp_input.c
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> index 8cdfc36d79d2..c6023e1ce92b 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> @@ -789,8 +789,15 @@ static inline void __cn10k_aura_freeptr(struct otx2_nic *pfvf, u64 aura,
->  	tar_addr = (__force u64)otx2_get_regaddr(pfvf, NPA_LF_AURA_BATCH_FREE0);
->  	/* LMTID is same as AURA Id */
->  	val = (lmt_info->lmt_id & 0x7FF) | BIT_ULL(63);
-> -	/* Set if [127:64] of last 128bit word has a valid pointer */
-> -	count_eot = (num_ptrs % 2) ? 0ULL : 1ULL;
-> +	/* Meaning of count_eot
-> +	 * CN10K: count_eot = 0 if the number of pointers to free is even,
-> +	 *	  count_eot = 1 if the number of pointers to free is odd.
-> +	 *
-> +	 * CN20K: count_eot represents the least significant 2 bits of the
-> +	 *	  total number of valid pointers to free.
-> +	 *        Example: if 7 pointers are freed (0b111), count_eot = 0b11.
-> +	 */
-> +	count_eot = (num_ptrs - 1) & 0x3ULL;
+ include/net/tcp.h       |  3 --
+ net/ipv4/tcp_input.c    | 79 +++++++++++++++++++++++++++++++++++++++--
+ net/ipv4/tcp_recovery.c | 75 --------------------------------------
+ 3 files changed, 77 insertions(+), 80 deletions(-)
 
-The new count_eot formula looks correct for passing to hardware, but does
-it break the size calculation further down in this function? The old code
-produced count_eot values of only 0 or 1, while the new formula can produce
-0, 1, 2, or 3.
-
-Later in this same function there is:
-
-    if (!count_eot)
-        size++;
-
-With the old formula, for num_ptrs=3 (2 buffers), count_eot was 0, so size
-got incremented from 1 to 2, which is correct for 24 bytes needing 2
-128-bit words.
-
-With the new formula, for num_ptrs=3, count_eot becomes 2, which is truthy,
-so size stays at 1. But 3 u64 values still require 2 128-bit words.
-
-This appears to cause incorrect LMTST size for num_ptrs values of 3, 7, 11,
-and 15, where the driver would tell hardware about fewer 128-bit words than
-are actually present.
-
-Should the size adjustment check be updated to something like:
-
-    if (!(count_eot & 1))
-        size++;
-
-to preserve the original behavior of incrementing size when the buffer
-count (num_ptrs - 1) is even?
 -- 
-pw-bot: cr
+2.53.0.rc1.217.geba53bf80e-goog
+
 
