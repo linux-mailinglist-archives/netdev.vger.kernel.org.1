@@ -1,348 +1,133 @@
-Return-Path: <netdev+bounces-253836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PH6BZ6seGl9rwEAu9opvQ
-	(envelope-from <netdev+bounces-253836-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:16:30 +0100
+	id 8DhUGcuxeGkksQEAu9opvQ
+	(envelope-from <netdev+bounces-253842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:38:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B6C7941E3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:16:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D82C894644
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94BA6300CE73
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:16:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 890DA301E23D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B592DC332;
-	Tue, 27 Jan 2026 12:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5B3354AF7;
+	Tue, 27 Jan 2026 12:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mmbZFXc6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ap8PHKzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66C61E4BE
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510CE346E7D
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 12:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769516176; cv=none; b=Sh93hitDoYw+ROpfI6Tmp8LN0CGIY4u1maqqq5coaJXKyPRjVxq2SUfRnn2nNNe1Ltuf1Q5FOGtYzlRwEfUmcSc1GiQW04ZcsR8os2S9wjw0HvyXQSjKwV7zZdIeJhEpd+YJudWdollu9uhhx+ANunbjRDm0qaKRN0m/R2Ft+B0=
+	t=1769517512; cv=none; b=BBZGaewlsjyswzVAcwj/YhWCaPTng3mbisAjOp5gXOZ0Qa+wyIyzaXJFL921DcZL96HK3EnvRg/bg28VZIB4elcxpzEZh2Iq2jNGHt6egIjQ0qCuTiiXhSuyo8ow0nyCA2iam+7FwvQOt3EUOh7OkR5PrbEOppCQMX/IBdPR9dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769516176; c=relaxed/simple;
-	bh=msmU2MyrqSWPyAAe2Zo1KaeZzDHoeq3eZ3UxRhiaGDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qr3mny4EYZxNzPyDreVwyqx0EmbCn7H3TQFHLWSfnnEBV0hmZeoALlJwWJrv2jsUun5BuWTz6AkOpKhmnbwIaN9thw1P5rqbJquWYp275BnhQs8UvY19fFR/n0dUJ7jdKEyd4xJZQMNKW55B4Bet6r17rk0xf7RH5NIH6imG3yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mmbZFXc6; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769516175; x=1801052175;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=msmU2MyrqSWPyAAe2Zo1KaeZzDHoeq3eZ3UxRhiaGDA=;
-  b=mmbZFXc64xwPuE/7HFSaG/uCbbWFggmDInv3d7LYASjniOn4QQS4dNzE
-   If803g0r/wnOPGwL2LF1fWZrJCBgE+Xzfsffej2k0zvLKaWj6P/hTBx3k
-   hFNGTeWas8BkFjk0P85IZBjRNC+x9xCzyKojOTL5hSwKPaF8gYrA1P7pQ
-   JmUPI6kn5TJgycbvDnAQqhaDdqQYzrjnHii9DIHdVGAI1avzRn+y1AtbG
-   upbyhEtU+BR9doG+pjUX2dkFdV0BLSCOPehn226TfVRRXsVndWI82A5f3
-   O+YQndC/zplXhbJ3qIi6PQtJUBihOmhLiLk2usHkfLNJR3Z5S2zCbahIE
-   w==;
-X-CSE-ConnectionGUID: i4J+X2ViROyTg1c+XAWFUA==
-X-CSE-MsgGUID: wz0f5IJER8G6hzLD2AddDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="81013527"
-X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
-   d="scan'208";a="81013527"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 04:16:14 -0800
-X-CSE-ConnectionGUID: Ay4bs5BvScGuClns8IJHCw==
-X-CSE-MsgGUID: frcpyRkuTbmj8aqOK3uuLA==
-X-ExtLoop1: 1
-Received: from amlin-018-252.igk.intel.com ([10.102.18.252])
-  by fmviesa003.fm.intel.com with ESMTP; 27 Jan 2026 04:16:12 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-next v3] ixgbe: e610: add ACI dynamic debug
-Date: Tue, 27 Jan 2026 13:37:11 +0100
-Message-ID: <20260127123711.595435-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1769517512; c=relaxed/simple;
+	bh=aY3o+iFnnJA2UL+XZVV83ITKFA3lqF0Q+eVkLbg54AY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=e7GfmN4zi+bfQlYsFQT8ZouVPSzCsEngdP0QTEyjyGrFghlvvHiLGkX6qrvVgwaUYERQ8pxRXzuDOt+af6R7qmA4d2ewUrr4cssxbcdvavWTXPiMzlSxhoB4OpnnN5i67eiNCAmUZGiBZmN7JL8WXElZwyUkDtu2yAl4C1lfOU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ap8PHKzz; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c70a62ca32so209420385a.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 04:38:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769517510; x=1770122310; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rg5Z71QjKnaSUP2TEkyRH9SzaaIwaz4czfXWMb6hoeQ=;
+        b=Ap8PHKzzOTZ6cHybE53ueYGS9qi4ZIYPBMs/Bn5D+AZRoJE0Ah6Lp/zZHVJe6ixKJR
+         LTBj5ZpyhhmLfxBE0c4zNn0+eBeTqha8iUKkIfqudjd6c1Iazg/XDBCBnlitLwGWSOMU
+         hBwqlzqq5ccBH68rQK3G02LZpV4wVgncJ6JO1le4aglzbXfPZcRg7BgpXtk9C4A1lX3P
+         WENKYk5l4UGciBT7sWj9XPA/0UfjW5cEKM/5zJibfQt6b6uyo7v4pM38sVQc4rAmuMwO
+         Jf7/AzndVYLL2epkb95q5kQOzZPP/QDLg26UhgOf8YDUQsQ6HFRqrwXAE6YhQq16FuwI
+         GVkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769517510; x=1770122310;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rg5Z71QjKnaSUP2TEkyRH9SzaaIwaz4czfXWMb6hoeQ=;
+        b=pqt5zGdPCmxfyDDfdh+7xHZtGQ45zzraEsgQOcIPMfl5Zl4mXre8L1W/AwGZHLwxyr
+         CUKH3cneGLDGUDMm324s6KQ6TiShMGSwzWoro5lEIeUHvVCofnjgvKGikwJGJ/0zzjCO
+         S7cM9vDlpwM5GNFPpNNpi9Cphn0bOxX+fXB8fLAa2mLPxESRHfUwZ9GLM9SJf31zcA3e
+         HWfz9KtA3hydo7rVU+h1BhtjK67kL9419ayyB7oo5oh9LwaASGgyf6LTqqIdbVnvj6lB
+         0Sl/QidGLYJpSx6fNXARQLoAmkgmH+MvU/4944JvsE4HFo0edRsNjDHB0CoyBVRDYxdC
+         w8jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEhYKfUVVK+2McXAqO6PH11JgHDISMEEYNRF4oCDlHlCbXKiQuoeYNLYUUY+OQBy1rGjduPNU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQXm+LyG1zbi/koQ0eFo/dn08nvIJbkQFhdEc3BNGwYgjbchpY
+	fEbiI65SVIZ8q3pKoZktsnIIK2iEJ+n22FXGr4pe5qq8PtT+JDcbk1GAgjhTQgDdG2f+nwsjAOp
+	Yoi8icmAzd6jGpw==
+X-Received: from qkpr6.prod.google.com ([2002:a05:620a:2986:b0:8c3:87db:d7eb])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:3184:b0:8b2:e179:feb7 with SMTP id af79cd13be357-8c70b8ebc3dmr167860585a.49.1769517510115;
+ Tue, 27 Jan 2026 04:38:30 -0800 (PST)
+Date: Tue, 27 Jan 2026 12:38:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
+Message-ID: <20260127123828.4098577-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] tcp: tcp_tx_timestamp() fix
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253836-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[piotr.kwapulinski@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253842-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8B6C7941E3
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D82C894644
 X-Rspamd-Action: no action
 
-Enable dynamic debug (dyndbg) of Admin Command Interface (ACI) for e610
-adapter. Utilizes the standard dynamic debug interface. For example to
-enable dyndbg at driver load:
+Fix an old bug in tcp_tx_timestamp().
 
-insmod ixgbe.ko dyndbg='+p'
+Add one corresponding packetdrill test.
 
-ACI debug output for e610 adapter is immediately printed into a kernel
-log (dmesg). Example output:
+Eric Dumazet (2):
+  tcp: tcp_tx_timestamp() must look at the rtx queue
+  selftest: packetdrill: add tcp_timestamping_tcp_tx_timestamp_bug.pkt
 
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0701, flags 0x3003, datalen 0x0060, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x8194E044 0x00600000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0: Buffer:
-ixgbe 0000:01:00.0 eth0: 00000000: 01 00 17 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000010: 1d 00 00 00 0b d5 1e 15 5e 4b 90 63 aa 0b 21 31
-ixgbe 0000:01:00.0 eth0: 00000020: 69 eb cd ab dc f8 8a fd f4 53 e2 dc 54 e0 81 fa
-ixgbe 0000:01:00.0 eth0: 00000030: 12 dc 41 82 01 00 00 00 24 20 08 26 53 08 00 00
-ixgbe 0000:01:00.0 eth0: 00000040: 08 00 14 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: 00000050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-ixgbe 0000:01:00.0 eth0: CQ CMD: opcode 0x0009, flags 0x2003, datalen 0x0000, retval 0x0000
-ixgbe 0000:01:00.0 eth0:       cookie (h,l) 0x00000000 0x00000000
-ixgbe 0000:01:00.0 eth0:       param (0,1)  0x00000001 0x00000000
-ixgbe 0000:01:00.0 eth0:       addr (h,l)   0x00000000 0x00000000
+ net/ipv4/tcp.c                                |  3 +
+ .../tcp_timestamping_tcp_tx_timestamp_bug.pkt | 70 +++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_timestamping_tcp_tx_timestamp_bug.pkt
 
-Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
----
-v1 -> v2
-  Commit message updated
-v2 -> v3
-  Remove unnecessary commit:
-  e610: Convert ACI descriptor buffer to little endian
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 112 ++++++++++++++++--
- 1 file changed, 105 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index c2f8189..ad58e11 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -9,6 +9,78 @@
- #include "ixgbe_mbx.h"
- #include "ixgbe_phy.h"
- 
-+#define IXGBE_ACI_DEBUG_ROW_SIZE	16
-+#define IXGBE_ACI_DEBUG_GROUP_SIZE	1
-+#define IXGBE_NETDEV_PREFIX_BUF_SIZE	64
-+
-+/**
-+ * ixgbe_hex_debug_dump - dump a blob of data in "hex ASCII" format
-+ * @hw: hardware structure address
-+ * @buf: data blob to dump
-+ * @buf_size: number of bytes in the @buf
-+ *
-+ * Dump a blob of data into a kernel log. The blob is printed in lines
-+ * consisting of 16 or 32 bytes decorated with PCI device string. Each byte is
-+ * printed in a "hex ASCII" format.
-+ * Example output:
-+ * ixgbe 0000:01:00.1 eth14: 00000000: 01 00 17 00 00 00 00 00 00 00 00 00 00 00 00 00
-+ * ixgbe 0000:01:00.1 eth14: 00000010: 1d 00 00 00 0b d5 1e 15 5e 4b 90 63 aa 0b 21 31
-+ * ixgbe 0000:01:00.1 eth14: 00000020: 69 eb cd ab dc f8 8a fd f4 53 e2 dc 54 e0 81 fa
-+ */
-+static void ixgbe_hex_debug_dump(struct ixgbe_hw *hw, void *buf,
-+				 size_t buf_size)
-+{
-+	char netdev_info[IXGBE_NETDEV_PREFIX_BUF_SIZE];
-+	struct ixgbe_adapter *adapter = hw->back;
-+	struct pci_dev *pdev = adapter->pdev;
-+
-+	snprintf(netdev_info, IXGBE_NETDEV_PREFIX_BUF_SIZE,
-+		 "%s %s %s: ", ixgbe_driver_name, pci_name(pdev),
-+		 netdev_name(adapter->netdev));
-+	print_hex_dump_debug(netdev_info, DUMP_PREFIX_OFFSET,
-+			     IXGBE_ACI_DEBUG_ROW_SIZE,
-+			     IXGBE_ACI_DEBUG_GROUP_SIZE,
-+			     buf, buf_size, false);
-+}
-+
-+/**
-+ * ixgbe_aci_debug - dump the ACI content
-+ * @hw: pointer to the hardware structure
-+ * @desc: pointer to control queue descriptor
-+ * @buf: pointer to command buffer
-+ * @buf_len: max length of buf
-+ *
-+ * Dump individual ACI commands and its descriptor details.
-+ */
-+static void ixgbe_aci_debug(struct ixgbe_hw *hw, void *desc, void *buf,
-+			    u16 buf_len)
-+{
-+	struct libie_aq_desc *aq_desc = desc;
-+	u16 datalen, flags;
-+
-+	datalen = le16_to_cpu(aq_desc->datalen);
-+	flags = le16_to_cpu(aq_desc->flags);
-+
-+	hw_dbg(hw, "CQ CMD: opcode 0x%04X, flags 0x%04X, datalen 0x%04X, retval 0x%04X\n",
-+	       le16_to_cpu(aq_desc->opcode), flags, datalen,
-+	       le16_to_cpu(aq_desc->retval));
-+	hw_dbg(hw, "\tcookie (h,l) 0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->cookie_high),
-+	       le32_to_cpu(aq_desc->cookie_low));
-+	hw_dbg(hw, "\tparam (0,1)  0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->params.generic.param0),
-+	       le32_to_cpu(aq_desc->params.generic.param1));
-+	hw_dbg(hw, "\taddr (h,l)   0x%08X 0x%08X\n",
-+	       le32_to_cpu(aq_desc->params.generic.addr_high),
-+	       le32_to_cpu(aq_desc->params.generic.addr_low));
-+
-+	if (buf && datalen && (flags & (LIBIE_AQ_FLAG_DD | LIBIE_AQ_FLAG_CMP |
-+	    LIBIE_AQ_FLAG_RD))) {
-+		hw_dbg(hw, "Buffer:\n");
-+		ixgbe_hex_debug_dump(hw, buf, min(buf_len, datalen));
-+	}
-+}
-+
- /**
-  * ixgbe_should_retry_aci_send_cmd_execute - decide if ACI command should
-  * be resent
-@@ -69,26 +141,33 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	/* It's necessary to check if mechanism is enabled */
- 	hicr = IXGBE_READ_REG(hw, IXGBE_PF_HICR);
- 
--	if (!(hicr & IXGBE_PF_HICR_EN))
-+	if (!(hicr & IXGBE_PF_HICR_EN)) {
-+		hw_dbg(hw, "CSR mechanism is not enabled\n");
- 		return -EIO;
-+	}
- 
- 	if (hicr & IXGBE_PF_HICR_C) {
- 		hw->aci.last_status = LIBIE_AQ_RC_EBUSY;
-+		hw_dbg(hw, "CSR mechanism is busy\n");
- 		return -EBUSY;
- 	}
- 
- 	opcode = le16_to_cpu(desc->opcode);
- 
--	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE)
-+	if (buf_size > IXGBE_ACI_MAX_BUFFER_SIZE) {
-+		hw_dbg(hw, "buf_size is too big\n");
- 		return -EINVAL;
-+	}
- 
- 	if (buf)
- 		desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_BUF);
- 
- 	if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_BUF)) {
- 		if ((buf && !buf_size) ||
--		    (!buf && buf_size))
-+		    (!buf && buf_size)) {
-+			hw_dbg(hw, "error: invalid argument buf or buf_size\n");
- 			return -EINVAL;
-+		}
- 		if (buf && buf_size)
- 			valid_buf = true;
- 	}
-@@ -106,8 +185,12 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 		if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_RD)) {
- 			for (i = 0; i < buf_size / 4; i++)
- 				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), ((u32 *)buf)[i]);
--			if (buf_tail_size)
-+			ixgbe_aci_debug(hw, desc, buf, buf_size);
-+			if (buf_tail_size) {
- 				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), buf_tail);
-+				ixgbe_aci_debug(hw, desc, &buf_tail,
-+						buf_tail_size);
-+			}
- 		}
- 	}
- 
-@@ -147,6 +230,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
- 			raw_desc[i] = raw_desc[i];
- 		}
-+		ixgbe_aci_debug(hw, raw_desc, NULL, 0);
- 	}
- 
- 	/* Read async Admin Command response */
-@@ -155,14 +239,21 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
- 			raw_desc[i] = raw_desc[i];
- 		}
-+		ixgbe_aci_debug(hw, raw_desc, NULL, 0);
- 	}
- 
- 	/* Handle timeout and invalid state of HICR register */
--	if (hicr & IXGBE_PF_HICR_C)
-+	if (hicr & IXGBE_PF_HICR_C) {
-+		hw_dbg(hw, "error: Admin Command 0x%X command timeout\n",
-+		       le16_to_cpu(desc->opcode));
- 		return -ETIME;
-+	}
- 
--	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV))
-+	if (!(hicr & IXGBE_PF_HICR_SV) && !(hicr & IXGBE_PF_HICR_EV)) {
-+		hw_dbg(hw, "error: Admin Command 0x%X invalid state of HICR register\n",
-+		       le16_to_cpu(desc->opcode));
- 		return -EIO;
-+	}
- 
- 	/* For every command other than 0x0014 treat opcode mismatch
- 	 * as an error. Response to 0x0014 command read from HIDA_2
-@@ -170,12 +261,16 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	 * different opcode than the command.
- 	 */
- 	if (desc->opcode != cpu_to_le16(opcode) &&
--	    opcode != ixgbe_aci_opc_get_fw_event)
-+	    opcode != ixgbe_aci_opc_get_fw_event) {
-+		hw_dbg(hw, "error: Admin Command failed, bad opcode returned\n");
- 		return -EIO;
-+	}
- 
- 	if (desc->retval) {
- 		hw->aci.last_status = (enum libie_aq_err)
- 			le16_to_cpu(desc->retval);
-+		hw_dbg(hw, "error: Admin Command failed with error %x\n",
-+		       le16_to_cpu(desc->retval));
- 		return -EIO;
- 	}
- 
-@@ -183,10 +278,13 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if (valid_buf) {
- 		for (i = 0; i < buf_size / 4; i++)
- 			((u32 *)buf)[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
-+		ixgbe_aci_debug(hw, raw_desc, buf, buf_size);
- 		if (buf_tail_size) {
- 			buf_tail = IXGBE_READ_REG(hw, IXGBE_PF_HIBA(i));
- 			memcpy(buf + buf_size - buf_tail_size, &buf_tail,
- 			       buf_tail_size);
-+			ixgbe_aci_debug(hw, raw_desc, &buf_tail,
-+					buf_tail_size);
- 		}
- 	}
- 
 -- 
-2.47.1
+2.53.0.rc1.217.geba53bf80e-goog
 
 
