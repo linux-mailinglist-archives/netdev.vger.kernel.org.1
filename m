@@ -1,181 +1,191 @@
-Return-Path: <netdev+bounces-253929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HjvLk/geGkGtwEAu9opvQ
-	(envelope-from <netdev+bounces-253929-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:57:03 +0100
+	id 6G8KJfTgeGkGtwEAu9opvQ
+	(envelope-from <netdev+bounces-253930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:59:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565F5973B1
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:57:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC5F97447
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A6DC130BBED7
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:48:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A6C830082B4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018BC35E554;
-	Tue, 27 Jan 2026 15:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F56D35CBAC;
+	Tue, 27 Jan 2026 15:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fpV21aWq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cE3dOsbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB6935CBD2
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 15:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769528901; cv=none; b=Xg9HhWhr7qYdR/FoXb5vin2yxr4hhY6nEUrN/iRafJweimTqQZ8kQ8TMVgliJI/R5j0xMw04vGS5sTeXgi+MP9qWN+rXWHuGw/fT2t5w6DIaEdAYnlTR6EmBaMQOI4AR0mPlrKqcbVfMr8XAJptB2kXyb7wn3rJAItTj1lk+330=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769528901; c=relaxed/simple;
-	bh=MyJH6B/DAC2Hks4I0KKh108Lu3whfs1qSGJMxXLIyA0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=K4CuAO6+drhZcOfUyZaDa1xn7jJw1tgz/x2CIYwxFMkRcAjCqiXeFjKVqeUoX7Ld8Bfc7EYCDG9qFVmzsJy1RP+FxU1K14+9G+8ukSsby1bEaNgBVAVKDcfEmTGoB4HAtNb4a2hWv884z+d/JX+gCz2NGN1Mpg4svsbCk37nmhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fpV21aWq; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 772884E422D3;
-	Tue, 27 Jan 2026 15:48:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4ADC8606F5;
-	Tue, 27 Jan 2026 15:48:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8AB21119A8637;
-	Tue, 27 Jan 2026 16:48:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769528896; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=OxkgHIERK1QMMyBS9ryD4i6d6w+RIzeILS9CMd6za+4=;
-	b=fpV21aWqssDyfTLubMz3GX7FBO/K944DIV7FsDzkeJY1zGQoT4g+hFHhUQktqnCgHWT8JK
-	ef2tYOjMpJNp0jZxNhVUKkKiLv2zBKwzsaKt4qNudaYDxRlQzX3IjggSJTybDZ03YBxSrl
-	UgwP8HK5I51PFp2oBmEwUE+KgmX2iWgtEv1dQzHuKfrM/xR+30opbvPBwLVLeSWPIV7YO8
-	NqYZ1SFnffF1HjucvPOJIaSUJ3BLVKjhfVaBuov/92yB3qjZv8DiWpdBp+rl2nJjnynCxY
-	F/27PHKDrXi9N+9TDFdqkbGejV3JyzYSfOMdMGTUatLdwv8mCpO2bmqZ+5MJHg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00C935CBA5
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 15:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769529328; cv=pass; b=rTFwExOJZetn4Zn/mqQGPKHVXdF2z4UWN7sJ3ypvhNMLXmMRMGIxTAhdX8ImQpYPte8PS8Hw1rr3mSO8I4nEMyuq17ICc3Po8vQ5UtqkdqhKn/JxPiy8LP2jSQBkbMGcb59P8C1JG8SDG1kwXL+YBjOhNLwOKMZJZVlbKD9pZM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769529328; c=relaxed/simple;
+	bh=ECZkfdjxMvGWu1OAl5cFKgNEi43tNjoGV2hwyoXo1R8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o9mXg7k8wV3p4H0EK/3BTrmZMSaG7I2uV1VRNntN4TpBIzeUlrCJD8slRv+BrZp5ZjMdEEugpkyNysBobPl19OiRQ7I57COIReaif/JBo/BWoN5l7CYMiQUiOe/gOOQceRL7dQLfSDHrPZ42sg544CwSNdS/cEBManLxTNMv4N0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cE3dOsbI; arc=pass smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4801eb2c0a5so57009055e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 07:55:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769529325; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iidLG82fZ/KEJ7jAyrK1OMnqPRUBJX7sf0XGJmWgO6MkQV97LIrai/3QIbyKZfnnWv
+         QvvJ2Vad+N9yv05O8huHwjkNInNv508vYmOvoi5rlMJhoplVtji2fMTKJVdlnDreQAM4
+         sPTVlndi6Dqt6ghWWKrt2okvmN3kar4qu6VY8IZmYgP9nV32Yaa4rWpoLctMgeIhZLnL
+         Pouh5oGQhyN1i158uOjnmm3bXv1ky1fzFNdSiO1aKTQ5dySvCmAyxCUL/YE7oY01nMMN
+         iJrqsVNmuY5+GOeW7pJYq0ssKp4uJf4kQwsZ94y2yUyNjHQb+e2uLWdKJRHxhP3W3EXD
+         +UNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mdjGxuEW0WnDn6G9gnMVeIPJ3u/i1K8ZcFBcJ8h4M4U=;
+        fh=oq79D0XdL3RBdm53pxIWNF1iOUfmYySPnRZIl8ppJiI=;
+        b=LOAWgowhYOtAsAmHKFn91qCYusLPuV0YSadbgyLylD6+uOxwfHKzMkfdjruB2k2jCy
+         ekawb9svdfxxBPtcTVBihbi3maQl3OHFcdUVLJBdXMJwqyqWPFB8ZrdEnPeoEZYHD+AT
+         HV192MC72GI9HzaxQRd0ov9C6obrf2+IqwfZpu5uSKYxSHpzT5ittbBe7lBpwZMFnBP3
+         OmXiItGw8naK5+qUhNJMwVetD7pUE+7+HlSSiZjO6N/1pc5BGIx6OD2LLXEn3Bd+nKAG
+         JNgNf/FVYS9+UchMFrhfRgn0m8hG7rm+idfy9YBWeVEQugxhk95LO5wBn/na1aQ3zHT+
+         eo1w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769529325; x=1770134125; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mdjGxuEW0WnDn6G9gnMVeIPJ3u/i1K8ZcFBcJ8h4M4U=;
+        b=cE3dOsbIcFUpRc95Rrkfl0bgcoGDZj/8Ai3+dCg/Vv2Tfz7gK2KFwwcJbXZDzWzdJt
+         GHBIflOmi2MWYaaf4qWPtzsVO4cbnxSFu3LtZC5ERVKpxZjXdysS3tgYZqwrq1VGUfhl
+         /hBcu2SOBRQ3ugCKLNfhpfy6r6ZpQ+b5HzIsoXJrn6cpyZuP9W+4L1MpkrAoKLBl+IQJ
+         iauuAm4rADa2Cf+eiAN17hrMutuhPwO0sbTeL0QQrXM5X625ZHXkAUFqMLrBkllVSVKh
+         zPiFA6JbV8G2EHojKTyuUa78wJnKW2xtsO2DbugYsqRC08ty63E02psep9/Ds/nvasw1
+         RkYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769529325; x=1770134125;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mdjGxuEW0WnDn6G9gnMVeIPJ3u/i1K8ZcFBcJ8h4M4U=;
+        b=jzWGxd+XUMjR7kumnOb8rjhg6yMvyhzMEgzeTD09/i0Xp5U8RkoCopFkj0ZyL3cMxB
+         AwZ1cdhSGtw/as7oKtMgYkN9JGYW5jDdJNd1qL8p8CnYTD/oLuHwHV0RIbg0NJhRzTZW
+         Tj2gUM32I4nw0RKAwsGeFbu6iANMXgqIONpi+n6wgsYCxc3lehwrzKDBk7k8fsbfPzhJ
+         TBVAnba+k5Y35SyC5HxNRx95ibhROlTbhlEEc2TaF9oj5RAH3cnFFBZAZvZGONqtkStY
+         nP0a9u52dFziOEe4jpIt68NFC+9u7qxjlSYkIwklfuIhT+jiKWMxKOZIaIvJPkZRxA4c
+         euQw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/9sPaWnHWXodIZDEtYwKnFZ6W0XHz4edquFpiJ93bvFL+Xio1AuSjrAfkzwF4DxP4hGkIA/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVSmUAeF81iLrueZMA23B4BAk5Wl5IIxZwnSuINFTSKqGud0dg
+	f9r/FCSlPQWJplZ1pSpv/BvO6aoETWpSKV8P2WQCkf2hmlN7MO/vKTXQV0DnPiTKRuD49lBS7fj
+	dHl69yXCEup1QzN1OMuuI9mTLHYdEs0k=
+X-Gm-Gg: AZuq6aIvbAojQM5jj/GIfEgTPnFGIexNhT0jQBiSjMHa55fFAbje3Ny4Tf3F7uqLvvB
+	9TrOPqqtWk1YN5XO4cn3P6npcSGxUJJ0xM58d+9PgECHyQC2H5WmqcammADgYWgkFfy3fuqgn+R
+	Iywwby36TiHQLVVjp9I5wVmMFjLX87DLGVJHzB5UY/ELxZof+Tg7inqIWRrjRbVTsV3+Wd8o6Uz
+	/1OGFt9jo7/hN6RHQwLgVDKqnHZ34Mlwmf2wHF6VGUmCa50F3C+Pf3Palg87U8PM2xUDt1JWHNH
+	Slt/eWpW5kvgjqAILC5l0w8hTigoEXkwRoo10x1P++Zw6PwT3nml/Srwag==
+X-Received: by 2002:a05:6000:186e:b0:42b:55a1:2158 with SMTP id
+ ffacd0b85a97d-435dd0304a0mr3286115f8f.17.1769529324882; Tue, 27 Jan 2026
+ 07:55:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk> <CA+V-a8t5RKY9vyFDg0V3AWcBovBdWbcvqdPeiPYmHRA8v2=UGQ@mail.gmail.com>
+ <CAMuHMdXOMMyYrbPr8H3O+oj7QeGg324jXdV1QUaUhQF4sxTyfg@mail.gmail.com>
+In-Reply-To: <CAMuHMdXOMMyYrbPr8H3O+oj7QeGg324jXdV1QUaUhQF4sxTyfg@mail.gmail.com>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Tue, 27 Jan 2026 15:54:57 +0000
+X-Gm-Features: AZwV_QiFFOxc86MsSOA1lIfzqIqjtoa3ZePZV2eq56xOKDzBCZT0iVVI9LGkicc
+Message-ID: <CA+V-a8sQTRZOFk=KASum4Gi4cKK7NdLZu1W0n4ZyWPuKGSc9uQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: stmmac: Preserve bootloader MAC address
+ across unconditional reset
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 27 Jan 2026 16:48:11 +0100
-Message-Id: <DFZHN2KXS7UI.C1WHCBAAII2K@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 3/8] cadence: macb: Add page pool support
- handle multi-descriptor frame rx
-Cc: <netdev@vger.kernel.org>, "Nicolas Ferre" <nicolas.ferre@microchip.com>,
- "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Lorenzo Bianconi" <lorenzo@kernel.org>,
- =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, "Thomas
- Petazzoni" <thomas.petazzoni@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>, "Andrew Lunn" <andrew@lunn.ch>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260115222531.313002-1-pvalerio@redhat.com>
- <20260115222531.313002-4-pvalerio@redhat.com>
- <4c74c2c4-7a47-45ff-be17-485e0702cc37@lunn.ch> <87cy315lru.fsf@redhat.com>
- <840fd286-779e-4130-b544-913116c97a29@lunn.ch> <87qzrdecs1.fsf@redhat.com>
- <b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch>
- <DFYQS9RIPCSY.25SHGGC3VM2M3@bootlin.com> <87ldhkexvq.fsf@redhat.com>
-In-Reply-To: <87ldhkexvq.fsf@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253929-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	TAGGED_FROM(0.00)[bounces-253930-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,bp.renesas.com,renesas.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:url,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,archlinux.org:url]
-X-Rspamd-Queue-Id: 565F5973B1
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[prabhakarcsengg@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-m68k.org:email,mail.gmail.com:mid,armlinux.org.uk:email]
+X-Rspamd-Queue-Id: 0FC5F97447
 X-Rspamd-Action: no action
 
-On Tue Jan 27, 2026 at 12:51 AM CET, Paolo Valerio wrote:
-> On 26 Jan 2026 at 07:45:29 PM, Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>=
+Hi Geert,
+
+On Tue, Jan 27, 2026 at 1:57=E2=80=AFPM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+>
+> Hi Prabhakar,
+>
+> On Tue, 27 Jan 2026 at 14:39, Lad, Prabhakar <prabhakar.csengg@gmail.com>=
  wrote:
->> On Mon Jan 26, 2026 at 3:29 PM CET, Andrew Lunn wrote:
->>>> > I was more interested in plain networking, not XDP. Does it perform
->>>> > better with page pool? You at least need to show it is not worse, yo=
-u
->>>> > need to avoid performance regressions.
->>>>=20
->>>> I retested with iperf3. The target has a single rx queue with iperf3
->>>> running with no cpu affinity set.
->>>>=20
->>>> |              |  64 | 128 |
->>>> | baseline     | 273 | 545 |
->>>> | pp (page)    | 273 | 544 |
->>>> | pp (2 frags) | 272 | 544 |
->>>
->>> So no real difference. That is unusual, it is typically faster, or if
->>> it is always doing line rate, it uses less CPU time. That might
->>> suggest the page pool integration is not optimal?
->>
->> One more data point. I get line rate with & without page_pool so below
->> are CPU times from /proc/stat:
->>
->>          upstream    pp
->> user            1     1
->> system        179    91 (!!!)
->> idle         7874  7303
->> softirq        35    37
->>
->> 16K pages on Mobileye EyeQ5 (MIPS), 7 fragments per page.
->>
->> Paolo shared 64 versus 128 measurements but I am unsure what those stand
->> for; I doubt it can be packet size as xdp-bench does not have it as a
->> parameter. https://man.archlinux.org/man/extra/xdp-tools/xdp-bench.8.en
+> > On Mon, Jan 26, 2026 at 6:11=E2=80=AFPM Russell King (Oracle)
+> > <linux@armlinux.org.uk> wrote:
+> > > On Mon, Jan 26, 2026 at 05:25:03PM +0000, Prabhakar wrote:
+> > > where "local-mac-address" states the MAC address to be used for eth0,
+> > > as specified by the boot loader.
+> > >
+> > Thanks for the pointer, I will use the above-mentioned method with
+> > which we won't be needing this patch on the RZ/T2H platform.
 >
-> 64 and 128 are packet size in bytes.
-> For the first test I used xdp-trafficgen on the sender side and
-> xdp-bench (skb-mode) to count the drops in pps on my board.
+> This should already work out-of-the-box, as
+> arch/arm64/boot/dts/renesas/rzt2h-n2h-evk-common.dtsi already has:
 >
-> For the stack test I used iperf3 (UDP) similarly with 64 and 128 for the
-> length option.
+>     aliases {
+>             ethernet3 =3D &gmac1;
+>             ethernet2 =3D &gmac2;
+>
+> So just make sure to set the "eth2addr" and "eth3addr" environment
+> variables in U-Boot.
+>
+Agreed, it was just that the aliases in Linux and u-boot didn't match
+up (Ive notified the BSP team to update it accordingly).
 
-|           |    64 | 128 |
-| baseline  |  75.3 | 145 |
-| page_pool |  79.3 | 154 |
-
-Call is: iperf3 -c $IP -u -A2 -b1G -l64   # or -l128
-
-CPU affinity is important. I get approx -30% on CPU0 (where IRQs land)
-and -12% on CPU1 (2nd thread of CPU0).
-
-I looked at ftrace function_graph and it looks sensible. Baseline spends
-16% of macb_rx_poll() in gem_rx_refill(). This goes down to 10% with
-page_pool.
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Cheers,
+Prabhakar
 
