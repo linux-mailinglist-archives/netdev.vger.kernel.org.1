@@ -1,605 +1,437 @@
-Return-Path: <netdev+bounces-253711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7PGiBsZVeGkDpgEAu9opvQ
-	(envelope-from <netdev+bounces-253711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:05:58 +0100
+	id eMf6LvZVeGkDpgEAu9opvQ
+	(envelope-from <netdev+bounces-253712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:06:46 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620C99039F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:05:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 265D4903AE
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE650301497B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 06:05:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA7623013D5F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 06:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18347329E58;
-	Tue, 27 Jan 2026 06:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BBF3329E5E;
+	Tue, 27 Jan 2026 06:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZBVo6tC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b+FwRf3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FC22FD69E
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 06:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769493954; cv=none; b=kBO3UV2kBbzRRDaX7hBrt4a5/eIvTcwSmz8mu43hv28eoy0AFST5XD28BIulM25vjeiJC7y0pXFpQ2W8YdondwSqZMXgLWx7dvN6NMp9X8NbSkafKYCJOn9xFn8+IrAQZmzGHDdCRizlRsgwZK71hUWEpGLBP4wVY9uvOM6JUo8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769493954; c=relaxed/simple;
-	bh=kb+mFM1KKjuWvR088e7HJwo4LsFJ3e8nRs5s2OPP6K4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H7TuNm/tsMzqaR8tcy0ruJYCJpXa+JvGuF1Dyl/lJWpokYOWxKPume5Ol1l3YLn/D1Yyu66aZWr7p2B5yh0gghIOlYlijSVsQzLVNr94PUEwpXeJIw4eC9tpYrS87q0xHK2VwF5nRdNWSD5MUNp9sLBlvPsSfivlpfHVSO2cAjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MZBVo6tC; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b74f839bdfso1808247eec.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 22:05:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769493951; x=1770098751; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HcO1KVufC1I4OS3VAY3Bmwf+Tg7ZUUg6BeGGKIBpvX8=;
-        b=MZBVo6tC3z4wWYyP5dlAoTfHmDU+Ey/qa6voNHPSxxBbeE3HBxHiVDN8pEHa22Voh9
-         hMGcwd/V6so00jfY+tMmPcSh5iZAZnwX0DRBNUREsqs005OQ8Z5kv4UDeofurNsnVnIu
-         jh1PqWfdlWiEtETlww2kvBOaXaK9Pl1/M7s6XxSNWeY/NrEqlpqOa1npahRHKAh4uMyT
-         wL7dPq7yvZP+Pgk95MQrHCP/Z8dN35OiO4yCQKilbuDOKtPPY5o6MIy1vKXeluNlnGct
-         cBQ/KJuWBLVp9Vft0PZWNjs4FZMq+Ms1hDFc6Ti+dy+85bl+HykhDX7xm+vIpniUoG1z
-         CTuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769493951; x=1770098751;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HcO1KVufC1I4OS3VAY3Bmwf+Tg7ZUUg6BeGGKIBpvX8=;
-        b=KWflK8jShue9scdYGL8RlyU00nAGbkzagxesG/KNQlmIuiX9kXJQFvClpis0uLpKI9
-         P/hOJfEihyPHWi8VNxrREyjJWHRvcbAhboX6l4YJ+mI2FJtJbOSQN/gqujG1W3RZQsIH
-         2lByHTEta7qE5LxF+kOcuhco4RaAGIpep8R0PQ3vJPy0vJuYGaJkHqLm7qs+YKPEoVGa
-         i6vaEz/c/EOxn2cjZ4qzf7I5OonrGvQEl+57sM/hOQhagEZNOVtkw64zSzJyU79AfhXw
-         M9y4/8k05Ijc+nXJkwIni5soVg+c8UWEluAMBOtAUkfRHdh/jVSGASF08HIuRKi3u2fJ
-         Hzqg==
-X-Gm-Message-State: AOJu0YzipFVV8+qwDVqwKqBpqhXQg1S6SOiCMzRJbluWVlm+Y7pqGSkP
-	Uylt6r2r27Yrl5O8sgKYWJ9FSwD0RC9gommMEazeC+vlx5+aFPYlULFjOv33vXc+
-X-Gm-Gg: AZuq6aInsMwsFNGp87m0aeVP3cqD05o++V5NskKK4Wvt2b0ro+UUz5YPYRkAXoaOjpb
-	ciTphPPrdXZd54Yfi8C7W+Lv3ldPKVIDd23uDxxw2wO1TzdnG1Bo6eEVIGquIU7z9uGrKK+s+hX
-	cXXAuLezgz4VaK/4x+r1mNXBDYG8MWP5vVkOSHMflnJQehaTLCIa50LcdjEx3sXE0z+0ms6hA4Q
-	l+W5Ysq8XPKiVSbRAqDaQTrfV61rjtn/rihMk++wDurAmP8C1HB2tMHetNmI51GGATGyTrAhk10
-	dmheTLQHYwq7cNK5pgw6hMx+mp3/6pQ7y9XyM7dl2hO4dca2FX5KBiqJoNKmppq2upArxsrhKfW
-	Gui3V3sgpeo6xeUmVn+DPhZ7d/Dhj10YgCiajmWP+I42XxoDmWGz5F/PDDMx8UoOI7WUdUUO9iO
-	PpQYUW5e+D7i7iRcj4o/PTH/rV1q+5OmH76lAYho0lppSYe+Qunscgb4AYRRla/4gkCapZdTlXS
-	qKKYsNBEQyOpoqBQP7RAarjNfydlJ+DtC8jYe3B/hhDfImjTGPbuWtvRpGSNHeHrBu9/0gOJ89h
-	DGcysqWM
-X-Received: by 2002:a05:7300:2324:b0:2b7:5a7f:f74c with SMTP id 5a478bee46e88-2b78e720760mr324439eec.9.1769493949807;
-        Mon, 26 Jan 2026 22:05:49 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b751bc5032sm11449351eec.1.2026.01.26.22.05.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 22:05:49 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Korsgaard <peter@korsgaard.com>,
-	Petko Manolov <petkan@nucleusys.com>,
-	Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Oliver Neukum <oneukum@suse.com>,
-	=?UTF-8?q?Krzysztof=20Ha=C5=82asa?= <khalasa@piap.pl>,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Max Schulze <max.schulze@online.de>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Eric Biggers <ebiggers@google.com>
-Subject: [PATCH net-next v3] net: usb: remove unnecessary get_drvinfo code and driver versions
-Date: Mon, 26 Jan 2026 22:04:38 -0800
-Message-ID: <20260127060534.51206-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2782DC78C;
+	Tue, 27 Jan 2026 06:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769494004; cv=fail; b=A5YtmFvAg7xZ/dzrsDWxHNPVrlve8aJ7/9LtsxmeQRirAAU5Lt+WlHCuxoU2hjChjJ1PBrXAQV0Sa4NJKEHRiy4WwxQE9RLUBPXKajF+BX9Sr/i+eDoaK+zEN4fW8/XdUPjrtigUHpO0sBPGDN1t6xOuf53Hm9cXRsIYWkEg4U0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769494004; c=relaxed/simple;
+	bh=oU7YOHuk17MG/26NTcN0JFJetFy0tfmSMj+kKbiI0Jo=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=RsJSiwyeN8Ld/zb9vi+lix0eAH6HZj3Vp2x2PfcEU1b8Vn5MHuCg4LGY9Qh9phekgPqjJduHQZhmwgOiTMfSIjDVyhISkGLTDReOlLtcidYCsx+VDJm3ELXa/ThDkbaGycwVx9kE2WOQ9fE5tGCSq6cnpj9sO93VqRwcIpzHnbE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b+FwRf3d; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769494002; x=1801030002;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=oU7YOHuk17MG/26NTcN0JFJetFy0tfmSMj+kKbiI0Jo=;
+  b=b+FwRf3dRXm9tu3UTTWEhvS/wTN47g1T0AyiTzzlqmBSoOJp2z7icD1p
+   iTyG0OGuyc+i5wdyUDKbHD5TcZwmBsqKZq2PyefUsGC2d+DzwW93N6Dl2
+   P9/n6pgAXGkY/vwI5jSogifupHDgtI+B3TH60TwyYvYlRKFl5C1UffyZI
+   /NCQKqYD/1PWi+hyWQyIXz/2tv0k+Unl9hN6x1Rbhv9X6feroYxXVS5cD
+   giiVE1seM0x98IvMytY++IeVl44+OoWoe1pu8fyaUcnzT8RnQOC6FG3K5
+   aGxIvhyYNEBRcBAFebupOfh3YiZWvPWaMrpkStv+DQeMiolRRqVD48yXX
+   w==;
+X-CSE-ConnectionGUID: 0bEV2JA/SwmDnIs+CGpzlQ==
+X-CSE-MsgGUID: iXJxsQP+R5eMuh//NA/eaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11683"; a="88095696"
+X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
+   d="scan'208";a="88095696"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 22:06:41 -0800
+X-CSE-ConnectionGUID: IXPGp636QkKPbgMuBWsvSA==
+X-CSE-MsgGUID: XVUTWlv1SS2a50h3kF2yWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,256,1763452800"; 
+   d="scan'208";a="207904142"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 22:06:40 -0800
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Mon, 26 Jan 2026 22:06:39 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Mon, 26 Jan 2026 22:06:39 -0800
+Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.60) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Mon, 26 Jan 2026 22:06:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UR+K59pICrCJ43+225nvQcdcqPI4rDqfJN8kFkDlBWtVQ2uXJK3fsDWcOuqcRrW0Y5IvdKcDOhQFi5/uinUecedn3OcGWTpOKhuhQgTplo/j9azSSwlP/PJjx4OvoMb6d27Eh4kvKRUm6Jc1pprT8HsDtqhF1J8aac7OSP2DGHvVaybaS5vVmkd5uDYTja2cKJDAYhYEvE4ugHZMJhGszx1AdJvDsJeG/qKTi+V2RQd+u3kPY/MK1iYJ0D3P4udSpYz5R7tEiWLvYvblnBGvnzopdkWfYtVH5lTePMn6NIEq6INLSSGKZMznI3FPKiWJJ7EHq0xP6NRdEWeLJQb51g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L6rXKgC2ZNXj1MehXXBR2aAbB2qVxkOp7MNUwFWg6Ks=;
+ b=tQZygLGX7jhuyBObANi6iHgY5rgDMYCyjeshWOV4WeII6ZRcNa34AbvSpsaY6QUZNkOYPTtzJOwLhyOAoKT6T/PiZfJV37Zfe/JqZ//R4fHUokNT3w4Z3CAm2L3arfFJaArp/ULCXhpezO6sONEN87f0TaSBThs0HQQ+QMjVoAHVN3ZQjzchnzp2Jih11X1PThQ+4ICuwqSUijUZVKoxmRRRdHQ/htkmHvvfyP9kVLUBpoji7iNrffG8JHkSSs6lqfdO3lV9TEK5RGLDRoZALJ5o3PHwLBM7truQcZvwhZLCaenrXsRf/AV4gMqxiavGvZU4ff9OgU9s+8AH7230IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by SA3PR11MB9509.namprd11.prod.outlook.com (2603:10b6:806:47e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Tue, 27 Jan
+ 2026 06:06:37 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%5]) with mapi id 15.20.9542.010; Tue, 27 Jan 2026
+ 06:06:37 +0000
+Date: Tue, 27 Jan 2026 14:06:21 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Qiliang Yuan <realwujing@gmail.com>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, Qiliang Yuan
+	<yuanql9@chinatelecom.cn>, <linux-mm@kvack.org>, <vbabka@suse.cz>,
+	<akpm@linux-foundation.org>, <david@kernel.org>, <edumazet@google.com>,
+	<hannes@cmpxchg.org>, <jackmanb@google.com>, <jis1@chinatelecom.cn>,
+	<lance.yang@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<liyi1@chinatelecom.cn>, <mhocko@suse.com>, <netdev@vger.kernel.org>,
+	<realwujing@gmail.com>, <rppt@kernel.org>, <sunshx@chinatelecom.cn>,
+	<surenb@google.com>, <wangh13@chinatelecom.cn>, <weixugc@google.com>,
+	<willy@infradead.org>, <zhangjn11@chinatelecom.cn>,
+	<zhangzq20@chinatelecom.cn>, <ziy@nvidia.com>, <oliver.sang@intel.com>
+Subject: Re: [PATCH v7] mm/page_alloc: boost watermarks on atomic allocation
+ failure
+Message-ID: <202601271341.5d24a59f-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260123064231.250767-1-realwujing@gmail.com>
+X-ClientProxiedBy: SI2PR02CA0017.apcprd02.prod.outlook.com
+ (2603:1096:4:194::17) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|SA3PR11MB9509:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2d7a6ca6-e254-4246-2624-08de5d6a3ae1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?liFRSBfLlgKGwxeOMY9pPQHvIu9pSavcCMDWEyCvBDCjuwBPOWoZ0gOyNxZd?=
+ =?us-ascii?Q?VJgynNAJVxkGJTmc9i/GtSEvMi0R5BCeVVDa+Lc5CBeJXzQRF5M/SbXl1uH/?=
+ =?us-ascii?Q?51Rb3p2r7UrqH0FvMIqwVBAUagO5RnC+ixb7Gwq8hr3YdMrF8ervSOtOBgiP?=
+ =?us-ascii?Q?zL0fiCXeyrXfJpbt/StZhZRI2jFELv9K8FcZ81pKl62zbf9d4ger9mMlg0lj?=
+ =?us-ascii?Q?m2YM7ZRGEXJmlfCE/AdjBh40qkJvv4HouDqnxP6I6tcCdWkyIozvbjMkout8?=
+ =?us-ascii?Q?vtoJkGGbBDLYIlX5Atj++Qvixu4Sq98FsYr7ePUr4xQarFh34YD3DpndZYcq?=
+ =?us-ascii?Q?JyHqnhEBOmdfXGd9dk+A0Jlk082WXtY8q8f2V8Pe1ywyb1uz5KZl+1DWnBT6?=
+ =?us-ascii?Q?49CNT38BEMseucllsZ8RlgsYykGue48wOJ+tjCPGitrUWpK1oHnEmWSsqPtr?=
+ =?us-ascii?Q?9Y+mR93pIJCmKSu6smECoGn/bCMGkfpp7AlHx5chUrt71aSEAf69XLLN9Wnh?=
+ =?us-ascii?Q?PnqCaGeZJ7lQDwxnM3TDRIqtk+WcxWE+/53qntFrnFsXSZMXRGqRGmTMRTVe?=
+ =?us-ascii?Q?eMcv49Vy5iV2nxWcF/LOlUX7sCEmVg5lANmNmJPe2sg+BN+mSMnf1KdXCOpk?=
+ =?us-ascii?Q?qHwC7bO3rDmDWwcZHYU2y4ePiiiFaRaeQ2D8BFSjIKEZ8wJ80zzj6ED4wTq9?=
+ =?us-ascii?Q?0UBiC0BjNcCmLjixM45T6XXyuOjFDwVQvZJfsAMLCCQkfPqvRctXB4yUKh/u?=
+ =?us-ascii?Q?31h1sPLZrxUmml+0D/9OhWMveH8dhg1PUahYgckOyktFH/WzlW6UBZ6Q05tA?=
+ =?us-ascii?Q?IDsaXyDh4BqRRQdf2VyilqcXCcbVfHMHcAUXDDwMxwx+k9+TJ1H14e0KIeZz?=
+ =?us-ascii?Q?BWyQhB+EB0inZEfVv5CdkvFQPCPiskrF9sghecmbDQtYPBaHcIj0lyXObtMS?=
+ =?us-ascii?Q?a+AnYs0Vi2f6qVHan3ZrAErdZk9Cb69i1FV8B9ArPRGJo8W0krVHi4nwPo8C?=
+ =?us-ascii?Q?fnOTHJZvywsOKditKuY/ucfo15brCnHx9qq2P/7GaM0vQ4MvuxX+fwNZH+EG?=
+ =?us-ascii?Q?oQQ3iAeG9tifOxK3Bx+E9QGdyrQYaVXJPdg/dDDWarYDMuuz4jMyOwy1Io+Y?=
+ =?us-ascii?Q?Itqs/72N3IY+lzjTvDAiMYZZLsQnrB6Sfus+Qq3JGS8HV/E915OarZOXCgNN?=
+ =?us-ascii?Q?jnXw2Nbg+ZPZ7nkaOL6QQee0AtY2XRVX5hRro4EDjd+ViAc8Sv7vWzGy3+Qq?=
+ =?us-ascii?Q?2+it8aNpk6cbVAbr5keiziCuRSlx6+5Qb7EbxIQ8MGA+//ED1M5agaCbRw4q?=
+ =?us-ascii?Q?YgXOa3kuRdvqtj5RNjNCkiZDmMl3KjddDaGks+KnZiMvEUaqEHdJ9EeLsSwG?=
+ =?us-ascii?Q?TLa+qin8lYt2ksfO5OcaM4eNWLhd7hb7+aIxQ2/ILfLmYlQ91o/8Zz/dMd2m?=
+ =?us-ascii?Q?RkbUDCkL8rvjIfkb3to3QSbr+Jpq4FdWPK+b31jKOIce6KLBnHEtgWfkKiaj?=
+ =?us-ascii?Q?+qLF2kNuWTRo5U2CFUHw5OP4V/dozS2EX0AYOLcJ2e4gGYRIUXJBBtdFUpo5?=
+ =?us-ascii?Q?RpAXdctGXfO69jXr/Emss2OiYrXLn8lbMknAsMAs?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+8Ovq0hnqlFQTOLr38AmHxecV6LI9ilhUoghX73/U++28OPVVtJ7gRQ0FTir?=
+ =?us-ascii?Q?F97qTvmAsHW4Yu/ULVHZGoczolLTdWVd/tymIRaVnbEyA92uJS2FxmJngpoP?=
+ =?us-ascii?Q?8+uQIU9cXZcCraXg/82bN/Ba8dJKoRRw8Y27zbwrzcBhABnq3BeiAsCRm6Ur?=
+ =?us-ascii?Q?051HhHHJs80IVS+yqDCNiFJqfgUndRdhwvE3NzibaGYdePAftCSCqYJt6LZd?=
+ =?us-ascii?Q?suC7JlIUi+y1AF0E4o0HL4B4JUTUAtNs5X1oMLOFipYG57dzLPwXrI4vNLDy?=
+ =?us-ascii?Q?JHc7uDgGttspCy9ef5gdRJDqRZhYZx98JQvT82qB1ZDssEimb5Hmtw7tD4ex?=
+ =?us-ascii?Q?d+dR7xU7Jt6ALiA90YMgmZJr4BsnMFPgX3M2toLuMmS2xpjc+nLTetNumAzx?=
+ =?us-ascii?Q?LTudND3n1WvzC9O3OpU7ATr0uLWL1d4S48I3Jv6TVChDB3quSxQjOzXFoiHK?=
+ =?us-ascii?Q?57EGwccKt6zDK1dWpKtm/hDcHcaH7sfCwe4Wqvm6ZmggXu/DykrnWKe1JlhX?=
+ =?us-ascii?Q?pDSljCCoo98QEQni/SwE4gSLHUtcGP+ccXGSku1gikbAVGc3Q7t0+sA6I3Ve?=
+ =?us-ascii?Q?3/nkB2p47WjuktAP/aTW4laL0zWCKhCcQ+TyZ6duxj9xZdObT+Ndd+ljxMgI?=
+ =?us-ascii?Q?Iv01vBrw/5ylJBlgAA9KPglx4RUepC2tn2fxWwG4QW0OM6A42NfByIH0TjZ2?=
+ =?us-ascii?Q?+Iape8iu3av7yX92CXJ5iNeLvI8MZNpjW3f6uAx5yB1OtL8MjfZZ/u4igptO?=
+ =?us-ascii?Q?QNMl1HK5qCsfsES7sDNO0IYMbF2u1i0UqqHoQlJ3tEa1lS6yTEtJRm0RO8IB?=
+ =?us-ascii?Q?WpH3p3RluzaDtV0Gahwto53rYp0VtmZQdPVz+FIHgQ75PR4qI1lKd6Y/Icff?=
+ =?us-ascii?Q?HliiODRZwcL3dXF/P20K4xyq8vfiuxMNntTF7hKanG5sgNoxEUjU/bx2sAbW?=
+ =?us-ascii?Q?l71hF8yT79HmsShA21mzdKMtM1SlKNp/MPXcXzxMisAkKgCrl1pkMPbfNDzY?=
+ =?us-ascii?Q?7ZkoKSGdQyv0Vrcqu3xu3WIjQGQdYIQZRwI+ySsQkFi6rfLBF9F349qVJAQo?=
+ =?us-ascii?Q?YvUqiwnCAmHJfkfdoXCK0G2LQ7BsnrdBFTT29KYAftEs+NdpG3fhaFqCEZmi?=
+ =?us-ascii?Q?RAb3+X+pwXJtSYFqIqFsmpsBQBePgd234OsPSqNOw9qomGobM1fr6Gaw0jHS?=
+ =?us-ascii?Q?vRHJopk/pMdlMaDP/xq/+pyF5sL2tqWfqgXfqEuGYSe9fWld+SEyNE+lAPG/?=
+ =?us-ascii?Q?lX2spZwBDuKaewZOPbUmiG8FLrHMX+ofFbm2t8tobsQhuaGKOsJI2JRYyDLZ?=
+ =?us-ascii?Q?oIrNIgSUpCIKQ6Plyftc5o9ViW5WcI+zdntG1f0/JL1X99tc6PG9uuc0CbFa?=
+ =?us-ascii?Q?YYL/p2uD+JTph4IPKhNSEOA8NVfDU7T/rJrAshvmjAtJUJ132/00eypPgrsP?=
+ =?us-ascii?Q?BLMTGnwYaOEvcLhJ1ImQCxQYUmnriEUgJXcZHFylAh0zSFEIqNBpCoIYvShL?=
+ =?us-ascii?Q?KD/ckm2Ko0zGuGJ8kxMe3krIyAi1x2iPEC6AJJpysq6ntUEqAJJ6SAXPZH/G?=
+ =?us-ascii?Q?WDEPThpDQWydRyAD23+sRTBiR2zqJ18Vg6a2IAC+uoirNV+N3Zlal5ywqrQC?=
+ =?us-ascii?Q?pO9oviO/06UaMW17OhNDmUivuwGdyS3SbIpPp7Cj6TWblwkB5BmaWsWsNHF+?=
+ =?us-ascii?Q?p1fRe64eZ8myyw9vNRLoBaoC81OIAQpTqinfsgCxOT98DbN6W/UyHBZCyj5c?=
+ =?us-ascii?Q?f+c7js1vHQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d7a6ca6-e254-4246-2624-08de5d6a3ae1
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2026 06:06:37.0249
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8y5PG+gEjaiO1/QWXu0eb9qVZQR4VM+bZrOoYoVwO1KJOdAqMGh9iIVuuB1nonjqOoEsTSw2EkfV+WeqYaNdDQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB9509
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,korsgaard.com,nucleusys.com,shawell.net,microchip.com,fintech.ru,suse.com,piap.pl,pengutronix.de,online.de];
+	TAGGED_FROM(0.00)[bounces-253712-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,intel.com,chinatelecom.cn,kvack.org,suse.cz,linux-foundation.org,kernel.org,google.com,cmpxchg.org,linux.dev,vger.kernel.org,suse.com,gmail.com,infradead.org,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-253711-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[oliver.sang@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.cz:email]
-X-Rspamd-Queue-Id: 620C99039F
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 265D4903AE
 X-Rspamd-Action: no action
 
-Many USB network drivers define get_drvinfo functions which add no
-value over usbnet_get_drvinfo, only setting the driver name and
-version. usbnet_get_drvinfo automatically sets the driver name, and
-separate driver versions are now frowned upon in the kernel. Remove all
-driver versions and replace these get_drvinfo functions with references
-to usbnet_get_drvinfo where possible. Where that is not possible,
-remove unnecessary code to set the driver name. Also remove two
-unnecessary initializations from aqc111_get_drvinfo, an inaccurate
-comment in pegasus.c, and an unused macro in catc.c.
 
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
-Changes in v3:
-Add changelog
-Add received Reviewed-by tag
 
-Changes in v2:
-Also remove driver versions from smsc[79]5xx (missed in the original
-patch because they had a version definition but didn't use it in
-get_drvinfo)
+Hello,
 
- drivers/net/usb/aqc111.c       |  5 -----
- drivers/net/usb/asix.h         |  3 ---
- drivers/net/usb/asix_common.c  |  8 --------
- drivers/net/usb/asix_devices.c |  8 +++-----
- drivers/net/usb/ax88172a.c     |  2 +-
- drivers/net/usb/catc.c         |  7 -------
- drivers/net/usb/dm9601.c       |  9 +--------
- drivers/net/usb/mcs7830.c      |  7 +------
- drivers/net/usb/pegasus.c      |  3 ---
- drivers/net/usb/r8152.c        | 10 ----------
- drivers/net/usb/rtl8150.c      |  3 ---
- drivers/net/usb/sierra_net.c   | 14 +-------------
- drivers/net/usb/smsc75xx.c     |  3 ---
- drivers/net/usb/smsc95xx.c     |  3 ---
- drivers/net/usb/sr9800.c       | 12 +-----------
- drivers/net/usb/sr9800.h       |  3 +--
- 16 files changed, 9 insertions(+), 91 deletions(-)
+kernel test robot noticed "WARNING:inconsistent_lock_state" on:
 
-diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
-index 9201ee10a13f..0722050dbe32 100644
---- a/drivers/net/usb/aqc111.c
-+++ b/drivers/net/usb/aqc111.c
-@@ -20,8 +20,6 @@
- 
- #include "aqc111.h"
- 
--#define DRIVER_NAME "aqc111"
--
- static int aqc111_read_cmd_nopm(struct usbnet *dev, u8 cmd, u16 value,
- 				u16 index, u16 size, void *data)
- {
-@@ -207,13 +205,10 @@ static void aqc111_get_drvinfo(struct net_device *net,
- 
- 	/* Inherit standard device info */
- 	usbnet_get_drvinfo(net, info);
--	strscpy(info->driver, DRIVER_NAME, sizeof(info->driver));
- 	snprintf(info->fw_version, sizeof(info->fw_version), "%u.%u.%u",
- 		 aqc111_data->fw_ver.major,
- 		 aqc111_data->fw_ver.minor,
- 		 aqc111_data->fw_ver.rev);
--	info->eedump_len = 0x00;
--	info->regdump_len = 0x00;
- }
- 
- static void aqc111_get_wol(struct net_device *net,
-diff --git a/drivers/net/usb/asix.h b/drivers/net/usb/asix.h
-index 8531b804021a..cf97bc3d388b 100644
---- a/drivers/net/usb/asix.h
-+++ b/drivers/net/usb/asix.h
-@@ -29,7 +29,6 @@
- #include <net/selftests.h>
- #include <linux/phylink.h>
- 
--#define DRIVER_VERSION "22-Dec-2011"
- #define DRIVER_NAME "asix"
- 
- /* ASIX AX8817X based USB 2.0 Ethernet Devices */
-@@ -248,8 +247,6 @@ int asix_get_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
- int asix_set_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
- 		    u8 *data);
- 
--void asix_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info);
--
- int asix_set_mac_address(struct net_device *net, void *p);
- 
- #endif /* _ASIX_H */
-diff --git a/drivers/net/usb/asix_common.c b/drivers/net/usb/asix_common.c
-index 6ab3486072cb..4f03f4e57655 100644
---- a/drivers/net/usb/asix_common.c
-+++ b/drivers/net/usb/asix_common.c
-@@ -731,14 +731,6 @@ int asix_set_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
- 	return ret;
- }
- 
--void asix_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
--{
--	/* Inherit standard device info */
--	usbnet_get_drvinfo(net, info);
--	strscpy(info->driver, DRIVER_NAME, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
--}
--
- int asix_set_mac_address(struct net_device *net, void *p)
- {
- 	struct usbnet *dev = netdev_priv(net);
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index 232bbd79a4de..96fa5dc2b469 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -115,7 +115,7 @@ static int asix_ioctl (struct net_device *net, struct ifreq *rq, int cmd)
-    own structure so we don't interfere with other usbnet
-    devices that may be connected at the same time. */
- static const struct ethtool_ops ax88172_ethtool_ops = {
--	.get_drvinfo		= asix_get_drvinfo,
-+	.get_drvinfo		= usbnet_get_drvinfo,
- 	.get_link		= asix_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
- 	.set_msglevel		= usbnet_set_msglevel,
-@@ -324,7 +324,7 @@ static int ax88772_ethtool_set_pauseparam(struct net_device *ndev,
- }
- 
- static const struct ethtool_ops ax88772_ethtool_ops = {
--	.get_drvinfo		= asix_get_drvinfo,
-+	.get_drvinfo		= usbnet_get_drvinfo,
- 	.get_link		= usbnet_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
- 	.set_msglevel		= usbnet_set_msglevel,
-@@ -985,7 +985,7 @@ static void ax88178_unbind(struct usbnet *dev, struct usb_interface *intf)
- }
- 
- static const struct ethtool_ops ax88178_ethtool_ops = {
--	.get_drvinfo		= asix_get_drvinfo,
-+	.get_drvinfo		= usbnet_get_drvinfo,
- 	.get_link		= asix_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
- 	.set_msglevel		= usbnet_set_msglevel,
-@@ -1642,7 +1642,5 @@ static struct usb_driver asix_driver = {
- module_usb_driver(asix_driver);
- 
- MODULE_AUTHOR("David Hollis");
--MODULE_VERSION(DRIVER_VERSION);
- MODULE_DESCRIPTION("ASIX AX8817X based USB 2.0 Ethernet Devices");
- MODULE_LICENSE("GPL");
--
-diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
-index 758a423a459b..3100fbe153c0 100644
---- a/drivers/net/usb/ax88172a.c
-+++ b/drivers/net/usb/ax88172a.c
-@@ -114,7 +114,7 @@ static const struct net_device_ops ax88172a_netdev_ops = {
- };
- 
- static const struct ethtool_ops ax88172a_ethtool_ops = {
--	.get_drvinfo		= asix_get_drvinfo,
-+	.get_drvinfo		= usbnet_get_drvinfo,
- 	.get_link		= usbnet_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
- 	.set_msglevel		= usbnet_set_msglevel,
-diff --git a/drivers/net/usb/catc.c b/drivers/net/usb/catc.c
-index 6759388692f8..5c7f19cbacf6 100644
---- a/drivers/net/usb/catc.c
-+++ b/drivers/net/usb/catc.c
-@@ -37,14 +37,8 @@
- 
- #include <linux/usb.h>
- 
--/*
-- * Version information.
-- */
--
--#define DRIVER_VERSION "v2.8"
- #define DRIVER_AUTHOR "Vojtech Pavlik <vojtech@suse.cz>"
- #define DRIVER_DESC "CATC EL1210A NetMate USB Ethernet driver"
--#define SHORT_DRIVER_DESC "EL1210A NetMate USB Ethernet"
- 
- MODULE_AUTHOR(DRIVER_AUTHOR);
- MODULE_DESCRIPTION(DRIVER_DESC);
-@@ -673,7 +667,6 @@ static void catc_get_drvinfo(struct net_device *dev,
- {
- 	struct catc *catc = netdev_priv(dev);
- 	strscpy(info->driver, driver_name, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
- 	usb_make_path(catc->usbdev, info->bus_info, sizeof(info->bus_info));
- }
- 
-diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
-index 2b4716ccf0c5..43fae1959547 100644
---- a/drivers/net/usb/dm9601.c
-+++ b/drivers/net/usb/dm9601.c
-@@ -259,13 +259,6 @@ static void dm9601_mdio_write(struct net_device *netdev, int phy_id, int loc,
- 	dm_write_shared_word(dev, 1, loc, res);
- }
- 
--static void dm9601_get_drvinfo(struct net_device *net,
--			       struct ethtool_drvinfo *info)
--{
--	/* Inherit standard device info */
--	usbnet_get_drvinfo(net, info);
--}
--
- static u32 dm9601_get_link(struct net_device *net)
- {
- 	struct usbnet *dev = netdev_priv(net);
-@@ -281,7 +274,7 @@ static int dm9601_ioctl(struct net_device *net, struct ifreq *rq, int cmd)
- }
- 
- static const struct ethtool_ops dm9601_ethtool_ops = {
--	.get_drvinfo	= dm9601_get_drvinfo,
-+	.get_drvinfo	= usbnet_get_drvinfo,
- 	.get_link	= dm9601_get_link,
- 	.get_msglevel	= usbnet_get_msglevel,
- 	.set_msglevel	= usbnet_set_msglevel,
-diff --git a/drivers/net/usb/mcs7830.c b/drivers/net/usb/mcs7830.c
-index fdda0616704e..3a551ad363d0 100644
---- a/drivers/net/usb/mcs7830.c
-+++ b/drivers/net/usb/mcs7830.c
-@@ -438,11 +438,6 @@ static int mcs7830_get_regs_len(struct net_device *net)
- 	return 0;
- }
- 
--static void mcs7830_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *drvinfo)
--{
--	usbnet_get_drvinfo(net, drvinfo);
--}
--
- static void mcs7830_get_regs(struct net_device *net, struct ethtool_regs *regs, void *data)
- {
- 	struct usbnet *dev = netdev_priv(net);
-@@ -452,11 +447,11 @@ static void mcs7830_get_regs(struct net_device *net, struct ethtool_regs *regs,
- }
- 
- static const struct ethtool_ops mcs7830_ethtool_ops = {
--	.get_drvinfo		= mcs7830_get_drvinfo,
- 	.get_regs_len		= mcs7830_get_regs_len,
- 	.get_regs		= mcs7830_get_regs,
- 
- 	/* common usbnet calls */
-+	.get_drvinfo		= usbnet_get_drvinfo,
- 	.get_link		= usbnet_get_link,
- 	.get_msglevel		= usbnet_get_msglevel,
- 	.set_msglevel		= usbnet_set_msglevel,
-diff --git a/drivers/net/usb/pegasus.c b/drivers/net/usb/pegasus.c
-index c514483134f0..7b6d6eb60709 100644
---- a/drivers/net/usb/pegasus.c
-+++ b/drivers/net/usb/pegasus.c
-@@ -18,9 +18,6 @@
- #include <linux/uaccess.h>
- #include "pegasus.h"
- 
--/*
-- * Version Information
-- */
- #define DRIVER_AUTHOR "Petko Manolov <petkan@nucleusys.com>"
- #define DRIVER_DESC "Pegasus/Pegasus II USB Ethernet driver"
- 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 880b59ed5422..e8e6689d2c70 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -30,13 +30,6 @@
- #include <linux/usb/r8152.h>
- #include <net/gso.h>
- 
--/* Information for net-next */
--#define NETNEXT_VERSION		"12"
--
--/* Information for net */
--#define NET_VERSION		"13"
--
--#define DRIVER_VERSION		"v1." NETNEXT_VERSION "." NET_VERSION
- #define DRIVER_AUTHOR "Realtek linux nic maintainers <nic_swsd@realtek.com>"
- #define DRIVER_DESC "Realtek RTL8152/RTL8153 Based USB Ethernet Adapters"
- #define MODULENAME "r8152"
-@@ -8756,7 +8749,6 @@ static void rtl8152_get_drvinfo(struct net_device *netdev,
- 	struct r8152 *tp = netdev_priv(netdev);
- 
- 	strscpy(info->driver, MODULENAME, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
- 	usb_make_path(tp->udev, info->bus_info, sizeof(info->bus_info));
- 	if (!IS_ERR_OR_NULL(tp->rtl_fw.fw))
- 		strscpy(info->fw_version, tp->rtl_fw.version,
-@@ -9950,7 +9942,6 @@ static int rtl8152_probe_once(struct usb_interface *intf,
- 		goto out2;
- 
- 	set_bit(PROBED_WITH_NO_ERRORS, &tp->flags);
--	netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
- 
- 	return 0;
- 
-@@ -10145,4 +10136,3 @@ module_exit(rtl8152_driver_exit);
- MODULE_AUTHOR(DRIVER_AUTHOR);
- MODULE_DESCRIPTION(DRIVER_DESC);
- MODULE_LICENSE("GPL");
--MODULE_VERSION(DRIVER_VERSION);
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index e40b0669d9f4..2f1f134b5b48 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -13,8 +13,6 @@
- #include <linux/usb.h>
- #include <linux/uaccess.h>
- 
--/* Version Information */
--#define DRIVER_VERSION "v0.6.2 (2004/08/27)"
- #define DRIVER_AUTHOR "Petko Manolov <petkan@users.sourceforge.net>"
- #define DRIVER_DESC "rtl8150 based usb-ethernet driver"
- 
-@@ -785,7 +783,6 @@ static void rtl8150_get_drvinfo(struct net_device *netdev, struct ethtool_drvinf
- 	rtl8150_t *dev = netdev_priv(netdev);
- 
- 	strscpy(info->driver, driver_name, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
- 	usb_make_path(dev->udev, info->bus_info, sizeof(info->bus_info));
- }
- 
-diff --git a/drivers/net/usb/sierra_net.c b/drivers/net/usb/sierra_net.c
-index 36c73db44f77..3ca60ebdd468 100644
---- a/drivers/net/usb/sierra_net.c
-+++ b/drivers/net/usb/sierra_net.c
-@@ -12,10 +12,8 @@
-  * Sierra Wireless. Use at your own risk.
-  */
- 
--#define DRIVER_VERSION "v.2.0"
- #define DRIVER_AUTHOR "Paxton Smith, Matthew Safar, Rory Filer"
- #define DRIVER_DESC "USB-to-WWAN Driver for Sierra Wireless modems"
--static const char driver_name[] = "sierra_net";
- 
- /* if defined debug messages enabled */
- /*#define	DEBUG*/
-@@ -607,15 +605,6 @@ static void sierra_net_status(struct usbnet *dev, struct urb *urb)
- 	}
- }
- 
--static void sierra_net_get_drvinfo(struct net_device *net,
--		struct ethtool_drvinfo *info)
--{
--	/* Inherit standard device info */
--	usbnet_get_drvinfo(net, info);
--	strscpy(info->driver, driver_name, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
--}
--
- static u32 sierra_net_get_link(struct net_device *net)
- {
- 	struct usbnet *dev = netdev_priv(net);
-@@ -624,7 +613,7 @@ static u32 sierra_net_get_link(struct net_device *net)
- }
- 
- static const struct ethtool_ops sierra_net_ethtool_ops = {
--	.get_drvinfo = sierra_net_get_drvinfo,
-+	.get_drvinfo = usbnet_get_drvinfo,
- 	.get_link = sierra_net_get_link,
- 	.get_msglevel = usbnet_get_msglevel,
- 	.set_msglevel = usbnet_set_msglevel,
-@@ -973,5 +962,4 @@ module_usb_driver(sierra_net_driver);
- 
- MODULE_AUTHOR(DRIVER_AUTHOR);
- MODULE_DESCRIPTION(DRIVER_DESC);
--MODULE_VERSION(DRIVER_VERSION);
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/usb/smsc75xx.c b/drivers/net/usb/smsc75xx.c
-index 78c821349f48..fbc9d796f605 100644
---- a/drivers/net/usb/smsc75xx.c
-+++ b/drivers/net/usb/smsc75xx.c
-@@ -21,7 +21,6 @@
- #include "smsc75xx.h"
- 
- #define SMSC_CHIPNAME			"smsc75xx"
--#define SMSC_DRIVER_VERSION		"1.0.0"
- #define HS_USB_PKT_SIZE			(512)
- #define FS_USB_PKT_SIZE			(64)
- #define DEFAULT_HS_BURST_CAP_SIZE	(16 * 1024 + 5 * HS_USB_PKT_SIZE)
-@@ -1447,8 +1446,6 @@ static int smsc75xx_bind(struct usbnet *dev, struct usb_interface *intf)
- 	struct smsc75xx_priv *pdata = NULL;
- 	int ret;
- 
--	printk(KERN_INFO SMSC_CHIPNAME " v" SMSC_DRIVER_VERSION "\n");
--
- 	ret = usbnet_get_endpoints(dev, intf);
- 	if (ret < 0) {
- 		netdev_warn(dev->net, "usbnet_get_endpoints failed: %d\n", ret);
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index de733e0488bf..488eac211a91 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -27,7 +27,6 @@
- #include "smsc95xx.h"
- 
- #define SMSC_CHIPNAME			"smsc95xx"
--#define SMSC_DRIVER_VERSION		"2.0.0"
- #define HS_USB_PKT_SIZE			(512)
- #define FS_USB_PKT_SIZE			(64)
- #define DEFAULT_HS_BURST_CAP_SIZE	(16 * 1024 + 5 * HS_USB_PKT_SIZE)
-@@ -1160,8 +1159,6 @@ static int smsc95xx_bind(struct usbnet *dev, struct usb_interface *intf)
- 	int ret, phy_irq;
- 	u32 val;
- 
--	printk(KERN_INFO SMSC_CHIPNAME " v" SMSC_DRIVER_VERSION "\n");
--
- 	ret = usbnet_get_endpoints(dev, intf);
- 	if (ret < 0) {
- 		netdev_warn(dev->net, "usbnet_get_endpoints failed: %d\n", ret);
-diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
-index 57947a5590cc..1a2cce6f275e 100644
---- a/drivers/net/usb/sr9800.c
-+++ b/drivers/net/usb/sr9800.c
-@@ -469,15 +469,6 @@ static int sr_get_eeprom(struct net_device *net,
- 	return 0;
- }
- 
--static void sr_get_drvinfo(struct net_device *net,
--				 struct ethtool_drvinfo *info)
--{
--	/* Inherit standard device info */
--	usbnet_get_drvinfo(net, info);
--	strscpy(info->driver, DRIVER_NAME, sizeof(info->driver));
--	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
--}
--
- static u32 sr_get_link(struct net_device *net)
- {
- 	struct usbnet *dev = netdev_priv(net);
-@@ -518,7 +509,7 @@ static int sr_set_mac_address(struct net_device *net, void *p)
- }
- 
- static const struct ethtool_ops sr9800_ethtool_ops = {
--	.get_drvinfo	= sr_get_drvinfo,
-+	.get_drvinfo	= usbnet_get_drvinfo,
- 	.get_link	= sr_get_link,
- 	.get_msglevel	= usbnet_get_msglevel,
- 	.set_msglevel	= usbnet_set_msglevel,
-@@ -872,6 +863,5 @@ static struct usb_driver sr_driver = {
- module_usb_driver(sr_driver);
- 
- MODULE_AUTHOR("Liu Junliang <liujunliang_ljl@163.com");
--MODULE_VERSION(DRIVER_VERSION);
- MODULE_DESCRIPTION("SR9800 USB 2.0 USB2NET Dev : http://www.corechip-sz.com");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/usb/sr9800.h b/drivers/net/usb/sr9800.h
-index 952e6f7c0321..98ac1c45740e 100644
---- a/drivers/net/usb/sr9800.h
-+++ b/drivers/net/usb/sr9800.h
-@@ -147,8 +147,7 @@
- #define SR_EEPROM_MAGIC			0xdeadbeef
- #define SR9800_EEPROM_LEN		0xff
- 
--/* SR9800 Driver Version and Driver Name */
--#define DRIVER_VERSION			"11-Nov-2013"
-+/* SR9800 Driver Name and Flags */
- #define DRIVER_NAME			"CoreChips"
- #define	DRIVER_FLAG		\
- 	(FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |  FLAG_MULTI_PACKET)
+commit: 4f0cbecbc533f56605274f6211e31907ed792bdf ("[PATCH v7] mm/page_alloc: boost watermarks on atomic allocation failure")
+url: https://github.com/intel-lab-lkp/linux/commits/Qiliang-Yuan/mm-page_alloc-boost-watermarks-on-atomic-allocation-failure/20260123-144418
+base: v6.19-rc6
+patch link: https://lore.kernel.org/all/20260123064231.250767-1-realwujing@gmail.com/
+patch subject: [PATCH v7] mm/page_alloc: boost watermarks on atomic allocation failure
+
+in testcase: trinity
+version: trinity-i386-abe9de86-1_20230429
+with following parameters:
+
+	runtime: 600s
+
+
+
+config: x86_64-randconfig-075-20251114
+compiler: gcc-14
+test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 32G
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202601271341.5d24a59f-lkp@intel.com
+
+
+
+[  151.153230][ T1379] WARNING: inconsistent lock state
+[  151.153836][ T1379] 6.19.0-rc6-00001-g4f0cbecbc533 #1 Not tainted
+[  151.154605][ T1379] --------------------------------
+[  151.155192][ T1379] inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+[  151.155825][ T1379] trinity-c0/1379 [HC0[0]:SC0[0]:HE1:SE1] takes:
+[  151.156424][ T1379] ffffffff8865d9e8 (&zone->lock){+.?.}-{3:3}, at: __alloc_pages_slowpath+0x1265/0x1b00
+[  151.157399][ T1379] {IN-SOFTIRQ-W} state was registered at:
+[  151.158029][ T1379]   __lock_acquire (kernel/locking/lockdep.c:5191 (discriminator 1))
+[  151.158629][ T1379]   lock_acquire (include/trace/events/lock.h:24 (discriminator 15) include/trace/events/lock.h:24 (discriminator 15) kernel/locking/lockdep.c:5831 (discriminator 15))
+[  151.159221][ T1379]   lock_acquire (kernel/locking/lockdep.c:5833)
+[  151.159670][ T1379]   _raw_spin_lock_irqsave (include/linux/spinlock_api_smp.h:111 kernel/locking/spinlock.c:162)
+[  151.160180][ T1379]   rmqueue_bulk (mm/page_alloc.c:2592 (discriminator 1))
+[  151.160637][ T1379]   __rmqueue_pcplist (mm/page_alloc.c:3374 (discriminator 3))
+[  151.161132][ T1379]   rmqueue+0x1b3c/0x3400
+[  151.161630][ T1379]   get_page_from_freelist (mm/page_alloc.c:3982)
+[  151.162294][ T1379]   __alloc_frozen_pages_noprof (mm/page_alloc.c:5282)
+[  151.163006][ T1379]   allocate_slab (mm/slub.c:3079 mm/slub.c:3248)
+[  151.163482][ T1379]   ___slab_alloc (mm/slub.c:3302 mm/slub.c:4656)
+[  151.163962][ T1379]   __slab_alloc+0x30/0x80
+[  151.164464][ T1379]   __kmalloc_noprof (mm/slub.c:4855 mm/slub.c:5251 mm/slub.c:5656 mm/slub.c:5669)
+[  151.164954][ T1379]   alloc_ep_req (drivers/usb/gadget/u_f.c:22 (discriminator 4))
+[  151.165425][ T1379]   source_sink_start_ep (drivers/usb/gadget/function/f_sourcesink.c:292 drivers/usb/gadget/function/f_sourcesink.c:608)
+[  151.166375][ T1379]   enable_source_sink (drivers/usb/gadget/function/f_sourcesink.c:662)
+[  151.167006][ T1379]   sourcesink_set_alt (drivers/usb/gadget/function/f_sourcesink.c:744)
+[  151.167515][ T1379]   set_config+0x323/0xb00
+[  151.168019][ T1379]   composite_setup (include/linux/spinlock.h:391 drivers/usb/gadget/composite.c:1901)
+[  151.168548][ T1379]   dummy_timer (include/linux/spinlock.h:351 drivers/usb/gadget/udc/dummy_hcd.c:1929)
+[  151.169019][ T1379]   __hrtimer_run_queues (kernel/time/hrtimer.c:1777 kernel/time/hrtimer.c:1841)
+[  151.169550][ T1379]   hrtimer_run_softirq (kernel/time/hrtimer.c:1860)
+[  151.170198][ T1379]   handle_softirqs (arch/x86/include/asm/jump_label.h:37 include/trace/events/irq.h:142 kernel/softirq.c:623)
+[  151.170817][ T1379]   __irq_exit_rcu (kernel/softirq.c:657 kernel/softirq.c:496 kernel/softirq.c:723)
+[  151.171325][ T1379]   irq_exit_rcu (kernel/softirq.c:741 (discriminator 38))
+[  151.171780][ T1379]   sysvec_call_function_single (arch/x86/kernel/smp.c:266 (discriminator 35) arch/x86/kernel/smp.c:266 (discriminator 35))
+[  151.172366][ T1379]   asm_sysvec_call_function_single (arch/x86/include/asm/idtentry.h:704)
+[  151.172952][ T1379]   pv_native_safe_halt (arch/x86/kernel/paravirt.c:82)
+[  151.173449][ T1379]   arch_cpu_idle (arch/x86/kernel/process.c:805)
+[  151.173991][ T1379]   default_idle_call (include/linux/cpuidle.h:143 (discriminator 1) kernel/sched/idle.c:123 (discriminator 1))
+[  151.174997][ T1379]   cpuidle_idle_call (kernel/sched/idle.c:192)
+[  151.175913][ T1379]   do_idle (kernel/sched/idle.c:332)
+[  151.176666][ T1379]   cpu_startup_entry (kernel/sched/idle.c:429)
+[  151.177536][ T1379]   rest_init (init/main.c:757)
+[  151.178357][ T1379]   start_kernel (init/main.c:1206)
+[  151.179249][ T1379]   x86_64_start_reservations (arch/x86/kernel/head64.c:310)
+[  151.180213][ T1379]   x86_64_start_kernel (??:?)
+[  151.181119][ T1379]   common_startup_64 (arch/x86/kernel/head_64.S:419)
+[  151.181992][ T1379] irq event stamp: 16437333
+[  151.182773][ T1379] hardirqs last  enabled at (16437333): _raw_spin_unlock_irq (arch/x86/include/asm/irqflags.h:42 arch/x86/include/asm/irqflags.h:119 include/linux/spinlock_api_smp.h:159 kernel/locking/spinlock.c:202)
+[  151.184399][ T1379] hardirqs last disabled at (16437332): _raw_spin_lock_irq (include/linux/spinlock_api_smp.h:117 (discriminator 1) kernel/locking/spinlock.c:170 (discriminator 1))
+[  151.186068][ T1379] softirqs last  enabled at (16422642): handle_softirqs (kernel/softirq.c:469 (discriminator 2) kernel/softirq.c:650 (discriminator 2))
+[  151.187758][ T1379] softirqs last disabled at (16422637): __irq_exit_rcu (kernel/softirq.c:657 kernel/softirq.c:496 kernel/softirq.c:723)
+[  151.189383][ T1379]
+[  151.189383][ T1379] other info that might help us debug this:
+[  151.190809][ T1379]  Possible unsafe locking scenario:
+[  151.190809][ T1379]
+[  151.192092][ T1379]        CPU0
+[  151.192740][ T1379]        ----
+[  151.193401][ T1379]   lock(&zone->lock);
+[  151.194192][ T1379]   <Interrupt>
+[  151.194940][ T1379]     lock(&zone->lock);
+[  151.195734][ T1379]
+[  151.195734][ T1379]  *** DEADLOCK ***
+[  151.195734][ T1379]
+[  151.197223][ T1379] 2 locks held by trinity-c0/1379:
+[  151.198134][ T1379]  #0: ffff8881001b2400 (sb_writers#5){.+.+}-{0:0}, at: ksys_fallocate (include/linux/file.h:62 (discriminator 1) include/linux/file.h:83 (discriminator 1) fs/open.c:358 (discriminator 1))
+[  151.199767][ T1379]  #1: ffff8881373cd0d0 (&sb->s_type->i_mutex_key#12){+.+.}-{4:4}, at: shmem_fallocate (mm/shmem.c:3688)
+[  151.201543][ T1379]
+[  151.201543][ T1379] stack backtrace:
+[  151.202709][ T1379] CPU: 0 UID: 65534 PID: 1379 Comm: trinity-c0 Not tainted 6.19.0-rc6-00001-g4f0cbecbc533 #1 PREEMPT  5190a26909b47a16cbbcf00ba20dd51a77658a62
+[  151.202723][ T1379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[  151.202735][ T1379] Call Trace:
+[  151.202739][ T1379]  <TASK>
+[  151.202743][ T1379]  dump_stack_lvl (lib/dump_stack.c:122)
+[  151.202760][ T1379]  dump_stack (lib/dump_stack.c:130)
+[  151.202766][ T1379]  print_usage_bug+0x25d/0x380
+[  151.202775][ T1379]  mark_lock_irq (kernel/locking/lockdep.c:4268)
+[  151.202782][ T1379]  ? save_trace (kernel/locking/lockdep.c:557 (discriminator 1) kernel/locking/lockdep.c:594 (discriminator 1))
+[  151.202792][ T1379]  mark_lock (kernel/locking/lockdep.c:4753)
+[  151.202798][ T1379]  mark_usage (kernel/locking/lockdep.c:4666 (discriminator 1))
+[  151.202803][ T1379]  __lock_acquire (kernel/locking/lockdep.c:5191 (discriminator 1))
+[  151.202809][ T1379]  ? mark_held_locks (kernel/locking/lockdep.c:4325 (discriminator 1))
+[  151.202815][ T1379]  lock_acquire (include/trace/events/lock.h:24 (discriminator 15) include/trace/events/lock.h:24 (discriminator 15) kernel/locking/lockdep.c:5831 (discriminator 15))
+[  151.202820][ T1379]  ? __alloc_pages_slowpath+0x1265/0x1b00
+[  151.202832][ T1379]  ? get_page_from_freelist (mm/page_alloc.c:3733 (discriminator 1) mm/page_alloc.c:3936 (discriminator 1))
+[  151.202838][ T1379]  ? wakeup_kswapd (arch/x86/include/asm/atomic64_64.h:15 include/linux/atomic/atomic-arch-fallback.h:2583 include/linux/atomic/atomic-long.h:38 include/linux/atomic/atomic-instrumented.h:3189 include/linux/mmzone.h:1106 include/linux/mmzone.h:1600 mm/vmscan.c:7378)
+[  151.202848][ T1379]  lock_acquire (kernel/locking/lockdep.c:5833)
+[  151.202853][ T1379]  ? __alloc_pages_slowpath+0x1265/0x1b00
+[  151.202861][ T1379]  _raw_spin_lock (include/linux/spinlock_api_smp.h:134 kernel/locking/spinlock.c:154)
+[  151.202869][ T1379]  ? __alloc_pages_slowpath+0x1265/0x1b00
+[  151.202876][ T1379]  __alloc_pages_slowpath+0x1265/0x1b00
+[  151.202887][ T1379]  ? warn_alloc (mm/page_alloc.c:4731)
+[  151.202896][ T1379]  ? get_page_from_freelist (mm/page_alloc.c:3733 (discriminator 1) mm/page_alloc.c:3936 (discriminator 1))
+[  151.202902][ T1379]  ? lock_is_held_type (kernel/locking/lockdep.c:5601 (discriminator 1) kernel/locking/lockdep.c:5940 (discriminator 1))
+[  151.202913][ T1379]  __alloc_frozen_pages_noprof (mm/page_alloc.c:5295)
+[  151.202920][ T1379]  ? __alloc_pages_slowpath+0x1b00/0x1b00
+[  151.202929][ T1379]  ? filemap_get_entry (mm/filemap.c:1888)
+[  151.202936][ T1379]  ? __folio_lock_or_retry (mm/filemap.c:1888)
+[  151.202944][ T1379]  __folio_alloc_noprof (mm/page_alloc.c:5316 mm/page_alloc.c:5326)
+[  151.202951][ T1379]  shmem_alloc_and_add_folio+0xfc/0x3c0
+[  151.202961][ T1379]  shmem_get_folio_gfp+0x388/0xd80
+[  151.202970][ T1379]  shmem_fallocate (mm/shmem.c:3780)
+[  151.202980][ T1379]  ? shmem_get_link (mm/shmem.c:3675)
+[  151.202987][ T1379]  ? find_held_lock (kernel/locking/lockdep.c:5350 (discriminator 1))
+[  151.202998][ T1379]  ? __lock_acquire (kernel/locking/lockdep.c:5237 (discriminator 1))
+[  151.203003][ T1379]  ? find_held_lock (kernel/locking/lockdep.c:5350 (discriminator 1))
+[  151.203013][ T1379]  ? lock_acquire (include/trace/events/lock.h:24 (discriminator 15) include/trace/events/lock.h:24 (discriminator 15) kernel/locking/lockdep.c:5831 (discriminator 15))
+[  151.203018][ T1379]  ? ksys_fallocate (include/linux/file.h:62 (discriminator 1) include/linux/file.h:83 (discriminator 1) fs/open.c:358 (discriminator 1))
+[  151.203030][ T1379]  ? lock_is_held_type (kernel/locking/lockdep.c:5601 (discriminator 1) kernel/locking/lockdep.c:5940 (discriminator 1))
+[  151.203039][ T1379]  vfs_fallocate (fs/open.c:339 (discriminator 1))
+[  151.203047][ T1379]  ksys_fallocate (include/linux/file.h:62 (discriminator 1) include/linux/file.h:83 (discriminator 1) fs/open.c:358 (discriminator 1))
+[  151.203055][ T1379]  __ia32_sys_ia32_fallocate (arch/x86/kernel/sys_ia32.c:119)
+[  151.203065][ T1379]  ? __do_fast_syscall_32 (arch/x86/include/asm/irqflags.h:42 arch/x86/include/asm/irqflags.h:119 arch/x86/entry/syscall_32.c:280)
+[  151.203074][ T1379]  ia32_sys_call (arch/x86/entry/syscall_32.c:50)
+[  151.203079][ T1379]  __do_fast_syscall_32 (arch/x86/entry/syscall_32.c:83 (discriminator 1) arch/x86/entry/syscall_32.c:307 (discriminator 1))
+[  151.203088][ T1379]  do_fast_syscall_32 (arch/x86/entry/syscall_32.c:332 (discriminator 1))
+[  151.203096][ T1379]  do_SYSENTER_32 (arch/x86/entry/syscall_32.c:371)
+[  151.203103][ T1379]  entry_SYSENTER_compat_after_hwframe (arch/x86/entry/entry_64_compat.S:127)
+[  151.203111][ T1379] RIP: 0023:0xf7ed9589
+[  151.203118][ T1379] Code: 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 2e 8d b4 26 00 00 00 00 8d b4 26 00 00 00
+All code
+========
+   0:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+	...
+  20:	00 51 52             	add    %dl,0x52(%rcx)
+  23:	55                   	push   %rbp
+  24:	89 e5                	mov    %esp,%ebp
+  26:*	0f 34                	sysenter		<-- trapping instruction
+  28:	cd 80                	int    $0x80
+  2a:	5d                   	pop    %rbp
+  2b:	5a                   	pop    %rdx
+  2c:	59                   	pop    %rcx
+  2d:	c3                   	ret
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	90                   	nop
+  31:	90                   	nop
+  32:	2e 8d b4 26 00 00 00 	cs lea 0x0(%rsi,%riz,1),%esi
+  39:	00 
+  3a:	8d                   	.byte 0x8d
+  3b:	b4 26                	mov    $0x26,%ah
+  3d:	00 00                	add    %al,(%rax)
+	...
+
+Code starting with the faulting instruction
+===========================================
+   0:	5d                   	pop    %rbp
+   1:	5a                   	pop    %rdx
+   2:	59                   	pop    %rcx
+   3:	c3                   	ret
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	2e 8d b4 26 00 00 00 	cs lea 0x0(%rsi,%riz,1),%esi
+   f:	00 
+  10:	8d                   	.byte 0x8d
+  11:	b4 26                	mov    $0x26,%ah
+  13:	00 00                	add    %al,(%rax)
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20260127/202601271341.5d24a59f-lkp@intel.com
+
+
+
 -- 
-2.43.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
