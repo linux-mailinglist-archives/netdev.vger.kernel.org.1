@@ -1,186 +1,211 @@
-Return-Path: <netdev+bounces-253832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNoeHFKneGnVrgEAu9opvQ
-	(envelope-from <netdev+bounces-253832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:53:54 +0100
+	id qAVUOs6oeGl9rwEAu9opvQ
+	(envelope-from <netdev+bounces-253833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:00:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D1C93E72
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:53:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA5093F26
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 887D130226AD
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:53:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7C79F3004D24
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079AA34AB0B;
-	Tue, 27 Jan 2026 11:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDE430EF90;
+	Tue, 27 Jan 2026 12:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kB8SrFBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9215307494;
-	Tue, 27 Jan 2026 11:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585642D6E5A;
+	Tue, 27 Jan 2026 12:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769514831; cv=none; b=JLf/xOq42E6q938sBTrq0ubkMKKOKKjNJ+W7p52KaS/7Xu78oj0/E9E6B7FOMpYF+y6Fz4mO0Rirk7qbCiN7gYxAsqRyRKTyw4gPPMzeg0fldgHT0IgT9Yfgn0cPf0rQuyst7eodiqdkytRYEg9ZHGNK9G9Tw9I7lkB3xQS0slg=
+	t=1769515211; cv=none; b=s++F8N5ebYvi0J1cfWeRPxEO1oYK+3SHIw4Kd86zfvWDNJKiCwl0Pk2S8zps8hE2B48VvPWK/cxDhJ70/IJs+jrzgTNMkw6i5b/cj1MqRXjt/KPw1Nfji90r+SQ6fNEWQFpKfr7if2UzdDdyipj1SbTms1brtR2QoITUZ1sMffI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769514831; c=relaxed/simple;
-	bh=0uuzltDyeIqpzLEcuqA6to0AWPnwQPXq94CKfGDwwaQ=;
+	s=arc-20240116; t=1769515211; c=relaxed/simple;
+	bh=SeLALWDOP83Jw3okDSyIifVylWpRx8J9njxbkkPruig=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLrQIKQMEPFUTI25RlL5R7D1s7TroeACDGFWKkW5UpzmLen5hvDyNMP7es+PI/vIZVnTb8RI5Krd5yMlTuord2FNUJIqlUuNyIZhCUMJOFXZGLjXZauXhvJ6MKodP5GXIBFv8z5rylzfMBy0zY2rXhFF7Ljvai/QOAWPQeWeXdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vkhdV-000000008UM-0oiX;
-	Tue, 27 Jan 2026 11:53:33 +0000
-Date: Tue, 27 Jan 2026 11:53:28 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v8 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aXinOE7KIFIm5dUK@makrotopia.org>
-References: <cover.1769053079.git.daniel@makrotopia.org>
- <18c6a24eef8617abb5073569fee162f1aa1c06ea.1769053079.git.daniel@makrotopia.org>
- <c2e191c4-dec4-4e42-b108-353778d9bd18@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZpeHNhW6RWvudHoBGxxJv2U2G6gFupBeFy3PPOXg+XT6+uDWdVAvhTQrQsQAON5un0kmYjHiK4SlYQ2awqVTTJIY2T4V4MtUn4rNpaLFRt60kSBjgLfNl0pn1D/E4PLE+mEHcXixq7hkaZnl33N3gtoEJyvy88ccoviUui98YAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kB8SrFBV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B45DC116C6;
+	Tue, 27 Jan 2026 12:00:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769515210;
+	bh=SeLALWDOP83Jw3okDSyIifVylWpRx8J9njxbkkPruig=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kB8SrFBVdLcDp1yO21dPiiLLQ4Jr5Ybfy6tLGM2XI/gK2CYW8fjNWg9Du6y4EWrjE
+	 3NIgAi2RQ6740vmp1QbiFheUnoRLQGoFNgH52Lg6XSHChxpK8T7FqMepfIUO4WsCym
+	 Xvjaq10fo61gyKaupdnylv2TwW/DKprmwbQbf3U3ghAFss4pj+jFTW8U4E/VF50nHi
+	 5PLaWITS4KnXj324Q22UeEUdk1gSpbbX79StZrHPYLa3IwTrN4wPGo4IQad7iCra3C
+	 sOUIXlEgIx0dE4oHDzLwm8fI1j/qbjFBhkNfXWvlYzCB5/3iCGFzJ36oQy4KqWTndo
+	 XcLRFyHCiWGyQ==
+Date: Tue, 27 Jan 2026 14:00:04 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: Liu Jian <liujian56@huawei.com>, dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org,
+	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
+ smc_ib_is_sg_need_sync()
+Message-ID: <20260127120004.GT13967@unreal>
+References: <20250828124117.2622624-1-liujian56@huawei.com>
+ <20250909094532.GD341237@unreal>
+ <20260126044501.GA18724@j66a10360.sqa.eu95>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c2e191c4-dec4-4e42-b108-353778d9bd18@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260126044501.GA18724@j66a10360.sqa.eu95>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253832-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	DMARC_NA(0.00)[makrotopia.org];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253833-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:mid]
-X-Rspamd-Queue-Id: C9D1C93E72
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3AA5093F26
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 11:41:00AM +0100, Paolo Abeni wrote:
-> On 1/22/26 4:42 AM, Daniel Golle wrote:
-> > +static int mxl862xx_send_cmd(struct mxl862xx_priv *priv, u16 cmd, u16 size,
-> > +			     bool quiet)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_LEN_RET, size);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_CTRL,
-> > +				 cmd | CTRL_BUSY_MASK);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = mxl862xx_busy_wait(priv);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = mxl862xx_reg_read(priv, MXL862XX_MMD_REG_LEN_RET);
-> > +	/* handle errors returned by the firmware as -EIO
-> > +	 * The firmware is based on Zephyr OS and uses the errors as
-> > +	 * defined in errno.h of Zephyr OS. See
-> > +	 * https://github.com/zephyrproject-rtos/zephyr/blob/v3.7.0/lib/libc/minimal/include/errno.h
-> > +	 */
-> > +	if ((s16)ret < 0) {
+On Mon, Jan 26, 2026 at 12:45:01PM +0800, D. Wythe wrote:
+> On Tue, Sep 09, 2025 at 12:45:32PM +0300, Leon Romanovsky wrote:
+> > On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
+> > > BUG: kernel NULL pointer dereference, address: 00000000000002ec
+> > > PGD 0 P4D 0
+> > > Oops: Oops: 0000 [#1] SMP PTI
+> > > CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
+> > > Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> > > Workqueue: smc_hs_wq smc_listen_work [smc]
+> > > RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
+> > > ...
+> > > Call Trace:
+> > >  <TASK>
+> > >  smcr_buf_map_link+0x211/0x2a0 [smc]
+> > >  __smc_buf_create+0x522/0x970 [smc]
+> > >  smc_buf_create+0x3a/0x110 [smc]
+> > >  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
+> > >  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
+> > >  smc_listen_find_device+0x1dd/0x2b0 [smc]
+> > >  smc_listen_work+0x30f/0x580 [smc]
+> > >  process_one_work+0x18c/0x340
+> > >  worker_thread+0x242/0x360
+> > >  kthread+0xe7/0x220
+> > >  ret_from_fork+0x13a/0x160
+> > >  ret_from_fork_asm+0x1a/0x30
+> > >  </TASK>
+> > > 
+> > > If the software RoCE device is used, ibdev->dma_device is a null pointer.
+> > > As a result, the problem occurs. Null pointer detection is added to
+> > > prevent problems.
+> > > 
+> > > Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
+> > > Signed-off-by: Liu Jian <liujian56@huawei.com>
+> > > ---
+> > > v1->v2:
+> > > move the check outside of loop.
+> > >  net/smc/smc_ib.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> > > index 53828833a3f7..a42ef3f77b96 100644
+> > > --- a/net/smc/smc_ib.c
+> > > +++ b/net/smc/smc_ib.c
+> > > @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
+> > >  	unsigned int i;
+> > >  	bool ret = false;
+> > >  
+> > > +	if (!lnk->smcibdev->ibdev->dma_device)
+> > > +		return ret;
+> > 
+> > Please use ib_uses_virt_dma() function for that.
+> > 
+> > It is clearly stated in the code:
+> >   2784 struct ib_device {
+> >   2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
+> >   2786         struct device                *dma_device;     
+> > 
+> > Thanks
+> > 
+> >
 > 
-> The cast is likely not needed above? if `ret` values < S16_MIN are
-> possible this will return such values to the caller without the IO err
-> printk.
+> Hi Leon,
+> 
+> Sorry for the late reply, I just noticed this and thank you for your review.
+> I agree completely with your feedback: we should not be accessing ibdev->dma_device
+> directly. Following your advice, replacing the
+> 
+> 	if (!lnk->smcibdev->ibdev->dma_device)
+> 
+> check with ib_uses_virt_dma() is straightforward and absolutely the correct
+> thing to do for that part of the logic.
+> 
+> However, this has led me to a further challenge. The main purpose of the
+> smc_ib_is_sg_need_sync() function is to get the result of dma_need_sync().
+> This means that even after correctly using ib_uses_virt_dma(), the function
+> still needs to call dma_need_sync(ibdev->dma_device, ...), which forces us
+> right back into the direct access pattern we are trying to eliminate.
 
-Right, it should rather be
+I would like to challenge the use of dma_need_sync() in smc_ib.c. From
+what I see, it is used to avoid calls to dma_sync_single_*_device()
+which will be NOP anyway in that case.
 
-if (ret > S16_MAX && ret <= U16_MAX)
-
-to really only catch the range of numbers which are negative 16-bit
-signed values represented as positive 32-bit signed values.
-
-mxl862xx_reg_read() primarily returns a signed 32-bit integer, as it is
-basically just a wrapper around __mdiodev_c45_read(). Negative values of
-that 32-bit integer mean that the MDIO Clause-45 read has somehow
-failed, ie. it's the error the MDIO bus .read_c45() operation has
-returned.
-
-In case __mdiodev_c45_read() succeeds it returns the 16-bit value of the
-register read. In this case, those 16-bit should be interpreted as a
-16-bit signed integer here. A negative value denotes an error returned
-from the firmware running on the switch (see comment above the code).
+Why did you copy that logic from XSK?
 
 > 
-> > +		if (!quiet)
-> > +			dev_err(&priv->mdiodev->dev,
-> > +				"CMD %04x returned error %d\n", cmd, (s16)ret);
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
-> > +		      u16 size, bool read, bool quiet)
-> > +{
-> > +	__le16 *data = _data;
-> > +	u16 max, i;
-> > +	int ret, cmd_ret;
+> Since the RDMA doesn't currently offer a helper for this "check" functionality,
+> I'd like to propose adding one. What are your thoughts on a new helper like
+> the one below, which would allow us to solve this cleanly?
 > 
-> Minor nit: reverse christmas tree above.
+> /* ib_verbs.h */
+> static inline bool ib_dma_need_sync(struct ib_device *dev, dma_addr_t dma_addr) {
+> 	return !ib_uses_virt_dma(dev) && dma_need_sync(dev->dma_device, dma_addr);
+> }
 
-Oh right.... I anyway found another minor issue, so I'm going to send
-v9 with the above as well as the other minor issue fixed.
+If we're discussing wrappers, it's likely better to provide a wrapper around
+dma_sync_sg_for_cpu() for use in ib_dma_sync_sg_for_cpu(), rather than
+open‑coding the logic.
 
-> BTW the initial port isolation LGTM, but I would appreciate some DSA
-> expert second opinion.
+Thanks
 
-+1
+> 
+> Best wishes,
+> D. Wythe
+> 
+> 
 
