@@ -1,328 +1,200 @@
-Return-Path: <netdev+bounces-253745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAXOIRRxeGnEpwEAu9opvQ
-	(envelope-from <netdev+bounces-253745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:02:28 +0100
+	id UHMpLBJyeGnEpwEAu9opvQ
+	(envelope-from <netdev+bounces-253746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:06:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158DB90E20
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:02:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2879790EC6
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5B784300C31C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:02:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33CF13038FF8
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3FE1F63CD;
-	Tue, 27 Jan 2026 08:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050402853F7;
+	Tue, 27 Jan 2026 08:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ftjCPuRA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPGh519B";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="INgneyKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA2B7E0E4
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 08:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769500944; cv=none; b=XjvhP3dyJsB+PTx0vSmRIwEXWsIscH7yU06YLNS8X2psnbns22AvDvtif+W85GS14/+kHPL/0eNeJuzts9oqDlor+74qhIxOxn8bKTSlxCbhOhYzP67HExI3R6j7aqqXRxUGkRU4ze1lXdKe/i86oMWGajYeiD/qH5fs20M+u2A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769500944; c=relaxed/simple;
-	bh=HsScYRN8C7XxHBUEFBrWlntzO0aUNoi24rZlNL0zzJY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uPfShCJ7GIOryt+5Syjq3XmgRpXnGjM2vy2vJSoR3H7Hpife+VEEcT3eFkexzHi/gQwUSUUSWZCtH+OvjJN7pMkhXFA1p+Qr9tnmRlKOpxvbNnsVXfpmaeP62VrSFVe4azYpCgdAE1nIQXPnDhD3f25Gc06aOLwUnqjMVsqmrks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ftjCPuRA; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5013c912f9fso60191451cf.2
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:02:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C33C2580EE
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 08:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769501192; cv=pass; b=joDMU9Gf0XVq8CwMDmCm2kzqXALXap9FJzsSRdswbzA+ktU25mCq8ucIlyWhOvdnwHAPIvnkvF3uDlhv678O8AJemEMLafzq4JQOkS6SCiiQgu4qBrxRo0hRXKShTuI4Did3VGATvAiS1W6looF0xygJ0PPYNuk0PoS1nahWxRA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769501192; c=relaxed/simple;
+	bh=TTzX35zi7e2uDGzGbD+UvIWRM4CrGZWHR2CuACTNbQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XNRvrG6FJNeeYamcjpdBEhpubuZk9o2lEnebOaLQZIIxzt6nb11C4rCw6jGyTzv+Ai4YjLRN3+Q/FrEVmn6UKXLTrNEcoXGONbc/XWWAaCVzSlhNlNwRO8C5bkuueKB438thFwGiK595ymVRzL8/eeQa+3px9IY7VD/+0JdLCuw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iPGh519B; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=INgneyKm; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769501190;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Np7Cptnfw+XZkLrXgFu9BqaG1+Fb7vNwdeFnlALDuRg=;
+	b=iPGh519BSDvaatI9Gjwaq80ZU6Fnmwnk73oXnbp0+BlhFLgfYUAy5Ln7S6WpVgDhKOpMkx
+	HWrK8nqYdjWYRxLE6/upL+BoscE/Ng3BcNLkdj8p6ol4ex0Ug6R38zbgO6vAlEhf76fnom
+	FlhzY6DUaH0Ftf7WisRjd7lc80y5+ew=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-299-8_2yIX5bMUq1rIVT6TbBag-1; Tue, 27 Jan 2026 03:06:28 -0500
+X-MC-Unique: 8_2yIX5bMUq1rIVT6TbBag-1
+X-Mimecast-MFC-AGG-ID: 8_2yIX5bMUq1rIVT6TbBag_1769501187
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b630b4d8d52so3581796a12.3
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:06:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769501187; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X8Wk6kKrhBf/Zzq+w5XTZMwglluKxCP+upvQlCH9jBu4iwOGgRiocUq1scjEJD9W0k
+         OafmPpVvICIvdYUmuym1X6MBdV8Hc2m68TOTo9RZXlaHtzuk1/MOuxhx0+scvK1QDvff
+         OwFalIq1tmtDUGmRpE+8Q2qR9YEyB2nIHcUSrnmuWOPPp6PaPw+VjDhm5rPqDkKiQkW9
+         GDlyonRGyQFKtTd127ne1YD5qriMGPYLHo+PaL/OlzsijwqX8TEYVDkIq+9VX7DjS4Gr
+         lG00XD5EpiV3pOxNbflfN/nP9KFUM0YFDWY6rLOtxANiLKhu9HiHUPxjqDh7Ipok7pga
+         5jiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Np7Cptnfw+XZkLrXgFu9BqaG1+Fb7vNwdeFnlALDuRg=;
+        fh=BuHJe0fgThetL32TQjziygVp6ibpprbt8Cv8Oj3VPdw=;
+        b=EHKous2tmzCnsj4/bkq6HyJl0CsgaGz3qPdrCU/We1YrS1OWvZQ0t3kXrHKdt76RAX
+         8BiL0JfEPcRiElSGVzjbnXM/pzYQczxqC0HqtBYDcQOuTTTNcGOu7Yi3dqYrniQpMrKY
+         v7RNjX64ypZ3pi4EZ49ZuL1amufbipqbLR/9MF24gu3KLe0qQPXC+U8vVe8cYwF3YRcM
+         4X1hrWQChAx1X9SqcaNmtKWY17x8NhpR2TCDcaW4pFasbCWI+5xCvkuQjGAAYmrQr81x
+         Zv3Gzv3c9TNl3kMbz+iGXmG30A9a+xOTE87JjF8BaG1GlJim1KdYYDxwJFmXu284soen
+         uoPQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769500941; x=1770105741; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gYyhxoUylHHW2V1XitCAxiaLRC0fKk6AB8sFPEBn1tg=;
-        b=ftjCPuRASxqKhEO7UMP2+uPIt8YnIGUwgt1pOhe7PzDckVoDQh83qK3EmZEnPbUiWR
-         pBhqU2hVJQzxC/ER7DVvuhYahNdMtj/PUsg+8yj9WAeOAutbmKyJsvyXZJmEvNOZsMk2
-         633oNNlfpBkyYGQc9vPbfHREYRqciRjDRXzun8hBs/GWDn8t4ToFJEkJvog/4pPm+537
-         NDPmolSJfAh0QquKiT3SAYcaPMJFhbmGJLO4YCdcni9YHFrIMViILs8Z8Dv9pVZRsQvS
-         CP4vdpQ1KdrxZB8oYVDHgOA+5nLV/Y0tW+MGvWoN/mlJyAOCx8z8FdCpq1vYNaXGHLlt
-         EJ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769500941; x=1770105741;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1769501187; x=1770105987; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gYyhxoUylHHW2V1XitCAxiaLRC0fKk6AB8sFPEBn1tg=;
-        b=qsv5IWmtqKDddFKfThO+9azv4oYK0m8rn9YQ6CUniZuepf1NAx9YR5idzF9UeltVyQ
-         t7ygQ3reomGjn8QQFxmKoQYugZz+U+AHom8LTcJmIfgB511pwpb7hT0OcaxP3EHvufNj
-         dUOaUhu1VMFZyaz8k96ueaHil5TJRbowIrveQQxdkyEZxcABPeXK3+y1XG4TwYSojdWD
-         dkgJWxuip4OqvyBQeMpeDDuocOGHXA6gGhgjoMs2CdZ8c/9wzx1MoWOwnElVxvU6pYDI
-         R2yGr1L4anz0QYPkshVEKpdrIpOaPBAVjOMO1U0wopLvQE4XlndGNsuhwjFWX1ieZ7Fp
-         PNgQ==
-X-Gm-Message-State: AOJu0YxaOXKO9lRcaBwhPALfe5i/LyFU0xSsBG4CP6xwsraQ49EKHpqZ
-	ZfpOj1Pvufw/WFn1EAwmGE16+SXlOzrOVquw4odEU3gLmQH6P83Z7wba
-X-Gm-Gg: AZuq6aJp4nm0luOUtl4yY/TSalAgwEezc3/4T0TXvj2jHP/ZWm7ypy9fKlEqZePVl6m
-	43ruoKdnyUlcSNl2Y01RAkxbHsNlErkbe4ug+nUWZfYLuNbC1sOsU8HBxE6RPA7PaNk8DY2kqCf
-	rIhOBWsDizUwrH2MQxZfy8XRDROXhz/BLkC/hic688VwACJ/c+nlLExZDxoRGzNhf+fJxba+YKs
-	/hCeqG8KE9Axyu8Lq+FXFgtXHlvC8MaVh8s1D77XyzJ7Ve0Vmpu2tKg0j3NCMi7088A+SIVXAGK
-	V4PkWd9w9be/bx83NgblJ9aVWqoza7F6WrOZjHQWoA6PRZB58+mZY8SZ9nMxc0zIZOyY/jnDXe/
-	Alidyi0iAeQzQmshuvl3nE/8NQ2SSZXjlMWrZchR41idWDk/45GH72DQ9qvSuE4t2tfhHBEVXaj
-	iTwYBjinhP8BwKThUBzSvC
-X-Received: by 2002:a05:622a:1453:b0:4ff:c144:a45 with SMTP id d75a77b69052e-5032f76dc5fmr8401861cf.1.1769500940541;
-        Tue, 27 Jan 2026 00:02:20 -0800 (PST)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-894aeb0ce21sm68244016d6.52.2026.01.27.00.02.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 00:02:20 -0800 (PST)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Tue, 27 Jan 2026 16:02:07 +0800
-Subject: [PATCH net v3] net: cpsw_new: Execute ndo_set_rx_mode callback in
- a work queue
+        bh=Np7Cptnfw+XZkLrXgFu9BqaG1+Fb7vNwdeFnlALDuRg=;
+        b=INgneyKmshgy37aWaFP8agBtMa1uB45+DBZ0PqCVbvKYdO+PU819WCH3Byn7/D8ZSW
+         RZLjyZfALZr4lOwuI23kmVFusbhxp4SppwqvseVvl8saKek5tsdX23Rt6R/47xiBU0hf
+         9WtTy3+HRVsddbeFE+L8zD06ibxHL42bgwG3MAePhO5peX+nenc/Ooovbmn3JgpTmWfF
+         ihswjFWhJgztjtT+I3vMhBU23yOJj6HjLJp2ICjE6uk2nzVdI/UfC0Kkb0Fvlb2ORXLy
+         EEzxDCpo6SVpOqHMXF2+d/AVd91On+uiKT7TLSG4BCuq4FWeXk2NBdSLznjRT56yp/Yq
+         W2AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769501187; x=1770105987;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Np7Cptnfw+XZkLrXgFu9BqaG1+Fb7vNwdeFnlALDuRg=;
+        b=mwPXt51My9OA+njU0Z4GsU1vxvPQRIg/pQtvGQmHLdSwXrmuZEAYNamds2kceC4C2K
+         SS1tKSIDZgPf1gmqm/lHIIlAmq32vM9p8Faddbz/I/+JI1gqzW9d54qMmS27vPOZ+XVO
+         caCSK6pNhg35wgzlYBIWa9aUIxbWZ9CefPLB3CRxwbptEi5sqwKSMriQ/cs8C0jtSLAb
+         z2E40HPYJZadbVMr8ZxEoRIUC3fBdbGvLudVkDCsKG3SF68gAV/QM4R4+2PTkiPcjTAB
+         k7Rd0UfSw8tYUpYG7b1fdyal7LisK5cC3MlplrKbxGC+quM+mQYJ+ZeTenkS2po873NX
+         sz0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVMINsJFBzM2jStY1akwENAKMiWdSO4Mi2AGA/mWE8yHgf3N/wlk2SgkbO8X1rRPtVLZka7ddM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQS1YPlzG1B2IXUx4AKju0HofeLIjJ/RHfN0kn8aaD3ggiAEYP
+	c/KKb0H0HSjzX+ijwVLFkvUIGgtps91iQubYX5QU0Z1cnyE6x/faFepX0efigBtx/h9sPxyKTsN
+	8joh4yWkyyHDf7m47o6xlGJ5COjZETvJd/TnWaNSUJ5Dy6ZTKnrSkwCeZJL5sXt5CEtbFtwmEPm
+	h1V+2tVdxTLZzXLvRE//Xn+TTsfY9x5QSx
+X-Gm-Gg: AZuq6aJM3Jn1rFWJ2H5JbT+FE6sq8+qcgb/g2QbQFUV0wSmgqy5rslA+zkPPW/EJy0v
+	cqt6xD98zLQwv35tCe3XpfhTDDxuq0x9/L0HDrp1ng3Qxl/rFmZXFHxX5MmSEM6s3EeRCKGamoO
+	iOl2djnoDPbsn3LFaIiz6D8KLetMySa8Vn8V1htC9qu5rwMeb7TOXe7TzZMQ23kw+9hUs=
+X-Received: by 2002:a05:6300:670b:b0:361:63eb:d024 with SMTP id adf61e73a8af0-38ec62c85f2mr864711637.23.1769501187110;
+        Tue, 27 Jan 2026 00:06:27 -0800 (PST)
+X-Received: by 2002:a05:6300:670b:b0:361:63eb:d024 with SMTP id
+ adf61e73a8af0-38ec62c85f2mr864691637.23.1769501186706; Tue, 27 Jan 2026
+ 00:06:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260127-bbb-v3-1-5e71f340c1e9@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAP5weGkC/1WMyw6CMBBFf4XM2po+oFVX/odxQV8wiVDTkkZD+
- Hdr3WDu6t6Zc1ZILqJLcGlWiC5jwjCXIg4NmLGfB0fQlg6cckkZF0RrTawRUnVeKmYplM9ndB5
- f1XKD2S1wL+OIaQnxXc2Z1dOfJDNSoqSmWrGTaO11mHp8HE2YKp/5nul+DP8yXau877U5W7Fnt
- m37ALL94w3PAAAA
-X-Change-ID: 20260123-bbb-dc3675f671d0
-To: netdev@vger.kernel.org
-Cc: Kevin Hao <haokexin@gmail.com>, stable@vger.kernel.org, 
- Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, linux-omap@vger.kernel.org
-X-Mailer: b4 0.14.2
+References: <20260127073921.175981-1-lulu@redhat.com>
+In-Reply-To: <20260127073921.175981-1-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 27 Jan 2026 16:06:14 +0800
+X-Gm-Features: AZwV_Qi9BNqEGOfaJTvxImo9xsBd4ZDBvvBGEwTUkdPThnSlmVC_s4smZpdhUJw
+Message-ID: <CACGkMEuEjtnY=-BFj-hhn7JG+N=LtjOJYM1HSonjgKo+wf3m5A@mail.gmail.com>
+Subject: Re: [PATCH] vhost: remove impossible check in VHOST_GET_FORK_FROM_OWNER
+ ioctl
+To: Cindy Lu <lulu@redhat.com>
+Cc: mst@redhat.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253745-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253746-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,ti.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,nxp.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nxp.com:email,ti.com:email,linux.dev:url]
-X-Rspamd-Queue-Id: 158DB90E20
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 2879790EC6
 X-Rspamd-Action: no action
 
-Commit 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for
-IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.") removed the RTNL lock for
-IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP operations. However, this
-change triggered the following call trace on my BeagleBone Black board:
-  WARNING: net/8021q/vlan_core.c:236 at vlan_for_each+0x120/0x124, CPU#0: rpcbind/496
-  RTNL: assertion failed at net/8021q/vlan_core.c (236)
-  Modules linked in:
-  CPU: 0 UID: 997 PID: 496 Comm: rpcbind Not tainted 6.19.0-rc6-next-20260122-yocto-standard+ #8 PREEMPT
-  Hardware name: Generic AM33XX (Flattened Device Tree)
-  Call trace:
-   unwind_backtrace from show_stack+0x28/0x2c
-   show_stack from dump_stack_lvl+0x30/0x38
-   dump_stack_lvl from __warn+0xb8/0x11c
-   __warn from warn_slowpath_fmt+0x130/0x194
-   warn_slowpath_fmt from vlan_for_each+0x120/0x124
-   vlan_for_each from cpsw_add_mc_addr+0x54/0xd8
-   cpsw_add_mc_addr from __hw_addr_ref_sync_dev+0xc4/0xec
-   __hw_addr_ref_sync_dev from __dev_mc_add+0x78/0x88
-   __dev_mc_add from igmp6_group_added+0x84/0xec
-   igmp6_group_added from __ipv6_dev_mc_inc+0x1fc/0x2f0
-   __ipv6_dev_mc_inc from __ipv6_sock_mc_join+0x124/0x1b4
-   __ipv6_sock_mc_join from do_ipv6_setsockopt+0x84c/0x1168
-   do_ipv6_setsockopt from ipv6_setsockopt+0x88/0xc8
-   ipv6_setsockopt from do_sock_setsockopt+0xe8/0x19c
-   do_sock_setsockopt from __sys_setsockopt+0x84/0xac
-   __sys_setsockopt from ret_fast_syscall+0x0/0x5
+On Tue, Jan 27, 2026 at 3:39=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> remove impossible fork_owner check in VHOST_GET_FORK_FROM_OWNER ioctl
+>
+> Fixes: 7d9896e9f6d02d8a ("vhost: Reintroduce kthread API and add mode sel=
+ection")
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vhost/vhost.c | 5 -----
+>  1 file changed, 5 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index bccdc9eab267..889481c92236 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2338,11 +2338,6 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned=
+ int ioctl, void __user *argp)
+>         if (ioctl =3D=3D VHOST_GET_FORK_FROM_OWNER) {
+>                 u8 fork_owner_val =3D d->fork_owner;
+>
+> -               if (fork_owner_val !=3D VHOST_FORK_OWNER_TASK &&
+> -                   fork_owner_val !=3D VHOST_FORK_OWNER_KTHREAD) {
 
-This trace occurs because vlan_for_each() is called within
-cpsw_ndo_set_rx_mode(), which expects the RTNL lock to be held.
-Since modifying vlan_for_each() to operate without the RTNL lock is not
-straightforward, and because ndo_set_rx_mode() is invoked both with and
-without the RTNL lock across different code paths, simply adding
-rtnl_lock() in cpsw_ndo_set_rx_mode() is not a viable solution.
+There's another similar check in VHOST_SET_FORK_FROM_OWNER?
 
-To resolve this issue, we opt to execute the actual processing within
-a work queue, following the approach used by the icssg-prueth driver.
+Thanks
 
-Fixes: 1767bb2d47b7 ("ipv6: mcast: Don't hold RTNL for IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.")
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
-Cc: stable@vger.kernel.org
----
-Changes in v3:
-- Resolve the deadlock issue identified in the AI review [2]
-  by moving the netif_running() check under the RTNL lock and removing the
-  cancel_work_sync() call in cpsw_ndo_stop().
-
-- Link to v2: https://lore.kernel.org/r/20260125-bbb-v2-1-1547ffabc9d3@gmail.com
-
-Changes in v2:
-- Addresses the issue identified in the AI review [1]:
-  - Adds a netif_running() check in cpsw_ndo_set_rx_mode_work()
-  - Cancels the rx_mode_work in cpsw_ndo_stop()
-
-- Link to v1: https://lore.kernel.org/r/20260123-bbb-v1-1-176b0b71834d@gmail.com
-
-[1] https://netdev-ai.bots.linux.dev/ai-review.html?id=bd885e1e-1aed-4755-ad60-7150737ad0f5
-[2] https://netdev-ai.bots.linux.dev/ai-review.html?id=c9fc3cf8-a06c-4cb8-b26b-910e775951a0
----
-Please note that the cpsw driver also has the same issue. If this resolution
-is acceptable, I will create another patch to fix the issue in cpsw.
-
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Roger Quadros <rogerq@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: linux-omap@vger.kernel.org
----
- drivers/net/ethernet/ti/cpsw_new.c  | 34 ++++++++++++++++++++++++++++++++--
- drivers/net/ethernet/ti/cpsw_priv.h |  2 ++
- 2 files changed, 34 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index ab88d4c02cbde76207f89cf433e2b383dcde6a83..838615c9a5ec3c9226c2aff6325ecda13ba9729f 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -248,15 +248,25 @@ static int cpsw_purge_all_mc(struct net_device *ndev, const u8 *addr, int num)
- 	return 0;
- }
- 
--static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
-+static void cpsw_ndo_set_rx_mode_work(struct work_struct *work)
- {
--	struct cpsw_priv *priv = netdev_priv(ndev);
-+	struct cpsw_priv *priv = container_of(work, struct cpsw_priv, rx_mode_work);
- 	struct cpsw_common *cpsw = priv->cpsw;
-+	struct net_device *ndev = priv->ndev;
- 
-+	rtnl_lock();
-+	if (!netif_running(ndev)) {
-+		rtnl_unlock();
-+		return;
-+	}
-+
-+	netif_addr_lock_bh(ndev);
- 	if (ndev->flags & IFF_PROMISC) {
- 		/* Enable promiscuous mode */
- 		cpsw_set_promiscious(ndev, true);
- 		cpsw_ale_set_allmulti(cpsw->ale, IFF_ALLMULTI, priv->emac_port);
-+		netif_addr_unlock_bh(ndev);
-+		rtnl_unlock();
- 		return;
- 	}
- 
-@@ -270,6 +280,16 @@ static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
- 	/* add/remove mcast address either for real netdev or for vlan */
- 	__hw_addr_ref_sync_dev(&ndev->mc, ndev, cpsw_add_mc_addr,
- 			       cpsw_del_mc_addr);
-+	netif_addr_unlock_bh(ndev);
-+	rtnl_unlock();
-+}
-+
-+static void cpsw_ndo_set_rx_mode(struct net_device *ndev)
-+{
-+	struct cpsw_priv *priv = netdev_priv(ndev);
-+	struct cpsw_common *cpsw = priv->cpsw;
-+
-+	queue_work(cpsw->cmd_wq, &priv->rx_mode_work);
- }
- 
- static unsigned int cpsw_rxbuf_total_len(unsigned int len)
-@@ -1398,6 +1418,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 		priv->msg_enable = netif_msg_init(debug_level, CPSW_DEBUG);
- 		priv->emac_port = i + 1;
- 		priv->tx_packet_min = CPSW_MIN_PACKET_SIZE;
-+		INIT_WORK(&priv->rx_mode_work, cpsw_ndo_set_rx_mode_work);
- 
- 		if (is_valid_ether_addr(slave_data->mac_addr)) {
- 			ether_addr_copy(priv->mac_addr, slave_data->mac_addr);
-@@ -1976,6 +1997,13 @@ static int cpsw_probe(struct platform_device *pdev)
- 	}
- 	cpsw_split_res(cpsw);
- 
-+	cpsw->cmd_wq = create_singlethread_workqueue("cpsw_cmd_wq");
-+	if (!cpsw->cmd_wq) {
-+		dev_err(dev, "error initializing workqueue\n");
-+		ret = -ENOMEM;
-+		goto clean_cpts;
-+	}
-+
- 	/* setup netdevs */
- 	ret = cpsw_create_ports(cpsw);
- 	if (ret)
-@@ -2042,6 +2070,7 @@ static int cpsw_probe(struct platform_device *pdev)
- clean_unregister_notifiers:
- 	cpsw_unregister_notifiers(cpsw);
- clean_unregister_netdev:
-+	destroy_workqueue(cpsw->cmd_wq);
- 	cpsw_unregister_ports(cpsw);
- clean_cpts:
- 	cpts_release(cpsw->cpts);
-@@ -2068,6 +2097,7 @@ static void cpsw_remove(struct platform_device *pdev)
- 		return;
- 	}
- 
-+	destroy_workqueue(cpsw->cmd_wq);
- 	cpsw_unregister_notifiers(cpsw);
- 	cpsw_unregister_devlink(cpsw);
- 	cpsw_unregister_ports(cpsw);
-diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
-index 91add8925e235c6cf5542fde11f3383b9234c872..8cdf4bff198fcc05436ff381a7e4326b3e3c27b1 100644
---- a/drivers/net/ethernet/ti/cpsw_priv.h
-+++ b/drivers/net/ethernet/ti/cpsw_priv.h
-@@ -362,6 +362,7 @@ struct cpsw_common {
- 	struct net_device *hw_bridge_dev;
- 	bool ale_bypass;
- 	u8 base_mac[ETH_ALEN];
-+	struct workqueue_struct *cmd_wq;
- };
- 
- struct cpsw_ale_ratelimit {
-@@ -391,6 +392,7 @@ struct cpsw_priv {
- 	u32 tx_packet_min;
- 	struct cpsw_ale_ratelimit ale_bc_ratelimit;
- 	struct cpsw_ale_ratelimit ale_mc_ratelimit;
-+	struct work_struct rx_mode_work;
- };
- 
- #define ndev_to_cpsw(ndev) (((struct cpsw_priv *)netdev_priv(ndev))->cpsw)
-
----
-base-commit: 615aad0f61e0c7a898184a394dc895c610100d4f
-change-id: 20260123-bbb-dc3675f671d0
-
-Best regards,
--- 
-Kevin Hao <haokexin@gmail.com>
+> -                       r =3D -EINVAL;
+> -                       goto done;
+> -               }
+>                 if (put_user(fork_owner_val, (u8 __user *)argp)) {
+>                         r =3D -EFAULT;
+>                         goto done;
+> --
+> 2.51.0
+>
 
 
