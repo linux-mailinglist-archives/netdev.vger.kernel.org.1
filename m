@@ -1,110 +1,110 @@
-Return-Path: <netdev+bounces-253812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBHeGlSaeGk9rQEAu9opvQ
-	(envelope-from <netdev+bounces-253812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:58:28 +0100
+	id 4MDmIq6aeGk9rQEAu9opvQ
+	(envelope-from <netdev+bounces-253813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:59:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C751493410
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:58:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C089345D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 836B630097E8
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:58:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FA68302296D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0408A345751;
-	Tue, 27 Jan 2026 10:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AC2336EDE;
+	Tue, 27 Jan 2026 10:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfMAw3/M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSiLfhmm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6D0344055
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 10:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB7434575F
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 10:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769511505; cv=pass; b=Y4kFfVMRc9/sLy9maSwbUTy9itrLAV5RAAND5Avipvy4q/zb6bTfb+O2SUfp1u3OsU2qu11/r9CcK4GMj5gCywkyWyO70QkVTKp7q8YaoSPu3AayGt/001KQy2UArvewLQDvCWJDad9FLb2EjmufZpYUpJcJ+a5Rqd1AIyGaXLg=
+	t=1769511591; cv=pass; b=Pe3GSC7EqUN9NzX8FAlLbUXfCPSz866LuXPOrPxNJ+IUDLVZHqPxqWQZGO0LlllMEnNgd0D8zCoDXBY1ghustxayWgrF3ZORBD6gTTX9ARxqB3r9AEzrtGqshDPCLMbokRllIFl+SIviaYvYyYCdHeFQxVU7Ngu3CyNkgkEsHJI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769511505; c=relaxed/simple;
-	bh=9j47t5rMsU8ZASRBZwwfTEmAJ8TWZKYRSbD51WsqFfE=;
+	s=arc-20240116; t=1769511591; c=relaxed/simple;
+	bh=BECvrmATlKBwshE0pKD8YMPH0q22JCw7MblIaHu1gcg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ONr30UnEbrwNxpR6WFA/niIQ4l/NQI1LFta8SB3WJgIT8N/MjUuezOZN3mtbLpT3Cy6Q1JB3n5yvWF8uNbA8nji+SfQ6/UXA930vI2ID9FfjKA0mwHNDkm8Uu9zyh/rx48QYc+Xjq9gGe/ZwS9E8xaaTnWrQ8SjX8BG6lamZqdI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfMAw3/M; arc=pass smtp.client-ip=209.85.208.177
+	 To:Cc:Content-Type; b=kEmECc+nGUMY8teZKu5nuJhnu6Dp2UJoayZRbdi2QpGxt9E6wd++BryIdMFCoWTsrRsUD9S9MtG1RoBCK1xpyzyfJX3NyBalQeYiJw8hdMBL5zihC+xg6GIqnx5fjLK5C+SNq+tGNfvUzfCqIH6VquKwFEe2ltyVj6QK8bJBZ6U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YSiLfhmm; arc=pass smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-385b6a15affso59764671fa.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:58:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769511502; cv=none;
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-59dd490be5fso7274618e87.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:59:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769511587; cv=none;
         d=google.com; s=arc-20240605;
-        b=h1LnaP4qn3ZYy44ZE8BsRnzJ2Sj1EmGtB2OSS6XtSkIfQDMS+voxfJMSP0d9VUgp9h
-         7rHGtFNJPkx8Nt03pQRowFUnxKVNdTFEGndQBshMDZB9z/eyAZA5UWOGdkxLrp2qTEjB
-         hwDk6Ia0UnGq9vY2It/KdWUbMIAOpcUSOv3Gm36UylOYbQwZeudumQHK/YBD5UqoyaFr
-         LfKPIDv5KMgMyZB22+ALpBVnWkLzYZYp3EcUCnD0P25wJ9M3SQ7Pidbuo9e5YuyFATg5
-         WRzJ7Y1CONp2iGcFINMCL7HXDvmUkzbL0d53eEN7488oedeR4IRKwe05vdC7+aV9+Oyz
-         jWMw==
+        b=gzLe8fr2L2vzmr78UB8T/SYt+JGy5v6mgQTFi0ByFZpoc4ZXiDF+atfNSf0cW4ecIc
+         9p1yrLJrjpLG6RXjVvJ8UPY0lOYnCGO8OJVOC0e2byELpW/RETsP9z81+G2bZ+6jkoQK
+         EV45oPxfgQmfxfGwL82xhAYHj/Uoe5R63Afjw/QT282pgCOc1sgAdDONSyWQ+Pjr5lDD
+         S0P2OsE4X4ijNufCAfk/mQ9eyyNXAnKYmtiQwY5AS7Zsh9/NaznTbnyfGQqo339QhVSD
+         bwWsq6YIyO4n3Dagedf4Uj/x3aZL/st39rwh2HYmIRVZfCuCXT1XmQ3xTrAng27LHkhi
+         3UBg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=9j47t5rMsU8ZASRBZwwfTEmAJ8TWZKYRSbD51WsqFfE=;
-        fh=Gb88EkPsvaE3txQuWxoe91YYi4lYHCqDxatpvMQNdeQ=;
-        b=OMkOJR+Q5yZf5HC5tCSnFAShS83nwLxl2DLM78nKAVvouQyO38LWPggutZKIUZaYtc
-         G3sFMnW1MeDq4QyYGR9gYwF1CbYN2ZRDobnYR3g6k5Tm8g1juFvIUMetU4oq3BzPov9Z
-         6owYU0zgk+LN+43vC63lO2ynON0CGo4tYUGhLXk62Z0jiUcso0mCJ/AZ2xE3KABZPQVi
-         Tj+7AXdBwViTHyH6EVTbwTk4SEMuTde2wDRVSdmy2dyvguO8K06/HZ9fftUicyydscjq
-         i7scw2+qN2IAWmZ2UU3O8Q8LLaU2GylfND6pjL8yVvoZlaPvbyLZnuU/8FufCKvf2O3Q
-         p+jQ==;
+        bh=WYsfFHIplmOm9N2B0bIUCqqqwv0zYamUAJ//iJfYf5A=;
+        fh=XsSkTL9tY5x91IYJpEXbak0D/VCDYUXyK93oJCK5NbA=;
+        b=GZq+Mkxor5jLw9l+qW2IZTBaQ1aTSMfWCoBzs2ZPJowvOggAGjL05iQVVes/SlCBCi
+         vl3Ru7CrOVZXtfvVStywAY2Y4M2ZimGM/poTnGoWQ0zMoVrKiowyWgaHUI6dsr3yGbwu
+         f8CtvVnylof7K5dJ0pyLeAxH59dw3eGn/OhJBb5jV8UJabZffZQOfNz6lx6l/Gj0aAvq
+         WtDmeNKj9KLrJbzPogtqZQvxZtwPMDwMJmPthIjKbVBGE1ODVExnwv8fLi1qaGMN4c0q
+         xLqvcgp+0jh3Ph3nv5qP8pQXdWgdMR26K6V2AqwHEFMHKW5VJI3F5oS19h05Iwy/KCnP
+         1p9g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769511502; x=1770116302; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769511587; x=1770116387; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9j47t5rMsU8ZASRBZwwfTEmAJ8TWZKYRSbD51WsqFfE=;
-        b=OfMAw3/Mic2rqr1c4ldAl7P+FvOUuDD6RMHYqKLQHNAThUg3+149AJ/4KktNPrgg/A
-         5QgdzukVlamnkp9LVkQD3SmXxb65cfmC8/2EJIwQi3BchlNHV+YbOI2kws5FUvrwlPHg
-         k0jTtOlpdGEG33rmtNyOvanKzcZyOIqoMp/jYBeSEIxy9KXHa3TgsabW5GW8dREL7KcF
-         yiry7+TpjjWJ2/zMiBmLslpVWUE1RCyN+wXVSE4V+qKpwKDmPJrJ49dRCjwohXAE5Hff
-         //gvCqMfZRgdn0Yhpv0bsCFqj8XSYlry5KKWz1+8jCxGxGNKFYvCX35NKYkxS6/fy54J
-         1etw==
+        bh=WYsfFHIplmOm9N2B0bIUCqqqwv0zYamUAJ//iJfYf5A=;
+        b=YSiLfhmmUhBhJ8UB/7rA3oQQzDOCg2xveCdqBGs5si2z4aVjBS62qgHDsN3lauL78Z
+         7a8SXQhs5LD8FtlQez2oIzL1s2g/Vkbfob6qvBVYWQx6kqT5npUxWnqX6PbCgf8+1hui
+         RGnXEKFPZoskXbCn0WUacJYRBM8DykMMzaSWAOtnKFOz6G7sTkxp8sYtI1FzQLJt3bO/
+         +vclPJxovWIzvDp1kn6J+dK4fi6qe8Hd7Xq0PPTGl22rRFZ+UTdOmCUYgIFZ6e2HHEyb
+         i6UrgvesIMGqC3Heddylm9FFMwuwnQYq3aJnd5Gr7z/5UXh6sMLujSlhDjkykAsNFa81
+         1NoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769511502; x=1770116302;
+        d=1e100.net; s=20230601; t=1769511587; x=1770116387;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9j47t5rMsU8ZASRBZwwfTEmAJ8TWZKYRSbD51WsqFfE=;
-        b=K+A6ihETx9JMsE98Z0ZlwDapoyr7UByunMRMC217Wa+wOd7RqS1ycSNADBbj5Wsl3S
-         4M7MtULWqhLha2xw6oxHz/+XmaHjh4bJq5mVkpqFajxCQfctXE8LLcLoYwf+JLMCfzUq
-         cLoOZb19ElT8EH3LLeEQ9hIbBp2xq/nnvWVR9p1wM3bg3e0MJ10rvMgCrKD04SR71B1h
-         5b7kiPy8sodUaq3s/7GpYLorcIFe6PApkxRVV/oB7K0C5C5DMZgz9dX2TSiektA/lI+N
-         3AzDdkqNsoy4iORIRjE53YHHdjsPt7/s2o4NUY3jNq/xvJFZQNMG0p/xjow8PdA+uE97
-         cchA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUzmOnn57ZOo2t+uhWeHWB6ePU4K9YsOdO7kNsVVGr0H7AUKpAGeOyXE9BybUzPypBayU+leM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjM4Squk5z5Gea3JJKc2OU6yD6lXHXJIBotyBqtBWpEXWdz1rH
-	ctrpFeCM4ZumIuaLm7chojzX4lMlZHtLUDfbTH8sPTr1CtqYsgm5h2DsQY1bI2/FDCu+7pjnXpn
-	ENcYFdsBj2KcqJkWlqNdzLUiPvoMuDd4=
-X-Gm-Gg: AZuq6aL5r3AAZxc0YqEiUhs+Q3PQr76H6vRGRyDEOKho8YghwG//sKyQvPbKJClZAIX
-	eDAIK93YVoWVCx+2jrw5Bs2yBnMog+LZa253+M8eKAzsp8rXQEeMGkWhTanQdgw9nYykvuEgnFQ
-	sMqGS3KXk4f4m1iPhpVuwbpYFnkcHu7omor6UxPIHQzOZFFCTFZwJPhSA2dLI6i37j8y6MGZBQL
-	U6qMvqYXNWIDSbfYwFUmjk0l8/MFie+fgKpTiQzXYVFSetVJuyEyANlzH94FN2swRSJyOPbPq2g
-	/DTcH3+9LIwhDU1SHdbfGVNdVg==
-X-Received: by 2002:a2e:a98c:0:b0:383:160f:c230 with SMTP id
- 38308e7fff4ca-3861cdf742fmr6587841fa.6.1769511502131; Tue, 27 Jan 2026
- 02:58:22 -0800 (PST)
+        bh=WYsfFHIplmOm9N2B0bIUCqqqwv0zYamUAJ//iJfYf5A=;
+        b=clp8TS8a75WxdlQTnIZuwGk6rQ2lHvB16Sry8mcwfw2S3tiEkT2pr6lmJAxIoliobv
+         z9MhAX6D+XvVJTJQJ46mz/zV4ueq4kKCKiIm5sR2vXpN76Fqllh6BFHjmjx/cNwkjra0
+         dMcYSmEK2xL7+WDC1cO8JyX/YaihsZ1PQSZ8oWkqJEwfwtdhXeiXQGDZL5YTPZFHMkgT
+         B5czMnhGLDpu+aOeIIR1QQBW1VtRSBYO+K27mrM3McQigeJOo/0LNImVI2BsIjkUHk86
+         p9wgo/3gki1uIg38+Hr0NftwhVUSbWbLLukldT7GWD89zFgI3v84fzSXiu6K3EMo/Vy7
+         QN+g==
+X-Forwarded-Encrypted: i=1; AJvYcCX8SpUm9P1j6XnTnG3jsnioPB0Y6qyKsbsrRw8+XAir+X+IJMDwPFntThXpnUIljWRBCwfz2mE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysKx7dVAHKyUWzAMqcqJTyC1ojHGjieWF94LV/ruUX3uI2D5tq
+	MOlZ4QmAMt1/LRqUYGmQKQygeDyElbcXX589ahihXppmPJK6NVeFZJhge07NXrbawiNHFq6NsBy
+	HhYw2o7skcedB6+dyozseSMhvwrljlgU=
+X-Gm-Gg: AZuq6aJ1pVIRMFqsDfvzbKOGEoNs15Cndykzjpjr46rPjA+dHaafnRyzHcZylXBnCjm
+	IuyP65QWk0EUjVgOqQqhWq00yTwrP853eXri1YJzEiD/xfLdNgJNE91ADzmJU0ziWrLXYXS8JlG
+	7awB16DXOxDcqiXUV2D+9bw8BYRhZ+xkFkxAL2p4SJ+HhEJ0xZNJ5qMun4Pl1OZAESreTJzakz3
+	rJEVSUwBLguYG1G5ObqlsjD8Wg9Ps+6+jPqQOEIWYAxlciJXcyCpnww2ZQDsedzovj9w+8wiHyY
+	eazTppLw9mUskc7GmhCSGLlscQ==
+X-Received: by 2002:a05:6512:234e:b0:59e:14f:a4d7 with SMTP id
+ 2adb3069b0e04-59e0412c504mr596109e87.27.1769511587201; Tue, 27 Jan 2026
+ 02:59:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121184621.198537-1-one-d-wide@protonmail.com>
-In-Reply-To: <20260121184621.198537-1-one-d-wide@protonmail.com>
+References: <20260121184621.198537-1-one-d-wide@protonmail.com> <20260121184621.198537-2-one-d-wide@protonmail.com>
+In-Reply-To: <20260121184621.198537-2-one-d-wide@protonmail.com>
 From: Donald Hunter <donald.hunter@gmail.com>
-Date: Tue, 27 Jan 2026 10:58:10 +0000
-X-Gm-Features: AZwV_QilmQ0M_E_OX9gIvzqQlcezsEx3A9Xsbwt7w5VyeNrZs3zZwncF7WeR9UU
-Message-ID: <CAD4GDZwLgUW1STpjQegzsMSZb4mOh_L79FVJx0SvmhXSpxjVSw@mail.gmail.com>
-Subject: Re: [PATCH v6 0/6] doc/netlink: Expand nftables specification
+Date: Tue, 27 Jan 2026 10:59:35 +0000
+X-Gm-Features: AZwV_QjjnqVDqp9AOjWvw9Flzx5vLDm-5nUzTQmwPn_FMTo536uddKntxFCb2_w
+Message-ID: <CAD4GDZwy3B4pYH8q+MwY=NMNELjAcdwwk-trM+vAKhyvQCzH3w@mail.gmail.com>
+Subject: Re: [PATCH v6 1/6] doc/netlink: netlink-raw: Add max check
 To: "Remy D. Farley" <one-d-wide@protonmail.com>
 Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
 	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
@@ -116,12 +116,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253812-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253813-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[protonmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -139,26 +139,55 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:email,protonmail.com:email,strlen.de:email]
-X-Rspamd-Queue-Id: C751493410
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,protonmail.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 38C089345D
 X-Rspamd-Action: no action
 
 On Wed, 21 Jan 2026 at 18:47, Remy D. Farley <one-d-wide@protonmail.com> wrote:
 >
-> Getting out some changes I've accumulated while making nftables work
-> with Rust netlink-bindings. Hopefully, this will be useful upstream.
+> Add definitions for max check and len-or-limit type, the same as in other
+> specifications.
+>
+> Suggested-by: Donald Hunter <donald.hunter@gmail.com>
+> Signed-off-by: Remy D. Farley <one-d-wide@protonmail.com>
 
-Hi Remy,
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
-Can you please cc the netfilter maintainers (and we should add
-nftables.yaml to the NETFILTER entry in MAINTAINERS).
-
-./scripts/get_maintainer.pl net/netfilter/nfnetlink.c
-Pablo Neira Ayuso <pablo@netfilter.org> (maintainer:NETFILTER)
-Florian Westphal <fw@strlen.de> (maintainer:NETFILTER)
-Phil Sutter <phil@nwl.cc> (reviewer:NETFILTER)
-...
-netfilter-devel@vger.kernel.org (open list:NETFILTER)
-coreteam@netfilter.org (open list:NETFILTER)
-...
+> ---
+>  Documentation/netlink/netlink-raw.yaml | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+> index 0166a7e4a..dd98dda55 100644
+> --- a/Documentation/netlink/netlink-raw.yaml
+> +++ b/Documentation/netlink/netlink-raw.yaml
+> @@ -19,6 +19,12 @@ $defs:
+>      type: [ string, integer ]
+>      pattern: ^[0-9A-Za-z_-]+( - 1)?$
+>      minimum: 0
+> +  len-or-limit:
+> +    # literal int, const name, or limit based on fixed-width type
+> +    # e.g. u8-min, u16-max, etc.
+> +    type: [ string, integer ]
+> +    pattern: ^[0-9A-Za-z_-]+$
+> +    minimum: 0
+>
+>  # Schema for specs
+>  title: Protocol
+> @@ -270,7 +276,10 @@ properties:
+>                      type: string
+>                    min:
+>                      description: Min value for an integer attribute.
+> -                    type: integer
+> +                    $ref: '#/$defs/len-or-limit'
+> +                  max:
+> +                    description: Max value for an integer attribute.
+> +                    $ref: '#/$defs/len-or-limit'
+>                    min-len:
+>                      description: Min length for a binary attribute.
+>                      $ref: '#/$defs/len-or-define'
+> --
+> 2.51.2
+>
+>
 
