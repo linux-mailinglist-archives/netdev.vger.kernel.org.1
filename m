@@ -1,156 +1,158 @@
-Return-Path: <netdev+bounces-253790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253791-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HgvKeqLeGmqqwEAu9opvQ
-	(envelope-from <netdev+bounces-253790-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:56:58 +0100
+	id oLTCJPaNeGmqqwEAu9opvQ
+	(envelope-from <netdev+bounces-253791-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:05:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A08922EC
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:56:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED969265C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C93653002518
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:51:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8FA82301187E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660C4335096;
-	Tue, 27 Jan 2026 09:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE251274B48;
+	Tue, 27 Jan 2026 10:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fZLJ3Q6b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bwq33vMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C20B278E63
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23FE42A80;
+	Tue, 27 Jan 2026 10:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769507477; cv=none; b=kjHCRznZVqU52mM1ePp/TVD/950A1tj0nhDvOhZPnTg+iNqGTyA5u0jJjCdKlzIdMZeMxRQLSa/uIJaQDMB6SgbI+FQDSgvxG4vnhvl0PTazKExq/84xSGLSu+mWUzfgQ4Iy8MuOAGamYxCG0qXNt/Hjee04rxCF+V/Op6RHgQo=
+	t=1769508028; cv=none; b=Rjcz+fw+3pgL/rWjFgh9X3TvDVtC0q5D8IZ1eds/C4LU/uNn5VEZIqGjs13nvrg4zSrDlnvAKrxjKtGZSmDBWZHE1a/CO9MVIPqyWreorIJ2EckWcmmPy4F+3vyPVMtBWu5C3PMKh0+PjM4G9gjhOJzL0avAwSHnI+csnOY5BW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769507477; c=relaxed/simple;
-	bh=luuMhjbbq0GlMuoXclwQOgCtRpyS712Z5w1+3a994SA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTK79sYJPaMmsAFabIUQvgTs93X0B5uVR4RPKfX+puL5zB2NoaBywl//ohlqZBEkfXKVzLNM2fzlh5oLOy9tJh9907eQ3M4rtkzXuzMDXkDnD6Da5pZYXUS4j5wazNJI7WtbStWjfwDoXpMY6LviAMKLbiE1rrN5i/H8gvlTgbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fZLJ3Q6b; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-432d256c2e6so5208762f8f.3
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:51:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1769507473; x=1770112273; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m4Z+XKbFJCQTXAQ2Mgr9fcEDIwslB88X62y88yyhlzU=;
-        b=fZLJ3Q6b5U6FraFqCuTG7dFPXobFcPtoqMECSGB0eUfuwtiqsFsLK/GItLia3mr9ew
-         n5i9a9d4Y9d6D17RPPGwhwa07wNb5SA3aiF0VRDKt+ElvVqWXuEPZI9qEHjQsVjTo7p9
-         aL9/a7ysrYmgY8gdZ7Qb4ZI8C7TuX/FsgWK4oo9pboFpXw/QiQU/XZveUPJ2Wu8YG2PT
-         qdQ29j2/FP9vG4wn5QIq11S8zD8FGPXRdiRS6fGwu2kKXc51L0Id01sd/heigOQ9THmx
-         +I/T8+iIgftnqX+YSTiLNAu0oaukEWy50C9FfsdFHGeTvV4U8usiokf1CKoEwd5Isu0K
-         8x5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769507473; x=1770112273;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m4Z+XKbFJCQTXAQ2Mgr9fcEDIwslB88X62y88yyhlzU=;
-        b=EHFXVHWDecoUJLIrdaBfgjHUlk453MS/78S97p8TJ3XkqTQqgfxll4IbMMo3YAkGU0
-         FZ1LXBGZ3wJ4QitutUHECVa9vtYJj4/mYUJ5hlqxH2CN/nWzDCEKHotJXj5KNoMmodRk
-         gmwJ0a5Ka9FQEMR67VAABHA60xCHzt5Glh+VuqvZSmuSR8qso80FulTJ8fQJG1RDPcHX
-         5qu8OLBtO8DpXx8zHxPW0dfdoNP5rb4Isfsj3W+IV2IzqqT+F0gJwU8+i4nFDv/aPGaO
-         lGVljB++8Ki98+KwYBchkyfWeRH4ETvTHxBfw/O+vbjM/BrmqsSf9yFxz6O0jO8prXk7
-         9VEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrqoYsOkJiq0HqRPqFPCOPhgJOS6fEKxSk6QZ+ALaqUgAPbdWS3JOCh++DqnQBbG9Efcd9rOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHuJXJM/UsuCE2S6qcNuI51Fh2ubr2KdozT6EwXJwQng4L7If6
-	SmMXxkBSDOx523MoVEyJZCKYdNYXOmcIJA4R6SjYG7UcjNIG7ALCNCkzwUFkbZjUbFc=
-X-Gm-Gg: AZuq6aJ84WDs3M84VpWVPchxATqwlRBJgL9jhkQHe8xXyGSa1fNI/8d6anc1B2mgvrx
-	Q2xeWlJZTY51DB3jvRY6MQg/5osdGqNnlCHKz9JRvZpasXlFCl+qap3XkVcnye/tX8PIk9HSLwp
-	m8u+vq9s97YDzPo1MN+bNb5+wFnGsKo02HT/rAfT2+AIFjSKP/o9qRaIub+I2ZDlG3D+TROFK3u
-	80kCZcnEBf8VUPRs9peZgCxtlvk0602/z0qpPUxRZQha1YCifEwPwqK8B34bBjsRwBJu+KYNAeA
-	TEX+H4fQvTyeU5T/3sWPPDBS8ytYNOY9R/oZeyV5epd4qN5J5xPf5ZbGtdp3ocI4axZh1zaTSNP
-	KyuQ24fvemYmPLas+4ao0/ohq1hi3dZ4O2WHydsIO7UoqNsTpqJeuUptWbtALBA1Wgf0NVdG3w1
-	uvtr6RT1lQz2/BFZS/orMn0yc=
-X-Received: by 2002:a5d:5f54:0:b0:430:fd84:315a with SMTP id ffacd0b85a97d-435dd1c0c3emr1722911f8f.39.1769507472561;
-        Tue, 27 Jan 2026 01:51:12 -0800 (PST)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1f74942sm35554428f8f.36.2026.01.27.01.51.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 01:51:12 -0800 (PST)
-Date: Tue, 27 Jan 2026 10:51:10 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Chuck Lever <chuck.lever@oracle.com>, 
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next v2] devlink: Implement devlink param multi
- attribute nested data values
-Message-ID: <rsngz5ql5s54luv4mnjs733uogjjdxiylbbm4w4pcaefow45rm@memr4a27ycc2>
-References: <20260126023946.906893-1-rkannoth@marvell.com>
- <20260126171859.5097dfb5@kernel.org>
+	s=arc-20240116; t=1769508028; c=relaxed/simple;
+	bh=pFX7o4jnF86Kw+kDPGmdPv5bnMWnQbrDfS2O1hpEqs4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cytgWZfPvRg8BH7/ll53SBK2jcA/md8doyZwUO5MEQ1UFSwTgDBGqNtsqly3/9ACzD7oVGioX2g/7T33s3/fDtGr/ro+3mhD+oZT1ZcbCbRqwUbotoslmrM7/EyMaGT4iSZ5icJXK471RUipMx3UNUCfzrOnDLTfPrPCZpevv6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bwq33vMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EF80C116C6;
+	Tue, 27 Jan 2026 10:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769508028;
+	bh=pFX7o4jnF86Kw+kDPGmdPv5bnMWnQbrDfS2O1hpEqs4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Bwq33vMMxxBbY+usGcLH3tB23eOxWDQavWIXv+/3aqwvQAZDDxI7Quk79oREjQaHB
+	 lehYy3Hk0p85ALNuOihE1gI8raMTsGeeK5PZx35Xg80sA8KoB30XzR4SCAKNocjpLt
+	 aiAmB51isIp8feiKM5CqA1lSqinLTeTH4zpbcxWHOufnD2kgS6r+Teq+yZ1pUZ9O+K
+	 xt63LFwp5ZuwaPT/G+YIWsr9qYIz/dTcYJnXZsOmYtM/73M6J9Z1FEjdRmvMcA0yW8
+	 5SUGh84fXLebmJ33+mQXDwqQoHRXyRzL2uwAGxzX6eQjK/YmXTV8Z2LAZmKj785jhY
+	 w3UEKSsO3bv7A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C8E36380A970;
+	Tue, 27 Jan 2026 10:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126171859.5097dfb5@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v16 00/12] vsock: add namespace support to
+ vhost-vsock and loopback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176950802260.768623.1051400818624436461.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Jan 2026 10:00:22 +0000
+References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
+In-Reply-To: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stefanha@redhat.com,
+ mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
+ xuanzhuo@linux.alibaba.com, kys@microsoft.com, haiyangz@microsoft.com,
+ wei.liu@kernel.org, decui@microsoft.com, bryan-bt.tan@broadcom.com,
+ vishnu.dasa@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ shuah@kernel.org, longli@microsoft.com, corbet@lwn.net,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, berrange@redhat.com, sargun@sargun.me,
+ linux-doc@vger.kernel.org, bobbyeshleman@meta.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-253791-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253790-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[marvell.com,vger.kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,oracle.com];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C4A08922EC
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vmtest.sh:url]
+X-Rspamd-Queue-Id: DED969265C
 X-Rspamd-Action: no action
 
-Tue, Jan 27, 2026 at 02:18:59AM +0100, kuba@kernel.org wrote:
->On Mon, 26 Jan 2026 08:09:44 +0530 Ratheesh Kannoth wrote:
->> Devlink param value attribute is not defined since devlink is handling
->> the value validating and parsing internally, this allows us to implement
->> multi attribute values without breaking any policies.
->> 
->> Devlink param multi-attribute values are considered to be dynamically
->> sized arrays of u32 values, by introducing a new devlink param type
->> DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
->> count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
->> 
->> Implement get/set parsing and add to the internal value structure passed
->> to drivers.
->> 
->> This is useful for devices that need to configure a list of values for
->> a specific configuration.
->
->Could you respin this as a series with the first driver implementing
->a param of this type?  We can't merge an API without a user.
+Hello:
 
-I may be missed it, are you okay with cleanup helpers now (__free(kfree)
-used here), or not yet? :)
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 21 Jan 2026 14:11:40 -0800 you wrote:
+> This series adds namespace support to vhost-vsock and loopback. It does
+> not add namespaces to any of the other guest transports (virtio-vsock,
+> hyperv, or vmci).
+> 
+> The current revision supports two modes: local and global. Local
+> mode is complete isolation of namespaces, while global mode is complete
+> sharing between namespaces of CIDs (the original behavior).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v16,01/12] vsock: add netns to vsock core
+    https://git.kernel.org/netdev/net-next/c/eafb64f40ca4
+  - [net-next,v16,02/12] virtio: set skb owner of virtio_transport_reset_no_sock() reply
+    https://git.kernel.org/netdev/net-next/c/a6ae12a599e0
+  - [net-next,v16,03/12] vsock: add netns support to virtio transports
+    https://git.kernel.org/netdev/net-next/c/a69686327e42
+  - [net-next,v16,04/12] selftests/vsock: increase timeout to 1200
+    https://git.kernel.org/netdev/net-next/c/873e7de9f9a3
+  - [net-next,v16,05/12] selftests/vsock: add namespace helpers to vmtest.sh
+    https://git.kernel.org/netdev/net-next/c/423ec6383edb
+  - [net-next,v16,06/12] selftests/vsock: prepare vm management helpers for namespaces
+    https://git.kernel.org/netdev/net-next/c/fd1b41725d58
+  - [net-next,v16,07/12] selftests/vsock: add vm_dmesg_{warn,oops}_count() helpers
+    https://git.kernel.org/netdev/net-next/c/4e870ac81df7
+  - [net-next,v16,08/12] selftests/vsock: use ss to wait for listeners instead of /proc/net
+    https://git.kernel.org/netdev/net-next/c/7418f3bb3aa2
+  - [net-next,v16,09/12] selftests/vsock: add tests for proc sys vsock ns_mode
+    https://git.kernel.org/netdev/net-next/c/06cf7895abf9
+  - [net-next,v16,10/12] selftests/vsock: add namespace tests for CID collisions
+    https://git.kernel.org/netdev/net-next/c/605caec5adc2
+  - [net-next,v16,11/12] selftests/vsock: add tests for host <-> vm connectivity with namespaces
+    https://git.kernel.org/netdev/net-next/c/0424ee7c3a17
+  - [net-next,v16,12/12] selftests/vsock: add tests for namespace deletion
+    https://git.kernel.org/netdev/net-next/c/b3b7b33264c6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
