@@ -1,127 +1,158 @@
-Return-Path: <netdev+bounces-253955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SL43DRb4eGnYuAEAu9opvQ
-	(envelope-from <netdev+bounces-253955-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:38:30 +0100
+	id cMqFEnj5eGlFuQEAu9opvQ
+	(envelope-from <netdev+bounces-253956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:44:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07919887A
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:38:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD292989BC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:44:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9A7CF300CFD4
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:38:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1CECF30078B5
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C3630CDAF;
-	Tue, 27 Jan 2026 17:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2229D312819;
+	Tue, 27 Jan 2026 17:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgXLaWun"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jTe6ZrJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81FE30BF69;
-	Tue, 27 Jan 2026 17:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BB82DC791
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 17:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769535505; cv=none; b=gO7xRTXK/Y1INi5gG+KieDySf2mEjw+q7y/u2A+C9487IZyTNQLEjVXj/OQzolCxzoNEbgo1kFAHJstwex1H3uGGSA0eWcPju+cPqSlSaTK7wdkW8hSA4HsgujfGit8I7sppcpF1ans4X5awG38aaPlENCZ+Fui4J7cTnL6KUdw=
+	t=1769535861; cv=none; b=uBmKdwXDSqB1ajfmJHvBOYg5vM7NhlD+iZwhxT2ALtnmTJm2dF7KZPv9lgaAZrzqoFnCflVZ4jK2kzAZLAHFrSpHOIz4l09BBHQ6NwwCqUZk7SF4KBBezh0k6lsaeuz2XK1gFWHP910x8OXn54QJmMIWnrjTfN7hG5MkfC1db6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769535505; c=relaxed/simple;
-	bh=1sORWrip5h6GNkhsP9WIl4kdoR8RvObly6DZBUxgvTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCxXYc5/1Dn5B9uXDfverQ4S6dIQ0kOm1dL+lc0x3BL2vU+T/BEGxgdgD3YEA/p7FrnrCLRcJ4MIWdRQ7vEio8fEPneu6TJBQ8Y3QaA1L/zX55IK64Tb8CUHzGzuxhILUCtE9MkEVoRQg60e99PYIvHPfC6WCfGuJpz2d8URQEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgXLaWun; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933A8C116C6;
-	Tue, 27 Jan 2026 17:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769535505;
-	bh=1sORWrip5h6GNkhsP9WIl4kdoR8RvObly6DZBUxgvTk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZgXLaWun9sMrq5KJ0SaGzj5XTqZK0BSObFq1hUCfnmNHC/cXT/wsoueX43VMXECMt
-	 ODvvxFIGdS3TcYix6deKoFmT1jJgAFWjHRG1MRss0+HeUvhtYFtHXMqYBbZS+Jy3ZM
-	 lf7KIFTn0WvKF7gr5uUvjICUyS9nVfW3mr0cX6rOGj3eCdnhBIQYtjHO2iao7jRNVp
-	 Ln30/m6R/6lpLJJe/aGx36zklndO9Ss4RwXiXLS/WvoWvvDCopHaC1ho/3el4oIqyK
-	 WAxoAX7VCNHNfsCzAgBKfhmlZT++JPWgo8bGXs0HTRk8nIkJpOq/K83U57VZT6fqjg
-	 y5OBGa4YSd/kg==
-Date: Tue, 27 Jan 2026 17:38:20 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net 0/3] mlx5 misc fixes 2026-01-26
-Message-ID: <aXj4DJFkgUpL6ad8@horms.kernel.org>
-References: <1769411695-18820-1-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1769535861; c=relaxed/simple;
+	bh=wXn+0XhC179yJWz3pippm+1nRV6T8nGZOAqw4GxLUDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uPjB6lHYHfZXHAxJ+Y5M9HihrREAt0FIl21qlNZkQtINlowplbjS6m8JFQVKYKo68mVKAhILkUWmHJ0zUJGRNj39EBxjQLfe4VVeFVqpNK7naG11mAiYET/aoVI9W7LHVnNDv3DgE7716A0jpA0v7pqOu4RSzfPkMvO32UYzKxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jTe6ZrJV; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RBEwIx3329570;
+	Tue, 27 Jan 2026 17:44:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=X6KBhdrKX2Ul6jmgEjOPVwTgXD8e6
+	q+SHpkeiDxUNxk=; b=jTe6ZrJVnih4x8gzRzkDytprjEe4/9y1Zma3BV2xryoUU
+	YOoNUIbyzzd1XTOFJ7IonfYmuoeoauiyNDRNXue81LR3T0pw1N/GyBjiwH6yurip
+	xQizmb3usatZjJ+4fn0TXl88J7w9sAbUNBeNKsyTa0YT36mPhuqEaSue4hDgnHrO
+	Po4RcwMSGJsUHr3L74UmN3nn56X0BO5IaZJ8pHHmG+dNXnT+0xceT1A+aTkLWbi5
+	xU8FV3h+45WxAnQUAndzz4Hlx4FmdBH8zWmoxLiI2Bf6MJHAuOnX+rMQgYAIw+n6
+	C0tTQ2uOw0DNF596FZ4IZ8ySFgGwU4U46eIghPPpw==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4bvmny4gs7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 27 Jan 2026 17:44:04 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 60RH0DlT012491;
+	Tue, 27 Jan 2026 17:44:03 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4bvmh9s3e4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 27 Jan 2026 17:44:03 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60RHi2tu005662;
+	Tue, 27 Jan 2026 17:44:02 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4bvmh9s3d8-1;
+	Tue, 27 Jan 2026 17:44:02 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sbhatta@marvell.com, hkelam@marvell.com, gakula@marvell.com,
+        sgoutham@marvell.com, bbhushan2@marvell.com, pabeni@redhat.com,
+        kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+        andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] octeontx2-pf: Fix header guard comment in otx2_devlink.h
+Date: Tue, 27 Jan 2026 09:42:52 -0800
+Message-ID: <20260127174333.1247747-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1769411695-18820-1-git-send-email-tariqt@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-27_04,2026-01-27_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ bulkscore=0 mlxscore=0 spamscore=0 phishscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2601150000 definitions=main-2601270144
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDE0NCBTYWx0ZWRfXxgtwNzcn+vqe
+ kZ2ir9AYnqerjWyfv9TUNC78v+ehElo+vgam4Sx3DbPwVmH6sZApubl3LVh6xlp27zGhsM4+v4R
+ tMMSolsUF26PAfqTK3S4TrltZrd86C4p4n1+mVDK/K2Q5dSsiODEisigx3i5OcDEjYTmjCuNmMn
+ QqmXyfF+a73zYoiAiyhjrm4pGCVO8S0roP6LpC0gpuMie4c5SerQYtBME3Q8hCMiVwPcPZ7aCdy
+ 23RW6Od7JYfNObs+Iwh6wu9Iz7kFUIK/Bdo7EfJFkp/e1QKIvMmE0MvV4khk6QKyjsLp+nk1imF
+ 3aOBklsisLzcLrmiP3Bumt+mzrazs4ahuCuuTfUEBQSbzDirD/9P7CTQugtqrE9qhCO48ieg0+0
+ /AH7144Gixu+oqMan/rF68DZmWhMl1KTIhWAVqSALbwKAkWH5pTmEkcUgW+bCK/m/mZuoKj511a
+ D+IA/wkB3G4UbH4h3zw==
+X-Proofpoint-GUID: MawMzU9a2WAIM91Thf22-AqrFuBDBfLn
+X-Authority-Analysis: v=2.4 cv=cZrfb3DM c=1 sm=1 tr=0 ts=6978f964 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=gFPa0cGCKXeg3HiXVbAA:9
+X-Proofpoint-ORIG-GUID: MawMzU9a2WAIM91Thf22-AqrFuBDBfLn
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253955-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253956-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_CC(0.00)[gmail.com,oracle.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[alok.a.tiwari@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,oracle.com:dkim,oracle.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A07919887A
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: DD292989BC
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 09:14:52AM +0200, Tariq Toukan wrote:
-> Hi,
-> 
-> This patchset provides misc bug fixes from the team to the mlx5 core and
-> Eth drivers.
-> 
-> Thanks,
-> Tariq.
-> 
-> 
-> Gal Pressman (1):
->   net/mlx5e: Account for netdev stats in ndo_get_stats64
-> 
-> Mark Bloch (1):
->   net/mlx5e: TC, delete flows only for existing peers
-> 
-> Shay Drory (1):
->   net/mlx5: Fix Unbinding uplink-netdev in switchdev mode
+The closing #endif comment in otx2_devlink.h refers to RVU_DEVLINK_H,
+but the actual header guard is OTX2_DEVLINK_H.
 
-Thanks,
+Fix the comment to match the correct header guard name.
 
-For the series:
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
+index c7bd4f3c6c6b..069e39b48847 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
+@@ -17,4 +17,4 @@ struct otx2_devlink {
+ int otx2_register_dl(struct otx2_nic *pfvf);
+ void otx2_unregister_dl(struct otx2_nic *pfvf);
+ 
+-#endif /* RVU_DEVLINK_H */
++#endif /* OTX2_DEVLINK_H */
+-- 
+2.50.1
 
 
