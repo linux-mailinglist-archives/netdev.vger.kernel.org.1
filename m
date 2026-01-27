@@ -1,71 +1,79 @@
-Return-Path: <netdev+bounces-253895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4GcQGwvEeGmltAEAu9opvQ
-	(envelope-from <netdev+bounces-253895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:27 +0100
+	id 6MAMGCLEeGnqtAEAu9opvQ
+	(envelope-from <netdev+bounces-253896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:50 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1648895361
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F4195376
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62C8D306EB6D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:50:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D8DA308F04E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C9435B626;
-	Tue, 27 Jan 2026 13:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382C03491D5;
+	Tue, 27 Jan 2026 13:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1ngN13m"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d6spFCuW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC2D2D979F;
-	Tue, 27 Jan 2026 13:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53142C0F75;
+	Tue, 27 Jan 2026 13:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521798; cv=none; b=eupEqadJaX/YttSmsMXOdWVZrRWVmccThcavkNycjUqyWVFCdrbJx0cbJdfOhpLNori46pqhhuLv6xIo1QXNSTw8l+XWSF6tCXoTxiBLb6Q6WksGfWnoCo9pMgc0iLy5o5xlMKBbpMhgy0bfJxtylyChllU6VWzvaTjQB4q4CPI=
+	t=1769521827; cv=none; b=ekpqZJQNOe2izBvaOjZ3dJtxqDEsjE007gESouPGKRQ3gm01jfmMr9w7EH6xRPEm+1bHnzO7XJYLYH7Jrs1+04e9q4RngzATugUL37aggxW0fvc11ns2gV7RWwfcNGqiPFBVn2Pcx1xLIOJ1XE1sXG/wqIwWUeJ2SCLUb7i7hNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521798; c=relaxed/simple;
-	bh=xJU6Yuhq5fJsCgB2olMgIDeTq7BGYRCyFgfx+0nnVog=;
+	s=arc-20240116; t=1769521827; c=relaxed/simple;
+	bh=QRatMhJnRNyEA67EhLdS0NL/K+LI/ja+JygeQrfuyYU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n/zu9L6VDpqS73QaxTIFbFECmI9lHobZgok4wegqZGHRgRub+8mGh4woLHYUCLrBZtvHzSzhLYTmgVf8HTWO7kSdFULgQ199tVEX/JWWKgSqSDVOBvkjX0K6h3t1wwPzuy1BNVRTpIv91UMS6G3wNwFz04YZZs49TYTDF8s3YXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1ngN13m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85131C116C6;
-	Tue, 27 Jan 2026 13:49:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769521797;
-	bh=xJU6Yuhq5fJsCgB2olMgIDeTq7BGYRCyFgfx+0nnVog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d1ngN13m7IgYqLmjsuowA02OOYZy8cHLn1RTksWhhAMFWrvDA+LGB+6ow9o9sl4MK
-	 LCkjI2qoQOX04TJ7DpYdAE+Fd+E3qbFgj8/I2PD9TgdbcAZjDTbZ7EJNIFQwrOVzsE
-	 53IAUNkNQxaLkdTq5n5PCji4nDUen0ewG/JMZqaq1dBnR3Js4jib3Il5AS09xiS8Uz
-	 XKRsqEf8Vd1B7KDdeF4oe//mZ3D56UePRhJkFXwk61n/S2IXfi4AVpBu9HW+tigH5i
-	 N5KrzCKJIXUc2WJRkTGmOcnA4njPJDdYJExYjr7pBxjtJs6MMaQ1iYUTlIHHYT67X8
-	 6JwI2v/f7oA2w==
-Date: Tue, 27 Jan 2026 13:49:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGcQXgZQSeDBjqNJgibj9DHvkmTMgGtxLwaKflMUHkckbYib7UnSEXG9ngjf+LD7PllA6N5oa6oW5ezWadFyMVvEFonHi6FP+wkXvpoJccksoiG3attOmgmnT25J8hq+Z+o95Frp2xIJR6PNwFeg3zrA604C5jVznv4KVxp3/bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d6spFCuW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VxcWSdk87k0N5BVm27/BnYw/EywV/d+fGz43a/TzZdA=; b=d6spFCuWzBDRXW+2fq/oOurQMl
+	pP1ygt+7RZVtd23KlozpXjgAWtUWj7WOX2poASVQ0CQTzcFwNldE4kCx8ZbNFgx+SercHK7Nug+LI
+	3LpXk0pREYmoW2dBSFK5qrXPHa4juE87O6QjeYD5iB66ach8887KYgV7pWyd6l+dD8tM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vkjSQ-004xa8-Lt; Tue, 27 Jan 2026 14:50:14 +0100
+Date: Tue, 27 Jan 2026 14:50:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next V6 07/14] devlink: Add parent dev to devlink API
-Message-ID: <aXjCf2iRC5VsRC5A@horms.kernel.org>
-References: <1769340723-14199-1-git-send-email-tariqt@nvidia.com>
- <1769340723-14199-8-git-send-email-tariqt@nvidia.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v8 4/4] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <5e7c2f9c-bf49-4564-91b3-a639ef1c97d8@lunn.ch>
+References: <cover.1769053079.git.daniel@makrotopia.org>
+ <18c6a24eef8617abb5073569fee162f1aa1c06ea.1769053079.git.daniel@makrotopia.org>
+ <c2e191c4-dec4-4e42-b108-353778d9bd18@redhat.com>
+ <aXinOE7KIFIm5dUK@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,116 +82,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1769340723-14199-8-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <aXinOE7KIFIm5dUK@makrotopia.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253895-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253896-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,nvidia.com,vger.kernel.org,infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1648895361
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
+X-Rspamd-Queue-Id: 02F4195376
 X-Rspamd-Action: no action
 
-On Sun, Jan 25, 2026 at 01:31:56PM +0200, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+> > > +	/* handle errors returned by the firmware as -EIO
+> > > +	 * The firmware is based on Zephyr OS and uses the errors as
+> > > +	 * defined in errno.h of Zephyr OS. See
+> > > +	 * https://github.com/zephyrproject-rtos/zephyr/blob/v3.7.0/lib/libc/minimal/include/errno.h
+> > > +	 */
+> > > +	if ((s16)ret < 0) {
+> > 
+> > The cast is likely not needed above? if `ret` values < S16_MIN are
+> > possible this will return such values to the caller without the IO err
+> > printk.
 > 
-> Upcoming changes to the rate commands need the parent devlink specified.
-> This change adds a nested 'parent-dev' attribute to the API and helpers
-> to obtain and put a reference to the parent devlink instance in
-> info->user_ptr[1].
+> Right, it should rather be
 > 
-> To avoid deadlocks, the parent devlink is unlocked before obtaining the
-> main devlink instance that is the target of the request.
-> A reference to the parent is kept until the end of the request to avoid
-> it suddenly disappearing.
+> if (ret > S16_MAX && ret <= U16_MAX)
 > 
-> This means that this reference is of limited use without additional
-> protection.
+> to really only catch the range of numbers which are negative 16-bit
+> signed values represented as positive 32-bit signed values.
 > 
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> mxl862xx_reg_read() primarily returns a signed 32-bit integer, as it is
+> basically just a wrapper around __mdiodev_c45_read(). Negative values of
+> that 32-bit integer mean that the MDIO Clause-45 read has somehow
+> failed, ie. it's the error the MDIO bus .read_c45() operation has
+> returned.
+> 
+> In case __mdiodev_c45_read() succeeds it returns the 16-bit value of the
+> register read. In this case, those 16-bit should be interpreted as a
+> 16-bit signed integer here. A negative value denotes an error returned
+> from the firmware running on the switch (see comment above the code).
 
-...
+Rather than these casts, maybe add a helper which takes the unsigned
+u16 from the register and returns a signed Zepher error code?
 
-Hi Cosmin, all,
+int mxl862xx_to_zephyr_errno(u16 reg)
 
-The netlink_gen.[ch] and spec changes in this patch do not seem consistent.
+Just having a name like this makes it clearer what is going on.
 
-$ tools/net/ynl/ynl-regen.sh -f
-$ git diff
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 6b691bdbf037..f4c61c2b4f22 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -39,11 +39,6 @@ devlink_attr_param_type_validate(const struct nlattr *attr,
- }
-
- /* Common nested types */
--const struct nla_policy devlink_dl_parent_dev_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
--       [DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
--       [DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
--};
--
- const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1] = {
-        [DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .type = NLA_BINARY, },
-        [DEVLINK_PORT_FN_ATTR_STATE] = NLA_POLICY_MAX(NLA_U8, 1),
-diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
-index d4db82a00522..2817d53a0eba 100644
---- a/net/devlink/netlink_gen.h
-+++ b/net/devlink/netlink_gen.h
-@@ -13,7 +13,6 @@
- #include <uapi/linux/devlink.h>
-
- /* Common nested types */
--extern const struct nla_policy devlink_dl_parent_dev_nl_policy[DEVLINK_ATTR_DEV_NAME + 1];
- extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1];
- extern const struct nla_policy devlink_dl_rate_tc_bws_nl_policy[DEVLINK_RATE_TC_ATTR_BW + 1];
- extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
-@@ -30,19 +29,12 @@ int devlink_nl_pre_doit_dev_lock(const struct genl_split_ops *ops,
- int devlink_nl_pre_doit_port_optional(const struct genl_split_ops *ops,
-                                      struct sk_buff *skb,
-                                      struct genl_info *info);
--int devlink_nl_pre_doit_parent_dev_optional(const struct genl_split_ops *ops,
--                                           struct sk_buff *skb,
--                                           struct genl_info *info);
- void
- devlink_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
-                     struct genl_info *info);
- void
- devlink_nl_post_doit_dev_lock(const struct genl_split_ops *ops,
-                              struct sk_buff *skb, struct genl_info *info);
--void
--devlink_nl_post_doit_parent_dev_optional(const struct genl_split_ops *ops,
--                                        struct sk_buff *skb,
--                                        struct genl_info *info);
-
- int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
-;
+     Andrew
 
