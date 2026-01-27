@@ -1,204 +1,181 @@
-Return-Path: <netdev+bounces-253793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Lw9LliPeGmqqwEAu9opvQ
-	(envelope-from <netdev+bounces-253793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:11:36 +0100
+	id iMcLDoqPeGmqqwEAu9opvQ
+	(envelope-from <netdev+bounces-253794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:12:26 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FAB9282D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:11:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 964D69284B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:12:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9F99304FC04
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:08:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7798530166DF
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCA5274B48;
-	Tue, 27 Jan 2026 10:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E472E8DE5;
+	Tue, 27 Jan 2026 10:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NZ4LNQxM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O77Lqwib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EF82E717B
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 10:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769508494; cv=pass; b=O0CeppVnk/e1/EUnhFZp5Set9iiy+jtGCI9qifCCWm3PpZmZQvVHQDkerF+7/9ozkAOxMKrkL1rbCPg72Q910DmrdZxyxDarrV47KMlrQl30vsnJi2HnTCSFA2Mcar7t9U0U64UwIdVWK9K/RzSjVXbQKa1tv+FrWr+r+5I1AXQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769508494; c=relaxed/simple;
-	bh=MLw86eBiDXAumXM++7EfiGG29Qu1A8IbBkYgIWvUoKk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A4a6EabDBBI/q6RN7PzcGkrFMeObIJb8eLnNPgo5/0myGDcmLrdTXSpGXNjpiF4SOuJiRGCCa3GikSqIH5Yyh/OZ+BcfEBuwyReuDQpDWmwAbRbiCq42HYJXAVu9NV5YeCqHTESKebl9As/cXrHGnZruxQ3wgj5AirKC43yrnMo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NZ4LNQxM; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64d02c01865so8753079a12.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:08:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769508491; cv=none;
-        d=google.com; s=arc-20240605;
-        b=a/YuFpqwc9XeEdd8E6SyyGr1tbydmLp5eiBEpRvynXm4Zizov24Hbg8j+Mk/4TE7qz
-         eluo6bMOFVkT1ewElzV0J9bbAOmeirkIn0rjsvljdHDSDinfAz7QH2F20wU3XIWUpf+x
-         v3ITjbKIj8JTBZdYoGHHor0yHHYQalYkoQD9Q9ZwRH0MMCk/E3PXXSglPds1lWwe46dD
-         gNjq72JLwKA3feH93o/gimuD84K5IxsUUWZyln69NnohJa3JjX0Xr0gKlvd0ClXXONeG
-         EZz0RyZDr8U3YnaJ8vbD6Wy0EtbdcEEtie95yP0ECjQk3w/1SDX0Mugl3DQsPNsMKyCv
-         3zKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
-        fh=yXrtQEZpXa9GQyYNZSuygmuaU1dJ80A3KNFKIvvbd20=;
-        b=JOPqIpE/oVYxhCmi8J5NbpslfH4cnBNVRH+lfcpv+zoovAt8lRBxiiarKOmW3HqjS3
-         ECHns0pqhN1nbAlP1sLsOE5UiD4Td/8FiN7UJYsqQW/d6Ydcl3ryybba3xs3pOIsuXRG
-         6WXXHESUGVPr4ckOKeOMoOuCRpaQRwhqRS3hOODcCugvnVh91RKSnRI9yj7RbejPODIP
-         Z7ON03pIYh9at0iMVdrXWDh1skB5eyiBn8gVJ0R3e6SA3yXDd4l1eklpu7KVjzr779mU
-         TuKqdiYMe7rN6yPXrrllJhmBI3iRPHD/m9hgaIymffU4NipX3OAu4M3GHeRCN9stwXJf
-         Y5zw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1769508491; x=1770113291; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
-        b=NZ4LNQxMyzH8a+73O1L+U3RpEVlcCjiKmi8MQ8VwPQkONMXrkMFCRTwxrmqCHkz6l1
-         2EkUZIxGbBgO6Ji7LA/xvWYUklFiXH9MIHvyf+zYHYPBbOz7jlxKijDrNQyPRrVBHJWQ
-         LD+DAc/KC/TLCakdfBx46NuXxT+Z2hfjnt/U7eCcYUbG1zyLSr8ZHfi0dlFf9RuAghYi
-         CIJQakHNnKXgaIpfw/HMS8FDOSEhbP6p2cuYiEkmu4KKON+ifvEi4Tv+LeOzrtP/fkhB
-         fn+8j98lx+ZUPmboBm6TOwRLb5TrJNmB9km7C6KGPm2UAxgYhv6Kry944o6rRElBwhTi
-         mm8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769508491; x=1770113291;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
-        b=lpeBhzx7IZIIgBNrOW2mp8VDqfDIDpuNLrBcJ76eZRLFHnz3uK7wOSvUAe2swqOgJ5
-         tVHb0xM4F7KA2F2IcZpQ6b0EQCtaOsqwbshON/dwjoXzVdCaImt6zrqsVojacjoaERYm
-         yC7B0BP3pHJ8hrVqpHCcrFSLFK6YdnHN0ELFjpg2C2jk7wjR1aP1R0LGNHeO7GgH1wHA
-         3jDXs7rv+iehNEoZJC7IMrDxY78zsUVYauAsKZ6UsvYBWBEpM1j7ON3TfE1LrFqFp+aY
-         idlQFcHLE5kEO77/xHTkCompn3sKOr+Cc0N311YZ8QEzNvDOFwkgRIUWB9Ee86QyNvfi
-         61yg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjoorjHEu27dhe/muCWlwOigK4wrv4VTEDnjevem9e2MNfxYnlYGUIQJrYX6wELOW0rmRm2q8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQh3OLhSH/rDTuTcX4BmctVgoYh+3p4JMGY3bLVEtKn4bWlDfI
-	IYbfJ5Pm+TIT5Ud5VSai8wzjTCaJEpX90OGaXobayBXBOkMJV40BlR5D5rVXHCt4M4+KClGP/E9
-	iUxQv1ZHxjwsmuWAChiUB+nurB3kl28jzeuFI+H2rOw==
-X-Gm-Gg: AZuq6aIb9INfSWcMW07/JoVb7fDAOanOX3D+mKDIt+KxNhZXDBzjRTU4lhFHIGFClUS
-	RN14sQjJwt9x5kNIpRjVQmSjkT+vj7DThjmsPpDNB2S4FJp10eLkwz4WXGlbgp59hintEuc7Zqw
-	u9QQXtNhjqdkGC/8Yo2v/2iFpEV5ujgFUk1lpvSjkTdXPiyupQBe63CgPKcAzZIi2yVZVal71hY
-	7SbgV96HFbsAwPtbzNSWjVg5DoCJbp/MoWwCPNBex0rA4MHL0ibbeg+isfbHLIsWi+wSPEWQ1yT
-	td7iKHEo5/VWpMLQyLmC6UEK
-X-Received: by 2002:a05:6402:1d50:b0:64b:6e44:217 with SMTP id
- 4fb4d7f45d1cf-658a5f8e7cdmr891417a12.0.1769508490979; Tue, 27 Jan 2026
- 02:08:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F812E8B66;
+	Tue, 27 Jan 2026 10:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769508508; cv=none; b=oj3TImT4j7nW03AWyG9CEvKEKaLoBRMjSKapshW0qiEg3JSOA7MttzJY/X2MGoxrHVoj5VI4FqxMuY1H7lLpIhmRDG5UIulITNFQyl43+1QxYdhJBkXEayFUgbr8zuZQoJ3rrrpgOoI6BIdMYUmJw2MhUekzcmm+vjTdstQlUVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769508508; c=relaxed/simple;
+	bh=eXH7LTpBzt1Nf5PxVt/Zw5NAmsupLUnjjKZooxxdMvw=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=RE51NVntuaajX8LQ0WIOuosIMe9NgZD8NF2QIkM1oRijlTm5hUECRxsC59Jz/1T7uamYJM2cp/Ol6rkfPJkodmn4+DQSVGdNJfl0aDOgmV989iEd6Fo/KYYcdi8XhIwkahmTeHmYxz7lJXeHzaMz3kN4/yRtvf6W+EXath4acpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O77Lqwib; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93118C116C6;
+	Tue, 27 Jan 2026 10:08:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769508508;
+	bh=eXH7LTpBzt1Nf5PxVt/Zw5NAmsupLUnjjKZooxxdMvw=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=O77LqwibsgbYXv0sPD4MPA6EMA9pdPtxYNvTmdpyBaPZO3JR9RX/r9DQXxVe/yrQT
+	 zlfOBASL3XdUncbooj9HoX4VQ0r4dWQfGK1fJCtOOjH8L6Kbu0EkPeF40wAJK65kKk
+	 BrHXV23nDTtyCLnyhC8Ht6V+PquWe3ZQ6ueqZ9eIi91cHkd6HfX3WugtNcxzDAYsQM
+	 gbg06EV0f5oa32Z3/1n7eXZnQ9KCxAUzcPlGsIKSpLxX1wmSI3IhWlHv6Gqb4aubrT
+	 z2jQS0azW95V10FADHw+ibbhTtxXkWyVFhUn2ShVFrIlY9ulYiRMG1smlKXVmaPZuL
+	 HGrjvItPTNinQ==
+Content-Type: multipart/mixed; boundary="===============4938179612018120319=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126092159.815968-1-vincent.guittot@linaro.org>
- <20260126092159.815968-3-vincent.guittot@linaro.org> <69592713b7bd419e23df458734ca78070a83e8ac.camel@pengutronix.de>
-In-Reply-To: <69592713b7bd419e23df458734ca78070a83e8ac.camel@pengutronix.de>
-From: Vincent Guittot <vincent.guittot@linaro.org>
-Date: Tue, 27 Jan 2026 11:07:59 +0100
-X-Gm-Features: AZwV_QiOrd8cMHRoDNLhWiUkjdTQ9Am6xMiRSspZlgdv4qBzTDeeYROI1wjEMTk
-Message-ID: <CAKfTPtD+EZ+apAnS7tccY5UrQx3EWXb4j33F_5SkHY80akxz-A@mail.gmail.com>
-Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
-To: Philipp Zabel <p.zabel@pengutronix.de>
-Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com, 
-	linux@armlinux.org.uk, ghennadi.procopciuc@nxp.com, 
-	bogdan-gabriel.roman@nxp.com, Ionut.Vicovan@nxp.com, 
-	alexandru-catalin.ionita@nxp.com, linux-phy@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	Frank.li@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <12bedb9d4fc0676edf3812bfcc8ff7c761286fc6d2e8ae4ca457a6602ec98dfe@mail.kernel.org>
+In-Reply-To: <4a1ad099a2db96b92318cb924d2a7b76ee530209.1769506741.git.zhuhui@kylinos.cn>
+References: <4a1ad099a2db96b92318cb924d2a7b76ee530209.1769506741.git.zhuhui@kylinos.cn>
+Subject: Re: [RFC PATCH bpf-next v5 10/12] mm/bpf: Add BPF_F_ALLOW_OVERRIDE support for memcg_bpf_ops
+From: bot+bpf-ci@kernel.org
+To: hui.zhu@linux.dev,akpm@linux-foundation.org,hannes@cmpxchg.org,mhocko@kernel.org,roman.gushchin@linux.dev,shakeel.butt@linux.dev,muchun.song@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,peterz@infradead.org,ojeda@kernel.org,nathan@kernel.org,kees@kernel.org,tj@kernel.org,jeffxu@chromium.org,mkoutny@suse.com,kernel@jfarr.cc,brauner@kernel.org,rdunlap@infradead.org,brgerst@gmail.com,masahiroy@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org,inwardvessel@gmail.com,willemb@google.com,kerneljasonxing@gmail.com,paul.chaignon@gmail.com,a.s.protopopov@gmail.com,ameryhung@gmail.com,chenridong@huaweicloud.com,lance.yang@linux.dev,jiayuan.chen@linux.dev,linux-kernel@vger.kernel.org,linux-mm@kvack.org,cgroups@vger.kernel.org,bpf@vger.kernel.org,netdev@vger.kernel.org,linu
+ x-kselftest@vger.kernel.org
+Cc: zhuhui@kylinos.cn,geliang@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue, 27 Jan 2026 10:08:27 +0000 (UTC)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kylinos.cn,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
+	TAGGED_FROM(0.00)[bounces-253794-lists,netdev=lfdr.de,bpf-ci];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253793-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	FREEMAIL_TO(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,iogearbox.net,gmail.com,fomichev.me,google.com,infradead.org,chromium.org,suse.com,jfarr.cc,davemloft.net,huaweicloud.com,vger.kernel.org,kvack.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCPT_COUNT_GT_50(0.00)[60];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vincent.guittot@linaro.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linaro.org:email,linaro.org:dkim,pengutronix.de:email,nxp.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 18FAB9282D
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.kernel.org:mid]
+X-Rspamd-Queue-Id: 964D69284B
 X-Rspamd-Action: no action
 
-On Mon, 26 Jan 2026 at 14:11, Philipp Zabel <p.zabel@pengutronix.de> wrote:
->
-> On Mo, 2026-01-26 at 10:21 +0100, Vincent Guittot wrote:
-> > s32g SoC family includes 2 serdes subsystems which are made of one PCIe
-> > controller, 2 XPCS and one Phy. The Phy got 2 lanes that can be configure
-> > to output PCIe lanes and/or SGMII.
-> >
-> > Implement PCIe phy support
-> >
-> > Co-developed-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-> > Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-> > Co-developed-by: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
-> > Signed-off-by: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
-> > Co-developed-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-> > Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
-> > Co-developed-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-> > Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
-> > Co-developed-by: Bogdan Roman <bogdan-gabriel.roman@nxp.com>
-> > Signed-off-by: Bogdan Roman <bogdan-gabriel.roman@nxp.com>
-> > Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
-> > ---
-> >  drivers/phy/freescale/Kconfig               |   9 +
-> >  drivers/phy/freescale/Makefile              |   1 +
-> >  drivers/phy/freescale/phy-nxp-s32g-serdes.c | 569 ++++++++++++++++++++
-> >  3 files changed, 579 insertions(+)
-> >  create mode 100644 drivers/phy/freescale/phy-nxp-s32g-serdes.c
-> >
-> [...]
-> > diff --git a/drivers/phy/freescale/phy-nxp-s32g-serdes.c b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
-> > new file mode 100644
-> > index 000000000000..8336c868c8dc
-> > --- /dev/null
-> > +++ b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
-> > @@ -0,0 +1,569 @@
-> [...]
-> > +static int s32g_serdes_get_ctrl_resources(struct platform_device *pdev, struct s32g_serdes *serdes)
-> > +{
-> [...]
-> > +     ctrl->rst = devm_reset_control_get(dev, "serdes");
->
-> Please use devm_reset_control_get_exclusive() directly.
+--===============4938179612018120319==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Okay
+> diff --git a/mm/bpf_memcontrol.c b/mm/bpf_memcontrol.c
+> index e746eb9cbd56..7cd983e350d7 100644
+> --- a/mm/bpf_memcontrol.c
+> +++ b/mm/bpf_memcontrol.c
 
->
-> [...]
-> > +static int s32g_serdes_get_pcie_resources(struct platform_device *pdev, struct s32g_serdes *serdes)
-> > +{
-> [...]
-> > +     pcie->rst = devm_reset_control_get(dev, "pcie");
->
-> Same here.
->
-> regards
-> Philipp
+[ ... ]
+
+> static int bpf_memcg_ops_reg(void *kdata, struct bpf_link *link)
+> {
+> 	struct bpf_struct_ops_link *ops_link
+> 		= container_of(link, struct bpf_struct_ops_link, link);
+>-	struct memcg_bpf_ops *ops = kdata;
+>+	struct memcg_bpf_ops *ops = kdata, *old_ops;
+> 	struct mem_cgroup *memcg, *iter = NULL;
+> 	int err = 0;
+
+[ ... ]
+
+>+	/* Check for incompatible bpf_ops in descendants. */
+> 	while ((iter = mem_cgroup_iter(memcg, iter, NULL))) {
+>-		if (READ_ONCE(iter->bpf_ops)) {
+>-			mem_cgroup_iter_break(memcg, iter);
+>+		struct memcg_bpf_ops *iter_ops = READ_ONCE(iter->bpf_ops);
+>+
+>+		if (iter_ops && iter_ops != old_ops) {
+>+			/* cannot override existing bpf_ops of sub-cgroup. */
+> 			err = -EBUSY;
+>-			break;
+>+			goto unlock_out;
+                        ^^^^
+
+It looks like this error path leaks a CSS reference. The original code
+called mem_cgroup_iter_break(memcg, iter) before breaking out of the loop,
+which releases the CSS reference held on iter. The new code jumps directly
+to unlock_out without releasing this reference.
+
+mem_cgroup_iter() acquires a reference on each returned memcg via
+css_tryget() in mm/memcontrol.c. When breaking out of the loop early,
+mem_cgroup_iter_break() must be called to release that reference.
+
+Should this be:
+
+    if (iter_ops && iter_ops != old_ops) {
+        mem_cgroup_iter_break(memcg, iter);
+        err = -EBUSY;
+        goto unlock_out;
+    }
+
+> 		}
+>+	}
+>+
+>+	while ((iter = mem_cgroup_iter(memcg, iter, NULL))) {
+> 		WRITE_ONCE(iter->bpf_ops, ops);
+>+		iter->bpf_ops_flags = ops_link->flags;
+> 	}
+>-	if (err)
+>-		clean_memcg_bpf_ops(memcg, ops);
+>+
+>+unlock_out:
+> 	cgroup_unlock();
+
+[ ... ]
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/21392729810
+
+AI-authorship-score: low
+AI-authorship-explanation: The commit follows standard kernel documentation patterns without distinctive AI markers.
+issues-found: 1
+issue-severity-score: medium
+issue-severity-explanation: CSS reference leak in error path leads to memcg lifetime issues but does not cause immediate system instability.
+
+--===============4938179612018120319==--
 
