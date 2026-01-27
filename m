@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-253890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4J2VLb/BeGmltAEAu9opvQ
-	(envelope-from <netdev+bounces-253890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:46:39 +0100
+	id UO90I9rCeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:51:22 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B1695144
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:46:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01BFC951EE
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:51:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8E3043011B49
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:44:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 986A73013DFD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F70C35DD1E;
-	Tue, 27 Jan 2026 13:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB47F35EDCA;
+	Tue, 27 Jan 2026 13:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YBc3+5Ug"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QFgv3IBR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C9235E55F;
-	Tue, 27 Jan 2026 13:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6442935EDBF
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521369; cv=none; b=dNQSHnVYrQGwMTxq9fpDnnqmpaKD6wlSpoG9r6dETfPI1I8pJ8yYf8+SB02aa9wWoEGlva8fltwIyGdkcqJSbz8SEVeLL/Qsslqyn40tqBavNCnV+bboSJ5db9eexjTMnC7WMD8Wn6vvzPAuvKx9QC/N6KWrxQuBH++7PcAv+9o=
+	t=1769521371; cv=none; b=Fx8DTsX1FaCX++sa+MvX2/cRuKJmnQpEGhZo48BlfGsFJnU5Qq0TRu1zxQpP/Na4jSO22uY23/vmIoJG8sSDHhG2GMxvcxOqTVerAvSDcIu3S9ZE1jgi4bHDPRiOogbHUyME6jUOShN+Nf+ylkqJ+XPEmuNXLGnswkvxEwY3BeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521369; c=relaxed/simple;
-	bh=eaH4DCg8PG4Qegz0pzNo2jDRbz5YV59l7hffXKKyWVw=;
+	s=arc-20240116; t=1769521371; c=relaxed/simple;
+	bh=dIW9DmuRZ6tKWsiS7mSRMUwkt75gVBWc0F9T4GKBWXA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cSIp354Z/AsEgoT0zIeZNu8QFVCyL7LOviyYoA5OV2Yi10H1jAnkLw3hrEFD43HeWsbfvsMKRWn0r7I2wd/kFw96q6Qmtmc7NXjATwWYAqmOG6R69VEXt0R+9t0iU6+0+ET+mJCVCllz1+YMasoyu6q8X3zQANkUikhm94yCz3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YBc3+5Ug; arc=none smtp.client-ip=185.246.85.4
+	 MIME-Version; b=t1Xw8aJcTuL1ZTbXpAvKR05bhfXLjmcZOw0QT8pEdvDW1+y4X6UmwjwoKF4j/VgWi+UtRMtanZU5Ae8pUxRP7Xiepppn+FmpRMYfosd9+1z1bSGLTPWG5fuhj/vuM+c4yHXS+lQ1zEMgeO0OqgBS+bIXuW1DdkQgTpzxs8anSR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QFgv3IBR; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 9A4A14E422D2;
-	Tue, 27 Jan 2026 13:42:46 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 14AA11A2A84;
+	Tue, 27 Jan 2026 13:42:49 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6CAA9606F5;
-	Tue, 27 Jan 2026 13:42:46 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 07AB0119A8695;
-	Tue, 27 Jan 2026 14:42:42 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id DC03B606F5;
+	Tue, 27 Jan 2026 13:42:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7971F119A8647;
+	Tue, 27 Jan 2026 14:42:45 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769521365; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1769521367; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=H9jO5cGzIFudrj2fBUC0gHtKPdipIN1zDR03sFJ/icQ=;
-	b=YBc3+5UgxfAtJlCe0ul8djtlz0fzu18HWByJcAncmqIZ8hzk6Nt+PzFIq3q8unte4P2/LP
-	KZHnwuvug7j4HpsU5Norfgr1SP/a4wpF9Aem2Wj6NCcvTXkuWrN3xFToujZ6Hh1NFBliN9
-	2M++ojZcRl3z7iKTTHcQV3pa5J3uPqXEfHNC0z7KAZl76OvFxTCBx2U0wIBQVVpNSCfOfF
-	4L+RKOsxILumhdtyDZQUvQbWL0e6T8C75+KSe8j7EZtWfEx2z0On08xaarpmp8xBajGGgJ
-	nLRoB/W0busmPJXgdIwfAj7ZEdI+qhMJx3JPtWB24/MHB5PVjsJcDr3yK92/1Q==
+	bh=JE1ajPZV3RBLMmNHm3FO3KqAiha9kx7cpVHokUOQiNc=;
+	b=QFgv3IBR6MRr+C4KXQbQZIogintzCljAemoiXBDCIzOurWAzlnU+RQBeMNYVARGhEHvCGP
+	G17QkATcyvP/pkbseAvcJ19VEUhfrTmAZO8+G1WwjwvZM0XhgjjYxDnP/hX4z2pK2s6WdG
+	Gxox07/cc92+8cvAqSXTtYti4JLg2Y2cI28lwlO462+07wIsJ8YnJtLXEQzYpm1HdmDYLn
+	GN0C7wT3nVm9ma2RSE9MwQWSwEuTF1HFmBwrzxmFu/vihzjxKcwjHbsELtn82wy76HqBwR
+	A4WCd71MjPQLQWUrFzeRCo06BktvzaR+4DlyH35XeJ0Doko8bPTwnkjcmPDRGw==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -76,9 +76,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next 11/13] net: phy: store phy_modes in a static array
-Date: Tue, 27 Jan 2026 14:41:59 +0100
-Message-ID: <20260127134202.8208-12-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 12/13] netlink: specs: Add ethernet port listing with ethtool
+Date: Tue, 27 Jan 2026 14:42:00 +0100
+Message-ID: <20260127134202.8208-13-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
 References: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
@@ -98,13 +98,13 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-253890-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253891-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -119,188 +119,202 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 80B1695144
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 01BFC951EE
 X-Rspamd-Action: no action
 
-The phy_modes() helper provided by include/linux/phy.h returns the name of
-a phy_interface_t value.
-
-As it may be used by callers that don't depend on PHYLIB, it's a static
-inline function.
-
-We want to report using netlink the phy_interface_t types that may be
-accessible on a phy_port, especially for SFP cages. We need access to
-that array of phy_interface_t names, let's therefore store it into a
-dedicated array in net/ethtool/common.c. This is part of CONFIG_NET, so
-it's accessible even without dependency on PHYLIB.
+Ethernet network interfaces may have more than one front-facing port.
+The phy_port infrastructure was introduced to keep track of
+these ports, and allow userspace to know about the presence and
+capability of these ports. Add a ethnl netlink message to report this
+information.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- include/linux/phy.h  | 84 +++-----------------------------------------
- net/ethtool/common.c | 44 +++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 79 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml      | 50 +++++++++++++++++++
+ Documentation/networking/ethtool-netlink.rst  | 35 +++++++++++++
+ .../uapi/linux/ethtool_netlink_generated.h    | 19 +++++++
+ 3 files changed, 104 insertions(+)
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index dc788ae4da64..cf607c1a5127 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -199,6 +199,8 @@ static inline void phy_interface_set_rgmii(unsigned long *intf)
- 	__set_bit(PHY_INTERFACE_MODE_RGMII_TXID, intf);
- }
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 0a2d2343f79a..f0f424009fb0 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -210,6 +210,10 @@ definitions:
+       -
+         name: discard
+         value: 31
++  -
++    name: port-type
++    type: enum
++    entries: [mdi, sfp]
  
-+extern const char phy_interface_names[][ETH_GSTRING_LEN];
-+
- /**
-  * phy_modes - map phy_interface_t enum to device tree binding of phy-mode
-  * @interface: enum phy_interface_t value
-@@ -209,86 +211,10 @@ static inline void phy_interface_set_rgmii(unsigned long *intf)
-  */
- static inline const char *phy_modes(phy_interface_t interface)
- {
--	switch (interface) {
--	case PHY_INTERFACE_MODE_NA:
--		return "";
--	case PHY_INTERFACE_MODE_INTERNAL:
--		return "internal";
--	case PHY_INTERFACE_MODE_MII:
--		return "mii";
--	case PHY_INTERFACE_MODE_GMII:
--		return "gmii";
--	case PHY_INTERFACE_MODE_SGMII:
--		return "sgmii";
--	case PHY_INTERFACE_MODE_TBI:
--		return "tbi";
--	case PHY_INTERFACE_MODE_REVMII:
--		return "rev-mii";
--	case PHY_INTERFACE_MODE_RMII:
--		return "rmii";
--	case PHY_INTERFACE_MODE_REVRMII:
--		return "rev-rmii";
--	case PHY_INTERFACE_MODE_RGMII:
--		return "rgmii";
--	case PHY_INTERFACE_MODE_RGMII_ID:
--		return "rgmii-id";
--	case PHY_INTERFACE_MODE_RGMII_RXID:
--		return "rgmii-rxid";
--	case PHY_INTERFACE_MODE_RGMII_TXID:
--		return "rgmii-txid";
--	case PHY_INTERFACE_MODE_RTBI:
--		return "rtbi";
--	case PHY_INTERFACE_MODE_SMII:
--		return "smii";
--	case PHY_INTERFACE_MODE_XGMII:
--		return "xgmii";
--	case PHY_INTERFACE_MODE_XLGMII:
--		return "xlgmii";
--	case PHY_INTERFACE_MODE_MOCA:
--		return "moca";
--	case PHY_INTERFACE_MODE_PSGMII:
--		return "psgmii";
--	case PHY_INTERFACE_MODE_QSGMII:
--		return "qsgmii";
--	case PHY_INTERFACE_MODE_TRGMII:
--		return "trgmii";
--	case PHY_INTERFACE_MODE_1000BASEX:
--		return "1000base-x";
--	case PHY_INTERFACE_MODE_1000BASEKX:
--		return "1000base-kx";
--	case PHY_INTERFACE_MODE_2500BASEX:
--		return "2500base-x";
--	case PHY_INTERFACE_MODE_5GBASER:
--		return "5gbase-r";
--	case PHY_INTERFACE_MODE_RXAUI:
--		return "rxaui";
--	case PHY_INTERFACE_MODE_XAUI:
--		return "xaui";
--	case PHY_INTERFACE_MODE_10GBASER:
--		return "10gbase-r";
--	case PHY_INTERFACE_MODE_25GBASER:
--		return "25gbase-r";
--	case PHY_INTERFACE_MODE_USXGMII:
--		return "usxgmii";
--	case PHY_INTERFACE_MODE_10GKR:
--		return "10gbase-kr";
--	case PHY_INTERFACE_MODE_100BASEX:
--		return "100base-x";
--	case PHY_INTERFACE_MODE_QUSGMII:
--		return "qusgmii";
--	case PHY_INTERFACE_MODE_10G_QXGMII:
--		return "10g-qxgmii";
--	case PHY_INTERFACE_MODE_50GBASER:
--		return "50gbase-r";
--	case PHY_INTERFACE_MODE_LAUI:
--		return "laui";
--	case PHY_INTERFACE_MODE_100GBASEP:
--		return "100gbase-p";
--	case PHY_INTERFACE_MODE_MIILITE:
--		return "mii-lite";
--	default:
-+	if (interface > PHY_INTERFACE_MODE_MAX)
- 		return "unknown";
--	}
-+
-+	return phy_interface_names[interface];
- }
+ attribute-sets:
+   -
+@@ -1890,6 +1894,32 @@ attribute-sets:
+         name: link
+         type: nest
+         nested-attributes: mse-snapshot
++  -
++    name: port
++    attr-cnt-name: --ethtool-a-port-cnt
++    attributes:
++      -
++        name: header
++        type: nest
++        nested-attributes: header
++      -
++        name: id
++        type: u32
++      -
++        name: supported-modes
++        type: nest
++        nested-attributes: bitset
++      -
++        name: supported-interfaces
++        type: nest
++        nested-attributes: bitset
++      -
++        name: type
++        type: u8
++        enum: port-type
++      -
++        name: occupied
++        type: u8
  
- /**
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 4036561b078b..d795d9a8b0cd 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -483,6 +483,50 @@ static const char ethtool_link_medium_names[][ETH_GSTRING_LEN] = {
+ operations:
+   enum-model: directional
+@@ -2842,6 +2872,26 @@ operations:
+             - worst-channel
+             - link
+       dump: *mse-get-op
++    -
++      name: port-get
++      doc: Get ports attached to an interface
++
++      attribute-set: port
++
++      do: &port-get-op
++        request:
++          attributes:
++            - header
++            - id
++        reply:
++          attributes:
++            - header
++            - id
++            - supported-modes
++            - supported-interfaces
++            - type
++            - occupied
++      dump: *port-get-op
+ 
+ mcast-groups:
+   list:
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index af56c304cef4..450004d545b8 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -2522,6 +2522,40 @@ Within each channel nest, only the metrics supported by the PHY will be present.
+ See ``struct phy_mse_snapshot`` kernel documentation in
+ ``include/linux/phy.h``.
+ 
++PORT_GET
++========
++
++Retrieve information about the physical connection points of a network device,
++referred to as "ports". User needs to specify a PORT_ID for the DO operation,
++in which case the DO request returns information about that specific port.
++
++As there can be more than one port, the DUMP operation can be used to list the
++ports present on a given interface, by passing an interface index or name in
++the dump request.
++
++Request contents:
++
++====================================  ======  =================================
++  ``ETHTOOL_A_PORT_HEADER``             nested  request header
++  ``ETHTOOL_A_PORT_ID``                 u32     port id
++  ====================================  ======  ===============================
++
++Kernel response contents:
++
++  =====================================   ======  =============================
++  ``ETHTOOL_A_PORT_HEADER``               nested  request header
++  ``ETHTOOL_A_PORT_ID``                   u32     the port's unique identifier,
++                                                  per netdevice.
++  ``ETHTOOL_A_PORT_SUPPORTED_MODES``      bitset  bitset of supported linkmodes
++  ``ETHTOOL_A_PORT_SUPPORTED_INTERFACES`` bitset  bitset of supported MII
++                                                  interfaces
++  ``ETHTOOL_A_PORT_TYPE``                 u32     the port type
++  ``ETHTOOL_A_PORT_OCCUPIED``             u8      for non-mdi ports, indicates
++                                                  if the port is connected
++                                                  another device that could
++                                                  expose a MDI
++  =====================================   ======  =============================
++
+ Request translation
+ ===================
+ 
+@@ -2632,4 +2666,5 @@ are netlink only.
+   n/a                                 ``ETHTOOL_MSG_PHY_GET``
+   ``SIOCGHWTSTAMP``                   ``ETHTOOL_MSG_TSCONFIG_GET``
+   ``SIOCSHWTSTAMP``                   ``ETHTOOL_MSG_TSCONFIG_SET``
++  n/a                                 ``ETHTOOL_MSG_PORT_GET``
+   =================================== =====================================
+diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
+index 556a0c834df5..7ccd864a6e38 100644
+--- a/include/uapi/linux/ethtool_netlink_generated.h
++++ b/include/uapi/linux/ethtool_netlink_generated.h
+@@ -78,6 +78,11 @@ enum ethtool_pse_event {
+ 	ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR = 64,
  };
- static_assert(ARRAY_SIZE(ethtool_link_medium_names) == __ETHTOOL_LINK_MEDIUM_LAST);
  
-+const char phy_interface_names[][ETH_GSTRING_LEN] = {
-+	[PHY_INTERFACE_MODE_NA] =	"",
-+	[PHY_INTERFACE_MODE_INTERNAL] =	"internal",
-+	[PHY_INTERFACE_MODE_MII] =	"mii",
-+	[PHY_INTERFACE_MODE_GMII] =	"gmii",
-+	[PHY_INTERFACE_MODE_SGMII] =	"sgmii",
-+	[PHY_INTERFACE_MODE_TBI] =	"tbi",
-+	[PHY_INTERFACE_MODE_REVMII] =	"rev-mii",
-+	[PHY_INTERFACE_MODE_RMII] =	"rmii",
-+	[PHY_INTERFACE_MODE_REVRMII] =	"rev-rmii",
-+	[PHY_INTERFACE_MODE_RGMII] =	"rgmii",
-+	[PHY_INTERFACE_MODE_RGMII_ID] = "rgmii-id",
-+	[PHY_INTERFACE_MODE_RGMII_RXID] = "rgmii-rxid",
-+	[PHY_INTERFACE_MODE_RGMII_TXID] = "rgmii-txid",
-+	[PHY_INTERFACE_MODE_RTBI] =	"rtbi",
-+	[PHY_INTERFACE_MODE_SMII] =	"smii",
-+	[PHY_INTERFACE_MODE_XGMII] =	"xgmii",
-+	[PHY_INTERFACE_MODE_XLGMII] =	"xlgmii",
-+	[PHY_INTERFACE_MODE_MOCA] =	"moca",
-+	[PHY_INTERFACE_MODE_PSGMII] =	"psgmii",
-+	[PHY_INTERFACE_MODE_QSGMII] =	"qsgmii",
-+	[PHY_INTERFACE_MODE_TRGMII] =	"trgmii",
-+	[PHY_INTERFACE_MODE_1000BASEX] = "1000base-x",
-+	[PHY_INTERFACE_MODE_1000BASEKX] = "1000base-kx",
-+	[PHY_INTERFACE_MODE_2500BASEX] = "2500base-x",
-+	[PHY_INTERFACE_MODE_5GBASER] =	"5gbase-r",
-+	[PHY_INTERFACE_MODE_RXAUI] =	"rxaui",
-+	[PHY_INTERFACE_MODE_XAUI] =	"xaui",
-+	[PHY_INTERFACE_MODE_10GBASER] =	"10gbase-r",
-+	[PHY_INTERFACE_MODE_25GBASER] =	"25gbase-r",
-+	[PHY_INTERFACE_MODE_USXGMII] =	"usxgmii",
-+	[PHY_INTERFACE_MODE_10GKR] =	"10gbase-kr",
-+	[PHY_INTERFACE_MODE_100BASEX] =	"100base-x",
-+	[PHY_INTERFACE_MODE_QUSGMII] =	"qusgmii",
-+	[PHY_INTERFACE_MODE_10G_QXGMII] = "10g-qxgmii",
-+	[PHY_INTERFACE_MODE_50GBASER] =	"50gbase-r",
-+	[PHY_INTERFACE_MODE_LAUI] =	"laui",
-+	[PHY_INTERFACE_MODE_100GBASEP] = "100gbase-p",
-+	[PHY_INTERFACE_MODE_MIILITE] =	"mii-lite",
-+
++enum ethtool_port_type {
++	ETHTOOL_PORT_TYPE_MDI,
++	ETHTOOL_PORT_TYPE_SFP,
 +};
-+static_assert(ARRAY_SIZE(phy_interface_names) == PHY_INTERFACE_MODE_MAX);
-+EXPORT_SYMBOL_GPL(phy_interface_names);
 +
- const char netif_msg_class_names[][ETH_GSTRING_LEN] = {
- 	[NETIF_MSG_DRV_BIT]		= "drv",
- 	[NETIF_MSG_PROBE_BIT]		= "probe",
+ enum {
+ 	ETHTOOL_A_HEADER_UNSPEC,
+ 	ETHTOOL_A_HEADER_DEV_INDEX,
+@@ -837,6 +842,18 @@ enum {
+ 	ETHTOOL_A_MSE_MAX = (__ETHTOOL_A_MSE_CNT - 1)
+ };
+ 
++enum {
++	ETHTOOL_A_PORT_HEADER = 1,
++	ETHTOOL_A_PORT_ID,
++	ETHTOOL_A_PORT_SUPPORTED_MODES,
++	ETHTOOL_A_PORT_SUPPORTED_INTERFACES,
++	ETHTOOL_A_PORT_TYPE,
++	ETHTOOL_A_PORT_OCCUPIED,
++
++	__ETHTOOL_A_PORT_CNT,
++	ETHTOOL_A_PORT_MAX = (__ETHTOOL_A_PORT_CNT - 1)
++};
++
+ enum {
+ 	ETHTOOL_MSG_USER_NONE = 0,
+ 	ETHTOOL_MSG_STRSET_GET = 1,
+@@ -890,6 +907,7 @@ enum {
+ 	ETHTOOL_MSG_RSS_CREATE_ACT,
+ 	ETHTOOL_MSG_RSS_DELETE_ACT,
+ 	ETHTOOL_MSG_MSE_GET,
++	ETHTOOL_MSG_PORT_GET,
+ 
+ 	__ETHTOOL_MSG_USER_CNT,
+ 	ETHTOOL_MSG_USER_MAX = (__ETHTOOL_MSG_USER_CNT - 1)
+@@ -951,6 +969,7 @@ enum {
+ 	ETHTOOL_MSG_RSS_CREATE_NTF,
+ 	ETHTOOL_MSG_RSS_DELETE_NTF,
+ 	ETHTOOL_MSG_MSE_GET_REPLY,
++	ETHTOOL_MSG_PORT_GET_REPLY,
+ 
+ 	__ETHTOOL_MSG_KERNEL_CNT,
+ 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
 -- 
 2.49.0
 
