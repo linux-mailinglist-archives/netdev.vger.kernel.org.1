@@ -1,52 +1,48 @@
-Return-Path: <netdev+bounces-253814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4IDSNVubeGk9rQEAu9opvQ
-	(envelope-from <netdev+bounces-253814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:02:51 +0100
+	id sBK8NXaceGlurQEAu9opvQ
+	(envelope-from <netdev+bounces-253815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:07:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E17934C2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:02:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4BEA935D4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8096930066B3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:02:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB2FA305BAA2
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E9530B51F;
-	Tue, 27 Jan 2026 11:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a494yn1e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FD830B53B;
+	Tue, 27 Jan 2026 11:05:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E1F30B50D;
-	Tue, 27 Jan 2026 11:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599B130B52E
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 11:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769511768; cv=none; b=G7Xl5xGxvbDTmUpWVdPjMPnJxG2BIyxBAN54fBcTH4pxlFlVmnN9vYdnLI3+5K/+/56nGGu+VQixrWI7TcyLY2rVAC+oTyc9bKYYmDdbv7sVZx/rKMy0162ih8AyyIfjnxsSmmEd7yIdTBR9vnMi7BA3CbWYmRxxQT6Gm+JZL7k=
+	t=1769511951; cv=none; b=KiME+92EZrUi2ws2V0bnhQkwYhLzx5KdyV5EaVaxCXEB7QK4oo812zGF4chLkff60ybD79mmAgUP63f+HPKU7Pp5FjDfeZs63HbDWb2z3Y2x0IPauJ0LzE0E5w531tVUo1UmaXSKBcheCTX/ezkGuNpb0N1dUz76Bhwx2yXF354=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769511768; c=relaxed/simple;
-	bh=y1iQYc67DVhYxrB/p1GAQkjp9lfULkyMwv5pXHH1MeY=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=ShqPFWpt+5+r1dlblnqHDTh+Df3/5KI1irBjKHE2Dr2pEjbp7sLwX/6bvRPSfA5sIrXFLFQ0jA/qGyEc2f9ji1EMCSg7domeVFg/pU9m+e2Qliv92nTUvheaFXHY36sM/egd1yffGalfRJSx7Csa1hXe3hVekfKehslY5gCYo74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a494yn1e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E952FC16AAE;
-	Tue, 27 Jan 2026 11:02:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769511768;
-	bh=y1iQYc67DVhYxrB/p1GAQkjp9lfULkyMwv5pXHH1MeY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a494yn1earYfQdWtOeC6onTEwHjvoiyDrY14fuT7ksTyakta8da4aokFgA7IBkXxm
-	 0Od5vvfE8dRocCFPZJbZTWC+Fx5utr1a2mVBzED22IBREwvFFn2xx/T8F0tYAWmTOu
-	 sF30e3qIp3P3dF9+zSZBJKTx8rPwo03w9mE32KcwvYaLptde5SXhcTdoWpesHZ4bXE
-	 tMk3S71XjdsRD1gXBRhSepD4pjtfsUZjGC6LHfyhLNBf405Uk8XAI1vVl1QKwb0vJG
-	 yOh7tS9LQ/rQ5IABErR0zw2yNgk/hUUP27S2+lZpqTye7jgZSdBo/vsmVT9kmSIt7q
-	 mgQSsni2aonpA==
-Content-Type: multipart/mixed; boundary="------------KRL6Ja5OIm97DC6q0pB1trVX"
-Message-ID: <1c357d72-2a73-47d8-9ec7-56a2912a2e10@kernel.org>
-Date: Tue, 27 Jan 2026 12:02:38 +0100
+	s=arc-20240116; t=1769511951; c=relaxed/simple;
+	bh=DfXpgS9oJTkpTt7P2WSRv4gLkmPGkoRxXohNRfqgkFc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=cl2Fsm1rQHlOZBiRnY8hlzkmVhLPut5DwYJYEsP5rFGjXRjDTIcOE5UT4qM69LlYmu/CqIH3PTup/sqIbQnids3zSthlYeHOPwWW/s0SIIMqxS6b9Ik5YmqWpMW5A8ZnLzP9Db53fsONBnT7jSEmkzThidxTwp1WwBpr293Spkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60RB5lhn067757;
+	Tue, 27 Jan 2026 20:05:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60RB5lPe067753
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 27 Jan 2026 20:05:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <4d69abe1-ca8d-4f0b-bcf8-13899b211e57@I-love.SAKURA.ne.jp>
+Date: Tue, 27 Jan 2026 20:05:46 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,173 +50,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: spacemit: Check for netif_carrier_ok() in
- emac_stats_update(): manual merge
-Content-Language: en-GB, fr-BE
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Chukun Pan <amadeus@jmu.edu.cn>,
- Michael Opdenacker <michael.opdenacker@rootcommit.com>,
- netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yixun Lan <dlan@gentoo.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alexandre Ghiti <alex@ghiti.fr>,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>
-References: <20260123-k1-ethernet-clarify-stat-timeout-v3-1-93b9df627e87@iscas.ac.cn>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260123-k1-ethernet-clarify-stat-timeout-v3-1-93b9df627e87@iscas.ac.cn>
-X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
-	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253814-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A1E17934C2
-X-Rspamd-Action: no action
-
-This is a multi-part message in MIME format.
---------------KRL6Ja5OIm97DC6q0pB1trVX
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH net v2] team: avoid NETDEV_CHANGEMTU event when unregistering
+ slave
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
+X-Rspamd-Server: lfdr
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253815-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,i-love.sakura.ne.jp:email,I-love.SAKURA.ne.jp:mid]
+X-Rspamd-Queue-Id: B4BEA935D4
+X-Rspamd-Action: no action
 
-Hi Vivian,
+syzbot is reporting
 
-+cc Mark Brown
+  unregister_netdevice: waiting for netdevsim0 to become free. Usage count = 3
+  ref_tracker: netdev@ffff88807dcf8618 has 1/2 users at
+       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
+       netdev_hold include/linux/netdevice.h:4429 [inline]
+       inetdev_init+0x201/0x4e0 net/ipv4/devinet.c:286
+       inetdev_event+0x251/0x1610 net/ipv4/devinet.c:1600
+       notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+       call_netdevice_notifiers_mtu net/core/dev.c:2318 [inline]
+       netif_set_mtu_ext+0x5aa/0x800 net/core/dev.c:9886
+       netif_set_mtu+0xd7/0x1b0 net/core/dev.c:9907
+       dev_set_mtu+0x126/0x260 net/core/dev_api.c:248
+       team_port_del+0xb07/0xcb0 drivers/net/team/team_core.c:1333
+       team_del_slave drivers/net/team/team_core.c:1936 [inline]
+       team_device_event+0x207/0x5b0 drivers/net/team/team_core.c:2929
+       notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+       call_netdevice_notifiers_extack net/core/dev.c:2281 [inline]
+       call_netdevice_notifiers net/core/dev.c:2295 [inline]
+       __dev_change_net_namespace+0xcb7/0x2050 net/core/dev.c:12592
+       do_setlink+0x2ce/0x4590 net/core/rtnetlink.c:3060
+       rtnl_changelink net/core/rtnetlink.c:3776 [inline]
+       __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
+       rtnl_newlink+0x15a9/0x1be0 net/core/rtnetlink.c:4072
+       rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:6958
+       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
 
-On 23/01/2026 04:52, Vivian Wang wrote:
-> Some PHYs stop the refclk for power saving, usually while link down.
-> This causes reading stats to time out.
-> 
-> Therefore, in emac_stats_update(), also don't update and reschedule if
-> !netif_carrier_ok(). But that means we could be missing later updates if
-> the link comes back up, so also reschedule when link up is detected in
-> emac_adjust_link().
-> 
-> While we're at it, improve the comments and error message prints around
-> this to reflect the better understanding of how this could happen.
-> Hopefully if this happens again on new hardware, these comments will
-> direct towards a solution.
+problem. Ido Schimmel found steps to reproduce
 
-(...)
+  ip link add name team1 type team
+  ip link add name dummy1 mtu 1499 master team1 type dummy
+  ip netns add ns1
+  ip link set dev dummy1 netns ns1
+  ip -n ns1 link del dev dummy1
 
-> ---
-> This has a conflict in context lines in emac_adjust_link() with current
-> net-next, which will show up when pulling that for next rc1. Just remove
-> "emac_set_fc_autoneg(priv);".
+and also found that the same issue was fixed in the bond driver in
+commit f51048c3e07b ("bonding: avoid NETDEV_CHANGEMTU event when
+unregistering slave").
 
-Thank you for this note, this was useful! Just in case it can be useful
-for linux-next and Net maintainers, I confirm the conflict when merging
-'net' in 'net-next' due to this patch applied in 'net':
+Let's do similar thing for the team driver, with commit ad7c7b2172c3 ("net:
+hold netdev instance lock during sysfs operations") and commit 303a8487a657
+("net: s/__dev_set_mtu/__netif_set_mtu/") also applied.
 
-  2c84959167d6 ("net: spacemit: Check for netif_carrier_ok() in
-emac_stats_update()")
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Suggested-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Fixes: 3d249d4ca7d0 ("net: introduce ethernet teaming device")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+v2:
+  - Added Reviewed-by: and Fixes: tag.
+  - Added MODULE_IMPORT_NS() line.
 
-and this one from 'net-next':
+v1:
+  - https://lkml.kernel.org/r/ece4365f-906c-44e2-80c9-ab73f91f7fb5@I-love.SAKURA.ne.jp
 
-  f66086798f91 ("net: spacemit: Remove broken flow control support")
+ drivers/net/team/team_core.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-The resolution is attached to this email, and rerere cache is available
-there:
-
- https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/526c74b
-
-Cheers,
-Matt
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index c08a5c1bd6e4..a0fe998cc055 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -1292,7 +1292,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 
+ static void __team_port_change_port_removed(struct team_port *port);
+ 
+-static int team_port_del(struct team *team, struct net_device *port_dev)
++static int team_port_del(struct team *team, struct net_device *port_dev, bool unregister)
+ {
+ 	struct net_device *dev = team->dev;
+ 	struct team_port *port;
+@@ -1330,7 +1330,13 @@ static int team_port_del(struct team *team, struct net_device *port_dev)
+ 	__team_port_change_port_removed(port);
+ 
+ 	team_port_set_orig_dev_addr(port);
+-	dev_set_mtu(port_dev, port->orig.mtu);
++	if (unregister) {
++		netdev_lock_ops(port_dev);
++		__netif_set_mtu(port_dev, port->orig.mtu);
++		netdev_unlock_ops(port_dev);
++	} else {
++		dev_set_mtu(port_dev, port->orig.mtu);
++	}
+ 	kfree_rcu(port, rcu);
+ 	netdev_info(dev, "Port device %s removed\n", portname);
+ 	netdev_compute_master_upper_features(team->dev, true);
+@@ -1634,7 +1640,7 @@ static void team_uninit(struct net_device *dev)
+ 	ASSERT_RTNL();
+ 
+ 	list_for_each_entry_safe(port, tmp, &team->port_list, list)
+-		team_port_del(team, port->dev);
++		team_port_del(team, port->dev, false);
+ 
+ 	__team_change_mode(team, NULL); /* cleanup */
+ 	__team_options_unregister(team, team_options, ARRAY_SIZE(team_options));
+@@ -1933,7 +1939,16 @@ static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
+ 
+ 	ASSERT_RTNL();
+ 
+-	return team_port_del(team, port_dev);
++	return team_port_del(team, port_dev, false);
++}
++
++static int team_del_slave_on_unregister(struct net_device *dev, struct net_device *port_dev)
++{
++	struct team *team = netdev_priv(dev);
++
++	ASSERT_RTNL();
++
++	return team_port_del(team, port_dev, true);
+ }
+ 
+ static netdev_features_t team_fix_features(struct net_device *dev,
+@@ -2926,7 +2941,7 @@ static int team_device_event(struct notifier_block *unused,
+ 					       !!netif_oper_up(port->dev));
+ 		break;
+ 	case NETDEV_UNREGISTER:
+-		team_del_slave(port->team->dev, dev);
++		team_del_slave_on_unregister(port->team->dev, dev);
+ 		break;
+ 	case NETDEV_FEAT_CHANGE:
+ 		if (!port->team->notifier_ctx) {
+@@ -2999,3 +3014,4 @@ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Jiri Pirko <jpirko@redhat.com>");
+ MODULE_DESCRIPTION("Ethernet team device driver");
+ MODULE_ALIAS_RTNL_LINK(DRV_NAME);
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
 -- 
-Sponsored by the NGI0 Core fund.
+2.47.3
 
---------------KRL6Ja5OIm97DC6q0pB1trVX
-Content-Type: text/x-patch; charset=UTF-8;
- name="7daa0aa370b7e9326e11e06fdb247227773bba0a.patch"
-Content-Disposition: attachment;
- filename="7daa0aa370b7e9326e11e06fdb247227773bba0a.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWNjIGRyaXZlcnMvbmV0L2V0aGVybmV0L3NwYWNlbWl0L2sxX2VtYWMuYwppbmRl
-eCBjODVkYzc0MmM0MDQsODhlOTQyNGQyZDUxLi4yM2I2ZjE1MzFlMGMKLS0tIGEvZHJpdmVy
-cy9uZXQvZXRoZXJuZXQvc3BhY2VtaXQvazFfZW1hYy5jCisrKyBiL2RyaXZlcnMvbmV0L2V0
-aGVybmV0L3NwYWNlbWl0L2sxX2VtYWMuYwpAQEAgLTE1MzEsNiAtMTY0OCwxNCArMTU0NSwx
-MiBAQEAgc3RhdGljIHZvaWQgZW1hY19hZGp1c3RfbGluayhzdHJ1Y3QgbmV0CiAgCQl9CiAg
-CiAgCQllbWFjX3dyKHByaXYsIE1BQ19HTE9CQUxfQ09OVFJPTCwgY3RybCk7CisgCiAtCQll
-bWFjX3NldF9mY19hdXRvbmVnKHByaXYpOwogLQorIAkJLyoKKyAJCSAqIFJlc2NoZWR1bGUg
-c3RhdHMgdXBkYXRlcyBub3cgdGhhdCBsaW5rIGlzIHVwLiBTZWUgY29tbWVudHMgaW4KKyAJ
-CSAqIGVtYWNfc3RhdHNfdXBkYXRlKCkuCisgCQkgKi8KKyAJCW1vZF90aW1lcigmcHJpdi0+
-c3RhdHNfdGltZXIsIGppZmZpZXMpOwogIAl9CiAgCiAgCXBoeV9wcmludF9zdGF0dXMocGh5
-ZGV2KTsK
-
---------------KRL6Ja5OIm97DC6q0pB1trVX--
 
