@@ -1,134 +1,173 @@
-Return-Path: <netdev+bounces-253852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFt6Jky2eGlzsQEAu9opvQ
-	(envelope-from <netdev+bounces-253852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:57:48 +0100
+	id GKcyJwK2eGlzsQEAu9opvQ
+	(envelope-from <netdev+bounces-253855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:56:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0056B94955
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:57:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA2F948E2
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:56:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 140DF30583AD
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:53:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 74BE03005585
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CEF355802;
-	Tue, 27 Jan 2026 12:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847A03559DB;
+	Tue, 27 Jan 2026 12:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ufhEVLBC"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="DnhurBOC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C6A3557FD;
-	Tue, 27 Jan 2026 12:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E10F35581F;
+	Tue, 27 Jan 2026 12:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769518421; cv=none; b=E7fM6tC6n+oXsQlyyqgibcR/x5ewSTW0UGI3wdbW+3ft7sByeYmC7FfW8z3ALup81se9mGXvjtFxEqSLbFfdN+8FvKtEVS+XHqqwZSZ9cHhl4WKObYL0wQy8OPa/VFHdNSSc6YSmtgU73+HMnkodZ0Zz99SP482W0shc4KkDPWs=
+	t=1769518591; cv=none; b=iSJ0TRiujj5Yud4guCsdQaIkZRgBzFAF8BYBn3RxR1Q/rXG8ixS06+oljbpOSkDE3jVI/Fa46Kp7g0D+1VYsYpfS+hprY5EA57b0flTt6xo9KSBju3Ccx8FcSadQfYWdrQC63e9HDTCiBa/StZ7RXip5npcfLGaZkkqmCfebL2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769518421; c=relaxed/simple;
-	bh=P2fI4zhGmSG3w1JBfh1j1ADfoI8Gq0YRrnXr1JCDZWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h4X500B084fHGRoSZMrb4CCN0/XYGMCoyYB1wBGhL3cLwZdcJlO01cHokS2XRf2GDtnL9kbx8iZJ6xDVGG7EtcCGup6kXQ/j6YLyYwu/KbTXJv3FC/ylxHUvJETTe+1q5wu3DqElzB6mUm7yi9SxNGxOpctGbY1tpWjlWz9TCnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ufhEVLBC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02A68C116C6;
-	Tue, 27 Jan 2026 12:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769518421;
-	bh=P2fI4zhGmSG3w1JBfh1j1ADfoI8Gq0YRrnXr1JCDZWo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ufhEVLBCkT8kChpNyO2l75fdZicFtbglWgVIE2SbMLNQmpm0DK4SSJqXjXOkOxBZw
-	 541fWTC8Ad8JspJhyRRY1d8j3DTV5wkznFaCmBvcqttOHl3eO47OLwZJQ0+3AnWLqc
-	 np0e+bOSnVOaozQxFtfuLzIek2b4BZWXFt6XwO/ndE+JDMbRrFwfdeuidP4rEJ65QR
-	 TWLcygY3sDeK94c5GiQ2W23dJhbSLHtv5jfGR1aTuQB4ARr0NjB8IZ28/d6+nDuYf4
-	 8ipQtPoBLrMSSAmd2n2ZMiTYTMI+PDgJ9VDiuLSAnui3YTOfn44A2EwXPtNMTYLees
-	 hW2XdXpp47FMw==
-Date: Tue, 27 Jan 2026 12:53:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com, lantao5@huawei.com,
-	huangdonghua3@h-partners.com, yangshuaisong@h-partners.com,
-	jonathan.cameron@huawei.com, salil.mehta@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] extend bit width in the flow director of
- HNS3 driver
-Message-ID: <aXi1T3WUmc0QvlN_@horms.kernel.org>
-References: <20260123094756.3718516-1-shaojijie@huawei.com>
- <aXd0QSip2AcefqT2@horms.kernel.org>
- <acbfdba6-1590-417f-8bf5-f5ad44e1c294@huawei.com>
+	s=arc-20240116; t=1769518591; c=relaxed/simple;
+	bh=3e2aBSrSkXQAuaPNuwS6lpbmlxBdZplp11Fd6S0gxH0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s7+WglT2CxxumL5plSgq+1+Uvdw2uu3sOu5iWI5MsC4brOHgpvam4Xc3VUvXvu+MEAm+YyY3FDX8gSvkeBzyRtQLcdEitfFEvBoAUKg9mPlCT4SV+DgTKvqdaTRFS3AudVlRmyhBtrk8UL0YALgjXYbF4eSzdYa2teTmW3jo/LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=DnhurBOC; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=DnhurBOC;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 60RCtreq1881655
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 27 Jan 2026 12:55:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1769518553; bh=Xgh0LbkWaqUxtIXydSJ7DsYEA/hHZbRQimjOjOJXgbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:From;
+	b=DnhurBOCXEmBdGtlmoGZGMbp3JsdvrMmTojblNJnv1RY4TFXSZvhlCRcymxlw3COT
+	 FB0Ec0+B1LTizDeUkVmCfUjSJCxVszeUoOAt4/MP680qJKm8J063YiomuHpUwx8cH2
+	 svMtQ5s1osxJq30Pt1GRRcl/TI88feiCqiVr+XZw=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 60RCtqow908877
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 27 Jan 2026 13:55:53 +0100
+Received: (nullmailer pid 1475181 invoked by uid 1000);
+	Tue, 27 Jan 2026 12:55:52 -0000
+From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+To: netdev@vger.kernel.org
+Cc: "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+Subject: [PATCH net-next v4 0/3] Airoha AN8811HB 2.5 Gbps phy support
+Date: Tue, 27 Jan 2026 13:55:44 +0100
+Message-ID: <20260127125547.1475164-1-bjorn@mork.no>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acbfdba6-1590-417f-8bf5-f5ad44e1c294@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253852-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	TAGGED_FROM(0.00)[bounces-253855-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mork.no:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0056B94955
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3FA2F948E2
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 09:50:21AM +0800, Jijie Shao wrote:
-> 
-> on 2026/1/26 22:03, Simon Horman wrote:
-> > On Fri, Jan 23, 2026 at 05:47:54PM +0800, Jijie Shao wrote:
-> > > The bit widths of HCLGE_FD_AD_QID and HCLGE_FD_AD_COUNTER_NUM are
-> > > increased to support higher specifications.
-> > > 
-> > > Note: The hardware already supports the specifications.
-> > Hi Jijie,
-> > 
-> > Are there any compatibility issues here?
-> > E.g. new driver with old hardware or firmware?
-> 
-> Thank you, There are no compatibility issues.
-> 
-> The chip and firmware are supported in V2.
-> However, the software does not support the extension due to
-> consistency with older versions(and the customer has not used the extended bits either).
-> 
-> The queue_cnt and counter_cnt specifications of the software are directly
-> or indirectly queried from the firmware, and the extended bits are not
-> used in the V1 version.
-> 
+The RFC patch posted earlier has been split into a series based on the
+feedback received:
 
-Thanks, I think that addresses my concern.
+ 1/3: preparing the EN8811H driver for maximum reuse
+ 2/3: adding support for the new AN8811HB hardware
+ 3/3: adding (optional) clock driver for AN8811HB
 
-The code changes themselves look good to me.
-So, for the series:
+Patch 3/3 is not required for a functional device. It is included here
+for full feature parity between the EN8811H and AN8811HB drivers.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The AN8811HB phy requires new firmware, which is now available with
+the 20260110 release of linux-firmware,
+
+RFC: https://lore.kernel.org/20251202102222.1681522-1-bjorn@mork.no/
+v1:  https://lore.kernel.org/20260122071601.1057083-1-bjorn@mork.no/
+v2:  https://lore.kernel.org/20260123075817.1162068-1-bjorn@mork.no/
+v3:  https://lore.kernel.org/20260126065749.1334867-1-bjorn@mork.no/
+
+
+Changes since v3:
+- msleep, not mdelay
+- added comment explaining why we continue after firmware CRC failures
+- refactored firmware loading to make the error handling more straight
+  forward and easier to read
+- removed coding style violating label names
+
+Changes since v2:
+- made read_status generic with one phy_id conditional block, reducing
+  initial refactoring and improving code readability
+
+Changes since v1:
+- moved AIR_AUX_CTRL_STATUS_SPEED_10 reference from patch 1 to 2, where
+  it is defined, fixing intermediate build error
+- rearranged an8811hb_check_crc loop to improve readability for AI and
+  other intelligent beings
+
+Changes since RFC:
+- refactoring of the existing EN8811H code is separated into a patch
+  of its own
+- ID conditionals are dropped, using separate functions for the two
+  hardware variants instead. Some common helpers have been added to
+  reduse code duplication
+- deprecated serdes polarity properties are not supported for AN8811HB
+- the polarity configuration code has proper error handling
+- a polarity configuration bug is fixed by using the new simplified
+  helper interface
+- the clock driver is split out in a separate patch to reduce the size
+  of the main AN8811HB driver patch
+
+Bjørn Mork (3):
+  net: phy: air_en8811h: factor out shareable code
+  net: phy: air_en8811h: add Airoha AN8811HB support
+  net: phy: air_en8811h: Add clk provider for an8811hb
+
+ drivers/net/phy/air_en8811h.c | 446 +++++++++++++++++++++++++++++++---
+ 1 file changed, 412 insertions(+), 34 deletions(-)
+
+-- 
+2.47.3
 
 
