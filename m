@@ -1,212 +1,220 @@
-Return-Path: <netdev+bounces-254000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eLQNG7kbeWmPvQEAu9opvQ
-	(envelope-from <netdev+bounces-254000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:10:33 +0100
+	id 2ExiMnkjeWndvgEAu9opvQ
+	(envelope-from <netdev+bounces-254001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:43:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4FB39A3E6
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:10:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CCD9A6CC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 21:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78A053058B87
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:10:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B80C1301C17E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C2B322B74;
-	Tue, 27 Jan 2026 20:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A1C32E733;
+	Tue, 27 Jan 2026 20:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWvWJBWj"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4LbDx3g+";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="C7huW96G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04DB28489E;
-	Tue, 27 Jan 2026 20:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FC123C503;
+	Tue, 27 Jan 2026 20:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769544599; cv=none; b=PxZrYOuAk5P/oXQrf/eukVKU1H+ullfQPVLyLUOhH4T5M/2vyFG7QMesxLL6e9Sxi6miUjxZ3f1FcqFjW7KgHYwCCD6fkzglNVVxM3YhY7+7DkMv+i+6IREkAeGg81RPfgSnj2s68ZwqllTndRzvuYd/VxICXQLJCrnuGXBzEKA=
+	t=1769546610; cv=none; b=p5rQD7UkWm5ahP/v0Iw0UoVI3/A6DaVEf57XQxVGs9eQpm84yO8yJ5pBmS87FGeR0b75sPbKCuQJQtNJdyyvkOT6qCYu7CZvRlxTrBih8/I36nwv7GaXdhv7w5tdNi0dTogZutwNjGcheDiw4YGiJ33tuiQXUxDgV40k4rimiyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769544599; c=relaxed/simple;
-	bh=WJHgbRzk+nm2ozhgo4Pc1OQr2YTFqZyBdg7StnRy7CA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L1u2nVdegDFznd1+1N5dH/RGxP+31NW0DI2vJQmETiWG+aZK03+Rg1pna7EyzE07rDJcuttwLOmc0GVr6ykk+NncsakYMpVrVFDUdcYMUKC7ErXK7iIj5F3ut60wUjXzMjxAh9G5gwEzpqexetdttoUDg1Jdl/l7IC7XBUoMVxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWvWJBWj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E833CC116C6;
-	Tue, 27 Jan 2026 20:09:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769544599;
-	bh=WJHgbRzk+nm2ozhgo4Pc1OQr2YTFqZyBdg7StnRy7CA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cWvWJBWjLej5U/XidMpk0CHSRUPbMf6CASETSQphNAImXnnzilNNG77yYQOHduz+C
-	 VUpCUAVIRyQsykkwpBeMGD8bHXyTyOZ6saVt3e7DX2KglYbPHobVn5m/tUxH9d53WZ
-	 QQUeSsNasg6ZUWyDuLJBkCWYdf+y+dULLxsVnc/ibOtjejr67uzvmQuegPGamT7CNQ
-	 NEt4+NkB042+qSFIlnoN67TslSkuqaKMjkhbhxOHM0xubDHyRlwLt3EjP1jSMI/8Re
-	 YwzNXvvzGc4Y8AFWokbJye0RjmbySohEbNqTscde4O0J+VjtUG51LomQWzR6dX0nkB
-	 1A63wlBws4qrw==
-Date: Tue, 27 Jan 2026 12:09:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, edumazet@google.com, parav@nvidia.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
- ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Subject: Re: [PATCH v11 net-next 10/15] tcp: accecn: unset ECT if receive or
- send ACE=0 in AccECN negotiaion
-Message-ID: <20260127120957.76e52cc5@kernel.org>
-In-Reply-To: <20260123100721.42451-11-chia-yu.chang@nokia-bell-labs.com>
-References: <20260123100721.42451-1-chia-yu.chang@nokia-bell-labs.com>
-	<20260123100721.42451-11-chia-yu.chang@nokia-bell-labs.com>
+	s=arc-20240116; t=1769546610; c=relaxed/simple;
+	bh=zfolhV9Ze02+UuPt5wWghVk9sRVd8mMoFTahMiBUxic=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Lzxgeb4u8ZUkB+5mzFS3qzvP6y9VGnwHp4OVHb+2O65sgaTM8YMWciwYz/3jkj++aOlT2SMvGM1SJpYoeTMi7wRYFJZ+i3068pUnL4f0VY+YvEThVWBKFBzeN7pybLi/m15J2oeEG8g0wg5SEi9KUqcAnamwmINuotxIGNeNnc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4LbDx3g+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=C7huW96G; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: John Ogness <john.ogness@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1769546606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZMqM0U1ZHpg6/6FCY9/v7F7AqZW0Y4S7oYJKqS3Z8UY=;
+	b=4LbDx3g+8h+jX9AJt6MMvJmeP76qCaXhN3d9gZJnVb3YXH1BJxfe9/87rbTpntiPt6i+Yj
+	uNheZP9S6MzLe5jWzDmV3voDcOYMj5eWMUYb7YQ36a69ts+xqLCTKa02A37j+D6jjgv/HB
+	gSQ6a0cEvjWgE8NrXzBCOGgimCfYSgs5tgmR/KrCrBGK/qPJ24XRIWUwHxoM8G6R/Xip2T
+	Qhy/6LfIQR4UjQ1EEZIb1hWV63MWHRdkAYj2CtEw2Rx73dqbHuFR/a01rtu1A8Xu+GNFQF
+	1URl2NsXAnUBOrjz21dAT6R4PDTaFGHKisLK8HuqrDMB0whc93K5LQmVR7iH5w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1769546606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZMqM0U1ZHpg6/6FCY9/v7F7AqZW0Y4S7oYJKqS3Z8UY=;
+	b=C7huW96Gin8geMejn6PtonNf1Fyc6G1X7ZsjsQIB3BaG3vHdHzFBGw6jGnHOL4zlGZKonS
+	bq8Z4/rz2nDr4kBA==
+To: Breno Leitao <leitao@debian.org>, Breno Leitao <leitao@debian.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, pmladek@suse.com
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+ gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+ mpdesouza@suse.com, kernel-team@meta.com
+Subject: Re: [PATCH net-next v4 1/5] printk: Add execution context (task
+ name/CPU) to printk_info
+In-Reply-To: <20260123-nbcon-v4-1-46a5cf567926@debian.org>
+References: <20260123-nbcon-v4-0-46a5cf567926@debian.org>
+ <20260123-nbcon-v4-1-46a5cf567926@debian.org>
+Date: Tue, 27 Jan 2026 21:49:25 +0106
+Message-ID: <87ldhi7pn6.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,google.com,nvidia.com,vger.kernel.org,lwn.net,kernel.org,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-254000-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-254001-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[john.ogness@linutronix.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33]
-X-Rspamd-Queue-Id: E4FB39A3E6
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[jogness.linutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 68CCD9A6CC
 X-Rspamd-Action: no action
 
-On Fri, 23 Jan 2026 11:07:16 +0100 chia-yu.chang@nokia-bell-labs.com
-wrote:
-> Based on specification:
->   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
-> 
-> Based on Section 3.1.5 of AccECN spec (RFC9768), a TCP Server in
-> AccECN mode MUST NOT set ECT on any packet for the rest of the connection,
-> if it has received or sent at least one valid SYN or Acceptable SYN/ACK
-> with (AE,CWR,ECE) = (0,0,0) during the handshake.
-> 
-> In addition, a host in AccECN mode that is feeding back the IP-ECN
-> field on a SYN or SYN/ACK MUST feed back the IP-ECN field on the
-> latest valid SYN or acceptable SYN/ACK to arrive.
+On 2026-01-23, Breno Leitao <leitao@debian.org> wrote:
+> diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+> index 32fc12e536752..391a58be0c5b3 100644
+> --- a/kernel/printk/nbcon.c
+> +++ b/kernel/printk/nbcon.c
+> @@ -946,6 +946,19 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+>  }
+>  EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
+>  
+> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> +static void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
+> +				     struct printk_message *pmsg)
+> +{
+> +	wctxt->cpu = pmsg->cpu;
+> +	wctxt->pid = pmsg->pid;
+> +	memcpy(wctxt->comm, pmsg->comm, TASK_COMM_LEN);
 
-FWIW this series is marked as Changes Requested in patchwork. 
-I don't think I did that, IDK why it's in that state :S
-I see these warnings when I try to apply it:
+Perhaps using sizeof() instead?
 
-Applying: selftests/net: packetdrill: add TCP Accurate ECN cases
-.git/rebase-apply/patch:325: new blank line at EOF.
-+
-.git/rebase-apply/patch:1550: new blank line at EOF.
-+
-.git/rebase-apply/patch:1641: new blank line at EOF.
-+
-warning: 3 lines add whitespace errors.
+	memcpy(wctxt->comm, pmsg->comm, sizeof(wctxt->comm));
 
+And adding a static assert that the sizes match?
 
-Other than that the AI code review made the following comment,
-I haven't investigated the expected behavior. Could you TAL?
+	static_assert(sizeof(wctxt->comm) == sizeof(pmsg->comm));
 
-> @@ -1103,6 +1104,8 @@ static void reqsk_timer_handler(struct timer_list *t)
->  	    (!resend ||
->  	     !tcp_rtx_synack(sk_listener, req) ||
->  	     inet_rsk(req)->acked)) {
-> +		if (req->num_retrans > 1 && tcp_rsk(req)->accecn_ok)
-> +			tcp_rsk(req)->accecn_fail_mode |= TCP_ACCECN_ACE_FAIL_SEND;
+> +}
 
-Note: This correctly sets the flag on tcp_rsk(req)->accecn_fail_mode,
-which will be propagated to the child socket via tcp_ecn_openreq_child().
+[...]
 
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-
-[ ... ]
-
-> @@ -481,6 +481,8 @@ static void tcp_ecn_openreq_child(struct sock *sk,
->  		tp->syn_ect_snt = treq->syn_ect_snt;
->  		tcp_accecn_third_ack(sk, skb, treq->syn_ect_snt);
->  		tp->saw_accecn_opt = treq->saw_accecn_opt;
-> +		if (treq->accecn_fail_mode & TCP_ACCECN_ACE_FAIL_SEND)
-> +			tcp_accecn_fail_mode_set(tp, TCP_ACCECN_ACE_FAIL_SEND);
-
-This propagates TCP_ACCECN_ACE_FAIL_SEND from the request socket to the
-child, but TCP_ACCECN_ACE_FAIL_RECV is not propagated here.
-
-> @@ -749,16 +751,32 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
->  		 */
->  		if (!tcp_oow_rate_limited(sock_net(sk), skb,
->  					  LINUX_MIB_TCPACKSKIPPEDSYNRECV,
-> -					  &tcp_rsk(req)->last_oow_ack_time) &&
-> -
-> -		    !tcp_rtx_synack(sk, req)) {
-> -			unsigned long expires = jiffies;
-> -
-> -			expires += tcp_reqsk_timeout(req);
-> -			if (!fastopen)
-> -				mod_timer_pending(&req->rsk_timer, expires);
-> -			else
-> -				req->rsk_timer.expires = expires;
-> +					  &tcp_rsk(req)->last_oow_ack_time)) {
-> +			if (tcp_rsk(req)->accecn_ok) {
-> +				u8 ect_rcv = TCP_SKB_CB(skb)->ip_dsfield &
-> +					     INET_ECN_MASK;
+> diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+> index 1d765ad242b82..7daaa27705339 100644
+> --- a/kernel/printk/printk.c
+> +++ b/kernel/printk/printk.c
+> @@ -2131,12 +2131,37 @@ static inline void printk_delay(int level)
+>  	}
+>  }
+>  
+> +#define CALLER_ID_MASK 0x80000000
 > +
-> +				tcp_rsk(req)->syn_ect_rcv = ect_rcv;
-> +				if (tcp_accecn_ace(tcp_hdr(skb)) == 0x0) {
-> +					u8 fail_mode = TCP_ACCECN_ACE_FAIL_RECV;
+>  static inline u32 printk_caller_id(void)
+>  {
+>  	return in_task() ? task_pid_nr(current) :
+> -		0x80000000 + smp_processor_id();
+> +		CALLER_ID_MASK + smp_processor_id();
+> +}
 > +
-> +					tcp_accecn_fail_mode_set(tcp_sk(sk),
-> +								 fail_mode);
-
-Should this be setting the flag on the request socket instead of the
-listener socket? Here tcp_sk(sk) is the listener, but reqsk_timer_handler()
-uses tcp_rsk(req)->accecn_fail_mode for the same purpose. The flag set
-on the listener socket will not be propagated to the child socket, so
-the child may incorrectly set ECT on outgoing packets even after receiving
-a SYN with ACE=0.
-
-For consistency with reqsk_timer_handler() and to ensure the flag reaches
-the child socket, this might need to be:
-
-    tcp_rsk(req)->accecn_fail_mode |= fail_mode;
-
-> +				}
-> +			}
-> +			if (!tcp_rtx_synack(sk, req)) {
-> +				unsigned long expires = jiffies;
+> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> +/* Store the opposite info than caller_id. */
+> +static u32 printk_caller_id2(void)
+> +{
+> +	return !in_task() ? task_pid_nr(current) :
+> +		CALLER_ID_MASK + smp_processor_id();
+>  }
+>  
+> +static pid_t printk_info_get_pid(const struct printk_info *info)
+> +{
+> +	u32 caller_id = info->caller_id;
+> +	u32 caller_id2 = info->caller_id2;
 > +
-> +				tcp_accecn_ace_fail_send_set_retrans(req,
-> +								     tcp_sk(sk));
+> +	return caller_id & CALLER_ID_MASK ? caller_id2 : caller_id;
+> +}
+> +
+> +static int printk_info_get_cpu(const struct printk_info *info)
+> +{
+> +	return ((info->caller_id & CALLER_ID_MASK ?
+> +		 info->caller_id : info->caller_id2) & ~CALLER_ID_MASK);
+> +}
 
-Similar question here: tcp_accecn_ace_fail_send_set_retrans() sets the
-flag on tcp_sk(sk) (the listener), while reqsk_timer_handler() sets it
-on tcp_rsk(req). Is this intentional?
+It is a bit odd that printk_info_get_pid() uses local variables and
+printk_info_get_cpu() does not. I could understand if things evolve that
+way over time, but it is odd to use the two different styles from the
+beginning.
+
+I would prefer the local variable variant. But mostly I would prefer
+that they are the same style.
+
+> +#endif
+> +
+>  /**
+>   * printk_parse_prefix - Parse level and control flags.
+>   *
+> @@ -2213,6 +2238,27 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+>  	return text_len;
+>  }
+>  
+> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> +static void printk_store_execution_ctx(struct printk_info *info)
+> +{
+> +	info->caller_id2 = printk_caller_id2();
+> +	get_task_comm(info->comm, current);
+> +}
+> +
+> +static void pmsg_load_execution_ctx(struct printk_message *pmsg,
+> +				    const struct printk_info *info)
+> +{
+> +	pmsg->cpu = printk_info_get_cpu(info);
+> +	pmsg->pid = printk_info_get_pid(info);
+> +	memcpy(pmsg->comm, info->comm, TASK_COMM_LEN);
+
+Here I also suggest using sizeof() and static_assert():
+
+	memcpy(pmsg->comm, info->comm, sizeof(pmsg->comm));
+	static_assert(sizeof(pmsg->comm) == sizeof(info->comm));
+
+John Ogness
 
