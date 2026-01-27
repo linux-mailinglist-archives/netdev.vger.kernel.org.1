@@ -1,204 +1,158 @@
-Return-Path: <netdev+bounces-253761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFqbFlN/eGkFqQEAu9opvQ
-	(envelope-from <netdev+bounces-253761-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:03:15 +0100
+	id GFE0MKR9eGkFqQEAu9opvQ
+	(envelope-from <netdev+bounces-253759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:56:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E9691728
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:03:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DECEF91593
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1AA7305D860
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:58:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5A1E33002B6D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 08:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240F532A3C3;
-	Tue, 27 Jan 2026 08:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B85A2DB790;
+	Tue, 27 Jan 2026 08:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LjXrrlep"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a7NdCjAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9832BE65F
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 08:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF9332A3F3
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 08:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769504302; cv=none; b=ptXo4Nr83Q+VMSrJknILwCGMX/aKgRv8Uo+192L2o0Qdm5UZbpP9QpgGqKTbGYphGCKnhPSBV2j4Og4/8vwSy6YRsvsXGonN30ugtOlUp8gg8As3G/dfRZj70p3jBEhNLz6GJ2SN1SW50qxy5L1FCcpU9u5ERmWXioHpP0JMDQQ=
+	t=1769504160; cv=none; b=nlQGvA/Lc13pAgJcNNpaJ4geOR/UqPwTxb3yId6PpZF6+upDbiO9QGugnbeRsdA2gg5YPMHld9RxrsW54LiY31EHY+nOq5d5DYbWl3AJIpgKK6FFno3D2nslB1UpOPTqwcLX8HgjFmpOwP+BznbOoDBOBxcl6BK1ikokAEfewqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769504302; c=relaxed/simple;
-	bh=uy0R3ruCI/qIqTm5UziPDABY7MS7MCPyOPk1CAcGHZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AGbyy/0ojSyO1oROq/HY2UrKMK9KSDeLFg0p91NF0hQwTlK5p58wz0q/QlcvmzMHSWdWgV9fWG+o+wtjaGwxmS6Rkkck2lX0HO7Thgu4PqcKC9p3x4C0ceX9NanZcvHB02+G/BXY3PL2bfIrXd9b9dvp+YTGYFN+SQrmpfhDmdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LjXrrlep; arc=none smtp.client-ip=50.112.246.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1769504160; c=relaxed/simple;
+	bh=uMKblArHl5A9jcSFlaLTAYlOk8eq3QqLeD+7zdgmwRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V57MdJJ845rEg85hwhgK+AZhhReOg6Czt5hE0uUGWAM2awMG+gKglcEJk8xPx2hc1PkVVtGYO9Ihw0SJmmZFsa5oliTcJCWTbLOUY8DHyFFmDwnnLCXyN8SeG/URbHBJWbvj38ZXVgPh7hcsHYE/WY9HuWekfbq8czFtrMQ48Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=a7NdCjAL; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47d59da3d81so40808575e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769504300; x=1801040300;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uX/5mrMkeTkN9LjvZeBrGkA31EqPLswoMX6OI/4YseM=;
-  b=LjXrrleptJQ0bx9Ci85PxQRXjkOfygbQYI84vGQWr/jIGUD+i7+AXBAq
-   a50/xEEgDarwp7T87G4PFIuQVbYHBRfhzbi/Y79o8kNUcVUo9TDXAxXG5
-   Roq/zlV5IaJGc/jdd2heldBHEIOmIHbrkqqPdqiQJzkSxwoe/e1DRwVOy
-   qhPrtkN4Q+S028BYE6ro01Vq65iRV1It1niJow8yiw5GO9tZ+qu8QF3y4
-   26fc+eZCHSsGwwn8n39kBoLfIVlkwTw8iL5w1T29IrNJopOovsu6IK9xx
-   cBQH8CrL34FGhuaRNpS0123Ui87Qh2J68ShsFH3rWZ5RjT/UD6HcptRmc
-   A==;
-X-CSE-ConnectionGUID: Yuatk1bvSKOSx5SsuqALRg==
-X-CSE-MsgGUID: +JWy8BhZQ7+lBNDztTlZiw==
-X-IronPort-AV: E=Sophos;i="6.21,256,1763424000"; 
-   d="scan'208";a="11489358"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 08:58:17 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:9193]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.66:2525] with esmtp (Farcaster)
- id 14b8c192-8f08-4013-8f10-c3ddba579f9f; Tue, 27 Jan 2026 08:58:17 +0000 (UTC)
-X-Farcaster-Flow-ID: 14b8c192-8f08-4013-8f10-c3ddba579f9f
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Tue, 27 Jan 2026 08:58:17 +0000
-Received: from 603e5f7bc1fe.amazon.com (10.37.245.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Tue, 27 Jan 2026 08:58:15 +0000
-From: Takashi Kozu <takkozu@amazon.com>
-To: <anthony.l.nguyen@intel.com>
-CC: <przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <aleksandr.loktionov@intel.com>,
-	<pmenzel@molgen.mpg.de>, <piotr.kwapulinski@intel.com>, <enjuk@amazon.com>,
-	Takashi Kozu <takkozu@amazon.com>
-Subject: [PATCH iwl-next v5 3/3] igb: allow configuring RSS key via ethtool set_rxfh
-Date: Tue, 27 Jan 2026 17:54:10 +0900
-Message-ID: <20260127085410.79645-8-takkozu@amazon.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20260127085410.79645-5-takkozu@amazon.com>
-References: <20260127085410.79645-5-takkozu@amazon.com>
+        d=linaro.org; s=google; t=1769504157; x=1770108957; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6gcw78eDfCGKXCKZBLgnF/iPeG+D4+74BvG9CfzhIA=;
+        b=a7NdCjALzVrFuDYprpgbei/cfz0vbzMpZmWos9idjaZZE/MCFcAtuJZLCko+b5LSzH
+         09wbUKiRBGHojrvUDxIUsATiCy34rSU2dzKYP3pbO2Kgeotenkhyx3pjqYL3VMKe6BWx
+         RzWgvPFj26K4ltrzc1GgUJcjqNHqkVaOz17V3JSfL41aiI5U/RujPJaZQUG2VNXAJ4o6
+         4MeV+/bkPFI2Ap53CpMWLVnxlEgIrMqXN3IzOsXpucPwNGonLJXGHVQz0zgLd1RJDxAk
+         FtqeOGNjSn3bhqwd0JrlhO2u/mjOcqQ8h0aLY4e2mvaylzGx7s7L4U524qj0ytRhexR9
+         jdRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769504157; x=1770108957;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J6gcw78eDfCGKXCKZBLgnF/iPeG+D4+74BvG9CfzhIA=;
+        b=ubBARbZ5ifIQ9MRv+SWPFlibahumBy2kA0Zl65CPXI/gKhEQix2KAdJrCY2lUmlPJJ
+         Adg4RzC99/49boqLlrYaStEMFfbfejH3wKaJDHMYbzSPBvVUVoC/FEddsl60dbgN7Sks
+         vQ3qb+mJUPgq/FqUiECtarNhxftVNrBaqOB4bTpH92e5mFX4bviN6u8iqBCThIV5xz+z
+         SI0PZ5htSo5/yeDOdj1bdKGXKNppbJATOGE4WvekbG/CkPje2Gg7hckZRGGP7saEyjc7
+         /DGIEMTvITMXTcx6KqUy5PnqZtuTjHws8g7UhwzmwraUKDLwkWUYRHBYZpD08K6MWdDp
+         r1tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxkI4pwYdpD5y72W6QV8dXF0unRlFLQ6tz2ACP0IgfAqqBGSifJQEOGVolawDAlZHudzKd6/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yycn/U9driepNrins1evqITBwGJbeFYhTB3x7f2+bcY/xPge3PE
+	UxzcRA8mQp45bFiValkBZBgYp2/D7swqYM0ySAhx/crLY6dh8Ph/vfdUl9duH5t/YP0=
+X-Gm-Gg: AZuq6aLz0j4ExvvZl+8pB9CEnjRWd1+8cgJc2+XQBNxyKZ3D8dGqu2UKKuL7xBxRPXQ
+	54nmyGOhz07FMbMVrFDOv9Ott3yXU9XIQNBZcsSOnTshIp6p3FM7sm2R3jnj3ow8bWiqXR30Q36
+	IU9Ejuk03g3bgY7wn2dEUFvGbcFhefPWUbfPwjIi5TXNSHVz/eDTLjWEtBI6jvjBhWLHoyeKXrN
+	W8aHFQ3kCw8ZAodUqt6ZRLlkaF3UVsLyhR0thECm61p3/MsysA+IiYw23o/gpZKoiExmsi+VCxs
+	WVtMywoyJ8t8ckwI3PHnMeaQvoD69kdYoJC5LhLCdpSaNPWzNbSnA4iyicj+IHe/za3D2A310R5
+	8QrGn1AT7R6Vi9Wtchil9TE2nQnMYGCSNJNEjHY+MkiJ2e4e8abpYRxRY2A/tAnsC/1gBMomwRA
+	yLrwT7+pGQk8Dojdc=
+X-Received: by 2002:a05:600c:33a6:b0:47d:52ef:c572 with SMTP id 5b1f17b1804b1-48069e0fd24mr6300105e9.1.1769504156658;
+        Tue, 27 Jan 2026 00:55:56 -0800 (PST)
+Received: from localhost ([41.210.143.248])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c42895sm50695725e9.14.2026.01.27.00.55.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jan 2026 00:55:56 -0800 (PST)
+Date: Tue, 27 Jan 2026 11:55:49 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, robh@kernel.org,
+	kuba@kernel.org, festevam@gmail.com,
+	ghennadi.procopciuc@oss.nxp.com, alexandre.torgue@foss.st.com,
+	linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch,
+	shawnguo@kernel.org, mbrugger@suse.com, mcoquelin.stm32@gmail.com,
+	linaro-s32@linaro.org, davem@davemloft.net, s.hauer@pengutronix.de,
+	edumazet@google.com, linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev, conor+dt@kernel.org, krzk+dt@kernel.org,
+	devicetree@vger.kernel.org, Frank.li@nxp.com,
+	chester62515@gmail.com, netdev@vger.kernel.org,
+	kernel@pengutronix.de, pabeni@redhat.com, jan.petrous@oss.nxp.com,
+	linux-stm32@st-md-mailman.stormreply.com, s32@nxp.com
+Subject: Re: [v4,1/3] net: stmmac: s32: use a syscon for
+ S32_PHY_INTF_SEL_RGMII
+Message-ID: <aXh9lcfw6D6KouI_@stanley.mountain>
+References: <8f2139e8adf02b485a4c84d558fc23f78cf04add.1769195864.git.dan.carpenter@linaro.org>
+ <20260126152430.1390514-1-horms@kernel.org>
+ <aXeJYo-0iiNuXVGH@shell.armlinux.org.uk>
+ <aXeP1y7cK0XRx3Wo@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXeP1y7cK0XRx3Wo@horms.kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-253761-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253759-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[takkozu@amazon.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,kernel.org,gmail.com,oss.nxp.com,foss.st.com,vger.kernel.org,lunn.ch,suse.com,linaro.org,davemloft.net,pengutronix.de,google.com,lists.infradead.org,lists.linux.dev,nxp.com,redhat.com,st-md-mailman.stormreply.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 44E9691728
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DECEF91593
 X-Rspamd-Action: no action
 
-Change igc_set_rxfh() to accept and save a userspace-provided
-RSS key. When a key is provided, store it in the adapter and write the
-E1000 registers accordingly.
+On Mon, Jan 26, 2026 at 04:01:27PM +0000, Simon Horman wrote:
+> But at any rate, I think the key question is should the case
+> where regmap_write() returns an error be handled in
+> s32_gmac_write_phy_intf_select() (by some means)?
 
-This can be tested using `ethtool -X <dev> hkey <key>`.
+Generally if register read/writes fail then there is nothing you
+can do a the software level, you need to buy a new computer.  However,
+in this case we may eventually put the registers behind an SCMI
+interface so probably checking is a good idea.
 
-Signed-off-by: Takashi Kozu <takkozu@amazon.com>
----
- drivers/net/ethernet/intel/igb/igb_ethtool.c | 48 +++++++++++---------
- 1 file changed, 26 insertions(+), 22 deletions(-)
+Could I leave the error message out?  The callers has an error
+message and if you ever see the error message, and even with SCMI,
+the fix is probably still to buy a new computer.
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index b387121f0ea7..b4eef14c09d5 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -3357,35 +3357,39 @@ static int igb_set_rxfh(struct net_device *netdev,
- 	u32 num_queues;
- 
- 	/* We do not allow change in unsupported parameters */
--	if (rxfh->key ||
--	    (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
--	     rxfh->hfunc != ETH_RSS_HASH_TOP))
-+	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-+	    rxfh->hfunc != ETH_RSS_HASH_TOP)
- 		return -EOPNOTSUPP;
--	if (!rxfh->indir)
--		return 0;
- 
--	num_queues = adapter->rss_queues;
-+	if (rxfh->indir) {
-+		num_queues = adapter->rss_queues;
- 
--	switch (hw->mac.type) {
--	case e1000_82576:
--		/* 82576 supports 2 RSS queues for SR-IOV */
--		if (adapter->vfs_allocated_count)
--			num_queues = 2;
--		break;
--	default:
--		break;
--	}
-+		switch (hw->mac.type) {
-+		case e1000_82576:
-+			/* 82576 supports 2 RSS queues for SR-IOV */
-+			if (adapter->vfs_allocated_count)
-+				num_queues = 2;
-+			break;
-+		default:
-+			break;
-+		}
- 
--	/* Verify user input. */
--	for (i = 0; i < IGB_RETA_SIZE; i++)
--		if (rxfh->indir[i] >= num_queues)
--			return -EINVAL;
-+		/* Verify user input. */
-+		for (i = 0; i < IGB_RETA_SIZE; i++)
-+			if (rxfh->indir[i] >= num_queues)
-+				return -EINVAL;
- 
- 
--	for (i = 0; i < IGB_RETA_SIZE; i++)
--		adapter->rss_indir_tbl[i] = rxfh->indir[i];
-+		for (i = 0; i < IGB_RETA_SIZE; i++)
-+			adapter->rss_indir_tbl[i] = rxfh->indir[i];
-+
-+		igb_write_rss_indir_tbl(adapter);
-+	}
- 
--	igb_write_rss_indir_tbl(adapter);
-+	if (rxfh->key) {
-+		memcpy(adapter->rss_key, rxfh->key, sizeof(adapter->rss_key));
-+		igb_write_rss_key(adapter);
-+	}
- 
- 	return 0;
- }
--- 
-2.52.0
-
+regards,
+dan carpenter
 
