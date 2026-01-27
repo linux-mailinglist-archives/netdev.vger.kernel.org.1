@@ -1,150 +1,158 @@
-Return-Path: <netdev+bounces-253771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253772-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CTgB3WEeGmqqgEAu9opvQ
-	(envelope-from <netdev+bounces-253771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:25:09 +0100
+	id kJYoM06IeGk/qwEAu9opvQ
+	(envelope-from <netdev+bounces-253772-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:41:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7561091A87
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:25:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789A391E1A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4098D300E707
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:24:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEF9330276A0
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98792DA742;
-	Tue, 27 Jan 2026 09:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D394B2DC33F;
+	Tue, 27 Jan 2026 09:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="L8oO2AK7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwfWSVSN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332782D97B5
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEEC2DBF47;
+	Tue, 27 Jan 2026 09:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769505840; cv=none; b=rUTdtOarGlfPNfQ0fEg47pNeOhr9MDfvv8onpvhS+ZZk5LpZMMu34QmHNQS4Kp2WUzBxjudurnVx76l6Ju5+jRBRDtVxmA2/ZSkk+0+E+1SejyEbZ7RPrG+wYphHUp+9ImQOp1XbK60leWcQQw4i5JK1WSSgLGN6aXnai+jqUt8=
+	t=1769505949; cv=none; b=sG7Bvdg3WfmOfoKg1qqXgjEeLLmxY85FFooOEIJUAxzBQ6FP4oE53c45LbNBluEuTVg7hLvMM8WPDzEM6xaZ+qeYnjhq/ZD5Yjdd8ueNigMzB33HFnpFPXauLptRLEJP2uV6R0IiFxcAUWzKrinOCzBrqID8J6hz6HPsA++Jy/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769505840; c=relaxed/simple;
-	bh=1/iUH8Y51lHdcNvj4qwjV0K0QoMu7X33Yn+rwXhA858=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A3LDQAX4QE72y6jaJOcB5KlsMA/lXhMWZg4DyWSt5Ad7+3BzLCxnnx+MByTPuoOc9Y4P7nGx52V/ZsvJA8y3eI9zNVB8HNgFafbFhMZcIr8mw+05enlOQOE03E0qybsoo+wmbW9zLKQo1s3mOHqBg/2TNoL8hE9Q4YHIsuAlPaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=L8oO2AK7; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4801c731d0aso42644255e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769505837; x=1770110637; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1rymuFbvBBtXY/nydGoduhBnxQ6RXb+ltZKTsRxuPdI=;
-        b=L8oO2AK7oGrkxWF+I/gEO44Rm/U7Zui59Gy9tJTOt21nK8l4XoRvQTmDzLe3K0zkHj
-         y7AC6XwBGX9jQP5IFnBoRpaewQY33f/+3y/WIdPwjrnslfeE88Y9b81ABKDNxdG0ZH7K
-         vKR97tLK1RzCTZCACIZ9Jz5w7s9ivKFlKyTTSQh3OjJ8MqdfBQ8RNoMoLNq3KfBQHhqf
-         2oM6ISSA77XC3j1pwwDVzr6Nz3mDWPYhRdySklgl/zlnGC7fLW6/+ZWCuz0IrMU3eRWC
-         7HJg6QhX92fFTGQZb1AV/I70IA6H74EXV0fve584O647drOiF34covmuVRVB6GArWa8n
-         E4QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769505837; x=1770110637;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1rymuFbvBBtXY/nydGoduhBnxQ6RXb+ltZKTsRxuPdI=;
-        b=GR4rQlVlTcX2WI5kP6MpTb2aVOSQfo55xXKrViumwLAlR8RsulyxzgDjDKMXkL4L8q
-         xY0AtRdyNKv6IgIVqb5h/dGgmYz/cYeXYK0unw3G5qgTuodJQs3C2kS3n06Aghhm8t3i
-         VseE4wbP/1TaErLkcMIB7QPphjooluY7+TKKpvUHOz47MT2wl/9G3nPK7BOCPdzgAE7K
-         xDDtfWuF1p8CgtDo/YejI0cmozGx7TUoXDsoWr5uWGfaHGIXS1pNs5BO3TCgSaoNfkmf
-         OEIE15fQVXm/aguMHiIcMhmpk4eycyCjAxvDy1rGcULuOAznh3Q+zU4GIj8nSmIf97qb
-         7hCA==
-X-Gm-Message-State: AOJu0Yx8HXx6enFEV3FW/ZLd9WI+DgkzTE2uIjJWRFS599bTMhyPCwQt
-	A2spp6d0/9ZXkjwanS6OotpY0ars7GeNKqXKefxVIEUfH0+1hf5lRDJZECAryyaKBCI=
-X-Gm-Gg: AZuq6aJ6e0r6N1nCb4NluRUCxlTcmaBWCXCh3ARG8sVxRNJTZv9i6DuMrov0sYzG2gu
-	MczbKbA6nYr+b+330VkWQ5L+0lFBMGxevyVZEMA92WKZkrQwSCjo22d/H1Wtf9ixzh+f9WNvfCn
-	hpOclfNcZidpocA446GZbDnA2G0aLV1eVTOt8NZxU0niqbqGnK2gdJm1U2SmvMi/g9XUxOj2gsJ
-	nO1lCvM+IJ58SR1ndeXeWAPAopzsp5mVXVhsVvQOI6eAwpGw4STUoEjwf6TxsttYcC7C6z/0IcO
-	N5MT4vKNApodPUZGOFWmdvGuot23xRq58LETpKNQekHzUDko5ObJb+zFruGQXHVhtQ4ZiTU7/nx
-	SHZ7pOvSicFskVcX+r99aZn08t9o6qVbhjzDCtyNWjKSLmNuR3oz1DE3IbxGOhC3mzn0kGoQE0I
-	6eA+oxd+QlbDepnvhXb5WfulS1/VLmQd1ZmHeJB7IDj/ZuK8hoT7dy+LQ=
-X-Received: by 2002:a05:600c:4746:b0:47e:e9c9:23bc with SMTP id 5b1f17b1804b1-48069c5547amr12943825e9.30.1769505837492;
-        Tue, 27 Jan 2026 01:23:57 -0800 (PST)
-Received: from ?IPV6:2001:a61:1310:7401:36c8:bb62:3315:2c36? ([2001:a61:1310:7401:36c8:bb62:3315:2c36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c24bedsm35318025f8f.17.2026.01.27.01.23.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 01:23:57 -0800 (PST)
-Message-ID: <314effcc-5bf2-47c5-9757-aafd5b47fe65@suse.com>
-Date: Tue, 27 Jan 2026 10:23:51 +0100
+	s=arc-20240116; t=1769505949; c=relaxed/simple;
+	bh=4jiQZv9wxoQeg5GZ0kgb1xulJUpKBRxTXH2y58bWr18=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uuqzRzOuAbIHdwOuI2vurHkFOSMiiZjYXwG5xLTxawq53J6EyxgDYgKmBAM6y1A/OZhf2tiEyYMdr7z0ziPIdCqnI6wITolS2GJsiBWYH/Ftt0OaxlXnXpVOUYf9S9mng9faznL1EBt88HM9k8AC4qkKA5YsVnxDbXubZJjnZBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwfWSVSN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD12C2BC86;
+	Tue, 27 Jan 2026 09:25:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769505949;
+	bh=4jiQZv9wxoQeg5GZ0kgb1xulJUpKBRxTXH2y58bWr18=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=MwfWSVSNX2GZRCGGxBdlvB8xQYGAbi+lkcajYFbHijmcWUpTHXDVhI7ydYg1uDjw4
+	 HPpv7cCWzutovVqQJEFV3KZL//Hjra5aOIzQJyjIGBzCYXBC3ssyUAgViMMRma4E8N
+	 9SI9RpBNdQlO2gZ1RG3HWsxR056Wvm49DwJQ5mjLp02M/PoyIPmVEZs045/mNPrN8l
+	 XEVpJ/uVSxciHV8bwp11WnyYsne7NENgI/2Vp0/n6QymhC8d5j3IAzg0x8lS3r/mDR
+	 Luvuoy36/GTL+oCN+smnWQtd3kI0mNNEOL3E95afS5itU4dMOYSPhDbadVadZSN/bL
+	 xSVk3WlsToqFA==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
+ <chleroy@kernel.org>, Alex Deucher <alexander.deucher@amd.com>, Christian
+ =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>, David Airlie
+ <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, "Creeley, Brett" <bcreeley@amd.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, Jaroslav
+ Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, Vivian Wang <wangruikang@iscas.ac.cn>,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-riscv@lists.infradead.org,
+ sophgo@lists.linux.dev, Takashi Iwai <tiwai@suse.de>
+Subject: Re: [PATCH v3 1/4] PCI/MSI: Conservatively generalize no_64bit_msi
+ into msi_addr_mask
+In-Reply-To: <20260123-pci-msi-addr-mask-v3-1-9f9baa048524@iscas.ac.cn>
+References: <20260123-pci-msi-addr-mask-v3-0-9f9baa048524@iscas.ac.cn>
+ <20260123-pci-msi-addr-mask-v3-1-9f9baa048524@iscas.ac.cn>
+Date: Tue, 27 Jan 2026 10:25:46 +0100
+Message-ID: <87o6mfbe5h.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: usb: kaweth: remove eth_addr_t typedef
- and bcast_addr definition
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20260125083501.34513-1-enelsonmoore@gmail.com>
- <20260125083501.34513-4-enelsonmoore@gmail.com>
- <9239ddef-c197-4fbd-8e88-691766bda3e2@suse.com>
- <CADkSEUjgRrC9eAQYOkaErd7wyXKkUs7+dG+Q1jz7VbqF+zxwuw@mail.gmail.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <CADkSEUjgRrC9eAQYOkaErd7wyXKkUs7+dG+Q1jz7VbqF+zxwuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [4.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-253771-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.com:+];
+	TAGGED_FROM(0.00)[bounces-253772-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[30];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	GREYLIST(0.00)[pass,body];
+	FREEMAIL_TO(0.00)[iscas.ac.cn,linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7561091A87
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 789A391E1A
 X-Rspamd-Action: no action
 
-On 27.01.26 05:38, Ethan Nelson-Moore wrote:
+On Fri, Jan 23 2026 at 14:07, Vivian Wang wrote:
+> Some PCI devices have PCI_MSI_FLAGS_64BIT in the MSI capability, but
+> implement less than 64 address bits. This breaks on platforms where such
+> a device is assigned an MSI address higher than what's reachable.
+>
+> Currently, we deal with this with a single no_64bit_msi flag, and
 
-> Hope that helps you get a sense of how much these drivers are being used.
+we don't deal with anything. The code has a single bit
+limitation. Please use passive voice as documented.
 
-Hi,
+> (notably on powerpc) forces 32-bit MSI address for these devices.
 
-yes I am aware of this. Yet there is no point in breaking
-existing setups. I would prefer this driver to get only
-clear fixes and adaptions to changes in API that are absolutely
-necessary.
+this is not a valid sentence.
 
-	Regards
-		Oliver
+> However, on some platforms the MSI doorbell address is above 32-bit but
+> within device ability.
+>
+> As a first step to enabling MSI on those combinations of devices and
+> platforms, conservatively generalize the single-bit flag no_64bit_msi
+> into msi_addr_mask. (The name msi_addr_mask is chosen to avoid confusion
+> with msi_mask.)
+>
+> The translation is essentially:
+>
+> - no_64bit_msi = 1    ->    msi_addr_mask = DMA_BIT_MASK(32)
+> - no_64bit_msi = 0    ->    msi_addr_mask = DMA_BIT_MASK(64)
+> - if (no_64bit_msi)   ->    if (msi_addr_mask < DMA_BIT_MASK(64))
+>
+> Since no values other than DMA_BIT_MASK(32) and DMA_BIT_MASK(64) is
 
+s/is/are/
+
+> used, no functional change is intended. Future patches that make use of
+> intermediate values of msi_addr_mask will follow, allowing devices that
+> cannot use full 64-bit addresses for MSI to work on platforms with MSI
+> doorbell above 32-bit address space.
+>
+> Acked-by: Takashi Iwai <tiwai@suse.de>
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+
+Other than those nits:
+
+Reviewed-by: Thomas Gleixner <tglx@kernel.org>
 
