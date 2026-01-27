@@ -1,190 +1,129 @@
-Return-Path: <netdev+bounces-253968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHY2Fo79eGmOuQEAu9opvQ
-	(envelope-from <netdev+bounces-253968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:01:50 +0100
+	id QIKYGG7+eGmOuQEAu9opvQ
+	(envelope-from <netdev+bounces-253969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:05:34 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC76898BBC
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D56A798C4E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:05:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B23C303C605
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:01:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19D0930490FF
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF1D3242D4;
-	Tue, 27 Jan 2026 18:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E1A3242D4;
+	Tue, 27 Jan 2026 18:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUWKmjLN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mhizygvn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240AF2264AB
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 18:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85FF221540;
+	Tue, 27 Jan 2026 18:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769536864; cv=none; b=jz3/5GZXVm0beW2HvZIQaI6jfb3PXcD/U9FGVVr+q6D1vV3kXgQLEL8Hfuc9BN8dFDuO52M3j2+Epk+Gbap/xMzK/F8uYJbBHb7CljjgxJ+VLjypXxtDM8X/Uy9LVrvcOaNt6pfVTzJnVHnAr4+4+IZW3Y5zaUbq0z17teatETs=
+	t=1769537071; cv=none; b=CphxNuxYoDS8HWRsus/74PAVoKd4HsHY9fcoqvUpKyJg5FXqRheO41gthTAxS2HlJhDxu+Lsat77QI7MKpngbMqetybxMY5Vly6I1/pouJVSaL4z09Erh0Qt76CPxuv8qW8TJWe6sd7gfsNSV6LGMCl/hyTFB65km4P655wBuXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769536864; c=relaxed/simple;
-	bh=rYPaCm+c4Ka/zd87e5yKTsUdun6FPkSI2nLcgM/zwx0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eXZirtAQYKxEB0NPd60p5FbFkKo/ZgFzMMKwaWdD3lFUei7aIoPdiipISrs9yz5S8cNgm/ru65etW/BoGZeqPgQPsCihTNA3Pb1yEH+T72oFoxT+GU6gYykFVkOAkkawWvryaFu8ym7vmhGHa/oRrpzK4dMjEtDmkhXNgK7n3pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUWKmjLN; arc=none smtp.client-ip=209.85.128.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-4801d98cf39so45661315e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 10:01:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769536860; x=1770141660; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FdIMuKrca0OMsXlKKw+mCgfZrpL7ruk2ZVGqQSIGBkg=;
-        b=YUWKmjLNFv0gnEftxmoDnUTUU46TNOmAbiQ+WgFBELb9t0pFJmuYKjjBweOBg6zGjr
-         Na8PAB8sh3mBxnALPp4qUfRDPhZ1cpCu8+oUMziSPd/Imll0CRDkO+AEgkuvUjnEt2ni
-         oadi4d6gjE0wvp+GEDPV3WbxaM4YFg+NUYYceFxIBTouhtVjpi9HFu0cAmKGWBoc7Ly1
-         Dq7ziIZIdEKCPNLPYdCTtZ+O0RKsNlhbHI3HvfnZe9lhRFcxAGC+By5tB9afbrizVpET
-         cDtTAVhy2SXkaibxNuKbouIXbDzMO8bbXAUGdSGR3zayV46Ahq6lmSV3h4tgV0oK2D7a
-         lUDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769536860; x=1770141660;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FdIMuKrca0OMsXlKKw+mCgfZrpL7ruk2ZVGqQSIGBkg=;
-        b=LkEbOIzvR6YELCaF4C8yfElyplNqjIasbKvr911KuGWFMI2Rzh4j6ZvP5qfpzzX2QR
-         Z0jcZP17TZzCXnSeR0gH234YqSBhEZ2uuJto12pLX6BEbH1QIus281oHmoPokaWW9/PX
-         yCMt6uEf0cgxawanM9BsQjQXideeYJN1f/aosI9iDUqU2ikA+jnsNe+/h8O7eCFU67Wa
-         5GO31e4LX6rr3u8UyoW8Nsdg7tEp70gXIXLcCTwZturBZDFWEfBX/2YYlDvc2Q/hMFen
-         IM9IXwGnoGuLTMLu2RF/cnTXtUs3P/Kb0CusZE08kzDswhBYJixX2qR7BTIy7V8WSfL8
-         IEbw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/mikJG0idorqx/G+koApt3gdnEqVm4Djp9PLtWcvNF6RYnOEYK3LkbVsd+CTtkTGcZWhaxDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/6ochrQYAecxyiZykI4dncgY4oJa0mjiZXOQ96c+hw2TBVVHk
-	i9T2GCQhESDMY2bnWbXc1b15iaMmob1gOu9CP/Dg1LmosnelwKcze6vccmr6UFaXUhw=
-X-Gm-Gg: AZuq6aLhHFiLgWU/1YXplkGZ5idyuaKsAB6chAzWiASPko1IN2EqFsR+WLJ88L7cDMq
-	I0j0YHorvX0VfQUR2hbxHcNsHd9IgHY3HwE64jjiYqcapBBHWJU3EYnCj5AUQs8bwGusDUUfFUd
-	DGEQBjZpWXD6KRkyJb1mkj9ZKpvVGn74eHx+FXWjL30kXJ86uthDHVbl/n1m6ahkPNzUA1Yrb2N
-	I4dFi1eE/VRJpSauny/cubN4M103B3yX3l44+zp3cR7vxzbgPmXy/pmpmemNXaRckH9Lryf7Xmo
-	d0i3gkdK9LAniA5nkvScjs8FpBhfl/r1hDVs8tSjQS6/aOvfNLc8pxjhNXvzpGzommpvp88hH+I
-	1nboM34WIiIxGiuGCtX1BqWH3P92p1xvBgW3ROOWxs9p/V0Bt0J4oDucsi1295bdQMTMQypRhlX
-	OIsKbS/zCU643qKcQgwVuRiqhgGXApWBOcqZepxbV2kkbLDQL3Y20XIZsyAu4E3eiVsw==
-X-Received: by 2002:a05:600c:450b:b0:480:426e:9d38 with SMTP id 5b1f17b1804b1-48069c96b8amr28115845e9.27.1769536859577;
-        Tue, 27 Jan 2026 10:00:59 -0800 (PST)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:7800:6d36:b552:d917? ([2a02:a03f:a75e:9a00:7800:6d36:b552:d917])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806d99cf6asm386315e9.13.2026.01.27.10.00.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 10:00:59 -0800 (PST)
-Message-ID: <b39454ab-3a4c-4dca-8446-c80afff18f41@gmail.com>
-Date: Tue, 27 Jan 2026 19:00:58 +0100
+	s=arc-20240116; t=1769537071; c=relaxed/simple;
+	bh=MjZ7v+ghGJIE+6DAOfJ2Xh+QBFgqEghaeM968xEKkoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m5PVlngj4j6kRvxTEWSz/w6vJgdh41/Z4TT66r9+SeYzJtNLkPzj79YgEVNfUVJJJwPn5NyAx9s7obdansD/P8yK2yPrd4ALtUtTmp/qSARN/ERLOQc8R/pQQMgyIki4iQnMdKmM1YqpfmvZCuzAkP5KPOKL/sotPxvLiFEAS30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mhizygvn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014DBC116C6;
+	Tue, 27 Jan 2026 18:04:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769537070;
+	bh=MjZ7v+ghGJIE+6DAOfJ2Xh+QBFgqEghaeM968xEKkoY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MhizygvnrEDcXmR4MBa0odXor4bpnwYs8cYaCUTPOOsBQOsxyzFTU95yzPgxqSPaF
+	 AqDMiz3z4nOBZEjqPI9/qjeZXCoSr+QsTPM5EbU4lUxVWleI15GVH3QsAgRGfP7kb2
+	 g6zXnMj8VXOeA9ojjBj2LsRmPydhF9L+EjBsOqzUkWwQrCbUrpY23BgxHW85pRnzV8
+	 b5ewdbTx6MJQKGRk5rLg7xkKUWGFBvl934mMOaxc1T0RxpF2pGa5DG2t6EEkzbX8Bl
+	 1VezBaP1qw5y8YqezuE7jxH9vdfLH5DBNPZZKbfPwsJi1AIhCnuv7PS3AMjAvlqeZ5
+	 AlqSoJ/ecLLSA==
+Date: Tue, 27 Jan 2026 10:04:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Chuck Lever <chuck.lever@oracle.com>, "Matthieu
+ Baerts (NGI0)" <matttbe@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next v2] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <20260127100429.26dc5258@kernel.org>
+In-Reply-To: <rsngz5ql5s54luv4mnjs733uogjjdxiylbbm4w4pcaefow45rm@memr4a27ycc2>
+References: <20260126023946.906893-1-rkannoth@marvell.com>
+	<20260126171859.5097dfb5@kernel.org>
+	<rsngz5ql5s54luv4mnjs733uogjjdxiylbbm4w4pcaefow45rm@memr4a27ycc2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 7/7] ipv6: Document enforce_ext_hdr_order
- sysctl
-To: Tom Herbert <tom@herbertland.com>, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
-References: <20260126194826.236075-1-tom@herbertland.com>
- <20260126194826.236075-8-tom@herbertland.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260126194826.236075-8-tom@herbertland.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-253968-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253969-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[marvell.com,vger.kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,oracle.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[herbertland.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BC76898BBC
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D56A798C4E
 X-Rspamd-Action: no action
 
-On 1/26/26 20:48, Tom Herbert wrote:
-> Document the enforce_ext_hdr_order sysctl that controls whether
-> Extension Header order is enforced on receive.
+On Tue, 27 Jan 2026 10:51:10 +0100 Jiri Pirko wrote:
+> Tue, Jan 27, 2026 at 02:18:59AM +0100, kuba@kernel.org wrote:
+> >On Mon, 26 Jan 2026 08:09:44 +0530 Ratheesh Kannoth wrote:  
+> >> Devlink param value attribute is not defined since devlink is handling
+> >> the value validating and parsing internally, this allows us to implement
+> >> multi attribute values without breaking any policies.
+> >> 
+> >> Devlink param multi-attribute values are considered to be dynamically
+> >> sized arrays of u32 values, by introducing a new devlink param type
+> >> DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
+> >> count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
+> >> 
+> >> Implement get/set parsing and add to the internal value structure passed
+> >> to drivers.
+> >> 
+> >> This is useful for devices that need to configure a list of values for
+> >> a specific configuration.  
+> >
+> >Could you respin this as a series with the first driver implementing
+> >a param of this type?  We can't merge an API without a user.  
 > 
-> Signed-off-by: Tom Herbert <tom@herbertland.com>
-> ---
->   Documentation/networking/ip-sysctl.rst | 28 ++++++++++++++++++++++++++
->   1 file changed, 28 insertions(+)
-> 
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-> index 4f568b0e39d2..1b12b955fa34 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -2581,6 +2581,34 @@ ioam6_id_wide - LONG INTEGER
->   
->           Default: 0xFFFFFFFFFFFFFF
->   
-> +enforce_ext_hdr_order - BOOLEAN
-> +	Enforce recommended Extension Header ordering in RFC8200.
-> +	If the sysctl is set to 1 then the ordering the ordering is
+> I may be missed it, are you okay with cleanup helpers now (__free(kfree)
+> used here), or not yet? :)
 
-Reported by AI:
-s/the ordering the ordering/the ordering
-
-> +	enforced in received packets and each Extension Header
-> +	may be present at most once per packet. If the sysctl is
-> +	set to 0 then ordering is not enforced and Extension Headers
-> +	may be present in any order and have any number of
-> +	occurences per packet (except for Hop-by-Hop Options).
-
-
-Reported by AI:
-s/occurences/occurrences
-
-> +
-> +	The Extension Header order is:
-> +
-> +	    IPv6 header
-> +	    Hop-by-Hop Options header
-> +	    Destination Options before the Routing header
-> +	    Routing header
-> +	    Fragment header
-> +	    Authentication header
-> +	    Encapsulating Security Payload header
-> +	    Destination Options header
-> +	    Upper-Layer header
-> +
-> +	Possible values:
-> +
-> +	- 0 (disabled)
-> +	- 1 (enabled)
-> +
-> +	Default: 1 (enabled)
-> +
->   IPv6 Fragmentation:
->   
->   ip6frag_high_thresh - INTEGER
-
-Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+Of course not, I haven't looked at the patch at all.
 
