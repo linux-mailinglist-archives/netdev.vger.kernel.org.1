@@ -1,320 +1,184 @@
-Return-Path: <netdev+bounces-253914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253915-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDqiAZHYeGmftgEAu9opvQ
-	(envelope-from <netdev+bounces-253914-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:24:01 +0100
+	id IJQjFOzWeGmUtgEAu9opvQ
+	(envelope-from <netdev+bounces-253915-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:17:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E762969DC
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:24:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10C349680F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AF8D7301C0C1
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:58:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2EB4D3033E5C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AD335CB66;
-	Tue, 27 Jan 2026 14:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564EF35CBB4;
+	Tue, 27 Jan 2026 14:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="JfZPlapf";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HSWOQrAz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LVgdLwoL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rxa1AWP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28094354AF2
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11FA35CB86
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769525882; cv=none; b=ezAq3FDV6BvCIVSmX1ZYH2LOHsfdrGmnpSaWUhDTotdRWVPKLZjh8pdiptlf9VA94L28SV7V9PCTazAOuIkAN35Y4GcSy/jrzbDOLPoe3axmR1Tv+E+8b6aY1W2QYC0ZlFWiUQUGVAtij6NfMWI8RwhuNGunepVWrBYiU9LYm1I=
+	t=1769525907; cv=none; b=cekrc0usKENBDC5drK5fCmlD7YaY447PVdAfPN32LjToK3v1DPcgHAIAS64FyhRFxqclu3DV/VsY3r+H6uEa7pBKxs3xl8hDn/jcTbC2ycFZ6LwSEkteIs2//bfGZl7zQ0KOALMJR82k7B72sI4v6iLa6mK/hzIano1q3sbFWVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769525882; c=relaxed/simple;
-	bh=T4S6WxgnOOkIwtltJ63CUwFYdV3gHvItd3PvplcsZt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoikOrVK/Qh1Abf9fLiUQ3tCkI0pnfMIjcCtOaPzgOogI5Zvf3yBCPluBvaLvJIuXN8bZz1bfeGjwSceJQn2ppqaD7PklQHZ7Ncg37KdswZhi6SfnBqDtLtggz4iHTJVEcRb8jAGEboroHd186Gi1bMBWCQtJ7v0IydocmYeAiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=JfZPlapf; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HSWOQrAz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RAjgFE700207
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:58:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=LWpVchwqvdGyEWC9dq5KQLLm
-	6bzYdAUNcEvylYGhyMk=; b=JfZPlapfYbLDmW8jIqIUG1zzsRs6BdzYsI20J1Ga
-	vpqifUaODyp/EbBsE7VGur1lPvpwW2LyLCCFu9I9wj22Hc9AhTiXQrKopV5k0Teq
-	R2GHzgjEQhEZnhP/yJV39yPxTvSDUm3uEQXB8csExTNm5EFWRdThOxM2rIRWZjSF
-	lgmeGNIPVSSdJYSop2kWFXzJgUBarZXUnJMiTbjdzPTUWIl7z3yKiORpQP41xppw
-	2UW04TuaCRTUoHoF9aX7whiNoViKOmS5QqbJZe6DyAvoRmxvYgOWzrpfyNfBujJ1
-	jO40wm+ddDMn7K30vv0vgDucLij7LxCP8PCy5FRB8JEDuQ==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxew3u6vu-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 14:58:00 +0000 (GMT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-34c48a76e75so5160779a91.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 06:58:00 -0800 (PST)
+	s=arc-20240116; t=1769525907; c=relaxed/simple;
+	bh=qFtP/gjDarLx9Fs3nZYgV2ID1buA9BlEYHOYEJpVBok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EFF2JLhc0ytp6OfKnkq42hQN3kHbDYVzuI/OsQTG5Yd6wL/dW8WQjKj4iD5Dc1A8FrhuA6+azOQwthLb7PvUjvW1UEdCYW5Fk4QJjJy0ts5zF4TNPjoIgHD6H+lScmK9/65OsTWK9S7SxiEKzsMOhIV1r7qaWP6yqvh11SO/rW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LVgdLwoL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rxa1AWP2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769525905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F2h2goAHWdjIgFq3UrSn8eEXzD+UQENUBlTE3tCDWnU=;
+	b=LVgdLwoLsFT7Sb39UxxdT6PvI6WQZQsLYdstgn8KG6kBtMQzgSwS7x6eww9McaDXOZ99Iu
+	2NFaukcR8Zn4qRY7c4TPaBq665BoiG6xmWPVeyWrRTmFV1ab70g4V+FiPSP0NuvoL2Yhoi
+	Be00U1GaK4tmTUCeQT9X32AadnkLbAs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-KUsymW4eNuy74COy_0wqIQ-1; Tue, 27 Jan 2026 09:58:23 -0500
+X-MC-Unique: KUsymW4eNuy74COy_0wqIQ-1
+X-Mimecast-MFC-AGG-ID: KUsymW4eNuy74COy_0wqIQ_1769525902
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4358f90fe8dso3347244f8f.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 06:58:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769525880; x=1770130680; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LWpVchwqvdGyEWC9dq5KQLLm6bzYdAUNcEvylYGhyMk=;
-        b=HSWOQrAzng4uCWEmIj/NUMGol5TxFKfPG9m32MuWU9N/IwYfgAEZg75BhGtBOg/Tdg
-         REMwNE7/kN1/CNdm+0tYX5MN9nTA7L9rGFr9IWyOvTgffCVxdV1AqZodn+fmRUqCewQ2
-         mszH8epY8KVnrkjICSTTUVJPOegKR3GPday8ckbuYbdysCDf8TS/LRj6qbRY5wmvYbMO
-         NhCPPc6/cjeCDkWJGIrBFNNOvb7G55AlhOCO9Fli9yde2fZpuPhMNyt+Akq2Ab0cKX5y
-         uOc3vkmdTjRgDOU6CDYmHPoVJRyDmAzrdml5/VaDYSNpbOIOpjpSIPRPN7jRDS0aV/Ha
-         PM+g==
+        d=redhat.com; s=google; t=1769525902; x=1770130702; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F2h2goAHWdjIgFq3UrSn8eEXzD+UQENUBlTE3tCDWnU=;
+        b=rxa1AWP2DEZyE4pLjSAuwgUkWAyWLd4KNyDLxN743/PQPA2+d7XGPG9SxPzb6ww1cR
+         TJRteQ9bN4iQ6U6HbpxBYyjxtgsDeo1vGMXIFhKJGAKVuOJ59vyl+vfQ8d4XgkIWGQX4
+         atVo0qa5ePLA8pueiQVZUI7Ipp9lrtSYDZEE1DeJwvojnAKzUKDz366npcUKP4iDcZVG
+         SgaxHdkLo+YdJpagNTxxo9c5WY8tM84XonLRd5MQO2fHrafPI07lRbjcEHACnL/LJYAI
+         e32/8ASEhff5d+ndVxe6eGeenmcjncmP887JltSsSxxWBMFDMjP8RQuvGx+aVzSY/tlQ
+         vy3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769525880; x=1770130680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LWpVchwqvdGyEWC9dq5KQLLm6bzYdAUNcEvylYGhyMk=;
-        b=QqQSJvIyiGltaBvcT+6+j00S3ff4jgrpNpcKFU21hL9NZQpzmTCs/i0gsBtzDj93Ab
-         NzuCnxBAwWgcvfTDN5FTfzp9VRK8Z5ogu6wN5Fi7RMRD4VLFWFBs8wtFwlAjvZKUsSlN
-         XQdRw+paL8DaHd0+Mn9YEKXebdzfN657Yoj2KYkpOuSItYPuf6v7ZrwVvJj+e7lwqe8h
-         Iz5Bm2iiQ/pPLWV8ebILVPhIi/5vEJc50U3wTib1LEz96vyz2xTPEzmBRyzmQm/xHUKC
-         3KjxTHrxIsTiNMBEiQ+Lk9L3llgwxKwa4OVvd5918kUBkMHhmn6KEremfanROlP//mT5
-         gD6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVOd8RzwfziqelCn3rjD/5AGgUnvStXHNp+rZQOXQZi5YWWgwbwiw7hOMc73TWzRph8C6Ur2T0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1+wS/ORZergNVtyEsYfHB6T6hXnIK5AP/4IKTV/4H7Y26diqH
-	bx6/ufoTcML8sErgTZCqRiu7r8MN73SUk3oMJ2WGhOwqvZomxWHWyYeFrYx1/rVzL1AmL0GwSlP
-	bG8NXxyQBrxHuEHRmYT+KbTCeaOYmov40FNKXHTqFvU1i0QIcK0oZBvtAY4s=
-X-Gm-Gg: AZuq6aJD26UFu8wIjgL9TCRf0SngO94GJigIZkP3bzlbPzeiaz2RgR7Y863FueT9Lrl
-	s731g0Ngr6IZCqWRNfT0d2NdntxVX/8eiQDQ0/cUDTxVkFg0aRam6DSHSbRZsRzsEBMfibKxl4O
-	itYtFstHWsPdvDNLg8y/15wc8ZWnjLJVfPqT++KaMfWHyJ7LBKEZG/kMLfv5t30sMovzd14o8oK
-	39fD1O+yVWqj7/em03YtIoxfDKZ7uGlNsKEvVwjMx5ppqrQZgmT2qtU9Ai/mXsi3PeqgInZala9
-	gXuD8+QktMqBLpW61PXkO9iPzB9saQx+fE0b6ZYbqVqkaPeBDzVqTU7/tcaIN4t82ZIzU5gCl57
-	oo7tjH7Ya5Px6uUqRrIM2FCQ=
-X-Received: by 2002:a17:90b:5627:b0:34a:47d0:9a82 with SMTP id 98e67ed59e1d1-353fed70718mr2006691a91.23.1769525879548;
-        Tue, 27 Jan 2026 06:57:59 -0800 (PST)
-X-Received: by 2002:a17:90b:5627:b0:34a:47d0:9a82 with SMTP id 98e67ed59e1d1-353fed70718mr2006667a91.23.1769525878954;
-        Tue, 27 Jan 2026 06:57:58 -0800 (PST)
-Received: from oss.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3536b050e08sm4712102a91.1.2026.01.27.06.57.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 06:57:58 -0800 (PST)
-Date: Tue, 27 Jan 2026 20:27:50 +0530
-From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-phy@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
- inband goodies
-Message-ID: <aXjSbu6L6ICYOPiJ@oss.qualcomm.com>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
- <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
- <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1769525902; x=1770130702;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F2h2goAHWdjIgFq3UrSn8eEXzD+UQENUBlTE3tCDWnU=;
+        b=tmnWK2FnNDotWmNr2ksnMk9Oe5mtu8g8F9ABIUSELYPoYdCQhZRMwtLK2TtYPYLC6h
+         kd0Ika5YJc7FOD8H7XHSU4b/CitYFbJop2/aBSDUl0A+sMtJ4t1vZ7B9Oz1NEQaie2+v
+         POrbM4sHQDDkKspWtUPhOTRzkqbB32Acc4OILZ5kBWY5U8hblkRK4GIxS5Qr21kFqecj
+         Izq65YqrX76RZ70oj1CzPAvHnGG/cYHs6Is+UEy3/6f/8tzrSFdGxMEkAOL3xfa/IlCM
+         NisOPGelfEVDrdL9sqxpByyetkZoUVylkioui3Lso9nhHnYVOHKsARivsqvTMKvLoRLN
+         ZLzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXdT6a47D9fJbMJgKkmlN5MBy9BFV9XTYS5FemQarx3y4MU56kZ9f4eaxMuRynkfIZH8XaqIWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh05Pcrq4SHN1swrHVhK8iv7U7HSXavcrulKwb3GAfxJUWtjUw
+	qRTcloSHwPmw16ovVrwaNE8NAKCVTUm7RQUvUXWbkbuCRBxoU9xm255vgXnnmrQz6cRJUzJ/JCe
+	+CSPiPv8lDmo9xgaKstKLBhXGiNWv+yDDBONtkyBIy7hi0I5fbYTJV6kSRA==
+X-Gm-Gg: AZuq6aKy+FX66Uz74qaRqkxVHbGYyss/jqAagK3+i2iwbTv/M9Escrq1ev08A65zHL6
+	Qq5w5SlhAn+FxN+ZeoP/VuuEvwYWDpe1/ht2d6GbmFdFQbX6A/ruowJoBDVm6ELnpD6FzXJUUeu
+	6csi3y8n0PCb4iyFv7VPbH4x3qOwq6/9pYKifFfhcYabf+j4urTGFkYqwbPMOJyq5WcHBan60TM
+	mns70gK6NtKlats+XkkN0kC70UaEg9z/nzTcp6bAEdKvtEZmg0tvjbOOem2LxEsZpdkILSjxKEo
+	83BvPh0lPBQL/oCu2MNDuadRkxHI9XqHXwpcd4UbvmRTYID5xT6A6TbF2beHsg9WqS++5jCMwlx
+	oZqUaoyjevVjV
+X-Received: by 2002:a05:6000:1ac6:b0:435:9144:13fe with SMTP id ffacd0b85a97d-435dd21d8f5mr2828315f8f.26.1769525902354;
+        Tue, 27 Jan 2026 06:58:22 -0800 (PST)
+X-Received: by 2002:a05:6000:1ac6:b0:435:9144:13fe with SMTP id ffacd0b85a97d-435dd21d8f5mr2828156f8f.26.1769525899962;
+        Tue, 27 Jan 2026 06:58:19 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.22])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1f7c8efsm39078800f8f.42.2026.01.27.06.58.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jan 2026 06:58:19 -0800 (PST)
+Message-ID: <a2540606-0cb5-474b-8a2c-57920bc3392b@redhat.com>
+Date: Tue, 27 Jan 2026 15:58:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aXPo5R1Q-qWG3r3l@shell.armlinux.org.uk>
-X-Proofpoint-ORIG-GUID: qAWD__sPoQtM_K9n7DajK22Xs0ywugTs
-X-Proofpoint-GUID: qAWD__sPoQtM_K9n7DajK22Xs0ywugTs
-X-Authority-Analysis: v=2.4 cv=J8CnLQnS c=1 sm=1 tr=0 ts=6978d278 cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=-kEnI-koradUIOcFO3kA:9 a=CjuIK1q_8ugA:10
- a=iS9zxrgQBfv6-_F4QbHw:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDEyMyBTYWx0ZWRfX3vCrVpXPgCd1
- ZgHwpabwlItTrLrVViyrlbGTSgUh/fzX6+IzIHsxeJogEFlwM9AJSPaWPoaKGypteTqOSq4NbS+
- haoRTX13wQ4TNor54IeSc91u7P5Y7thxamr+utzmd0GUjKAAeLDCWYUiCBIRSPzoBh30+vmY5c+
- Pe3vzfCFtZN5gJfFnr95RLRI2pKl3D5IvIHxxoRU9eGbaMujlxh1ZLzW+Q7yRUHuinNOiLvtC/8
- pYnefWCS8MzZb5a4CHAPa27AGoPWccf/LXSCfsv6jHl/jATh1ByhpDY8HWgkcRgIxwHbCPXpcfp
- zsH2IjLREO2pGeFzJasInv7ltkrgKXusAwJquodaJnjvHvWJXDYHVfzsV8/GmhU3CB13xl/H6rz
- Jt19ND/eP4sT9+gdMdtXFN0oByhff17I607sy7eFAU9qqhDt43e5nns5OYgtrLqGdJbboPwddxy
- cNxbcU30fx163Lnme1Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-27_03,2026-01-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 bulkscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601270123
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/5] printk: Add execution context (task
+ name/CPU) to printk_info
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, pmladek@suse.com, john.ogness@linutronix.de
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
+ gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
+ mpdesouza@suse.com, kernel-team@meta.com
+References: <20260123-nbcon-v4-0-46a5cf567926@debian.org>
+ <20260123-nbcon-v4-1-46a5cf567926@debian.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260123-nbcon-v4-1-46a5cf567926@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-253914-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,goodmis.org,chromium.org,linux-foundation.org,vger.kernel.org,gmail.com,gmx.de,wbinvd.org,jvosburgh.net,suse.com,meta.com];
+	TAGGED_FROM(0.00)[bounces-253915-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 1E762969DC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:email,linutronix.de:email]
+X-Rspamd-Queue-Id: 10C349680F
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 09:32:21PM +0000, Russell King (Oracle) wrote:
+On 1/23/26 1:17 PM, Breno Leitao wrote:
+> Extend struct printk_info to include the task name, pid, and CPU
+> number where printk messages originate. This information is captured
+> at vprintk_store() time and propagated through printk_message to
+> nbcon_write_context, making it available to nbcon console drivers.
 > 
-> and the failing store is the one for that last line of C code - in
-> other words, pcs = NULL.
+> This is useful for consoles like netconsole that want to include
+> execution context in their output, allowing correlation of messages
+> with specific tasks and CPUs regardless of where the console driver
+> actually runs.
 > 
-> This means that mac_select_pcs() returned NULL when being asked
-> "which PCS should be used for 2500base-X" ?
+> The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+> automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+> the helper functions compile to no-ops with no overhead.
 > 
-> This suggests that the SerDes detection of support for 2500BASE-X
-> isn't working, meaning that stmmac_mac_select_pcs() ends up returning
-> NULL, rather than &priv->integrated_pcs->pcs.
-> 
-> That would only happen if:
-> 
->                 /* Only allow 2500Base-X if the SerDes has support. */
->                 ret = dwmac_serdes_validate(priv, PHY_INTERFACE_MODE_2500BASEX);
->                 if (ret == 0)
->                         __set_bit(PHY_INTERFACE_MODE_2500BASEX,
->                                   spcs->pcs.supported_interfaces);
-> 
-> fails, meaning we don't set that interface mode for the PCS.
-> dwmac_serdes_validate() calls phy_validate() for PHY_MODE_ETHERNET
-> with the PHY interface mode as the sub mode.
-> 
-> Patch 3 adds the required methods to phy-qcom-sgmii-eth.c to allow
-> phy_validate() to indicate whether this is supported or not:
-> 
->         .validate       = qcom_dwmac_sgmii_phy_validate,
-> 
-> and its implementation is:
-> 
->         int ret = qcom_dwmac_sgmii_phy_speed(mode, submode);
-> 
->         return ret < 0 ? ret : 0;
-> 
-> where qcom_dwmac_sgmii_phy_speed() is:
-> 
->         if (mode != PHY_MODE_ETHERNET)
->                 return -EINVAL;
-> 
->         if (submode == PHY_INTERFACE_MODE_SGMII ||
->             submode == PHY_INTERFACE_MODE_1000BASEX)
->                 return SPEED_1000;
-> 
->         if (submode == PHY_INTERFACE_MODE_2500BASEX)
->                 return SPEED_2500;
-> 
->         return -EINVAL;
-> 
-> So, this should be returning a positive integer (SPEED_2500), which
-> should cause phy_validate(serdes, PHY_MODE_ETHERNET,
-> PHY_INTERFACE_MODE_2500BASEX, NULL) to return success (zero). That
-> should result in PHY_INTERFACE_MODE_2500BASEX being set in
-> spcs->pcs.supported_interfaces, and thus &priv->integrated_pcs->pcs
-> being returned for PHY_INTERFACE_MODE_2500BASEX.
-> 
-> Is the particular hardware you're running this oopsing test on not
-> using a SerDes PHY? If that's the case, how does it switch between
-> 2.5Gbps and 1Gbps data rate on the SerDes?
-> 
+> Suggested-by: John Ogness <john.ogness@linutronix.de>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Signed-off-by: Petr Mladek <pmladek@suse.com>
+The netconsole bits in later patches LGTM, but we need explicit ack from
+printk maintainers here.
 
-It is using the same SerDes PHY (qcom_dwmac_sgmii_phy_driver).
+Thanks,
 
-I added additional debug prints, and I think the crash is due to
-BMSR_ESTATEN not being set in GMAC_AN_STATUS.
-
-During pcs_init, BIT(8) of GMAC_AN_STATUS is 0:
-[    7.985913] [DBG] GMAC_AN_STATUS = 8
-
-Therefore, this check:
-	if (readl(spcs->base + GMAC_AN_STATUS) & BMSR_ESTATEN) {
-		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-			  spcs->pcs.supported_interfaces);
-
-		/* Only allow 2500Base-X if the SerDes has support. */
-		ret = dwmac_serdes_validate(priv, PHY_INTERFACE_MODE_2500BASEX);
-		if (ret == 0)
-			__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-				  spcs->pcs.supported_interfaces);
-	}
-fails, and PHY_INTERFACE_MODE_2500BASEX never gets set in
-pcs.supported_interfaces. Pardon my naivete, but does the
-BMSR_ESTATEN bit not being set break some standard?
-
-If I remove the check, the NULL pointer dereference is not observed
-anymore. Although the SerDes link is still unstable.
-
-I also tried enabling comma detect during dwmac_integrated_pcs_config,
-but I am still seeing the Tx timeouts. I remember that when I had
-tested the patches in October (without the SerDes driver changes),
-the link state used to flap, but the data path became functional
-after the link stabilized.
-
-	Ayaan
-
----
-Full Logs (Speed Change: 1G -> 2.5G)
-[  244.817499] qcom-ethqos 23040000.ethernet eth1: pcs link down
-[  257.066210] dwmac: PCS configuration changed from phylink by glue, please report: 0x00040000 -> 0x00041000
-[  257.076143] dwmac:      ANE 0 -> 1
-[  257.079668] qcom-ethqos 23040000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
-[  264.260852] qcom-ethqos 23040000.ethernet eth1: NETDEV WATCHDOG: CPU: 7: transmit queue 3 timed out 5472 ms
-[  264.271394] qcom-ethqos 23040000.ethernet eth1: Reset adapter.
-[  264.280493] qcom-ethqos 23040000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
-[  264.842309] qcom-ethqos 23040000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
-[  264.850391] qcom-ethqos 23040000.ethernet eth1: failed to kill vid 0081/0
-[  264.857547] qcom-ethqos 23040000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-0
-[  264.865795] qcom-ethqos 23040000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-1
-[  264.873939] qcom-ethqos 23040000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-2
-[  264.882111] qcom-ethqos 23040000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-3
-[  265.792807] qcom-ethqos 23040000.ethernet eth1: PHY stmmac-0:08 uses interfaces 4,23,27, validating 23
-[  265.802389] [DBG] stmmac_mac_select_pcs - testing for 23 (2500base-x) on priv->integrated_pcs->pcs.supported_interfaces = 4
-[  265.802399] qcom-ethqos 23040000.ethernet eth1:  interface 23 (2500base-x) rate match pause supports 0-7,9,13-14,47
-[  265.824572] qcom-ethqos 23040000.ethernet eth1: PHY [stmmac-0:08] driver [Aquantia AQR115C] (irq=334)
-[  265.834055] qcom-ethqos 23040000.ethernet eth1: phy: sgmii setting supported 00000000,00000000,00008000,000062ff advertising 00000000,00000000,00008000,000062ff
-[  265.852828] [DBG] qcom_dwmac_sgmii_phy_speed called with mode=15, submode=4
-[  265.852837] [DBG] qcom_dwmac_sgmii_phy_validate - qcom_dwmac_sgmii_phy_speed returned 1000
-[  265.868580] qcom-ethqos 23040000.ethernet eth1: Enabling Safety Features
-[  265.884237] qcom-ethqos 23040000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
-[  265.893946] qcom-ethqos 23040000.ethernet eth1: registered PTP clock
-[  265.900561] qcom-ethqos 23040000.ethernet eth1: configuring for phy/sgmii link mode
-[  265.908451] qcom-ethqos 23040000.ethernet eth1: major config, requested phy/sgmii
-[  265.916159] [DBG] stmmac_mac_select_pcs - testing for 4 (sgmii) on priv->integrated_pcs->pcs.supported_interfaces = 4
-[  265.916166] qcom-ethqos 23040000.ethernet eth1: interface sgmii inband modes: pcs=03 phy=03
-[  265.935652] qcom-ethqos 23040000.ethernet eth1: major config, active phy/outband/sgmii
-[  265.943795] qcom-ethqos 23040000.ethernet eth1: phylink_mac_config: mode=phy/sgmii/none adv=00000000,00000000,00000000,00000000 pause=00
-[  265.956407] [DBG] qcom_dwmac_sgmii_phy_speed called with mode=15, submode=4
-[  265.956408] [DBG] qcom_dwmac_sgmii_phy_set_mode - qcom_dwmac_sgmii_phy_speed returned 1000
-[  265.976997] qcom-ethqos 23040000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
-[  270.556001] qcom-ethqos 23040000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/off/nolpi
-[  270.567649] qcom-ethqos 23040000.ethernet eth1: major config, requested phy/2500base-x
-[  270.575823] [DBG] stmmac_mac_select_pcs - testing for 23 (2500base-x) on priv->integrated_pcs->pcs.supported_interfaces = 4
-[  270.575831] qcom-ethqos 23040000.ethernet eth1: mac_select_pcs returned NULL
-[  270.594521] qcom-ethqos 23040000.ethernet eth1: interface 2500base-x inband modes: pcs=00 phy=00
-[  270.603554] qcom-ethqos 23040000.ethernet eth1: major config, active phy/outband/2500base-x
-[  270.612286] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
+Paolo
 
 
