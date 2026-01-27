@@ -1,189 +1,130 @@
-Return-Path: <netdev+bounces-253947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDs1GdLteGkCuAEAu9opvQ
-	(envelope-from <netdev+bounces-253947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:54:42 +0100
+	id GF5YO0rueGkCuAEAu9opvQ
+	(envelope-from <netdev+bounces-253948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:56:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030F398071
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:54:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8B3980E0
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:56:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6B4453003813
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:54:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7B331300F1A7
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5901335CB76;
-	Tue, 27 Jan 2026 16:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D80A361657;
+	Tue, 27 Jan 2026 16:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="H6dCryx1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="blUgooW0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FHY9k/0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00AE31328C;
-	Tue, 27 Jan 2026 16:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E815D352C24;
+	Tue, 27 Jan 2026 16:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769532875; cv=none; b=Uz5GZ5Pc91g0eoHlRwJw12wAU7vJk8lUHSKHrp5eDx3V5ckPKHAz8c7jC9dWWH8Z4j0Opp4GVTSxWFvz6ywQ5NaYn9mTWZkinQ+Z/rwQuRfCjsfIbYhcPnKupJIdKXmgnt4Cc+oZ882T8YQ4TwY/l22yoMNq+xo+s7EbC2reNtg=
+	t=1769532893; cv=none; b=YUakHnP9fmYiBr6XlbiaygvWXbiAjIkDX48DcA3XFwJ7369gCQnMcl77zhiryEtQxSnHylGpdTkM4iSxYJT4LKWqwV/vQL2u7EXk3U9z09/C4+BwETSuE1ZQdfYh1UqTSZNHKojBhOyne8do7tqhFZdsg/kMabdksDHnkgLyPbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769532875; c=relaxed/simple;
-	bh=jJeGr3AEZZLhwBUcqwXf18TUbomahmCrVv+XKeQ1/JE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWu9B/tSgUCDNU6p4oZE+brufMDWhig7y3zkp+oaB9CvivWW3PQexM6Ij28jZCyVd/ZWPq2uXqH0s9RARMsxDAxXHWhiOUvQicJkrGwcDUgcfPr/4/mTnIdklZERbRAvoRMUNQPN/IEs2A2TKBZceCps3dhDq+RgM7SYGZZH3ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=H6dCryx1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=blUgooW0; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 27 Jan 2026 17:54:30 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769532871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N7fcR1AvKm3ql6k8caDYfB9Iq3Onn9HmlZ0agYF2W0A=;
-	b=H6dCryx16kkd3zKXDMGtnq6nmXV7yCGqVJjtlsMV9TXay0d8Fwb7GARB6kbHyNVubcva2M
-	+FMj3hPSgDIKSwc8WL+6sKQ4ver6KHsAsxxG1Gvag+8011S5Bh9KtJPOM96h91CyjH5rUa
-	lHCILMOO9McLVwTuVGlY/myP6f/Dj6ezNhwR5mY4Pi7AR0Cw9GJUnQGAf85CLCXSduGqS6
-	Ao9Rs2nCHd5mKDiuhaKqn4YoYtTuxbFOreWlqKCOentGqLV//SbWD3YQz7BAjsLO3dgWV7
-	ujQh6rkwUU8/5idc05hlVoJ5exVcReIU7dvUOmRsLBDi0TFccbu9Pl3nYMn4qA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769532871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N7fcR1AvKm3ql6k8caDYfB9Iq3Onn9HmlZ0agYF2W0A=;
-	b=blUgooW0SrS3sXg0n7sBI1McAfFwdRJ6Ox8O+sCzjZSrJa6u7jUbHZUiYT6oP7XzcEImxL
-	GZbKgeJLFgPQM3Bg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-Message-ID: <20260127165430.7ui_LGkg@linutronix.de>
-References: <20260127135334.qUEaYP9G@linutronix.de>
- <alpine.DEB.2.21.2601271508160.40317@angie.orcam.me.uk>
+	s=arc-20240116; t=1769532893; c=relaxed/simple;
+	bh=KWKe0wX4GK/AG/2rFbVu3ED65dDKanSyJnKDxVkTOZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nw7gSP8xoXT906Yu/3WSP9ChSExvb+QUnsgJXZrlpvAB6CFgtxnkFljLpAs8+VVCW3yH9qAhx6M8THeBJftgvfVtX+GO+GCxYuAKGvkhoShXE7caT2l3XoJqngM290soVL014hxCS+QWTTNjrv+rTy/wi/6D2hOh/HrGvZtXrXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FHY9k/0s; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 76C49C211C6;
+	Tue, 27 Jan 2026 16:54:52 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 45E78606F5;
+	Tue, 27 Jan 2026 16:54:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7AECF119A8695;
+	Tue, 27 Jan 2026 17:54:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769532889; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=KWKe0wX4GK/AG/2rFbVu3ED65dDKanSyJnKDxVkTOZ0=;
+	b=FHY9k/0sIYVFFS5ztIeN/TPvuWhS7KyzaGKYYmzgvIfyRCIDneKxfgI+wSczN7KP3qCTQt
+	tWqwAWboB86xuHNnH15VlglQYs2Cy+/dlK4Sv0vWUIL1lMxvRE9cIdSZWTTtR/Iyvs2dOU
+	5zqxbRUVSVjK9jj8bZrgf6SPXOg/5clbelj+GH3TrJ++PL+hOvmX7io9T6BATgvbKDWgWx
+	ohdWtFq+6kPNs2cPGlLvqhxZiELHMgh0beK11up0D1+mt9C6lpaLvf/xU1yTNR21BiUdUt
+	eLTVtWawCRLVvogz3x/xSgt7S8+YcAlSKYeLdIZp7HBK7OXD3P4EPN0FjEH1xg==
+Date: Tue, 27 Jan 2026 17:54:46 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: horms@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, jianhao.xu@seu.edu.cn, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, marco.crivellari@suse.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net v3 2/3] net: liquidio: Fix off-by-one error in VF
+ setup_nic_devices() cleanup
+Message-ID: <20260127175446.73fe9c7e@kmaincent-XPS-13-7390>
+In-Reply-To: <20260127151241.1144039-3-zilin@seu.edu.cn>
+References: <20260127151241.1144039-1-zilin@seu.edu.cn>
+	<20260127151241.1144039-3-zilin@seu.edu.cn>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2601271508160.40317@angie.orcam.me.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253947-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-253948-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 030F398071
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,seu.edu.cn:email,bootlin.com:email,bootlin.com:url,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 5F8B3980E0
 X-Rspamd-Action: no action
 
-On 2026-01-27 15:46:10 [+0000], Maciej W. Rozycki wrote:
-> On Tue, 27 Jan 2026, Sebastian Andrzej Siewior wrote:
-> 
-> > The IRQF_ONESHOT flag was added in commit 0fabe1021f8bc ("MIPS:
-> > DECstation I/O ASIC DMA interrupt classes"). It moved
-> > clear_ioasic_dma_irq() from the driver into the irq-chip.
-> > For EOI interrupts the clear_ioasic_dma_irq() callback is now invoked as
-> > ->irq_eoi() which is invoked after the IRQ was handled while the
-> > interrupt is masked due to IRQF_ONESHOT. Without IRQF_ONESHOT it would
-> > be invoked while interrupt is unmasked (but interrupts are disabled).
-> 
->  Umm, are they?  It's been a while, but have I missed anything?  As I 
-> recall ->irq_mask() is called exactly so that interrupts can be re-enabled 
-> at the CPU level right way so as not to block other sources which may have 
-> a low latency requirement while a hardirq handler is running.
+On Tue, 27 Jan 2026 15:12:40 +0000
+Zilin Guan <zilin@seu.edu.cn> wrote:
 
-A hardirq is always serviced with disabled interrupts from CPU point of
-view. There were exceptions in the IDE department as far as I remember
-where it was possible to enable interrupts from CPUs point of view while
-the interrupt was serviced. That was 2.2/2.4 time frame and edge
-interrupts made it possible.
+> In setup_nic_devices(), the initialization loop jumps to the label
+> setup_nic_dev_free on failure. The current cleanup loop while(i--)
+> skip the failing index i, causing a memory leak.
+>=20
+> Fix this by changing the loop to iterate from the current index i
+> down to 0.
+>=20
+> Compile tested only. Issue found using code review.
 
-It is not required to mask the interrupt while the handler is invoked
-unless it is required to properly ACK the interrupt from device's and
-IRQ-chip point of view.
-The sole purpose of IRQF_ONESHOT was to disable the interrupt source
-while the threaded interrupt is running. This driver has none.
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-> > If it is *required* to invoke EOI-ack while the interrupt is masked (and
-> > not a misunderstanding) due to irq-chip cascading/ hierarchical reasons
-> > then using handle_fasteoi_mask_irq() as flow-handler would be the right
-> > way to do so.
-> 
->  Since this is a level-triggered interrupt unmasking it before the EOI 
-> will make it retrigger right away and loop forever.  And as the 
-> description of commit 0fabe1021f8b ("MIPS: DECstation I/O ASIC DMA 
-> interrupt classes") says the interrupt must not be acked before EOI, as 
-> the problematic transfer would restart while the IRQ handler is still 
-> running:
-
-If it is a level interrupt and MASK/ACK in the irq-chip then the device
-will issue the interrupt again if the source of the interrupt (i.e. the
-error) has not been solved. Since the handler does only a printk() it
-should trigger again.
-
-> 16 R/W0C LANCE DMA memory read error
->          This bit is set to 1 and DMA disabled, when the LANCE DMA
->          encounters a memory read error. The LANCE then times out and
->          interrupts the processor, which handles the problem. The LPR can
->          read the address of the error. The bit may be cleared by writing a 0;
->          writing a 1 has no effect.
-> 
-> so a combined ACK-EOI is the only correct way to handle it.
-
-Make sense. So first the driver needs to set this bit and then IRQ-chip
-would need to see the EOI after the handler run. You would still need to
-cancel/ tear down the transfer before that.
-
-Again, with the interrupt handler setup as-is lance_dma_merr_int() will
-run with disabled interrupts.
-
->  Yes, the handler is sort of a placeholder, but the structure of handling 
-> ought to be correct regardless.
-> 
->  One issue here is this is a recovery handler for an error scenario that 
-> is not supposed to happen with a correctly operating system.  I've never 
-> seen it actually fire, which is also why there's no actual recovery action 
-> implemented.  Perhaps such an error could be induced for verification 
-> purposes, I don't know.  All in all this code may have to rely solely on 
-> hw specs.
-> 
->  I need more data to conclude whether this is the right change to make I'm 
-> afraid.  Thank you for looking into it though.
-
-Fair enough. Would it work for you if we scratch this from net-next and
-you route this or something else via the mips tree?
-
->   Maciej
-
-Sebastian
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
