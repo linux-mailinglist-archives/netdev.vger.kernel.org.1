@@ -1,165 +1,275 @@
-Return-Path: <netdev+bounces-253877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IeUBE/AeGn6sgEAu9opvQ
-	(envelope-from <netdev+bounces-253877-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:40:31 +0100
+	id SBXROifCeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:48:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201D695025
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:40:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E0A9518D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 61D833004D99
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:40:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F456306C9FD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB6F359F82;
-	Tue, 27 Jan 2026 13:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0906535A95C;
+	Tue, 27 Jan 2026 13:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cnGsOS2y"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sh7/BsHm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3FA3596FB;
-	Tue, 27 Jan 2026 13:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3659C359FB6
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521224; cv=none; b=MhDzpDTbA3i2i39kPf9VucOj8HSIPXrKgTW3kYpBeJ2NWMG+NACOI8wxC2S9ic/API9T47hsJNddSpCYdtGOZ0gVolZ5xcDjJ7XGChGXmTU9HK9cTVmI1Uz/49rgQSnoqwia1u+cx+IKK+tTF/1qP/XexSlr5uik3JbHZtPYslI=
+	t=1769521343; cv=none; b=qCCA3wsoxVcCf4egalcsVMi30PiUeId5ogXj0H/PZqDZBx0UfbWLzmBgZQaOOwL1hSVm8ihvHCHUudcFKZEGUoVbRnBRjuH7oaWbud59CDIWFGWhSilQnToxtPc744ZTQFuCKJx7HHEfaysgucr887B6Yrb0F/mylv/feirOO/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521224; c=relaxed/simple;
-	bh=q/t8q6cIDKN4tGqUOXEyEpqfjwEaUcXWcc9726MeDqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BuowjA9OGVONWk0hw/GTxnmZLnVDPksu4wbRzZP0Pf+zkwSq8kauU1aFhm2nclXNjCLkk+xc5NCWlb4eYZNg/h42WaIiOdoLW/LOMtswt+uln4ua/MbDyPi95yQwU5yZS3U4xd/DAlqmvtjmMnk9jykT3T5ClD0uyOUxI5TvBNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cnGsOS2y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=PJdRV52Sg2t3bV7DwpZwSOiK3NFQ9DZEEcrZUnrZodU=; b=cn
-	GsOS2yQvDZsBDp5Wz+Jbu1jU+YHTDmHBhdXeEIzuGNWN40Nd+DG9Tjfc2btNHdwqq56odmbX3jNhY
-	VO1ybpvEP03QAAvSkm3RVj6TNE/GutH3KUIEKDhspKWLofy3XS5x8xcwTnRD7rakGj/hKKScIR44p
-	i6M87pQKKGEDGAc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vkjIc-004xPn-HT; Tue, 27 Jan 2026 14:40:06 +0100
-Date: Tue, 27 Jan 2026 14:40:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Min Lin <linmin@eswincomputing.com>
-Cc: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
-	Bo Gan <ganboing@gmail.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com,
-	weishangjuan@eswincomputing.com
-Subject: Re: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock
- sampling control
-Message-ID: <e7183ae1-8b8b-4e77-9f4e-3bc1b4b63556@lunn.ch>
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
- <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
- <aWKZvEW7rKFFwZLG@shell.armlinux.org.uk>
- <0d54ddca-9270-40a5-aa82-d8a7b65027ff@gmail.com>
- <1a622916.2d28.19bb105feab.Coremail.lizhi2@eswincomputing.com>
- <d010a6b8-5bf0-40ff-8e76-18362a238d50@lunn.ch>
- <203bb660.2c91.19bfe45d677.Coremail.linmin@eswincomputing.com>
+	s=arc-20240116; t=1769521343; c=relaxed/simple;
+	bh=DB9kEdPNCukofrnc0NQOSFwRY85g+LWgn59ph42lBvM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GZ9bdUgHlLq6XZEhd44hlUYPZcieJrO5dTKYSU/wdV9SaXWv+mEnXPtNYV1QE17/WZvWwcv19AbZCcVkHPznztgMPtCxPiX4oRE6nbfosbX8aO9ygqdtDx2xvqicY18s2/VECNVs1HSa72D5F9ghkYzAvRoZ4+3YhYXh/Wl2uzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sh7/BsHm; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 723BAC211C0;
+	Tue, 27 Jan 2026 13:42:21 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5C9F0606F5;
+	Tue, 27 Jan 2026 13:42:19 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C2FD6119A864C;
+	Tue, 27 Jan 2026 14:42:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769521338; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=oKlXBMUh5ZhX/zwuswGc13LoRx5lpPr3lRXPECma5Ek=;
+	b=sh7/BsHmT5al/NZJ/LsO/PLqT65iZvw9/smYulxgS2H8xH7N29a5kKTFu3YmQGG2IroZVX
+	IjW+NekKAl6YBF097DHNn9xk/iF9WmGx0CPYAyWsgd+dcsK81fWc8PrBoxNcLOmXspqMvj
+	vuXo9rt6xFQ5azIWffscz6ZcB6qINie98rUVm33C3kueCPlaszZgftsai0j4wnGmvZEJW+
+	+o/lZjDM9yvMgMiz6sMQvlI/tefR1ZEFgavOg8uAH9e8RiWEmREN8ITAbFkWZK3S8Rcyut
+	j2IXJnoRu9jGFBHZ8SBLfKy6GvyiUs6ywXs7BK7TRjmvfY0FOCq8/VMi1Aguyw==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next 00/13] net: phy_port: SFP modules representation and phy_port listing
+Date: Tue, 27 Jan 2026 14:41:48 +0100
+Message-ID: <20260127134202.8208-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <203bb660.2c91.19bfe45d677.Coremail.linmin@eswincomputing.com>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-253879-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253877-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[eswincomputing.com,gmail.com,armlinux.org.uk,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,stormreply.com:email,st.com:email,armlinux.org.uk:email,infradead.org:email,einfochips.com:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,eswincomputing.com:email]
-X-Rspamd-Queue-Id: 201D695025
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 81E0A9518D
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 03:05:48PM +0800, Min Lin wrote:
-> Hi Andrew,
-> 
-> Thank you for taking the time to review the patch.
-> 
-> > -----Original Messages-----
-> > From: "Andrew Lunn" <andrew@lunn.ch>
-> > Send time:Thursday, 22/01/2026 21:27:34
-> > To: 李志 <lizhi2@eswincomputing.com>
-> > Cc: "Bo Gan" <ganboing@gmail.com>, "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ningyu@eswincomputing.com, linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-> > Subject: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling control
-> > 
-> > > We also intend
-> > > to upstream complete DTS files for EIC7700 so the bindings can be validated
-> > > against real hardware.
-> > 
-> > I suggest you prioritise this. ARM-SOC is pretty flexible for
-> > accepting work in progress support for new SoCs. All you really need
-> > is for the board to boot to a login prompt on a serial port using an
-> > initramsfs. So the .dtsi and .dts file can be very slim, CPUs, memory
-> > and UARTs.
-> > 
-> > Once you have that merged you can work on the other drivers, their
-> > bindings, etc.
-> > 
-> The eic7700.dtsi and eic7700-hifive-premier-p550.dts are already in
-> v6.19-rc6.
+Hello everyone,
 
-Great.
+This series is another step towards dealing with multi-port interfaces.
 
-> Because the device drivers such as Ethernet rely on the clock driver,
-> our plan is that once the clock driver is applied, we will add other
-> device nodes such as Ethernet and eMMC in the next upstream patch
-> of the DTS. Is this reasonable?
+It build on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
 
-Yes, this is reasonable. When you submit Ethernet support, please
-include the DT patches as part of the series, so we can see the full
-picture. When it comes to actually merging it could be the DT patches
-get separated out and go a different path, but we can decide that when
-we get to that stage.
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
 
-Given the new information, it becomes clear that backwards
-compatibility is not an issue. Since mainline does not have any users
-of the Ethernet driver, you should make non-backwards compatible
-changes in order to keep things clean. Just ensure the commit messages
-point out there are no users, so the changes are safe.
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
 
-	Andrew
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
+
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Occupied: no
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
+
+
+- Get Combo-ports supported modes, on each port :
+
+# ethtool --show-ports eth0
+
+Port for eth0:
+	Port id: 1
+	Occupied: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Half 1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth0:
+	Port id: 2
+	Occupied: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+	
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Occupied: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Half 1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Occupied: yes
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Occupied: no
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Maxime Chevallier (13):
+  net: phy: phy_port: Correctly recompute the port's linkmodes
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP busses
+  net: phy: Create SFP phy_port before registering usptream
+  net: sfp: Add a sfp-bus ops when connecting a module without PHY
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phylink: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a MII port's occupancy
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  net: phy: store phy_modes in a static array
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  35 ++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 104 ++++-
+ drivers/net/phy/phy_link_topology.c           |  80 +++-
+ drivers/net/phy/phy_port.c                    |   9 +-
+ drivers/net/phy/phylink.c                     | 121 ++++++
+ drivers/net/phy/sfp-bus.c                     |  20 +
+ drivers/net/phy/sfp.c                         |  12 +
+ drivers/net/phy/sfp.h                         |   2 +
+ include/linux/phy.h                           |  88 +----
+ include/linux/phy_link_topology.h             |  34 ++
+ include/linux/phy_port.h                      |   5 +
+ include/linux/sfp.h                           |   5 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/common.c                          |  44 +++
+ net/ethtool/netlink.c                         |  11 +
+ net/ethtool/netlink.h                         |   5 +
+ net/ethtool/port.c                            | 373 ++++++++++++++++++
+ 22 files changed, 943 insertions(+), 105 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
+-- 
+2.49.0
+
 
