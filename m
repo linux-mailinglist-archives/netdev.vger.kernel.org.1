@@ -1,122 +1,172 @@
-Return-Path: <netdev+bounces-253847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMU8HVKzeGlzsQEAu9opvQ
-	(envelope-from <netdev+bounces-253847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:45:06 +0100
+	id QPm9EmazeGlzsQEAu9opvQ
+	(envelope-from <netdev+bounces-253848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:45:26 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1641B9471D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:45:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA49E94734
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4033F3021E84
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:45:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C9373027955
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 12:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F35355039;
-	Tue, 27 Jan 2026 12:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00593557ED;
+	Tue, 27 Jan 2026 12:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="kQZ0HYQa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqptSIfL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24431.protonmail.ch (mail-24431.protonmail.ch [109.224.244.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95389347BA5;
-	Tue, 27 Jan 2026 12:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EC031196F;
+	Tue, 27 Jan 2026 12:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769517902; cv=none; b=otRaAs8URHZnibek8ppABWY39+YHOqMR/cplWYOHekXW2eJCmIAK/HWAGbnKifZtoZG9hT/+RrR1eVQdI4tGuVXqtCCwdD1ej59NZsgw+wLPFlVIfrkf8vV+p/jP+9zkRVIbmamr+CgSOxibHCreNo9uvMjbto0pSFf2uUcNW1c=
+	t=1769517909; cv=none; b=lSaDGX+vfHBP5n5Pq9+3wdY0jj5gTkKrSdKnBkT22eVxosjmYrX747N1J7hONcm3HhopVBxy7dX9lO5IphbQi8vKDCxRGS2kGEOFR47iXNsa3WtxMff+RQ2/GrM50PS8I7qDjhc5VB3tf4UrmZKNIG098uVx9EoPgS7MEXLcIDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769517902; c=relaxed/simple;
-	bh=/qI1KkfdbGxLYvSpOLUvzWtHz4bF7FNuyslfm+1wUw8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oYhcJzn7DMN3Qj8F1apPyZ7qv4XqMUsOCzus/d0ggi/1diOYsJ+380pOkkyOA+LQ3VETw0EC4AYrgon2Vjq1J8CR+7YTW+MYk5ztJjGmeewY3XOnTJfZsSHWeSKDfB45szO9Ih+Dsu0N/6XstEqC7tdS0F7SA9nNEOiDBbFFzvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=kQZ0HYQa; arc=none smtp.client-ip=109.224.244.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1769517891; x=1769777091;
-	bh=/qI1KkfdbGxLYvSpOLUvzWtHz4bF7FNuyslfm+1wUw8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=kQZ0HYQaRCb6JR1WzkMfHeOoPPvv0kQyQoj7KEeDcRQkViO/jRFKBCvCHQ2I5cqCP
-	 +n8gJwWy1FydaBcVucRp1rqQ+P9lbo+wt2xmWGrk4d6XQvn0SEZitLTLk8e3I8MB0C
-	 tFcz1W2lL6C4QRfsyAgPQbZcn+i5gpdqpZZeJq6oKinXkeHgb+CKz0nW1itilcFZTz
-	 9YT6Z5nU6mc5b8QYwPKafmPRUM35zqMXNw6HGErRuiuORhHjz3RPHqf64onbBa4sYB
-	 9pEPlTgezSAKYQfdaq74WJcv2C0eda9q97aOFfTjtYX/CU7XYAfPbC0T8uu/BA0p7i
-	 2ZXciyGdwOpVQ==
-Date: Tue, 27 Jan 2026 12:44:45 +0000
-To: Florian Westphal <fw@strlen.de>
-From: "Remy D. Farley" <one-d-wide@protonmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH v6 5/6] doc/netlink: nftables: Add getcompat operation
-Message-ID: <2mi8BfZGa57pxicf4pXNT_oDJ3bvV7pByJOBhG8e7u_3eBbjubS3YJ88xHp4oDiMi3iY20zcG6FgF8_m5nsJJ_3CYHNftjAL_4EAqN5zeU0=@protonmail.com>
-In-Reply-To: <aXiwkXKg7uvIon4p@strlen.de>
-References: <20260121184621.198537-1-one-d-wide@protonmail.com> <20260121184621.198537-6-one-d-wide@protonmail.com> <aXiiYOxuXVn5YhXG@strlen.de> <Y2VtJPFWA2Kgxe16KslviULQU9LRZsdYFsoUD6VZ9CH-49a2P2fwiQ9B03i3Rmfq6tUczD-oiGpWCCs9aPGwwD2N-vVzy4cFIZT7F7-83Fc=@protonmail.com> <aXiwkXKg7uvIon4p@strlen.de>
-Feedback-ID: 59017272:user:proton
-X-Pm-Message-ID: a6367344ac5633e3026c1e814b4a9a4949616229
+	s=arc-20240116; t=1769517909; c=relaxed/simple;
+	bh=ofe10jGZoPAqJE9FQOSEtDptbVaYpx/CGbuhre/HHNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sY28Rn/e1mXjEU2LhmjdcPJH81QrLEnSpQwoivZDBNh1UzjSHjL5Mgvd9+5s/Pm5peJ4cEO5ywkCytNg0Gw0v/+rEhP/gncGyNmEfbfOV3rrRcmC+KF8P6h2NsNi5Ovd0q3QMmrvB/uZsq1ItPJe7UiUWBi/thOktr2/LO/ICjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqptSIfL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AACFEC116C6;
+	Tue, 27 Jan 2026 12:45:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769517909;
+	bh=ofe10jGZoPAqJE9FQOSEtDptbVaYpx/CGbuhre/HHNI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZqptSIfLm29TLryUzU52GQpI9Y5j/egT2jG8/oQhaPPiFuy2brZcTTjX8upURbbwK
+	 O2avXbgCiqu9oze4K2pbYNChHpLvtm1Jz9vMFgmPsvm1Qg+qCGw0xz/oS/xiGbbAQa
+	 SpjcCq8AzzyIPMh00tl2Kgj9nT4Pwz/av8vbzs9TI8IvS0TbBOA5TPk5EJhldEKCd8
+	 z9JwUU8X8St7FkUL33asPHS0EmzbQdBqKLrg7pOsDN/QpZKsgStUPPRJtFFRc43nWE
+	 6CsKod/Uczqk8wBl9Y2/65PFXOSK8XPZjs8cgK1siNQjv5//Rrl9afMnIDi/jt4EBR
+	 gt2lbSbmoncAQ==
+Date: Tue, 27 Jan 2026 13:45:06 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Michal Hocko <mhocko@suse.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aXizUsfywjtIIN50@localhost.localdomain>
+References: <20260125224541.50226-1-frederic@kernel.org>
+ <20260125224541.50226-4-frederic@kernel.org>
+ <aXeZQoSHJ9QX7B6W@tiehlicka>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXeZQoSHJ9QX7B6W@tiehlicka>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253847-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253848-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,netfilter.org,nwl.cc];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,suse.com,linux-foundation.org,google.com,arm.com,huawei.com,kernel.org,davemloft.net,redhat.com,linuxfoundation.org,kernel.dk,cmpxchg.org,gmail.com,linux.dev,infradead.org,linutronix.de,suse.cz,lists.infradead.org,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[one-d-wide@protonmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[protonmail.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[frederic@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[protonmail.com];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[protonmail.com:email,protonmail.com:dkim,protonmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email]
-X-Rspamd-Queue-Id: 1641B9471D
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,localhost.localdomain:mid]
+X-Rspamd-Queue-Id: EA49E94734
 X-Rspamd-Action: no action
 
-On Tuesday, January 27th, 2026 at 12:33, Florian Westphal <fw@strlen.de> wr=
-ote:
+Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
+> On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > runtime. In order to synchronize against memcg workqueue to make sure
+> > that no asynchronous draining is pending or executing on a newly made
+> > isolated CPU, target and queue a drain work under the same RCU critical
+> > section.
+> > 
+> > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> > workqueue flush will also be issued in a further change to make sure
+> > that no work remains pending after a CPU has been made isolated.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > ---
+> >  mm/memcontrol.c | 21 +++++++++++++++++----
+> >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > index be810c1fbfc3..2289a0299331 100644
+> > --- a/mm/memcontrol.c
+> > +++ b/mm/memcontrol.c
+> > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+> >  	return flush;
+> >  }
+> >  
+> > +static void schedule_drain_work(int cpu, struct work_struct *work)
+> > +{
+> > +	/*
+> > +	 * Protect housekeeping cpumask read and work enqueue together
+> > +	 * in the same RCU critical section so that later cpuset isolated
+> > +	 * partition update only need to wait for an RCU GP and flush the
+> > +	 * pending work on newly isolated CPUs.
+> > +	 */
+> > +	guard(rcu)();
+> > +	if (!cpu_is_isolated(cpu))
+> > +		schedule_work_on(cpu, work);
+> 
+> Shouldn't this in the guarded rcu section?
 
-> Remy D. Farley one-d-wide@protonmail.com wrote:
->=20
-> > > Whats the intent here? nft_compat isn't used by nftables, this
-> > > is iptables-nft compatibility glue.
-> >=20
-> > I noticed getcompat operation used by `nft list ruleset` command, and i=
-t
-> > doesn't seem to be defined anywhere else. Should I re/move it?
->=20
->=20
-> Its used by compatibility mode, it requires an nft binary linked
-> to libxtables, native nftables doesn't need it.
->=20
-> I would prefer not to mention its existence.
+This is what guard(rcu)() does, right?
+Or am I missing something?
 
-Ah, I see. Netlink-bindings have a tool to decode netlink communication, so
-it's a bit awkward to show a bunch of unkown-operations on a common command=
-.
-I'm fine keeping it downstream.
+Thanks.
+
+-- 
+Frederic Weisbecker
+SUSE Labs
 
