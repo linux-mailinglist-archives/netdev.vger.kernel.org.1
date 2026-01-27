@@ -1,199 +1,190 @@
-Return-Path: <netdev+bounces-253991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iAugK18UeWl3vAEAu9opvQ
-	(envelope-from <netdev+bounces-253991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:11 +0100
+	id EOt4LH0UeWl3vAEAu9opvQ
+	(envelope-from <netdev+bounces-253992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59F5E9A068
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597DB9A085
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 20:39:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3119030AFC3C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:32:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5CA03061457
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 19:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F32236E48D;
-	Tue, 27 Jan 2026 19:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5626B36CDE3;
+	Tue, 27 Jan 2026 19:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Us1RXAi/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MvrHHE4A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF83836CDE9;
-	Tue, 27 Jan 2026 19:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5582BCF7F
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 19:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769542375; cv=none; b=fhhf6Y4aGHj/G536GzAkBOEX8ODhztqtXTbGYC4Qtr2U+M5mEnrD3O4qTRHx7Bngs49SlcCM8QxXV0+Aap2WqqzFgTS9wNt+XDuJBryEyL/oIfd/dAtwB3ldUEzPPOp0RakPJPUAxSW24pnfqJhwNpmVCmBFKk5sFWYyIbT3CFQ=
+	t=1769542438; cv=none; b=R+o/rmMBu3xbp7hx1A+X5+J9FfOkgqbHSaFWdvhEODz5148Eakv3JZWBvozztNEFbZKVBRuSFlkwqJVmmw2Ozmk/u665uA0GgkBm4yBPZ+H+kmMifZW/rTMkqpz4biIhXZ2h+lGlZDTXXEU7IHBo8HSPmx5/lkgsM9DJLsvkBrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769542375; c=relaxed/simple;
-	bh=c8lDWX4D3RavtMw9/plTwOleLSxCRDavxuXHfl8Y4Is=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C7qlAJLGfN7DQjcd6m0+z4cKae/MNcVWO92oxosYRwVM6UNPks4nQegT77kkECOZjtOghDBb7ddHe9KZF71yeMuTg6PE6pAU9v/Dpxkl1yOEb3JKS7IeflU/PtbrM6/jJN/6Pck43D1tUkB1PAUgl6XGzumVW778hqY+R0I9Y40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Us1RXAi/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E238BC116C6;
-	Tue, 27 Jan 2026 19:32:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769542375;
-	bh=c8lDWX4D3RavtMw9/plTwOleLSxCRDavxuXHfl8Y4Is=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Us1RXAi/IEvWuS9/cJUHqRKGTDB/ch+lkjjBuCKN1HTYGwxxBh3UH14PJFLIbcRrS
-	 5yIV+yXpYK/FKWIm2D2hKKrJ+Wh61IO55bd+rVTgZeX+UE3M2ppjvB1zFE3OjN8RIM
-	 12qYoEfhc9J69L5n4UBuT8O7n98rkvpaNhSgwtIH11ToI6Esj7DjGBgJp7l2y75BWx
-	 mKuNhCLTWN5CJaCnvtH6/QnXZnJ8BjBnPS7hzd2jK1FGTYEAGMzacgILU8XhUKwOuj
-	 +H4kW9QMyvDcJBcC407wtZQOEd7822/MUB6jZBNsO6GFmJ9MobEMcbzsvv8bv3ENEo
-	 4VPeO1aqPngUg==
-Date: Tue, 27 Jan 2026 19:32:48 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] dt-bindings: net: nxp,s32-dwmac: Declare
- per-queue interrupts
-Message-ID: <20260127-crock-catty-e62e4f699f5a@spud>
-References: <20260123-dwmac_multi_irq-v3-0-cc53f2be8961@oss.nxp.com>
- <20260123-dwmac_multi_irq-v3-2-cc53f2be8961@oss.nxp.com>
- <20260123-dinner-aloft-e57deb6c546a@spud>
- <aXdiNb92B4HH+ZFt@lsv051416.swis.nl-cdc01.nxp.com>
- <20260126-blinker-secluding-a745f60caccb@spud>
- <aXi07hPBrl7EYezi@lsv051416.swis.nl-cdc01.nxp.com>
+	s=arc-20240116; t=1769542438; c=relaxed/simple;
+	bh=iYAxyduA0s22PkYnL2nakuErPqp1U9iyFl2fdqR+s7w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ea6mC6cbFDGkXIu5ny01+NeFjk7vjG80aGkSAiRsUYiB9pjMSo8Gmz6FdM7+FFR1GbcTDtrZGNu//zLpP2qT/XuY00n2Asc+TnIfD7xm6dtOQWpdkjChtaRs5tzHUy1zU3/6YDSAdqYKtItR1vnAHGGa285k8DHkRktK+08CXLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MvrHHE4A; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <243ea894-3bf3-4c10-b012-d4451e7ec17e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769542424;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3DrtAfvaeBV+P4A9wsocJoQ3hSxFzimNThzq0s5w4qU=;
+	b=MvrHHE4ASs7vyavoa/VJYmmAgD8AXEib483PbIUj8Wfu4x3AbgWNmAhBaTECcOEBPlkqyQ
+	hX2Qrh0Ed5+eio9mr+Lvqn1CEkaYDkn8zsTP3NMUkU63UGwNXtVcLaCWelx3QVmeV4DJS3
+	DdRZaR6KpstVb5JsZSQ9U3iu1iaRCRM=
+Date: Tue, 27 Jan 2026 11:33:30 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WkvxyB8JqVtHXRO6"
-Content-Disposition: inline
-In-Reply-To: <aXi07hPBrl7EYezi@lsv051416.swis.nl-cdc01.nxp.com>
+Subject: Re: [PATCH net-next 00/10] Call skb_metadata_set when skb->data
+ points past metadata
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
+ bpf@vger.kernel.org, kernel-team@cloudflare.com,
+ Jakub Kicinski <kuba@kernel.org>, Amery Hung <ameryhung@gmail.com>
+References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
+ <20260112190856.3ff91f8d@kernel.org> <87bjixwv41.fsf@cloudflare.com>
+ <ad835a9b-e544-48d3-b6e2-ffe172fcfa6d@linux.dev>
+ <878qdltsg0.fsf@cloudflare.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <878qdltsg0.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_FROM(0.00)[bounces-253991-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,broadcom.com,lunn.ch,intel.com,nvidia.com,iogearbox.net,gmail.com,fomichev.me,lists.osuosl.org,cloudflare.com];
+	TAGGED_FROM(0.00)[bounces-253992-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_TWELVE(0.00)[25];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 59F5E9A068
+X-Rspamd-Queue-Id: 597DB9A085
 X-Rspamd-Action: no action
 
 
---WkvxyB8JqVtHXRO6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 27, 2026 at 01:51:58PM +0100, Jan Petrous wrote:
-> On Mon, Jan 26, 2026 at 08:00:33PM +0000, Conor Dooley wrote:
-> > On Mon, Jan 26, 2026 at 01:46:45PM +0100, Jan Petrous wrote:
-> > > On Fri, Jan 23, 2026 at 05:13:03PM +0000, Conor Dooley wrote:
-> > > > On Fri, Jan 23, 2026 at 11:09:55AM +0100, Jan Petrous via B4 Relay =
-wrote:
-> > > > > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> > > > >=20
-> > > > > The DWMAC IP on NXP S32G/R SoCs has connected queue-based IRQ lin=
-es,
-> > > > > set them to allow using Multi-IRQ mode when supported.
-> > > >=20
-> > > > The binding only supports s32{g,r} devices, why is the existing min=
-imum
-> > > > retained? What devices are going to not have all 11 interrupts
-> > > > connected?
-> > > >=20
-> > >=20
-> > > The original idea was to support backward compatibility, as older DTs
-> > > didn't contain queue-based interrupt lines described.
-> > >=20
-> > > But now, when you asked, I started to think it is not needed,
-> > > the requirement for backward compatibility is managed inside the driv=
-er
-> > > and yaml shall describe the hardware not used configuration.
-> >=20
-> > Just to be clear, cos the last portion of that "yaml shall..." isn't to
-> > me, you mean that the driver will support 1 or 11 interrupts but you
-> > will make the binding only allow 11? That would be fine.
-> > Just note in the commit message that all of these devices have the 11
-> > interrupts.
-> >=20
->=20
-> Well, all those supported devices have 11 interrupts connected (1x MAC),
-> then 5x RX (queue0..queue4) and  5x TX (queue0..queue4).
->=20
-> Until now, the driver was using on MAC IRQ, so the only one shared line.
-> Now, we are enabling support for per-queue interrupts, what means for
-> supported SoCs up to 11 IRQs as the DWMAC IP on S32G/R has 5 queues.
->=20
-> The driver can still opearate on this one shared IRQ mode, but
-> if the DT node configuration describes all IRQs, then the driver switch
-> to multi-IRQ mode. What allows better distribution of processor core
-> load.
+On 1/25/26 11:15 AM, Jakub Sitnicki wrote:
+> On Thu, Jan 22, 2026 at 12:21 PM -08, Martin KaFai Lau wrote:
+>> On 1/13/26 4:33 AM, Jakub Sitnicki wrote:
+>>> Good point. I'm hoping we don't have to allocate from
+>>> skb_metadata_set(), which does sound prohibitively expensive. Instead
+>>> we'd allocate the extension together with the skb if we know upfront
+>>> that metadata will be used.
+>>
+>> [ Sorry for being late. Have been catching up after holidays. ]
+>>
+>> For the sk local storage (which was mentioned in other replies as making skb
+>> metadata to look more like sk local storage), there is a plan (Amery has been
+>> looking into it) to allocate the storage together with sk for performance
+>> reason. This means allocating a larger 'struct sock'. The extra space will be at
+>> the front of sk instead of the end of sk because of how the 'struct sock' is
+>> embedded in tcp_sock/udp_sock/... If skb is going in the same direction, it
+>> should be useful to have a similar scheme on: upfront allocation and then shared
+>> by multiple BPF progs.
+>>
+>> The current thinking is to built upon the existing bpf_sk_local_storage usage. A
+>> boot param decides how much BPF space should be allocated for 'struct
+>> sock'. When a bpf_sk_storage_map is created (with a new use_reserve flag), the
+>> space will be allocated permanently from the head space of every sk for this
+>> map. The read (from a BPF prog) will be at one stable offset before a sk. If
+>> there is no more head space left, the map creation will fail. User can decide if
+>> it wants to retry without the 'use_reserve' flag.
+> 
+> Thanks for sharing the plans.
+> 
+> We will definitely be looking into ways of eliminating allocations in
+> the long run. With one allocation for skb_ext, one for
+> bpf_local_storage, and one for the actual map, it seems unlikely we will
+> be able to attach metadata this way to every packet. Which is something
+> we wanted for our "label packet once, use label everywhere" use case.
+> 
+> I'm not sure how much we can squeeze in together with the sk_buff.
+> Hopefully at least skb_ext plus a pointer to bpf_local_storage.
 
-> So the 11 IRQs are the maximum value, in the case when all queues are
-> used. But I can imagine some other use-cases, when not all queues
-> are enabled, ie. only queue0 and quque1. In that case, the driver will
+yeah, only a bpf_local_storage pointer is needed in skb (or in skb_ext). 
+It is the same for the bpf sk/task/... storage.
 
-Since all of the devices have 11 interrupts, this would be software
-configuration and the devicetree should contain all 11 even if shared
-mode is desired, to reflect how the hardware is configured. I think
-minItems should be changed to 11, unless another device gets added later
-that does not have all 11 connected.
+To be clear, for allocation in skb, I was thinking more about Paolo's 
+comment on "...increasing struct sk_buff size as an alternative to the 
+mptcp skb extension...".
 
-> use some subset of all IRQs.
-> That means that DT can contain only lesser interrupt list then maximum.
->=20
-> I feel like having "minItems: 1" shall cover such use-case.
+> 
+> I'm also hoping we can allocate memory for bpf_local_storage together
+> with the backing space for the map, which update triggers the skb
+> extension activation.
 
+Allocate the actual storage at the end of bpf_local_storage? Hmm... off 
+the top of my head, I don't have a good idea how to do it without 
+trading off flexibility. If trading off flexibility, may as well 
+allocate fixed extra space at the sk (/skb) and get a performance 
+benefit (which would need to be measured).
 
---WkvxyB8JqVtHXRO6
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> Finally, bpf_local_storage itself has a pretty generous cache which
+> blows it up. Maybe the cache could be a flexible array, which could be
+> smaller for skb local storage.
 
------BEGIN PGP SIGNATURE-----
+For our usage, the cache has been slowly filling up, so we actually have 
+another side of the issue. Improvements on bpf_local_storage is always 
+welcomed.
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaXkS3QAKCRB4tDGHoIJi
-0jI2AP0WP0sgcNZESXVAvwbBqgu4z6UoHTvYjGRucW4qVxBD2AD+LhuETgd5tQxm
-i4Feuiwe6K3mZ5APrN+lkwC0B8lkkg4=
-=nLqP
------END PGP SIGNATURE-----
+I am currently more interested in getting the extra memory/headroom 
+allocated for an sk. Eventually, the storage(s) that will be needed for 
+all (or most) sk will use the extra headroom of sk. The current 
+bpf_local_storage (pointer) in sk will be more for testing/ad-hoc 
+purpose or for performance-insensitive usage.
 
---WkvxyB8JqVtHXRO6--
+It is probably off topic now. It seems having extra tail space in a skb 
+is not in your current plan for the next respin.
+
 
