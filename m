@@ -1,63 +1,88 @@
-Return-Path: <netdev+bounces-253646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253647-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id D0HWCooSeGkYnwEAu9opvQ
-	(envelope-from <netdev+bounces-253646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:06 +0100
+	id 6EtrAbUSeGkYnwEAu9opvQ
+	(envelope-from <netdev+bounces-253647-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:49 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB458EA5C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6678F8EA6E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:19:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3B9D3301FC89
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:19:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 384B530215BD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FB1238D22;
-	Tue, 27 Jan 2026 01:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYs67asI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190CE23AB90;
+	Tue, 27 Jan 2026 01:19:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEB8199E94;
-	Tue, 27 Jan 2026 01:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F0A1FF1B5;
+	Tue, 27 Jan 2026 01:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769476741; cv=none; b=O59XD/OFDsN8lEIxKgko7aAsfNTnU8y94NfZLm1mbHEy5ieU0YRb1X90oyM5uGux99ApbLx80Vzl50cVld5689SR5z5HZNzUr8xOs3NlmbwEgHJMbvNnFmZPTomT8MpmY6/FHmyWFiurtpO7FQr+pH78h72dRCOZiWPGxi8GN7s=
+	t=1769476786; cv=none; b=Cu4z22h5TArDV7YOWUjeh2l1SZgIZk6hzBDfxDJQDCMeYu/vbovw8J5awEV1iGX0CP3uN7uet1y0mQHAiJ+ld95trSaxK17Fmj7ySAUdd8PajHp1tEQTMnf53/ck66tAJKCuI7hArro3R0gQy4DLWFoKz+ytShQ5fwbj/3wrFWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769476741; c=relaxed/simple;
-	bh=I7zlTeswa8SHh4ArIiC4MzQa3xWyYpORcMwR8zCd7/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TBsdoFJAVJWa4549k4+X0EIEc2TaRrZ4ZtgHosBcN87WrvvgYvVtk5MAwFFmYjhqBC7oyYNYrqUZsgh+ZujyzN0hh21HI4LhTxpyNn/Z3nL0t+CEhZKCsDyHTJW3u7flIlG82mtBExl1hbtikH8sE+hy8FF1EJWEXyufHDuBW3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYs67asI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 684B9C116C6;
-	Tue, 27 Jan 2026 01:19:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769476741;
-	bh=I7zlTeswa8SHh4ArIiC4MzQa3xWyYpORcMwR8zCd7/s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pYs67asI5GUDMhYypY4QZlVkelpALPLOGilgr+6yX4s+uvYCxvJYZvetMRla+Q4mc
-	 eFSCUUBUr9gL0G6K/5h06NrxGcPFekctSke3y3SdDlAq7nAjP2WDlPOZVdr3OME47s
-	 /PE1rXKHtAxmP/8NC/G50T7kvRJazL39jR+zvWoXtfMzGWbVmxgWA2bZNuny6HDJh4
-	 Vtj+7R9CsP4h488uYwyAl9wKnMQLtzqF12i8n56voZ+/Q3MuMjGV5lCiZN1imPbpOb
-	 hTT8eHf0q7q3MC1QhV1Lcn6lA5C/BzsdCHV+Aq//TSVv82MPJZwiJjWeXpuGc7lTCK
-	 +3aWCy0PgXUsw==
-Date: Mon, 26 Jan 2026 17:18:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Saeed Mahameed
- <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Chuck Lever <chuck.lever@oracle.com>, "Matthieu Baerts
- (NGI0)" <matttbe@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next v2] devlink: Implement devlink param multi
- attribute nested data values
-Message-ID: <20260126171859.5097dfb5@kernel.org>
-In-Reply-To: <20260126023946.906893-1-rkannoth@marvell.com>
-References: <20260126023946.906893-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1769476786; c=relaxed/simple;
+	bh=ssCiDavxKEbwZwVsjiEsnnR//r40IO9WyiCR/IKIQwg=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=tPXS0nAM2gcDjy7eD6b101Cg4JZHQOE6bvJyV5ExyGyqyW8q6tzixlhrnNr5ynylbbl306I/MriDn+/cdt1FQVyY+6JAl3Ryl1FNEoiJVUhT/RWSkUrit/X+L5pENJSt47JY8GBsuWpw08UGKFqNTJ+RK9pcj80u0UkEwznfMwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 5922092009C; Tue, 27 Jan 2026 02:19:34 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 5181F92009B;
+	Tue, 27 Jan 2026 01:19:34 +0000 (GMT)
+Date: Tue, 27 Jan 2026 01:19:34 +0000 (GMT)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+    linux-pci@vger.kernel.org, linux-mips@vger.kernel.org, 
+    linux-s390@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+    Linas Vepstas <linasvepstas@gmail.com>, 
+    Mahesh J Salgaonkar <mahesh@linux.ibm.com>, 
+    Oliver O'Halloran <oohall@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+    Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+    Madhavan Srinivasan <maddy@linux.ibm.com>, 
+    Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+    "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+    Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Sven Schnelle <svens@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+    Andrew Morton <akpm@linux-foundation.org>, 
+    =?UTF-8?Q?Martin_Kepplinger-Novakovi=C4=87?= <martink@posteo.de>, 
+    Pavel Machek <pavel@ucw.cz>, MD Danish Anwar <danishanwar@ti.com>, 
+    Mengyuan Lou <mengyuanlou@net-swift.com>, 
+    Pablo Neira Ayuso <pablo@netfilter.org>, Takashi Iwai <tiwai@suse.de>, 
+    Huacai Chen <chenhuacai@kernel.org>, Theodore Ts'o <tytso@mit.edu>, 
+    Eric Biggers <ebiggers@google.com>, 
+    Madadi Vineeth Reddy <vineethr@linux.ibm.com>, 
+    Shrikanth Hegde <sshegde@linux.ibm.com>, 
+    Geert Uytterhoeven <geert@linux-m68k.org>, 
+    Ard Biesheuvel <ardb@kernel.org>, 
+    "Martin K. Petersen" <martin.petersen@oracle.com>, 
+    Frederic Barrat <fbarrat@linux.ibm.com>, 
+    Andrew Donnellan <ajd@linux.ibm.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, 
+    Konstantin Shkolnyy <kshk@linux.ibm.com>, 
+    Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+    Lorenzo Bianconi <lorenzo@kernel.org>, 
+    Lukas Bulwahn <lukas.bulwahn@redhat.com>, Dong Yibo <dong100@mucse.com>, 
+    Heiner Kallweit <hkallweit1@gmail.com>, Thomas Gleixner <tglx@kernel.org>, 
+    Ingo Molnar <mingo@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+    Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH net-next v2] net: ethernet: neterion: s2io: remove unused
+ driver
+In-Reply-To: <20260126031352.22997-1-enelsonmoore@gmail.com>
+Message-ID: <alpine.DEB.2.21.2601270110590.40317@angie.orcam.me.uk>
+References: <20260126031352.22997-1-enelsonmoore@gmail.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,58 +90,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253646-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,resnulli.us,oracle.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-253647-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lwn.net,gmail.com,linux.ibm.com,google.com,davemloft.net,kernel.org,redhat.com,alpha.franken.de,ellerman.id.au,lunn.ch,linux-foundation.org,posteo.de,ucw.cz,ti.com,net-swift.com,netfilter.org,suse.de,mit.edu,linux-m68k.org,oracle.com,gondor.apana.org.au,linux.dev,mucse.com,wunner.de,intel.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[orcam.me.uk];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[55];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7DB458EA5C
+X-Rspamd-Queue-Id: 6678F8EA6E
 X-Rspamd-Action: no action
 
-On Mon, 26 Jan 2026 08:09:44 +0530 Ratheesh Kannoth wrote:
-> Devlink param value attribute is not defined since devlink is handling
-> the value validating and parsing internally, this allows us to implement
-> multi attribute values without breaking any policies.
-> 
-> Devlink param multi-attribute values are considered to be dynamically
-> sized arrays of u32 values, by introducing a new devlink param type
-> DEVLINK_PARAM_TYPE_U32_ARRAY, driver and user space can set a variable
-> count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
-> 
-> Implement get/set parsing and add to the internal value structure passed
-> to drivers.
-> 
-> This is useful for devices that need to configure a list of values for
-> a specific configuration.
+On Sun, 25 Jan 2026, Ethan Nelson-Moore wrote:
 
-Could you respin this as a series with the first driver implementing
-a param of this type?  We can't merge an API without a user.
--- 
-pw-bot: cr
+> The s2io driver supports Exar (formerly Neterion and S2io) PCI-X 10
+> Gigabit Ethernet cards. Hardware supporting PCI-X has not been
+> manufactured in years. On x86, it was quickly replaced by PCIe. While
+> it stuck around longer on POWER hardware, the last POWER hardware to
+> support it was POWER7, which is not supported by ppc64le Linux
+> distributions. The last supported mainstream ppc64 Linux distribution
+> was RHEL 7; while it is still supported under ELS, ELS is only
+> available for x86 and IBM Z. It is possible to use many PCI-X cards in
+> standard PCI slots (which are still available on new motherboards), but
+> it does not make sense to do so for 10 Gigabit Ethernet because the
+> maximum bandwidth of standard PCI is only 1067 Mbps. It is therefore
+
+ However 64-bit PCI at 66MHz will let you reach 4 times as much.  Also 
+PCI-X can be bridged from PCIe or HT.
+
+> highly unlikely that this driver is still being used. Remove the
+> driver, and move the former maintainer to the CREDITS file (restoring
+> credit for the vxge driver, which was removed in commit f05643a0f60b
+> ("eth: remove neterion/vxge").
+
+ How do you know it's not used?  What's the gain from removing a driver 
+unless say it's broken and does not build?
+
+  Maciej
 
