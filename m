@@ -1,137 +1,181 @@
-Return-Path: <netdev+bounces-253928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MP8XIgHheGkGtwEAu9opvQ
-	(envelope-from <netdev+bounces-253928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:00:01 +0100
+	id 8HjvLk/geGkGtwEAu9opvQ
+	(envelope-from <netdev+bounces-253929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:57:03 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291309744F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:00:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 565F5973B1
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 16:57:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BBB46301A77D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:46:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6DC130BBED7
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869BD35B653;
-	Tue, 27 Jan 2026 15:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018BC35E554;
+	Tue, 27 Jan 2026 15:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fpV21aWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BC735CB76;
-	Tue, 27 Jan 2026 15:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB6935CBD2
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 15:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769528775; cv=none; b=p7iH4QgF72BZdmHSeH5qRvxvGg7qooIyRbQgNZ/uKSTmQ2J030bkpyC3S4VgqPYSDUp22GjN7kk2MuoyT362oMiqMr0mN3yU0mzGLmbonvv0ARV2XUYdJfEXESnapfDFGA155FMgAzT31UrYm1beACFNUaoX73ejpa2wLtWa6co=
+	t=1769528901; cv=none; b=Xg9HhWhr7qYdR/FoXb5vin2yxr4hhY6nEUrN/iRafJweimTqQZ8kQ8TMVgliJI/R5j0xMw04vGS5sTeXgi+MP9qWN+rXWHuGw/fT2t5w6DIaEdAYnlTR6EmBaMQOI4AR0mPlrKqcbVfMr8XAJptB2kXyb7wn3rJAItTj1lk+330=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769528775; c=relaxed/simple;
-	bh=YxUtHGJp3rRQoEqVIndKTQ6jCokoIDKpRH+cCW78r2c=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=hbI6++1Zj4QfUHqMWXzf5pWdx7KlhDM4P5WFJW3YiXmku/DW785+Bzq73hwgoFwmoS1a1mISfRM3jVnAJ2WpqfqKei8sxCGXG/am1r4x0xzaVfOL753c4TAInGCq0LWQgsbuVJqbiyXFlZezF61Mlnx7nbPBzEbdtVf1s51liD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id EB21992009C; Tue, 27 Jan 2026 16:46:10 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id E4D4092009B;
-	Tue, 27 Jan 2026 15:46:10 +0000 (GMT)
-Date: Tue, 27 Jan 2026 15:46:10 +0000 (GMT)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-cc: netdev@vger.kernel.org, linux-mips@vger.kernel.org, 
-    Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-In-Reply-To: <20260127135334.qUEaYP9G@linutronix.de>
-Message-ID: <alpine.DEB.2.21.2601271508160.40317@angie.orcam.me.uk>
-References: <20260127135334.qUEaYP9G@linutronix.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1769528901; c=relaxed/simple;
+	bh=MyJH6B/DAC2Hks4I0KKh108Lu3whfs1qSGJMxXLIyA0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=K4CuAO6+drhZcOfUyZaDa1xn7jJw1tgz/x2CIYwxFMkRcAjCqiXeFjKVqeUoX7Ld8Bfc7EYCDG9qFVmzsJy1RP+FxU1K14+9G+8ukSsby1bEaNgBVAVKDcfEmTGoB4HAtNb4a2hWv884z+d/JX+gCz2NGN1Mpg4svsbCk37nmhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fpV21aWq; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 772884E422D3;
+	Tue, 27 Jan 2026 15:48:17 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4ADC8606F5;
+	Tue, 27 Jan 2026 15:48:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8AB21119A8637;
+	Tue, 27 Jan 2026 16:48:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769528896; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=OxkgHIERK1QMMyBS9ryD4i6d6w+RIzeILS9CMd6za+4=;
+	b=fpV21aWqssDyfTLubMz3GX7FBO/K944DIV7FsDzkeJY1zGQoT4g+hFHhUQktqnCgHWT8JK
+	ef2tYOjMpJNp0jZxNhVUKkKiLv2zBKwzsaKt4qNudaYDxRlQzX3IjggSJTybDZ03YBxSrl
+	UgwP8HK5I51PFp2oBmEwUE+KgmX2iWgtEv1dQzHuKfrM/xR+30opbvPBwLVLeSWPIV7YO8
+	NqYZ1SFnffF1HjucvPOJIaSUJ3BLVKjhfVaBuov/92yB3qjZv8DiWpdBp+rl2nJjnynCxY
+	F/27PHKDrXi9N+9TDFdqkbGejV3JyzYSfOMdMGTUatLdwv8mCpO2bmqZ+5MJHg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 27 Jan 2026 16:48:11 +0100
+Message-Id: <DFZHN2KXS7UI.C1WHCBAAII2K@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next 3/8] cadence: macb: Add page pool support
+ handle multi-descriptor frame rx
+Cc: <netdev@vger.kernel.org>, "Nicolas Ferre" <nicolas.ferre@microchip.com>,
+ "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Lorenzo Bianconi" <lorenzo@kernel.org>,
+ =?utf-8?q?Gr=C3=A9gory_Clement?= <gregory.clement@bootlin.com>, "Thomas
+ Petazzoni" <thomas.petazzoni@bootlin.com>
+To: "Paolo Valerio" <pvalerio@redhat.com>, =?utf-8?q?Th=C3=A9o_Lebrun?=
+ <theo.lebrun@bootlin.com>, "Andrew Lunn" <andrew@lunn.ch>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260115222531.313002-1-pvalerio@redhat.com>
+ <20260115222531.313002-4-pvalerio@redhat.com>
+ <4c74c2c4-7a47-45ff-be17-485e0702cc37@lunn.ch> <87cy315lru.fsf@redhat.com>
+ <840fd286-779e-4130-b544-913116c97a29@lunn.ch> <87qzrdecs1.fsf@redhat.com>
+ <b0bff7a8-a004-4eb7-bf1d-2137182e59f9@lunn.ch>
+ <DFYQS9RIPCSY.25SHGGC3VM2M3@bootlin.com> <87ldhkexvq.fsf@redhat.com>
+In-Reply-To: <87ldhkexvq.fsf@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253928-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DMARC_NA(0.00)[orcam.me.uk];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253929-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[macro@orcam.me.uk,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 291309744F
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:url,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,archlinux.org:url]
+X-Rspamd-Queue-Id: 565F5973B1
 X-Rspamd-Action: no action
 
-On Tue, 27 Jan 2026, Sebastian Andrzej Siewior wrote:
+On Tue Jan 27, 2026 at 12:51 AM CET, Paolo Valerio wrote:
+> On 26 Jan 2026 at 07:45:29 PM, Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>=
+ wrote:
+>> On Mon Jan 26, 2026 at 3:29 PM CET, Andrew Lunn wrote:
+>>>> > I was more interested in plain networking, not XDP. Does it perform
+>>>> > better with page pool? You at least need to show it is not worse, yo=
+u
+>>>> > need to avoid performance regressions.
+>>>>=20
+>>>> I retested with iperf3. The target has a single rx queue with iperf3
+>>>> running with no cpu affinity set.
+>>>>=20
+>>>> |              |  64 | 128 |
+>>>> | baseline     | 273 | 545 |
+>>>> | pp (page)    | 273 | 544 |
+>>>> | pp (2 frags) | 272 | 544 |
+>>>
+>>> So no real difference. That is unusual, it is typically faster, or if
+>>> it is always doing line rate, it uses less CPU time. That might
+>>> suggest the page pool integration is not optimal?
+>>
+>> One more data point. I get line rate with & without page_pool so below
+>> are CPU times from /proc/stat:
+>>
+>>          upstream    pp
+>> user            1     1
+>> system        179    91 (!!!)
+>> idle         7874  7303
+>> softirq        35    37
+>>
+>> 16K pages on Mobileye EyeQ5 (MIPS), 7 fragments per page.
+>>
+>> Paolo shared 64 versus 128 measurements but I am unsure what those stand
+>> for; I doubt it can be packet size as xdp-bench does not have it as a
+>> parameter. https://man.archlinux.org/man/extra/xdp-tools/xdp-bench.8.en
+>
+> 64 and 128 are packet size in bytes.
+> For the first test I used xdp-trafficgen on the sender side and
+> xdp-bench (skb-mode) to count the drops in pps on my board.
+>
+> For the stack test I used iperf3 (UDP) similarly with 64 and 128 for the
+> length option.
 
-> The IRQF_ONESHOT flag was added in commit 0fabe1021f8bc ("MIPS:
-> DECstation I/O ASIC DMA interrupt classes"). It moved
-> clear_ioasic_dma_irq() from the driver into the irq-chip.
-> For EOI interrupts the clear_ioasic_dma_irq() callback is now invoked as
-> ->irq_eoi() which is invoked after the IRQ was handled while the
-> interrupt is masked due to IRQF_ONESHOT. Without IRQF_ONESHOT it would
-> be invoked while interrupt is unmasked (but interrupts are disabled).
+|           |    64 | 128 |
+| baseline  |  75.3 | 145 |
+| page_pool |  79.3 | 154 |
 
- Umm, are they?  It's been a while, but have I missed anything?  As I 
-recall ->irq_mask() is called exactly so that interrupts can be re-enabled 
-at the CPU level right way so as not to block other sources which may have 
-a low latency requirement while a hardirq handler is running.
+Call is: iperf3 -c $IP -u -A2 -b1G -l64   # or -l128
 
-> If it is *required* to invoke EOI-ack while the interrupt is masked (and
-> not a misunderstanding) due to irq-chip cascading/ hierarchical reasons
-> then using handle_fasteoi_mask_irq() as flow-handler would be the right
-> way to do so.
+CPU affinity is important. I get approx -30% on CPU0 (where IRQs land)
+and -12% on CPU1 (2nd thread of CPU0).
 
- Since this is a level-triggered interrupt unmasking it before the EOI 
-will make it retrigger right away and loop forever.  And as the 
-description of commit 0fabe1021f8b ("MIPS: DECstation I/O ASIC DMA 
-interrupt classes") says the interrupt must not be acked before EOI, as 
-the problematic transfer would restart while the IRQ handler is still 
-running:
+I looked at ftrace function_graph and it looks sensible. Baseline spends
+16% of macb_rx_poll() in gem_rx_refill(). This goes down to 10% with
+page_pool.
 
-16 R/W0C LANCE DMA memory read error
-         This bit is set to 1 and DMA disabled, when the LANCE DMA
-         encounters a memory read error. The LANCE then times out and
-         interrupts the processor, which handles the problem. The LPR can
-         read the address of the error. The bit may be cleared by writing a 0;
-         writing a 1 has no effect.
+Thanks,
 
-so a combined ACK-EOI is the only correct way to handle it.
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
- Yes, the handler is sort of a placeholder, but the structure of handling 
-ought to be correct regardless.
-
- One issue here is this is a recovery handler for an error scenario that 
-is not supposed to happen with a correctly operating system.  I've never 
-seen it actually fire, which is also why there's no actual recovery action 
-implemented.  Perhaps such an error could be induced for verification 
-purposes, I don't know.  All in all this code may have to rely solely on 
-hw specs.
-
- I need more data to conclude whether this is the right change to make I'm 
-afraid.  Thank you for looking into it though.
-
-  Maciej
 
