@@ -1,279 +1,217 @@
-Return-Path: <netdev+bounces-254034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGeaKrVGeWlWwQEAu9opvQ
-	(envelope-from <netdev+bounces-254034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 00:13:57 +0100
+	id WCwQKndHeWlWwQEAu9opvQ
+	(envelope-from <netdev+bounces-254035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 00:17:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255839B56C
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 00:13:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F2A9B5A8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 00:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1031D30120E6
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:13:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A857300B05B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 23:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5624E2EBDD0;
-	Tue, 27 Jan 2026 23:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CB929B22F;
+	Tue, 27 Jan 2026 23:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="upoWD/Be"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q8RpoYDm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72382BD580
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 23:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769555635; cv=pass; b=q7qVHWYhIxhQOsAKcFxV+l0lgGUdf4kIALoyTn1cFwFiFUwOBSgmTcvhrst/7cBA3+1fRzBhAF4mTWp2BxvqV6+H9ffS/kcnKFmBzbO8DXTnQ0i1DmSFTnEpgd1lFZjnhY4l2zw/OODD0tr59cexCVKFAPk0fOIrwKBO8TEcCCA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769555635; c=relaxed/simple;
-	bh=xb40snI4cL8+jHGEewGctsfuifnXr+1DbEvvig+jeI0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SWLIv/Zfrr9ScbqADHEUefEUKyzcfLyAPPEdUjfMu3bTEsKhSe9toupUoHYtXHuh7n+QW5ueZq1or9RzxcFLeiq4l3DT0zF3wKY6LvmU/FmPI5NS5QEOmHzzryE0qzZwsum7T4DmrBMG5CIPtCN+VUlwJPtZO/3fuIFHPkLnZ9o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=upoWD/Be; arc=pass smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2b71515d8adso6085736eec.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 15:13:53 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769555633; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OSYcX6fDAkFjBG/x62RLMlncr4RRhr/Gvdxkv2eyghwxxeX0zUaFakmYWnJydWbk+s
-         kQZdBuMBhTDLX0K/E+Z7O86iKHQjK9gsniFWv3NPJhV6bc3Lg4I+FiZX54tUvJAkkL+t
-         pBuWbwGwFktRmzIU+3nbz+J8BfoQoXukIuDbeuGjn449Y0CL7SOfiBx682pOphHTqI9B
-         1ABO7s/qTIxDFuFrdpH14L2jsXZ+2MFZVvu71MPNT7iR2l2vKcx7/ZW7M8iXAwqHb21p
-         BiFvHVGaPuIOzGpVmVRS6XWLgiEhWQda433C9l6jxXHHDfVCG/LvejwQmJkZKrtMoZib
-         uP0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mtT0BqTp2zcqo5ksB90ktPFH8D1L2OPW30rexRlRuNU=;
-        fh=ERvK3ySukd0GCMIZiGZoltaqkyO58/doqiIT1mQl9NM=;
-        b=j4I1UHzNSNR3P2bI6KAWpDeH3yIzdNubtkmt9ktcdIsrBQAy39kGZL60Kl8X3clsra
-         Z+ro809u2v9/n0gpsVtw8XYuNBn6W3aMvbIBeK3dsgx7SMo8H/Xs0JQc2U56YIxCHE1y
-         msliXPflK8A0QpXVxo/FUcdN9nRVQUaY4q3qZTNx8DfJZZZEM0vo+s4Qs/EXGuUIurpM
-         s+V74BHgTRbs9CVFNf5Tqvoe61cyBaB9w8giI7Ul6iKh3AFef3mod2UziyVuXRaT9n5E
-         M33FB+mUhuUrNWokyz5zGjCFH4TtR3QB/Zz1VFoj/7Tf+DJEiiPAhb1tvqvG5aZC+7FP
-         aOxQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769555633; x=1770160433; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mtT0BqTp2zcqo5ksB90ktPFH8D1L2OPW30rexRlRuNU=;
-        b=upoWD/BeMD0bq4Qet3bmcLXuRwIzFvCNVBX8fsJU0+ycTrs3RXkWpTfFgG0hKieN35
-         nktAN3Q98j5gKYvVachbDbbQD50FM51TA+wx1Y7Ekhcplba+ZRyegBwIjhsAtIo4mY/G
-         vBnIicPXHkhEKwXmhaXgM/glqmwsGw/SxrPwJyVVcZUhUnvxOUcYPllmvUexZwlBic7/
-         L9IgMZr3KW/oxSyNvCuZA0Ksz1245qMwsKCJdLpb2jUSzFsRh0B1HYzcgtf4pEukD3uW
-         yOPYN/OTE/RPg41bTLTVdbOCQ3fp+Bsbp6XTSOMJpHQBfX/UMMBXwAfgWnfGGHLe8Oze
-         uoxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769555633; x=1770160433;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mtT0BqTp2zcqo5ksB90ktPFH8D1L2OPW30rexRlRuNU=;
-        b=okp7fBz6ncsvEcu3OW3b+caRifGxGjFju5+QN3HR7ULy1Qz5YsKC5teUCihpvvTXDc
-         cbM4dehnDYFgAynIkNU9FE5SEVt7ERlbyznVV6C0DVqolPAfjyhHQXOgMJ450DlJdZ8H
-         Qn8jEX0ldj8VqV0/SNcz+i4Q1GgopXLoD87BvfQu7zEtujCYEuJ31AZzRyWG6boCz4V9
-         h9su7sYUJE9icLw32jplaF/kchzfegCnnSZbd15lJAgxobYaguMdpd+5ShHAeD2qUfX0
-         sq7ZV/PGIS12hhe9oEyZNgKn0vPcS3/z76TsIWkKjpWZPS4N7LjfM4+52BlD683m42P2
-         +C3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVj//hckYQUEhJIRowZ2yQx1FLkjufir+QHNdKEdIqXSBbcjUJDpi3qhQ0Zk3o2NoD7ovS8TF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOLzdxuwcT8VaAReWWuuyCfvzNiRBRjwLecwraflXtwrDmP0ev
-	AfFe2lhAMBQyUDQyimLxQSrTMHPB2rrbGGLbodYFmbMKZ+3HEgnR3FoMYwhexjLlvMf6WC8dU2A
-	EzFzgtntmqyiv9piUkn3pw6FJP7nErbQErXf0ohYu
-X-Gm-Gg: AZuq6aLIM0qycDvmXSb/w/wonjHOysO6eA0QHmG6pJldCS6/EgaEJG7oSSOobNvTwFE
-	3CmTANl3Alf36QYV40ffN6awo6vu8srqs6DC1oaI4aIThv+CHx1PCFvV0i4yGEDj14SJu07Edl9
-	BxAuEYD89HcrZ85+iPxUXDxdX5VQ4QXZH0q1yjlKqkuj0NfassfnZE3fzyG7YM9hO5K8MGvb/v6
-	2QVvOduQVWzyHkUEdOROlNUs3ruAx/WfY3IpthPVmbXocmkhjpuRqqP29Y7SpYWMPrLEHI=
-X-Received: by 2002:a05:7301:fa8b:b0:2b6:c617:f79d with SMTP id
- 5a478bee46e88-2b78d8a51admr2214320eec.13.1769555632506; Tue, 27 Jan 2026
- 15:13:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F093F26ED3A;
+	Tue, 27 Jan 2026 23:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769555828; cv=none; b=ji+qvBffMDB7Qwt52teAT069Bm3dKpK8qrIFwXnwpihEvihM1p49SxnSOxnWVAUG13eZ/YBOnskzAcpm32vmo9bYl5alDeLePX0FUOfMnUntwxDds5653iPJgNj4xNxVqefYJM4F6Z5+qQHtByNGlfoc09Ms2xoPUhJe1NvuWOw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769555828; c=relaxed/simple;
+	bh=gWope56I4QlZ5z0v2nya+iChrbGZ5OFefD3iU3L0jIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcvXvUzG4ke/GgOkWustDqxh6VkjDnClI57SERs74g+mrGA+yDShrAb1jKhCkY3BdFmHAYrjJLDjPsTpYTLMao8Mf6hKqL5el0Y+WCt7a5B2yaG7Gp0XvnDdPI0JgxoeffYme4CLnvSOUnI8cGXJtoSa/ghSzXARqqmqs6x85Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q8RpoYDm; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769555826; x=1801091826;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gWope56I4QlZ5z0v2nya+iChrbGZ5OFefD3iU3L0jIE=;
+  b=Q8RpoYDmVA4P1Ezj7NZ0cMqmnuLPDAFjz4ruWw5KmAZFNufYrs2pGePM
+   /fiIfmSHqBTugt4AkmsyTJBzMgWHnA5sbvE7u3MzKId1C/n9iYuSZfw/Q
+   7nQ4oGwhG3gBiyZZkuaRlKLKlvogb+QOvO8HfruVFrbPgHsZFVNWUaIUL
+   m0TMbTl/ZpGZxz5b/g2ZoQccx6b1Ki8xXhcMhPP6ibAgXadMEw4IsIrsY
+   K6ExeI+2q6ZC3J8pkcDRup00Kbmt7w7XjLkoX4EFp358nEhkmaUuQdtLS
+   WzWYSTgCkhQesVt1G15zTYgiddBT1JGj99QlC6Ql7msol+Xx1ZRavU0JC
+   A==;
+X-CSE-ConnectionGUID: rgvIkxMdTU2zXdAVLxCt7A==
+X-CSE-MsgGUID: V/mZ3w9oSJaCVTEwqf6vqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="81487176"
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="81487176"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 15:17:05 -0800
+X-CSE-ConnectionGUID: /JJWdyt3RViz2ZMVXJtj5A==
+X-CSE-MsgGUID: r54WFEILSWu4mw5pZwG6CA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="208461286"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 27 Jan 2026 15:17:00 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vksIr-00000000Z1M-22wR;
+	Tue, 27 Jan 2026 23:16:57 +0000
+Date: Wed, 28 Jan 2026 07:16:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next 13/13] net: ethtool: Introduce ethtool command
+ to list ports
+Message-ID: <202601280753.G8XBwank-lkp@intel.com>
+References: <20260127134202.8208-14-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121160458.990785-1-yyd@google.com> <20260121160458.990785-2-yyd@google.com>
- <c5ba02dd-e81f-4590-9e35-90c9b2c33bee@engleder-embedded.com>
- <willemdebruijn.kernel.13b62cc180aaa@gmail.com> <9d21ddb4-5e7d-4dfa-9ee4-ecdf73499f5b@engleder-embedded.com>
- <willemdebruijn.kernel.976a69fefaaa@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.976a69fefaaa@gmail.com>
-From: Kevin Yang <yyd@google.com>
-Date: Tue, 27 Jan 2026 18:13:41 -0500
-X-Gm-Features: AZwV_QgvnMYcNLaMhTKWiNeZ2Q7YH8Wt0EP68NeiZajpY0HClPpXRXmJQlybW0E
-Message-ID: <CAPREpbZpjwpUkY11Qz_xbVbCm44DZw=3Z2GYu=K93z+L-_4EhA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] net: extend ndo_get_tstamp for other
- timestamp types
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Gerhard Engleder <gerhard@engleder-embedded.com>, Jakub Kicinski <kuba@kernel.org>, 
-	netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Joshua Washington <joshwash@google.com>, 
-	Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260127134202.8208-14-maxime.chevallier@bootlin.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254034-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux.dev,bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-254035-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[bootlin.com,davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yyd@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[engleder-embedded.com,kernel.org,vger.kernel.org,google.com,lunn.ch,davemloft.net,redhat.com,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 255839B56C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 62F2A9B5A8
 X-Rspamd-Action: no action
 
-Just to clarify, the ptp vclocks approach is not contradictory to this patc=
-h.
+Hi Maxime,
 
-I think converting the timestamp should be a net_device ndo function. Since
--  a TCP socket may receive packets from multiple net_devices
--  only the driver is aware of the device clock's details and whether
-  a conversion is actually required
+kernel test robot noticed the following build errors:
 
-That conversion is implemented per device:
--  Some devices can identify the correct vclock and call
-ptp_convert_timestamp(&hwtstamp, vclock). This is a valid approach,
-but it requires the system admin to run phc2sys to sync the vclock to
-REALTIME(or MONOTONIC), alongside necessary lookup infrastructure.
--  Some devices may already sync their clock to REALTIME natively.
-In this case, hwtstamp is returned as-is without conversion.
--  Some devices may handle conversion internally without using PTP.
-This is the case for our current GVE patch.
+[auto build test ERROR on net-next/main]
 
-With that, I think this patch (extending ndo_get_tstamp) has value
-regardless of the specific driver implementation.
+url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-phy-phy_port-Correctly-recompute-the-port-s-linkmodes/20260127-215318
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260127134202.8208-14-maxime.chevallier%40bootlin.com
+patch subject: [PATCH net-next 13/13] net: ethtool: Introduce ethtool command to list ports
+config: um-defconfig (https://download.01.org/0day-ci/archive/20260128/202601280753.G8XBwank-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260128/202601280753.G8XBwank-lkp@intel.com/reproduce)
 
-As for the second patch and the question of why GVE does not use vclocks:
-The current GVE patch is simple and self-contained. Switching to vclocks
-would likely require adding PTP infrastructure to look up a vclock without
-user interaction, which complicates development compared to the current
-approach. Also, ptp_convert_timestamp involves a mutex lock, this might
-raise performance concerns since the usage is on the TCP RX fast path.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601280753.G8XBwank-lkp@intel.com/
 
-On Sun, Jan 25, 2026 at 4:41=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Gerhard Engleder wrote:
-> > On 22.01.26 23:28, Willem de Bruijn wrote:
-> > > Gerhard Engleder wrote:
-> > >> On 21.01.26 17:04, Kevin Yang wrote:
-> > >>> Network device hardware timestamps (hwtstamps) and the system's
-> > >>> clock (ktime) often originate from different clock domains.
-> > >>> This makes it hard to directly calculate the duration between
-> > >>> a hardware-timestamped event and a system-time event by simple
-> > >>> subtraction.
-> > >>>
-> > >>> This patch extends ndo_get_tstamp to allow a netdev to provide
-> > >>> a hwtstamp into the system's CLOCK_REALTIME domain. This allows a
-> > >>> driver to either perform a conversion by estimating or, if the
-> > >>> clocks are kept synchronized, return the original timestamp directl=
-y.
-> > >>> Other clock domains, e.g. CLOCK_MONOTONIC_RAW can also be added whe=
-n
-> > >>> a use surfaces.
-> > >>>
-> > >>> This is useful for features that need to measure the delay between
-> > >>> a packet's hardware arrival/departure and a later software event.
-> > >>> For example, the TCP stack can use this to measure precise
-> > >>> packet receive delays, which is a requirement for the upcoming
-> > >>> TCP Swift [1] congestion control algorithm.
-> > >>>
-> > >>> [1] Kumar, Gautam, et al. "Swift: Delay is simple and effective
-> > >>> for congestion control in the datacenter." Proceedings of the
-> > >>> Annual conference of the ACM Special Interest Group on Data
-> > >>> Communication on the applications, technologies, architectures,
-> > >>> and protocols for computer communication. 2020.
-> > >>>
-> > >>> Signed-off-by: Kevin Yang <yyd@google.com>
-> > >>> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > >>
-> > >> Like Jakub in his reply
-> > >> https://lore.kernel.org/netdev/20260119115710.6fdde8c0@kernel.org/
-> > >> for me also the question why this is a driver implementation came to=
- my
-> > >> mind.
-> > >>
-> > >> With vclocks it is already possible to get timestamps for arbitrary
-> > >> clock domains in parallel. So it is already possible to synchronize
-> > >> the hwtstamp to CLOCK_REALTIME, CLOCK_MONOTONIC, ... in parallel.
-> > >> Therefore, user space synchronisation is needed, but e.g. ptp4l does
-> > >> a much better synchronisation job than your solution.
-> > >>
-> > >> Maybe CLOCK_REALTIME is not supported by ptp4l, because due to dayti=
-me
-> > >> saving this clock jumps. IMO these jumps will also be problem for
-> > >> your solution, as it will lead to wrong delays two times a year.
-> > >> So usually CLOCK_TAI or CLOCK_MONOTONIC would be a better choice.
-> > >>
-> > >> To sum up: IMO you suggest a driver specific in-kernel solution wher=
-e
-> > >> already a driver independent user space solution with higher accurac=
-y
-> > >> exists.
-> > >
-> > > Definitely a promising alternative.
-> > >
-> > > With multiple netdevices, a TCP listener socket may receive packets
-> > > from all devices. This would need new infrastructure to lookup the
-> > > correct vclock for a given net_device, cannot hardcode a choice with
-> > > SOF_TIMESTAMPING_BIND_PHC.
-> > >
-> > > And this needs to happen for every packet, so with minimal overhead.
-> > >
-> > > Though for established connections the expectation will be that
-> > > packets generally arrive on the same netdevice. Bar infrequent path
-> > > changes such as from sk_rethink_txhash on the peer. So there this
-> > > value can perhaps be cached.
-> > >
-> > > It would still have to be learned by the kernel, no explicit
-> > > setsockopt.
-> >
-> > Maybe it would also be an option, that the kernel learns with which
-> > clock domain the timestamps of the PHC and vclocks correlate. Then
-> > the TCP stack could calculate the delay if it finds a valid e.g.
-> > CLOCK_MONOTONIC timestamp in the packet. This would make the
-> > TCP listener socket independent from the devices. Just an idea, without
-> > thinking about implementation details.
->
-> I think we're on the same page.
->
-> - use the existing vclocks
-> - look up the right vclock based on the original incoming iface
-> - cache this known clock with an established socket
->
-> But I also have not looked at how/whether the lookup infra can be
-> implemented to find a vclock automatically, i.e., without userspace
-> admin.
->
-> In some cases shinfo hwtstamp raw format may actually be the
-> CLOCK_REALTIME that TCP requires. But if the raw clock is not
-> realtime, we'll have to adjust based on timecounter/cyclecounter.
+All errors (new ones prefixed by >>):
+
+   In file included from net/core/dev.c:165:
+>> include/linux/phy_link_topology.h:110:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         | ^
+         | int
+>> include/linux/phy_link_topology.h:112:9: error: incompatible pointer to integer conversion returning 'void *' from a function with result type 'int' [-Wint-conversion]
+     112 |         return NULL;
+         |                ^~~~
+   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+       8 | #define NULL ((void *)0)
+         |              ^~~~~~~~~~~
+   In file included from net/core/dev.c:165:
+   include/linux/phy_link_topology.h:110:1: warning: no previous prototype for function 'phy_link_topo_get_port' [-Wmissing-prototypes]
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         | ^
+   include/linux/phy_link_topology.h:110:23: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         |                       ^
+         |                       static 
+   1 warning and 2 errors generated.
+--
+   In file included from net/ethtool/port.c:11:
+>> include/linux/phy_link_topology.h:110:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         | ^
+         | int
+>> include/linux/phy_link_topology.h:112:9: error: incompatible pointer to integer conversion returning 'void *' from a function with result type 'int' [-Wint-conversion]
+     112 |         return NULL;
+         |                ^~~~
+   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+       8 | #define NULL ((void *)0)
+         |              ^~~~~~~~~~~
+   In file included from net/ethtool/port.c:11:
+   include/linux/phy_link_topology.h:110:1: warning: no previous prototype for function 'phy_link_topo_get_port' [-Wmissing-prototypes]
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         | ^
+   include/linux/phy_link_topology.h:110:23: note: declare 'static' if the function is not intended to be used outside of this translation unit
+     110 | phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+         |                       ^
+         |                       static 
+>> net/ethtool/port.c:70:7: error: incompatible integer to pointer conversion assigning to 'struct phy_port *' from 'int' [-Wint-conversion]
+      70 |         port = phy_link_topo_get_port(req_info->dev, request->port_id);
+         |              ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 warning and 3 errors generated.
+
+
+vim +/int +110 include/linux/phy_link_topology.h
+
+624ef6af11779e Maxime Chevallier 2026-01-27  109  
+624ef6af11779e Maxime Chevallier 2026-01-27 @110  phy_link_topo_get_port(struct net_device *dev, u32 port_id)
+624ef6af11779e Maxime Chevallier 2026-01-27  111  {
+624ef6af11779e Maxime Chevallier 2026-01-27 @112  	return NULL;
+624ef6af11779e Maxime Chevallier 2026-01-27  113  }
+38496878690920 Maxime Chevallier 2024-08-21  114  #endif
+38496878690920 Maxime Chevallier 2024-08-21  115  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
