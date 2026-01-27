@@ -1,156 +1,169 @@
-Return-Path: <netdev+bounces-253898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253899-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNJ0EuzEeGmltAEAu9opvQ
-	(envelope-from <netdev+bounces-253898-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:00:12 +0100
+	id 0NBXIITEeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253899-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:58:28 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E2995435
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:00:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3B5953CA
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:58:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C4A2302E79F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:53:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C687F301859C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE5835A95F;
-	Tue, 27 Jan 2026 13:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="N86MAWi5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2T3mrBvN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E0735A94C;
+	Tue, 27 Jan 2026 13:57:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605433570AD;
-	Tue, 27 Jan 2026 13:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAD835B15D
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769522019; cv=none; b=c+XCDxZy0mlhF6Qc9JktJ7ajYEMsSlDUglqdIprPLBuqc5Yb58As8jeEFcn/yHfgLtpsiYsj0kU/Ofb9Oo6pQ0vrXWSCztyzDfORyfbiHpFjyg8nLQAWiIEfWG/nRiH8fKjkztAX8a494yTnroJ0ClrKHPug4hgMumTXysgOBtE=
+	t=1769522248; cv=none; b=G/Ug1z3yBthc00sHLyZLqPhtii0B+Hzmy/i26Z9HNAj+PRDopwa8cLbhrnrxae/smH+Wq2Fe2S4l1rkS+DUj4LETt7vFsLCP9lYb+dzd7A6P8d/ZXhYOKyAilGFiJG37m6K1hWnvyCNwYOKs4m7QTpdo6bA7six6d8udpbkmXX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769522019; c=relaxed/simple;
-	bh=BwreBWKzwCGIXM9xkXw+Gm6OCes550z5oAe2Y3klNlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FjHOLvIa1DQ2jfOTxfix7nGteurMwyrs6LCyAoiArYwSdspHuV+Fy0d2erKAwevDf90mwQAZN/mlwP40TnO98qcap2W2v0TDNZuYrv2P8AjrUVeH5Vjs6z1xDS/fiOEpgI4VbV1WQgNUqRR09IPXJeAJDooDK1UaTlNDg65qf28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=N86MAWi5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2T3mrBvN; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 27 Jan 2026 14:53:34 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1769522016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Uws7L94Uj+vJ/pChcGJTKMbNi1IcV4xKl4/ty70FJPo=;
-	b=N86MAWi5xhHQNFZQ1wgSaZnp5TIkkDQh3T2sRgHXgP58kqSla+A0Ni4co7st0PiB92fpCA
-	7Qon8Qhp0rA78lrrq6NmxMY0lqwrplmQRamBqp33AwUG9eQ9gErFqihUbZXNA7FmkIWB5g
-	CQT1G/j2nZxxluTBnBtSu26mX6Tcc9VeOQ2P/B5ra/T49JuAqbB03fFICG3/s8dWZUwX1C
-	twTWS4zXIx5MBx1Ms9ZClqjhpb8Sl/6QuCr1O4yvgB/01jf78wXYSuuxKfvFtwaHIABgRz
-	gpT/RX5uwuC7HIxx/9AQ3BWegCaZT0CKjuxhestWEY6ahrQ3lhQW7MIgByLehg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1769522016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Uws7L94Uj+vJ/pChcGJTKMbNi1IcV4xKl4/ty70FJPo=;
-	b=2T3mrBvNcj8DRx7IlKSaHbrTtwGT6UsSY/yeWUS0AEAygACsGcp8khUDc5q+6dF2NJ0GPL
-	mEGW7SAa6YOJFpBA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: netdev@vger.kernel.org, linux-mips@vger.kernel.org
-Cc: "Maciej W. Rozycki" <macro@orcam.me.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2] declance: Remove IRQF_ONESHOT
-Message-ID: <20260127135334.qUEaYP9G@linutronix.de>
+	s=arc-20240116; t=1769522248; c=relaxed/simple;
+	bh=CqxlbIALm6Hh+VY/KHyTOXJyg+eOFZZgrK/8Nd9qlfA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VWn+NpG1svd32QkFLFezoKki8n4nK81pzyCcWTJtqI7qeje+cNznDTcMf3M55Zwu0wYVMGqvR20gCYgGqvW4RCISuMcUSlbIRylpATcEgpW+suX1LlRlKz40p3+wZXycxz+2Q5bm345WD42EKO631fBPhMGkX9jGWcMtI1lw7Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5636784884eso1221620e0c.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:57:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769522245; x=1770127045;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=75PQCFMMISya6miWyFTo5NFlD+yMTmEC4MBoTSgZA6E=;
+        b=ggyLCR1ER/Ap7H2gfwBgNb4Fgb7wAABhVWObhKogb5TwLAkKWkg5xdtj+joEgFN0jA
+         QNvk2lGQ5jn2ayjf9lrNVJWvkmEJyWVH5w6fXibyJXb9xhEJLdTXtWANT5PbYl3jLcyi
+         BVihDbS5TPAU7O6qkKkclk0z3tH5O9LKwhFHlaRwFdbjQPPvZj/JBg6JKzZLsuq0IXCp
+         n326iuntjp9WDvVHrMVe033P3yOAW8ym7KgP0QeYL10nOB7dyheIqfaHdARkQTwFSLn3
+         e/+GYh8LUKzc/eE+LdwGvDTx3Ma0UGQfbkd2rP2hKlyFZv4MJSFYObKImDrszED/yJ5N
+         5RwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMff24GkELC8CGy8CP2yL8daYo/6EOKdjYTMGrnLVS6kM76jyjVFeGATAJ3FA3UpZ5+nkHLV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtsHTS0aKxwwEyKhLgrqzwLHZUc8C+1Q9QpPJq+OZd0tumShLZ
+	mQu5k2bkjItizXHKOWG2iePRy8ze4HUEg8QFfmP2hyQmazGi6aOXzmcQzwqnsstK
+X-Gm-Gg: AZuq6aKavNkbwKBNe8viGo2Amml63w2AoZ5gAKo3j6NgxgvKr+8TdYCGaS7LNOwEUiL
+	lx68XDVkAbZaq1FJzczLdm1bGhf/iiuLm+4b3YSLebnnE4YWGScRTPxUofEXiVdg9VEGva0H+1K
+	KFkGK7Mx8CHciyT9r9LV23/kWpWZf+8F/SDyA2+h1au5diJ1WNn71IddYqK320lUXwk8JhGVMwb
+	6DmG7/fUEQvN4DqO6jxlz4olHKlPrg/upQEmm/tnEDdMHW/l8rJJg+12CFq3ZuE3PWAcY9RADGq
+	wLECkiBElsH+UKYgapSi2G9BnTToTSX1TuF30s+SdusKZ7+Dbx8RT/b5IaI4xZ8hdYBtlxsGhx1
+	KLbAQjoasI6ZJqsdf39nuzabeXG7/Cw8C9qJBHJjmNkCK7lRY4kFOizFMrCuKfRrMblZHOkYgC9
+	L5btvL6T0645MCIr/M1cwHoZOq1YyVTYCwNsANjHLhckh1YJV5/+c647j2g+GAo4c=
+X-Received: by 2002:a05:6122:2a4e:b0:563:4a88:6ecb with SMTP id 71dfb90a1353d-566795ebe77mr476994e0c.18.1769522245129;
+        Tue, 27 Jan 2026 05:57:25 -0800 (PST)
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com. [209.85.221.171])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5663fb584ebsm2264846e0c.11.2026.01.27.05.57.24
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jan 2026 05:57:24 -0800 (PST)
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-56638fca064so1417600e0c.3
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:57:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWp6rEUPUDbt3USPFGEajimijkzx696FuiwGgfM6WamzxI2vTRXItrwnDPKURKNi5+ewqUrhz4=@vger.kernel.org
+X-Received: by 2002:a05:6122:78b:b0:563:8339:6201 with SMTP id
+ 71dfb90a1353d-566795e7f59mr418577e0c.17.1769522244153; Tue, 27 Jan 2026
+ 05:57:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk> <CA+V-a8t5RKY9vyFDg0V3AWcBovBdWbcvqdPeiPYmHRA8v2=UGQ@mail.gmail.com>
+In-Reply-To: <CA+V-a8t5RKY9vyFDg0V3AWcBovBdWbcvqdPeiPYmHRA8v2=UGQ@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 27 Jan 2026 14:57:13 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXOMMyYrbPr8H3O+oj7QeGg324jXdV1QUaUhQF4sxTyfg@mail.gmail.com>
+X-Gm-Features: AZwV_QgbBo9gCTeM_9WEMxs9EnfZIFfAoe0fWXmaoPkXJK4PoXh0OCn_st1Xl0A
+Message-ID: <CAMuHMdXOMMyYrbPr8H3O+oj7QeGg324jXdV1QUaUhQF4sxTyfg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: stmmac: Preserve bootloader MAC address
+ across unconditional reset
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253898-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-253899-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,bp.renesas.com,renesas.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_NA(0.00)[linux-m68k.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,linutronix.de:email,linutronix.de:dkim,linutronix.de:mid,davemloft.net:email]
-X-Rspamd-Queue-Id: 74E2995435
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-m68k.org:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: EF3B5953CA
 X-Rspamd-Action: no action
 
-Passing IRQF_ONESHOT ensures that the interrupt source is masked until
-the secondary (threaded) handler is done. If only a primary handler is
-used then the flag makes no sense because the interrupt can not fire
-(again) while its handler is running.
-The flag also disallows force-threading of the primary handler and the
-irq-core will warn about this as of commit aef30c8d569c0 ("genirq: Warn
-about using IRQF_ONESHOT without a threaded handler").
+Hi Prabhakar,
 
-The IRQF_ONESHOT flag was added in commit 0fabe1021f8bc ("MIPS:
-DECstation I/O ASIC DMA interrupt classes"). It moved
-clear_ioasic_dma_irq() from the driver into the irq-chip.
-For EOI interrupts the clear_ioasic_dma_irq() callback is now invoked as
-->irq_eoi() which is invoked after the IRQ was handled while the
-interrupt is masked due to IRQF_ONESHOT. Without IRQF_ONESHOT it would
-be invoked while interrupt is unmasked (but interrupts are disabled).
+On Tue, 27 Jan 2026 at 14:39, Lad, Prabhakar <prabhakar.csengg@gmail.com> w=
+rote:
+> On Mon, Jan 26, 2026 at 6:11=E2=80=AFPM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> > On Mon, Jan 26, 2026 at 05:25:03PM +0000, Prabhakar wrote:
+> > where "local-mac-address" states the MAC address to be used for eth0,
+> > as specified by the boot loader.
+> >
+> Thanks for the pointer, I will use the above-mentioned method with
+> which we won't be needing this patch on the RZ/T2H platform.
 
-If it is *required* to invoke EOI-ack while the interrupt is masked (and
-not a misunderstanding) due to irq-chip cascading/ hierarchical reasons
-then using handle_fasteoi_mask_irq() as flow-handler would be the right
-way to do so.
+This should already work out-of-the-box, as
+arch/arm64/boot/dts/renesas/rzt2h-n2h-evk-common.dtsi already has:
 
-Remove IRQF_ONESHOT to irqflags.
+    aliases {
+            ethernet3 =3D &gmac1;
+            ethernet2 =3D &gmac2;
 
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
+So just make sure to set the "eth2addr" and "eth3addr" environment
+variables in U-Boot.
 
-The mentioned genirq commit is in -next.
+Gr{oetje,eeting}s,
 
- drivers/net/ethernet/amd/declance.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+                        Geert
 
-diff --git a/drivers/net/ethernet/amd/declance.c b/drivers/net/ethernet/amd/declance.c
-index 8d05a0c5f2d5d..e6d56fcdc1ddd 100644
---- a/drivers/net/ethernet/amd/declance.c
-+++ b/drivers/net/ethernet/amd/declance.c
-@@ -813,7 +813,7 @@ static int lance_open(struct net_device *dev)
- 	if (lp->dma_irq >= 0) {
- 		unsigned long flags;
- 
--		if (request_irq(lp->dma_irq, lance_dma_merr_int, IRQF_ONESHOT,
-+		if (request_irq(lp->dma_irq, lance_dma_merr_int, 0,
- 				"lance error", dev)) {
- 			free_irq(dev->irq, dev);
- 			printk("%s: Can't get DMA IRQ %d\n", dev->name,
--- 
-2.51.0
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
