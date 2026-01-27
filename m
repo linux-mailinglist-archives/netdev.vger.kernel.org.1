@@ -1,172 +1,204 @@
-Return-Path: <netdev+bounces-253792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MByfI02OeGmqqwEAu9opvQ
-	(envelope-from <netdev+bounces-253792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:07:09 +0100
+	id 8Lw9LliPeGmqqwEAu9opvQ
+	(envelope-from <netdev+bounces-253793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:11:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F2D926CE
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:07:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FAB9282D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 11:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB53C3013ECB
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:07:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9F99304FC04
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54DD2E7621;
-	Tue, 27 Jan 2026 10:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCA5274B48;
+	Tue, 27 Jan 2026 10:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="RNEPDd56"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NZ4LNQxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871312E7166;
-	Tue, 27 Jan 2026 10:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769508424; cv=none; b=EsnRoXaAATv3EgOWT7DOh9gdVO1clpBfKrV/+ygRSg19Mce3BtP73Gizhj6JdbN6AYV6YCvB9nXkOqmgxSRuZ5VXWNRupMZM5qIPNNUJbRWalCUxk6QyIxsbiGGHe4ZYg3u26wTHsqqGhQyHz2PeYV2bP1HAOhoAxknEq4UIXbQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769508424; c=relaxed/simple;
-	bh=vvrMhJs0YBove3hTWVczx/F0E1j64fXCbcJxZA41GM0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q395xGr9R3Qt1ToKZ5TFi2j4raBd6A0RVH9VkOPqVqM08MbH8t/r/b/HU5aJQCauYLaeO5VnyPo+P4zLpOqeB62+xXVWgUbo0QUMeYPRSf/bCRS08oSKVWAoLpx57nZpRvGmzJ5s5oM3g8gykwY6LD48aZ1dArrKUL3PUgk916o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=RNEPDd56; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3220d013d;
-	Tue, 27 Jan 2026 18:06:50 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: horms@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jianhao.xu@seu.edu.cn,
-	kory.maincent@bootlin.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	marco.crivellari@suse.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	vadim.fedorenko@linux.dev,
-	zilin@seu.edu.cn
-Subject: Re: [net,v2,1/2] net: liquidio: Fix off-by-one error in setup_nic_devices() cleanup
-Date: Tue, 27 Jan 2026 10:06:48 +0000
-Message-Id: <20260127100648.957628-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <aXeOl5D7BR-xnEgm@horms.kernel.org>
-References: <aXeOl5D7BR-xnEgm@horms.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EF82E717B
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 10:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769508494; cv=pass; b=O0CeppVnk/e1/EUnhFZp5Set9iiy+jtGCI9qifCCWm3PpZmZQvVHQDkerF+7/9ozkAOxMKrkL1rbCPg72Q910DmrdZxyxDarrV47KMlrQl30vsnJi2HnTCSFA2Mcar7t9U0U64UwIdVWK9K/RzSjVXbQKa1tv+FrWr+r+5I1AXQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769508494; c=relaxed/simple;
+	bh=MLw86eBiDXAumXM++7EfiGG29Qu1A8IbBkYgIWvUoKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A4a6EabDBBI/q6RN7PzcGkrFMeObIJb8eLnNPgo5/0myGDcmLrdTXSpGXNjpiF4SOuJiRGCCa3GikSqIH5Yyh/OZ+BcfEBuwyReuDQpDWmwAbRbiCq42HYJXAVu9NV5YeCqHTESKebl9As/cXrHGnZruxQ3wgj5AirKC43yrnMo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NZ4LNQxM; arc=pass smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64d02c01865so8753079a12.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:08:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769508491; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a/YuFpqwc9XeEdd8E6SyyGr1tbydmLp5eiBEpRvynXm4Zizov24Hbg8j+Mk/4TE7qz
+         eluo6bMOFVkT1ewElzV0J9bbAOmeirkIn0rjsvljdHDSDinfAz7QH2F20wU3XIWUpf+x
+         v3ITjbKIj8JTBZdYoGHHor0yHHYQalYkoQD9Q9ZwRH0MMCk/E3PXXSglPds1lWwe46dD
+         gNjq72JLwKA3feH93o/gimuD84K5IxsUUWZyln69NnohJa3JjX0Xr0gKlvd0ClXXONeG
+         EZz0RyZDr8U3YnaJ8vbD6Wy0EtbdcEEtie95yP0ECjQk3w/1SDX0Mugl3DQsPNsMKyCv
+         3zKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
+        fh=yXrtQEZpXa9GQyYNZSuygmuaU1dJ80A3KNFKIvvbd20=;
+        b=JOPqIpE/oVYxhCmi8J5NbpslfH4cnBNVRH+lfcpv+zoovAt8lRBxiiarKOmW3HqjS3
+         ECHns0pqhN1nbAlP1sLsOE5UiD4Td/8FiN7UJYsqQW/d6Ydcl3ryybba3xs3pOIsuXRG
+         6WXXHESUGVPr4ckOKeOMoOuCRpaQRwhqRS3hOODcCugvnVh91RKSnRI9yj7RbejPODIP
+         Z7ON03pIYh9at0iMVdrXWDh1skB5eyiBn8gVJ0R3e6SA3yXDd4l1eklpu7KVjzr779mU
+         TuKqdiYMe7rN6yPXrrllJhmBI3iRPHD/m9hgaIymffU4NipX3OAu4M3GHeRCN9stwXJf
+         Y5zw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1769508491; x=1770113291; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
+        b=NZ4LNQxMyzH8a+73O1L+U3RpEVlcCjiKmi8MQ8VwPQkONMXrkMFCRTwxrmqCHkz6l1
+         2EkUZIxGbBgO6Ji7LA/xvWYUklFiXH9MIHvyf+zYHYPBbOz7jlxKijDrNQyPRrVBHJWQ
+         LD+DAc/KC/TLCakdfBx46NuXxT+Z2hfjnt/U7eCcYUbG1zyLSr8ZHfi0dlFf9RuAghYi
+         CIJQakHNnKXgaIpfw/HMS8FDOSEhbP6p2cuYiEkmu4KKON+ifvEi4Tv+LeOzrtP/fkhB
+         fn+8j98lx+ZUPmboBm6TOwRLb5TrJNmB9km7C6KGPm2UAxgYhv6Kry944o6rRElBwhTi
+         mm8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769508491; x=1770113291;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bpxQmfY9VK7T+Y3W6DWNgC6rQuK+Ld0siGTt5w9irRg=;
+        b=lpeBhzx7IZIIgBNrOW2mp8VDqfDIDpuNLrBcJ76eZRLFHnz3uK7wOSvUAe2swqOgJ5
+         tVHb0xM4F7KA2F2IcZpQ6b0EQCtaOsqwbshON/dwjoXzVdCaImt6zrqsVojacjoaERYm
+         yC7B0BP3pHJ8hrVqpHCcrFSLFK6YdnHN0ELFjpg2C2jk7wjR1aP1R0LGNHeO7GgH1wHA
+         3jDXs7rv+iehNEoZJC7IMrDxY78zsUVYauAsKZ6UsvYBWBEpM1j7ON3TfE1LrFqFp+aY
+         idlQFcHLE5kEO77/xHTkCompn3sKOr+Cc0N311YZ8QEzNvDOFwkgRIUWB9Ee86QyNvfi
+         61yg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjoorjHEu27dhe/muCWlwOigK4wrv4VTEDnjevem9e2MNfxYnlYGUIQJrYX6wELOW0rmRm2q8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQh3OLhSH/rDTuTcX4BmctVgoYh+3p4JMGY3bLVEtKn4bWlDfI
+	IYbfJ5Pm+TIT5Ud5VSai8wzjTCaJEpX90OGaXobayBXBOkMJV40BlR5D5rVXHCt4M4+KClGP/E9
+	iUxQv1ZHxjwsmuWAChiUB+nurB3kl28jzeuFI+H2rOw==
+X-Gm-Gg: AZuq6aIb9INfSWcMW07/JoVb7fDAOanOX3D+mKDIt+KxNhZXDBzjRTU4lhFHIGFClUS
+	RN14sQjJwt9x5kNIpRjVQmSjkT+vj7DThjmsPpDNB2S4FJp10eLkwz4WXGlbgp59hintEuc7Zqw
+	u9QQXtNhjqdkGC/8Yo2v/2iFpEV5ujgFUk1lpvSjkTdXPiyupQBe63CgPKcAzZIi2yVZVal71hY
+	7SbgV96HFbsAwPtbzNSWjVg5DoCJbp/MoWwCPNBex0rA4MHL0ibbeg+isfbHLIsWi+wSPEWQ1yT
+	td7iKHEo5/VWpMLQyLmC6UEK
+X-Received: by 2002:a05:6402:1d50:b0:64b:6e44:217 with SMTP id
+ 4fb4d7f45d1cf-658a5f8e7cdmr891417a12.0.1769508490979; Tue, 27 Jan 2026
+ 02:08:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9bfeeb947a03a1kunm7811029b48abc
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCT09CVkMYTx4aSUkeSUhDGlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
-	tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=RNEPDd56RNS41rjPCYzVNIdgynzEP2uVvkyMIP2JNpUr/KX9IElKVueH50q8dHCkjniEVcMCOujBgmv3xdRXEIxAuxElWZOXM+0txetg/DZOieUdew9S8L6RKkOk6IuRM/Ycksv2ara7m1oOE7qIDhbaXZyEbZ5hYF2SctLBwWQ=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=j6Y2k0clA9t998gV4fxQT8R9+5/RvLiHvl7iV4bCcbo=;
-	h=date:mime-version:subject:message-id:from;
+References: <20260126092159.815968-1-vincent.guittot@linaro.org>
+ <20260126092159.815968-3-vincent.guittot@linaro.org> <69592713b7bd419e23df458734ca78070a83e8ac.camel@pengutronix.de>
+In-Reply-To: <69592713b7bd419e23df458734ca78070a83e8ac.camel@pengutronix.de>
+From: Vincent Guittot <vincent.guittot@linaro.org>
+Date: Tue, 27 Jan 2026 11:07:59 +0100
+X-Gm-Features: AZwV_QiOrd8cMHRoDNLhWiUkjdTQ9Am6xMiRSspZlgdv4qBzTDeeYROI1wjEMTk
+Message-ID: <CAKfTPtD+EZ+apAnS7tccY5UrQx3EWXb4j33F_5SkHY80akxz-A@mail.gmail.com>
+Subject: Re: [PATCH 2/4] phy: s32g: Add serdes subsystem phy
+To: Philipp Zabel <p.zabel@pengutronix.de>
+Cc: vkoul@kernel.org, neil.armstrong@linaro.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, ciprianmarian.costea@oss.nxp.com, s32@nxp.com, 
+	linux@armlinux.org.uk, ghennadi.procopciuc@nxp.com, 
+	bogdan-gabriel.roman@nxp.com, Ionut.Vicovan@nxp.com, 
+	alexandru-catalin.ionita@nxp.com, linux-phy@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	Frank.li@nxp.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
-	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253793-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253792-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zilin@seu.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vincent.guittot@linaro.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,seu.edu.cn:mid,seu.edu.cn:dkim]
-X-Rspamd-Queue-Id: D0F2D926CE
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linaro.org:email,linaro.org:dkim,pengutronix.de:email,nxp.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 18FAB9282D
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 03:56:07PM +0000, Simon Horman wrote:
-> On Mon, Jan 26, 2026 at 03:50:39PM +0000, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > 
-> > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+On Mon, 26 Jan 2026 at 14:11, Philipp Zabel <p.zabel@pengutronix.de> wrote:
+>
+> On Mo, 2026-01-26 at 10:21 +0100, Vincent Guittot wrote:
+> > s32g SoC family includes 2 serdes subsystems which are made of one PCIe
+> > controller, 2 XPCS and one Phy. The Phy got 2 lanes that can be configure
+> > to output PCIe lanes and/or SGMII.
+> >
+> > Implement PCIe phy support
+> >
+> > Co-developed-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> > Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> > Co-developed-by: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
+> > Signed-off-by: Alexandru-Catalin Ionita <alexandru-catalin.ionita@nxp.com>
+> > Co-developed-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+> > Signed-off-by: Ghennadi Procopciuc <ghennadi.procopciuc@nxp.com>
+> > Co-developed-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+> > Signed-off-by: Ionut Vicovan <Ionut.Vicovan@nxp.com>
+> > Co-developed-by: Bogdan Roman <bogdan-gabriel.roman@nxp.com>
+> > Signed-off-by: Bogdan Roman <bogdan-gabriel.roman@nxp.com>
+> > Signed-off-by: Vincent Guittot <vincent.guittot@linaro.org>
 > > ---
-> > net: liquidio: Fix off-by-one error in setup_nic_devices() cleanup
-> > 
-> > This patch changes the cleanup loop from while(i--) to do{}while(i--)
-> > to ensure that when a device fails to initialize, it gets cleaned up
-> > along with all previously initialized devices.
-> > 
-> > > diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-> > > index 0732440eeacd..3ba2806f5d1e 100644
-> > > --- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
-> > > +++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-> > > @@ -3765,11 +3765,11 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
-> > >
-> > >  setup_nic_dev_free:
-> > >
-> > > -	while (i--) {
-> > > +	do {
-> > >  		dev_err(&octeon_dev->pci_dev->dev,
-> > >  			"NIC ifidx:%d Setup failed\n", i);
-> > >  		liquidio_destroy_nic_device(octeon_dev, i);
-> > > -	}
-> > > +	} while (i--);
-> > 
-> > In lio_main.c, setup_nic_devices() can also reach setup_nic_dev_free from
-> > the devlink_alloc() failure path after the main for loop completes. At that
-> > point i equals ifcount (the loop counter has been incremented past the last
-> > valid device).
-> > 
-> > With the do-while change, the first iteration will call
-> > liquidio_destroy_nic_device(octeon_dev, ifcount) for a device index that
-> > was never initialized. The function has a guard for NULL netdev so it will
-> > not crash, but it will print a spurious error message about a device that
-> > never existed.
-> > 
-> > The fix works correctly for failures within the loop (which is the case
-> > described in the commit message), but is there a way to handle the
-> > post-loop devlink_alloc() failure case without printing the spurious
-> > error message?
-> 
-> Sorry for not realising this when I made this suggestion in
-> my review of v1.
-> 
-> Also, I would suggest splitting this patch in two: one patch
-> per driver.
+> >  drivers/phy/freescale/Kconfig               |   9 +
+> >  drivers/phy/freescale/Makefile              |   1 +
+> >  drivers/phy/freescale/phy-nxp-s32g-serdes.c | 569 ++++++++++++++++++++
+> >  3 files changed, 579 insertions(+)
+> >  create mode 100644 drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> >
+> [...]
+> > diff --git a/drivers/phy/freescale/phy-nxp-s32g-serdes.c b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> > new file mode 100644
+> > index 000000000000..8336c868c8dc
+> > --- /dev/null
+> > +++ b/drivers/phy/freescale/phy-nxp-s32g-serdes.c
+> > @@ -0,0 +1,569 @@
+> [...]
+> > +static int s32g_serdes_get_ctrl_resources(struct platform_device *pdev, struct s32g_serdes *serdes)
+> > +{
+> [...]
+> > +     ctrl->rst = devm_reset_control_get(dev, "serdes");
+>
+> Please use devm_reset_control_get_exclusive() directly.
 
-Hi Simon,
+Okay
 
-Apologies from my side as well; I overlooked the devlink_alloc failure 
-path myself.
-
-As noted, the loop index i is indeed invalid at that point. I will fix
-this by decrementing i in the error path to ensure it points to the last
-successfully initialized device before cleanup.
-
-I will also split this patch into two separate patches in v3 as requested.
-
-Regards,
-Zilin
+>
+> [...]
+> > +static int s32g_serdes_get_pcie_resources(struct platform_device *pdev, struct s32g_serdes *serdes)
+> > +{
+> [...]
+> > +     pcie->rst = devm_reset_control_get(dev, "pcie");
+>
+> Same here.
+>
+> regards
+> Philipp
 
