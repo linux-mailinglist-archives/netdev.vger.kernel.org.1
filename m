@@ -1,287 +1,165 @@
-Return-Path: <netdev+bounces-253876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEgCMEnBeGn6sgEAu9opvQ
-	(envelope-from <netdev+bounces-253876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:44:41 +0100
+	id +IeUBE/AeGn6sgEAu9opvQ
+	(envelope-from <netdev+bounces-253877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:40:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B157950D9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:44:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201D695025
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4729309FC04
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:39:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 61D833004D99
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F553596F3;
-	Tue, 27 Jan 2026 13:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB6F359F82;
+	Tue, 27 Jan 2026 13:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZodmSZzS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cnGsOS2y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E8C3590DE
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521199; cv=pass; b=gG8KvuOoLnhGGpeJaZFf/h65J276VxnfdQgbyKLyrw2xcus2xd/Thv+4CH4EdPzhL1ugGg99iF6Jof01VJw4jhvpS5fpRTSwfrS9b6g42rBTg6Ik3GhjiYkqXH6YRJFFWoRN30lykZ7L1my5nGHyGz4oRwU+7vgodxicRHcGj3I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521199; c=relaxed/simple;
-	bh=NmJ64+sVhRlTVy+n9tWimJPXuaBxwQ0/c9YnNJraOrA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rmNDN15G6ULj6o36fkkeqy/0qPgmZTocSzpLjmiWpMtU/B43Bw068OaDpd2nyepFJahBZXs38FCr+tdVUHS8QA0osnXNSD0/JqqZrK+78dr/JfUkoQYl1ZWwgmn0zNxMJiPg5bPzIhvGD4fGbdA8cRqoLSmAgUUB4ALEOw+d41g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZodmSZzS; arc=pass smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-432d2c7dd52so5780313f8f.2
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:39:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769521196; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ITi9b3KiYJRgjhoUvVhA8hnC/XikJ8MpbVHEIH+unTfucIjAgZ7Tb7P4zAmjEu5phW
-         jGbwPf4sw5TOLD6WBRf0mU5v2PJBJa23UV4qWQ2Mr6/qxFKPpEcxhKgDXaWIshyGzyuz
-         RHEMqs7Ezb0c9ZE48Csh1G9VncYgueKp12JErftOu5mBQPT+iAZbtMuY0KgNwLjYlJhB
-         gVSRxbJKj9qh5FKTXoyjzJLUGnqZQjhdk/E4U8xddLJDJx+9MLEzZgVlYEYHhSf+2spm
-         Njoq1uVuhTeI0MQBkJlC2Po1BFlyDCOyB5eTOF/Hhq57Yr5g3/mlXH2LrU9+hIM5KwpD
-         MpZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=IlR/WA7RxT5C3CkoKZj7WZ73vofWrh2up1KlQooa0gk=;
-        fh=hFXwb3kKEWfCwNDbptwAirBjSZ7HduAxhNcnXzFSbFc=;
-        b=f42OUOkI+K/5NVKdQRMby0RNkrn3mZHPnoJwS28KnLFG8bl01vEpLefRU79YNZE3kf
-         QwcFWBLfaVjBsYPTH4tEciqeHb/0ssHrtDzjGWk44iXfhhCrFeLjdh3zSwT0JmyF7kC4
-         //i3eW34RCpyOQSev6NDgUS3+WezX4x1Qs2iuLId6IYJZezY+zs/89OWEqBF3VyRWZ59
-         0Mt17vTBo0MEkkJ6k6Nq0U7WnCpTV+rr8Lu4RI7dYvgQMan6+UJJVnTm8DrwotK0PYhI
-         hsulkn6kZedYfSb5Qob0HVOjl0beucsd+oHUymrWMKzTS51cDGO01aWxbfPL3EJqtIic
-         aL1A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769521196; x=1770125996; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IlR/WA7RxT5C3CkoKZj7WZ73vofWrh2up1KlQooa0gk=;
-        b=ZodmSZzSDYtfDQJ/jQ3DpEwSD+iD72VXGhwhrYczJwLOXuECKPJjTMZwNzxS6peDM1
-         16svGQOUZbXze8r+g9Yc1VupRRYt/mk0vxyilxggtF/S9pydvqxNJX7V5us8s9TvLt51
-         dTxCICmwGwjdL5mqFQJYRZR2Fl6pzo5CyFlH5iPcGz/BUsWv70xhtwX9lcdzw7kyu0Dt
-         tf+g5r32mwYmQIF/VchhD53vXUakjA424uOGuveu51N1/AaFF5CjYmLvP2xXB5lOHqY7
-         /YWuyJXl/mhDfU/Kd8/2juVoeuajX5qpq2DMoZELMs9ywji+lkCd7o6C/IKktUAOdMT6
-         8MGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769521196; x=1770125996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IlR/WA7RxT5C3CkoKZj7WZ73vofWrh2up1KlQooa0gk=;
-        b=EGajHvZBX4ihCpoNvpKKg1Omel9J8mV1QDejqOV3ph77vusd9GfV+IFMK/71y1Iqce
-         mxzM6zYEjmoI13gLjKe3XbRFJA66AibYD8IttACnLyJPt+8esBsfUWjgTjObEbyED8R0
-         61e1A5jxVKmYaLUNxJc0QDBjr0T3GGI2Mjbsn/v6RSQJ9J2Tl0Voo7jIi5ooRVfo0zNo
-         fw0htdOSRvDfzO+x0hVxsmJNxhaGHUPC9yeQy+usvV9dxcorqh6W019LkLhm51JIiv7K
-         2DfJ8vv24mJAs+Su7Ip8bWwnP21PO+kaX8B/SgVrz8J8X7/+byl0SLKyjp8boncbIWru
-         Gu2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVsk/DQFXN61WOdB4nM+2ci9NfRihBboB3AdZ9Ay5KYKEDCGYysFBRzQARFw7FYRDjir79ttC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0VHOUXgXkREW1qDLaMIiepNdl0nLBEcnYUw2NOcNWf9YEi67x
-	et5mIfb0QtoYeQ+cG4RzCDSGFkWpJ0h1PJZdIvamyUAmjmkH0DYTGSERiczodFkHu2mgughWli/
-	3pSHk/Z2CRPkRmolIxqCrMq7gqc32R6Y=
-X-Gm-Gg: AZuq6aJUsyNKM8BoKnA9Q5yJc/9WAdXiU+8MJGscxuGpz7mQ3skv4RnXQw3q5RRoFDa
-	ZxjPqOdUC4oAYRCJTgJ2TgBIjti47TcGfqOV8g6pge7eVbwhIN+n/DOqicKmQ8XED3szWwYUIE3
-	PSMio2M/pnU35B+RlNOJvS//vklL4eWC/iS82U/Mgm9ppUh6/Q+BxeiFXn1ZD5yYnH7QTzVWvHN
-	toZ+80Se04nNQRjWiLj21zpNW9uKWmXJ/zHl4Bxq3dSB1njLwuJckKn80B/1yVLQXBTPDqy6ttc
-	glzSwrMeLWzEmL3uffp0DuiWa9+g7Um4664f67lp5e9czP8i6xOeJdjtHQ==
-X-Received: by 2002:a05:6000:26c7:b0:435:9691:d525 with SMTP id
- ffacd0b85a97d-435dd02bd66mr2596133f8f.13.1769521195749; Tue, 27 Jan 2026
- 05:39:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3FA3596FB;
+	Tue, 27 Jan 2026 13:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769521224; cv=none; b=MhDzpDTbA3i2i39kPf9VucOj8HSIPXrKgTW3kYpBeJ2NWMG+NACOI8wxC2S9ic/API9T47hsJNddSpCYdtGOZ0gVolZ5xcDjJ7XGChGXmTU9HK9cTVmI1Uz/49rgQSnoqwia1u+cx+IKK+tTF/1qP/XexSlr5uik3JbHZtPYslI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769521224; c=relaxed/simple;
+	bh=q/t8q6cIDKN4tGqUOXEyEpqfjwEaUcXWcc9726MeDqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BuowjA9OGVONWk0hw/GTxnmZLnVDPksu4wbRzZP0Pf+zkwSq8kauU1aFhm2nclXNjCLkk+xc5NCWlb4eYZNg/h42WaIiOdoLW/LOMtswt+uln4ua/MbDyPi95yQwU5yZS3U4xd/DAlqmvtjmMnk9jykT3T5ClD0uyOUxI5TvBNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cnGsOS2y; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=PJdRV52Sg2t3bV7DwpZwSOiK3NFQ9DZEEcrZUnrZodU=; b=cn
+	GsOS2yQvDZsBDp5Wz+Jbu1jU+YHTDmHBhdXeEIzuGNWN40Nd+DG9Tjfc2btNHdwqq56odmbX3jNhY
+	VO1ybpvEP03QAAvSkm3RVj6TNE/GutH3KUIEKDhspKWLofy3XS5x8xcwTnRD7rakGj/hKKScIR44p
+	i6M87pQKKGEDGAc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vkjIc-004xPn-HT; Tue, 27 Jan 2026 14:40:06 +0100
+Date: Tue, 27 Jan 2026 14:40:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Min Lin <linmin@eswincomputing.com>
+Cc: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
+	Bo Gan <ganboing@gmail.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com,
+	weishangjuan@eswincomputing.com
+Subject: Re: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock
+ sampling control
+Message-ID: <e7183ae1-8b8b-4e77-9f4e-3bc1b4b63556@lunn.ch>
+References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
+ <20260109080859.1285-1-lizhi2@eswincomputing.com>
+ <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
+ <aWKZvEW7rKFFwZLG@shell.armlinux.org.uk>
+ <0d54ddca-9270-40a5-aa82-d8a7b65027ff@gmail.com>
+ <1a622916.2d28.19bb105feab.Coremail.lizhi2@eswincomputing.com>
+ <d010a6b8-5bf0-40ff-8e76-18362a238d50@lunn.ch>
+ <203bb660.2c91.19bfe45d677.Coremail.linmin@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126172503.238724-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk>
-In-Reply-To: <aXeuR_YLoAFYEAVi@shell.armlinux.org.uk>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 27 Jan 2026 13:39:29 +0000
-X-Gm-Features: AZwV_Qi7ONuSH5cnoHQEqydQB-V8V2QfAv3cVDqg-9__qb79RGS2Oo_Iqp8eszA
-Message-ID: <CA+V-a8t5RKY9vyFDg0V3AWcBovBdWbcvqdPeiPYmHRA8v2=UGQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] net: stmmac: Preserve bootloader MAC address
- across unconditional reset
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <203bb660.2c91.19bfe45d677.Coremail.linmin@eswincomputing.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253876-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253877-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,pengutronix.de,glider.be,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,bp.renesas.com,renesas.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[eswincomputing.com,gmail.com,armlinux.org.uk,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	SURBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:query timed out];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[prabhakarcsengg@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email]
-X-Rspamd-Queue-Id: 5B157950D9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,stormreply.com:email,st.com:email,armlinux.org.uk:email,infradead.org:email,einfochips.com:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,eswincomputing.com:email]
+X-Rspamd-Queue-Id: 201D695025
 X-Rspamd-Action: no action
 
-Hi Russell,
+On Tue, Jan 27, 2026 at 03:05:48PM +0800, Min Lin wrote:
+> Hi Andrew,
+> 
+> Thank you for taking the time to review the patch.
+> 
+> > -----Original Messages-----
+> > From: "Andrew Lunn" <andrew@lunn.ch>
+> > Send time:Thursday, 22/01/2026 21:27:34
+> > To: 李志 <lizhi2@eswincomputing.com>
+> > Cc: "Bo Gan" <ganboing@gmail.com>, "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ningyu@eswincomputing.com, linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
+> > Subject: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling control
+> > 
+> > > We also intend
+> > > to upstream complete DTS files for EIC7700 so the bindings can be validated
+> > > against real hardware.
+> > 
+> > I suggest you prioritise this. ARM-SOC is pretty flexible for
+> > accepting work in progress support for new SoCs. All you really need
+> > is for the board to boot to a login prompt on a serial port using an
+> > initramsfs. So the .dtsi and .dts file can be very slim, CPUs, memory
+> > and UARTs.
+> > 
+> > Once you have that merged you can work on the other drivers, their
+> > bindings, etc.
+> > 
+> The eic7700.dtsi and eic7700-hifive-premier-p550.dts are already in
+> v6.19-rc6.
 
-On Mon, Jan 26, 2026 at 6:11=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Mon, Jan 26, 2026 at 05:25:03PM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Commit 90f522a20e3d1 ("NET: dwmac: Make dwmac reset unconditional")
-> > asserts a reset in probe when a reset controller is present. This reset
-> > clears the MAC address registers, so a valid address programmed by the
-> > bootloader gets lost and the driver falls back to a random address.
-> >
-> > Read the MAC address from the hardware registers before resetting the
-> > hardware. Keep the existing address selection logic when no valid
-> > address is found, and program the selected address back into the MAC
-> > after probe so it remains consistent in hardware.
-> >
-> > Export stmmac_bus_clks_config() so the early read path can enable the
-> > bus clocks before accessing the MAC registers.
->
-> I don't think this is a good idea. stmmac_bus_clks_config() is specific
-> to using platform devices, but the core stmmac driver also supports
-> PCI that doesn't use stmmac_bus_clks_config().
->
-> stmmac_bus_clks_config() handles:
->
->  - plat_dat->stmmac_clk
->  - plat_dat->pclk
->  - any clock handled by the plat_dat->clks_config() method
->
-> For platform devices, stmmac_probe_config_dt() gets these two clocks
-> from DT, and prepares and enables them both. So, by the time the
-> probe function is called, these clocks are already running.
->
-> For those handled by the platform glue, the glues that populate
-> this function:
->
-> eic7700: eic7700_clks_config() - this is called from the init/exit
-> handlers. Will be invoked to enable the clocks by stmmac_dvr_probe().
->
-> imx: imx_dwmac_clks_config() - called by imx_dwmac_probe() to enable
-> clocks prior to stmmac_dvr_probe() being invoked.
->
-> mediaktek: mediatek_dwmac_clks_config() - called by
-> mediatek_dwmac_probe() to enable clocks prior to stmmac_dvr_probe()
-> being invoked.
->
-> qcom-ethqos: ethqos_clks_config() - called by qcom_ethqos_probe() to
-> enable clocks prior to stmmac_dvr_probe() being invoked.
->
-> So, I can confidently say that all clocks should be running by the
-> time __stmmac_dvr_probe() is called, and thus there should be no
-> requirement to call stmmac_bus_clks_config() in this code.
->
-Agreed.
+Great.
 
->
-> The next problem: you place this code to read registers from stmmac
-> before:
->
->         ret =3D reset_control_deassert(priv->plat->stmmac_ahb_rst);
->
-> Sadly, the binding documentation is too vague to pin down what this
-> is, as dwmac can have AHB master (which generates bus cycles for
-> accessing memory) and AHB slave (which would be the target for
-> register accesses) interfaces.
->
-> The problem here is that if some platform glue has wired this reset
-> such that it resets the AHB slave side, that will prevent register
-> access, and thus your attempt to read the MAC across all devices
-> will fail.
->
-Ok, got you.
+> Because the device drivers such as Ethernet rely on the clock driver,
+> our plan is that once the clock driver is applied, we will add other
+> device nodes such as Ethernet and eMMC in the next upstream patch
+> of the DTS. Is this reasonable?
 
->
-> The next question that comes up is that we have a perfectly good way
-> that's been around for years to pass a MAC address from the boot
-> loader into the kernel for any network interface. I notice that it
-> isn't mentioned in the DT bindings, presumably to prevent people
-> from adding it to their in-kernel DT files.
->
->         mac-address =3D
->         local-mac-address =3D
->
-> The old documentation in ethernet.txt was:
->
-> - mac-address: array of 6 bytes, specifies the MAC address that was last =
-used by
->   the boot program; should be used in cases where the MAC address assigne=
-d to
->   the device by the boot program is different from the "local-mac-address=
-"
->   property;
-> - local-mac-address: array of 6 bytes, specifies the MAC address that was
->   assigned to the network device;
->
-> Given that these are interfaces between the boot loader and the kernel,
-> they can't be deprecated, as platforms will rely upon these properties
-> to pass the MAC address from the boot loader to the kernel. For example
-> on one of my systems:
->
-> $ vdir /sys/class/net/eth0/of_node/
-> total 0
-> -r--r--r-- 1 root root  4 Jan 26 18:08 gop-port-id
-> -r--r--r-- 1 root root 50 Jan 26 18:08 interrupt-names
-> -r--r--r-- 1 root root 80 Jan 26 18:08 interrupts
-> -r--r--r-- 1 root root  6 Jan 26 18:08 local-mac-address
-> -r--r--r-- 1 root root 14 Jan 26 18:08 name
-> -r--r--r-- 1 root root  4 Jan 26 18:08 phy
-> -r--r--r-- 1 root root 10 Jan 26 18:08 phy-mode
-> -r--r--r-- 1 root root  8 Jan 26 18:08 phys
-> -r--r--r-- 1 root root  4 Jan 26 18:08 port-id
-> -r--r--r-- 1 root root  4 Jan 26 18:08 reg
-> -r--r--r-- 1 root root  5 Jan 26 18:08 status
->
-> where "local-mac-address" states the MAC address to be used for eth0,
-> as specified by the boot loader.
->
-Thanks for the pointer, I will use the above-mentioned method with
-which we won't be needing this patch on the RZ/T2H platform.
+Yes, this is reasonable. When you submit Ethernet support, please
+include the DT patches as part of the series, so we can see the full
+picture. When it comes to actually merging it could be the DT patches
+get separated out and go a different path, but we can decide that when
+we get to that stage.
 
-> I don't think stmmac needs this extra complication provided platforms
-> make use of mechanisms that already exist... and I feel it's time to
-> start saying no to platform specific quirks that can be handled by
-> those mechanisms.
->
-Ok.
+Given the new information, it becomes clear that backwards
+compatibility is not an issue. Since mainline does not have any users
+of the Ethernet driver, you should make non-backwards compatible
+changes in order to keep things clean. Just ensure the commit messages
+point out there are no users, so the changes are safe.
 
-Cheers,
-Prabhakar
+	Andrew
 
