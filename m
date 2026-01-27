@@ -1,80 +1,70 @@
-Return-Path: <netdev+bounces-253662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253663-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPfjBQgoeGl7oQEAu9opvQ
-	(envelope-from <netdev+bounces-253662-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:50:48 +0100
+	id 0KpHAeApeGl7oQEAu9opvQ
+	(envelope-from <netdev+bounces-253663-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:58:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4CB8F3A5
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:50:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB0E8F4C1
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:58:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3528730C3455
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:45:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C88A3013ABB
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253022DF151;
-	Tue, 27 Jan 2026 02:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1321B1F3D56;
+	Tue, 27 Jan 2026 02:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3OpRkkl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwrFUzI0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6CC2FDC20;
-	Tue, 27 Jan 2026 02:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C59139D
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769481882; cv=none; b=k5x3pqBfJoVbZu6AhE0BxHAtDNliSd+Pw77EAPn8ggLMqVC/lmx34QmdPM0KIYBBhvBSn7sCKSq5MJwHsAdw505uA98A7Yjno0GHcXHIpalqgNIu7DMCcy9+8eptymOxDWkkfJlUN6tMgDwWfs0dHyahCa4rNhebgUzg0Ck3yis=
+	t=1769482461; cv=none; b=TfO9wBEcO8JC9ETaJG9LhZQvBz/cmToduwkTlcYVBgNfZPJxjYEVxIDdHwYc9sCkzy9CBXp3AYBmkiljyP4bK+VPncFqXaX6H4NxxXdkTvCWf02TpysMvDdialnSt7HQ1BJhGmi5zkNz2+JxpiprjuHh0Ml5INIUQN1iKMjA5dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769481882; c=relaxed/simple;
-	bh=S3Iqv2UJ//ANnGVhqJ9ttWirfCzi27qFI76ZSe0b+FQ=;
+	s=arc-20240116; t=1769482461; c=relaxed/simple;
+	bh=t5Ws8K9ruX9jK+rrFbsHhjSSQv/nHotDIXG0CEYJYd8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GK9tY2CrATqMch05/87Zjf+LmTpxXB3jkJNdPFb59EWYPduOrTZ0AOHQHnj0FKCrgNHbYKe+AOIEXPm/0dhtITmIc5/zWbPL23lvf3kMDtUeiH5zypQRtC3jWc2eTMPtN36Q4z67NzbvJkAhMd2DU3rb/+EZ0+bo7nVdpAZOSbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3OpRkkl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27F14C19421;
-	Tue, 27 Jan 2026 02:44:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=M0GX+5G1DRz1rKNsjMqs0s5vHMfNGWWZEke2UcNbhOqfN7dxNes7Ewi8vBbJjr/XSVvMcLlAeE43AjduFCalcv1LwMRKeHD3/LjUE5xxmCebiy6MXnk14pp0sJ/88imxsxKmZjMyO8TKbhk5QH+RMoI1ey1/4h932OTNyCBgb9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwrFUzI0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 030B4C116C6;
+	Tue, 27 Jan 2026 02:54:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769481882;
-	bh=S3Iqv2UJ//ANnGVhqJ9ttWirfCzi27qFI76ZSe0b+FQ=;
+	s=k20201202; t=1769482460;
+	bh=t5Ws8K9ruX9jK+rrFbsHhjSSQv/nHotDIXG0CEYJYd8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h3OpRkkl4n9357WKdBrgLX7LAe+6aaa1OucIzp4sF4ML4DVrO7USZJIreSRrw0xij
-	 VpjEEqoi4J8mPAaT4Ss1ksoaq70V1KCI2946aQztwcqT6So9Zng4ruOLy7SFsr7OKD
-	 r5Y3nd3juyFxNBUBSk+ddPDwQDgElPSC8hC1XPCTJ5m/gX6OWjNlW+jpN0vGdB6eFh
-	 b6NSQ4eKMknjTb7LOIb6ipTDracDgXWPy1oaoU/776uzL22osQaLYEvPwXyWkOjpUJ
-	 xlJeKuVQuVWGBqWF7pF3YSlANL/u/lB0T5qsMFw6lW9f1tfrGdZRit3e2vh3lLQRQT
-	 pPZJWw0eSgM0A==
-Date: Mon, 26 Jan 2026 18:44:40 -0800
+	b=gwrFUzI00eEw/Xbx59fhVsGFJm6+EaEH58Fw34xJ2gBMcoAuxFP3JYa77vY6YQpsb
+	 CUXwOZopU/dGFO8MasO7NZGLZFWB67RIr9HPG7u6whk3ifg1rP6xqMHJZx9AHshYZN
+	 TTQtK5Z15YmL/Yi02BXYkdARCr0TwsfaRkVgeu3NZxJ4jU64ZFv8sFYdK+f68iHbxY
+	 t77HU3V+bmyt5ybyLh/WIcR2MOrhHmtuIBs+wLrp49R0h4Xy/FNW8Z+LnsPXMoI6Jr
+	 fOZPLFajNKmCGntEK6lwFdhpxpU4aA+AsJEIwt/dPoEifECT4uHoiCkYCyVW9uzjfG
+	 sZ/R6K6MGG7MA==
+Date: Mon, 26 Jan 2026 18:54:19 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, Neal Cardwell
- <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, Mina Almasry
- <almasrymina@google.com>, Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
- <shuah@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Stanislav
- Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com, Bobby
- Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 4/5] net: devmem: document
- NETDEV_A_DMABUF_AUTORELEASE netlink attribute
-Message-ID: <20260126184440.755a55b2@kernel.org>
-In-Reply-To: <aXgjVb5PVqdPM10J@devvm11784.nha0.facebook.com>
-References: <20260115-scratch-bobbyeshleman-devmem-tcp-token-upstream-v10-4-686d0af71978@meta.com>
-	<20260120163650.5a962648@kernel.org>
-	<aXBnqYQdomzH9bT/@devvm11784.nha0.facebook.com>
-	<20260121173512.748e2155@kernel.org>
-	<aXGNhEKOhkTHbJvw@devvm11784.nha0.facebook.com>
-	<20260121185021.446b00e8@kernel.org>
-	<CAKB00G2xNvfiV6J3RzKDs=GHMGZ7L16+VKUYLGjpZdOrLnSYKA@mail.gmail.com>
-	<20260121194615.33dc0812@kernel.org>
-	<aXGib0OcNdHTLyZN@mini-arch>
-	<20260126172646.2e5af2d4@kernel.org>
-	<aXgjVb5PVqdPM10J@devvm11784.nha0.facebook.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Heiko
+ Stuebner <heiko@sntech.de>, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, Paolo
+ Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 06/22] net: stmmac: rk: add SoC specific
+ ->init() method
+Message-ID: <20260126185419.626ba56e@kernel.org>
+In-Reply-To: <aXgbEYvjcXqQKRIx@shell.armlinux.org.uk>
+References: <aXdTi4ViCkhhXvFI@shell.armlinux.org.uk>
+	<E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
+	<aXd7aSk7KIxlQd5z@shell.armlinux.org.uk>
+	<20260126165144.25055591@kernel.org>
+	<aXgN2UjiI_OxWHH-@shell.armlinux.org.uk>
+	<20260126171606.6153aa1a@kernel.org>
+	<aXgbEYvjcXqQKRIx@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,68 +79,78 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253663-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253662-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,fomichev.me,vger.kernel.org,meta.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9E4CB8F3A5
+X-Rspamd-Queue-Id: 7DB0E8F4C1
 X-Rspamd-Action: no action
 
-On Mon, 26 Jan 2026 18:30:45 -0800 Bobby Eshleman wrote:
-> > > I'm not a fan of the existing cmsg scheme, but we already have userspace
-> > > using it, so getting more performance out of it seems like an easy win?  
+On Tue, 27 Jan 2026 01:55:29 +0000 Russell King (Oracle) wrote:
+> On Mon, Jan 26, 2026 at 05:16:06PM -0800, Jakub Kicinski wrote:
+> > On Tue, 27 Jan 2026 00:59:05 +0000 Russell King (Oracle) wrote:  
+> > > This sounds like my contributions to netdev aren't valued, and if that's
+> > > the case, I will stop.  
 > > 
-> > I don't like:
-> >  - the fact that we have to add the binding to a socket (extra field)
-> >    - single socket can only serve single binding, there's no technical
-> >      reason for this really, AFAICT, just the fact that we have a single
-> >      pointer in the sock struct  
+> > Quite the opposite, what I'm saying is that your complaints make me
+> > feel like the weekends spent on trying to make this project come out 
+> > of stone age testing-wise are not appreciated. Of course your
+> > contributions are appreciated.
+> > 
+> > The AI code reviews on existing buggy code are indeed very painful.
+> > Not sure what we can do here to make the contributing easier.
+> > It costs us around $2 now to review a single patch so we can't afford
+> > public access. I think Google is working on making Gemini code reviews
+> > public and free, hopefully that materializes.  
 > 
-> The core reason is that sockets lose the ability to map a given token to
-> a given binding by no longer storing the niov ptr.
+> For a series of this size and complexity, the AI reviews are valued
+> because it's finding real issues that I can't test for.
 > 
-> One proposal I had was to encode some number of bits in the token that
-> can be used to lookup the binding in an array, I could reboot that
-> approach.
+> The big problem is that the AI only finds one issue with a patch, not
+> all the issues. So, it's going to take multiple submissions to get to
+> a point where the AI review of this series is clean.
 > 
-> With 32 bits, we can represent:
-> 
-> dmabuf max size = 512 GB, max dmabuf count = 8
-> dmabuf max size = 256 GB, max dmabuf count = 16
-> dmabuf max size = 128 GB, max dmabuf count = 32
-> 
-> etc...
-> 
-> Then, if the dmabuf count encoding space is exhausted, the socket would
-> have to wait until the user returns all of the tokens from one of the
-> dmabufs and frees the ID (or err out is another option).
-> 
-> This wouldn't change adding a field to the socket, we'd have to add one
-> or two more for allocating the dmabuf ID and fetching the dmabuf with
-> it. But it does fix the single binding thing.
+> I suspect the problem with "AI only finds one issue" is that the AI
+> systems aren't advanced enough to do anything else yet.
 
-I think the bigger problem (than space exhaustion) is that we'd also
-have some understanding of permissions. If an application guesses 
-the binding ID of another app it can mess up its buffers. ENOBUENO..
+Yes, looking at its "reasoning" output it both goes down different
+investigation paths each time but more importantly it runs out of
+tokens at some point, so it won't cover all the same paths each time.
+
+> So, do I continue fixing the AI issues each day and resubmitting a new
+> version of this series each day this week, costing $44 each time?
+
+I think so.. I don't want to change our process because of AI, but 
+some ways to save cost rhyme with our normal recommendations.
+Keep the series under 15 patches. Split the series up, and extract
+trivial patches out so that they can be applied and not reposted.
+
+> Do we reach a point where it gets merged even though the AI review
+> still has issues?
+
+Whether the comment comes from AI is secondary, so it's just a question
+of whether we merge code knowing that it has issues. Rarely, I guess.
+
+> These are honest questions... and if they haven't been considered, I
+> think they need to be, because I can see this series becoming very
+> expensive.
 
