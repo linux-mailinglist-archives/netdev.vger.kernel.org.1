@@ -1,144 +1,128 @@
-Return-Path: <netdev+bounces-253949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMyYGJXweGkCuAEAu9opvQ
-	(envelope-from <netdev+bounces-253949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:06:29 +0100
+	id UHreH+zweGkCuAEAu9opvQ
+	(envelope-from <netdev+bounces-253950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:07:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3068982BE
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:06:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C448F9830A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 18:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E5913046BBB
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:04:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C76BF307A364
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 17:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE183624B8;
-	Tue, 27 Jan 2026 17:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72423363C4D;
+	Tue, 27 Jan 2026 17:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gF9Uvrx1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLHsNhV8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DDD230BD5;
-	Tue, 27 Jan 2026 17:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1353F3624CA;
+	Tue, 27 Jan 2026 17:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769533450; cv=none; b=Xe4S55cx3A39v92k621bkW2DEwwfs9zszYWBrmo9/rAOprb4RUAUaxIek20GvT3VjcoNZLkGsotNaSv2yJjRzobjr9PmZO+4SSPgMYGKGlUF66DTuRxvrfRAqYicEya+IpUKUFeuN5THd4nhEY/rgiQ3wxjFy3/RqOM5292S8AY=
+	t=1769533483; cv=none; b=Nzy99Z9szafffBUfHRnP6+2AMRvQ7uYvtd3Q4CzbkcpMhqGvf6B49PZuJVjzws87EdKYrhPVfhaECtTYNQ5NxYDtFD6kxBmm3AVbVRrOUbwd8/ntMyGF90x3QZYFn3PxoaO+Slm0L51wW+hve8T79I+Nrqe7gtnW+RbHBJagf1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769533450; c=relaxed/simple;
-	bh=CLbX10FOpGfbSRQQ1CxzVCEQDHooEy+rXOMRV/pi2eM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FrurMywUkXRA5wI9I6lJmGytzIyJ2dpot0vpbXMldw6WleN28S0E2W0q5YK5GFJ8JeSr4QsG54juggRS9Aa9EQIvdR6ZAjYgNd0pRQVXRc6TQBYjcVWvipYOrypp4fzZpwwu/iCo6E7Oafawg2/3n/d3/k4X2mMoxusTXcGNvLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gF9Uvrx1; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 8E0C24E422D4;
-	Tue, 27 Jan 2026 17:04:06 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A0AD606F5;
-	Tue, 27 Jan 2026 17:04:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CFD25119A867D;
-	Tue, 27 Jan 2026 18:04:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769533445; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=CLbX10FOpGfbSRQQ1CxzVCEQDHooEy+rXOMRV/pi2eM=;
-	b=gF9Uvrx1Hx4o+3B4/naGi0evZIqZcwnBTW1dZq2qoXpxHY2oLfTcW4q+CwbIA9J4/yQ6kj
-	retfPMDcEOJUs0tY9N4dV3SkkOlHv8TdwQkqsVUr/0jbtim78mxyIMRXZ+jDWj1YO1OJhh
-	4CzYy5HvR2wet5EPTgkbIPRkiAMiX+Sdk8II+CTLBY8gGdDG1To1s5p7wxje3CXhr/C9f5
-	so3x0oJLU/4A748FPV3PiDEvbK/oLJ7W7Ujn/fvRa9qSbgjoaZQ2lSy8LLvhIW+e4nj0rC
-	6Fsk83PLIrmiP0eOnIAainUkA3z6VM9a0J5NXgGqrO2Dwe2WD5IE2NQ2+gEg+Q==
-Date: Tue, 27 Jan 2026 18:04:01 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: horms@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, jianhao.xu@seu.edu.cn, kuba@kernel.org,
- linux-kernel@vger.kernel.org, marco.crivellari@suse.com,
- netdev@vger.kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net v3 3/3] net: liquidio: Initialize netdev pointer
- before queue setup
-Message-ID: <20260127180401.69787770@kmaincent-XPS-13-7390>
-In-Reply-To: <20260127151241.1144039-4-zilin@seu.edu.cn>
-References: <20260127151241.1144039-1-zilin@seu.edu.cn>
-	<20260127151241.1144039-4-zilin@seu.edu.cn>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1769533483; c=relaxed/simple;
+	bh=YTCShUFzAaqSuSCHRFqs0c9DV4DqEpv+MFTFEQyHWgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BZvb9cWzjVVCbheGRSJMFQVmmtaJkb6wP6KYm4FNy6XNPuutUXN6NEcriGQK2fAZjlKBTl4gh8s3Quavf8INJ0bqRXb0pG+Id8AcHLJh7GAfSitA4qsbx29SWjwodwmfycAGDh9LmoF7nvKJHygvRjfm5aBJBzfKLn5Pdvg8Ydc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLHsNhV8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EFD1C116C6;
+	Tue, 27 Jan 2026 17:04:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769533482;
+	bh=YTCShUFzAaqSuSCHRFqs0c9DV4DqEpv+MFTFEQyHWgY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JLHsNhV8srvXH2ZlFjDoHXST6eInOLIA2mrPFbzDx8Twwnq2yGK0YR6iYkROJqASA
+	 H3ggx3lRQ1l4ucmB6WUJd4RDQJGpMHILE5Elf9RT3DV9g6MDRq8AnYcgolVZCLA1ww
+	 UrqlQjH6lVMuYlM0WT+7PjNp94MhWz/dnd7nBQ2W7JgBcdRFV9f5Y/T3Ay+o22Gw2L
+	 /x+bBMw3EvMJKEHznh6rY5W2pW9z7dONFmzer3vBhPO2N1f02HccBRAVZ0U03xAtkC
+	 99QDuLmAxR34r+zOss4tpzFUlBiFVfELyjCGCpFz19alsui8E7qSjzSW1NTm9qBC+4
+	 RvKSNBaaLwMZw==
+Date: Tue, 27 Jan 2026 17:04:39 +0000
+From: Simon Horman <horms@kernel.org>
+To: Junjie Cao <junjie.cao@intel.com>
+Cc: Shuah Khan <shuah@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] selftests: ptp: treat unsupported PHC operations
+ as skip
+Message-ID: <aXjwJ-p47nn1GfYO@horms.kernel.org>
+References: <20260126061532.12532-1-junjie.cao@intel.com>
+ <20260126061532.12532-2-junjie.cao@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126061532.12532-2-junjie.cao@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-253949-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253950-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:url,bootlin.com:dkim,seu.edu.cn:email]
-X-Rspamd-Queue-Id: C3068982BE
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C448F9830A
 X-Rspamd-Action: no action
 
-On Tue, 27 Jan 2026 15:12:41 +0000
-Zilin Guan <zilin@seu.edu.cn> wrote:
+On Mon, Jan 26, 2026 at 02:15:32PM +0800, Junjie Cao wrote:
+> Some PTP hardware clock (PHC) devices may return -EOPNOTSUPP for
+> operations like settime, adjtime, or adjfreq. This commonly occurs
+> with timestamp-only PHC implementations that don't support full clock
+> control.
+> 
+> For background, syzbot previously exposed a crash risk when PTP clock
+> drivers lacked required callbacks[1]. Subsequent work[2] made callback
+> presence a registration requirement. As a result, some drivers (like
+> iwlwifi MVM/MLD[3]) now provide stub callbacks that return -EOPNOTSUPP
+> for unsupported operations.
+> 
+> When phc_ctl encounters such devices, the "Operation not supported"
+> error should be treated as a skip (device limitation) rather than a
+> test failure. This patch:
+> - Adds [SKIP] output handling in log_test()
+> - Detects "Operation not supported" from phc_ctl and returns ksft_skip
+> - Returns ksft_skip if all tests are skipped, preventing false-positive
+>   results when testing timestamp-only PHC implementations
+> 
+> Link: https://lore.kernel.org/netdev/20251028043216.1971292-1-junjie.cao@intel.com/ [1]
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=dfb073d32cac [2]
+> Link: https://lore.kernel.org/netdev/20251204123204.9316-1-ziyao@disroot.org/ [3]
+> Signed-off-by: Junjie Cao <junjie.cao@intel.com>
 
-> In setup_nic_devices(), the netdev is allocated using alloc_etherdev_mq().
-> However, the pointer to this structure is stored in oct->props[i].netdev
-> only after the calls to netif_set_real_num_rx_queues() and
-> netif_set_real_num_tx_queues().
->=20
-> If either of these functions fails, setup_nic_devices() returns an error
-> without freeing the allocated netdev. Since oct->props[i].netdev is still
-> NULL at this point, the cleanup function liquidio_destroy_nic_device()
-> will fail to find and free the netdev, resulting in a memory leak.
->=20
-> Fix this by initializing oct->props[i].netdev before calling the queue
-> setup functions. This ensures that the netdev is properly accessible for
-> cleanup in case of errors.
->=20
-> Compile tested only. Issue found using a prototype static analysis tool
-> and code review.
 
-I think this patch should be moved before patch 1.
-Thanks to Patch 1 we are now cleaning the failing index, but we could face
-dereference NULL pointer if we are failing in one of those
-netif_set_real_num_rx_queues() and netif_set_real_num_tx_queues() functions.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-With this patch moved:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
