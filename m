@@ -1,155 +1,134 @@
-Return-Path: <netdev+bounces-253773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253774-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNs1Hk2IeGk/qwEAu9opvQ
-	(envelope-from <netdev+bounces-253773-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:41:33 +0100
+	id WMjxFQiHeGk/qwEAu9opvQ
+	(envelope-from <netdev+bounces-253774-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:36:08 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 249E291E0A
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:41:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE01991CEA
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 10:36:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BEB7D3015463
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:28:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D05783037451
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 09:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BB52DC348;
-	Tue, 27 Jan 2026 09:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A952E090B;
+	Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEO2FeMp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqg/p5fw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B587A217723;
-	Tue, 27 Jan 2026 09:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632EB217723
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769506081; cv=none; b=e97nOJk1LtCrnXRTMDxPs8D85tyHn5lP2efE/24x528TEqzgJQcvbMLiW211XuVCPS7N1+3gzLDGgBwUypfBZwZiZdO16HdlcazobeNUCCMtPKjZCS9d0/KQNQk2wGWHd1X48TjtqmB23BzF6Jn4C0LLxzC5uRwnsHpeDLkp+iE=
+	t=1769506377; cv=none; b=tJT1NsrcZfoiZS2B1sB7iYRhxCQaRmhZv/oSaKrdaIDL0nkoE17bLxypIIZXdcKkx7hl//+3RMwZgp6k/ovBv8Doa3L5EfFXDfC8fySzoxsOrFTwxvmbTQ9md9gACrzwSaRbkK2QxSTaojIBXJACjiKVRAI0pfOUHbbyZpXDSrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769506081; c=relaxed/simple;
-	bh=NUtdM1nWlicDFUqsuPzcoMB/gzA3aziNceLt7F8iSE8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MQqNf5pPa61vtDPMz5lcSd0b9E+f3EvZnuyjYs7bs4v9j79mheRTTMbJxMtI7JwsWwr7tneJaaA/qeYI4EYpQKb7YmvucOjGpLivbo08wiJ/OLVXKGBKtM5Xt7fMP0adTRTrTKaXuLT3NJQ184WZ7hvYqtT20a6m1mx/6QqlEQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEO2FeMp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA751C116C6;
-	Tue, 27 Jan 2026 09:28:00 +0000 (UTC)
+	s=arc-20240116; t=1769506377; c=relaxed/simple;
+	bh=nd4756Hy+92ohyhREHEr2ehaES7a+HF9kecPSnYoKRI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i6kWIG3Hau8uZvp+yQLqWA5EANVX9Uv6f1EMzawq8jRzbz7Yub7KLzXFFvL5bIHidOqUcqC7uLGF0OMX+dYb+nftt1BR4gXv7kZoFLIEDpihCJ4vO65s3Lh8qmJ4A5hgAM0Nh5k++EeMh/KkX21wXijXGnRhAzhdMCyX8D7Ccts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqg/p5fw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39BCFC2BCB4
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 09:32:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769506081;
-	bh=NUtdM1nWlicDFUqsuPzcoMB/gzA3aziNceLt7F8iSE8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=oEO2FeMpvi1NaSCO2Gn8Cj6UbLkdPGgHSCr2a7tIho96JHKe2OPIWUlyKRZRs+g/p
-	 bOydMQemiNt+degt62tyGOKCzCMxGQP/+fWYHd5fQoEeMMtMBrEhvbKzxQI+uASfo+
-	 WnvxAODGQoHBidevnuikSB14Qm/l1uuA8SKt8swMro14a0ryd5Zo1SXOw/QtvrZtYe
-	 o9wowBLm4NktfnH4gj6vq4gkvSOgZCJwp+WvtCKPASNeo0iUYm1k9Mj89Qs/nBEKdC
-	 UoXofhNhiJNlSAVG+UzzUh/MKGzx0b0QaoSEXAsSwPPoP60aL3O7aNFQz0OEp+KLaq
-	 Ksz08X55xve/w==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Vivian Wang <wangruikang@iscas.ac.cn>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
- <chleroy@kernel.org>, Alex Deucher <alexander.deucher@amd.com>, Christian
- =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>, David Airlie
- <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, "Creeley, Brett" <bcreeley@amd.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, Jaroslav
- Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: Han Gao <gaohan@iscas.ac.cn>, Vivian Wang <wangruikang@iscas.ac.cn>,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-riscv@lists.infradead.org,
- sophgo@lists.linux.dev
-Subject: Re: [PATCH v3 2/4] PCI/MSI: Check msi_addr_mask in
- msi_verify_entries()
-In-Reply-To: <20260123-pci-msi-addr-mask-v3-2-9f9baa048524@iscas.ac.cn>
-References: <20260123-pci-msi-addr-mask-v3-0-9f9baa048524@iscas.ac.cn>
- <20260123-pci-msi-addr-mask-v3-2-9f9baa048524@iscas.ac.cn>
-Date: Tue, 27 Jan 2026 10:27:58 +0100
-Message-ID: <87jyx3be1t.ffs@tglx>
+	s=k20201202; t=1769506377;
+	bh=nd4756Hy+92ohyhREHEr2ehaES7a+HF9kecPSnYoKRI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=hqg/p5fwd0Wtm1K4HPBR20a0ZALUIPwJbR+HTRa2SE9d84XqA97XGZ0n5H7mZ/pdY
+	 LrjP7i6moJ/1DKMh3Ytl3YLATfXpP09QgOljgvsJQY/IYIEHYWaCJWONYB5b1bsQdM
+	 JVDDcg/mmFlM3swvNUuEodb70UKzeHAXzR3f3GWxzLI+QLDjCYFcH0etlakY+OErJj
+	 UtNpdTSkGiffuXXOp+rivvZLqk7ewNp1ny7Vd5fcL9tYwhlehqrW4wLewQ5h4JslZ7
+	 P2hD4a0YTZxIISfyde3jLLAOXwD7M0PnMd/pnnluIIr1/1vvlxzzehe1wM3o8X4nrE
+	 rDvlKs0ndj1Zg==
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-790ac42fd00so55436987b3.3
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 01:32:57 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUtnAqLkQO1WIiX9O/TTL7IzwVg3LxtNyP88t9o/g1WmOmTGLbLSAXJZBlf8mqJYV+95ARS5qE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoQztz1ysolNyW9/ElmSbDbOQSja9lzOiXsKxZ5RguQuAJ7XyE
+	hbSXEO9M0mLK5Sm7d6qgl/en91Ercr7o6EHJ0sO4UJJCbBiL19BsOe3+dWxXTxLpkaYSSfOZ2CG
+	PC+WYgi3M4ftxSqY31glVw2ieXVPrQaI=
+X-Received: by 2002:a05:690c:fd1:b0:794:78ad:470d with SMTP id
+ 00721157ae682-7947ab40c1fmr16169877b3.27.1769506376440; Tue, 27 Jan 2026
+ 01:32:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260115114021.111324-1-robert.marko@sartura.hr> <20260115114021.111324-7-robert.marko@sartura.hr>
+In-Reply-To: <20260115114021.111324-7-robert.marko@sartura.hr>
+From: Linus Walleij <linusw@kernel.org>
+Date: Tue, 27 Jan 2026 10:32:45 +0100
+X-Gmail-Original-Message-ID: <CAD++jLn3pP4cdB3h5KN04Pn_v+XuvK6ROuxpNfJVhSRJpo2FUQ@mail.gmail.com>
+X-Gm-Features: AZwV_QjPaAf4YpNWpzKIxLTu_1dAPvSU-dSWNUWnEkSR0mawzeMGDcKYjAjufcE
+Message-ID: <CAD++jLn3pP4cdB3h5KN04Pn_v+XuvK6ROuxpNfJVhSRJpo2FUQ@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
+ add LAN969x
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	lee@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, olivia@selenic.com, richard.genoud@bootlin.com, 
+	radu_nicolae.pirea@upb.ro, gregkh@linuxfoundation.org, 
+	richardcochran@gmail.com, horatiu.vultur@microchip.com, 
+	Ryan.Wanner@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, lars.povlsen@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, luka.perkov@sartura.hr, 
+	Conor Dooley <conor.dooley@microchip.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [4.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253773-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,body];
-	FREEMAIL_TO(0.00)[iscas.ac.cn,linux.ibm.com,ellerman.id.au,gmail.com,kernel.org,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-253774-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,microchip.com,bootlin.com,tuxon.dev,gondor.apana.org.au,davemloft.net,lunn.ch,google.com,redhat.com,selenic.com,upb.ro,linuxfoundation.org,gmail.com,linaro.org,vger.kernel.org,lists.infradead.org,sartura.hr];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 249E291E0A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tuxon.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: AE01991CEA
 X-Rspamd-Action: no action
 
-On Fri, Jan 23 2026 at 14:07, Vivian Wang wrote:
-> Instead of a 32-bit/64-bit dichotomy, check the MSI address against
-> msi_addr_mask.
+On Thu, Jan 15, 2026 at 12:41=E2=80=AFPM Robert Marko <robert.marko@sartura=
+.hr> wrote:
+
+> Document LAN969x compatibles for SGPIO.
 >
-> This allows platforms with MSI doorbell above 32-bit address space to
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
-with a MSI doorbell address above the 32-bit limit to
+This patch 6/11 applied to the pinctrl tree!
 
-> work with devices without full 64-bit MSI address support, as long as
-> the doorbell is within addressable range of MSI of the device.
-
-within the addressable
-
->  static int msi_verify_entries(struct pci_dev *dev)
->  {
->  	struct msi_desc *entry;
-> +	u64 address;
->  
->  	if (dev->msi_addr_mask == DMA_BIT_MASK(64))
->  		return 0;
->  
->  	msi_for_each_desc(entry, &dev->dev, MSI_DESC_ALL) {
-> -		if (entry->msg.address_hi) {
-> -			pci_err(dev, "arch assigned 64-bit MSI address %#x%08x but device only supports 32 bits\n",
-> -				entry->msg.address_hi, entry->msg.address_lo);
-> +		address = (u64)entry->msg.address_hi << 32 |
-> +			  entry->msg.address_lo;
-
-No line break required. Let it stick out.
-
-> +		if (address & ~dev->msi_addr_mask) {
-> +			pci_err(dev, "arch assigned 64-bit MSI address %#llx above device MSI address mask %#llx\n",
-> +				address, dev->msi_addr_mask);
->  			break;
->  		}
->  	}
-
-Other than those nits:
-
-Reviewed-by: Thomas Gleixner <tglx@kernel.org>
+Yours,
+Linus Walleij
 
