@@ -1,159 +1,200 @@
-Return-Path: <netdev+bounces-253698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id HYb7GDI9eGkYpAEAu9opvQ
-	(envelope-from <netdev+bounces-253698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:21:06 +0100
+	id yBwsHLM+eGkzpAEAu9opvQ
+	(envelope-from <netdev+bounces-253699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:27:31 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61FE8FD77
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A1E8FD9C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 05:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C1D4301992E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:21:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C997301A39A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91193310777;
-	Tue, 27 Jan 2026 04:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lwao6kVA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF463233F4;
+	Tue, 27 Jan 2026 04:27:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3237B2745C
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 04:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.193
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769487663; cv=pass; b=ECraE9NPCGBzEGrVUCJO87biRWc3G5Vtm0Dss6mbikOoLg1cggo/aoepXi9l6PkDQa5iqMu75hm1Oi0U15X4VObaR/NMfNSyl5LbvIXaIR0d/ckvUK4utk/Kohac4cp61uuvNjBSlom0ruZmS8mhDRXXUv66oe8RI+J0ONj6gdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769487663; c=relaxed/simple;
-	bh=QGuLNgKUVWwgE6vVNwL0mPDyimDYATLC4PF38VkBCZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rwcGX4XCY660NGE6TWAtFwVKkp59Virk7HedmuBunwCEjJ93rB1h168cfzSfa5fwFCj0jOobsW37I+WvSgVH8rA+Wb9YaaFGpWWgSlskmJ9+qX+LGc4mN1QCv+1mH2KLo67HfPb0Yo1WHbcApwmMIZrErIFVJe5Hru/s6YtpaO0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lwao6kVA; arc=pass smtp.client-ip=209.85.222.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8c531473fdcso707404885a.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 20:21:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769487661; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EEET5bejpyTEDs+QceH1FI0t1eqqRarGiH24LGM3fx/2oDYYx3TQcGSYI180GLJ72k
-         aL3OJBEzMRauILWGG3sb0doISUevCPtLXEorj5ePcneNCYFSBBqucEGKvKyk3Ap7X2kI
-         u/ZWEfFzqY1JbBMJSVlXoGyiQ4xA73oxXRlqLGYMuAFI82Sz63MF4aSCbv7Nc5gyGn35
-         Hx02z9Peb2xOXncjG4doV2yEUQTihDAlw2OSjmjDzBMGrZ8yxlMF0gAssrhMrRXYmUue
-         PjFKsw0fKCGLwlkSEdGqJ3tb94TYuuSmubnKCrQDWLXpjzuAQTWSgdjlwniBIuNZ7Q5v
-         NM6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vIhnDe1MXsaKo5y6+UQRQMKim72X07VZpodVq29siKU=;
-        fh=1/f04J0uhm6O22R9GYFo4iIPNzEehJ9gr+ZoV6ZmpHk=;
-        b=NNzpApr44yH5ZIXIRIJDxA2qdrwDHLKzsaFbvGT9S9YZtQY9R2lF4XpjmNORjswHoG
-         AlzAHCL0y1UXwVWJoTBMq0w/6+8ete7Z3oLpuylstGiwCqyTdOotwmzU81xEp3vcDSYo
-         MdkVMVLixNujptRf5JVPOUk1yWs51UFuqdV0IT1lPNd/s95vXRSDd5B1qHtLvRGqh2Fl
-         iIK8K82Ta+fBPXNER+iILCpZzdIj652cSrs9kKvBWVzZuDaO4U/4Ih/9oHlJV6pNk4ge
-         rHuU67Pwq/Sr8d/QayYn8QQAkYeK+eM8c/G4Alfn7JZC13MrHPbVohIqw/Y95WK+21mr
-         3zWA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769487661; x=1770092461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vIhnDe1MXsaKo5y6+UQRQMKim72X07VZpodVq29siKU=;
-        b=Lwao6kVA5kNOcwigz5l2IBTRwv1mhLIwhvDoykQYfEErXtSQWElHx7DwXnRT1XFnEV
-         CQNahqeFAhJF3i8pDpCut1E6/nmi9GEmKJjg2yus42qi029l5IgMZDPT8PbuUCMCMd4c
-         LgdieR61O8l37xSY3OBvxQFBIAwMjsltn5U3LxWEABJBGn8XL5L8Ywq1JCv0bpjUm8hz
-         JGSJ3yZAbyYHWbJ8ZgEUGWsA04fGJJxq96zTpEgg0JXSKT5gZcQPlMppWQFr5FOdUpgy
-         t7Kvk2IV8BhTKr4+GCBVaQnG1cMmadsR8pcArt3FFtSiirqqe9P7zYAqeBDd0LRCtYIa
-         7Y4g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1A31F2B8D
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 04:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769488048; cv=none; b=m6Jr5CrtZXCuNjve3R6s5OqlSSKrpcD+yLQuMmxrYkCd/jUlGq//AAh94JliTdGQHQvMKuKGbrJ8INA0djv3stJ+6YQZNgkWzbxWot+pEBOVGCqS+E2xl2qFS2mMQ5QaLMl+knW/51vYYQ2ZJzI+VBx5JWCtShDuUkogXffThWQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769488048; c=relaxed/simple;
+	bh=YuFUtxbGs8XoO6mBjA0KxEddLWHuYp+dvmesQhy1vNk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gha7gd/y3s75E4US7STZUOACuORA5S/9kLK4BGBeNf3Uv3plyFRD0yDYFHRKSu3OW98T1eRqDNi5FChB0ROGPaxKIBckpStTsE92+KZhxIdxojqvXFmBje2nm1F87SsFbpBdY5I29bQ33FsQUEZIB5q2+cHBcGZcYpuwLnBusUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-45c91358254so14100890b6e.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 20:27:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769487661; x=1770092461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vIhnDe1MXsaKo5y6+UQRQMKim72X07VZpodVq29siKU=;
-        b=aLuR7mDMqQyiIUZMiBMeM1bs6DD/nMQuAsCW3o2ZWkfiblhP3oD9iMvyL7yBYGK3zT
-         mz4D3Uv1YZBwF40GVwEOnskJOyTPf39p/MXLKFVJMCIJXbbJSEDpbeFQx9bKEErkhjWB
-         wg4xPSFbSzuDwTHyOKajwkD6zi8rmKNSwNcp+8L0MJSO+iPWYNRQjigaI6e4Vmdq0YGO
-         afNIpsUaH+9/7Q7cP7hpX7UF2jTO3A0tXYncJmmlYmzE8h27xfIpqJyoxf3IzOcZu8EK
-         BwQgJRh9jngr84IJq74uBqxUZeRS0FTdNJ2p7vs2gJJ64QMM0M5U+vMB8UU5BScPeug3
-         c7Dw==
-X-Gm-Message-State: AOJu0YxyINYxyFl7Ky3hD6+dOtZ8S1oak56Q05XZeb4ci8AG85Wy+5Sk
-	zNkASx5op94KJu8btbRYxm/Qnw+7CqvVyHF3Wc9X1cXbu4SpyIi8kwtCdjxcSIubWIMFlop2Q8n
-	ieTBYo93h4kqUecfv+gsmN3jxKJGHI8Q=
-X-Gm-Gg: AZuq6aIpwnKTxvmfBJUDgP6ATa9HKlgavgI6tYn/FOqMhxFzQnsyc9ZAPDg3pHde4sF
-	l3uqy3QGW+QVQObpuFZuYob40Hx2lx2ZMa2w/EJBg+tjjwhyqkUwvWCQK3Z5b6RVFiAtv8uj9dH
-	ykg5kqv8Aq/daQQwbArKW+0i5+wu9CgLOvM5yQ0QqEIVD8/jb1y072+/FDJAxJCkdPsYbexg58k
-	eVpC0iePlcFn5lQXSQ9BI5Nl5IL+BcGa5mxzbxlbLXiD3+YioP6hAXt9YbAro0SOLBslMYtSgcZ
-	GbOJ1F9zFbPAluo0gNFf181XXZSZY9qD8yfzfFbWen1Qgstkov+nPyWQpOqp
-X-Received: by 2002:a05:620a:2585:b0:8c6:a034:9231 with SMTP id
- af79cd13be357-8c70b8776a3mr58218985a.32.1769487661122; Mon, 26 Jan 2026
- 20:21:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769488046; x=1770092846;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QGPXctGzCvQhO6o5zNaSG+4khA0zm/mQn3hOs7bG9JY=;
+        b=L+LzT3yX7u6ac/nQrzv4i3s0bvwYOptMUwIh+mwxOtHMLBXtfXThR+zDRtxIRLvPOz
+         BhyvKIK5+wL2FjHjFiwnw2zXJIyhEzmXoISA6E7/WDcUk6XFcy+9/EY0hPfiCAhE4F3p
+         uerJqE9NBXEYF+D76JVEQ2t56qp3OJQkU/OtxYJ4Lbu0m8XalUSPE/xJi67rVvjeYKsT
+         gs2E2UY0OqUZ7Qt//vDyOueZ7z/DrpgtauM37sL3BdpJGZ+u0Z2EJMMBubZP25rmN3gl
+         99dZxvXbXS56W5COXiSqfjU+0Z3g4jnqMCuDsJV9Nz/wGqt1wkQWkZjDSxyH978TscQV
+         JGdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU0IT1XuoiLs/+Wa8WhwK5Ckz8PqP+D37FK19TQ9te7W4WfAIi9wckKoHDj5Ng2pct763hg5xs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyN/V3xgiQhCpGxWfI0rsp7/MCCKv+CS7+Llnvp4og+JRUW7OI/
+	rCme/1oWkBR/r/1s5njnswKqyZt49KQt1ko9uUcdaKjW+3SJb3KRhOpyzPG6YcPMCf55kF+nY3X
+	UlqKJEZfn1vmC5+GLUqdwzE3wdfxwR7v/7oJPp/1YjExrmOuokTYCzIIKV+I=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260124040226.34390-1-enelsonmoore@gmail.com> <aXdxY81-bXBF2sRR@horms.kernel.org>
-In-Reply-To: <aXdxY81-bXBF2sRR@horms.kernel.org>
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Date: Mon, 26 Jan 2026 20:20:50 -0800
-X-Gm-Features: AZwV_Qi2Ktx2ayGcgSUWZGIj6qsUhXatp4rlJGgFB3wZBisQBK2jC6wPL6_Gm-g
-Message-ID: <CADkSEUh3mOq0CJmMbKMt_qVj6552y7r0HsE=D3sW3YiH2gnErg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: usb: sr9700: clarify code using BIT and
- GENMASK macros
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+X-Received: by 2002:a05:6820:1998:b0:65b:5745:6123 with SMTP id
+ 006d021491bc7-662f202860emr291800eaf.16.1769488045785; Mon, 26 Jan 2026
+ 20:27:25 -0800 (PST)
+Date: Mon, 26 Jan 2026 20:27:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69783ead.050a0220.c9109.0013.GAE@google.com>
+Subject: [syzbot] [net?] KCSAN: data-race in fib_table_lookup /
+ fib_table_lookup (4)
+From: syzbot <syzbot+d24f940f770afda885cf@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=8e27f4588a0f2183];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253698-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[enelsonmoore@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B61FE8FD77
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-253699-lists,netdev=lfdr.de,d24f940f770afda885cf];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url,storage.googleapis.com:url,googlegroups.com:email]
+X-Rspamd-Queue-Id: B6A1E8FD9C
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 5:51=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
-> My advice is to wait for all your outstanding sr9700 to settle.  And then
-> collect up those that are left into a patchset, addressing review of them=
-.
-> And include, in that patchset, this patch, in it's full form.
+Hello,
 
-Hi, Simon,
-That makes sense to me. I've adjusted this patch to be part of a new
-patch series I'm working on, and to adjust all bitmasks, even ones
-that are removed later in the series.
-Ethan
+syzbot found the following issue on:
+
+HEAD commit:    fcb70a56f4d8 Merge tag 'vfs-6.19-rc8.fixes' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10c8a05a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8e27f4588a0f2183
+dashboard link: https://syzkaller.appspot.com/bug?extid=d24f940f770afda885cf
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f09fa28d6094/disk-fcb70a56.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d7b2aaa28bcd/vmlinux-fcb70a56.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/aa72cf9601a0/bzImage-fcb70a56.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d24f940f770afda885cf@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in fib_table_lookup / fib_table_lookup
+
+write to 0xffff88811b06a7fa of 1 bytes by task 4167 on cpu 0:
+ fib_alias_accessed net/ipv4/fib_lookup.h:32 [inline]
+ fib_table_lookup+0x361/0xd60 net/ipv4/fib_trie.c:1565
+ fib_lookup include/net/ip_fib.h:390 [inline]
+ ip_route_output_key_hash_rcu+0x378/0x1380 net/ipv4/route.c:2814
+ ip_route_output_key_hash net/ipv4/route.c:2705 [inline]
+ __ip_route_output_key include/net/route.h:169 [inline]
+ ip_route_output_flow+0x65/0x110 net/ipv4/route.c:2932
+ udp_sendmsg+0x13c3/0x15d0 net/ipv4/udp.c:1450
+ inet_sendmsg+0xac/0xd0 net/ipv4/af_inet.c:859
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x53a/0x600 net/socket.c:2592
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
+ __sys_sendmmsg+0x185/0x320 net/socket.c:2735
+ __do_sys_sendmmsg net/socket.c:2762 [inline]
+ __se_sys_sendmmsg net/socket.c:2759 [inline]
+ __x64_sys_sendmmsg+0x57/0x70 net/socket.c:2759
+ x64_sys_call+0x1e28/0x3000 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+read to 0xffff88811b06a7fa of 1 bytes by task 4168 on cpu 1:
+ fib_alias_accessed net/ipv4/fib_lookup.h:31 [inline]
+ fib_table_lookup+0x338/0xd60 net/ipv4/fib_trie.c:1565
+ fib_lookup include/net/ip_fib.h:390 [inline]
+ ip_route_output_key_hash_rcu+0x378/0x1380 net/ipv4/route.c:2814
+ ip_route_output_key_hash net/ipv4/route.c:2705 [inline]
+ __ip_route_output_key include/net/route.h:169 [inline]
+ ip_route_output_flow+0x65/0x110 net/ipv4/route.c:2932
+ udp_sendmsg+0x13c3/0x15d0 net/ipv4/udp.c:1450
+ inet_sendmsg+0xac/0xd0 net/ipv4/af_inet.c:859
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x53a/0x600 net/socket.c:2592
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
+ __sys_sendmmsg+0x185/0x320 net/socket.c:2735
+ __do_sys_sendmmsg net/socket.c:2762 [inline]
+ __se_sys_sendmmsg net/socket.c:2759 [inline]
+ __x64_sys_sendmmsg+0x57/0x70 net/socket.c:2759
+ x64_sys_call+0x1e28/0x3000 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc0/0x2a0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+value changed: 0x00 -> 0x01
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 UID: 0 PID: 4168 Comm: syz.4.206 Not tainted syzkaller #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
