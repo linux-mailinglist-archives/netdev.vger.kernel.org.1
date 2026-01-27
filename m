@@ -1,120 +1,102 @@
-Return-Path: <netdev+bounces-253893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INwRFfjCeGmltAEAu9opvQ
-	(envelope-from <netdev+bounces-253893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:51:52 +0100
+	id QJHrKZPDeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:54:27 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5E69520D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:51:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 162C2952BF
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:54:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DF003111434
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:45:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A3B730581A9
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B3C35B158;
-	Tue, 27 Jan 2026 13:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A103359F90;
+	Tue, 27 Jan 2026 13:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="o6wilfU5";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fUQwfIWd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goHiphA2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFDC35B634
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0371126ED54
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521512; cv=none; b=Bcv7li9BftkTD6e0k/C2HDJTyeWb4BoiMsfSAwzFCvwzemcr9ogcXwZ0XPF5bnJd/KTelZCdnRE6Qr6OS9PJV1CrFKjpn0Glav3Ge8WcIX7R7Rrb/5965jA97Obe+NvHvi7t9Mg0bYQlIj19Y9zUjhhIFLLc5hU9fjKAjW1A4dI=
+	t=1769521572; cv=none; b=qHonRYZBhcIY6n34c4IENvToP8QCvwlY0OLE9kUejkXhNhzfioKs6NHVDI4e8AYCFwTINY6+4oIxowRo8Wl7GTvNFqwdRoiQzbz5tRl/pC2NWBdahsxhIb3ZjC3IQLxDWzuIFixphBEvW/cosUFGNEBWbU6Tov4xQ1tSj71hBas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521512; c=relaxed/simple;
-	bh=HL18fgXkdgJF9QdeVDk/2U9jrroWxf6RWO1+7ZAfGp0=;
+	s=arc-20240116; t=1769521572; c=relaxed/simple;
+	bh=re6NSiZizBDEm3EpB+1e8HbLc2V1raKduoGD2wp8Pe4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R6ywMRSo8SbDcHns1TVdWAoogEFHaCa5N5Z/rR4FRfJdOtgTS9WDxvGDOy1wZjMVBLAHAk76Eot4cesZThCO0GM/mXindPPalcVfEJLN4SUh32KJ7m8EvQ8aok++wnnam6FxIT1MzlHD3tL1uI/Mrb85sPFRiwr3aWegf5OqVT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=o6wilfU5; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fUQwfIWd; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RD2fxH112562
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:45:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=+KoxU3lQMnCDsUz9/HEPI79F
-	t/PTbWYdpT8UE6jWc1A=; b=o6wilfU5s8bXBP2STeBnmiA5I6XiJBQj4RpvUpkV
-	f4dbXpJVC7BDE73HApnOeEld+tHX/9A86npskqVnIGxMN7IgF0AtibhiEnWvzIbv
-	Zm+xbx9TiS/ioqvKOF9qWjK2UgdAvgI3fH07qNBbWTZMiUMB0NB+cSx3iOsC3Edo
-	eRN7hrjisUZ3EfUHvN0SHzx9f8Ld0O3qcCOyUm9+UDO+EkzD+azxzvqqmp/OX3Ue
-	KYBpq6y1CS9Basa96vDqoJhrtx3xho+UanRP+1CESf3CIRxdgUtUpGWU0JW4ck1K
-	ah3R105tTpnnhcjx8jojyw9xmGbNJXaTI/ujT2fUequbzw==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bxs0e18gv-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 13:45:09 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a0e952f153so17013045ad.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:45:09 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IyYsIIpXwYGKecVrHYgBrWa5tf4DHCUhrzro3IoUHIJcGDevF9IzJSMPF57YgotpU9Yehqux3JSrZXFBb718LWVlB6Y4cHEog+78FG5C9YsxW5Lh1ETzrp8ltt+31i7G87Bvmz6gnRoWPYDLlSNA5wnoENZToYV5RamTGidBWAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=goHiphA2; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4327790c4e9so3701193f8f.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 05:46:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769521509; x=1770126309; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769521569; x=1770126369; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+KoxU3lQMnCDsUz9/HEPI79Ft/PTbWYdpT8UE6jWc1A=;
-        b=fUQwfIWdyv7E1nxKQWwc1BwvZDPzHo4Z4XrGBrrTBp7Zvy2KqiS0y4jFnGr/KqiLaS
-         DwPtPVvNsOgh9MjZSY1+jUGOM78/WoV5sGcPiMQCPO7Dhc9togsiptyoxHhy9hQ/Bc4c
-         hSRCKDiO5+0fJRC5t7yS9hN+WyyVRm9TuBjRCpqSAVAkPgqop3oNhtrc/lZrrnt3+e2x
-         M8VGnWm3KkqO/l6/1Bpw9pQ8Jk/TSXxhAdaOORmTClVMjVL8bXJziKgKWQ5UkYVa3Gxj
-         DLI/wFcvM61qDjbnzsKkKOf/nQa2Xdw0GFtdqYNZUBco09DqUUTNXooxl6k0/W43IciS
-         bKPQ==
+        bh=x6OQwLQVXz7cUVwRGuGUS5QtspAXdqTx91X6RLYCCic=;
+        b=goHiphA2BY86LhXWzMT9cZDXAFvdKVS5K0wRNu/VOX/YDeliq7P1qru4TNUkrV+mW5
+         2EpgC/05F8dCeMh/kn3W9x2pM1TlCHtiulznaekt1k2heI1ilxwDFFVhDPvrkOojAJXx
+         iXsLxklr5PTjLnYW59zBtkY7cIRpF/mxoqp1ofZkiWl6eaY063h9zl5u1Kv/N95QvTxU
+         hfFLR2RAKKd1aKr3PQAFyokEexebiLs/4Qrd8zx4pSC9ezL+K/APnmw5mzYCXMpkKvs9
+         oqcpkRrjmpfsAoQmMgjR+AHMK6gbQSw8Uu8pPExDS/tuj3NN8pqDLoPYoHuaF2qOwz9X
+         WgXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769521509; x=1770126309;
+        d=1e100.net; s=20230601; t=1769521569; x=1770126369;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+KoxU3lQMnCDsUz9/HEPI79Ft/PTbWYdpT8UE6jWc1A=;
-        b=A4tMCBWZDF/Y2OnVVesSDg/jS+1v3XYBDQ0CeNZ3f7QZ7korE5KEgmdWGSZLHPXItx
-         aDBdWifXVdWjw60ew5HOmwkteMljZKzDiBA9chtyBvdEiutY3LOf+OZagQwnGofvAnch
-         aYkOgMiJAg/HGTjzp2ZAps0EYuIG2GXQQrB2Ifh9CjK76J2PAiA2yBKjLUhZRUuMXk3V
-         pjijXUVJK9jNCeq17iH0dlRMPEYsPSbRPXNtMypVgSFmfXm2FFhvZ2lIZv5r4vqLwL+0
-         qfsSra+hsMQEVkaVuHXcyUXVCrq1CVzTbzFqBkxzLDwJqQrOZ6sGqK+4HVYKxoUQyP56
-         MYew==
-X-Forwarded-Encrypted: i=1; AJvYcCXG1Y4kP1xEgQBa0jrr6kSIrYHsfyjMcbWvlLBdMx208NM4rnV1G/4OFKkalRjoLB6PC8BankI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAlYb0ZRQjmRpAsP/kKA/bQf+lBrl/aQFxOd7a2RwGjlc7i6S1
-	+OFq1k8CwQPHzEN1sppeMqKuFOIwvZgfRY+udjRTGDJtlJGH+r/h421k7SJ9nuwZ+LNJe576Fuc
-	XaseAzEm3c7UPIUkBNiJKPPvMh7HTTfBLsfrKkfY6NVsOTZP/OEyuYpA2kAo=
-X-Gm-Gg: AZuq6aLNn5MtyrFk28drmqLnbUlLKgeNndSFGbdz8RpDwWG0A1yiFWk80wwhIQgw6ht
-	1aUcN86I/izdAPKm7/ePW7dd5BDCVhl0deaUJ6GnOPvHRNceYvtv03/pYViFe475skMZqBWDlb5
-	bIx3nlBau2EihZ+M886y4RBjzpdXy4z6E4RitN1skdmMmejvkwzC/1prxapvgzzm3h0nhcgLV/M
-	r1bEbBwkHp1LB08THzhNICsAkjips2y+kQTBPj0Lvrr/+e8NE8HJsjuYGTZFpkpbtPDRCzKOopd
-	PFl7RolOmQGyFmVPVO3kaFpw74qSImGWCrTXtcmDojNAbV1yTZjxty+tASPNa47j0g8HqnbufJd
-	sU+VNe1Mi6hkOG9kMacaGA38=
-X-Received: by 2002:a17:903:2acd:b0:2a1:10f7:9718 with SMTP id d9443c01a7336-2a870e18919mr20174295ad.30.1769521508931;
-        Tue, 27 Jan 2026 05:45:08 -0800 (PST)
-X-Received: by 2002:a17:903:2acd:b0:2a1:10f7:9718 with SMTP id d9443c01a7336-2a870e18919mr20173925ad.30.1769521508384;
-        Tue, 27 Jan 2026 05:45:08 -0800 (PST)
-Received: from oss.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802f97a81sm116816095ad.47.2026.01.27.05.45.03
+        bh=x6OQwLQVXz7cUVwRGuGUS5QtspAXdqTx91X6RLYCCic=;
+        b=IMv6ZoPrTJQ7HebDzDoWxVuQOCYa6BHU38Olv8biPIilDQnFnpzyfzjPRbWG1+p8rN
+         UhEKXh5NJLbmrLAaZ2lJhFYmWzK/fijUMkarCdhJMgr6rQE1Bp2NWU3JZaDezAaO3Vor
+         2Hm6jjEBshRlOqe2ISX06cn6ySSbdNzhJe0POUCDByDGFpzWP0HssjS76ewk4a4rGP8t
+         d1krtmYCBLOGAx3O83Ascoytnp6oWFqX0n4REfTIi6Q6+2421BrXfq42aeA0v+gAzzPY
+         2vP0Y26AVsd4CItOVQ77t8mOWy3+X7OAdqmPCI8U3DCjydzjo4F2mo5ZAc5PHR25KAxr
+         YW2g==
+X-Forwarded-Encrypted: i=1; AJvYcCU7EyffHQoW4KmIOJE80TFe4SMlkPoOCpIZCU3j9yLzZLMPiN1DvHfaMDir8kbtPkACSVRo8zE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw88L9brJrDnF6ra5/IBKEnD2m8aliAUI4IB9AmzOyZgqeqjwkL
+	5IEzQWo9Dusvf/T+hPhNOuyyR9GX+bc1LHc9T+EXnX+V/nRIpBBEbT0f
+X-Gm-Gg: AZuq6aJrlnp0ycoRAmziS8Gsjr8i2FlvczIMt9oxbHcr5k0fgPWJN+2vqxWl8CsM/zI
+	g1rZWwmFOEEveYDMbXHJ2C0gBIPw3IBU08Ox63rahGtGn9T6UF8PTZsBMrg7Cl4oz69aR/yJfSD
+	xexi4QgLpV/NUrKiTooUNYXIJFfBWHjgfvan0giWWmvqZc+2AOeHuiM8eXa8XPvXifK7g8Jmm0p
+	1s5B8IHFDZ4NughCcmOMg/JHCo59DmUwMtatIOLi59mm0u4YTMajkoe/9Z9b0ahaSjC+VBf9T8Y
+	Y5FtP/OopZ717tIIuUlIWw5O6hO7F31JpDpkKFVZWTjiWgoKWyzG3h7OxuQuSkqovrrGNakwMEz
+	AjxLmFtRGzUoTGer/9VBhwfrZLYRPywLVm6gNZW8XlRgpvhjIHNvkxKNB8wR4t6jGofeG89gLtd
+	OhHzSGmUWWdnRqo7Sk9M9L91g=
+X-Received: by 2002:a05:6000:2c0c:b0:42b:3806:2ba0 with SMTP id ffacd0b85a97d-435dd02dc43mr2250887f8f.2.1769521569105;
+        Tue, 27 Jan 2026 05:46:09 -0800 (PST)
+Received: from debian.local ([2a0a:ef40:e94:5d01:a218:5589:9f9c:4f52])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1c24a8asm37902764f8f.12.2026.01.27.05.46.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 05:45:07 -0800 (PST)
-Date: Tue, 27 Jan 2026 19:15:01 +0530
-From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-phy@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: SerDes, PCS, BASE-X, and
- inband goodies
-Message-ID: <aXjBXYLlFChzI7mb@oss.qualcomm.com>
-References: <aXNEwBW3OA1xLEUj@shell.armlinux.org.uk>
- <aXN5BFXMshnhwBQ7@oss.qualcomm.com>
- <aXOvV-XRmn_Pe-ca@shell.armlinux.org.uk>
+        Tue, 27 Jan 2026 05:46:08 -0800 (PST)
+Date: Tue, 27 Jan 2026 13:46:06 +0000
+From: Chris Bainbridge <chris.bainbridge@gmail.com>
+To: "Korenblit, Miriam Rachel" <miriam.rachel.korenblit@intel.com>
+Cc: "kvalo@kernel.org" <kvalo@kernel.org>,
+	"Berg, Johannes" <johannes.berg@intel.com>,
+	"benjamin@sipsolutions.net" <benjamin@sipsolutions.net>,
+	"gustavoars@kernel.org" <gustavoars@kernel.org>,
+	"linux-intel-wifi@intel.com" <linux-intel-wifi@intel.com>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] Revert "wifi: iwlwifi: trans: remove STATUS_SUSPENDED"
+Message-ID: <aXjBnu8MAg5ly76z@debian.local>
+References: <20260125233335.6875-1-chris.bainbridge@gmail.com>
+ <DM3PPF63A6024A93B1437A144E82CC38B7AA393A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+ <aXcovK8uhsiaHumT@debian.local>
+ <DM3PPF63A6024A907097A88AEB32669C1E5A393A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+ <CAP-bSRZ60CSEtR-_9OL6k_Lzg=w8MtD2i79KpwF+nYYzgak=-Q@mail.gmail.com>
+ <DM3PPF63A6024A9FCE1CF29C0492A406E7AA390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+ <aXit5795WQLL290t@debian.local>
+ <DM3PPF63A6024A91EFB76D52F9590E82C30A390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -123,87 +105,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXOvV-XRmn_Pe-ca@shell.armlinux.org.uk>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDExMiBTYWx0ZWRfX7VK7R5AXPpZP
- h+ULzgPSlh1+qg7zGHeBF7bxgi4A6ScrKdc/ZkRPB2A93X3j8AGISjW5OD3wVC+xzlE7tdgLv8/
- e9B+ilAPvxQhoEmSO4pPsBTP9Zsj90S7AdYbEScHmSAHq3iNGF3l7itP5V6YhovnpZFib7iVYBq
- /6TEct1DfiHqRnUESwrLhDHofizsUMpKb86XztTpe4Wmp12W/bKm33VgYY7pSM332GodNJs2uKC
- nDybxgLRcMVdJDdy/b0WvKdruCigMKBaSxOp8u77ugrCK0RdgqvYeGRn+VBwyxLQXZim1WfV5nH
- WDqCSFXo1+hrI06JmD9AW+LvJ91YCAs7XJwW4wDb2PqEnM2dsOFtsrgGiZRrsofGcy27zGkFDDh
- V3ITpJZ+j8bapOUmH7ktuKUuBAWkf5fLgzfaxEh8/WuwEFyJYyR2jiCUCEwfVApGszRZ6UdRU0P
- yEs+Bc1dOTxRU7/tnzg==
-X-Proofpoint-ORIG-GUID: shNE1LELojvwaKXmNAvbHeWl8G_2PzkH
-X-Authority-Analysis: v=2.4 cv=Hvh72kTS c=1 sm=1 tr=0 ts=6978c165 cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=tlC0plkVVdZB6woX1b4A:9 a=CjuIK1q_8ugA:10
- a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-GUID: shNE1LELojvwaKXmNAvbHeWl8G_2PzkH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-27_03,2026-01-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 bulkscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601270112
+In-Reply-To: <DM3PPF63A6024A91EFB76D52F9590E82C30A390A@DM3PPF63A6024A9.namprd11.prod.outlook.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,oss.qualcomm.com,lists.infradead.org,vger.kernel.org,st-md-mailman.stormreply.com,linaro.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-253893-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-253894-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chrisbainbridge@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: BA5E69520D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sipsolutions.net:email,debian.local:mid]
+X-Rspamd-Queue-Id: 162C2952BF
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 05:26:47PM +0000, Russell King (Oracle) wrote:
-> Sorry to hear that, but if it's any consolation, you're not alone. On
-> new year's eve, I had three teeth extracted, including one that was
-> laying horizontally in the palate of the mouth buried in bone, and
-> needed in bone graft (modern bone grafts are quite different from what
-> you'd expect btw.) It's been quite sore/painful as it heals.
+On Tue, Jan 27, 2026 at 01:22:06PM +0000, Korenblit, Miriam Rachel wrote:
 > 
-
-That sounds like a nightmare. I hope you get better soon.
-
-> Given the results you've given, my suggestion would be that the
-> following patches are probably the most risky:
 > 
-> Patch 2 "net: stmmac: qcom-ethqos: convert to set_clk_tx_rate() method"
+> > -----Original Message-----
+> > From: Chris Bainbridge <chris.bainbridge@gmail.com>
+> > Sent: Tuesday, January 27, 2026 2:22 PM
+> > To: Korenblit, Miriam Rachel <miriam.rachel.korenblit@intel.com>
+> > Cc: kvalo@kernel.org; Berg, Johannes <johannes.berg@intel.com>;
+> > benjamin@sipsolutions.net; gustavoars@kernel.org; linux-intel-wifi@intel.com;
+> > linux-wireless@vger.kernel.org; netdev@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; stable@vger.kernel.org
+> > Subject: Re: [PATCH] Revert "wifi: iwlwifi: trans: remove STATUS_SUSPENDED"
+> > 
+> > On Tue, Jan 27, 2026 at 05:05:31AM +0000, Korenblit, Miriam Rachel wrote:
+> > >
+> > > Just making sure: have you been able to reproduce the assert
+> > (ADVANCED_SYSASSERT in the log), and then the panic didn't happen?
+> > 
+> > Yes, the ADVANCED_SYSASSERT was logged but there was no subsequent null
+> > pointer dereference.
+> > 
+> > > If yes, please test the attached patch, which is supposed to fix the assert itself.
+> > With this, you are not even supposed to see an assert.
+> > 
+> > I ran this through 15 suspend/resume cycles with network traffic. The
+> > ADVANCED_SYSASSERT did not occur, so it looks like the patch does fix the
+> > SYSASSERT. There was a warning logged once out of the 15 cycles:
+> > 
+> > I think that this is probably a different bug though - checking previous logs with
+> > journalctl, I see the same warning occurred once with 6.17.0-06871-
+> > gf79e772258df which predates the "remove STATUS_SUSPENDED"
+> > commit.
 > 
-> This changes the way the clock is configured. It would be worth
-> testing that and giving a tested-by for the first two patches if
-> that's successful.
+> Thanks for the help!
+> 
+> Regarding the warning, please open Bugzilla ticket for that
+> 
+> Miri
 
-Right, this new sequence would move the clock rate setting to after the
-custom core is configured. Unfortunately, I don't have a device with an
-RGMII interface. I am checking if I can get my hands on one.
-
-I have given a t-b for the first patch.
-
-	Ayaan
+Sure, ticket is https://bugzilla.kernel.org/show_bug.cgi?id=221017
 
