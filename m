@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-253656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMjCFlIeeGkKoQEAu9opvQ
-	(envelope-from <netdev+bounces-253656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:09:22 +0100
+	id MMH3L1EeeGkKoQEAu9opvQ
+	(envelope-from <netdev+bounces-253657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:09:21 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D421B8EE3B
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 658618EE34
 	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D502F302B51D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:09:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5177230067BD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 02:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89572BEC43;
-	Tue, 27 Jan 2026 02:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D5F2D7DD2;
+	Tue, 27 Jan 2026 02:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUHuuODN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcRrFefQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B643284890
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF822D6E4B
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 02:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769479745; cv=none; b=H1n38sRSic8C4gOsq29qURPnRVX0a3ozmCOoFe60S564mqNF++JiUKp9UBLSdf+bKWuU2z4jbjlOK08K2+NrGObfcgIdFjAk/COzONMNNd9ngCHGlOsu5szOsjmJtL0K0ld63ZhGbufBcYFxa+YwDv2VxL6X2wZjTcNbynvr9/I=
+	t=1769479749; cv=none; b=lNsauYDs3Fr+3SOnPoU1P0jksai4LVd45Dxvf7pLo9hT74VwOcP1tV9RRSJ9l5FMQMJMj8AQiTPV0+vgiAOdNcbYunvd7G+iDtbRctkN8A+nz9xqHEVpnisVZgEps9Vna+LonnncxRtfEBeWXqPdOdp1lxUHpXt5fRWoInuYjfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769479745; c=relaxed/simple;
-	bh=hlr/u6OSB1ld/maQM78jagON3c9o+2MplWv+F++9Bjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J4V5torFHYLJH1s0egVXTujSqbg9Oo/xRy5nZnPePnUMWj090Vx+0JyvfxTjvW4o8ByQy8i0JBSslNeaaTk1zABXBUraHDE33Ob4hCZLld0ARvk4rAoAueJV05OqBmDrEcQ2DjLvmlUCj9LYfVqnd5/CFZWvlaWz6tSAYfBLk6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUHuuODN; arc=none smtp.client-ip=209.85.210.176
+	s=arc-20240116; t=1769479749; c=relaxed/simple;
+	bh=0t0dl3v9CeZspqERK8OCxRJsZj/7BPyDqzX+ailEm5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cQARsGrqVU3jJD5IG8uh0hMsYEV5i1uVL7HQqXWK1gW4tM7f/x8TrFC4Z12SZljQvCc1Rj8I1xYqVwv0H+gp2beU5tJL9HQ6nQdULDzOEwh1Y4uNoi12h5dk0pPIV7lYJXHTC/2YMNA1GBJRVwM5W2QCCua3d0U1T0Hq50vgWPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcRrFefQ; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81e8b1bdf0cso2769401b3a.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 18:09:04 -0800 (PST)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-352c5bd2769so3256235a91.1
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 18:09:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769479743; x=1770084543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WRqI3EYnGEVaei8c3HWyub0Uf95BjfkFkPwdlg2GbA0=;
-        b=cUHuuODNyBGQCF/+T5xP6PZ3HxlSBvxxRP9tbJ4jh0ki6nTl0RvBzAMjorVwwZSDMR
-         gUnJ05CqKszJh8W9baUe664cfhc2LNIjkE/yHjSRwhV1LXv/7x3sEdYAlN3yWpGghO7q
-         Kq9ZTc6gc8Z9ZIM6yz26P/BmgniH4vM4C6sSvXHZPEN5tq2LNHFTy6p/vMC9VZiH+7Ew
-         cBIjpmB9CcM3TlWPftUacZbU5i9kYkpZ8ADxhW4LBHLqWdr2Dd3OFPWWYOUQ4aKyI/yP
-         qR7KpLkrhWFUQ1W3KCtgtxsR+HQ6/j+pLmE/RPzTMuaq3Hdiv3aQ4WZlXOXDMTduCmsO
-         2kEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769479743; x=1770084543;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1769479748; x=1770084548; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WRqI3EYnGEVaei8c3HWyub0Uf95BjfkFkPwdlg2GbA0=;
-        b=dkPBP+DiXvXcWaV7iF3ZHC8K324qVebn2OD4lMnPhUgm9EBbtmga/kXi6Pz+mTMkjr
-         DimzQI2SObL2xhMiZr8SrNIQdbolztA+ZAXlnQco5ArV485Oxi6wmDwCz7ymZH2KRC14
-         HqbiIx1fdRFpdZz0qTCcF+DduXvBTvVuTPM0V/B2GKkabOtZIRNxFKXWhhYqlzYz0q2N
-         Db4/RYqsERj1Z3aDTKvFfjFZUnol4VjnRb0JAkWj2CRxkGVNDnRB08/Cd6gdeR23FsTF
-         Q/Lhylud0pE6F+0Sh2bc+Z6uwAfAKLLGORlwlp2fC0tgRMzfKvzcThsFWDqfddFZ7HLV
-         sbOQ==
-X-Gm-Message-State: AOJu0Yxcx78QXCYPOgIoPNVG6SXf5STyhUfzxW8ESLGbsgfF9gyMLNNQ
-	IYsXAo6mmSJ+banPsqqNeOy5uaLOyWqQ7KFWK26xMtz7RNniax9CMl4S4FAvKg==
-X-Gm-Gg: AZuq6aK0gjK+6zEsTwb3xUnSL+MRmJDXf8i+4uQ7fdLtcRYjtU0gQtk1Hkem0gBi8mU
-	pN+9tya3P4D51scdY06vWOJJItxGOIQ9667iPcZT+ZleApVnJU6tiMnHkAtILuldWr9MTnp1MGv
-	LztDQlMrA2gACkLSv4RlUrCUgmIMk3G2Hqf+5eORay7K14NRz1Kx3BFMz+1jCI5s21zTYfDs3an
-	XCzPmoJwAK1hRlIPHtv6OApDYPI2irw3ygBVEnVvpgRUwka9I1b6RQn4qX2iFR2kD/vVKJIwtrs
-	qsumyCrSFafDr9u7B+Sly7v6tmVKJ3bIFveTqCYDc1D1s9MhMyUAjrwTLqid5mhRUHaOeCvbVYp
-	s84BgOryfI10x6d62wAfWxiGQUjMDjbzwZ5rr972hPCv5LoRyLFR/Rd24UngxvciEAQrS9c+SCB
-	tANRryCB0pq/SVhJeaNmyer7E2LJ2oNWZHj24pfm+VRnS+UwurPwwcGw==
-X-Received: by 2002:a05:6a21:328c:b0:38e:9405:beff with SMTP id adf61e73a8af0-38e9f1f2a9emr6674893637.65.1769479743515;
-        Mon, 26 Jan 2026 18:09:03 -0800 (PST)
+        bh=vpCifLiPOJS30ldSXwTRHj3fHBDp1Tvh3VJtIU/qW+o=;
+        b=LcRrFefQStG0Dqq5FNAOBKmuT9u7G7fxmSpbJ6h0YLWJXpsV9rTXcKex5GAGCEXWne
+         YOyQsshvq7pH7+eILpismXTIt655nm5Uavx2g4itGwG1QrP6npDNQpLqXw7Ee4lRu7cI
+         wbKO2dQGsdnqOgq8I6CXGncWFq4GnhrhAxFNpiXTzULbz4821U9VTKB3xD6Wr+zqixTc
+         4W5U8qdjdc0srU1OapECy1iHSjNtAw3kvYPUaHAObgtMuT6PZaizpG7Q3jv1tPF0UejN
+         xkDsPD59c6mAgCA3d18OT4q7qUd4qmxMg0m0xCpcwUiFRMx5f85LoUxVNMx6g2U6Zz+U
+         yL4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769479748; x=1770084548;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vpCifLiPOJS30ldSXwTRHj3fHBDp1Tvh3VJtIU/qW+o=;
+        b=S/HpmCwOKCMMyv8Yv/0nAMS+EOB+abVvpe2hqRmTOtv1bj5jWpltCyplpMSXU0Dn4k
+         eYgd8GbD76MLHbiwV6N1GyB/nZF//o3yzYWD1KdE1cCaBAz4V6sV85z0n6IjgR4kDd6G
+         z0uBhGn4YVq2GzAkY6Klgdp+TN6AZZV398NTciDBH/nBJEhK8C8vaSvOiXlyaupjYBmR
+         mzgAtIWzr4TOcL+D/QuieopWJ7YhaH05rPD62Bkg3MzplHyZeABxIAbgQNhNVyF4UC6X
+         9G0wuIBID4Agd2Kor8fcJzRIfIg3hSNz2I+zWcuMY/UHAtlDxXAefvXwgRCSa3VXq14m
+         uI+A==
+X-Gm-Message-State: AOJu0YzZxxxsGI6s2imFzQLIKQFLP1FLsivM9SJ/m0It+cdjzCCurk8K
+	GjhBy8UfK2qFIOW2qH/pbgMVxo0GKtBZzs9qU6qaDgXfwQF/WxYOmvLuLxJ98w==
+X-Gm-Gg: AZuq6aIUnSfFjJYRt/xLQNtY4w0g37JHKqNE5gOF6V3V1/FicFdg3o9hPhEfB8t47w9
+	kXwXCLPQdZj+vR6FFZwntmS8cY7d+S7VYeffgzjtpDEOMLeXNmmgoBF9OKg0tV06mRhFceOyRhT
+	hQRyG09leYQfE2kA3nbDPp62PxoNNUXwUoHTlMmd+vN/udWgE/lCdnzsosZQogNxLGXBp2F+Pa2
+	Pu56qzk9OB3P0zR7Nwme0vq/3+NN/FIz4hCTVnNfqZK6iL4yRpTFDtGGc63S+1oQKl/YVwlWL05
+	KdqzFU27mkqs85iG9q8Clo0ZidWGqMLUZ2gyit4f91nui7sfgdbtypZDXL623BtItIzaTcbkITV
+	iehwjjr2gTpVrW+flQq2MklYJFcaazXIEhnEa7nJ7M9/LzS4qyzgrml53anQVDP7xM9nGZW5Clm
+	IZHjHQIhZjcLULhNrtTEHJ8dQS1llZZvd/OorJS5JsEMYpCWO2UOrXnw==
+X-Received: by 2002:a17:90b:560f:b0:347:5ddd:b2d1 with SMTP id 98e67ed59e1d1-353feda7677mr276391a91.27.1769479747594;
+        Mon, 26 Jan 2026 18:09:07 -0800 (PST)
 Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353f613fc36sm693540a91.10.2026.01.26.18.08.59
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-353f613fc36sm693540a91.10.2026.01.26.18.09.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 18:09:03 -0800 (PST)
+        Mon, 26 Jan 2026 18:09:07 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -85,10 +87,12 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 0/4] net: dsa: yt921x: Add DCB/QoS support
-Date: Tue, 27 Jan 2026 10:07:57 +0800
-Message-ID: <20260127020847.1482724-1-mmyangfl@gmail.com>
+Subject: [PATCH net-next v4 1/4] net: dsa: tag_yt921x: fix priority support
+Date: Tue, 27 Jan 2026 10:07:58 +0800
+Message-ID: <20260127020847.1482724-2-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260127020847.1482724-1-mmyangfl@gmail.com>
+References: <20260127020847.1482724-1-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,13 +107,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-253656-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253657-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -124,36 +128,53 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D421B8EE3B
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 658618EE34
 X-Rspamd-Action: no action
 
-This series add DCB/QoS support to the driver.
+Packet priority is part of the rx tag. It defaults to 0, but adding DCB
+support to the switch driver will break the tag driver by setting it to
+non-zero.
 
-v3: https://lore.kernel.org/r/20260125001328.3784006-1-mmyangfl@gmail.com
-  - fix port_del_dscp_prio()
-  - split yt921x_chip_setup()
-v2: https://lore.kernel.org/r/20260122194233.2777550-1-mmyangfl@gmail.com
-  - make DCB support optional
-  - refine with enum yt921x_app_selector
-  - add missing dscp_prio_mapping_is_global
-  - fix pcp support
-v1: https://lore.kernel.org/r/20260119185935.2072685-1-mmyangfl@gmail.com
-  - rebase
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ net/dsa/tag_yt921x.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-David Yang (4):
-  net: dsa: tag_yt921x: fix priority support
-  net: dsa: yt921x: Refactor VLAN awareness setting
-  net: dsa: yt921x: Refactor yt921x_chip_setup()
-  net: dsa: yt921x: Add DCB/QoS support
-
- drivers/net/dsa/Kconfig  |   1 +
- drivers/net/dsa/yt921x.c | 305 ++++++++++++++++++++++++++++++++++++---
- drivers/net/dsa/yt921x.h |  55 +++++--
- net/dsa/tag_yt921x.c     |   8 +-
- 4 files changed, 337 insertions(+), 32 deletions(-)
-
+diff --git a/net/dsa/tag_yt921x.c b/net/dsa/tag_yt921x.c
+index 6bbfd42dc5df..b93715a057c7 100644
+--- a/net/dsa/tag_yt921x.c
++++ b/net/dsa/tag_yt921x.c
+@@ -17,7 +17,8 @@
+  *   2: Rx Port
+  *     15b: Rx Port Valid
+  *     14b-11b: Rx Port
+- *     10b-0b: Cmd?
++ *     10b-8b: Priority
++ *     7b-0b: Cmd
+  *   2: Tx Port(s)
+  *     15b: Tx Port(s) Valid
+  *     10b-0b: Tx Port(s) Mask
+@@ -33,7 +34,8 @@
+ 
+ #define YT921X_TAG_PORT_EN		BIT(15)
+ #define YT921X_TAG_RX_PORT_M		GENMASK(14, 11)
+-#define YT921X_TAG_RX_CMD_M		GENMASK(10, 0)
++#define YT921X_TAG_RX_PRIO_M		GENMASK(10, 8)
++#define YT921X_TAG_RX_CMD_M		GENMASK(7, 0)
+ #define  YT921X_TAG_RX_CMD(x)			FIELD_PREP(YT921X_TAG_RX_CMD_M, (x))
+ #define  YT921X_TAG_RX_CMD_FORWARDED		0x80
+ #define  YT921X_TAG_RX_CMD_UNK_UCAST		0xb2
+@@ -98,6 +100,8 @@ yt921x_tag_rcv(struct sk_buff *skb, struct net_device *netdev)
+ 		return NULL;
+ 	}
+ 
++	skb->priority = FIELD_GET(YT921X_TAG_RX_PRIO_M, rx);
++
+ 	cmd = FIELD_GET(YT921X_TAG_RX_CMD_M, rx);
+ 	switch (cmd) {
+ 	case YT921X_TAG_RX_CMD_FORWARDED:
 -- 
 2.51.0
 
