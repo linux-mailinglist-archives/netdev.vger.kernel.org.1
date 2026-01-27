@@ -1,137 +1,156 @@
-Return-Path: <netdev+bounces-253633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253634-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id nEAJHagHeGntnQEAu9opvQ
-	(envelope-from <netdev+bounces-253633-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:32:40 +0100
+	id 6M15Ap4JeGk2ngEAu9opvQ
+	(envelope-from <netdev+bounces-253634-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:02 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A6BA8E7E2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:32:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 960948E830
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 01:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 201DA3006479
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:32:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C79DC30067A5
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 00:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CEA156236;
-	Tue, 27 Jan 2026 00:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969931D63E4;
+	Tue, 27 Jan 2026 00:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="lVf2ImBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0wLd03M"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EAB38FA3;
-	Tue, 27 Jan 2026 00:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CB642AA6
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 00:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769473956; cv=none; b=UnimRtKwNebrWIVrmCL5k5xlcLLyBeJ7BMNnDqa39kCIwZwqHsixWrart2pMd9wPAMH9eJKS6mjtt7OhEYD2NPzZ5dpspe4pKjhi/wbLT9H0HzHIz7gD06XRx9t616zm+1FqIfFwyHHWJaSuhlV7WbkG+D/4rw7Nyq6NJQjEVXs=
+	t=1769474457; cv=none; b=JRWPyWRwRAnfI0uh/nHoCLsIpKdIO62TsftKsPLfUKj/nRcNQa1WeVU9rf3CRczZkRx7526/3sBTZm551wUQJF+Hfe3/Hfpc8gR9BrRLxsw9ONbGA9RMRwCNudEWrXRNRQj8S8H7j6t0HSec/L/uW+0K+Xio7rZ7MpyCPhmJaGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769473956; c=relaxed/simple;
-	bh=0H3mcYtLkoimfh59Ktyvf7h4R2eDIiT8HXaTVTxM8+M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ibVavHpzw9zMrXH6/37aBd4r4PKqDSkISMZoN8AFWXnL2unCsjyUtjwUHD+ryPdlibXjkCc2MxAZ48oWUG6+BUBC1b4SlHoTF3OQXDe7HhYzo4vJ/nEDHWwpfgNH/d1Z8Qj4EqAd/nm8tytsaMdbNxF7zMFFTnjdRl6JSxkOOlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=lVf2ImBy; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1769473946;
-	bh=0H3mcYtLkoimfh59Ktyvf7h4R2eDIiT8HXaTVTxM8+M=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=lVf2ImBywBa+k42XkU+DqPsa1yMlILXzb8z87z9p2bLEvciuHd+VapIJxFqDJ9a04
-	 UbJH1lG/dtJbR+kbgCnN3ILfAPGoBjKdDE6G6q7NnmKLeb6Kf2ji+fyln/TKOrvByn
-	 Jgeu6KNxsnR+KT3Wn/VcwZGWdc7UQHfWJMfPbi1a9lt2rKKEfqpBy3ku8Jj44J/ZtF
-	 Q/aOvC5Ail2Jqp56tlwNI6XFEPySDO52ZIYKyfq8IncNVOSyhFtgwKoyrrM8iHBsBb
-	 lqlmM/9mEAiX4Rms5Lx14QG9nbUg18FIZOWTU3FKub/pNfElXiZp1n57TiDFIAfXR0
-	 k1LRM9n14Fcyw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 2B9B864704;
-	Tue, 27 Jan 2026 08:32:24 +0800 (AWST)
-Message-ID: <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, Matt Johnston
- <matt@codeconstruct.com.au>, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Date: Tue, 27 Jan 2026 08:32:24 +0800
-In-Reply-To: <aXdyll4KVOF6SWni@kuha>
-References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
-	 <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
-	 <aXdyll4KVOF6SWni@kuha>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1769474457; c=relaxed/simple;
+	bh=FDSZmApZTKLD7bqxE5fcK4gRn51ugRSvMR/vvQBFnWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=vAKnH3Ew+MKEmrov4agXyFU4vQGlaCrzNqXOdRSQloszrksb6XeBcmkQ8jdJnPXVF/4+sYBD3ZxA+LKeKCllf77prXRzXukNGDYYf97ahSkWuZwBNiXUwYaNqPDQJtP/UxHO+/ofVHx1cTIWx+wHefFdGDka0zff2bnXdL2zQRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0wLd03M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DAAC116C6;
+	Tue, 27 Jan 2026 00:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769474457;
+	bh=FDSZmApZTKLD7bqxE5fcK4gRn51ugRSvMR/vvQBFnWc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=q0wLd03Mgtol6WxGBhARowmEdA89LnFc0PHMRjf8qlNgKYXb3eMpsPBlZ6e8XwYFO
+	 IvqM5UDxe219kUeXSOmepN2HI5MdrL8eCwcI39U5MVHLAkzG/i7anAzgFwa1B700vL
+	 3/6zDrsLrTcefDf+bVuFrLUMHiZDSmeJD7f8a7hPMiMiTsPoUqHJ+ObOAFYCJr3pB9
+	 vEwEG5akak2+X/ZL91NSPlvDlJ0vWLfNu3EEGO60iu0ML26kuBTQGADJzuanY7iMLK
+	 ULRUV/f1CU8SwwzhAI0a24zyuKKJvlFxjx9nFVHQ7HwDvC/ycIyfTqfhvBXgjnz8xT
+	 YMfhBE8PvdVHg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: rmk+kernel@armlinux.org.uk
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	andrew+netdev@lunn.ch,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	linux-rockchip@lists.infradead.org,
+	heiko@sntech.de,
+	alexandre.torgue@foss.st.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: Re: [net-next,v2,06/22] net: stmmac: rk: add SoC specific ->init() method
+Date: Mon, 26 Jan 2026 16:40:20 -0800
+Message-ID: <20260127004020.3785641-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
+References: <E1vkL28-00000005usi-30YC@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-253634-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253633-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1A6BA8E7E2
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 960948E830
 X-Rspamd-Action: no action
 
-Hi Heikki,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-> Since we use kernel mode device drivers, we need the kernel device
-> instances (struct device) that bind to them. If you want to deal with
-> user mode drivers then you can always do that with the i2c-dev
-> interface, but then you will not be using the kernel drivers such as
-> the mctp-i2c.c in this case.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: stmmac: rk: add SoC specific ->init() method
 
-Sure you could - the userspace ARP implementation would be responsible
-for binding an existing kernel driver to the newly-allocated dynamic i2c
-address - say, through the new_device interface. The choice of driver
-would typically depend on the enumerated UDID.
+This commit adds infrastructure for SoC-specific initialization by adding
+an init callback to rk_gmac_ops and calling it from rk_gmac_setup().
 
-> But just to be clear, this is not only
-> about MCTP. The ARP-capable i2c-clients can be anything.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 7f8ffd1549bc..4117f6863ff0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
 
-Yes, I'm not just talking about MCTP here either.
+[ ... ]
 
-> So even if you still want to scan the ARP-devices in user space
-> separately, the kernel must enumerate those devices independently in
-> any case.
->=20
-> I should also point out that to my surprise the i2c-dev interface
-> (I2C_CHARDEV) isn't always enabled, even when I2C seems to be
-> otherwise fully supported in the kernel. We simply can't assume that
-> it's always available.
+> @@ -1618,6 +1619,14 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
+>
+>  	bsp_priv->dev = dev;
+>
+> +	if (ops->init) {
+> +		ret = ops->init(bsp_priv);
+> +		if (ret) {
+> +			dev_err_probe(dev, ret, "failed to init BSP\n");
+> +			return ERR_PTR(ret);
+                        ^^^^^^^^^^^^^^^
 
-I don't think requiring a specific functionality to be enabled would be
-a showstopper for any particular implementation. We need CONFIG_I2C
-already, why is CONFIG_I2C_CHARDEV any different?
+If ops->init() fails here, does bsp_priv->phy_reset need to be released?
 
-Cheers,
+Earlier in rk_gmac_setup(), at line 1610, the code calls:
 
+    bsp_priv->phy_reset = of_reset_control_get(plat->phy_node, NULL);
 
-Jeremy
+of_reset_control_get() is not a devm-managed function, so the reset control
+would need to be explicitly released with reset_control_put() on error paths.
+
+This new error return happens after phy_reset could have been acquired (when
+the device has an integrated PHY), but before the function successfully
+returns. If this path is taken, it appears the reset control would be leaked.
+
+Currently no SoC sets ops->init so this path cannot trigger, but when a
+future SoC implements this callback, the leak would occur on init failure
+for devices with integrated PHYs.
+
+> +		}
+> +	}
+> +
+>  	return bsp_priv;
+>  }
 
