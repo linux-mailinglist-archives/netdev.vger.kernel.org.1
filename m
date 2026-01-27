@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-253674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253675-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PzaGYcveGn5ogEAu9opvQ
-	(envelope-from <netdev+bounces-253674-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:22:47 +0100
+	id uKEiC5UveGn5ogEAu9opvQ
+	(envelope-from <netdev+bounces-253675-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:23:01 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E49F8F82E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:22:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A71D88F83D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 28F85302297B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:21:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BDA6C302C6F7
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0507229E0F6;
-	Tue, 27 Jan 2026 03:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8A13033FF;
+	Tue, 27 Jan 2026 03:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2V69hNgF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JD0mncN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B964309EFB
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 03:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B4B2FE582
+	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 03:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769484113; cv=none; b=jwpzmXbXStTxyoDo3KtrxIjS6dZiPesF+2U5sa8OTKhWhIWRwVxdb8z5rCDBTum9Y+7bj45qEjtjvadn4b6YhKSUCjd9Q3GyDH1Df+p1uYNj8fu+FiB1tgZd8K0OsUXl/LPO/LMyUrVMfsFMUMwjOD9GAETB+KJNKq4gRJicBYU=
+	t=1769484115; cv=none; b=Tz1IQDjxcZvGT9/P3dvpK+jjue3QJ6wfjAfMhjBdIHbkT24wzV8xzBd+T/OUX+4xSUvy1uIzTRgf+kTZos6cW7sOt2/XG5eYfR5Wd2ApyWmZb1hwtUfeR/6KAsodnSHXNxTRCYo+VEb2gf8NtQfE3FtquUQtGCMnTbjNSB/0kN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769484113; c=relaxed/simple;
-	bh=PwQ1o54/J4Q5gCE9HBNHaCNDUpZeP/7POLXSM9AypQ8=;
+	s=arc-20240116; t=1769484115; c=relaxed/simple;
+	bh=ocyvdKrP3Hy32p8oQ/1IYKwBrsdgytyKRMZjxekS1m8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JWWt2oKF3SH8FA4nxmc9F3FjpiMv9zG9bFh5VMuRzFaRgNFvel4N6QkCNQxwxvEx4Jr1zKI/jr/ilG9ci8JFykEqD+yxrSaMlmmbik4ZmtoKN2NYbHGgwri+GO/61aKM6d3BfI9vW/vu9oZ6G3PbgCNBhIfKVoQtlmm0l6++osk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2V69hNgF; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=d6+GSxrE8jINOVgQ+83gQuGZxB53jLzfTUV2RSpztqCQ1l+rFcvavPPgP6IUI1rro5sXLDSnG16JItv3fuF5HuTYaA6KBk7UD+yfp4qk1S75ocwk4LQQOPDb6c0ZNRxbc3ppwhLlQlhEZObAVzprv9+2sDHenep0KggEScfuCNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JD0mncN7; arc=none smtp.client-ip=74.125.224.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-890587d4e87so195697626d6.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:21:52 -0800 (PST)
+Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-64956928dafso5723527d50.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:21:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769484111; x=1770088911; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769484113; x=1770088913; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYLUQQ+iCrCewHjRxgSfs4e64Vq+8BTa9AhQFalyreQ=;
-        b=2V69hNgFCAXzj1kQ9JqgdOdlh1wUTjoWMI1qy1F19vYD693N4Sro1BTBj0iIotcnFM
-         kTQ0B0B8RRH4MFesd1ZQ7KKTN8B8cXKeAkMUWq2KtjeYXpR8iDLNR3jSe9UbMsU5ZFs/
-         ZX97sNDA7s2I3yKF0vYE3ebxqRBQhbdu3P8/EMEow80h11cDzBKlDkrof6KO5vB+eTgx
-         wO4pivo8l9BtIcCcdjnyHWxzYq5mM0ReyQZZeKufhZxTvNZkNkDL0sOy1g5W2ON1uqtg
-         y0cxftOKyF+FgdAk3mJZAclgHj2ToRFb30bvnPjhPij6a8tMZ2ZEDZsQMHzZFC3q0xfr
-         C1dw==
+        bh=gT/Eb//4hPc8Ua+9EmOIlzxcPFWWGdqENEs/7+97xzI=;
+        b=JD0mncN7Q1w0JstJgxr2CdDMkvdUTnWnEWp8ypTzZG5P1EZfKEQpX0GrPXu4kxECfd
+         6Z0S3VyHxFck5QYn0Xc1uMsSrsElpfLgRaWKkOALbEo/ujUok2YXQestbgf8EL8u/Sv3
+         RHdVfUivi2vqPbTMOFhif5DkXQh3S/TRcD63K71fjByKUHK5ix7a5He3KZ66sxUTDLTh
+         Xt4ZoxPu2qN1INU4ZepmOIWptowNBEN+Pn51EcyItcxicYlWZH+MZztooZjM+9fPqX1L
+         UC4dyEd6ML8cosuosoisFFk94uokdrhfUcDR5QdWBXdFRE2WlGJ2kHA8NnUz/UgzgHWt
+         0BxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769484111; x=1770088911;
+        d=1e100.net; s=20230601; t=1769484113; x=1770088913;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYLUQQ+iCrCewHjRxgSfs4e64Vq+8BTa9AhQFalyreQ=;
-        b=eZYrSpZ0CGMN8eoQuRv+EtXcR478cROqLGl84/M4Wq3BSLbGrrj7nM824O99PD9x/D
-         TaCLQ5iYsoS6QTIzI3HfcblRMFn3bn0Kf2sG3t00qaXUFXrwCkU+mOGBvNHjG4CCzZfd
-         xCaQyDrQAYdoh/ZGO6//0fWZRe0A8odWl4vhuRsVpF8M1zkYbtS3c8z03PP+GTUtzeT7
-         RuYoEqzw7NYnH69F1jCiwjvdiuKkXTRhV3f2maTdhej/mm63dn9XzPHgHEAQTwhgwoYK
-         XrSiVjcSPb++oPIH0TjR4YnGB5yznBQn32P5d5KM6sqUvpw6QlTD5udicqOzlepHPn5D
-         +L9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVWMS0ndZ22J4iDd2QvuFkzplEM7xhVWocFSJUUmkMB3RyyN2Yl/wtzh0nIffCcOymxQLCh2F8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0KMyQW0vUoRyH3dsBWAtOTaewZdNnmvO6+kuVuOkVxHhoCCxT
-	fL+hGLMAUYOOr9SYI6K5tF0XYGr+QZG4OQFtBxls1tFD6bYKqrh2VYCnwRkwxj91IPdPb8Ub/+0
-	HU34fbXDynYXd2w==
-X-Received: from qvbkk28.prod.google.com ([2002:a05:6214:509c:b0:894:7038:8dac])
+        bh=gT/Eb//4hPc8Ua+9EmOIlzxcPFWWGdqENEs/7+97xzI=;
+        b=VCm+KYdnnrR5vP63vKYcTiPFOAIkjxT3e9T8mzxo8gJf7nbAi32b6xXTJLIgAhR499
+         phovA509C2r5tjYzjeST3JJaIbYgemMeIjo5d6KbTL36u4V2aTkIpkxqiH0vLtyM8dDk
+         rD+WF+D6YopoxrF8XLobH595JFMi1e5ScBpwEXmW468caCayEP+DhZ/kg0RqeQNfN2GW
+         e5fUt4S6umPxi5svkSnsDW+1+vVcnWNhl4cR3qCvOAw8YH6G7+tnwFj07jEnG+8K5Amp
+         wrApnzjrYjhfr2sGeyui12efo12rmF+SpmQSmnZLwhZ7GCqgB0OgtxCBCUGNCTWXxMbD
+         bfOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnCRExPC8H5COWouHRQZS2li6bD+e4L9B3ZP51wmCTOzgLRUnSZOKKVZdz+GOp2OqbDPyyrhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzbyEorMZ5rLGd4CX81mm1wakOLCM2fRz4T6yVz+rlgJUviqYF
+	R1NzdhMUCyEgpOEdn8rdhr3NPYn/aLErJlCZiTGKvC6GHX7WDBzPURMyzHzwsrPwMjpbZ2LEZex
+	Ygi4r+o8k3tAFhg==
+X-Received: from yxrn10.prod.google.com ([2002:a53:ebca:0:b0:641:4b3:8bd9])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:c4f:b0:880:8600:efbf with SMTP id 6a1803df08f44-894cc91d8fbmr5046596d6.56.1769484111490;
- Mon, 26 Jan 2026 19:21:51 -0800 (PST)
-Date: Tue, 27 Jan 2026 03:21:46 +0000
+ 2002:a05:690e:419a:b0:649:5ff5:707 with SMTP id 956f58d0204a3-6498fc3b242mr93627d50.57.1769484113138;
+ Mon, 26 Jan 2026 19:21:53 -0800 (PST)
+Date: Tue, 27 Jan 2026 03:21:47 +0000
 In-Reply-To: <20260127032147.3498272-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260127032147.3498272-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
-Message-ID: <20260127032147.3498272-3-edumazet@google.com>
-Subject: [PATCH net-next 2/3] tcp: move tcp_rack_update_reo_wnd() to tcp_input.c
+Message-ID: <20260127032147.3498272-4-edumazet@google.com>
+Subject: [PATCH net-next 3/3] tcp: move tcp_rack_advance() to tcp_input.c
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253674-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253675-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -114,149 +114,129 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9E49F8F82E
+X-Rspamd-Queue-Id: A71D88F83D
 X-Rspamd-Action: no action
 
-tcp_rack_update_reo_wnd() is called only once from tcp_ack()
+tcp_rack_advance() is called from tcp_ack() and tcp_sacktag_one().
 
-Move it to tcp_input.c so that it can be inlined by the compiler
-to save space and cpu cycles.
+Moving it to tcp_input.c allows the compiler to inline it and save
+both space and cpu cycles in TCP fast path.
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 0/2 grow/shrink: 1/0 up/down: 110/-153 (-43)
+$ scripts/bloat-o-meter -t vmlinux.1 vmlinux.2
+add/remove: 0/2 grow/shrink: 1/1 up/down: 98/-132 (-34)
 Function                                     old     new   delta
-tcp_ack                                     5631    5741    +110
-__pfx_tcp_rack_update_reo_wnd                 16       -     -16
-tcp_rack_update_reo_wnd                      137       -    -137
-Total: Before=22572723, After=22572680, chg -0.00%
+tcp_ack                                     5741    5839     +98
+tcp_sacktag_one                              407     395     -12
+__pfx_tcp_rack_advance                        16       -     -16
+tcp_rack_advance                             104       -    -104
+Total: Before=22572680, After=22572646, chg -0.00%
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tcp.h       |  1 -
- net/ipv4/tcp_input.c    | 43 +++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_recovery.c | 43 -----------------------------------------
- 3 files changed, 43 insertions(+), 44 deletions(-)
+ include/net/tcp.h       |  2 --
+ net/ipv4/tcp_input.c    | 32 ++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_recovery.c | 32 --------------------------------
+ 3 files changed, 32 insertions(+), 34 deletions(-)
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index efff433de9a4..a4d9f263ea68 100644
+index a4d9f263ea68..f1cf9e6730c8 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -2517,7 +2517,6 @@ extern bool tcp_rack_mark_lost(struct sock *sk);
- extern void tcp_rack_advance(struct tcp_sock *tp, u8 sacked, u32 end_seq,
- 			     u64 xmit_time);
+@@ -2514,8 +2514,6 @@ void tcp_newreno_mark_lost(struct sock *sk, bool snd_una_advanced);
+ extern s32 tcp_rack_skb_timeout(struct tcp_sock *tp, struct sk_buff *skb,
+ 				u32 reo_wnd);
+ extern bool tcp_rack_mark_lost(struct sock *sk);
+-extern void tcp_rack_advance(struct tcp_sock *tp, u8 sacked, u32 end_seq,
+-			     u64 xmit_time);
  extern void tcp_rack_reo_timeout(struct sock *sk);
--extern void tcp_rack_update_reo_wnd(struct sock *sk, struct rate_sample *rs);
  
  /* tcp_plb.c */
- 
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index f2fafba95705..d504a9a9b6ec 100644
+index d504a9a9b6ec..a2a872382fc0 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -4149,6 +4149,49 @@ static u32 tcp_newly_delivered(struct sock *sk, u32 prior_delivered,
- 	return delivered;
+@@ -1558,6 +1558,38 @@ static int tcp_match_skb_to_sack(struct sock *sk, struct sk_buff *skb,
+ 	return in_sack;
  }
  
-+/* Updates the RACK's reo_wnd based on DSACK and no. of recoveries.
-+ *
-+ * If a DSACK is received that seems like it may have been due to reordering
-+ * triggering fast recovery, increment reo_wnd by min_rtt/4 (upper bounded
-+ * by srtt), since there is possibility that spurious retransmission was
-+ * due to reordering delay longer than reo_wnd.
-+ *
-+ * Persist the current reo_wnd value for TCP_RACK_RECOVERY_THRESH (16)
-+ * no. of successful recoveries (accounts for full DSACK-based loss
-+ * recovery undo). After that, reset it to default (min_rtt/4).
-+ *
-+ * At max, reo_wnd is incremented only once per rtt. So that the new
-+ * DSACK on which we are reacting, is due to the spurious retx (approx)
-+ * after the reo_wnd has been updated last time.
-+ *
-+ * reo_wnd is tracked in terms of steps (of min_rtt/4), rather than
-+ * absolute value to account for change in rtt.
++/* Record the most recently (re)sent time among the (s)acked packets
++ * This is "Step 3: Advance RACK.xmit_time and update RACK.RTT" from
++ * draft-cheng-tcpm-rack-00.txt
 + */
-+static void tcp_rack_update_reo_wnd(struct sock *sk, struct rate_sample *rs)
++static void tcp_rack_advance(struct tcp_sock *tp, u8 sacked,
++			     u32 end_seq, u64 xmit_time)
 +{
-+	struct tcp_sock *tp = tcp_sk(sk);
++	u32 rtt_us;
 +
-+	if ((READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_recovery) &
-+	     TCP_RACK_STATIC_REO_WND) ||
-+	    !rs->prior_delivered)
++	rtt_us = tcp_stamp_us_delta(tp->tcp_mstamp, xmit_time);
++	if (rtt_us < tcp_min_rtt(tp) && (sacked & TCPCB_RETRANS)) {
++		/* If the sacked packet was retransmitted, it's ambiguous
++		 * whether the retransmission or the original (or the prior
++		 * retransmission) was sacked.
++		 *
++		 * If the original is lost, there is no ambiguity. Otherwise
++		 * we assume the original can be delayed up to aRTT + min_rtt.
++		 * the aRTT term is bounded by the fast recovery or timeout,
++		 * so it's at least one RTT (i.e., retransmission is at least
++		 * an RTT later).
++		 */
 +		return;
-+
-+	/* Disregard DSACK if a rtt has not passed since we adjusted reo_wnd */
-+	if (before(rs->prior_delivered, tp->rack.last_delivered))
-+		tp->rack.dsack_seen = 0;
-+
-+	/* Adjust the reo_wnd if update is pending */
-+	if (tp->rack.dsack_seen) {
-+		tp->rack.reo_wnd_steps = min_t(u32, 0xFF,
-+					       tp->rack.reo_wnd_steps + 1);
-+		tp->rack.dsack_seen = 0;
-+		tp->rack.last_delivered = tp->delivered;
-+		tp->rack.reo_wnd_persist = TCP_RACK_RECOVERY_THRESH;
-+	} else if (!tp->rack.reo_wnd_persist) {
-+		tp->rack.reo_wnd_steps = 1;
++	}
++	tp->rack.advanced = 1;
++	tp->rack.rtt_us = rtt_us;
++	if (tcp_skb_sent_after(xmit_time, tp->rack.mstamp,
++			       end_seq, tp->rack.end_seq)) {
++		tp->rack.mstamp = xmit_time;
++		tp->rack.end_seq = end_seq;
 +	}
 +}
 +
- /* This routine deals with incoming acks, but not outgoing ones. */
- static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- {
+ /* Mark the given newly-SACKed range as such, adjusting counters and hints. */
+ static u8 tcp_sacktag_one(struct sock *sk,
+ 			  struct tcp_sacktag_state *state, u8 sacked,
 diff --git a/net/ipv4/tcp_recovery.c b/net/ipv4/tcp_recovery.c
-index c52fd3254b6e..40732b84771e 100644
+index 40732b84771e..139646751073 100644
 --- a/net/ipv4/tcp_recovery.c
 +++ b/net/ipv4/tcp_recovery.c
-@@ -166,49 +166,6 @@ void tcp_rack_reo_timeout(struct sock *sk)
- 		tcp_rearm_rto(sk);
+@@ -111,38 +111,6 @@ bool tcp_rack_mark_lost(struct sock *sk)
+ 	return !!timeout;
  }
  
--/* Updates the RACK's reo_wnd based on DSACK and no. of recoveries.
-- *
-- * If a DSACK is received that seems like it may have been due to reordering
-- * triggering fast recovery, increment reo_wnd by min_rtt/4 (upper bounded
-- * by srtt), since there is possibility that spurious retransmission was
-- * due to reordering delay longer than reo_wnd.
-- *
-- * Persist the current reo_wnd value for TCP_RACK_RECOVERY_THRESH (16)
-- * no. of successful recoveries (accounts for full DSACK-based loss
-- * recovery undo). After that, reset it to default (min_rtt/4).
-- *
-- * At max, reo_wnd is incremented only once per rtt. So that the new
-- * DSACK on which we are reacting, is due to the spurious retx (approx)
-- * after the reo_wnd has been updated last time.
-- *
-- * reo_wnd is tracked in terms of steps (of min_rtt/4), rather than
-- * absolute value to account for change in rtt.
+-/* Record the most recently (re)sent time among the (s)acked packets
+- * This is "Step 3: Advance RACK.xmit_time and update RACK.RTT" from
+- * draft-cheng-tcpm-rack-00.txt
 - */
--void tcp_rack_update_reo_wnd(struct sock *sk, struct rate_sample *rs)
+-void tcp_rack_advance(struct tcp_sock *tp, u8 sacked, u32 end_seq,
+-		      u64 xmit_time)
 -{
--	struct tcp_sock *tp = tcp_sk(sk);
+-	u32 rtt_us;
 -
--	if ((READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_recovery) &
--	     TCP_RACK_STATIC_REO_WND) ||
--	    !rs->prior_delivered)
+-	rtt_us = tcp_stamp_us_delta(tp->tcp_mstamp, xmit_time);
+-	if (rtt_us < tcp_min_rtt(tp) && (sacked & TCPCB_RETRANS)) {
+-		/* If the sacked packet was retransmitted, it's ambiguous
+-		 * whether the retransmission or the original (or the prior
+-		 * retransmission) was sacked.
+-		 *
+-		 * If the original is lost, there is no ambiguity. Otherwise
+-		 * we assume the original can be delayed up to aRTT + min_rtt.
+-		 * the aRTT term is bounded by the fast recovery or timeout,
+-		 * so it's at least one RTT (i.e., retransmission is at least
+-		 * an RTT later).
+-		 */
 -		return;
--
--	/* Disregard DSACK if a rtt has not passed since we adjusted reo_wnd */
--	if (before(rs->prior_delivered, tp->rack.last_delivered))
--		tp->rack.dsack_seen = 0;
--
--	/* Adjust the reo_wnd if update is pending */
--	if (tp->rack.dsack_seen) {
--		tp->rack.reo_wnd_steps = min_t(u32, 0xFF,
--					       tp->rack.reo_wnd_steps + 1);
--		tp->rack.dsack_seen = 0;
--		tp->rack.last_delivered = tp->delivered;
--		tp->rack.reo_wnd_persist = TCP_RACK_RECOVERY_THRESH;
--	} else if (!tp->rack.reo_wnd_persist) {
--		tp->rack.reo_wnd_steps = 1;
+-	}
+-	tp->rack.advanced = 1;
+-	tp->rack.rtt_us = rtt_us;
+-	if (tcp_skb_sent_after(xmit_time, tp->rack.mstamp,
+-			       end_seq, tp->rack.end_seq)) {
+-		tp->rack.mstamp = xmit_time;
+-		tp->rack.end_seq = end_seq;
 -	}
 -}
 -
- /* RFC6582 NewReno recovery for non-SACK connection. It simply retransmits
-  * the next unacked packet upon receiving
-  * a) three or more DUPACKs to start the fast recovery
+ /* We have waited long enough to accommodate reordering. Mark the expired
+  * packets lost and retransmit them.
+  */
 -- 
 2.53.0.rc1.217.geba53bf80e-goog
 
