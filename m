@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-253896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MAMGCLEeGnqtAEAu9opvQ
-	(envelope-from <netdev+bounces-253896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:50 +0100
+	id UOMkB+rEeGmltAEAu9opvQ
+	(envelope-from <netdev+bounces-253897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:00:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F4195376
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 14:56:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B937C9542C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 15:00:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D8DA308F04E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:50:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1F6B30C0FB5
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 13:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382C03491D5;
-	Tue, 27 Jan 2026 13:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2599235A95F;
+	Tue, 27 Jan 2026 13:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d6spFCuW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m6MVRLeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53142C0F75;
-	Tue, 27 Jan 2026 13:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6CA34D938;
+	Tue, 27 Jan 2026 13:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769521827; cv=none; b=ekpqZJQNOe2izBvaOjZ3dJtxqDEsjE007gESouPGKRQ3gm01jfmMr9w7EH6xRPEm+1bHnzO7XJYLYH7Jrs1+04e9q4RngzATugUL37aggxW0fvc11ns2gV7RWwfcNGqiPFBVn2Pcx1xLIOJ1XE1sXG/wqIwWUeJ2SCLUb7i7hNo=
+	t=1769521968; cv=none; b=EkAidkIVQ6mmSTIZAeQR6hsNJp4OkSgEnpt91FQX1uPpLiwrx0+Ep/dbPbWYW4IlVhZYYv+F5WFBnyb4naHw7Ps1GCxlodl7KQ6reASZC94pEXgrQuxTWB5IrNvX2q2XkPFm2dTqd3XS7uDDeqYVAq1uWm0QgidXDuplFUuyzfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769521827; c=relaxed/simple;
-	bh=QRatMhJnRNyEA67EhLdS0NL/K+LI/ja+JygeQrfuyYU=;
+	s=arc-20240116; t=1769521968; c=relaxed/simple;
+	bh=F8XnPSK1WV42BiKx6nBfPnvD7hLslXmHdEE8LU5fzIc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGcQXgZQSeDBjqNJgibj9DHvkmTMgGtxLwaKflMUHkckbYib7UnSEXG9ngjf+LD7PllA6N5oa6oW5ezWadFyMVvEFonHi6FP+wkXvpoJccksoiG3attOmgmnT25J8hq+Z+o95Frp2xIJR6PNwFeg3zrA604C5jVznv4KVxp3/bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d6spFCuW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VxcWSdk87k0N5BVm27/BnYw/EywV/d+fGz43a/TzZdA=; b=d6spFCuWzBDRXW+2fq/oOurQMl
-	pP1ygt+7RZVtd23KlozpXjgAWtUWj7WOX2poASVQ0CQTzcFwNldE4kCx8ZbNFgx+SercHK7Nug+LI
-	3LpXk0pREYmoW2dBSFK5qrXPHa4juE87O6QjeYD5iB66ach8887KYgV7pWyd6l+dD8tM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vkjSQ-004xa8-Lt; Tue, 27 Jan 2026 14:50:14 +0100
-Date: Tue, 27 Jan 2026 14:50:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v8 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <5e7c2f9c-bf49-4564-91b3-a639ef1c97d8@lunn.ch>
-References: <cover.1769053079.git.daniel@makrotopia.org>
- <18c6a24eef8617abb5073569fee162f1aa1c06ea.1769053079.git.daniel@makrotopia.org>
- <c2e191c4-dec4-4e42-b108-353778d9bd18@redhat.com>
- <aXinOE7KIFIm5dUK@makrotopia.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nW2QMHTYHl93f6IybE2kr3cU8AbN+eXOaW6G8QL2syxKx7SpIVe49ZBf9DL2TVk352C7kEfZRsAqoRcCQUBeict7/ZB/ruPRm06tO1Bk9AmYFkSOBgdGbYmruRC4XkzabGBkVrhKhLR4ACZ2SVK8794Qb97c9hyePcYk2J23qFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m6MVRLeu; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769521967; x=1801057967;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F8XnPSK1WV42BiKx6nBfPnvD7hLslXmHdEE8LU5fzIc=;
+  b=m6MVRLeuPUXFheedIu7k1EoPlLY7EE4rCo6s79h6uddpnm/hD+yN5Ov+
+   zoxLcWnNddq6xLXXofaOdlFfu4IXHf3AH0JnATaJtV2n0+FDiMlsby4oG
+   3u+Cuepa+5J8AgGn9CMP3uOgb01xZZbpAtKoiVWaaKbrY+ciDVX7luTCO
+   qK0Di7KkL935zMchy5aqYswAdVwuO3WXK7Z2r88gDfVBdxNX6cY+h2NGU
+   ZTArCBxyPNWHIcknRlYT/DfSfloCL7Wrs8txfNuHm0NCLfe9jm02w3az3
+   meptO1ImhpuBiokjxMF7soJEZ7/PxLN7yVO8fz+7PZrMjxfVyWcErI6dy
+   g==;
+X-CSE-ConnectionGUID: oMISwTkAS9aZMNoZMb1xNQ==
+X-CSE-MsgGUID: 8Qc4/L74QfWz5I+HtSo8+A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="82082541"
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="82082541"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 05:52:46 -0800
+X-CSE-ConnectionGUID: B7snmXXfQdG1wgwWWIMeYA==
+X-CSE-MsgGUID: m4+GHUwUQVuIn0+vgrCUNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="208414929"
+Received: from vverma7-mobl3.amr.corp.intel.com (HELO kuha) ([10.124.223.181])
+  by fmviesa009.fm.intel.com with SMTP; 27 Jan 2026 05:52:43 -0800
+Received: by kuha (sSMTP sendmail emulation); Tue, 27 Jan 2026 15:52:16 +0200
+Date: Tue, 27 Jan 2026 15:52:16 +0200
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
+Message-ID: <aXjDENOsmWe5_VqS@kuha>
+References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
+ <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
+ <aXdyll4KVOF6SWni@kuha>
+ <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,74 +83,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXinOE7KIFIm5dUK@makrotopia.org>
+In-Reply-To: <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253896-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,davemloft.net,google.com,kernel.org,armlinux.org.uk,vger.kernel.org,gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-253897-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:mid,lunn.ch:dkim]
-X-Rspamd-Queue-Id: 02F4195376
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[heikki.krogerus@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: B937C9542C
 X-Rspamd-Action: no action
 
-> > > +	/* handle errors returned by the firmware as -EIO
-> > > +	 * The firmware is based on Zephyr OS and uses the errors as
-> > > +	 * defined in errno.h of Zephyr OS. See
-> > > +	 * https://github.com/zephyrproject-rtos/zephyr/blob/v3.7.0/lib/libc/minimal/include/errno.h
-> > > +	 */
-> > > +	if ((s16)ret < 0) {
+Hi,
+
+Tue, Jan 27, 2026 at 08:32:24AM +0800, Jeremy Kerr wrote:
+> Hi Heikki,
+> 
+> > Since we use kernel mode device drivers, we need the kernel device
+> > instances (struct device) that bind to them. If you want to deal with
+> > user mode drivers then you can always do that with the i2c-dev
+> > interface, but then you will not be using the kernel drivers such as
+> > the mctp-i2c.c in this case.
+> 
+> Sure you could - the userspace ARP implementation would be responsible
+> for binding an existing kernel driver to the newly-allocated dynamic i2c
+> address - say, through the new_device interface. The choice of driver
+> would typically depend on the enumerated UDID.
+
+Uh, no. You should only use interfaces like new_device with the
+devices that really can't be detected in kernel, which isn't the case
+here. There is nothing preventing the kernel from detecting the ARP
+devices.
+
+So that really can not be the solution that we'll use with these
+devices, but regardless of that, relying on user space in general with
+the ARP protocol has considerable challenges that I don't see that
+could be solved easily:
+
+- You still need to deliver the UDID to the kernel because of things
+  like the PEC flag, and the drivers will also need information from
+  it.
+- With the static (not hotplugged) devices you need to assign the
+  correct ACPI node (or what ever fwnode) to the ARP-device.
+- When the device is hotplugged, you would need new ABI, like I think
+  you already noticed, but this really does not make any sense. We
+  simply don't need it, because the kernel can process this
+  information on its own very simply.
+
+On top of those there were concerns, like what if an ARP-device is
+needed relatively early on during the system bootup, but I don't
+actually know how big issues things like that are.
+
+But in any case, I don't think you would ever be able to make the ARP
+work from user space except with the simples cases (possibly not
+reliable even with those because of things like the PEC flag) which is
+not enough.
+
+So why would you want involve the user space at all since it would
+just add complexity and limitations without any benefits? The SMBus
+ARP is a standard, and _simple_, method of enumerating devices, so why
+in earth would you not just let the kernel always take care of it?
+
+> > But just to be clear, this is not only
+> > about MCTP. The ARP-capable i2c-clients can be anything.
+> 
+> Yes, I'm not just talking about MCTP here either.
+> 
+> > So even if you still want to scan the ARP-devices in user space
+> > separately, the kernel must enumerate those devices independently in
+> > any case.
 > > 
-> > The cast is likely not needed above? if `ret` values < S16_MIN are
-> > possible this will return such values to the caller without the IO err
-> > printk.
+> > I should also point out that to my surprise the i2c-dev interface
+> > (I2C_CHARDEV) isn't always enabled, even when I2C seems to be
+> > otherwise fully supported in the kernel. We simply can't assume that
+> > it's always available.
 > 
-> Right, it should rather be
-> 
-> if (ret > S16_MAX && ret <= U16_MAX)
-> 
-> to really only catch the range of numbers which are negative 16-bit
-> signed values represented as positive 32-bit signed values.
-> 
-> mxl862xx_reg_read() primarily returns a signed 32-bit integer, as it is
-> basically just a wrapper around __mdiodev_c45_read(). Negative values of
-> that 32-bit integer mean that the MDIO Clause-45 read has somehow
-> failed, ie. it's the error the MDIO bus .read_c45() operation has
-> returned.
-> 
-> In case __mdiodev_c45_read() succeeds it returns the 16-bit value of the
-> register read. In this case, those 16-bit should be interpreted as a
-> 16-bit signed integer here. A negative value denotes an error returned
-> from the firmware running on the switch (see comment above the code).
+> I don't think requiring a specific functionality to be enabled would be
+> a showstopper for any particular implementation. We need CONFIG_I2C
+> already, why is CONFIG_I2C_CHARDEV any different?
 
-Rather than these casts, maybe add a helper which takes the unsigned
-u16 from the register and returns a signed Zepher error code?
+Oh, if I just had the power, I would place this requirement on
+everyone and everything. Unfortunately I don't have that power :(
 
-int mxl862xx_to_zephyr_errno(u16 reg)
+I think this would mean that either we take care of the ARP
+enumeration in kernel, like honestly it really has to be done
+(regardless of this requirement), or we have to continue maintaining
+(and adding :-( ) the code in the drivers and board files that create
+the i2c-clients for these devices.
 
-Just having a name like this makes it clearer what is going on.
+Br,
 
-     Andrew
+-- 
+heikki
 
