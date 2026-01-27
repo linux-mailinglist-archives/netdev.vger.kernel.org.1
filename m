@@ -1,196 +1,200 @@
-Return-Path: <netdev+bounces-253669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBz3J9IreGl7oQEAu9opvQ
-	(envelope-from <netdev+bounces-253669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:06:58 +0100
+	id kPK/On0teGl7oQEAu9opvQ
+	(envelope-from <netdev+bounces-253670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:14:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1719B8F5FE
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:06:58 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD378F76F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 04:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 782883008C39
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:06:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F06043006204
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 03:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87172FD1B6;
-	Tue, 27 Jan 2026 03:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43E22FD695;
+	Tue, 27 Jan 2026 03:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IU47TRk1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrqzeG+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1B12F659F
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 03:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F723187FE4;
+	Tue, 27 Jan 2026 03:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769483213; cv=none; b=bX+4KFH2fW382yZtvG5WplOYhMaLLPui27Dmp/aocpW7+Piyk10WHwHVfjS7JcyNAE/mhvTH14O2AADHEnE5XFbYZhH+vxLfPSBDTywNue00RizpJ4HeDqCpV/RdfF9GfGNatanYE8yyR4rK6wG/29J7IKnHJvPPakDVaJbJJyE=
+	t=1769483521; cv=none; b=Wu46dK1qNwIe1/uo9KshcAR9OCKzbEIosFLacqvx7OwHl3VGbFSKMCZHRpQFhU1FHrQIH8qHZ7sDwWAv3ecO3EjQYjOgUaa/uJbGYQy4sEcPMjcyFTZWkMR9R5rSCbW/BHAi+/VgBoPq5bQUSYbbue+Kca6khIIvIOz6TbofxgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769483213; c=relaxed/simple;
-	bh=wYEcUgNuD+lPf2tV7/btjfFjqrI60S+N7nj/8yNW7Xo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cb8PfMvaAQnfOXbBjFq2kNNpnekv1JuNs3Svg7op0cMZATEn1kqGPM42YGT/DMrsSA+UeDHLPuutXreEz/195bPBGbtdWpqmwYQydim8pw51TjXiupNixhZZhtoGEdLTEVlOuoc4aMgo/zLq3y+tdzx/7eyaqArLKETQ5LR0F8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IU47TRk1; arc=none smtp.client-ip=209.85.128.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-79478ec4cf1so2125617b3.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 19:06:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769483211; x=1770088011; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XtcTamun/anyrF+4xJBkkNRqAbEPEhjvU9VCmmVXBeM=;
-        b=IU47TRk1K97pPGLqScYNmy4ieeG4lxxAnlN6s9T5ZO8WFpCbaJanHJru4scZJ/CbVl
-         SmKDr9/06OWQzItbsOcZI+uuqTGVB015Uq996Jb2kNYlwbiOMYACKf7wpL7on99kakp8
-         H415wOaurydKRZ4sP9l2enHfr+aDhBIQLMuW4lazcPnGyJSzVcerSo7WtZbSYgxzA2Oa
-         QO4OHhOH+mGDtYKpF+GBlnJl7CLwjkiQn5iSJ+HXjjPExlu8ajNLuurTzkaoirbPsbtK
-         DlHwskRWVw1SXw5/65rCtlEOiLMAt1gKOqNEs+NzjdM4s9c5TnNXAnoeWZKbrmDCYpXH
-         NxdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769483211; x=1770088011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XtcTamun/anyrF+4xJBkkNRqAbEPEhjvU9VCmmVXBeM=;
-        b=nZqlOcJOWr27kB/AFNGxg1V/VltqMncwglCxLOvZ4wHfI1bGTtGreB/MbdRRzPofXo
-         ZNo/evRIHgQkQeATvJ7nE+It5gZSDriQ3CIgSEjIU/tc4ASptYBoesMTWz7gYeg0aIuR
-         G79MJGp+RxMJIe+1svc4j78yYsztIy2eYflNC6AwyxQubjsNT2W0h6iWOrMAK8G/CW0k
-         S5yKyvsCohKiOHY9IUQD5Y26ZYGi5lcmQN4c557NUqLbLlsItrCcTFWKczytZtsQl76Q
-         Pr4pB07FdQ458jOfa+VMWQkbIoj/vwVcIWrced6tJNCvaY6BgpGyeRn4oO6/n82gwyJH
-         HYbw==
-X-Forwarded-Encrypted: i=1; AJvYcCXa8qvH0K44HZXvKlChbEzkBfYVVecSqdnyN73GxWvb/pCudpw1KB8G1Bn853pEPz5tlvndoIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwxuYnmwnZR00N7dXXzGUlcgveYfVOLtyDNMgECcDJXvbwySTS
-	ZSjgpDYRhrZT3Pq7MsQ3A3VH/2vP7KNhtC5l/7yEMZS/PYg5tqffhlXr
-X-Gm-Gg: AZuq6aIAvLoq5obI1yf8de/uPjDO+2QGDFaCuVu28XpBjnJ9Rwg/3AzktQixSrWt2zt
-	Lm4RijhovVA1A9mmiAk8z09NOjw1wE6fCXIkNCsNE02Bzlc7c0C90L1jREwfWG7kVdfTeqflIcN
-	DhfAiHSZ2wIxWOvGXSjnICXuIfEdBjZ4ng1QpJk7BVfGe/h9LTszHCG2MH9Ww8Y/XXY4bpwNuYM
-	pQh1pP55TIk8ZGAcMtq2Yw0I6CbrK0TtYgMrdbJi7A48b+zHoJGuzNir1S+4WyG9C3xPDGRnJO4
-	tIRGqmQhfX6gTsxFyFul647lOu+QL+G5BOo+x02tVjCUGVsd549H8v7oRTG6/LeEzC5y1SBncBX
-	2Jdmjw88+2yw7bSjhzq6aI2f1vnkHvko1e+4scDAvS5RT2T2XpukoTK5mWSjVzfk0f+ALQ8fj86
-	4L8YJOwjSIGYb11iWrMt0wTVH3aJQMhIjF+w==
-X-Received: by 2002:a05:690c:f02:b0:786:7a54:4635 with SMTP id 00721157ae682-7947ab3c172mr1656687b3.21.1769483211400;
-        Mon, 26 Jan 2026 19:06:51 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79475c0212asm5994517b3.2.2026.01.26.19.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 19:06:51 -0800 (PST)
-Date: Mon, 26 Jan 2026 19:06:49 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v10 4/5] net: devmem: document
- NETDEV_A_DMABUF_AUTORELEASE netlink attribute
-Message-ID: <aXgryaSx9CzFR7kv@devvm11784.nha0.facebook.com>
-References: <aXBnqYQdomzH9bT/@devvm11784.nha0.facebook.com>
- <20260121173512.748e2155@kernel.org>
- <aXGNhEKOhkTHbJvw@devvm11784.nha0.facebook.com>
- <20260121185021.446b00e8@kernel.org>
- <CAKB00G2xNvfiV6J3RzKDs=GHMGZ7L16+VKUYLGjpZdOrLnSYKA@mail.gmail.com>
- <20260121194615.33dc0812@kernel.org>
- <aXGib0OcNdHTLyZN@mini-arch>
- <20260126172646.2e5af2d4@kernel.org>
- <aXgjVb5PVqdPM10J@devvm11784.nha0.facebook.com>
- <20260126184440.755a55b2@kernel.org>
+	s=arc-20240116; t=1769483521; c=relaxed/simple;
+	bh=yUD4rZQgtNsdI6Yn488Qs5CLgJCqlAjCfXJ2v7y+RIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HEA4jcH/Y/4sThsngbhBFCJWqOH1BUtIeBajR9/KLhukX8L+qca2Hw6QYSbvAADi7aWOLPQtfKIeX3+qQm7Qku4b5jrU+fTrd+BLzF68aVhtmyhfN8JfEZijUd/XhY4BeWN/vxrCfN2ofkPMeFU+S7SeN1D66nwIRfcU1znKcQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrqzeG+0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03B6C116C6;
+	Tue, 27 Jan 2026 03:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769483521;
+	bh=yUD4rZQgtNsdI6Yn488Qs5CLgJCqlAjCfXJ2v7y+RIc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GrqzeG+0agZmusNDpcWTqXPFVIup9zuzKwJfwXYdu466vt/8kEe1iXgnEuM9Lw0ar
+	 cxU00Y7+dw/2CLEjdnqsm3crh9d902nSQrn6kI54f1rLPqkxtpbljLnGGjjUkh9gi0
+	 lHDSEyWGhxEQP3o1KBUDGAmhTwod8Etnivv7ZFdWxZgIfhcij8OFNHYyW9SQ3a/46X
+	 wx7W4mYP91IUFm8x720eyMEk2zQr9FukK2Xia0swHPEO95yY25bjI5LePDbvN9yAIw
+	 sQqsHqVb8qAaXigklT++ufxBAP1sunmX1tV1oXUvs/vtJz4gxrRRwPYpWMvOcSksl6
+	 uUyv42dpd7upg==
+Date: Mon, 26 Jan 2026 19:11:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
+Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>, Daniel
+ Golle <daniel@makrotopia.org>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] net: phy: air_en8811h: add Airoha
+ AN8811HB support
+Message-ID: <20260126191159.05b57b91@kernel.org>
+In-Reply-To: <20260126065749.1334867-3-bjorn@mork.no>
+References: <20260126065749.1334867-1-bjorn@mork.no>
+	<20260126065749.1334867-3-bjorn@mork.no>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126184440.755a55b2@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-253669-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,arndb.de,lwn.net,lunn.ch,fomichev.me,vger.kernel.org,meta.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,makrotopia.org,nxp.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-253670-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm11784.nha0.facebook.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1719B8F5FE
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[airoha.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2BD378F76F
 X-Rspamd-Action: no action
 
-On Mon, Jan 26, 2026 at 06:44:40PM -0800, Jakub Kicinski wrote:
-> On Mon, 26 Jan 2026 18:30:45 -0800 Bobby Eshleman wrote:
-> > > > I'm not a fan of the existing cmsg scheme, but we already have userspace
-> > > > using it, so getting more performance out of it seems like an easy win?  
-> > > 
-> > > I don't like:
-> > >  - the fact that we have to add the binding to a socket (extra field)
-> > >    - single socket can only serve single binding, there's no technical
-> > >      reason for this really, AFAICT, just the fact that we have a single
-> > >      pointer in the sock struct  
-> > 
-> > The core reason is that sockets lose the ability to map a given token to
-> > a given binding by no longer storing the niov ptr.
-> > 
-> > One proposal I had was to encode some number of bits in the token that
-> > can be used to lookup the binding in an array, I could reboot that
-> > approach.
-> > 
-> > With 32 bits, we can represent:
-> > 
-> > dmabuf max size = 512 GB, max dmabuf count = 8
-> > dmabuf max size = 256 GB, max dmabuf count = 16
-> > dmabuf max size = 128 GB, max dmabuf count = 32
-> > 
-> > etc...
-> > 
-> > Then, if the dmabuf count encoding space is exhausted, the socket would
-> > have to wait until the user returns all of the tokens from one of the
-> > dmabufs and frees the ID (or err out is another option).
-> > 
-> > This wouldn't change adding a field to the socket, we'd have to add one
-> > or two more for allocating the dmabuf ID and fetching the dmabuf with
-> > it. But it does fix the single binding thing.
-> 
-> I think the bigger problem (than space exhaustion) is that we'd also
-> have some understanding of permissions. If an application guesses 
-> the binding ID of another app it can mess up its buffers. ENOBUENO..
+On Mon, 26 Jan 2026 07:57:48 +0100 Bj=C3=B8rn Mork wrote:
+> The Airoha AN8811HB is mostly compatible with the EN8811H, adding 10Base-T
+> support and reducing power consumption.
+>=20
+> This driver is based on the air_an8811hb v0.0.4 out-of-tree driver
+> written by "Lucien.Jheng <lucien.jheng@airoha.com>"
+>=20
+> Firmware is available in linux-firmware. The driver has been tested with
+> firmware version 25110702
 
-I was thinking it would be per-socket, effectively:
+> +static int an8811hb_check_crc(struct phy_device *phydev, u32 set1,
+> +			      u32 mon2, u32 mon3)
+> +{
+> +	u32 pbus_value;
+> +	int retry =3D 25;
+> +	int ret;
+> +
+> +	/* Configure CRC */
+> +	ret =3D air_buckpbus_reg_modify(phydev, set1,
+> +				      AN8811HB_CRC_RD_EN,
+> +				      AN8811HB_CRC_RD_EN);
+> +	if (ret < 0)
+> +		return ret;
+> +	air_buckpbus_reg_read(phydev, set1, &pbus_value);
+> +
+> +	do {
+> +		mdelay(300);
 
-sk->sk_devmem_info.bindings[binding_id_from_token(token)]
+Did you mean msleep()? mdelay(300) is a lot of spinning.
 
-So sockets could only access those that they have already recv'd on.
+> +		air_buckpbus_reg_read(phydev, mon2, &pbus_value);
+> +
+> +		if (pbus_value & AN8811HB_CRC_ST) {
+> +			air_buckpbus_reg_read(phydev, mon3, &pbus_value);
+> +			phydev_dbg(phydev, "CRC Check %s!\n",
+> +				   pbus_value & AN8811HB_CRC_CHECK_PASS ?
+> +					"PASS" : "FAIL");
+
+AI code review points out on failure you just print a FAIL and carry on.
+Is this because this is what the vendor driver does? Or we know bad CRC
+FWs exist in the wild? A comment would be useful here..
+
+> +			return air_buckpbus_reg_modify(phydev, set1,
+> +						       AN8811HB_CRC_RD_EN, 0);
+> +		}
+> +	} while (--retry);
+> +
+
+> +static int an8811hb_load_firmware(struct phy_device *phydev)
+> +{
+> +	struct device *dev =3D &phydev->mdio.dev;
+> +	const struct firmware *fw1, *fw2;
+> +	int ret;
+> +
+> +	ret =3D request_firmware_direct(&fw1, AN8811HB_MD32_DM, dev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret =3D request_firmware_direct(&fw2, AN8811HB_MD32_DSP, dev);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_rel1;
+
+Please name labels after what they jump to. Per CodingStyle..
+
+> +	ret =3D air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+> +				     EN8811H_FW_CTRL_1_START);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+> +
+> +	ret =3D air_write_buf(phydev, AIR_FW_ADDR_DM,  fw1);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+> +
+> +	ret =3D an8811hb_check_crc(phydev, AN8811HB_CRC_DM_SET1,
+> +				 AN8811HB_CRC_DM_MON2,
+> +				 AN8811HB_CRC_DM_MON3);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+> +
+> +	ret =3D air_write_buf(phydev, AIR_FW_ADDR_DSP, fw2);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+> +
+> +	ret =3D an8811hb_check_crc(phydev, AN8811HB_CRC_PM_SET1,
+> +				 AN8811HB_CRC_PM_MON2,
+> +				 AN8811HB_CRC_PM_MON3);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+> +
+> +	ret =3D en8811h_wait_mcu_ready(phydev);
+> +	if (ret < 0)
+> +		goto an8811hb_load_firmware_out;
+
+TBH the gotos are a bit hard to read, maybe factor out the logic that
+can fail to a separate function? Then we can just capture ret here and
+fall thru; and the helper itself can return ret; directly.
+--=20
+pw-bot: cr
 
