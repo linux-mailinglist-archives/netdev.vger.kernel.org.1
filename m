@@ -1,193 +1,175 @@
-Return-Path: <netdev+bounces-253717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-253718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MFNOP1aeGkupgEAu9opvQ
-	(envelope-from <netdev+bounces-253717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:28:13 +0100
+	id yKVNKxFceGkupgEAu9opvQ
+	(envelope-from <netdev+bounces-253718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:32:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4768F90637
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:28:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20129069E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 07:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BEF0D303DAD7
-	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 06:26:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8C35E300845B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jan 2026 06:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B1D32AAB1;
-	Tue, 27 Jan 2026 06:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546A529A30E;
+	Tue, 27 Jan 2026 06:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MD2gHp1h"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hT5XgYAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFC12D7817
-	for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 06:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CD4227BA4;
+	Tue, 27 Jan 2026 06:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769495213; cv=none; b=DMrfUEfPiDbYmu8pAq/UzAfjimN6dknJpnl8g7dN/Mlzleq97MxDXcaj2pnDP/dVE/4EtFb7hOkw0ie6y6QgbCF0mjxj2A0RIKumtsc0RlPCv0Tqbe1T8csEVkJN1tk9iLwvTmSwaOoRvYcBlaR487nKQ88A2S0oP0eFLCBb0Xk=
+	t=1769495563; cv=none; b=OXtbhu6ZWnnpPHosw2p5ttcGQkfEiZnHgrMIFLauS7t39WYz/HGs6GqsFxVez+2NxVqK5tKZjwQgePFfTUS85TUjo7XfsjGy2Tc//PLw9NerM9uPUlJ3zKe+bMY85BgmcEaeARpKvA4GGEZSZqKCwL1NC8cxhXDi7+N3sGUCZLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769495213; c=relaxed/simple;
-	bh=3ZMwlMDdcZOeFSfV+NKz7u07M2f8knHtILiYPoeGklM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XMhQYWSvBEdLYL4NzyYPeRNVnHGJ7NMK5EecNfyBnw2n7KsyR66+Due1IdjMDKheNhAVFywbbtATbd3PZW4rJDhal5aAU9H6BbRCovTl1fTa6oElmX55Zs6jezlqqU5V4njUiyfsqbly42uxnvlPG9rYk10pQHVF8KIhmAPjb88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MD2gHp1h; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47ee07570deso40165495e9.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jan 2026 22:26:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769495210; x=1770100010; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SWD55duaNuQRMmraETqUDpWummec5E+B5H4qqlJvJhs=;
-        b=MD2gHp1hOmczY8b85TcOvXXekJLF/TgM/lINdHzTxvIuHa5eWNjcj6mt3FgXiMnO04
-         kEBNAerDLhInEdkhdrXBHgu6SHsb+eZLDAAidXux+OQdBBa0+PZlKFY+4voA4yooGW4M
-         ZYOnlf+JZH3pEcaHPcdYaiCnEpVccwsjIGIV0cejUKD1wvkVztfInWQ0H+TqfTBwhdIm
-         KWtcUsttNyuJ/vemqG0PBs/sN0R1QnQuUwUyF3xK6u6SAUnwGmHBpvwXNmTRfr5NqYkm
-         ndbFPznm2illzItGmOBAUC/R/ypmiZH4qtTpviytxNdBDc/rc8eQzqbhXNRWZMFw2EBG
-         yM4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769495210; x=1770100010;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SWD55duaNuQRMmraETqUDpWummec5E+B5H4qqlJvJhs=;
-        b=ktelc2QyS9UU2sP15oqIo5wCBGISwjTZQfOxG8+xWBEHSI+rXLusGXLe0ZAKLZIvb7
-         aqHSxo8sADZo6jTBx8WIMfWtYeR4xC3ZFej7U8QeMqWY53mahjVOXW9GahcFpb7fL4Yw
-         EtuwbdsfTr2IR1I2DCYbtanyuhXHyokn/8q1LzVZiz83xMRz6mPeeOn172xNDEWMFKqh
-         IizHtrzF8w1Cjpo0VPtGEsSqkYosn/DN6VR9x28axWG8N5GUasX9EUoHdyMJOvhWtPGf
-         I7h1YOpZ8OPKbxTc6ASwyN8pTOElLPkn/vp+kNtduZ2xWiF2HEgF23JPN0eRfs1mPqP4
-         +ZIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhy8qgK4dz9OdPgYK+HCi/9nkNcHBYXFc5Lz+kjTTRY2vBXA4GlkriSfJpWjz5aPDp4i7nYmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmzyU6E2YwEJJHD3s5Rzlkm4qJANHla0QEOeCH5uWyyLaicd9W
-	bi5yuvKKlYYqwNPyREc7KSN5lOzIcdgxXFTYL+0i98upX2qm7eQcd1s+
-X-Gm-Gg: AZuq6aJRm6X8t3C1VfVPiO2VbC3cOvk1kR/FC2Jvq9OyELXZVwfR/6WLbdByojvbZtL
-	2hdeXkVr+lLH3Vp+7If6RX99gR5I8o/AsNwoltoRrrlq5mtr679EIu+L+vQE5lrXTEC+BHSo1mH
-	A62EqwMSRKFVZ8YhJufukJwSO4hqSyyTObF7rZuX62xlu/Lf932iwv1Ry/EXSVxrU117nX/eGzP
-	JmvdJI4KraenYMhqEapO2h1gNhVvxFpOyspa7SAeur6faj2FByEOuh4chrnntr91nYmTwiQdv2v
-	dp6yl3QRfHm8fhAyp1bCe1gY2uly0Wry3hqv0mhWGEZOEntyG3X7M5R4EPjx6qais8Cxw7y65Lm
-	9iUKIJQYOCerU8vXdhnrGElsIVcFqMpD4iqMr3AbxI9P9vtcF092LOhXNktECcq/5LcoTxEi0DY
-	jIg4PHf+qBfdTggWx2/uFtjR1d5EVd6WeerDc=
-X-Received: by 2002:a05:600c:8719:b0:480:1aae:676c with SMTP id 5b1f17b1804b1-48069c78706mr7026885e9.18.1769495209781;
-        Mon, 26 Jan 2026 22:26:49 -0800 (PST)
-Received: from [10.221.205.245] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c37420sm42358365e9.9.2026.01.26.22.26.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jan 2026 22:26:49 -0800 (PST)
-Message-ID: <85b9a197-9957-4646-8f97-5aa4d90eb415@gmail.com>
-Date: Tue, 27 Jan 2026 08:26:49 +0200
+	s=arc-20240116; t=1769495563; c=relaxed/simple;
+	bh=8w4CPGEvc7t+CmAt+3IEgYbYBOA/2MelGC9jLPHp0bg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iLxf+xWsAnW1FKmNlg5Y+XgFaApl1fZfz/tYsXpzt9CgT+e+GQVEf2kXziahhVBkszBG24dDOx4zjJui4nY+I2X2FobC4AO7FFZeYxxqBp//FZ+l5sMkj5mdmdEJCC6m5F2OxBV6tZ1ozeOHBTp5mAdKubqPMkMZFutFvn9iulY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hT5XgYAG; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60QEUFAb380323;
+	Mon, 26 Jan 2026 22:32:19 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=tpkRTpawKAYYxED8L6kAasuS9
+	3UkRTtR3eHoDFF7xf0=; b=hT5XgYAG84J9omhiieWEOCBIJWGYNcAYulsj3eMpj
+	AVSh01othNbhgzjEDcvgaXkKWr+inwEaKSPT+aa1/agK2kSVnWeQmtN1bk7VYmFz
+	96L0J76VshZC/5fVw9xTUTLXHNQPVbUIct/KRiVRoc1fDLAnmErwqfRR2Qwq/9qd
+	Mbyi4YVHeQiNEziRot3cR9G5A+0b4Ml54ZZ8oh1s1h4UkzeMdf7+XQUA/2TQ0Upn
+	YGuOI5uUOL/7tWqUuitzaDyJztdJtjHYADiE7ysRXLsOAe5fAg0v31um0avFnTl4
+	8silH55c9aNNrV0ymWNbMbFZDPBKLYrVB1S/yS4EOfEIg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bxa2y9u77-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Jan 2026 22:32:19 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 26 Jan 2026 22:32:35 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 26 Jan 2026 22:32:35 -0800
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 6F6333F70B1;
+	Mon, 26 Jan 2026 22:32:14 -0800 (PST)
+Date: Tue, 27 Jan 2026 12:02:13 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <davem@davemloft.net>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <lcherian@marvell.com>, <sbhatta@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <bbhushan2@marvell.com>
+Subject: Re: [net-next PatchV4 2/2] Octeontx2-pf: Add support for DMAC_FILTER
+ trap
+Message-ID: <aXhb7fZHRh7kB1fd@test-OptiPlex-Tower-Plus-7010>
+References: <20260123104731.2710019-1-hkelam@marvell.com>
+ <20260123104731.2710019-3-hkelam@marvell.com>
+ <20260125142412.20b37981@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx4: fix MAC table total count corruption in
- __mlx4_unregister_mac()
-To: Kery Qi <qikeyu2017@gmail.com>, tariqt@nvidia.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: jackm@dev.mellanox.co.il, ogerlitz@mellanox.com, monis@mellanox.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260122183906.2015-2-qikeyu2017@gmail.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260122183906.2015-2-qikeyu2017@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260125142412.20b37981@kernel.org>
+X-Proofpoint-GUID: mfTZjBaGwnmIEoY7qOyL0TmoWgfrEGe3
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI3MDA1MiBTYWx0ZWRfX5Ke/3ROdie94
+ vHKrKEO6Qn0YFcG2C51eKHUHvnrhrJfzeMSlzxr+Y58Zp5Slju5ejlTKpyoNs8xJSOx/sbHBbUz
+ mLHL9Jo/BYK4VWeT/xum0dtGba3yMZwdn3I9d26/ZaNiaPnzx0cRzpOK9mXSUYFqCfYAfAEzi0S
+ i4vbaLSQhNRHw0wMP8civk00dDm9dG/z/mGdffZ+KU9FoyztX9Nfwk37TV5tzHkX11mygjumX0I
+ nNlOmUjvbdt2oovC2chxzyFpGXnB1Z+qg86FkWFWXRDCtXTE+qmNs8C4z7jf3LvX37MWS7v2iPr
+ 54i8qVUVo86T/x23UPg0vJsaKBOtmJWiBkNcXTmbaG+GbJOsxJ5xnyv/cS9IS+fh5AHshlQsral
+ io2Nwjx9cbErQA0VR3dlGyhRFZLASJfwete6aTYcjL9F6kJ6X4J3OeTLYXMGU9zMXuZ8hxYPco5
+ IWSAFyUUwZNrnKLxQBg==
+X-Authority-Analysis: v=2.4 cv=CY8FJbrl c=1 sm=1 tr=0 ts=69785bf3 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=UKaYxVDTM21LO6YuAbgA:9 a=CjuIK1q_8ugA:10
+ a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: mfTZjBaGwnmIEoY7qOyL0TmoWgfrEGe3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
+ definitions=2026-01-27_01,2026-01-26_01,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-253717-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-253718-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,nvidia.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ttoukanlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[hkelam@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4768F90637
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: E20129069E
 X-Rspamd-Action: no action
 
-
-
-On 22/01/2026 20:39, Kery Qi wrote:
-> In __mlx4_unregister_mac(), when operating in mf_bonded mode
-> (SR-IOV with bonding), it appears that the code might be incorrectly
-> decrementing table->total instead of dup_table->total when cleaning
-> up the duplicate table entry.
+On 2026-01-26 at 03:54:12, Jakub Kicinski (kuba@kernel.org) wrote:
+> On Fri, 23 Jan 2026 16:17:31 +0530 Hariprasad Kelam wrote:
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > @@ -3282,6 +3282,10 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> >  	if (err)
+> >  		goto err_mcam_flow_del;
+> >  
+> > +	err = otx2_devlink_traps_register(pf);
+> > +	if (err)
+> > +		goto err_unregister_dl;
+> > +
+> >  	/* Initialize SR-IOV resources */
+> >  	err = otx2_sriov_vfcfg_init(pf);
+> >  	if (err)
+> > @@ -3314,6 +3318,8 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> >  	otx2_sriov_vfcfg_cleanup(pf);
+> >  err_pf_sriov_init:
+> >  	otx2_shutdown_tc(pf);
+> > +err_unregister_dl:
+> > +	otx2_unregister_dl(pf);
 > 
-> If this is the case, it would cause the primary table's total counter
-> to be decremented twice (once for itself and once when it should
-> decrement the duplicate table), leading to counter corruption.
-> Over time, table->total could become negative, which would
-> break the "table->total == table->max" fullness check in
-> __mlx4_register_mac().
+> Hm, you're still not calling otx2_devlink_traps_unregister()
+> anywhere in this unwind ladder. If the missing otx2_unregister_dl()
+> is a pre-existing bug please send a separate fix (to net?) to address
+> that, and then this series on top.
+>
+  ACK, will send "otx2_unregister_dl" as a separate patch.
+> >  err_mcam_flow_del:
+> >  	otx2_mcam_flow_del(pf);
+> >  err_unreg_netdev:
+> > @@ -3514,6 +3520,7 @@ static void otx2_remove(struct pci_dev *pdev)
+> >  	/* Disable link notifications */
+> >  	otx2_cgx_config_linkevents(pf, false);
+> >  
+> > +	otx2_devlink_traps_unregister(pf);
+> >  	otx2_unregister_dl(pf);
+> -- 
+> pw-bot: cr
 > 
-> The registration path correctly increments both counters:
->    ++table->total;
->    if (dup) {
->        ...
->        ++dup_table->total;
->    }
-> 
-> However, the unregistration path seems to have a typo:
->    --table->total;
->    if (dup) {
->        ...
->        --table->total; // Should this be --dup_table->total?
-> 
-> Fixes: 5f61385d2ebc2 ("net/mlx4_core: Keep VLAN/MAC tables mirrored in multifunc HA mode")
-> Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
-> ---
-
-Hi Kery,
-
-1. Commit message is phrased as an RFC, with questions and uncertainty.
-Please re-phrase.
-2. Do you hit an actual failure here? What are the steps? What error do 
-you see?
-
-Other than that, code LGTM.
-
->   drivers/net/ethernet/mellanox/mlx4/port.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
-> index e3d0b13c1610..6d0295c471da 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/port.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/port.c
-> @@ -410,7 +410,7 @@ void __mlx4_unregister_mac(struct mlx4_dev *dev, u8 port, u64 mac)
->   		if (mlx4_set_port_mac_table(dev, dup_port, dup_table->entries))
->   			mlx4_warn(dev, "Fail to set mac in duplicate port %d during unregister\n", dup_port);
->   
-> -		--table->total;
-> +		--dup_table->total;
->   	}
->   out:
->   	if (dup) {
-
 
