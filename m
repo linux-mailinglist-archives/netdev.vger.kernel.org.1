@@ -1,244 +1,216 @@
-Return-Path: <netdev+bounces-254245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254246-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJbfDvUGemlE1gEAu9opvQ
-	(envelope-from <netdev+bounces-254245-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:54:13 +0100
+	id EG+MOusHemn11wEAu9opvQ
+	(envelope-from <netdev+bounces-254246-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:58:19 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85533A1A25
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B50A1AF2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:58:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4FF95308846A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:50:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77B8F300577C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8207834F253;
-	Wed, 28 Jan 2026 12:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D483A2868B0;
+	Wed, 28 Jan 2026 12:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OMK/xqpk"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="MARtANKl";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="/4SFIFVt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE3B350A0F;
-	Wed, 28 Jan 2026 12:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769604647; cv=none; b=mYn2P9WVQURHFSJBd6jEiuz5iRC7kRQFcoJm+boQLVC16dUbRXT5qMvfADqBQkAz93Zs/SzEGrkxBSLmJRfJpgZbMXky+xdJOapn+G0g/YPu8Uvh0NJQ+viojmVjEc+eavOgrSW4Hdduw5CFkAo60YgGOx34x+r0kCRG39HcHto=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769604647; c=relaxed/simple;
-	bh=yWDW3QkG+QPR1rIiRsOy8Q9Ai5y5RyeuxRbLeZwLASM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uk1zEmcPq6y71THbLxA3WKUoA0iyB+Xnl7rUe5F/ebDLu+kWa0uodjTH6mle7nduEUupT/pIT691N5Kj9S4vijhKe31sBwuD6X5YBOsMUE9C19QcVda46yWmY71fegkbGwz8xdKw89o6v4JjQGQ7t5dZuQuE2xczJWJBzPv1i3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OMK/xqpk; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769604634; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=IhGx0I6bZoii/1oPBzX5dugB47PlvVIILrTKQWUizSs=;
-	b=OMK/xqpki5+yujBe3zv6DGWWo5CGBWUxstlk5jsUtgYj/UGTHqcCNdtPLTGRiZ7yQRkiYcmfBmpofzG6RRHLff+lly7y7UHI+GWu2ZK4fXyXjZYxgwQgpPA6sysW8uv2CFYDkNUueiLecCs9L2p48IJfaaarJb3IGWo54GUXx5g=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wy3RrJO_1769604633 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 28 Jan 2026 20:50:33 +0800
-Date: Wed, 28 Jan 2026 20:50:33 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Leon Romanovsky <leon@kernel.org>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Liu Jian <liujian56@huawei.com>,
-	dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	guangguan.wang@linux.alibaba.com, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
- smc_ib_is_sg_need_sync()
-Message-ID: <20260128125033.GA116672@j66a10360.sqa.eu95>
-References: <20250828124117.2622624-1-liujian56@huawei.com>
- <20250909094532.GD341237@unreal>
- <20260126044501.GA18724@j66a10360.sqa.eu95>
- <20260127120004.GT13967@unreal>
- <20260128055051.GA79132@j66a10360.sqa.eu95>
- <20260128112122.GE12149@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145481F19A;
+	Wed, 28 Jan 2026 12:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769604980; cv=pass; b=g6hh5kdEPSQYF7ymWsAPFuiOfQvx5ZB4LT88BU4/qqo29PAb5WTUBGHEo+Ipt08Y0vrhyjzDlBucNQ/ukKNPMPl7kpl5DmuWQiNCEt/vPedFWSK+u9vNfWg7N9j8JzrqxHUlfXZPk0HgNenOYxMytqVYP8cc4MBpr8vzYk5Fw7o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769604980; c=relaxed/simple;
+	bh=7f1b7lLSt7KzsBiMqFQxyddM/EoABeMExoSua98AEI8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=egMt0Pv8fO6n8b/GteZ4D74KzRxtvUCe/+zs4r/UD0ZWMBP0r7Zwy2/D8NLQiY185m4VtbttDdmGeMmh1SRwOJB99731LAZsNsn380PB60in6nXbwEvV3UIeb7+N91/ZyrY6CHRILvxkOlUuLFJ5tODMNsO94FNaobYvIE7DmbI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=MARtANKl; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=/4SFIFVt; arc=pass smtp.client-ip=85.215.255.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1769604785; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=h0Q4KxSWZqZ+ZA6qCN16vafwiyWE0ioFgHOp/+bv0L1qUjYBfXbBPtoGuEeoLi0Ig3
+    nHvRk/QF+Dsh+elQ9zbYBICnfXzJS5rn2lO4L6ndQ/emaX0OTOCAkO3driESVRORmnpn
+    44G9AByhAFQCgZdYBURPccuvhZxsbvMAz6jaGR6jUiOOM9j59sUtHkwucd05/udZdFUt
+    tzURlsQUXQ5tDvcqapCuNLzvz+e4kr/7MQE8+LzcGou67W707bp4IgNGuXeOIcNsd2Y6
+    jwKlpUBFcwqu1oYiyuXME3jBlqRofRYU+FhwdDGFuXXjDE6V9H4yhybYe2RkWWef0CWe
+    JkFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1769604785;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Wfcjn4ErLr/aSFLRMwtSn9aEKFoYfsMLh4tx9/f3COM=;
+    b=Vr3X1gnUCmPFezcO/AWOObuUWvFTj4j3xx/cjxnf72cADWfA7rCoOZPLc+fmQFYktr
+    brj0tv9zW60hpEVhnT26IiKVz2hpnPmj1CyPYqYGROThkToWr2Dtc0JBaPvUl3oZf2lV
+    7TxR1U3IzQYRn22HUzSrq6IdMXpSVwa7UqssgbNLu9Iew34l1CPnYvldShyRUPltuZqB
+    +AicnS9Ik9ndUb+VuqvDZbcURa2AjGAymKTkuWSUzFEkz2WFaHxUNT5/b4p/kykJTeIr
+    kfzhqHScU8EsITq0UdcNBLF94oaC5q93TXhUaW0hOy45AJi9lzRvk3mKB0ZfzbPFDfiu
+    aRoQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1769604785;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Wfcjn4ErLr/aSFLRMwtSn9aEKFoYfsMLh4tx9/f3COM=;
+    b=MARtANKlBYR/QOLetF0i980OQM/zUo6KH7HkC4B+dSkrkMwE/tFf1SJZmhpuUC29nH
+    Fnu+daTpYbQFNz8Bl8/jyNU7fHkJrqsALa7HlvyofrBf92gKwUILEdhPyrBh2R3xxL4M
+    nRcUY0Qq0GEbSubqFpClmYv+hUlYRcFxZhzoanEZKzuFFMkh10OLS3wZNj4sg7RynWM5
+    0q7W3iuokN6+PKk3fwRnsHJ9Zqz7VU1BV5/wrdH0X2zisrszVzB8VpZYNLF77P0oh3kv
+    jfGvcnwjuw1EWn+UghkqrbIJsGXHpBtzv1u/5zYfvKPDABvVxYYJ92FI+23W9sDWTXXJ
+    a2MA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1769604785;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Wfcjn4ErLr/aSFLRMwtSn9aEKFoYfsMLh4tx9/f3COM=;
+    b=/4SFIFVtjVL5c9IhmajFZpmZ3n7m8bdVLI+3eXEh9aEaNy55MESu+Q0nUqLTUyjSlO
+    LEc4yrQUHtH7fX3quWDg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8YjX10Q=="
+Received: from [IPV6:2a00:6020:4a38:6810::76e]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b20SCr4mSU
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 28 Jan 2026 13:53:04 +0100 (CET)
+Message-ID: <4909066f-cf9c-49ac-b02f-d2e16908bbd9@hartkopp.net>
+Date: Wed, 28 Jan 2026 13:52:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260128112122.GE12149@unreal>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
+To: Florian Westphal <fw@strlen.de>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-can@vger.kernel.org
+References: <20260125201601.5018-1-socketcan@hartkopp.net>
+ <20260127174937.4c5fc226@kernel.org> <aXn0iLuRqdOdcIBN@strlen.de>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <aXn0iLuRqdOdcIBN@strlen.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[hartkopp.net,reject];
+	R_DKIM_ALLOW(-0.20)[hartkopp.net:s=strato-dkim-0002,hartkopp.net:s=strato-dkim-0003];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[hartkopp.net:+];
+	TAGGED_FROM(0.00)[bounces-254246-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254245-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,j66a10360.sqa.eu95:mid,linux.alibaba.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+]
-X-Rspamd-Queue-Id: 85533A1A25
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[socketcan@hartkopp.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 29B50A1AF2
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 01:21:22PM +0200, Leon Romanovsky wrote:
-> On Wed, Jan 28, 2026 at 01:50:51PM +0800, D. Wythe wrote:
-> > On Tue, Jan 27, 2026 at 02:00:04PM +0200, Leon Romanovsky wrote:
-> > > On Mon, Jan 26, 2026 at 12:45:01PM +0800, D. Wythe wrote:
-> > > > On Tue, Sep 09, 2025 at 12:45:32PM +0300, Leon Romanovsky wrote:
-> > > > > On Thu, Aug 28, 2025 at 08:41:17PM +0800, Liu Jian wrote:
-> > > > > > BUG: kernel NULL pointer dereference, address: 00000000000002ec
-> > > > > > PGD 0 P4D 0
-> > > > > > Oops: Oops: 0000 [#1] SMP PTI
-> > > > > > CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
-> > > > > > Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-> > > > > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> > > > > > Workqueue: smc_hs_wq smc_listen_work [smc]
-> > > > > > RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
-> > > > > > ...
-> > > > > > Call Trace:
-> > > > > >  <TASK>
-> > > > > >  smcr_buf_map_link+0x211/0x2a0 [smc]
-> > > > > >  __smc_buf_create+0x522/0x970 [smc]
-> > > > > >  smc_buf_create+0x3a/0x110 [smc]
-> > > > > >  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
-> > > > > >  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
-> > > > > >  smc_listen_find_device+0x1dd/0x2b0 [smc]
-> > > > > >  smc_listen_work+0x30f/0x580 [smc]
-> > > > > >  process_one_work+0x18c/0x340
-> > > > > >  worker_thread+0x242/0x360
-> > > > > >  kthread+0xe7/0x220
-> > > > > >  ret_from_fork+0x13a/0x160
-> > > > > >  ret_from_fork_asm+0x1a/0x30
-> > > > > >  </TASK>
-> > > > > > 
-> > > > > > If the software RoCE device is used, ibdev->dma_device is a null pointer.
-> > > > > > As a result, the problem occurs. Null pointer detection is added to
-> > > > > > prevent problems.
-> > > > > > 
-> > > > > > Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
-> > > > > > Signed-off-by: Liu Jian <liujian56@huawei.com>
-> > > > > > ---
-> > > > > > v1->v2:
-> > > > > > move the check outside of loop.
-> > > > > >  net/smc/smc_ib.c | 3 +++
-> > > > > >  1 file changed, 3 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> > > > > > index 53828833a3f7..a42ef3f77b96 100644
-> > > > > > --- a/net/smc/smc_ib.c
-> > > > > > +++ b/net/smc/smc_ib.c
-> > > > > > @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
-> > > > > >  	unsigned int i;
-> > > > > >  	bool ret = false;
-> > > > > >  
-> > > > > > +	if (!lnk->smcibdev->ibdev->dma_device)
-> > > > > > +		return ret;
-> > > > > 
-> > > > > Please use ib_uses_virt_dma() function for that.
-> > > > > 
-> > > > > It is clearly stated in the code:
-> > > > >   2784 struct ib_device {
-> > > > >   2785         /* Do not access @dma_device directly from ULP nor from HW drivers. */
-> > > > >   2786         struct device                *dma_device;     
-> > > > > 
-> > > > > Thanks
-> > > > > 
-> > > > >
-> > > > 
-> > > > Hi Leon,
-> > > > 
-> > > > Sorry for the late reply, I just noticed this and thank you for your review.
-> > > > I agree completely with your feedback: we should not be accessing ibdev->dma_device
-> > > > directly. Following your advice, replacing the
-> > > > 
-> > > > 	if (!lnk->smcibdev->ibdev->dma_device)
-> > > > 
-> > > > check with ib_uses_virt_dma() is straightforward and absolutely the correct
-> > > > thing to do for that part of the logic.
-> > > > 
-> > > > However, this has led me to a further challenge. The main purpose of the
-> > > > smc_ib_is_sg_need_sync() function is to get the result of dma_need_sync().
-> > > > This means that even after correctly using ib_uses_virt_dma(), the function
-> > > > still needs to call dma_need_sync(ibdev->dma_device, ...), which forces us
-> > > > right back into the direct access pattern we are trying to eliminate.
-> > > 
-> > > I would like to challenge the use of dma_need_sync() in smc_ib.c. From
-> > > what I see, it is used to avoid calls to dma_sync_single_*_device()
-> > > which will be NOP anyway in that case.
-> > > 
-> > > Why did you copy that logic from XSK?
-> > > 
-> > 
-> > You are right. I just noticed that the DMA has already introduced a
-> > similar optimization.
-> > 
-> > The check in SMC was added back in 2022, while the DMA introduced
-> > the internal "skip redundant sync" mechanism in 2024 (commit f406c8e4b770).
-> > 
-> > Given this, it might be better to simply remove this redundant check
-> > from SMC now, which would also eliminate the need for direct access to
-> > ibdev->dma_device. I need to perform some tests to confirm this.
-> 
-> It may also be worth looking at this series from Chuck, which reuses the
-> recently introduced DMA API to remove the SG conversions:
-> https://lore.kernel.org/linux-rdma/20260128005400.25147-1-cel@kernel.org/
-> 
-> You might be able to apply a similar approach and drop SG from your
-> datapath entirely.
-> 
-> Thanks.
-> 
 
-Thanks for the pointer. I'll take some time to look into this series and
-see if we can adopt a similar approach.
 
-> > 
-> > Thanks for your feedback.
-> > 
-> > D. Wythe
-> > 
-> > > > 
-> > > > Since the RDMA doesn't currently offer a helper for this "check" functionality,
-> > > > I'd like to propose adding one. What are your thoughts on a new helper like
-> > > > the one below, which would allow us to solve this cleanly?
-> > > > 
-> > > > /* ib_verbs.h */
-> > > > static inline bool ib_dma_need_sync(struct ib_device *dev, dma_addr_t dma_addr) {
-> > > > 	return !ib_uses_virt_dma(dev) && dma_need_sync(dev->dma_device, dma_addr);
-> > > > }
-> > > 
-> > > If we're discussing wrappers, it's likely better to provide a wrapper around
-> > > dma_sync_sg_for_cpu() for use in ib_dma_sync_sg_for_cpu(), rather than
-> > > open‑coding the logic.
-> > > 
-> > > Thanks
-> > > 
-> > > > 
-> > > > Best wishes,
-> > > > D. Wythe
-> > > > 
-> > > > 
-> > 
+On 28.01.26 12:35, Florian Westphal wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+>> This is fine. Wish we could make md_dst work, since skb_ext still burns
+>> a bit in the skb (last extension bit in fact, next user will have to
+>> bump the filed size). And you very much do not route these frames,
+>> so dst would work perfectly fine. But whatever.
+> 
+> An alternative would be to 'union' extensions that cannot be
+> active at the same time.  Something like the br netfilter extension
+> for example.
+> 
+> When the first extensions were added all of them could be enabled
+> at same time, but I think that has changed.
+
+IMO we do not need to 'union' extensions as long as automatic enum 
+calculation does it job with the enabled Kconfig options.
+
+My only concern would be distribution kernels that have an all-yes 
+config policy ;-)
+
+Btw. while we are at it ...
+
+With my patch set the enum would now look like this:
+
+#ifdef CONFIG_SKB_EXTENSIONS
+enum skb_ext_id {
+#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+         SKB_EXT_BRIDGE_NF,
+#endif
+#ifdef CONFIG_XFRM
+         SKB_EXT_SEC_PATH,
+#endif
+#if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+         TC_SKB_EXT,
+#endif
+#if IS_ENABLED(CONFIG_MPTCP)
+         SKB_EXT_MPTCP,
+#endif
+#if IS_ENABLED(CONFIG_MCTP_FLOWS)
+         SKB_EXT_MCTP,
+#endif
+#if IS_ENABLED(CONFIG_INET_PSP)
+         SKB_EXT_PSP,
+#endif
+#if IS_ENABLED(CONFIG_CAN)
+         SKB_EXT_CAN,
+#endif
+         SKB_EXT_NUM, /* must be last */
+};
+
+=> SKB_EXT_NUM is then 7
+
+When we (correctly) add another extension, SKB_EXT_NUM would become 8 
+which is still fine IMO. But then the BUILD_BUG_ON check in 
+skb_extensions_init() would need the below fix, right?
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 648c20e19038..609851d70173 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -5156,11 +5156,11 @@ static __always_inline unsigned int 
+skb_ext_total_length(void)
+         return l;
+  }
+
+  static void skb_extensions_init(void)
+  {
+-       BUILD_BUG_ON(SKB_EXT_NUM >= 8);
++       BUILD_BUG_ON(SKB_EXT_NUM > 8);
+  #if !IS_ENABLED(CONFIG_KCOV_INSTRUMENT_ALL)
+         BUILD_BUG_ON(skb_ext_total_length() > 255);
+  #endif
+
+         skbuff_ext_cache = kmem_cache_create("skbuff_ext_cache",
+
+
+Should I send a proper patch?
+
+Best regards,
+Oliver
 
