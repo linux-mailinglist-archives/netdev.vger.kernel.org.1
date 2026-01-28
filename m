@@ -1,163 +1,195 @@
-Return-Path: <netdev+bounces-254452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gE4fK4J5emkC7AEAu9opvQ
-	(envelope-from <netdev+bounces-254452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:02:58 +0100
+	id OGDuMtl5emkC7AEAu9opvQ
+	(envelope-from <netdev+bounces-254453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:04:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A76A8E60
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:02:58 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B34A8EAC
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D28DD302D101
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:02:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 222E1300728F
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB375374746;
-	Wed, 28 Jan 2026 21:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9964A376BF2;
+	Wed, 28 Jan 2026 21:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9sud/Oj"
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="mydLqzA+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C477528642D;
-	Wed, 28 Jan 2026 21:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769634173; cv=none; b=M22KiEoWX8hFjA9+TydzQnNPCG5fZaDRvJnXZNFnFqDTQ8YfQG4MDgiYPlwf6la02jj4hXsaoDP3uIP2k4qdST9gytLdwqHZyZUp7fO7nzEpD8NqUcayo5iEynAl2TeSan6F2FiLJdNcM5XCsvutv40hPa22cOKwZ4k2BARaZR4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769634173; c=relaxed/simple;
-	bh=Em+1CFVsGAsUe/PMauooL4Cb4HFJrPLZWLtlAhkW/CA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=elDRcheAB02fdeW0Fhcreqb1CmlEGHJcpdkeaCekyu1oIZRpbibeizHjTAhoIdo3GGwRhsN/Wb9Q2G1DXW4+q91MQ+8Nq7Yi+Bg4irPKmFfF7U7UkTelX12Oy7zHXh8Am0UV7SgsPOExl8AwJOmJ86YPQClpFKWPrG7bgmFuFg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9sud/Oj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9049C4CEF1;
-	Wed, 28 Jan 2026 21:02:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769634173;
-	bh=Em+1CFVsGAsUe/PMauooL4Cb4HFJrPLZWLtlAhkW/CA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L9sud/OjQlo/A8mfYVJG4RYoCHr0nhu15eOZV8viCBJwMyvP70iv5PR2+yhazk3UH
-	 8r9nOrBDvFeEtCKI0Pxd7lB4HmSf9Y4kCqCaF2uyICd/VipWRTepNSW3SVTtgmKRSg
-	 9jlyZD3nNL/djj9ed/Ic1JMP32OVh/NddE/JTxt5zzrSOsRiWA1XugXm8DYPde+73e
-	 4HgePSHGO0Peu97Z1U/vMnJ6/KZs5aKjw3G5m9oM/GnRs8f1Yu/1la43tFdlHnevBp
-	 FPLBMoFxCIFt2CJuj7me5PshlVjXA+mGBCyQfySrEZjO3R9ZeqLzGIRwjXAG1ZLNu1
-	 mNF9JwPDdqq7A==
-Date: Wed, 28 Jan 2026 22:02:48 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Linux Doc Mailing List
- <linux-doc@vger.kernel.org>, "Mauro Carvalho Chehab" <mchehab@kernel.org>,
- <bpf@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Randy Dunlap <rdunlap@infradead.org>, Shuah Khan
- <skhan@linuxfoundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [Intel-wired-lan] [PATCH v2 23/25]
- tools/lib/python/unittest_helper.py
-Message-ID: <20260128220248.7a0d5b9f@foz.lan>
-In-Reply-To: <5b8fe4ae-25a2-4967-bb83-a52dd5907951@intel.com>
-References: <cover.1769617841.git.mchehab+huawei@kernel.org>
-	<f370f2a0dfcaa679c9969488c908eaac82026031.1769617841.git.mchehab+huawei@kernel.org>
-	<5b8fe4ae-25a2-4967-bb83-a52dd5907951@intel.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0B1374181
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 21:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769634258; cv=pass; b=ihLry1lTx/FpYxGnMxZCOvtmmu8N1DmVzsjFvnTD5tztfVpuyHPqr+c8fCuC2qnKbmF+t2LSyQJ2CDhecT2FOK80hKpWNMihzJFA0vIT4Zb03mF3Dyw0f9ZKl0GIOzrpluawdOYzLzfEllFlHURoC4Uqu6Yr/QqNsdz90aiKyaE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769634258; c=relaxed/simple;
+	bh=BygABrZs+wt84ZiF/+S94JaIE9wJlUmfQCMn9on8jek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=APJzpBu5t45RftxObxWfK9jPe79R+X5pJn7uPKEf+Iu3CAufpJE856CRwiA8mAOay+KCs7i3RPku2jw3RUBnNqNVDMUeUWA32LBKDPgSNOeRoA5IET+LoXUfTCwYzEDalnMzna/rZchrcTQOUuiEV/z41JuXdqrPfi0NpWyl2p8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=mydLqzA+; arc=pass smtp.client-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-2b71515d8adso332612eec.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 13:04:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769634256; cv=none;
+        d=google.com; s=arc-20240605;
+        b=I/lDmjzdjOVNXNdkbQQZkI9GZ/P1beuJMOoBc618Yw51Yv4T9sGVcbylgX3OIcV5zD
+         wYIKD26+IDKkFGTS2Zxt0r5CpKcvoLOPyD9z3VppAPq0ZOkPbzqCYEF4NXm2z0QvmqVt
+         QXcXUlCwntHTGaUYxFdyLC6VA4xIhRrrAINTbEplTgdlXH1ipjb9SH4hII1c+FrtbatG
+         8RCfm47KlD9Td+1dnH44GK43xyj5MSKb34Xr7lP9gl+ss1IrMsL9DTBbfRYxlQ44Tjw4
+         XCGMDLvuT1I+MWhjk93XwYjIX2XerTjRl/JFFfixogMUlNLhy5zgrnwrTw7mdkMgmp9/
+         ks3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=A+V9f1KpRq1EFF7gJxUeGto+TPrHemnbiENvZwSi9QY=;
+        fh=E70+97TVQv50oxdXS3uCo7ZTykUJbEsNEWFehBDzmT8=;
+        b=bSxjilFGld5H2qJhgb5GxrvMEBbuavvnXLFtC2HYyE9I+Cd9mlFroEcIciKwxHZN1B
+         1X50MeeVz68N2srvsucUtAzfNWGvR+abxCuuFFByE+w/zagNLTCaSjMEzuYz2qriRtjD
+         2WR2BF8YoePV5nQLPZoMXJSYws/M2czWNcwEPAQ/Zp7bXzjfwPSSkxu6a18A9Vljdf/u
+         EIdP9C+093et0xEFOxAGy3NUY/lpyWAfx5H+o5l4BxnTINe+l85yKNRsLIv8O1zkzJQI
+         DbXd4LZ4eU7jWUcSESq5PDFZYqK3vbWEX54R/nfKU6KC0bOrfz0yG6oNudLfYonM6i5P
+         nnag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amarulasolutions.com; s=google; t=1769634256; x=1770239056; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A+V9f1KpRq1EFF7gJxUeGto+TPrHemnbiENvZwSi9QY=;
+        b=mydLqzA++kYyj284CLdZz9NBqCLCMhnC5r/DN+2kmu1ctDIi0mi1XWYdBeWoklrAaO
+         80Alzso06c43UMJjR44rxFoe+rIAvYp0sEt4ebfLZHpA+aJXU51PUuGGmuuPuI6/qd+M
+         TO4X20jkQZIEqVKP/mhKyrxlfebEoFKRX2dvs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769634256; x=1770239056;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A+V9f1KpRq1EFF7gJxUeGto+TPrHemnbiENvZwSi9QY=;
+        b=E4wZJAwxWxqTYxxXb7xXSIpsV53qVsLE+tEKFXHRwGRwd1mIzliVAl2mReuz+PO3kg
+         aWQfQ2/fKJrb9yKTLHHWehvqNExpELa74gTCjJa81emEyBAk0daigggo98EXIt9HY2xu
+         I7ckKD5sPb07EjUhb2rPU/pfI3yKzPoF0oJe96fWKUV6usZrRj5B36+ry+XPvQL4L638
+         sOJoIu3d2Nt84io8jQTdpHrYKNM7y1nLFuyhGu7frMfC+cBYr4XDpaMdBmqZG1Q6ACb9
+         +qdfgSinPcLdvNdtWuzK10HjQ6LR2TtsB/s3Re09ASHnJf/mtfMYGF/lg1FrDszVp5st
+         QpEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxgGeXBtLaROnVXZNhmdg9smpjXkkslAaRpdDvxVk9V5Vkxyc4vOtnBS2kXnccDpBuDYvcgJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yykp8dfnpjykndofjMJFJIlVV0LCK2gqlhOtlqKkxYltrkMm5ho
+	p1n580T0dzN2QXi9EWDgiwYkymft9XXKWl3q8SdW8kfLhNa588tRyu0wmA4JVnXIKZlD060+32l
+	P6XsTejWqQtiRYJrEmw2Ko6zuJ0xmvwYng32jmTkxFg==
+X-Gm-Gg: AZuq6aKln0+IOPn3ldTrja+sVravdJEkhuO0tbBXuJSHC6FcPR3gCvHcJsl7lZDm3lF
+	+TYsi82NuVELwXy/GakHhFf2SksMp1G+31K5kMiFbTiFBmKTo08m5jZhJAr8JVuLaIlreVptQJv
+	gn8cqn5gQ3+bhlvJRzy451zDlC4WsAblxSO4DW6YrLWa7taWfcGt+ZZK5VsRSMBF2jAnIvcvj34
+	1Ai+q8rFZ7JbZAu/CH5vN7WWPNFgMwe7uLoWw5rK28eOEGHHtacM4TNX8JyE86FFdy2VIL1WmGR
+	BDfNcUgCrPUH0Rjqro9/qVkRKA==
+X-Received: by 2002:a05:7300:bc99:b0:2ae:614a:330e with SMTP id
+ 5a478bee46e88-2b78da0d5f8mr4150693eec.41.1769634256264; Wed, 28 Jan 2026
+ 13:04:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch> <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk> <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+ <fe9385a5-170f-474c-af8d-24bbfa5eb3ab@lunn.ch>
+In-Reply-To: <fe9385a5-170f-474c-af8d-24bbfa5eb3ab@lunn.ch>
+From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
+Date: Wed, 28 Jan 2026 22:04:03 +0100
+X-Gm-Features: AZwV_QjeVK6653l_oKvazr-qVIRp2OY5CRy56KYjvXXmGOXOKRv3DL9zvmlu5TU
+Message-ID: <CAOf5uwkr0Rmb_x0U88JAfozCQpkOoFOZ-V7BNteVZfcnNQF-Lw@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into phy_init_hw
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Marco Felsch <m.felsch@pengutronix.de>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, 
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>, 
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amarulasolutions.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[amarulasolutions.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254453-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254452-lists,netdev=lfdr.de,huawei];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[pengutronix.de,armlinux.org.uk,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mchehab@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[michael@amarulasolutions.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amarulasolutions.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 59A76A8E60
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,lunn.ch:email,amarulasolutions.com:email,amarulasolutions.com:url,amarulasolutions.com:dkim]
+X-Rspamd-Queue-Id: D7B34A8EAC
 X-Rspamd-Action: no action
 
-Hi Jacob,
+Hi
 
-On Wed, 28 Jan 2026 10:09:18 -0800
-Jacob Keller <jacob.e.keller@intel.com> wrote:
+On Wed, Jan 28, 2026 at 9:51=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > The issue was with the out-of-band reset coming from the FEC driver
+> > which doesn't honor the phy state-machine.
+>
+> Could you explain this is more details. Is the FEC doing something
+> wrong?
 
-> On 1/28/2026 8:50 AM, Mauro Carvalho Chehab wrote:
-> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> > ---  
-> 
-> What is this patch trying to do? the title is not descriptive, and its 
-> contents don't make sense.
-> 
-> >   tools/lib/python/unittest_helper.py | 16 +---------------
-> >   1 file changed, 1 insertion(+), 15 deletions(-)
-> > 
-> > diff --git a/tools/lib/python/unittest_helper.py b/tools/lib/python/unittest_helper.py
-> > index e438472fa704..3cf1075b1de4 100755
-> > --- a/tools/lib/python/unittest_helper.py
-> > +++ b/tools/lib/python/unittest_helper.py
-> > @@ -8,21 +8,7 @@
-> >   Helper class to better display unittest results.
-> >   
-> >   Those help functions provide a nice colored output summary of each
-> > -executed test and, when a test fails, it shows the different in diff
-> > -format when running in verbose mode, like::
-> > -
-> > -    $ tools/unittests/nested_match.py -v
-> > -    ...
-> > -    Traceback (most recent call last):
-> > -    File "/new_devel/docs/tools/unittests/nested_match.py", line 69, in test_count_limit
-> > -        self.assertEqual(replaced, "bar(a); bar(b); foo(c)")
-> > -        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > -    AssertionError: 'bar(a) foo(b); foo(c)' != 'bar(a); bar(b); foo(c)'
-> > -    - bar(a) foo(b); foo(c)
-> > -    ?       ^^^^
-> > -    + bar(a); bar(b); foo(c)
-> > -    ?       ^^^^^
-> > -    ...
-> > +executed test.
-> >     
-> 
-> You delete a bunch of the output here, but don't explain why. If this 
-> part of the doc is no longer valid this should be squashed into whatever 
-> patch made it invalid. I suspect this is the result of the new wrapper 
-> you added?
+The fact that the phy should be reset when the clk is provided to it, is no=
+t
+connected at all with the fec. I think that fec_main does not register itse=
+lf
+as clock provider, You "should" define the phy to have a clock if this is n=
+eeded
+during the restoration and we should not give any "magic" at controller lev=
+el.
 
-This patch came from a tool I wrote about one year ago for my own
-personal usage. 
+* Marco * Your commit bedd8d78aba300860cec3f85d6ff549b3b7f2679 is clear
+and I have tried to use it but if I remember the problem is the clock
+is provided
+by the ethernet controller.
 
-It was meant to be merged with patch 21/25, as it cleans up
-the module description. I ended removing a function that was
-requiring:
+Michael
 
-	from difflib import unified_diff
 
-as it was unused, but, a second look at it, I guess we can just
-drop this patch, as this is plain unittest output.
+>
+>         Andrew
 
-Anyway, I'll handle it either way at the next version.
 
-Thanks,
-Mauro
+
+--=20
+Michael Nazzareno Trimarchi
+Co-Founder & Chief Executive Officer
+M. +39 347 913 2170
+michael@amarulasolutions.com
+__________________________________
+
+Amarula Solutions BV
+Joop Geesinkweg 125, 1114 AB, Amsterdam, NL
+T. +31 (0)85 111 9172
+info@amarulasolutions.com
+www.amarulasolutions.com
 
