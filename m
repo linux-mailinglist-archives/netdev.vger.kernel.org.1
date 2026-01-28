@@ -1,123 +1,137 @@
-Return-Path: <netdev+bounces-254330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kH3MB1o3eml+4gEAu9opvQ
-	(envelope-from <netdev+bounces-254330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:20:42 +0100
+	id kAvRM9Uzeml+4gEAu9opvQ
+	(envelope-from <netdev+bounces-254331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:05:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C8FA5730
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:20:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29807A50EA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 91FF73023007
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:54:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 786113053292
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1F330CDBE;
-	Wed, 28 Jan 2026 15:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95DE30274D;
+	Wed, 28 Jan 2026 15:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=twx-software.de header.i=@twx-software.de header.b="lVK/Nu8d"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N6ccxv5Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.twlab.de (mail.twlab.de [80.151.39.74])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470C22DF155
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 15:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.151.39.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88CD288C22
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 15:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769615625; cv=none; b=uKHbSCsxhMTN1qJJktXlRfOzWR5jnUDvuSwCbMJPEZtbwWFUoUlYgL+u1OJBHNY79a2Bi7tBICuP2pNxd2GB0CI/OQ/b12zWJoTs0ldw3mqiU8ZeBx4vNbbu0LbZyvadjcXa/bBSZZ80cfn9DENY6C0XAPZANdOa1ecV+NDH/Pc=
+	t=1769615673; cv=none; b=ufFbnJQrDZ1Azm3LHR8s0lvwovGQ2VnVz8HS/q9wn+Iw06E9LR5Uyx7fQZ/NhBV9SBnqJ48Y1Qz3EXtJFFEaORxNUPCSRLZS6kH1WIl5MxPu65hQCdJRGOvLQ1wbKAz+nODnwBsUFuyb/J/6wbTxsGKeJzyVolxfeIxuhJggl1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769615625; c=relaxed/simple;
-	bh=tPuyJWTnwkqWaGNhZFTBM2EbSUW+2EljRGqc4mTdWTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=buN2jKCZ/EuRDL8m88IhTbmwlTvFtqfKe21QZa/lNIu6ik1/BF71z4QdunUTjWDhobYYkDXPycNXBq04UR66oqYXVxHc5D8QfnAQz9wUOqkbt+7LXo80bv624+DR33S8bIIfZnb2NAQpt1qKgX8X67jvUeqLziPHlgz0ETn0mhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=twx-software.de; spf=pass smtp.mailfrom=twx-software.de; dkim=pass (2048-bit key) header.d=twx-software.de header.i=@twx-software.de header.b=lVK/Nu8d; arc=none smtp.client-ip=80.151.39.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=twx-software.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=twx-software.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 173F55EAAFF;
-	Wed, 28 Jan 2026 16:53:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=twx-software.de;
-	s=dkim; t=1769615618;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=xT01+AFWV1syzTX1xDdDa6N3RaaTkmROC7VQwJ7aBhI=;
-	b=lVK/Nu8d8i85F2df5IHSvOrX5HvW6p0YS8mgJZ/ltpUiNNfyWjuXtmw2JhUSw3qumokJml
-	E2i0xnQ3gj8xCxAgiBQZceoJ6iRNtjjpUZ7ECzTtT/fnZtYhNhU+TiHgMuzOvyJ4sX+vyl
-	AX7DR5BeJpFHjHlda2TNVQdyrh7xuRBYUx9kmgwuzUEcHEhjSFytb+dKEbx53T5vpd8Jnc
-	p08+7uTEQ57eIVCcqFaTwdL3WR2M29aXbT5fFvuukyqmpehtfHhkMja+LpT7vmA7aG3q82
-	nn79AM1gEAqrOFjYlEnjESgCH9kwItxL6CgnU7bmdiGriJcxGJLTeY8t56Dbkw==
-Message-ID: <da974b72-8ba7-46b8-ac21-86a2fa26e22d@twx-software.de>
-Date: Wed, 28 Jan 2026 16:53:29 +0100
+	s=arc-20240116; t=1769615673; c=relaxed/simple;
+	bh=7zFQMAueteEBXuRscGq9SmKOgiZk6KkfanUBpMe78R8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MuVSoZpYNhcazHgvAtUF40NbheizHYvNVXALn5ZOgLgC7yN/Gj4jTLFlH5eABddGpZ9DqBRIciUDmNyNNp0IHdk0+RbrSBJt/1QpUbH+T2Jt0AFogXJ+PJceIVMaBk4kyv7zEeVPUumaM7ey1/t3ciYBSflO7QBbCyELQbWESns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N6ccxv5Z; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 6C2B31A2AC1;
+	Wed, 28 Jan 2026 15:54:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2F7E96071F;
+	Wed, 28 Jan 2026 15:54:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA028119A8812;
+	Wed, 28 Jan 2026 16:54:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769615668; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=7zFQMAueteEBXuRscGq9SmKOgiZk6KkfanUBpMe78R8=;
+	b=N6ccxv5Z2zGUP8k1Pn45ZSolsdl2Nhh55xvinqSLIfwyGr9erLQmW4AJ9KvZGOD1QmcH8B
+	B9nZVeC7Y4BnXrXtmB2O3pl49otpfd0s3ldb+Wv2KBPQEpJ04oi/NAi8OO9xpwlWjrA7aT
+	6ODSD03TwfpyaWcG9Oy9NXz1y+ru2hKZTl+/JOUrONiNeDYryRshA3ggi5b1tF3uBpun+R
+	mTgCAKli74i3k7reJ1QrA1laDX8DVB3/jHJbg/+P+YBIhAZDjFcb++sjNK5hAT1SJfpUyY
+	LJD/aCxDFvEMwWaBvLFW0E86SVp4hQNR0+Hmc21+7JJTQUn5Y+pyLBXWomN9rw==
+Date: Wed, 28 Jan 2026 16:54:23 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org, jianhao.xu@seu.edu.cn,
+ marco.crivellari@suse.com, vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net v4 0/3] net: liquidio: Fix memory leaks in
+ setup_nic_devices()
+Message-ID: <20260128165423.0e1b0cab@kmaincent-XPS-13-7390>
+In-Reply-To: <20260128154440.278369-1-zilin@seu.edu.cn>
+References: <20260128154440.278369-1-zilin@seu.edu.cn>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/3] dt-bindings: net: dsa: microchip: add
- microchip,single-led-mode flag
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org
-References: <20260128133842.1173406-1-ht@twx-software.de>
- <20260128133842.1173406-2-ht@twx-software.de>
- <6871816c-2732-4c5f-9f10-1f9773d5f23d@lunn.ch>
- <9090d12e-e85e-4827-9dc3-5bbece12c50d@twx-software.de>
- <18c6696a-7874-454d-8032-ca5130e41665@lunn.ch>
-Content-Language: en-US, de-DE
-From: =?UTF-8?Q?Heinrich_T=C3=B6ws_=28TWx=29?= <ht@twx-software.de>
-In-Reply-To: <18c6696a-7874-454d-8032-ca5130e41665@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[twx-software.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[twx-software.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-254331-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254330-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,linaro.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ht@twx-software.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[twx-software.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,twx-software.de:mid,twx-software.de:dkim]
-X-Rspamd-Queue-Id: 58C8FA5730
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:url,bootlin.com:dkim]
+X-Rspamd-Queue-Id: 29807A50EA
 X-Rspamd-Action: no action
 
-Hi Andrew,
+On Wed, 28 Jan 2026 15:44:37 +0000
+Zilin Guan <zilin@seu.edu.cn> wrote:
 
-Am 28.01.26 um 16:22 schrieb Andrew Lunn:
-> Is that really true? Generally, what actually happens is the
-> configuration is left alone. So if the boot loader, for example, has
-> set the configuration, that configuration is left unchanged. So it
-> could actually be in single LED mode, not tri-colour.
+> This series fixes memory leaks in the initialization paths of the=20
+> NIC devices.
+>=20
+> Patch 1 moves the initialization of oct->props[i].netdev before queue=20
+> setup calls. This ensures that if queue setup fails, the cleanup function=
+=20
+> can find and free the allocated netdev. It also initializes lio->oct_dev=
+=20
+> early to prevent a crash in the cleanup path.
+>=20
+> Patch 2 fixes an off-by-one error in the PF cleanup loop. It ensures
+> the current device index is cleaned up and correctly handles the=20
+> post-loop devlink_alloc failure case.
+>=20
+> Patch 3 fixes the same off-by-one error in the VF cleanup loop.
 
-Oh, you're right. We cannot assume a hardware reset state here.
-Since the driver currently does not touch these registers, the 
-configuration is indeed "inherited" from the bootloader or the
-hardware strapping.
+For the series:
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Thanks,
-
-Heinrich.
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
