@@ -1,161 +1,125 @@
-Return-Path: <netdev+bounces-254082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254083-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id bQBlF8N6eWlbxQEAu9opvQ
-	(envelope-from <netdev+bounces-254082-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:56:03 +0100
+	id uDbFGXl7eWldxQEAu9opvQ
+	(envelope-from <netdev+bounces-254083-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:59:05 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827309C6F4
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:56:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D53DD9C713
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AFF6300AB1F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:56:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 78CC6300B12A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82335250BF2;
-	Wed, 28 Jan 2026 02:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4592C1594;
+	Wed, 28 Jan 2026 02:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDhdNG6w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Czi83NqY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF7D1F95C
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 02:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9589425332E;
+	Wed, 28 Jan 2026 02:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769568960; cv=none; b=L8WsG94fni2EYgHTXU8nP3cL9Zvl7bpE386wI/Go550ssAOwv/Dz55yKevDiV4bTsHXm3HvmBiAljnPP2OJDQIgXOqqzsNwJbZRbplmaVBzFAkyKDcO2E2o4gd99Un5l569EFNWejwIhSQmBnZDd0+apdd6rJXHkJZrNL6bo4Bc=
+	t=1769569138; cv=none; b=ozFolpUaHpVeCxzPw+Bwp9Dixx3eH3wJ9CSkwUz8Xo3L6GpDUpkrbSIDvmj+5dPIj52mPsuLnz2JQPkdIkUsN8NTeRGYr4iZqg+YCBgSR4GZkERIj0Zm/rAeMaTwJaK3+s57yRIDMcIWlnXpLvPWpPrtrZmxdne4Op5MoinCfJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769568960; c=relaxed/simple;
-	bh=j982pDnofHYNBgQsDPqjFMdsuN1MAaSO3+M2cykRu3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BMO3C7ZX0EjsO41WmtqJu1DlS4EQwgfbI6XxeTFyT77Vl4OcDsFlK7pwK1WwelaD8lOvwU5FeNBAik033yJfRraSktOQzZyq1eIs6dSV9jM9suvKbQjChniego3gEkbk7xrGjKcbKrc1OGYKDdiHN3F0JWA95m6XlSA2WZjKubE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDhdNG6w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 600D2C116D0;
-	Wed, 28 Jan 2026 02:55:59 +0000 (UTC)
+	s=arc-20240116; t=1769569138; c=relaxed/simple;
+	bh=Ac37IbqyWcca/4SCl1e9MinT7q6JQCs4TTXGSBDTQSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gq/M7Mbv5DSY6kRBqzhRvKjMbVtXoE/WnpIov+2KKkG7elkSeM+UHQ1W0jmcJzfxj+3gfn8ll48XEzVjQqz37yt/xmf8p4OztSuvkTSIr+AJDBcndHJs8ddspEP00h9nk3heLhRIs6+Hr2kwQ2ZbUBkWYV7XqhdPvbwKDGCKh2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Czi83NqY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B749C116C6;
+	Wed, 28 Jan 2026 02:58:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769568959;
-	bh=j982pDnofHYNBgQsDPqjFMdsuN1MAaSO3+M2cykRu3Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JDhdNG6w4Mw/0J5H+9aGf7Z+1DFTKb+cjzpbr7N6HXKcuF3XUCash/S8K4nLt/r+v
-	 CI9dcT+fbqBUIfCBaUIbKvnJjId/mQGtdFhiliuSEYIkYXP5f64EhR2uOwquBkA2gd
-	 t45DMbOgjwT9icFuEwnJg6fxBOpOM19Er941GRkFYEqY9q6o5JTJaD4OwMebm8vwoO
-	 a9ELFsEJPgdsImXYFtPPnkFvfuOKk1g12lnrCWur2BKnh64dg0r1JvvmzDD+9Idcbe
-	 M78v8zdM8q6UbRwYJFOZfslmzmT1f9DN3Fql39/3DwGcha16zA3gitZ/vCMvUk4xYG
-	 YLLgbo16kUtzw==
+	s=k20201202; t=1769569138;
+	bh=Ac37IbqyWcca/4SCl1e9MinT7q6JQCs4TTXGSBDTQSM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Czi83NqYSNKrxmRgX372KLBq4N0q6ZYGNnWp0xDVFG4P7X8GrGke0CJ4zqsE8BxEN
+	 LDLPZY/w41T0q3kYeCNtejzOfiGaQ9Zadgsmxx5jVg6R5ufjKA/AMyL6j2zHFWpBtE
+	 cKgBDoV3wKRbB8PZUdjM7GwnByl8AifblS1CDl1P9NxJXJxM7yWqb3jXJsQ1fWjk0D
+	 4TXdhbMv14oimt5km2iT5d6Lm7jecy0Jiscwm2IGAXtcCaXB5jflJUmA9llI8Cid+m
+	 sISGBjqanyJFIlpOGRBFDHhwLhw1fC31F01vo6Q0hDRSKngFZdqU/ZMp+PeRZC+JK3
+	 yBy1gmfRyG+ag==
+Date: Tue, 27 Jan 2026 18:58:56 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: edumazet@google.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	horms@kernel.org,
-	jhs@mojatatu.com,
-	davem@davemloft.net,
-	jiri@resnulli.us,
-	km.kim1503@gmail.com,
-	pabeni@redhat.com,
-	xiyou.wangcong@gmail.com,
-	eric.dumazet@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [net,1/2] net: add skb_header_pointer_careful() helper
-Date: Tue, 27 Jan 2026 18:55:56 -0800
-Message-ID: <20260128025556.4169217-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260127144433.196836-2-edumazet@google.com>
-References: <20260127144433.196836-2-edumazet@google.com>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Peter Korsgaard
+ <peter@korsgaard.com>, Petko Manolov <petkan@nucleusys.com>, Steve
+ Glendinning <steve.glendinning@shawell.net>, UNGLinuxDriver@microchip.com,
+ Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Oliver Neukum
+ <oneukum@suse.com>, Krzysztof =?UTF-8?B?SGHFgmFzYQ==?= <khalasa@piap.pl>,
+ Deepanshu Kartikey <kartikey406@gmail.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Max Schulze <max.schulze@online.de>, Thomas
+ Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>, Kees Cook <kees@kernel.org>, Eric Biggers
+ <ebiggers@google.com>
+Subject: Re: [PATCH net-next v3] net: usb: remove unnecessary get_drvinfo
+ code and driver versions
+Message-ID: <20260127185856.7ff5d1a2@kernel.org>
+In-Reply-To: <20260127060534.51206-1-enelsonmoore@gmail.com>
+References: <20260127060534.51206-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,davemloft.net,resnulli.us,gmail.com,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254082-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254083-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.intel.com,lunn.ch,davemloft.net,google.com,redhat.com,korsgaard.com,nucleusys.com,shawell.net,microchip.com,fintech.ru,suse.com,piap.pl,gmail.com,pengutronix.de,online.de,kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 827309C6F4
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D53DD9C713
 X-Rspamd-Action: no action
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Mon, 26 Jan 2026 22:04:38 -0800 Ethan Nelson-Moore wrote:
+> Many USB network drivers define get_drvinfo functions which add no
+> value over usbnet_get_drvinfo, only setting the driver name and
+> version. usbnet_get_drvinfo automatically sets the driver name, and
+> separate driver versions are now frowned upon in the kernel. Remove all
+> driver versions and replace these get_drvinfo functions with references
+> to usbnet_get_drvinfo where possible. Where that is not possible,
+> remove unnecessary code to set the driver name. Also remove two
+> unnecessary initializations from aqc111_get_drvinfo, an inaccurate
+> comment in pegasus.c, and an unused macro in catc.c.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: add skb_header_pointer_careful() helper
-
-This patch adds a new helper to validate negative offsets before calling
-skb_header_pointer().  The commit message states that negative offsets
-are supported "as long as the zone starts between skb->head and
-skb->data."
-
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 86737076101d..72679aa7af58 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -4301,6 +4301,18 @@ skb_header_pointer(const struct sk_buff *skb, int offset, int len, void *buffer)
->  				    skb_headlen(skb), buffer);
->  }
->
-> +/* Variant of skb_header_pointer() where @offset is user-controlled
-> + * and potentially negative.
-> + */
-> +static inline void * __must_check
-> +skb_header_pointer_careful(const struct sk_buff *skb, int offset,
-> +			   int len, void *buffer)
-> +{
-> +	if (unlikely(offset < 0 && -offset > skb_headlen(skb)))
-> +		return NULL;
-
-Should this check use skb_headroom() instead of skb_headlen()?
-
-The commit message says negative offsets should be valid when the zone
-is "between skb->head and skb->data" - that describes the headroom, not
-the headlen.  For a negative offset, skb_header_pointer() returns
-skb->data + offset, which points into the headroom area.
-
-skb_headlen() returns the linear data length after skb->data (skb->len
-minus skb->data_len), while skb_headroom() returns the space before
-skb->data (skb->data minus skb->head).
-
-These values are quite different in practice - headroom is typically
-small (2-128 bytes), while headlen can be up to MTU size (~1500 bytes).
-With the current check, an offset like -100 would pass validation when
-skb_headlen is 1500, but could read before skb->head if skb_headroom is
-only 2 bytes.
-
-The existing offset_valid() function in net/sched/act_pedit.c uses
-skb_headroom() for this same type of check:
-
-    if  (offset < 0 && -offset > skb_headroom(skb))
-        return false;
-
-> +	return skb_header_pointer(skb, offset, len, buffer);
-> +}
+I slightly lost track of the conversations on your patches so forgive
+a possibly obvious statement :) - but this did not apply cleanly to
+net-next at the time of posting. So it needs a respin.
 -- 
 pw-bot: cr
 
