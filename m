@@ -1,150 +1,215 @@
-Return-Path: <netdev+bounces-254118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254119-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMB5GH+yeWkOygEAu9opvQ
-	(envelope-from <netdev+bounces-254118-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:53:51 +0100
+	id kMVSM5S0eWk0ygEAu9opvQ
+	(envelope-from <netdev+bounces-254119-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:02:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931769D890
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:53:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5229D8FA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 77D723012CC8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 06:53:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82DB0300F9F5
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9EBB2FFDEB;
-	Wed, 28 Jan 2026 06:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37812238D27;
+	Wed, 28 Jan 2026 07:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="bwvxl5Cq"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Eu/btvwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359BD25782D;
-	Wed, 28 Jan 2026 06:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81041EBFE0
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 07:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769583225; cv=none; b=le9PXOVpWETc7LEg75l5U3q7fVyUNuTpFebLRb6y1fYuHxe0v/DZjta7PeSBi4/hrwiu0I1xAhC6bLWrORMIV3UGrFINaX3IBWjREIyuGe81S6PgJTF9zGsNN0SwG2Aa8Lj/zU+9rjWURiuDp2nfRRW7nyZ8SuNpWqmaHsy9Ymo=
+	t=1769583761; cv=none; b=HmnRdQ6ovT4tb4nvJVOv/+A497gfLUIsuoeAr2mzS0UVD0VSexz55HBN/ekVU30WaThKUE70P4KRNoRwwh9/hu/bL0DLYHJdNxsVfGZUwRaZXWimuylNRNAM7+oDnh/O/Cown1Pb5IdvWuI1OlYNpR+XeecWqeon8EPeAvecBgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769583225; c=relaxed/simple;
-	bh=RhIB2UOkdFShxDb2YdhlO0pU0A+bNIEoVa4dL3JONv4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q8NYeSuDH4WVDVnZoVluFlWduWatHkZ1zOI+FAwQI+zvtFJPKMSjUDMVHUjYjGagSXxe423HGF1f66NNb8989Xmn3u/p/vjaNnnFN7qt5vGQEDHUV7pbT1HRHsE9tTrTsBo5xvYzTT6f/h2FC3nhNLLR7pImZobhcJ9IBIh5wE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=bwvxl5Cq; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60S6r9odD419075, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1769583189;
-	bh=cotDTHDvsg7hUeOBoFSRMX89+nSGhMyqdzHb6uUqnZ4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=bwvxl5CqvtRYHkZagTsLjUSPAslAwOG5VwiDC9PdqGjB5vkFDyufpZJol3F6Fezau
-	 SNl0/4DSk1liIVQS+9LjMs6ZsIJ0RgZxEnELbO6suO3lIjzmbPxuiX9Aqeh6LNyscy
-	 Q2LK2zR9ftI+V2ay+Clae6a5gfBpOy7KSbn1/UCB+tV1w1QE7KAwH5au43Am/U0lbn
-	 9Eg76uhVXshZVMjRPmyLeZA/bRiRi0buCdZXEP16qaJM6yx37lLnwFr4uIrCCQ5GRc
-	 aZ87LbIjx0UoieFIcbQkuj7ZBbSXYAZl1CXkvZ38Mrgy9dDYNfaH5YQ9Lu2lMWbfKV
-	 CjOA7wILGKVPw==
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60S6r9odD419075
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 28 Jan 2026 14:53:09 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 28 Jan 2026 14:53:09 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Wed, 28 Jan 2026 14:53:09 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <javen_xu@realsil.com.cn>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <nic_swsd@realtek.com>, <pabeni@redhat.com>
-Subject: RE: [PATCH net-next v1 0/3] r816e: Add r816e driver in Realtek
-Date: Wed, 28 Jan 2026 14:53:09 +0800
-Message-ID: <20260128065309.556-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <640c373b-09d9-4b54-9113-782df41aa152@gmail.com>
-References: <640c373b-09d9-4b54-9113-782df41aa152@gmail.com>
+	s=arc-20240116; t=1769583761; c=relaxed/simple;
+	bh=jNWVs3NoJCDLt3Uob6MZkTWfmT/4JmZ5ZegDFFtHMQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XSrlQ8AyEQiJSbmu1727DZuajn0fvaTWQ3T0bh1Mbj9QBru1bLVH1UybEsVcv+VcAwBt5YRtxmSgugQsiXvv4TTk+afMPUUKa8tH5aGDuZ8mF2X8iwFlCwZfLQ4K0hr2800WxsLfLJlKEfo//J759CwSFHl2AaRJOJQGfzbEoUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Eu/btvwj; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-29efd139227so45814415ad.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 23:02:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1769583759; x=1770188559; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zpz1+E5bIfL6Vl+vGItOAAFJ78Sq/brE0PF9AQXfuD0=;
+        b=Eu/btvwjDHWSVkM9sBMw1iYxgv4q/mCO7Cw+OEWWYn2R9r5ftSc8DJ4Zsx+LGvcBM9
+         +nfPnxxJETpAAKIx6p2eYeI5qqEO/fgie7iWQwsITNKGv3DW1SUF8lmPFHc52nWdZ4ZS
+         eLCJcB3xtHYc4uz9gNZQmv5pfyjMpXzC5cpBs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769583759; x=1770188559;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zpz1+E5bIfL6Vl+vGItOAAFJ78Sq/brE0PF9AQXfuD0=;
+        b=nJhpbtSeAA2pelj6ByTu0Sbl9/k2AYwabJ+Xl9bcZpzc/2ZCXq5BEKKKRbo904KnJ9
+         qkjxHOHJSlsrSWSAOfhgeqnFPydffI4ZK+9lM0nEh7oORxalKgMZ5BLfMtJkuMooA0jk
+         VBjRY7BmlON04bOzsdWfL5LrpVQMgsIoSYUfN92bv4FD5T0sxADKHD1K8pH36J41xApL
+         FRPK9Cq6kKgAtlurwYH+2yoW+K5XBzhAsHah9EVUomydcz5tsy7/tOZo89hAURLKOFlY
+         DL+yXmnDpXaBP/jBB0Bx7BC8CQUREzkOEe4HTjHweM5gjPAPYfFuriUrglhSpkfUWS/t
+         NjEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOra3+JBjpZlDIeplf/xYyVweVazEoHYkcG0YZRMCcRrRwFugwcsiWLYUgzy+Md2p2jTS24Y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynBVrTKBNWLS6/2sBdlCDUZ4uN2swsG01iLGQr5O/6td441JFw
+	U+9ecNmh/sS0v+FfelOqC3Z4y3OEtUoIvT0ZrUOf3zCMINJ7pwbpyAtspfcI/ImTpw==
+X-Gm-Gg: AZuq6aJx12H92Z1gw/quUrn8uS5y55tFYoKPnl6Xyv10Gwf3N143DJfoPkDdCpXuHqS
+	MOLNyqgP+qV/2gDTyAoa9TSf790TJ7DmUseLJr09FjubLfsOdM551HU0bA7cGCgHOgd3oZmOxFc
+	KvBlBZq17Xflp+ETFesPNX2YwV2zXwGqKTLy+SEq5cLTkvG4FQA7jY4Rhzz1CCQS9ChhPQvizlU
+	FHx+v52/ZM8AYRBYUIXqQ3in7Y3/EQyUtFuWkqbwGRWSaVkOPiineA6tqyCEvL6ikMJENI/dLrJ
+	9xRZ3sWHAzTIBrJlcJQeYvLdek6/uziztroN8Jg8HfMFy98bA1hwnO+tHPh1QMPJdf12woHJS1g
+	D1+dJSApoqXbrplkjBJ9T5soaZcFHX5e5UgfOt8N952zDjr5JIslJi0AzmFaAVGbBK3XDwqWf1+
+	yhEnIdLgBQbi4RdCT2ch0l43MCgSZpEAzd4cldO7RoslLoR45Oa9CzdhNl7cJtVhI3hbzULbzV
+X-Received: by 2002:a17:903:40ca:b0:2a0:f0db:690e with SMTP id d9443c01a7336-2a870e8ac0bmr41142995ad.52.1769583758569;
+        Tue, 27 Jan 2026 23:02:38 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:bf24:413d:1e8a:6aa])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b3eedd0sm12975735ad.3.2026.01.27.23.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jan 2026 23:02:37 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Douglas Anderson <dianders@chromium.org>,
+	Tomasz Figa <tfiga@chromium.org>,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] net: usb: r8152: fix resume reset deadlock
+Date: Wed, 28 Jan 2026 16:01:52 +0900
+Message-ID: <20260128070222.3393746-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[chromium.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[chromium.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254118-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-254119-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[chromium.org:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[senozhatsky@chromium.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 931769D890
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chromium.org:email,chromium.org:dkim,chromium.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0E5229D8FA
 X-Rspamd-Action: no action
 
->On 1/27/2026 12:34 PM, javen wrote:=0D
->> From: Javen Xu <javen_xu@realsil.com.cn>=0D
->>=0D
->> This series patch add a fake driver r816e to ensure the kernel could =0D
->> set the correct power state for #fun through r816e driver when suspendin=
-g.=0D
->>=0D
->=0D
-> I think a better approach would be to contribute to adding phylink/sfp su=
-pport=0D
-> to r8169, so that the SFP NIC versions (incl. RTL8116AF) can be properly=
-=0D
-> supported. This would have to include making the SFP I2C bus accessible b=
-y=0D
-> the kernel (instead of firmware only).=0D
->=0D
-=0D
-RTL8116af is a multi-function device. fun0 is a BMC virtual driver and fun1=
- is=0D
-the nic driver. The BMC virtual driver(fun0) is used for power management,=
-=0D
-while fun1 provides the actual network functionality.=0D
-=0D
-Thanks,=0D
-Javen Xu=0D
->> Javen Xu (3):=0D
->>   r816e: add a fake driver r816e for RTL8116af=0D
->>   r816e: Add a Makefile in the r816e folder=0D
->>   realtek: Update Makefile and Kconfig=0D
->>=0D
->>  drivers/net/ethernet/realtek/Kconfig        |  7 ++=0D
->>  drivers/net/ethernet/realtek/Makefile       |  1 +=0D
->>  drivers/net/ethernet/realtek/r816e/Makefile |  8 +++  =0D
->> drivers/net/ethernet/realtek/r816e/r816e.c  | 75 +++++++++++++++++++++=0D
->>  4 files changed, 91 insertions(+)=0D
->>  create mode 100644 drivers/net/ethernet/realtek/r816e/Makefile=0D
->>  create mode 100644 drivers/net/ethernet/realtek/r816e/r816e.c=0D
->>=0D
+rtl8152 can trigger device reset during reset which
+potentially can result in a deadlock:
+
+ **** DPM device timeout after 10 seconds; 15 seconds until panic ****
+ Call Trace:
+ <TASK>
+ schedule+0x483/0x1370
+ schedule_preempt_disabled+0x15/0x30
+ __mutex_lock_common+0x1fd/0x470
+ __rtl8152_set_mac_address+0x80/0x1f0
+ dev_set_mac_address+0x7f/0x150
+ rtl8152_post_reset+0x72/0x150
+ usb_reset_device+0x1d0/0x220
+ rtl8152_resume+0x99/0xc0
+ usb_resume_interface+0x3e/0xc0
+ usb_resume_both+0x104/0x150
+ usb_resume+0x22/0x110
+
+The problem is that rtl8152 resume calls reset under
+tp->control mutex while reset basically re-enters rtl8152
+and attempts to acquire the same tp->control lock once
+again.
+
+Reset INACCESSIBLE device outside of tp->control mutex
+scope to avoid recursive mutex_lock() deadlock.
+
+Fixes: 4933b066fefb ("r8152: If inaccessible at resume time, issue a reset")
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/net/usb/r8152.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 30f937527cd2..c4f4e6a35ff4 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -8538,19 +8538,6 @@ static int rtl8152_system_resume(struct r8152 *tp)
+ 		usb_submit_urb(tp->intr_urb, GFP_NOIO);
+ 	}
+ 
+-	/* If the device is RTL8152_INACCESSIBLE here then we should do a
+-	 * reset. This is important because the usb_lock_device_for_reset()
+-	 * that happens as a result of usb_queue_reset_device() will silently
+-	 * fail if the device was suspended or if too much time passed.
+-	 *
+-	 * NOTE: The device is locked here so we can directly do the reset.
+-	 * We don't need usb_lock_device_for_reset() because that's just a
+-	 * wrapper over device_lock() and device_resume() (which calls us)
+-	 * does that for us.
+-	 */
+-	if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
+-		usb_reset_device(tp->udev);
+-
+ 	return 0;
+ }
+ 
+@@ -8661,6 +8648,7 @@ static int rtl8152_suspend(struct usb_interface *intf, pm_message_t message)
+ static int rtl8152_resume(struct usb_interface *intf)
+ {
+ 	struct r8152 *tp = usb_get_intfdata(intf);
++	bool system_resume = !test_bit(SELECTIVE_SUSPEND, &tp->flags);
+ 	int ret;
+ 
+ 	mutex_lock(&tp->control);
+@@ -8674,6 +8662,19 @@ static int rtl8152_resume(struct usb_interface *intf)
+ 
+ 	mutex_unlock(&tp->control);
+ 
++	/* If the device is RTL8152_INACCESSIBLE here then we should do a
++	 * reset. This is important because the usb_lock_device_for_reset()
++	 * that happens as a result of usb_queue_reset_device() will silently
++	 * fail if the device was suspended or if too much time passed.
++	 *
++	 * NOTE: The device is locked here so we can directly do the reset.
++	 * We don't need usb_lock_device_for_reset() because that's just a
++	 * wrapper over device_lock() and device_resume() (which calls us)
++	 * does that for us.
++	 */
++	if (system_resume && test_bit(RTL8152_INACCESSIBLE, &tp->flags))
++		ret = usb_reset_device(tp->udev);
++
+ 	return ret;
+ }
+ 
+-- 
+2.53.0.rc1.225.gd81095ad13-goog
+
 
