@@ -1,167 +1,168 @@
-Return-Path: <netdev+bounces-254191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254193-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PZRC+/keWl60wEAu9opvQ
-	(envelope-from <netdev+bounces-254191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:03 +0100
+	id 8JuBLpnoeWkF1AEAu9opvQ
+	(envelope-from <netdev+bounces-254193-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:44:41 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE54A9F764
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6039D9FA34
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6ECD030095CB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:28:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C21EF30041F2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA2F2FBDFF;
-	Wed, 28 Jan 2026 10:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820DB31D732;
+	Wed, 28 Jan 2026 10:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="P9Smfeyh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jUnMIGjJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C0B2E8B6B;
-	Wed, 28 Jan 2026 10:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA422F1FD7;
+	Wed, 28 Jan 2026 10:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769596117; cv=none; b=GdcdQhgyZQdpA/3UH37fO1soUtheyKWSTovgrQdO98T3hGCsz9UBB2yErGysZuZPYqG5T51DB6fVVGjfC1aPiI4+FCmzXaY6/crEgtOOUsCP3LYFQ1n26sRTNYa20K1QkG7B3dGu3hxAjH0LKrEYngHVLsz2W25YRgvkn0mEmrA=
+	t=1769597079; cv=none; b=cVwhiPyLBvyqQmPITHvbe2BHqYwGy+FLz/Y2mBvrwYMGsNy8RTCCLBlWQsgVYG1y7B+m+nSVSx1qr3K9PprhyERmkDcyDqKxmGlEXjWpl2ywvshpHFP/k30HOXqEEPyukDFY1M5pjSxgUR48ZRYD7I5kX3SpPwhznwterewCwbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769596117; c=relaxed/simple;
-	bh=fST2TX5PPZJpDLOSpjQLko63WnxUbMvUHXK4UwSoCIc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MWNd47XxXB6yczMsvjO3DiLUd40aYFaIi0DGj4pQb8N/yXf8FIm4MrywbWnFyHV/lcpiq6+bIzDuvycks1KXBlA0wrknexVQO11j5UIcBndbrXMrok1PtGmJEeQiLa39ci53Nh6C5wF8P+Nx9zbc+2Q4HKqHyKTGxDFSQbZM4Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=P9Smfeyh; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1769596105;
-	bh=fST2TX5PPZJpDLOSpjQLko63WnxUbMvUHXK4UwSoCIc=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=P9Smfeyhj+3R4c507f8lR4nt3CVe+M1aTK5Mu2SpAP/JV2jc1lv8CZTSt4RE2DcWt
-	 MLOZwcMzcRi01fsbbjpBCDmN6DRmyM40MfJLGCnxyUjxryOghhQI95MqRds0HYeULL
-	 3g3LdFnJEb/JIPRDnKdt30zA30vl3jDLEQQOFhG88qzWVNcBbhyjAWflv6EwCacvaS
-	 /Nta5fC2XAF2KfOQHLW7gPcFQpOq2+Q7T+pkZtIT8H0ONJi/DLVoiYEDvR5b0wJLN+
-	 9pitWreykAIi4jFCYMYZO3/TzltNHHoLG88uqml/ZsNcQ7cUg2H41TAW/dP2U13LV+
-	 HQCieJFCUx5RA==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id C082764706;
-	Wed, 28 Jan 2026 18:28:24 +0800 (AWST)
-Message-ID: <189d4a03f32ace3fd995596e8b5415ced6ae9c3a.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v2 0/4] i2c: SMBus ARP support
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, Matt Johnston
- <matt@codeconstruct.com.au>, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Date: Wed, 28 Jan 2026 18:28:24 +0800
-In-Reply-To: <aXjDENOsmWe5_VqS@kuha>
-References: <20260121092328.2308705-1-heikki.krogerus@linux.intel.com>
-	 <30ad166e2b3d7f10080356ec232e604f3ac9ea2e.camel@codeconstruct.com.au>
-	 <aXdyll4KVOF6SWni@kuha>
-	 <6ca4bc87620bb0c2e5bfb264ec88189f32b53757.camel@codeconstruct.com.au>
-	 <aXjDENOsmWe5_VqS@kuha>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1769597079; c=relaxed/simple;
+	bh=TtrRZVlvHPD/HluPN4mbE6SJ5OBzC3bIvEmY2KwSgoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qq1VfWEMjKS9anYGV9DvnMMbSEmmjYO7fC/ZZJlbQm+mja7+plgAc41rXbQB8Xo3tRBDszB9YD7xiUeyVzrprd6+cUxGH/FcCeesO8eFPD9PHEW1zse2AsiLMInxnWvftqILSbDraFi46Bg5T6m/DxNxCqfOpEsxt9T7VGF+Qqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jUnMIGjJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mFTuDiU8Vo0BWz7M+z3udd6nhM1Sv2pMgRAh1jtNodg=; b=jUnMIGjJB8N/e3tmB1dhe6jNHy
+	QW80cUOaOEVJYbU8vdhPqd/MwxyQqSDoLi4OgOmqpOZ2B+u3hnP/S9+JtEC9ly43ycYrgRJny8aYM
+	u3f13NjG8X3vh1S71+NuN+A0GqvZ9mNCnJPJc2V8JpRPHWibszpXQhalLbLMb55atsWSrZmdtm0rz
+	jtlnej22Ri5hDarpvZrBhXvB00zfMYdphVlGur4/QpBaUQnB9KwmJk8JZZIRvB5/Qx0VvGY05Z8mJ
+	LSMVN3+qc7FlXECUb904BRi3XSOfCOpeMXY5020pSd6mI1rAdCrXXQCdjWfDWo792/AwZ8e9gUoAM
+	+DfaI8PA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44758)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vl31Z-000000007Bf-3r94;
+	Wed, 28 Jan 2026 10:43:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vl31L-000000006uC-3EYm;
+	Wed, 28 Jan 2026 10:43:35 +0000
+Date: Wed, 28 Jan 2026 10:43:35 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Yao Zi <ziyao@disroot.org>,
+	Yanteng Si <siyanteng@cqsoftware.com.cn>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Quentin Schulz <quentin.schulz@cherry.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add glue layer for Spacemit
+ K3 SoC
+Message-ID: <aXnoV3Ay0uCc3HGQ@shell.armlinux.org.uk>
+References: <20260128072931.875041-1-inochiama@gmail.com>
+ <20260128072931.875041-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260128072931.875041-4-inochiama@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-254193-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254191-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[36];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gentoo.org,gmail.com,foss.st.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,disroot.org,cqsoftware.com.cn,bp.renesas.com,bootlin.com,linux.intel.com,eswincomputing.com,altera.com,cherry.de,st.com,synopsys.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,st-md-mailman.stormreply.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,codeconstruct.com.au:mid,codeconstruct.com.au:dkim]
-X-Rspamd-Queue-Id: DE54A9F764
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6039D9FA34
 X-Rspamd-Action: no action
 
-Hi Heikki,
+On Wed, Jan 28, 2026 at 03:29:29PM +0800, Inochi Amaoto wrote:
+> +#include <linux/clk.h>
+> +#include <linux/math.h>
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/module.h>
+> +#include <linux/mfd/syscon.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/property.h>
+> +#include <linux/regmap.h>
+> +
+> +#include "stmmac_platform.h"
+> +
+> +/* ctrl register bits */
+> +#define PHY_INTF_RGMII			BIT(3)
+> +#define PHY_INTF_MII			BIT(4)
 
-> Uh, no. You should only use interfaces like new_device with the
-> devices that really can't be detected in kernel, which isn't the case
-> here.
+Please add a suitable prefix for these.
 
-Who is deciding this "you should only" case? If the facility works, it's
-suitable. You raise some good points that may mean it is not a suitable
-approach for an ARP implementation, but we should still make sure we're
-taking the right approach.
+> +
+> +#define WAKE_IRQ_EN			BIT(9)
+> +#define PHY_IRQ_EN			BIT(12)
 
-[You seem pretty defensive here? I'm not saying no to the kernel
-implementation, just doing our homework before agreeing to it]
+While you're renaming the PHY_INTF_*, you might wish to also add the
+same prefix here to identify that they're all part of the same register.
 
-> So why would you want involve the user space at all since it would
-> just add complexity and limitations without any benefits?
-
-Because we have fewer risks implementing this in userspace.
-
-As an example, you currently seem to have a stack information leak in
-the proposed Get UDID implementation, which would be much less of an
-issue for the equivalent protocol handling implemented in userspace.
-
-> - You still need to deliver the UDID to the kernel because of things
-> =C2=A0 like the PEC flag, and the drivers will also need information from
-> =C2=A0 it.
-
-That seems like the main reason for requiring a kernel approach, in that
-we need more information than just the assigned address. It's not
-possible (at present) to specify the PEC flag through existing
-interfaces, right?
-
-For me, this would be the deciding factor to go for a kernel approach,
-in that we otherwise cannot properly describe ARPed devices to the i2c
-subsystem. We *could* push a new_device with a UDID, but I'm not sure
-that's a great idea.
-
-> - With the static (not hotplugged) devices you need to assign the
-> =C2=A0 correct ACPI node (or what ever fwnode) to the ARP-device.
-
-Is that possible at present? how are you planning to represent ARPed
-devices in the DT - or more importantly, correlate DT (or other fwnode)
-nodes to discovered devices?
-
-> - When the device is hotplugged, you would need new ABI, like I think
-> =C2=A0 you already noticed, but this really does not make any sense. We
-> =C2=A0 simply don't need it, because the kernel can process this
-> =C2=A0 information on its own very simply.
-
-Even this "very simple" implementation may have bugs.
-
-Assuming we go with a kernel approach: For the MCTP case, for full ARP
-support of MCTP endpoints, we would still need to consume a hotplug
-event that indicates that the device is available at its new address
-- there is no kernel driver bound for the remote MCTP endpoints. This
-event would be consumed by the (existing) MCTP infrastructure in order
-to start MCTP enumeration. Is this something you have looked at
-already? If so, if you can send an example of an actual event, I will
-look at the mctpd part of this.
-
-Cheers,
-
-
-Jeremy
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
