@@ -1,148 +1,160 @@
-Return-Path: <netdev+bounces-254497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254498-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIUQHR6SemlC8AEAu9opvQ
-	(envelope-from <netdev+bounces-254497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:47:58 +0100
+	id wHc9AzCSemlC8AEAu9opvQ
+	(envelope-from <netdev+bounces-254498-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:48:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0502A9BD9
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:47:57 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9C7A9BEE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 23:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A4BA930157CC
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:47:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 00AE53008260
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 22:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B132C159A;
-	Wed, 28 Jan 2026 22:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3301B33B6D8;
+	Wed, 28 Jan 2026 22:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="SyOhNsIE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n10ph/+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47EA26CE2C;
-	Wed, 28 Jan 2026 22:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82BA13959D;
+	Wed, 28 Jan 2026 22:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769640472; cv=none; b=o/XL+i3CrR4NBEV82jgeUfCXazQYcuPSjsU3IIWy4BJ0astCo7KDMeYaTVhUIS3jPts8DvNn7r75BwIwdfxCbHuN7xyjM6OhX8w4z1sZGxp7m3bzL+m9w0pJYRmhkfE+g4aq8ejYV2mK/DJntDpyPJa/oJVKzgK5tO0iyfSCaTs=
+	t=1769640494; cv=none; b=GnbMleramRJDancWzS31cFge3OIHl6tAuD5xBW3svl22449e8mEBCwLQfzMKcwJBOpnwLdQLCY9XExCzAIJLTP7+gQD9G1+zPd4VvV/kHi7zFNUJ/3IyXwqmY1eRysZzgEfeejQD6xE3Btf7SNNhDoTMfHLoRjAivdefr4VuXfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769640472; c=relaxed/simple;
-	bh=ialA5TyIBgxp+uDi4ejZ5ByJ3omyVvwj+aptox/jc5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dFJSCPgEOXW7q7GIoCsKfZOjzUCH79nmRIxZFG3HoxWndnLvhqBfvv1HZNTblyCvF+FSNIilH8OzEXU1fhzPTnNlOE2gJZp0F1w3+X2P4zV5CWjRuHrM0okj6EVZH4MZiT8lm9+v1xBcru5r9Pz0CeNELRQK4uH3+I6TyokAk/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=SyOhNsIE; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4f1cqQ2Kkhz9tgG;
-	Wed, 28 Jan 2026 23:47:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1769640466;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O4upRbVfTJ07DQH6ODb25K7X4KuRaWDl+UDpNd35zMs=;
-	b=SyOhNsIE+x9Koof+yayV9dROTmHkxZR2tmaXFlmoeW44lqFagrJdNkWousn1cicP7XiTHY
-	DawN7wl5LiqsBW7AI9VDIXQGPfHLD75VGtrYTxK4GHSaIscGr7Oc2u6pL2eHuY5pF9atMn
-	TxO+WldlLcQx6UyyJicNCkghMB3b0GmC0f71pRK72knE8HDQQF1hcFodMBMVwoErd2t1GD
-	4ySioLnGAQcrYpsAfeezykD6ZZykeyhtLymTdatgn3vu2W516EW4EVlmuXZHIBUNLDMwFt
-	A2i27xDC8jmDdSGiW8OyduPz0t+el9ptTDlA2mkwQcHx1amp3Uc3Kwg1jT/lvA==
-Date: Wed, 28 Jan 2026 23:47:36 +0100
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
+	s=arc-20240116; t=1769640494; c=relaxed/simple;
+	bh=vrnO1W+6ac7j5M0/tiDJZSAmJBbRiTOLVFQogL8dHP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=udxKy6Xg1v8ta2rnMMjU0NURNCHyWdXFlObA9Te76n3oNK02WubVLXatiycn8glV56xhSxYhQ1EwH4IJsDWr7cPRcggCPfcvy/o+FBkhnXLZ3tgIGPzOGgclfRA5+JjWwtlHiS91j3O2NfTViXlxlfUyVrTPioLetKoaDwC4udE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=n10ph/+0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+VMl/aaNyIVJsJjKhxjqtuqB/BkcH/0vrzYt9HocKc4=; b=n10ph/+0k7RmnEiXmw9nru7U0N
+	A52Hi7TufbaUz9i+HazOFUTQdX6e/Tgh3Z/S5v7UnSz60624dspmXywzV/DtP6owUdsxukkRCYH8C
+	syeCItqHkV5l9NmRwkdCd7MfHYOBfQpngRzEjyPeLQvVM14sR1MA77zdB+tYQGsISSE6AYHz3Kd19
+	DQZOdn/U1Nsuu4KqrvsEF7hPWxLBOjxFsbEGdB9k9i2jMCbhJrrcWYlL+17Yf+bOev0gGaXnf8RJ3
+	cY7wsEokFAeWJP2dJ0KzrqRWnjGls/zJ5WxxuFUeGOBIroEUzdFPa8jgc+ETPq8jLWliMnpoYOvp+
+	pU1dW4fg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44740)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vlEKR-000000007yM-3L8V;
+	Wed, 28 Jan 2026 22:48:03 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vlEKP-000000007Mo-1w2H;
+	Wed, 28 Jan 2026 22:48:01 +0000
+Date: Wed, 28 Jan 2026 22:48:01 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, festevam@gmail.com,
- linux-arm-kernel@lists.infradead.org, s.hauer@pengutronix.de,
- kernel@pengutronix.de, horms@kernel.org, shawnguo@kernel.org,
- imx@lists.linux.dev, linux-kernel@vger.kernel.org, conor+dt@kernel.org,
- devicetree@vger.kernel.org, wahrenst@gmx.net, pabeni@redhat.com,
- davem@davemloft.net, netdev@vger.kernel.org, richardcochran@gmail.com,
- edumazet@google.com, andrew+netdev@lunn.ch, robh@kernel.org,
- krzk+dt@kernel.org
-Subject: Re: [net-next,v20,2/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20260128234736.49bd70b3@wsk>
-In-Reply-To: <ed0e1af1-0210-4461-8939-3e4e35d74dae@lunn.ch>
-References: <20260126103400.1683125-3-lukasz.majewski@mailbox.org>
-	<20260128022549.4151341-1-kuba@kernel.org>
-	<20260128224125.246bcf41@wsk>
-	<ed0e1af1-0210-4461-8939-3e4e35d74dae@lunn.ch>
-Organization: mailbox.org
+Cc: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Marco Felsch <m.felsch@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
+ phy_init_hw
+Message-ID: <aXqSIU-AjGrqP8wb@shell.armlinux.org.uk>
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
+ <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
+ <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+ <fe9385a5-170f-474c-af8d-24bbfa5eb3ab@lunn.ch>
+ <CAOf5uwkr0Rmb_x0U88JAfozCQpkOoFOZ-V7BNteVZfcnNQF-Lw@mail.gmail.com>
+ <9f6b520c-203d-48cc-8bef-18959672052c@lunn.ch>
+ <aXqLBXs0fUIVkQg_@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: 686151c5d01e846fd34
-X-MBO-RS-META: 5xys9hdxh1j3adjqtyn71d9ygs5oeaky
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXqLBXs0fUIVkQg_@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254497-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lists.infradead.org,pengutronix.de,lists.linux.dev,vger.kernel.org,gmx.net,redhat.com,davemloft.net,google.com,lunn.ch];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukasz.majewski@mailbox.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[amarulasolutions.com,pengutronix.de,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_ALL(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-254498-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E0502A9BD9
+	NEURAL_HAM(-0.00)[-0.995];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15]
+X-Rspamd-Queue-Id: 9F9C7A9BEE
 X-Rspamd-Action: no action
 
-Hi Andrew,
+On Wed, Jan 28, 2026 at 10:17:41PM +0000, Russell King (Oracle) wrote:
+> As I've just mentioned earlier in this thread, there seems to be nothing
+> special about the LAN8710-like PHYs requiring their XTAL clock to be
+> running for reset to be functional. The same is true of AR8035 used
+> on i.MX6 SolidRun platforms, and Marvell 88E151x PHYs that I've looked
+> at. I would suggest that, in general, _all_ PHYs require their XTAL
+> clock to be running.
+> 
+> Therefore, this is not a work of the PHY at all.
+> 
+> It is a quirk of the board design to provide the PHY's XTAL clock from
+> the SoC, and this _seems_ to be common with FEC based systems, probably
+> because there's an easy way to get the clock from the FEC, thus saving
+> the cost of a crystal.
+> 
+> I stated how SolidRun handles this quirk entirely in uboot so the kernel
+> doesn't have to care about this at all, and the kernel doesn't get to
+> even know that the PHY has a reset GPIO.
 
-> On Wed, Jan 28, 2026 at 10:41:25PM +0100, =C5=81ukasz Majewski wrote:
-> > Hi Jakub,
-> >  =20
-> > > This is an AI-generated review =20
-> >=20
-> > AI is going to take the "Maintainer's" job :D =20
->=20
-> We had a bit of a discussion about this.
->=20
-> Our observations so far is that AI finds different sorts of issues,
-> which human reviewer often don't spot. It also does get things wrong,
-> so we spend some time sanity checking its reports. So overall, it
-> might actually increase the workload, but also increase the quality of
-> the code which gets committed.
->=20
+I've just been looking at the ZII dev rev B board, which uses a VF610
+with a KSZ8041 PHY. It sources its clock from the SoC as well. However,
+looking at the PHY datasheet, no clock is specified required during
+reset.
 
-Frankly - from the MTIP L2 switch patch set review - the AI review does
-a _really_ good job ...
+However, from what I can see, similar to the SolidRun platforms, the
+clock for the PHY isn't described in DT. It goes further though - nor
+is the PHY described, nor is the PHYs reset signal (which comes from
+io-expander@20).
 
-It finds non trivial issues - with very deep insights to function's
-call dependencies.
-
-> 	Andrew
-
-
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
