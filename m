@@ -1,202 +1,228 @@
-Return-Path: <netdev+bounces-254180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOgPNUvdeWnI0QEAu9opvQ
-	(envelope-from <netdev+bounces-254180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:56:27 +0100
+	id IELQMRffeWnI0QEAu9opvQ
+	(envelope-from <netdev+bounces-254181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:04:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A9F9F122
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:56:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4609F316
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F386304E72D
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:54:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F15CC30514A9
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E009F34CFBB;
-	Wed, 28 Jan 2026 09:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F892D7DE2;
+	Wed, 28 Jan 2026 10:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jIlDeW1b"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sjd96eby"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D3534D4FD
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 09:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4282C11E9
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769594059; cv=none; b=Bld5JiQ899Z/jK5GvFDGtqsuR5PMwdS6WFbbXRkQt1XaIzYeUf8dGhygMOaIG65llA48oYoKFfenjkn+68PwTnJaoxLXd2nc78daIf+J0+Q3PBz2Nb23VymxqKVUqMD7ncs++37nTifBPvpKAnAv9wBAyK4O1i8uA5k1APpPLno=
+	t=1769594551; cv=none; b=bIIocPDzbJVgMndGrWCu06CqSETLkUNVZrtVmBZlHvBOG26UC6oVT2QmqS2WFTmHG+gYYBKtw/HMop9C5DT2SUyyDzBHn9ojSJ47cFKpkEKhNybBzB3qV7vmYQv5dsOwC+us3vvP1ce6hfTYiDvHrFhjMhlkS/KQ46QWsjM4HJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769594059; c=relaxed/simple;
-	bh=8OOj3Wng4dXaPJsiDwVOM1LzCgSn6Um4RNSrv4895sE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OM3M6sdzT8DE30XoCD1JLLsGEgVMcHWxyVdt1t+RJH2hdnLMrIRG3n3cn780ekiO1H4TdgHmOmTKuXv54ELFwmylv8Hyval93Cs+XXx3e9os++tMC3j0IhHijmeqGbQbjaQHTRFwn7Uyp7JycN/RuP4hZcI0Ix6FsX4QGd2xhqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jIlDeW1b; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4806f9e61f9so2028275e9.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 01:54:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1769594056; x=1770198856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=93zs4bIGQjJ2eAJOoDnsMxPVORSrFYYCc5PKWJTbXFs=;
-        b=jIlDeW1b5o+cBEAZCUzsZAh8M9q4DYiYmboP2EEsyi+j0vGBio5x7tM5+LAPaK0PS5
-         iimWiGFtjCbecEYRSDsDg2gU7PYlC+Lm2Lvu+oSt3K5ClCeTzd4Blj8VAI9NpR0P5aXr
-         qccMfRpjoJDqMgvjDAJXXWsf5qNGc/tK9KovUWK4uLejHihh1WAdMmYnS/LOM8MgXTeG
-         jxTMosnVUhiaoHlDrlAFDVccAs17qONeVC3iUZmNfPCrfNozvTiKbRy1vKA+1ea25UAc
-         xala84Bx/9BYOZ02ZRuFWj25SuuP2dp7tVymeTQxht+p4YlwrEdiP7R40n/YJqnI6qnK
-         Y0bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769594056; x=1770198856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=93zs4bIGQjJ2eAJOoDnsMxPVORSrFYYCc5PKWJTbXFs=;
-        b=SnR19X2aNPYhq0UcnNQKHlXl4R9Tix3V+iexp98kLVGxQrxijtn4RG4cGAKAo6s2JS
-         KioKdmZG3/fQHcloZh6r6zwuiVAlaM0acPt0znp5atrNY0XqUjTj1vd9NbgBTSBEye0M
-         VtJXXheSIpUR90MQKsfgp8ySxeHxtkNGRne1kGWMdsOfUVrdqweJ4O5nBrmvld3FB4b5
-         CEFJGMQuX2lxCwmC4991YeQHu8Os8CpAG7Cl4jibDSCQ2hJ0O5oscVI6vR/dRZngiEDR
-         EDH6tU8YFXgmOwrdQwwQxfoxqLsvtpVnikbL5z/csaEzCu3biQqy6VKEeix5IQTmunyt
-         j4Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUe12w4Hotuos6RewR2Psy43a42jvhtEgNUvN3PlFt2fFyUvTj8FjbmEEHAzarusUSCnvE380A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRhupJIDvkF+dI0caYbP5ah3UrzVooCxtjLSKvVbaMuzs0lUwU
-	R38BQffYgPJ4xXx6DR7aE0TFP+jQbu2yqx53p8dFFTUNUPhW9O+e6YNukcpwVJcOOAc=
-X-Gm-Gg: AZuq6aIM04bJkkzGHeVTsBYqpBVLvTnCcqqm4LWfobbJddPn64AXY7DwVEDALSEUnZJ
-	LuaXG5OgcUTOMey+fX79l+1NCXGWgChRKcazGxc91aM3ysGWOdqhUoAHIJsel/62j9wQZPZG8ec
-	W+SR1fGSNzRAjfy2g8aDIv1V4UQrT5gPZDMDIbn051u1SXkDGruhLO+T0U0GvAhhq1o4v5OQ5zc
-	LnpcfKQbezpz9sEX54wi6DlWdyTf8k3mwTWmJoy3oTC1PrSYLV1FCvmgOm6CGxgK1UaEZaW+I3j
-	Zn0plPgjTsqUvBpnSqbnivMV+7XIEd8UfRw2goFC/QhL4lMujaODKlW9x24KdM6VEqpPFFhfA5y
-	ebSw8uyvEWjTvjIv6KZqwO9LZLYGU+awR70hRqqS6vOEt+p4EKFl/DVGHaBzANpE7oGgc3Ta86s
-	vVpjVkEXdQCVFTf739
-X-Received: by 2002:a05:600c:1d8c:b0:47b:deb9:f8a with SMTP id 5b1f17b1804b1-48069c7c4eemr58122425e9.30.1769594056369;
-        Wed, 28 Jan 2026 01:54:16 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1354114sm5903050f8f.42.2026.01.28.01.54.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 01:54:15 -0800 (PST)
-Date: Wed, 28 Jan 2026 12:54:13 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Chester Lin <chester62515@gmail.com>
-Cc: Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linaro-s32@linaro.org
-Subject: [PATCH v5 3/3] dts: s32g: Add GPR syscon region
-Message-ID: <1fbfa51de753039f132edc2554c41667e00c0176.1769592679.git.dan.carpenter@linaro.org>
-References: <cover.1769592679.git.dan.carpenter@linaro.org>
+	s=arc-20240116; t=1769594551; c=relaxed/simple;
+	bh=F72nBXVKIDY5tpWLPUxBk5sHSnJn/wGfp9bj9IxOdwQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fry8HQKU9OxgYBTBB7Ly+hRmZg2nBfMYBPrgaqaHlWwH1pXSMdPC9lWcZCcADyiSXKDonUu/HswI7MZK2AHIaCY3FhBRnWZ/OAb5T6Uz+Bq+hjM8yCzg1MC83BAXoAGkILk1Gf6SykcI5R2gZDGe3CCJGbWo+P8o0VC+ezNcX/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sjd96eby; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id C2D29C211E3;
+	Wed, 28 Jan 2026 10:02:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 49F6E6071A;
+	Wed, 28 Jan 2026 10:02:21 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 17E2C119A8805;
+	Wed, 28 Jan 2026 11:02:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1769594538; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=jl/qUj03yO9xDW1xqUwBwXsZCnYBNJNRMPOW11zOe6Y=;
+	b=sjd96ebyrvCGdPERJq6YfDm4tCFtKy+a7g8m54wbglfV7iboWOEwY5SJmSfnInyV4QPBlY
+	LzDO5YFZ1j+mGCmYTk8GCQjQy9wpAUCtaXmm2EfayCmHll9JgibdqvDTgkHpGSQQrFLAEO
+	CdvX1tkRhD9D9Zhg56BJ+XIv+QG0dBdqwlApnNO4alZVBO14eCXTwOiZ9FI37MWwCfDwBc
+	hU1eeKF1lmnHZw4ow541st0frBdOYlTx4xsD1wZe2NjwlKoRSebHvWKqYoGARtcvb2PH77
+	wupAyD/u1Edg7tK/FRyQjMJiFOJ/RriyV7US/aExvrfKYduY1o7agjt9LkGX7A==
+Message-ID: <fd4bb158-5138-4fc9-ad1f-d0002ec0fee4@bootlin.com>
+Date: Wed, 28 Jan 2026 11:02:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1769592679.git.dan.carpenter@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: micrel: fix clk warning when removing the
+ driver
+To: Wei Fang <wei.fang@nxp.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+ "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>,
+ "florian.fainelli@broadcom.com" <florian.fainelli@broadcom.com>
+Cc: "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260126081544.983517-1-wei.fang@nxp.com>
+ <13f1599a-afd7-4350-a395-83c57ab91f18@bootlin.com>
+ <AM9PR04MB8505744A93921B488AD9505C8891A@AM9PR04MB8505.eurprd04.prod.outlook.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <AM9PR04MB8505744A93921B488AD9505C8891A@AM9PR04MB8505.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254180-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254181-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,oss.nxp.com,nxp.com,kernel.org,pengutronix.de,gmail.com,lists.infradead.org,lists.linux.dev,vger.kernel.org,linaro.org];
-	DKIM_TRACE(0.00)[linaro.org:+];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.carpenter@linaro.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid,4007c000:email,4033c000:email]
-X-Rspamd-Queue-Id: 35A9F9F122
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:mid,bootlin.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email]
+X-Rspamd-Queue-Id: 3F4609F316
 X-Rspamd-Action: no action
 
-Add the GPR syscon region for the s32 chipset.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-v5: no change
-v4: no change
-v3: no change
-v2: Remove #address-cells and #size-cells
 
- arch/arm64/boot/dts/freescale/s32g2.dtsi | 6 ++++++
- arch/arm64/boot/dts/freescale/s32g3.dtsi | 6 ++++++
- 2 files changed, 12 insertions(+)
+On 28/01/2026 10:36, Wei Fang wrote:
+>> On 26/01/2026 09:15, Wei Fang wrote:
+>>> Since the commit 25c6a5ab151f ("net: phy: micrel: Dynamically control
+>>> external clock of KSZ PHY"), the clock of Micrel PHY has been enabled
+>>> by phy_driver::resume() and disabled by phy_driver::suspend(). However,
+>>> devm_clk_get_optional_enabled() is used in kszphy_probe(), so the clock
+>>> will automatically be disabled when the device is unbound from the bus.
+>>> Therefore, this could cause the clock to be disabled twice, resulting
+>>> in clk driver warnings.
+>>>
+>>> For example, this issue can be reproduced on i.MX6ULL platform, and we
+>>> can see the following logs when removing the FEC MAC drivers.
+>>>
+>>> $ echo 2188000.ethernet > /sys/bus/platform/drivers/fec/unbind
+>>> $ echo 20b4000.ethernet > /sys/bus/platform/drivers/fec/unbind
+>>> [  109.758207] ------------[ cut here ]------------
+>>> [  109.758240] WARNING: drivers/clk/clk.c:1188 at
+>> clk_core_disable+0xb4/0xd0, CPU#0: sh/639
+>>> [  109.771011] enet2_ref already disabled
+>>> [  109.793359] Call trace:
+>>> [  109.822006]  clk_core_disable from clk_disable+0x28/0x34
+>>> [  109.827340]  clk_disable from clk_disable_unprepare+0xc/0x18
+>>> [  109.833029]  clk_disable_unprepare from devm_clk_release+0x1c/0x28
+>>> [  109.839241]  devm_clk_release from devres_release_all+0x98/0x100
+>>> [  109.845278]  devres_release_all from device_unbind_cleanup+0xc/0x70
+>>> [  109.851571]  device_unbind_cleanup from
+>> device_release_driver_internal+0x1a4/0x1f4
+>>> [  109.859170]  device_release_driver_internal from
+>> bus_remove_device+0xbc/0xe4
+>>> [  109.866243]  bus_remove_device from device_del+0x140/0x458
+>>> [  109.871757]  device_del from phy_mdio_device_remove+0xc/0x24
+>>> [  109.877452]  phy_mdio_device_remove from
+>> mdiobus_unregister+0x40/0xac
+>>> [  109.883918]  mdiobus_unregister from
+>> fec_enet_mii_remove+0x40/0x78
+>>> [  109.890125]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
+>>> [  109.896076]  fec_drv_remove from
+>> device_release_driver_internal+0x17c/0x1f4
+>>> [  109.962748] WARNING: drivers/clk/clk.c:1047 at
+>> clk_core_unprepare+0xfc/0x13c, CPU#0: sh/639
+>>> [  109.975805] enet2_ref already unprepared
+>>> [  110.002866] Call trace:
+>>> [  110.031758]  clk_core_unprepare from clk_unprepare+0x24/0x2c
+>>> [  110.037440]  clk_unprepare from devm_clk_release+0x1c/0x28
+>>> [  110.042957]  devm_clk_release from devres_release_all+0x98/0x100
+>>> [  110.048989]  devres_release_all from device_unbind_cleanup+0xc/0x70
+>>> [  110.055280]  device_unbind_cleanup from
+>> device_release_driver_internal+0x1a4/0x1f4
+>>> [  110.062877]  device_release_driver_internal from
+>> bus_remove_device+0xbc/0xe4
+>>> [  110.069950]  bus_remove_device from device_del+0x140/0x458
+>>> [  110.075469]  device_del from phy_mdio_device_remove+0xc/0x24
+>>> [  110.081165]  phy_mdio_device_remove from
+>> mdiobus_unregister+0x40/0xac
+>>> [  110.087632]  mdiobus_unregister from
+>> fec_enet_mii_remove+0x40/0x78
+>>> [  110.093836]  fec_enet_mii_remove from fec_drv_remove+0x4c/0x158
+>>> [  110.099782]  fec_drv_remove from
+>> device_release_driver_internal+0x17c/0x1f4
+>>>
+>>> After analyzing the process of removing the FEC driver, as shown below,
+>>> it can be seen that the clock was disabled twice by the PHY driver.
+>>>
+>>> fec_drv_remove()
+>>>   --> fec_enet_close()
+>>>     --> phy_stop()
+>>>       --> phy_suspend()
+>>>         --> kszphy_suspend() #1 The clock is disabled
+>>>   --> fec_enet_mii_remove()
+>>>     --> mdiobus_unregister()
+>>>       --> phy_mdio_device_remove()
+>>>         --> device_del()
+>>>           --> devm_clk_release() #2 The clock is disabled again
+>>>
+>>> Therefore, devm_clk_get_optional() is used to fix the above issue. And
+>>> to avoid the issue mentioned by the commit 985329462723 ("net: phy:
+>>> micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
+>>> clock is enabled by clk_prepare_enable() to get the correct clock rate.
+>>>
+>>> Fixes: 25c6a5ab151f ("net: phy: micrel: Dynamically control external clock of
+>> KSZ PHY")
+>>> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+>>
+>> This should fix the issue indeed. The dance of enabling/disabling then
+>> re-enabling at resume() again feels odd, but at least it's balanced.
+>>
+>> We may be able to avoid that entirely by dealing with the ref_mii_clk
+>> selection only in the .resume() path, as it's also called no long after
+>> config_init(). That would mean reading the clock rate in
+>> kszphy_config_reset(), then performing the kszphy_rmii_clk_sel()
+>> accordingly.
+>>
+> 
+> It seems rather strange to get the clock rate every time the .resume()
+> is called. Otherwise, we would need to add some additional logic to 
+> kszphy_rmii_clk_sel() to ensure that the clock rate is only obtained
+> once. IMO, it would be more reasonable to only get the clock rate in
+> the .probe() during the lifetime of the PHY driver.
+> 
+> Furthermore, this seems to break the previous logic: when the clock
+> rate is incorrect, the .probe() will return an error, meaning the PHY
+> driver will not be loaded.
+> 
 
-diff --git a/arch/arm64/boot/dts/freescale/s32g2.dtsi b/arch/arm64/boot/dts/freescale/s32g2.dtsi
-index 51d00dac12de..b954952d962b 100644
---- a/arch/arm64/boot/dts/freescale/s32g2.dtsi
-+++ b/arch/arm64/boot/dts/freescale/s32g2.dtsi
-@@ -325,6 +325,11 @@ usdhc0-200mhz-grp4 {
- 			};
- 		};
- 
-+		gpr: syscon@4007c000 {
-+			compatible = "nxp,s32g2-gpr", "syscon";
-+			reg = <0x4007c000 0x3000>;
-+		};
-+
- 		ocotp: nvmem@400a4000 {
- 			compatible = "nxp,s32g2-ocotp";
- 			reg = <0x400a4000 0x400>;
-@@ -731,6 +736,7 @@ gmac0: ethernet@4033c000 {
- 			compatible = "nxp,s32g2-dwmac";
- 			reg = <0x4033c000 0x2000>, /* gmac IP */
- 			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-+			nxp,phy-sel = <&gpr 0x4>;
- 			interrupt-parent = <&gic>;
- 			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
- 			interrupt-names = "macirq";
-diff --git a/arch/arm64/boot/dts/freescale/s32g3.dtsi b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-index e314f3c7d61d..be03db737384 100644
---- a/arch/arm64/boot/dts/freescale/s32g3.dtsi
-+++ b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-@@ -383,6 +383,11 @@ usdhc0-200mhz-grp4 {
- 			};
- 		};
- 
-+		gpr: syscon@4007c000 {
-+			compatible = "nxp,s32g3-gpr", "syscon";
-+			reg = <0x4007c000 0x3000>;
-+		};
-+
- 		ocotp: nvmem@400a4000 {
- 			compatible = "nxp,s32g3-ocotp", "nxp,s32g2-ocotp";
- 			reg = <0x400a4000 0x400>;
-@@ -808,6 +813,7 @@ gmac0: ethernet@4033c000 {
- 			compatible = "nxp,s32g2-dwmac";
- 			reg = <0x4033c000 0x2000>, /* gmac IP */
- 			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-+			nxp,phy-sel = <&gpr 0x4>;
- 			interrupt-parent = <&gic>;
- 			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
- 			interrupt-names = "macirq";
--- 
-2.51.0
+Makes sense to validate it early indeed :) All in all, this seems ok then.
+
+Maxime
 
 
