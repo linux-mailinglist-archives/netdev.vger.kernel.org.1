@@ -1,63 +1,68 @@
-Return-Path: <netdev+bounces-254240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gD6wNk4Cemn31QEAu9opvQ
-	(envelope-from <netdev+bounces-254240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:34:22 +0100
+	id 4GWfH04Demku1gEAu9opvQ
+	(envelope-from <netdev+bounces-254241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:38:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33C25A14F4
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C33F9A1593
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 13:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A38873063D78
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:31:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2040B3055E7C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 12:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCBF34EF06;
-	Wed, 28 Jan 2026 12:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A2734F468;
+	Wed, 28 Jan 2026 12:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/cCCv2F"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4307034E760;
-	Wed, 28 Jan 2026 12:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE92634EF1E
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 12:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769603465; cv=none; b=HkWb0gq6Tq7bkzr7p0ZRzQujNrkOBOrilqYG+QNK3nuAiadQJkBmD9Z7Z5nVVUEVnW4fdxPIVS91ytWGnm2lKDj/fBGljlZcq7nUPuM3xzmzL4nmd+vnjX2xE7bwBCy1eg6Im9SU3u89G1oxnyuwJIWRlaFdt/FKRh+KsQj+dLs=
+	t=1769603750; cv=none; b=gkV/uOKbGT++EDnbEbhaUFru/Xdvkgsof0eCg/xK2Y/6OKyewk/HNu/8JSnay8Smc0vrdEqHJMFtRNIgAoxkTdNjRMcIlg+xvjY5+wBgyFS8up0gWNyr/WWHxAbuqEY5LB/n4YbROQfIL1ycmzqwMxYb1oxfQmQWvMjwhcJnC/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769603465; c=relaxed/simple;
-	bh=o26NIRifOz86Ls8d6uX3q14Y/0oFbx2QAS8UvO81KgE=;
+	s=arc-20240116; t=1769603750; c=relaxed/simple;
+	bh=2hB3mxmxd1PJsgoUfw0PYv8ForcxzI42wf0pNXzt5JQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZFdU3qhUKl6Vr7KWwDImxEJpvAOyNGCqoc9BosLKc0hsIriCy7sgBDU+lnhs7hijwKlMfXpKwAByhL+zt8bnqh8Fky2fiN6lrby3wO6SBxkcQqE8n65rKVGntmRJllDTjBAYLvDEwjH7WGgCHyd5aCcIzHzi3T7Ed6rX2v8f9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 002151A1B8C;
-	Wed, 28 Jan 2026 13:30:57 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id DD1241A1B7F;
-	Wed, 28 Jan 2026 13:30:56 +0100 (CET)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BF73520364;
-	Wed, 28 Jan 2026 13:30:55 +0100 (CET)
-Date: Wed, 28 Jan 2026 13:30:56 +0100
-From: Jan Petrous <jan.petrous@oss.nxp.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: s32@nxp.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjzfq3C6UZQX3jchZ8JAWcWAuNxkKVhBcxBUk48BsTCrNhROslXRSR814Pszkw9DznL+tPfYtpCkCvmZsUHajnBLM3q/YHfByXQdv8cRkNmyympiPCeAq3k2XOA/FQ7mpifSWDD3bmB7ICFeXnecG0AKH8NEAJt91gJxvXgu2P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/cCCv2F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC8BC116C6;
+	Wed, 28 Jan 2026 12:35:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769603750;
+	bh=2hB3mxmxd1PJsgoUfw0PYv8ForcxzI42wf0pNXzt5JQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E/cCCv2F7IVATYMpVDys0ekpoa90PuotWl79Y5+Nkd2vdQY1Qjgg2AKdUbkqDFzqR
+	 eAZx+jd82qWzoGzRde4dt49gJJBd/O96OUiqMrRIASu5w/oSLbC5ckic3dOgcA3FYk
+	 1QyfW/F5siqVLktTHUaEUP/olmaV0rZxOtEyRLoZhbV78M8wnq028i9htqRLqaaycC
+	 nSYYIqP9Pk6uwCEgNX1ZatKXNRIAFLh909fm8o0V1ZSQZAzfzRwm/tg1hnhC9cSZHY
+	 4/lEqMrsa4oscEmkoVrlJP8cuSmzoE9cjsMbhx/GufKLM8WXLr504p9EQ1Cy4DjJwm
+	 ka8oPv5OGkW5g==
+Date: Wed, 28 Jan 2026 14:35:46 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linaro-s32@linaro.org, imx@lists.linux.dev
-Subject: Re: [PATCH v5 1/3] net: stmmac: s32: use a syscon for
- S32_PHY_INTF_SEL_RGMII
-Message-ID: <aXoBgO+qRRmB1yVM@lsv051416.swis.nl-cdc01.nxp.com>
-References: <cover.1769592679.git.dan.carpenter@linaro.org>
- <b38f1c628cdac8e87271e5fa4e2b71110c15b42c.1769592679.git.dan.carpenter@linaro.org>
+	Simon Horman <horms@kernel.org>, Ilan Tayari <ilant@mellanox.com>,
+	Guy Shapiro <guysh@mellanox.com>,
+	Yossi Kuperman <yossiku@mellanox.com>,
+	Network Development <netdev@vger.kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [PATCH net] xfrm: always flush state and policy upon
+ NETDEV_DOWN/NETDEV_UNREGISTER events
+Message-ID: <20260128123546.GC40916@unreal>
+References: <1de734e2-1da6-4b5c-8e03-66af7f88d074@I-love.SAKURA.ne.jp>
+ <20260128102404.GC12149@unreal>
+ <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,133 +71,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b38f1c628cdac8e87271e5fa4e2b71110c15b42c.1769592679.git.dan.carpenter@linaro.org>
-X-Virus-Scanned: ClamAV using ClamSMTP
+In-Reply-To: <83d06aca-4437-4d61-9c99-ac19b797a243@I-love.SAKURA.ne.jp>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254240-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,linaro.org,lists.linux.dev];
+	TO_DN_ALL(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254241-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jan.petrous@oss.nxp.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lsv051416.swis.nl-cdc01.nxp.com:mid,linaro.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email]
-X-Rspamd-Queue-Id: 33C25A14F4
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C33F9A1593
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 12:54:01PM +0300, Dan Carpenter wrote:
-> On the s32 chipsets the GMAC_0_CTRL_STS register is in GPR region.
-> Originally, accessing this register was done in a sort of ad-hoc way,
-> but we want to use the syscon interface to do it.
+On Wed, Jan 28, 2026 at 07:44:02PM +0900, Tetsuo Handa wrote:
+> On 2026/01/28 19:24, Leon Romanovsky wrote:
+> > I think this can work, but IMHO the more robust approach is to ensure that all
+> > states and policies are removed when the NETIF_F_HW_ESP feature bit is cleared.
 > 
-> This is a little bit ugly because we have to maintain backwards
-> compatibility to the old device trees so we have to support both ways
-> to access this register.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> v5: Return an error if regmap_write() fails
-> v4: no change
-> v3: no change
-> v2: Fix forward porting bug.  s/PHY_INTF_SEL_RGMII/S32_PHY_INTF_SEL_RGMII/
-> 
->  .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 28 +++++++++++++++----
->  1 file changed, 22 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> index 5a485ee98fa7..af594a096676 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> @@ -11,12 +11,14 @@
->  #include <linux/device.h>
->  #include <linux/ethtool.h>
->  #include <linux/io.h>
-> +#include <linux/mfd/syscon.h>
->  #include <linux/module.h>
->  #include <linux/of_mdio.h>
->  #include <linux/of_address.h>
->  #include <linux/phy.h>
->  #include <linux/phylink.h>
->  #include <linux/platform_device.h>
-> +#include <linux/regmap.h>
->  #include <linux/stmmac.h>
->  
->  #include "stmmac_platform.h"
-> @@ -32,6 +34,8 @@
->  struct s32_priv_data {
->  	void __iomem *ioaddr;
->  	void __iomem *ctrl_sts;
-> +	struct regmap *sts_regmap;
-> +	unsigned int sts_offset;
->  	struct device *dev;
->  	phy_interface_t *intf_mode;
->  	struct clk *tx_clk;
-> @@ -40,11 +44,17 @@ struct s32_priv_data {
->  
->  static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
->  {
-> -	writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
-> +	int ret = 0;
-> +
-> +	if (gmac->ctrl_sts)
-> +		writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
-> +	else
-> +		ret = regmap_write(gmac->sts_regmap, gmac->sts_offset,
-> +				   S32_PHY_INTF_SEL_RGMII);
->  
->  	dev_dbg(gmac->dev, "PHY mode set to %s\n", phy_modes(*gmac->intf_mode));
->  
-> -	return 0;
-> +	return ret;
->  }
->  
->  static int s32_gmac_init(struct device *dev, void *priv)
-> @@ -125,10 +135,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
->  				     "dt configuration failed\n");
->  
->  	/* PHY interface mode control reg */
-> -	gmac->ctrl_sts = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
-> -	if (IS_ERR(gmac->ctrl_sts))
-> -		return dev_err_probe(dev, PTR_ERR(gmac->ctrl_sts),
-> -				     "S32CC config region is missing\n");
-> +	gmac->sts_regmap = syscon_regmap_lookup_by_phandle_args(dev->of_node,
-> +					"nxp,phy-sel", 1, &gmac->sts_offset);
-> +	if (gmac->sts_regmap == ERR_PTR(-EPROBE_DEFER))
-> +		return PTR_ERR(gmac->sts_regmap);
-> +	if (IS_ERR(gmac->sts_regmap)) {
-> +		gmac->ctrl_sts = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
-> +		if (IS_ERR(gmac->ctrl_sts))
-> +			return dev_err_probe(dev, PTR_ERR(gmac->ctrl_sts),
-> +					     "S32CC config region is missing\n");
-> +	}
->  
->  	/* tx clock */
->  	gmac->tx_clk = devm_clk_get(&pdev->dev, "tx");
-> -- 
-> 2.51.0
-> 
+> The transaction will become complicated, for dev->features manipulation
+> function can fail.
 
-Reviewed-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+Line above returning NOTIFY_OK, check that NETIF_F_HW_ESP is cleared,
+and remove everything.
 
-Thanks.
-/Jan
+> 
+> > 
+> > Would it be possible to handle this in NETDEV_FEAT_CHANGE?
+> > 
+> 
+> Is there a guarantee that xfrm_dev_event(NETDEV_FEAT_CHANGE) is called
+> regardless of other callback functions, for it can return NOTIFY_BAD ?
 
+I don't know.
+
+Thanks
+
+> 
+> 
 
