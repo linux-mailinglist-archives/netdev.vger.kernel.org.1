@@ -1,207 +1,470 @@
-Return-Path: <netdev+bounces-254272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254273-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPyrH7wWemlS2QEAu9opvQ
-	(envelope-from <netdev+bounces-254272-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:01:32 +0100
+	id QJZkLs4XemlS2QEAu9opvQ
+	(envelope-from <netdev+bounces-254273-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:06:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D10A26A3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:01:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D634A2794
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 15:06:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4675C3004939
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 14:01:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6AE3E300D9ED
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 14:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B4C219303;
-	Wed, 28 Jan 2026 14:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108B523C4FD;
+	Wed, 28 Jan 2026 14:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OXv8lvup"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q08SQs3X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B540221F06
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 14:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769608889; cv=pass; b=rJEg6XyctYkaG7bswSIVcFZcd/A+fCY/wn+d8WLUSUiGRNUVv5S6lY/ebfEqL6s8kMwzTkcqu7NfgA5bTSSMBF6NNhqXUJs3dP/cvDI3lwopHN4iCd6BHE9xsz8qkvNRFrp5ecZTpi+2f5kiyl+DMa1qeODZi8LdEBTGUEKO70w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769608889; c=relaxed/simple;
-	bh=H7z8j6o5Nmr2FL63yiXwxYVIrezSwaaMXJMmSAwN0+g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=scPaZYcyJ55naUPwPNv7DCH+9gqbrx/Em7s9LENS53IPHCUCnKbvE+uKXj7v95i52HM1ZpM1TUBLqfZRt0pGOzyEUCDMKnRIC+Y5+vSt+LFDwV5UTL7nc0cHlA8O7/04XngHOIPTUDuyFNq83LREpqar/8jvZ8r+h05TxTak/Mg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OXv8lvup; arc=pass smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-89461ccc46eso117690096d6.2
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 06:01:28 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769608887; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Aqowv1qHgp6mXyGA7JpDbPh83J5hL3K99Pt495dyb+GVjxpPGsiDujclvE3QpNKlxE
-         88tLmh5Cyfzvcq/UpwBDl01+JJJKy9nJ2S15/YjYnSOtCOTe8XXM8ZMaIVznz1xBZn1Q
-         zxUJGFYbuOaH/YO/w7sfVBD+AJHLqj5KJHlXGKuGoH6fu2f6fsJcoEwKi4C2wT4F4LEt
-         6rnoEGIOssvHqkLXU7lNmq6yTkPbb20Dg9Ia9cNRouP+qZdT28wDGN6TTTMC2+fsCsKN
-         TaHFzpJ9zwFtDrA5F65z7DYXxRGsNcwLDYLkY9msNkGwzEAphzVHIy34tK+kjz9htI/G
-         1NDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=N6L5hcSI3XBBd6lYV7gjsb5kWjjN9hWWalHKMad3KQ0=;
-        fh=zQLqiYioY5Onrrih7g6byyrI9W3EO2sqXBvND63vsS0=;
-        b=heYBIocyShWKe+2zvmfVgptvxsHMPJOjfRMlxlpmEDfqb+ms+3iT3I0aDUYyz6W9A7
-         0xhGO2OmBF+ZxkBaiCOM1j/khDiQGZK7FilXaPVejJ1yZhIJj3BXb2cFwUzYH20MfXi3
-         VfqekPCJZ0tYnpo7phEzFeCa6P/oH9ovw69EMW82qzrxpK726vlNIocbfIp9ZpIz4chK
-         NSZL1+E2tjGGZJ14raebWJJixe/PdtKO32pWBfbtBoG2/ymKy/Zypxt3XJehr9Zh2a5c
-         /oMyQ4MUaQ0VRJET/Ov363TQJzkpHrP3YaoeqLpsWaMcrIl1IJjTp3l/Fh1c74NHYZP+
-         oUNg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769608887; x=1770213687; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N6L5hcSI3XBBd6lYV7gjsb5kWjjN9hWWalHKMad3KQ0=;
-        b=OXv8lvupnRDbDQzJuuYblMFAsTH+GVva4JCDdQgvLev4akxLG8nqJ+ei4/GEGnqpVq
-         zqJsswv+R2V5EsUPa+Kbw3HQg/oq1JyMcLWEkXWZRN5IHlUn/uT9mEdd+AM52BUY3uKx
-         fJCSCBBveVCy+RO2nRfItdGo9OBwgdpCnaMQKd3dz+LZOxS3RGCkEwGIazUuJ8xgWSvi
-         UVbDewFmpUIql4eG90zP7dkfEexEt0zXaFuJ0rmb0i7ilNMMaSiom7Zi6ZUj6uJhIPb2
-         R8LFn6r94pM8pWcop1Huc7OovQlonC9n+KDYmB4VTSPhpRFrw0Sb0ee0vlbkqWxnM2eG
-         Awmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769608887; x=1770213687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=N6L5hcSI3XBBd6lYV7gjsb5kWjjN9hWWalHKMad3KQ0=;
-        b=WYY5U/8vkOaH0DDwK2XopCLqFf0A5VC44Y0RkVwREpMkDmntuIU7YCvuBK0lgiNTxp
-         9rbN/f7wsOu5CBS700uSAMqpwFtn0ppIb+ZgPzicC5ZpBMPWCiqcTrgdO2Y6SEyNmQST
-         iu1ZvZo75EiHkN1NR4gdgLa1ha2P0syNiJ7koidRK05UQdpZKxYqxavAqLU+2g/jAs+f
-         uL4qzq9Fp/QG9OSk0ns4LP5LbZzjH1QkW9hMlO16g8o4D/k2ZLIw068zJ+IWQReqSPQZ
-         EWh6mKD8fp2WmMzW0q1TDmud8QEEZa07If0Lm6oww6SkcsOSp5e36lQUTnCmoMsOZsDv
-         kDeA==
-X-Forwarded-Encrypted: i=1; AJvYcCX56pEC2CsHSS9TvM6eWiH+Dt1A56Qkn9RGzvPNiIie8DEgG85OB/DBCU0u7BaomWeNqsAzqtU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtcd7Po4EsCWXG9OTabVoi7ZyqdqJG29Z5Z6IMc+WArAgolo3b
-	v9C0EpRSg6d188jNMThN35WxjnRIH+YFKD7UxhqHhWoXlt4/cdlTY7mLtvy+SFn3His4MuQh1pa
-	VOJBZditOeJaKZg9Z7wt6vixtT/DEQsb2VR+R2nfV
-X-Gm-Gg: AZuq6aKR/gSKfI+pnXQ5fm8fNRlPrlnJJKDx0Ra91c7bVVEx7uMmoVHrO+NgIlDcCbd
-	PS00XvRHraBsdnEcPZHsF2YKcG2CUbH6XRJXLjl9qfbArgmd/pY+uMVdRCakfWC2vS0KpD/Ptz5
-	/kjf8/lHeXznjpNsQfmPf9IvXVpBHedvFZ3AGYv5N9ZUYV9bp7iMOLJ16erIF6s4u3/ttBURuTZ
-	sD535Eyxe7vTFKYsQMf/DLvq4yR59Os6Ifj2mUlTRyLBfdA4JfF5vP/QZ/7lghMcpoi7w==
-X-Received: by 2002:ac8:7f55:0:b0:501:4cd0:a486 with SMTP id
- d75a77b69052e-5032f8f3d3amr69727581cf.54.1769608885150; Wed, 28 Jan 2026
- 06:01:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA95234964;
+	Wed, 28 Jan 2026 14:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769608960; cv=none; b=GxSoiwYfBN7yp70/A5dpj47LeWgboaHJxcqJPiJb/+1l0ol0kRWm4iX1c+kAlty1x2Fk9n7jKb5YOY0YroE2W0d1TuunX/eEoEXJd0LjPqSys/c3bAGRiFJCoPPuLPdAOgljCkir3+/qaVy5RlnBidllJS3ghPdeksBF3bzxmjQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769608960; c=relaxed/simple;
+	bh=DJYJy6rAk8mT7ZaSQdUIpTiwpwqy148hC1cHlbsyWMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uUwnSbFEY2pqB2It88xzlITal83M/NBj/Jtz1Y20WaQ8Ki7d3Q8sADCR5IvshXCEGWbBybBHJptmivcIr2a4M2puBuAFdh/US7qGSXj7gEtr4VgY1jt2kPzlXedJIj4+shOcDp+4zdHaDMiDmya9rsofxaoN3Ekgrlou8N9WHGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q08SQs3X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D5FCC4CEF1;
+	Wed, 28 Jan 2026 14:02:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769608960;
+	bh=DJYJy6rAk8mT7ZaSQdUIpTiwpwqy148hC1cHlbsyWMs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Q08SQs3Xfz4etQe09Uf2U07aKF8yM3DjGfCHspwWepYA6a4QMYujKntJdJT23t8R2
+	 LjMzRMGqjS2IbK4OCx351wRmzgvot4atywiaJr/9BO8HDTuS70url9H6UJhUi9Dtxk
+	 juZHnWQAq6CGv04Rx6rk1msE96O478gaC4KxoLpArKIOWsQrUEhjhwyHEFYmqdrBVG
+	 CGZZ8oKf7a2zkZKmessyFz1TvrI2numIePwaxzW9SLTD+imj6e+lkZr30ktMkMzb13
+	 +4te8RaxgErCavsbk3CiKQIzS/C9g+CcBi7fAwZnrjrBy6D95T2nNPwuHSQh0gqH6y
+	 mPDhSsHJuNOpw==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] powerpc: dts: fsl: Drop unused .dtsi files
+Date: Wed, 28 Jan 2026 08:02:20 -0600
+Message-ID: <20260128140222.1627203-1-robh@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260127144433.196836-2-edumazet@google.com> <20260128025556.4169217-1-kuba@kernel.org>
-In-Reply-To: <20260128025556.4169217-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 28 Jan 2026 15:01:13 +0100
-X-Gm-Features: AZwV_QgoUUMQuMFp5Jt_bp1NYh-ndfG06OmuabUin03w1gYxrWHzNEWp5QjGRVk
-Message-ID: <CANn89i+W13kkNwpW6YPeZswf_WJR4g_TMGS_27cU2fHS8KKG-w@mail.gmail.com>
-Subject: Re: [net,1/2] net: add skb_header_pointer_careful() helper
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: horms@kernel.org, jhs@mojatatu.com, davem@davemloft.net, jiri@resnulli.us, 
-	km.kim1503@gmail.com, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	eric.dumazet@gmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,davemloft.net,resnulli.us,gmail.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-254272-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,linux.ibm.com,ellerman.id.au,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254273-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 83D10A26A3
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6D634A2794
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 3:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
-> ---
-> net: add skb_header_pointer_careful() helper
->
-> This patch adds a new helper to validate negative offsets before calling
-> skb_header_pointer().  The commit message states that negative offsets
-> are supported "as long as the zone starts between skb->head and
-> skb->data."
->
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index 86737076101d..72679aa7af58 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -4301,6 +4301,18 @@ skb_header_pointer(const struct sk_buff *skb, in=
-t offset, int len, void *buffer)
-> >                                   skb_headlen(skb), buffer);
-> >  }
-> >
-> > +/* Variant of skb_header_pointer() where @offset is user-controlled
-> > + * and potentially negative.
-> > + */
-> > +static inline void * __must_check
-> > +skb_header_pointer_careful(const struct sk_buff *skb, int offset,
-> > +                        int len, void *buffer)
-> > +{
-> > +     if (unlikely(offset < 0 && -offset > skb_headlen(skb)))
-> > +             return NULL;
->
-> Should this check use skb_headroom() instead of skb_headlen()?
->
-> The commit message says negative offsets should be valid when the zone
-> is "between skb->head and skb->data" - that describes the headroom, not
-> the headlen.  For a negative offset, skb_header_pointer() returns
-> skb->data + offset, which points into the headroom area.
->
-> skb_headlen() returns the linear data length after skb->data (skb->len
-> minus skb->data_len), while skb_headroom() returns the space before
-> skb->data (skb->data minus skb->head).
->
-> These values are quite different in practice - headroom is typically
-> small (2-128 bytes), while headlen can be up to MTU size (~1500 bytes).
-> With the current check, an offset like -100 would pass validation when
-> skb_headlen is 1500, but could read before skb->head if skb_headroom is
-> only 2 bytes.
->
-> The existing offset_valid() function in net/sched/act_pedit.c uses
-> skb_headroom() for this same type of check:
->
->     if  (offset < 0 && -offset > skb_headroom(skb))
->         return false;
->
-> > +     return skb_header_pointer(skb, offset, len, buffer);
-> > +}
+These files are not included by anything and therefore don't get built or
+tested.
 
-Yes, of course, silly error on my side.
+There's also no upstream driver for the interlaken-lac stuff.
+
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ .../boot/dts/fsl/interlaken-lac-portals.dtsi  | 156 ------------------
+ arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi |  45 -----
+ .../boot/dts/fsl/pq3-mpic-message-B.dtsi      |  43 -----
+ .../fsl/qoriq-fman3-0-10g-1-best-effort.dtsi  |  80 ---------
+ 4 files changed, 324 deletions(-)
+ delete mode 100644 arch/powerpc/boot/dts/fsl/interlaken-lac-portals.dtsi
+ delete mode 100644 arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi
+ delete mode 100644 arch/powerpc/boot/dts/fsl/pq3-mpic-message-B.dtsi
+ delete mode 100644 arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
+
+diff --git a/arch/powerpc/boot/dts/fsl/interlaken-lac-portals.dtsi b/arch/powerpc/boot/dts/fsl/interlaken-lac-portals.dtsi
+deleted file mode 100644
+index 9cffccf4e07e..000000000000
+--- a/arch/powerpc/boot/dts/fsl/interlaken-lac-portals.dtsi
++++ /dev/null
+@@ -1,156 +0,0 @@
+-/* T4240 Interlaken LAC Portal device tree stub with 24 portals.
+- *
+- * Copyright 2012 Freescale Semiconductor Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Freescale Semiconductor nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- *
+- * ALTERNATIVELY, this software may be distributed under the terms of the
+- * GNU General Public License ("GPL") as published by the Free Software
+- * Foundation, either version 2 of that License or (at your option) any
+- * later version.
+- *
+- * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+- * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-#address-cells = <0x1>;
+-#size-cells = <0x1>;
+-compatible = "fsl,interlaken-lac-portals";
+-
+-lportal0: lac-portal@0 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x0 0x1000>;
+-};
+-
+-lportal1: lac-portal@1000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x1000 0x1000>;
+-};
+-
+-lportal2: lac-portal@2000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x2000 0x1000>;
+-};
+-
+-lportal3: lac-portal@3000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x3000 0x1000>;
+-};
+-
+-lportal4: lac-portal@4000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x4000 0x1000>;
+-};
+-
+-lportal5: lac-portal@5000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x5000 0x1000>;
+-};
+-
+-lportal6: lac-portal@6000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x6000 0x1000>;
+-};
+-
+-lportal7: lac-portal@7000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x7000 0x1000>;
+-};
+-
+-lportal8: lac-portal@8000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x8000 0x1000>;
+-};
+-
+-lportal9: lac-portal@9000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x9000 0x1000>;
+-};
+-
+-lportal10: lac-portal@A000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xA000 0x1000>;
+-};
+-
+-lportal11: lac-portal@B000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xB000 0x1000>;
+-};
+-
+-lportal12: lac-portal@C000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xC000 0x1000>;
+-};
+-
+-lportal13: lac-portal@D000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xD000 0x1000>;
+-};
+-
+-lportal14: lac-portal@E000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xE000 0x1000>;
+-};
+-
+-lportal15: lac-portal@F000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0xF000 0x1000>;
+-};
+-
+-lportal16: lac-portal@10000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x10000 0x1000>;
+-};
+-
+-lportal17: lac-portal@11000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x11000 0x1000>;
+-};
+-
+-lportal18: lac-portal@1200 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x12000 0x1000>;
+-};
+-
+-lportal19: lac-portal@13000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x13000 0x1000>;
+-};
+-
+-lportal20: lac-portal@14000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x14000 0x1000>;
+-};
+-
+-lportal21: lac-portal@15000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x15000 0x1000>;
+-};
+-
+-lportal22: lac-portal@16000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x16000 0x1000>;
+-};
+-
+-lportal23: lac-portal@17000 {
+-	compatible = "fsl,interlaken-lac-portal-v1.0";
+-	reg = <0x17000 0x1000>;
+-};
+diff --git a/arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi b/arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi
+deleted file mode 100644
+index e8208720ac0e..000000000000
+--- a/arch/powerpc/boot/dts/fsl/interlaken-lac.dtsi
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/*
+- * T4 Interlaken Look-aside Controller (LAC) device tree stub
+- *
+- * Copyright 2012 Freescale Semiconductor Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Freescale Semiconductor nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- *
+- * ALTERNATIVELY, this software may be distributed under the terms of the
+- * GNU General Public License ("GPL") as published by the Free Software
+- * Foundation, either version 2 of that License or (at your option) any
+- * later version.
+- *
+- * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+- * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-lac: lac@229000 {
+-	compatible = "fsl,interlaken-lac";
+-	reg = <0x229000 0x1000>;
+-	interrupts = <16 2 1 18>;
+-};
+-
+-lac-hv@228000 {
+-	compatible = "fsl,interlaken-lac-hv";
+-	reg = <0x228000 0x1000>;
+-	fsl,non-hv-node = <&lac>;
+-};
+diff --git a/arch/powerpc/boot/dts/fsl/pq3-mpic-message-B.dtsi b/arch/powerpc/boot/dts/fsl/pq3-mpic-message-B.dtsi
+deleted file mode 100644
+index 1cf0b77b1efe..000000000000
+--- a/arch/powerpc/boot/dts/fsl/pq3-mpic-message-B.dtsi
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/*
+- * PQ3 MPIC Message (Group B) device tree stub [ controller @ offset 0x42400 ]
+- *
+- * Copyright 2012 Freescale Semiconductor Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Freescale Semiconductor nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- *
+- * ALTERNATIVELY, this software may be distributed under the terms of the
+- * GNU General Public License ("GPL") as published by the Free Software
+- * Foundation, either version 2 of that License or (at your option) any
+- * later version.
+- *
+- * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor ``AS IS'' AND ANY
+- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+- * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-message@42400 {
+-	compatible = "fsl,mpic-v3.1-msgr";
+-	reg = <0x42400 0x200>;
+-	interrupts = <
+-		0xb4 2 0 0
+-		0xb5 2 0 0
+-		0xb6 2 0 0
+-		0xb7 2 0 0>;
+-};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
+deleted file mode 100644
+index 71eb75e82c2e..000000000000
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/*
+- * QorIQ FMan v3 1g port #1 device tree stub [ controller @ offset 0x400000 ]
+- *
+- * Copyright 2012 - 2015 Freescale Semiconductor Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *	 notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *	 notice, this list of conditions and the following disclaimer in the
+- *	 documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Freescale Semiconductor nor the
+- *	 names of its contributors may be used to endorse or promote products
+- *	 derived from this software without specific prior written permission.
+- *
+- *
+- * ALTERNATIVELY, this software may be distributed under the terms of the
+- * GNU General Public License ("GPL") as published by the Free Software
+- * Foundation, either version 2 of that License or (at your option) any
+- * later version.
+- *
+- * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor ``AS IS'' AND ANY
+- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+- * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
+-
+-fman@400000 {
+-	fman0_rx_0x09: port@89000 {
+-		cell-index = <0x9>;
+-		compatible = "fsl,fman-v3-port-rx";
+-		reg = <0x89000 0x1000>;
+-		fsl,fman-10g-port;
+-		fsl,fman-best-effort-port;
+-	};
+-
+-	fman0_tx_0x29: port@a9000 {
+-		cell-index = <0x29>;
+-		compatible = "fsl,fman-v3-port-tx";
+-		reg = <0xa9000 0x1000>;
+-		fsl,fman-10g-port;
+-		fsl,fman-best-effort-port;
+-	};
+-
+-	ethernet@e2000 {
+-		cell-index = <1>;
+-		compatible = "fsl,fman-memac";
+-		reg = <0xe2000 0x1000>;
+-		fsl,fman-ports = <&fman0_rx_0x09 &fman0_tx_0x29>;
+-		ptp-timer = <&ptp_timer0>;
+-		pcsphy-handle = <&pcsphy1>, <&qsgmiia_pcs1>;
+-		pcs-handle-names = "sgmii", "qsgmii";
+-	};
+-
+-	mdio@e1000 {
+-		qsgmiia_pcs1: ethernet-pcs@1 {
+-			compatible = "fsl,lynx-pcs";
+-			reg = <1>;
+-		};
+-	};
+-
+-	mdio@e3000 {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		compatible = "fsl,fman-memac-mdio", "fsl,fman-xmdio";
+-		reg = <0xe3000 0x1000>;
+-		fsl,erratum-a011043; /* must ignore read errors */
+-
+-		pcsphy1: ethernet-phy@0 {
+-			reg = <0x0>;
+-		};
+-	};
+-};
+-- 
+2.51.0
+
 
