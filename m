@@ -1,169 +1,133 @@
-Return-Path: <netdev+bounces-254372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sB4JFNFEemn34wEAu9opvQ
-	(envelope-from <netdev+bounces-254372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:18:09 +0100
+	id MBvrBXFGemkp5AEAu9opvQ
+	(envelope-from <netdev+bounces-254374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:25:05 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C87BA6B57
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:18:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABABCA6CFF
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 13CAC30DD7D9
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 16:57:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E22673038AE8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 17:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC863101DC;
-	Wed, 28 Jan 2026 16:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689B130FC12;
+	Wed, 28 Jan 2026 17:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NSvCk+PI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ENZnNNTq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com [209.85.160.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A162308F1D
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 16:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465D429A9C8
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 17:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769619462; cv=none; b=hiD8jPHRU69EIDMNlzYT6UL/yxA5KRF0hvnoipBGsia+RDnb99Nx2RZ6q5AqMs24FgKLqauy082gi08D/izl9BoAszCifsz1CR8mLRY5SM84wQcTQkyxWCDIP8bQXAE/0u0uhcQsj+NCfEn3uqNCRHpOk4nwxmjnSEgNMAoycj0=
+	t=1769619650; cv=none; b=fdP0Tl0Srx7p2t/GK8NseDXDaM1u6iedwW2gvmDedFNpsQX/HDs8G2iZHQtBtQ4zgup4HtjJdoYa7XUJujDPUrLj3r589LL/wFnoF9lXkVTz4EeUgOE4i1zLxcdUIYqSW726hreEI9PkkPLwIj4S+SrdIJKmtH7YHUOa8xwgJSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769619462; c=relaxed/simple;
-	bh=4K4OLHaqM/t/HXgyCFJoyTmAZzqjtCmqUqovtxJuMsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W5XWKZqDPvq5q+rJ+Adq9dLyRDlp5rvcQ+HB1z6zsva2Dqb6ViQjSGnaQLImSakQRtsMZPkwQf0asdUOAyKLft6p7WTqEK60ukvmUYlJ6BEytkg8fYesZB0sWYIcMp24/JR5JqxTo/rHRzd0C8RWWzvT5zRSh68IFxIamrEh0Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NSvCk+PI; arc=none smtp.client-ip=209.85.160.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f195.google.com with SMTP id d75a77b69052e-501502318b1so68882961cf.3
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 08:57:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769619460; x=1770224260; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=x5PPbKkTts0Y3gVIJ6pivviiM6v1XzmJpI/qsHikqnY=;
-        b=NSvCk+PIgibHYCb0s3AdIGmdLI4QoBnFvDwKJuBP5DmiVW4yY79sJBf8qYBpOmDO5W
-         s8uZeICawl1lVSPl0j34z6nCA3cC8ov0GbfWxFDPCYv1SaI3ci/SCe5k3h8tsfigeUsY
-         RvLaI+VQqmAxSVnTJk47FWIRbTEfLfdLiT4oJ7Pa5gNT9oLy5IOaTMH34pLKFzUbPqvy
-         KbQGVbRBLnVQ9UsP21MMKtDg6LPsUeLR9BRcU593Nmdr9qhbLnsy5O5phNWpSAojHfip
-         oxPPubyWn1/0lV1ho0SvwtUhVoXMzhD3/k7PzFHAWVXpEi1TqTuv/tXK54d994vX3vkm
-         9MPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769619460; x=1770224260;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x5PPbKkTts0Y3gVIJ6pivviiM6v1XzmJpI/qsHikqnY=;
-        b=MGOABlSFfUL7Lshub0hQ/259feiu2z9IcTq9S0KCa4qGLWJzqkSYtreTRT2Ps+OZid
-         KmIRGRSFGZftkryV60CLQd7CBxDl9s7Crsii7IkGYAeI7iBHAaVyY1MRc5gmfnlBiqkG
-         Y6jPgiUojMOY0pcxg9ZqAS71XPs2LjcEYZ1IlloBSZXMmzaclVMCe9ytIjAqaV6l1H5U
-         rD/+ZgCI4l/typTaEc6QtkfsLjarM/FPaxUTyizJXV05XfO3KaaXAk5zeGn7BTYPigVx
-         tADzsElM8DGFJ6WKsdZPLxd+wy4/H5D1gYCS0HbcPI/2yBwUgMvr/iR6S/RjaKgV+MqT
-         eTgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXY1/2UwG5P+a2Bc2eZUQ59Yu0nvPjITXNdVOetmG7Om5ry90pbyZfrFpykZX2rHPGI23k8Mk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKkvwCbPeplX+S4X8VtVftTwtxYDNDBb0WDcxvZKdXE3ShkE4X
-	yCc6lV0SOvo9lKEnbc+yKwMvLgd65EMR2FNJakK42q+rqKXrc27HiO5xGWLXKeCR13E=
-X-Gm-Gg: AZuq6aI4C+tOYgu3bFcdaA4u9NV5zzs3NMDOgBq6yfDsHCkUxYZLfxl6fY6TXjMMou7
-	fz41G8EqFIgzan/Q5J6kW/Hjrxq5KNyOPx/ZGaErrk82yvVx9NHZ/YYfHaEocwN3PWvYF9Ebxd5
-	n+WpGnavhygxAnp/eOCOgG2eAlHLwGckj4ikuN3nmFbtLt54Hxl8MqnbAa5TmACnP5iDkQIGxRM
-	+CjU6s3cJeCPZzhMkJwIy27jICeEKu3mLSpbjF6K5TM+uWwzNvppyQ8HuTojYKGUjbSvFJw4Zgo
-	SoktO1oT5JnY0iTgjfB3kbiAN4LELj+pbWmViUO/GPd5eR7C0CssteY22TTVEhBwcUQiYMlBIh3
-	NZ5wqpCnk181pxUqzcSUS5s/+egobNYuoNEsvYC7X4SSIuXvB8LvN1pd6kKMWh/+nE+IBFO9mv6
-	jFhr8cRAyLyFI9dudLHWHU6hBLQ1k8ems4EKyv479i9BbG37oX+OXfn8DDBWDDbpMaBiQ=
-X-Received: by 2002:a05:622a:592:b0:4e8:a6f8:e3c1 with SMTP id d75a77b69052e-5032f886480mr76621061cf.18.1769619460454;
-        Wed, 28 Jan 2026 08:57:40 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-894d36c85b9sm20499826d6.24.2026.01.28.08.57.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 08:57:39 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vl8rL-00000009KeE-1DOy;
-	Wed, 28 Jan 2026 12:57:39 -0400
-Date: Wed, 28 Jan 2026 12:57:39 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Zhiping Zhang <zhipingz@meta.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
-	Yochai Cohen <yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
-Message-ID: <20260128165739.GQ1641016@ziepe.ca>
-References: <20260113164923.GQ745888@ziepe.ca>
- <20260124011436.172058-1-zhipingz@meta.com>
+	s=arc-20240116; t=1769619650; c=relaxed/simple;
+	bh=rg6AtoBkuEsKAhSf+xlIls5ssn0QYilU2CZz4fWEzrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jLxfpoMmTK2y6UhZYgK7aZMx/jLiJ+vuhQHGby3wboYsxXIpGKlkvDp7ciDLRm1LNNaHK4oF3XYo7dwVMMhixBlPWnEjfEY2xs1WgoHiCj9T15acmtxrmBAFv4dbZ/VOmnSSf0BMOJI7D5iK6IDlEbnbE+Ti49WPr1V1hNm0Ur0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ENZnNNTq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAFEEC4CEF1;
+	Wed, 28 Jan 2026 17:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769619650;
+	bh=rg6AtoBkuEsKAhSf+xlIls5ssn0QYilU2CZz4fWEzrA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ENZnNNTqNY/Ogd3Q+DVhK+C6L7+CxJuDJXmeLS2GLe2QcHwLh9PcILKl/w5OjooH4
+	 EHIDMB2cKF7fNy/z17Lv+fZ1lu2xdnF2goew2dCWGUv4AbgaGodwCTBz8qZBvnEbFR
+	 /z4pGJHmGIBpaFHA09nkqW4anVJ32w8SAqz/EGOx2xS5idxPMSxn2bNjGcYdasrBIQ
+	 CxZguk/zBxAeGu+L5w72dOH3bIM4qtbxi7MAOPng6iNuI7KQrHCFt2JfMTkFxTbP7j
+	 5Ztx3shejSTZDLRWtaPipZBd+2N2JLg9AT4Ec2YLvjNBqNTdp4c4JRyjZUMh9fOGa2
+	 l2t3l0IBV80Fw==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next] net: sfp: add quirk for Lantech 8330-265D
+Date: Wed, 28 Jan 2026 18:00:44 +0100
+Message-ID: <20260128170044.15576-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260124011436.172058-1-zhipingz@meta.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	TAGGED_FROM(0.00)[bounces-254372-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,gmail.com,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-254374-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kabel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C87BA6B57
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ABABCA6CFF
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 05:13:19PM -0800, Zhiping Zhang wrote:
-> On Tue, 13 Jan 2026 12:49:23 -0400, Jason Gunthorpe wrote:
-> 
-> > On Mon, Jan 12, 2026 at 11:43:13PM -0800, Zhiping Zhang wrote:
-> > > Got it, thanks for pointing out the security concern! To address this, I
-> > > propose that we still pass the TPH value when allocating the dmah, but we add
-> > > a verification callback in the reg_mr_dmabuf flow to the dmabuf exporter. This
-> > > callback will ensure that the TPH value is correctly linked to the exporting
-> > > device’s MMIO, and only the exporter can authorize the TPH/tag association.
-> 
-> > That still sounds messy because we have to protect CPU memory.
-> 
-> > I think you should not use dmah possibly and make it so the dmabuf
-> entirely supplies the TPH value.
-> 
-> > Jason
-> 
-> Thanks Jason.
-> 
-> We already have an end-to-end workflow around dmah (perftest → rdma-core → kernel)
-> to carry the TPH hint, across multiple patch sets. References:
->   https://github.com/linux-rdma/perftest/commit/98bfb3679a1e71ec96df6a6d6c8124ac66ebce25
->   https://github.com/linux-rdma/rdma-core/pull/1623/commits
->   https://lore.kernel.org/all/cover.1752752567.git.leon@kernel.org/
-> 
-> Given that, I’d like to minimize churn and use the existing dmah-based flow, while
-> addressing the CPU-memory protection concern you raised. Would you be open to
-> reconsidering this approach?
+Similar to Lantech 8330-262D-E, the Lantech 8330-265D also reports
+2500MBd instead of 3125MBd.
 
-You would need to initialize the dmah from the dmabuf and then lock it
-to only be usable with that dmabuf. It doesn't avoid any dmabuf work,
-it just makes the whole flow more convoluted.
+Also, all 8330-265D report normal RX_LOS in EEPROM, but some signal
+inverted RX_LOS. We therefore need to ignore RX_LOS on these modules.
 
-Jason
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+ drivers/net/phy/sfp.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 47f095bd91ce..4746a8af3a8d 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -530,9 +530,13 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
+ 		  sfp_fixup_ignore_tx_fault),
+ 
+-	// Lantech 8330-262D-E can operate at 2500base-X, but incorrectly report
+-	// 2500MBd NRZ in their EEPROM
++	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
++	// incorrectly report 2500MBd NRZ in their EEPROM.
++	// Some 8330-265D modules have inverted LOS, while all of them report
++	// normal LOS in EEPROM. Therefore we need to ignore LOS entirely.
+ 	SFP_QUIRK_S("Lantech", "8330-262D-E", sfp_quirk_2500basex),
++	SFP_QUIRK("Lantech", "8330-265D", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_los),
+ 
+ 	SFP_QUIRK_S("UBNT", "UF-INSTANT", sfp_quirk_ubnt_uf_instant),
+ 
+-- 
+2.52.0
+
 
