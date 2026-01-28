@@ -1,162 +1,154 @@
-Return-Path: <netdev+bounces-254189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IrKCgDleWl60wEAu9opvQ
-	(envelope-from <netdev+bounces-254189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:20 +0100
+	id qCp7L8DkeWl60wEAu9opvQ
+	(envelope-from <netdev+bounces-254190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:28:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837E99F781
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:29:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCEB9F732
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:28:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1EC6C300AB05
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:25:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D169300DA7E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7E02E03F1;
-	Wed, 28 Jan 2026 10:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="EMUef2P4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7492EDD70;
+	Wed, 28 Jan 2026 10:28:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882D722A4EE;
-	Wed, 28 Jan 2026 10:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466E22DA75C
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769595935; cv=none; b=q7R1XJwYAA++NcX2DiB5dfRdPhq2JxcT/z860Mq7tFTb7NADvVZy5ynuzot944nE5tQNSmTbue3CCtESm/1Ry2sbUMuHKr/5KX3+KXnGsXHlfIKOKncvAbyshpgOtlBqbPadGQckzTU7a8VszvgzxIXmod5q2IqXlLtf0Ruj17s=
+	t=1769596092; cv=none; b=Zq9441xByDrxZfvg03YAIy8MAL9ft6Qw1WmXcotX/cwpg0SwujbqkvN1EqIsA5udK5zZtvfUag0UFFe59lbJQSwcXXDlQP2a9Xzvd5+RhxXv+0EG+hCLGfyTGar2WOorzTQOX18yPDui1nTUhZzLljsRbsgcmLFizLdcpM8nAwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769595935; c=relaxed/simple;
-	bh=YIy6M2/AOzp65V88aV0dZ7NcQwMFl2BcAWFhX101+UU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CznfS7AHOf9jojiE0TpncbWuUze9BG92ubTYG5mvwfIOzk90QW1O2wj92SZNfpJ9GWiu1UGE1l6g/y4n5BnRUi0avfYDUiUObNbkZhyAc9QNAPI0ipbAQXEeVhJ13NMmjmfXlbtTf4rZZbk3+h+iTNUTAGoGvYUuKW2/LKNKACc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=EMUef2P4; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id AB7D320758;
-	Wed, 28 Jan 2026 11:25:31 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HPq2c7-Ty6xV; Wed, 28 Jan 2026 11:25:31 +0100 (CET)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 212A820728;
-	Wed, 28 Jan 2026 11:25:31 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 212A820728
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1769595931;
-	bh=w47EH4sfTJk+vUYce7sc7AiolyK33rRCJj1B95arpUY=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=EMUef2P4Ut5c9j2BTF9/xd3b7eKBKBjvuQN+Nev7a0f9JozLwPxjCzcnzVd7CF5il
-	 G9c/7GkSfx8uhdTortPto7tnzVKhHihFt94csDKHe4p9HFjyMNA0DX3Db8DG3IPsYo
-	 tv5h+XzGpraZuAgvpaL/dCSg/6EyV0zwHd0/8/jG/Aw1I50XYw8+ttfhl8BdPN+DH8
-	 qFdlO9d8t4JfRoUHpkJB6do3vEM9/YyEQRfSjPu1HwkwjitZxXXPSIg/OegG8qkkdi
-	 QEF4zGvduGlPPPYjR4yM+Wi8aaKugUGt70Ob4jFilc72uUuZIXbt2tXozhVykwuD3D
-	 qfsNiJU+VL33A==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 28 Jan
- 2026 11:25:28 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Antony Antony <antony.antony@secunet.com>, Jakub Kicinski
-	<kuba@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, David Ahern
-	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, Shuah Khan
-	<shuah@kernel.org>, <devel@linux-ipsec.org>, Tobias Brunner
-	<tobias@strongswan.org>, Simon Horman <horms@kernel.org>,
-	<stable+noautosel@kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v4 1/2] icmp: fix ICMP error source address when xfrm policy matches
-Date: Wed, 28 Jan 2026 11:25:14 +0100
-Message-ID: <f820e0e9f80b1467f97d1408f00f61b1fdb1b986.1769595011.git.antony.antony@secunet.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <cover.1769595011.git.antony.antony@secunet.com>
-References: <cover.1769595011.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1769596092; c=relaxed/simple;
+	bh=pbVl0ODL9OzExgUwxrbIhZ3mNab1RLmbIY3owANW0Js=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fu5i7ICXGPbGEneK/SrO9MGoab6urJeSXHiJ0OSo5JawGgPY6uZg0g7/TDo/JalTkPDSCSgyxdgAI4E8xVOH+H2m4aa1s4ct3WMzqg4Pcofi2778/N4/hWT9pjg+caZbJMOS+VX+NZGMea+JUMizHry40PR/YAYwpEl/nS2yFa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60SAS7W1005303;
+	Wed, 28 Jan 2026 19:28:07 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60SAS78j005299
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 28 Jan 2026 19:28:07 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <1bb453af-3ef2-4ab6-a909-0705bd07c136@I-love.SAKURA.ne.jp>
+Date: Wed, 28 Jan 2026 19:28:05 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
- (10.32.0.172)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xfrm: kill xfrm_dev_{state,policy}_flush_secctx_check()
+To: Paul Moore <paul@paul-moore.com>, SELinux <selinux@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <2ec9c137-79a5-4562-8587-43dd2633f116@I-love.SAKURA.ne.jp>
+ <CAHC9VhQikhv+qCyQdnJguvy-qTkGXB+NU7=QZjw5d+WfyVxZhw@mail.gmail.com>
+ <00ed59a3-a9c9-47c3-97da-5a8e3da1ea82@I-love.SAKURA.ne.jp>
+ <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <CAHC9VhQq6jY63kYEQCp2t89Vv+_PDqv54RV6TO_TePDQyU6Vug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav203.rs.sakura.ne.jp
+X-Virus-Status: clean
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254189-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strongswan.org:email,secunet.com:email,secunet.com:dkim,secunet.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev,noautosel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[I-love.SAKURA.ne.jp:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 837E99F781
+	MIME_TRACE(0.00)[0:+];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[i-love.sakura.ne.jp];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[penguin-kernel@I-love.SAKURA.ne.jp,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254190-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 9CCEB9F732
 X-Rspamd-Action: no action
 
-When an IPsec gateway generates an ICMP error (e.g., Destination Host
-Unreachable), the source address incorrectly shows the unreachable
-destination instead of the gateway's address. IPv6 behaves correctly.
+On 2026/01/28 6:59, Paul Moore wrote:
+> It sounds like we either need to confirm that
+> security_xfrm_{policy,state}_delete() is already present in all code
+> paths that result in SPD/SAD deletions (in a place that can safely
+> fail and return an error),
 
-Before fix:
-  ping 10.1.6.3
-  From 10.1.6.3 icmp_seq=1 Destination Host Unreachable
-  (wrong - 10.1.6.3 is the unreachable host)
+Yes.
 
-After fix:
-  ping 10.1.6.3
-  From 10.1.5.2 icmp_seq=1 Destination Host Unreachable
-  (correct - 10.1.5.2 is the gateway)
+>                            or we need to place
+> xfrm_dev_{policy,state}_flush_secctx_check() in a location that can
+> safely fail.
 
-The fix removes the memcpy that overwrote fl4 with fl4_dec after
-xfrm_lookup(). A follow-up commit adds a selftest.
+Did you mean xfrm_{policy,state}_flush_secctx_check() ?
 
-Fixes: 415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
-Cc: stable+noautosel@kernel.org # Avoid false positives in tests
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Acked-by: Tobias Brunner <tobias@strongswan.org>
----
- net/ipv4/icmp.c | 1 -
- 1 file changed, 1 deletion(-)
+Regarding xfrm_policy_flush() as an example, we can observe that we are
+calling LSM hooks for must-not-fail callers. If the task_valid argument was
+meant to be interpreted as whether to call LSM hooks, xfrm_policy_flush() needs
+below change.
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 19c9c838967f..4bd421208ce0 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -569,7 +569,6 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
- 	rt2 = dst_rtable(dst2);
- 	if (!IS_ERR(dst2)) {
- 		dst_release(&rt->dst);
--		memcpy(fl4, &fl4_dec, sizeof(*fl4));
- 		rt = rt2;
- 	} else if (PTR_ERR(dst2) == -EPERM) {
- 		if (rt)
---
-2.39.5
+ int xfrm_policy_flush(struct net *net, u8 type, bool task_valid)
+ {
+ (...snipped...)
+-	err = xfrm_policy_flush_secctx_check(net, type, task_valid);
++	err = task_valid ? xfrm_policy_flush_secctx_check(net, type, task_valid) : 0;
+ (...snipped...)
+ }
+
+>               The patch doesn't relocate
+> xfrm_dev_{policy,state}_flush_secctx_check() and I don't really see
+> any mention about security_xfrm_{policy,state}_delete() in the patch
+> or description;
+>                 have you verified that the LSM xfrm hooks are still
+> being called to authorize the removals?
+
+Please distinguish caller for "delete" and caller for "release".
+LSM xfrm hooks need to be called for "delete" callers, but
+LSM xfrm hooks need to be bypassed for "release" callers.
+
+Maybe task_valid == true is for "delete" callers and task_valid == false is
+for "release" callers; though it seems that some locations are passing wrong
+task_valid flag (e.g. xfrm_dev_down() is passing task_valid == true despite
+it is a "release" caller).
+
+If 'task_valid == true is for "delete" callers and task_valid == false is for
+"release" callers' does not hold, we might need to add a "forced" flag
+(which is interpreted as whether LSM hooks must be bypassed) like
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit?h=next-20260123&id=fc0f090e41e652d158f946c616cdd82baed3c8f4
+does.
+
+Anyway, this patch which kills xfrm_dev_{state,policy}_flush_secctx_check()
+can be applied as-is because all callers are "release" callers.
 
 
