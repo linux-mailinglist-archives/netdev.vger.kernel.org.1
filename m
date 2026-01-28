@@ -1,132 +1,205 @@
-Return-Path: <netdev+bounces-254095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254096-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIxKIkCFeWnGxQEAu9opvQ
-	(envelope-from <netdev+bounces-254095-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:40:48 +0100
+	id CHYvDIeGeWnjxQEAu9opvQ
+	(envelope-from <netdev+bounces-254096-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:46:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125189CCD8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:40:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F7A9CD5C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F39933010DB6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:40:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3171F30098AB
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2902532E6BD;
-	Wed, 28 Jan 2026 03:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F2C21B9DA;
+	Wed, 28 Jan 2026 03:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BNTD6fv0"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C52F2C2346;
-	Wed, 28 Jan 2026 03:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBECEAE7;
+	Wed, 28 Jan 2026 03:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769571623; cv=none; b=JHLm90ZdYW1rC6o7nzqkcOc0e5BPMGRhOc4elq9VGyiehs1dxO8vxukBTPpCnWU9cRlbZl+OwFP0q6y55I5RZGx7pZDnIDQgZTdYFtcp7InR3601BT2qwMQbSMSa/cuTc8PQvNy8K++a0k+n6vD8Hgl29C8Xmi+CSgkHv2ivpKo=
+	t=1769571971; cv=none; b=CQ31yrN+yE4ma9zC0LFG1hyUAAqvi8kQXo91rllc0u/ZaayfYiqT4nayK0ik9pLWj3jWTIGsGt1N0XKGAx0aJZZREkRaQDi+tTvASkUlHZJiALv8vYZ+TJ2MqXdR1/SSNpksC6rWmeRwjqU/m2o2m6RCMBsZ3oTjwP+C5AowLkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769571623; c=relaxed/simple;
-	bh=zqCXqmNXUJ7W1NhgHlgGJdn677YyT7F7XqW9V1liAgo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sfb+4lJ76aG0BXLZ7LwX9dskafiMEoM0C6bg/+FlXjhTNIqiaSh+VkZYXSfH7Mfl3Cv/Qcx92s8eQmaI3JvzCyo1aqoHKvXSVzs3F+jXT7RBldcI+0oHoPuO3E9H7OpDYE7OsoAeFpJV/M6o5ibX3605yVdudvLdJVYWQjy7xvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.109] (unknown [123.118.222.47])
-	by APP-01 (Coremail) with SMTP id qwCowADHcW0DhXlpfl6GBg--.10567S2;
-	Wed, 28 Jan 2026 11:39:47 +0800 (CST)
-Message-ID: <91bf33e2-4588-419f-aedc-1f1b4e99fc56@iscas.ac.cn>
-Date: Wed, 28 Jan 2026 11:39:47 +0800
+	s=arc-20240116; t=1769571971; c=relaxed/simple;
+	bh=1M+1YOGQbt9/6ziEPlQTpN44s/6c/66A/9DeKBVuxcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tsuTh/JRt6UaSlqR4KS1prD/AI2fESJbb/KA6uhJT3oXvQtWvstByrAHwK1UFGEncyAbWgGy039QgcXbORg0bVyroEszsEcc5SijWH5GG3qlGlJb4fZbVjIUULuXlFcGh1aZgpHLfOpShRemfT5IumxuBKmmOR/j+ZZUfOKyVg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BNTD6fv0; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1769571959; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=UmaKvabuMBlglXK1NBRq+El3BuZIg9w3LA15cprF3JU=;
+	b=BNTD6fv0pzFuCp4Xt7rxDjR6uqw4EIEdBn+QjMSeC9su3sCiDXR0zAq3dGiI0zmh/6p2PnNcpMLOBkHWkRPPXb9M/YBFkM5cK2BnPg5tzjAlHs3OFAvaJLzOL+hkJv7hgPcvuxNDv2m+pHUhAErE+20ZaONAUh0kUzvh/PSKG0E=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wy20ywq_1769571958 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 28 Jan 2026 11:45:58 +0800
+Date: Wed, 28 Jan 2026 11:45:58 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Leon Romanovsky <leon@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	oliver.yang@linux.alibaba.com
+Subject: Re: [PATCH net-next 2/3] mm: vmalloc: export find_vm_area()
+Message-ID: <20260128034558.GA126415@j66a10360.sqa.eu95>
+References: <20260123082349.42663-1-alibuda@linux.alibaba.com>
+ <20260123082349.42663-3-alibuda@linux.alibaba.com>
+ <aXPEFdEdtSmd6AzF@milan>
+ <20260124093505.GA98529@j66a10360.sqa.eu95>
+ <aXSjm1DXm6yP62tD@pc636>
+ <20260124145754.GA57116@j66a10360.sqa.eu95>
+ <20260127133417.GU13967@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] PCI/MSI: Check msi_addr_mask in
- msi_verify_entries()
-To: Thomas Gleixner <tglx@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- "Creeley, Brett" <bcreeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-Cc: Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-riscv@lists.infradead.org, sophgo@lists.linux.dev
-References: <20260123-pci-msi-addr-mask-v3-0-9f9baa048524@iscas.ac.cn>
- <20260123-pci-msi-addr-mask-v3-2-9f9baa048524@iscas.ac.cn>
- <87jyx3be1t.ffs@tglx>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <87jyx3be1t.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qwCowADHcW0DhXlpfl6GBg--.10567S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYk7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2js
-	IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
-	5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
-	CFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxG
-	xcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4c8EcI0Ec7CjxVAaw2AFwI0_GF
-	v_Wryl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUojjgUUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260127133417.GU13967@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-254096-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FREEMAIL_TO(0.00)[kernel.org,linux.ibm.com,ellerman.id.au,gmail.com,amd.com,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,perex.cz,suse.com];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-254095-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,gmail.com,davemloft.net,linux-foundation.org,google.com,kernel.org,redhat.com,linux.ibm.com,vger.kernel.org,kvack.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wangruikang@iscas.ac.cn,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 125189CCD8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alibaba.com:email]
+X-Rspamd-Queue-Id: 95F7A9CD5C
 X-Rspamd-Action: no action
 
-Hi Thomas,
+On Tue, Jan 27, 2026 at 03:34:17PM +0200, Leon Romanovsky wrote:
+> On Sat, Jan 24, 2026 at 10:57:54PM +0800, D. Wythe wrote:
+> > On Sat, Jan 24, 2026 at 11:48:59AM +0100, Uladzislau Rezki wrote:
+> > > Hello, D. Wythe!
+> > > 
+> > > > On Fri, Jan 23, 2026 at 07:55:17PM +0100, Uladzislau Rezki wrote:
+> > > > > On Fri, Jan 23, 2026 at 04:23:48PM +0800, D. Wythe wrote:
+> > > > > > find_vm_area() provides a way to find the vm_struct associated with a
+> > > > > > virtual address. Export this symbol to modules so that modularized
+> > > > > > subsystems can perform lookups on vmalloc addresses.
+> > > > > > 
+> > > > > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> > > > > > ---
+> > > > > >  mm/vmalloc.c | 1 +
+> > > > > >  1 file changed, 1 insertion(+)
+> > > > > > 
+> > > > > > diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> > > > > > index ecbac900c35f..3eb9fe761c34 100644
+> > > > > > --- a/mm/vmalloc.c
+> > > > > > +++ b/mm/vmalloc.c
+> > > > > > @@ -3292,6 +3292,7 @@ struct vm_struct *find_vm_area(const void *addr)
+> > > > > >  
+> > > > > >  	return va->vm;
+> > > > > >  }
+> > > > > > +EXPORT_SYMBOL_GPL(find_vm_area);
+> > > > > >  
+> > > > > This is internal. We can not just export it.
+> > > > > 
+> > > > > --
+> > > > > Uladzislau Rezki
+> > > > 
+> > > > Hi Uladzislau,
+> > > > 
+> > > > Thank you for the feedback. I agree that we should avoid exposing
+> > > > internal implementation details like struct vm_struct to external
+> > > > subsystems.
+> > > > 
+> > > > Following Christoph's suggestion, I'm planning to encapsulate the page
+> > > > order lookup into a minimal helper instead:
+> > > > 
+> > > > unsigned int vmalloc_page_order(const void *addr){
+> > > > 	struct vm_struct *vm;
+> > > >  	vm = find_vm_area(addr);
+> > > > 	return vm ? vm->page_order : 0;
+> > > > }
+> > > > EXPORT_SYMBOL_GPL(vmalloc_page_order);
+> > > > 
+> > > > Does this approach look reasonable to you? It would keep the vm_struct
+> > > > layout private while satisfying the optimization needs of SMC.
+> > > > 
+> > > Could you please clarify why you need info about page_order? I have not
+> > > looked at your second patch.
+> > > 
+> > > Thanks!
+> > > 
+> > > --
+> > > Uladzislau Rezki
+> > 
+> > Hi Uladzislau,
+> > 
+> > This stems from optimizing memory registration in SMC-R. To provide the
+> > RDMA hardware with direct access to memory buffers, we must register
+> > them with the NIC. During this process, the hardware generates one MTT
+> > entry for each physically contiguous block. Since these hardware entries
+> > are a finite and scarce resource, and SMC currently defaults to a 4KB
+> > registration granularity, a single 2MB buffer consumes 512 entries. In
+> > high-concurrency scenarios, this inefficiency quickly exhausts NIC
+> > resources and becomes a major bottleneck for system scalability.
+> 
+> I believe this complexity can be avoided by using the RDMA MR pool API,
+> as other ULPs do, for example NVMe.
+> 
+> Thanks
+> 
 
-On 1/27/26 17:27, Thomas Gleixner wrote:
-> [...]
->
-> Other than those nits:
->
-> Reviewed-by: Thomas Gleixner <tglx@kernel.org>
+Hi Leon,
 
-I will fix these and patch 1 as well in v4. Thanks for your review.
+Am I correct in assuming you are suggesting mr_pool to limit the number
+of MRs as a way to cap MTTE consumption?
 
-Vivian "dramforever" Wang
+However, our goal is to maximize the total registered memory within
+the MTTE limits rather than to cap it. In SMC-R, each connection
+occupies a configurable, fixed-size registered buffer; consequently,
+the more memory we can register, the more concurrent connections
+we can support.
 
+By leveraging vmalloc_huge() and the proposed helper to increase the
+page_size in ib_map_mr_sg(), each MTTE covers a much larger contiguous
+physical block. This significantly reduces the total number of entries
+required to map the same amount of memory, allowing us to serve more
+connections under the same hardware constraints
+
+D. Wythe
 
