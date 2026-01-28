@@ -1,218 +1,243 @@
-Return-Path: <netdev+bounces-254414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254415-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMo1G7tbemm35QEAu9opvQ
-	(envelope-from <netdev+bounces-254414-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:55:55 +0100
+	id uHkuGAdcemm35QEAu9opvQ
+	(envelope-from <netdev+bounces-254415-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:57:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6829A7F35
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:55:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3BBA7F7E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 19:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E29A83013867
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:55:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B306300EA8A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 18:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6186436F427;
-	Wed, 28 Jan 2026 18:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0892D7DD1;
+	Wed, 28 Jan 2026 18:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C1dR8ubk"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XHjEqoAn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-vk1-f226.google.com (mail-vk1-f226.google.com [209.85.221.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E562C28AAEE
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 18:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622C3218592
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 18:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769626551; cv=none; b=Le4oXmDWVQQEJGHqAIIi4nU23DGCQLzmHmfn62n9zAU2i2cJtZJzIC+ZSx7ykyoiSMbIexWmhsj64QL3oQ6+AnDSYIZDoaaGcHQGJYvkOqSaiC2q6l9Y3Ctx+y+McPFQswaDkPUN4hcKGKH1hHuUhoChwfoxl/BlcjTzYsU/zwQ=
+	t=1769626628; cv=none; b=EN0nm0JoR/ouoQU7dIrMJN/tETXCaL5Gkq+fdOFrvSkiwtdg7R0MTrMmtg3PR/VXCmE+mVHQMypcIFGdy7J1C8TkPXz5uBQTQHQrH5pgCM+UBUub3zCuWwCL6ZWrN7cYE0KR/rRB5RZ94Wn4RJN30kS60ll0/Tbgh8NuEhKYVW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769626551; c=relaxed/simple;
-	bh=4sEz2VoxMP+LI4h0ZsT1LkK74861Mx7cpOxVUdrnGOs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZnKbQMbKHsmSfI5Rw7kOreCx57SdYbnVTrPcIO7sLLUcAsqFFu6spmILcZ/ZYlX4gWxa6oaU33v37wjlPjYRZ3PWRA/hg6OmKOTLQC/hLwgoG6WENpkd04KUhyf4Tyup9ql3lGyNud/U1psLvckcM8T/KyPpQbfWH0q8S8Ka7U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C1dR8ubk; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8c277fe676eso56660485a.0
-        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:55:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769626549; x=1770231349; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ghh46kZJNoiWH745I0ybK4zRgokPEdXhpdKREegy6yE=;
-        b=C1dR8ubkLJnZLNCaoDHkr1KBbCDDrUit1fm4yKSwMC1bKh/Fx/k/34rbU83+IPHdQO
-         VKOX4f7uX1poVACMIbIL2T8lR7wQej2KlsVYbu4xy0mui6frS6WRmyDINJi45CAEKZXM
-         Rc57fWoJtRLBAXhed5z7zvcx8jAhnt8Gas0gSLBY1bLfF2e2f50LvsUQCwDkEcYZji2i
-         LGv1/1GDSOXt3ss6LZRFsrWcF0ejcqUPHmzi4bU3mHn/tW5lxi6u27igALrai32q/Fep
-         N0GnIe8xN0ZAhKOuDrZOMn/2QS1m3l1TxWuwz7LxAQbqint08IsiMSch06W3nrbprPmB
-         x+NQ==
+	s=arc-20240116; t=1769626628; c=relaxed/simple;
+	bh=ZZFvhLLW+4tjabPStNfpCMG2EK6qmhVIP4RrtCFTlUg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JnHdZmcGprjbpOkkWebIAXFtwJiJvTG2TPYudTz0vX73l8zIyqnrXULxZ+Ngupbq2je/qf0MLl4+Hwe/B16SJcRT1PaPNQSWn08sTKuT0Cat5WJ6XNwt9iSiJXi1aVhHYzBdEhqK8iDDFXQI0TdSPeUJlWYNXMslejLzwEXh7bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XHjEqoAn; arc=none smtp.client-ip=209.85.221.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-vk1-f226.google.com with SMTP id 71dfb90a1353d-5664393d409so58984e0c.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:57:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769626549; x=1770231349;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ghh46kZJNoiWH745I0ybK4zRgokPEdXhpdKREegy6yE=;
-        b=Q7YjGHr+oDn9xkwobLpxD0bMaxMCwAxojxf50J/lCNZr5BlTIV409SDwBgY8nEgTIi
-         6RmA8hfg1y9Q81vjBqP67Od6H3KjVSSjNaJD7njm8Omir6n/m38FNvdpRNfx/+6cuTev
-         b0mRzpl5v4aBXNwMIos7amgxhAMqRUamk1Xd7M7LnQlqvDiet4Oxq45ZwMp6vavIcWCT
-         qtyx65vv9uvml5XlSWOFpbXp95lO6dwOzs/1/KuTOR31jCiTKiiS+sbGP0IJ2bMRKCiZ
-         9fM3RnAGAQ1BKxnm8c0BWH8zJ/B+UA9jE0Mu8leRSPYsmQVoUWVGhKFZ/JbC0RfqtkcS
-         4rPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdhQgRFSfPGPTKfO1ceDYRo0P2kr/ZYjG9IFgxhMKTvm1W2mPz1/uYmcU8f1IpiJDoAeIU+4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYMjz93M7WiNRpRLiL+RIfeY4vR0N7oZClno3ZTCJEiRheKGwi
-	opwY2GuE5DfobbPwp9qu76ZuZTcMvcmKHaa8n7XFtKXyB+5UYDh6GSocSscYMTkf09cAqLmMXBz
-	vlS8w1JKU5T6H2w==
-X-Received: from qkla23.prod.google.com ([2002:a05:620a:1257:b0:8c2:3ee9:f2c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1a95:b0:8c5:25dc:29c4 with SMTP id af79cd13be357-8c70b873f83mr790622985a.35.1769626548875;
- Wed, 28 Jan 2026 10:55:48 -0800 (PST)
-Date: Wed, 28 Jan 2026 18:55:47 +0000
+        d=1e100.net; s=20230601; t=1769626626; x=1770231426;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BvFd1fTqO9146bVPRLMhdaLclbvKUuCto0jGRttNiHA=;
+        b=mcag8KjmfwDQ5QcJ+dNGzYMU9KEaienpRUCD/521/GLAm4L8jca4+b9Lv3/f+KsebN
+         YJ3bt4RKOh/J6oAVQGPg766SmhatoVKwmGA48Mk0gxQmBUHXk4FML/nueTkzGe2HfdMU
+         0bmrNCIBiGj5vQwcIZgp+KUorDebg7B6PPbwq7KNZmS3NhNW1GHcDnMgRlT2014ELGz+
+         Xy3c+/2IoYfEsg68auvPhyNqcrj/KY2adu6XudSo9SpOZCB075guE0TMqnd7S8lbK+8v
+         6QMQAKXzGI6+MiChusaAHyn1JDIfB9tDnyuBl5ZhNhljgFZyZnAWWsogLW/6wHxMyHbK
+         jmnA==
+X-Gm-Message-State: AOJu0Yzt2PmJmQhVqEVJi5/Li1/lgh2XHgftDwu7Boblwhbelwdxn9ZW
+	Y/eRRMWOkXZCS1XD3eohTNwsWkKubcvXHeUhsBC30bvUXt8zczxAVG1JzcT5htKxCy+haMhB/Ek
+	3OOYFYFB3/NVBgNVuOFWSUGw+Ucx/I1NrP3bNOv7T0fLH5FEwUvPaqftgDz195++hz+Gsxz08PS
+	S2i7195tMR/UebJbcJnWdrqfjLt0Bv0J0RGgAiaJcRB2n80kB4aG21TJKCoq+wZUDgnAqL6Tuo2
+	GW7r3ilaQRXGzd/qw==
+X-Gm-Gg: AZuq6aJ5rQQIDmCQlcfMQ5rpL3Hn2S0rK16+LOaxz5iyOR+JvPz7bXP56DH5AaQFbCZ
+	kI6f+qpiPHXzU6ZJCDPT8odSgZvOw3jCb7gPm5lSyVM5OLhPq+EmadblsIOx8vLGmmiV7nGgr9i
+	Nsr/ec6EbKhVOQSsjtfJoeetRYAnV2NVQMv7kCRiWQtkR6KOE+YtSZqNsPkln4EyYGqbHKSyrmA
+	dfvQkRfL7mtnIb7g4Q4h30nlNng+fl6YXw4wJXlMdkooApdGRlHEvZbEv2ly4UNd8nk2UlH8ZmS
+	yyqSdNRAKY2roPfp67eLKtwOQkWApVHaSvO4G2dGIjtKiG6cPQ749W+fjvJMejkZ+esIBL9B7lH
+	zip23SFO2NjZjSCCIV9Go+GjUR7scqbZhRAG1SbFWtvyAWLUaYfneclfKCLXFX9Ivf2xvt/ZYig
+	IE0+5GYyRXVKjH+F0FYJZDdHtPTo6a3EMWEBv5vu/CTgxR846yfHQ=
+X-Received: by 2002:a05:6122:45a2:b0:566:34a2:71c8 with SMTP id 71dfb90a1353d-566794d31d5mr1913569e0c.6.1769626626113;
+        Wed, 28 Jan 2026 10:57:06 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-20.dlp.protect.broadcom.com. [144.49.247.20])
+        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-56685bac163sm342919e0c.3.2026.01.28.10.57.05
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Jan 2026 10:57:06 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-82323cc7594so60067b3a.2
+        for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:57:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1769626624; x=1770231424; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BvFd1fTqO9146bVPRLMhdaLclbvKUuCto0jGRttNiHA=;
+        b=XHjEqoAnVp1ZB27gEK2fDJSvJyOf9SQ8zi2+mnoZdjQyDBC4SjZDbf9KS80fKm5OTE
+         ECmwLHSEntiFfX2gTWjVhHx8NIFyk0A8braW5GUCvQdh/6qiwb2XujS7/T+t776zZsWb
+         rkUhgfzKQ05wUBFP7n96lQIsdAtCqkIDA1T+E=
+X-Received: by 2002:a05:6a00:2d17:b0:823:88a:7f1d with SMTP id d2e1a72fcca58-823692ed7ccmr5625244b3a.62.1769626624600;
+        Wed, 28 Jan 2026 10:57:04 -0800 (PST)
+X-Received: by 2002:a05:6a00:2d17:b0:823:88a:7f1d with SMTP id d2e1a72fcca58-823692ed7ccmr5625225b3a.62.1769626624214;
+        Wed, 28 Jan 2026 10:57:04 -0800 (PST)
+Received: from localhost.localdomain ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379c22466sm3263536b3a.50.2026.01.28.10.56.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 10:57:03 -0800 (PST)
+From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	vikas.gupta@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [v7, net-next 0/8] bng_en: enhancements for RX and TX datapath 
+Date: Thu, 29 Jan 2026 00:26:15 +0530
+Message-ID: <20260128185623.26559-1-bhargava.marreddy@broadcom.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
-Message-ID: <20260128185548.3738781-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: optimize fl6_update_dst()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254414-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254415-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E6829A7F35
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: BA3BBA7F7E
 X-Rspamd-Action: no action
 
-fl6_update_dst() is called for every TCP (and others) transmit,
-and is a nop for common cases.
+Hi,
 
-Split it in two parts :
+This series enhances the bng_en driver by adding:
+1. Tx support (standard + TSO)
+2. Rx support (standard + LRO/TPA)
 
-1) fl6_update_dst() inline helper, small and fast.
+Changes from:
+v6->v7:
+ - Addressed netdev.ai feedback shared by Jakub Kicinski by adding bounds
+   check in bnge_tpa_agg() to prevent agg_arr overflow.
 
-2) __fl6_update_dst() for the exception, out of line.
+v5->v6:
+ - Addressed netdev.ai feedback shared by Jakub Kicinski:
+    - Fixed AGG buffer leak in the non-copy (large packet) allocation path.
+    - Corrected TPA ID mask (0-1023) to prevent out-of-bounds array access.
+ - Refactored bnge_hw_def.h:
+    - Removed unused macros and migrated to BIT() and GENMASK().
+ - Retained DMA sync in buffer reuse path:
+    https://lore.kernel.org/netdev/CANXQDtaLFQc3XRrLEH2AytcZvkeUdD9AW8=KUwqGQvM+=Q6M2w@mail.gmail.com/
+    - Retained dma_sync_single_for_device() in the buffer reuse path.
+      Further review confirmed the sync is necessary for hardware ownership
+      transfer even for read-only CPU access.
 
-Small size increase to get better TX performance.
+v4->v5
+ Addressed comments from Paolo Abeni
+ - Fixed mixed whitespace and tab usage
+ - Reverse Christmas Tree style
+ - Replaced bitfields with bool
+ - Dropped redundant DMA sync to device
+ - Implemented ndo_features_check() to move length
+   and num_frag validation out of the Tx path
+ - Dropped redundant queue mapping check in Tx path
 
-$ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-add/remove: 2/2 grow/shrink: 8/0 up/down: 296/-125 (171)
-Function                                     old     new   delta
-__fl6_update_dst                               -     104    +104
-rawv6_sendmsg                               2244    2284     +40
-udpv6_sendmsg                               3013    3043     +30
-tcp_v6_connect                              1514    1534     +20
-cookie_v6_check                             1501    1519     +18
-ip6_datagram_dst_update                      673     690     +17
-inet6_sk_rebuild_header                      499     516     +17
-inet6_csk_route_socket                       507     524     +17
-inet6_csk_route_req                          343     360     +17
-__pfx___fl6_update_dst                         -      16     +16
-__pfx_fl6_update_dst                          16       -     -16
-fl6_update_dst                               109       -    -109
-Total: Before=22570304, After=22570475, chg +0.00%
+ Addressed comments from Paolo Abeni and Andrew Lunn
+ - Positioned macros before their associated structs
+ - Migrated to BIT() and GENMASK() macros
+ - Optimized DMA sync scope to packet length instead of full buffer
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/ipv6.h | 16 +++++++++++++---
- net/ipv6/exthdrs.c | 14 +++++++-------
- 2 files changed, 20 insertions(+), 10 deletions(-)
+ Addressed comments from ALOK TIWARI
+ - Fixed a typo in a comment.
+ - Updated macro to require all arguments to be passed explicitly
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index c7f597da01cd92293b9ffbd9e692dea75fd581b8..cf2203ff2bfd2b42381aba196578cd2668796c8b 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -1174,9 +1174,19 @@ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset, int target,
- 
- int ipv6_find_tlv(const struct sk_buff *skb, int offset, int type);
- 
--struct in6_addr *fl6_update_dst(struct flowi6 *fl6,
--				const struct ipv6_txoptions *opt,
--				struct in6_addr *orig);
-+struct in6_addr *__fl6_update_dst(struct flowi6 *fl6,
-+				  const struct ipv6_txoptions *opt,
-+				  struct in6_addr *orig);
-+
-+static inline struct in6_addr *
-+fl6_update_dst(struct flowi6 *fl6, const struct ipv6_txoptions *opt,
-+	       struct in6_addr *orig)
-+{
-+	if (likely(!opt))
-+		return NULL;
-+
-+	return __fl6_update_dst(fl6, opt, orig);
-+}
- 
- /*
-  *	socket options (ipv6_sockglue.c)
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index 54088fa0c09d068d35779e3cafd721cd24e00ea8..ae173abdca9965fb4be2a0565c81d1e24c5535c7 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -1336,21 +1336,21 @@ struct ipv6_txoptions *__ipv6_fixup_options(struct ipv6_txoptions *opt_space,
- EXPORT_SYMBOL_GPL(__ipv6_fixup_options);
- 
- /**
-- * fl6_update_dst - update flowi destination address with info given
-+ * __fl6_update_dst - update flowi destination address with info given
-  *                  by srcrt option, if any.
-  *
-  * @fl6: flowi6 for which daddr is to be updated
-  * @opt: struct ipv6_txoptions in which to look for srcrt opt
-  * @orig: copy of original daddr address if modified
-  *
-- * Returns NULL if no txoptions or no srcrt, otherwise returns orig
-+ * Returns NULL if no srcrt or invalid srcrt type, otherwise returns orig
-  * and initial value of fl6->daddr set in orig
-  */
--struct in6_addr *fl6_update_dst(struct flowi6 *fl6,
--				const struct ipv6_txoptions *opt,
--				struct in6_addr *orig)
-+struct in6_addr *__fl6_update_dst(struct flowi6 *fl6,
-+				  const struct ipv6_txoptions *opt,
-+				  struct in6_addr *orig)
- {
--	if (!opt || !opt->srcrt)
-+	if (!opt->srcrt)
- 		return NULL;
- 
- 	*orig = fl6->daddr;
-@@ -1374,4 +1374,4 @@ struct in6_addr *fl6_update_dst(struct flowi6 *fl6,
- 
- 	return orig;
- }
--EXPORT_SYMBOL_GPL(fl6_update_dst);
-+EXPORT_SYMBOL_GPL(__fl6_update_dst);
+v3->v4
+ - Scoped the series to RX and TX datapath per Jakub Kicinski's comments.
+ - Dropped IS_ERR() per Alok Tiwari's comments.
+
+v2->v3
+ Addressed comments from Andrew Lunn
+   - Apply Rev-xmas fix in several places.
+   - Correct ethtool-speed comment to reflect accurate behavior.
+
+ Addressed comments from ALOK TIWARI
+   - Remove duplicate definition of RX_CMP_L2_ERRORS.
+   - Fix macro by adding the required arguments.
+   - Add newline for clarity/formatting.
+
+ Addressed kernel test robot warning
+   - Fix compilation error: removed unused variable gro
+
+ Moved hw specific structs to appropriate header file
+
+v1->v2
+ Removed unused function bnge_alloc_rx_page()
+ Removed inline keywords from couple of functions
+ Removed some stats related code that doesn't applicable (missed_irqs)
+ Addressed kernel test robot warning
+    - Fixed compilation issue with CONFIG_INET is not set
+
+Bhargava Marreddy (8):
+  bng_en: Extend bnge_set_ring_params() for rx-copybreak
+  bng_en: Add RX support
+  bng_en: Handle an HWRM completion request
+  bng_en: Add TX support
+  bng_en: Add ndo_features_check support
+  bng_en: Add support to handle AGG events
+  bng_en: Add TPA related functions
+  bng_en: Add support for TPA events
+
+ drivers/net/ethernet/broadcom/bnge/Makefile   |    3 +-
+ .../net/ethernet/broadcom/bnge/bnge_hw_def.h  |  446 +++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |   65 +
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |    2 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  |  409 +++-
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  121 +-
+ .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 1645 +++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_txrx.h    |  126 ++
+ 8 files changed, 2776 insertions(+), 41 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
+
 -- 
-2.53.0.rc1.217.geba53bf80e-goog
+2.47.3
 
 
