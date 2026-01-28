@@ -1,65 +1,97 @@
-Return-Path: <netdev+bounces-254048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254049-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qJjmKGRjeWlhwwEAu9opvQ
-	(envelope-from <netdev+bounces-254048-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:16:20 +0100
+	id 4E5IAedkeWl1wwEAu9opvQ
+	(envelope-from <netdev+bounces-254049-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:22:47 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DB089BDD9
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A499BE1F
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B61FF305364E
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 01:14:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71E48300F9E3
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 01:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFDC23E334;
-	Wed, 28 Jan 2026 01:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFCE1C860C;
+	Wed, 28 Jan 2026 01:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gz3JH4Bc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L96/DjME"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B839023BCF7;
-	Wed, 28 Jan 2026 01:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FC119309C
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 01:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769562838; cv=none; b=AVc6SYPuJmOe+Pb4ZOD81EAfA4C18VtTs1FVsqavBpwSYn+zsCAkSaENV24wx9IizQMyBnR0MnTAALJv4yKCEuR1rZrbFc0kUP7Rcu7jHwhRvMeXpuOeJ7bdlWCUn0CRiaYJz448HShTQ6SDxmWBAV/QYxErNMHQc+PqNLNF/Os=
+	t=1769563363; cv=none; b=hHEuj6GEshvBbZogdpRJigKtkRsa0tWDdtANQAixCfbwoDCxvAnnTz9n2R1C6s7vsqkY1WIv79aNjfBw0iDTUXQzXdrMmrYt2U7dimaULzzvRiDI/ydPon5Dlo+tA0WvfSGPlWf7bS5WUB/Jh5f/BVOYkWLfaO94WdFqcl/2/Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769562838; c=relaxed/simple;
-	bh=CnY2yyQuycb6hQgMr4nKM5II5eO9Cte0UHBOW/ImI3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WhfpVkEE0ffJQeF7tdetC5hnnRb2uNLHw2Dmc/eG/Je6ne9I7o6SzBm0uqsorepBEFlOZd/jKbb9bul6pikEl5tknaYmNrCJuyAef2ktrEEKh94Aa2eFLAr/wM6+wxmOGMOy9Ulrsdbj5i5xjT7R+XTzG7iHWMI3P0XnJ0NqIvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gz3JH4Bc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06501C116C6;
-	Wed, 28 Jan 2026 01:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769562838;
-	bh=CnY2yyQuycb6hQgMr4nKM5II5eO9Cte0UHBOW/ImI3A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gz3JH4Bcvm8Z6rVePOGvW/G17DgctModl94ss9r1F1esLrTxZNip5sxPaQe/yYDbn
-	 PBS9Yowg7yhZT+ctNIvJSM6CHR/4uwr2DR8YodfKzjdO/PASzSF6Dh7zeYdi9f57+O
-	 ObwMCWPrZDA6UwsbA9Rlsqj3c5UWtmPOSkzPd+Doerzh/wWOwrwGvNZloirMGCxbCE
-	 SI3jk9Mmw57wy7XBWNBpd3Kzp9ryisxZz7U3qQeOjAHZEJQPumdEmahx2u8DexzSJB
-	 BxjT/lx8iYD1nuI1cdMe99PJ1bGodxsvY6MenfoWRISmgOXlogBh8Q5JoLvKiOO1cz
-	 3amOtEf1VV6LQ==
-From: Allison Henderson <achender@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	rds-devel@oss.oracle.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	allison.henderson@oracle.com
-Subject: [PATCH net-next v2 7/7] net/rds: Trigger rds_send_ping() more than once
-Date: Tue, 27 Jan 2026 18:13:51 -0700
-Message-ID: <20260128011351.78511-8-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260128011351.78511-1-achender@kernel.org>
-References: <20260128011351.78511-1-achender@kernel.org>
+	s=arc-20240116; t=1769563363; c=relaxed/simple;
+	bh=wdSxOj+/8brg2xyTPyKuK4zewxw/8x/s52TKc+XkVw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B0H9jsO7H4xovWlpuT7Hb/AICgtO4FxL2svhDcLv0GNnGqjlHERKXk0GFmrNmX+4vBcUb6PbfFDUCGBKW9R2nPcJWrEV0VaoyifO9rErLTusUDzW/XB9dy2t1Rg8c+3ye+w7HI4OfAPpkY3zsk1fD2kXUKRz49uKJAtFN/mqBkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L96/DjME; arc=none smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-12331482b8fso1293734c88.1
+        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 17:22:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769563361; x=1770168161; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WdlJkODskdsR/d8eXcoiwCooiZWIMrUfvjPFzHYdnGE=;
+        b=L96/DjMEm9QbxBY1xN7aB76nfrUgJMOHXvH4xt5dZ3wnaLf44oWHPIAg7TxYpZD5b/
+         HUBQTainkroJ6I4sJEyvzsxvtvp+DKO7G+NPwnbsE4Jwcde4sD+DMuB8p+XdqAFfuZoP
+         3YyrGzjemrT+tzV9jFmHVCA9QPgyz2dwDuXozIs3NY/CuGeHXnODxlnSl8NVAWiWW/VQ
+         tvZh+7NFUceNs6yQjN+fOdlcw3dQ01VWu1oz9gWfGp7mQZhnTXDHjOiSucsriR4ZF8fD
+         0xUlsNemLuirwpQ0PIwWnuIlO0XGORW7WyLB4V+xZotx0L12ef2IOiYxqoHufHOWUeL1
+         YsDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769563361; x=1770168161;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WdlJkODskdsR/d8eXcoiwCooiZWIMrUfvjPFzHYdnGE=;
+        b=H3kVNUWS4hkQYjlACqcO/dhJCbGiipj6CxrzUu6y2pEbe0jdpJGxUEOBT8vo6ZETTI
+         XPMVxobgvl7h1UrAAhsGTxK9F8EAdUK2FAb/E6aWZsszJsYA69WszgifomEdVSUYQTmw
+         82n5yj03tH53jwinFVzuWGVrb6ewgD5D8SZyVDpntpaGUEFlG4Yb3yTgmJGJupa7D+EL
+         aZif6LaGlod78bsHz6sTS97gZ2W+oIMgziMlI+J3OA44q8RTqIFr4JeZtsKBwn4FNyrG
+         GWju0gbMSjsEop+R2NswwPGcxO/RkMumjlt7eV+iPN0bpvlVl26dcGt6wJN71xokT66d
+         2p3g==
+X-Forwarded-Encrypted: i=1; AJvYcCX3xiC8Lh19BycmIpDWMmxCBobqZNt1s24/bfWFXiYjHkiCElqIf5czeHLV2zOiQK9pgp8wc7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVWnFUunNgca6J7PP+sA3U4eLBL0Ivi2VAitBtuYeZ7WTlJN/F
+	JrNlUs6V1gCBj2pPmWhzIzHWM7EhtOLrSGVb4SeGVGkA5iavzldElcnq
+X-Gm-Gg: AZuq6aIof9fbqJXrfN6/8x+ea50d9UTKo10XdaxLg2mwd+2BFZLOG/O9pZkHuXKD7aD
+	llidGTaBLvBP0gwJEXpOi5o8neF/Qc6X+PVqK/IZLJft+R3mVOpdhF/9/mVVh6/xowxFZZXmgyx
+	1kQ/DOXolxaFYDzg/Y/YqgfJ0TTSuEtSMo9AEraloJwrU0aGP41xEEgdQKOQE0r3bPF0OOrfCxl
+	K7rNUSCjKn2f4PMO4eTV3hPWPJ5JQj5z4MEvFMMpqMOSHmpId4IafM01jGhKbxZtmL6YzcH2D9b
+	2cf6NRz2bh+MZXIM5Uw9z/4ecDAaDXsgjtzGIw8L2kz0Dzkh9Vd6grCR8lPgSIN066rN2tJ73st
+	67oHd1Czs2TxEMCDc69vLv5FAYog9rKFizaHzeb585D4HtfooKMbn1SllyDnaZUS/2AQ2XJ/kj/
+	QdQWnwqiYoxHqvkA==
+X-Received: by 2002:a05:7022:912:b0:11b:f056:a1b3 with SMTP id a92af1059eb24-124a00684dfmr2656657c88.11.1769563361149;
+        Tue, 27 Jan 2026 17:22:41 -0800 (PST)
+Received: from debian ([74.48.213.230])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9de948esm581244c88.9.2026.01.27.17.22.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jan 2026 17:22:40 -0800 (PST)
+From: Qiliang Yuan <realwujing@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Jeff Layton <jlayton@kernel.org>,
+	Qiliang Yuan <realwujing@gmail.com>
+Cc: Qiliang Yuan <yuanql9@chinatelecom.cn>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] netns: optimize netns cleaning by batching unhash_nsid calls
+Date: Tue, 27 Jan 2026 20:21:31 -0500
+Message-ID: <20260128012145.1682016-1-realwujing@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,293 +101,163 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-254048-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-254049-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,queasysnail.net,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[realwujing@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
-X-Rspamd-Queue-Id: 4DB089BDD9
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chinatelecom.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 50A499BE1F
 X-Rspamd-Action: no action
 
-From: Gerd Rausch <gerd.rausch@oracle.com>
+Currently, unhash_nsid() scans the entire net_namespace_list for each
+netns in a destruction batch during cleanup_net(). This leads to
+O(M_batch * N_system * M_nsids) complexity, where M_batch is the
+destruction batch size, N_system is the total number of namespaces,
+and M_nsids is the number of IDs in each IDR.
 
-Even though a peer may have already received a
-non-zero value for "RDS_EXTHDR_NPATHS" from a node in the past,
-the current peer may not.
+Reduce the complexity to O(N_system * M_nsids) by introducing an
+'is_dying' flag to mark namespaces being destroyed. This allows
+unhash_nsid() to perform a single-pass traversal over the system's
+namespaces. In this pass, for each survivor namespace, iterate
+through its netns_ids and remove any mappings that point to a marked
+namespace, effectively eliminating the M_batch multiplier.
 
-Therefore it is important to initiate another rds_send_ping()
-after a re-connect to any peer:
-It is unknown at that time if we're still talking to the same
-instance of RDS kernel modules on the other side.
-
-Otherwise, the peer may just operate on a single lane
-("c_npaths == 0"), not knowing that more lanes are available.
-
-However, if "c_with_sport_idx" is supported,
-we also need to check that the connection we accepted on lane#0
-meets the proper source port modulo requirement, as we fan out:
-
-Since the exchange of "RDS_EXTHDR_NPATHS" and "RDS_EXTHDR_SPORT_IDX"
-is asynchronous, initially we have no choice but to accept an incoming
-connection (via "accept") in the first slot ("cp_index == 0")
-for backwards compatibility.
-
-But that very connection may have come from a different lane
-with "cp_index != 0", since the peer thought that we already understood
-and handled "c_with_sport_idx" properly, as indicated by a previous
-exchange before a module was reloaded.
-
-In short:
-If a module gets reloaded, we recover from that, but do *not*
-allow a downgrade to support fewer lanes.
-
-Downgrades would require us to merge messages from separate lanes,
-which is rather tricky with the current RDS design.
-Each lane has its own sequence number space and all messages
-would need to be re-sequenced as we merge, all while
-handling "RDS_FLAG_RETRANSMITTED" and "cp_retrans" properly.
-
-Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
-Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
+Signed-off-by: Qiliang Yuan <realwujing@gmail.com>
+Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
 ---
- net/rds/connection.c |  5 +++-
- net/rds/rds.h        |  2 +-
- net/rds/recv.c       |  7 +++++-
- net/rds/send.c       | 18 +++++++++++++++
- net/rds/tcp.h        |  2 +-
- net/rds/tcp_listen.c | 55 +++++++++++++++++++++++++++++++++-----------
- 6 files changed, 72 insertions(+), 17 deletions(-)
+v3:
+ - Update target tree to net-next.
+ - Post as a new thread instead of a reply.
+v2:
+ - Move 'is_dying' setting to __put_net() to eliminate the O(M_batch) loop.
+ - Remove redundant initializations in preinit_net().
+v1:
+ - Initial implementation of batch unhash_nsid().
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 4b7715eb2111..185f73b01694 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -447,13 +447,16 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
- 	rcu_read_lock();
- 	if (!hlist_unhashed(&conn->c_hash_node)) {
- 		rcu_read_unlock();
-+		if (conn->c_trans->t_mp_capable &&
-+		    cp->cp_index == 0)
-+			rds_send_ping(conn, 0);
- 		rds_queue_reconnect(cp);
- 	} else {
- 		rcu_read_unlock();
- 	}
+ include/net/net_namespace.h |  1 +
+ net/core/net_namespace.c    | 46 ++++++++++++++++++++++++++-----------
+ 2 files changed, 34 insertions(+), 13 deletions(-)
+
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index cb664f6e3558..bd1acc6056ac 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -69,6 +69,7 @@ struct net {
  
- 	if (conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, false);
+ 	unsigned int		dev_base_seq;	/* protected by rtnl_mutex */
+ 	u32			ifindex;
++	bool			is_dying;
+ 
+ 	spinlock_t		nsid_lock;
+ 	atomic_t		fnhe_genid;
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index a6e6a964a287..50fdd4f9bb3b 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -624,9 +624,10 @@ void net_ns_get_ownership(const struct net *net, kuid_t *uid, kgid_t *gid)
  }
+ EXPORT_SYMBOL_GPL(net_ns_get_ownership);
  
- /* destroy a single rds_conn_path. rds_conn_destroy() iterates over
-diff --git a/net/rds/rds.h b/net/rds/rds.h
-index f78477912e7c..eab396ef2c2d 100644
---- a/net/rds/rds.h
-+++ b/net/rds/rds.h
-@@ -548,7 +548,7 @@ struct rds_transport {
- 	 * messages received on the new socket are not discarded when no
- 	 * connection path was available at the time.
- 	 */
--	void (*conn_slots_available)(struct rds_connection *conn);
-+	void (*conn_slots_available)(struct rds_connection *conn, bool fan_out);
- 	int (*conn_path_connect)(struct rds_conn_path *cp);
- 
- 	/*
-diff --git a/net/rds/recv.c b/net/rds/recv.c
-index 889a5b7935e5..4b3f9e4a8bfd 100644
---- a/net/rds/recv.c
-+++ b/net/rds/recv.c
-@@ -209,6 +209,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 	bool new_with_sport_idx = false;
- 	u32 new_peer_gen_num = 0;
- 	int new_npaths;
-+	bool fan_out;
- 
- 	new_npaths = conn->c_npaths;
- 
-@@ -248,7 +249,11 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 		spin_lock_irqsave(&cp0->cp_lock, flags);
- 		conn->c_cp0_mprds_catchup_tx_seq = cp0->cp_next_tx_seq;
- 		spin_unlock_irqrestore(&cp0->cp_lock, flags);
-+		fan_out = true;
-+	} else {
-+		fan_out = false;
- 	}
-+
- 	/* if RDS_EXTHDR_NPATHS was not found, default to a single-path */
- 	conn->c_npaths = max_t(int, new_npaths, 1);
- 
-@@ -257,7 +262,7 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 
- 	if (conn->c_npaths > 1 &&
- 	    conn->c_trans->conn_slots_available)
--		conn->c_trans->conn_slots_available(conn);
-+		conn->c_trans->conn_slots_available(conn, fan_out);
- }
- 
- /* rds_start_mprds() will synchronously start multiple paths when appropriate.
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 599c2cfb7a1d..68f6b12c60ef 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1339,6 +1339,24 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
- 		cpath = &conn->c_path[0];
- 	}
- 
-+	/* Check to see if we have talked to this peer before.
-+	 * If not, this means conn->c_npaths will be zero,
-+	 * and we should initiate a connection request to the
-+	 * peer right away.
-+	 */
-+	if (conn->c_trans->t_mp_capable &&
-+	    !rds_conn_path_up(&conn->c_path[0])) {
-+		/* Ensures that only one request is queued.  And
-+		 * rds_send_ping() ensures that only one ping is
-+		 * outstanding.
-+		 */
-+		if (!test_and_set_bit(RDS_RECONNECT_PENDING,
-+				      &conn->c_path[0].cp_flags))
-+			queue_delayed_work(conn->c_path[0].cp_wq,
-+					   &conn->c_path[0].cp_conn_w, 0);
-+		rds_send_ping(conn, 0);
-+	}
-+
- 	rm->m_conn_path = cpath;
- 
- 	/* Parse any control messages the user may have included. */
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index b36af0865a07..39c86347188c 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -90,7 +90,7 @@ void rds_tcp_state_change(struct sock *sk);
- struct socket *rds_tcp_listen_init(struct net *net, bool isv6);
- void rds_tcp_listen_stop(struct socket *sock, struct work_struct *acceptor);
- void rds_tcp_listen_data_ready(struct sock *sk);
--void rds_tcp_conn_slots_available(struct rds_connection *conn);
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out);
- int rds_tcp_accept_one(struct rds_tcp_net *rtn);
- void rds_tcp_keepalive(struct socket *sock);
- void *rds_tcp_listen_sock_def_readable(struct net *net);
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index c628f62421d4..04fafdf59d72 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -56,14 +56,8 @@ void rds_tcp_keepalive(struct socket *sock)
- 	tcp_sock_set_keepintvl(sock->sk, keepidle);
- }
- 
--/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-- * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-- * socket and force a reconneect from smaller -> larger ip addr. The reason
-- * we special case cp_index 0 is to allow the rds probe ping itself to itself
-- * get through efficiently.
-- */
--static struct rds_tcp_connection *
--rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+static int
-+rds_tcp_get_peer_sport(struct socket *sock)
+-static void unhash_nsid(struct net *net, struct net *last)
++static void unhash_nsid(struct net *last)
  {
- 	union {
- 		struct sockaddr_storage storage;
-@@ -71,11 +65,9 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		struct sockaddr_in sin;
- 		struct sockaddr_in6 sin6;
- 	} saddr;
--	int sport, npaths, i_min, i_max, i;
-+	int sport;
+ 	struct net *tmp;
++
+ 	/* This function is only called from cleanup_net() work,
+ 	 * and this work is the only process, that may delete
+ 	 * a net from net_namespace_list. So, when the below
+@@ -636,20 +637,34 @@ static void unhash_nsid(struct net *net, struct net *last)
+ 	for_each_net(tmp) {
+ 		int id;
  
--	if (conn->c_with_sport_idx &&
--	    kernel_getpeername(sock, &saddr.addr) == 0) {
--		/* cp->cp_index is encoded in lowest bits of source-port */
-+	if (kernel_getpeername(sock, &saddr.addr) == 0) {
- 		switch (saddr.addr.sa_family) {
- 		case AF_INET:
- 			sport = ntohs(saddr.sin.sin_port);
-@@ -90,6 +82,26 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 		sport = -1;
+-		spin_lock(&tmp->nsid_lock);
+-		id = __peernet2id(tmp, net);
+-		if (id >= 0)
+-			idr_remove(&tmp->netns_ids, id);
+-		spin_unlock(&tmp->nsid_lock);
+-		if (id >= 0)
+-			rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
+-					  GFP_KERNEL);
++		for (id = 0; ; id++) {
++			struct net *peer;
++			bool dying;
++
++			rcu_read_lock();
++			peer = idr_get_next(&tmp->netns_ids, &id);
++			dying = peer && peer->is_dying;
++			rcu_read_unlock();
++
++			if (!peer)
++				break;
++			if (!dying)
++				continue;
++
++			spin_lock(&tmp->nsid_lock);
++			if (idr_find(&tmp->netns_ids, id) == peer)
++				idr_remove(&tmp->netns_ids, id);
++			else
++				peer = NULL;
++			spin_unlock(&tmp->nsid_lock);
++
++			if (peer)
++				rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0,
++						  NULL, GFP_KERNEL);
++		}
+ 		if (tmp == last)
+ 			break;
  	}
- 
-+	return sport;
-+}
-+
-+/* rds_tcp_accept_one_path(): if accepting on cp_index > 0, make sure the
-+ * client's ipaddr < server's ipaddr. Otherwise, close the accepted
-+ * socket and force a reconneect from smaller -> larger ip addr. The reason
-+ * we special case cp_index 0 is to allow the rds probe ping itself to itself
-+ * get through efficiently.
-+ */
-+static struct rds_tcp_connection *
-+rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
-+{
-+	int sport, npaths, i_min, i_max, i;
-+
-+	if (conn->c_with_sport_idx)
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+	else
-+		sport = -1;
-+
- 	npaths = max_t(int, 1, conn->c_npaths);
- 
- 	if (sport >= 0) {
-@@ -111,10 +123,12 @@ rds_tcp_accept_one_path(struct rds_connection *conn, struct socket *sock)
- 	return NULL;
+-	spin_lock(&net->nsid_lock);
+-	idr_destroy(&net->netns_ids);
+-	spin_unlock(&net->nsid_lock);
  }
  
--void rds_tcp_conn_slots_available(struct rds_connection *conn)
-+void rds_tcp_conn_slots_available(struct rds_connection *conn, bool fan_out)
+ static LLIST_HEAD(cleanup_list);
+@@ -688,8 +703,12 @@ static void cleanup_net(struct work_struct *work)
+ 	last = list_last_entry(&net_namespace_list, struct net, list);
+ 	up_write(&net_rwsem);
+ 
++	unhash_nsid(last);
++
+ 	llist_for_each_entry(net, net_kill_list, cleanup_list) {
+-		unhash_nsid(net, last);
++		spin_lock(&net->nsid_lock);
++		idr_destroy(&net->netns_ids);
++		spin_unlock(&net->nsid_lock);
+ 		list_add_tail(&net->exit_list, &net_exit_list);
+ 	}
+ 
+@@ -739,6 +758,7 @@ static DECLARE_WORK(net_cleanup_work, cleanup_net);
+ void __put_net(struct net *net)
  {
- 	struct rds_tcp_connection *tc;
- 	struct rds_tcp_net *rtn;
-+	struct socket *sock;
-+	int sport, npaths;
- 
- 	if (rds_destroy_pending(conn))
- 		return;
-@@ -124,6 +138,21 @@ void rds_tcp_conn_slots_available(struct rds_connection *conn)
- 	if (!rtn)
- 		return;
- 
-+	sock = tc->t_sock;
-+
-+	/* During fan-out, check that the connection we already
-+	 * accepted in slot#0 carried the proper source port modulo.
-+	 */
-+	if (fan_out && conn->c_with_sport_idx && sock &&
-+	    rds_addr_cmp(&conn->c_laddr, &conn->c_faddr) > 0) {
-+		/* cp->cp_index is encoded in lowest bits of source-port */
-+		sport = rds_tcp_get_peer_sport(sock);
-+		npaths = max_t(int, 1, conn->c_npaths);
-+		if (sport >= 0 && sport % npaths != 0)
-+			/* peer initiated with a non-#0 lane first */
-+			rds_conn_path_drop(conn->c_path, 0);
-+	}
-+
- 	/* As soon as a connection went down,
- 	 * it is safe to schedule a "rds_tcp_accept_one"
- 	 * attempt even if there are no connections pending:
+ 	ref_tracker_dir_exit(&net->refcnt_tracker);
++	net->is_dying = true;
+ 	/* Cleanup the network namespace in process context */
+ 	if (llist_add(&net->cleanup_list, &cleanup_list))
+ 		queue_work(netns_wq, &net_cleanup_work);
 -- 
-2.43.0
+2.51.0
 
 
