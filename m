@@ -1,174 +1,189 @@
-Return-Path: <netdev+bounces-254183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254184-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJNsC2fgeWm50gEAu9opvQ
-	(envelope-from <netdev+bounces-254183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:09:43 +0100
+	id gJvaIpHgeWm50gEAu9opvQ
+	(envelope-from <netdev+bounces-254184-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:10:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CDE9F436
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:09:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F93D9F44C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 11:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8CE833046052
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:04:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AECA63003EC4
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D65F2D0C92;
-	Wed, 28 Jan 2026 10:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BF62D4B77;
+	Wed, 28 Jan 2026 10:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ug73yjXI"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108962C11E9
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 10:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07BD278E5D;
+	Wed, 28 Jan 2026 10:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769594671; cv=none; b=bHYaWwzI8arcQjjuCEfm0HHUmMYvfbJdjpIMjB3D2/KVuc/3zobC2fTAS5l2BFhaYq8zGx0RCPtJxFYwpoaBR7cXfnMOVv830GlHq/+r/ta0Ci0sVggOgFGYcrGGaNoxnrrhdRQIn9mAvgiVY0ivCX74WAA0Br2lsgHjJOn6RAI=
+	t=1769594758; cv=none; b=BVC1RM0S9bFAJPHuKJCkSsFKGmX72sRqkHTsuwYj/1+tf7GekPjrfmhGnq+FjeU25Q1WsQCaF6Knn60qVi3a37Odu+u64hxlucG0M3SgOxCSSsFsXJREo8idqaxcKeMgcPCMhjCXLbkMns4lJoMv/NrzCA3NEfftlz4NFH1JDNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769594671; c=relaxed/simple;
-	bh=cWXOogrWK0vb/sM5Gb08cOEf3p8t+pakkcmTytY6enE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z203aPfHH0EjxIXo4VLek5XTwCkcCaA1o1f8QKPNhpx6LcfLG8rE2FNurZgywshIII5bXpMz9H4B7YqKcSNiHg0qxAjnGPQL9LbWNl4/GUtSy4vP1uTNqOZSe89FsECdtliwxyBPWbqdD2nRbFjdAGPcjjyX8jDtTwSEy4M07jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vl2PQ-00049x-BJ; Wed, 28 Jan 2026 11:04:24 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vl2PQ-002tnW-2Q;
-	Wed, 28 Jan 2026 11:04:24 +0100
-Received: from pengutronix.de (p54b15bf8.dip0.t-ipconnect.de [84.177.91.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id C04494DA0C6;
-	Wed, 28 Jan 2026 10:04:23 +0000 (UTC)
-Date: Wed, 28 Jan 2026 11:04:23 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-can@vger.kernel.org
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-Message-ID: <20260128-keen-owl-of-emphasis-ca7f18-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260125201601.5018-1-socketcan@hartkopp.net>
- <20260127174937.4c5fc226@kernel.org>
- <67cb17f4-2f72-4847-aa04-3633f3d8df33@hartkopp.net>
- <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
+	s=arc-20240116; t=1769594758; c=relaxed/simple;
+	bh=mNogkX6AMNbYNT9d0odM8p5Ws8xBsTc5rwxPzqRLBSQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LaNtW/ZEqvD1zCAI82I2cKP6boKSrec7AdMYacxU88+RVzVn4YxUvrWX8p3CHoQnrAIXJxhxOO0YfWykuTZMHeLza9cya3I64LupJIRM1T6HkvhU9ob9Um4w/eIN4g5PS2gKklPl/vM5913J51HcQH/rLJCOJBEGvwdtQ2t2ONU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ug73yjXI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F9CC4CEF1;
+	Wed, 28 Jan 2026 10:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769594758;
+	bh=mNogkX6AMNbYNT9d0odM8p5Ws8xBsTc5rwxPzqRLBSQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ug73yjXIv5tH9NOLkWogciX2FvYW41BTFvfR0W2aAuVfWpEbdzxoupA8x3PKQztHV
+	 JJcbVEqyS3Ted/xj/wVkTNaowQ4dpsCEmT9lmY3Rx2cWEu+o50/mLK8T1ilMY4bbcD
+	 zQfLVq80sBpxrHlEfo920OVp3kGbMAEJcgEvhQen3ZTmTmwB43DnDpGIZ73qcMBr58
+	 c+7qbrKxVi+XveF3o/3caM8C7YAxm5oraCDv09Tn4V1vPftNeGoP90dMEfb8Z6hWHh
+	 ZeIZ4C7GYsLX5AmaqK/cLyY/UTY1370mg0H1WVvVDU8LD59FuDUHh2OFAQOuW+QVEu
+	 45LKLh8NLI73Q==
+Message-ID: <3ed93cd3-677c-4d0c-a3a6-25c3d47a4ef2@kernel.org>
+Date: Wed, 28 Jan 2026 11:05:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oysvqpl4c7f3mvsl"
-Content-Disposition: inline
-In-Reply-To: <20260128-booby-of-phenomenal-proficiency-4db5ab-mkl@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
+ control
+To: Bo Gan <ganboing@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ rmk+kernel@armlinux.org.uk, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ ningyu@eswincomputing.com, linmin@eswincomputing.com,
+ pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
+References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
+ <20260109080859.1285-1-lizhi2@eswincomputing.com>
+ <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
+ <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
+ <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
+ <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
+ <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
+ <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
+ <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
+ <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.56 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-254183-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
+	TAGGED_FROM(0.00)[bounces-254184-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,eswincomputing.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,st-md-mailman.stormreply.com,lists.infradead.org,eswincomputing.com,einfochips.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MAILSPIKE_FAIL(0.00)[2600:3c0a:e001:db::12fc:5321:query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strato-hosting.co.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:url,pengutronix.de:mid]
-X-Rspamd-Queue-Id: A8CDE9F436
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1F93D9F44C
 X-Rspamd-Action: no action
 
+On 23/01/2026 11:47, Bo Gan wrote:
+> Hi Krzysztof,
+> 
+> On 1/23/26 02:07, Krzysztof Kozlowski wrote:
+>> On 23/01/2026 08:39, Bo Gan wrote:
+>>>> I assume the address of the interface is fixed. So you can just key
+>>>> off that to distinguish the two instances.
+>>>>
+>>>> Since this is an internal property, not a board property, it is not
+>>>> clear it actually belongs on DT.
+>>>>
+>>>>       Andrew
+>>>
+>>> IMO, they should be in DT to provide maximum flexibility. The SoC .dtsi
+>>
+>> This is not the purpose of DT. Please rather use arguments in terms of
+>> DT rules (see docs, presentations).
+>>
+> Any examples? links? Thank you for your patience.
 
---oysvqpl4c7f3mvsl
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [net-next 0/6] move CAN skb headroom content to skb extensions
-MIME-Version: 1.0
+Really, doing simple search for it is your homework, not our task. You
+need to try harder if you want to prove that you are not wasting our time.
 
-On 28.01.2026 10:07:13, Marc Kleine-Budde wrote:
-> > In fact patch 6 stuck in my providers mail system which responded this =
-to
-> > (only) patch 6 =C2=AF\_(=E3=83=84)_/=C2=AF
-> >
-> > 5.7.1 Refused by local policy. No SPAM please! (B-EX
-> > 155302::1769588601-AC38E895-223F95BA/10/71040183929) see https://www.st=
-rato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered
-> > [MSG0011]
-> >
-> > As this could not been solved since Sunday I'll kindly ask Marc to send=
- the
-> > attached v2 patchset (including your __u32 remark) to the mailing list,=
- so
-> > that also the AI bot can take a look at it.
->
-> I'll do. In the mean time, please have a look at b4, it has support for
-> sending patches via a web hook.
+Documentation/devicetree/bindings
 
-Your ISP's mailserver also classified Patch#6 as spam when I was sending
-it :/
+Or any elinux resources or any recent talks of mine.
 
-| Reporting-MTA: dns; metis.whiteo.stw.pengutronix.de
-|
-| Action: failed
-| Final-Recipient: rfc822;socketcan@hartkopp.net
-| Status: 5.0.0
-| Remote-MTA: dns; smtpin.rzone.de
-| Diagnostic-Code: smtp; 550 5.7.1 Refused by local policy. No SPAM please!=
- (B-EX 149500::1769594129-F202EB70-729865BA/10/71040183929) see https://www=
-=2Estrato-hosting.co.uk/faq/product/why-are-my-emails-not-being-delivered [=
-MSG0011]
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---oysvqpl4c7f3mvsl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAml53yMACgkQDHRl3/mQ
-kZy/fwf/VFWWOTWronZ0zENTA9JycJ+ktnG02/TfSrqONArP2/3Ed5YZhggvg3/w
-QZ10DJTRlFHu7MA/tbE0KgBn7qgSxe29MAvzqN6DuFRt8tJtWfj26tr9iDLCxoT1
-dgBbjY21hkITzANUpK/Jvonl1zrrTUcrOs0o+yQcnm6spgnGxwf/3hFmXZ4aGEIR
-cIp+QPi8/Z/wGx4fjqFJgrOUr5YPLqXCqbsMdvAFsI1auYyWtVGYzLyNGWcBiQt3
-CmWuTEIx+c+M8KmmmFm/ZqV2vPENjOB6d61c8HydTSZVbqshpI7zq0fDGBP+rB1w
-bAB1yt51jBeii/1ZQqpeZaivVPqyEQ==
-=7gJi
------END PGP SIGNATURE-----
-
---oysvqpl4c7f3mvsl--
+Best regards,
+Krzysztof
 
