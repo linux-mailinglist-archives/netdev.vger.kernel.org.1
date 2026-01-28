@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-254438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254439-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wEpdM4N1emmE6wEAu9opvQ
-	(envelope-from <netdev+bounces-254438-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:45:55 +0100
+	id UKsxN4Z1emmE6wEAu9opvQ
+	(envelope-from <netdev+bounces-254439-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:45:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443ACA8C5B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:45:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE3FA8C62
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7BC023019FD9
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:45:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7436C301BEF2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452B137418C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7D376478;
 	Wed, 28 Jan 2026 20:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EiVu0vk0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="rLhr7Yx4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACB621B9FD
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2223228DB46
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769633147; cv=none; b=u8O6GHy7k4R8zsAvqbI4KEG+7bFGnKNWB9HGr7zitMqqnFNPM7oexu6VKAzRkYyU8YtV3qDhFG8VtwNKdfytbrz21gFs29XttWllROCpjKmtCEm3RXnutClBmbgualcA+vdCxfdUsASNnPjwfhkbH2SgO4saPx/2/q2V8GNW9tU=
+	t=1769633147; cv=none; b=ZK2+6rzBG/wj7afsRky18rEazgxwutjCsOpcKrcz/zNBS9u/gGC0i39BFctf0nCRuMzd/ZUKvWnF/psevgbluhQ0M2ljGI/fdkD/kiyt/9Qpe8u1lZ/wDkaEPilAKTNIIFSOdUGoT5EVdL4Nt6mfUvvjiY+SeJdmkl0oQJ3RLFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769633147; c=relaxed/simple;
-	bh=cVlGaDtD/sHzN/VmwT1BIJq3CDK2ab5YwpOqp1MmRXU=;
+	bh=FzfPssaMTtMlTXsQB3uWK2d1KPWw1AhO9CiOrY0mA4o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=llufBhzQYEYlV8W9+qTwhnUY7ohWCvgXDMgLIn2RhsQlj6ZWB4BZZdNTmQZewz0menmgKpz9XhWuokX41g09446jmTZxySj7pZOdIOUqgxUwbiSqXLvQgAHyVCEoTobFD+vwPcjLu7ywng4XSR3Hl7mOflRCp7yuZ/dcTN6xdeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EiVu0vk0; arc=none smtp.client-ip=185.246.85.4
+	 MIME-Version; b=cIusZAqbg3hncS+XFCvMxbR7nsNLRvC5p2QIcI01LaPH81jaJbQqnA+tetV2EukyZWcBgNlfxsT3RRtyX7JawX5WcUr+sgFv0HsfQDuUpu8xDHRDTdqzKSLere9WpFwSsm0Wso5xkENXCZ3u9ibejEqy/8q1iNKCt+mEBNLQDYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=rLhr7Yx4; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id AF7784E42308;
-	Wed, 28 Jan 2026 20:45:42 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 5CCE8C211F2;
+	Wed, 28 Jan 2026 20:45:47 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8421D6071F;
-	Wed, 28 Jan 2026 20:45:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6BFFD119A882A;
-	Wed, 28 Jan 2026 21:45:39 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id AC3456071F;
+	Wed, 28 Jan 2026 20:45:44 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AEA33119A8834;
+	Wed, 28 Jan 2026 21:45:41 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769633141; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1769633143; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=cUxQMmS4PTgDBQUSEvvZqd3m1nQMmyjDBJyQpg9/Dko=;
-	b=EiVu0vk0MI5kVykZCoVFWr7dX3WM6oDjs/9NqFEXBph8d0lWjmjclq4Pwa3qIUVep20gsn
-	utG1zgUCDSJeyWBdJW1HABfJWjK9yq2nOQREUiD6a5E1OEVdu1BQk/0waHzDtPOEmdT6+/
-	aLDKxVttJkljI/fbyCdFLUz3vI3PZsSaoS8vSIjEu8NziDVoz/6M60h+jkIjfnqbEkfTxS
-	SUS62VJUXQGqCSI0fG7o3gwbH83tuTZKh0Sw/kxIfzlmvhJLelGBaisTT6l52VIRqpLjRt
-	iLsqeh1IV+6yi2k3taMXxvAOUvR6zJD4W9KkcT6wBEBTb8yFp6Q5W2ontWjmJQ==
+	bh=LWzrt0LzFGZIeHx1tJakp6EzeCmz9kccT2ixoT2csH8=;
+	b=rLhr7Yx4httqJE1Oxo8L1AD7ebbspZn5r1nsNkrHKL1mUfXR3IyrEE/FkjSYkPB8BKJHUb
+	/y7N8lPAvIaKfdrZTLnrM5tyqO4aty5Bks6RoP0CZzfIk6Q0b5fnbVXHdaOpPXh/QQONZc
+	O1SwVIE1Gu0Iw4ZmxC2IrMrdqE0HKIKquf1MOm9PnRsuaU29enw8pfKP9B7ybuXTkAG+5W
+	gtYeQjH3E0Ltn5Qck1yD7KF2k0E5pJTcQ8QNiDpYHBnye6zQYfMTpdNUCqpohDROMXp9Xj
+	PeZqz6OD1whm0B9EeLR33c9bsYvAUftQuhezLuLhgNPd1n3H7c6yOPMlUuYjhw==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -76,9 +76,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v2 01/12] net: phy: phy_port: Correctly recompute the port's linkmodes
-Date: Wed, 28 Jan 2026 21:45:14 +0100
-Message-ID: <20260128204526.170927-2-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v2 02/12] net: phy: phy_link_topology: Add a helper for opportunistic alloc
+Date: Wed, 28 Jan 2026 21:45:15 +0100
+Message-ID: <20260128204526.170927-3-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260128204526.170927-1-maxime.chevallier@bootlin.com>
 References: <20260128204526.170927-1-maxime.chevallier@bootlin.com>
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-254438-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-254439-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
@@ -122,51 +122,69 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
-X-Rspamd-Queue-Id: 443ACA8C5B
+X-Rspamd-Queue-Id: 9FE3FA8C62
 X-Rspamd-Action: no action
 
-a PHY-driven phy_port contains a 'supported' field containing the
-linkmodes available on this port. This is populated based on :
- - The PHY's reported features
- - The DT representation of the connector
- - The PHY's attach_mdi() callback
+The phy_link_topology structure stores information about the PHY-related
+components connected to a net_device. It is opportunistically allocated,
+when we add the first item to the topology, as this is not relevant for
+all kinds of net_devices.
 
-As these different attrbution methods work in conjunction, the helper
-phy_port_update_supported() recomputes the final 'supported' value based
-on the populated mediums, linkmodes and pairs.
+In preparation for the addition of phy_port tracking in the topology,
+let's make a dedicated helper for that allocation sequence.
 
-However this recompute wasn't correctly implemented, and added more
-modes than necessary by or'ing the medium-specific modes to the existing
-support. Let's fix this and properly filter the modes.
-
-Fixes: 589e934d2735 ("net: phy: Introduce PHY ports representation")
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_port.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/phy/phy_link_topology.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/phy/phy_port.c b/drivers/net/phy/phy_port.c
-index ec93c8ca051e..68a0068220ed 100644
---- a/drivers/net/phy/phy_port.c
-+++ b/drivers/net/phy/phy_port.c
-@@ -118,11 +118,14 @@ void phy_port_update_supported(struct phy_port *port)
- 	int i;
+diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+index 0e9e987f37dd..7dc2ff10c74a 100644
+--- a/drivers/net/phy/phy_link_topology.c
++++ b/drivers/net/phy/phy_link_topology.c
+@@ -27,21 +27,34 @@ static int netdev_alloc_phy_link_topology(struct net_device *dev)
+ 	return 0;
+ }
  
- 	for_each_set_bit(i, &port->mediums, __ETHTOOL_LINK_MEDIUM_LAST) {
--		linkmode_zero(supported);
--		phy_caps_medium_get_supported(supported, i, port->pairs);
--		linkmode_or(port->supported, port->supported, supported);
-+		__ETHTOOL_DECLARE_LINK_MODE_MASK(med_supported) = {0};
++static struct phy_link_topology *phy_link_topo_get_or_alloc(struct net_device *dev)
++{
++	int ret;
 +
-+		phy_caps_medium_get_supported(med_supported, i, port->pairs);
-+		linkmode_or(supported, supported, med_supported);
- 	}
++	if (dev->link_topo)
++		return dev->link_topo;
++
++	/* The topology is allocated the first time we add an object to it.
++	 * It is freed alongside the netdev.
++	 */
++	ret = netdev_alloc_phy_link_topology(dev);
++	if (ret)
++		return ERR_PTR(ret);
++
++	return dev->link_topo;
++}
++
+ int phy_link_topo_add_phy(struct net_device *dev,
+ 			  struct phy_device *phy,
+ 			  enum phy_upstream upt, void *upstream)
+ {
+-	struct phy_link_topology *topo = dev->link_topo;
++	struct phy_link_topology *topo;
+ 	struct phy_device_node *pdn;
+ 	int ret;
  
-+	linkmode_and(port->supported, port->supported, supported);
-+
- 	/* If there's no pairs specified, we grab the default number of
- 	 * pairs as the max of the default pairs for each linkmode
- 	 */
+-	if (!topo) {
+-		ret = netdev_alloc_phy_link_topology(dev);
+-		if (ret)
+-			return ret;
+-
+-		topo = dev->link_topo;
+-	}
++	topo = phy_link_topo_get_or_alloc(dev);
++	if (IS_ERR(topo))
++		return PTR_ERR(topo);
+ 
+ 	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
+ 	if (!pdn)
 -- 
 2.49.0
 
