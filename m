@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-254092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254093-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AL7sBEGEeWnGxQEAu9opvQ
-	(envelope-from <netdev+bounces-254092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:36:33 +0100
+	id kBpWE1iEeWnGxQEAu9opvQ
+	(envelope-from <netdev+bounces-254093-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:36:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E66A9CC2A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:36:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD739CC4A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:36:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 655DF301D07A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:36:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D6E3B300C9BE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F7732695A;
-	Wed, 28 Jan 2026 03:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A4F32695A;
+	Wed, 28 Jan 2026 03:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BCiWl+lw"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="KObCyvTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7E130B52E;
-	Wed, 28 Jan 2026 03:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D762EC541;
+	Wed, 28 Jan 2026 03:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769571364; cv=none; b=eA+SLUCTsMXEOW6sT0CBdrK+rXQWxFwVxEmJm1TdEJGkIcbUdIOvzwjSlQcLHbaD1uSNfIiy1UrAfoJ/ZpFtahU87Qqs0C+dCQFPCC6l3SPN41Be59/aWGcJmTPteRbB9UaAWcgBoHUyv516yJSRh9K80RkG1neJt8tf03OLrYw=
+	t=1769571413; cv=none; b=DeN5YeyFfTTRsH5zk9M6L1jFOokL40YbGHmf+xbi9A+rjY724U//ZJCQFgtP6WpDeLSX7T1gswGtd6RPb0UvZcOHuLiPzeCbHD6WQ/ULSzbXkBhl7EYNBLZ6x8qpAWLyi/T+eOOnzqy/ucy/7K5+sAWsfBBT/TG6itM1OVihHJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769571364; c=relaxed/simple;
-	bh=XaZm0xy3k5EBSreK2p6rpxDnagbw57SepK7uE92J6Mc=;
+	s=arc-20240116; t=1769571413; c=relaxed/simple;
+	bh=ubWCOAW/3Af3X54QpHOJptLeWLmRZnC7Ouhmtqvu9yU=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wh/aWUM0vYqIm6bXklmYQlcDx0f+qlZCh+egAz7cysgC7X6albk4q4V0zEK9ylhz2Yvol8ARzeNvpKjzdqHXlKsywXYmvQDFpQjjVzk1lax+a6dt6P21wko5XHBEn+0XkQ45YoRIPkTz/qcV+H78JS1VgEtViaK0EUMTym4BIxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BCiWl+lw; arc=none smtp.client-ip=67.231.156.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=tfFIrnaR+yONnAEvsyImuuXM7iIqn+CFQIf6dm5n1NBwkqzezyDTYNIS74M07VgdeScb9UGDofPWh92zE0PFUqOY5iwpcX1pMPsa7ngpbLhs083qYiwssSkIUXPhZAb3RvltMsuqBpQdgdiantA/MUBxEVyU3qGB7U8MbiMteH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=KObCyvTP; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S1MwCC3583354;
-	Tue, 27 Jan 2026 19:35:54 -0800
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60RG2EwK1389849;
+	Tue, 27 Jan 2026 19:36:41 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=aQWNyUSW2LeyAUU4Y5ILG4V7/
-	zUJJ11wNy4okBYufqQ=; b=BCiWl+lw424PhvvxJBrYnTntjvU5S/4Jw80WZNyIC
-	lXl+Cr/uhWk+Jdx1HWNDK6T4/lQfYvVmYoM6+T22dcuLE6ES60b7GAZc5GiuSaQR
-	NINARW3KlckFLbMNltFOCW5n6zoW6TAltJZ3RoTcSarSHNBJbqKKveuZjpkPO7f3
-	oyQ2v9VqmjIjn0xhmoxiYJxEYvAG+pg/VPUtGK2BIF3SacVXo6qsm0+gi6eQaR5U
-	N9j3pJcLhfBhBV5G5ScvJq/E7n5jM8A88c8XmL5KQyc3NyxL2b7Dal2CuIdkGhTV
-	aySoFYPewJV/pkrf6jLb9XVrNExuAK+4pB3+CLtZO2ttw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4by8r68778-1
+	:references:subject:to; s=pfpt0220; bh=60SxqvJal81ZGycRP4KJMMrHL
+	wVZgeHHXtcFbIHEUBk=; b=KObCyvTPSSStU8Atcl05FSr+KBbXu4ZSyTxBYmaAc
+	HRh1F/qHHCix5ebCNE6SnnlVzp8gwdPy9ttZzgcdUo73ceT7398pBvTnNBe0yhb6
+	sr+icVe+M1JcdVVDmI359xXxv+9nB+xAqqAAhfb6yCAnKaXbPOQJESfAcwQrQ81L
+	pJ7Z+6/aG55f/ZWyfL52vysE3rKyhwNWF0VszTJe7mYR7NviQ7w1VNG3RRfG4dbP
+	T66lKiYA7ToNFCeMnV1HnH4Rjdu97QfDJOcxMcJxOhdEgpzgmGTz5KWVIU3tM3d0
+	qqq7VKi7xPWzmOxG1l6BdJ5M5QgUj5bV6QgO1/vi7E52g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bx0qswhc2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jan 2026 19:35:54 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Tue, 27 Jan 2026 19:36:40 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 27 Jan 2026 19:36:08 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 27 Jan 2026 19:36:08 -0800
+ 15.2.1544.25; Tue, 27 Jan 2026 19:36:39 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 27 Jan 2026 19:36:39 -0800
 Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 2EC953F70AD;
-	Tue, 27 Jan 2026 19:35:49 -0800 (PST)
-Date: Wed, 28 Jan 2026 09:05:49 +0530
+	by maili.marvell.com (Postfix) with SMTP id C7D903F70AD;
+	Tue, 27 Jan 2026 19:36:36 -0800 (PST)
+Date: Wed, 28 Jan 2026 09:06:35 +0530
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: Jakub Kicinski <kuba@kernel.org>
 CC: <sbhatta@marvell.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
         <netdev@vger.kernel.org>, <sgoutham@marvell.com>, <sumang@marvell.com>,
         <pabeni@redhat.com>, <davem@davemloft.net>,
         <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next,v5,09/13] octeontx2-af: npc: cn20k: virtual index
- support
-Message-ID: <aXmEFX1HUKa448Ih@rkannoth-OptiPlex-7090>
-References: <20260126123254.1000480-10-rkannoth@marvell.com>
- <20260128022928.4153136-1-kuba@kernel.org>
+Subject: Re: [net-next,v5,10/13] octeontx2-af: npc: cn20k: Allocate MCAM
+ entry for flow installation
+Message-ID: <aXmEQ00dZU_psD-0@rkannoth-OptiPlex-7090>
+References: <20260126123254.1000480-11-rkannoth@marvell.com>
+ <20260128022930.4153164-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,22 +80,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260128022928.4153136-1-kuba@kernel.org>
-X-Authority-Analysis: v=2.4 cv=Ka/fcAYD c=1 sm=1 tr=0 ts=6979841a cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+In-Reply-To: <20260128022930.4153164-1-kuba@kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDAyNSBTYWx0ZWRfX/g8uoNkpQS8y
+ 4qXpJgqk6BiehraHPAqGt8MhrO6QTwK5/3IMU63x9DaMnixC8aNBqL4krTIAxhDNmh3HKlENAT/
+ a2G9zwdChE1eCR7AmYa0TBiXMuyjfsAX0bC147x+2sLGHFHMY8YNNIS5X3QouOJ8ZhXpyvaSvRw
+ Ycu0GML1IabfwHFoHggF0TVh+UXoAmFfhwHZXf88vC8cA6L26woMTScE7dX4sVU7g3TIM1wMZE8
+ 1IgMxpdjbhay3SRH2NfyomBcK/oMuZ00nainI2lRm+5OUdUGemI/4oHHOzuCw8dyKtOSnCTcZCx
+ XHnu6od8hUogo9JsO81QlhHULOBfv8ZUh+JxUgESQCbB51YGq7wzvvittFpf1toZkG/pitYggjr
+ NPU+7YPp+KMaOl/JKKUzXZEXJ3KVBmO+8roB1eQnCRJdecgFimgPF6NNLa5wdDLwd6yByBRMA6h
+ sm6XgkxX4wUl8VS+amw==
+X-Authority-Analysis: v=2.4 cv=P9E3RyAu c=1 sm=1 tr=0 ts=69798448 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=9R54UkLUAAAA:8 a=VwQbUJbxAAAA:8 a=iUMg8g7UlDxS8Tr-YeUA:9 a=CjuIK1q_8ugA:10
+ a=9R54UkLUAAAA:8 a=VwQbUJbxAAAA:8 a=301O3xPN7kGrk-tezfwA:9 a=CjuIK1q_8ugA:10
  a=16MAPSKLCI0A:10 a=YTcpBFlVQWkNscrzJ_Dz:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDAyNSBTYWx0ZWRfX2lL+UcWVrPRS
- A8ny5e6L5NoWYte9jhcCDtptzGzl1LBHNdwnhwd0WgxAyUF0peIF5HRQfMpertMT7NGVXFwKcDK
- t9xB8MFhO9pxHEiRLc2VC5Kv83ELACfKWjq3hKsJS5joMbw3XT0PAAb1bIqjc+DzIJrYkiziVC3
- GNOuhiNJ4g+Gyo2yhdwnNPZMP02xSAFnL24L8P0d04aFXJ0HgWx8CLl7nVYHddj3M4K3SSBdw3R
- WA9Ehbw6An7g8/bMvIPBzIQq5tEa8aU6RkM7BN6Hkg7dteS60LFxiDyU26UTCZTeyI5Nmf94LG6
- q3/gqBkKubAZ1TDrn8YH2AE+DhjiCKzWRKe4o+jTq610KA8WD4xbua8+GP8fLW2YkmUSVyVw3Jy
- byCILWqh8cILg2huiX7pIHn1bBqoK3UsyteQePrhsmm87KG/R9ZlE6kSeuSDLDM9ZQjmmTMiO1o
- LFiTky9PzBHqKGD7MdQ==
-X-Proofpoint-GUID: SGeXBOGQENsHhRXBbJoEgewrp8GuPnin
-X-Proofpoint-ORIG-GUID: SGeXBOGQENsHhRXBbJoEgewrp8GuPnin
+X-Proofpoint-ORIG-GUID: 8Yqq0y-63AKjpUbaVyGfAcsPvsE-dA4p
+X-Proofpoint-GUID: 8Yqq0y-63AKjpUbaVyGfAcsPvsE-dA4p
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-01-27_05,2026-01-27_03,2025-10-01_01
@@ -105,13 +105,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254092-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-254093-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -126,117 +126,99 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 4E66A9CC2A
+X-Rspamd-Queue-Id: ECD739CC4A
 X-Rspamd-Action: no action
 
-On 2026-01-28 at 07:59:28, Jakub Kicinski (kuba@kernel.org) wrote:
+On 2026-01-28 at 07:59:30, Jakub Kicinski (kuba@kernel.org) wrote:
 > This is an AI-generated review of your patch. The human sending this
 > email has considered the AI review valid, or at least plausible.
 >
 > For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 > ---
-> octeontx2-af: npc: cn20k: virtual index support
+> octeontx2-af: npc: cn20k: Allocate MCAM entry for flow installation
 >
-> This patch adds support for virtual MCAM index allocation and improves
-> CN20K MCAM defragmentation handling.  Virtual indexes allow the hardware
-> to move mapped MCAM entries internally, enabling defragmentation.
+> This patch extends the install_flow mailbox request message with additional
+> fields that allow the AF driver to determine the required NPC MCAM entry
+> type, allocate the MCAM entry, and complete the flow installation in a
+> single step for CN20K.
 >
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> > index 8b77ac053d8d..d1a927f3d5db 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> > index 052d989f2d9a..efd994c65b32 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
 >
 > [ ... ]
 >
-> > +static int npc_vidx_maps_modify(struct rvu *rvu, u16 vidx, u16 new_midx)
+> > +static int otx2_get_kw_type(struct otx2_nic *pfvf,
+> > +			    struct npc_install_flow_req *fl_req,
+> > +			    u8 *kw_type)
 > > +{
-> > +	u16 old_midx;
-> > +	void *map;
-> > +	int rc;
+> > +	struct npc_get_num_kws_req *req;
+> > +	struct npc_get_num_kws_rsp *rsp;
+> > +	u8 *src, *dst;
+> > +	int off, err;
+> > +	int kw_bits;
 > > +
-> > +	if (!npc_is_vidx(vidx)) {
-> > +		dev_err(rvu->dev,
-> > +			"%s: vidx(%u) does not map to proper mcam idx\n",
-> > +			__func__, vidx);
-> > +		return -ESRCH;
-> > +	}
+> > +	off = offsetof(struct npc_install_flow_req, packet);
 > > +
-> > +	map = xa_erase(&npc_priv.xa_vidx2idx_map, vidx);
-> > +	if (!map) {
-> > +		dev_err(rvu->dev,
-> > +			"%s: vidx(%u) could not be deleted from vidx2idx map\n",
-> > +			__func__, vidx);
-> > +		return -ESRCH;
-> > +	}
+> > +	mutex_lock(&pfvf->mbox.lock);
 > > +
-> > +	old_midx = xa_to_value(map);
+> > +	req = otx2_mbox_alloc_msg_npc_get_num_kws(&pfvf->mbox);
 > > +
-> > +	rc = xa_insert(&npc_priv.xa_vidx2idx_map, vidx,
-> > +		       xa_mk_value(new_midx), GFP_KERNEL);
-> > +	if (rc) {
-> > +		dev_err(rvu->dev,
-> > +			"%s: vidx(%u) cannot be added to vidx2idx map\n",
-> > +			__func__, vidx);
-> > +		return rc;
-> > +	}
-> > +
-> > +	map = xa_erase(&npc_priv.xa_idx2vidx_map, old_midx);
-> > +	if (!map) {
-> > +		dev_err(rvu->dev,
-> > +			"%s: old_midx(%u, vidx(%u)) cannot be added to idx2vidx map\n",
-> > +			__func__, old_midx, vidx);
-> > +		return -ESRCH;
->
-> If this error path is taken, xa_vidx2idx_map now has vidx pointing to
-> new_midx, but xa_idx2vidx_map still has old_midx pointing back to vidx.
-> The bidirectional mapping becomes inconsistent.  Can this leave the maps
-> in a corrupted state?
+> > +	dst = (u8 *)&req->fl + off;
+>                   ^^^
 ACK.
 
 >
-> > +	}
-> > +
-> > +	rc = xa_insert(&npc_priv.xa_idx2vidx_map, new_midx,
-> > +		       xa_mk_value(vidx), GFP_KERNEL);
-> > +	if (rc) {
-> > +		dev_err(rvu->dev,
-> > +			"%s: new_midx(%u, vidx(%u)) cannot be added to idx2vidx map\n",
-> > +			__func__, new_midx, vidx);
-> > +		return rc;
+> Can this dereference a NULL pointer? otx2_mbox_alloc_msg_* functions can
+> return NULL on allocation failure, and this line accesses req->fl without
+> first checking if req is NULL.
 >
-> Similarly here, if xa_insert fails (e.g., memory pressure), the maps are
-> left inconsistent: xa_vidx2idx_map has vidx -> new_midx but xa_idx2vidx_map
-> has neither old_midx nor new_midx pointing to vidx.  Subsequent lookups
-> via npc_idx2vidx() for new_midx would fail to find the correct vidx.
-> Should these error paths restore the previous map state?
+> Other similar functions in this file (e.g., otx2_mcam_pfl_info_get(),
+> otx2_get_dft_rl_idx()) properly check for NULL after the mailbox
+> allocation before using the returned pointer.
+>
+> > +	src = (u8 *)fl_req + off;
+> > +
+> > +	memcpy(dst, src, sizeof(struct npc_install_flow_req) - off);
+>
+> [ ... ]
+>
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> > index 963d12ecd328..5fe077935c97 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+>
+> [ ... ]
+>
+> > @@ -1759,8 +1857,11 @@ int rvu_mbox_handler_npc_install_flow(struct rvu *rvu,
+> >  		enable = true;
+> >
+> >  	/* Do not allow requests from uninitialized VFs */
+> > -	if (from_vf && !enable)
+> > +	if (from_vf && !enable) {
+> > +		rvu_npc_free_entry_for_flow_install(rvu, req->hdr.pcifunc,
+> > +						    allocated, req->entry);
+> >  		return NPC_FLOW_VF_NOT_INIT;
+> > +	}
+> >
+> >  	/* PF sets VF mac & VF NIXLF is not attached, update the mac addr */
+> >  	if (pf_set_vfs_mac && !enable) {
+> >  		ether_addr_copy(pfvf->default_mac, req->packet.dmac);
+> >  		ether_addr_copy(pfvf->mac_addr, req->packet.dmac);
+> >  		set_bit(PF_SET_VF_MAC, &pfvf->flags);
+> >  		return 0;
+>                 ^^^^^^^^^^
+>
+> Does this path leak the allocated MCAM entry? When rvu_npc_alloc_entry_for_
+> flow_install() allocates an entry (setting allocated=true), but then this
+> early return path is taken, rvu_npc_free_entry_for_flow_install() is not
+> called. All other early return paths in this function properly free the
+> entry, but this one does not.
 ACK.
 
 >
-> > +	}
-> > +
-> > +	return 0;
-> > +}
->
-> [ ... ]
->
-> > +static int npc_defrag_process(struct rvu *rvu, struct list_head *lh)
-> > +{
->
-> [ ... ]
->
-> > +err:
-> > +	/* TODO: how to go back to old state ? */
-> > +	return rc;
-> > +}
->
-> The TODO comment here suggests awareness that error recovery is incomplete.
-> Given that npc_defrag_move_vdx_to_free() calls npc_vidx_maps_modify() which
-> can fail mid-operation, should the defragmentation be made atomic or have
-> proper rollback?
-Whole defragmentation process is done under lock. We cannot roll back as roll back
-can also fail.
-
-The defragmentation process failure indicate a bug in index management code.
-
-I removed the "TODO" comment and added an explantion.
+> >  	}
+> >
+> >  	mutex_lock(&rswitch->switch_lock);
 
