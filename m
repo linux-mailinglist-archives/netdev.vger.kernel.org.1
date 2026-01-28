@@ -1,233 +1,221 @@
-Return-Path: <netdev+bounces-254154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDIPMwrOeWnfzgEAu9opvQ
-	(envelope-from <netdev+bounces-254154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:51:22 +0100
+	id gNoNONTQeWk0zwEAu9opvQ
+	(envelope-from <netdev+bounces-254155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:03:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78D7B9E723
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:51:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F33E9E994
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 10:03:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 85069303A6CE
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:50:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6A1F304BC07
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 09:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE1233ADAA;
-	Wed, 28 Jan 2026 08:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132DF33C53B;
+	Wed, 28 Jan 2026 09:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bALrlQbE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b0KPPrCi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012058.outbound.protection.outlook.com [52.101.48.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF7933A71A;
-	Wed, 28 Jan 2026 08:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769590198; cv=none; b=mZhYSTToRrnpJJyqmq9rvf29f+DU+w9/MB9aXLyVncVhtHjwqq7XnHvxRehR3HlbvJyKsSKn2GnEtZZOb/cSUbSjExhVtezf21Hpt+uDbO6qsK/RRmtkt/oWhRVHyGgBuWwPbjNQYi4lRhcvAdvtR+/AHniZAT8jKTnP7yuDKUU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769590198; c=relaxed/simple;
-	bh=n9Iorvk8iVt3UkSxca9W0HXO8bsTIYYN0SFfGhp1PmY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PqZ7PU4jazeyW8BZ6dfxPT0Sf2sfNMl8u4BrQA+0hA2CLPY04+nVIBDVa2CO6WruWh78ahy3600dFxNPkT2s9btOKGujK9wPtwIMDcmEr1Du+XjWN+1Pg1CqhMzbERMmTDBdZkHRtK1xrd7WkzceaPXjf/0tdJdZl+K1m0pRPcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bALrlQbE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D8AD6C4CEF1;
-	Wed, 28 Jan 2026 08:49:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769590197;
-	bh=n9Iorvk8iVt3UkSxca9W0HXO8bsTIYYN0SFfGhp1PmY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=bALrlQbEMGkAolqBk9DExUb3FBfk1ov2ZITw/sUoCznI4ThO9/XJ/4NlBm13YPqIY
-	 t3ExTvN9Dc32S4zyJaiXumqHht/k6o3GhCQbwRtQX1Mr+8EptUMOWKP5xy7g6YBrBW
-	 iI8MoWLUj081fdkXAtB1/Pyi5uxUE1yanzXjDfh5YFA0aul3FR/EA9uW/2Nqg34iAV
-	 hhaPBq/mqzpXZojIODSrbySkuJ7rEv6zJ4PdCT4aF0z7kXAZnXpAXCwlw+JDahCbNS
-	 f4QuTecSIZO4j+NSAilyrcdK/Njc0dmBBr2pnZm303MloSMJFEfg2Urwhjjmm/VZCm
-	 X7st+jKcsX0ng==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C71E5D35694;
-	Wed, 28 Jan 2026 08:49:57 +0000 (UTC)
-From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Date: Wed, 28 Jan 2026 09:49:55 +0100
-Subject: [PATCH v4 4/4] stmmac: s32: enable support for Multi-IRQ mode
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3AA33BBCF;
+	Wed, 28 Jan 2026 09:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769590947; cv=fail; b=if8sttSvMpJllgDR59PHTAU0TMoKOQAK3xN5K0BJTEY/ytEKKNHqkbXQlAv6md5Ii0cyECCd9UEaUthzgxrhTPa0BUU9dF8wLpnNfUVFqccUQvEk1bSPYKKCn0Al5AFlV4345S0z1M5CaUGnB1R/IumGUiMLEMC07MEbhSxlEWU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769590947; c=relaxed/simple;
+	bh=l/2APZu2GwwL+paAocdRg3LEoTGUdOKphU7/I/cmvKo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UePl0Adw+ckOo5LODqmkRXG4Bv+fq3UfhacSGhliRxzmU5iXmpHSZoHK8uy1br7idwVUT6YeauRGKrqNTOIkSCGBfpnB2OoXlYrCFg1BVjIZDlZZeue7BIScFOHUrYWuACuW3pyadPusgCTLBAwV9AsDHSxZYxPdUws9V6Cl5wU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b0KPPrCi; arc=fail smtp.client-ip=52.101.48.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=plX7TOzVNiu+xpRIiV7e7So61D3Y91puJMN1x5TsmNQAbtyIUQ7bC9kkfFUa/WSEmVYeySaP5IKcRZrtFkUl1MzaAzL7K4V9BSjl4pXNfLNMRfYqihPN80+1CXmyNwMO5pUxqKHbCIgVUhIqWeAKItdXEiPst/QwFzljcIowL2wNBL1gG9IxRXTThocGBQ1ZZTpYRxIebT/AZmfYv47F0TKahIaYnXzO/upy3IBjtTuGO2esC9RlMAM8SmO6tVWqmn/llo25l1wxQbFAImOdoMxFBuDJAkrurq7+t8Xfjd0wFXt2rqOXtCH1yXZ/odX1J9mWFEZ4WHndwNYn2ksrYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6hbV42zdU4kOdRtE1hywYgvgHlbgRH8VcuO3jBlyKNM=;
+ b=NW+hZXFT0vAplfINN8012VPCkq37tpWehv4ynVd+8fcib7rV9DRhHajrSADi42SPjGwZCmUepaQVcZQUG75sdgHQkT6fBap9vTyPnHd2/RmM7snkvT52SE8k+KRiC5Gckm+XlrtO1VL8DzYmJhi2BBDo/zgpxXZBZbAJ7xy/DHX0eiuZYV8dwJa0C5t05LgotFEc7DE52XjSk7VauXEU/NSH4tHY96U07HtltmLt6+U1LA96g0hu8QWJBqrY1i7vWOfyFEqKCnBnfH+SxG4Ui8b73vTAh0zkSfwK0he6BKApTPatPJlzHJg5znvpYWsHh4sj3Yl78CqqUxTw1iDLZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6hbV42zdU4kOdRtE1hywYgvgHlbgRH8VcuO3jBlyKNM=;
+ b=b0KPPrCiA3NTKInD5kNF/XQVCaLzBQD2BC3y60rIU3TzCsS+qOqHo/Zo8tUmkSFGMO9ubrtgNrX4MRQ+9Q0kBFjNzAps2VlHM6zuGwJlKEsEW4sb+FNgKgkAVLyFXEWUlPw7K3bAPnR9Hh3D4Gj0I0H4/Wp1TaWi4/RU2vxRWZ9dOYrHRqDAIjEthfT60pvr5PUw0qLVxfcgpQBh3a+kXwfSKQ/6MijW1m9dVun2f0JEW59U9lgyHfPd0nhMoSTouNKduUy13V3ESsVyJAmDpYJBjGsLgy+7B62ZnTThiogKLbQWS2+M3YzmbFfkq0XDwEndm2BrjAJ5XTpP3d02Cw==
+Received: from BL1PR13CA0302.namprd13.prod.outlook.com (2603:10b6:208:2c1::7)
+ by PH7PR12MB7869.namprd12.prod.outlook.com (2603:10b6:510:27e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.16; Wed, 28 Jan
+ 2026 09:02:22 +0000
+Received: from BL02EPF0002992D.namprd02.prod.outlook.com
+ (2603:10b6:208:2c1:cafe::66) by BL1PR13CA0302.outlook.office365.com
+ (2603:10b6:208:2c1::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.7 via Frontend Transport; Wed,
+ 28 Jan 2026 09:02:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL02EPF0002992D.mail.protection.outlook.com (10.167.249.58) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 09:02:20 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
+ 2026 01:02:07 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 28 Jan
+ 2026 01:02:07 -0800
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Wed, 28
+ Jan 2026 01:02:04 -0800
+From: Nimrod Oren <noren@nvidia.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Nimrod Oren <noren@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>
+Subject: [PATCH net-next] selftests: drv-net: rss_flow_label: skip unsupported devices
+Date: Wed, 28 Jan 2026 11:02:17 +0200
+Message-ID: <20260128090217.663366-1-noren@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260128-dwmac_multi_irq-v4-4-82fa34fcf2f2@oss.nxp.com>
-References: <20260128-dwmac_multi_irq-v4-0-82fa34fcf2f2@oss.nxp.com>
-In-Reply-To: <20260128-dwmac_multi_irq-v4-0-82fa34fcf2f2@oss.nxp.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
- Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
- NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- imx@lists.linux.dev, devicetree@vger.kernel.org, 
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1769590195; l=3825;
- i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
- bh=F5iLqXdHMZ2qiiJkqKhxBpUsPyBKNhvXgKzEG4aoAks=;
- b=GMmeRxime6Zalz6f8cJNInShlnHl2IGRspApM3aNDxKsncINGGej0ms30rkwEIshXjUDTw4hS
- pLuP9QH+OdyD4LrfdukIsvsC6+xAkZUEhQkih4wlGHMk13XiWnhWw7R
-X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
- pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
-X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
- auth_id=217
-X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-Reply-To: jan.petrous@oss.nxp.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0002992D:EE_|PH7PR12MB7869:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f030148-95f9-4335-ad63-08de5e4bf1ff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?f8DWqu/kNkdXbm3Q7TLR8R6MuWFLC5fe35hUpfL1rJemYuUhz4i0zYskQYeu?=
+ =?us-ascii?Q?ax5lX4rRFfMfjfWiVVypK+A6zvZ4rPSvwTZjIV27VzDcP9/asOeVPcZqMRuE?=
+ =?us-ascii?Q?OSuxmqez+IDuoQ9aIdEx4omx+C8F/Gaz4aadrD+xsPMVPPbKGqqr0BJkIJ6f?=
+ =?us-ascii?Q?xmtz+Ikv2+9DDPqIiGGWgM0y/F4sg2rjV0vAKzLiFr+DvVH8E2oAWZtyppP5?=
+ =?us-ascii?Q?XuHz5crFvWaP4ZnOsHxX680XeLEvM+kJrQLmNmQYpyy7k7PDKOa/OUhm3wHo?=
+ =?us-ascii?Q?TOXhXxjWS6kuMJfFjKr/4++IkZs+sE/f3PBCnanLZWVzYgpQThfxPMvxv3NV?=
+ =?us-ascii?Q?1O7wc/4AiteReCmArkTrgxYXR/Wy2XsEPq1asGitMGzk2orYcZbwfPL40WfL?=
+ =?us-ascii?Q?4iFt3dfeTXBNfdliVDjd7C3TJAyKvFHk0k1YTkQLo+PZFZ6zx3CvAvnYjU5g?=
+ =?us-ascii?Q?SE9jwYyIMl2IvPjtkduzKPn6vAENTF3odjGQYteSXfd74lW1NSdvlzmpwgwF?=
+ =?us-ascii?Q?4SfCiL7ZkR7MTcLmhBptNS9BVYeQVkxAnpaEH7ySxpvRMJBO7k22+/ycx2CX?=
+ =?us-ascii?Q?OwiYEo/cCW8QVmx/+k8oiFrt1+k6irBZifOe92sYTQV6P6gZ4MT9ER62mKo/?=
+ =?us-ascii?Q?vIq/iawJGVrXn89w+8BmFQ2qn8u+UAqyzhgoQuav9BfOmyCoVGGwVXxeE5w3?=
+ =?us-ascii?Q?hOJ/p4GQ75fHQuC9p+WghWlWXORuk6LvzOHPwwVwdOKNTWTaYZHEaXFBV7gD?=
+ =?us-ascii?Q?9eddamyy+8exWYD8Cb7VMs6oTSuVIW8xqwPErRLhGV+qMSRhhmom72R+M/lq?=
+ =?us-ascii?Q?b3HCFjb2rRDcXCeYcd29RTiH27sxhyRTZEV5yOkD/qBMVkplvy4UfDEtlgOr?=
+ =?us-ascii?Q?aE970c7CIDHTiHBLVJYLwapIRl/L22ztodN95m2oc4ITK7GELkhfrB/y5wMd?=
+ =?us-ascii?Q?Q+eclccXSUvSIcAh3H+DQArEZ9taqoMhVP0wBUQ+vbZBshEwSPfXwcu2pjQV?=
+ =?us-ascii?Q?1R83TKfi4l+bliZRg6YJjHG4eLQWnNtyUEY1jO+N/LRnKsq6188+0gKYvsbF?=
+ =?us-ascii?Q?Vy5QeYmeicC+fAGz27Wm5YlxN5cs8tFP10R812Ls+VMTXNxQbOrWYQAkj5lp?=
+ =?us-ascii?Q?l0FQRT3PDrQf/pugjrIxyb8YqIfLjFwut6Z47BXFC9WeK4cWb4CipTrhN3Qx?=
+ =?us-ascii?Q?EdoxEZRTqM6LyaFfLra/hPQYIzO6nzbbYwbCYs1PsvR9lwD3euHuEK/Ro6Y/?=
+ =?us-ascii?Q?XJJD3gXPr9Uosc9Pwk1/upfcxiFdu1tslpkxZ7kS6bA7Sg+RmbMYdxP5nv43?=
+ =?us-ascii?Q?1D2srwlFBqOrslABRL+0tSDw9UsH63YPUQo+x4TBJtkzP69Q78F9QknOeSVg?=
+ =?us-ascii?Q?z0xLKCcxGCyd5tTJDojlW/VmrpeKUcJ0XgaEyxL7JmK9j9jRKetiH1rdVTq3?=
+ =?us-ascii?Q?EIvbfA6SIQxuaA0JY/yEx+9nZegzGqsutYnNyWlM45MBQ+IY72gRt4V6S99e?=
+ =?us-ascii?Q?RJ7+Kd0wSnMJJA8C+YhKSg+ZPFOQQKFrp1E5iPUHDBhwWQlUGIxdb67SGdeJ?=
+ =?us-ascii?Q?4bsz989jQZOrbi8YPJ91+f4sYjbXV+/uw49tPeMy2SmDqARIml4jg/Cx0FTy?=
+ =?us-ascii?Q?n8utZpAAee8Y1dOc3iQeOM9YkJZENKcJtkBHSOoydH3o5LzJYA0WZofoQGG1?=
+ =?us-ascii?Q?56xeNA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(7142099003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 09:02:20.6758
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f030148-95f9-4335-ad63-08de5e4bf1ff
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0002992D.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7869
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254154-lists,netdev=lfdr.de,jan.petrous.oss.nxp.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_REPLYTO(0.00)[jan.petrous@oss.nxp.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254155-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[4033c000:email,oss.nxp.com:mid,oss.nxp.com:replyto,s32g399aevb3:email,suse.com:email,nxp.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 78D7B9E723
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[noren@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 5F33E9E994
 X-Rspamd-Action: no action
 
-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+The test_rss_flow_label_6only test case fails on devices that do not
+support IPv6 flow label hashing. Make it skip neatly, consistent with
+the behavior of the test_rss_flow_label case.
 
-To get enabled Multi-IRQ mode, the driver checks:
-
-  1) property of 'snps,mtl-xx-config' subnode
-     defines 'snps,xx-queues-to-use' bigger then one, ie:
-
-     ethernet@4033c000 {
-         compatible = "nxp,s32g2-dwmac";
-         ...
-         snps,mtl-rx-config = <&mtl_rx_setup>;
-         ...
-
-         mtl_rx_setup: rx-queues-config {
-             snps,rx-queues-to-use = <2>;
-         };
-
-  2) queue based IRQs are set, ie:
-
-     ethernet@4033c000 {
-         compatible = "nxp,s32g2-dwmac";
-         ...
-         interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
-                      /* CHN 0: tx, rx */
-                      <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
-                      <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
-                      /* CHN 1: tx, rx */
-                      <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
-                      <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
-         interrupt-names = "macirq",
-                           "tx-queue-0", "rx-queue-0",
-                           "tx-queue-1", "rx-queue-1";
-
-If those prerequisites are met, the driver switch to Multi-IRQ mode,
-using per-queue IRQs for rx/tx data pathr:
-
-[    1.387045] s32-dwmac 4033c000.ethernet: Multi-IRQ mode (per queue IRQs) selected
-
-Now the driver owns all queues IRQs:
-
-root@s32g399aevb3:~# grep eth /proc/interrupts
- 29:    0    0    0    0    0    0    0    0    GICv3  89 Level   eth0:mac
- 30:    0    0    0    0    0    0    0    0    GICv3  91 Level   eth0:rx-0
- 31:    0    0    0    0    0    0    0    0    GICv3  93 Level   eth0:rx-1
- 32:    0    0    0    0    0    0    0    0    GICv3  95 Level   eth0:rx-2
- 33:    0    0    0    0    0    0    0    0    GICv3  97 Level   eth0:rx-3
- 34:    0    0    0    0    0    0    0    0    GICv3  99 Level   eth0:rx-4
- 35:    0    0    0    0    0    0    0    0    GICv3  90 Level   eth0:tx-0
- 36:    0    0    0    0    0    0    0    0    GICv3  92 Level   eth0:tx-1
- 37:    0    0    0    0    0    0    0    0    GICv3  94 Level   eth0:tx-2
- 38:    0    0    0    0    0    0    0    0    GICv3  96 Level   eth0:tx-3
- 39:    0    0    0    0    0    0    0    0    GICv3  98 Level   eth0:tx-4
-
-Otherwise, if one of the prerequisite don't met, the driver
-continue with MAC IRQ mode:
-
-[    1.387045] s32-dwmac 4033c000.ethernet: MAC IRQ mode selected
-
-And only MAC IRQ will be attached:
-
-root@s32g399aevb3:~# grep eth /proc/interrupts
- 29:    0    0    0    0    0    0    0    0    GICv3  89 Level   eth0:mac
-
-What represents the original MAC IRQ mode and is fully backward
-compatible.
-
-Reviewed-by: Matthias Brugger <mbrugger@suse.com>
-Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Nimrod Oren <noren@nvidia.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ .../selftests/drivers/net/hw/rss_flow_label.py        | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index 5a485ee98fa7..37a5b7b46973 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -2,7 +2,7 @@
- /*
-  * NXP S32G/R GMAC glue layer
-  *
-- * Copyright 2019-2024 NXP
-+ * Copyright 2019-2026 NXP
-  *
-  */
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+index 6fa95fe27c47..7dc80070884a 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+@@ -145,9 +145,14 @@ def test_rss_flow_label_6only(cfg):
  
-@@ -149,6 +149,16 @@ static int s32_dwmac_probe(struct platform_device *pdev)
- 	plat->core_type = DWMAC_CORE_GMAC4;
- 	plat->pmt = 1;
- 	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
-+
-+	/* Check for multi-IRQ config. Assumption: symetrical rx/tx queues */
-+	if (plat->rx_queues_to_use > 1 &&
-+	    (res.rx_irq[0] > 0 && res.tx_irq[0] > 0)) {
-+		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-+		dev_info(dev, "Multi-IRQ mode (per queue IRQs) selected\n");
-+	} else {
-+		dev_info(dev, "MAC IRQ mode selected\n");
-+	}
-+
- 	plat->rx_fifo_size = 20480;
- 	plat->tx_fifo_size = 20480;
+     # Try to enable Flow Labels and check again, in case it leaks thru
+     initial = _ethtool_get_cfg(cfg, "udp6")
+-    changed = initial.replace("l", "") if "l" in initial else initial + "l"
+-
+-    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {changed}")
++    no_lbl = initial.replace("l", "")
++    if "l" not in initial:
++        try:
++            cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 l{no_lbl}")
++        except CmdExitFailure as exc:
++            raise KsftSkipEx("Device doesn't support Flow Label for UDP6") from exc
++    else:
++        cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {no_lbl}")
+     restore = defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
  
-
+     _check_v4_flow_types(cfg)
 -- 
-2.47.0
-
+2.45.0
 
 
