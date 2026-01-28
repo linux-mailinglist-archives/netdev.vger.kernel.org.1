@@ -1,160 +1,216 @@
-Return-Path: <netdev+bounces-254433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLdBHbxwemlI6QEAu9opvQ
-	(envelope-from <netdev+bounces-254433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:25:32 +0100
+	id mNuaDyRxemlI6QEAu9opvQ
+	(envelope-from <netdev+bounces-254434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:27:16 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCFC4A877B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:25:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C7CA87AE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 21:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B35793021EA4
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:25:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D60D430488FC
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 20:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE98328B68;
-	Wed, 28 Jan 2026 20:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f+3eECS5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE51B35FF67;
+	Wed, 28 Jan 2026 20:26:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A177327C18
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B923733031E
+	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 20:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769631922; cv=none; b=bnrwJFbH+jbCza5smZP+YgF+pSepoMt8VA/14wSRYcdjyVOuYi8SzuZJr1ncB9mUvUOiYw2YyIqzFPW6ObEwnv+KLeXf6CQgty4DNqsuWVa3QG0xWQ8Gx2xiLnV4K0uO3XAWWMuEI516RcPlk/xkpgybFe03nF7go852QrpsaCY=
+	t=1769632011; cv=none; b=POjuNGoNnAEyguvezekmC6NBKkKUJFk5aSLboG7zQLa1Ef/jIf2plxK/WnJP4Sxl08WW/ZQDrlOmwaGBT2AqnwX+CKEcwxKglMtYWpskip3DuE8qH4kMk4OaJn34iIL6Py/pPeY2aR54VlcV5kZnkf7SN03gLdRqu4xIftNsJ2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769631922; c=relaxed/simple;
-	bh=1THU/IXqc2zov1vCJBRjkt4WEKVf9VZSfAJe/fhn0Mw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YUeikzDl9fnPi5Em5JTAYIw3AQYYUO+HJGHQ5l1BO1JFW3nqQeZS6r7Xbh0DpaCmJPILjBtA57ARKwpXZG4RZkZ+NuJJv1P8c0u2nJYsS93EWVikvLksMt2HUZUCsPtTKyDFhlqKKhOWGkls7qwVDAGO1ghix0H3DVF02uYPoww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f+3eECS5; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D78F34E422F0;
-	Wed, 28 Jan 2026 20:25:16 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 96E6D6071F;
-	Wed, 28 Jan 2026 20:25:16 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 73AC9119A882A;
-	Wed, 28 Jan 2026 21:25:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1769631915; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=SMfXIGAVa52Lc0KHAoLt8kPypfvKVyXFIVQcUwllpO0=;
-	b=f+3eECS5rX9nJuCYjiQNpi6vq9rORfn4RDkY6QY6l5DjrlEKm62iUNOiXtUGoGRa4zR1P7
-	XkADItiyHSDdWG05D5BNZIKAF0ZGmFBOZ8UXXDiOpaXMVHa67UKNkUPIj1vO3ocRIz+8+3
-	PqG6JYx0J3azkIzHzRdXOnrl+ZuhN/+o9pqt5MRO4RxBtmZA80WpVacDVkzhQFt5g3fUyS
-	bGANNyM+F/XlXsfEGmsN1+AJKpWuvkT3YbKIe/1qYPlEJzIKXdgWS9trSel7NyYG9SE4ff
-	ia+F15x0NcrTXqTaA7rrj3F0b+EEaSfHN6wIN8wX7Pb986Ipl9hpaL+GT/L0yg==
-Message-ID: <65ba2124-3940-4dd6-bbab-a31cdc67f573@bootlin.com>
-Date: Wed, 28 Jan 2026 21:25:10 +0100
+	s=arc-20240116; t=1769632011; c=relaxed/simple;
+	bh=HZa5ht60kTuZ5mPivPN4oV1/ntHz7uBm3f9ivO1VrjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nk4UmzrD0XbC2UBxkoROTkPxxh9K0hxHxL3/x1n2C/5DwguZD7gpvttdb9gu7/y0BIpsJGR2QHSNoKVDhXz+8YYiW8ex1TlIWZKadFNvooNyOYSxRr/1RYJe1+5DqITaqb6O1//fADRcB8ELii3FVpHlSBOYX/QrQno28hUI4PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlC7Z-0002t1-3M; Wed, 28 Jan 2026 21:26:37 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlC7X-002yRW-06;
+	Wed, 28 Jan 2026 21:26:34 +0100
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vlC7W-002trp-0b;
+	Wed, 28 Jan 2026 21:26:34 +0100
+Date: Wed, 28 Jan 2026 21:26:34 +0100
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>,
+	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <imx@lists.linux.dev>,
+	"open list:FREESCALE IMX / MXC FEC DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: phy: integrate reset-after-clock quirk into
+ phy_init_hw
+Message-ID: <20260128202634.gqevi76o6wnf5xno@pengutronix.de>
+References: <20260128094644.302313-1-michael@amarulasolutions.com>
+ <13d1018c-d9aa-4838-8bb3-35c509cd3e35@lunn.ch>
+ <CAOf5uwm30=AVhqm67yz8Y5TkX9FWdxizTevCGSeaQuJS0KqtNA@mail.gmail.com>
+ <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: sfp: Fix quirk for Ubiquiti U-Fiber Instant SFP
- module
-To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, netdev@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-References: <20260128175714.11411-1-kabel@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260128175714.11411-1-kabel@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+In-Reply-To: <aXoV-U-yqcDJj2vk@shell.armlinux.org.uk>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,gmail.com,lunn.ch];
-	TAGGED_FROM(0.00)[bounces-254433-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FREEMAIL_CC(0.00)[amarulasolutions.com,lunn.ch,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lists.linux.dev,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-254434-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[m.felsch@pengutronix.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CCFC4A877B
+X-Rspamd-Queue-Id: C1C7CA87AE
 X-Rspamd-Action: no action
 
-Hi Marek,
-
-On 28/01/2026 18:57, Marek Behún wrote:
-> Commit fd580c9830316eda ("net: sfp: augment SFP parsing with
-> phy_interface_t bitmap") did not add augumentation for the interface
-                                       ^^^^^^^^^^^^^
-                                       augmentation
-> bitmap in the quirk for Ubiquiti U-Fiber Instant.
+On 26-01-28, Russell King (Oracle) wrote:
+> On Wed, Jan 28, 2026 at 02:33:24PM +0100, Michael Nazzareno Trimarchi wrote:
+> > Hi Andrew
+> > 
+> > On Wed, Jan 28, 2026 at 2:25 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > >
+> > > On Wed, Jan 28, 2026 at 10:46:41AM +0100, Michael Trimarchi wrote:
+> > > > The current implementation of phy_reset_after_clk_enable requires MAC drivers
+> > > > (like fec_main.c) to manually track PHY probing states and trigger resets
+> > > > at specific points in their clock management flow and was created just for a SoC
+> > > > vendor.
+> > >
+> > > We try to keep workarounds for specific SoC vendors out of the core,
+> > > when possible. It just makes the core more complex for an edge case
+> > > which most people don't care about. It is better to hide the
+> > > complexity away in the driver which needs it.
+> > 
+> > We should not merge things in the core that are for one Soc and
+> > after d65af21842f8a7821fc3b28dc043c2f92b2b312c, I need to anyway to do:
+> > 
+> > net: phy: smsc: Fix functionality of lan8710 in combination with NXP fec
+> > 
+> > Revert "net: phy: smsc: LAN8710/20: remove PHY_RST_AFTER_CLK_EN flag"
+> > d65af21842
 > 
-> The subsequent commit f81fa96d8a6c7a77 ("net: phylink: use
-> phy_interface_t bitmaps for optical modules") then changed phylink code
-> for selection of SFP interface: instead of using link mode bitmap, the
-> interface bitmap is used, and the fastest interface mode supported by
-> both SFP module and MAC is chosen.
+> That commit is an example of a poor commit description. It doesn't
+> describe the problem, nor which hardware this affects, so when we end
+> up with this kind of situation, we're lacking the context behind why
+> the change was made.
+
+I need to say that this commit lacks a bit of context which is part of
+my previous commit. I thought, that I made that clear with:
+
+|   The same behaviour can be archived now by specifying the refclk.
+
+To be honest, I should have made it more clear.
+
+> So, how do we know that reverting that commit is not going to cause a
+> regression for whatever platform the patch was proposed for?
+
+If I get the Michael's patch correct, he tries to move the quirk
+handling into the core. I really don't know why Michael requires the
+speical reset handling at all. The commit adding the
+PHY_RST_AFTER_CLK_EN flag says:
+
+|    phylib: add reset after clk enable support
+|
+|   Some PHYs need the refclk to be a continuous clock. Therefore they don't
+|   allow turning it off and on again during operation. Nonetheless such a
+|   clock switching is performed by some ETH drivers (namely FEC [1]) for
+|   power saving reasons. An example for an affected PHY is the
+|   SMSC/Microchip LAN8720 in "REF_CLK In Mode".
+
+This can be achieved with commit
+bedd8d78aba300860cec3f85d6ff549b3b7f2679 if specified accordingly.
+
+> If you read the preceeding commit (which is referenced by the commit
+> you intend to revert) itgives more information about the problem, and
+> I would expect that reverting it will cause a regression with
+> interrupts.
+
+Yes, my bad I thought this reference is enough.
+
+> Adding Marco to this thread for comment.
+
+Thanks.
+
+The issue was with the out-of-band reset coming from the FEC driver
+which doesn't honor the phy state-machine. It shouldn't cause a
+regression (TM) if it would be part of the state-machine (aka this RFC
+patch) but it needs to be tested!
+
+As said above, I'm not sure why PHY_RST_AFTER_CLK_EN is required in the
+first place.
+
+> Also, maybe you could clearly state what the issue that you are trying
+> to address - why do you need special reset handling for the combination
+> of FEC + this PHY. Consider including that description in the commit
+> message for any proposed solution so that - as is the case here looking
+> back at Macro's commit - we can see _why_ the change is being made.
+
+With the context of the previous commit it should be clear.
+
+Regards,
+  Marco
+
 > 
-> Since the interface bitmap contains also modes faster than 1000base-x,
-> this caused a regression wherein this module stopped working
-> out-of-the-box.
-> 
-> Fix this.
-> 
-> Fixes: fd580c9830316eda ("net: sfp: augment SFP parsing with phy_interface_t bitmap")
-> Signed-off-by: Marek Behún <kabel@kernel.org>
-> ---
->  drivers/net/phy/sfp.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index 47f095bd91ce..eb6fa98e5d71 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -479,6 +479,8 @@ static void sfp_quirk_ubnt_uf_instant(const struct sfp_eeprom_id *id,
->  	linkmode_zero(caps->link_modes);
->  	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
->  			 caps->link_modes);
-> +	bitmap_zero(caps->interfaces, PHY_INTERFACE_MODE_MAX);
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-small nit, you can use phy_interface_zero() here.
+-- 
+#gernperDu 
+#CallMeByMyFirstName
 
-> +	__set_bit(PHY_INTERFACE_MODE_1000BASEX, caps->interfaces);
->  }
->  
->  #define SFP_QUIRK(_v, _p, _s, _f) \
-
-With that, it looks good to me,
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
