@@ -1,230 +1,155 @@
-Return-Path: <netdev+bounces-254099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6F7DGBSQeWl9xgEAu9opvQ
-	(envelope-from <netdev+bounces-254099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 05:27:00 +0100
+	id GOy0BSl4eWkSxQEAu9opvQ
+	(envelope-from <netdev+bounces-254078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:44:57 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4A09CF81
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 05:26:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4F49C628
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 03:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B2C81300468A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 04:26:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 26D8C3006933
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 02:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8325D33032C;
-	Wed, 28 Jan 2026 04:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CFCC2BF001;
+	Wed, 28 Jan 2026 02:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSCbreYE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMd74uBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C044F32F74D
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 04:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C8229B8DB;
+	Wed, 28 Jan 2026 02:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769574416; cv=none; b=lJKbTIHsWGqUO9+UcTyGvjaHkvs/PEvF6HkL4/0nZACx0Ef+8BnP3/+cTWwmPocMwR2iE7VRyLKZ8+WAXyOApCUqlaM6nyKZzYYrbaiIjPWiFGSvRJnyFnkR1ryyPU7e236k1A7HsofE6wpSm2Oo8KJhDvra+0MGowBj5rpD258=
+	t=1769568290; cv=none; b=R7IOUDhgcEQoYZifdn7rqi/gXpENZWO9/NTzUu3CFn1YHG6FyrvBCnrRrF/zoinA2HUXx2FR+P4Xfqp6S0sw+szp9u3+O+Nu1LNfbr4mrpR6qF6lkNNjeNqxMf0R8Gu6aB1mcO4U1YAQim9caJx0t30NiASaYsmi4YNV3+WwqJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769574416; c=relaxed/simple;
-	bh=oM89C4h0+705Q5QrOC+AfMkyUp4pRbPcDrBjP080Sos=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KZMpGwWHUoViV8I+3RvRPAw+H2HEhvygc56Xwxxb+ZmhbCvCwSbvcyOZNruD5tmSNKrupKsAVwb2gPzti3FJHL10Xi7Fmj9906PjzXsLJ1lgJBlXyoYh6nBrI55BZ2Tg/FNhi6qn87boGa11adiGPXDm3aWyRvfR9NCbRmPQUg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSCbreYE; arc=none smtp.client-ip=209.85.210.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7d18d02af68so345403a34.2
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 20:26:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769574413; x=1770179213; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VklwEd5dwuBjikrAPpEFP/UQPzhOaAWoIKJ/0tvPqOU=;
-        b=kSCbreYEXAhYBbYLYGpFyiN+NWpLZGu1kwM5p1Enx2QxAirsG+QvfJQoU4CoXS1gzH
-         U3FZ9xihO5Pd/Nn+hameRMXYf/vGhludPcd+JkSHDEvBXL1fIKHGCFxSfe2MR2wlbmGI
-         tDyl0lhyt6e23w1oQlgdD6RqfhuTz2dmCpRA0M2WBTiBJ/79iw/WN3QisPul/SfGlDhk
-         8tdljfB2qPBr/+Kpa+krat5/9cNjNMgJHRCbel53bNRaBM6qq9WGAPZB/OYbDyGsIwYE
-         wriGLq8SBK46OJdFmgs/YS1z/Et905tXZ9KR4qOUrjVwLqiFqoRESi5/HYofezzkQTeF
-         Z65Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769574413; x=1770179213;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VklwEd5dwuBjikrAPpEFP/UQPzhOaAWoIKJ/0tvPqOU=;
-        b=UVN2QCefBarqeqwRhKUU0xSOh1Hme3E2akoC457GSNkadUp+HTMH5i6CAyM1PCAs4q
-         SnCnJM8nAqbopCXvb4OM5KuhfnwX1h8QI208LNIE+lbMcM1AmqcaQ15mXi9k2ulGkDwb
-         bsvjTPC4va7yeXskDflQn1CPJwMO0dDVBT9h45yflNcSKiAyIBfvzabXdi0WENaW6ae6
-         CgF4l3NJCg8z/p/w/wbkXZRtOiWmHAKnrvHkD9dAs/99jcugaw/K3/Vn1JEx2axxnEnm
-         0bwFZ1E7VVxzyj3nLE3kE8GeMv/6i9D11YUYRZXzWpyU7y33UC+yba6tcqEp0Wdw9Wjd
-         sYtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPF199UPWnexqNiTVyXwwFAXJthNrA/3DDrDEgUlATBh+z2/SjPGxhbkpP3SXh6MxY6qaZUwQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/a/PokYx0MtzSRpq25UGPrWLHtN/jqi6wqcf/UuRZ5IrcxsgM
-	AyqgMOwTAY0q2PmnWGXVAeWlpD2OrbgQoke2B1tTwunsF0EhAOzxlrwYfzB74Q==
-X-Gm-Gg: AZuq6aIwyU1SksHTbGBT2ngPZ+9O1oGwWCFdj54zJ26YBLPW159SNXuwYB0d5oTqrZ9
-	Aiqz3kBwvZ90sFdHXl9GzrbocsiHCpoMnkfz2Yci8+dbQdShjPt7PQRj7V8aM/xH4icW90WC/dx
-	Y+WEyN4IR7tXmChoXsrchx3lODeLxe1lmobKiUqqlpjavvL10IpxHv7Ncd0VFJUDIswQXfYIrXC
-	f+Sb1hUy92CHy6cWPgY/s+I7x7SYN3mw9i+VHGXKod5Ljm+lMD10uFiMRTI1mv5Hch3D9xrbfCB
-	rfyICaJVgaU2KJ+wuaBo1a3oK90s8tqw50LfSCaSJD6wxHSXJBk3Ybj+MYH6TXfunxgWT4x0MHG
-	Gtq4K6msJ43VFxuUKd2SCYMUqONawERBYls26zZoWFiiXMr429oIW9uAsMjfmzO3KXBxBMayHpb
-	IYSdp3IiKQVC+g71XA25zMzdAzR50RCuOYcVnCp3X37TAKjg==
-X-Received: by 2002:a05:7022:1099:b0:123:3488:89a3 with SMTP id a92af1059eb24-124a00bd734mr1918278c88.24.1769567650952;
-        Tue, 27 Jan 2026 18:34:10 -0800 (PST)
-Received: from [172.16.0.242] ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1addafesm780825eec.25.2026.01.27.18.34.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 18:34:10 -0800 (PST)
-Message-ID: <973f2b4b-bf8d-4a77-a27a-47495bc21ff8@gmail.com>
-Date: Tue, 27 Jan 2026 18:38:28 -0800
+	s=arc-20240116; t=1769568290; c=relaxed/simple;
+	bh=QI4eswQrEkadHsXfTL8PxZRa+DYKd57x62u0Yj8uH8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PfPhwl1qYoSaRqTYWi6ShUHd+VMjtvysPqTUhZRBckcGO+FxAutwi1rRxg9Sw07otK9NOcxVEvF120WuUZmAj8ePldVeCsE8cq/v+ZVw9fLykJNoz3Hy3Pl4qAYBiwU4tWTzO3DgBf8AMbK+1g7fpvJ1ct3zX7IBJ8p9NOVwXYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMd74uBu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A06E2C116C6;
+	Wed, 28 Jan 2026 02:44:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769568290;
+	bh=QI4eswQrEkadHsXfTL8PxZRa+DYKd57x62u0Yj8uH8c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HMd74uBuf5bN0n4U/rfjpjS/v17wlub0COHTcgH1Q/h8ogrPIgvsP2NpJXoyP89Y3
+	 zm4xRLfGcjVnj5LaQIFBJ/Wwwz+hR5KrcuwXaQNaVrtcGwyOasSH86SXqEt7iDDL+F
+	 7sulgKKzY6JcAFrrvkXdFB0UZytQ868zY1jhcmeW2BUJpIXy9B+QRKNphMPXyOkgik
+	 Pv27KHBaSlq/tvj4Ttaisd2L8i8FN33gVlLZEP7GiPkOnI9P+rQfxDOYunQ/lg4OqR
+	 X1Q676fu8WQPar615rwUhwGpzrDdHxQFOuqdLsyAjDhaQ7WpUl7J6k15pF7/L2G4FD
+	 fLbnQD8c6edhg==
+Date: Tue, 27 Jan 2026 18:44:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aleksei Oladko <aleksey.oladko@virtuozzo.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Aaron Conole
+ <aconole@redhat.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] selftests: net: fix false failures due to
+ missing features and host interference
+Message-ID: <20260127184448.2976475f@kernel.org>
+In-Reply-To: <20260127225134.304362-1-aleksey.oladko@virtuozzo.com>
+References: <20260127225134.304362-1-aleksey.oladko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
- control
-To: Min Lin <linmin@eswincomputing.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Krzysztof Kozlowski <krzk@kernel.org>,
- =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>,
- devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com,
- weishangjuan@eswincomputing.com
-References: <308b676.2d03.19bb0caebed.Coremail.lizhi2@eswincomputing.com>
- <59cec617-0189-4dc3-bc3f-6346155a62ae@lunn.ch>
- <4e2a55e7.3662.19be8cb9c3c.Coremail.lizhi2@eswincomputing.com>
- <c5c0bfdb-316d-4796-afa0-f6f018ceb414@lunn.ch>
- <abf12a3f-9cdd-472d-a02e-af4da594b84f@gmail.com>
- <e6f7da45-3dec-4af6-a5b1-a72210bf24f4@kernel.org>
- <43923bf9-6202-4147-8eac-5bd7bb653fd4@gmail.com>
- <bd202cfa-d6eb-4d0e-982d-b49795dd25f7@lunn.ch>
- <009aefc4-fbc9-4f91-9230-23d18c281bf3@gmail.com>
- <73ea5619.2b71.19bf847c80d.Coremail.linmin@eswincomputing.com>
- <aXeydXuWEMDz-yVM@shell.armlinux.org.uk>
- <32a1f814.2c79.19bfe173225.Coremail.linmin@eswincomputing.com>
-Content-Language: en-US
-From: Bo Gan <ganboing@gmail.com>
-In-Reply-To: <32a1f814.2c79.19bfe173225.Coremail.linmin@eswincomputing.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-254099-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,eswincomputing.com,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,st-md-mailman.stormreply.com,lists.infradead.org,einfochips.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-254078-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ganboing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[einfochips.com:email,stormreply.com:email,armlinux.org.uk:email,st.com:email,davemloft.net:email,eswincomputing.com:email,lunn.ch:email,infradead.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nxp.com:url]
-X-Rspamd-Queue-Id: AD4A09CF81
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,pmtu.sh:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5F4F49C628
 X-Rspamd-Action: no action
 
-Hi Min, Russell, Krzysztof,
+On Tue, 27 Jan 2026 22:51:29 +0000 Aleksei Oladko wrote:
+> This series addresses several issues in the networking kselftests
+> that cause false-positive failures depending on the host environment,
+> kernel configuration, or library versions.
+> 
+> The main focus of these changes is to isolate tests from the host
+> environment (using namespaces) and to ensure proper fallback or
+> skipping when dependencies are missing.
+> 
+> Summary of changes:
+> 1. Adds a check for cls_basic module in fib_tests. Without this
+>    module, the test fails when attempting to add tc rules instead
+>    of skipping.
+> 2. Fixes ovs-dpctl.py to return a non-zero exit code when pyroute2
+>    is too old. This allows pmtu.sh to correctly fall back to ovs-vsctl
+>    instead of assuming the configuration was successful.
+> 3,4. Move reuseport and pmtu.sh tests info dedicated network namespaces.
+>    This prevents failures caused by port conflicts with host processes
+>    or interference from host firewall rules.
+> 5. Ensures io_uring is enabled via sysctl before running io_uring_zerocopy
+>    test, preventing failures on systems where kernel.io_uring_disabled
+>    is set.
 
-On 1/26/26 22:14, Min Lin wrote:
-> Hi Russell,
-> 
-> 
->> -----Original Messages-----
->> From: "Russell King (Oracle)" <linux@armlinux.org.uk>
->> Send time:Tuesday, 27/01/2026 02:29:09
->> To: "Min Lin" <linmin@eswincomputing.com>
->> Cc: "Bo Gan" <ganboing@gmail.com>, "Andrew Lunn" <andrew@lunn.ch>, "Krzysztof Kozlowski" <krzk@kernel.org>, 李志 <lizhi2@eswincomputing.com>, devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ningyu@eswincomputing.com, pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
->> Subject: Re: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling control
->>
->> On Mon, Jan 26, 2026 at 11:10:12AM +0800, Min Lin wrote:
->>> Due to chip backend reasons, there is already a ~4-5ns skew between the RX
->>> clock and data of the eth1 MAC controller inside the silicon.
->>
->> Let's analyse this.
->>
->> 	TXC / RXC	TXC / RXC
->> Speed	Clock rate	Clock period
->> 1G	125MHz		8ns
->> 100M	25MHz		40ns
->> 10M	2.5MHz		400ns
->>
->> The required skew for TXC and RXC at the receiver is specified to be
->> between 1 and 2.6ns irrespective of the speed. The edge of the clock
->> is also important: the rising edge indicates the lower 4 bits, and
->> the falling edge indicates the upper 4 bits.
->>
->> At 1G speed, with a "4 to 5ns" skew in the chip. If this is accurate,
->> then inverting the clock and adding 1ns of additional skew by some
->> means (PCB trace, or at the MAC or PHY) will give the required clock
->> at the receiver.
->>
-> 
-> Yes, that's exactly the case.
-> 
->> The timing table in the RGMII standard (3.3) allows for Tcyc (the
->> clock rate) to be scaled, but there is no allowance for scaling
->> TskewR (the required 1 to 2.6ns skew.) This skew parameter is
->> fixed.
->>
->> So, at the other speeds, you are completely unable to meet the timing
->> specification, whether irrespective of the clock inversion. In effect,
->> the only speed that you can meet the specification is 1G.
->>
-> 
-> The timing table in the RGMII standard(3.3) says the max value of Tskew
-> for 10/100 is unspecified.
-> Quotation:"note1: ...,For 10/100 the Max value is unspecified."
-> 
-> I think for 10/100, the "4 to 5ns" skew in the chip doesn't break the
-> standard. At 10/100 speeds, it meets the timing specification without
-> having to to add clock inversion.
-> In practice, it works at 10/100 speeds in the rgmii-id phy mode.
-> 
->> Thus, I think this is something that needs a lot more than just "do
->> we need to invert the clock". You also need to prevent 10M and 100M
->> being supported IMHO.
->>
-> 
-> Regards,
-> Lin Min
+Something in this series breaks the pmtu test for us in the CI:
 
-I had an offline discussion with Yao Zi and others regarding this. We feel
-like the proper way for ESWIN to deal with this broken eth1 is to have a
-different compatible string just for eth1, where it can be associated with
-platform data with quirks to do eswin,rx-clk-invert at 1G. The property is
-therefore not required to be exposed in DT. (Pretend it conforms to spec
-for 1G). Need confirmation for 10M/100M, though. I double checked Lin Min's
-claim, and indeed the spec says "For 10/100 the Max value is unspecified":
-https://community.nxp.com/pwmxy87654/attachments/pwmxy87654/imx-processors/20655/1/RGMIIv2_0_final_hp.pdf
+# 64.84 [+2.54] TEST: IPv6, bridged geneve6: PMTU exceptions - nexthop objects      [ OK ]
+# 65.73 [+0.89]   ovs_bridge not supported
+# 65.73 [+0.00] TEST: IPv4, OVS vxlan4: PMTU exceptions                             [SKIP]
+# 67.20 [+1.47]   ovs_bridge not supported
+# 67.20 [+0.00] TEST: IPv6, OVS vxlan4: PMTU exceptions                             [SKIP]
+# 68.66 [+1.45]   ovs_bridge not supported
+# 68.66 [+0.00] TEST: IPv4, OVS vxlan6: PMTU exceptions                             [SKIP]
+# 70.11 [+1.45]   ovs_bridge not supported
+# 70.11 [+0.00] TEST: IPv6, OVS vxlan6: PMTU exceptions                             [SKIP]
+# 71.57 [+1.45]   ovs_bridge not supported
+# 71.57 [+0.00] TEST: IPv4, OVS geneve4: PMTU exceptions                            [SKIP]
+# 73.01 [+1.44]   ovs_bridge not supported
+# 73.01 [+0.00] TEST: IPv6, OVS geneve4: PMTU exceptions                            [SKIP]
+# 74.46 [+1.45]   ovs_bridge not supported
+# 74.46 [+0.00] TEST: IPv4, OVS geneve6: PMTU exceptions                            [SKIP]
+# 75.92 [+1.46]   ovs_bridge not supported
+# 75.93 [+0.00] TEST: IPv6, OVS geneve6: PMTU exceptions                            [SKIP]
 
-Thoughts?
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/492641/137-pmtu-wrapper-sh/stdout
 
-Bo
+It was fine before:
+
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-dbg/results/492461/6-pmtu-sh/stdout
+
+Since this is a bash test there are of course no logs to go by.. :/
+
+I tried running 
+ python tools/testing/selftests/net/openvswitch/ovs-dpctl.py add-dp br0
+in a netns and that works just fine. 
+
+No idea what's going on..
 
