@@ -1,103 +1,53 @@
-Return-Path: <netdev+bounces-254141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254142-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YODjEla+eWnoygEAu9opvQ
-	(envelope-from <netdev+bounces-254141-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:44:22 +0100
+	id qEH9MaDAeWl/ywEAu9opvQ
+	(envelope-from <netdev+bounces-254142-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:54:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B899DD58
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:44:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D7B9DE27
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CB17630041D3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:44:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E409E300CFC3
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EC3324B2D;
-	Wed, 28 Jan 2026 07:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012F432ABD0;
+	Wed, 28 Jan 2026 07:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="El/IZcUt";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gt+bxbDh"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="JKfJAniW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CD2221FB6
-	for <netdev@vger.kernel.org>; Wed, 28 Jan 2026 07:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5B232AAD6;
+	Wed, 28 Jan 2026 07:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769586258; cv=none; b=K7Bqo/lw/In6w/hJRlA7VpBxPJCsuKBaBdBgeRf4MWXudtjdVMe4BF65ZJtJU02EEfHYgEEeilCuLmFFJ47D8JPa9S6jUe351eLR0TqVHJDU2bTaFIbbnm45kpLwQJbQncUkQdEwprsfWF6U6X52ei5bunzmseqNWU+SMr/sMk4=
+	t=1769586845; cv=none; b=uTPIR6Oz97Vp77f4uEHi2SD7kyX1WTm9QrUN0OfN0218e52pMS964imd40wMglUEFvIybw3Ki4HcJhh0X8swbSzLchydCYkgUqXTO8Csyh7nBJMtiOGKFovuQQuuVXXzQfeTBzNpO3m12k2Nj7ImpuMFFNE6xprgUCOXgaZSwE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769586258; c=relaxed/simple;
-	bh=1sqaxyg9uUfww2vS/d6/pDwRt5NvTGwpHUEkBH22Jkw=;
+	s=arc-20240116; t=1769586845; c=relaxed/simple;
+	bh=RJpZbsGqYhQMnwJL6cFQDDTzLA15QLu6kSCexH+vLQM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=psljwDfs7D5pu6kPJDYvCJiRpq73+Fk/jm//VT7b/FJjZpgXxEVNnAg3ZWiU4HkuXWli7/hDk2TefUKOxdtEZntCo0rJAigCLpB1KDf1gTUbPN7o/AIh/bwfECozBuhnIzuDlESI9xIbda7CK95m1cmqNXPcriK0IGCXAuMHBIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=El/IZcUt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gt+bxbDh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769586256;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N2r8/rRraCmZGhd+qX9Y3lCkPKausqhtTQk0k54UGaw=;
-	b=El/IZcUtD91Bl1jAyhnfs1beUMx2BFkZSdEqGlfrJd/1tPzbprbzI021VMrNAcjQg2UX37
-	64Qx1vYIceGOyYqaJJI1hYBEYw8APwFo3x853wwATJm/0nF1dNpZCf9KTlYqpjHt+7MwwX
-	orl91IOhSMk1ZBH/p4EgdL3r7zlGdWU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-UkqN4jP8O3iHxN5PQmzYCA-1; Wed, 28 Jan 2026 02:44:14 -0500
-X-MC-Unique: UkqN4jP8O3iHxN5PQmzYCA-1
-X-Mimecast-MFC-AGG-ID: UkqN4jP8O3iHxN5PQmzYCA_1769586254
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48070c21420so1066595e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jan 2026 23:44:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769586253; x=1770191053; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N2r8/rRraCmZGhd+qX9Y3lCkPKausqhtTQk0k54UGaw=;
-        b=gt+bxbDh5U2i8qh8qd5iT8lTAuLyg1777UtIw/jUElitPWiQV7XztvS7FqeBz8tc1H
-         B26eYiAYsC753cKcSNkTD3fPVbeVyto2evz5ubqqnaxkl0/MHlL85QJU3jqMsgDEUZCc
-         q0BbCqHDW/p6b8d0EhxKRJdW7xP6RSIeevn5B1oZcqyNj4VK6aI+/DkMnS41NRPnnEN/
-         oOjO5aQIkJmMNFDseo6TfMoH2c+Wlp/qyRrgl7ZgoGU4B7IAZAvoCra+Z2APo4f7Xk70
-         QkwcgSLOr+NSIOK5oVBtG05OJAFAQLJVm2h51sNt1IjLaPrYYBROCq/ajQMCObLPVCdz
-         JFjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769586253; x=1770191053;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N2r8/rRraCmZGhd+qX9Y3lCkPKausqhtTQk0k54UGaw=;
-        b=I2sXu1Ggkb5XjqbPBmf7lcVexg2nir3TPnAWn+dJkwH9yix5EdgbGBV4F2rH2KFkUK
-         jyc8TQ9EW6p6sgP4gKQpJhUZ+TkUVQICcRGg9jJRTc6pAo26fS/qbjd6kJtjHEYS92ZB
-         nVqXhtrxiiT4cTirBPtPJEgArUF+VoDmCYTP7eVoy0T3ao9Q5kqHdkIFE3ndrt5qAfWn
-         1meZGR1i3ha0E6Kohy5hWoPXcikCG+FxYClsez7IRpMNVDOX7cZMzjyshc6cxVEd79tj
-         byNOOPiOdhpQaLi+7tT/hVdqzs4LCoRI6AfJcFRSP82tb5JjKqZ986GPjmgqJfOf8uWQ
-         BWRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxHOIxybDjdzN+uIMXU42Lqj9Cog6ydFv7tLEM2gLjeRIf5Fo0HeeJnarSHRerY4VKX1l/00A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYAvsqLOooqK3M7P18Okzp7dClR0TY+9V1TM+lPrPOef7xvzke
-	FtqioAHCHEsJIwf2o5e+1ymU5z1ezHkn6f3UxOZW6MVqWAMXcya3ZXk6xYBzWz+CoGQLCBvWec/
-	pPxm2n5Hqs30RlBRXSHOCTvEv1MncCFHxzcq7rqJK6AxiGZTgoyRYJE0ysA==
-X-Gm-Gg: AZuq6aJfbhiCE2gmSx80IhDNM6rWRc8j1FIh7UCRQSr7HicCAgVy5Ks/fpcH9Ifmub6
-	hft/1Z1cko5EsxlUC5YxEb/RxOTLU0JGLulaeJhKmW0yF8FGZsFzcPyWVBQ7GWE5nowgnnha+Ct
-	STd0NndnW0o79vpKJyI5de+RbbE7P+DardkBut3SY2zjewHQ/8CMI+Z2/6cgR+mJeoRbYj18itA
-	ISyD3zTYm/gu+z+XBPvggzRBJZbBJezBmwy/RQVkolIAAOI5NZIqle38IbhDAPTCrFneixLOjRl
-	J0bR8ArZJjD3C00WrPaMFFmhjgKPSjnGyJJ5azD9erYCQ93EJlECVUPQ/E1SDaL7kl97YSqQqQQ
-	GUp3/6rSloKUs
-X-Received: by 2002:a05:600c:5742:b0:47e:e0b3:2437 with SMTP id 5b1f17b1804b1-48069e24623mr37363475e9.5.1769586253600;
-        Tue, 27 Jan 2026 23:44:13 -0800 (PST)
-X-Received: by 2002:a05:600c:5742:b0:47e:e0b3:2437 with SMTP id 5b1f17b1804b1-48069e24623mr37363235e9.5.1769586253131;
-        Tue, 27 Jan 2026 23:44:13 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066c428basm116931625e9.12.2026.01.27.23.44.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 23:44:12 -0800 (PST)
-Message-ID: <13f7664e-af7e-4c78-ba0c-b58b3ab59075@redhat.com>
-Date: Wed, 28 Jan 2026 08:44:10 +0100
+	 In-Reply-To:Content-Type; b=QXfkUV/n0uCXBXtbd/ntI5zhXDmqA5/QjDGBy491/W69Ia1qWd1Zwx+b7j/iYWynqtFYN+lIa6xtWp5Q/5hThGAUOBZo+vw+hsnsT7r4QkngAmAyxs2av29jpRiRIr4zUbWmkHukLOUeqT/rwi/30aex0VNA+LnTjyJViTW3LVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=JKfJAniW; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.38] ([129.217.186.38])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60S7rpqT026743
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 28 Jan 2026 08:53:51 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1769586832;
+	bh=RJpZbsGqYhQMnwJL6cFQDDTzLA15QLu6kSCexH+vLQM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=JKfJAniWA0VqNwLZyYUe74fLrCCYzysB56Ucdi6Pe1pSmfCbpEJfvHKLKGiaTa3JF
+	 jSaTA4EPvuJS3CxoNjJWL3t0IeY3dj8N/EwoN17EQaN8xBXhn8MmgTbDiJ7f/Ee9NA
+	 ehNTZPE1mxecu+orQ1vrQXnFlm8jzmPRXMgHAMFw=
+Message-ID: <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
+Date: Wed, 28 Jan 2026 08:53:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,84 +55,281 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 net-next 10/15] tcp: accecn: unset ECT if receive or
- send ACE=0 in AccECN negotiaion
-To: Jakub Kicinski <kuba@kernel.org>, chia-yu.chang@nokia-bell-labs.com
-Cc: edumazet@google.com, parav@nvidia.com, linux-doc@vger.kernel.org,
- corbet@lwn.net, horms@kernel.org, dsahern@kernel.org, kuniyu@google.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com,
- jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20260123100721.42451-1-chia-yu.chang@nokia-bell-labs.com>
- <20260123100721.42451-11-chia-yu.chang@nokia-bell-labs.com>
- <20260127120957.76e52cc5@kernel.org>
+Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
+ <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
+ <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
+ <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+ <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
+ <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
+ <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
+ <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
+ <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
+ <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260127120957.76e52cc5@kernel.org>
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	FREEMAIL_CC(0.00)[google.com,nvidia.com,vger.kernel.org,lwn.net,kernel.org,gmail.com,mojatatu.com,networkplumber.org,resnulli.us,davemloft.net,lunn.ch,fiberby.net,nokia-bell-labs.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-254141-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-254142-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ietf.org:url,nokia-bell-labs.com:email]
-X-Rspamd-Queue-Id: B7B899DD58
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid]
+X-Rspamd-Queue-Id: 56D7B9DE27
 X-Rspamd-Action: no action
 
-On 1/27/26 9:09 PM, Jakub Kicinski wrote:
-> On Fri, 23 Jan 2026 11:07:16 +0100 chia-yu.chang@nokia-bell-labs.com
-> wrote:
->> Based on specification:
->>   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
+On 1/28/26 08:03, Jason Wang wrote:
+> On Wed, Jan 28, 2026 at 12:48 AM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
 >>
->> Based on Section 3.1.5 of AccECN spec (RFC9768), a TCP Server in
->> AccECN mode MUST NOT set ECT on any packet for the rest of the connection,
->> if it has received or sent at least one valid SYN or Acceptable SYN/ACK
->> with (AE,CWR,ECE) = (0,0,0) during the handshake.
->>
->> In addition, a host in AccECN mode that is feeding back the IP-ECN
->> field on a SYN or SYN/ACK MUST feed back the IP-ECN field on the
->> latest valid SYN or acceptable SYN/ACK to arrive.
+>> On 1/23/26 10:54, Simon Schippers wrote:
+>>> On 1/23/26 04:05, Jason Wang wrote:
+>>>> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>>>
+>>>>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
+>>>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>>>
+>>>>>> On 1/9/26 07:02, Jason Wang wrote:
+>>>>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
+>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>>>>>
+>>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
+>>>>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>>>>>>>
+>>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
+>>>>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
+>>>>>>>>>> space in the underlying ptr_ring.
+>>>>>>>>>>
+>>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
+>>>>>>>>>> in an upcoming commit.
+>>>>>>>>>>
+>>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>>>>> ---
+>>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
+>>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
+>>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
+>>>>>>>>>> --- a/drivers/net/tap.c
+>>>>>>>>>> +++ b/drivers/net/tap.c
+>>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>>>>>>>         return ret ? ret : total;
+>>>>>>>>>>  }
+>>>>>>>>>>
+>>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
+>>>>>>>>>> +{
+>>>>>>>>>> +       struct ptr_ring *ring = &q->ring;
+>>>>>>>>>> +       struct net_device *dev;
+>>>>>>>>>> +       void *ptr;
+>>>>>>>>>> +
+>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
+>>>>>>>>>> +
+>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
+>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>>>>>>>> +               rcu_read_lock();
+>>>>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
+>>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
+>>>>>>>>>> +               rcu_read_unlock();
+>>>>>>>>>> +       }
+>>>>>>>>>> +
+>>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
+>>>>>>>>>> +
+>>>>>>>>>> +       return ptr;
+>>>>>>>>>> +}
+>>>>>>>>>> +
+>>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>>>>>>                            struct iov_iter *to,
+>>>>>>>>>>                            int noblock, struct sk_buff *skb)
+>>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>>>>>>>>>>                                         TASK_INTERRUPTIBLE);
+>>>>>>>>>>
+>>>>>>>>>>                 /* Read frames from the queue */
+>>>>>>>>>> -               skb = ptr_ring_consume(&q->ring);
+>>>>>>>>>> +               skb = tap_ring_consume(q);
+>>>>>>>>>>                 if (skb)
+>>>>>>>>>>                         break;
+>>>>>>>>>>                 if (noblock) {
+>>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
+>>>>>>>>>> --- a/drivers/net/tun.c
+>>>>>>>>>> +++ b/drivers/net/tun.c
+>>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>>>>>>>         return total;
+>>>>>>>>>>  }
+>>>>>>>>>>
+>>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
+>>>>>>>>>> +{
+>>>>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
+>>>>>>>>>> +       struct net_device *dev;
+>>>>>>>>>> +       void *ptr;
+>>>>>>>>>> +
+>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
+>>>>>>>>>> +
+>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
+>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>>>>>>>
+>>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
+>>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
+>>>>>>>>> another call to tweak the current API.
+>>>>>>>>>
+>>>>>>>>>> +               rcu_read_lock();
+>>>>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
+>>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
+>>>>>>>>>
+>>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
+>>>>>>>>> I'm not sure is what we want.
+>>>>>>>>
+>>>>>>>> What else would you suggest calling to wake the queue?
+>>>>>>>
+>>>>>>> I don't have a good method in my mind, just want to point out its implications.
+>>>>>>
+>>>>>> I have to admit I'm a bit stuck at this point, particularly with this
+>>>>>> aspect.
+>>>>>>
+>>>>>> What is the correct way to pass the producer CPU ID to the consumer?
+>>>>>> Would it make sense to store smp_processor_id() in the tfile inside
+>>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
+>>>>>> XDP bit)? In the latter case, my concern is that this information may
+>>>>>> already be significantly outdated by the time it is used.
+>>>>>>
+>>>>>> Based on that, my idea would be for the consumer to wake the producer by
+>>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
+>>>>>> smp_call_function_single().
+>>>>>> Is this a reasonable approach?
+>>>>>
+>>>>> I'm not sure but it would introduce costs like IPI.
+>>>>>
+>>>>>>
+>>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
+>>>>>> considered a deal-breaker for the patch set?
+>>>>>
+>>>>> It depends on whether or not it has effects on the performance.
+>>>>> Especially when vhost is pinned.
+>>>>
+>>>> I meant we can benchmark to see the impact. For example, pin vhost to
+>>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
+>>>>
+>>>> Thanks
+>>>>
+>>>
+>>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
+>>> for both the stock and patched versions. The benchmarks were run with
+>>> the full patch series applied, since testing only patches 1-3 would not
+>>> be meaningful - the queue is never stopped in that case, so no
+>>> TX_SOFTIRQ is triggered.
+>>>
+>>> Compared to the non-pinned CPU benchmarks in the cover letter,
+>>> performance is lower for pktgen with a single thread but higher with
+>>> four threads. The results show no regression for the patched version,
+>>> with even slight performance improvements observed:
+>>>
+>>> +-------------------------+-----------+----------------+
+>>> | pktgen benchmarks to    | Stock     | Patched with   |
+>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
+>>> | 100M packets            |           |                |
+>>> | vhost pinned to core 0  |           |                |
+>>> +-----------+-------------+-----------+----------------+
+>>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
+>>> |  +        +-------------+-----------+----------------+
+>>> | vhost-net | Lost        | 1154 Kpps | 0              |
+>>> +-----------+-------------+-----------+----------------+
+>>>
+>>> +-------------------------+-----------+----------------+
+>>> | pktgen benchmarks to    | Stock     | Patched with   |
+>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
+>>> | 100M packets            |           |                |
+>>> | vhost pinned to core 0  |           |                |
+>>> | *4 threads*             |           |                |
+>>> +-----------+-------------+-----------+----------------+
+>>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
+>>> |  +        +-------------+-----------+----------------+
+>>> | vhost-net | Lost        | 1527 Kpps | 0              |
+>>> +-----------+-------------+-----------+----------------+
 > 
-> FWIW this series is marked as Changes Requested in patchwork. 
-> I don't think I did that, IDK why it's in that state :S
+> The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
+> the guest or an xdp program that did XDP_DROP in the guest.
 
-I was me. I went over the AI feedback and it looked legit and relevant
-to me: AFAICS the listener socket status is wrongly updated instead of
-the request socket and likely corrupted.
+I forgot to mention that these PPS values are per thread.
+So overall we have 71 Kpps * 4 = 284 Kpps and 79 Kpps * 4 = 326 Kpps,
+respectively. For packet loss, that comes out to 1154 Kpps * 4 =
+4616 Kpps and 0, respectively.
 
-I was sure I sent the feedback email before updating the series status,
-but I see it did not land anywhere - PEBKAC here, I'm sorry.
+Sorry about that!
 
-/P
+The pktgen benchmarks with a single thread look fine, right?
 
+I'll still look into using an XDP program that does XDP_DROP in the
+guest.
+
+Thanks!
+
+> 
+>>>
+>>> +------------------------+-------------+----------------+
+>>> | iperf3 TCP benchmarks  | Stock       | Patched with   |
+>>> | to Debian VM 120s      |             | fq_codel qdisc |
+>>> | vhost pinned to core 0 |             |                |
+>>> +------------------------+-------------+----------------+
+>>> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
+>>> |  +                     |             |                |
+>>> | vhost-net              |             |                |
+>>> +------------------------+-------------+----------------+
+>>>
+>>> +---------------------------+-------------+----------------+
+>>> | iperf3 TCP benchmarks     | Stock       | Patched with   |
+>>> | to Debian VM 120s         |             | fq_codel qdisc |
+>>> | vhost pinned to core 0    |             |                |
+>>> | *4 iperf3 client threads* |             |                |
+>>> +---------------------------+-------------+----------------+
+>>> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
+>>> |  +                        |             |                |
+>>> | vhost-net                 |             |                |
+>>> +---------------------------+-------------+----------------+
+>>
+>> What are your thoughts on this?
+>>
+>> Thanks!
+>>
+>>
+> 
+> Thanks
+> 
 
