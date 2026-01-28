@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-254135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-254136-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALpFGbC3eWlHygEAu9opvQ
-	(envelope-from <netdev+bounces-254135-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:16:00 +0100
+	id iC5zNcG4eWl8ygEAu9opvQ
+	(envelope-from <netdev+bounces-254136-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:20:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180BC9DA30
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:16:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537129DB46
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 08:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B0BE5301E7CF
-	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:14:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 98FCB304F224
+	for <lists+netdev@lfdr.de>; Wed, 28 Jan 2026 07:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BD733DEC4;
-	Wed, 28 Jan 2026 07:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E816333EAE7;
+	Wed, 28 Jan 2026 07:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="OkSqiWSe"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SAVrKCOZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB1B33A010;
-	Wed, 28 Jan 2026 07:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE4033F375;
+	Wed, 28 Jan 2026 07:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769584428; cv=none; b=RDQLVjZ2NdUVPrJZMIcDW33jG7X4pmRLs91zGnU/ZQA3Rpr6olK7LvffjRtUoHfZwX0jf7bVhGPdQHnaxoyZZ1eZg79zDT5Sln3OZ/IbghFgepfoYVQiOldVlYc7EoAvE5NqmeFdi9hkHcTT5HAowSu0+YeXlglL/5SOxBjBnDM=
+	t=1769584432; cv=none; b=Vh5yP/DQYiJDdB+w/LLZ2/qHUJBonUOm+OPiTfpH9BNsrz4w9qsAhXIJSloaorGi1ornf+we58yhYvWUBTX8jlVFL1DUeUIDLD2qS+bHSbPtuFxDnGCOQwDlnvyJZBDfh0u2W9VklknnuwIQiReST4F0AfJkNqg91rFufzM+omE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769584428; c=relaxed/simple;
-	bh=H2t4dNUqFkQg4jWXQ0+JQdLkKsTN4x3SADKE7x2bj2c=;
+	s=arc-20240116; t=1769584432; c=relaxed/simple;
+	bh=IXl2kAgehTYowxAWroz5Z1oWZiO8b1Em1YjHX1gh4qY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AmH8K400CQMV434CR8od7RViKnun42velrX1++eBN/hk7U0OlJcDVGgZmtJbttgngky2ec7Hpm5KfllLFdaSUcnnTcbZDZqWL3EBoxfptNKaFLKcVscs2AOF9MxXjcFgyDCfjPFyHNwxrPAe85pB3fw4VhNIe9qpQIPG2fqttpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=OkSqiWSe; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=DQWXHdp94KOTuyWjwXKod+QH0ctqEaZqaX+puU8Bgqm2l7GB9e3DHh/zqQCBmxpMzhIaYkB/fLhIOsGwHzl7LOHl5uP/cbbsNDZh25kupjVB7P1juCD9ArFf211RbgskSrkU+bJjiHFMxIUkQQ54qyFnSaQMsWMhuC2BfnNxyz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SAVrKCOZ; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S1MwrC3583353;
-	Tue, 27 Jan 2026 23:13:38 -0800
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60S4a2YT3054212;
+	Tue, 27 Jan 2026 23:13:41 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=d
-	sFdzb4xZ3RkWS2AUpghp1Zp9yrWbTiGOhJAI1bd7Bg=; b=OkSqiWSeVYrcdbK7l
-	ixEq9vQ+tdzrp+1xxwNIsu+hRnJgLXppWJFkZqwkcnjylIFw9z8SmEt/c6DKNEsD
-	xNq3JWRAsQeKTcob/sU5XkIQE2HzwiGOy6ac1SrghEBNeqJZwWMxMW/hsFxXuRBk
-	sSFN4MWRXhO4U8EyUCuQKok8XE3+u+h+cbXfJ759oFQfoiQxHmDkeSzWYQ4FEILy
-	5oV3jPTz0qjZfr6I6NnbBCfX73MTFl86F5Wus8QqmO4OL0W0u6BAVPZswh4vsRpR
-	RCNjP/2llG4p7DgwXx498OVpK2zEMGeQHkRrEPRZbPDfQEznunP83S0iuDsCSLsD
-	xn4Kw==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=c
+	Mo1d8loG0zy0tjyPOE4eEwhzt1vHGc5WFJ47GiBJZk=; b=SAVrKCOZWCcYwrzYd
+	gPfgUYyxA0u++xzac5DNAK6EpV7LqYKknz2MCoKgpPJQ5TEn43qlUuqXsbueMaav
+	4mCUupZ0MXK5E6pKWmYUKZuVxgk8IsRCanmNQdnyiQ1TgVG9pcyN//iUiYDtQZnb
+	hCaFifOgGHMVWSCgL4+0k9Ror6lNkCaGmz+qn0NItF5MVuaxDp2maA1OkZLFh7eb
+	DrYjow5fJ63n693emkEqmefPrh088xysQ1Gq5EJ5g/l4ODytwJL3AlbCBE+0C5wm
+	ZBqYAg/no1Bem7moPfa7hw7O6d92LYh9bXu+GZmxQK3uyD2qWP9xBIViJzCRafSr
+	EJTVA==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4by8r68kd9-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bvxfjqwyp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jan 2026 23:13:38 -0800 (PST)
+	Tue, 27 Jan 2026 23:13:41 -0800 (PST)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 27 Jan 2026 23:13:37 -0800
+ 15.2.1544.25; Tue, 27 Jan 2026 23:13:40 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 27 Jan 2026 23:13:37 -0800
+ Transport; Tue, 27 Jan 2026 23:13:40 -0800
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 28C673F7106;
-	Tue, 27 Jan 2026 23:13:33 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id C8A2B3F7108;
+	Tue, 27 Jan 2026 23:13:37 -0800 (PST)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
         "Ratheesh
  Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v6 12/13] octeontx2-af: npc: cn20k: add debugfs support
-Date: Wed, 28 Jan 2026 12:42:34 +0530
-Message-ID: <20260128071235.3577206-13-rkannoth@marvell.com>
+Subject: [PATCH net-next v6 13/13] octeontx2-af: npc: Use common structures
+Date: Wed, 28 Jan 2026 12:42:35 +0530
+Message-ID: <20260128071235.3577206-14-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260128071235.3577206-1-rkannoth@marvell.com>
 References: <20260128071235.3577206-1-rkannoth@marvell.com>
@@ -81,20 +81,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=Ka/fcAYD c=1 sm=1 tr=0 ts=6979b722 cx=c_pps
+X-Proofpoint-GUID: o8dZDCGNine3I1baBheTBkPniQSeU-92
+X-Proofpoint-ORIG-GUID: o8dZDCGNine3I1baBheTBkPniQSeU-92
+X-Authority-Analysis: v=2.4 cv=S9LUAYsP c=1 sm=1 tr=0 ts=6979b725 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=VlSHqinqd2IHOLuXnyEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA1NyBTYWx0ZWRfX9CAbzYm76lp+
- lz2I1mjCh5Kd6gXYFP7+OKtcYKH+iVzZiGn7suWkw7vlNoUwr5RwaXQGUxG78LR2s6AMtJK/VW0
- UxMjThR08QA1pXVfp1wcmSnhUkIh//qreqmbNEz2z4zCs0ubXCEiqqXdEP2YdU5QPvWERkUlypB
- 3n5+XgQs/cIbuKOA5M4IZYGWXazVh9t6wP3Ce+uIgobYeGcwbutERnuOVGpyhdZNTrhLfWVfDBA
- T6NwwAPW1u0+PELM2uPKAXdMXYsRN4H1TBITpv7vG7LDxXJ3rrURsW98XLVHsDtDAKWjt3n+1xJ
- mbTdDi1e71um5D03HkBhmgH3UTmuhUOpTX6K/GcsWgkB3KShzaefsa6x0ax7hCk2NwWpq7OwUTf
- y0hR+nKZjRDy0NGOO80YK+iRxa8QKA2E3Gq+hM5UBivW3+qMO9YVhGjbxE2xMchcUEvXdU1vtBH
- ndDWm/O0847FBB0PQHQ==
-X-Proofpoint-GUID: sJxQ5tzPqsnoQnIpk1X-sY8l_ASslH_i
-X-Proofpoint-ORIG-GUID: sJxQ5tzPqsnoQnIpk1X-sY8l_ASslH_i
+ a=bNx57pydN-Y4TXDtlhsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA1NyBTYWx0ZWRfXywpXIhmeGC8e
+ PlKlZWJ/+43b7JAlk9rKQMtfbzsrdRVynldhnZxtadMLylpuKGbnKCxPPbvarVpU7rTuUodFFHb
+ ZbFPzXNkHq8GK01yl4k91Vh9jgb77Pa3+T7GJ+bnFI5WFJuI7lWfkHKqUVAzVXyrcsLXQ+aDtUn
+ CRXXmlL1jL+1bthjfJlUB+TVWvkJ2uUSZjy2/aymIJItq56d8090zayrppshRjpklEavltWxFJs
+ 3eoYAmD/fFyrPVcU8fcDks8G/KeN9TJrxseCBFNUDQoH5QcN2ZlK+CAasFfUDs+qmo8XWp4HXlz
+ aLMpFxSoZnU4KfXgMtFptQOwApp76wYCfRfw6oqY92bUKnpKzDqXyvbwb1gbO4TasRAMlz5HAlY
+ MMrnbR+/33Lg7HtgMYOizGD37hjLKFrYxZxBmdZ/iRb4eVhwvPjAng8FVN1flePRxbvOq5R7Cva
+ LbHHM8jjuhn2WujEH+Q==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-01-28_01,2026-01-27_03,2025-10-01_01
@@ -106,385 +106,213 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-254135-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-254136-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,marvell.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,marvell.com:dkim,marvell.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 180BC9DA30
+X-Rspamd-Queue-Id: 537129DB46
 X-Rspamd-Action: no action
 
-CN20K silicon divides the NPC MCAM into banks and subbanks, with each
-subbank configurable for x2 or x4 key widths. This patch adds debugfs
-entries to expose subbank usage details and their configured key type.
-
-A debugfs entry is also added to display the default MCAM indexes
-allocated for each pcifunc.
-
-Additionally, debugfs support is introduced to show the mapping between
-virtual indexes and real MCAM indexes, and vice versa.
+CN20K and legacy silicon differ in the size of key words used
+in NPC MCAM. However, SoC-specific structures are not required
+for low-level functions. Remove the SoC-specific structures
+and rename the macros to improve readability.
 
 Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- .../marvell/octeontx2/af/cn20k/debugfs.c      | 261 ++++++++++++++++++
- .../marvell/octeontx2/af/rvu_debugfs.c        |  41 ++-
- 2 files changed, 292 insertions(+), 10 deletions(-)
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 11 ++++---
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  | 16 ++++++----
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  2 +-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         | 31 ++++++++-----------
+ 4 files changed, 30 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-index 0ba123be6643..3debf2fae1a4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-@@ -15,8 +15,269 @@
- #include "debugfs.h"
- #include "cn20k/npc.h"
- 
-+static int npc_mcam_layout_show(struct seq_file *s, void *unused)
-+{
-+	int i, j, sbd, idx0, idx1, vidx0, vidx1;
-+	struct npc_priv_t *npc_priv;
-+	char buf0[32], buf1[32];
-+	struct npc_subbank *sb;
-+	unsigned int bw0, bw1;
-+	bool v0, v1;
-+	int pf1, pf2;
-+	bool e0, e1;
-+	void *map;
-+
-+	npc_priv = s->private;
-+
-+	sbd = npc_priv->subbank_depth;
-+
-+	for (i = npc_priv->num_subbanks - 1; i >= 0; i--) {
-+		sb = &npc_priv->sb[i];
-+		mutex_lock(&sb->lock);
-+
-+		if (sb->flags & NPC_SUBBANK_FLAG_FREE)
-+			goto next;
-+
-+		bw0 = bitmap_weight(sb->b0map, npc_priv->subbank_depth);
-+		if (sb->key_type == NPC_MCAM_KEY_X4) {
-+			seq_printf(s, "\n\nsubbank:%u, x4, free=%u, used=%u\n",
-+				   sb->idx, sb->free_cnt, bw0);
-+
-+			for (j = sbd - 1; j >= 0; j--) {
-+				if (!test_bit(j, sb->b0map))
-+					continue;
-+
-+				idx0 = sb->b0b + j;
-+				map = xa_load(&npc_priv->xa_idx2pf_map, idx0);
-+				pf1 = xa_to_value(map);
-+
-+				map = xa_load(&npc_priv->xa_idx2vidx_map, idx0);
-+				if (map) {
-+					vidx0 = xa_to_value(map);
-+					snprintf(buf0, sizeof(buf0),
-+						 "v:%u", vidx0);
-+				}
-+
-+				seq_printf(s, "\t%u(%#x) %s\n", idx0, pf1,
-+					   map ? buf0 : " ");
-+			}
-+			goto next;
-+		}
-+
-+		bw1 = bitmap_weight(sb->b1map, npc_priv->subbank_depth);
-+		seq_printf(s, "\n\nsubbank:%u, x2, free=%u, used=%u\n",
-+			   sb->idx, sb->free_cnt, bw0 + bw1);
-+		seq_printf(s, "bank1(%u)\t\tbank0(%u)\n", bw1, bw0);
-+
-+		for (j = sbd - 1; j >= 0; j--) {
-+			e0 = test_bit(j, sb->b0map);
-+			e1 = test_bit(j, sb->b1map);
-+
-+			if (!e1 && !e0)
-+				continue;
-+
-+			if (e1 && e0) {
-+				idx0 = sb->b0b + j;
-+				map = xa_load(&npc_priv->xa_idx2pf_map, idx0);
-+				pf1 = xa_to_value(map);
-+
-+				map = xa_load(&npc_priv->xa_idx2vidx_map, idx0);
-+				v0 = !!map;
-+				if (v0) {
-+					vidx0 = xa_to_value(map);
-+					snprintf(buf0, sizeof(buf0), "v:%05u",
-+						 vidx0);
-+				}
-+
-+				idx1 = sb->b1b + j;
-+				map = xa_load(&npc_priv->xa_idx2pf_map, idx1);
-+				pf2 = xa_to_value(map);
-+
-+				map = xa_load(&npc_priv->xa_idx2vidx_map, idx1);
-+				v1 = !!map;
-+				if (v1) {
-+					vidx1 = xa_to_value(map);
-+					snprintf(buf1, sizeof(buf1), "v:%05u",
-+						 vidx1);
-+				}
-+
-+				seq_printf(s, "%05u(%#x) %s\t\t%05u(%#x) %s\n",
-+					   idx1, pf2, v1 ? buf1 : "       ",
-+					   idx0, pf1, v0 ? buf0 : "       ");
-+
-+				continue;
-+			}
-+
-+			if (e0) {
-+				idx0 = sb->b0b + j;
-+				map = xa_load(&npc_priv->xa_idx2pf_map, idx0);
-+				pf1 = xa_to_value(map);
-+
-+				map = xa_load(&npc_priv->xa_idx2vidx_map, idx0);
-+				if (map) {
-+					vidx0 = xa_to_value(map);
-+					snprintf(buf0, sizeof(buf0), "v:%05u",
-+						 vidx0);
-+				}
-+
-+				seq_printf(s, "\t\t   \t\t%05u(%#x) %s\n", idx0,
-+					   pf1, map ? buf0 : " ");
-+				continue;
-+			}
-+
-+			idx1 = sb->b1b + j;
-+			map = xa_load(&npc_priv->xa_idx2pf_map, idx1);
-+			pf1 = xa_to_value(map);
-+			map = xa_load(&npc_priv->xa_idx2vidx_map, idx1);
-+			if (map) {
-+				vidx1 = xa_to_value(map);
-+				snprintf(buf1, sizeof(buf1), "v:%05u", vidx1);
-+			}
-+
-+			seq_printf(s, "%05u(%#x) %s\n", idx1, pf1,
-+				   map ? buf1 : " ");
-+		}
-+next:
-+		mutex_unlock(&sb->lock);
-+	}
-+	return 0;
-+}
-+
-+DEFINE_SHOW_ATTRIBUTE(npc_mcam_layout);
-+
-+static int npc_mcam_default_show(struct seq_file *s, void *unused)
-+{
-+	struct npc_priv_t *npc_priv;
-+	unsigned long index;
-+	u16 ptr[4], pcifunc;
-+	struct rvu *rvu;
-+	int rc, i;
-+	void *map;
-+
-+	npc_priv = npc_priv_get();
-+	rvu = s->private;
-+
-+	seq_puts(s, "\npcifunc\tBcast\tmcast\tpromisc\tucast\n");
-+
-+	xa_for_each(&npc_priv->xa_pf_map, index, map) {
-+		pcifunc = index;
-+
-+		for (i = 0; i < ARRAY_SIZE(ptr); i++)
-+			ptr[i] = USHRT_MAX;
-+
-+		rc = npc_cn20k_dft_rules_idx_get(rvu, pcifunc, &ptr[0],
-+						 &ptr[1], &ptr[2], &ptr[3]);
-+		if (rc)
-+			continue;
-+
-+		seq_printf(s, "%#x\t", pcifunc);
-+		for (i = 0; i < ARRAY_SIZE(ptr); i++) {
-+			if (ptr[i] != USHRT_MAX)
-+				seq_printf(s, "%u\t", ptr[i]);
-+			else
-+				seq_puts(s, "\t");
-+		}
-+		seq_puts(s, "\n");
-+	}
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(npc_mcam_default);
-+
-+static int npc_vidx2idx_map_show(struct seq_file *s, void *unused)
-+{
-+	struct npc_priv_t *npc_priv;
-+	unsigned long index, start;
-+	struct xarray *xa;
-+	void *map;
-+
-+	npc_priv = s->private;
-+	start = npc_priv->bank_depth * 2;
-+	xa = &npc_priv->xa_vidx2idx_map;
-+
-+	seq_puts(s, "\nvidx\tmcam_idx\n");
-+
-+	xa_for_each_start(xa, index, map, start)
-+		seq_printf(s, "%lu\t%lu\n", index, xa_to_value(map));
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(npc_vidx2idx_map);
-+
-+static int npc_idx2vidx_map_show(struct seq_file *s, void *unused)
-+{
-+	struct npc_priv_t *npc_priv;
-+	unsigned long index;
-+	struct xarray *xa;
-+	void *map;
-+
-+	npc_priv = s->private;
-+	xa = &npc_priv->xa_idx2vidx_map;
-+
-+	seq_puts(s, "\nmidx\tvidx\n");
-+
-+	xa_for_each(xa, index, map)
-+		seq_printf(s, "%lu\t%lu\n", index, xa_to_value(map));
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(npc_idx2vidx_map);
-+
-+static int npc_defrag_show(struct seq_file *s, void *unused)
-+{
-+	struct npc_defrag_show_node *node;
-+	struct npc_priv_t *npc_priv;
-+	u16 sbd, bdm;
-+
-+	npc_priv = s->private;
-+	bdm = npc_priv->bank_depth - 1;
-+	sbd = npc_priv->subbank_depth;
-+
-+	seq_puts(s, "\nold(sb)   ->    new(sb)\t\tvidx\n");
-+
-+	mutex_lock(&npc_priv->lock);
-+	list_for_each_entry(node, &npc_priv->defrag_lh, list)
-+		seq_printf(s, "%u(%u)\t%u(%u)\t%u\n", node->old_midx,
-+			   (node->old_midx & bdm) / sbd,
-+			   node->new_midx,
-+			   (node->new_midx & bdm) / sbd,
-+			   node->vidx);
-+	mutex_unlock(&npc_priv->lock);
-+	return 0;
-+}
-+
-+DEFINE_SHOW_ATTRIBUTE(npc_defrag);
-+
- int npc_cn20k_debugfs_init(struct rvu *rvu)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+index 8322427c8390..703d08dd14ff 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+@@ -3945,10 +3945,10 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
+ 				     struct npc_get_num_kws_req *req,
+ 				     struct npc_get_num_kws_rsp *rsp)
  {
-+	struct npc_priv_t *npc_priv = npc_priv_get();
-+	struct dentry *npc_dentry;
++	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
++	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
+ 	struct rvu_npc_mcam_rule dummy = { 0 };
+-	struct cn20k_mcam_entry cn20k_entry = { 0 };
+ 	struct mcam_entry_mdata mdata = { };
+-	struct mcam_entry entry = { 0 };
+ 	struct npc_install_flow_req *fl;
+ 	int i, cnt = 0, blkaddr;
+ 
+@@ -3965,7 +3965,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
+ 		return NPC_MCAM_INVALID_REQ;
+ 	}
+ 
+-	npc_populate_mcam_mdata(rvu, &mdata, &cn20k_entry, &entry);
++	mdata.kw = kw;
++	mdata.kw_mask = kw_mask;
+ 
+ 	npc_update_flow(rvu, &mdata, fl->features, &fl->packet,
+ 			&fl->mask, &dummy, fl->intf, blkaddr);
+@@ -3973,8 +3974,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
+ 	/* Find the most significant word valid. Traverse from
+ 	 * MSB to LSB, check if cam0 or cam1 is set
+ 	 */
+-	for (i = NPC_CN20K_MAX_KWS_IN_KEY - 1; i >= 0; i--) {
+-		if (cn20k_entry.kw[i] || cn20k_entry.kw_mask[i]) {
++	for (i = NPC_KWS_IN_KEY_SZ_MAX - 1; i >= 0; i--) {
++		if (kw[i] || kw_mask[i]) {
+ 			cnt = i + 1;
+ 			break;
+ 		}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index 2d9f6cb4820f..dc42c81c0942 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -1593,18 +1593,22 @@ struct mcam_entry_mdata {
+ 	u8 max_kw;
+ };
+ 
++enum npc_kws_in_key_sz {
++	NPC_KWS_IN_KEY_SZ_7 = 7,
++	NPC_KWS_IN_KEY_SZ_8 = 8,
++	NPC_KWS_IN_KEY_SZ_MAX,
++};
 +
-+	npc_dentry = debugfs_create_file("mcam_layout", 0444, rvu->rvu_dbg.npc,
-+					 npc_priv, &npc_mcam_layout_fops);
-+
-+	if (!npc_dentry)
-+		return -EFAULT;
-+
-+	npc_dentry = debugfs_create_file("mcam_default", 0444, rvu->rvu_dbg.npc,
-+					 rvu, &npc_mcam_default_fops);
-+
-+	if (!npc_dentry)
-+		return -EFAULT;
-+
-+	npc_dentry = debugfs_create_file("vidx2idx", 0444, rvu->rvu_dbg.npc,
-+					 npc_priv, &npc_vidx2idx_map_fops);
-+	if (!npc_dentry)
-+		return -EFAULT;
-+
-+	npc_dentry = debugfs_create_file("idx2vidx", 0444, rvu->rvu_dbg.npc,
-+					 npc_priv, &npc_idx2vidx_map_fops);
-+	if (!npc_dentry)
-+		return -EFAULT;
-+
-+	npc_dentry = debugfs_create_file("defrag", 0444, rvu->rvu_dbg.npc,
-+					 npc_priv, &npc_defrag_fops);
-+	if (!npc_dentry)
-+		return -EFAULT;
-+
- 	return 0;
+ struct mcam_entry {
+-#define NPC_MAX_KWS_IN_KEY	7 /* Number of keywords in max keywidth */
+-	u64	kw[NPC_MAX_KWS_IN_KEY];
+-	u64	kw_mask[NPC_MAX_KWS_IN_KEY];
++	u64	kw[NPC_KWS_IN_KEY_SZ_7];
++	u64	kw_mask[NPC_KWS_IN_KEY_SZ_7];
+ 	u64	action;
+ 	u64	vtag_action;
+ };
+ 
+ struct cn20k_mcam_entry {
+-#define NPC_CN20K_MAX_KWS_IN_KEY	8
+-	u64	kw[NPC_CN20K_MAX_KWS_IN_KEY];
+-	u64	kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
++	u64	kw[NPC_KWS_IN_KEY_SZ_8];
++	u64	kw_mask[NPC_KWS_IN_KEY_SZ_8];
+ 	u64	action;
+ 	u64	vtag_action;
+ 	u64	action2;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index f811d6b5c545..a466181cf908 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -197,7 +197,7 @@ struct npc_key_field {
+ 	/* Masks where all set bits indicate position
+ 	 * of a field in the key
+ 	 */
+-	u64 kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
++	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX];
+ 	/* Number of words in the key a field spans. If a field is
+ 	 * of 16 bytes and key offset is 4 then the field will use
+ 	 * 4 bytes in KW0, 8 bytes in KW1 and 4 bytes in KW2 and
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 7a48ba1db5e9..53737953a225 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -227,7 +227,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
+ 		input = &mcam->tx_key_fields[type];
+ 	}
+ 
+-	kws = NPC_MAX_KWS_IN_KEY;
++	kws = NPC_KWS_IN_KEY_SZ_7;
+ 
+ 	if (is_cn20k(rvu->pdev))
+ 		goto skip_cn10k_config;
+@@ -289,7 +289,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
+ 			 * field bits
+ 			 */
+ 			if (npc_check_overlap_fields(dummy, input,
+-						     NPC_CN20K_MAX_KWS_IN_KEY))
++						     NPC_KWS_IN_KEY_SZ_8))
+ 				return true;
+ 		}
+ 	}
+@@ -460,9 +460,9 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
+ 	u8 start_lid;
+ 
+ 	if (is_cn20k(rvu->pdev))
+-		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
++		max_kw = NPC_KWS_IN_KEY_SZ_8;
+ 	else
+-		max_kw = NPC_MAX_KWS_IN_KEY;
++		max_kw = NPC_KWS_IN_KEY_SZ_7;
+ 
+ 	key_fields = mcam->rx_key_fields;
+ 	features = &mcam->rx_features;
+@@ -906,12 +906,12 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+ 		      struct mcam_entry_mdata *mdata, u64 val_lo,
+ 		      u64 val_hi, u64 mask_lo, u64 mask_hi, u8 intf)
+ {
+-	struct cn20k_mcam_entry cn20k_dummy = { {0} };
++	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
++	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+-	struct mcam_entry dummy = { {0} };
+-	u64 *kw, *kw_mask, *val, *mask;
+ 	struct npc_key_field *field;
+ 	u64 kw1, kw2, kw3;
++	u64 *val, *mask;
+ 	int i, max_kw;
+ 	u8 shift;
+ 
+@@ -922,15 +922,10 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+ 	if (!field->nr_kws)
+ 		return;
+ 
+-	if (is_cn20k(rvu->pdev)) {
+-		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
+-		kw = cn20k_dummy.kw;
+-		kw_mask = cn20k_dummy.kw_mask;
+-	} else {
+-		max_kw = NPC_MAX_KWS_IN_KEY;
+-		kw = dummy.kw;
+-		kw_mask = dummy.kw_mask;
+-	}
++	if (is_cn20k(rvu->pdev))
++		max_kw = NPC_KWS_IN_KEY_SZ_8;
++	else
++		max_kw = NPC_KWS_IN_KEY_SZ_7;
+ 
+ 	for (i = 0; i < max_kw; i++) {
+ 		if (!field->kw_mask[i])
+@@ -1315,14 +1310,14 @@ npc_populate_mcam_mdata(struct rvu *rvu,
+ 		mdata->kw_mask = cn20k_entry->kw_mask;
+ 		mdata->action = &cn20k_entry->action;
+ 		mdata->vtag_action = &cn20k_entry->vtag_action;
+-		mdata->max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
++		mdata->max_kw = NPC_KWS_IN_KEY_SZ_8;
+ 		return;
+ 	}
+ 	mdata->kw = entry->kw;
+ 	mdata->kw_mask = entry->kw_mask;
+ 	mdata->action = &entry->action;
+ 	mdata->vtag_action = &entry->vtag_action;
+-	mdata->max_kw = NPC_MAX_KWS_IN_KEY;
++	mdata->max_kw = NPC_KWS_IN_KEY_SZ_7;
  }
  
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 620724dad093..413f9fa40b33 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -23,6 +23,7 @@
- 
- #include "cn20k/reg.h"
- #include "cn20k/debugfs.h"
-+#include "cn20k/npc.h"
- 
- #define DEBUGFS_DIR_NAME "octeontx2"
- 
-@@ -3197,7 +3198,9 @@ static void rvu_print_npc_mcam_info(struct seq_file *s,
- static int rvu_dbg_npc_mcam_info_display(struct seq_file *filp, void *unsued)
- {
- 	struct rvu *rvu = filp->private;
-+	int x4_free, x2_free, sb_free;
- 	int pf, vf, numvfs, blkaddr;
-+	struct npc_priv_t *npc_priv;
- 	struct npc_mcam *mcam;
- 	u16 pcifunc, counters;
- 	u64 cfg;
-@@ -3211,16 +3214,34 @@ static int rvu_dbg_npc_mcam_info_display(struct seq_file *filp, void *unsued)
- 
- 	seq_puts(filp, "\nNPC MCAM info:\n");
- 	/* MCAM keywidth on receive and transmit sides */
--	cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_KEX_CFG(NIX_INTF_RX));
--	cfg = (cfg >> 32) & 0x07;
--	seq_printf(filp, "\t\t RX keywidth \t: %s\n", (cfg == NPC_MCAM_KEY_X1) ?
--		   "112bits" : ((cfg == NPC_MCAM_KEY_X2) ?
--		   "224bits" : "448bits"));
--	cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_KEX_CFG(NIX_INTF_TX));
--	cfg = (cfg >> 32) & 0x07;
--	seq_printf(filp, "\t\t TX keywidth \t: %s\n", (cfg == NPC_MCAM_KEY_X1) ?
--		   "112bits" : ((cfg == NPC_MCAM_KEY_X2) ?
--		   "224bits" : "448bits"));
-+	if (is_cn20k(rvu->pdev)) {
-+		npc_priv = npc_priv_get();
-+		seq_printf(filp, "\t\t RX keywidth \t: %s\n",
-+			   (npc_priv->kw == NPC_MCAM_KEY_X1) ?
-+			   "256bits" : "512bits");
-+
-+		npc_cn20k_subbank_calc_free(rvu, &x2_free, &x4_free, &sb_free);
-+		seq_printf(filp, "\t\t free x4 slots\t: %d\n", x4_free);
-+
-+		seq_printf(filp, "\t\t free x2 slots\t: %d\n", x2_free);
-+
-+		seq_printf(filp, "\t\t free subbanks\t: %d\n", sb_free);
-+	} else {
-+		cfg = rvu_read64(rvu, blkaddr,
-+				 NPC_AF_INTFX_KEX_CFG(NIX_INTF_RX));
-+		cfg = (cfg >> 32) & 0x07;
-+		seq_printf(filp, "\t\t RX keywidth \t: %s\n",
-+			   (cfg == NPC_MCAM_KEY_X1) ?
-+			   "112bits" : ((cfg == NPC_MCAM_KEY_X2) ?
-+					"224bits" : "448bits"));
-+		cfg = rvu_read64(rvu, blkaddr,
-+				 NPC_AF_INTFX_KEX_CFG(NIX_INTF_TX));
-+		cfg = (cfg >> 32) & 0x07;
-+		seq_printf(filp, "\t\t TX keywidth \t: %s\n",
-+			   (cfg == NPC_MCAM_KEY_X1) ?
-+			   "112bits" : ((cfg == NPC_MCAM_KEY_X2) ?
-+					"224bits" : "448bits"));
-+	}
- 
- 	mutex_lock(&mcam->lock);
- 	/* MCAM entries */
+ static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
 -- 
 2.43.0
 
